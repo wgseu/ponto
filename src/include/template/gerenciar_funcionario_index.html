@@ -1,0 +1,92 @@
+<!--{include header_gerenciar}-->
+<script type="text/javascript">$(function(){Gerenciar.funcionario.init();});</script>
+<div class="row">
+	<div class="page-title">
+		<div class="col-lg-2 col-md-2 col-sm-2 col-xs-12">
+			<h3>Funcionários</h3>
+		</div>
+		<form method="get" action="/gerenciar/funcionario/" id="search-form">
+			<div class="form-group col-lg-2 col-md-5 col-sm-5 col-xs-6">
+				<label for="funcao">Função:</label>
+				<select class="form-control" id="funcao" name="funcao">
+					${Utility::Option($funcoes, $_GET['funcao'], 'Todas')}
+				</select>
+			</div>
+			<div class="form-group col-lg-2 col-md-3 col-sm-3 col-xs-6">
+				<label for="genero">Genero:</label>
+				<select class="form-control" id="genero" name="genero">
+					${Utility::Option($generos, $_GET['genero'], 'Todos')}
+				</select>
+			</div>
+			<div class="form-group col-lg-2 col-md-2 col-sm-2 col-xs-6">
+				<label for="estado">Estado:</label>
+				<select class="form-control" id="estado" name="estado">
+					${Utility::Option($estados, $_GET['estado'], 'Todos')}
+				</select>
+			</div>
+			<div class="form-group col-lg-4 col-md-12 col-sm-12 col-xs-6">
+				<label for="query">Busca:</label>
+				<div class="input-group">
+					<input type="text" class="form-control" id="query" name="query" placeholder="Nome, Telefone, E-mail ou CPF..." value="{$_GET['query']}">
+					<span class="input-group-btn">
+						<button class="btn btn-default" type="submit"><i class="fa fa-search"></i></button>
+					</span>
+				</div>
+			</div>
+		</form>
+	</div>
+	<div class="clearfix"></div>
+	<div class="">
+		<div class="col-md-12 col-sm-12 col-xs-12">
+			<div class="x_panel">
+				<div class="x_title">
+					<h2>Funcionários<small></small></h2>
+					<a href="/gerenciar/funcionario/cadastrar">
+						<button type="button" class="btn btn-info pull-right">Cadastrar</button>
+					</a>
+					<div class="clearfix"></div>
+				</div>
+				<div class="x_content x_scroll">
+					<table class="table">
+						<thead>
+							<tr>
+								<th>Nome</th>
+								<th>Função</th>
+								<th>Linguagem</th>
+								<th class="text-center">Data de cadastro</th>
+								<th width="10%" style="text-align: center;">Ações</th>
+							</tr>
+						</thead>
+						<tbody>
+<!--{loop $funcionarios $funcionario}-->
+							<tr ${$funcionario->isAtivo()?'':'class="active"'}>
+<!--${$_cliente = ZCliente::getPeloID($funcionario->getClienteID())}-->
+								<td><a href="/gerenciar/cliente/editar?id={$_cliente->getID()}" title="Editar cliente '{$_cliente->getNomeCompleto()}'"><img src="${get_image_url($_cliente->getImagem(), 'cliente', 'cliente.png')}" class="${$_cliente->getTipo() == ClienteTipo::FISICA?'rounded':''}" height="48" alt="Foto" title="Foto"/><strong>{$_cliente->getNomeCompleto()}</strong></a></td>
+<!--${$_funcao = ZFuncao::getPeloID($funcionario->getFuncaoID())}-->
+								<td><a href="/gerenciar/funcao/editar?id={$_funcao->getID()}" title="Editar função '{$_funcao->getDescricao()}'">{$_funcao->getDescricao()}</a></td>
+								<td>{$linguagens[$funcionario->getLinguagemID()]}</td>
+								<td class="text-center">
+									<strong title="Data de cadastro">${is_null($funcionario->getDataCadastro())?'':date('d/m/Y H:i', strtotime($funcionario->getDataCadastro()))}</strong>
+									<small title="Data de saída">${is_null($funcionario->getDataSaida())?'':date('d/m/Y H:i', strtotime($funcionario->getDataSaida()))}</small>
+								</td>
+								<td class="text-center">
+									<ul class="nav panel_toolbox">
+										<li>
+											<a href="/gerenciar/funcionario/editar?id={$funcionario->getID()}" title="Editar funcionário '{$_cliente->getNomeCompleto()}'"><i class="fa fa-edit"></i></a>
+										</li>
+										<li>
+											<a href="/gerenciar/funcionario/excluir?id={$funcionario->getID()}" title="Excluir funcionário '{$_cliente->getNomeCompleto()}'" class="ajaxlink" ask="Deseja excluir o funcionário '{$_cliente->getNomeCompleto()}'?"><i class="fa fa-close"></i></a>
+										</li>
+									</ul>
+								</td>
+							</tr>
+<!--{/loop}-->
+						</tbody>
+					</table>
+					{$pagestring}
+				</div>
+			</div>
+		</div>
+	</div>
+</div>	
+<!--{include footer_gerenciar}-->

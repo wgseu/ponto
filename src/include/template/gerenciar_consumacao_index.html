@@ -1,0 +1,70 @@
+<!--{include header_gerenciar}-->
+<script type="text/javascript">$(function(){Gerenciar.consumacao.init();});</script>
+<div class="row">
+	<div class="page-title">
+		<div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+			<h3>Consumações</h3>
+		</div>
+		<form method="get" action="/gerenciar/consumacao/" id="search-form">
+			<div class="form-group col-lg-3 col-md-3 col-sm-3 col-xs-6">
+				<label for="modulo">Módulo de venda:</label>
+				<select class="form-control" id="modulo" name="modulo">
+					${Utility::Option($modulos, $_GET['modulo'], 'Todos')}
+				</select>
+			</div>
+			<div class="form-group col-lg-3 col-md-3 col-sm-3 col-xs-6">
+				<label for="dia">Dia:</label>
+				<select class="form-control" id="dia" name="dia">
+					${Utility::Option($dias, $_GET['dia'], 'Todos')}
+				</select>
+			</div>
+		</form>
+	</div>
+	<div class="clearfix"></div>
+	<div class="">
+		<div class="col-md-12 col-sm-12 col-xs-12">
+			<div class="x_panel">
+				<div class="x_title">
+					<h2>Consumações<small></small></h2>
+					<a href="/gerenciar/consumacao/cadastrar">
+						<button type="button" class="btn btn-info pull-right">Cadastrar</button>
+					</a>
+					<div class="clearfix"></div>
+				</div>
+				<div class="x_content x_scroll">
+					<table class="table">
+						<thead>
+							<tr>
+								<th>Módulo de venda</th>
+								<th>Dia</th>
+								<th>Valor</th>
+								<th width="10%" style="text-align: center;">Ações</th>
+							</tr>
+						</thead>
+						<tbody>
+<!--{loop $consumacoes $consumacao}-->
+							<tr>
+								<td>{$modulos[$consumacao->getModulo()]}</td>
+								<td>{$dias[$consumacao->getDia()]}</td>
+								<td>R$ ${moneyit($consumacao->getValor())}</td>
+								<td class="text-center">
+									<ul class="nav panel_toolbox">
+										<li>
+											<a href="/gerenciar/consumacao/editar?id={$consumacao->getID()}" title="Editar consumação '{$consumacao->getModulo()}'"><i class="fa fa-edit"></i></a>
+										</li>
+										<li>
+											<a href="/gerenciar/consumacao/excluir?id={$consumacao->getID()}" title="Excluir consumação '{$consumacao->getModulo()}'" class="ajaxlink" ask="Deseja excluir a consumação '{$consumacao->getModulo()}'?"><i class="fa fa-close"></i></a>
+										</li>
+									</ul>
+								</td>
+							</tr>
+<!--{/loop}-->
+						</tbody>
+					</table>
+					{$pagestring}
+				</div>
+			</div>
+		</div>
+	</div>
+</div>	
+<!--{include footer_gerenciar}-->

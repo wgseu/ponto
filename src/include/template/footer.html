@@ -1,0 +1,49 @@
+    <footer>
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4">
+                    <span class="copyright">Copyright &copy; GrandChef ${date('Y')}</span>
+                </div>
+                <div class="col-md-4">
+                    <ul class="list-inline social-buttons">
+<!--{if !is_null($__empresa__->getTwitterURL())}-->
+                        <li><a href="{$__empresa__->getTwitterURL()}"><i class="fa fa-twitter"></i></a></li>
+<!--{/if}-->
+<!--{if !is_null($__empresa__->getFacebookURL())}-->
+                        <li><a href="{$__empresa__->getFacebookURL()}"><i class="fa fa-facebook"></i></a></li>
+<!--{/if}-->
+<!--{if !is_null($__empresa__->getLinkedInURL())}-->
+                        <li><a href="{$__empresa__->getLinkedInURL()}"><i class="fa fa-linkedin"></i></a></li>
+<!--{/if}-->
+                    </ul>
+                </div>
+                <div class="col-md-4">
+                    <ul class="list-inline quicklinks">
+                        <li><a href="/sobre/privacidade">Privacidade</a>
+                        </li>
+                        <li><a href="/sobre/termos">Termos de Uso</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Bootstrap Core JavaScript -->
+    <script src="/static/js/bootstrap.min.js"></script>
+
+    <!-- Plugin JavaScript -->
+    <script src="/static/js/jquery.easing.min.js"></script>
+    <script src="/static/js/classie.js"></script>
+    <script src="/static/js/cbpAnimatedHeader.js"></script>
+
+    <!-- Maked Input JavaScript -->
+    <script src="/static/js/jquery.maskedinput.min.js"></script>
+
+    <!-- Custom Theme JavaScript -->
+    <script src="/static/js/agency.js"></script>
+    <script type="text/javascript" src="${auto_version('/static/js/index.min.js')}"></script>
+    
+</body>
+
+</html>

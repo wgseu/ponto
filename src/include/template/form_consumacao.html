@@ -1,0 +1,19 @@
+<div class="form-group col-lg-3 col-md-4 col-sm-6 col-xs-12">
+	<label for="modulo">Módulo de venda:</label>
+	<select id="modulo" name="modulo" class="form-control">
+		<option value="Mesa" ${$consumacao->getModulo() == 'Mesa'?'selected':''}>Mesa</option>
+		<option value="Comanda" ${$consumacao->getModulo() == 'Comanda'?'selected':''}>Comanda</option>
+		<option value="Avulso" ${$consumacao->getModulo() == 'Avulso'?'selected':''}>Balcão</option>
+		<option value="Entrega" ${$consumacao->getModulo() == 'Entrega'?'selected':''}>Entrega</option>
+	</select>
+</div>
+<div class="form-group col-lg-3 col-md-4 col-sm-6 col-xs-12">
+	<label for="dia">Dia:</label>
+	<select class="form-control" id="dia" name="dia">
+		${Utility::Option($dias, $consumacao->getDia())}
+	</select>
+</div>
+<div class="form-group col-lg-3 col-md-4 col-sm-6 col-xs-12">
+	<label for="valor">Valor:</label>
+	<input type="text" id="valor" name="valor" class="numeric form-control" data-a-sep="." data-a-dec="," data-a-sign="R$ " value="{$consumacao->getValor()}">
+</div>

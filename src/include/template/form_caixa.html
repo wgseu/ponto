@@ -1,0 +1,9 @@
+<div class="form-group col-lg-3 col-md-4 col-sm-6 col-xs-12">
+	<label for="descricao">Descrição:</label>
+	<input type="text" id="descricao" name="descricao" class="form-control" value="{$caixa->getDescricao()}">
+</div>
+<div class="checkbox col-lg-3 col-md-4 col-sm-6 col-xs-12">
+	<label>
+		<input type="checkbox" id="ativo" name="ativo" value="Y" ${$caixa->getAtivo() == 'Y'?'checked':''}> Ativo
+	</label>
+</div>

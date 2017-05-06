@@ -1,0 +1,95 @@
+<!--{include header_gerenciar}-->
+<script type="text/javascript">$(function(){Gerenciar.folha_cheque.init();});</script>
+<div class="row">
+	<div class="page-title">
+		<div class="col-lg-4 col-md-6 col-sm-6 col-xs-6">
+			<h3>Folhas de cheques</h3>
+		</div>
+		<form method="get" action="/gerenciar/folha_cheque/" id="search-form">
+			<div class="form-group col-lg-2 col-md-6 col-sm-6 col-xs-6">
+				<label for="estado">Estado:</label>
+				<select class="form-control" id="estado" name="estado">
+					${Utility::Option($estados, $_GET['estado'], 'Todos')}
+				</select>
+			</div>
+			<input type="hidden" id="bancoid" name="bancoid" data-content="{$_banco->getRazaoSocial()}" value="{$_banco->getID()}">
+			<div class="form-group col-lg-3 col-md-6 col-sm-6 col-xs-12">
+				<label for="banco">Banco: <span class="identifier">{$_banco->getNumero()}<span></label>
+				<input type="text" id="banco" class="form-control" value="{$_banco->getRazaoSocial()}">
+			</div>
+			<input type="hidden" id="clienteid" name="clienteid" data-nome="{$_cliente->getNomeCompleto()}" value="{$_cliente->getID()}">
+			<div class="form-group col-lg-3 col-md-6 col-sm-6 col-xs-12">
+				<label for="cliente">Cliente: <span class="identifier">${mask($_cliente->getFone(1), '(99) 9999-9999?9')}<span></label>
+				<input type="text" id="cliente" class="form-control" value="{$_cliente->getNomeCompleto()}">
+			</div>
+			<input type="submit" style="position: absolute; left: -9999px; width: 1px; height: 1px;" tabindex="-1" />
+		</form>
+	</div>
+	<div class="clearfix"></div>
+	<div class="">
+		<div class="col-md-12 col-sm-12 col-xs-12">
+			<div class="x_panel">
+				<div class="x_title">
+					<h2>Folhas de cheques<small></small></h2>
+					<div class="clearfix"></div>
+				</div>
+				<div class="x_content x_scroll">
+					<table class="table">
+						<thead>
+							<tr>
+								<th>Cliente</th>
+								<th>Banco</th>
+								<th>Agência</th>
+								<th>Conta</th>
+								<th>Valor</th>
+								<th>Compensação</th>
+								<th>Número</th>
+								<th>Vencimento</th>
+								<th>C1</th>
+								<th>C2</th>
+								<th>C3</th>
+								<th>Série</th>
+								<th>Recolhido</th>
+								<th width="10%" style="text-align: center;">Ações</th>
+							</tr>
+						</thead>
+						<tbody>
+<!--{loop $folhas_de_cheques $folha_cheque}-->
+<!--${$_cheque = ZCheque::getPeloID($folha_cheque->getChequeID())}-->
+							<tr ${$_cheque->isCancelado()?'class="active"':($folha_cheque->isRecolhido()?'class="success"':'')}>
+<!--${$_banco = ZBanco::getPeloID($_cheque->getBancoID())}-->
+<!--${$_cliente = ZCliente::getPeloID($_cheque->getClienteID())}-->
+								<td>{$_cliente->getNomeCompleto()}</td>
+								<td><a href="/gerenciar/banco/editar?id={$_banco->getID()}" title="Editar banco '{$_banco->getRazaoSocial()}'">{$_banco->getRazaoSocial()}</a></td>
+								<td>{$_cheque->getAgencia()}</td>
+								<td>{$_cheque->getConta()}</td>
+								<td>R$ ${moneyit($folha_cheque->getValor())}</td>
+								<td>{$folha_cheque->getCompensacao()}</td>
+								<td>{$folha_cheque->getNumero()}</td>
+								<td>${is_null($folha_cheque->getVencimento())?'':date('d/m/Y H:i', strtotime($folha_cheque->getVencimento()))}</td>
+								<td>{$folha_cheque->getC(1)}</td>
+								<td>{$folha_cheque->getC(2)}</td>
+								<td>{$folha_cheque->getC(3)}</td>
+								<td>{$folha_cheque->getSerie()}</td>
+								<td>
+									<strong>${$folha_cheque->getRecolhido() == 'Y'?'Sim':'Não'}</strong>
+									<small>${is_null($folha_cheque->getRecolhimento())?'':date('d/m/Y H:i', strtotime($folha_cheque->getRecolhimento()))}</small>
+								</td>
+								<td class="text-center">
+									<ul class="nav panel_toolbox">
+										<li>
+											<a href="/gerenciar/folha_cheque/recolher?id={$folha_cheque->getID()}" title="Recolher folha de cheque '{$folha_cheque->getNumero()}' do cliente {$_cliente->getNomeCompleto()}" class="ajaxlink" ask="Deseja recolher a folha de cheque '{$folha_cheque->getNumero()}' do cliente {$_cliente->getNomeCompleto()}?"><i class="fa fa-university"></i></a>
+										</li>
+									</ul>
+								</td>
+							</tr>
+<!--{/loop}-->
+						</tbody>
+					</table>
+					{$pagestring}
+				</div>
+			</div>
+		</div>
+	</div>
+</div>	
+<!--{include footer_gerenciar}-->

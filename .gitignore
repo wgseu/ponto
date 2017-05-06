@@ -1,0 +1,5 @@
+/src/include/compiled/*.php
+/src/include/logs/*.txt
+/src/static/doc/xml/*/*/*.xml
+/src/static/doc/cert/*.pem
+/utils/*.sublime-workspace

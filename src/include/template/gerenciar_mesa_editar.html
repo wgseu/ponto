@@ -1,0 +1,24 @@
+<!--{include header_gerenciar}-->
+<script type="text/javascript">$(function(){Gerenciar.mesa.initForm('{$focusctrl}');});</script>
+<div class="row">
+	<div class="col-md-12 col-sm-12 col-xs-12">
+		<div class="x_panel">
+			<div class="x_title">
+				<h2>Mesa <small>Editando mesa: {$old_mesa->getNome()}</small></h2>
+				<div class="clearfix"></div>
+			</div>
+			<div class="x_content">
+				<form id="mesa-form" class="form-horizontal form-label-left" method="post" action="/gerenciar/mesa/editar?id={$mesa->getID()}" enctype="multipart/form-data">
+<!--{include form_mesa}-->
+					<div class="form-group">
+						<div class="col-md-12 col-sm-12 col-xs-12 text-center">
+							<div class="ln_solid"></div>
+							<button type="submit" class="btn btn-success">Salvar</button>
+						</div>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+</div>
+<!--{include footer_gerenciar}-->

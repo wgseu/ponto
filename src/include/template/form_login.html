@@ -1,0 +1,24 @@
+<div class="col-md-6">
+    <div class="form-group">
+		<input type="text" class="form-control" placeholder="Seu Usuário *" id="email" name="usuario" maxlength="160" value="{$_POST['usuario']}"/>
+        <p class="help-block text-danger"></p>
+    </div>
+</div>
+<div class="col-md-6">
+    <div class="form-group">
+		<input type="password" class="form-control" placeholder="Digite a senha *" id="login-password" name="senha" maxlength="60"/>
+        <p class="help-block text-danger"></p>
+    </div>
+</div>
+<div class="col-md-12">
+    <div class="checkbox">
+        <label>
+    		<input type="checkbox" class="inlradio" id="lembrar" name="lembrar" value="true" ${$_POST['lembrar'] == 'true'? 'checked': ''}>Manter conectado
+        </label>
+    </div>
+</div>
+<div class="clearfix"></div>
+<div class="col-lg-12 text-center">
+    <div id="success"></div>
+    <button type="submit" class="btn btn-xl">Entrar</button>
+</div>

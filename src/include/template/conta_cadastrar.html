@@ -1,0 +1,17 @@
+<!--{include header}-->
+<script type="text/javascript">$(function(){Cliente.conta.initForm('{$fieldfocus}');});</script>
+<section id="register" style="background-image: url('${get_site_image_url('Image.Cadastrar')}');">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12 text-center">
+                <h2 class="section-heading">Cadastrar conta</h2>
+            </div>
+        </div>
+        <div class="row">
+            <form id="cliente-form" action="/conta/cadastrar" method="post">
+<!--{include form_cliente_simple}-->
+            </form>
+        </div>
+    </div>
+</section>
+<!--{include footer}-->

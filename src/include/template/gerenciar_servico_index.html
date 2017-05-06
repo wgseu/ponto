@@ -1,0 +1,82 @@
+<!--{include header_gerenciar}-->
+<script type="text/javascript">$(function(){Gerenciar.servico.init();});</script>
+<div class="row">
+	<div class="page-title">
+		<div class="col-lg-6 col-md-4 col-sm-3 col-xs-6">
+			<h3>Serviços</h3>
+		</div>
+		<form method="get" action="/gerenciar/servico/" id="search-form">
+			<div class="form-group col-lg-2 col-md-3 col-sm-3 col-xs-6">
+				<label for="tipo">Tipo:</label>
+				<select class="form-control" id="tipo" name="tipo">
+					${Utility::Option($tipos, $_GET['tipo'], 'Todos')}
+				</select>
+			</div>
+			<div class="form-group col-lg-4 col-md-5 col-sm-6 col-xs-12">
+				<label for="query">Busca:</label>
+				<div class="input-group">
+					<input type="text" class="form-control" id="query" name="query" placeholder="Procurar..." value="{$_GET['query']}">
+					<span class="input-group-btn">
+						<button class="btn btn-default" type="submit"><i class="fa fa-search"></i></button>
+					</span>
+				</div>
+			</div>
+		</form>
+	</div>
+	<div class="clearfix"></div>
+	<div class="">
+		<div class="col-md-12 col-sm-12 col-xs-12">
+			<div class="x_panel">
+				<div class="x_title">
+					<h2>Serviços<small></small></h2>
+					<a href="/gerenciar/servico/cadastrar">
+						<button type="button" class="btn btn-info pull-right">Cadastrar</button>
+					</a>
+					<div class="clearfix"></div>
+				</div>
+				<div class="x_content x_scroll">
+					<table class="table">
+						<thead>
+							<tr>
+								<th>Descrição</th>
+								<th>Nome</th>
+								<th>Tipo</th>
+								<th>Obrigatório</th>
+								<th>Valor</th>
+								<th>Individual</th>
+								<th width="10%" style="text-align: center;">Ações</th>
+							</tr>
+						</thead>
+						<tbody>
+<!--{loop $servicos $servico}-->
+							<tr ${$servico->isAtivo()?'':'class="active"'}>
+								<td>
+									<strong>{$servico->getDescricao()}</strong>
+									<small>{$servico->getDetalhes()}</small>
+								</td>
+								<td>{$servico->getNome()}</td>
+								<td>{$tipos[$servico->getTipo()]}</td>
+								<td>${$servico->getObrigatorio() == 'Y'?'Sim':'Não'}</td>
+								<td>R$ ${moneyit($servico->getValor())}</td>
+								<td>${$servico->getIndividual() == 'Y'?'Sim':'Não'}</td>
+								<td class="text-center">
+									<ul class="nav panel_toolbox">
+										<li>
+											<a href="/gerenciar/servico/editar?id={$servico->getID()}" title="Editar serviço '{$servico->getDescricao()}'"><i class="fa fa-edit"></i></a>
+										</li>
+										<li>
+											<a href="/gerenciar/servico/excluir?id={$servico->getID()}" title="Excluir serviço '{$servico->getDescricao()}'" class="ajaxlink" ask="Deseja excluir a serviço '{$servico->getDescricao()}'?"><i class="fa fa-close"></i></a>
+										</li>
+									</ul>
+								</td>
+							</tr>
+<!--{/loop}-->
+						</tbody>
+					</table>
+					{$pagestring}
+				</div>
+			</div>
+		</div>
+	</div>
+</div>	
+<!--{include footer_gerenciar}-->

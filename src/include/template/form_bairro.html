@@ -1,0 +1,34 @@
+<div class="form-group col-lg-3 col-md-4 col-sm-4 col-xs-12">
+	<label for="paisid"><div class="cell-icon pais-icons" style="background-position: -{$pais->getBandeiraIndex() * 16}px 0px;"></div>País:</label>
+	<select class="form-control" id="paisid">
+<!--{loop $_paises $_pais}-->
+		<option value="{$_pais->getID()}" data-bandeira="{$_pais->getBandeiraIndex()}" data-codigo="{$_pais->getCodigo()}" data-sigla="{$_pais->getSigla()}" ${$pais->getID() == $_pais->getID()?'selected':''}>{$_pais->getNome()}</option>
+<!--{/loop}-->
+	</select>
+</div>
+<div class="form-group col-lg-3 col-md-4 col-sm-6 col-xs-12">
+	<label for="estadoid">Estado:</label>
+	<select class="form-control" id="estadoid">
+<!--{loop $_estados $_estado}-->
+		<option value="{$_estado->getID()}" ${$estado->getID() == $_estado->getID()?'selected':''}>{$_estado->getNome()}</option>
+<!--{/loop}-->
+	</select>
+</div>
+<input type="hidden" id="cidade" name="cidadeid" class="form-control" value="{$cidade->getID()}">
+<div class="form-group col-lg-3 col-md-4 col-sm-6 col-xs-12">
+	<label for="cidade">Cidade:</label>
+	<input type="text" id="cidadeid" class="form-control" value="{$cidade->getNome()}">
+</div>
+<div class="form-group col-lg-3 col-md-4 col-sm-6 col-xs-12">
+	<label for="nome">Nome:</label>
+	<input type="text" id="nome" name="nome" class="form-control" value="{$bairro->getNome()}">
+</div>
+<div class="form-group col-lg-3 col-md-4 col-sm-6 col-xs-12">
+	<label for="valorentrega">Valor da entrega:</label>
+	<input type="text" id="valorentrega" name="valorentrega" class="numeric form-control" data-a-sep="." data-a-dec="," data-a-sign="R$ " value="{$bairro->getValorEntrega()}">
+</div>
+<div class="checkbox col-lg-3 col-md-4 col-sm-6 col-xs-12">
+	<label>
+		<input type="checkbox" id="disponivel" name="disponivel" value="Y" ${$bairro->getDisponivel() == 'Y'?'checked':''}> Disponível
+	</label>
+</div>

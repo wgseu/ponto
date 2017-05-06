@@ -1,0 +1,12 @@
+Options -MultiViews
+RewriteEngine on
+
+IndexIgnore .htaccess */.??* *~ *
+
+RewriteRule ^static/img/produto/([0-9]+).png$ /produto/imagem/download.php?produto=$1 [NC,L]
+RewriteRule ^static/img/categoria/([0-9]+).png$ /categoria/imagem/download.php?categoria=$1 [NC,L]
+RewriteRule ^static/img/cliente/([0-9]+).png$ /conta/imagem/download.php?cliente=$1 [NC,L]
+RewriteRule ^include/.*$             /error404.html                                     [L,R=404]
+RewriteCond %{REQUEST_FILENAME} !-d 
+RewriteCond %{REQUEST_FILENAME}\.php -f 
+RewriteRule ^(.*)$ $1.php [L]

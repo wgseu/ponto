@@ -1,0 +1,70 @@
+<!--{include header_gerenciar}-->
+<script type="text/javascript">$(function(){Gerenciar.pagina.init();});</script>
+<div class="">
+	<div class="page-title">
+		<div class="title_left">
+		<h3>Páginas <small>Visualizar páginas</small></h3>
+		</div>
+		<div class="title_right">
+			<form method="get" action="/gerenciar/pagina/" id="search-form">
+				<div class="form-group col-lg-6 col-md-6 col-sm-12 col-xs-12">
+					<label for="nome">Página:</label>
+					<select class="form-control" id="nome" name="nome">
+						${Utility::Option($nomes, $_GET['nome'], 'Todas')}
+					</select>
+				</div>
+				<div class="form-group col-lg-6 col-md-6 col-sm-12 col-xs-12">
+					<label for="linguagemid">Idioma:</label>
+					<select class="form-control" id="linguagemid" name="linguagemid">
+						${Utility::Option($linguagens, $_GET['linguagemid'], 'Todos')}
+					</select>
+				</div>
+			</form>
+		</div>
+	</div>
+	<div class="clearfix"></div>
+	<div class="row">
+		<div class="col-md-12 col-sm-12 col-xs-12">
+			<div class="x_panel">
+				<div class="x_title">
+					<h2>Páginas<small></small></h2>
+					<a href="/gerenciar/pagina/cadastrar">
+						<button type="button" class="btn btn-info pull-right">Cadastrar</button>
+					</a>
+					<div class="clearfix"></div>
+				</div>
+				<div class="x_content x_scroll">
+					<table class="table">
+						<thead>
+							<tr>
+								<th>Nome</th>
+								<th>Linguagem</th>
+								<th width="10%" style="text-align: center;">Ações</th>
+							</tr>
+						</thead>
+						<tbody>
+<!--{loop $paginas $pagina}-->
+							<tr>
+								<td>{$nomes[$pagina->getNome()]}</td>
+								<td>{$linguagens[$pagina->getLinguagemID()]}</td>
+								<td class="text-center">
+									<ul class="nav panel_toolbox">
+										<li>
+											<a href="/gerenciar/pagina/editar?id={$pagina->getID()}" title="Editar página '{$pagina->getNome()}'"><i class="fa fa-edit"></i></a>
+										</li>
+										<li>
+											<a href="/gerenciar/pagina/excluir?id={$pagina->getID()}" title="Excluir página '{$pagina->getNome()}'" class="ajaxlink" ask="Deseja excluir a página '{$pagina->getNome()}'?"><i class="fa fa-close"></i></a>
+										</li>
+									</ul>
+								</td>
+							</tr>
+<!--{/loop}-->
+						</tbody>
+					</table>
+					{$pagestring}
+				</div>
+			</div>
+		</div>
+	</div>
+</div>	
+<!--{include footer_gerenciar}-->

@@ -1,0 +1,144 @@
+<!--{include header_gerenciar}-->
+<script type="text/javascript">$(function(){Gerenciar.pagamento.init();});</script>
+<div class="row">
+	<div class="page-title">
+		<div class="col-lg-2 col-md-3 col-sm-3 col-xs-12">
+			<h3>Pagamentos</h3>
+		</div>
+		<form method="get" action="/gerenciar/pagamento/" id="search-form">
+<!--${$_funcao = ZFuncao::getPeloID($_funcionario->getFuncaoID())}-->
+<!--${$_cliente_func = ZCliente::getPeloID($_funcionario->getClienteID())}-->
+			<input type="hidden" id="funcionarioid" name="funcionarioid" data-content="{$_cliente_func->getNomeCompleto()}" value="{$_funcionario->getID()}">
+			<div class="form-group col-lg-4 col-md-5 col-sm-5 col-xs-12">
+				<label for="funcionario">Funcionário(a): <span class="identifier">{$_funcao->getDescricao()}<span></label>
+				<input type="text" id="funcionario" class="form-control" value="{$_cliente_func->getNomeCompleto()}">
+			</div>
+			<div class="form-group col-lg-3 col-md-4 col-sm-4 col-xs-6">
+				<label for="formapagtoid">Forma de pagamento:</label>
+				<select class="form-control" id="formapagtoid" name="formapagtoid">
+					${Utility::Option($_forma_names, $_GET['formapagtoid'], 'Todas')}
+				</select>
+			</div>
+			<div class="form-group col-lg-3 col-md-3 col-sm-3 col-xs-6">
+				<label for="cartaoid">Cartão:</label>
+				<select class="form-control" id="cartaoid" name="cartaoid">
+					${Utility::Option($_cartao_names, $_GET['cartaoid'], 'Todos')}
+				</select>
+			</div>
+			<div class="form-group col-lg-2 col-md-3 col-sm-3 col-xs-6">
+				<label for="estado">Estado:</label>
+				<select class="form-control" id="estado" name="estado">
+					${Utility::Option($_estado_names, $_GET['estado'], 'Todos')}
+				</select>
+			</div>
+			<div class="form-group col-lg-3 col-md-3 col-sm-3 col-xs-6">
+				<label for="carteiraid">Carteira:</label>
+				<select class="form-control" id="carteiraid" name="carteiraid">
+					${Utility::Option($_carteira_names, $_GET['carteiraid'], 'Todas')}
+				</select>
+			</div>
+			<div class="form-group col-lg-2 col-md-3 col-sm-3 col-xs-6">
+				<label for="inicio">Data inicial:</label>
+				<input type="text" id="inicio" name="inicio" class="datetime-picker form-control" value="{$_GET['inicio']}">
+			</div>
+			<div class="form-group col-lg-2 col-md-3 col-sm-3 col-xs-6">
+				<label for="fim">Data final:</label>
+				<input type="text" id="fim" name="fim" class="datetime-picker form-control" value="{$_GET['fim']}">
+			</div>
+			<div class=" form-group col-lg-3 col-md-9 col-sm-9 col-xs-12">
+				<label>Busca:</label>
+				<div class="input-group">
+					<input type="text" class="form-control" id="query" name="query" placeholder="Detalhes, Pedido ou #Movimentação..." value="{$_GET['query']}">
+					<span class="input-group-btn">
+						<button class="btn btn-default" type="submit"><i class="fa fa-search"></i></button>
+					</span>
+				</div>
+			</div>
+			<input type="submit" style="position: absolute; left: -9999px; width: 1px; height: 1px;" tabindex="-1" />
+		</form>
+	</div>
+	<div class="clearfix"></div>
+	<div class="">
+		<div class="col-md-12 col-sm-12 col-xs-12">
+			<div class="x_panel">
+				<div class="x_title">
+					<h2>Pagamentos<small></small></h2>
+					<div class="clearfix"></div>
+				</div>
+				<div class="x_content x_scroll">
+					<table class="table">
+						<thead>
+							<tr>
+								<th>Descrição</th>
+								<th class="text-right">Total</th>
+								<th class="text-center">Forma de pagamento</th>
+								<th class="text-center">Funcionário(a)</th>
+								<th class="text-center">Parcelas</th>
+								<th class="text-center">Movimentação</th>
+								<th class="text-center">Detalhes</th>
+								<th class="text-center">Data de hora</th>
+							</tr>
+						</thead>
+						<tbody>
+<!--{loop $pagamentos $pagamento}-->
+							<tr ${$pagamento->isCancelado()?'class="danger"':($pagamento->isAtivo()?'':'class="warning"')}>
+								<td>
+<!--${$_forma_pagto = ZFormaPagto::getPeloID($pagamento->getFormaPagtoID())}-->
+									<div class="cell-icon pagamento-icons" style="background-position: -{$_pagamento_icon[$_forma_pagto->getTipo()]}px 0px;"></div>
+<!--${$_conta = ZConta::getPeloID($pagamento->getPagtoContaID())}-->
+<!--${$_pedido = ZPedido::getPeloID($pagamento->getPedidoID())}-->
+<!--{if is_null($pagamento->getPedidoID())}-->
+									<a href="/gerenciar/conta/editar?id={$_conta->getID()}" title="Editar conta '{$_conta->getDescricao()}'">${$_conta->getID() != 1?$_conta->getDescricao():$pagamento->getDetalhes()}</a>
+<!--{else}-->
+<!--${$_comanda = ZComanda::getPeloID($_pedido->getComandaID())}-->
+<!--${$_mesa = ZMesa::getPeloID($_pedido->getMesaID())}-->
+									<a href="/gerenciar/pedido/?query={$_pedido->getID()}" title="Visualizar pedido '{$_pedido->getID()}'">Pedido {$_pedido->getID()}: ${$_pedido->getTipo() == PedidoTipo::ENTREGA && is_null($_pedido->getLocalizacaoID())?'Viagem':($_pedido->getTipo() == PedidoTipo::MESA?$_mesa->getNome():($_pedido->getTipo() == PedidoTipo::COMANDA?$_comanda->getNome():$_tipo_names[$_pedido->getTipo()]))}</a>
+<!--{/if}-->
+								</td>
+								<td class="text-right">
+									<strong title="Total">R$ ${moneyit($pagamento->getTotal())}</strong>
+<!--{if $pagamento->getTaxas() < -0.005 || $pagamento->getTaxas() > 0.005}-->
+									<small title="Taxas">R$ ${moneyit($pagamento->getTaxas())}</small>
+<!--{/if}-->
+								</td>
+								<td class="text-center"><strong>
+<!--{if $_forma_pagto->getTipo() != FormaPagtoTipo::CARTAO}-->
+									<a href="/gerenciar/forma_pagto/editar?id={$_forma_pagto->getID()}" title="Editar forma de pagamento '{$_forma_pagto->getDescricao()}'">{$_forma_pagto->getDescricao()}</a>
+<!--{else}-->
+<!--${$_cartao = ZCartao::getPeloID($pagamento->getCartaoID())}-->
+									<a href="/gerenciar/cartao/editar?id={$_cartao->getID()}" title="Editar cartão '{$_cartao->getDescricao()}'">Cartão {$_cartao->getDescricao()}</a>
+<!--{/if}-->
+								</strong>
+<!--${$_carteira = ZCarteira::getPeloID($pagamento->getCarteiraID())}-->
+								<small><a href="/gerenciar/carteira/editar?id={$_carteira->getID()}" title="Editar carteira '{$_carteira->getDescricao()}'">{$_carteira->getDescricao()}</a></small></td>
+<!--${$_funcionario = ZFuncionario::getPeloID($pagamento->getFuncionarioID())}-->
+<!--${$_cliente = ZCliente::getPeloID($_funcionario->getClienteID())}-->
+								<td class="text-center"><a href="/gerenciar/funcionario/editar?id={$_funcionario->getID()}" title="Editar funcionário '{$_cliente->getNomeCompleto()}'">{$_cliente->getNomeCompleto()}</a></td>
+								<td class="text-center">
+<!--{if $pagamento->getParcelas() > 0}-->
+									{$pagamento->getParcelas()} x R$ ${moneyit($pagamento->getValorParcela())}</td>
+<!--{/if}-->
+								</td>
+<!--${$_movimentacao = ZMovimentacao::getPeloID($pagamento->getMovimentacaoID())}-->
+								<td class="text-center">
+									<strong>{$_movimentacao->getID()}</strong>
+									<small>Sessão {$_movimentacao->getSessaoID()}</small>
+								</td>
+								<td class="text-center">{$pagamento->getDetalhes()}</td>
+								<td class="text-center">
+									<strong title="Data do pagamento">${is_null($pagamento->getDataHora())?'':date('d/m/Y H:i', strtotime($pagamento->getDataHora()))}</strong>
+<!--{if $pagamento->getDataHora() != $pagamento->getDataCompensacao()}-->
+									<small title="Data de compensação">${is_null($pagamento->getDataCompensacao())?'':date('d/m/Y H:i', strtotime($pagamento->getDataCompensacao()))}</small>
+<!--{/if}-->
+								</td>
+							</tr>
+<!--{/loop}-->
+						</tbody>
+					</table>
+					{$pagestring}
+				</div>
+			</div>
+		</div>
+	</div>
+</div>	
+<!--{include footer_gerenciar}-->

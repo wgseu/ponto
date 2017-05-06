@@ -1,0 +1,101 @@
+<!--{include header_gerenciar}-->
+<script type="text/javascript">$(function(){Gerenciar.$[table.unix].init();});</script>
+<div class="row">
+	<div class="page-title">
+		<div class="col-lg-2 col-md-2 col-sm-2 col-xs-6">
+			<h3>$[Table.name.plural]</h3>
+		</div>
+		<form id="search-form" action="/gerenciar/$[table.unix]/" method="get">
+$[field.each]
+$[field.if(enum)]
+			<div class="form-group col-lg-3 col-md-4 col-sm-4 col-xs-6">
+				<label>$[Field.name]:</label>
+				<select class="form-control" id="$[field]" name="$[field]">
+					${Utility::Option($$[field.unix]_values, $_GET['$[field]'], 'Tod$[field.gender]s')}
+				</select>
+			</div>
+$[field.end]
+$[field.end]
+			<div class="form-group col-lg-3 col-md-4 col-sm-12 col-xs-12">
+				<label>$[Table.desc]:</label>
+				<input type="text" class="form-control" id="query" name="query" placeholder="Procurar..." value="{$_GET['query']}">
+			</div>
+		</form>
+	</div>
+	<div class="clearfix"></div>
+	<div class="">
+		<div class="col-md-12 col-sm-12 col-xs-12">
+			<div class="x_panel">
+				<div class="x_title">
+					<h2>$[Table.name.plural]<small></small></h2>
+					<a href="/gerenciar/$[table.unix]/cadastrar">
+						<button type="button" class="btn btn-info pull-right">Cadastrar</button>
+					</a>
+					<div class="clearfix"></div>
+				</div>
+				<div class="x_content">
+					<table class="table">
+						<thead>
+							<tr>
+$[field.each]
+$[field.if(password)]
+$[field.else.if(text)]
+$[field.else]
+								<th>$[Field.name]</th>
+$[field.end]
+$[field.end]
+								<th width="10%" style="text-align: center;">Ações</th>
+							</tr>
+						</thead>
+						<tbody>
+<!--{loop $$[table.unix.plural] $$[table.unix]}-->
+							<tr>
+$[field.each]
+$[field.if(reference)]
+<!--${$_$[reference.unix] = $[reference.class]::$[reference.class.get]($$[table.unix]->$[field.get])}-->
+								<td><a href="/gerenciar/$[reference.unix]/editar?$[reference.pk]={$_$[reference.unix]->$[reference.pk.get]}" title="Editar $[reference.name] '{$_$[reference.unix]->$[reference.desc.get]}'">{$_$[reference.unix]->$[reference.desc.get]}</a></td>
+$[field.else.if(masked)]
+								<td>${mask($$[table.unix]->$[field.get], '$[field.mask]')}</td>
+$[field.else.if(enum)]
+								<td>{$$[field.unix]_values[$$[table.unix]->$[field.get]]}</td>
+$[field.else.if(image)]
+								<td><a href="/gerenciar/$[table.unix]/editar?$[table.pk]={$$[table.unix]->$[table.pk.get]}" title="Editar $[table.name] '{$$[table.unix]->$[table.desc.get]}'"><img src="${get_image_url($$[table.unix]->$[field.get], '$[field.image.folder]', '$[field.image.default]')}" height="48" alt="$[Field.name]" title="$[Field.info]"/></a></td>
+$[field.else.if(blob)]
+								<td><a href="/gerenciar/$[table.unix]/editar?$[table.pk]={$$[table.unix]->$[table.pk.get]}" title="Editar $[table.name] '{$$[table.unix]->$[table.desc.get]}'"><img src="${get_image_url($$[table.unix]->$[field.get], '$[field.image.folder]', '$[field.image.default]')}" height="48" alt="$[Field.name]" title="$[Field.info]"/></a></td>
+$[field.else.if(datetime)]
+								<td>${is_null($$[table.unix]->$[field.get])?'':date('d/m/Y H:i', strtotime($$[table.unix]->$[field.get]))}</td>
+$[field.else.if(date)]
+								<td>${is_null($$[table.unix]->$[field.get])?'':date('d/m/Y', strtotime($$[table.unix]->$[field.get]))}</td>
+$[field.else.if(time)]
+								<td>${is_null($$[table.unix]->$[field.get])?'':date('H:i', strtotime($$[table.unix]->$[field.get]))}</td>
+$[field.else.if(currency)]
+								<td>R$ ${moneyit($$[table.unix]->$[field.get])}</td>
+$[field.else.if(boolean)]
+								<td>${$$[table.unix]->$[field.get] == 'Y'?'Sim':'Não'}</td>
+$[field.else.if(password)]
+$[field.else.if(text)]
+$[field.else]
+								<td>{$$[table.unix]->$[field.get]}</td>
+$[field.end]
+$[field.end]
+								<td class="text-center">
+									<ul class="nav panel_toolbox">
+										<li>
+											<a href="/gerenciar/$[table.unix]/editar?$[table.pk]={$$[table.unix]->$[table.pk.get]}" title="Editar $[table.name] '{$$[table.unix]->$[table.desc.get]}'"><i class="fa fa-edit"></i></a>
+										</li>
+										<li>
+											<a href="/gerenciar/$[table.unix]/excluir?$[table.pk]={$$[table.unix]->$[table.pk.get]}" title="Excluir $[table.name] '{$$[table.unix]->$[table.desc.get]}'" class="ajaxlink" ask="Deseja excluir $[table.gender] $[table.name] '{$$[table.unix]->$[table.desc.get]}'?"><i class="fa fa-close"></i></a>
+										</li>
+									</ul>
+								</td>
+							</tr>
+<!--{/loop}-->
+						</tbody>
+					</table>
+					{$pagestring}
+				</div>
+			</div>
+		</div>
+	</div>
+</div>	
+<!--{include footer_gerenciar}-->

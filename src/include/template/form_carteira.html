@@ -1,0 +1,29 @@
+<div class="form-group col-lg-3 col-md-4 col-sm-6 col-xs-12">
+	<label for="descricao">Descrição:</label>
+	<input type="text" id="descricao" name="descricao" class="form-control" value="{$carteira->getDescricao()}">
+</div>
+<div class="form-group col-lg-3 col-md-4 col-sm-6 col-xs-12">
+	<label for="tipo">Tipo:</label>
+	<select id="tipo" name="tipo" class="form-control">
+		<option value="Bancaria" ${$carteira->getTipo() == 'Bancaria'?'selected':''}>Bancária</option>
+		<option value="Financeira" ${$carteira->getTipo() == 'Financeira'?'selected':''}>Financeira</option>
+	</select>
+</div>
+<input type="hidden" id="bancoid" name="bancoid" data-content="{$_banco->getRazaoSocial()}" value="{$_banco->getID()}" data-agenciamascara="{$_banco->getAgenciaMascara()}" data-contamascara="{$_banco->getContaMascara()}">
+<div class="form-group col-lg-3 col-md-4 col-sm-6 col-xs-12">
+	<label for="banco">Banco: <span class="identifier">{$_banco->getNumero()}<span></label>
+	<input type="text" id="banco" class="form-control" value="{$_banco->getRazaoSocial()}">
+</div>
+<div class="form-group col-lg-3 col-md-4 col-sm-6 col-xs-12">
+	<label for="conta" data-conta="Conta:" data-servico="Serviço:">Conta:</label>
+	<input type="text" id="conta" name="conta" class="form-control" value="{$carteira->getConta()}">
+</div>
+<div class="form-group col-lg-3 col-md-4 col-sm-6 col-xs-12">
+	<label for="agencia" data-agencia="Agência:" data-conta="Conta:">Agência:</label>
+	<input type="text" id="agencia" name="agencia" class="form-control" value="{$carteira->getAgencia()}">
+</div>
+<div class="checkbox col-lg-3 col-md-4 col-sm-6 col-xs-12">
+	<label>
+		<input type="checkbox" id="ativa" name="ativa" value="Y" ${$carteira->getAtiva() == 'Y'?'checked':''}> Ativa
+	</label>
+</div>

@@ -1,0 +1,81 @@
+<div class="form-group col-lg-4 col-md-4 col-sm-6 col-xs-12">
+	<label for="descricao">Descrição:</label>
+	<input type="text" id="descricao" name="descricao" class="form-control" value="{$conta->getDescricao()}">
+</div>
+<div class="form-group col-lg-3 col-md-4 col-sm-6 col-xs-12">
+	<label for="tipo">Tipo de conta:</label>
+	<select id="tipo" name="tipo" class="form-control">
+		<option value="1" ${$conta->getValor() > 0?'selected':''}>Receita</option>
+		<option value="-1" ${$conta->getValor() <= 0?'selected':''}>Despesa</option>
+	</select>
+</div>
+<div class="form-group col-lg-2 col-md-4 col-sm-6 col-xs-12">
+	<label for="valor">Valor:</label>
+	<input type="text" id="valor" name="valor" class="numeric form-control text-right" data-a-sep="." data-a-dec="," data-a-sign="R$ " value="${abs($conta->getValor())}">
+</div>
+<!--${$_cliente = ZCliente::getPeloID($conta->getClienteID())}-->
+<input type="hidden" id="clienteid" name="clienteid" data-nome="{$_cliente->getNomeCompleto()}" value="{$_cliente->getID()}">
+<div class="form-group col-lg-3 col-md-4 col-sm-6 col-xs-12">
+	<label for="cliente">Cliente: <span class="identifier">${mask($_cliente->getFone(1), '(99) 9999-9999?9')}<span></label>
+	<input type="text" id="cliente" class="form-control" value="{$_cliente->getNomeCompleto()}">
+</div>
+<div class="form-group col-lg-3 col-md-4 col-sm-6 col-xs-12">
+	<label>Acréscimo: <input type="checkbox" style="margin: 0px;" id="autoacrescimo" name="autoacrescimo" value="Y" ${$conta->getAutoAcrescimo() == 'Y'?'checked':''}> Automático</label>
+	<input type="text" id="acrescimo" name="acrescimo" class="numeric form-control text-right" data-a-sep="." data-a-dec="," data-a-sign="R$ " value="${abs($conta->getAcrescimo())}">
+</div>
+<div class="form-group col-lg-2 col-md-4 col-sm-6 col-xs-12">
+	<label for="multa">Multa:</label>
+	<input type="text" id="multa" name="multa" class="numeric form-control text-right" data-a-sep="." data-a-dec="," data-a-sign="R$ " value="${abs($conta->getMulta())}">
+</div>
+<div class="form-group col-lg-2 col-md-4 col-sm-6 col-xs-12">
+	<label for="juros">Juros:</label>
+	<input type="text" id="juros" name="juros" class="numeric form-control text-right" data-a-sign=" %" data-p-sign="s" data-a-sep="." data-a-dec="," data-a-pad="false" value="{$conta->getJuros() * 100}">
+</div>
+<div class="form-group col-lg-5 col-md-4 col-sm-6 col-xs-12">
+	<label for="classificacaoid">Classificação:</label>
+	<select class="form-control" id="classificacaoid" name="classificacaoid">
+<!--{loop $_classificacoes $_classificacao}-->
+		<option value="{$_classificacao->getID()}" ${$conta->getClassificacaoID() == $_classificacao->getID()?'selected':''}>{$_classificacao->getDescricao()}</option>
+<!--{/loop}-->
+	</select>
+</div>
+<div class="form-group col-lg-3 col-md-4 col-sm-6 col-xs-12">
+	<label for="subclassificacaoid">Subclassificação:</label>
+	<select class="form-control" id="subclassificacaoid" name="subclassificacaoid">
+		<option value="" ${is_null($conta->getSubClassificacaoID())?'selected':''}>Não informada</option>
+<!--{loop $_sub_classificacoes $_classificacao}-->
+		<option value="{$_classificacao->getID()}" ${$conta->getSubClassificacaoID() == $_classificacao->getID()?'selected':''}>{$_classificacao->getDescricao()}</option>
+<!--{/loop}-->
+	</select>
+</div>
+<div class="form-group col-lg-3 col-md-4 col-sm-6 col-xs-12">
+	<label for="vencimento">Data de vencimento:</label>
+	<input type="text" id="vencimento" name="vencimento" class="datetime-picker form-control" value="${is_empty($conta->getVencimento())?'':date('d/m/Y', strtotime($conta->getVencimento()))}">
+</div>
+<div class="form-group col-lg-3 col-md-4 col-sm-6 col-xs-12">
+	<label for="dataemissao">Data de emissão:</label>
+	<input type="text" id="dataemissao" name="dataemissao" class="datetime-picker form-control" value="${is_empty($conta->getDataEmissao())?'':date('d/m/Y', strtotime($conta->getDataEmissao()))}">
+</div>
+<div class="form-group col-lg-3 col-md-4 col-sm-6 col-xs-12">
+	<label for="numerodoc">Número do documento:</label>
+	<input type="text" id="numerodoc" name="numerodoc" class="form-control" value="{$conta->getNumeroDoc()}">
+</div>
+<input type="hidden" id="anexocaminho" name="anexocaminho" value="{$conta->getAnexoCaminho()}">
+<div class="form-group col-lg-9 col-md-8 col-sm-6 col-xs-12">
+	<label for="raw_anexocaminho">Anexo:</label>
+	<div class="input-group">
+        <label class="input-group-btn">
+            <span class="btn btn-primary">
+                Selecionar… <input type="file" id="raw_anexocaminho" name="raw_anexocaminho" style="display: none;">
+            </span>
+        </label>
+        <input type="text" class="form-control" readonly="" value="{$conta->getAnexoCaminho()}">
+		<span class="input-group-btn">
+			<button class="btn btn-default" id="clear_anexocaminho" type="button">Remover</button>
+		</span>
+    </div>
+</div>
+<div class="form-group col-lg-3 col-md-4 col-sm-6 col-xs-12">
+	<label for="datapagamento">Data de pagamento:</label>
+	<input type="text" id="datapagamento" name="datapagamento" class="datetime-picker form-control" value="${is_empty($conta->getDataPagamento())?'':date('d/m/Y', strtotime($conta->getDataPagamento()))}">
+</div>

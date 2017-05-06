@@ -1,0 +1,78 @@
+<!--{include header_gerenciar}-->
+<script type="text/javascript">$(function(){Gerenciar.movimentacao.init();});</script>
+<div class="row">
+	<div class="page-title">
+		<div class="col-lg-3 col-md-3 col-sm-3 col-xs-6">
+			<h3>Movimentações</h3>
+		</div>
+		<form method="get" action="/gerenciar/movimentacao/" id="search-form">
+			<div class="form-group col-lg-3 col-md-2 col-sm-2 col-xs-6">
+				<label for="aberto">Estado:</label>
+				<select class="form-control" id="aberto" name="aberto">
+					${Utility::Option($estados, $_GET['aberto'], 'Todos')}
+				</select>
+			</div>
+<!--${$_funcao = ZFuncao::getPeloID($_funcionario->getFuncaoID())}-->
+<!--${$_cliente_func = ZCliente::getPeloID($_funcionario->getClienteID())}-->
+			<input type="hidden" id="inicializadorid" name="inicializadorid" data-content="{$_cliente_func->getNomeCompleto()}" value="{$_funcionario->getID()}">
+			<div class="form-group col-lg-3 col-md-4 col-sm-4 col-xs-6">
+				<label for="inicializador">Inicializador: <span class="identifier">{$_funcao->getDescricao()}<span></label>
+				<input type="text" id="inicializador" class="form-control" value="{$_cliente_func->getNomeCompleto()}">
+			</div>
+			<div class="form-group col-lg-3 col-md-3 col-sm-3 col-xs-6">
+				<label for="caixaid">Caixa:</label>
+				<select class="form-control" id="caixaid" name="caixaid">
+					${Utility::Option($_caixa_names, $_GET['caixaid'], 'Todos')}
+				</select>
+			</div>
+		</form>
+	</div>
+	<div class="clearfix"></div>
+	<div class="">
+		<div class="col-md-12 col-sm-12 col-xs-12">
+			<div class="x_panel">
+				<div class="x_title">
+					<h2>Movimentações<small></small></h2>
+					<div class="clearfix"></div>
+				</div>
+				<div class="x_content x_scroll">
+					<table class="table">
+						<thead>
+							<tr>
+								<th>Código</th>
+								<th class="text-center">Sessão</th>
+								<th class="text-center">Caixa</th>
+								<th class="text-center">Funcionário inicializador</th>
+								<th class="text-center">Funcionário fechador</th>
+							</tr>
+						</thead>
+						<tbody>
+<!--{loop $movimentacoes $movimentacao}-->
+							<tr ${$movimentacao->isAberta()?'class="success"':''}>
+								<td><div title="${$movimentacao->isAberta()?'Caixa aberto':'Caixa fechado'}" class="cell-icon movimentacao-icons" style="background-position: -{$_movimentacao_icon[$movimentacao->getAberta()]}px 0px;"></div><a href="/gerenciar/pagamento/?query=%23{$movimentacao->getID()}" title="Visualizar pagamentos da movimentação '{$movimentacao->getID()}'">{$movimentacao->getID()}</a></td>
+								<td class="text-center"><a href="/gerenciar/pedido/?query=%23{$movimentacao->getSessaoID()}" title="Visualizar pedidos da sessão '{$movimentacao->getSessaoID()}'">{$movimentacao->getSessaoID()}</a></td>
+<!--${$_caixa = ZCaixa::getPeloID($movimentacao->getCaixaID())}-->
+								<td class="text-center"><a href="/gerenciar/caixa/editar?id={$_caixa->getID()}" title="Editar caixa '{$_caixa->getDescricao()}'">{$_caixa->getDescricao()}</a></td>
+<!--${$_funcionario = ZFuncionario::getPeloID($movimentacao->getFuncionarioAberturaID())}-->
+<!--${$_cliente = ZCliente::getPeloID($_funcionario->getClienteID())}-->
+								<td class="text-center">
+									<strong><a href="/gerenciar/funcionario/editar?id={$_funcionario->getID()}" title="Editar funcionário '{$_cliente->getNomeCompleto()}'">{$_cliente->getNomeCompleto()}</a></strong>
+									<small>${date('d/m/Y H:i', strtotime($movimentacao->getDataAbertura()))}</small>
+								</td>
+<!--${$_funcionario = ZFuncionario::getPeloID($movimentacao->getFuncionarioFechamentoID())}-->
+<!--${$_cliente = ZCliente::getPeloID($_funcionario->getClienteID())}-->
+								<td class="text-center">
+									<strong><a href="/gerenciar/funcionario/editar?id={$_funcionario->getID()}" title="Editar funcionário '{$_cliente->getNomeCompleto()}'">{$_cliente->getNomeCompleto()}</a></strong>
+									<small>${is_null($movimentacao->getDataFechamento())?'':date('d/m/Y H:i', strtotime($movimentacao->getDataFechamento()))}</small>
+								</td>
+							</tr>
+<!--{/loop}-->
+						</tbody>
+					</table>
+					{$pagestring}
+				</div>
+			</div>
+		</div>
+	</div>
+</div>	
+<!--{include footer_gerenciar}-->

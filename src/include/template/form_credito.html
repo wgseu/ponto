@@ -1,0 +1,14 @@
+<div class="form-group col-lg-6 col-md-4 col-sm-12 col-xs-12">
+	<label for="detalhes">Detalhes:</label>
+	<input type="text" id="detalhes" name="detalhes" class="form-control" value="{$credito->getDetalhes()}">
+</div>
+<div class="form-group col-lg-3 col-md-4 col-sm-6 col-xs-12">
+	<label for="valor">Valor:</label>
+	<input type="text" id="valor" name="valor" class="numeric form-control text-right" data-a-sep="." data-a-dec="," data-a-sign="R$ " value="{$credito->getValor()}">
+</div>
+<!--${$_cliente = ZCliente::getPeloID($credito->getClienteID())}-->
+<input type="hidden" id="clienteid" name="clienteid" data-nome="{$_cliente->getNomeCompleto()}" value="{$_cliente->getID()}">
+<div class="form-group col-lg-3 col-md-4 col-sm-6 col-xs-12">
+	<label for="cliente">Cliente: <span class="identifier">${mask($_cliente->getFone(1), '(99) 9999-9999?9')}<span></label>
+	<input type="text" id="cliente" class="form-control" value="{$_cliente->getNomeCompleto()}">
+</div>

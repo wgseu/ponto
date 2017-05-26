@@ -30,10 +30,10 @@ class ZHorario {
 
 	public function __construct($horario = array()) {
 		if(is_array($horario)) {
-			$this->setID($horario['id']);
-			$this->setInicio($horario['inicio']);
-			$this->setFim($horario['fim']);
-			$this->setTempoEntrega($horario['tempoentrega']);
+			$this->setID(isset($horario['id'])?$horario['id']:null);
+			$this->setInicio(isset($horario['inicio'])?$horario['inicio']:null);
+			$this->setFim(isset($horario['fim'])?$horario['fim']:null);
+			$this->setTempoEntrega(isset($horario['tempoentrega'])?$horario['tempoentrega']:null);
 		}
 	}
 

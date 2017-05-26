@@ -30,10 +30,10 @@ class ZCidade {
 
 	public function __construct($cidade = array()) {
 		if(is_array($cidade)) {
-			$this->setID($cidade['id']);
-			$this->setEstadoID($cidade['estadoid']);
-			$this->setNome($cidade['nome']);
-			$this->setCEP($cidade['cep']);
+			$this->setID(isset($cidade['id'])?$cidade['id']:null);
+			$this->setEstadoID(isset($cidade['estadoid'])?$cidade['estadoid']:null);
+			$this->setNome(isset($cidade['nome'])?$cidade['nome']:null);
+			$this->setCEP(isset($cidade['cep'])?$cidade['cep']:null);
 		}
 	}
 

@@ -32,12 +32,12 @@ class ZValorNutricional {
 
 	public function __construct($valor_nutricional = array()) {
 		if(is_array($valor_nutricional)) {
-			$this->setID($valor_nutricional['id']);
-			$this->setInformacaoID($valor_nutricional['informacaoid']);
-			$this->setUnidadeID($valor_nutricional['unidadeid']);
-			$this->setNome($valor_nutricional['nome']);
-			$this->setQuantidade($valor_nutricional['quantidade']);
-			$this->setValorDiario($valor_nutricional['valordiario']);
+			$this->setID(isset($valor_nutricional['id'])?$valor_nutricional['id']:null);
+			$this->setInformacaoID(isset($valor_nutricional['informacaoid'])?$valor_nutricional['informacaoid']:null);
+			$this->setUnidadeID(isset($valor_nutricional['unidadeid'])?$valor_nutricional['unidadeid']:null);
+			$this->setNome(isset($valor_nutricional['nome'])?$valor_nutricional['nome']:null);
+			$this->setQuantidade(isset($valor_nutricional['quantidade'])?$valor_nutricional['quantidade']:null);
+			$this->setValorDiario(isset($valor_nutricional['valordiario'])?$valor_nutricional['valordiario']:null);
 		}
 	}
 

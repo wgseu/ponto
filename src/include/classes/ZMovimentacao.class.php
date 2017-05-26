@@ -34,14 +34,14 @@ class ZMovimentacao {
 
 	public function __construct($movimentacao = array()) {
 		if(is_array($movimentacao)) {
-			$this->setID($movimentacao['id']);
-			$this->setSessaoID($movimentacao['sessaoid']);
-			$this->setCaixaID($movimentacao['caixaid']);
-			$this->setAberta($movimentacao['aberta']);
-			$this->setFuncionarioAberturaID($movimentacao['funcionarioaberturaid']);
-			$this->setDataAbertura($movimentacao['dataabertura']);
-			$this->setFuncionarioFechamentoID($movimentacao['funcionariofechamentoid']);
-			$this->setDataFechamento($movimentacao['datafechamento']);
+			$this->setID(isset($movimentacao['id'])?$movimentacao['id']:null);
+			$this->setSessaoID(isset($movimentacao['sessaoid'])?$movimentacao['sessaoid']:null);
+			$this->setCaixaID(isset($movimentacao['caixaid'])?$movimentacao['caixaid']:null);
+			$this->setAberta(isset($movimentacao['aberta'])?$movimentacao['aberta']:null);
+			$this->setFuncionarioAberturaID(isset($movimentacao['funcionarioaberturaid'])?$movimentacao['funcionarioaberturaid']:null);
+			$this->setDataAbertura(isset($movimentacao['dataabertura'])?$movimentacao['dataabertura']:null);
+			$this->setFuncionarioFechamentoID(isset($movimentacao['funcionariofechamentoid'])?$movimentacao['funcionariofechamentoid']:null);
+			$this->setDataFechamento(isset($movimentacao['datafechamento'])?$movimentacao['datafechamento']:null);
 		}
 	}
 

@@ -41,18 +41,18 @@ class ZSistema {
 
 	public function __construct($sistema = array()) {
 		if(is_array($sistema)) {
-			$this->setID($sistema['id']);
-			$this->setPaisID($sistema['paisid']);
-			$this->setEmpresaID($sistema['empresaid']);
-			$this->setParceiroID($sistema['parceiroid']);
-			$this->setAccessKey($sistema['accesskey']);
-			$this->setRegistryKey($sistema['registrykey']);
-			$this->setLicenseKey($sistema['licensekey']);
-			$this->setComputadores($sistema['computadores']);
-			$this->setGUID($sistema['guid']);
-			$this->setOpcoes($sistema['opcoes']);
-			$this->setUltimoBackup($sistema['ultimobackup']);
-			$this->setVersaoDB($sistema['versaodb']);
+			$this->setID(isset($sistema['id'])?$sistema['id']:null);
+			$this->setPaisID(isset($sistema['paisid'])?$sistema['paisid']:null);
+			$this->setEmpresaID(isset($sistema['empresaid'])?$sistema['empresaid']:null);
+			$this->setParceiroID(isset($sistema['parceiroid'])?$sistema['parceiroid']:null);
+			$this->setAccessKey(isset($sistema['accesskey'])?$sistema['accesskey']:null);
+			$this->setRegistryKey(isset($sistema['registrykey'])?$sistema['registrykey']:null);
+			$this->setLicenseKey(isset($sistema['licensekey'])?$sistema['licensekey']:null);
+			$this->setComputadores(isset($sistema['computadores'])?$sistema['computadores']:null);
+			$this->setGUID(isset($sistema['guid'])?$sistema['guid']:null);
+			$this->setOpcoes(isset($sistema['opcoes'])?$sistema['opcoes']:null);
+			$this->setUltimoBackup(isset($sistema['ultimobackup'])?$sistema['ultimobackup']:null);
+			$this->setVersaoDB(isset($sistema['versaodb'])?$sistema['versaodb']:null);
 		}
 	}
 

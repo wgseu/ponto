@@ -47,21 +47,21 @@ class ZPatrimonio {
 
 	public function __construct($patrimonio = array()) {
 		if(is_array($patrimonio)) {
-			$this->setID($patrimonio['id']);
-			$this->setEmpresaID($patrimonio['empresaid']);
-			$this->setFornecedorID($patrimonio['fornecedorid']);
-			$this->setNumero($patrimonio['numero']);
-			$this->setDescricao($patrimonio['descricao']);
-			$this->setQuantidade($patrimonio['quantidade']);
-			$this->setAltura($patrimonio['altura']);
-			$this->setLargura($patrimonio['largura']);
-			$this->setComprimento($patrimonio['comprimento']);
-			$this->setEstado($patrimonio['estado']);
-			$this->setCusto($patrimonio['custo']);
-			$this->setValor($patrimonio['valor']);
-			$this->setAtivo($patrimonio['ativo']);
-			$this->setImagemAnexada($patrimonio['imagemanexada']);
-			$this->setDataAtualizacao($patrimonio['dataatualizacao']);
+			$this->setID(isset($patrimonio['id'])?$patrimonio['id']:null);
+			$this->setEmpresaID(isset($patrimonio['empresaid'])?$patrimonio['empresaid']:null);
+			$this->setFornecedorID(isset($patrimonio['fornecedorid'])?$patrimonio['fornecedorid']:null);
+			$this->setNumero(isset($patrimonio['numero'])?$patrimonio['numero']:null);
+			$this->setDescricao(isset($patrimonio['descricao'])?$patrimonio['descricao']:null);
+			$this->setQuantidade(isset($patrimonio['quantidade'])?$patrimonio['quantidade']:null);
+			$this->setAltura(isset($patrimonio['altura'])?$patrimonio['altura']:null);
+			$this->setLargura(isset($patrimonio['largura'])?$patrimonio['largura']:null);
+			$this->setComprimento(isset($patrimonio['comprimento'])?$patrimonio['comprimento']:null);
+			$this->setEstado(isset($patrimonio['estado'])?$patrimonio['estado']:null);
+			$this->setCusto(isset($patrimonio['custo'])?$patrimonio['custo']:null);
+			$this->setValor(isset($patrimonio['valor'])?$patrimonio['valor']:null);
+			$this->setAtivo(isset($patrimonio['ativo'])?$patrimonio['ativo']:null);
+			$this->setImagemAnexada(isset($patrimonio['imagemanexada'])?$patrimonio['imagemanexada']:null);
+			$this->setDataAtualizacao(isset($patrimonio['dataatualizacao'])?$patrimonio['dataatualizacao']:null);
 		}
 	}
 

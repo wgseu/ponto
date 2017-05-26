@@ -38,12 +38,12 @@ class ZListaCompra {
 
 	public function __construct($lista_compra = array()) {
 		if(is_array($lista_compra)) {
-			$this->setID($lista_compra['id']);
-			$this->setDescricao($lista_compra['descricao']);
-			$this->setEstado($lista_compra['estado']);
-			$this->setCompradorID($lista_compra['compradorid']);
-			$this->setDataCompra($lista_compra['datacompra']);
-			$this->setDataCadastro($lista_compra['datacadastro']);
+			$this->setID(isset($lista_compra['id'])?$lista_compra['id']:null);
+			$this->setDescricao(isset($lista_compra['descricao'])?$lista_compra['descricao']:null);
+			$this->setEstado(isset($lista_compra['estado'])?$lista_compra['estado']:null);
+			$this->setCompradorID(isset($lista_compra['compradorid'])?$lista_compra['compradorid']:null);
+			$this->setDataCompra(isset($lista_compra['datacompra'])?$lista_compra['datacompra']:null);
+			$this->setDataCadastro(isset($lista_compra['datacadastro'])?$lista_compra['datacadastro']:null);
 		}
 	}
 

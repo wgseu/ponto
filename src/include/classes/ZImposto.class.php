@@ -136,12 +136,12 @@ class ZImposto {
 	public function fromArray($imposto = array()) {
 		if(!is_array($imposto))
 			return $this;
-		$this->setID($imposto['id']);
-		$this->setGrupo($imposto['grupo']);
-		$this->setSimples($imposto['simples']);
-		$this->setSubstituicao($imposto['substituicao']);
-		$this->setCodigo($imposto['codigo']);
-		$this->setDescricao($imposto['descricao']);
+		$this->setID(isset($imposto['id'])?$imposto['id']:null);
+		$this->setGrupo(isset($imposto['grupo'])?$imposto['grupo']:null);
+		$this->setSimples(isset($imposto['simples'])?$imposto['simples']:null);
+		$this->setSubstituicao(isset($imposto['substituicao'])?$imposto['substituicao']:null);
+		$this->setCodigo(isset($imposto['codigo'])?$imposto['codigo']:null);
+		$this->setDescricao(isset($imposto['descricao'])?$imposto['descricao']:null);
 	}
 
 	public static function getPeloID($id) {

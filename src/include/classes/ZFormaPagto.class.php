@@ -46,17 +46,17 @@ class ZFormaPagto {
 
 	public function __construct($forma_pagto = array()) {
 		if(is_array($forma_pagto)) {
-			$this->setID($forma_pagto['id']);
-			$this->setTipo($forma_pagto['tipo']);
-			$this->setCarteiraID($forma_pagto['carteiraid']);
-			$this->setCarteiraPagtoID($forma_pagto['carteirapagtoid']);
-			$this->setDescricao($forma_pagto['descricao']);
-			$this->setParcelado($forma_pagto['parcelado']);
-			$this->setMinParcelas($forma_pagto['minparcelas']);
-			$this->setMaxParcelas($forma_pagto['maxparcelas']);
-			$this->setParcelasSemJuros($forma_pagto['parcelassemjuros']);
-			$this->setJuros($forma_pagto['juros']);
-			$this->setAtiva($forma_pagto['ativa']);
+			$this->setID(isset($forma_pagto['id'])?$forma_pagto['id']:null);
+			$this->setTipo(isset($forma_pagto['tipo'])?$forma_pagto['tipo']:null);
+			$this->setCarteiraID(isset($forma_pagto['carteiraid'])?$forma_pagto['carteiraid']:null);
+			$this->setCarteiraPagtoID(isset($forma_pagto['carteirapagtoid'])?$forma_pagto['carteirapagtoid']:null);
+			$this->setDescricao(isset($forma_pagto['descricao'])?$forma_pagto['descricao']:null);
+			$this->setParcelado(isset($forma_pagto['parcelado'])?$forma_pagto['parcelado']:null);
+			$this->setMinParcelas(isset($forma_pagto['minparcelas'])?$forma_pagto['minparcelas']:null);
+			$this->setMaxParcelas(isset($forma_pagto['maxparcelas'])?$forma_pagto['maxparcelas']:null);
+			$this->setParcelasSemJuros(isset($forma_pagto['parcelassemjuros'])?$forma_pagto['parcelassemjuros']:null);
+			$this->setJuros(isset($forma_pagto['juros'])?$forma_pagto['juros']:null);
+			$this->setAtiva(isset($forma_pagto['ativa'])?$forma_pagto['ativa']:null);
 		}
 	}
 

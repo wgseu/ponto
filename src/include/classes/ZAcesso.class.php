@@ -29,9 +29,9 @@ class ZAcesso {
 
 	public function __construct($acesso = array()) {
 		if(is_array($acesso)) {
-			$this->setID($acesso['id']);
-			$this->setFuncaoID($acesso['funcaoid']);
-			$this->setPermissaoID($acesso['permissaoid']);
+			$this->setID(isset($acesso['id'])?$acesso['id']:null);
+			$this->setFuncaoID(isset($acesso['funcaoid'])?$acesso['funcaoid']:null);
+			$this->setPermissaoID(isset($acesso['permissaoid'])?$acesso['permissaoid']:null);
 		}
 	}
 

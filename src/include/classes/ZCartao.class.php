@@ -36,16 +36,16 @@ class ZCartao {
 
 	public function __construct($cartao = array()) {
 		if(is_array($cartao)) {
-			$this->setID($cartao['id']);
-			$this->setCarteiraID($cartao['carteiraid']);
-			$this->setCarteiraPagtoID($cartao['carteirapagtoid']);
-			$this->setDescricao($cartao['descricao']);
-			$this->setImageIndex($cartao['imageindex']);
-			$this->setMensalidade($cartao['mensalidade']);
-			$this->setTransacao($cartao['transacao']);
-			$this->setTaxa($cartao['taxa']);
-			$this->setDiasRepasse($cartao['diasrepasse']);
-			$this->setAtivo($cartao['ativo']);
+			$this->setID(isset($cartao['id'])?$cartao['id']:null);
+			$this->setCarteiraID(isset($cartao['carteiraid'])?$cartao['carteiraid']:null);
+			$this->setCarteiraPagtoID(isset($cartao['carteirapagtoid'])?$cartao['carteirapagtoid']:null);
+			$this->setDescricao(isset($cartao['descricao'])?$cartao['descricao']:null);
+			$this->setImageIndex(isset($cartao['imageindex'])?$cartao['imageindex']:null);
+			$this->setMensalidade(isset($cartao['mensalidade'])?$cartao['mensalidade']:null);
+			$this->setTransacao(isset($cartao['transacao'])?$cartao['transacao']:null);
+			$this->setTaxa(isset($cartao['taxa'])?$cartao['taxa']:null);
+			$this->setDiasRepasse(isset($cartao['diasrepasse'])?$cartao['diasrepasse']:null);
+			$this->setAtivo(isset($cartao['ativo'])?$cartao['ativo']:null);
 		}
 	}
 

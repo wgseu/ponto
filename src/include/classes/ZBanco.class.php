@@ -31,11 +31,11 @@ class ZBanco {
 
 	public function __construct($banco = array()) {
 		if(is_array($banco)) {
-			$this->setID($banco['id']);
-			$this->setNumero($banco['numero']);
-			$this->setRazaoSocial($banco['razaosocial']);
-			$this->setAgenciaMascara($banco['agenciamascara']);
-			$this->setContaMascara($banco['contamascara']);
+			$this->setID(isset($banco['id'])?$banco['id']:null);
+			$this->setNumero(isset($banco['numero'])?$banco['numero']:null);
+			$this->setRazaoSocial(isset($banco['razaosocial'])?$banco['razaosocial']:null);
+			$this->setAgenciaMascara(isset($banco['agenciamascara'])?$banco['agenciamascara']:null);
+			$this->setContaMascara(isset($banco['contamascara'])?$banco['contamascara']:null);
 		}
 	}
 

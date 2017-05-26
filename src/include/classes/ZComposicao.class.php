@@ -40,13 +40,13 @@ class ZComposicao {
 
 	public function __construct($composicao = array()) {
 		if(is_array($composicao)) {
-			$this->setID($composicao['id']);
-			$this->setComposicaoID($composicao['composicaoid']);
-			$this->setProdutoID($composicao['produtoid']);
-			$this->setTipo($composicao['tipo']);
-			$this->setQuantidade($composicao['quantidade']);
-			$this->setValor($composicao['valor']);
-			$this->setAtiva($composicao['ativa']);
+			$this->setID(isset($composicao['id'])?$composicao['id']:null);
+			$this->setComposicaoID(isset($composicao['composicaoid'])?$composicao['composicaoid']:null);
+			$this->setProdutoID(isset($composicao['produtoid'])?$composicao['produtoid']:null);
+			$this->setTipo(isset($composicao['tipo'])?$composicao['tipo']:null);
+			$this->setQuantidade(isset($composicao['quantidade'])?$composicao['quantidade']:null);
+			$this->setValor(isset($composicao['valor'])?$composicao['valor']:null);
+			$this->setAtiva(isset($composicao['ativa'])?$composicao['ativa']:null);
 		}
 	}
 

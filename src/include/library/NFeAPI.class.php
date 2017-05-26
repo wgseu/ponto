@@ -19,8 +19,6 @@
 	O Cliente adquire apenas o direito de usar o software e não adquire qualquer outros
 	direitos, expressos ou implícitos no GrandChef diferentes dos especificados nesta Licença.
 */
-include_once (dirname(__FILE__) . '/NFeAPI/vendor/autoload.php');
-
 class NFeAPI extends \NFe\Common\Ajuste {
 
 	private $sefaz;

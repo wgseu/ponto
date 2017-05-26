@@ -80,7 +80,7 @@
 <!--{loop $pedidos $pedido}-->
 							<tr ${$pedido->isCancelado()?'class="danger"':''}>
 								<td><div title="{$_tipo_names[$pedido->getTipo()]}" class="cell-icon pedido-icons" style="background-position: -{$_pedido_icon[$pedido->getTipo()]}px 0px;"></div><a href="/gerenciar/produto_pedido/?query={$pedido->getID()}" title="Visualizar produtos e serviços">{$pedido->getID()}</a></td>
-<!--${$_comanda = ZComanda::getPeloID($pedido->getComandaID())}-->
+<!--${$_comanda = \MZ\Sale\Comanda::findByID($pedido->getComandaID())}-->
 <!--${$_mesa = ZMesa::getPeloID($pedido->getMesaID())}-->
 								<td>${$pedido->getTipo() == PedidoTipo::ENTREGA && is_null($pedido->getLocalizacaoID())?'Viagem':($pedido->getTipo() == PedidoTipo::MESA?$_mesa->getNome():($pedido->getTipo() == PedidoTipo::COMANDA?$_comanda->getNome():$_tipo_names[$pedido->getTipo()]))}</td>
 <!--${$_info = ZPedido::getTotalDetalhado($pedido->getID(), $pedido->getCancelado())}-->

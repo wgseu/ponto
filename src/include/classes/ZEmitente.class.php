@@ -171,16 +171,16 @@ class ZEmitente {
 	public function fromArray($emitente = array()) {
 		if(!is_array($emitente))
 			return $this;
-		$this->setID($emitente['id']);
-		$this->setContadorID($emitente['contadorid']);
-		$this->setRegimeID($emitente['regimeid']);
-		$this->setAmbiente($emitente['ambiente']);
-		$this->setCSC($emitente['csc']);
-		$this->setToken($emitente['token']);
-		$this->setIBPT($emitente['ibpt']);
-		$this->setChavePrivada($emitente['chaveprivada']);
-		$this->setChavePublica($emitente['chavepublica']);
-		$this->setDataExpiracao($emitente['dataexpiracao']);
+		$this->setID(isset($emitente['id'])?$emitente['id']:null);
+		$this->setContadorID(isset($emitente['contadorid'])?$emitente['contadorid']:null);
+		$this->setRegimeID(isset($emitente['regimeid'])?$emitente['regimeid']:null);
+		$this->setAmbiente(isset($emitente['ambiente'])?$emitente['ambiente']:null);
+		$this->setCSC(isset($emitente['csc'])?$emitente['csc']:null);
+		$this->setToken(isset($emitente['token'])?$emitente['token']:null);
+		$this->setIBPT(isset($emitente['ibpt'])?$emitente['ibpt']:null);
+		$this->setChavePrivada(isset($emitente['chaveprivada'])?$emitente['chaveprivada']:null);
+		$this->setChavePublica(isset($emitente['chavepublica'])?$emitente['chavepublica']:null);
+		$this->setDataExpiracao(isset($emitente['dataexpiracao'])?$emitente['dataexpiracao']:null);
 	}
 
 	public static function getPeloID($id) {

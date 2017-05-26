@@ -31,11 +31,11 @@ class ZBairro {
 
 	public function __construct($bairro = array()) {
 		if(is_array($bairro)) {
-			$this->setID($bairro['id']);
-			$this->setCidadeID($bairro['cidadeid']);
-			$this->setNome($bairro['nome']);
-			$this->setValorEntrega($bairro['valorentrega']);
-			$this->setDisponivel($bairro['disponivel']);
+			$this->setID(isset($bairro['id'])?$bairro['id']:null);
+			$this->setCidadeID(isset($bairro['cidadeid'])?$bairro['cidadeid']:null);
+			$this->setNome(isset($bairro['nome'])?$bairro['nome']:null);
+			$this->setValorEntrega(isset($bairro['valorentrega'])?$bairro['valorentrega']:null);
+			$this->setDisponivel(isset($bairro['disponivel'])?$bairro['disponivel']:null);
 		}
 	}
 

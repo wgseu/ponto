@@ -47,22 +47,22 @@ class ZLocalizacao {
 
 	public function __construct($localizacao = array()) {
 		if(is_array($localizacao)) {
-			$this->setID($localizacao['id']);
-			$this->setClienteID($localizacao['clienteid']);
-			$this->setBairroID($localizacao['bairroid']);
-			$this->setCEP($localizacao['cep']);
-			$this->setLogradouro($localizacao['logradouro']);
-			$this->setNumero($localizacao['numero']);
-			$this->setTipo($localizacao['tipo']);
-			$this->setComplemento($localizacao['complemento']);
-			$this->setCondominio($localizacao['condominio']);
-			$this->setBloco($localizacao['bloco']);
-			$this->setApartamento($localizacao['apartamento']);
-			$this->setReferencia($localizacao['referencia']);
-			$this->setLatitude($localizacao['latitude']);
-			$this->setLongitude($localizacao['longitude']);
-			$this->setApelido($localizacao['apelido']);
-			$this->setMostrar($localizacao['mostrar']);
+			$this->setID(isset($localizacao['id'])?$localizacao['id']:null);
+			$this->setClienteID(isset($localizacao['clienteid'])?$localizacao['clienteid']:null);
+			$this->setBairroID(isset($localizacao['bairroid'])?$localizacao['bairroid']:null);
+			$this->setCEP(isset($localizacao['cep'])?$localizacao['cep']:null);
+			$this->setLogradouro(isset($localizacao['logradouro'])?$localizacao['logradouro']:null);
+			$this->setNumero(isset($localizacao['numero'])?$localizacao['numero']:null);
+			$this->setTipo(isset($localizacao['tipo'])?$localizacao['tipo']:null);
+			$this->setComplemento(isset($localizacao['complemento'])?$localizacao['complemento']:null);
+			$this->setCondominio(isset($localizacao['condominio'])?$localizacao['condominio']:null);
+			$this->setBloco(isset($localizacao['bloco'])?$localizacao['bloco']:null);
+			$this->setApartamento(isset($localizacao['apartamento'])?$localizacao['apartamento']:null);
+			$this->setReferencia(isset($localizacao['referencia'])?$localizacao['referencia']:null);
+			$this->setLatitude(isset($localizacao['latitude'])?$localizacao['latitude']:null);
+			$this->setLongitude(isset($localizacao['longitude'])?$localizacao['longitude']:null);
+			$this->setApelido(isset($localizacao['apelido'])?$localizacao['apelido']:null);
+			$this->setMostrar(isset($localizacao['mostrar'])?$localizacao['mostrar']:null);
 		}
 	}
 

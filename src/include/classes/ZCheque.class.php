@@ -35,15 +35,15 @@ class ZCheque {
 
 	public function __construct($cheque = array()) {
 		if(is_array($cheque)) {
-			$this->setID($cheque['id']);
-			$this->setBancoID($cheque['bancoid']);
-			$this->setAgencia($cheque['agencia']);
-			$this->setConta($cheque['conta']);
-			$this->setClienteID($cheque['clienteid']);
-			$this->setParcelas($cheque['parcelas']);
-			$this->setTotal($cheque['total']);
-			$this->setCancelado($cheque['cancelado']);
-			$this->setDataCadastro($cheque['datacadastro']);
+			$this->setID(isset($cheque['id'])?$cheque['id']:null);
+			$this->setBancoID(isset($cheque['bancoid'])?$cheque['bancoid']:null);
+			$this->setAgencia(isset($cheque['agencia'])?$cheque['agencia']:null);
+			$this->setConta(isset($cheque['conta'])?$cheque['conta']:null);
+			$this->setClienteID(isset($cheque['clienteid'])?$cheque['clienteid']:null);
+			$this->setParcelas(isset($cheque['parcelas'])?$cheque['parcelas']:null);
+			$this->setTotal(isset($cheque['total'])?$cheque['total']:null);
+			$this->setCancelado(isset($cheque['cancelado'])?$cheque['cancelado']:null);
+			$this->setDataCadastro(isset($cheque['datacadastro'])?$cheque['datacadastro']:null);
 		}
 	}
 

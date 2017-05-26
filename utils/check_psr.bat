@@ -1,6 +1,6 @@
 @echo OFF
-set PATH=%PATH%;%~pd0..\public_html\include\vendor\bin
+set PATH=%PATH%;%~pd0..\src\include\vendor\bin
 
 cd ..
-phpcs --standard=psr2 public_html\include\api\MZ
+phpcs --standard=psr2 src\include\api
 cd %~pd0

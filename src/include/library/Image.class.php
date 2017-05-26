@@ -12,7 +12,6 @@ class Image {
 
 	public static function convert($srcFile=null,$destFile=null,$width=null,$height=null){
 		try {
-			ImageWorkshopLoader::init();
 			$layer = ImageWorkshop::initFromPath($srcFile);
 			if(($width == $layer->getWidth() && $height == $layer->getHeight()) or (is_null($width) && is_null($height))) {
 	            /** force image type from extension **/
@@ -42,7 +41,6 @@ class Image {
 
 	public static function toBase64($srcFile=null,$width=null,$height=null){
 		try {
-			ImageWorkshopLoader::init();
 			$layer = ImageWorkshop::initFromPath($srcFile);
 			if(($width != $layer->getWidth() || $height != $layer->getHeight()) && (!is_null($width) || !is_null($height))) {
 				$dest_height = $layer->getWidth() * floatval($height / $width);

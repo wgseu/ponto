@@ -395,30 +395,30 @@ class ZNota {
 	public function fromArray($nota = array()) {
 		if(!is_array($nota))
 			return $this;
-		$this->setID($nota['id']);
-		$this->setTipo($nota['tipo']);
-		$this->setAmbiente($nota['ambiente']);
-		$this->setAcao($nota['acao']);
-		$this->setEstado($nota['estado']);
-		$this->setSerie($nota['serie']);
-		$this->setNumeroInicial($nota['numeroinicial']);
-		$this->setNumeroFinal($nota['numerofinal']);
-		$this->setSequencia($nota['sequencia']);
-		$this->setChave($nota['chave']);
-		$this->setRecibo($nota['recibo']);
-		$this->setProtocolo($nota['protocolo']);
-		$this->setPedidoID($nota['pedidoid']);
-		$this->setMotivo($nota['motivo']);
-		$this->setContingencia($nota['contingencia']);
-		$this->setConsultaURL($nota['consultaurl']);
-		$this->setQRCode($nota['qrcode']);
-		$this->setTributos($nota['tributos']);
-		$this->setDetalhes($nota['detalhes']);
-		$this->setCorrigido($nota['corrigido']);
-		$this->setConcluido($nota['concluido']);
-		$this->setDataAutorizacao($nota['dataautorizacao']);
-		$this->setDataEmissao($nota['dataemissao']);
-		$this->setDataLancamento($nota['datalancamento']);
+		$this->setID(isset($nota['id'])?$nota['id']:null);
+		$this->setTipo(isset($nota['tipo'])?$nota['tipo']:null);
+		$this->setAmbiente(isset($nota['ambiente'])?$nota['ambiente']:null);
+		$this->setAcao(isset($nota['acao'])?$nota['acao']:null);
+		$this->setEstado(isset($nota['estado'])?$nota['estado']:null);
+		$this->setSerie(isset($nota['serie'])?$nota['serie']:null);
+		$this->setNumeroInicial(isset($nota['numeroinicial'])?$nota['numeroinicial']:null);
+		$this->setNumeroFinal(isset($nota['numerofinal'])?$nota['numerofinal']:null);
+		$this->setSequencia(isset($nota['sequencia'])?$nota['sequencia']:null);
+		$this->setChave(isset($nota['chave'])?$nota['chave']:null);
+		$this->setRecibo(isset($nota['recibo'])?$nota['recibo']:null);
+		$this->setProtocolo(isset($nota['protocolo'])?$nota['protocolo']:null);
+		$this->setPedidoID(isset($nota['pedidoid'])?$nota['pedidoid']:null);
+		$this->setMotivo(isset($nota['motivo'])?$nota['motivo']:null);
+		$this->setContingencia(isset($nota['contingencia'])?$nota['contingencia']:null);
+		$this->setConsultaURL(isset($nota['consultaurl'])?$nota['consultaurl']:null);
+		$this->setQRCode(isset($nota['qrcode'])?$nota['qrcode']:null);
+		$this->setTributos(isset($nota['tributos'])?$nota['tributos']:null);
+		$this->setDetalhes(isset($nota['detalhes'])?$nota['detalhes']:null);
+		$this->setCorrigido(isset($nota['corrigido'])?$nota['corrigido']:null);
+		$this->setConcluido(isset($nota['concluido'])?$nota['concluido']:null);
+		$this->setDataAutorizacao(isset($nota['dataautorizacao'])?$nota['dataautorizacao']:null);
+		$this->setDataEmissao(isset($nota['dataemissao'])?$nota['dataemissao']:null);
+		$this->setDataLancamento(isset($nota['datalancamento'])?$nota['datalancamento']:null);
 	}
 
 	public function isAutorizada()

@@ -37,11 +37,11 @@ class ZFormacao {
 
 	public function __construct($formacao = array()) {
 		if(is_array($formacao)) {
-			$this->setID($formacao['id']);
-			$this->setProdutoPedidoID($formacao['produtopedidoid']);
-			$this->setTipo($formacao['tipo']);
-			$this->setPacoteID($formacao['pacoteid']);
-			$this->setComposicaoID($formacao['composicaoid']);
+			$this->setID(isset($formacao['id'])?$formacao['id']:null);
+			$this->setProdutoPedidoID(isset($formacao['produtopedidoid'])?$formacao['produtopedidoid']:null);
+			$this->setTipo(isset($formacao['tipo'])?$formacao['tipo']:null);
+			$this->setPacoteID(isset($formacao['pacoteid'])?$formacao['pacoteid']:null);
+			$this->setComposicaoID(isset($formacao['composicaoid'])?$formacao['composicaoid']:null);
 		}
 	}
 

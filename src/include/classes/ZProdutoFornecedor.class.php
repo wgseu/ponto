@@ -35,15 +35,15 @@ class ZProdutoFornecedor {
 
 	public function __construct($produto_fornecedor = array()) {
 		if(is_array($produto_fornecedor)) {
-			$this->setID($produto_fornecedor['id']);
-			$this->setProdutoID($produto_fornecedor['produtoid']);
-			$this->setFornecedorID($produto_fornecedor['fornecedorid']);
-			$this->setPrecoCompra($produto_fornecedor['precocompra']);
-			$this->setPrecoVenda($produto_fornecedor['precovenda']);
-			$this->setQuantidadeMinima($produto_fornecedor['quantidademinima']);
-			$this->setEstoque($produto_fornecedor['estoque']);
-			$this->setLimitado($produto_fornecedor['limitado']);
-			$this->setDataConsulta($produto_fornecedor['dataconsulta']);
+			$this->setID(isset($produto_fornecedor['id'])?$produto_fornecedor['id']:null);
+			$this->setProdutoID(isset($produto_fornecedor['produtoid'])?$produto_fornecedor['produtoid']:null);
+			$this->setFornecedorID(isset($produto_fornecedor['fornecedorid'])?$produto_fornecedor['fornecedorid']:null);
+			$this->setPrecoCompra(isset($produto_fornecedor['precocompra'])?$produto_fornecedor['precocompra']:null);
+			$this->setPrecoVenda(isset($produto_fornecedor['precovenda'])?$produto_fornecedor['precovenda']:null);
+			$this->setQuantidadeMinima(isset($produto_fornecedor['quantidademinima'])?$produto_fornecedor['quantidademinima']:null);
+			$this->setEstoque(isset($produto_fornecedor['estoque'])?$produto_fornecedor['estoque']:null);
+			$this->setLimitado(isset($produto_fornecedor['limitado'])?$produto_fornecedor['limitado']:null);
+			$this->setDataConsulta(isset($produto_fornecedor['dataconsulta'])?$produto_fornecedor['dataconsulta']:null);
 		}
 	}
 

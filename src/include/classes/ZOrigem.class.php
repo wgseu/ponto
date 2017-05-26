@@ -75,9 +75,9 @@ class ZOrigem {
 	public function fromArray($origem = array()) {
 		if(!is_array($origem))
 			return $this;
-		$this->setID($origem['id']);
-		$this->setCodigo($origem['codigo']);
-		$this->setDescricao($origem['descricao']);
+		$this->setID(isset($origem['id'])?$origem['id']:null);
+		$this->setCodigo(isset($origem['codigo'])?$origem['codigo']:null);
+		$this->setDescricao(isset($origem['descricao'])?$origem['descricao']:null);
 	}
 
 	public static function getPeloID($id) {

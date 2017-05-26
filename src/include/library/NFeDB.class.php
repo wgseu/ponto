@@ -19,8 +19,6 @@
 	O Cliente adquire apenas o direito de usar o software e não adquire qualquer outros
 	direitos, expressos ou implícitos no GrandChef diferentes dos especificados nesta Licença.
 */
-include_once (dirname(__FILE__) . '/NFeAPI/vendor/autoload.php');
-
 class NFeDB extends \NFe\Database\Estatico {
 
 	public static function getCaminhoXmlAtual($_nota) {
@@ -95,7 +93,7 @@ class NFeDB extends \NFe\Database\Estatico {
 				$nota->addObservacao('Local', $_mesa->getNome());
 				break;
 			case PedidoTipo::COMANDA:
-				$_comanda = ZComanda::getPeloID($_pedido->getComandaID());
+				$_comanda = \MZ\Sale\Comanda::findByID($_pedido->getComandaID());
 				$nota->addObservacao('Local', $_comanda->getNome());
 				break;
 			case PedidoTipo::AVULSO:

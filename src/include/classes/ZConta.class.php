@@ -23,25 +23,25 @@ class ZConta {
 
 	public function __construct($conta = array()) {
 		if(is_array($conta)) {
-			$this->setID($conta['id']);
-			$this->setClassificacaoID($conta['classificacaoid']);
-			$this->setFuncionarioID($conta['funcionarioid']);
-			$this->setSubClassificacaoID($conta['subclassificacaoid']);
-			$this->setClienteID($conta['clienteid']);
-			$this->setPedidoID($conta['pedidoid']);
-			$this->setDescricao($conta['descricao']);
-			$this->setValor($conta['valor']);
-			$this->setAcrescimo($conta['acrescimo']);
-			$this->setMulta($conta['multa']);
-			$this->setJuros($conta['juros']);
-			$this->setAutoAcrescimo($conta['autoacrescimo']);
-			$this->setVencimento($conta['vencimento']);
-			$this->setDataEmissao($conta['dataemissao']);
-			$this->setNumeroDoc($conta['numerodoc']);
-			$this->setAnexoCaminho($conta['anexocaminho']);
-			$this->setCancelada($conta['cancelada']);
-			$this->setDataPagamento($conta['datapagamento']);
-			$this->setDataCadastro($conta['datacadastro']);
+			$this->setID(isset($conta['id'])?$conta['id']:null);
+			$this->setClassificacaoID(isset($conta['classificacaoid'])?$conta['classificacaoid']:null);
+			$this->setFuncionarioID(isset($conta['funcionarioid'])?$conta['funcionarioid']:null);
+			$this->setSubClassificacaoID(isset($conta['subclassificacaoid'])?$conta['subclassificacaoid']:null);
+			$this->setClienteID(isset($conta['clienteid'])?$conta['clienteid']:null);
+			$this->setPedidoID(isset($conta['pedidoid'])?$conta['pedidoid']:null);
+			$this->setDescricao(isset($conta['descricao'])?$conta['descricao']:null);
+			$this->setValor(isset($conta['valor'])?$conta['valor']:null);
+			$this->setAcrescimo(isset($conta['acrescimo'])?$conta['acrescimo']:null);
+			$this->setMulta(isset($conta['multa'])?$conta['multa']:null);
+			$this->setJuros(isset($conta['juros'])?$conta['juros']:null);
+			$this->setAutoAcrescimo(isset($conta['autoacrescimo'])?$conta['autoacrescimo']:null);
+			$this->setVencimento(isset($conta['vencimento'])?$conta['vencimento']:null);
+			$this->setDataEmissao(isset($conta['dataemissao'])?$conta['dataemissao']:null);
+			$this->setNumeroDoc(isset($conta['numerodoc'])?$conta['numerodoc']:null);
+			$this->setAnexoCaminho(isset($conta['anexocaminho'])?$conta['anexocaminho']:null);
+			$this->setCancelada(isset($conta['cancelada'])?$conta['cancelada']:null);
+			$this->setDataPagamento(isset($conta['datapagamento'])?$conta['datapagamento']:null);
+			$this->setDataCadastro(isset($conta['datacadastro'])?$conta['datacadastro']:null);
 		}
 	}
 

@@ -41,7 +41,7 @@ try {
 	$mesa = ZMesa::getPeloID($_POST['mesa']);
 	if(is_null($mesa->getID()) && $tipo == PedidoTipo::MESA)
 		throw new Exception('A mesa não foi informada ou não existe');
-	$comanda = ZComanda::getPeloID($_POST['comanda']);
+	$comanda = \MZ\Sale\Comanda::findByID($_POST['comanda']);
 	if(is_null($comanda->getID()) && $tipo == PedidoTipo::COMANDA)
 		throw new Exception('A comanda não foi informada ou não existe');
 	$pedido = ZPedido::getPeloLocal($tipo, $mesa->getID(), $comanda->getID());

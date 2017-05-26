@@ -30,10 +30,10 @@ class ZEstado {
 
 	public function __construct($estado = array()) {
 		if(is_array($estado)) {
-			$this->setID($estado['id']);
-			$this->setPaisID($estado['paisid']);
-			$this->setNome($estado['nome']);
-			$this->setUF($estado['uf']);
+			$this->setID(isset($estado['id'])?$estado['id']:null);
+			$this->setPaisID(isset($estado['paisid'])?$estado['paisid']:null);
+			$this->setNome(isset($estado['nome'])?$estado['nome']:null);
+			$this->setUF(isset($estado['uf'])?$estado['uf']:null);
 		}
 	}
 

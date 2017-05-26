@@ -31,13 +31,13 @@ class ZMesa {
 
 	public function __construct($mesa = array()) {
 		if(is_array($mesa)) {
-			$this->setID($mesa['id']);
-			$this->setNome($mesa['nome']);
-			$this->setAtiva($mesa['ativa']);
+			$this->setID(isset($mesa['id'])?$mesa['id']:null);
+			$this->setNome(isset($mesa['nome'])?$mesa['nome']:null);
+			$this->setAtiva(isset($mesa['ativa'])?$mesa['ativa']:null);
 			// extra
-			$this->setEstado($mesa['estado']);
-			$this->setJuntaID($mesa['juntaid']);
-			$this->setJuntaNome($mesa['juntanome']);
+			$this->setEstado(isset($mesa['estado'])?$mesa['estado']:null);
+			$this->setJuntaID(isset($mesa['juntaid'])?$mesa['juntaid']:null);
+			$this->setJuntaNome(isset($mesa['juntanome'])?$mesa['juntanome']:null);
 		}
 	}
 

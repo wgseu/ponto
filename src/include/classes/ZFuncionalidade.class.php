@@ -29,9 +29,9 @@ class ZFuncionalidade {
 
 	public function __construct($funcionalidade = array()) {
 		if(is_array($funcionalidade)) {
-			$this->setID($funcionalidade['id']);
-			$this->setNome($funcionalidade['nome']);
-			$this->setDescricao($funcionalidade['descricao']);
+			$this->setID(isset($funcionalidade['id'])?$funcionalidade['id']:null);
+			$this->setNome(isset($funcionalidade['nome'])?$funcionalidade['nome']:null);
+			$this->setDescricao(isset($funcionalidade['descricao'])?$funcionalidade['descricao']:null);
 		}
 	}
 

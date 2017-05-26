@@ -459,30 +459,30 @@ class ZProduto {
 	public function fromArray($produto = array()) {
 		if(!is_array($produto))
 			return $this;
-		$this->setID($produto['id']);
-		$this->setCodigoBarras($produto['codigobarras']);
-		$this->setCategoriaID($produto['categoriaid']);
-		$this->setUnidadeID($produto['unidadeid']);
-		$this->setSetorEstoqueID($produto['setorestoqueid']);
-		$this->setSetorPreparoID($produto['setorpreparoid']);
-		$this->setTributacaoID($produto['tributacaoid']);
-		$this->setDescricao($produto['descricao']);
-		$this->setAbreviacao($produto['abreviacao']);
-		$this->setDetalhes($produto['detalhes']);
-		$this->setQuantidadeLimite($produto['quantidadelimite']);
-		$this->setQuantidadeMaxima($produto['quantidademaxima']);
-		$this->setConteudo($produto['conteudo']);
-		$this->setPrecoVenda($produto['precovenda']);
-		$this->setCustoProducao($produto['custoproducao']);
-		$this->setTipo($produto['tipo']);
-		$this->setCobrarServico($produto['cobrarservico']);
-		$this->setDivisivel($produto['divisivel']);
-		$this->setPesavel($produto['pesavel']);
-		$this->setPerecivel($produto['perecivel']);
-		$this->setTempoPreparo($produto['tempopreparo']);
-		$this->setVisivel($produto['visivel']);
-		$this->setImagem($produto['imagem']);
-		$this->setDataAtualizacao($produto['dataatualizacao']);
+		$this->setID(isset($produto['id'])?$produto['id']:null);
+		$this->setCodigoBarras(isset($produto['codigobarras'])?$produto['codigobarras']:null);
+		$this->setCategoriaID(isset($produto['categoriaid'])?$produto['categoriaid']:null);
+		$this->setUnidadeID(isset($produto['unidadeid'])?$produto['unidadeid']:null);
+		$this->setSetorEstoqueID(isset($produto['setorestoqueid'])?$produto['setorestoqueid']:null);
+		$this->setSetorPreparoID(isset($produto['setorpreparoid'])?$produto['setorpreparoid']:null);
+		$this->setTributacaoID(isset($produto['tributacaoid'])?$produto['tributacaoid']:null);
+		$this->setDescricao(isset($produto['descricao'])?$produto['descricao']:null);
+		$this->setAbreviacao(isset($produto['abreviacao'])?$produto['abreviacao']:null);
+		$this->setDetalhes(isset($produto['detalhes'])?$produto['detalhes']:null);
+		$this->setQuantidadeLimite(isset($produto['quantidadelimite'])?$produto['quantidadelimite']:null);
+		$this->setQuantidadeMaxima(isset($produto['quantidademaxima'])?$produto['quantidademaxima']:null);
+		$this->setConteudo(isset($produto['conteudo'])?$produto['conteudo']:null);
+		$this->setPrecoVenda(isset($produto['precovenda'])?$produto['precovenda']:null);
+		$this->setCustoProducao(isset($produto['custoproducao'])?$produto['custoproducao']:null);
+		$this->setTipo(isset($produto['tipo'])?$produto['tipo']:null);
+		$this->setCobrarServico(isset($produto['cobrarservico'])?$produto['cobrarservico']:null);
+		$this->setDivisivel(isset($produto['divisivel'])?$produto['divisivel']:null);
+		$this->setPesavel(isset($produto['pesavel'])?$produto['pesavel']:null);
+		$this->setPerecivel(isset($produto['perecivel'])?$produto['perecivel']:null);
+		$this->setTempoPreparo(isset($produto['tempopreparo'])?$produto['tempopreparo']:null);
+		$this->setVisivel(isset($produto['visivel'])?$produto['visivel']:null);
+		$this->setImagem(isset($produto['imagem'])?$produto['imagem']:null);
+		$this->setDataAtualizacao(isset($produto['dataatualizacao'])?$produto['dataatualizacao']:null);
 	}
 
 	private static function initGet() {

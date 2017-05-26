@@ -109,11 +109,11 @@ class ZCaixa {
 	public function fromArray($caixa = array()) {
 		if(!is_array($caixa))
 			return $this;
-		$this->setID($caixa['id']);
-		$this->setDescricao($caixa['descricao']);
-		$this->setSerie($caixa['serie']);
-		$this->setNumeroInicial($caixa['numeroinicial']);
-		$this->setAtivo($caixa['ativo']);
+		$this->setID(isset($caixa['id'])?$caixa['id']:null);
+		$this->setDescricao(isset($caixa['descricao'])?$caixa['descricao']:null);
+		$this->setSerie(isset($caixa['serie'])?$caixa['serie']:null);
+		$this->setNumeroInicial(isset($caixa['numeroinicial'])?$caixa['numeroinicial']:null);
+		$this->setAtivo(isset($caixa['ativo'])?$caixa['ativo']:null);
 	}
 
 	public static function getPeloID($id) {

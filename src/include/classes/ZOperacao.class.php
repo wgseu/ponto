@@ -88,10 +88,10 @@ class ZOperacao {
 	public function fromArray($operacao = array()) {
 		if(!is_array($operacao))
 			return $this;
-		$this->setID($operacao['id']);
-		$this->setCodigo($operacao['codigo']);
-		$this->setDescricao($operacao['descricao']);
-		$this->setDetalhes($operacao['detalhes']);
+		$this->setID(isset($operacao['id'])?$operacao['id']:null);
+		$this->setCodigo(isset($operacao['codigo'])?$operacao['codigo']:null);
+		$this->setDescricao(isset($operacao['descricao'])?$operacao['descricao']:null);
+		$this->setDetalhes(isset($operacao['detalhes'])?$operacao['detalhes']:null);
 	}
 
 	public static function getPeloID($id) {

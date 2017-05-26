@@ -19,7 +19,7 @@
     O Cliente adquire apenas o direito de usar o software e não adquire qualquer outros
     direitos, expressos ou implícitos no GrandChef diferentes dos especificados nesta Licença.
 */
-class UploadException extends Exception 
+class UploadException extends \Exception 
 { 
     public function __construct($code) { 
         $message = $this->codeToMessage($code); 

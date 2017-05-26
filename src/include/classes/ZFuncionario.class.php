@@ -37,16 +37,16 @@ class ZFuncionario {
 
 	public function __construct($funcionario = array()) {
 		if(is_array($funcionario)) {
-			$this->setID($funcionario['id']);
-			$this->setFuncaoID($funcionario['funcaoid']);
-			$this->setClienteID($funcionario['clienteid']);
-			$this->setCodigoBarras($funcionario['codigobarras']);
-			$this->setPorcentagem($funcionario['porcentagem']);
-			$this->setLinguagemID($funcionario['linguagemid']);
-			$this->setPontuacao($funcionario['pontuacao']);
-			$this->setAtivo($funcionario['ativo']);
-			$this->setDataSaida($funcionario['datasaida']);
-			$this->setDataCadastro($funcionario['datacadastro']);
+			$this->setID(isset($funcionario['id'])?$funcionario['id']:null);
+			$this->setFuncaoID(isset($funcionario['funcaoid'])?$funcionario['funcaoid']:null);
+			$this->setClienteID(isset($funcionario['clienteid'])?$funcionario['clienteid']:null);
+			$this->setCodigoBarras(isset($funcionario['codigobarras'])?$funcionario['codigobarras']:null);
+			$this->setPorcentagem(isset($funcionario['porcentagem'])?$funcionario['porcentagem']:null);
+			$this->setLinguagemID(isset($funcionario['linguagemid'])?$funcionario['linguagemid']:null);
+			$this->setPontuacao(isset($funcionario['pontuacao'])?$funcionario['pontuacao']:null);
+			$this->setAtivo(isset($funcionario['ativo'])?$funcionario['ativo']:null);
+			$this->setDataSaida(isset($funcionario['datasaida'])?$funcionario['datasaida']:null);
+			$this->setDataCadastro(isset($funcionario['datacadastro'])?$funcionario['datacadastro']:null);
 		}
 	}
 

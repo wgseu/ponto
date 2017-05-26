@@ -3,3 +3,8 @@
 /src/static/doc/xml/*/*/*.xml
 /src/static/doc/cert/*.pem
 /utils/*.sublime-workspace
+/src/include/vendor
+/tmp
+/utils/tmp/coverage
+/*.lock
+/build

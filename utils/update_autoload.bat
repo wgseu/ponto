@@ -1,6 +1,6 @@
 @echo OFF
 
-cd ..\public_html\include\
+cd ..\
 
 composer dump-autoload
 

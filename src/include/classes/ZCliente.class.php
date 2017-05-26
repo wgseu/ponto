@@ -60,30 +60,30 @@ class ZCliente {
 
 	public function __construct($cliente = array()) {
 		if(is_array($cliente)) {
-			$this->setID($cliente['id']);
-			$this->setTipo($cliente['tipo']);
-			$this->setAcionistaID($cliente['acionistaid']);
-			$this->setLogin($cliente['login']);
-			$this->setSenha($cliente['senha']);
-			$this->setNome($cliente['nome']);
-			$this->setSobrenome($cliente['sobrenome']);
-			$this->setGenero($cliente['genero']);
-			$this->setCPF($cliente['cpf']);
-			$this->setRG($cliente['rg']);
-			$this->setIM($cliente['im']);
-			$this->setEmail($cliente['email']);
-			$this->setDataAniversario($cliente['dataaniversario']);
+			$this->setID(isset($cliente['id'])?$cliente['id']:null);
+			$this->setTipo(isset($cliente['tipo'])?$cliente['tipo']:null);
+			$this->setAcionistaID(isset($cliente['acionistaid'])?$cliente['acionistaid']:null);
+			$this->setLogin(isset($cliente['login'])?$cliente['login']:null);
+			$this->setSenha(isset($cliente['senha'])?$cliente['senha']:null);
+			$this->setNome(isset($cliente['nome'])?$cliente['nome']:null);
+			$this->setSobrenome(isset($cliente['sobrenome'])?$cliente['sobrenome']:null);
+			$this->setGenero(isset($cliente['genero'])?$cliente['genero']:null);
+			$this->setCPF(isset($cliente['cpf'])?$cliente['cpf']:null);
+			$this->setRG(isset($cliente['rg'])?$cliente['rg']:null);
+			$this->setIM(isset($cliente['im'])?$cliente['im']:null);
+			$this->setEmail(isset($cliente['email'])?$cliente['email']:null);
+			$this->setDataAniversario(isset($cliente['dataaniversario'])?$cliente['dataaniversario']:null);
 			for($i = 1; $i <= 2; $i++)
-				$this->setFone($i, $cliente['fone'.$i]);
-			$this->setSlogan($cliente['slogan']);
-			$this->setSecreto($cliente['secreto']);
-			$this->setLimiteCompra($cliente['limitecompra']);
-			$this->setFacebookURL($cliente['facebookurl']);
-			$this->setTwitterURL($cliente['twitterurl']);
-			$this->setLinkedInURL($cliente['linkedinurl']);
-			$this->setImagem($cliente['imagem']);
-			$this->setDataAtualizacao($cliente['dataatualizacao']);
-			$this->setDataCadastro($cliente['datacadastro']);
+				$this->setFone($i, isset($cliente['fone'.$i])?$cliente['fone'.$i]:null);
+			$this->setSlogan(isset($cliente['slogan'])?$cliente['slogan']:null);
+			$this->setSecreto(isset($cliente['secreto'])?$cliente['secreto']:null);
+			$this->setLimiteCompra(isset($cliente['limitecompra'])?$cliente['limitecompra']:null);
+			$this->setFacebookURL(isset($cliente['facebookurl'])?$cliente['facebookurl']:null);
+			$this->setTwitterURL(isset($cliente['twitterurl'])?$cliente['twitterurl']:null);
+			$this->setLinkedInURL(isset($cliente['linkedinurl'])?$cliente['linkedinurl']:null);
+			$this->setImagem(isset($cliente['imagem'])?$cliente['imagem']:null);
+			$this->setDataAtualizacao(isset($cliente['dataatualizacao'])?$cliente['dataatualizacao']:null);
+			$this->setDataCadastro(isset($cliente['datacadastro'])?$cliente['datacadastro']:null);
 		}
 	}
 
@@ -474,7 +474,7 @@ class ZCliente {
 		return sha1(utf8_decode(self::CHAVE_SECRETA . $p));
 	}
 
-	private static function initSelectFields(&$query) {
+	private static function initSelectFields($query) {
 		return $query->select(null)
 					 ->select('c.id')
 					 ->select('c.tipo')

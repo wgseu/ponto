@@ -23,9 +23,9 @@ require_once(dirname(dirname(__FILE__)) . '/app.php');
 
 need_permission(PermissaoNome::CADASTROCOMANDAS);
 
-$count = ZComanda::getCount($_GET['ativa'], $_GET['query']);
+$count = \MZ\Sale\Comanda::getCount($_GET['ativa'], $_GET['query']);
 list($pagesize, $offset, $pagestring) = pagestring($count, 10);
-$comandas = ZComanda::getTodas($_GET['ativa'], $_GET['query'], $offset, $pagesize);
+$comandas = \MZ\Sale\Comanda::getTodas($_GET['ativa'], $_GET['query'], $offset, $pagesize);
 
 $ativas = array(
 	'Y' => 'Ativas',

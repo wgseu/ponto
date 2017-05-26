@@ -30,9 +30,9 @@ class ZSetor {
 
 	public function __construct($setor = array()) {
 		if(is_array($setor)) {
-			$this->setID($setor['id']);
-			$this->setNome($setor['nome']);
-			$this->setDescricao($setor['descricao']);
+			$this->setID(isset($setor['id'])?$setor['id']:null);
+			$this->setNome(isset($setor['nome'])?$setor['nome']:null);
+			$this->setDescricao(isset($setor['descricao'])?$setor['descricao']:null);
 		}
 	}
 

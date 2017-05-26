@@ -1,6 +1,6 @@
 @echo OFF
-set PATH=%PATH%;%~pd0..\public_html\include\vendor\bin
+set PATH=%PATH%;%~pd0..\src\include\vendor\bin
 
 cd ..
-phpcpd public_html\include\api
+phpcpd src\include\api
 cd %~pd0

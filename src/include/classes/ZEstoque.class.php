@@ -46,22 +46,22 @@ class ZEstoque {
 
 	public function __construct($estoque = array()) {
 		if(is_array($estoque)) {
-			$this->setID($estoque['id']);
-			$this->setProdutoID($estoque['produtoid']);
-			$this->setTransacaoID($estoque['transacaoid']);
-			$this->setEntradaID($estoque['entradaid']);
-			$this->setFornecedorID($estoque['fornecedorid']);
-			$this->setSetorID($estoque['setorid']);
-			$this->setFuncionarioID($estoque['funcionarioid']);
-			$this->setTipoMovimento($estoque['tipomovimento']);
-			$this->setQuantidade($estoque['quantidade']);
-			$this->setPrecoCompra($estoque['precocompra']);
-			$this->setLote($estoque['lote']);
-			$this->setDataFabricacao($estoque['datafabricacao']);
-			$this->setDataVencimento($estoque['datavencimento']);
-			$this->setDetalhes($estoque['detalhes']);
-			$this->setCancelado($estoque['cancelado']);
-			$this->setDataMovimento($estoque['datamovimento']);
+			$this->setID(isset($estoque['id'])?$estoque['id']:null);
+			$this->setProdutoID(isset($estoque['produtoid'])?$estoque['produtoid']:null);
+			$this->setTransacaoID(isset($estoque['transacaoid'])?$estoque['transacaoid']:null);
+			$this->setEntradaID(isset($estoque['entradaid'])?$estoque['entradaid']:null);
+			$this->setFornecedorID(isset($estoque['fornecedorid'])?$estoque['fornecedorid']:null);
+			$this->setSetorID(isset($estoque['setorid'])?$estoque['setorid']:null);
+			$this->setFuncionarioID(isset($estoque['funcionarioid'])?$estoque['funcionarioid']:null);
+			$this->setTipoMovimento(isset($estoque['tipomovimento'])?$estoque['tipomovimento']:null);
+			$this->setQuantidade(isset($estoque['quantidade'])?$estoque['quantidade']:null);
+			$this->setPrecoCompra(isset($estoque['precocompra'])?$estoque['precocompra']:null);
+			$this->setLote(isset($estoque['lote'])?$estoque['lote']:null);
+			$this->setDataFabricacao(isset($estoque['datafabricacao'])?$estoque['datafabricacao']:null);
+			$this->setDataVencimento(isset($estoque['datavencimento'])?$estoque['datavencimento']:null);
+			$this->setDetalhes(isset($estoque['detalhes'])?$estoque['detalhes']:null);
+			$this->setCancelado(isset($estoque['cancelado'])?$estoque['cancelado']:null);
+			$this->setDataMovimento(isset($estoque['datamovimento'])?$estoque['datamovimento']:null);
 		}
 	}
 

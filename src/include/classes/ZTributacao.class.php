@@ -114,12 +114,12 @@ class ZTributacao {
 	public function fromArray($tributacao = array()) {
 		if(!is_array($tributacao))
 			return $this;
-		$this->setID($tributacao['id']);
-		$this->setNCM($tributacao['ncm']);
-		$this->setCEST($tributacao['cest']);
-		$this->setOrigemID($tributacao['origemid']);
-		$this->setOperacaoID($tributacao['operacaoid']);
-		$this->setImpostoID($tributacao['impostoid']);
+		$this->setID(isset($tributacao['id'])?$tributacao['id']:null);
+		$this->setNCM(isset($tributacao['ncm'])?$tributacao['ncm']:null);
+		$this->setCEST(isset($tributacao['cest'])?$tributacao['cest']:null);
+		$this->setOrigemID(isset($tributacao['origemid'])?$tributacao['origemid']:null);
+		$this->setOperacaoID(isset($tributacao['operacaoid'])?$tributacao['operacaoid']:null);
+		$this->setImpostoID(isset($tributacao['impostoid'])?$tributacao['impostoid']:null);
 	}
 
 	public static function getPeloID($id) {

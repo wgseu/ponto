@@ -127,10 +127,10 @@ class ZPermissao {
 
 	public function __construct($permissao = array()) {
 		if(is_array($permissao)) {
-			$this->setID($permissao['id']);
-			$this->setFuncionalidadeID($permissao['funcionalidadeid']);
-			$this->setNome($permissao['nome']);
-			$this->setDescricao($permissao['descricao']);
+			$this->setID(isset($permissao['id'])?$permissao['id']:null);
+			$this->setFuncionalidadeID(isset($permissao['funcionalidadeid'])?$permissao['funcionalidadeid']:null);
+			$this->setNome(isset($permissao['nome'])?$permissao['nome']:null);
+			$this->setDescricao(isset($permissao['descricao'])?$permissao['descricao']:null);
 		}
 	}
 

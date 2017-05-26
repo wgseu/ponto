@@ -29,9 +29,9 @@ class ZFuncao {
 
 	public function __construct($funcao = array()) {
 		if(is_array($funcao)) {
-			$this->setID($funcao['id']);
-			$this->setDescricao($funcao['descricao']);
-			$this->setSalarioBase($funcao['salariobase']);
+			$this->setID(isset($funcao['id'])?$funcao['id']:null);
+			$this->setDescricao(isset($funcao['descricao'])?$funcao['descricao']:null);
+			$this->setSalarioBase(isset($funcao['salariobase'])?$funcao['salariobase']:null);
 		}
 	}
 

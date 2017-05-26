@@ -35,15 +35,15 @@ class ZListaProduto {
 
 	public function __construct($lista_produto = array()) {
 		if(is_array($lista_produto)) {
-			$this->setID($lista_produto['id']);
-			$this->setListaCompraID($lista_produto['listacompraid']);
-			$this->setProdutoID($lista_produto['produtoid']);
-			$this->setFornecedorID($lista_produto['fornecedorid']);
-			$this->setQuantidade($lista_produto['quantidade']);
-			$this->setPrecoMaximo($lista_produto['precomaximo']);
-			$this->setPreco($lista_produto['preco']);
-			$this->setObservacoes($lista_produto['observacoes']);
-			$this->setComprado($lista_produto['comprado']);
+			$this->setID(isset($lista_produto['id'])?$lista_produto['id']:null);
+			$this->setListaCompraID(isset($lista_produto['listacompraid'])?$lista_produto['listacompraid']:null);
+			$this->setProdutoID(isset($lista_produto['produtoid'])?$lista_produto['produtoid']:null);
+			$this->setFornecedorID(isset($lista_produto['fornecedorid'])?$lista_produto['fornecedorid']:null);
+			$this->setQuantidade(isset($lista_produto['quantidade'])?$lista_produto['quantidade']:null);
+			$this->setPrecoMaximo(isset($lista_produto['precomaximo'])?$lista_produto['precomaximo']:null);
+			$this->setPreco(isset($lista_produto['preco'])?$lista_produto['preco']:null);
+			$this->setObservacoes(isset($lista_produto['observacoes'])?$lista_produto['observacoes']:null);
+			$this->setComprado(isset($lista_produto['comprado'])?$lista_produto['comprado']:null);
 		}
 	}
 

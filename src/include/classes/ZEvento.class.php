@@ -128,12 +128,12 @@ class ZEvento {
 	public function fromArray($evento = array()) {
 		if(!is_array($evento))
 			return $this;
-		$this->setID($evento['id']);
-		$this->setNotaID($evento['notaid']);
-		$this->setEstado($evento['estado']);
-		$this->setMensagem($evento['mensagem']);
-		$this->setCodigo($evento['codigo']);
-		$this->setDataCriacao($evento['datacriacao']);
+		$this->setID(isset($evento['id'])?$evento['id']:null);
+		$this->setNotaID(isset($evento['notaid'])?$evento['notaid']:null);
+		$this->setEstado(isset($evento['estado'])?$evento['estado']:null);
+		$this->setMensagem(isset($evento['mensagem'])?$evento['mensagem']:null);
+		$this->setCodigo(isset($evento['codigo'])?$evento['codigo']:null);
+		$this->setDataCriacao(isset($evento['datacriacao'])?$evento['datacriacao']:null);
 	}
 
 	public static function getPeloID($id) {

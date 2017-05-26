@@ -34,14 +34,14 @@ class ZPais {
 
 	public function __construct($pais = array()) {
 		if(is_array($pais)) {
-			$this->setID($pais['id']);
-			$this->setNome($pais['nome']);
-			$this->setSigla($pais['sigla']);
-			$this->setMoedaID($pais['moedaid']);
-			$this->setBandeiraIndex($pais['bandeiraindex']);
-			$this->setLinguagemID($pais['linguagemid']);
-			$this->setEntradas($pais['entradas']);
-			$this->setUnitario($pais['unitario']);
+			$this->setID(isset($pais['id'])?$pais['id']:null);
+			$this->setNome(isset($pais['nome'])?$pais['nome']:null);
+			$this->setSigla(isset($pais['sigla'])?$pais['sigla']:null);
+			$this->setMoedaID(isset($pais['moedaid'])?$pais['moedaid']:null);
+			$this->setBandeiraIndex(isset($pais['bandeiraindex'])?$pais['bandeiraindex']:null);
+			$this->setLinguagemID(isset($pais['linguagemid'])?$pais['linguagemid']:null);
+			$this->setEntradas(isset($pais['entradas'])?$pais['entradas']:null);
+			$this->setUnitario(isset($pais['unitario'])?$pais['unitario']:null);
 		}
 	}
 

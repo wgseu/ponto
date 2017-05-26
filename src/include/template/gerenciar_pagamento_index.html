@@ -90,7 +90,7 @@
 <!--{if is_null($pagamento->getPedidoID())}-->
 									<a href="/gerenciar/conta/editar?id={$_conta->getID()}" title="Editar conta '{$_conta->getDescricao()}'">${$_conta->getID() != 1?$_conta->getDescricao():$pagamento->getDetalhes()}</a>
 <!--{else}-->
-<!--${$_comanda = ZComanda::getPeloID($_pedido->getComandaID())}-->
+<!--${$_comanda = \MZ\Sale\Comanda::findByID($_pedido->getComandaID())}-->
 <!--${$_mesa = ZMesa::getPeloID($_pedido->getMesaID())}-->
 									<a href="/gerenciar/pedido/?query={$_pedido->getID()}" title="Visualizar pedido '{$_pedido->getID()}'">Pedido {$_pedido->getID()}: ${$_pedido->getTipo() == PedidoTipo::ENTREGA && is_null($_pedido->getLocalizacaoID())?'Viagem':($_pedido->getTipo() == PedidoTipo::MESA?$_mesa->getNome():($_pedido->getTipo() == PedidoTipo::COMANDA?$_comanda->getNome():$_tipo_names[$_pedido->getTipo()]))}</a>
 <!--{/if}-->

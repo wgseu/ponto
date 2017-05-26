@@ -38,13 +38,13 @@ class ZCarteira {
 
 	public function __construct($carteira = array()) {
 		if(is_array($carteira)) {
-			$this->setID($carteira['id']);
-			$this->setTipo($carteira['tipo']);
-			$this->setBancoID($carteira['bancoid']);
-			$this->setDescricao($carteira['descricao']);
-			$this->setConta($carteira['conta']);
-			$this->setAgencia($carteira['agencia']);
-			$this->setAtiva($carteira['ativa']);
+			$this->setID(isset($carteira['id'])?$carteira['id']:null);
+			$this->setTipo(isset($carteira['tipo'])?$carteira['tipo']:null);
+			$this->setBancoID(isset($carteira['bancoid'])?$carteira['bancoid']:null);
+			$this->setDescricao(isset($carteira['descricao'])?$carteira['descricao']:null);
+			$this->setConta(isset($carteira['conta'])?$carteira['conta']:null);
+			$this->setAgencia(isset($carteira['agencia'])?$carteira['agencia']:null);
+			$this->setAtiva(isset($carteira['ativa'])?$carteira['ativa']:null);
 		}
 	}
 

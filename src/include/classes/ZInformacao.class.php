@@ -32,12 +32,12 @@ class ZInformacao {
 
 	public function __construct($informacao = array()) {
 		if(is_array($informacao)) {
-			$this->setID($informacao['id']);
-			$this->setProdutoID($informacao['produtoid']);
-			$this->setUnidadeID($informacao['unidadeid']);
-			$this->setPorcao($informacao['porcao']);
-			$this->setDieta($informacao['dieta']);
-			$this->setIngredientes($informacao['ingredientes']);
+			$this->setID(isset($informacao['id'])?$informacao['id']:null);
+			$this->setProdutoID(isset($informacao['produtoid'])?$informacao['produtoid']:null);
+			$this->setUnidadeID(isset($informacao['unidadeid'])?$informacao['unidadeid']:null);
+			$this->setPorcao(isset($informacao['porcao'])?$informacao['porcao']:null);
+			$this->setDieta(isset($informacao['dieta'])?$informacao['dieta']:null);
+			$this->setIngredientes(isset($informacao['ingredientes'])?$informacao['ingredientes']:null);
 		}
 	}
 

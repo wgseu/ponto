@@ -31,10 +31,10 @@ class ZPagina {
 
 	public function __construct($pagina = array()) {
 		if(is_array($pagina)) {
-			$this->setID($pagina['id']);
-			$this->setNome($pagina['nome']);
-			$this->setLinguagemID($pagina['linguagemid']);
-			$this->setConteudo($pagina['conteudo']);
+			$this->setID(isset($pagina['id'])?$pagina['id']:null);
+			$this->setNome(isset($pagina['nome'])?$pagina['nome']:null);
+			$this->setLinguagemID(isset($pagina['linguagemid'])?$pagina['linguagemid']:null);
+			$this->setConteudo(isset($pagina['conteudo'])?$pagina['conteudo']:null);
 		}
 	}
 

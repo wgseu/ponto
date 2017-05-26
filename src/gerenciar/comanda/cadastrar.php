@@ -25,10 +25,10 @@ need_permission(PermissaoNome::CADASTROCOMANDAS);
 $focusctrl = 'nome';
 $errors = array();
 if ($_POST) {
-	$comanda = new ZComanda($_POST);
+	$comanda = new \MZ\Sale\Comanda($_POST);
 	try {
 		$comanda->setID(null);
-		$comanda = ZComanda::cadastrar($comanda);
+		$comanda = \MZ\Sale\Comanda::cadastrar($comanda);
 		Thunder::success('Comanda "'.$comanda->getNome().'" cadastrada com sucesso!', true);
 		redirect('/gerenciar/comanda/');
 	} catch (ValidationException $e) {
@@ -42,8 +42,8 @@ if ($_POST) {
 		break;
 	}
 } else {
-	$comanda = new ZComanda();
-	$comanda->setID(ZComanda::getProximoID());
+	$comanda = new \MZ\Sale\Comanda();
+	$comanda->setID(\MZ\Sale\Comanda::getProximoID());
 	$comanda->setNome('Comanda ' . $comanda->getID());
 	$comanda->setAtiva('Y');
 }

@@ -30,10 +30,10 @@ class ZUnidade {
 
 	public function __construct($unidade = array()) {
 		if(is_array($unidade)) {
-			$this->setID($unidade['id']);
-			$this->setNome($unidade['nome']);
-			$this->setDescricao($unidade['descricao']);
-			$this->setSigla($unidade['sigla']);
+			$this->setID(isset($unidade['id'])?$unidade['id']:null);
+			$this->setNome(isset($unidade['nome'])?$unidade['nome']:null);
+			$this->setDescricao(isset($unidade['descricao'])?$unidade['descricao']:null);
+			$this->setSigla(isset($unidade['sigla'])?$unidade['sigla']:null);
 		}
 	}
 

@@ -31,11 +31,11 @@ class ZEndereco {
 
 	public function __construct($endereco = array()) {
 		if(is_array($endereco)) {
-			$this->setID($endereco['id']);
-			$this->setCidadeID($endereco['cidadeid']);
-			$this->setBairroID($endereco['bairroid']);
-			$this->setLogradouro($endereco['logradouro']);
-			$this->setCEP($endereco['cep']);
+			$this->setID(isset($endereco['id'])?$endereco['id']:null);
+			$this->setCidadeID(isset($endereco['cidadeid'])?$endereco['cidadeid']:null);
+			$this->setBairroID(isset($endereco['bairroid'])?$endereco['bairroid']:null);
+			$this->setLogradouro(isset($endereco['logradouro'])?$endereco['logradouro']:null);
+			$this->setCEP(isset($endereco['cep'])?$endereco['cep']:null);
 		}
 	}
 

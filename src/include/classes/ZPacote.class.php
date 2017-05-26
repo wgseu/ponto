@@ -37,16 +37,16 @@ class ZPacote {
 
 	public function __construct($pacote = array()) {
 		if(is_array($pacote)) {
-			$this->setID($pacote['id']);
-			$this->setPacoteID($pacote['pacoteid']);
-			$this->setGrupoID($pacote['grupoid']);
-			$this->setProdutoID($pacote['produtoid']);
-			$this->setPropriedadeID($pacote['propriedadeid']);
-			$this->setAssociacaoID($pacote['associacaoid']);
-			$this->setQuantidade($pacote['quantidade']);
-			$this->setValor($pacote['valor']);
-			$this->setSelecionado($pacote['selecionado']);
-			$this->setVisivel($pacote['visivel']);
+			$this->setID(isset($pacote['id'])?$pacote['id']:null);
+			$this->setPacoteID(isset($pacote['pacoteid'])?$pacote['pacoteid']:null);
+			$this->setGrupoID(isset($pacote['grupoid'])?$pacote['grupoid']:null);
+			$this->setProdutoID(isset($pacote['produtoid'])?$pacote['produtoid']:null);
+			$this->setPropriedadeID(isset($pacote['propriedadeid'])?$pacote['propriedadeid']:null);
+			$this->setAssociacaoID(isset($pacote['associacaoid'])?$pacote['associacaoid']:null);
+			$this->setQuantidade(isset($pacote['quantidade'])?$pacote['quantidade']:null);
+			$this->setValor(isset($pacote['valor'])?$pacote['valor']:null);
+			$this->setSelecionado(isset($pacote['selecionado'])?$pacote['selecionado']:null);
+			$this->setVisivel(isset($pacote['visivel'])?$pacote['visivel']:null);
 		}
 	}
 

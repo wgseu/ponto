@@ -37,11 +37,11 @@ class ZJuncao {
 
 	public function __construct($juncao = array()) {
 		if(is_array($juncao)) {
-			$this->setID($juncao['id']);
-			$this->setMesaID($juncao['mesaid']);
-			$this->setPedidoID($juncao['pedidoid']);
-			$this->setEstado($juncao['estado']);
-			$this->setDataMovimento($juncao['datamovimento']);
+			$this->setID(isset($juncao['id'])?$juncao['id']:null);
+			$this->setMesaID(isset($juncao['mesaid'])?$juncao['mesaid']:null);
+			$this->setPedidoID(isset($juncao['pedidoid'])?$juncao['pedidoid']:null);
+			$this->setEstado(isset($juncao['estado'])?$juncao['estado']:null);
+			$this->setDataMovimento(isset($juncao['datamovimento'])?$juncao['datamovimento']:null);
 		}
 	}
 

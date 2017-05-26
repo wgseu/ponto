@@ -27,10 +27,10 @@ class ZSessao {
 
 	public function __construct($sessao = array()) {
 		if(is_array($sessao)) {
-			$this->setID($sessao['id']);
-			$this->setDataInicio($sessao['datainicio']);
-			$this->setDataTermino($sessao['datatermino']);
-			$this->setAberta($sessao['aberta']);
+			$this->setID(isset($sessao['id'])?$sessao['id']:null);
+			$this->setDataInicio(isset($sessao['datainicio'])?$sessao['datainicio']:null);
+			$this->setDataTermino(isset($sessao['datatermino'])?$sessao['datatermino']:null);
+			$this->setAberta(isset($sessao['aberta'])?$sessao['aberta']:null);
 		}
 	}
 

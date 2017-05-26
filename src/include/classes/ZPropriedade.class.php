@@ -32,12 +32,12 @@ class ZPropriedade {
 
 	public function __construct($propriedade = array()) {
 		if(is_array($propriedade)) {
-			$this->setID($propriedade['id']);
-			$this->setGrupoID($propriedade['grupoid']);
-			$this->setNome($propriedade['nome']);
-			$this->setAbreviacao($propriedade['abreviacao']);
-			$this->setImagem($propriedade['imagem']);
-			$this->setDataAtualizacao($propriedade['dataatualizacao']);
+			$this->setID(isset($propriedade['id'])?$propriedade['id']:null);
+			$this->setGrupoID(isset($propriedade['grupoid'])?$propriedade['grupoid']:null);
+			$this->setNome(isset($propriedade['nome'])?$propriedade['nome']:null);
+			$this->setAbreviacao(isset($propriedade['abreviacao'])?$propriedade['abreviacao']:null);
+			$this->setImagem(isset($propriedade['imagem'])?$propriedade['imagem']:null);
+			$this->setDataAtualizacao(isset($propriedade['dataatualizacao'])?$propriedade['dataatualizacao']:null);
 		}
 	}
 

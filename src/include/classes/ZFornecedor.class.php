@@ -30,10 +30,10 @@ class ZFornecedor {
 
 	public function __construct($fornecedor = array()) {
 		if(is_array($fornecedor)) {
-			$this->setID($fornecedor['id']);
-			$this->setEmpresaID($fornecedor['empresaid']);
-			$this->setPrazoPagamento($fornecedor['prazopagamento']);
-			$this->setDataCadastro($fornecedor['datacadastro']);
+			$this->setID(isset($fornecedor['id'])?$fornecedor['id']:null);
+			$this->setEmpresaID(isset($fornecedor['empresaid'])?$fornecedor['empresaid']:null);
+			$this->setPrazoPagamento(isset($fornecedor['prazopagamento'])?$fornecedor['prazopagamento']:null);
+			$this->setDataCadastro(isset($fornecedor['datacadastro'])?$fornecedor['datacadastro']:null);
 		}
 	}
 

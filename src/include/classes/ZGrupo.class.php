@@ -47,16 +47,16 @@ class ZGrupo {
 
 	public function __construct($grupo = array()) {
 		if(is_array($grupo)) {
-			$this->setID($grupo['id']);
-			$this->setProdutoID($grupo['produtoid']);
-			$this->setDescricao($grupo['descricao']);
-			$this->setMultiplo($grupo['multiplo']);
-			$this->setTipo($grupo['tipo']);
-			$this->setQuantidadeMinima($grupo['quantidademinima']);
-			$this->setQuantidadeMaxima($grupo['quantidademaxima']);
-			$this->setFuncao($grupo['funcao']);
+			$this->setID(isset($grupo['id'])?$grupo['id']:null);
+			$this->setProdutoID(isset($grupo['produtoid'])?$grupo['produtoid']:null);
+			$this->setDescricao(isset($grupo['descricao'])?$grupo['descricao']:null);
+			$this->setMultiplo(isset($grupo['multiplo'])?$grupo['multiplo']:null);
+			$this->setTipo(isset($grupo['tipo'])?$grupo['tipo']:null);
+			$this->setQuantidadeMinima(isset($grupo['quantidademinima'])?$grupo['quantidademinima']:null);
+			$this->setQuantidadeMaxima(isset($grupo['quantidademaxima'])?$grupo['quantidademaxima']:null);
+			$this->setFuncao(isset($grupo['funcao'])?$grupo['funcao']:null);
 			// extra
-			$this->setGrupoAssociadoID($grupo['grupoassociadoid']);
+			$this->setGrupoAssociadoID(isset($grupo['grupoassociadoid'])?$grupo['grupoassociadoid']:null);
 		}
 	}
 

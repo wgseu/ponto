@@ -31,11 +31,11 @@ class ZModulo {
 
 	public function __construct($modulo = array()) {
 		if(is_array($modulo)) {
-			$this->setID($modulo['id']);
-			$this->setNome($modulo['nome']);
-			$this->setDescricao($modulo['descricao']);
-			$this->setImageIndex($modulo['imageindex']);
-			$this->setHabilitado($modulo['habilitado']);
+			$this->setID(isset($modulo['id'])?$modulo['id']:null);
+			$this->setNome(isset($modulo['nome'])?$modulo['nome']:null);
+			$this->setDescricao(isset($modulo['descricao'])?$modulo['descricao']:null);
+			$this->setImageIndex(isset($modulo['imageindex'])?$modulo['imageindex']:null);
+			$this->setHabilitado(isset($modulo['habilitado'])?$modulo['habilitado']:null);
 		}
 	}
 

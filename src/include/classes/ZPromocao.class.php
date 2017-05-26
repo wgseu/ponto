@@ -33,12 +33,12 @@ class ZPromocao {
 
 	public function __construct($promocao = array()) {
 		if(is_array($promocao)) {
-			$this->setID($promocao['id']);
-			$this->setProdutoID($promocao['produtoid']);
-			$this->setInicio($promocao['inicio']);
-			$this->setFim($promocao['fim']);
-			$this->setValor($promocao['valor']);
-			$this->setProibir($promocao['proibir']);
+			$this->setID(isset($promocao['id'])?$promocao['id']:null);
+			$this->setProdutoID(isset($promocao['produtoid'])?$promocao['produtoid']:null);
+			$this->setInicio(isset($promocao['inicio'])?$promocao['inicio']:null);
+			$this->setFim(isset($promocao['fim'])?$promocao['fim']:null);
+			$this->setValor(isset($promocao['valor'])?$promocao['valor']:null);
+			$this->setProibir(isset($promocao['proibir'])?$promocao['proibir']:null);
 		}
 	}
 

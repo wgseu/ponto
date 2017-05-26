@@ -48,18 +48,18 @@ class ZTransferencia {
 
 	public function __construct($transferencia = array()) {
 		if(is_array($transferencia)) {
-			$this->setID($transferencia['id']);
-			$this->setPedidoID($transferencia['pedidoid']);
-			$this->setDestinoPedidoID($transferencia['destinopedidoid']);
-			$this->setTipo($transferencia['tipo']);
-			$this->setModulo($transferencia['modulo']);
-			$this->setMesaID($transferencia['mesaid']);
-			$this->setDestinoMesaID($transferencia['destinomesaid']);
-			$this->setComandaID($transferencia['comandaid']);
-			$this->setDestinoComandaID($transferencia['destinocomandaid']);
-			$this->setProdutoPedidoID($transferencia['produtopedidoid']);
-			$this->setFuncionarioID($transferencia['funcionarioid']);
-			$this->setDataHora($transferencia['datahora']);
+			$this->setID(isset($transferencia['id'])?$transferencia['id']:null);
+			$this->setPedidoID(isset($transferencia['pedidoid'])?$transferencia['pedidoid']:null);
+			$this->setDestinoPedidoID(isset($transferencia['destinopedidoid'])?$transferencia['destinopedidoid']:null);
+			$this->setTipo(isset($transferencia['tipo'])?$transferencia['tipo']:null);
+			$this->setModulo(isset($transferencia['modulo'])?$transferencia['modulo']:null);
+			$this->setMesaID(isset($transferencia['mesaid'])?$transferencia['mesaid']:null);
+			$this->setDestinoMesaID(isset($transferencia['destinomesaid'])?$transferencia['destinomesaid']:null);
+			$this->setComandaID(isset($transferencia['comandaid'])?$transferencia['comandaid']:null);
+			$this->setDestinoComandaID(isset($transferencia['destinocomandaid'])?$transferencia['destinocomandaid']:null);
+			$this->setProdutoPedidoID(isset($transferencia['produtopedidoid'])?$transferencia['produtopedidoid']:null);
+			$this->setFuncionarioID(isset($transferencia['funcionarioid'])?$transferencia['funcionarioid']:null);
+			$this->setDataHora(isset($transferencia['datahora'])?$transferencia['datahora']:null);
 		}
 	}
 

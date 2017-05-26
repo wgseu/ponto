@@ -33,13 +33,13 @@ class ZMoeda {
 
 	public function __construct($moeda = array()) {
 		if(is_array($moeda)) {
-			$this->setID($moeda['id']);
-			$this->setNome($moeda['nome']);
-			$this->setSimbolo($moeda['simbolo']);
-			$this->setCodigo($moeda['codigo']);
-			$this->setDivisao($moeda['divisao']);
-			$this->setFracao($moeda['fracao']);
-			$this->setFormato($moeda['formato']);
+			$this->setID(isset($moeda['id'])?$moeda['id']:null);
+			$this->setNome(isset($moeda['nome'])?$moeda['nome']:null);
+			$this->setSimbolo(isset($moeda['simbolo'])?$moeda['simbolo']:null);
+			$this->setCodigo(isset($moeda['codigo'])?$moeda['codigo']:null);
+			$this->setDivisao(isset($moeda['divisao'])?$moeda['divisao']:null);
+			$this->setFracao(isset($moeda['fracao'])?$moeda['fracao']:null);
+			$this->setFormato(isset($moeda['formato'])?$moeda['formato']:null);
 		}
 	}
 

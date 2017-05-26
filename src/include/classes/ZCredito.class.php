@@ -33,13 +33,13 @@ class ZCredito {
 
 	public function __construct($credito = array()) {
 		if(is_array($credito)) {
-			$this->setID($credito['id']);
-			$this->setClienteID($credito['clienteid']);
-			$this->setValor($credito['valor']);
-			$this->setDetalhes($credito['detalhes']);
-			$this->setFuncionarioID($credito['funcionarioid']);
-			$this->setCancelado($credito['cancelado']);
-			$this->setDataCadastro($credito['datacadastro']);
+			$this->setID(isset($credito['id'])?$credito['id']:null);
+			$this->setClienteID(isset($credito['clienteid'])?$credito['clienteid']:null);
+			$this->setValor(isset($credito['valor'])?$credito['valor']:null);
+			$this->setDetalhes(isset($credito['detalhes'])?$credito['detalhes']:null);
+			$this->setFuncionarioID(isset($credito['funcionarioid'])?$credito['funcionarioid']:null);
+			$this->setCancelado(isset($credito['cancelado'])?$credito['cancelado']:null);
+			$this->setDataCadastro(isset($credito['datacadastro'])?$credito['datacadastro']:null);
 		}
 	}
 

@@ -57,26 +57,26 @@ class ZPedido {
 
 	public function __construct($pedido = array()) {
 		if(is_array($pedido)) {
-			$this->setID($pedido['id']);
-			$this->setMesaID($pedido['mesaid']);
-			$this->setComandaID($pedido['comandaid']);
-			$this->setMovimentacaoID($pedido['movimentacaoid']);
-			$this->setSessaoID($pedido['sessaoid']);
-			$this->setFuncionarioID($pedido['funcionarioid']);
-			$this->setEntregadorID($pedido['entregadorid']);
-			$this->setClienteID($pedido['clienteid']);
-			$this->setLocalizacaoID($pedido['localizacaoid']);
-			$this->setTipo($pedido['tipo']);
-			$this->setEstado($pedido['estado']);
-			$this->setPessoas($pedido['pessoas']);
-			$this->setDescricao($pedido['descricao']);
-			$this->setFechadorID($pedido['fechadorid']);
-			$this->setDataImpressao($pedido['dataimpressao']);
-			$this->setCancelado($pedido['cancelado']);
-			$this->setDataCriacao($pedido['datacriacao']);
-			$this->setDataAgendamento($pedido['dataagendamento']);
-			$this->setDataEntrega($pedido['dataentrega']);
-			$this->setDataConclusao($pedido['dataconclusao']);
+			$this->setID(isset($pedido['id'])?$pedido['id']:null);
+			$this->setMesaID(isset($pedido['mesaid'])?$pedido['mesaid']:null);
+			$this->setComandaID(isset($pedido['comandaid'])?$pedido['comandaid']:null);
+			$this->setMovimentacaoID(isset($pedido['movimentacaoid'])?$pedido['movimentacaoid']:null);
+			$this->setSessaoID(isset($pedido['sessaoid'])?$pedido['sessaoid']:null);
+			$this->setFuncionarioID(isset($pedido['funcionarioid'])?$pedido['funcionarioid']:null);
+			$this->setEntregadorID(isset($pedido['entregadorid'])?$pedido['entregadorid']:null);
+			$this->setClienteID(isset($pedido['clienteid'])?$pedido['clienteid']:null);
+			$this->setLocalizacaoID(isset($pedido['localizacaoid'])?$pedido['localizacaoid']:null);
+			$this->setTipo(isset($pedido['tipo'])?$pedido['tipo']:null);
+			$this->setEstado(isset($pedido['estado'])?$pedido['estado']:null);
+			$this->setPessoas(isset($pedido['pessoas'])?$pedido['pessoas']:null);
+			$this->setDescricao(isset($pedido['descricao'])?$pedido['descricao']:null);
+			$this->setFechadorID(isset($pedido['fechadorid'])?$pedido['fechadorid']:null);
+			$this->setDataImpressao(isset($pedido['dataimpressao'])?$pedido['dataimpressao']:null);
+			$this->setCancelado(isset($pedido['cancelado'])?$pedido['cancelado']:null);
+			$this->setDataCriacao(isset($pedido['datacriacao'])?$pedido['datacriacao']:null);
+			$this->setDataAgendamento(isset($pedido['dataagendamento'])?$pedido['dataagendamento']:null);
+			$this->setDataEntrega(isset($pedido['dataentrega'])?$pedido['dataentrega']:null);
+			$this->setDataConclusao(isset($pedido['dataconclusao'])?$pedido['dataconclusao']:null);
 		}
 	}
 

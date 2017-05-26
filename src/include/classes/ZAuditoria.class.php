@@ -43,13 +43,13 @@ class ZAuditoria {
 
 	public function __construct($auditoria = array()) {
 		if(is_array($auditoria)) {
-			$this->setID($auditoria['id']);
-			$this->setFuncionarioID($auditoria['funcionarioid']);
-			$this->setAutorizadorID($auditoria['autorizadorid']);
-			$this->setTipo($auditoria['tipo']);
-			$this->setPrioridade($auditoria['prioridade']);
-			$this->setDescricao($auditoria['descricao']);
-			$this->setDataHora($auditoria['datahora']);
+			$this->setID(isset($auditoria['id'])?$auditoria['id']:null);
+			$this->setFuncionarioID(isset($auditoria['funcionarioid'])?$auditoria['funcionarioid']:null);
+			$this->setAutorizadorID(isset($auditoria['autorizadorid'])?$auditoria['autorizadorid']:null);
+			$this->setTipo(isset($auditoria['tipo'])?$auditoria['tipo']:null);
+			$this->setPrioridade(isset($auditoria['prioridade'])?$auditoria['prioridade']:null);
+			$this->setDescricao(isset($auditoria['descricao'])?$auditoria['descricao']:null);
+			$this->setDataHora(isset($auditoria['datahora'])?$auditoria['datahora']:null);
 		}
 	}
 

@@ -75,9 +75,9 @@ class ZRegime {
 	public function fromArray($regime = array()) {
 		if(!is_array($regime))
 			return $this;
-		$this->setID($regime['id']);
-		$this->setCodigo($regime['codigo']);
-		$this->setDescricao($regime['descricao']);
+		$this->setID(isset($regime['id'])?$regime['id']:null);
+		$this->setCodigo(isset($regime['codigo'])?$regime['codigo']:null);
+		$this->setDescricao(isset($regime['descricao'])?$regime['descricao']:null);
 	}
 
 	public static function getPeloID($id) {

@@ -47,17 +47,17 @@ class ZServico {
 
 	public function __construct($servico = array()) {
 		if(is_array($servico)) {
-			$this->setID($servico['id']);
-			$this->setNome($servico['nome']);
-			$this->setDescricao($servico['descricao']);
-			$this->setDetalhes($servico['detalhes']);
-			$this->setTipo($servico['tipo']);
-			$this->setObrigatorio($servico['obrigatorio']);
-			$this->setDataInicio($servico['datainicio']);
-			$this->setDataFim($servico['datafim']);
-			$this->setValor($servico['valor']);
-			$this->setIndividual($servico['individual']);
-			$this->setAtivo($servico['ativo']);
+			$this->setID(isset($servico['id'])?$servico['id']:null);
+			$this->setNome(isset($servico['nome'])?$servico['nome']:null);
+			$this->setDescricao(isset($servico['descricao'])?$servico['descricao']:null);
+			$this->setDetalhes(isset($servico['detalhes'])?$servico['detalhes']:null);
+			$this->setTipo(isset($servico['tipo'])?$servico['tipo']:null);
+			$this->setObrigatorio(isset($servico['obrigatorio'])?$servico['obrigatorio']:null);
+			$this->setDataInicio(isset($servico['datainicio'])?$servico['datainicio']:null);
+			$this->setDataFim(isset($servico['datafim'])?$servico['datafim']:null);
+			$this->setValor(isset($servico['valor'])?$servico['valor']:null);
+			$this->setIndividual(isset($servico['individual'])?$servico['individual']:null);
+			$this->setAtivo(isset($servico['ativo'])?$servico['ativo']:null);
 		}
 	}
 

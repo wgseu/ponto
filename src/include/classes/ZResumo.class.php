@@ -41,11 +41,11 @@ class ZResumo {
 
 	public function __construct($resumo = array()) {
 		if(is_array($resumo)) {
-			$this->setID($resumo['id']);
-			$this->setMovimentacaoID($resumo['movimentacaoid']);
-			$this->setTipo($resumo['tipo']);
-			$this->setCartaoID($resumo['cartaoid']);
-			$this->setValor($resumo['valor']);
+			$this->setID(isset($resumo['id'])?$resumo['id']:null);
+			$this->setMovimentacaoID(isset($resumo['movimentacaoid'])?$resumo['movimentacaoid']:null);
+			$this->setTipo(isset($resumo['tipo'])?$resumo['tipo']:null);
+			$this->setCartaoID(isset($resumo['cartaoid'])?$resumo['cartaoid']:null);
+			$this->setValor(isset($resumo['valor'])?$resumo['valor']:null);
 		}
 	}
 

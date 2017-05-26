@@ -30,12 +30,12 @@ class ZCategoria {
 
 	public function __construct($categoria = array()) {
 		if(is_array($categoria)) {
-			$this->setID($categoria['id']);
-			$this->setCategoriaID($categoria['categoriaid']);
-			$this->setDescricao($categoria['descricao']);
-			$this->setServico($categoria['servico']);
-			$this->setImagem($categoria['imagem']);
-			$this->setDataAtualizacao($categoria['dataatualizacao']);
+			$this->setID(isset($categoria['id'])?$categoria['id']:null);
+			$this->setCategoriaID(isset($categoria['categoriaid'])?$categoria['categoriaid']:null);
+			$this->setDescricao(isset($categoria['descricao'])?$categoria['descricao']:null);
+			$this->setServico(isset($categoria['servico'])?$categoria['servico']:null);
+			$this->setImagem(isset($categoria['imagem'])?$categoria['imagem']:null);
+			$this->setDataAtualizacao(isset($categoria['dataatualizacao'])?$categoria['dataatualizacao']:null);
 		}
 	}
 

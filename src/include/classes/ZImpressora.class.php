@@ -44,17 +44,17 @@ class ZImpressora {
 
 	public function __construct($impressora = array()) {
 		if(is_array($impressora)) {
-			$this->setID($impressora['id']);
-			$this->setSetorID($impressora['setorid']);
-			$this->setDispositivoID($impressora['dispositivoid']);
-			$this->setNome($impressora['nome']);
-			$this->setDriver($impressora['driver']);
-			$this->setDescricao($impressora['descricao']);
-			$this->setModo($impressora['modo']);
-			$this->setOpcoes($impressora['opcoes']);
-			$this->setColunas($impressora['colunas']);
-			$this->setAvanco($impressora['avanco']);
-			$this->setComandos($impressora['comandos']);
+			$this->setID(isset($impressora['id'])?$impressora['id']:null);
+			$this->setSetorID(isset($impressora['setorid'])?$impressora['setorid']:null);
+			$this->setDispositivoID(isset($impressora['dispositivoid'])?$impressora['dispositivoid']:null);
+			$this->setNome(isset($impressora['nome'])?$impressora['nome']:null);
+			$this->setDriver(isset($impressora['driver'])?$impressora['driver']:null);
+			$this->setDescricao(isset($impressora['descricao'])?$impressora['descricao']:null);
+			$this->setModo(isset($impressora['modo'])?$impressora['modo']:null);
+			$this->setOpcoes(isset($impressora['opcoes'])?$impressora['opcoes']:null);
+			$this->setColunas(isset($impressora['colunas'])?$impressora['colunas']:null);
+			$this->setAvanco(isset($impressora['avanco'])?$impressora['avanco']:null);
+			$this->setComandos(isset($impressora['comandos'])?$impressora['comandos']:null);
 		}
 	}
 

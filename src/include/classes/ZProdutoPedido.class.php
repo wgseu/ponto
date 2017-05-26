@@ -51,25 +51,25 @@ class ZProdutoPedido {
 
 	public function __construct($produto_pedido = array()) {
 		if(is_array($produto_pedido)) {
-			$this->setID($produto_pedido['id']);
-			$this->setPedidoID($produto_pedido['pedidoid']);
-			$this->setFuncionarioID($produto_pedido['funcionarioid']);
-			$this->setProdutoID($produto_pedido['produtoid']);
-			$this->setServicoID($produto_pedido['servicoid']);
-			$this->setProdutoPedidoID($produto_pedido['produtopedidoid']);
-			$this->setDescricao($produto_pedido['descricao']);
-			$this->setPreco($produto_pedido['preco']);
-			$this->setQuantidade($produto_pedido['quantidade']);
-			$this->setPorcentagem($produto_pedido['porcentagem']);
-			$this->setPrecoVenda($produto_pedido['precovenda']);
-			$this->setPrecoCompra($produto_pedido['precocompra']);
-			$this->setDetalhes($produto_pedido['detalhes']);
-			$this->setEstado($produto_pedido['estado']);
-			$this->setVisualizado($produto_pedido['visualizado']);
-			$this->setDataVisualizacao($produto_pedido['datavisualizacao']);
-			$this->setDataAtualizacao($produto_pedido['dataatualizacao']);
-			$this->setCancelado($produto_pedido['cancelado']);
-			$this->setDataHora($produto_pedido['datahora']);
+			$this->setID(isset($produto_pedido['id'])?$produto_pedido['id']:null);
+			$this->setPedidoID(isset($produto_pedido['pedidoid'])?$produto_pedido['pedidoid']:null);
+			$this->setFuncionarioID(isset($produto_pedido['funcionarioid'])?$produto_pedido['funcionarioid']:null);
+			$this->setProdutoID(isset($produto_pedido['produtoid'])?$produto_pedido['produtoid']:null);
+			$this->setServicoID(isset($produto_pedido['servicoid'])?$produto_pedido['servicoid']:null);
+			$this->setProdutoPedidoID(isset($produto_pedido['produtopedidoid'])?$produto_pedido['produtopedidoid']:null);
+			$this->setDescricao(isset($produto_pedido['descricao'])?$produto_pedido['descricao']:null);
+			$this->setPreco(isset($produto_pedido['preco'])?$produto_pedido['preco']:null);
+			$this->setQuantidade(isset($produto_pedido['quantidade'])?$produto_pedido['quantidade']:null);
+			$this->setPorcentagem(isset($produto_pedido['porcentagem'])?$produto_pedido['porcentagem']:null);
+			$this->setPrecoVenda(isset($produto_pedido['precovenda'])?$produto_pedido['precovenda']:null);
+			$this->setPrecoCompra(isset($produto_pedido['precocompra'])?$produto_pedido['precocompra']:null);
+			$this->setDetalhes(isset($produto_pedido['detalhes'])?$produto_pedido['detalhes']:null);
+			$this->setEstado(isset($produto_pedido['estado'])?$produto_pedido['estado']:null);
+			$this->setVisualizado(isset($produto_pedido['visualizado'])?$produto_pedido['visualizado']:null);
+			$this->setDataVisualizacao(isset($produto_pedido['datavisualizacao'])?$produto_pedido['datavisualizacao']:null);
+			$this->setDataAtualizacao(isset($produto_pedido['dataatualizacao'])?$produto_pedido['dataatualizacao']:null);
+			$this->setCancelado(isset($produto_pedido['cancelado'])?$produto_pedido['cancelado']:null);
+			$this->setDataHora(isset($produto_pedido['datahora'])?$produto_pedido['datahora']:null);
 		}
 	}
 

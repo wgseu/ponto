@@ -36,17 +36,17 @@ class ZFolhaCheque {
 
 	public function __construct($folha_cheque = array()) {
 		if(is_array($folha_cheque)) {
-			$this->setID($folha_cheque['id']);
-			$this->setChequeID($folha_cheque['chequeid']);
-			$this->setCompensacao($folha_cheque['compensacao']);
-			$this->setNumero($folha_cheque['numero']);
-			$this->setValor($folha_cheque['valor']);
-			$this->setVencimento($folha_cheque['vencimento']);
+			$this->setID(isset($folha_cheque['id'])?$folha_cheque['id']:null);
+			$this->setChequeID(isset($folha_cheque['chequeid'])?$folha_cheque['chequeid']:null);
+			$this->setCompensacao(isset($folha_cheque['compensacao'])?$folha_cheque['compensacao']:null);
+			$this->setNumero(isset($folha_cheque['numero'])?$folha_cheque['numero']:null);
+			$this->setValor(isset($folha_cheque['valor'])?$folha_cheque['valor']:null);
+			$this->setVencimento(isset($folha_cheque['vencimento'])?$folha_cheque['vencimento']:null);
 			for($i = 1; $i <= 3; $i++)
-				$this->setC($i, $folha_cheque['c'.$i]);
-			$this->setSerie($folha_cheque['serie']);
-			$this->setRecolhido($folha_cheque['recolhido']);
-			$this->setRecolhimento($folha_cheque['recolhimento']);
+				$this->setC($i, isset($folha_cheque['c'.$i])?$folha_cheque['c'.$i]:null);
+			$this->setSerie(isset($folha_cheque['serie'])?$folha_cheque['serie']:null);
+			$this->setRecolhido(isset($folha_cheque['recolhido'])?$folha_cheque['recolhido']:null);
+			$this->setRecolhimento(isset($folha_cheque['recolhimento'])?$folha_cheque['recolhimento']:null);
 		}
 	}
 

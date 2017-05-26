@@ -40,15 +40,15 @@ class ZDispositivo {
 
 	public function __construct($dispositivo = array()) {
 		if(is_array($dispositivo)) {
-			$this->setID($dispositivo['id']);
-			$this->setSetorID($dispositivo['setorid']);
-			$this->setCaixaID($dispositivo['caixaid']);
-			$this->setNome($dispositivo['nome']);
-			$this->setTipo($dispositivo['tipo']);
-			$this->setDescricao($dispositivo['descricao']);
-			$this->setOpcoes($dispositivo['opcoes']);
-			$this->setSerial($dispositivo['serial']);
-			$this->setValidacao($dispositivo['validacao']);
+			$this->setID(isset($dispositivo['id'])?$dispositivo['id']:null);
+			$this->setSetorID(isset($dispositivo['setorid'])?$dispositivo['setorid']:null);
+			$this->setCaixaID(isset($dispositivo['caixaid'])?$dispositivo['caixaid']:null);
+			$this->setNome(isset($dispositivo['nome'])?$dispositivo['nome']:null);
+			$this->setTipo(isset($dispositivo['tipo'])?$dispositivo['tipo']:null);
+			$this->setDescricao(isset($dispositivo['descricao'])?$dispositivo['descricao']:null);
+			$this->setOpcoes(isset($dispositivo['opcoes'])?$dispositivo['opcoes']:null);
+			$this->setSerial(isset($dispositivo['serial'])?$dispositivo['serial']:null);
+			$this->setValidacao(isset($dispositivo['validacao'])?$dispositivo['validacao']:null);
 		}
 	}
 

@@ -1,0 +1,53 @@
+{
+    "name": "mazinsw/grandchef",
+    "type": "website",
+    "description": "GrandChef Web Site",
+    "keywords": ["grandchef", "mzsw"],
+    "homepage": "http://www.grandchef.com.br",
+    "license": "CUSTOM",
+    "authors": [
+        {
+            "name": "Francimar Alves",
+            "email": "mazinsw@gmail.com",
+            "homepage": "https://www.facebook.com/mazinsw",
+            "role": "Developer"
+        }
+    ],
+    "config": {
+        "vendor-dir": "src/include/vendor"
+    },
+    "require": {
+        "php": ">=5.3.0",
+        "fpdo/fluentpdo": "1.1.*",
+        "sybio/image-workshop": "@stable",
+        "phpmailer/phpmailer": "~5.2",
+        "mazinsw/nfe-api": "@stable"
+    },
+    "require-dev": {
+        "phpunit/phpunit": ">=4.8",
+        "squizlabs/php_codesniffer": ">=2.8",
+        "pdepend/pdepend" : "@stable",
+        "phpmd/phpmd" : "@stable",
+        "sebastian/phpcpd": "*",
+        "phpdocumentor/phpdocumentor": ">=2.9",
+        "phploc/phploc": "*"
+    },
+    "autoload": {
+        "classmap": [
+            "src/include/api",
+            "src/include/classes",
+            "src/include/library"
+        ],
+        "files": [
+            "src/include/function/common.php",
+            "src/include/function/configure.php",
+            "src/include/function/mailer.php",
+            "src/include/function/template.php"
+        ]
+    },
+    "scripts": {
+        "test": [
+            "phpunit"
+        ]
+    }
+}

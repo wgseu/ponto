@@ -38,10 +38,10 @@ class ZConsumacao {
 
 	public function __construct($consumacao = array()) {
 		if(is_array($consumacao)) {
-			$this->setID($consumacao['id']);
-			$this->setModulo($consumacao['modulo']);
-			$this->setDia($consumacao['dia']);
-			$this->setValor($consumacao['valor']);
+			$this->setID(isset($consumacao['id'])?$consumacao['id']:null);
+			$this->setModulo(isset($consumacao['modulo'])?$consumacao['modulo']:null);
+			$this->setDia(isset($consumacao['dia'])?$consumacao['dia']:null);
+			$this->setValor(isset($consumacao['valor'])?$consumacao['valor']:null);
 		}
 	}
 

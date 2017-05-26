@@ -29,9 +29,9 @@ class ZClassificacao {
 
 	public function __construct($classificacao = array()) {
 		if(is_array($classificacao)) {
-			$this->setID($classificacao['id']);
-			$this->setClassificacaoID($classificacao['classificacaoid']);
-			$this->setDescricao($classificacao['descricao']);
+			$this->setID(isset($classificacao['id'])?$classificacao['id']:null);
+			$this->setClassificacaoID(isset($classificacao['classificacaoid'])?$classificacao['classificacaoid']:null);
+			$this->setDescricao(isset($classificacao['descricao'])?$classificacao['descricao']:null);
 		}
 	}
 

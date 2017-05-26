@@ -24,26 +24,26 @@ class ZPagamento {
 
 	public function __construct($pagamento = array()) {
 		if(is_array($pagamento)) {
-			$this->setID($pagamento['id']);
-			$this->setCarteiraID($pagamento['carteiraid']);
-			$this->setMovimentacaoID($pagamento['movimentacaoid']);
-			$this->setFuncionarioID($pagamento['funcionarioid']);
-			$this->setFormaPagtoID($pagamento['formapagtoid']);
-			$this->setPedidoID($pagamento['pedidoid']);
-			$this->setPagtoContaID($pagamento['pagtocontaid']);
-			$this->setCartaoID($pagamento['cartaoid']);
-			$this->setChequeID($pagamento['chequeid']);
-			$this->setContaID($pagamento['contaid']);
-			$this->setCreditoID($pagamento['creditoid']);
-			$this->setTotal($pagamento['total']);
-			$this->setParcelas($pagamento['parcelas']);
-			$this->setValorParcela($pagamento['valorparcela']);
-			$this->setTaxas($pagamento['taxas']);
-			$this->setDetalhes($pagamento['detalhes']);
-			$this->setCancelado($pagamento['cancelado']);
-			$this->setAtivo($pagamento['ativo']);
-			$this->setDataCompensacao($pagamento['datacompensacao']);
-			$this->setDataHora($pagamento['datahora']);
+			$this->setID(isset($pagamento['id'])?$pagamento['id']:null);
+			$this->setCarteiraID(isset($pagamento['carteiraid'])?$pagamento['carteiraid']:null);
+			$this->setMovimentacaoID(isset($pagamento['movimentacaoid'])?$pagamento['movimentacaoid']:null);
+			$this->setFuncionarioID(isset($pagamento['funcionarioid'])?$pagamento['funcionarioid']:null);
+			$this->setFormaPagtoID(isset($pagamento['formapagtoid'])?$pagamento['formapagtoid']:null);
+			$this->setPedidoID(isset($pagamento['pedidoid'])?$pagamento['pedidoid']:null);
+			$this->setPagtoContaID(isset($pagamento['pagtocontaid'])?$pagamento['pagtocontaid']:null);
+			$this->setCartaoID(isset($pagamento['cartaoid'])?$pagamento['cartaoid']:null);
+			$this->setChequeID(isset($pagamento['chequeid'])?$pagamento['chequeid']:null);
+			$this->setContaID(isset($pagamento['contaid'])?$pagamento['contaid']:null);
+			$this->setCreditoID(isset($pagamento['creditoid'])?$pagamento['creditoid']:null);
+			$this->setTotal(isset($pagamento['total'])?$pagamento['total']:null);
+			$this->setParcelas(isset($pagamento['parcelas'])?$pagamento['parcelas']:null);
+			$this->setValorParcela(isset($pagamento['valorparcela'])?$pagamento['valorparcela']:null);
+			$this->setTaxas(isset($pagamento['taxas'])?$pagamento['taxas']:null);
+			$this->setDetalhes(isset($pagamento['detalhes'])?$pagamento['detalhes']:null);
+			$this->setCancelado(isset($pagamento['cancelado'])?$pagamento['cancelado']:null);
+			$this->setAtivo(isset($pagamento['ativo'])?$pagamento['ativo']:null);
+			$this->setDataCompensacao(isset($pagamento['datacompensacao'])?$pagamento['datacompensacao']:null);
+			$this->setDataHora(isset($pagamento['datahora'])?$pagamento['datahora']:null);
 		}
 	}
 

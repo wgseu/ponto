@@ -50,27 +50,7 @@ class ZProdutoPedido {
 	private $data_hora;
 
 	public function __construct($produto_pedido = array()) {
-		if(is_array($produto_pedido)) {
-			$this->setID(isset($produto_pedido['id'])?$produto_pedido['id']:null);
-			$this->setPedidoID(isset($produto_pedido['pedidoid'])?$produto_pedido['pedidoid']:null);
-			$this->setFuncionarioID(isset($produto_pedido['funcionarioid'])?$produto_pedido['funcionarioid']:null);
-			$this->setProdutoID(isset($produto_pedido['produtoid'])?$produto_pedido['produtoid']:null);
-			$this->setServicoID(isset($produto_pedido['servicoid'])?$produto_pedido['servicoid']:null);
-			$this->setProdutoPedidoID(isset($produto_pedido['produtopedidoid'])?$produto_pedido['produtopedidoid']:null);
-			$this->setDescricao(isset($produto_pedido['descricao'])?$produto_pedido['descricao']:null);
-			$this->setPreco(isset($produto_pedido['preco'])?$produto_pedido['preco']:null);
-			$this->setQuantidade(isset($produto_pedido['quantidade'])?$produto_pedido['quantidade']:null);
-			$this->setPorcentagem(isset($produto_pedido['porcentagem'])?$produto_pedido['porcentagem']:null);
-			$this->setPrecoVenda(isset($produto_pedido['precovenda'])?$produto_pedido['precovenda']:null);
-			$this->setPrecoCompra(isset($produto_pedido['precocompra'])?$produto_pedido['precocompra']:null);
-			$this->setDetalhes(isset($produto_pedido['detalhes'])?$produto_pedido['detalhes']:null);
-			$this->setEstado(isset($produto_pedido['estado'])?$produto_pedido['estado']:null);
-			$this->setVisualizado(isset($produto_pedido['visualizado'])?$produto_pedido['visualizado']:null);
-			$this->setDataVisualizacao(isset($produto_pedido['datavisualizacao'])?$produto_pedido['datavisualizacao']:null);
-			$this->setDataAtualizacao(isset($produto_pedido['dataatualizacao'])?$produto_pedido['dataatualizacao']:null);
-			$this->setCancelado(isset($produto_pedido['cancelado'])?$produto_pedido['cancelado']:null);
-			$this->setDataHora(isset($produto_pedido['datahora'])?$produto_pedido['datahora']:null);
-		}
+		$this->fromArray($produto_pedido);
 	}
 
 	public function getID() {
@@ -277,6 +257,130 @@ class ZProdutoPedido {
 		return !is_null($this->getServicoID()) && is_greater($this->getPreco(), 0.00);
 	}
 
+	public function getDestino($values)
+	{
+		switch ($values['pedido_tipo']) {
+			case \PedidoTipo::MESA:
+				return $values['mesa_nome'];
+			case \PedidoTipo::COMANDA:
+				return $values['comanda_nome'];
+			case \PedidoTipo::AVULSO:
+				return 'Balcão';
+			default:
+				return 'Entrega';
+		}
+	}
+
+    /**
+     * Fill this instance with from array values, you can pass instance to
+     * @param  mixed $produto_pedido Associated key -> value to assign into this instance
+     * @return ProdutoPedido Self instance
+     */
+    public function fromArray($produto_pedido = array())
+    {
+        if ($produto_pedido instanceof ProdutoPedido) {
+            $produto_pedido = $produto_pedido->toArray();
+        } elseif (!is_array($produto_pedido)) {
+            $produto_pedido = array();
+        }
+        if (!isset($produto_pedido['id'])) {
+            $this->setID(null);
+        } else {
+            $this->setID($produto_pedido['id']);
+        }
+        if (!isset($produto_pedido['pedidoid'])) {
+            $this->setPedidoID(null);
+        } else {
+            $this->setPedidoID($produto_pedido['pedidoid']);
+        }
+        if (!isset($produto_pedido['funcionarioid'])) {
+            $this->setFuncionarioID(null);
+        } else {
+            $this->setFuncionarioID($produto_pedido['funcionarioid']);
+        }
+        if (!array_key_exists('produtoid', $produto_pedido)) {
+            $this->setProdutoID(null);
+        } else {
+            $this->setProdutoID($produto_pedido['produtoid']);
+        }
+        if (!array_key_exists('servicoid', $produto_pedido)) {
+            $this->setServicoID(null);
+        } else {
+            $this->setServicoID($produto_pedido['servicoid']);
+        }
+        if (!array_key_exists('produtopedidoid', $produto_pedido)) {
+            $this->setProdutoPedidoID(null);
+        } else {
+            $this->setProdutoPedidoID($produto_pedido['produtopedidoid']);
+        }
+        if (!array_key_exists('descricao', $produto_pedido)) {
+            $this->setDescricao(null);
+        } else {
+            $this->setDescricao($produto_pedido['descricao']);
+        }
+        if (!isset($produto_pedido['preco'])) {
+            $this->setPreco(null);
+        } else {
+            $this->setPreco($produto_pedido['preco']);
+        }
+        if (!isset($produto_pedido['quantidade'])) {
+            $this->setQuantidade(null);
+        } else {
+            $this->setQuantidade($produto_pedido['quantidade']);
+        }
+        if (!isset($produto_pedido['porcentagem'])) {
+            $this->setPorcentagem(null);
+        } else {
+            $this->setPorcentagem($produto_pedido['porcentagem']);
+        }
+        if (!isset($produto_pedido['precovenda'])) {
+            $this->setPrecoVenda(null);
+        } else {
+            $this->setPrecoVenda($produto_pedido['precovenda']);
+        }
+        if (!isset($produto_pedido['precocompra'])) {
+            $this->setPrecoCompra(null);
+        } else {
+            $this->setPrecoCompra($produto_pedido['precocompra']);
+        }
+        if (!array_key_exists('detalhes', $produto_pedido)) {
+            $this->setDetalhes(null);
+        } else {
+            $this->setDetalhes($produto_pedido['detalhes']);
+        }
+        if (!isset($produto_pedido['estado'])) {
+            $this->setEstado(null);
+        } else {
+            $this->setEstado($produto_pedido['estado']);
+        }
+        if (!isset($produto_pedido['visualizado'])) {
+            $this->setVisualizado(null);
+        } else {
+            $this->setVisualizado($produto_pedido['visualizado']);
+        }
+        if (!array_key_exists('datavisualizacao', $produto_pedido)) {
+            $this->setDataVisualizacao(null);
+        } else {
+            $this->setDataVisualizacao($produto_pedido['datavisualizacao']);
+        }
+        if (!array_key_exists('dataatualizacao', $produto_pedido)) {
+            $this->setDataAtualizacao(null);
+        } else {
+            $this->setDataAtualizacao($produto_pedido['dataatualizacao']);
+        }
+        if (!isset($produto_pedido['cancelado'])) {
+            $this->setCancelado(null);
+        } else {
+            $this->setCancelado($produto_pedido['cancelado']);
+        }
+        if (!isset($produto_pedido['datahora'])) {
+            $this->setDataHora(null);
+        } else {
+            $this->setDataHora($produto_pedido['datahora']);
+        }
+        return $this;
+    }
+
 	public function toArray() {
 		$produto_pedido = array();
 		$produto_pedido['id'] = $this->getID();
@@ -463,11 +567,31 @@ class ZProdutoPedido {
 		return $query->execute();
 	}
 
-	private static function initSearch($busca, $produto_id, $funcionario_id, $tipo, $estado, $modulo, $data_inicio, $data_fim) {
+	private static function initSearch(
+		$busca,
+		$produto_id,
+		$funcionario_id,
+		$sessao_id,
+		$movimentacao_id,
+		$tipo,
+		$estado,
+		$modulo,
+		$data_inicio,
+		$data_fim
+	) {
 		$query = DB::$pdo->from('Produtos_Pedidos pdp')
+						 ->select('p.tipo as pedido_tipo')
+						 ->select('cf.login as funcionario_login')
+						 ->select('COALESCE(sc.descricao, COALESCE(pdp.descricao, pd.descricao)) as produto_descricao')
+						 ->select('m.nome as mesa_nome')
+						 ->select('cm.nome as comanda_nome')
 						 ->leftJoin('Pedidos p ON p.id = pdp.pedidoid')
 						 ->leftJoin('Produtos pd ON pd.id = pdp.produtoid')
 						 ->leftJoin('Servicos sc ON sc.id = pdp.servicoid')
+						 ->leftJoin('Mesas m ON m.id = p.mesaid')
+						 ->leftJoin('Comandas cm ON cm.id = p.comandaid')
+						 ->leftJoin('Funcionarios f ON f.id = pdp.funcionarioid')
+						 ->leftJoin('Clientes cf ON cf.id = f.clienteid')
 		                 ->orderBy('pdp.id DESC');
 		$busca = trim($busca);
 		if(is_numeric($busca)) {
@@ -507,6 +631,12 @@ class ZProdutoPedido {
 			$query = $query->where('pdp.produtoid', intval($produto_id));
 		if(is_numeric($funcionario_id))
 			$query = $query->where('pdp.funcionarioid', intval($funcionario_id));
+		if (is_numeric($sessao_id)) {
+			$query = $query->where('p.sessaoid', intval($sessao_id));
+		}
+		if (is_numeric($movimentacao_id)) {
+			$query = $query->where('p.movimentacaoid', intval($movimentacao_id));
+		}
 		if(!is_null($data_inicio))
 			$query = $query->where('pdp.datahora >= ?', date('Y-m-d', $data_inicio));
 		if(!is_null($data_fim))
@@ -514,13 +644,30 @@ class ZProdutoPedido {
 		return $query;
 	}
 
-	public static function getTodos($busca = null, $produto_id = null, $funcionario_id = null, 
-			$tipo = null, $estado = null, $modulo = null, $data_inicio = null, $data_fim = null, $inicio = null, $quantidade = null) {
-		$query = self::initSearch($busca, $produto_id, $funcionario_id, $tipo, $estado, $modulo, $data_inicio, $data_fim);
+	public static function getTodos(
+		$busca = null,
+		$produto_id = null,
+		$funcionario_id = null, 
+		$sessao_id = null,
+		$movimentacao_id = null,
+		$tipo = null,
+		$estado = null,
+		$modulo = null,
+		$data_inicio = null,
+		$data_fim = null,
+		$raw = false,
+		$inicio = null,
+		$quantidade = null
+	) {
+		$query = self::initSearch($busca, $produto_id, $funcionario_id, $sessao_id, $movimentacao_id, 
+			$tipo, $estado, $modulo, $data_inicio, $data_fim);
 		if(!is_null($inicio) && !is_null($quantidade)) {
 			$query = $query->limit($quantidade)->offset($inicio);
 		}
 		$_produto_pedidos = $query->fetchAll();
+		if ($raw) {
+			return $_produto_pedidos;
+		}
 		$produto_pedidos = array();
 		foreach($_produto_pedidos as $produto_pedido)
 			$produto_pedidos[] = new ZProdutoPedido($produto_pedido);

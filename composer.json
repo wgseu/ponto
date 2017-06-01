@@ -21,7 +21,9 @@
         "fpdo/fluentpdo": "1.1.*",
         "sybio/image-workshop": "@stable",
         "phpmailer/phpmailer": "~5.2",
-        "mazinsw/nfe-api": "@stable"
+        "mazinsw/nfe-api": "@stable",
+        "phpoffice/phpexcel": "@stable",
+        "setasign/fpdf": "1.8.1"
     },
     "require-dev": {
         "phpunit/phpunit": ">=4.8",

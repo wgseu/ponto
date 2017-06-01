@@ -30,8 +30,21 @@ $data_fim = $data_fim===false?null:$data_fim->getTimestamp();
 $count = ZProdutoPedido::getCount($_GET['query'], $_GET['produtoid'], $_GET['funcionarioid'], 
 		$_GET['tipo'], $_GET['estado'], $_GET['modulo'], $data_inicio, $data_fim);
 list($pagesize, $offset, $pagestring) = pagestring($count, 10);
-$itens_do_pedido = ZProdutoPedido::getTodos($_GET['query'], $_GET['produtoid'], $_GET['funcionarioid'], 
-		$_GET['tipo'], $_GET['estado'], $_GET['modulo'], $data_inicio, $data_fim, $offset, $pagesize);
+$itens_do_pedido = ZProdutoPedido::getTodos(
+	$_GET['query'],
+	$_GET['produtoid'],
+	$_GET['funcionarioid'],
+	null, // id da sessão
+	null, // id da movimentação
+	$_GET['tipo'],
+	$_GET['estado'],
+	$_GET['modulo'],
+	$data_inicio,
+	$data_fim,
+	false, // disable raw
+	$offset,
+	$pagesize
+);
 
 $_modulo_names = array(
 	'Mesa' => 'Mesa',

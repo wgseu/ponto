@@ -140,6 +140,12 @@ class ZUnidade {
 		return $data['quantidade'];
 	}
 
+	public function formatar($quantidade, $conteudo)
+	{
+		$data = $this->processaUnidade($quantidade, $conteudo);
+		return strval($data['quantidade']) . ' ' . $data['unidade'];
+	}
+
 	public static function getPeloID($id) {
 		$query = DB::$pdo->from('Unidades')
 		                 ->where(array('id' => $id));

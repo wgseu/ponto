@@ -59,32 +59,7 @@ class ZCliente {
 	private $data_cadastro;
 
 	public function __construct($cliente = array()) {
-		if(is_array($cliente)) {
-			$this->setID(isset($cliente['id'])?$cliente['id']:null);
-			$this->setTipo(isset($cliente['tipo'])?$cliente['tipo']:null);
-			$this->setAcionistaID(isset($cliente['acionistaid'])?$cliente['acionistaid']:null);
-			$this->setLogin(isset($cliente['login'])?$cliente['login']:null);
-			$this->setSenha(isset($cliente['senha'])?$cliente['senha']:null);
-			$this->setNome(isset($cliente['nome'])?$cliente['nome']:null);
-			$this->setSobrenome(isset($cliente['sobrenome'])?$cliente['sobrenome']:null);
-			$this->setGenero(isset($cliente['genero'])?$cliente['genero']:null);
-			$this->setCPF(isset($cliente['cpf'])?$cliente['cpf']:null);
-			$this->setRG(isset($cliente['rg'])?$cliente['rg']:null);
-			$this->setIM(isset($cliente['im'])?$cliente['im']:null);
-			$this->setEmail(isset($cliente['email'])?$cliente['email']:null);
-			$this->setDataAniversario(isset($cliente['dataaniversario'])?$cliente['dataaniversario']:null);
-			for($i = 1; $i <= 2; $i++)
-				$this->setFone($i, isset($cliente['fone'.$i])?$cliente['fone'.$i]:null);
-			$this->setSlogan(isset($cliente['slogan'])?$cliente['slogan']:null);
-			$this->setSecreto(isset($cliente['secreto'])?$cliente['secreto']:null);
-			$this->setLimiteCompra(isset($cliente['limitecompra'])?$cliente['limitecompra']:null);
-			$this->setFacebookURL(isset($cliente['facebookurl'])?$cliente['facebookurl']:null);
-			$this->setTwitterURL(isset($cliente['twitterurl'])?$cliente['twitterurl']:null);
-			$this->setLinkedInURL(isset($cliente['linkedinurl'])?$cliente['linkedinurl']:null);
-			$this->setImagem(isset($cliente['imagem'])?$cliente['imagem']:null);
-			$this->setDataAtualizacao(isset($cliente['dataatualizacao'])?$cliente['dataatualizacao']:null);
-			$this->setDataCadastro(isset($cliente['datacadastro'])?$cliente['datacadastro']:null);
-		}
+		$this->fromArray($cliente);
 	}
 
 	/**
@@ -419,8 +394,9 @@ class ZCliente {
 	 * Obtém o nome completo da pessoa física ou o nome fantasia da empresa
 	 */
 	public function getNomeCompleto() {
-		if($this->getTipo() == ClienteTipo::JURIDICA)
+		if ($this->getTipo() == ClienteTipo::JURIDICA) {
 			return $this->getNome();
+		}
 		return trim($this->getNome() . ' ' . $this->getSobrenome());
 	}
 
@@ -438,6 +414,141 @@ class ZCliente {
  		}
 		return trim($this->nome." ".$sobrenome);
 	}
+
+    /**
+     * Fill this instance with from array values, you can pass instance to
+     * @param  mixed $cliente Associated key -> value to assign into this instance
+     * @return Cliente Self instance
+     */
+    public function fromArray($cliente = array())
+    {
+        if ($cliente instanceof ZCliente) {
+            $cliente = $cliente->toArray();
+        } elseif (!is_array($cliente)) {
+            $cliente = array();
+        }
+        if (!isset($cliente['id'])) {
+            $this->setID(null);
+        } else {
+            $this->setID($cliente['id']);
+        }
+        if (!isset($cliente['tipo'])) {
+            $this->setTipo(null);
+        } else {
+            $this->setTipo($cliente['tipo']);
+        }
+        if (!array_key_exists('acionistaid', $cliente)) {
+            $this->setAcionistaID(null);
+        } else {
+            $this->setAcionistaID($cliente['acionistaid']);
+        }
+        if (!array_key_exists('login', $cliente)) {
+            $this->setLogin(null);
+        } else {
+            $this->setLogin($cliente['login']);
+        }
+        if (!array_key_exists('senha', $cliente)) {
+            $this->setSenha(null);
+        } else {
+            $this->setSenha($cliente['senha']);
+        }
+        if (!isset($cliente['nome'])) {
+            $this->setNome(null);
+        } else {
+            $this->setNome($cliente['nome']);
+        }
+        if (!array_key_exists('sobrenome', $cliente)) {
+            $this->setSobrenome(null);
+        } else {
+            $this->setSobrenome($cliente['sobrenome']);
+        }
+        if (!array_key_exists('genero', $cliente)) {
+            $this->setGenero(null);
+        } else {
+            $this->setGenero($cliente['genero']);
+        }
+        if (!array_key_exists('cpf', $cliente)) {
+            $this->setCPF(null);
+        } else {
+            $this->setCPF($cliente['cpf']);
+        }
+        if (!array_key_exists('rg', $cliente)) {
+            $this->setRG(null);
+        } else {
+            $this->setRG($cliente['rg']);
+        }
+        if (!array_key_exists('im', $cliente)) {
+            $this->setIM(null);
+        } else {
+            $this->setIM($cliente['im']);
+        }
+        if (!array_key_exists('email', $cliente)) {
+            $this->setEmail(null);
+        } else {
+            $this->setEmail($cliente['email']);
+        }
+        if (!array_key_exists('dataaniversario', $cliente)) {
+            $this->setDataAniversario(null);
+        } else {
+            $this->setDataAniversario($cliente['dataaniversario']);
+        }
+        if (!array_key_exists('fone1', $cliente)) {
+            $this->setFone(1, null);
+        } else {
+            $this->setFone(1, $cliente['fone1']);
+        }
+        if (!array_key_exists('fone2', $cliente)) {
+            $this->setFone(2, null);
+        } else {
+            $this->setFone(2, $cliente['fone2']);
+        }
+        if (!array_key_exists('slogan', $cliente)) {
+            $this->setSlogan(null);
+        } else {
+            $this->setSlogan($cliente['slogan']);
+        }
+        if (!array_key_exists('secreto', $cliente)) {
+            $this->setSecreto(null);
+        } else {
+            $this->setSecreto($cliente['secreto']);
+        }
+        if (!array_key_exists('limitecompra', $cliente)) {
+            $this->setLimiteCompra(null);
+        } else {
+            $this->setLimiteCompra($cliente['limitecompra']);
+        }
+        if (!array_key_exists('facebookurl', $cliente)) {
+            $this->setFacebookURL(null);
+        } else {
+            $this->setFacebookURL($cliente['facebookurl']);
+        }
+        if (!array_key_exists('twitterurl', $cliente)) {
+            $this->setTwitterURL(null);
+        } else {
+            $this->setTwitterURL($cliente['twitterurl']);
+        }
+        if (!array_key_exists('linkedinurl', $cliente)) {
+            $this->setLinkedInURL(null);
+        } else {
+            $this->setLinkedInURL($cliente['linkedinurl']);
+        }
+        if (!array_key_exists('imagem', $cliente)) {
+            $this->setImagem(null);
+        } else {
+            $this->setImagem($cliente['imagem']);
+        }
+        if (!isset($cliente['dataatualizacao'])) {
+            $this->setDataAtualizacao(null);
+        } else {
+            $this->setDataAtualizacao($cliente['dataatualizacao']);
+        }
+        if (!isset($cliente['datacadastro'])) {
+            $this->setDataCadastro(null);
+        } else {
+            $this->setDataCadastro($cliente['datacadastro']);
+        }
+        return $this;
+    }
 
 	public function toArray($ignore = array()) {
 		$cliente = array();
@@ -514,7 +625,7 @@ class ZCliente {
 	}
 
 	public static function getPeloFone($fone) {
-		$_fone = numberonly($fone);
+		$_fone = \MZ\Util\Filter::digits($fone);
 		if(strlen($_fone) == 0)
 			return new ZCliente();
 		$_ddd = substr($_fone, 0, 2).'%';
@@ -664,7 +775,7 @@ class ZCliente {
 			$cliente['genero'] = ClienteGenero::FEMININO;
 		if(!in_array($cliente['genero'], array('Masculino', 'Feminino')))
 			$erros['genero'] = 'O gênero informado não é válido';
-		$cliente['cpf'] = numberonly($cliente['cpf']);
+		$cliente['cpf'] = \MZ\Util\Filter::digits($cliente['cpf']);
 		if(strlen($cliente['cpf']) == 0)
 			$cliente['cpf'] = null;
 		else if(!check_cpf($cliente['cpf']) && $cliente['tipo'] == ClienteTipo::FISICA)
@@ -693,7 +804,7 @@ class ZCliente {
 				$cliente['dataaniversario'] = date('Y-m-d', $time);
 		}
 		for($i = 1; $i <= 2; $i++) {
-			$cliente['fone'.$i] = numberonly($cliente['fone'.$i]);
+			$cliente['fone'.$i] = \MZ\Util\Filter::digits($cliente['fone'.$i]);
 			if(strlen($cliente['fone'.$i]) == 0)
 				$cliente['fone'.$i] = null;
 			else if(!check_fone($cliente['fone'.$i]))
@@ -818,95 +929,155 @@ class ZCliente {
 		return $query->execute();
 	}
 
-	private static function initSearch($nome, $tipo, $genero, $mes_inicio, $mes_fim) {
+    /**
+     * Gets textual and translated Tipo for Cliente
+     * @return array A associative key -> translated representative text
+     */
+    public static function getTipoOptions()
+    {
+        return array(
+            ClienteTipo::FISICA => 'Física',
+            ClienteTipo::JURIDICA => 'Jurídica',
+        );
+    }
+
+    /**
+     * Gets textual and translated Genero for Cliente
+     * @param  int $index choose option from index
+     * @return mixed A associative key -> translated representative text or text for index
+     */
+    public static function getGeneroOptions($index = null)
+    {
+        $options = array(
+            ClienteGenero::MASCULINO => 'Masculino',
+            ClienteGenero::FEMININO => 'Feminino',
+        );
+        if (!is_null($index)) {
+            return $options[$index];
+        }
+        return $options;
+    }
+
+	private static function initSearch($nome, $tipo, $genero, $mes_inicio, $mes_fim, $cpf, $fone, $email, $birthday)
+	{
 		$query = self::initSelect();
 		$data_inicio = null;
-		if(!is_null($mes_inicio) && !is_numeric($mes_inicio))
+		if (!is_null($mes_inicio) && !is_numeric($mes_inicio)) {
 			$data_inicio = strtotime($mes_inicio);
-		else if(!is_null($mes_inicio))
+		} elseif (!is_null($mes_inicio)) {
 			$data_inicio = strtotime(date('Y-m').' '.$mes_inicio.' month');
+		}
 		$data_fim = null;
-		if(!is_null($mes_fim) && !is_numeric($mes_fim))
+		if (!is_null($mes_fim) && !is_numeric($mes_fim)) {
 			$data_fim = strtotime($mes_fim);
-		else if(!is_null($mes_fim)) {
+		} elseif (!is_null($mes_fim)) {
 			$data_fim = strtotime(date('Y-m').' '.$mes_fim.' month');
 			$data_fim = strtotime('last day of this month', $data_fim);
 		}
-		$tipo = strtolower($tipo);
-		if($tipo == strtolower(ClienteTipo::JURIDICA))
-			$tipo = ClienteTipo::JURIDICA;
-		else if($tipo == strtolower(ClienteTipo::FISICA))
-			$tipo = ClienteTipo::FISICA;
-		else
-			$tipo = null;
-
-		$genero = strtolower($genero);
-		if($tipo == ClienteTipo::JURIDICA) {
-			# não faz nada
-		} else if($genero == strtolower(ClienteGenero::MASCULINO)) {
-			$query = $query->where('c.genero', ClienteGenero::MASCULINO);
-			$tipo = ClienteTipo::FISICA;
-		} else if($genero == strtolower(ClienteGenero::FEMININO)) {
-			$query = $query->where('c.genero', ClienteGenero::FEMININO);
-			$tipo = ClienteTipo::FISICA;
-		}
-
-		if(!is_null($tipo))
+		if (in_array($tipo, array_keys(self::getTipoOptions()))) {
 			$query = $query->where('c.tipo', $tipo);
-
-		$nome = trim($nome);
-		if($nome == '') {
-			# não faz nada
-		} else if(check_email($nome)) {
-			$query = $query->where('c.email', $nome);
-		} else if($tipo != strtolower(ClienteTipo::JURIDICA) && check_cpf($nome)) {
-			$query = $query->where('c.cpf', numberonly($nome));
-		} else if($tipo != strtolower(ClienteTipo::FISICA) && check_cnpj($nome)) {
-			$query = $query->where('c.cpf', numberonly($nome));
-		} else if(check_fone($nome, true)) {
-			$_fone = numberonly($nome);
-			$_ddd = substr($_fone, 0, 2).'%';
-			if(strlen($_fone) == 10)
-				$_fone = $_ddd . substr($_fone, 2, 8);
-			else if(strlen($_fone) <= 9)
-				$_fone = '%' . $_fone;
-			else
-				$_fone = $_ddd . substr($_fone, 3);
-			$query = $query->where('(c.fone1 LIKE ? OR c.fone2 LIKE ?)', $_fone, $_fone);
-		} else {
-			$keywords = preg_split('/[\s,]+/', $nome);
-			$words = '';
-	 		foreach ($keywords as $word) {
-	 			$words .= '%'.$word.'%';
-	 			$query = $query->orderBy('IF(LOCATE(?, CONCAT(" ", c.nome, " ", COALESCE(c.sobrenome, ""))) = 0, '.
-					'256, LOCATE(?, CONCAT(" ", c.nome, " ", COALESCE(c.sobrenome, "")))) ASC, IF(LOCATE(?, '.
-					'CONCAT(c.nome, " ", COALESCE(c.sobrenome, ""))) = 0, 256, LOCATE(?, CONCAT(c.nome, " ", COALESCE(c.sobrenome, "")))) ASC', 
-	 				' '.$word, ' '.$word, $word, $word);
-	 		}
-			$query = $query->where('CONCAT(c.nome, " ", COALESCE(c.sobrenome, "")) LIKE ?', $words);
 		}
-		if(!is_null($data_inicio))
+		if (in_array($genero, array_keys(self::getGeneroOptions()))) {
+			$query = $query->where('c.genero', $genero);
+		}
+		$nome = trim($nome);
+		if ($nome == '') {
+			$nome = null;
+		} elseif (check_email($nome)) {
+			$email = $nome;
+			$nome = null;
+		} elseif (check_cpf($nome) || check_cnpj($nome)) {
+			$cpf = $nome;
+			$nome = null;
+		} elseif (check_fone($nome, true)) {
+			$fone = \MZ\Util\Filter::digits($nome);
+			$nome = null;
+		}
+		if (!is_null($nome)) {
+			$keywords = preg_split('/[\s,]+/', $nome);
+	 		foreach ($keywords as $word) {
+				$query = $query->where('CONCAT(c.nome, " ", COALESCE(c.sobrenome, "")) LIKE ?', '%'.$word.'%');
+	 			$query = $query->orderBy(
+	 				'COALESCE(NULLIF(LOCATE(?, CONCAT(" ", c.nome, " ", COALESCE(c.sobrenome, ""))), 0), 65535) ASC',
+	 				' ' . $word
+	 			);
+	 			$query = $query->orderBy(
+	 				'COALESCE(NULLIF(LOCATE(?, CONCAT(c.nome, " ", COALESCE(c.sobrenome, ""))), 0), 65535) ASC',
+	 				$word
+	 			);
+	 		}
+		}
+		if (!is_null($email)) {
+			$query = $query->where('c.email', $email);
+		}
+		if (!is_null($cpf)) {
+			$query = $query->where('c.cpf', \MZ\Util\Filter::digits($cpf));
+		}
+		if (!is_null($fone)) {
+			$_fone = \MZ\Util\Filter::digits($fone);
+			$_ddd = substr($_fone, 0, 2).'%';
+			if (strlen($_fone) == 10) {
+				$_fone = $_ddd . substr($_fone, 2, 8);
+			} elseif (strlen($_fone) <= 9) {
+				$_fone = '%' . $_fone;
+			} else {
+				$_fone = $_ddd . substr($_fone, 3);
+			}
+			$query = $query->where('(c.fone1 LIKE ? OR c.fone2 LIKE ?)', $_fone, $_fone);
+		}
+		if (!is_null($data_inicio)) {
 			$query = $query->where('c.datacadastro >= ?', date('Y-m-d', $data_inicio));
-		if(!is_null($data_fim))
+		}
+		if (!is_null($data_fim)) {
 			$query = $query->where('c.datacadastro <= ?', date('Y-m-d 23:59:59', $data_fim));
-		$query = $query->orderBy('id ASC');
+		}
+		if ($birthday == 'Y') {
+			$query = $query->where('NOT ISNULL(c.dataaniversario)');
+			$query = $query->where('MONTH(c.dataaniversario) = MONTH(NOW())');
+			$query = $query->where('DAYOFMONTH(c.dataaniversario) = DAYOFMONTH(NOW())');
+		}
+		$query = $query->orderBy('CONCAT(c.nome, " ", COALESCE(c.sobrenome, "")) ASC');
+		$query = $query->orderBy('c.id ASC');
 		return $query;
 	}
 
-	public static function getTodos($nome = null, $tipo = null, $genero = null, $mes_inicio = null, $mes_fim = null, $inicio = null, $quantidade = null) {
-		$query = self::initSearch($nome, $tipo, $genero, $mes_inicio, $mes_fim);
-		if(!is_null($inicio) && !is_null($quantidade)) {
+	public static function getTodos(
+		$nome = null,
+		$tipo = null,
+		$genero = null,
+		$mes_inicio = null,
+		$mes_fim = null,
+		$cpf = null,
+		$fone = null,
+		$email = null,
+		$birthday = null,
+		$inicio = null,
+		$quantidade = null
+	) {
+		$query = self::initSearch($nome, $tipo, $genero, $mes_inicio, $mes_fim, $cpf, $fone, $email, $birthday);
+		if (!is_null($inicio) && !is_null($quantidade)) {
 			$query = $query->limit($quantidade)->offset($inicio);
 		}
 		$_clientes = $query->fetchAll();
 		$clientes = array();
-		foreach($_clientes as $cliente)
+		foreach ($_clientes as $cliente) {
 			$clientes[] = new ZCliente($cliente);
+		}
 		return $clientes;
 	}
 
-	public static function getCount($nome = null, $tipo = null, $genero = null, $mes_inicio = null, $mes_fim = null) {
-		$query = self::initSearch($nome, $tipo, $genero, $mes_inicio, $mes_fim);
+	public static function getCount(
+		$nome = null,
+		$tipo = null,
+		$genero = null,
+		$mes_inicio = null,
+		$mes_fim = null,
+		$cpf = null,
+		$fone = null,
+		$email = null,
+		$birthday = null
+	) {
+		$query = self::initSearch($nome, $tipo, $genero, $mes_inicio, $mes_fim, $cpf, $fone, $email, $birthday);
 		return $query->count();
 	}
 

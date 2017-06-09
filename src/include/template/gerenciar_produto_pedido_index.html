@@ -26,21 +26,21 @@
 			</div>
 			<div class="form-group col-lg-2 col-md-4 col-sm-4 col-xs-6">
 				<label for="inicio">Data inicial:</label>
-				<input type="text" id="inicio" name="inicio" class="datetime-picker form-control" value="{$_GET['inicio']}">
+				<input type="text" id="inicio" name="datahora_inicio" class="datetime-picker form-control" value="{$_GET['datahora_inicio']}">
 			</div>
 			<div class="form-group col-lg-2 col-md-4 col-sm-4 col-xs-6">
 				<label for="fim">Data final:</label>
-				<input type="text" id="fim" name="fim" class="datetime-picker form-control" value="{$_GET['fim']}">
+				<input type="text" id="fim" name="datahora_fim" class="datetime-picker form-control" value="{$_GET['datahora_fim']}">
 			</div>
 <!--${$_funcao = ZFuncao::getPeloID($_funcionario->getFuncaoID())}-->
 <!--${$_cliente_func = ZCliente::getPeloID($_funcionario->getClienteID())}-->
-			<input type="hidden" id="funcionarioid" name="funcionarioid" data-content="{$_cliente_func->getNomeCompleto()}" value="{$_funcionario->getID()}">
+			<input type="hidden" id="funcionarioid" name="funcionario_id" data-content="{$_cliente_func->getNomeCompleto()}" value="{$_funcionario->getID()}">
 			<div class="form-group col-lg-3 col-md-4 col-sm-4 col-xs-6 col-lg-offset-2">
 				<label for="funcionario">Atendente: <span class="identifier">{$_funcao->getDescricao()}<span></label>
 				<input type="text" id="funcionario" class="form-control" value="{$_cliente_func->getNomeCompleto()}">
 			</div>
 <!--${$_categoria = ZCategoria::getPeloID($_produto->getCategoriaID())}-->
-			<input type="hidden" id="produtoid" name="produtoid" data-descricao="{$_produto->getDescricao()}" value="{$_produto->getID()}">
+			<input type="hidden" id="produtoid" name="produto_id" data-descricao="{$_produto->getDescricao()}" value="{$_produto->getID()}">
 			<div class="form-group col-lg-3 col-md-6 col-sm-6 col-xs-6">
 				<label for="produto">Produto: <span class="identifier">{$_categoria->getDescricao()}<span></label>
 				<input type="text" id="produto" class="form-control" value="{$_produto->getDescricao()}">
@@ -48,7 +48,7 @@
 			<div class=" form-group col-lg-4 col-md-6 col-sm-6 col-xs-12">
 				<label>Busca:</label>
 				<div class="input-group">
-					<input type="text" class="form-control" id="query" name="query" placeholder="Pedido ou Observação..." value="{$_GET['query']}">
+					<input type="text" class="form-control" id="query" name="query" placeholder="Pedido ou Observação..." value="${\MZ\Util\Filter::input(isset($_GET['query'])?$_GET['query']:null)}">
 					<span class="input-group-btn">
 						<button class="btn btn-default" type="submit"><i class="fa fa-search"></i></button>
 					</span>

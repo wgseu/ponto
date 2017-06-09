@@ -21,34 +21,37 @@
 */
 require_once(dirname(dirname(__FILE__)) . '/app.php');
 
-need_permission(PermissaoNome::$[TABLE.style], $_GET['saida'] == 'json');
-$$[table.pk.unix] = $_GET['$[table.pk]'];
-$$[table.unix] = $[class]::$[class.get]($$[table.pk.unix]);
-if(is_null($$[table.unix]->$[table.pk.get])) {
-	$msg = '$[Table.gender] $[table.name] de $[table.pk] "'.$$[table.pk.unix].'" não existe!';
-	if($_GET['saida'] == 'json')
+need_permission(\PermissaoNome::$[TABLE.style], isset($_GET['saida']) && $_GET['saida'] == 'json');
+$$[primary.unix] = $_GET['$[primary.unix]'];
+$$[table.unix] = \Z$[tAble.norm]::getPel$[primary.gender]$[pRimary.norm]($$[primary.unix]);
+if (is_null($$[table.unix]->$[primary.get])) {
+	$msg = 'Não existe $[tAble.name] com $[primary.gender] $[pRimary.name] informado!';
+	if (isset($_GET['saida']) && $_GET['saida'] == 'json') {
 		json($msg);
-	Thunder::warning($msg);
+	}
+	\Thunder::warning($msg);
 	redirect('/gerenciar/$[table.unix]/');
 }
 try {
-	$[class]::excluir($$[table.pk.unix]);
+	\Z$[tAble.norm]::excluir($$[primary.unix]);
 $[field.each]
 $[field.if(image)]
-	// exclui $[field.gender] $[field.name] enviad$[field.gender]
-	if(!is_null($$[table.unix]->$[field.get])) {
-		unlink(WWW_ROOT . get_image_url($$[table.unix]->$[field.get], '$[field.image.folder]'));
+	// exclui $[field.gender] $[fIeld.name] enviad$[field.gender]
+	if (!is_null($$[table.unix]->get$[fIeld.norm]())) {
+		unlink(WWW_ROOT . get_image_url($$[table.unix]->get$[fIeld.norm](), '$[field.image.folder]'));
 	}
 $[field.end]
 $[field.end]
-	$msg = '$[Table.name] "' . $$[table.unix]->$[table.desc.get] . '" excluíd$[table.gender] com sucesso!';
-	if($_GET['saida'] == 'json')
+	$msg = '$[tAble.name] "' . $$[table.unix]->get$[dEscriptor.norm]() . '" excluíd$[table.gender] com sucesso!';
+	if (isset($_GET['saida']) && $_GET['saida'] == 'json') {
 		json('msg', $msg);
-	Thunder::success($msg, true);
-} catch (Exception $e) {
-	$msg = 'Não foi possível excluir $[table.gender] $[table.name] "' . $$[table.unix]->$[table.desc.get] . '"!';
-	if($_GET['saida'] == 'json')
+	}
+	\Thunder::success($msg, true);
+} catch (\Exception $e) {
+	$msg = 'Não foi possível excluir $[table.gender] $[tAble.name] "' . $$[table.unix]->get$[dEscriptor.norm]() . '"!';
+	if (isset($_GET['saida']) && $_GET['saida'] == 'json') {
 		json($msg);
-	Thunder::error($msg);
+	}
+	\Thunder::error($msg);
 }
 redirect('/gerenciar/$[table.unix]/');

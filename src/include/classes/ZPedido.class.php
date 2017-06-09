@@ -591,17 +591,28 @@ class ZPedido {
 		}
 	}
 
-	private static function initSearch($busca, $cliente_id, $funcionario_id, $tipo, $estado, $cancelado, $data_inicio, $data_fim) {
+	private static function initSearch(
+		$busca,
+		$cliente_id,
+		$funcionario_id,
+		$tipo,
+		$estado,
+		$cancelado,
+		$data_inicio, $data_fim, 
+		$sessao_id,
+		$caixa_id,
+		$movimentacao_id
+	) {
 		$query = DB::$pdo->from('Pedidos')
 		                 ->orderBy('id DESC');
 		$sessao_id = null;
 		$busca = trim($busca);
-		if(is_numeric($busca)) {
+		if (is_numeric($busca)) {
 			$query = $query->where('id', intval($busca));
-		} else if(substr($busca, 0, 1) == '#') {
+		} elseif (substr($busca, 0, 1) == '#') {
 			$sessao_id = intval(substr($busca, 1));
 			$query = $query->where('sessaoid', $sessao_id);
-		} else if($busca != '') {
+		} elseif ($busca != '') {
 			$query = $query->where('descricao LIKE ?', '%'.$busca.'%');
 		}
 		if(is_numeric($cliente_id))
@@ -624,24 +635,70 @@ class ZPedido {
 		return $query;
 	}
 
-	public static function getTodos($busca = null, $cliente_id = null, $funcionario_id = null, 
-			$tipo = null, $estado = null, $cancelado = null, $data_inicio = null, $data_fim = null, 
-			$inicio = null, $quantidade = null) {
-		$query = self::initSearch($busca, $cliente_id, $funcionario_id, $tipo, $estado, $cancelado, $data_inicio, $data_fim);
+	public static function getTodos(
+		$busca = null,
+		$cliente_id = null,
+		$funcionario_id = null,
+		$tipo = null,
+		$estado = null,
+		$cancelado = null,
+		$data_inicio = null,
+		$data_fim = null,
+		$sessao_id = null,
+		$caixa_id = null,
+		$movimentacao_id = null,
+		$inicio = null,
+		$quantidade = null
+	) {
+		$query = self::initSearch(
+			$busca,
+			$cliente_id,
+			$funcionario_id,
+			$tipo,
+			$estado,
+			$cancelado,
+			$data_inicio, $data_fim, 
+			$sessao_id,
+			$caixa_id,
+			$movimentacao_id
+		);
 		if(!is_null($inicio) && !is_null($quantidade)) {
 			$query = $query->limit($quantidade)->offset($inicio);
 		}
 		$_pedidos = $query->fetchAll();
 		$pedidos = array();
-		foreach($_pedidos as $pedido)
+		foreach ($_pedidos as $pedido) {
 			$pedidos[] = new ZPedido($pedido);
+		}
 		return $pedidos;
 	}
 
-	public static function getCount($busca = null, $cliente_id = null, $funcionario_id = null, 
-			$tipo = null, $estado = null, $cancelado = null, $data_inicio = null, $data_fim = null, 
-			$inicio = null, $quantidade = null) {
-		$query = self::initSearch($busca, $cliente_id, $funcionario_id, $tipo, $estado, $cancelado, $data_inicio, $data_fim);
+	public static function getCount(
+		$busca = null,
+		$cliente_id = null,
+		$funcionario_id = null,
+		$tipo = null,
+		$estado = null,
+		$cancelado = null,
+		$data_inicio = null,
+		$data_fim = null,
+		$sessao_id = null,
+		$caixa_id = null,
+		$movimentacao_id = null
+	) {		
+		$query = self::initSearch(
+			$busca,
+			$cliente_id,
+			$funcionario_id,
+			$tipo,
+			$estado,
+			$cancelado,
+			$data_inicio,
+			$data_fim, 
+			$sessao_id,
+			$caixa_id,
+			$movimentacao_id
+		);
 		return $query->count();
 	}
 

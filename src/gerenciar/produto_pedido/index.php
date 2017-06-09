@@ -23,17 +23,27 @@ require_once(dirname(dirname(__FILE__)) . '/app.php');
 
 need_permission(PermissaoNome::PAGAMENTO);
 
-$data_inicio = date_create_from_format('d/m/Y', $_GET['inicio']);
+$data_inicio = date_create_from_format('d/m/Y', $_GET['datahora_inicio']);
 $data_inicio = $data_inicio===false?null:$data_inicio->getTimestamp();
-$data_fim = date_create_from_format('d/m/Y', $_GET['fim']);
+$data_fim = date_create_from_format('d/m/Y', $_GET['datahora_fim']);
 $data_fim = $data_fim===false?null:$data_fim->getTimestamp();
-$count = ZProdutoPedido::getCount($_GET['query'], $_GET['produtoid'], $_GET['funcionarioid'], 
-		$_GET['tipo'], $_GET['estado'], $_GET['modulo'], $data_inicio, $data_fim);
+$count = ZProdutoPedido::getCount(
+	$_GET['query'],
+	$_GET['produto_id'],
+	$_GET['funcionario_id'],
+	null, // id da sessão
+	null, // id da movimentação
+	$_GET['tipo'],
+	$_GET['estado'],
+	$_GET['modulo'],
+	$data_inicio,
+	$data_fim
+);
 list($pagesize, $offset, $pagestring) = pagestring($count, 10);
 $itens_do_pedido = ZProdutoPedido::getTodos(
 	$_GET['query'],
-	$_GET['produtoid'],
-	$_GET['funcionarioid'],
+	$_GET['produto_id'],
+	$_GET['funcionario_id'],
 	null, // id da sessão
 	null, // id da movimentação
 	$_GET['tipo'],
@@ -82,6 +92,6 @@ $_pedido_icon = array(
 	'Entrega' => 48,
 );
 
-$_produto = ZProduto::getPeloID($_GET['produtoid']);
-$_funcionario = ZFuncionario::getPeloID($_GET['funcionarioid']);
+$_produto = ZProduto::getPeloID($_GET['produto_id']);
+$_funcionario = ZFuncionario::getPeloID($_GET['funcionario_id']);
 include template('gerenciar_produto_pedido_index');

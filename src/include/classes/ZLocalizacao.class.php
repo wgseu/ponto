@@ -285,7 +285,7 @@ class ZLocalizacao {
 	public static function getPeloClienteID($cliente_id) {
 		$query = DB::$pdo->from('Localizacoes')
 						 ->where('clienteid', $cliente_id)
-						 ->orderBy('mostrar DESC')
+						 ->orderBy('mostrar ASC')
 						 ->limit(1);
 		return new ZLocalizacao($query->fetch());
 	}
@@ -409,6 +409,23 @@ class ZLocalizacao {
 						 ->where(array('id' => $id));
 		return $query->execute();
 	}
+
+    /**
+     * Gets textual and translated Tipo for Localizacao
+     * @param  int $index choose option from index
+     * @return mixed A associative key -> translated representative text or text for index
+     */
+    public static function getTipoOptions($index = null)
+    {
+        $options = array(
+            LocalizacaoTipo::CASA => 'Casa',
+            LocalizacaoTipo::APARTAMENTO => 'Apartamento',
+        );
+        if (!is_null($index)) {
+            return $options[$index];
+        }
+        return $options;
+    }
 
 	private static function initSearch() {
 		return   DB::$pdo->from('Localizacoes')

@@ -14,20 +14,20 @@
 			</div>
 			<div class="form-group col-lg-2 col-md-3 col-sm-3 col-xs-6">
 				<label for="unidade">Unidade:</label>
-				<select class="form-control" id="unidade" name="unidade">
-					${Utility::Option($unidades, $_GET['unidade'], 'Todas')}
+				<select class="form-control" id="unidade" name="unidade_id">
+					${Utility::Option($unidades, $_GET['unidade_id'], 'Todas')}
 				</select>
 			</div>
 			<div class="form-group col-lg-2 col-md-5 col-sm-5 col-xs-6">
 				<label for="categoria">Categoria:</label>
-				<select class="form-control" id="categoria" name="categoria">
-					${Utility::Option($categorias, $_GET['categoria'], 'Todas')}
+				<select class="form-control" id="categoria" name="categoria_id">
+					${Utility::Option($categorias, $_GET['categoria_id'], 'Todas')}
 				</select>
 			</div>
 			<div class="form-group col-lg-4 col-md-12 col-sm-12 col-xs-6">
 				<label for="query">Busca:</label>
 				<div class="input-group">
-					<input type="text" class="form-control" id="query" name="query" placeholder="Descrição ou Código..." value="{$_GET['query']}">
+					<input type="text" class="form-control" id="query" name="query" placeholder="Descrição ou Código..." value="${\MZ\Util\Filter::input(isset($_GET['query'])?$_GET['query']:null)}">
 					<span class="input-group-btn">
 						<button class="btn btn-default" type="submit"><i class="fa fa-search"></i></button>
 					</span>

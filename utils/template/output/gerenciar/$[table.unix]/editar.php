@@ -21,99 +21,107 @@
 */
 require_once(dirname(dirname(__FILE__)) . '/app.php');
 
-need_permission(PermissaoNome::$[TABLE.style], $_GET['saida'] == 'json');
-$$[table.unix] = $[class]::$[class.get]($_GET['$[table.pk]']);
-if(is_null($$[table.unix]->$[table.pk.get])) {
-	$msg = '$[Table.gender] $[table.name] de $[table.pk] "'.$$[table.pk.unix].'" não existe!';
-	if($_GET['saida'] == 'json')
+need_permission(PermissaoNome::$[TABLE.style], isset($_GET['saida']) && $_GET['saida'] == 'json');
+$$[table.unix] = \Z$[tAble.norm]::getPel$[primary.gender]$[pRimary.norm]($_GET['$[primary]']);
+if (is_null($$[table.unix]->get$[pRimary.norm]())) {
+	$msg = 'Não existe $[tAble.name] com $[primary.gender] $[pRimary.name] informado!';
+	if (isset($_GET['saida']) && $_GET['saida'] == 'json') {
 		json($msg);
-	Thunder::warning($msg);
+	}
+	\Thunder::warning($msg);
 	redirect('/gerenciar/$[table.unix]/');
 }
-$focusctrl = '$[table.desc]';
+$focusctrl = '$[descriptor]';
 $errors = array();
 $old_$[table.unix] = $$[table.unix];
 if ($_POST) {
-	$$[table.unix] = new $[class]($_POST);
+	$$[table.unix] = new \Z$[tAble.norm]($_POST);
 	try {
-		$$[table.unix]->$[table.pk.set]$old_$[table.unix]->$[table.pk.get]);
+		$$[table.unix]->set$[pRimary.norm]($old_$[table.unix]->get$[pRimary.norm]());
 $[field.each]
 $[field.if(date)]
-		$_$[field.unix] = date_create_from_format('d/m/Y', $$[table.unix]->$[field.get]);
-		$$[table.unix]->$[field.set]$_$[field.unix] === false?null:date_format($_$[field.unix], 'Y-m-d'));
+		$$[table.unix]->set$[fIeld.norm](\MZ\Util\Filter::date($$[table.unix]->get$[fIeld.norm]()));
 $[field.else.if(time)]
-		$_$[field.unix] = strtotime($$[table.unix]->$[field.get]);
-		$$[table.unix]->$[field.set]$_$[field.unix] === false?null:date('H:i:s', $_$[field.unix]));
+		$$[table.unix]->set$[fIeld.norm](\MZ\Util\Filter::time($$[table.unix]->get$[fIeld.norm]()));
 $[field.else.if(datetime)]
-		$_$[field.unix] = strtotime($$[table.unix]->$[field.get]);
-		$$[table.unix]->$[field.set]$_$[field.unix] === false?null:date('Y-m-d H:i:s', $_$[field.unix]));
+		$$[table.unix]->set$[fIeld.norm](\MZ\Util\Filter::datetime($$[table.unix]->get$[fIeld.norm]()));
 $[field.else.if(currency)]
-		$$[table.unix]->$[field.set]valmoney($$[table.unix]->$[field.get]));
+		$$[table.unix]->set$[fIeld.norm](\MZ\Util\Filter::money($$[table.unix]->get$[fIeld.norm]()));
 $[field.else.if(float)]
-		$$[table.unix]->$[field.set]valmoney($$[table.unix]->$[field.get]));
+		$$[table.unix]->set$[fIeld.norm](\MZ\Util\Filter::money($$[table.unix]->get$[fIeld.norm]()));
 $[field.else.if(integer)]
-		$$[table.unix]->$[field.set]number_only($$[table.unix]->$[field.get]));
+		$$[table.unix]->set$[fIeld.norm](\MZ\Util\Filter::number($$[table.unix]->get$[fIeld.norm]()));
 $[field.else.if(masked)]
-		$$[table.unix]->$[field.set]unmask($$[table.unix]->$[field.get], '$[field.mask]'));
+		$$[table.unix]->set$[fIeld.norm](\MZ\Util\Filter::unmask($$[table.unix]->get$[fIeld.norm](), '$[field.mask]'));
 $[field.else.if(image)]
 		$$[field.unix] = upload_image('raw_$[field]', '$[field.image.folder]');
-		if(!is_null($$[field.unix]))
-			$$[table.unix]->$[field.set]$$[field.unix]);
-		else if(trim($$[table.unix]->$[field.get]) != '') // evita sobrescrever
-			$$[table.unix]->$[field.set]$old_$[table.unix]->$[field.get]);
+		if (!is_null($$[field.unix])) {
+			$$[table.unix]->set$[fIeld.norm]($$[field.unix]);
+		} elseif (trim($$[table.unix]->get$[fIeld.norm]()) != '') { // evita sobrescrever
+			$$[table.unix]->set$[fIeld.norm]($old_$[table.unix]->get$[fIeld.norm]());
+		}
 $[field.else.if(blob)]
 		$$[field.unix] = upload_image('raw_$[field]', '$[field.image.folder]');
-		if(!is_null($$[field.unix])) {
-			$$[table.unix]->$[field.set]file_get_contents(WWW_ROOT . get_image_url($$[field.unix], '$[field.image.folder]')));
+		if (!is_null($$[field.unix])) {
+			$$[table.unix]->set$[fIeld.norm](file_get_contents(WWW_ROOT . get_image_url($$[field.unix], '$[field.image.folder]')));
 			unlink(WWW_ROOT . get_image_url($$[field.unix], '$[field.image.folder]'));
-		} else if(trim($$[table.unix]->$[field.get]) != '') // evita sobrescrever
-			$$[table.unix]->$[field.set]true);
-$[field.end]
-$[field.end]
-		$$[table.unix] = $[class]::atualizar($$[table.unix]);
-$[field.each]
-$[field.if(image)]
-		// exclui $[field.gender] $[field.name] antig$[field.gender]
-		if(!is_null($old_$[table.unix]->$[field.get]) && 
-			$$[table.unix]->$[field.get] != $old_$[table.unix]->$[field.get]) {
-			unlink(WWW_ROOT . get_image_url($old_$[table.unix]->$[field.get], '$[field.image.folder]'));
+		} elseif (trim($$[table.unix]->get$[fIeld.norm]()) != '') { // evita sobrescrever
+			$$[table.unix]->set$[fIeld.norm](true);
 		}
 $[field.end]
 $[field.end]
-		$msg = '$[Table.name] "'.$$[table.unix]->$[table.desc.get].'" atualizad$[table.gender] com sucesso!';
-		if($_GET['saida'] == 'json')
+		$$[table.unix] = \Z$[tAble.norm]::atualizar($$[table.unix]);
+$[field.each]
+$[field.if(image)]
+		// exclui $[field.gender] $[field.name] antig$[field.gender]
+		if (
+			!is_null($old_$[table.unix]->get$[fIeld.norm]()) && 
+			$$[table.unix]->get$[fIeld.norm]() != $old_$[table.unix]->get$[fIeld.norm]()
+		) {
+			unlink(WWW_ROOT . get_image_url($old_$[table.unix]->get$[fIeld.norm](), '$[field.image.folder]'));
+		}
+$[field.end]
+$[field.end]
+		$msg = '$[tAble.name] "'.$$[table.unix]->get$[dEscriptor.norm]().'" atualizad$[table.gender] com sucesso!';
+		if (isset($_GET['saida']) && $_GET['saida'] == 'json') {
 			json(null, array('item' => $$[table.unix]->toArray(), 'msg' => $msg));
-		Thunder::success($msg, true);
+		}
+		\Thunder::success($msg, true);
 		redirect('/gerenciar/$[table.unix]/');
-	} catch (ValidationException $e) {
+	} catch (\ValidationException $e) {
 		$errors = $e->getErrors();
-	} catch (Exception $e) {
+	} catch (\Exception $e) {
 		$errors['unknow'] = $e->getMessage();
 	}
 $[field.each]
 $[field.if(image)]
 	// exclui $[field.gender] $[field.name] enviad$[field.gender]
-	if(!is_null($$[table.unix]->$[field.get]) && 
-		$old_$[table.unix]->$[field.get] != $$[table.unix]->$[field.get]) {
-		unlink(WWW_ROOT . get_image_url($$[table.unix]->$[field.get], '$[field.image.folder]'));
+	if (
+		!is_null($$[table.unix]->get$[fIeld.norm]()) && 
+		$old_$[table.unix]->get$[fIeld.norm]() != $$[table.unix]->get$[fIeld.norm]()
+	) {
+		unlink(WWW_ROOT . get_image_url($$[table.unix]->get$[fIeld.norm](), '$[field.image.folder]'));
 	}
 $[field.else.if(blob)]
 	// restaura $[field.gender] $[field.name] original
-	if($$[table.unix]->$[field.get] === true)
-		$$[table.unix]->$[field.set]$old_$[table.unix]->$[field.get]);
+	if ($$[table.unix]->get$[fIeld.norm]() === true) {
+		$$[table.unix]->set$[fIeld.norm]($old_$[table.unix]->get$[fIeld.norm]());
+	}
 $[field.end]
 $[field.end]
-	foreach($errors as $key => $value) {
+	foreach ($errors as $key => $value) {
 		$focusctrl = $key;
-		if($_GET['saida'] == 'json')
+		if (isset($_GET['saida']) && $_GET['saida'] == 'json') {
 			json($value, null, array('field' => $focusctrl));
-		Thunder::error($value);
+		}
+		\Thunder::error($value);
 		break;
 	}
 }
-if($_GET['saida'] == 'json')
+if (isset($_GET['saida']) && $_GET['saida'] == 'json') {
 	json('Nenhum dado foi enviado');
+}
 $[field.each(reference)]
-$_$[reference.unix.plural] = $[reference.class]::$[reference.class.get.all]();
+$_$[reference.unix.plural] = \Z$[rEference.norm]::getTod$[rEference.gender]s();
 $[field.end]
 include template('gerenciar_$[table.unix]_editar');

@@ -20,17 +20,12 @@
 	direitos, expressos ou implícitos no GrandChef diferentes dos especificados nesta Licença.
 */
 
-// retorna apenas os números da string
-function numberonly($str) {
-	return preg_replace('/[^0-9]/', '', $str);
-}
-
 function numberval($str) {
 	return preg_replace('/[^0-9-]/', '', $str);
 }
 
 function is_number($value) {
-	return numberonly($value) == $value;
+	return \MZ\Util\Filter::digits($value) == $value;
 }
 
 function is_equal($value, $compare, $delta = 0.005) {
@@ -48,7 +43,7 @@ function is_less($value, $compare, $delta = 0.005) {
 // Função que valida o CPF
 function check_cpf($cpf) {
 	// Verifiva se o número digitado contém todos os digitos
-	$cpf = numberonly($cpf);
+	$cpf = \MZ\Util\Filter::digits($cpf);
 	$pattern = '/^0+$|^1+$|^2+$|^3+$|^4+$|^5+$|^6+$|^7+$|^8+$|^9+$/';
 	// Verifica se nenhuma das sequências abaixo foi digitada, caso seja, retorna falso
 	if (strlen($cpf) != 11 || preg_match($pattern, $cpf))
@@ -68,7 +63,7 @@ function check_cpf($cpf) {
 // Função que valida o CNPJ
 function check_cnpj($cnpj) {
 	// Verifiva se o número digitado contém todos os digitos
-	$cnpj = numberonly($cnpj);
+	$cnpj = \MZ\Util\Filter::digits($cnpj);
 	$pattern = '/^0+$|^1+$|^2+$|^3+$|^4+$|^5+$|^6+$|^7+$|^8+$|^9+$/';
 	if(strlen($cnpj) != 14 || preg_match($pattern, $cnpj)) {
 		return false;
@@ -105,13 +100,13 @@ function check_usuario($usuario) {
 
 // Função que valida o telefone
 function check_fone($fone, $ignore_ddd = false) {
-	$fone = numberonly($fone);
+	$fone = \MZ\Util\Filter::digits($fone);
 	return strlen($fone) == 10 || strlen($fone) == 11 || ($ignore_ddd && (strlen($fone) == 8 || strlen($fone) == 9));
 }
 
 // Função que valida o CEP
 function check_cep($cep) {
-	$cep = numberonly($cep);
+	$cep = \MZ\Util\Filter::digits($cep);
 	return strlen($cep) == 8;
 }
 
@@ -219,48 +214,6 @@ function human_range($inicio, $fim, $sep = '/') {
 		}
 		return 'entre '.date('d'.$sep.'m'.$sep.'Y', $inicio).' e '.date('d'.$sep.'m'.$sep.'Y', $fim);
 	}
-}
-
-function mask_fone($fone) {
-	$fone = numberonly($fone);
-	if(trim($fone) == '')
-		return '';
-	return sprintf("(%s) %s-%s",
-				substr($fone, 0, 2),
-				substr($fone, 2, 4),
-				substr($fone, 6));
-}
-
-function mask_cep($cep) {
-	$cep = numberonly($cep);
-	if(trim($cep) == '')
-		return '';
-	return sprintf("%s-%s",
-				substr($cep, 0, 5),
-				substr($cep, 5, 3));
-}
-
-function mask_cpf($cpf) {
-	$cpf = numberonly($cpf);
-	if(trim($cpf) == '')
-		return '';
-	return sprintf("%s.%s.%s-%s",
-				substr($cpf, 0, 3),
-				substr($cpf, 3, 3),
-				substr($cpf, 6, 3),
-				substr($cpf, 9, 2));
-}
-
-function mask_cnpj($cnpj) {
-	$cnpj = numberonly($cnpj);
-	if(trim($cnpj) == '')
-		return '';
-	return sprintf("%s.%s.%s/%s-%s",
-				substr($cnpj, 0, 2),
-				substr($cnpj, 2, 3),
-				substr($cnpj, 5, 3),
-				substr($cnpj, 8, 4),
-				substr($cnpj, 12, 2));
 }
 
 /**

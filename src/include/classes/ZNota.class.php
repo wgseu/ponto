@@ -684,14 +684,19 @@ class ZNota {
 
 	public function getCaminhoXml() {
 		$xmlfile = NFeDB::getCaminhoXmlAtual($this);
-		if(!file_exists($xmlfile))
+		if (!file_exists($xmlfile)) {
 			throw new Exception('Não existe XML para a nota de número "' . $this->getNumeroInicial() . '"', 404);
+		}
 		return $xmlfile;
 	}
 
 	public static function zip($notas) {
 		$files = array();
 		foreach ($notas as $_nota) {
+			// Notas abertas não possuem arquivo XML
+			if ($_nota->getEstado() == NotaEstado::ABERTO) {
+				continue;
+			}
 			$xmlfile = $_nota->getCaminhoXml();
 			$xmlname = basename($xmlfile);
 			$directory = basename(dirname($xmlfile));

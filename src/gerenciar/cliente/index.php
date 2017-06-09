@@ -23,21 +23,43 @@ require_once(dirname(dirname(__FILE__)) . '/app.php');
 
 need_permission(PermissaoNome::CADASTROCLIENTES);
 
-$tipo = strtolower($_GET['tipo']);
-$genero = null;
-if($tipo == 'empresa') {
+$genero = isset($_GET['genero'])?$_GET['genero']:null;
+$busca = isset($_GET['query'])?$_GET['query']:null;
+if ($genero == 'Empresa') {
 	$tipo = ClienteTipo::JURIDICA;
+	$genero = null;
 } else {
-	$genero = $tipo;
 	$tipo = null;
 }
-$count = ZCliente::getCount($_GET['query'], $tipo, $genero, null, null);
-list($pagesize, $offset, $pagestring) = pagestring($count, 10);
-$clientes = ZCliente::getTodos($_GET['query'], $tipo, $genero, null, null, $offset, $pagesize);
-
-$tipos = array(
-	'Empresa' => 'Empresa',
-	ClienteGenero::MASCULINO => 'Masculino',
-	ClienteGenero::FEMININO => 'Feminino',
+$count = ZCliente::getCount(
+	$busca,
+	$tipo,
+	$genero,
+	null, // mes_inicio
+	null, // mes_fim
+	null, // cpf
+	null, // fone
+	null, // email
+	null, // birthday
+	$offset,
+	$pagesize
 );
+list($pagesize, $offset, $pagestring) = pagestring($count, 10);
+$clientes = ZCliente::getTodos(
+	$busca,
+	$tipo,
+	$genero,
+	null, // mes_inicio
+	null, // mes_fim
+	null, // cpf
+	null, // fone
+	null, // email
+	null, // birthday
+	$offset,
+	$pagesize
+);
+
+$tipos = ZCliente::getGeneroOptions();
+$tipos = array('Empresa' => 'Empresa') + $tipos;
+
 include template('gerenciar_cliente_index');

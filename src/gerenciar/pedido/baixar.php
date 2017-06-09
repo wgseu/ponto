@@ -24,64 +24,55 @@ require_once(dirname(dirname(__FILE__)) . '/app.php');
 need_permission(PermissaoNome::RELATORIOVENDAS, isset($_GET['saida']) && $_GET['saida'] == 'json');
 
 try {
-	$funcionario_id = isset($_GET['funcionario_id'])?intval($_GET['funcionario_id']):null;
-	$datahora_inicio = isset($_GET['datahora_inicio'])?strtotime($_GET['datahora_inicio']):null;
-	$datahora_fim = isset($_GET['datahora_fim'])?strtotime($_GET['datahora_fim']):null;
-	$sessao_id = isset($_GET['sessao_id'])?intval($_GET['sessao_id']):null;
-	$movimentacao_id = isset($_GET['movimentacao_id'])?intval($_GET['movimentacao_id']):null;
-	$pedido_id = isset($_GET['pedido_id'])?intval($_GET['pedido_id']):null;
-	$produto_id = isset($_GET['produto_id'])?intval($_GET['produto_id']):null;
+	$query = isset($_GET['query'])?$_GET['query']:null;
 	$cancelado = isset($_GET['cancelado'])?$_GET['cancelado']:null;
-	$servicos = isset($_GET['servicos'])?$_GET['servicos']:null;
+	$sessao_id = isset($_GET['sessao_id'])?intval($_GET['sessao_id']):null;
+	$caixa_id = isset($_GET['caixa_id'])?intval($_GET['caixa_id']):null;
+	$movimentacao_id = isset($_GET['movimentacao_id'])?intval($_GET['movimentacao_id']):null;
+	$funcionario_id = isset($_GET['funcionario_id'])?intval($_GET['funcionario_id']):null;
+	$cliente_id = isset($_GET['cliente_id'])?intval($_GET['cliente_id']):null;
+	$criacao_inicio = isset($_GET['criacao_inicio'])?strtotime($_GET['criacao_inicio']):null;
+	$criacao_fim = isset($_GET['criacao_fim'])?strtotime($_GET['criacao_fim']):null;
+	$tipo = isset($_GET['tipo'])?$_GET['tipo']:null;
 	$formato = isset($_GET['formato'])?$_GET['formato']:null;
 
-	$estado = null;
-	if ($cancelado == 'Y') {
-		$estado = 'Cancelado';
-	}
-	$tipo = 'Produtos';
-	if ($servicos == 'Y') {
-		$tipo = null;
-	}
-	$itens_do_pedido = ZProdutoPedido::getTodos(
-		$pedido_id,
-		$produto_id,
+	$pedidos = ZPedido::getTodos(
+		$query,
+		$cliente_id,
 		$funcionario_id,
-		$sessao_id,
-		$movimentacao_id,
 		$tipo,
-		$estado,
-		null, // módulo de vendas (todos)
-		$datahora_inicio,
-		$datahora_fim,
-		true // raw enabled
+		null, // estado
+		$cancelado,
+		$criacao_inicio,
+		$criacao_fim,
+		$sessao_id,
+		$caixa_id,
+		$movimentacao_id
 	);
     // Coluna dos dados
 	$columns = array(
-		'Pedido',
-		'Destino',
-		'Atendente',
 		'Código',
-		'Descrição',
-		'Preço (R$)',
-		'Quantidade',
+		'Caixa',
+		'Destino',
+		'Produtos (R$)',
 		'Comissão (R$)',
+		'Serviços (R$)',
 		'Subtotal (R$)',
+		'Descontos (R$)',
 		'Total (R$)',
-		'Preço de venda (R$)',
 		'Custo (R$)',
 		'Lucro (R$)',
-		'Custo total (R$)',
-		'Lucro total (R$)',
-		'Observações',
+		'Sessão',
+		'Atendente',
+		'Pessoas',
 		'Data do pedido'
 	);
 	$data = array($columns);
 	$line = 3;
 	$column = 'B';
 	$i = $line;
-	$value = new ZProdutoPedido();
-	foreach ($itens_do_pedido as $key => $item) {
+	$value = new ZPedido();
+	foreach ($pedidos as $key => $item) {
 		$i++;
 		$value->fromArray($item);
 
@@ -112,7 +103,7 @@ try {
 	}
 	// footer
 	$row = array();
-	$row[] = count($itens_do_pedido) . ' Vendas';
+	$row[] = count($pedidos) . ' Vendas';
 	$row[] = null;
 	$row[] = null;
 	$row[] = null;

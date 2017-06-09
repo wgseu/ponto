@@ -659,8 +659,18 @@ class ZProdutoPedido {
 		$inicio = null,
 		$quantidade = null
 	) {
-		$query = self::initSearch($busca, $produto_id, $funcionario_id, $sessao_id, $movimentacao_id, 
-			$tipo, $estado, $modulo, $data_inicio, $data_fim);
+		$query = self::initSearch(
+			$busca,
+			$produto_id,
+			$funcionario_id,
+			$sessao_id,
+			$movimentacao_id,
+			$tipo,
+			$estado,
+			$modulo,
+			$data_inicio,
+			$data_fim
+		);
 		if(!is_null($inicio) && !is_null($quantidade)) {
 			$query = $query->limit($quantidade)->offset($inicio);
 		}
@@ -674,9 +684,30 @@ class ZProdutoPedido {
 		return $produto_pedidos;
 	}
 
-	public static function getCount($busca = null, $produto_id = null, $funcionario_id = null, 
-			$tipo = null, $estado = null, $modulo = null, $data_inicio = null, $data_fim = null) {
-		$query = self::initSearch($busca, $produto_id, $funcionario_id, $tipo, $estado, $modulo, $data_inicio, $data_fim);
+	public static function getCount(
+		$busca = null,
+		$produto_id = null,
+		$funcionario_id = null, 
+		$sessao_id = null,
+		$movimentacao_id = null,
+		$tipo = null,
+		$estado = null,
+		$modulo = null,
+		$data_inicio = null,
+		$data_fim = null
+	) {
+		$query = self::initSearch(
+			$busca,
+			$produto_id,
+			$funcionario_id,
+			$sessao_id,
+			$movimentacao_id,
+			$tipo,
+			$estado,
+			$modulo,
+			$data_inicio,
+			$data_fim
+		);
 		return $query->count();
 	}
 

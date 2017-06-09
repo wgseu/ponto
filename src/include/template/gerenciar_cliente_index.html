@@ -8,14 +8,14 @@
 		<form id="search-form" action="/gerenciar/cliente/" method="get">
 			<div class="form-group col-lg-2 col-md-4 col-sm-4 col-xs-6">
 				<label for="tipo">Genero:</label>
-				<select class="form-control" id="tipo" name="tipo">
-					${Utility::Option($tipos, $_GET['tipo'], 'Todos')}
+				<select class="form-control" id="tipo" name="genero">
+					${Utility::Option($tipos, $_GET['genero'], 'Todos')}
 				</select>
 			</div>
 			<div class="form-group col-lg-4 col-md-4 col-sm-4 col-xs-12">
 				<label>Busca:</label>
 				<div class="input-group">
-					<input type="text" class="form-control" id="query" name="query" placeholder="Nome, Telefone, E-mail ou CPF..." value="{$_GET['query']}">
+					<input type="text" class="form-control" id="query" name="query" placeholder="Nome, Telefone, E-mail ou CPF..." value="${\MZ\Util\Filter::input(isset($_GET['query'])?$_GET['query']:null)}">
 					<span class="input-group-btn">
 						<button class="btn btn-default" type="submit"><i class="fa fa-search"></i></button>
 					</span>

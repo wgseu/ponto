@@ -1,4 +1,4 @@
 <div class="form-group col-lg-3 col-md-4 col-sm-6 col-xs-12">
-	<label for="$[field]">$[Field.name]:</label>
-	<input type="text" id="$[field]" name="$[field]" class="datetime-picker form-control" value="${is_empty($$[table.unix]->$[field.get])?'':date('d/m/Y H:i', strtotime($$[table.unix]->$[field.get]))}">
+	<label for="$[field]">$[fIeld.name]:</label>
+	<input type="text" id="$[field]" name="$[field]" class="datetime-picker form-control" value="${\MZ\Util\Mask::datetime($$[table.unix]->get$[fIeld.norm]())}">
 </div>

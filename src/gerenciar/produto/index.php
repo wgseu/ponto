@@ -23,15 +23,36 @@ require_once(dirname(dirname(__FILE__)) . '/app.php');
 
 need_permission(PermissaoNome::CADASTROPRODUTOS);
 
-$count = ZProduto::getCount($_GET['query'], $_GET['categoria'], $_GET['unidade'], $_GET['tipo'], null);
-list($pagesize, $offset, $pagestring) = pagestring($count, 10);
-$produtos = ZProduto::getTodos($_GET['query'], $_GET['categoria'], $_GET['unidade'], $_GET['tipo'], null, $offset, $pagesize);
-
-$tipos = array(
-	ProdutoTipo::PRODUTO => 'Produto',
-	ProdutoTipo::COMPOSICAO => 'Composição',
-	ProdutoTipo::PACOTE => 'Pacote',
+$count = ZProduto::getCount(
+	$_GET['query'],
+	$_GET['categoria_id'],
+	$_GET['unidade_id'],
+	$_GET['tipo'],
+	null, // estoque
+	null, // setor de estoque
+	null, // incluir promoção
+	null, // visibilidade
+	null, // mostrar com estoque limitado
+	null  // pesável
 );
+list($pagesize, $offset, $pagestring) = pagestring($count, 10);
+$produtos = ZProduto::getTodos(
+	$_GET['query'],
+	$_GET['categoria_id'],
+	$_GET['unidade_id'],
+	$_GET['tipo'],
+	null, // estoque
+	null, // setor de estoque
+	null, // incluir promoção
+	null, // visibilidade
+	null, // mostrar com estoque limitado
+	null, // pesável
+	false, // raw mode
+	$offset,
+	$pagesize
+);
+
+$tipos = ZProduto::getTipoOptions();
 $categorias = array();
 $_categorias = ZCategoria::getTodas(true);
 foreach ($_categorias as $categoria) {

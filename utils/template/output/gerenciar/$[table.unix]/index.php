@@ -23,26 +23,27 @@ require_once(dirname(dirname(__FILE__)) . '/app.php');
 
 need_permission(PermissaoNome::$[TABLE.style], $_GET['saida'] == 'json');
 
-$limite = trim($_GET['limite']);
-if(!is_numeric($limite) || $limite > 100 || $limite < 0)
+$limite = isset($_GET['limite'])?intval($_GET['limite']):10;
+if ($limite > 100 || $limite < 1) {
 	$limite = 10;
-$count = $[class]::getCount();
+}
+$count = \Z$[tAble.norm]::getCount();
 list($pagesize, $offset, $pagestring) = pagestring($count, $limite);
-$$[table.unix.plural] = $[class]::$[class.get.all]($offset, $pagesize);
+$$[table.unix.plural] = \Z$[tAble.norm]::getTod$[table.gender]s($offset, $pagesize);
 
-if($_GET['saida'] == 'json') {
-	$_$[table.unix.plural] = array();
+if (isset($_GET['saida']) && $_GET['saida'] == 'json') {
+	$items = array();
 	foreach ($$[table.unix.plural] as $$[table.unix]) {
-		$_$[table.unix.plural][] = $$[table.unix]->toArray();
+		$items[] = $$[table.unix]->toArray();
 	}
-	json(array('status' => 'ok', 'items' => $_$[table.unix.plural]));
+	json(array('status' => 'ok', 'items' => $items));
 }
 
-$[field.each]
+$[field.each(all)]
 $[field.if(enum)]
-$$[field.unix]_values = array(
+$$[field.unix]_options = array(
 $[field.each(option)]
-	'$[field.option]' => '$[Field.option.name]',
+	'$[field.option]' => '$[fIeld.option.name]',
 $[field.end]
 );
 $[field.end]

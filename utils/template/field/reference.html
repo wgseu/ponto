@@ -1,11 +1,11 @@
 <div class="form-group col-lg-3 col-md-4 col-sm-6 col-xs-12">
-	<label for="$[field]">$[Field.name]:</label>
+	<label for="$[field]">$[fIeld.name]:</label>
 	<select class="form-control" id="$[field]" name="$[field]">
 $[field.if(null)]
-		<option value="" ${is_null($$[table.unix]->$[field.get])?'selected':''}>Não informad$[field.gender]</option>
+		<option value="" ${is_null($$[table.unix]->get$[fIeld.norm]())?'selected':''}>Não informad$[field.gender]</option>
 $[field.end]
 <!--{loop $_$[reference.unix.plural] $_$[reference.unix]}-->
-		<option value="{$_$[reference.unix]->$[reference.pk.get]}" ${$$[table.unix]->$[field.get] == $_$[reference.unix]->$[reference.pk.get]?'selected':''}>{$_$[reference.unix]->$[reference.desc.get]}</option>
+		<option value="{$_$[reference.unix]->get$[rEference.pk.norm]()}" ${$$[table.unix]->get$[fIeld.norm]() == $_$[reference.unix]->get$[rEference.pk.norm]()?'selected':''}>{$_$[reference.unix]->get$[rEference.desc.norm]()}</option>
 <!--{/loop}-->
 	</select>
 </div>

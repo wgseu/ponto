@@ -34,7 +34,21 @@ if(isset($_GET['categoria']) && is_numeric($_GET['categoria'])) {
 	$limit = null;
 	$categoria_id = intval($_GET['categoria']);
 }
-$produtos = ZProduto::getTodosEx($_GET['busca'], $categoria_id, null, null, $estoque, 0, $limit);
+$produtos = ZProduto::getTodos(
+	$_GET['busca'],
+	$categoria_id,
+	null,
+	null,
+	$estoque,
+	null,
+	null,
+	null,
+	null,
+	null,
+	true,
+	0,
+	$limit
+);
 $response = array('status' => 'ok');
 $campos = array(
 			'id',

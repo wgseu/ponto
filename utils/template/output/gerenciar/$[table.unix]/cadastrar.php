@@ -21,88 +21,89 @@
 */
 require_once(dirname(dirname(__FILE__)) . '/app.php');
 
-need_permission(PermissaoNome::$[TABLE.style], $_GET['saida'] == 'json');
-$focusctrl = '$[table.desc]';
+need_permission(PermissaoNome::$[TABLE.style], isset($_GET['saida']) && $_GET['saida'] == 'json');
+$focusctrl = '$[descriptor]';
 $errors = array();
 if ($_POST) {
-	$$[table.unix] = new $[class]($_POST);
+	$$[table.unix] = new \Z$[tAble.norm]($_POST);
 	try {
-		$$[table.unix]->$[table.pk.set]null);
+		$$[table.unix]->set$[pRimary.norm](null);
 $[field.each]
 $[field.if(date)]
-		$_$[field.unix] = date_create_from_format('d/m/Y', $$[table.unix]->$[field.get]);
-		$$[table.unix]->$[field.set]$_$[field.unix] === false?null:date_format($_$[field.unix], 'Y-m-d'));
+		$$[table.unix]->set$[fIeld.norm](\MZ\Util\Filter::date($$[table.unix]->get$[fIeld.norm]()));
 $[field.else.if(time)]
-		$_$[field.unix] = strtotime($$[table.unix]->$[field.get]);
-		$$[table.unix]->$[field.set]$_$[field.unix] === false?null:date('H:i:s', $_$[field.unix]));
+		$$[table.unix]->set$[fIeld.norm](\MZ\Util\Filter::time($$[table.unix]->get$[fIeld.norm]()));
 $[field.else.if(datetime)]
-		$_$[field.unix] = strtotime($$[table.unix]->$[field.get]);
-		$$[table.unix]->$[field.set]$_$[field.unix] === false?null:date('Y-m-d H:i:s', $_$[field.unix]));
+		$$[table.unix]->set$[fIeld.norm](\MZ\Util\Filter::datetime($$[table.unix]->get$[fIeld.norm]()));
 $[field.else.if(currency)]
-		$$[table.unix]->$[field.set]valmoney($$[table.unix]->$[field.get]));
+		$$[table.unix]->set$[fIeld.norm](\MZ\Util\Filter::money($$[table.unix]->get$[fIeld.norm]()));
 $[field.else.if(float)]
-		$$[table.unix]->$[field.set]valmoney($$[table.unix]->$[field.get]));
+		$$[table.unix]->set$[fIeld.norm](\MZ\Util\Filter::money($$[table.unix]->get$[fIeld.norm]()));
 $[field.else.if(integer)]
-		$$[table.unix]->$[field.set]number_only($$[table.unix]->$[field.get]));
+		$$[table.unix]->set$[fIeld.norm](\MZ\Util\Filter::number($$[table.unix]->get$[fIeld.norm]()));
 $[field.else.if(masked)]
-		$$[table.unix]->$[field.set]unmask($$[table.unix]->$[field.get], '$[field.mask]'));
+		$$[table.unix]->set$[fIeld.norm](\MZ\Util\Filter::unmask($$[table.unix]->get$[fIeld.norm](), '$[field.mask]'));
 $[field.else.if(image)]
 		$$[field.unix] = upload_image('raw_$[field]', '$[field.image.folder]');
-		$$[table.unix]->$[field.set]$$[field.unix]);
+		$$[table.unix]->set$[fIeld.norm]($$[field.unix]);
 $[field.else.if(blob)]
 		$$[field.unix] = upload_image('raw_$[field]', '$[field.image.folder]');
-		if(!is_null($$[field.unix])) {
-			$$[table.unix]->$[field.set]file_get_contents(WWW_ROOT . get_image_url($$[field.unix], '$[field.image.folder]')));
+		if (!is_null($$[field.unix])) {
+			$$[table.unix]->set$[fIeld.norm](file_get_contents(WWW_ROOT . get_image_url($$[field.unix], '$[field.image.folder]')));
 			unlink(WWW_ROOT . get_image_url($$[field.unix], '$[field.image.folder]'));
-		} else
-			$$[table.unix]->$[field.set]null);
+		} else {
+			$$[table.unix]->set$[fIeld.norm](null);
+		}
 $[field.end]
 $[field.end]
-		$$[table.unix] = $[class]::cadastrar($$[table.unix]);
-		$msg = '$[Table.name] "'.$$[table.unix]->$[table.desc.get].'" cadastrad$[table.gender] com sucesso!';
-		if($_GET['saida'] == 'json')
+		$$[table.unix] = \Z$[tAble.norm]::cadastrar($$[table.unix]);
+		$msg = '$[tAble.name] "'.$$[table.unix]->get$[dEscriptor.norm]().'" cadastrad$[table.gender] com sucesso!';
+		if (isset($_GET['saida']) && $_GET['saida'] == 'json') {
 			json(null, array('item' => $$[table.unix]->toArray(), 'msg' => $msg));
-		Thunder::success($msg, true);
+		}
+		\Thunder::success($msg, true);
 		redirect('/gerenciar/$[table.unix]/');
-	} catch (ValidationException $e) {
+	} catch (\ValidationException $e) {
 		$errors = $e->getErrors();
-	} catch (Exception $e) {
+	} catch (\Exception $e) {
 		$errors['unknow'] = $e->getMessage();
 	}
 $[field.each]
 $[field.if(image)]
 	// remove $[field.gender] $[field.name] enviad$[field.gender]
-	if(!is_null($$[table.unix]->$[field.get]))
-		unlink(WWW_ROOT . get_image_url($$[table.unix]->$[field.get], '$[field.image.folder]'));
-	$$[table.unix]->$[field.set]null);
+	if (!is_null($$[table.unix]->get$[fIeld.norm]())) {
+		unlink(WWW_ROOT . get_image_url($$[table.unix]->get$[fIeld.norm](), '$[field.image.folder]'));
+	}
+	$$[table.unix]->set$[fIeld.norm](null);
 $[field.else.if(blob)]
 	// remove $[field.gender] $[field.name] enviad$[field.gender]
-	$$[table.unix]->$[field.set]null);
+	$$[table.unix]->set$[fIeld.norm](null);
 $[field.end]
 $[field.end]
-	foreach($errors as $key => $value) {
+	foreach ($errors as $key => $value) {
 		$focusctrl = $key;
-		if($_GET['saida'] == 'json')
+		if (isset($_GET['saida']) && $_GET['saida'] == 'json') {
 			json($value, null, array('field' => $focusctrl));
-		Thunder::error($value);
+		}
+		\Thunder::error($value);
 		break;
 	}
 } else {
-	$$[table.unix] = new $[class]();
+	$$[table.unix] = new \Z$[tAble.norm]();
 $[field.each]
 $[field.if(date)]
-	$$[table.unix]->$[field.set]date('Y-m-d', time()));
-$[field.end]
-$[field.end]
-$[field.each]
-$[field.if(datetime)]
-	$$[table.unix]->$[field.set]date('Y-m-d H:i:s', time()));
+	$$[table.unix]->set$[fIeld.norm](date('Y-m-d', time()));
+$[field.else.if(time)]
+	$$[table.unix]->set$[fIeld.norm](date('H:i:s', time()));
+$[field.else.if(datetime)]
+	$$[table.unix]->set$[fIeld.norm](date('Y-m-d H:i:s', time()));
 $[field.end]
 $[field.end]
 }
-if($_GET['saida'] == 'json')
+if (isset($_GET['saida']) && $_GET['saida'] == 'json') {
 	json('Nenhum dado foi enviado');
+}
 $[field.each(reference)]
-$_$[reference.unix.plural] = $[reference.class]::$[reference.class.get.all]();
+$_$[reference.unix.plural] = \Z$[rEference.norm]::getTod$[rEference.gender]s();
 $[field.end]
 include template('gerenciar_$[table.unix]_cadastrar');

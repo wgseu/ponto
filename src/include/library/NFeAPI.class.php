@@ -64,6 +64,7 @@ class NFeAPI extends \NFe\Common\Ajuste {
 		$this->setCSC($this->external_emitente->getCSC());
 		$this->setTokenIBPT($this->external_emitente->getIBPT());
 		$this->setSincrono('Y');
+		$this->setTempoLimite(6);
 
 		/* Emitente */
 		$emitente = new \NFe\Entity\Emitente();

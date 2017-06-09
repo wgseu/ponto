@@ -485,37 +485,42 @@ class ZProduto {
 		$this->setDataAtualizacao(isset($produto['dataatualizacao'])?$produto['dataatualizacao']:null);
 	}
 
-	private static function initGet() {
+	private static function initGet($setor_id = null, $promocao = 'Y') {
+		$promocao = $promocao == 'N'?'N':'Y';
 		return DB::$pdo->from('Produtos p')
-						 ->select(null)
-						 ->select('p.id')
-						 ->select('p.codigobarras')
-						 ->select('p.categoriaid')
-						 ->select('p.unidadeid')
-						 ->select('p.setorestoqueid')
-						 ->select('p.setorpreparoid')
-						 ->select('p.tributacaoid')
-						 ->select('p.descricao')
-						 ->select('p.abreviacao')
-						 ->select('p.detalhes')
-						 ->select('p.quantidadelimite')
-						 ->select('p.quantidademaxima')
-						 ->select('p.conteudo')
-						 ->select('(p.precovenda + COALESCE(prm.valor, 0)) as precovenda')
-						 ->select('p.custoproducao')
-						 ->select('p.tipo')
-						 ->select('p.cobrarservico')
-						 ->select('p.divisivel')
-						 ->select('p.pesavel')
-						 ->select('p.perecivel')
-						 ->select('p.tempopreparo')
-						 ->select('IF(COALESCE(prm.proibir, "N") = "N", p.visivel, "N") as visivel')
-						 ->select('IF(ISNULL(p.imagem), NULL, CONCAT(p.id, ".png")) as imagem')
-						 ->select('p.dataatualizacao')
-						 // extra
-						 ->select('COALESCE(sum(e.quantidade), 0) as estoque')
-						 ->leftJoin('Estoque e ON e.produtoid = p.id AND e.cancelado = "N" AND (ISNULL(p.setorestoqueid) OR e.setorid = p.setorestoqueid)')
-						 ->leftJoin('Promocoes prm ON prm.produtoid = p.id AND NOW() BETWEEN DATE_ADD(CURDATE(), INTERVAL prm.inicio - DAYOFWEEK(CURDATE()) * 1440 MINUTE) AND DATE_ADD(CURDATE(), INTERVAL prm.fim - DAYOFWEEK(CURDATE()) * 1440 MINUTE)');
+			->select(null)
+			->select('p.id')
+			->select('p.codigobarras')
+			->select('p.categoriaid')
+			->select('p.unidadeid')
+			->select('p.setorestoqueid')
+			->select('p.setorpreparoid')
+			->select('p.tributacaoid')
+			->select('p.descricao')
+			->select('p.abreviacao')
+			->select('p.detalhes')
+			->select('p.quantidadelimite')
+			->select('p.quantidademaxima')
+			->select('p.conteudo')
+			->select('(p.precovenda + IF(? = "Y", COALESCE(prm.valor, 0), 0)) as precovenda', $promocao)
+			->select('p.custoproducao')
+			->select('p.tipo')
+			->select('p.cobrarservico')
+			->select('p.divisivel')
+			->select('p.pesavel')
+			->select('p.perecivel')
+			->select('p.tempopreparo')
+			->select('p.visivel')
+			->select('IF(ISNULL(p.imagem), NULL, CONCAT(p.id, ".png")) as imagem')
+			->select('p.dataatualizacao')
+			// extra
+			->select('COALESCE(sum(e.quantidade), 0) as estoque')
+			->leftJoin(
+				'Estoque e ON e.produtoid = p.id AND e.cancelado = "N" AND'.
+				' e.setorid = IFNULL(?, IFNULL(p.setorestoqueid, e.setorid))',
+				$setor_id
+			)
+			->leftJoin('Promocoes prm ON prm.produtoid = p.id AND NOW() BETWEEN DATE_ADD(CURDATE(), INTERVAL prm.inicio - DAYOFWEEK(CURDATE()) * 1440 MINUTE) AND DATE_ADD(CURDATE(), INTERVAL prm.fim - DAYOFWEEK(CURDATE()) * 1440 MINUTE)');
 	}
 
 	public static function getPeloID($id) {
@@ -730,32 +735,83 @@ class ZProduto {
 		return $query->execute();
 	}
 
-	private static function initSearch($busca, $categoria_id, $unidade_id, $tipo, $estoque) {
+	public static function getTipoOptions($index = null)
+	{
+		$tipos = array(
+			ProdutoTipo::PRODUTO => 'Produto',
+			ProdutoTipo::COMPOSICAO => 'Composição',
+			ProdutoTipo::PACOTE => 'Pacote',
+		);
+		if (in_array($index, $tipos)) {
+			return $tipos[$index];
+		}
+		return $tipos;
+	}
+
+	private static function initSearch(
+		$busca,
+		$categoria_id,
+		$unidade_id,
+		$tipo,
+		$estoque, 
+		$setor_id,
+		$promocao,
+		$visivel,
+		$limitado,
+		$pesavel
+	) {
 		$negativo = intval(is_boolean_config('Estoque', 'Estoque.Negativo'));
-		if(!is_null($estoque)) {
+		if (!is_null($estoque)) {
 			$estoque = intval($estoque);
-			if($estoque)
+			if ($estoque) {
 				$tipo = ProdutoTipo::PRODUTO;
-		} else
+			} else {
+				$visivel = 'Y';
+			}
+		} else {
 			$estoque = 1;
-		$query = self::initGet()
-					 ->leftJoin('Categorias c ON c.id = p.categoriaid')
-					 ->where('(COALESCE(prm.proibir, "N") = "N" OR 1 = ?)', $estoque)
-					 ->having('(p.tipo <> "Produto" OR (estoque > 0 OR 1 = ?))', intval($negativo || $estoque))
-					 ->groupBy('p.id');
- 		if(!$estoque)
- 			$query = $query->where('p.visivel', 'Y');
-		if(trim($tipo) != '')
-			$query = $query->where('p.tipo', trim($tipo));
- 		if(is_numeric($categoria_id)) {
+		}
+		$limitado = $limitado == 'Y'?'Y':'N';
+		$query = self::initGet($setor_id, $promocao)
+			->select('c.descricao as categoria')
+			->select('u.sigla as unidade')
+			->select('u.nome as unidade_nome')
+			->select('se.nome as setor_estoque')
+			->select('sp.nome as setor_preparo')
+			->leftJoin('Categorias c ON c.id = p.categoriaid')
+			->leftJoin('Unidades u ON u.id = p.unidadeid')
+			->leftJoin('Setores se ON se.id = p.setorestoqueid')
+			->leftJoin('Setores sp ON sp.id = p.setorpreparoid')
+			->where('(COALESCE(prm.proibir, "N") = "N" OR 1 = ?)', $estoque)
+			->having('(p.tipo <> "Produto" OR (estoque > 0 OR 1 = ?))', intval($negativo || $estoque))
+			->having('(? = "N" OR COALESCE(estoque, 0) <= p.quantidadelimite)', $limitado)
+			->groupBy('p.id');
+ 		if (!is_null($visivel)) {
+ 			$query = $query->where('p.visivel', $visivel);
+ 			$query = $query->where('COALESCE(prm.proibir, "N") <> ?', $visivel);
+ 		}
+		if (!empty($tipo) || is_array($tipo)) {
+			$query = $query->where('p.tipo', $tipo);
+		}
+ 		if (is_numeric($categoria_id)) {
 			$query = $query->where('(p.categoriaid = ? OR c.categoriaid = ?)', $categoria_id, $categoria_id);
 		}
- 		if(is_numeric($unidade_id))
+ 		if (is_numeric($unidade_id)) {
 			$query = $query->where('p.unidadeid', $unidade_id);
+ 		}
+ 		if (is_numeric($setor_id)) {
+			$query = $query->where('p.setor', $setor_id);
+ 		}
+ 		if (!is_null($pesavel)) {
+ 			$query = $query->where('p.pesavel', $pesavel);
+ 		}
+ 		if (!is_null($pesavel)) {
+ 			$query = $query->where('p.pesavel', $pesavel);
+ 		}
 		$busca = trim($busca);
-		if(is_numeric($busca)) {
+		if (is_numeric($busca)) {
 			$query = $query->where('(p.id = ? OR p.codigobarras = ?)', intval($busca), $busca);
-		} else if($busca != '') {
+		} elseif ($busca != '') {
 			$keywords = preg_split('/[\s,]+/', $busca);
 	 		foreach ($keywords as $word) {
 				$query = $query->where('p.descricao LIKE ?', '%'.$word.'%');
@@ -767,37 +823,75 @@ class ZProduto {
  		return $query;
 	}
 
-	public static function getTodos($busca = null, $categoria_id = null, $unidade_id = null, 
-			$tipo = null, $estoque = null, $inicio = null, $quantidade = null) {
-		$query = self::initSearch($busca, $categoria_id, $unidade_id, $tipo, $estoque);
-		if(!is_null($inicio) && !is_null($quantidade)) {
+	public static function getTodos(
+		$busca = null,
+		$categoria_id = null,
+		$unidade_id = null, 
+		$tipo = null,
+		$estoque = null,
+		$setor_id = null,
+		$promocao = null,
+		$visivel = null,
+		$limitado = null,
+		$pesavel = null,
+		$raw = false,
+		$inicio = null,
+		$quantidade = null
+	) {
+		$query = self::initSearch(
+			$busca,
+			$categoria_id,
+			$unidade_id,
+			$tipo,
+			$estoque, 
+			$setor_id,
+			$promocao,
+			$visivel,
+			$limitado,
+			$pesavel
+		);
+		if (!is_null($inicio) && !is_null($quantidade)) {
 			$query = $query->limit($quantidade)->offset($inicio);
 		}
 		$_produtos = $query->fetchAll();
+		if ($raw) {
+			return $_produtos;
+		}
 		$produtos = array();
-		foreach($_produtos as $produto)
+		foreach ($_produtos as $produto) {
 			$produtos[] = new ZProduto($produto);
+		}
 		return $produtos;
 	}
 
-	public static function getTodosEx($busca = null, $categoria_id = null, $unidade_id = null, 
-			$tipo = null, $estoque = null, $inicio = null, $quantidade = null) {
-		$query = self::initSearch($busca, $categoria_id, $unidade_id, $tipo, $estoque);
-		$query = $query->leftJoin('Unidades u ON u.id = p.unidadeid')
-					   ->select('c.descricao as categoria')
-					   ->select('u.sigla as unidade');
-		if(!is_null($inicio) && !is_null($quantidade)) {
-			$query = $query->limit($quantidade)->offset($inicio);
-		}
-		return $query->fetchAll();
-	}
-
-	public static function getCount($busca = null, $categoria_id = null, $unidade_id = null, 
-			$tipo = null, $estoque = null) {
-		$query = self::initSearch($busca, $categoria_id, $unidade_id, $tipo, $estoque);
+	public static function getCount(
+		$busca = null,
+		$categoria_id = null,
+		$unidade_id = null,
+		$tipo = null,
+		$estoque = null,
+		$setor_id = null,
+		$promocao = null,
+		$visivel = null,
+		$limitado = null,
+		$pesavel = null
+	) {
+		$query = self::initSearch(
+			$busca,
+			$categoria_id,
+			$unidade_id,
+			$tipo,
+			$estoque, 
+			$setor_id,
+			$promocao,
+			$visivel,
+			$limitado,
+			$pesavel
+		);
 		$query = $query->select(null)
 					   ->select('COUNT(DISTINCT p.id) as count')
 					   ->select('p.tipo')
+					   ->select('p.quantidadelimite')
 					   ->select('COALESCE(sum(e.quantidade), 0) as estoque')
 					   ->groupBy(null);
 		return (int) $query->fetchColumn();

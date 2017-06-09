@@ -361,9 +361,9 @@ class ZFuncionario {
 		} else if(check_email($nome)) {
 			$query = $query->where('c.email', $nome);
 		} else if(check_cpf($nome)) {
-			$query = $query->where('c.cpf', numberonly($nome));
+			$query = $query->where('c.cpf', \MZ\Util\Filter::digits($nome));
 		} else if(check_fone($nome, true)) {
-			$_fone = numberonly($nome);
+			$_fone = \MZ\Util\Filter::digits($nome);
 			$_ddd = substr($_fone, 0, 2).'%';
 			if(strlen($_fone) == 10)
 				$_fone = $_ddd . substr($_fone, 2, 8);

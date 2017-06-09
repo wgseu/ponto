@@ -50,7 +50,7 @@ class Mask
      */
     public static function date($value)
     {
-        $date = \DateTime::createFromFormat('!d-m-Y', $value);
+        $date = \DateTime::createFromFormat('!Y-m-d', $value);
         if ($date === false) {
             return null;
         }
@@ -87,6 +87,19 @@ class Mask
             return vsprintf('R$ %s', array($number));
         }
         return $number;
+    }
+
+    /**
+     * Convert boolean value into yes no text
+     * @param  mixed $value boolean value
+     * @return string boolean value into yes no text
+     */
+    public static function bool($value)
+    {
+        if ($value) {
+            return 'Sim';
+        }
+        return 'Não';
     }
 
     /**

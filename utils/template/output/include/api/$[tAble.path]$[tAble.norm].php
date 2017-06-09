@@ -370,15 +370,20 @@ $[field.if(enum)]
 
     /**
      * Gets textual and translated $[fIeld.norm] for $[tAble.norm]
-     * @return array A associative key -> translated representative text
+     * @param  int $index choose option from index
+     * @return mixed A associative key -> translated representative text or text for index
      */
-    public static function get$[fIeld.norm]Options()
+    public static function get$[fIeld.norm]Options($index = null)
     {
-        return array(
+        $options = array(
 $[field.each(option)]
-            self::$[FIELD.unix]_$[FIELD.option.norm] => '$[fIeld.option.name]'),
+            self::$[FIELD.unix]_$[FIELD.option.norm] => '$[fIeld.option.name]',
 $[field.end]
         );
+        if (!is_null($index)) {
+            return $options[$index];
+        }
+        return $options;
     }
 $[field.end]
 $[field.end]

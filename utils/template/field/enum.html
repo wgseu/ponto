@@ -1,8 +1,8 @@
 <div class="form-group col-lg-3 col-md-4 col-sm-6 col-xs-12">
-	<label for="$[field]">$[Field.name]:</label>
+	<label for="$[field]">$[fIeld.name]:</label>
 	<select id="$[field]" name="$[field]" class="form-control">
 $[field.each(option)]
-		<option value="$[field.option]" ${$$[table.unix]->$[field.get] == '$[field.option]'?'selected':''}>$[Field.option.name]</option>
+		<option value="$[field.option]" ${$$[table.unix]->get$[fIeld.norm]() == '$[field.option]'?'selected':''}>$[fIeld.option.name]</option>
 $[field.end]
 	</select>
 </div>

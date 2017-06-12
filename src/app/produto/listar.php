@@ -37,34 +37,34 @@ if(isset($_GET['categoria']) && is_numeric($_GET['categoria'])) {
 $produtos = ZProduto::getTodos(
 	$_GET['busca'],
 	$categoria_id,
-	null,
-	null,
+	null, // unidade_id
+	null, // tipo
 	$estoque,
-	null,
-	null,
-	null,
-	null,
-	null,
-	true,
-	0,
+	null, // setor de estoque
+	null, // incluir promoção
+	null, // visibilidade
+	null, // mostrar com estoque limitado
+	null, // pesável
+	true, // raw mode
+	0, // offset
 	$limit
 );
 $response = array('status' => 'ok');
 $campos = array(
-			'id',
-			'descricao',
-			'detalhes',
-			'precovenda',
-			'tipo',
-			'conteudo',
-			'divisivel',
-			'dataatualizacao',
-			// extras
-			'estoque',
-			'imagemurl',
-			'categoria',
-			'unidade',
-		);
+	'id',
+	'descricao',
+	'detalhes',
+	'precovenda',
+	'tipo',
+	'conteudo',
+	'divisivel',
+	'dataatualizacao',
+	// extras
+	'estoque',
+	'imagemurl',
+	'categoria',
+	'unidade',
+);
 $_produtos = array();
 foreach ($produtos as $produto) {
 	$produto['imagemurl'] = get_image_url($produto['imagem'], 'produto', null);

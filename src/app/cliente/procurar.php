@@ -30,7 +30,19 @@ else if($limit < 1)
 	$limit = 5;
 else if($limit > 20)
 	$limit = 20;
-$clientes = ZCliente::getTodos($_GET['busca'], $_GET['tipo'], null, null, null, 0, $limit);
+$clientes = ZCliente::getTodos(
+	$_GET['busca'],
+	$_GET['tipo'],
+	null, // genero
+	null, // mes_inicio
+	null, // mes_fim
+	null, // cpf
+	null, // fone
+	null, // email
+	null, // birthday
+	0,    // offset
+	$limit // pagesize
+);
 $response = array('status' => 'ok');
 $campos = array(
 			'id',
@@ -47,8 +59,9 @@ $_clientes = array();
 $domask = intval($_GET['formatar']) != 0;
 foreach ($clientes as $cliente) {
 	$_cliente = $cliente->toArray();
-	if($domask)
+	if ($domask) {
 		$_cliente['fone1'] = mask($_cliente['fone1'], '(99) 9999-9999?9'); 
+	}
 	$_cliente['imagemurl'] = get_image_url($_cliente['imagem'], 'cliente', null);
 	$_clientes[] = array_intersect_key($_cliente, array_flip($campos));
 }

@@ -39,9 +39,35 @@ $data_inicio = $data_inicio===false?null:$data_inicio->getTimestamp();
 $data_fim = date_create_from_format('d/m/Y', $_GET['fim']);
 $data_fim = $data_fim===false?null:$data_fim->getTimestamp();
 
-$count = ZPedido::getCount($_GET['query'], $_GET['clienteid'], $_GET['funcionarioid'], $_GET['tipo'], $estado, $cancelado, $data_inicio, $data_fim);
+$count = ZPedido::getCount(
+	$_GET['query'],
+	$_GET['clienteid'],
+	$_GET['funcionarioid'],
+	$_GET['tipo'],
+	$estado,
+	$cancelado,
+	$data_inicio,
+	$data_fim,
+	null,
+	null,
+	null
+);
 list($pagesize, $offset, $pagestring) = pagestring($count, 10);
-$pedidos = ZPedido::getTodos($_GET['query'], $_GET['clienteid'], $_GET['funcionarioid'], $_GET['tipo'], $estado, $cancelado, $data_inicio, $data_fim, $offset, $pagesize);
+$pedidos = ZPedido::getTodos(
+	$_GET['query'],
+	$_GET['clienteid'],
+	$_GET['funcionarioid'],
+	$_GET['tipo'],
+	$estado,
+	$cancelado,
+	$data_inicio,
+	$data_fim,
+	null,
+	null,
+	null,
+	$offset,
+	$pagesize
+);
 
 $_tipo_names = array(
 	'Mesa' => 'Mesa',

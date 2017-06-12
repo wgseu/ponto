@@ -598,40 +598,49 @@ class ZPedido {
 		$tipo,
 		$estado,
 		$cancelado,
-		$data_inicio, $data_fim, 
+		$data_inicio,
+		$data_fim,
 		$sessao_id,
 		$caixa_id,
 		$movimentacao_id
 	) {
-		$query = DB::$pdo->from('Pedidos')
-		                 ->orderBy('id DESC');
-		$sessao_id = null;
+		$query = DB::$pdo->from('Pedidos p')
+		                 ->orderBy('p.id DESC');
+		$sessaoid = null;
 		$busca = trim($busca);
 		if (is_numeric($busca)) {
-			$query = $query->where('id', intval($busca));
+			$query = $query->where('p.id', intval($busca));
 		} elseif (substr($busca, 0, 1) == '#') {
-			$sessao_id = intval(substr($busca, 1));
-			$query = $query->where('sessaoid', $sessao_id);
+			$sessaoid = intval(substr($busca, 1));
+			$query = $query->where('p.sessaoid', $sessaoid);
 		} elseif ($busca != '') {
-			$query = $query->where('descricao LIKE ?', '%'.$busca.'%');
+			$query = $query->where('p.descricao LIKE ?', '%'.$busca.'%');
 		}
 		if(is_numeric($cliente_id))
-			$query = $query->where('clienteid', intval($cliente_id));
+			$query = $query->where('p.clienteid', intval($cliente_id));
 		if(is_numeric($funcionario_id))
-			$query = $query->where('funcionarioid', intval($funcionario_id));
+			$query = $query->where('p.funcionarioid', intval($funcionario_id));
 		$tipo = trim($tipo);
 		if($tipo != '')
-			$query = $query->where('tipo', $tipo);
+			$query = $query->where('p.tipo', $tipo);
 		$estado = trim($estado);
 		if($estado != '')
-			$query = $query->where('estado', $estado);
+			$query = $query->where('p.estado', $estado);
 		$cancelado = trim($cancelado);
 		if($cancelado != '')
-			$query = $query->where('cancelado', $cancelado);
-		if(!is_null($data_inicio) && is_null($sessao_id))
-			$query = $query->where('datacriacao >= ?', date('Y-m-d', $data_inicio));
-		if(!is_null($data_fim) && is_null($sessao_id))
-			$query = $query->where('datacriacao <= ?', date('Y-m-d 23:59:59', $data_fim));
+			$query = $query->where('p.cancelado', $cancelado);
+		if (!is_null($data_inicio) && is_null($sessaoid)) {
+			$query = $query->where('p.datacriacao >= ?', date('Y-m-d', $data_inicio));
+		}
+		if (!is_null($data_fim) && is_null($sessaoid)) {
+			$query = $query->where('p.datacriacao <= ?', date('Y-m-d 23:59:59', $data_fim));
+		}
+		if (is_numeric($sessao_id)) {
+			$query = $query->where('p.sessaoid', $sessao_id);
+		}
+		if (is_numeric($movimentacao_id)) {
+			$query = $query->where('p.movimentacaoid', $movimentacao_id);
+		}
 		return $query;
 	}
 
@@ -657,7 +666,8 @@ class ZPedido {
 			$tipo,
 			$estado,
 			$cancelado,
-			$data_inicio, $data_fim, 
+			$data_inicio,
+			$data_fim, 
 			$sessao_id,
 			$caixa_id,
 			$movimentacao_id

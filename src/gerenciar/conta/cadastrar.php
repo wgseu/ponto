@@ -24,7 +24,6 @@ require_once(dirname(dirname(__FILE__)) . '/app.php');
 need_permission(PermissaoNome::CADASTROCONTAS);
 $focusctrl = 'descricao';
 $errors = array();
-$_classificacoes = ZClassificacao::getTodas(true);
 if ($_POST) {
 	$conta = new ZConta($_POST);
 	try {
@@ -67,11 +66,10 @@ if ($_POST) {
 		break;
 	}
 } else {
-	$classificacao = current($_classificacoes);
 	$conta = new ZConta();
 	$conta->setVencimento(date('Y-m-d', time()));
 	$conta->setDataEmissao(date('Y-m-d', time()));
-	$conta->setClassificacaoID($classificacao->getID());
 }
-$_sub_classificacoes = ZClassificacao::getTodas(false, $conta->getClassificacaoID());
+$classificacao_id_obj = \ZClassificacao::getPeloID($conta->getClassificacaoID());
+$sub_classificacao_id_obj = \ZClassificacao::getPeloID($conta->getSubClassificacaoID());
 include template('gerenciar_conta_cadastrar');

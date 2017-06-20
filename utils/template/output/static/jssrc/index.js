@@ -13,10 +13,10 @@ $[field.end]
         $.get(makeurl(url, {saida: 'json'}), function (data){
             if(data.status != 'ok') {
                 $('.thunder-container').message('error', data.msg);
-                return;
+            } else {
+                $('.thunder-container').message('success', data.msg, { autoClose: { enable: true } });
+                row.remove();
             }
-            $('.thunder-container').message('success', data.msg, { autoClose: { enable: true } });
-            row.remove();
         });
     });
 };
@@ -26,6 +26,10 @@ $[field.if(image)]
     Image.upload.initialize('#$[field]_container');
 $[field.else.if(blob)]
     Image.upload.initialize('#$[field]_container');
+$[field.else.if(reference)]
+$[field.if(searchable)]
+    Gerenciar.$[reference.unix].initField('#$[field]');
+$[field.end]
 $[field.else.if(integer)]
     $('#$[field]').autoNumeric('init');
 $[field.else.if(currency)]
@@ -59,3 +63,15 @@ $[field.end]
         $('#' + focus_ctrl).focus();
     }
 };
+$[table.exists(descriptor)]
+Gerenciar.$[table.unix].initField = function(field) {
+    Gerenciar.common.autocomplete('/gerenciar/$[table.unix]/', field + '_input', undefined,
+        function (data) {
+            return {value: data.$[descriptor], title: data.$[primary]};
+        }$[table.exists(image)]$[field.each]$[field.if(image)],
+        function (data) {
+            return data.$[field] || '/static/img/$[field.image.default]';
+        }$[field.end]$[field.end]$[table.else], undefined$[table.end], undefined, undefined, field
+    );
+};
+$[table.end]

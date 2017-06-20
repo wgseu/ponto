@@ -31,22 +31,15 @@
 	<label for="juros">Juros:</label>
 	<input type="text" id="juros" name="juros" class="numeric form-control text-right" data-a-sign=" %" data-p-sign="s" data-a-sep="." data-a-dec="," data-a-pad="false" value="{$conta->getJuros() * 100}">
 </div>
+<input type="hidden" id="classificacaoid" name="classificacaoid" data-content="{$classificacao_id_obj->getDescricao()}" value="{$conta->getClassificacaoID()}">
 <div class="form-group col-lg-5 col-md-4 col-sm-6 col-xs-12">
-	<label for="classificacaoid">Classificação:</label>
-	<select class="form-control" id="classificacaoid" name="classificacaoid">
-<!--{loop $_classificacoes $_classificacao}-->
-		<option value="{$_classificacao->getID()}" ${$conta->getClassificacaoID() == $_classificacao->getID()?'selected':''}>{$_classificacao->getDescricao()}</option>
-<!--{/loop}-->
-	</select>
+	<label for="classificacaoid_input">Classificação: <span class="identifier">{$classificacao_id_obj->getID()}<span></label>
+	<input type="text" id="classificacaoid_input" class="form-control" placeholder="Procurar pela Descrição..." value="{$classificacao_id_obj->getDescricao()}">
 </div>
+<input type="hidden" id="subclassificacaoid" name="subclassificacaoid" data-content="{$sub_classificacao_id_obj->getDescricao()}" value="{$conta->getSubClassificacaoID()}">
 <div class="form-group col-lg-3 col-md-4 col-sm-6 col-xs-12">
-	<label for="subclassificacaoid">Subclassificação:</label>
-	<select class="form-control" id="subclassificacaoid" name="subclassificacaoid">
-		<option value="" ${is_null($conta->getSubClassificacaoID())?'selected':''}>Não informada</option>
-<!--{loop $_sub_classificacoes $_classificacao}-->
-		<option value="{$_classificacao->getID()}" ${$conta->getSubClassificacaoID() == $_classificacao->getID()?'selected':''}>{$_classificacao->getDescricao()}</option>
-<!--{/loop}-->
-	</select>
+	<label for="subclassificacaoid_input">Subclassificação: <span class="identifier">{$sub_classificacao_id_obj->getID()}<span></label>
+	<input type="text" id="subclassificacaoid_input" class="form-control" placeholder="Procurar pela Descrição..." value="{$sub_classificacao_id_obj->getDescricao()}">
 </div>
 <div class="form-group col-lg-3 col-md-4 col-sm-6 col-xs-12">
 	<label for="vencimento">Data de vencimento:</label>

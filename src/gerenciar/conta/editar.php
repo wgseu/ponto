@@ -84,6 +84,7 @@ if ($_POST) {
 		break;
 	}
 }
-$_classificacoes = ZClassificacao::getTodas(true);
-$_sub_classificacoes = ZClassificacao::getTodas(false, $conta->getClassificacaoID());
+
+$classificacao_id_obj = \ZClassificacao::getPeloID($conta->getClassificacaoID());
+$sub_classificacao_id_obj = \ZClassificacao::getPeloID($conta->getSubClassificacaoID());
 include template('gerenciar_conta_editar');

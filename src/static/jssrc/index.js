@@ -216,7 +216,7 @@ Gerenciar.common.autocomplete = function(url, input, selectfn, displayfn, def_im
 
     $(input).autocomplete({
         lookup: function (query, done) {
-            var params = {busca: query};
+            var params = {busca: query, saida: 'json'};
             if(paramfn != undefined)
                 params = paramfn(query);
             $.get(url, params,
@@ -1789,6 +1789,13 @@ Gerenciar.classificacao.initForm = function(focus_ctrl) {
     if(focus_ctrl != undefined)
         $('#' + focus_ctrl).focus();
 };
+Gerenciar.classificacao.initField = function(field, paramfn) {
+    Gerenciar.common.autocomplete('/gerenciar/classificacao/', field + '_input', undefined,
+        function (data) {
+            return {value: data.descricao, title: data.id};
+        }, undefined, paramfn, undefined, field
+    );
+};
 Gerenciar.conta = {};
 Gerenciar.conta.init = function() {
     ajaxLink();
@@ -1819,21 +1826,18 @@ Gerenciar.conta.initForm = function(focus_ctrl) {
     if(focus_ctrl != undefined)
         $('#' + focus_ctrl).focus();
     Gerenciar.cliente.initField('#cliente', '#clienteid');
-    $('#classificacaoid').change(function() {
-        Gerenciar.common.load('/gerenciar/classificacao/', 
-            {classificacao: $('#classificacaoid').val(), saida: 'json'}, 
-            '#subclassificacaoid', function(item) {
-                return {value: item.id, title: item.descricao};
-            },
-            function(data) {
-                var option = $('<option></option>');
-                option.val('');
-                option.text('Não informada');
-                $('#subclassificacaoid').append(option);
-                return data.items;
-            }
-        );
-    });
+    Gerenciar.classificacao.initField(
+        '#classificacaoid',
+        function(query) {
+            return {busca: query, superior: 'Y', saida: 'json'};
+        }
+    );
+    Gerenciar.classificacao.initField(
+        '#subclassificacaoid',
+        function(query) {
+            return {busca: query, classificacao: $('#classificacaoid').val(), saida: 'json'};
+        }
+    );
     $('#raw_anexocaminho').change(function() {
         var input = $(this),
             label = input.val().replace(/\\/g, '/').replace(/.*\//, '');

@@ -1,7 +1,6 @@
 <!--${$maps_api = get_string_config('Site', 'Maps.API', '')}-->
 <!--{if !empty($maps_api)}-->
 <script>function initMap(){$(function(){Gerenciar.localizacao.initMap();});}</script>
-<script async defer src="/static/js/diacritics.js"></script>
 <script async defer src="https://maps.googleapis.com/maps/api/js?key={$maps_api}&callback=initMap"></script>
 <div class="form-group col-lg-12 col-md-12 col-sm-12 col-xs-12">
 	<label>Arraste o ícone do mapa para a localização exata da sua casa</label>

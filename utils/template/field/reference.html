@@ -1,3 +1,9 @@
+$[field.if(searchable)]
+<input type="hidden" id="$[field]" name="$[field]" data-content="{$$[field.unix]_obj->get$[rEference.desc.norm]()}" value="{$$[table.unix]->get$[fIeld.norm]()}">
+<div class="form-group col-lg-3 col-md-4 col-sm-6 col-xs-12">
+	<label for="$[field]_input">$[fIeld.name]: <span class="identifier">{$$[field.unix]_obj->get$[rEference.pk.norm]()}<span></label>
+	<input type="text" id="$[field]_input" class="form-control" placeholder="Procurar pel$[reference.desc.gender] $[rEference.desc.name]..." value="{$$[field.unix]_obj->get$[rEference.desc.norm]()}">
+</div>$[field.else]
 <div class="form-group col-lg-3 col-md-4 col-sm-6 col-xs-12">
 	<label for="$[field]">$[fIeld.name]:</label>
 	<select class="form-control" id="$[field]" name="$[field]">
@@ -8,4 +14,4 @@ $[field.end]
 		<option value="{$_$[reference.unix]->get$[rEference.pk.norm]()}" ${$$[table.unix]->get$[fIeld.norm]() == $_$[reference.unix]->get$[rEference.pk.norm]()?'selected':''}>{$_$[reference.unix]->get$[rEference.desc.norm]()}</option>
 <!--{/loop}-->
 	</select>
-</div>
+</div>$[field.end]

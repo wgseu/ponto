@@ -1,74 +1,98 @@
-@echo OFF
+@echo off
 
-cat index.js > main.js
+cat %~dp0..\src\static\jssrc\jquery.thunder.js > index.js
 if NOT %ERRORLEVEL% == 0 goto error
-cat bootstrap.js >> main.js
+cat %~dp0..\src\static\jssrc\diacritics.js >> index.js
 if NOT %ERRORLEVEL% == 0 goto error
-cat SmoothScroll.js >> main.js
+cat %~dp0..\src\static\jssrc\auto.numeric.min.js >> index.js
 if NOT %ERRORLEVEL% == 0 goto error
-cat carousel-swipe.js >> main.js
+cat %~dp0..\src\static\jssrc\jquery.datetimepicker.full.min.js >> index.js
 if NOT %ERRORLEVEL% == 0 goto error
-cat jarallax.js >> main.js
+cat %~dp0..\src\static\jssrc\bootstrap.min.js >> index.js
 if NOT %ERRORLEVEL% == 0 goto error
-cat masonry.pkgd.js >> main.js
+cat %~dp0..\src\static\jssrc\jquery.easing.min.js >> index.js
 if NOT %ERRORLEVEL% == 0 goto error
-cat imagesloaded.pkgd.js >> main.js
+cat %~dp0..\src\static\jssrc\classie.js >> index.js
 if NOT %ERRORLEVEL% == 0 goto error
-cat social-likes.js >> main.js
+cat %~dp0..\src\static\jssrc\cbpAnimatedHeader.js >> index.js
 if NOT %ERRORLEVEL% == 0 goto error
-cat script.js >> main.js
+cat %~dp0..\src\static\jssrc\jquery.maskedinput.min.js >> index.js
 if NOT %ERRORLEVEL% == 0 goto error
-cat script.gallery.js >> main.js
+cat %~dp0..\src\static\jssrc\agency.js >> index.js
 if NOT %ERRORLEVEL% == 0 goto error
-cat jquery.maskedinput.js >> main.js
+cat %~dp0..\src\static\jssrc\index.js >> index.js
 if NOT %ERRORLEVEL% == 0 goto error
-cat base64.js >> main.js
+java -jar packer\yuicompressor.jar index.js -o ..\src\static\js\index.min.js --charset utf-8
 if NOT %ERRORLEVEL% == 0 goto error
-cat switchery.js >> main.js
-if NOT %ERRORLEVEL% == 0 goto error
-cat jquery.thunder.js >> main.js
-if NOT %ERRORLEVEL% == 0 goto error
-cat accordion.js >> main.js
-if NOT %ERRORLEVEL% == 0 goto error
-cat jquery.vmap.js >> main.js
-if NOT %ERRORLEVEL% == 0 goto error
-java -jar packer\yuicompressor.jar main.js -o ..\js\main.min.js --charset utf-8
-if NOT %ERRORLEVEL% == 0 goto error
-echo Output: ..\js\main.min.js
-del main.js
+echo Output: src\static\js\index.min.js
+del index.js
 
-cat bootstrap.js > manager.js
+cat %~dp0..\src\static\jssrc\jquery.thunder.js > manager.js
 if NOT %ERRORLEVEL% == 0 goto error
-cat custom.js >> manager.js
+cat %~dp0..\src\static\jssrc\gauge\gauge.min.js >> manager.js
 if NOT %ERRORLEVEL% == 0 goto error
-cat shortcut.js >> manager.js
+cat %~dp0..\src\static\jssrc\moment\moment.min.js >> manager.js
 if NOT %ERRORLEVEL% == 0 goto error
-cat jquery.nicescroll.js >> manager.js
+cat %~dp0..\src\static\jssrc\chartjs\chart.min.js >> manager.js
 if NOT %ERRORLEVEL% == 0 goto error
-cat auto.numeric.js >> manager.js
+cat %~dp0..\src\static\jssrc\progressbar\bootstrap-progressbar.min.js >> manager.js
 if NOT %ERRORLEVEL% == 0 goto error
-cat jquery.maskedinput.js >> manager.js
+cat %~dp0..\src\static\jssrc\icheck\icheck.min.js >> manager.js
 if NOT %ERRORLEVEL% == 0 goto error
-cat jquery.datetimepicker.full.js >> manager.js
+cat %~dp0..\src\static\jssrc\datepicker\daterangepicker.js >> manager.js
 if NOT %ERRORLEVEL% == 0 goto error
-cat jquery.autocomplete.js >> manager.js
+cat %~dp0..\src\static\jssrc\flot\jquery.flot.js >> manager.js
 if NOT %ERRORLEVEL% == 0 goto error
-cat simplebar.js >> manager.js
+cat %~dp0..\src\static\jssrc\flot\jquery.flot.pie.js >> manager.js
 if NOT %ERRORLEVEL% == 0 goto error
-cat starrr.js >> manager.js
+cat %~dp0..\src\static\jssrc\flot\jquery.flot.orderBars.js >> manager.js
 if NOT %ERRORLEVEL% == 0 goto error
-cat kc.fab.js >> manager.js
+cat %~dp0..\src\static\jssrc\flot\jquery.flot.time.min.js >> manager.js
 if NOT %ERRORLEVEL% == 0 goto error
-cat jquery.thunder.js >> manager.js
+cat %~dp0..\src\static\jssrc\flot\date.js >> manager.js
 if NOT %ERRORLEVEL% == 0 goto error
-java -jar packer\yuicompressor.jar manager.js -o ..\js\manager.min.js --charset utf-8
+cat %~dp0..\src\static\jssrc\flot\jquery.flot.spline.js >> manager.js
 if NOT %ERRORLEVEL% == 0 goto error
-echo Output: ..\js\manager.min.js
+cat %~dp0..\src\static\jssrc\flot\jquery.flot.stack.js >> manager.js
+if NOT %ERRORLEVEL% == 0 goto error
+cat %~dp0..\src\static\jssrc\flot\curvedLines.js >> manager.js
+if NOT %ERRORLEVEL% == 0 goto error
+cat %~dp0..\src\static\jssrc\flot\jquery.flot.resize.js >> manager.js
+if NOT %ERRORLEVEL% == 0 goto error
+cat %~dp0..\src\static\jssrc\diacritics.js >> manager.js
+if NOT %ERRORLEVEL% == 0 goto error
+cat %~dp0..\src\static\jssrc\switchery\switchery.min.js >> manager.js
+if NOT %ERRORLEVEL% == 0 goto error
+cat %~dp0..\src\static\jssrc\nicescroll\jquery.nicescroll.min.js >> manager.js
+if NOT %ERRORLEVEL% == 0 goto error
+cat %~dp0..\src\static\jssrc\custom.js >> manager.js
+if NOT %ERRORLEVEL% == 0 goto error
+cat %~dp0..\src\static\jssrc\bootstrap.min.js >> manager.js
+if NOT %ERRORLEVEL% == 0 goto error
+cat %~dp0..\src\static\jssrc\auto.numeric.min.js >> manager.js
+if NOT %ERRORLEVEL% == 0 goto error
+cat %~dp0..\src\static\jssrc\inputmask.min.js >> manager.js
+if NOT %ERRORLEVEL% == 0 goto error
+cat %~dp0..\src\static\jssrc\jquery.datetimepicker.full.min.js >> manager.js
+if NOT %ERRORLEVEL% == 0 goto error
+cat %~dp0..\src\static\jssrc\jquery.maskedinput.min.js >> manager.js
+if NOT %ERRORLEVEL% == 0 goto error
+cat %~dp0..\src\static\jssrc\jquery.autocomplete.min.js >> manager.js
+if NOT %ERRORLEVEL% == 0 goto error
+cat %~dp0..\src\static\jssrc\simplebar.min.js >> manager.js
+if NOT %ERRORLEVEL% == 0 goto error
+cat %~dp0..\src\static\jssrc\jquery.ddslick.js >> manager.js
+if NOT %ERRORLEVEL% == 0 goto error
+cat %~dp0..\src\static\jssrc\raphael.js >> manager.js
+if NOT %ERRORLEVEL% == 0 goto error
+cat %~dp0..\src\static\jssrc\Treant.js >> manager.js
+if NOT %ERRORLEVEL% == 0 goto error
+cat %~dp0..\src\static\jssrc\index.js >> manager.js
+if NOT %ERRORLEVEL% == 0 goto error
+java -jar packer\yuicompressor.jar manager.js -o ..\src\static\js\manager.min.js --charset utf-8
+if NOT %ERRORLEVEL% == 0 goto error
+echo Output: src\static\js\manager.min.js
 del manager.js
-
-java -jar packer\yuicompressor.jar index.js -o ..\js\index.min.js --charset utf-8
-if NOT %ERRORLEVEL% == 0 goto error
-echo Output: ..\js\index.min.js
 
 goto success
 

@@ -26,7 +26,6 @@ class Thunder {
 	private static function ShowMessage($type, $msg, $auto_close, $execute) {
 		if(self::$refCount == 0) {
 			echo '<link rel="stylesheet" type="text/css" href="/static/css/jquery.thunder.css" />'."\r\n";
-			echo '<script src="/static/js/jquery.thunder.js"></script>'."\r\n";
 			self::$refCount++;
 		}
 		if(!$execute)

@@ -26,9 +26,10 @@ need_permission(PermissaoNome::CADASTROCONTAS, $_GET['saida'] == 'json');
 $limite = trim($_GET['limite']);
 if(!is_numeric($limite) || $limite > 100 || $limite < 0)
 	$limite = 10;
-$count = ZClassificacao::getCount(false, $_GET['classificacao'], $_GET['query']);
+$superiores = isset($_GET['superior'])? $_GET['superior'] == 'Y': false;
+$count = ZClassificacao::getCount($superiores, $_GET['classificacao'], $_GET['query']);
 list($pagesize, $offset, $pagestring) = pagestring($count, $limite);
-$classificacoes = ZClassificacao::getTodas(false, $_GET['classificacao'], $_GET['query'], $offset, $pagesize);
+$classificacoes = ZClassificacao::getTodas($superiores, $_GET['classificacao'], $_GET['query'], $offset, $pagesize);
 
 if($_GET['saida'] == 'json') {
 	$_classificacoes = array();

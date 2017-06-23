@@ -34,7 +34,7 @@ if ($_POST) {
 	$cidade = new ZCidade($_POST);
 	try {
 		$cidade->setID($old_cidade->getID());
-		$cidade->setCEP(unmask($cidade->getCEP(), '99999-999'));
+		$cidade->setCEP(\MZ\Util\Filter::unmask($cidade->getCEP(), _p('Mascara', 'CEP')));
 		$cidade = ZCidade::atualizar($cidade);
 		Thunder::success('Cidade "'.$cidade->getNome().'" atualizada com sucesso!', true);
 		redirect('/gerenciar/cidade/');

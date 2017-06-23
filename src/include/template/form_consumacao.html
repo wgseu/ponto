@@ -15,5 +15,5 @@
 </div>
 <div class="form-group col-lg-3 col-md-4 col-sm-6 col-xs-12">
 	<label for="valor">Valor:</label>
-	<input type="text" id="valor" name="valor" class="numeric form-control" data-a-sep="." data-a-dec="," data-a-sign="R$ " value="{$consumacao->getValor()}">
+	<input type="text" id="valor" name="valor" class="numeric form-control" data-a-sep="." data-a-dec="," data-a-sign="{$__moeda__->getSimbolo()} " value="{$consumacao->getValor()}">
 </div>

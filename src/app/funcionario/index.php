@@ -53,7 +53,7 @@ foreach ($funcionarios as $funcionario) {
 	$_funcionario['email'] = $cliente->getEmail();
 	$_funcionario['funcao'] = $funcao->getDescricao();
 	if($domask)
-		$_funcionario['fone1'] = mask($_funcionario['fone1'], '(99) 9999-9999?9'); 
+		$_funcionario['fone1'] = \MZ\Util\Mask::phone($_funcionario['fone1']); 
 	$_funcionario['imagemurl'] = get_image_url($cliente->getImagem(), 'cliente', null);
 	$_funcionarios[] = array_intersect_key($_funcionario, array_flip($campos));
 }

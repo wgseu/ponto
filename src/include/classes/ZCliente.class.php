@@ -779,9 +779,9 @@ class ZCliente {
 		if(strlen($cliente['cpf']) == 0)
 			$cliente['cpf'] = null;
 		else if(!check_cpf($cliente['cpf']) && $cliente['tipo'] == ClienteTipo::FISICA)
-			$erros['cpf'] = 'CPF inválido';
+			$erros['cpf'] = vsprintf('%s inválido', array(_p('Titulo', 'CPF')));
 		else if(!check_cnpj($cliente['cpf']) && $cliente['tipo'] == ClienteTipo::JURIDICA)
-			$erros['cpf'] = 'CNPJ inválido';
+			$erros['cpf'] = vsprintf('%s inválido', array(_p('Titulo', 'CNPJ')));
 		$cliente['rg'] = strip_tags(trim($cliente['rg']));
 		if(strlen($cliente['rg']) == 0)
 			$cliente['rg'] = null;
@@ -811,7 +811,7 @@ class ZCliente {
 				$erros['fone'.$i] = 'Telefone inválido';
 		}
 		if(trim($cliente['cpf']) == '' && trim($cliente['fone1']) == '' && trim($cliente['email']) == '')
-			$erros['fone1'] = 'Nenhum dado chave foi informado, informe um Telefone, E-mail ou CPF';
+			$erros['fone1'] = vsprintf('Nenhum dado chave foi informado, informe um Telefone, E-mail ou %s', array(_p('Titulo', 'CPF')));
 		$cliente['slogan'] = strip_tags(trim($cliente['slogan']));
 		if(strlen($cliente['slogan']) == 0)
 			$cliente['slogan'] = null;
@@ -850,7 +850,7 @@ class ZCliente {
 		if(stripos($e->getMessage(), 'Email_UNIQUE') !== false)
 			throw new ValidationException(array('email' => 'O E-mail informado já está cadastrado'));
 		if(stripos($e->getMessage(), 'CPF_UNIQUE') !== false)
-			throw new ValidationException(array('cpf' => 'O CPF informado já está cadastrado'));
+			throw new ValidationException(array('cpf' => vsprintf('O %s informado já está cadastrado'. array(_p('Titulo', 'CPF')))));
 		if(stripos($e->getMessage(), 'Login_UNIQUE') !== false)
 			throw new ValidationException(array('login' => 'O nome de usuário informado já está cadastrado'));
 		if(stripos($e->getMessage(), 'Secreto_UNIQUE') !== false)

@@ -11,7 +11,9 @@ $__bairro__ = ZBairro::getPeloID($__localizacao__->getBairroID());
 $__cidade__ = ZCidade::getPeloID($__bairro__->getCidadeID());
 $__estado__ = ZEstado::getPeloID($__cidade__->getEstadoID());
 $__pais__ = ZPais::getPeloID($__estado__->getPaisID());
+$__moeda__ = $__pais__->findMoedaID();
 $__options__  = parse_ini_string(base64_decode($__sistema__->getOpcoes()), true, INI_SCANNER_RAW);
+$__entries__  = parse_ini_string(base64_decode($__pais__->getEntradas()), true, INI_SCANNER_RAW);
 set_timezone_for($__estado__->getUF(), $__pais__->getSigla());
 
 $login_cliente = ZAutenticacao::getCliente();

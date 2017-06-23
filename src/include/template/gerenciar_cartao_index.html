@@ -57,8 +57,8 @@
 <!--${$_carteira = ZCarteira::getPeloID($cartao->getCarteiraPagtoID())}-->
 									<small><a href="/gerenciar/carteira/editar?id={$_carteira->getID()}" title="Editar carteira '{$_carteira->getDescricao()}'">{$_carteira->getDescricao()}</a></small>
 								</td>
-								<td>R$ ${moneyit($cartao->getMensalidade())}</td>
-								<td>R$ ${moneyit($cartao->getTransacao())}</td>
+								<td>${\MZ\Util\Mask::money($cartao->getMensalidade(), true)}</td>
+								<td>${\MZ\Util\Mask::money($cartao->getTransacao(), true)}</td>
 								<td>{$cartao->getTaxa()}%</td>
 								<td>{$cartao->getDiasRepasse()} dias</td>
 								<td class="text-center">

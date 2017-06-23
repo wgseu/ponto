@@ -33,7 +33,7 @@ if ($_POST) {
 			throw new Exception('Você não tem permissão para atribuir um endereço a essa empresa!');
 		}
 		$localizacao->setID(null);
-		$localizacao->setCEP(unmask($localizacao->getCEP(), '99999-999'));
+		$localizacao->setCEP(\MZ\Util\Filter::unmask($localizacao->getCEP(), _p('Mascara', 'CEP')));
 		$estado = ZEstado::getPeloID($_POST['estadoid']);
 		if(is_null($estado->getID())) 
 			throw new ValidationException(array('estadoid' => 'O estado não foi informado ou não existe!'));

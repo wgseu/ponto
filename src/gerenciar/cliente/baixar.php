@@ -59,7 +59,7 @@ try {
 		'Celular',
 		'E-mail',
 		'Aniversário/Fundação',
-		'CPF/CNPJ',
+		vsprintf('%s/%s', array(_p('Titulo', 'CPF'), _p('Titulo', 'CNPJ'))),
 		'RG/IE',
 		'Gênero',
 		'Apelido',

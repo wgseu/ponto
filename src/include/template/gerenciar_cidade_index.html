@@ -52,7 +52,7 @@
 							<tr>
 								<th>Nome</th>
 								<th>Estado</th>
-								<th>CEP</th>
+								<th>${_p('Titulo', 'CEP')}</th>
 								<th width="10%" style="text-align: center;">Ações</th>
 							</tr>
 						</thead>
@@ -62,7 +62,7 @@
 								<td>{$cidade->getNome()}</td>
 <!--${$_estado = ZEstado::getPeloID($cidade->getEstadoID())}-->
 								<td><a href="/gerenciar/estado/editar?id={$_estado->getID()}" title="Editar estado '{$_estado->getNome()}'">{$_estado->getNome()}</a></td>
-								<td>${mask($cidade->getCEP(), '99999-999')}</td>
+								<td>${\MZ\Util\Mask::cep($cidade->getCEP())}</td>
 								<td class="text-center">
 									<ul class="nav panel_toolbox">
 										<li>

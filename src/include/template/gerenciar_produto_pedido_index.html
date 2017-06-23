@@ -100,12 +100,12 @@
 <!--{/if}-->
 									</strong><small>{$produto_pedido->getDetalhes()}</small>
 								</td>
-								<td class="text-right">R$ ${moneyit($produto_pedido->getPreco())}</td>
+								<td class="text-right">${\MZ\Util\Mask::money($produto_pedido->getPreco(), true)}</td>
 								<td class="text-center">{$produto_pedido->getQuantidade()}</td>
-								<td class="text-right">R$ ${moneyit($produto_pedido->getComissao())}</td>
-								<td class="text-right">R$ ${moneyit($produto_pedido->getTotal())}</td>
-								<td class="text-right">R$ ${moneyit($produto_pedido->getCusto())}</td>
-								<td class="text-right">R$ ${moneyit($produto_pedido->getLucro())}</td>
+								<td class="text-right">${\MZ\Util\Mask::money($produto_pedido->getComissao(), true)}</td>
+								<td class="text-right">${\MZ\Util\Mask::money($produto_pedido->getTotal(), true)}</td>
+								<td class="text-right">${\MZ\Util\Mask::money($produto_pedido->getCusto(), true)}</td>
+								<td class="text-right">${\MZ\Util\Mask::money($produto_pedido->getLucro(), true)}</td>
 <!--${$_funcionario = ZFuncionario::getPeloID($produto_pedido->getFuncionarioID())}-->
 <!--${$_cliente = ZCliente::getPeloID($_funcionario->getClienteID())}-->
 								<td class="text-center"><a href="/gerenciar/funcionario/editar?id={$_funcionario->getID()}" title="Editar funcionário '{$_cliente->getNomeCompleto()}'">{$_cliente->getNomeCompleto()}</a></td>

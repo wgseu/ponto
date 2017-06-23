@@ -53,7 +53,7 @@ try {
 	$columns = array(
 		'Código',
 		'Descrição',
-		'Preço de Venda (R$)',
+		'Preço de Venda ('. $__moeda__->getSimbolo() . ')',
 		'Categoria',
 		'Tipo',
 		'Unidades',

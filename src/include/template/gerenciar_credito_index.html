@@ -14,7 +14,7 @@
 			</div>
 			<input type="hidden" id="clienteid" name="clienteid" data-nome="{$_cliente->getNomeCompleto()}" value="{$_cliente->getID()}">
 			<div class="form-group col-lg-3 col-md-6 col-sm-6 col-xs-6">
-				<label for="cliente">Cliente: <span class="identifier">${mask($_cliente->getFone(1), '(99) 9999-9999?9')}<span></label>
+				<label for="cliente">Cliente: <span class="identifier">${\MZ\Util\Mask::phone($_cliente->getFone(1))}<span></label>
 				<input type="text" id="cliente" class="form-control" value="{$_cliente->getNomeCompleto()}">
 			</div>
 			<div class="form-group col-lg-4 col-md-12 col-sm-12 col-xs-6">
@@ -56,7 +56,7 @@
 <!--{loop $creditos $credito}-->
 							<tr ${$credito->isCancelado()?'class="active"':''}>
 								<td>{$credito->getDetalhes()}</td>
-								<td>R$ ${moneyit($credito->getValor())}</td>
+								<td>${\MZ\Util\Mask::money($credito->getValor(), true)}</td>
 <!--${$_cliente = ZCliente::getPeloID($credito->getClienteID())}-->
 								<td><a href="/gerenciar/cliente/editar?id={$_cliente->getID()}" title="Editar cliente '{$_cliente->getNomeCompleto()}'">{$_cliente->getNomeCompleto()}</a></td>
 <!--${$_funcionario = ZFuncionario::getPeloID($credito->getFuncionarioID())}-->

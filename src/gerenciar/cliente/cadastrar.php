@@ -37,13 +37,13 @@ if ($_POST) {
 		}
 		$cliente->setAcionistaID(numberval($cliente->getAcionistaID()));
 		if($cliente->getTipo() == ClienteTipo::JURIDICA)
-			$cliente->setCPF(unmask($cliente->getCPF(), '99.999.999/9999-99'));
+			$cliente->setCPF(\MZ\Util\Filter::unmask($cliente->getCPF(), _p('Mascara', 'CNPJ')));
 		else
-			$cliente->setCPF(unmask($cliente->getCPF(), '999.999.999-99'));
+			$cliente->setCPF(\MZ\Util\Filter::unmask($cliente->getCPF(), _p('Mascara', 'CPF')));
 		$_data_aniversario = date_create_from_format('d/m/Y', $cliente->getDataAniversario());
 		$cliente->setDataAniversario($_data_aniversario===false?null:date_format($_data_aniversario, 'Y-m-d'));
-		$cliente->setFone(1, unmask($cliente->getFone(1), '(99) 9999-9999?9'));
-		$cliente->setFone(2, unmask($cliente->getFone(2), '(99) 9999-9999?9'));
+		$cliente->setFone(1, \MZ\Util\Filter::unmask($cliente->getFone(1), _p('Mascara', 'Telefone')));
+		$cliente->setFone(2, \MZ\Util\Filter::unmask($cliente->getFone(2), _p('Mascara', 'Telefone')));
 		$cliente->setLimiteCompra(moneyval($cliente->getLimiteCompra()));
 		$width = 256;
 		if($cliente->getTipo() == ClienteTipo::JURIDICA)

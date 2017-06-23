@@ -46,7 +46,7 @@
 							<tr>
 								<td>{$modulos[$consumacao->getModulo()]}</td>
 								<td>{$dias[$consumacao->getDia()]}</td>
-								<td>R$ ${moneyit($consumacao->getValor())}</td>
+								<td>${\MZ\Util\Mask::money($consumacao->getValor(), true)}</td>
 								<td class="text-center">
 									<ul class="nav panel_toolbox">
 										<li>

@@ -98,8 +98,10 @@ try {
 			$total = $subtotal + $pedido_total;
 			$pagamentos = ZPagamento::getTotalPedido($pedido->getID());
 			$restante = $pedido_total - $pagamentos;
-			if($total > $pagamentos)
-				throw new Exception('Saldo insuficiente para a realização do pedido, Necessário: R$ '.moneyit($subtotal).', Saldo atual: R$ '.moneyit(-$restante));
+			$msg = 'Saldo insuficiente para a realização do pedido, Necessário: %s, Saldo atual: %s';
+			if ($total > $pagamentos) {
+				throw new \Exception(vsprintf($msg, array(\MZ\Util\Mask::money($subtotal, true), \MZ\Util\Mask::money(-$restante, true))));
+			}
 		}
 		$produto_pedido = ZProdutoPedido::cadastrar($produto_pedido, $produto, $formacoes);
 		if($produto->getTipo() == ProdutoTipo::PACOTE) {

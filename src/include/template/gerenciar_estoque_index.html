@@ -15,7 +15,7 @@
 <!--${$_cliente_fornecedor = ZCliente::getPeloID($_fornecedor->getEmpresaID())}-->
 			<input type="hidden" id="fornecedorid" name="fornecedorid" data-nome="{$_cliente_fornecedor->getNome()}" value="{$_fornecedor->getID()}">
 			<div class="form-group col-lg-3 col-md-6 col-sm-6 col-xs-12">
-				<label for="fornecedor">Fornecedor: <span class="identifier">${mask($_cliente_fornecedor->getFone(1), '(99) 9999-9999?9')}<span></label>
+				<label for="fornecedor">Fornecedor: <span class="identifier">${\MZ\Util\Mask::phone($_cliente_fornecedor->getFone(1))}<span></label>
 				<input type="text" id="fornecedor" class="form-control" value="{$_cliente_fornecedor->getNome()}">
 			</div>
 <!--${$_categoria = ZCategoria::getPeloID($_produto->getCategoriaID())}-->
@@ -69,7 +69,7 @@
 								</td>
 								<td>{$tipos[$estoque->getTipoMovimento()]}</td>
 								<td>{$estoque->getQuantidade()}</td>
-								<td>R$ ${moneyit($estoque->getPrecoCompra())}</td>
+								<td>${\MZ\Util\Mask::money($estoque->getPrecoCompra(), true)}</td>
 								<td>{$estoque->getLote()}</td>
 								<td>
 									<strong title="Data de fabricação">${is_null($estoque->getDataFabricacao())?'':date('d/m/Y H:i', strtotime($estoque->getDataFabricacao()))}</strong>

@@ -57,7 +57,7 @@
 								<td>{$servico->getNome()}</td>
 								<td>{$tipos[$servico->getTipo()]}</td>
 								<td>${$servico->getObrigatorio() == 'Y'?'Sim':'Não'}</td>
-								<td>R$ ${moneyit($servico->getValor())}</td>
+								<td>${\MZ\Util\Mask::money($servico->getValor(), true)}</td>
 								<td>${$servico->getIndividual() == 'Y'?'Sim':'Não'}</td>
 								<td class="text-center">
 									<ul class="nav panel_toolbox">

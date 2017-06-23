@@ -29,7 +29,7 @@
 					<div class="categoria-nav${count($categorias) < 5?'hide':''} next">&gt;</div>
 				</div>
 			</div>
-			<div class="row" id="product-list">
+			<div class="row" id="product-list" data-symbol="{$__moeda__->getSimbolo()}">
 <!--{loop $produtos $produto}-->
 				<div class="col-md-3 col-sm-4 col-xs-6 ofertas">
 					<div class="item" data-produto="{$produto->getID()}" data-detalhes="{$produto->getDetalhes()}">
@@ -44,7 +44,7 @@
 						<div class="detalhes">
 							<div class="limite">
 								<div class="preco">
-									<div class="por"><span>R$ </span><strong>${moneyit($produto->getPrecoVenda())}</strong></div>
+									<div class="por"><span>{$__moeda__->getSimbolo()} </span><strong>${\MZ\Util\Mask::money($produto->getPrecoVenda())}</strong></div>
 								</div>
 								<button>Detalhes</button>
 							</div>
@@ -69,7 +69,7 @@
 		  	<div class="product-details">
 			  	<div class="description"></div>
 			  	<div class="details"></div>
-			  	<div class="price"><span>R$ </span><strong>0,00</strong></div>
+			  	<div class="price"><span>{$__moeda__->getSimbolo()} </span><strong>0,00</strong></div>
 			</div>
 		  </div>
 		  <div class="modal-footer">

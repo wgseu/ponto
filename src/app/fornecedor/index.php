@@ -51,7 +51,7 @@ foreach ($fornecedores as $fornecedor) {
 	$_fornecedor['cnpj'] = $cliente->getCPF();
 	$_fornecedor['email'] = $cliente->getEmail();
 	if($domask)
-		$_fornecedor['fone1'] = mask($_fornecedor['fone1'], '(99) 9999-9999?9'); 
+		$_fornecedor['fone1'] = \MZ\Util\Mask::phone($_fornecedor['fone1']); 
 	$_fornecedor['imagemurl'] = get_image_url($cliente->getImagem(), 'cliente', null);
 	$_fornecedores[] = array_intersect_key($_fornecedor, array_flip($campos));
 }

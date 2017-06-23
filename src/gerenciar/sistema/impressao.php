@@ -5,7 +5,7 @@ need_permission(PermissaoNome::ALTERARCONFIGURACOES, isset($_POST));
 
 $tab_impressao = 'active';
 $opcoes_impressao = array(
-	array('section' => 'Imprimir', 'key' => 'Empresa.CNPJ', 'default' => true, 'title' => 'Imprimir o CNPJ'),
+	array('section' => 'Imprimir', 'key' => 'Empresa.CNPJ', 'default' => true, 'title' => vsprintf('Imprimir o %s', array(_p('Titulo', 'CNPJ')))),
 	array('section' => 'Imprimir', 'key' => 'Empresa.Endereco', 'default' => true, 'title' => 'Imprimir o endereço'),
 	array('section' => 'Imprimir', 'key' => 'Empresa.Telefone_1', 'default' => true, 'title' => 'Imprimir o telefone 1'),
 	array('section' => 'Imprimir', 'key' => 'Empresa.Telefone_2', 'default' => true, 'title' => 'Imprimir o telefone 2'),

@@ -20,6 +20,6 @@
 	<input type="text" id="nome" name="nome" class="form-control" value="{$cidade->getNome()}">
 </div>
 <div class="form-group col-lg-3 col-md-4 col-sm-6 col-xs-12">
-	<label for="cep">CEP:</label>
-	<input type="text" id="cep" name="cep" class="form-control masked" mask="99999-999" value="${mask($cidade->getCEP(), '99999-999')}">
+	<label for="cep">${_p('Titulo', 'CEP')}:</label>
+	<input type="text" id="cep" name="cep" class="form-control masked" mask="${_p('Mascara', 'CEP')}" value="${\MZ\Util\Mask::cep($cidade->getCEP())}">
 </div>

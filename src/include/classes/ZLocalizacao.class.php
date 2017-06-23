@@ -296,11 +296,11 @@ class ZLocalizacao {
 			$erros['clienteid'] = 'O cliente não foi informado';
 		if(!is_numeric($localizacao['bairroid']))
 			$erros['bairroid'] = 'O bairro não foi informado';
-		$localizacao['cep'] = unmask($localizacao['cep'], '99999-999');
+		$localizacao['cep'] = \MZ\Util\Filter::unmask($localizacao['cep'], _p('Mascara', 'CEP'));
 		if(strlen($localizacao['cep']) == 0)
 			$localizacao['cep'] = null;
 		else if(!check_cep($localizacao['cep']))
-			$erros['cep'] = 'CEP inválido';
+			$erros['cep'] = vsprintf('%s inválido', array(_p('Titulo', 'CEP')));
 		$localizacao['logradouro'] = strip_tags(trim($localizacao['logradouro']));
 		if(strlen($localizacao['logradouro']) == 0)
 			$erros['logradouro'] = 'O logradouro não pode ser vazio';

@@ -350,39 +350,39 @@ class ZConta {
 	private static function validarCampos(&$conta) {
 		$erros = array();
 		if(!is_numeric($conta['classificacaoid']))
-			$erros['classificacaoid'] = 'A classificacaoid não foi informada';
+			$erros['classificacaoid'] = 'A classificação não foi informada';
 		if(!is_numeric($conta['funcionarioid']))
-			$erros['funcionarioid'] = 'O funcionarioid não foi informado';
+			$erros['funcionarioid'] = 'O funcionário não foi informado';
 		$conta['subclassificacaoid'] = trim($conta['subclassificacaoid']);
 		if(strlen($conta['subclassificacaoid']) == 0)
 			$conta['subclassificacaoid'] = null;
 		else if(!is_numeric($conta['subclassificacaoid']))
-			$erros['subclassificacaoid'] = 'A subclassificacaoid não foi informada';
+			$erros['subclassificacaoid'] = 'A subclassificação é inválida';
 		$conta['clienteid'] = trim($conta['clienteid']);
 		if(strlen($conta['clienteid']) == 0)
 			$conta['clienteid'] = null;
 		else if(!is_numeric($conta['clienteid']))
-			$erros['clienteid'] = 'O clienteid não foi informado';
+			$erros['clienteid'] = 'O cliente ou fornecedor é inválido';
 		$conta['pedidoid'] = trim($conta['pedidoid']);
 		if(strlen($conta['pedidoid']) == 0)
 			$conta['pedidoid'] = null;
 		else if(!is_numeric($conta['pedidoid']))
-			$erros['pedidoid'] = 'O pedidoid não foi informado';
+			$erros['pedidoid'] = 'O pedido informado é inválido';
 		$conta['descricao'] = strip_tags(trim($conta['descricao']));
 		if(strlen($conta['descricao']) == 0)
-			$erros['descricao'] = 'A descricao não pode ser vazia';
+			$erros['descricao'] = 'A descrição não pode ser vazia';
 		if(!is_numeric($conta['valor']))
 			$erros['valor'] = 'O valor não foi informado';
 		else if(is_equal($conta['valor'], 0))
 			$erros['valor'] = 'O valor não pode ser nulo';
 		if(!is_numeric($conta['acrescimo']))
-			$erros['acrescimo'] = 'O acrescimo não foi informado';
+			$erros['acrescimo'] = 'O acréscimo não foi informado';
 		else {
 			$conta['acrescimo'] = floatval($conta['acrescimo']);
 			if($conta['valor'] > 0 && $conta['acrescimo'] < 0)
-				$erros['acrescimo'] = 'O acrescimo não pode ser negativo';
+				$erros['acrescimo'] = 'O acréscimo não pode ser negativo';
 			else if($conta['valor'] <= 0 && $conta['acrescimo'] > 0)
-				$erros['acrescimo'] = 'O acrescimo não pode ser positivo';
+				$erros['acrescimo'] = 'O acréscimo não pode ser positivo';
 		}
 		if(!is_numeric($conta['multa']))
 			$erros['multa'] = 'A multa não foi informada';
@@ -448,7 +448,7 @@ class ZConta {
 		}
 		$conta['datacadastro'] = date('Y-m-d H:i:s');
 		$receitas = 0;
-		if(is_numeric($conta['id'])) {
+		if (is_numeric($conta['id'])) {
 			$info = self::getTotalAbertas($conta['id']);
 			if(is_equal($info['receitas'], 0) && is_equal($info['despesas'], 0)) {
 				throw new Exception('A conta informada já foi consolidada e não '.
@@ -461,22 +461,32 @@ class ZConta {
 			$_conta = ZConta::getPeloID($conta['id']);
 			$receitas = $_conta->getTotal();
 		}
-		if(is_numeric($conta['clienteid']) && $conta['valor'] > 0) {
+		if (is_numeric($conta['clienteid']) && $conta['valor'] > 0) {
 			$cliente = ZCliente::getPeloID($conta['clienteid']);
-			if($cliente->getLimiteCompra() > 0) {
+			if ($cliente->getLimiteCompra() > 0) {
 				$info_total = self::getTotalAbertas(null, $conta['clienteid']);
 				$utilizado = ($info_total['receitas'] - $info_total['recebido']) + 
 					($info_total['despesas'] - $info_total['pago']) - $receitas;
-				if($conta['valor'] + $utilizado > $cliente->getLimiteCompra()) {
+				if ($conta['valor'] + $utilizado > $cliente->getLimiteCompra()) {
 					$restante = ($conta['valor'] + $utilizado) - $cliente->getLimiteCompra();
-					throw new Exception('O cliente "'.$cliente->getNomeCompleto().'" não possui limite de crédito '.
-						'suficiente para concluir a operação, necessário R$ '.moneyit($restante).', limite '.
-						'utilizado R$ '.moneyit($utilizado).' de R$ '.moneyit($cliente->getLimiteCompra()));
+					$msg = 'O cliente "%s" não possui limite de crédito '.
+						'suficiente para concluir a operação, necessário %s, limite '.
+						'utilizado %s de %s';
+					throw new \Exception(vsprintf(
+						$msg,
+						array(
+							$cliente->getNomeCompleto(),
+							\MZ\Util\Mask::money($restante, true),
+							\MZ\Util\Mask::money($utilizado, true),
+							\MZ\Util\Mask::money($cliente->getLimiteCompra(), true)
+						)
+					));
 				}
 			}
 		}
-		if(!empty($erros))
+		if (!empty($erros)) {
 			throw new ValidationException($erros);
+		}
 	}
 
 	private static function handleException(&$e) {

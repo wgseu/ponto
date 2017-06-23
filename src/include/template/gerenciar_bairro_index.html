@@ -67,7 +67,7 @@
 <!--${$_cidade = ZCidade::getPeloID($bairro->getCidadeID())}-->
 <!--${$_estado = ZEstado::getPeloID($_cidade->getEstadoID())}-->
 								<td>{$bairro->getNome()}</td>
-								<td>R$ ${moneyit($bairro->getValorEntrega())}</td>
+								<td>${\MZ\Util\Mask::money($bairro->getValorEntrega(), true)}</td>
 								<td><strong><a href="/gerenciar/cidade/editar?id={$_cidade->getID()}" title="Editar cidade '{$_cidade->getNome()}'">{$_cidade->getNome()}</a></strong><small><a href="/gerenciar/estado/editar?id={$_estado->getID()}" title="Editar estado '{$_estado->getNome()}'">{$_estado->getNome()}</a></small></td>
 								<td class="text-center">
 									<ul class="nav panel_toolbox">

@@ -42,72 +42,33 @@ function is_less($value, $compare, $delta = 0.005) {
 
 // Função que valida o CPF
 function check_cpf($cpf) {
-	// Verifiva se o número digitado contém todos os digitos
-	$cpf = \MZ\Util\Filter::digits($cpf);
-	$pattern = '/^0+$|^1+$|^2+$|^3+$|^4+$|^5+$|^6+$|^7+$|^8+$|^9+$/';
-	// Verifica se nenhuma das sequências abaixo foi digitada, caso seja, retorna falso
-	if (strlen($cpf) != 11 || preg_match($pattern, $cpf))
-		return false;
-	// Calcula os números para verificar se o CPF é verdadeiro
-	for ($t = 9; $t < 11; $t++) {
-		for ($d = 0, $c = 0; $c < $t; $c++) {
-			$d += $cpf{$c} * (($t + 1) - $c);
-		}
-		$d = ((10 * $d) % 11) % 10;
-		if ($cpf{$c} != $d)
-			return false;
-	}
-	return true;
+	return \MZ\Util\Validator::checkCPF($cpf);
 }
 
 // Função que valida o CNPJ
 function check_cnpj($cnpj) {
-	// Verifiva se o número digitado contém todos os digitos
-	$cnpj = \MZ\Util\Filter::digits($cnpj);
-	$pattern = '/^0+$|^1+$|^2+$|^3+$|^4+$|^5+$|^6+$|^7+$|^8+$|^9+$/';
-	if(strlen($cnpj) != 14 || preg_match($pattern, $cnpj)) {
-		return false;
-	}
-	$calcular = 0;
-	$calcularDois = 0;
-	for ($i = 0, $x = 5; $i <= 11; $i++, $x--) {
-		$x = ($x < 2) ? 9 : $x;
-		$number = substr($cnpj, $i, 1);
-		$calcular += $number * $x;
-	}
-	for ($i = 0, $x = 6; $i <= 12; $i++, $x--) {
-		$x = ($x < 2) ? 9 : $x;
-		$numberDois = substr($cnpj, $i, 1);
-		$calcularDois += $numberDois * $x;
-	}
-	$digitoUm = (($calcular % 11) < 2) ? 0 : 11 - ($calcular % 11);
-	$digitoDois = (($calcularDois % 11) < 2) ? 0 : 11 - ($calcularDois % 11);
-	if ($digitoUm != substr($cnpj, 12, 1) || $digitoDois != substr($cnpj, 13, 1)) {
-		return false;
-	}
-	return true;
+	return \MZ\Util\Validator::checkCNPJ($cnpj);
 }
 
 // Função que valida o Email
 function check_email($email) {
-	return Utility::ValidEmail($email);
+	return \MZ\Util\Validator::checkEmail($email);
 }
 
 // Função que valida o nome de usuário
 function check_usuario($usuario) {
-	return preg_match('/^[A-Za-z][A-Za-z0-9\._-]{2,44}$/', $usuario);
+	return \MZ\Util\Validator::checkUsername($usuario);
 }
 
 // Função que valida o telefone
 function check_fone($fone, $ignore_ddd = false) {
-	$fone = \MZ\Util\Filter::digits($fone);
-	return strlen($fone) == 10 || strlen($fone) == 11 || ($ignore_ddd && (strlen($fone) == 8 || strlen($fone) == 9));
+	$foned = \MZ\Util\Filter::digits($fone);
+	return \MZ\Util\Validator::checkPhone($fone) || ($ignore_ddd && (strlen($foned) == 8 || strlen($foned) == 9));
 }
 
 // Função que valida o CEP
 function check_cep($cep) {
-	$cep = \MZ\Util\Filter::digits($cep);
-	return strlen($cep) == 8;
+	return \MZ\Util\Validator::checkCEP($cep);
 }
 
 function human_size($size) {
@@ -123,11 +84,6 @@ function human_size($size) {
 
 function human_filesize($filename) {
 	return human_size(filesize($filename));
-}
-
-function moneyit($k, $sep = ',') {
-	$k = round($k, 2);
-	return number_format($k, 2, ',', '.');
 }
 
 function moneyval($k) {
@@ -509,6 +465,159 @@ function config_values_exists($array, $section, $key) {
 	return false;
 }
 
+function _p($section, $key)
+{
+	global $__entries__;
+
+	$entries = array(
+        'Titulo.CNPJ' => 'CNPJ',
+        'Mascara.CNPJ' => '99.999.999/9999-99',
+        'Titulo.CPF' => 'CPF',
+        'Mascara.CPF' => '999.999.999-99',
+        'Titulo.CEP' => 'CEP',
+        'Mascara.CEP' => '99999-999',
+        'Mascara.Telefone' => '(99) 9999-9999?9',
+        'Auditoria.Pedido.Cancelar' => 'O(A) funcionário(a) "%s" cancelou o pedido %d',
+        'Auditoria.Estoque.Retirar' => 'O(A) funcionário(a) "%s" retirou %s "%s" do estoque, motivo: %s',
+        'Auditoria.Funcionario.Cadastrar' => 'O(A) funcionário(a) "%s" cadastrou o(a) funcionário(a) "%s"',
+        'Auditoria.Funcionario.Atualizar' => 'O(A) funcionário(a) "%s" atualizou suas informações de cadastro',
+        'Auditoria.Funcionario.Alterar' => 'O(A) funcionário(a) "%s" alterou as informações de cadastro do(a) funcionário(a) "%s"',
+        'Auditoria.Funcionario.Excluir' => 'O(A) funcionário(a) "%s" excluiu o(a) funcionário(a) "%s"',
+        'Auditoria.Estoque.Cancelar' => 'O(A) funcionário(a) "%s" cancelou a entrada no estoque: %s x "%s"',
+        'Auditoria.Pedido.Conta' => 'Pagamento em conta autorizado para o pedido %d',
+        'Auditoria.Caixa.Abrir' => 'O(A) funcionário(a) "%s" abriu o caixa "%s" da sessão %d com %s',
+        'Auditoria.Caixa.Fechar' => 'O(A) funcionário(a) "%s" fechou o caixa "%s" da sessão %d',
+        'Auditoria.Sessao.Fechar' => 'O(A) funcionário(a) "%s" fechou a sessão %d',
+        'Auditoria.Auditoria.Acesso' => 'O(A) funcionário(a) "%s" acessou a auditoria',
+        'Auditoria.Comanda.Cadastrar' => 'O(A) funcionário(a) "%s" cadastrou a comanda "%s"',
+        'Auditoria.Comanda.Renomear' => 'O(A) funcionário(a) "%s" alterou a comanda "%s" para "%s"',
+        'Auditoria.Comanda.Alterar' => 'O(A) funcionário(a) "%s" alterou as informações da comanda "%s"',
+        'Auditoria.Comanda.Excluir' => 'O(A) funcionário(a) "%s" excluiu a comanda "%s"',
+        'Auditoria.Pedido.Transferir' => 'O(A) funcionário(a) "%s" transferiu a "%s" para a "%s"',
+        'Auditoria.Pedido.Transf.Produtos' => 'O(A) funcionário(a) "%s" transferiu %d produto(s) da "%s" para a "%s"',
+        'Auditoria.Pedido.Local.Cancelar' => 'O(A) funcionário(a) "%s" cancelou a "%s" de pedido %d',
+        'Auditoria.Pedido.Alterar' => 'O(A) funcionário(a) "%s" alterou as informações da "%s" e pedido %d',
+        'Auditoria.Produto.Local.Cancelar' => 'O(A) funcionário(a) "%s" cancelou o produto "%s" da "%s" do pedido %d',
+        'Auditoria.Produto.Cancelar' => 'O(A) funcionário(a) "%s" cancelou o produto "%s" do pedido %d',
+        'Auditoria.Produto.Desconto' => 'O(A) funcionário(a) "%s" realizou um desconto no produto "%s" de %s para %s na venda %d e pedido %d',
+        'Auditoria.Servico.Cancelar' => 'O(A) funcionário(a) "%s" cancelou o serviço "%s" de %s do pedido %d',
+        'Auditoria.Caixa.Inserir' => 'O(A) funcionário(a) "%s" inseriu %s no caixa "%s"',
+        'Auditoria.Caixa.Retirar' => 'O(A) funcionário(a) "%s" retirou %s do caixa "%s"',
+        'Auditoria.Caixa.Transferir' => 'O(A) funcionário(a) "%s" transferiu %s da carteira "%s" para a carteira "%s"',
+        'Auditoria.Mesa.Cadastrar' => 'O(A) funcionário(a) "%s" cadastrou a mesa "%s"',
+        'Auditoria.Mesa.Renomear' => 'O(A) funcionário(a) "%s" alterou a mesa "%s" para "%s"',
+        'Auditoria.Mesa.Alterar' => 'O(A) funcionário(a) "%s" alterou as informações da mesa "%s"',
+        'Auditoria.Mesa.Excluir' => 'O(A) funcionário(a) "%s" excluiu a mesa "%s"',
+        'Auditoria.Mesa.Reservar' => 'O(A) funcionário(a) "%s" reservou a "%s" com pedido %d',
+        'Auditoria.Acesso.Negado' => 'Tentativa de acesso ao sistema pelo funcionário(a) "%s" não permitida',
+        'Auditoria.Login' => 'O(A) funcionário(a) "%s" fez login no sistema',
+        'Auditoria.Comissao.Restaurar' => 'O(A) funcionário(a) "%s" restaurou a comissão da "%s" e pedido %d',
+        'Auditoria.Comissao.Alterar' => 'O(A) funcionário(a) "%s" alterou a comissão da "%s" de %s para %s e pedido %d',
+        'Auditoria.Pedido.Desconto' => 'O(A) funcionário(a) "%s" realizou um desconto de %s no pedido %d',
+        'Auditoria.Pedido.Desconto.Revogar' => 'O(A) funcionário(a) "%s" revogou um desconto de %s do pedido %d',
+        'Auditoria.Conta.Cancelar' => 'O(A) funcionário(a) "%s" cancelou a conta "%s" de código %d do cliente "%s"',
+        'Auditoria.Mesa.Separar' => 'O(A) funcionário(a) "%s" separou a mesa "%s" da mesa "%s"',
+        'Localizacao.Apelido.Padrao' => 'Meu endereço',
+        'Cupom.Comissao.Titulo' => 'Comissão',
+        'Cupom.Senha' => 'Senha',
+        'Cupom.Pedido' => 'Pedido',
+        'Cupom.DataHoraFmt' => 'dd/mm/yy hh:nn:ss',
+        'Cupom.Pagamentos' => 'Pagamentos',
+        'Cupom.Telefone' => 'Telefone',
+        'Cupom.Endereco' => 'Endereço',
+        'Cupom.Entregador' => 'Entregador(a)',
+        'Cupom.Lancamentos' => 'Lançamentos',
+        'Cupom.Lancado' => 'Lançado',
+        'Cupom.PedidoEntrega' => 'Pedido para Entrega',
+        'Cupom.FormaPagto' => 'Forma de pagamento',
+        'Cupom.Pagamento' => 'Pagamento',
+        'Cupom.SemValorFiscal' => 'Não tem valor fiscal',
+        'Cupom.MovFinanceira' => 'Movimentação financeira',
+        'Cupom.Carteira' => 'Carteira',
+        'Cupom.Motivo' => 'Motivo',
+        'Cupom.Valor' => 'Valor',
+        'Cupom.Total' => 'Total',
+        'Cupom.Supervisor' => 'Supervisor(a)',
+        'Cupom.PagtoCredito' => 'Pagamento com crédito',
+        'Cupom.Pago' => 'Pago',
+        'Cupom.Mesa' => 'Mesa',
+        'Cupom.Comanda' => 'Comanda',
+        'Cupom.PedidoViagem' => 'Pedido para Viagem',
+        'Cupom.VendaBalcao' => 'Venda Balcão',
+        'Cupom.Atendente' => 'Atendente',
+        'Cupom.Codigo' => 'Código',
+        'Cupom.Descricao' => 'Descrição',
+        'Cupom.QuantAbrev' => 'Qtd',
+        'Cupom.Detalhes' => 'Detalhes',
+        'Cupom.Local' => 'Local',
+        'Cupom.Pessoas' => 'Pessoas',
+        'Cupom.Ordem' => 'Ordem',
+        'Cupom.Validacao' => 'Validação',
+        'Cupom.Cliente' => 'Cliente',
+        'Cupom.RelatorioPara' => 'Relatório para %s',
+        'Cupom.PagtoConta' => 'Pagamento em Conta',
+        'Cupom.Assinatura' => 'Assinatura',
+        'Cupom.Vencimento' => 'Vencimento',
+        'Cupom.Tempo' => 'Tempo',
+        'Cupom.Permanencia' => 'Permanência',
+        'Cupom.Operador' => 'Operador(a)',
+        'Cupom.RelatorioConsumo' => 'Relatório de consumo',
+        'Cupom.Fone' => 'Fone',
+        'Cupom.Fones' => 'Fones',
+        'Cupom.Item' => 'Item',
+        'Cupom.Preco' => 'Preço',
+        'Cupom.Produtos' => 'Produtos',
+        'Cupom.ServicosTaxas' => 'Serviços e Taxas',
+        'Cupom.Servicos' => 'Serviços',
+        'Cupom.Subtotal' => 'Subtotal',
+        'Cupom.Descontos' => 'Descontos',
+        'Cupom.Taxas' => 'Taxas',
+        'Cupom.Apagar' => 'A Pagar',
+        'Cupom.Individual' => 'Individual',
+        'Cupom.NaoDocFiscal' => 'Não é documento fiscal',
+        'Cupom.RelatorioCancel' => 'Relatório de cancelamento',
+        'Cupom.ADevolver' => 'A devolver',
+        'Cupom.Sessao' => 'Sessão',
+        'Cupom.Movimentacao' => 'Movimentação',
+        'Cupom.DataAbertura' => 'Data de abertura',
+        'Cupom.DataFecham' => 'Data de fechamento',
+        'Cupom.DataFmt' => 'dd/mm/yy',
+        'Cupom.HoraFmt' => 'hh:nn:ss',
+        'Cupom.RelatorioFechaCaixa' => 'Relatório de fechamento de caixa',
+        'Cupom.ProdutosVendidos' => 'Produtos vendidos',
+        'Cupom.Quantidade' => 'Quantidade',
+        'Cupom.EntradasSaidas' => 'Entradas e Saídas',
+        'Cupom.PagamentoContas' => 'Pagamento de contas',
+        'Cupom.RecebimentoContas' => 'Recebimento de contas',
+        'Cupom.Vendas' => 'Vendas',
+        'Cupom.Balcao' => 'Balcão',
+        'Cupom.Mesas' => 'Mesas',
+        'Cupom.Comandas' => 'Comandas',
+        'Cupom.Entrega' => 'Entrega',
+        'Cupom.Caixa' => 'Caixa',
+        'Cupom.ComJuros' => 'Com juros',
+        'Cupom.SemJuros' => 'Sem juros',
+        'Cupom.Dinheiro' => 'Dinheiro',
+        'Cupom.Cartao' => 'Cartão',
+        'Cupom.Cheque' => 'Cheque',
+        'Cupom.Conta' => 'Conta',
+        'Cupom.Credito' => 'Crédito',
+        'Cupom.Transferencia' => 'Transferência',
+        'Cupom.Entradas' => 'Entradas',
+        'Cupom.Saidas' => 'Saídas',
+        'Cupom.Recebimentos' => 'Recebimentos',
+        'Cupom.Liquido' => 'Líquido',
+        'Cupom.Conferido' => 'Conferido',
+        'Cupom.Diferenca' => 'Diferença',
+        'Cupom.Restante' => 'Restante',
+        'Cupom.TotalJuros' => 'Total(J)'
+    );
+	if (array_key_exists($section, $__entries__) && array_key_exists($key, $__entries__[$section])) {
+		return $__entries__[$section][$key];
+	}
+	return $entries[$section.'.'.$key];
+}
+
 function register_device($device, $serial) {
 	if(!isset($device) || trim(strval($device)) == '')
 		throw new Exception("O nome do dispositivo não foi informado");
@@ -617,26 +726,6 @@ function json($tag, $data = null, $field = null) {
 
 function to_utf8($str) {
 	return iconv('WINDOWS-1252', 'UTF-8', $str);
-}
-
-function split_camel_case($str) {
-	$result = array();
-	$len = strlen($str);
-	$supr = strtoupper($str);
-	$start = 0;
-	$lc = 0;
-	for ($i=0; $i < $len; $i++) { 
-		if($str[$i] === $supr[$i] && $lc > 0) {
-			$result[] = substr($str, $start, $i - $start);
-			$start = $i;
-			$lc = 0;
-		} else if($str[$i] !== $supr[$i])
-			$lc++;
-	}
-	if($start < $i - 1) {
-		$result[] = substr($str, $start, $i - $start);
-	}
-	return $result;
 }
 
 function xchmod($path, $access = 0644) {

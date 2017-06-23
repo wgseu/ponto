@@ -131,9 +131,9 @@ class ZEndereco {
 		$endereco['logradouro'] = strip_tags(trim($endereco['logradouro']));
 		if(strlen($endereco['logradouro']) == 0)
 			$erros['logradouro'] = 'O logradouro não pode ser vazio';
-		$endereco['cep'] = unmask($endereco['cep'], '99999-999');
+		$endereco['cep'] = \MZ\Util\Filter::unmask($endereco['cep'], _p('Mascara', 'CEP'));
 		if(!check_cep($endereco['cep']))
-			$erros['cep'] = 'CEP inválido';
+			$erros['cep'] = vsprintf('%s inválido', array(_p('Titulo', 'CEP')));
 		if(!empty($erros))
 			throw new ValidationException($erros);
 	}
@@ -142,7 +142,7 @@ class ZEndereco {
 		if(stripos($e->getMessage(), 'PRIMARY') !== false)
 			throw new ValidationException(array('id' => 'O ID informado já está cadastrado'));
 		if(stripos($e->getMessage(), 'CEP_UNIQUE') !== false)
-			throw new ValidationException(array('cep' => 'O CEP informado já está cadastrado'));
+			throw new ValidationException(array('cep' => vsprintf('O %s informado já está cadastrado', array(_p('Titulo', 'CEP')))));
 		if(stripos($e->getMessage(), 'BairroID_Logradouro_UNIQUE') !== false)
 			throw new ValidationException(array('logradouro' => 'O logradouro informado já está cadastrado'));
 	}

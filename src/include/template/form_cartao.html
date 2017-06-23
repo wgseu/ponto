@@ -22,11 +22,11 @@
 </div>
 <div class="form-group col-lg-3 col-md-4 col-sm-6 col-xs-12">
 	<label for="mensalidade">Mensalidade:</label>
-	<input type="text" id="mensalidade" name="mensalidade" class="numeric form-control" data-a-sep="." data-a-dec="," data-a-sign="R$ " value="{$cartao->getMensalidade()}">
+	<input type="text" id="mensalidade" name="mensalidade" class="numeric form-control" data-a-sep="." data-a-dec="," data-a-sign="{$__moeda__->getSimbolo()} " value="{$cartao->getMensalidade()}">
 </div>
 <div class="form-group col-lg-2 col-md-4 col-sm-6 col-xs-12">
 	<label for="transacao">Transação:</label>
-	<input type="text" id="transacao" name="transacao" class="numeric form-control" data-a-sep="." data-a-dec="," data-a-sign="R$ " value="{$cartao->getTransacao()}">
+	<input type="text" id="transacao" name="transacao" class="numeric form-control" data-a-sep="." data-a-dec="," data-a-sign="{$__moeda__->getSimbolo()} " value="{$cartao->getTransacao()}">
 </div>
 <div class="form-group col-lg-2 col-md-4 col-sm-6 col-xs-12">
 	<label for="taxa">Taxa:</label>

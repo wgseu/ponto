@@ -60,7 +60,7 @@ $domask = intval($_GET['formatar']) != 0;
 foreach ($clientes as $cliente) {
 	$_cliente = $cliente->toArray();
 	if ($domask) {
-		$_cliente['fone1'] = mask($_cliente['fone1'], '(99) 9999-9999?9'); 
+		$_cliente['fone1'] = \MZ\Util\Mask::phone($_cliente['fone1']); 
 	}
 	$_cliente['imagemurl'] = get_image_url($_cliente['imagem'], 'cliente', null);
 	$_clientes[] = array_intersect_key($_cliente, array_flip($campos));

@@ -166,7 +166,7 @@ Upload.form = function(selector, event) {
 var Cliente = {};
 Cliente.conta = {};
 Cliente.conta.initForm = function (focus_ctrl) {
-    $('#cliente-form #fone1').mask("(99) 9999-9999?9");
+    $('#cliente-form #fone1').mask($('#cliente-form #fone1').attr('mask'));
     if(focus_ctrl != undefined)
         $('#' + focus_ctrl).focus();
 };
@@ -216,7 +216,7 @@ Gerenciar.common.autocomplete = function(url, input, selectfn, displayfn, def_im
 
     $(input).autocomplete({
         lookup: function (query, done) {
-            var params = {busca: query, saida: 'json'};
+            var params = {query: query, saida: 'json'};
             if(paramfn != undefined)
                 params = paramfn(query);
             $.get(url, params,
@@ -339,7 +339,7 @@ Gerenciar.diversos.init = function(d1, doughnutData, meta_val, meta_max) {
         yaxis: {
             tickDecimals: 2,
             tickFormatter: function(val, axis) {
-                return 'R$ ' + val.toFixed(2).replace(/\./g, ",").replace(/\B(?=(?:\d{3})+(?!\d))/g, ".");
+                return $('#placeholder33x').data('symbol') + ' ' + val.toFixed(2).replace(/\./g, ",").replace(/\B(?=(?:\d{3})+(?!\d))/g, ".");
             },
             min: 0
         },
@@ -372,7 +372,7 @@ Gerenciar.diversos.init = function(d1, doughnutData, meta_val, meta_max) {
                     var dat = item.datapoint[0];
                     var val = item.datapoint[1];
                     var x = moment.unix(dat).format('DD/MM/YYYY');
-                    var y = 'R$ ' + val.toFixed(2).replace(/\./g, ",").replace(/\B(?=(?:\d{3})+(?!\d))/g, ".");
+                    var y = $('#placeholder33x').data('symbol') + ' ' + val.toFixed(2).replace(/\./g, ",").replace(/\B(?=(?:\d{3})+(?!\d))/g, ".");
                     var color = item.series.color;
                     showTooltip(item.pageX, item.pageY, color, "<strong>" + y + "</strong><br/>" + x);
                 }
@@ -574,7 +574,7 @@ Gerenciar.diversos.init = function(d1, doughnutData, meta_val, meta_max) {
             }
             $('#meta-name').text(link.text());
             $('#gauge-text').text(Util.toMoney(data.atual));
-            $('#goal-text').text('R$' + Util.toMoney(data.base));
+            $('#goal-text').text($('#placeholder33x').data('symbol') + Util.toMoney(data.base));
             meta_val = Math.round(data.atual);
             meta_max = Math.max(Math.round(data.base), meta_val);
             gauge.maxValue = meta_max; // set max gauge value
@@ -828,6 +828,7 @@ Gerenciar.cliente.initForm = function(focus_ctrl) {
         tipoAlterado($(this).find(':selected').val());
     });
     $.datetimepicker.setLocale('pt-BR');
+    $('#dataaniversario').mask('99/99/9999');
     $('#dataaniversario').datetimepicker({
         timepicker: false,
         format: 'd/m/Y',
@@ -1317,6 +1318,7 @@ Gerenciar.pedido.init = function() {
     Gerenciar.cliente.initField('#cliente', '#clienteid');
     Gerenciar.funcionario.initField('#funcionario', '');
     $.datetimepicker.setLocale('pt-BR');
+    $('#inicio, #fim').mask('99/99/9999');
     $('#inicio, #fim').datetimepicker({
         timepicker:false,
         format:'d/m/Y',
@@ -1326,6 +1328,7 @@ Gerenciar.pedido.init = function() {
 Gerenciar.pedido.initForm = function(focus_ctrl) {
     $('#pessoas').autoNumeric('init');
     $.datetimepicker.setLocale('pt-BR');
+    $('#dataagendamento').mask('99/99/9999 99:99');
     $('#dataagendamento').datetimepicker({
         format:'d/m/Y H:i',
         enterLikeTab: false
@@ -1402,7 +1405,7 @@ var template =
         '<div class="detalhes">' +
             '<div class="limite">' +
                 '<div class="preco">' +
-                    '<div class="por"><span>R$ </span><strong></strong></div>' +
+                    '<div class="por"><span class="simbolo"></span><strong></strong></div>' +
                 '</div>' +
                 '<button>Detalhes</button>' +
             '</div>' +
@@ -1417,6 +1420,7 @@ var allLoaded = false;
     function fillProducts(data) {
         for (var i in data.produtos) {
             var item = $(template);
+            $('.simbolo', item).text($('#product-list').data('symbol') + ' ');
             if(data.produtos[i].imagemurl == undefined)
                 $('img', item).attr('src', '/static/img/produto.png');
             else
@@ -1725,10 +1729,12 @@ Gerenciar.servico.initForm = function(focus_ctrl) {
     }
 
     $.datetimepicker.setLocale('pt-BR');
+    $('#datainicio').mask('99/99/9999 99:99');
     $('#datainicio').datetimepicker({
         format:'d/m/Y H:i',
         enterLikeTab: false
     });
+    $('#datafim').mask('99/99/9999 99:99');
     $('#datafim').datetimepicker({
         format:'d/m/Y H:i',
         enterLikeTab: false
@@ -1750,6 +1756,7 @@ Gerenciar.produto_pedido.init = function() {
     });
     Gerenciar.funcionario.initField('#funcionario', '');
     $.datetimepicker.setLocale('pt-BR');
+    $('#inicio, #fim').mask('99/99/9999');
     $('#inicio, #fim').datetimepicker({
         timepicker:false,
         format:'d/m/Y',
@@ -1811,14 +1818,17 @@ Gerenciar.conta.initForm = function(focus_ctrl) {
     $('#multa').autoNumeric('init');
     $('#juros').autoNumeric('init');
     $.datetimepicker.setLocale('pt-BR');
+    $('#vencimento').mask('99/99/9999');
     $('#vencimento').datetimepicker({
         format:'d/m/Y',
         enterLikeTab: false
     });
+    $('#dataemissao').mask('99/99/9999');
     $('#dataemissao').datetimepicker({
         format:'d/m/Y',
         enterLikeTab: false
     });
+    $('#datapagamento').mask('99/99/9999');
     $('#datapagamento').datetimepicker({
         format:'d/m/Y',
         enterLikeTab: false
@@ -1829,13 +1839,13 @@ Gerenciar.conta.initForm = function(focus_ctrl) {
     Gerenciar.classificacao.initField(
         '#classificacaoid',
         function(query) {
-            return {busca: query, superior: 'Y', saida: 'json'};
+            return {query: query, superior: 'Y', saida: 'json'};
         }
     );
     Gerenciar.classificacao.initField(
         '#subclassificacaoid',
         function(query) {
-            return {busca: query, classificacao: $('#classificacaoid').val(), saida: 'json'};
+            return {query: query, classificacao: $('#classificacaoid').val(), saida: 'json'};
         }
     );
     $('#raw_anexocaminho').change(function() {
@@ -1877,6 +1887,7 @@ Gerenciar.pagamento.init = function() {
     });
     Gerenciar.funcionario.initField('#funcionario', '');
     $.datetimepicker.setLocale('pt-BR');
+    $('#inicio, #fim').mask('99/99/9999');
     $('#inicio, #fim').datetimepicker({
         timepicker:false,
         format:'d/m/Y',
@@ -2095,6 +2106,7 @@ Gerenciar.produto_fornecedor.initForm = function(focus_ctrl) {
     $('#quantidademinima').autoNumeric('init');
     $('#estoque').autoNumeric('init');
     $.datetimepicker.setLocale('pt-BR');
+    $('#dataconsulta').mask('99/99/9999 99:99');
     $('#dataconsulta').datetimepicker({
         format:'d/m/Y H:i',
         enterLikeTab: false
@@ -2261,6 +2273,7 @@ Gerenciar.lista_compra.init = function() {
 };
 Gerenciar.lista_compra.initForm = function(focus_ctrl) {
     $.datetimepicker.setLocale('pt-BR');
+    $('#datacompra').mask('99/99/9999 99:99');
     $('#datacompra').datetimepicker({
         format:'d/m/Y H:i',
         enterLikeTab: false

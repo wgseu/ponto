@@ -51,8 +51,8 @@
 	</div>
 </div>
 <div class="form-group col-lg-3 col-md-4 col-sm-3 col-xs-6">
-	<label for="cpf">CPF:</label>
-	<input type="text" id="cpf" name="cpf" class="form-control masked" mask="999.999.999-99" mask-cnpj="99.999.999/9999-99" value="${mask($cliente->getCPF(), $cliente->getTipo() == ClienteTipo::JURIDICA?'99.999.999/9999-99':'999.999.999-99')}" data-cpf="CPF:" data-cnpj="CNPJ:">
+	<label for="cpf">${_p('Titulo', 'CPF')}:</label>
+	<input type="text" id="cpf" name="cpf" class="form-control masked" mask="${_p('Mascara', 'CPF')}" mask-cnpj="${_p('Mascara', 'CNPJ')}" value="${$cliente->getTipo() == ClienteTipo::JURIDICA?\MZ\Util\Mask::cnpj($cliente->getCPF()):\MZ\Util\Mask::cpf($cliente->getCPF())}" data-cpf="${_p('Titulo', 'CPF')}:" data-cnpj="${_p('Titulo', 'CNPJ')}:">
 </div>
 <div class="form-group col-lg-3 col-md-4 col-sm-4 col-xs-6">
 	<label for="rg">Registro geral (RG):</label>
@@ -72,11 +72,11 @@
 </div>
 <div class="form-group col-lg-2 col-md-3 col-sm-4 col-xs-6">
 	<label for="fone1">Telefone:</label>
-	<input type="text" id="fone1" name="fone1" class="form-control masked" mask="(99) 9999-9999?9" value="${mask($cliente->getFone(1), '(99) 9999-9999?9')}">
+	<input type="text" id="fone1" name="fone1" class="form-control masked" mask="${_p('Mascara', 'Telefone')}" value="${\MZ\Util\Mask::phone($cliente->getFone(1))}">
 </div>
 <div class="form-group col-lg-2 col-md-3 col-sm-4 col-xs-6">
 	<label for="fone2">Celular:</label>
-	<input type="text" id="fone2" name="fone2" class="form-control masked" mask="(99) 9999-9999?9" value="${mask($cliente->getFone(2), '(99) 9999-9999?9')}">
+	<input type="text" id="fone2" name="fone2" class="form-control masked" mask="${_p('Mascara', 'Telefone')}" value="${\MZ\Util\Mask::phone($cliente->getFone(2))}">
 </div>
 <div class="form-group col-lg-4 col-md-9 col-sm-9 col-xs-12">
 	<label for="slogan">Observação:</label>
@@ -84,7 +84,7 @@
 </div>
 <div class="form-group col-lg-2 col-md-3 col-sm-3 col-xs-12">
 	<label for="limitecompra">Limite de compra:</label>
-	<input type="text" id="limitecompra" name="limitecompra" class="numeric form-control text-right" data-a-sep="." data-a-dec="," data-a-sign="R$ " value="{$cliente->getLimiteCompra()}">
+	<input type="text" id="limitecompra" name="limitecompra" class="numeric form-control text-right" data-a-sep="." data-a-dec="," data-a-sign="{$__moeda__->getSimbolo()} " value="{$cliente->getLimiteCompra()}">
 </div>
 <div class="form-group col-lg-4 col-md-4 col-sm-12 col-xs-12">
 	<label for="facebookurl">Facebook:</label>

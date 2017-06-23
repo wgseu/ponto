@@ -1,7 +1,7 @@
 <!--${$_empresa = ZCliente::getPeloID($fornecedor->getEmpresaID())}-->
 <input type="hidden" id="empresaid" name="empresaid" data-nome="{$_empresa->getNome()}" value="{$fornecedor->getEmpresaID()}">
 <div class="form-group col-lg-6 col-md-6 col-sm-6 col-xs-12">
-	<label for="empresa">Empresa: <span class="identifier">${mask($_empresa->getFone(1), '(99) 9999-9999?9')}<span></label>
+	<label for="empresa">Empresa: <span class="identifier">${\MZ\Util\Mask::phone($_empresa->getFone(1))}<span></label>
 	<input type="text" id="empresa" class="form-control" value="{$_empresa->getNome()}">
 </div>
 <div class="form-group col-lg-6 col-md-6 col-sm-6 col-xs-12">

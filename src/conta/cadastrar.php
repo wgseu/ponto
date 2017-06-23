@@ -42,9 +42,9 @@ if($_POST) {
 		if(trim($_POST['email']) == '')
 			throw new ValidationException(array('email' => 'O E-mail não foi informado'));
 		if($cliente->getTipo() == ClienteTipo::JURIDICA)
-			$cliente->setCPF(unmask($cliente->getCPF(), '99.999.999/9999-99'));
+			$cliente->setCPF(\MZ\Util\Filter::unmask($cliente->getCPF(), _p('Mascara', 'CNPJ')));
 		else
-			$cliente->setCPF(unmask($cliente->getCPF(), '999.999.999-99'));
+			$cliente->setCPF(\MZ\Util\Filter::unmask($cliente->getCPF(), _p('Mascara', 'CPF')));
 		$cliente = ZCliente::cadastrar($cliente, true);
 		$login_cliente = $cliente;
 		$login_cliente_id = $cliente->getID();

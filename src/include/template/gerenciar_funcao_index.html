@@ -42,7 +42,7 @@
 <!--{loop $funcoes $funcao}-->
 							<tr>
 								<td><a href="/gerenciar/acesso/?funcao={$funcao->getID()}">{$funcao->getDescricao()}</a></td>
-								<td>R$ ${moneyit($funcao->getSalarioBase())}</td>
+								<td>${\MZ\Util\Mask::money($funcao->getSalarioBase(), true)}</td>
 								<td class="text-center">
 									<ul class="nav panel_toolbox">
 										<li>

@@ -15,14 +15,14 @@
 <!--${$_empresa = ZCliente::getPeloID($patrimonio->getEmpresaID())}-->
 <input type="hidden" id="empresaid" name="empresaid" data-nome="{$_empresa->getNome()}" value="{$patrimonio->getEmpresaID()}">
 <div class="form-group col-lg-3 col-md-6 col-sm-6 col-xs-12">
-	<label for="empresa">Empresa: <span class="identifier">${mask($_empresa->getFone(1), '(99) 9999-9999?9')}<span></label>
+	<label for="empresa">Empresa: <span class="identifier">${\MZ\Util\Mask::phone($_empresa->getFone(1))}<span></label>
 	<input type="text" id="empresa" class="form-control" value="{$_empresa->getNome()}">
 </div>
 <!--${$_fornecedor = ZFornecedor::getPeloID($patrimonio->getFornecedorID())}-->
 <!--${$_fornecedor = ZCliente::getPeloID($_fornecedor->getEmpresaID())}-->
 <input type="hidden" id="fornecedorid" name="fornecedorid" data-nome="{$_fornecedor->getNome()}" value="{$patrimonio->getFornecedorID()}">
 <div class="form-group col-lg-3 col-md-6 col-sm-6 col-xs-12">
-	<label for="fornecedor">Fornecedor: <span class="identifier">${mask($_fornecedor->getFone(1), '(99) 9999-9999?9')}<span></label>
+	<label for="fornecedor">Fornecedor: <span class="identifier">${\MZ\Util\Mask::phone($_fornecedor->getFone(1))}<span></label>
 	<input type="text" id="fornecedor" class="form-control" value="{$_fornecedor->getNome()}">
 </div>
 <div class="form-group col-lg-4 col-md-6 col-sm-6 col-xs-12">
@@ -59,11 +59,11 @@
 </div>
 <div class="form-group col-lg-2 col-md-3 col-sm-3 col-xs-6">
 	<label for="custo">Custo:</label>
-	<input type="text" id="custo" name="custo" class="numeric form-control text-right" data-a-sep="." data-a-dec="," data-a-sign="R$ " value="{$patrimonio->getCusto()}">
+	<input type="text" id="custo" name="custo" class="numeric form-control text-right" data-a-sep="." data-a-dec="," data-a-sign="{$__moeda__->getSimbolo()} " value="{$patrimonio->getCusto()}">
 </div>
 <div class="form-group col-lg-2 col-md-3 col-sm-3 col-xs-6">
 	<label for="valor">Valor:</label>
-	<input type="text" id="valor" name="valor" class="numeric form-control text-right" data-a-sep="." data-a-dec="," data-a-sign="R$ " value="{$patrimonio->getValor()}">
+	<input type="text" id="valor" name="valor" class="numeric form-control text-right" data-a-sep="." data-a-dec="," data-a-sign="{$__moeda__->getSimbolo()} " value="{$patrimonio->getValor()}">
 </div>
 <div class="checkbox col-lg-3 col-md-6 col-sm-6 col-xs-6">
 	<label>

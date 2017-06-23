@@ -8,7 +8,7 @@
 		<form method="get" action="/gerenciar/conta/" id="search-form">
 			<input type="hidden" id="clienteid" name="clienteid" data-nome="{$_cliente->getNomeCompleto()}" value="{$_cliente->getID()}">
 			<div class="form-group col-lg-3 col-md-6 col-sm-6 col-xs-12">
-				<label for="cliente">Cliente: <span class="identifier">${mask($_cliente->getFone(1), '(99) 9999-9999?9')}<span></label>
+				<label for="cliente">Cliente: <span class="identifier">${\MZ\Util\Mask::phone($_cliente->getFone(1))}<span></label>
 				<input type="text" id="cliente" class="form-control" value="{$_cliente->getNomeCompleto()}">
 			</div>
 			<div class="form-group col-lg-3 col-md-6 col-sm-6 col-xs-12">
@@ -63,9 +63,9 @@
 								<td><div title="${$conta->getValor() > 0?'Receita':'Despesa'}" class="cell-icon conta-icons" style="background-position: -${$conta->getValor() > 0?0:16}px 0px;"></div><a href="/gerenciar/conta/editar?id={$conta->getID()}" title="Editar conta '{$conta->getDescricao()}'">{$conta->getDescricao()}</a></td>
 								<td>
 <!--${$_conta_total = $conta->getTotal()}-->
-									<strong title="Valor + Acréscimos + Multa + Juros">R$ ${moneyit($_conta_total)}</strong>
+									<strong title="Valor + Acréscimos + Multa + Juros">${\MZ\Util\Mask::money($_conta_total, true)}</strong>
 <!--{if !is_equal($_conta_total, $conta->getValor())}-->
-									<small title="Valor inicial da conta">R$ ${moneyit($conta->getValor())}</small>
+									<small title="Valor inicial da conta">${\MZ\Util\Mask::money($conta->getValor(), true)}</small>
 <!--{/if}-->
 								</td>
 <!--${$_cliente = ZCliente::getPeloID($conta->getClienteID())}-->
@@ -81,10 +81,10 @@
 <!--{if $conta->isAutoAcrescimo()}-->
 									<div title="Acréscimo automático" class="cell-icon conta-icons" style="background-position: -48px 0px;"></div>
 <!--{/if}-->
-									R$ ${moneyit($conta->getAcrescimo())}
+									${\MZ\Util\Mask::money($conta->getAcrescimo(), true)}
 								</td>
 								<td class="text-center">
-									<strong title="Multa">R$ ${moneyit($conta->getMulta())}</strong>
+									<strong title="Multa">${\MZ\Util\Mask::money($conta->getMulta(), true)}</strong>
 									<small title="Juros">{$conta->getJuros() * 100}%</small>
 								</td>
 								<td>${is_null($conta->getVencimento())?'':date('d/m/Y', strtotime($conta->getVencimento()))}</td>

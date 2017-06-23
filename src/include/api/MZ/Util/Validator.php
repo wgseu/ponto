@@ -69,9 +69,13 @@ class Validator
         if (is_null($phone) && $empty) {
             return true;
         }
-        $mask = '(99) 9999-9999?9';
+        $mask = _p('Mascara', 'Telefone');
         $phone = Filter::unmask($phone, $mask);
         $mask_len = strlen(Filter::digits($mask));
+        global $__pais__;
+        if ($__pais__->getSigla() != 'BRA') {
+            return strlen($phone) == $mask_len;
+        }
         // Somente Brasil (Nono dígito)
         return strlen($phone) == 10 || strlen($phone) == 11;
     }
@@ -88,11 +92,15 @@ class Validator
             return true;
         }
         // Verifica se o número digitado contém todos os digitos
-        $mask = '999.999.999-99';
+        $mask = _p('Mascara', 'CPF');
         $cpf = Filter::unmask($cpf, $mask);
         $mask_len = strlen(Filter::digits($mask));
         if (strlen($cpf) != $mask_len) {
             return false;
+        }
+        global $__pais__;
+        if ($__pais__->getSigla() != 'BRA') {
+            return true;
         }
         // Somente Brasil
         $pattern = '/^0+$|^1+$|^2+$|^3+$|^4+$|^5+$|^6+$|^7+$|^8+$|^9+$/';
@@ -125,11 +133,15 @@ class Validator
             return true;
         }
         // Verifiva se o número digitado contém todos os digitos
-        $mask = '99.999.999/9999-99';
+        $mask = _p('Mascara', 'CNPJ');
         $cnpj = Filter::unmask($cnpj, $mask);
         $mask_len = strlen(Filter::digits($mask));
         if (strlen($cnpj) != $mask_len) {
             return false;
+        }
+        global $__pais__;
+        if ($__pais__->getSigla() != 'BRA') {
+            return true;
         }
         // Somente Brasil
         $pattern = '/^0+$|^1+$|^2+$|^3+$|^4+$|^5+$|^6+$|^7+$|^8+$|^9+$/';
@@ -221,7 +233,7 @@ class Validator
         if ($cep == '' && $empty) {
             return true;
         }
-        $mask = '99999-999';
+        $mask = _p('Mascara', 'CEP');
         $cep = Filter::unmask($cep, $mask);
         $mask_len = strlen(Filter::digits($mask));
         return strlen($cep) == strlen($mask);

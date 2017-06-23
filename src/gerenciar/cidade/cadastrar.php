@@ -28,7 +28,7 @@ if ($_POST) {
 	$cidade = new ZCidade($_POST);
 	try {
 		$cidade->setID(null);
-		$cidade->setCEP(unmask($cidade->getCEP(), '99999-999'));
+		$cidade->setCEP(\MZ\Util\Filter::unmask($cidade->getCEP(), _p('Mascara', 'CEP')));
 		$cidade = ZCidade::cadastrar($cidade);
 		Thunder::success('Cidade "'.$cidade->getNome().'" cadastrada com sucesso!', true);
 		redirect('/gerenciar/cidade/');

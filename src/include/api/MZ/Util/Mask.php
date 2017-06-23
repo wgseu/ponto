@@ -79,12 +79,14 @@ class Mask
      */
     public static function money($value, $format = false)
     {
+        global $__moeda__;
+
         $value = round($value, 2);
         $sep = '.';
         $dec = ',';
         $number =  number_format($value, 2, $dec, $sep);
         if ($format) {
-            return vsprintf('R$ %s', array($number));
+            return vsprintf($__moeda__->getFormato(), array($number));
         }
         return $number;
     }
@@ -109,7 +111,7 @@ class Mask
      */
     public static function phone($fone)
     {
-        return self::mask(Filter::digits($fone), '(99) 9999-9999?9');
+        return self::mask(Filter::digits($fone), _p('Mascara', 'Telefone'));
     }
 
     /**
@@ -119,7 +121,7 @@ class Mask
      */
     public static function cep($cep)
     {
-        return self::mask(Filter::digits($cep), '99999-999');
+        return self::mask(Filter::digits($cep), _p('Mascara', 'CEP'));
     }
 
     /**
@@ -129,7 +131,7 @@ class Mask
      */
     public static function cpf($cpf)
     {
-        return self::mask(Filter::digits($cpf), '999.999.999-99');
+        return self::mask(Filter::digits($cpf), _p('Mascara', 'CPF'));
     }
 
     /**
@@ -139,7 +141,7 @@ class Mask
      */
     public static function cnpj($cnpj)
     {
-        return self::mask(Filter::digits($cnpj), '99.999.999/9999-99');
+        return self::mask(Filter::digits($cnpj), _p('Mascara', 'CNPJ'));
     }
 
     /**

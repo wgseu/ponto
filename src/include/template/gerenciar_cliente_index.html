@@ -45,7 +45,7 @@
 <!--${$_genero_names['Masculino'] = 'Masculino'}-->
 <!--${$_genero_names['Feminino'] = 'Feminino'}-->
 								<th>Gênero</th>
-								<th class="text-center">CPF/CNPJ</th>
+								<th class="text-center">${_p('Titulo', 'CPF')}/${_p('Titulo', 'CNPJ')}</th>
 								<th class="text-center">Data de cadastro</th>
 								<th width="10%" style="text-align: center;">Ações</th>
 							</tr>
@@ -55,8 +55,8 @@
 							<tr>
 								<td><a href="/gerenciar/cliente/editar?id={$cliente->getID()}" title="Editar cliente '{$cliente->getNomeCompleto()}'"><img src="${get_image_url($cliente->getImagem(), 'cliente', $cliente->getTipo() == ClienteTipo::JURIDICA?'empresa.png':'cliente.png')}" class="${$cliente->getTipo() == ClienteTipo::FISICA?'rounded':''}" height="48" alt="Foto" title="Foto"/><strong>{$cliente->getNomeCompleto()}</strong></a></td>
 								<td class="text-center">
-									<strong>${mask($cliente->getFone(1), '(99) 9999-9999?9')}</strong>
-									<small title="Celular">${mask($cliente->getFone(2), '(99) 9999-9999?9')}</small>
+									<strong>${\MZ\Util\Mask::phone($cliente->getFone(1))}</strong>
+									<small title="Celular">${\MZ\Util\Mask::phone($cliente->getFone(2))}</small>
 								</td>
 								<td class="text-center">
 									<strong>{$cliente->getLogin()}</strong>
@@ -65,10 +65,10 @@
 								<td>${$cliente->getTipo() == ClienteTipo::JURIDICA?'Empresa':$_genero_names[$cliente->getGenero()]}</td>
 								<td class="text-center">
 <!--{if $cliente->getTipo() == ClienteTipo::JURIDICA}-->
-									<strong>${mask($cliente->getCPF(), '99.999.999/9999-99')}</strong>
+									<strong>${\MZ\Util\Mask::cnpj($cliente->getCPF())}</strong>
 									<small title="Inscrição estadual">{$cliente->getRG()}</small>
 <!--{else}-->
-									<strong>${mask($cliente->getCPF(), '999.999.999-99')}</strong>
+									<strong>${\MZ\Util\Mask::cpf($cliente->getCPF())}</strong>
 									<small title="RG">{$cliente->getRG()}</small>
 <!--{/if}-->
 								</td>

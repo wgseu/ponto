@@ -12,7 +12,7 @@
 <!--{/if}-->
 			text: {
 				name: '${single_quotes($_produto->getAbreviado())}',
-				title: '${quantify($_composicao->getQuantidade(), $_unidade->getSigla(), $_produto->getConteudo())} = R$ ${moneyit($_composicao->getValor() * $_composicao->getQuantidade())}',
+				title: '${quantify($_composicao->getQuantidade(), $_unidade->getSigla(), $_produto->getConteudo())} = ${\MZ\Util\Mask::money($_composicao->getValor() * $_composicao->getQuantidade(), true)}',
 			},
 			image: '${get_image_url($_produto->getImagem(), 'produto', 'produto.png')}'
 		},

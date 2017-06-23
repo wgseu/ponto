@@ -189,6 +189,15 @@ class ZPais {
 		return new ZPais($query->fetch());
 	}
 
+    /**
+     * Informa a moeda principal do país
+     * @return \MZ\Wallet\Moeda The object fetched from database
+     */
+    public function findMoedaID()
+    {
+        return ZMoeda::getPeloID($this->getMoedaID());
+    }
+
 	private static function validarCampos(&$pais) {
 		$erros = array();
 		$pais['nome'] = strip_tags(trim($pais['nome']));

@@ -96,9 +96,9 @@
 <!--{/if}-->
 								</td>
 								<td class="text-right">
-									<strong title="Total">R$ ${moneyit($pagamento->getTotal())}</strong>
+									<strong title="Total">${\MZ\Util\Mask::money($pagamento->getTotal(), true)}</strong>
 <!--{if $pagamento->getTaxas() < -0.005 || $pagamento->getTaxas() > 0.005}-->
-									<small title="Taxas">R$ ${moneyit($pagamento->getTaxas())}</small>
+									<small title="Taxas">${\MZ\Util\Mask::money($pagamento->getTaxas(), true)}</small>
 <!--{/if}-->
 								</td>
 								<td class="text-center"><strong>
@@ -116,7 +116,7 @@
 								<td class="text-center"><a href="/gerenciar/funcionario/editar?id={$_funcionario->getID()}" title="Editar funcionário '{$_cliente->getNomeCompleto()}'">{$_cliente->getNomeCompleto()}</a></td>
 								<td class="text-center">
 <!--{if $pagamento->getParcelas() > 0}-->
-									{$pagamento->getParcelas()} x R$ ${moneyit($pagamento->getValorParcela())}</td>
+									{$pagamento->getParcelas()} x ${\MZ\Util\Mask::money($pagamento->getValorParcela(), true)}</td>
 <!--{/if}-->
 								</td>
 <!--${$_movimentacao = ZMovimentacao::getPeloID($pagamento->getMovimentacaoID())}-->

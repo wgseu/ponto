@@ -19,7 +19,7 @@
 			</div>
 			<input type="hidden" id="clienteid" name="clienteid" data-nome="{$_cliente->getNomeCompleto()}" value="{$_cliente->getID()}">
 			<div class="form-group col-lg-3 col-md-6 col-sm-6 col-xs-12">
-				<label for="cliente">Cliente: <span class="identifier">${mask($_cliente->getFone(1), '(99) 9999-9999?9')}<span></label>
+				<label for="cliente">Cliente: <span class="identifier">${\MZ\Util\Mask::phone($_cliente->getFone(1))}<span></label>
 				<input type="text" id="cliente" class="form-control" value="{$_cliente->getNomeCompleto()}">
 			</div>
 			<input type="submit" style="position: absolute; left: -9999px; width: 1px; height: 1px;" tabindex="-1" />
@@ -63,7 +63,7 @@
 								<td><a href="/gerenciar/banco/editar?id={$_banco->getID()}" title="Editar banco '{$_banco->getRazaoSocial()}'">{$_banco->getRazaoSocial()}</a></td>
 								<td>{$_cheque->getAgencia()}</td>
 								<td>{$_cheque->getConta()}</td>
-								<td>R$ ${moneyit($folha_cheque->getValor())}</td>
+								<td>${\MZ\Util\Mask::money($folha_cheque->getValor(), true)}</td>
 								<td>{$folha_cheque->getCompensacao()}</td>
 								<td>{$folha_cheque->getNumero()}</td>
 								<td>${is_null($folha_cheque->getVencimento())?'':date('d/m/Y H:i', strtotime($folha_cheque->getVencimento()))}</td>

@@ -125,11 +125,11 @@ class ZCidade {
 		$cidade['nome'] = strip_tags(trim($cidade['nome']));
 		if(strlen($cidade['nome']) == 0)
 			$erros['nome'] = 'O nome não pode ser vazio';
-		$cidade['cep'] = unmask($cidade['cep'], '99999-999');
+		$cidade['cep'] = \MZ\Util\Filter::unmask($cidade['cep'], _p('Mascara', 'CEP'));
 		if(strlen($cidade['cep']) == 0)
 			$cidade['cep'] = null;
 		else if(!check_cep($cidade['cep']))
-			$erros['cep'] = 'CEP inválido';
+			$erros['cep'] = vsprintf('%s inválido', array(_p('Titulo', 'CEP')));
 		if(!empty($erros))
 			throw new ValidationException($erros);
 	}
@@ -140,7 +140,7 @@ class ZCidade {
 		if(stripos($e->getMessage(), 'EstadoID_Nome_UNIQUE') !== false)
 			throw new ValidationException(array('nome' => 'O nome informado já está cadastrado'));
 		if(stripos($e->getMessage(), 'CEP_UNIQUE') !== false)
-			throw new ValidationException(array('cep' => 'O CEP informado já está cadastrado'));
+			throw new ValidationException(array('cep' => vsprintf('O %s informado já está cadastrado', array(_p('Titulo', 'CEP')))));
 	}
 
 	public static function cadastrar($cidade) {

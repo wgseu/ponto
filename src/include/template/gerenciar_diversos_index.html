@@ -14,22 +14,22 @@
 			<div class="right">
 				<span class="count_top"><i class="fa fa-clock-o"></i> Permanência média</span>
 				<div class="count">${get_tempo($permanencia)}</div>
-				<span class="count_bottom"><i class="green">R$ ${moneyit($ticket_medio)} </i> ticket médio</span>
+				<span class="count_bottom"><i class="green">${\MZ\Util\Mask::money($ticket_medio, true)} </i> ticket médio</span>
 			</div>
 		</div>
 		<div class="animated flipInY col-md-2 col-sm-4 col-xs-4 tile_stats_count">
 			<div class="left"></div>
 			<div class="right">
 				<span class="count_top"><i class="fa fa-money"></i> Receitas</span>
-				<div class="count green">${moneyit($receitas)}</div>
-				<span class="count_bottom"><i class="green">R$ ${moneyit($vendas['total'])} </i> Vendas</span>
+				<div class="count green">${\MZ\Util\Mask::money($receitas)}</div>
+				<span class="count_bottom"><i class="green">${\MZ\Util\Mask::money($vendas['total'], true)} </i> Vendas</span>
 			</div>
 		</div>
 		<div class="animated flipInY col-md-2 col-sm-4 col-xs-4 tile_stats_count">
 			<div class="left"></div>
 			<div class="right">
 				<span class="count_top" title="Faturamento mensal"><i class="fa fa-area-chart"></i> Faturamento</span>
-				<div class="count">${moneyit($faturamento['atual'])}</div>
+				<div class="count">${\MZ\Util\Mask::money($faturamento['atual'])}</div>
 				<span class="count_bottom" title="Comparação com o mês passado">
 <!--{if $faturamento['atual'] >= $faturamento['anterior'] }-->
 					<i class="green"><i class="fa fa-sort-asc"></i>${get_aumento($faturamento['anterior'], $faturamento['atual'], true)}% </i>
@@ -43,8 +43,8 @@
 			<div class="left"></div>
 			<div class="right">
 				<span class="count_top" title="Despesas do mês que ainda não foram pagas"><i class="fa fa-shopping-cart"></i> Despesas</span>
-				<div class="count">${moneyit(-$despesas['apagar'])}</div>
-				<span class="count_bottom" title="Contas pagas do mês"><i class="red">R$ ${moneyit(-$despesas['pagas'])} </i> pago</span>
+				<div class="count">${\MZ\Util\Mask::money(-$despesas['apagar'])}</div>
+				<span class="count_bottom" title="Contas pagas do mês"><i class="red">${\MZ\Util\Mask::money(-$despesas['pagas'], true)} </i> pago</span>
 			</div>
 		</div>
 		<div class="animated flipInY col-md-2 col-sm-4 col-xs-4 tile_stats_count">
@@ -75,7 +75,7 @@
 				<div class="x_content">
 					<div class="col-md-9 col-sm-12 col-xs-12">
 						<div class="demo-container" style="height:380px">
-							<div id="placeholder33x" class="demo-placeholder"></div>
+							<div id="placeholder33x" class="demo-placeholder" data-symbol="{$__moeda__->getSimbolo()}"></div>
 						</div>
 					</div>
 					<div class="col-md-3 col-sm-12 col-xs-12">
@@ -92,7 +92,7 @@
 									</a>
 									<div class="media-body">
 										<a class="title" href="/gerenciar/cliente/editar?id={$top_cliente['id']}">{$top_cliente['nome']}</a>
-										<p><a href="/gerenciar/pedido/?clienteid={$top_cliente['id']}"><strong>R$ ${moneyit($top_cliente['total'])}</strong> compras no semestre </a></p>
+										<p><a href="/gerenciar/pedido/?clienteid={$top_cliente['id']}"><strong>${\MZ\Util\Mask::money($top_cliente['total'], true)}</strong> compras no semestre </a></p>
 										<p> <small>{$top_cliente['pedidos']} pedidos no semestre</small>
 										</p>
 									</div>
@@ -146,7 +146,7 @@
 							</div>
 						</div>
 						<div class="w_right w_25">
-							<span>R$ ${moneyit($categoria['total'])}</span>
+							<span>${\MZ\Util\Mask::money($categoria['total'], true)}</span>
 						</div>
 						<div class="clearfix"></div>
 					</div>
@@ -203,7 +203,7 @@
 										<td>
 											<p><i class="fa fa-square" style="color: ${hexcolor($index, true)};"></i>${get_forma_pagto($pagamento['tipo'])} </p>
 										</td>
-										<td><p class="text-right">R$ ${moneyit($pagamento['total'])}</p></td>
+										<td><p class="text-right">${\MZ\Util\Mask::money($pagamento['total'], true)}</p></td>
 									</tr>
 <!--{/loop}-->
 								</table>
@@ -247,9 +247,9 @@
 							<h4>Progresso atual</h4>
 							<canvas width="150" height="80" id="foo" class="" style="width: 160px; height: 100px;"></canvas>
 							<div class="goal-wrapper">
-								<span class="gauge-value pull-left">R$</span>
-								<span id="gauge-text" class="gauge-value pull-left">${moneyit(round($faturamento['atual']))}</span>
-								<span id="goal-text" class="goal-value pull-right">R$${moneyit(round($faturamento['base']))}</span>
+								<span class="gauge-value pull-left">{$__moeda__->getSimbolo()}</span>
+								<span id="gauge-text" class="gauge-value pull-left">${\MZ\Util\Mask::money(round($faturamento['atual']))}</span>
+								<span id="goal-text" class="goal-value pull-right">{$__moeda__->getSimbolo()}${\MZ\Util\Mask::money(round($faturamento['base']))}</span>
 							</div>
 						</div>
 					</div>

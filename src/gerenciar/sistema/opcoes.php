@@ -11,11 +11,11 @@ $opcoes_comportamento = array(
     array('section' => 'Vendas', 'key' => 'Lembrar.Atendente', 'default' => false, 'title' => 'Lembrar o último atendente nas vendas'),
     array('section' => 'Estoque', 'key' => 'Estoque.Negativo', 'default' => false, 'title' => 'Permitir estoque negativo'),
     array('section' => 'Vendas', 'key' => 'Tela.Cheia', 'default' => true, 'title' => 'Exibir a tela de venda rápida em tela cheia'),
+    array('section' => 'Sistema', 'key' => 'Backup.Auto', 'default' => true, 'title' => 'Realizar backup automaticamente'),
     array('section' => 'Vendas', 'key' => 'Balcao.Comissao', 'default' => false, 'title' => 'Comissão na venda balcão'),
     array('section' => 'Sistema', 'key' => 'Tablet.Logout', 'default' => false, 'title' => 'Fazer logout no tablet após lançar pedido'),
     array('section' => 'Vendas', 'key' => 'Mesas.Juntar', 'default' => true, 'title' => 'Reservar mesas ao juntar'),
     array('section' => 'Vendas', 'key' => 'Mesas.Redirecionar', 'default' => false, 'title' => 'Redirecionar para a mesa principal'),
-    array('section' => 'Sistema', 'key' => 'Backup.Auto', 'default' => true, 'title' => 'Realizar backup automaticamente'),
     array('section' => 'Vendas', 'key' => 'Comanda.Observacao', 'default' => false, 'title' => 'Observação como nome de comanda'),
     array('section' => 'Vendas', 'key' => 'Quantidade.Perguntar', 'default' => true, 'title' => 'Confirmar ao lançar quantidades elevadas'),
 );

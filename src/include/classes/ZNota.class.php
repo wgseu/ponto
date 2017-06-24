@@ -707,8 +707,20 @@ class ZNota {
 		return $zipfile;
 	}
 
-	private static function initSearch($busca, $estado, $acao, $ambiente, $serie, $pedido_id, 
-		$tipo, $contingencia, $emissao_inicio, $emissao_fim, $lancamento_inicio, $lancamento_fim) {
+	private static function initSearch(
+			$busca,
+			$estado,
+			$acao,
+			$ambiente,
+			$serie,
+			$pedido_id, 
+			$tipo,
+			$contingencia,
+			$emissao_inicio,
+			$emissao_fim,
+			$lancamento_inicio,
+			$lancamento_fim
+	) {
 		$query = DB::$pdo->from('Notas')
 		                 ->orderBy('id ASC');
 		$chave = null;
@@ -784,11 +796,37 @@ class ZNota {
 		return $query;
 	}
 
-	public static function getTodas($busca = null, $estado = null, $acao = null, $ambiente = null, $serie = null, $pedido_id = null, 
-		$tipo = null, $contingencia = null, $emissao_inicio = false, $emissao_fim = false, $lancamento_inicio = false, $lancamento_fim = false, $inicio = null, $quantidade = null) {
-		$query = self::initSearch($busca, $estado, $acao, $ambiente, $serie, $pedido_id, 
-		$tipo, $contingencia, $emissao_inicio, $emissao_fim, $lancamento_inicio, $lancamento_fim);
-		if(!is_null($inicio) && !is_null($quantidade)) {
+	public static function getTodas(
+		$busca = null,
+		$estado = null,
+		$acao = null,
+		$ambiente = null,
+		$serie = null,
+		$pedido_id = null, 
+		$tipo = null,
+		$contingencia = null,
+		$emissao_inicio = false,
+		$emissao_fim = false,
+		$lancamento_inicio = false,
+		$lancamento_fim = false,
+		$inicio = null,
+		$quantidade = null
+	) {
+		$query = self::initSearch(
+			$busca,
+			$estado,
+			$acao,
+			$ambiente,
+			$serie,
+			$pedido_id, 
+			$tipo,
+			$contingencia,
+			$emissao_inicio,
+			$emissao_fim,
+			$lancamento_inicio,
+			$lancamento_fim
+		);
+		if (!is_null($inicio) && !is_null($quantidade)) {
 			$query = $query->limit($quantidade)->offset($inicio);
 		}
 		$_notas = $query->fetchAll();
@@ -798,10 +836,34 @@ class ZNota {
 		return $notas;
 	}
 
-	public static function getCount($busca = null, $estado = null, $acao = null, $ambiente = null, $serie = null, $pedido_id = null, 
-		$tipo = null, $contingencia = null, $emissao_inicio = false, $emissao_fim = false, $lancamento_inicio = false, $lancamento_fim = false) {
-		$query = self::initSearch($busca, $estado, $acao, $ambiente, $serie, $pedido_id, 
-		$tipo, $contingencia, $emissao_inicio, $emissao_fim, $lancamento_inicio, $lancamento_fim);
+	public static function getCount(
+		$busca = null,
+		$estado = null,
+		$acao = null,
+		$ambiente = null,
+		$serie = null,
+		$pedido_id = null, 
+		$tipo = null,
+		$contingencia = null,
+		$emissao_inicio = false,
+		$emissao_fim = false,
+		$lancamento_inicio = false,
+		$lancamento_fim = false
+	) {
+		$query = self::initSearch(
+			$busca,
+			$estado,
+			$acao,
+			$ambiente,
+			$serie,
+			$pedido_id, 
+			$tipo,
+			$contingencia,
+			$emissao_inicio,
+			$emissao_fim,
+			$lancamento_inicio,
+			$lancamento_fim
+		);
 		return $query->count();
 	}
 

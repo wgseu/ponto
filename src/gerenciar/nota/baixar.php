@@ -20,10 +20,10 @@ try {
 	$pedido_id = isset($_GET['pedido_id'])?$_GET['pedido_id']:null;
 	$tipo = isset($_GET['tipo'])?$_GET['tipo']:null;
 	$contingencia = isset($_GET['contingencia'])?$_GET['contingencia']:null;
-	$emissao_inicio = isset($_GET['emissao_inicio']?strtotime($_GET['emissao_inicio']):null;
-	$emissao_fim = isset($_GET['emissao_fim'])?strtotime($_GET['emissao_fim']):null;
-	$lancamento_inicio = isset($_GET['lancamento_inicio'])?strtotime($_GET['lancamento_inicio']):null;
-	$lancamento_fim = isset($_GET['lancamento_fim'])?strtotime($_GET['lancamento_fim']):null;
+	$emissao_inicio = isset($_GET['emissao_inicio'])?strtotime($_GET['emissao_inicio']):false;
+	$emissao_fim = isset($_GET['emissao_fim'])?strtotime($_GET['emissao_fim']):false;
+	$lancamento_inicio = isset($_GET['lancamento_inicio'])?strtotime($_GET['lancamento_inicio']):false;
+	$lancamento_fim = isset($_GET['lancamento_fim'])?strtotime($_GET['lancamento_fim']):false;
 
 	$notas = \ZNota::getTodas(
 		$busca,

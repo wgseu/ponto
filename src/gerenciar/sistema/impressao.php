@@ -37,7 +37,9 @@ $opcoes_impressao = array(
 	array('section' => 'Cupom'   , 'key' => 'Servicos.Perguntar', 'default' => false, 'title' => 'Imprimir serviços sem perguntar'),
 	array('section' => 'Imprimir', 'key' => 'Cozinha.Cliente', 'default' => false, 'title' => 'Imprimir cliente nos serviços'),
 	array('section' => 'Imprimir', 'key' => 'Cozinha.Pedido.Descricao', 'default' => false, 'title' => 'Imprimir observação do pedido nos serviços'),
+	array('section' => 'Imprimir', 'key' => 'Pedido.Descricao', 'default' => false, 'title' => 'Imprimir observações no pedido'),
 	array('section' => 'Imprimir', 'key' => 'Pacotes.Agrupados', 'default' => true, 'title' => 'Imprimir pacotes agrupados'),
+	array('section' => 'Imprimir', 'key' => 'Caixa.Fechamento', 'default' => true, 'title' => 'Imprimir fechamento de caixa'),
 	array('section' => 'Cupom'   , 'key' => 'Perguntar', 'default' => false, 'title' => 'Exibir pegunta de impressão'),
 );
 if($_POST) {

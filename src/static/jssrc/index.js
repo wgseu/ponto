@@ -2144,6 +2144,12 @@ Gerenciar.sistema.initEmpresa = function(focus_ctrl) {
         $('#cliente-form').submit();
     });
 };
+Gerenciar.sistema.initFiscal = function(focus_ctrl) {
+    $('#fiscal_timeout').autoNumeric('init');
+    if (focus_ctrl != undefined) {
+        $('#' + focus_ctrl).focus();
+    }
+};
 Gerenciar.sistema.initAvancado = function(focus_ctrl) {
     if(focus_ctrl != undefined)
         $('#' + focus_ctrl).focus();
@@ -2250,19 +2256,6 @@ Gerenciar.formacao.init = function() {
     $('#query').focus();
 };
 Gerenciar.formacao.initForm = function(focus_ctrl) {
-    if(focus_ctrl != undefined)
-        $('#' + focus_ctrl).focus();
-};
-Gerenciar.consumacao = {};
-Gerenciar.consumacao.init = function() {
-    ajaxLink();
-    $('#query').focus();
-    $('#modulo, #dia').change(function() {
-        $(this).closest('form').submit();
-    });
-};
-Gerenciar.consumacao.initForm = function(focus_ctrl) {
-    $('#valor').autoNumeric('init');
     if(focus_ctrl != undefined)
         $('#' + focus_ctrl).focus();
 };

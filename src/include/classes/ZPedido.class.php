@@ -399,18 +399,16 @@ class ZPedido {
 	public static function getTotalDetalhado($id, $cancelado = null) {
 		$query = DB::$pdo->from('Pedidos p')
 						 ->select(null)
-						 ->select('IF(p.cancelado = "Y" OR p.estado = "Finalizado", 0, csm.valor) as taxaminima')
 						 ->select('SUM(pdp.precocompra * pdp.quantidade) as custo')
 						 ->select('SUM(IF(NOT ISNULL(pdp.produtoid), pdp.preco * pdp.quantidade, 0)) as produtos')
 						 ->select('SUM(IF(NOT ISNULL(pdp.produtoid), pdp.preco * pdp.quantidade * pdp.porcentagem / 100, 0)) as comissao')
 						 ->select('SUM(IF(NOT ISNULL(pdp.servicoid) AND pdp.preco >= 0, pdp.preco * pdp.quantidade, 0)) as servicos')
 						 ->select('SUM(IF(NOT ISNULL(pdp.servicoid) AND pdp.preco < 0, pdp.preco * pdp.quantidade, 0)) as descontos')
-						 ->leftJoin('Consumacoes csm ON csm.modulo = IF(p.tipo = "Avulso" AND NOT ISNULL(p.localizacaoid), "Entrega", p.tipo) AND csm.dia = DAYOFWEEK(CURDATE())')
 						 ->leftJoin('Produtos_Pedidos pdp ON pdp.pedidoid = p.id AND (? = "" OR pdp.cancelado = ?)', strval($cancelado), strval($cancelado))
 		                 ->where('p.id', $id);
 		$row = $query->fetch();
 		$row['subtotal'] = $row['servicos'] + $row['produtos'] + $row['comissao'];
-		$row['total'] = max($row['taxaminima'] + 0.00, $row['descontos'] + $row['subtotal']);
+		$row['total'] = $row['descontos'] + $row['subtotal'];
 		return $row;
 	}
 

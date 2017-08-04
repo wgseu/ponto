@@ -31,7 +31,6 @@ class ZServico {
 
 	const DESCONTO_ID = 1;
 	const ENTREGA_ID = 2;
-	const CONSUMACAO_ID = 3;
 
 	private $id;
 	private $nome;
@@ -303,8 +302,9 @@ class ZServico {
 		$_servico = $servico->toArray();
 		if(!$_servico['id'])
 			throw new ValidationException(array('id' => 'O id do servico não foi informado'));
-		if($_servico['id'] >= 1 && $_servico['id'] <= 3)
+		if($_servico['id'] >= self::DESCONTO_ID && $_servico['id'] <= self::ENTREGA_ID) {
 			throw new Exception('Não é possível alterar esse serviço, o serviço é utilizado internamente pelo sistema');
+		}
 		self::validarCampos($_servico);
 		$campos = array(
 			'nome',
@@ -331,10 +331,12 @@ class ZServico {
 	}
 
 	public static function excluir($id) {
-		if(!$id)
+		if (!$id) {
 			throw new Exception('Não foi possível excluir o servico, o id do serviço não foi informado');
-		if($id >= 1 && $id <= 3)
+		}
+		if ($id >= self::DESCONTO_ID && $id <= self::ENTREGA_ID) {
 			throw new Exception('Não é possível excluir esse serviço, o serviço é utilizado internamente pelo sistema');
+		}
 		$query = DB::$pdo->deleteFrom('Servicos')
 		                 ->where(array('id' => $id));
 		return $query->execute();

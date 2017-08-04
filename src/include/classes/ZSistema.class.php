@@ -231,6 +231,15 @@ class ZSistema {
 		return $this->computadores * 2;
 	}
 
+	/**
+	 * Informa se o sistema está operando no modo fiscal
+	 * @return boolean true para modo fiscal, false caso contrário
+	 */
+	public function isFiscal()
+	{
+		return !is_null(get_string_config('Licenca', 'Modulo.Fiscal', null));
+	}
+
 	public function toArray() {
 		$sistema = array();
 		$sistema['id'] = $this->getID();

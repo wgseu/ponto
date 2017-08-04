@@ -83,7 +83,6 @@ class PermissaoNome {
 	const ALTERARCONFIGURACOES = 'AlterarConfiguracoes'; // Permitir alterar informações da empresa e configurações do sistema
 	const LISTACOMPRAS = 'ListaCompras'; // Permitir cadastrar lista de compras de produtos
 	const RELATORIOMENSAL = 'RelatorioMensal'; // Permitir visualizar e emitir relatórios de vendas mensais
-	const CADASTROCONSUMACOES = 'CadastroConsumacoes'; // Permitir cadastrar ou alterar as taxas de consumações mínimas
 	const CADASTROCIDADES = 'CadastroCidades'; // Permitir cadastrar ou alterar as cidades dos estados
 	const RETIRARDOESTOQUE = 'RetirarDoEstoque'; // Permitir retirar produtos do estoque
 	const RELATORIOBAIRROS = 'RelatorioBairros'; // Permitir visualizar relatórios de bairros

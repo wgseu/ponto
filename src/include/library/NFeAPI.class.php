@@ -64,7 +64,7 @@ class NFeAPI extends \NFe\Common\Ajuste {
 		$this->setCSC($this->external_emitente->getCSC());
 		$this->setTokenIBPT($this->external_emitente->getIBPT());
 		$this->setSincrono('Y');
-		$this->setTempoLimite(6);
+		$this->setTempoLimite(get_int_config('Sistema', 'Fiscal.Timeout', 30));
 
 		/* Emitente */
 		$emitente = new \NFe\Entity\Emitente();
@@ -246,12 +246,6 @@ class NFeAPI extends \NFe\Common\Ajuste {
 	 */
 	public function onNotaRejeitada($nota, $xml, $retorno) {
 		$_nota = ZNota::getPelaChave($nota->getID());
-		// quando uma consulta de nota em contingencia informa que a nota não existe
-		// volta a enviar a nota novamente
-		if ($_nota->isContingencia() && $retorno->isInexistente()) {
-			$this->onNotaValidada($nota, $xml);
-			return;
-		}
 		$this->deleteXmlAnteriores($nota);
 		$path = $this->getPastaXmlRejeitado($nota->getAmbiente());
 		$filename = $path . '/' . $nota->getID() . '.xml';
@@ -259,14 +253,12 @@ class NFeAPI extends \NFe\Common\Ajuste {
 		file_put_contents($filename, $xml->saveXML());
 
 		// não salva o evento, pois será salvo no onNotaErro
-		if($_nota->getAcao() == NotaAcao::CANCELAR && is_null($_nota->getProtocolo())) {
+		if ($_nota->getAcao() == NotaAcao::CANCELAR && is_null($_nota->getProtocolo())) {
 			$data_emissao = strtotime($_nota->getDataEmissao());
-			// só inutiliza depois de 10 min após a tentativa de autorizar a nota
-			// if ($data_emissao + 600 < time()) {
-				// se a intenção era cancelar uma nota sem protocolo, então muda para inutilização
-				// pois a rejeição foi resultante de uma consulta do status da nota pela chave de acesso
-				$_nota->setAcao(NotaAcao::INUTILIZAR);
-			// }
+			// só deveria inutilizar depois de 10 min após a tentativa de autorizar a nota
+			// se a intenção era cancelar uma nota sem protocolo, então muda para inutilização
+			// pois a rejeição foi resultante de uma consulta do status da nota pela chave de acesso
+			$_nota->setAcao(NotaAcao::INUTILIZAR);
 			// mantém o XML rejeitado, pois pode acontecer da nota estar em processamento e não ser reconhecida ainda
 		} else {
 			// evita de ficar enviando uma mesma nota rejeitada a todo momento
@@ -295,8 +287,9 @@ class NFeAPI extends \NFe\Common\Ajuste {
 			$retorno->getStatus()
 		);
 		// não precisa analisar a denegação se a intenção era cancelar
-		if($_nota->getAcao() != NotaAcao::CANCELAR)
+		if ($_nota->getAcao() != NotaAcao::CANCELAR) {
 			$_nota->setCorrigido('N');
+		}
 		$_nota->setConcluido('Y');
 		$_nota->setEstado(NotaEstado::DENEGADO);
 		$_nota = ZNota::atualizar($_nota);

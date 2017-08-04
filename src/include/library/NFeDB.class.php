@@ -76,10 +76,14 @@ class NFeDB extends \NFe\Database\Estatico {
 		$nota->setCodigo($_pedido->getID());
 		$nota->setSerie($_nota->getSerie());
 		$nota->setNumero($_nota->getNumeroInicial());
-		if($_nota->isContingencia())
-			$nota->setDataEmissao($_nota->setDataLancamento());
-		else
+		if ($_nota->isContingencia()) {
+			$nota->setEmissao(\NFe\Core\Nota::EMISSAO_CONTINGENCIA);
+			$nota->setDataEmissao($_nota->getDataLancamento());
+			$nota->setJustificativa($_nota->getMotivo());
+		} else {
+			$nota->setEmissao(\NFe\Core\Nota::EMISSAO_NORMAL);
 			$nota->setDataEmissao(time());
+		}
 		if($_pedido->isDelivery())
 			$nota->setPresenca(\NFe\Core\Nota::PRESENCA_ENTREGA);
 		else

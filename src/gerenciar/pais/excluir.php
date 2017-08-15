@@ -24,14 +24,14 @@ require_once(dirname(dirname(__FILE__)) . '/app.php');
 need_permission(PermissaoNome::CADASTROPAISES);
 $id = $_GET['id'];
 $pais = ZPais::getPeloID($id);
-if(is_null($pais->getID())) {
-	Thunder::warning('O país de id "'.$id.'" não existe!');
-	redirect('/gerenciar/pais/');
+if (is_null($pais->getID())) {
+    Thunder::warning('O país de id "'.$id.'" não existe!');
+    redirect('/gerenciar/pais/');
 }
 try {
-	ZPais::excluir($id);
-	Thunder::success('País "' . $pais->getNome() . '" excluído com sucesso!', true);
+    ZPais::excluir($id);
+    Thunder::success('País "' . $pais->getNome() . '" excluído com sucesso!', true);
 } catch (Exception $e) {
-	Thunder::error('Não foi possível excluir o país "' . $pais->getNome() . '"!');
+    Thunder::error('Não foi possível excluir o país "' . $pais->getNome() . '"!');
 }
 redirect('/gerenciar/pais/');

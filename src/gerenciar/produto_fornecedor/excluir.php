@@ -24,14 +24,14 @@ require_once(dirname(dirname(__FILE__)) . '/app.php');
 need_permission(PermissaoNome::CADASTROFORNECEDORES);
 $id = $_GET['id'];
 $produto_fornecedor = ZProdutoFornecedor::getPeloID($id);
-if(is_null($produto_fornecedor->getID())) {
-	Thunder::warning('O produto de fornecedor de id "'.$id.'" não existe!');
-	redirect('/gerenciar/produto_fornecedor/');
+if (is_null($produto_fornecedor->getID())) {
+    Thunder::warning('O produto de fornecedor de id "'.$id.'" não existe!');
+    redirect('/gerenciar/produto_fornecedor/');
 }
 try {
-	ZProdutoFornecedor::excluir($id);
-	Thunder::success('Produto de fornecedor "' . $produto_fornecedor->getProdutoID() . '" excluído com sucesso!', true);
+    ZProdutoFornecedor::excluir($id);
+    Thunder::success('Produto de fornecedor "' . $produto_fornecedor->getProdutoID() . '" excluído com sucesso!', true);
 } catch (Exception $e) {
-	Thunder::error('Não foi possível excluir o produto de fornecedor "' . $produto_fornecedor->getProdutoID() . '"!');
+    Thunder::error('Não foi possível excluir o produto de fornecedor "' . $produto_fornecedor->getProdutoID() . '"!');
 }
 redirect('/gerenciar/produto_fornecedor/');

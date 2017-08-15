@@ -21,46 +21,53 @@
 */
 require_once(dirname(dirname(dirname(__FILE__))) . '/app.php');
 
-if(!is_login())
-	json('Usuário não autenticado!');
+if (!is_login()) {
+    json('Usuário não autenticado!');
+}
 try {
-	DB::BeginTransaction();
-	$sessao = ZSessao::getPorAberta();
-	if(is_null($sessao->getID()))
-		throw new Exception('A sessão ainda não foi aberta');
-	$tipo = PedidoTipo::MESA;
-	if($_GET['tipo'] == 'comanda')
-		$tipo = PedidoTipo::COMANDA;
-	/* else if($_GET['tipo'] == 'avulso')
+    DB::BeginTransaction();
+    $sessao = ZSessao::getPorAberta();
+    if (is_null($sessao->getID())) {
+        throw new Exception('A sessão ainda não foi aberta');
+    }
+    $tipo = PedidoTipo::MESA;
+    if ($_GET['tipo'] == 'comanda') {
+        $tipo = PedidoTipo::COMANDA;
+    }
+    /* else if($_GET['tipo'] == 'avulso')
 		$tipo = PedidoTipo::AVULSO;
 	else if($_GET['tipo'] == 'entrega')
 		$tipo = PedidoTipo::ENTREGA; */
-	if($tipo == PedidoTipo::MESA && !have_permission(PermissaoNome::PEDIDOMESA))
-		throw new Exception('Você não tem permissão para acessar mesas');
-	else if($tipo == PedidoTipo::COMANDA && !have_permission(PermissaoNome::PEDIDOCOMANDA))
-		throw new Exception('Você não tem permissão para acessar comandas');
-	$mesa = ZMesa::getPeloID($_GET['mesa']);
-	if(is_null($mesa->getID()) && $tipo == PedidoTipo::MESA)
-		throw new Exception('A mesa não foi informada ou não existe');
-	$comanda = \MZ\Sale\Comanda::findByID($_GET['comanda']);
-	if(is_null($comanda->getID()) && $tipo == PedidoTipo::COMANDA)
-		throw new Exception('A comanda não foi informada ou não existe');
-	$pedido = ZPedido::getPeloLocal($tipo, $mesa->getID(), $comanda->getID());
-	if(is_null($pedido->getID())) 
-		throw new Exception('A mesa ou comanda informada não está aberta');
-	if($pedido->getEstado() != PedidoEstado::FECHADO) {
-		$pedido->setFechadorID($login_funcionario->getID());
-		$pedido->setDataImpressao(date('Y-m-d H:i:s'));
-		$pedido->setEstado(PedidoEstado::FECHADO);
-		$pedido = ZPedido::atualizar($pedido);
-	}
-	$appsync = new AppSync();
-	$appsync->printOrder($pedido->getID(), $login_funcionario->getID());
-	$appsync->updateOrder($pedido->getID(), $pedido->getTipo(), $pedido->getMesaID(), $pedido->getComandaID(), AppSync::ACTION_STATE);
-	DB::Commit();
+    if ($tipo == PedidoTipo::MESA && !have_permission(PermissaoNome::PEDIDOMESA)) {
+        throw new Exception('Você não tem permissão para acessar mesas');
+    } elseif ($tipo == PedidoTipo::COMANDA && !have_permission(PermissaoNome::PEDIDOCOMANDA)) {
+        throw new Exception('Você não tem permissão para acessar comandas');
+    }
+    $mesa = ZMesa::getPeloID($_GET['mesa']);
+    if (is_null($mesa->getID()) && $tipo == PedidoTipo::MESA) {
+        throw new Exception('A mesa não foi informada ou não existe');
+    }
+    $comanda = \MZ\Sale\Comanda::findByID($_GET['comanda']);
+    if (is_null($comanda->getID()) && $tipo == PedidoTipo::COMANDA) {
+        throw new Exception('A comanda não foi informada ou não existe');
+    }
+    $pedido = ZPedido::getPeloLocal($tipo, $mesa->getID(), $comanda->getID());
+    if (is_null($pedido->getID())) {
+        throw new Exception('A mesa ou comanda informada não está aberta');
+    }
+    if ($pedido->getEstado() != PedidoEstado::FECHADO) {
+        $pedido->setFechadorID($login_funcionario->getID());
+        $pedido->setDataImpressao(date('Y-m-d H:i:s'));
+        $pedido->setEstado(PedidoEstado::FECHADO);
+        $pedido = ZPedido::atualizar($pedido);
+    }
+    $appsync = new AppSync();
+    $appsync->printOrder($pedido->getID(), $login_funcionario->getID());
+    $appsync->updateOrder($pedido->getID(), $pedido->getTipo(), $pedido->getMesaID(), $pedido->getComandaID(), AppSync::ACTION_STATE);
+    DB::Commit();
 } catch (Exception $e) {
-	DB::RollBack();
-	Log::error($e->getMessage());
-	json($e->getMessage());
+    DB::RollBack();
+    Log::error($e->getMessage());
+    json($e->getMessage());
 }
 json(array('status' => 'ok'));

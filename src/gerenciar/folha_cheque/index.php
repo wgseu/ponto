@@ -30,7 +30,7 @@ $folhas_de_cheques = ZFolhaCheque::getTodos($_GET['bancoid'], $_GET['clienteid']
 $_banco = ZBanco::getPeloID($_GET['bancoid']);
 $_cliente = ZCliente::getPeloID($_GET['clienteid']);
 $estados = array(
-	'N' => 'A compensar',
-	'Y' => 'Recolhido',
+    'N' => 'A compensar',
+    'Y' => 'Recolhido',
 );
 include template('gerenciar_folha_cheque_index');

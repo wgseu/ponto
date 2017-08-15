@@ -26,28 +26,30 @@ $status['status'] = 'ok';
 $status['versao'] = ZSistema::VERSAO;
 $status['validacao'] = '';
 $status['autologout'] = is_boolean_config('Sistema', 'Tablet.Logout');
-if(is_manager())
-	$status['acesso'] = 'funcionario';
-else if(is_login())
-	$status['acesso'] = 'cliente';
-else
-	$status['acesso'] = 'visitante';
-if(is_login()) {
-	try {
-		if(is_manager())
-			$dispositivo = register_device($_GET['device'], $_GET['serial']);
-		else
-			$dispositivo = new ZDispositivo();
-		$status['cliente'] = $login_cliente->getID();
-		$status['funcionario'] = intval($login_funcionario->getID());
-		$status['validacao'] = $dispositivo->getValidacao();
-		$status['permissoes'] = ZAcesso::getPermissoes($login_funcionario->getID());
-	} catch (Exception $e) {
-		$status['status'] = 'error';
-		$status['acesso'] = 'cliente';
-		$status['msg'] = $e->getMessage();
-	}
+if (is_manager()) {
+    $status['acesso'] = 'funcionario';
+} elseif (is_login()) {
+    $status['acesso'] = 'cliente';
 } else {
-	$status['permissoes'] = array();
+    $status['acesso'] = 'visitante';
+}
+if (is_login()) {
+    try {
+        if (is_manager()) {
+            $dispositivo = register_device($_GET['device'], $_GET['serial']);
+        } else {
+            $dispositivo = new ZDispositivo();
+        }
+        $status['cliente'] = $login_cliente->getID();
+        $status['funcionario'] = intval($login_funcionario->getID());
+        $status['validacao'] = $dispositivo->getValidacao();
+        $status['permissoes'] = ZAcesso::getPermissoes($login_funcionario->getID());
+    } catch (Exception $e) {
+        $status['status'] = 'error';
+        $status['acesso'] = 'cliente';
+        $status['msg'] = $e->getMessage();
+    }
+} else {
+    $status['permissoes'] = array();
 }
 json($status);

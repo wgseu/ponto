@@ -32,9 +32,9 @@ $estoques = ZEstoque::getTodos($_produto->getID(), $_fornecedor->getID(), $_GET[
 
 
 $tipos = array(
-	'Entrada' => 'Entrada',
-	'Venda' => 'Venda',
-	'Consumo' => 'Consumo',
-	'Transferencia' => 'Transferência',
+    'Entrada' => 'Entrada',
+    'Venda' => 'Venda',
+    'Consumo' => 'Consumo',
+    'Transferencia' => 'Transferência',
 );
 include template('gerenciar_estoque_index');

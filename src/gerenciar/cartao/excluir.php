@@ -24,14 +24,14 @@ require_once(dirname(dirname(__FILE__)) . '/app.php');
 need_permission(PermissaoNome::CADASTROCARTOES);
 $id = $_GET['id'];
 $cartao = ZCartao::getPeloID($id);
-if(is_null($cartao->getID())) {
-	Thunder::warning('O cartão de id "'.$id.'" não existe!');
-	redirect('/gerenciar/cartao/');
+if (is_null($cartao->getID())) {
+    Thunder::warning('O cartão de id "'.$id.'" não existe!');
+    redirect('/gerenciar/cartao/');
 }
 try {
-	ZCartao::excluir($id);
-	Thunder::success('Cartão "' . $cartao->getDescricao() . '" excluído com sucesso!', true);
+    ZCartao::excluir($id);
+    Thunder::success('Cartão "' . $cartao->getDescricao() . '" excluído com sucesso!', true);
 } catch (Exception $e) {
-	Thunder::error('Não foi possível excluir o cartão "' . $cartao->getDescricao() . '"!');
+    Thunder::error('Não foi possível excluir o cartão "' . $cartao->getDescricao() . '"!');
 }
 redirect('/gerenciar/cartao/');

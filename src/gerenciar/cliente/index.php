@@ -26,37 +26,37 @@ need_permission(PermissaoNome::CADASTROCLIENTES);
 $genero = isset($_GET['genero'])?$_GET['genero']:null;
 $busca = isset($_GET['query'])?$_GET['query']:null;
 if ($genero == 'Empresa') {
-	$tipo = ClienteTipo::JURIDICA;
-	$genero = null;
+    $tipo = ClienteTipo::JURIDICA;
+    $genero = null;
 } else {
-	$tipo = null;
+    $tipo = null;
 }
 $count = ZCliente::getCount(
-	$busca,
-	$tipo,
-	$genero,
-	null, // mes_inicio
-	null, // mes_fim
-	null, // cpf
-	null, // fone
-	null, // email
-	null, // birthday
-	$offset,
-	$pagesize
+    $busca,
+    $tipo,
+    $genero,
+    null, // mes_inicio
+    null, // mes_fim
+    null, // cpf
+    null, // fone
+    null, // email
+    null, // birthday
+    $offset,
+    $pagesize
 );
 list($pagesize, $offset, $pagestring) = pagestring($count, 10);
 $clientes = ZCliente::getTodos(
-	$busca,
-	$tipo,
-	$genero,
-	null, // mes_inicio
-	null, // mes_fim
-	null, // cpf
-	null, // fone
-	null, // email
-	null, // birthday
-	$offset,
-	$pagesize
+    $busca,
+    $tipo,
+    $genero,
+    null, // mes_inicio
+    null, // mes_fim
+    null, // cpf
+    null, // fone
+    null, // email
+    null, // birthday
+    $offset,
+    $pagesize
 );
 
 $tipos = ZCliente::getGeneroOptions();

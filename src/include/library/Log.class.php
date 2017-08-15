@@ -19,33 +19,39 @@
 	O Cliente adquire apenas o direito de usar o software e não adquire qualquer outros
 	direitos, expressos ou implícitos no GrandChef diferentes dos especificados nesta Licença.
 */
-class Log {
+class Log
+{
 
-	private static function write($type, $message) {
-		$log_dir = dirname(dirname(__FILE__)).'/logs';
-		$filename = $log_dir.'/'.date('Ymd').'.txt';
-		$fp = fopen($filename, 'a');
-		if(!$fp)
-			return;
-		fwrite($fp,date('d/m/Y H:i:s').' - '.$type.': '.$message."\n");
-		fclose($fp);
-		chmod($filename, 0755);
-	}
+    private static function write($type, $message)
+    {
+        $log_dir = dirname(dirname(__FILE__)).'/logs';
+        $filename = $log_dir.'/'.date('Ymd').'.txt';
+        $fp = fopen($filename, 'a');
+        if (!$fp) {
+            return;
+        }
+        fwrite($fp, date('d/m/Y H:i:s').' - '.$type.': '.$message."\n");
+        fclose($fp);
+        chmod($filename, 0755);
+    }
 
-	public static function error($message) {
-		self::write('error', $message);
-	}
+    public static function error($message)
+    {
+        self::write('error', $message);
+    }
 
-	public static function warning($message) {
-		self::write('warning', $message);
-	}
+    public static function warning($message)
+    {
+        self::write('warning', $message);
+    }
 
-	public static function debug($message) {
-		self::write('debug', $message);
-	}
+    public static function debug($message)
+    {
+        self::write('debug', $message);
+    }
 
-	public static function information($message) {
-		self::write('information', $message);
-	}
-
+    public static function information($message)
+    {
+        self::write('information', $message);
+    }
 }

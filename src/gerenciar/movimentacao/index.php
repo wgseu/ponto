@@ -28,18 +28,18 @@ list($pagesize, $offset, $pagestring) = pagestring($count, 10);
 $movimentacoes = ZMovimentacao::getTodas($_GET['caixaid'], $_GET['aberto'], $_GET['inicializadorid'], $offset, $pagesize);
 
 $_movimentacao_icon = array(
-	'Y' => 0,
-	'N' => 16,
+    'Y' => 0,
+    'N' => 16,
 );
 
 $estados = array(
-	'Y' => 'Aberto',
-	'N' => 'Fechado',
+    'Y' => 'Aberto',
+    'N' => 'Fechado',
 );
 $caixas = ZCaixa::getTodas();
 $_caixa_names = array();
 foreach ($caixas as $caixa) {
-	$_caixa_names[$caixa->getID()] = $caixa->getDescricao();
+    $_caixa_names[$caixa->getID()] = $caixa->getDescricao();
 }
 $_funcionario = ZFuncionario::getPeloID($_GET['inicializadorid']);
 include template('gerenciar_movimentacao_index');

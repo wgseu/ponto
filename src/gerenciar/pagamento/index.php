@@ -27,48 +27,48 @@ $data_inicio = date_create_from_format('d/m/Y', $_GET['inicio']);
 $data_inicio = $data_inicio===false?null:$data_inicio->getTimestamp();
 $data_fim = date_create_from_format('d/m/Y', $_GET['fim']);
 $data_fim = $data_fim===false?null:$data_fim->getTimestamp();
-$count = ZPagamento::getCount($_GET['query'], $_GET['formapagtoid'], $_GET['cartaoid'], 
-	$_GET['funcionarioid'], $_GET['carteiraid'], $_GET['estado'], $data_inicio, $data_fim);
+$count = ZPagamento::getCount($_GET['query'], $_GET['formapagtoid'], $_GET['cartaoid'],
+    $_GET['funcionarioid'], $_GET['carteiraid'], $_GET['estado'], $data_inicio, $data_fim);
 list($pagesize, $offset, $pagestring) = pagestring($count, 10);
-$pagamentos = ZPagamento::getTodos($_GET['query'], $_GET['formapagtoid'], $_GET['cartaoid'], 
-	$_GET['funcionarioid'], $_GET['carteiraid'], $_GET['estado'], $data_inicio, $data_fim, $offset, $pagesize);
+$pagamentos = ZPagamento::getTodos($_GET['query'], $_GET['formapagtoid'], $_GET['cartaoid'],
+    $_GET['funcionarioid'], $_GET['carteiraid'], $_GET['estado'], $data_inicio, $data_fim, $offset, $pagesize);
 
 $_tipo_names = array(
-	'Mesa' => 'Mesa',
-	'Comanda' => 'Comanda',
-	'Avulso' => 'Balcão',
-	'Entrega' => 'Entrega',
+    'Mesa' => 'Mesa',
+    'Comanda' => 'Comanda',
+    'Avulso' => 'Balcão',
+    'Entrega' => 'Entrega',
 );
 $_estado_names = array(
-	'Valido' => 'Válido',
-	'Ativo' => 'Ativo',
-	'Espera' => 'Em espera',
-	'Cancelado' => 'Cancelado',
+    'Valido' => 'Válido',
+    'Ativo' => 'Ativo',
+    'Espera' => 'Em espera',
+    'Cancelado' => 'Cancelado',
 );
 
 $_pagamento_icon = array(
-	'Dinheiro' => 0,
-	'Cartao' => 16,
-	'Cheque' => 32,
-	'Conta' => 48,
-	'Credito' => 64,
-	'Transferencia' => 80,
+    'Dinheiro' => 0,
+    'Cartao' => 16,
+    'Cheque' => 32,
+    'Conta' => 48,
+    'Credito' => 64,
+    'Transferencia' => 80,
 );
 
 $formas_de_pagamento = ZFormaPagto::getTodos();
 $_forma_names = array();
 foreach ($formas_de_pagamento as $forma) {
-	$_forma_names[$forma->getID()] = $forma->getDescricao();
+    $_forma_names[$forma->getID()] = $forma->getDescricao();
 }
 $cartoes = ZCartao::getTodos();
 $_cartao_names = array();
 foreach ($cartoes as $cartao) {
-	$_cartao_names[$cartao->getID()] = $cartao->getDescricao();
+    $_cartao_names[$cartao->getID()] = $cartao->getDescricao();
 }
 $carteiras = ZCarteira::getTodas();
 $_carteira_names = array();
 foreach ($carteiras as $carteira) {
-	$_carteira_names[$carteira->getID()] = $carteira->getDescricao();
+    $_carteira_names[$carteira->getID()] = $carteira->getDescricao();
 }
 $_funcionario = ZFuncionario::getPeloID($_GET['funcionarioid']);
 include template('gerenciar_pagamento_index');

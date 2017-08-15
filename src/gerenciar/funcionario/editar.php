@@ -23,55 +23,56 @@ require_once(dirname(dirname(__FILE__)) . '/app.php');
 
 need_manager();
 $funcionario = ZFuncionario::getPeloID($_GET['id']);
-if(is_null($funcionario->getID())) {
-	Thunder::warning('O(a) funcionário(a) de id "'.$_GET['id'].'" não existe!');
-	redirect('/gerenciar/funcionario/');
+if (is_null($funcionario->getID())) {
+    Thunder::warning('O(a) funcionário(a) de id "'.$_GET['id'].'" não existe!');
+    redirect('/gerenciar/funcionario/');
 }
-if((!have_permission(PermissaoNome::CADASTROFUNCIONARIOS) && 
-	!is_self($funcionario)) ||
-   ( have_permission(PermissaoNome::CADASTROFUNCIONARIOS, $funcionario) && 
-	!is_self($funcionario) && !is_owner()) ) {
-	Thunder::warning('Você não tem permissão para alterar as informações desse(a) funcionário(a)!');
-	redirect('/gerenciar/funcionario/');
+if ((!have_permission(PermissaoNome::CADASTROFUNCIONARIOS) &&
+    !is_self($funcionario)) ||
+   ( have_permission(PermissaoNome::CADASTROFUNCIONARIOS, $funcionario) &&
+    !is_self($funcionario) && !is_owner()) ) {
+    Thunder::warning('Você não tem permissão para alterar as informações desse(a) funcionário(a)!');
+    redirect('/gerenciar/funcionario/');
 }
 $cliente_func = ZCliente::getPeloID($funcionario->getClienteID());
 $focusctrl = 'clienteid';
 $errors = array();
 $old_funcionario = $funcionario;
 if ($_POST) {
-	$funcionario = new ZFuncionario($_POST);
-	try {
-		$funcionario->setPorcentagem(moneyval($funcionario->getPorcentagem()));
-		$funcionario->setLinguagemID(numberval($funcionario->getLinguagemID()));
-		$funcionario->setPontuacao(numberval($funcionario->getPontuacao()));
-		$funcionario->setID($old_funcionario->getID()); // não permite alterar o código
-		$funcionario->setDataSaida($old_funcionario->getDataSaida()); // não altera a data de saida
-		if(is_owner($old_funcionario) || is_self($old_funcionario)) {
-			$funcionario->setClienteID($old_funcionario->getClienteID());
-			$funcionario->setFuncaoID($old_funcionario->getFuncaoID());
-			$funcionario->setAtivo($old_funcionario->getAtivo());
-			if(!is_owner($old_funcionario)) {
-				$funcionario->setPorcentagem($old_funcionario->getPorcentagem());
-				$funcionario->setCodigoBarras($old_funcionario->getCodigoBarras());
-				$funcionario->setPontuacao($old_funcionario->getPontuacao());
-			}
-		}
-		$funcionario = ZFuncionario::atualizar($funcionario);
-		Thunder::success('Funcionário(a) "'.$cliente_func->getLogin().'" atualizado(a) com sucesso!', true);
-		redirect('/gerenciar/funcionario/');
-	} catch (ValidationException $e) {
-		$errors = $e->getErrors();
-	} catch (Exception $e) {
-		$errors['unknow'] = $e->getMessage();
-	}
-	foreach($errors as $key => $value) {
-		$focusctrl = $key;
-		Thunder::error($value);
-		break;
-	}
+    $funcionario = new ZFuncionario($_POST);
+    try {
+        $funcionario->setPorcentagem(moneyval($funcionario->getPorcentagem()));
+        $funcionario->setLinguagemID(numberval($funcionario->getLinguagemID()));
+        $funcionario->setPontuacao(numberval($funcionario->getPontuacao()));
+        $funcionario->setID($old_funcionario->getID()); // não permite alterar o código
+        $funcionario->setDataSaida($old_funcionario->getDataSaida()); // não altera a data de saida
+        if (is_owner($old_funcionario) || is_self($old_funcionario)) {
+            $funcionario->setClienteID($old_funcionario->getClienteID());
+            $funcionario->setFuncaoID($old_funcionario->getFuncaoID());
+            $funcionario->setAtivo($old_funcionario->getAtivo());
+            if (!is_owner($old_funcionario)) {
+                $funcionario->setPorcentagem($old_funcionario->getPorcentagem());
+                $funcionario->setCodigoBarras($old_funcionario->getCodigoBarras());
+                $funcionario->setPontuacao($old_funcionario->getPontuacao());
+            }
+        }
+        $funcionario = ZFuncionario::atualizar($funcionario);
+        Thunder::success('Funcionário(a) "'.$cliente_func->getLogin().'" atualizado(a) com sucesso!', true);
+        redirect('/gerenciar/funcionario/');
+    } catch (ValidationException $e) {
+        $errors = $e->getErrors();
+    } catch (Exception $e) {
+        $errors['unknow'] = $e->getMessage();
+    }
+    foreach ($errors as $key => $value) {
+        $focusctrl = $key;
+        Thunder::error($value);
+        break;
+    }
 }
-if($focusctrl == 'clienteid')
-	$focusctrl = 'cliente';
+if ($focusctrl == 'clienteid') {
+    $focusctrl = 'cliente';
+}
 $_funcoes = ZFuncao::getTodas();
 $linguagens = get_languages_info();
 include template('gerenciar_funcionario_editar');

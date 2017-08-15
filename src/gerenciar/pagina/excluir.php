@@ -24,16 +24,16 @@ require_once(dirname(dirname(__FILE__)) . '/app.php');
 need_permission(PermissaoNome::ALTERARPAGINAS);
 $id = $_GET['id'];
 $pagina = ZPagina::getPeloID($id);
-if(is_null($pagina->getID())) {
-	Thunder::warning('A página de id "'.$id.'" não existe!');
-	redirect('/gerenciar/pagina/');
+if (is_null($pagina->getID())) {
+    Thunder::warning('A página de id "'.$id.'" não existe!');
+    redirect('/gerenciar/pagina/');
 }
 $nomes = get_pages_info();
 $linguagens = get_languages_info();
 try {
-	ZPagina::excluir($id);
-	Thunder::success('Página "' . $nomes[$pagina->getNome()] . ' - ' . $linguagens[$pagina->getLinguagemID()] . '" excluída com sucesso!', true);
+    ZPagina::excluir($id);
+    Thunder::success('Página "' . $nomes[$pagina->getNome()] . ' - ' . $linguagens[$pagina->getLinguagemID()] . '" excluída com sucesso!', true);
 } catch (Exception $e) {
-	Thunder::error('Não foi possível excluir a página "' . $nomes[$pagina->getNome()] . ' - ' . $linguagens[$pagina->getLinguagemID()] . '"!');
+    Thunder::error('Não foi possível excluir a página "' . $nomes[$pagina->getNome()] . ' - ' . $linguagens[$pagina->getLinguagemID()] . '"!');
 }
 redirect('/gerenciar/pagina/');

@@ -23,29 +23,29 @@ require_once(dirname(dirname(__FILE__)) . '/app.php');
 
 need_permission(PermissaoNome::CADASTROCOMANDAS);
 $comanda = \MZ\Sale\Comanda::findByID($_GET['id']);
-if(is_null($comanda->getID())) {
-	Thunder::warning('A comanda de id "'.$_GET['id'].'" não existe!');
-	redirect('/gerenciar/comanda/');
+if (is_null($comanda->getID())) {
+    Thunder::warning('A comanda de id "'.$_GET['id'].'" não existe!');
+    redirect('/gerenciar/comanda/');
 }
 $focusctrl = 'nome';
 $errors = array();
 $old_comanda = $comanda;
 if ($_POST) {
-	$comanda = new \MZ\Sale\Comanda($_POST);
-	try {
-		$comanda->setID($old_comanda->getID());
-		$comanda = \MZ\Sale\Comanda::atualizar($comanda);
-		Thunder::success('Comanda "'.$comanda->getNome().'" atualizada com sucesso!', true);
-		redirect('/gerenciar/comanda/');
-	} catch (ValidationException $e) {
-		$errors = $e->getErrors();
-	} catch (Exception $e) {
-		$errors['unknow'] = $e->getMessage();
-	}
-	foreach($errors as $key => $value) {
-		$focusctrl = $key;
-		Thunder::error($value);
-		break;
-	}
+    $comanda = new \MZ\Sale\Comanda($_POST);
+    try {
+        $comanda->setID($old_comanda->getID());
+        $comanda = \MZ\Sale\Comanda::atualizar($comanda);
+        Thunder::success('Comanda "'.$comanda->getNome().'" atualizada com sucesso!', true);
+        redirect('/gerenciar/comanda/');
+    } catch (ValidationException $e) {
+        $errors = $e->getErrors();
+    } catch (Exception $e) {
+        $errors['unknow'] = $e->getMessage();
+    }
+    foreach ($errors as $key => $value) {
+        $focusctrl = $key;
+        Thunder::error($value);
+        break;
+    }
 }
 include template('gerenciar_comanda_editar');

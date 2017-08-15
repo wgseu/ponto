@@ -30,8 +30,8 @@ list($pagesize, $offset, $pagestring) = pagestring($count, 10);
 $carteiras = ZCarteira::getTodas($_GET['query'], $_banco->getID(), $_GET['tipo'], $offset, $pagesize);
 
 $tipos = array(
-	'Bancaria' => 'Bancária',
-	'Financeira' => 'Financeira',
+    'Bancaria' => 'Bancária',
+    'Financeira' => 'Financeira',
 );
 
 include template('gerenciar_carteira_index');

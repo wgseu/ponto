@@ -23,26 +23,27 @@ require_once(dirname(dirname(__FILE__)) . '/app.php');
 
 need_permission(PermissaoNome::ALTERARCONFIGURACOES, isset($_POST));
 
-if($_POST) {
-	try {
-		DB::BeginTransaction();
-		$modulo = ZModulo::getPeloID($_POST['id']);
-		if (is_null($modulo->getID()))
-		    throw new Exception('O módulo informado não existe', 1);
-		$modulo->setHabilitado($_POST['marcado']);
-		$modulo = ZModulo::atualizar($modulo);
-		try {
-			$appsync = new AppSync();
-			$appsync->systemOptionsChanged();
-		} catch (Exception $e) {
-			Log::error($e->getMessage());
-		}
-		DB::Commit();
-		json(array('status' => 'ok'));
-	} catch (Exception $e) {
-		DB::Rollback();
-		json($e->getMessage());
-	}
+if ($_POST) {
+    try {
+        DB::BeginTransaction();
+        $modulo = ZModulo::getPeloID($_POST['id']);
+        if (is_null($modulo->getID())) {
+            throw new Exception('O módulo informado não existe', 1);
+        }
+        $modulo->setHabilitado($_POST['marcado']);
+        $modulo = ZModulo::atualizar($modulo);
+        try {
+            $appsync = new AppSync();
+            $appsync->systemOptionsChanged();
+        } catch (Exception $e) {
+            Log::error($e->getMessage());
+        }
+        DB::Commit();
+        json(array('status' => 'ok'));
+    } catch (Exception $e) {
+        DB::Rollback();
+        json($e->getMessage());
+    }
 }
 
 $count = ZModulo::getCount($_GET['query']);

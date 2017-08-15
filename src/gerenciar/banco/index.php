@@ -24,18 +24,20 @@ require_once(dirname(dirname(__FILE__)) . '/app.php');
 need_permission(PermissaoNome::CADASTROBANCOS, $_GET['saida'] == 'json');
 
 $limite = trim($_GET['limite']);
-if(!is_numeric($limite) || $limite > 100 || $limite < 1)
-	$limite = 10;
+if (!is_numeric($limite) || $limite > 100 || $limite < 1) {
+    $limite = 10;
+}
 
 $count = ZBanco::getCount($_GET['query']);
 list($pagesize, $offset, $pagestring) = pagestring($count, $limite);
 $bancos = ZBanco::getTodos($_GET['query'], $offset, $pagesize);
 
-if($_GET['saida'] == 'json') {
-	$_bancos = array();
-	foreach ($bancos as $banco)
-		$_bancos[] = $banco->toArray();
-	json('items', $_bancos);
+if ($_GET['saida'] == 'json') {
+    $_bancos = array();
+    foreach ($bancos as $banco) {
+        $_bancos[] = $banco->toArray();
+    }
+    json('items', $_bancos);
 }
 
 include template('gerenciar_banco_index');

@@ -21,44 +21,47 @@
 */
 require_once(dirname(dirname(dirname(__FILE__))) . '/app.php');
 
-if(!is_login())
-	json('Usuário não autenticado!');
-if(!is_null($_GET['comanda']) && !have_permission(PermissaoNome::PEDIDOCOMANDA))
-	json('Você não tem permissão para acessar os produtos das comandas');
-else if(!have_permission(PermissaoNome::PEDIDOMESA))
-	json('Você não tem permissão para acessar os produtos das mesas');
+if (!is_login()) {
+    json('Usuário não autenticado!');
+}
+if (!is_null($_GET['comanda']) && !have_permission(PermissaoNome::PEDIDOCOMANDA)) {
+    json('Você não tem permissão para acessar os produtos das comandas');
+} elseif (!have_permission(PermissaoNome::PEDIDOMESA)) {
+    json('Você não tem permissão para acessar os produtos das mesas');
+}
 
 $tipo = PedidoTipo::MESA;
-if(!is_null($_GET['comanda']))
-	$tipo = PedidoTipo::COMANDA;
+if (!is_null($_GET['comanda'])) {
+    $tipo = PedidoTipo::COMANDA;
+}
 $pedidos = ZProdutoPedido::getTodosDoLocal($tipo, $_GET['mesa'], $_GET['comanda']);
 $response = array('status' => 'ok');
 $campos = array(
-			'id',
-			'produtopedidoid',
-			'tipo',
-			'mesaid',
-			'comandaid',
-			'produtoid',
-			'produtotipo',
-			'produtodescricao',
-			'produtoconteudo',
-			'unidadesigla',
-			'preco',
-			'quantidade',
-			'precovenda',
-			'porcentagem',
-			'detalhes',
-			'descricao',
-			'imagemurl',
-			'produtodataatualizacao',
-			'datahora',
-		);
+            'id',
+            'produtopedidoid',
+            'tipo',
+            'mesaid',
+            'comandaid',
+            'produtoid',
+            'produtotipo',
+            'produtodescricao',
+            'produtoconteudo',
+            'unidadesigla',
+            'preco',
+            'quantidade',
+            'precovenda',
+            'porcentagem',
+            'detalhes',
+            'descricao',
+            'imagemurl',
+            'produtodataatualizacao',
+            'datahora',
+        );
 $_pedidos = array();
 foreach ($pedidos as $pedido) {
-	$_pedido = array_intersect_key($pedido, array_flip($campos));
-	$_pedido['imagemurl'] = get_image_url($_pedido['imagemurl'], 'produto', null);
-	$_pedidos[] = $_pedido;
+    $_pedido = array_intersect_key($pedido, array_flip($campos));
+    $_pedido['imagemurl'] = get_image_url($_pedido['imagemurl'], 'produto', null);
+    $_pedidos[] = $_pedido;
 }
 $response['total'] = ZPedido::getTotalDoLocal($tipo, $_GET['mesa'], $_GET['comanda']);
 $response['pedidos'] = $_pedidos;

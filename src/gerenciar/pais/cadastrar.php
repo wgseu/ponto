@@ -25,29 +25,30 @@ need_permission(PermissaoNome::CADASTROPAISES);
 $focusctrl = 'nome';
 $errors = array();
 if ($_POST) {
-	$pais = new ZPais($_POST);
-	try {
-		$pais->setID(null);
-		$pais->setBandeiraIndex(numberval($pais->getBandeiraIndex()));
-		$pais->setLinguagemID(numberval($pais->getLinguagemID()));
-		$pais = ZPais::cadastrar($pais);
-		Thunder::success('País "'.$pais->getNome().'" cadastrado com sucesso!', true);
-		redirect('/gerenciar/pais/');
-	} catch (ValidationException $e) {
-		$errors = $e->getErrors();
-	} catch (Exception $e) {
-		$errors['unknow'] = $e->getMessage();
-	}
-	foreach($errors as $key => $value) {
-		$focusctrl = $key;
-		Thunder::error($value);
-		break;
-	}
+    $pais = new ZPais($_POST);
+    try {
+        $pais->setID(null);
+        $pais->setBandeiraIndex(numberval($pais->getBandeiraIndex()));
+        $pais->setLinguagemID(numberval($pais->getLinguagemID()));
+        $pais = ZPais::cadastrar($pais);
+        Thunder::success('País "'.$pais->getNome().'" cadastrado com sucesso!', true);
+        redirect('/gerenciar/pais/');
+    } catch (ValidationException $e) {
+        $errors = $e->getErrors();
+    } catch (Exception $e) {
+        $errors['unknow'] = $e->getMessage();
+    }
+    foreach ($errors as $key => $value) {
+        $focusctrl = $key;
+        Thunder::error($value);
+        break;
+    }
 } else {
-	$pais = new ZPais();
+    $pais = new ZPais();
 }
 $_moedas = ZMoeda::getTodas();
 $images = array();
-for($i = 0; $i < 238; $i++)
-	$images[] = array('index' => $i);
+for ($i = 0; $i < 238; $i++) {
+    $images[] = array('index' => $i);
+}
 include template('gerenciar_pais_cadastrar');

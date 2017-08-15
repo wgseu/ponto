@@ -23,36 +23,37 @@ require_once(dirname(dirname(__FILE__)) . '/app.php');
 
 need_permission(PermissaoNome::CADASTROPAISES);
 $pais = ZPais::getPeloID($_GET['id']);
-if(is_null($pais->getID())) {
-	Thunder::warning('O país de id "'.$_GET['id'].'" não existe!');
-	redirect('/gerenciar/pais/');
+if (is_null($pais->getID())) {
+    Thunder::warning('O país de id "'.$_GET['id'].'" não existe!');
+    redirect('/gerenciar/pais/');
 }
 $focusctrl = 'nome';
 $errors = array();
 $old_pais = $pais;
 if ($_POST) {
-	$pais = new ZPais($_POST);
-	try {
-		$pais->setID($old_pais->getID());
-		$pais->setEntradas($old_pais->getEntradas());
-		$pais->setBandeiraIndex(numberval($pais->getBandeiraIndex()));
-		$pais->setLinguagemID(numberval($pais->getLinguagemID()));
-		$pais = ZPais::atualizar($pais);
-		Thunder::success('País "'.$pais->getNome().'" atualizado com sucesso!', true);
-		redirect('/gerenciar/pais/');
-	} catch (ValidationException $e) {
-		$errors = $e->getErrors();
-	} catch (Exception $e) {
-		$errors['unknow'] = $e->getMessage();
-	}
-	foreach($errors as $key => $value) {
-		$focusctrl = $key;
-		Thunder::error($value);
-		break;
-	}
+    $pais = new ZPais($_POST);
+    try {
+        $pais->setID($old_pais->getID());
+        $pais->setEntradas($old_pais->getEntradas());
+        $pais->setBandeiraIndex(numberval($pais->getBandeiraIndex()));
+        $pais->setLinguagemID(numberval($pais->getLinguagemID()));
+        $pais = ZPais::atualizar($pais);
+        Thunder::success('País "'.$pais->getNome().'" atualizado com sucesso!', true);
+        redirect('/gerenciar/pais/');
+    } catch (ValidationException $e) {
+        $errors = $e->getErrors();
+    } catch (Exception $e) {
+        $errors['unknow'] = $e->getMessage();
+    }
+    foreach ($errors as $key => $value) {
+        $focusctrl = $key;
+        Thunder::error($value);
+        break;
+    }
 }
 $_moedas = ZMoeda::getTodas();
 $images = array();
-for($i = 0; $i < 238; $i++)
-	$images[] = array('index' => $i);
+for ($i = 0; $i < 238; $i++) {
+    $images[] = array('index' => $i);
+}
 include template('gerenciar_pais_editar');

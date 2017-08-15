@@ -24,14 +24,14 @@ require_once(dirname(dirname(__FILE__)) . '/app.php');
 need_permission(PermissaoNome::CADASTROBANCOS);
 $id = $_GET['id'];
 $banco = ZBanco::getPeloID($id);
-if(is_null($banco->getID())) {
-	Thunder::warning('O banco de id "'.$id.'" não existe!');
-	redirect('/gerenciar/banco/');
+if (is_null($banco->getID())) {
+    Thunder::warning('O banco de id "'.$id.'" não existe!');
+    redirect('/gerenciar/banco/');
 }
 try {
-	ZBanco::excluir($id);
-	Thunder::success('Banco "' . $banco->getRazaoSocial() . '" excluído com sucesso!', true);
+    ZBanco::excluir($id);
+    Thunder::success('Banco "' . $banco->getRazaoSocial() . '" excluído com sucesso!', true);
 } catch (Exception $e) {
-	Thunder::error('Não foi possível excluir o banco "' . $banco->getRazaoSocial() . '"!');
+    Thunder::error('Não foi possível excluir o banco "' . $banco->getRazaoSocial() . '"!');
 }
 redirect('/gerenciar/banco/');

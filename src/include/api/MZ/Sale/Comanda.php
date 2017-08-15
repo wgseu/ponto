@@ -370,43 +370,54 @@ class Comanda extends \MZ\Database\Helper
         return $query->count();
     }
 
-    public static function getPeloID($id) {
+    public static function getPeloID($id)
+    {
         return self::findByID($id);
     }
 
-    public static function getPeloNome($nome) {
+    public static function getPeloNome($nome)
+    {
         return self::findByNome($nome);
     }
 
-    public static function getProximoID() {
+    public static function getProximoID()
+    {
         $query = self::query()
             ->select(null)
             ->select('MAX(id) as id');
         return $query->fetch('id') + 1;
     }
 
-    private static function validarCampos(&$comanda) {
+    private static function validarCampos(&$comanda)
+    {
         $erros = array();
         $comanda['nome'] = strip_tags(trim($comanda['nome']));
-        if(strlen($comanda['nome']) == 0)
+        if (strlen($comanda['nome']) == 0) {
             $erros['nome'] = 'O Nome não pode ser vazio';
+        }
         $comanda['ativa'] = trim($comanda['ativa']);
-        if(strlen($comanda['ativa']) == 0)
+        if (strlen($comanda['ativa']) == 0) {
             $comanda['ativa'] = 'N';
-        else if(!in_array($comanda['ativa'], array('Y', 'N')))
+        } elseif (!in_array($comanda['ativa'], array('Y', 'N'))) {
             $erros['ativa'] = 'O estado de ativação da comanda não é válido';
-        if(!empty($erros))
+        }
+        if (!empty($erros)) {
             throw new \MZ\Exception\ValidationException($erros);
+        }
     }
 
-    private static function handleException(&$e) {
-        if(stripos($e->getMessage(), 'PRIMARY') !== false)
+    private static function handleException(&$e)
+    {
+        if (stripos($e->getMessage(), 'PRIMARY') !== false) {
             throw new \MZ\Exception\ValidationException(array('id' => 'O ID informado já está cadastrado'));
-        if(stripos($e->getMessage(), 'Nome_UNIQUE') !== false)
+        }
+        if (stripos($e->getMessage(), 'Nome_UNIQUE') !== false) {
             throw new \MZ\Exception\ValidationException(array('nome' => 'O Nome informado já está cadastrado'));
+        }
     }
 
-    public static function cadastrar($comanda) {
+    public static function cadastrar($comanda)
+    {
         $_comanda = $comanda->toArray();
         self::validarCampos($_comanda);
         try {
@@ -418,10 +429,12 @@ class Comanda extends \MZ\Database\Helper
         return self::getPeloID($_comanda['id']);
     }
 
-    public static function atualizar($comanda) {
+    public static function atualizar($comanda)
+    {
         $_comanda = $comanda->toArray();
-        if(!$_comanda['id'])
+        if (!$_comanda['id']) {
             throw new \MZ\Exception\ValidationException(array('id' => 'O id da comanda não foi informado'));
+        }
         self::validarCampos($_comanda);
         $campos = array(
             'nome',
@@ -439,42 +452,48 @@ class Comanda extends \MZ\Database\Helper
         return self::getPeloID($_comanda['id']);
     }
 
-    public static function excluir($id) {
-        if(!$id)
+    public static function excluir($id)
+    {
+        if (!$id) {
             throw new \Exception('Não foi possível excluir a comanda, o id da comanda não foi informado');
+        }
         $query = self::getDB()->deleteFrom('Comandas')
                          ->where(array('id' => $id));
         return $query->execute();
     }
 
-    private static function initSearch($ativa, $busca) {
+    private static function initSearch($ativa, $busca)
+    {
         $query = self::query();
         $busca = trim($busca);
-        if(is_numeric($busca)) {
+        if (is_numeric($busca)) {
             $query = $query->where('id', $busca);
-        } else if($busca != '') {
+        } elseif ($busca != '') {
             $query = $query->where('nome LIKE ?', '%'.$busca.'%');
         }
-        if(in_array($ativa, array('Y', 'N'))) {
+        if (in_array($ativa, array('Y', 'N'))) {
             $query = $query->where('ativa', $ativa);
         }
         $query = $query->orderBy('id ASC');
         return $query;
     }
 
-    public static function getTodas($ativa = null, $busca = null, $inicio = null, $quantidade = null) {
+    public static function getTodas($ativa = null, $busca = null, $inicio = null, $quantidade = null)
+    {
         $query = self::initSearch($ativa, $busca);
-        if(!is_null($inicio) && !is_null($quantidade)) {
+        if (!is_null($inicio) && !is_null($quantidade)) {
             $query = $query->limit($quantidade)->offset($inicio);
         }
         $_comandas = $query->fetchAll();
         $comandas = array();
-        foreach($_comandas as $comanda)
+        foreach ($_comandas as $comanda) {
             $comandas[] = new Comanda($comanda);
+        }
         return $comandas;
     }
 
-    public static function getCount($ativa = null, $busca = null) {
+    public static function getCount($ativa = null, $busca = null)
+    {
         $query = self::initSearch($ativa, $busca);
         return $query->count();
     }

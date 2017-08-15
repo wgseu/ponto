@@ -28,8 +28,8 @@ list($pagesize, $offset, $pagestring) = pagestring($count, 10);
 $cartoes = ZCartao::getTodos($_GET['query'], $_GET['estado'], $offset, $pagesize);
 
 $estados = array(
-	'Y' => 'Ativos',
-	'N' => 'Inativos',
+    'Y' => 'Ativos',
+    'N' => 'Inativos',
 );
 $_imagens = ZCartao::getImages();
 include template('gerenciar_cartao_index');

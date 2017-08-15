@@ -25,26 +25,26 @@ need_permission(PermissaoNome::CADASTROCOMANDAS);
 $focusctrl = 'nome';
 $errors = array();
 if ($_POST) {
-	$comanda = new \MZ\Sale\Comanda($_POST);
-	try {
-		$comanda->setID(null);
-		$comanda = \MZ\Sale\Comanda::cadastrar($comanda);
-		Thunder::success('Comanda "'.$comanda->getNome().'" cadastrada com sucesso!', true);
-		redirect('/gerenciar/comanda/');
-	} catch (ValidationException $e) {
-		$errors = $e->getErrors();
-	} catch (Exception $e) {
-		$errors['unknow'] = $e->getMessage();
-	}
-	foreach($errors as $key => $value) {
-		$focusctrl = $key;
-		Thunder::error($value);
-		break;
-	}
+    $comanda = new \MZ\Sale\Comanda($_POST);
+    try {
+        $comanda->setID(null);
+        $comanda = \MZ\Sale\Comanda::cadastrar($comanda);
+        Thunder::success('Comanda "'.$comanda->getNome().'" cadastrada com sucesso!', true);
+        redirect('/gerenciar/comanda/');
+    } catch (ValidationException $e) {
+        $errors = $e->getErrors();
+    } catch (Exception $e) {
+        $errors['unknow'] = $e->getMessage();
+    }
+    foreach ($errors as $key => $value) {
+        $focusctrl = $key;
+        Thunder::error($value);
+        break;
+    }
 } else {
-	$comanda = new \MZ\Sale\Comanda();
-	$comanda->setID(\MZ\Sale\Comanda::getProximoID());
-	$comanda->setNome('Comanda ' . $comanda->getID());
-	$comanda->setAtiva('Y');
+    $comanda = new \MZ\Sale\Comanda();
+    $comanda->setID(\MZ\Sale\Comanda::getProximoID());
+    $comanda->setNome('Comanda ' . $comanda->getID());
+    $comanda->setAtiva('Y');
 }
 include template('gerenciar_comanda_cadastrar');

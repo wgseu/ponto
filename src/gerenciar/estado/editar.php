@@ -23,30 +23,30 @@ require_once(dirname(dirname(__FILE__)) . '/app.php');
 
 need_permission(PermissaoNome::CADASTROESTADOS);
 $estado = ZEstado::getPeloID($_GET['id']);
-if(is_null($estado->getID())) {
-	Thunder::warning('O estado de id "'.$_GET['id'].'" não existe!');
-	redirect('/gerenciar/estado/');
+if (is_null($estado->getID())) {
+    Thunder::warning('O estado de id "'.$_GET['id'].'" não existe!');
+    redirect('/gerenciar/estado/');
 }
 $focusctrl = 'nome';
 $errors = array();
 $old_estado = $estado;
 if ($_POST) {
-	$estado = new ZEstado($_POST);
-	try {
-		$estado->setID($old_estado->getID());
-		$estado = ZEstado::atualizar($estado);
-		Thunder::success('Estado "'.$estado->getNome().'" atualizado com sucesso!', true);
-		redirect('/gerenciar/estado/');
-	} catch (ValidationException $e) {
-		$errors = $e->getErrors();
-	} catch (Exception $e) {
-		$errors['unknow'] = $e->getMessage();
-	}
-	foreach($errors as $key => $value) {
-		$focusctrl = $key;
-		Thunder::error($value);
-		break;
-	}
+    $estado = new ZEstado($_POST);
+    try {
+        $estado->setID($old_estado->getID());
+        $estado = ZEstado::atualizar($estado);
+        Thunder::success('Estado "'.$estado->getNome().'" atualizado com sucesso!', true);
+        redirect('/gerenciar/estado/');
+    } catch (ValidationException $e) {
+        $errors = $e->getErrors();
+    } catch (Exception $e) {
+        $errors['unknow'] = $e->getMessage();
+    }
+    foreach ($errors as $key => $value) {
+        $focusctrl = $key;
+        Thunder::error($value);
+        break;
+    }
 }
 $_paises = ZPais::getTodas();
 include template('gerenciar_estado_editar');

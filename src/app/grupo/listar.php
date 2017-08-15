@@ -21,13 +21,14 @@
 */
 require_once(dirname(dirname(dirname(__FILE__))) . '/app.php');
 
-if(!isset($_GET['produto']) || !is_numeric($_GET['produto']))
-	json('Produto não informado!');
+if (!isset($_GET['produto']) || !is_numeric($_GET['produto'])) {
+    json('Produto não informado!');
+}
 $grupos = ZGrupo::getTodosDoProdutoID(intval($_GET['produto']));
 $response = array('status' => 'ok');
 $grupos_array = array();
 foreach ($grupos as $grupo) {
-	$grupos_array[] = $grupo->toArray();
+    $grupos_array[] = $grupo->toArray();
 }
 $response['grupos'] = $grupos_array;
 json($response);

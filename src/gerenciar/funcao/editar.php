@@ -23,30 +23,30 @@ require_once(dirname(dirname(__FILE__)) . '/app.php');
 
 need_owner();
 $funcao = ZFuncao::getPeloID($_GET['id']);
-if(is_null($funcao->getID())) {
-	Thunder::warning('A função de id "'.$_GET['id'].'" não existe!');
-	redirect('/gerenciar/funcao/');
+if (is_null($funcao->getID())) {
+    Thunder::warning('A função de id "'.$_GET['id'].'" não existe!');
+    redirect('/gerenciar/funcao/');
 }
 $focusctrl = 'descricao';
 $errors = array();
 $old_funcao = $funcao;
 if ($_POST) {
-	$funcao = new ZFuncao($_POST);
-	try {
-		$funcao->setID($old_funcao->getID());
-		$funcao->setSalarioBase(moneyval($funcao->getSalarioBase()));
-		$funcao = ZFuncao::atualizar($funcao);
-		Thunder::success('Função "'.$funcao->getDescricao().'" atualizada com sucesso!', true);
-		redirect('/gerenciar/funcao/');
-	} catch (ValidationException $e) {
-		$errors = $e->getErrors();
-	} catch (Exception $e) {
-		$errors['unknow'] = $e->getMessage();
-	}
-	foreach($errors as $key => $value) {
-		$focusctrl = $key;
-		Thunder::error($value);
-		break;
-	}
+    $funcao = new ZFuncao($_POST);
+    try {
+        $funcao->setID($old_funcao->getID());
+        $funcao->setSalarioBase(moneyval($funcao->getSalarioBase()));
+        $funcao = ZFuncao::atualizar($funcao);
+        Thunder::success('Função "'.$funcao->getDescricao().'" atualizada com sucesso!', true);
+        redirect('/gerenciar/funcao/');
+    } catch (ValidationException $e) {
+        $errors = $e->getErrors();
+    } catch (Exception $e) {
+        $errors['unknow'] = $e->getMessage();
+    }
+    foreach ($errors as $key => $value) {
+        $focusctrl = $key;
+        Thunder::error($value);
+        break;
+    }
 }
 include template('gerenciar_funcao_editar');

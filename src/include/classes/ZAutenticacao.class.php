@@ -21,37 +21,42 @@
 */
 class ZAutenticacao
 {
-	public static $cookie_name = 'ru';
+    public static $cookie_name = 'ru';
 
-	public static function getCliente() {
-		$cliente_id = abs(intval(Session::Get('cliente_id')));
-		if (!$cliente_id) {
-			$cliente = ZCliente::getPeloCookie(self::$cookie_name);
-			if(!is_null($cliente->getID())) {
-				self::login($cliente->getID());
-				return $cliente;
-			}
-			return new ZCliente();
-		}
-		return ZCliente::getPeloID($cliente_id);
-	}
+    public static function getCliente()
+    {
+        $cliente_id = abs(intval(Session::Get('cliente_id')));
+        if (!$cliente_id) {
+            $cliente = ZCliente::getPeloCookie(self::$cookie_name);
+            if (!is_null($cliente->getID())) {
+                self::login($cliente->getID());
+                return $cliente;
+            }
+            return new ZCliente();
+        }
+        return ZCliente::getPeloID($cliente_id);
+    }
 
-	public static function login($cliente_id) {
-		Session::Set('cliente_id', $cliente_id);
-		return true;
-	}
+    public static function login($cliente_id)
+    {
+        Session::Set('cliente_id', $cliente_id);
+        return true;
+    }
 
-	public static function lembrar($cliente) {
-		$zone = $cliente->getID().'@'.$cliente->getSenha();
-		cookieset(self::$cookie_name, base64_encode($zone), 30*86400);
-	}
+    public static function lembrar($cliente)
+    {
+        $zone = $cliente->getID().'@'.$cliente->getSenha();
+        cookieset(self::$cookie_name, base64_encode($zone), 30*86400);
+    }
 
-	public static function esquecer() {
-		cookieset(self::$cookie_name, null, -1);
-	}
-	
-	public static function logout() {
-		Session::Get('cliente_id', true);
-		self::esquecer();
-	}
+    public static function esquecer()
+    {
+        cookieset(self::$cookie_name, null, -1);
+    }
+    
+    public static function logout()
+    {
+        Session::Get('cliente_id', true);
+        self::esquecer();
+    }
 }

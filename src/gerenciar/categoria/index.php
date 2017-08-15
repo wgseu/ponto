@@ -30,7 +30,7 @@ $categorias = ZCategoria::getTodas(true, $_GET['categoria'], $_GET['query'], $of
 $_sup_categorias = ZCategoria::getTodas(true, true);
 $sup_categorias = array();
 foreach ($_sup_categorias as $categoria) {
-	$sup_categorias[$categoria->getID()] = $categoria->getDescricao();
+    $sup_categorias[$categoria->getID()] = $categoria->getDescricao();
 }
 
 include template('gerenciar_categoria_index');

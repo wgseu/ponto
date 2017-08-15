@@ -24,14 +24,14 @@ require_once(dirname(dirname(__FILE__)) . '/app.php');
 need_permission(PermissaoNome::CADASTROBAIRROS);
 $id = $_GET['id'];
 $bairro = ZBairro::getPeloID($id);
-if(is_null($bairro->getID())) {
-	Thunder::warning('O bairro de id "'.$id.'" não existe!');
-	redirect('/gerenciar/bairro/');
+if (is_null($bairro->getID())) {
+    Thunder::warning('O bairro de id "'.$id.'" não existe!');
+    redirect('/gerenciar/bairro/');
 }
 try {
-	ZBairro::excluir($id);
-	Thunder::success('Bairro "' . $bairro->getNome() . '" excluído com sucesso!', true);
+    ZBairro::excluir($id);
+    Thunder::success('Bairro "' . $bairro->getNome() . '" excluído com sucesso!', true);
 } catch (Exception $e) {
-	Thunder::error('Não foi possível excluir o bairro "' . $bairro->getNome() . '"!');
+    Thunder::error('Não foi possível excluir o bairro "' . $bairro->getNome() . '"!');
 }
 redirect('/gerenciar/bairro/');

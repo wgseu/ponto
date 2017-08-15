@@ -23,30 +23,30 @@ require_once(dirname(dirname(__FILE__)) . '/app.php');
 
 need_permission(PermissaoNome::CADASTROMOEDAS);
 $moeda = ZMoeda::getPeloID($_GET['id']);
-if(is_null($moeda->getID())) {
-	Thunder::warning('A moeda de id "'.$_GET['id'].'" não existe!');
-	redirect('/gerenciar/moeda/');
+if (is_null($moeda->getID())) {
+    Thunder::warning('A moeda de id "'.$_GET['id'].'" não existe!');
+    redirect('/gerenciar/moeda/');
 }
 $focusctrl = 'nome';
 $errors = array();
 $old_moeda = $moeda;
 if ($_POST) {
-	$moeda = new ZMoeda($_POST);
-	try {
-		$moeda->setID($old_moeda->getID());
-		$moeda->setDivisao(numberval($moeda->getDivisao()));
-		$moeda = ZMoeda::atualizar($moeda);
-		Thunder::success('Moeda "'.$moeda->getNome().'" atualizada com sucesso!', true);
-		redirect('/gerenciar/moeda/');
-	} catch (ValidationException $e) {
-		$errors = $e->getErrors();
-	} catch (Exception $e) {
-		$errors['unknow'] = $e->getMessage();
-	}
-	foreach($errors as $key => $value) {
-		$focusctrl = $key;
-		Thunder::error($value);
-		break;
-	}
+    $moeda = new ZMoeda($_POST);
+    try {
+        $moeda->setID($old_moeda->getID());
+        $moeda->setDivisao(numberval($moeda->getDivisao()));
+        $moeda = ZMoeda::atualizar($moeda);
+        Thunder::success('Moeda "'.$moeda->getNome().'" atualizada com sucesso!', true);
+        redirect('/gerenciar/moeda/');
+    } catch (ValidationException $e) {
+        $errors = $e->getErrors();
+    } catch (Exception $e) {
+        $errors['unknow'] = $e->getMessage();
+    }
+    foreach ($errors as $key => $value) {
+        $focusctrl = $key;
+        Thunder::error($value);
+        break;
+    }
 }
 include template('gerenciar_moeda_editar');

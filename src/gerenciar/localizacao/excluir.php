@@ -24,14 +24,14 @@ require_once(dirname(dirname(__FILE__)) . '/app.php');
 need_permission(PermissaoNome::CADASTROCLIENTES);
 $id = $_GET['id'];
 $localizacao = ZLocalizacao::getPeloID($id);
-if(is_null($localizacao->getID())) {
-	Thunder::warning('A localização de id "'.$id.'" não existe!');
-	redirect('/gerenciar/localizacao/');
+if (is_null($localizacao->getID())) {
+    Thunder::warning('A localização de id "'.$id.'" não existe!');
+    redirect('/gerenciar/localizacao/');
 }
 try {
-	ZLocalizacao::excluir($id);
-	Thunder::success('Localização "' . $localizacao->getLogradouro() . '" excluída com sucesso!', true);
+    ZLocalizacao::excluir($id);
+    Thunder::success('Localização "' . $localizacao->getLogradouro() . '" excluída com sucesso!', true);
 } catch (Exception $e) {
-	Thunder::error('Não foi possível excluir a localização "' . $localizacao->getLogradouro() . '"!');
+    Thunder::error('Não foi possível excluir a localização "' . $localizacao->getLogradouro() . '"!');
 }
 redirect('/gerenciar/localizacao/');

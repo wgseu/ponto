@@ -23,32 +23,32 @@ require_once(dirname(dirname(__FILE__)) . '/app.php');
 
 need_permission(PermissaoNome::CADASTROCAIXAS);
 $caixa = ZCaixa::getPeloID($_GET['id']);
-if(is_null($caixa->getID())) {
-	Thunder::warning('O caixa de id "'.$_GET['id'].'" não existe!');
-	redirect('/gerenciar/caixa/');
+if (is_null($caixa->getID())) {
+    Thunder::warning('O caixa de id "'.$_GET['id'].'" não existe!');
+    redirect('/gerenciar/caixa/');
 }
 $focusctrl = 'descricao';
 $errors = array();
 $old_caixa = $caixa;
 if ($_POST) {
-	$caixa = new ZCaixa($_POST);
-	try {
-		$caixa->setID($old_caixa->getID());
-		$caixa->setNumeroInicial($old_caixa->getNumeroInicial());
-		$caixa->setSerie($old_caixa->getSerie());
+    $caixa = new ZCaixa($_POST);
+    try {
+        $caixa->setID($old_caixa->getID());
+        $caixa->setNumeroInicial($old_caixa->getNumeroInicial());
+        $caixa->setSerie($old_caixa->getSerie());
 
-		$caixa = ZCaixa::atualizar($caixa);
-		Thunder::success('Caixa "'.$caixa->getDescricao().'" atualizado com sucesso!', true);
-		redirect('/gerenciar/caixa/');
-	} catch (ValidationException $e) {
-		$errors = $e->getErrors();
-	} catch (Exception $e) {
-		$errors['unknow'] = $e->getMessage();
-	}
-	foreach($errors as $key => $value) {
-		$focusctrl = $key;
-		Thunder::error($value);
-		break;
-	}
+        $caixa = ZCaixa::atualizar($caixa);
+        Thunder::success('Caixa "'.$caixa->getDescricao().'" atualizado com sucesso!', true);
+        redirect('/gerenciar/caixa/');
+    } catch (ValidationException $e) {
+        $errors = $e->getErrors();
+    } catch (Exception $e) {
+        $errors['unknow'] = $e->getMessage();
+    }
+    foreach ($errors as $key => $value) {
+        $focusctrl = $key;
+        Thunder::error($value);
+        break;
+    }
 }
 include template('gerenciar_caixa_editar');

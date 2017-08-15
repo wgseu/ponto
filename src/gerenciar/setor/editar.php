@@ -23,29 +23,29 @@ require_once(dirname(dirname(__FILE__)) . '/app.php');
 
 need_permission(PermissaoNome::ESTOQUE);
 $setor = ZSetor::getPeloID($_GET['id']);
-if(is_null($setor->getID())) {
-	Thunder::warning('O setor de id "'.$_GET['id'].'" não existe!');
-	redirect('/gerenciar/setor/');
+if (is_null($setor->getID())) {
+    Thunder::warning('O setor de id "'.$_GET['id'].'" não existe!');
+    redirect('/gerenciar/setor/');
 }
 $focusctrl = 'nome';
 $errors = array();
 $old_setor = $setor;
 if ($_POST) {
-	$setor = new ZSetor($_POST);
-	try {
-		$setor->setID($old_setor->getID());
-		$setor = ZSetor::atualizar($setor);
-		Thunder::success('Setor "'.$setor->getNome().'" atualizado com sucesso!', true);
-		redirect('/gerenciar/setor/');
-	} catch (ValidationException $e) {
-		$errors = $e->getErrors();
-	} catch (Exception $e) {
-		$errors['unknow'] = $e->getMessage();
-	}
-	foreach($errors as $key => $value) {
-		$focusctrl = $key;
-		Thunder::error($value);
-		break;
-	}
+    $setor = new ZSetor($_POST);
+    try {
+        $setor->setID($old_setor->getID());
+        $setor = ZSetor::atualizar($setor);
+        Thunder::success('Setor "'.$setor->getNome().'" atualizado com sucesso!', true);
+        redirect('/gerenciar/setor/');
+    } catch (ValidationException $e) {
+        $errors = $e->getErrors();
+    } catch (Exception $e) {
+        $errors['unknow'] = $e->getMessage();
+    }
+    foreach ($errors as $key => $value) {
+        $focusctrl = $key;
+        Thunder::error($value);
+        break;
+    }
 }
 include template('gerenciar_setor_editar');

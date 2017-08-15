@@ -24,14 +24,14 @@ require_once(dirname(dirname(__FILE__)) . '/app.php');
 need_permission(PermissaoNome::CADASTROESTADOS);
 $id = $_GET['id'];
 $estado = ZEstado::getPeloID($id);
-if(is_null($estado->getID())) {
-	Thunder::warning('O estado de id "'.$id.'" não existe!');
-	redirect('/gerenciar/estado/');
+if (is_null($estado->getID())) {
+    Thunder::warning('O estado de id "'.$id.'" não existe!');
+    redirect('/gerenciar/estado/');
 }
 try {
-	ZEstado::excluir($id);
-	Thunder::success('Estado "' . $estado->getNome() . '" excluído com sucesso!', true);
+    ZEstado::excluir($id);
+    Thunder::success('Estado "' . $estado->getNome() . '" excluído com sucesso!', true);
 } catch (Exception $e) {
-	Thunder::error('Não foi possível excluir o estado "' . $estado->getNome() . '"!');
+    Thunder::error('Não foi possível excluir o estado "' . $estado->getNome() . '"!');
 }
 redirect('/gerenciar/estado/');

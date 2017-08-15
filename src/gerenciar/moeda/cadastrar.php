@@ -25,24 +25,24 @@ need_permission(PermissaoNome::CADASTROMOEDAS);
 $focusctrl = 'nome';
 $errors = array();
 if ($_POST) {
-	$moeda = new ZMoeda($_POST);
-	try {
-		$moeda->setID(null);
-		$moeda->setDivisao(numberval($moeda->getDivisao()));
-		$moeda = ZMoeda::cadastrar($moeda);
-		Thunder::success('Moeda "'.$moeda->getNome().'" cadastrada com sucesso!', true);
-		redirect('/gerenciar/moeda/');
-	} catch (ValidationException $e) {
-		$errors = $e->getErrors();
-	} catch (Exception $e) {
-		$errors['unknow'] = $e->getMessage();
-	}
-	foreach($errors as $key => $value) {
-		$focusctrl = $key;
-		Thunder::error($value);
-		break;
-	}
+    $moeda = new ZMoeda($_POST);
+    try {
+        $moeda->setID(null);
+        $moeda->setDivisao(numberval($moeda->getDivisao()));
+        $moeda = ZMoeda::cadastrar($moeda);
+        Thunder::success('Moeda "'.$moeda->getNome().'" cadastrada com sucesso!', true);
+        redirect('/gerenciar/moeda/');
+    } catch (ValidationException $e) {
+        $errors = $e->getErrors();
+    } catch (Exception $e) {
+        $errors['unknow'] = $e->getMessage();
+    }
+    foreach ($errors as $key => $value) {
+        $focusctrl = $key;
+        Thunder::error($value);
+        break;
+    }
 } else {
-	$moeda = new ZMoeda();
+    $moeda = new ZMoeda();
 }
 include template('gerenciar_moeda_cadastrar');

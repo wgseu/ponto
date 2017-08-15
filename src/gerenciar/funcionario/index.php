@@ -23,32 +23,33 @@ require_once(dirname(dirname(__FILE__)) . '/app.php');
 
 need_manager();
 $funcao = ZFuncao::getPeloID($_GET['funcao']);
-if($_GET['estado'] == 'ativo')
-	$estado = 'Y';
-else if($_GET['estado'] == 'inativo')
-	$estado = 'N';
-else
-	$estado = null;
-$funcoes = array();
-if(have_permission(PermissaoNome::CADASTROFUNCIONARIOS)) {
-	$count = ZFuncionario::getCount($_GET['query'], $funcao->getID(), $_GET['genero'], $estado);
-	list($pagesize, $offset, $pagestring) = pagestring($count, 10);
-	$funcionarios = ZFuncionario::getTodos($_GET['query'], $funcao->getID(), $_GET['genero'], $estado, $offset, $pagesize);
-	$_funcoes = ZFuncao::getTodas();
-	foreach ($_funcoes as $funcao) {
-		$funcoes[$funcao->getID()] = $funcao->getDescricao();
-	}
+if ($_GET['estado'] == 'ativo') {
+    $estado = 'Y';
+} elseif ($_GET['estado'] == 'inativo') {
+    $estado = 'N';
 } else {
-	$funcionarios = array();
-	$funcionarios[] = $login_funcionario;
+    $estado = null;
+}
+$funcoes = array();
+if (have_permission(PermissaoNome::CADASTROFUNCIONARIOS)) {
+    $count = ZFuncionario::getCount($_GET['query'], $funcao->getID(), $_GET['genero'], $estado);
+    list($pagesize, $offset, $pagestring) = pagestring($count, 10);
+    $funcionarios = ZFuncionario::getTodos($_GET['query'], $funcao->getID(), $_GET['genero'], $estado, $offset, $pagesize);
+    $_funcoes = ZFuncao::getTodas();
+    foreach ($_funcoes as $funcao) {
+        $funcoes[$funcao->getID()] = $funcao->getDescricao();
+    }
+} else {
+    $funcionarios = array();
+    $funcionarios[] = $login_funcionario;
 }
 $generos = array(
-	ClienteGenero::MASCULINO => 'Masculino',
-	ClienteGenero::FEMININO => 'Feminino',
+    ClienteGenero::MASCULINO => 'Masculino',
+    ClienteGenero::FEMININO => 'Feminino',
 );
 $estados = array(
-	'ativo' => 'Ativo',
-	'inativo' => 'Inativo',
+    'ativo' => 'Ativo',
+    'inativo' => 'Inativo',
 );
 $linguagens = get_languages_info();
 include template('gerenciar_funcionario_index');

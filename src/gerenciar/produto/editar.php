@@ -23,47 +23,48 @@ require_once(dirname(dirname(__FILE__)) . '/app.php');
 
 need_permission(PermissaoNome::CADASTROPRODUTOS);
 $produto = ZProduto::getPeloID($_GET['id']);
-if(is_null($produto->getID())) {
-	Thunder::warning('O produto de id "'.$_GET['id'].'" não existe!');
-	redirect('/gerenciar/produto/');
+if (is_null($produto->getID())) {
+    Thunder::warning('O produto de id "'.$_GET['id'].'" não existe!');
+    redirect('/gerenciar/produto/');
 }
 $focusctrl = 'descricao';
 $errors = array();
 $old_produto = $produto;
 if ($_POST) {
-	$produto = new ZProduto($_POST);
-	try {
-		$produto->setID($old_produto->getID());
-		$produto->setTributacaoID($old_produto->getTributacaoID());
+    $produto = new ZProduto($_POST);
+    try {
+        $produto->setID($old_produto->getID());
+        $produto->setTributacaoID($old_produto->getTributacaoID());
 
-		$produto->setQuantidadeLimite(moneyval($produto->getQuantidadeLimite()));
-		$produto->setQuantidadeMaxima(moneyval($produto->getQuantidadeMaxima()));
-		$produto->setConteudo(moneyval($produto->getConteudo()));
-		$produto->setPrecoVenda(moneyval($produto->getPrecoVenda()));
-		$produto->setCustoProducao(moneyval($produto->getCustoProducao()));
-		$produto->setTempoPreparo(numberval($produto->getTempoPreparo()));
-		$imagem = upload_image('raw_imagem', 'produto', null, 256, 256, true);
-		if(!is_null($imagem)) {
-			$produto->setImagem(file_get_contents(WWW_ROOT . get_image_url($imagem, 'produto')));
-			unlink(WWW_ROOT . get_image_url($imagem, 'produto'));
-		} else if(trim($produto->getImagem()) != '') // evita sobrescrever
-			$produto->setImagem(true);
-		$produto->setDataAtualizacao(date('Y-m-d H:i:s', time()));
-		$produto = ZProduto::atualizar($produto);
-		Thunder::success('Produto "'.$produto->getDescricao().'" atualizado com sucesso!', true);
-		redirect('/gerenciar/produto/');
-	} catch (ValidationException $e) {
-		$errors = $e->getErrors();
-	} catch (Exception $e) {
-		$errors['unknow'] = $e->getMessage();
-	}
-	// restaura a imagem original
-	$produto->setImagem($old_produto->getImagem());
-	foreach($errors as $key => $value) {
-		$focusctrl = $key;
-		Thunder::error($value);
-		break;
-	}
+        $produto->setQuantidadeLimite(moneyval($produto->getQuantidadeLimite()));
+        $produto->setQuantidadeMaxima(moneyval($produto->getQuantidadeMaxima()));
+        $produto->setConteudo(moneyval($produto->getConteudo()));
+        $produto->setPrecoVenda(moneyval($produto->getPrecoVenda()));
+        $produto->setCustoProducao(moneyval($produto->getCustoProducao()));
+        $produto->setTempoPreparo(numberval($produto->getTempoPreparo()));
+        $imagem = upload_image('raw_imagem', 'produto', null, 256, 256, true);
+        if (!is_null($imagem)) {
+            $produto->setImagem(file_get_contents(WWW_ROOT . get_image_url($imagem, 'produto')));
+            unlink(WWW_ROOT . get_image_url($imagem, 'produto'));
+        } elseif (trim($produto->getImagem()) != '') { // evita sobrescrever
+            $produto->setImagem(true);
+        }
+        $produto->setDataAtualizacao(date('Y-m-d H:i:s', time()));
+        $produto = ZProduto::atualizar($produto);
+        Thunder::success('Produto "'.$produto->getDescricao().'" atualizado com sucesso!', true);
+        redirect('/gerenciar/produto/');
+    } catch (ValidationException $e) {
+        $errors = $e->getErrors();
+    } catch (Exception $e) {
+        $errors['unknow'] = $e->getMessage();
+    }
+    // restaura a imagem original
+    $produto->setImagem($old_produto->getImagem());
+    foreach ($errors as $key => $value) {
+        $focusctrl = $key;
+        Thunder::error($value);
+        break;
+    }
 }
 $_categorias = ZCategoria::getTodas(true);
 $_unidades = ZUnidade::getTodas();

@@ -24,38 +24,40 @@ require_once(dirname(dirname(dirname(__FILE__))) . '/app.php');
 need_manager(true);
 
 $limit = intval($_GET['limite']);
-if($_GET['primeiro'] || check_fone($_GET['busca'], true))
-	$limit = 1;
-else if($limit < 1)
-	$limit = 5;
-else if($limit > 20)
-	$limit = 20;
+if ($_GET['primeiro'] || check_fone($_GET['busca'], true)) {
+    $limit = 1;
+} elseif ($limit < 1) {
+    $limit = 5;
+} elseif ($limit > 20) {
+    $limit = 20;
+}
 $funcionarios = ZFuncionario::getTodos($_GET['busca'], null, null, $_GET['ativo'], 0, $limit);
 $response = array('status' => 'ok');
 $campos = array(
-			'id',
-			'nome',
-			'fone1',
-			'cpf',
-			'email',
-			'funcao',
-			'imagemurl',
-		);
+            'id',
+            'nome',
+            'fone1',
+            'cpf',
+            'email',
+            'funcao',
+            'imagemurl',
+        );
 $_funcionarios = array();
 $domask = intval($_GET['format']) != 0;
 foreach ($funcionarios as $funcionario) {
-	$_funcionario = $funcionario->toArray();
-	$funcao = ZFuncao::getPeloID($funcionario->getFuncaoID());
-	$cliente = ZCliente::getPeloID($funcionario->getClienteID());
-	$_funcionario['nome'] = $cliente->getNomeCompleto();
-	$_funcionario['fone1'] = $cliente->getFone(1);
-	$_funcionario['cpf'] = $cliente->getCPF();
-	$_funcionario['email'] = $cliente->getEmail();
-	$_funcionario['funcao'] = $funcao->getDescricao();
-	if($domask)
-		$_funcionario['fone1'] = \MZ\Util\Mask::phone($_funcionario['fone1']); 
-	$_funcionario['imagemurl'] = get_image_url($cliente->getImagem(), 'cliente', null);
-	$_funcionarios[] = array_intersect_key($_funcionario, array_flip($campos));
+    $_funcionario = $funcionario->toArray();
+    $funcao = ZFuncao::getPeloID($funcionario->getFuncaoID());
+    $cliente = ZCliente::getPeloID($funcionario->getClienteID());
+    $_funcionario['nome'] = $cliente->getNomeCompleto();
+    $_funcionario['fone1'] = $cliente->getFone(1);
+    $_funcionario['cpf'] = $cliente->getCPF();
+    $_funcionario['email'] = $cliente->getEmail();
+    $_funcionario['funcao'] = $funcao->getDescricao();
+    if ($domask) {
+        $_funcionario['fone1'] = \MZ\Util\Mask::phone($_funcionario['fone1']);
+    }
+    $_funcionario['imagemurl'] = get_image_url($cliente->getImagem(), 'cliente', null);
+    $_funcionarios[] = array_intersect_key($_funcionario, array_flip($campos));
 }
 $response['items'] = $_funcionarios;
 json($response);

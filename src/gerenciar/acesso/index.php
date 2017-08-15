@@ -23,49 +23,53 @@ require_once(dirname(dirname(__FILE__)) . '/app.php');
 
 need_owner($_GET['saida'] == 'json');
 $funcao = ZFuncao::getPeloID($_GET['funcao']?:$_POST['funcao']);
-if(is_null($funcao->getID())) {
-	if($_GET['saida'] == 'json')
-		json('A função não foi informada ou não existe');
-	redirect('/gerenciar/funcao/');
+if (is_null($funcao->getID())) {
+    if ($_GET['saida'] == 'json') {
+        json('A função não foi informada ou não existe');
+    }
+    redirect('/gerenciar/funcao/');
 }
 $errors = array();
-if($_POST) {
-	try {
-		$permissao = ZPermissao::getPeloID($_POST['permissao']);
-		if (is_null($permissao->getID()))
-		    throw new Exception('A permissão informada não existe', 1);
-		if($_POST['marcado'] == 'Y') {
-			$acesso = new ZAcesso();
-			$acesso->setFuncaoID($funcao->getID());
-			$acesso->setPermissaoID($permissao->getID());
-			$acesso = ZAcesso::cadastrar($acesso);
-		} else {
-			$acesso = ZAcesso::getPelaFuncaoIDPermissaoID($funcao->getID(), $permissao->getID());
-			ZAcesso::excluir($acesso->getID());
-		}
-		if($_GET['saida'] == 'json')
-			json(array('status' => 'ok'));
-		redirect('/gerenciar/acesso/?funcao='.$funcao->getID());
-	} catch (Exception $e) {
-		$errors['unknow'] = $e->getMessage();
-	}
-	foreach($errors as $key => $value) {
-		$focusctrl = $key;
-		if($_GET['saida'] == 'json')
-			json($value);
-		Thunder::error($value);
-		break;
-	}
+if ($_POST) {
+    try {
+        $permissao = ZPermissao::getPeloID($_POST['permissao']);
+        if (is_null($permissao->getID())) {
+            throw new Exception('A permissão informada não existe', 1);
+        }
+        if ($_POST['marcado'] == 'Y') {
+            $acesso = new ZAcesso();
+            $acesso->setFuncaoID($funcao->getID());
+            $acesso->setPermissaoID($permissao->getID());
+            $acesso = ZAcesso::cadastrar($acesso);
+        } else {
+            $acesso = ZAcesso::getPelaFuncaoIDPermissaoID($funcao->getID(), $permissao->getID());
+            ZAcesso::excluir($acesso->getID());
+        }
+        if ($_GET['saida'] == 'json') {
+            json(array('status' => 'ok'));
+        }
+        redirect('/gerenciar/acesso/?funcao='.$funcao->getID());
+    } catch (Exception $e) {
+        $errors['unknow'] = $e->getMessage();
+    }
+    foreach ($errors as $key => $value) {
+        $focusctrl = $key;
+        if ($_GET['saida'] == 'json') {
+            json($value);
+        }
+        Thunder::error($value);
+        break;
+    }
 }
 $permissoes = ZPermissao::getTodas($_GET['query']);
-if($_GET['saida'] == 'json') {
-	$_permissoes = array();
-	foreach ($permissoes as $permissao) {
-		$_permissao = $permissao->toArray();
-		$_acesso = ZAcesso::getPelaFuncaoIDPermissaoID($funcao->getID(), $permissao->getID());
-		$_permissao['marcado'] = is_null($_acesso->getID())?'N':'Y';
-		$_permissoes[] = $_permissao;
-	}
-	json(array('status' => 'ok', 'items' => $_permissoes));
+if ($_GET['saida'] == 'json') {
+    $_permissoes = array();
+    foreach ($permissoes as $permissao) {
+        $_permissao = $permissao->toArray();
+        $_acesso = ZAcesso::getPelaFuncaoIDPermissaoID($funcao->getID(), $permissao->getID());
+        $_permissao['marcado'] = is_null($_acesso->getID())?'N':'Y';
+        $_permissoes[] = $_permissao;
+    }
+    json(array('status' => 'ok', 'items' => $_permissoes));
 }
 include template('gerenciar_acesso_index');

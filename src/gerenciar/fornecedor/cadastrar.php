@@ -25,27 +25,28 @@ need_permission(PermissaoNome::CADASTROFORNECEDORES);
 $focusctrl = 'empresaid';
 $errors = array();
 if ($_POST) {
-	$fornecedor = new ZFornecedor($_POST);
-	try {
-		$fornecedor->setID(null);
-		$fornecedor->setPrazoPagamento(numberval($fornecedor->getPrazoPagamento()));
-		$fornecedor = ZFornecedor::cadastrar($fornecedor);
-		Thunder::success('Fornecedor "'.$fornecedor->getEmpresaID().'" cadastrado com sucesso!', true);
-		redirect('/gerenciar/fornecedor/');
-	} catch (ValidationException $e) {
-		$errors = $e->getErrors();
-	} catch (Exception $e) {
-		$errors['unknow'] = $e->getMessage();
-	}
-	foreach($errors as $key => $value) {
-		$focusctrl = $key;
-		Thunder::error($value);
-		break;
-	}
+    $fornecedor = new ZFornecedor($_POST);
+    try {
+        $fornecedor->setID(null);
+        $fornecedor->setPrazoPagamento(numberval($fornecedor->getPrazoPagamento()));
+        $fornecedor = ZFornecedor::cadastrar($fornecedor);
+        Thunder::success('Fornecedor "'.$fornecedor->getEmpresaID().'" cadastrado com sucesso!', true);
+        redirect('/gerenciar/fornecedor/');
+    } catch (ValidationException $e) {
+        $errors = $e->getErrors();
+    } catch (Exception $e) {
+        $errors['unknow'] = $e->getMessage();
+    }
+    foreach ($errors as $key => $value) {
+        $focusctrl = $key;
+        Thunder::error($value);
+        break;
+    }
 } else {
-	$fornecedor = new ZFornecedor();
-	$fornecedor->setPrazoPagamento(30);
+    $fornecedor = new ZFornecedor();
+    $fornecedor->setPrazoPagamento(30);
 }
-if($focusctrl == 'empresaid')
-	$focusctrl = 'empresa';
+if ($focusctrl == 'empresaid') {
+    $focusctrl = 'empresa';
+}
 include template('gerenciar_fornecedor_cadastrar');

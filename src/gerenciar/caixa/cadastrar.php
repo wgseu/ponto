@@ -25,24 +25,24 @@ need_permission(PermissaoNome::CADASTROCAIXAS);
 $focusctrl = 'descricao';
 $errors = array();
 if ($_POST) {
-	$caixa = new ZCaixa($_POST);
-	try {
-		$caixa->setID(null);
-		$caixa = ZCaixa::cadastrar($caixa);
-		Thunder::success('Caixa "'.$caixa->getDescricao().'" cadastrado com sucesso!', true);
-		redirect('/gerenciar/caixa/');
-	} catch (ValidationException $e) {
-		$errors = $e->getErrors();
-	} catch (Exception $e) {
-		$errors['unknow'] = $e->getMessage();
-	}
-	foreach($errors as $key => $value) {
-		$focusctrl = $key;
-		Thunder::error($value);
-		break;
-	}
+    $caixa = new ZCaixa($_POST);
+    try {
+        $caixa->setID(null);
+        $caixa = ZCaixa::cadastrar($caixa);
+        Thunder::success('Caixa "'.$caixa->getDescricao().'" cadastrado com sucesso!', true);
+        redirect('/gerenciar/caixa/');
+    } catch (ValidationException $e) {
+        $errors = $e->getErrors();
+    } catch (Exception $e) {
+        $errors['unknow'] = $e->getMessage();
+    }
+    foreach ($errors as $key => $value) {
+        $focusctrl = $key;
+        Thunder::error($value);
+        break;
+    }
 } else {
-	$caixa = new ZCaixa();
-	$caixa->setAtivo('Y');
+    $caixa = new ZCaixa();
+    $caixa->setAtivo('Y');
 }
 include template('gerenciar_caixa_cadastrar');

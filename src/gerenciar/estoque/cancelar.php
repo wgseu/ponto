@@ -24,24 +24,27 @@ require_once(dirname(dirname(__FILE__)) . '/app.php');
 need_permission(array(PermissaoNome::ESTOQUE, PermissaoNome::RETIRARDOESTOQUE), $_GET['saida'] == 'json');
 $id = $_GET['id'];
 $estoque = ZEstoque::getPeloID($id);
-if(is_null($estoque->getID())) {
-	$msg = 'O estoque de id "'.$id.'" não existe!';
-	if($_GET['saida'] == 'json')
-		json($msg);
-	Thunder::warning($msg);
-	redirect('/gerenciar/estoque/');
+if (is_null($estoque->getID())) {
+    $msg = 'O estoque de id "'.$id.'" não existe!';
+    if ($_GET['saida'] == 'json') {
+        json($msg);
+    }
+    Thunder::warning($msg);
+    redirect('/gerenciar/estoque/');
 }
 try {
-	$produto = ZProduto::getPeloID($estoque->getProdutoID());
-	$estoque->cancelar();
-	$msg = 'Entrada do produto "' . $produto->getDescricao() . '" e quantidade ' . $estoque->getQuantidade() . ' cancelada com sucesso!';
-	if($_GET['saida'] == 'json')
-		json('msg', $msg);
-	Thunder::success($msg, true);
+    $produto = ZProduto::getPeloID($estoque->getProdutoID());
+    $estoque->cancelar();
+    $msg = 'Entrada do produto "' . $produto->getDescricao() . '" e quantidade ' . $estoque->getQuantidade() . ' cancelada com sucesso!';
+    if ($_GET['saida'] == 'json') {
+        json('msg', $msg);
+    }
+    Thunder::success($msg, true);
 } catch (Exception $e) {
-	$msg = $e->getMessage();
-	if($_GET['saida'] == 'json')
-		json($msg);
-	Thunder::error($msg);
+    $msg = $e->getMessage();
+    if ($_GET['saida'] == 'json') {
+        json($msg);
+    }
+    Thunder::error($msg);
 }
 redirect('/gerenciar/estoque/');

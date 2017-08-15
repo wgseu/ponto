@@ -21,33 +21,38 @@
 */
 require_once(dirname(dirname(dirname(__FILE__))) . '/app.php');
 
-if(!is_login())
-	json('Usuário não autenticado!');
-if(!have_permission(PermissaoNome::PEDIDOCOMANDA))
-	json('Você não tem permissão para acessar comandas');
+if (!is_login()) {
+    json('Usuário não autenticado!');
+}
+if (!have_permission(PermissaoNome::PEDIDOCOMANDA)) {
+    json('Você não tem permissão para acessar comandas');
+}
 /* verifica se deve ordenar pelo número da comanda ou pelo funcionário */
 $funcionario_id = null;
-if(!isset($_GET['ordenar']) && $_GET['ordenar'] != 'comanda')
-	$funcionario_id = $login_funcionario_id;
+if (!isset($_GET['ordenar']) && $_GET['ordenar'] != 'comanda') {
+    $funcionario_id = $login_funcionario_id;
+}
 $comandas = ZPedido::getTodasComandas($funcionario_id);
 $items = array();
 $obs_name = is_boolean_config('Vendas', 'Comanda.Observacao');
 foreach ($comandas as $_comanda) {
-	switch ($_comanda['estado']) {
-		case PedidoEstado::ATIVO:
-			$_comanda['estado'] = 'ocupado';
-			break;
-		case PedidoEstado::AGENDADO:
-			$_comanda['estado'] = 'reservado';
-			break;
-		default:
-			if(is_null($_comanda['estado']))
-				$_comanda['estado'] = 'livre';
-			else
-				$_comanda['estado'] = strtolower($_comanda['estado']);
-	}
-	if($obs_name && trim($_comanda['observacao']) != '')
-		$_comanda['nome'] = $_comanda['observacao'];
-	$items[] = $_comanda;
+    switch ($_comanda['estado']) {
+        case PedidoEstado::ATIVO:
+            $_comanda['estado'] = 'ocupado';
+            break;
+        case PedidoEstado::AGENDADO:
+            $_comanda['estado'] = 'reservado';
+            break;
+        default:
+            if (is_null($_comanda['estado'])) {
+                $_comanda['estado'] = 'livre';
+            } else {
+                $_comanda['estado'] = strtolower($_comanda['estado']);
+            }
+    }
+    if ($obs_name && trim($_comanda['observacao']) != '') {
+        $_comanda['nome'] = $_comanda['observacao'];
+    }
+    $items[] = $_comanda;
 }
 json('comandas', $items);

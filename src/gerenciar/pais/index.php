@@ -30,7 +30,7 @@ $paises = ZPais::getTodas($_GET['query'], $_GET['moeda'], $offset, $pagesize);
 $moedas = ZMoeda::getTodas();
 $_moeda_names = array();
 foreach ($moedas as $moeda) {
-	$_moeda_names[$moeda->getID()] = $moeda->getNome();
+    $_moeda_names[$moeda->getID()] = $moeda->getNome();
 }
 
 include template('gerenciar_pais_index');

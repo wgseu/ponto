@@ -23,29 +23,29 @@ require_once(dirname(dirname(__FILE__)) . '/app.php');
 
 need_permission(PermissaoNome::CADASTROPRODUTOS);
 $unidade = ZUnidade::getPeloID($_GET['id']);
-if(is_null($unidade->getID())) {
-	Thunder::warning('A unidade de id "'.$_GET['id'].'" não existe!');
-	redirect('/gerenciar/unidade/');
+if (is_null($unidade->getID())) {
+    Thunder::warning('A unidade de id "'.$_GET['id'].'" não existe!');
+    redirect('/gerenciar/unidade/');
 }
 $focusctrl = 'nome';
 $errors = array();
 $old_unidade = $unidade;
 if ($_POST) {
-	$unidade = new ZUnidade($_POST);
-	try {
-		$unidade->setID($old_unidade->getID());
-		$unidade = ZUnidade::atualizar($unidade);
-		Thunder::success('Unidade "'.$unidade->getNome().'" atualizada com sucesso!', true);
-		redirect('/gerenciar/unidade/');
-	} catch (ValidationException $e) {
-		$errors = $e->getErrors();
-	} catch (Exception $e) {
-		$errors['unknow'] = $e->getMessage();
-	}
-	foreach($errors as $key => $value) {
-		$focusctrl = $key;
-		Thunder::error($value);
-		break;
-	}
+    $unidade = new ZUnidade($_POST);
+    try {
+        $unidade->setID($old_unidade->getID());
+        $unidade = ZUnidade::atualizar($unidade);
+        Thunder::success('Unidade "'.$unidade->getNome().'" atualizada com sucesso!', true);
+        redirect('/gerenciar/unidade/');
+    } catch (ValidationException $e) {
+        $errors = $e->getErrors();
+    } catch (Exception $e) {
+        $errors['unknow'] = $e->getMessage();
+    }
+    foreach ($errors as $key => $value) {
+        $focusctrl = $key;
+        Thunder::error($value);
+        break;
+    }
 }
 include template('gerenciar_unidade_editar');

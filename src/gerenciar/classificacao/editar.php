@@ -23,30 +23,30 @@ require_once(dirname(dirname(__FILE__)) . '/app.php');
 
 need_permission(PermissaoNome::CADASTROCONTAS);
 $classificacao = ZClassificacao::getPeloID($_GET['id']);
-if(is_null($classificacao->getID())) {
-	Thunder::warning('A classificação de id "'.$_GET['id'].'" não existe!');
-	redirect('/gerenciar/classificacao/');
+if (is_null($classificacao->getID())) {
+    Thunder::warning('A classificação de id "'.$_GET['id'].'" não existe!');
+    redirect('/gerenciar/classificacao/');
 }
 $focusctrl = 'descricao';
 $errors = array();
 $old_classificacao = $classificacao;
 if ($_POST) {
-	$classificacao = new ZClassificacao($_POST);
-	try {
-		$classificacao->setID($old_classificacao->getID());
-		$classificacao = ZClassificacao::atualizar($classificacao);
-		Thunder::success('Classificação "'.$classificacao->getDescricao().'" atualizada com sucesso!', true);
-		redirect('/gerenciar/classificacao/');
-	} catch (ValidationException $e) {
-		$errors = $e->getErrors();
-	} catch (Exception $e) {
-		$errors['unknow'] = $e->getMessage();
-	}
-	foreach($errors as $key => $value) {
-		$focusctrl = $key;
-		Thunder::error($value);
-		break;
-	}
+    $classificacao = new ZClassificacao($_POST);
+    try {
+        $classificacao->setID($old_classificacao->getID());
+        $classificacao = ZClassificacao::atualizar($classificacao);
+        Thunder::success('Classificação "'.$classificacao->getDescricao().'" atualizada com sucesso!', true);
+        redirect('/gerenciar/classificacao/');
+    } catch (ValidationException $e) {
+        $errors = $e->getErrors();
+    } catch (Exception $e) {
+        $errors['unknow'] = $e->getMessage();
+    }
+    foreach ($errors as $key => $value) {
+        $focusctrl = $key;
+        Thunder::error($value);
+        break;
+    }
 }
 $_classificacoes = ZClassificacao::getTodas(true);
 include template('gerenciar_classificacao_editar');

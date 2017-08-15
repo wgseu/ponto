@@ -24,14 +24,14 @@ require_once(dirname(dirname(__FILE__)) . '/app.php');
 need_permission(PermissaoNome::CADASTROCONTAS);
 $id = $_GET['id'];
 $classificacao = ZClassificacao::getPeloID($id);
-if(is_null($classificacao->getID())) {
-	Thunder::warning('A classificação de id "'.$id.'" não existe!');
-	redirect('/gerenciar/classificacao/');
+if (is_null($classificacao->getID())) {
+    Thunder::warning('A classificação de id "'.$id.'" não existe!');
+    redirect('/gerenciar/classificacao/');
 }
 try {
-	ZClassificacao::excluir($id);
-	Thunder::success('Classificação "' . $classificacao->getDescricao() . '" excluída com sucesso!', true);
+    ZClassificacao::excluir($id);
+    Thunder::success('Classificação "' . $classificacao->getDescricao() . '" excluída com sucesso!', true);
 } catch (Exception $e) {
-	Thunder::error('Não foi possível excluir a classificação "' . $classificacao->getDescricao() . '"!');
+    Thunder::error('Não foi possível excluir a classificação "' . $classificacao->getDescricao() . '"!');
 }
 redirect('/gerenciar/classificacao/');

@@ -21,71 +21,78 @@
 */
 require_once(dirname(dirname(dirname(__FILE__))) . '/app.php');
 
-if(is_login()) {
-	if($weblogin)
-		redirect('/');
-	if(is_manager()) {
-		try {
-			$dispositivo = register_device($_POST['device'], $_POST['serial']);
-		} catch (Exception $e) {
-			json($e->getMessage());
-		}
-	} else {
-		$dispositivo = new ZDispositivo();
-	}
-	$status = array('status' => 'ok', 'msg' => 'Já está autenticado');
-	$status['versao'] = ZSistema::VERSAO;
-	$status['cliente'] = $login_cliente->getID();
-	$status['funcionario'] = intval($login_funcionario->getID());
-	$status['validacao'] = $dispositivo->getValidacao();
-	$status['autologout'] = is_boolean_config('Sistema', 'Tablet.Logout');
-	$status['permissoes'] = ZAcesso::getPermissoes($login_funcionario->getID());
-	json($status);
+if (is_login()) {
+    if ($weblogin) {
+        redirect('/');
+    }
+    if (is_manager()) {
+        try {
+            $dispositivo = register_device($_POST['device'], $_POST['serial']);
+        } catch (Exception $e) {
+            json($e->getMessage());
+        }
+    } else {
+        $dispositivo = new ZDispositivo();
+    }
+    $status = array('status' => 'ok', 'msg' => 'Já está autenticado');
+    $status['versao'] = ZSistema::VERSAO;
+    $status['cliente'] = $login_cliente->getID();
+    $status['funcionario'] = intval($login_funcionario->getID());
+    $status['validacao'] = $dispositivo->getValidacao();
+    $status['autologout'] = is_boolean_config('Sistema', 'Tablet.Logout');
+    $status['permissoes'] = ZAcesso::getPermissoes($login_funcionario->getID());
+    json($status);
 }
-if(!$_POST)
-	json('Método incorreto');
+if (!$_POST) {
+    json('Método incorreto');
+}
 $usuario = strval($_POST['usuario']);
 $senha = strval($_POST['senha']);
 $lembrar = strval($_POST['lembrar']);
 $metodo = strval($_POST['metodo']);
 $token = strval($_POST['token']);
-if($metodo == 'desktop')
-	$cliente = ZCliente::getPeloToken($token);
-else
-	$cliente = ZCliente::getPeloLoginSenha($usuario, $senha);
-if ( is_null($cliente->getID()) ) {
-	if($metodo == 'desktop')
-		$msg = 'Token inválido!';
-	else
-		$msg = 'Usuário ou senha incorretos!';
-	if($weblogin) {
-		Thunder::error($msg);
-		exit(include template('conta_entrar'));
-	} else
-		json($msg);
+if ($metodo == 'desktop') {
+    $cliente = ZCliente::getPeloToken($token);
+} else {
+    $cliente = ZCliente::getPeloLoginSenha($usuario, $senha);
+}
+if (is_null($cliente->getID())) {
+    if ($metodo == 'desktop') {
+        $msg = 'Token inválido!';
+    } else {
+        $msg = 'Usuário ou senha incorretos!';
+    }
+    if ($weblogin) {
+        Thunder::error($msg);
+        exit(include template('conta_entrar'));
+    } else {
+        json($msg);
+    }
 }
 $funcionario = ZFuncionario::getPeloClienteID($cliente->getID());
-if((is_null($weblogin) || !$weblogin) && !is_null($funcionario->getID())) {
-	if(!ZAcesso::temPermissao($funcionario->getFuncaoID(), PermissaoNome::SISTEMA))
-		json('Você não tem permissão para acessar o sistema!');
-	try {
-		$dispositivo = register_device($_POST['device'], $_POST['serial']);
-	} catch (Exception $e) {
-		json($e->getMessage());
-	}
+if ((is_null($weblogin) || !$weblogin) && !is_null($funcionario->getID())) {
+    if (!ZAcesso::temPermissao($funcionario->getFuncaoID(), PermissaoNome::SISTEMA)) {
+        json('Você não tem permissão para acessar o sistema!');
+    }
+    try {
+        $dispositivo = register_device($_POST['device'], $_POST['serial']);
+    } catch (Exception $e) {
+        json($e->getMessage());
+    }
 } else {
-	$dispositivo = new ZDispositivo();
+    $dispositivo = new ZDispositivo();
 }
 $login_cliente = $cliente;
 $login_cliente_id = $cliente->getID();
 $login_funcionario = $funcionario;
 $login_funcionario_id = $funcionario->getID();
 ZAutenticacao::login($cliente->getID());
-if($lembrar == 'true')
-	ZAutenticacao::lembrar($login_cliente);
-if($weblogin) {
-	$url = is_null($_POST['redirect'])?'/':strval($_POST['redirect']);
-	redirect($url);
+if ($lembrar == 'true') {
+    ZAutenticacao::lembrar($login_cliente);
+}
+if ($weblogin) {
+    $url = is_null($_POST['redirect'])?'/':strval($_POST['redirect']);
+    redirect($url);
 }
 $status = array('status' => 'ok', 'msg' => 'Login efetuado com sucesso!');
 $status['versao'] = ZSistema::VERSAO;

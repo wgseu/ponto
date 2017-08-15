@@ -22,158 +22,184 @@
 /**
  * Função ou cargo de um funcionário
  */
-class ZFuncao {
-	private $id;
-	private $descricao;
-	private $salario_base;
+class ZFuncao
+{
+    private $id;
+    private $descricao;
+    private $salario_base;
 
-	public function __construct($funcao = array()) {
-		if(is_array($funcao)) {
-			$this->setID(isset($funcao['id'])?$funcao['id']:null);
-			$this->setDescricao(isset($funcao['descricao'])?$funcao['descricao']:null);
-			$this->setSalarioBase(isset($funcao['salariobase'])?$funcao['salariobase']:null);
-		}
-	}
+    public function __construct($funcao = array())
+    {
+        if (is_array($funcao)) {
+            $this->setID(isset($funcao['id'])?$funcao['id']:null);
+            $this->setDescricao(isset($funcao['descricao'])?$funcao['descricao']:null);
+            $this->setSalarioBase(isset($funcao['salariobase'])?$funcao['salariobase']:null);
+        }
+    }
 
-	/**
-	 * Identificador da função
-	 */
-	public function getID() {
-		return $this->id;
-	}
+    /**
+     * Identificador da função
+     */
+    public function getID()
+    {
+        return $this->id;
+    }
 
-	public function setID($id) {
-		$this->id = $id;
-	}
+    public function setID($id)
+    {
+        $this->id = $id;
+    }
 
-	/**
-	 * Descreve o nome da função
-	 */
-	public function getDescricao() {
-		return $this->descricao;
-	}
+    /**
+     * Descreve o nome da função
+     */
+    public function getDescricao()
+    {
+        return $this->descricao;
+    }
 
-	public function setDescricao($descricao) {
-		$this->descricao = $descricao;
-	}
+    public function setDescricao($descricao)
+    {
+        $this->descricao = $descricao;
+    }
 
-	/**
-	 * Salário base ou mínimo que será acrescentado comissões
-	 */
-	public function getSalarioBase() {
-		return $this->salario_base;
-	}
+    /**
+     * Salário base ou mínimo que será acrescentado comissões
+     */
+    public function getSalarioBase()
+    {
+        return $this->salario_base;
+    }
 
-	public function setSalarioBase($salario_base) {
-		$this->salario_base = $salario_base;
-	}
+    public function setSalarioBase($salario_base)
+    {
+        $this->salario_base = $salario_base;
+    }
 
-	public function toArray() {
-		$funcao = array();
-		$funcao['id'] = $this->getID();
-		$funcao['descricao'] = $this->getDescricao();
-		$funcao['salariobase'] = $this->getSalarioBase();
-		return $funcao;
-	}
+    public function toArray()
+    {
+        $funcao = array();
+        $funcao['id'] = $this->getID();
+        $funcao['descricao'] = $this->getDescricao();
+        $funcao['salariobase'] = $this->getSalarioBase();
+        return $funcao;
+    }
 
-	public static function getPeloID($id) {
-		$query = DB::$pdo->from('Funcoes')
-		                 ->where(array('id' => $id));
-		return new ZFuncao($query->fetch());
-	}
+    public static function getPeloID($id)
+    {
+        $query = DB::$pdo->from('Funcoes')
+                         ->where(array('id' => $id));
+        return new ZFuncao($query->fetch());
+    }
 
-	public static function getPelaDescricao($descricao) {
-		$query = DB::$pdo->from('Funcoes')
-		                 ->where(array('descricao' => $descricao));
-		return new ZFuncao($query->fetch());
-	}
+    public static function getPelaDescricao($descricao)
+    {
+        $query = DB::$pdo->from('Funcoes')
+                         ->where(array('descricao' => $descricao));
+        return new ZFuncao($query->fetch());
+    }
 
-	private static function validarCampos(&$funcao) {
-		$erros = array();
-		$funcao['descricao'] = strip_tags(trim($funcao['descricao']));
-		if(strlen($funcao['descricao']) == 0)
-			$erros['descricao'] = 'A descrição não pode ser vazia';
-		if(!is_numeric($funcao['salariobase']))
-			$erros['salariobase'] = 'O salário base não foi informado';
-		else if($funcao['salariobase'] < 0)
-			$erros['salariobase'] = 'O salário base não pode ser negativo';
-		if(!empty($erros))
-			throw new ValidationException($erros);
-	}
+    private static function validarCampos(&$funcao)
+    {
+        $erros = array();
+        $funcao['descricao'] = strip_tags(trim($funcao['descricao']));
+        if (strlen($funcao['descricao']) == 0) {
+            $erros['descricao'] = 'A descrição não pode ser vazia';
+        }
+        if (!is_numeric($funcao['salariobase'])) {
+            $erros['salariobase'] = 'O salário base não foi informado';
+        } elseif ($funcao['salariobase'] < 0) {
+            $erros['salariobase'] = 'O salário base não pode ser negativo';
+        }
+        if (!empty($erros)) {
+            throw new ValidationException($erros);
+        }
+    }
 
-	private static function handleException(&$e) {
-		if(stripos($e->getMessage(), 'PRIMARY') !== false)
-			throw new ValidationException(array('id' => 'O ID informado já está cadastrado'));
-		if(stripos($e->getMessage(), 'Descricao_UNIQUE') !== false)
-			throw new ValidationException(array('descricao' => 'A descrição informada já está cadastrada'));
-	}
+    private static function handleException(&$e)
+    {
+        if (stripos($e->getMessage(), 'PRIMARY') !== false) {
+            throw new ValidationException(array('id' => 'O ID informado já está cadastrado'));
+        }
+        if (stripos($e->getMessage(), 'Descricao_UNIQUE') !== false) {
+            throw new ValidationException(array('descricao' => 'A descrição informada já está cadastrada'));
+        }
+    }
 
-	public static function cadastrar($funcao) {
-		$_funcao = $funcao->toArray();
-		self::validarCampos($_funcao);
-		try {
-			$_funcao['id'] = DB::$pdo->insertInto('Funcoes')->values($_funcao)->execute();
-		} catch (Exception $e) {
-			self::handleException($e);
-			throw $e;
-		}
-		return self::getPeloID($_funcao['id']);
-	}
+    public static function cadastrar($funcao)
+    {
+        $_funcao = $funcao->toArray();
+        self::validarCampos($_funcao);
+        try {
+            $_funcao['id'] = DB::$pdo->insertInto('Funcoes')->values($_funcao)->execute();
+        } catch (Exception $e) {
+            self::handleException($e);
+            throw $e;
+        }
+        return self::getPeloID($_funcao['id']);
+    }
 
-	public static function atualizar($funcao) {
-		$_funcao = $funcao->toArray();
-		if(!$_funcao['id'])
-			throw new ValidationException(array('id' => 'O id da funcao não foi informado'));
-		self::validarCampos($_funcao);
-		$campos = array(
-			'descricao',
-			'salariobase',
-		);
-		try {
-			$query = DB::$pdo->update('Funcoes');
-			$query = $query->set(array_intersect_key($_funcao, array_flip($campos)));
-			$query = $query->where('id', $_funcao['id']);
-			$query->execute();
-		} catch (Exception $e) {
-			self::handleException($e);
-			throw $e;
-		}
-		return self::getPeloID($_funcao['id']);
-	}
+    public static function atualizar($funcao)
+    {
+        $_funcao = $funcao->toArray();
+        if (!$_funcao['id']) {
+            throw new ValidationException(array('id' => 'O id da funcao não foi informado'));
+        }
+        self::validarCampos($_funcao);
+        $campos = array(
+            'descricao',
+            'salariobase',
+        );
+        try {
+            $query = DB::$pdo->update('Funcoes');
+            $query = $query->set(array_intersect_key($_funcao, array_flip($campos)));
+            $query = $query->where('id', $_funcao['id']);
+            $query->execute();
+        } catch (Exception $e) {
+            self::handleException($e);
+            throw $e;
+        }
+        return self::getPeloID($_funcao['id']);
+    }
 
-	public static function excluir($id) {
-		if(!$id)
-			throw new Exception('Não foi possível excluir a funcao, o id da funcao não foi informado');
-		$query = DB::$pdo->deleteFrom('Funcoes')
-		                 ->where(array('id' => $id));
-		return $query->execute();
-	}
+    public static function excluir($id)
+    {
+        if (!$id) {
+            throw new Exception('Não foi possível excluir a funcao, o id da funcao não foi informado');
+        }
+        $query = DB::$pdo->deleteFrom('Funcoes')
+                         ->where(array('id' => $id));
+        return $query->execute();
+    }
 
-	private static function initSearch($busca) {
-		$query = DB::$pdo->from('Funcoes')
-		                 ->orderBy('id ASC');
-		$busca = trim($busca);
-		if($busca != '') {
-			$query = $query->where('descricao LIKE ?', '%'.$busca.'%');
-		}
-		return $query;
-	}
+    private static function initSearch($busca)
+    {
+        $query = DB::$pdo->from('Funcoes')
+                         ->orderBy('id ASC');
+        $busca = trim($busca);
+        if ($busca != '') {
+            $query = $query->where('descricao LIKE ?', '%'.$busca.'%');
+        }
+        return $query;
+    }
 
-	public static function getTodas($busca = null, $inicio = null, $quantidade = null) {
-		$query = self::initSearch($busca);
-		if(!is_null($inicio) && !is_null($quantidade)) {
-			$query = $query->limit($quantidade)->offset($inicio);
-		}
-		$_funcaos = $query->fetchAll();
-		$funcaos = array();
-		foreach($_funcaos as $funcao)
-			$funcaos[] = new ZFuncao($funcao);
-		return $funcaos;
-	}
+    public static function getTodas($busca = null, $inicio = null, $quantidade = null)
+    {
+        $query = self::initSearch($busca);
+        if (!is_null($inicio) && !is_null($quantidade)) {
+            $query = $query->limit($quantidade)->offset($inicio);
+        }
+        $_funcaos = $query->fetchAll();
+        $funcaos = array();
+        foreach ($_funcaos as $funcao) {
+            $funcaos[] = new ZFuncao($funcao);
+        }
+        return $funcaos;
+    }
 
-	public static function getCount($busca = null) {
-		$query = self::initSearch($busca);
-		return $query->count();
-	}
-
+    public static function getCount($busca = null)
+    {
+        $query = self::initSearch($busca);
+        return $query->count();
+    }
 }

@@ -25,24 +25,24 @@ need_permission(PermissaoNome::CADASTROCONTAS);
 $focusctrl = 'descricao';
 $errors = array();
 if ($_POST) {
-	$classificacao = new ZClassificacao($_POST);
-	try {
-		$classificacao->setID(null);
-		$classificacao = ZClassificacao::cadastrar($classificacao);
-		Thunder::success('Classificação "'.$classificacao->getDescricao().'" cadastrada com sucesso!', true);
-		redirect('/gerenciar/classificacao/');
-	} catch (ValidationException $e) {
-		$errors = $e->getErrors();
-	} catch (Exception $e) {
-		$errors['unknow'] = $e->getMessage();
-	}
-	foreach($errors as $key => $value) {
-		$focusctrl = $key;
-		Thunder::error($value);
-		break;
-	}
+    $classificacao = new ZClassificacao($_POST);
+    try {
+        $classificacao->setID(null);
+        $classificacao = ZClassificacao::cadastrar($classificacao);
+        Thunder::success('Classificação "'.$classificacao->getDescricao().'" cadastrada com sucesso!', true);
+        redirect('/gerenciar/classificacao/');
+    } catch (ValidationException $e) {
+        $errors = $e->getErrors();
+    } catch (Exception $e) {
+        $errors['unknow'] = $e->getMessage();
+    }
+    foreach ($errors as $key => $value) {
+        $focusctrl = $key;
+        Thunder::error($value);
+        break;
+    }
 } else {
-	$classificacao = new ZClassificacao();
+    $classificacao = new ZClassificacao();
 }
 $_classificacoes = ZClassificacao::getTodas(true);
 include template('gerenciar_classificacao_cadastrar');

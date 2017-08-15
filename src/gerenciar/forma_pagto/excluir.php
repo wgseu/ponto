@@ -24,14 +24,14 @@ require_once(dirname(dirname(__FILE__)) . '/app.php');
 need_permission(PermissaoNome::CADASTROFORMASPAGTO);
 $id = $_GET['id'];
 $forma_pagto = ZFormaPagto::getPeloID($id);
-if(is_null($forma_pagto->getID())) {
-	Thunder::warning('A forma de pagamento de id "'.$id.'" não existe!');
-	redirect('/gerenciar/forma_pagto/');
+if (is_null($forma_pagto->getID())) {
+    Thunder::warning('A forma de pagamento de id "'.$id.'" não existe!');
+    redirect('/gerenciar/forma_pagto/');
 }
 try {
-	ZFormaPagto::excluir($id);
-	Thunder::success('Forma de pagamento "' . $forma_pagto->getDescricao() . '" excluída com sucesso!', true);
+    ZFormaPagto::excluir($id);
+    Thunder::success('Forma de pagamento "' . $forma_pagto->getDescricao() . '" excluída com sucesso!', true);
 } catch (Exception $e) {
-	Thunder::error('Não foi possível excluir a forma de pagamento "' . $forma_pagto->getDescricao() . '"!');
+    Thunder::error('Não foi possível excluir a forma de pagamento "' . $forma_pagto->getDescricao() . '"!');
 }
 redirect('/gerenciar/forma_pagto/');

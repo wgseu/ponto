@@ -25,33 +25,34 @@ need_permission(PermissaoNome::CADASTROCIDADES);
 $focusctrl = 'nome';
 $errors = array();
 if ($_POST) {
-	$cidade = new ZCidade($_POST);
-	try {
-		$cidade->setID(null);
-		$cidade->setCEP(\MZ\Util\Filter::unmask($cidade->getCEP(), _p('Mascara', 'CEP')));
-		$cidade = ZCidade::cadastrar($cidade);
-		Thunder::success('Cidade "'.$cidade->getNome().'" cadastrada com sucesso!', true);
-		redirect('/gerenciar/cidade/');
-	} catch (ValidationException $e) {
-		$errors = $e->getErrors();
-	} catch (Exception $e) {
-		$errors['unknow'] = $e->getMessage();
-	}
-	foreach($errors as $key => $value) {
-		$focusctrl = $key;
-		Thunder::error($value);
-		break;
-	}
+    $cidade = new ZCidade($_POST);
+    try {
+        $cidade->setID(null);
+        $cidade->setCEP(\MZ\Util\Filter::unmask($cidade->getCEP(), _p('Mascara', 'CEP')));
+        $cidade = ZCidade::cadastrar($cidade);
+        Thunder::success('Cidade "'.$cidade->getNome().'" cadastrada com sucesso!', true);
+        redirect('/gerenciar/cidade/');
+    } catch (ValidationException $e) {
+        $errors = $e->getErrors();
+    } catch (Exception $e) {
+        $errors['unknow'] = $e->getMessage();
+    }
+    foreach ($errors as $key => $value) {
+        $focusctrl = $key;
+        Thunder::error($value);
+        break;
+    }
 } else {
-	$cidade = new ZCidade();
+    $cidade = new ZCidade();
 }
 $_estado = ZEstado::getPeloID($cidade->getEstadoID());
 $_paises = ZPais::getTodas();
-if(!is_null($_estado->getID()))
-	$pais = ZPais::getPeloID($_estado->getPaisID());
-else if(count($_paises) > 0)
-	$pais = current($_paises);
-else
-	$pais = new ZPais();
+if (!is_null($_estado->getID())) {
+    $pais = ZPais::getPeloID($_estado->getPaisID());
+} elseif (count($_paises) > 0) {
+    $pais = current($_paises);
+} else {
+    $pais = new ZPais();
+}
 $_estados = ZEstado::getTodosDaPaisID($pais->getID());
 include template('gerenciar_cidade_cadastrar');

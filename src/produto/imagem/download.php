@@ -21,27 +21,30 @@
 */
 require_once(dirname(dirname(dirname(__FILE__))) . '/app.php');
 
-function exitNotFound() {
-	header('HTTP/1.0 404 Not Found');
+function exitNotFound()
+{
+    header('HTTP/1.0 404 Not Found');
     echo "<h1>404 Imagem não encontrada</h1>";
     echo "A imagem ou o produto não existe.";
     exit;
 }
-if(!isset($_GET['produto']) || !is_numeric($_GET['produto']))
-	exitNotFound();
+if (!isset($_GET['produto']) || !is_numeric($_GET['produto'])) {
+    exitNotFound();
+}
 if (isset($_SERVER['HTTP_IF_MODIFIED_SINCE'])) {
-	$imagem = ZProduto::getImagemPeloID(intval($_GET['produto']), true);
-    if(strtotime($_SERVER['HTTP_IF_MODIFIED_SINCE']) >= strtotime($imagem['dataatualizacao'])) {
-	    header('HTTP/1.0 304 Not Modified');
-		header('Cache-Control: max-age=12096000, public');
-		header('Expires: ' . gmdate('D, d M Y H:i:s T', time() + 12096000));
-	    exit;
-	}
+    $imagem = ZProduto::getImagemPeloID(intval($_GET['produto']), true);
+    if (strtotime($_SERVER['HTTP_IF_MODIFIED_SINCE']) >= strtotime($imagem['dataatualizacao'])) {
+        header('HTTP/1.0 304 Not Modified');
+        header('Cache-Control: max-age=12096000, public');
+        header('Expires: ' . gmdate('D, d M Y H:i:s T', time() + 12096000));
+        exit;
+    }
 }
 $imagem = ZProduto::getImagemPeloID(intval($_GET['produto']));
 $imagebytes = $imagem['imagem'];
-if($imagebytes == null)
-	exitNotFound();
+if ($imagebytes == null) {
+    exitNotFound();
+}
 header('Content-type: image/png');
 header('Last-Modified: ' . gmdate('D, d M Y H:i:s T', strtotime($imagem['dataatualizacao'])));
 header('Cache-Control: max-age=12096000, public');

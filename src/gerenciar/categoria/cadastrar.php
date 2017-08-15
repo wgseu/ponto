@@ -25,34 +25,35 @@ need_permission(PermissaoNome::CADASTROPRODUTOS);
 $focusctrl = 'descricao';
 $errors = array();
 if ($_POST) {
-	$categoria = new ZCategoria($_POST);
-	try {
-		$categoria->setID(null);
-		$imagem = upload_image('raw_imagem', 'categoria', null, 256, 256, true);
-		if(!is_null($imagem)) {
-			$categoria->setImagem(file_get_contents(WWW_ROOT . get_image_url($imagem, 'categoria')));
-			unlink(WWW_ROOT . get_image_url($imagem, 'categoria'));
-		} else
-			$categoria->setImagem(null);
-		$categoria->setDataAtualizacao(date('Y-m-d H:i:s', time()));
-		$categoria = ZCategoria::cadastrar($categoria);
-		Thunder::success('Categoria "'.$categoria->getDescricao().'" cadastrada com sucesso!', true);
-		redirect('/gerenciar/categoria/');
-	} catch (ValidationException $e) {
-		$errors = $e->getErrors();
-	} catch (Exception $e) {
-		$errors['unknow'] = $e->getMessage();
-	}
-	// remove a imagem enviada
-	$categoria->setImagem(null);
-	foreach($errors as $key => $value) {
-		$focusctrl = $key;
-		Thunder::error($value);
-		break;
-	}
+    $categoria = new ZCategoria($_POST);
+    try {
+        $categoria->setID(null);
+        $imagem = upload_image('raw_imagem', 'categoria', null, 256, 256, true);
+        if (!is_null($imagem)) {
+            $categoria->setImagem(file_get_contents(WWW_ROOT . get_image_url($imagem, 'categoria')));
+            unlink(WWW_ROOT . get_image_url($imagem, 'categoria'));
+        } else {
+            $categoria->setImagem(null);
+        }
+        $categoria->setDataAtualizacao(date('Y-m-d H:i:s', time()));
+        $categoria = ZCategoria::cadastrar($categoria);
+        Thunder::success('Categoria "'.$categoria->getDescricao().'" cadastrada com sucesso!', true);
+        redirect('/gerenciar/categoria/');
+    } catch (ValidationException $e) {
+        $errors = $e->getErrors();
+    } catch (Exception $e) {
+        $errors['unknow'] = $e->getMessage();
+    }
+    // remove a imagem enviada
+    $categoria->setImagem(null);
+    foreach ($errors as $key => $value) {
+        $focusctrl = $key;
+        Thunder::error($value);
+        break;
+    }
 } else {
-	$categoria = new ZCategoria();
-	$categoria->setDataAtualizacao(date('Y-m-d H:i:s', time()));
+    $categoria = new ZCategoria();
+    $categoria->setDataAtualizacao(date('Y-m-d H:i:s', time()));
 }
 $_categorias = ZCategoria::getTodas(true, true);
 include template('gerenciar_categoria_cadastrar');

@@ -22,173 +22,204 @@
 /**
  * Código Fiscal de Operações e Prestações (CFOP)
  */
-class ZOperacao {
-	private $id;
-	private $codigo;
-	private $descricao;
-	private $detalhes;
+class ZOperacao
+{
+    private $id;
+    private $codigo;
+    private $descricao;
+    private $detalhes;
 
-	public function __construct($operacao = array()) {
-		$this->fromArray($operacao);
-	}
+    public function __construct($operacao = array())
+    {
+        $this->fromArray($operacao);
+    }
 
-	/**
-	 * Identificador da operação
-	 */
-	public function getID() {
-		return $this->id;
-	}
+    /**
+     * Identificador da operação
+     */
+    public function getID()
+    {
+        return $this->id;
+    }
 
-	public function setID($id) {
-		$this->id = $id;
-	}
+    public function setID($id)
+    {
+        $this->id = $id;
+    }
 
-	/**
-	 * Código CFOP sem pontuação
-	 */
-	public function getCodigo() {
-		return $this->codigo;
-	}
+    /**
+     * Código CFOP sem pontuação
+     */
+    public function getCodigo()
+    {
+        return $this->codigo;
+    }
 
-	public function setCodigo($codigo) {
-		$this->codigo = $codigo;
-	}
+    public function setCodigo($codigo)
+    {
+        $this->codigo = $codigo;
+    }
 
-	/**
-	 * Descrição da operação
-	 */
-	public function getDescricao() {
-		return $this->descricao;
-	}
+    /**
+     * Descrição da operação
+     */
+    public function getDescricao()
+    {
+        return $this->descricao;
+    }
 
-	public function setDescricao($descricao) {
-		$this->descricao = $descricao;
-	}
+    public function setDescricao($descricao)
+    {
+        $this->descricao = $descricao;
+    }
 
-	/**
-	 * Detalhes da operação (Opcional)
-	 */
-	public function getDetalhes() {
-		return $this->detalhes;
-	}
+    /**
+     * Detalhes da operação (Opcional)
+     */
+    public function getDetalhes()
+    {
+        return $this->detalhes;
+    }
 
-	public function setDetalhes($detalhes) {
-		$this->detalhes = $detalhes;
-	}
+    public function setDetalhes($detalhes)
+    {
+        $this->detalhes = $detalhes;
+    }
 
-	public function toArray() {
-		$operacao = array();
-		$operacao['id'] = $this->getID();
-		$operacao['codigo'] = $this->getCodigo();
-		$operacao['descricao'] = $this->getDescricao();
-		$operacao['detalhes'] = $this->getDetalhes();
-		return $operacao;
-	}
+    public function toArray()
+    {
+        $operacao = array();
+        $operacao['id'] = $this->getID();
+        $operacao['codigo'] = $this->getCodigo();
+        $operacao['descricao'] = $this->getDescricao();
+        $operacao['detalhes'] = $this->getDetalhes();
+        return $operacao;
+    }
 
-	public function fromArray($operacao = array()) {
-		if(!is_array($operacao))
-			return $this;
-		$this->setID(isset($operacao['id'])?$operacao['id']:null);
-		$this->setCodigo(isset($operacao['codigo'])?$operacao['codigo']:null);
-		$this->setDescricao(isset($operacao['descricao'])?$operacao['descricao']:null);
-		$this->setDetalhes(isset($operacao['detalhes'])?$operacao['detalhes']:null);
-	}
+    public function fromArray($operacao = array())
+    {
+        if (!is_array($operacao)) {
+            return $this;
+        }
+        $this->setID(isset($operacao['id'])?$operacao['id']:null);
+        $this->setCodigo(isset($operacao['codigo'])?$operacao['codigo']:null);
+        $this->setDescricao(isset($operacao['descricao'])?$operacao['descricao']:null);
+        $this->setDetalhes(isset($operacao['detalhes'])?$operacao['detalhes']:null);
+    }
 
-	public static function getPeloID($id) {
-		$query = DB::$pdo->from('Operacoes')
-		                 ->where(array('id' => $id));
-		return new ZOperacao($query->fetch());
-	}
+    public static function getPeloID($id)
+    {
+        $query = DB::$pdo->from('Operacoes')
+                         ->where(array('id' => $id));
+        return new ZOperacao($query->fetch());
+    }
 
-	public static function getPeloCodigo($codigo) {
-		$query = DB::$pdo->from('Operacoes')
-		                 ->where(array('codigo' => $codigo));
-		return new ZOperacao($query->fetch());
-	}
+    public static function getPeloCodigo($codigo)
+    {
+        $query = DB::$pdo->from('Operacoes')
+                         ->where(array('codigo' => $codigo));
+        return new ZOperacao($query->fetch());
+    }
 
-	private static function validarCampos(&$operacao) {
-		$erros = array();
-		if(!is_numeric($operacao['codigo']))
-			$erros['codigo'] = 'O código não foi informado';
-		$operacao['descricao'] = strip_tags(trim($operacao['descricao']));
-		if(strlen($operacao['descricao']) == 0)
-			$erros['descricao'] = 'A descrição não pode ser vazia';
-		$operacao['detalhes'] = strip_tags(trim($operacao['detalhes']));
-		if(strlen($operacao['detalhes']) == 0)
-			$operacao['detalhes'] = null;
-		if(!empty($erros))
-			throw new ValidationException($erros);
-	}
+    private static function validarCampos(&$operacao)
+    {
+        $erros = array();
+        if (!is_numeric($operacao['codigo'])) {
+            $erros['codigo'] = 'O código não foi informado';
+        }
+        $operacao['descricao'] = strip_tags(trim($operacao['descricao']));
+        if (strlen($operacao['descricao']) == 0) {
+            $erros['descricao'] = 'A descrição não pode ser vazia';
+        }
+        $operacao['detalhes'] = strip_tags(trim($operacao['detalhes']));
+        if (strlen($operacao['detalhes']) == 0) {
+            $operacao['detalhes'] = null;
+        }
+        if (!empty($erros)) {
+            throw new ValidationException($erros);
+        }
+    }
 
-	private static function handleException(&$e) {
-		if(stripos($e->getMessage(), 'PRIMARY') !== false)
-			throw new ValidationException(array('id' => 'O id informado já está cadastrado'));
-		if(stripos($e->getMessage(), 'Codigo_UNIQUE') !== false)
-			throw new ValidationException(array('codigo' => 'O código informado já está cadastrado'));
-	}
+    private static function handleException(&$e)
+    {
+        if (stripos($e->getMessage(), 'PRIMARY') !== false) {
+            throw new ValidationException(array('id' => 'O id informado já está cadastrado'));
+        }
+        if (stripos($e->getMessage(), 'Codigo_UNIQUE') !== false) {
+            throw new ValidationException(array('codigo' => 'O código informado já está cadastrado'));
+        }
+    }
 
-	public static function cadastrar($operacao) {
-		$_operacao = $operacao->toArray();
-		self::validarCampos($_operacao);
-		try {
-			$_operacao['id'] = DB::$pdo->insertInto('Operacoes')->values($_operacao)->execute();
-		} catch (Exception $e) {
-			self::handleException($e);
-			throw $e;
-		}
-		return self::getPeloID($_operacao['id']);
-	}
+    public static function cadastrar($operacao)
+    {
+        $_operacao = $operacao->toArray();
+        self::validarCampos($_operacao);
+        try {
+            $_operacao['id'] = DB::$pdo->insertInto('Operacoes')->values($_operacao)->execute();
+        } catch (Exception $e) {
+            self::handleException($e);
+            throw $e;
+        }
+        return self::getPeloID($_operacao['id']);
+    }
 
-	public static function atualizar($operacao) {
-		$_operacao = $operacao->toArray();
-		if(!$_operacao['id'])
-			throw new ValidationException(array('id' => 'O id da operacao não foi informado'));
-		self::validarCampos($_operacao);
-		$campos = array(
-			'codigo',
-			'descricao',
-			'detalhes',
-		);
-		try {
-			$query = DB::$pdo->update('Operacoes');
-			$query = $query->set(array_intersect_key($_operacao, array_flip($campos)));
-			$query = $query->where('id', $_operacao['id']);
-			$query->execute();
-		} catch (Exception $e) {
-			self::handleException($e);
-			throw $e;
-		}
-		return self::getPeloID($_operacao['id']);
-	}
+    public static function atualizar($operacao)
+    {
+        $_operacao = $operacao->toArray();
+        if (!$_operacao['id']) {
+            throw new ValidationException(array('id' => 'O id da operacao não foi informado'));
+        }
+        self::validarCampos($_operacao);
+        $campos = array(
+            'codigo',
+            'descricao',
+            'detalhes',
+        );
+        try {
+            $query = DB::$pdo->update('Operacoes');
+            $query = $query->set(array_intersect_key($_operacao, array_flip($campos)));
+            $query = $query->where('id', $_operacao['id']);
+            $query->execute();
+        } catch (Exception $e) {
+            self::handleException($e);
+            throw $e;
+        }
+        return self::getPeloID($_operacao['id']);
+    }
 
-	public static function excluir($id) {
-		if(!$id)
-			throw new Exception('Não foi possível excluir a operacao, o id da operacao não foi informado');
-		$query = DB::$pdo->deleteFrom('Operacoes')
-		                 ->where(array('id' => $id));
-		return $query->execute();
-	}
+    public static function excluir($id)
+    {
+        if (!$id) {
+            throw new Exception('Não foi possível excluir a operacao, o id da operacao não foi informado');
+        }
+        $query = DB::$pdo->deleteFrom('Operacoes')
+                         ->where(array('id' => $id));
+        return $query->execute();
+    }
 
-	private static function initSearch() {
-		return   DB::$pdo->from('Operacoes')
-		                 ->orderBy('id ASC');
-	}
+    private static function initSearch()
+    {
+        return   DB::$pdo->from('Operacoes')
+                         ->orderBy('id ASC');
+    }
 
-	public static function getTodas($inicio = null, $quantidade = null) {
-		$query = self::initSearch();
-		if(!is_null($inicio) && !is_null($quantidade)) {
-			$query = $query->limit($quantidade)->offset($inicio);
-		}
-		$_operacaos = $query->fetchAll();
-		$operacaos = array();
-		foreach($_operacaos as $operacao)
-			$operacaos[] = new ZOperacao($operacao);
-		return $operacaos;
-	}
+    public static function getTodas($inicio = null, $quantidade = null)
+    {
+        $query = self::initSearch();
+        if (!is_null($inicio) && !is_null($quantidade)) {
+            $query = $query->limit($quantidade)->offset($inicio);
+        }
+        $_operacaos = $query->fetchAll();
+        $operacaos = array();
+        foreach ($_operacaos as $operacao) {
+            $operacaos[] = new ZOperacao($operacao);
+        }
+        return $operacaos;
+    }
 
-	public static function getCount() {
-		$query = self::initSearch();
-		return $query->count();
-	}
-
+    public static function getCount()
+    {
+        $query = self::initSearch();
+        return $query->count();
+    }
 }

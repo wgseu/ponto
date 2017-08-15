@@ -25,23 +25,23 @@ need_permission(PermissaoNome::CADASTROPRODUTOS);
 $focusctrl = 'nome';
 $errors = array();
 if ($_POST) {
-	$unidade = new ZUnidade($_POST);
-	try {
-		$unidade->setID(null);
-		$unidade = ZUnidade::cadastrar($unidade);
-		Thunder::success('Unidade "'.$unidade->getNome().'" cadastrada com sucesso!', true);
-		redirect('/gerenciar/unidade/');
-	} catch (ValidationException $e) {
-		$errors = $e->getErrors();
-	} catch (Exception $e) {
-		$errors['unknow'] = $e->getMessage();
-	}
-	foreach($errors as $key => $value) {
-		$focusctrl = $key;
-		Thunder::error($value);
-		break;
-	}
+    $unidade = new ZUnidade($_POST);
+    try {
+        $unidade->setID(null);
+        $unidade = ZUnidade::cadastrar($unidade);
+        Thunder::success('Unidade "'.$unidade->getNome().'" cadastrada com sucesso!', true);
+        redirect('/gerenciar/unidade/');
+    } catch (ValidationException $e) {
+        $errors = $e->getErrors();
+    } catch (Exception $e) {
+        $errors['unknow'] = $e->getMessage();
+    }
+    foreach ($errors as $key => $value) {
+        $focusctrl = $key;
+        Thunder::error($value);
+        break;
+    }
 } else {
-	$unidade = new ZUnidade();
+    $unidade = new ZUnidade();
 }
 include template('gerenciar_unidade_cadastrar');

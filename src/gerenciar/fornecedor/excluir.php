@@ -24,14 +24,14 @@ require_once(dirname(dirname(__FILE__)) . '/app.php');
 need_permission(PermissaoNome::CADASTROFORNECEDORES);
 $id = $_GET['id'];
 $fornecedor = ZFornecedor::getPeloID($id);
-if(is_null($fornecedor->getID())) {
-	Thunder::warning('O fornecedor de id "'.$id.'" não existe!');
-	redirect('/gerenciar/fornecedor/');
+if (is_null($fornecedor->getID())) {
+    Thunder::warning('O fornecedor de id "'.$id.'" não existe!');
+    redirect('/gerenciar/fornecedor/');
 }
 try {
-	ZFornecedor::excluir($id);
-	Thunder::success('Fornecedor "' . $fornecedor->getEmpresaID() . '" excluído com sucesso!', true);
+    ZFornecedor::excluir($id);
+    Thunder::success('Fornecedor "' . $fornecedor->getEmpresaID() . '" excluído com sucesso!', true);
 } catch (Exception $e) {
-	Thunder::error('Não foi possível excluir o fornecedor "' . $fornecedor->getEmpresaID() . '"!');
+    Thunder::error('Não foi possível excluir o fornecedor "' . $fornecedor->getEmpresaID() . '"!');
 }
 redirect('/gerenciar/fornecedor/');

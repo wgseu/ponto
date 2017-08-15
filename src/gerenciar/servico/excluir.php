@@ -24,14 +24,14 @@ require_once(dirname(dirname(__FILE__)) . '/app.php');
 need_permission(PermissaoNome::CADASTROSERVICOS);
 $id = $_GET['id'];
 $servico = ZServico::getPeloID($id);
-if(is_null($servico->getID())) {
-	Thunder::warning('O serviço de id "'.$id.'" não existe!');
-	redirect('/gerenciar/servico/');
+if (is_null($servico->getID())) {
+    Thunder::warning('O serviço de id "'.$id.'" não existe!');
+    redirect('/gerenciar/servico/');
 }
 try {
-	ZServico::excluir($id);
-	Thunder::success('Serviço "' . $servico->getDescricao() . '" excluído com sucesso!', true);
+    ZServico::excluir($id);
+    Thunder::success('Serviço "' . $servico->getDescricao() . '" excluído com sucesso!', true);
 } catch (Exception $e) {
-	Thunder::error('Não foi possível excluir o serviço "' . $servico->getDescricao() . '"!');
+    Thunder::error('Não foi possível excluir o serviço "' . $servico->getDescricao() . '"!');
 }
 redirect('/gerenciar/servico/');

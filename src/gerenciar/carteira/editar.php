@@ -23,30 +23,30 @@ require_once(dirname(dirname(__FILE__)) . '/app.php');
 
 need_permission(PermissaoNome::CADASTROCARTEIRAS);
 $carteira = ZCarteira::getPeloID($_GET['id']);
-if(is_null($carteira->getID())) {
-	Thunder::warning('A carteira de id "'.$_GET['id'].'" não existe!');
-	redirect('/gerenciar/carteira/');
+if (is_null($carteira->getID())) {
+    Thunder::warning('A carteira de id "'.$_GET['id'].'" não existe!');
+    redirect('/gerenciar/carteira/');
 }
 $focusctrl = 'descricao';
 $errors = array();
 $old_carteira = $carteira;
 if ($_POST) {
-	$carteira = new ZCarteira($_POST);
-	try {
-		$carteira->setID($old_carteira->getID());
-		$carteira = ZCarteira::atualizar($carteira);
-		Thunder::success('Carteira "'.$carteira->getDescricao().'" atualizada com sucesso!', true);
-		redirect('/gerenciar/carteira/');
-	} catch (ValidationException $e) {
-		$errors = $e->getErrors();
-	} catch (Exception $e) {
-		$errors['unknow'] = $e->getMessage();
-	}
-	foreach($errors as $key => $value) {
-		$focusctrl = $key;
-		Thunder::error($value);
-		break;
-	}
+    $carteira = new ZCarteira($_POST);
+    try {
+        $carteira->setID($old_carteira->getID());
+        $carteira = ZCarteira::atualizar($carteira);
+        Thunder::success('Carteira "'.$carteira->getDescricao().'" atualizada com sucesso!', true);
+        redirect('/gerenciar/carteira/');
+    } catch (ValidationException $e) {
+        $errors = $e->getErrors();
+    } catch (Exception $e) {
+        $errors['unknow'] = $e->getMessage();
+    }
+    foreach ($errors as $key => $value) {
+        $focusctrl = $key;
+        Thunder::error($value);
+        break;
+    }
 }
 $_banco = ZBanco::getPeloID($carteira->getBancoID());
 include template('gerenciar_carteira_editar');

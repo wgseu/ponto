@@ -23,34 +23,34 @@ require_once(dirname(dirname(__FILE__)) . '/app.php');
 
 need_permission(PermissaoNome::CADASTROFORMASPAGTO);
 $forma_pagto = ZFormaPagto::getPeloID($_GET['id']);
-if(is_null($forma_pagto->getID())) {
-	Thunder::warning('A forma de pagamento de id "'.$_GET['id'].'" não existe!');
-	redirect('/gerenciar/forma_pagto/');
+if (is_null($forma_pagto->getID())) {
+    Thunder::warning('A forma de pagamento de id "'.$_GET['id'].'" não existe!');
+    redirect('/gerenciar/forma_pagto/');
 }
 $focusctrl = 'descricao';
 $errors = array();
 $old_forma_pagto = $forma_pagto;
 if ($_POST) {
-	$forma_pagto = new ZFormaPagto($_POST);
-	try {
-		$forma_pagto->setID($old_forma_pagto->getID());
-		$forma_pagto->setMinParcelas(numberval($forma_pagto->getMinParcelas()));
-		$forma_pagto->setMaxParcelas(numberval($forma_pagto->getMaxParcelas()));
-		$forma_pagto->setParcelasSemJuros(numberval($forma_pagto->getParcelasSemJuros()));
-		$forma_pagto->setJuros(moneyval($forma_pagto->getJuros()));
-		$forma_pagto = ZFormaPagto::atualizar($forma_pagto);
-		Thunder::success('Forma de pagamento "'.$forma_pagto->getDescricao().'" atualizada com sucesso!', true);
-		redirect('/gerenciar/forma_pagto/');
-	} catch (ValidationException $e) {
-		$errors = $e->getErrors();
-	} catch (Exception $e) {
-		$errors['unknow'] = $e->getMessage();
-	}
-	foreach($errors as $key => $value) {
-		$focusctrl = $key;
-		Thunder::error($value);
-		break;
-	}
+    $forma_pagto = new ZFormaPagto($_POST);
+    try {
+        $forma_pagto->setID($old_forma_pagto->getID());
+        $forma_pagto->setMinParcelas(numberval($forma_pagto->getMinParcelas()));
+        $forma_pagto->setMaxParcelas(numberval($forma_pagto->getMaxParcelas()));
+        $forma_pagto->setParcelasSemJuros(numberval($forma_pagto->getParcelasSemJuros()));
+        $forma_pagto->setJuros(moneyval($forma_pagto->getJuros()));
+        $forma_pagto = ZFormaPagto::atualizar($forma_pagto);
+        Thunder::success('Forma de pagamento "'.$forma_pagto->getDescricao().'" atualizada com sucesso!', true);
+        redirect('/gerenciar/forma_pagto/');
+    } catch (ValidationException $e) {
+        $errors = $e->getErrors();
+    } catch (Exception $e) {
+        $errors['unknow'] = $e->getMessage();
+    }
+    foreach ($errors as $key => $value) {
+        $focusctrl = $key;
+        Thunder::error($value);
+        break;
+    }
 }
 $_carteiras = ZCarteira::getTodas();
 include template('gerenciar_forma_pagto_editar');

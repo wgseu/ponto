@@ -24,14 +24,14 @@ require_once(dirname(dirname(__FILE__)) . '/app.php');
 need_permission(PermissaoNome::CADASTROCIDADES);
 $id = $_GET['id'];
 $cidade = ZCidade::getPeloID($id);
-if(is_null($cidade->getID())) {
-	Thunder::warning('A cidade de id "'.$id.'" não existe!');
-	redirect('/gerenciar/cidade/');
+if (is_null($cidade->getID())) {
+    Thunder::warning('A cidade de id "'.$id.'" não existe!');
+    redirect('/gerenciar/cidade/');
 }
 try {
-	ZCidade::excluir($id);
-	Thunder::success('Cidade "' . $cidade->getNome() . '" excluída com sucesso!', true);
+    ZCidade::excluir($id);
+    Thunder::success('Cidade "' . $cidade->getNome() . '" excluída com sucesso!', true);
 } catch (Exception $e) {
-	Thunder::error('Não foi possível excluir a cidade "' . $cidade->getNome() . '"!');
+    Thunder::error('Não foi possível excluir a cidade "' . $cidade->getNome() . '"!');
 }
 redirect('/gerenciar/cidade/');

@@ -21,17 +21,18 @@
 */
 require_once(dirname(dirname(dirname(__FILE__))) . '/app.php');
 
-if(!is_login())
-	json('Usuário não autenticado!');
+if (!is_login()) {
+    json('Usuário não autenticado!');
+}
 $_estoque = $_POST['estoque'];
 try {
-	if(!have_permission(PermissaoNome::ESTOQUE)) {
-		throw new Exception('Você não tem permissão para inserir no estoque');
-	}
-	$estoque = new ZEstoque($_estoque);
-	$estoque->setFuncionarioID($login_funcionario->getID());
-	$estoque = ZEstoque::inserir($estoque);
-	json(array('status' => 'ok', 'estoque' => $estoque->toArray()));
+    if (!have_permission(PermissaoNome::ESTOQUE)) {
+        throw new Exception('Você não tem permissão para inserir no estoque');
+    }
+    $estoque = new ZEstoque($_estoque);
+    $estoque->setFuncionarioID($login_funcionario->getID());
+    $estoque = ZEstoque::inserir($estoque);
+    json(array('status' => 'ok', 'estoque' => $estoque->toArray()));
 } catch (Exception $e) {
-	json($e->getMessage());
+    json($e->getMessage());
 }

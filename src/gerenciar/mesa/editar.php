@@ -23,29 +23,29 @@ require_once(dirname(dirname(__FILE__)) . '/app.php');
 
 need_permission(PermissaoNome::CADASTROMESAS);
 $mesa = ZMesa::getPeloID($_GET['id']);
-if(is_null($mesa->getID())) {
-	Thunder::warning('A mesa de id "'.$_GET['id'].'" não existe!');
-	redirect('/gerenciar/mesa/');
+if (is_null($mesa->getID())) {
+    Thunder::warning('A mesa de id "'.$_GET['id'].'" não existe!');
+    redirect('/gerenciar/mesa/');
 }
 $focusctrl = 'nome';
 $errors = array();
 $old_mesa = $mesa;
 if ($_POST) {
-	$mesa = new ZMesa($_POST);
-	try {
-		$mesa->setID($old_mesa->getID());
-		$mesa = ZMesa::atualizar($mesa);
-		Thunder::success('Mesa "'.$mesa->getNome().'" atualizada com sucesso!', true);
-		redirect('/gerenciar/mesa/');
-	} catch (ValidationException $e) {
-		$errors = $e->getErrors();
-	} catch (Exception $e) {
-		$errors['unknow'] = $e->getMessage();
-	}
-	foreach($errors as $key => $value) {
-		$focusctrl = $key;
-		Thunder::error($value);
-		break;
-	}
+    $mesa = new ZMesa($_POST);
+    try {
+        $mesa->setID($old_mesa->getID());
+        $mesa = ZMesa::atualizar($mesa);
+        Thunder::success('Mesa "'.$mesa->getNome().'" atualizada com sucesso!', true);
+        redirect('/gerenciar/mesa/');
+    } catch (ValidationException $e) {
+        $errors = $e->getErrors();
+    } catch (Exception $e) {
+        $errors['unknow'] = $e->getMessage();
+    }
+    foreach ($errors as $key => $value) {
+        $focusctrl = $key;
+        Thunder::error($value);
+        break;
+    }
 }
 include template('gerenciar_mesa_editar');

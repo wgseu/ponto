@@ -25,74 +25,81 @@ need_permission(PermissaoNome::CADASTROCLIENTES, $_GET['saida'] == 'json');
 $focusctrl = 'nome';
 $errors = array();
 if ($_POST) {
-	$cliente = new ZCliente($_POST);
-	try {
-		DB::BeginTransaction();
-		$cliente->setID(null);
-		if(intval($_GET['sistema']) == 1 && $cliente->getTipo() != ClienteTipo::JURIDICA) {
-			throw new ValidationException(array('tipo' => 'O tipo da empresa deve ser jurídica'));
-		}
-		if(intval($_GET['sistema']) == 1 && !is_null($__sistema__->getEmpresaID())) {
-			throw new Exception('Você deve alterar a empresa "' . $__empresa__->getNomeCompleto() . '" em vez de cadastrar uma nova');
-		}
-		$cliente->setAcionistaID(numberval($cliente->getAcionistaID()));
-		if($cliente->getTipo() == ClienteTipo::JURIDICA)
-			$cliente->setCPF(\MZ\Util\Filter::unmask($cliente->getCPF(), _p('Mascara', 'CNPJ')));
-		else
-			$cliente->setCPF(\MZ\Util\Filter::unmask($cliente->getCPF(), _p('Mascara', 'CPF')));
-		$_data_aniversario = date_create_from_format('d/m/Y', $cliente->getDataAniversario());
-		$cliente->setDataAniversario($_data_aniversario===false?null:date_format($_data_aniversario, 'Y-m-d'));
-		$cliente->setFone(1, \MZ\Util\Filter::unmask($cliente->getFone(1), _p('Mascara', 'Telefone')));
-		$cliente->setFone(2, \MZ\Util\Filter::unmask($cliente->getFone(2), _p('Mascara', 'Telefone')));
-		$cliente->setLimiteCompra(moneyval($cliente->getLimiteCompra()));
-		$width = 256;
-		if($cliente->getTipo() == ClienteTipo::JURIDICA)
-			$width = 640;
-		$imagem = upload_image('raw_imagem', 'cliente', null, $width, 256, true);
-		if(!is_null($imagem)) {
-			$cliente->setImagem(file_get_contents(WWW_ROOT . get_image_url($imagem, 'cliente')));
-			unlink(WWW_ROOT . get_image_url($imagem, 'cliente'));
-		} else
-			$cliente->setImagem(null);
-		$cliente = ZCliente::cadastrar($cliente);
-		if(intval($_GET['sistema']) == 1) {
-			$__sistema__->setEmpresaID($cliente->getID());
-			$__sistema__ = ZSistema::atualizar($__sistema__, array('empresaid'));
+    $cliente = new ZCliente($_POST);
+    try {
+        DB::BeginTransaction();
+        $cliente->setID(null);
+        if (intval($_GET['sistema']) == 1 && $cliente->getTipo() != ClienteTipo::JURIDICA) {
+            throw new ValidationException(array('tipo' => 'O tipo da empresa deve ser jurídica'));
+        }
+        if (intval($_GET['sistema']) == 1 && !is_null($__sistema__->getEmpresaID())) {
+            throw new Exception('Você deve alterar a empresa "' . $__empresa__->getNomeCompleto() . '" em vez de cadastrar uma nova');
+        }
+        $cliente->setAcionistaID(numberval($cliente->getAcionistaID()));
+        if ($cliente->getTipo() == ClienteTipo::JURIDICA) {
+            $cliente->setCPF(\MZ\Util\Filter::unmask($cliente->getCPF(), _p('Mascara', 'CNPJ')));
+        } else {
+            $cliente->setCPF(\MZ\Util\Filter::unmask($cliente->getCPF(), _p('Mascara', 'CPF')));
+        }
+        $_data_aniversario = date_create_from_format('d/m/Y', $cliente->getDataAniversario());
+        $cliente->setDataAniversario($_data_aniversario===false?null:date_format($_data_aniversario, 'Y-m-d'));
+        $cliente->setFone(1, \MZ\Util\Filter::unmask($cliente->getFone(1), _p('Mascara', 'Telefone')));
+        $cliente->setFone(2, \MZ\Util\Filter::unmask($cliente->getFone(2), _p('Mascara', 'Telefone')));
+        $cliente->setLimiteCompra(moneyval($cliente->getLimiteCompra()));
+        $width = 256;
+        if ($cliente->getTipo() == ClienteTipo::JURIDICA) {
+            $width = 640;
+        }
+        $imagem = upload_image('raw_imagem', 'cliente', null, $width, 256, true);
+        if (!is_null($imagem)) {
+            $cliente->setImagem(file_get_contents(WWW_ROOT . get_image_url($imagem, 'cliente')));
+            unlink(WWW_ROOT . get_image_url($imagem, 'cliente'));
+        } else {
+            $cliente->setImagem(null);
+        }
+        $cliente = ZCliente::cadastrar($cliente);
+        if (intval($_GET['sistema']) == 1) {
+            $__sistema__->setEmpresaID($cliente->getID());
+            $__sistema__ = ZSistema::atualizar($__sistema__, array('empresaid'));
 
-			try {
-				$appsync = new AppSync();
-				$appsync->systemOptionsChanged();
-				$appsync->enterpriseChanged();
-			} catch (Exception $e) {
-				Log::error($e->getMessage());
-			}
-		}
-		DB::Commit();
-		$msg = 'Cliente "'.$cliente->getNomeCompleto().'" cadastrado com sucesso!';
-		if($_GET['saida'] == 'json')
-			json(array('status' => 'ok', 'item' => $cliente->toArray(array('secreto', 'senha')), 'msg' => $msg));
-		Thunder::success($msg, true);
-		redirect('/gerenciar/cliente/');
-	} catch (ValidationException $e) {
-		$errors = $e->getErrors();
-	} catch (Exception $e) {
-		$errors['unknow'] = $e->getMessage();
-	}
-	DB::RollBack();
-	// remove a foto enviada
-	$cliente->setImagem(null);
-	foreach($errors as $key => $value) {
-		$focusctrl = $key;
-		if($focusctrl == 'genero')
-			$focusctrl = $focusctrl . '-' . strtolower(ClienteGenero::MASCULINO);
-		if($_GET['saida'] == 'json')
-			json($value, null, array('field' => $focusctrl));
-		Thunder::error($value);
-		break;
-	}
+            try {
+                $appsync = new AppSync();
+                $appsync->systemOptionsChanged();
+                $appsync->enterpriseChanged();
+            } catch (Exception $e) {
+                Log::error($e->getMessage());
+            }
+        }
+        DB::Commit();
+        $msg = 'Cliente "'.$cliente->getNomeCompleto().'" cadastrado com sucesso!';
+        if ($_GET['saida'] == 'json') {
+            json(array('status' => 'ok', 'item' => $cliente->toArray(array('secreto', 'senha')), 'msg' => $msg));
+        }
+        Thunder::success($msg, true);
+        redirect('/gerenciar/cliente/');
+    } catch (ValidationException $e) {
+        $errors = $e->getErrors();
+    } catch (Exception $e) {
+        $errors['unknow'] = $e->getMessage();
+    }
+    DB::RollBack();
+    // remove a foto enviada
+    $cliente->setImagem(null);
+    foreach ($errors as $key => $value) {
+        $focusctrl = $key;
+        if ($focusctrl == 'genero') {
+            $focusctrl = $focusctrl . '-' . strtolower(ClienteGenero::MASCULINO);
+        }
+        if ($_GET['saida'] == 'json') {
+            json($value, null, array('field' => $focusctrl));
+        }
+        Thunder::error($value);
+        break;
+    }
 } else {
-	$cliente = new ZCliente();
+    $cliente = new ZCliente();
 }
-if($_GET['saida'] == 'json')
-	json('Nenhum dado foi enviado');
+if ($_GET['saida'] == 'json') {
+    json('Nenhum dado foi enviado');
+}
 include template('gerenciar_cliente_cadastrar');

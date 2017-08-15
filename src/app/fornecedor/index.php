@@ -24,36 +24,38 @@ require_once(dirname(dirname(dirname(__FILE__))) . '/app.php');
 need_manager(true);
 
 $limit = intval($_GET['limite']);
-if($_GET['primeiro'] || check_fone($_GET['busca'], true))
-	$limit = 1;
-else if($limit < 1)
-	$limit = 5;
-else if($limit > 20)
-	$limit = 20;
+if ($_GET['primeiro'] || check_fone($_GET['busca'], true)) {
+    $limit = 1;
+} elseif ($limit < 1) {
+    $limit = 5;
+} elseif ($limit > 20) {
+    $limit = 20;
+}
 $fornecedores = ZFornecedor::getTodos($_GET['busca'], 0, $limit);
 $response = array('status' => 'ok');
 $campos = array(
-			'id',
-			'nome',
-			'fone1',
-			'cnpj',
-			'email',
-			'prazopagamento',
-			'imagemurl',
-		);
+            'id',
+            'nome',
+            'fone1',
+            'cnpj',
+            'email',
+            'prazopagamento',
+            'imagemurl',
+        );
 $_fornecedores = array();
 $domask = intval($_GET['format']) != 0;
 foreach ($fornecedores as $fornecedor) {
-	$_fornecedor = $fornecedor->toArray();
-	$cliente = ZCliente::getPeloID($fornecedor->getEmpresaID());
-	$_fornecedor['nome'] = $cliente->getNome();
-	$_fornecedor['fone1'] = $cliente->getFone(1);
-	$_fornecedor['cnpj'] = $cliente->getCPF();
-	$_fornecedor['email'] = $cliente->getEmail();
-	if($domask)
-		$_fornecedor['fone1'] = \MZ\Util\Mask::phone($_fornecedor['fone1']); 
-	$_fornecedor['imagemurl'] = get_image_url($cliente->getImagem(), 'cliente', null);
-	$_fornecedores[] = array_intersect_key($_fornecedor, array_flip($campos));
+    $_fornecedor = $fornecedor->toArray();
+    $cliente = ZCliente::getPeloID($fornecedor->getEmpresaID());
+    $_fornecedor['nome'] = $cliente->getNome();
+    $_fornecedor['fone1'] = $cliente->getFone(1);
+    $_fornecedor['cnpj'] = $cliente->getCPF();
+    $_fornecedor['email'] = $cliente->getEmail();
+    if ($domask) {
+        $_fornecedor['fone1'] = \MZ\Util\Mask::phone($_fornecedor['fone1']);
+    }
+    $_fornecedor['imagemurl'] = get_image_url($cliente->getImagem(), 'cliente', null);
+    $_fornecedores[] = array_intersect_key($_fornecedor, array_flip($campos));
 }
 $response['items'] = $_fornecedores;
 json($response);

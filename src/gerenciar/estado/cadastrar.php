@@ -25,24 +25,24 @@ need_permission(PermissaoNome::CADASTROESTADOS);
 $focusctrl = 'nome';
 $errors = array();
 if ($_POST) {
-	$estado = new ZEstado($_POST);
-	try {
-		$estado->setID(null);
-		$estado = ZEstado::cadastrar($estado);
-		Thunder::success('Estado "'.$estado->getNome().'" cadastrado com sucesso!', true);
-		redirect('/gerenciar/estado/');
-	} catch (ValidationException $e) {
-		$errors = $e->getErrors();
-	} catch (Exception $e) {
-		$errors['unknow'] = $e->getMessage();
-	}
-	foreach($errors as $key => $value) {
-		$focusctrl = $key;
-		Thunder::error($value);
-		break;
-	}
+    $estado = new ZEstado($_POST);
+    try {
+        $estado->setID(null);
+        $estado = ZEstado::cadastrar($estado);
+        Thunder::success('Estado "'.$estado->getNome().'" cadastrado com sucesso!', true);
+        redirect('/gerenciar/estado/');
+    } catch (ValidationException $e) {
+        $errors = $e->getErrors();
+    } catch (Exception $e) {
+        $errors['unknow'] = $e->getMessage();
+    }
+    foreach ($errors as $key => $value) {
+        $focusctrl = $key;
+        Thunder::error($value);
+        break;
+    }
 } else {
-	$estado = new ZEstado();
+    $estado = new ZEstado();
 }
 $_paises = ZPais::getTodas();
 include template('gerenciar_estado_cadastrar');

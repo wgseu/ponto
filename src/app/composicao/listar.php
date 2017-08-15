@@ -21,15 +21,16 @@
 */
 require_once(dirname(dirname(dirname(__FILE__))) . '/app.php');
 
-if(!isset($_GET['produto']) || !is_numeric($_GET['produto']))
-	json('Produto não informado!');
-$composicoes = ZComposicao::getTodasDaComposicaoIDEx($_GET['produto'], intval($_GET['selecionaveis']) != 0, 
-	intval($_GET['adicionais']) != 0);
+if (!isset($_GET['produto']) || !is_numeric($_GET['produto'])) {
+    json('Produto não informado!');
+}
+$composicoes = ZComposicao::getTodasDaComposicaoIDEx($_GET['produto'], intval($_GET['selecionaveis']) != 0,
+    intval($_GET['adicionais']) != 0);
 $response = array('status' => 'ok');
 $_composicoes = array();
 foreach ($composicoes as $composicao) {
-	$composicao['imagemurl'] = get_image_url($composicao['imagemurl'], 'produto', null);
-	$_composicoes[] = $composicao;
+    $composicao['imagemurl'] = get_image_url($composicao['imagemurl'], 'produto', null);
+    $_composicoes[] = $composicao;
 }
 $response['composicoes'] = $_composicoes;
 json($response);

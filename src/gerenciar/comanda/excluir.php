@@ -24,14 +24,14 @@ require_once(dirname(dirname(__FILE__)) . '/app.php');
 need_permission(PermissaoNome::CADASTROCOMANDAS);
 $id = $_GET['id'];
 $comanda = \MZ\Sale\Comanda::findByID($id);
-if(is_null($comanda->getID())) {
-	Thunder::warning('A comanda de id "'.$id.'" não existe!');
-	redirect('/gerenciar/comanda/');
+if (is_null($comanda->getID())) {
+    Thunder::warning('A comanda de id "'.$id.'" não existe!');
+    redirect('/gerenciar/comanda/');
 }
 try {
-	\MZ\Sale\Comanda::excluir($id);
-	Thunder::success('Comanda "' . $comanda->getNome() . '" excluída com sucesso!', true);
+    \MZ\Sale\Comanda::excluir($id);
+    Thunder::success('Comanda "' . $comanda->getNome() . '" excluída com sucesso!', true);
 } catch (Exception $e) {
-	Thunder::error('Não foi possível excluir a comanda "' . $comanda->getNome() . '"!');
+    Thunder::error('Não foi possível excluir a comanda "' . $comanda->getNome() . '"!');
 }
 redirect('/gerenciar/comanda/');

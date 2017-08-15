@@ -25,30 +25,30 @@ need_permission(PermissaoNome::CADASTROCARTOES);
 $focusctrl = 'descricao';
 $errors = array();
 if ($_POST) {
-	$cartao = new ZCartao($_POST);
-	try {
-		$cartao->setID(null);
-		$cartao->setImageIndex(numberval($cartao->getImageIndex()));
-		$cartao->setMensalidade(moneyval($cartao->getMensalidade()));
-		$cartao->setTransacao(moneyval($cartao->getTransacao()));
-		$cartao->setTaxa(moneyval($cartao->getTaxa()));
-		$cartao->setDiasRepasse(numberval($cartao->getDiasRepasse()));
-		$cartao = ZCartao::cadastrar($cartao);
-		Thunder::success('Cartão "'.$cartao->getDescricao().'" cadastrado com sucesso!', true);
-		redirect('/gerenciar/cartao/');
-	} catch (ValidationException $e) {
-		$errors = $e->getErrors();
-	} catch (Exception $e) {
-		$errors['unknow'] = $e->getMessage();
-	}
-	foreach($errors as $key => $value) {
-		$focusctrl = $key;
-		Thunder::error($value);
-		break;
-	}
+    $cartao = new ZCartao($_POST);
+    try {
+        $cartao->setID(null);
+        $cartao->setImageIndex(numberval($cartao->getImageIndex()));
+        $cartao->setMensalidade(moneyval($cartao->getMensalidade()));
+        $cartao->setTransacao(moneyval($cartao->getTransacao()));
+        $cartao->setTaxa(moneyval($cartao->getTaxa()));
+        $cartao->setDiasRepasse(numberval($cartao->getDiasRepasse()));
+        $cartao = ZCartao::cadastrar($cartao);
+        Thunder::success('Cartão "'.$cartao->getDescricao().'" cadastrado com sucesso!', true);
+        redirect('/gerenciar/cartao/');
+    } catch (ValidationException $e) {
+        $errors = $e->getErrors();
+    } catch (Exception $e) {
+        $errors['unknow'] = $e->getMessage();
+    }
+    foreach ($errors as $key => $value) {
+        $focusctrl = $key;
+        Thunder::error($value);
+        break;
+    }
 } else {
-	$cartao = new ZCartao();
-	$cartao->setAtivo('Y');
+    $cartao = new ZCartao();
+    $cartao->setAtivo('Y');
 }
 $_carteiras = ZCarteira::getTodas();
 $_imagens = ZCartao::getImages();

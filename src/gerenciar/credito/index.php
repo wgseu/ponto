@@ -29,7 +29,7 @@ $creditos = ZCredito::getTodos($_GET['query'], $_GET['clienteid'], $_GET['estado
 
 $_cliente = ZCliente::getPeloID($_GET['clienteid']);
 $estados = array(
-	'Y' => 'Cancelados',
-	'N' => 'Válidos',
+    'Y' => 'Cancelados',
+    'N' => 'Válidos',
 );
 include template('gerenciar_credito_index');

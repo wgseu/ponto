@@ -23,34 +23,34 @@ require_once(dirname(dirname(__FILE__)) . '/app.php');
 
 need_permission(PermissaoNome::CADASTROSERVICOS);
 $servico = ZServico::getPeloID($_GET['id']);
-if(is_null($servico->getID())) {
-	Thunder::warning('A serviço de id "'.$_GET['id'].'" não existe!');
-	redirect('/gerenciar/servico/');
+if (is_null($servico->getID())) {
+    Thunder::warning('A serviço de id "'.$_GET['id'].'" não existe!');
+    redirect('/gerenciar/servico/');
 }
 $focusctrl = 'descricao';
 $errors = array();
 $old_servico = $servico;
 if ($_POST) {
-	$servico = new ZServico($_POST);
-	try {
-		$servico->setID($old_servico->getID());
-		$_data_inicio = date_create_from_format('d/m/Y H:i', $servico->getDataInicio());
-		$servico->setDataInicio($_data_inicio===false?null:date_format($_data_inicio, 'Y-m-d H:i:s'));
-		$_data_fim = date_create_from_format('d/m/Y H:i', $servico->getDataFim());
-		$servico->setDataFim($_data_fim===false?null:date_format($_data_fim, 'Y-m-d H:i:s'));
-		$servico->setValor(moneyval($servico->getValor()));
-		$servico = ZServico::atualizar($servico);
-		Thunder::success('Serviço "'.$servico->getDescricao().'" atualizada com sucesso!', true);
-		redirect('/gerenciar/servico/');
-	} catch (ValidationException $e) {
-		$errors = $e->getErrors();
-	} catch (Exception $e) {
-		$errors['unknow'] = $e->getMessage();
-	}
-	foreach($errors as $key => $value) {
-		$focusctrl = $key;
-		Thunder::error($value);
-		break;
-	}
+    $servico = new ZServico($_POST);
+    try {
+        $servico->setID($old_servico->getID());
+        $_data_inicio = date_create_from_format('d/m/Y H:i', $servico->getDataInicio());
+        $servico->setDataInicio($_data_inicio===false?null:date_format($_data_inicio, 'Y-m-d H:i:s'));
+        $_data_fim = date_create_from_format('d/m/Y H:i', $servico->getDataFim());
+        $servico->setDataFim($_data_fim===false?null:date_format($_data_fim, 'Y-m-d H:i:s'));
+        $servico->setValor(moneyval($servico->getValor()));
+        $servico = ZServico::atualizar($servico);
+        Thunder::success('Serviço "'.$servico->getDescricao().'" atualizada com sucesso!', true);
+        redirect('/gerenciar/servico/');
+    } catch (ValidationException $e) {
+        $errors = $e->getErrors();
+    } catch (Exception $e) {
+        $errors['unknow'] = $e->getMessage();
+    }
+    foreach ($errors as $key => $value) {
+        $focusctrl = $key;
+        Thunder::error($value);
+        break;
+    }
 }
 include template('gerenciar_servico_editar');

@@ -23,23 +23,23 @@ require_once(dirname(dirname(__FILE__)) . '/app.php');
 
 $pagetitle = 'Produtos';
 $categorias = ZCategoria::getTodas();
-if(count($categorias) > 0) {
-	$categoria_atual = current($categorias);
-	$produtos = ZProduto::getTodos(
-		null, // busca
-		$categoria_atual->getID(),
-		null, // unidade
-		null, // tipo
-		0, // estoque
-		null, // setor de estoque
-		null, // incluir promoção
-		null, // visibilidade
-		null, // mostrar com estoque limitado
-		null, // pesável
-		false // raw mode
-	);
+if (count($categorias) > 0) {
+    $categoria_atual = current($categorias);
+    $produtos = ZProduto::getTodos(
+        null, // busca
+        $categoria_atual->getID(),
+        null, // unidade
+        null, // tipo
+        0, // estoque
+        null, // setor de estoque
+        null, // incluir promoção
+        null, // visibilidade
+        null, // mostrar com estoque limitado
+        null, // pesável
+        false // raw mode
+    );
 } else {
-	$produtos = array();
-	$categoria_atual = new ZCategoria();
+    $produtos = array();
+    $categoria_atual = new ZCategoria();
 }
 include template('produto_index');

@@ -23,9 +23,9 @@ require_once(dirname(dirname(__FILE__)) . '/app.php');
 
 need_permission(PermissaoNome::ALTERARPAGINAS);
 $pagina = ZPagina::getPeloID($_GET['id']);
-if(is_null($pagina->getID())) {
-	Thunder::warning('A página de id "'.$_GET['id'].'" não existe!');
-	redirect('/gerenciar/pagina/');
+if (is_null($pagina->getID())) {
+    Thunder::warning('A página de id "'.$_GET['id'].'" não existe!');
+    redirect('/gerenciar/pagina/');
 }
 $focusctrl = 'nome';
 $errors = array();
@@ -33,22 +33,22 @@ $old_pagina = $pagina;
 $nomes = get_pages_info();
 $linguagens = get_languages_info();
 if ($_POST) {
-	$pagina = new ZPagina($_POST);
-	try {
-		$pagina->setID($old_pagina->getID());
-		$pagina->setLinguagemID(numberval($pagina->getLinguagemID()));
-		$pagina = ZPagina::atualizar($pagina);
-		Thunder::success('Página "'.$nomes[$pagina->getNome()] . ' - ' . $linguagens[$pagina->getLinguagemID()].'" atualizada com sucesso!', true);
-		redirect('/gerenciar/pagina/');
-	} catch (ValidationException $e) {
-		$errors = $e->getErrors();
-	} catch (Exception $e) {
-		$errors['unknow'] = $e->getMessage();
-	}
-	foreach($errors as $key => $value) {
-		$focusctrl = $key;
-		Thunder::error($value);
-		break;
-	}
+    $pagina = new ZPagina($_POST);
+    try {
+        $pagina->setID($old_pagina->getID());
+        $pagina->setLinguagemID(numberval($pagina->getLinguagemID()));
+        $pagina = ZPagina::atualizar($pagina);
+        Thunder::success('Página "'.$nomes[$pagina->getNome()] . ' - ' . $linguagens[$pagina->getLinguagemID()].'" atualizada com sucesso!', true);
+        redirect('/gerenciar/pagina/');
+    } catch (ValidationException $e) {
+        $errors = $e->getErrors();
+    } catch (Exception $e) {
+        $errors['unknow'] = $e->getMessage();
+    }
+    foreach ($errors as $key => $value) {
+        $focusctrl = $key;
+        Thunder::error($value);
+        break;
+    }
 }
 include template('gerenciar_pagina_editar');

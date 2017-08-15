@@ -21,14 +21,15 @@
 */
 require_once(dirname(dirname(dirname(__FILE__))) . '/app.php');
 
-if(!isset($_GET['grupo']) || !is_numeric($_GET['grupo']))
-	json('Grupo não informado!');
+if (!isset($_GET['grupo']) || !is_numeric($_GET['grupo'])) {
+    json('Grupo não informado!');
+}
 $pacotes = ZPacote::getTodosDoGrupoIDEx(intval($_GET['grupo']), $_POST['pacote'], strval($_GET['busca']));
 $response = array('status' => 'ok');
 $_pacotes = array();
 foreach ($pacotes as $pacote) {
-	$pacote['imagemurl'] = get_image_url($pacote['imagemurl'], (is_null($pacote['produtoid'])?'propriedade':'produto'), null);
-	$_pacotes[] = $pacote;
+    $pacote['imagemurl'] = get_image_url($pacote['imagemurl'], (is_null($pacote['produtoid'])?'propriedade':'produto'), null);
+    $_pacotes[] = $pacote;
 }
 $response['pacotes'] = $_pacotes;
 json($response);

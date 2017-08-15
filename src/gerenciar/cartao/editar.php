@@ -23,35 +23,35 @@ require_once(dirname(dirname(__FILE__)) . '/app.php');
 
 need_permission(PermissaoNome::CADASTROCARTOES);
 $cartao = ZCartao::getPeloID($_GET['id']);
-if(is_null($cartao->getID())) {
-	Thunder::warning('O cartão de id "'.$_GET['id'].'" não existe!');
-	redirect('/gerenciar/cartao/');
+if (is_null($cartao->getID())) {
+    Thunder::warning('O cartão de id "'.$_GET['id'].'" não existe!');
+    redirect('/gerenciar/cartao/');
 }
 $focusctrl = 'descricao';
 $errors = array();
 $old_cartao = $cartao;
 if ($_POST) {
-	$cartao = new ZCartao($_POST);
-	try {
-		$cartao->setID($old_cartao->getID());
-		$cartao->setImageIndex(numberval($cartao->getImageIndex()));
-		$cartao->setMensalidade(moneyval($cartao->getMensalidade()));
-		$cartao->setTransacao(moneyval($cartao->getTransacao()));
-		$cartao->setTaxa(moneyval($cartao->getTaxa()));
-		$cartao->setDiasRepasse(numberval($cartao->getDiasRepasse()));
-		$cartao = ZCartao::atualizar($cartao);
-		Thunder::success('Cartão "'.$cartao->getDescricao().'" atualizado com sucesso!', true);
-		redirect('/gerenciar/cartao/');
-	} catch (ValidationException $e) {
-		$errors = $e->getErrors();
-	} catch (Exception $e) {
-		$errors['unknow'] = $e->getMessage();
-	}
-	foreach($errors as $key => $value) {
-		$focusctrl = $key;
-		Thunder::error($value);
-		break;
-	}
+    $cartao = new ZCartao($_POST);
+    try {
+        $cartao->setID($old_cartao->getID());
+        $cartao->setImageIndex(numberval($cartao->getImageIndex()));
+        $cartao->setMensalidade(moneyval($cartao->getMensalidade()));
+        $cartao->setTransacao(moneyval($cartao->getTransacao()));
+        $cartao->setTaxa(moneyval($cartao->getTaxa()));
+        $cartao->setDiasRepasse(numberval($cartao->getDiasRepasse()));
+        $cartao = ZCartao::atualizar($cartao);
+        Thunder::success('Cartão "'.$cartao->getDescricao().'" atualizado com sucesso!', true);
+        redirect('/gerenciar/cartao/');
+    } catch (ValidationException $e) {
+        $errors = $e->getErrors();
+    } catch (Exception $e) {
+        $errors['unknow'] = $e->getMessage();
+    }
+    foreach ($errors as $key => $value) {
+        $focusctrl = $key;
+        Thunder::error($value);
+        break;
+    }
 }
 $_carteiras = ZCarteira::getTodas();
 $_imagens = ZCartao::getImages();

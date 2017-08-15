@@ -25,14 +25,14 @@ need_permission(PermissaoNome::PAGAMENTO);
 
 $estado = trim($_GET['estado']);
 $cancelado = null;
-if($estado == 'Cancelado') {
-	$cancelado = 'Y';
-	$estado = null;
-} else if($estado == 'Valido') {
-	$cancelado = 'N';
-	$estado = null;
-} else if($estado != ''){
-	$cancelado = 'N';
+if ($estado == 'Cancelado') {
+    $cancelado = 'Y';
+    $estado = null;
+} elseif ($estado == 'Valido') {
+    $cancelado = 'N';
+    $estado = null;
+} elseif ($estado != '') {
+    $cancelado = 'N';
 }
 $data_inicio = date_create_from_format('d/m/Y', $_GET['inicio']);
 $data_inicio = $data_inicio===false?null:$data_inicio->getTimestamp();
@@ -40,57 +40,57 @@ $data_fim = date_create_from_format('d/m/Y', $_GET['fim']);
 $data_fim = $data_fim===false?null:$data_fim->getTimestamp();
 
 $count = ZPedido::getCount(
-	$_GET['query'],
-	$_GET['clienteid'],
-	$_GET['funcionarioid'],
-	$_GET['tipo'],
-	$estado,
-	$cancelado,
-	$data_inicio,
-	$data_fim,
-	null,
-	null,
-	null
+    $_GET['query'],
+    $_GET['clienteid'],
+    $_GET['funcionarioid'],
+    $_GET['tipo'],
+    $estado,
+    $cancelado,
+    $data_inicio,
+    $data_fim,
+    null,
+    null,
+    null
 );
 list($pagesize, $offset, $pagestring) = pagestring($count, 10);
 $pedidos = ZPedido::getTodos(
-	$_GET['query'],
-	$_GET['clienteid'],
-	$_GET['funcionarioid'],
-	$_GET['tipo'],
-	$estado,
-	$cancelado,
-	$data_inicio,
-	$data_fim,
-	null,
-	null,
-	null,
-	$offset,
-	$pagesize
+    $_GET['query'],
+    $_GET['clienteid'],
+    $_GET['funcionarioid'],
+    $_GET['tipo'],
+    $estado,
+    $cancelado,
+    $data_inicio,
+    $data_fim,
+    null,
+    null,
+    null,
+    $offset,
+    $pagesize
 );
 
 $_tipo_names = array(
-	'Mesa' => 'Mesa',
-	'Comanda' => 'Comanda',
-	'Avulso' => 'Balcão',
-	'Entrega' => 'Entrega',
+    'Mesa' => 'Mesa',
+    'Comanda' => 'Comanda',
+    'Avulso' => 'Balcão',
+    'Entrega' => 'Entrega',
 );
 
 $_estado_names = array(
-	'Valido' => 'Válido',
-	'Finalizado' => 'Finalizado',
-	'Ativo' => 'Ativo',
-	'Agendado' => 'Agendado',
-	'Entrega' => 'Entrega',
-	'Fechado' => 'Fechado',
-	'Cancelado' => 'Cancelado',
+    'Valido' => 'Válido',
+    'Finalizado' => 'Finalizado',
+    'Ativo' => 'Ativo',
+    'Agendado' => 'Agendado',
+    'Entrega' => 'Entrega',
+    'Fechado' => 'Fechado',
+    'Cancelado' => 'Cancelado',
 );
 
 $_pedido_icon = array(
-	'Mesa' => 0,
-	'Comanda' => 16,
-	'Avulso' => 32,
-	'Entrega' => 48,
+    'Mesa' => 0,
+    'Comanda' => 16,
+    'Avulso' => 32,
+    'Entrega' => 48,
 );
 
 $_cliente = ZCliente::getPeloID($_GET['clienteid']);

@@ -25,46 +25,50 @@ need_permission(PermissaoNome::CADASTROCLIENTES, $_GET['saida'] == 'json');
 $focusctrl = 'logradouro';
 $errors = array();
 if ($_POST) {
-	$localizacao = new ZLocalizacao($_POST);
-	try {
-		DB::BeginTransaction();
-		if($localizacao->getClienteID() == $__empresa__->getID() && 
-			!have_permission(PermissaoNome::ALTERARCONFIGURACOES)) {
-			throw new Exception('Você não tem permissão para atribuir um endereço a essa empresa!');
-		}
-		$localizacao->setID(null);
-		$localizacao->setCEP(\MZ\Util\Filter::unmask($localizacao->getCEP(), _p('Mascara', 'CEP')));
-		$estado = ZEstado::getPeloID($_POST['estadoid']);
-		if(is_null($estado->getID())) 
-			throw new ValidationException(array('estadoid' => 'O estado não foi informado ou não existe!'));
-		$cidade = ZCidade::procuraOuCadastra($estado->getID(), $_POST['cidade']);
-		$bairro = ZBairro::procuraOuCadastra($cidade->getID(), $_POST['bairro']);
-		$localizacao->setBairroID($bairro->getID());
-		$localizacao = ZLocalizacao::cadastrar($localizacao);
-		DB::Commit();
-		$msg = 'Localização "'.$localizacao->getLogradouro().'" cadastrada com sucesso!';
-		if($_GET['saida'] == 'json')
-			json(array('status' => 'ok', 'item' => $localizacao->toArray(), 'msg' => $msg));
-		Thunder::success($msg, true);
-		redirect('/gerenciar/localizacao/');
-	} catch (ValidationException $e) {
-		$errors = $e->getErrors();
-	} catch (Exception $e) {
-		$errors['unknow'] = $e->getMessage();
-	}
-	DB::RollBack();
-	foreach($errors as $key => $value) {
-		$focusctrl = $key;
-		if($_GET['saida'] == 'json')
-			json($value, null, array('field' => $focusctrl));
-		Thunder::error($value);
-		break;
-	}
+    $localizacao = new ZLocalizacao($_POST);
+    try {
+        DB::BeginTransaction();
+        if ($localizacao->getClienteID() == $__empresa__->getID() &&
+            !have_permission(PermissaoNome::ALTERARCONFIGURACOES)) {
+            throw new Exception('Você não tem permissão para atribuir um endereço a essa empresa!');
+        }
+        $localizacao->setID(null);
+        $localizacao->setCEP(\MZ\Util\Filter::unmask($localizacao->getCEP(), _p('Mascara', 'CEP')));
+        $estado = ZEstado::getPeloID($_POST['estadoid']);
+        if (is_null($estado->getID())) {
+            throw new ValidationException(array('estadoid' => 'O estado não foi informado ou não existe!'));
+        }
+        $cidade = ZCidade::procuraOuCadastra($estado->getID(), $_POST['cidade']);
+        $bairro = ZBairro::procuraOuCadastra($cidade->getID(), $_POST['bairro']);
+        $localizacao->setBairroID($bairro->getID());
+        $localizacao = ZLocalizacao::cadastrar($localizacao);
+        DB::Commit();
+        $msg = 'Localização "'.$localizacao->getLogradouro().'" cadastrada com sucesso!';
+        if ($_GET['saida'] == 'json') {
+            json(array('status' => 'ok', 'item' => $localizacao->toArray(), 'msg' => $msg));
+        }
+        Thunder::success($msg, true);
+        redirect('/gerenciar/localizacao/');
+    } catch (ValidationException $e) {
+        $errors = $e->getErrors();
+    } catch (Exception $e) {
+        $errors['unknow'] = $e->getMessage();
+    }
+    DB::RollBack();
+    foreach ($errors as $key => $value) {
+        $focusctrl = $key;
+        if ($_GET['saida'] == 'json') {
+            json($value, null, array('field' => $focusctrl));
+        }
+        Thunder::error($value);
+        break;
+    }
 } else {
-	$localizacao = new ZLocalizacao();
-	$localizacao->setApelido('Minha casa');
-	$localizacao->setMostrar('Y');
+    $localizacao = new ZLocalizacao();
+    $localizacao->setApelido('Minha casa');
+    $localizacao->setMostrar('Y');
 }
-if($_GET['saida'] == 'json')
-	json('Nenhum dado foi enviado');
+if ($_GET['saida'] == 'json') {
+    json('Nenhum dado foi enviado');
+}
 include template('gerenciar_localizacao_cadastrar');

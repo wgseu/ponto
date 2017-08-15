@@ -4,8 +4,8 @@ require_once(dirname(dirname(__FILE__)) . '/app.php');
 need_manager($_GET['saida'] == 'json');
 
 /* not allow access app.php */
-$script_filename = str_replace('\\','/', __FILE__);
-if($_SERVER['SCRIPT_FILENAME'] == $script_filename){
-	redirect('/gerenciar/');
+$script_filename = str_replace('\\', '/', __FILE__);
+if ($_SERVER['SCRIPT_FILENAME'] == $script_filename) {
+    redirect('/gerenciar/');
 }
 /* end */

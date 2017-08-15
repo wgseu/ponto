@@ -23,7 +23,7 @@ try {
         $products[] = array('id' => $produto->getID(), 'imagemurl' => $imagemurl);
     }
     $outputs['produtos'] = $products;
-	json(null, $outputs);
+    json(null, $outputs);
 } catch (Exception $e) {
-	json($e->getMessage());
+    json($e->getMessage());
 }

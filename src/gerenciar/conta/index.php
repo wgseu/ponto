@@ -32,6 +32,6 @@ $_classificacao = ZClassificacao::getPeloID($_GET['classificacao']);
 $classificacoes = ZClassificacao::getTodas();
 $_classificacoes = array();
 foreach ($classificacoes as $classificacao) {
-	$_classificacoes[$classificacao->getID()] = $classificacao->getDescricao();
+    $_classificacoes[$classificacao->getID()] = $classificacao->getDescricao();
 }
 include template('gerenciar_conta_index');

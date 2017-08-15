@@ -25,31 +25,31 @@ need_permission(PermissaoNome::CADASTROFORNECEDORES);
 $focusctrl = 'produtoid';
 $errors = array();
 if ($_POST) {
-	$produto_fornecedor = new ZProdutoFornecedor($_POST);
-	try {
-		$produto_fornecedor->setID(null);
-		$produto_fornecedor->setPrecoCompra(moneyval($produto_fornecedor->getPrecoCompra()));
-		$produto_fornecedor->setPrecoVenda(moneyval($produto_fornecedor->getPrecoVenda()));
-		$produto_fornecedor->setQuantidadeMinima(moneyval($produto_fornecedor->getQuantidadeMinima()));
-		$produto_fornecedor->setEstoque(moneyval($produto_fornecedor->getEstoque()));
-		$_data_consulta = strtotime($produto_fornecedor->getDataConsulta());
-		$produto_fornecedor->setDataConsulta(date('Y-m-d H:i:s', $_data_consulta));
-		$produto_fornecedor = ZProdutoFornecedor::cadastrar($produto_fornecedor);
-		Thunder::success('Produto de fornecedor "'.$produto_fornecedor->getProdutoID().'" cadastrado com sucesso!', true);
-		redirect('/gerenciar/produto_fornecedor/');
-	} catch (ValidationException $e) {
-		$errors = $e->getErrors();
-	} catch (Exception $e) {
-		$errors['unknow'] = $e->getMessage();
-	}
-	foreach($errors as $key => $value) {
-		$focusctrl = $key;
-		Thunder::error($value);
-		break;
-	}
+    $produto_fornecedor = new ZProdutoFornecedor($_POST);
+    try {
+        $produto_fornecedor->setID(null);
+        $produto_fornecedor->setPrecoCompra(moneyval($produto_fornecedor->getPrecoCompra()));
+        $produto_fornecedor->setPrecoVenda(moneyval($produto_fornecedor->getPrecoVenda()));
+        $produto_fornecedor->setQuantidadeMinima(moneyval($produto_fornecedor->getQuantidadeMinima()));
+        $produto_fornecedor->setEstoque(moneyval($produto_fornecedor->getEstoque()));
+        $_data_consulta = strtotime($produto_fornecedor->getDataConsulta());
+        $produto_fornecedor->setDataConsulta(date('Y-m-d H:i:s', $_data_consulta));
+        $produto_fornecedor = ZProdutoFornecedor::cadastrar($produto_fornecedor);
+        Thunder::success('Produto de fornecedor "'.$produto_fornecedor->getProdutoID().'" cadastrado com sucesso!', true);
+        redirect('/gerenciar/produto_fornecedor/');
+    } catch (ValidationException $e) {
+        $errors = $e->getErrors();
+    } catch (Exception $e) {
+        $errors['unknow'] = $e->getMessage();
+    }
+    foreach ($errors as $key => $value) {
+        $focusctrl = $key;
+        Thunder::error($value);
+        break;
+    }
 } else {
-	$produto_fornecedor = new ZProdutoFornecedor();
-	$produto_fornecedor->setDataConsulta(date('Y-m-d H:i:s', time()));
+    $produto_fornecedor = new ZProdutoFornecedor();
+    $produto_fornecedor->setDataConsulta(date('Y-m-d H:i:s', time()));
 }
 $_produtos = ZProduto::getTodos();
 $_fornecedores = ZFornecedor::getTodos();

@@ -25,34 +25,35 @@ need_permission(PermissaoNome::CADASTROFUNCIONARIOS);
 $focusctrl = 'clienteid';
 $errors = array();
 if ($_POST) {
-	$funcionario = new ZFuncionario($_POST);
-	try {
-		$funcionario->setID(null);
-		$funcionario->setPorcentagem(moneyval($funcionario->getPorcentagem()));
-		$funcionario->setLinguagemID(numberval($funcionario->getLinguagemID()));
-		$funcionario->setPontuacao(numberval($funcionario->getPontuacao()));
-		$funcionario->setAtivo('Y');
-		$funcionario = ZFuncionario::cadastrar($funcionario);
-		$cliente = ZCliente::getPeloID($funcionario->getClienteID());
-		Thunder::success('Funcionário "'.$cliente->getLogin().'" cadastrado com sucesso!', true);
-		redirect('/gerenciar/funcionario/');
-	} catch (ValidationException $e) {
-		$errors = $e->getErrors();
-	} catch (Exception $e) {
-		$errors['unknow'] = $e->getMessage();
-	}
-	foreach($errors as $key => $value) {
-		$focusctrl = $key;
-		Thunder::error($value);
-		break;
-	}
+    $funcionario = new ZFuncionario($_POST);
+    try {
+        $funcionario->setID(null);
+        $funcionario->setPorcentagem(moneyval($funcionario->getPorcentagem()));
+        $funcionario->setLinguagemID(numberval($funcionario->getLinguagemID()));
+        $funcionario->setPontuacao(numberval($funcionario->getPontuacao()));
+        $funcionario->setAtivo('Y');
+        $funcionario = ZFuncionario::cadastrar($funcionario);
+        $cliente = ZCliente::getPeloID($funcionario->getClienteID());
+        Thunder::success('Funcionário "'.$cliente->getLogin().'" cadastrado com sucesso!', true);
+        redirect('/gerenciar/funcionario/');
+    } catch (ValidationException $e) {
+        $errors = $e->getErrors();
+    } catch (Exception $e) {
+        $errors['unknow'] = $e->getMessage();
+    }
+    foreach ($errors as $key => $value) {
+        $focusctrl = $key;
+        Thunder::error($value);
+        break;
+    }
 } else {
-	$funcionario = new ZFuncionario();
-	$funcionario->setPontuacao(0);
-	$funcionario->setAtivo('Y');
+    $funcionario = new ZFuncionario();
+    $funcionario->setPontuacao(0);
+    $funcionario->setAtivo('Y');
 }
-if($focusctrl == 'clienteid')
-	$focusctrl = 'cliente';
+if ($focusctrl == 'clienteid') {
+    $focusctrl = 'cliente';
+}
 $_funcoes = ZFuncao::getTodas();
 $linguagens = get_languages_info();
 include template('gerenciar_funcionario_cadastrar');

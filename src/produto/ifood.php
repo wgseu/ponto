@@ -27,75 +27,76 @@ need_permission(PermissaoNome::CADASTROPRODUTOS);
 $pagetitle = 'Converter cardápio iFood';
 
 if ($_POST) {
-	try {
-		$cardapio_file = upload_document('raw_cardapio', 'xml', 'cardapio.html');
-		if(is_null($cardapio_file))
-			throw new Exception('O cardápio não foi enviado', 404);
-		$cardapio_path = WWW_ROOT . get_document_url($cardapio_file, 'xml');
-		$cardapio_data = file_get_contents($cardapio_path);
-		unlink($cardapio_path);
-		$dom = new \DOMDocument();
-		$dom->loadHTML($cardapio_data);
-		$nodes = $dom->getElementsByTagName('strong');
-		$ifood = array();
-		$codigos = array();
-		$i = 0;
-		foreach ($nodes as $strong) {
-			$finder = new DOMXPath($dom);
-			$list = $strong->getElementsByTagName('input');
-			// $list = $finder->query("//input[contains(@class, 'codigo')]", $strong);
-			if ($list->length > 0) {
-				$codigo = $list->item(0)->getAttribute('value');
-			} else {
-				$list = $strong->getElementsByTagName('span');
-				if ($list->length > 0) {
-					$codigo = $list->item(0)->getAttribute('id');
-				} else {
-					$codigo = 'unknow_'.++$i;
-				}
-			}
-			$descricao = trim($strong->nodeValue);
-			$codigos[$codigo] = $descricao;
-		}
-		$codigos_sistema = array();
-		$produtos = ZProduto::getTodos();
-		foreach ($produtos as $produto) {
-			$codigos_sistema[$produto->getID()] = $produto->getDescricao();
-			if ($produto->getTipo() != ProdutoTipo::PACOTE) {
-				continue;
-			}
-			$grupos = ZGrupo::getTodosDoProdutoID($produto->getID());
-			foreach ($grupos as $grupo) {
-				$pacotes = ZPacote::getTodosDoGrupoIDEx($grupo->getID());
-				foreach ($pacotes as $pacote) {
-					if (!is_null($pacote['associacaoid'])) {
-						$associado = ZPacote::getPeloID($pacote['associacaoid']);
-						$produto_associado = ZProduto::getPeloID($associado->getProdutoID());
-						$propriedade_associado = ZPropriedade::getPeloID($associado->getPropriedadeID());
-						$assoc_desc = is_null($associado->getProdutoID())?$propriedade_associado->getNome().' - '.$propriedade_associado->getAbreviacao():$produto_associado->getDescricao().' - '.$produto_associado->getAbreviacao();
-						$assoc_desc = ': '.$assoc_desc;
-					} else {
-						$assoc_desc = '';
-					}
-					if (!is_null($pacote['abreviacao'])) {
-						$abrev = ' - '.$pacote['abreviacao'].$assoc_desc;
-					} else {
-						$abrev = '';
-					}
-					$codigos_sistema['pacote['.$pacote['id'].']'] = $pacote['descricao'].$abrev;
-				}
-			}
-		}
-		$ifood['Codigos'] = $codigos;
-		$ifood['Sistema'] = $codigos_sistema;
+    try {
+        $cardapio_file = upload_document('raw_cardapio', 'xml', 'cardapio.html');
+        if (is_null($cardapio_file)) {
+            throw new Exception('O cardápio não foi enviado', 404);
+        }
+        $cardapio_path = WWW_ROOT . get_document_url($cardapio_file, 'xml');
+        $cardapio_data = file_get_contents($cardapio_path);
+        unlink($cardapio_path);
+        $dom = new \DOMDocument();
+        $dom->loadHTML($cardapio_data);
+        $nodes = $dom->getElementsByTagName('strong');
+        $ifood = array();
+        $codigos = array();
+        $i = 0;
+        foreach ($nodes as $strong) {
+            $finder = new DOMXPath($dom);
+            $list = $strong->getElementsByTagName('input');
+            // $list = $finder->query("//input[contains(@class, 'codigo')]", $strong);
+            if ($list->length > 0) {
+                $codigo = $list->item(0)->getAttribute('value');
+            } else {
+                $list = $strong->getElementsByTagName('span');
+                if ($list->length > 0) {
+                    $codigo = $list->item(0)->getAttribute('id');
+                } else {
+                    $codigo = 'unknow_'.++$i;
+                }
+            }
+            $descricao = trim($strong->nodeValue);
+            $codigos[$codigo] = $descricao;
+        }
+        $codigos_sistema = array();
+        $produtos = ZProduto::getTodos();
+        foreach ($produtos as $produto) {
+            $codigos_sistema[$produto->getID()] = $produto->getDescricao();
+            if ($produto->getTipo() != ProdutoTipo::PACOTE) {
+                continue;
+            }
+            $grupos = ZGrupo::getTodosDoProdutoID($produto->getID());
+            foreach ($grupos as $grupo) {
+                $pacotes = ZPacote::getTodosDoGrupoIDEx($grupo->getID());
+                foreach ($pacotes as $pacote) {
+                    if (!is_null($pacote['associacaoid'])) {
+                        $associado = ZPacote::getPeloID($pacote['associacaoid']);
+                        $produto_associado = ZProduto::getPeloID($associado->getProdutoID());
+                        $propriedade_associado = ZPropriedade::getPeloID($associado->getPropriedadeID());
+                        $assoc_desc = is_null($associado->getProdutoID())?$propriedade_associado->getNome().' - '.$propriedade_associado->getAbreviacao():$produto_associado->getDescricao().' - '.$produto_associado->getAbreviacao();
+                        $assoc_desc = ': '.$assoc_desc;
+                    } else {
+                        $assoc_desc = '';
+                    }
+                    if (!is_null($pacote['abreviacao'])) {
+                        $abrev = ' - '.$pacote['abreviacao'].$assoc_desc;
+                    } else {
+                        $abrev = '';
+                    }
+                    $codigos_sistema['pacote['.$pacote['id'].']'] = $pacote['descricao'].$abrev;
+                }
+            }
+        }
+        $ifood['Codigos'] = $codigos;
+        $ifood['Sistema'] = $codigos_sistema;
 
-		header('Content-Type: text/plain');
-		header('Content-Disposition: attachment; filename="ifood.ini"');
-		echo to_ini($ifood);
-		exit;
-	} catch (Exception $e) {
-		Thunder::error($e->getMessage());
-	}
+        header('Content-Type: text/plain');
+        header('Content-Disposition: attachment; filename="ifood.ini"');
+        echo to_ini($ifood);
+        exit;
+    } catch (Exception $e) {
+        Thunder::error($e->getMessage());
+    }
 }
 
 include template('produto_ifood');

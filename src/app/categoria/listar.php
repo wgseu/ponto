@@ -25,9 +25,9 @@ $categorias = ZCategoria::getTodas();
 $response = array('status' => 'ok');
 $_categorias = array();
 foreach ($categorias as $categoria) {
-	$_categoria = $categoria->toArray();
-	$_categoria['imagemurl'] = get_image_url($_categoria['imagem'], 'categoria', null);
-	$_categorias[] = $_categoria;
+    $_categoria = $categoria->toArray();
+    $_categoria['imagemurl'] = get_image_url($_categoria['imagem'], 'categoria', null);
+    $_categorias[] = $_categoria;
 }
 $response['categorias'] = $_categorias;
 json($response);

@@ -25,41 +25,43 @@ need_permission(PermissaoNome::CADASTROPATRIMONIO);
 $focusctrl = 'descricao';
 $errors = array();
 if ($_POST) {
-	$patrimonio = new ZPatrimonio($_POST);
-	try {
-		$patrimonio->setID(null);
-		$patrimonio->setQuantidade(moneyval($patrimonio->getQuantidade()));
-		$patrimonio->setAltura(moneyval($patrimonio->getAltura()));
-		$patrimonio->setLargura(moneyval($patrimonio->getLargura()));
-		$patrimonio->setComprimento(moneyval($patrimonio->getComprimento()));
-		$patrimonio->setCusto(moneyval($patrimonio->getCusto()));
-		$patrimonio->setValor(moneyval($patrimonio->getValor()));
-		$patrimonio->setDataAtualizacao(date('Y-m-d H:i:s', time()));
-		$imagem_anexada = upload_image('raw_imagemanexada', 'patrimonio');
-		$patrimonio->setImagemAnexada($imagem_anexada);
-		$patrimonio = ZPatrimonio::cadastrar($patrimonio);
-		Thunder::success('Patrimônio "'.$patrimonio->getDescricao().'" cadastrado com sucesso!', true);
-		redirect('/gerenciar/patrimonio/');
-	} catch (ValidationException $e) {
-		$errors = $e->getErrors();
-	} catch (Exception $e) {
-		$errors['unknow'] = $e->getMessage();
-	}
-	// remove a foto do bem enviada
-	if(!is_null($patrimonio->getImagemAnexada()))
-		unlink(WWW_ROOT . get_image_url($patrimonio->getImagemAnexada(), 'patrimonio'));
-	$patrimonio->setImagemAnexada(null);
-	foreach($errors as $key => $value) {
-		$focusctrl = $key;
-		Thunder::error($value);
-		break;
-	}
+    $patrimonio = new ZPatrimonio($_POST);
+    try {
+        $patrimonio->setID(null);
+        $patrimonio->setQuantidade(moneyval($patrimonio->getQuantidade()));
+        $patrimonio->setAltura(moneyval($patrimonio->getAltura()));
+        $patrimonio->setLargura(moneyval($patrimonio->getLargura()));
+        $patrimonio->setComprimento(moneyval($patrimonio->getComprimento()));
+        $patrimonio->setCusto(moneyval($patrimonio->getCusto()));
+        $patrimonio->setValor(moneyval($patrimonio->getValor()));
+        $patrimonio->setDataAtualizacao(date('Y-m-d H:i:s', time()));
+        $imagem_anexada = upload_image('raw_imagemanexada', 'patrimonio');
+        $patrimonio->setImagemAnexada($imagem_anexada);
+        $patrimonio = ZPatrimonio::cadastrar($patrimonio);
+        Thunder::success('Patrimônio "'.$patrimonio->getDescricao().'" cadastrado com sucesso!', true);
+        redirect('/gerenciar/patrimonio/');
+    } catch (ValidationException $e) {
+        $errors = $e->getErrors();
+    } catch (Exception $e) {
+        $errors['unknow'] = $e->getMessage();
+    }
+    // remove a foto do bem enviada
+    if (!is_null($patrimonio->getImagemAnexada())) {
+        unlink(WWW_ROOT . get_image_url($patrimonio->getImagemAnexada(), 'patrimonio'));
+    }
+    $patrimonio->setImagemAnexada(null);
+    foreach ($errors as $key => $value) {
+        $focusctrl = $key;
+        Thunder::error($value);
+        break;
+    }
 } else {
-	$patrimonio = new ZPatrimonio();
-	$patrimonio->setAtivo('Y');
+    $patrimonio = new ZPatrimonio();
+    $patrimonio->setAtivo('Y');
 }
-if($focusctrl == 'empresaid')
-	$focusctrl == 'empresa';
-else if($focusctrl == 'fornecedorid')
-	$focusctrl == 'fornecedor';
+if ($focusctrl == 'empresaid') {
+    $focusctrl == 'empresa';
+} elseif ($focusctrl == 'fornecedorid') {
+    $focusctrl == 'fornecedor';
+}
 include template('gerenciar_patrimonio_cadastrar');

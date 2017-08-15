@@ -25,29 +25,29 @@ need_permission(PermissaoNome::CADASTROFORMASPAGTO);
 $focusctrl = 'descricao';
 $errors = array();
 if ($_POST) {
-	$forma_pagto = new ZFormaPagto($_POST);
-	try {
-		$forma_pagto->setID(null);
-		$forma_pagto->setMinParcelas(numberval($forma_pagto->getMinParcelas()));
-		$forma_pagto->setMaxParcelas(numberval($forma_pagto->getMaxParcelas()));
-		$forma_pagto->setParcelasSemJuros(numberval($forma_pagto->getParcelasSemJuros()));
-		$forma_pagto->setJuros(moneyval($forma_pagto->getJuros()));
-		$forma_pagto = ZFormaPagto::cadastrar($forma_pagto);
-		Thunder::success('Forma de pagamento "'.$forma_pagto->getDescricao().'" cadastrada com sucesso!', true);
-		redirect('/gerenciar/forma_pagto/');
-	} catch (ValidationException $e) {
-		$errors = $e->getErrors();
-	} catch (Exception $e) {
-		$errors['unknow'] = $e->getMessage();
-	}
-	foreach($errors as $key => $value) {
-		$focusctrl = $key;
-		Thunder::error($value);
-		break;
-	}
+    $forma_pagto = new ZFormaPagto($_POST);
+    try {
+        $forma_pagto->setID(null);
+        $forma_pagto->setMinParcelas(numberval($forma_pagto->getMinParcelas()));
+        $forma_pagto->setMaxParcelas(numberval($forma_pagto->getMaxParcelas()));
+        $forma_pagto->setParcelasSemJuros(numberval($forma_pagto->getParcelasSemJuros()));
+        $forma_pagto->setJuros(moneyval($forma_pagto->getJuros()));
+        $forma_pagto = ZFormaPagto::cadastrar($forma_pagto);
+        Thunder::success('Forma de pagamento "'.$forma_pagto->getDescricao().'" cadastrada com sucesso!', true);
+        redirect('/gerenciar/forma_pagto/');
+    } catch (ValidationException $e) {
+        $errors = $e->getErrors();
+    } catch (Exception $e) {
+        $errors['unknow'] = $e->getMessage();
+    }
+    foreach ($errors as $key => $value) {
+        $focusctrl = $key;
+        Thunder::error($value);
+        break;
+    }
 } else {
-	$forma_pagto = new ZFormaPagto();
-	$forma_pagto->setAtiva('Y');
+    $forma_pagto = new ZFormaPagto();
+    $forma_pagto->setAtiva('Y');
 }
 $_carteiras = ZCarteira::getTodas();
 include template('gerenciar_forma_pagto_cadastrar');

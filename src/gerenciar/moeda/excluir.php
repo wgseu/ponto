@@ -24,14 +24,14 @@ require_once(dirname(dirname(__FILE__)) . '/app.php');
 need_permission(PermissaoNome::CADASTROMOEDAS);
 $id = $_GET['id'];
 $moeda = ZMoeda::getPeloID($id);
-if(is_null($moeda->getID())) {
-	Thunder::warning('A moeda de id "'.$id.'" não existe!');
-	redirect('/gerenciar/moeda/');
+if (is_null($moeda->getID())) {
+    Thunder::warning('A moeda de id "'.$id.'" não existe!');
+    redirect('/gerenciar/moeda/');
 }
 try {
-	ZMoeda::excluir($id);
-	Thunder::success('Moeda "' . $moeda->getNome() . '" excluída com sucesso!', true);
+    ZMoeda::excluir($id);
+    Thunder::success('Moeda "' . $moeda->getNome() . '" excluída com sucesso!', true);
 } catch (Exception $e) {
-	Thunder::error('Não foi possível excluir a moeda "' . $moeda->getNome() . '"!');
+    Thunder::error('Não foi possível excluir a moeda "' . $moeda->getNome() . '"!');
 }
 redirect('/gerenciar/moeda/');

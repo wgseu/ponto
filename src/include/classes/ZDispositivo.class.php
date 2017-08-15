@@ -19,379 +19,439 @@
 	O Cliente adquire apenas o direito de usar o software e não adquire qualquer outros
 	direitos, expressos ou implícitos no GrandChef diferentes dos especificados nesta Licença.
 */
-class DispositivoTipo {
-	const COMPUTADOR = 'Computador';
-	const TABLET = 'Tablet';
+class DispositivoTipo
+{
+    const COMPUTADOR = 'Computador';
+    const TABLET = 'Tablet';
 }
 
 /**
  * Computadores e tablets com opções de acesso
  */
-class ZDispositivo {
-	private $id;
-	private $setor_id;
-	private $caixa_id;
-	private $nome;
-	private $tipo;
-	private $descricao;
-	private $opcoes;
-	private $serial;
-	private $validacao;
+class ZDispositivo
+{
+    private $id;
+    private $setor_id;
+    private $caixa_id;
+    private $nome;
+    private $tipo;
+    private $descricao;
+    private $opcoes;
+    private $serial;
+    private $validacao;
 
-	public function __construct($dispositivo = array()) {
-		if(is_array($dispositivo)) {
-			$this->setID(isset($dispositivo['id'])?$dispositivo['id']:null);
-			$this->setSetorID(isset($dispositivo['setorid'])?$dispositivo['setorid']:null);
-			$this->setCaixaID(isset($dispositivo['caixaid'])?$dispositivo['caixaid']:null);
-			$this->setNome(isset($dispositivo['nome'])?$dispositivo['nome']:null);
-			$this->setTipo(isset($dispositivo['tipo'])?$dispositivo['tipo']:null);
-			$this->setDescricao(isset($dispositivo['descricao'])?$dispositivo['descricao']:null);
-			$this->setOpcoes(isset($dispositivo['opcoes'])?$dispositivo['opcoes']:null);
-			$this->setSerial(isset($dispositivo['serial'])?$dispositivo['serial']:null);
-			$this->setValidacao(isset($dispositivo['validacao'])?$dispositivo['validacao']:null);
-		}
-	}
+    public function __construct($dispositivo = array())
+    {
+        if (is_array($dispositivo)) {
+            $this->setID(isset($dispositivo['id'])?$dispositivo['id']:null);
+            $this->setSetorID(isset($dispositivo['setorid'])?$dispositivo['setorid']:null);
+            $this->setCaixaID(isset($dispositivo['caixaid'])?$dispositivo['caixaid']:null);
+            $this->setNome(isset($dispositivo['nome'])?$dispositivo['nome']:null);
+            $this->setTipo(isset($dispositivo['tipo'])?$dispositivo['tipo']:null);
+            $this->setDescricao(isset($dispositivo['descricao'])?$dispositivo['descricao']:null);
+            $this->setOpcoes(isset($dispositivo['opcoes'])?$dispositivo['opcoes']:null);
+            $this->setSerial(isset($dispositivo['serial'])?$dispositivo['serial']:null);
+            $this->setValidacao(isset($dispositivo['validacao'])?$dispositivo['validacao']:null);
+        }
+    }
 
-	/**
-	 * Identificador do dispositivo
-	 */
-	public function getID() {
-		return $this->id;
-	}
+    /**
+     * Identificador do dispositivo
+     */
+    public function getID()
+    {
+        return $this->id;
+    }
 
-	/**
-	 * Identificador do dispositivo
-	 */
-	public function setID($id) {
-		$this->id = $id;
-	}
+    /**
+     * Identificador do dispositivo
+     */
+    public function setID($id)
+    {
+        $this->id = $id;
+    }
 
-	/**
-	 * Setor em que o dispositivo está instalado/será usado
-	 */
-	public function getSetorID() {
-		return $this->setor_id;
-	}
+    /**
+     * Setor em que o dispositivo está instalado/será usado
+     */
+    public function getSetorID()
+    {
+        return $this->setor_id;
+    }
 
-	/**
-	 * Setor em que o dispositivo está instalado/será usado
-	 */
-	public function setSetorID($setor_id) {
-		$this->setor_id = $setor_id;
-	}
+    /**
+     * Setor em que o dispositivo está instalado/será usado
+     */
+    public function setSetorID($setor_id)
+    {
+        $this->setor_id = $setor_id;
+    }
 
-	/**
-	 * Finalidade do dispositivo, caixa ou terminal, o caixa é único entre os dispositivos
-	 */
-	public function getCaixaID() {
-		return $this->caixa_id;
-	}
+    /**
+     * Finalidade do dispositivo, caixa ou terminal, o caixa é único entre os dispositivos
+     */
+    public function getCaixaID()
+    {
+        return $this->caixa_id;
+    }
 
-	/**
-	 * Finalidade do dispositivo, caixa ou terminal, o caixa é único entre os dispositivos
-	 */
-	public function setCaixaID($caixa_id) {
-		$this->caixa_id = $caixa_id;
-	}
+    /**
+     * Finalidade do dispositivo, caixa ou terminal, o caixa é único entre os dispositivos
+     */
+    public function setCaixaID($caixa_id)
+    {
+        $this->caixa_id = $caixa_id;
+    }
 
-	/**
-	 * Nome do computador ou tablet em rede, único entre os dispositivos
-	 */
-	public function getNome() {
-		return $this->nome;
-	}
+    /**
+     * Nome do computador ou tablet em rede, único entre os dispositivos
+     */
+    public function getNome()
+    {
+        return $this->nome;
+    }
 
-	/**
-	 * Nome do computador ou tablet em rede, único entre os dispositivos
-	 */
-	public function setNome($nome) {
-		$this->nome = $nome;
-	}
+    /**
+     * Nome do computador ou tablet em rede, único entre os dispositivos
+     */
+    public function setNome($nome)
+    {
+        $this->nome = $nome;
+    }
 
-	/**
-	 * Tipo de dispositivo
-	 */
-	public function getTipo() {
-		return $this->tipo;
-	}
+    /**
+     * Tipo de dispositivo
+     */
+    public function getTipo()
+    {
+        return $this->tipo;
+    }
 
-	/**
-	 * Tipo de dispositivo
-	 */
-	public function setTipo($tipo) {
-		$this->tipo = $tipo;
-	}
+    /**
+     * Tipo de dispositivo
+     */
+    public function setTipo($tipo)
+    {
+        $this->tipo = $tipo;
+    }
 
-	/**
-	 * Descrição do dispositivo
-	 */
-	public function getDescricao() {
-		return $this->descricao;
-	}
+    /**
+     * Descrição do dispositivo
+     */
+    public function getDescricao()
+    {
+        return $this->descricao;
+    }
 
-	/**
-	 * Descrição do dispositivo
-	 */
-	public function setDescricao($descricao) {
-		$this->descricao = $descricao;
-	}
+    /**
+     * Descrição do dispositivo
+     */
+    public function setDescricao($descricao)
+    {
+        $this->descricao = $descricao;
+    }
 
-	/**
-	 * Opções do dispositivo, Ex.: Balança, identificador de chamadas e outros
-	 */
-	public function getOpcoes() {
-		return $this->opcoes;
-	}
+    /**
+     * Opções do dispositivo, Ex.: Balança, identificador de chamadas e outros
+     */
+    public function getOpcoes()
+    {
+        return $this->opcoes;
+    }
 
-	/**
-	 * Opções do dispositivo, Ex.: Balança, identificador de chamadas e outros
-	 */
-	public function setOpcoes($opcoes) {
-		$this->opcoes = $opcoes;
-	}
+    /**
+     * Opções do dispositivo, Ex.: Balança, identificador de chamadas e outros
+     */
+    public function setOpcoes($opcoes)
+    {
+        $this->opcoes = $opcoes;
+    }
 
-	/**
-	 * Serial do tablet para validação, único entre os dispositivos
-	 */
-	public function getSerial() {
-		return $this->serial;
-	}
+    /**
+     * Serial do tablet para validação, único entre os dispositivos
+     */
+    public function getSerial()
+    {
+        return $this->serial;
+    }
 
-	/**
-	 * Serial do tablet para validação, único entre os dispositivos
-	 */
-	public function setSerial($serial) {
-		$this->serial = $serial;
-	}
+    /**
+     * Serial do tablet para validação, único entre os dispositivos
+     */
+    public function setSerial($serial)
+    {
+        $this->serial = $serial;
+    }
 
-	/**
-	 * Validação do tablet
-	 */
-	public function getValidacao() {
-		return $this->validacao;
-	}
+    /**
+     * Validação do tablet
+     */
+    public function getValidacao()
+    {
+        return $this->validacao;
+    }
 
-	/**
-	 * Validação do tablet
-	 */
-	public function setValidacao($validacao) {
-		$this->validacao = $validacao;
-	}
-	public function toArray() {
-		$dispositivo = array();
-		$dispositivo['id'] = $this->getID();
-		$dispositivo['setorid'] = $this->getSetorID();
-		$dispositivo['caixaid'] = $this->getCaixaID();
-		$dispositivo['nome'] = $this->getNome();
-		$dispositivo['tipo'] = $this->getTipo();
-		$dispositivo['descricao'] = $this->getDescricao();
-		$dispositivo['opcoes'] = $this->getOpcoes();
-		$dispositivo['serial'] = $this->getSerial();
-		$dispositivo['validacao'] = $this->getValidacao();
-		return $dispositivo;
-	}
+    /**
+     * Validação do tablet
+     */
+    public function setValidacao($validacao)
+    {
+        $this->validacao = $validacao;
+    }
+    public function toArray()
+    {
+        $dispositivo = array();
+        $dispositivo['id'] = $this->getID();
+        $dispositivo['setorid'] = $this->getSetorID();
+        $dispositivo['caixaid'] = $this->getCaixaID();
+        $dispositivo['nome'] = $this->getNome();
+        $dispositivo['tipo'] = $this->getTipo();
+        $dispositivo['descricao'] = $this->getDescricao();
+        $dispositivo['opcoes'] = $this->getOpcoes();
+        $dispositivo['serial'] = $this->getSerial();
+        $dispositivo['validacao'] = $this->getValidacao();
+        return $dispositivo;
+    }
 
-	public static function getPeloID($id) {
-		$query = DB::$pdo->from('Dispositivos')
-		                 ->where(array('id' => $id));
-		return new ZDispositivo($query->fetch());
-	}
+    public static function getPeloID($id)
+    {
+        $query = DB::$pdo->from('Dispositivos')
+                         ->where(array('id' => $id));
+        return new ZDispositivo($query->fetch());
+    }
 
-	public static function getPeloNome($nome) {
-		$query = DB::$pdo->from('Dispositivos')
-		                 ->where(array('nome' => $nome));
-		return new ZDispositivo($query->fetch());
-	}
+    public static function getPeloNome($nome)
+    {
+        $query = DB::$pdo->from('Dispositivos')
+                         ->where(array('nome' => $nome));
+        return new ZDispositivo($query->fetch());
+    }
 
-	public static function getNaoValidado() {
-		$query = DB::$pdo->from('Dispositivos')
-		                 ->where(array('validacao' => null, 
-		                 			   'tipo' => DispositivoTipo::TABLET))
-						 ->limit(1)->offset(0);
-		return new ZDispositivo($query->fetch());
-	}
+    public static function getNaoValidado()
+    {
+        $query = DB::$pdo->from('Dispositivos')
+                         ->where(array('validacao' => null,
+                                       'tipo' => DispositivoTipo::TABLET))
+                         ->limit(1)->offset(0);
+        return new ZDispositivo($query->fetch());
+    }
 
-	public static function getPelaCaixaID($caixa_id) {
-		$query = DB::$pdo->from('Dispositivos')
-		                 ->where(array('caixaid' => $caixa_id));
-		return new ZDispositivo($query->fetch());
-	}
+    public static function getPelaCaixaID($caixa_id)
+    {
+        $query = DB::$pdo->from('Dispositivos')
+                         ->where(array('caixaid' => $caixa_id));
+        return new ZDispositivo($query->fetch());
+    }
 
-	public static function getPelaSerial($serial) {
-		$query = DB::$pdo->from('Dispositivos')
-		                 ->where(array('serial' => $serial));
-		return new ZDispositivo($query->fetch());
-	}
+    public static function getPelaSerial($serial)
+    {
+        $query = DB::$pdo->from('Dispositivos')
+                         ->where(array('serial' => $serial));
+        return new ZDispositivo($query->fetch());
+    }
 
-	private static function validarCampos(&$dispositivo) {
-		$erros = array();
-		if(!is_numeric($dispositivo['setorid']))
-			$erros['setorid'] = 'O ID do setor não é um número';
-		$dispositivo['caixaid'] = trim($dispositivo['caixaid']);
-		if(strlen($dispositivo['caixaid']) == 0)
-			$dispositivo['caixaid'] = null;
-		else if(!is_numeric($dispositivo['caixaid']))
-			$erros['caixaid'] = 'O ID do caixa não é um número';
-		$dispositivo['nome'] = strip_tags(trim($dispositivo['nome']));
-		if(strlen($dispositivo['nome']) == 0)
-			$erros['nome'] = 'O Nome não pode ser vazio';
-		$dispositivo['tipo'] = trim($dispositivo['tipo']);
-		if(strlen($dispositivo['tipo']) == 0)
-			$dispositivo['tipo'] = null;
-		else if(!in_array($dispositivo['tipo'], array('Computador', 'Tablet')))
-			$erros['tipo'] = 'O Tipo informado não é válido';
-		$dispositivo['descricao'] = strip_tags(trim($dispositivo['descricao']));
-		if(strlen($dispositivo['descricao']) == 0)
-			$dispositivo['descricao'] = null;
-		if(!is_numeric($dispositivo['opcoes']))
-			$erros['opcoes'] = 'As opções do dispositivo não é um número';
-		else
-			$dispositivo['opcoes'] = intval($dispositivo['opcoes']);
-		$dispositivo['serial'] = strip_tags(trim($dispositivo['serial']));
-		if(strlen($dispositivo['serial']) == 0)
-			$dispositivo['serial'] = null;
-		$dispositivo['validacao'] = strip_tags(trim($dispositivo['validacao']));
-		if(strlen($dispositivo['validacao']) == 0)
-			$dispositivo['validacao'] = null;
-		if(!empty($erros))
-			throw new ValidationException($erros);
-	}
+    private static function validarCampos(&$dispositivo)
+    {
+        $erros = array();
+        if (!is_numeric($dispositivo['setorid'])) {
+            $erros['setorid'] = 'O ID do setor não é um número';
+        }
+        $dispositivo['caixaid'] = trim($dispositivo['caixaid']);
+        if (strlen($dispositivo['caixaid']) == 0) {
+            $dispositivo['caixaid'] = null;
+        } elseif (!is_numeric($dispositivo['caixaid'])) {
+            $erros['caixaid'] = 'O ID do caixa não é um número';
+        }
+        $dispositivo['nome'] = strip_tags(trim($dispositivo['nome']));
+        if (strlen($dispositivo['nome']) == 0) {
+            $erros['nome'] = 'O Nome não pode ser vazio';
+        }
+        $dispositivo['tipo'] = trim($dispositivo['tipo']);
+        if (strlen($dispositivo['tipo']) == 0) {
+            $dispositivo['tipo'] = null;
+        } elseif (!in_array($dispositivo['tipo'], array('Computador', 'Tablet'))) {
+            $erros['tipo'] = 'O Tipo informado não é válido';
+        }
+        $dispositivo['descricao'] = strip_tags(trim($dispositivo['descricao']));
+        if (strlen($dispositivo['descricao']) == 0) {
+            $dispositivo['descricao'] = null;
+        }
+        if (!is_numeric($dispositivo['opcoes'])) {
+            $erros['opcoes'] = 'As opções do dispositivo não é um número';
+        } else {
+            $dispositivo['opcoes'] = intval($dispositivo['opcoes']);
+        }
+        $dispositivo['serial'] = strip_tags(trim($dispositivo['serial']));
+        if (strlen($dispositivo['serial']) == 0) {
+            $dispositivo['serial'] = null;
+        }
+        $dispositivo['validacao'] = strip_tags(trim($dispositivo['validacao']));
+        if (strlen($dispositivo['validacao']) == 0) {
+            $dispositivo['validacao'] = null;
+        }
+        if (!empty($erros)) {
+            throw new ValidationException($erros);
+        }
+    }
 
-	private static function handleException(&$e) {
-		if(stripos($e->getMessage(), 'PRIMARY') !== false)
-			throw new ValidationException(array('id' => 'O ID informado já está cadastrado'));
-		if(stripos($e->getMessage(), 'Nome_UNIQUE') !== false)
-			throw new ValidationException(array('nome' => 'O Nome informado já está cadastrado'));
-		if(stripos($e->getMessage(), 'CaixaID_UNIQUE') !== false)
-			throw new ValidationException(array('caixaid' => 'Já existe um dispositivo para este caixa'));
-		if(stripos($e->getMessage(), 'Serial_UNIQUE') !== false)
-			throw new ValidationException(array('serial' => 'O serial informado já está cadastrado'));
-	}
+    private static function handleException(&$e)
+    {
+        if (stripos($e->getMessage(), 'PRIMARY') !== false) {
+            throw new ValidationException(array('id' => 'O ID informado já está cadastrado'));
+        }
+        if (stripos($e->getMessage(), 'Nome_UNIQUE') !== false) {
+            throw new ValidationException(array('nome' => 'O Nome informado já está cadastrado'));
+        }
+        if (stripos($e->getMessage(), 'CaixaID_UNIQUE') !== false) {
+            throw new ValidationException(array('caixaid' => 'Já existe um dispositivo para este caixa'));
+        }
+        if (stripos($e->getMessage(), 'Serial_UNIQUE') !== false) {
+            throw new ValidationException(array('serial' => 'O serial informado já está cadastrado'));
+        }
+    }
 
-	public static function cadastrar($dispositivo) {
-		$_dispositivo = $dispositivo->toArray();
-		self::validarCampos($_dispositivo);
-		try {
-			$_dispositivo['id'] = DB::$pdo->insertInto('Dispositivos')->values($_dispositivo)->execute();
-		} catch (Exception $e) {
-			self::handleException($e);
-			throw $e;
-		}
-		return self::getPeloID($_dispositivo['id']);
-	}
+    public static function cadastrar($dispositivo)
+    {
+        $_dispositivo = $dispositivo->toArray();
+        self::validarCampos($_dispositivo);
+        try {
+            $_dispositivo['id'] = DB::$pdo->insertInto('Dispositivos')->values($_dispositivo)->execute();
+        } catch (Exception $e) {
+            self::handleException($e);
+            throw $e;
+        }
+        return self::getPeloID($_dispositivo['id']);
+    }
 
-	public static function atualizar($dispositivo) {
-		$_dispositivo = $dispositivo->toArray();
-		if(!$_dispositivo['id'])
-			throw new ValidationException(array('id' => 'O id do dispositivo não foi informado'));
-		self::validarCampos($_dispositivo);
-		$campos = array(
-			'setorid',
-			'caixaid',
-			'nome',
-			'tipo',
-			'descricao',
-			'opcoes',
-			'serial',
-			'validacao',
-		);
-		try {
-			$query = DB::$pdo->update('Dispositivos');
-			$query = $query->set(array_intersect_key($_dispositivo, array_flip($campos)));
-			$query = $query->where('id', $_dispositivo['id']);
-			$query->execute();
-		} catch (Exception $e) {
-			self::handleException($e);
-			throw $e;
-		}
-		return self::getPeloID($_dispositivo['id']);
-	}
+    public static function atualizar($dispositivo)
+    {
+        $_dispositivo = $dispositivo->toArray();
+        if (!$_dispositivo['id']) {
+            throw new ValidationException(array('id' => 'O id do dispositivo não foi informado'));
+        }
+        self::validarCampos($_dispositivo);
+        $campos = array(
+            'setorid',
+            'caixaid',
+            'nome',
+            'tipo',
+            'descricao',
+            'opcoes',
+            'serial',
+            'validacao',
+        );
+        try {
+            $query = DB::$pdo->update('Dispositivos');
+            $query = $query->set(array_intersect_key($_dispositivo, array_flip($campos)));
+            $query = $query->where('id', $_dispositivo['id']);
+            $query->execute();
+        } catch (Exception $e) {
+            self::handleException($e);
+            throw $e;
+        }
+        return self::getPeloID($_dispositivo['id']);
+    }
 
-	public static function excluir($id) {
-		if(!$id)
-			throw new Exception('Não foi possível excluir o dispositivo, o id do dispositivo não foi informado');
-		$query = DB::$pdo->deleteFrom('Dispositivos')
-		                 ->where(array('id' => $id));
-		return $query->execute();
-	}
+    public static function excluir($id)
+    {
+        if (!$id) {
+            throw new Exception('Não foi possível excluir o dispositivo, o id do dispositivo não foi informado');
+        }
+        $query = DB::$pdo->deleteFrom('Dispositivos')
+                         ->where(array('id' => $id));
+        return $query->execute();
+    }
 
-	private static function initSearch() {
-		return   DB::$pdo->from('Dispositivos')
-		                 ->orderBy('id ASC');
-	}
+    private static function initSearch()
+    {
+        return   DB::$pdo->from('Dispositivos')
+                         ->orderBy('id ASC');
+    }
 
-	public static function getTodos($inicio = null, $quantidade = null) {
-		$query = self::initSearch();
-		if(!is_null($inicio) && !is_null($quantidade)) {
-			$query = $query->limit($quantidade)->offset($inicio);
-		}
-		$_dispositivos = $query->fetchAll();
-		$dispositivos = array();
-		foreach($_dispositivos as $dispositivo)
-			$dispositivos[] = new ZDispositivo($dispositivo);
-		return $dispositivos;
-	}
+    public static function getTodos($inicio = null, $quantidade = null)
+    {
+        $query = self::initSearch();
+        if (!is_null($inicio) && !is_null($quantidade)) {
+            $query = $query->limit($quantidade)->offset($inicio);
+        }
+        $_dispositivos = $query->fetchAll();
+        $dispositivos = array();
+        foreach ($_dispositivos as $dispositivo) {
+            $dispositivos[] = new ZDispositivo($dispositivo);
+        }
+        return $dispositivos;
+    }
 
-	public static function getCount() {
-		$query = self::initSearch();
-		return $query->count();
-	}
+    public static function getCount()
+    {
+        $query = self::initSearch();
+        return $query->count();
+    }
 
-	private static function initSearchDoTablet() {
-		return   DB::$pdo->from('Dispositivos')
-		                 ->where(array('tipo' => DispositivoTipo::TABLET))
-		                 ->orderBy('id ASC');
-	}
+    private static function initSearchDoTablet()
+    {
+        return   DB::$pdo->from('Dispositivos')
+                         ->where(array('tipo' => DispositivoTipo::TABLET))
+                         ->orderBy('id ASC');
+    }
 
-	public static function getCountDoTablet() {
-		$query = self::initSearchDoTablet();
-		return $query->count();
-	}
+    public static function getCountDoTablet()
+    {
+        $query = self::initSearchDoTablet();
+        return $query->count();
+    }
 
-	private static function initSearchDoSetorID($setor_id) {
-		return   DB::$pdo->from('Dispositivos')
-		                 ->where(array('setorid' => $setor_id))
-		                 ->orderBy('id ASC');
-	}
+    private static function initSearchDoSetorID($setor_id)
+    {
+        return   DB::$pdo->from('Dispositivos')
+                         ->where(array('setorid' => $setor_id))
+                         ->orderBy('id ASC');
+    }
 
-	public static function getTodosDoSetorID($setor_id, $inicio = null, $quantidade = null) {
-		$query = self::initSearchDoSetorID($setor_id);
-		if(!is_null($inicio) && !is_null($quantidade)) {
-			$query = $query->limit($quantidade)->offset($inicio);
-		}
-		$_dispositivos = $query->fetchAll();
-		$dispositivos = array();
-		foreach($_dispositivos as $dispositivo)
-			$dispositivos[] = new ZDispositivo($dispositivo);
-		return $dispositivos;
-	}
+    public static function getTodosDoSetorID($setor_id, $inicio = null, $quantidade = null)
+    {
+        $query = self::initSearchDoSetorID($setor_id);
+        if (!is_null($inicio) && !is_null($quantidade)) {
+            $query = $query->limit($quantidade)->offset($inicio);
+        }
+        $_dispositivos = $query->fetchAll();
+        $dispositivos = array();
+        foreach ($_dispositivos as $dispositivo) {
+            $dispositivos[] = new ZDispositivo($dispositivo);
+        }
+        return $dispositivos;
+    }
 
-	public static function getCountDoSetorID($setor_id) {
-		$query = self::initSearchDoSetorID($setor_id);
-		return $query->count();
-	}
+    public static function getCountDoSetorID($setor_id)
+    {
+        $query = self::initSearchDoSetorID($setor_id);
+        return $query->count();
+    }
 
-	private static function initSearchDaCaixaID($caixa_id) {
-		return   DB::$pdo->from('Dispositivos')
-		                 ->where(array('caixaid' => $caixa_id))
-		                 ->orderBy('id ASC');
-	}
+    private static function initSearchDaCaixaID($caixa_id)
+    {
+        return   DB::$pdo->from('Dispositivos')
+                         ->where(array('caixaid' => $caixa_id))
+                         ->orderBy('id ASC');
+    }
 
-	public static function getTodosDaCaixaID($caixa_id, $inicio = null, $quantidade = null) {
-		$query = self::initSearchDaCaixaID($caixa_id);
-		if(!is_null($inicio) && !is_null($quantidade)) {
-			$query = $query->limit($quantidade)->offset($inicio);
-		}
-		$_dispositivos = $query->fetchAll();
-		$dispositivos = array();
-		foreach($_dispositivos as $dispositivo)
-			$dispositivos[] = new ZDispositivo($dispositivo);
-		return $dispositivos;
-	}
+    public static function getTodosDaCaixaID($caixa_id, $inicio = null, $quantidade = null)
+    {
+        $query = self::initSearchDaCaixaID($caixa_id);
+        if (!is_null($inicio) && !is_null($quantidade)) {
+            $query = $query->limit($quantidade)->offset($inicio);
+        }
+        $_dispositivos = $query->fetchAll();
+        $dispositivos = array();
+        foreach ($_dispositivos as $dispositivo) {
+            $dispositivos[] = new ZDispositivo($dispositivo);
+        }
+        return $dispositivos;
+    }
 
-	public static function getCountDaCaixaID($caixa_id) {
-		$query = self::initSearchDaCaixaID($caixa_id);
-		return $query->count();
-	}
-
+    public static function getCountDaCaixaID($caixa_id)
+    {
+        $query = self::initSearchDaCaixaID($caixa_id);
+        return $query->count();
+    }
 }

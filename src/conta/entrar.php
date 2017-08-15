@@ -21,14 +21,14 @@
 */
 require_once(dirname(dirname(__FILE__)) . '/app.php');
 
-if(is_login()) {
-	$url = ($_POST && isset($_POST['redirect']))?strval($_POST['redirect']):null;
-	redirect($url);
+if (is_login()) {
+    $url = ($_POST && isset($_POST['redirect']))?strval($_POST['redirect']):null;
+    redirect($url);
 }
 $weblogin = true;
-if($_POST) {
-	require_once(dirname(dirname(__FILE__)) . '/app/conta/entrar.php');
+if ($_POST) {
+    require_once(dirname(dirname(__FILE__)) . '/app/conta/entrar.php');
 } else {
-	$_POST['lembrar'] = 'true';
-	include template('conta_entrar');
+    $_POST['lembrar'] = 'true';
+    include template('conta_entrar');
 }

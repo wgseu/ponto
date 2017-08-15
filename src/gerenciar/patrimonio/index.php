@@ -28,9 +28,9 @@ list($pagesize, $offset, $pagestring) = pagestring($count, 10);
 $patrimonios = ZPatrimonio::getTodos($_GET['empresaid'], $_GET['fornecedorid'], $_GET['estado'], $_GET['query'], $offset, $pagesize);
 
 $_estado_names = array(
-	'Novo' => 'Novo',
-	'Conservado' => 'Conservado',
-	'Ruim' => 'Ruim',
+    'Novo' => 'Novo',
+    'Conservado' => 'Conservado',
+    'Ruim' => 'Ruim',
 );
 
 $_empresa = ZCliente::getPeloID($_GET['empresaid']);

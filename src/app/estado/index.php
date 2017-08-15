@@ -23,11 +23,12 @@ require_once(dirname(dirname(dirname(__FILE__))) . '/app.php');
 
 $pais_id = $_GET['paisid'];
 $pais = ZPais::getPeloID($pais_id);
-if(is_null($pais->getID()))
-	json('O país não foi informado ou não existe!');
+if (is_null($pais->getID())) {
+    json('O país não foi informado ou não existe!');
+}
 $estados = ZEstado::getTodosDaPaisID($pais->getID());
 $_estados = array();
 foreach ($estados as $estado) {
-	$_estados[] = $estado->toArray();
+    $_estados[] = $estado->toArray();
 }
 json(array('status' => 'ok', 'items' => $_estados));

@@ -25,31 +25,31 @@ need_permission(PermissaoNome::CADASTROSERVICOS);
 $focusctrl = 'descricao';
 $errors = array();
 if ($_POST) {
-	$servico = new ZServico($_POST);
-	try {
-		$servico->setID(null);
-		$_data_inicio = date_create_from_format('d/m/Y H:i', $servico->getDataInicio());
-		$servico->setDataInicio($_data_inicio===false?null:date_format($_data_inicio, 'Y-m-d H:i:00'));
-		$_data_fim = date_create_from_format('d/m/Y H:i', $servico->getDataFim());
-		$servico->setDataFim($_data_fim===false?null:date_format($_data_fim, 'Y-m-d H:i:00'));
-		$servico->setValor(moneyval($servico->getValor()));
-		$servico = ZServico::cadastrar($servico);
-		Thunder::success('Serviço "'.$servico->getDescricao().'" cadastrada com sucesso!', true);
-		redirect('/gerenciar/servico/');
-	} catch (ValidationException $e) {
-		$errors = $e->getErrors();
-	} catch (Exception $e) {
-		$errors['unknow'] = $e->getMessage();
-	}
-	foreach($errors as $key => $value) {
-		$focusctrl = $key;
-		Thunder::error($value);
-		break;
-	}
+    $servico = new ZServico($_POST);
+    try {
+        $servico->setID(null);
+        $_data_inicio = date_create_from_format('d/m/Y H:i', $servico->getDataInicio());
+        $servico->setDataInicio($_data_inicio===false?null:date_format($_data_inicio, 'Y-m-d H:i:00'));
+        $_data_fim = date_create_from_format('d/m/Y H:i', $servico->getDataFim());
+        $servico->setDataFim($_data_fim===false?null:date_format($_data_fim, 'Y-m-d H:i:00'));
+        $servico->setValor(moneyval($servico->getValor()));
+        $servico = ZServico::cadastrar($servico);
+        Thunder::success('Serviço "'.$servico->getDescricao().'" cadastrada com sucesso!', true);
+        redirect('/gerenciar/servico/');
+    } catch (ValidationException $e) {
+        $errors = $e->getErrors();
+    } catch (Exception $e) {
+        $errors['unknow'] = $e->getMessage();
+    }
+    foreach ($errors as $key => $value) {
+        $focusctrl = $key;
+        Thunder::error($value);
+        break;
+    }
 } else {
-	$servico = new ZServico();
-	$servico->setDataInicio(date('Y-m-d H:i:s', time()));
-	$servico->setDataFim(date('Y-m-d H:i:s', time()));
-	$servico->setAtivo('Y');
+    $servico = new ZServico();
+    $servico->setDataInicio(date('Y-m-d H:i:s', time()));
+    $servico->setDataFim(date('Y-m-d H:i:s', time()));
+    $servico->setAtivo('Y');
 }
 include template('gerenciar_servico_cadastrar');

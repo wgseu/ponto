@@ -27,24 +27,24 @@ $errors = array();
 $nomes = get_pages_info();
 $linguagens = get_languages_info();
 if ($_POST) {
-	$pagina = new ZPagina($_POST);
-	try {
-		$pagina->setID(null);
-		$pagina->setLinguagemID(numberval($pagina->getLinguagemID()));
-		$pagina = ZPagina::cadastrar($pagina);
-		Thunder::success('Página "'.$nomes[$pagina->getNome()] . ' - ' . $linguagens[$pagina->getLinguagemID()].'" cadastrada com sucesso!', true);
-		redirect('/gerenciar/pagina/');
-	} catch (ValidationException $e) {
-		$errors = $e->getErrors();
-	} catch (Exception $e) {
-		$errors['unknow'] = $e->getMessage();
-	}
-	foreach($errors as $key => $value) {
-		$focusctrl = $key;
-		Thunder::error($value);
-		break;
-	}
+    $pagina = new ZPagina($_POST);
+    try {
+        $pagina->setID(null);
+        $pagina->setLinguagemID(numberval($pagina->getLinguagemID()));
+        $pagina = ZPagina::cadastrar($pagina);
+        Thunder::success('Página "'.$nomes[$pagina->getNome()] . ' - ' . $linguagens[$pagina->getLinguagemID()].'" cadastrada com sucesso!', true);
+        redirect('/gerenciar/pagina/');
+    } catch (ValidationException $e) {
+        $errors = $e->getErrors();
+    } catch (Exception $e) {
+        $errors['unknow'] = $e->getMessage();
+    }
+    foreach ($errors as $key => $value) {
+        $focusctrl = $key;
+        Thunder::error($value);
+        break;
+    }
 } else {
-	$pagina = new ZPagina();
+    $pagina = new ZPagina();
 }
 include template('gerenciar_pagina_cadastrar');

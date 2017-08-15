@@ -24,18 +24,18 @@ require_once(dirname(dirname(__FILE__)) . '/app.php');
 need_permission(PermissaoNome::CADASTROPATRIMONIO);
 $id = $_GET['id'];
 $patrimonio = ZPatrimonio::getPeloID($id);
-if(is_null($patrimonio->getID())) {
-	Thunder::warning('O patrimônio de id "'.$id.'" não existe!');
-	redirect('/gerenciar/patrimonio/');
+if (is_null($patrimonio->getID())) {
+    Thunder::warning('O patrimônio de id "'.$id.'" não existe!');
+    redirect('/gerenciar/patrimonio/');
 }
 try {
-	ZPatrimonio::excluir($id);
-	// exclui a foto do bem enviada
-	if(!is_null($patrimonio->getImagemAnexada())) {
-		unlink(WWW_ROOT . get_image_url($patrimonio->getImagemAnexada(), 'patrimonio'));
-	}
-	Thunder::success('Patrimônio "' . $patrimonio->getDescricao() . '" excluído com sucesso!', true);
+    ZPatrimonio::excluir($id);
+    // exclui a foto do bem enviada
+    if (!is_null($patrimonio->getImagemAnexada())) {
+        unlink(WWW_ROOT . get_image_url($patrimonio->getImagemAnexada(), 'patrimonio'));
+    }
+    Thunder::success('Patrimônio "' . $patrimonio->getDescricao() . '" excluído com sucesso!', true);
 } catch (Exception $e) {
-	Thunder::error('Não foi possível excluir o patrimônio "' . $patrimonio->getDescricao() . '"!');
+    Thunder::error('Não foi possível excluir o patrimônio "' . $patrimonio->getDescricao() . '"!');
 }
 redirect('/gerenciar/patrimonio/');

@@ -22,53 +22,56 @@
 require_once(dirname(dirname(dirname(__FILE__))) . '/app.php');
 
 $estoque = intval($_GET['estoque']);
-if($estoque < 0 && is_manager())
-	$estoque = null;
+if ($estoque < 0 && is_manager()) {
+    $estoque = null;
+}
 $limit = isset($_GET['limite'])?intval($_GET['limite']):5;
-if($limit < 1 || $limit > 10)
-	$limit = 5;
-if($_GET['primeiro'])
-	$limit = 1;
+if ($limit < 1 || $limit > 10) {
+    $limit = 5;
+}
+if ($_GET['primeiro']) {
+    $limit = 1;
+}
 $categoria_id = null;
-if(isset($_GET['categoria']) && is_numeric($_GET['categoria'])) {
-	$limit = null;
-	$categoria_id = intval($_GET['categoria']);
+if (isset($_GET['categoria']) && is_numeric($_GET['categoria'])) {
+    $limit = null;
+    $categoria_id = intval($_GET['categoria']);
 }
 $produtos = ZProduto::getTodos(
-	$_GET['busca'],
-	$categoria_id,
-	null, // unidade_id
-	null, // tipo
-	$estoque,
-	null, // setor de estoque
-	null, // incluir promoção
-	null, // visibilidade
-	null, // mostrar com estoque limitado
-	null, // pesável
-	true, // raw mode
-	0, // offset
-	$limit
+    $_GET['busca'],
+    $categoria_id,
+    null, // unidade_id
+    null, // tipo
+    $estoque,
+    null, // setor de estoque
+    null, // incluir promoção
+    null, // visibilidade
+    null, // mostrar com estoque limitado
+    null, // pesável
+    true, // raw mode
+    0, // offset
+    $limit
 );
 $response = array('status' => 'ok');
 $campos = array(
-	'id',
-	'descricao',
-	'detalhes',
-	'precovenda',
-	'tipo',
-	'conteudo',
-	'divisivel',
-	'dataatualizacao',
-	// extras
-	'estoque',
-	'imagemurl',
-	'categoria',
-	'unidade',
+    'id',
+    'descricao',
+    'detalhes',
+    'precovenda',
+    'tipo',
+    'conteudo',
+    'divisivel',
+    'dataatualizacao',
+    // extras
+    'estoque',
+    'imagemurl',
+    'categoria',
+    'unidade',
 );
 $_produtos = array();
 foreach ($produtos as $produto) {
-	$produto['imagemurl'] = get_image_url($produto['imagem'], 'produto', null);
-	$_produtos[] = array_intersect_key($produto, array_flip($campos));
+    $produto['imagemurl'] = get_image_url($produto['imagem'], 'produto', null);
+    $_produtos[] = array_intersect_key($produto, array_flip($campos));
 }
 $response['produtos'] = $_produtos;
 json($response);

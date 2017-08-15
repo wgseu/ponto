@@ -25,26 +25,26 @@ need_permission(PermissaoNome::CADASTRARCREDITOS);
 $focusctrl = 'detalhes';
 $errors = array();
 if ($_POST) {
-	$credito = new ZCredito($_POST);
-	try {
-		$credito->setID(null);
-		$credito->setValor(moneyval($credito->getValor()));
-		$credito->setFuncionarioID($login_funcionario->getID());
-		$credito->setCancelado('N');
-		$credito = ZCredito::cadastrar($credito);
-		Thunder::success('Crédito "'.$credito->getDetalhes().'" cadastrado com sucesso!', true);
-		redirect('/gerenciar/credito/');
-	} catch (ValidationException $e) {
-		$errors = $e->getErrors();
-	} catch (Exception $e) {
-		$errors['unknow'] = $e->getMessage();
-	}
-	foreach($errors as $key => $value) {
-		$focusctrl = $key;
-		Thunder::error($value);
-		break;
-	}
+    $credito = new ZCredito($_POST);
+    try {
+        $credito->setID(null);
+        $credito->setValor(moneyval($credito->getValor()));
+        $credito->setFuncionarioID($login_funcionario->getID());
+        $credito->setCancelado('N');
+        $credito = ZCredito::cadastrar($credito);
+        Thunder::success('Crédito "'.$credito->getDetalhes().'" cadastrado com sucesso!', true);
+        redirect('/gerenciar/credito/');
+    } catch (ValidationException $e) {
+        $errors = $e->getErrors();
+    } catch (Exception $e) {
+        $errors['unknow'] = $e->getMessage();
+    }
+    foreach ($errors as $key => $value) {
+        $focusctrl = $key;
+        Thunder::error($value);
+        break;
+    }
 } else {
-	$credito = new ZCredito();
+    $credito = new ZCredito();
 }
 include template('gerenciar_credito_cadastrar');

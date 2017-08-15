@@ -25,23 +25,23 @@ need_permission(PermissaoNome::ESTOQUE);
 $focusctrl = 'nome';
 $errors = array();
 if ($_POST) {
-	$setor = new ZSetor($_POST);
-	try {
-		$setor->setID(null);
-		$setor = ZSetor::cadastrar($setor);
-		Thunder::success('Setor "'.$setor->getNome().'" cadastrado com sucesso!', true);
-		redirect('/gerenciar/setor/');
-	} catch (ValidationException $e) {
-		$errors = $e->getErrors();
-	} catch (Exception $e) {
-		$errors['unknow'] = $e->getMessage();
-	}
-	foreach($errors as $key => $value) {
-		$focusctrl = $key;
-		Thunder::error($value);
-		break;
-	}
+    $setor = new ZSetor($_POST);
+    try {
+        $setor->setID(null);
+        $setor = ZSetor::cadastrar($setor);
+        Thunder::success('Setor "'.$setor->getNome().'" cadastrado com sucesso!', true);
+        redirect('/gerenciar/setor/');
+    } catch (ValidationException $e) {
+        $errors = $e->getErrors();
+    } catch (Exception $e) {
+        $errors['unknow'] = $e->getMessage();
+    }
+    foreach ($errors as $key => $value) {
+        $focusctrl = $key;
+        Thunder::error($value);
+        break;
+    }
 } else {
-	$setor = new ZSetor();
+    $setor = new ZSetor();
 }
 include template('gerenciar_setor_cadastrar');

@@ -23,33 +23,33 @@ require_once(dirname(dirname(__FILE__)) . '/app.php');
 
 need_permission(PermissaoNome::CADASTRARCREDITOS);
 $credito = ZCredito::getPeloID($_GET['id']);
-if(is_null($credito->getID())) {
-	Thunder::warning('O crédito de id "'.$_GET['id'].'" não existe!');
-	redirect('/gerenciar/credito/');
+if (is_null($credito->getID())) {
+    Thunder::warning('O crédito de id "'.$_GET['id'].'" não existe!');
+    redirect('/gerenciar/credito/');
 }
 $focusctrl = 'detalhes';
 $errors = array();
 $old_credito = $credito;
 if ($_POST) {
-	$credito = new ZCredito($_POST);
-	try {
-		$credito->setID($old_credito->getID());
-		$credito->setFuncionarioID($old_credito->getFuncionarioID());
-		$credito->setCancelado($old_credito->getCancelado());
+    $credito = new ZCredito($_POST);
+    try {
+        $credito->setID($old_credito->getID());
+        $credito->setFuncionarioID($old_credito->getFuncionarioID());
+        $credito->setCancelado($old_credito->getCancelado());
 
-		$credito->setValor(moneyval($credito->getValor()));
-		$credito = ZCredito::atualizar($credito);
-		Thunder::success('Crédito "'.$credito->getDetalhes().'" atualizado com sucesso!', true);
-		redirect('/gerenciar/credito/');
-	} catch (ValidationException $e) {
-		$errors = $e->getErrors();
-	} catch (Exception $e) {
-		$errors['unknow'] = $e->getMessage();
-	}
-	foreach($errors as $key => $value) {
-		$focusctrl = $key;
-		Thunder::error($value);
-		break;
-	}
+        $credito->setValor(moneyval($credito->getValor()));
+        $credito = ZCredito::atualizar($credito);
+        Thunder::success('Crédito "'.$credito->getDetalhes().'" atualizado com sucesso!', true);
+        redirect('/gerenciar/credito/');
+    } catch (ValidationException $e) {
+        $errors = $e->getErrors();
+    } catch (Exception $e) {
+        $errors['unknow'] = $e->getMessage();
+    }
+    foreach ($errors as $key => $value) {
+        $focusctrl = $key;
+        Thunder::error($value);
+        break;
+    }
 }
 include template('gerenciar_credito_editar');

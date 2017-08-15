@@ -23,7 +23,13 @@ $faturamento['anterior'] = ZPagamento::getFaturamento(null, $start_prev, $end_pr
 $faturamento['base'] = ZPagamento::getFaturamento(null, -1, -1);
 $clientes = array();
 $clientes['total'] = ZCliente::getCount();
-$clientes['hoje'] = ZCliente::getCount(0, 0);
+$clientes['hoje'] = ZCliente::getCount(
+    null, // busca
+    null, // tipo
+    null, // genero
+    date('Y-m-d'), // mes_inicio
+    date('Y-m-d') // mes_fim
+);
 $start_curr = strtotime(date('Y-m').' 0 month');
 $despesas = array();
 $despesas['pagas'] = ZPagamento::getDespesas(null, $start_curr, $data_fim);

@@ -25,24 +25,24 @@ need_owner();
 $focusctrl = 'descricao';
 $errors = array();
 if ($_POST) {
-	$funcao = new ZFuncao($_POST);
-	try {
-		$funcao->setID(null);
-		$funcao->setSalarioBase(moneyval($funcao->getSalarioBase()));
-		$funcao = ZFuncao::cadastrar($funcao);
-		Thunder::success('Função "'.$funcao->getDescricao().'" cadastrada com sucesso!', true);
-		redirect('/gerenciar/funcao/');
-	} catch (ValidationException $e) {
-		$errors = $e->getErrors();
-	} catch (Exception $e) {
-		$errors['unknow'] = $e->getMessage();
-	}
-	foreach($errors as $key => $value) {
-		$focusctrl = $key;
-		Thunder::error($value);
-		break;
-	}
+    $funcao = new ZFuncao($_POST);
+    try {
+        $funcao->setID(null);
+        $funcao->setSalarioBase(moneyval($funcao->getSalarioBase()));
+        $funcao = ZFuncao::cadastrar($funcao);
+        Thunder::success('Função "'.$funcao->getDescricao().'" cadastrada com sucesso!', true);
+        redirect('/gerenciar/funcao/');
+    } catch (ValidationException $e) {
+        $errors = $e->getErrors();
+    } catch (Exception $e) {
+        $errors['unknow'] = $e->getMessage();
+    }
+    foreach ($errors as $key => $value) {
+        $focusctrl = $key;
+        Thunder::error($value);
+        break;
+    }
 } else {
-	$funcao = new ZFuncao();
+    $funcao = new ZFuncao();
 }
 include template('gerenciar_funcao_cadastrar');

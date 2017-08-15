@@ -23,31 +23,34 @@ require_once(dirname(dirname(dirname(__FILE__))) . '/app.php');
 
 $estado_id = $_GET['estadoid'];
 $estado = ZEstado::getPeloID($estado_id);
-if(is_null($estado->getID()))
-	json('O estado não foi informado ou não existe!');
+if (is_null($estado->getID())) {
+    json('O estado não foi informado ou não existe!');
+}
 $cidade = ZCidade::getPeloEstadoIDNome($estado_id, trim($_GET['cidade']));
-if(is_null($cidade->getID()))
-	json('A cidade "' . $_GET['cidade'] . '" não existe!');
-if($_GET['tipo'] == 'logradouro')
-	$localizacoes = ZLocalizacao::getTodasDaCidadeID($cidade->getID(), 'logradouro', $_GET['logradouro'], 0, 10);
-else if($_GET['tipo'] == 'condominio')
-	$localizacoes = ZLocalizacao::getTodasDaCidadeID($cidade->getID(), 'condominio', $_GET['condominio'], 0, 10);
-else
-	$localizacoes = array();
+if (is_null($cidade->getID())) {
+    json('A cidade "' . $_GET['cidade'] . '" não existe!');
+}
+if ($_GET['tipo'] == 'logradouro') {
+    $localizacoes = ZLocalizacao::getTodasDaCidadeID($cidade->getID(), 'logradouro', $_GET['logradouro'], 0, 10);
+} elseif ($_GET['tipo'] == 'condominio') {
+    $localizacoes = ZLocalizacao::getTodasDaCidadeID($cidade->getID(), 'condominio', $_GET['condominio'], 0, 10);
+} else {
+    $localizacoes = array();
+}
 $_localizacoes = array();
 $campos = array(
-	'cep',
-	'logradouro'
+    'cep',
+    'logradouro'
 );
-if($_GET['tipo'] == 'condominio') {
-	$campos[] = 'numero';
-	$campos[] = 'condominio';
+if ($_GET['tipo'] == 'condominio') {
+    $campos[] = 'numero';
+    $campos[] = 'condominio';
 }
 foreach ($localizacoes as $localizacao) {
-	$bairro = ZBairro::getPeloID($localizacao->getBairroID());
-	$_localizacao = $localizacao->toArray();
-	$_localizacao = array_intersect_key($_localizacao, array_flip($campos)); 
-	$_localizacao['bairro'] = $bairro->getNome();
-	$_localizacoes[] = $_localizacao;
+    $bairro = ZBairro::getPeloID($localizacao->getBairroID());
+    $_localizacao = $localizacao->toArray();
+    $_localizacao = array_intersect_key($_localizacao, array_flip($campos));
+    $_localizacao['bairro'] = $bairro->getNome();
+    $_localizacoes[] = $_localizacao;
 }
 json(array('status' => 'ok', 'items' => $_localizacoes));

@@ -21,52 +21,56 @@
 */
 require_once(dirname(dirname(__FILE__)) . '/app.php');
 
-if(is_login()) {
-	Thunder::information('Você já está cadastrado e autenticado!', true);
-	redirect('/');
+if (is_login()) {
+    Thunder::information('Você já está cadastrado e autenticado!', true);
+    redirect('/');
 }
 $fieldfocus = 'nome';
 $gerenciando = false;
 $cadastrar_cliente = true;
 $erro = array();
-if($_POST) {
-	$cliente = new ZCliente($_POST);
-	$cliente->setImagem(null);
-	$aceitar = $_POST['aceitar'];
-	try {
-		if($aceitar != 'true')
-			throw new ValidationException(array('aceitar' => 'Os termos não foram aceitos'));
-		if($_POST['confirmarsenha'] != $_POST['senha']) {
-			throw new ValidationException(array('senha' => 'As senhas não são iguais', 'confirmarsenha' => 'As senhas não são iguais'));
-		}
-		if(trim($_POST['email']) == '')
-			throw new ValidationException(array('email' => 'O E-mail não foi informado'));
-		if($cliente->getTipo() == ClienteTipo::JURIDICA)
-			$cliente->setCPF(\MZ\Util\Filter::unmask($cliente->getCPF(), _p('Mascara', 'CNPJ')));
-		else
-			$cliente->setCPF(\MZ\Util\Filter::unmask($cliente->getCPF(), _p('Mascara', 'CPF')));
-		$cliente = ZCliente::cadastrar($cliente, true);
-		$login_cliente = $cliente;
-		$login_cliente_id = $cliente->getID();
-		ZAutenticacao::login($cliente->getID());
-		redirect(get_redirect_page());
-	} catch (ValidationException $e) {
-		$erro = $e->getErrors();
-	} catch (Exception $e) {
-		$erro['unknow'] = $e->getMessage();
-	}
+if ($_POST) {
+    $cliente = new ZCliente($_POST);
+    $cliente->setImagem(null);
+    $aceitar = $_POST['aceitar'];
+    try {
+        if ($aceitar != 'true') {
+            throw new ValidationException(array('aceitar' => 'Os termos não foram aceitos'));
+        }
+        if ($_POST['confirmarsenha'] != $_POST['senha']) {
+            throw new ValidationException(array('senha' => 'As senhas não são iguais', 'confirmarsenha' => 'As senhas não são iguais'));
+        }
+        if (trim($_POST['email']) == '') {
+            throw new ValidationException(array('email' => 'O E-mail não foi informado'));
+        }
+        if ($cliente->getTipo() == ClienteTipo::JURIDICA) {
+            $cliente->setCPF(\MZ\Util\Filter::unmask($cliente->getCPF(), _p('Mascara', 'CNPJ')));
+        } else {
+            $cliente->setCPF(\MZ\Util\Filter::unmask($cliente->getCPF(), _p('Mascara', 'CPF')));
+        }
+        $cliente = ZCliente::cadastrar($cliente, true);
+        $login_cliente = $cliente;
+        $login_cliente_id = $cliente->getID();
+        ZAutenticacao::login($cliente->getID());
+        redirect(get_redirect_page());
+    } catch (ValidationException $e) {
+        $erro = $e->getErrors();
+    } catch (Exception $e) {
+        $erro['unknow'] = $e->getMessage();
+    }
 } else {
-	$cliente = new ZCliente();
+    $cliente = new ZCliente();
 }
-foreach($erro as $key => $value) {
-	$fieldfocus = $key;
-	break;
+foreach ($erro as $key => $value) {
+    $fieldfocus = $key;
+    break;
 }
-if(array_key_exists($fieldfocus, $erro)) {
-	Thunder::error($erro[$fieldfocus]);
+if (array_key_exists($fieldfocus, $erro)) {
+    Thunder::error($erro[$fieldfocus]);
 }
-if($fieldfocus == 'genero')
-	$fieldfocus .= '_m';
+if ($fieldfocus == 'genero') {
+    $fieldfocus .= '_m';
+}
 
 $pagetitle = 'Cadastrar';
 include template('conta_cadastrar');

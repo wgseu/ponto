@@ -24,14 +24,14 @@ require_once(dirname(dirname(__FILE__)) . '/app.php');
 need_permission(PermissaoNome::CADASTROPRODUTOS);
 $id = $_GET['id'];
 $produto = ZProduto::getPeloID($id);
-if(is_null($produto->getID())) {
-	Thunder::warning('O produto de id "'.$id.'" não existe!');
-	redirect('/gerenciar/produto/');
+if (is_null($produto->getID())) {
+    Thunder::warning('O produto de id "'.$id.'" não existe!');
+    redirect('/gerenciar/produto/');
 }
 try {
-	ZProduto::excluir($id);
-	Thunder::success('Produto "' . $produto->getDescricao() . '" excluído com sucesso!', true);
+    ZProduto::excluir($id);
+    Thunder::success('Produto "' . $produto->getDescricao() . '" excluído com sucesso!', true);
 } catch (Exception $e) {
-	Thunder::error('Não foi possível excluir o produto "' . $produto->getDescricao() . '"!');
+    Thunder::error('Não foi possível excluir o produto "' . $produto->getDescricao() . '"!');
 }
 redirect('/gerenciar/produto/');

@@ -25,25 +25,25 @@ need_permission(PermissaoNome::CADASTROMESAS);
 $focusctrl = 'nome';
 $errors = array();
 if ($_POST) {
-	$mesa = new ZMesa($_POST);
-	try {
-		$mesa = ZMesa::cadastrar($mesa);
-		Thunder::success('Mesa "'.$mesa->getNome().'" cadastrada com sucesso!', true);
-		redirect('/gerenciar/mesa/');
-	} catch (ValidationException $e) {
-		$errors = $e->getErrors();
-	} catch (Exception $e) {
-		$errors['unknow'] = $e->getMessage();
-	}
-	foreach($errors as $key => $value) {
-		$focusctrl = $key;
-		Thunder::error($value);
-		break;
-	}
+    $mesa = new ZMesa($_POST);
+    try {
+        $mesa = ZMesa::cadastrar($mesa);
+        Thunder::success('Mesa "'.$mesa->getNome().'" cadastrada com sucesso!', true);
+        redirect('/gerenciar/mesa/');
+    } catch (ValidationException $e) {
+        $errors = $e->getErrors();
+    } catch (Exception $e) {
+        $errors['unknow'] = $e->getMessage();
+    }
+    foreach ($errors as $key => $value) {
+        $focusctrl = $key;
+        Thunder::error($value);
+        break;
+    }
 } else {
-	$mesa = new ZMesa();
-	$mesa->setID(ZMesa::getProximoID());
-	$mesa->setNome('Mesa ' . $mesa->getID());
-	$mesa->setAtiva('Y');
+    $mesa = new ZMesa();
+    $mesa->setID(ZMesa::getProximoID());
+    $mesa->setNome('Mesa ' . $mesa->getID());
+    $mesa->setAtiva('Y');
 }
 include template('gerenciar_mesa_cadastrar');

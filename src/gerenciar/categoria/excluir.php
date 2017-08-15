@@ -24,14 +24,14 @@ require_once(dirname(dirname(__FILE__)) . '/app.php');
 need_permission(PermissaoNome::CADASTROPRODUTOS);
 $id = $_GET['id'];
 $categoria = ZCategoria::getPeloID($id);
-if(is_null($categoria->getID())) {
-	Thunder::warning('A categoria de id "'.$id.'" não existe!');
-	redirect('/gerenciar/categoria/');
+if (is_null($categoria->getID())) {
+    Thunder::warning('A categoria de id "'.$id.'" não existe!');
+    redirect('/gerenciar/categoria/');
 }
 try {
-	ZCategoria::excluir($id);
-	Thunder::success('Categoria "' . $categoria->getDescricao() . '" excluída com sucesso!', true);
+    ZCategoria::excluir($id);
+    Thunder::success('Categoria "' . $categoria->getDescricao() . '" excluída com sucesso!', true);
 } catch (Exception $e) {
-	Thunder::error('Não foi possível excluir a categoria "' . $categoria->getDescricao() . '"!');
+    Thunder::error('Não foi possível excluir a categoria "' . $categoria->getDescricao() . '"!');
 }
 redirect('/gerenciar/categoria/');

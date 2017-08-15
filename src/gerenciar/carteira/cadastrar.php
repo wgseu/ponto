@@ -25,25 +25,25 @@ need_permission(PermissaoNome::CADASTROCARTEIRAS);
 $focusctrl = 'descricao';
 $errors = array();
 if ($_POST) {
-	$carteira = new ZCarteira($_POST);
-	try {
-		$carteira->setID(null);
-		$carteira = ZCarteira::cadastrar($carteira);
-		Thunder::success('Carteira "'.$carteira->getDescricao().'" cadastrada com sucesso!', true);
-		redirect('/gerenciar/carteira/');
-	} catch (ValidationException $e) {
-		$errors = $e->getErrors();
-	} catch (Exception $e) {
-		$errors['unknow'] = $e->getMessage();
-	}
-	foreach($errors as $key => $value) {
-		$focusctrl = $key;
-		Thunder::error($value);
-		break;
-	}
+    $carteira = new ZCarteira($_POST);
+    try {
+        $carteira->setID(null);
+        $carteira = ZCarteira::cadastrar($carteira);
+        Thunder::success('Carteira "'.$carteira->getDescricao().'" cadastrada com sucesso!', true);
+        redirect('/gerenciar/carteira/');
+    } catch (ValidationException $e) {
+        $errors = $e->getErrors();
+    } catch (Exception $e) {
+        $errors['unknow'] = $e->getMessage();
+    }
+    foreach ($errors as $key => $value) {
+        $focusctrl = $key;
+        Thunder::error($value);
+        break;
+    }
 } else {
-	$carteira = new ZCarteira();
-	$carteira->setAtiva('Y');
+    $carteira = new ZCarteira();
+    $carteira->setAtiva('Y');
 }
 $_banco = ZBanco::getPeloID($carteira->getBancoID());
 include template('gerenciar_carteira_cadastrar');

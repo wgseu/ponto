@@ -28,8 +28,8 @@ list($pagesize, $offset, $pagestring) = pagestring($count, 10);
 $servicos = ZServico::getTodos($_GET['query'], $_GET['tipo'], $offset, $pagesize);
 
 $tipos = array(
-	'Evento' => 'Evento',
-	'Taxa' => 'Taxa',
+    'Evento' => 'Evento',
+    'Taxa' => 'Taxa',
 );
 
 include template('gerenciar_servico_index');

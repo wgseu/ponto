@@ -23,173 +23,200 @@
 /**
  * Setor de impressão e de estoque
  */
-class ZSetor {
-	private $id;
-	private $nome;
-	private $descricao;
+class ZSetor
+{
+    private $id;
+    private $nome;
+    private $descricao;
 
-	public function __construct($setor = array()) {
-		if(is_array($setor)) {
-			$this->setID(isset($setor['id'])?$setor['id']:null);
-			$this->setNome(isset($setor['nome'])?$setor['nome']:null);
-			$this->setDescricao(isset($setor['descricao'])?$setor['descricao']:null);
-		}
-	}
+    public function __construct($setor = array())
+    {
+        if (is_array($setor)) {
+            $this->setID(isset($setor['id'])?$setor['id']:null);
+            $this->setNome(isset($setor['nome'])?$setor['nome']:null);
+            $this->setDescricao(isset($setor['descricao'])?$setor['descricao']:null);
+        }
+    }
 
-	/**
-	 * Identificador do setor
-	 */
-	public function getID() {
-		return $this->id;
-	}
+    /**
+     * Identificador do setor
+     */
+    public function getID()
+    {
+        return $this->id;
+    }
 
-	/**
-	 * Identificador do setor
-	 */
-	public function setID($id) {
-		$this->id = $id;
-	}
+    /**
+     * Identificador do setor
+     */
+    public function setID($id)
+    {
+        $this->id = $id;
+    }
 
-	/**
-	 * Nome do setor, único em todo o sistema
-	 */
-	public function getNome() {
-		return $this->nome;
-	}
+    /**
+     * Nome do setor, único em todo o sistema
+     */
+    public function getNome()
+    {
+        return $this->nome;
+    }
 
-	/**
-	 * Nome do setor, único em todo o sistema
-	 */
-	public function setNome($nome) {
-		$this->nome = $nome;
-	}
+    /**
+     * Nome do setor, único em todo o sistema
+     */
+    public function setNome($nome)
+    {
+        $this->nome = $nome;
+    }
 
-	/**
-	 * Descreve a utilização do setor
-	 */
-	public function getDescricao() {
-		return $this->descricao;
-	}
+    /**
+     * Descreve a utilização do setor
+     */
+    public function getDescricao()
+    {
+        return $this->descricao;
+    }
 
-	/**
-	 * Descreve a utilização do setor
-	 */
-	public function setDescricao($descricao) {
-		$this->descricao = $descricao;
-	}
+    /**
+     * Descreve a utilização do setor
+     */
+    public function setDescricao($descricao)
+    {
+        $this->descricao = $descricao;
+    }
 
-	public function toArray() {
-		$setor = array();
-		$setor['id'] = $this->getID();
-		$setor['nome'] = $this->getNome();
-		$setor['descricao'] = $this->getDescricao();
-		return $setor;
-	}
+    public function toArray()
+    {
+        $setor = array();
+        $setor['id'] = $this->getID();
+        $setor['nome'] = $this->getNome();
+        $setor['descricao'] = $this->getDescricao();
+        return $setor;
+    }
 
-	public static function getPeloID($id) {
-		$query = DB::$pdo->from('Setores')
-		                 ->where(array('id' => $id));
-		return new ZSetor($query->fetch());
-	}
+    public static function getPeloID($id)
+    {
+        $query = DB::$pdo->from('Setores')
+                         ->where(array('id' => $id));
+        return new ZSetor($query->fetch());
+    }
 
-	public static function getPrimeiro() {
-		$query = DB::$pdo->from('Setores')
-						 ->limit(1)->offset(0);
-		return new ZSetor($query->fetch());
-	}
+    public static function getPrimeiro()
+    {
+        $query = DB::$pdo->from('Setores')
+                         ->limit(1)->offset(0);
+        return new ZSetor($query->fetch());
+    }
 
-	public static function getPeloNome($nome) {
-		$query = DB::$pdo->from('Setores')
-		                 ->where(array('nome' => $nome))
-						 ->limit(1)->offset(0);
-		return new ZSetor($query->fetch());
-	}
+    public static function getPeloNome($nome)
+    {
+        $query = DB::$pdo->from('Setores')
+                         ->where(array('nome' => $nome))
+                         ->limit(1)->offset(0);
+        return new ZSetor($query->fetch());
+    }
 
-	private static function validarCampos(&$setor) {
-		$erros = array();
-		$setor['nome'] = strip_tags(trim($setor['nome']));
-		if(strlen($setor['nome']) == 0)
-			$erros['nome'] = 'O nome não pode ser vazio';
-		$setor['descricao'] = strip_tags(trim($setor['descricao']));
-		if(strlen($setor['descricao']) == 0)
-			$setor['descricao'] = null;
-		if(!empty($erros))
-			throw new ValidationException($erros);
-	}
+    private static function validarCampos(&$setor)
+    {
+        $erros = array();
+        $setor['nome'] = strip_tags(trim($setor['nome']));
+        if (strlen($setor['nome']) == 0) {
+            $erros['nome'] = 'O nome não pode ser vazio';
+        }
+        $setor['descricao'] = strip_tags(trim($setor['descricao']));
+        if (strlen($setor['descricao']) == 0) {
+            $setor['descricao'] = null;
+        }
+        if (!empty($erros)) {
+            throw new ValidationException($erros);
+        }
+    }
 
-	private static function handleException(&$e) {
-		if(stripos($e->getMessage(), 'PRIMARY') !== false)
-			throw new ValidationException(array('id' => 'O ID informado já está cadastrado'));
-		if(stripos($e->getMessage(), 'Nome_UNIQUE') !== false)
-			throw new ValidationException(array('nome' => 'O nome informado já está cadastrado'));
-	}
+    private static function handleException(&$e)
+    {
+        if (stripos($e->getMessage(), 'PRIMARY') !== false) {
+            throw new ValidationException(array('id' => 'O ID informado já está cadastrado'));
+        }
+        if (stripos($e->getMessage(), 'Nome_UNIQUE') !== false) {
+            throw new ValidationException(array('nome' => 'O nome informado já está cadastrado'));
+        }
+    }
 
-	public static function cadastrar($setor) {
-		$_setor = $setor->toArray();
-		self::validarCampos($_setor);
-		try {
-			$_setor['id'] = DB::$pdo->insertInto('Setores')->values($_setor)->execute();
-		} catch (Exception $e) {
-			self::handleException($e);
-			throw $e;
-		}
-		return self::getPeloID($_setor['id']);
-	}
+    public static function cadastrar($setor)
+    {
+        $_setor = $setor->toArray();
+        self::validarCampos($_setor);
+        try {
+            $_setor['id'] = DB::$pdo->insertInto('Setores')->values($_setor)->execute();
+        } catch (Exception $e) {
+            self::handleException($e);
+            throw $e;
+        }
+        return self::getPeloID($_setor['id']);
+    }
 
-	public static function atualizar($setor) {
-		$_setor = $setor->toArray();
-		if(!$_setor['id'])
-			throw new ValidationException(array('id' => 'O id do setor não foi informado'));
-		self::validarCampos($_setor);
-		$campos = array(
-			'nome',
-			'descricao',
-		);
-		try {
-			$query = DB::$pdo->update('Setores');
-			$query = $query->set(array_intersect_key($_setor, array_flip($campos)));
-			$query = $query->where('id', $_setor['id']);
-			$query->execute();
-		} catch (Exception $e) {
-			self::handleException($e);
-			throw $e;
-		}
-		return self::getPeloID($_setor['id']);
-	}
+    public static function atualizar($setor)
+    {
+        $_setor = $setor->toArray();
+        if (!$_setor['id']) {
+            throw new ValidationException(array('id' => 'O id do setor não foi informado'));
+        }
+        self::validarCampos($_setor);
+        $campos = array(
+            'nome',
+            'descricao',
+        );
+        try {
+            $query = DB::$pdo->update('Setores');
+            $query = $query->set(array_intersect_key($_setor, array_flip($campos)));
+            $query = $query->where('id', $_setor['id']);
+            $query->execute();
+        } catch (Exception $e) {
+            self::handleException($e);
+            throw $e;
+        }
+        return self::getPeloID($_setor['id']);
+    }
 
-	public static function excluir($id) {
-		if(!$id)
-			throw new Exception('Não foi possível excluir o setor, o id do setor não foi informado');
-		$query = DB::$pdo->deleteFrom('Setores')
-		                 ->where(array('id' => $id));
-		return $query->execute();
-	}
+    public static function excluir($id)
+    {
+        if (!$id) {
+            throw new Exception('Não foi possível excluir o setor, o id do setor não foi informado');
+        }
+        $query = DB::$pdo->deleteFrom('Setores')
+                         ->where(array('id' => $id));
+        return $query->execute();
+    }
 
-	private static function initSearch($busca) {
-		$query = DB::$pdo->from('Setores')
-		                 ->orderBy('nome ASC');
-		$busca = trim($busca);
-		if($busca != '') {
-			$query = $query->where('CONCAT(nome, " ", descricao) LIKE ?', '%'.$busca.'%');
-		}
-		return $query;
-	}
+    private static function initSearch($busca)
+    {
+        $query = DB::$pdo->from('Setores')
+                         ->orderBy('nome ASC');
+        $busca = trim($busca);
+        if ($busca != '') {
+            $query = $query->where('CONCAT(nome, " ", descricao) LIKE ?', '%'.$busca.'%');
+        }
+        return $query;
+    }
 
-	public static function getTodos($busca = null, $inicio = null, $quantidade = null) {
-		$query = self::initSearch($busca);
-		if(!is_null($inicio) && !is_null($quantidade)) {
-			$query = $query->limit($quantidade)->offset($inicio);
-		}
-		$_setors = $query->fetchAll();
-		$setors = array();
-		foreach($_setors as $setor)
-			$setors[] = new ZSetor($setor);
-		return $setors;
-	}
+    public static function getTodos($busca = null, $inicio = null, $quantidade = null)
+    {
+        $query = self::initSearch($busca);
+        if (!is_null($inicio) && !is_null($quantidade)) {
+            $query = $query->limit($quantidade)->offset($inicio);
+        }
+        $_setors = $query->fetchAll();
+        $setors = array();
+        foreach ($_setors as $setor) {
+            $setors[] = new ZSetor($setor);
+        }
+        return $setors;
+    }
 
-	public static function getCount($busca = null) {
-		$query = self::initSearch($busca);
-		return $query->count();
-	}
-
+    public static function getCount($busca = null)
+    {
+        $query = self::initSearch($busca);
+        return $query->count();
+    }
 }

@@ -22,44 +22,51 @@
 require_once(dirname(dirname(__FILE__)) . '/app.php');
 
 $fieldfocus = 'nome';
-if(is_login())
-	$fieldfocus = 'assunto';
+if (is_login()) {
+    $fieldfocus = 'assunto';
+}
 $erro = array();
 if ($_POST) {
-	if(is_login()) {
-		$email = $login_cliente->getEmail();
-		$nome = $login_cliente->getNome();
-	} else {
-		$email = strip_tags(trim($_POST['email']));
-		$nome = strip_tags(trim($_POST['nome']));
-	}
-	$assunto = strip_tags(trim($_POST['assunto']));
-	$mensagem = strip_tags(trim($_POST['mensagem']));
-	if($nome == '')
-		$erros['nome'] = 'O nome não pode ser vazio';
-	if(!check_email($email))
-		$erros['email'] = 'O E-mail é inválido';
-	if($assunto == '')
-		$erros['assunto'] = 'O assunto não foi informado';
-	if($mensagem == '')
-		$erros['mensagem'] = 'A mensagem não foi informada';
-	try {
-		if(!empty($erros))
-			throw new ValidationException($erros);
-		if(!mail_contato($email, $nome, $assunto, $mensagem))
-			throw new Exception("Não foi possível enviar o E-mail, por favor tente novamente mais tarde");
-		include template('contato_sucesso');
-		exit;
-	} catch (ValidationException $e) {
-		$erro = $e->getErrors();
-	} catch (Exception $e) {
-		$erro['unknow'] = $e->getMessage();
-	}
-	foreach($erro as $key => $value) {
-		$fieldfocus = $key;
-		break;
-	}
-	Thunder::error($erro[$fieldfocus]);
+    if (is_login()) {
+        $email = $login_cliente->getEmail();
+        $nome = $login_cliente->getNome();
+    } else {
+        $email = strip_tags(trim($_POST['email']));
+        $nome = strip_tags(trim($_POST['nome']));
+    }
+    $assunto = strip_tags(trim($_POST['assunto']));
+    $mensagem = strip_tags(trim($_POST['mensagem']));
+    if ($nome == '') {
+        $erros['nome'] = 'O nome não pode ser vazio';
+    }
+    if (!check_email($email)) {
+        $erros['email'] = 'O E-mail é inválido';
+    }
+    if ($assunto == '') {
+        $erros['assunto'] = 'O assunto não foi informado';
+    }
+    if ($mensagem == '') {
+        $erros['mensagem'] = 'A mensagem não foi informada';
+    }
+    try {
+        if (!empty($erros)) {
+            throw new ValidationException($erros);
+        }
+        if (!mail_contato($email, $nome, $assunto, $mensagem)) {
+            throw new Exception("Não foi possível enviar o E-mail, por favor tente novamente mais tarde");
+        }
+        include template('contato_sucesso');
+        exit;
+    } catch (ValidationException $e) {
+        $erro = $e->getErrors();
+    } catch (Exception $e) {
+        $erro['unknow'] = $e->getMessage();
+    }
+    foreach ($erro as $key => $value) {
+        $fieldfocus = $key;
+        break;
+    }
+    Thunder::error($erro[$fieldfocus]);
 }
 
 $pagetitle = 'Contato';

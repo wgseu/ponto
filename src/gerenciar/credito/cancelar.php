@@ -24,14 +24,14 @@ require_once(dirname(dirname(__FILE__)) . '/app.php');
 need_permission(PermissaoNome::CADASTRARCREDITOS);
 $id = $_GET['id'];
 $credito = ZCredito::getPeloID($id);
-if(is_null($credito->getID())) {
-	Thunder::warning('O crédito de id "'.$id.'" não existe!');
-	redirect('/gerenciar/credito/');
+if (is_null($credito->getID())) {
+    Thunder::warning('O crédito de id "'.$id.'" não existe!');
+    redirect('/gerenciar/credito/');
 }
 try {
-	$credito->cancelar();
-	Thunder::success('Crédito "' . $credito->getDetalhes() . '" cancelado com sucesso!', true);
+    $credito->cancelar();
+    Thunder::success('Crédito "' . $credito->getDetalhes() . '" cancelado com sucesso!', true);
 } catch (Exception $e) {
-	Thunder::error('Não foi possível cancelar o crédito "' . $credito->getDetalhes() . '"!');
+    Thunder::error('Não foi possível cancelar o crédito "' . $credito->getDetalhes() . '"!');
 }
 redirect('/gerenciar/credito/');

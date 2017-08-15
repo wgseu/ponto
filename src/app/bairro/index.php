@@ -23,14 +23,16 @@ require_once(dirname(dirname(dirname(__FILE__))) . '/app.php');
 
 $estado_id = $_GET['estadoid'];
 $estado = ZEstado::getPeloID($estado_id);
-if(is_null($estado->getID()))
-	json('O estado não foi informado ou não existe!');
+if (is_null($estado->getID())) {
+    json('O estado não foi informado ou não existe!');
+}
 $cidade = ZCidade::getPeloEstadoIDNome($estado_id, trim($_GET['cidade']));
-if(is_null($cidade->getID()))
-	json('A cidade "' . $_GET['cidade'] . '" não existe!');
+if (is_null($cidade->getID())) {
+    json('A cidade "' . $_GET['cidade'] . '" não existe!');
+}
 $bairros = ZBairro::getTodosDaCidadeID($cidade->getID(), $_GET['nome'], 0, 10);
 $_bairros = array();
 foreach ($bairros as $bairro) {
-	$_bairros[] = $bairro->toArray();
+    $_bairros[] = $bairro->toArray();
 }
 json(array('status' => 'ok', 'items' => $_bairros));

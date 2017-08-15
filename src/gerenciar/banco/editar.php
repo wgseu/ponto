@@ -23,29 +23,29 @@ require_once(dirname(dirname(__FILE__)) . '/app.php');
 
 need_permission(PermissaoNome::CADASTROBANCOS);
 $banco = ZBanco::getPeloID($_GET['id']);
-if(is_null($banco->getID())) {
-	Thunder::warning('O banco de id "'.$_GET['id'].'" não existe!');
-	redirect('/gerenciar/banco/');
+if (is_null($banco->getID())) {
+    Thunder::warning('O banco de id "'.$_GET['id'].'" não existe!');
+    redirect('/gerenciar/banco/');
 }
 $focusctrl = 'razaosocial';
 $errors = array();
 $old_banco = $banco;
 if ($_POST) {
-	$banco = new ZBanco($_POST);
-	try {
-		$banco->setID($old_banco->getID());
-		$banco = ZBanco::atualizar($banco);
-		Thunder::success('Banco "'.$banco->getRazaoSocial().'" atualizado com sucesso!', true);
-		redirect('/gerenciar/banco/');
-	} catch (ValidationException $e) {
-		$errors = $e->getErrors();
-	} catch (Exception $e) {
-		$errors['unknow'] = $e->getMessage();
-	}
-	foreach($errors as $key => $value) {
-		$focusctrl = $key;
-		Thunder::error($value);
-		break;
-	}
+    $banco = new ZBanco($_POST);
+    try {
+        $banco->setID($old_banco->getID());
+        $banco = ZBanco::atualizar($banco);
+        Thunder::success('Banco "'.$banco->getRazaoSocial().'" atualizado com sucesso!', true);
+        redirect('/gerenciar/banco/');
+    } catch (ValidationException $e) {
+        $errors = $e->getErrors();
+    } catch (Exception $e) {
+        $errors['unknow'] = $e->getMessage();
+    }
+    foreach ($errors as $key => $value) {
+        $focusctrl = $key;
+        Thunder::error($value);
+        break;
+    }
 }
 include template('gerenciar_banco_editar');

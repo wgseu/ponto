@@ -24,14 +24,14 @@ require_once(dirname(dirname(__FILE__)) . '/app.php');
 need_permission(PermissaoNome::CADASTROPRODUTOS);
 $id = $_GET['id'];
 $unidade = ZUnidade::getPeloID($id);
-if(is_null($unidade->getID())) {
-	Thunder::warning('A unidade de id "'.$id.'" não existe!');
-	redirect('/gerenciar/unidade/');
+if (is_null($unidade->getID())) {
+    Thunder::warning('A unidade de id "'.$id.'" não existe!');
+    redirect('/gerenciar/unidade/');
 }
 try {
-	ZUnidade::excluir($id);
-	Thunder::success('Unidade "' . $unidade->getNome() . '" excluída com sucesso!', true);
+    ZUnidade::excluir($id);
+    Thunder::success('Unidade "' . $unidade->getNome() . '" excluída com sucesso!', true);
 } catch (Exception $e) {
-	Thunder::error('Não foi possível excluir a unidade "' . $unidade->getNome() . '"!');
+    Thunder::error('Não foi possível excluir a unidade "' . $unidade->getNome() . '"!');
 }
 redirect('/gerenciar/unidade/');

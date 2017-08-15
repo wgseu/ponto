@@ -22,225 +22,261 @@
 /**
  * Moedas financeiras de um país
  */
-class ZMoeda {
-	private $id;
-	private $nome;
-	private $simbolo;
-	private $codigo;
-	private $divisao;
-	private $fracao;
-	private $formato;
+class ZMoeda
+{
+    private $id;
+    private $nome;
+    private $simbolo;
+    private $codigo;
+    private $divisao;
+    private $fracao;
+    private $formato;
 
-	public function __construct($moeda = array()) {
-		if(is_array($moeda)) {
-			$this->setID(isset($moeda['id'])?$moeda['id']:null);
-			$this->setNome(isset($moeda['nome'])?$moeda['nome']:null);
-			$this->setSimbolo(isset($moeda['simbolo'])?$moeda['simbolo']:null);
-			$this->setCodigo(isset($moeda['codigo'])?$moeda['codigo']:null);
-			$this->setDivisao(isset($moeda['divisao'])?$moeda['divisao']:null);
-			$this->setFracao(isset($moeda['fracao'])?$moeda['fracao']:null);
-			$this->setFormato(isset($moeda['formato'])?$moeda['formato']:null);
-		}
-	}
+    public function __construct($moeda = array())
+    {
+        if (is_array($moeda)) {
+            $this->setID(isset($moeda['id'])?$moeda['id']:null);
+            $this->setNome(isset($moeda['nome'])?$moeda['nome']:null);
+            $this->setSimbolo(isset($moeda['simbolo'])?$moeda['simbolo']:null);
+            $this->setCodigo(isset($moeda['codigo'])?$moeda['codigo']:null);
+            $this->setDivisao(isset($moeda['divisao'])?$moeda['divisao']:null);
+            $this->setFracao(isset($moeda['fracao'])?$moeda['fracao']:null);
+            $this->setFormato(isset($moeda['formato'])?$moeda['formato']:null);
+        }
+    }
 
-	/**
-	 * Identificador da moeda
-	 */
-	public function getID() {
-		return $this->id;
-	}
+    /**
+     * Identificador da moeda
+     */
+    public function getID()
+    {
+        return $this->id;
+    }
 
-	public function setID($id) {
-		$this->id = $id;
-	}
+    public function setID($id)
+    {
+        $this->id = $id;
+    }
 
-	/**
-	 * Nome da moeda
-	 */
-	public function getNome() {
-		return $this->nome;
-	}
+    /**
+     * Nome da moeda
+     */
+    public function getNome()
+    {
+        return $this->nome;
+    }
 
-	public function setNome($nome) {
-		$this->nome = $nome;
-	}
+    public function setNome($nome)
+    {
+        $this->nome = $nome;
+    }
 
-	/**
-	 * Símbolo da moeda, Ex.: R$, $
-	 */
-	public function getSimbolo() {
-		return $this->simbolo;
-	}
+    /**
+     * Símbolo da moeda, Ex.: R$, $
+     */
+    public function getSimbolo()
+    {
+        return $this->simbolo;
+    }
 
-	public function setSimbolo($simbolo) {
-		$this->simbolo = $simbolo;
-	}
+    public function setSimbolo($simbolo)
+    {
+        $this->simbolo = $simbolo;
+    }
 
-	/**
-	 * Código internacional da moeda, Ex.: USD, BRL
-	 */
-	public function getCodigo() {
-		return $this->codigo;
-	}
+    /**
+     * Código internacional da moeda, Ex.: USD, BRL
+     */
+    public function getCodigo()
+    {
+        return $this->codigo;
+    }
 
-	public function setCodigo($codigo) {
-		$this->codigo = $codigo;
-	}
+    public function setCodigo($codigo)
+    {
+        $this->codigo = $codigo;
+    }
 
-	/**
-	 * Informa o número fracionário para determinar a quantidade de casas decimais, Ex:
-	 * 100 para 0,00. 10 para 0,0
-	 */
-	public function getDivisao() {
-		return $this->divisao;
-	}
+    /**
+     * Informa o número fracionário para determinar a quantidade de casas decimais, Ex:
+     * 100 para 0,00. 10 para 0,0
+     */
+    public function getDivisao()
+    {
+        return $this->divisao;
+    }
 
-	public function setDivisao($divisao) {
-		$this->divisao = $divisao;
-	}
+    public function setDivisao($divisao)
+    {
+        $this->divisao = $divisao;
+    }
 
-	/**
-	 * Informa o nome da fração, Ex.: Centavo
-	 */
-	public function getFracao() {
-		return $this->fracao;
-	}
+    /**
+     * Informa o nome da fração, Ex.: Centavo
+     */
+    public function getFracao()
+    {
+        return $this->fracao;
+    }
 
-	public function setFracao($fracao) {
-		$this->fracao = $fracao;
-	}
+    public function setFracao($fracao)
+    {
+        $this->fracao = $fracao;
+    }
 
-	/**
-	 * Formado de exibição do valor, Ex: $ %s, para $ 3,00
-	 */
-	public function getFormato() {
-		return $this->formato;
-	}
+    /**
+     * Formado de exibição do valor, Ex: $ %s, para $ 3,00
+     */
+    public function getFormato()
+    {
+        return $this->formato;
+    }
 
-	public function setFormato($formato) {
-		$this->formato = $formato;
-	}
+    public function setFormato($formato)
+    {
+        $this->formato = $formato;
+    }
 
-	public function toArray() {
-		$moeda = array();
-		$moeda['id'] = $this->getID();
-		$moeda['nome'] = $this->getNome();
-		$moeda['simbolo'] = $this->getSimbolo();
-		$moeda['codigo'] = $this->getCodigo();
-		$moeda['divisao'] = $this->getDivisao();
-		$moeda['fracao'] = $this->getFracao();
-		$moeda['formato'] = $this->getFormato();
-		return $moeda;
-	}
+    public function toArray()
+    {
+        $moeda = array();
+        $moeda['id'] = $this->getID();
+        $moeda['nome'] = $this->getNome();
+        $moeda['simbolo'] = $this->getSimbolo();
+        $moeda['codigo'] = $this->getCodigo();
+        $moeda['divisao'] = $this->getDivisao();
+        $moeda['fracao'] = $this->getFracao();
+        $moeda['formato'] = $this->getFormato();
+        return $moeda;
+    }
 
-	public static function getPeloID($id) {
-		$query = DB::$pdo->from('Moedas')
-		                 ->where(array('id' => $id));
-		return new ZMoeda($query->fetch());
-	}
+    public static function getPeloID($id)
+    {
+        $query = DB::$pdo->from('Moedas')
+                         ->where(array('id' => $id));
+        return new ZMoeda($query->fetch());
+    }
 
-	private static function validarCampos(&$moeda) {
-		$erros = array();
-		$moeda['nome'] = strip_tags(trim($moeda['nome']));
-		if(strlen($moeda['nome']) == 0)
-			$erros['nome'] = 'O nome não pode ser vazio';
-		$moeda['simbolo'] = strip_tags(trim($moeda['simbolo']));
-		if(strlen($moeda['simbolo']) == 0)
-			$erros['simbolo'] = 'O símbolo não pode ser vazio';
-		$moeda['codigo'] = strip_tags(trim($moeda['codigo']));
-		if(strlen($moeda['codigo']) == 0)
-			$moeda['codigo'] = null;
-		if(!is_numeric($moeda['divisao']))
-			$erros['divisao'] = 'A divisão não foi informada';
-		else if($moeda['divisao'] < 0)
-			$erros['divisao'] = 'A divisão não pode ser negativa';
-		else if($moeda['divisao'] < 1)
-			$erros['divisao'] = 'A divisão não pode ser nula';
-		$moeda['fracao'] = strip_tags(trim($moeda['fracao']));
-		if(strlen($moeda['fracao']) == 0)
-			$moeda['fracao'] = null;
-		$moeda['formato'] = strip_tags(trim($moeda['formato']));
-		if(strlen($moeda['formato']) == 0)
-			$erros['formato'] = 'O formato não pode ser vazio';
-		if(!empty($erros))
-			throw new ValidationException($erros);
-	}
+    private static function validarCampos(&$moeda)
+    {
+        $erros = array();
+        $moeda['nome'] = strip_tags(trim($moeda['nome']));
+        if (strlen($moeda['nome']) == 0) {
+            $erros['nome'] = 'O nome não pode ser vazio';
+        }
+        $moeda['simbolo'] = strip_tags(trim($moeda['simbolo']));
+        if (strlen($moeda['simbolo']) == 0) {
+            $erros['simbolo'] = 'O símbolo não pode ser vazio';
+        }
+        $moeda['codigo'] = strip_tags(trim($moeda['codigo']));
+        if (strlen($moeda['codigo']) == 0) {
+            $moeda['codigo'] = null;
+        }
+        if (!is_numeric($moeda['divisao'])) {
+            $erros['divisao'] = 'A divisão não foi informada';
+        } elseif ($moeda['divisao'] < 0) {
+            $erros['divisao'] = 'A divisão não pode ser negativa';
+        } elseif ($moeda['divisao'] < 1) {
+            $erros['divisao'] = 'A divisão não pode ser nula';
+        }
+        $moeda['fracao'] = strip_tags(trim($moeda['fracao']));
+        if (strlen($moeda['fracao']) == 0) {
+            $moeda['fracao'] = null;
+        }
+        $moeda['formato'] = strip_tags(trim($moeda['formato']));
+        if (strlen($moeda['formato']) == 0) {
+            $erros['formato'] = 'O formato não pode ser vazio';
+        }
+        if (!empty($erros)) {
+            throw new ValidationException($erros);
+        }
+    }
 
-	private static function handleException(&$e) {
-		if(stripos($e->getMessage(), 'PRIMARY') !== false)
-			throw new ValidationException(array('id' => 'O ID informado já está cadastrado'));
-	}
+    private static function handleException(&$e)
+    {
+        if (stripos($e->getMessage(), 'PRIMARY') !== false) {
+            throw new ValidationException(array('id' => 'O ID informado já está cadastrado'));
+        }
+    }
 
-	public static function cadastrar($moeda) {
-		$_moeda = $moeda->toArray();
-		self::validarCampos($_moeda);
-		try {
-			$_moeda['id'] = DB::$pdo->insertInto('Moedas')->values($_moeda)->execute();
-		} catch (Exception $e) {
-			self::handleException($e);
-			throw $e;
-		}
-		return self::getPeloID($_moeda['id']);
-	}
+    public static function cadastrar($moeda)
+    {
+        $_moeda = $moeda->toArray();
+        self::validarCampos($_moeda);
+        try {
+            $_moeda['id'] = DB::$pdo->insertInto('Moedas')->values($_moeda)->execute();
+        } catch (Exception $e) {
+            self::handleException($e);
+            throw $e;
+        }
+        return self::getPeloID($_moeda['id']);
+    }
 
-	public static function atualizar($moeda) {
-		$_moeda = $moeda->toArray();
-		if(!$_moeda['id'])
-			throw new ValidationException(array('id' => 'O id da moeda não foi informado'));
-		self::validarCampos($_moeda);
-		$campos = array(
-			'nome',
-			'simbolo',
-			'codigo',
-			'divisao',
-			'fracao',
-			'formato',
-		);
-		try {
-			$query = DB::$pdo->update('Moedas');
-			$query = $query->set(array_intersect_key($_moeda, array_flip($campos)));
-			$query = $query->where('id', $_moeda['id']);
-			$query->execute();
-		} catch (Exception $e) {
-			self::handleException($e);
-			throw $e;
-		}
-		return self::getPeloID($_moeda['id']);
-	}
+    public static function atualizar($moeda)
+    {
+        $_moeda = $moeda->toArray();
+        if (!$_moeda['id']) {
+            throw new ValidationException(array('id' => 'O id da moeda não foi informado'));
+        }
+        self::validarCampos($_moeda);
+        $campos = array(
+            'nome',
+            'simbolo',
+            'codigo',
+            'divisao',
+            'fracao',
+            'formato',
+        );
+        try {
+            $query = DB::$pdo->update('Moedas');
+            $query = $query->set(array_intersect_key($_moeda, array_flip($campos)));
+            $query = $query->where('id', $_moeda['id']);
+            $query->execute();
+        } catch (Exception $e) {
+            self::handleException($e);
+            throw $e;
+        }
+        return self::getPeloID($_moeda['id']);
+    }
 
-	public static function excluir($id) {
-		if(!$id)
-			throw new Exception('Não foi possível excluir a moeda, o id da moeda não foi informado');
-		$query = DB::$pdo->deleteFrom('Moedas')
-		                 ->where(array('id' => $id));
-		return $query->execute();
-	}
+    public static function excluir($id)
+    {
+        if (!$id) {
+            throw new Exception('Não foi possível excluir a moeda, o id da moeda não foi informado');
+        }
+        $query = DB::$pdo->deleteFrom('Moedas')
+                         ->where(array('id' => $id));
+        return $query->execute();
+    }
 
-	private static function initSearch($busca) {
-		$query = DB::$pdo->from('Moedas')
-		                 ->orderBy('nome ASC');
-		$busca = trim($busca);
-		if($busca != '') {
-			$query = $query->where('CONCAT(nome, " ", codigo) LIKE ?', '%'.$busca.'%');
-		}
-		return $query;
-	}
+    private static function initSearch($busca)
+    {
+        $query = DB::$pdo->from('Moedas')
+                         ->orderBy('nome ASC');
+        $busca = trim($busca);
+        if ($busca != '') {
+            $query = $query->where('CONCAT(nome, " ", codigo) LIKE ?', '%'.$busca.'%');
+        }
+        return $query;
+    }
 
-	public static function getTodas($busca = null, $inicio = null, $quantidade = null) {
-		$query = self::initSearch($busca);
-		if(!is_null($inicio) && !is_null($quantidade)) {
-			$query = $query->limit($quantidade)->offset($inicio);
-		}
-		$_moedas = $query->fetchAll();
-		$moedas = array();
-		foreach($_moedas as $moeda)
-			$moedas[] = new ZMoeda($moeda);
-		return $moedas;
-	}
+    public static function getTodas($busca = null, $inicio = null, $quantidade = null)
+    {
+        $query = self::initSearch($busca);
+        if (!is_null($inicio) && !is_null($quantidade)) {
+            $query = $query->limit($quantidade)->offset($inicio);
+        }
+        $_moedas = $query->fetchAll();
+        $moedas = array();
+        foreach ($_moedas as $moeda) {
+            $moedas[] = new ZMoeda($moeda);
+        }
+        return $moedas;
+    }
 
-	public static function getCount($busca = null) {
-		$query = self::initSearch($busca);
-		return $query->count();
-	}
-
+    public static function getCount($busca = null)
+    {
+        $query = self::initSearch($busca);
+        return $query->count();
+    }
 }

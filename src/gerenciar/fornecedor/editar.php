@@ -23,32 +23,33 @@ require_once(dirname(dirname(__FILE__)) . '/app.php');
 
 need_permission(PermissaoNome::CADASTROFORNECEDORES);
 $fornecedor = ZFornecedor::getPeloID($_GET['id']);
-if(is_null($fornecedor->getID())) {
-	Thunder::warning('O fornecedor de id "'.$_GET['id'].'" não existe!');
-	redirect('/gerenciar/fornecedor/');
+if (is_null($fornecedor->getID())) {
+    Thunder::warning('O fornecedor de id "'.$_GET['id'].'" não existe!');
+    redirect('/gerenciar/fornecedor/');
 }
 $focusctrl = 'empresaid';
 $errors = array();
 $old_fornecedor = $fornecedor;
 if ($_POST) {
-	$fornecedor = new ZFornecedor($_POST);
-	try {
-		$fornecedor->setID($old_fornecedor->getID());
-		$fornecedor->setPrazoPagamento(numberval($fornecedor->getPrazoPagamento()));
-		$fornecedor = ZFornecedor::atualizar($fornecedor);
-		Thunder::success('Fornecedor "'.$fornecedor->getEmpresaID().'" atualizado com sucesso!', true);
-		redirect('/gerenciar/fornecedor/');
-	} catch (ValidationException $e) {
-		$errors = $e->getErrors();
-	} catch (Exception $e) {
-		$errors['unknow'] = $e->getMessage();
-	}
-	foreach($errors as $key => $value) {
-		$focusctrl = $key;
-		Thunder::error($value);
-		break;
-	}
+    $fornecedor = new ZFornecedor($_POST);
+    try {
+        $fornecedor->setID($old_fornecedor->getID());
+        $fornecedor->setPrazoPagamento(numberval($fornecedor->getPrazoPagamento()));
+        $fornecedor = ZFornecedor::atualizar($fornecedor);
+        Thunder::success('Fornecedor "'.$fornecedor->getEmpresaID().'" atualizado com sucesso!', true);
+        redirect('/gerenciar/fornecedor/');
+    } catch (ValidationException $e) {
+        $errors = $e->getErrors();
+    } catch (Exception $e) {
+        $errors['unknow'] = $e->getMessage();
+    }
+    foreach ($errors as $key => $value) {
+        $focusctrl = $key;
+        Thunder::error($value);
+        break;
+    }
 }
-if($focusctrl == 'empresaid')
-	$focusctrl == 'empresa';
+if ($focusctrl == 'empresaid') {
+    $focusctrl == 'empresa';
+}
 include template('gerenciar_fornecedor_editar');

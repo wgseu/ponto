@@ -22,202 +22,237 @@
 /**
  * Bancos disponíveis no país
  */
-class ZBanco {
-	private $id;
-	private $numero;
-	private $razao_social;
-	private $agencia_mascara;
-	private $conta_mascara;
+class ZBanco
+{
+    private $id;
+    private $numero;
+    private $razao_social;
+    private $agencia_mascara;
+    private $conta_mascara;
 
-	public function __construct($banco = array()) {
-		if(is_array($banco)) {
-			$this->setID(isset($banco['id'])?$banco['id']:null);
-			$this->setNumero(isset($banco['numero'])?$banco['numero']:null);
-			$this->setRazaoSocial(isset($banco['razaosocial'])?$banco['razaosocial']:null);
-			$this->setAgenciaMascara(isset($banco['agenciamascara'])?$banco['agenciamascara']:null);
-			$this->setContaMascara(isset($banco['contamascara'])?$banco['contamascara']:null);
-		}
-	}
+    public function __construct($banco = array())
+    {
+        if (is_array($banco)) {
+            $this->setID(isset($banco['id'])?$banco['id']:null);
+            $this->setNumero(isset($banco['numero'])?$banco['numero']:null);
+            $this->setRazaoSocial(isset($banco['razaosocial'])?$banco['razaosocial']:null);
+            $this->setAgenciaMascara(isset($banco['agenciamascara'])?$banco['agenciamascara']:null);
+            $this->setContaMascara(isset($banco['contamascara'])?$banco['contamascara']:null);
+        }
+    }
 
-	/**
-	 * Identificador do banco
-	 */
-	public function getID() {
-		return $this->id;
-	}
+    /**
+     * Identificador do banco
+     */
+    public function getID()
+    {
+        return $this->id;
+    }
 
-	public function setID($id) {
-		$this->id = $id;
-	}
+    public function setID($id)
+    {
+        $this->id = $id;
+    }
 
-	/**
-	 * Número do banco
-	 */
-	public function getNumero() {
-		return $this->numero;
-	}
+    /**
+     * Número do banco
+     */
+    public function getNumero()
+    {
+        return $this->numero;
+    }
 
-	public function setNumero($numero) {
-		$this->numero = $numero;
-	}
+    public function setNumero($numero)
+    {
+        $this->numero = $numero;
+    }
 
-	/**
-	 * Razão social do banco
-	 */
-	public function getRazaoSocial() {
-		return $this->razao_social;
-	}
+    /**
+     * Razão social do banco
+     */
+    public function getRazaoSocial()
+    {
+        return $this->razao_social;
+    }
 
-	public function setRazaoSocial($razao_social) {
-		$this->razao_social = $razao_social;
-	}
+    public function setRazaoSocial($razao_social)
+    {
+        $this->razao_social = $razao_social;
+    }
 
-	/**
-	 * Mascara para formatação do número da agência
-	 */
-	public function getAgenciaMascara() {
-		return $this->agencia_mascara;
-	}
+    /**
+     * Mascara para formatação do número da agência
+     */
+    public function getAgenciaMascara()
+    {
+        return $this->agencia_mascara;
+    }
 
-	public function setAgenciaMascara($agencia_mascara) {
-		$this->agencia_mascara = $agencia_mascara;
-	}
+    public function setAgenciaMascara($agencia_mascara)
+    {
+        $this->agencia_mascara = $agencia_mascara;
+    }
 
-	/**
-	 * Máscara para formatação do número da conta
-	 */
-	public function getContaMascara() {
-		return $this->conta_mascara;
-	}
+    /**
+     * Máscara para formatação do número da conta
+     */
+    public function getContaMascara()
+    {
+        return $this->conta_mascara;
+    }
 
-	public function setContaMascara($conta_mascara) {
-		$this->conta_mascara = $conta_mascara;
-	}
+    public function setContaMascara($conta_mascara)
+    {
+        $this->conta_mascara = $conta_mascara;
+    }
 
-	public function toArray() {
-		$banco = array();
-		$banco['id'] = $this->getID();
-		$banco['numero'] = $this->getNumero();
-		$banco['razaosocial'] = $this->getRazaoSocial();
-		$banco['agenciamascara'] = $this->getAgenciaMascara();
-		$banco['contamascara'] = $this->getContaMascara();
-		return $banco;
-	}
+    public function toArray()
+    {
+        $banco = array();
+        $banco['id'] = $this->getID();
+        $banco['numero'] = $this->getNumero();
+        $banco['razaosocial'] = $this->getRazaoSocial();
+        $banco['agenciamascara'] = $this->getAgenciaMascara();
+        $banco['contamascara'] = $this->getContaMascara();
+        return $banco;
+    }
 
-	public static function getPeloID($id) {
-		$query = DB::$pdo->from('Bancos')
-		                 ->where(array('id' => $id));
-		return new ZBanco($query->fetch());
-	}
+    public static function getPeloID($id)
+    {
+        $query = DB::$pdo->from('Bancos')
+                         ->where(array('id' => $id));
+        return new ZBanco($query->fetch());
+    }
 
-	public static function getPelaRazaoSocial($razao_social) {
-		$query = DB::$pdo->from('Bancos')
-		                 ->where(array('razaosocial' => $razao_social));
-		return new ZBanco($query->fetch());
-	}
+    public static function getPelaRazaoSocial($razao_social)
+    {
+        $query = DB::$pdo->from('Bancos')
+                         ->where(array('razaosocial' => $razao_social));
+        return new ZBanco($query->fetch());
+    }
 
-	public static function getPeloNumero($numero) {
-		$query = DB::$pdo->from('Bancos')
-		                 ->where(array('numero' => $numero));
-		return new ZBanco($query->fetch());
-	}
+    public static function getPeloNumero($numero)
+    {
+        $query = DB::$pdo->from('Bancos')
+                         ->where(array('numero' => $numero));
+        return new ZBanco($query->fetch());
+    }
 
-	private static function validarCampos(&$banco) {
-		$erros = array();
-		$banco['numero'] = strip_tags(trim($banco['numero']));
-		if(strlen($banco['numero']) == 0)
-			$erros['numero'] = 'O número não pode ser vazio';
-		$banco['razaosocial'] = strip_tags(trim($banco['razaosocial']));
-		if(strlen($banco['razaosocial']) == 0)
-			$erros['razaosocial'] = 'A razão social não pode ser vazia';
-		$banco['agenciamascara'] = strip_tags(trim($banco['agenciamascara']));
-		if(strlen($banco['agenciamascara']) == 0)
-			$banco['agenciamascara'] = null;
-		$banco['contamascara'] = strip_tags(trim($banco['contamascara']));
-		if(strlen($banco['contamascara']) == 0)
-			$banco['contamascara'] = null;
-		if(!empty($erros))
-			throw new ValidationException($erros);
-	}
+    private static function validarCampos(&$banco)
+    {
+        $erros = array();
+        $banco['numero'] = strip_tags(trim($banco['numero']));
+        if (strlen($banco['numero']) == 0) {
+            $erros['numero'] = 'O número não pode ser vazio';
+        }
+        $banco['razaosocial'] = strip_tags(trim($banco['razaosocial']));
+        if (strlen($banco['razaosocial']) == 0) {
+            $erros['razaosocial'] = 'A razão social não pode ser vazia';
+        }
+        $banco['agenciamascara'] = strip_tags(trim($banco['agenciamascara']));
+        if (strlen($banco['agenciamascara']) == 0) {
+            $banco['agenciamascara'] = null;
+        }
+        $banco['contamascara'] = strip_tags(trim($banco['contamascara']));
+        if (strlen($banco['contamascara']) == 0) {
+            $banco['contamascara'] = null;
+        }
+        if (!empty($erros)) {
+            throw new ValidationException($erros);
+        }
+    }
 
-	private static function handleException(&$e) {
-		if(stripos($e->getMessage(), 'PRIMARY') !== false)
-			throw new ValidationException(array('id' => 'O ID informado já está cadastrado'));
-		if(stripos($e->getMessage(), 'RazaoSocial_UNIQUE') !== false)
-			throw new ValidationException(array('razaosocial' => 'A razão social informada já está cadastrada'));
-		if(stripos($e->getMessage(), 'Numero_UNIQUE') !== false)
-			throw new ValidationException(array('numero' => 'O número informado já está cadastrado'));
-	}
+    private static function handleException(&$e)
+    {
+        if (stripos($e->getMessage(), 'PRIMARY') !== false) {
+            throw new ValidationException(array('id' => 'O ID informado já está cadastrado'));
+        }
+        if (stripos($e->getMessage(), 'RazaoSocial_UNIQUE') !== false) {
+            throw new ValidationException(array('razaosocial' => 'A razão social informada já está cadastrada'));
+        }
+        if (stripos($e->getMessage(), 'Numero_UNIQUE') !== false) {
+            throw new ValidationException(array('numero' => 'O número informado já está cadastrado'));
+        }
+    }
 
-	public static function cadastrar($banco) {
-		$_banco = $banco->toArray();
-		self::validarCampos($_banco);
-		try {
-			$_banco['id'] = DB::$pdo->insertInto('Bancos')->values($_banco)->execute();
-		} catch (Exception $e) {
-			self::handleException($e);
-			throw $e;
-		}
-		return self::getPeloID($_banco['id']);
-	}
+    public static function cadastrar($banco)
+    {
+        $_banco = $banco->toArray();
+        self::validarCampos($_banco);
+        try {
+            $_banco['id'] = DB::$pdo->insertInto('Bancos')->values($_banco)->execute();
+        } catch (Exception $e) {
+            self::handleException($e);
+            throw $e;
+        }
+        return self::getPeloID($_banco['id']);
+    }
 
-	public static function atualizar($banco) {
-		$_banco = $banco->toArray();
-		if(!$_banco['id'])
-			throw new ValidationException(array('id' => 'O id do banco não foi informado'));
-		self::validarCampos($_banco);
-		$campos = array(
-			'numero',
-			'razaosocial',
-			'agenciamascara',
-			'contamascara',
-		);
-		try {
-			$query = DB::$pdo->update('Bancos');
-			$query = $query->set(array_intersect_key($_banco, array_flip($campos)));
-			$query = $query->where('id', $_banco['id']);
-			$query->execute();
-		} catch (Exception $e) {
-			self::handleException($e);
-			throw $e;
-		}
-		return self::getPeloID($_banco['id']);
-	}
+    public static function atualizar($banco)
+    {
+        $_banco = $banco->toArray();
+        if (!$_banco['id']) {
+            throw new ValidationException(array('id' => 'O id do banco não foi informado'));
+        }
+        self::validarCampos($_banco);
+        $campos = array(
+            'numero',
+            'razaosocial',
+            'agenciamascara',
+            'contamascara',
+        );
+        try {
+            $query = DB::$pdo->update('Bancos');
+            $query = $query->set(array_intersect_key($_banco, array_flip($campos)));
+            $query = $query->where('id', $_banco['id']);
+            $query->execute();
+        } catch (Exception $e) {
+            self::handleException($e);
+            throw $e;
+        }
+        return self::getPeloID($_banco['id']);
+    }
 
-	public static function excluir($id) {
-		if(!$id)
-			throw new Exception('Não foi possível excluir o banco, o id do banco não foi informado');
-		$query = DB::$pdo->deleteFrom('Bancos')
-		                 ->where(array('id' => $id));
-		return $query->execute();
-	}
+    public static function excluir($id)
+    {
+        if (!$id) {
+            throw new Exception('Não foi possível excluir o banco, o id do banco não foi informado');
+        }
+        $query = DB::$pdo->deleteFrom('Bancos')
+                         ->where(array('id' => $id));
+        return $query->execute();
+    }
 
-	private static function initSearch($busca) {
-		$query = DB::$pdo->from('Bancos')
-		                 ->orderBy('id ASC');
-		$busca = trim($busca);
-		if(is_numeric($busca))
-			$query = $query->where('numero', $busca);
-		else if($busca != '')
-			$query = $query->where('razaosocial LIKE ?', '%'.$busca.'%');
-		return $query;
-	}
+    private static function initSearch($busca)
+    {
+        $query = DB::$pdo->from('Bancos')
+                         ->orderBy('id ASC');
+        $busca = trim($busca);
+        if (is_numeric($busca)) {
+            $query = $query->where('numero', $busca);
+        } elseif ($busca != '') {
+            $query = $query->where('razaosocial LIKE ?', '%'.$busca.'%');
+        }
+        return $query;
+    }
 
-	public static function getTodos($busca = null, $inicio = null, $quantidade = null) {
-		$query = self::initSearch($busca);
-		if(!is_null($inicio) && !is_null($quantidade)) {
-			$query = $query->limit($quantidade)->offset($inicio);
-		}
-		$_bancos = $query->fetchAll();
-		$bancos = array();
-		foreach($_bancos as $banco)
-			$bancos[] = new ZBanco($banco);
-		return $bancos;
-	}
+    public static function getTodos($busca = null, $inicio = null, $quantidade = null)
+    {
+        $query = self::initSearch($busca);
+        if (!is_null($inicio) && !is_null($quantidade)) {
+            $query = $query->limit($quantidade)->offset($inicio);
+        }
+        $_bancos = $query->fetchAll();
+        $bancos = array();
+        foreach ($_bancos as $banco) {
+            $bancos[] = new ZBanco($banco);
+        }
+        return $bancos;
+    }
 
-	public static function getCount($busca = null) {
-		$query = self::initSearch($busca);
-		return $query->count();
-	}
-
+    public static function getCount($busca = null)
+    {
+        $query = self::initSearch($busca);
+        return $query->count();
+    }
 }

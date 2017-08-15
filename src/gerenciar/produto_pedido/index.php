@@ -28,68 +28,68 @@ $data_inicio = $data_inicio===false?null:$data_inicio->getTimestamp();
 $data_fim = date_create_from_format('d/m/Y', $_GET['datahora_fim']);
 $data_fim = $data_fim===false?null:$data_fim->getTimestamp();
 $count = ZProdutoPedido::getCount(
-	$_GET['query'],
-	$_GET['produto_id'],
-	$_GET['funcionario_id'],
-	null, // id da sessão
-	null, // id da movimentação
-	$_GET['tipo'],
-	$_GET['estado'],
-	$_GET['modulo'],
-	$data_inicio,
-	$data_fim
+    $_GET['query'],
+    $_GET['produto_id'],
+    $_GET['funcionario_id'],
+    null, // id da sessão
+    null, // id da movimentação
+    $_GET['tipo'],
+    $_GET['estado'],
+    $_GET['modulo'],
+    $data_inicio,
+    $data_fim
 );
 list($pagesize, $offset, $pagestring) = pagestring($count, 10);
 $itens_do_pedido = ZProdutoPedido::getTodos(
-	$_GET['query'],
-	$_GET['produto_id'],
-	$_GET['funcionario_id'],
-	null, // id da sessão
-	null, // id da movimentação
-	$_GET['tipo'],
-	$_GET['estado'],
-	$_GET['modulo'],
-	$data_inicio,
-	$data_fim,
-	false, // disable raw
-	$offset,
-	$pagesize
+    $_GET['query'],
+    $_GET['produto_id'],
+    $_GET['funcionario_id'],
+    null, // id da sessão
+    null, // id da movimentação
+    $_GET['tipo'],
+    $_GET['estado'],
+    $_GET['modulo'],
+    $data_inicio,
+    $data_fim,
+    false, // disable raw
+    $offset,
+    $pagesize
 );
 
 $_modulo_names = array(
-	'Mesa' => 'Mesa',
-	'Comanda' => 'Comanda',
-	'Avulso' => 'Balcão',
-	'Entrega' => 'Entrega',
+    'Mesa' => 'Mesa',
+    'Comanda' => 'Comanda',
+    'Avulso' => 'Balcão',
+    'Entrega' => 'Entrega',
 );
 
 $_estado_names = array(
-	'Valido' => 'Válido',
-	'Adicionado' => 'Adicionado',
-	'Enviado' => 'Enviado',
-	'Processado' => 'Processado',
-	'Pronto' => 'Pronto',
-	'Disponivel' => 'Disponível',
-	'Entregue' => 'Entregue',
-	'Cancelado' => 'Cancelado',
+    'Valido' => 'Válido',
+    'Adicionado' => 'Adicionado',
+    'Enviado' => 'Enviado',
+    'Processado' => 'Processado',
+    'Pronto' => 'Pronto',
+    'Disponivel' => 'Disponível',
+    'Entregue' => 'Entregue',
+    'Cancelado' => 'Cancelado',
 );
 
 $_tipo_names = array(
-	'Produtos' => 'Todos os produtos',
-	'Produto' => 'Produto',
-	'Composicao' => 'Composição',
-	'Pacote' => 'Pacote',
-	'Servico' => 'Todos os serviços',
-	'Evento' => 'Evento',
-	'Taxa' => 'Taxa',
-	'Desconto' => 'Desconto',
+    'Produtos' => 'Todos os produtos',
+    'Produto' => 'Produto',
+    'Composicao' => 'Composição',
+    'Pacote' => 'Pacote',
+    'Servico' => 'Todos os serviços',
+    'Evento' => 'Evento',
+    'Taxa' => 'Taxa',
+    'Desconto' => 'Desconto',
 );
 
 $_pedido_icon = array(
-	'Mesa' => 0,
-	'Comanda' => 16,
-	'Avulso' => 32,
-	'Entrega' => 48,
+    'Mesa' => 0,
+    'Comanda' => 16,
+    'Avulso' => 32,
+    'Entrega' => 48,
 );
 
 $_produto = ZProduto::getPeloID($_GET['produto_id']);

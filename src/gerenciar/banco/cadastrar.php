@@ -25,23 +25,23 @@ need_permission(PermissaoNome::CADASTROBANCOS);
 $focusctrl = 'razaosocial';
 $errors = array();
 if ($_POST) {
-	$banco = new ZBanco($_POST);
-	try {
-		$banco->setID(null);
-		$banco = ZBanco::cadastrar($banco);
-		Thunder::success('Banco "'.$banco->getRazaoSocial().'" cadastrado com sucesso!', true);
-		redirect('/gerenciar/banco/');
-	} catch (ValidationException $e) {
-		$errors = $e->getErrors();
-	} catch (Exception $e) {
-		$errors['unknow'] = $e->getMessage();
-	}
-	foreach($errors as $key => $value) {
-		$focusctrl = $key;
-		Thunder::error($value);
-		break;
-	}
+    $banco = new ZBanco($_POST);
+    try {
+        $banco->setID(null);
+        $banco = ZBanco::cadastrar($banco);
+        Thunder::success('Banco "'.$banco->getRazaoSocial().'" cadastrado com sucesso!', true);
+        redirect('/gerenciar/banco/');
+    } catch (ValidationException $e) {
+        $errors = $e->getErrors();
+    } catch (Exception $e) {
+        $errors['unknow'] = $e->getMessage();
+    }
+    foreach ($errors as $key => $value) {
+        $focusctrl = $key;
+        Thunder::error($value);
+        break;
+    }
 } else {
-	$banco = new ZBanco();
+    $banco = new ZBanco();
 }
 include template('gerenciar_banco_cadastrar');

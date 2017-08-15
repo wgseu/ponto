@@ -23,39 +23,40 @@ require_once(dirname(dirname(__FILE__)) . '/app.php');
 
 need_permission(PermissaoNome::CADASTROCIDADES);
 $cidade = ZCidade::getPeloID($_GET['id']);
-if(is_null($cidade->getID())) {
-	Thunder::warning('A cidade de id "'.$_GET['id'].'" não existe!');
-	redirect('/gerenciar/cidade/');
+if (is_null($cidade->getID())) {
+    Thunder::warning('A cidade de id "'.$_GET['id'].'" não existe!');
+    redirect('/gerenciar/cidade/');
 }
 $focusctrl = 'nome';
 $errors = array();
 $old_cidade = $cidade;
 if ($_POST) {
-	$cidade = new ZCidade($_POST);
-	try {
-		$cidade->setID($old_cidade->getID());
-		$cidade->setCEP(\MZ\Util\Filter::unmask($cidade->getCEP(), _p('Mascara', 'CEP')));
-		$cidade = ZCidade::atualizar($cidade);
-		Thunder::success('Cidade "'.$cidade->getNome().'" atualizada com sucesso!', true);
-		redirect('/gerenciar/cidade/');
-	} catch (ValidationException $e) {
-		$errors = $e->getErrors();
-	} catch (Exception $e) {
-		$errors['unknow'] = $e->getMessage();
-	}
-	foreach($errors as $key => $value) {
-		$focusctrl = $key;
-		Thunder::error($value);
-		break;
-	}
+    $cidade = new ZCidade($_POST);
+    try {
+        $cidade->setID($old_cidade->getID());
+        $cidade->setCEP(\MZ\Util\Filter::unmask($cidade->getCEP(), _p('Mascara', 'CEP')));
+        $cidade = ZCidade::atualizar($cidade);
+        Thunder::success('Cidade "'.$cidade->getNome().'" atualizada com sucesso!', true);
+        redirect('/gerenciar/cidade/');
+    } catch (ValidationException $e) {
+        $errors = $e->getErrors();
+    } catch (Exception $e) {
+        $errors['unknow'] = $e->getMessage();
+    }
+    foreach ($errors as $key => $value) {
+        $focusctrl = $key;
+        Thunder::error($value);
+        break;
+    }
 }
 $_estado = ZEstado::getPeloID($cidade->getEstadoID());
 $_paises = ZPais::getTodas();
-if(!is_null($_estado->getID()))
-	$pais = ZPais::getPeloID($_estado->getPaisID());
-else if(count($_paises) > 0)
-	$pais = current($_paises);
-else
-	$pais = new ZPais();
+if (!is_null($_estado->getID())) {
+    $pais = ZPais::getPeloID($_estado->getPaisID());
+} elseif (count($_paises) > 0) {
+    $pais = current($_paises);
+} else {
+    $pais = new ZPais();
+}
 $_estados = ZEstado::getTodosDaPaisID($pais->getID());
 include template('gerenciar_cidade_editar');

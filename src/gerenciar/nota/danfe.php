@@ -7,7 +7,7 @@ need_permission(
         PermissaoNome::SELECIONARCAIXA, array('||'),
         PermissaoNome::RELATORIOPEDIDOS
     ),
-    $_GET['saida'] == 'json'
+    is_output('json')
 );
 
 try {
@@ -27,7 +27,7 @@ try {
     $xmlfile = NFeDB::getCaminhoXmlAtual($_nota);
     $nota = new \NFe\Core\NFCe();
     $nota->load($xmlfile);
-    if ($_GET['saida'] == 'json') {
+    if (is_output('json')) {
         json('nota', $nota->toArray(true));
     }
 } catch (Exception $e) {

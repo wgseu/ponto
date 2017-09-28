@@ -1,7 +1,7 @@
 <?php
 require_once(dirname(dirname(__FILE__)) . '/app.php');
 
-need_manager($_GET['saida'] == 'json');
+need_manager(is_output('json'));
 
 /* not allow access app.php */
 $script_filename = str_replace('\\', '/', __FILE__);

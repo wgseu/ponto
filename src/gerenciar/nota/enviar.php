@@ -3,7 +3,7 @@ require_once(dirname(dirname(__FILE__)) . '/app.php');
 
 need_permission(
     PermissaoNome::PAGAMENTO,
-    $_GET['saida'] == 'json'
+    is_output('json')
 );
 
 set_time_limit(0);
@@ -94,7 +94,7 @@ try {
             PermissaoNome::RELATORIOFLUXO,
             PermissaoNome::EXCLUIRPEDIDO,
         ),
-        $_GET['saida'] == 'json'
+        is_output('json')
     );
     $zipfile = ZNota::zip($notas);
     $zipname = 'Notas'.$sufixo.'.zip';

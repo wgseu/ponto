@@ -24,7 +24,12 @@ require_once(dirname(dirname(dirname(__FILE__))) . '/app.php');
 if (!isset($_GET['grupo']) || !is_numeric($_GET['grupo'])) {
     json('Grupo não informado!');
 }
-$pacotes = ZPacote::getTodosDoGrupoIDEx(intval($_GET['grupo']), $_POST['pacote'], strval($_GET['busca']));
+$limite = isset($_GET['limite'])?intval($_GET['limite']):null;
+if (!is_null($limite) && $limite < 1) {
+	$limite = null;
+}
+$associacoes = isset($_POST['pacote'])?$_POST['pacote']:array();
+$pacotes = ZPacote::getTodosDoGrupoIDEx(intval($_GET['grupo']), $associacoes, strval($_GET['busca']), 0, $limite);
 $response = array('status' => 'ok');
 $_pacotes = array();
 foreach ($pacotes as $pacote) {

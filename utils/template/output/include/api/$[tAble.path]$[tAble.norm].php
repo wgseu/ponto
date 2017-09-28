@@ -207,6 +207,25 @@ $[field.end]
     }
 
     /**
+     * Convert this instance into array associated key -> value with only public fields
+     * @return array All public field and values into array format
+     */
+    public function publish()
+    {
+        $$[table.unix] = parent::publish();
+$[field.each(all)]
+$[field.if(image|blob)]
+        $$[table.unix]['$[field]'] = $this->make$[fIeld.norm]($[field.if(array)]$[field.array.number]$[field.end]);
+$[field.else.if(masked)]
+        $$[table.unix]['$[field]'] = \MZ\Util\Mask::mask($$[table.unix]['$[field]'], _p('$[field.unix].mask'));
+$[field.else.match(ip|senha|password|secreto|salt|deletado)]
+        unset($$[table.unix]['$[field]']);
+$[field.end]
+$[field.end]
+        return $$[table.unix];
+    }
+
+    /**
      * Filter fields, upload data and keep key data
      * @param $[tAble.norm] $original Original instance without modifications
      */
@@ -366,6 +385,24 @@ $[table.else]
 $[table.end]
     }
 $[field.each(all)]
+$[field.if(image|blob)]
+
+    /**
+     * Get relative $[field.name] path or default $[field.name]
+     * @param boolean $default If true return default image, otherwise check field
+     * @return string relative web path for $[table.name] $[field.name]
+     */
+    public function make$[fIeld.norm]($default = false)
+    {
+        $$[field.unix] = $this->get$[fIeld.norm]();
+        if ($default) {
+            $$[field.unix] = null;
+        }
+        return get_image_url($$[field.unix], '$[field.image.folder]', '$[table.unix].png');
+    }
+$[field.end]
+$[field.end]
+$[field.each(all)]
 $[field.if(enum)]
 
     /**
@@ -424,7 +461,7 @@ $[table.end]
      * @param  array $condition condition to filter rows
      * @return SelectQuery query object with condition statement
      */
-    private static function query($condition = array())
+    private static function query($condition = array(), $order = array())
     {
         $query = self::getDB()->from('$[tAble]');
         return $query->where($condition);
@@ -452,9 +489,9 @@ $[table.end]
      * @param  integer $offset start index to get rows, null for begining
      * @return array All rows instanced and filled
      */
-    public static function findAll($condition = array(), $limit = null, $offset = null)
+    public static function findAll($condition = array(), $order = array(), $limit = null, $offset = null)
     {
-        $query = self::query($condition);
+        $query = self::query($condition, $order);
         if (!is_null($limit)) {
             $query = $query->limit($limit);
         }
@@ -510,6 +547,18 @@ $[table.end]
             throw $this->translate($e);
         }
         return $this;
+    }
+
+    /**
+     * Save the $[tAble.name] into the database
+     * @return $[tAble.norm] Self instance
+     */
+    public function save()
+    {
+        if ($this->exists()) {
+            return $this->update();
+        }
+        return $this->insert();
     }
 
     /**

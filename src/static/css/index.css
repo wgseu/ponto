@@ -749,3 +749,8 @@ section#register {
     transform: none !important;
 }
 label .identifier {color: blue;}
+@media print {
+  a[href]:after {
+  content: none !important;
+  }
+}

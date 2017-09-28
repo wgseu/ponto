@@ -21,7 +21,7 @@
 */
 require_once(dirname(dirname(__FILE__)) . '/app.php');
 
-need_permission(PermissaoNome::CADASTROCLIENTES, $_GET['saida'] == 'json');
+need_permission(PermissaoNome::CADASTROCLIENTES, is_output('json'));
 $focusctrl = 'logradouro';
 $errors = array();
 if ($_POST) {
@@ -44,7 +44,7 @@ if ($_POST) {
         $localizacao = ZLocalizacao::cadastrar($localizacao);
         DB::Commit();
         $msg = 'Localização "'.$localizacao->getLogradouro().'" cadastrada com sucesso!';
-        if ($_GET['saida'] == 'json') {
+        if (is_output('json')) {
             json(array('status' => 'ok', 'item' => $localizacao->toArray(), 'msg' => $msg));
         }
         Thunder::success($msg, true);
@@ -57,7 +57,7 @@ if ($_POST) {
     DB::RollBack();
     foreach ($errors as $key => $value) {
         $focusctrl = $key;
-        if ($_GET['saida'] == 'json') {
+        if (is_output('json')) {
             json($value, null, array('field' => $focusctrl));
         }
         Thunder::error($value);
@@ -68,7 +68,7 @@ if ($_POST) {
     $localizacao->setApelido('Minha casa');
     $localizacao->setMostrar('Y');
 }
-if ($_GET['saida'] == 'json') {
+if (is_output('json')) {
     json('Nenhum dado foi enviado');
 }
 include template('gerenciar_localizacao_cadastrar');

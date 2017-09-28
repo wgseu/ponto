@@ -1,7 +1,7 @@
 <?php
 require_once(dirname(dirname(__FILE__)) . '/app.php');
 
-need_permission(PermissaoNome::ALTERARCONFIGURACOES, $_GET['saida'] == 'json');
+need_permission(PermissaoNome::ALTERARCONFIGURACOES, is_output('json'));
 
 set_time_limit(0);
 $nfe_api = new NFeAPI();

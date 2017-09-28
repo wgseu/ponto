@@ -21,12 +21,12 @@
 */
 require_once(dirname(dirname(__FILE__)) . '/app.php');
 
-need_permission(PermissaoNome::PAGAMENTO, $_GET['saida'] == 'json');
+need_permission(PermissaoNome::PAGAMENTO, is_output('json'));
 $id = $_GET['id'];
 $folha_cheque = ZFolhaCheque::getPeloID($id);
 if (is_null($folha_cheque->getID())) {
     $msg = 'A folha de cheque de id "'.$id.'" não existe!';
-    if ($_GET['saida'] == 'json') {
+    if (is_output('json')) {
         json($msg);
     }
     Thunder::warning($msg);
@@ -35,13 +35,13 @@ if (is_null($folha_cheque->getID())) {
 try {
     $folha_cheque->recolher();
     $msg = 'Folha de cheque "' . $folha_cheque->getNumero() . '" compensada com sucesso!';
-    if ($_GET['saida'] == 'json') {
+    if (is_output('json')) {
         json('msg', $msg);
     }
     Thunder::success($msg, true);
 } catch (Exception $e) {
     $msg = 'Não foi possível recolher a folha de cheque "' . $folha_cheque->getNumero() . '"!';
-    if ($_GET['saida'] == 'json') {
+    if (is_output('json')) {
         json($msg);
     }
     Thunder::error($msg);

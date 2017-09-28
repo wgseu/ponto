@@ -75,6 +75,8 @@ cat %~dp0..\src\static\jssrc\inputmask.min.js >> manager.js
 if NOT %ERRORLEVEL% == 0 goto error
 cat %~dp0..\src\static\jssrc\jquery.datetimepicker.full.min.js >> manager.js
 if NOT %ERRORLEVEL% == 0 goto error
+cat %~dp0..\src\static\jssrc\jquery-ui\jquery-ui.js >> manager.js
+if NOT %ERRORLEVEL% == 0 goto error
 cat %~dp0..\src\static\jssrc\jquery.maskedinput.min.js >> manager.js
 if NOT %ERRORLEVEL% == 0 goto error
 cat %~dp0..\src\static\jssrc\jquery.autocomplete.min.js >> manager.js

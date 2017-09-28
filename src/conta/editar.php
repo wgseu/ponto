@@ -21,7 +21,7 @@
 */
 require_once(dirname(dirname(__FILE__)) . '/app.php');
 
-need_login($_GET['saida'] == 'json');
+need_login(is_output('json'));
 $cliente = $login_cliente;
 $tab_dados = 'selected';
 $fieldfocus = 'nome';
@@ -66,7 +66,7 @@ if ($_POST) {
         }
         $cliente = ZCliente::atualizar($cliente);
         $msg = 'Conta atualizada com sucesso!';
-        if ($_GET['saida'] == 'json') {
+        if (is_output('json')) {
             json(array('status' => 'ok', 'item' => $cliente->toArray(array('secreto', 'senha')), 'msg' => $msg));
         }
         Thunder::success($msg, true);
@@ -80,7 +80,7 @@ if ($_POST) {
     $cliente->setImagem($old_cliente->getImagem());
     foreach ($erro as $key => $value) {
         $fieldfocus = $key;
-        if ($_GET['saida'] == 'json') {
+        if (is_output('json')) {
             json($value);
         }
         Thunder::error($value);
@@ -90,7 +90,7 @@ if ($_POST) {
 if ($fieldfocus == 'sexo') {
     $fieldfocus .= '_m';
 }
-if ($_GET['saida'] == 'json') {
+if (is_output('json')) {
     json('Nenhum dado foi enviado');
 }
 $pagetitle = 'Editar Conta';

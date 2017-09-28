@@ -27,9 +27,11 @@
 	<link href="/static/css/jquery.datetimepicker.css" rel="stylesheet" type="text/css" />
 	<link href="/static/css/Treant.css" rel="stylesheet" type="text/css" >
 
+    <script>if (typeof module === 'object') {window.module = module; module = undefined;}</script>
 	<script src="/static/js/jquery.min.js"></script>
 	<script src="/static/js/nprogress.js"></script>
 	<script src="/static/ckeditor/ckeditor.js"></script>
+    <script>if (window.module) module = window.module;</script>
 </head>
 <body class="nav-md">
 	<div class="container body">
@@ -205,6 +207,9 @@
 								<li>
 									<a><i class="fa fa-cog"></i><span class="nav-text"> Configurações </span><span class="fa fa-chevron-down"></span></a>
 									<ul class="nav child_menu" style="display: none">
+<!--{if have_permission(PermissaoNome::ALTERARCONFIGURACOES)}-->
+										<li><a href="/gerenciar/integracao/"><i class="fa fa-exchange"></i><span class="nav-text"> Integrações </span><span class="fa"></span></a></li>
+<!--{/if}-->
 <!--{if have_permission(PermissaoNome::ALTERARCONFIGURACOES)}-->
 										<li><a href="/gerenciar/sistema/"><i class="fa fa-wrench"></i><span class="nav-text"> Sistema </span><span class="fa"></span></a></li>
 <!--{/if}-->

@@ -21,11 +21,11 @@
 */
 require_once(dirname(dirname(__FILE__)) . '/app.php');
 
-need_permission(PermissaoNome::CADASTROCLIENTES, $_GET['saida'] == 'json');
+need_permission(PermissaoNome::CADASTROCLIENTES, is_output('json'));
 $localizacao = ZLocalizacao::getPeloID($_GET['id']);
 if (is_null($localizacao->getID())) {
     $msg = 'A localização de id "'.$id.'" não existe!';
-    if ($_GET['saida'] == 'json') {
+    if (is_output('json')) {
         json($msg);
     }
     Thunder::warning($msg);
@@ -34,7 +34,7 @@ if (is_null($localizacao->getID())) {
 if ($localizacao->getClienteID() == $__empresa__->getID() &&
     !have_permission(PermissaoNome::ALTERARCONFIGURACOES)) {
     $msg = 'Você não tem permissão para alterar o endereço dessa empresa!';
-    if ($_GET['saida'] == 'json') {
+    if (is_output('json')) {
         json($msg);
     }
     Thunder::warning($msg);
@@ -69,7 +69,7 @@ if ($_POST) {
             Log::error($e->getMessage());
         }
         $msg = 'Localização "'.$localizacao->getLogradouro().'" atualizada com sucesso!';
-        if ($_GET['saida'] == 'json') {
+        if (is_output('json')) {
             json(array('status' => 'ok', 'item' => $localizacao->toArray(), 'msg' => $msg));
         }
         Thunder::success($msg, true);
@@ -82,14 +82,14 @@ if ($_POST) {
     DB::RollBack();
     foreach ($errors as $key => $value) {
         $focusctrl = $key;
-        if ($_GET['saida'] == 'json') {
+        if (is_output('json')) {
             json($value, null, array('field' => $focusctrl));
         }
         Thunder::error($value);
         break;
     }
 }
-if ($_GET['saida'] == 'json') {
+if (is_output('json')) {
     json('Nenhum dado foi enviado');
 }
 include template('gerenciar_localizacao_editar');

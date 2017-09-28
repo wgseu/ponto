@@ -21,7 +21,7 @@
 */
 require_once(dirname(dirname(__FILE__)) . '/app.php');
 
-need_permission(PermissaoNome::CADASTROPRODUTOS, isset($_GET['saida']) && $_GET['saida'] == 'json');
+need_permission(PermissaoNome::CADASTROPRODUTOS, isset($_GET['saida']) && is_output('json'));
 
 set_time_limit(0);
 

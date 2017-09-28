@@ -361,6 +361,18 @@ function is_post()
     return strtoupper($_SERVER['REQUEST_METHOD']) == 'POST';
 }
 
+function is_output($format)
+{
+    switch ($format) {
+        case 'json':
+            return isset($_GET['saida']) && $_GET['saida'] == 'json';
+        case 'xml':
+            return isset($_GET['saida']) && $_GET['saida'] == 'xml';
+        default:
+            return false;
+    }
+}
+
 function have_permission($array, $funcionario = null)
 {
     global $login_funcionario;
@@ -940,9 +952,25 @@ function get_image_url($name, $namespace, $default = null)
     return get_file_url('/static/img/', $name, $namespace, $default);
 }
 
+function get_image_path($name, $namespace)
+{
+    if (is_null($name)) {
+        return null;
+    }
+    return WWW_ROOT . get_image_url($name, $namespace);
+}
+
 function get_document_url($name, $namespace, $default = null)
 {
     return get_file_url('/static/doc/', $name, $namespace, $default);
+}
+
+function get_document_path($name, $namespace)
+{
+    if (is_null($name)) {
+        return null;
+    }
+    return WWW_ROOT . get_document_url($name, $namespace);
 }
 
 function is_local_path($name)

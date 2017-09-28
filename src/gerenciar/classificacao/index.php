@@ -21,7 +21,7 @@
 */
 require_once(dirname(dirname(__FILE__)) . '/app.php');
 
-need_permission(PermissaoNome::CADASTROCONTAS, $_GET['saida'] == 'json');
+need_permission(PermissaoNome::CADASTROCONTAS, is_output('json'));
 
 $limite = trim($_GET['limite']);
 if (!is_numeric($limite) || $limite > 100 || $limite < 0) {
@@ -32,7 +32,7 @@ $count = ZClassificacao::getCount($superiores, $_GET['classificacao'], $_GET['qu
 list($pagesize, $offset, $pagestring) = pagestring($count, $limite);
 $classificacoes = ZClassificacao::getTodas($superiores, $_GET['classificacao'], $_GET['query'], $offset, $pagesize);
 
-if ($_GET['saida'] == 'json') {
+if (is_output('json')) {
     $_classificacoes = array();
     foreach ($classificacoes as $classificacao) {
         $_classificacoes[] = $classificacao->toArray();

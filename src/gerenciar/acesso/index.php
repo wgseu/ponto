@@ -21,10 +21,10 @@
 */
 require_once(dirname(dirname(__FILE__)) . '/app.php');
 
-need_owner($_GET['saida'] == 'json');
+need_owner(is_output('json'));
 $funcao = ZFuncao::getPeloID($_GET['funcao']?:$_POST['funcao']);
 if (is_null($funcao->getID())) {
-    if ($_GET['saida'] == 'json') {
+    if (is_output('json')) {
         json('A função não foi informada ou não existe');
     }
     redirect('/gerenciar/funcao/');
@@ -45,7 +45,7 @@ if ($_POST) {
             $acesso = ZAcesso::getPelaFuncaoIDPermissaoID($funcao->getID(), $permissao->getID());
             ZAcesso::excluir($acesso->getID());
         }
-        if ($_GET['saida'] == 'json') {
+        if (is_output('json')) {
             json(array('status' => 'ok'));
         }
         redirect('/gerenciar/acesso/?funcao='.$funcao->getID());
@@ -54,7 +54,7 @@ if ($_POST) {
     }
     foreach ($errors as $key => $value) {
         $focusctrl = $key;
-        if ($_GET['saida'] == 'json') {
+        if (is_output('json')) {
             json($value);
         }
         Thunder::error($value);
@@ -62,7 +62,7 @@ if ($_POST) {
     }
 }
 $permissoes = ZPermissao::getTodas($_GET['query']);
-if ($_GET['saida'] == 'json') {
+if (is_output('json')) {
     $_permissoes = array();
     foreach ($permissoes as $permissao) {
         $_permissao = $permissao->toArray();

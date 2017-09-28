@@ -66,6 +66,15 @@ abstract class Helper
     }
 
     /**
+     * Convert this instance into array associated key -> value with only public fields
+     * @return array All public field and values into array format
+     */
+    public function publish()
+    {
+        return $this->toArray(true);
+    }
+
+    /**
      * Check if this instance have a valid primary key
      * @return boolean true if have a valid primary key, false otherwise
      */
@@ -130,4 +139,28 @@ abstract class Helper
      * @return integer Number of rows deleted (Max 1)
      */
     abstract public function delete();
+
+    /**
+     * Retorn current date and time on database format
+     * @return string current date and time database formatted
+     */
+    public static function now($timestamp = null)
+    {
+        if (is_string($timestamp)) {
+            $timestamp = strtotime($timestamp);
+        }
+        return date('Y-m-d H:i:s', $timestamp?:time());
+    }
+
+    /**
+     * Retorn current date on database format
+     * @return string current date database formatted
+     */
+    public static function date($timestamp = null)
+    {
+        if (is_string($timestamp)) {
+            $timestamp = strtotime($timestamp);
+        }
+        return date('Y-m-d', $timestamp?:time());
+    }
 }

@@ -2,7 +2,7 @@
 	<label for="set_$[field]">$[fIeld.name]:</label>
 	<div id="$[field]_container" class="image-view third-effect" style="height: $[field.image.height]px;">
 		<label for="image_header" class="lbltitle">
-			<img src="${get_image_url($$[table.unix]->get$[fIeld.norm](), '$[field.image.folder]', '$[field.image.default]')}" no-picture="${get_image_url(null, '$[field.image.folder]', '$[field.image.default]')}" height="$[field.image.height]" alt="$[fIeld.name]" title="$[fIeld.info]"/>
+			<img src="{$$[table.unix]->make$[fIeld.norm]()}" no-picture="{$$[table.unix]->make$[fIeld.norm](true)}" height="$[field.image.height]" alt="$[fIeld.name]" title="$[fIeld.info]"/>
 		</label>
 		<input class="upload" type="file" id="raw_$[field]" name="raw_$[field]" accept="image/x-png, image/jpeg"/>
 		<input type="hidden" name="$[field]" value="{$$[table.unix]->get$[fIeld.norm]()}" />

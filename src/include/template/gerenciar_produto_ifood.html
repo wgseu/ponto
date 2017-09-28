@@ -1,0 +1,117 @@
+<!--{include header_gerenciar}-->
+<script type="text/javascript">$(function(){Gerenciar.integracao.iFoodInit();});</script>
+<div class="row">
+	<div class="page-title">
+		<div class="col-lg-8 col-md-6 col-sm-6 col-xs-12">
+			<h3>Produtos iFood</h3>
+		</div>
+		<form method="get" action="/gerenciar/produto/ifood" id="search-form">
+			<div class="form-group col-lg-4 col-md-6 col-sm-6 col-xs-12">
+				<label for="query">Busca:</label>
+				<div class="input-group">
+					<input type="text" class="form-control" id="query" name="query" placeholder="Descrição ou Código..." value="${\MZ\Util\Filter::input(isset($_GET['query'])?$_GET['query']:null)}">
+					<span class="input-group-btn">
+						<button class="btn btn-default" type="submit"><i class="fa fa-search"></i></button>
+					</span>
+				</div>
+			</div>
+		</form>
+	</div>
+	<div class="clearfix"></div>
+	<div class="">
+		<div class="col-md-12 col-sm-12 col-xs-12">
+			<div class="x_panel">
+				<div class="x_title">
+					<h2>Produtos<small>Associar produtos</small></h2>
+					<ul class="nav navbar-right panel_toolbox hidden-print">
+						<li><a href="?action=download" title="Baixar INI"><i class="fa fa-download"></i></a></li>
+						<li><a href="#" title="Enviar XML" data-toggle="modal" data-target="#send-file"><i class="fa fa-upload"></i></a></li>
+					</ul>
+					<div class="clearfix"></div>
+				</div>
+				<div class="x_content">
+<!--{loop $produtos $produto}-->
+<!--${$associado = $produto['produto']}-->
+					<div class="col-md-4 col-sm-6 col-xs-12 top-row">
+						<div class="assoc-item {$produto['status']}">
+							<div class="assoc-img">
+								<img src="${get_image_url($associado->getImagem(), 'produto', 'produto.png')}" height="48" alt="Imagem"/>
+							</div>
+							<div class="assoc-info">
+								<input type="hidden" id="produto_{$produto['codigo']}" name="produto[{$produto['codigo']}]" data-descricao="${\MZ\Util\Filter::input($associado->getDescricao())}" data-codigo="{$produto['codigo']}" data-id="{$associado->getID()}" data-item-count="${count($produto['itens'])}" value="{$associado->getID()}">
+								<div class="form-group">
+									<label for="produto">Produto: <span class="identifier">{$produto['descricao']}</span><i class="fa fa-remove remove-item" title="Excluir produto da associação"></i></label>
+									<div class="input-group">
+										<input type="text" id="produto_{$produto['codigo']}_input" class="form-control assoc-input" value="${\MZ\Util\Filter::input($associado->getDescricao())}">
+										<span class="input-group-btn">
+											<button class="btn btn-default ${is_null($associado->getID()) || count($produto['itens']) == 0?'disabled':''}" tabindex="-1"><i class="fa fa-{$produto['icon']}"></i></button>
+										</span>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+<!--{/loop}-->
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<!-- Modal Send XML -->
+<form id="arquivo-form" class="form-horizontal form-label-left" method="post" action="/gerenciar/produto/ifood?action=upload" enctype="multipart/form-data">
+	<div class="modal" id="send-file" tabindex="-1" role="dialog" aria-labelledby="send-file-label">
+		<div class="modal-dialog" role="document">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+						<span aria-hidden="true">&times;</span>
+					</button>
+					<h4 class="modal-title" id="send-file-label">Enviar XML com códigos</h4>
+				</div>
+				<div class="modal-body">
+					<input type="hidden" id="arquivo" name="arquivo" value="">
+					<div class="form-group col-xs-12">
+						<label for="raw_arquivo">Arquivo XML:</label>
+						<div class="input-group">
+							<label class="input-group-btn">
+								<span class="btn btn-primary">
+									Selecionar…<input type="file" id="raw_arquivo" name="raw_arquivo" style="display: none;">
+								</span>
+							</label>
+							<input type="text" class="form-control" readonly="" value="">
+							<span class="input-group-btn">
+								<button class="btn btn-default" id="clear_arquivo" type="button">Remover</button>
+							</span>
+						</div>
+					</div>
+					<div class="clearfix"></div>
+				</div>
+				<div class="modal-footer">
+					<input type="submit" class="btn btn-primary" value="Enviar">
+					<button type="button" class="btn btn-default" data-dismiss="modal">Fechar</button>
+				</div>
+			</div>
+		</div>
+	</div>
+</form>
+<!-- Modal Send XML -->
+<div class="modal" id="edit-pkg" tabindex="-1" role="dialog" aria-labelledby="edit-pkg-label">
+	<div class="modal-dialog modal-lg" role="document">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+				<h4 class="modal-title" id="edit-pkg-label">Nome do pacote</h4>
+			</div>
+			<div class="modal-body">
+				<div id="group-list"></div>
+				<div class="clearfix"></div>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-default" data-dismiss="modal">Fechar</button>
+			</div>
+		</div>
+	</div>
+</div>
+<!--{include footer_gerenciar}-->

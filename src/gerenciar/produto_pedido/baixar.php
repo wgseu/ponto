@@ -21,7 +21,7 @@
 */
 require_once(dirname(dirname(__FILE__)) . '/app.php');
 
-need_permission(PermissaoNome::RELATORIOVENDAS, isset($_GET['saida']) && $_GET['saida'] == 'json');
+need_permission(PermissaoNome::RELATORIOVENDAS, isset($_GET['saida']) && is_output('json'));
 
 try {
     $funcionario_id = isset($_GET['funcionario_id'])?intval($_GET['funcionario_id']):null;

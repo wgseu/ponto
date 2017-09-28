@@ -24,8 +24,12 @@ require_once(dirname(dirname(dirname(__FILE__))) . '/app.php');
 if (!isset($_GET['produto']) || !is_numeric($_GET['produto'])) {
     json('Produto não informado!');
 }
+$limite = isset($_GET['limite'])?intval($_GET['limite']):null;
+if (!is_null($limite) && $limite < 1) {
+	$limite = null;
+}
 $composicoes = ZComposicao::getTodasDaComposicaoIDEx($_GET['produto'], intval($_GET['selecionaveis']) != 0,
-    intval($_GET['adicionais']) != 0);
+    intval($_GET['adicionais']) != 0, 0, $limite);
 $response = array('status' => 'ok');
 $_composicoes = array();
 foreach ($composicoes as $composicao) {

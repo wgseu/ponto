@@ -21,11 +21,14 @@
 */
 require_once(dirname(dirname(__FILE__)) . '/app.php');
 
-need_permission(PermissaoNome::$[TABLE.style], isset($_GET['saida']) && $_GET['saida'] == 'json');
-$$[table.unix] = \Z$[tAble.norm]::getPel$[primary.gender]$[pRimary.norm]($_GET['$[primary]']);
-if (is_null($$[table.unix]->get$[pRimary.norm]())) {
+use $[tAble.package]\$[tAble.norm];
+
+need_permission(\PermissaoNome::$[TABLE.style], is_output('json'));
+$$[primary.unix] = isset($_GET['$[primary.unix]'])?$_GET['$[primary.unix]']:null;
+$$[table.unix] = $[tAble.norm]::findBy$[pRimary.norm]($$[primary.unix]);
+if (!$$[table.unix]->exists()) {
     $msg = 'Não existe $[tAble.name] com $[primary.gender] $[pRimary.name] informado!';
-    if (isset($_GET['saida']) && $_GET['saida'] == 'json') {
+    if (is_output('json')) {
         json($msg);
     }
     \Thunder::warning($msg);
@@ -35,97 +38,42 @@ $focusctrl = '$[descriptor]';
 $errors = array();
 $old_$[table.unix] = $$[table.unix];
 if ($_POST) {
-    $$[table.unix] = new \Z$[tAble.norm]($_POST);
+    $$[table.unix] = new $[tAble.norm]($_POST);
     try {
-        $$[table.unix]->set$[pRimary.norm]($old_$[table.unix]->get$[pRimary.norm]());
-$[field.each]
-$[field.if(date)]
-        $$[table.unix]->set$[fIeld.norm](\MZ\Util\Filter::date($$[table.unix]->get$[fIeld.norm]()));
-$[field.else.if(time)]
-        $$[table.unix]->set$[fIeld.norm](\MZ\Util\Filter::time($$[table.unix]->get$[fIeld.norm]()));
-$[field.else.if(datetime)]
-        $$[table.unix]->set$[fIeld.norm](\MZ\Util\Filter::datetime($$[table.unix]->get$[fIeld.norm]()));
-$[field.else.if(currency)]
-        $$[table.unix]->set$[fIeld.norm](\MZ\Util\Filter::money($$[table.unix]->get$[fIeld.norm]()));
-$[field.else.if(float)]
-        $$[table.unix]->set$[fIeld.norm](\MZ\Util\Filter::money($$[table.unix]->get$[fIeld.norm]()));
-$[field.else.if(integer)]
-        $$[table.unix]->set$[fIeld.norm](\MZ\Util\Filter::number($$[table.unix]->get$[fIeld.norm]()));
-$[field.else.if(masked)]
-        $$[table.unix]->set$[fIeld.norm](\MZ\Util\Filter::unmask($$[table.unix]->get$[fIeld.norm](), '$[field.mask]'));
-$[field.else.if(image)]
-        $$[field.unix] = upload_image('raw_$[field]', '$[field.image.folder]');
-        if (!is_null($$[field.unix])) {
-            $$[table.unix]->set$[fIeld.norm]($$[field.unix]);
-        } elseif (trim($$[table.unix]->get$[fIeld.norm]()) != '') { // evita sobrescrever
-            $$[table.unix]->set$[fIeld.norm]($old_$[table.unix]->get$[fIeld.norm]());
-        }
-$[field.else.if(blob)]
-        $$[field.unix] = upload_image('raw_$[field]', '$[field.image.folder]');
-        if (!is_null($$[field.unix])) {
-            $$[table.unix]->set$[fIeld.norm](file_get_contents(WWW_ROOT . get_image_url($$[field.unix], '$[field.image.folder]')));
-            unlink(WWW_ROOT . get_image_url($$[field.unix], '$[field.image.folder]'));
-        } elseif (trim($$[table.unix]->get$[fIeld.norm]()) != '') { // evita sobrescrever
-            $$[table.unix]->set$[fIeld.norm](true);
-        }
-$[field.end]
-$[field.end]
-        $$[table.unix] = \Z$[tAble.norm]::atualizar($$[table.unix]);
-$[field.each]
-$[field.if(image)]
-        // exclui $[field.gender] $[field.name] antig$[field.gender]
-        if (
-            !is_null($old_$[table.unix]->get$[fIeld.norm]()) && 
-            $$[table.unix]->get$[fIeld.norm]() != $old_$[table.unix]->get$[fIeld.norm]()
-        ) {
-            unlink(WWW_ROOT . get_image_url($old_$[table.unix]->get$[fIeld.norm](), '$[field.image.folder]'));
-        }
-$[field.end]
-$[field.end]
-        $msg = '$[tAble.name] "'.$$[table.unix]->get$[dEscriptor.norm]().'" atualizad$[table.gender] com sucesso!';
-        if (isset($_GET['saida']) && $_GET['saida'] == 'json') {
-            json(null, array('item' => $$[table.unix]->toArray(), 'msg' => $msg));
+        $$[table.unix]->filter($old_$[table.unix]);
+        $$[table.unix]->save();
+        $old_$[table.unix]->clean($$[table.unix]);
+        $msg = sprintf(
+            '$[tAble.name] "%s" atualizad$[table.gender] com sucesso!',
+            $$[table.unix]->get$[dEscriptor.norm]()
+        );
+        if (is_output('json')) {
+            json(null, array('item' => $$[table.unix]->publish(), 'msg' => $msg));
         }
         \Thunder::success($msg, true);
         redirect('/gerenciar/$[table.unix]/');
-    } catch (\ValidationException $e) {
-        $errors = $e->getErrors();
     } catch (\Exception $e) {
-        $errors['unknow'] = $e->getMessage();
-    }
-$[field.each]
-$[field.if(image)]
-    // exclui $[field.gender] $[field.name] enviad$[field.gender]
-    if (
-        !is_null($$[table.unix]->get$[fIeld.norm]()) && 
-        $old_$[table.unix]->get$[fIeld.norm]() != $$[table.unix]->get$[fIeld.norm]()
-    ) {
-        unlink(WWW_ROOT . get_image_url($$[table.unix]->get$[fIeld.norm](), '$[field.image.folder]'));
-    }
-$[field.else.if(blob)]
-    // restaura $[field.gender] $[field.name] original
-    if ($$[table.unix]->get$[fIeld.norm]() === true) {
-        $$[table.unix]->set$[fIeld.norm]($old_$[table.unix]->get$[fIeld.norm]());
-    }
-$[field.end]
-$[field.end]
-    foreach ($errors as $key => $value) {
-        $focusctrl = $key;
-        if (isset($_GET['saida']) && $_GET['saida'] == 'json') {
-            json($value, null, array('field' => $focusctrl));
+        $$[table.unix]->clean($old_$[table.unix]);
+        if ($e instanceof \ValidationException) {
+            $errors = $e->getErrors();
         }
-        \Thunder::error($value);
-        break;
+        if (is_output('json')) {
+            json($e->getMessage(), null, array('errors' => $errors));
+        }
+        \Thunder::error($e->getMessage());
+        foreach ($errors as $key => $value) {
+            $focusctrl = $key;
+            break;
+        }
     }
-}
-if (isset($_GET['saida']) && $_GET['saida'] == 'json') {
+} elseif (is_output('json')) {
     json('Nenhum dado foi enviado');
 }
 $[field.each(reference)]
 $[field.if(searchable)]
-$$[field.unix]_obj = \Z$[rEference.norm]::getPel$[reference.pk.gender]$[rEference.pk.norm]($$[table.unix]->get$[fIeld.norm]());
+$$[field.unix]_obj = $$[table.unix]->find$[fIeld.norm]($[field.if(array)]$[field.array.number]$[field.end]);
 $[field.else]
-$_$[reference.unix.plural] = \Z$[rEference.norm]::getTod$[reference.gender]s();
+$$[reference.unix.plural] = \$[rEference.package]\$[rEference.norm]::findAll();
 $[field.end]
 $[field.end]
 include template('gerenciar_$[table.unix]_editar');

@@ -2,6 +2,7 @@
 /src/include/logs/*.txt
 /src/static/doc/xml/*/*/*.xml
 /src/static/doc/cert/*.pem
+/src/static/doc/integracao/*.json
 /utils/*.sublime-workspace
 /utils/tmp/generated
 /utils/tmp/coverage

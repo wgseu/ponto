@@ -21,35 +21,27 @@
 */
 require_once(dirname(dirname(__FILE__)) . '/app.php');
 
-use $[tAble.package]\$[tAble.norm];
+use MZ\System\Integracao;
+use MZ\Util\Filter;
 
-need_permission(\PermissaoNome::$[TABLE.style], is_output('json'));
-$$[primary.unix] = isset($_GET['$[primary.unix]'])?$_GET['$[primary.unix]']:null;
-$$[table.unix] = $[tAble.norm]::findBy$[pRimary.norm]($$[primary.unix]);
-if (!$$[table.unix]->exists()) {
-	$msg = 'Não existe $[tAble.name] com $[primary.gender] $[pRimary.name] informado!';
-	if (is_output('json')) {
-		json($msg);
-	}
-	\Thunder::warning($msg);
-	redirect('/gerenciar/$[table.unix]/');
+need_permission(\PermissaoNome::ALTERARCONFIGURACOES, is_output('json'));
+
+$limite = isset($_GET['limite'])?intval($_GET['limite']):10;
+if ($limite > 100 || $limite < 1) {
+	$limite = 10;
 }
-try {
-	$$[table.unix]->delete();
-	$$[table.unix]->clean(new $[tAble.norm]());
-	$msg = '$[tAble.name] "' . $$[table.unix]->get$[dEscriptor.norm]() . '" excluíd$[table.gender] com sucesso!';
-	if (is_output('json')) {
-		json('msg', $msg);
+$condition = Filter::query($condition);
+$order = Filter::orderBy(isset($_GET['ordem'])?$_GET['ordem']:'');
+$count = Integracao::count($condition);
+list($pagesize, $offset, $pagestring) = pagestring($count, $limite);
+$integracoes = Integracao::findAll($condition, $order, $pagesize, $offset);
+
+if (is_output('json')) {
+	$items = array();
+	foreach ($integracoes as $integracao) {
+		$items[] = $integracao->publish();
 	}
-	\Thunder::success($msg, true);
-} catch (\Exception $e) {
-	$msg = sprintf(
-		'Não foi possível excluir $[table.gender] $[tAble.name] "%s"!',
-		$$[table.unix]->get$[dEscriptor.norm]()
-	);
-	if (is_output('json')) {
-		json($msg);
-	}
-	\Thunder::error($msg);
+	json(array('status' => 'ok', 'items' => $items));
 }
-redirect('/gerenciar/$[table.unix]/');
+
+include template('gerenciar_integracao_index');

@@ -26,7 +26,7 @@ $id = $_GET['id'];
 $cliente = ZCliente::getPeloID($id);
 if (is_null($cliente->getID())) {
     $msg = 'O cliente de id "'.$id.'" não existe!';
-    if ($_GET['saida'] == 'json') {
+    if (is_output('json')) {
         json($msg);
     }
     Thunder::warning($msg);
@@ -35,7 +35,7 @@ if (is_null($cliente->getID())) {
 if ($cliente->getID() == $__empresa__->getID() &&
     !have_permission(PermissaoNome::ALTERARCONFIGURACOES)) {
     $msg = 'Você não tem permissão para excluir essa empresa!';
-    if ($_GET['saida'] == 'json') {
+    if (is_output('json')) {
         json($msg);
     }
     Thunder::warning($msg);
@@ -48,7 +48,7 @@ if (!is_null($funcionario->getID()) && (
     ( have_permission(PermissaoNome::CADASTROFUNCIONARIOS, $funcionario) &&
      $login_funcionario->getID() != $funcionario->getID() && !is_owner()) ) ) {
     $msg = 'Você não tem permissão para excluir esse cliente!';
-    if ($_GET['saida'] == 'json') {
+    if (is_output('json')) {
         json($msg);
     }
     Thunder::warning($msg);
@@ -57,13 +57,13 @@ if (!is_null($funcionario->getID()) && (
 try {
     ZCliente::excluir($id);
     $msg = 'Cliente "' . $cliente->getNomeCompleto() . '" excluído com sucesso!';
-    if ($_GET['saida'] == 'json') {
+    if (is_output('json')) {
         json('msg', $msg);
     }
     Thunder::success($msg, true);
 } catch (Exception $e) {
     $msg = 'Não foi possível excluir o cliente "' . $cliente->getNomeCompleto() . '"!';
-    if ($_GET['saida'] == 'json') {
+    if (is_output('json')) {
         json($msg);
     }
     Thunder::error($msg);

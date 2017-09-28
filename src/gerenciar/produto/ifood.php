@@ -1,0 +1,290 @@
+<?php
+/*
+	Copyright 2016 da MZ Software - MZ Desenvolvimento de Sistemas LTDA
+	Este arquivo é parte do programa GrandChef - Sistema para Gerenciamento de Churrascarias, Bares e Restaurantes.
+	O GrandChef é um software proprietário; você não pode redistribuí-lo e/ou modificá-lo.
+	DISPOSIÇÕES GERAIS
+	O cliente não deverá remover qualquer identificação do produto, avisos de direitos autorais,
+	ou outros avisos ou restrições de propriedade do GrandChef.
+
+	O cliente não deverá causar ou permitir a engenharia reversa, desmontagem,
+	ou descompilação do GrandChef.
+
+	PROPRIEDADE DOS DIREITOS AUTORAIS DO PROGRAMA
+
+	GrandChef é a especialidade do desenvolvedor e seus
+	licenciadores e é protegido por direitos autorais, segredos comerciais e outros direitos
+	de leis de propriedade.
+
+	O Cliente adquire apenas o direito de usar o software e não adquire qualquer outros
+	direitos, expressos ou implícitos no GrandChef diferentes dos especificados nesta Licença.
+*/
+require_once(dirname(dirname(__FILE__)) . '/app.php');
+
+use MZ\System\Integracao;
+
+need_permission(PermissaoNome::CADASTROPRODUTOS);
+
+$integracao = Integracao::findByAcessoURL('ifood');
+$dados = $integracao->read();
+$produtos = isset($dados['produtos'])?$dados['produtos']:array();
+$cartoes = isset($dados['cartoes'])?$dados['cartoes']:array();
+
+if (isset($_GET['action'])) {
+    if ($_POST && $_GET['action'] == 'upload') {
+        try {
+            if (!isset($_FILES['raw_arquivo']) || $_FILES['raw_arquivo']['error'] === UPLOAD_ERR_NO_FILE) {
+                throw new \Exception('Nenhum arquivo foi enviado');
+            }
+            $file = $_FILES['raw_arquivo'];
+            if ($file['error'] !== UPLOAD_ERR_OK) {
+                throw new \UploadException($file['error']);
+            }
+            if (in_array($file['type'], array('text/xml', 'application/xml'))) {
+                $dom = new \DOMDocument();
+                if ($dom->load($file['tmp_name']) === false) {
+                    throw new \Exception('Falha ao carregar XML', 401);
+                }
+                $nodes = $dom->getElementsByTagName('response-body');
+                foreach ($nodes as $list) {
+                    $itens = $list->getElementsByTagName('item');
+                    foreach ($itens as $item) {
+                        $codigo = $item->getElementsByTagName('codCardapio')->item(0)->nodeValue;
+                        $temp = $item->getElementsByTagName('codProdutoPdv');
+                        $codigo_pdv = $temp->length > 0?$temp->item(0)->nodeValue:null;
+                        $temp = $item->getElementsByTagName('codPai');
+                        $codigo_pai = $temp->length > 0?$temp->item(0)->nodeValue:null;
+                        $descricao = $item->getElementsByTagName('descricaoCardapio')->item(0)->nodeValue;
+                        $produto = array(
+                            'codigo' => $codigo,
+                            'codigo_pai' => $codigo_pai,
+                            'codigo_pdv' => $codigo_pdv,
+                            'descricao' => $descricao,
+                            'itens' => array(),
+                        );
+                        if (isset($produtos[$codigo_pai])) {
+                            unset($produto['itens']);
+                            if (isset($produtos[$codigo_pai]['itens'][$codigo])) {
+                                $produtos[$codigo_pai]['itens'][$codigo] = array_merge(
+                                    $produto,
+                                    $produtos[$codigo_pai]['itens'][$codigo]
+                                );
+                            } else {
+                                $produtos[$codigo_pai]['itens'][$codigo] = $produto;
+                            }
+                        } else {
+                            unset($produto['codigo_pai']);
+                            if (isset($produtos[$codigo])) {
+                                $produtos[$codigo] = array_merge(
+                                    $produto,
+                                    $produtos[$codigo]
+                                );
+                            } else {
+                                $produtos[$codigo] = $produto;
+                            }
+                        }
+                    }
+                }
+                $dados = isset($dados)?$dados:array();
+                $dados['produtos'] = $produtos;
+                $integracao->write($dados);
+            } else {
+                throw new \Exception('Formato não suportado', 401);
+            }
+        } catch (\Exception $e) {
+            json($e->getMessage());
+        }
+    } elseif ($_POST && $_GET['action'] == 'update') {
+        try {
+            if (!isset($_POST['codigo']) || !isset($_POST['id'])) {
+                throw new \Exception('Código ou ID inválido', 401);
+            }
+            $codigo = $_POST['codigo'];
+            if (!isset($produtos[$codigo])) {
+                throw new \Exception('O produto informado não existe', 404);
+            }
+            $produtos[$codigo]['id'] = $_POST['id'];
+            $dados = isset($dados)?$dados:array();
+            $dados['produtos'] = $produtos;
+            $integracao->write($dados);
+            json(null, array('produto' => $produtos[$codigo]));
+        } catch (\Exception $e) {
+            json($e->getMessage());
+        }
+    } elseif ($_POST && $_GET['action'] == 'delete') {
+        try {
+            if (!isset($_POST['codigo'])) {
+                throw new \Exception('Código inválido ou não informado', 401);
+            }
+            $codigo = $_POST['codigo'];
+            if (!isset($produtos[$codigo])) {
+                throw new \Exception('O produto informado não existe', 404);
+            }
+            $subcodigo = isset($_POST['subcodigo'])?$_POST['subcodigo']:null;
+            if (isset($subcodigo) && !isset($produtos[$codigo]['itens'][$subcodigo])) {
+                throw new \Exception('O item informado não existe no pacote', 404);
+            }
+            if (isset($subcodigo)) {
+                unset($produtos[$codigo]['itens'][$subcodigo]);
+            } else {
+                unset($produtos[$codigo]);
+            }
+            $dados = isset($dados)?$dados:array();
+            $dados['produtos'] = $produtos;
+            $integracao->write($dados);
+            if (isset($subcodigo)) {
+                $msg = 'Item do pacote excluído com sucesso!';
+            } else {
+                $msg = 'Produto excluído com sucesso!';
+            }
+            json(null, array('msg' => $msg));
+        } catch (\Exception $e) {
+            json($e->getMessage());
+        }
+    } elseif ($_POST && $_GET['action'] == 'mount') {
+        try {
+            if (!isset($_POST['codigo']) || !isset($_POST['id'])) {
+                throw new \Exception('Código ou ID inválido', 401);
+            }
+            $codigo = $_POST['codigo'];
+            if (!isset($produtos[$codigo])) {
+                throw new \Exception('O produto informado não existe', 404);
+            }
+            $subcodigo = $_POST['subcodigo'];
+            if (!isset($produtos[$codigo]['itens'][$subcodigo])) {
+                throw new \Exception('O item do pacote não existe', 404);
+            }
+            $produtos[$codigo]['itens'][$subcodigo]['id'] = $_POST['id'];
+            $dados = isset($dados)?$dados:array();
+            $dados['produtos'] = $produtos;
+            $integracao->write($dados);
+            json(null, array('pacote' => $produtos[$codigo]['itens'][$subcodigo]));
+        } catch (\Exception $e) {
+            json($e->getMessage());
+        }
+    } elseif ($_GET['action'] == 'package') {
+        try {
+            if (!isset($_GET['codigo'])) {
+                throw new \Exception('Código não informado', 401);
+            }
+            $codigo = $_GET['codigo'];
+            if (!isset($produtos[$codigo])) {
+                throw new \Exception('O produto informado não existe', 404);
+            }
+            $produto = $produtos[$codigo];
+            $associado = \ZProduto::getPeloID(isset($produto['id'])?$produto['id']:$produto['codigo_pdv']);
+            if (is_null($associado->getID())) {
+                throw new \Exception('O produto informado não foi associado', 401);
+            }
+            if ($associado->getTipo() == \ProdutoTipo::PRODUTO) {
+                throw new \Exception('O produto associado não permite formação', 401);
+            }
+            $produto['tipo'] = $associado->getTipo();
+            $_grupos = \ZGrupo::getTodosDoProdutoID($associado->getID());
+            $grupos = array();
+            foreach ($_grupos as $grupo) {
+                $grupos[] = $grupo->toArray();
+            }
+            $grupo = new \ZGrupo();
+            $grupo->setID(0);
+            $grupo->setDescricao('Adicionais');
+            if ($associado->getTipo() == \ProdutoTipo::PACOTE) {
+                $grupo->setDescricao('Sem grupo');
+            }
+            if (count($grupos) > 1 || count($grupos) == 0) {
+                $grupos[] = $grupo->toArray();
+            }
+            foreach ($produto['itens'] as $subcodigo => $subproduto) {
+                if ($associado->getTipo() == \ProdutoTipo::PACOTE) {
+                    $subassociado = \ZPacote::getPeloID(isset($subproduto['id'])?$subproduto['id']:$subproduto['codigo_pdv']);
+                    if ($subassociado->getPacoteID() != $associado->getID()) {
+                        $subassociado = new \ZPacote();
+                    }
+                    if (count($grupos) == 1) {
+                        $produto['itens'][$subcodigo]['grupoid'] = current($grupos)['id'];
+                    } else {
+                        $produto['itens'][$subcodigo]['grupoid'] = intval($subassociado->getGrupoID());
+                    }
+                    if (!is_null($subassociado->getPropriedadeID())) {
+                        $item = \ZPropriedade::getPeloID($subassociado->getPropriedadeID());
+                    } else {
+                        $item = \ZProduto::getPeloID($subassociado->getProdutoID());
+                    }
+                } else {
+                    $subassociado = \ZComposicao::getPeloID(isset($subproduto['id'])?$subproduto['id']:$subproduto['codigo_pdv']);
+                    $produto['itens'][$subcodigo]['grupoid'] = 0;
+                    $item = \ZProduto::getPeloID($subassociado->getProdutoID());
+                }
+                $produto['itens'][$subcodigo]['associado'] = $item->toArray();
+            }
+            json(null, array('produto' => $produto, 'grupos' => $grupos));
+        } catch (\Exception $e) {
+            json($e->getMessage());
+        }
+    } elseif ($_GET['action'] == 'download') {
+        $_cartoes = array();
+        $_produtos = array();
+        $_desconhecidos = array();
+        foreach ($produtos as $codigo => $produto) {
+            if (!is_null($produto['id'])) {
+                $_produtos[$codigo] = $produto['id'];
+            } else {
+                $_desconhecidos[$codigo] = $produto['descricao'];
+            }
+            foreach ($produto['itens'] as $subcodigo => $subproduto) {
+                if (!is_null($subproduto['id'])) {
+                    $_produtos[$subcodigo] = $subproduto['id'];
+                } else {
+                    $_desconhecidos[$subcodigo] = $subproduto['descricao'];
+                }
+            }
+        }
+        if (empty($cartoes)) {
+            $cartoes['/[\w]+ \*\*\*\* [0-9]{4}/'] = 'iFood';
+            $cartoes['/^MASTERCARD|VISA$/'] = 'iFood';
+        }
+        foreach ($cartoes as $regex => $cartao) {
+            $_cartoes[$regex] = $cartao;
+        }
+        $ini = array(
+            'Cartoes' => $_cartoes,
+            'Codigos' => $_produtos,
+            'Desconhecidos' => $_desconhecidos
+        );
+        $filename = 'ifood.ini';
+        header('Content-Type: text/plain');
+        header("Content-Disposition: attachment; filename*=UTF-8''" . rawurlencode($filename));
+        echo to_ini($ini);
+        exit;
+    }
+}
+foreach ($produtos as $codigo => $produto) {
+    $associado = \ZProduto::getPeloID(isset($produto['id'])?$produto['id']:$produto['codigo_pdv']);
+    $produtos[$codigo]['produto'] = $associado;
+    $associados = 0;
+    foreach ($produto['itens'] as $subcodigo => $subproduto) {
+        if ($associado->getTipo() == \ProdutoTipo::PACOTE) {
+            $subassociado = \ZPacote::getPeloID(isset($subproduto['id'])?$subproduto['id']:$subproduto['codigo_pdv']);
+            if ($subassociado->getPacoteID() != $associado->getID()) {
+                $subassociado = new \ZPacote();
+            }
+        } else {
+            $subassociado = \ZProduto::getPeloID(isset($subproduto['id'])?$subproduto['id']:$subproduto['codigo_pdv']);            
+        }
+        if (!is_null($subassociado->getID())) {
+            $associados++;
+        }
+        $produtos[$codigo]['itens'][$subcodigo]['composicao'] = $subassociado;
+    }
+    $status = '';
+    if (is_null($associado->getID())) {
+        $status = 'empty';
+    } elseif ($associado->getTipo() == \ProdutoTipo::PRODUTO && count($produto['itens']) > 0) {
+        $status = 'error';
+    } elseif (count($produto['itens']) != $associados) {
+        $status = 'incomplete';
+    }
+    $produtos[$codigo]['status'] = $status;
+    $produtos[$codigo]['icon'] = count($produto['itens']) > 0 && !is_null($associado->getID())?'edit':'save';
+}
+include template('gerenciar_produto_ifood');

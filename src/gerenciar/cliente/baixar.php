@@ -27,7 +27,7 @@ need_permission(
         array('||'),
         PermissaoNome::RELATORIOCLIENTES
     ),
-    isset($_GET['saida']) && $_GET['saida'] == 'json'
+    isset($_GET['saida']) && is_output('json')
 );
 
 set_time_limit(0);

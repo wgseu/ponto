@@ -21,31 +21,36 @@
 */
 require_once(dirname(dirname(__FILE__)) . '/app.php');
 
-need_permission(PermissaoNome::$[TABLE.style], $_GET['saida'] == 'json');
+use $[tAble.package]\$[tAble.norm];
+use MZ\Util\Filter;
+
+need_permission(\PermissaoNome::$[TABLE.style], is_output('json'));
 
 $limite = isset($_GET['limite'])?intval($_GET['limite']):10;
 if ($limite > 100 || $limite < 1) {
 	$limite = 10;
 }
-$count = \Z$[tAble.norm]::getCount();
+$condition = Filter::query($condition);
+$order = Filter::orderBy(isset($_GET['ordem'])?$_GET['ordem']:'');
+$count = $[tAble.norm]::count($condition);
 list($pagesize, $offset, $pagestring) = pagestring($count, $limite);
-$$[table.unix.plural] = \Z$[tAble.norm]::getTod$[table.gender]s($offset, $pagesize);
+$$[table.unix.plural] = $[tAble.norm]::findAll($condition, $order, $pagesize, $offset);
 
-if (isset($_GET['saida']) && $_GET['saida'] == 'json') {
+if (is_output('json')) {
 	$items = array();
 	foreach ($$[table.unix.plural] as $$[table.unix]) {
-		$items[] = $$[table.unix]->toArray();
+		$items[] = $$[table.unix]->publish();
 	}
 	json(array('status' => 'ok', 'items' => $items));
 }
 
 $[field.each(all)]
 $[field.if(enum)]
-$$[field.unix]_options = array(
-$[field.each(option)]
-	'$[field.option]' => '$[fIeld.option.name]',
+$$[field.unix]_options = $[tAble.norm]::get$[fIeld.norm]Options();
+$[field.else.if(reference)]
+$[field.if(searchable)]
+$$[field.unix]_obj = $$[table.unix]->find$[fIeld.norm]();
 $[field.end]
-);
 $[field.end]
 $[field.end]
 include template('gerenciar_$[table.unix]_index');

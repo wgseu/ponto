@@ -21,7 +21,7 @@
 */
 require_once(dirname(dirname(__FILE__)) . '/app.php');
 
-need_permission(PermissaoNome::CADASTROCLIENTES, $_GET['saida'] == 'json');
+need_permission(PermissaoNome::CADASTROCLIENTES, is_output('json'));
 $focusctrl = 'nome';
 $errors = array();
 if ($_POST) {
@@ -72,7 +72,7 @@ if ($_POST) {
         }
         DB::Commit();
         $msg = 'Cliente "'.$cliente->getNomeCompleto().'" cadastrado com sucesso!';
-        if ($_GET['saida'] == 'json') {
+        if (is_output('json')) {
             json(array('status' => 'ok', 'item' => $cliente->toArray(array('secreto', 'senha')), 'msg' => $msg));
         }
         Thunder::success($msg, true);
@@ -90,7 +90,7 @@ if ($_POST) {
         if ($focusctrl == 'genero') {
             $focusctrl = $focusctrl . '-' . strtolower(ClienteGenero::MASCULINO);
         }
-        if ($_GET['saida'] == 'json') {
+        if (is_output('json')) {
             json($value, null, array('field' => $focusctrl));
         }
         Thunder::error($value);
@@ -99,7 +99,7 @@ if ($_POST) {
 } else {
     $cliente = new ZCliente();
 }
-if ($_GET['saida'] == 'json') {
+if (is_output('json')) {
     json('Nenhum dado foi enviado');
 }
 include template('gerenciar_cliente_cadastrar');

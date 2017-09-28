@@ -155,6 +155,35 @@ class Filter
     }
 
     /**
+     * Parse order by string to array
+     * @param  mixed $order order array or string to sort rows
+     * @return array order list
+     */
+    public static function orderBy($order)
+    {
+        if (is_array($order)) {
+            return $order;
+        }
+        if (trim($order) != '') {
+            $stmt = explode(',', $order);
+        } else {
+            $stmt = array();
+        }
+        $order = array();
+        foreach ($stmt as $key => $value) {
+            $entry = explode(':', $value);
+            if (count($entry) == 2 && $entry[1] == 'desc') {
+                $order[$entry[0]] = -1;
+            } elseif (count($entry) == 2 && $entry[1] == 'asc') {
+                $order[$entry[0]] = 1;
+            } else {
+                $order[$entry[0]] =  0;
+            }
+        }
+        return $order;
+    }
+
+    /**
      * Parse a datetime string for current country
      * @param  string $value humman datetime value
      * @return string        database datetime format
@@ -188,7 +217,7 @@ class Filter
         return array_filter(
             $array,
             function ($value) {
-                return trim($value) !== '';
+                return is_array($value) || trim($value) !== '';
             }
         );
     }

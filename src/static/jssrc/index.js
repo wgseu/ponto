@@ -491,7 +491,7 @@ Gerenciar.diversos.init = function(d1, doughnutData, meta_val, meta_max) {
              end   : picker.endDate.format('YYYY-MM-DD')},
         function(data){
             if(data.status != 'ok') {
-                alert(data.msg);
+                $('.thunder-container').message('error', data.msg);
                 return;
             }
             d1 = [];
@@ -569,7 +569,7 @@ Gerenciar.diversos.init = function(d1, doughnutData, meta_val, meta_max) {
              intervalo: link.attr('range')},
         function(data){
             if(data.status != 'ok') {
-                alert(data.msg);
+                $('.thunder-container').message('error', data.msg);
                 return;
             }
             $('#meta-name').text(link.text());
@@ -1376,7 +1376,10 @@ Gerenciar.produto.init = function() {
     });
 };
 Gerenciar.produto.initField = function(input, field, stock) {
-    Gerenciar.common.autocomplete('/app/produto/procurar', input, undefined,
+    Gerenciar.produto.initFieldSelect(input, field, stock, undefined);
+};
+Gerenciar.produto.initFieldSelect = function(input, field, stock, selectFn) {
+    Gerenciar.common.autocomplete('/app/produto/procurar', input, selectFn,
         function (data) {
             return {value: data.descricao, title: data.categoria};
         }, 
@@ -1451,8 +1454,9 @@ var allLoaded = false;
         $.get('/app/produto/listar', {categoria: cat_id},
         function(data) {
             if(data.status != 'ok') {
-                if(!load_only)
-                    alert(data.msg);
+                if(!load_only) {
+                    $('.thunder-container').message('error', data.msg);
+                }
                 return;
             }
             cache[cat_id] = data;
@@ -1467,7 +1471,7 @@ var allLoaded = false;
         .fail(function() {
             if(load_only)
                 return;
-            alert('Falha na conexão com o servidor');
+            $('.thunder-container').message('error', 'Falha na conexão com o servidor');
             $('#product-list .loader').remove();
         });
     }
@@ -1478,7 +1482,7 @@ var allLoaded = false;
         $.get('/app/produto/procurar', {busca: query, limite: 8},
         function(data) {
             if(data.status != 'ok') {
-                alert(data.msg);
+                $('.thunder-container').message('error', data.msg);
                 return;
             }
             fillProducts(data);
@@ -1486,7 +1490,7 @@ var allLoaded = false;
             $('#product-list div:first .item').addClass('selected');
         })
         .fail(function() {
-            alert('Falha na conexão com o servidor');
+            $('.thunder-container').message('error', 'Falha na conexão com o servidor');
             $('#product-list .loader').remove();
         });
     }
@@ -1944,6 +1948,20 @@ Gerenciar.composicao.initForm = function(focus_ctrl) {
     if(focus_ctrl != undefined)
         $('#' + focus_ctrl).focus();
 };
+Gerenciar.composicao.initFieldSelect = function(input, field, produtoid, selectFn) {
+    Gerenciar.common.autocomplete('/app/composicao/listar', input, selectFn,
+        function (data) {
+            return {value: data.produtodescricao, title: data.tipo};
+        }, 
+        '/static/img/produto.png', 
+        function (query) {
+            return {busca: query, produto: produtoid, adicionais: 1, limite: -1};
+        }, 
+        function (response) {
+            return response.composicoes;
+        }, field, 'data-descricao'
+    );
+};
 Gerenciar.fornecedor = {};
 Gerenciar.fornecedor.init = function() {
     ajaxLink();
@@ -2015,6 +2033,24 @@ Gerenciar.pacote.initForm = function(focus_ctrl) {
     if(focus_ctrl != undefined)
         $('#' + focus_ctrl).focus();
 };
+Gerenciar.pacote.initFieldSelect = function(input, field, grupoid, selectFn) {
+    Gerenciar.common.autocomplete('/app/pacote/listar', input, selectFn,
+        function (data) {
+            return {value: data.descricao, title: data.produtotipo};
+        }, 
+        '/static/img/produto.png', 
+        function (query) {
+            var grupo_id = grupoid;
+            if (isFunction(grupoid)) {
+                grupo_id = grupoid(input);
+            }
+            return {busca: query, grupo: grupo_id, limite: 5};
+        }, 
+        function (response) {
+            return response.pacotes;
+        }, field, 'data-descricao'
+    );
+};
 Gerenciar.dispositivo = {};
 Gerenciar.dispositivo.init = function() {
     ajaxLink();
@@ -2077,7 +2113,7 @@ Gerenciar.acesso.init = function() {
         },
         function(data){
             if(data.status != 'ok') {
-                alert(data.msg);
+                $('.thunder-container').message('error', data.msg);
                 return;
             }
             var row = input.closest('tr');
@@ -2087,7 +2123,7 @@ Gerenciar.acesso.init = function() {
                 row.addClass('active');
         })
         .fail(function() {
-            alert('Falha na conexão com o servidor');
+            $('.thunder-container').message('error', 'Falha na conexão com o servidor');
         });
     });
 };
@@ -2168,11 +2204,12 @@ Gerenciar.sistema.optionChecker = function(url) {
             chave: $(this).attr('data-key')
         },
         function(data){
-            if(data.status != 'ok')
-                alert(data.msg);
+            if(data.status != 'ok') {
+                $('.thunder-container').message('error', data.msg);
+            }
         })
         .fail(function() {
-            alert('Falha na conexão com o servidor');
+            $('.thunder-container').message('error', 'Falha na conexão com o servidor');
         });
     });
 };
@@ -2287,7 +2324,7 @@ Gerenciar.modulo.init = function() {
         },
         function(data){
             if(data.status != 'ok') {
-                alert(data.msg);
+                $('.thunder-container').message('error', data.msg);
                 return;
             }
             var row = input.closest('tr');
@@ -2297,7 +2334,7 @@ Gerenciar.modulo.init = function() {
                 row.addClass('active');
         })
         .fail(function() {
-            alert('Falha na conexão com o servidor');
+            $('.thunder-container').message('error', 'Falha na conexão com o servidor');
         });
     });
 };
@@ -2401,4 +2438,309 @@ Gerenciar.juncao.init = function() {
 Gerenciar.juncao.initForm = function(focus_ctrl) {
     if(focus_ctrl != undefined)
         $('#' + focus_ctrl).focus();
+};
+Gerenciar.integracao = {};
+Gerenciar.integracao.init = function() {
+    $('#query').focus();
+    $('input.js-switch').click(function() {
+        var input = $(this);
+        $.post('/gerenciar/integracao/opcoes',
+        {
+            id: input.attr('data-id'),
+            ativo: Util.checkVal(input)
+        },
+        function(data){
+            if(data.status != 'ok') {
+                $('.thunder-container').message('error', data.msg);
+                return;
+            }
+            var row = input.closest('tr');
+            if(input.is(':checked'))
+                row.removeClass('active');
+            else
+                row.addClass('active');
+        })
+        .fail(function() {
+            $('.thunder-container').message('error', 'Falha na conexão com o servidor');
+        });
+    });
+};
+Gerenciar.integracao.iFoodInit = function() {
+
+var group_template = '\
+    <span class="section col-md-12 col-sm-12 col-xs-12"></span>\
+';
+var item_template = '\
+    <div class="col-md-6 col-sm-12 col-xs-12 ui-state-default top-row">\
+        <div class="assoc-item">\
+            <div class="assoc-img">\
+                <img src="/static/img/produto.png" height="48" alt="Imagem"/>\
+            </div>\
+            <div class="assoc-info">\
+                <input type="hidden" id="" name="" data-descricao="" data-codigo="" value="">\
+                <div class="form-group">\
+                    <label for="produto">Produto: <span class="identifier"></span><i class="fa fa-remove remove-item" title="Excluir item do pacote da associação"></i></label>\
+                    <div class="input-group">\
+                        <input type="text" id="" class="form-control assoc-input" value="">\
+                        <span class="input-group-btn">\
+                            <button class="btn btn-default disabled" tabindex="-1"><i class="fa fa-save"></i></button>\
+                        </span>\
+                    </div>\
+                </div>\
+            </div>\
+        </div>\
+    </div>\
+';
+    $('#query').focus();
+    $('#raw_arquivo').change(function() {
+        var input = $(this),
+            label = input.val().replace(/\\/g, '/').replace(/.*\//, '');
+        var text = $(this).closest('.input-group').find(':text');
+        if( input.length )
+            text.val(label);
+    });
+    $('#clear_arquivo').click(function() {
+        var text = $(this).closest('.input-group').find(':text');
+        $('#arquivo').val('');
+        text.val('');
+        var input = $('#raw_arquivo');
+        input.replaceWith( input = input.clone( true ) );
+    });
+    function initRemoveItem(elem, titleFn, paramFn) {
+        elem.click(function() {
+            var top_item = $(this).closest('.top-row');
+            if (!confirm(titleFn(top_item))) {
+                return false;
+            }
+            $.post(
+                '/gerenciar/produto/ifood?action=delete',
+                paramFn(top_item),
+                function (data) {
+                    if (data.status != 'ok') {
+                        $('.thunder-container').message('error', data.msg);
+                        return;
+                    }
+                    top_item.remove();
+                }
+            );
+        });
+    }
+    initRemoveItem($('.assoc-item .remove-item'),
+        function (top_item) {
+            return 'Deseja excluir o produto "' + top_item.find('.identifier').text() + '" da associação?';
+        },
+        function(top_item) {
+            return {codigo: top_item.find('input[type=hidden]').data('codigo')};
+        }
+    );
+    function salvarCodigo(field, btn, item) {
+        $.post(
+            '/gerenciar/produto/ifood?action=update',
+            {codigo: field.data('codigo'), id: field.val()},
+            function (data) {
+                if (data.status != 'ok') {
+                    $('.thunder-container').message('error', data.msg);
+                    return;
+                }
+                field.attr('data-id', field.val());
+                field.data('id', field.val());
+                item.removeClass('empty error incomplete');
+                if (field.data('item-count') == 0) {
+                    btn.addClass('disabled');
+                } else {
+                    btn.find('i').addClass('fa-edit');
+                    btn.find('i').removeClass('fa-save');
+                }
+                if (field.val() == '') {
+                    item.addClass('empty');
+                } else if (field.data('item-count') > 0) {
+                    item.addClass('incomplete');
+                }
+            }
+        );
+    }
+    function salvarPacote(group_list, field, btn, item, pacote_item) {
+        $.post(
+            '/gerenciar/produto/ifood?action=mount',
+            {codigo: group_list.data('codigo'), subcodigo: field.data('codigo'), id: field.val()},
+            function (data) {
+                if (data.status != 'ok') {
+                    $('.thunder-container').message('error', data.msg);
+                    return;
+                }
+                var old_id = field.data('id');
+                field.attr('data-id', field.val());
+                field.data('id', field.val());
+                item.removeClass('empty');
+                btn.addClass('disabled');
+                if (field.val() == '') {
+                    item.addClass('empty');
+                }
+                if ($.isNumeric(old_id) != $.isNumeric(field.data('id'))) {
+                    var saved_count = group_list.data('saved-count');
+                    if (field.val() == '') {
+                        saved_count--;
+                    } else {
+                        saved_count++;
+                    }
+                    group_list.attr('data-saved-count', saved_count);
+                    group_list.data('saved-count', saved_count);
+                    if (saved_count != group_list.data('item-count')) {
+                        pacote_item.addClass('incomplete');
+                    } else {
+                        pacote_item.removeClass('incomplete');
+                    }
+                }
+            }
+        );
+    }
+    function editaPacote(field, btn, pacote_item) {
+        var group_list = $('#group-list');
+        group_list.empty();
+        $('#edit-pkg-label').text(field.data('descricao'));
+        $.get(
+            '/gerenciar/produto/ifood?action=package',
+            {codigo: field.data('codigo')},
+            function(data) {
+                if (data.status != 'ok') {
+                    $('.thunder-container').message('error', data.msg);
+                    return;
+                }
+                group_list.attr('data-item-count', Object.keys(data.produto.itens).length);
+                group_list.data('item-count', Object.keys(data.produto.itens).length);
+                group_list.attr('data-descricao', data.produto.descricao);
+                group_list.data('descricao', data.produto.descricao);
+                group_list.attr('data-codigo', data.produto.codigo);
+                group_list.data('codigo', data.produto.codigo);
+                group_list.attr('data-tipo', data.produto.tipo);
+                group_list.data('tipo', data.produto.tipo);
+                group_list.attr('data-id', data.produto.id);
+                group_list.data('id', data.produto.id);
+                var grupos = {};
+                $.each(data.grupos, function() {
+                    var group = $(group_template);
+                    group.text(this.descricao);
+                    group_list.append(group);
+                    var div = $('<div class="connectedSortable"/>');
+                    group_list.append(div);
+                    grupos[this.id] = div;
+                    div.attr('data-grupoid', this.id);
+                    div.data('grupoid', this.id);
+                    div.sortable({
+                        connectWith: '.connectedSortable',
+                        placeholder: 'connectedSortable-placeholder assoc-item',
+                        receive: function( event, ui ) {
+                            ui.item.find('input[type=text]').focus();
+                        }
+                    });
+                });
+                var saved_count = 0;
+                $.each(data.produto.itens, function() {
+                    var item = $(item_template);
+                    var group = grupos[this.grupoid];
+                    var input = $('input[type=text]', item);
+                    var field = $('input[type=hidden]', item);
+                    var btn = $('button', item);
+                    $('.identifier', item).text(this.descricao);
+                    field.attr('id', 'produto_' + this.codigo);
+                    field.attr('name', 'produto[' + this.codigo + ']');
+                    field.attr('data-descricao', this.associado.descricao);
+                    field.data('descricao', this.associado.descricao);
+                    field.attr('data-codigo', this.codigo);
+                    field.data('codigo', this.codigo);
+                    field.val(this.id);
+                    input.attr('id', 'produto_' + this.codigo +  '_input');
+                    input.val(this.associado.descricao);
+                    group.append(item);
+                    item = $('.assoc-item', item);
+                    if (!this.id) {
+                        item.addClass('empty');
+                    } else {
+                        saved_count++;
+                    }
+                    btn.click(function(event) {
+                        event.preventDefault();
+                        if (btn.hasClass('disabled')) {
+                            return;
+                        }
+                        salvarPacote(group_list, field, btn, item, pacote_item);
+                    })
+                    input.keyup(function(e){
+                        if (e.keyCode == 13) {
+                            btn.click();
+                        }
+                    });
+                    if (data.produto.tipo == 'Pacote') {
+                        Gerenciar.pacote.initFieldSelect(
+                            input[0],
+                            field[0],
+                            function(text_input) {
+                                return $(text_input).closest('.connectedSortable').data('grupoid');
+                            },
+                            function(data) {
+                                btn.removeClass('disabled');
+                            }
+                        );
+                    } else {
+                        Gerenciar.composicao.initFieldSelect(
+                            input[0],
+                            field[0],
+                            group_list.data('id'),
+                            function(data) {
+                                btn.removeClass('disabled');
+                            }
+                        );
+                    }
+                });
+                initRemoveItem($('.assoc-item .remove-item', group_list),
+                    function (top_item) {
+                        return 'Deseja excluir o item "' + 
+                            top_item.find('.identifier').text() + 
+                            '" do pacote "' + group_list.data('descricao') + 
+                            '" da associação?';
+                    },
+                    function(top_item) {
+                        return {
+                            codigo: group_list.data('codigo'),
+                            subcodigo: top_item.find('input[type=hidden]').data('codigo')
+                        };
+                    }
+                );
+                group_list.attr('data-saved-count', saved_count);
+                group_list.data('saved-count', saved_count);
+            }
+        );
+        $('#edit-pkg').modal('show');
+    }
+    $('.assoc-input').each(function() {
+        var input = $(this);
+        var field = $(this).closest('.assoc-info').find('input[type=hidden]');
+        var btn = $(this).closest('div').find('button');
+        var item = $(this).closest('.assoc-item');
+        btn.click(function() {
+            if (btn.hasClass('disabled')) {
+                return;
+            }
+            if (field.data('item-count') == 0 || field.val() != field.data('id')) {
+                salvarCodigo(field, btn, item);
+            } else {
+                editaPacote(field, btn, item);
+            }
+        })
+        input.keyup(function(e){
+            if (e.keyCode == 13) {
+                btn.click();
+            }
+        });
+        Gerenciar.produto.initFieldSelect(this, field[0], -1, function(data) {
+            btn.removeClass('disabled');
+            if (field.data('item-count') == 0 || field.val() != field.data('id')) {
+                btn.find('i').addClass('fa-save');
+                btn.find('i').removeClass('fa-edit');
+            } else {
+                btn.find('i').addClass('fa-edit');
+                btn.find('i').removeClass('fa-save');
+            }
+        });
+    });
 };

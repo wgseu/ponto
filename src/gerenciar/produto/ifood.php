@@ -213,12 +213,12 @@ if (isset($_GET['action'])) {
                         $subassociado = new \ZPacote();
                     }
 					$grupoid = intval($subassociado->getGrupoID());
-					if ($total_igual && $grupo_index < count($grupos) && $grupoid == 0) {
+					if (($total_igual || count($grupos) == 1) && $grupo_index < count($grupos) && $grupoid == 0) {
 						$grupoid = $grupos[$grupo_index]['id'];
 					}
                     $produto['itens'][$subcodigo]['grupoid'] = $grupoid;
 					$total_pacotes++;
-					if ($grupo_index < count($contagem) && $total_pacotes == $contagem[$grupo_index]) {
+					if ($grupo_index < count($contagem) && $total_pacotes == $contagem[$grupo_index] && $grupo_index < count($grupos) - 1) {
 						$grupo_index++;
 						$total_pacotes = 0;
 					}

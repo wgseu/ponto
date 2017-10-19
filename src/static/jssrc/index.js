@@ -1955,7 +1955,7 @@ Gerenciar.composicao.initFieldSelect = function(input, field, produtoid, selectF
         }, 
         '/static/img/produto.png', 
         function (query) {
-            return {busca: query, produto: produtoid, adicionais: 1, limite: -1};
+            return {busca: query, produto: produtoid, adicionais: 1, limite: 5};
         }, 
         function (response) {
             return response.composicoes;
@@ -2614,8 +2614,8 @@ var item_template = '\
                 group_list.data('codigo', data.produto.codigo);
                 group_list.attr('data-tipo', data.produto.tipo);
                 group_list.data('tipo', data.produto.tipo);
-                group_list.attr('data-id', data.produto.id);
-                group_list.data('id', data.produto.id);
+                group_list.attr('data-id', data.produto.id || data.produto.codigo_pdv);
+                group_list.data('id', data.produto.id || data.produto.codigo_pdv);
                 var grupos = {};
                 $.each(data.grupos, function() {
                     var group = $(group_template);

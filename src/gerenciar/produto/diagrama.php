@@ -47,7 +47,7 @@ while (!$stack->isEmpty()) {
     }
     if ($_produto->getTipo() == ProdutoTipo::COMPOSICAO) {
         $valor = 0.0;
-        $composicoes = ZComposicao::getTodasDaComposicaoID($composicao->getProdutoID());
+        $composicoes = ZComposicao::getTodasDaComposicaoID(null, $composicao->getProdutoID());
         foreach ($composicoes as $_composicao) {
             if ($_composicao->getTipo() == ComposicaoTipo::ADICIONAL) {
                 continue;

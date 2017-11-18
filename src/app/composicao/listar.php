@@ -28,7 +28,7 @@ $limite = isset($_GET['limite'])?intval($_GET['limite']):null;
 if (!is_null($limite) && $limite < 1) {
 	$limite = null;
 }
-$composicoes = ZComposicao::getTodasDaComposicaoIDEx($_GET['produto'], intval($_GET['selecionaveis']) != 0,
+$composicoes = ZComposicao::getTodasDaComposicaoIDEx(strval($_GET['busca']), $_GET['produto'], intval($_GET['selecionaveis']) != 0,
     intval($_GET['adicionais']) != 0, 0, $limite);
 $response = array('status' => 'ok');
 $_composicoes = array();

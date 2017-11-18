@@ -451,17 +451,11 @@ class ZPacote
                          ->orderBy('pc.id ASC');
         if (!is_null($busca) && strlen($busca) > 0) {
             $keywords = preg_split('/[\s,]+/', $busca);
-            $words = '';
             foreach ($keywords as $word) {
-                $words .= '%'.$word.'%';
-                $query = $query->orderBy('IF(LOCATE(?, '.
-                    'CONCAT(" ", COALESCE(COALESCE(p.abreviacao, pr.abreviacao), ""), " ", COALESCE(p.descricao, pr.nome))) = 0, 256, LOCATE(?, '.
-                    'CONCAT(" ", COALESCE(COALESCE(p.abreviacao, pr.abreviacao), ""), " ", COALESCE(p.descricao, pr.nome)))) ASC', ' '.$word, ' '.$word);
-                $query = $query->orderBy('IF(LOCATE(?, '.
-                    'CONCAT(COALESCE(COALESCE(p.abreviacao, pr.abreviacao), ""), " ", COALESCE(p.descricao, pr.nome))) = 0, 256, LOCATE(?, '.
-                    'CONCAT(COALESCE(COALESCE(p.abreviacao, pr.abreviacao), ""), " ", COALESCE(p.descricao, pr.nome)))) ASC', $word, $word);
+                $query = $query->where('CONCAT(COALESCE(COALESCE(p.abreviacao, pr.abreviacao), ""), " ", COALESCE(p.descricao, pr.nome)) LIKE ?', '%'.$word.'%');
+                $query = $query->orderBy('COALESCE(NULLIF(LOCATE(?, CONCAT(" ", COALESCE(COALESCE(p.abreviacao, pr.abreviacao), ""), " ", COALESCE(p.descricao, pr.nome))), 0), 65535) ASC', ' '.$word);
+                $query = $query->orderBy('COALESCE(NULLIF(LOCATE(?, CONCAT(COALESCE(COALESCE(p.abreviacao, pr.abreviacao), ""), " ", COALESCE(p.descricao, pr.nome))), 0), 65535) ASC', $word);
             }
-            $query = $query->where('CONCAT(COALESCE(COALESCE(p.abreviacao, pr.abreviacao), ""), " ", COALESCE(p.descricao, pr.nome)) LIKE ?', $words);
         }
         if (!is_null($pacotes) && count($pacotes) > 0) {
             $query = $query->where('pc.associacaoid', $pacotes);
@@ -505,9 +499,9 @@ class ZPacote
         return $query->fetchAll();
     }
 
-    public static function getCountDoGrupoID($grupo_id)
+    public static function getCountDoGrupoID($grupo_id, $pacotes = array(), $busca = null)
     {
-        $query = self::initSearchDoGrupoID($grupo_id);
+        $query = self::initSearchDoGrupoID($grupo_id, $pacotes, $busca);
         return $query->count();
     }
 

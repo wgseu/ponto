@@ -26,7 +26,7 @@ if (!isset($_GET['grupo']) || !is_numeric($_GET['grupo'])) {
 }
 $limite = isset($_GET['limite'])?intval($_GET['limite']):null;
 if (!is_null($limite) && $limite < 1) {
-	$limite = null;
+    $limite = null;
 }
 $associacoes = isset($_POST['pacote'])?$_POST['pacote']:array();
 $pacotes = ZPacote::getTodosDoGrupoIDEx(intval($_GET['grupo']), $associacoes, strval($_GET['busca']), 0, $limite);

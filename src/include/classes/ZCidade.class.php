@@ -164,7 +164,9 @@ class ZCidade
             throw new ValidationException(array('nome' => 'O nome informado já está cadastrado'));
         }
         if (stripos($e->getMessage(), 'CEP_UNIQUE') !== false) {
-            throw new ValidationException(array('cep' => vsprintf('O %s informado já está cadastrado', array(_p('Titulo', 'CEP')))));
+            throw new ValidationException(
+                array('cep' => vsprintf('O %s informado já está cadastrado', array(_p('Titulo', 'CEP'))))
+            );
         }
     }
 
@@ -233,8 +235,13 @@ class ZCidade
         return $query;
     }
 
-    public static function getTodas($busca = null, $pais_id = null, $estado_id = null, $inicio = null, $quantidade = null)
-    {
+    public static function getTodas(
+        $busca = null,
+        $pais_id = null,
+        $estado_id = null,
+        $inicio = null,
+        $quantidade = null
+    ) {
         $query = self::initSearch($busca, $pais_id, $estado_id);
         if (!is_null($inicio) && !is_null($quantidade)) {
             $query = $query->limit($quantidade)->offset($inicio);

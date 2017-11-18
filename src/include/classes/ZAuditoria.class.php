@@ -238,8 +238,14 @@ class ZAuditoria
         return $query;
     }
 
-    public static function getTodas($busca = null, $funcionario_id = null, $tipo = null, $prioridade = null, $inicio = null, $quantidade = null)
-    {
+    public static function getTodas(
+        $busca = null,
+        $funcionario_id = null,
+        $tipo = null,
+        $prioridade = null,
+        $inicio = null,
+        $quantidade = null
+    ) {
         $query = self::initSearch($busca, $funcionario_id, $tipo, $prioridade);
         if (!is_null($inicio) && !is_null($quantidade)) {
             $query = $query->limit($quantidade)->offset($inicio);

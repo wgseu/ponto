@@ -258,8 +258,14 @@ class ZBairro
         return $query;
     }
 
-    public static function getTodos($busca = null, $pais_id = null, $estado_id = null, $cidade_id = null, $inicio = null, $quantidade = null)
-    {
+    public static function getTodos(
+        $busca = null,
+        $pais_id = null,
+        $estado_id = null,
+        $cidade_id = null,
+        $inicio = null,
+        $quantidade = null
+    ) {
         $query = self::initSearch($busca, $pais_id, $estado_id, $cidade_id);
         if (!is_null($inicio) && !is_null($quantidade)) {
             $query = $query->limit($quantidade)->offset($inicio);

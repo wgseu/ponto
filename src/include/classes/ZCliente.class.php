@@ -761,8 +761,11 @@ class ZCliente
         }
         $ccrc = dechex(crc32($id.$hash));
         $m = time();
-        $sm = strtotime(preg_replace("/([0-9]{4})([0-9]{2})([0-9]{2})([0-9]{2})([0-9]{2})([0-9]{2})/",
-            "$1-$2-$3 $4:$5:$6", substr($id, -14)));
+        $sm = strtotime(preg_replace(
+            "/([0-9]{4})([0-9]{2})([0-9]{2})([0-9]{2})([0-9]{2})([0-9]{2})/",
+            "$1-$2-$3 $4:$5:$6",
+            substr($id, -14)
+        ));
         $i = round(abs($tm - $stm) / 60);
         if ($i > 5 || $sm === false || strcasecmp($crc, $ccrc) != 0) {
             return new ZCliente();

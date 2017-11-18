@@ -26,10 +26,16 @@ if (!isset($_GET['produto']) || !is_numeric($_GET['produto'])) {
 }
 $limite = isset($_GET['limite'])?intval($_GET['limite']):null;
 if (!is_null($limite) && $limite < 1) {
-	$limite = null;
+    $limite = null;
 }
-$composicoes = ZComposicao::getTodasDaComposicaoIDEx(strval($_GET['busca']), $_GET['produto'], intval($_GET['selecionaveis']) != 0,
-    intval($_GET['adicionais']) != 0, 0, $limite);
+$composicoes = ZComposicao::getTodasDaComposicaoIDEx(
+    strval($_GET['busca']),
+    $_GET['produto'],
+    intval($_GET['selecionaveis']) != 0,
+    intval($_GET['adicionais']) != 0,
+    0,
+    $limite
+);
 $response = array('status' => 'ok');
 $_composicoes = array();
 foreach ($composicoes as $composicao) {

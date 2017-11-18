@@ -190,8 +190,13 @@ class ZClassificacao
         return $query;
     }
 
-    public static function getTodas($superiores = false, $classificacao_id = null, $busca = null, $inicio = null, $quantidade = null)
-    {
+    public static function getTodas(
+        $superiores = false,
+        $classificacao_id = null,
+        $busca = null,
+        $inicio = null,
+        $quantidade = null
+    ) {
         $query = self::initSearch($superiores, $classificacao_id, $busca);
         if (!is_null($inicio) && !is_null($quantidade)) {
             $query = $query->limit($quantidade)->offset($inicio);

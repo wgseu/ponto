@@ -46,7 +46,7 @@ function __parse($tFile, $cFile)
         die("Can't get file contents [$tFile]!");
         return false;
     }
-    $fileContent = preg_replace('/^(\xef\xbb\xbf)/', '', $fileContent ); //EFBBBF
+    $fileContent = preg_replace('/^(\xef\xbb\xbf)/', '', $fileContent); //EFBBBF
     $fileContent = preg_replace_callback("/\<\!\-\-\s*\\\$\{(.+?)\}\s*\-\-\>/is", '__parsestmt', $fileContent);
     $fileContent = preg_replace("/\{(\\\$[a-zA-Z0-9_\[\]\\\ \-\'\,\%\*\/\.\(\)\>\'\"\$\x7f-\xff]+)\}/s", "<?php echo \\1; ?>", $fileContent);
     $fileContent = preg_replace_callback("/\\\$\{(.+?)\}/is", '__parseecho', $fileContent);
@@ -75,7 +75,7 @@ function __replace($string)
 
 function __template($tFile)
 {
-    $tFileN = preg_replace( '/\.html$/', '', $tFile);
+    $tFileN = preg_replace('/\.html$/', '', $tFile);
     $tFile = DIR_TEMPLATE . '/' . $tFileN . '.html';
     $cFile = DIR_COMPILED . '/' . str_replace('/', '_', $tFileN) . '.php';
     if (false === file_exists($tFile)) {

@@ -926,24 +926,25 @@ class ZProdutoPedido
         $query = DB::$pdo->from('Produtos_Pedidos pp')
                          ->select(null)
                          ->select(
-                            'IF(COUNT(pp.id) = 1, pp.id, 0) as id, '.
-                            'pp.pedidoid, '.
-                            'pp.funcionarioid, '.
-                            'pp.produtoid, '.
-                            'pp.servicoid, '.
-                            'pp.produtopedidoid, '.
-                            'pp.descricao, '.
-                            'pp.preco, '.
-                            'pp.porcentagem, '.
-                            'pp.precovenda, '.
-                            'pp.precocompra, '.
-                            'pp.detalhes, '.
-                            'pp.estado, '.
-                            'pp.visualizado, '.
-                            'pp.datavisualizacao, '.
-                            'pp.dataatualizacao, '.
-                            'pp.cancelado, '.
-                            'pp.datahora')
+                             'IF(COUNT(pp.id) = 1, pp.id, 0) as id, '.
+                             'pp.pedidoid, '.
+                             'pp.funcionarioid, '.
+                             'pp.produtoid, '.
+                             'pp.servicoid, '.
+                             'pp.produtopedidoid, '.
+                             'pp.descricao, '.
+                             'pp.preco, '.
+                             'pp.porcentagem, '.
+                             'pp.precovenda, '.
+                             'pp.precocompra, '.
+                             'pp.detalhes, '.
+                             'pp.estado, '.
+                             'pp.visualizado, '.
+                             'pp.datavisualizacao, '.
+                             'pp.dataatualizacao, '.
+                             'pp.cancelado, '.
+                             'pp.datahora'
+                         )
                          ->select('SUM(pp.quantidade) as quantidade')
                          ->select('COALESCE(pp.descricao, pd.descricao) as produtodescricao')
                          ->select('pd.dataatualizacao as produtodataatualizacao')

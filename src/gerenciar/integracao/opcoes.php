@@ -35,20 +35,20 @@ if (!$integracao->exists()) {
 }
 $old_integracao = $integracao;
     $integracao = new Integracao($_POST);
-    try {
-        $integracao->filter($old_integracao);
-        $integracao->save();
-        $old_integracao->clean($integracao);
-        $msg = sprintf(
-            'Integração "%s" atualizada com sucesso!',
-            $integracao->getNome()
-        );
-        json(null, array('item' => $integracao->publish(), 'msg' => $msg));
-    } catch (\Exception $e) {
-        $integracao->clean($old_integracao);
-        $errors = array();
-        if ($e instanceof \ValidationException) {
-            $errors = $e->getErrors();
-        }
-        json($e->getMessage(), null, array('errors' => $errors));
+try {
+    $integracao->filter($old_integracao);
+    $integracao->save();
+    $old_integracao->clean($integracao);
+    $msg = sprintf(
+        'Integração "%s" atualizada com sucesso!',
+        $integracao->getNome()
+    );
+    json(null, array('item' => $integracao->publish(), 'msg' => $msg));
+} catch (\Exception $e) {
+    $integracao->clean($old_integracao);
+    $errors = array();
+    if ($e instanceof \ValidationException) {
+        $errors = $e->getErrors();
     }
+    json($e->getMessage(), null, array('errors' => $errors));
+}

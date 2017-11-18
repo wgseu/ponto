@@ -640,8 +640,16 @@ class ZPagamento
         $inicio = null,
         $quantidade = null
     ) {
-        $query = self::initSearch($busca, $formapagto_id, $cartao_id, $funcionario_id, $carteira_id,
-                $estado, $data_inicio, $data_fim);
+        $query = self::initSearch(
+            $busca,
+            $formapagto_id,
+            $cartao_id,
+            $funcionario_id,
+            $carteira_id,
+            $estado,
+            $data_inicio,
+            $data_fim
+        );
         if (!is_null($inicio) && !is_null($quantidade)) {
             $query = $query->limit($quantidade)->offset($inicio);
         }
@@ -663,8 +671,16 @@ class ZPagamento
         $data_inicio = null,
         $data_fim = null
     ) {
-        $query = self::initSearch($busca, $formapagto_id, $cartao_id, $funcionario_id, $carteira_id,
-                $estado, $data_inicio, $data_fim);
+        $query = self::initSearch(
+            $busca,
+            $formapagto_id,
+            $cartao_id,
+            $funcionario_id,
+            $carteira_id,
+            $estado,
+            $data_inicio,
+            $data_fim
+        );
         return $query->count();
     }
 
@@ -945,8 +961,13 @@ class ZPagamento
         $dia_inicio,
         $dia_fim
     ) {
-        $query = self::initGetFaturamento(null, $mes_inicio, $mes_fim,
-            $dia_inicio, $dia_fim);
+        $query = self::initGetFaturamento(
+            null,
+            $mes_inicio,
+            $mes_fim,
+            $dia_inicio,
+            $dia_fim
+        );
         $query = $query->select('DATE_FORMAT(pg.datahora, "%Y-%m-%d") as data');
         $query = $query->groupBy('DATE_FORMAT(pg.datahora, "%Y-%m-%d")');
         return $query;
@@ -960,8 +981,12 @@ class ZPagamento
         $inicio = null,
         $quantidade = null
     ) {
-        $query = self::initSearchFaturamentos($mes_inicio, $mes_fim,
-            $dia_inicio, $dia_fim);
+        $query = self::initSearchFaturamentos(
+            $mes_inicio,
+            $mes_fim,
+            $dia_inicio,
+            $dia_fim
+        );
         if (!is_null($inicio) && !is_null($quantidade)) {
             $query = $query->limit($quantidade)->offset($inicio);
         }
@@ -974,8 +999,12 @@ class ZPagamento
         $dia_inicio = null,
         $dia_fim = null
     ) {
-        $query = self::initSearchFaturamentos($mes_inicio, $mes_fim,
-            $dia_inicio, $dia_fim);
+        $query = self::initSearchFaturamentos(
+            $mes_inicio,
+            $mes_fim,
+            $dia_inicio,
+            $dia_fim
+        );
         return $query->count();
     }
 }

@@ -183,13 +183,13 @@ if (isset($_GET['action'])) {
             $produto['tipo'] = $associado->getTipo();
             $_grupos = \ZGrupo::getTodosDoProdutoID($associado->getID());
             $grupos = array();
-			$contagem = array();
-			$total_pacotes = 0;
+            $contagem = array();
+            $total_pacotes = 0;
             foreach ($_grupos as $grupo) {
                 $grupos[] = $grupo->toArray();
-				$qtd_pacotes = \ZPacote::getCountDoGrupoID($grupo->getID());
-				$contagem[] = $qtd_pacotes;
-				$total_pacotes += $qtd_pacotes;
+                $qtd_pacotes = \ZPacote::getCountDoGrupoID($grupo->getID());
+                $contagem[] = $qtd_pacotes;
+                $total_pacotes += $qtd_pacotes;
             }
             $grupo = new \ZGrupo();
             $grupo->setID(0);
@@ -197,31 +197,31 @@ if (isset($_GET['action'])) {
             if ($associado->getTipo() == \ProdutoTipo::PACOTE) {
                 $grupo->setDescricao('Sem grupo');
             }
-			$total_igual = count($produto['itens']) == $total_pacotes;
+            $total_igual = count($produto['itens']) == $total_pacotes;
             if ((count($grupos) > 1 && !$total_igual) || count($grupos) == 0) {
                 $grupos[] = $grupo->toArray();
-				$contagem[] = count($produto['itens']);
+                $contagem[] = count($produto['itens']);
             }
-			$total_pacotes = 0;
-			$grupo_index = 0;
+            $total_pacotes = 0;
+            $grupo_index = 0;
             foreach ($produto['itens'] as $subcodigo => $subproduto) {
                 if ($associado->getTipo() == \ProdutoTipo::PACOTE) {
                     $subassociado = \ZPacote::getPeloID(
-						isset($subproduto['id'])?$subproduto['id']:$subproduto['codigo_pdv']
-					);
+                        isset($subproduto['id'])?$subproduto['id']:$subproduto['codigo_pdv']
+                    );
                     if ($subassociado->getPacoteID() != $associado->getID()) {
                         $subassociado = new \ZPacote();
                     }
-					$grupoid = intval($subassociado->getGrupoID());
-					if (($total_igual || count($grupos) == 1) && $grupo_index < count($grupos) && $grupoid == 0) {
-						$grupoid = $grupos[$grupo_index]['id'];
-					}
+                    $grupoid = intval($subassociado->getGrupoID());
+                    if (($total_igual || count($grupos) == 1) && $grupo_index < count($grupos) && $grupoid == 0) {
+                        $grupoid = $grupos[$grupo_index]['id'];
+                    }
                     $produto['itens'][$subcodigo]['grupoid'] = $grupoid;
-					$total_pacotes++;
-					if ($grupo_index < count($contagem) && $total_pacotes == $contagem[$grupo_index] && $grupo_index < count($grupos) - 1) {
-						$grupo_index++;
-						$total_pacotes = 0;
-					}
+                    $total_pacotes++;
+                    if ($grupo_index < count($contagem) && $total_pacotes == $contagem[$grupo_index] && $grupo_index < count($grupos) - 1) {
+                        $grupo_index++;
+                        $total_pacotes = 0;
+                    }
                     // if (count($grupos) == 1) {
                     //     $produto['itens'][$subcodigo]['grupoid'] = current($grupos)['id'];
                     // } else {
@@ -233,8 +233,8 @@ if (isset($_GET['action'])) {
                     }
                 } else {
                     $subassociado = \ZComposicao::getPeloID(
-						isset($subproduto['id'])?$subproduto['id']:$subproduto['codigo_pdv']
-					);
+                        isset($subproduto['id'])?$subproduto['id']:$subproduto['codigo_pdv']
+                    );
                     if ($subassociado->getComposicaoID() != $associado->getID()) {
                         $subassociado = new \ZComposicao();
                     }
@@ -294,19 +294,19 @@ foreach ($produtos as $codigo => $produto) {
             if ($subassociado->getPacoteID() != $associado->getID()) {
                 $subassociado = new \ZPacote();
             }
-			if (!is_null($subassociado->getPropriedadeID())) {
-				$item = \ZPropriedade::getPeloID($subassociado->getPropriedadeID());
-			} else {
-				$item = \ZProduto::getPeloID($subassociado->getProdutoID());
-			}
+            if (!is_null($subassociado->getPropriedadeID())) {
+                $item = \ZPropriedade::getPeloID($subassociado->getPropriedadeID());
+            } else {
+                $item = \ZProduto::getPeloID($subassociado->getProdutoID());
+            }
         } else {
-			$subassociado = \ZComposicao::getPeloID(
-				isset($subproduto['id'])?$subproduto['id']:$subproduto['codigo_pdv']
-			);
-			if ($subassociado->getComposicaoID() != $associado->getID()) {
-				$subassociado = new \ZComposicao();
-			}
-			$item = \ZProduto::getPeloID($subassociado->getProdutoID());            
+            $subassociado = \ZComposicao::getPeloID(
+                isset($subproduto['id'])?$subproduto['id']:$subproduto['codigo_pdv']
+            );
+            if ($subassociado->getComposicaoID() != $associado->getID()) {
+                $subassociado = new \ZComposicao();
+            }
+            $item = \ZProduto::getPeloID($subassociado->getProdutoID());
         }
         if (!is_null($item->getID())) {
             $associados++;

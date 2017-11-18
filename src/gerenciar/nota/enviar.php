@@ -27,8 +27,20 @@ try {
     if (!in_array($modo, array('contador', 'consumidor'))) {
         throw new Exception('O modo de envio "'.$modo.'" é inválido', 500);
     }
-    $notas = ZNota::getTodas($busca, $estado, $acao, $ambiente, $serie, $pedido_id,
-        $tipo, $contingencia, $emissao_inicio, $emissao_fim, $lancamento_inicio, $lancamento_fim);
+    $notas = ZNota::getTodas(
+        $busca,
+        $estado,
+        $acao,
+        $ambiente,
+        $serie,
+        $pedido_id,
+        $tipo,
+        $contingencia,
+        $emissao_inicio,
+        $emissao_fim,
+        $lancamento_inicio,
+        $lancamento_fim
+    );
     if (count($notas) == 0) {
         throw new Exception('Nenhuma nota no resultado da busca', 404);
     }

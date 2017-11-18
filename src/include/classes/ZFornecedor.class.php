@@ -220,10 +220,15 @@ class ZFornecedor
             $words = '';
             foreach ($keywords as $word) {
                 $words .= '%'.$word.'%';
-                $query = $query->orderBy('IF(LOCATE(?, CONCAT(" ", c.nome, " ", COALESCE(c.sobrenome, ""))) = 0, '.
+                $query = $query->orderBy(
+                    'IF(LOCATE(?, CONCAT(" ", c.nome, " ", COALESCE(c.sobrenome, ""))) = 0, '.
                     '256, LOCATE(?, CONCAT(" ", c.nome, " ", COALESCE(c.sobrenome, "")))) ASC, IF(LOCATE(?, '.
                     'CONCAT(c.nome, " ", COALESCE(c.sobrenome, ""))) = 0, 256, LOCATE(?, CONCAT(c.nome, " ", COALESCE(c.sobrenome, "")))) ASC',
-                    ' '.$word, ' '.$word, $word, $word);
+                    ' '.$word,
+                    ' '.$word,
+                    $word,
+                    $word
+                );
             }
             $query = $query->where('CONCAT(c.nome, " ", COALESCE(c.sobrenome, "")) LIKE ?', $words);
         }

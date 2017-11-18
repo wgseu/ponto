@@ -916,8 +916,13 @@ function upload_image($inputname, $type, $name = null, $width = null, $height = 
 function upload_document($inputname, $type, $name = null)
 {
     $dir = DOC_ROOT . '/' . $type . '/';
-    return upload_file($inputname, $dir, $name, '.pdf',
-        'txt|doc|docx|xls|xlsx|csv|pptx|ppt|rtf|pps|ppsx|tex|ods|odt|odp|html|xml|pdf|gif|bmp|png|jpg|jpeg|pfx');
+    return upload_file(
+        $inputname,
+        $dir,
+        $name,
+        '.pdf',
+        'txt|doc|docx|xls|xlsx|csv|pptx|ppt|rtf|pps|ppsx|tex|ods|odt|odp|html|xml|pdf|gif|bmp|png|jpg|jpeg|pfx'
+    );
 }
 
 function create_zip($files = array(), $destination = '', $overwrite = false)

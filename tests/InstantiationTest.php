@@ -65,7 +65,6 @@ class InstantiationTest extends \PHPUnit_Framework_TestCase
         $informacao = new \ZInformacao();
         $resumo = new \ZResumo();
         $formacao = new \ZFormacao();
-        $consumacao = new \ZConsumacao();
         $lista_compra = new \ZListaCompra();
         $modulo = new \ZModulo();
         $lista_produto = new \ZListaProduto();

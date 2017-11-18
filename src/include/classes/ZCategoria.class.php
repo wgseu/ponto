@@ -282,9 +282,11 @@ class ZCategoria
     public static function initSearch($todas, $superiores, $busca)
     {
         $query = self::initGet()
-                         ->leftJoin('Produtos p ON p.categoriaid = c.id AND p.visivel = "Y"')
-                         ->leftJoin('Produtos_Pedidos pp ON pp.produtoid = p.id AND pp.datahora > DATE_SUB(NOW(), INTERVAL 1 MONTH)')
-                         ->groupBy('c.id');
+            ->leftJoin('Produtos p ON p.categoriaid = c.id AND p.visivel = "Y"')
+            ->leftJoin(
+                'Produtos_Pedidos pp ON pp.produtoid = p.id AND pp.datahora > DATE_SUB(NOW(), INTERVAL 1 MONTH)'
+            )
+            ->groupBy('c.id');
         if (!$todas) {
             $query = $query->orderBy('SUM(pp.quantidade) DESC')
                            ->having('COUNT(p.id) > 0');
@@ -302,8 +304,13 @@ class ZCategoria
         return $query;
     }
 
-    public static function getTodas($todas = false, $superiores = false, $busca = null, $inicio = null, $quantidade = null)
-    {
+    public static function getTodas(
+        $todas = false,
+        $superiores = false,
+        $busca = null,
+        $inicio = null,
+        $quantidade = null
+    ) {
         $query = self::initSearch($todas, $superiores, $busca);
         if (!is_null($inicio) && !is_null($quantidade)) {
             $query = $query->limit($quantidade)->offset($inicio);

@@ -20,7 +20,7 @@ class Session
         if (isset($_SESSION[$name])) {
             $v = $_SESSION[$name];
             if ($once) {
-                unset( $_SESSION[$name] );
+                unset($_SESSION[$name]);
             }
         }
         return $v;

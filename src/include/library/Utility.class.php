@@ -174,12 +174,12 @@ class Utility
         } else {
             foreach ($a as $one) {
                 if (is_array($one)) {
-                    if (false==isset( $ret[ @$one[$column] ] )) {
+                    if (false==isset($ret[ @$one[$column] ])) {
                         $ret[ @$one[$column] ] = array();
                     }
                     $ret[ @$one[$column] ][ @$one[$scolumn] ] = $one;
                 } else {
-                    if (false==isset( $ret[ @$one->$column ] )) {
+                    if (false==isset($ret[ @$one->$column ])) {
                         $ret[ @$one->$column ] = array();
                     }
 
@@ -193,7 +193,7 @@ class Utility
     public static function GetRemoteIp($default = '127.0.0.1')
     {
         $ip_string = $_SERVER['HTTP_CLIENT_IP'].','.$_SERVER['HTTP_X_FORWARDED_FOR'].','.$_SERVER['REMOTE_ADDR'];
-        if (preg_match ("/\d+\.\d+\.\d+\.\d+/", $ip_string, $matches)) {
+        if (preg_match("/\d+\.\d+\.\d+\.\d+/", $ip_string, $matches)) {
             return $matches[0];
         }
         return $default;

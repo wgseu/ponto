@@ -18,7 +18,7 @@
     },
     "require": {
         "php": ">=5.3.0",
-        "fpdo/fluentpdo": "1.1.*",
+        "fpdo/fluentpdo": "1.1.1",
         "sybio/image-workshop": "@stable",
         "phpmailer/phpmailer": "~5.2",
         "mazinsw/nfe-api": "@stable",

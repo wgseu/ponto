@@ -215,7 +215,7 @@ class ZPais
 
     /**
      * Informa a moeda principal do país
-     * @return \MZ\Wallet\Moeda The object fetched from database
+     * @return ZMoeda The object fetched from database
      */
     public function findMoedaID()
     {

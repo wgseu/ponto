@@ -32,6 +32,7 @@ $erro = array();
 if ($_POST) {
     $cliente = new ZCliente($_POST);
     $cliente->setImagem(null);
+    $cliente->setSlogan(null);
     $aceitar = $_POST['aceitar'];
     try {
         if ($aceitar != 'true') {

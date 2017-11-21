@@ -40,6 +40,7 @@ if ($_POST) {
         $cliente->setTipo($old_cliente->getTipo());
         $cliente->setAcionistaID($old_cliente->getAcionistaID());
         $cliente->setLimiteCompra($old_cliente->getLimiteCompra());
+        $cliente->setSlogan($old_cliente->getSlogan());
 
         if ($cliente->getTipo() == ClienteTipo::JURIDICA) {
             $cliente->setCPF(\MZ\Util\Filter::unmask($cliente->getCPF(), _p('Mascara', 'CNPJ')));
@@ -67,7 +68,7 @@ if ($_POST) {
         $cliente = ZCliente::atualizar($cliente);
         $msg = 'Conta atualizada com sucesso!';
         if (is_output('json')) {
-            json(array('status' => 'ok', 'item' => $cliente->toArray(array('secreto', 'senha')), 'msg' => $msg));
+            json(array('status' => 'ok', 'item' => $cliente->toArray(array('secreto', 'senha', 'slogan')), 'msg' => $msg));
         }
         Thunder::success($msg, true);
         redirect('/conta/editar');

@@ -22,7 +22,7 @@
 require_once(dirname(dirname(__FILE__)) . '/app.php');
 
 need_permission(PermissaoNome::CADASTROPRODUTOS);
-$focusctrl = 'descricao';
+$focusctrl = 'codigobarras';
 $errors = array();
 if ($_POST) {
     $produto = new ZProduto($_POST);
@@ -58,10 +58,14 @@ if ($_POST) {
         break;
     }
 } else {
+    $unidade = ZUnidade::getPelaSigla('UN');
     $produto = new ZProduto();
+    $produto->setTipo(ProdutoTipo::COMPOSICAO);
     $produto->setVisivel('Y');
+    $produto->setCobrarServico('Y');
     $produto->setConteudo(1);
     $produto->setTempoPreparo(0);
+    $produto->setUnidadeID($unidade->getID());
 }
 $_categorias = ZCategoria::getTodas(true);
 $_unidades = ZUnidade::getTodas();

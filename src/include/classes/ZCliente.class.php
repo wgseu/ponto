@@ -1114,18 +1114,11 @@ class ZCliente
             $nome = null;
         }
         if (!is_null($nome)) {
-            $keywords = preg_split('/[\s,]+/', $nome);
-            foreach ($keywords as $word) {
-                $query = $query->where('CONCAT(c.nome, " ", COALESCE(c.sobrenome, "")) LIKE ?', '%'.$word.'%');
-                $query = $query->orderBy(
-                    'COALESCE(NULLIF(LOCATE(?, CONCAT(" ", c.nome, " ", COALESCE(c.sobrenome, ""))), 0), 65535) ASC',
-                    ' ' . $word
-                );
-                $query = $query->orderBy(
-                    'COALESCE(NULLIF(LOCATE(?, CONCAT(c.nome, " ", COALESCE(c.sobrenome, ""))), 0), 65535) ASC',
-                    $word
-                );
-            }
+            $query = \MZ\Database\Helper::buildSearch(
+                $nome,
+                'CONCAT(c.nome, " ", COALESCE(c.sobrenome, ""))',
+                $query
+            );
         }
         if (!is_null($email)) {
             $query = $query->where('c.email', $email);

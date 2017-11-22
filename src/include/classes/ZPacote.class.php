@@ -450,12 +450,11 @@ class ZPacote
                          ->where(array('pc.visivel' => 'Y', 'pc.grupoid' => $grupo_id))
                          ->orderBy('pc.id ASC');
         if (!is_null($busca) && strlen($busca) > 0) {
-            $keywords = preg_split('/[\s,]+/', $busca);
-            foreach ($keywords as $word) {
-                $query = $query->where('CONCAT(COALESCE(COALESCE(p.abreviacao, pr.abreviacao), ""), " ", COALESCE(p.descricao, pr.nome)) LIKE ?', '%'.$word.'%');
-                $query = $query->orderBy('COALESCE(NULLIF(LOCATE(?, CONCAT(" ", COALESCE(COALESCE(p.abreviacao, pr.abreviacao), ""), " ", COALESCE(p.descricao, pr.nome))), 0), 65535) ASC', ' '.$word);
-                $query = $query->orderBy('COALESCE(NULLIF(LOCATE(?, CONCAT(COALESCE(COALESCE(p.abreviacao, pr.abreviacao), ""), " ", COALESCE(p.descricao, pr.nome))), 0), 65535) ASC', $word);
-            }
+            $query = \MZ\Database\Helper::buildSearch(
+                $busca,
+                'CONCAT(COALESCE(COALESCE(p.abreviacao, pr.abreviacao), ""), " ", COALESCE(p.descricao, pr.nome))',
+                $query
+            );
         }
         if (!is_null($pacotes) && count($pacotes) > 0) {
             $query = $query->where('pc.associacaoid', $pacotes);

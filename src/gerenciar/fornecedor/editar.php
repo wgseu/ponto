@@ -27,7 +27,7 @@ if (is_null($fornecedor->getID())) {
     Thunder::warning('O fornecedor de id "'.$_GET['id'].'" não existe!');
     redirect('/gerenciar/fornecedor/');
 }
-$focusctrl = 'empresaid';
+$focusctrl = 'empresa';
 $errors = array();
 $old_fornecedor = $fornecedor;
 if ($_POST) {

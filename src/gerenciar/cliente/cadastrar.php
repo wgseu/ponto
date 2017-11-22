@@ -22,7 +22,7 @@
 require_once(dirname(dirname(__FILE__)) . '/app.php');
 
 need_permission(PermissaoNome::CADASTROCLIENTES, is_output('json'));
-$focusctrl = 'nome';
+$focusctrl = 'tipo';
 $errors = array();
 if ($_POST) {
     $cliente = new ZCliente($_POST);

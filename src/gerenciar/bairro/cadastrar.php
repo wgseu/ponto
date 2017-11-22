@@ -45,6 +45,7 @@ if ($_POST) {
 } else {
     $bairro = new ZBairro();
     $bairro->setDisponivel('Y');
+    $bairro->setCidadeID($__cidade__->getID());
 }
 $cidade = ZCidade::getPeloID($bairro->getCidadeID());
 $estado = ZEstado::getPeloID($cidade->getEstadoID());

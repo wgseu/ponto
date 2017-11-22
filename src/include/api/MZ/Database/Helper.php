@@ -163,4 +163,15 @@ abstract class Helper
         }
         return date('Y-m-d', $timestamp?:time());
     }
+
+    public static function buildSearch($search, $field, $query)
+    {
+        $keywords = preg_split('/[\s,]+/', $search);
+        foreach ($keywords as $word) {
+            $query = $query->where($field . ' LIKE ?', '%'.$word.'%');
+            $query = $query->orderBy('COALESCE(NULLIF(LOCATE(?, CONCAT(" ", ' . $field . ')), 0), 65535) ASC', ' '.$word);
+            $query = $query->orderBy('COALESCE(NULLIF(LOCATE(?, ' . $field . '), 0), 65535) ASC', $word);
+        }
+        return $query;
+    }
 }

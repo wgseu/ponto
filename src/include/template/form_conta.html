@@ -16,7 +16,7 @@
 <!--${$_cliente = ZCliente::getPeloID($conta->getClienteID())}-->
 <input type="hidden" id="clienteid" name="clienteid" data-nome="{$_cliente->getNomeCompleto()}" value="{$_cliente->getID()}">
 <div class="form-group col-lg-3 col-md-4 col-sm-6 col-xs-12">
-	<label for="cliente">Cliente: <span class="identifier">${\MZ\Util\Mask::phone($_cliente->getFone(1))}<span></label>
+	<label for="cliente"><span id="cliente-label">Cliente: </span><span class="identifier">${\MZ\Util\Mask::phone($_cliente->getFone(1))}<span></label>
 	<input type="text" id="cliente" class="form-control" value="{$_cliente->getNomeCompleto()}">
 </div>
 <div class="form-group col-lg-3 col-md-4 col-sm-6 col-xs-12">

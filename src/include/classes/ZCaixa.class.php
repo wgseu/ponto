@@ -157,17 +157,24 @@ class ZCaixa
 
     private static function validarCampos(&$caixa)
     {
+        global $__sistema__;
+
         $erros = array();
+        $old_caixa = self::getPeloID($caixa['id']);
         $caixa['descricao'] = strip_tags(trim($caixa['descricao']));
         if (strlen($caixa['descricao']) == 0) {
             $erros['descricao'] = 'A descrição não pode ser vazia';
         }
-        if (!is_numeric($caixa['serie'])) {
+        if (!$__sistema__->isFiscal()) {
+            $caixa['serie'] = is_null($old_caixa->getID())?1:$old_caixa->getSerie();
+        } elseif (!is_numeric($caixa['serie'])) {
             $erros['serie'] = 'A série não foi informada';
         } else {
             $caixa['serie'] = intval($caixa['serie']);
         }
-        if (!is_numeric($caixa['numeroinicial'])) {
+        if (!$__sistema__->isFiscal()) {
+            $caixa['numeroinicial'] = is_null($old_caixa->getID())?1:$old_caixa->getNumeroInicial();
+        } elseif (!is_numeric($caixa['numeroinicial'])) {
             $erros['numeroinicial'] = 'O número inicial não foi informado';
         } else {
             $caixa['numeroinicial'] = intval($caixa['numeroinicial']);

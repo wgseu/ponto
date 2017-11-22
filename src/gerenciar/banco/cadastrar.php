@@ -22,7 +22,7 @@
 require_once(dirname(dirname(__FILE__)) . '/app.php');
 
 need_permission(PermissaoNome::CADASTROBANCOS);
-$focusctrl = 'razaosocial';
+$focusctrl = 'numero';
 $errors = array();
 if ($_POST) {
     $banco = new ZBanco($_POST);

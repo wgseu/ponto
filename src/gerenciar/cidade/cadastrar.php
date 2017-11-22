@@ -44,6 +44,7 @@ if ($_POST) {
     }
 } else {
     $cidade = new ZCidade();
+    $cidade->setEstadoID($__estado__->getID());
 }
 $_estado = ZEstado::getPeloID($cidade->getEstadoID());
 $_paises = ZPais::getTodas();

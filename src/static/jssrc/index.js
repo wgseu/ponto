@@ -956,14 +956,17 @@ Gerenciar.cidade.init = function() {
     });
 };
 Gerenciar.cidade.initForm = function(focus_ctrl) {
+    if (focus_ctrl != undefined) {
+        $('#' + focus_ctrl).focus();
+    }
     $('#cep').each(function() {
         $(this).mask($(this).attr('mask'));
     });
-    if(focus_ctrl != undefined)
-        $('#' + focus_ctrl).focus();
-    $('#paisid').change(function(){
+    $('#paisid').change(function() {
+        Gerenciar.pais.setBandeira($(this));
         Gerenciar.estado.load($(this).find(':selected').val());
     });
+    Gerenciar.pais.setBandeira($('#paisid'));
 };
 Gerenciar.cidade.autocomplete = function(cidade_selector, estado_selector, use_data_value) {
     $(cidade_selector).autocomplete({
@@ -1817,6 +1820,17 @@ Gerenciar.conta.init = function() {
     Gerenciar.cliente.initField('#cliente', '#clienteid');
 };
 Gerenciar.conta.initForm = function(focus_ctrl) {
+    function tipoAlterado(tipo) {
+        if (tipo == '1') {
+            $('#cliente-label').text('Cliente: ');
+        } else {
+            $('#cliente-label').text('Fornecedor: ');
+        }
+    }
+    $('#tipo').change(function() {
+        tipoAlterado($(this).find(':selected').val());
+    });
+    tipoAlterado($('#tipo').find(':selected').val());
     $('#valor').autoNumeric('init');
     $('#acrescimo').autoNumeric('init');
     $('#multa').autoNumeric('init');

@@ -324,18 +324,7 @@ class ZComposicao
                          ->leftJoin('Produtos p ON p.id = c.produtoid')
                          ->where(array('c.ativa' => 'Y', 'c.composicaoid' => intval($composicao_id)));
         if (!is_null($busca) && strlen($busca) > 0) {
-            $keywords = preg_split('/[\s,]+/', $busca);
-            foreach ($keywords as $word) {
-                $query = $query->where('p.descricao LIKE ?', '%'.$word.'%');
-                $query = $query->orderBy(
-                    'COALESCE(NULLIF(LOCATE(?, CONCAT(" ", p.descricao)), 0), 65535) ASC',
-                    ' '.$word
-                );
-                $query = $query->orderBy(
-                    'COALESCE(NULLIF(LOCATE(?, p.descricao), 0), 65535) ASC',
-                    $word
-                );
-            }
+            $query = \MZ\Database\Helper::buildSearch($busca, 'p.descricao', $query);
         }
         if ($somente_selecionaveis) {
             $query = $query->where('c.tipo <> ?', ComposicaoTipo::COMPOSICAO);

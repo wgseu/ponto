@@ -915,12 +915,7 @@ class ZProduto
         if (is_numeric($busca)) {
             $query = $query->where('(p.id = ? OR p.codigobarras = ?)', intval($busca), $busca);
         } elseif ($busca != '') {
-            $keywords = preg_split('/[\s,]+/', $busca);
-            foreach ($keywords as $word) {
-                $query = $query->where('p.descricao LIKE ?', '%'.$word.'%');
-                $query = $query->orderBy('COALESCE(NULLIF(LOCATE(?, CONCAT(" ", p.descricao)), 0), 65535) ASC', ' '.$word);
-                $query = $query->orderBy('COALESCE(NULLIF(LOCATE(?, p.descricao), 0), 65535) ASC', $word);
-            }
+            $query = \MZ\Database\Helper::buildSearch($busca, 'p.descricao', $query);
         }
         $query = $query->orderBy('p.descricao ASC');
         return $query;

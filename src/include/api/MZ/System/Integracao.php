@@ -552,6 +552,10 @@ class Integracao extends \MZ\Database\Helper
     private static function query($condition = array(), $order = array())
     {
         $query = self::getDB()->from('Integracoes');
+        if (isset($condition['query'])) {
+            $query = self::buildSearch($condition['query'], 'CONCAT(nome, " ", descricao)', $query);
+            unset($condition['query']);
+        }
         return $query->where($condition);
     }
 

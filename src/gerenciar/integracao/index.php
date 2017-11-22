@@ -30,6 +30,7 @@ $limite = isset($_GET['limite'])?intval($_GET['limite']):10;
 if ($limite > 100 || $limite < 1) {
     $limite = 10;
 }
+$condition = array_intersect_key($_GET, array_flip(array('query')));
 $condition = Filter::query($condition);
 $order = Filter::orderBy(isset($_GET['ordem'])?$_GET['ordem']:'');
 $count = Integracao::count($condition);

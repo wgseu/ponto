@@ -1,6 +1,8 @@
 <?php
 require_once(dirname(dirname(dirname(__FILE__))) . '/app.php'); // main app file
 
+need_permission(PermissaoNome::ALTERARCONFIGURACOES, true);
+
 try {
     $outputs = array();
     $products = array();

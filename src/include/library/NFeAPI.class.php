@@ -334,12 +334,12 @@ class NFeAPI extends \NFe\Common\Ajuste
             $exception->getCode()
         );
         // Pode acontecer de uma nota já em contingência ficar pendente, ou seja
-        // não sabermos se ela foi autorizada no envio, assim consultaremos para saber o status
+        // não sabemos se ela foi autorizada no envio, assim consultaremos para saber o status
         // Para só depois tentar autorizar novamente
         if (!$_nota->isContingencia()) {
             // cancela a nota, mas como não tem protocolo será forçado uma consulta
-            // se a consulta não obtiver sucesso com a chave, o número será inutilizado
-            // caso a nota tenha sido autorizada, ela será autorizada normalmente
+            // se a consulta não obtiver sucesso com a chave, o número será inutilizado.
+            // Caso a nota tenha sido autorizada, ela será autorizada normalmente
             // mas depois será cancelada pois a acão da nota continua sendo CANCELAR
             $_nota->setMotivo('Falha no retorno do status, problema de rede');
             $_nota->setAcao(NotaAcao::CANCELAR);

@@ -925,6 +925,66 @@ function upload_document($inputname, $type, $name = null)
     );
 }
 
+function zip_add_folder($zip, $folder, $inside = null)
+{
+    // Create recursive directory iterator
+    /** @var SplFileInfo[] $files */
+    $files = new RecursiveIteratorIterator(
+        new RecursiveDirectoryIterator($folder),
+        RecursiveIteratorIterator::LEAVES_ONLY
+    );
+
+    foreach ($files as $name => $file)
+    {
+        // Skip directories (they would be added automatically)
+        if (!$file->isDir())
+        {
+            // Get real and relative path for current file
+            $filePath = $file->getRealPath();
+            $relativePath = substr($filePath, strlen($folder) + 1);
+            // Add current file to archive
+            $zip->addFile($filePath, $inside.$relativePath);
+        }
+    }
+}
+
+function zip_extract_folder($zip, $redirect)
+{
+    for ($i = 0; $i < $zip->numFiles; $i++) {
+        $name = $zip->getNameIndex($i);
+        $norm = str_replace('\\', '/', $name);
+        // Skip files not in $source
+        $skip = true;
+        foreach ($redirect as $source => $target) {
+            if (strpos($norm, "{$source}/") === 0) {
+                $skip = false;
+                break;
+            }
+        }
+        if ($skip) {
+            continue;
+        }
+
+        // Determine output filename (removing the $source prefix)
+        $file = $target.'/'.substr($norm, strlen($source) + 1);
+
+        // Create the directories if necessary
+        $dir = dirname($file);
+        if (!is_dir($dir)) {
+            xmkdir($dir, 0711);
+        }
+        // Read from Zip and write to disk
+        $fpr = $zip->getStream($name);
+        $fpw = fopen($file, 'w');
+        while ($data = fread($fpr, 1024)) {
+            fwrite($fpw, $data);
+        }
+        fclose($fpr);
+        fclose($fpw);
+        xchmod($file, 0644);
+    }
+}
+
 function create_zip($files = array(), $destination = '', $overwrite = false)
 {
     if (file_exists($destination) && !$overwrite) {

@@ -927,20 +927,23 @@ function upload_document($inputname, $type, $name = null)
 
 function zip_add_folder($zip, $folder, $inside = null)
 {
+    if (!is_dir($folder)) {
+        return;
+    }
     // Create recursive directory iterator
     /** @var SplFileInfo[] $files */
     $files = new RecursiveIteratorIterator(
         new RecursiveDirectoryIterator($folder),
         RecursiveIteratorIterator::LEAVES_ONLY
     );
-
-    foreach ($files as $name => $file)
-    {
+    $folder = str_replace('\\', '/', $folder);
+    $inside = str_replace('\\', '/', $inside);
+    foreach ($files as $name => $file) {
         // Skip directories (they would be added automatically)
-        if (!$file->isDir())
-        {
+        if (!$file->isDir()) {
             // Get real and relative path for current file
             $filePath = $file->getRealPath();
+            $filePath = str_replace('\\', '/', $name);
             $relativePath = substr($filePath, strlen($folder) + 1);
             // Add current file to archive
             $zip->addFile($filePath, $inside.$relativePath);

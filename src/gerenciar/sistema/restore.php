@@ -4,10 +4,10 @@ require_once(dirname(dirname(dirname(__FILE__))) . '/app.php'); // main app file
 need_owner(true);
 
 try {
-	$inputname = 'zipfile';
-	if (!isset($_FILES[$inputname])) {
-        throw new \Exception('Nenhum dados foi enviado', 401);		
-	}
+    $inputname = 'zipfile';
+    if (!isset($_FILES[$inputname])) {
+        throw new \Exception('Nenhum dados foi enviado', 401);
+    }
     $file = $_FILES[$inputname];
     if (!$file || $file['error'] === UPLOAD_ERR_NO_FILE) {
         throw new \Exception('Nenhum arquivo foi enviado', 401);
@@ -18,20 +18,20 @@ try {
     $zip = new ZipArchive;
     $zip->open($file['tmp_name']);
 
-	zip_extract_folder(
-		$zip,
-		array(
-			'Site/Upload' => WWW_ROOT . '/static/upload',
-			'Site/Documents' => DOC_ROOT,
-			'Site/Images/header' => IMG_ROOT . '/header',
-			'Site/Images/patrimonio' => IMG_ROOT . '/patrimonio'
-		)
-	);
+    zip_extract_folder(
+        $zip,
+        array(
+            'Site/Upload' => WWW_ROOT . '/static/upload',
+            'Site/Documents' => DOC_ROOT,
+            'Site/Images/header' => IMG_ROOT . '/header',
+            'Site/Images/patrimonio' => IMG_ROOT . '/patrimonio'
+        )
+    );
 
-	// Close and release file
-	$zip->close();
+    // Close and release file
+    $zip->close();
 
-	json(null, array());
+    json(null, array());
 } catch (\Exception $e) {
-	json($e->getMessage());
+    json($e->getMessage());
 }

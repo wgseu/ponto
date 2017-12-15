@@ -1,48 +1,38 @@
-server {
+root "%PUBLIC_PATH%";
 
-    listen       80;
-    listen       8080;
-    
-    server_name  grandchef.localhost www.grandchef.localhost;
-    root         %PUBLIC_PATH%;
+location / {
+    try_files $uri $uri.html $uri/ @extensionless-php;
+    index index.php index.html index.htm;
+}
 
-    access_log   logs/grandchef.localhost-access.log;
-    error_log    logs/grandchef.localhost-error.log;
+location @extensionless-php {
+    rewrite ^(.*)$ $1.php last;
+}
 
-    location / {
-        try_files $uri $uri.html $uri/ @extensionless-php;
-        index index.php index.html index.htm;
-    }
+location ~* \.(ogg|ogv|svg|svgz|eot|otf|woff|mp4|mp3|ttf|css|rss|atom|js|jpg|jpeg|gif|png|ico|zip|tgz|gz|rar|bz2|doc|xls|exe|ppt|tar|mid|midi|wav|bmp|rtf)$ {
+    access_log off;
+    expires max;
+    add_header Pragma public;
+    add_header Cache-Control "public";
+    try_files $uri @fallback;
+}
 
-    location @extensionless-php {
-        rewrite ^(.*)$ $1.php last;
-    }
+location @fallback {
+    rewrite ^/static/img/produto/(\d+).png$ /produto/imagem/download.php?produto=$1 last;
+    rewrite ^/static/img/categoria/(\d+).png$ /categoria/imagem/download.php?categoria=$1 last;
+    rewrite ^/static/img/cliente/(\d+).png$ /conta/imagem/download.php?cliente=$1 last;
+}
 
-    location ~* \.(ogg|ogv|svg|svgz|eot|otf|woff|mp4|mp3|ttf|css|rss|atom|js|jpg|jpeg|gif|png|ico|zip|tgz|gz|rar|bz2|doc|xls|exe|ppt|tar|mid|midi|wav|bmp|rtf)$ {
-        access_log off;
-        expires max;
-        add_header Pragma public;
-        add_header Cache-Control "public";
-        try_files $uri @fallback;
-    }
+location ~ \.php$ {
+    fastcgi_split_path_info ^(.+\.php)(/.+)$;
+    fastcgi_pass    127.0.0.1:9456;
+    fastcgi_index  index.php;
+    fastcgi_param   SCRIPT_FILENAME  $document_root$fastcgi_script_name;
+    include         fastcgi_params;
+}
 
-    location @fallback {
-        rewrite ^/static/img/produto/(\d+).png$ /produto/imagem/download.php?produto=$1 last;
-        rewrite ^/static/img/categoria/(\d+).png$ /categoria/imagem/download.php?categoria=$1 last;
-        rewrite ^/static/img/cliente/(\d+).png$ /conta/imagem/download.php?cliente=$1 last;
-    }
-
-    location ~ \.php$ {
-        fastcgi_split_path_info ^(.+\.php)(/.+)$;
-        fastcgi_pass    127.0.0.1:9456;
-        fastcgi_index  index.php;
-        fastcgi_param   SCRIPT_FILENAME  $document_root$fastcgi_script_name;
-        include         fastcgi_params;
-    }
-
-    # deny access to .htaccess files, if Apache's document root
-    # concurs with nginx's one
-    location ~ /(\.ht|include/|static/doc/cert/) {
-       deny  all;
-    }
+# deny access to .htaccess files, if Apache's document root
+# concurs with nginx's one
+location ~ /(\.ht|include/|static/doc/cert/) {
+   deny  all;
 }

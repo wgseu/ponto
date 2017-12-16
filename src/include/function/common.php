@@ -718,6 +718,9 @@ function register_device($device, $serial)
         throw new Exception("Não há dados na tabela do sistema");
     }
     $tablet_count = ZDispositivo::getCountDoTablet();
+    if ($tablet_count > $__sistema__->getTablets()) {
+        throw new Exception("Limite de Tablets excedido, remova os tablets excedentes para continuar");
+    }
     if (is_null($dispositivo->getID()) && $tablet_count >= $__sistema__->getTablets()) {
         // tenta sobrescrever um tablet não validado
         $dispositivo = ZDispositivo::getNaoValidado();

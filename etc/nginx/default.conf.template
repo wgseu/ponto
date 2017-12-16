@@ -24,6 +24,7 @@ location @fallback {
 }
 
 location ~ \.php$ {
+    try_files $uri /erro/404.php =404;
     fastcgi_split_path_info ^(.+\.php)(/.+)$;
     fastcgi_pass    127.0.0.1:9456;
     fastcgi_index  index.php;

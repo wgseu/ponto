@@ -38,6 +38,8 @@ try {
     $estado = null;
     if ($cancelado == 'Y') {
         $estado = 'Cancelado';
+    } elseif ($cancelado == 'N') {
+        $estado = 'Valido';
     }
     $tipo = 'Produtos';
     if ($servicos == 'Y') {

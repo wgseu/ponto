@@ -9,3 +9,6 @@
 /src/include/vendor
 /*.lock
 /build
+etc/nginx/grandchef.location
+storage/*
+.env

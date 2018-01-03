@@ -109,7 +109,7 @@
 									<a href="/gerenciar/cartao/editar?id={$_cartao->getID()}" title="Editar cartão '{$_cartao->getDescricao()}'">Cartão {$_cartao->getDescricao()}</a>
 <!--{/if}-->
 								</strong>
-<!--${$_carteira = ZCarteira::getPeloID($pagamento->getCarteiraID())}-->
+<!--${$_carteira = \MZ\Wallet\Carteira::findByID($pagamento->getCarteiraID())}-->
 								<small><a href="/gerenciar/carteira/editar?id={$_carteira->getID()}" title="Editar carteira '{$_carteira->getDescricao()}'">{$_carteira->getDescricao()}</a></small></td>
 <!--${$_funcionario = ZFuncionario::getPeloID($pagamento->getFuncionarioID())}-->
 <!--${$_cliente = ZCliente::getPeloID($_funcionario->getClienteID())}-->

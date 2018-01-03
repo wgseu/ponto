@@ -21,17 +21,23 @@
 */
 require_once(dirname(dirname(__FILE__)) . '/app.php');
 
+use MZ\Wallet\Carteira;
+use MZ\Wallet\Banco;
+use MZ\Util\Filter;
+
 need_permission(PermissaoNome::CADASTROCARTEIRAS);
 
-$_banco = ZBanco::getPeloID($_GET['bancoid']);
-
-$count = ZCarteira::getCount($_GET['query'], $_banco->getID(), $_GET['tipo']);
-list($pagesize, $offset, $pagestring) = pagestring($count, 10);
-$carteiras = ZCarteira::getTodas($_GET['query'], $_banco->getID(), $_GET['tipo'], $offset, $pagesize);
-
-$tipos = array(
-    'Bancaria' => 'Bancária',
-    'Financeira' => 'Financeira',
+$_banco = Banco::findByID($_GET['bancoid']);
+$condition = array(
+	'query' => $_GET['query'],
+	'bancoid' => $_banco->getID(),
+	'tipo' => $_GET['tipo']
 );
+$condition = Filter::query($condition);
+$count = Carteira::count($condition);
+list($pagesize, $offset, $pagestring) = pagestring($count, 10);
+$carteiras = Carteira::findAll($condition, array(), $pagesize, $offset);
+
+$tipos = Carteira::getTipoOptions();
 
 include template('gerenciar_carteira_index');

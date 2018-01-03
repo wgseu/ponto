@@ -21,8 +21,10 @@
 */
 require_once(dirname(dirname(__FILE__)) . '/app.php');
 
+use MZ\Wallet\Carteira;
+
 need_permission(PermissaoNome::CADASTROCARTEIRAS);
-$carteira = ZCarteira::getPeloID($_GET['id']);
+$carteira = Carteira::findByID($_GET['id']);
 if (is_null($carteira->getID())) {
     Thunder::warning('A carteira de id "'.$_GET['id'].'" não existe!');
     redirect('/gerenciar/carteira/');
@@ -31,10 +33,10 @@ $focusctrl = 'descricao';
 $errors = array();
 $old_carteira = $carteira;
 if ($_POST) {
-    $carteira = new ZCarteira($_POST);
+    $carteira = new Carteira($_POST);
     try {
-        $carteira->setID($old_carteira->getID());
-        $carteira = ZCarteira::atualizar($carteira);
+        $carteira->filter($old_carteira);
+        $carteira->update();
         Thunder::success('Carteira "'.$carteira->getDescricao().'" atualizada com sucesso!', true);
         redirect('/gerenciar/carteira/');
     } catch (ValidationException $e) {
@@ -48,5 +50,5 @@ if ($_POST) {
         break;
     }
 }
-$_banco = ZBanco::getPeloID($carteira->getBancoID());
+$_banco = $carteira->findBancoID();
 include template('gerenciar_carteira_editar');

@@ -21,6 +21,8 @@
 */
 require_once(dirname(dirname(__FILE__)) . '/app.php');
 
+use MZ\Wallet\Carteira;
+
 need_permission(PermissaoNome::CADASTROFORMASPAGTO);
 $forma_pagto = ZFormaPagto::getPeloID($_GET['id']);
 if (is_null($forma_pagto->getID())) {
@@ -52,5 +54,5 @@ if ($_POST) {
         break;
     }
 }
-$_carteiras = ZCarteira::getTodas();
+$_carteiras = Carteira::findAll();
 include template('gerenciar_forma_pagto_editar');

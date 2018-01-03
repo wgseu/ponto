@@ -8,6 +8,8 @@ class InstantiationTest extends \PHPUnit_Framework_TestCase
 
     public function testClasses()
     {
+        $banco = new \MZ\Wallet\Banco();
+        $carteira = new \MZ\Wallet\Carteira();
         $comanda = new \MZ\Sale\Comanda();
     }
 
@@ -16,8 +18,6 @@ class InstantiationTest extends \PHPUnit_Framework_TestCase
         $mesa = new \ZMesa();
         $sessao = new \ZSessao();
         $caixa = new \ZCaixa();
-        $banco = new \ZBanco();
-        $carteira = new \ZCarteira();
         $forma_pagto = new \ZFormaPagto();
         $cartao = new \ZCartao();
         $funcao = new \ZFuncao();

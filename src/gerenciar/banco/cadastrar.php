@@ -21,14 +21,18 @@
 */
 require_once(dirname(dirname(__FILE__)) . '/app.php');
 
+use MZ\Wallet\Banco;
+
 need_permission(PermissaoNome::CADASTROBANCOS);
 $focusctrl = 'numero';
 $errors = array();
+$banco = new Banco();
+$old_banco = $banco;
 if ($_POST) {
-    $banco = new ZBanco($_POST);
+    $banco = new Banco($_POST);
     try {
-        $banco->setID(null);
-        $banco = ZBanco::cadastrar($banco);
+        $banco->filter($old_banco);
+        $banco->insert();
         Thunder::success('Banco "'.$banco->getRazaoSocial().'" cadastrado com sucesso!', true);
         redirect('/gerenciar/banco/');
     } catch (ValidationException $e) {
@@ -41,7 +45,5 @@ if ($_POST) {
         Thunder::error($value);
         break;
     }
-} else {
-    $banco = new ZBanco();
 }
 include template('gerenciar_banco_cadastrar');

@@ -21,8 +21,10 @@
 */
 require_once(dirname(dirname(__FILE__)) . '/app.php');
 
+use MZ\Wallet\Banco;
+
 need_permission(PermissaoNome::CADASTROBANCOS);
-$banco = ZBanco::getPeloID($_GET['id']);
+$banco = Banco::findByID($_GET['id']);
 if (is_null($banco->getID())) {
     Thunder::warning('O banco de id "'.$_GET['id'].'" não existe!');
     redirect('/gerenciar/banco/');
@@ -31,10 +33,10 @@ $focusctrl = 'razaosocial';
 $errors = array();
 $old_banco = $banco;
 if ($_POST) {
-    $banco = new ZBanco($_POST);
+    $banco = new Banco($_POST);
     try {
-        $banco->setID($old_banco->getID());
-        $banco = ZBanco::atualizar($banco);
+        $banco->filter($old_banco);
+        $banco->update();
         Thunder::success('Banco "'.$banco->getRazaoSocial().'" atualizado com sucesso!', true);
         redirect('/gerenciar/banco/');
     } catch (ValidationException $e) {

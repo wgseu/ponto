@@ -57,7 +57,7 @@
 							<tr ${$carteira->isAtiva()?'':'class="active"'}>
 								<td>{$carteira->getDescricao()}</td>
 								<td>{$tipos[$carteira->getTipo()]}</td>
-<!--${$_banco = ZBanco::getPeloID($carteira->getBancoID())}-->
+<!--${$_banco = $carteira->findBancoID()}-->
 								<td><a href="/gerenciar/banco/editar?id={$_banco->getID()}" title="Editar banco '{$_banco->getRazaoSocial()}'">{$_banco->getRazaoSocial()}</a></td>
 								<td>{$carteira->getConta()}</td>
 								<td>{$carteira->getAgencia()}</td>

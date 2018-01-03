@@ -1,9 +1,10 @@
 <?php
 require_once(dirname(dirname(dirname(__FILE__))) . '/app.php');
 
-need_permission(PermissaoNome::ALTERARCONFIGURACOES, true);
+need_permission(PermissaoNome::BACKUP, true);
 
 try {
+    set_time_limit(0);
     // Prepare File
     $file = tempnam("tmp", "zip");
     $zip = new ZipArchive();

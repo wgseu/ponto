@@ -21,15 +21,17 @@
 */
 require_once(dirname(dirname(__FILE__)) . '/app.php');
 
+use MZ\Wallet\Carteira;
+
 need_permission(PermissaoNome::CADASTROCARTEIRAS);
 $id = $_GET['id'];
-$carteira = ZCarteira::getPeloID($id);
+$carteira = Carteira::findByID($id);
 if (is_null($carteira->getID())) {
     Thunder::warning('A carteira de id "'.$id.'" não existe!');
     redirect('/gerenciar/carteira/');
 }
 try {
-    ZCarteira::excluir($id);
+    $carteira->delete();
     Thunder::success('Carteira "' . $carteira->getDescricao() . '" excluída com sucesso!', true);
 } catch (Exception $e) {
     Thunder::error('Não foi possível excluir a carteira "' . $carteira->getDescricao() . '"!');

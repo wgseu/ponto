@@ -21,14 +21,18 @@
 */
 require_once(dirname(dirname(__FILE__)) . '/app.php');
 
+use MZ\Wallet\Carteira;
+
 need_permission(PermissaoNome::CADASTROCARTEIRAS);
 $focusctrl = 'descricao';
 $errors = array();
+$carteira = new Carteira();
+$old_carteira = $carteira;
 if ($_POST) {
-    $carteira = new ZCarteira($_POST);
+    $carteira = new Carteira($_POST);
     try {
-        $carteira->setID(null);
-        $carteira = ZCarteira::cadastrar($carteira);
+        $carteira->filter($old_carteira);
+        $carteira->insert();
         Thunder::success('Carteira "'.$carteira->getDescricao().'" cadastrada com sucesso!', true);
         redirect('/gerenciar/carteira/');
     } catch (ValidationException $e) {
@@ -42,8 +46,7 @@ if ($_POST) {
         break;
     }
 } else {
-    $carteira = new ZCarteira();
     $carteira->setAtiva('Y');
 }
-$_banco = ZBanco::getPeloID($carteira->getBancoID());
+$_banco = $carteira->findBancoID();
 include template('gerenciar_carteira_cadastrar');

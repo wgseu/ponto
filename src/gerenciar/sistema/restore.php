@@ -1,9 +1,10 @@
 <?php
 require_once(dirname(dirname(dirname(__FILE__))) . '/app.php'); // main app file
 
-need_owner(true);
+need_permission(PermissaoNome::RESTAURACAO, true);
 
 try {
+    set_time_limit(0);
     $inputname = 'zipfile';
     if (!isset($_FILES[$inputname])) {
         throw new \Exception('Nenhum dados foi enviado', 401);

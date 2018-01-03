@@ -21,16 +21,18 @@
 */
 require_once(dirname(dirname(__FILE__)) . '/app.php');
 
+use MZ\Wallet\Banco;
+
 need_permission(PermissaoNome::CADASTROBANCOS, is_output('json'));
 
 $limite = trim($_GET['limite']);
 if (!is_numeric($limite) || $limite > 100 || $limite < 1) {
     $limite = 10;
 }
-
-$count = ZBanco::getCount($_GET['query']);
+$condition = array('query' => $_GET['query']);
+$count = Banco::count($condition);
 list($pagesize, $offset, $pagestring) = pagestring($count, $limite);
-$bancos = ZBanco::getTodos($_GET['query'], $offset, $pagesize);
+$bancos = Banco::findAll($condition, array(), $pagesize, $offset);
 
 if (is_output('json')) {
     $_bancos = array();

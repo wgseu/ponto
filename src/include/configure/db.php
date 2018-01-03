@@ -1,9 +1,14 @@
 <?php
 
+$content = file_get_contents(dirname(dirname(dirname(__DIR__))) . '/.env');
+# remove comments
+$content = preg_replace('/[ \t]*#[^\n]*\n/', '', $content);
+$env  = parse_ini_string($content, true, INI_SCANNER_RAW);
+
 $value = array (
-	'host' => '127.0.0.1',
-	'port' => '6033',
-	'user' => 'grandweb',
-	'pass' => 'Pd#@5+*-Las83jd564',
-	'name' => 'GrandChef',
+	'host' => $env['MYSQL_HOST'],
+	'port' => $env['MYSQL_PORT'],
+	'user' => $env['MYSQL_USER'],
+	'pass' => $env['MYSQL_PASSWORD'],
+	'name' => $env['MYSQL_DATABASE']
 );

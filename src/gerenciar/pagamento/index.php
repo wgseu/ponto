@@ -21,6 +21,8 @@
 */
 require_once(dirname(dirname(__FILE__)) . '/app.php');
 
+use MZ\Wallet\Carteira;
+
 need_permission(PermissaoNome::PAGAMENTO);
 
 $data_inicio = date_create_from_format('d/m/Y', $_GET['inicio']);
@@ -83,7 +85,7 @@ $_cartao_names = array();
 foreach ($cartoes as $cartao) {
     $_cartao_names[$cartao->getID()] = $cartao->getDescricao();
 }
-$carteiras = ZCarteira::getTodas();
+$carteiras = Carteira::findAll();
 $_carteira_names = array();
 foreach ($carteiras as $carteira) {
     $_carteira_names[$carteira->getID()] = $carteira->getDescricao();

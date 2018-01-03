@@ -21,6 +21,8 @@
 */
 require_once(dirname(dirname(__FILE__)) . '/app.php');
 
+use MZ\Wallet\Carteira;
+
 need_permission(PermissaoNome::CADASTROCARTOES);
 $cartao = ZCartao::getPeloID($_GET['id']);
 if (is_null($cartao->getID())) {
@@ -53,6 +55,6 @@ if ($_POST) {
         break;
     }
 }
-$_carteiras = ZCarteira::getTodas();
+$_carteiras = Carteira::findAll();
 $_imagens = ZCartao::getImages();
 include template('gerenciar_cartao_editar');

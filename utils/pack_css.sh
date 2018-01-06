@@ -1,6 +1,6 @@
-@echo off
+#!/bin/sh
 
-REM Site principal
+# Site principal
 cat ../resources/assets/css/bootstrap.css  > index.bundle.css
 cat ../resources/assets/css/agency.css >> index.bundle.css
 cat ../resources/assets/css/index.css >> index.bundle.css
@@ -10,7 +10,7 @@ cat ../resources/assets/css/jquery.thunder.css >> index.bundle.css
 java -jar packer/yuicompressor.jar index.bundle.css -o ../public/static/css/index.min.css --charset utf-8
 rm -f index.bundle.css
 
-REM Gerenciamento
+# Gerenciamento
 cat ../resources/assets/css/bootstrap.css  > manager.bundle.css
 cat ../resources/assets/css/font-awesome.css >> manager.bundle.css
 cat ../resources/assets/css/animate.css >> manager.bundle.css

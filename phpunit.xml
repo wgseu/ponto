@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <phpunit 
-        bootstrap="src/include/vendor/autoload.php"
+        bootstrap="public/include/vendor/autoload.php"
         convertErrorsToExceptions="true"
         convertNoticesToExceptions="true"
         convertWarningsToExceptions="true"
@@ -12,10 +12,10 @@
     </testsuites>
     <filter>
         <whitelist processUncoveredFilesFromWhitelist="true">
-            <directory suffix=".php">src/include/api</directory>
-            <directory suffix=".php">src/include/library</directory>
-            <directory suffix=".php">src/include/classes</directory>
-            <directory suffix=".php">src/include/function</directory>
+            <directory suffix=".php">public/include/api</directory>
+            <directory suffix=".php">public/include/library</directory>
+            <directory suffix=".php">public/include/classes</directory>
+            <directory suffix=".php">public/include/function</directory>
         </whitelist>
     </filter>
     <php>

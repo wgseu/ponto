@@ -14,7 +14,7 @@
         }
     ],
     "config": {
-        "vendor-dir": "src/include/vendor"
+        "vendor-dir": "public/include/vendor"
     },
     "require": {
         "php": ">=5.3.0",
@@ -36,15 +36,15 @@
     },
     "autoload": {
         "classmap": [
-            "src/include/api",
-            "src/include/classes",
-            "src/include/library"
+            "public/include/api",
+            "public/include/classes",
+            "public/include/library"
         ],
         "files": [
-            "src/include/function/common.php",
-            "src/include/function/configure.php",
-            "src/include/function/mailer.php",
-            "src/include/function/template.php"
+            "public/include/function/common.php",
+            "public/include/function/configure.php",
+            "public/include/function/mailer.php",
+            "public/include/function/template.php"
         ]
     },
     "scripts": {

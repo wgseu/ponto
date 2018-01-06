@@ -1,6 +1,9 @@
 @echo OFF
-set PATH=%PATH%;%~pd0..\src\include\vendor\bin
+SET OLD_PATH=%PATH%
+set PATH=%PATH%;%~pd0..\public\include\vendor\bin
 
 cd ..
-phpmd src\include\api text cleancode,codesize,controversial,design,unusedcode > utils\tmp\analisys.txt
+phpmd public\include\api text cleancode,codesize,controversial,design,unusedcode > utils\tmp\analisys.txt
 cd %~pd0
+
+SET PATH=%OLD_PATH%

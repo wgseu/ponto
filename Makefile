@@ -27,19 +27,19 @@ init:
 	@echo "Initializing..."
 
 doc:
-	@docker-compose exec -T php ./src/include/vendor/bin/apigen generate app --destination docs/api
+	@docker-compose exec -T php ./public/include/vendor/bin/apigen generate app --destination docs/api
 	@make -s reset
 
 clean:
 	@rm -Rf storage/db/mysql
 	@rm -Rf $(MYSQL_DUMPS_DIR)
-	@rm -Rf src/include/vendor
+	@rm -Rf public/include/vendor
 	@rm -Rf composer.lock
 	@rm -Rf docs/api
 
 check:
 	@echo "Checking the standard code..."
-	@docker-compose exec -T php ./src/include/vendor/bin/phpcs --standard=PSR2 src/include/api src/include/classes src/include/function src/include/library src/app src/categoria src/conta src/contato src/gerenciar src/produto src/sobre
+	@docker-compose exec -T php ./public/include/vendor/bin/phpcs --standard=PSR2 public/include/api public/include/classes public/include/function public/include/library public/app public/categoria public/conta public/contato public/gerenciar public/produto public/sobre
 
 update:
 	@docker run --rm -v $(shell pwd):/app composer update
@@ -49,7 +49,7 @@ autoload:
 
 start: init
 	@cp etc/nginx/default.conf.template etc/nginx/grandchef.location
-	@sed -i "s/\"%PUBLIC_PATH%\"/\/var\/www\/html\/src/g" etc/nginx/grandchef.location 
+	@sed -i "s/\"%PUBLIC_PATH%\"/\/var\/www\/html\/public/g" etc/nginx/grandchef.location 
 	@sed -i "s/127.0.0.1:9456;/php:9000;/g" etc/nginx/grandchef.location
 	docker-compose up -d
 
@@ -80,7 +80,7 @@ restore:
 	@docker exec -i $(shell docker-compose ps -q gmysqldb) mysql -u"$(MYSQL_ROOT_USER)" -p"$(MYSQL_ROOT_PASSWORD)" < $(MYSQL_DUMPS_DIR)/db.sql 2>/dev/null
 
 test:
-	@docker-compose exec -T php ./src/include/vendor/bin/phpunit --colors=always --configuration ./ --no-coverage ./tests
+	@docker-compose exec -T php ./public/include/vendor/bin/phpunit --colors=always --configuration ./ --no-coverage ./tests
 	@make -s reset
 
 class:

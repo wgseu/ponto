@@ -1,6 +1,9 @@
 @echo OFF
-set PATH=%PATH%;%~pd0..\src\include\vendor\bin
+SET OLD_PATH=%PATH%
+set PATH=%PATH%;%~pd0..\public\include\vendor\bin
 
 cd ..
-phpcbf --standard=psr2 src\include\api src\include\classes src\include\function src\include\library src\app src\categoria src\conta src\contato src\gerenciar src\produto src\sobre
+phpcbf --standard=psr2 public\include\api public\include\classes public\include\function public\include\library public\app public\categoria public\conta public\contato public\gerenciar public\produto public\sobre
 cd %~pd0
+
+SET PATH=%OLD_PATH%

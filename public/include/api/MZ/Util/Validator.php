@@ -236,6 +236,6 @@ class Validator
         $mask = _p('Mascara', 'CEP');
         $cep = Filter::unmask($cep, $mask);
         $mask_len = strlen(Filter::digits($mask));
-        return strlen($cep) == strlen($mask);
+        return strlen($cep) == $mask_len;
     }
 }

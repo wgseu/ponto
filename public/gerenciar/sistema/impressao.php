@@ -41,6 +41,7 @@ $opcoes_impressao = array(
     array('section' => 'Imprimir', 'key' => 'Pacotes.Agrupados', 'default' => true, 'title' => 'Imprimir pacotes agrupados'),
     array('section' => 'Imprimir', 'key' => 'Caixa.Fechamento', 'default' => true, 'title' => 'Imprimir fechamento de caixa'),
     array('section' => 'Cupom'   , 'key' => 'Perguntar', 'default' => false, 'title' => 'Exibir pegunta de impressão'),
+    array('section' => 'Imprimir', 'key' => 'Cozinha.Separar', 'default' => false, 'title' => 'Imprimir linha separadora de serviços'),
 );
 if ($_POST) {
     try {

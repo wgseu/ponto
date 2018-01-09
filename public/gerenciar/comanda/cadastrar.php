@@ -21,14 +21,18 @@
 */
 require_once(dirname(dirname(__FILE__)) . '/app.php');
 
+use MZ\Sale\Comanda;
+
 need_permission(PermissaoNome::CADASTROCOMANDAS);
 $focusctrl = 'nome';
 $errors = array();
+$comanda = new Comanda();
 if ($_POST) {
-    $comanda = new \MZ\Sale\Comanda($_POST);
+    $old_comanda = $comanda;
+    $comanda = new Comanda($_POST);
     try {
-        $comanda->setID(null);
-        $comanda = \MZ\Sale\Comanda::cadastrar($comanda);
+        $comanda->filter($old_comanda);
+        $comanda->insert();
         Thunder::success('Comanda "'.$comanda->getNome().'" cadastrada com sucesso!', true);
         redirect('/gerenciar/comanda/');
     } catch (ValidationException $e) {
@@ -42,8 +46,7 @@ if ($_POST) {
         break;
     }
 } else {
-    $comanda = new \MZ\Sale\Comanda();
-    $comanda->setID(\MZ\Sale\Comanda::getProximoID());
+    $comanda->setID(Comanda::getNextID());
     $comanda->setNome('Comanda ' . $comanda->getID());
     $comanda->setAtiva('Y');
 }

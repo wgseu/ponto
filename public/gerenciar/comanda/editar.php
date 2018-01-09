@@ -21,8 +21,10 @@
 */
 require_once(dirname(dirname(__FILE__)) . '/app.php');
 
+use MZ\Sale\Comanda;
+
 need_permission(PermissaoNome::CADASTROCOMANDAS);
-$comanda = \MZ\Sale\Comanda::findByID($_GET['id']);
+$comanda = Comanda::findByID($_GET['id']);
 if (is_null($comanda->getID())) {
     Thunder::warning('A comanda de id "'.$_GET['id'].'" não existe!');
     redirect('/gerenciar/comanda/');
@@ -31,10 +33,10 @@ $focusctrl = 'nome';
 $errors = array();
 $old_comanda = $comanda;
 if ($_POST) {
-    $comanda = new \MZ\Sale\Comanda($_POST);
+    $comanda = new Comanda($_POST);
     try {
-        $comanda->setID($old_comanda->getID());
-        $comanda = \MZ\Sale\Comanda::atualizar($comanda);
+        $comanda->filter($old_comanda);
+        $comanda->update();
         Thunder::success('Comanda "'.$comanda->getNome().'" atualizada com sucesso!', true);
         redirect('/gerenciar/comanda/');
     } catch (ValidationException $e) {

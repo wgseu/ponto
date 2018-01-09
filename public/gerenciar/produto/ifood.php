@@ -280,7 +280,7 @@ if (isset($_GET['action'])) {
         $filename = 'ifood.ini';
         header('Content-Type: text/plain');
         header("Content-Disposition: attachment; filename*=UTF-8''" . rawurlencode($filename));
-        echo to_ini($ini);
+        echo mb_convert_encoding(to_ini($ini), 'UTF-8', 'Windows-1252');
         exit;
     }
 }

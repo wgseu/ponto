@@ -21,11 +21,18 @@
 */
 require_once(dirname(dirname(__FILE__)) . '/app.php');
 
+use MZ\Sale\Comanda;
+
 need_permission(PermissaoNome::CADASTROCOMANDAS);
 
-$count = \MZ\Sale\Comanda::getCount($_GET['ativa'], $_GET['query']);
+$condition = array();
+$condition['ativa'] = isset($_GET['ativa'])?$_GET['ativa']:null;
+$condition['query'] = isset($_GET['query'])?$_GET['query']:null;
+$condition = \MZ\Util\Filter::query($condition);
+
+$count = Comanda::count($condition);
 list($pagesize, $offset, $pagestring) = pagestring($count, 10);
-$comandas = \MZ\Sale\Comanda::getTodas($_GET['ativa'], $_GET['query'], $offset, $pagesize);
+$comandas = Comanda::findAll($condition, array(), $pagesize, $offset);
 
 $ativas = array(
     'Y' => 'Ativas',

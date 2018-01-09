@@ -162,11 +162,21 @@ class Comanda extends \MZ\Database\Helper
             $this->setNome($comanda['nome']);
         }
         if (!isset($comanda['ativa'])) {
-            $this->setAtiva(null);
+            $this->setAtiva('N');
         } else {
             $this->setAtiva($comanda['ativa']);
         }
         return $this;
+    }
+
+    /**
+     * Convert this instance into array associated key -> value with only public fields
+     * @return array All public field and values into array format
+     */
+    public function publish()
+    {
+        $comanda = parent::publish();
+        return $comanda;
     }
 
     /**
@@ -195,10 +205,17 @@ class Comanda extends \MZ\Database\Helper
     {
         $errors = array();
         if (is_null($this->getNome())) {
-            $errors['nome'] = 'O Nome não pode ser vazio';
+            $errors['nome'] = 'O nome não pode ser vazio';
         }
         if (is_null($this->getAtiva())) {
-            $errors['ativa'] = 'A Ativa não pode ser vazia';
+            $errors['ativa'] = 'A disponibilidade da comanda não foi informada';
+        }
+        $old_comanda = self::findByID($this->getID());
+        if ($old_comanda->exists() && $old_comanda->isAtiva() && !$this->isAtiva()) {
+            $pedido = \ZPedido::getPelaComandaID($old_comanda->getID());
+            if (!is_null($pedido->getID())) {
+                $errors['ativa'] = 'A comanda não pode ser desativada porque possui um pedido em aberto';
+            }
         }
         if (!empty($errors)) {
             throw new \MZ\Exception\ValidationException($errors);
@@ -215,12 +232,18 @@ class Comanda extends \MZ\Database\Helper
     {
         if (stripos($e->getMessage(), 'PRIMARY') !== false) {
             return new \MZ\Exception\ValidationException(array(
-                'id' => vsprintf('O Número "%s" já está cadastrado', array($this->getID())),
+                'id' => vsprintf(
+                    'O Número "%s" já está cadastrado',
+                    array($this->getID())
+                ),
             ));
         }
         if (stripos($e->getMessage(), 'Nome_UNIQUE') !== false) {
             return new \MZ\Exception\ValidationException(array(
-                'nome' => vsprintf('O Nome "%s" já está cadastrado', array($this->getNome())),
+                'nome' => vsprintf(
+                    'O Nome "%s" já está cadastrado',
+                    array($this->getNome())
+                ),
             ));
         }
         return parent::translate($e);
@@ -255,9 +278,21 @@ class Comanda extends \MZ\Database\Helper
      * @param  array $condition condition to filter rows
      * @return SelectQuery query object with condition statement
      */
-    private static function query($condition = array())
+    private static function query($condition = array(), $order = array())
     {
         $query = self::getDB()->from('Comandas');
+        if (array_key_exists('query', $condition)) {
+            $busca = trim($condition['query']);
+            if (is_numeric($busca)) {
+                $query = $query->where('id', $busca);
+            } elseif ($busca != '') {
+                $query = $query->where('nome LIKE ?', '%'.$busca.'%');
+            }
+            unset($condition['query']);
+        }
+        if (empty($order)) {
+            $query = $query->orderBy('id ASC');
+        }
         return $query->where($condition);
     }
 
@@ -277,15 +312,27 @@ class Comanda extends \MZ\Database\Helper
     }
 
     /**
+     * Get next available Comanda id
+     * @return int available Comanda id
+     */
+    public static function getNextID()
+    {
+        $query = self::query()
+            ->select(null)
+            ->select('MAX(id) as id');
+        return $query->fetch('id') + 1;
+    }
+
+    /**
      * Fetch all rows from database with matched condition critery
      * @param  array $condition condition to filter rows
      * @param  integer $limit number of rows to get, null for all
      * @param  integer $offset start index to get rows, null for begining
      * @return array All rows instanced and filled
      */
-    public static function findAll($condition = array(), $limit = null, $offset = null)
+    public static function findAll($condition = array(), $order = array(), $limit = null, $offset = null)
     {
-        $query = self::query($condition);
+        $query = self::query($condition, $order);
         if (!is_null($limit)) {
             $query = $query->limit($limit);
         }
@@ -344,6 +391,18 @@ class Comanda extends \MZ\Database\Helper
     }
 
     /**
+     * Save the Comanda into the database
+     * @return Comanda Self instance
+     */
+    public function save()
+    {
+        if ($this->exists()) {
+            return $this->update();
+        }
+        return $this->insert();
+    }
+
+    /**
      * Delete this instance from database using Número
      * @return integer Number of rows deleted (Max 1)
      */
@@ -367,134 +426,6 @@ class Comanda extends \MZ\Database\Helper
     public static function count($condition = array())
     {
         $query = self::query($condition);
-        return $query->count();
-    }
-
-    public static function getPeloID($id)
-    {
-        return self::findByID($id);
-    }
-
-    public static function getPeloNome($nome)
-    {
-        return self::findByNome($nome);
-    }
-
-    public static function getProximoID()
-    {
-        $query = self::query()
-            ->select(null)
-            ->select('MAX(id) as id');
-        return $query->fetch('id') + 1;
-    }
-
-    private static function validarCampos(&$comanda)
-    {
-        $erros = array();
-        $comanda['nome'] = strip_tags(trim($comanda['nome']));
-        if (strlen($comanda['nome']) == 0) {
-            $erros['nome'] = 'O Nome não pode ser vazio';
-        }
-        $comanda['ativa'] = trim($comanda['ativa']);
-        if (strlen($comanda['ativa']) == 0) {
-            $comanda['ativa'] = 'N';
-        } elseif (!in_array($comanda['ativa'], array('Y', 'N'))) {
-            $erros['ativa'] = 'O estado de ativação da comanda não é válido';
-        }
-        if (!empty($erros)) {
-            throw new \MZ\Exception\ValidationException($erros);
-        }
-    }
-
-    private static function handleException(&$e)
-    {
-        if (stripos($e->getMessage(), 'PRIMARY') !== false) {
-            throw new \MZ\Exception\ValidationException(array('id' => 'O ID informado já está cadastrado'));
-        }
-        if (stripos($e->getMessage(), 'Nome_UNIQUE') !== false) {
-            throw new \MZ\Exception\ValidationException(array('nome' => 'O Nome informado já está cadastrado'));
-        }
-    }
-
-    public static function cadastrar($comanda)
-    {
-        $_comanda = $comanda->toArray();
-        self::validarCampos($_comanda);
-        try {
-            $_comanda['id'] = self::getDB()->insertInto('Comandas')->values($_comanda)->execute();
-        } catch (\Exception $e) {
-            self::handleException($e);
-            throw $e;
-        }
-        return self::getPeloID($_comanda['id']);
-    }
-
-    public static function atualizar($comanda)
-    {
-        $_comanda = $comanda->toArray();
-        if (!$_comanda['id']) {
-            throw new \MZ\Exception\ValidationException(array('id' => 'O id da comanda não foi informado'));
-        }
-        self::validarCampos($_comanda);
-        $campos = array(
-            'nome',
-            'ativa',
-        );
-        try {
-            $query = self::getDB()->update('Comandas');
-            $query = $query->set(array_intersect_key($_comanda, array_flip($campos)));
-            $query = $query->where('id', $_comanda['id']);
-            $query->execute();
-        } catch (\Exception $e) {
-            self::handleException($e);
-            throw $e;
-        }
-        return self::getPeloID($_comanda['id']);
-    }
-
-    public static function excluir($id)
-    {
-        if (!$id) {
-            throw new \Exception('Não foi possível excluir a comanda, o id da comanda não foi informado');
-        }
-        $query = self::getDB()->deleteFrom('Comandas')
-                         ->where(array('id' => $id));
-        return $query->execute();
-    }
-
-    private static function initSearch($ativa, $busca)
-    {
-        $query = self::query();
-        $busca = trim($busca);
-        if (is_numeric($busca)) {
-            $query = $query->where('id', $busca);
-        } elseif ($busca != '') {
-            $query = $query->where('nome LIKE ?', '%'.$busca.'%');
-        }
-        if (in_array($ativa, array('Y', 'N'))) {
-            $query = $query->where('ativa', $ativa);
-        }
-        $query = $query->orderBy('id ASC');
-        return $query;
-    }
-
-    public static function getTodas($ativa = null, $busca = null, $inicio = null, $quantidade = null)
-    {
-        $query = self::initSearch($ativa, $busca);
-        if (!is_null($inicio) && !is_null($quantidade)) {
-            $query = $query->limit($quantidade)->offset($inicio);
-        }
-        $_comandas = $query->fetchAll();
-        $comandas = array();
-        foreach ($_comandas as $comanda) {
-            $comandas[] = new Comanda($comanda);
-        }
-        return $comandas;
-    }
-
-    public static function getCount($ativa = null, $busca = null)
-    {
-        $query = self::initSearch($ativa, $busca);
         return $query->count();
     }
 }

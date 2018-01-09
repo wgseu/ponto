@@ -157,6 +157,13 @@ class ZMesa
         } elseif (!in_array($mesa['ativa'], array('Y', 'N'))) {
             $erros['ativa'] = 'O estado de ativação da mesa não é válido';
         }
+        $old_mesa = self::getPeloID($mesa['id']);
+        if (!is_null($old_mesa->getID()) && $old_mesa->isAtiva() && $mesa['ativa'] == 'N') {
+            $pedido = ZPedido::getPelaMesaID($old_mesa->getID());
+            if (!is_null($pedido->getID())) {
+                $erros['ativa'] = 'A mesa não pode ser desativada porque possui um pedido em aberto';
+            }
+        }
         if (!empty($erros)) {
             throw new ValidationException($erros);
         }

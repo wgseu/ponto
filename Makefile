@@ -10,28 +10,31 @@ help:
 	@echo "usage: make COMMAND"
 	@echo ""
 	@echo "Commands:"
-	@echo "  doc                 Generate documentation of API"
-	@echo "  check               Check the API with PHP Code Sniffer (PSR2)"
-	@echo "  clean               Clean directories for reset"
-	@echo "  update              Update PHP dependencies with composer"
-	@echo "  start               Create and start containers"
-	@echo "  stop                Stop and clear all services"
-	@echo "  logs                Follow log output"
-	@echo "  populate            Recreate and populate database"
-	@echo "  dump                Create backup of whole database"
-	@echo "  restore             Restore backup from whole database"
-	@echo "  test                Test application"
-	@echo "  class               Generate initial code from template files (Run utils/fix_script before)"
+	@echo "  doc          Generate documentation of API"
+	@echo "  check        Check the API with PHP Code Sniffer (PSR2)"
+	@echo "  clean        Clean directories for reset"
+	@echo "  update       Update PHP dependencies with composer"
+	@echo "  autoload     Update PHP autoload files"
+	@echo "  start        Create and start containers"
+	@echo "  stop         Stop and clear all services"
+	@echo "  logs         Follow log output"
+	@echo "  populate     Recreate and populate database"
+	@echo "  dump         Create backup of whole database"
+	@echo "  restore      Restore backup from whole database"
+	@echo "  test         Test application"
+	@echo "  class        Generate initial code from template files"
 
 init:
 	@echo "Initializing..."
+	@chmod 777 public/include/compiled
 
 doc:
 	@docker-compose exec -T php ./public/include/vendor/bin/apigen generate app --destination docs/api
 	@make -s reset
 
-clean:
+clean: stop
 	@rm -Rf storage/db/mysql
+	@rm -Rf storage/app/generated
 	@rm -Rf $(MYSQL_DUMPS_DIR)
 	@rm -Rf public/include/vendor
 	@rm -Rf composer.lock
@@ -75,8 +78,6 @@ dump:
 	@make -s reset
 
 restore:
-	@$(shell perl -0777 -i.original -pe "s/\`mzsw\`/\`$(MYSQL_DATABASE)\`/igs" $(MYSQL_DUMPS_DIR)/db.sql)
-	@rm -f $(MYSQL_DUMPS_DIR)/db.sql.original
 	@docker exec -i $(shell docker-compose ps -q gmysqldb) mysql -u"$(MYSQL_ROOT_USER)" -p"$(MYSQL_ROOT_PASSWORD)" < $(MYSQL_DUMPS_DIR)/db.sql 2>/dev/null
 
 test:
@@ -84,7 +85,17 @@ test:
 	@make -s reset
 
 class:
-	@java -jar utils/SQLtoClass.jar -p utils/config.properties -t utils/template -o utils/tmp/generated
+	@mkdir -p $(MYSQL_DUMPS_DIR)
+	@cp -f database/model/script.sql 														$(MYSQL_DUMPS_DIR)/script_no_trigger.sql
+	@perl -0777 -i.original -pe "s/USE \`GrandChef\`\\$$\\\$$\r?\n//igs" 					$(MYSQL_DUMPS_DIR)/script_no_trigger.sql
+	@perl -0777 -i.original -pe "s/USE \`GrandChef\`;\r?\n//igs" 							$(MYSQL_DUMPS_DIR)/script_no_trigger.sql
+	@perl -0777 -i.original -pe "s/END\\\$$\\\$$\r?\n/END \\\$$\\\$$/igs" 					$(MYSQL_DUMPS_DIR)/script_no_trigger.sql
+	@perl -0777 -i.original -pe "s/\`GrandChef\`\.//igs" 									$(MYSQL_DUMPS_DIR)/script_no_trigger.sql
+	@perl -0777 -i.original -pe "s/\r?\nDELIMITER \\\$$\\\$$.*?DELIMITER ;\r?\n\r?\n//igs" 	$(MYSQL_DUMPS_DIR)/script_no_trigger.sql
+	@perl -0777 -i.original -pe "s/' \/\* comment truncated \*\/ \/\*([^\*]+)\*\//\1'/igs"	$(MYSQL_DUMPS_DIR)/script_no_trigger.sql
+	@perl -0777 -i.original -pe "s/([^\\\\\][\\\\\])([^\\\\\'])/\1\\\\\\\\\2/igs"			$(MYSQL_DUMPS_DIR)/script_no_trigger.sql
+	@rm -f $(MYSQL_DUMPS_DIR)/script_no_trigger.sql.original
+	@java -jar utils/SQLtoClass.jar -p utils/config.properties -t utils/template -o storage/app/generated
 
 reset: ;
 

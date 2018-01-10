@@ -12,3 +12,4 @@ build
 etc/nginx/grandchef.location
 storage/*
 .env
+.vscode/

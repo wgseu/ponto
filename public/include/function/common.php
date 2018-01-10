@@ -841,7 +841,9 @@ function xchmod($path, $access = 0644)
 function xmkdir($dir, $access = 0711)
 {
     $oldUmask = umask(0);
-    mkdir($dir, $access, true);
+    if (!file_exists($dir)) {
+        mkdir($dir, $access, true);
+    }
     chmod($dir, $access);
     umask($oldUmask);
 }

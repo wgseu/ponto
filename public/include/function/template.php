@@ -61,6 +61,7 @@ function __parse($tFile, $cFile)
     //Add for call <!--{include othertpl}-->
     $fileContent = preg_replace("#<!--\s*{\s*include\s+([^\{\}]+)\s*\}\s*-->#i", '<?php include template("\\1"); ?>', $fileContent);
     //Add value namespace
+    xmkdir(dirname($cFile), 0775);
     if (file_put_contents($cFile, $fileContent) === false) {
         die("Can't write file [$cFile]!");
         return false;

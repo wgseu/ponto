@@ -26,7 +26,6 @@ help:
 
 init:
 	@echo "Initializing..."
-	@chmod 777 public/include/compiled
 
 doc:
 	@docker-compose exec -T php ./public/include/vendor/bin/apigen generate app --destination docs/api
@@ -37,6 +36,7 @@ clean: stop
 	@rm -Rf storage/app/generated
 	@rm -Rf $(MYSQL_DUMPS_DIR)
 	@rm -Rf public/include/vendor
+	@rm -Rf public/include/compiled
 	@rm -Rf composer.lock
 	@rm -Rf docs/api
 
@@ -97,6 +97,7 @@ class:
 	@rm -f $(MYSQL_DUMPS_DIR)/script_no_trigger.sql.original
 	@java -jar utils/SQLtoClass.jar -p utils/config.properties -t utils/template -o storage/app/generated
 
-reset: ;
+reset:
+	@chmod 777 public/include/compiled
 
 .PHONY: clean test check init

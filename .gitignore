@@ -1,4 +1,4 @@
-public/include/compiled/*.php
+public/include/compiled/
 public/include/logs/*.txt
 public/static/doc/xml/*/*/*.xml
 public/static/doc/cert/*.pem

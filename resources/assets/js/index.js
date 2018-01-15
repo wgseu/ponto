@@ -2050,7 +2050,11 @@ Gerenciar.pacote.initForm = function(focus_ctrl) {
 Gerenciar.pacote.initFieldSelect = function(input, field, grupoid, selectFn) {
     Gerenciar.common.autocomplete('/app/pacote/listar', input, selectFn,
         function (data) {
-            return {value: data.descricao, title: data.produtotipo};
+            var title = data.produtotipo;
+            if (data.propriedadeid) {
+                title = 'Propriedade';
+            }
+            return {value: data.descricao, title: title};
         }, 
         '/static/img/produto.png', 
         function (query) {

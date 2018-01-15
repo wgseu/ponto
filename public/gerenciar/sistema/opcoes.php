@@ -18,6 +18,7 @@ $opcoes_comportamento = array(
     array('section' => 'Vendas', 'key' => 'Mesas.Redirecionar', 'default' => false, 'title' => 'Redirecionar para a mesa principal'),
     array('section' => 'Vendas', 'key' => 'Comanda.Observacao', 'default' => false, 'title' => 'Observação como nome de comanda'),
     array('section' => 'Vendas', 'key' => 'Quantidade.Perguntar', 'default' => true, 'title' => 'Confirmar ao lançar quantidades elevadas'),
+    array('section' => 'Sistema', 'key' => 'Fiscal.Mostrar', 'default' => false, 'title' => 'Mostrar campos fiscais e tributários'),
 );
 #    array('section' => 'Sistema', 'key' => 'Logout.Timeout', 'default' => 3, 'title' => 'Minutos de inatividade'),
 

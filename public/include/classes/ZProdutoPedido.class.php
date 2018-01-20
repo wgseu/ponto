@@ -502,6 +502,9 @@ class ZProdutoPedido
         if (!is_numeric($produto_pedido['quantidade'])) {
             $erros['quantidade'] = 'A quantidade não foi informada';
         }
+        if ($produto_pedido['quantidade'] > 10000) {
+            $erros['quantidade'] = 'Quantidade muito elevada, faça multiplos lançamentos menores';
+        }
         if (!is_numeric($produto_pedido['porcentagem'])) {
             $erros['porcentagem'] = 'A porcentagem da comissão não foi informada';
         } else {

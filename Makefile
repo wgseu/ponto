@@ -10,35 +10,52 @@ help:
 	@echo "usage: make COMMAND"
 	@echo ""
 	@echo "Commands:"
-	@echo "  doc          Generate documentation of API"
-	@echo "  check        Check the API with PHP Code Sniffer (PSR2)"
-	@echo "  clean        Clean directories for reset"
+	@echo "  start        Create and start containers"
+	@echo "  populate     Recreate and populate database"
 	@echo "  update       Update PHP dependencies with composer"
 	@echo "  autoload     Update PHP autoload files"
-	@echo "  start        Create and start containers"
-	@echo "  stop         Stop and clear all services"
-	@echo "  logs         Follow log output"
-	@echo "  populate     Recreate and populate database"
+	@echo "  test         Test application"
+	@echo "  check        Check the API with PHP Code Sniffer (PSR2)"
 	@echo "  dump         Create backup of whole database"
 	@echo "  restore      Restore backup from whole database"
-	@echo "  test         Test application"
 	@echo "  class        Generate initial code from template files"
+	@echo "  clean        Stop docker and clean generated folder"
+	@echo "  purge        Clean and remove vendor folder"
+	@echo "  doc          Generate documentation of API"
+	@echo "  logs         Follow log output"
+	@echo "  stop         Stop and clear all services"
 
 init:
 	@echo "Initializing..."
+	@mkdir -p $(MYSQL_DUMPS_DIR)
+	@mkdir -p public/include/compiled
+	@mkdir -p public/static/doc/conta
+	@mkdir -p public/static/doc/cert
+	@mkdir -p public/static/img/categoria
+	@mkdir -p public/static/img/cliente
+	@mkdir -p public/static/img/patrimonio
+	@mkdir -p public/static/img/produto
+	@mkdir -p public/static/img/header
 
 doc:
 	@docker-compose exec -T php ./public/include/vendor/bin/apigen generate app --destination docs/api
 	@make -s reset
 
 clean: stop
-	@rm -Rf storage/db/mysql
-	@rm -Rf storage/app/generated
-	@rm -Rf $(MYSQL_DUMPS_DIR)
-	@rm -Rf public/include/vendor
+	@rm -Rf storage
 	@rm -Rf public/include/compiled
-	@rm -Rf composer.lock
+	@rm -Rf public/static/doc/conta
+	@rm -Rf public/static/doc/cert
+	@rm -Rf public/static/img/categoria
+	@rm -Rf public/static/img/cliente
+	@rm -Rf public/static/img/patrimonio
+	@rm -Rf public/static/img/produto
+	@rm -Rf public/static/img/header
 	@rm -Rf docs/api
+
+purge: clean
+	@rm -Rf public/include/vendor
+	@rm -Rf composer.lock
 
 check:
 	@echo "Checking the standard code..."
@@ -50,9 +67,9 @@ update:
 autoload:
 	@docker run --rm -v $(shell pwd):/app composer dump-autoload
 
-start: init
+start: init reset
 	@cp etc/nginx/default.conf.template etc/nginx/grandchef.location
-	@sed -i "s/\"%PUBLIC_PATH%\"/\/var\/www\/html\/public/g" etc/nginx/grandchef.location 
+	@sed -i "s/\"%PUBLIC_PATH%\"/\/var\/www\/html\/public/g" etc/nginx/grandchef.location
 	@sed -i "s/127.0.0.1:9456;/php:9000;/g" etc/nginx/grandchef.location
 	docker-compose up -d
 
@@ -99,5 +116,12 @@ class:
 
 reset:
 	@chmod 777 public/include/compiled
+	@chmod 777 public/static/doc/conta
+	@chmod 777 public/static/doc/cert
+	@chmod 777 public/static/img/categoria
+	@chmod 777 public/static/img/cliente
+	@chmod 777 public/static/img/patrimonio
+	@chmod 777 public/static/img/produto
+	@chmod 777 public/static/img/header
 
 .PHONY: clean test check init

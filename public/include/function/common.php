@@ -888,7 +888,7 @@ function upload_file($inputname, $dir, $name, $def_ext, $allow_ext, $force_ext =
         $error_msg = 'Não foi possível salvar o arquivo no servidor';
     }
     if (!move_uploaded_file($file['tmp_name'], $path)) {
-        throw new Exception($error_msg . $path);
+        throw new Exception($error_msg);
     }
     xchmod($path, 0644);
     return $name;

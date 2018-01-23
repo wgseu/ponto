@@ -19,15 +19,15 @@
 	O Cliente adquire apenas o direito de usar o software e não adquire qualquer outros
 	direitos, expressos ou implícitos no GrandChef diferentes dos especificados nesta Licença.
 */
-require_once(dirname(dirname(__FILE__)) . '/app.php');
+require_once(dirname(__DIR__) . '/app.php');
 
 if (is_login()) {
-    $url = ($_POST && isset($_POST['redirect']))?strval($_POST['redirect']):null;
+    $url = (is_post() && isset($_POST['redirect']))?strval($_POST['redirect']):null;
     redirect($url);
 }
 $weblogin = true;
-if ($_POST) {
-    require_once(dirname(dirname(__FILE__)) . '/app/conta/entrar.php');
+if (is_post()) {
+    require_once(dirname(__DIR__) . '/app/conta/entrar.php');
 } else {
     $_POST['lembrar'] = 'true';
     include template('conta_entrar');

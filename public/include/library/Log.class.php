@@ -24,7 +24,7 @@ class Log
 
     private static function write($type, $message)
     {
-        $log_dir = dirname(dirname(__FILE__)).'/logs';
+        $log_dir = dirname(__DIR__).'/logs';
         $filename = $log_dir.'/'.date('Ymd').'.txt';
         $fp = fopen($filename, 'a');
         if (!$fp) {

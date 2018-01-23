@@ -1,5 +1,5 @@
 <?php
-require_once(dirname(dirname(__FILE__)) . '/app.php');
+require_once(dirname(__DIR__) . '/app.php');
 need_owner(true);
 $action = $_GET['action'];
 if ($action == 'faturamento') {

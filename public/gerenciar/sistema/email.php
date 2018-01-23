@@ -1,5 +1,5 @@
 <?php
-require_once(dirname(dirname(__FILE__)) . '/app.php');
+require_once(dirname(__DIR__) . '/app.php');
 
 need_permission(PermissaoNome::ALTERARCONFIGURACOES);
 
@@ -12,7 +12,7 @@ $servidor = get_string_config('Email', 'Servidor');
 $porta = get_int_config('Email', 'Porta', 587);
 $encriptacao = get_int_config('Email', 'Criptografia', 2);
 $usuario = get_string_config('Email', 'Usuario');
-if ($_POST) {
+if (is_post()) {
     try {
         $destinatario = trim($_POST['destinatario']);
         set_string_config('Email', 'Remetente', $destinatario);

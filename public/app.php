@@ -1,5 +1,5 @@
 <?php
-require_once(dirname(__FILE__). '/include/application.php');
+require_once(__DIR__. '/include/application.php');
 
 Session::Init();
 $INI = ZSistema::getINI();

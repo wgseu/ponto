@@ -125,6 +125,11 @@ class AppSync
         $this->send(array('cmd' => 'sistema', 'action' => 'empresa_info'));
     }
 
+    public function integratorChanged()
+    {
+        $this->send(array('cmd' => 'integracao', 'action' => 'alteracao'));
+    }
+
     public function invoiceAdded($nota_id, $pedido_id)
     {
         $this->send(array('cmd' => 'nota', 'id' => intval($nota_id), 'pedido' => intval($pedido_id), 'action' => 'criacao'));

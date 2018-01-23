@@ -19,12 +19,12 @@
 	O Cliente adquire apenas o direito de usar o software e não adquire qualquer outros
 	direitos, expressos ou implícitos no GrandChef diferentes dos especificados nesta Licença.
 */
-require_once(dirname(dirname(__FILE__)) . '/app.php');
+require_once(dirname(__DIR__) . '/app.php');
 
 need_permission(PermissaoNome::CADASTROCLIENTES, is_output('json'));
 $focusctrl = 'logradouro';
 $errors = array();
-if ($_POST) {
+if (is_post()) {
     $localizacao = new ZLocalizacao($_POST);
     try {
         DB::BeginTransaction();

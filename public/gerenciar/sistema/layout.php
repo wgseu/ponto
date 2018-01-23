@@ -1,5 +1,5 @@
 <?php
-require_once(dirname(dirname(__FILE__)) . '/app.php');
+require_once(dirname(__DIR__) . '/app.php');
 
 need_permission(PermissaoNome::ALTERARCONFIGURACOES);
 
@@ -55,7 +55,7 @@ foreach ($images_info as $key => &$value) {
 }
 $text_bemvindo = get_string_config('Site', 'Text.BemVindo', 'Bem-vindo ao nosso restaurante!');
 $text_chamada = get_string_config('Site', 'Text.Chamada', 'Conheça nosso cardápio!');
-if ($_POST) {
+if (is_post()) {
     foreach ($images_info as $key => &$value) {
         $value['save'] = $value['url'];
     }

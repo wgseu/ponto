@@ -1,5 +1,5 @@
 <?php
-require_once(dirname(dirname(dirname(__FILE__))) . '/app.php'); // main app file
+require_once(dirname(dirname(__DIR__)) . '/app.php'); // main app file
 
 need_permission(PermissaoNome::ALTERARCONFIGURACOES, isset($_POST));
 
@@ -22,7 +22,7 @@ $opcoes_comportamento = array(
 );
 #    array('section' => 'Sistema', 'key' => 'Logout.Timeout', 'default' => 3, 'title' => 'Minutos de inatividade'),
 
-if ($_POST) {
+if (is_post()) {
     try {
         if (!config_values_exists($opcoes_comportamento, $_POST['secao'], $_POST['chave'])) {
             throw new Exception('A opção de comportamento informada não existe', 1);

@@ -1,5 +1,5 @@
 <?php
-require_once(dirname(dirname(__FILE__)) . '/app.php');
+require_once(dirname(__DIR__) . '/app.php');
 
 need_permission(PermissaoNome::ALTERARCONFIGURACOES);
 
@@ -9,7 +9,7 @@ $tab_avancado = 'active';
 $erro = array();
 $maps_api = get_string_config('Site', 'Maps.API');
 $dropbox_token = get_string_config('Sistema', 'Dropbox.AccessKey');
-if ($_POST) {
+if (is_post()) {
     try {
         $maps_api = trim($_POST['mapskey']);
         set_string_config('Site', 'Maps.API', $maps_api);

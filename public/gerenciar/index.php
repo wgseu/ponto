@@ -1,5 +1,5 @@
 <?php
-require_once(dirname(__FILE__) . '/app.php');
+require_once(__DIR__ . '/app.php');
 
 if (is_owner()) {
     require_once('diversos/index.php');

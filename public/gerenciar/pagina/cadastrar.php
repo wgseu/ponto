@@ -19,14 +19,14 @@
 	O Cliente adquire apenas o direito de usar o software e não adquire qualquer outros
 	direitos, expressos ou implícitos no GrandChef diferentes dos especificados nesta Licença.
 */
-require_once(dirname(dirname(__FILE__)) . '/app.php');
+require_once(dirname(__DIR__) . '/app.php');
 
 need_permission(PermissaoNome::ALTERARPAGINAS);
 $focusctrl = 'nome';
 $errors = array();
 $nomes = get_pages_info();
 $linguagens = get_languages_info();
-if ($_POST) {
+if (is_post()) {
     $pagina = new ZPagina($_POST);
     try {
         $pagina->setID(null);

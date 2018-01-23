@@ -1,5 +1,5 @@
 <?php
-require_once(dirname(dirname(__FILE__)) . '/app.php');
+require_once(dirname(__DIR__) . '/app.php');
 
 need_permission(array(PermissaoNome::PAGAMENTO, array('||'), PermissaoNome::SELECIONARCAIXA), is_output('json'));
 

@@ -19,7 +19,7 @@
 	O Cliente adquire apenas o direito de usar o software e não adquire qualquer outros
 	direitos, expressos ou implícitos no GrandChef diferentes dos especificados nesta Licença.
 */
-require_once(dirname(dirname(__FILE__)) . '/app.php');
+require_once(dirname(__DIR__) . '/app.php');
 
 need_login(is_output('json'));
 $cliente = $login_cliente;
@@ -29,7 +29,7 @@ $gerenciando = false;
 $cadastrar_cliente = false;
 $aceitar = 'true';
 $erro = array();
-if ($_POST) {
+if (is_post()) {
     $old_cliente = $cliente;
     $cliente = new ZCliente($_POST);
     try {

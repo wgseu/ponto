@@ -1,5 +1,5 @@
 <?php
-require_once(dirname(dirname(__FILE__)) . '/app.php');
+require_once(dirname(__DIR__) . '/app.php');
 need_owner();
 
 $data_inicio = strtotime(date('Y-m').' -1 month');

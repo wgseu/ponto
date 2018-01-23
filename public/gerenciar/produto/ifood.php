@@ -19,11 +19,11 @@
 	O Cliente adquire apenas o direito de usar o software e não adquire qualquer outros
 	direitos, expressos ou implícitos no GrandChef diferentes dos especificados nesta Licença.
 */
-require_once(dirname(dirname(__FILE__)) . '/app.php');
+require_once(dirname(dirname(__DIR__)) . '/app.php');
 
 use MZ\System\Integracao;
 
-need_permission(PermissaoNome::CADASTROPRODUTOS);
+define('IFOOD_TOKEN', 'wKPZ1ABDOO9EVHJMuORwrFogsUPU7Ca5');
 
 $integracao = Integracao::findByAcessoURL('ifood');
 $dados = $integracao->read();
@@ -31,7 +31,10 @@ $produtos = isset($dados['produtos'])?$dados['produtos']:array();
 $cartoes = isset($dados['cartoes'])?$dados['cartoes']:array();
 
 if (isset($_GET['action'])) {
-    if ($_POST && $_GET['action'] == 'upload') {
+    if (is_post() && $_GET['action'] == 'upload') {
+        if (!isset($_GET['token']) || $_GET['token'] != IFOOD_TOKEN) {
+            need_permission(PermissaoNome::CADASTROPRODUTOS, true);
+        }
         try {
             if (!isset($_FILES['raw_arquivo']) || $_FILES['raw_arquivo']['error'] === UPLOAD_ERR_NO_FILE) {
                 throw new \Exception('Nenhum arquivo foi enviado');
@@ -91,11 +94,12 @@ if (isset($_GET['action'])) {
             } else {
                 throw new \Exception('Formato não suportado', 401);
             }
-            redirect('/gerenciar/produto/ifood');
+            json(null, array('msg' => 'Upload realizado com sucesso'));
         } catch (\Exception $e) {
             json($e->getMessage());
         }
-    } elseif ($_POST && $_GET['action'] == 'update') {
+    } elseif (is_post() && $_GET['action'] == 'update') {
+        need_permission(PermissaoNome::CADASTROPRODUTOS, true);
         try {
             if (!isset($_POST['codigo']) || !isset($_POST['id'])) {
                 throw new \Exception('Código ou ID inválido', 401);
@@ -108,11 +112,14 @@ if (isset($_GET['action'])) {
             $dados = isset($dados)?$dados:array();
             $dados['produtos'] = $produtos;
             $integracao->write($dados);
+            $appsync = new AppSync();
+            $appsync->integratorChanged();
             json(null, array('produto' => $produtos[$codigo]));
         } catch (\Exception $e) {
             json($e->getMessage());
         }
-    } elseif ($_POST && $_GET['action'] == 'delete') {
+    } elseif (is_post() && $_GET['action'] == 'delete') {
+        need_permission(PermissaoNome::CADASTROPRODUTOS, true);
         try {
             if (!isset($_POST['codigo'])) {
                 throw new \Exception('Código inválido ou não informado', 401);
@@ -138,11 +145,14 @@ if (isset($_GET['action'])) {
             } else {
                 $msg = 'Produto excluído com sucesso!';
             }
+            $appsync = new AppSync();
+            $appsync->integratorChanged();
             json(null, array('msg' => $msg));
         } catch (\Exception $e) {
             json($e->getMessage());
         }
-    } elseif ($_POST && $_GET['action'] == 'mount') {
+    } elseif (is_post() && $_GET['action'] == 'mount') {
+        need_permission(PermissaoNome::CADASTROPRODUTOS, true);
         try {
             if (!isset($_POST['codigo']) || !isset($_POST['id'])) {
                 throw new \Exception('Código ou ID inválido', 401);
@@ -159,11 +169,14 @@ if (isset($_GET['action'])) {
             $dados = isset($dados)?$dados:array();
             $dados['produtos'] = $produtos;
             $integracao->write($dados);
+            $appsync = new AppSync();
+            $appsync->integratorChanged();
             json(null, array('pacote' => $produtos[$codigo]['itens'][$subcodigo]));
         } catch (\Exception $e) {
             json($e->getMessage());
         }
     } elseif ($_GET['action'] == 'package') {
+        need_permission(PermissaoNome::CADASTROPRODUTOS, true);
         try {
             if (!isset($_GET['codigo'])) {
                 throw new \Exception('Código não informado', 401);
@@ -248,6 +261,9 @@ if (isset($_GET['action'])) {
             json($e->getMessage());
         }
     } elseif ($_GET['action'] == 'download') {
+        if (!isset($_GET['token']) || $_GET['token'] != IFOOD_TOKEN) {
+            need_permission(PermissaoNome::CADASTROPRODUTOS, true);
+        }
         $_cartoes = array();
         $_produtos = array();
         $_desconhecidos = array();
@@ -280,10 +296,11 @@ if (isset($_GET['action'])) {
         $filename = 'ifood.ini';
         header('Content-Type: text/plain');
         header("Content-Disposition: attachment; filename*=UTF-8''" . rawurlencode($filename));
-        echo mb_convert_encoding(to_ini($ini), 'UTF-8', 'Windows-1252');
+        echo to_ini($ini);
         exit;
     }
 }
+need_permission(PermissaoNome::CADASTROPRODUTOS);
 foreach ($produtos as $codigo => $produto) {
     $associado = \ZProduto::getPeloID(isset($produto['id'])?$produto['id']:$produto['codigo_pdv']);
     $produtos[$codigo]['produto'] = $associado;

@@ -19,4 +19,4 @@
 	O Cliente adquire apenas o direito de usar o software e não adquire qualquer outros
 	direitos, expressos ou implícitos no GrandChef diferentes dos especificados nesta Licença.
 */
-require_once(dirname(__FILE__) . '/listar.php');
+require_once(__DIR__ . '/listar.php');

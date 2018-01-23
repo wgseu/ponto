@@ -19,7 +19,7 @@
 	O Cliente adquire apenas o direito de usar o software e não adquire qualquer outros
 	direitos, expressos ou implícitos no GrandChef diferentes dos especificados nesta Licença.
 */
-require_once(dirname(dirname(__FILE__)) . '/app.php');
+require_once(dirname(__DIR__) . '/app.php');
 
 need_owner(is_output('json'));
 $funcao = ZFuncao::getPeloID($_GET['funcao']?:$_POST['funcao']);
@@ -30,7 +30,7 @@ if (is_null($funcao->getID())) {
     redirect('/gerenciar/funcao/');
 }
 $errors = array();
-if ($_POST) {
+if (is_post()) {
     try {
         $permissao = ZPermissao::getPeloID($_POST['permissao']);
         if (is_null($permissao->getID())) {

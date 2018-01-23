@@ -1,5 +1,5 @@
 <?php
-require_once(dirname(dirname(dirname(__FILE__))) . '/app.php');
+require_once(dirname(dirname(__DIR__)) . '/app.php');
 
 need_permission(PermissaoNome::BACKUP, true);
 

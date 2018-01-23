@@ -9,7 +9,7 @@ if (isset($_SERVER['HTTP_X_ORIGINAL_URL'])) {
 /* end */
 
 error_reporting(E_ALL & ~E_NOTICE & ~E_DEPRECATED & ~E_WARNING);
-define('DIR_ROOT', str_replace('\\', '/', dirname(__FILE__)));
+define('DIR_ROOT', str_replace('\\', '/', __DIR__));
 define('DIR_LIBRARY', DIR_ROOT . '/library');
 define('DIR_CLASSES', DIR_ROOT . '/classes');
 define('DIR_COMPILED', DIR_ROOT . '/compiled');

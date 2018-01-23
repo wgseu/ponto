@@ -23,10 +23,6 @@
 			<div class="x_panel">
 				<div class="x_title">
 					<h2>Produtos<small>Associar produtos</small></h2>
-					<ul class="nav navbar-right panel_toolbox hidden-print">
-						<li><a href="?action=download" title="Baixar INI"><i class="fa fa-download"></i></a></li>
-						<li><a href="#" title="Enviar XML" data-toggle="modal" data-target="#send-file"><i class="fa fa-upload"></i></a></li>
-					</ul>
 					<div class="clearfix"></div>
 				</div>
 				<div class="x_content">
@@ -57,43 +53,6 @@
 		</div>
 	</div>
 </div>
-<!-- Modal Send XML -->
-<form id="arquivo-form" class="form-horizontal form-label-left" method="post" action="/gerenciar/produto/ifood?action=upload" enctype="multipart/form-data">
-	<div class="modal" id="send-file" tabindex="-1" role="dialog" aria-labelledby="send-file-label">
-		<div class="modal-dialog" role="document">
-			<div class="modal-content">
-				<div class="modal-header">
-					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
-						<span aria-hidden="true">&times;</span>
-					</button>
-					<h4 class="modal-title" id="send-file-label">Enviar XML com códigos</h4>
-				</div>
-				<div class="modal-body">
-					<input type="hidden" id="arquivo" name="arquivo" value="">
-					<div class="form-group col-xs-12">
-						<label for="raw_arquivo">Arquivo XML:</label>
-						<div class="input-group">
-							<label class="input-group-btn">
-								<span class="btn btn-primary">
-									Selecionar…<input type="file" id="raw_arquivo" name="raw_arquivo" style="display: none;">
-								</span>
-							</label>
-							<input type="text" class="form-control" readonly="" value="">
-							<span class="input-group-btn">
-								<button class="btn btn-default" id="clear_arquivo" type="button">Remover</button>
-							</span>
-						</div>
-					</div>
-					<div class="clearfix"></div>
-				</div>
-				<div class="modal-footer">
-					<input type="submit" class="btn btn-primary" value="Enviar">
-					<button type="button" class="btn btn-default" data-dismiss="modal">Fechar</button>
-				</div>
-			</div>
-		</div>
-	</div>
-</form>
 <!-- Modal Send XML -->
 <div class="modal" id="edit-pkg" tabindex="-1" role="dialog" aria-labelledby="edit-pkg-label">
 	<div class="modal-dialog modal-lg" role="document">

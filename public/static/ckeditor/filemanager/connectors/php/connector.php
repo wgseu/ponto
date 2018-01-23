@@ -24,7 +24,7 @@
 
 ob_start() ;
 
-require_once(dirname(dirname(dirname(dirname(dirname(dirname(__FILE__)))))) . '/app.php');
+require_once(dirname(dirname(dirname(dirname(dirname(__DIR__))))) . '/app.php');
 require('./config.php') ;
 require('./util.php') ;
 require('./io.php') ;

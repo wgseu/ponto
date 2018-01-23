@@ -1,5 +1,5 @@
 <?php
-require_once(dirname(dirname(__FILE__)) . '/app.php');
+require_once(dirname(__DIR__) . '/app.php');
 
 need_permission(PermissaoNome::ALTERARCONFIGURACOES);
 
@@ -8,7 +8,7 @@ $tab_fiscal = 'active';
 
 $erros = array();
 $fiscal_timeout = get_int_config('Sistema', 'Fiscal.Timeout', 6);
-if ($_POST) {
+if (is_post()) {
     try {
         $fiscal_timeout = \MZ\Util\Filter::number(isset($_POST['fiscal_timeout'])?$_POST['fiscal_timeout']:null);
         if (intval($fiscal_timeout) < 2) {

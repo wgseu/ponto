@@ -19,7 +19,7 @@
 	O Cliente adquire apenas o direito de usar o software e não adquire qualquer outros
 	direitos, expressos ou implícitos no GrandChef diferentes dos especificados nesta Licença.
 */
-require_once(dirname(dirname(__FILE__)) . '/app.php');
+require_once(dirname(__DIR__) . '/app.php');
 
 need_permission(PermissaoNome::CADASTROPATRIMONIO);
 $patrimonio = ZPatrimonio::getPeloID($_GET['id']);
@@ -30,7 +30,7 @@ if (is_null($patrimonio->getID())) {
 $focusctrl = 'descricao';
 $errors = array();
 $old_patrimonio = $patrimonio;
-if ($_POST) {
+if (is_post()) {
     $patrimonio = new ZPatrimonio($_POST);
     try {
         $patrimonio->setID($old_patrimonio->getID());

@@ -1,5 +1,5 @@
 <?php
-require_once(dirname(dirname(dirname(__FILE__))) . '/app.php'); // main app file
+require_once(dirname(dirname(__DIR__)) . '/app.php'); // main app file
 
 need_permission(PermissaoNome::ALTERARCONFIGURACOES, isset($_POST));
 
@@ -43,7 +43,7 @@ $opcoes_impressao = array(
     array('section' => 'Cupom'   , 'key' => 'Perguntar', 'default' => false, 'title' => 'Exibir pegunta de impressão'),
     array('section' => 'Imprimir', 'key' => 'Cozinha.Separar', 'default' => false, 'title' => 'Imprimir linha separadora de serviços'),
 );
-if ($_POST) {
+if (is_post()) {
     try {
         if (!config_values_exists($opcoes_impressao, $_POST['secao'], $_POST['chave'])) {
             throw new Exception('A opção de impressão informada não existe', 1);

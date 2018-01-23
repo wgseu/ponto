@@ -70,7 +70,10 @@ if (isset($_GET['action'])) {
                             if (isset($produtos[$codigo_pai]['itens'][$codigo])) {
                                 $produtos[$codigo_pai]['itens'][$codigo] = array_merge(
                                     $produto,
-                                    $produtos[$codigo_pai]['itens'][$codigo]
+                                    array_merge(
+                                        $produtos[$codigo_pai]['itens'][$codigo],
+                                        array('descricao' => $descricao)
+                                    )
                                 );
                             } else {
                                 $produtos[$codigo_pai]['itens'][$codigo] = $produto;
@@ -80,7 +83,10 @@ if (isset($_GET['action'])) {
                             if (isset($produtos[$codigo])) {
                                 $produtos[$codigo] = array_merge(
                                     $produto,
-                                    $produtos[$codigo]
+                                    array_merge(
+                                        $produtos[$codigo],
+                                        array('descricao' => $descricao)
+                                    )
                                 );
                             } else {
                                 $produtos[$codigo] = $produto;
@@ -91,6 +97,35 @@ if (isset($_GET['action'])) {
                 $dados = isset($dados)?$dados:array();
                 $dados['produtos'] = $produtos;
                 $integracao->write($dados);
+            } elseif (in_array($file['type'], array('text/plain'))) {
+                // upgrade from INI file
+                $content = file_get_contents($file['tmp_name']);
+                $content = preg_replace('/\/[^=\/]*\/=[^\r\n]*[\r\n]*/', '', $content);
+                $sections = parse_ini_string($content, true, INI_SCANNER_RAW);
+                if (isset($sections['Codigos'])) {
+                    foreach ($sections['Codigos'] as $codigo => $value) {
+                        $produto = array(
+                            'id' => $value,
+                            'codigo' => $codigo,
+                            'descricao' => 'Auto gerado pelo ifood.ini',
+                            'itens' => array(),
+                        );
+                        if (isset($produtos[$codigo])) {
+                            $produtos[$codigo] = array_merge(
+                                $produto,
+                                array_merge(
+                                    $produtos[$codigo],
+                                    array('id' => $value)
+                                )
+                            );
+                        } else {
+                            $produtos[$codigo] = $produto;
+                        }
+                    }
+                    $dados = isset($dados)?$dados:array();
+                    $dados['produtos'] = $produtos;
+                    $integracao->write($dados);
+                }
             } else {
                 throw new \Exception('Formato não suportado', 401);
             }
@@ -282,8 +317,7 @@ if (isset($_GET['action'])) {
             }
         }
         if (empty($cartoes)) {
-            $cartoes['/[\w]+ \*\*\*\* [0-9]{4}/'] = 'iFood';
-            $cartoes['/^MASTERCARD|VISA$/'] = 'iFood';
+            $cartoes['/^VVREST|RSODEX|TRE|VALECA|VR_SMA|AM|DNR|ELO|MC|VIS^/'] = 'iFood';
         }
         foreach ($cartoes as $regex => $cartao) {
             $_cartoes[$regex] = $cartao;

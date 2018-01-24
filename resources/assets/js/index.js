@@ -212,6 +212,8 @@ Gerenciar.common.autocomplete = function(url, input, selectfn, displayfn, def_im
         $(field).removeAttr(attribute);
         var spanId = $(input).closest('div').find('label .identifier');
         spanId.text('');
+        if (selectfn != undefined && selectfn != null)
+            selectfn(null);
     }
 
     $(input).autocomplete({
@@ -252,21 +254,33 @@ Gerenciar.common.autocomplete = function(url, input, selectfn, displayfn, def_im
             if(def_image == undefined)
                 return result;
             var imagemurl = null;
+            var classes = '';
             var style = '';
+            var src = '';
+            var tag = 'img';
             if(isFunction(def_image)) {
                 imagemurl = def_image(suggestion.data);
                 if(isObject(imagemurl)) {
+                    classes = imagemurl.classes;
                     style = imagemurl.style;
+                    tag = imagemurl.tag || tag;
                     imagemurl = imagemurl.url;
-                    if(style != '')
-                        style = ' class="' + style + '"';
+                    if (classes != '') {
+                        classes = ' class="' + classes + '"';
+                    }
+                    if (style != '') {
+                        style = ' style="' + style + '"';
+                    }
                 }
             } else {
                 imagemurl = suggestion.data.imagemurl;
                 if(imagemurl == null)
                     imagemurl = def_image;
             }
-            return '<div><img src="' + imagemurl + '"' + style + '/><p>' + result + '</p><p>' + displayfn(suggestion.data).title + '</p></div>';
+            if (tag == 'img') {
+                src = ' src="' + imagemurl + '"';
+            }
+            return '<div><' + tag + src + classes + style + '/><p>' + result + '</p><p>' + displayfn(suggestion.data).title + '</p></div>';
         }
     });
     $(input).blur(function() {
@@ -755,6 +769,25 @@ Gerenciar.cartao.initForm = function(focus_ctrl) {
         }
     });
 };
+Gerenciar.cartao.initField = function (input, field) {
+    Gerenciar.cartao.initFieldSelect(input, field, undefined);
+};
+Gerenciar.cartao.initFieldSelect = function (input, field, selectFn) {
+    Gerenciar.common.autocomplete('/gerenciar/cartao/', input, selectFn,
+        function (data) {
+            return { value: data.descricao, title: '' };
+        },
+        function (data) {
+            return { tag: 'div', style: 'background-position: -' + (data.imageindex * 50) + 'px 0px;', classes: 'cell-icon cartao-icons' };
+        },
+        function (query) {
+            return { query: query, saida: 'json', limite: 5 };
+        },
+        function (response) {
+            return response.cartoes;
+        }, field, 'data-descricao'
+    );
+};
 Gerenciar.funcao = {};
 Gerenciar.funcao.init = function() {
     ajaxLink();
@@ -778,16 +811,16 @@ Gerenciar.cliente.initField = function(input, field, tipo) {
         function (data) {
             return {value: $.trim(data.nome + (data.tipo != 'Fisica' || data.sobrenome == null?''
                 :' ' + data.sobrenome)), title: data.fone1};
-        }, 
+        },
         function (data) {
             var imagemurl = data.imagemurl;
             if(imagemurl != null) {
                 if(data.tipo == 'Fisica')
-                    return {url: imagemurl, style: 'fisica'};
+                    return {url: imagemurl, classes: 'fisica'};
                 return imagemurl;
             }
             if(data.tipo == 'Fisica')
-                return {url: '/static/img/cliente.png', style: 'fisica'};
+                return { url: '/static/img/cliente.png', classes: 'fisica'};
             return '/static/img/empresa.png';
         }, 
         function (query) {
@@ -864,7 +897,7 @@ Gerenciar.funcionario.initField = function(input, ativo) {
             var imagemurl = data.imagemurl;
             if(imagemurl == null)
                 imagemurl = '/static/img/cliente.png';
-            return {url: imagemurl, style: 'fisica'};
+            return {url: imagemurl, classes: 'fisica'};
         },
         function (query) {
             return {busca: query, ativo: ativo, limite: 5, format: 1};
@@ -2510,20 +2543,6 @@ var item_template = '\
     </div>\
 ';
     $('#query').focus();
-    $('#raw_arquivo').change(function() {
-        var input = $(this),
-            label = input.val().replace(/\\/g, '/').replace(/.*\//, '');
-        var text = $(this).closest('.input-group').find(':text');
-        if( input.length )
-            text.val(label);
-    });
-    $('#clear_arquivo').click(function() {
-        var text = $(this).closest('.input-group').find(':text');
-        $('#arquivo').val('');
-        text.val('');
-        var input = $('#raw_arquivo');
-        input.replaceWith( input = input.clone( true ) );
-    });
     function initRemoveItem(elem, titleFn, paramFn) {
         elem.click(function() {
             var top_item = $(this).closest('.top-row');
@@ -2758,6 +2777,56 @@ var item_template = '\
             } else {
                 btn.find('i').addClass('fa-edit');
                 btn.find('i').removeClass('fa-save');
+            }
+        });
+    });
+};
+Gerenciar.integracao.iFoodCardInit = function () {
+    $('#query').focus();
+    function salvarCodigo(field, btn, item) {
+        $.post(
+            '/gerenciar/cartao/ifood?action=update',
+            { codigo: field.data('codigo'), id: field.val() },
+            function (data) {
+                if (data.status != 'ok') {
+                    $('.thunder-container').message('error', data.msg);
+                    return;
+                }
+                field.attr('data-id', field.val());
+                field.data('id', field.val());
+                item.removeClass('empty error incomplete');
+                btn.addClass('disabled');
+                if (field.val() == '') {
+                    item.addClass('empty');
+                }
+            }
+        );
+    }
+    $('.assoc-input').each(function () {
+        var input = $(this);
+        var field = $(this).closest('.assoc-info').find('input[type=hidden]');
+        var btn = $(this).closest('div').find('button');
+        var item = $(this).closest('.assoc-item');
+        var imgdiv = item.find('.cell-icon');
+        btn.click(function () {
+            if (btn.hasClass('disabled')) {
+                return;
+            }
+            salvarCodigo(field, btn, item);
+        });
+        input.keyup(function (e) {
+            if (e.keyCode == 13) {
+                btn.click();
+            }
+        });
+        Gerenciar.cartao.initFieldSelect(this, field[0], function (data) {
+            if (field.val() != field.data('id')) {
+                btn.removeClass('disabled');
+                if (data != null) {
+                    imgdiv.css('background-position', '-' + (data.imageindex * 50) + 'px 0px');
+                } else {
+                    imgdiv.css('background-position', '0px 0px');
+                }
             }
         });
     });

@@ -21,11 +21,24 @@
 */
 require_once(dirname(__DIR__) . '/app.php');
 
-need_permission(PermissaoNome::CADASTROCARTOES);
+need_permission(PermissaoNome::CADASTROCARTOES, is_output('json'));
+
+$limite = isset($_GET['limite'])?intval($_GET['limite']):10;
+if ($limite > 100 || $limite < 1) {
+	$limite = 10;
+}
 
 $count = ZCartao::getCount($_GET['query'], $_GET['estado']);
-list($pagesize, $offset, $pagestring) = pagestring($count, 10);
+list($pagesize, $offset, $pagestring) = pagestring($count, $limite);
 $cartoes = ZCartao::getTodos($_GET['query'], $_GET['estado'], $offset, $pagesize);
+
+if (is_output('json')) {
+	$items = array();
+	foreach ($cartoes as $cartao) {
+		$items[] = $cartao->toArray();
+	}
+	json(array('status' => 'ok', 'cartoes' => $items));
+}
 
 $estados = array(
     'Y' => 'Ativos',

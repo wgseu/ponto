@@ -270,10 +270,6 @@ if (isset($_GET['action'])) {
                         $grupo_index++;
                         $total_pacotes = 0;
                     }
-                    // if (count($grupos) == 1) {
-                    //     $produto['itens'][$subcodigo]['grupoid'] = current($grupos)['id'];
-                    // } else {
-                    // }
                     if (!is_null($subassociado->getPropriedadeID())) {
                         $item = \ZPropriedade::getPeloID($subassociado->getPropriedadeID());
                     } else {
@@ -305,6 +301,8 @@ if (isset($_GET['action'])) {
         foreach ($produtos as $codigo => $produto) {
             if (!is_null($produto['id'])) {
                 $_produtos[$codigo] = $produto['id'];
+            } elseif (!is_null($produto['codigo_pdv'])) {
+                $_produtos[$codigo] = $produto['codigo_pdv'];
             } else {
                 $_desconhecidos[$codigo] = $produto['descricao'];
             }

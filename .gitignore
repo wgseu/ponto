@@ -16,3 +16,6 @@ etc/nginx/grandchef.location
 storage/
 .env
 .vscode/
+node_modules/
+package-lock.json
+npm-debug.log

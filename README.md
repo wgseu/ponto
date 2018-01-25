@@ -1,17 +1,63 @@
-# GrandChef
-## Instalação
-**Windows**
-- Instalar Git pelo site https://git-scm.com/download/win
-- Instalar o mingw32-base pelo mingw-get-setup https://sourceforge.net/projects/mingw/
-- Adicionar a pasta bin do MinGW no PATH
-- Copiar arquivo "mingw32-make.exe" da pasta bin do MinGW para "make.exe"
-- Instalar Sublime Text 3
-**Windows 7**
-- Instalar Docker Toolbox
-- Caso o projeto esteja em outra unidade que a unidade ```C:```
-Mudar a linha ```60``` do arquivo ```"%ProgramFiles%\Docker Toolbox\start.sh"``` de:
-```"${DOCKER_MACHINE}" create -d virtualbox $PROXY_ENV "${VM}"```
-Para:
-```"${DOCKER_MACHINE}" create -d virtualbox --virtualbox-share-folder "D:\Projects:/d/Projects" $PROXY_ENV "${VM}"```
+# GrandChef - Site
+Site do GrandChef que fornece API para tablets, gerenciamento e possibilita backup de documentos e outras mídias.
 
-## Execução
+  - Publica o cardápio online
+  - Permite o gerenciamento web do sistema
+  - Possibilita a comunicação com tablets com acionamento de impressão
+  - Permite fazer cópia de segurança de notas fiscais e outros documentos
+
+# Novos recursos!
+
+  - Integração com iFood
+
+Você pode também:
+  - Associar produtos e cartões do iFood com os do GrandChef
+  - Visualizar gráficos de vendas detalhados
+  - Baixar arquivos exportados para Excel
+
+### Tecnologias
+
+GrandChef usa vários projetos de código aberto para funcionar apropriadamente:
+
+* [PHP] - PHP is a popular general-purpose scripting language that is especially suited to web development.
+* [Nginx] - nginx [engine x] is an HTTP and reverse proxy server, a mail proxy server, and a generic TCP/UDP proxy server.
+* [MySQL] - MySQL is an open-source relational database management system.
+* [Composer] - Composer is an application-level package manager for the PHP.
+* [Docker] - Docker is a software technology providing operating-system-level virtualization also known as containers.
+* [Start Bootstrap - Agency] - Agency is a one page agency portfolio theme for Bootstrap created by Start Bootstrap.
+* [Gentelella Admin] - Gentelella Admin is a free to use Bootstrap admin template.
+* [Twitter Bootstrap] - The most popular HTML, CSS, and JS library in the world.
+* [node.js] - Node.js is an open-source, cross-platform JavaScript run-time environment for executing JavaScript code server-side
+* [Gulp] - gulp is a toolkit for automating painful or time-consuming tasks in your development workflow
+* [jQuery] - The Write Less, Do More, JavaScript Library.
+
+### Dependências
+- Git
+- make
+- msys
+- Docker
+
+### Instalação
+
+Instale as dependências e inicie o servidor.
+```sh
+git clone https://git.assembla.com/churrascaria.site.git grandchef.site
+cd grandchef.site
+cp .env.example .env
+npm install
+make start
+make populate
+npm run dev
+```
+
+   [PHP]: <http://www.php.net/>
+   [Nginx]: <https://nginx.org/>
+   [MySQL]: <https://dev.mysql.com/downloads/mysql/>
+   [Composer]: <https://getcomposer.org/>
+   [Docker]: <https://www.docker.com/>
+   [Start Bootstrap - Agency]: <https://github.com/BlackrockDigital/startbootstrap-agency>
+   [Gentelella Admin]: <https://github.com/puikinsh/gentelella>
+   [node.js]: <http://nodejs.org>
+   [Twitter Bootstrap]: <http://twitter.github.com/bootstrap/>
+   [Gulp]: <http://gulpjs.com>
+   [jQuery]: <http://jquery.com>

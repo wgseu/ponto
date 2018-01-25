@@ -1,0 +1,19 @@
+{
+  "name": "grandchef.site",
+  "productName": "GrandChef",
+  "version": "1.9.2",
+  "private": true,
+  "description": "Gerenciamento de Restaurantes e Afins",
+  "author": "MZ Software <contato@grandchef.com.br>",
+  "scripts": {
+    "dev": "gulp"
+  },
+  "devDependencies": {
+    "browser-sync": "^2.23.6",
+    "gulp": "^3.9.1",
+    "gulp-clean-css": "^3.9.2",
+    "gulp-concat": "^2.6.1",
+    "gulp-uglify": "^3.0.0",
+    "gulp-util": "^3.0.8"
+  }
+}

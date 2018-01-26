@@ -595,6 +595,13 @@ class ZPedido
 
     public static function cadastrar($pedido)
     {
+        global $__sistema__;
+        if (trim($__sistema__->getLicenseKey()) == '') {
+            $count = self::getCount();
+            if ($count >= 10) {
+                throw new Exception('Quantidade de pedidos excedido, adquira uma licença para continuar', 401);
+            }
+        }
         $_pedido = $pedido->toArray();
         self::validarCampos($_pedido);
         try {

@@ -403,7 +403,8 @@ $[field.if(image|blob)]
 $[field.end]
 $[field.end]
 $[field.each(all)]
-$[field.if(enum)]
+$[field.if(primary)]
+$[field.else.if(enum)]
 
     /**
      * Gets textual and translated $[fIeld.norm] for $[tAble.norm]

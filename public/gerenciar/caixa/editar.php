@@ -34,9 +34,10 @@ if (is_post()) {
     $caixa = new ZCaixa($_POST);
     try {
         $caixa->setID($old_caixa->getID());
-        $caixa->setNumeroInicial($old_caixa->getNumeroInicial());
-        $caixa->setSerie($old_caixa->getSerie());
-
+        if (!$__sistema__->isFiscalVisible()) {
+            $caixa->setNumeroInicial($old_caixa->getNumeroInicial());
+            $caixa->setSerie($old_caixa->getSerie());
+        }
         $caixa = ZCaixa::atualizar($caixa);
         Thunder::success('Caixa "'.$caixa->getDescricao().'" atualizado com sucesso!', true);
         redirect('/gerenciar/caixa/');

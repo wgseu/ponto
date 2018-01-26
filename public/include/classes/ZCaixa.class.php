@@ -165,14 +165,14 @@ class ZCaixa
         if (strlen($caixa['descricao']) == 0) {
             $erros['descricao'] = 'A descrição não pode ser vazia';
         }
-        if (!$__sistema__->isFiscal()) {
+        if (!$__sistema__->isFiscalVisible()) {
             $caixa['serie'] = is_null($old_caixa->getID())?1:$old_caixa->getSerie();
         } elseif (!is_numeric($caixa['serie'])) {
             $erros['serie'] = 'A série não foi informada';
         } else {
             $caixa['serie'] = intval($caixa['serie']);
         }
-        if (!$__sistema__->isFiscal()) {
+        if (!$__sistema__->isFiscalVisible()) {
             $caixa['numeroinicial'] = is_null($old_caixa->getID())?1:$old_caixa->getNumeroInicial();
         } elseif (!is_numeric($caixa['numeroinicial'])) {
             $erros['numeroinicial'] = 'O número inicial não foi informado';

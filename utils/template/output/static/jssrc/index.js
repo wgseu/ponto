@@ -1,17 +1,17 @@
 Gerenciar.$[table.unix] = {};
-Gerenciar.$[table.unix].init = function() {
+Gerenciar.$[table.unix].init = function () {
     $('#query').focus();
 $[field.each]
 $[field.if(enum)]
-    $('#$[field]').change(function() {
+    $('#$[field]').change(function () {
         $(this).closest('form').submit();
     });
 $[field.end]
 $[field.end]
     ajaxLink('$[table.unix]-delete').on('$[table.unix]-delete', function (ev, url) {
         var row = $(this).closest('tr');
-        $.get(makeurl(url, {saida: 'json'}), function (data){
-            if(data.status != 'ok') {
+        $.get(makeurl(url, { saida: 'json' }), function (data) {
+            if (data.status != 'ok') {
                 $('.thunder-container').message('error', data.msg);
             } else {
                 $('.thunder-container').message('success', data.msg, { autoClose: { enable: true } });
@@ -20,7 +20,7 @@ $[field.end]
         });
     });
 };
-Gerenciar.$[table.unix].initForm = function(focus_ctrl) {
+Gerenciar.$[table.unix].initForm = function (focus_ctrl) {
 $[field.each]
 $[field.if(image)]
     Image.upload.initialize('#$[field]_container');
@@ -64,10 +64,10 @@ $[field.end]
     }
 };
 $[table.exists(descriptor)]
-Gerenciar.$[table.unix].initField = function(field) {
+Gerenciar.$[table.unix].initField = function (field) {
     Gerenciar.common.autocomplete('/gerenciar/$[table.unix]/', field + '_input', undefined,
         function (data) {
-            return {value: data.$[descriptor], title: data.$[primary]};
+            return { value: data.$[descriptor], title: data.$[primary] };
         }$[table.exists(image)]$[field.each]$[field.if(image)],
         function (data) {
             return data.$[field] || '/static/img/$[field.image.default]';

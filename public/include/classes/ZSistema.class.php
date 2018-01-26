@@ -267,6 +267,16 @@ class ZSistema
         return !is_null(get_string_config('Licenca', 'Modulo.Fiscal', null));
     }
 
+
+    /**
+     * Informa se o sistema dve exibir configurações fiscais
+     * @return boolean true para exibir, false caso contrário
+     */
+    public function isFiscalVisible()
+    {
+        return $this->isFiscal() || is_boolean_config('Sistema', 'Fiscal.Mostrar', false);
+    }
+
     public function toArray()
     {
         $sistema = array();

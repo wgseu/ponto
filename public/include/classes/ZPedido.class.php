@@ -598,7 +598,7 @@ class ZPedido
         global $__sistema__;
         if (trim($__sistema__->getLicenseKey()) == '') {
             $count = self::getCount();
-            if ($count >= 10) {
+            if ($count >= 20) {
                 throw new Exception('Quantidade de pedidos excedido, adquira uma licença para continuar', 401);
             }
         }

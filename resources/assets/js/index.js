@@ -2669,6 +2669,7 @@ Gerenciar.integracao.iFoodInit = function () {
                     var group = grupos[this.grupoid];
                     var input = $('input[type=text]', item);
                     var field = $('input[type=hidden]', item);
+                    var imgdiv = item.find('img');
                     var btn = $('button', item);
                     $('.identifier', item).text(this.descricao);
                     field.attr('id', 'produto_' + this.codigo);
@@ -2706,8 +2707,13 @@ Gerenciar.integracao.iFoodInit = function () {
                             function (text_input) {
                                 return $(text_input).closest('.connectedSortable').data('grupoid');
                             },
-                            function () {
+                            function (data) {
                                 btn.removeClass('disabled');
+                                if (data != null && data.imagemurl != null) {
+                                    imgdiv.attr('src', data.imagemurl);
+                                } else {
+                                    imgdiv.attr('src', '/static/img/produto.png');
+                                }
                             }
                         );
                     } else {
@@ -2715,8 +2721,13 @@ Gerenciar.integracao.iFoodInit = function () {
                             input[0],
                             field[0],
                             group_list.data('id'),
-                            function () {
+                            function (data) {
                                 btn.removeClass('disabled');
+                                if (data != null && data.imagemurl != null) {
+                                    imgdiv.attr('src', data.imagemurl);
+                                } else {
+                                    imgdiv.attr('src', '/static/img/produto.png');
+                                }
                             }
                         );
                     }
@@ -2746,6 +2757,7 @@ Gerenciar.integracao.iFoodInit = function () {
         var field = $(this).closest('.assoc-info').find('input[type=hidden]');
         var btn = $(this).closest('div').find('button');
         var item = $(this).closest('.assoc-item');
+        var imgdiv = item.find('img');
         btn.click(function () {
             if (btn.hasClass('disabled')) {
                 return;
@@ -2761,8 +2773,13 @@ Gerenciar.integracao.iFoodInit = function () {
                 btn.click();
             }
         });
-        Gerenciar.produto.initFieldSelect(this, field[0], -1, function () {
+        Gerenciar.produto.initFieldSelect(this, field[0], -1, function (data) {
             btn.removeClass('disabled');
+            if (data != null && data.imagemurl != null) {
+                imgdiv.attr('src', data.imagemurl);
+            } else {
+                imgdiv.attr('src', '/static/img/produto.png');
+            }
             if (field.data('item-count') == 0 || field.val() != field.data('id')) {
                 btn.find('i').addClass('fa-save');
                 btn.find('i').removeClass('fa-edit');

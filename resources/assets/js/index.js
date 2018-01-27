@@ -2674,14 +2674,19 @@ Gerenciar.integracao.iFoodInit = function () {
                     $('.identifier', item).text(this.descricao);
                     field.attr('id', 'produto_' + this.codigo);
                     field.attr('name', 'produto[' + this.codigo + ']');
-                    field.attr('data-descricao', this.associado.descricao);
-                    field.data('descricao', this.associado.descricao);
+                    field.attr('data-descricao', this.associado.descricao || this.associado.nome);
+                    field.data('descricao', this.associado.descricao || this.associado.nome);
                     field.attr('data-codigo', this.codigo);
                     field.data('codigo', this.codigo);
                     field.val(this.id);
                     input.attr('id', 'produto_' + this.codigo + '_input');
-                    input.val(this.associado.descricao);
+                    input.val(this.associado.descricao || this.associado.nome);
                     group.append(item);
+                    if (this.associado.imagem != null) {
+                        imgdiv.attr('src', '/static/img/produto/' + this.associado.imagem);
+                    } else {
+                        imgdiv.attr('src', '/static/img/produto.png');
+                    }
                     item = $('.assoc-item', item);
                     if (!this.id) {
                         item.addClass('empty');

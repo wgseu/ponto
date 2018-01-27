@@ -2562,6 +2562,20 @@ Gerenciar.integracao.iFoodInit = function () {
             return { codigo: top_item.find('input[type=hidden]').data('codigo') };
         }
     );
+    function changeButtonState(field, btn) {
+        if (field.val() == field.data('id') && (field.data('item-count') == 0 || field.val() == '')) {
+            btn.addClass('disabled');
+        } else {
+            btn.removeClass('disabled');
+        }
+        if (field.val() == field.data('id') && field.data('item-count') > 0) {
+            btn.find('i').addClass('fa-edit');
+            btn.find('i').removeClass('fa-save');
+        } else {
+            btn.find('i').addClass('fa-save');
+            btn.find('i').removeClass('fa-edit');
+        }
+    }
     function salvarCodigo(field, btn, item) {
         $.post(
             '/gerenciar/produto/ifood?action=update',
@@ -2574,12 +2588,7 @@ Gerenciar.integracao.iFoodInit = function () {
                 field.attr('data-id', field.val());
                 field.data('id', field.val());
                 item.removeClass('empty error incomplete');
-                if (field.data('item-count') == 0) {
-                    btn.addClass('disabled');
-                } else {
-                    btn.find('i').addClass('fa-edit');
-                    btn.find('i').removeClass('fa-save');
-                }
+                changeButtonState(field, btn);
                 if (field.val() == '') {
                     item.addClass('empty');
                 } else if (field.data('item-count') > 0) {
@@ -2672,6 +2681,8 @@ Gerenciar.integracao.iFoodInit = function () {
                     var imgdiv = item.find('img');
                     var btn = $('button', item);
                     $('.identifier', item).text(this.descricao);
+                    field.attr('data-id', this.id);
+                    field.data('id', this.id);
                     field.attr('id', 'produto_' + this.codigo);
                     field.attr('name', 'produto[' + this.codigo + ']');
                     field.attr('data-descricao', this.associado.descricao || this.associado.nome);
@@ -2713,7 +2724,11 @@ Gerenciar.integracao.iFoodInit = function () {
                                 return $(text_input).closest('.connectedSortable').data('grupoid');
                             },
                             function (data) {
-                                btn.removeClass('disabled');
+                                if (field.val() == field.data('id')) {
+                                    btn.addClass('disabled');
+                                } else {
+                                    btn.removeClass('disabled');
+                                }
                                 if (data != null && data.imagemurl != null) {
                                     imgdiv.attr('src', data.imagemurl);
                                 } else {
@@ -2727,7 +2742,11 @@ Gerenciar.integracao.iFoodInit = function () {
                             field[0],
                             group_list.data('id'),
                             function (data) {
-                                btn.removeClass('disabled');
+                                if (field.val() == field.data('id')) {
+                                    btn.addClass('disabled');
+                                } else {
+                                    btn.removeClass('disabled');
+                                }
                                 if (data != null && data.imagemurl != null) {
                                     imgdiv.attr('src', data.imagemurl);
                                 } else {
@@ -2767,7 +2786,7 @@ Gerenciar.integracao.iFoodInit = function () {
             if (btn.hasClass('disabled')) {
                 return;
             }
-            if (field.data('item-count') == 0 || field.val() != field.data('id')) {
+            if (btn.find('i').hasClass('fa-save')) {
                 salvarCodigo(field, btn, item);
             } else {
                 editaPacote(field, btn, item);
@@ -2779,18 +2798,11 @@ Gerenciar.integracao.iFoodInit = function () {
             }
         });
         Gerenciar.produto.initFieldSelect(this, field[0], -1, function (data) {
-            btn.removeClass('disabled');
+            changeButtonState(field, btn);
             if (data != null && data.imagemurl != null) {
                 imgdiv.attr('src', data.imagemurl);
             } else {
                 imgdiv.attr('src', '/static/img/produto.png');
-            }
-            if (field.data('item-count') == 0 || field.val() != field.data('id')) {
-                btn.find('i').addClass('fa-save');
-                btn.find('i').removeClass('fa-edit');
-            } else {
-                btn.find('i').addClass('fa-edit');
-                btn.find('i').removeClass('fa-save');
             }
         });
     });
@@ -2834,13 +2846,15 @@ Gerenciar.integracao.iFoodCardInit = function () {
             }
         });
         Gerenciar.cartao.initFieldSelect(this, field[0], function (data) {
-            if (field.val() != field.data('id')) {
+            if (field.val() == field.data('id')) {
+                btn.addClass('disabled');
+            } else {
                 btn.removeClass('disabled');
-                if (data != null) {
-                    imgdiv.css('background-position', '-' + (data.imageindex * 50) + 'px 0px');
-                } else {
-                    imgdiv.css('background-position', '0px 0px');
-                }
+            }
+            if (data != null) {
+                imgdiv.css('background-position', '-' + (data.imageindex * 50) + 'px 0px');
+            } else {
+                imgdiv.css('background-position', '0px 0px');
             }
         });
     });

@@ -318,7 +318,8 @@ class ZComposicao
         $busca,
         $composicao_id,
         $somente_selecionaveis,
-        $incluir_adicionais
+        $incluir_adicionais,
+        $sem_opcionais
     ) {
         $query = DB::$pdo->from('Composicoes c')
                          ->leftJoin('Produtos p ON p.id = c.produtoid')
@@ -332,6 +333,9 @@ class ZComposicao
         if ($somente_selecionaveis && !$incluir_adicionais) {
             $query = $query->where('c.tipo <> ?', ComposicaoTipo::ADICIONAL);
         }
+        if ($somente_selecionaveis && $sem_opcionais) {
+            $query = $query->where('c.tipo <> ?', ComposicaoTipo::OPCIONAL);
+        }
         return $query;
     }
 
@@ -340,10 +344,17 @@ class ZComposicao
         $composicao_id,
         $somente_selecionaveis = false,
         $incluir_adicionais = false,
+        $sem_opcionais = false,
         $inicio = null,
         $quantidade = null
     ) {
-        $query = self::initSearchDaComposicaoID($busca, $composicao_id, $somente_selecionaveis, $incluir_adicionais);
+        $query = self::initSearchDaComposicaoID(
+            $busca,
+            $composicao_id,
+            $somente_selecionaveis,
+            $incluir_adicionais,
+            $sem_opcionais
+        );
         if (!is_null($inicio) && !is_null($quantidade)) {
             $query = $query->limit($quantidade)->offset($inicio);
         }
@@ -360,10 +371,17 @@ class ZComposicao
         $composicao_id,
         $somente_selecionaveis = false,
         $incluir_adicionais = false,
+        $sem_opcionais = false,
         $inicio = null,
         $quantidade = null
     ) {
-        $query = self::initSearchDaComposicaoID($busca, $composicao_id, $somente_selecionaveis, $incluir_adicionais);
+        $query = self::initSearchDaComposicaoID(
+            $busca,
+            $composicao_id,
+            $somente_selecionaveis,
+            $incluir_adicionais,
+            $sem_opcionais
+        );
         $query = $query->select('p.descricao as produtodescricao')
                        ->select('p.abreviacao as produtoabreviacao')
                        ->select('p.conteudo as produtoconteudo')
@@ -379,9 +397,20 @@ class ZComposicao
         return $query->fetchAll();
     }
 
-    public static function getCountDaComposicaoID($busca, $composicao_id, $somente_selecionaveis = false, $incluir_adicionais = false)
-    {
-        $query = self::initSearchDaComposicaoID($busca, $composicao_id, $somente_selecionaveis, $incluir_adicionais);
+    public static function getCountDaComposicaoID(
+        $busca,
+        $composicao_id,
+        $somente_selecionaveis = false,
+        $incluir_adicionais = false,
+        $sem_opcionais = false
+    ) {
+        $query = self::initSearchDaComposicaoID(
+            $busca,
+            $composicao_id,
+            $somente_selecionaveis,
+            $incluir_adicionais,
+            $sem_opcionais
+        );
         return $query->count();
     }
 

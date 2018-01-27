@@ -1976,8 +1976,9 @@ Gerenciar.composicao.init = function () {
 Gerenciar.composicao.initForm = function (focus_ctrl) {
     $('#quantidade').autoNumeric('init');
     $('#valor').autoNumeric('init');
-    if (focus_ctrl != undefined)
+    if (focus_ctrl != undefined) {
         $('#' + focus_ctrl).focus();
+    }
 };
 Gerenciar.composicao.initFieldSelect = function (input, field, produtoid, selectFn) {
     Gerenciar.common.autocomplete('/app/composicao/listar', input, selectFn,
@@ -1986,7 +1987,14 @@ Gerenciar.composicao.initFieldSelect = function (input, field, produtoid, select
         },
         '/static/img/produto.png',
         function (query) {
-            return { busca: query, produto: produtoid, adicionais: 1, limite: 5 };
+            return {
+                busca: query,
+                produto: produtoid,
+                selecionaveis: 1,
+                adicionais: 1,
+                sem_opcionais: 1,
+                limite: 5
+            };
         },
         function (response) {
             return response.composicoes;

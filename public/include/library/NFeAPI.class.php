@@ -505,10 +505,6 @@ class NFeAPI extends \NFe\Common\Ajuste
             // não bloqueia a tarefa se for problema de rede
             return;
         }
-        if ($_nota->isContingencia()) {
-            // não bloqueia a tarefa de consulta de notas pendentes em contingência
-            return;
-        }
         // Evita de ficar toda hora enviando a mesma nota com erro
         $_nota->setCorrigido('N');
         $_nota = ZNota::atualizar($_nota);

@@ -99,7 +99,6 @@ restore:
 
 test:
 	@docker-compose exec -T php ./public/include/vendor/bin/phpunit --colors=always --configuration ./ --no-coverage ./tests
-	@make -s reset
 
 class:
 	@mkdir -p $(MYSQL_DUMPS_DIR)

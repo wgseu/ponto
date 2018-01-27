@@ -33,6 +33,7 @@ $composicoes = ZComposicao::getTodasDaComposicaoIDEx(
     $_GET['produto'],
     intval($_GET['selecionaveis']) != 0,
     intval($_GET['adicionais']) != 0,
+    intval($_GET['sem_opcionais']) != 0,
     0,
     $limite
 );

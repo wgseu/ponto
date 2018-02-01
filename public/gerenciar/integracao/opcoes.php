@@ -24,7 +24,7 @@ require_once(dirname(__DIR__) . '/app.php');
 use MZ\System\Integracao;
 
 need_permission(\PermissaoNome::ALTERARCONFIGURACOES, true);
-if (!$_POST) {
+if (!is_post()) {
     json('Nenhum dado foi enviado');
 }
 $id = isset($_POST['id'])?$_POST['id']:null;

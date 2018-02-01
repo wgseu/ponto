@@ -3,7 +3,7 @@ require_once(dirname(__DIR__) . '/app.php');
 
 need_permission(PermissaoNome::ALTERARCONFIGURACOES, is_output('json'));
 
-if (!$_POST) {
+if (!is_post()) {
     json('Nenhum dado foi enviado');
 }
 

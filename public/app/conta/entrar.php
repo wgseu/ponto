@@ -43,7 +43,7 @@ if (is_login()) {
     $status['permissoes'] = ZAcesso::getPermissoes($login_funcionario->getID());
     json($status);
 }
-if (!$_POST) {
+if (!is_post()) {
     json('Método incorreto');
 }
 $usuario = strval($_POST['usuario']);

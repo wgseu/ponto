@@ -66,6 +66,10 @@ if (isset($_GET['action'])) {
                             'itens' => array(),
                         );
                         if (isset($produtos[$codigo_pai])) {
+                            if (isset($produtos[$codigo]['id'])) {
+                                $produto['id'] = $produtos[$codigo]['id'];
+                                unset($produtos[$codigo]);
+                            }
                             unset($produto['itens']);
                             if (isset($produtos[$codigo_pai]['itens'][$codigo])) {
                                 $produtos[$codigo_pai]['itens'][$codigo] = array_merge(
@@ -119,7 +123,23 @@ if (isset($_GET['action'])) {
                                 )
                             );
                         } else {
-                            $produtos[$codigo] = $produto;
+                            $found = false;
+                            foreach ($produtos as $_codigo => $_produto) {
+                                if (isset($_produto['itens'][$codigo])) {
+                                    $found = true;
+                                    $produtos[$_codigo]['itens'][$codigo] = array_merge(
+                                        $_produto['itens'][$codigo],
+                                        array_merge(
+                                            $_produto['itens'][$codigo],
+                                            array('id' => $value)
+                                        )
+                                    );
+                                    break;
+                                }
+                            }
+                            if (!$found) {
+                                $produtos[$codigo] = $produto;
+                            }
                         }
                     }
                     $dados = isset($dados)?$dados:array();

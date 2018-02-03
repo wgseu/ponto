@@ -4,7 +4,7 @@ require_once(dirname(dirname(__DIR__)) . '/app.php'); // main app file
 need_permission(PermissaoNome::ALTERARCONFIGURACOES, isset($_POST));
 
 $tab_impressao = 'active';
-$opcoes_impressao = array(
+$opcoes_aparencia = array(
     array('section' => 'Imprimir', 'key' => 'Empresa.CNPJ', 'default' => true, 'title' => vsprintf('Imprimir o %s', array(_p('Titulo', 'CNPJ')))),
     array('section' => 'Imprimir', 'key' => 'Empresa.Endereco', 'default' => true, 'title' => 'Imprimir o endereço'),
     array('section' => 'Imprimir', 'key' => 'Empresa.Telefone_1', 'default' => true, 'title' => 'Imprimir o telefone 1'),
@@ -20,30 +20,36 @@ $opcoes_impressao = array(
     array('section' => 'Imprimir', 'key' => 'Cozinha.Produto.Detalhes', 'default' => false, 'title' => 'Imprimir os detalhes do produto'),
     array('section' => 'Imprimir', 'key' => 'Mesa.Atendente_Dividir', 'default' => false, 'title' => 'Imprimir local e atendente separados'),
     array('section' => 'Imprimir', 'key' => 'Relatorio.Grafico_3D', 'default' => true, 'title' => 'Imprimir gráficos em 3D'),
-    array('section' => 'Imprimir', 'key' => 'Vendas.Cancelamentos', 'default' => false, 'title' => 'Imprimir cancelamentos'),
     array('section' => 'Imprimir', 'key' => 'Fechamento.Produtos', 'default' => false, 'title' => 'Imprimir produtos no fechamento'),
-    array('section' => 'Imprimir', 'key' => 'Senha.Paineis', 'default' => false, 'title' => 'Imprimir senha para painéis'),
-    array('section' => 'Imprimir', 'key' => 'Comanda.Senha', 'default' => false, 'title' => 'Imprimir senha nas comandas'),
     array('section' => 'Imprimir', 'key' => 'Cozinha.Fonte.Gigante', 'default' => false, 'title' => 'Imprimir serviços em letra grande'),
     array('section' => 'Imprimir', 'key' => 'Servico.Detalhado', 'default' => true, 'title' => 'Imprimir serviços detalhadamente'),
     array('section' => 'Imprimir', 'key' => 'Endereco.Destacado', 'default' => true, 'title' => 'Imprimir endereço destacado'),
     array('section' => 'Imprimir', 'key' => 'Cozinha.Local_Destacado', 'default' => true, 'title' => 'Imprimir local destacado'),
     array('section' => 'Imprimir', 'key' => 'Servicos.Pessoas', 'default' => true, 'title' => 'Imprimir quantidade de pessoas nos serviços'),
-    array('section' => 'Imprimir', 'key' => 'Vendas.Resumo.Entrega', 'default' => false, 'title' => 'Imprimir resumo de entrega'),
-    array('section' => 'Cupom'   , 'key' => 'Pedido.Fechamento', 'default' => true, 'title' => 'Imprimir conta ao fechar pedidos'),
-    array('section' => 'Imprimir', 'key' => 'Guia.Pagamento', 'default' => true, 'title' => 'Imprimir guia de pagamento'),
-    array('section' => 'Imprimir', 'key' => 'Contas.Comprovantes', 'default' => true, 'title' => 'Imprimir comprovante de contas'),
-    array('section' => 'Imprimir', 'key' => 'Caixa.Operacoes', 'default' => true, 'title' => 'Imprimir operações financeiras'),
-    array('section' => 'Cupom'   , 'key' => 'Servicos.Perguntar', 'default' => false, 'title' => 'Imprimir serviços sem perguntar'),
     array('section' => 'Imprimir', 'key' => 'Cozinha.Cliente', 'default' => false, 'title' => 'Imprimir cliente nos serviços'),
     array('section' => 'Imprimir', 'key' => 'Cozinha.Pedido.Descricao', 'default' => false, 'title' => 'Imprimir observação do pedido nos serviços'),
     array('section' => 'Imprimir', 'key' => 'Pedido.Descricao', 'default' => false, 'title' => 'Imprimir observações no pedido'),
     array('section' => 'Imprimir', 'key' => 'Pacotes.Agrupados', 'default' => true, 'title' => 'Imprimir pacotes agrupados'),
-    array('section' => 'Imprimir', 'key' => 'Caixa.Fechamento', 'default' => true, 'title' => 'Imprimir fechamento de caixa'),
-    array('section' => 'Cupom'   , 'key' => 'Perguntar', 'default' => false, 'title' => 'Exibir pegunta de impressão'),
     array('section' => 'Imprimir', 'key' => 'Cozinha.Separar', 'default' => false, 'title' => 'Imprimir linha separadora de serviços'),
     array('section' => 'Imprimir', 'key' => 'Cozinha.Saldo', 'default' => false, 'title' => 'Imprimir saldo restante da comanda nos serviços'),
 );
+$opcoes_guias = array(
+    array('section' => 'Imprimir', 'key' => 'Caixa.Fechamento', 'default' => true, 'title' => 'Imprimir fechamento de caixa'),
+    array('section' => 'Imprimir', 'key' => 'Contas.Comprovantes', 'default' => true, 'title' => 'Imprimir comprovante de contas'),
+    array('section' => 'Imprimir', 'key' => 'Vendas.Cancelamentos', 'default' => false, 'title' => 'Imprimir cancelamentos'),
+    array('section' => 'Imprimir', 'key' => 'Caixa.Operacoes', 'default' => true, 'title' => 'Imprimir operações financeiras'),
+    array('section' => 'Imprimir', 'key' => 'Guia.Pagamento', 'default' => true, 'title' => 'Imprimir guia de pagamento'),
+    array('section' => 'Imprimir', 'key' => 'Senha.Paineis', 'default' => false, 'title' => 'Imprimir senha para painéis'),
+    array('section' => 'Imprimir', 'key' => 'Comanda.Senha', 'default' => false, 'title' => 'Imprimir senha nas comandas'),
+    array('section' => 'Imprimir', 'key' => 'Vendas.Resumo.Entrega', 'default' => false, 'title' => 'Imprimir resumo de entrega'),
+    array('section' => 'Cupom'   , 'key' => 'Pedido.Fechamento', 'default' => true, 'title' => 'Imprimir conta ao fechar pedidos'),
+);
+$opcoes_comportamento = array(
+    array('section' => 'Cupom'   , 'key' => 'Perguntar', 'default' => false, 'title' => 'Exibir pegunta de impressão'),
+    array('section' => 'Cupom'   , 'key' => 'Servicos.Perguntar', 'default' => false, 'title' => 'Perguntar antes de imprimir serviços'),
+);
+$opcoes_impressao = array_merge($opcoes_aparencia, $opcoes_guias, $opcoes_comportamento);
+
 if (is_post()) {
     try {
         if (!config_values_exists($opcoes_impressao, $_POST['secao'], $_POST['chave'])) {

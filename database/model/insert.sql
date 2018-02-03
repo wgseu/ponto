@@ -166,7 +166,9 @@ INSERT INTO `Permissoes` (ID, FuncionalidadeID, Nome, Descricao) VALUES
 	(91, 1, "TransformarEntrega", "Permitir transformar um pedido de entrega para viagem e vice versa"),
 	(92, 4, "ConferirCaixa", "Permitir alterar os valores de conferência de um caixa"),
 	(93, 2, "ContaViagem", "Permitir imprimir conta de pedidos para viagem"),
-	(94, 2, "EntregaAdicionar", "Permitir adicionar produtos na tela de entrega");
+	(94, 2, "EntregaAdicionar", "Permitir adicionar produtos na tela de entrega"),
+	(95, 1, "EntregarPedidos", "Permitir realizar entrega de pedidos"),
+	(96, 5, "InformarDesperdicio", "Permitir informar um desperdício ao cancelar um produto");
 
 INSERT INTO `Acessos` (FuncaoID, PermissaoID) VALUES
 	(1, 1),
@@ -261,6 +263,8 @@ INSERT INTO `Acessos` (FuncaoID, PermissaoID) VALUES
 	(1, 92),
 	(1, 93),
 	(1, 94),
+	(1, 95),
+	(1, 96),
 	(2, 1),
 	(2, 4),
 	(2, 6),
@@ -313,6 +317,7 @@ INSERT INTO `Acessos` (FuncaoID, PermissaoID) VALUES
 	(3, 91),
 	(3, 93),
 	(3, 94),
+	(3, 96),
 	(4, 1),
 	(4, 70),
 	(6, 1),
@@ -320,6 +325,7 @@ INSERT INTO `Acessos` (FuncaoID, PermissaoID) VALUES
 	(6, 45),
 	(6, 65),
 	(6, 71),
+	(6, 95),
 	(7, 1),
 	(7, 17),
 	(7, 28),
@@ -327,7 +333,8 @@ INSERT INTO `Acessos` (FuncaoID, PermissaoID) VALUES
 	(7, 66),
 	(7, 72),
 	(7, 80),
-	(7, 81);
+	(7, 81),
+	(7, 96);
 
 INSERT INTO `Mesas` (ID, Nome, Ativa) VALUES 
 	(1, "Mesa 1", 'Y'),
@@ -417,7 +424,7 @@ INSERT INTO `Classificacoes` (ID, Descricao) VALUES
 
 INSERT INTO `Contas` (ID, ClassificacaoID, FuncionarioID, Descricao, Valor, Cancelada, DataCadastro) VALUES
 	(1, 1, 1, "Movimentação no caixa", 0, 'N', NOW());
-	
+
 INSERT INTO `Servicos` (ID, Nome, Descricao, Tipo, Obrigatorio, Valor, Individual, Ativo) VALUES
 	(1, "Desconto", "Permite realizar descontos nos pedidos", 'Taxa', 'N', 0, 'N', 'Y'),
 	(2, "Entrega", "Permite cobrar taxa de entrega de pedidos", 'Taxa', 'N', 0, 'N', 'Y');
@@ -565,7 +572,7 @@ INSERT INTO `Integracoes` (`Nome`, `AcessoURL`, `Descricao`, `IconeURL`, `Ativo`
 	('iFood', 'ifood', 'Módulo de integração com o iFood', 'ifood.png', 'N', NOW());
 
 INSERT INTO `Sistema` (ID, PaisID, VersaoDB, UltimoBackup) VALUES
-	(1, 1, "1.9.2.5", NOW());
+	(1, 1, "1.9.3.0", NOW());
 
 SET SQL_MODE=@OLD_SQL_MODE;
 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;

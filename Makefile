@@ -84,6 +84,7 @@ populate:
 	@$(shell echo "SET NAMES 'utf8' COLLATE 'utf8_unicode_ci';" > $(MYSQL_DUMPS_DIR)/populate.sql)
 	@$(shell cat database/model/script.sql >> $(MYSQL_DUMPS_DIR)/populate.sql)
 	@$(shell cat database/model/insert.sql >> $(MYSQL_DUMPS_DIR)/populate.sql)
+	@$(shell cat database/model/populate.sql >> $(MYSQL_DUMPS_DIR)/populate.sql)
 	@$(shell perl -0777 -i.original -pe "s/\`GrandChef\`/\`$(MYSQL_DATABASE)\`/igs" $(MYSQL_DUMPS_DIR)/populate.sql)
 	@rm -f $(MYSQL_DUMPS_DIR)/populate.sql.original
 	@make -s reset

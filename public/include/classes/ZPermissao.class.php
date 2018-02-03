@@ -114,6 +114,8 @@ class PermissaoNome
     const CONFERIRCAIXA = 'ConferirCaixa'; // Permitir alterar os valores de conferência de um caixa
     const CONTAVIAGEM = 'ContaViagem'; // Permitir imprimir conta de pedidos para viagem
     const ENTREGAADICIONAR = 'EntregaAdicionar'; // Permitir adicionar produtos na tela de entrega
+    const ENTREGARPEDIDOS = 'EntregarPedidos'; // Permitir realizar entrega de pedidos
+    const INFORMARDESPERDICIO = 'InformarDesperdicio'; // Permitir informar um desperdício ao cancelar um produto
 }
 
 /**

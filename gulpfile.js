@@ -137,6 +137,7 @@ gulp.task('watch', ['browser-sync'], function () {
 
 gulp.task('browser-sync', function () {
     browserSync.init({
+        ui: false,
         proxy: proxy_host + ':8001',
         port: 3001
     });

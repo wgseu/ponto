@@ -42,6 +42,7 @@ $opcoes_impressao = array(
     array('section' => 'Imprimir', 'key' => 'Caixa.Fechamento', 'default' => true, 'title' => 'Imprimir fechamento de caixa'),
     array('section' => 'Cupom'   , 'key' => 'Perguntar', 'default' => false, 'title' => 'Exibir pegunta de impressão'),
     array('section' => 'Imprimir', 'key' => 'Cozinha.Separar', 'default' => false, 'title' => 'Imprimir linha separadora de serviços'),
+    array('section' => 'Imprimir', 'key' => 'Cozinha.Saldo', 'default' => false, 'title' => 'Imprimir saldo restante da comanda nos serviços'),
 );
 if (is_post()) {
     try {

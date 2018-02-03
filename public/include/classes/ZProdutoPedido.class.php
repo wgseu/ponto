@@ -49,6 +49,14 @@ class ZProdutoPedido
     private $data_visualizacao;
     private $data_atualizacao;
     private $cancelado;
+    /**
+     * Informa o motivo do item ser cancelado
+     */
+    private $motivo;
+    /**
+     * Informa se o item foi cancelado por conta de desperdício
+     */
+    private $desperdicado;
     private $data_hora;
 
     public function __construct($produto_pedido = array())
@@ -246,6 +254,55 @@ class ZProdutoPedido
         $this->cancelado = $cancelado;
     }
 
+    /**
+     * Informa o motivo do item ser cancelado
+     * @return mixed Motivo of ProdutoPedido
+     */
+    public function getMotivo()
+    {
+        return $this->motivo;
+    }
+
+    /**
+     * Set Motivo value to new on param
+     * @param  mixed $motivo new value for Motivo
+     * @return ProdutoPedido Self instance
+     */
+    public function setMotivo($motivo)
+    {
+        $this->motivo = $motivo;
+        return $this;
+    }
+
+    /**
+     * Informa se o item foi cancelado por conta de desperdício
+     * @return mixed Desperdiçado of ProdutoPedido
+     */
+    public function getDesperdicado()
+    {
+        return $this->desperdicado;
+    }
+
+    /**
+     * Informa se o item foi cancelado por conta de desperdício
+     * @return boolean Check if o of Desperdicado is selected or checked
+     */
+    public function isDesperdicado()
+    {
+        return $this->desperdicado == 'Y';
+    }
+
+    /**
+     * Set Desperdicado value to new on param
+     * @param  mixed $desperdicado new value for Desperdicado
+     * @return ProdutoPedido Self instance
+     */
+    public function setDesperdicado($desperdicado)
+    {
+        $this->desperdicado = $desperdicado;
+        return $this;
+    }
+
     public function getDataHora()
     {
         return $this->data_hora;
@@ -425,6 +482,16 @@ class ZProdutoPedido
         } else {
             $this->setCancelado($produto_pedido['cancelado']);
         }
+        if (!array_key_exists('motivo', $produto_pedido)) {
+            $this->setMotivo(null);
+        } else {
+            $this->setMotivo($produto_pedido['motivo']);
+        }
+        if (!isset($produto_pedido['desperdicado'])) {
+            $this->setDesperdicado('N');
+        } else {
+            $this->setDesperdicado($produto_pedido['desperdicado']);
+        }
         if (!isset($produto_pedido['datahora'])) {
             $this->setDataHora(null);
         } else {
@@ -454,6 +521,8 @@ class ZProdutoPedido
         $produto_pedido['datavisualizacao'] = $this->getDataVisualizacao();
         $produto_pedido['dataatualizacao'] = $this->getDataAtualizacao();
         $produto_pedido['cancelado'] = $this->getCancelado();
+        $produto_pedido['motivo'] = $this->getMotivo();
+        $produto_pedido['desperdicado'] = $this->getDesperdicado();
         $produto_pedido['datahora'] = $this->getDataHora();
         return $produto_pedido;
     }
@@ -542,6 +611,12 @@ class ZProdutoPedido
         } elseif (!in_array($produto_pedido['cancelado'], array('Y', 'N'))) {
             $erros['cancelado'] = 'A informação de cancelamento não é válida';
         }
+        $produto_pedido['desperdicado'] = trim($produto_pedido['desperdicado']);
+        if (strlen($produto_pedido['desperdicado']) == 0) {
+            $produto_pedido['desperdicado'] = 'N';
+        } elseif (!in_array($produto_pedido['desperdicado'], array('Y', 'N'))) {
+            $erros['desperdicado'] = 'O desperdício informado não é válido';
+        }
         $produto_pedido['datahora'] = date('Y-m-d H:i:s');
         if (!empty($erros)) {
             throw new ValidationException($erros);
@@ -629,6 +704,8 @@ class ZProdutoPedido
             'datavisualizacao',
             'dataatualizacao',
             'cancelado',
+            'motivo',
+            'desperdicado',
             'datahora',
         );
         try {
@@ -946,6 +1023,8 @@ class ZProdutoPedido
                              'pp.datavisualizacao, '.
                              'pp.dataatualizacao, '.
                              'pp.cancelado, '.
+                             'pp.motivo, '.
+                             'pp.desperdicado, '.
                              'pp.datahora'
                          )
                          ->select('SUM(pp.quantidade) as quantidade')

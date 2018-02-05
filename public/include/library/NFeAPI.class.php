@@ -496,7 +496,7 @@ class NFeAPI extends \NFe\Common\Ajuste
     {
         $_nota = ZNota::getPeloID($tarefa->getID());
         // não bloqueia a tarefa quando mudar de cancelamento para inutilização
-        if ($tarefa->getAcao() == \NFe\Task\Tarefa::ACAO_CANCELAR && $_nota->getAcao() == NotaAcao::INUTILIZAR) {
+        if ($tarefa->getAcao() != \NFe\Task\Tarefa::ACAO_INUTILIZAR && $_nota->getAcao() == NotaAcao::INUTILIZAR) {
             return;
         }
         $_evento = ZEvento::log(

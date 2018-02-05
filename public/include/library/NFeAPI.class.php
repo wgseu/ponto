@@ -495,14 +495,18 @@ class NFeAPI extends \NFe\Common\Ajuste
     public function onTarefaErro($tarefa, $exception)
     {
         $_nota = ZNota::getPeloID($tarefa->getID());
+        // não bloqueia a tarefa quando mudar de cancelamento para inutilização
+        if ($tarefa->getAcao() == \NFe\Task\Tarefa::ACAO_CANCELAR && $_nota->getAcao() == NotaAcao::INUTILIZAR) {
+            return;
+        }
         $_evento = ZEvento::log(
             $_nota->getID(),
             $_nota->getEstado(),
             $exception->getMessage(),
             $exception->getCode()
         );
+        // não bloqueia a tarefa se for problema de rede
         if ($exception instanceof \NFe\Exception\NetworkException) {
-            // não bloqueia a tarefa se for problema de rede
             return;
         }
         // Evita de ficar toda hora enviando a mesma nota com erro

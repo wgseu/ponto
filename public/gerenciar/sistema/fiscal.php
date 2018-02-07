@@ -7,7 +7,7 @@ $fieldfocus = 'fiscal_timeout';
 $tab_fiscal = 'active';
 
 $erros = array();
-$fiscal_timeout = get_int_config('Sistema', 'Fiscal.Timeout', 6);
+$fiscal_timeout = get_int_config('Sistema', 'Fiscal.Timeout', 30);
 if (is_post()) {
     try {
         $fiscal_timeout = \MZ\Util\Filter::number(isset($_POST['fiscal_timeout'])?$_POST['fiscal_timeout']:null);

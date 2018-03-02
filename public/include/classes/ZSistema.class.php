@@ -38,7 +38,7 @@ class ZSistema
     private $ultimo_backup;
     private $versao_db;
 
-    const VERSAO = '1805';
+    const VERSAO = '1935';
 
     public function __construct($sistema = array())
     {

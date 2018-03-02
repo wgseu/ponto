@@ -23,6 +23,12 @@ require_once(dirname(dirname(__DIR__)) . '/app.php');
 
 $status = array();
 $status['status'] = 'ok';
+$status['info'] = array(
+    'empresa' => array(
+        'nome' => $__empresa__->getNome(),
+        'imagemurl' => get_image_url($__empresa__->getImagem(), 'cliente', null)
+    )
+);
 $status['versao'] = ZSistema::VERSAO;
 $status['validacao'] = '';
 $status['autologout'] = is_boolean_config('Sistema', 'Tablet.Logout');
@@ -41,6 +47,12 @@ if (is_login()) {
             $dispositivo = new ZDispositivo();
         }
         $status['cliente'] = $login_cliente->getID();
+        $status['info']['usuario'] = array(
+            'nome' => $login_cliente->getNome(),
+            'email' => $login_cliente->getEmail(),
+            'login' => $login_cliente->getLogin(),
+            'imagemurl' => get_image_url($login_cliente->getImagem(), 'cliente', null)
+        );
         $status['funcionario'] = intval($login_funcionario->getID());
         $status['validacao'] = $dispositivo->getValidacao();
         $status['permissoes'] = ZAcesso::getPermissoes($login_funcionario->getID());

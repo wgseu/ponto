@@ -742,16 +742,24 @@ function register_device($device, $serial)
         }
         $dispositivo->setSetorID($setor->getID());
         $dispositivo = ZDispositivo::cadastrar($dispositivo);
-        $appsync = new AppSync();
-        $appsync->deviceAdded($dispositivo->getNome(), $dispositivo->getCaixaID());
+        try {
+            $appsync = new AppSync();
+            $appsync->deviceAdded($dispositivo->getNome(), $dispositivo->getCaixaID());
+        } catch (\Exception $e) {
+            \Log::warning($e->getMessage());
+        }
     }
     if ($dispositivo->getSerial() != $serial || $dispositivo->getNome() != $device) {
         // atualiza as informações do dispositivo
         $dispositivo->setNome($device);
         $dispositivo->setSerial($serial);
         $dispositivo = ZDispositivo::atualizar($dispositivo);
-        $appsync = new AppSync();
-        $appsync->deviceUpdated($dispositivo->getNome(), $dispositivo->getCaixaID());
+        try {
+            $appsync = new AppSync();
+            $appsync->deviceUpdated($dispositivo->getNome(), $dispositivo->getCaixaID());
+        } catch (\Exception $e) {
+            \Log::warning($e->getMessage());
+        }
     }
     return $dispositivo;
 }

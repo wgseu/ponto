@@ -37,9 +37,24 @@ if (is_login()) {
     $status = array('status' => 'ok', 'msg' => 'Já está autenticado');
     $status['versao'] = ZSistema::VERSAO;
     $status['cliente'] = $login_cliente->getID();
+    $status['info'] = array(
+        'usuario' => array(
+            'nome' => $login_cliente->getNome(),
+            'email' => $login_cliente->getEmail(),
+            'login' => $login_cliente->getLogin(),
+            'imagemurl' => get_image_url($login_cliente->getImagem(), 'cliente', null)
+        )
+    );
     $status['funcionario'] = intval($login_funcionario->getID());
     $status['validacao'] = $dispositivo->getValidacao();
     $status['autologout'] = is_boolean_config('Sistema', 'Tablet.Logout');
+    if (is_manager()) {
+        $status['acesso'] = 'funcionario';
+    } elseif (is_login()) {
+        $status['acesso'] = 'cliente';
+    } else {
+        $status['acesso'] = 'visitante';
+    }
     $status['permissoes'] = ZAcesso::getPermissoes($login_funcionario->getID());
     json($status);
 }
@@ -97,8 +112,23 @@ if ($weblogin) {
 $status = array('status' => 'ok', 'msg' => 'Login efetuado com sucesso!');
 $status['versao'] = ZSistema::VERSAO;
 $status['cliente'] = $login_cliente->getID();
+$status['info'] = array(
+    'usuario' => array(
+        'nome' => $login_cliente->getNome(),
+        'email' => $login_cliente->getEmail(),
+        'login' => $login_cliente->getLogin(),
+        'imagemurl' => get_image_url($login_cliente->getImagem(), 'cliente', null)
+    )
+);
 $status['funcionario'] = intval($login_funcionario->getID());
 $status['validacao'] = $dispositivo->getValidacao();
 $status['autologout'] = is_boolean_config('Sistema', 'Tablet.Logout');
+if (is_manager()) {
+    $status['acesso'] = 'funcionario';
+} elseif (is_login()) {
+    $status['acesso'] = 'cliente';
+} else {
+    $status['acesso'] = 'visitante';
+}
 $status['permissoes'] = ZAcesso::getPermissoes($login_funcionario->getID());
 json($status);

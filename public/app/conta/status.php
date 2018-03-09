@@ -40,25 +40,24 @@ if (is_manager()) {
     $status['acesso'] = 'visitante';
 }
 if (is_login()) {
+    $status['cliente'] = $login_cliente->getID();
+    $status['info']['usuario'] = array(
+        'nome' => $login_cliente->getNome(),
+        'email' => $login_cliente->getEmail(),
+        'login' => $login_cliente->getLogin(),
+        'imagemurl' => get_image_url($login_cliente->getImagem(), 'cliente', null)
+    );
+    $status['funcionario'] = intval($login_funcionario->getID());
     try {
+        $status['permissoes'] = ZAcesso::getPermissoes($login_funcionario->getID());
         if (is_manager()) {
             $dispositivo = register_device($_GET['device'], $_GET['serial']);
         } else {
             $dispositivo = new ZDispositivo();
         }
-        $status['cliente'] = $login_cliente->getID();
-        $status['info']['usuario'] = array(
-            'nome' => $login_cliente->getNome(),
-            'email' => $login_cliente->getEmail(),
-            'login' => $login_cliente->getLogin(),
-            'imagemurl' => get_image_url($login_cliente->getImagem(), 'cliente', null)
-        );
-        $status['funcionario'] = intval($login_funcionario->getID());
         $status['validacao'] = $dispositivo->getValidacao();
-        $status['permissoes'] = ZAcesso::getPermissoes($login_funcionario->getID());
     } catch (Exception $e) {
         $status['status'] = 'error';
-        $status['acesso'] = 'cliente';
         $status['msg'] = $e->getMessage();
     }
 } else {

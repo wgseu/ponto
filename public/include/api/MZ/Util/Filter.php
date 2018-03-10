@@ -155,11 +155,11 @@ class Filter
     }
 
     /**
-     * Parse order by string to array
+     * Parse order string to array
      * @param  mixed $order order array or string to sort rows
      * @return array order list
      */
-    public static function orderBy($order)
+    public static function order($order)
     {
         if (is_array($order)) {
             return $order;
@@ -181,6 +181,51 @@ class Filter
             }
         }
         return $order;
+    }
+
+    /**
+     * Filter array with allowed keys
+     * @param  mixed $array array to filter
+     * @param  mixed $allowed allowed array keys
+     * @return array allowed array
+     */
+    public static function keys($array, $allowed)
+    {
+        $result = array();
+        foreach ($array as $key => $value) {
+            if (array_key_exists($key, $allowed)) {
+                $result[$key] = $value;
+            }
+        }
+        return $result;
+    }
+
+    /**
+     * Concat array keys
+     * @param  string $left concat left to key
+     * @param  array $array array to concat keys
+     * @param  string $right concat right to key
+     * @return array concatenated array keys
+     */
+    public static function concatKeys($left, $array, $right = '')
+    {
+        $result = array();
+        foreach ($array as $key => $value) {
+            $result[$left . $key . $right] = $value;
+        }
+        return $result;
+    }
+
+    /**
+     * Parse and filter order by string to array
+     * @param  mixed $order order array or string to sort rows
+     * @param  mixed $allowed allowed array keys
+     * @return array allowed order array
+     */
+    public static function orderBy($order, $allowed)
+    {
+        $order = self::order($order);
+        return self::keys($order, $allowed);
     }
 
     /**

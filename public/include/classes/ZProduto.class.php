@@ -26,6 +26,8 @@ class ProdutoTipo
     const PACOTE = 'Pacote';
 }
 
+use MZ\Product\Pacote;
+
 /**
  * Informações sobre o produto, composição ou pacote
  */
@@ -703,7 +705,10 @@ class ZProduto
         } elseif (!in_array($produto['tipo'], array('Produto', 'Composicao', 'Pacote'))) {
             $erros['tipo'] = 'O tipo informado não é válido';
         }
-        if ($produto['tipo'] == ProdutoTipo::PACOTE && ZPacote::existe($produto['id'])) {
+        if (
+            $produto['tipo'] == ProdutoTipo::PACOTE &&
+            Pacote::count(array('produtoid' => $produto['id'])) > 0
+        ) {
             $erros['tipo'] = 'O produto não pode ser um pacote pois já faz parte de um';
         }
         $produto['cobrarservico'] = trim($produto['cobrarservico']);

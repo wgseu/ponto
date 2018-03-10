@@ -99,7 +99,10 @@ restore:
 	@docker exec -i $(shell docker-compose ps -q gmysqldb) mysql -u"$(MYSQL_ROOT_USER)" -p"$(MYSQL_ROOT_PASSWORD)" < $(MYSQL_DUMPS_DIR)/db.sql 2>/dev/null
 
 test:
-	@docker-compose exec -T php ./public/include/vendor/bin/phpunit --colors=always --configuration ./ --no-coverage ./tests
+	@docker-compose exec -T php ./public/include/vendor/bin/phpunit --configuration ./ --no-coverage
+
+cover:
+	@docker-compose exec -T php ./public/include/vendor/bin/phpunit --configuration ./
 
 class:
 	@mkdir -p $(MYSQL_DUMPS_DIR)

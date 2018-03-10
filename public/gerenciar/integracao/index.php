@@ -32,7 +32,7 @@ if ($limite > 100 || $limite < 1) {
 }
 $condition = array_intersect_key($_GET, array_flip(array('query')));
 $condition = Filter::query($condition);
-$order = Filter::orderBy(isset($_GET['ordem'])?$_GET['ordem']:'');
+$order = Filter::order(isset($_GET['ordem'])?$_GET['ordem']:'');
 $count = Integracao::count($condition);
 list($pagesize, $offset, $pagestring) = pagestring($count, $limite);
 $integracoes = Integracao::findAll($condition, $order, $pagesize, $offset);

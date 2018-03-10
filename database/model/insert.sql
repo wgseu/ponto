@@ -4,19 +4,19 @@ SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='TRADITIONAL,ALLOW_INVALID_DATES';
 
 USE `GrandChef`;
 
-INSERT INTO `Moedas` VALUES
+INSERT INTO `Moedas` (`ID`, `Nome`, `Simbolo`, `Codigo`, `Divisao`, `Fracao`, `Formato`) VALUES
 	(1, "Real", "R$", "BRL", 100, "Centavo", "R$ %s"),
 	(2, "Dollar", "$", "USD", 100, "Cent", "$ %s"),
 	(3, "Euro", "€", "EUR", 100, "Cent", "€ %s"),
 	(4, "Metical", "MT", "MZN", 100, "Centavo", "%s MT");
 
-INSERT INTO `Paises` VALUES
+INSERT INTO `Paises` (`ID`, `Nome`, `Sigla`, `MoedaID`, `BandeiraIndex`, `LinguagemID`, `Entradas`, `Unitario`) VALUES
 	(1, "Brasil", "BRA", 1, 28, 1046, NULL, 'N'),
 	(2, "United States of America", "USA", 2, 220, 1033, 'W1RpdHVsb10NCkNFUD1aSVANCkNQRj1TU04NCg0KW01hc2NhcmFdDQpDRVA9OTk5OTkNCkNQRj05OTktOTktOTk5OQ0KVGVsZWZvbmU9KDk5OSkgOTk5LTk5OTkNCg0KW0F1ZGl0b3JpYV0NCg0K', 'N'),
 	(3, "España", "ESP", 3, 66, 1034, 'W1RpdHVsb10NCkNOUEo9UlVUDQpDUEY9TlVJUA0KQ0VQPUNPUA0KDQpbTWFzY2FyYV0NCkNQRj05Ljk5OS45OTkuOTk5DQpDRVA9OTk5OTkNCkNOUEo9OTkuOTk5Ljk5OS05DQpUZWxlZm9uZT05OTkgOTk5IDk5OQ0KDQo=', 'Y'),
 	(4, "Moçambique", "MOZ", 4, 151, 1046, 'W1RpdHVsb10NCkNOUEo9TlVJVA0KQ0VQPUNPUA0KDQpbTWFzY2FyYV0NCkNOUEo9OS45OTk5OTk5LTkNCkNFUD05OTk5DQpUZWxlZm9uZT05OTk5LTk5OTk5DQoNCg==', 'Y');
 
-INSERT INTO `Estados` VALUES 
+INSERT INTO `Estados` (`ID`, `PaisID`, `Nome`, `UF`) VALUES
 	(1, 1, "Acre", "AC"),
 	(2, 1, "Alagoas", "AL"),
 	(3, 1, "Amazonas", "AM"),
@@ -45,7 +45,7 @@ INSERT INTO `Estados` VALUES
 	(26, 1, "São Paulo", "SP"),
 	(27, 1, "Tocantins", "TO");
 
-INSERT INTO `Funcoes` (ID, Descricao, SalarioBase) VALUES
+INSERT INTO `Funcoes` (`ID`, `Descricao`, `SalarioBase`) VALUES
 	(1, "Administrador", 1400),
 	(2, "Garçom", 880),
 	(3, "Operador(a) de Caixa", 1200),
@@ -54,7 +54,7 @@ INSERT INTO `Funcoes` (ID, Descricao, SalarioBase) VALUES
 	(6, "Entregador(a)", 880),
 	(7, "Estoquista", 880);
 
-INSERT INTO `Modulos` (ID, Nome, Descricao, ImageIndex, Habilitado) VALUES
+INSERT INTO `Modulos` (`ID`, `Nome`, `Descricao`, `ImageIndex`, `Habilitado`) VALUES
 	(1, "Mesas", "Permite realizar vendas para mesas", 4, 'Y'),
 	(2, "Venda rápida", "Permite realizar vendas rápidas com código de barras", 5, 'Y'),
 	(3, "Cartão de consumo", "Permite realizar vendas com cartão de consumo", 6, 'Y'),
@@ -63,7 +63,7 @@ INSERT INTO `Modulos` (ID, Nome, Descricao, ImageIndex, Habilitado) VALUES
 	(6, "Controle de contas", "Permite cadastrar contas a pagar e a receber", 9, 'Y'),
 	(7, "Comanda eletrônica", "Permite realizar pedidos pelo celular ou tablet", 10, 'Y');
 
-INSERT INTO `Funcionalidades` (ID, Nome, Descricao) VALUES
+INSERT INTO `Funcionalidades` (`ID`, `Nome`, `Descricao`) VALUES
 	(1, "Operacional", "Controla operações nas telas do sistema"),
 	(2, "Vendas", "Controla cancelamentos e outras operações de vendas"),
 	(3, "Mesas e Comandas", "Controla operações sobre mesas e comandas"),
@@ -73,7 +73,7 @@ INSERT INTO `Funcionalidades` (ID, Nome, Descricao) VALUES
 	(7, "Relatórios", "Controla a visualização ou emissão de relatórios"),
 	(8, "Sistema", "Controla dispositivos e comportamento do sistema");
 
-INSERT INTO `Permissoes` (ID, FuncionalidadeID, Nome, Descricao) VALUES
+INSERT INTO `Permissoes` (`ID`, `FuncionalidadeID`, `Nome`, `Descricao`) VALUES
 	(1, 1, "Sistema", "Permitir acesso ao sistema"),
 	(2, 8, "Restauracao", "Permitir restaurar o banco de dados"),
 	(3, 8, "Backup", "Permitir realização de cópia de segurança do banco de dados"),
@@ -170,7 +170,7 @@ INSERT INTO `Permissoes` (ID, FuncionalidadeID, Nome, Descricao) VALUES
 	(95, 1, "EntregarPedidos", "Permitir realizar entrega de pedidos"),
 	(96, 5, "InformarDesperdicio", "Permitir informar um desperdício ao cancelar um produto");
 
-INSERT INTO `Acessos` (FuncaoID, PermissaoID) VALUES
+INSERT INTO `Acessos` (`FuncaoID`, `PermissaoID`) VALUES
 	(1, 1),
 	(1, 3),
 	(1, 4),
@@ -335,7 +335,7 @@ INSERT INTO `Acessos` (FuncaoID, PermissaoID) VALUES
 	(7, 81),
 	(7, 96);
 
-INSERT INTO `Mesas` (ID, Nome, Ativa) VALUES 
+INSERT INTO `Mesas` (`ID`, `Nome`, `Ativa`) VALUES
 	(1, "Mesa 1", 'Y'),
 	(2, "Mesa 2", 'Y'),
 	(3, "Mesa 3", 'Y'),
@@ -347,7 +347,7 @@ INSERT INTO `Mesas` (ID, Nome, Ativa) VALUES
 	(9, "Mesa 9", 'Y'),
 	(10, "Mesa 10", 'Y');
 	
-INSERT INTO `Comandas` (ID, Nome, Ativa) VALUES 
+INSERT INTO `Comandas` (`ID`, `Nome`, `Ativa`) VALUES
 	(1, "Comanda 1", 'Y'),
 	(2, "Comanda 2", 'Y'),
 	(3, "Comanda 3", 'Y'),
@@ -359,26 +359,26 @@ INSERT INTO `Comandas` (ID, Nome, Ativa) VALUES
 	(9, "Comanda 9", 'Y'),
 	(10, "Comanda 10", 'Y');
 
-INSERT INTO `Clientes` (ID, Tipo, Login, Senha, Nome, Sobrenome, Genero, Fone1, DataAtualizacao, DataCadastro) VALUES
+INSERT INTO `Clientes` (`ID`, `Tipo`, `Login`, `Senha`, `Nome`, `Sobrenome`, `Genero`, `Fone1`, `DataAtualizacao`, `DataCadastro`) VALUES
 	(1, 'Fisica', "Admin", "e14268a48adfacfdaed1d420573f69df7ce4b829", "Administrador", "do Sistema", 'Masculino', "0000000001", NOW(), NOW());
 
-INSERT INTO `Funcionarios` (ID, FuncaoID, ClienteID, Ativo, DataCadastro) VALUES
+INSERT INTO `Funcionarios` (`ID`, `FuncaoID`, `ClienteID`, `Ativo`, `DataCadastro`) VALUES
 	(1, 1, 1, 'Y', NOW());
 
-INSERT INTO `Caixas` (ID, Descricao, Ativo) VALUES
+INSERT INTO `Caixas` (`ID`, `Descricao`, `Ativo`) VALUES
 	(1, "Caixa 1", 'Y');
 
-INSERT INTO `Carteiras` (ID, Tipo, Descricao, Ativa) VALUES
+INSERT INTO `Carteiras` (`ID`, `Tipo`, `Descricao`, `Ativa`) VALUES
 	(1, 'Financeira', 'Caixa da empresa', 'Y');
 
-INSERT INTO `Formas_Pagto` (ID, Descricao, Tipo, CarteiraID, CarteiraPagtoID, Parcelado, MinParcelas, MaxParcelas, ParcelasSemJuros, Juros, Ativa) VALUES 
+INSERT INTO `Formas_Pagto` (`ID`, `Descricao`, `Tipo`, `CarteiraID`, `CarteiraPagtoID`, `Parcelado`, `MinParcelas`, `MaxParcelas`, `ParcelasSemJuros`, `Juros`, `Ativa`) VALUES
 	(1, "Dinheiro", 'Dinheiro', 1, 1, 'N', NULL, NULL, NULL, NULL, 'Y'),
 	(2, "Cartão", 'Cartao', 1, 1, 'Y', 1, 1, 1, 2.5, 'Y'),
 	(3, "Cheque", 'Cheque', 1, 1, 'Y', 1, 6, 3, 2.5, 'N'),
 	(4, "Conta", 'Conta', 1, 1, 'N', NULL, NULL, NULL, NULL, 'Y'),
 	(5, "Crédito", 'Credito', 1, 1, 'N', NULL, NULL, NULL, NULL, 'Y');
 
-INSERT INTO `Cartoes` (ID, Descricao, ImageIndex, Ativo) VALUES 
+INSERT INTO `Cartoes` (`ID`, `Descricao`, `ImageIndex`, `Ativo`) VALUES
 	(1, "Visa", 3, 'Y'),
 	(2, "MasterCard", 4, 'Y'),
 	(3, "Hipercard", 2, 'Y'),
@@ -390,7 +390,7 @@ INSERT INTO `Cartoes` (ID, Descricao, ImageIndex, Ativo) VALUES
 	(9, "Maestro", 9, 'N'),
 	(10, "Ticket", 10, 'N');
 
-INSERT INTO `Categorias` (ID, Descricao, Servico, DataAtualizacao) VALUES
+INSERT INTO `Categorias` (`ID`, `Descricao`, `Servico`, `DataAtualizacao`) VALUES
 	(1, "Pizzas e massas", 'Y', NOW()),
 	(2, "Refeições", 'Y', NOW()),
 	(3, "Cervejas", 'N', NOW()),
@@ -404,31 +404,31 @@ INSERT INTO `Categorias` (ID, Descricao, Servico, DataAtualizacao) VALUES
 	(11, "Porções", 'Y', NOW()),
 	(12, "Bebidas Tropicais", 'N', NOW());
 
-INSERT INTO `Setores` (ID, Nome, Descricao) VALUES
+INSERT INTO `Setores` (`ID`, `Nome`, `Descricao`) VALUES
 	(1, "Vendas", "Setor de vendas"),
 	(2, "Cozinha", "Cozinha"),
 	(3, "Churrasqueira", "Churrasqueira"),
 	(4, "Bar", "Setor de bebidas");
 
-INSERT INTO `Unidades` (Nome, Descricao, Sigla) VALUES
+INSERT INTO `Unidades` (`Nome`, `Descricao`, `Sigla`) VALUES
 	("Unidade", "Unidade", "UN"),
 	("Litro", "Unidade Líquida", "L"),
 	("Grama", "Unidade de Peso", "g"),
 	("Caloria", "Unidade de medida de energia", "cal"),
 	("Joule", "Unidade de medida de energia", "J");
 
-INSERT INTO `Classificacoes` (ID, Descricao) VALUES
+INSERT INTO `Classificacoes` (`ID`, `Descricao`) VALUES
 	(1, "Movimentações do caixa"),
 	(2, "Pagamento de contas");
 
-INSERT INTO `Contas` (ID, ClassificacaoID, FuncionarioID, Descricao, Valor, Cancelada, DataCadastro) VALUES
+INSERT INTO `Contas` (`ID`, `ClassificacaoID`, `FuncionarioID`, `Descricao`, `Valor`, `Cancelada`, `DataCadastro`) VALUES
 	(1, 1, 1, "Movimentação no caixa", 0, 'N', NOW());
 
-INSERT INTO `Servicos` (ID, Nome, Descricao, Tipo, Obrigatorio, Valor, Individual, Ativo) VALUES
+INSERT INTO `Servicos` (`ID`, `Nome`, `Descricao`, `Tipo`, `Obrigatorio`, `Valor`, `Individual`, `Ativo`) VALUES
 	(1, "Desconto", "Permite realizar descontos nos pedidos", 'Taxa', 'N', 0, 'N', 'Y'),
 	(2, "Entrega", "Permite cobrar taxa de entrega de pedidos", 'Taxa', 'N', 0, 'N', 'Y');
 
-INSERT INTO `Bancos` (Numero, RazaoSocial, AgenciaMascara, ContaMascara) VALUES
+INSERT INTO `Bancos` (`Numero`, `RazaoSocial`, `AgenciaMascara`, `ContaMascara`) VALUES
 	("1", "Banco do Brasil S.A.", "9999->a", "99.999->a"),
 	("3", "Banco da Amazônia S.A.", NULL, NULL),
 	("4", "Banco do Nordeste do Brasil S.A.", NULL, NULL),
@@ -630,8 +630,8 @@ INSERT INTO `Operacoes` (`ID`, `Codigo`, `Descricao`, `Detalhes`) VALUES
 INSERT INTO `Integracoes` (`Nome`, `AcessoURL`, `Descricao`, `IconeURL`, `Ativo`, `DataAtualizacao`) VALUES
 	('iFood', 'ifood', 'Módulo de integração com o iFood', 'ifood.png', 'N', NOW());
 
-INSERT INTO `Sistema` (ID, PaisID, VersaoDB, UltimoBackup) VALUES
-	(1, 1, "1.9.3.0", NOW());
+INSERT INTO `Sistema` (`ID`, `PaisID`, `VersaoDB`, `UltimoBackup`, `Computadores`) VALUES
+	(1, 1, "1.9.3.5", NOW(), 1);
 
 SET SQL_MODE=@OLD_SQL_MODE;
 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;

@@ -11,6 +11,7 @@ class InstantiationTest extends \PHPUnit_Framework_TestCase
         $banco = new \MZ\Wallet\Banco();
         $carteira = new \MZ\Wallet\Carteira();
         $comanda = new \MZ\Sale\Comanda();
+        $pacote = new MZ\Product\Pacote();
     }
 
     public function testOldClasses()
@@ -53,7 +54,6 @@ class InstantiationTest extends \PHPUnit_Framework_TestCase
         $estoque = new \ZEstoque();
         $grupo = new \ZGrupo();
         $propriedade = new \ZPropriedade();
-        $pacote = new \ZPacote();
         $dispositivo = new \ZDispositivo();
         $impressora = new \ZImpressora();
         $promocao = new \ZPromocao();

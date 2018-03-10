@@ -164,6 +164,32 @@ abstract class Helper
         return date('Y-m-d', $timestamp?:time());
     }
 
+    /**
+     * Add order statement into query object
+     * @param  SelectQuery $query FluentPDO query
+     * @param  array $order associative field name -> [-1, 1]
+     * @return SelectQuery query object with order statement
+     */
+    public static function buildOrderBy($query, $order)
+    {
+        foreach ($order as $key => $value) {
+            if (is_array($value)) {
+                $param = current($value);
+                $value = key($value);
+                if ($value < 0) {
+                    $query = $query->orderBy($key . ' DESC', $param);
+                } else {
+                    $query = $query->orderBy($key . ' ASC', $param);
+                }
+            } elseif ($value < 0) {
+                $query = $query->orderBy($key . ' DESC');
+            } else {
+                $query = $query->orderBy($key . ' ASC');
+            }
+        }
+        return $query;
+    }
+
     public static function buildSearch($search, $field, $query)
     {
         $keywords = preg_split('/[\s,]+/', $search);

@@ -458,24 +458,52 @@ $[unique.end]
 $[table.end]
 
     /**
+     * Filter order array
+     * @param  mixed $order order string or array to parse and filter allowed
+     * @return array allowed associative order
+     */
+    private static function filterOrder($order)
+    {
+        $$[table.unix] = new $[tAble.norm]();
+        $allowed = $$[table.unix]->toArray();
+        return Filter::orderBy($order, $allowed);
+    }
+
+    /**
+     * Filter condition array with allowed fields
+     * @param  array $condition condition to filter rows
+     * @return array allowed condition
+     */
+    private static function filterCondition($condition)
+    {
+        $$[table.unix] = new $[tAble.norm]();
+        $allowed = $$[table.unix]->toArray();
+        return Filter::keys($condition, $allowed);
+    }
+
+    /**
      * Fetch data from database with a condition
      * @param  array $condition condition to filter rows
+     * @param  array $order order rows
      * @return SelectQuery query object with condition statement
      */
     private static function query($condition = array(), $order = array())
     {
         $query = self::getDB()->from('$[tAble]');
+        $condition = self::filterCondition($condition);
+        $query = self::buildOrderBy($query, self::filterOrder($order));
         return $query->where($condition);
     }
 
     /**
      * Search one register with a condition
      * @param  array $condition Condition for searching the row
+     * @param  array $order order rows
      * @return $[tAble.norm] A filled $[tAble.name] or empty instance
      */
-    public static function find($condition)
+    public static function find($condition, $order = array())
     {
-        $query = self::query($condition)->limit(1);
+        $query = self::query($condition, $order)->limit(1);
         $row = $query->fetch();
         if ($row === false) {
             $row = array();

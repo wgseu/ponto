@@ -21,6 +21,8 @@
 */
 require_once(dirname(dirname(__DIR__)) . '/app.php');
 
+use MZ\Product\Pacote;
+
 if (!isset($_GET['grupo']) || !is_numeric($_GET['grupo'])) {
     json('Grupo não informado!');
 }
@@ -29,7 +31,16 @@ if (!is_null($limite) && $limite < 1) {
     $limite = null;
 }
 $associacoes = isset($_POST['pacote'])?$_POST['pacote']:array();
-$pacotes = ZPacote::getTodosDoGrupoIDEx(intval($_GET['grupo']), $associacoes, strval($_GET['busca']), 0, $limite);
+$pacotes = Pacote::rawFindAll(
+	array(
+		'pc.grupoid' => intval($_GET['grupo']),
+		'pc.associacaoid' => $associacoes,
+		'pc.visivel' => 'Y',
+		'query' => strval($_GET['busca'])
+	),
+	array('pc.id' => 1),
+	$limite
+);
 $response = array('status' => 'ok');
 $_pacotes = array();
 foreach ($pacotes as $pacote) {

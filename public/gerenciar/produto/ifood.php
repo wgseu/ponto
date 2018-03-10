@@ -22,6 +22,7 @@
 require_once(dirname(dirname(__DIR__)) . '/app.php');
 
 use MZ\System\Integracao;
+use MZ\Product\Pacote;
 
 define('IFOOD_TOKEN', 'wKPZ1ABDOO9EVHJMuORwrFogsUPU7Ca5');
 
@@ -255,7 +256,9 @@ if (isset($_GET['action'])) {
             $total_pacotes = 0;
             foreach ($_grupos as $grupo) {
                 $grupos[] = $grupo->toArray();
-                $qtd_pacotes = \ZPacote::getCountDoGrupoID($grupo->getID());
+                $qtd_pacotes = Pacote::count(
+                    array('visivel' => 'Y', 'grupoid' => $grupo->getID())
+                );
                 $contagem[] = $qtd_pacotes;
                 $total_pacotes += $qtd_pacotes;
             }
@@ -274,11 +277,11 @@ if (isset($_GET['action'])) {
             $grupo_index = 0;
             foreach ($produto['itens'] as $subcodigo => $subproduto) {
                 if ($associado->getTipo() == \ProdutoTipo::PACOTE) {
-                    $subassociado = \ZPacote::getPeloID(
+                    $subassociado = Pacote::findByID(
                         isset($subproduto['id'])?$subproduto['id']:$subproduto['codigo_pdv']
                     );
                     if ($subassociado->getPacoteID() != $associado->getID()) {
-                        $subassociado = new \ZPacote();
+                        $subassociado = new Pacote();
                     }
                     $grupoid = intval($subassociado->getGrupoID());
                     if (($total_igual || count($grupos) == 1) && $grupo_index < count($grupos) && $grupoid == 0) {
@@ -359,9 +362,9 @@ foreach ($produtos as $codigo => $produto) {
     $associados = 0;
     foreach ($produto['itens'] as $subcodigo => $subproduto) {
         if ($associado->getTipo() == \ProdutoTipo::PACOTE) {
-            $subassociado = \ZPacote::getPeloID(isset($subproduto['id'])?$subproduto['id']:$subproduto['codigo_pdv']);
+            $subassociado = Pacote::findByID(isset($subproduto['id'])?$subproduto['id']:$subproduto['codigo_pdv']);
             if ($subassociado->getPacoteID() != $associado->getID()) {
-                $subassociado = new \ZPacote();
+                $subassociado = new Pacote();
             }
             if (!is_null($subassociado->getPropriedadeID())) {
                 $item = \ZPropriedade::getPeloID($subassociado->getPropriedadeID());

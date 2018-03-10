@@ -7,7 +7,7 @@
         colors="true">
     <testsuites>
         <testsuite name="GrandChef Test Suite">
-            <directory>tests</directory>
+            <directory>tests/</directory>
         </testsuite>
     </testsuites>
     <filter>
@@ -20,6 +20,7 @@
     </filter>
     <php>
         <ini name="date.timezone" value="UTC"/>
+        <env name="APP_ENV" value="testing"/>
     </php>
     <logging>
         <log type="coverage-clover" target="build/logs/clover.xml"/>

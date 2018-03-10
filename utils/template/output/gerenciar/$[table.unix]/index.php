@@ -30,8 +30,9 @@ $limite = isset($_GET['limite'])?intval($_GET['limite']):10;
 if ($limite > 100 || $limite < 1) {
 	$limite = 10;
 }
-$condition = Filter::query($condition);
-$order = Filter::orderBy(isset($_GET['ordem'])?$_GET['ordem']:'');
+$condition = Filter::query($_GET);
+unset($condition['ordem']);
+$order = Filter::order(isset($_GET['ordem'])?$_GET['ordem']:'');
 $count = $[tAble.norm]::count($condition);
 list($pagesize, $offset, $pagestring) = pagestring($count, $limite);
 $$[table.unix.plural] = $[tAble.norm]::findAll($condition, $order, $pagesize, $offset);

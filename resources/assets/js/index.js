@@ -1717,22 +1717,6 @@ Gerenciar.produto.initDiagram = function (data) {
     data.unshift(config);
     new Treant(data);
 }
-Gerenciar.produto.iFoodForm = function () {
-    $('#raw_cardapio').change(function () {
-        var input = $(this),
-            label = input.val().replace(/\\/g, '/').replace(/.*\//, '');
-        var text = $(this).parents('.input-group').find(':text');
-        if (input.length)
-            text.val(label);
-    });
-    $('#clear_cardapio').click(function () {
-        var text = $(this).parents('.input-group').find(':text');
-        $('#cardapio').val('');
-        text.val('');
-        var input = $('#raw_cardapio');
-        input.replaceWith(input = input.clone(true));
-    });
-};
 Gerenciar.servico = {};
 Gerenciar.servico.init = function () {
     ajaxLink();
@@ -2508,7 +2492,7 @@ Gerenciar.integracao.init = function () {
             });
     });
 };
-Gerenciar.integracao.iFoodInit = function () {
+Gerenciar.integracao.productInit = function (service) {
 
     var group_template = '\
     <span class="section col-md-12 col-sm-12 col-xs-12"></span>\
@@ -2542,7 +2526,7 @@ Gerenciar.integracao.iFoodInit = function () {
                 return false;
             }
             $.post(
-                '/gerenciar/produto/ifood?action=delete',
+                '/gerenciar/produto/' + service + '?action=delete',
                 paramFn(top_item),
                 function (data) {
                     if (data.status != 'ok') {
@@ -2578,7 +2562,7 @@ Gerenciar.integracao.iFoodInit = function () {
     }
     function salvarCodigo(field, btn, item) {
         $.post(
-            '/gerenciar/produto/ifood?action=update',
+            '/gerenciar/produto/' + service + '?action=update',
             { codigo: field.data('codigo'), id: field.val() },
             function (data) {
                 if (data.status != 'ok') {
@@ -2599,7 +2583,7 @@ Gerenciar.integracao.iFoodInit = function () {
     }
     function salvarPacote(group_list, field, btn, item, pacote_item) {
         $.post(
-            '/gerenciar/produto/ifood?action=mount',
+            '/gerenciar/produto/' + service + '?action=mount',
             { codigo: group_list.data('codigo'), subcodigo: field.data('codigo'), id: field.val() },
             function (data) {
                 if (data.status != 'ok') {
@@ -2637,7 +2621,7 @@ Gerenciar.integracao.iFoodInit = function () {
         group_list.empty();
         $('#edit-pkg-label').text(field.data('descricao'));
         $.get(
-            '/gerenciar/produto/ifood?action=package',
+            '/gerenciar/produto/' + service + '?action=package',
             { codigo: field.data('codigo') },
             function (data) {
                 if (data.status != 'ok') {
@@ -2807,11 +2791,11 @@ Gerenciar.integracao.iFoodInit = function () {
         });
     });
 };
-Gerenciar.integracao.iFoodCardInit = function () {
+Gerenciar.integracao.cardInit = function (service) {
     $('#query').focus();
     function salvarCodigo(field, btn, item) {
         $.post(
-            '/gerenciar/cartao/ifood?action=update',
+            '/gerenciar/cartao/' + service + '?action=update',
             { codigo: field.data('codigo'), id: field.val() },
             function (data) {
                 if (data.status != 'ok') {

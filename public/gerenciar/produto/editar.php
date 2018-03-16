@@ -42,7 +42,7 @@ if (is_post()) {
         $produto->setPrecoVenda(moneyval($produto->getPrecoVenda()));
         $produto->setCustoProducao(moneyval($produto->getCustoProducao()));
         $produto->setTempoPreparo(numberval($produto->getTempoPreparo()));
-        $imagem = upload_image('raw_imagem', 'produto', null, 256, 256, true);
+        $imagem = upload_image('raw_imagem', 'produto', null, 256, 256, true, 'crop');
         if (!is_null($imagem)) {
             $produto->setImagem(file_get_contents(WWW_ROOT . get_image_url($imagem, 'produto')));
             unlink(WWW_ROOT . get_image_url($imagem, 'produto'));

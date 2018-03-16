@@ -41,7 +41,7 @@
 			<div class=" form-group col-lg-4 col-md-4 col-sm-4 col-xs-12">
 				<label>Busca:</label>
 				<div class="input-group">
-					<input type="text" class="form-control" id="query" name="query" placeholder="Código, #Sessão ou Observação..." value="${\MZ\Util\Filter::input(isset($_GET['query'])?$_GET['query']:null)}">
+					<input type="text" class="form-control" id="query" name="query" placeholder="Código, #Sessão ou Observação..." value="${\MZ\Util\Filter::input($_GET, 'query')}">
 					<span class="input-group-btn">
 						<button class="btn btn-default" type="submit"><i class="fa fa-search"></i></button>
 					</span>

@@ -244,11 +244,15 @@ class Filter
 
     /**
      * Escape single and double quotes
-     * @param  string $value Text to be escaped
+     * @param  mixed $value Text to be escaped or array
+     * @param  string $key Key to access array
      * @return string        escaped text
      */
-    public static function input($value)
+    public static function input($value, $key = null)
     {
+        if (is_array($value)) {
+            $value = isset($value[$key])?$value[$key]:null;
+        }
         return htmlspecialchars($value, ENT_QUOTES, 'UTF-8');
     }
 

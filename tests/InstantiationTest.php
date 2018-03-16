@@ -2,18 +2,6 @@
 
 class InstantiationTest extends \PHPUnit_Framework_TestCase
 {
-    protected function setUp()
-    {
-    }
-
-    public function testClasses()
-    {
-        $banco = new \MZ\Wallet\Banco();
-        $carteira = new \MZ\Wallet\Carteira();
-        $comanda = new \MZ\Sale\Comanda();
-        $pacote = new MZ\Product\Pacote();
-    }
-
     public function testOldClasses()
     {
         $mesa = new \ZMesa();
@@ -24,12 +12,6 @@ class InstantiationTest extends \PHPUnit_Framework_TestCase
         $funcao = new \ZFuncao();
         $cliente = new \ZCliente();
         $funcionario = new \ZFuncionario();
-        $moeda = new \ZMoeda();
-        $pais = new \ZPais();
-        $estado = new \ZEstado();
-        $cidade = new \ZCidade();
-        $bairro = new \ZBairro();
-        $localizacao = new \ZLocalizacao();
         $movimentacao = new \ZMovimentacao();
         $pedido = new \ZPedido();
         $categoria = new \ZCategoria();

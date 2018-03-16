@@ -10,11 +10,11 @@ INSERT INTO `Moedas` (`ID`, `Nome`, `Simbolo`, `Codigo`, `Divisao`, `Fracao`, `F
 	(3, "Euro", "€", "EUR", 100, "Cent", "€ %s"),
 	(4, "Metical", "MT", "MZN", 100, "Centavo", "%s MT");
 
-INSERT INTO `Paises` (`ID`, `Nome`, `Sigla`, `MoedaID`, `BandeiraIndex`, `LinguagemID`, `Entradas`, `Unitario`) VALUES
-	(1, "Brasil", "BRA", 1, 28, 1046, NULL, 'N'),
-	(2, "United States of America", "USA", 2, 220, 1033, 'W1RpdHVsb10NCkNFUD1aSVANCkNQRj1TU04NCg0KW01hc2NhcmFdDQpDRVA9OTk5OTkNCkNQRj05OTktOTktOTk5OQ0KVGVsZWZvbmU9KDk5OSkgOTk5LTk5OTkNCg0KW0F1ZGl0b3JpYV0NCg0K', 'N'),
-	(3, "España", "ESP", 3, 66, 1034, 'W1RpdHVsb10NCkNOUEo9UlVUDQpDUEY9TlVJUA0KQ0VQPUNPUA0KDQpbTWFzY2FyYV0NCkNQRj05Ljk5OS45OTkuOTk5DQpDRVA9OTk5OTkNCkNOUEo9OTkuOTk5Ljk5OS05DQpUZWxlZm9uZT05OTkgOTk5IDk5OQ0KDQo=', 'Y'),
-	(4, "Moçambique", "MOZ", 4, 151, 1046, 'W1RpdHVsb10NCkNOUEo9TlVJVA0KQ0VQPUNPUA0KDQpbTWFzY2FyYV0NCkNOUEo9OS45OTk5OTk5LTkNCkNFUD05OTk5DQpUZWxlZm9uZT05OTk5LTk5OTk5DQoNCg==', 'Y');
+INSERT INTO `Paises` (`ID`, `Nome`, `Sigla`, `Codigo`, `MoedaID`, `BandeiraIndex`, `LinguagemID`, `Entradas`, `Unitario`) VALUES
+	(1, "Brasil", "BRA", "BR", 1, 28, 1046, NULL, 'N'),
+	(2, "United States of America", "USA", "US", 2, 220, 1033, 'W1RpdHVsb10NCkNFUD1aSVANCkNQRj1TU04NCg0KW01hc2NhcmFdDQpDRVA9OTk5OTkNCkNQRj05OTktOTktOTk5OQ0KVGVsZWZvbmU9KDk5OSkgOTk5LTk5OTkNCg0KW0F1ZGl0b3JpYV0NCg0K', 'N'),
+	(3, "España", "ESP", "ES", 3, 66, 1034, 'W1RpdHVsb10NCkNOUEo9UlVUDQpDUEY9TlVJUA0KQ0VQPUNPUA0KDQpbTWFzY2FyYV0NCkNQRj05Ljk5OS45OTkuOTk5DQpDRVA9OTk5OTkNCkNOUEo9OTkuOTk5Ljk5OS05DQpUZWxlZm9uZT05OTkgOTk5IDk5OQ0KDQo=', 'Y'),
+	(4, "Moçambique", "MOZ", "MZ", 4, 151, 1046, 'W1RpdHVsb10NCkNOUEo9TlVJVA0KQ0VQPUNPUA0KDQpbTWFzY2FyYV0NCkNOUEo9OS45OTk5OTk5LTkNCkNFUD05OTk5DQpUZWxlZm9uZT05OTk5LTk5OTk5DQoNCg==', 'Y');
 
 INSERT INTO `Estados` (`ID`, `PaisID`, `Nome`, `UF`) VALUES
 	(1, 1, "Acre", "AC"),
@@ -628,7 +628,8 @@ INSERT INTO `Operacoes` (`ID`, `Codigo`, `Descricao`, `Detalhes`) VALUES
 	(7, 5405, 'Venda de mercadoria adquirida ou recebida de terceiros em operação com mercadoria sujeita ao regime de substituição tributária, na condição de contribuinte substituído', 'Classificam-se neste código as vendas de mercadorias adquiridas ou recebidas de terceiros em operação com mercadorias sujeitas ao regime de substituição tributária, na condição de contribuinte substituído');
 
 INSERT INTO `Integracoes` (`Nome`, `AcessoURL`, `Descricao`, `IconeURL`, `Ativo`, `DataAtualizacao`) VALUES
-	('iFood', 'ifood', 'Módulo de integração com o iFood', 'ifood.png', 'N', NOW());
+	('iFood', 'ifood', 'Módulo de integração com o iFood', 'ifood.png', 'N', NOW()),
+	('Kromax', 'kromax', 'Módulo de integração com a Kromax', 'kromax.png', 'N', NOW());
 
 INSERT INTO `Sistema` (`ID`, `PaisID`, `VersaoDB`, `UltimoBackup`, `Computadores`) VALUES
 	(1, 1, "1.9.3.5", NOW(), 1);

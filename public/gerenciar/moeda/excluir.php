@@ -21,17 +21,35 @@
 */
 require_once(dirname(__DIR__) . '/app.php');
 
-need_permission(PermissaoNome::CADASTROMOEDAS);
-$id = $_GET['id'];
-$moeda = ZMoeda::getPeloID($id);
-if (is_null($moeda->getID())) {
-    Thunder::warning('A moeda de id "'.$id.'" não existe!');
-    redirect('/gerenciar/moeda/');
+use MZ\Wallet\Moeda;
+
+need_permission(\PermissaoNome::CADASTROMOEDAS, is_output('json'));
+$id = isset($_GET['id'])?$_GET['id']:null;
+$moeda = Moeda::findByID($id);
+if (!$moeda->exists()) {
+	$msg = 'Não existe Moeda com o ID informado!';
+	if (is_output('json')) {
+		json($msg);
+	}
+	\Thunder::warning($msg);
+	redirect('/gerenciar/moeda/');
 }
 try {
-    ZMoeda::excluir($id);
-    Thunder::success('Moeda "' . $moeda->getNome() . '" excluída com sucesso!', true);
-} catch (Exception $e) {
-    Thunder::error('Não foi possível excluir a moeda "' . $moeda->getNome() . '"!');
+	$moeda->delete();
+	$moeda->clean(new Moeda());
+	$msg = 'Moeda "' . $moeda->getNome() . '" excluída com sucesso!';
+	if (is_output('json')) {
+		json('msg', $msg);
+	}
+	\Thunder::success($msg, true);
+} catch (\Exception $e) {
+	$msg = sprintf(
+		'Não foi possível excluir a Moeda "%s"!',
+		$moeda->getNome()
+	);
+	if (is_output('json')) {
+		json($msg);
+	}
+	\Thunder::error($msg);
 }
 redirect('/gerenciar/moeda/');

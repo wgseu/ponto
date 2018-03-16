@@ -22,7 +22,9 @@
 require_once(dirname(__DIR__) . '/app.php');
 
 use $[tAble.package]\$[tAble.norm];
+$[table.exists(date|datetime)]
 use MZ\Database\Helper;
+$[table.end]
 
 need_permission(\PermissaoNome::$[TABLE.style], is_output('json'));
 $$[primary.unix] = isset($_GET['$[primary.unix]'])?$_GET['$[primary.unix]']:null;
@@ -57,7 +59,7 @@ if (is_post()) {
         redirect('/gerenciar/$[table.unix]/');
     } catch (\Exception $e) {
         $$[table.unix]->clean($old_$[table.unix]);
-        if ($e instanceof \ValidationException) {
+        if ($e instanceof \MZ\Exception\ValidationException) {
             $errors = $e->getErrors();
         }
         if (is_output('json')) {

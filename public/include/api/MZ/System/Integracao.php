@@ -26,6 +26,8 @@ namespace MZ\System;
 
 use MZ\Util\Filter;
 use MZ\Util\Validator;
+use MZ\Integrator\IFood;
+use MZ\Integrator\Kromax;
 
 /**
  * Informa quais integrações estão disponíveis
@@ -506,6 +508,25 @@ class Integracao extends \MZ\Database\Helper
             );
         }
         xchmod($filename, 0644);
+    }
+
+    public function getTask()
+    {
+        switch ($this->getAcessoURL()) {
+            case IFood::NAME:
+                $ifood = new IFood();
+                $ifood->setData($this);
+                return $ifood;
+            case Kromax::NAME:
+                $kromax = new Kromax();
+                $kromax->setData($this);
+                return $kromax;
+            default:
+                throw new \Exception(
+                    sprintf('Integração com "%s" não implementada', $this->getNome()),
+                    404
+                );
+        }
     }
 
     /**

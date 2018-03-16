@@ -55,6 +55,7 @@ $produtos = ZProduto::getTodos(
 $response = array('status' => 'ok');
 $campos = array(
     'id',
+    'categoriaid',
     'descricao',
     'detalhes',
     'precovenda',
@@ -63,6 +64,7 @@ $campos = array(
     'divisivel',
     'dataatualizacao',
     // extras
+    'estrelas',
     'estoque',
     'imagemurl',
     'categoria',
@@ -70,6 +72,8 @@ $campos = array(
 );
 $_produtos = array();
 foreach ($produtos as $produto) {
+    // TODO implementar estrelas de mais vendido
+    $produto['estrelas'] = 3;
     $produto['imagemurl'] = get_image_url($produto['imagem'], 'produto', null);
     $_produtos[] = array_intersect_key($produto, array_flip($campos));
 }

@@ -11,7 +11,7 @@ class Image
 {
     const SAVE_QUALITY = 100;
 
-    public static function convert($srcFile = null, $destFile = null, $width = null, $height = null)
+    public static function convert($srcFile = null, $destFile = null, $width = null, $height = null, $mode = 'crop')
     {
         try {
             $layer = ImageWorkshop::initFromPath($srcFile);
@@ -35,7 +35,23 @@ class Image
                 if ($srcFile == $destFile) {
                     return true;
                 }
-                return copy($destFile, $destFile);
+                return copy($srcFile, $destFile);
+            }
+            if ($mode == 'crop') {
+                $dr = $width / $height;
+                $sr = $layer->getWidth() / $layer->getHeight();
+                $dest_width = $layer->getWidth();
+                $dest_height = $layer->getHeight();
+                if ($sr > $dr) {
+                    $dest_width = (int)($layer->getWidth() * $dr / $sr);
+                } else {
+                    $dest_height = (int)($layer->getHeight() * $sr / $dr);
+                }
+                $posX = ($layer->getWidth() - $dest_width) / 2;
+                $posY = ($layer->getHeight() - $dest_height) / 2;
+                if ($dest_width != $layer->getWidth() || $dest_height != $layer->getHeight()) {
+                    $layer->cropInPixel($dest_width, $dest_height, (int)$posX, (int)$posY);
+                }
             }
             $layer->resizeInPixel($width, $height, true, 0, 0, 'MM');
             $layer->save(dirname($destFile), basename($destFile), false, null, self::SAVE_QUALITY);
@@ -51,8 +67,8 @@ class Image
             $layer = ImageWorkshop::initFromPath($srcFile);
             if (($width != $layer->getWidth() || $height != $layer->getHeight()) && (!is_null($width) || !is_null($height))) {
                 $dest_height = $layer->getWidth() * floatval($height / $width);
-                $posX = ($layer->getHeight() - $dest_height) / 2;
-                $layer->cropInPixel($layer->getWidth(), $dest_height, 0, (int)$posX);
+                $posY = ($layer->getHeight() - $dest_height) / 2;
+                $layer->cropInPixel($layer->getWidth(), $dest_height, 0, (int)$posY);
                 $layer->resizeInPixel($width, $height, false, 0, 0, 'MM');
             }
             ob_start();

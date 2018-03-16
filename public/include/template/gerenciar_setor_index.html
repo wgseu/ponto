@@ -9,7 +9,7 @@
 			<form method="get" action="/gerenciar/setor/" id="search-form">
 				<div class="col-md-5 col-sm-5 col-xs-12 form-group pull-right">
 					<div class="input-group">
-						<input type="text" class="form-control" id="query" name="query" placeholder="Procurar..." value="${\MZ\Util\Filter::input(isset($_GET['query'])?$_GET['query']:null)}">
+						<input type="text" class="form-control" id="query" name="query" placeholder="Procurar..." value="${\MZ\Util\Filter::input($_GET, 'query')}">
 						<span class="input-group-btn">
 							<button class="btn btn-default" type="submit"><i class="fa fa-search"></i></button>
 						</span>

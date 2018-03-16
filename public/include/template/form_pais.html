@@ -9,7 +9,7 @@
 <div class="form-group col-lg-3 col-md-4 col-sm-6 col-xs-12">
 	<label for="moedaid">Moeda:</label>
 	<select class="form-control" id="moedaid" name="moedaid">
-<!--{loop $_moedas $_moeda}-->
+<!--{loop $moedas $_moeda}-->
 		<option value="{$_moeda->getID()}" ${$pais->getMoedaID() == $_moeda->getID()?'selected':''}>{$_moeda->getNome()}</option>
 <!--{/loop}-->
 	</select>
@@ -17,7 +17,7 @@
 <div class="form-group col-lg-3 col-md-4 col-sm-6 col-xs-12">
 	<label for="bandeiraindex"><div class="cell-icon pais-icons" style="background-position: -{$pais->getBandeiraIndex() * 16}px 0px;"></div>Bandeira:</label>
 	<select class="form-control" id="bandeiraindex" name="bandeiraindex">
-<!--{loop $images $image}-->
+<!--{loop $flags_images $image}-->
 		<option value="{$image['index']}" data-bandeira="{$image['index']}" ${$pais->getBandeiraIndex() == $image['index']?'selected':''}>{$image['index']}</option>
 <!--{/loop}-->
 	</select>

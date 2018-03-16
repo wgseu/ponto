@@ -454,6 +454,20 @@ class ZCliente
     }
 
     /**
+     * Obtém o nome completo da pessoa física ou o nome fantasia da empresa
+     */
+    public function setNomeCompleto($nome)
+    {
+        $pos = strpos($nome, ' ');
+        if ($pos === false) {
+            $this->setSobrenome(null);
+            return $this->setNome($nome);
+        }
+        $this->setNome(substr($nome, 0, $pos));
+        return $this->setSobrenome(substr($nome, $pos + 1, strlen($nome) - $pos - 1));
+    }
+
+    /**
      * Retorna a assinatura do cliente
      */
     public function getAssinatura()

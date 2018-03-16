@@ -54,7 +54,7 @@ if (is_post()) {
         redirect('/gerenciar/$[table.unix]/');
     } catch (\Exception $e) {
         $$[table.unix]->clean($old_$[table.unix]);
-        if ($e instanceof \ValidationException) {
+        if ($e instanceof \MZ\Exception\ValidationException) {
             $errors = $e->getErrors();
         }
         if (is_output('json')) {

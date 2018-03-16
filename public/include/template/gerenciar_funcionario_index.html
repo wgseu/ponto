@@ -27,7 +27,7 @@
 			<div class="form-group col-lg-4 col-md-12 col-sm-12 col-xs-6">
 				<label for="query">Busca:</label>
 				<div class="input-group">
-					<input type="text" class="form-control" id="query" name="query" placeholder="Nome, Telefone, E-mail ou ${_p('Titulo', 'CPF')}..." value="${\MZ\Util\Filter::input(isset($_GET['query'])?$_GET['query']:null)}">
+					<input type="text" class="form-control" id="query" name="query" placeholder="Nome, Telefone, E-mail ou ${_p('Titulo', 'CPF')}..." value="${\MZ\Util\Filter::input($_GET, 'query')}">
 					<span class="input-group-btn">
 						<button class="btn btn-default" type="submit"><i class="fa fa-search"></i></button>
 					</span>

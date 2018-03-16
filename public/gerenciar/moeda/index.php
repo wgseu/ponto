@@ -21,10 +21,28 @@
 */
 require_once(dirname(__DIR__) . '/app.php');
 
-need_permission(PermissaoNome::CADASTROMOEDAS);
+use MZ\Wallet\Moeda;
+use MZ\Util\Filter;
 
-$count = ZMoeda::getCount($_GET['query']);
-list($pagesize, $offset, $pagestring) = pagestring($count, 10);
-$moedas = ZMoeda::getTodas($_GET['query'], $offset, $pagesize);
+need_permission(\PermissaoNome::CADASTROMOEDAS, is_output('json'));
+
+$limite = isset($_GET['limite'])?intval($_GET['limite']):10;
+if ($limite > 100 || $limite < 1) {
+	$limite = 10;
+}
+$condition = Filter::query($_GET);
+unset($condition['ordem']);
+$order = Filter::order(isset($_GET['ordem'])?$_GET['ordem']:'');
+$count = Moeda::count($condition);
+list($pagesize, $offset, $pagestring) = pagestring($count, $limite);
+$moedas = Moeda::findAll($condition, $order, $pagesize, $offset);
+
+if (is_output('json')) {
+	$items = array();
+	foreach ($moedas as $moeda) {
+		$items[] = $moeda->publish();
+	}
+	json(array('status' => 'ok', 'items' => $items));
+}
 
 include template('gerenciar_moeda_index');

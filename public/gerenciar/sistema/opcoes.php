@@ -19,6 +19,7 @@ $opcoes_comportamento = array(
     array('section' => 'Vendas', 'key' => 'Comanda.Observacao', 'default' => false, 'title' => 'Observação como nome de comanda'),
     array('section' => 'Vendas', 'key' => 'Quantidade.Perguntar', 'default' => true, 'title' => 'Confirmar ao lançar quantidades elevadas'),
     array('section' => 'Sistema', 'key' => 'Fiscal.Mostrar', 'default' => false, 'title' => 'Mostrar campos fiscais e tributários'),
+    array('section' => 'Vendas', 'key' => 'Lancar.Peso.Auto', 'default' => true, 'title' => 'Lançar produtos pesáveis automaticamente'),
 );
 #    array('section' => 'Sistema', 'key' => 'Logout.Timeout', 'default' => 3, 'title' => 'Minutos de inatividade'),
 

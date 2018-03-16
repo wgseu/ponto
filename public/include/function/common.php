@@ -902,7 +902,7 @@ function upload_file($inputname, $dir, $name, $def_ext, $allow_ext, $force_ext =
     return $name;
 }
 
-function upload_image($inputname, $type, $name = null, $width = null, $height = null, $png = false)
+function upload_image($inputname, $type, $name = null, $width = null, $height = null, $png = false, $mode = null)
 {
     $force_ext = null;
     if ($png) {
@@ -918,7 +918,7 @@ function upload_image($inputname, $type, $name = null, $width = null, $height = 
         throw new Exception('O arquivo informado não é uma imagem');
     }
     $path = $dir . $name;
-    if (!Image::convert($path, $path, $width, $height)) {
+    if (!Image::convert($path, $path, $width, $height, $mode)) {
         unlink($path);
         throw new Exception('Falha ao processar imagem');
     }

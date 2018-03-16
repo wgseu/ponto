@@ -22,18 +22,15 @@
 require_once(dirname(dirname(__DIR__)) . '/app.php');
 
 use MZ\System\Integracao;
-use MZ\Product\Pacote;
 
-define('IFOOD_TOKEN', 'wKPZ1ABDOO9EVHJMuORwrFogsUPU7Ca5');
+define('INTGR_TOKEN', 'wKPZ1ABDOO9EVHJMuORwrFogsUPU7Ca5');
 
-$integracao = Integracao::findByAcessoURL('ifood');
-$dados = $integracao->read();
-$produtos = isset($dados['produtos'])?$dados['produtos']:array();
-$cartoes = isset($dados['cartoes'])?$dados['cartoes']:array();
+$integracao = Integracao::findByAcessoURL(\MZ\Integrator\IFood::NAME);
+$association = new \MZ\Association\Product($integracao);
 
 if (isset($_GET['action'])) {
     if (is_post() && $_GET['action'] == 'upload') {
-        if (!isset($_GET['token']) || $_GET['token'] != IFOOD_TOKEN) {
+        if (!isset($_GET['token']) || $_GET['token'] != INTGR_TOKEN) {
             need_permission(PermissaoNome::CADASTROPRODUTOS, true);
         }
         try {
@@ -45,65 +42,10 @@ if (isset($_GET['action'])) {
                 throw new \UploadException($file['error']);
             }
             if (in_array($file['type'], array('text/xml', 'application/xml'))) {
-                $dom = new \DOMDocument();
-                if ($dom->load($file['tmp_name']) === false) {
-                    throw new \Exception('Falha ao carregar XML', 401);
-                }
-                $nodes = $dom->getElementsByTagName('response-body');
-                foreach ($nodes as $list) {
-                    $itens = $list->getElementsByTagName('item');
-                    foreach ($itens as $item) {
-                        $codigo = $item->getElementsByTagName('codCardapio')->item(0)->nodeValue;
-                        $temp = $item->getElementsByTagName('codProdutoPdv');
-                        $codigo_pdv = $temp->length > 0?$temp->item(0)->nodeValue:null;
-                        $temp = $item->getElementsByTagName('codPai');
-                        $codigo_pai = $temp->length > 0?$temp->item(0)->nodeValue:null;
-                        $descricao = $item->getElementsByTagName('descricaoCardapio')->item(0)->nodeValue;
-                        $produto = array(
-                            'codigo' => $codigo,
-                            'codigo_pai' => $codigo_pai,
-                            'codigo_pdv' => $codigo_pdv,
-                            'descricao' => $descricao,
-                            'itens' => array(),
-                        );
-                        if (isset($produtos[$codigo_pai])) {
-                            if (isset($produtos[$codigo]['id'])) {
-                                $produto['id'] = $produtos[$codigo]['id'];
-                                unset($produtos[$codigo]);
-                            }
-                            unset($produto['itens']);
-                            if (isset($produtos[$codigo_pai]['itens'][$codigo])) {
-                                $produtos[$codigo_pai]['itens'][$codigo] = array_merge(
-                                    $produto,
-                                    array_merge(
-                                        $produtos[$codigo_pai]['itens'][$codigo],
-                                        array('descricao' => $descricao)
-                                    )
-                                );
-                            } else {
-                                $produtos[$codigo_pai]['itens'][$codigo] = $produto;
-                            }
-                        } else {
-                            unset($produto['codigo_pai']);
-                            if (isset($produtos[$codigo])) {
-                                $produtos[$codigo] = array_merge(
-                                    $produto,
-                                    array_merge(
-                                        $produtos[$codigo],
-                                        array('descricao' => $descricao)
-                                    )
-                                );
-                            } else {
-                                $produtos[$codigo] = $produto;
-                            }
-                        }
-                    }
-                }
-                $dados = isset($dados)?$dados:array();
-                $dados['produtos'] = $produtos;
-                $integracao->write($dados);
+                $association->populate($file['tmp_name']);
             } elseif (in_array($file['type'], array('text/plain'))) {
-                // upgrade from INI file
+                // migrate from INI file
+                $produtos = $association->getProdutos();
                 $content = file_get_contents($file['tmp_name']);
                 $content = preg_replace('/\/[^=\/]*\/=[^\r\n]*[\r\n]*/', '', $content);
                 $sections = parse_ini_string($content, true, INI_SCANNER_RAW);
@@ -143,6 +85,7 @@ if (isset($_GET['action'])) {
                             }
                         }
                     }
+                    $dados = $association->getDados();
                     $dados = isset($dados)?$dados:array();
                     $dados['produtos'] = $produtos;
                     $integracao->write($dados);
@@ -157,19 +100,12 @@ if (isset($_GET['action'])) {
     } elseif (is_post() && $_GET['action'] == 'update') {
         need_permission(PermissaoNome::CADASTROPRODUTOS, true);
         try {
-            if (!isset($_POST['codigo']) || !isset($_POST['id'])) {
-                throw new \Exception('Código ou ID inválido', 401);
-            }
-            $codigo = $_POST['codigo'];
-            if (!isset($produtos[$codigo])) {
-                throw new \Exception('O produto informado não existe', 404);
-            }
-            $produtos[$codigo]['id'] = $_POST['id'];
-            $dados = isset($dados)?$dados:array();
-            $dados['produtos'] = $produtos;
-            $integracao->write($dados);
-            $appsync = new AppSync();
-            $appsync->integratorChanged();
+            $codigo = isset($_POST['codigo'])?$_POST['codigo']:null;
+            $association->update(
+                $codigo,
+                isset($_POST['id'])?$_POST['id']:null
+            );
+            $produtos = $association->getProdutos();
             json(null, array('produto' => $produtos[$codigo]));
         } catch (\Exception $e) {
             json($e->getMessage());
@@ -177,32 +113,14 @@ if (isset($_GET['action'])) {
     } elseif (is_post() && $_GET['action'] == 'delete') {
         need_permission(PermissaoNome::CADASTROPRODUTOS, true);
         try {
-            if (!isset($_POST['codigo'])) {
-                throw new \Exception('Código inválido ou não informado', 401);
-            }
-            $codigo = $_POST['codigo'];
-            if (!isset($produtos[$codigo])) {
-                throw new \Exception('O produto informado não existe', 404);
-            }
+            $codigo = isset($_POST['codigo'])?$_POST['codigo']:null;
             $subcodigo = isset($_POST['subcodigo'])?$_POST['subcodigo']:null;
-            if (isset($subcodigo) && !isset($produtos[$codigo]['itens'][$subcodigo])) {
-                throw new \Exception('O item informado não existe no pacote', 404);
-            }
-            if (isset($subcodigo)) {
-                unset($produtos[$codigo]['itens'][$subcodigo]);
-            } else {
-                unset($produtos[$codigo]);
-            }
-            $dados = isset($dados)?$dados:array();
-            $dados['produtos'] = $produtos;
-            $integracao->write($dados);
+            $association->delete($codigo, $subcodigo);
             if (isset($subcodigo)) {
                 $msg = 'Item do pacote excluído com sucesso!';
             } else {
                 $msg = 'Produto excluído com sucesso!';
             }
-            $appsync = new AppSync();
-            $appsync->integratorChanged();
             json(null, array('msg' => $msg));
         } catch (\Exception $e) {
             json($e->getMessage());
@@ -210,23 +128,11 @@ if (isset($_GET['action'])) {
     } elseif (is_post() && $_GET['action'] == 'mount') {
         need_permission(PermissaoNome::CADASTROPRODUTOS, true);
         try {
-            if (!isset($_POST['codigo']) || !isset($_POST['id'])) {
-                throw new \Exception('Código ou ID inválido', 401);
-            }
-            $codigo = $_POST['codigo'];
-            if (!isset($produtos[$codigo])) {
-                throw new \Exception('O produto informado não existe', 404);
-            }
-            $subcodigo = $_POST['subcodigo'];
-            if (!isset($produtos[$codigo]['itens'][$subcodigo])) {
-                throw new \Exception('O item do pacote não existe', 404);
-            }
-            $produtos[$codigo]['itens'][$subcodigo]['id'] = $_POST['id'];
-            $dados = isset($dados)?$dados:array();
-            $dados['produtos'] = $produtos;
-            $integracao->write($dados);
-            $appsync = new AppSync();
-            $appsync->integratorChanged();
+            $codigo = isset($_POST['codigo'])?$_POST['codigo']:null;
+            $subcodigo = isset($_POST['subcodigo'])?$_POST['subcodigo']:null;
+            $id = isset($_POST['id'])?$_POST['id']:null;
+            $association->mount($codigo, $subcodigo, $id);
+            $produtos = $association->getProdutos();
             json(null, array('pacote' => $produtos[$codigo]['itens'][$subcodigo]));
         } catch (\Exception $e) {
             json($e->getMessage());
@@ -234,90 +140,19 @@ if (isset($_GET['action'])) {
     } elseif ($_GET['action'] == 'package') {
         need_permission(PermissaoNome::CADASTROPRODUTOS, true);
         try {
-            if (!isset($_GET['codigo'])) {
-                throw new \Exception('Código não informado', 401);
-            }
-            $codigo = $_GET['codigo'];
-            if (!isset($produtos[$codigo])) {
-                throw new \Exception('O produto informado não existe', 404);
-            }
-            $produto = $produtos[$codigo];
-            $associado = \ZProduto::getPeloID(isset($produto['id'])?$produto['id']:$produto['codigo_pdv']);
-            if (is_null($associado->getID())) {
-                throw new \Exception('O produto informado não foi associado', 401);
-            }
-            if ($associado->getTipo() == \ProdutoTipo::PRODUTO) {
-                throw new \Exception('O produto associado não permite formação', 401);
-            }
-            $produto['tipo'] = $associado->getTipo();
-            $_grupos = \ZGrupo::getTodosDoProdutoID($associado->getID());
-            $grupos = array();
-            $contagem = array();
-            $total_pacotes = 0;
-            foreach ($_grupos as $grupo) {
-                $grupos[] = $grupo->toArray();
-                $qtd_pacotes = Pacote::count(
-                    array('visivel' => 'Y', 'grupoid' => $grupo->getID())
-                );
-                $contagem[] = $qtd_pacotes;
-                $total_pacotes += $qtd_pacotes;
-            }
-            $grupo = new \ZGrupo();
-            $grupo->setID(0);
-            $grupo->setDescricao('Adicionais');
-            if ($associado->getTipo() == \ProdutoTipo::PACOTE) {
-                $grupo->setDescricao('Sem grupo');
-            }
-            $total_igual = count($produto['itens']) == $total_pacotes;
-            if ((count($grupos) > 1 && !$total_igual) || count($grupos) == 0) {
-                $grupos[] = $grupo->toArray();
-                $contagem[] = count($produto['itens']);
-            }
-            $total_pacotes = 0;
-            $grupo_index = 0;
-            foreach ($produto['itens'] as $subcodigo => $subproduto) {
-                if ($associado->getTipo() == \ProdutoTipo::PACOTE) {
-                    $subassociado = Pacote::findByID(
-                        isset($subproduto['id'])?$subproduto['id']:$subproduto['codigo_pdv']
-                    );
-                    if ($subassociado->getPacoteID() != $associado->getID()) {
-                        $subassociado = new Pacote();
-                    }
-                    $grupoid = intval($subassociado->getGrupoID());
-                    if (($total_igual || count($grupos) == 1) && $grupo_index < count($grupos) && $grupoid == 0) {
-                        $grupoid = $grupos[$grupo_index]['id'];
-                    }
-                    $produto['itens'][$subcodigo]['grupoid'] = $grupoid;
-                    $total_pacotes++;
-                    if ($grupo_index < count($contagem) && $total_pacotes == $contagem[$grupo_index] && $grupo_index < count($grupos) - 1) {
-                        $grupo_index++;
-                        $total_pacotes = 0;
-                    }
-                    if (!is_null($subassociado->getPropriedadeID())) {
-                        $item = \ZPropriedade::getPeloID($subassociado->getPropriedadeID());
-                    } else {
-                        $item = \ZProduto::getPeloID($subassociado->getProdutoID());
-                    }
-                } else {
-                    $subassociado = \ZComposicao::getPeloID(
-                        isset($subproduto['id'])?$subproduto['id']:$subproduto['codigo_pdv']
-                    );
-                    if ($subassociado->getComposicaoID() != $associado->getID()) {
-                        $subassociado = new \ZComposicao();
-                    }
-                    $produto['itens'][$subcodigo]['grupoid'] = 0;
-                    $item = \ZProduto::getPeloID($subassociado->getProdutoID());
-                }
-                $produto['itens'][$subcodigo]['associado'] = $item->toArray();
-            }
-            json(null, array('produto' => $produto, 'grupos' => $grupos));
+            $codigo = isset($_GET['codigo'])?$_GET['codigo']:null;
+            $package = $association->findPackage($codigo);
+            json(null, $package);
         } catch (\Exception $e) {
             json($e->getMessage());
         }
     } elseif ($_GET['action'] == 'download') {
-        if (!isset($_GET['token']) || $_GET['token'] != IFOOD_TOKEN) {
+        if (!isset($_GET['token']) || $_GET['token'] != INTGR_TOKEN) {
             need_permission(PermissaoNome::CADASTROPRODUTOS, true);
         }
+        $card = new MZ\Association\Card($integracao);
+        $cartoes = $card->getCartoes();
+        $produtos = $association->getProdutos();
         $_cartoes = array();
         $_produtos = array();
         $_desconhecidos = array();
@@ -356,44 +191,7 @@ if (isset($_GET['action'])) {
     }
 }
 need_permission(PermissaoNome::CADASTROPRODUTOS);
-foreach ($produtos as $codigo => $produto) {
-    $associado = \ZProduto::getPeloID(isset($produto['id'])?$produto['id']:$produto['codigo_pdv']);
-    $produtos[$codigo]['produto'] = $associado;
-    $associados = 0;
-    foreach ($produto['itens'] as $subcodigo => $subproduto) {
-        if ($associado->getTipo() == \ProdutoTipo::PACOTE) {
-            $subassociado = Pacote::findByID(isset($subproduto['id'])?$subproduto['id']:$subproduto['codigo_pdv']);
-            if ($subassociado->getPacoteID() != $associado->getID()) {
-                $subassociado = new Pacote();
-            }
-            if (!is_null($subassociado->getPropriedadeID())) {
-                $item = \ZPropriedade::getPeloID($subassociado->getPropriedadeID());
-            } else {
-                $item = \ZProduto::getPeloID($subassociado->getProdutoID());
-            }
-        } else {
-            $subassociado = \ZComposicao::getPeloID(
-                isset($subproduto['id'])?$subproduto['id']:$subproduto['codigo_pdv']
-            );
-            if ($subassociado->getComposicaoID() != $associado->getID()) {
-                $subassociado = new \ZComposicao();
-            }
-            $item = \ZProduto::getPeloID($subassociado->getProdutoID());
-        }
-        if (!is_null($item->getID())) {
-            $associados++;
-        }
-        $produtos[$codigo]['itens'][$subcodigo]['associado'] = $item->toArray();
-    }
-    $status = '';
-    if (is_null($associado->getID())) {
-        $status = 'empty';
-    } elseif ($associado->getTipo() == \ProdutoTipo::PRODUTO && count($produto['itens']) > 0) {
-        $status = 'error';
-    } elseif (count($produto['itens']) != $associados) {
-        $status = 'incomplete';
-    }
-    $produtos[$codigo]['status'] = $status;
-    $produtos[$codigo]['icon'] = count($produto['itens']) > 0 && !is_null($associado->getID())?'edit':'save';
-}
-include template('gerenciar_produto_ifood');
+
+$produtos = $association->findAll();
+
+include template('gerenciar_produto_associar');

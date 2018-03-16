@@ -25,9 +25,7 @@ use MZ\System\Integracao;
 
 need_permission(PermissaoNome::CADASTROCARTOES);
 
-$integracao = Integracao::findByAcessoURL('ifood');
-$dados = $integracao->read();
-$cartoes = isset($dados['cartoes'])?$dados['cartoes']:array();
+$integracao = Integracao::findByAcessoURL(\MZ\Integrator\IFood::NAME);
 $codigos = array(
     'RAM' => array('name' => 'AMERICAN EXPRESS (Crédito)'),
     'DNREST' => array('name' => 'DINERS (Crédito)'),
@@ -49,46 +47,19 @@ $codigos = array(
     'MC' => array('name' => 'MASTERCARD (Online)'),
     'VIS' => array('name' => 'VISA (Online)')
 );
+$association = new \MZ\Association\Card($integracao, $codigos);
 
 if (isset($_GET['action']) && is_post() && $_GET['action'] == 'update') {
     need_permission(PermissaoNome::CADASTROCARTOES, true);
     try {
-        if (!isset($_POST['codigo']) || !array_key_exists('id', $_POST)) {
-            throw new \Exception('Código ou cartão não informado', 401);
-        }
-        $codigo = $_POST['codigo'];
-        if (!array_key_exists($codigo, $codigos)) {
-            throw new \Exception('O cartão informado não existe no iFood', 404);
-        }
-        $cartao = \ZCartao::getPeloID($_POST['id']);
-        if (is_null($cartao->getID()) && is_numeric($_POST['id'])) {
-            throw new \Exception('Cartão não encontrado', 401);
-        }
-        $cartoes[$codigo] = $cartao->getID();
-        $dados = isset($dados)?$dados:array();
-        $dados['cartoes'] = $cartoes;
-        $integracao->write($dados);
-        $appsync = new AppSync();
-        $appsync->integratorChanged();
+        $codigo = isset($_POST['codigo'])?$_POST['codigo']:null;
+        $id = array_key_exists('id', $_POST)?$_POST['id']:null;
+        $cartao = $association->update($codigo, $id);
         json(null, array('cartao' => $cartao->toArray()));
     } catch (\Exception $e) {
         json($e->getMessage());
     }
 }
-foreach ($codigos as $index => $value) {
-    $codigos[$index]['cartao'] = new \ZCartao();
-    $codigos[$index]['status'] = 'empty';
-    $codigos[$index]['icon'] = 'save';
-}
-foreach ($cartoes as $index => $id) {
-    $cartao = \ZCartao::getPeloID($id);
-    $status = '';
-    if (is_null($cartao->getID())) {
-        $status = 'empty';
-    }
-    $codigos[$index]['cartao'] = $cartao;
-    $codigos[$index]['status'] = $status;
-    $codigos[$index]['icon'] = 'save';
-}
+$codigos = $association->findAll();
 $_imagens = \ZCartao::getImages();
-include template('gerenciar_cartao_ifood');
+include template('gerenciar_cartao_associar');

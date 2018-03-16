@@ -21,16 +21,29 @@
 */
 require_once(dirname(__DIR__) . '/app.php');
 
-need_permission(PermissaoNome::CADASTROPAISES);
+use MZ\Location\Pais;
+use MZ\Util\Filter;
 
-$count = ZPais::getCount($_GET['query'], $_GET['moeda']);
-list($pagesize, $offset, $pagestring) = pagestring($count, 10);
-$paises = ZPais::getTodas($_GET['query'], $_GET['moeda'], $offset, $pagesize);
+need_permission(\PermissaoNome::CADASTROPAISES, is_output('json'));
 
-$moedas = ZMoeda::getTodas();
-$_moeda_names = array();
-foreach ($moedas as $moeda) {
-    $_moeda_names[$moeda->getID()] = $moeda->getNome();
+$limite = isset($_GET['limite'])?intval($_GET['limite']):10;
+if ($limite > 100 || $limite < 1) {
+	$limite = 10;
+}
+$condition = Filter::query($_GET);
+unset($condition['ordem']);
+$order = Filter::order(isset($_GET['ordem'])?$_GET['ordem']:'');
+$count = Pais::count($condition);
+list($pagesize, $offset, $pagestring) = pagestring($count, $limite);
+$paises = Pais::findAll($condition, $order, $pagesize, $offset);
+
+if (is_output('json')) {
+	$items = array();
+	foreach ($paises as $pais) {
+		$items[] = $pais->publish();
+	}
+	json(array('status' => 'ok', 'items' => $items));
 }
 
+$moedas = \MZ\Wallet\Moeda::findAll();
 include template('gerenciar_pais_index');

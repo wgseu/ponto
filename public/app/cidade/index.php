@@ -23,21 +23,17 @@ require_once(dirname(dirname(__DIR__)) . '/app.php');
 
 use MZ\Location\Cidade;
 
-$estado_id = isset($_GET['estadoid'])?$_GET['estadoid']:null;
-$estado = \MZ\Location\Estado::findByID($estado_id);
-if (!$estado->exists()) {
-    json('O estado não foi informado ou não existe!');
+$limite = isset($_GET['limite'])?intval($_GET['limite']):10;
+if ($limite > 100 || $limite < 1) {
+	$limite = 10;
 }
-$cidades = Cidade::findAll(
-	array(
-		'estadoid' => $estado->getID(),
-		'search' => isset($_GET['nome'])?$_GET['nome']:null
-	),
-	array(),
-	10
-);
-$_cidades = array();
+$condition = \MZ\Util\Filter::query($_GET);
+unset($condition['ordem']);
+$order = \MZ\Util\Filter::order(isset($_GET['ordem'])?$_GET['ordem']:'');
+$cidades = Cidade::findAll($condition, $order, $limite);
+
+$items = array();
 foreach ($cidades as $cidade) {
-    $_cidades[] = $cidade->toArray();
+    $items[] = $cidade->publish();
 }
-json(array('status' => 'ok', 'items' => $_cidades));
+json(array('status' => 'ok', 'items' => $items));

@@ -32,7 +32,7 @@ $cidade = \MZ\Location\Cidade::findByEstadoIDNome($estado_id, isset($_GET['cidad
 if (!$cidade->exists()) {
     json('A cidade informada não existe!');
 }
-$condition = Filter::query($_GET);
+$condition = \MZ\Util\Filter::query($_GET);
 $condition['cidadeid'] = $cidade->getID();
 // filter remove empty entry
 if (array_key_exists('typesearch', $_GET)) {

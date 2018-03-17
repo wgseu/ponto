@@ -74,6 +74,16 @@ class Filter
     }
 
     /**
+     * Filter string float repesentation to float or null
+     * @param  string $value Country specific formated value
+     * @return float         raw value
+     */
+    public static function float($value)
+    {
+        return self::money($value);
+    }
+
+    /**
      * Filter string striping tags and removing spaces
      * @param  string $value unsafe string
      * @return string        trimmed and stripped string

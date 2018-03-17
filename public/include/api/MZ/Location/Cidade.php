@@ -378,7 +378,7 @@ class Cidade extends \MZ\Database\Helper
     {
         $allowed = self::getAllowedKeys();
         if (isset($condition['search'])) {
-            $search = $condition['search'];
+            $search = trim($condition['search']);
             $field = 'c.nome LIKE ?';
             $condition[$field] = '%'.$search.'%';
             $allowed[$field] = true;

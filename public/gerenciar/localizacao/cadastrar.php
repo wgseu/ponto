@@ -30,6 +30,7 @@ if (is_post()) {
     $localizacao = new Localizacao($_POST);
     try {
         \DB::BeginTransaction();
+        $old_localizacao->setClienteID($localizacao->getClienteID());
         if ($localizacao->getClienteID() == $__empresa__->getID() &&
             !have_permission(PermissaoNome::ALTERARCONFIGURACOES)) {
             throw new \Exception('Você não tem permissão para atribuir um endereço a essa empresa!');

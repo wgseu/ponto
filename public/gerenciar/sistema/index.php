@@ -25,11 +25,18 @@ need_permission(PermissaoNome::ALTERARCONFIGURACOES);
 
 $tab_empresa = 'active';
 $cliente = $__empresa__;
+if (is_null($cliente->getID())) {
+	$cliente->setTipo(\ClienteTipo::JURIDICA);
+}
 $localizacao = \MZ\Location\Localizacao::find(array('clienteid' => $__empresa__->getID()));
 $bairro = $localizacao->findBairroID();
 $cidade = $bairro->findCidadeID();
 $estado = $cidade->findEstadoID();
-$pais_id = $estado->getPaisID();
-$_estados = \MZ\Location\Estado::findAll(array('paisid' => $pais_id));
 $_paises = \MZ\Location\Pais::findAll();
+if (!$estado->exists() && count($_paises) > 0) {
+	$estado->setPaisID(reset($_paises)->getID());
+}
+$pais_id = $estado->getPaisID();
+$focusctrl = 'nome';
+$_estados = \MZ\Location\Estado::findAll(array('paisid' => $pais_id));
 include template('gerenciar_sistema_index');

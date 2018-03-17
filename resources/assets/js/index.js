@@ -991,7 +991,7 @@ Gerenciar.cidade.autocomplete = function (cidade_selector, estado_selector, use_
             var estado_value = $(estado_selector).val();
             if (use_data_value)
                 estado_value = $(estado_selector).find(':selected').attr('data-id');
-            $.get('/app/cidade/', { nome: query, estadoid: estado_value },
+            $.get('/app/cidade/', { search: query, estadoid: estado_value },
                 function (response) {
                     var result = { suggestions: [] };
                     if (response.status == 'ok') {
@@ -1027,7 +1027,9 @@ Gerenciar.bairro.init = function () {
     $('#estadoid').change(function () {
         $(this).closest('form').submit();
     });
-    Gerenciar.cidade.autocomplete('#cidade', '#estadoid', true);
+    Gerenciar.cidade.autocomplete('#cidadeid', '#estadoid', true).on('cidadechoose', function (ev, data) {
+        Gerenciar.cidade.fill(data.id, data.nome, '', '');
+    });
 };
 Gerenciar.bairro.initForm = function (focus_ctrl) {
     $('#valorentrega').autoNumeric('init');
@@ -1255,7 +1257,7 @@ Gerenciar.localizacao.initForm = function (focus_ctrl) {
     });
     $('#logradouro').autocomplete({
         lookup: function (query, done) {
-            $.get('/app/localizacao/', { tipo: 'Casa', typesearch: query, estadoid: $('#estadoid').val(), cidade: $('#cidade').val() },
+            $.get('/app/localizacao/', { typesearch: query, estadoid: $('#estadoid').val(), cidade: $('#cidade').val() },
                 function (response) {
                     var result = { suggestions: [] };
                     if (response.status == 'ok') {

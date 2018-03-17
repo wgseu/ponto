@@ -695,7 +695,10 @@ function _p($section, $key)
         'Cupom.Restante' => 'Restante',
         'Cupom.TotalJuros' => 'Total(J)'
     );
-    if (array_key_exists($section, $__entries__) && array_key_exists($key, $__entries__[$section])) {
+    if (is_array($__entries__) &&
+        array_key_exists($section, $__entries__) &&
+        array_key_exists($key, $__entries__[$section])
+    ) {
         return $__entries__[$section][$key];
     }
     return $entries[$section.'.'.$key];

@@ -38,7 +38,7 @@ class AppSync
         // open socket
         $this->socket = fsockopen('127.0.0.1', 6219, $errno, $errstr);
         if ($this->socket === false) {
-            throw new Exception($errstr, $errno);
+            throw new \Exception('O servidor do GrandChef está fechado', $errno);
         }
     }
 
@@ -53,7 +53,7 @@ class AppSync
         // send message to server
         $result = fwrite($this->socket, $message);
         if ($result === false) {
-            throw new Exception('Could not send data to server');
+            throw new \Exception('Falha ao notificar ao servidor do GrandChef');
         }
     }
 
@@ -61,7 +61,7 @@ class AppSync
     {
         $result = fgets($this->socket);
         if ($result === false) {
-            throw new Exception('Could not read server response');
+            throw new \Exception('Falha ao receber uma notificação do servidor do GrandChef');
         }
         return $result;
     }

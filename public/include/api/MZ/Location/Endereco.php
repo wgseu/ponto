@@ -292,7 +292,7 @@ class Endereco extends \MZ\Database\Helper
                 'id' => sprintf(
                     'O id "%s" já está cadastrado',
                     $this->getID()
-                )),
+                ),
             ));
         }
         if (stripos($e->getMessage(), 'CEP_UNIQUE') !== false) {
@@ -300,7 +300,7 @@ class Endereco extends \MZ\Database\Helper
                 'cep' => sprintf(
                     'O cep "%s" já está cadastrado',
                     $this->getCEP()
-                )),
+                ),
             ));
         }
         if (stripos($e->getMessage(), 'BairroID_Logradouro_UNIQUE') !== false) {
@@ -308,11 +308,11 @@ class Endereco extends \MZ\Database\Helper
                 'bairroid' => sprintf(
                     'O bairro "%s" já está cadastrado',
                     $this->getBairroID()
-                )),
+                ),
                 'logradouro' => sprintf(
                     'O logradouro "%s" já está cadastrado',
                     $this->getLogradouro()
-                )),
+                ),
             ));
         }
         return parent::translate($e);

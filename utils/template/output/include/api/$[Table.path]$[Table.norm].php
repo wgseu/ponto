@@ -391,7 +391,7 @@ $[unique.each(all)]
                 '$[field]' => sprintf(
                     '$[FIELD.gender] $[field.name] "%s" já está cadastrad$[field.gender]',
                     $this->get$[Field.norm]($[field.if(array)]$[field.array.number]$[field.end])
-                )),
+                ),
 $[unique.end]
             ));
         }

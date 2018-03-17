@@ -572,7 +572,7 @@ class Localizacao extends \MZ\Database\Helper
     public function publish()
     {
         $localizacao = parent::publish();
-        $localizacao['cep'] = \MZ\Util\Mask::mask($localizacao['cep'], _p('cep.mask'));
+        $localizacao['cep'] = \MZ\Util\Mask::cep($localizacao['cep']);
         return $localizacao;
     }
 
@@ -583,9 +583,9 @@ class Localizacao extends \MZ\Database\Helper
     public function filter($original)
     {
         $this->setID($original->getID());
-        $this->setClienteID(Filter::number($this->getClienteID()));
+        $this->setClienteID(Filter::number($original->getClienteID()));
         $this->setBairroID(Filter::number($this->getBairroID()));
-        $this->setCEP(Filter::unmask($this->getCEP(), '99999-999'));
+        $this->setCEP(Filter::unmask($this->getCEP(), _p('Mascara', 'CEP')));
         $this->setLogradouro(Filter::string($this->getLogradouro()));
         $this->setNumero(Filter::string($this->getNumero()));
         $this->setComplemento(Filter::string($this->getComplemento()));
@@ -614,16 +614,19 @@ class Localizacao extends \MZ\Database\Helper
     {
         $errors = array();
         if (is_null($this->getClienteID())) {
-            $errors['clienteid'] = 'O Cliente não pode ser vazio';
+            $errors['clienteid'] = 'O cliente não pode ser vazio';
         }
         if (is_null($this->getBairroID())) {
-            $errors['bairroid'] = 'O Bairro não pode ser vazio';
+            $errors['bairroid'] = 'O bairro não pode ser vazio';
+        }
+        if (!Validator::checkCEP($this->getCEP(), true)) {
+            $errors['cep'] = sprintf('O %s é inválido', _p('Titulo', 'CEP'));
         }
         if (is_null($this->getLogradouro())) {
-            $errors['logradouro'] = 'O Logradouro não pode ser vazio';
+            $errors['logradouro'] = 'O logradouro não pode ser vazio';
         }
         if (is_null($this->getNumero())) {
-            $errors['numero'] = 'O Número não pode ser vazio';
+            $errors['numero'] = 'O número não pode ser vazio';
         }
         if (is_null($this->getTipo())) {
             $this->setTipo(self::TIPO_CASA);
@@ -631,10 +634,15 @@ class Localizacao extends \MZ\Database\Helper
         if (!is_null($this->getTipo()) &&
             !array_key_exists($this->getTipo(), self::getTipoOptions())
         ) {
-            $errors['tipo'] = 'O Tipo é invalido';
+            $errors['tipo'] = 'O tipo é inválido';
         }
         if (is_null($this->getMostrar())) {
-            $this->setMostrar('Y');
+            $this->setMostrar('N');
+        }
+        if (!is_null($this->getMostrar()) &&
+            !array_key_exists($this->getMostrar(), self::getBooleanOptions())
+        ) {
+            $errors['mostrar'] = 'A exibição do endereço é inválida';
         }
         if (!empty($errors)) {
             throw new \MZ\Exception\ValidationException($errors);
@@ -652,7 +660,7 @@ class Localizacao extends \MZ\Database\Helper
         if (stripos($e->getMessage(), 'PRIMARY') !== false) {
             return new \MZ\Exception\ValidationException(array(
                 'id' => vsprintf(
-                    'O ID "%s" já está cadastrado',
+                    'O id "%s" já está cadastrado',
                     array($this->getID())
                 ),
             ));
@@ -660,11 +668,11 @@ class Localizacao extends \MZ\Database\Helper
         if (stripos($e->getMessage(), 'UK_Localizacoes_ClienteID_Apelido') !== false) {
             return new \MZ\Exception\ValidationException(array(
                 'clienteid' => vsprintf(
-                    'O Cliente "%s" já está cadastrado',
+                    'O cliente "%s" já está cadastrado',
                     array($this->getClienteID())
                 ),
                 'apelido' => vsprintf(
-                    'O Apelido "%s" já está cadastrado',
+                    'O apelido "%s" já está cadastrado',
                     array($this->getApelido())
                 ),
             ));
@@ -716,15 +724,26 @@ class Localizacao extends \MZ\Database\Helper
     }
 
     /**
+     * Get allowed keys array
+     * @return array allowed keys array
+     */
+    private static function getAllowedKeys()
+    {
+        $localizacao = new Localizacao();
+        $allowed = Filter::concatKeys('l.', $localizacao->toArray());
+        $allowed['b.cidadeid'] = true;
+        return $allowed;
+    }
+
+    /**
      * Filter order array
      * @param  mixed $order order string or array to parse and filter allowed
      * @return array allowed associative order
      */
     private static function filterOrder($order)
     {
-        $localizacao = new Localizacao();
-        $allowed = $localizacao->toArray();
-        return Filter::orderBy($order, $allowed);
+        $allowed = self::getAllowedKeys();
+        return Filter::orderBy($order, $allowed, array('l.', 'b.'));
     }
 
     /**
@@ -734,9 +753,20 @@ class Localizacao extends \MZ\Database\Helper
      */
     private static function filterCondition($condition)
     {
-        $localizacao = new Localizacao();
-        $allowed = $localizacao->toArray();
-        return Filter::keys($condition, $allowed);
+        $allowed = self::getAllowedKeys();
+        if (isset($condition['typesearch'])) {
+            $typesearch = $condition['typesearch'];
+            $condition = Filter::keys($condition, $allowed, array('l.', 'b.'));
+            if (isset($condition['l.tipo']) && $condition['l.tipo'] == self::TIPO_APARTAMENTO) {
+                $field = 'l.condominio LIKE ?';
+            } else {
+                $field = 'l.logradouro LIKE ?';
+            }
+            $condition[$field] = '%'.$typesearch.'%';
+        } else {
+            $condition = Filter::keys($condition, $allowed, array('l.', 'b.'));
+        }
+        return $condition;
     }
 
     /**
@@ -747,10 +777,23 @@ class Localizacao extends \MZ\Database\Helper
      */
     private static function query($condition = array(), $order = array())
     {
-        $query = self::getDB()->from('Localizacoes');
+        $query = self::getDB()->from('Localizacoes l');
+        $query = $query->leftJoin('Bairros b ON b.id = l.bairroid');
+        $typesearch = array_key_exists('typesearch', $condition);
         $condition = self::filterCondition($condition);
         $query = self::buildOrderBy($query, self::filterOrder($order));
-        return $query->where($condition);
+        if ($typesearch) {
+            if (isset($condition['l.tipo']) && $condition['l.tipo'] == self::TIPO_APARTAMENTO) {
+                $query = $query->orderBy('l.condominio ASC');
+                $query = $query->groupBy('l.condominio');
+            } else {
+                $query = $query->orderBy('l.logradouro ASC');
+                $query = $query->groupBy('l.logradouro');
+            }
+        }
+        $query = $query->orderBy('l.mostrar ASC');
+        $query = $query->orderBy('l.id ASC');
+        return self::buildCondition($query, $condition);
     }
 
     /**
@@ -871,17 +914,27 @@ class Localizacao extends \MZ\Database\Helper
      */
     public static function count($condition = array())
     {
+        $typesearch = array_key_exists('typesearch', $condition);
         $query = self::query($condition);
+        if ($typesearch) {
+            $condition = self::filterCondition($condition);
+            if (isset($condition['l.tipo']) && $condition['l.tipo'] == self::TIPO_APARTAMENTO) {
+                $query = $query->select(null)->groupBy(null)->select('COUNT(DISTINCT l.condominio)');
+            } else {
+                $query = $query->select(null)->groupBy(null)->select('COUNT(DISTINCT l.logradouro)');
+            }
+            return (int) $query->fetchColumn();
+        }
         return $query->count();
     }
 
     /**
      * Cliente a qual esse endereço pertence
-     * @return \MZ\Account\Cliente The object fetched from database
+     * @return \ZCliente The object fetched from database
      */
     public function findClienteID()
     {
-        return \MZ\Account\Cliente::findByID($this->getClienteID());
+        return \ZCliente::getPeloID($this->getClienteID());
     }
 
     /**

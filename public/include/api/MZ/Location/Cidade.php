@@ -197,7 +197,7 @@ class Cidade extends \MZ\Database\Helper
     public function publish()
     {
         $cidade = parent::publish();
-        $cidade['cep'] = \MZ\Util\Mask::mask($cidade['cep'], _p('cep.mask'));
+        $cidade['cep'] = \MZ\Util\Mask::mask($cidade['cep'], _p('Mascara', 'CEP'));
         return $cidade;
     }
 
@@ -210,7 +210,7 @@ class Cidade extends \MZ\Database\Helper
         $this->setID($original->getID());
         $this->setEstadoID(Filter::number($this->getEstadoID()));
         $this->setNome(Filter::string($this->getNome()));
-        $this->setCEP(Filter::unmask($this->getCEP(), '99999-999'));
+        $this->setCEP(Filter::unmask($this->getCEP(), _p('Mascara', 'CEP')));
     }
 
     /**
@@ -229,10 +229,13 @@ class Cidade extends \MZ\Database\Helper
     {
         $errors = array();
         if (is_null($this->getEstadoID())) {
-            $errors['estadoid'] = 'O Estado não pode ser vazio';
+            $errors['estadoid'] = 'O estado não pode ser vazio';
         }
         if (is_null($this->getNome())) {
-            $errors['nome'] = 'O Nome não pode ser vazio';
+            $errors['nome'] = 'O nome não pode ser vazio';
+        }
+        if (!Validator::checkCEP($this->getCEP(), true)) {
+            $errors['cep'] = sprintf('O %s é inválido', _p('Titulo', 'CEP'));
         }
         if (!empty($errors)) {
             throw new \MZ\Exception\ValidationException($errors);
@@ -250,7 +253,7 @@ class Cidade extends \MZ\Database\Helper
         if (stripos($e->getMessage(), 'PRIMARY') !== false) {
             return new \MZ\Exception\ValidationException(array(
                 'id' => vsprintf(
-                    'O ID "%s" já está cadastrado',
+                    'O id "%s" já está cadastrado',
                     array($this->getID())
                 ),
             ));
@@ -258,11 +261,11 @@ class Cidade extends \MZ\Database\Helper
         if (stripos($e->getMessage(), 'EstadoID_Nome_UNIQUE') !== false) {
             return new \MZ\Exception\ValidationException(array(
                 'estadoid' => vsprintf(
-                    'O Estado "%s" já está cadastrado',
+                    'O estado "%s" já está cadastrado',
                     array($this->getEstadoID())
                 ),
                 'nome' => vsprintf(
-                    'O Nome "%s" já está cadastrado',
+                    'O nome "%s" já está cadastrado',
                     array($this->getNome())
                 ),
             ));
@@ -270,8 +273,11 @@ class Cidade extends \MZ\Database\Helper
         if (stripos($e->getMessage(), 'CEP_UNIQUE') !== false) {
             return new \MZ\Exception\ValidationException(array(
                 'cep' => vsprintf(
-                    'O CEP "%s" já está cadastrado',
-                    array($this->getCEP())
+                    'O %s "%s" já está cadastrado',
+                    array(
+                        _p('Titulo', 'CEP'),
+                        \MZ\Util\Mask::mask($cidade['cep'], _p('Mascara', 'CEP'))
+                    )
                 ),
             ));
         }
@@ -317,15 +323,50 @@ class Cidade extends \MZ\Database\Helper
     }
 
     /**
+     * Find city with that name or register a new one
+     * @param  int $estado_id estado to find Cidade
+     * @param  string $nome nome to find Cidade
+     * @return Cidade A filled instance
+     */
+    public static function findOrInsert($estado_id, $nome)
+    {
+        $cidade = self::findByEstadoIDNome(
+            $estado_id,
+            Filter::string($nome)
+        );
+        if ($cidade->exists()) {
+            return $cidade;
+        }
+        if (!have_permission(\PermissaoNome::CADASTROCIDADES)) {
+            throw new \Exception('A cidade não está cadastrada e você não tem permissão para cadastrar uma');
+        }
+        $cidade->setEstadoID($estado_id);
+        $cidade->setNome($nome);
+        $cidade->filter(new Cidade());
+        return $cidade->insert();
+    }
+
+    /**
+     * Get allowed keys array
+     * @return array allowed keys array
+     */
+    private static function getAllowedKeys()
+    {
+        $cidade = new Cidade();
+        $allowed = Filter::concatKeys('c.', $cidade->toArray());
+        $allowed['e.paisid'] = true;
+        return $allowed;
+    }
+
+    /**
      * Filter order array
      * @param  mixed $order order string or array to parse and filter allowed
      * @return array allowed associative order
      */
     private static function filterOrder($order)
     {
-        $cidade = new Cidade();
-        $allowed = $cidade->toArray();
-        return Filter::orderBy($order, $allowed);
+        $allowed = self::getAllowedKeys();
+        return Filter::orderBy($order, $allowed, array('c.', 'e.'));
     }
 
     /**
@@ -335,9 +376,15 @@ class Cidade extends \MZ\Database\Helper
      */
     private static function filterCondition($condition)
     {
-        $cidade = new Cidade();
-        $allowed = $cidade->toArray();
-        return Filter::keys($condition, $allowed);
+        $allowed = self::getAllowedKeys();
+        if (isset($condition['search'])) {
+            $search = $condition['search'];
+            $field = 'c.nome LIKE ?';
+            $condition[$field] = '%'.$search.'%';
+            $allowed[$field] = true;
+            unset($condition['search']);
+        }
+        return Filter::keys($condition, $allowed, array('c.', 'e.'));
     }
 
     /**
@@ -348,10 +395,13 @@ class Cidade extends \MZ\Database\Helper
      */
     private static function query($condition = array(), $order = array())
     {
-        $query = self::getDB()->from('Cidades');
+        $query = self::getDB()->from('Cidades c');
+        $query = $query->leftJoin('Estados e ON e.id = c.estadoid');
         $condition = self::filterCondition($condition);
         $query = self::buildOrderBy($query, self::filterOrder($order));
-        return $query->where($condition);
+        $query = $query->orderBy('c.nome ASC');
+        $query = $query->orderBy('c.id ASC');
+        return self::buildCondition($query, $condition);
     }
 
     /**

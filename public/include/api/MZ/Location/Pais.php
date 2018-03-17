@@ -552,7 +552,7 @@ class Pais extends \MZ\Database\Helper
         $query = self::getDB()->from('Paises');
         $condition = self::filterCondition($condition);
         $query = self::buildOrderBy($query, self::filterOrder($order));
-        return $query->where($condition);
+        return self::buildCondition($query, $condition);
     }
 
     /**

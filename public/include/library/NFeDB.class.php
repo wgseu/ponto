@@ -72,10 +72,10 @@ class NFeDB extends \NFe\Database\Estatico
         /* Itens do pedido */
         $_itens = ZProdutoPedido::getTodosDoPedidoID($_pedido->getID());
         /* Informações de entrega */
-        $_localizacao_entrega = ZLocalizacao::getPeloID($_pedido->getLocalizacaoID());
-        $_bairro_entrega = ZBairro::getPeloID($_localizacao_entrega->getBairroID());
-        $_cidade_entrega = ZCidade::getPeloID($_bairro_entrega->getCidadeID());
-        $_estado_entrega = ZEstado::getPeloID($_cidade_entrega->getEstadoID());
+        $_localizacao_entrega = \MZ\Location\Localizacao::findByID($_pedido->getLocalizacaoID());
+        $_bairro_entrega = $_localizacao_entrega->findBairroID();
+        $_cidade_entrega = $_bairro_entrega->findCidadeID();
+        $_estado_entrega = $_cidade_entrega->findEstadoID();
         /* Informações do cliente */
         $_cliente = ZCliente::getPeloID($_pedido->getClienteID());
 

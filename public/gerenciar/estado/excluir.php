@@ -21,17 +21,35 @@
 */
 require_once(dirname(__DIR__) . '/app.php');
 
-need_permission(PermissaoNome::CADASTROESTADOS);
-$id = $_GET['id'];
-$estado = ZEstado::getPeloID($id);
-if (is_null($estado->getID())) {
-    Thunder::warning('O estado de id "'.$id.'" não existe!');
-    redirect('/gerenciar/estado/');
+use MZ\Location\Estado;
+
+need_permission(\PermissaoNome::CADASTROESTADOS, is_output('json'));
+$id = isset($_GET['id'])?$_GET['id']:null;
+$estado = Estado::findByID($id);
+if (!$estado->exists()) {
+	$msg = 'Não existe Estado com o ID informado!';
+	if (is_output('json')) {
+		json($msg);
+	}
+	\Thunder::warning($msg);
+	redirect('/gerenciar/estado/');
 }
 try {
-    ZEstado::excluir($id);
-    Thunder::success('Estado "' . $estado->getNome() . '" excluído com sucesso!', true);
-} catch (Exception $e) {
-    Thunder::error('Não foi possível excluir o estado "' . $estado->getNome() . '"!');
+	$estado->delete();
+	$estado->clean(new Estado());
+	$msg = sprintf('Estado "%s" excluído com sucesso!', $estado->getNome());
+	if (is_output('json')) {
+		json('msg', $msg);
+	}
+	\Thunder::success($msg, true);
+} catch (\Exception $e) {
+	$msg = sprintf(
+		'Não foi possível excluir o Estado "%s"!',
+		$estado->getNome()
+	);
+	if (is_output('json')) {
+		json($msg);
+	}
+	\Thunder::error($msg);
 }
 redirect('/gerenciar/estado/');

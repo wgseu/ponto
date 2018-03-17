@@ -21,17 +21,35 @@
 */
 require_once(dirname(__DIR__) . '/app.php');
 
-need_permission(PermissaoNome::CADASTROPAISES);
-$id = $_GET['id'];
-$pais = ZPais::getPeloID($id);
-if (is_null($pais->getID())) {
-    Thunder::warning('O país de id "'.$id.'" não existe!');
-    redirect('/gerenciar/pais/');
+use MZ\Location\Pais;
+
+need_permission(\PermissaoNome::CADASTROPAISES, is_output('json'));
+$id = isset($_GET['id'])?$_GET['id']:null;
+$pais = Pais::findByID($id);
+if (!$pais->exists()) {
+	$msg = 'Não existe País com o ID informado!';
+	if (is_output('json')) {
+		json($msg);
+	}
+	\Thunder::warning($msg);
+	redirect('/gerenciar/pais/');
 }
 try {
-    ZPais::excluir($id);
-    Thunder::success('País "' . $pais->getNome() . '" excluído com sucesso!', true);
-} catch (Exception $e) {
-    Thunder::error('Não foi possível excluir o país "' . $pais->getNome() . '"!');
+	$pais->delete();
+	$pais->clean(new Pais());
+	$msg = 'País "' . $pais->getNome() . '" excluído com sucesso!';
+	if (is_output('json')) {
+		json('msg', $msg);
+	}
+	\Thunder::success($msg, true);
+} catch (\Exception $e) {
+	$msg = sprintf(
+		'Não foi possível excluir o País "%s"!',
+		$pais->getNome()
+	);
+	if (is_output('json')) {
+		json($msg);
+	}
+	\Thunder::error($msg);
 }
 redirect('/gerenciar/pais/');

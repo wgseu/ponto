@@ -21,6 +21,8 @@
 */
 require_once(dirname(__DIR__) . '/app.php');
 
+use MZ\Location\Localizacao;
+
 need_permission(
     array(
         PermissaoNome::CADASTROCLIENTES,
@@ -84,10 +86,10 @@ try {
     $i = $line;
     foreach ($clientes as $value) {
         $i++;
-        $localizacao = ZLocalizacao::getPeloClienteID($value->getID());
-        $bairro = ZBairro::getPeloID($localizacao->getBairroID());
-        $cidade = ZCidade::getPeloID($bairro->getCidadeID());
-        $estado = ZEstado::getPeloID($cidade->getEstadoID());
+        $localizacao = Localizacao::find(array('clienteid' => $value->getID()));
+        $bairro = $localizacao->findBairroID();
+        $cidade = $bairro->findCidadeID();
+        $estado = $cidade->findEstadoID();
 
         $row = array();
         $row[] = $value->getNomeCompleto();
@@ -117,7 +119,7 @@ try {
         $row[] = $bairro->getNome();
         $row[] = $localizacao->getLogradouro();
         $row[] = $localizacao->getNumero();
-        $row[] = ZLocalizacao::getTipoOptions($localizacao->getTipo());
+        $row[] = Localizacao::getTipoOptions($localizacao->getTipo());
         $row[] = $localizacao->getCondominio();
         $row[] = $localizacao->getBloco();
         $row[] = $localizacao->getApartamento();

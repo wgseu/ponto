@@ -426,7 +426,7 @@ class Carteira extends \MZ\Database\Helper
             }
             unset($condition['query']);
         }
-        return $query->where($condition);
+        return self::buildCondition($query, $condition);
     }
 
     /**

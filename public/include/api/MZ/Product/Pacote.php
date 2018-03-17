@@ -585,7 +585,7 @@ class Pacote extends \MZ\Database\Helper
         $query = self::getDB()->from('Pacotes');
         $condition = self::filterCondition($condition);
         $query = self::buildOrderBy($query, self::filterOrder($order));
-        return $query->where($condition);
+        return self::buildCondition($query, $condition);
     }
 
     /**
@@ -629,7 +629,7 @@ class Pacote extends \MZ\Database\Helper
             unset($condition['pc.associacaoid']);
         }
         $query = self::buildOrderBy($query, self::filterOrderEx($order));
-        return $query->where($condition);
+        return self::buildCondition($query, $condition);
     }
 
     /**

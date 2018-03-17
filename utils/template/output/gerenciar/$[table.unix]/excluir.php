@@ -21,13 +21,13 @@
 */
 require_once(dirname(__DIR__) . '/app.php');
 
-use $[tAble.package]\$[tAble.norm];
+use $[Table.package]\$[Table.norm];
 
 need_permission(\PermissaoNome::$[TABLE.style], is_output('json'));
 $$[primary.unix] = isset($_GET['$[primary.unix]'])?$_GET['$[primary.unix]']:null;
-$$[table.unix] = $[tAble.norm]::findBy$[pRimary.norm]($$[primary.unix]);
+$$[table.unix] = $[Table.norm]::findBy$[Primary.norm]($$[primary.unix]);
 if (!$$[table.unix]->exists()) {
-	$msg = 'Não existe $[tAble.name] com $[primary.gender] $[pRimary.name] informado!';
+	$msg = 'Não existe $[Table.name] com $[primary.gender] $[Primary.name] informado!';
 	if (is_output('json')) {
 		json($msg);
 	}
@@ -36,16 +36,16 @@ if (!$$[table.unix]->exists()) {
 }
 try {
 	$$[table.unix]->delete();
-	$$[table.unix]->clean(new $[tAble.norm]());
-	$msg = '$[tAble.name] "' . $$[table.unix]->get$[dEscriptor.norm]() . '" excluíd$[table.gender] com sucesso!';
+	$$[table.unix]->clean(new $[Table.norm]());
+	$msg = sprintf('$[Table.name] "%s" excluíd$[table.gender] com sucesso!', $$[table.unix]->get$[Descriptor.norm]());
 	if (is_output('json')) {
 		json('msg', $msg);
 	}
 	\Thunder::success($msg, true);
 } catch (\Exception $e) {
 	$msg = sprintf(
-		'Não foi possível excluir $[table.gender] $[tAble.name] "%s"!',
-		$$[table.unix]->get$[dEscriptor.norm]()
+		'Não foi possível excluir $[table.gender] $[Table.name] "%s"!',
+		$$[table.unix]->get$[Descriptor.norm]()
 	);
 	if (is_output('json')) {
 		json($msg);

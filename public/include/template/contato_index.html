@@ -1,6 +1,6 @@
 <!--{include header}-->
     <script type="text/javascript">$(function(){$('#' + '{$fieldfocus}').focus();});</script>
-<!--{if !is_login()}-->
+<!--{if !is_login() || is_null($login_cliente->getEmail())}-->
     <!--${$col = array(
         'col-md-6',
         'col-md-6',
@@ -24,9 +24,9 @@
                     <form name="contato" id="contato-form" method="post" action="/contato/">
                         <div class="row">
                             <div class="{$col[0]}">
-<!--{if !is_login()}-->
+<!--{if !is_login() || is_null($login_cliente->getEmail())}-->
                                 <div class="form-group">
-                                    <input type="text" class="form-control" placeholder="Seu nome *" id="nome" name="nome" value="{$_POST['nome']}">
+                                    <input type="text" class="form-control" placeholder="Seu nome *" id="nome" name="nome" value="${$_POST['nome'] ?: $login_cliente->getNomeCompleto()}">
                                 </div>
                                 <div class="form-group">
                                     <input type="email" class="form-control" placeholder="Seu E-mail *" id="email" name="email" value="{$_POST['email']}">

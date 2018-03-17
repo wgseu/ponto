@@ -21,17 +21,27 @@
 */
 require_once(dirname(__DIR__) . '/app.php');
 
-need_permission(PermissaoNome::CADASTROCLIENTES);
-$id = $_GET['id'];
-$localizacao = ZLocalizacao::getPeloID($id);
-if (is_null($localizacao->getID())) {
-    Thunder::warning('A localização de id "'.$id.'" não existe!');
-    redirect('/gerenciar/localizacao/');
+use MZ\Location\Localizacao;
+
+need_permission(\PermissaoNome::CADASTROCLIENTES, true);
+$id = isset($_GET['id'])?$_GET['id']:null;
+$localizacao = Localizacao::findByID($id);
+if (!$localizacao->exists()) {
+	$msg = 'Não existe Localização com o ID informado!';
+	json($msg);
 }
 try {
-    ZLocalizacao::excluir($id);
-    Thunder::success('Localização "' . $localizacao->getLogradouro() . '" excluída com sucesso!', true);
-} catch (Exception $e) {
-    Thunder::error('Não foi possível excluir a localização "' . $localizacao->getLogradouro() . '"!');
+	$localizacao->delete();
+	$localizacao->clean(new Localizacao());
+	$msg = sprintf(
+		'Localização "%s" excluída com sucesso!',
+		$localizacao->getApelido() ?: $localizacao->getLogradouro()
+	);
+	json('msg', $msg);
+} catch (\Exception $e) {
+	$msg = sprintf(
+		'Não foi possível excluir a Localização "%s"!',
+		$localizacao->getApelido() ?: $localizacao->getLogradouro()
+	);
+	json($msg);
 }
-redirect('/gerenciar/localizacao/');

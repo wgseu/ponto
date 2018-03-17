@@ -21,12 +21,21 @@
 */
 require_once(dirname(dirname(__DIR__)) . '/app.php');
 
-$estado_id = $_GET['estadoid'];
-$estado = ZEstado::getPeloID($estado_id);
-if (is_null($estado->getID())) {
+use MZ\Location\Cidade;
+
+$estado_id = isset($_GET['estadoid'])?$_GET['estadoid']:null;
+$estado = \MZ\Location\Estado::findByID($estado_id);
+if (!$estado->exists()) {
     json('O estado não foi informado ou não existe!');
 }
-$cidades = ZCidade::getTodasDoEstadoID($estado->getID(), $_GET['nome'], 0, 10);
+$cidades = Cidade::findAll(
+	array(
+		'estadoid' => $estado->getID(),
+		'search' => isset($_GET['nome'])?$_GET['nome']:null
+	),
+	array(),
+	10
+);
 $_cidades = array();
 foreach ($cidades as $cidade) {
     $_cidades[] = $cidade->toArray();

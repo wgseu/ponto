@@ -3,13 +3,13 @@
 <div class="row">
 	<div class="page-title">
 		<div class="col-lg-2 col-md-2 col-sm-2 col-xs-6">
-			<h3>$[tAble.name.plural]</h3>
+			<h3>$[Table.name.plural]</h3>
 		</div>
 		<form id="search-form" action="/gerenciar/$[table.unix]/" method="get">
 $[field.each(all)]
 $[field.if(enum)]
 			<div class="form-group col-lg-3 col-md-4 col-sm-4 col-xs-6">
-				<label>$[fIeld.name]:</label>
+				<label>$[Field.name]:</label>
 				<select class="form-control" id="$[field]" name="$[field]">
 					${\Utility::Option($$[field.unix]_options, isset($_GET['$[field]'])?$_GET['$[field]']:null, 'Tod$[field.gender]s')}
 				</select>
@@ -17,9 +17,9 @@ $[field.if(enum)]
 $[field.end]
 $[field.end]
 			<div class="form-group col-lg-3 col-md-4 col-sm-12 col-xs-12">
-				<label for="query">$[dEscriptor.name]:</label>
+				<label for="search">$[Descriptor.name]:</label>
 				<div class="input-group">
-					<input type="text" class="form-control" id="query" name="query" placeholder="Procurar..." value="${\MZ\Util\Filter::input($_GET, 'query')}">
+					<input type="text" class="form-control" id="search" name="search" placeholder="Procurar..." value="${\MZ\Util\Filter::input($_GET, 'search')}">
 					<span class="input-group-btn">
 						<button class="btn btn-default" type="submit"><i class="fa fa-search"></i></button>
 					</span>
@@ -32,9 +32,9 @@ $[field.end]
 		<div class="col-md-12 col-sm-12 col-xs-12">
 			<div class="x_panel">
 				<div class="x_title">
-					<h2>$[tAble.name.plural]<small></small></h2>
+					<h2>$[Table.name.plural]<small></small></h2>
 					<ul class="nav navbar-right panel_toolbox hidden-print">
-						<li><a href="/gerenciar/$[table.unix]/cadastrar" title="Cadastrar nov$[table.gender] $[tAble.name]"><i class="fa fa-plus-square"></i></a></li>
+						<li><a href="/gerenciar/$[table.unix]/cadastrar" title="Cadastrar nov$[table.gender] $[Table.name]"><i class="fa fa-plus-square"></i></a></li>
 					</ul>
 					<div class="clearfix"></div>
 				</div>
@@ -46,7 +46,7 @@ $[field.each]
 $[field.if(password)]
 $[field.else.if(text)]
 $[field.else]
-								<th>$[fIeld.name]</th>
+								<th>$[Field.name]</th>
 $[field.end]
 $[field.end]
 								<th width="10%" class="text-center">Ações</th>
@@ -57,42 +57,42 @@ $[field.end]
 							<tr>
 $[field.each]
 $[field.if(reference)]
-<!--${$_$[reference.unix] = \Z$[rEference.norm]::getPeloID($$[table.unix]->get$[fIeld.norm]())}-->
-								<td><a href="/gerenciar/$[reference.unix]/editar?$[reference.pk]={$_$[reference.unix]->getID()}" title="Editar $[rEference.name] '${\MZ\Util\Filter::input($_$[reference.unix]->get$[rEference.desc.norm]())}'">{$_$[reference.unix]->get$[rEference.desc.norm]()}</a></td>
+<!--${$_$[reference.unix] = $$[table.unix]->find$[Field.norm]()}-->
+								<td><a href="/gerenciar/$[reference.unix]/editar?$[reference.pk]={$_$[reference.unix]->getID()}" title="Editar $[Reference.name] '${\MZ\Util\Filter::input($_$[reference.unix]->get$[Reference.desc.norm]())}'">{$_$[reference.unix]->get$[Reference.desc.norm]()}</a></td>
 $[field.else.if(masked)]
-								<td>${\MZ\Util\Mask::mask($$[table.unix]->get$[fIeld.norm](), '$[field.mask]')}</td>
+								<td>${\MZ\Util\Mask::mask($$[table.unix]->get$[Field.norm](), '$[field.mask]')}</td>
 $[field.else.if(enum)]
-								<td>{$$[field.unix]_options[$$[table.unix]->get$[fIeld.norm]()]}</td>
+								<td>{$$[field.unix]_options[$$[table.unix]->get$[Field.norm]()]}</td>
 $[field.else.if(image)]
-								<td><a href="/gerenciar/$[table.unix]/editar?$[primary.unix]={$$[table.unix]->get$[pRimary.norm]()}" title="Editar $[tAble.name] '${\MZ\Util\Filter::input($$[table.unix]->get$[dEscriptor.norm]())}'"><img src="${get_image_url($$[table.unix]->get$[fIeld.norm](), '$[field.image.folder]', '$[field.image.default]')}" height="48" alt="$[fIeld.name]" title="$[fIeld.info]"/></a></td>
+								<td><a href="/gerenciar/$[table.unix]/editar?$[primary.unix]={$$[table.unix]->get$[Primary.norm]()}" title="Editar $[Table.name] '${\MZ\Util\Filter::input($$[table.unix]->get$[Descriptor.norm]())}'"><img src="{$$[table.unix]->make$[Field.norm]()}" height="48" alt="$[Field.name]" title="$[Field.info]"/></a></td>
 $[field.else.if(blob)]
-								<td><a href="/gerenciar/$[table.unix]/editar?$[primary.unix]={$$[table.unix]->get$[pRimary.norm]()}" title="Editar $[tAble.name] '${\MZ\Util\Filter::input($$[table.unix]->get$[dEscriptor.norm]())}'"><img src="${get_image_url($$[table.unix]->get$[fIeld.norm](), '$[field.image.folder]', '$[field.image.default]')}" height="48" alt="$[fIeld.name]" title="$[fIeld.info]"/></a></td>
+								<td><a href="/gerenciar/$[table.unix]/editar?$[primary.unix]={$$[table.unix]->get$[Primary.norm]()}" title="Editar $[Table.name] '${\MZ\Util\Filter::input($$[table.unix]->get$[Descriptor.norm]())}'"><img src="{$$[table.unix]->make$[Field.norm]()}" height="48" alt="$[Field.name]" title="$[Field.info]"/></a></td>
 $[field.else.if(datetime)]
-								<td>${\MZ\Util\Mask::datetime($$[table.unix]->get$[fIeld.norm]())}</td>
+								<td>${\MZ\Util\Mask::datetime($$[table.unix]->get$[Field.norm]())}</td>
 $[field.else.if(date)]
-								<td>${\MZ\Util\Mask::date($$[table.unix]->get$[fIeld.norm]())}</td>
+								<td>${\MZ\Util\Mask::date($$[table.unix]->get$[Field.norm]())}</td>
 $[field.else.if(time)]
-								<td>${\MZ\Util\Mask::time($$[table.unix]->get$[fIeld.norm]())}</td>
+								<td>${\MZ\Util\Mask::time($$[table.unix]->get$[Field.norm]())}</td>
 $[field.else.if(currency)]
-								<td>${\MZ\Util\Mask::money($$[table.unix]->get$[fIeld.norm](), true)}</td>
+								<td>${\MZ\Util\Mask::money($$[table.unix]->get$[Field.norm](), true)}</td>
 $[field.else.if(boolean)]
-								<td>${\MZ\Util\Mask::bool($$[table.unix]->is$[fIeld.norm]())}</td>
+								<td>${\MZ\Util\Mask::bool($$[table.unix]->is$[Field.norm]())}</td>
 $[field.else.if(password)]
 $[field.else.if(text)]
 $[field.else]
-								<td>{$$[table.unix]->get$[fIeld.norm]()}</td>
+								<td>{$$[table.unix]->get$[Field.norm]()}</td>
 $[field.end]
 $[field.end]
 								<td class="text-center">
 									<ul class="nav panel_toolbox">
 										<li>
-											<a href="/gerenciar/$[table.unix]/editar?$[primary.unix]={$$[table.unix]->get$[pRimary.norm]()}" title="Editar $[tAble.name] '${\MZ\Util\Filter::input($$[table.unix]->get$[dEscriptor.norm]())}'"><i class="fa fa-edit"></i></a>
+											<a href="/gerenciar/$[table.unix]/editar?$[primary.unix]={$$[table.unix]->get$[Primary.norm]()}" title="Editar $[table.name] '${\MZ\Util\Filter::input($$[table.unix]->get$[Descriptor.norm]())}'"><i class="fa fa-edit"></i></a>
 										</li>
 										<li>
-											<a href="/gerenciar/$[table.unix]/cadastrar?duplicar={$$[table.unix]->get$[pRimary.norm]()}" title="Duplicar $[tAble.name] '${\MZ\Util\Filter::input($$[table.unix]->get$[dEscriptor.norm]())}'"><i class="fa fa-cubes"></i></a>
+											<a href="/gerenciar/$[table.unix]/cadastrar?duplicar={$$[table.unix]->get$[Primary.norm]()}" title="Duplicar $[table.name] '${\MZ\Util\Filter::input($$[table.unix]->get$[Descriptor.norm]())}'"><i class="fa fa-cubes"></i></a>
 										</li>
 										<li>
-											<a href="/gerenciar/$[table.unix]/excluir?$[primary.unix]={$$[table.unix]->get$[pRimary.norm]()}" title="Excluir $[tAble.name] '${\MZ\Util\Filter::input($$[table.unix]->get$[dEscriptor.norm]())}'" class="ajaxlink" ask="Deseja excluir $[table.gender] $[tAble.name] '${\MZ\Util\Filter::input($$[table.unix]->get$[dEscriptor.norm]())}'?"><i class="fa fa-close"></i></a>
+											<a href="/gerenciar/$[table.unix]/excluir?$[primary.unix]={$$[table.unix]->get$[Primary.norm]()}" title="Excluir $[table.name] '${\MZ\Util\Filter::input($$[table.unix]->get$[Descriptor.norm]())}'" class="ajaxlink" ask="Deseja excluir $[table.gender] $[table.name] '${\MZ\Util\Filter::input($$[table.unix]->get$[Descriptor.norm]())}'?"><i class="fa fa-close"></i></a>
 										</li>
 									</ul>
 								</td>

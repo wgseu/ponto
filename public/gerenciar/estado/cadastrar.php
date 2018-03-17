@@ -1,48 +1,67 @@
 <?php
 /*
-	Copyright 2016 da MZ Software - MZ Desenvolvimento de Sistemas LTDA
-	Este arquivo é parte do programa GrandChef - Sistema para Gerenciamento de Churrascarias, Bares e Restaurantes.
-	O GrandChef é um software proprietário; você não pode redistribuí-lo e/ou modificá-lo.
-	DISPOSIÇÕES GERAIS
-	O cliente não deverá remover qualquer identificação do produto, avisos de direitos autorais,
-	ou outros avisos ou restrições de propriedade do GrandChef.
+    Copyright 2016 da MZ Software - MZ Desenvolvimento de Sistemas LTDA
+    Este arquivo é parte do programa GrandChef - Sistema para Gerenciamento de Churrascarias, Bares e Restaurantes.
+    O GrandChef é um software proprietário; você não pode redistribuí-lo e/ou modificá-lo.
+    DISPOSIÇÕES GERAIS
+    O cliente não deverá remover qualquer identificação do produto, avisos de direitos autorais,
+    ou outros avisos ou restrições de propriedade do GrandChef.
 
-	O cliente não deverá causar ou permitir a engenharia reversa, desmontagem,
-	ou descompilação do GrandChef.
+    O cliente não deverá causar ou permitir a engenharia reversa, desmontagem,
+    ou descompilação do GrandChef.
 
-	PROPRIEDADE DOS DIREITOS AUTORAIS DO PROGRAMA
+    PROPRIEDADE DOS DIREITOS AUTORAIS DO PROGRAMA
 
-	GrandChef é a especialidade do desenvolvedor e seus
-	licenciadores e é protegido por direitos autorais, segredos comerciais e outros direitos
-	de leis de propriedade.
+    GrandChef é a especialidade do desenvolvedor e seus
+    licenciadores e é protegido por direitos autorais, segredos comerciais e outros direitos
+    de leis de propriedade.
 
-	O Cliente adquire apenas o direito de usar o software e não adquire qualquer outros
-	direitos, expressos ou implícitos no GrandChef diferentes dos especificados nesta Licença.
+    O Cliente adquire apenas o direito de usar o software e não adquire qualquer outros
+    direitos, expressos ou implícitos no GrandChef diferentes dos especificados nesta Licença.
 */
 require_once(dirname(__DIR__) . '/app.php');
 
-need_permission(PermissaoNome::CADASTROESTADOS);
+use MZ\Location\Estado;
+
+need_permission(\PermissaoNome::CADASTROESTADOS, is_output('json'));
+$id = isset($_GET['id'])?$_GET['id']:null;
+$estado = Estado::findByID($id);
+$estado->setID(null);
+
 $focusctrl = 'nome';
 $errors = array();
+$old_estado = $estado;
 if (is_post()) {
-    $estado = new ZEstado($_POST);
+    $estado = new Estado($_POST);
     try {
-        $estado->setID(null);
-        $estado = ZEstado::cadastrar($estado);
-        Thunder::success('Estado "'.$estado->getNome().'" cadastrado com sucesso!', true);
+        $estado->filter($old_estado);
+        $estado->save();
+        $old_estado->clean($estado);
+        $msg = sprintf(
+            'Estado "%s" atualizado com sucesso!',
+            $estado->getNome()
+        );
+        if (is_output('json')) {
+            json(null, array('item' => $estado->publish(), 'msg' => $msg));
+        }
+        \Thunder::success($msg, true);
         redirect('/gerenciar/estado/');
-    } catch (ValidationException $e) {
-        $errors = $e->getErrors();
-    } catch (Exception $e) {
-        $errors['unknow'] = $e->getMessage();
+    } catch (\Exception $e) {
+        $estado->clean($old_estado);
+        if ($e instanceof \MZ\Exception\ValidationException) {
+            $errors = $e->getErrors();
+        }
+        if (is_output('json')) {
+            json($e->getMessage(), null, array('errors' => $errors));
+        }
+        \Thunder::error($e->getMessage());
+        foreach ($errors as $key => $value) {
+            $focusctrl = $key;
+            break;
+        }
     }
-    foreach ($errors as $key => $value) {
-        $focusctrl = $key;
-        Thunder::error($value);
-        break;
-    }
-} else {
-    $estado = new ZEstado();
+} elseif (is_output('json')) {
+    json('Nenhum dado foi enviado');
 }
-$_paises = ZPais::getTodas();
+$_paises = \MZ\Location\Pais::findAll();
 include template('gerenciar_estado_cadastrar');

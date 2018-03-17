@@ -1,5 +1,5 @@
 <div class="form-group col-lg-3 col-md-4 col-sm-6 col-xs-12">
-<!--${$_pais = ZPais::getPeloID($estado->getPaisID())}-->
+<!--${$_pais = $estado->findPaisID()}-->
 	<label for="paisid"><div class="cell-icon pais-icons" style="background-position: -{$_pais->getBandeiraIndex() * 16}px 0px;"></div>País:</label>
 	<select class="form-control" id="paisid" name="paisid">
 <!--{loop $_paises $_pais}-->

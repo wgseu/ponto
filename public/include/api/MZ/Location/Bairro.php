@@ -267,16 +267,21 @@ class Bairro extends \MZ\Database\Helper
     {
         $errors = array();
         if (is_null($this->getCidadeID())) {
-            $errors['cidadeid'] = 'A Cidade não pode ser vazia';
+            $errors['cidadeid'] = 'A cidade não pode ser vazia';
         }
         if (is_null($this->getNome())) {
-            $errors['nome'] = 'O Nome não pode ser vazio';
+            $errors['nome'] = 'O nome não pode ser vazio';
         }
         if (is_null($this->getValorEntrega())) {
             $errors['valorentrega'] = 'O Valor da entrega não pode ser vazio';
+        } elseif ($this->getValorEntrega() < 0) {
+            $errors['valorentrega'] = 'O valor da entrega não pode ser negativo';
         }
         if (is_null($this->getDisponivel())) {
-            $this->setDisponivel('Y');
+            $this->setDisponivel('N');
+        }
+        if (!array_key_exists($this->getDisponivel(), self::getBooleanOptions())) {
+            $errors['disponivel'] = 'A disponibilidade de entrega é inválida';
         }
         if (!empty($errors)) {
             throw new \MZ\Exception\ValidationException($errors);
@@ -302,11 +307,11 @@ class Bairro extends \MZ\Database\Helper
         if (stripos($e->getMessage(), 'CidadeID_Nome_UNIQUE') !== false) {
             return new \MZ\Exception\ValidationException(array(
                 'cidadeid' => vsprintf(
-                    'A Cidade "%s" já está cadastrada',
+                    'A cidade "%s" já está cadastrada',
                     array($this->getCidadeID())
                 ),
                 'nome' => vsprintf(
-                    'O Nome "%s" já está cadastrado',
+                    'O nome "%s" já está cadastrado',
                     array($this->getNome())
                 ),
             ));
@@ -341,15 +346,52 @@ class Bairro extends \MZ\Database\Helper
     }
 
     /**
+     * Find district with that name or register a new one
+     * @param  int $cidade_id cidade to find Bairro
+     * @param  string $nome nome to find Bairro
+     * @return Bairro A filled instance
+     */
+    public static function findOrInsert($cidade_id, $nome)
+    {
+        $bairro = self::findByCidadeIDNome(
+            $cidade_id,
+            Filter::string($nome)
+        );
+        if ($bairro->exists()) {
+            return $bairro;
+        }
+        if (!have_permission(\PermissaoNome::CADASTROBAIRROS)) {
+            throw new \Exception('O bairro não está cadastrada e você não tem permissão para cadastrar um');
+        }
+        $bairro->setCidadeID($cidade_id);
+        $bairro->setNome($nome);
+        $bairro->setValorEntrega(0.0);
+        $bairro->filter(new Bairro());
+        return $bairro->insert();
+    }
+
+    /**
+     * Get allowed keys array
+     * @return array allowed keys array
+     */
+    private static function getAllowedKeys()
+    {
+        $bairro = new Bairro();
+        $allowed = Filter::concatKeys('b.', $bairro->toArray());
+        $allowed['e.paisid'] = true;
+        $allowed['c.estadoid'] = true;
+        return $allowed;
+    }
+
+    /**
      * Filter order array
      * @param  mixed $order order string or array to parse and filter allowed
      * @return array allowed associative order
      */
     private static function filterOrder($order)
     {
-        $bairro = new Bairro();
-        $allowed = $bairro->toArray();
-        return Filter::orderBy($order, $allowed);
+        $allowed = self::getAllowedKeys();
+        return Filter::orderBy($order, $allowed, array('b.', 'c.', 'e.'));
     }
 
     /**
@@ -359,9 +401,15 @@ class Bairro extends \MZ\Database\Helper
      */
     private static function filterCondition($condition)
     {
-        $bairro = new Bairro();
-        $allowed = $bairro->toArray();
-        return Filter::keys($condition, $allowed);
+        $allowed = self::getAllowedKeys();
+        if (isset($condition['search'])) {
+            $search = $condition['search'];
+            $field = 'b.nome LIKE ?';
+            $condition[$field] = '%'.$search.'%';
+            $allowed[$field] = true;
+            unset($condition['search']);
+        }
+        return Filter::keys($condition, $allowed, array('b.', 'c.', 'e.'));
     }
 
     /**
@@ -372,10 +420,14 @@ class Bairro extends \MZ\Database\Helper
      */
     private static function query($condition = array(), $order = array())
     {
-        $query = self::getDB()->from('Bairros');
+        $query = self::getDB()->from('Bairros b')
+            ->leftJoin('Cidades c ON c.id = b.cidadeid')
+            ->leftJoin('Estados e ON e.id = c.estadoid');
         $condition = self::filterCondition($condition);
         $query = self::buildOrderBy($query, self::filterOrder($order));
-        return $query->where($condition);
+        $query = $query->orderBy('b.nome ASC');
+        $query = $query->orderBy('b.id ASC');
+        return self::buildCondition($query, $condition);
     }
 
     /**

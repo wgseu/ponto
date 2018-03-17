@@ -1255,7 +1255,7 @@ Gerenciar.localizacao.initForm = function (focus_ctrl) {
     });
     $('#logradouro').autocomplete({
         lookup: function (query, done) {
-            $.get('/app/localizacao/', { tipo: 'logradouro', logradouro: query, estadoid: $('#estadoid').val(), cidade: $('#cidade').val() },
+            $.get('/app/localizacao/', { tipo: 'Casa', typesearch: query, estadoid: $('#estadoid').val(), cidade: $('#cidade').val() },
                 function (response) {
                     var result = { suggestions: [] };
                     if (response.status == 'ok') {
@@ -1278,7 +1278,7 @@ Gerenciar.localizacao.initForm = function (focus_ctrl) {
     });
     $('#condominio').autocomplete({
         lookup: function (query, done) {
-            $.get('/app/localizacao/', { tipo: 'condominio', condominio: query, estadoid: $('#estadoid').val(), cidade: $('#cidade').val() },
+            $.get('/app/localizacao/', { tipo: 'Apartamento', typesearch: query, estadoid: $('#estadoid').val(), cidade: $('#cidade').val() },
                 function (response) {
                     var result = { suggestions: [] };
                     if (response.status == 'ok') {

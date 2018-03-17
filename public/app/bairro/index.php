@@ -21,18 +21,25 @@
 */
 require_once(dirname(dirname(__DIR__)) . '/app.php');
 
-$estado_id = $_GET['estadoid'];
-$estado = ZEstado::getPeloID($estado_id);
-if (is_null($estado->getID())) {
+$estado_id = isset($_GET['estadoid'])?$_GET['estadoid']:null;
+$estado = \MZ\Location\Estado::findByID($estado_id);
+if (!$estado->exists()) {
     json('O estado não foi informado ou não existe!');
 }
-$cidade = ZCidade::getPeloEstadoIDNome($estado_id, trim($_GET['cidade']));
-if (is_null($cidade->getID())) {
-    json('A cidade "' . $_GET['cidade'] . '" não existe!');
+$cidade = \MZ\Location\Cidade::findByEstadoIDNome($estado_id, isset($_GET['cidade'])?trim($_GET['cidade']):null);
+if (!$cidade->exists()) {
+    json('A cidade informada não existe!');
 }
-$bairros = ZBairro::getTodosDaCidadeID($cidade->getID(), $_GET['nome'], 0, 10);
-$_bairros = array();
+$bairros = \MZ\Location\Bairro::findAll(
+	array(
+		'cidadeid' => $cidade->getID(),
+		'search' => isset($_GET['nome'])?$_GET['nome']:null
+	),
+	array(),
+	10
+);
+$items = array();
 foreach ($bairros as $bairro) {
-    $_bairros[] = $bairro->toArray();
+    $items[] = $bairro->publish();
 }
-json(array('status' => 'ok', 'items' => $_bairros));
+json(array('status' => 'ok', 'items' => $items));

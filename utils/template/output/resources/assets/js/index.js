@@ -1,6 +1,6 @@
 Gerenciar.$[table.unix] = {};
 Gerenciar.$[table.unix].init = function () {
-    $('#query').focus();
+    $('#search').focus();
 $[field.each]
 $[field.if(enum)]
     $('#$[field]').change(function () {

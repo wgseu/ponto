@@ -21,12 +21,30 @@
 */
 require_once(dirname(__DIR__) . '/app.php');
 
-need_permission(PermissaoNome::CADASTROESTADOS);
+use MZ\Location\Estado;
+use MZ\Util\Filter;
 
-$_pais = ZPais::getPelaSigla($_GET['pais']);
-$count = ZEstado::getCount($_GET['query'], $_pais->getID());
-list($pagesize, $offset, $pagestring) = pagestring($count, 10);
-$estados = ZEstado::getTodos($_GET['query'], $_pais->getID(), $offset, $pagesize);
+need_permission(\PermissaoNome::CADASTROESTADOS, is_output('json'));
 
-$_paises = ZPais::getTodas();
+$limite = isset($_GET['limite'])?intval($_GET['limite']):10;
+if ($limite > 100 || $limite < 1) {
+	$limite = 10;
+}
+$condition = Filter::query($_GET);
+unset($condition['ordem']);
+$order = Filter::order(isset($_GET['ordem'])?$_GET['ordem']:'');
+$count = Estado::count($condition);
+list($pagesize, $offset, $pagestring) = pagestring($count, $limite);
+$estados = Estado::findAll($condition, $order, $pagesize, $offset);
+
+if (is_output('json')) {
+	$items = array();
+	foreach ($estados as $estado) {
+		$items[] = $estado->publish();
+	}
+	json(array('status' => 'ok', 'items' => $items));
+}
+
+$pais = \MZ\Location\Pais::findByID($_GET['paisid']);
+$_paises = \MZ\Location\Pais::findAll();
 include template('gerenciar_estado_index');

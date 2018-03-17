@@ -227,7 +227,7 @@ class Endereco extends \MZ\Database\Helper
     public function publish()
     {
         $endereco = parent::publish();
-        $endereco['cep'] = \MZ\Util\Mask::mask($endereco['cep'], _p('cep.mask'));
+        $endereco['cep'] = \MZ\Util\Mask::cep($endereco['cep']);
         return $endereco;
     }
 
@@ -241,7 +241,7 @@ class Endereco extends \MZ\Database\Helper
         $this->setCidadeID(Filter::number($this->getCidadeID()));
         $this->setBairroID(Filter::number($this->getBairroID()));
         $this->setLogradouro(Filter::string($this->getLogradouro()));
-        $this->setCEP(Filter::unmask($this->getCEP(), '99999-999'));
+        $this->setCEP(Filter::unmask($this->getCEP(), _p('Mascara', 'CEP')));
     }
 
     /**
@@ -260,16 +260,19 @@ class Endereco extends \MZ\Database\Helper
     {
         $errors = array();
         if (is_null($this->getCidadeID())) {
-            $errors['cidadeid'] = 'A Cidade não pode ser vazia';
+            $errors['cidadeid'] = 'A cidade não pode ser vazia';
         }
         if (is_null($this->getBairroID())) {
-            $errors['bairroid'] = 'O Bairro não pode ser vazio';
+            $errors['bairroid'] = 'O bairro não pode ser vazio';
         }
         if (is_null($this->getLogradouro())) {
-            $errors['logradouro'] = 'O Logradouro não pode ser vazio';
+            $errors['logradouro'] = 'O logradouro não pode ser vazio';
         }
         if (is_null($this->getCEP())) {
-            $errors['cep'] = 'O CEP não pode ser vazio';
+            $errors['cep'] = sprintf('O %s não pode ser vazio', _p('Titulo', 'CEP'));
+        }
+        if (!Validator::checkCEP($this->getCEP())) {
+            $errors['cep'] = sprintf('O %s é inválido', _p('Titulo', 'CEP'));
         }
         if (!empty($errors)) {
             throw new \MZ\Exception\ValidationException($errors);
@@ -286,30 +289,30 @@ class Endereco extends \MZ\Database\Helper
     {
         if (stripos($e->getMessage(), 'PRIMARY') !== false) {
             return new \MZ\Exception\ValidationException(array(
-                'id' => vsprintf(
-                    'O ID "%s" já está cadastrado',
-                    array($this->getID())
-                ),
+                'id' => sprintf(
+                    'O id "%s" já está cadastrado',
+                    $this->getID()
+                )),
             ));
         }
         if (stripos($e->getMessage(), 'CEP_UNIQUE') !== false) {
             return new \MZ\Exception\ValidationException(array(
-                'cep' => vsprintf(
-                    'O CEP "%s" já está cadastrado',
-                    array($this->getCEP())
-                ),
+                'cep' => sprintf(
+                    'O cep "%s" já está cadastrado',
+                    $this->getCEP()
+                )),
             ));
         }
         if (stripos($e->getMessage(), 'BairroID_Logradouro_UNIQUE') !== false) {
             return new \MZ\Exception\ValidationException(array(
-                'bairroid' => vsprintf(
-                    'O Bairro "%s" já está cadastrado',
-                    array($this->getBairroID())
-                ),
-                'logradouro' => vsprintf(
-                    'O Logradouro "%s" já está cadastrado',
-                    array($this->getLogradouro())
-                ),
+                'bairroid' => sprintf(
+                    'O bairro "%s" já está cadastrado',
+                    $this->getBairroID()
+                )),
+                'logradouro' => sprintf(
+                    'O logradouro "%s" já está cadastrado',
+                    $this->getLogradouro()
+                )),
             ));
         }
         return parent::translate($e);
@@ -354,15 +357,25 @@ class Endereco extends \MZ\Database\Helper
     }
 
     /**
+     * Get allowed keys array
+     * @return array allowed keys array
+     */
+    private static function getAllowedKeys()
+    {
+        $endereco = new Endereco();
+        $allowed = Filter::concatKeys('e.', $endereco->toArray());
+        return $allowed;
+    }
+
+    /**
      * Filter order array
      * @param  mixed $order order string or array to parse and filter allowed
      * @return array allowed associative order
      */
     private static function filterOrder($order)
     {
-        $endereco = new Endereco();
-        $allowed = $endereco->toArray();
-        return Filter::orderBy($order, $allowed);
+        $allowed = self::getAllowedKeys();
+        return Filter::orderBy($order, $allowed, 'e.');
     }
 
     /**
@@ -372,9 +385,15 @@ class Endereco extends \MZ\Database\Helper
      */
     private static function filterCondition($condition)
     {
-        $endereco = new Endereco();
-        $allowed = $endereco->toArray();
-        return Filter::keys($condition, $allowed);
+        $allowed = self::getAllowedKeys();
+        if (isset($condition['search'])) {
+            $search = $condition['search'];
+            $field = 'e.logradouro LIKE ?';
+            $condition[$field] = '%'.$search.'%';
+            $allowed[$field] = true;
+            unset($condition['search']);
+        }
+        return Filter::keys($condition, $allowed, 'e.');
     }
 
     /**
@@ -385,10 +404,12 @@ class Endereco extends \MZ\Database\Helper
      */
     private static function query($condition = array(), $order = array())
     {
-        $query = self::getDB()->from('Enderecos');
+        $query = self::getDB()->from('Enderecos e');
         $condition = self::filterCondition($condition);
         $query = self::buildOrderBy($query, self::filterOrder($order));
-        return $query->where($condition);
+        $query = $query->orderBy('e.logradouro ASC');
+        $query = $query->orderBy('e.id ASC');
+        return self::buildCondition($query, $condition);
     }
 
     /**

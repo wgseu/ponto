@@ -51,7 +51,10 @@ if (is_login()) {
     try {
         $status['permissoes'] = ZAcesso::getPermissoes($login_funcionario->getID());
         if (is_manager()) {
-            $dispositivo = register_device($_GET['device'], $_GET['serial']);
+            $dispositivo = register_device(
+                isset($_GET['device'])?$_GET['device']:null,
+                isset($_GET['serial'])?$_GET['serial']:null
+            );
         } else {
             $dispositivo = new ZDispositivo();
         }

@@ -9,6 +9,7 @@
 			<div class="form-group col-lg-4 col-md-4 col-sm-4 col-xs-6">
 				<label for="classificacaoid">Moeda:</label>
 				<select class="form-control" id="moedaid" name="moedaid">
+					<option value="" ${!isset($_GET['moedaid'])?'selected':''}>Todas</option>
 <!--{loop $moedas $_moeda}-->
 					<option value="{$_moeda->getID()}" ${isset($_GET['moedaid']) && $_GET['moedaid'] == $_moeda->getID()?'selected':''}>{$_moeda->getNome()}</option>
 <!--{/loop}-->

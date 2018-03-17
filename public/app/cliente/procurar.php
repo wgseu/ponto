@@ -23,8 +23,10 @@ require_once(dirname(dirname(__DIR__)) . '/app.php');
 
 need_manager(true);
 
-$limit = intval($_GET['limite']);
-if ($_GET['primeiro'] || check_fone($_GET['busca'], true)) {
+$limit = intval(isset($_GET['limite'])?$_GET['limite']:5);
+if ((isset($_GET['primeiro'])?$_GET['primeiro']:false) ||
+    check_fone(isset($_GET['busca'])?$_GET['busca']:null, true)
+) {
     $limit = 1;
 } elseif ($limit < 1) {
     $limit = 5;
@@ -32,8 +34,8 @@ if ($_GET['primeiro'] || check_fone($_GET['busca'], true)) {
     $limit = 20;
 }
 $clientes = ZCliente::getTodos(
-    $_GET['busca'],
-    $_GET['tipo'],
+    isset($_GET['busca'])?$_GET['busca']:null,
+    isset($_GET['tipo'])?$_GET['tipo']:null,
     null, // genero
     null, // mes_inicio
     null, // mes_fim
@@ -57,7 +59,7 @@ $campos = array(
             'imagemurl',
         );
 $_clientes = array();
-$domask = intval($_GET['formatar']) != 0;
+$domask = intval(isset($_GET['formatar'])?$_GET['formatar']:0) != 0;
 foreach ($clientes as $cliente) {
     $_cliente = $cliente->toArray();
     if ($domask) {

@@ -21,36 +21,38 @@
 */
 require_once(dirname(dirname(__DIR__)) . '/app.php');
 
-$estado_id = $_GET['estadoid'];
-$estado = ZEstado::getPeloID($estado_id);
-if (is_null($estado->getID())) {
+use \MZ\Location\Localizacao;
+
+$estado_id = isset($_GET['estadoid'])?$_GET['estadoid']:null;
+$estado = \MZ\Location\Estado::findByID($estado_id);
+if (!$estado->exists()) {
     json('O estado não foi informado ou não existe!');
 }
-$cidade = ZCidade::getPeloEstadoIDNome($estado_id, trim($_GET['cidade']));
-if (is_null($cidade->getID())) {
-    json('A cidade "' . $_GET['cidade'] . '" não existe!');
+$cidade = \MZ\Location\Cidade::findByEstadoIDNome($estado_id, isset($_GET['cidade'])?trim($_GET['cidade']):null);
+if (!$cidade->exists()) {
+    json('A cidade informada não existe!');
 }
-if ($_GET['tipo'] == 'logradouro') {
-    $localizacoes = ZLocalizacao::getTodasDaCidadeID($cidade->getID(), 'logradouro', $_GET['logradouro'], 0, 10);
-} elseif ($_GET['tipo'] == 'condominio') {
-    $localizacoes = ZLocalizacao::getTodasDaCidadeID($cidade->getID(), 'condominio', $_GET['condominio'], 0, 10);
-} else {
-    $localizacoes = array();
+$condition = Filter::query($_GET);
+$condition['cidadeid'] = $cidade->getID();
+// filter remove empty entry
+if (array_key_exists('typesearch', $_GET)) {
+    $condition['typesearch'] = $_GET['typesearch'];
 }
-$_localizacoes = array();
+$localizacoes = Localizacao::findAll($condition, array(), 10);
 $campos = array(
     'cep',
     'logradouro'
 );
-if ($_GET['tipo'] == 'condominio') {
+if (isset($_GET['tipo']) && $_GET['tipo'] == Localizacao::TIPO_APARTAMENTO) {
     $campos[] = 'numero';
     $campos[] = 'condominio';
 }
+$items = array();
 foreach ($localizacoes as $localizacao) {
-    $bairro = ZBairro::getPeloID($localizacao->getBairroID());
-    $_localizacao = $localizacao->toArray();
-    $_localizacao = array_intersect_key($_localizacao, array_flip($campos));
-    $_localizacao['bairro'] = $bairro->getNome();
-    $_localizacoes[] = $_localizacao;
+    $item = $localizacao->publish();
+    $item = array_intersect_key($item, array_flip($campos));
+    $bairro = $localizacao->findBairroID();
+    $item['bairro'] = $bairro->getNome();
+    $items[] = $item;
 }
-json(array('status' => 'ok', 'items' => $_localizacoes));
+json(array('status' => 'ok', 'items' => $items));

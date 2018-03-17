@@ -21,7 +21,7 @@
 */
 require_once(dirname(__DIR__) . '/app.php');
 
-use $[tAble.package]\$[tAble.norm];
+use $[Table.package]\$[Table.norm];
 use MZ\Util\Filter;
 
 need_permission(\PermissaoNome::$[TABLE.style], is_output('json'));
@@ -33,9 +33,9 @@ if ($limite > 100 || $limite < 1) {
 $condition = Filter::query($_GET);
 unset($condition['ordem']);
 $order = Filter::order(isset($_GET['ordem'])?$_GET['ordem']:'');
-$count = $[tAble.norm]::count($condition);
+$count = $[Table.norm]::count($condition);
 list($pagesize, $offset, $pagestring) = pagestring($count, $limite);
-$$[table.unix.plural] = $[tAble.norm]::findAll($condition, $order, $pagesize, $offset);
+$$[table.unix.plural] = $[Table.norm]::findAll($condition, $order, $pagesize, $offset);
 
 if (is_output('json')) {
 	$items = array();
@@ -47,10 +47,10 @@ if (is_output('json')) {
 
 $[field.each(all)]
 $[field.if(enum)]
-$$[field.unix]_options = $[tAble.norm]::get$[fIeld.norm]Options();
+$$[field.unix]_options = $[Table.norm]::get$[Field.norm]Options();
 $[field.else.if(reference)]
 $[field.if(searchable)]
-$$[field.unix]_obj = $$[table.unix]->find$[fIeld.norm]();
+$$[field.unix]_obj = $$[table.unix]->find$[Field.norm]();
 $[field.end]
 $[field.end]
 $[field.end]

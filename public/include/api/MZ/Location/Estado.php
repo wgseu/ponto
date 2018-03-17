@@ -228,10 +228,10 @@ class Estado extends \MZ\Database\Helper
     {
         $errors = array();
         if (is_null($this->getPaisID())) {
-            $errors['paisid'] = 'O País não pode ser vazio';
+            $errors['paisid'] = 'O país não pode ser vazio';
         }
         if (is_null($this->getNome())) {
-            $errors['nome'] = 'O Nome não pode ser vazio';
+            $errors['nome'] = 'O nome não pode ser vazio';
         }
         if (is_null($this->getUF())) {
             $errors['uf'] = 'A UF não pode ser vazia';
@@ -252,7 +252,7 @@ class Estado extends \MZ\Database\Helper
         if (stripos($e->getMessage(), 'PRIMARY') !== false) {
             return new \MZ\Exception\ValidationException(array(
                 'id' => vsprintf(
-                    'O ID "%s" já está cadastrado',
+                    'O id "%s" já está cadastrado',
                     array($this->getID())
                 ),
             ));
@@ -260,11 +260,11 @@ class Estado extends \MZ\Database\Helper
         if (stripos($e->getMessage(), 'PaisID_Nome_UNIQUE') !== false) {
             return new \MZ\Exception\ValidationException(array(
                 'paisid' => vsprintf(
-                    'O País "%s" já está cadastrado',
+                    'O país "%s" já está cadastrado',
                     array($this->getPaisID())
                 ),
                 'nome' => vsprintf(
-                    'O Nome "%s" já está cadastrado',
+                    'O nome "%s" já está cadastrado',
                     array($this->getNome())
                 ),
             ));
@@ -272,7 +272,7 @@ class Estado extends \MZ\Database\Helper
         if (stripos($e->getMessage(), 'PaisID_UF_UNIQUE') !== false) {
             return new \MZ\Exception\ValidationException(array(
                 'paisid' => vsprintf(
-                    'O País "%s" já está cadastrado',
+                    'O país "%s" já está cadastrado',
                     array($this->getPaisID())
                 ),
                 'uf' => vsprintf(
@@ -325,15 +325,25 @@ class Estado extends \MZ\Database\Helper
     }
 
     /**
+     * Get allowed keys array
+     * @return array allowed keys array
+     */
+    private static function getAllowedKeys()
+    {
+        $estado = new Estado();
+        $allowed = Filter::concatKeys('e.', $estado->toArray());
+        return $allowed;
+    }
+
+    /**
      * Filter order array
      * @param  mixed $order order string or array to parse and filter allowed
      * @return array allowed associative order
      */
     private static function filterOrder($order)
     {
-        $estado = new Estado();
-        $allowed = $estado->toArray();
-        return Filter::orderBy($order, $allowed);
+        $allowed = self::getAllowedKeys();
+        return Filter::orderBy($order, $allowed, 'e.');
     }
 
     /**
@@ -343,9 +353,15 @@ class Estado extends \MZ\Database\Helper
      */
     private static function filterCondition($condition)
     {
-        $estado = new Estado();
-        $allowed = $estado->toArray();
-        return Filter::keys($condition, $allowed);
+        $allowed = self::getAllowedKeys();
+        if (isset($condition['search'])) {
+            $search = $condition['search'];
+            $field = '(e.nome LIKE ? OR e.uf = ?)';
+            $condition[$field] = array('%'.$search.'%', $search);
+            $allowed[$field] = true;
+            unset($condition['search']);
+        }
+        return Filter::keys($condition, $allowed, 'e.');
     }
 
     /**
@@ -356,10 +372,12 @@ class Estado extends \MZ\Database\Helper
      */
     private static function query($condition = array(), $order = array())
     {
-        $query = self::getDB()->from('Estados');
+        $query = self::getDB()->from('Estados e');
         $condition = self::filterCondition($condition);
         $query = self::buildOrderBy($query, self::filterOrder($order));
-        return $query->where($condition);
+        $query = $query->orderBy('e.nome ASC');
+        $query = $query->orderBy('e.id ASC');
+        return self::buildCondition($query, $condition);
     }
 
     /**

@@ -21,10 +21,24 @@
 */
 require_once(dirname(__DIR__) . '/app.php');
 
-need_permission(PermissaoNome::CADASTROCLIENTES);
+use MZ\Location\Localizacao;
+use MZ\Util\Filter;
 
-$count = ZLocalizacao::getCount();
-list($pagesize, $offset, $pagestring) = pagestring($count, 10);
-$localizacoes = ZLocalizacao::getTodas($offset, $pagesize);
+need_permission(\PermissaoNome::CADASTROCLIENTES, true);
 
-include template('gerenciar_localizacao_index');
+$limite = isset($_GET['limite'])?intval($_GET['limite']):10;
+if ($limite > 100 || $limite < 1) {
+	$limite = 10;
+}
+$condition = Filter::query($_GET);
+unset($condition['ordem']);
+$order = Filter::order(isset($_GET['ordem'])?$_GET['ordem']:'');
+$count = Localizacao::count($condition);
+list($pagesize, $offset, $pagestring) = pagestring($count, $limite);
+$localizacoes = Localizacao::findAll($condition, $order, $pagesize, $offset);
+
+$items = array();
+foreach ($localizacoes as $localizacao) {
+	$items[] = $localizacao->publish();
+}
+json(array('status' => 'ok', 'items' => $items));

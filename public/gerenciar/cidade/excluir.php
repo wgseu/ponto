@@ -21,17 +21,35 @@
 */
 require_once(dirname(__DIR__) . '/app.php');
 
-need_permission(PermissaoNome::CADASTROCIDADES);
-$id = $_GET['id'];
-$cidade = ZCidade::getPeloID($id);
-if (is_null($cidade->getID())) {
-    Thunder::warning('A cidade de id "'.$id.'" não existe!');
-    redirect('/gerenciar/cidade/');
+use MZ\Location\Cidade;
+
+need_permission(\PermissaoNome::CADASTROCIDADES, is_output('json'));
+$id = isset($_GET['id'])?$_GET['id']:null;
+$cidade = Cidade::findByID($id);
+if (!$cidade->exists()) {
+	$msg = 'Não existe Cidade com o ID informado!';
+	if (is_output('json')) {
+		json($msg);
+	}
+	\Thunder::warning($msg);
+	redirect('/gerenciar/cidade/');
 }
 try {
-    ZCidade::excluir($id);
-    Thunder::success('Cidade "' . $cidade->getNome() . '" excluída com sucesso!', true);
-} catch (Exception $e) {
-    Thunder::error('Não foi possível excluir a cidade "' . $cidade->getNome() . '"!');
+	$cidade->delete();
+	$cidade->clean(new Cidade());
+	$msg = sprintf('Cidade "%s" excluída com sucesso!', $cidade->getNome());
+	if (is_output('json')) {
+		json('msg', $msg);
+	}
+	\Thunder::success($msg, true);
+} catch (\Exception $e) {
+	$msg = sprintf(
+		'Não foi possível excluir a Cidade "%s"!',
+		$cidade->getNome()
+	);
+	if (is_output('json')) {
+		json($msg);
+	}
+	\Thunder::error($msg);
 }
 redirect('/gerenciar/cidade/');

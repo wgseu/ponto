@@ -21,17 +21,35 @@
 */
 require_once(dirname(__DIR__) . '/app.php');
 
-need_permission(PermissaoNome::CADASTROBAIRROS);
-$id = $_GET['id'];
-$bairro = ZBairro::getPeloID($id);
-if (is_null($bairro->getID())) {
-    Thunder::warning('O bairro de id "'.$id.'" não existe!');
-    redirect('/gerenciar/bairro/');
+use MZ\Location\Bairro;
+
+need_permission(\PermissaoNome::CADASTROBAIRROS, is_output('json'));
+$id = isset($_GET['id'])?$_GET['id']:null;
+$bairro = Bairro::findByID($id);
+if (!$bairro->exists()) {
+	$msg = 'Não existe Bairro com o ID informado!';
+	if (is_output('json')) {
+		json($msg);
+	}
+	\Thunder::warning($msg);
+	redirect('/gerenciar/bairro/');
 }
 try {
-    ZBairro::excluir($id);
-    Thunder::success('Bairro "' . $bairro->getNome() . '" excluído com sucesso!', true);
-} catch (Exception $e) {
-    Thunder::error('Não foi possível excluir o bairro "' . $bairro->getNome() . '"!');
+	$bairro->delete();
+	$bairro->clean(new Bairro());
+	$msg = sprintf('Bairro "%s" excluído com sucesso!', $bairro->getNome());
+	if (is_output('json')) {
+		json('msg', $msg);
+	}
+	\Thunder::success($msg, true);
+} catch (\Exception $e) {
+	$msg = sprintf(
+		'Não foi possível excluir o Bairro "%s"!',
+		$bairro->getNome()
+	);
+	if (is_output('json')) {
+		json($msg);
+	}
+	\Thunder::error($msg);
 }
 redirect('/gerenciar/bairro/');

@@ -577,7 +577,7 @@ class Integracao extends \MZ\Database\Helper
             $query = self::buildSearch($condition['query'], 'CONCAT(nome, " ", descricao)', $query);
             unset($condition['query']);
         }
-        return $query->where($condition);
+        return self::buildCondition($query, $condition);
     }
 
     /**

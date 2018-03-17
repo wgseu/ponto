@@ -23,14 +23,14 @@
  * @author  Francimar Alves <mazinsw@gmail.com>
  */
 $[table.if(package)]
-namespace $[tAble.package];
+namespace $[Table.package];
 $[table.end]
 
-class $[tAble.norm]Test extends \PHPUnit_Framework_TestCase
+class $[Table.norm]Test extends \PHPUnit_Framework_TestCase
 {
     public function testPublish()
     {
-        $$[table.unix] = new $[tAble.norm]();
+        $$[table.unix] = new $[Table.norm]();
         $values = $$[table.unix]->publish();
         $allowed = array(
 $[field.each(all)]

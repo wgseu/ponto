@@ -21,14 +21,14 @@
 */
 require_once(dirname(dirname(__DIR__)) . '/app.php');
 
-$pais_id = $_GET['paisid'];
-$pais = ZPais::getPeloID($pais_id);
-if (is_null($pais->getID())) {
+$pais_id = isset($_GET['paisid'])?$_GET['paisid']:null;
+$pais = \MZ\Location\Pais::findByID($pais_id);
+if (!$pais->exists()) {
     json('O país não foi informado ou não existe!');
 }
-$estados = ZEstado::getTodosDaPaisID($pais->getID());
-$_estados = array();
+$estados = \MZ\Location\Estado::findAll(array('paisid' => $pais->getID()));
+$items = array();
 foreach ($estados as $estado) {
-    $_estados[] = $estado->toArray();
+    $items[] = $estado->publish();
 }
-json(array('status' => 'ok', 'items' => $_estados));
+json(array('status' => 'ok', 'items' => $items));

@@ -24,6 +24,11 @@ namespace MZ\Association;
 use MZ\Util\Document;
 use MZ\Util\Filter;
 use MZ\Database\Helper;
+use MZ\Location\Localizacao;
+use MZ\Location\Cidade;
+use MZ\Location\Bairro;
+use MZ\Location\Estado;
+use MZ\Location\Pais;
 
 class Order extends \ZPedido
 {
@@ -126,27 +131,27 @@ class Order extends \ZPedido
         }
         $entregar = Document::childValue($body_pedido, 'togo');
         if ($entregar == 'false') {
-            $this->localization = new \ZLocalizacao();
+            $this->localization = new Localizacao();
             $this->localization->setCEP(Document::childValue($body_pedido, 'cep'));
-            $this->localization->setTipo(\LocalizacaoTipo::CASA);
+            $this->localization->setTipo(Localizacao::TIPO_CASA);
             $this->localization->setLogradouro(Document::childValue($body_pedido, 'logradouro'));
             $this->localization->setNumero(Document::childValue($body_pedido, 'logradouroNum'));
             $this->localization->setComplemento(Document::childValue($body_pedido, 'complemento', false));
             $this->localization->setReferencia(Document::childValue($body_pedido, 'referencia', false));
             $this->localization->setMostrar('Y');
 
-            $this->district = new \ZBairro();
+            $this->district = new Bairro();
             $this->district->setNome(Document::childValue($body_pedido, 'bairro'));
             $this->district->setValorEntrega(floatval(Document::childValue($body_pedido, 'vlrTaxa')));
 
-            $this->city = new \ZCidade();
+            $this->city = new Cidade();
             $this->city->setNome(Document::childValue($body_pedido, 'cidade'));
 
-            $this->state = new \ZEstado();
+            $this->state = new Estado();
             $this->state->setUF(Document::childValue($body_pedido, 'estado'));
 
-            $this->country = new \ZPais();
-            // $this->country->setCodigo(Document::childValue($body_pedido, 'pais'));
+            $this->country = new Pais();
+            $this->country->setCodigo(Document::childValue($body_pedido, 'pais'));
 
         }
         //TODO

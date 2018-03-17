@@ -25,11 +25,11 @@ need_permission(PermissaoNome::ALTERARCONFIGURACOES);
 
 $tab_empresa = 'active';
 $cliente = $__empresa__;
-$localizacao = ZLocalizacao::getPeloClienteID($__empresa__->getID());
-$bairro = ZBairro::getPeloID($localizacao->getBairroID());
-$cidade = ZCidade::getPeloID($bairro->getCidadeID());
-$estado = ZEstado::getPeloID($cidade->getEstadoID());
+$localizacao = \MZ\Location\Localizacao::find(array('clienteid' => $__empresa__->getID()));
+$bairro = $localizacao->findBairroID();
+$cidade = $bairro->findCidadeID();
+$estado = $cidade->findEstadoID();
 $pais_id = $estado->getPaisID();
-$_estados = ZEstado::getTodosDaPaisID($pais_id);
-$_paises = ZPais::getTodas();
+$_estados = \MZ\Location\Estado::findAll(array('paisid' => $pais_id));
+$_paises = \MZ\Location\Pais::findAll();
 include template('gerenciar_sistema_index');

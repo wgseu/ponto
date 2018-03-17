@@ -21,17 +21,35 @@
 */
 require_once(dirname(__DIR__) . '/app.php');
 
-need_permission(PermissaoNome::CADASTROBAIRROS);
+use MZ\Location\Bairro;
+use MZ\Util\Filter;
 
-$pais = ZPais::getPelaSigla($_GET['pais']);
-$estado = ZEstado::getPelaPaisIDUF($pais->getID(), $_GET['estado']);
-$cidade = ZCidade::getPeloEstadoIDNome($estado->getID(), $_GET['cidade']);
+need_permission(\PermissaoNome::CADASTROBAIRROS, is_output('json'));
 
-$count = ZBairro::getCount($_GET['query'], $pais->getID(), $estado->getID(), $cidade->getID());
-list($pagesize, $offset, $pagestring) = pagestring($count, 10);
-$bairros = ZBairro::getTodos($_GET['query'], $pais->getID(), $estado->getID(), $cidade->getID(), $offset, $pagesize);
+$limite = isset($_GET['limite'])?intval($_GET['limite']):10;
+if ($limite > 100 || $limite < 1) {
+	$limite = 10;
+}
+$condition = Filter::query($_GET);
+unset($condition['ordem']);
+$order = Filter::order(isset($_GET['ordem'])?$_GET['ordem']:'');
+$count = Bairro::count($condition);
+list($pagesize, $offset, $pagestring) = pagestring($count, $limite);
+$bairros = Bairro::findAll($condition, $order, $pagesize, $offset);
 
-$_paises = ZPais::getTodas();
-$_estados = ZEstado::getTodosDaPaisID($pais->getID());
+if (is_output('json')) {
+	$items = array();
+	foreach ($bairros as $bairro) {
+		$items[] = $bairro->publish();
+	}
+	json(array('status' => 'ok', 'items' => $items));
+}
+
+$pais = \MZ\Location\Pais::findByID(isset($_GET['paisid'])?$_GET['paisid']:null);
+$estado = \MZ\Location\Estado::findByID(isset($_GET['estadoid'])?$_GET['estadoid']:null);
+$cidade = \MZ\Location\Cidade::findByID(isset($_GET['cidadeid'])?$_GET['cidadeid']:null);
+
+$_paises = \MZ\Location\Pais::findAll();
+$_estados = \MZ\Location\Estado::findAll(array('paisid' => $pais->getID()));
 
 include template('gerenciar_bairro_index');

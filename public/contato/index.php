@@ -23,7 +23,11 @@ require_once(dirname(__DIR__) . '/app.php');
 
 $fieldfocus = 'nome';
 if (is_login()) {
-    $fieldfocus = 'assunto';
+    if (is_null($login_cliente->getEmail())) {
+        $fieldfocus = 'email';
+    } else {
+        $fieldfocus = 'assunto';        
+    }
 }
 $erro = array();
 if (is_post()) {

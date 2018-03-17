@@ -50,7 +50,6 @@ class InstantiationTest extends \PHPUnit_Framework_TestCase
         $lista_compra = new \ZListaCompra();
         $modulo = new \ZModulo();
         $lista_produto = new \ZListaProduto();
-        $endereco = new \ZEndereco();
         $horario = new \ZHorario();
         $valor_nutricional = new \ZValorNutricional();
         $transferencia = new \ZTransferencia();

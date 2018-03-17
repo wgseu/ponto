@@ -165,6 +165,21 @@ abstract class Helper
     }
 
     /**
+     * Gets boolean array or boolean value for index
+     * @param  string $index Y or N, null to return array
+     * @return mixed A array or boolean value
+     */
+    public static function getBooleanOptions($index = null)
+    {
+        $options = array('Y' => true, 'N' => false);
+        if (!is_null($index)) {
+            return $options[$index];
+        }
+        return $options;
+    }
+
+
+    /**
      * Add order statement into query object
      * @param  SelectQuery $query FluentPDO query
      * @param  array $order associative field name -> [-1, 1]
@@ -172,19 +187,37 @@ abstract class Helper
      */
     public static function buildOrderBy($query, $order)
     {
-        foreach ($order as $key => $value) {
-            if (is_array($value)) {
-                $param = current($value);
-                $value = key($value);
-                if ($value < 0) {
-                    $query = $query->orderBy($key . ' DESC', $param);
+        foreach ($order as $field => $direction) {
+            if (is_array($direction)) {
+                $param = current($direction);
+                $direction = key($direction);
+                if ($direction < 0) {
+                    $query = $query->orderBy($field . ' DESC', $param);
                 } else {
-                    $query = $query->orderBy($key . ' ASC', $param);
+                    $query = $query->orderBy($field . ' ASC', $param);
                 }
-            } elseif ($value < 0) {
-                $query = $query->orderBy($key . ' DESC');
+            } elseif ($direction < 0) {
+                $query = $query->orderBy($field . ' DESC');
             } else {
-                $query = $query->orderBy($key . ' ASC');
+                $query = $query->orderBy($field . ' ASC');
+            }
+        }
+        return $query;
+    }
+
+    public static function buildCondition($query, $condition)
+    {
+        foreach ($condition as $field => $value) {
+            if (is_array($value)) {
+                if (count($value) == 0 || substr_count($field, '?') != count($value)) {
+                    $query = $query->where($field, $value);
+                } else {
+                    $params = $value;
+                    array_unshift($params, $field);
+                    $query = call_user_func_array(array($query, 'where'), $params);
+                }
+            } else {
+                $query = $query->where($field, $value);
             }
         }
         return $query;

@@ -21,13 +21,13 @@
 */
 require_once(dirname(__DIR__) . '/app.php');
 
-use $[tAble.package]\$[tAble.norm];
+use $[Table.package]\$[Table.norm];
 
 need_permission(\PermissaoNome::$[TABLE.style], is_output('json'));
 $$[primary.unix] = isset($_GET['$[primary.unix]'])?$_GET['$[primary.unix]']:null;
-$$[table.unix] = $[tAble.norm]::findBy$[pRimary.norm]($$[primary.unix]);
+$$[table.unix] = $[Table.norm]::findBy$[Primary.norm]($$[primary.unix]);
 if (!$$[table.unix]->exists()) {
-    $msg = 'Não existe $[tAble.name] com $[primary.gender] $[pRimary.name] informado!';
+    $msg = 'Não existe $[Table.name] com $[primary.gender] $[Primary.name] informado!';
     if (is_output('json')) {
         json($msg);
     }
@@ -38,14 +38,14 @@ $focusctrl = '$[descriptor]';
 $errors = array();
 $old_$[table.unix] = $$[table.unix];
 if (is_post()) {
-    $$[table.unix] = new $[tAble.norm]($_POST);
+    $$[table.unix] = new $[Table.norm]($_POST);
     try {
         $$[table.unix]->filter($old_$[table.unix]);
         $$[table.unix]->save();
         $old_$[table.unix]->clean($$[table.unix]);
         $msg = sprintf(
-            '$[tAble.name] "%s" atualizad$[table.gender] com sucesso!',
-            $$[table.unix]->get$[dEscriptor.norm]()
+            '$[Table.name] "%s" atualizad$[table.gender] com sucesso!',
+            $$[table.unix]->get$[Descriptor.norm]()
         );
         if (is_output('json')) {
             json(null, array('item' => $$[table.unix]->publish(), 'msg' => $msg));
@@ -71,9 +71,9 @@ if (is_post()) {
 }
 $[field.each(reference)]
 $[field.if(searchable)]
-$$[field.unix]_obj = $$[table.unix]->find$[fIeld.norm]($[field.if(array)]$[field.array.number]$[field.end]);
+$$[field.unix]_obj = $$[table.unix]->find$[Field.norm]($[field.if(array)]$[field.array.number]$[field.end]);
 $[field.else]
-$$[reference.unix.plural] = \$[rEference.package]\$[rEference.norm]::findAll();
+$$[reference.unix.plural] = \$[Reference.package]\$[Reference.norm]::findAll();
 $[field.end]
 $[field.end]
 include template('gerenciar_$[table.unix]_editar');

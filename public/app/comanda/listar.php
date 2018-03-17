@@ -29,7 +29,7 @@ if (!have_permission(PermissaoNome::PEDIDOCOMANDA)) {
 }
 /* verifica se deve ordenar pelo número da comanda ou pelo funcionário */
 $funcionario_id = null;
-if (!isset($_GET['ordenar']) && $_GET['ordenar'] != 'comanda') {
+if (!isset($_GET['ordenar']) || $_GET['ordenar'] != 'comanda') {
     $funcionario_id = $login_funcionario_id;
 }
 $comandas = ZPedido::getTodasComandas($funcionario_id);

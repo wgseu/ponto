@@ -21,15 +21,33 @@
 */
 require_once(dirname(__DIR__) . '/app.php');
 
-need_permission(PermissaoNome::CADASTROCIDADES);
+use MZ\Location\Cidade;
+use MZ\Util\Filter;
 
-$pais = ZPais::getPelaSigla($_GET['pais']);
-$estado = ZEstado::getPelaPaisIDUF($pais->getID(), $_GET['estado']);
+need_permission(\PermissaoNome::CADASTROCIDADES, is_output('json'));
 
-$count = ZCidade::getCount($_GET['query'], $pais->getID(), $estado->getID());
-list($pagesize, $offset, $pagestring) = pagestring($count, 10);
-$cidades = ZCidade::getTodas($_GET['query'], $pais->getID(), $estado->getID(), $offset, $pagesize);
+$limite = isset($_GET['limite'])?intval($_GET['limite']):10;
+if ($limite > 100 || $limite < 1) {
+	$limite = 10;
+}
+$condition = Filter::query($_GET);
+unset($condition['ordem']);
+$order = Filter::order(isset($_GET['ordem'])?$_GET['ordem']:'');
+$count = Cidade::count($condition);
+list($pagesize, $offset, $pagestring) = pagestring($count, $limite);
+$cidades = Cidade::findAll($condition, $order, $pagesize, $offset);
 
-$_paises = ZPais::getTodas();
-$_estados = ZEstado::getTodosDaPaisID($pais->getID());
+if (is_output('json')) {
+	$items = array();
+	foreach ($cidades as $cidade) {
+		$items[] = $cidade->publish();
+	}
+	json(array('status' => 'ok', 'items' => $items));
+}
+
+$pais = \MZ\Location\Pais::findByID(isset($_GET['paisid'])?$_GET['paisid']:null);
+$estado = \MZ\Location\Estado::findByID(isset($_GET['estadoid'])?$_GET['estadoid']:null);
+$_paises = \MZ\Location\Pais::findAll();
+$_estados = \MZ\Location\Estado::findAll(array('paisid' => $pais->getID()));
+
 include template('gerenciar_cidade_index');

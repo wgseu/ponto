@@ -293,7 +293,7 @@ class Comanda extends \MZ\Database\Helper
         if (empty($order)) {
             $query = $query->orderBy('id ASC');
         }
-        return $query->where($condition);
+        return self::buildCondition($query, $condition);
     }
 
     /**

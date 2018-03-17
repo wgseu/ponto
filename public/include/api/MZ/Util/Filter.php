@@ -88,6 +88,19 @@ class Filter
     }
 
     /**
+     * Filter raw or special text
+     * @param  string $value unknow text
+     * @return string        processed text
+     */
+    public static function text($value)
+    {
+        if (strval($value) == '') {
+            return null;
+        }
+        return $value;
+    }
+
+    /**
      * Filter name and beautiful camel case letters
      * @param  string $nome name with tags and wrong case letters
      * @return string       beautiful name
@@ -189,12 +202,21 @@ class Filter
      * @param  mixed $allowed allowed array keys
      * @return array allowed array
      */
-    public static function keys($array, $allowed)
+    public static function keys($array, $allowed, $prefix = '')
     {
         $result = array();
         foreach ($array as $key => $value) {
             if (array_key_exists($key, $allowed)) {
                 $result[$key] = $value;
+            } elseif (is_array($prefix)) {
+                foreach ($prefix as $kprefix) {
+                    if (array_key_exists($kprefix.$key, $allowed)) {
+                        $result[$kprefix.$key] = $value;
+                        break;
+                    }
+                }
+            } elseif (array_key_exists($prefix.$key, $allowed)) {
+                $result[$prefix.$key] = $value;
             }
         }
         return $result;
@@ -222,10 +244,10 @@ class Filter
      * @param  mixed $allowed allowed array keys
      * @return array allowed order array
      */
-    public static function orderBy($order, $allowed)
+    public static function orderBy($order, $allowed, $prefix = '')
     {
         $order = self::order($order);
-        return self::keys($order, $allowed);
+        return self::keys($order, $allowed, $prefix);
     }
 
     /**

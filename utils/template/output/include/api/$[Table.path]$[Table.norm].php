@@ -23,7 +23,7 @@
  * @author  Francimar Alves <mazinsw@gmail.com>
  */
 $[table.if(package)]
-namespace $[tAble.package];
+namespace $[Table.package];
 $[table.end]
 
 use MZ\Util\Filter;
@@ -36,7 +36,7 @@ $[table.each(comment)]
 $[table.end]
  */
 $[table.end]
-class $[tAble.norm]$[table.if(inherited)] extends $[table.inherited]$[table.end]
+class $[Table.norm]$[table.if(inherited)] extends $[table.inherited]$[table.end]
 
 {
 $[field.each(all)]
@@ -71,7 +71,7 @@ $[field.end]
 $[field.end]
 
     /**
-     * Constructor for a new empty instance of $[tAble.norm]
+     * Constructor for a new empty instance of $[Table.norm]
      * @param array $$[table.unix] All field and values to fill the instance
      */
     public function __construct($$[table.unix] = array())
@@ -92,12 +92,12 @@ $[field.each(comment)]
      * $[Field.comment]
 $[field.end]
 $[field.if(array)]
-     * @param  integer $index index to get $[fIeld.norm]
+     * @param  integer $index index to get $[Field.norm]
 $[field.end]
-     * @return mixed $[fIeld.name] of $[tAble.norm]
+     * @return mixed $[Field.name] of $[Table.norm]
      */
 $[field.end]
-    public function get$[fIeld.norm]($[field.if(array)]$index$[field.end])
+    public function get$[Field.norm]($[field.if(array)]$index$[field.end])
     {
 $[field.if(array)]
         if ($index < 1 || $index > $[field.array.count]) {
@@ -119,24 +119,24 @@ $[field.if(comment)]
 $[field.each(comment)]
      * $[Field.comment]
 $[field.end]
-     * @return boolean Check if $[field.gender] of $[fIeld.norm] is selected or checked
+     * @return boolean Check if $[field.gender] of $[Field.norm] is selected or checked
      */
 $[field.end]
-    public function is$[fIeld.norm]()
+    public function is$[Field.norm]()
     {
         return $this->$[field.unix] == 'Y';
     }
 $[field.end]
 
     /**
-     * Set $[fIeld.norm] value to new on param
+     * Set $[Field.norm] value to new on param
 $[field.if(array)]
-     * @param  integer $index index for set $[fIeld.norm]
+     * @param  integer $index index for set $[Field.norm]
 $[field.end]
-     * @param  mixed $$[field.unix] new value for $[fIeld.norm]
-     * @return $[tAble.norm] Self instance
+     * @param  mixed $$[field.unix] new value for $[Field.norm]
+     * @return $[Table.norm] Self instance
      */
-    public function set$[fIeld.norm]($[field.if(array)]$index, $[field.end]$$[field.unix])
+    public function set$[Field.norm]($[field.if(array)]$index, $[field.end]$$[field.unix])
     {
 $[field.if(array)]
         if ($index < 1 || $index > $[field.array.count]) {
@@ -168,7 +168,7 @@ $[table.else]
         $$[table.unix] = array();
 $[table.end]
 $[field.each(all)]
-        $$[table.unix]['$[field]'] = $this->get$[fIeld.norm]($[field.if(array)]$[field.array.number]$[field.end]);
+        $$[table.unix]['$[field]'] = $this->get$[Field.norm]($[field.if(array)]$[field.array.number]$[field.end]);
 $[field.end]
         return $$[table.unix];
     }
@@ -176,11 +176,11 @@ $[field.end]
     /**
      * Fill this instance with from array values, you can pass instance to
      * @param  mixed $$[table.unix] Associated key -> value to assign into this instance
-     * @return $[tAble.norm] Self instance
+     * @return $[Table.norm] Self instance
      */
     public function fromArray($$[table.unix] = array())
     {
-        if ($$[table.unix] instanceof $[tAble.norm]) {
+        if ($$[table.unix] instanceof $[Table.norm]) {
             $$[table.unix] = $$[table.unix]->toArray();
         } elseif (!is_array($$[table.unix])) {
             $$[table.unix] = array();
@@ -195,12 +195,12 @@ $[field.else]
         if (!isset($$[table.unix]['$[field]'])) {
 $[field.end]
 $[field.if(info)]
-            $this->set$[fIeld.norm]($[field.if(array)]$[field.array.number], $[field.end]$[fIeld.info]);
+            $this->set$[Field.norm]($[field.if(array)]$[field.array.number], $[field.end]$[Field.info]);
 $[field.else]
-            $this->set$[fIeld.norm]($[field.if(array)]$[field.array.number], $[field.end]null);
+            $this->set$[Field.norm]($[field.if(array)]$[field.array.number], $[field.end]null);
 $[field.end]
         } else {
-            $this->set$[fIeld.norm]($[field.if(array)]$[field.array.number], $[field.end]$$[table.unix]['$[field]']);
+            $this->set$[Field.norm]($[field.if(array)]$[field.array.number], $[field.end]$$[table.unix]['$[field]']);
         }
 $[field.end]
         return $this;
@@ -215,9 +215,9 @@ $[field.end]
         $$[table.unix] = parent::publish();
 $[field.each(all)]
 $[field.if(image|blob)]
-        $$[table.unix]['$[field]'] = $this->make$[fIeld.norm]($[field.if(array)]$[field.array.number]$[field.end]);
+        $$[table.unix]['$[field]'] = $this->make$[Field.norm]($[field.if(array)]$[field.array.number]$[field.end]);
 $[field.else.if(masked)]
-        $$[table.unix]['$[field]'] = \MZ\Util\Mask::mask($$[table.unix]['$[field]'], _p('$[field.unix].mask'));
+        $$[table.unix]['$[field]'] = \MZ\Util\Mask::cep($$[table.unix]['$[field]']);
 $[field.else.match(ip|senha|password|secreto|salt|deletado)]
         unset($$[table.unix]['$[field]']);
 $[field.end]
@@ -227,72 +227,72 @@ $[field.end]
 
     /**
      * Filter fields, upload data and keep key data
-     * @param $[tAble.norm] $original Original instance without modifications
+     * @param $[Table.norm] $original Original instance without modifications
      */
     public function filter($original)
     {
 $[field.each(all)]
 $[field.if(primary)]
-        $this->set$[fIeld.norm]($original->get$[fIeld.norm]($[field.if(array)]$[field.array.number]$[field.end]));
+        $this->set$[Field.norm]($original->get$[Field.norm]($[field.if(array)]$[field.array.number]$[field.end]));
 $[field.else.if(date)]
-        $this->set$[fIeld.norm]($[field.if(array)]$[field.array.number], $[field.end]Filter::date($this->get$[fIeld.norm]($[field.if(array)]$[field.array.number]$[field.end])));
+        $this->set$[Field.norm]($[field.if(array)]$[field.array.number], $[field.end]Filter::date($this->get$[Field.norm]($[field.if(array)]$[field.array.number]$[field.end])));
 $[field.else.if(time)]
-        $this->set$[fIeld.norm]($[field.if(array)]$[field.array.number], $[field.end]Filter::time($this->get$[fIeld.norm]($[field.if(array)]$[field.array.number]$[field.end])));
+        $this->set$[Field.norm]($[field.if(array)]$[field.array.number], $[field.end]Filter::time($this->get$[Field.norm]($[field.if(array)]$[field.array.number]$[field.end])));
 $[field.else.if(datetime)]
-        $this->set$[fIeld.norm]($[field.if(array)]$[field.array.number], $[field.end]Filter::datetime($this->get$[fIeld.norm]($[field.if(array)]$[field.array.number]$[field.end])));
+        $this->set$[Field.norm]($[field.if(array)]$[field.array.number], $[field.end]Filter::datetime($this->get$[Field.norm]($[field.if(array)]$[field.array.number]$[field.end])));
 $[field.else.if(currency)]
-        $this->set$[fIeld.norm]($[field.if(array)]$[field.array.number], $[field.end]Filter::money($this->get$[fIeld.norm]($[field.if(array)]$[field.array.number]$[field.end])));
+        $this->set$[Field.norm]($[field.if(array)]$[field.array.number], $[field.end]Filter::money($this->get$[Field.norm]($[field.if(array)]$[field.array.number]$[field.end])));
 $[field.else.if(float|double)]
-        $this->set$[fIeld.norm]($[field.if(array)]$[field.array.number], $[field.end]Filter::float($this->get$[fIeld.norm]($[field.if(array)]$[field.array.number]$[field.end])));
+        $this->set$[Field.norm]($[field.if(array)]$[field.array.number], $[field.end]Filter::float($this->get$[Field.norm]($[field.if(array)]$[field.array.number]$[field.end])));
 $[field.else.if(masked)]
-        $this->set$[fIeld.norm]($[field.if(array)]$[field.array.number], $[field.end]Filter::unmask($this->get$[fIeld.norm]($[field.if(array)]$[field.array.number]$[field.end]), '$[fIeld.mask]'));
+        $this->set$[Field.norm]($[field.if(array)]$[field.array.number], $[field.end]Filter::unmask($this->get$[Field.norm]($[field.if(array)]$[field.array.number]$[field.end]), _p('Mascara', '$[Field.norm]')));
 $[field.else.if(integer|bigint)]
-        $this->set$[fIeld.norm]($[field.if(array)]$[field.array.number], $[field.end]Filter::number($this->get$[fIeld.norm]($[field.if(array)]$[field.array.number]$[field.end])));
+        $this->set$[Field.norm]($[field.if(array)]$[field.array.number], $[field.end]Filter::number($this->get$[Field.norm]($[field.if(array)]$[field.array.number]$[field.end])));
 $[field.else.if(image)]
         $$[field.unix] = upload_image('raw_$[field]', '$[field.image.folder]');
-        if (is_null($$[field.unix]) && trim($this->get$[fIeld.norm]($[field.if(array)]$[field.array.number]$[field.end])) != '') {
-            $this->set$[fIeld.norm]($[field.if(array)]$[field.array.number], $[field.end]$original->get$[fIeld.norm]($[field.if(array)]$[field.array.number]$[field.end]));
+        if (is_null($$[field.unix]) && trim($this->get$[Field.norm]($[field.if(array)]$[field.array.number]$[field.end])) != '') {
+            $this->set$[Field.norm]($[field.if(array)]$[field.array.number], $[field.end]$original->get$[Field.norm]($[field.if(array)]$[field.array.number]$[field.end]));
         } else {
-            $this->set$[fIeld.norm]($[field.if(array)]$[field.array.number], $[field.end]$$[field.unix]);
+            $this->set$[Field.norm]($[field.if(array)]$[field.array.number], $[field.end]$$[field.unix]);
         }
 $[field.else.if(blob)]
         $$[field.unix] = upload_image('raw_$[field]', '$[field.image.folder]');
         if (!is_null($$[field.unix])) {
             $$[field.unix]_path = get_image_path($$[field.unix], '$[field.image.folder]');
-            $this->set$[fIeld.norm]($[field.if(array)]$[field.array.number], $[field.end]file_get_contents($$[field.unix]_path));
+            $this->set$[Field.norm]($[field.if(array)]$[field.array.number], $[field.end]file_get_contents($$[field.unix]_path));
             unlink($$[field.unix]_path);
-        } elseif (trim($this->get$[fIeld.norm]($[field.if(array)]$[field.array.number]$[field.end])) != '') {
-            $this->set$[fIeld.norm]($[field.if(array)]$[field.array.number], $[field.end]true);
+        } elseif (trim($this->get$[Field.norm]($[field.if(array)]$[field.array.number]$[field.end])) != '') {
+            $this->set$[Field.norm]($[field.if(array)]$[field.array.number], $[field.end]true);
         }
 $[field.else.if(text)]
-        $this->set$[fIeld.norm]($[field.if(array)]$[field.array.number], $[field.end]Filter::text($this->get$[fIeld.norm]($[field.if(array)]$[field.array.number]$[field.end])));
+        $this->set$[Field.norm]($[field.if(array)]$[field.array.number], $[field.end]Filter::text($this->get$[Field.norm]($[field.if(array)]$[field.array.number]$[field.end])));
 $[field.else.if(string)]
-        $this->set$[fIeld.norm]($[field.if(array)]$[field.array.number], $[field.end]Filter::string($this->get$[fIeld.norm]($[field.if(array)]$[field.array.number]$[field.end])));
+        $this->set$[Field.norm]($[field.if(array)]$[field.array.number], $[field.end]Filter::string($this->get$[Field.norm]($[field.if(array)]$[field.array.number]$[field.end])));
 $[field.end]
 $[field.end]
     }
 
     /**
      * Clean instance resources like images and docs
-     * @param  $[tAble.norm] $dependency Don't clean when dependency use same resources
+     * @param  $[Table.norm] $dependency Don't clean when dependency use same resources
      */
     public function clean($dependency)
     {
 $[field.each(all)]
 $[field.if(image)]
-        if (!is_null($this->get$[fIeld.norm]($[field.if(array)]$[field.array.number]$[field.end])) && $dependency->get$[fIeld.norm]($[field.if(array)]$[field.array.number]$[field.end]) != $this->get$[fIeld.norm]($[field.if(array)]$[field.array.number]$[field.end])) {
-            unlink(get_image_path($this->get$[fIeld.norm]($[field.if(array)]$[field.array.number]$[field.end]), '$[field.image.folder]'));
+        if (!is_null($this->get$[Field.norm]($[field.if(array)]$[field.array.number]$[field.end])) && $dependency->get$[Field.norm]($[field.if(array)]$[field.array.number]$[field.end]) != $this->get$[Field.norm]($[field.if(array)]$[field.array.number]$[field.end])) {
+            unlink(get_image_path($this->get$[Field.norm]($[field.if(array)]$[field.array.number]$[field.end]), '$[field.image.folder]'));
         }
-        $this->set$[fIeld.norm]($[field.if(array)]$[field.array.number], $[field.end]$dependency->get$[fIeld.norm]($[field.if(array)]$[field.array.number]$[field.end]));
+        $this->set$[Field.norm]($[field.if(array)]$[field.array.number], $[field.end]$dependency->get$[Field.norm]($[field.if(array)]$[field.array.number]$[field.end]));
 $[field.else.if(blob)]
-        $this->set$[fIeld.norm]($[field.if(array)]$[field.array.number], $[field.end]$dependency->get$[fIeld.norm]($[field.if(array)]$[field.array.number]$[field.end]));
+        $this->set$[Field.norm]($[field.if(array)]$[field.array.number], $[field.end]$dependency->get$[Field.norm]($[field.if(array)]$[field.array.number]$[field.end]));
 $[field.end]
 $[field.end]
     }
 
     /**
      * Validate fields updating them and throw exception when invalid data has found
-     * @return array All field of $[tAble.norm] in array format
+     * @return array All field of $[Table.norm] in array format
      */
     public function validate()
     {
@@ -302,53 +302,71 @@ $[field.if(primary)]
 $[field.else]
 $[field.if(null)]
 $[field.if(info)]
-        if (is_null($this->get$[fIeld.norm]($[field.if(array)]$[field.array.number]$[field.end]))) {
-            $this->set$[fIeld.norm]($[field.if(array)]$[field.array.number], $[field.end]$[fIeld.info]);
+        if (is_null($this->get$[Field.norm]($[field.if(array)]$[field.array.number]$[field.end]))) {
+$[field.if(boolean)]
+            $this->set$[Field.norm]($[field.if(array)]$[field.array.number], $[field.end]'N');
+$[field.else]
+            $this->set$[Field.norm]($[field.if(array)]$[field.array.number], $[field.end]$[Field.info]);
+$[field.end]
         }
 $[field.end]
 $[field.else]
-        if (is_null($this->get$[fIeld.norm]($[field.if(array)]$[field.array.number]$[field.end]))) {
+        if (is_null($this->get$[Field.norm]($[field.if(array)]$[field.array.number]$[field.end]))) {
 $[field.if(info)]
-            $this->set$[fIeld.norm]($[field.if(array)]$[field.array.number], $[field.end]$[fIeld.info]);
+$[field.if(boolean)]
+            $this->set$[Field.norm]($[field.if(array)]$[field.array.number], $[field.end]'N');
 $[field.else]
-            $errors['$[field]'] = '$[Field.gender] $[fIeld.name] não pode ser vazi$[field.gender]';
+            $this->set$[Field.norm]($[field.if(array)]$[field.array.number], $[field.end]$[Field.info]);
+$[field.end]
+$[field.else]
+            $errors['$[field]'] = '$[FIELD.gender] $[field.name] não pode ser vazi$[field.gender]';
 $[field.end]
         }
 $[field.end]
 $[field.contains(fone)]
-        if (!Validator::checkPhone($this->get$[fIeld.norm]($[field.if(array)]$[field.array.number]$[field.end])$[field.if(null)], true$[field.end])) {
-            $errors['$[field]'] = '$[Field.gender] $[fIeld.name] é invalid$[field.gender]';
+        if (!Validator::checkPhone($this->get$[Field.norm]($[field.if(array)]$[field.array.number]$[field.end])$[field.if(null)], true$[field.end])) {
+            $errors['$[field]'] = '$[FIELD.gender] $[Field.name] é inválid$[field.gender]';
         }
 $[field.else.match(cpf)]
-        if (!Validator::checkCPF($this->get$[fIeld.norm]($[field.if(array)]$[field.array.number]$[field.end])$[field.if(null)], true$[field.end])) {
-            $errors['$[field]'] = '$[Field.gender] $[fIeld.name] é invalid$[field.gender]';
+        if (!Validator::checkCPF($this->get$[Field.norm]($[field.if(array)]$[field.array.number]$[field.end])$[field.if(null)], true$[field.end])) {
+            $errors['$[field]'] = sprintf('$[FIELD.gender] %s é inválid$[field.gender]', _p('Titulo', '$[Field.name]'));
+        }
+$[field.else.match(cep)]
+        if (!Validator::checkCEP($this->get$[Field.norm]($[field.if(array)]$[field.array.number]$[field.end])$[field.if(null)], true$[field.end])) {
+            $errors['$[field]'] = sprintf('$[FIELD.gender] %s é inválid$[field.gender]', _p('Titulo', '$[Field.name]'));
         }
 $[field.else.match(cnpj)]
-        if (!Validator::checkCNPJ($this->get$[fIeld.norm]($[field.if(array)]$[field.array.number]$[field.end])$[field.if(null)], true$[field.end])) {
-            $errors['$[field]'] = '$[Field.gender] $[fIeld.name] é invalid$[field.gender]';
+        if (!Validator::checkCNPJ($this->get$[Field.norm]($[field.if(array)]$[field.array.number]$[field.end])$[field.if(null)], true$[field.end])) {
+            $errors['$[field]'] = sprintf('$[FIELD.gender] %s é inválid$[field.gender]', _p('Titulo', '$[Field.name]'));
         }
 $[field.else.match(usuario|login)]
-        if (!Validator::checkUsername($this->get$[fIeld.norm]($[field.if(array)]$[field.array.number]$[field.end])$[field.if(null)], true$[field.end])) {
-            $errors['$[field]'] = '$[Field.gender] $[fIeld.name] é invalid$[field.gender]';
+        if (!Validator::checkUsername($this->get$[Field.norm]($[field.if(array)]$[field.array.number]$[field.end])$[field.if(null)], true$[field.end])) {
+            $errors['$[field]'] = '$[FIELD.gender] $[field.name] é inválid$[field.gender]';
         }
 $[field.else.match(email)]
-        if (!Validator::checkEmail($this->get$[fIeld.norm]($[field.if(array)]$[field.array.number]$[field.end])$[field.if(null)], true$[field.end])) {
-            $errors['$[field]'] = '$[Field.gender] $[fIeld.name] é invalid$[field.gender]';
+        if (!Validator::checkEmail($this->get$[Field.norm]($[field.if(array)]$[field.array.number]$[field.end])$[field.if(null)], true$[field.end])) {
+            $errors['$[field]'] = '$[FIELD.gender] $[field.name] é inválid$[field.gender]';
         }
 $[field.else.match(ip)]
-        if (!Validator::checkIP($this->get$[fIeld.norm]($[field.if(array)]$[field.array.number]$[field.end])$[field.if(null)], true$[field.end])) {
-            $errors['$[field]'] = '$[Field.gender] $[fIeld.name] é invalid$[field.gender]';
+        if (!Validator::checkIP($this->get$[Field.norm]($[field.if(array)]$[field.array.number]$[field.end])$[field.if(null)], true$[field.end])) {
+            $errors['$[field]'] = '$[FIELD.gender] $[Field.name] é inválid$[field.gender]';
         }
 $[field.else.match(senha|password)]
-        if (!Validator::checkPassword($this->get$[fIeld.norm]($[field.if(array)]$[field.array.number]$[field.end]), true)) {
-            $errors['$[field]'] = '$[Field.gender] $[fIeld.name] informad$[field.gender] não é segur$[field.gender]';
+        if (!Validator::checkPassword($this->get$[Field.norm]($[field.if(array)]$[field.array.number]$[field.end]), true)) {
+            $errors['$[field]'] = '$[FIELD.gender] $[field.name] informad$[field.gender] não é segur$[field.gender]';
         }
 $[field.end]
 $[field.if(enum)]
-        if (!is_null($this->get$[fIeld.norm]($[field.if(array)]$[field.array.number]$[field.end])) &&
-            !array_key_exists($this->get$[fIeld.norm]($[field.if(array)]$[field.array.number]$[field.end]), self::get$[fIeld.norm]Options())
+        if (!is_null($this->get$[Field.norm]($[field.if(array)]$[field.array.number]$[field.end])) &&
+            !array_key_exists($this->get$[Field.norm]($[field.if(array)]$[field.array.number]$[field.end]), self::get$[Field.norm]Options())
         ) {
-            $errors['$[field]'] = '$[Field.gender] $[fIeld.name] é invalid$[field.gender]';
+            $errors['$[field]'] = '$[FIELD.gender] $[field.name] é inválid$[field.gender]';
+        }
+$[field.else.if(boolean)]
+        if (!is_null($this->get$[Field.norm]($[field.if(array)]$[field.array.number]$[field.end])) &&
+            !array_key_exists($this->get$[Field.norm]($[field.if(array)]$[field.array.number]$[field.end]), self::getBooleanOptions())
+        ) {
+            $errors['$[field]'] = '$[FIELD.gender] $[field.name] é inválid$[field.gender]';
         }
 $[field.end]
 $[field.end]
@@ -367,13 +385,13 @@ $[field.end]
     protected function translate($e)
     {
 $[table.each(unique)]
-        if (stripos($e->getMessage(), '$[uNique.name]') !== false) {
+        if (stripos($e->getMessage(), '$[Unique.name]') !== false) {
             return new \MZ\Exception\ValidationException(array(
 $[unique.each(all)]
-                '$[field]' => vsprintf(
-                    '$[Field.gender] $[fIeld.name] "%s" já está cadastrad$[field.gender]',
-                    array($this->get$[fIeld.norm]($[field.if(array)]$[field.array.number]$[field.end]))
-                ),
+                '$[field]' => sprintf(
+                    '$[FIELD.gender] $[field.name] "%s" já está cadastrad$[field.gender]',
+                    $this->get$[Field.norm]($[field.if(array)]$[field.array.number]$[field.end])
+                )),
 $[unique.end]
             ));
         }
@@ -392,9 +410,9 @@ $[field.if(image|blob)]
      * @param boolean $default If true return default image, otherwise check field
      * @return string relative web path for $[table.name] $[field.name]
      */
-    public function make$[fIeld.norm]($default = false)
+    public function make$[Field.norm]($default = false)
     {
-        $$[field.unix] = $this->get$[fIeld.norm]();
+        $$[field.unix] = $this->get$[Field.norm]();
         if ($default) {
             $$[field.unix] = null;
         }
@@ -407,15 +425,15 @@ $[field.if(primary)]
 $[field.else.if(enum)]
 
     /**
-     * Gets textual and translated $[fIeld.norm] for $[tAble.norm]
+     * Gets textual and translated $[Field.norm] for $[Table.norm]
      * @param  int $index choose option from index
      * @return mixed A associative key -> translated representative text or text for index
      */
-    public static function get$[fIeld.norm]Options($index = null)
+    public static function get$[Field.norm]Options($index = null)
     {
         $options = array(
 $[field.each(option)]
-            self::$[FIELD.unix]_$[FIELD.option.norm] => '$[fIeld.option.name]',
+            self::$[FIELD.unix]_$[FIELD.option.norm] => '$[Field.option.name]',
 $[field.end]
         );
         if (!is_null($index)) {
@@ -428,20 +446,20 @@ $[field.end]
 $[table.each(unique)]
 
     /**
-     * Find this object on database using$[unique.each(all)], $[fIeld.norm]$[unique.end]
+     * Find this object on database using$[unique.each(all)], $[Field.norm]$[unique.end]
 
 $[unique.each(all)]
 $[field.if(integer|bigint)]
-     * @param  int $$[field.unix] $[field.name] to find $[tAble.name]
+     * @param  int $$[field.unix] $[field.name] to find $[Table.name]
 $[field.else.if(float|double)]
-     * @param  float $$[field.unix] $[field.name] to find $[tAble.name]
+     * @param  float $$[field.unix] $[field.name] to find $[Table.name]
 $[field.else]
-     * @param  string $$[field.unix] $[field.name] to find $[tAble.name]
+     * @param  string $$[field.unix] $[field.name] to find $[Table.name]
 $[field.end]
 $[unique.end]
-     * @return $[tAble.norm] A filled instance or empty when not found
+     * @return $[Table.norm] A filled instance or empty when not found
      */
-    public static function findBy$[unique.each(all)]$[fIeld.norm]$[unique.end]($[unique.each(all)]$[field.if(first)]$[field.else], $[field.end]$$[field.unix]$[unique.end])
+    public static function findBy$[unique.each(all)]$[Field.norm]$[unique.end]($[unique.each(all)]$[field.if(first)]$[field.else], $[field.end]$$[field.unix]$[unique.end])
     {
         return self::find(array(
 $[unique.each(all)]
@@ -458,15 +476,25 @@ $[unique.end]
 $[table.end]
 
     /**
+     * Get allowed keys array
+     * @return array allowed keys array
+     */
+    private static function getAllowedKeys()
+    {
+        $$[table.unix] = new $[Table.norm]();
+        $allowed = Filter::concatKeys('$[table.letter].', $$[table.unix]->toArray());
+        return $allowed;
+    }
+
+    /**
      * Filter order array
      * @param  mixed $order order string or array to parse and filter allowed
      * @return array allowed associative order
      */
     private static function filterOrder($order)
     {
-        $$[table.unix] = new $[tAble.norm]();
-        $allowed = $$[table.unix]->toArray();
-        return Filter::orderBy($order, $allowed);
+        $allowed = self::getAllowedKeys();
+        return Filter::orderBy($order, $allowed, '$[table.letter].');
     }
 
     /**
@@ -476,9 +504,17 @@ $[table.end]
      */
     private static function filterCondition($condition)
     {
-        $$[table.unix] = new $[tAble.norm]();
-        $allowed = $$[table.unix]->toArray();
-        return Filter::keys($condition, $allowed);
+        $allowed = self::getAllowedKeys();
+$[descriptor.if(string)]
+        if (isset($condition['search'])) {
+            $search = $condition['search'];
+            $field = '$[table.letter].$[descriptor] LIKE ?';
+            $condition[$field] = '%'.$search.'%';
+            $allowed[$field] = true;
+            unset($condition['search']);
+        }
+$[descriptor.end]
+        return Filter::keys($condition, $allowed, '$[table.letter].');
     }
 
     /**
@@ -489,17 +525,21 @@ $[table.end]
      */
     private static function query($condition = array(), $order = array())
     {
-        $query = self::getDB()->from('$[tAble]');
+        $query = self::getDB()->from('$[Table] $[table.letter]');
         $condition = self::filterCondition($condition);
         $query = self::buildOrderBy($query, self::filterOrder($order));
-        return $query->where($condition);
+$[descriptor.if(string)]
+        $query = $query->orderBy('$[table.letter].$[descriptor] ASC');
+$[descriptor.end]
+        $query = $query->orderBy('$[table.letter].$[primary] ASC');
+        return self::buildCondition($query, $condition);
     }
 
     /**
      * Search one register with a condition
      * @param  array $condition Condition for searching the row
      * @param  array $order order rows
-     * @return $[tAble.norm] A filled $[tAble.name] or empty instance
+     * @return $[Table.norm] A filled $[Table.name] or empty instance
      */
     public static function find($condition, $order = array())
     {
@@ -508,7 +548,7 @@ $[table.end]
         if ($row === false) {
             $row = array();
         }
-        return new $[tAble.norm]($row);
+        return new $[Table.norm]($row);
     }
 
     /**
@@ -530,22 +570,22 @@ $[table.end]
         $rows = $query->fetchAll();
         $result = array();
         foreach ($rows as $row) {
-            $result[] = new $[tAble.norm]($row);
+            $result[] = new $[Table.norm]($row);
         }
         return $result;
     }
 
     /**
-     * Insert a new $[tAble.name] into the database and fill instance from database
-     * @return $[tAble.norm] Self instance
+     * Insert a new $[Table.name] into the database and fill instance from database
+     * @return $[Table.norm] Self instance
      */
     public function insert()
     {
         $values = $this->validate();
         unset($values['$[primary]']);
         try {
-            $$[primary.unix] = self::getDB()->insertInto('$[tAble]')->values($values)->execute();
-            $$[table.unix] = self::findBy$[pRimary.norm]($$[primary.unix]);
+            $$[primary.unix] = self::getDB()->insertInto('$[Table]')->values($values)->execute();
+            $$[table.unix] = self::findBy$[Primary.norm]($$[primary.unix]);
             $this->fromArray($$[table.unix]->toArray());
         } catch (\Exception $e) {
             throw $this->translate($e);
@@ -554,8 +594,8 @@ $[table.end]
     }
 
     /**
-     * Update $[tAble.name] with instance values into database for $[pRimary.name]
-     * @return $[tAble.norm] Self instance
+     * Update $[Table.name] with instance values into database for $[Primary.name]
+     * @return $[Table.norm] Self instance
      */
     public function update()
     {
@@ -566,11 +606,11 @@ $[table.end]
         unset($values['$[primary]']);
         try {
             self::getDB()
-                ->update('$[tAble]')
+                ->update('$[Table]')
                 ->set($values)
-                ->where('$[primary]', $this->get$[pRimary.norm]())
+                ->where('$[primary]', $this->get$[Primary.norm]())
                 ->execute();
-            $$[table.unix] = self::findBy$[pRimary.norm]($this->get$[pRimary.norm]());
+            $$[table.unix] = self::findBy$[Primary.norm]($this->get$[Primary.norm]());
             $this->fromArray($$[table.unix]->toArray());
         } catch (\Exception $e) {
             throw $this->translate($e);
@@ -579,8 +619,8 @@ $[table.end]
     }
 
     /**
-     * Save the $[tAble.name] into the database
-     * @return $[tAble.norm] Self instance
+     * Save the $[Table.name] into the database
+     * @return $[Table.norm] Self instance
      */
     public function save()
     {
@@ -591,7 +631,7 @@ $[table.end]
     }
 
     /**
-     * Delete this instance from database using $[pRimary.name]
+     * Delete this instance from database using $[Primary.name]
      * @return integer Number of rows deleted (Max 1)
      */
     public function delete()
@@ -600,8 +640,8 @@ $[table.end]
             throw new \Exception('O identificador d$[table.gender] $[table.name] não foi informado');
         }
         $result = self::getDB()
-            ->deleteFrom('$[tAble]')
-            ->where('$[primary]', $this->get$[pRimary.norm]())
+            ->deleteFrom('$[Table]')
+            ->where('$[primary]', $this->get$[Primary.norm]())
             ->execute();
         return $result;
     }
@@ -624,17 +664,17 @@ $[field.if(comment)]
 $[field.each(comment)]
      * $[Field.comment]
 $[field.end]
-     * @return \$[rEference.package]\$[rEference.norm] The object fetched from database
+     * @return \$[Reference.package]\$[Reference.norm] The object fetched from database
      */
 $[field.end]
-    public function find$[fIeld.norm]($[field.if(array)]$index$[field.end])
+    public function find$[Field.norm]($[field.if(array)]$index$[field.end])
     {
 $[field.if(null)]
-        if (is_null($this->get$[fIeld.norm]($[field.if(array)]$index$[field.end]))) {
-            return new \$[rEference.package]\$[rEference.norm]();
+        if (is_null($this->get$[Field.norm]($[field.if(array)]$index$[field.end]))) {
+            return new \$[Reference.package]\$[Reference.norm]();
         }
 $[field.end]
-        return \$[rEference.package]\$[rEference.norm]::findBy$[rEference.pk.norm]($this->get$[fIeld.norm]($[field.if(array)]$index$[field.end]));
+        return \$[Reference.package]\$[Reference.norm]::findBy$[Reference.pk.norm]($this->get$[Field.norm]($[field.if(array)]$index$[field.end]));
     }
 $[field.end]
 $[field.end]

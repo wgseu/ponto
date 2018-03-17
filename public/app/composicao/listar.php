@@ -29,11 +29,11 @@ if (!is_null($limite) && $limite < 1) {
     $limite = null;
 }
 $composicoes = ZComposicao::getTodasDaComposicaoIDEx(
-    strval($_GET['busca']),
-    $_GET['produto'],
-    intval($_GET['selecionaveis']) != 0,
-    intval($_GET['adicionais']) != 0,
-    intval($_GET['sem_opcionais']) != 0,
+    strval(isset($_GET['busca'])?$_GET['busca']:null),
+    isset($_GET['produto'])?$_GET['produto']:null,
+    intval(isset($_GET['selecionaveis'])?$_GET['selecionaveis']:0) != 0,
+    intval(isset($_GET['adicionais'])?$_GET['adicionais']:0) != 0,
+    intval(isset($_GET['sem_opcionais'])?$_GET['sem_opcionais']:0) != 0,
     0,
     $limite
 );

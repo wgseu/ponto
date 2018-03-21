@@ -236,30 +236,40 @@ class NFeDB extends \NFe\Database\Estatico
         $count = count($nota->getProdutos());
         $i = 0;
         $produtos = $nota->getProdutos();
+        $produto_maximo = null;
+        // distribui o desconto de forma proporcional para todos os produtos
         foreach ($produtos as $produto) {
-            $i++;
-            if ($i == $count) {
-                $_desconto = $desconto - $soma_desconto;
-                $_servicos = $servicos - $soma_servicos;
-                $_frete = $frete - $soma_frete;
-            } else {
-                $_base = $produto->getBase();
-                $_desconto = $desconto * $_base / $total_produtos;
-                $_servicos = $servicos * $_base / $total_produtos;
-                $_frete = $frete * $_base / $total_produtos;
-            }
-            $old_desconto = $produto->getDesconto();
-            $old_servicos = $produto->getDespesas();
-            $old_frete = $produto->getFrete();
-            $produto->setDesconto($_desconto);
-            $produto->setDespesas($_servicos);
-            $produto->setFrete($_frete);
-            $soma_desconto += floatval($produto->getDesconto(true));
-            $soma_servicos += floatval($produto->getDespesas(true));
-            $soma_frete += floatval($produto->getFrete(true));
-            $produto->setDesconto($_desconto + $old_desconto);
-            $produto->setDespesas($_servicos + $old_servicos);
-            $produto->setFrete($_frete + $old_frete);
+            // limita o desconto
+            $_base = $produto->getBase();
+            $_desconto = $desconto * $_base / $total_produtos;
+            $_servicos = $servicos * $_base / $total_produtos;
+            $_frete = $frete * $_base / $total_produtos;
+            do {
+                $i++;
+                $old_desconto = $produto->getDesconto();
+                $old_servicos = $produto->getDespesas();
+                $old_frete = $produto->getFrete();
+                $produto->setDesconto($_desconto);
+                $produto->setDespesas($_servicos);
+                $produto->setFrete($_frete);
+                $soma_desconto += floatval($produto->getDesconto(true));
+                $soma_servicos += floatval($produto->getDespesas(true));
+                $soma_frete += floatval($produto->getFrete(true));
+                $produto->setDesconto($_desconto + $old_desconto);
+                $produto->setDespesas($_servicos + $old_servicos);
+                $produto->setFrete($_frete + $old_frete);
+                /* aplica o desconto restante em um produto com maior saldo */
+                if (is_null($produto_maximo) || $produto->getBase() > $produto_maximo->getBase()) {
+                    $produto_maximo = $produto;
+                }
+                if ($i == $count) {
+                    $_desconto = $desconto - $soma_desconto;
+                    $_servicos = $servicos - $soma_servicos;
+                    $_frete = $frete - $soma_frete;
+                    $produto = $produto_maximo;
+                }
+                /* fim do desconto restante */
+            } while ($i == $count);
         }
         $total_pago = 0.00;
         $troco = 0.00;

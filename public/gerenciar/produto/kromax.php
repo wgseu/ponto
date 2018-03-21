@@ -38,7 +38,7 @@ if (isset($_GET['action'])) {
                 isset($_POST['id'])?$_POST['id']:null
             );
             $produtos = $association->getProdutos();
-            json(null, array('produto' => $produtos[$codigo]));
+            json(null, ['produto' => $produtos[$codigo]]);
         } catch (\Exception $e) {
             json($e->getMessage());
         }
@@ -53,7 +53,7 @@ if (isset($_GET['action'])) {
             } else {
                 $msg = 'Produto excluído com sucesso!';
             }
-            json(null, array('msg' => $msg));
+            json(null, ['msg' => $msg]);
         } catch (\Exception $e) {
             json($e->getMessage());
         }
@@ -65,7 +65,7 @@ if (isset($_GET['action'])) {
             $id = isset($_POST['id'])?$_POST['id']:null;
             $association->mount($codigo, $subcodigo, $id);
             $produtos = $association->getProdutos();
-            json(null, array('pacote' => $produtos[$codigo]['itens'][$subcodigo]));
+            json(null, ['pacote' => $produtos[$codigo]['itens'][$subcodigo]]);
         } catch (\Exception $e) {
             json($e->getMessage());
         }

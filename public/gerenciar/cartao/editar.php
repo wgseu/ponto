@@ -30,7 +30,7 @@ if (is_null($cartao->getID())) {
     redirect('/gerenciar/cartao/');
 }
 $focusctrl = 'descricao';
-$errors = array();
+$errors = [];
 $old_cartao = $cartao;
 if (is_post()) {
     $cartao = new ZCartao($_POST);

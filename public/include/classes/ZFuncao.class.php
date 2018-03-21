@@ -28,7 +28,7 @@ class ZFuncao
     private $descricao;
     private $salario_base;
 
-    public function __construct($funcao = array())
+    public function __construct($funcao = [])
     {
         if (is_array($funcao)) {
             $this->setID(isset($funcao['id'])?$funcao['id']:null);
@@ -78,7 +78,7 @@ class ZFuncao
 
     public function toArray()
     {
-        $funcao = array();
+        $funcao = [];
         $funcao['id'] = $this->getID();
         $funcao['descricao'] = $this->getDescricao();
         $funcao['salariobase'] = $this->getSalarioBase();
@@ -88,20 +88,20 @@ class ZFuncao
     public static function getPeloID($id)
     {
         $query = DB::$pdo->from('Funcoes')
-                         ->where(array('id' => $id));
+                         ->where(['id' => $id]);
         return new ZFuncao($query->fetch());
     }
 
     public static function getPelaDescricao($descricao)
     {
         $query = DB::$pdo->from('Funcoes')
-                         ->where(array('descricao' => $descricao));
+                         ->where(['descricao' => $descricao]);
         return new ZFuncao($query->fetch());
     }
 
     private static function validarCampos(&$funcao)
     {
-        $erros = array();
+        $erros = [];
         $funcao['descricao'] = strip_tags(trim($funcao['descricao']));
         if (strlen($funcao['descricao']) == 0) {
             $erros['descricao'] = 'A descrição não pode ser vazia';
@@ -119,10 +119,10 @@ class ZFuncao
     private static function handleException(&$e)
     {
         if (stripos($e->getMessage(), 'PRIMARY') !== false) {
-            throw new ValidationException(array('id' => 'O ID informado já está cadastrado'));
+            throw new ValidationException(['id' => 'O ID informado já está cadastrado']);
         }
         if (stripos($e->getMessage(), 'Descricao_UNIQUE') !== false) {
-            throw new ValidationException(array('descricao' => 'A descrição informada já está cadastrada'));
+            throw new ValidationException(['descricao' => 'A descrição informada já está cadastrada']);
         }
     }
 
@@ -143,13 +143,13 @@ class ZFuncao
     {
         $_funcao = $funcao->toArray();
         if (!$_funcao['id']) {
-            throw new ValidationException(array('id' => 'O id da funcao não foi informado'));
+            throw new ValidationException(['id' => 'O id da funcao não foi informado']);
         }
         self::validarCampos($_funcao);
-        $campos = array(
+        $campos = [
             'descricao',
             'salariobase',
-        );
+        ];
         try {
             $query = DB::$pdo->update('Funcoes');
             $query = $query->set(array_intersect_key($_funcao, array_flip($campos)));
@@ -168,7 +168,7 @@ class ZFuncao
             throw new Exception('Não foi possível excluir a funcao, o id da funcao não foi informado');
         }
         $query = DB::$pdo->deleteFrom('Funcoes')
-                         ->where(array('id' => $id));
+                         ->where(['id' => $id]);
         return $query->execute();
     }
 
@@ -190,7 +190,7 @@ class ZFuncao
             $query = $query->limit($quantidade)->offset($inicio);
         }
         $_funcaos = $query->fetchAll();
-        $funcaos = array();
+        $funcaos = [];
         foreach ($_funcaos as $funcao) {
             $funcaos[] = new ZFuncao($funcao);
         }

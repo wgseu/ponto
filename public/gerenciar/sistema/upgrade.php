@@ -4,8 +4,8 @@ require_once(dirname(dirname(__DIR__)) . '/app.php'); // main app file
 need_permission(PermissaoNome::ALTERARCONFIGURACOES, true);
 
 try {
-    $outputs = array();
-    $products = array();
+    $outputs = [];
+    $products = [];
     $produtos = ZProduto::getTodos();
     foreach ($produtos as $produto) {
         if (is_null($produto->getImagem())) {
@@ -22,7 +22,7 @@ try {
         file_put_contents($path, $imagebytes);
         $name = iconv("WINDOWS-1252//IGNORE", "UTF-8//IGNORE", $name);
         $imagemurl = get_image_url($name, $type, null);
-        $products[] = array('id' => $produto->getID(), 'imagemurl' => $imagemurl);
+        $products[] = ['id' => $produto->getID(), 'imagemurl' => $imagemurl];
     }
     $outputs['produtos'] = $products;
     json(null, $outputs);

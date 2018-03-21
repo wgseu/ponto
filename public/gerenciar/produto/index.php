@@ -53,12 +53,12 @@ $produtos = ZProduto::getTodos(
 );
 
 $tipos = ZProduto::getTipoOptions();
-$categorias = array();
+$categorias = [];
 $_categorias = ZCategoria::getTodas(true);
 foreach ($_categorias as $categoria) {
     $categorias[$categoria->getID()] = $categoria->getDescricao();
 }
-$unidades = array();
+$unidades = [];
 $_unidades = ZUnidade::getTodas();
 foreach ($_unidades as $unidade) {
     $unidades[$unidade->getID()] = $unidade->getNome();

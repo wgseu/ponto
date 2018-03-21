@@ -8,7 +8,7 @@ class Utility
     const CHAR_NUM = 1;
     const CHAR_WORD = 2;
 
-    public static function Option($a = array(), $v = null, $all = null)
+    public static function Option($a = [], $v = null, $all = null)
     {
         $option = null;
         if ($all) {
@@ -46,9 +46,9 @@ class Utility
         return false;
     }
 
-    public static function ArrayFilter($a, $need_keys = array())
+    public static function ArrayFilter($a, $need_keys = [])
     {
-        $r = array();
+        $r = [];
         foreach ($need_keys as $k) {
             if (isset($a[$k])) {
                 $r[$k] = $a[$k];
@@ -57,9 +57,9 @@ class Utility
         return $r;
     }
 
-    public static function CommaTips($a = array(), $v = null)
+    public static function CommaTips($a = [], $v = null)
     {
-        $cval = array();
+        $cval = [];
         if (is_string($v)) {
             $v = preg_split('/[\s,]+/', $v, -1, PREG_SPLIT_NO_EMPTY);
         }
@@ -96,7 +96,7 @@ class Utility
         return $cbox;
     }
 
-    public static function RadioButton($a = array(), $v = null, $n = 'cb')
+    public static function RadioButton($a = [], $v = null, $n = 'cb')
     {
         $cbox = null;
         if (is_string($v)) {
@@ -114,25 +114,25 @@ class Utility
         return $cbox;
     }
 
-    public static function OptionArray($a = array(), $c1, $c2)
+    public static function OptionArray($a = [], $c1, $c2)
     {
         if (empty($a)) {
-            return array();
+            return [];
         }
         $s1 = self::GetColumn($a, $c1);
         $s2 = self::GetColumn($a, $c2);
         if ($s1 && $s2 && count($s1)==count($s2)) {
             return array_combine($s1, $s2);
         }
-        return array();
+        return [];
     }
 
-    public static function SortArray($a = array(), $s = array(), $key = null)
+    public static function SortArray($a = [], $s = [], $key = null)
     {
         if ($key) {
             $a = self::AssColumn($a, $key);
         }
-        $ret = array();
+        $ret = [];
         foreach ($s as $one) {
             if (isset($a[$one])) {
                 $ret[$one] = $a[$one];
@@ -141,9 +141,9 @@ class Utility
         return $ret;
     }
 
-    public static function GetColumn($a = array(), $column = 'id', $null = true, $column2 = null)
+    public static function GetColumn($a = [], $column = 'id', $null = true, $column2 = null)
     {
-        $ret = array();
+        $ret = [];
         @list($column, $anc) = preg_split('/[\s\-]/', $column, 2, PREG_SPLIT_NO_EMPTY);
         foreach ($a as $one) {
             if ($null || @$one[ $column ]) {
@@ -154,14 +154,14 @@ class Utility
     }
 
     /* support 2-level now */
-    public static function AssColumn($a = array(), $column = 'id')
+    public static function AssColumn($a = [], $column = 'id')
     {
         $two_level = func_num_args() > 2 ? true : false;
         if ($two_level) {
             $scolumn = func_get_arg(2);
         }
 
-        $ret = array();
+        $ret = [];
         settype($a, 'array');
         if (false == $two_level) {
             foreach ($a as $one) {
@@ -175,12 +175,12 @@ class Utility
             foreach ($a as $one) {
                 if (is_array($one)) {
                     if (false==isset($ret[ @$one[$column] ])) {
-                        $ret[ @$one[$column] ] = array();
+                        $ret[ @$one[$column] ] = [];
                     }
                     $ret[ @$one[$column] ][ @$one[$scolumn] ] = $one;
                 } else {
                     if (false==isset($ret[ @$one->$column ])) {
-                        $ret[ @$one->$column ] = array();
+                        $ret[ @$one->$column ] = [];
                     }
 
                     $ret[ @$one->$column ][ @$one->$scolumn ] = $one;
@@ -199,16 +199,16 @@ class Utility
         return $default;
     }
 
-    public static function CombineNull($keys = array())
+    public static function CombineNull($keys = [])
     {
-        $ret = array();
+        $ret = [];
         foreach ($keys as $one) {
             $ret[$one] = null;
         }
         return $ret;
     }
 
-    public static function ExtraEncode($extra = array())
+    public static function ExtraEncode($extra = [])
     {
         return base64_encode(json_encode($extra));
     }
@@ -225,10 +225,10 @@ class Utility
         return $page_no > 0 ? $page_no : 1;
     }
 
-    public static function ScanDir($d, $e = array(), $r = false)
+    public static function ScanDir($d, $e = [], $r = false)
     {
         $c = scandir($d);
-        $a = array();
+        $a = [];
         foreach ($c as $o) {
             if ($o == '.' || $o == '..') {
                 continue;
@@ -275,11 +275,11 @@ class Utility
 
     public static function GetDate()
     {
-        $w = array('S','M','T','W','T','F','S');
-        return $now = array(
+        $w = ['S','M','T','W','T','F','S'];
+        return $now = [
                 'date' => date('m.d.Y'),
                 'week' => 'week '.$w[ date('w')]
-                );
+                ];
     }
 
     public static function GetMessagePic($message)
@@ -300,14 +300,14 @@ class Utility
         return preg_split('/[\s,]+/', $s, $n, PREG_SPLIT_NO_EMPTY);
     }
 
-    public static function CommaJoin($a = array(), $n = -1)
+    public static function CommaJoin($a = [], $n = -1)
     {
         return join(',', $a);
     }
 
     public static function Getcsv($s, $split = ' ')
     {
-        $r = array();
+        $r = [];
         while ($s) {
             $qp1 = mb_strpos($s, '"');
             $p0 = mb_strpos($s, $split);
@@ -346,7 +346,7 @@ class Utility
     public static function GetKeyValue($string = null)
     {
         $csv = Utility::GetCsv($string);
-        $kv = array();
+        $kv = [];
         foreach ($csv as $one) {
             @list($name, $v) = explode('=', $one, 2);
             if ($v === null) {
@@ -404,7 +404,7 @@ class Utility
         return $guid;
     }
 
-    static function Random($a = array())
+    static function Random($a = [])
     {
         $tv = 0;
         foreach ($a as $k => $v) {
@@ -485,7 +485,7 @@ class Utility
         return self::GetHttpContent($fsock);
     }
 
-    public static function DoPost($url, $post_data = array())
+    public static function DoPost($url, $post_data = [])
     {
         $url2 = parse_url($url);
         $url2["path"] = ($url2["path"] == "" ? "/" : $url2["path"]);
@@ -513,7 +513,7 @@ class Utility
         return self::GetHttpContent($fsock);
     }
 
-    static function HttpRequest($url, $data = array(), $abort = false)
+    static function HttpRequest($url, $data = [], $abort = false)
     {
         if (!function_exists('curl_init')) {
             return empty($data) ? self::DoGet($url) : self::DoPost($url, $data);
@@ -535,12 +535,12 @@ class Utility
     
     static function MakeURL($str)
     {
-        return strtolower(preg_replace(array('/[^a-zA-Z0-9_ -]/', '/[ ]+/', '/^-|-$/'), array('', '_', ''), self::RemoveAccent($str)));
+        return strtolower(preg_replace(['/[^a-zA-Z0-9_ -]/', '/[ ]+/', '/^-|-$/'], ['', '_', ''], self::RemoveAccent($str)));
     }
 
     static function RemoveAccent($str)
     {
-        return iconv('UTF-8', 'ASCII//TRANSLIT', str_replace(array('ª', 'º', ','), array('', '', '-'), self::StripAccents($str)));
+        return iconv('UTF-8', 'ASCII//TRANSLIT', str_replace(['ª', 'º', ','], ['', '', '-'], self::StripAccents($str)));
     }
     
     static function StripAccents($str)

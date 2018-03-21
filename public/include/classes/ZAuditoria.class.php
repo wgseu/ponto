@@ -44,7 +44,7 @@ class ZAuditoria
     private $descricao;
     private $data_hora;
 
-    public function __construct($auditoria = array())
+    public function __construct($auditoria = [])
     {
         if (is_array($auditoria)) {
             $this->setID(isset($auditoria['id'])?$auditoria['id']:null);
@@ -150,7 +150,7 @@ class ZAuditoria
 
     public function toArray()
     {
-        $auditoria = array();
+        $auditoria = [];
         $auditoria['id'] = $this->getID();
         $auditoria['funcionarioid'] = $this->getFuncionarioID();
         $auditoria['autorizadorid'] = $this->getAutorizadorID();
@@ -164,13 +164,13 @@ class ZAuditoria
     public static function getPeloID($id)
     {
         $query = DB::$pdo->from('Auditoria')
-                         ->where(array('id' => $id));
+                         ->where(['id' => $id]);
         return new ZAuditoria($query->fetch());
     }
 
     private static function validarCampos(&$auditoria)
     {
-        $erros = array();
+        $erros = [];
         if (!is_numeric($auditoria['funcionarioid'])) {
             $erros['funcionarioid'] = 'O funcionário não foi informado';
         }
@@ -178,11 +178,11 @@ class ZAuditoria
             $erros['autorizadorid'] = 'O autorizador não foi informado';
         }
         $auditoria['tipo'] = strval($auditoria['tipo']);
-        if (!in_array($auditoria['tipo'], array('Financeiro', 'Administrativo'))) {
+        if (!in_array($auditoria['tipo'], ['Financeiro', 'Administrativo'])) {
             $erros['tipo'] = 'O tipo informado não é válido';
         }
         $auditoria['prioridade'] = strval($auditoria['prioridade']);
-        if (!in_array($auditoria['prioridade'], array('Baixa', 'Media', 'Alta'))) {
+        if (!in_array($auditoria['prioridade'], ['Baixa', 'Media', 'Alta'])) {
             $erros['prioridade'] = 'A prioridade informada não é válida';
         }
         $auditoria['descricao'] = strip_tags(trim($auditoria['descricao']));
@@ -198,7 +198,7 @@ class ZAuditoria
     private static function handleException(&$e)
     {
         if (stripos($e->getMessage(), 'PRIMARY') !== false) {
-            throw new ValidationException(array('id' => 'O ID informado já está cadastrado'));
+            throw new ValidationException(['id' => 'O ID informado já está cadastrado']);
         }
     }
 
@@ -251,7 +251,7 @@ class ZAuditoria
             $query = $query->limit($quantidade)->offset($inicio);
         }
         $_auditorias = $query->fetchAll();
-        $auditorias = array();
+        $auditorias = [];
         foreach ($_auditorias as $auditoria) {
             $auditorias[] = new ZAuditoria($auditoria);
         }
@@ -267,7 +267,7 @@ class ZAuditoria
     private static function initSearchDoFuncionarioID($funcionario_id)
     {
         return   DB::$pdo->from('Auditoria')
-                         ->where(array('funcionarioid' => $funcionario_id))
+                         ->where(['funcionarioid' => $funcionario_id])
                          ->orderBy('id ASC');
     }
 
@@ -278,7 +278,7 @@ class ZAuditoria
             $query = $query->limit($quantidade)->offset($inicio);
         }
         $_auditorias = $query->fetchAll();
-        $auditorias = array();
+        $auditorias = [];
         foreach ($_auditorias as $auditoria) {
             $auditorias[] = new ZAuditoria($auditoria);
         }
@@ -294,7 +294,7 @@ class ZAuditoria
     private static function initSearchDoAutorizadorID($autorizador_id)
     {
         return   DB::$pdo->from('Auditoria')
-                         ->where(array('autorizadorid' => $autorizador_id))
+                         ->where(['autorizadorid' => $autorizador_id])
                          ->orderBy('id ASC');
     }
 
@@ -305,7 +305,7 @@ class ZAuditoria
             $query = $query->limit($quantidade)->offset($inicio);
         }
         $_auditorias = $query->fetchAll();
-        $auditorias = array();
+        $auditorias = [];
         foreach ($_auditorias as $auditoria) {
             $auditorias[] = new ZAuditoria($auditoria);
         }

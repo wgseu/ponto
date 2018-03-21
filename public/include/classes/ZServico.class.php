@@ -46,7 +46,7 @@ class ZServico
     private $individual;
     private $ativo;
 
-    public function __construct($servico = array())
+    public function __construct($servico = [])
     {
         if (is_array($servico)) {
             $this->setID(isset($servico['id'])?$servico['id']:null);
@@ -232,7 +232,7 @@ class ZServico
 
     public function toArray()
     {
-        $servico = array();
+        $servico = [];
         $servico['id'] = $this->getID();
         $servico['nome'] = $this->getNome();
         $servico['descricao'] = $this->getDescricao();
@@ -250,13 +250,13 @@ class ZServico
     public static function getPeloID($id)
     {
         $query = DB::$pdo->from('Servicos')
-                         ->where(array('id' => $id));
+                         ->where(['id' => $id]);
         return new ZServico($query->fetch());
     }
 
     private static function validarCampos(&$servico)
     {
-        $erros = array();
+        $erros = [];
         $servico['nome'] = strip_tags(trim($servico['nome']));
         if (strlen($servico['nome']) == 0) {
             $erros['nome'] = 'O nome não pode ser vazio';
@@ -270,13 +270,13 @@ class ZServico
             $servico['detalhes'] = null;
         }
         $servico['tipo'] = strval($servico['tipo']);
-        if (!in_array($servico['tipo'], array('Evento', 'Taxa'))) {
+        if (!in_array($servico['tipo'], ['Evento', 'Taxa'])) {
             $erros['tipo'] = 'O tipo informado não é válido';
         }
         $servico['obrigatorio'] = trim($servico['obrigatorio']);
         if (strlen($servico['obrigatorio']) == 0) {
             $servico['obrigatorio'] = 'N';
-        } elseif (!in_array($servico['obrigatorio'], array('Y', 'N'))) {
+        } elseif (!in_array($servico['obrigatorio'], ['Y', 'N'])) {
             $erros['obrigatorio'] = 'O obrigatório informado não é válido';
         }
         if ($servico['tipo'] == ServicoTipo::EVENTO) {
@@ -309,13 +309,13 @@ class ZServico
         $servico['individual'] = trim($servico['individual']);
         if (strlen($servico['individual']) == 0) {
             $servico['individual'] = 'N';
-        } elseif (!in_array($servico['individual'], array('Y', 'N'))) {
+        } elseif (!in_array($servico['individual'], ['Y', 'N'])) {
             $erros['individual'] = 'O individual informado não é válido';
         }
         $servico['ativo'] = trim($servico['ativo']);
         if (strlen($servico['ativo']) == 0) {
             $servico['ativo'] = 'N';
-        } elseif (!in_array($servico['ativo'], array('Y', 'N'))) {
+        } elseif (!in_array($servico['ativo'], ['Y', 'N'])) {
             $erros['ativo'] = 'O ativo informado não é válido';
         }
         if (!empty($erros)) {
@@ -326,7 +326,7 @@ class ZServico
     private static function handleException(&$e)
     {
         if (stripos($e->getMessage(), 'PRIMARY') !== false) {
-            throw new ValidationException(array('id' => 'O ID informado já está cadastrado'));
+            throw new ValidationException(['id' => 'O ID informado já está cadastrado']);
         }
     }
 
@@ -347,13 +347,13 @@ class ZServico
     {
         $_servico = $servico->toArray();
         if (!$_servico['id']) {
-            throw new ValidationException(array('id' => 'O id do servico não foi informado'));
+            throw new ValidationException(['id' => 'O id do servico não foi informado']);
         }
         if ($_servico['id'] >= self::DESCONTO_ID && $_servico['id'] <= self::ENTREGA_ID) {
             throw new Exception('Não é possível alterar esse serviço, o serviço é utilizado internamente pelo sistema');
         }
         self::validarCampos($_servico);
-        $campos = array(
+        $campos = [
             'nome',
             'descricao',
             'detalhes',
@@ -364,7 +364,7 @@ class ZServico
             'valor',
             'individual',
             'ativo',
-        );
+        ];
         try {
             $query = DB::$pdo->update('Servicos');
             $query = $query->set(array_intersect_key($_servico, array_flip($campos)));
@@ -386,7 +386,7 @@ class ZServico
             throw new Exception('Não é possível excluir esse serviço, o serviço é utilizado internamente pelo sistema');
         }
         $query = DB::$pdo->deleteFrom('Servicos')
-                         ->where(array('id' => $id));
+                         ->where(['id' => $id]);
         return $query->execute();
     }
 
@@ -412,7 +412,7 @@ class ZServico
             $query = $query->limit($quantidade)->offset($inicio);
         }
         $_servicos = $query->fetchAll();
-        $servicos = array();
+        $servicos = [];
         foreach ($_servicos as $servico) {
             $servicos[] = new ZServico($servico);
         }

@@ -28,7 +28,7 @@ class ZOrigem
     private $codigo;
     private $descricao;
 
-    public function __construct($origem = array())
+    public function __construct($origem = [])
     {
         $this->fromArray($origem);
     }
@@ -74,14 +74,14 @@ class ZOrigem
 
     public function toArray()
     {
-        $origem = array();
+        $origem = [];
         $origem['id'] = $this->getID();
         $origem['codigo'] = $this->getCodigo();
         $origem['descricao'] = $this->getDescricao();
         return $origem;
     }
 
-    public function fromArray($origem = array())
+    public function fromArray($origem = [])
     {
         if (!is_array($origem)) {
             return $this;
@@ -94,20 +94,20 @@ class ZOrigem
     public static function getPeloID($id)
     {
         $query = DB::$pdo->from('Origens')
-                         ->where(array('id' => $id));
+                         ->where(['id' => $id]);
         return new ZOrigem($query->fetch());
     }
 
     public static function getPeloCodigo($codigo)
     {
         $query = DB::$pdo->from('Origens')
-                         ->where(array('codigo' => $codigo));
+                         ->where(['codigo' => $codigo]);
         return new ZOrigem($query->fetch());
     }
 
     private static function validarCampos(&$origem)
     {
-        $erros = array();
+        $erros = [];
         if (!is_numeric($origem['codigo'])) {
             $erros['codigo'] = 'O código não foi informado';
         }
@@ -123,10 +123,10 @@ class ZOrigem
     private static function handleException(&$e)
     {
         if (stripos($e->getMessage(), 'PRIMARY') !== false) {
-            throw new ValidationException(array('id' => 'O id informado já está cadastrado'));
+            throw new ValidationException(['id' => 'O id informado já está cadastrado']);
         }
         if (stripos($e->getMessage(), 'Codigo_UNIQUE') !== false) {
-            throw new ValidationException(array('codigo' => 'O código informado já está cadastrado'));
+            throw new ValidationException(['codigo' => 'O código informado já está cadastrado']);
         }
     }
 
@@ -147,13 +147,13 @@ class ZOrigem
     {
         $_origem = $origem->toArray();
         if (!$_origem['id']) {
-            throw new ValidationException(array('id' => 'O id da origem não foi informado'));
+            throw new ValidationException(['id' => 'O id da origem não foi informado']);
         }
         self::validarCampos($_origem);
-        $campos = array(
+        $campos = [
             'codigo',
             'descricao',
-        );
+        ];
         try {
             $query = DB::$pdo->update('Origens');
             $query = $query->set(array_intersect_key($_origem, array_flip($campos)));
@@ -172,7 +172,7 @@ class ZOrigem
             throw new Exception('Não foi possível excluir a origem, o id da origem não foi informado');
         }
         $query = DB::$pdo->deleteFrom('Origens')
-                         ->where(array('id' => $id));
+                         ->where(['id' => $id]);
         return $query->execute();
     }
 
@@ -189,7 +189,7 @@ class ZOrigem
             $query = $query->limit($quantidade)->offset($inicio);
         }
         $_origems = $query->fetchAll();
-        $origems = array();
+        $origems = [];
         foreach ($_origems as $origem) {
             $origems[] = new ZOrigem($origem);
         }

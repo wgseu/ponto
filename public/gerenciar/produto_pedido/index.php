@@ -56,14 +56,14 @@ $itens_do_pedido = ZProdutoPedido::getTodos(
     $pagesize
 );
 
-$_modulo_names = array(
+$_modulo_names = [
     'Mesa' => 'Mesa',
     'Comanda' => 'Comanda',
     'Avulso' => 'Balcão',
     'Entrega' => 'Entrega',
-);
+];
 
-$_estado_names = array(
+$_estado_names = [
     'Valido' => 'Válido',
     'Adicionado' => 'Adicionado',
     'Enviado' => 'Enviado',
@@ -72,9 +72,9 @@ $_estado_names = array(
     'Disponivel' => 'Disponível',
     'Entregue' => 'Entregue',
     'Cancelado' => 'Cancelado',
-);
+];
 
-$_tipo_names = array(
+$_tipo_names = [
     'Produtos' => 'Todos os produtos',
     'Produto' => 'Produto',
     'Composicao' => 'Composição',
@@ -83,14 +83,14 @@ $_tipo_names = array(
     'Evento' => 'Evento',
     'Taxa' => 'Taxa',
     'Desconto' => 'Desconto',
-);
+];
 
-$_pedido_icon = array(
+$_pedido_icon = [
     'Mesa' => 0,
     'Comanda' => 16,
     'Avulso' => 32,
     'Entrega' => 48,
-);
+];
 
 $_produto = ZProduto::getPeloID($_GET['produto_id']);
 $_funcionario = ZFuncionario::getPeloID($_GET['funcionario_id']);

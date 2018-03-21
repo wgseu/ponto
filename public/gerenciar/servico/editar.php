@@ -28,7 +28,7 @@ if (is_null($servico->getID())) {
     redirect('/gerenciar/servico/');
 }
 $focusctrl = 'descricao';
-$errors = array();
+$errors = [];
 $old_servico = $servico;
 if (is_post()) {
     $servico = new ZServico($_POST);

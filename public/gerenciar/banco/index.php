@@ -29,13 +29,13 @@ $limite = trim($_GET['limite']);
 if (!is_numeric($limite) || $limite > 100 || $limite < 1) {
     $limite = 10;
 }
-$condition = array('query' => $_GET['query']);
+$condition = ['query' => $_GET['query']];
 $count = Banco::count($condition);
 list($pagesize, $offset, $pagestring) = pagestring($count, $limite);
-$bancos = Banco::findAll($condition, array(), $pagesize, $offset);
+$bancos = Banco::findAll($condition, [], $pagesize, $offset);
 
 if (is_output('json')) {
-    $_bancos = array();
+    $_bancos = [];
     foreach ($bancos as $banco) {
         $_bancos[] = $banco->toArray();
     }

@@ -28,30 +28,30 @@ list($pagesize, $offset, $pagestring) = pagestring($count, 10);
 $auditorias = ZAuditoria::getTodas($_GET['query'], $_GET['funcionarioid'], $_GET['tipo'], $_GET['prioridade'], $offset, $pagesize);
 
 $funcionarios = ZFuncionario::getTodos();
-$_funcionario_names = array();
+$_funcionario_names = [];
 foreach ($funcionarios as $funcionario) {
     $_cliente = ZCliente::getPeloID($funcionario->getClienteID());
     $_funcionario_names[$funcionario->getID()] = $_cliente->getLogin();
 }
 
-$_tipo_names = array(
+$_tipo_names = [
     'Financeiro' => 'Financeiro',
     'Administrativo' => 'Administrativo'
-);
-$_prioridade_names = array(
+];
+$_prioridade_names = [
     'Baixa' => 'Baixa',
     'Media' => 'Média',
     'Alta' => 'Alta'
-);
+];
 
-$_prioridade_classe = array(
+$_prioridade_classe = [
     'Baixa' => '',
     'Media' => 'warning',
     'Alta' => 'danger'
-);
-$_tipo_icon = array(
+];
+$_tipo_icon = [
     'Financeiro' => 0,
     'Administrativo' => 16
-);
+];
 $_funcionario = ZFuncionario::getPeloID($_GET['funcionarioid']);
 include template('gerenciar_auditoria_index');

@@ -32,7 +32,7 @@ try {
     $estoque = new ZEstoque($_estoque);
     $estoque->setFuncionarioID($login_funcionario->getID());
     $estoque = ZEstoque::inserir($estoque);
-    json(array('status' => 'ok', 'estoque' => $estoque->toArray()));
+    json(['status' => 'ok', 'estoque' => $estoque->toArray()]);
 } catch (Exception $e) {
     json($e->getMessage());
 }

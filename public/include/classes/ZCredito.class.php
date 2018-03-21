@@ -32,7 +32,7 @@ class ZCredito
     private $cancelado;
     private $data_cadastro;
 
-    public function __construct($credito = array())
+    public function __construct($credito = [])
     {
         if (is_array($credito)) {
             $this->setID(isset($credito['id'])?$credito['id']:null);
@@ -146,7 +146,7 @@ class ZCredito
 
     public function toArray()
     {
-        $credito = array();
+        $credito = [];
         $credito['id'] = $this->getID();
         $credito['clienteid'] = $this->getClienteID();
         $credito['valor'] = $this->getValor();
@@ -160,13 +160,13 @@ class ZCredito
     public static function getPeloID($id)
     {
         $query = DB::$pdo->from('Creditos')
-                         ->where(array('id' => $id));
+                         ->where(['id' => $id]);
         return new ZCredito($query->fetch());
     }
 
     private static function validarCampos(&$credito)
     {
-        $erros = array();
+        $erros = [];
         if (!is_numeric($credito['clienteid'])) {
             $erros['clienteid'] = 'O cliente não foi informado';
         }
@@ -185,7 +185,7 @@ class ZCredito
         $credito['cancelado'] = trim($credito['cancelado']);
         if (strlen($credito['cancelado']) == 0) {
             $credito['cancelado'] = 'N';
-        } elseif (!in_array($credito['cancelado'], array('Y', 'N'))) {
+        } elseif (!in_array($credito['cancelado'], ['Y', 'N'])) {
             $erros['cancelado'] = 'O cancelado informado não é válido';
         }
         $credito['datacadastro'] = date('Y-m-d H:i:s');
@@ -197,7 +197,7 @@ class ZCredito
     private static function handleException(&$e)
     {
         if (stripos($e->getMessage(), 'PRIMARY') !== false) {
-            throw new ValidationException(array('id' => 'O ID informado já está cadastrado'));
+            throw new ValidationException(['id' => 'O ID informado já está cadastrado']);
         }
     }
 
@@ -217,20 +217,20 @@ class ZCredito
     public static function atualizar($credito)
     {
         if ($credito->isCancelado()) {
-            throw new ValidationException(array('cancelado' => 'O credito está cancelado e não pode mais ser alterado'));
+            throw new ValidationException(['cancelado' => 'O credito está cancelado e não pode mais ser alterado']);
         }
         $_credito = $credito->toArray();
         if (!$_credito['id']) {
-            throw new ValidationException(array('id' => 'O id do credito não foi informado'));
+            throw new ValidationException(['id' => 'O id do credito não foi informado']);
         }
         self::validarCampos($_credito);
-        $campos = array(
+        $campos = [
             'clienteid',
             'valor',
             'detalhes',
             'funcionarioid',
             'cancelado',
-        );
+        ];
         try {
             $query = DB::$pdo->update('Creditos');
             $query = $query->set(array_intersect_key($_credito, array_flip($campos)));
@@ -261,7 +261,7 @@ class ZCredito
             throw new Exception('Não foi possível excluir o credito, o id do credito não foi informado');
         }
         $query = DB::$pdo->deleteFrom('Creditos')
-                         ->where(array('id' => $id));
+                         ->where(['id' => $id]);
         return $query->execute();
     }
 
@@ -290,7 +290,7 @@ class ZCredito
             $query = $query->limit($quantidade)->offset($inicio);
         }
         $_creditos = $query->fetchAll();
-        $creditos = array();
+        $creditos = [];
         foreach ($_creditos as $credito) {
             $creditos[] = new ZCredito($credito);
         }
@@ -306,7 +306,7 @@ class ZCredito
     private static function initSearchDoClienteID($cliente_id)
     {
         return   DB::$pdo->from('Creditos')
-                         ->where(array('clienteid' => $cliente_id))
+                         ->where(['clienteid' => $cliente_id])
                          ->orderBy('id ASC');
     }
 
@@ -317,7 +317,7 @@ class ZCredito
             $query = $query->limit($quantidade)->offset($inicio);
         }
         $_creditos = $query->fetchAll();
-        $creditos = array();
+        $creditos = [];
         foreach ($_creditos as $credito) {
             $creditos[] = new ZCredito($credito);
         }
@@ -333,7 +333,7 @@ class ZCredito
     private static function initSearchDoFuncionarioID($funcionario_id)
     {
         return   DB::$pdo->from('Creditos')
-                         ->where(array('funcionarioid' => $funcionario_id))
+                         ->where(['funcionarioid' => $funcionario_id])
                          ->orderBy('id ASC');
     }
 
@@ -344,7 +344,7 @@ class ZCredito
             $query = $query->limit($quantidade)->offset($inicio);
         }
         $_creditos = $query->fetchAll();
-        $creditos = array();
+        $creditos = [];
         foreach ($_creditos as $credito) {
             $creditos[] = new ZCredito($credito);
         }

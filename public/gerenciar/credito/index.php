@@ -28,8 +28,8 @@ list($pagesize, $offset, $pagestring) = pagestring($count, 10);
 $creditos = ZCredito::getTodos($_GET['query'], $_GET['clienteid'], $_GET['estado'], $offset, $pagesize);
 
 $_cliente = ZCliente::getPeloID($_GET['clienteid']);
-$estados = array(
+$estados = [
     'Y' => 'Cancelados',
     'N' => 'Válidos',
-);
+];
 include template('gerenciar_credito_index');

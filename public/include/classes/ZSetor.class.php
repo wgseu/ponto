@@ -29,7 +29,7 @@ class ZSetor
     private $nome;
     private $descricao;
 
-    public function __construct($setor = array())
+    public function __construct($setor = [])
     {
         if (is_array($setor)) {
             $this->setID(isset($setor['id'])?$setor['id']:null);
@@ -88,7 +88,7 @@ class ZSetor
 
     public function toArray()
     {
-        $setor = array();
+        $setor = [];
         $setor['id'] = $this->getID();
         $setor['nome'] = $this->getNome();
         $setor['descricao'] = $this->getDescricao();
@@ -98,7 +98,7 @@ class ZSetor
     public static function getPeloID($id)
     {
         $query = DB::$pdo->from('Setores')
-                         ->where(array('id' => $id));
+                         ->where(['id' => $id]);
         return new ZSetor($query->fetch());
     }
 
@@ -112,14 +112,14 @@ class ZSetor
     public static function getPeloNome($nome)
     {
         $query = DB::$pdo->from('Setores')
-                         ->where(array('nome' => $nome))
+                         ->where(['nome' => $nome])
                          ->limit(1)->offset(0);
         return new ZSetor($query->fetch());
     }
 
     private static function validarCampos(&$setor)
     {
-        $erros = array();
+        $erros = [];
         $setor['nome'] = strip_tags(trim($setor['nome']));
         if (strlen($setor['nome']) == 0) {
             $erros['nome'] = 'O nome não pode ser vazio';
@@ -136,10 +136,10 @@ class ZSetor
     private static function handleException(&$e)
     {
         if (stripos($e->getMessage(), 'PRIMARY') !== false) {
-            throw new ValidationException(array('id' => 'O ID informado já está cadastrado'));
+            throw new ValidationException(['id' => 'O ID informado já está cadastrado']);
         }
         if (stripos($e->getMessage(), 'Nome_UNIQUE') !== false) {
-            throw new ValidationException(array('nome' => 'O nome informado já está cadastrado'));
+            throw new ValidationException(['nome' => 'O nome informado já está cadastrado']);
         }
     }
 
@@ -160,13 +160,13 @@ class ZSetor
     {
         $_setor = $setor->toArray();
         if (!$_setor['id']) {
-            throw new ValidationException(array('id' => 'O id do setor não foi informado'));
+            throw new ValidationException(['id' => 'O id do setor não foi informado']);
         }
         self::validarCampos($_setor);
-        $campos = array(
+        $campos = [
             'nome',
             'descricao',
-        );
+        ];
         try {
             $query = DB::$pdo->update('Setores');
             $query = $query->set(array_intersect_key($_setor, array_flip($campos)));
@@ -185,7 +185,7 @@ class ZSetor
             throw new Exception('Não foi possível excluir o setor, o id do setor não foi informado');
         }
         $query = DB::$pdo->deleteFrom('Setores')
-                         ->where(array('id' => $id));
+                         ->where(['id' => $id]);
         return $query->execute();
     }
 
@@ -207,7 +207,7 @@ class ZSetor
             $query = $query->limit($quantidade)->offset($inicio);
         }
         $_setors = $query->fetchAll();
-        $setors = array();
+        $setors = [];
         foreach ($_setors as $setor) {
             $setors[] = new ZSetor($setor);
         }

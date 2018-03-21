@@ -23,7 +23,7 @@ require_once(dirname(__DIR__) . '/app.php');
 
 need_permission(PermissaoNome::CADASTROFUNCIONARIOS);
 $focusctrl = 'funcaoid';
-$errors = array();
+$errors = [];
 if (is_post()) {
     $funcionario = new ZFuncionario($_POST);
     try {

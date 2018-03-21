@@ -31,7 +31,7 @@ class ZPropriedade
     private $imagem;
     private $data_atualizacao;
 
-    public function __construct($propriedade = array())
+    public function __construct($propriedade = [])
     {
         if (is_array($propriedade)) {
             $this->setID(isset($propriedade['id'])?$propriedade['id']:null);
@@ -124,7 +124,7 @@ class ZPropriedade
 
     public function toArray()
     {
-        $propriedade = array();
+        $propriedade = [];
         $propriedade['id'] = $this->getID();
         $propriedade['grupoid'] = $this->getGrupoID();
         $propriedade['nome'] = $this->getNome();
@@ -137,20 +137,20 @@ class ZPropriedade
     public static function getPeloID($id)
     {
         $query = DB::$pdo->from('Propriedades')
-                         ->where(array('id' => $id));
+                         ->where(['id' => $id]);
         return new ZPropriedade($query->fetch());
     }
 
     public static function getPeloGrupoIDNome($grupo_id, $nome)
     {
         $query = DB::$pdo->from('Propriedades')
-                         ->where(array('grupoid' => $grupo_id, 'nome' => $nome));
+                         ->where(['grupoid' => $grupo_id, 'nome' => $nome]);
         return new ZPropriedade($query->fetch());
     }
 
     private static function validarCampos(&$propriedade)
     {
-        $erros = array();
+        $erros = [];
         if (!is_numeric($propriedade['grupoid'])) {
             $erros['grupoid'] = 'O grupo não foi informado';
         }
@@ -174,10 +174,10 @@ class ZPropriedade
     private static function handleException(&$e)
     {
         if (stripos($e->getMessage(), 'PRIMARY') !== false) {
-            throw new ValidationException(array('id' => 'O ID informado já está cadastrado'));
+            throw new ValidationException(['id' => 'O ID informado já está cadastrado']);
         }
         if (stripos($e->getMessage(), 'GrupoID_Nome_UNIQUE') !== false) {
-            throw new ValidationException(array('nome' => 'O nome informado já está cadastrado'));
+            throw new ValidationException(['nome' => 'O nome informado já está cadastrado']);
         }
     }
 
@@ -198,15 +198,15 @@ class ZPropriedade
     {
         $_propriedade = $propriedade->toArray();
         if (!$_propriedade['id']) {
-            throw new ValidationException(array('id' => 'O id da propriedade não foi informado'));
+            throw new ValidationException(['id' => 'O id da propriedade não foi informado']);
         }
         self::validarCampos($_propriedade);
-        $campos = array(
+        $campos = [
             'grupoid',
             'nome',
             'abreviacao',
             'dataatualizacao',
-        );
+        ];
         if ($_propriedade['imagem'] !== true) {
             $campos[] = 'imagem';
         }
@@ -228,7 +228,7 @@ class ZPropriedade
             throw new Exception('Não foi possível excluir a propriedade, o id da propriedade não foi informado');
         }
         $query = DB::$pdo->deleteFrom('Propriedades')
-                         ->where(array('id' => $id));
+                         ->where(['id' => $id]);
         return $query->execute();
     }
 
@@ -245,7 +245,7 @@ class ZPropriedade
             $query = $query->limit($quantidade)->offset($inicio);
         }
         $_propriedades = $query->fetchAll();
-        $propriedades = array();
+        $propriedades = [];
         foreach ($_propriedades as $propriedade) {
             $propriedades[] = new ZPropriedade($propriedade);
         }
@@ -261,7 +261,7 @@ class ZPropriedade
     private static function initSearchDoGrupoID($grupo_id)
     {
         return   DB::$pdo->from('Propriedades')
-                         ->where(array('grupoid' => $grupo_id))
+                         ->where(['grupoid' => $grupo_id])
                          ->orderBy('id ASC');
     }
 
@@ -272,7 +272,7 @@ class ZPropriedade
             $query = $query->limit($quantidade)->offset($inicio);
         }
         $_propriedades = $query->fetchAll();
-        $propriedades = array();
+        $propriedades = [];
         foreach ($_propriedades as $propriedade) {
             $propriedades[] = new ZPropriedade($propriedade);
         }

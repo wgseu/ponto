@@ -38,16 +38,16 @@ $condition['cidadeid'] = $cidade->getID();
 if (array_key_exists('typesearch', $_GET)) {
     $condition['typesearch'] = $_GET['typesearch'];
 }
-$localizacoes = Localizacao::findAll($condition, array(), 10);
-$campos = array(
+$localizacoes = Localizacao::findAll($condition, [], 10);
+$campos = [
     'cep',
     'logradouro'
-);
+];
 if (isset($_GET['tipo']) && $_GET['tipo'] == Localizacao::TIPO_APARTAMENTO) {
     $campos[] = 'numero';
     $campos[] = 'condominio';
 }
-$items = array();
+$items = [];
 foreach ($localizacoes as $localizacao) {
     $item = $localizacao->publish();
     $item = array_intersect_key($item, array_flip($campos));
@@ -55,4 +55,4 @@ foreach ($localizacoes as $localizacao) {
     $item['bairro'] = $bairro->getNome();
     $items[] = $item;
 }
-json(array('status' => 'ok', 'items' => $items));
+json(['status' => 'ok', 'items' => $items]);

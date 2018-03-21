@@ -32,8 +32,8 @@ unset($condition['ordem']);
 $order = \MZ\Util\Filter::order(isset($_GET['ordem'])?$_GET['ordem']:'');
 $cidades = Cidade::findAll($condition, $order, $limite);
 
-$items = array();
+$items = [];
 foreach ($cidades as $cidade) {
     $items[] = $cidade->publish();
 }
-json(array('status' => 'ok', 'items' => $items));
+json(['status' => 'ok', 'items' => $items]);

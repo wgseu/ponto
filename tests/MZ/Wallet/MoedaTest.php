@@ -30,7 +30,7 @@ class MoedaTest extends \PHPUnit_Framework_TestCase
     {
         $moeda = new Moeda();
         $values = $moeda->publish();
-        $allowed = array(
+        $allowed = [
             'id',
             'nome',
             'simbolo',
@@ -38,7 +38,7 @@ class MoedaTest extends \PHPUnit_Framework_TestCase
             'divisao',
             'fracao',
             'formato',
-        );
+        ];
         $this->assertEquals($allowed, array_keys($values));
     }
 }

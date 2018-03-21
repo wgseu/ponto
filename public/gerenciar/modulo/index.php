@@ -39,7 +39,7 @@ if (is_post()) {
             Log::error($e->getMessage());
         }
         DB::Commit();
-        json(array('status' => 'ok'));
+        json(['status' => 'ok']);
     } catch (Exception $e) {
         DB::Rollback();
         json($e->getMessage());

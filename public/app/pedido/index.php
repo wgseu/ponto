@@ -100,7 +100,7 @@ try {
         $produto_pedido->setVisualizado('N');
         $formacoes = $_produto_pedido['formacoes'];
         if (is_null($formacoes)) {
-            $formacoes = array();
+            $formacoes = [];
         }
         if ($pedido->getTipo() == PedidoTipo::COMANDA && is_boolean_config('Comandas', 'PrePaga')) {
             $subtotal = $produto_pedido->getTotal();
@@ -110,7 +110,7 @@ try {
             $restante = $pedido_total - $pagamentos;
             $msg = 'Saldo insuficiente para a realização do pedido, Necessário: %s, Saldo atual: %s';
             if ($total > $pagamentos) {
-                throw new \Exception(vsprintf($msg, array(\MZ\Util\Mask::money($subtotal, true), \MZ\Util\Mask::money(-$restante, true))));
+                throw new \Exception(vsprintf($msg, [\MZ\Util\Mask::money($subtotal, true), \MZ\Util\Mask::money(-$restante, true)]));
             }
         }
         $produto_pedido = ZProdutoPedido::cadastrar($produto_pedido, $produto, $formacoes);
@@ -147,4 +147,4 @@ try {
     DB::RollBack();
     json($e->getMessage());
 }
-json(array('status' => 'ok', 'action' => $action));
+json(['status' => 'ok', 'action' => $action]);

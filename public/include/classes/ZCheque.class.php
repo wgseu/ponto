@@ -34,7 +34,7 @@ class ZCheque
     private $cancelado;
     private $data_cadastro;
 
-    public function __construct($cheque = array())
+    public function __construct($cheque = [])
     {
         if (is_array($cheque)) {
             $this->setID(isset($cheque['id'])?$cheque['id']:null);
@@ -176,7 +176,7 @@ class ZCheque
 
     public function toArray()
     {
-        $cheque = array();
+        $cheque = [];
         $cheque['id'] = $this->getID();
         $cheque['bancoid'] = $this->getBancoID();
         $cheque['agencia'] = $this->getAgencia();
@@ -192,13 +192,13 @@ class ZCheque
     public static function getPeloID($id)
     {
         $query = DB::$pdo->from('Cheques')
-                         ->where(array('id' => $id));
+                         ->where(['id' => $id]);
         return new ZCheque($query->fetch());
     }
 
     private static function validarCampos(&$cheque)
     {
-        $erros = array();
+        $erros = [];
         if (!is_numeric($cheque['bancoid'])) {
             $erros['bancoid'] = 'O banco não foi informado';
         }
@@ -222,7 +222,7 @@ class ZCheque
         $cheque['cancelado'] = trim($cheque['cancelado']);
         if (strlen($cheque['cancelado']) == 0) {
             $cheque['cancelado'] = 'N';
-        } elseif (!in_array($cheque['cancelado'], array('Y', 'N'))) {
+        } elseif (!in_array($cheque['cancelado'], ['Y', 'N'])) {
             $erros['cancelado'] = 'O cancelado informado não é válido';
         }
         $cheque['datacadastro'] = date('Y-m-d H:i:s');
@@ -234,7 +234,7 @@ class ZCheque
     private static function handleException(&$e)
     {
         if (stripos($e->getMessage(), 'PRIMARY') !== false) {
-            throw new ValidationException(array('id' => 'O ID informado já está cadastrado'));
+            throw new ValidationException(['id' => 'O ID informado já está cadastrado']);
         }
     }
 
@@ -255,10 +255,10 @@ class ZCheque
     {
         $_cheque = $cheque->toArray();
         if (!$_cheque['id']) {
-            throw new ValidationException(array('id' => 'O id do cheque não foi informado'));
+            throw new ValidationException(['id' => 'O id do cheque não foi informado']);
         }
         self::validarCampos($_cheque);
-        $campos = array(
+        $campos = [
             'bancoid',
             'agencia',
             'conta',
@@ -266,7 +266,7 @@ class ZCheque
             'parcelas',
             'total',
             'cancelado',
-        );
+        ];
         try {
             $query = DB::$pdo->update('Cheques');
             $query = $query->set(array_intersect_key($_cheque, array_flip($campos)));
@@ -292,7 +292,7 @@ class ZCheque
             $query = $query->limit($quantidade)->offset($inicio);
         }
         $_cheques = $query->fetchAll();
-        $cheques = array();
+        $cheques = [];
         foreach ($_cheques as $cheque) {
             $cheques[] = new ZCheque($cheque);
         }
@@ -308,7 +308,7 @@ class ZCheque
     private static function initSearchDoBancoID($banco_id)
     {
         return   DB::$pdo->from('Cheques')
-                         ->where(array('bancoid' => $banco_id))
+                         ->where(['bancoid' => $banco_id])
                          ->orderBy('id ASC');
     }
 
@@ -319,7 +319,7 @@ class ZCheque
             $query = $query->limit($quantidade)->offset($inicio);
         }
         $_cheques = $query->fetchAll();
-        $cheques = array();
+        $cheques = [];
         foreach ($_cheques as $cheque) {
             $cheques[] = new ZCheque($cheque);
         }
@@ -335,7 +335,7 @@ class ZCheque
     private static function initSearchDoClienteID($cliente_id)
     {
         return   DB::$pdo->from('Cheques')
-                         ->where(array('clienteid' => $cliente_id))
+                         ->where(['clienteid' => $cliente_id])
                          ->orderBy('id ASC');
     }
 
@@ -346,7 +346,7 @@ class ZCheque
             $query = $query->limit($quantidade)->offset($inicio);
         }
         $_cheques = $query->fetchAll();
-        $cheques = array();
+        $cheques = [];
         foreach ($_cheques as $cheque) {
             $cheques[] = new ZCheque($cheque);
         }

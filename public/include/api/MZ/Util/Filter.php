@@ -190,9 +190,9 @@ class Filter
         if (trim($order) != '') {
             $stmt = explode(',', $order);
         } else {
-            $stmt = array();
+            $stmt = [];
         }
-        $order = array();
+        $order = [];
         foreach ($stmt as $key => $value) {
             $entry = explode(':', $value);
             if (count($entry) == 2 && $entry[1] == 'desc') {
@@ -214,7 +214,7 @@ class Filter
      */
     public static function keys($array, $allowed, $prefix = '')
     {
-        $result = array();
+        $result = [];
         foreach ($array as $key => $value) {
             if (array_key_exists($key, $allowed)) {
                 $result[$key] = $value;
@@ -241,7 +241,7 @@ class Filter
      */
     public static function concatKeys($left, $array, $right = '')
     {
-        $result = array();
+        $result = [];
         foreach ($array as $key => $value) {
             $result[$left . $key . $right] = $value;
         }

@@ -46,7 +46,7 @@ class ZFormaPagto
     private $juros;
     private $ativa;
 
-    public function __construct($forma_pagto = array())
+    public function __construct($forma_pagto = [])
     {
         if (is_array($forma_pagto)) {
             $this->setID(isset($forma_pagto['id'])?$forma_pagto['id']:null);
@@ -224,7 +224,7 @@ class ZFormaPagto
 
     public function toArray()
     {
-        $forma_pagto = array();
+        $forma_pagto = [];
         $forma_pagto['id'] = $this->getID();
         $forma_pagto['tipo'] = $this->getTipo();
         $forma_pagto['carteiraid'] = $this->getCarteiraID();
@@ -242,22 +242,22 @@ class ZFormaPagto
     public static function getPeloID($id)
     {
         $query = DB::$pdo->from('Formas_Pagto')
-                         ->where(array('id' => $id));
+                         ->where(['id' => $id]);
         return new ZFormaPagto($query->fetch());
     }
 
     public static function getPelaDescricao($descricao)
     {
         $query = DB::$pdo->from('Formas_Pagto')
-                         ->where(array('descricao' => $descricao));
+                         ->where(['descricao' => $descricao]);
         return new ZFormaPagto($query->fetch());
     }
 
     private static function validarCampos(&$forma_pagto)
     {
-        $erros = array();
+        $erros = [];
         $forma_pagto['tipo'] = strval($forma_pagto['tipo']);
-        if (!in_array($forma_pagto['tipo'], array('Dinheiro', 'Cartao', 'Cheque', 'Conta', 'Credito', 'Transferencia'))) {
+        if (!in_array($forma_pagto['tipo'], ['Dinheiro', 'Cartao', 'Cheque', 'Conta', 'Credito', 'Transferencia'])) {
             $erros['tipo'] = 'O tipo informado não é válido';
         }
         if (!is_numeric($forma_pagto['carteiraid'])) {
@@ -270,7 +270,7 @@ class ZFormaPagto
         if (strlen($forma_pagto['descricao']) == 0) {
             $erros['descricao'] = 'A descrição não pode ser vazia';
         }
-        if (in_array($forma_pagto['tipo'], array('Cartao', 'Cheque'))) {
+        if (in_array($forma_pagto['tipo'], ['Cartao', 'Cheque'])) {
             $forma_pagto['parcelado'] = 'Y';
         } else {
             $forma_pagto['parcelado'] = 'N';
@@ -314,7 +314,7 @@ class ZFormaPagto
         $forma_pagto['ativa'] = trim($forma_pagto['ativa']);
         if (strlen($forma_pagto['ativa']) == 0) {
             $forma_pagto['ativa'] = 'N';
-        } elseif (!in_array($forma_pagto['ativa'], array('Y', 'N'))) {
+        } elseif (!in_array($forma_pagto['ativa'], ['Y', 'N'])) {
             $erros['ativa'] = 'A ativa informada não é válida';
         }
         if (!empty($erros)) {
@@ -325,10 +325,10 @@ class ZFormaPagto
     private static function handleException(&$e)
     {
         if (stripos($e->getMessage(), 'PRIMARY') !== false) {
-            throw new ValidationException(array('id' => 'O ID informado já está cadastrado'));
+            throw new ValidationException(['id' => 'O ID informado já está cadastrado']);
         }
         if (stripos($e->getMessage(), 'Descricao_UNIQUE') !== false) {
-            throw new ValidationException(array('descricao' => 'A descrição informada já está cadastrada'));
+            throw new ValidationException(['descricao' => 'A descrição informada já está cadastrada']);
         }
     }
 
@@ -349,10 +349,10 @@ class ZFormaPagto
     {
         $_forma_pagto = $forma_pagto->toArray();
         if (!$_forma_pagto['id']) {
-            throw new ValidationException(array('id' => 'O id do formapagto não foi informado'));
+            throw new ValidationException(['id' => 'O id do formapagto não foi informado']);
         }
         self::validarCampos($_forma_pagto);
-        $campos = array(
+        $campos = [
             'tipo',
             'carteiraid',
             'carteirapagtoid',
@@ -363,7 +363,7 @@ class ZFormaPagto
             'parcelassemjuros',
             'juros',
             'ativa',
-        );
+        ];
         try {
             $query = DB::$pdo->update('Formas_Pagto');
             $query = $query->set(array_intersect_key($_forma_pagto, array_flip($campos)));
@@ -382,7 +382,7 @@ class ZFormaPagto
             throw new Exception('Não foi possível excluir o formapagto, o id do formapagto não foi informado');
         }
         $query = DB::$pdo->deleteFrom('Formas_Pagto')
-                         ->where(array('id' => $id));
+                         ->where(['id' => $id]);
         return $query->execute();
     }
 
@@ -412,7 +412,7 @@ class ZFormaPagto
             $query = $query->limit($quantidade)->offset($inicio);
         }
         $_forma_pagtos = $query->fetchAll();
-        $forma_pagtos = array();
+        $forma_pagtos = [];
         foreach ($_forma_pagtos as $forma_pagto) {
             $forma_pagtos[] = new ZFormaPagto($forma_pagto);
         }
@@ -428,7 +428,7 @@ class ZFormaPagto
     private static function initSearchDaCarteiraID($carteira_id)
     {
         return   DB::$pdo->from('Formas_Pagto')
-                         ->where(array('carteiraid' => $carteira_id))
+                         ->where(['carteiraid' => $carteira_id])
                          ->orderBy('id ASC');
     }
 
@@ -439,7 +439,7 @@ class ZFormaPagto
             $query = $query->limit($quantidade)->offset($inicio);
         }
         $_forma_pagtos = $query->fetchAll();
-        $forma_pagtos = array();
+        $forma_pagtos = [];
         foreach ($_forma_pagtos as $forma_pagto) {
             $forma_pagtos[] = new ZFormaPagto($forma_pagto);
         }
@@ -455,7 +455,7 @@ class ZFormaPagto
     private static function initSearchDoCarteiraPagtoID($carteira_pagto_id)
     {
         return   DB::$pdo->from('Formas_Pagto')
-                         ->where(array('carteirapagtoid' => $carteira_pagto_id))
+                         ->where(['carteirapagtoid' => $carteira_pagto_id])
                          ->orderBy('id ASC');
     }
 
@@ -466,7 +466,7 @@ class ZFormaPagto
             $query = $query->limit($quantidade)->offset($inicio);
         }
         $_forma_pagtos = $query->fetchAll();
-        $forma_pagtos = array();
+        $forma_pagtos = [];
         foreach ($_forma_pagtos as $forma_pagto) {
             $forma_pagtos[] = new ZFormaPagto($forma_pagto);
         }

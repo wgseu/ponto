@@ -30,13 +30,13 @@ class EnderecoTest extends \PHPUnit_Framework_TestCase
     {
         $endereco = new Endereco();
         $values = $endereco->publish();
-        $allowed = array(
+        $allowed = [
             'id',
             'cidadeid',
             'bairroid',
             'logradouro',
             'cep',
-        );
+        ];
         $this->assertEquals($allowed, array_keys($values));
     }
 }

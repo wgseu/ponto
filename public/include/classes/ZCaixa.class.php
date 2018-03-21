@@ -30,7 +30,7 @@ class ZCaixa
     private $numero_inicial;
     private $ativo;
 
-    public function __construct($caixa = array())
+    public function __construct($caixa = [])
     {
         $this->fromArray($caixa);
     }
@@ -111,7 +111,7 @@ class ZCaixa
 
     public function toArray()
     {
-        $caixa = array();
+        $caixa = [];
         $caixa['id'] = $this->getID();
         $caixa['descricao'] = $this->getDescricao();
         $caixa['serie'] = $this->getSerie();
@@ -120,7 +120,7 @@ class ZCaixa
         return $caixa;
     }
 
-    public function fromArray($caixa = array())
+    public function fromArray($caixa = [])
     {
         if (!is_array($caixa)) {
             return $this;
@@ -135,21 +135,21 @@ class ZCaixa
     public static function getPeloID($id)
     {
         $query = DB::$pdo->from('Caixas')
-                         ->where(array('id' => $id));
+                         ->where(['id' => $id]);
         return new ZCaixa($query->fetch());
     }
 
     public static function getPelaDescricao($descricao)
     {
         $query = DB::$pdo->from('Caixas')
-                         ->where(array('descricao' => $descricao));
+                         ->where(['descricao' => $descricao]);
         return new ZCaixa($query->fetch());
     }
 
     public static function getPelaSerie($serie)
     {
         $query = DB::$pdo->from('Caixas')
-                         ->where(array('serie' => $serie))
+                         ->where(['serie' => $serie])
                          ->orderBy('numeroinicial DESC')
                          ->limit(1);
         return new ZCaixa($query->fetch());
@@ -159,7 +159,7 @@ class ZCaixa
     {
         global $__sistema__;
 
-        $erros = array();
+        $erros = [];
         $old_caixa = self::getPeloID($caixa['id']);
         $caixa['descricao'] = strip_tags(trim($caixa['descricao']));
         if (strlen($caixa['descricao']) == 0) {
@@ -182,7 +182,7 @@ class ZCaixa
         $caixa['ativo'] = trim($caixa['ativo']);
         if (strlen($caixa['ativo']) == 0) {
             $caixa['ativo'] = 'N';
-        } elseif (!in_array($caixa['ativo'], array('Y', 'N'))) {
+        } elseif (!in_array($caixa['ativo'], ['Y', 'N'])) {
             $erros['ativo'] = 'O ativo informado não é válido';
         }
         if ($caixa['ativo'] == 'N' && ZMovimentacao::existe($caixa['id'])) {
@@ -196,10 +196,10 @@ class ZCaixa
     private static function handleException(&$e)
     {
         if (stripos($e->getMessage(), 'PRIMARY') !== false) {
-            throw new ValidationException(array('id' => 'O ID informado já está cadastrado'));
+            throw new ValidationException(['id' => 'O ID informado já está cadastrado']);
         }
         if (stripos($e->getMessage(), 'Descricao_UNIQUE') !== false) {
-            throw new ValidationException(array('descricao' => 'A descrição informada já está cadastrada'));
+            throw new ValidationException(['descricao' => 'A descrição informada já está cadastrada']);
         }
     }
 
@@ -220,15 +220,15 @@ class ZCaixa
     {
         $_caixa = $caixa->toArray();
         if (!$_caixa['id']) {
-            throw new ValidationException(array('id' => 'O id da caixa não foi informado'));
+            throw new ValidationException(['id' => 'O id da caixa não foi informado']);
         }
         self::validarCampos($_caixa);
-        $campos = array(
+        $campos = [
             'descricao',
             'serie',
             'numeroinicial',
             'ativo',
-        );
+        ];
         try {
             $query = DB::$pdo->update('Caixas');
             $query = $query->set(array_intersect_key($_caixa, array_flip($campos)));
@@ -260,7 +260,7 @@ class ZCaixa
             throw new Exception('Não foi possível excluir a caixa, o id da caixa não foi informado');
         }
         $query = DB::$pdo->deleteFrom('Caixas')
-                         ->where(array('id' => $id));
+                         ->where(['id' => $id]);
         return $query->execute();
     }
 
@@ -286,7 +286,7 @@ class ZCaixa
             $query = $query->limit($quantidade)->offset($inicio);
         }
         $_caixas = $query->fetchAll();
-        $caixas = array();
+        $caixas = [];
         foreach ($_caixas as $caixa) {
             $caixas[] = new ZCaixa($caixa);
         }

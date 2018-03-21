@@ -74,7 +74,7 @@ class Carteira extends \MZ\Database\Helper
      * Constructor for a new empty instance of Carteira
      * @param array $carteira All field and values to fill the instance
      */
-    public function __construct($carteira = array())
+    public function __construct($carteira = [])
     {
         parent::__construct($carteira);
     }
@@ -252,12 +252,12 @@ class Carteira extends \MZ\Database\Helper
      * @param  mixed $carteira Associated key -> value to assign into this instance
      * @return Carteira Self instance
      */
-    public function fromArray($carteira = array())
+    public function fromArray($carteira = [])
     {
         if ($carteira instanceof Carteira) {
             $carteira = $carteira->toArray();
         } elseif (!is_array($carteira)) {
-            $carteira = array();
+            $carteira = [];
         }
         parent::fromArray($carteira);
         if (!isset($carteira['id'])) {
@@ -335,7 +335,7 @@ class Carteira extends \MZ\Database\Helper
      */
     public function validate()
     {
-        $errors = array();
+        $errors = [];
         if (is_null($this->getTipo())) {
             $errors['tipo'] = 'O Tipo não pode ser vazio';
         }
@@ -370,12 +370,12 @@ class Carteira extends \MZ\Database\Helper
     protected function translate($e)
     {
         if (stripos($e->getMessage(), 'PRIMARY') !== false) {
-            return new \MZ\Exception\ValidationException(array(
+            return new \MZ\Exception\ValidationException([
                 'id' => vsprintf(
                     'O ID "%s" já está cadastrado',
-                    array($this->getID())
+                    [$this->getID()]
                 ),
-            ));
+            ]);
         }
         return parent::translate($e);
     }
@@ -387,10 +387,10 @@ class Carteira extends \MZ\Database\Helper
      */
     public static function getTipoOptions($index = null)
     {
-        $options = array(
+        $options = [
             self::TIPO_BANCARIA => 'Bancária',
             self::TIPO_FINANCEIRA => 'Financeira',
-        );
+        ];
         if (!is_null($index)) {
             return $options[$index];
         }
@@ -404,9 +404,9 @@ class Carteira extends \MZ\Database\Helper
      */
     public static function findByID($id)
     {
-        return self::find(array(
+        return self::find([
             'id' => intval($id),
-        ));
+        ]);
     }
 
     /**
@@ -414,7 +414,7 @@ class Carteira extends \MZ\Database\Helper
      * @param  array $condition condition to filter rows
      * @return SelectQuery query object with condition statement
      */
-    private static function query($condition = array(), $order = array())
+    private static function query($condition = [], $order = [])
     {
         $query = self::getDB()->from('Carteiras');
         if (array_key_exists('query', $condition)) {
@@ -439,7 +439,7 @@ class Carteira extends \MZ\Database\Helper
         $query = self::query($condition)->limit(1);
         $row = $query->fetch();
         if ($row === false) {
-            $row = array();
+            $row = [];
         }
         return new Carteira($row);
     }
@@ -451,7 +451,7 @@ class Carteira extends \MZ\Database\Helper
      * @param  integer $offset start index to get rows, null for begining
      * @return array All rows instanced and filled
      */
-    public static function findAll($condition = array(), $order = array(), $limit = null, $offset = null)
+    public static function findAll($condition = [], $order = [], $limit = null, $offset = null)
     {
         $query = self::query($condition, $order);
         if (!is_null($limit)) {
@@ -461,7 +461,7 @@ class Carteira extends \MZ\Database\Helper
             $query = $query->offset($offset);
         }
         $rows = $query->fetchAll();
-        $result = array();
+        $result = [];
         foreach ($rows as $row) {
             $result[] = new Carteira($row);
         }
@@ -544,7 +544,7 @@ class Carteira extends \MZ\Database\Helper
      * @param  array $condition condition to filter rows
      * @return integer Quantity of rows
      */
-    public static function count($condition = array())
+    public static function count($condition = [])
     {
         $query = self::query($condition);
         return $query->count();

@@ -2,11 +2,11 @@
 require_once(dirname(__DIR__) . '/app.php');
 
 need_permission(
-    array(
-        PermissaoNome::PAGAMENTO, array('||'),
-        PermissaoNome::SELECIONARCAIXA, array('||'),
+    [
+        PermissaoNome::PAGAMENTO, ['||'],
+        PermissaoNome::SELECIONARCAIXA, ['||'],
         PermissaoNome::RELATORIOPEDIDOS
-    ),
+    ],
     is_output('json')
 );
 

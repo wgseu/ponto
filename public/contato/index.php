@@ -26,17 +26,16 @@ if (is_login()) {
     if (is_null($login_cliente->getEmail())) {
         $fieldfocus = 'email';
     } else {
-        $fieldfocus = 'assunto';        
+        $fieldfocus = 'assunto';
     }
 }
-$erro = array();
+$erro = [];
 if (is_post()) {
+    $email = strip_tags(trim($_POST['email']));
+    $nome = strip_tags(trim($_POST['nome']));
     if (is_login()) {
-        $email = $login_cliente->getEmail();
-        $nome = $login_cliente->getNome();
-    } else {
-        $email = strip_tags(trim($_POST['email']));
-        $nome = strip_tags(trim($_POST['nome']));
+        $email = $email ?: $login_cliente->getEmail();
+        $nome = $nome ?: $login_cliente->getNome();
     }
     $assunto = strip_tags(trim($_POST['assunto']));
     $mensagem = strip_tags(trim($_POST['mensagem']));

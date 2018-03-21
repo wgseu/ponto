@@ -108,7 +108,7 @@ class Localizacao extends \MZ\Database\Helper
      * Constructor for a new empty instance of Localizacao
      * @param array $localizacao All field and values to fill the instance
      */
-    public function __construct($localizacao = array())
+    public function __construct($localizacao = [])
     {
         parent::__construct($localizacao);
     }
@@ -474,12 +474,12 @@ class Localizacao extends \MZ\Database\Helper
      * @param  mixed $localizacao Associated key -> value to assign into this instance
      * @return Localizacao Self instance
      */
-    public function fromArray($localizacao = array())
+    public function fromArray($localizacao = [])
     {
         if ($localizacao instanceof Localizacao) {
             $localizacao = $localizacao->toArray();
         } elseif (!is_array($localizacao)) {
-            $localizacao = array();
+            $localizacao = [];
         }
         parent::fromArray($localizacao);
         if (!isset($localizacao['id'])) {
@@ -612,7 +612,7 @@ class Localizacao extends \MZ\Database\Helper
      */
     public function validate()
     {
-        $errors = array();
+        $errors = [];
         if (is_null($this->getClienteID())) {
             $errors['clienteid'] = 'O cliente não pode ser vazio';
         }
@@ -658,24 +658,24 @@ class Localizacao extends \MZ\Database\Helper
     protected function translate($e)
     {
         if (stripos($e->getMessage(), 'PRIMARY') !== false) {
-            return new \MZ\Exception\ValidationException(array(
+            return new \MZ\Exception\ValidationException([
                 'id' => vsprintf(
                     'O id "%s" já está cadastrado',
-                    array($this->getID())
+                    [$this->getID()]
                 ),
-            ));
+            ]);
         }
         if (stripos($e->getMessage(), 'UK_Localizacoes_ClienteID_Apelido') !== false) {
-            return new \MZ\Exception\ValidationException(array(
+            return new \MZ\Exception\ValidationException([
                 'clienteid' => vsprintf(
                     'O cliente "%s" já está cadastrado',
-                    array($this->getClienteID())
+                    [$this->getClienteID()]
                 ),
                 'apelido' => vsprintf(
                     'O apelido "%s" já está cadastrado',
-                    array($this->getApelido())
+                    [$this->getApelido()]
                 ),
-            ));
+            ]);
         }
         return parent::translate($e);
     }
@@ -687,10 +687,10 @@ class Localizacao extends \MZ\Database\Helper
      */
     public static function getTipoOptions($index = null)
     {
-        $options = array(
+        $options = [
             self::TIPO_CASA => 'Casa',
             self::TIPO_APARTAMENTO => 'Apartamento',
-        );
+        ];
         if (!is_null($index)) {
             return $options[$index];
         }
@@ -704,9 +704,9 @@ class Localizacao extends \MZ\Database\Helper
      */
     public static function findByID($id)
     {
-        return self::find(array(
+        return self::find([
             'id' => intval($id),
-        ));
+        ]);
     }
 
     /**
@@ -717,10 +717,10 @@ class Localizacao extends \MZ\Database\Helper
      */
     public static function findByClienteIDApelido($cliente_id, $apelido)
     {
-        return self::find(array(
+        return self::find([
             'clienteid' => intval($cliente_id),
             'apelido' => strval($apelido),
-        ));
+        ]);
     }
 
     /**
@@ -743,7 +743,7 @@ class Localizacao extends \MZ\Database\Helper
     private static function filterOrder($order)
     {
         $allowed = self::getAllowedKeys();
-        return Filter::orderBy($order, $allowed, array('l.', 'b.'));
+        return Filter::orderBy($order, $allowed, ['l.', 'b.']);
     }
 
     /**
@@ -756,7 +756,7 @@ class Localizacao extends \MZ\Database\Helper
         $allowed = self::getAllowedKeys();
         if (isset($condition['typesearch'])) {
             $typesearch = $condition['typesearch'];
-            $condition = Filter::keys($condition, $allowed, array('l.', 'b.'));
+            $condition = Filter::keys($condition, $allowed, ['l.', 'b.']);
             if (isset($condition['l.tipo']) && $condition['l.tipo'] == self::TIPO_APARTAMENTO) {
                 $field = 'l.condominio LIKE ?';
             } else {
@@ -764,7 +764,7 @@ class Localizacao extends \MZ\Database\Helper
             }
             $condition[$field] = '%'.$typesearch.'%';
         } else {
-            $condition = Filter::keys($condition, $allowed, array('l.', 'b.'));
+            $condition = Filter::keys($condition, $allowed, ['l.', 'b.']);
         }
         return $condition;
     }
@@ -775,7 +775,7 @@ class Localizacao extends \MZ\Database\Helper
      * @param  array $order order rows
      * @return SelectQuery query object with condition statement
      */
-    private static function query($condition = array(), $order = array())
+    private static function query($condition = [], $order = [])
     {
         $query = self::getDB()->from('Localizacoes l');
         $query = $query->leftJoin('Bairros b ON b.id = l.bairroid');
@@ -802,12 +802,12 @@ class Localizacao extends \MZ\Database\Helper
      * @param  array $order order rows
      * @return Localizacao A filled Localização or empty instance
      */
-    public static function find($condition, $order = array())
+    public static function find($condition, $order = [])
     {
         $query = self::query($condition, $order)->limit(1);
         $row = $query->fetch();
         if ($row === false) {
-            $row = array();
+            $row = [];
         }
         return new Localizacao($row);
     }
@@ -819,7 +819,7 @@ class Localizacao extends \MZ\Database\Helper
      * @param  integer $offset start index to get rows, null for begining
      * @return array All rows instanced and filled
      */
-    public static function findAll($condition = array(), $order = array(), $limit = null, $offset = null)
+    public static function findAll($condition = [], $order = [], $limit = null, $offset = null)
     {
         $query = self::query($condition, $order);
         if (!is_null($limit)) {
@@ -829,7 +829,7 @@ class Localizacao extends \MZ\Database\Helper
             $query = $query->offset($offset);
         }
         $rows = $query->fetchAll();
-        $result = array();
+        $result = [];
         foreach ($rows as $row) {
             $result[] = new Localizacao($row);
         }
@@ -912,7 +912,7 @@ class Localizacao extends \MZ\Database\Helper
      * @param  array $condition condition to filter rows
      * @return integer Quantity of rows
      */
-    public static function count($condition = array())
+    public static function count($condition = [])
     {
         $typesearch = array_key_exists('typesearch', $condition);
         $query = self::query($condition);

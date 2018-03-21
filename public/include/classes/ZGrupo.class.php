@@ -48,7 +48,7 @@ class ZGrupo
     // extra
     private $grupo_associado_id;
 
-    public function __construct($grupo = array())
+    public function __construct($grupo = [])
     {
         if (is_array($grupo)) {
             $this->setID(isset($grupo['id'])?$grupo['id']:null);
@@ -206,7 +206,7 @@ class ZGrupo
 
     public function toArray()
     {
-        $grupo = array();
+        $grupo = [];
         $grupo['id'] = $this->getID();
         $grupo['produtoid'] = $this->getProdutoID();
         $grupo['descricao'] = $this->getDescricao();
@@ -223,20 +223,20 @@ class ZGrupo
     public static function getPeloID($id)
     {
         $query = DB::$pdo->from('Grupos')
-                         ->where(array('id' => $id));
+                         ->where(['id' => $id]);
         return new ZGrupo($query->fetch());
     }
 
     public static function getPeloProdutoIDDescricao($produto_id, $descricao)
     {
         $query = DB::$pdo->from('Grupos')
-                         ->where(array('produtoid' => $produto_id, 'descricao' => $descricao));
+                         ->where(['produtoid' => $produto_id, 'descricao' => $descricao]);
         return new ZGrupo($query->fetch());
     }
 
     private static function validarCampos(&$grupo)
     {
-        $erros = array();
+        $erros = [];
         if (!is_numeric($grupo['produtoid'])) {
             $erros['produtoid'] = 'O produto não foi informado';
         }
@@ -247,13 +247,13 @@ class ZGrupo
         $grupo['multiplo'] = trim($grupo['multiplo']);
         if (strlen($grupo['multiplo']) == 0) {
             $grupo['multiplo'] = 'N';
-        } elseif (!in_array($grupo['multiplo'], array('Y', 'N'))) {
+        } elseif (!in_array($grupo['multiplo'], ['Y', 'N'])) {
             $erros['multiplo'] = 'O múltiplo informado não é válido';
         }
         $grupo['tipo'] = trim($grupo['tipo']);
         if (strlen($grupo['tipo']) == 0) {
             $grupo['tipo'] = null;
-        } elseif (!in_array($grupo['tipo'], array('Inteiro', 'Fracionado'))) {
+        } elseif (!in_array($grupo['tipo'], ['Inteiro', 'Fracionado'])) {
             $erros['tipo'] = 'O tipo informado não é válido';
         }
         if (!is_numeric($grupo['quantidademinima'])) {
@@ -269,7 +269,7 @@ class ZGrupo
         $grupo['funcao'] = trim($grupo['funcao']);
         if (strlen($grupo['funcao']) == 0) {
             $grupo['funcao'] = null;
-        } elseif (!in_array($grupo['funcao'], array('Minimo', 'Media', 'Maximo', 'Soma'))) {
+        } elseif (!in_array($grupo['funcao'], ['Minimo', 'Media', 'Maximo', 'Soma'])) {
             $erros['funcao'] = 'A função informada não é válida';
         }
         // extra
@@ -282,10 +282,10 @@ class ZGrupo
     private static function handleException(&$e)
     {
         if (stripos($e->getMessage(), 'PRIMARY') !== false) {
-            throw new ValidationException(array('id' => 'O ID informado já está cadastrado'));
+            throw new ValidationException(['id' => 'O ID informado já está cadastrado']);
         }
         if (stripos($e->getMessage(), 'UK_Grupos_Produto_Descricao') !== false) {
-            throw new ValidationException(array('descricao' => 'A descrição informada já está cadastrada'));
+            throw new ValidationException(['descricao' => 'A descrição informada já está cadastrada']);
         }
     }
 
@@ -306,10 +306,10 @@ class ZGrupo
     {
         $_grupo = $grupo->toArray();
         if (!$_grupo['id']) {
-            throw new ValidationException(array('id' => 'O id do grupo não foi informado'));
+            throw new ValidationException(['id' => 'O id do grupo não foi informado']);
         }
         self::validarCampos($_grupo);
-        $campos = array(
+        $campos = [
             'produtoid',
             'descricao',
             'multiplo',
@@ -317,7 +317,7 @@ class ZGrupo
             'quantidademinima',
             'quantidademaxima',
             'funcao',
-        );
+        ];
         try {
             $query = DB::$pdo->update('Grupos');
             $query = $query->set(array_intersect_key($_grupo, array_flip($campos)));
@@ -336,7 +336,7 @@ class ZGrupo
             throw new Exception('Não foi possível excluir o grupo, o id do grupo não foi informado');
         }
         $query = DB::$pdo->deleteFrom('Grupos')
-                         ->where(array('id' => $id));
+                         ->where(['id' => $id]);
         return $query->execute();
     }
 
@@ -353,7 +353,7 @@ class ZGrupo
             $query = $query->limit($quantidade)->offset($inicio);
         }
         $_grupos = $query->fetchAll();
-        $grupos = array();
+        $grupos = [];
         foreach ($_grupos as $grupo) {
             $grupos[] = new ZGrupo($grupo);
         }
@@ -373,7 +373,7 @@ class ZGrupo
                          ->innerJoin('Pacotes pc ON pc.grupoid = g.id')
                          ->leftJoin('Pacotes pcf ON pcf.grupoid = pc.grupoid AND pcf.id > pc.id')
                          ->leftJoin('Pacotes pca ON pca.id = pc.associacaoid')
-                         ->where(array('g.produtoid' => $produto_id, 'pcf.id' => null))
+                         ->where(['g.produtoid' => $produto_id, 'pcf.id' => null])
                          ->orderBy('g.id ASC');
     }
 
@@ -384,7 +384,7 @@ class ZGrupo
             $query = $query->limit($quantidade)->offset($inicio);
         }
         $_grupos = $query->fetchAll();
-        $grupos = array();
+        $grupos = [];
         foreach ($_grupos as $grupo) {
             $grupos[] = new ZGrupo($grupo);
         }

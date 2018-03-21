@@ -35,7 +35,7 @@ class ZCartao
     private $dias_repasse;
     private $ativo;
 
-    public function __construct($cartao = array())
+    public function __construct($cartao = [])
     {
         if (is_array($cartao)) {
             $this->setID(isset($cartao['id'])?$cartao['id']:null);
@@ -191,7 +191,7 @@ class ZCartao
 
     public function toArray()
     {
-        $cartao = array();
+        $cartao = [];
         $cartao['id'] = $this->getID();
         $cartao['carteiraid'] = $this->getCarteiraID();
         $cartao['carteirapagtoid'] = $this->getCarteiraPagtoID();
@@ -207,38 +207,38 @@ class ZCartao
 
     public static function getImages()
     {
-        return array(
-            1 => array('id' => 1, 'name' => 'Credishop'),
-            2 => array('id' => 2, 'name' => 'Hipercard'),
-            3 => array('id' => 3, 'name' => 'Visa'),
-            4 => array('id' => 4, 'name' => 'MasterCard'),
-            5 => array('id' => 5, 'name' => 'American Express'),
-            6 => array('id' => 6, 'name' => 'Diners Club'),
-            7 => array('id' => 7, 'name' => 'Elo'),
-            8 => array('id' => 8, 'name' => 'Sodexo'),
-            9 => array('id' => 9, 'name' => 'Maestro'),
-            10 => array('id' => 10, 'name' => 'Ticket'),
-            11 => array('id' => 11, 'name' => 'Visa Electron'),
-        );
+        return [
+            1 => ['id' => 1, 'name' => 'Credishop'],
+            2 => ['id' => 2, 'name' => 'Hipercard'],
+            3 => ['id' => 3, 'name' => 'Visa'],
+            4 => ['id' => 4, 'name' => 'MasterCard'],
+            5 => ['id' => 5, 'name' => 'American Express'],
+            6 => ['id' => 6, 'name' => 'Diners Club'],
+            7 => ['id' => 7, 'name' => 'Elo'],
+            8 => ['id' => 8, 'name' => 'Sodexo'],
+            9 => ['id' => 9, 'name' => 'Maestro'],
+            10 => ['id' => 10, 'name' => 'Ticket'],
+            11 => ['id' => 11, 'name' => 'Visa Electron'],
+        ];
     }
 
     public static function getPeloID($id)
     {
         $query = DB::$pdo->from('Cartoes')
-                         ->where(array('id' => $id));
+                         ->where(['id' => $id]);
         return new ZCartao($query->fetch());
     }
 
     public static function getPelaDescricao($descricao)
     {
         $query = DB::$pdo->from('Cartoes')
-                         ->where(array('descricao' => $descricao));
+                         ->where(['descricao' => $descricao]);
         return new ZCartao($query->fetch());
     }
 
     private static function validarCampos(&$cartao)
     {
-        $erros = array();
+        $erros = [];
         $cartao['carteiraid'] = trim($cartao['carteiraid']);
         if (strlen($cartao['carteiraid']) == 0) {
             $cartao['carteiraid'] = null;
@@ -298,7 +298,7 @@ class ZCartao
         $cartao['ativo'] = trim($cartao['ativo']);
         if (strlen($cartao['ativo']) == 0) {
             $cartao['ativo'] = 'N';
-        } elseif (!in_array($cartao['ativo'], array('Y', 'N'))) {
+        } elseif (!in_array($cartao['ativo'], ['Y', 'N'])) {
             $erros['ativo'] = 'O ativo informado não é válido';
         }
         if (!empty($erros)) {
@@ -309,10 +309,10 @@ class ZCartao
     private static function handleException(&$e)
     {
         if (stripos($e->getMessage(), 'PRIMARY') !== false) {
-            throw new ValidationException(array('id' => 'O ID informado já está cadastrado'));
+            throw new ValidationException(['id' => 'O ID informado já está cadastrado']);
         }
         if (stripos($e->getMessage(), 'Descricao_UNIQUE') !== false) {
-            throw new ValidationException(array('descricao' => 'A descrição informada já está cadastrada'));
+            throw new ValidationException(['descricao' => 'A descrição informada já está cadastrada']);
         }
     }
 
@@ -333,10 +333,10 @@ class ZCartao
     {
         $_cartao = $cartao->toArray();
         if (!$_cartao['id']) {
-            throw new ValidationException(array('id' => 'O id do cartao não foi informado'));
+            throw new ValidationException(['id' => 'O id do cartao não foi informado']);
         }
         self::validarCampos($_cartao);
-        $campos = array(
+        $campos = [
             'carteiraid',
             'carteirapagtoid',
             'descricao',
@@ -346,7 +346,7 @@ class ZCartao
             'taxa',
             'diasrepasse',
             'ativo',
-        );
+        ];
         try {
             $query = DB::$pdo->update('Cartoes');
             $query = $query->set(array_intersect_key($_cartao, array_flip($campos)));
@@ -365,7 +365,7 @@ class ZCartao
             throw new Exception('Não foi possível excluir o cartao, o id do cartao não foi informado');
         }
         $query = DB::$pdo->deleteFrom('Cartoes')
-                         ->where(array('id' => $id));
+                         ->where(['id' => $id]);
         return $query->execute();
     }
 
@@ -391,7 +391,7 @@ class ZCartao
             $query = $query->limit($quantidade)->offset($inicio);
         }
         $_cartaos = $query->fetchAll();
-        $cartaos = array();
+        $cartaos = [];
         foreach ($_cartaos as $cartao) {
             $cartaos[] = new ZCartao($cartao);
         }
@@ -407,7 +407,7 @@ class ZCartao
     private static function initSearchDaCarteiraID($carteira_id)
     {
         return   DB::$pdo->from('Cartoes')
-                         ->where(array('carteiraid' => $carteira_id))
+                         ->where(['carteiraid' => $carteira_id])
                          ->orderBy('id ASC');
     }
 
@@ -418,7 +418,7 @@ class ZCartao
             $query = $query->limit($quantidade)->offset($inicio);
         }
         $_cartaos = $query->fetchAll();
-        $cartaos = array();
+        $cartaos = [];
         foreach ($_cartaos as $cartao) {
             $cartaos[] = new ZCartao($cartao);
         }
@@ -434,7 +434,7 @@ class ZCartao
     private static function initSearchDoCarteiraPagtoID($carteira_pagto_id)
     {
         return   DB::$pdo->from('Cartoes')
-                         ->where(array('carteirapagtoid' => $carteira_pagto_id))
+                         ->where(['carteirapagtoid' => $carteira_pagto_id])
                          ->orderBy('id ASC');
     }
 
@@ -445,7 +445,7 @@ class ZCartao
             $query = $query->limit($quantidade)->offset($inicio);
         }
         $_cartaos = $query->fetchAll();
-        $cartaos = array();
+        $cartaos = [];
         foreach ($_cartaos as $cartao) {
             $cartaos[] = new ZCartao($cartao);
         }

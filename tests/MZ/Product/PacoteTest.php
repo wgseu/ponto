@@ -30,7 +30,7 @@ class PacoteTest extends \PHPUnit_Framework_TestCase
     {
         $pacote = new Pacote();
         $values = $pacote->publish();
-        $allowed = array(
+        $allowed = [
             'id',
             'pacoteid',
             'grupoid',
@@ -42,7 +42,7 @@ class PacoteTest extends \PHPUnit_Framework_TestCase
             'valor',
             'selecionado',
             'visivel',
-        );
+        ];
         $this->assertEquals($allowed, array_keys($values));
     }
 }

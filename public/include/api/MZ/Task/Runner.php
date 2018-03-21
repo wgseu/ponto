@@ -119,7 +119,7 @@ class Runner
      */
     private function build()
     {
-        $integracoes = Integracao::findAll(array('ativo' => 'Y'));
+        $integracoes = Integracao::findAll(['ativo' => 'Y']);
         foreach ($integracoes as $integracao) {
             $this->addTask($integracao->getTask());
         }
@@ -134,7 +134,7 @@ class Runner
         $this->processed = 0;
         $this->pending = 0;
         $this->failed = 0;
-        $this->tasks = array();
+        $this->tasks = [];
         return $this;
     }
 }

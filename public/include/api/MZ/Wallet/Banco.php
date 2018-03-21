@@ -58,7 +58,7 @@ class Banco extends \MZ\Database\Helper
      * Constructor for a new empty instance of Banco
      * @param array $banco All field and values to fill the instance
      */
-    public function __construct($banco = array())
+    public function __construct($banco = [])
     {
         parent::__construct($banco);
     }
@@ -184,12 +184,12 @@ class Banco extends \MZ\Database\Helper
      * @param  mixed $banco Associated key -> value to assign into this instance
      * @return Banco Self instance
      */
-    public function fromArray($banco = array())
+    public function fromArray($banco = [])
     {
         if ($banco instanceof Banco) {
             $banco = $banco->toArray();
         } elseif (!is_array($banco)) {
-            $banco = array();
+            $banco = [];
         }
         parent::fromArray($banco);
         if (!isset($banco['id'])) {
@@ -257,7 +257,7 @@ class Banco extends \MZ\Database\Helper
      */
     public function validate()
     {
-        $errors = array();
+        $errors = [];
         if (is_null($this->getNumero())) {
             $errors['numero'] = 'O Número não pode ser vazio';
         }
@@ -278,28 +278,28 @@ class Banco extends \MZ\Database\Helper
     protected function translate($e)
     {
         if (stripos($e->getMessage(), 'PRIMARY') !== false) {
-            return new \MZ\Exception\ValidationException(array(
+            return new \MZ\Exception\ValidationException([
                 'id' => vsprintf(
                     'O ID "%s" já está cadastrado',
-                    array($this->getID())
+                    [$this->getID()]
                 ),
-            ));
+            ]);
         }
         if (stripos($e->getMessage(), 'RazaoSocial_UNIQUE') !== false) {
-            return new \MZ\Exception\ValidationException(array(
+            return new \MZ\Exception\ValidationException([
                 'razaosocial' => vsprintf(
                     'A Razão social "%s" já está cadastrada',
-                    array($this->getRazaoSocial())
+                    [$this->getRazaoSocial()]
                 ),
-            ));
+            ]);
         }
         if (stripos($e->getMessage(), 'Numero_UNIQUE') !== false) {
-            return new \MZ\Exception\ValidationException(array(
+            return new \MZ\Exception\ValidationException([
                 'numero' => vsprintf(
                     'O Número "%s" já está cadastrado',
-                    array($this->getNumero())
+                    [$this->getNumero()]
                 ),
-            ));
+            ]);
         }
         return parent::translate($e);
     }
@@ -311,9 +311,9 @@ class Banco extends \MZ\Database\Helper
      */
     public static function findByID($id)
     {
-        return self::find(array(
+        return self::find([
             'id' => intval($id),
-        ));
+        ]);
     }
 
     /**
@@ -323,9 +323,9 @@ class Banco extends \MZ\Database\Helper
      */
     public static function findByRazaoSocial($razao_social)
     {
-        return self::find(array(
+        return self::find([
             'razaosocial' => strval($razao_social),
-        ));
+        ]);
     }
 
     /**
@@ -335,9 +335,9 @@ class Banco extends \MZ\Database\Helper
      */
     public static function findByNumero($numero)
     {
-        return self::find(array(
+        return self::find([
             'numero' => strval($numero),
-        ));
+        ]);
     }
 
     /**
@@ -345,7 +345,7 @@ class Banco extends \MZ\Database\Helper
      * @param  array $condition condition to filter rows
      * @return SelectQuery query object with condition statement
      */
-    private static function query($condition = array(), $order = array())
+    private static function query($condition = [], $order = [])
     {
         $query = self::getDB()->from('Bancos');
         if (array_key_exists('query', $condition)) {
@@ -370,7 +370,7 @@ class Banco extends \MZ\Database\Helper
         $query = self::query($condition)->limit(1);
         $row = $query->fetch();
         if ($row === false) {
-            $row = array();
+            $row = [];
         }
         return new Banco($row);
     }
@@ -382,7 +382,7 @@ class Banco extends \MZ\Database\Helper
      * @param  integer $offset start index to get rows, null for begining
      * @return array All rows instanced and filled
      */
-    public static function findAll($condition = array(), $order = array(), $limit = null, $offset = null)
+    public static function findAll($condition = [], $order = [], $limit = null, $offset = null)
     {
         $query = self::query($condition, $order);
         if (!is_null($limit)) {
@@ -392,7 +392,7 @@ class Banco extends \MZ\Database\Helper
             $query = $query->offset($offset);
         }
         $rows = $query->fetchAll();
-        $result = array();
+        $result = [];
         foreach ($rows as $row) {
             $result[] = new Banco($row);
         }
@@ -475,7 +475,7 @@ class Banco extends \MZ\Database\Helper
      * @param  array $condition condition to filter rows
      * @return integer Quantity of rows
      */
-    public static function count($condition = array())
+    public static function count($condition = [])
     {
         $query = self::query($condition);
         return $query->count();

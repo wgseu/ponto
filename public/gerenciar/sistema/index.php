@@ -28,7 +28,7 @@ $cliente = $__empresa__;
 if (is_null($cliente->getID())) {
 	$cliente->setTipo(\ClienteTipo::JURIDICA);
 }
-$localizacao = \MZ\Location\Localizacao::find(array('clienteid' => $__empresa__->getID()));
+$localizacao = \MZ\Location\Localizacao::find(['clienteid' => $__empresa__->getID()]);
 $bairro = $localizacao->findBairroID();
 $cidade = $bairro->findCidadeID();
 $estado = $cidade->findEstadoID();
@@ -38,5 +38,5 @@ if (!$estado->exists() && count($_paises) > 0) {
 }
 $pais_id = $estado->getPaisID();
 $focusctrl = 'nome';
-$_estados = \MZ\Location\Estado::findAll(array('paisid' => $pais_id));
+$_estados = \MZ\Location\Estado::findAll(['paisid' => $pais_id]);
 include template('gerenciar_sistema_index');

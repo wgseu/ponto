@@ -53,40 +53,40 @@ $pagamentos = ZPagamento::getTodos(
     $pagesize
 );
 
-$_tipo_names = array(
+$_tipo_names = [
     'Mesa' => 'Mesa',
     'Comanda' => 'Comanda',
     'Avulso' => 'Balcão',
     'Entrega' => 'Entrega',
-);
-$_estado_names = array(
+];
+$_estado_names = [
     'Valido' => 'Válido',
     'Ativo' => 'Ativo',
     'Espera' => 'Em espera',
     'Cancelado' => 'Cancelado',
-);
+];
 
-$_pagamento_icon = array(
+$_pagamento_icon = [
     'Dinheiro' => 0,
     'Cartao' => 16,
     'Cheque' => 32,
     'Conta' => 48,
     'Credito' => 64,
     'Transferencia' => 80,
-);
+];
 
 $formas_de_pagamento = ZFormaPagto::getTodos();
-$_forma_names = array();
+$_forma_names = [];
 foreach ($formas_de_pagamento as $forma) {
     $_forma_names[$forma->getID()] = $forma->getDescricao();
 }
 $cartoes = ZCartao::getTodos();
-$_cartao_names = array();
+$_cartao_names = [];
 foreach ($cartoes as $cartao) {
     $_cartao_names[$cartao->getID()] = $cartao->getDescricao();
 }
 $carteiras = Carteira::findAll();
-$_carteira_names = array();
+$_carteira_names = [];
 foreach ($carteiras as $carteira) {
     $_carteira_names[$carteira->getID()] = $carteira->getDescricao();
 }

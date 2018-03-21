@@ -34,7 +34,7 @@ try {
     $cliente = ZCliente::cadastrar($cliente);
     $_cliente = $cliente->toArray();
     $_cliente['imagemurl'] = get_image_url($_cliente['imagem'], 'cliente', null);
-    json(array('status' => 'ok', 'cliente' => $_cliente));
+    json(['status' => 'ok', 'cliente' => $_cliente]);
 } catch (Exception $e) {
     json($e->getMessage());
 }

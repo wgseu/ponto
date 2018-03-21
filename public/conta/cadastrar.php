@@ -28,7 +28,7 @@ if (is_login()) {
 $fieldfocus = 'nome';
 $gerenciando = false;
 $cadastrar_cliente = true;
-$erro = array();
+$erro = [];
 if (is_post()) {
     $cliente = new ZCliente($_POST);
     $cliente->setImagem(null);
@@ -36,13 +36,13 @@ if (is_post()) {
     $aceitar = $_POST['aceitar'];
     try {
         if ($aceitar != 'true') {
-            throw new ValidationException(array('aceitar' => 'Os termos não foram aceitos'));
+            throw new ValidationException(['aceitar' => 'Os termos não foram aceitos']);
         }
         if ($_POST['confirmarsenha'] != $_POST['senha']) {
-            throw new ValidationException(array('senha' => 'As senhas não são iguais', 'confirmarsenha' => 'As senhas não são iguais'));
+            throw new ValidationException(['senha' => 'As senhas não são iguais', 'confirmarsenha' => 'As senhas não são iguais']);
         }
         if (trim($_POST['email']) == '') {
-            throw new ValidationException(array('email' => 'O E-mail não foi informado'));
+            throw new ValidationException(['email' => 'O E-mail não foi informado']);
         }
         if ($cliente->getTipo() == ClienteTipo::JURIDICA) {
             $cliente->setCPF(\MZ\Util\Filter::unmask($cliente->getCPF(), _p('Mascara', 'CNPJ')));

@@ -24,7 +24,7 @@ try {
     $lancamento_inicio = strtotime($_GET['lancamento_inicio']);
     $lancamento_fim = strtotime($_GET['lancamento_fim']);
 
-    if (!in_array($modo, array('contador', 'consumidor'))) {
+    if (!in_array($modo, ['contador', 'consumidor'])) {
         throw new Exception('O modo de envio "'.$modo.'" é inválido', 500);
     }
     $notas = ZNota::getTodas(
@@ -71,7 +71,7 @@ try {
         }
     }
     $sufixo = '';
-    $filters = array();
+    $filters = [];
     if ($emissao_inicio !== false || $emissao_fim !== false) {
         $sufixo .= ' emissão '.human_range($emissao_inicio, $emissao_fim, '-');
         $filters['Período de emissão'] = human_range($emissao_inicio, $emissao_fim);
@@ -97,27 +97,27 @@ try {
         $xmlfile = $_nota->getCaminhoXml();
         if (!is_array($xmlfile)) {
             $xmlname = basename($xmlfile);
-            mail_nota($destinatario->getEmail(), $destinatario->getNome(), $modo, $filters, array($xmlname => $xmlfile));
-            json(null, array());
+            mail_nota($destinatario->getEmail(), $destinatario->getNome(), $modo, $filters, [$xmlname => $xmlfile]);
+            json(null, []);
         }
     }
     need_permission(
-        array(
+        [
             PermissaoNome::RELATORIOFLUXO,
             PermissaoNome::EXCLUIRPEDIDO,
-        ),
+        ],
         is_output('json')
     );
     $zipfile = ZNota::zip($notas);
     $zipname = 'Notas'.$sufixo.'.zip';
     try {
-        mail_nota($destinatario->getEmail(), $destinatario->getNome(), $modo, $filters, array($zipname => $zipfile));
+        mail_nota($destinatario->getEmail(), $destinatario->getNome(), $modo, $filters, [$zipname => $zipfile]);
     } catch (Exception $e) {
         unlink($zipfile);
         throw $e;
     }
     unlink($zipfile);
-    json(null, array());
+    json(null, []);
 } catch (Exception $e) {
     Log::error($e->getMessage());
     json($e->getMessage());

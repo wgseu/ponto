@@ -2,10 +2,10 @@
 require_once(dirname(__DIR__) . '/app.php');
 
 need_permission(
-    array(
+    [
         \PermissaoNome::RELATORIOFLUXO,
         \PermissaoNome::EXCLUIRPEDIDO,
-    ),
+    ],
     isset($_GET['saida']) && is_output('json')
 );
 

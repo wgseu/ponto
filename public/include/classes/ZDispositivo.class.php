@@ -40,7 +40,7 @@ class ZDispositivo
     private $serial;
     private $validacao;
 
-    public function __construct($dispositivo = array())
+    public function __construct($dispositivo = [])
     {
         if (is_array($dispositivo)) {
             $this->setID(isset($dispositivo['id'])?$dispositivo['id']:null);
@@ -200,7 +200,7 @@ class ZDispositivo
     }
     public function toArray()
     {
-        $dispositivo = array();
+        $dispositivo = [];
         $dispositivo['id'] = $this->getID();
         $dispositivo['setorid'] = $this->getSetorID();
         $dispositivo['caixaid'] = $this->getCaixaID();
@@ -216,22 +216,22 @@ class ZDispositivo
     public static function getPeloID($id)
     {
         $query = DB::$pdo->from('Dispositivos')
-                         ->where(array('id' => $id));
+                         ->where(['id' => $id]);
         return new ZDispositivo($query->fetch());
     }
 
     public static function getPeloNome($nome)
     {
         $query = DB::$pdo->from('Dispositivos')
-                         ->where(array('nome' => $nome));
+                         ->where(['nome' => $nome]);
         return new ZDispositivo($query->fetch());
     }
 
     public static function getNaoValidado()
     {
         $query = DB::$pdo->from('Dispositivos')
-                         ->where(array('validacao' => null,
-                                       'tipo' => DispositivoTipo::TABLET))
+                         ->where(['validacao' => null,
+                                       'tipo' => DispositivoTipo::TABLET])
                          ->limit(1)->offset(0);
         return new ZDispositivo($query->fetch());
     }
@@ -239,20 +239,20 @@ class ZDispositivo
     public static function getPelaCaixaID($caixa_id)
     {
         $query = DB::$pdo->from('Dispositivos')
-                         ->where(array('caixaid' => $caixa_id));
+                         ->where(['caixaid' => $caixa_id]);
         return new ZDispositivo($query->fetch());
     }
 
     public static function getPelaSerial($serial)
     {
         $query = DB::$pdo->from('Dispositivos')
-                         ->where(array('serial' => $serial));
+                         ->where(['serial' => $serial]);
         return new ZDispositivo($query->fetch());
     }
 
     private static function validarCampos(&$dispositivo)
     {
-        $erros = array();
+        $erros = [];
         if (!is_numeric($dispositivo['setorid'])) {
             $erros['setorid'] = 'O ID do setor não é um número';
         }
@@ -269,7 +269,7 @@ class ZDispositivo
         $dispositivo['tipo'] = trim($dispositivo['tipo']);
         if (strlen($dispositivo['tipo']) == 0) {
             $dispositivo['tipo'] = null;
-        } elseif (!in_array($dispositivo['tipo'], array('Computador', 'Tablet'))) {
+        } elseif (!in_array($dispositivo['tipo'], ['Computador', 'Tablet'])) {
             $erros['tipo'] = 'O Tipo informado não é válido';
         }
         $dispositivo['descricao'] = strip_tags(trim($dispositivo['descricao']));
@@ -297,16 +297,16 @@ class ZDispositivo
     private static function handleException(&$e)
     {
         if (stripos($e->getMessage(), 'PRIMARY') !== false) {
-            throw new ValidationException(array('id' => 'O ID informado já está cadastrado'));
+            throw new ValidationException(['id' => 'O ID informado já está cadastrado']);
         }
         if (stripos($e->getMessage(), 'Nome_UNIQUE') !== false) {
-            throw new ValidationException(array('nome' => 'O Nome informado já está cadastrado'));
+            throw new ValidationException(['nome' => 'O Nome informado já está cadastrado']);
         }
         if (stripos($e->getMessage(), 'CaixaID_UNIQUE') !== false) {
-            throw new ValidationException(array('caixaid' => 'Já existe um dispositivo para este caixa'));
+            throw new ValidationException(['caixaid' => 'Já existe um dispositivo para este caixa']);
         }
         if (stripos($e->getMessage(), 'Serial_UNIQUE') !== false) {
-            throw new ValidationException(array('serial' => 'O serial informado já está cadastrado'));
+            throw new ValidationException(['serial' => 'O serial informado já está cadastrado']);
         }
     }
 
@@ -327,10 +327,10 @@ class ZDispositivo
     {
         $_dispositivo = $dispositivo->toArray();
         if (!$_dispositivo['id']) {
-            throw new ValidationException(array('id' => 'O id do dispositivo não foi informado'));
+            throw new ValidationException(['id' => 'O id do dispositivo não foi informado']);
         }
         self::validarCampos($_dispositivo);
-        $campos = array(
+        $campos = [
             'setorid',
             'caixaid',
             'nome',
@@ -339,7 +339,7 @@ class ZDispositivo
             'opcoes',
             'serial',
             'validacao',
-        );
+        ];
         try {
             $query = DB::$pdo->update('Dispositivos');
             $query = $query->set(array_intersect_key($_dispositivo, array_flip($campos)));
@@ -358,7 +358,7 @@ class ZDispositivo
             throw new Exception('Não foi possível excluir o dispositivo, o id do dispositivo não foi informado');
         }
         $query = DB::$pdo->deleteFrom('Dispositivos')
-                         ->where(array('id' => $id));
+                         ->where(['id' => $id]);
         return $query->execute();
     }
 
@@ -375,7 +375,7 @@ class ZDispositivo
             $query = $query->limit($quantidade)->offset($inicio);
         }
         $_dispositivos = $query->fetchAll();
-        $dispositivos = array();
+        $dispositivos = [];
         foreach ($_dispositivos as $dispositivo) {
             $dispositivos[] = new ZDispositivo($dispositivo);
         }
@@ -391,7 +391,7 @@ class ZDispositivo
     private static function initSearchDoTablet()
     {
         return   DB::$pdo->from('Dispositivos')
-                         ->where(array('tipo' => DispositivoTipo::TABLET))
+                         ->where(['tipo' => DispositivoTipo::TABLET])
                          ->orderBy('id ASC');
     }
 
@@ -404,7 +404,7 @@ class ZDispositivo
     private static function initSearchDoSetorID($setor_id)
     {
         return   DB::$pdo->from('Dispositivos')
-                         ->where(array('setorid' => $setor_id))
+                         ->where(['setorid' => $setor_id])
                          ->orderBy('id ASC');
     }
 
@@ -415,7 +415,7 @@ class ZDispositivo
             $query = $query->limit($quantidade)->offset($inicio);
         }
         $_dispositivos = $query->fetchAll();
-        $dispositivos = array();
+        $dispositivos = [];
         foreach ($_dispositivos as $dispositivo) {
             $dispositivos[] = new ZDispositivo($dispositivo);
         }
@@ -431,7 +431,7 @@ class ZDispositivo
     private static function initSearchDaCaixaID($caixa_id)
     {
         return   DB::$pdo->from('Dispositivos')
-                         ->where(array('caixaid' => $caixa_id))
+                         ->where(['caixaid' => $caixa_id])
                          ->orderBy('id ASC');
     }
 
@@ -442,7 +442,7 @@ class ZDispositivo
             $query = $query->limit($quantidade)->offset($inicio);
         }
         $_dispositivos = $query->fetchAll();
-        $dispositivos = array();
+        $dispositivos = [];
         foreach ($_dispositivos as $dispositivo) {
             $dispositivos[] = new ZDispositivo($dispositivo);
         }

@@ -45,10 +45,10 @@ class NFeDB extends \NFe\Database\Estatico
                 break;
             case NotaEstado::CANCELADO:
                 $path = $config->getPastaXmlCancelado($ambiente);
-                $arquivos = array(
+                $arquivos = [
                     'nota' => $path . '/' . $_nota->getChave() . '.xml',
                     'evento' => $path . '/' . $_nota->getChave() . self::CANCEL_SUFFIX . '.xml'
-                );
+                ];
                 return $arquivos;
             case NotaEstado::AUTORIZADO:
                 $path = $config->getPastaXmlAutorizado($ambiente);
@@ -273,9 +273,9 @@ class NFeDB extends \NFe\Database\Estatico
         }
         $total_pago = 0.00;
         $troco = 0.00;
-        $dinheiro = array(); // guarda os pagamentos em dinheiro
-        $outros = array(); // guarda os outros pagamentos
-        $pagamentos = array();
+        $dinheiro = []; // guarda os pagamentos em dinheiro
+        $outros = []; // guarda os outros pagamentos
+        $pagamentos = [];
         foreach ($_pagamentos as $key => $_pagamento) {
             $_forma = ZFormaPagto::getPeloID($_pagamento->getFormaPagtoID());
             if (is_less($_pagamento->getTotal(), 0.00)) {
@@ -301,7 +301,7 @@ class NFeDB extends \NFe\Database\Estatico
             }
         }
         $troco_total = $troco;
-        $arrays = array($dinheiro, $outros);
+        $arrays = [$dinheiro, $outros];
         foreach ($arrays as $array) {
             foreach ($array as $key => $pagamento) {
                 if (!is_less($troco, 0.00)) {
@@ -327,7 +327,7 @@ class NFeDB extends \NFe\Database\Estatico
      */
     public function getNotasAbertas($inicio = null, $quantidade = null)
     {
-        $notas = array();
+        $notas = [];
         $config = \NFe\Core\SEFAZ::getInstance()->getConfiguracao();
         $_notas = ZNota::getAbertas($inicio, $quantidade);
         foreach ($_notas as $_nota) {
@@ -368,7 +368,7 @@ class NFeDB extends \NFe\Database\Estatico
      */
     public function getNotasPendentes($inicio = null, $quantidade = null)
     {
-        $tarefas = array();
+        $tarefas = [];
         $config = \NFe\Core\SEFAZ::getInstance()->getConfiguracao();
         if ($config->isOffline()) {
             return $tarefas;
@@ -413,7 +413,7 @@ class NFeDB extends \NFe\Database\Estatico
      */
     public function getNotasTarefas($inicio = null, $quantidade = null)
     {
-        $tarefas = array();
+        $tarefas = [];
         $config = \NFe\Core\SEFAZ::getInstance()->getConfiguracao();
         if ($config->isOffline()) {
             return $tarefas;

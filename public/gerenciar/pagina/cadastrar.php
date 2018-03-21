@@ -23,7 +23,7 @@ require_once(dirname(__DIR__) . '/app.php');
 
 need_permission(PermissaoNome::ALTERARPAGINAS);
 $focusctrl = 'nome';
-$errors = array();
+$errors = [];
 $nomes = get_pages_info();
 $linguagens = get_languages_info();
 if (is_post()) {

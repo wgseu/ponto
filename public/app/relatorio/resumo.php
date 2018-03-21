@@ -29,7 +29,7 @@ if (!have_permission(PermissaoNome::RELATORIOCAIXA)) {
 }
 $sessao = ZSessao::getAbertaOuUltima();
 $data_inicio = strtotime($sessao->getDataInicio())?:strtotime("midnight", time());
-$response = array('status' => 'ok');
+$response = ['status' => 'ok'];
 $response['vendas'] = ZPedido::getTotal($sessao->getID(), $data_inicio);
 $response['receitas'] = ZPagamento::getReceitas($sessao->getID(), $data_inicio);
 $response['despesas'] = ZPagamento::getDespesas($sessao->getID(), $data_inicio);
@@ -48,13 +48,13 @@ if ($response['faturamento']['anterior'] < 0.01) {
 }
 $response['faturamento']['pagamentos'] = ZPagamento::getPagamentos(null, 0, null);
 $mes = abs(intval($_GET['mes']));
-$meses = array();
+$meses = [];
 for ($i = $mes; $i < $mes + 4; $i++) {
     $data = strtotime(date('Y-m').' -'.$i.' month');
-    $meses[] = array(
+    $meses[] = [
             'mes' => human_date(date('Y-m-d', $data), true),
             'total' => ZPagamento::getFaturamento(null, -$i, -$i)
-        );
+        ];
 }
 $response['faturamento']['mensal'] = $meses;
 json($response);

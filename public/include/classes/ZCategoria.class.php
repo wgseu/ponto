@@ -29,7 +29,7 @@ class ZCategoria
     private $imagem;
     private $data_atualizacao;
 
-    public function __construct($categoria = array())
+    public function __construct($categoria = [])
     {
         if (is_array($categoria)) {
             $this->setID(isset($categoria['id'])?$categoria['id']:null);
@@ -141,7 +141,7 @@ class ZCategoria
 
     public function toArray()
     {
-        $categoria = array();
+        $categoria = [];
         $categoria['id'] = $this->getID();
         $categoria['categoriaid'] = $this->getCategoriaID();
         $categoria['descricao'] = $this->getDescricao();
@@ -165,7 +165,7 @@ class ZCategoria
 
     public static function getPeloID($categoria_id)
     {
-        $query = self::initGet()->where(array('c.id' => $categoria_id));
+        $query = self::initGet()->where(['c.id' => $categoria_id]);
         return new ZCategoria($query->fetch());
     }
 
@@ -174,7 +174,7 @@ class ZCategoria
         $query = DB::$pdo->from('Categorias c')
                          ->select(null)
                          ->select('c.dataatualizacao')
-                         ->where(array('c.id' => $categoria_id));
+                         ->where(['c.id' => $categoria_id]);
         if (!$dataSomente) {
             $query = $query->select('c.imagem');
         }
@@ -183,7 +183,7 @@ class ZCategoria
 
     private static function validarCampos(&$categoria)
     {
-        $erros = array();
+        $erros = [];
         $categoria['categoriaid'] = trim($categoria['categoriaid']);
         if (strlen($categoria['categoriaid']) == 0) {
             $categoria['categoriaid'] = null;
@@ -206,7 +206,7 @@ class ZCategoria
         $categoria['servico'] = strval($categoria['servico']);
         if (strlen($categoria['servico']) == 0) {
             $categoria['servico'] = 'N';
-        } elseif (!in_array($categoria['servico'], array('Y', 'N'))) {
+        } elseif (!in_array($categoria['servico'], ['Y', 'N'])) {
             $erros['servico'] = 'O serviço informado não é válido';
         }
         if ($categoria['imagem'] === '') {
@@ -221,10 +221,10 @@ class ZCategoria
     private static function handleException(&$e)
     {
         if (stripos($e->getMessage(), 'PRIMARY') !== false) {
-            throw new ValidationException(array('id' => 'O ID informado já está cadastrado'));
+            throw new ValidationException(['id' => 'O ID informado já está cadastrado']);
         }
         if (stripos($e->getMessage(), 'Descricao_UNIQUE') !== false) {
-            throw new ValidationException(array('descricao' => 'A descrição informada já está cadastrada'));
+            throw new ValidationException(['descricao' => 'A descrição informada já está cadastrada']);
         }
     }
 
@@ -245,15 +245,15 @@ class ZCategoria
     {
         $_categoria = $categoria->toArray();
         if (!$_categoria['id']) {
-            throw new ValidationException(array('id' => 'O id da categoria não foi informado'));
+            throw new ValidationException(['id' => 'O id da categoria não foi informado']);
         }
         self::validarCampos($_categoria);
-        $campos = array(
+        $campos = [
             'categoriaid',
             'descricao',
             'servico',
             'dataatualizacao',
-        );
+        ];
         if ($_categoria['imagem'] !== true) {
             $campos[] = 'imagem';
         }
@@ -275,7 +275,7 @@ class ZCategoria
             throw new Exception('Não foi possível excluir a categoria, o id da categoria não foi informado');
         }
         $query = DB::$pdo->deleteFrom('Categorias')
-                         ->where(array('id' => $id));
+                         ->where(['id' => $id]);
         return $query->execute();
     }
 
@@ -316,7 +316,7 @@ class ZCategoria
             $query = $query->limit($quantidade)->offset($inicio);
         }
         $_categorias = $query->fetchAll();
-        $categorias = array();
+        $categorias = [];
         foreach ($_categorias as $categoria) {
             $categorias[] = new ZCategoria($categoria);
         }

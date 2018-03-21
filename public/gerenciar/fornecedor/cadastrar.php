@@ -23,7 +23,7 @@ require_once(dirname(__DIR__) . '/app.php');
 
 need_permission(PermissaoNome::CADASTROFORNECEDORES);
 $focusctrl = 'empresa';
-$errors = array();
+$errors = [];
 if (is_post()) {
     $fornecedor = new ZFornecedor($_POST);
     try {

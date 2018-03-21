@@ -28,7 +28,7 @@ if (is_null($classificacao->getID())) {
     redirect('/gerenciar/classificacao/');
 }
 $focusctrl = 'descricao';
-$errors = array();
+$errors = [];
 $old_classificacao = $classificacao;
 if (is_post()) {
     $classificacao = new ZClassificacao($_POST);

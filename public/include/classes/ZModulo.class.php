@@ -30,7 +30,7 @@ class ZModulo
     private $image_index;
     private $habilitado;
 
-    public function __construct($modulo = array())
+    public function __construct($modulo = [])
     {
         if (is_array($modulo)) {
             $this->setID(isset($modulo['id'])?$modulo['id']:null);
@@ -117,7 +117,7 @@ class ZModulo
 
     public function toArray()
     {
-        $modulo = array();
+        $modulo = [];
         $modulo['id'] = $this->getID();
         $modulo['nome'] = $this->getNome();
         $modulo['descricao'] = $this->getDescricao();
@@ -129,20 +129,20 @@ class ZModulo
     public static function getPeloID($id)
     {
         $query = DB::$pdo->from('Modulos')
-                         ->where(array('id' => $id));
+                         ->where(['id' => $id]);
         return new ZModulo($query->fetch());
     }
 
     public static function getPeloNome($nome)
     {
         $query = DB::$pdo->from('Modulos')
-                         ->where(array('nome' => $nome));
+                         ->where(['nome' => $nome]);
         return new ZModulo($query->fetch());
     }
 
     private static function validarCampos(&$modulo)
     {
-        $erros = array();
+        $erros = [];
         $modulo['nome'] = strip_tags(trim($modulo['nome']));
         if (strlen($modulo['nome']) == 0) {
             $erros['nome'] = 'O nome não pode ser vazio';
@@ -157,7 +157,7 @@ class ZModulo
         $modulo['habilitado'] = trim($modulo['habilitado']);
         if (strlen($modulo['habilitado']) == 0) {
             $modulo['habilitado'] = 'N';
-        } elseif (!in_array($modulo['habilitado'], array('Y', 'N'))) {
+        } elseif (!in_array($modulo['habilitado'], ['Y', 'N'])) {
             $erros['habilitado'] = 'O habilitado informado não é válido';
         }
         if (!empty($erros)) {
@@ -168,10 +168,10 @@ class ZModulo
     private static function handleException(&$e)
     {
         if (stripos($e->getMessage(), 'PRIMARY') !== false) {
-            throw new ValidationException(array('id' => 'O ID informado já está cadastrado'));
+            throw new ValidationException(['id' => 'O ID informado já está cadastrado']);
         }
         if (stripos($e->getMessage(), 'Nome_UNIQUE') !== false) {
-            throw new ValidationException(array('nome' => 'O nome informado já está cadastrado'));
+            throw new ValidationException(['nome' => 'O nome informado já está cadastrado']);
         }
     }
 
@@ -192,15 +192,15 @@ class ZModulo
     {
         $_modulo = $modulo->toArray();
         if (!$_modulo['id']) {
-            throw new ValidationException(array('id' => 'O id do modulo não foi informado'));
+            throw new ValidationException(['id' => 'O id do modulo não foi informado']);
         }
         self::validarCampos($_modulo);
-        $campos = array(
+        $campos = [
             'nome',
             'descricao',
             'imageindex',
             'habilitado',
-        );
+        ];
         try {
             $query = DB::$pdo->update('Modulos');
             $query = $query->set(array_intersect_key($_modulo, array_flip($campos)));
@@ -219,7 +219,7 @@ class ZModulo
             throw new Exception('Não foi possível excluir o modulo, o id do modulo não foi informado');
         }
         $query = DB::$pdo->deleteFrom('Modulos')
-                         ->where(array('id' => $id));
+                         ->where(['id' => $id]);
         return $query->execute();
     }
 
@@ -241,7 +241,7 @@ class ZModulo
             $query = $query->limit($quantidade)->offset($inicio);
         }
         $_modulos = $query->fetchAll();
-        $modulos = array();
+        $modulos = [];
         foreach ($_modulos as $modulo) {
             $modulos[] = new ZModulo($modulo);
         }

@@ -24,11 +24,11 @@ try {
     $certinfo = openssl_x509_parse($cert_info['cert']);
     file_put_contents(WWW_ROOT . get_document_url('public.pem', 'cert'), $cert_info['cert']);
     file_put_contents(WWW_ROOT . get_document_url('private.pem', 'cert'), $cert_info['pkey']);
-    json('chave', array(
+    json('chave', [
         'publica' => 'public.pem',
         'privada' => 'private.pem',
         'expiracao' => date('Y-m-d H:i:s', $certinfo['validTo_time_t']),
-    ));
+    ]);
 } catch (Exception $e) {
     json($e->getMessage());
 }

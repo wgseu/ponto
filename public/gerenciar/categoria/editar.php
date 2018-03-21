@@ -28,7 +28,7 @@ if (is_null($categoria->getID())) {
     redirect('/gerenciar/categoria/');
 }
 $focusctrl = 'descricao';
-$errors = array();
+$errors = [];
 $old_categoria = $categoria;
 if (is_post()) {
     $categoria = new ZCategoria($_POST);

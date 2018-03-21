@@ -27,8 +27,8 @@ $count = ZMesa::getCount(null, $_GET['ativa'], $_GET['query']);
 list($pagesize, $offset, $pagestring) = pagestring($count, 10);
 $mesas = ZMesa::getTodas(null, $_GET['ativa'], $_GET['query'], $offset, $pagesize);
 
-$ativas = array(
+$ativas = [
     'Y' => 'Ativas',
     'N' => 'Inativas',
-);
+];
 include template('gerenciar_mesa_index');

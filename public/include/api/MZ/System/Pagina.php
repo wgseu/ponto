@@ -1,0 +1,476 @@
+<?php
+/**
+ * Copyright 2014 da MZ Software - MZ Desenvolvimento de Sistemas LTDA
+ *
+ * Este arquivo é parte do programa GrandChef - Sistema para Gerenciamento de Churrascarias, Bares e Restaurantes.
+ * O GrandChef é um software proprietário; você não pode redistribuí-lo e/ou modificá-lo.
+ * DISPOSIÇÕES GERAIS
+ * O cliente não deverá remover qualquer identificação do produto, avisos de direitos autorais,
+ * ou outros avisos ou restrições de propriedade do GrandChef.
+ *
+ * O cliente não deverá causar ou permitir a engenharia reversa, desmontagem,
+ * ou descompilação do GrandChef.
+ *
+ * PROPRIEDADE DOS DIREITOS AUTORAIS DO PROGRAMA
+ *
+ * GrandChef é a especialidade do desenvolvedor e seus
+ * licenciadores e é protegido por direitos autorais, segredos comerciais e outros direitos
+ * de leis de propriedade.
+ *
+ * O Cliente adquire apenas o direito de usar o software e não adquire qualquer outros
+ * direitos, expressos ou implícitos no GrandChef diferentes dos especificados nesta Licença.
+ *
+ * @author  Francimar Alves <mazinsw@gmail.com>
+ */
+namespace MZ\System;
+
+use MZ\Util\Filter;
+use MZ\Util\Validator;
+
+/**
+ * Página WEB que contém informações de contato, termos e outras
+ * informações da empresa
+ */
+class Pagina extends \MZ\Database\Helper
+{
+
+    /**
+     * Identificador da página
+     */
+    private $id;
+    /**
+     * Nome da página, único no sistema com o código da linguagem
+     */
+    private $nome;
+    /**
+     * Código da linguagem para exibição no idioma correto, único com o nome
+     */
+    private $linguagem_id;
+    /**
+     * Conteúdo da página, geralmente texto formatado em HTML
+     */
+    private $conteudo;
+
+    /**
+     * Constructor for a new empty instance of Pagina
+     * @param array $pagina All field and values to fill the instance
+     */
+    public function __construct($pagina = [])
+    {
+        parent::__construct($pagina);
+    }
+
+    /**
+     * Identificador da página
+     * @return mixed ID of Pagina
+     */
+    public function getID()
+    {
+        return $this->id;
+    }
+
+    /**
+     * Set ID value to new on param
+     * @param  mixed $id new value for ID
+     * @return Pagina Self instance
+     */
+    public function setID($id)
+    {
+        $this->id = $id;
+        return $this;
+    }
+
+    /**
+     * Nome da página, único no sistema com o código da linguagem
+     * @return mixed Nome of Pagina
+     */
+    public function getNome()
+    {
+        return $this->nome;
+    }
+
+    /**
+     * Set Nome value to new on param
+     * @param  mixed $nome new value for Nome
+     * @return Pagina Self instance
+     */
+    public function setNome($nome)
+    {
+        $this->nome = $nome;
+        return $this;
+    }
+
+    /**
+     * Código da linguagem para exibição no idioma correto, único com o nome
+     * @return mixed Linguagem of Pagina
+     */
+    public function getLinguagemID()
+    {
+        return $this->linguagem_id;
+    }
+
+    /**
+     * Set LinguagemID value to new on param
+     * @param  mixed $linguagem_id new value for LinguagemID
+     * @return Pagina Self instance
+     */
+    public function setLinguagemID($linguagem_id)
+    {
+        $this->linguagem_id = $linguagem_id;
+        return $this;
+    }
+
+    /**
+     * Conteúdo da página, geralmente texto formatado em HTML
+     * @return mixed Conteúdo of Pagina
+     */
+    public function getConteudo()
+    {
+        return $this->conteudo;
+    }
+
+    /**
+     * Set Conteudo value to new on param
+     * @param  mixed $conteudo new value for Conteudo
+     * @return Pagina Self instance
+     */
+    public function setConteudo($conteudo)
+    {
+        $this->conteudo = $conteudo;
+        return $this;
+    }
+
+    /**
+     * Convert this instance to array associated key -> value
+     * @param  boolean $recursive Allow rescursive conversion of fields
+     * @return array All field and values into array format
+     */
+    public function toArray($recursive = false)
+    {
+        $pagina = parent::toArray($recursive);
+        $pagina['id'] = $this->getID();
+        $pagina['nome'] = $this->getNome();
+        $pagina['linguagemid'] = $this->getLinguagemID();
+        $pagina['conteudo'] = $this->getConteudo();
+        return $pagina;
+    }
+
+    /**
+     * Fill this instance with from array values, you can pass instance to
+     * @param  mixed $pagina Associated key -> value to assign into this instance
+     * @return Pagina Self instance
+     */
+    public function fromArray($pagina = [])
+    {
+        if ($pagina instanceof Pagina) {
+            $pagina = $pagina->toArray();
+        } elseif (!is_array($pagina)) {
+            $pagina = [];
+        }
+        parent::fromArray($pagina);
+        if (!isset($pagina['id'])) {
+            $this->setID(null);
+        } else {
+            $this->setID($pagina['id']);
+        }
+        if (!isset($pagina['nome'])) {
+            $this->setNome(null);
+        } else {
+            $this->setNome($pagina['nome']);
+        }
+        if (!isset($pagina['linguagemid'])) {
+            $this->setLinguagemID(null);
+        } else {
+            $this->setLinguagemID($pagina['linguagemid']);
+        }
+        if (!array_key_exists('conteudo', $pagina)) {
+            $this->setConteudo(null);
+        } else {
+            $this->setConteudo($pagina['conteudo']);
+        }
+        return $this;
+    }
+
+    /**
+     * Convert this instance into array associated key -> value with only public fields
+     * @return array All public field and values into array format
+     */
+    public function publish()
+    {
+        $pagina = parent::publish();
+        return $pagina;
+    }
+
+    /**
+     * Filter fields, upload data and keep key data
+     * @param Pagina $original Original instance without modifications
+     */
+    public function filter($original)
+    {
+        $this->setID($original->getID());
+        $this->setNome(Filter::string($this->getNome()));
+        $this->setLinguagemID(Filter::number($this->getLinguagemID()));
+        $this->setConteudo(Filter::text($this->getConteudo()));
+    }
+
+    /**
+     * Clean instance resources like images and docs
+     * @param  Pagina $dependency Don't clean when dependency use same resources
+     */
+    public function clean($dependency)
+    {
+    }
+
+    /**
+     * Validate fields updating them and throw exception when invalid data has found
+     * @return array All field of Pagina in array format
+     */
+    public function validate()
+    {
+        $errors = [];
+        if (is_null($this->getNome())) {
+            $errors['nome'] = 'O nome não pode ser vazio';
+        }
+        if (is_null($this->getLinguagemID())) {
+            $errors['linguagemid'] = 'A linguagem não pode ser vazia';
+        }
+        if (!empty($errors)) {
+            throw new \MZ\Exception\ValidationException($errors);
+        }
+        return $this->toArray();
+    }
+
+    /**
+     * Translate SQL exception into application exception
+     * @param  \Exception $e exception to translate into a readable error
+     * @return \MZ\Exception\ValidationException new exception translated
+     */
+    protected function translate($e)
+    {
+        if (stripos($e->getMessage(), 'PRIMARY') !== false) {
+            return new \MZ\Exception\ValidationException([
+                'id' => sprintf(
+                    'O id "%s" já está cadastrado',
+                    $this->getID()
+                ),
+            ]);
+        }
+        if (stripos($e->getMessage(), 'Nome_LinguagemID_UNIQUE') !== false) {
+            return new \MZ\Exception\ValidationException([
+                'nome' => sprintf(
+                    'O nome "%s" já está cadastrado',
+                    $this->getNome()
+                ),
+                'linguagemid' => sprintf(
+                    'A linguagem "%s" já está cadastrada',
+                    $this->getLinguagemID()
+                ),
+            ]);
+        }
+        return parent::translate($e);
+    }
+
+    /**
+     * Find this object on database using, ID
+     * @param  int $id id to find Página
+     * @return Pagina A filled instance or empty when not found
+     */
+    public static function findByID($id)
+    {
+        return self::find([
+            'id' => intval($id),
+        ]);
+    }
+
+    /**
+     * Find this object on database using, Nome, LinguagemID
+     * @param  string $nome nome to find Página
+     * @param  int $linguagem_id linguagem to find Página
+     * @return Pagina A filled instance or empty when not found
+     */
+    public static function findByNomeLinguagemID($nome, $linguagem_id)
+    {
+        return self::find([
+            'nome' => strval($nome),
+            'linguagemid' => intval($linguagem_id),
+        ]);
+    }
+
+    /**
+     * Get allowed keys array
+     * @return array allowed keys array
+     */
+    private static function getAllowedKeys()
+    {
+        $pagina = new Pagina();
+        $allowed = Filter::concatKeys('p.', $pagina->toArray());
+        return $allowed;
+    }
+
+    /**
+     * Filter order array
+     * @param  mixed $order order string or array to parse and filter allowed
+     * @return array allowed associative order
+     */
+    private static function filterOrder($order)
+    {
+        $allowed = self::getAllowedKeys();
+        return Filter::orderBy($order, $allowed, 'p.');
+    }
+
+    /**
+     * Filter condition array with allowed fields
+     * @param  array $condition condition to filter rows
+     * @return array allowed condition
+     */
+    private static function filterCondition($condition)
+    {
+        $allowed = self::getAllowedKeys();
+        if (isset($condition['search'])) {
+            $search = $condition['search'];
+            $field = 'p.nome LIKE ?';
+            $condition[$field] = '%'.$search.'%';
+            $allowed[$field] = true;
+            unset($condition['search']);
+        }
+        return Filter::keys($condition, $allowed, 'p.');
+    }
+
+    /**
+     * Fetch data from database with a condition
+     * @param  array $condition condition to filter rows
+     * @param  array $order order rows
+     * @return SelectQuery query object with condition statement
+     */
+    private static function query($condition = [], $order = [])
+    {
+        $query = self::getDB()->from('Paginas p');
+        $condition = self::filterCondition($condition);
+        $query = self::buildOrderBy($query, self::filterOrder($order));
+        $query = $query->orderBy('p.nome ASC');
+        $query = $query->orderBy('p.id ASC');
+        return self::buildCondition($query, $condition);
+    }
+
+    /**
+     * Search one register with a condition
+     * @param  array $condition Condition for searching the row
+     * @param  array $order order rows
+     * @return Pagina A filled Página or empty instance
+     */
+    public static function find($condition, $order = [])
+    {
+        $query = self::query($condition, $order)->limit(1);
+        $row = $query->fetch();
+        if ($row === false) {
+            $row = [];
+        }
+        return new Pagina($row);
+    }
+
+    /**
+     * Fetch all rows from database with matched condition critery
+     * @param  array $condition condition to filter rows
+     * @param  integer $limit number of rows to get, null for all
+     * @param  integer $offset start index to get rows, null for begining
+     * @return array All rows instanced and filled
+     */
+    public static function findAll($condition = [], $order = [], $limit = null, $offset = null)
+    {
+        $query = self::query($condition, $order);
+        if (!is_null($limit)) {
+            $query = $query->limit($limit);
+        }
+        if (!is_null($offset)) {
+            $query = $query->offset($offset);
+        }
+        $rows = $query->fetchAll();
+        $result = [];
+        foreach ($rows as $row) {
+            $result[] = new Pagina($row);
+        }
+        return $result;
+    }
+
+    /**
+     * Insert a new Página into the database and fill instance from database
+     * @return Pagina Self instance
+     */
+    public function insert()
+    {
+        $values = $this->validate();
+        unset($values['id']);
+        try {
+            $id = self::getDB()->insertInto('Paginas')->values($values)->execute();
+            $pagina = self::findByID($id);
+            $this->fromArray($pagina->toArray());
+        } catch (\Exception $e) {
+            throw $this->translate($e);
+        }
+        return $this;
+    }
+
+    /**
+     * Update Página with instance values into database for ID
+     * @return Pagina Self instance
+     */
+    public function update()
+    {
+        $values = $this->validate();
+        if (!$this->exists()) {
+            throw new \Exception('O identificador da página não foi informado');
+        }
+        unset($values['id']);
+        try {
+            self::getDB()
+                ->update('Paginas')
+                ->set($values)
+                ->where('id', $this->getID())
+                ->execute();
+            $pagina = self::findByID($this->getID());
+            $this->fromArray($pagina->toArray());
+        } catch (\Exception $e) {
+            throw $this->translate($e);
+        }
+        return $this;
+    }
+
+    /**
+     * Save the Página into the database
+     * @return Pagina Self instance
+     */
+    public function save()
+    {
+        if ($this->exists()) {
+            return $this->update();
+        }
+        return $this->insert();
+    }
+
+    /**
+     * Delete this instance from database using ID
+     * @return integer Number of rows deleted (Max 1)
+     */
+    public function delete()
+    {
+        if (!$this->exists()) {
+            throw new \Exception('O identificador da página não foi informado');
+        }
+        $result = self::getDB()
+            ->deleteFrom('Paginas')
+            ->where('id', $this->getID())
+            ->execute();
+        return $result;
+    }
+
+    /**
+     * Count all rows from database with matched condition critery
+     * @param  array $condition condition to filter rows
+     * @return integer Quantity of rows
+     */
+    public static function count($condition = [])
+    {
+        $query = self::query($condition);
+        return $query->count();
+    }
+}

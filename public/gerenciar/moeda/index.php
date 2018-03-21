@@ -38,11 +38,11 @@ list($pagesize, $offset, $pagestring) = pagestring($count, $limite);
 $moedas = Moeda::findAll($condition, $order, $pagesize, $offset);
 
 if (is_output('json')) {
-	$items = array();
+	$items = [];
 	foreach ($moedas as $moeda) {
 		$items[] = $moeda->publish();
 	}
-	json(array('status' => 'ok', 'items' => $items));
+	json(['status' => 'ok', 'items' => $items]);
 }
 
 include template('gerenciar_moeda_index');

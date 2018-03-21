@@ -37,8 +37,8 @@ $composicoes = ZComposicao::getTodasDaComposicaoIDEx(
     0,
     $limite
 );
-$response = array('status' => 'ok');
-$_composicoes = array();
+$response = ['status' => 'ok'];
+$_composicoes = [];
 foreach ($composicoes as $composicao) {
     $composicao['imagemurl'] = get_image_url($composicao['imagemurl'], 'produto', null);
     $_composicoes[] = $composicao;

@@ -26,7 +26,7 @@ class ZSessao
     private $data_termino;
     private $aberta;
 
-    public function __construct($sessao = array())
+    public function __construct($sessao = [])
     {
         if (is_array($sessao)) {
             $this->setID(isset($sessao['id'])?$sessao['id']:null);
@@ -83,7 +83,7 @@ class ZSessao
 
     public function toArray()
     {
-        $sessao = array();
+        $sessao = [];
         $sessao['id'] = $this->getID();
         $sessao['datainicio'] = $this->getDataInicio();
         $sessao['datatermino'] = $this->getDataTermino();
@@ -94,14 +94,14 @@ class ZSessao
     public static function getPeloID($id)
     {
         $query = DB::$pdo->from('Sessoes')
-                         ->where(array('id' => $id));
+                         ->where(['id' => $id]);
         return new ZSessao($query->fetch());
     }
 
     public static function getPorAberta()
     {
         $query = DB::$pdo->from('Sessoes')
-                         ->where(array('aberta' => 'Y'))
+                         ->where(['aberta' => 'Y'])
                          ->limit(1);
         return new ZSessao($query->fetch());
     }
@@ -116,11 +116,11 @@ class ZSessao
 
     private static function validarCampos(&$sessao)
     {
-        $erros = array();
+        $erros = [];
         $sessao['datainicio'] = date('Y-m-d H:i:s');
         $sessao['datatermino'] = date('Y-m-d H:i:s');
         $sessao['aberta'] = strval($sessao['aberta']);
-        if (!in_array($sessao['aberta'], array('Y', 'N'))) {
+        if (!in_array($sessao['aberta'], ['Y', 'N'])) {
             $erros['aberta'] = 'A Aberta informado não é válida';
         }
         if (!empty($erros)) {
@@ -131,7 +131,7 @@ class ZSessao
     private static function handleException(&$e)
     {
         if (stripos($e->getMessage(), 'PRIMARY') !== false) {
-            throw new ValidationException(array('id' => 'O ID informado já está cadastrado'));
+            throw new ValidationException(['id' => 'O ID informado já está cadastrado']);
         }
     }
 
@@ -152,13 +152,13 @@ class ZSessao
     {
         $_sessao = $sessao->toArray();
         if (!$_sessao['id']) {
-            throw new ValidationException(array('id' => 'O id da sessao não foi informado'));
+            throw new ValidationException(['id' => 'O id da sessao não foi informado']);
         }
         self::validarCampos($_sessao);
-        $campos = array(
+        $campos = [
             'datatermino',
             'aberta',
-        );
+        ];
         try {
             $query = DB::$pdo->update('Sessoes');
             $query = $query->set(array_intersect_key($_sessao, array_flip($campos)));
@@ -184,7 +184,7 @@ class ZSessao
             $query = $query->limit($quantidade)->offset($inicio);
         }
         $_sessaos = $query->fetchAll();
-        $sessaos = array();
+        $sessaos = [];
         foreach ($_sessaos as $sessao) {
             $sessaos[] = new ZSessao($sessao);
         }

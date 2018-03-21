@@ -30,13 +30,13 @@ class BairroTest extends \PHPUnit_Framework_TestCase
     {
         $bairro = new Bairro();
         $values = $bairro->publish();
-        $allowed = array(
+        $allowed = [
             'id',
             'cidadeid',
             'nome',
             'valorentrega',
             'disponivel',
-        );
+        ];
         $this->assertEquals($allowed, array_keys($values));
     }
 }

@@ -29,7 +29,7 @@ if (is_null($funcao->getID())) {
     }
     redirect('/gerenciar/funcao/');
 }
-$errors = array();
+$errors = [];
 if (is_post()) {
     try {
         $permissao = ZPermissao::getPeloID($_POST['permissao']);
@@ -46,7 +46,7 @@ if (is_post()) {
             ZAcesso::excluir($acesso->getID());
         }
         if (is_output('json')) {
-            json(array('status' => 'ok'));
+            json(['status' => 'ok']);
         }
         redirect('/gerenciar/acesso/?funcao='.$funcao->getID());
     } catch (Exception $e) {
@@ -63,13 +63,13 @@ if (is_post()) {
 }
 $permissoes = ZPermissao::getTodas($_GET['query']);
 if (is_output('json')) {
-    $_permissoes = array();
+    $_permissoes = [];
     foreach ($permissoes as $permissao) {
         $_permissao = $permissao->toArray();
         $_acesso = ZAcesso::getPelaFuncaoIDPermissaoID($funcao->getID(), $permissao->getID());
         $_permissao['marcado'] = is_null($_acesso->getID())?'N':'Y';
         $_permissoes[] = $_permissao;
     }
-    json(array('status' => 'ok', 'items' => $_permissoes));
+    json(['status' => 'ok', 'items' => $_permissoes]);
 }
 include template('gerenciar_acesso_index');

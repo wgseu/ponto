@@ -28,7 +28,7 @@ if (is_null($setor->getID())) {
     redirect('/gerenciar/setor/');
 }
 $focusctrl = 'nome';
-$errors = array();
+$errors = [];
 $old_setor = $setor;
 if (is_post()) {
     $setor = new ZSetor($_POST);

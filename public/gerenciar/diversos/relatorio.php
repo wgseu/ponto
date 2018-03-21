@@ -15,14 +15,14 @@ if ($action == 'faturamento') {
         $end = strtotime('+3 month', $start);
     }
     $faturamentos = ZPagamento::getTodosFaturamentos(date('Y-m-d', $start), date('Y-m-d', $end));
-    $data = array();
+    $data = [];
     foreach ($faturamentos as $faturamento) {
-        $data[] = array('data' => strtotime($faturamento['data']), 'total' => $faturamento['total']);
+        $data[] = ['data' => strtotime($faturamento['data']), 'total' => $faturamento['total']];
     }
-    json(array(
+    json([
         'status' => 'ok',
         'faturamento' => $data,
-    ));
+    ]);
 } elseif ($action == 'meta') {
     $intervalo = strtolower($_GET['intervalo']);
     switch ($intervalo) {
@@ -54,9 +54,9 @@ if ($action == 'faturamento') {
     }
     $atual = ZPagamento::getFaturamento(null, $atual_de, $atual_ate);
     $base = ZPagamento::getFaturamento(null, $base_de, $base_ate);
-    json(array(
+    json([
         'status' => 'ok',
         'atual' => $atual,
         'base' => $base,
-    ));
+    ]);
 }

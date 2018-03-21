@@ -29,7 +29,7 @@ class ZOperacao
     private $descricao;
     private $detalhes;
 
-    public function __construct($operacao = array())
+    public function __construct($operacao = [])
     {
         $this->fromArray($operacao);
     }
@@ -88,7 +88,7 @@ class ZOperacao
 
     public function toArray()
     {
-        $operacao = array();
+        $operacao = [];
         $operacao['id'] = $this->getID();
         $operacao['codigo'] = $this->getCodigo();
         $operacao['descricao'] = $this->getDescricao();
@@ -96,7 +96,7 @@ class ZOperacao
         return $operacao;
     }
 
-    public function fromArray($operacao = array())
+    public function fromArray($operacao = [])
     {
         if (!is_array($operacao)) {
             return $this;
@@ -110,20 +110,20 @@ class ZOperacao
     public static function getPeloID($id)
     {
         $query = DB::$pdo->from('Operacoes')
-                         ->where(array('id' => $id));
+                         ->where(['id' => $id]);
         return new ZOperacao($query->fetch());
     }
 
     public static function getPeloCodigo($codigo)
     {
         $query = DB::$pdo->from('Operacoes')
-                         ->where(array('codigo' => $codigo));
+                         ->where(['codigo' => $codigo]);
         return new ZOperacao($query->fetch());
     }
 
     private static function validarCampos(&$operacao)
     {
-        $erros = array();
+        $erros = [];
         if (!is_numeric($operacao['codigo'])) {
             $erros['codigo'] = 'O código não foi informado';
         }
@@ -143,10 +143,10 @@ class ZOperacao
     private static function handleException(&$e)
     {
         if (stripos($e->getMessage(), 'PRIMARY') !== false) {
-            throw new ValidationException(array('id' => 'O id informado já está cadastrado'));
+            throw new ValidationException(['id' => 'O id informado já está cadastrado']);
         }
         if (stripos($e->getMessage(), 'Codigo_UNIQUE') !== false) {
-            throw new ValidationException(array('codigo' => 'O código informado já está cadastrado'));
+            throw new ValidationException(['codigo' => 'O código informado já está cadastrado']);
         }
     }
 
@@ -167,14 +167,14 @@ class ZOperacao
     {
         $_operacao = $operacao->toArray();
         if (!$_operacao['id']) {
-            throw new ValidationException(array('id' => 'O id da operacao não foi informado'));
+            throw new ValidationException(['id' => 'O id da operacao não foi informado']);
         }
         self::validarCampos($_operacao);
-        $campos = array(
+        $campos = [
             'codigo',
             'descricao',
             'detalhes',
-        );
+        ];
         try {
             $query = DB::$pdo->update('Operacoes');
             $query = $query->set(array_intersect_key($_operacao, array_flip($campos)));
@@ -193,7 +193,7 @@ class ZOperacao
             throw new Exception('Não foi possível excluir a operacao, o id da operacao não foi informado');
         }
         $query = DB::$pdo->deleteFrom('Operacoes')
-                         ->where(array('id' => $id));
+                         ->where(['id' => $id]);
         return $query->execute();
     }
 
@@ -210,7 +210,7 @@ class ZOperacao
             $query = $query->limit($quantidade)->offset($inicio);
         }
         $_operacaos = $query->fetchAll();
-        $operacaos = array();
+        $operacaos = [];
         foreach ($_operacaos as $operacao) {
             $operacaos[] = new ZOperacao($operacao);
         }

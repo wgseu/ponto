@@ -6,7 +6,7 @@ need_permission(PermissaoNome::ALTERARCONFIGURACOES);
 $fieldfocus = 'mapskey';
 $tab_avancado = 'active';
 
-$erro = array();
+$erro = [];
 $maps_api = get_string_config('Site', 'Maps.API');
 $dropbox_token = get_string_config('Sistema', 'Dropbox.AccessKey');
 if (is_post()) {

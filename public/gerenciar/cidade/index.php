@@ -38,16 +38,16 @@ list($pagesize, $offset, $pagestring) = pagestring($count, $limite);
 $cidades = Cidade::findAll($condition, $order, $pagesize, $offset);
 
 if (is_output('json')) {
-	$items = array();
+	$items = [];
 	foreach ($cidades as $cidade) {
 		$items[] = $cidade->publish();
 	}
-	json(array('status' => 'ok', 'items' => $items));
+	json(['status' => 'ok', 'items' => $items]);
 }
 
 $pais = \MZ\Location\Pais::findByID(isset($_GET['paisid'])?$_GET['paisid']:null);
 $estado = \MZ\Location\Estado::findByID(isset($_GET['estadoid'])?$_GET['estadoid']:null);
 $_paises = \MZ\Location\Pais::findAll();
-$_estados = \MZ\Location\Estado::findAll(array('paisid' => $pais->getID()));
+$_estados = \MZ\Location\Estado::findAll(['paisid' => $pais->getID()]);
 
 include template('gerenciar_cidade_index');

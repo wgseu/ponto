@@ -25,7 +25,7 @@ use MZ\Wallet\Banco;
 
 need_permission(PermissaoNome::CADASTROBANCOS);
 $focusctrl = 'numero';
-$errors = array();
+$errors = [];
 $banco = new Banco();
 $old_banco = $banco;
 if (is_post()) {

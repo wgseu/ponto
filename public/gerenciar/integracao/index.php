@@ -30,7 +30,7 @@ $limite = isset($_GET['limite'])?intval($_GET['limite']):10;
 if ($limite > 100 || $limite < 1) {
     $limite = 10;
 }
-$condition = array_intersect_key($_GET, array_flip(array('query')));
+$condition = array_intersect_key($_GET, array_flip(['query']));
 $condition = Filter::query($condition);
 $order = Filter::order(isset($_GET['ordem'])?$_GET['ordem']:'');
 $count = Integracao::count($condition);
@@ -38,11 +38,11 @@ list($pagesize, $offset, $pagestring) = pagestring($count, $limite);
 $integracoes = Integracao::findAll($condition, $order, $pagesize, $offset);
 
 if (is_output('json')) {
-    $items = array();
+    $items = [];
     foreach ($integracoes as $integracao) {
         $items[] = $integracao->publish();
     }
-    json(array('status' => 'ok', 'items' => $items));
+    json(['status' => 'ok', 'items' => $items]);
 }
 
 include template('gerenciar_integracao_index');

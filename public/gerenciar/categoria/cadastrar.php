@@ -23,7 +23,7 @@ require_once(dirname(__DIR__) . '/app.php');
 
 need_permission(PermissaoNome::CADASTROPRODUTOS);
 $focusctrl = 'descricao';
-$errors = array();
+$errors = [];
 if (is_post()) {
     $categoria = new ZCategoria($_POST);
     try {

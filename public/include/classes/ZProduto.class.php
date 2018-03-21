@@ -58,7 +58,7 @@ class ZProduto
     private $imagem;
     private $data_atualizacao;
 
-    public function __construct($produto = array())
+    public function __construct($produto = [])
     {
         $this->fromArray($produto);
     }
@@ -489,7 +489,7 @@ class ZProduto
 
     public function toArray()
     {
-        $produto = array();
+        $produto = [];
         $produto['id'] = $this->getID();
         $produto['codigobarras'] = $this->getCodigoBarras();
         $produto['categoriaid'] = $this->getCategoriaID();
@@ -517,7 +517,7 @@ class ZProduto
         return $produto;
     }
 
-    public function fromArray($produto = array())
+    public function fromArray($produto = [])
     {
         if (!is_array($produto)) {
             return $this;
@@ -589,19 +589,19 @@ class ZProduto
 
     public static function getPeloID($id)
     {
-        $query = self::initGet()->where(array('p.id' => $id));
+        $query = self::initGet()->where(['p.id' => $id]);
         return new ZProduto($query->fetch());
     }
 
     public static function getPelaDescricao($descricao)
     {
-        $query = self::initGet()->where(array('p.descricao' => $descricao));
+        $query = self::initGet()->where(['p.descricao' => $descricao]);
         return new ZProduto($query->fetch());
     }
 
     public static function getPeloCodigoBarras($codigo_barras)
     {
-        $query = self::initGet()->where(array('p.codigobarras' => $codigo_barras));
+        $query = self::initGet()->where(['p.codigobarras' => $codigo_barras]);
         return new ZProduto($query->fetch());
     }
 
@@ -610,7 +610,7 @@ class ZProduto
         $query = DB::$pdo->from('Produtos p')
                          ->select(null)
                          ->select('p.dataatualizacao')
-                         ->where(array('p.id' => $produto_id));
+                         ->where(['p.id' => $produto_id]);
         if (!$dataSomente) {
             $query = $query->select('p.imagem');
         }
@@ -619,7 +619,7 @@ class ZProduto
 
     private static function validarCampos(&$produto)
     {
-        $erros = array();
+        $erros = [];
         $produto['codigobarras'] = strip_tags(trim($produto['codigobarras']));
         if (strlen($produto['codigobarras']) == 0) {
             $produto['codigobarras'] = null;
@@ -702,37 +702,37 @@ class ZProduto
         $produto['tipo'] = trim($produto['tipo']);
         if (strlen($produto['tipo']) == 0) {
             $produto['tipo'] = null;
-        } elseif (!in_array($produto['tipo'], array('Produto', 'Composicao', 'Pacote'))) {
+        } elseif (!in_array($produto['tipo'], ['Produto', 'Composicao', 'Pacote'])) {
             $erros['tipo'] = 'O tipo informado não é válido';
         }
         if (
             $produto['tipo'] == ProdutoTipo::PACOTE &&
-            Pacote::count(array('produtoid' => $produto['id'])) > 0
+            Pacote::count(['produtoid' => $produto['id']]) > 0
         ) {
             $erros['tipo'] = 'O produto não pode ser um pacote pois já faz parte de um';
         }
         $produto['cobrarservico'] = trim($produto['cobrarservico']);
         if (strlen($produto['cobrarservico']) == 0) {
             $produto['cobrarservico'] = 'N';
-        } elseif (!in_array($produto['cobrarservico'], array('Y', 'N'))) {
+        } elseif (!in_array($produto['cobrarservico'], ['Y', 'N'])) {
             $erros['cobrarservico'] = 'A cobrança de serviço informada não é válida';
         }
         $produto['divisivel'] = trim($produto['divisivel']);
         if (strlen($produto['divisivel']) == 0) {
             $produto['divisivel'] = 'N';
-        } elseif (!in_array($produto['divisivel'], array('Y', 'N'))) {
+        } elseif (!in_array($produto['divisivel'], ['Y', 'N'])) {
             $erros['divisivel'] = 'O divisível informado não é válido';
         }
         $produto['pesavel'] = trim($produto['pesavel']);
         if (strlen($produto['pesavel']) == 0) {
             $produto['pesavel'] = 'N';
-        } elseif (!in_array($produto['pesavel'], array('Y', 'N'))) {
+        } elseif (!in_array($produto['pesavel'], ['Y', 'N'])) {
             $erros['pesavel'] = 'O pesável informado não é válido';
         }
         $produto['perecivel'] = trim($produto['perecivel']);
         if (strlen($produto['perecivel']) == 0) {
             $produto['perecivel'] = 'N';
-        } elseif (!in_array($produto['perecivel'], array('Y', 'N'))) {
+        } elseif (!in_array($produto['perecivel'], ['Y', 'N'])) {
             $erros['perecivel'] = 'O perecível informado não é válido';
         }
         if ($produto['tipo'] != ProdutoTipo::COMPOSICAO) {
@@ -749,7 +749,7 @@ class ZProduto
         $produto['visivel'] = trim($produto['visivel']);
         if (strlen($produto['visivel']) == 0) {
             $produto['visivel'] = 'N';
-        } elseif (!in_array($produto['visivel'], array('Y', 'N'))) {
+        } elseif (!in_array($produto['visivel'], ['Y', 'N'])) {
             $erros['visivel'] = 'O visível informado não é válido';
         }
         if ($produto['imagem'] === '') {
@@ -764,13 +764,13 @@ class ZProduto
     private static function handleException(&$e)
     {
         if (stripos($e->getMessage(), 'PRIMARY') !== false) {
-            throw new ValidationException(array('id' => 'O ID informado já está cadastrado'));
+            throw new ValidationException(['id' => 'O ID informado já está cadastrado']);
         }
         if (stripos($e->getMessage(), 'Descricao_UNIQUE') !== false) {
-            throw new ValidationException(array('descricao' => 'A descrição informada já está cadastrada'));
+            throw new ValidationException(['descricao' => 'A descrição informada já está cadastrada']);
         }
         if (stripos($e->getMessage(), 'CodBarras_UNIQUE') !== false) {
-            throw new ValidationException(array('codigobarras' => 'O código de barras informado já está cadastrado'));
+            throw new ValidationException(['codigobarras' => 'O código de barras informado já está cadastrado']);
         }
     }
 
@@ -791,10 +791,10 @@ class ZProduto
     {
         $_produto = $produto->toArray();
         if (!$_produto['id']) {
-            throw new ValidationException(array('id' => 'O id do produto não foi informado'));
+            throw new ValidationException(['id' => 'O id do produto não foi informado']);
         }
         self::validarCampos($_produto);
-        $campos = array(
+        $campos = [
             'codigobarras',
             'categoriaid',
             'unidadeid',
@@ -817,7 +817,7 @@ class ZProduto
             'tempopreparo',
             'visivel',
             'dataatualizacao',
-        );
+        ];
         if ($_produto['imagem'] !== true) {
             $campos[] = 'imagem';
         }
@@ -839,17 +839,17 @@ class ZProduto
             throw new Exception('Não foi possível excluir o produto, o id do produto não foi informado');
         }
         $query = DB::$pdo->deleteFrom('Produtos')
-                         ->where(array('id' => $id));
+                         ->where(['id' => $id]);
         return $query->execute();
     }
 
     public static function getTipoOptions($index = null)
     {
-        $tipos = array(
+        $tipos = [
             ProdutoTipo::PRODUTO => 'Produto',
             ProdutoTipo::COMPOSICAO => 'Composição',
             ProdutoTipo::PACOTE => 'Pacote',
-        );
+        ];
         if (in_array($index, $tipos)) {
             return $tipos[$index];
         }
@@ -960,7 +960,7 @@ class ZProduto
         if ($raw) {
             return $_produtos;
         }
-        $produtos = array();
+        $produtos = [];
         foreach ($_produtos as $produto) {
             $produtos[] = new ZProduto($produto);
         }

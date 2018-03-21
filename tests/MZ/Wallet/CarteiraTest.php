@@ -30,7 +30,7 @@ class CarteiraTest extends \PHPUnit_Framework_TestCase
     {
         $carteira = new Carteira();
         $values = $carteira->publish();
-        $allowed = array(
+        $allowed = [
             'id',
             'tipo',
             'bancoid',
@@ -38,7 +38,7 @@ class CarteiraTest extends \PHPUnit_Framework_TestCase
             'conta',
             'agencia',
             'ativa',
-        );
+        ];
         $this->assertEquals($allowed, array_keys($values));
     }
 }

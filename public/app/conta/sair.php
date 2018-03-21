@@ -22,4 +22,4 @@
 require_once(dirname(dirname(__DIR__)) . '/app.php');
 
 ZAutenticacao::logout();
-json(array('status' => 'ok', 'msg' => 'Logout efetuado com sucesso!'));
+json(['status' => 'ok', 'msg' => 'Logout efetuado com sucesso!']);

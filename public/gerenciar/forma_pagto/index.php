@@ -27,18 +27,18 @@ $count = ZFormaPagto::getCount($_GET['query'], $_GET['tipo'], $_GET['estado']);
 list($pagesize, $offset, $pagestring) = pagestring($count, 10);
 $formas_de_pagamento = ZFormaPagto::getTodos($_GET['query'], $_GET['tipo'], $_GET['estado'], $offset, $pagesize);
 
-$estados = array(
+$estados = [
     'Y' => 'Ativos',
     'N' => 'Inativos',
-);
+];
 
-$tipos = array(
+$tipos = [
     'Dinheiro' => 'Dinheiro',
     'Cartao' => 'Cartão',
     'Cheque' => 'Cheque',
     'Conta' => 'Conta',
     'Credito' => 'Crédito',
     'Transferencia' => 'Transferência',
-);
+];
 
 include template('gerenciar_forma_pagto_index');

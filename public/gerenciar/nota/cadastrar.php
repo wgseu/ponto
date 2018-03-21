@@ -1,7 +1,7 @@
 <?php
 require_once(dirname(__DIR__) . '/app.php');
 
-need_permission(array(PermissaoNome::PAGAMENTO, array('||'), PermissaoNome::SELECIONARCAIXA), is_output('json'));
+need_permission([PermissaoNome::PAGAMENTO, ['||'], PermissaoNome::SELECIONARCAIXA], is_output('json'));
 
 if (!is_post()) {
     json('Nenhum dado foi enviado');
@@ -48,12 +48,12 @@ try {
     } catch (Exception $e) {
         Log::error($e->getMessage());
     }
-    json('nota', array(
+    json('nota', [
         'id' => $nota->getID(),
         'pedido_id' => $nota->getPedidoID(),
         'notificado' => $notified,
         'adicionado' => $added
-    ));
+    ]);
 } catch (Exception $e) {
     Log::error($e->getMessage());
     json($e->getMessage());

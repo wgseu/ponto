@@ -39,7 +39,7 @@ if (is_post()) {
         $estado = \MZ\Location\Estado::findByID(isset($_POST['estadoid'])?$_POST['estadoid']:null);
         if (!$estado->exists()) {
             throw new \MZ\Exception\ValidationException(
-                array('estadoid' => 'O estado não foi informado ou não existe!')
+                ['estadoid' => 'O estado não foi informado ou não existe!']
             );
         }
         $cidade = \MZ\Location\Cidade::findOrInsert($estado->getID(), isset($_POST['cidade'])?$_POST['cidade']:null);
@@ -52,15 +52,15 @@ if (is_post()) {
             'Localização "%s" atualizada com sucesso!',
             $localizacao->getLogradouro()
         );
-        json(null, array('item' => $localizacao->publish(), 'msg' => $msg));
+        json(null, ['item' => $localizacao->publish(), 'msg' => $msg]);
     } catch (\Exception $e) {
         \DB::RollBack();
         $localizacao->clean($old_localizacao);
-        $errors = array();
+        $errors = [];
         if ($e instanceof \MZ\Exception\ValidationException) {
             $errors = $e->getErrors();
         }
-        json($e->getMessage(), null, array('errors' => $errors));
+        json($e->getMessage(), null, ['errors' => $errors]);
     }
 } else {
     json('Nenhum dado foi enviado');

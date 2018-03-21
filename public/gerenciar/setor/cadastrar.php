@@ -23,7 +23,7 @@ require_once(dirname(__DIR__) . '/app.php');
 
 need_permission(PermissaoNome::ESTOQUE);
 $focusctrl = 'nome';
-$errors = array();
+$errors = [];
 if (is_post()) {
     $setor = new ZSetor($_POST);
     try {

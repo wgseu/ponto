@@ -14,7 +14,7 @@ class Pager
     public $pageString = 'page';
 
     private $script = null;
-    private $valueArray = array();
+    private $valueArray = [];
 
     public function __construct($count = 0, $size = 20, $string = 'page')
     {
@@ -49,9 +49,9 @@ class Pager
             $script = substr($script_uri, 0, $q_pos);
         } else {
             $script = $script_uri;
-            $valueArray = array();
+            $valueArray = [];
         }
-        $this->valueArray = empty($valueArray) ? array() : $valueArray;
+        $this->valueArray = empty($valueArray) ? [] : $valueArray;
         $this->script = $script;
     }
 
@@ -66,7 +66,7 @@ class Pager
         $max = $this->pageCount;
         $total = $this->rowCount;
 
-        return array(
+        return [
             'offset' => $this->offset,
             'from' => $from,
             'to' => $to,
@@ -74,7 +74,7 @@ class Pager
             'no' => $no,
             'max' => $max,
             'total' => $total,
-        );
+        ];
     }
 
     public function GenBasic()

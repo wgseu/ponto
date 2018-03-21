@@ -30,12 +30,12 @@ class CidadeTest extends \PHPUnit_Framework_TestCase
     {
         $cidade = new Cidade();
         $values = $cidade->publish();
-        $allowed = array(
+        $allowed = [
             'id',
             'estadoid',
             'nome',
             'cep',
-        );
+        ];
         $this->assertEquals($allowed, array_keys($values));
     }
 }

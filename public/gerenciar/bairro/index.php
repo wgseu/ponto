@@ -38,11 +38,11 @@ list($pagesize, $offset, $pagestring) = pagestring($count, $limite);
 $bairros = Bairro::findAll($condition, $order, $pagesize, $offset);
 
 if (is_output('json')) {
-	$items = array();
+	$items = [];
 	foreach ($bairros as $bairro) {
 		$items[] = $bairro->publish();
 	}
-	json(array('status' => 'ok', 'items' => $items));
+	json(['status' => 'ok', 'items' => $items]);
 }
 
 $pais = \MZ\Location\Pais::findByID(isset($_GET['paisid'])?$_GET['paisid']:null);
@@ -50,6 +50,6 @@ $estado = \MZ\Location\Estado::findByID(isset($_GET['estadoid'])?$_GET['estadoid
 $cidade = \MZ\Location\Cidade::findByID(isset($_GET['cidadeid'])?$_GET['cidadeid']:null);
 
 $_paises = \MZ\Location\Pais::findAll();
-$_estados = \MZ\Location\Estado::findAll(array('paisid' => $pais->getID()));
+$_estados = \MZ\Location\Estado::findAll(['paisid' => $pais->getID()]);
 
 include template('gerenciar_bairro_index');

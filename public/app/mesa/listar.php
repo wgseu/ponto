@@ -33,8 +33,8 @@ if (!isset($_GET['ordenar']) && $_GET['ordenar'] != 'mesa') {
     $funcionario_id = $login_funcionario_id;
 }
 $mesas = ZMesa::getTodas($funcionario_id);
-$response = array('status' => 'ok');
-$mesas_array = array();
+$response = ['status' => 'ok'];
+$mesas_array = [];
 foreach ($mesas as $mesa) {
     $mesas_array[] = $mesa->toArray();
 }

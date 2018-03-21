@@ -25,7 +25,7 @@ use MZ\Wallet\Carteira;
 
 need_permission(PermissaoNome::CADASTROFORMASPAGTO);
 $focusctrl = 'descricao';
-$errors = array();
+$errors = [];
 if (is_post()) {
     $forma_pagto = new ZFormaPagto($_POST);
     try {

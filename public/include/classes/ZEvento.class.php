@@ -46,7 +46,7 @@ class ZEvento
     private $codigo;
     private $data_criacao;
 
-    public function __construct($evento = array())
+    public function __construct($evento = [])
     {
         $this->fromArray($evento);
     }
@@ -131,7 +131,7 @@ class ZEvento
 
     public function toArray()
     {
-        $evento = array();
+        $evento = [];
         $evento['id'] = $this->getID();
         $evento['notaid'] = $this->getNotaID();
         $evento['estado'] = $this->getEstado();
@@ -141,7 +141,7 @@ class ZEvento
         return $evento;
     }
 
-    public function fromArray($evento = array())
+    public function fromArray($evento = [])
     {
         if (!is_array($evento)) {
             return $this;
@@ -157,18 +157,18 @@ class ZEvento
     public static function getPeloID($id)
     {
         $query = DB::$pdo->from('Eventos')
-                         ->where(array('id' => $id));
+                         ->where(['id' => $id]);
         return new ZEvento($query->fetch());
     }
 
     private static function validarCampos(&$evento)
     {
-        $erros = array();
+        $erros = [];
         if (!is_numeric($evento['notaid'])) {
             $erros['notaid'] = 'A nota não foi informada';
         }
         $evento['estado'] = strval($evento['estado']);
-        if (!in_array($evento['estado'], array('Aberto', 'Assinado', 'Validado', 'Pendente', 'Processamento', 'Denegado', 'Cancelado', 'Rejeitado', 'Contingencia', 'Inutilizado', 'Autorizado'))) {
+        if (!in_array($evento['estado'], ['Aberto', 'Assinado', 'Validado', 'Pendente', 'Processamento', 'Denegado', 'Cancelado', 'Rejeitado', 'Contingencia', 'Inutilizado', 'Autorizado'])) {
             $erros['estado'] = 'O estado informado não é válido';
         }
         $evento['mensagem'] = strip_tags(trim($evento['mensagem']));
@@ -188,7 +188,7 @@ class ZEvento
     private static function handleException(&$e)
     {
         if (stripos($e->getMessage(), 'PRIMARY') !== false) {
-            throw new ValidationException(array('id' => 'O id informado já está cadastrado'));
+            throw new ValidationException(['id' => 'O id informado já está cadastrado']);
         }
     }
 
@@ -209,15 +209,15 @@ class ZEvento
     {
         $_evento = $evento->toArray();
         if (!$_evento['id']) {
-            throw new ValidationException(array('id' => 'O id do evento não foi informado'));
+            throw new ValidationException(['id' => 'O id do evento não foi informado']);
         }
         self::validarCampos($_evento);
-        $campos = array(
+        $campos = [
             'notaid',
             'estado',
             'mensagem',
             'codigo',
-        );
+        ];
         try {
             $query = DB::$pdo->update('Eventos');
             $query = $query->set(array_intersect_key($_evento, array_flip($campos)));
@@ -236,7 +236,7 @@ class ZEvento
             throw new Exception('Não foi possível excluir o evento, o id do evento não foi informado');
         }
         $query = DB::$pdo->deleteFrom('Eventos')
-                         ->where(array('id' => $id));
+                         ->where(['id' => $id]);
         return $query->execute();
     }
 
@@ -266,7 +266,7 @@ class ZEvento
             $query = $query->limit($quantidade)->offset($inicio);
         }
         $_eventos = $query->fetchAll();
-        $eventos = array();
+        $eventos = [];
         foreach ($_eventos as $evento) {
             $eventos[] = new ZEvento($evento);
         }
@@ -282,7 +282,7 @@ class ZEvento
     private static function initSearchDaNotaID($nota_id)
     {
         return   DB::$pdo->from('Eventos')
-                         ->where(array('notaid' => $nota_id))
+                         ->where(['notaid' => $nota_id])
                          ->orderBy('id ASC');
     }
 
@@ -293,7 +293,7 @@ class ZEvento
             $query = $query->limit($quantidade)->offset($inicio);
         }
         $_eventos = $query->fetchAll();
-        $eventos = array();
+        $eventos = [];
         foreach ($_eventos as $evento) {
             $eventos[] = new ZEvento($evento);
         }

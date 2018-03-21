@@ -28,7 +28,7 @@ if (is_null($credito->getID())) {
     redirect('/gerenciar/credito/');
 }
 $focusctrl = 'detalhes';
-$errors = array();
+$errors = [];
 $old_credito = $credito;
 if (is_post()) {
     $credito = new ZCredito($_POST);

@@ -58,7 +58,7 @@ class Bairro extends \MZ\Database\Helper
      * Constructor for a new empty instance of Bairro
      * @param array $bairro All field and values to fill the instance
      */
-    public function __construct($bairro = array())
+    public function __construct($bairro = [])
     {
         parent::__construct($bairro);
     }
@@ -193,12 +193,12 @@ class Bairro extends \MZ\Database\Helper
      * @param  mixed $bairro Associated key -> value to assign into this instance
      * @return Bairro Self instance
      */
-    public function fromArray($bairro = array())
+    public function fromArray($bairro = [])
     {
         if ($bairro instanceof Bairro) {
             $bairro = $bairro->toArray();
         } elseif (!is_array($bairro)) {
-            $bairro = array();
+            $bairro = [];
         }
         parent::fromArray($bairro);
         if (!isset($bairro['id'])) {
@@ -265,7 +265,7 @@ class Bairro extends \MZ\Database\Helper
      */
     public function validate()
     {
-        $errors = array();
+        $errors = [];
         if (is_null($this->getCidadeID())) {
             $errors['cidadeid'] = 'A cidade não pode ser vazia';
         }
@@ -297,24 +297,24 @@ class Bairro extends \MZ\Database\Helper
     protected function translate($e)
     {
         if (stripos($e->getMessage(), 'PRIMARY') !== false) {
-            return new \MZ\Exception\ValidationException(array(
+            return new \MZ\Exception\ValidationException([
                 'id' => vsprintf(
                     'O ID "%s" já está cadastrado',
-                    array($this->getID())
+                    [$this->getID()]
                 ),
-            ));
+            ]);
         }
         if (stripos($e->getMessage(), 'CidadeID_Nome_UNIQUE') !== false) {
-            return new \MZ\Exception\ValidationException(array(
+            return new \MZ\Exception\ValidationException([
                 'cidadeid' => vsprintf(
                     'A cidade "%s" já está cadastrada',
-                    array($this->getCidadeID())
+                    [$this->getCidadeID()]
                 ),
                 'nome' => vsprintf(
                     'O nome "%s" já está cadastrado',
-                    array($this->getNome())
+                    [$this->getNome()]
                 ),
-            ));
+            ]);
         }
         return parent::translate($e);
     }
@@ -326,9 +326,9 @@ class Bairro extends \MZ\Database\Helper
      */
     public static function findByID($id)
     {
-        return self::find(array(
+        return self::find([
             'id' => intval($id),
-        ));
+        ]);
     }
 
     /**
@@ -339,10 +339,10 @@ class Bairro extends \MZ\Database\Helper
      */
     public static function findByCidadeIDNome($cidade_id, $nome)
     {
-        return self::find(array(
+        return self::find([
             'cidadeid' => intval($cidade_id),
             'nome' => strval($nome),
-        ));
+        ]);
     }
 
     /**
@@ -391,7 +391,7 @@ class Bairro extends \MZ\Database\Helper
     private static function filterOrder($order)
     {
         $allowed = self::getAllowedKeys();
-        return Filter::orderBy($order, $allowed, array('b.', 'c.', 'e.'));
+        return Filter::orderBy($order, $allowed, ['b.', 'c.', 'e.']);
     }
 
     /**
@@ -409,7 +409,7 @@ class Bairro extends \MZ\Database\Helper
             $allowed[$field] = true;
             unset($condition['search']);
         }
-        return Filter::keys($condition, $allowed, array('b.', 'c.', 'e.'));
+        return Filter::keys($condition, $allowed, ['b.', 'c.', 'e.']);
     }
 
     /**
@@ -418,7 +418,7 @@ class Bairro extends \MZ\Database\Helper
      * @param  array $order order rows
      * @return SelectQuery query object with condition statement
      */
-    private static function query($condition = array(), $order = array())
+    private static function query($condition = [], $order = [])
     {
         $query = self::getDB()->from('Bairros b')
             ->leftJoin('Cidades c ON c.id = b.cidadeid')
@@ -436,12 +436,12 @@ class Bairro extends \MZ\Database\Helper
      * @param  array $order order rows
      * @return Bairro A filled Bairro or empty instance
      */
-    public static function find($condition, $order = array())
+    public static function find($condition, $order = [])
     {
         $query = self::query($condition, $order)->limit(1);
         $row = $query->fetch();
         if ($row === false) {
-            $row = array();
+            $row = [];
         }
         return new Bairro($row);
     }
@@ -453,7 +453,7 @@ class Bairro extends \MZ\Database\Helper
      * @param  integer $offset start index to get rows, null for begining
      * @return array All rows instanced and filled
      */
-    public static function findAll($condition = array(), $order = array(), $limit = null, $offset = null)
+    public static function findAll($condition = [], $order = [], $limit = null, $offset = null)
     {
         $query = self::query($condition, $order);
         if (!is_null($limit)) {
@@ -463,7 +463,7 @@ class Bairro extends \MZ\Database\Helper
             $query = $query->offset($offset);
         }
         $rows = $query->fetchAll();
-        $result = array();
+        $result = [];
         foreach ($rows as $row) {
             $result[] = new Bairro($row);
         }
@@ -546,7 +546,7 @@ class Bairro extends \MZ\Database\Helper
      * @param  array $condition condition to filter rows
      * @return integer Quantity of rows
      */
-    public static function count($condition = array())
+    public static function count($condition = [])
     {
         $query = self::query($condition);
         return $query->count();

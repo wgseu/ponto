@@ -35,7 +35,7 @@ if (!$integracao->exists()) {
     redirect('/gerenciar/integracao/');
 }
 $focusctrl = 'nome';
-$errors = array();
+$errors = [];
 $old_integracao = $integracao;
 if (is_post()) {
     $integracao = new Integracao($_POST);
@@ -49,7 +49,7 @@ if (is_post()) {
             $integracao->getNome()
         );
         if (is_output('json')) {
-            json(null, array('item' => $integracao->publish(), 'msg' => $msg));
+            json(null, ['item' => $integracao->publish(), 'msg' => $msg]);
         }
         \Thunder::success($msg, true);
         redirect('/gerenciar/integracao/');
@@ -59,7 +59,7 @@ if (is_post()) {
             $errors = $e->getErrors();
         }
         if (is_output('json')) {
-            json($e->getMessage(), null, array('errors' => $errors));
+            json($e->getMessage(), null, ['errors' => $errors]);
         }
         \Thunder::error($e->getMessage());
         foreach ($errors as $key => $value) {

@@ -35,8 +35,8 @@ if (!is_null($_GET['comanda'])) {
     $tipo = PedidoTipo::COMANDA;
 }
 $pedidos = ZProdutoPedido::getTodosDoLocal($tipo, $_GET['mesa'], $_GET['comanda']);
-$response = array('status' => 'ok');
-$campos = array(
+$response = ['status' => 'ok'];
+$campos = [
             'id',
             'produtopedidoid',
             'tipo',
@@ -56,8 +56,8 @@ $campos = array(
             'imagemurl',
             'produtodataatualizacao',
             'datahora',
-        );
-$_pedidos = array();
+        ];
+$_pedidos = [];
 foreach ($pedidos as $pedido) {
     $_pedido = array_intersect_key($pedido, array_flip($campos));
     $_pedido['imagemurl'] = get_image_url($_pedido['imagemurl'], 'produto', null);

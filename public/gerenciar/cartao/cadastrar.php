@@ -25,7 +25,7 @@ use MZ\Wallet\Carteira;
 
 need_permission(PermissaoNome::CADASTROCARTOES);
 $focusctrl = 'descricao';
-$errors = array();
+$errors = [];
 if (is_post()) {
     $cartao = new ZCartao($_POST);
     try {

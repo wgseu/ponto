@@ -21,7 +21,7 @@
 */
 require_once(dirname(__DIR__) . '/app.php');
 
-need_permission(array(PermissaoNome::ESTOQUE, PermissaoNome::RETIRARDOESTOQUE), is_output('json'));
+need_permission([PermissaoNome::ESTOQUE, PermissaoNome::RETIRARDOESTOQUE], is_output('json'));
 $id = $_GET['id'];
 $estoque = ZEstoque::getPeloID($id);
 if (is_null($estoque->getID())) {

@@ -32,8 +32,8 @@ if ($_GET['primeiro'] || check_fone($_GET['busca'], true)) {
     $limit = 20;
 }
 $fornecedores = ZFornecedor::getTodos($_GET['busca'], 0, $limit);
-$response = array('status' => 'ok');
-$campos = array(
+$response = ['status' => 'ok'];
+$campos = [
             'id',
             'nome',
             'fone1',
@@ -41,8 +41,8 @@ $campos = array(
             'email',
             'prazopagamento',
             'imagemurl',
-        );
-$_fornecedores = array();
+        ];
+$_fornecedores = [];
 $domask = intval($_GET['format']) != 0;
 foreach ($fornecedores as $fornecedor) {
     $_fornecedor = $fornecedor->toArray();

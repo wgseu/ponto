@@ -30,7 +30,7 @@ if (is_null($banco->getID())) {
     redirect('/gerenciar/banco/');
 }
 $focusctrl = 'razaosocial';
-$errors = array();
+$errors = [];
 $old_banco = $banco;
 if (is_post()) {
     $banco = new Banco($_POST);

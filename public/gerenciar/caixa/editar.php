@@ -28,7 +28,7 @@ if (is_null($caixa->getID())) {
     redirect('/gerenciar/caixa/');
 }
 $focusctrl = 'descricao';
-$errors = array();
+$errors = [];
 $old_caixa = $caixa;
 if (is_post()) {
     $caixa = new ZCaixa($_POST);

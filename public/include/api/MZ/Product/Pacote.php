@@ -86,7 +86,7 @@ class Pacote extends \MZ\Database\Helper
      * Constructor for a new empty instance of Pacote
      * @param array $pacote All field and values to fill the instance
      */
-    public function __construct($pacote = array())
+    public function __construct($pacote = [])
     {
         parent::__construct($pacote);
     }
@@ -361,12 +361,12 @@ class Pacote extends \MZ\Database\Helper
      * @param  mixed $pacote Associated key -> value to assign into this instance
      * @return Pacote Self instance
      */
-    public function fromArray($pacote = array())
+    public function fromArray($pacote = [])
     {
         if ($pacote instanceof Pacote) {
             $pacote = $pacote->toArray();
         } elseif (!is_array($pacote)) {
-            $pacote = array();
+            $pacote = [];
         }
         parent::fromArray($pacote);
         if (!isset($pacote['id'])) {
@@ -468,7 +468,7 @@ class Pacote extends \MZ\Database\Helper
      */
     public function validate()
     {
-        $errors = array();
+        $errors = [];
         if (is_null($this->getPacoteID())) {
             $errors['pacoteid'] = 'O Pacote não pode ser vazio';
         }
@@ -504,12 +504,12 @@ class Pacote extends \MZ\Database\Helper
     protected function translate($e)
     {
         if (stripos($e->getMessage(), 'PRIMARY') !== false) {
-            return new \MZ\Exception\ValidationException(array(
+            return new \MZ\Exception\ValidationException([
                 'id' => vsprintf(
                     'O ID "%s" já está cadastrado',
-                    array($this->getID())
+                    [$this->getID()]
                 ),
-            ));
+            ]);
         }
         return parent::translate($e);
     }
@@ -521,9 +521,9 @@ class Pacote extends \MZ\Database\Helper
      */
     public static function findByID($id)
     {
-        return self::find(array(
+        return self::find([
             'id' => intval($id),
-        ));
+        ]);
     }
 
     /**
@@ -580,7 +580,7 @@ class Pacote extends \MZ\Database\Helper
      * @param  array $order order rows
      * @return SelectQuery query object with condition statement
      */
-    private static function query($condition = array(), $order = array())
+    private static function query($condition = [], $order = [])
     {
         $query = self::getDB()->from('Pacotes');
         $condition = self::filterCondition($condition);
@@ -593,7 +593,7 @@ class Pacote extends \MZ\Database\Helper
      * @param  array $condition condition to filter rows
      * @return SelectQuery query object with condition statement
      */
-    private static function queryEx($condition = array(), $order = array())
+    private static function queryEx($condition = [], $order = [])
     {
         $query = self::getDB()->from('Pacotes pc')
             ->leftJoin('Produtos p ON p.id = pc.produtoid')
@@ -638,12 +638,12 @@ class Pacote extends \MZ\Database\Helper
      * @param  array $order order rows
      * @return Pacote A filled Pacote or empty instance
      */
-    public static function find($condition, $order = array())
+    public static function find($condition, $order = [])
     {
         $query = self::query($condition, $order)->limit(1);
         $row = $query->fetch();
         if ($row === false) {
-            $row = array();
+            $row = [];
         }
         return new Pacote($row);
     }
@@ -655,7 +655,7 @@ class Pacote extends \MZ\Database\Helper
      * @param  integer $offset start index to get rows, null for begining
      * @return array All rows instanced and filled
      */
-    public static function findAll($condition = array(), $order = array(), $limit = null, $offset = null)
+    public static function findAll($condition = [], $order = [], $limit = null, $offset = null)
     {
         $query = self::query($condition, $order);
         if (!is_null($limit)) {
@@ -665,7 +665,7 @@ class Pacote extends \MZ\Database\Helper
             $query = $query->offset($offset);
         }
         $rows = $query->fetchAll();
-        $result = array();
+        $result = [];
         foreach ($rows as $row) {
             $result[] = new Pacote($row);
         }
@@ -679,7 +679,7 @@ class Pacote extends \MZ\Database\Helper
      * @param  integer $offset start index to get rows, null for begining
      * @return array All rows instanced and filled
      */
-    public static function rawFindAll($condition = array(), $order = array(), $limit = null, $offset = null)
+    public static function rawFindAll($condition = [], $order = [], $limit = null, $offset = null)
     {
         $query = self::queryEx($condition, $order);
         if (!is_null($limit)) {
@@ -767,7 +767,7 @@ class Pacote extends \MZ\Database\Helper
      * @param  array $condition condition to filter rows
      * @return integer Quantity of rows
      */
-    public static function count($condition = array())
+    public static function count($condition = [])
     {
         $query = self::query($condition);
         return $query->count();

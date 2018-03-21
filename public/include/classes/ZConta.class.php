@@ -22,7 +22,7 @@ class ZConta
     private $data_pagamento;
     private $data_cadastro;
 
-    public function __construct($conta = array())
+    public function __construct($conta = [])
     {
         if (is_array($conta)) {
             $this->setID(isset($conta['id'])?$conta['id']:null);
@@ -266,14 +266,14 @@ class ZConta
             return $this->getAcrescimo();
         }
         if (!is_numeric($this->getID())) {
-            $info = array(
+            $info = [
                 'quantidade' => 0,
                 'despesas' => 0,
                 'receitas' => 0,
                 'pago' => 0,
                 'recebido' => 0,
                 'datapagto' => null,
-            );
+            ];
         } else {
             $info = self::getTotalAbertas($this->getID());
         }
@@ -304,7 +304,7 @@ class ZConta
 
     public function toArray()
     {
-        $conta = array();
+        $conta = [];
         $conta['id'] = $this->getID();
         $conta['classificacaoid'] = $this->getClassificacaoID();
         $conta['funcionarioid'] = $this->getFuncionarioID();
@@ -330,7 +330,7 @@ class ZConta
     public static function getPeloID($id)
     {
         $query = DB::$pdo->from('Contas')
-                         ->where(array('id' => $id));
+                         ->where(['id' => $id]);
         return new ZConta($query->fetch());
     }
 
@@ -356,7 +356,7 @@ class ZConta
         }
         $db = DB::$pdo->getPdo();
         $sql = '';
-        $data = array();
+        $data = [];
         $descricao = trim($descricao);
         if (is_numeric($descricao)) {
             $sql .= 'AND c.id = :codigo ';
@@ -398,19 +398,19 @@ class ZConta
                                 'HAVING (ABS(valor + acrescimo) - ABS(pago + recebido)) >= 0.005) a');
         $stmt->execute($data);
         $info = $stmt->fetch();
-        return array(
+        return [
             'quantidade' => $info['quantidade'] + 0,
             'despesas' => $info['despesas'] + 0,
             'receitas' => $info['receitas'] + 0,
             'pago' => $info['pago'] + 0,
             'recebido' => $info['recebido'] + 0,
             'datapagto' => $info['datapagto'],
-        );
+        ];
     }
 
     private static function validarCampos(&$conta)
     {
-        $erros = array();
+        $erros = [];
         if (!is_numeric($conta['classificacaoid'])) {
             $erros['classificacaoid'] = 'A classificação não foi informada';
         }
@@ -475,7 +475,7 @@ class ZConta
         $conta['autoacrescimo'] = trim($conta['autoacrescimo']);
         if (strlen($conta['autoacrescimo']) == 0) {
             $conta['autoacrescimo'] = 'N';
-        } elseif (!in_array($conta['autoacrescimo'], array('Y', 'N'))) {
+        } elseif (!in_array($conta['autoacrescimo'], ['Y', 'N'])) {
             $erros['autoacrescimo'] = 'O acréscimo automático informado não é válido';
         }
         $conta['vencimento'] = strval($conta['vencimento']);
@@ -511,7 +511,7 @@ class ZConta
         $conta['cancelada'] = trim($conta['cancelada']);
         if (strlen($conta['cancelada']) == 0) {
             $conta['cancelada'] = 'N';
-        } elseif (!in_array($conta['cancelada'], array('Y', 'N'))) {
+        } elseif (!in_array($conta['cancelada'], ['Y', 'N'])) {
             $erros['cancelada'] = 'O cancelamento informada não é válido';
         }
         $conta['datapagamento'] = strval($conta['datapagamento']);
@@ -555,12 +555,12 @@ class ZConta
                         'utilizado %s de %s';
                     throw new \Exception(vsprintf(
                         $msg,
-                        array(
+                        [
                             $cliente->getNomeCompleto(),
                             \MZ\Util\Mask::money($restante, true),
                             \MZ\Util\Mask::money($utilizado, true),
                             \MZ\Util\Mask::money($cliente->getLimiteCompra(), true)
-                        )
+                        ]
                     ));
                 }
             }
@@ -573,7 +573,7 @@ class ZConta
     private static function handleException(&$e)
     {
         if (stripos($e->getMessage(), 'PRIMARY') !== false) {
-            throw new ValidationException(array('id' => 'O ID informado já está cadastrado'));
+            throw new ValidationException(['id' => 'O ID informado já está cadastrado']);
         }
     }
 
@@ -594,13 +594,13 @@ class ZConta
     {
         $_conta = $conta->toArray();
         if (!$_conta['id']) {
-            throw new ValidationException(array('id' => 'O id da conta não foi informado'));
+            throw new ValidationException(['id' => 'O id da conta não foi informado']);
         }
         if ($_conta['id'] == 1) {
             throw new Exception('Não é possível atualizar essa conta, a conta informada é utilizada internamente pelo sistema');
         }
         self::validarCampos($_conta);
-        $campos = array(
+        $campos = [
             'classificacaoid',
             'funcionarioid',
             'subclassificacaoid',
@@ -618,7 +618,7 @@ class ZConta
             'anexocaminho',
             'cancelada',
             'datapagamento',
-        );
+        ];
         try {
             $query = DB::$pdo->update('Contas');
             $query = $query->set(array_intersect_key($_conta, array_flip($campos)));
@@ -640,7 +640,7 @@ class ZConta
             throw new Exception('Não é possível excluir essa conta, a conta informada é utilizada internamente pelo sistema');
         }
         $query = DB::$pdo->deleteFrom('Contas')
-                         ->where(array('id' => $id));
+                         ->where(['id' => $id]);
         return $query->execute();
     }
 
@@ -672,7 +672,7 @@ class ZConta
             $query = $query->limit($quantidade)->offset($inicio);
         }
         $_contas = $query->fetchAll();
-        $contas = array();
+        $contas = [];
         foreach ($_contas as $conta) {
             $contas[] = new ZConta($conta);
         }
@@ -688,7 +688,7 @@ class ZConta
     private static function initSearchDoClienteID($cliente_id)
     {
         return   DB::$pdo->from('Contas')
-                         ->where(array('clienteid' => $cliente_id))
+                         ->where(['clienteid' => $cliente_id])
                          ->orderBy('id ASC');
     }
 
@@ -699,7 +699,7 @@ class ZConta
             $query = $query->limit($quantidade)->offset($inicio);
         }
         $_contas = $query->fetchAll();
-        $contas = array();
+        $contas = [];
         foreach ($_contas as $conta) {
             $contas[] = new ZConta($conta);
         }
@@ -715,7 +715,7 @@ class ZConta
     private static function initSearchDoFuncionarioID($funcionario_id)
     {
         return   DB::$pdo->from('Contas')
-                         ->where(array('funcionarioid' => $funcionario_id))
+                         ->where(['funcionarioid' => $funcionario_id])
                          ->orderBy('id ASC');
     }
 
@@ -726,7 +726,7 @@ class ZConta
             $query = $query->limit($quantidade)->offset($inicio);
         }
         $_contas = $query->fetchAll();
-        $contas = array();
+        $contas = [];
         foreach ($_contas as $conta) {
             $contas[] = new ZConta($conta);
         }
@@ -742,7 +742,7 @@ class ZConta
     private static function initSearchDoPedidoID($pedido_id)
     {
         return   DB::$pdo->from('Contas')
-                         ->where(array('pedidoid' => $pedido_id))
+                         ->where(['pedidoid' => $pedido_id])
                          ->orderBy('id ASC');
     }
 
@@ -753,7 +753,7 @@ class ZConta
             $query = $query->limit($quantidade)->offset($inicio);
         }
         $_contas = $query->fetchAll();
-        $contas = array();
+        $contas = [];
         foreach ($_contas as $conta) {
             $contas[] = new ZConta($conta);
         }
@@ -769,7 +769,7 @@ class ZConta
     private static function initSearchDaClassificacaoID($classificacao_id)
     {
         return   DB::$pdo->from('Contas')
-                         ->where(array('classificacaoid' => $classificacao_id))
+                         ->where(['classificacaoid' => $classificacao_id])
                          ->orderBy('id ASC');
     }
 
@@ -780,7 +780,7 @@ class ZConta
             $query = $query->limit($quantidade)->offset($inicio);
         }
         $_contas = $query->fetchAll();
-        $contas = array();
+        $contas = [];
         foreach ($_contas as $conta) {
             $contas[] = new ZConta($conta);
         }
@@ -796,7 +796,7 @@ class ZConta
     private static function initSearchDaSubClassificacaoID($sub_classificacao_id)
     {
         return   DB::$pdo->from('Contas')
-                         ->where(array('subclassificacaoid' => $sub_classificacao_id))
+                         ->where(['subclassificacaoid' => $sub_classificacao_id])
                          ->orderBy('id ASC');
     }
 
@@ -807,7 +807,7 @@ class ZConta
             $query = $query->limit($quantidade)->offset($inicio);
         }
         $_contas = $query->fetchAll();
-        $contas = array();
+        $contas = [];
         foreach ($_contas as $conta) {
             $contas[] = new ZConta($conta);
         }

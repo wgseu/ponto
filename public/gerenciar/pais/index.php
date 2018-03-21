@@ -38,11 +38,11 @@ list($pagesize, $offset, $pagestring) = pagestring($count, $limite);
 $paises = Pais::findAll($condition, $order, $pagesize, $offset);
 
 if (is_output('json')) {
-	$items = array();
+	$items = [];
 	foreach ($paises as $pais) {
 		$items[] = $pais->publish();
 	}
-	json(array('status' => 'ok', 'items' => $items));
+	json(['status' => 'ok', 'items' => $items]);
 }
 
 $moedas = \MZ\Wallet\Moeda::findAll();

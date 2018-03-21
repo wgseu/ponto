@@ -23,14 +23,14 @@ require_once(dirname(__DIR__) . '/app.php');
 
 need_permission(PermissaoNome::CADASTROCLIENTES, is_output('json'));
 $focusctrl = 'tipo';
-$errors = array();
+$errors = [];
 if (is_post()) {
     $cliente = new ZCliente($_POST);
     try {
         DB::BeginTransaction();
         $cliente->setID(null);
         if (intval($_GET['sistema']) == 1 && $cliente->getTipo() != ClienteTipo::JURIDICA) {
-            throw new ValidationException(array('tipo' => 'O tipo da empresa deve ser jurídica'));
+            throw new ValidationException(['tipo' => 'O tipo da empresa deve ser jurídica']);
         }
         if (intval($_GET['sistema']) == 1 && !is_null($__sistema__->getEmpresaID())) {
             throw new Exception('Você deve alterar a empresa "' . $__empresa__->getNomeCompleto() . '" em vez de cadastrar uma nova');
@@ -60,7 +60,7 @@ if (is_post()) {
         $cliente = ZCliente::cadastrar($cliente);
         if (intval($_GET['sistema']) == 1) {
             $__sistema__->setEmpresaID($cliente->getID());
-            $__sistema__ = ZSistema::atualizar($__sistema__, array('empresaid'));
+            $__sistema__ = ZSistema::atualizar($__sistema__, ['empresaid']);
 
             try {
                 $appsync = new AppSync();
@@ -73,7 +73,7 @@ if (is_post()) {
         DB::Commit();
         $msg = 'Cliente "'.$cliente->getNomeCompleto().'" cadastrado com sucesso!';
         if (is_output('json')) {
-            json(array('status' => 'ok', 'item' => $cliente->toArray(array('secreto', 'senha')), 'msg' => $msg));
+            json(['status' => 'ok', 'item' => $cliente->toArray(['secreto', 'senha']), 'msg' => $msg]);
         }
         Thunder::success($msg, true);
         redirect('/gerenciar/cliente/');
@@ -91,7 +91,7 @@ if (is_post()) {
             $focusctrl = $focusctrl . '-' . strtolower(ClienteGenero::MASCULINO);
         }
         if (is_output('json')) {
-            json($value, null, array('field' => $focusctrl));
+            json($value, null, ['field' => $focusctrl]);
         }
         Thunder::error($value);
         break;

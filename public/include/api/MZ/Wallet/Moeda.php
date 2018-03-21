@@ -67,7 +67,7 @@ class Moeda extends \MZ\Database\Helper
      * Constructor for a new empty instance of Moeda
      * @param array $moeda All field and values to fill the instance
      */
-    public function __construct($moeda = array())
+    public function __construct($moeda = [])
     {
         parent::__construct($moeda);
     }
@@ -236,12 +236,12 @@ class Moeda extends \MZ\Database\Helper
      * @param  mixed $moeda Associated key -> value to assign into this instance
      * @return Moeda Self instance
      */
-    public function fromArray($moeda = array())
+    public function fromArray($moeda = [])
     {
         if ($moeda instanceof Moeda) {
             $moeda = $moeda->toArray();
         } elseif (!is_array($moeda)) {
-            $moeda = array();
+            $moeda = [];
         }
         parent::fromArray($moeda);
         if (!isset($moeda['id'])) {
@@ -321,7 +321,7 @@ class Moeda extends \MZ\Database\Helper
      */
     public function validate()
     {
-        $errors = array();
+        $errors = [];
         if (is_null($this->getNome())) {
             $errors['nome'] = 'O Nome não pode ser vazio';
         }
@@ -353,12 +353,12 @@ class Moeda extends \MZ\Database\Helper
     protected function translate($e)
     {
         if (stripos($e->getMessage(), 'PRIMARY') !== false) {
-            return new \MZ\Exception\ValidationException(array(
+            return new \MZ\Exception\ValidationException([
                 'id' => vsprintf(
                     'O ID "%s" já está cadastrado',
-                    array($this->getID())
+                    [$this->getID()]
                 ),
-            ));
+            ]);
         }
         return parent::translate($e);
     }
@@ -370,9 +370,9 @@ class Moeda extends \MZ\Database\Helper
      */
     public static function findByID($id)
     {
-        return self::find(array(
+        return self::find([
             'id' => intval($id),
-        ));
+        ]);
     }
 
     /**
@@ -399,7 +399,7 @@ class Moeda extends \MZ\Database\Helper
         if (isset($condition['search'])) {
             $search = $condition['search'];
             $field = '(nome LIKE ? OR codigo = ?)';
-            $condition[$field] = array('%'.$search.'%', $search);
+            $condition[$field] = ['%'.$search.'%', $search];
             $allowed[$field] = true;
             unset($condition['search']);
         }
@@ -412,7 +412,7 @@ class Moeda extends \MZ\Database\Helper
      * @param  array $order order rows
      * @return SelectQuery query object with condition statement
      */
-    private static function query($condition = array(), $order = array())
+    private static function query($condition = [], $order = [])
     {
         $query = self::getDB()->from('Moedas');
         $condition = self::filterCondition($condition);
@@ -426,12 +426,12 @@ class Moeda extends \MZ\Database\Helper
      * @param  array $order order rows
      * @return Moeda A filled Moeda or empty instance
      */
-    public static function find($condition, $order = array())
+    public static function find($condition, $order = [])
     {
         $query = self::query($condition, $order)->limit(1);
         $row = $query->fetch();
         if ($row === false) {
-            $row = array();
+            $row = [];
         }
         return new Moeda($row);
     }
@@ -443,7 +443,7 @@ class Moeda extends \MZ\Database\Helper
      * @param  integer $offset start index to get rows, null for begining
      * @return array All rows instanced and filled
      */
-    public static function findAll($condition = array(), $order = array(), $limit = null, $offset = null)
+    public static function findAll($condition = [], $order = [], $limit = null, $offset = null)
     {
         $query = self::query($condition, $order);
         if (!is_null($limit)) {
@@ -453,7 +453,7 @@ class Moeda extends \MZ\Database\Helper
             $query = $query->offset($offset);
         }
         $rows = $query->fetchAll();
-        $result = array();
+        $result = [];
         foreach ($rows as $row) {
             $result[] = new Moeda($row);
         }
@@ -536,7 +536,7 @@ class Moeda extends \MZ\Database\Helper
      * @param  array $condition condition to filter rows
      * @return integer Quantity of rows
      */
-    public static function count($condition = array())
+    public static function count($condition = [])
     {
         $query = self::query($condition);
         return $query->count();

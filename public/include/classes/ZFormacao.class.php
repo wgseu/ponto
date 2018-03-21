@@ -37,7 +37,7 @@ class ZFormacao
     private $pacote_id;
     private $composicao_id;
 
-    public function __construct($formacao = array())
+    public function __construct($formacao = [])
     {
         if (is_array($formacao)) {
             $this->setID(isset($formacao['id'])?$formacao['id']:null);
@@ -117,7 +117,7 @@ class ZFormacao
 
     public function toArray()
     {
-        $formacao = array();
+        $formacao = [];
         $formacao['id'] = $this->getID();
         $formacao['produtopedidoid'] = $this->getProdutoPedidoID();
         $formacao['tipo'] = $this->getTipo();
@@ -129,27 +129,27 @@ class ZFormacao
     public static function getPeloID($id)
     {
         $query = DB::$pdo->from('Formacoes')
-                         ->where(array('id' => $id));
+                         ->where(['id' => $id]);
         return new ZFormacao($query->fetch());
     }
 
     public static function getPeloProdutoPedidoIDPacoteID($produto_pedido_id, $pacote_id)
     {
         $query = DB::$pdo->from('Formacoes')
-                         ->where(array('produtopedidoid' => $produto_pedido_id, 'pacoteid' => $pacote_id));
+                         ->where(['produtopedidoid' => $produto_pedido_id, 'pacoteid' => $pacote_id]);
         return new ZFormacao($query->fetch());
     }
 
     private static function validarCampos(&$formacao)
     {
-        $erros = array();
+        $erros = [];
         if (!is_numeric($formacao['produtopedidoid'])) {
             $erros['produtopedidoid'] = 'O item do pedido não foi informado';
         }
         $formacao['tipo'] = trim($formacao['tipo']);
         if (strlen($formacao['tipo']) == 0) {
             $formacao['tipo'] = null;
-        } elseif (!in_array($formacao['tipo'], array('Pacote', 'Composicao'))) {
+        } elseif (!in_array($formacao['tipo'], ['Pacote', 'Composicao'])) {
             $erros['tipo'] = 'O tipo informado não é válido';
         }
         $formacao['pacoteid'] = trim($formacao['pacoteid']);
@@ -172,10 +172,10 @@ class ZFormacao
     private static function handleException(&$e)
     {
         if (stripos($e->getMessage(), 'PRIMARY') !== false) {
-            throw new ValidationException(array('id' => 'O ID informado já está cadastrado'));
+            throw new ValidationException(['id' => 'O ID informado já está cadastrado']);
         }
         if (stripos($e->getMessage(), 'UK_Formacoes_ProdutoPedidoID_PacoteID') !== false) {
-            throw new ValidationException(array('pacoteid' => 'O pacote informado já está cadastrado'));
+            throw new ValidationException(['pacoteid' => 'O pacote informado já está cadastrado']);
         }
     }
 
@@ -196,15 +196,15 @@ class ZFormacao
     {
         $_formacao = $formacao->toArray();
         if (!$_formacao['id']) {
-            throw new ValidationException(array('id' => 'O id da formacao não foi informado'));
+            throw new ValidationException(['id' => 'O id da formacao não foi informado']);
         }
         self::validarCampos($_formacao);
-        $campos = array(
+        $campos = [
             'produtopedidoid',
             'tipo',
             'pacoteid',
             'composicaoid',
-        );
+        ];
         try {
             $query = DB::$pdo->update('Formacoes');
             $query = $query->set(array_intersect_key($_formacao, array_flip($campos)));
@@ -230,7 +230,7 @@ class ZFormacao
             $query = $query->limit($quantidade)->offset($inicio);
         }
         $_formacaos = $query->fetchAll();
-        $formacaos = array();
+        $formacaos = [];
         foreach ($_formacaos as $formacao) {
             $formacaos[] = new ZFormacao($formacao);
         }
@@ -246,7 +246,7 @@ class ZFormacao
     private static function initSearchDoProdutoPedidoID($produto_pedido_id)
     {
         return   DB::$pdo->from('Formacoes')
-                         ->where(array('produtopedidoid' => $produto_pedido_id))
+                         ->where(['produtopedidoid' => $produto_pedido_id])
                          ->orderBy('id ASC');
     }
 
@@ -257,7 +257,7 @@ class ZFormacao
             $query = $query->limit($quantidade)->offset($inicio);
         }
         $_formacaos = $query->fetchAll();
-        $formacaos = array();
+        $formacaos = [];
         foreach ($_formacaos as $formacao) {
             $formacaos[] = new ZFormacao($formacao);
         }
@@ -273,7 +273,7 @@ class ZFormacao
     private static function initSearchDoPacoteID($pacote_id)
     {
         return   DB::$pdo->from('Formacoes')
-                         ->where(array('pacoteid' => $pacote_id))
+                         ->where(['pacoteid' => $pacote_id])
                          ->orderBy('id ASC');
     }
 
@@ -284,7 +284,7 @@ class ZFormacao
             $query = $query->limit($quantidade)->offset($inicio);
         }
         $_formacaos = $query->fetchAll();
-        $formacaos = array();
+        $formacaos = [];
         foreach ($_formacaos as $formacao) {
             $formacaos[] = new ZFormacao($formacao);
         }
@@ -300,7 +300,7 @@ class ZFormacao
     private static function initSearchDaComposicaoID($composicao_id)
     {
         return   DB::$pdo->from('Formacoes')
-                         ->where(array('composicaoid' => $composicao_id))
+                         ->where(['composicaoid' => $composicao_id])
                          ->orderBy('id ASC');
     }
 
@@ -311,7 +311,7 @@ class ZFormacao
             $query = $query->limit($quantidade)->offset($inicio);
         }
         $_formacaos = $query->fetchAll();
-        $formacaos = array();
+        $formacaos = [];
         foreach ($_formacaos as $formacao) {
             $formacaos[] = new ZFormacao($formacao);
         }

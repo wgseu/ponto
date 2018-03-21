@@ -30,7 +30,7 @@ if (is_null($comanda->getID())) {
     redirect('/gerenciar/comanda/');
 }
 $focusctrl = 'nome';
-$errors = array();
+$errors = [];
 $old_comanda = $comanda;
 if (is_post()) {
     $comanda = new Comanda($_POST);

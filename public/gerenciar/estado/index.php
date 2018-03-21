@@ -38,11 +38,11 @@ list($pagesize, $offset, $pagestring) = pagestring($count, $limite);
 $estados = Estado::findAll($condition, $order, $pagesize, $offset);
 
 if (is_output('json')) {
-	$items = array();
+	$items = [];
 	foreach ($estados as $estado) {
 		$items[] = $estado->publish();
 	}
-	json(array('status' => 'ok', 'items' => $items));
+	json(['status' => 'ok', 'items' => $items]);
 }
 
 $pais = \MZ\Location\Pais::findByID($_GET['paisid']);

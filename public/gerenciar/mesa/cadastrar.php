@@ -23,7 +23,7 @@ require_once(dirname(__DIR__) . '/app.php');
 
 need_permission(PermissaoNome::CADASTROMESAS);
 $focusctrl = 'nome';
-$errors = array();
+$errors = [];
 if (is_post()) {
     $mesa = new ZMesa($_POST);
     try {

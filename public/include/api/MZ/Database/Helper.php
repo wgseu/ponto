@@ -34,7 +34,7 @@ abstract class Helper
      * Constructor for a new empty instance of Helper
      * @param array $helper All field and values to fill the instance
      */
-    public function __construct($helper = array())
+    public function __construct($helper = [])
     {
         $this->fromArray($helper);
     }
@@ -52,7 +52,7 @@ abstract class Helper
      */
     public function toArray($recursive = false)
     {
-        return array();
+        return [];
     }
 
     /**
@@ -60,7 +60,7 @@ abstract class Helper
      * @param  mixed $helper Associated key -> value to assign into this instance
      * @return Helper Self instance
      */
-    public function fromArray($helper = array())
+    public function fromArray($helper = [])
     {
         return $this;
     }
@@ -171,7 +171,7 @@ abstract class Helper
      */
     public static function getBooleanOptions($index = null)
     {
-        $options = array('Y' => true, 'N' => false);
+        $options = ['Y' => true, 'N' => false];
         if (!is_null($index)) {
             return $options[$index];
         }
@@ -214,7 +214,7 @@ abstract class Helper
                 } else {
                     $params = $value;
                     array_unshift($params, $field);
-                    $query = call_user_func_array(array($query, 'where'), $params);
+                    $query = call_user_func_array([$query, 'where'], $params);
                 }
             } else {
                 $query = $query->where($field, $value);

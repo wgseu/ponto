@@ -41,7 +41,7 @@ class Product
     public function __construct($integracao) {
         $this->integracao = $integracao;
         $this->dados = $this->integracao->read();
-        $this->produtos = isset($this->dados['produtos'])?$this->dados['produtos']:array();
+        $this->produtos = isset($this->dados['produtos'])?$this->dados['produtos']:[];
     }
 
     public function getProdutos()
@@ -84,13 +84,13 @@ class Product
                 $temp = $item->getElementsByTagName('codPai');
                 $codigo_pai = $temp->length > 0?$temp->item(0)->nodeValue:null;
                 $descricao = $item->getElementsByTagName('descricaoCardapio')->item(0)->nodeValue;
-                $produto = array(
+                $produto = [
                     'codigo' => $codigo,
                     'codigo_pai' => $codigo_pai,
                     'codigo_pdv' => $codigo_pdv,
                     'descricao' => $descricao,
-                    'itens' => array(),
-                );
+                    'itens' => [],
+                ];
                 if (isset($this->produtos[$codigo_pai])) {
                     if (isset($this->produtos[$codigo]['id'])) {
                         $produto['id'] = $this->produtos[$codigo]['id'];
@@ -102,7 +102,7 @@ class Product
                             $produto,
                             array_merge(
                                 $this->produtos[$codigo_pai]['itens'][$codigo],
-                                array('descricao' => $descricao)
+                                ['descricao' => $descricao]
                             )
                         );
                     } else {
@@ -115,7 +115,7 @@ class Product
                             $produto,
                             array_merge(
                                 $this->produtos[$codigo],
-                                array('descricao' => $descricao)
+                                ['descricao' => $descricao]
                             )
                         );
                     } else {
@@ -124,7 +124,7 @@ class Product
                 }
             }
         }
-        $this->dados = isset($this->dados)?$this->dados:array();
+        $this->dados = isset($this->dados)?$this->dados:[];
         $this->dados['produtos'] = $this->produtos;
         $this->integracao->write($this->dados);
         return $this;
@@ -139,7 +139,7 @@ class Product
             throw new \Exception('O produto informado não existe', 404);
         }
         $this->produtos[$codigo]['id'] = $id;
-        $this->dados = isset($this->dados)?$this->dados:array();
+        $this->dados = isset($this->dados)?$this->dados:[];
         $this->dados['produtos'] = $this->produtos;
         $this->integracao->write($this->dados);
         try {
@@ -167,7 +167,7 @@ class Product
         } else {
             unset($this->produtos[$codigo]);
         }
-        $this->dados = isset($this->dados)?$this->dados:array();
+        $this->dados = isset($this->dados)?$this->dados:[];
         $this->dados['produtos'] = $this->produtos;
         $this->integracao->write($this->dados);
         try {
@@ -191,7 +191,7 @@ class Product
             throw new \Exception('O item do pacote não existe', 404);
         }
         $this->produtos[$codigo]['itens'][$subcodigo]['id'] = $id;
-        $this->dados = isset($this->dados)?$this->dados:array();
+        $this->dados = isset($this->dados)?$this->dados:[];
         $this->dados['produtos'] = $this->produtos;
         $this->integracao->write($this->dados);
         try {
@@ -221,13 +221,13 @@ class Product
         }
         $produto['tipo'] = $associado->getTipo();
         $_grupos = \ZGrupo::getTodosDoProdutoID($associado->getID());
-        $grupos = array();
-        $contagem = array();
+        $grupos = [];
+        $contagem = [];
         $total_pacotes = 0;
         foreach ($_grupos as $grupo) {
             $grupos[] = $grupo->toArray();
             $qtd_pacotes = Pacote::count(
-                array('visivel' => 'Y', 'grupoid' => $grupo->getID())
+                ['visivel' => 'Y', 'grupoid' => $grupo->getID()]
             );
             $contagem[] = $qtd_pacotes;
             $total_pacotes += $qtd_pacotes;
@@ -284,7 +284,7 @@ class Product
             }
             $produto['itens'][$subcodigo]['associado'] = $item->toArray();
         }
-        return array('produto' => $produto, 'grupos' => $grupos);
+        return ['produto' => $produto, 'grupos' => $grupos];
     }
 
     public function findAll()

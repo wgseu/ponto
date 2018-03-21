@@ -33,16 +33,16 @@ list($pagesize, $offset, $pagestring) = pagestring($count, $limite);
 $cartoes = ZCartao::getTodos($_GET['query'], $_GET['estado'], $offset, $pagesize);
 
 if (is_output('json')) {
-	$items = array();
+	$items = [];
 	foreach ($cartoes as $cartao) {
 		$items[] = $cartao->toArray();
 	}
-	json(array('status' => 'ok', 'cartoes' => $items));
+	json(['status' => 'ok', 'cartoes' => $items]);
 }
 
-$estados = array(
+$estados = [
     'Y' => 'Ativos',
     'N' => 'Inativos',
-);
+];
 $_imagens = ZCartao::getImages();
 include template('gerenciar_cartao_index');

@@ -35,7 +35,7 @@ if (!$pais->exists()) {
     redirect('/gerenciar/pais/');
 }
 $focusctrl = 'nome';
-$errors = array();
+$errors = [];
 $old_pais = $pais;
 if (is_post()) {
     $pais = new Pais($_POST);
@@ -48,7 +48,7 @@ if (is_post()) {
             $pais->getNome()
         );
         if (is_output('json')) {
-            json(null, array('item' => $pais->publish(), 'msg' => $msg));
+            json(null, ['item' => $pais->publish(), 'msg' => $msg]);
         }
         \Thunder::success($msg, true);
         redirect('/gerenciar/pais/');
@@ -58,7 +58,7 @@ if (is_post()) {
             $errors = $e->getErrors();
         }
         if (is_output('json')) {
-            json($e->getMessage(), null, array('errors' => $errors));
+            json($e->getMessage(), null, ['errors' => $errors]);
         }
         \Thunder::error($e->getMessage());
         foreach ($errors as $key => $value) {

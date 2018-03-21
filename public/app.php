@@ -6,7 +6,7 @@ $INI = ZSistema::getINI();
 $__instance__ = DB::Instance();
 $__sistema__  = ZSistema::getPeloID('1');
 $__empresa__  = ZCliente::getPeloID($__sistema__->getEmpresaID());
-$__localizacao__ = \MZ\Location\Localizacao::find(array('clienteid' => $__empresa__->getID()));
+$__localizacao__ = \MZ\Location\Localizacao::find(['clienteid' => $__empresa__->getID()]);
 $__bairro__ = $__localizacao__->findBairroID();
 $__cidade__ = $__bairro__->findCidadeID();
 $__estado__ = $__cidade__->findEstadoID();

@@ -31,10 +31,10 @@ list($pagesize, $offset, $pagestring) = pagestring($count, 10);
 $estoques = ZEstoque::getTodos($_produto->getID(), $_fornecedor->getID(), $_GET['tipo'], $offset, $pagesize);
 
 
-$tipos = array(
+$tipos = [
     'Entrada' => 'Entrada',
     'Venda' => 'Venda',
     'Consumo' => 'Consumo',
     'Transferencia' => 'Transferência',
-);
+];
 include template('gerenciar_estoque_index');

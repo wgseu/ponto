@@ -30,7 +30,7 @@ if (is_null($carteira->getID())) {
     redirect('/gerenciar/carteira/');
 }
 $focusctrl = 'descricao';
-$errors = array();
+$errors = [];
 $old_carteira = $carteira;
 if (is_post()) {
     $carteira = new Carteira($_POST);

@@ -40,7 +40,7 @@ class ZImposto
     private $codigo;
     private $descricao;
 
-    public function __construct($imposto = array())
+    public function __construct($imposto = [])
     {
         $this->fromArray($imposto);
     }
@@ -141,7 +141,7 @@ class ZImposto
 
     public function toArray()
     {
-        $imposto = array();
+        $imposto = [];
         $imposto['id'] = $this->getID();
         $imposto['grupo'] = $this->getGrupo();
         $imposto['simples'] = $this->getSimples();
@@ -151,7 +151,7 @@ class ZImposto
         return $imposto;
     }
 
-    public function fromArray($imposto = array())
+    public function fromArray($imposto = [])
     {
         if (!is_array($imposto)) {
             return $this;
@@ -167,34 +167,34 @@ class ZImposto
     public static function getPeloID($id)
     {
         $query = DB::$pdo->from('Impostos')
-                         ->where(array('id' => $id));
+                         ->where(['id' => $id]);
         return new ZImposto($query->fetch());
     }
 
     public static function getPeloGrupoSimplesSubstituicaoCodigo($grupo, $simples, $substituicao, $codigo)
     {
         $query = DB::$pdo->from('Impostos')
-                         ->where(array('grupo' => $grupo, 'simples' => $simples, 'substituicao' => $substituicao, 'codigo' => $codigo));
+                         ->where(['grupo' => $grupo, 'simples' => $simples, 'substituicao' => $substituicao, 'codigo' => $codigo]);
         return new ZImposto($query->fetch());
     }
 
     private static function validarCampos(&$imposto)
     {
-        $erros = array();
+        $erros = [];
         $imposto['grupo'] = strval($imposto['grupo']);
-        if (!in_array($imposto['grupo'], array('ICMS', 'PIS', 'COFINS', 'IPI', 'II'))) {
+        if (!in_array($imposto['grupo'], ['ICMS', 'PIS', 'COFINS', 'IPI', 'II'])) {
             $erros['grupo'] = 'O grupo informado não é válido';
         }
         $imposto['simples'] = strval($imposto['simples']);
         if (strlen($imposto['simples']) == 0) {
             $imposto['simples'] = 'N';
-        } elseif (!in_array($imposto['simples'], array('Y', 'N'))) {
+        } elseif (!in_array($imposto['simples'], ['Y', 'N'])) {
             $erros['simples'] = 'O simples nacional informado não é válido';
         }
         $imposto['substituicao'] = strval($imposto['substituicao']);
         if (strlen($imposto['substituicao']) == 0) {
             $imposto['substituicao'] = 'N';
-        } elseif (!in_array($imposto['substituicao'], array('Y', 'N'))) {
+        } elseif (!in_array($imposto['substituicao'], ['Y', 'N'])) {
             $erros['substituicao'] = 'A substituição tributária informada não é válida';
         }
         if (!is_numeric($imposto['codigo'])) {
@@ -212,10 +212,10 @@ class ZImposto
     private static function handleException(&$e)
     {
         if (stripos($e->getMessage(), 'PRIMARY') !== false) {
-            throw new ValidationException(array('id' => 'O id informado já está cadastrado'));
+            throw new ValidationException(['id' => 'O id informado já está cadastrado']);
         }
         if (stripos($e->getMessage(), 'UK_Imposto') !== false) {
-            throw new ValidationException(array('codigo' => 'O código informado já está cadastrado'));
+            throw new ValidationException(['codigo' => 'O código informado já está cadastrado']);
         }
     }
 
@@ -236,16 +236,16 @@ class ZImposto
     {
         $_imposto = $imposto->toArray();
         if (!$_imposto['id']) {
-            throw new ValidationException(array('id' => 'O id do imposto não foi informado'));
+            throw new ValidationException(['id' => 'O id do imposto não foi informado']);
         }
         self::validarCampos($_imposto);
-        $campos = array(
+        $campos = [
             'grupo',
             'simples',
             'substituicao',
             'codigo',
             'descricao',
-        );
+        ];
         try {
             $query = DB::$pdo->update('Impostos');
             $query = $query->set(array_intersect_key($_imposto, array_flip($campos)));
@@ -264,7 +264,7 @@ class ZImposto
             throw new Exception('Não foi possível excluir o imposto, o id do imposto não foi informado');
         }
         $query = DB::$pdo->deleteFrom('Impostos')
-                         ->where(array('id' => $id));
+                         ->where(['id' => $id]);
         return $query->execute();
     }
 
@@ -281,7 +281,7 @@ class ZImposto
             $query = $query->limit($quantidade)->offset($inicio);
         }
         $_impostos = $query->fetchAll();
-        $impostos = array();
+        $impostos = [];
         foreach ($_impostos as $imposto) {
             $impostos[] = new ZImposto($imposto);
         }

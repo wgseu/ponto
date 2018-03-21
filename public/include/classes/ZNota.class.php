@@ -78,7 +78,7 @@ class ZNota
     private $data_emissao;
     private $data_lancamento;
 
-    public function __construct($nota = array())
+    public function __construct($nota = [])
     {
         $this->fromArray($nota);
     }
@@ -422,7 +422,7 @@ class ZNota
 
     public function toArray()
     {
-        $nota = array();
+        $nota = [];
         $nota['id'] = $this->getID();
         $nota['tipo'] = $this->getTipo();
         $nota['ambiente'] = $this->getAmbiente();
@@ -450,7 +450,7 @@ class ZNota
         return $nota;
     }
 
-    public function fromArray($nota = array())
+    public function fromArray($nota = [])
     {
         if (!is_array($nota)) {
             return $this;
@@ -498,14 +498,14 @@ class ZNota
     public static function getPeloID($id)
     {
         $query = DB::$pdo->from('Notas')
-                         ->where(array('id' => $id));
+                         ->where(['id' => $id]);
         return new ZNota($query->fetch());
     }
 
     public static function getPelaChave($chave, $todos = false)
     {
         $query = DB::$pdo->from('Notas')
-                         ->where(array('chave' => $chave))
+                         ->where(['chave' => $chave])
                          ->orderBy('concluido ASC, corrigido DESC, datalancamento DESC')
                          ->limit(1);
         if (!$todos) {
@@ -539,21 +539,21 @@ class ZNota
 
     private static function validarCampos(&$nota)
     {
-        $erros = array();
+        $erros = [];
         $nota['tipo'] = strval($nota['tipo']);
-        if (!in_array($nota['tipo'], array('Nota', 'Inutilizacao'))) {
+        if (!in_array($nota['tipo'], ['Nota', 'Inutilizacao'])) {
             $erros['tipo'] = 'O tipo informado não é válido';
         }
         $nota['ambiente'] = strval($nota['ambiente']);
-        if (!in_array($nota['ambiente'], array('Homologacao', 'Producao'))) {
+        if (!in_array($nota['ambiente'], ['Homologacao', 'Producao'])) {
             $erros['ambiente'] = 'O ambiente informado não é válido';
         }
         $nota['acao'] = strval($nota['acao']);
-        if (!in_array($nota['acao'], array('Autorizar', 'Cancelar', 'Inutilizar'))) {
+        if (!in_array($nota['acao'], ['Autorizar', 'Cancelar', 'Inutilizar'])) {
             $erros['acao'] = 'A ação informada não é válida';
         }
         $nota['estado'] = strval($nota['estado']);
-        if (!in_array($nota['estado'], array('Aberto', 'Assinado', 'Pendente', 'Processamento', 'Denegado', 'Rejeitado', 'Cancelado', 'Inutilizado', 'Autorizado'))) {
+        if (!in_array($nota['estado'], ['Aberto', 'Assinado', 'Pendente', 'Processamento', 'Denegado', 'Rejeitado', 'Cancelado', 'Inutilizado', 'Autorizado'])) {
             $erros['estado'] = 'O estado informado não é válido';
         }
         if (!is_numeric($nota['serie'])) {
@@ -593,7 +593,7 @@ class ZNota
         $nota['contingencia'] = strval($nota['contingencia']);
         if (strlen($nota['contingencia']) == 0) {
             $nota['contingencia'] = 'N';
-        } elseif (!in_array($nota['contingencia'], array('Y', 'N'))) {
+        } elseif (!in_array($nota['contingencia'], ['Y', 'N'])) {
             $erros['contingencia'] = 'A contingência informada não é válida';
         }
         $nota['consultaurl'] = strip_tags(trim($nota['consultaurl']));
@@ -617,13 +617,13 @@ class ZNota
         $nota['corrigido'] = trim($nota['corrigido']);
         if (strlen($nota['corrigido']) == 0) {
             $nota['corrigido'] = 'N';
-        } elseif (!in_array($nota['corrigido'], array('Y', 'N'))) {
+        } elseif (!in_array($nota['corrigido'], ['Y', 'N'])) {
             $erros['corrigido'] = 'O corrigido informado não é válido';
         }
         $nota['concluido'] = trim($nota['concluido']);
         if (strlen($nota['concluido']) == 0) {
             $nota['concluido'] = 'N';
-        } elseif (!in_array($nota['concluido'], array('Y', 'N'))) {
+        } elseif (!in_array($nota['concluido'], ['Y', 'N'])) {
             $erros['concluido'] = 'O concluído informado não é válido';
         }
         $dataautorizacao = null;
@@ -657,7 +657,7 @@ class ZNota
     private static function handleException(&$e)
     {
         if (stripos($e->getMessage(), 'PRIMARY') !== false) {
-            throw new ValidationException(array('id' => 'O id informado já está cadastrado'));
+            throw new ValidationException(['id' => 'O id informado já está cadastrado']);
         }
     }
 
@@ -678,10 +678,10 @@ class ZNota
     {
         $_nota = $nota->toArray();
         if (!$_nota['id']) {
-            throw new ValidationException(array('id' => 'O id da nota não foi informado'));
+            throw new ValidationException(['id' => 'O id da nota não foi informado']);
         }
         self::validarCampos($_nota);
-        $campos = array(
+        $campos = [
             'tipo',
             'ambiente',
             'acao',
@@ -705,7 +705,7 @@ class ZNota
             'dataautorizacao',
             'dataemissao',
             'datalancamento',
-        );
+        ];
         try {
             $query = DB::$pdo->update('Notas');
             $query = $query->set(array_intersect_key($_nota, array_flip($campos)));
@@ -724,7 +724,7 @@ class ZNota
             throw new Exception('Não foi possível excluir a nota, o id da nota não foi informado');
         }
         $query = DB::$pdo->deleteFrom('Notas')
-                         ->where(array('id' => $id));
+                         ->where(['id' => $id]);
         return $query->execute();
     }
 
@@ -790,7 +790,7 @@ class ZNota
         if (is_array($xmlfile)) {
             $files = $xmlfile;
         } else {
-            $files = array('nota' => $xmlfile);
+            $files = ['nota' => $xmlfile];
         }
         foreach ($files as $name => $path) {
             if (!file_exists($path)) {
@@ -803,7 +803,7 @@ class ZNota
 
     public static function zip($notas)
     {
-        $files = array();
+        $files = [];
         foreach ($notas as $_nota) {
             // Notas abertas não possuem arquivo XML
             if ($_nota->getEstado() == NotaEstado::ABERTO) {
@@ -814,7 +814,7 @@ class ZNota
             if (is_array($xmlfile)) {
                 $_files = $xmlfile;
             } else {
-                $_files = array('nota' => $xmlfile);
+                $_files = ['nota' => $xmlfile];
             }
             foreach ($_files as $xmlfile) {
                 $xmlname = basename($xmlfile);
@@ -898,7 +898,7 @@ class ZNota
         if (trim($tipo) != '') {
             $query = $query->where('tipo', strval($tipo));
         }
-        if (in_array($contingencia, array('Y', 'N'))) {
+        if (in_array($contingencia, ['Y', 'N'])) {
             $query = $query->where('contingencia', strval($contingencia));
         }
         if ($emissao_inicio !== false) {
@@ -950,7 +950,7 @@ class ZNota
             $query = $query->limit($quantidade)->offset($inicio);
         }
         $_notas = $query->fetchAll();
-        $notas = array();
+        $notas = [];
         foreach ($_notas as $nota) {
             $notas[] = new ZNota($nota);
         }
@@ -1007,7 +1007,7 @@ class ZNota
             $query = $query->limit($quantidade)->offset($inicio);
         }
         $_notas = $query->fetchAll();
-        $notas = array();
+        $notas = [];
         foreach ($_notas as $nota) {
             $notas[] = new ZNota($nota);
         }
@@ -1038,7 +1038,7 @@ class ZNota
             $query = $query->limit($quantidade)->offset($inicio);
         }
         $_notas = $query->fetchAll();
-        $notas = array();
+        $notas = [];
         foreach ($_notas as $nota) {
             $notas[] = new ZNota($nota);
         }
@@ -1067,7 +1067,7 @@ class ZNota
             $query = $query->limit($quantidade)->offset($inicio);
         }
         $_notas = $query->fetchAll();
-        $notas = array();
+        $notas = [];
         foreach ($_notas as $nota) {
             $notas[] = new ZNota($nota);
         }
@@ -1083,7 +1083,7 @@ class ZNota
     private static function initSearchDoPedidoID($pedido_id)
     {
         return   DB::$pdo->from('Notas')
-                         ->where(array('pedidoid' => $pedido_id))
+                         ->where(['pedidoid' => $pedido_id])
                          ->orderBy('id ASC');
     }
 
@@ -1094,7 +1094,7 @@ class ZNota
             $query = $query->limit($quantidade)->offset($inicio);
         }
         $_notas = $query->fetchAll();
-        $notas = array();
+        $notas = [];
         foreach ($_notas as $nota) {
             $notas[] = new ZNota($nota);
         }

@@ -25,7 +25,7 @@ use MZ\Wallet\Carteira;
 
 need_permission(PermissaoNome::CADASTROCARTEIRAS);
 $focusctrl = 'descricao';
-$errors = array();
+$errors = [];
 $carteira = new Carteira();
 $old_carteira = $carteira;
 if (is_post()) {

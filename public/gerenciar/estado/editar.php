@@ -35,7 +35,7 @@ if (!$estado->exists()) {
     redirect('/gerenciar/estado/');
 }
 $focusctrl = 'nome';
-$errors = array();
+$errors = [];
 $old_estado = $estado;
 if (is_post()) {
     $estado = new Estado($_POST);
@@ -48,7 +48,7 @@ if (is_post()) {
             $estado->getNome()
         );
         if (is_output('json')) {
-            json(null, array('item' => $estado->publish(), 'msg' => $msg));
+            json(null, ['item' => $estado->publish(), 'msg' => $msg]);
         }
         \Thunder::success($msg, true);
         redirect('/gerenciar/estado/');
@@ -58,7 +58,7 @@ if (is_post()) {
             $errors = $e->getErrors();
         }
         if (is_output('json')) {
-            json($e->getMessage(), null, array('errors' => $errors));
+            json($e->getMessage(), null, ['errors' => $errors]);
         }
         \Thunder::error($e->getMessage());
         foreach ($errors as $key => $value) {

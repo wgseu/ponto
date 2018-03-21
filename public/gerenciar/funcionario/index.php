@@ -30,7 +30,7 @@ if ($_GET['estado'] == 'ativo') {
 } else {
     $estado = null;
 }
-$funcoes = array();
+$funcoes = [];
 if (have_permission(PermissaoNome::CADASTROFUNCIONARIOS)) {
     $count = ZFuncionario::getCount($_GET['query'], $funcao->getID(), $_GET['genero'], $estado);
     list($pagesize, $offset, $pagestring) = pagestring($count, 10);
@@ -40,16 +40,16 @@ if (have_permission(PermissaoNome::CADASTROFUNCIONARIOS)) {
         $funcoes[$funcao->getID()] = $funcao->getDescricao();
     }
 } else {
-    $funcionarios = array();
+    $funcionarios = [];
     $funcionarios[] = $login_funcionario;
 }
-$generos = array(
+$generos = [
     ClienteGenero::MASCULINO => 'Masculino',
     ClienteGenero::FEMININO => 'Feminino',
-);
-$estados = array(
+];
+$estados = [
     'ativo' => 'Ativo',
     'inativo' => 'Inativo',
-);
+];
 $linguagens = get_languages_info();
 include template('gerenciar_funcionario_index');

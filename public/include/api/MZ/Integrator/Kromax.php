@@ -43,8 +43,10 @@ class Kromax extends \MZ\System\Task
         $this->setPending(0);
         $order = new \MZ\Association\Order($this->getData());
         if (!$this->checkReponse($dom, 0)) {
+            // TODO atualizar tabela de produtos por outro meio mais rápido
             $product = new \MZ\Association\Product($this->getData());
             $product->populateFromXML($dom);
+
             $order->loadDOM($dom);
             $order->findOrder();
             if (is_null($order->getID())) {
@@ -63,7 +65,7 @@ class Kromax extends \MZ\System\Task
 
     private function submit($changes)
     {
-        $updates = array();
+        $updates = [];
         foreach ($changes as $change) {
             $this->submitStatus($change['code'], $change['estado']);
             $updates[] = $change;

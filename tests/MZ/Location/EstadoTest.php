@@ -30,12 +30,12 @@ class EstadoTest extends \PHPUnit_Framework_TestCase
     {
         $estado = new Estado();
         $values = $estado->publish();
-        $allowed = array(
+        $allowed = [
             'id',
             'paisid',
             'nome',
             'uf',
-        );
+        ];
         $this->assertEquals($allowed, array_keys($values));
     }
 }

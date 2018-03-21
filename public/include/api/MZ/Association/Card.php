@@ -43,7 +43,7 @@ class Card
     public function __construct($integracao, $codigos) {
         $this->integracao = $integracao;
         $this->dados = $this->integracao->read();
-        $this->cartoes = isset($this->dados['cartoes'])?$this->dados['cartoes']:array();
+        $this->cartoes = isset($this->dados['cartoes'])?$this->dados['cartoes']:[];
         $this->codigos = $codigos;
     }
 
@@ -70,7 +70,7 @@ class Card
             throw new \Exception('Cartão não encontrado', 401);
         }
         $this->cartoes[$codigo] = $cartao->getID();
-        $this->dados = isset($this->dados)?$this->dados:array();
+        $this->dados = isset($this->dados)?$this->dados:[];
         $this->dados['cartoes'] = $this->cartoes;
         $this->integracao->write($this->dados);
         try {

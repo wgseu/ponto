@@ -31,15 +31,15 @@ if (!$cidade->exists()) {
     json('A cidade informada não existe!');
 }
 $bairros = \MZ\Location\Bairro::findAll(
-	array(
+	[
 		'cidadeid' => $cidade->getID(),
 		'search' => isset($_GET['nome'])?$_GET['nome']:null
-	),
-	array(),
+	],
+	[],
 	10
 );
-$items = array();
+$items = [];
 foreach ($bairros as $bairro) {
     $items[] = $bairro->publish();
 }
-json(array('status' => 'ok', 'items' => $items));
+json(['status' => 'ok', 'items' => $items]);

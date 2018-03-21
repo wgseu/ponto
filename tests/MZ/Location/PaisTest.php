@@ -30,7 +30,7 @@ class PaisTest extends \PHPUnit_Framework_TestCase
     {
         $pais = new Pais();
         $values = $pais->publish();
-        $allowed = array(
+        $allowed = [
             'id',
             'nome',
             'sigla',
@@ -40,7 +40,7 @@ class PaisTest extends \PHPUnit_Framework_TestCase
             'linguagemid',
             'entradas',
             'unitario',
-        );
+        ];
         $this->assertEquals($allowed, array_keys($values));
     }
 }

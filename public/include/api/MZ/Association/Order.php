@@ -77,8 +77,8 @@ class Order extends \ZPedido
     public function loadDOM($dom)
     {
         $dados = $this->integracao->read();
-        $cartoes = isset($dados['cartoes'])?$dados['cartoes']:array();
-        $produtos = isset($dados['produtos'])?$dados['produtos']:array();
+        $cartoes = isset($dados['cartoes'])?$dados['cartoes']:[];
+        $produtos = isset($dados['produtos'])?$dados['produtos']:[];
         $response = $dom->documentElement;
         if (is_null($response)) {
             throw new \Exception('Root element not found in XML file', 401);
@@ -131,28 +131,46 @@ class Order extends \ZPedido
         }
         $entregar = Document::childValue($body_pedido, 'togo');
         if ($entregar == 'false') {
-            $this->localization = new Localizacao();
-            $this->localization->setCEP(Document::childValue($body_pedido, 'cep'));
-            $this->localization->setTipo(Localizacao::TIPO_CASA);
-            $this->localization->setLogradouro(Document::childValue($body_pedido, 'logradouro'));
-            $this->localization->setNumero(Document::childValue($body_pedido, 'logradouroNum'));
-            $this->localization->setComplemento(Document::childValue($body_pedido, 'complemento', false));
-            $this->localization->setReferencia(Document::childValue($body_pedido, 'referencia', false));
-            $this->localization->setMostrar('Y');
+            $this->setLocalizacaoID(1);
+        } else {
+            $this->setLocalizacaoID(null);
+        }
+        $this->localization = new Localizacao();
+        $this->localization->setCEP(Document::childValue($body_pedido, 'cep'));
+        $this->localization->setTipo(Localizacao::TIPO_CASA);
+        $this->localization->setLogradouro(Document::childValue($body_pedido, 'logradouro'));
+        $this->localization->setNumero(Document::childValue($body_pedido, 'logradouroNum'));
+        $this->localization->setComplemento(Document::childValue($body_pedido, 'complemento', false));
+        $this->localization->setReferencia(Document::childValue($body_pedido, 'referencia', false));
+        $this->localization->setMostrar('Y');
 
-            $this->district = new Bairro();
-            $this->district->setNome(Document::childValue($body_pedido, 'bairro'));
-            $this->district->setValorEntrega(floatval(Document::childValue($body_pedido, 'vlrTaxa')));
+        $this->district = new Bairro();
+        $this->district->setNome(Document::childValue($body_pedido, 'bairro'));
+        $this->district->setValorEntrega(floatval(Document::childValue($body_pedido, 'vlrTaxa')));
 
-            $this->city = new Cidade();
-            $this->city->setNome(Document::childValue($body_pedido, 'cidade'));
+        $this->city = new Cidade();
+        $this->city->setNome(Document::childValue($body_pedido, 'cidade'));
 
-            $this->state = new Estado();
-            $this->state->setUF(Document::childValue($body_pedido, 'estado'));
+        $this->state = new Estado();
+        $this->state->setUF(Document::childValue($body_pedido, 'estado'));
 
-            $this->country = new Pais();
-            $this->country->setCodigo(Document::childValue($body_pedido, 'pais'));
+        $this->country = new Pais();
+        $this->country->setCodigo(Document::childValue($body_pedido, 'pais'));
+        // pagamentos e descontos
+        $pagamentos_node = Document::findChild($body_pedido, 'pagamentos', false);
+        if (!is_null($pagamentos_node)) {
+            $pagamento_list = $pagamentos_node->getElementsByTagName('pagamento');
+            foreach ($pagamento_list as $pagamento_node) {
+                $cod_tipo_cond_pagto = Document::childValue($pagamento_node, 'codTipoCondPagto');
+                if ($cod_tipo_cond_pagto == 'D') {
+                    $produto_pedido = new ZProdutoPedido();
+                    $produto_pedido->setServicoID(\ZServico::DESCONTO_ID);
+                    $produto_pedido->setQuantidade(1);
+                    $produto_pedido->setPreco(-floatval(Document::childValue($pagamento_node, 'valor')));
+                } else {
 
+                }
+            }
         }
         //TODO
         // foreach ($itens as $item) {
@@ -182,9 +200,9 @@ class Order extends \ZPedido
 
     public function store()
     {
-        $changes = array();
+        $changes = [];
         //TODO
-        $changes[] = array('code' => 2981, 'estado' => \PedidoEstado::AGENDADO);
+        $changes[] = ['code' => 2981, 'estado' => \PedidoEstado::AGENDADO];
         return $changes;
     }
 

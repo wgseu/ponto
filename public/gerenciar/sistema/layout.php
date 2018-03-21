@@ -7,49 +7,49 @@ $fieldfocus = 'bemvindo';
 $base_url = 'header';
 $tab_layout = 'active';
 
-$erro = array();
-$images_info = array(
-    'header' => array(
+$erro = [];
+$images_info = [
+    'header' => [
         'section' => 'Image.Header',
         'field' => 'header_url',
         'image' => 'image_header',
-    ),
-    'login' => array(
+    ],
+    'login' => [
         'section' => 'Image.Login',
         'field' => 'login_url',
         'image' => 'image_login',
-    ),
-    'cadastrar' => array(
+    ],
+    'cadastrar' => [
         'section' => 'Image.Cadastrar',
         'field' => 'cadastrar_url',
         'image' => 'image_cadastrar',
-    ),
-    'produtos' => array(
+    ],
+    'produtos' => [
         'section' => 'Image.Produtos',
         'field' => 'produtos_url',
         'image' => 'image_produtos',
-    ),
-    'sobre' => array(
+    ],
+    'sobre' => [
         'section' => 'Image.Sobre',
         'field' => 'sobre_url',
         'image' => 'image_sobre',
-    ),
-    'privacidade' => array(
+    ],
+    'privacidade' => [
         'section' => 'Image.Privacidade',
         'field' => 'privacidade_url',
         'image' => 'image_privacidade',
-    ),
-    'termos' => array(
+    ],
+    'termos' => [
         'section' => 'Image.Termos',
         'field' => 'termos_url',
         'image' => 'image_termos',
-    ),
-    'contato' => array(
+    ],
+    'contato' => [
         'section' => 'Image.Contato',
         'field' => 'contato_url',
         'image' => 'image_contato',
-    ),
-);
+    ],
+];
 foreach ($images_info as $key => &$value) {
     $value['url'] = get_string_config('Site', $value['section']);
 }

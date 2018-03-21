@@ -2,10 +2,10 @@
 
 function configure_keys()
 {
-    return array(
+    return [
         'db',
         'system',
-    );
+    ];
 }
 
 function configure_save($key = null)

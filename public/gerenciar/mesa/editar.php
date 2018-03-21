@@ -28,7 +28,7 @@ if (is_null($mesa->getID())) {
     redirect('/gerenciar/mesa/');
 }
 $focusctrl = 'nome';
-$errors = array();
+$errors = [];
 $old_mesa = $mesa;
 if (is_post()) {
     $mesa = new ZMesa($_POST);

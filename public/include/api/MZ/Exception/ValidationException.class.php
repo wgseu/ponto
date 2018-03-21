@@ -26,9 +26,9 @@ namespace MZ\Exception;
 
 class ValidationException extends \Exception
 {
-    private $errors = array();
+    private $errors = [];
 
-    public function __construct($errors = array(), $code = 400)
+    public function __construct($errors = [], $code = 400)
     {
         $this->errors = $errors;
         reset($errors);

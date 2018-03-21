@@ -57,17 +57,17 @@ if (!is_null($funcionario->getID()) && (
     redirect('/gerenciar/cliente/');
 }
 $focusctrl = 'nome';
-$errors = array();
+$errors = [];
 $old_cliente = $cliente;
 if (is_post()) {
     $cliente = new ZCliente($_POST);
     try {
         $cliente->setID($old_cliente->getID());
         if ($cliente->getID() == $__empresa__->getID() && $cliente->getTipo() != ClienteTipo::JURIDICA) {
-            throw new ValidationException(array('tipo' => 'O tipo da empresa deve ser jurídica'));
+            throw new ValidationException(['tipo' => 'O tipo da empresa deve ser jurídica']);
         }
         if (strlen($cliente->getSenha()) > 0 && $cliente->getSenha() != $_POST['confirmarsenha']) {
-            throw new ValidationException(array('senha' => 'As senhas não são iguais'));
+            throw new ValidationException(['senha' => 'As senhas não são iguais']);
         }
         $cliente->setAcionistaID(numberval($cliente->getAcionistaID()));
         if ($cliente->getTipo() == ClienteTipo::JURIDICA) {
@@ -102,7 +102,7 @@ if (is_post()) {
         }
         $msg = 'Cliente "'.$cliente->getNomeCompleto().'" atualizado com sucesso!';
         if (is_output('json')) {
-            json(array('status' => 'ok', 'item' => $cliente->toArray(array('secreto', 'senha')), 'msg' => $msg));
+            json(['status' => 'ok', 'item' => $cliente->toArray(['secreto', 'senha']), 'msg' => $msg]);
         }
         Thunder::success($msg, true);
         redirect('/gerenciar/cliente/');
@@ -116,7 +116,7 @@ if (is_post()) {
     foreach ($errors as $key => $value) {
         $focusctrl = $key;
         if (is_output('json')) {
-            json($value, null, array('field' => $focusctrl));
+            json($value, null, ['field' => $focusctrl]);
         }
         Thunder::error($value);
         break;

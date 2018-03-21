@@ -30,7 +30,7 @@ $contas = ZConta::getTodas($_GET['query'], $_GET['clienteid'], $_GET['classifica
 $_cliente = ZCliente::getPeloID($_GET['clienteid']);
 $_classificacao = ZClassificacao::getPeloID($_GET['classificacao']);
 $classificacoes = ZClassificacao::getTodas();
-$_classificacoes = array();
+$_classificacoes = [];
 foreach ($classificacoes as $classificacao) {
     $_classificacoes[$classificacao->getID()] = $classificacao->getDescricao();
 }

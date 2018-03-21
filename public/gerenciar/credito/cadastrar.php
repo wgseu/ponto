@@ -23,7 +23,7 @@ require_once(dirname(__DIR__) . '/app.php');
 
 need_permission(PermissaoNome::CADASTRARCREDITOS);
 $focusctrl = 'detalhes';
-$errors = array();
+$errors = [];
 if (is_post()) {
     $credito = new ZCredito($_POST);
     try {

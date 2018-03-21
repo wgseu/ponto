@@ -39,7 +39,7 @@ if (count($categorias) > 0) {
         false // raw mode
     );
 } else {
-    $produtos = array();
+    $produtos = [];
     $categoria_atual = new ZCategoria();
 }
 include template('produto_index');

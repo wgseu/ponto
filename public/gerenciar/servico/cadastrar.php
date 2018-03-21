@@ -23,7 +23,7 @@ require_once(dirname(__DIR__) . '/app.php');
 
 need_permission(PermissaoNome::CADASTROSERVICOS);
 $focusctrl = 'nome';
-$errors = array();
+$errors = [];
 if (is_post()) {
     $servico = new ZServico($_POST);
     try {

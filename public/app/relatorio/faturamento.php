@@ -27,15 +27,15 @@ if (!is_login()) {
 if (!have_permission(PermissaoNome::RELATORIOCAIXA)) {
     json('Você não tem permissão para acessar o faturamento da empresa');
 }
-$response = array('status' => 'ok');
+$response = ['status' => 'ok'];
 $mes = abs(intval($_GET['mes']));
-$meses = array();
+$meses = [];
 for ($i = $mes; $i < $mes + 4; $i++) {
     $data = strtotime(date('Y-m').' -'.$i.' month');
-    $meses[] = array(
+    $meses[] = [
             'mes' => human_date(date('Y-m-d', $data), true),
             'total' => ZPagamento::getFaturamento(null, -$i, -$i)
-        );
+        ];
 }
 $response['mensal'] = $meses;
 json($response);

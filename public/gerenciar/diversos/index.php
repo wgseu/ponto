@@ -14,14 +14,14 @@ $permanencia = $stats['permanencia'];
 $ticket_medio = $stats['total'];
 $receitas = ZPagamento::getReceitas($sessao->getID());
 $vendas = ZPedido::getTotal($sessao->getID());
-$faturamento = array();
+$faturamento = [];
 $faturamento['atual'] = ZPagamento::getFaturamento(null, date('Y-m').'-01', date('Y-m-d'));
 $prev_month = strtotime(date('Y-m').' -1 month');
 $start_prev = date('Y-m', $prev_month).'-01';
 $end_prev = date('Y-m', $prev_month).'-'.relative_day(-1);
 $faturamento['anterior'] = ZPagamento::getFaturamento(null, $start_prev, $end_prev);
 $faturamento['base'] = ZPagamento::getFaturamento(null, -1, -1);
-$clientes = array();
+$clientes = [];
 $clientes['total'] = ZCliente::getCount();
 $clientes['hoje'] = ZCliente::getCount(
     null, // busca
@@ -31,7 +31,7 @@ $clientes['hoje'] = ZCliente::getCount(
     date('Y-m-d') // mes_fim
 );
 $start_curr = strtotime(date('Y-m').' 0 month');
-$despesas = array();
+$despesas = [];
 $despesas['pagas'] = ZPagamento::getDespesas(null, $start_curr, $data_fim);
 $conta_info = ZConta::getTotalAbertas(null, null, -1, null, date('Y-m-d', $data_fim));
 $despesas['apagar'] = $conta_info['despesas'] - $conta_info['pago'];

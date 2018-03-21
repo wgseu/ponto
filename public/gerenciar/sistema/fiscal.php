@@ -6,14 +6,14 @@ need_permission(PermissaoNome::ALTERARCONFIGURACOES);
 $fieldfocus = 'fiscal_timeout';
 $tab_fiscal = 'active';
 
-$erros = array();
+$erros = [];
 $fiscal_timeout = get_int_config('Sistema', 'Fiscal.Timeout', 30);
 if (is_post()) {
     try {
         $fiscal_timeout = \MZ\Util\Filter::number(isset($_POST['fiscal_timeout'])?$_POST['fiscal_timeout']:null);
         if (intval($fiscal_timeout) < 2) {
             throw new \MZ\Exception\ValidationException(
-                array('fiscal_timeout' => 'O tempo limite não pode ser menor que 2 segundos')
+                ['fiscal_timeout' => 'O tempo limite não pode ser menor que 2 segundos']
             );
         }
         set_int_config('Sistema', 'Fiscal.Timeout', $fiscal_timeout);

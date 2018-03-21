@@ -46,7 +46,7 @@ class ZEstoque
     private $cancelado;
     private $data_movimento;
 
-    public function __construct($estoque = array())
+    public function __construct($estoque = [])
     {
         if (is_array($estoque)) {
             $this->setID(isset($estoque['id'])?$estoque['id']:null);
@@ -235,7 +235,7 @@ class ZEstoque
 
     public function toArray()
     {
-        $estoque = array();
+        $estoque = [];
         $estoque['id'] = $this->getID();
         $estoque['produtoid'] = $this->getProdutoID();
         $estoque['transacaoid'] = $this->getTransacaoID();
@@ -258,7 +258,7 @@ class ZEstoque
     public static function getPeloID($id)
     {
         $query = DB::$pdo->from('Estoque')
-                         ->where(array('id' => $id));
+                         ->where(['id' => $id]);
         return new ZEstoque($query->fetch());
     }
 
@@ -267,10 +267,10 @@ class ZEstoque
         $query = DB::$pdo->from('Estoque')
                          ->select(null)
                          ->select('precocompra')
-                         ->where(array(
+                         ->where([
                                 'produtoid' => $produtoid,
                                 'cancelado' => 'N',
-                            ))
+                            ])
                          ->orderBy('id DESC')
                          ->limit(1);
         return $query->fetchColumn() + 0.0;
@@ -281,11 +281,11 @@ class ZEstoque
         $query = DB::$pdo->from('Estoque ee')
                          ->select('ROUND(ee.quantidade + SUM(COALESCE(es.quantidade, 0)), 6) as quantidaderestante')
                          ->leftJoin('Estoque es ON es.entradaid = ee.id AND es.cancelado = ?', 'N')
-                         ->where(array(
+                         ->where([
                                 'ee.produtoid' => $estoque->getProdutoID(),
                                 'ee.setorid' => $estoque->getSetorID(),
                                 'ee.cancelado' => 'N',
-                            ))
+                            ])
                          ->where('ee.quantidade > 0')
                          ->groupBy('ee.id')
                          ->having('quantidaderestante > 0')
@@ -298,7 +298,7 @@ class ZEstoque
 
     private static function validarCampos(&$estoque)
     {
-        $erros = array();
+        $erros = [];
         if (!is_numeric($estoque['produtoid'])) {
             $erros['produtoid'] = 'O código do produto não foi informado';
         }
@@ -327,7 +327,7 @@ class ZEstoque
             $erros['funcionarioid'] = 'O código do funcionario não foi informado corretamente';
         }
         $estoque['tipomovimento'] = strval($estoque['tipomovimento']);
-        if (!in_array($estoque['tipomovimento'], array('Entrada', 'Venda', 'Consumo', 'Transferencia'))) {
+        if (!in_array($estoque['tipomovimento'], ['Entrada', 'Venda', 'Consumo', 'Transferencia'])) {
             $erros['tipomovimento'] = 'O tipo de movimento informado não é válido';
         }
         if (!is_numeric($estoque['quantidade'])) {
@@ -375,7 +375,7 @@ class ZEstoque
         $estoque['cancelado'] = trim($estoque['cancelado']);
         if (strlen($estoque['cancelado']) == 0) {
             $estoque['cancelado'] = 'N';
-        } elseif (!in_array($estoque['cancelado'], array('Y', 'N'))) {
+        } elseif (!in_array($estoque['cancelado'], ['Y', 'N'])) {
             $erros['cancelado'] = 'O status de cancelamento informado não é válido';
         }
         $estoque['datamovimento'] = date('Y-m-d H:i:s');
@@ -387,7 +387,7 @@ class ZEstoque
     private static function handleException(&$e)
     {
         if (stripos($e->getMessage(), 'PRIMARY') !== false) {
-            throw new ValidationException(array('id' => 'O ID informado já está cadastrado'));
+            throw new ValidationException(['id' => 'O ID informado já está cadastrado']);
         }
     }
 
@@ -408,10 +408,10 @@ class ZEstoque
     {
         $_estoque = $estoque->toArray();
         if (!$_estoque['id']) {
-            throw new ValidationException(array('id' => 'O id do estoque não foi informado'));
+            throw new ValidationException(['id' => 'O id do estoque não foi informado']);
         }
         self::validarCampos($_estoque);
-        $campos = array(
+        $campos = [
             'produtoid',
             'transacaoid',
             'entradaid',
@@ -427,7 +427,7 @@ class ZEstoque
             'detalhes',
             'cancelado',
             'datamovimento',
-        );
+        ];
         try {
             $query = DB::$pdo->update('Estoque');
             $query = $query->set(array_intersect_key($_estoque, array_flip($campos)));
@@ -446,7 +446,7 @@ class ZEstoque
             throw new Exception('Não foi possível excluir o estoque, o id do estoque não foi informado');
         }
         $query = DB::$pdo->deleteFrom('Estoque')
-                         ->where(array('id' => $id));
+                         ->where(['id' => $id]);
         return $query->execute();
     }
 
@@ -485,10 +485,10 @@ class ZEstoque
         $estoque->setSetorID($setor->getID());
         $produto = ZProduto::getPeloID($estoque->getProdutoID());
         if (is_null($produto->getID())) {
-            throw new ValidationException(array('produtoid' => 'O produto informado não existe'));
+            throw new ValidationException(['produtoid' => 'O produto informado não existe']);
         }
         if ($produto->getTipo() != ProdutoTipo::PRODUTO) {
-            throw new ValidationException(array('produtoid' => 'O produto informado não é do tipo produto'));
+            throw new ValidationException(['produtoid' => 'O produto informado não é do tipo produto']);
         }
         if (!is_null($produto->getSetorEstoqueID())) {
             $estoque->setSetorID($produto->getSetorEstoqueID());
@@ -601,7 +601,7 @@ class ZEstoque
             $query = $query->limit($quantidade)->offset($inicio);
         }
         $_estoques = $query->fetchAll();
-        $estoques = array();
+        $estoques = [];
         foreach ($_estoques as $estoque) {
             $estoques[] = new ZEstoque($estoque);
         }
@@ -617,7 +617,7 @@ class ZEstoque
     private static function initSearchDoProdutoID($produto_id)
     {
         return   DB::$pdo->from('Estoque')
-                         ->where(array('produtoid' => $produto_id))
+                         ->where(['produtoid' => $produto_id])
                          ->orderBy('id ASC');
     }
 
@@ -628,7 +628,7 @@ class ZEstoque
             $query = $query->limit($quantidade)->offset($inicio);
         }
         $_estoques = $query->fetchAll();
-        $estoques = array();
+        $estoques = [];
         foreach ($_estoques as $estoque) {
             $estoques[] = new ZEstoque($estoque);
         }
@@ -644,7 +644,7 @@ class ZEstoque
     private static function initSearchDaTransacaoID($transacao_id)
     {
         return   DB::$pdo->from('Estoque')
-                         ->where(array('transacaoid' => $transacao_id))
+                         ->where(['transacaoid' => $transacao_id])
                          ->orderBy('id ASC');
     }
 
@@ -655,7 +655,7 @@ class ZEstoque
             $query = $query->limit($quantidade)->offset($inicio);
         }
         $_estoques = $query->fetchAll();
-        $estoques = array();
+        $estoques = [];
         foreach ($_estoques as $estoque) {
             $estoques[] = new ZEstoque($estoque);
         }
@@ -671,7 +671,7 @@ class ZEstoque
     private static function initSearchDoFornecedorID($fornecedor_id)
     {
         return   DB::$pdo->from('Estoque')
-                         ->where(array('fornecedorid' => $fornecedor_id))
+                         ->where(['fornecedorid' => $fornecedor_id])
                          ->orderBy('id ASC');
     }
 
@@ -682,7 +682,7 @@ class ZEstoque
             $query = $query->limit($quantidade)->offset($inicio);
         }
         $_estoques = $query->fetchAll();
-        $estoques = array();
+        $estoques = [];
         foreach ($_estoques as $estoque) {
             $estoques[] = new ZEstoque($estoque);
         }
@@ -698,7 +698,7 @@ class ZEstoque
     private static function initSearchDoFuncionarioID($funcionario_id)
     {
         return   DB::$pdo->from('Estoque')
-                         ->where(array('funcionarioid' => $funcionario_id))
+                         ->where(['funcionarioid' => $funcionario_id])
                          ->orderBy('id ASC');
     }
 
@@ -709,7 +709,7 @@ class ZEstoque
             $query = $query->limit($quantidade)->offset($inicio);
         }
         $_estoques = $query->fetchAll();
-        $estoques = array();
+        $estoques = [];
         foreach ($_estoques as $estoque) {
             $estoques[] = new ZEstoque($estoque);
         }
@@ -725,7 +725,7 @@ class ZEstoque
     private static function initSearchDoSetorID($setor_id)
     {
         return   DB::$pdo->from('Estoque')
-                         ->where(array('setorid' => $setor_id))
+                         ->where(['setorid' => $setor_id])
                          ->orderBy('id ASC');
     }
 
@@ -736,7 +736,7 @@ class ZEstoque
             $query = $query->limit($quantidade)->offset($inicio);
         }
         $_estoques = $query->fetchAll();
-        $estoques = array();
+        $estoques = [];
         foreach ($_estoques as $estoque) {
             $estoques[] = new ZEstoque($estoque);
         }
@@ -752,7 +752,7 @@ class ZEstoque
     private static function initSearchDaEntradaID($entrada_id)
     {
         return   DB::$pdo->from('Estoque')
-                         ->where(array('entradaid' => $entrada_id))
+                         ->where(['entradaid' => $entrada_id])
                          ->orderBy('id ASC');
     }
 
@@ -763,7 +763,7 @@ class ZEstoque
             $query = $query->limit($quantidade)->offset($inicio);
         }
         $_estoques = $query->fetchAll();
-        $estoques = array();
+        $estoques = [];
         foreach ($_estoques as $estoque) {
             $estoques[] = new ZEstoque($estoque);
         }

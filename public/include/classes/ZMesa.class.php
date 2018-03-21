@@ -30,7 +30,7 @@ class ZMesa
     private $juntaid;
     private $juntanome;
 
-    public function __construct($mesa = array())
+    public function __construct($mesa = [])
     {
         if (is_array($mesa)) {
             $this->setID(isset($mesa['id'])?$mesa['id']:null);
@@ -111,7 +111,7 @@ class ZMesa
 
     public function toArray()
     {
-        $mesa = array();
+        $mesa = [];
         $mesa['id'] = $this->getID();
         $mesa['nome'] = $this->getNome();
         $mesa['ativa'] = $this->getAtiva();
@@ -125,14 +125,14 @@ class ZMesa
     public static function getPeloID($mesa_id)
     {
         $query = DB::$pdo->from('Mesas')
-                         ->where(array('id' => $mesa_id));
+                         ->where(['id' => $mesa_id]);
         return new ZMesa($query->fetch());
     }
 
     public static function getPeloNome($nome)
     {
         $query = DB::$pdo->from('Mesas')
-                         ->where(array('nome' => $nome));
+                         ->where(['nome' => $nome]);
         return new ZMesa($query->fetch());
     }
 
@@ -146,7 +146,7 @@ class ZMesa
 
     private static function validarCampos(&$mesa)
     {
-        $erros = array();
+        $erros = [];
         $mesa['nome'] = strip_tags(trim($mesa['nome']));
         if (strlen($mesa['nome']) == 0) {
             $erros['nome'] = 'O nome não pode ser vazio';
@@ -154,7 +154,7 @@ class ZMesa
         $mesa['ativa'] = trim($mesa['ativa']);
         if (strlen($mesa['ativa']) == 0) {
             $mesa['ativa'] = 'N';
-        } elseif (!in_array($mesa['ativa'], array('Y', 'N'))) {
+        } elseif (!in_array($mesa['ativa'], ['Y', 'N'])) {
             $erros['ativa'] = 'O estado de ativação da mesa não é válido';
         }
         $old_mesa = self::getPeloID($mesa['id']);
@@ -176,10 +176,10 @@ class ZMesa
     private static function handleException(&$e)
     {
         if (stripos($e->getMessage(), 'PRIMARY') !== false) {
-            throw new ValidationException(array('id' => 'O ID informado já está cadastrado'));
+            throw new ValidationException(['id' => 'O ID informado já está cadastrado']);
         }
         if (stripos($e->getMessage(), 'Nome_UNIQUE') !== false) {
-            throw new ValidationException(array('nome' => 'O nome informado já está cadastrado'));
+            throw new ValidationException(['nome' => 'O nome informado já está cadastrado']);
         }
     }
 
@@ -200,13 +200,13 @@ class ZMesa
     {
         $_mesa = $mesa->toArray();
         if (!$_mesa['id']) {
-            throw new ValidationException(array('id' => 'O id da mesa não foi informado'));
+            throw new ValidationException(['id' => 'O id da mesa não foi informado']);
         }
         self::validarCampos($_mesa);
-        $campos = array(
+        $campos = [
             'nome',
             'ativa',
-        );
+        ];
         try {
             $query = DB::$pdo->update('Mesas');
             $query = $query->set(array_intersect_key($_mesa, array_flip($campos)));
@@ -225,7 +225,7 @@ class ZMesa
             throw new Exception('Não foi possível excluir a mesa, o id da mesa não foi informado');
         }
         $query = DB::$pdo->deleteFrom('Mesas')
-                         ->where(array('id' => $id));
+                         ->where(['id' => $id]);
         return $query->execute();
     }
 
@@ -250,7 +250,7 @@ class ZMesa
         } elseif ($busca != '') {
             $query = $query->where('m.nome LIKE ?', '%'.$busca.'%');
         }
-        if (in_array($ativa, array('Y', 'N'))) {
+        if (in_array($ativa, ['Y', 'N'])) {
             $query = $query->where('m.ativa', $ativa);
         }
         $query = $query->orderBy('m.id ASC');
@@ -264,7 +264,7 @@ class ZMesa
             $query = $query->limit($quantidade)->offset($inicio);
         }
         $_mesas = $query->fetchAll();
-        $mesas = array();
+        $mesas = [];
         foreach ($_mesas as $mesa) {
             $mesas[] = new ZMesa($mesa);
         }

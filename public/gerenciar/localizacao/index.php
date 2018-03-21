@@ -37,8 +37,8 @@ $count = Localizacao::count($condition);
 list($pagesize, $offset, $pagestring) = pagestring($count, $limite);
 $localizacoes = Localizacao::findAll($condition, $order, $pagesize, $offset);
 
-$items = array();
+$items = [];
 foreach ($localizacoes as $localizacao) {
 	$items[] = $localizacao->publish();
 }
-json(array('status' => 'ok', 'items' => $items));
+json(['status' => 'ok', 'items' => $items]);

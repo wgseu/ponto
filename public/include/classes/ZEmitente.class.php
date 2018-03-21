@@ -41,7 +41,7 @@ class ZEmitente
     private $chave_publica;
     private $data_expiracao;
 
-    public function __construct($emitente = array())
+    public function __construct($emitente = [])
     {
         $this->fromArray($emitente);
     }
@@ -178,7 +178,7 @@ class ZEmitente
 
     public function toArray()
     {
-        $emitente = array();
+        $emitente = [];
         $emitente['id'] = $this->getID();
         $emitente['contadorid'] = $this->getContadorID();
         $emitente['regimeid'] = $this->getRegimeID();
@@ -192,7 +192,7 @@ class ZEmitente
         return $emitente;
     }
 
-    public function fromArray($emitente = array())
+    public function fromArray($emitente = [])
     {
         if (!is_array($emitente)) {
             return $this;
@@ -212,17 +212,17 @@ class ZEmitente
     public static function getPeloID($id)
     {
         $query = DB::$pdo->from('Emitentes')
-                         ->where(array('id' => $id));
+                         ->where(['id' => $id]);
         return new ZEmitente($query->fetch());
     }
 
     private static function validarCampos(&$emitente)
     {
-        $erros = array();
+        $erros = [];
         $emitente['id'] = trim($emitente['id']);
         if (strlen($emitente['id']) == 0) {
             $emitente['id'] = null;
-        } elseif (!in_array($emitente['id'], array('1'))) {
+        } elseif (!in_array($emitente['id'], ['1'])) {
             $erros['id'] = 'O id informado não é válido';
         }
         $emitente['contadorid'] = trim($emitente['contadorid']);
@@ -235,7 +235,7 @@ class ZEmitente
             $erros['regimeid'] = 'O regime tributário não foi informado';
         }
         $emitente['ambiente'] = strval($emitente['ambiente']);
-        if (!in_array($emitente['ambiente'], array('Homologacao', 'Producao'))) {
+        if (!in_array($emitente['ambiente'], ['Homologacao', 'Producao'])) {
             $erros['ambiente'] = 'O ambiente informado não é válido';
         }
         $emitente['csc'] = strip_tags(trim($emitente['csc']));
@@ -267,7 +267,7 @@ class ZEmitente
     private static function handleException(&$e)
     {
         if (stripos($e->getMessage(), 'PRIMARY') !== false) {
-            throw new ValidationException(array('id' => 'O id informado já está cadastrado'));
+            throw new ValidationException(['id' => 'O id informado já está cadastrado']);
         }
     }
 
@@ -288,10 +288,10 @@ class ZEmitente
     {
         $_emitente = $emitente->toArray();
         if (!$_emitente['id']) {
-            throw new ValidationException(array('id' => 'O id do emitente não foi informado'));
+            throw new ValidationException(['id' => 'O id do emitente não foi informado']);
         }
         self::validarCampos($_emitente);
-        $campos = array(
+        $campos = [
             'contadorid',
             'regimeid',
             'ambiente',
@@ -301,7 +301,7 @@ class ZEmitente
             'chaveprivada',
             'chavepublica',
             'dataexpiracao',
-        );
+        ];
         try {
             $query = DB::$pdo->update('Emitentes');
             $query = $query->set(array_intersect_key($_emitente, array_flip($campos)));
@@ -320,14 +320,14 @@ class ZEmitente
             throw new Exception('Não foi possível excluir o emitente, o id do emitente não foi informado');
         }
         $query = DB::$pdo->deleteFrom('Emitentes')
-                         ->where(array('id' => $id));
+                         ->where(['id' => $id]);
         return $query->execute();
     }
 
     private static function initSearchDoContadorID($contador_id)
     {
         return   DB::$pdo->from('Emitentes')
-                         ->where(array('contadorid' => $contador_id))
+                         ->where(['contadorid' => $contador_id])
                          ->orderBy('id ASC');
     }
 
@@ -338,7 +338,7 @@ class ZEmitente
             $query = $query->limit($quantidade)->offset($inicio);
         }
         $_emitentes = $query->fetchAll();
-        $emitentes = array();
+        $emitentes = [];
         foreach ($_emitentes as $emitente) {
             $emitentes[] = new ZEmitente($emitente);
         }
@@ -354,7 +354,7 @@ class ZEmitente
     private static function initSearchDoRegimeID($regime_id)
     {
         return   DB::$pdo->from('Emitentes')
-                         ->where(array('regimeid' => $regime_id))
+                         ->where(['regimeid' => $regime_id])
                          ->orderBy('id ASC');
     }
 
@@ -365,7 +365,7 @@ class ZEmitente
             $query = $query->limit($quantidade)->offset($inicio);
         }
         $_emitentes = $query->fetchAll();
-        $emitentes = array();
+        $emitentes = [];
         foreach ($_emitentes as $emitente) {
             $emitentes[] = new ZEmitente($emitente);
         }

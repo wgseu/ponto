@@ -27,11 +27,11 @@ $count = ZPatrimonio::getCount($_GET['empresaid'], $_GET['fornecedorid'], $_GET[
 list($pagesize, $offset, $pagestring) = pagestring($count, 10);
 $patrimonios = ZPatrimonio::getTodos($_GET['empresaid'], $_GET['fornecedorid'], $_GET['estado'], $_GET['query'], $offset, $pagesize);
 
-$_estado_names = array(
+$_estado_names = [
     'Novo' => 'Novo',
     'Conservado' => 'Conservado',
     'Ruim' => 'Ruim',
-);
+];
 
 $_empresa = ZCliente::getPeloID($_GET['empresaid']);
 $_fornecedor = ZFornecedor::getPeloID($_GET['fornecedorid']);

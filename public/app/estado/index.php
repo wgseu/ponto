@@ -26,9 +26,9 @@ $pais = \MZ\Location\Pais::findByID($pais_id);
 if (!$pais->exists()) {
     json('O país não foi informado ou não existe!');
 }
-$estados = \MZ\Location\Estado::findAll(array('paisid' => $pais->getID()));
-$items = array();
+$estados = \MZ\Location\Estado::findAll(['paisid' => $pais->getID()]);
+$items = [];
 foreach ($estados as $estado) {
     $items[] = $estado->publish();
 }
-json(array('status' => 'ok', 'items' => $items));
+json(['status' => 'ok', 'items' => $items]);

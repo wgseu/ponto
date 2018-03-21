@@ -27,17 +27,17 @@ $count = ZMovimentacao::getCount($_GET['caixaid'], $_GET['aberto'], $_GET['inici
 list($pagesize, $offset, $pagestring) = pagestring($count, 10);
 $movimentacoes = ZMovimentacao::getTodas($_GET['caixaid'], $_GET['aberto'], $_GET['inicializadorid'], $offset, $pagesize);
 
-$_movimentacao_icon = array(
+$_movimentacao_icon = [
     'Y' => 0,
     'N' => 16,
-);
+];
 
-$estados = array(
+$estados = [
     'Y' => 'Aberto',
     'N' => 'Fechado',
-);
+];
 $caixas = ZCaixa::getTodas();
-$_caixa_names = array();
+$_caixa_names = [];
 foreach ($caixas as $caixa) {
     $_caixa_names[$caixa->getID()] = $caixa->getDescricao();
 }

@@ -36,7 +36,7 @@ if ((!have_permission(PermissaoNome::CADASTROFUNCIONARIOS) &&
 }
 $cliente_func = ZCliente::getPeloID($funcionario->getClienteID());
 $focusctrl = 'clienteid';
-$errors = array();
+$errors = [];
 $old_funcionario = $funcionario;
 if (is_post()) {
     $funcionario = new ZFuncionario($_POST);

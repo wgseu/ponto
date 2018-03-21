@@ -28,7 +28,7 @@ if (is_null($unidade->getID())) {
     redirect('/gerenciar/unidade/');
 }
 $focusctrl = 'nome';
-$errors = array();
+$errors = [];
 $old_unidade = $unidade;
 if (is_post()) {
     $unidade = new ZUnidade($_POST);

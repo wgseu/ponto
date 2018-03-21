@@ -76,7 +76,7 @@ class Integracao extends \MZ\Database\Helper
      * Constructor for a new empty instance of Integracao
      * @param array $integracao All field and values to fill the instance
      */
-    public function __construct($integracao = array())
+    public function __construct($integracao = [])
     {
         parent::__construct($integracao);
     }
@@ -295,12 +295,12 @@ class Integracao extends \MZ\Database\Helper
      * @param  mixed $integracao Associated key -> value to assign into this instance
      * @return Integracao Self instance
      */
-    public function fromArray($integracao = array())
+    public function fromArray($integracao = [])
     {
         if ($integracao instanceof Integracao) {
             $integracao = $integracao->toArray();
         } elseif (!is_array($integracao)) {
-            $integracao = array();
+            $integracao = [];
         }
         parent::fromArray($integracao);
         if (!isset($integracao['id'])) {
@@ -396,7 +396,7 @@ class Integracao extends \MZ\Database\Helper
      */
     public function validate()
     {
-        $errors = array();
+        $errors = [];
         if (is_null($this->getNome())) {
             $errors['nome'] = 'O Nome não pode ser vazio';
         }
@@ -423,28 +423,28 @@ class Integracao extends \MZ\Database\Helper
     protected function translate($e)
     {
         if (stripos($e->getMessage(), 'PRIMARY') !== false) {
-            return new \MZ\Exception\ValidationException(array(
+            return new \MZ\Exception\ValidationException([
                 'id' => vsprintf(
                     'O ID "%s" já está cadastrado',
-                    array($this->getID())
+                    [$this->getID()]
                 ),
-            ));
+            ]);
         }
         if (stripos($e->getMessage(), 'Nome_UNIQUE') !== false) {
-            return new \MZ\Exception\ValidationException(array(
+            return new \MZ\Exception\ValidationException([
                 'nome' => vsprintf(
                     'O Nome "%s" já está cadastrado',
-                    array($this->getNome())
+                    [$this->getNome()]
                 ),
-            ));
+            ]);
         }
         if (stripos($e->getMessage(), 'AcessoURL_UNIQUE') !== false) {
-            return new \MZ\Exception\ValidationException(array(
+            return new \MZ\Exception\ValidationException([
                 'acessourl' => vsprintf(
                     'A URL "%s" já está cadastrada',
-                    array($this->getAcessoURL())
+                    [$this->getAcessoURL()]
                 ),
-            ));
+            ]);
         }
         return parent::translate($e);
     }
@@ -485,7 +485,7 @@ class Integracao extends \MZ\Database\Helper
     {
         $filename = WWW_ROOT . $this->makeDataURL();
         if (!file_exists($filename)) {
-            return array();
+            return [];
         }
         return json_decode(file_get_contents($filename), true);
     }
@@ -536,9 +536,9 @@ class Integracao extends \MZ\Database\Helper
      */
     public static function findByID($id)
     {
-        return self::find(array(
+        return self::find([
             'id' => intval($id),
-        ));
+        ]);
     }
 
     /**
@@ -548,9 +548,9 @@ class Integracao extends \MZ\Database\Helper
      */
     public static function findByNome($nome)
     {
-        return self::find(array(
+        return self::find([
             'nome' => strval($nome),
-        ));
+        ]);
     }
 
     /**
@@ -560,9 +560,9 @@ class Integracao extends \MZ\Database\Helper
      */
     public static function findByAcessoURL($acesso_url)
     {
-        return self::find(array(
+        return self::find([
             'acessourl' => strval($acesso_url),
-        ));
+        ]);
     }
 
     /**
@@ -570,7 +570,7 @@ class Integracao extends \MZ\Database\Helper
      * @param  array $condition condition to filter rows
      * @return SelectQuery query object with condition statement
      */
-    private static function query($condition = array(), $order = array())
+    private static function query($condition = [], $order = [])
     {
         $query = self::getDB()->from('Integracoes');
         if (isset($condition['query'])) {
@@ -590,7 +590,7 @@ class Integracao extends \MZ\Database\Helper
         $query = self::query($condition)->limit(1);
         $row = $query->fetch();
         if ($row === false) {
-            $row = array();
+            $row = [];
         }
         return new Integracao($row);
     }
@@ -602,7 +602,7 @@ class Integracao extends \MZ\Database\Helper
      * @param  integer $offset start index to get rows, null for begining
      * @return array All rows instanced and filled
      */
-    public static function findAll($condition = array(), $order = array(), $limit = null, $offset = null)
+    public static function findAll($condition = [], $order = [], $limit = null, $offset = null)
     {
         $query = self::query($condition, $order);
         if (!is_null($limit)) {
@@ -612,7 +612,7 @@ class Integracao extends \MZ\Database\Helper
             $query = $query->offset($offset);
         }
         $rows = $query->fetchAll();
-        $result = array();
+        $result = [];
         foreach ($rows as $row) {
             $result[] = new Integracao($row);
         }
@@ -695,7 +695,7 @@ class Integracao extends \MZ\Database\Helper
      * @param  array $condition condition to filter rows
      * @return integer Quantity of rows
      */
-    public static function count($condition = array())
+    public static function count($condition = [])
     {
         $query = self::query($condition);
         return $query->count();

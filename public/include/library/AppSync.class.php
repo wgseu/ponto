@@ -66,7 +66,7 @@ class AppSync
         return $result;
     }
 
-    public function send($data = array())
+    public function send($data = [])
     {
         $cmd = json_encode($data);
         $length = strlen($cmd);
@@ -77,66 +77,66 @@ class AppSync
 
     public function updateOrder($id, $tipo, $mesa_id, $comanda_id, $action)
     {
-        $this->send(array('cmd' => 'pedidos', 'id' => $id, 'tipo' => $tipo, 'mesa' => intval($mesa_id), 'comanda' => intval($comanda_id), 'action' => $action));
+        $this->send(['cmd' => 'pedidos', 'id' => $id, 'tipo' => $tipo, 'mesa' => intval($mesa_id), 'comanda' => intval($comanda_id), 'action' => $action]);
     }
 
     public function updateAuth($funcionario_id, $dispositivo_nome)
     {
-        $this->send(array('cmd' => 'autenticacao', 'funcionario' => $funcionario_id, 'dispositivo' => $dispositivo_nome));
+        $this->send(['cmd' => 'autenticacao', 'funcionario' => $funcionario_id, 'dispositivo' => $dispositivo_nome]);
     }
 
     public function printOrder($pedido_id, $funcionario_id)
     {
-        $this->send(array('cmd' => 'imprimir', 'pedido' => intval($pedido_id), 'funcionario' => $funcionario_id, 'action' => 'conta'));
+        $this->send(['cmd' => 'imprimir', 'pedido' => intval($pedido_id), 'funcionario' => $funcionario_id, 'action' => 'conta']);
     }
 
     public function printServices($pedido_id)
     {
-        $this->send(array('cmd' => 'imprimir', 'pedido' => intval($pedido_id), 'action' => 'servicos'));
+        $this->send(['cmd' => 'imprimir', 'pedido' => intval($pedido_id), 'action' => 'servicos']);
     }
 
     public function printQueue($pedido_id)
     {
-        $this->send(array('cmd' => 'imprimir', 'pedido' => intval($pedido_id), 'action' => 'senha'));
+        $this->send(['cmd' => 'imprimir', 'pedido' => intval($pedido_id), 'action' => 'senha']);
     }
 
     public function deviceAdded($device_name, $caixa_id)
     {
-        $this->send(array('cmd' => 'dispositivos', 'nome' => $device_name, 'caixa' => intval($caixa_id), 'action' => 'criacao'));
+        $this->send(['cmd' => 'dispositivos', 'nome' => $device_name, 'caixa' => intval($caixa_id), 'action' => 'criacao']);
     }
 
     public function deviceUpdated($device_name, $caixa_id)
     {
-        $this->send(array('cmd' => 'dispositivos', 'nome' => $device_name, 'caixa' => intval($caixa_id), 'action' => 'alteracao'));
+        $this->send(['cmd' => 'dispositivos', 'nome' => $device_name, 'caixa' => intval($caixa_id), 'action' => 'alteracao']);
     }
 
     public function printOptionsChanged()
     {
-        $this->send(array('cmd' => 'sistema', 'action' => 'impressao_opcoes'));
+        $this->send(['cmd' => 'sistema', 'action' => 'impressao_opcoes']);
     }
 
     public function systemOptionsChanged()
     {
-        $this->send(array('cmd' => 'sistema', 'action' => 'sistema_info'));
+        $this->send(['cmd' => 'sistema', 'action' => 'sistema_info']);
     }
 
     public function enterpriseChanged()
     {
-        $this->send(array('cmd' => 'sistema', 'action' => 'empresa_info'));
+        $this->send(['cmd' => 'sistema', 'action' => 'empresa_info']);
     }
 
     public function integratorChanged()
     {
-        $this->send(array('cmd' => 'integracao', 'action' => 'alteracao'));
+        $this->send(['cmd' => 'integracao', 'action' => 'alteracao']);
     }
 
     public function invoiceAdded($nota_id, $pedido_id)
     {
-        $this->send(array('cmd' => 'nota', 'id' => intval($nota_id), 'pedido' => intval($pedido_id), 'action' => 'criacao'));
+        $this->send(['cmd' => 'nota', 'id' => intval($nota_id), 'pedido' => intval($pedido_id), 'action' => 'criacao']);
     }
 
     public function invoiceRun($nota_id, $pedido_id)
     {
-        $this->send(array('cmd' => 'nota', 'id' => intval($nota_id), 'pedido' => intval($pedido_id), 'action' => 'executar'));
+        $this->send(['cmd' => 'nota', 'id' => intval($nota_id), 'pedido' => intval($pedido_id), 'action' => 'executar']);
     }
 }

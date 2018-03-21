@@ -59,7 +59,7 @@ try {
         true // raw enabled
     );
     // Coluna dos dados
-    $columns = array(
+    $columns = [
         'Pedido',
         'Destino',
         'Atendente',
@@ -77,8 +77,8 @@ try {
         'Lucro total ('. $__moeda__->getSimbolo() . ')',
         'Observações',
         'Data do pedido'
-    );
-    $data = array($columns);
+    ];
+    $data = [$columns];
     $line = 3;
     $column = 'B';
     $i = $line;
@@ -92,7 +92,7 @@ try {
         $datahora = strtotime($value->getDataHora());
         date_default_timezone_set($tz);
 
-        $row = array();
+        $row = [];
         $row[] = $value->getPedidoID();
         $row[] = $value->getDestino($item);
         $row[] = $item['funcionario_login'];
@@ -113,7 +113,7 @@ try {
         $data[] = $row;
     }
     // footer
-    $row = array();
+    $row = [];
     $row[] = count($itens_do_pedido) . ' Vendas';
     $row[] = null;
     $row[] = null;
@@ -172,13 +172,13 @@ try {
     $objPHPExcel->getActiveSheet()->getStyle("I{$j}:P{$j}")->getAlignment()
         ->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_RIGHT);
     $objPHPExcel->getActiveSheet()->getStyle('B3:R3')->getFont()->setBold(true);
-    $objPHPExcel->getActiveSheet()->getStyle('B3:R3')->getBorders()->applyFromArray(array(
-        'allborders' => array('style' => PHPExcel_Style_Border::BORDER_MEDIUM)
-    ));
+    $objPHPExcel->getActiveSheet()->getStyle('B3:R3')->getBorders()->applyFromArray([
+        'allborders' => ['style' => PHPExcel_Style_Border::BORDER_MEDIUM]
+    ]);
     $objPHPExcel->getActiveSheet()->getStyle("B{$j}:R{$j}")->getFont()->setBold(true);
-    $objPHPExcel->getActiveSheet()->getStyle("B{$j}:R{$j}")->getBorders()->applyFromArray(array(
-        'allborders' => array('style' => PHPExcel_Style_Border::BORDER_MEDIUM)
-    ));
+    $objPHPExcel->getActiveSheet()->getStyle("B{$j}:R{$j}")->getBorders()->applyFromArray([
+        'allborders' => ['style' => PHPExcel_Style_Border::BORDER_MEDIUM]
+    ]);
     $objPHPExcel->getActiveSheet()->getStyle("R4:R{$i}")->getNumberFormat()->setFormatCode(
         PHPExcel_Style_NumberFormat::FORMAT_DATE_DATETIME
     );
@@ -190,10 +190,10 @@ try {
     );
     foreach ($columns as $title) {
         $objPHPExcel->getActiveSheet()->getColumnDimension($column)->setAutoSize(true);
-        $objPHPExcel->getActiveSheet()->getStyle("{$column}4:{$column}{$i}")->getBorders()->applyFromArray(array(
-            'left' => array('style' => PHPExcel_Style_Border::BORDER_MEDIUM),
-            'right' => array('style' => PHPExcel_Style_Border::BORDER_MEDIUM)
-        ));
+        $objPHPExcel->getActiveSheet()->getStyle("{$column}4:{$column}{$i}")->getBorders()->applyFromArray([
+            'left' => ['style' => PHPExcel_Style_Border::BORDER_MEDIUM],
+            'right' => ['style' => PHPExcel_Style_Border::BORDER_MEDIUM]
+        ]);
         $column++;
     }
     if ($formato == 'xlsx') {

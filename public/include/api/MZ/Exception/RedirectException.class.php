@@ -26,7 +26,7 @@ namespace MZ\Exception;
 
 class RedirectException extends \Exception
 {
-    private $url = array();
+    private $url = [];
 
     public function __construct($message, $code, $url)
     {

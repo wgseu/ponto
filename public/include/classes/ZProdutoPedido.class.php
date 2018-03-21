@@ -59,7 +59,7 @@ class ZProdutoPedido
     private $desperdicado;
     private $data_hora;
 
-    public function __construct($produto_pedido = array())
+    public function __construct($produto_pedido = [])
     {
         $this->fromArray($produto_pedido);
     }
@@ -385,12 +385,12 @@ class ZProdutoPedido
      * @param  mixed $produto_pedido Associated key -> value to assign into this instance
      * @return ProdutoPedido Self instance
      */
-    public function fromArray($produto_pedido = array())
+    public function fromArray($produto_pedido = [])
     {
         if ($produto_pedido instanceof ProdutoPedido) {
             $produto_pedido = $produto_pedido->toArray();
         } elseif (!is_array($produto_pedido)) {
-            $produto_pedido = array();
+            $produto_pedido = [];
         }
         if (!isset($produto_pedido['id'])) {
             $this->setID(null);
@@ -502,7 +502,7 @@ class ZProdutoPedido
 
     public function toArray()
     {
-        $produto_pedido = array();
+        $produto_pedido = [];
         $produto_pedido['id'] = $this->getID();
         $produto_pedido['pedidoid'] = $this->getPedidoID();
         $produto_pedido['funcionarioid'] = $this->getFuncionarioID();
@@ -530,13 +530,13 @@ class ZProdutoPedido
     public static function getPeloID($id)
     {
         $query = DB::$pdo->from('Produtos_Pedidos')
-                         ->where(array('id' => $id));
+                         ->where(['id' => $id]);
         return new ZProdutoPedido($query->fetch());
     }
 
     private static function validarCampos(&$produto_pedido)
     {
-        $erros = array();
+        $erros = [];
         if (!is_numeric($produto_pedido['pedidoid'])) {
             $erros['pedidoid'] = 'O id do pedido não foi informado';
         }
@@ -594,13 +594,13 @@ class ZProdutoPedido
         $produto_pedido['estado'] = trim($produto_pedido['estado']);
         if (strlen($produto_pedido['estado']) == 0) {
             $produto_pedido['estado'] = null;
-        } elseif (!in_array($produto_pedido['estado'], array('Adicionado', 'Enviado', 'Processado', 'Pronto', 'Disponivel', 'Entregue'))) {
+        } elseif (!in_array($produto_pedido['estado'], ['Adicionado', 'Enviado', 'Processado', 'Pronto', 'Disponivel', 'Entregue'])) {
             $erros['estado'] = 'O estado informado não é válido';
         }
         $produto_pedido['visualizado'] = trim($produto_pedido['visualizado']);
         if (strlen($produto_pedido['visualizado']) == 0) {
             $produto_pedido['visualizado'] = 'N';
-        } elseif (!in_array($produto_pedido['visualizado'], array('Y', 'N'))) {
+        } elseif (!in_array($produto_pedido['visualizado'], ['Y', 'N'])) {
             $erros['visualizado'] = 'A visualização informada não é válida';
         }
         $produto_pedido['datavisualizacao'] = null;
@@ -608,13 +608,13 @@ class ZProdutoPedido
         $produto_pedido['cancelado'] = trim($produto_pedido['cancelado']);
         if (strlen($produto_pedido['cancelado']) == 0) {
             $produto_pedido['cancelado'] = 'N';
-        } elseif (!in_array($produto_pedido['cancelado'], array('Y', 'N'))) {
+        } elseif (!in_array($produto_pedido['cancelado'], ['Y', 'N'])) {
             $erros['cancelado'] = 'A informação de cancelamento não é válida';
         }
         $produto_pedido['desperdicado'] = trim($produto_pedido['desperdicado']);
         if (strlen($produto_pedido['desperdicado']) == 0) {
             $produto_pedido['desperdicado'] = 'N';
-        } elseif (!in_array($produto_pedido['desperdicado'], array('Y', 'N'))) {
+        } elseif (!in_array($produto_pedido['desperdicado'], ['Y', 'N'])) {
             $erros['desperdicado'] = 'O desperdício informado não é válido';
         }
         $produto_pedido['datahora'] = date('Y-m-d H:i:s');
@@ -626,7 +626,7 @@ class ZProdutoPedido
     private static function handleException(&$e)
     {
         if (stripos($e->getMessage(), 'PRIMARY') !== false) {
-            throw new ValidationException(array('id' => 'O ID informado já está cadastrado'));
+            throw new ValidationException(['id' => 'O ID informado já está cadastrado']);
         }
     }
 
@@ -645,7 +645,7 @@ class ZProdutoPedido
                     }
                     $composicao = ZComposicao::getPeloID($formacao->getComposicaoID());
                     if (is_null($composicao->getID())) {
-                        throw new ValidationException(array('formacao' => 'A composição formada não existe'));
+                        throw new ValidationException(['formacao' => 'A composição formada não existe']);
                     }
                     $operacao = -1;
                     if ($composicao->getTipo() == ComposicaoTipo::ADICIONAL) {
@@ -658,7 +658,7 @@ class ZProdutoPedido
             $_produto_pedido['id'] = DB::$pdo->insertInto('Produtos_Pedidos')->values($_produto_pedido)->execute();
             $produto_pedido = self::getPeloID($_produto_pedido['id']);
             // TODO: verificar se o preço informado está correto
-            $composicoes = array();
+            $composicoes = [];
             foreach ($formacoes as $key => $_formacao) {
                 $formacao = new ZFormacao($_formacao);
                 $formacao->setProdutoPedidoID($produto_pedido->getID());
@@ -683,10 +683,10 @@ class ZProdutoPedido
     {
         $_produto_pedido = $produto_pedido->toArray();
         if (!$_produto_pedido['id']) {
-            throw new ValidationException(array('id' => 'O id do produtopedido não foi informado'));
+            throw new ValidationException(['id' => 'O id do produtopedido não foi informado']);
         }
         self::validarCampos($_produto_pedido);
-        $campos = array(
+        $campos = [
             'pedidoid',
             'funcionarioid',
             'produtoid',
@@ -707,7 +707,7 @@ class ZProdutoPedido
             'motivo',
             'desperdicado',
             'datahora',
-        );
+        ];
         try {
             $query = DB::$pdo->update('Produtos_Pedidos');
             $query = $query->set(array_intersect_key($_produto_pedido, array_flip($campos)));
@@ -726,7 +726,7 @@ class ZProdutoPedido
             throw new Exception('Não foi possível excluir o produtopedido, o id do produtopedido não foi informado');
         }
         $query = DB::$pdo->deleteFrom('Produtos_Pedidos')
-                         ->where(array('id' => $id));
+                         ->where(['id' => $id]);
         return $query->execute();
     }
 
@@ -845,7 +845,7 @@ class ZProdutoPedido
         if ($raw) {
             return $_produto_pedidos;
         }
-        $produto_pedidos = array();
+        $produto_pedidos = [];
         foreach ($_produto_pedidos as $produto_pedido) {
             $produto_pedidos[] = new ZProdutoPedido($produto_pedido);
         }
@@ -894,7 +894,7 @@ class ZProdutoPedido
             $query = $query->limit($quantidade)->offset($inicio);
         }
         $_produto_pedidos = $query->fetchAll();
-        $produto_pedidos = array();
+        $produto_pedidos = [];
         foreach ($_produto_pedidos as $produto_pedido) {
             $produto_pedidos[] = new ZProdutoPedido($produto_pedido);
         }
@@ -910,7 +910,7 @@ class ZProdutoPedido
     private static function initSearchDoProdutoID($produto_id)
     {
         return   DB::$pdo->from('Produtos_Pedidos')
-                         ->where(array('produtoid' => $produto_id))
+                         ->where(['produtoid' => $produto_id])
                          ->orderBy('id ASC');
     }
 
@@ -921,7 +921,7 @@ class ZProdutoPedido
             $query = $query->limit($quantidade)->offset($inicio);
         }
         $_produto_pedidos = $query->fetchAll();
-        $produto_pedidos = array();
+        $produto_pedidos = [];
         foreach ($_produto_pedidos as $produto_pedido) {
             $produto_pedidos[] = new ZProdutoPedido($produto_pedido);
         }
@@ -937,7 +937,7 @@ class ZProdutoPedido
     private static function initSearchDoFuncionarioID($funcionario_id)
     {
         return   DB::$pdo->from('Produtos_Pedidos')
-                         ->where(array('funcionarioid' => $funcionario_id))
+                         ->where(['funcionarioid' => $funcionario_id])
                          ->orderBy('id ASC');
     }
 
@@ -948,7 +948,7 @@ class ZProdutoPedido
             $query = $query->limit($quantidade)->offset($inicio);
         }
         $_produto_pedidos = $query->fetchAll();
-        $produto_pedidos = array();
+        $produto_pedidos = [];
         foreach ($_produto_pedidos as $produto_pedido) {
             $produto_pedidos[] = new ZProdutoPedido($produto_pedido);
         }
@@ -970,11 +970,11 @@ class ZProdutoPedido
                          ->leftJoin('Pedidos p ON p.id = pp.pedidoid')
                          ->leftJoin('Produtos pd ON pd.id = pp.produtoid')
                          ->leftJoin('Categorias c ON c.id = pd.categoriaid')
-                         ->where(array('p.cancelado' => 'N', 'pp.cancelado' => 'N'))
+                         ->where(['p.cancelado' => 'N', 'pp.cancelado' => 'N'])
                          ->groupBy('pd.categoriaid')
                          ->orderBy('total DESC');
         if (!is_null($sessao_id)) {
-            $query = $query->where(array('p.sessaoid' => $sessao_id));
+            $query = $query->where(['p.sessaoid' => $sessao_id]);
         }
         if (!is_null($data_inicio) && is_null($sessao_id)) {
             $query = $query->where('pp.datahora >= ?', date('Y-m-d', $data_inicio));
@@ -1040,24 +1040,24 @@ class ZProdutoPedido
                          ->leftJoin('Pedidos p ON p.id = pp.pedidoid')
                          ->leftJoin('Produtos pd ON pd.id = pp.produtoid')
                          ->leftJoin('Unidades u ON u.id = pd.unidadeid')
-                         ->where(array(
+                         ->where([
                                 'NOT pp.produtoid' => null,
                                 'p.cancelado' => 'N',
                                 'pp.cancelado' => 'N',
-                            ))
+                            ])
                          ->where('p.estado <> ?', PedidoEstado::FINALIZADO)
                          ->orderBy('pp.id ASC')
                          ->groupBy('pp.produtoid, pp.preco, pp.detalhes');
         if ($tipo == PedidoTipo::COMANDA) {
-            $query = $query->where(array(
+            $query = $query->where([
                                 'p.comandaid' => $comanda_id,
                                 'p.tipo' => PedidoTipo::COMANDA,
-                            ));
+                            ]);
         } else {
-            $query = $query->where(array(
+            $query = $query->where([
                                 'p.mesaid' => $mesa_id,
                                 'p.tipo' => PedidoTipo::MESA,
-                            ));
+                            ]);
         }
         return $query;
     }

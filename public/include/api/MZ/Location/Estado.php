@@ -54,7 +54,7 @@ class Estado extends \MZ\Database\Helper
      * Constructor for a new empty instance of Estado
      * @param array $estado All field and values to fill the instance
      */
-    public function __construct($estado = array())
+    public function __construct($estado = [])
     {
         parent::__construct($estado);
     }
@@ -159,12 +159,12 @@ class Estado extends \MZ\Database\Helper
      * @param  mixed $estado Associated key -> value to assign into this instance
      * @return Estado Self instance
      */
-    public function fromArray($estado = array())
+    public function fromArray($estado = [])
     {
         if ($estado instanceof Estado) {
             $estado = $estado->toArray();
         } elseif (!is_array($estado)) {
-            $estado = array();
+            $estado = [];
         }
         parent::fromArray($estado);
         if (!isset($estado['id'])) {
@@ -226,7 +226,7 @@ class Estado extends \MZ\Database\Helper
      */
     public function validate()
     {
-        $errors = array();
+        $errors = [];
         if (is_null($this->getPaisID())) {
             $errors['paisid'] = 'O país não pode ser vazio';
         }
@@ -250,36 +250,36 @@ class Estado extends \MZ\Database\Helper
     protected function translate($e)
     {
         if (stripos($e->getMessage(), 'PRIMARY') !== false) {
-            return new \MZ\Exception\ValidationException(array(
+            return new \MZ\Exception\ValidationException([
                 'id' => vsprintf(
                     'O id "%s" já está cadastrado',
-                    array($this->getID())
+                    [$this->getID()]
                 ),
-            ));
+            ]);
         }
         if (stripos($e->getMessage(), 'PaisID_Nome_UNIQUE') !== false) {
-            return new \MZ\Exception\ValidationException(array(
+            return new \MZ\Exception\ValidationException([
                 'paisid' => vsprintf(
                     'O país "%s" já está cadastrado',
-                    array($this->getPaisID())
+                    [$this->getPaisID()]
                 ),
                 'nome' => vsprintf(
                     'O nome "%s" já está cadastrado',
-                    array($this->getNome())
+                    [$this->getNome()]
                 ),
-            ));
+            ]);
         }
         if (stripos($e->getMessage(), 'PaisID_UF_UNIQUE') !== false) {
-            return new \MZ\Exception\ValidationException(array(
+            return new \MZ\Exception\ValidationException([
                 'paisid' => vsprintf(
                     'O país "%s" já está cadastrado',
-                    array($this->getPaisID())
+                    [$this->getPaisID()]
                 ),
                 'uf' => vsprintf(
                     'A UF "%s" já está cadastrada',
-                    array($this->getUF())
+                    [$this->getUF()]
                 ),
-            ));
+            ]);
         }
         return parent::translate($e);
     }
@@ -291,9 +291,9 @@ class Estado extends \MZ\Database\Helper
      */
     public static function findByID($id)
     {
-        return self::find(array(
+        return self::find([
             'id' => intval($id),
-        ));
+        ]);
     }
 
     /**
@@ -304,10 +304,10 @@ class Estado extends \MZ\Database\Helper
      */
     public static function findByPaisIDNome($pais_id, $nome)
     {
-        return self::find(array(
+        return self::find([
             'paisid' => intval($pais_id),
             'nome' => strval($nome),
-        ));
+        ]);
     }
 
     /**
@@ -318,10 +318,10 @@ class Estado extends \MZ\Database\Helper
      */
     public static function findByPaisIDUF($pais_id, $uf)
     {
-        return self::find(array(
+        return self::find([
             'paisid' => intval($pais_id),
             'uf' => strval($uf),
-        ));
+        ]);
     }
 
     /**
@@ -357,7 +357,7 @@ class Estado extends \MZ\Database\Helper
         if (isset($condition['search'])) {
             $search = $condition['search'];
             $field = '(e.nome LIKE ? OR e.uf = ?)';
-            $condition[$field] = array('%'.$search.'%', $search);
+            $condition[$field] = ['%'.$search.'%', $search];
             $allowed[$field] = true;
             unset($condition['search']);
         }
@@ -370,7 +370,7 @@ class Estado extends \MZ\Database\Helper
      * @param  array $order order rows
      * @return SelectQuery query object with condition statement
      */
-    private static function query($condition = array(), $order = array())
+    private static function query($condition = [], $order = [])
     {
         $query = self::getDB()->from('Estados e');
         $condition = self::filterCondition($condition);
@@ -386,12 +386,12 @@ class Estado extends \MZ\Database\Helper
      * @param  array $order order rows
      * @return Estado A filled Estado or empty instance
      */
-    public static function find($condition, $order = array())
+    public static function find($condition, $order = [])
     {
         $query = self::query($condition, $order)->limit(1);
         $row = $query->fetch();
         if ($row === false) {
-            $row = array();
+            $row = [];
         }
         return new Estado($row);
     }
@@ -403,7 +403,7 @@ class Estado extends \MZ\Database\Helper
      * @param  integer $offset start index to get rows, null for begining
      * @return array All rows instanced and filled
      */
-    public static function findAll($condition = array(), $order = array(), $limit = null, $offset = null)
+    public static function findAll($condition = [], $order = [], $limit = null, $offset = null)
     {
         $query = self::query($condition, $order);
         if (!is_null($limit)) {
@@ -413,7 +413,7 @@ class Estado extends \MZ\Database\Helper
             $query = $query->offset($offset);
         }
         $rows = $query->fetchAll();
-        $result = array();
+        $result = [];
         foreach ($rows as $row) {
             $result[] = new Estado($row);
         }
@@ -496,7 +496,7 @@ class Estado extends \MZ\Database\Helper
      * @param  array $condition condition to filter rows
      * @return integer Quantity of rows
      */
-    public static function count($condition = array())
+    public static function count($condition = [])
     {
         $query = self::query($condition);
         return $query->count();

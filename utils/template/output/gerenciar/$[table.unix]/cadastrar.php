@@ -40,7 +40,7 @@ $[field.end]
 $[field.end]
 
 $focusctrl = '$[descriptor]';
-$errors = array();
+$errors = [];
 $old_$[table.unix] = $$[table.unix];
 if (is_post()) {
     $$[table.unix] = new $[Table.norm]($_POST);
@@ -53,7 +53,7 @@ if (is_post()) {
             $$[table.unix]->get$[Descriptor.norm]()
         );
         if (is_output('json')) {
-            json(null, array('item' => $$[table.unix]->publish(), 'msg' => $msg));
+            json(null, ['item' => $$[table.unix]->publish(), 'msg' => $msg]);
         }
         \Thunder::success($msg, true);
         redirect('/gerenciar/$[table.unix]/');
@@ -63,7 +63,7 @@ if (is_post()) {
             $errors = $e->getErrors();
         }
         if (is_output('json')) {
-            json($e->getMessage(), null, array('errors' => $errors));
+            json($e->getMessage(), null, ['errors' => $errors]);
         }
         \Thunder::error($e->getMessage());
         foreach ($errors as $key => $value) {

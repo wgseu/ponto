@@ -28,7 +28,7 @@ class ZRegime
     private $codigo;
     private $descricao;
 
-    public function __construct($regime = array())
+    public function __construct($regime = [])
     {
         $this->fromArray($regime);
     }
@@ -74,14 +74,14 @@ class ZRegime
 
     public function toArray()
     {
-        $regime = array();
+        $regime = [];
         $regime['id'] = $this->getID();
         $regime['codigo'] = $this->getCodigo();
         $regime['descricao'] = $this->getDescricao();
         return $regime;
     }
 
-    public function fromArray($regime = array())
+    public function fromArray($regime = [])
     {
         if (!is_array($regime)) {
             return $this;
@@ -94,20 +94,20 @@ class ZRegime
     public static function getPeloID($id)
     {
         $query = DB::$pdo->from('Regimes')
-                         ->where(array('id' => $id));
+                         ->where(['id' => $id]);
         return new ZRegime($query->fetch());
     }
 
     public static function getPeloCodigo($codigo)
     {
         $query = DB::$pdo->from('Regimes')
-                         ->where(array('codigo' => $codigo));
+                         ->where(['codigo' => $codigo]);
         return new ZRegime($query->fetch());
     }
 
     private static function validarCampos(&$regime)
     {
-        $erros = array();
+        $erros = [];
         if (!is_numeric($regime['codigo'])) {
             $erros['codigo'] = 'O código não foi informado';
         }
@@ -123,10 +123,10 @@ class ZRegime
     private static function handleException(&$e)
     {
         if (stripos($e->getMessage(), 'PRIMARY') !== false) {
-            throw new ValidationException(array('id' => 'O id informado já está cadastrado'));
+            throw new ValidationException(['id' => 'O id informado já está cadastrado']);
         }
         if (stripos($e->getMessage(), 'Codigo_UNIQUE') !== false) {
-            throw new ValidationException(array('codigo' => 'O código informado já está cadastrado'));
+            throw new ValidationException(['codigo' => 'O código informado já está cadastrado']);
         }
     }
 
@@ -147,13 +147,13 @@ class ZRegime
     {
         $_regime = $regime->toArray();
         if (!$_regime['id']) {
-            throw new ValidationException(array('id' => 'O id do regime não foi informado'));
+            throw new ValidationException(['id' => 'O id do regime não foi informado']);
         }
         self::validarCampos($_regime);
-        $campos = array(
+        $campos = [
             'codigo',
             'descricao',
-        );
+        ];
         try {
             $query = DB::$pdo->update('Regimes');
             $query = $query->set(array_intersect_key($_regime, array_flip($campos)));
@@ -172,7 +172,7 @@ class ZRegime
             throw new Exception('Não foi possível excluir o regime, o id do regime não foi informado');
         }
         $query = DB::$pdo->deleteFrom('Regimes')
-                         ->where(array('id' => $id));
+                         ->where(['id' => $id]);
         return $query->execute();
     }
 
@@ -189,7 +189,7 @@ class ZRegime
             $query = $query->limit($quantidade)->offset($inicio);
         }
         $_regimes = $query->fetchAll();
-        $regimes = array();
+        $regimes = [];
         foreach ($_regimes as $regime) {
             $regimes[] = new ZRegime($regime);
         }

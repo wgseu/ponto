@@ -25,7 +25,7 @@ use MZ\Sale\Comanda;
 
 need_permission(PermissaoNome::CADASTROCOMANDAS);
 $focusctrl = 'nome';
-$errors = array();
+$errors = [];
 $comanda = new Comanda();
 if (is_post()) {
     $old_comanda = $comanda;

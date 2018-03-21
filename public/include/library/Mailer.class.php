@@ -16,7 +16,7 @@ class Mailer
         return '=?' . $encoding . '?B?'. base64_Encode($string) .'?=';
     }
     
-    static function SmtpMail($to, $subject, $message, $options = null, $bcc = array(), $reply = null, $attachment = array())
+    static function SmtpMail($to, $subject, $message, $options = null, $bcc = [], $reply = null, $attachment = [])
     {
         /* settings */
         if (!isset($options['subjectenc'])) {
@@ -36,7 +36,7 @@ class Mailer
         }
         global $__empresa__;
         /* get from ini */
-        $security = array('', 'ssl', 'tls');
+        $security = ['', 'ssl', 'tls'];
         $host = get_string_config('Email', 'Servidor');
         $port = get_int_config('Email', 'Porta');
         $ssl  = $security[get_int_config('Email', 'Criptografia', 2)];

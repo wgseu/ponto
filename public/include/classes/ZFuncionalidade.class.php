@@ -28,7 +28,7 @@ class ZFuncionalidade
     private $nome;
     private $descricao;
 
-    public function __construct($funcionalidade = array())
+    public function __construct($funcionalidade = [])
     {
         if (is_array($funcionalidade)) {
             $this->setID(isset($funcionalidade['id'])?$funcionalidade['id']:null);
@@ -78,7 +78,7 @@ class ZFuncionalidade
 
     public function toArray()
     {
-        $funcionalidade = array();
+        $funcionalidade = [];
         $funcionalidade['id'] = $this->getID();
         $funcionalidade['nome'] = $this->getNome();
         $funcionalidade['descricao'] = $this->getDescricao();
@@ -88,20 +88,20 @@ class ZFuncionalidade
     public static function getPeloID($id)
     {
         $query = DB::$pdo->from('Funcionalidades')
-                         ->where(array('id' => $id));
+                         ->where(['id' => $id]);
         return new ZFuncionalidade($query->fetch());
     }
 
     public static function getPeloNome($nome)
     {
         $query = DB::$pdo->from('Funcionalidades')
-                         ->where(array('nome' => $nome));
+                         ->where(['nome' => $nome]);
         return new ZFuncionalidade($query->fetch());
     }
 
     private static function validarCampos(&$funcionalidade)
     {
-        $erros = array();
+        $erros = [];
         $funcionalidade['nome'] = strip_tags(trim($funcionalidade['nome']));
         if (strlen($funcionalidade['nome']) == 0) {
             $erros['nome'] = 'O nome não pode ser vazio';
@@ -118,10 +118,10 @@ class ZFuncionalidade
     private static function handleException(&$e)
     {
         if (stripos($e->getMessage(), 'PRIMARY') !== false) {
-            throw new ValidationException(array('id' => 'O ID informado já está cadastrado'));
+            throw new ValidationException(['id' => 'O ID informado já está cadastrado']);
         }
         if (stripos($e->getMessage(), 'Nome_UNIQUE') !== false) {
-            throw new ValidationException(array('nome' => 'O nome informado já está cadastrado'));
+            throw new ValidationException(['nome' => 'O nome informado já está cadastrado']);
         }
     }
 
@@ -138,7 +138,7 @@ class ZFuncionalidade
             $query = $query->limit($quantidade)->offset($inicio);
         }
         $_funcionalidades = $query->fetchAll();
-        $funcionalidades = array();
+        $funcionalidades = [];
         foreach ($_funcionalidades as $funcionalidade) {
             $funcionalidades[] = new ZFuncionalidade($funcionalidade);
         }

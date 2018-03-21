@@ -28,7 +28,7 @@ if (is_null($patrimonio->getID())) {
     redirect('/gerenciar/patrimonio/');
 }
 $focusctrl = 'descricao';
-$errors = array();
+$errors = [];
 $old_patrimonio = $patrimonio;
 if (is_post()) {
     $patrimonio = new ZPatrimonio($_POST);

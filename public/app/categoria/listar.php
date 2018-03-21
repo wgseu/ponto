@@ -22,8 +22,8 @@
 require_once(dirname(dirname(__DIR__)) . '/app.php');
 
 $categorias = ZCategoria::getTodas();
-$response = array('status' => 'ok');
-$_categorias = array();
+$response = ['status' => 'ok'];
+$_categorias = [];
 foreach ($categorias as $categoria) {
     $_categoria = $categoria->toArray();
     $_categoria['imagemurl'] = get_image_url($_categoria['imagem'], 'categoria', null);

@@ -28,7 +28,7 @@ if (is_null($conta->getID())) {
     redirect('/gerenciar/conta/');
 }
 $focusctrl = 'descricao';
-$errors = array();
+$errors = [];
 $old_conta = $conta;
 if (is_post()) {
     $conta = new ZConta($_POST);

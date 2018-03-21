@@ -74,7 +74,7 @@ class Pais extends \MZ\Database\Helper
      * Constructor for a new empty instance of Pais
      * @param array $pais All field and values to fill the instance
      */
-    public function __construct($pais = array())
+    public function __construct($pais = [])
     {
         parent::__construct($pais);
     }
@@ -293,12 +293,12 @@ class Pais extends \MZ\Database\Helper
      * @param  mixed $pais Associated key -> value to assign into this instance
      * @return Pais Self instance
      */
-    public function fromArray($pais = array())
+    public function fromArray($pais = [])
     {
         if ($pais instanceof Pais) {
             $pais = $pais->toArray();
         } elseif (!is_array($pais)) {
-            $pais = array();
+            $pais = [];
         }
         parent::fromArray($pais);
         if (!isset($pais['id'])) {
@@ -389,7 +389,7 @@ class Pais extends \MZ\Database\Helper
      */
     public function validate()
     {
-        $errors = array();
+        $errors = [];
         if (is_null($this->getNome())) {
             $errors['nome'] = 'O nome não pode ser vazio';
         }
@@ -428,36 +428,36 @@ class Pais extends \MZ\Database\Helper
     protected function translate($e)
     {
         if (stripos($e->getMessage(), 'PRIMARY') !== false) {
-            return new \MZ\Exception\ValidationException(array(
+            return new \MZ\Exception\ValidationException([
                 'id' => vsprintf(
                     'O ID "%s" já está cadastrado',
-                    array($this->getID())
+                    [$this->getID()]
                 ),
-            ));
+            ]);
         }
         if (stripos($e->getMessage(), 'Nome_UNIQUE') !== false) {
-            return new \MZ\Exception\ValidationException(array(
+            return new \MZ\Exception\ValidationException([
                 'nome' => vsprintf(
                     'O Nome "%s" já está cadastrado',
-                    array($this->getNome())
+                    [$this->getNome()]
                 ),
-            ));
+            ]);
         }
         if (stripos($e->getMessage(), 'Sigla_UNIQUE') !== false) {
-            return new \MZ\Exception\ValidationException(array(
+            return new \MZ\Exception\ValidationException([
                 'sigla' => vsprintf(
                     'A Sigla "%s" já está cadastrada',
-                    array($this->getSigla())
+                    [$this->getSigla()]
                 ),
-            ));
+            ]);
         }
         if (stripos($e->getMessage(), 'Codigo_UNIQUE') !== false) {
-            return new \MZ\Exception\ValidationException(array(
+            return new \MZ\Exception\ValidationException([
                 'codigo' => vsprintf(
                     'O Código "%s" já está cadastrado',
-                    array($this->getCodigo())
+                    [$this->getCodigo()]
                 ),
-            ));
+            ]);
         }
         return parent::translate($e);
     }
@@ -469,9 +469,9 @@ class Pais extends \MZ\Database\Helper
      */
     public static function findByID($id)
     {
-        return self::find(array(
+        return self::find([
             'id' => intval($id),
-        ));
+        ]);
     }
 
     /**
@@ -481,9 +481,9 @@ class Pais extends \MZ\Database\Helper
      */
     public static function findByNome($nome)
     {
-        return self::find(array(
+        return self::find([
             'nome' => strval($nome),
-        ));
+        ]);
     }
 
     /**
@@ -493,9 +493,9 @@ class Pais extends \MZ\Database\Helper
      */
     public static function findBySigla($sigla)
     {
-        return self::find(array(
+        return self::find([
             'sigla' => strval($sigla),
-        ));
+        ]);
     }
 
     /**
@@ -505,9 +505,9 @@ class Pais extends \MZ\Database\Helper
      */
     public static function findByCodigo($codigo)
     {
-        return self::find(array(
+        return self::find([
             'codigo' => strval($codigo),
-        ));
+        ]);
     }
 
     /**
@@ -534,7 +534,7 @@ class Pais extends \MZ\Database\Helper
         if (isset($condition['search'])) {
             $search = $condition['search'];
             $field = '(nome LIKE ? OR sigla = ? OR codigo = ?)';
-            $condition[$field] = array('%'.$search.'%', $search, $search);
+            $condition[$field] = ['%'.$search.'%', $search, $search];
             $allowed[$field] = true;
             unset($condition['search']);
         }
@@ -547,7 +547,7 @@ class Pais extends \MZ\Database\Helper
      * @param  array $order order rows
      * @return SelectQuery query object with condition statement
      */
-    private static function query($condition = array(), $order = array())
+    private static function query($condition = [], $order = [])
     {
         $query = self::getDB()->from('Paises');
         $condition = self::filterCondition($condition);
@@ -561,12 +561,12 @@ class Pais extends \MZ\Database\Helper
      * @param  array $order order rows
      * @return Pais A filled País or empty instance
      */
-    public static function find($condition, $order = array())
+    public static function find($condition, $order = [])
     {
         $query = self::query($condition, $order)->limit(1);
         $row = $query->fetch();
         if ($row === false) {
-            $row = array();
+            $row = [];
         }
         return new Pais($row);
     }
@@ -578,7 +578,7 @@ class Pais extends \MZ\Database\Helper
      * @param  integer $offset start index to get rows, null for begining
      * @return array All rows instanced and filled
      */
-    public static function findAll($condition = array(), $order = array(), $limit = null, $offset = null)
+    public static function findAll($condition = [], $order = [], $limit = null, $offset = null)
     {
         $query = self::query($condition, $order);
         if (!is_null($limit)) {
@@ -588,7 +588,7 @@ class Pais extends \MZ\Database\Helper
             $query = $query->offset($offset);
         }
         $rows = $query->fetchAll();
-        $result = array();
+        $result = [];
         foreach ($rows as $row) {
             $result[] = new Pais($row);
         }
@@ -671,9 +671,9 @@ class Pais extends \MZ\Database\Helper
      */
     public static function getImageIndexOptions()
     {
-        $images = array();
+        $images = [];
         for ($i = 0; $i < 238; $i++) {
-            $images[] = array('index' => $i);
+            $images[] = ['index' => $i];
         }
         return $images;
     }
@@ -683,7 +683,7 @@ class Pais extends \MZ\Database\Helper
      * @param  array $condition condition to filter rows
      * @return integer Quantity of rows
      */
-    public static function count($condition = array())
+    public static function count($condition = [])
     {
         $query = self::query($condition);
         return $query->count();

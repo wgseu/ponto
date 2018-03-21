@@ -46,8 +46,8 @@ $clientes = ZCliente::getTodos(
     0,    // offset
     $limit // pagesize
 );
-$response = array('status' => 'ok');
-$campos = array(
+$response = ['status' => 'ok'];
+$campos = [
             'id',
             'tipo',
             'genero',
@@ -57,8 +57,8 @@ $campos = array(
             'email',
             'cpf',
             'imagemurl',
-        );
-$_clientes = array();
+        ];
+$_clientes = [];
 $domask = intval(isset($_GET['formatar'])?$_GET['formatar']:0) != 0;
 foreach ($clientes as $cliente) {
     $_cliente = $cliente->toArray();

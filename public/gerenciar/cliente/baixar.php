@@ -24,11 +24,11 @@ require_once(dirname(__DIR__) . '/app.php');
 use MZ\Location\Localizacao;
 
 need_permission(
-    array(
+    [
         PermissaoNome::CADASTROCLIENTES,
-        array('||'),
+        ['||'],
         PermissaoNome::RELATORIOCLIENTES
-    ),
+    ],
     isset($_GET['saida']) && is_output('json')
 );
 
@@ -55,13 +55,13 @@ try {
         $aniversariantes
     );
     // Coluna dos dados
-    $columns = array(
+    $columns = [
         'Nome/Fantasia',
         'Telefone',
         'Celular',
         'E-mail',
         'Aniversário/Fundação',
-        vsprintf('%s/%s', array(_p('Titulo', 'CPF'), _p('Titulo', 'CNPJ'))),
+        vsprintf('%s/%s', [_p('Titulo', 'CPF'), _p('Titulo', 'CNPJ')]),
         'RG/IE',
         'Gênero',
         'Apelido',
@@ -78,20 +78,20 @@ try {
         'Cidade',
         'Estado',
         'Ativo'
-    );
-    $data = array($columns);
+    ];
+    $data = [$columns];
     $column = 'B';
     $last = chr(ord($column) + count($columns) - 1);
     $line = 4;
     $i = $line;
     foreach ($clientes as $value) {
         $i++;
-        $localizacao = Localizacao::find(array('clienteid' => $value->getID()));
+        $localizacao = Localizacao::find(['clienteid' => $value->getID()]);
         $bairro = $localizacao->findBairroID();
         $cidade = $bairro->findCidadeID();
         $estado = $cidade->findEstadoID();
 
-        $row = array();
+        $row = [];
         $row[] = $value->getNomeCompleto();
         $row[] = \MZ\Util\Mask::phone($value->getFone(1));
         $row[] = \MZ\Util\Mask::phone($value->getFone(2));
@@ -131,7 +131,7 @@ try {
         $data[] = $row;
     }
     // footer
-    $row = array();
+    $row = [];
     $row[] = count($clientes) . ' Clientes';
     $row[] = null;
     $row[] = null;
@@ -200,20 +200,20 @@ try {
         ->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
     // Format header
     $objPHPExcel->getActiveSheet()->getStyle("B3:{$last}4")->getFont()->setBold(true);
-    $objPHPExcel->getActiveSheet()->getStyle("B3:{$last}4")->getBorders()->applyFromArray(array(
-        'allborders' => array('style' => PHPExcel_Style_Border::BORDER_MEDIUM)
-    ));
+    $objPHPExcel->getActiveSheet()->getStyle("B3:{$last}4")->getBorders()->applyFromArray([
+        'allborders' => ['style' => PHPExcel_Style_Border::BORDER_MEDIUM]
+    ]);
     // Format footer
     $objPHPExcel->getActiveSheet()->getStyle("B{$j}:{$last}{$j}")->getFont()->setBold(true);
-    $objPHPExcel->getActiveSheet()->getStyle("B{$j}:{$last}{$j}")->getBorders()->applyFromArray(array(
-        'allborders' => array('style' => PHPExcel_Style_Border::BORDER_MEDIUM)
-    ));
+    $objPHPExcel->getActiveSheet()->getStyle("B{$j}:{$last}{$j}")->getBorders()->applyFromArray([
+        'allborders' => ['style' => PHPExcel_Style_Border::BORDER_MEDIUM]
+    ]);
     foreach ($columns as $value) {
         $objPHPExcel->getActiveSheet()->getColumnDimension($column)->setAutoSize(true);
-        $objPHPExcel->getActiveSheet()->getStyle("{$column}4:{$column}{$i}")->getBorders()->applyFromArray(array(
-            'left' => array('style' => PHPExcel_Style_Border::BORDER_MEDIUM),
-            'right' => array('style' => PHPExcel_Style_Border::BORDER_MEDIUM)
-        ));
+        $objPHPExcel->getActiveSheet()->getStyle("{$column}4:{$column}{$i}")->getBorders()->applyFromArray([
+            'left' => ['style' => PHPExcel_Style_Border::BORDER_MEDIUM],
+            'right' => ['style' => PHPExcel_Style_Border::BORDER_MEDIUM]
+        ]);
         $column++;
     }
     if ($formato == 'xlsx') {

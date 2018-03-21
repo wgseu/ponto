@@ -66,7 +66,7 @@ $[field.each(comment)]
 $[field.end]
      */
 $[field.end]
-    private $$[field.unix]$[field.if(array)] = array()$[field.end];
+    private $$[field.unix]$[field.if(array)] = []$[field.end];
 $[field.end]
 $[field.end]
 
@@ -74,7 +74,7 @@ $[field.end]
      * Constructor for a new empty instance of $[Table.norm]
      * @param array $$[table.unix] All field and values to fill the instance
      */
-    public function __construct($$[table.unix] = array())
+    public function __construct($$[table.unix] = [])
     {
 $[table.if(inherited)]
         parent::__construct($$[table.unix]);
@@ -104,7 +104,7 @@ $[field.if(array)]
             throw new \Exception(
                 vsprintf(
                     'Índice %d inválido, aceito somente de %d até %d',
-                    array(intval($index), 1, $[field.array.count])
+                    [intval($index), 1, $[field.array.count]]
                 ),
                 500
             );
@@ -143,7 +143,7 @@ $[field.if(array)]
             throw new \Exception(
                 vsprintf(
                     'Índice %d inválido, aceito somente de %d até %d',
-                    array(intval($index), 1, $[field.array.count])
+                    [intval($index), 1, $[field.array.count]]
                 ),
                 500
             );
@@ -165,7 +165,7 @@ $[field.end]
 $[table.if(inherited)]
         $$[table.unix] = parent::toArray($recursive);
 $[table.else]
-        $$[table.unix] = array();
+        $$[table.unix] = [];
 $[table.end]
 $[field.each(all)]
         $$[table.unix]['$[field]'] = $this->get$[Field.norm]($[field.if(array)]$[field.array.number]$[field.end]);
@@ -178,12 +178,12 @@ $[field.end]
      * @param  mixed $$[table.unix] Associated key -> value to assign into this instance
      * @return $[Table.norm] Self instance
      */
-    public function fromArray($$[table.unix] = array())
+    public function fromArray($$[table.unix] = [])
     {
         if ($$[table.unix] instanceof $[Table.norm]) {
             $$[table.unix] = $$[table.unix]->toArray();
         } elseif (!is_array($$[table.unix])) {
-            $$[table.unix] = array();
+            $$[table.unix] = [];
         }
 $[table.if(inherited)]
         parent::fromArray($$[table.unix]);
@@ -296,7 +296,7 @@ $[field.end]
      */
     public function validate()
     {
-        $errors = array();
+        $errors = [];
 $[field.each(all)]
 $[field.if(primary)]
 $[field.else]
@@ -386,14 +386,14 @@ $[field.end]
     {
 $[table.each(unique)]
         if (stripos($e->getMessage(), '$[Unique.name]') !== false) {
-            return new \MZ\Exception\ValidationException(array(
+            return new \MZ\Exception\ValidationException([
 $[unique.each(all)]
                 '$[field]' => sprintf(
                     '$[FIELD.gender] $[field.name] "%s" já está cadastrad$[field.gender]',
                     $this->get$[Field.norm]($[field.if(array)]$[field.array.number]$[field.end])
                 ),
 $[unique.end]
-            ));
+            ]);
         }
 $[table.end]
 $[table.if(inherited)]
@@ -431,11 +431,11 @@ $[field.else.if(enum)]
      */
     public static function get$[Field.norm]Options($index = null)
     {
-        $options = array(
+        $options = [
 $[field.each(option)]
             self::$[FIELD.unix]_$[FIELD.option.norm] => '$[Field.option.name]',
 $[field.end]
-        );
+        ];
         if (!is_null($index)) {
             return $options[$index];
         }
@@ -461,7 +461,7 @@ $[unique.end]
      */
     public static function findBy$[unique.each(all)]$[Field.norm]$[unique.end]($[unique.each(all)]$[field.if(first)]$[field.else], $[field.end]$$[field.unix]$[unique.end])
     {
-        return self::find(array(
+        return self::find([
 $[unique.each(all)]
 $[field.if(integer|bigint)]
             '$[field]' => intval($$[field.unix]),
@@ -471,7 +471,7 @@ $[field.else]
             '$[field]' => strval($$[field.unix]),
 $[field.end]
 $[unique.end]
-        ));
+        ]);
     }
 $[table.end]
 
@@ -523,7 +523,7 @@ $[descriptor.end]
      * @param  array $order order rows
      * @return SelectQuery query object with condition statement
      */
-    private static function query($condition = array(), $order = array())
+    private static function query($condition = [], $order = [])
     {
         $query = self::getDB()->from('$[Table] $[table.letter]');
         $condition = self::filterCondition($condition);
@@ -541,12 +541,12 @@ $[descriptor.end]
      * @param  array $order order rows
      * @return $[Table.norm] A filled $[Table.name] or empty instance
      */
-    public static function find($condition, $order = array())
+    public static function find($condition, $order = [])
     {
         $query = self::query($condition, $order)->limit(1);
         $row = $query->fetch();
         if ($row === false) {
-            $row = array();
+            $row = [];
         }
         return new $[Table.norm]($row);
     }
@@ -558,7 +558,7 @@ $[descriptor.end]
      * @param  integer $offset start index to get rows, null for begining
      * @return array All rows instanced and filled
      */
-    public static function findAll($condition = array(), $order = array(), $limit = null, $offset = null)
+    public static function findAll($condition = [], $order = [], $limit = null, $offset = null)
     {
         $query = self::query($condition, $order);
         if (!is_null($limit)) {
@@ -568,7 +568,7 @@ $[descriptor.end]
             $query = $query->offset($offset);
         }
         $rows = $query->fetchAll();
-        $result = array();
+        $result = [];
         foreach ($rows as $row) {
             $result[] = new $[Table.norm]($row);
         }
@@ -651,7 +651,7 @@ $[descriptor.end]
      * @param  array $condition condition to filter rows
      * @return integer Quantity of rows
      */
-    public static function count($condition = array())
+    public static function count($condition = [])
     {
         $query = self::query($condition);
         return $query->count();

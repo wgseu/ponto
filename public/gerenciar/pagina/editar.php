@@ -28,7 +28,7 @@ if (is_null($pagina->getID())) {
     redirect('/gerenciar/pagina/');
 }
 $focusctrl = 'nome';
-$errors = array();
+$errors = [];
 $old_pagina = $pagina;
 $nomes = get_pages_info();
 $linguagens = get_languages_info();

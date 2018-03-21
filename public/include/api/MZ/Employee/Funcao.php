@@ -1,0 +1,438 @@
+<?php
+/**
+ * Copyright 2014 da MZ Software - MZ Desenvolvimento de Sistemas LTDA
+ *
+ * Este arquivo é parte do programa GrandChef - Sistema para Gerenciamento de Churrascarias, Bares e Restaurantes.
+ * O GrandChef é um software proprietário; você não pode redistribuí-lo e/ou modificá-lo.
+ * DISPOSIÇÕES GERAIS
+ * O cliente não deverá remover qualquer identificação do produto, avisos de direitos autorais,
+ * ou outros avisos ou restrições de propriedade do GrandChef.
+ *
+ * O cliente não deverá causar ou permitir a engenharia reversa, desmontagem,
+ * ou descompilação do GrandChef.
+ *
+ * PROPRIEDADE DOS DIREITOS AUTORAIS DO PROGRAMA
+ *
+ * GrandChef é a especialidade do desenvolvedor e seus
+ * licenciadores e é protegido por direitos autorais, segredos comerciais e outros direitos
+ * de leis de propriedade.
+ *
+ * O Cliente adquire apenas o direito de usar o software e não adquire qualquer outros
+ * direitos, expressos ou implícitos no GrandChef diferentes dos especificados nesta Licença.
+ *
+ * @author  Francimar Alves <mazinsw@gmail.com>
+ */
+namespace MZ\Employee;
+
+use MZ\Util\Filter;
+use MZ\Util\Validator;
+
+/**
+ * Função ou cargo de um funcionário
+ */
+class Funcao extends \MZ\Database\Helper
+{
+
+    /**
+     * Identificador da função
+     */
+    private $id;
+    /**
+     * Descreve o nome da função
+     */
+    private $descricao;
+    /**
+     * Salário base ou mínimo que será acrescentado comissões
+     */
+    private $salario_base;
+
+    /**
+     * Constructor for a new empty instance of Funcao
+     * @param array $funcao All field and values to fill the instance
+     */
+    public function __construct($funcao = [])
+    {
+        parent::__construct($funcao);
+    }
+
+    /**
+     * Identificador da função
+     * @return mixed ID of Funcao
+     */
+    public function getID()
+    {
+        return $this->id;
+    }
+
+    /**
+     * Set ID value to new on param
+     * @param  mixed $id new value for ID
+     * @return Funcao Self instance
+     */
+    public function setID($id)
+    {
+        $this->id = $id;
+        return $this;
+    }
+
+    /**
+     * Descreve o nome da função
+     * @return mixed Descrição of Funcao
+     */
+    public function getDescricao()
+    {
+        return $this->descricao;
+    }
+
+    /**
+     * Set Descricao value to new on param
+     * @param  mixed $descricao new value for Descricao
+     * @return Funcao Self instance
+     */
+    public function setDescricao($descricao)
+    {
+        $this->descricao = $descricao;
+        return $this;
+    }
+
+    /**
+     * Salário base ou mínimo que será acrescentado comissões
+     * @return mixed Salário base of Funcao
+     */
+    public function getSalarioBase()
+    {
+        return $this->salario_base;
+    }
+
+    /**
+     * Set SalarioBase value to new on param
+     * @param  mixed $salario_base new value for SalarioBase
+     * @return Funcao Self instance
+     */
+    public function setSalarioBase($salario_base)
+    {
+        $this->salario_base = $salario_base;
+        return $this;
+    }
+
+    /**
+     * Convert this instance to array associated key -> value
+     * @param  boolean $recursive Allow rescursive conversion of fields
+     * @return array All field and values into array format
+     */
+    public function toArray($recursive = false)
+    {
+        $funcao = parent::toArray($recursive);
+        $funcao['id'] = $this->getID();
+        $funcao['descricao'] = $this->getDescricao();
+        $funcao['salariobase'] = $this->getSalarioBase();
+        return $funcao;
+    }
+
+    /**
+     * Fill this instance with from array values, you can pass instance to
+     * @param  mixed $funcao Associated key -> value to assign into this instance
+     * @return Funcao Self instance
+     */
+    public function fromArray($funcao = [])
+    {
+        if ($funcao instanceof Funcao) {
+            $funcao = $funcao->toArray();
+        } elseif (!is_array($funcao)) {
+            $funcao = [];
+        }
+        parent::fromArray($funcao);
+        if (!isset($funcao['id'])) {
+            $this->setID(null);
+        } else {
+            $this->setID($funcao['id']);
+        }
+        if (!isset($funcao['descricao'])) {
+            $this->setDescricao(null);
+        } else {
+            $this->setDescricao($funcao['descricao']);
+        }
+        if (!isset($funcao['salariobase'])) {
+            $this->setSalarioBase(null);
+        } else {
+            $this->setSalarioBase($funcao['salariobase']);
+        }
+        return $this;
+    }
+
+    /**
+     * Convert this instance into array associated key -> value with only public fields
+     * @return array All public field and values into array format
+     */
+    public function publish()
+    {
+        $funcao = parent::publish();
+        return $funcao;
+    }
+
+    /**
+     * Filter fields, upload data and keep key data
+     * @param Funcao $original Original instance without modifications
+     */
+    public function filter($original)
+    {
+        $this->setID($original->getID());
+        $this->setDescricao(Filter::string($this->getDescricao()));
+        $this->setSalarioBase(Filter::money($this->getSalarioBase()));
+    }
+
+    /**
+     * Clean instance resources like images and docs
+     * @param  Funcao $dependency Don't clean when dependency use same resources
+     */
+    public function clean($dependency)
+    {
+    }
+
+    /**
+     * Validate fields updating them and throw exception when invalid data has found
+     * @return array All field of Funcao in array format
+     */
+    public function validate()
+    {
+        $errors = [];
+        if (is_null($this->getDescricao())) {
+            $errors['descricao'] = 'A descrição não pode ser vazia';
+        }
+        if (is_null($this->getSalarioBase())) {
+            $errors['salariobase'] = 'O salário base não pode ser vazio';
+        }
+        if (!empty($errors)) {
+            throw new \MZ\Exception\ValidationException($errors);
+        }
+        return $this->toArray();
+    }
+
+    /**
+     * Translate SQL exception into application exception
+     * @param  \Exception $e exception to translate into a readable error
+     * @return \MZ\Exception\ValidationException new exception translated
+     */
+    protected function translate($e)
+    {
+        if (stripos($e->getMessage(), 'PRIMARY') !== false) {
+            return new \MZ\Exception\ValidationException([
+                'id' => sprintf(
+                    'O id "%s" já está cadastrado',
+                    $this->getID()
+                ),
+            ]);
+        }
+        if (stripos($e->getMessage(), 'Descricao_UNIQUE') !== false) {
+            return new \MZ\Exception\ValidationException([
+                'descricao' => sprintf(
+                    'A descrição "%s" já está cadastrada',
+                    $this->getDescricao()
+                ),
+            ]);
+        }
+        return parent::translate($e);
+    }
+
+    /**
+     * Find this object on database using, ID
+     * @param  int $id id to find Função
+     * @return Funcao A filled instance or empty when not found
+     */
+    public static function findByID($id)
+    {
+        return self::find([
+            'id' => intval($id),
+        ]);
+    }
+
+    /**
+     * Find this object on database using, Descricao
+     * @param  string $descricao descrição to find Função
+     * @return Funcao A filled instance or empty when not found
+     */
+    public static function findByDescricao($descricao)
+    {
+        return self::find([
+            'descricao' => strval($descricao),
+        ]);
+    }
+
+    /**
+     * Get allowed keys array
+     * @return array allowed keys array
+     */
+    private static function getAllowedKeys()
+    {
+        $funcao = new Funcao();
+        $allowed = Filter::concatKeys('f.', $funcao->toArray());
+        return $allowed;
+    }
+
+    /**
+     * Filter order array
+     * @param  mixed $order order string or array to parse and filter allowed
+     * @return array allowed associative order
+     */
+    private static function filterOrder($order)
+    {
+        $allowed = self::getAllowedKeys();
+        return Filter::orderBy($order, $allowed, 'f.');
+    }
+
+    /**
+     * Filter condition array with allowed fields
+     * @param  array $condition condition to filter rows
+     * @return array allowed condition
+     */
+    private static function filterCondition($condition)
+    {
+        $allowed = self::getAllowedKeys();
+        if (isset($condition['search'])) {
+            $search = $condition['search'];
+            $field = 'f.descricao LIKE ?';
+            $condition[$field] = '%'.$search.'%';
+            $allowed[$field] = true;
+            unset($condition['search']);
+        }
+        return Filter::keys($condition, $allowed, 'f.');
+    }
+
+    /**
+     * Fetch data from database with a condition
+     * @param  array $condition condition to filter rows
+     * @param  array $order order rows
+     * @return SelectQuery query object with condition statement
+     */
+    private static function query($condition = [], $order = [])
+    {
+        $query = self::getDB()->from('Funcoes f');
+        $condition = self::filterCondition($condition);
+        $query = self::buildOrderBy($query, self::filterOrder($order));
+        $query = $query->orderBy('f.descricao ASC');
+        $query = $query->orderBy('f.id ASC');
+        return self::buildCondition($query, $condition);
+    }
+
+    /**
+     * Search one register with a condition
+     * @param  array $condition Condition for searching the row
+     * @param  array $order order rows
+     * @return Funcao A filled Função or empty instance
+     */
+    public static function find($condition, $order = [])
+    {
+        $query = self::query($condition, $order)->limit(1);
+        $row = $query->fetch();
+        if ($row === false) {
+            $row = [];
+        }
+        return new Funcao($row);
+    }
+
+    /**
+     * Fetch all rows from database with matched condition critery
+     * @param  array $condition condition to filter rows
+     * @param  integer $limit number of rows to get, null for all
+     * @param  integer $offset start index to get rows, null for begining
+     * @return array All rows instanced and filled
+     */
+    public static function findAll($condition = [], $order = [], $limit = null, $offset = null)
+    {
+        $query = self::query($condition, $order);
+        if (!is_null($limit)) {
+            $query = $query->limit($limit);
+        }
+        if (!is_null($offset)) {
+            $query = $query->offset($offset);
+        }
+        $rows = $query->fetchAll();
+        $result = [];
+        foreach ($rows as $row) {
+            $result[] = new Funcao($row);
+        }
+        return $result;
+    }
+
+    /**
+     * Insert a new Função into the database and fill instance from database
+     * @return Funcao Self instance
+     */
+    public function insert()
+    {
+        $values = $this->validate();
+        unset($values['id']);
+        try {
+            $id = self::getDB()->insertInto('Funcoes')->values($values)->execute();
+            $funcao = self::findByID($id);
+            $this->fromArray($funcao->toArray());
+        } catch (\Exception $e) {
+            throw $this->translate($e);
+        }
+        return $this;
+    }
+
+    /**
+     * Update Função with instance values into database for ID
+     * @return Funcao Self instance
+     */
+    public function update()
+    {
+        $values = $this->validate();
+        if (!$this->exists()) {
+            throw new \Exception('O identificador da função não foi informado');
+        }
+        unset($values['id']);
+        try {
+            self::getDB()
+                ->update('Funcoes')
+                ->set($values)
+                ->where('id', $this->getID())
+                ->execute();
+            $funcao = self::findByID($this->getID());
+            $this->fromArray($funcao->toArray());
+        } catch (\Exception $e) {
+            throw $this->translate($e);
+        }
+        return $this;
+    }
+
+    /**
+     * Save the Função into the database
+     * @return Funcao Self instance
+     */
+    public function save()
+    {
+        if ($this->exists()) {
+            return $this->update();
+        }
+        return $this->insert();
+    }
+
+    /**
+     * Delete this instance from database using ID
+     * @return integer Number of rows deleted (Max 1)
+     */
+    public function delete()
+    {
+        if (!$this->exists()) {
+            throw new \Exception('O identificador da função não foi informado');
+        }
+        $result = self::getDB()
+            ->deleteFrom('Funcoes')
+            ->where('id', $this->getID())
+            ->execute();
+        return $result;
+    }
+
+    /**
+     * Count all rows from database with matched condition critery
+     * @param  array $condition condition to filter rows
+     * @return integer Quantity of rows
+     */
+    public static function count($condition = [])
+    {
+        $query = self::query($condition);
+        return $query->count();
+    }
+}

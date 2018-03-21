@@ -23,7 +23,7 @@ require_once(dirname(__DIR__) . '/app.php');
 
 need_permission(PermissaoNome::CADASTROPATRIMONIO);
 $focusctrl = 'descricao';
-$errors = array();
+$errors = [];
 if (is_post()) {
     $patrimonio = new ZPatrimonio($_POST);
     try {

@@ -43,12 +43,12 @@ try {
         'Integração "%s" atualizada com sucesso!',
         $integracao->getNome()
     );
-    json(null, array('item' => $integracao->publish(), 'msg' => $msg));
+    json(null, ['item' => $integracao->publish(), 'msg' => $msg]);
 } catch (\Exception $e) {
     $integracao->clean($old_integracao);
-    $errors = array();
+    $errors = [];
     if ($e instanceof \ValidationException) {
         $errors = $e->getErrors();
     }
-    json($e->getMessage(), null, array('errors' => $errors));
+    json($e->getMessage(), null, ['errors' => $errors]);
 }

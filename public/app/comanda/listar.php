@@ -33,7 +33,7 @@ if (!isset($_GET['ordenar']) || $_GET['ordenar'] != 'comanda') {
     $funcionario_id = $login_funcionario_id;
 }
 $comandas = ZPedido::getTodasComandas($funcionario_id);
-$items = array();
+$items = [];
 $obs_name = is_boolean_config('Vendas', 'Comanda.Observacao');
 foreach ($comandas as $_comanda) {
     switch ($_comanda['estado']) {

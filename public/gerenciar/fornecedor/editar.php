@@ -28,7 +28,7 @@ if (is_null($fornecedor->getID())) {
     redirect('/gerenciar/fornecedor/');
 }
 $focusctrl = 'empresa';
-$errors = array();
+$errors = [];
 $old_fornecedor = $fornecedor;
 if (is_post()) {
     $fornecedor = new ZFornecedor($_POST);

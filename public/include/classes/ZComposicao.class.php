@@ -40,7 +40,7 @@ class ZComposicao
     private $valor;
     private $ativa;
 
-    public function __construct($composicao = array())
+    public function __construct($composicao = [])
     {
         if (is_array($composicao)) {
             $this->setID(isset($composicao['id'])?$composicao['id']:null);
@@ -169,7 +169,7 @@ class ZComposicao
 
     public function toArray()
     {
-        $composicao = array();
+        $composicao = [];
         $composicao['id'] = $this->getID();
         $composicao['composicaoid'] = $this->getComposicaoID();
         $composicao['produtoid'] = $this->getProdutoID();
@@ -183,20 +183,20 @@ class ZComposicao
     public static function getPeloID($id)
     {
         $query = DB::$pdo->from('Composicoes')
-                         ->where(array('id' => $id));
+                         ->where(['id' => $id]);
         return new ZComposicao($query->fetch());
     }
 
     public static function getPelaComposicaoIDProdutoID($composicao_id, $produto_id)
     {
         $query = DB::$pdo->from('Composicoes')
-                         ->where(array('composicaoid' => $composicao_id, 'produtoid' => $produto_id));
+                         ->where(['composicaoid' => $composicao_id, 'produtoid' => $produto_id]);
         return new ZComposicao($query->fetch());
     }
 
     private static function validarCampos(&$composicao)
     {
-        $erros = array();
+        $erros = [];
         if (!is_numeric($composicao['composicaoid'])) {
             $erros['composicaoid'] = 'A composição não foi informada';
         }
@@ -206,7 +206,7 @@ class ZComposicao
         $composicao['tipo'] = trim($composicao['tipo']);
         if (strlen($composicao['tipo']) == 0) {
             $composicao['tipo'] = null;
-        } elseif (!in_array($composicao['tipo'], array('Composicao', 'Opcional', 'Adicional'))) {
+        } elseif (!in_array($composicao['tipo'], ['Composicao', 'Opcional', 'Adicional'])) {
             $erros['tipo'] = 'O tipo informado não é válido';
         }
         if (!is_numeric($composicao['quantidade'])) {
@@ -220,7 +220,7 @@ class ZComposicao
         $composicao['ativa'] = trim($composicao['ativa']);
         if (strlen($composicao['ativa']) == 0) {
             $composicao['ativa'] = 'N';
-        } elseif (!in_array($composicao['ativa'], array('Y', 'N'))) {
+        } elseif (!in_array($composicao['ativa'], ['Y', 'N'])) {
             $erros['ativa'] = 'A informação se a composição está ativa não é válida';
         }
         if (!empty($erros)) {
@@ -231,10 +231,10 @@ class ZComposicao
     private static function handleException(&$e)
     {
         if (stripos($e->getMessage(), 'PRIMARY') !== false) {
-            throw new ValidationException(array('id' => 'O ID informado já está cadastrado'));
+            throw new ValidationException(['id' => 'O ID informado já está cadastrado']);
         }
         if (stripos($e->getMessage(), 'UK_Composicoes_CompID_ProdID') !== false) {
-            throw new ValidationException(array('produtoid' => 'O produto informado já está cadastrado'));
+            throw new ValidationException(['produtoid' => 'O produto informado já está cadastrado']);
         }
     }
 
@@ -255,17 +255,17 @@ class ZComposicao
     {
         $_composicao = $composicao->toArray();
         if (!$_composicao['id']) {
-            throw new ValidationException(array('id' => 'O id da composicao não foi informado'));
+            throw new ValidationException(['id' => 'O id da composicao não foi informado']);
         }
         self::validarCampos($_composicao);
-        $campos = array(
+        $campos = [
             'composicaoid',
             'produtoid',
             'tipo',
             'quantidade',
             'valor',
             'ativa',
-        );
+        ];
         try {
             $query = DB::$pdo->update('Composicoes');
             $query = $query->set(array_intersect_key($_composicao, array_flip($campos)));
@@ -284,7 +284,7 @@ class ZComposicao
             throw new Exception('Não foi possível excluir a composicao, o id da composicao não foi informado');
         }
         $query = DB::$pdo->deleteFrom('Composicoes')
-                         ->where(array('id' => $id));
+                         ->where(['id' => $id]);
         return $query->execute();
     }
 
@@ -301,7 +301,7 @@ class ZComposicao
             $query = $query->limit($quantidade)->offset($inicio);
         }
         $_composicaos = $query->fetchAll();
-        $composicaos = array();
+        $composicaos = [];
         foreach ($_composicaos as $composicao) {
             $composicaos[] = new ZComposicao($composicao);
         }
@@ -323,7 +323,7 @@ class ZComposicao
     ) {
         $query = DB::$pdo->from('Composicoes c')
                          ->leftJoin('Produtos p ON p.id = c.produtoid')
-                         ->where(array('c.ativa' => 'Y', 'c.composicaoid' => intval($composicao_id)));
+                         ->where(['c.ativa' => 'Y', 'c.composicaoid' => intval($composicao_id)]);
         if (!is_null($busca) && strlen($busca) > 0) {
             $query = \MZ\Database\Helper::buildSearch($busca, 'p.descricao', $query);
         }
@@ -359,7 +359,7 @@ class ZComposicao
             $query = $query->limit($quantidade)->offset($inicio);
         }
         $_composicaos = $query->fetchAll();
-        $composicaos = array();
+        $composicaos = [];
         foreach ($_composicaos as $composicao) {
             $composicaos[] = new ZComposicao($composicao);
         }
@@ -417,7 +417,7 @@ class ZComposicao
     private static function initSearchDoProdutoID($produto_id)
     {
         return   DB::$pdo->from('Composicoes')
-                         ->where(array('produtoid' => $produto_id))
+                         ->where(['produtoid' => $produto_id])
                          ->orderBy('id ASC');
     }
 
@@ -428,7 +428,7 @@ class ZComposicao
             $query = $query->limit($quantidade)->offset($inicio);
         }
         $_composicaos = $query->fetchAll();
-        $composicaos = array();
+        $composicaos = [];
         foreach ($_composicaos as $composicao) {
             $composicaos[] = new ZComposicao($composicao);
         }

@@ -23,7 +23,7 @@ require_once(dirname(__DIR__) . '/app.php');
 
 need_permission(PermissaoNome::CADASTROCAIXAS);
 $focusctrl = 'descricao';
-$errors = array();
+$errors = [];
 if (is_post()) {
     $caixa = new ZCaixa($_POST);
     try {

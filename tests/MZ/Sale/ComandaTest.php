@@ -30,11 +30,11 @@ class ComandaTest extends \PHPUnit_Framework_TestCase
     {
         $comanda = new Comanda();
         $values = $comanda->publish();
-        $allowed = array(
+        $allowed = [
             'id',
             'nome',
             'ativa',
-        );
+        ];
         $this->assertEquals($allowed, array_keys($values));
     }
 }

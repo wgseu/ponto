@@ -28,15 +28,15 @@ use MZ\Util\Filter;
 need_permission(PermissaoNome::CADASTROCARTEIRAS);
 
 $_banco = Banco::findByID($_GET['bancoid']);
-$condition = array(
+$condition = [
 	'query' => $_GET['query'],
 	'bancoid' => $_banco->getID(),
 	'tipo' => $_GET['tipo']
-);
+];
 $condition = Filter::query($condition);
 $count = Carteira::count($condition);
 list($pagesize, $offset, $pagestring) = pagestring($count, 10);
-$carteiras = Carteira::findAll($condition, array(), $pagesize, $offset);
+$carteiras = Carteira::findAll($condition, [], $pagesize, $offset);
 
 $tipos = Carteira::getTipoOptions();
 

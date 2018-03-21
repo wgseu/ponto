@@ -30,12 +30,12 @@ class ZFolhaCheque
     private $numero;
     private $valor;
     private $vencimento;
-    private $c = array();
+    private $c = [];
     private $serie;
     private $recolhido;
     private $recolhimento;
 
-    public function __construct($folha_cheque = array())
+    public function __construct($folha_cheque = [])
     {
         if (is_array($folha_cheque)) {
             $this->setID(isset($folha_cheque['id'])?$folha_cheque['id']:null);
@@ -199,7 +199,7 @@ class ZFolhaCheque
 
     public function toArray()
     {
-        $folha_cheque = array();
+        $folha_cheque = [];
         $folha_cheque['id'] = $this->getID();
         $folha_cheque['chequeid'] = $this->getChequeID();
         $folha_cheque['compensacao'] = $this->getCompensacao();
@@ -218,20 +218,20 @@ class ZFolhaCheque
     public static function getPeloID($id)
     {
         $query = DB::$pdo->from('Folhas_Cheques')
-                         ->where(array('id' => $id));
+                         ->where(['id' => $id]);
         return new ZFolhaCheque($query->fetch());
     }
 
     public static function getPeloChequeIDNumero($cheque_id, $numero)
     {
         $query = DB::$pdo->from('Folhas_Cheques')
-                         ->where(array('chequeid' => $cheque_id, 'numero' => $numero));
+                         ->where(['chequeid' => $cheque_id, 'numero' => $numero]);
         return new ZFolhaCheque($query->fetch());
     }
 
     private static function validarCampos(&$folha_cheque)
     {
-        $erros = array();
+        $erros = [];
         if (!is_numeric($folha_cheque['chequeid'])) {
             $erros['chequeid'] = 'O cheque não foi informado';
         }
@@ -259,7 +259,7 @@ class ZFolhaCheque
         $folha_cheque['recolhido'] = trim($folha_cheque['recolhido']);
         if (strlen($folha_cheque['recolhido']) == 0) {
             $folha_cheque['recolhido'] = 'N';
-        } elseif (!in_array($folha_cheque['recolhido'], array('Y', 'N'))) {
+        } elseif (!in_array($folha_cheque['recolhido'], ['Y', 'N'])) {
             $erros['recolhido'] = 'O recolhido informado não é válido';
         }
         $folha_cheque['recolhimento'] = date('Y-m-d H:i:s');
@@ -271,10 +271,10 @@ class ZFolhaCheque
     private static function handleException(&$e)
     {
         if (stripos($e->getMessage(), 'PRIMARY') !== false) {
-            throw new ValidationException(array('id' => 'O ID informado já está cadastrado'));
+            throw new ValidationException(['id' => 'O ID informado já está cadastrado']);
         }
         if (stripos($e->getMessage(), 'UK_Folhas_Cheques_ChequeID_Numero') !== false) {
-            throw new ValidationException(array('numero' => 'O número informado já está cadastrado'));
+            throw new ValidationException(['numero' => 'O número informado já está cadastrado']);
         }
     }
 
@@ -295,10 +295,10 @@ class ZFolhaCheque
     {
         $_folha_cheque = $folha_cheque->toArray();
         if (!$_folha_cheque['id']) {
-            throw new ValidationException(array('id' => 'O id do folhacheque não foi informado'));
+            throw new ValidationException(['id' => 'O id do folhacheque não foi informado']);
         }
         self::validarCampos($_folha_cheque);
-        $campos = array(
+        $campos = [
             'chequeid',
             'compensacao',
             'numero',
@@ -307,7 +307,7 @@ class ZFolhaCheque
             'serie',
             'recolhido',
             'recolhimento',
-        );
+        ];
         for ($i = 1; $i <= 3; $i++) {
             $campos[] = 'c'.$i;
         }
@@ -363,7 +363,7 @@ class ZFolhaCheque
             $query = $query->limit($quantidade)->offset($inicio);
         }
         $_folha_cheques = $query->fetchAll();
-        $folha_cheques = array();
+        $folha_cheques = [];
         foreach ($_folha_cheques as $folha_cheque) {
             $folha_cheques[] = new ZFolhaCheque($folha_cheque);
         }
@@ -379,7 +379,7 @@ class ZFolhaCheque
     private static function initSearchDoChequeID($cheque_id)
     {
         return   DB::$pdo->from('Folhas_Cheques')
-                         ->where(array('chequeid' => $cheque_id))
+                         ->where(['chequeid' => $cheque_id])
                          ->orderBy('id ASC');
     }
 
@@ -390,7 +390,7 @@ class ZFolhaCheque
             $query = $query->limit($quantidade)->offset($inicio);
         }
         $_folha_cheques = $query->fetchAll();
-        $folha_cheques = array();
+        $folha_cheques = [];
         foreach ($_folha_cheques as $folha_cheque) {
             $folha_cheques[] = new ZFolhaCheque($folha_cheque);
         }

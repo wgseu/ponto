@@ -91,7 +91,7 @@ function IsHtmlExtension( $ext, $htmlExtensions )
 	{
 		return false ;
 	}
-	$lcaseHtmlExtensions = array() ;
+	$lcaseHtmlExtensions = [] ;
 	foreach ( $htmlExtensions as $key => $val )
 	{
 		$lcaseHtmlExtensions[$key] = strtolower( $val ) ;
@@ -135,7 +135,7 @@ function DetectHtml( $filePath )
 		return true;
 	}
 
-	$tags = array( '<body', '<head', '<html', '<img', '<pre', '<script', '<table', '<title' ) ;
+	$tags = [ '<body', '<head', '<html', '<img', '<pre', '<script', '<table', '<title' ] ;
 
 	foreach( $tags as $tag )
 	{
@@ -184,7 +184,7 @@ function IsImageValid( $filePath, $extension )
 		return -1;
 	}
 
-	$imageCheckExtensions = array('gif', 'jpeg', 'jpg', 'png', 'swf', 'psd', 'bmp', 'iff');
+	$imageCheckExtensions = ['gif', 'jpeg', 'jpg', 'png', 'swf', 'psd', 'bmp', 'iff'];
 
 	// version_compare is available since PHP4 >= 4.0.7
 	if ( function_exists( 'version_compare' ) ) {

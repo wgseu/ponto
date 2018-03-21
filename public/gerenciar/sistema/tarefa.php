@@ -15,11 +15,11 @@ try {
     $runner->execute();
     json(
         'result',
-        array(
+        [
             'processed' => $runner->getProcessed(),
             'pending' => $runner->getPending(),
             'failed' => $runner->getFailed()
-        )
+        ]
     );
 } catch (\Exception $e) {
     Log::error($e->getMessage());

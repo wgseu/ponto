@@ -31,7 +31,7 @@ if ($produto->getTipo() != ProdutoTipo::COMPOSICAO) {
     Thunder::warning('O produto "'.$produto->getDescricao().'" não é uma composição!');
     redirect('/gerenciar/produto/');
 }
-$nos = array();
+$nos = [];
 $stack = new SplStack();
 $composicao = new ZComposicao();
 $composicao->setID(0); // código do pai
@@ -60,7 +60,7 @@ while (!$stack->isEmpty()) {
         $valor = ZEstoque::getUltimoPrecoCompra($_produto->getID());
     }
     $composicao->setValor($valor);
-    $no = array();
+    $no = [];
     $no['produto'] = $_produto;
     $no['composicao'] = $composicao;
     $nos[$composicao->getID()] = $no;

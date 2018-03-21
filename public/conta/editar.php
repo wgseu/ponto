@@ -28,7 +28,7 @@ $fieldfocus = 'nome';
 $gerenciando = false;
 $cadastrar_cliente = false;
 $aceitar = 'true';
-$erro = array();
+$erro = [];
 if (is_post()) {
     $old_cliente = $cliente;
     $cliente = new ZCliente($_POST);
@@ -63,12 +63,12 @@ if (is_post()) {
             $cliente->setImagem(true);
         }
         if ($_POST['confirmarsenha'] != $_POST['senha']) {
-            throw new ValidationException(array('senha' => 'As senhas não são iguais', 'confirmarsenha' => 'As senhas não são iguais'));
+            throw new ValidationException(['senha' => 'As senhas não são iguais', 'confirmarsenha' => 'As senhas não são iguais']);
         }
         $cliente = ZCliente::atualizar($cliente);
         $msg = 'Conta atualizada com sucesso!';
         if (is_output('json')) {
-            json(array('status' => 'ok', 'item' => $cliente->toArray(array('secreto', 'senha', 'slogan')), 'msg' => $msg));
+            json(['status' => 'ok', 'item' => $cliente->toArray(['secreto', 'senha', 'slogan']), 'msg' => $msg]);
         }
         Thunder::success($msg, true);
         redirect('/conta/editar');

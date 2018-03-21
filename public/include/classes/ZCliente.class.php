@@ -50,7 +50,7 @@ class ZCliente
     private $im;
     private $email;
     private $data_aniversario;
-    private $fone = array();
+    private $fone = [];
     private $slogan;
     private $secreto;
     private $limite_compra;
@@ -61,7 +61,7 @@ class ZCliente
     private $data_atualizacao;
     private $data_cadastro;
 
-    public function __construct($cliente = array())
+    public function __construct($cliente = [])
     {
         $this->fromArray($cliente);
     }
@@ -475,7 +475,7 @@ class ZCliente
         $nomes = preg_split('/[\s,]+/', $this->getSobrenome());
         $sobrenome = $this->getSobrenome();
         foreach ($nomes as $nome) {
-            if (in_array($nome, array('da', 'de', 'do', 'das', 'dos'))) {
+            if (in_array($nome, ['da', 'de', 'do', 'das', 'dos'])) {
                 continue;
             }
             $sobrenome = $nome;
@@ -489,12 +489,12 @@ class ZCliente
      * @param  mixed $cliente Associated key -> value to assign into this instance
      * @return Cliente Self instance
      */
-    public function fromArray($cliente = array())
+    public function fromArray($cliente = [])
     {
         if ($cliente instanceof ZCliente) {
             $cliente = $cliente->toArray();
         } elseif (!is_array($cliente)) {
-            $cliente = array();
+            $cliente = [];
         }
         if (!isset($cliente['id'])) {
             $this->setID(null);
@@ -619,9 +619,9 @@ class ZCliente
         return $this;
     }
 
-    public function toArray($ignore = array())
+    public function toArray($ignore = [])
     {
-        $cliente = array();
+        $cliente = [];
         $cliente['id'] = $this->getID();
         $cliente['tipo'] = $this->getTipo();
         $cliente['acionistaid'] = $this->getAcionistaID();
@@ -696,7 +696,7 @@ class ZCliente
     public static function getPeloID($id)
     {
         $query = self::initSelect()
-                         ->where(array('id' => $id));
+                         ->where(['id' => $id]);
         return new ZCliente($query->fetch());
     }
 
@@ -724,28 +724,28 @@ class ZCliente
     public static function getPelaEmail($email)
     {
         $query = self::initSelect()
-                         ->where(array('email' => $email));
+                         ->where(['email' => $email]);
         return new ZCliente($query->fetch());
     }
 
     public static function getPeloCPF($cpf)
     {
         $query = self::initSelect()
-                         ->where(array('cpf' => $cpf));
+                         ->where(['cpf' => $cpf]);
         return new ZCliente($query->fetch());
     }
 
     public static function getPeloLogin($login)
     {
         $query = self::initSelect()
-                         ->where(array('login' => $login));
+                         ->where(['login' => $login]);
         return new ZCliente($query->fetch());
     }
 
     public static function getPeloSecreto($secreto)
     {
         $query = self::initSelect()
-                         ->where(array('secreto' => $secreto));
+                         ->where(['secreto' => $secreto]);
         return new ZCliente($query->fetch());
     }
 
@@ -785,10 +785,10 @@ class ZCliente
             return new ZCliente();
         }
         $id = substr($id, 0, -14);
-        $query = self::initSelect()->where(array(
+        $query = self::initSelect()->where([
                                 'c.id' => intval($id),
                                 'c.senha' => $hash,
-                            ));
+                            ]);
         return new ZCliente($query->fetch());
     }
 
@@ -798,10 +798,10 @@ class ZCliente
         if ($cv) {
             $zone = base64_decode($cv);
             $p = explode('@', $zone, 2);
-            $query = self::initSelect()->where(array(
+            $query = self::initSelect()->where([
                                 'c.id' => $p[0],
                                 'c.senha' => $p[1],
-                            ));
+                            ]);
             return new ZCliente($query->fetch());
         }
         return new ZCliente();
@@ -815,10 +815,10 @@ class ZCliente
         } else {
             $field = 'c.login';
         }
-        $query = self::initSelect()->where(array(
+        $query = self::initSelect()->where([
                             $field => $email,
                             'c.senha' => $senha,
-                        ));
+                        ]);
         return new ZCliente($query->fetch());
     }
 
@@ -827,7 +827,7 @@ class ZCliente
         $query = DB::$pdo->from('Clientes c')
                          ->select(null)
                          ->select('c.dataatualizacao')
-                         ->where(array('c.id' => $cliente_id));
+                         ->where(['c.id' => $cliente_id]);
         if (!$dataSomente) {
             $query = $query->select('c.imagem');
         }
@@ -836,12 +836,12 @@ class ZCliente
 
     private static function validarCampos(&$cliente)
     {
-        $erros = array();
+        $erros = [];
         $funcionario = ZFuncionario::getPeloClienteID($cliente['id']);
         $cliente['tipo'] = trim($cliente['tipo']);
         if (strlen($cliente['tipo']) == 0) {
             $cliente['tipo'] = ClienteTipo::FISICA;
-        } elseif (!in_array($cliente['tipo'], array('Fisica', 'Juridica'))) {
+        } elseif (!in_array($cliente['tipo'], ['Fisica', 'Juridica'])) {
             $erros['tipo'] = 'O tipo de cliente informado não é válido';
         }
         if (is_manager($funcionario) && $cliente['tipo'] != 'Fisica') {
@@ -876,16 +876,16 @@ class ZCliente
         if ($cliente['tipo'] == ClienteTipo::JURIDICA) {
             $cliente['genero'] = ClienteGenero::FEMININO;
         }
-        if (!in_array($cliente['genero'], array('Masculino', 'Feminino'))) {
+        if (!in_array($cliente['genero'], ['Masculino', 'Feminino'])) {
             $erros['genero'] = 'O gênero informado não é válido';
         }
         $cliente['cpf'] = \MZ\Util\Filter::digits($cliente['cpf']);
         if (strlen($cliente['cpf']) == 0) {
             $cliente['cpf'] = null;
         } elseif (!check_cpf($cliente['cpf']) && $cliente['tipo'] == ClienteTipo::FISICA) {
-            $erros['cpf'] = vsprintf('%s inválido', array(_p('Titulo', 'CPF')));
+            $erros['cpf'] = vsprintf('%s inválido', [_p('Titulo', 'CPF')]);
         } elseif (!check_cnpj($cliente['cpf']) && $cliente['tipo'] == ClienteTipo::JURIDICA) {
-            $erros['cpf'] = vsprintf('%s inválido', array(_p('Titulo', 'CNPJ')));
+            $erros['cpf'] = vsprintf('%s inválido', [_p('Titulo', 'CNPJ')]);
         }
         $cliente['rg'] = strip_tags(trim($cliente['rg']));
         if (strlen($cliente['rg']) == 0) {
@@ -921,7 +921,7 @@ class ZCliente
             }
         }
         if (trim($cliente['cpf']) == '' && trim($cliente['fone1']) == '' && trim($cliente['email']) == '') {
-            $erros['fone1'] = vsprintf('Nenhum dado chave foi informado, informe um Telefone, E-mail ou %s', array(_p('Titulo', 'CPF')));
+            $erros['fone1'] = vsprintf('Nenhum dado chave foi informado, informe um Telefone, E-mail ou %s', [_p('Titulo', 'CPF')]);
         }
         $cliente['slogan'] = strip_tags(trim($cliente['slogan']));
         if (strlen($cliente['slogan']) == 0) {
@@ -964,22 +964,22 @@ class ZCliente
     private static function handleException(&$e)
     {
         if (stripos($e->getMessage(), 'PRIMARY') !== false) {
-            throw new ValidationException(array('id' => 'O ID informado já está cadastrado'));
+            throw new ValidationException(['id' => 'O ID informado já está cadastrado']);
         }
         if (stripos($e->getMessage(), 'Fone1_UNIQUE') !== false) {
-            throw new ValidationException(array('fone1' => 'O Telefone informado já está cadastrado'));
+            throw new ValidationException(['fone1' => 'O Telefone informado já está cadastrado']);
         }
         if (stripos($e->getMessage(), 'Email_UNIQUE') !== false) {
-            throw new ValidationException(array('email' => 'O E-mail informado já está cadastrado'));
+            throw new ValidationException(['email' => 'O E-mail informado já está cadastrado']);
         }
         if (stripos($e->getMessage(), 'CPF_UNIQUE') !== false) {
-            throw new ValidationException(array('cpf' => vsprintf('O %s informado já está cadastrado'. array(_p('Titulo', 'CPF')))));
+            throw new ValidationException(['cpf' => vsprintf('O %s informado já está cadastrado'. [_p('Titulo', 'CPF')])]);
         }
         if (stripos($e->getMessage(), 'Login_UNIQUE') !== false) {
-            throw new ValidationException(array('login' => 'O nome de usuário informado já está cadastrado'));
+            throw new ValidationException(['login' => 'O nome de usuário informado já está cadastrado']);
         }
         if (stripos($e->getMessage(), 'Secreto_UNIQUE') !== false) {
-            throw new ValidationException(array('secreto' => 'O código de recuperação informado já está cadastrado'));
+            throw new ValidationException(['secreto' => 'O código de recuperação informado já está cadastrado']);
         }
     }
 
@@ -992,7 +992,7 @@ class ZCliente
         self::validarCampos($_cliente);
         // a senha não pode ser vazia
         if (trim($_cliente['senha']) == '' && !is_login()) {
-            throw new ValidationException(array('senha' => 'A senha não pode ser vazia'));
+            throw new ValidationException(['senha' => 'A senha não pode ser vazia']);
         }
         $_cliente['senha'] = self::gerarSenha($_cliente['senha']);
         try {
@@ -1008,10 +1008,10 @@ class ZCliente
     {
         $_cliente = $cliente->toArray();
         if (!$_cliente['id']) {
-            throw new ValidationException(array('id' => 'O id do cliente não foi informado'));
+            throw new ValidationException(['id' => 'O id do cliente não foi informado']);
         }
         self::validarCampos($_cliente);
-        $campos = array(
+        $campos = [
             'tipo',
             'acionistaid',
             'login',
@@ -1030,7 +1030,7 @@ class ZCliente
             'twitterurl',
             'linkedinurl',
             'dataatualizacao',
-        );
+        ];
         if ($_cliente['imagem'] !== true) {
             $campos[] = 'imagem';
         }
@@ -1059,7 +1059,7 @@ class ZCliente
             throw new Exception('Não foi possível excluir o cliente, o id do cliente não foi informado');
         }
         $query = DB::$pdo->deleteFrom('Clientes')
-                         ->where(array('id' => $id));
+                         ->where(['id' => $id]);
         return $query->execute();
     }
 
@@ -1069,10 +1069,10 @@ class ZCliente
      */
     public static function getTipoOptions()
     {
-        return array(
+        return [
             ClienteTipo::FISICA => 'Física',
             ClienteTipo::JURIDICA => 'Jurídica',
-        );
+        ];
     }
 
     /**
@@ -1082,10 +1082,10 @@ class ZCliente
      */
     public static function getGeneroOptions($index = null)
     {
-        $options = array(
+        $options = [
             ClienteGenero::MASCULINO => 'Masculino',
             ClienteGenero::FEMININO => 'Feminino',
-        );
+        ];
         if (!is_null($index)) {
             return $options[$index];
         }
@@ -1186,7 +1186,7 @@ class ZCliente
             $query = $query->limit($quantidade)->offset($inicio);
         }
         $_clientes = $query->fetchAll();
-        $clientes = array();
+        $clientes = [];
         foreach ($_clientes as $cliente) {
             $clientes[] = new ZCliente($cliente);
         }

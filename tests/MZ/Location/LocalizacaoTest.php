@@ -30,7 +30,7 @@ class LocalizacaoTest extends \PHPUnit_Framework_TestCase
     {
         $localizacao = new Localizacao();
         $values = $localizacao->publish();
-        $allowed = array(
+        $allowed = [
             'id',
             'clienteid',
             'bairroid',
@@ -47,7 +47,7 @@ class LocalizacaoTest extends \PHPUnit_Framework_TestCase
             'longitude',
             'apelido',
             'mostrar',
-        );
+        ];
         $this->assertEquals($allowed, array_keys($values));
     }
 }

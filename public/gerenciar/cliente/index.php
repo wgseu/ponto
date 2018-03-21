@@ -60,6 +60,6 @@ $clientes = ZCliente::getTodos(
 );
 
 $tipos = ZCliente::getGeneroOptions();
-$tipos = array('Empresa' => 'Empresa') + $tipos;
+$tipos = ['Empresa' => 'Empresa'] + $tipos;
 
 include template('gerenciar_cliente_index');

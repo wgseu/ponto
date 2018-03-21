@@ -33,14 +33,14 @@ list($pagesize, $offset, $pagestring) = pagestring($count, $limite);
 $classificacoes = ZClassificacao::getTodas($superiores, $_GET['classificacao'], $_GET['query'], $offset, $pagesize);
 
 if (is_output('json')) {
-    $_classificacoes = array();
+    $_classificacoes = [];
     foreach ($classificacoes as $classificacao) {
         $_classificacoes[] = $classificacao->toArray();
     }
-    json(array('status' => 'ok', 'items' => $_classificacoes));
+    json(['status' => 'ok', 'items' => $_classificacoes]);
 }
 $classificacoes_sup = ZClassificacao::getTodas(true);
-$_classificacao_names = array();
+$_classificacao_names = [];
 foreach ($classificacoes_sup as $classificacao) {
     $_classificacao_names[$classificacao->getID()] = $classificacao->getDescricao();
 }

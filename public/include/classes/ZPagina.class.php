@@ -30,7 +30,7 @@ class ZPagina
     private $linguagem_id;
     private $conteudo;
 
-    public function __construct($pagina = array())
+    public function __construct($pagina = [])
     {
         if (is_array($pagina)) {
             $this->setID(isset($pagina['id'])?$pagina['id']:null);
@@ -94,7 +94,7 @@ class ZPagina
 
     public function toArray()
     {
-        $pagina = array();
+        $pagina = [];
         $pagina['id'] = $this->getID();
         $pagina['nome'] = $this->getNome();
         $pagina['linguagemid'] = $this->getLinguagemID();
@@ -105,20 +105,20 @@ class ZPagina
     public static function getPeloID($id)
     {
         $query = DB::$pdo->from('Paginas')
-                         ->where(array('id' => $id));
+                         ->where(['id' => $id]);
         return new ZPagina($query->fetch());
     }
 
     public static function getPeloNomeLinguagemID($nome, $linguagem_id)
     {
         $query = DB::$pdo->from('Paginas')
-                         ->where(array('nome' => $nome, 'linguagemid' => $linguagem_id));
+                         ->where(['nome' => $nome, 'linguagemid' => $linguagem_id]);
         return new ZPagina($query->fetch());
     }
 
     private static function validarCampos(&$pagina)
     {
-        $erros = array();
+        $erros = [];
         $nomes = array_keys(get_pages_info());
         $linguagens = array_keys(get_languages_info());
         $pagina['nome'] = strip_tags(trim($pagina['nome']));
@@ -148,10 +148,10 @@ class ZPagina
     private static function handleException(&$e)
     {
         if (stripos($e->getMessage(), 'PRIMARY') !== false) {
-            throw new ValidationException(array('id' => 'O ID informado já está cadastrado'));
+            throw new ValidationException(['id' => 'O ID informado já está cadastrado']);
         }
         if (stripos($e->getMessage(), 'Nome_LinguagemID_UNIQUE') !== false) {
-            throw new ValidationException(array('linguagemid' => 'A linguagem informada já está cadastrada'));
+            throw new ValidationException(['linguagemid' => 'A linguagem informada já está cadastrada']);
         }
     }
 
@@ -172,14 +172,14 @@ class ZPagina
     {
         $_pagina = $pagina->toArray();
         if (!$_pagina['id']) {
-            throw new ValidationException(array('id' => 'O id da pagina não foi informado'));
+            throw new ValidationException(['id' => 'O id da pagina não foi informado']);
         }
         self::validarCampos($_pagina);
-        $campos = array(
+        $campos = [
             'nome',
             'linguagemid',
             'conteudo',
-        );
+        ];
         try {
             $query = DB::$pdo->update('Paginas');
             $query = $query->set(array_intersect_key($_pagina, array_flip($campos)));
@@ -198,7 +198,7 @@ class ZPagina
             throw new Exception('Não foi possível excluir a pagina, o id da pagina não foi informado');
         }
         $query = DB::$pdo->deleteFrom('Paginas')
-                         ->where(array('id' => $id));
+                         ->where(['id' => $id]);
         return $query->execute();
     }
 
@@ -224,7 +224,7 @@ class ZPagina
             $query = $query->limit($quantidade)->offset($inicio);
         }
         $_paginas = $query->fetchAll();
-        $paginas = array();
+        $paginas = [];
         foreach ($_paginas as $pagina) {
             $paginas[] = new ZPagina($pagina);
         }

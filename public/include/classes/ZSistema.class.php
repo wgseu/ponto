@@ -40,7 +40,7 @@ class ZSistema
 
     const VERSAO = '1935';
 
-    public function __construct($sistema = array())
+    public function __construct($sistema = [])
     {
         if (is_array($sistema)) {
             $this->setID(isset($sistema['id'])?$sistema['id']:null);
@@ -279,7 +279,7 @@ class ZSistema
 
     public function toArray()
     {
-        $sistema = array();
+        $sistema = [];
         $sistema['id'] = $this->getID();
         $sistema['paisid'] = $this->getPaisID();
         $sistema['empresaid'] = $this->getEmpresaID();
@@ -298,15 +298,15 @@ class ZSistema
     public static function getPeloID($id)
     {
         $query = DB::$pdo->from('Sistema')
-                         ->where(array('id' => $id));
+                         ->where(['id' => $id]);
         return new ZSistema($query->fetch());
     }
 
     private static function validarCampos(&$sistema)
     {
-        $erros = array();
+        $erros = [];
         $sistema['id'] = strval($sistema['id']);
-        if (!in_array($sistema['id'], array('1'))) {
+        if (!in_array($sistema['id'], ['1'])) {
             $erros['id'] = 'O ID informado não é válido';
         }
         $sistema['paisid'] = trim($sistema['paisid']);
@@ -366,20 +366,20 @@ class ZSistema
     private static function handleException(&$e)
     {
         if (stripos($e->getMessage(), 'PRIMARY') !== false) {
-            throw new ValidationException(array('id' => 'O ID informado já está cadastrado'));
+            throw new ValidationException(['id' => 'O ID informado já está cadastrado']);
         }
     }
 
-    public static function atualizar($sistema, $campos = array())
+    public static function atualizar($sistema, $campos = [])
     {
         $_sistema = $sistema->toArray();
         if (!$_sistema['id']) {
-            throw new ValidationException(array('id' => 'O id do sistema não foi informado'));
+            throw new ValidationException(['id' => 'O id do sistema não foi informado']);
         }
         self::validarCampos($_sistema);
         $_campos = $campos;
         if (count($_campos) == 0) {
-            $_campos = array(
+            $_campos = [
                 // 'paisid',
                 // 'empresaid',
                 // 'parceiroid',
@@ -391,7 +391,7 @@ class ZSistema
                 'opcoes',
                 // 'ultimobackup',
                 // 'versaodb',
-            );
+            ];
         }
         try {
             $query = DB::$pdo->update('Sistema');
@@ -408,7 +408,7 @@ class ZSistema
     private static function initSearchDaEmpresaID($empresa_id)
     {
         return   DB::$pdo->from('Sistema')
-                         ->where(array('empresaid' => $empresa_id))
+                         ->where(['empresaid' => $empresa_id])
                          ->orderBy('id ASC');
     }
 
@@ -419,7 +419,7 @@ class ZSistema
             $query = $query->limit($quantidade)->offset($inicio);
         }
         $_sistemas = $query->fetchAll();
-        $sistemas = array();
+        $sistemas = [];
         foreach ($_sistemas as $sistema) {
             $sistemas[] = new ZSistema($sistema);
         }
@@ -435,7 +435,7 @@ class ZSistema
     private static function initSearchDoParceiroID($parceiro_id)
     {
         return   DB::$pdo->from('Sistema')
-                         ->where(array('parceiroid' => $parceiro_id))
+                         ->where(['parceiroid' => $parceiro_id])
                          ->orderBy('id ASC');
     }
 
@@ -446,7 +446,7 @@ class ZSistema
             $query = $query->limit($quantidade)->offset($inicio);
         }
         $_sistemas = $query->fetchAll();
-        $sistemas = array();
+        $sistemas = [];
         foreach ($_sistemas as $sistema) {
             $sistemas[] = new ZSistema($sistema);
         }
@@ -462,7 +462,7 @@ class ZSistema
     private static function initSearchDaPaisID($pais_id)
     {
         return   DB::$pdo->from('Sistema')
-                         ->where(array('paisid' => $pais_id))
+                         ->where(['paisid' => $pais_id])
                          ->orderBy('id ASC');
     }
 
@@ -473,7 +473,7 @@ class ZSistema
             $query = $query->limit($quantidade)->offset($inicio);
         }
         $_sistemas = $query->fetchAll();
-        $sistemas = array();
+        $sistemas = [];
         foreach ($_sistemas as $sistema) {
             $sistemas[] = new ZSistema($sistema);
         }

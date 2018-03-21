@@ -29,7 +29,7 @@ class ZUnidade
     private $descricao;
     private $sigla;
 
-    public function __construct($unidade = array())
+    public function __construct($unidade = [])
     {
         if (is_array($unidade)) {
             $this->setID(isset($unidade['id'])?$unidade['id']:null);
@@ -93,7 +93,7 @@ class ZUnidade
 
     public function toArray()
     {
-        $unidade = array();
+        $unidade = [];
         $unidade['id'] = $this->getID();
         $unidade['nome'] = $this->getNome();
         $unidade['descricao'] = $this->getDescricao();
@@ -104,7 +104,7 @@ class ZUnidade
     private function processaUnidade($quantidade, $conteudo)
     {
         $unidade = $this->getSigla();
-        $grandezas = array(
+        $grandezas = [
             -24 => 'y',
             -21 => 'z',
             -18 => 'a',
@@ -126,17 +126,17 @@ class ZUnidade
              18 => 'E',
              21 => 'Z',
              24 => 'Y'
-        );
+        ];
         $index = intval(log10($conteudo));
         $remain = $conteudo / pow(10, $index);
         if (!array_key_exists($index, $grandezas)) {
             throw new Exception('Não existe grandeza para o conteudo '.$conteudo.' da unidade '.$unidade, 404);
         }
         $unidade = $grandezas[$index].$unidade;
-        return array(
+        return [
             'unidade' => $unidade,
             'quantidade' => $quantidade * $remain
-        );
+        ];
     }
 
     public function processaSigla($quantidade, $conteudo)
@@ -160,20 +160,20 @@ class ZUnidade
     public static function getPeloID($id)
     {
         $query = DB::$pdo->from('Unidades')
-                         ->where(array('id' => $id));
+                         ->where(['id' => $id]);
         return new ZUnidade($query->fetch());
     }
 
     public static function getPelaSigla($sigla)
     {
         $query = DB::$pdo->from('Unidades')
-                         ->where(array('sigla' => $sigla));
+                         ->where(['sigla' => $sigla]);
         return new ZUnidade($query->fetch());
     }
 
     private static function validarCampos(&$unidade)
     {
-        $erros = array();
+        $erros = [];
         $unidade['nome'] = strip_tags(trim($unidade['nome']));
         if (strlen($unidade['nome']) == 0) {
             $erros['nome'] = 'O nome não pode ser vazio';
@@ -194,10 +194,10 @@ class ZUnidade
     private static function handleException(&$e)
     {
         if (stripos($e->getMessage(), 'PRIMARY') !== false) {
-            throw new ValidationException(array('id' => 'O ID informado já está cadastrado'));
+            throw new ValidationException(['id' => 'O ID informado já está cadastrado']);
         }
         if (stripos($e->getMessage(), 'Sigla_UNIQUE') !== false) {
-            throw new ValidationException(array('sigla' => 'A sigla informada já está cadastrada'));
+            throw new ValidationException(['sigla' => 'A sigla informada já está cadastrada']);
         }
     }
 
@@ -218,14 +218,14 @@ class ZUnidade
     {
         $_unidade = $unidade->toArray();
         if (!$_unidade['id']) {
-            throw new ValidationException(array('id' => 'O id da unidade não foi informado'));
+            throw new ValidationException(['id' => 'O id da unidade não foi informado']);
         }
         self::validarCampos($_unidade);
-        $campos = array(
+        $campos = [
             'nome',
             'descricao',
             'sigla',
-        );
+        ];
         try {
             $query = DB::$pdo->update('Unidades');
             $query = $query->set(array_intersect_key($_unidade, array_flip($campos)));
@@ -244,7 +244,7 @@ class ZUnidade
             throw new Exception('Não foi possível excluir a unidade, o id da unidade não foi informado');
         }
         $query = DB::$pdo->deleteFrom('Unidades')
-                         ->where(array('id' => $id));
+                         ->where(['id' => $id]);
         return $query->execute();
     }
 
@@ -266,7 +266,7 @@ class ZUnidade
             $query = $query->limit($quantidade)->offset($inicio);
         }
         $_unidades = $query->fetchAll();
-        $unidades = array();
+        $unidades = [];
         foreach ($_unidades as $unidade) {
             $unidades[] = new ZUnidade($unidade);
         }

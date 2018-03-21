@@ -76,17 +76,17 @@ if ($weblogin) {
     $url = is_null($_POST['redirect'])?'/':strval($_POST['redirect']);
     redirect($url);
 }
-$status = array('status' => 'ok', 'msg' => 'Login efetuado com sucesso!');
+$status = ['status' => 'ok', 'msg' => 'Login efetuado com sucesso!'];
 $status['versao'] = ZSistema::VERSAO;
 $status['cliente'] = $login_cliente->getID();
-$status['info'] = array(
-    'usuario' => array(
+$status['info'] = [
+    'usuario' => [
         'nome' => $login_cliente->getNome(),
         'email' => $login_cliente->getEmail(),
         'login' => $login_cliente->getLogin(),
         'imagemurl' => get_image_url($login_cliente->getImagem(), 'cliente', null)
-    )
-);
+    ]
+];
 $status['funcionario'] = intval($login_funcionario->getID());
 $status['validacao'] = $dispositivo->getValidacao();
 $status['autologout'] = is_boolean_config('Sistema', 'Tablet.Logout');

@@ -28,7 +28,7 @@ if (is_null($produto->getID())) {
     redirect('/gerenciar/produto/');
 }
 $focusctrl = 'descricao';
-$errors = array();
+$errors = [];
 $old_produto = $produto;
 if (is_post()) {
     $produto = new ZProduto($_POST);

@@ -30,19 +30,19 @@ $limite = isset($_GET['limite'])?intval($_GET['limite']):null;
 if (!is_null($limite) && $limite < 1) {
     $limite = null;
 }
-$associacoes = isset($_POST['pacote'])?$_POST['pacote']:array();
+$associacoes = isset($_POST['pacote'])?$_POST['pacote']:[];
 $pacotes = Pacote::rawFindAll(
-	array(
+	[
 		'pc.grupoid' => intval($_GET['grupo']),
 		'pc.associacaoid' => $associacoes,
 		'pc.visivel' => 'Y',
 		'query' => strval($_GET['busca'])
-	),
-	array('pc.id' => 1),
+	],
+	['pc.id' => 1],
 	$limite
 );
-$response = array('status' => 'ok');
-$_pacotes = array();
+$response = ['status' => 'ok'];
+$_pacotes = [];
 foreach ($pacotes as $pacote) {
     $pacote['imagemurl'] = get_image_url($pacote['imagemurl'], (is_null($pacote['produtoid'])?'propriedade':'produto'), null);
     $_pacotes[] = $pacote;

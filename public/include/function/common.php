@@ -149,9 +149,9 @@ function relative_day($window, $date = null)
 function human_date($date, $year = false)
 {
     $_date = date_create($date);
-    $months = array(1 => 'Jan', 2 => 'Fev', 3 => 'Mar', 4 => 'Abr',
+    $months = [1 => 'Jan', 2 => 'Fev', 3 => 'Mar', 4 => 'Abr',
             5 => 'Mai', 6 => 'Jun', 7 => 'Jul', 8 => 'Ago',
-            9 => 'Set', 10 => 'Out', 11 => 'Nov', 12 => 'Dez');
+            9 => 'Set', 10 => 'Out', 11 => 'Nov', 12 => 'Dez'];
     if ($year) {
         if (date_format($_date, 'Y') == date('Y')) {
             return $months[date_format($_date, 'n')];
@@ -171,9 +171,9 @@ function human_range($inicio, $fim, $sep = '/')
     if ($inicio === false && $fim === false) {
         return null;
     }
-    $months = array(1 => 'janeiro', 2 => 'fevereiro', 3 => 'março', 4 => 'abril',
+    $months = [1 => 'janeiro', 2 => 'fevereiro', 3 => 'março', 4 => 'abril',
             5 => 'maio', 6 => 'junho', 7 => 'julho', 8 => 'agosto',
-            9 => 'setembro', 10 => 'outubro', 11 => 'novembro', 12 => 'dezembro');
+            9 => 'setembro', 10 => 'outubro', 11 => 'novembro', 12 => 'dezembro'];
     if ($inicio === false && $fim !== false) {
         return 'até dia '.date('j', $fim).' de '.$months[date('n', $fim)].' de '.date('Y', $fim);
     } elseif ($inicio !== false && $fim === false) {
@@ -240,7 +240,7 @@ function template($tFile)
     return __template($tFile);
 }
 
-function render($tFile, $vs = array())
+function render($tFile, $vs = [])
 {
     ob_start();
     foreach ($GLOBALS as $_k => $_v) {
@@ -409,26 +409,26 @@ function have_permission($array, $funcionario = null)
 
 function get_pages_info()
 {
-    return array(
+    return [
         'sobre' => 'Sobre a empresa',
         'privacidade' => 'Privacidade',
         'termos' => 'Termos de uso',
-    );
+    ];
 }
 
 function get_languages_info()
 {
-    return array(
+    return [
         '1046' => 'Português(Brasil)',
         '1033' => 'English(United States)',
         '1034' => 'Espanõl',
-    );
+    ];
 }
 
 function set_timezone_for($uf, $pais = 'Brasil')
 {
-    $timezones = array(
-        'BR' => array(
+    $timezones = [
+        'BR' => [
             'AC' => 'America/Rio_branco',   'AL' => 'America/Maceio',
             'AP' => 'America/Belem',        'AM' => 'America/Manaus',
             'BA' => 'America/Bahia',        'CE' => 'America/Fortaleza',
@@ -443,8 +443,8 @@ function set_timezone_for($uf, $pais = 'Brasil')
             'RR' => 'America/Boa_Vista',    'SC' => 'America/Sao_Paulo',
             'SE' => 'America/Maceio',       'SP' => 'America/Sao_Paulo',
             'TO' => 'America/Araguaia'
-        )
-    );
+        ]
+    ];
     $timezone = date_default_timezone_get();
     switch ($pais) {
         case 'BR':
@@ -552,7 +552,7 @@ function _p($section, $key)
 {
     global $__entries__;
 
-    $entries = array(
+    $entries = [
         'Titulo.CNPJ' => 'CNPJ',
         'Mascara.CNPJ' => '99.999.999/9999-99',
         'Titulo.CPF' => 'CPF',
@@ -694,7 +694,7 @@ function _p($section, $key)
         'Cupom.Diferenca' => 'Diferença',
         'Cupom.Restante' => 'Restante',
         'Cupom.TotalJuros' => 'Total(J)'
-    );
+    ];
     if (is_array($__entries__) &&
         array_key_exists($section, $__entries__) &&
         array_key_exists($key, $__entries__[$section])
@@ -824,15 +824,15 @@ function json($tag, $data = null, $field = null)
 {
     header('Content-Type: application/json');
     if (is_null($tag)) {
-        echo json_encode(array_merge(array('status'=> 'ok'), $data));
+        echo json_encode(array_merge(['status'=> 'ok'], $data));
     } elseif (is_array($tag)) {
         echo json_encode($tag);
     } elseif (is_null($data) && !is_null($field)) {
-        echo json_encode(array_merge(array('status'=> 'error', 'msg' => $tag), $field));
+        echo json_encode(array_merge(['status'=> 'error', 'msg' => $tag], $field));
     } elseif (is_null($data)) {
-        echo json_encode(array('status'=> 'error', 'msg' => $tag));
+        echo json_encode(['status'=> 'error', 'msg' => $tag]);
     } else {
-        echo json_encode(array('status'=> 'ok', $tag => $data));
+        echo json_encode(['status'=> 'ok', $tag => $data]);
     }
     exit;
 }
@@ -1004,7 +1004,7 @@ function zip_extract_folder($zip, $redirect)
     }
 }
 
-function create_zip($files = array(), $destination = '', $overwrite = false)
+function create_zip($files = [], $destination = '', $overwrite = false)
 {
     if (file_exists($destination) && !$overwrite) {
         throw new Exception('O arquivo zip de destino já existe');
@@ -1122,12 +1122,12 @@ function get_forma_pagto($type)
 function pagestring($count, $pagesize, $field = 'pagina')
 {
     $p = new Pager($count, $pagesize, $field);
-    return array($pagesize, $p->offset, $p->genBasic());
+    return [$pagesize, $p->offset, $p->genBasic()];
 }
 
 function to_ini($array)
 {
-    $res = array();
+    $res = [];
     foreach ($array as $key => $val) {
         if (is_array($val)) {
             $res[] = "[$key]";
@@ -1182,11 +1182,11 @@ function unmask($str, $mask)
 
 function hexcolor($index, $css = false, $escape = false)
 {
-    $colors = array(
+    $colors = [
         'FFA200', '00A03E', '24A8AC', '0087CB', '982395', /* Igaranti pallete */
         '28BE9B', '92DCE0', '609194', 'EF9950', 'D79C8C', /* Paw Studio */
         'B0A472', 'F5DF65', '2B9464', '59C8DF', 'D14D28', /* Mohiuddin Parekh */
-    );
+    ];
     $color = $colors[$index % count($colors)];
     if ($css) {
         $color = '#'.$color;

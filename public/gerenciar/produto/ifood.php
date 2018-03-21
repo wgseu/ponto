@@ -41,9 +41,9 @@ if (isset($_GET['action'])) {
             if ($file['error'] !== UPLOAD_ERR_OK) {
                 throw new \UploadException($file['error']);
             }
-            if (in_array($file['type'], array('text/xml', 'application/xml'))) {
+            if (in_array($file['type'], ['text/xml', 'application/xml'])) {
                 $association->populate($file['tmp_name']);
-            } elseif (in_array($file['type'], array('text/plain'))) {
+            } elseif (in_array($file['type'], ['text/plain'])) {
                 // migrate from INI file
                 $produtos = $association->getProdutos();
                 $content = file_get_contents($file['tmp_name']);
@@ -51,18 +51,18 @@ if (isset($_GET['action'])) {
                 $sections = parse_ini_string($content, true, INI_SCANNER_RAW);
                 if (isset($sections['Codigos'])) {
                     foreach ($sections['Codigos'] as $codigo => $value) {
-                        $produto = array(
+                        $produto = [
                             'id' => $value,
                             'codigo' => $codigo,
                             'descricao' => 'Auto gerado pelo ifood.ini',
-                            'itens' => array(),
-                        );
+                            'itens' => [],
+                        ];
                         if (isset($produtos[$codigo])) {
                             $produtos[$codigo] = array_merge(
                                 $produto,
                                 array_merge(
                                     $produtos[$codigo],
-                                    array('id' => $value)
+                                    ['id' => $value]
                                 )
                             );
                         } else {
@@ -74,7 +74,7 @@ if (isset($_GET['action'])) {
                                         $_produto['itens'][$codigo],
                                         array_merge(
                                             $_produto['itens'][$codigo],
-                                            array('id' => $value)
+                                            ['id' => $value]
                                         )
                                     );
                                     break;
@@ -86,14 +86,14 @@ if (isset($_GET['action'])) {
                         }
                     }
                     $dados = $association->getDados();
-                    $dados = isset($dados)?$dados:array();
+                    $dados = isset($dados)?$dados:[];
                     $dados['produtos'] = $produtos;
                     $integracao->write($dados);
                 }
             } else {
                 throw new \Exception('Formato não suportado', 401);
             }
-            json(null, array('msg' => 'Upload realizado com sucesso'));
+            json(null, ['msg' => 'Upload realizado com sucesso']);
         } catch (\Exception $e) {
             json($e->getMessage());
         }
@@ -106,7 +106,7 @@ if (isset($_GET['action'])) {
                 isset($_POST['id'])?$_POST['id']:null
             );
             $produtos = $association->getProdutos();
-            json(null, array('produto' => $produtos[$codigo]));
+            json(null, ['produto' => $produtos[$codigo]]);
         } catch (\Exception $e) {
             json($e->getMessage());
         }
@@ -121,7 +121,7 @@ if (isset($_GET['action'])) {
             } else {
                 $msg = 'Produto excluído com sucesso!';
             }
-            json(null, array('msg' => $msg));
+            json(null, ['msg' => $msg]);
         } catch (\Exception $e) {
             json($e->getMessage());
         }
@@ -133,7 +133,7 @@ if (isset($_GET['action'])) {
             $id = isset($_POST['id'])?$_POST['id']:null;
             $association->mount($codigo, $subcodigo, $id);
             $produtos = $association->getProdutos();
-            json(null, array('pacote' => $produtos[$codigo]['itens'][$subcodigo]));
+            json(null, ['pacote' => $produtos[$codigo]['itens'][$subcodigo]]);
         } catch (\Exception $e) {
             json($e->getMessage());
         }
@@ -153,9 +153,9 @@ if (isset($_GET['action'])) {
         $card = new MZ\Association\Card($integracao);
         $cartoes = $card->getCartoes();
         $produtos = $association->getProdutos();
-        $_cartoes = array();
-        $_produtos = array();
-        $_desconhecidos = array();
+        $_cartoes = [];
+        $_produtos = [];
+        $_desconhecidos = [];
         foreach ($produtos as $codigo => $produto) {
             if (!is_null($produto['id'])) {
                 $_produtos[$codigo] = $produto['id'];
@@ -178,11 +178,11 @@ if (isset($_GET['action'])) {
         foreach ($cartoes as $regex => $cartao) {
             $_cartoes[$regex] = $cartao;
         }
-        $ini = array(
+        $ini = [
             'Cartoes' => $_cartoes,
             'Codigos' => $_produtos,
             'Desconhecidos' => $_desconhecidos
-        );
+        ];
         $filename = 'ifood.ini';
         header('Content-Type: text/plain');
         header("Content-Disposition: attachment; filename*=UTF-8''" . rawurlencode($filename));

@@ -27,9 +27,9 @@ $count = ZServico::getCount($_GET['query'], $_GET['tipo']);
 list($pagesize, $offset, $pagestring) = pagestring($count, 10);
 $servicos = ZServico::getTodos($_GET['query'], $_GET['tipo'], $offset, $pagesize);
 
-$tipos = array(
+$tipos = [
     'Evento' => 'Evento',
     'Taxa' => 'Taxa',
-);
+];
 
 include template('gerenciar_servico_index');

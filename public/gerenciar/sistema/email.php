@@ -5,7 +5,7 @@ need_permission(PermissaoNome::ALTERARCONFIGURACOES);
 
 $tab_email = 'active';
 $fieldfocus = 'destinatario';
-$errors = array();
+$errors = [];
 
 $destinatario = get_string_config('Email', 'Remetente');
 $servidor = get_string_config('Email', 'Servidor');

@@ -21,7 +21,7 @@
 */
 class Thunder
 {
-    private static $idRefMap = array();
+    private static $idRefMap = [];
     
     private static function ShowMessage($type, $msg, $auto_close, $execute)
     {
@@ -45,12 +45,12 @@ class Thunder
     
     private static function message($type, $msg, $auto_close)
     {
-        $messages = array();
+        $messages = [];
         if (Session::Get('thunder') != null) {
             $messages = unserialize(Session::Get('thunder', true));
         }
         $msg = json_encode($msg);
-        $messages[] = array('type' => $type, 'data' => array('message' => $msg, 'auto_close' => $auto_close));
+        $messages[] = ['type' => $type, 'data' => ['message' => $msg, 'auto_close' => $auto_close]];
         Session::Set('thunder', serialize($messages));
     }
     
@@ -76,7 +76,7 @@ class Thunder
 
     public static function Execute()
     {
-        $messages = array();
+        $messages = [];
         if (Session::Get('thunder') != null) {
             $messages = unserialize(Session::Get('thunder', true));
         }
@@ -86,6 +86,6 @@ class Thunder
         if (count($messages) == 0) {
             self::ShowMessage('information', null, false, false);
         }
-        self::$idRefMap = array();
+        self::$idRefMap = [];
     }
 }

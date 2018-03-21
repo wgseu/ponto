@@ -28,7 +28,7 @@ class ZClassificacao
     private $classificacao_id;
     private $descricao;
 
-    public function __construct($classificacao = array())
+    public function __construct($classificacao = [])
     {
         if (is_array($classificacao)) {
             $this->setID(isset($classificacao['id'])?$classificacao['id']:null);
@@ -79,7 +79,7 @@ class ZClassificacao
 
     public function toArray()
     {
-        $classificacao = array();
+        $classificacao = [];
         $classificacao['id'] = $this->getID();
         $classificacao['classificacaoid'] = $this->getClassificacaoID();
         $classificacao['descricao'] = $this->getDescricao();
@@ -89,20 +89,20 @@ class ZClassificacao
     public static function getPeloID($id)
     {
         $query = DB::$pdo->from('Classificacoes')
-                         ->where(array('id' => $id));
+                         ->where(['id' => $id]);
         return new ZClassificacao($query->fetch());
     }
 
     public static function getPelaDescricao($descricao)
     {
         $query = DB::$pdo->from('Classificacoes')
-                         ->where(array('descricao' => $descricao));
+                         ->where(['descricao' => $descricao]);
         return new ZClassificacao($query->fetch());
     }
 
     private static function validarCampos(&$classificacao)
     {
-        $erros = array();
+        $erros = [];
         $classificacao['classificacaoid'] = trim($classificacao['classificacaoid']);
         if (strlen($classificacao['classificacaoid']) == 0) {
             $classificacao['classificacaoid'] = null;
@@ -121,10 +121,10 @@ class ZClassificacao
     private static function handleException(&$e)
     {
         if (stripos($e->getMessage(), 'PRIMARY') !== false) {
-            throw new ValidationException(array('id' => 'O ID informado já está cadastrado'));
+            throw new ValidationException(['id' => 'O ID informado já está cadastrado']);
         }
         if (stripos($e->getMessage(), 'Descricao_UNIQUE') !== false) {
-            throw new ValidationException(array('descricao' => 'A descrição informada já está cadastrada'));
+            throw new ValidationException(['descricao' => 'A descrição informada já está cadastrada']);
         }
     }
 
@@ -145,13 +145,13 @@ class ZClassificacao
     {
         $_classificacao = $classificacao->toArray();
         if (!$_classificacao['id']) {
-            throw new ValidationException(array('id' => 'O id da classificacao não foi informado'));
+            throw new ValidationException(['id' => 'O id da classificacao não foi informado']);
         }
         self::validarCampos($_classificacao);
-        $campos = array(
+        $campos = [
             'classificacaoid',
             'descricao',
-        );
+        ];
         try {
             $query = DB::$pdo->update('Classificacoes');
             $query = $query->set(array_intersect_key($_classificacao, array_flip($campos)));
@@ -170,7 +170,7 @@ class ZClassificacao
             throw new Exception('Não foi possível excluir a classificacao, o id da classificacao não foi informado');
         }
         $query = DB::$pdo->deleteFrom('Classificacoes')
-                         ->where(array('id' => $id));
+                         ->where(['id' => $id]);
         return $query->execute();
     }
 
@@ -202,7 +202,7 @@ class ZClassificacao
             $query = $query->limit($quantidade)->offset($inicio);
         }
         $_classificacaos = $query->fetchAll();
-        $classificacaos = array();
+        $classificacaos = [];
         foreach ($_classificacaos as $classificacao) {
             $classificacaos[] = new ZClassificacao($classificacao);
         }
@@ -218,7 +218,7 @@ class ZClassificacao
     private static function initSearchDaClassificacaoID($classificacao_id)
     {
         return   DB::$pdo->from('Classificacoes')
-                         ->where(array('classificacaoid' => $classificacao_id))
+                         ->where(['classificacaoid' => $classificacao_id])
                          ->orderBy('id ASC');
     }
 
@@ -229,7 +229,7 @@ class ZClassificacao
             $query = $query->limit($quantidade)->offset($inicio);
         }
         $_classificacaos = $query->fetchAll();
-        $classificacaos = array();
+        $classificacaos = [];
         foreach ($_classificacaos as $classificacao) {
             $classificacaos[] = new ZClassificacao($classificacao);
         }

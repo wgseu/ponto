@@ -26,27 +26,27 @@ use MZ\System\Integracao;
 need_permission(PermissaoNome::CADASTROCARTOES);
 
 $integracao = Integracao::findByAcessoURL(\MZ\Integrator\IFood::NAME);
-$codigos = array(
-    'RAM' => array('name' => 'AMERICAN EXPRESS (Crédito)'),
-    'DNREST' => array('name' => 'DINERS (Crédito)'),
-    'REC' => array('name' => 'ELO (Crédito)'),
-    'RHIP' => array('name' => 'HIPERCARD (Crédito)'),
-    'RDREST' => array('name' => 'MASTERCARD (Crédito)'),
-    'VSREST' => array('name' => 'VISA (Crédito)'),
-    'RED' => array('name' => 'ELO (Débito)'),
-    'MEREST' => array('name' => 'MASTERCARD (Débito)'),
-    'VIREST' => array('name' => 'VISA (Débito)'),
-    'VVREST' => array('name' => 'ALELO REFEICAO (Vale)'),
-    'RSODEX' => array('name' => 'SODEXO (Vale)'),
-    'TRE' => array('name' => 'TICKET RESTAURANTE (Vale)'),
-    'VALECA' => array('name' => 'VALE CARD (Vale)'),
-    'VR_SMA' => array('name' => 'VR SMART (Vale)'),
-    'AM' => array('name' => 'AMEX (Online)'),
-    'DNR' => array('name' => 'DINERS (Online)'),
-    'ELO' => array('name' => 'ELO (Online)'),
-    'MC' => array('name' => 'MASTERCARD (Online)'),
-    'VIS' => array('name' => 'VISA (Online)')
-);
+$codigos = [
+    'RAM' => ['name' => 'AMERICAN EXPRESS (Crédito)'],
+    'DNREST' => ['name' => 'DINERS (Crédito)'],
+    'REC' => ['name' => 'ELO (Crédito)'],
+    'RHIP' => ['name' => 'HIPERCARD (Crédito)'],
+    'RDREST' => ['name' => 'MASTERCARD (Crédito)'],
+    'VSREST' => ['name' => 'VISA (Crédito)'],
+    'RED' => ['name' => 'ELO (Débito)'],
+    'MEREST' => ['name' => 'MASTERCARD (Débito)'],
+    'VIREST' => ['name' => 'VISA (Débito)'],
+    'VVREST' => ['name' => 'ALELO REFEICAO (Vale)'],
+    'RSODEX' => ['name' => 'SODEXO (Vale)'],
+    'TRE' => ['name' => 'TICKET RESTAURANTE (Vale)'],
+    'VALECA' => ['name' => 'VALE CARD (Vale)'],
+    'VR_SMA' => ['name' => 'VR SMART (Vale)'],
+    'AM' => ['name' => 'AMEX (Online)'],
+    'DNR' => ['name' => 'DINERS (Online)'],
+    'ELO' => ['name' => 'ELO (Online)'],
+    'MC' => ['name' => 'MASTERCARD (Online)'],
+    'VIS' => ['name' => 'VISA (Online)']
+];
 $association = new \MZ\Association\Card($integracao, $codigos);
 
 if (isset($_GET['action']) && is_post() && $_GET['action'] == 'update') {
@@ -55,7 +55,7 @@ if (isset($_GET['action']) && is_post() && $_GET['action'] == 'update') {
         $codigo = isset($_POST['codigo'])?$_POST['codigo']:null;
         $id = array_key_exists('id', $_POST)?$_POST['id']:null;
         $cartao = $association->update($codigo, $id);
-        json(null, array('cartao' => $cartao->toArray()));
+        json(null, ['cartao' => $cartao->toArray()]);
     } catch (\Exception $e) {
         json($e->getMessage());
     }

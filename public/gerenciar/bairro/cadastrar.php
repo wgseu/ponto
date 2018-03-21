@@ -29,7 +29,7 @@ $bairro = Bairro::findByID($id);
 $bairro->setID(null);
 
 $focusctrl = 'nome';
-$errors = array();
+$errors = [];
 $old_bairro = $bairro;
 if (is_post()) {
     $bairro = new Bairro($_POST);
@@ -42,7 +42,7 @@ if (is_post()) {
             $bairro->getNome()
         );
         if (is_output('json')) {
-            json(null, array('item' => $bairro->publish(), 'msg' => $msg));
+            json(null, ['item' => $bairro->publish(), 'msg' => $msg]);
         }
         \Thunder::success($msg, true);
         redirect('/gerenciar/bairro/');
@@ -52,7 +52,7 @@ if (is_post()) {
             $errors = $e->getErrors();
         }
         if (is_output('json')) {
-            json($e->getMessage(), null, array('errors' => $errors));
+            json($e->getMessage(), null, ['errors' => $errors]);
         }
         \Thunder::error($e->getMessage());
         foreach ($errors as $key => $value) {
@@ -76,6 +76,6 @@ if ($estado->exists()) {
 } else {
     $pais = new \MZ\Location\Pais();
 }
-$_estados = \MZ\Location\Estado::findAll(array('paisid' => $pais->getID()));
+$_estados = \MZ\Location\Estado::findAll(['paisid' => $pais->getID()]);
 
 include template('gerenciar_bairro_cadastrar');

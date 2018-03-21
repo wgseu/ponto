@@ -23,7 +23,7 @@ class ZPagamento
     private $data_compensacao;
     private $data_hora;
 
-    public function __construct($pagamento = array())
+    public function __construct($pagamento = [])
     {
         if (is_array($pagamento)) {
             $this->setID(isset($pagamento['id'])?$pagamento['id']:null);
@@ -261,7 +261,7 @@ class ZPagamento
 
     public function toArray()
     {
-        $pagamento = array();
+        $pagamento = [];
         $pagamento['id'] = $this->getID();
         $pagamento['carteiraid'] = $this->getCarteiraID();
         $pagamento['movimentacaoid'] = $this->getMovimentacaoID();
@@ -288,7 +288,7 @@ class ZPagamento
     public static function getPeloID($id)
     {
         $query = DB::$pdo->from('Pagamentos')
-                         ->where(array('id' => $id));
+                         ->where(['id' => $id]);
         return new ZPagamento($query->fetch());
     }
 
@@ -303,7 +303,7 @@ class ZPagamento
                          ->where('(NOT ISNULL(pg.pedidoid) OR (pg.total >= 0 AND NOT ISNULL(pg.pagtocontaid) AND pg.pagtocontaid <> 1))');
         if (!is_null($sessao_id)) {
             $query = $query->leftJoin('Movimentacoes mv ON mv.id = pg.movimentacaoid');
-            $query = $query->where(array('mv.sessaoid' => $sessao_id));
+            $query = $query->where(['mv.sessaoid' => $sessao_id]);
         }
         if (!is_null($data_inicio) && is_null($sessao_id)) {
             $query = $query->where('pg.datahora >= ?', date('Y-m-d', $data_inicio));
@@ -326,7 +326,7 @@ class ZPagamento
                          ->where('NOT ISNULL(pg.pagtocontaid)');
         if (!is_null($sessao_id)) {
             $query = $query->leftJoin('Movimentacoes mv ON mv.id = pg.movimentacaoid');
-            $query = $query->where(array('mv.sessaoid' => $sessao_id));
+            $query = $query->where(['mv.sessaoid' => $sessao_id]);
         }
         if (!is_null($data_inicio) && is_null($sessao_id)) {
             $query = $query->where('pg.datahora >= ?', date('Y-m-d', $data_inicio));
@@ -373,7 +373,7 @@ class ZPagamento
                          ->where('NOT ISNULL(pg.pedidoid)');
         if (!is_null($sessao_id)) {
             $query = $query->leftJoin('Movimentacoes mv ON mv.id = pg.movimentacaoid');
-            $query = $query->where(array('mv.sessaoid' => $sessao_id));
+            $query = $query->where(['mv.sessaoid' => $sessao_id]);
         }
         if (!is_null($data_inicio)) {
             $query = $query->where('pg.datahora >= ?', date('Y-m-d', $data_inicio));
@@ -424,7 +424,7 @@ class ZPagamento
 
     private static function validarCampos(&$pagamento)
     {
-        $erros = array();
+        $erros = [];
         if (!is_numeric($pagamento['carteiraid'])) {
             $erros['carteiraid'] = 'A carteiraid não foi informada';
         }
@@ -497,13 +497,13 @@ class ZPagamento
         $pagamento['cancelado'] = trim($pagamento['cancelado']);
         if (strlen($pagamento['cancelado']) == 0) {
             $pagamento['cancelado'] = 'N';
-        } elseif (!in_array($pagamento['cancelado'], array('Y', 'N'))) {
+        } elseif (!in_array($pagamento['cancelado'], ['Y', 'N'])) {
             $erros['cancelado'] = 'O cancelado informado não é válido';
         }
         $pagamento['ativo'] = trim($pagamento['ativo']);
         if (strlen($pagamento['ativo']) == 0) {
             $pagamento['ativo'] = 'N';
-        } elseif (!in_array($pagamento['ativo'], array('Y', 'N'))) {
+        } elseif (!in_array($pagamento['ativo'], ['Y', 'N'])) {
             $erros['ativo'] = 'O ativo informado não é válido';
         }
         $pagamento['datacompensacao'] = date('Y-m-d H:i:s');
@@ -516,7 +516,7 @@ class ZPagamento
     private static function handleException(&$e)
     {
         if (stripos($e->getMessage(), 'PRIMARY') !== false) {
-            throw new ValidationException(array('id' => 'O ID informado já está cadastrado'));
+            throw new ValidationException(['id' => 'O ID informado já está cadastrado']);
         }
     }
 
@@ -537,10 +537,10 @@ class ZPagamento
     {
         $_pagamento = $pagamento->toArray();
         if (!$_pagamento['id']) {
-            throw new ValidationException(array('id' => 'O id do pagamento não foi informado'));
+            throw new ValidationException(['id' => 'O id do pagamento não foi informado']);
         }
         self::validarCampos($_pagamento);
-        $campos = array(
+        $campos = [
             'carteiraid',
             'movimentacaoid',
             'funcionarioid',
@@ -560,7 +560,7 @@ class ZPagamento
             'ativo',
             'datacompensacao',
             'datahora',
-        );
+        ];
         try {
             $query = DB::$pdo->update('Pagamentos');
             $query = $query->set(array_intersect_key($_pagamento, array_flip($campos)));
@@ -654,7 +654,7 @@ class ZPagamento
             $query = $query->limit($quantidade)->offset($inicio);
         }
         $_pagamentos = $query->fetchAll();
-        $pagamentos = array();
+        $pagamentos = [];
         foreach ($_pagamentos as $pagamento) {
             $pagamentos[] = new ZPagamento($pagamento);
         }
@@ -687,7 +687,7 @@ class ZPagamento
     private static function initSearchDoFuncionarioID($funcionario_id)
     {
         return   DB::$pdo->from('Pagamentos')
-                         ->where(array('funcionarioid' => $funcionario_id))
+                         ->where(['funcionarioid' => $funcionario_id])
                          ->orderBy('id ASC');
     }
 
@@ -698,7 +698,7 @@ class ZPagamento
             $query = $query->limit($quantidade)->offset($inicio);
         }
         $_pagamentos = $query->fetchAll();
-        $pagamentos = array();
+        $pagamentos = [];
         foreach ($_pagamentos as $pagamento) {
             $pagamentos[] = new ZPagamento($pagamento);
         }
@@ -714,7 +714,7 @@ class ZPagamento
     private static function initSearchDoFormaPagtoID($forma_pagto_id)
     {
         return   DB::$pdo->from('Pagamentos')
-                         ->where(array('formapagtoid' => $forma_pagto_id))
+                         ->where(['formapagtoid' => $forma_pagto_id])
                          ->orderBy('id ASC');
     }
 
@@ -725,7 +725,7 @@ class ZPagamento
             $query = $query->limit($quantidade)->offset($inicio);
         }
         $_pagamentos = $query->fetchAll();
-        $pagamentos = array();
+        $pagamentos = [];
         foreach ($_pagamentos as $pagamento) {
             $pagamentos[] = new ZPagamento($pagamento);
         }
@@ -753,7 +753,7 @@ class ZPagamento
             $query = $query->limit($quantidade)->offset($inicio);
         }
         $_pagamentos = $query->fetchAll();
-        $pagamentos = array();
+        $pagamentos = [];
         foreach ($_pagamentos as $pagamento) {
             $pagamentos[] = new ZPagamento($pagamento);
         }
@@ -769,7 +769,7 @@ class ZPagamento
     private static function initSearchDoCartaoID($cartao_id)
     {
         return   DB::$pdo->from('Pagamentos')
-                         ->where(array('cartaoid' => $cartao_id))
+                         ->where(['cartaoid' => $cartao_id])
                          ->orderBy('id ASC');
     }
 
@@ -780,7 +780,7 @@ class ZPagamento
             $query = $query->limit($quantidade)->offset($inicio);
         }
         $_pagamentos = $query->fetchAll();
-        $pagamentos = array();
+        $pagamentos = [];
         foreach ($_pagamentos as $pagamento) {
             $pagamentos[] = new ZPagamento($pagamento);
         }
@@ -796,7 +796,7 @@ class ZPagamento
     private static function initSearchDoChequeID($cheque_id)
     {
         return   DB::$pdo->from('Pagamentos')
-                         ->where(array('chequeid' => $cheque_id))
+                         ->where(['chequeid' => $cheque_id])
                          ->orderBy('id ASC');
     }
 
@@ -807,7 +807,7 @@ class ZPagamento
             $query = $query->limit($quantidade)->offset($inicio);
         }
         $_pagamentos = $query->fetchAll();
-        $pagamentos = array();
+        $pagamentos = [];
         foreach ($_pagamentos as $pagamento) {
             $pagamentos[] = new ZPagamento($pagamento);
         }
@@ -823,7 +823,7 @@ class ZPagamento
     private static function initSearchDaContaID($conta_id)
     {
         return   DB::$pdo->from('Pagamentos')
-                         ->where(array('contaid' => $conta_id))
+                         ->where(['contaid' => $conta_id])
                          ->orderBy('id ASC');
     }
 
@@ -834,7 +834,7 @@ class ZPagamento
             $query = $query->limit($quantidade)->offset($inicio);
         }
         $_pagamentos = $query->fetchAll();
-        $pagamentos = array();
+        $pagamentos = [];
         foreach ($_pagamentos as $pagamento) {
             $pagamentos[] = new ZPagamento($pagamento);
         }
@@ -850,7 +850,7 @@ class ZPagamento
     private static function initSearchDaPagtoContaID($pagto_conta_id)
     {
         return   DB::$pdo->from('Pagamentos')
-                         ->where(array('pagtocontaid' => $pagto_conta_id))
+                         ->where(['pagtocontaid' => $pagto_conta_id])
                          ->orderBy('id ASC');
     }
 
@@ -861,7 +861,7 @@ class ZPagamento
             $query = $query->limit($quantidade)->offset($inicio);
         }
         $_pagamentos = $query->fetchAll();
-        $pagamentos = array();
+        $pagamentos = [];
         foreach ($_pagamentos as $pagamento) {
             $pagamentos[] = new ZPagamento($pagamento);
         }
@@ -877,7 +877,7 @@ class ZPagamento
     private static function initSearchDaMovimentacaoID($movimentacao_id)
     {
         return   DB::$pdo->from('Pagamentos')
-                         ->where(array('movimentacaoid' => $movimentacao_id))
+                         ->where(['movimentacaoid' => $movimentacao_id])
                          ->orderBy('id ASC');
     }
 
@@ -888,7 +888,7 @@ class ZPagamento
             $query = $query->limit($quantidade)->offset($inicio);
         }
         $_pagamentos = $query->fetchAll();
-        $pagamentos = array();
+        $pagamentos = [];
         foreach ($_pagamentos as $pagamento) {
             $pagamentos[] = new ZPagamento($pagamento);
         }
@@ -904,7 +904,7 @@ class ZPagamento
     private static function initSearchDaCarteiraID($carteira_id)
     {
         return   DB::$pdo->from('Pagamentos')
-                         ->where(array('carteiraid' => $carteira_id))
+                         ->where(['carteiraid' => $carteira_id])
                          ->orderBy('id ASC');
     }
 
@@ -915,7 +915,7 @@ class ZPagamento
             $query = $query->limit($quantidade)->offset($inicio);
         }
         $_pagamentos = $query->fetchAll();
-        $pagamentos = array();
+        $pagamentos = [];
         foreach ($_pagamentos as $pagamento) {
             $pagamentos[] = new ZPagamento($pagamento);
         }
@@ -931,7 +931,7 @@ class ZPagamento
     private static function initSearchDoCreditoID($credito_id)
     {
         return   DB::$pdo->from('Pagamentos')
-                         ->where(array('creditoid' => $credito_id))
+                         ->where(['creditoid' => $credito_id])
                          ->orderBy('id ASC');
     }
 
@@ -942,7 +942,7 @@ class ZPagamento
             $query = $query->limit($quantidade)->offset($inicio);
         }
         $_pagamentos = $query->fetchAll();
-        $pagamentos = array();
+        $pagamentos = [];
         foreach ($_pagamentos as $pagamento) {
             $pagamentos[] = new ZPagamento($pagamento);
         }

@@ -36,7 +36,7 @@ class ZFuncionario
     private $data_saida;
     private $data_cadastro;
 
-    public function __construct($funcionario = array())
+    public function __construct($funcionario = [])
     {
         if (is_array($funcionario)) {
             $this->setID(isset($funcionario['id'])?$funcionario['id']:null);
@@ -222,7 +222,7 @@ class ZFuncionario
 
     public function toArray()
     {
-        $funcionario = array();
+        $funcionario = [];
         $funcionario['id'] = $this->getID();
         $funcionario['funcaoid'] = $this->getFuncaoID();
         $funcionario['clienteid'] = $this->getClienteID();
@@ -243,34 +243,34 @@ class ZFuncionario
 
     public static function getPeloID($id)
     {
-        $query = self::initGet()->where(array('f.id' => $id));
+        $query = self::initGet()->where(['f.id' => $id]);
         return new ZFuncionario($query->fetch());
     }
 
     public static function getPeloLogin($login)
     {
-        $query = self::initGet()->where(array('c.login' => $login));
+        $query = self::initGet()->where(['c.login' => $login]);
         return new ZFuncionario($query->fetch());
     }
 
     public static function getPeloClienteID($cliente_id, $todos = false)
     {
-        $query = self::initGet()->where(array('f.clienteid' => $cliente_id));
+        $query = self::initGet()->where(['f.clienteid' => $cliente_id]);
         if (!$todos) {
-            $query = $query->where(array('f.ativo' => 'Y'));
+            $query = $query->where(['f.ativo' => 'Y']);
         }
         return new ZFuncionario($query->fetch());
     }
 
     public static function getPeloCodigoBarras($codigo_barras)
     {
-        $query = self::initGet()->where(array('f.codigobarras' => $codigo_barras));
+        $query = self::initGet()->where(['f.codigobarras' => $codigo_barras]);
         return new ZFuncionario($query->fetch());
     }
 
     private static function validarCampos(&$funcionario)
     {
-        $erros = array();
+        $erros = [];
         if (!is_numeric($funcionario['funcaoid'])) {
             $erros['funcaoid'] = 'A função não foi informada';
         }
@@ -316,7 +316,7 @@ class ZFuncionario
         $funcionario['ativo'] = trim($funcionario['ativo']);
         if (strlen($funcionario['ativo']) == 0) {
             $funcionario['ativo'] = 'N';
-        } elseif (!in_array($funcionario['ativo'], array('Y', 'N'))) {
+        } elseif (!in_array($funcionario['ativo'], ['Y', 'N'])) {
             $erros['ativo'] = 'A informação se o funcionário está ativo é inválida';
         }
         if ($funcionario['ativo'] == 'N' && is_null($funcionario['datasaida'])) {
@@ -333,13 +333,13 @@ class ZFuncionario
     private static function handleException(&$e)
     {
         if (stripos($e->getMessage(), 'PRIMARY') !== false) {
-            throw new ValidationException(array('id' => 'O ID informado já está cadastrado'));
+            throw new ValidationException(['id' => 'O ID informado já está cadastrado']);
         }
         if (stripos($e->getMessage(), 'UK_ClienteID') !== false) {
-            throw new ValidationException(array('clienteid' => 'O cliente informado já é um funcionário'));
+            throw new ValidationException(['clienteid' => 'O cliente informado já é um funcionário']);
         }
         if (stripos($e->getMessage(), 'CodigoBarras_UNIQUE') !== false) {
-            throw new ValidationException(array('codigobarras' => 'O código de barras informado já está cadastrado'));
+            throw new ValidationException(['codigobarras' => 'O código de barras informado já está cadastrado']);
         }
     }
 
@@ -360,10 +360,10 @@ class ZFuncionario
     {
         $_funcionario = $funcionario->toArray();
         if (!$_funcionario['id']) {
-            throw new ValidationException(array('id' => 'O id do funcionário não foi informado'));
+            throw new ValidationException(['id' => 'O id do funcionário não foi informado']);
         }
         self::validarCampos($_funcionario);
-        $campos = array(
+        $campos = [
             'funcaoid',
             'clienteid',
             'codigobarras',
@@ -372,7 +372,7 @@ class ZFuncionario
             'pontuacao',
             'ativo',
             'datasaida',
-        );
+        ];
         try {
             $query = DB::$pdo->update('Funcionarios');
             $query = $query->set(array_intersect_key($_funcionario, array_flip($campos)));
@@ -400,7 +400,7 @@ class ZFuncionario
             throw new Exception('Esse funcionário não pode ser excluído!');
         }
         $query = DB::$pdo->deleteFrom('Funcionarios')
-                         ->where(array('id' => $funcionario->getID()));
+                         ->where(['id' => $funcionario->getID()]);
         return $query->execute();
     }
 
@@ -467,7 +467,7 @@ class ZFuncionario
             $query = $query->limit($quantidade)->offset($inicio);
         }
         $_funcionarios = $query->fetchAll();
-        $funcionarios = array();
+        $funcionarios = [];
         foreach ($_funcionarios as $funcionario) {
             $funcionarios[] = new ZFuncionario($funcionario);
         }
@@ -482,7 +482,7 @@ class ZFuncionario
 
     private static function initSearchDaFuncaoID($funcao_id)
     {
-        return   self::initGet()->where(array('f.funcaoid' => $funcao_id))
+        return   self::initGet()->where(['f.funcaoid' => $funcao_id])
                          ->orderBy('f.id ASC');
     }
 
@@ -493,7 +493,7 @@ class ZFuncionario
             $query = $query->limit($quantidade)->offset($inicio);
         }
         $_funcionarios = $query->fetchAll();
-        $funcionarios = array();
+        $funcionarios = [];
         foreach ($_funcionarios as $funcionario) {
             $funcionarios[] = new ZFuncionario($funcionario);
         }
@@ -508,7 +508,7 @@ class ZFuncionario
 
     private static function initSearchDoClienteID($cliente_id)
     {
-        return   self::initGet()->where(array('f.clienteid' => $cliente_id))
+        return   self::initGet()->where(['f.clienteid' => $cliente_id])
                          ->orderBy('f.id ASC');
     }
 
@@ -519,7 +519,7 @@ class ZFuncionario
             $query = $query->limit($quantidade)->offset($inicio);
         }
         $_funcionarios = $query->fetchAll();
-        $funcionarios = array();
+        $funcionarios = [];
         foreach ($_funcionarios as $funcionario) {
             $funcionarios[] = new ZFuncionario($funcionario);
         }

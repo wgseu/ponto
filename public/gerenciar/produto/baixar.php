@@ -50,7 +50,7 @@ try {
         true // raw
     );
     // Coluna dos dados
-    $columns = array(
+    $columns = [
         'Código',
         'Descrição',
         'Preço de Venda ('. $__moeda__->getSimbolo() . ')',
@@ -73,8 +73,8 @@ try {
         'Abreviação',
         'Detalhes',
         'Visível'
-    );
-    $data = array($columns);
+    ];
+    $data = [$columns];
     $column = 'B';
     $last = chr(ord($column) + count($columns) - 1);
     $line = 3;
@@ -86,7 +86,7 @@ try {
         $value->fromArray($item);
         $unidade->setSigla($item['unidade']);
 
-        $row = array();
+        $row = [];
         $row[] = $value->getID();
         $row[] = $value->getDescricao($item);
         $row[] = $value->getPrecoVenda();
@@ -112,7 +112,7 @@ try {
         $data[] = $row;
     }
     // footer
-    $row = array();
+    $row = [];
     $row[] = count($produtos) . ' Produtos';
     $row[] = null;
     $row[] = null;
@@ -177,14 +177,14 @@ try {
         ->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
     // Format header
     $objPHPExcel->getActiveSheet()->getStyle("B3:{$last}3")->getFont()->setBold(true);
-    $objPHPExcel->getActiveSheet()->getStyle("B3:{$last}3")->getBorders()->applyFromArray(array(
-        'allborders' => array('style' => PHPExcel_Style_Border::BORDER_MEDIUM)
-    ));
+    $objPHPExcel->getActiveSheet()->getStyle("B3:{$last}3")->getBorders()->applyFromArray([
+        'allborders' => ['style' => PHPExcel_Style_Border::BORDER_MEDIUM]
+    ]);
     // Format footer
     $objPHPExcel->getActiveSheet()->getStyle("B{$j}:{$last}{$j}")->getFont()->setBold(true);
-    $objPHPExcel->getActiveSheet()->getStyle("B{$j}:{$last}{$j}")->getBorders()->applyFromArray(array(
-        'allborders' => array('style' => PHPExcel_Style_Border::BORDER_MEDIUM)
-    ));
+    $objPHPExcel->getActiveSheet()->getStyle("B{$j}:{$last}{$j}")->getBorders()->applyFromArray([
+        'allborders' => ['style' => PHPExcel_Style_Border::BORDER_MEDIUM]
+    ]);
     // Format Currency data columns
     $objPHPExcel->getActiveSheet()->getStyle("D4:D{$i}")->getNumberFormat()->setFormatCode(
         PHPExcel_Style_NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED2
@@ -194,10 +194,10 @@ try {
     );
     foreach ($columns as $value) {
         $objPHPExcel->getActiveSheet()->getColumnDimension($column)->setAutoSize(true);
-        $objPHPExcel->getActiveSheet()->getStyle("{$column}4:{$column}{$i}")->getBorders()->applyFromArray(array(
-            'left' => array('style' => PHPExcel_Style_Border::BORDER_MEDIUM),
-            'right' => array('style' => PHPExcel_Style_Border::BORDER_MEDIUM)
-        ));
+        $objPHPExcel->getActiveSheet()->getStyle("{$column}4:{$column}{$i}")->getBorders()->applyFromArray([
+            'left' => ['style' => PHPExcel_Style_Border::BORDER_MEDIUM],
+            'right' => ['style' => PHPExcel_Style_Border::BORDER_MEDIUM]
+        ]);
         $column++;
     }
     if ($formato == 'xlsx') {

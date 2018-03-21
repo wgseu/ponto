@@ -52,8 +52,8 @@ $produtos = ZProduto::getTodos(
     0, // offset
     $limit
 );
-$response = array('status' => 'ok');
-$campos = array(
+$response = ['status' => 'ok'];
+$campos = [
     'id',
     'categoriaid',
     'descricao',
@@ -69,8 +69,8 @@ $campos = array(
     'imagemurl',
     'categoria',
     'unidade',
-);
-$_produtos = array();
+];
+$_produtos = [];
 foreach ($produtos as $produto) {
     // TODO implementar estrelas de mais vendido
     $produto['estrelas'] = 3;

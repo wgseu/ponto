@@ -47,7 +47,7 @@ class ZPatrimonio
     private $imagem_anexada;
     private $data_atualizacao;
 
-    public function __construct($patrimonio = array())
+    public function __construct($patrimonio = [])
     {
         if (is_array($patrimonio)) {
             $this->setID(isset($patrimonio['id'])?$patrimonio['id']:null);
@@ -273,7 +273,7 @@ class ZPatrimonio
 
     public function toArray()
     {
-        $patrimonio = array();
+        $patrimonio = [];
         $patrimonio['id'] = $this->getID();
         $patrimonio['empresaid'] = $this->getEmpresaID();
         $patrimonio['fornecedorid'] = $this->getFornecedorID();
@@ -295,20 +295,20 @@ class ZPatrimonio
     public static function getPeloID($id)
     {
         $query = DB::$pdo->from('Patrimonios')
-                         ->where(array('id' => $id));
+                         ->where(['id' => $id]);
         return new ZPatrimonio($query->fetch());
     }
 
     public static function getPeloNumeroEstado($numero, $estado)
     {
         $query = DB::$pdo->from('Patrimonios')
-                         ->where(array('numero' => $numero, 'estado' => $estado));
+                         ->where(['numero' => $numero, 'estado' => $estado]);
         return new ZPatrimonio($query->fetch());
     }
 
     private static function validarCampos(&$patrimonio)
     {
-        $erros = array();
+        $erros = [];
         if (!is_numeric($patrimonio['empresaid'])) {
             $erros['empresaid'] = 'A empresa não foi informada';
         }
@@ -358,7 +358,7 @@ class ZPatrimonio
         $patrimonio['estado'] = trim($patrimonio['estado']);
         if (strlen($patrimonio['estado']) == 0) {
             $patrimonio['estado'] = null;
-        } elseif (!in_array($patrimonio['estado'], array('Novo', 'Conservado', 'Ruim'))) {
+        } elseif (!in_array($patrimonio['estado'], ['Novo', 'Conservado', 'Ruim'])) {
             $erros['estado'] = 'O estado informado não é válido';
         }
         if (!is_numeric($patrimonio['custo'])) {
@@ -380,7 +380,7 @@ class ZPatrimonio
         $patrimonio['ativo'] = trim($patrimonio['ativo']);
         if (strlen($patrimonio['ativo']) == 0) {
             $patrimonio['ativo'] = 'N';
-        } elseif (!in_array($patrimonio['ativo'], array('Y', 'N'))) {
+        } elseif (!in_array($patrimonio['ativo'], ['Y', 'N'])) {
             $erros['ativo'] = 'O ativo informado não é válido';
         }
         $patrimonio['imagemanexada'] = strip_tags(trim($patrimonio['imagemanexada']));
@@ -396,10 +396,10 @@ class ZPatrimonio
     private static function handleException(&$e)
     {
         if (stripos($e->getMessage(), 'PRIMARY') !== false) {
-            throw new ValidationException(array('id' => 'O ID informado já está cadastrado'));
+            throw new ValidationException(['id' => 'O ID informado já está cadastrado']);
         }
         if (stripos($e->getMessage(), 'Numero_Estado_UNIQUE') !== false) {
-            throw new ValidationException(array('estado' => 'O estado informado já está cadastrado'));
+            throw new ValidationException(['estado' => 'O estado informado já está cadastrado']);
         }
     }
 
@@ -420,10 +420,10 @@ class ZPatrimonio
     {
         $_patrimonio = $patrimonio->toArray();
         if (!$_patrimonio['id']) {
-            throw new ValidationException(array('id' => 'O id do patrimonio não foi informado'));
+            throw new ValidationException(['id' => 'O id do patrimonio não foi informado']);
         }
         self::validarCampos($_patrimonio);
-        $campos = array(
+        $campos = [
             'empresaid',
             'fornecedorid',
             'numero',
@@ -438,7 +438,7 @@ class ZPatrimonio
             'ativo',
             'imagemanexada',
             'dataatualizacao',
-        );
+        ];
         try {
             $query = DB::$pdo->update('Patrimonios');
             $query = $query->set(array_intersect_key($_patrimonio, array_flip($campos)));
@@ -457,7 +457,7 @@ class ZPatrimonio
             throw new Exception('Não foi possível excluir o patrimonio, o id do patrimonio não foi informado');
         }
         $query = DB::$pdo->deleteFrom('Patrimonios')
-                         ->where(array('id' => $id));
+                         ->where(['id' => $id]);
         return $query->execute();
     }
 
@@ -489,7 +489,7 @@ class ZPatrimonio
             $query = $query->limit($quantidade)->offset($inicio);
         }
         $_patrimonios = $query->fetchAll();
-        $patrimonios = array();
+        $patrimonios = [];
         foreach ($_patrimonios as $patrimonio) {
             $patrimonios[] = new ZPatrimonio($patrimonio);
         }
@@ -505,7 +505,7 @@ class ZPatrimonio
     private static function initSearchDoFornecedorID($fornecedor_id)
     {
         return   DB::$pdo->from('Patrimonios')
-                         ->where(array('fornecedorid' => $fornecedor_id))
+                         ->where(['fornecedorid' => $fornecedor_id])
                          ->orderBy('id ASC');
     }
 
@@ -516,7 +516,7 @@ class ZPatrimonio
             $query = $query->limit($quantidade)->offset($inicio);
         }
         $_patrimonios = $query->fetchAll();
-        $patrimonios = array();
+        $patrimonios = [];
         foreach ($_patrimonios as $patrimonio) {
             $patrimonios[] = new ZPatrimonio($patrimonio);
         }
@@ -532,7 +532,7 @@ class ZPatrimonio
     private static function initSearchDaEmpresaID($empresa_id)
     {
         return   DB::$pdo->from('Patrimonios')
-                         ->where(array('empresaid' => $empresa_id))
+                         ->where(['empresaid' => $empresa_id])
                          ->orderBy('id ASC');
     }
 
@@ -543,7 +543,7 @@ class ZPatrimonio
             $query = $query->limit($quantidade)->offset($inicio);
         }
         $_patrimonios = $query->fetchAll();
-        $patrimonios = array();
+        $patrimonios = [];
         foreach ($_patrimonios as $patrimonio) {
             $patrimonios[] = new ZPatrimonio($patrimonio);
         }

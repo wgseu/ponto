@@ -27,9 +27,9 @@ $count = ZCaixa::getCount($_GET['query'], $_GET['estado']);
 list($pagesize, $offset, $pagestring) = pagestring($count, 10);
 $caixas = ZCaixa::getTodas($_GET['query'], $_GET['estado'], $offset, $pagesize);
 
-$estados = array(
+$estados = [
     'Y' => 'Ativos',
     'N' => 'Inativos',
-);
+];
 
 include template('gerenciar_caixa_index');

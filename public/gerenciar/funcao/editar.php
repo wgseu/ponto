@@ -28,7 +28,7 @@ if (is_null($funcao->getID())) {
     redirect('/gerenciar/funcao/');
 }
 $focusctrl = 'descricao';
-$errors = array();
+$errors = [];
 $old_funcao = $funcao;
 if (is_post()) {
     $funcao = new ZFuncao($_POST);

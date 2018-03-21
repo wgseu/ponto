@@ -28,7 +28,7 @@ list($pagesize, $offset, $pagestring) = pagestring($count, 10);
 $categorias = ZCategoria::getTodas(true, $_GET['categoria'], $_GET['query'], $offset, $pagesize);
 
 $_sup_categorias = ZCategoria::getTodas(true, true);
-$sup_categorias = array();
+$sup_categorias = [];
 foreach ($_sup_categorias as $categoria) {
     $sup_categorias[$categoria->getID()] = $categoria->getDescricao();
 }

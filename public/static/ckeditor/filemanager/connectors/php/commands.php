@@ -28,7 +28,7 @@ function GetFolders( $resourceType, $currentFolder )
 	$sServerDir = ServerMapFolder( $resourceType, $currentFolder, 'GetFolders' ) ;
 
 	// Array that will hold the folders names.
-	$aFolders	= array() ;
+	$aFolders	= [] ;
 
 	$oCurrentFolder = @opendir( $sServerDir ) ;
 
@@ -59,8 +59,8 @@ function GetFoldersAndFiles( $resourceType, $currentFolder )
 	$sServerDir = ServerMapFolder( $resourceType, $currentFolder, 'GetFoldersAndFiles' ) ;
 
 	// Arrays that will hold the folders and files names.
-	$aFolders	= array() ;
-	$aFiles		= array() ;
+	$aFolders	= [] ;
+	$aFiles		= [] ;
 
 	$oCurrentFolder = @opendir( $sServerDir ) ;
 

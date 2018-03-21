@@ -32,8 +32,8 @@ if ($_GET['primeiro'] || check_fone($_GET['busca'], true)) {
     $limit = 20;
 }
 $funcionarios = ZFuncionario::getTodos($_GET['busca'], null, null, $_GET['ativo'], 0, $limit);
-$response = array('status' => 'ok');
-$campos = array(
+$response = ['status' => 'ok'];
+$campos = [
             'id',
             'nome',
             'fone1',
@@ -41,8 +41,8 @@ $campos = array(
             'email',
             'funcao',
             'imagemurl',
-        );
-$_funcionarios = array();
+        ];
+$_funcionarios = [];
 $domask = intval($_GET['format']) != 0;
 foreach ($funcionarios as $funcionario) {
     $_funcionario = $funcionario->toArray();

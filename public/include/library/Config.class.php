@@ -1,7 +1,7 @@
 <?php
 class Config
 {
-    private static $mInstance = array();
+    private static $mInstance = [];
     /**
      * Instance of this singleton class
      *
@@ -57,7 +57,7 @@ class Config
                 foreach ($c as $k => $v) {
                     if (isset($o->$k)) {
                         if (!is_array($o->$k)) {
-                            $o->$k = array($o->$k);
+                            $o->$k = [$o->$k];
                         }
                         $o->{$k}[] = self::_dump($v);
                     } else {

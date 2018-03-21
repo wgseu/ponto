@@ -69,14 +69,14 @@ $pedidos = ZPedido::getTodos(
     $pagesize
 );
 
-$_tipo_names = array(
+$_tipo_names = [
     'Mesa' => 'Mesa',
     'Comanda' => 'Comanda',
     'Avulso' => 'Balcão',
     'Entrega' => 'Entrega',
-);
+];
 
-$_estado_names = array(
+$_estado_names = [
     'Valido' => 'Válido',
     'Finalizado' => 'Finalizado',
     'Ativo' => 'Ativo',
@@ -84,14 +84,14 @@ $_estado_names = array(
     'Entrega' => 'Entrega',
     'Fechado' => 'Fechado',
     'Cancelado' => 'Cancelado',
-);
+];
 
-$_pedido_icon = array(
+$_pedido_icon = [
     'Mesa' => 0,
     'Comanda' => 16,
     'Avulso' => 32,
     'Entrega' => 48,
-);
+];
 
 $_cliente = ZCliente::getPeloID($_GET['clienteid']);
 $_funcionario = ZFuncionario::getPeloID($_GET['funcionarioid']);

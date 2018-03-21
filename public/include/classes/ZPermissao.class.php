@@ -128,7 +128,7 @@ class ZPermissao
     private $nome;
     private $descricao;
 
-    public function __construct($permissao = array())
+    public function __construct($permissao = [])
     {
         if (is_array($permissao)) {
             $this->setID(isset($permissao['id'])?$permissao['id']:null);
@@ -203,7 +203,7 @@ class ZPermissao
     }
     public function toArray()
     {
-        $permissao = array();
+        $permissao = [];
         $permissao['id'] = $this->getID();
         $permissao['funcionalidadeid'] = $this->getFuncionalidadeID();
         $permissao['nome'] = $this->getNome();
@@ -214,20 +214,20 @@ class ZPermissao
     public static function getPeloID($id)
     {
         $query = DB::$pdo->from('Permissoes')
-                         ->where(array('id' => $id));
+                         ->where(['id' => $id]);
         return new ZPermissao($query->fetch());
     }
 
     public static function getPeloNome($nome)
     {
         $query = DB::$pdo->from('Permissoes')
-                         ->where(array('nome' => $nome));
+                         ->where(['nome' => $nome]);
         return new ZPermissao($query->fetch());
     }
 
     private static function validarCampos(&$permissao)
     {
-        $erros = array();
+        $erros = [];
         if (!is_numeric($permissao['funcionalidadeid'])) {
             $erros['funcionalidadeid'] = 'A funcionalidade não foi informada';
         }
@@ -247,10 +247,10 @@ class ZPermissao
     private static function handleException(&$e)
     {
         if (stripos($e->getMessage(), 'PRIMARY') !== false) {
-            throw new ValidationException(array('id' => 'O ID informado já está cadastrado'));
+            throw new ValidationException(['id' => 'O ID informado já está cadastrado']);
         }
         if (stripos($e->getMessage(), 'Nome_UNIQUE') !== false) {
-            throw new ValidationException(array('nome' => 'O Nome informado já está cadastrado'));
+            throw new ValidationException(['nome' => 'O Nome informado já está cadastrado']);
         }
     }
 
@@ -272,7 +272,7 @@ class ZPermissao
             $query = $query->limit($quantidade)->offset($inicio);
         }
         $_permissaos = $query->fetchAll();
-        $permissaos = array();
+        $permissaos = [];
         foreach ($_permissaos as $permissao) {
             $permissaos[] = new ZPermissao($permissao);
         }
@@ -288,7 +288,7 @@ class ZPermissao
     private static function initSearchDaFuncionalidadeID($funcionalidade_id)
     {
         return   DB::$pdo->from('Permissoes')
-                         ->where(array('funcionalidadeid' => $funcionalidade_id))
+                         ->where(['funcionalidadeid' => $funcionalidade_id])
                          ->orderBy('id ASC');
     }
 
@@ -299,7 +299,7 @@ class ZPermissao
             $query = $query->limit($quantidade)->offset($inicio);
         }
         $_permissaos = $query->fetchAll();
-        $permissaos = array();
+        $permissaos = [];
         foreach ($_permissaos as $permissao) {
             $permissaos[] = new ZPermissao($permissao);
         }

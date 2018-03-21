@@ -32,14 +32,14 @@ class $[Table.norm]Test extends \PHPUnit_Framework_TestCase
     {
         $$[table.unix] = new $[Table.norm]();
         $values = $$[table.unix]->publish();
-        $allowed = array(
+        $allowed = [
 $[field.each(all)]
 $[field.match(ip|senha|password|secreto|salt|deletado)]
 $[field.else]
             '$[field]',
 $[field.end]
 $[field.end]
-        );
+        ];
         $this->assertEquals($allowed, array_keys($values));
     }
 }

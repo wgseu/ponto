@@ -35,7 +35,7 @@ if (!$cidade->exists()) {
     redirect('/gerenciar/cidade/');
 }
 $focusctrl = 'nome';
-$errors = array();
+$errors = [];
 $old_cidade = $cidade;
 if (is_post()) {
     $cidade = new Cidade($_POST);
@@ -48,7 +48,7 @@ if (is_post()) {
             $cidade->getNome()
         );
         if (is_output('json')) {
-            json(null, array('item' => $cidade->publish(), 'msg' => $msg));
+            json(null, ['item' => $cidade->publish(), 'msg' => $msg]);
         }
         \Thunder::success($msg, true);
         redirect('/gerenciar/cidade/');
@@ -58,7 +58,7 @@ if (is_post()) {
             $errors = $e->getErrors();
         }
         if (is_output('json')) {
-            json($e->getMessage(), null, array('errors' => $errors));
+            json($e->getMessage(), null, ['errors' => $errors]);
         }
         \Thunder::error($e->getMessage());
         foreach ($errors as $key => $value) {

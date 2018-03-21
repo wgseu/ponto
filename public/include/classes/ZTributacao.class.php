@@ -31,7 +31,7 @@ class ZTributacao
     private $operacao_id;
     private $imposto_id;
 
-    public function __construct($tributacao = array())
+    public function __construct($tributacao = [])
     {
         $this->fromArray($tributacao);
     }
@@ -116,7 +116,7 @@ class ZTributacao
 
     public function toArray()
     {
-        $tributacao = array();
+        $tributacao = [];
         $tributacao['id'] = $this->getID();
         $tributacao['ncm'] = $this->getNCM();
         $tributacao['cest'] = $this->getCEST();
@@ -126,7 +126,7 @@ class ZTributacao
         return $tributacao;
     }
 
-    public function fromArray($tributacao = array())
+    public function fromArray($tributacao = [])
     {
         if (!is_array($tributacao)) {
             return $this;
@@ -142,13 +142,13 @@ class ZTributacao
     public static function getPeloID($id)
     {
         $query = DB::$pdo->from('Tributacoes')
-                         ->where(array('id' => $id));
+                         ->where(['id' => $id]);
         return new ZTributacao($query->fetch());
     }
 
     private static function validarCampos(&$tributacao)
     {
-        $erros = array();
+        $erros = [];
         $tributacao['ncm'] = strip_tags(trim($tributacao['ncm']));
         if (strlen($tributacao['ncm']) == 0) {
             $erros['ncm'] = 'O NCM não pode ser vazio';
@@ -174,7 +174,7 @@ class ZTributacao
     private static function handleException(&$e)
     {
         if (stripos($e->getMessage(), 'PRIMARY') !== false) {
-            throw new ValidationException(array('id' => 'O id informado já está cadastrado'));
+            throw new ValidationException(['id' => 'O id informado já está cadastrado']);
         }
     }
 
@@ -195,16 +195,16 @@ class ZTributacao
     {
         $_tributacao = $tributacao->toArray();
         if (!$_tributacao['id']) {
-            throw new ValidationException(array('id' => 'O id da tributacao não foi informado'));
+            throw new ValidationException(['id' => 'O id da tributacao não foi informado']);
         }
         self::validarCampos($_tributacao);
-        $campos = array(
+        $campos = [
             'ncm',
             'cest',
             'origemid',
             'operacaoid',
             'impostoid',
-        );
+        ];
         try {
             $query = DB::$pdo->update('Tributacoes');
             $query = $query->set(array_intersect_key($_tributacao, array_flip($campos)));
@@ -223,7 +223,7 @@ class ZTributacao
             throw new Exception('Não foi possível excluir a tributacao, o id da tributacao não foi informado');
         }
         $query = DB::$pdo->deleteFrom('Tributacoes')
-                         ->where(array('id' => $id));
+                         ->where(['id' => $id]);
         return $query->execute();
     }
 
@@ -240,7 +240,7 @@ class ZTributacao
             $query = $query->limit($quantidade)->offset($inicio);
         }
         $_tributacaos = $query->fetchAll();
-        $tributacaos = array();
+        $tributacaos = [];
         foreach ($_tributacaos as $tributacao) {
             $tributacaos[] = new ZTributacao($tributacao);
         }
@@ -256,7 +256,7 @@ class ZTributacao
     private static function initSearchDaOrigemID($origem_id)
     {
         return   DB::$pdo->from('Tributacoes')
-                         ->where(array('origemid' => $origem_id))
+                         ->where(['origemid' => $origem_id])
                          ->orderBy('id ASC');
     }
 
@@ -267,7 +267,7 @@ class ZTributacao
             $query = $query->limit($quantidade)->offset($inicio);
         }
         $_tributacaos = $query->fetchAll();
-        $tributacaos = array();
+        $tributacaos = [];
         foreach ($_tributacaos as $tributacao) {
             $tributacaos[] = new ZTributacao($tributacao);
         }
@@ -283,7 +283,7 @@ class ZTributacao
     private static function initSearchDaOperacaoID($operacao_id)
     {
         return   DB::$pdo->from('Tributacoes')
-                         ->where(array('operacaoid' => $operacao_id))
+                         ->where(['operacaoid' => $operacao_id])
                          ->orderBy('id ASC');
     }
 
@@ -294,7 +294,7 @@ class ZTributacao
             $query = $query->limit($quantidade)->offset($inicio);
         }
         $_tributacaos = $query->fetchAll();
-        $tributacaos = array();
+        $tributacaos = [];
         foreach ($_tributacaos as $tributacao) {
             $tributacaos[] = new ZTributacao($tributacao);
         }
@@ -310,7 +310,7 @@ class ZTributacao
     private static function initSearchDoImpostoID($imposto_id)
     {
         return   DB::$pdo->from('Tributacoes')
-                         ->where(array('impostoid' => $imposto_id))
+                         ->where(['impostoid' => $imposto_id])
                          ->orderBy('id ASC');
     }
 
@@ -321,7 +321,7 @@ class ZTributacao
             $query = $query->limit($quantidade)->offset($inicio);
         }
         $_tributacaos = $query->fetchAll();
-        $tributacaos = array();
+        $tributacaos = [];
         foreach ($_tributacaos as $tributacao) {
             $tributacaos[] = new ZTributacao($tributacao);
         }

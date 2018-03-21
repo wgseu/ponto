@@ -70,4 +70,4 @@ try {
     Log::error($e->getMessage());
     json($e->getMessage());
 }
-json(array('status' => 'ok'));
+json(['status' => 'ok']);

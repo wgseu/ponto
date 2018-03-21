@@ -58,7 +58,7 @@ class ZPedido
     private $data_entrega;
     private $data_conclusao;
 
-    public function __construct($pedido = array())
+    public function __construct($pedido = [])
     {
         if (is_array($pedido)) {
             $this->setID(isset($pedido['id'])?$pedido['id']:null);
@@ -317,7 +317,7 @@ class ZPedido
 
     public function toArray()
     {
-        $pedido = array();
+        $pedido = [];
         $pedido['id'] = $this->getID();
         $pedido['mesaid'] = $this->getMesaID();
         $pedido['comandaid'] = $this->getComandaID();
@@ -344,14 +344,14 @@ class ZPedido
     public static function getPeloID($id)
     {
         $query = DB::$pdo->from('Pedidos')
-                         ->where(array('id' => $id));
+                         ->where(['id' => $id]);
         return new ZPedido($query->fetch());
     }
 
     public static function getPelaMesaID($mesa_id)
     {
         $query = DB::$pdo->from('Pedidos')
-                         ->where(array('mesaid' => $mesa_id, 'cancelado' => 'N', 'tipo' => PedidoTipo::MESA))
+                         ->where(['mesaid' => $mesa_id, 'cancelado' => 'N', 'tipo' => PedidoTipo::MESA])
                          ->where('estado <> ?', PedidoEstado::FINALIZADO);
         return new ZPedido($query->fetch());
     }
@@ -359,7 +359,7 @@ class ZPedido
     public static function getPelaComandaID($comanda_id)
     {
         $query = DB::$pdo->from('Pedidos')
-                         ->where(array('comandaid' => $comanda_id, 'cancelado' => 'N', 'tipo' => PedidoTipo::COMANDA))
+                         ->where(['comandaid' => $comanda_id, 'cancelado' => 'N', 'tipo' => PedidoTipo::COMANDA])
                          ->where('estado <> ?', PedidoEstado::FINALIZADO);
         return new ZPedido($query->fetch());
     }
@@ -381,9 +381,9 @@ class ZPedido
                          ->select(null)
                          ->select('SUM(TIME_TO_SEC(TIMEDIFF(COALESCE(p.dataconclusao, NOW()), p.datacriacao))) as segundos')
                          ->select('COUNT(p.id) as quantidade')
-                         ->where(array('p.cancelado' => 'N'));
+                         ->where(['p.cancelado' => 'N']);
         if (!is_null($sessao_id)) {
-            $query = $query->where(array('p.sessaoid' => $sessao_id));
+            $query = $query->where(['p.sessaoid' => $sessao_id]);
         }
         if (!is_null($data_inicio) && is_null($sessao_id)) {
             $query = $query->where('p.datacriacao >= ?', date('Y-m-d', $data_inicio));
@@ -392,10 +392,10 @@ class ZPedido
             $query = $query->where('p.datacriacao <= ?', date('Y-m-d H:i:s', $data_fim));
         }
         $row = $query->fetch();
-        $result = array(
+        $result = [
             'permanencia' => intval($row['segundos']),
             'pedidos' => intval($row['quantidade'])
-        );
+        ];
         $total = self::getTotal($sessao_id, $data_inicio, $data_fim);
         if ($result['pedidos'] > 0) {
             $result['permanencia'] = (int)($result['permanencia'] / $result['pedidos']);
@@ -413,10 +413,10 @@ class ZPedido
                          ->select(null)
                          ->select('SUM(p.pessoas) as total')
                          ->select('SUM(IF(p.estado = ?, 0, p.pessoas)) as atual', PedidoEstado::FINALIZADO)
-                         ->where(array('p.cancelado' => 'N'))
+                         ->where(['p.cancelado' => 'N'])
                          ->where('p.tipo <> ?', PedidoTipo::ENTREGA);
         if (!is_null($sessao_id)) {
-            $query = $query->where(array('p.sessaoid' => $sessao_id));
+            $query = $query->where(['p.sessaoid' => $sessao_id]);
         }
         if (!is_null($data_inicio) && is_null($sessao_id)) {
             $query = $query->where('p.datacriacao >= ?', date('Y-m-d', $data_inicio));
@@ -425,7 +425,7 @@ class ZPedido
             $query = $query->where('p.datacriacao <= ?', date('Y-m-d H:i:s', $data_fim));
         }
         $row = $query->fetch();
-        return array('total' => $row['total'] + 0, 'atual' => $row['atual'] + 0);
+        return ['total' => $row['total'] + 0, 'atual' => $row['atual'] + 0];
     }
 
     public static function getTotal($sessao_id, $data_inicio = null, $data_fim = null)
@@ -439,9 +439,9 @@ class ZPedido
                          ->select('ROUND(SUM(IF(p.tipo = "Avulso", pdp.preco * pdp.quantidade * (pdp.porcentagem / 100 + 1), 0)), 4) as avulso')
                          ->select('ROUND(SUM(IF(p.tipo = "Entrega", pdp.preco * pdp.quantidade * (pdp.porcentagem / 100 + 1), 0)), 4) as entrega')
                          ->leftJoin('Produtos_Pedidos pdp ON pdp.pedidoid = p.id AND pdp.cancelado = "N"')
-                         ->where(array('p.cancelado' => 'N'));
+                         ->where(['p.cancelado' => 'N']);
         if (!is_null($sessao_id)) {
-            $query = $query->where(array('p.sessaoid' => $sessao_id));
+            $query = $query->where(['p.sessaoid' => $sessao_id]);
         }
         if (!is_null($data_inicio) && is_null($sessao_id)) {
             $query = $query->where('p.datacriacao >= ?', date('Y-m-d', $data_inicio));
@@ -450,14 +450,14 @@ class ZPedido
             $query = $query->where('p.datacriacao <= ?', date('Y-m-d H:i:s', $data_fim));
         }
         $row = $query->fetch();
-        return array('total' => $row['total'] + 0,
+        return ['total' => $row['total'] + 0,
                      'subtotal' => $row['total'] + 0,
-                     'tipo' => array(
+                     'tipo' => [
                         'mesa' => $row['mesa'] + 0,
                         'comanda' => $row['comanda'] + 0,
                         'avulso' => $row['avulso'] + 0,
-                        'entrega' => $row['entrega'] + 0)
-                    );
+                        'entrega' => $row['entrega'] + 0]
+                    ];
     }
 
     public static function getTotalDetalhado($id, $cancelado = null)
@@ -490,7 +490,7 @@ class ZPedido
 
     private static function validarCampos(&$pedido)
     {
-        $erros = array();
+        $erros = [];
         $pedido['mesaid'] = trim($pedido['mesaid']);
         if (strlen($pedido['mesaid']) == 0) {
             $pedido['mesaid'] = null;
@@ -536,13 +536,13 @@ class ZPedido
         $pedido['tipo'] = trim($pedido['tipo']);
         if (strlen($pedido['tipo']) == 0) {
             $pedido['tipo'] = null;
-        } elseif (!in_array($pedido['tipo'], array('Mesa', 'Comanda', 'Avulso', 'Entrega'))) {
+        } elseif (!in_array($pedido['tipo'], ['Mesa', 'Comanda', 'Avulso', 'Entrega'])) {
             $erros['tipo'] = 'O Tipo informado não é válido';
         }
         $pedido['estado'] = trim($pedido['estado']);
         if (strlen($pedido['estado']) == 0) {
             $pedido['estado'] = null;
-        } elseif (!in_array($pedido['estado'], array('Finalizado', 'Ativo', 'Agendado', 'Entrega', 'Fechado'))) {
+        } elseif (!in_array($pedido['estado'], ['Finalizado', 'Ativo', 'Agendado', 'Entrega', 'Fechado'])) {
             $erros['estado'] = 'O Estado informado não é válido';
         }
         if (!is_numeric($pedido['pessoas'])) {
@@ -574,7 +574,7 @@ class ZPedido
         $pedido['cancelado'] = trim($pedido['cancelado']);
         if (strlen($pedido['cancelado']) == 0) {
             $pedido['cancelado'] = 'N';
-        } elseif (!in_array($pedido['cancelado'], array('Y', 'N'))) {
+        } elseif (!in_array($pedido['cancelado'], ['Y', 'N'])) {
             $erros['cancelado'] = 'O Cancelado informado não é válido';
         }
         $pedido['datacriacao'] = date('Y-m-d H:i:s');
@@ -589,7 +589,7 @@ class ZPedido
     private static function handleException(&$e)
     {
         if (stripos($e->getMessage(), 'PRIMARY') !== false) {
-            throw new ValidationException(array('id' => 'O ID informado já está cadastrado'));
+            throw new ValidationException(['id' => 'O ID informado já está cadastrado']);
         }
     }
 
@@ -617,10 +617,10 @@ class ZPedido
     {
         $_pedido = $pedido->toArray();
         if (!$_pedido['id']) {
-            throw new ValidationException(array('id' => 'O id do pedido não foi informado'));
+            throw new ValidationException(['id' => 'O id do pedido não foi informado']);
         }
         self::validarCampos($_pedido);
-        $campos = array(
+        $campos = [
             // 'mesaid',
             // 'comandaid',
             // 'movimentacaoid',
@@ -639,7 +639,7 @@ class ZPedido
             // 'dataagendamento',
             // 'dataentrega',
             // 'dataconclusao',
-        );
+        ];
         try {
             $query = DB::$pdo->update('Pedidos');
             $query = $query->set(array_intersect_key($_pedido, array_flip($campos)));
@@ -665,7 +665,7 @@ class ZPedido
         if (is_null($this->getID())) {
             return;
         }
-        if (!in_array($this->getTipo(), array(PedidoTipo::MESA, PedidoTipo::COMANDA))) {
+        if (!in_array($this->getTipo(), [PedidoTipo::MESA, PedidoTipo::COMANDA])) {
             return;
         }
         if ($this->getFuncionarioID() == $funcionario->getID()) {
@@ -775,7 +775,7 @@ class ZPedido
             $query = $query->limit($quantidade)->offset($inicio);
         }
         $_pedidos = $query->fetchAll();
-        $pedidos = array();
+        $pedidos = [];
         foreach ($_pedidos as $pedido) {
             $pedidos[] = new ZPedido($pedido);
         }
@@ -814,7 +814,7 @@ class ZPedido
     private static function initSearchDaMesaID($mesa_id)
     {
         return   DB::$pdo->from('Pedidos')
-                         ->where(array('mesaid' => $mesa_id))
+                         ->where(['mesaid' => $mesa_id])
                          ->orderBy('id ASC');
     }
 
@@ -825,7 +825,7 @@ class ZPedido
             $query = $query->limit($quantidade)->offset($inicio);
         }
         $_pedidos = $query->fetchAll();
-        $pedidos = array();
+        $pedidos = [];
         foreach ($_pedidos as $pedido) {
             $pedidos[] = new ZPedido($pedido);
         }
@@ -841,7 +841,7 @@ class ZPedido
     private static function initSearchDaSessaoID($sessao_id)
     {
         return   DB::$pdo->from('Pedidos')
-                         ->where(array('sessaoid' => $sessao_id))
+                         ->where(['sessaoid' => $sessao_id])
                          ->orderBy('id ASC');
     }
 
@@ -852,7 +852,7 @@ class ZPedido
             $query = $query->limit($quantidade)->offset($inicio);
         }
         $_pedidos = $query->fetchAll();
-        $pedidos = array();
+        $pedidos = [];
         foreach ($_pedidos as $pedido) {
             $pedidos[] = new ZPedido($pedido);
         }
@@ -868,7 +868,7 @@ class ZPedido
     private static function initSearchDoFuncionarioID($funcionario_id)
     {
         return   DB::$pdo->from('Pedidos')
-                         ->where(array('funcionarioid' => $funcionario_id))
+                         ->where(['funcionarioid' => $funcionario_id])
                          ->orderBy('id ASC');
     }
 
@@ -879,7 +879,7 @@ class ZPedido
             $query = $query->limit($quantidade)->offset($inicio);
         }
         $_pedidos = $query->fetchAll();
-        $pedidos = array();
+        $pedidos = [];
         foreach ($_pedidos as $pedido) {
             $pedidos[] = new ZPedido($pedido);
         }
@@ -895,7 +895,7 @@ class ZPedido
     private static function initSearchDoClienteID($cliente_id)
     {
         return   DB::$pdo->from('Pedidos')
-                         ->where(array('clienteid' => $cliente_id))
+                         ->where(['clienteid' => $cliente_id])
                          ->orderBy('id ASC');
     }
 
@@ -906,7 +906,7 @@ class ZPedido
             $query = $query->limit($quantidade)->offset($inicio);
         }
         $_pedidos = $query->fetchAll();
-        $pedidos = array();
+        $pedidos = [];
         foreach ($_pedidos as $pedido) {
             $pedidos[] = new ZPedido($pedido);
         }
@@ -922,7 +922,7 @@ class ZPedido
     private static function initSearchDoEntregadorID($entregador_id)
     {
         return   DB::$pdo->from('Pedidos')
-                         ->where(array('entregadorid' => $entregador_id))
+                         ->where(['entregadorid' => $entregador_id])
                          ->orderBy('id ASC');
     }
 
@@ -933,7 +933,7 @@ class ZPedido
             $query = $query->limit($quantidade)->offset($inicio);
         }
         $_pedidos = $query->fetchAll();
-        $pedidos = array();
+        $pedidos = [];
         foreach ($_pedidos as $pedido) {
             $pedidos[] = new ZPedido($pedido);
         }
@@ -949,7 +949,7 @@ class ZPedido
     private static function initSearchDaLocalizacaoID($localizacao_id)
     {
         return   DB::$pdo->from('Pedidos')
-                         ->where(array('localizacaoid' => $localizacao_id))
+                         ->where(['localizacaoid' => $localizacao_id])
                          ->orderBy('id ASC');
     }
 
@@ -960,7 +960,7 @@ class ZPedido
             $query = $query->limit($quantidade)->offset($inicio);
         }
         $_pedidos = $query->fetchAll();
-        $pedidos = array();
+        $pedidos = [];
         foreach ($_pedidos as $pedido) {
             $pedidos[] = new ZPedido($pedido);
         }
@@ -976,7 +976,7 @@ class ZPedido
     private static function initSearchDaComandaID($comanda_id)
     {
         return   DB::$pdo->from('Pedidos')
-                         ->where(array('comandaid' => $comanda_id))
+                         ->where(['comandaid' => $comanda_id])
                          ->orderBy('id ASC');
     }
 
@@ -987,7 +987,7 @@ class ZPedido
             $query = $query->limit($quantidade)->offset($inicio);
         }
         $_pedidos = $query->fetchAll();
-        $pedidos = array();
+        $pedidos = [];
         foreach ($_pedidos as $pedido) {
             $pedidos[] = new ZPedido($pedido);
         }
@@ -1003,7 +1003,7 @@ class ZPedido
     private static function initSearchDaMovimentacaoID($movimentacao_id)
     {
         return   DB::$pdo->from('Pedidos')
-                         ->where(array('movimentacaoid' => $movimentacao_id))
+                         ->where(['movimentacaoid' => $movimentacao_id])
                          ->orderBy('id ASC');
     }
 
@@ -1014,7 +1014,7 @@ class ZPedido
             $query = $query->limit($quantidade)->offset($inicio);
         }
         $_pedidos = $query->fetchAll();
-        $pedidos = array();
+        $pedidos = [];
         foreach ($_pedidos as $pedido) {
             $pedidos[] = new ZPedido($pedido);
         }
@@ -1030,7 +1030,7 @@ class ZPedido
     private static function initSearchDoFechadorID($fechador_id)
     {
         return   DB::$pdo->from('Pedidos')
-                         ->where(array('fechadorid' => $fechador_id))
+                         ->where(['fechadorid' => $fechador_id])
                          ->orderBy('id ASC');
     }
 
@@ -1041,7 +1041,7 @@ class ZPedido
             $query = $query->limit($quantidade)->offset($inicio);
         }
         $_pedidos = $query->fetchAll();
-        $pedidos = array();
+        $pedidos = [];
         foreach ($_pedidos as $pedido) {
             $pedidos[] = new ZPedido($pedido);
         }

@@ -30,7 +30,7 @@ if (is_null($forma_pagto->getID())) {
     redirect('/gerenciar/forma_pagto/');
 }
 $focusctrl = 'descricao';
-$errors = array();
+$errors = [];
 $old_forma_pagto = $forma_pagto;
 if (is_post()) {
     $forma_pagto = new ZFormaPagto($_POST);

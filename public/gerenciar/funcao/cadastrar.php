@@ -23,7 +23,7 @@ require_once(dirname(__DIR__) . '/app.php');
 
 need_owner();
 $focusctrl = 'descricao';
-$errors = array();
+$errors = [];
 if (is_post()) {
     $funcao = new ZFuncao($_POST);
     try {

@@ -25,17 +25,17 @@ use MZ\Sale\Comanda;
 
 need_permission(PermissaoNome::CADASTROCOMANDAS);
 
-$condition = array();
+$condition = [];
 $condition['ativa'] = isset($_GET['ativa'])?$_GET['ativa']:null;
 $condition['query'] = isset($_GET['query'])?$_GET['query']:null;
 $condition = \MZ\Util\Filter::query($condition);
 
 $count = Comanda::count($condition);
 list($pagesize, $offset, $pagestring) = pagestring($count, 10);
-$comandas = Comanda::findAll($condition, array(), $pagesize, $offset);
+$comandas = Comanda::findAll($condition, [], $pagesize, $offset);
 
-$ativas = array(
+$ativas = [
     'Y' => 'Ativas',
     'N' => 'Inativas',
-);
+];
 include template('gerenciar_comanda_index');

@@ -310,7 +310,7 @@ EOF;
 		$fileName = "";
 	}
 
-	$rpl = array( '\\' => '\\\\', '"' => '\\"' ) ;
+	$rpl = [ '\\' => '\\\\', '"' => '\\"' ] ;
 	echo 'window.parent.OnUploadCompleted(' . $errorNumber . ',"' . strtr( $fileUrl, $rpl ) . '","' . strtr( $fileName, $rpl ) . '", "' . strtr( $customMsg, $rpl ) . '") ;' ;
 	echo '</script>' ;
 	exit ;
@@ -321,7 +321,7 @@ function SendCKEditorResults ($callback, $sFileUrl, $customMsg = '')
 {
   echo '<script type="text/javascript">';
 
-  $rpl = array( '\\' => '\\\\', '"' => '\\"' ) ;
+  $rpl = [ '\\' => '\\\\', '"' => '\\"' ] ;
 
   echo 'window.parent.CKEDITOR.tools.callFunction("'. $callback. '","'.
     strtr($sFileUrl, $rpl). '", "'. strtr( $customMsg, $rpl). '");' ; 

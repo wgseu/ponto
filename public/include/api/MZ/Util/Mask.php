@@ -86,7 +86,7 @@ class Mask
         $dec = ',';
         $number =  number_format($value, 2, $dec, $sep);
         if ($format) {
-            return vsprintf($__moeda__->getFormato(), array($number));
+            return vsprintf($__moeda__->getFormato(), [$number]);
         }
         return $number;
     }

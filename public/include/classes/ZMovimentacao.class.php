@@ -33,7 +33,7 @@ class ZMovimentacao
     private $funcionario_fechamento_id;
     private $data_fechamento;
 
-    public function __construct($movimentacao = array())
+    public function __construct($movimentacao = [])
     {
         if (is_array($movimentacao)) {
             $this->setID(isset($movimentacao['id'])?$movimentacao['id']:null);
@@ -162,7 +162,7 @@ class ZMovimentacao
 
     public function toArray()
     {
-        $movimentacao = array();
+        $movimentacao = [];
         $movimentacao['id'] = $this->getID();
         $movimentacao['sessaoid'] = $this->getSessaoID();
         $movimentacao['caixaid'] = $this->getCaixaID();
@@ -177,13 +177,13 @@ class ZMovimentacao
     public static function getPeloID($id)
     {
         $query = DB::$pdo->from('Movimentacoes')
-                         ->where(array('id' => $id));
+                         ->where(['id' => $id]);
         return new ZMovimentacao($query->fetch());
     }
 
     private static function validarCampos(&$movimentacao)
     {
-        $erros = array();
+        $erros = [];
         if (!is_numeric($movimentacao['sessaoid'])) {
             $erros['sessaoid'] = 'A sessão não foi informada';
         }
@@ -193,7 +193,7 @@ class ZMovimentacao
         $movimentacao['aberta'] = trim($movimentacao['aberta']);
         if (strlen($movimentacao['aberta']) == 0) {
             $movimentacao['aberta'] = 'N';
-        } elseif (!in_array($movimentacao['aberta'], array('Y', 'N'))) {
+        } elseif (!in_array($movimentacao['aberta'], ['Y', 'N'])) {
             $erros['aberta'] = 'A aberta informada não é válida';
         }
         if (!is_numeric($movimentacao['funcionarioaberturaid'])) {
@@ -215,7 +215,7 @@ class ZMovimentacao
     private static function handleException(&$e)
     {
         if (stripos($e->getMessage(), 'PRIMARY') !== false) {
-            throw new ValidationException(array('id' => 'O ID informado já está cadastrado'));
+            throw new ValidationException(['id' => 'O ID informado já está cadastrado']);
         }
     }
 
@@ -236,17 +236,17 @@ class ZMovimentacao
     {
         $_movimentacao = $movimentacao->toArray();
         if (!$_movimentacao['id']) {
-            throw new ValidationException(array('id' => 'O id da movimentacao não foi informado'));
+            throw new ValidationException(['id' => 'O id da movimentacao não foi informado']);
         }
         self::validarCampos($_movimentacao);
-        $campos = array(
+        $campos = [
             'sessaoid',
             'caixaid',
             'aberta',
             'funcionarioaberturaid',
             'funcionariofechamentoid',
             'datafechamento',
-        );
+        ];
         try {
             $query = DB::$pdo->update('Movimentacoes');
             $query = $query->set(array_intersect_key($_movimentacao, array_flip($campos)));
@@ -295,7 +295,7 @@ class ZMovimentacao
             $query = $query->limit($quantidade)->offset($inicio);
         }
         $_movimentacaos = $query->fetchAll();
-        $movimentacaos = array();
+        $movimentacaos = [];
         foreach ($_movimentacaos as $movimentacao) {
             $movimentacaos[] = new ZMovimentacao($movimentacao);
         }
@@ -311,7 +311,7 @@ class ZMovimentacao
     private static function initSearchDaSessaoID($sessao_id)
     {
         return   DB::$pdo->from('Movimentacoes')
-                         ->where(array('sessaoid' => $sessao_id))
+                         ->where(['sessaoid' => $sessao_id])
                          ->orderBy('id ASC');
     }
 
@@ -322,7 +322,7 @@ class ZMovimentacao
             $query = $query->limit($quantidade)->offset($inicio);
         }
         $_movimentacaos = $query->fetchAll();
-        $movimentacaos = array();
+        $movimentacaos = [];
         foreach ($_movimentacaos as $movimentacao) {
             $movimentacaos[] = new ZMovimentacao($movimentacao);
         }
@@ -338,7 +338,7 @@ class ZMovimentacao
     private static function initSearchDaCaixaID($caixa_id)
     {
         return   DB::$pdo->from('Movimentacoes')
-                         ->where(array('caixaid' => $caixa_id))
+                         ->where(['caixaid' => $caixa_id])
                          ->orderBy('id ASC');
     }
 
@@ -349,7 +349,7 @@ class ZMovimentacao
             $query = $query->limit($quantidade)->offset($inicio);
         }
         $_movimentacaos = $query->fetchAll();
-        $movimentacaos = array();
+        $movimentacaos = [];
         foreach ($_movimentacaos as $movimentacao) {
             $movimentacaos[] = new ZMovimentacao($movimentacao);
         }
@@ -365,7 +365,7 @@ class ZMovimentacao
     private static function initSearchDaFuncionarioAberturaID($funcionario_abertura_id)
     {
         return   DB::$pdo->from('Movimentacoes')
-                         ->where(array('funcionarioaberturaid' => $funcionario_abertura_id))
+                         ->where(['funcionarioaberturaid' => $funcionario_abertura_id])
                          ->orderBy('id ASC');
     }
 
@@ -376,7 +376,7 @@ class ZMovimentacao
             $query = $query->limit($quantidade)->offset($inicio);
         }
         $_movimentacaos = $query->fetchAll();
-        $movimentacaos = array();
+        $movimentacaos = [];
         foreach ($_movimentacaos as $movimentacao) {
             $movimentacaos[] = new ZMovimentacao($movimentacao);
         }
@@ -392,7 +392,7 @@ class ZMovimentacao
     private static function initSearchDoFuncionarioFechamentoID($funcionario_fechamento_id)
     {
         return   DB::$pdo->from('Movimentacoes')
-                         ->where(array('funcionariofechamentoid' => $funcionario_fechamento_id))
+                         ->where(['funcionariofechamentoid' => $funcionario_fechamento_id])
                          ->orderBy('id ASC');
     }
 
@@ -403,7 +403,7 @@ class ZMovimentacao
             $query = $query->limit($quantidade)->offset($inicio);
         }
         $_movimentacaos = $query->fetchAll();
-        $movimentacaos = array();
+        $movimentacaos = [];
         foreach ($_movimentacaos as $movimentacao) {
             $movimentacaos[] = new ZMovimentacao($movimentacao);
         }

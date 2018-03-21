@@ -21,18 +21,18 @@ try {
 
     zip_extract_folder(
         $zip,
-        array(
+        [
             'Site/Upload' => WWW_ROOT . '/static/upload',
             'Site/Documents' => DOC_ROOT,
             'Site/Images/header' => IMG_ROOT . '/header',
             'Site/Images/patrimonio' => IMG_ROOT . '/patrimonio'
-        )
+        ]
     );
 
     // Close and release file
     $zip->close();
 
-    json(null, array());
+    json(null, []);
 } catch (\Exception $e) {
     json($e->getMessage());
 }

@@ -25,8 +25,8 @@ if (!isset($_GET['produto']) || !is_numeric($_GET['produto'])) {
     json('Produto não informado!');
 }
 $grupos = ZGrupo::getTodosDoProdutoID(intval($_GET['produto']));
-$response = array('status' => 'ok');
-$grupos_array = array();
+$response = ['status' => 'ok'];
+$grupos_array = [];
 foreach ($grupos as $grupo) {
     $grupos_array[] = $grupo->toArray();
 }

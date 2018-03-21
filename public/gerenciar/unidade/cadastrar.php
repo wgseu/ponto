@@ -23,7 +23,7 @@ require_once(dirname(__DIR__) . '/app.php');
 
 need_permission(PermissaoNome::CADASTROPRODUTOS);
 $focusctrl = 'nome';
-$errors = array();
+$errors = [];
 if (is_post()) {
     $unidade = new ZUnidade($_POST);
     try {

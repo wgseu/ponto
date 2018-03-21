@@ -58,7 +58,7 @@ class Endereco extends \MZ\Database\Helper
      * Constructor for a new empty instance of Endereco
      * @param array $endereco All field and values to fill the instance
      */
-    public function __construct($endereco = array())
+    public function __construct($endereco = [])
     {
         parent::__construct($endereco);
     }
@@ -184,12 +184,12 @@ class Endereco extends \MZ\Database\Helper
      * @param  mixed $endereco Associated key -> value to assign into this instance
      * @return Endereco Self instance
      */
-    public function fromArray($endereco = array())
+    public function fromArray($endereco = [])
     {
         if ($endereco instanceof Endereco) {
             $endereco = $endereco->toArray();
         } elseif (!is_array($endereco)) {
-            $endereco = array();
+            $endereco = [];
         }
         parent::fromArray($endereco);
         if (!isset($endereco['id'])) {
@@ -258,7 +258,7 @@ class Endereco extends \MZ\Database\Helper
      */
     public function validate()
     {
-        $errors = array();
+        $errors = [];
         if (is_null($this->getCidadeID())) {
             $errors['cidadeid'] = 'A cidade não pode ser vazia';
         }
@@ -288,23 +288,23 @@ class Endereco extends \MZ\Database\Helper
     protected function translate($e)
     {
         if (stripos($e->getMessage(), 'PRIMARY') !== false) {
-            return new \MZ\Exception\ValidationException(array(
+            return new \MZ\Exception\ValidationException([
                 'id' => sprintf(
                     'O id "%s" já está cadastrado',
                     $this->getID()
                 ),
-            ));
+            ]);
         }
         if (stripos($e->getMessage(), 'CEP_UNIQUE') !== false) {
-            return new \MZ\Exception\ValidationException(array(
+            return new \MZ\Exception\ValidationException([
                 'cep' => sprintf(
                     'O cep "%s" já está cadastrado',
                     $this->getCEP()
                 ),
-            ));
+            ]);
         }
         if (stripos($e->getMessage(), 'BairroID_Logradouro_UNIQUE') !== false) {
-            return new \MZ\Exception\ValidationException(array(
+            return new \MZ\Exception\ValidationException([
                 'bairroid' => sprintf(
                     'O bairro "%s" já está cadastrado',
                     $this->getBairroID()
@@ -313,7 +313,7 @@ class Endereco extends \MZ\Database\Helper
                     'O logradouro "%s" já está cadastrado',
                     $this->getLogradouro()
                 ),
-            ));
+            ]);
         }
         return parent::translate($e);
     }
@@ -325,9 +325,9 @@ class Endereco extends \MZ\Database\Helper
      */
     public static function findByID($id)
     {
-        return self::find(array(
+        return self::find([
             'id' => intval($id),
-        ));
+        ]);
     }
 
     /**
@@ -337,9 +337,9 @@ class Endereco extends \MZ\Database\Helper
      */
     public static function findByCEP($cep)
     {
-        return self::find(array(
+        return self::find([
             'cep' => strval($cep),
-        ));
+        ]);
     }
 
     /**
@@ -350,10 +350,10 @@ class Endereco extends \MZ\Database\Helper
      */
     public static function findByBairroIDLogradouro($bairro_id, $logradouro)
     {
-        return self::find(array(
+        return self::find([
             'bairroid' => intval($bairro_id),
             'logradouro' => strval($logradouro),
-        ));
+        ]);
     }
 
     /**
@@ -402,7 +402,7 @@ class Endereco extends \MZ\Database\Helper
      * @param  array $order order rows
      * @return SelectQuery query object with condition statement
      */
-    private static function query($condition = array(), $order = array())
+    private static function query($condition = [], $order = [])
     {
         $query = self::getDB()->from('Enderecos e');
         $condition = self::filterCondition($condition);
@@ -418,12 +418,12 @@ class Endereco extends \MZ\Database\Helper
      * @param  array $order order rows
      * @return Endereco A filled Endereço or empty instance
      */
-    public static function find($condition, $order = array())
+    public static function find($condition, $order = [])
     {
         $query = self::query($condition, $order)->limit(1);
         $row = $query->fetch();
         if ($row === false) {
-            $row = array();
+            $row = [];
         }
         return new Endereco($row);
     }
@@ -435,7 +435,7 @@ class Endereco extends \MZ\Database\Helper
      * @param  integer $offset start index to get rows, null for begining
      * @return array All rows instanced and filled
      */
-    public static function findAll($condition = array(), $order = array(), $limit = null, $offset = null)
+    public static function findAll($condition = [], $order = [], $limit = null, $offset = null)
     {
         $query = self::query($condition, $order);
         if (!is_null($limit)) {
@@ -445,7 +445,7 @@ class Endereco extends \MZ\Database\Helper
             $query = $query->offset($offset);
         }
         $rows = $query->fetchAll();
-        $result = array();
+        $result = [];
         foreach ($rows as $row) {
             $result[] = new Endereco($row);
         }
@@ -528,7 +528,7 @@ class Endereco extends \MZ\Database\Helper
      * @param  array $condition condition to filter rows
      * @return integer Quantity of rows
      */
-    public static function count($condition = array())
+    public static function count($condition = [])
     {
         $query = self::query($condition);
         return $query->count();

@@ -30,13 +30,13 @@ class BancoTest extends \PHPUnit_Framework_TestCase
     {
         $banco = new Banco();
         $values = $banco->publish();
-        $allowed = array(
+        $allowed = [
             'id',
             'numero',
             'razaosocial',
             'agenciamascara',
             'contamascara',
-        );
+        ];
         $this->assertEquals($allowed, array_keys($values));
     }
 }

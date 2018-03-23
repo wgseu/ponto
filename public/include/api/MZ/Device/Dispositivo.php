@@ -398,9 +398,7 @@ class Dispositivo extends \MZ\Database\Helper
         if (is_null($this->getTipo())) {
             $errors['tipo'] = 'O tipo não pode ser vazio';
         }
-        if (!is_null($this->getTipo()) &&
-            !array_key_exists($this->getTipo(), self::getTipoOptions())
-        ) {
+        if (!Validator::checkInSet($this->getTipo(), self::getTipoOptions(), true)) {
             $errors['tipo'] = 'O tipo é inválido';
         }
         if (is_null($this->getOpcoes())) {
@@ -455,6 +453,148 @@ class Dispositivo extends \MZ\Database\Helper
     }
 
     /**
+     * Insert a new Dispositivo into the database and fill instance from database
+     * @return Dispositivo Self instance
+     */
+    public function insert()
+    {
+        $values = $this->validate();
+        unset($values['id']);
+        try {
+            $id = self::getDB()->insertInto('Dispositivos')->values($values)->execute();
+            $dispositivo = self::findByID($id);
+            $this->fromArray($dispositivo->toArray());
+        } catch (\Exception $e) {
+            throw $this->translate($e);
+        }
+        return $this;
+    }
+
+    /**
+     * Update Dispositivo with instance values into database for ID
+     * @return Dispositivo Self instance
+     */
+    public function update()
+    {
+        $values = $this->validate();
+        if (!$this->exists()) {
+            throw new \Exception('O identificador do dispositivo não foi informado');
+        }
+        unset($values['id']);
+        try {
+            self::getDB()
+                ->update('Dispositivos')
+                ->set($values)
+                ->where('id', $this->getID())
+                ->execute();
+            $dispositivo = self::findByID($this->getID());
+            $this->fromArray($dispositivo->toArray());
+        } catch (\Exception $e) {
+            throw $this->translate($e);
+        }
+        return $this;
+    }
+
+    /**
+     * Delete this instance from database using ID
+     * @return integer Number of rows deleted (Max 1)
+     */
+    public function delete()
+    {
+        if (!$this->exists()) {
+            throw new \Exception('O identificador do dispositivo não foi informado');
+        }
+        $result = self::getDB()
+            ->deleteFrom('Dispositivos')
+            ->where('id', $this->getID())
+            ->execute();
+        return $result;
+    }
+
+    /**
+     * Load one register for it self with a condition
+     * @param  array $condition Condition for searching the row
+     * @param  array $order associative field name -> [-1, 1]
+     * @return Dispositivo Self instance filled or empty
+     */
+    public function load($condition, $order = [])
+    {
+        $query = self::query($condition, $order)->limit(1);
+        $row = $query->fetch() ?: [];
+        return $this->fromArray($row);
+    }
+
+    /**
+     * Load into this object from database using, ID
+     * @param  int $id id to find Dispositivo
+     * @return Dispositivo Self filled instance or empty when not found
+     */
+    public function loadByID($id)
+    {
+        return $this->load([
+            'id' => intval($id),
+        ]);
+    }
+
+    /**
+     * Load into this object from database using, Nome
+     * @param  string $nome nome to find Dispositivo
+     * @return Dispositivo Self filled instance or empty when not found
+     */
+    public function loadByNome($nome)
+    {
+        return $this->load([
+            'nome' => strval($nome),
+        ]);
+    }
+
+    /**
+     * Load into this object from database using, CaixaID
+     * @param  int $caixa_id caixa to find Dispositivo
+     * @return Dispositivo Self filled instance or empty when not found
+     */
+    public function loadByCaixaID($caixa_id)
+    {
+        return $this->load([
+            'caixaid' => intval($caixa_id),
+        ]);
+    }
+
+    /**
+     * Load into this object from database using, Serial
+     * @param  string $serial serial to find Dispositivo
+     * @return Dispositivo Self filled instance or empty when not found
+     */
+    public function loadBySerial($serial)
+    {
+        return $this->load([
+            'serial' => strval($serial),
+        ]);
+    }
+
+    /**
+     * Setor em que o dispositivo está instalado/será usado
+     * @return \MZ\Environment\Setor The object fetched from database
+     */
+    public function findSetorID()
+    {
+        return \MZ\Environment\Setor::findByID($this->getSetorID());
+    }
+
+    /**
+     * Finalidade do dispositivo, caixa ou terminal, o caixa é único entre os
+     * dispositivos
+     * @return \MZ\Session\Caixa The object fetched from database
+     */
+    public function findCaixaID()
+    {
+        if (is_null($this->getCaixaID())) {
+            return new \MZ\Session\Caixa();
+        }
+        return \MZ\Session\Caixa::findByID($this->getCaixaID());
+    }
+
+    /**
      * Gets textual and translated Tipo for Dispositivo
      * @param  int $index choose option from index
      * @return mixed A associative key -> translated representative text or text for index
@@ -469,54 +609,6 @@ class Dispositivo extends \MZ\Database\Helper
             return $options[$index];
         }
         return $options;
-    }
-
-    /**
-     * Find this object on database using, ID
-     * @param  int $id id to find Dispositivo
-     * @return Dispositivo A filled instance or empty when not found
-     */
-    public static function findByID($id)
-    {
-        return self::find([
-            'id' => intval($id),
-        ]);
-    }
-
-    /**
-     * Find this object on database using, Nome
-     * @param  string $nome nome to find Dispositivo
-     * @return Dispositivo A filled instance or empty when not found
-     */
-    public static function findByNome($nome)
-    {
-        return self::find([
-            'nome' => strval($nome),
-        ]);
-    }
-
-    /**
-     * Find this object on database using, CaixaID
-     * @param  int $caixa_id caixa to find Dispositivo
-     * @return Dispositivo A filled instance or empty when not found
-     */
-    public static function findByCaixaID($caixa_id)
-    {
-        return self::find([
-            'caixaid' => intval($caixa_id),
-        ]);
-    }
-
-    /**
-     * Find this object on database using, Serial
-     * @param  string $serial serial to find Dispositivo
-     * @return Dispositivo A filled instance or empty when not found
-     */
-    public static function findBySerial($serial)
-    {
-        return self::find([
-            'serial' => strval($serial),
-        ]);
     }
 
     /**
@@ -584,19 +676,65 @@ class Dispositivo extends \MZ\Database\Helper
     public static function find($condition, $order = [])
     {
         $query = self::query($condition, $order)->limit(1);
-        $row = $query->fetch();
-        if ($row === false) {
-            $row = [];
-        }
+        $row = $query->fetch() ?: [];
         return new Dispositivo($row);
     }
 
     /**
-     * Fetch all rows from database with matched condition critery
-     * @param  array $condition condition to filter rows
-     * @param  integer $limit number of rows to get, null for all
-     * @param  integer $offset start index to get rows, null for begining
-     * @return array All rows instanced and filled
+     * Find this object on database using, ID
+     * @param  int $id id to find Dispositivo
+     * @return Dispositivo A filled instance or empty when not found
+     */
+    public static function findByID($id)
+    {
+        return self::find([
+            'id' => intval($id),
+        ]);
+    }
+
+    /**
+     * Find this object on database using, Nome
+     * @param  string $nome nome to find Dispositivo
+     * @return Dispositivo A filled instance or empty when not found
+     */
+    public static function findByNome($nome)
+    {
+        return self::find([
+            'nome' => strval($nome),
+        ]);
+    }
+
+    /**
+     * Find this object on database using, CaixaID
+     * @param  int $caixa_id caixa to find Dispositivo
+     * @return Dispositivo A filled instance or empty when not found
+     */
+    public static function findByCaixaID($caixa_id)
+    {
+        return self::find([
+            'caixaid' => intval($caixa_id),
+        ]);
+    }
+
+    /**
+     * Find this object on database using, Serial
+     * @param  string $serial serial to find Dispositivo
+     * @return Dispositivo A filled instance or empty when not found
+     */
+    public static function findBySerial($serial)
+    {
+        return self::find([
+            'serial' => strval($serial),
+        ]);
+    }
+
+    /**
+     * Find all Dispositivo
+     * @param  array  $condition Condition to get all Dispositivo
+     * @param  array  $order     Order Dispositivo
+     * @param  int    $limit     Limit data into row count
+     * @param  int    $offset    Start offset to get rows
+     * @return array             List of all rows instanced as Dispositivo
      */
     public static function findAll($condition = [], $order = [], $limit = null, $offset = null)
     {
@@ -616,77 +754,6 @@ class Dispositivo extends \MZ\Database\Helper
     }
 
     /**
-     * Insert a new Dispositivo into the database and fill instance from database
-     * @return Dispositivo Self instance
-     */
-    public function insert()
-    {
-        $values = $this->validate();
-        unset($values['id']);
-        try {
-            $id = self::getDB()->insertInto('Dispositivos')->values($values)->execute();
-            $dispositivo = self::findByID($id);
-            $this->fromArray($dispositivo->toArray());
-        } catch (\Exception $e) {
-            throw $this->translate($e);
-        }
-        return $this;
-    }
-
-    /**
-     * Update Dispositivo with instance values into database for ID
-     * @return Dispositivo Self instance
-     */
-    public function update()
-    {
-        $values = $this->validate();
-        if (!$this->exists()) {
-            throw new \Exception('O identificador do dispositivo não foi informado');
-        }
-        unset($values['id']);
-        try {
-            self::getDB()
-                ->update('Dispositivos')
-                ->set($values)
-                ->where('id', $this->getID())
-                ->execute();
-            $dispositivo = self::findByID($this->getID());
-            $this->fromArray($dispositivo->toArray());
-        } catch (\Exception $e) {
-            throw $this->translate($e);
-        }
-        return $this;
-    }
-
-    /**
-     * Save the Dispositivo into the database
-     * @return Dispositivo Self instance
-     */
-    public function save()
-    {
-        if ($this->exists()) {
-            return $this->update();
-        }
-        return $this->insert();
-    }
-
-    /**
-     * Delete this instance from database using ID
-     * @return integer Number of rows deleted (Max 1)
-     */
-    public function delete()
-    {
-        if (!$this->exists()) {
-            throw new \Exception('O identificador do dispositivo não foi informado');
-        }
-        $result = self::getDB()
-            ->deleteFrom('Dispositivos')
-            ->where('id', $this->getID())
-            ->execute();
-        return $result;
-    }
-
-    /**
      * Count all rows from database with matched condition critery
      * @param  array $condition condition to filter rows
      * @return integer Quantity of rows
@@ -695,27 +762,5 @@ class Dispositivo extends \MZ\Database\Helper
     {
         $query = self::query($condition);
         return $query->count();
-    }
-
-    /**
-     * Setor em que o dispositivo está instalado/será usado
-     * @return \MZ\Environment\Setor The object fetched from database
-     */
-    public function findSetorID()
-    {
-        return \MZ\Environment\Setor::findByID($this->getSetorID());
-    }
-
-    /**
-     * Finalidade do dispositivo, caixa ou terminal, o caixa é único entre os
-     * dispositivos
-     * @return \MZ\Session\Caixa The object fetched from database
-     */
-    public function findCaixaID()
-    {
-        if (is_null($this->getCaixaID())) {
-            return new \MZ\Session\Caixa();
-        }
-        return \MZ\Session\Caixa::findByID($this->getCaixaID());
     }
 }

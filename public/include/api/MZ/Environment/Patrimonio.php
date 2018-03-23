@@ -537,6 +537,20 @@ class Patrimonio extends \MZ\Database\Helper
     }
 
     /**
+     * Get relative foto do bem path or default foto do bem
+     * @param boolean $default If true return default image, otherwise check field
+     * @return string relative web path for patrimônio foto do bem
+     */
+    public function makeImagemAnexada($default = false)
+    {
+        $imagem_anexada = $this->getImagemAnexada();
+        if ($default) {
+            $imagem_anexada = null;
+        }
+        return get_image_url($imagem_anexada, 'patrimonio', 'patrimonio.png');
+    }
+
+    /**
      * Convert this instance into array associated key -> value with only public fields
      * @return array All public field and values into array format
      */
@@ -580,7 +594,7 @@ class Patrimonio extends \MZ\Database\Helper
     public function clean($dependency)
     {
         if (!is_null($this->getImagemAnexada()) && $dependency->getImagemAnexada() != $this->getImagemAnexada()) {
-            unlink(get_image_path($this->getImagemAnexada(), 'patrimonio'));
+            @unlink(get_image_path($this->getImagemAnexada(), 'patrimonio'));
         }
         $this->setImagemAnexada($dependency->getImagemAnexada());
     }
@@ -616,9 +630,7 @@ class Patrimonio extends \MZ\Database\Helper
         if (is_null($this->getEstado())) {
             $errors['estado'] = 'O estado não pode ser vazio';
         }
-        if (!is_null($this->getEstado()) &&
-            !array_key_exists($this->getEstado(), self::getEstadoOptions())
-        ) {
+        if (!Validator::checkInSet($this->getEstado(), self::getEstadoOptions(), true)) {
             $errors['estado'] = 'O estado é inválido';
         }
         if (is_null($this->getCusto())) {
@@ -630,9 +642,7 @@ class Patrimonio extends \MZ\Database\Helper
         if (is_null($this->getAtivo())) {
             $errors['ativo'] = 'O ativo não pode ser vazio';
         }
-        if (!is_null($this->getAtivo()) &&
-            !array_key_exists($this->getAtivo(), self::getBooleanOptions())
-        ) {
+        if (!Validator::checkBoolean($this->getAtivo(), true)) {
             $errors['ativo'] = 'O ativo é inválido';
         }
         if (is_null($this->getDataAtualizacao())) {
@@ -675,17 +685,122 @@ class Patrimonio extends \MZ\Database\Helper
     }
 
     /**
-     * Get relative foto do bem path or default foto do bem
-     * @param boolean $default If true return default image, otherwise check field
-     * @return string relative web path for patrimônio foto do bem
+     * Insert a new Patrimônio into the database and fill instance from database
+     * @return Patrimonio Self instance
      */
-    public function makeImagemAnexada($default = false)
+    public function insert()
     {
-        $imagem_anexada = $this->getImagemAnexada();
-        if ($default) {
-            $imagem_anexada = null;
+        $values = $this->validate();
+        unset($values['id']);
+        try {
+            $id = self::getDB()->insertInto('Patrimonios')->values($values)->execute();
+            $patrimonio = self::findByID($id);
+            $this->fromArray($patrimonio->toArray());
+        } catch (\Exception $e) {
+            throw $this->translate($e);
         }
-        return get_image_url($imagem_anexada, 'patrimonio', 'patrimonio.png');
+        return $this;
+    }
+
+    /**
+     * Update Patrimônio with instance values into database for ID
+     * @return Patrimonio Self instance
+     */
+    public function update()
+    {
+        $values = $this->validate();
+        if (!$this->exists()) {
+            throw new \Exception('O identificador do patrimônio não foi informado');
+        }
+        unset($values['id']);
+        try {
+            self::getDB()
+                ->update('Patrimonios')
+                ->set($values)
+                ->where('id', $this->getID())
+                ->execute();
+            $patrimonio = self::findByID($this->getID());
+            $this->fromArray($patrimonio->toArray());
+        } catch (\Exception $e) {
+            throw $this->translate($e);
+        }
+        return $this;
+    }
+
+    /**
+     * Delete this instance from database using ID
+     * @return integer Number of rows deleted (Max 1)
+     */
+    public function delete()
+    {
+        if (!$this->exists()) {
+            throw new \Exception('O identificador do patrimônio não foi informado');
+        }
+        $result = self::getDB()
+            ->deleteFrom('Patrimonios')
+            ->where('id', $this->getID())
+            ->execute();
+        return $result;
+    }
+
+    /**
+     * Load one register for it self with a condition
+     * @param  array $condition Condition for searching the row
+     * @param  array $order associative field name -> [-1, 1]
+     * @return Patrimonio Self instance filled or empty
+     */
+    public function load($condition, $order = [])
+    {
+        $query = self::query($condition, $order)->limit(1);
+        $row = $query->fetch() ?: [];
+        return $this->fromArray($row);
+    }
+
+    /**
+     * Load into this object from database using, ID
+     * @param  int $id id to find Patrimônio
+     * @return Patrimonio Self filled instance or empty when not found
+     */
+    public function loadByID($id)
+    {
+        return $this->load([
+            'id' => intval($id),
+        ]);
+    }
+
+    /**
+     * Load into this object from database using, Numero, Estado
+     * @param  string $numero número to find Patrimônio
+     * @param  string $estado estado to find Patrimônio
+     * @return Patrimonio Self filled instance or empty when not found
+     */
+    public function loadByNumeroEstado($numero, $estado)
+    {
+        return $this->load([
+            'numero' => strval($numero),
+            'estado' => strval($estado),
+        ]);
+    }
+
+    /**
+     * Empresa a que esse bem pertence
+     * @return \MZ\Account\Cliente The object fetched from database
+     */
+    public function findEmpresaID()
+    {
+        return \MZ\Account\Cliente::findByID($this->getEmpresaID());
+    }
+
+    /**
+     * Fornecedor do bem
+     * @return \MZ\Stock\Fornecedor The object fetched from database
+     */
+    public function findFornecedorID()
+    {
+        if (is_null($this->getFornecedorID())) {
+            return new \MZ\Stock\Fornecedor();
+        }
+        return \MZ\Stock\Fornecedor::findByID($this->getFornecedorID());
     }
 
     /**
@@ -704,32 +819,6 @@ class Patrimonio extends \MZ\Database\Helper
             return $options[$index];
         }
         return $options;
-    }
-
-    /**
-     * Find this object on database using, ID
-     * @param  int $id id to find Patrimônio
-     * @return Patrimonio A filled instance or empty when not found
-     */
-    public static function findByID($id)
-    {
-        return self::find([
-            'id' => intval($id),
-        ]);
-    }
-
-    /**
-     * Find this object on database using, Numero, Estado
-     * @param  string $numero número to find Patrimônio
-     * @param  string $estado estado to find Patrimônio
-     * @return Patrimonio A filled instance or empty when not found
-     */
-    public static function findByNumeroEstado($numero, $estado)
-    {
-        return self::find([
-            'numero' => strval($numero),
-            'estado' => strval($estado),
-        ]);
     }
 
     /**
@@ -797,19 +886,43 @@ class Patrimonio extends \MZ\Database\Helper
     public static function find($condition, $order = [])
     {
         $query = self::query($condition, $order)->limit(1);
-        $row = $query->fetch();
-        if ($row === false) {
-            $row = [];
-        }
+        $row = $query->fetch() ?: [];
         return new Patrimonio($row);
     }
 
     /**
-     * Fetch all rows from database with matched condition critery
-     * @param  array $condition condition to filter rows
-     * @param  integer $limit number of rows to get, null for all
-     * @param  integer $offset start index to get rows, null for begining
-     * @return array All rows instanced and filled
+     * Find this object on database using, ID
+     * @param  int $id id to find Patrimônio
+     * @return Patrimonio A filled instance or empty when not found
+     */
+    public static function findByID($id)
+    {
+        return self::find([
+            'id' => intval($id),
+        ]);
+    }
+
+    /**
+     * Find this object on database using, Numero, Estado
+     * @param  string $numero número to find Patrimônio
+     * @param  string $estado estado to find Patrimônio
+     * @return Patrimonio A filled instance or empty when not found
+     */
+    public static function findByNumeroEstado($numero, $estado)
+    {
+        return self::find([
+            'numero' => strval($numero),
+            'estado' => strval($estado),
+        ]);
+    }
+
+    /**
+     * Find all Patrimônio
+     * @param  array  $condition Condition to get all Patrimônio
+     * @param  array  $order     Order Patrimônio
+     * @param  int    $limit     Limit data into row count
+     * @param  int    $offset    Start offset to get rows
+     * @return array             List of all rows instanced as Patrimonio
      */
     public static function findAll($condition = [], $order = [], $limit = null, $offset = null)
     {
@@ -829,77 +942,6 @@ class Patrimonio extends \MZ\Database\Helper
     }
 
     /**
-     * Insert a new Patrimônio into the database and fill instance from database
-     * @return Patrimonio Self instance
-     */
-    public function insert()
-    {
-        $values = $this->validate();
-        unset($values['id']);
-        try {
-            $id = self::getDB()->insertInto('Patrimonios')->values($values)->execute();
-            $patrimonio = self::findByID($id);
-            $this->fromArray($patrimonio->toArray());
-        } catch (\Exception $e) {
-            throw $this->translate($e);
-        }
-        return $this;
-    }
-
-    /**
-     * Update Patrimônio with instance values into database for ID
-     * @return Patrimonio Self instance
-     */
-    public function update()
-    {
-        $values = $this->validate();
-        if (!$this->exists()) {
-            throw new \Exception('O identificador do patrimônio não foi informado');
-        }
-        unset($values['id']);
-        try {
-            self::getDB()
-                ->update('Patrimonios')
-                ->set($values)
-                ->where('id', $this->getID())
-                ->execute();
-            $patrimonio = self::findByID($this->getID());
-            $this->fromArray($patrimonio->toArray());
-        } catch (\Exception $e) {
-            throw $this->translate($e);
-        }
-        return $this;
-    }
-
-    /**
-     * Save the Patrimônio into the database
-     * @return Patrimonio Self instance
-     */
-    public function save()
-    {
-        if ($this->exists()) {
-            return $this->update();
-        }
-        return $this->insert();
-    }
-
-    /**
-     * Delete this instance from database using ID
-     * @return integer Number of rows deleted (Max 1)
-     */
-    public function delete()
-    {
-        if (!$this->exists()) {
-            throw new \Exception('O identificador do patrimônio não foi informado');
-        }
-        $result = self::getDB()
-            ->deleteFrom('Patrimonios')
-            ->where('id', $this->getID())
-            ->execute();
-        return $result;
-    }
-
-    /**
      * Count all rows from database with matched condition critery
      * @param  array $condition condition to filter rows
      * @return integer Quantity of rows
@@ -908,26 +950,5 @@ class Patrimonio extends \MZ\Database\Helper
     {
         $query = self::query($condition);
         return $query->count();
-    }
-
-    /**
-     * Empresa a que esse bem pertence
-     * @return \MZ\Account\Cliente The object fetched from database
-     */
-    public function findEmpresaID()
-    {
-        return \MZ\Account\Cliente::findByID($this->getEmpresaID());
-    }
-
-    /**
-     * Fornecedor do bem
-     * @return \MZ\Stock\Fornecedor The object fetched from database
-     */
-    public function findFornecedorID()
-    {
-        if (is_null($this->getFornecedorID())) {
-            return new \MZ\Stock\Fornecedor();
-        }
-        return \MZ\Stock\Fornecedor::findByID($this->getFornecedorID());
     }
 }

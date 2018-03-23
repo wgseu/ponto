@@ -340,29 +340,120 @@ class ValorNutricional extends \MZ\Database\Helper
     }
 
     /**
-     * Find this object on database using, ID
-     * @param  int $id id to find Valor nutricional
-     * @return ValorNutricional A filled instance or empty when not found
+     * Insert a new Valor nutricional into the database and fill instance from database
+     * @return ValorNutricional Self instance
      */
-    public static function findByID($id)
+    public function insert()
     {
-        return self::find([
+        $values = $this->validate();
+        unset($values['id']);
+        try {
+            $id = self::getDB()->insertInto('Valores_Nutricionais')->values($values)->execute();
+            $valor_nutricional = self::findByID($id);
+            $this->fromArray($valor_nutricional->toArray());
+        } catch (\Exception $e) {
+            throw $this->translate($e);
+        }
+        return $this;
+    }
+
+    /**
+     * Update Valor nutricional with instance values into database for ID
+     * @return ValorNutricional Self instance
+     */
+    public function update()
+    {
+        $values = $this->validate();
+        if (!$this->exists()) {
+            throw new \Exception('O identificador do valor nutricional não foi informado');
+        }
+        unset($values['id']);
+        try {
+            self::getDB()
+                ->update('Valores_Nutricionais')
+                ->set($values)
+                ->where('id', $this->getID())
+                ->execute();
+            $valor_nutricional = self::findByID($this->getID());
+            $this->fromArray($valor_nutricional->toArray());
+        } catch (\Exception $e) {
+            throw $this->translate($e);
+        }
+        return $this;
+    }
+
+    /**
+     * Delete this instance from database using ID
+     * @return integer Number of rows deleted (Max 1)
+     */
+    public function delete()
+    {
+        if (!$this->exists()) {
+            throw new \Exception('O identificador do valor nutricional não foi informado');
+        }
+        $result = self::getDB()
+            ->deleteFrom('Valores_Nutricionais')
+            ->where('id', $this->getID())
+            ->execute();
+        return $result;
+    }
+
+    /**
+     * Load one register for it self with a condition
+     * @param  array $condition Condition for searching the row
+     * @param  array $order associative field name -> [-1, 1]
+     * @return ValorNutricional Self instance filled or empty
+     */
+    public function load($condition, $order = [])
+    {
+        $query = self::query($condition, $order)->limit(1);
+        $row = $query->fetch() ?: [];
+        return $this->fromArray($row);
+    }
+
+    /**
+     * Load into this object from database using, ID
+     * @param  int $id id to find Valor nutricional
+     * @return ValorNutricional Self filled instance or empty when not found
+     */
+    public function loadByID($id)
+    {
+        return $this->load([
             'id' => intval($id),
         ]);
     }
 
     /**
-     * Find this object on database using, InformacaoID, Nome
+     * Load into this object from database using, InformacaoID, Nome
      * @param  int $informacao_id informação to find Valor nutricional
      * @param  string $nome nome to find Valor nutricional
-     * @return ValorNutricional A filled instance or empty when not found
+     * @return ValorNutricional Self filled instance or empty when not found
      */
-    public static function findByInformacaoIDNome($informacao_id, $nome)
+    public function loadByInformacaoIDNome($informacao_id, $nome)
     {
-        return self::find([
+        return $this->load([
             'informacaoid' => intval($informacao_id),
             'nome' => strval($nome),
         ]);
+    }
+
+    /**
+     * Informe a que tabela nutricional este valor pertence
+     * @return \MZ\Product\Informacao The object fetched from database
+     */
+    public function findInformacaoID()
+    {
+        return \MZ\Product\Informacao::findByID($this->getInformacaoID());
+    }
+
+    /**
+     * Unidade de medida do valor nutricional, geralmente grama, exceto para
+     * valor energético
+     * @return \MZ\Product\Unidade The object fetched from database
+     */
+    public function findUnidadeID()
+    {
+        return \MZ\Product\Unidade::findByID($this->getUnidadeID());
     }
 
     /**
@@ -430,19 +521,43 @@ class ValorNutricional extends \MZ\Database\Helper
     public static function find($condition, $order = [])
     {
         $query = self::query($condition, $order)->limit(1);
-        $row = $query->fetch();
-        if ($row === false) {
-            $row = [];
-        }
+        $row = $query->fetch() ?: [];
         return new ValorNutricional($row);
     }
 
     /**
-     * Fetch all rows from database with matched condition critery
-     * @param  array $condition condition to filter rows
-     * @param  integer $limit number of rows to get, null for all
-     * @param  integer $offset start index to get rows, null for begining
-     * @return array All rows instanced and filled
+     * Find this object on database using, ID
+     * @param  int $id id to find Valor nutricional
+     * @return ValorNutricional A filled instance or empty when not found
+     */
+    public static function findByID($id)
+    {
+        return self::find([
+            'id' => intval($id),
+        ]);
+    }
+
+    /**
+     * Find this object on database using, InformacaoID, Nome
+     * @param  int $informacao_id informação to find Valor nutricional
+     * @param  string $nome nome to find Valor nutricional
+     * @return ValorNutricional A filled instance or empty when not found
+     */
+    public static function findByInformacaoIDNome($informacao_id, $nome)
+    {
+        return self::find([
+            'informacaoid' => intval($informacao_id),
+            'nome' => strval($nome),
+        ]);
+    }
+
+    /**
+     * Find all Valor nutricional
+     * @param  array  $condition Condition to get all Valor nutricional
+     * @param  array  $order     Order Valor nutricional
+     * @param  int    $limit     Limit data into row count
+     * @param  int    $offset    Start offset to get rows
+     * @return array             List of all rows instanced as ValorNutricional
      */
     public static function findAll($condition = [], $order = [], $limit = null, $offset = null)
     {
@@ -462,77 +577,6 @@ class ValorNutricional extends \MZ\Database\Helper
     }
 
     /**
-     * Insert a new Valor nutricional into the database and fill instance from database
-     * @return ValorNutricional Self instance
-     */
-    public function insert()
-    {
-        $values = $this->validate();
-        unset($values['id']);
-        try {
-            $id = self::getDB()->insertInto('Valores_Nutricionais')->values($values)->execute();
-            $valor_nutricional = self::findByID($id);
-            $this->fromArray($valor_nutricional->toArray());
-        } catch (\Exception $e) {
-            throw $this->translate($e);
-        }
-        return $this;
-    }
-
-    /**
-     * Update Valor nutricional with instance values into database for ID
-     * @return ValorNutricional Self instance
-     */
-    public function update()
-    {
-        $values = $this->validate();
-        if (!$this->exists()) {
-            throw new \Exception('O identificador do valor nutricional não foi informado');
-        }
-        unset($values['id']);
-        try {
-            self::getDB()
-                ->update('Valores_Nutricionais')
-                ->set($values)
-                ->where('id', $this->getID())
-                ->execute();
-            $valor_nutricional = self::findByID($this->getID());
-            $this->fromArray($valor_nutricional->toArray());
-        } catch (\Exception $e) {
-            throw $this->translate($e);
-        }
-        return $this;
-    }
-
-    /**
-     * Save the Valor nutricional into the database
-     * @return ValorNutricional Self instance
-     */
-    public function save()
-    {
-        if ($this->exists()) {
-            return $this->update();
-        }
-        return $this->insert();
-    }
-
-    /**
-     * Delete this instance from database using ID
-     * @return integer Number of rows deleted (Max 1)
-     */
-    public function delete()
-    {
-        if (!$this->exists()) {
-            throw new \Exception('O identificador do valor nutricional não foi informado');
-        }
-        $result = self::getDB()
-            ->deleteFrom('Valores_Nutricionais')
-            ->where('id', $this->getID())
-            ->execute();
-        return $result;
-    }
-
-    /**
      * Count all rows from database with matched condition critery
      * @param  array $condition condition to filter rows
      * @return integer Quantity of rows
@@ -541,24 +585,5 @@ class ValorNutricional extends \MZ\Database\Helper
     {
         $query = self::query($condition);
         return $query->count();
-    }
-
-    /**
-     * Informe a que tabela nutricional este valor pertence
-     * @return \MZ\Product\Informacao The object fetched from database
-     */
-    public function findInformacaoID()
-    {
-        return \MZ\Product\Informacao::findByID($this->getInformacaoID());
-    }
-
-    /**
-     * Unidade de medida do valor nutricional, geralmente grama, exceto para
-     * valor energético
-     * @return \MZ\Product\Unidade The object fetched from database
-     */
-    public function findUnidadeID()
-    {
-        return \MZ\Product\Unidade::findByID($this->getUnidadeID());
     }
 }

@@ -472,9 +472,7 @@ class FormaPagto extends \MZ\Database\Helper
         if (is_null($this->getTipo())) {
             $errors['tipo'] = 'O tipo não pode ser vazio';
         }
-        if (!is_null($this->getTipo()) &&
-            !array_key_exists($this->getTipo(), self::getTipoOptions())
-        ) {
+        if (!Validator::checkInSet($this->getTipo(), self::getTipoOptions(), true)) {
             $errors['tipo'] = 'O tipo é inválido';
         }
         if (is_null($this->getCarteiraID())) {
@@ -489,17 +487,13 @@ class FormaPagto extends \MZ\Database\Helper
         if (is_null($this->getParcelado())) {
             $errors['parcelado'] = 'O parcelado não pode ser vazio';
         }
-        if (!is_null($this->getParcelado()) &&
-            !array_key_exists($this->getParcelado(), self::getBooleanOptions())
-        ) {
+        if (!Validator::checkBoolean($this->getParcelado(), true)) {
             $errors['parcelado'] = 'O parcelado é inválido';
         }
         if (is_null($this->getAtiva())) {
             $errors['ativa'] = 'A ativa não pode ser vazia';
         }
-        if (!is_null($this->getAtiva()) &&
-            !array_key_exists($this->getAtiva(), self::getBooleanOptions())
-        ) {
+        if (!Validator::checkBoolean($this->getAtiva(), true)) {
             $errors['ativa'] = 'A ativa é inválida';
         }
         if (!empty($errors)) {
@@ -535,6 +529,120 @@ class FormaPagto extends \MZ\Database\Helper
     }
 
     /**
+     * Insert a new Forma de pagamento into the database and fill instance from database
+     * @return FormaPagto Self instance
+     */
+    public function insert()
+    {
+        $values = $this->validate();
+        unset($values['id']);
+        try {
+            $id = self::getDB()->insertInto('Formas_Pagto')->values($values)->execute();
+            $forma_pagto = self::findByID($id);
+            $this->fromArray($forma_pagto->toArray());
+        } catch (\Exception $e) {
+            throw $this->translate($e);
+        }
+        return $this;
+    }
+
+    /**
+     * Update Forma de pagamento with instance values into database for ID
+     * @return FormaPagto Self instance
+     */
+    public function update()
+    {
+        $values = $this->validate();
+        if (!$this->exists()) {
+            throw new \Exception('O identificador da forma de pagamento não foi informado');
+        }
+        unset($values['id']);
+        try {
+            self::getDB()
+                ->update('Formas_Pagto')
+                ->set($values)
+                ->where('id', $this->getID())
+                ->execute();
+            $forma_pagto = self::findByID($this->getID());
+            $this->fromArray($forma_pagto->toArray());
+        } catch (\Exception $e) {
+            throw $this->translate($e);
+        }
+        return $this;
+    }
+
+    /**
+     * Delete this instance from database using ID
+     * @return integer Number of rows deleted (Max 1)
+     */
+    public function delete()
+    {
+        if (!$this->exists()) {
+            throw new \Exception('O identificador da forma de pagamento não foi informado');
+        }
+        $result = self::getDB()
+            ->deleteFrom('Formas_Pagto')
+            ->where('id', $this->getID())
+            ->execute();
+        return $result;
+    }
+
+    /**
+     * Load one register for it self with a condition
+     * @param  array $condition Condition for searching the row
+     * @param  array $order associative field name -> [-1, 1]
+     * @return FormaPagto Self instance filled or empty
+     */
+    public function load($condition, $order = [])
+    {
+        $query = self::query($condition, $order)->limit(1);
+        $row = $query->fetch() ?: [];
+        return $this->fromArray($row);
+    }
+
+    /**
+     * Load into this object from database using, ID
+     * @param  int $id id to find Forma de pagamento
+     * @return FormaPagto Self filled instance or empty when not found
+     */
+    public function loadByID($id)
+    {
+        return $this->load([
+            'id' => intval($id),
+        ]);
+    }
+
+    /**
+     * Load into this object from database using, Descricao
+     * @param  string $descricao descrição to find Forma de pagamento
+     * @return FormaPagto Self filled instance or empty when not found
+     */
+    public function loadByDescricao($descricao)
+    {
+        return $this->load([
+            'descricao' => strval($descricao),
+        ]);
+    }
+
+    /**
+     * Carteira que será usada para entrada de valores no caixa
+     * @return \MZ\Wallet\Carteira The object fetched from database
+     */
+    public function findCarteiraID()
+    {
+        return \MZ\Wallet\Carteira::findByID($this->getCarteiraID());
+    }
+
+    /**
+     * Carteira de saída de valores do caixa
+     * @return \MZ\Wallet\Carteira The object fetched from database
+     */
+    public function findCarteiraPagtoID()
+    {
+        return \MZ\Wallet\Carteira::findByID($this->getCarteiraPagtoID());
+    }
+
+    /**
      * Gets textual and translated Tipo for FormaPagto
      * @param  int $index choose option from index
      * @return mixed A associative key -> translated representative text or text for index
@@ -553,30 +661,6 @@ class FormaPagto extends \MZ\Database\Helper
             return $options[$index];
         }
         return $options;
-    }
-
-    /**
-     * Find this object on database using, ID
-     * @param  int $id id to find Forma de pagamento
-     * @return FormaPagto A filled instance or empty when not found
-     */
-    public static function findByID($id)
-    {
-        return self::find([
-            'id' => intval($id),
-        ]);
-    }
-
-    /**
-     * Find this object on database using, Descricao
-     * @param  string $descricao descrição to find Forma de pagamento
-     * @return FormaPagto A filled instance or empty when not found
-     */
-    public static function findByDescricao($descricao)
-    {
-        return self::find([
-            'descricao' => strval($descricao),
-        ]);
     }
 
     /**
@@ -644,19 +728,41 @@ class FormaPagto extends \MZ\Database\Helper
     public static function find($condition, $order = [])
     {
         $query = self::query($condition, $order)->limit(1);
-        $row = $query->fetch();
-        if ($row === false) {
-            $row = [];
-        }
+        $row = $query->fetch() ?: [];
         return new FormaPagto($row);
     }
 
     /**
-     * Fetch all rows from database with matched condition critery
-     * @param  array $condition condition to filter rows
-     * @param  integer $limit number of rows to get, null for all
-     * @param  integer $offset start index to get rows, null for begining
-     * @return array All rows instanced and filled
+     * Find this object on database using, ID
+     * @param  int $id id to find Forma de pagamento
+     * @return FormaPagto A filled instance or empty when not found
+     */
+    public static function findByID($id)
+    {
+        return self::find([
+            'id' => intval($id),
+        ]);
+    }
+
+    /**
+     * Find this object on database using, Descricao
+     * @param  string $descricao descrição to find Forma de pagamento
+     * @return FormaPagto A filled instance or empty when not found
+     */
+    public static function findByDescricao($descricao)
+    {
+        return self::find([
+            'descricao' => strval($descricao),
+        ]);
+    }
+
+    /**
+     * Find all Forma de pagamento
+     * @param  array  $condition Condition to get all Forma de pagamento
+     * @param  array  $order     Order Forma de pagamento
+     * @param  int    $limit     Limit data into row count
+     * @param  int    $offset    Start offset to get rows
+     * @return array             List of all rows instanced as FormaPagto
      */
     public static function findAll($condition = [], $order = [], $limit = null, $offset = null)
     {
@@ -676,77 +782,6 @@ class FormaPagto extends \MZ\Database\Helper
     }
 
     /**
-     * Insert a new Forma de pagamento into the database and fill instance from database
-     * @return FormaPagto Self instance
-     */
-    public function insert()
-    {
-        $values = $this->validate();
-        unset($values['id']);
-        try {
-            $id = self::getDB()->insertInto('Formas_Pagto')->values($values)->execute();
-            $forma_pagto = self::findByID($id);
-            $this->fromArray($forma_pagto->toArray());
-        } catch (\Exception $e) {
-            throw $this->translate($e);
-        }
-        return $this;
-    }
-
-    /**
-     * Update Forma de pagamento with instance values into database for ID
-     * @return FormaPagto Self instance
-     */
-    public function update()
-    {
-        $values = $this->validate();
-        if (!$this->exists()) {
-            throw new \Exception('O identificador da forma de pagamento não foi informado');
-        }
-        unset($values['id']);
-        try {
-            self::getDB()
-                ->update('Formas_Pagto')
-                ->set($values)
-                ->where('id', $this->getID())
-                ->execute();
-            $forma_pagto = self::findByID($this->getID());
-            $this->fromArray($forma_pagto->toArray());
-        } catch (\Exception $e) {
-            throw $this->translate($e);
-        }
-        return $this;
-    }
-
-    /**
-     * Save the Forma de pagamento into the database
-     * @return FormaPagto Self instance
-     */
-    public function save()
-    {
-        if ($this->exists()) {
-            return $this->update();
-        }
-        return $this->insert();
-    }
-
-    /**
-     * Delete this instance from database using ID
-     * @return integer Number of rows deleted (Max 1)
-     */
-    public function delete()
-    {
-        if (!$this->exists()) {
-            throw new \Exception('O identificador da forma de pagamento não foi informado');
-        }
-        $result = self::getDB()
-            ->deleteFrom('Formas_Pagto')
-            ->where('id', $this->getID())
-            ->execute();
-        return $result;
-    }
-
-    /**
      * Count all rows from database with matched condition critery
      * @param  array $condition condition to filter rows
      * @return integer Quantity of rows
@@ -755,23 +790,5 @@ class FormaPagto extends \MZ\Database\Helper
     {
         $query = self::query($condition);
         return $query->count();
-    }
-
-    /**
-     * Carteira que será usada para entrada de valores no caixa
-     * @return \MZ\Wallet\Carteira The object fetched from database
-     */
-    public function findCarteiraID()
-    {
-        return \MZ\Wallet\Carteira::findByID($this->getCarteiraID());
-    }
-
-    /**
-     * Carteira de saída de valores do caixa
-     * @return \MZ\Wallet\Carteira The object fetched from database
-     */
-    public function findCarteiraPagtoID()
-    {
-        return \MZ\Wallet\Carteira::findByID($this->getCarteiraPagtoID());
     }
 }

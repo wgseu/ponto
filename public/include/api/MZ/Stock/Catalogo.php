@@ -411,9 +411,7 @@ class Catalogo extends \MZ\Database\Helper
         if (is_null($this->getLimitado())) {
             $errors['limitado'] = 'O limitado não pode ser vazio';
         }
-        if (!is_null($this->getLimitado()) &&
-            !array_key_exists($this->getLimitado(), self::getBooleanOptions())
-        ) {
+        if (!Validator::checkBoolean($this->getLimitado(), true)) {
             $errors['limitado'] = 'O limitado é inválido';
         }
         if (!empty($errors)) {
@@ -441,15 +439,105 @@ class Catalogo extends \MZ\Database\Helper
     }
 
     /**
-     * Find this object on database using, ID
-     * @param  int $id id to find Catálogo de produtos
-     * @return Catalogo A filled instance or empty when not found
+     * Insert a new Catálogo de produtos into the database and fill instance from database
+     * @return Catalogo Self instance
      */
-    public static function findByID($id)
+    public function insert()
     {
-        return self::find([
+        $values = $this->validate();
+        unset($values['id']);
+        try {
+            $id = self::getDB()->insertInto('Catalogos')->values($values)->execute();
+            $catalogo = self::findByID($id);
+            $this->fromArray($catalogo->toArray());
+        } catch (\Exception $e) {
+            throw $this->translate($e);
+        }
+        return $this;
+    }
+
+    /**
+     * Update Catálogo de produtos with instance values into database for ID
+     * @return Catalogo Self instance
+     */
+    public function update()
+    {
+        $values = $this->validate();
+        if (!$this->exists()) {
+            throw new \Exception('O identificador do catálogo de produtos não foi informado');
+        }
+        unset($values['id']);
+        try {
+            self::getDB()
+                ->update('Catalogos')
+                ->set($values)
+                ->where('id', $this->getID())
+                ->execute();
+            $catalogo = self::findByID($this->getID());
+            $this->fromArray($catalogo->toArray());
+        } catch (\Exception $e) {
+            throw $this->translate($e);
+        }
+        return $this;
+    }
+
+    /**
+     * Delete this instance from database using ID
+     * @return integer Number of rows deleted (Max 1)
+     */
+    public function delete()
+    {
+        if (!$this->exists()) {
+            throw new \Exception('O identificador do catálogo de produtos não foi informado');
+        }
+        $result = self::getDB()
+            ->deleteFrom('Catalogos')
+            ->where('id', $this->getID())
+            ->execute();
+        return $result;
+    }
+
+    /**
+     * Load one register for it self with a condition
+     * @param  array $condition Condition for searching the row
+     * @param  array $order associative field name -> [-1, 1]
+     * @return Catalogo Self instance filled or empty
+     */
+    public function load($condition, $order = [])
+    {
+        $query = self::query($condition, $order)->limit(1);
+        $row = $query->fetch() ?: [];
+        return $this->fromArray($row);
+    }
+
+    /**
+     * Load into this object from database using, ID
+     * @param  int $id id to find Catálogo de produtos
+     * @return Catalogo Self filled instance or empty when not found
+     */
+    public function loadByID($id)
+    {
+        return $this->load([
             'id' => intval($id),
         ]);
+    }
+
+    /**
+     * Produto consultado
+     * @return \MZ\Product\Produto The object fetched from database
+     */
+    public function findProdutoID()
+    {
+        return \MZ\Product\Produto::findByID($this->getProdutoID());
+    }
+
+    /**
+     * Fornecedor que possui o produto à venda
+     * @return \MZ\Stock\Fornecedor The object fetched from database
+     */
+    public function findFornecedorID()
+    {
+        return \MZ\Stock\Fornecedor::findByID($this->getFornecedorID());
     }
 
     /**
@@ -509,19 +597,29 @@ class Catalogo extends \MZ\Database\Helper
     public static function find($condition, $order = [])
     {
         $query = self::query($condition, $order)->limit(1);
-        $row = $query->fetch();
-        if ($row === false) {
-            $row = [];
-        }
+        $row = $query->fetch() ?: [];
         return new Catalogo($row);
     }
 
     /**
-     * Fetch all rows from database with matched condition critery
-     * @param  array $condition condition to filter rows
-     * @param  integer $limit number of rows to get, null for all
-     * @param  integer $offset start index to get rows, null for begining
-     * @return array All rows instanced and filled
+     * Find this object on database using, ID
+     * @param  int $id id to find Catálogo de produtos
+     * @return Catalogo A filled instance or empty when not found
+     */
+    public static function findByID($id)
+    {
+        return self::find([
+            'id' => intval($id),
+        ]);
+    }
+
+    /**
+     * Find all Catálogo de produtos
+     * @param  array  $condition Condition to get all Catálogo de produtos
+     * @param  array  $order     Order Catálogo de produtos
+     * @param  int    $limit     Limit data into row count
+     * @param  int    $offset    Start offset to get rows
+     * @return array             List of all rows instanced as Catalogo
      */
     public static function findAll($condition = [], $order = [], $limit = null, $offset = null)
     {
@@ -541,77 +639,6 @@ class Catalogo extends \MZ\Database\Helper
     }
 
     /**
-     * Insert a new Catálogo de produtos into the database and fill instance from database
-     * @return Catalogo Self instance
-     */
-    public function insert()
-    {
-        $values = $this->validate();
-        unset($values['id']);
-        try {
-            $id = self::getDB()->insertInto('Catalogos')->values($values)->execute();
-            $catalogo = self::findByID($id);
-            $this->fromArray($catalogo->toArray());
-        } catch (\Exception $e) {
-            throw $this->translate($e);
-        }
-        return $this;
-    }
-
-    /**
-     * Update Catálogo de produtos with instance values into database for ID
-     * @return Catalogo Self instance
-     */
-    public function update()
-    {
-        $values = $this->validate();
-        if (!$this->exists()) {
-            throw new \Exception('O identificador do catálogo de produtos não foi informado');
-        }
-        unset($values['id']);
-        try {
-            self::getDB()
-                ->update('Catalogos')
-                ->set($values)
-                ->where('id', $this->getID())
-                ->execute();
-            $catalogo = self::findByID($this->getID());
-            $this->fromArray($catalogo->toArray());
-        } catch (\Exception $e) {
-            throw $this->translate($e);
-        }
-        return $this;
-    }
-
-    /**
-     * Save the Catálogo de produtos into the database
-     * @return Catalogo Self instance
-     */
-    public function save()
-    {
-        if ($this->exists()) {
-            return $this->update();
-        }
-        return $this->insert();
-    }
-
-    /**
-     * Delete this instance from database using ID
-     * @return integer Number of rows deleted (Max 1)
-     */
-    public function delete()
-    {
-        if (!$this->exists()) {
-            throw new \Exception('O identificador do catálogo de produtos não foi informado');
-        }
-        $result = self::getDB()
-            ->deleteFrom('Catalogos')
-            ->where('id', $this->getID())
-            ->execute();
-        return $result;
-    }
-
-    /**
      * Count all rows from database with matched condition critery
      * @param  array $condition condition to filter rows
      * @return integer Quantity of rows
@@ -620,23 +647,5 @@ class Catalogo extends \MZ\Database\Helper
     {
         $query = self::query($condition);
         return $query->count();
-    }
-
-    /**
-     * Produto consultado
-     * @return \MZ\Product\Produto The object fetched from database
-     */
-    public function findProdutoID()
-    {
-        return \MZ\Product\Produto::findByID($this->getProdutoID());
-    }
-
-    /**
-     * Fornecedor que possui o produto à venda
-     * @return \MZ\Stock\Fornecedor The object fetched from database
-     */
-    public function findFornecedorID()
-    {
-        return \MZ\Stock\Fornecedor::findByID($this->getFornecedorID());
     }
 }

@@ -276,9 +276,7 @@ class Formacao extends \MZ\Database\Helper
         if (is_null($this->getTipo())) {
             $errors['tipo'] = 'O tipo não pode ser vazio';
         }
-        if (!is_null($this->getTipo()) &&
-            !array_key_exists($this->getTipo(), self::getTipoOptions())
-        ) {
+        if (!Validator::checkInSet($this->getTipo(), self::getTipoOptions(), true)) {
             $errors['tipo'] = 'O tipo é inválido';
         }
         if (!empty($errors)) {
@@ -318,6 +316,137 @@ class Formacao extends \MZ\Database\Helper
     }
 
     /**
+     * Insert a new Formação into the database and fill instance from database
+     * @return Formacao Self instance
+     */
+    public function insert()
+    {
+        $values = $this->validate();
+        unset($values['id']);
+        try {
+            $id = self::getDB()->insertInto('Formacoes')->values($values)->execute();
+            $formacao = self::findByID($id);
+            $this->fromArray($formacao->toArray());
+        } catch (\Exception $e) {
+            throw $this->translate($e);
+        }
+        return $this;
+    }
+
+    /**
+     * Update Formação with instance values into database for ID
+     * @return Formacao Self instance
+     */
+    public function update()
+    {
+        $values = $this->validate();
+        if (!$this->exists()) {
+            throw new \Exception('O identificador da formação não foi informado');
+        }
+        unset($values['id']);
+        try {
+            self::getDB()
+                ->update('Formacoes')
+                ->set($values)
+                ->where('id', $this->getID())
+                ->execute();
+            $formacao = self::findByID($this->getID());
+            $this->fromArray($formacao->toArray());
+        } catch (\Exception $e) {
+            throw $this->translate($e);
+        }
+        return $this;
+    }
+
+    /**
+     * Delete this instance from database using ID
+     * @return integer Number of rows deleted (Max 1)
+     */
+    public function delete()
+    {
+        if (!$this->exists()) {
+            throw new \Exception('O identificador da formação não foi informado');
+        }
+        $result = self::getDB()
+            ->deleteFrom('Formacoes')
+            ->where('id', $this->getID())
+            ->execute();
+        return $result;
+    }
+
+    /**
+     * Load one register for it self with a condition
+     * @param  array $condition Condition for searching the row
+     * @param  array $order associative field name -> [-1, 1]
+     * @return Formacao Self instance filled or empty
+     */
+    public function load($condition, $order = [])
+    {
+        $query = self::query($condition, $order)->limit(1);
+        $row = $query->fetch() ?: [];
+        return $this->fromArray($row);
+    }
+
+    /**
+     * Load into this object from database using, ID
+     * @param  int $id id to find Formação
+     * @return Formacao Self filled instance or empty when not found
+     */
+    public function loadByID($id)
+    {
+        return $this->load([
+            'id' => intval($id),
+        ]);
+    }
+
+    /**
+     * Load into this object from database using, ProdutoPedidoID, PacoteID
+     * @param  int $produto_pedido_id item do pedido to find Formação
+     * @param  int $pacote_id pacote to find Formação
+     * @return Formacao Self filled instance or empty when not found
+     */
+    public function loadByProdutoPedidoIDPacoteID($produto_pedido_id, $pacote_id)
+    {
+        return $this->load([
+            'produtopedidoid' => intval($produto_pedido_id),
+            'pacoteid' => intval($pacote_id),
+        ]);
+    }
+
+    /**
+     * Informa qual foi o produto vendido para essa formação
+     * @return \MZ\Sale\ProdutoPedido The object fetched from database
+     */
+    public function findProdutoPedidoID()
+    {
+        return \MZ\Sale\ProdutoPedido::findByID($this->getProdutoPedidoID());
+    }
+
+    /**
+     * Informa qual pacote foi selecionado no momento da venda
+     * @return \MZ\Product\Pacote The object fetched from database
+     */
+    public function findPacoteID()
+    {
+        if (is_null($this->getPacoteID())) {
+            return new \MZ\Product\Pacote();
+        }
+        return \MZ\Product\Pacote::findByID($this->getPacoteID());
+    }
+
+    /**
+     * Informa qual composição foi retirada ou adicionada no momento da venda
+     * @return \MZ\Product\Composicao The object fetched from database
+     */
+    public function findComposicaoID()
+    {
+        if (is_null($this->getComposicaoID())) {
+            return new \MZ\Product\Composicao();
+        }
+        return \MZ\Product\Composicao::findByID($this->getComposicaoID());
+    }
+
+    /**
      * Gets textual and translated Tipo for Formacao
      * @param  int $index choose option from index
      * @return mixed A associative key -> translated representative text or text for index
@@ -332,32 +461,6 @@ class Formacao extends \MZ\Database\Helper
             return $options[$index];
         }
         return $options;
-    }
-
-    /**
-     * Find this object on database using, ID
-     * @param  int $id id to find Formação
-     * @return Formacao A filled instance or empty when not found
-     */
-    public static function findByID($id)
-    {
-        return self::find([
-            'id' => intval($id),
-        ]);
-    }
-
-    /**
-     * Find this object on database using, ProdutoPedidoID, PacoteID
-     * @param  int $produto_pedido_id item do pedido to find Formação
-     * @param  int $pacote_id pacote to find Formação
-     * @return Formacao A filled instance or empty when not found
-     */
-    public static function findByProdutoPedidoIDPacoteID($produto_pedido_id, $pacote_id)
-    {
-        return self::find([
-            'produtopedidoid' => intval($produto_pedido_id),
-            'pacoteid' => intval($pacote_id),
-        ]);
     }
 
     /**
@@ -417,19 +520,43 @@ class Formacao extends \MZ\Database\Helper
     public static function find($condition, $order = [])
     {
         $query = self::query($condition, $order)->limit(1);
-        $row = $query->fetch();
-        if ($row === false) {
-            $row = [];
-        }
+        $row = $query->fetch() ?: [];
         return new Formacao($row);
     }
 
     /**
-     * Fetch all rows from database with matched condition critery
-     * @param  array $condition condition to filter rows
-     * @param  integer $limit number of rows to get, null for all
-     * @param  integer $offset start index to get rows, null for begining
-     * @return array All rows instanced and filled
+     * Find this object on database using, ID
+     * @param  int $id id to find Formação
+     * @return Formacao A filled instance or empty when not found
+     */
+    public static function findByID($id)
+    {
+        return self::find([
+            'id' => intval($id),
+        ]);
+    }
+
+    /**
+     * Find this object on database using, ProdutoPedidoID, PacoteID
+     * @param  int $produto_pedido_id item do pedido to find Formação
+     * @param  int $pacote_id pacote to find Formação
+     * @return Formacao A filled instance or empty when not found
+     */
+    public static function findByProdutoPedidoIDPacoteID($produto_pedido_id, $pacote_id)
+    {
+        return self::find([
+            'produtopedidoid' => intval($produto_pedido_id),
+            'pacoteid' => intval($pacote_id),
+        ]);
+    }
+
+    /**
+     * Find all Formação
+     * @param  array  $condition Condition to get all Formação
+     * @param  array  $order     Order Formação
+     * @param  int    $limit     Limit data into row count
+     * @param  int    $offset    Start offset to get rows
+     * @return array             List of all rows instanced as Formacao
      */
     public static function findAll($condition = [], $order = [], $limit = null, $offset = null)
     {
@@ -449,77 +576,6 @@ class Formacao extends \MZ\Database\Helper
     }
 
     /**
-     * Insert a new Formação into the database and fill instance from database
-     * @return Formacao Self instance
-     */
-    public function insert()
-    {
-        $values = $this->validate();
-        unset($values['id']);
-        try {
-            $id = self::getDB()->insertInto('Formacoes')->values($values)->execute();
-            $formacao = self::findByID($id);
-            $this->fromArray($formacao->toArray());
-        } catch (\Exception $e) {
-            throw $this->translate($e);
-        }
-        return $this;
-    }
-
-    /**
-     * Update Formação with instance values into database for ID
-     * @return Formacao Self instance
-     */
-    public function update()
-    {
-        $values = $this->validate();
-        if (!$this->exists()) {
-            throw new \Exception('O identificador da formação não foi informado');
-        }
-        unset($values['id']);
-        try {
-            self::getDB()
-                ->update('Formacoes')
-                ->set($values)
-                ->where('id', $this->getID())
-                ->execute();
-            $formacao = self::findByID($this->getID());
-            $this->fromArray($formacao->toArray());
-        } catch (\Exception $e) {
-            throw $this->translate($e);
-        }
-        return $this;
-    }
-
-    /**
-     * Save the Formação into the database
-     * @return Formacao Self instance
-     */
-    public function save()
-    {
-        if ($this->exists()) {
-            return $this->update();
-        }
-        return $this->insert();
-    }
-
-    /**
-     * Delete this instance from database using ID
-     * @return integer Number of rows deleted (Max 1)
-     */
-    public function delete()
-    {
-        if (!$this->exists()) {
-            throw new \Exception('O identificador da formação não foi informado');
-        }
-        $result = self::getDB()
-            ->deleteFrom('Formacoes')
-            ->where('id', $this->getID())
-            ->execute();
-        return $result;
-    }
-
-    /**
      * Count all rows from database with matched condition critery
      * @param  array $condition condition to filter rows
      * @return integer Quantity of rows
@@ -528,38 +584,5 @@ class Formacao extends \MZ\Database\Helper
     {
         $query = self::query($condition);
         return $query->count();
-    }
-
-    /**
-     * Informa qual foi o produto vendido para essa formação
-     * @return \MZ\Sale\ProdutoPedido The object fetched from database
-     */
-    public function findProdutoPedidoID()
-    {
-        return \MZ\Sale\ProdutoPedido::findByID($this->getProdutoPedidoID());
-    }
-
-    /**
-     * Informa qual pacote foi selecionado no momento da venda
-     * @return \MZ\Product\Pacote The object fetched from database
-     */
-    public function findPacoteID()
-    {
-        if (is_null($this->getPacoteID())) {
-            return new \MZ\Product\Pacote();
-        }
-        return \MZ\Product\Pacote::findByID($this->getPacoteID());
-    }
-
-    /**
-     * Informa qual composição foi retirada ou adicionada no momento da venda
-     * @return \MZ\Product\Composicao The object fetched from database
-     */
-    public function findComposicaoID()
-    {
-        if (is_null($this->getComposicaoID())) {
-            return new \MZ\Product\Composicao();
-        }
-        return \MZ\Product\Composicao::findByID($this->getComposicaoID());
     }
 }

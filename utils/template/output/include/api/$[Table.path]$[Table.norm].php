@@ -235,7 +235,17 @@ $[field.each(all)]
 $[field.if(image|blob)]
         $$[table.unix]['$[field]'] = $this->make$[Field.norm]($[field.if(array)]$[field.array.number]$[field.end]);
 $[field.else.if(masked)]
+$[field.contains(fone)]
+        $$[table.unix]['$[field]'] = \MZ\Util\Mask::phone($$[table.unix]['$[field]']);
+$[field.else.match(cpf)]
+        $$[table.unix]['$[field]'] = \MZ\Util\Mask::cpf($$[table.unix]['$[field]']);
+$[field.else.match(cep)]
         $$[table.unix]['$[field]'] = \MZ\Util\Mask::cep($$[table.unix]['$[field]']);
+$[field.else.match(cnpj)]
+        $$[table.unix]['$[field]'] = \MZ\Util\Mask::cnpj($$[table.unix]['$[field]']);
+$[field.else]
+        $$[table.unix]['$[field]'] = \MZ\Util\Mask::mask($$[table.unix]['$[field]'], _p('$[field.unix].mask'));
+$[field.end]
 $[field.else.match(ip|senha|password|secreto|salt|deletado)]
         unset($$[table.unix]['$[field]']);
 $[field.end]
@@ -299,7 +309,7 @@ $[field.end]
 $[field.each(all)]
 $[field.if(image)]
         if (!is_null($this->get$[Field.norm]($[field.if(array)]$[field.array.number]$[field.end])) && $dependency->get$[Field.norm]($[field.if(array)]$[field.array.number]$[field.end]) != $this->get$[Field.norm]($[field.if(array)]$[field.array.number]$[field.end])) {
-            unlink(get_image_path($this->get$[Field.norm]($[field.if(array)]$[field.array.number]$[field.end]), '$[field.image.folder]'));
+            @unlink(get_image_path($this->get$[Field.norm]($[field.if(array)]$[field.array.number]$[field.end]), '$[field.image.folder]'));
         }
         $this->set$[Field.norm]($[field.if(array)]$[field.array.number], $[field.end]$dependency->get$[Field.norm]($[field.if(array)]$[field.array.number]$[field.end]));
 $[field.else.if(blob)]

@@ -812,33 +812,25 @@ class ProdutoPedido extends \MZ\Database\Helper
         if (is_null($this->getEstado())) {
             $errors['estado'] = 'O estado não pode ser vazio';
         }
-        if (!is_null($this->getEstado()) &&
-            !array_key_exists($this->getEstado(), self::getEstadoOptions())
-        ) {
+        if (!Validator::checkInSet($this->getEstado(), self::getEstadoOptions(), true)) {
             $errors['estado'] = 'O estado é inválido';
         }
         if (is_null($this->getVisualizado())) {
             $errors['visualizado'] = 'O visualizado não pode ser vazio';
         }
-        if (!is_null($this->getVisualizado()) &&
-            !array_key_exists($this->getVisualizado(), self::getBooleanOptions())
-        ) {
+        if (!Validator::checkBoolean($this->getVisualizado(), true)) {
             $errors['visualizado'] = 'O visualizado é inválido';
         }
         if (is_null($this->getCancelado())) {
             $errors['cancelado'] = 'O cancelado não pode ser vazio';
         }
-        if (!is_null($this->getCancelado()) &&
-            !array_key_exists($this->getCancelado(), self::getBooleanOptions())
-        ) {
+        if (!Validator::checkBoolean($this->getCancelado(), true)) {
             $errors['cancelado'] = 'O cancelado é inválido';
         }
         if (is_null($this->getDesperdicado())) {
             $errors['desperdicado'] = 'O desperdiçado não pode ser vazio';
         }
-        if (!is_null($this->getDesperdicado()) &&
-            !array_key_exists($this->getDesperdicado(), self::getBooleanOptions())
-        ) {
+        if (!Validator::checkBoolean($this->getDesperdicado(), true)) {
             $errors['desperdicado'] = 'O desperdiçado é inválido';
         }
         if (is_null($this->getDataHora())) {
@@ -869,6 +861,144 @@ class ProdutoPedido extends \MZ\Database\Helper
     }
 
     /**
+     * Insert a new Item do pedido into the database and fill instance from database
+     * @return ProdutoPedido Self instance
+     */
+    public function insert()
+    {
+        $values = $this->validate();
+        unset($values['id']);
+        try {
+            $id = self::getDB()->insertInto('Produtos_Pedidos')->values($values)->execute();
+            $produto_pedido = self::findByID($id);
+            $this->fromArray($produto_pedido->toArray());
+        } catch (\Exception $e) {
+            throw $this->translate($e);
+        }
+        return $this;
+    }
+
+    /**
+     * Update Item do pedido with instance values into database for ID
+     * @return ProdutoPedido Self instance
+     */
+    public function update()
+    {
+        $values = $this->validate();
+        if (!$this->exists()) {
+            throw new \Exception('O identificador do item do pedido não foi informado');
+        }
+        unset($values['id']);
+        try {
+            self::getDB()
+                ->update('Produtos_Pedidos')
+                ->set($values)
+                ->where('id', $this->getID())
+                ->execute();
+            $produto_pedido = self::findByID($this->getID());
+            $this->fromArray($produto_pedido->toArray());
+        } catch (\Exception $e) {
+            throw $this->translate($e);
+        }
+        return $this;
+    }
+
+    /**
+     * Delete this instance from database using ID
+     * @return integer Number of rows deleted (Max 1)
+     */
+    public function delete()
+    {
+        if (!$this->exists()) {
+            throw new \Exception('O identificador do item do pedido não foi informado');
+        }
+        $result = self::getDB()
+            ->deleteFrom('Produtos_Pedidos')
+            ->where('id', $this->getID())
+            ->execute();
+        return $result;
+    }
+
+    /**
+     * Load one register for it self with a condition
+     * @param  array $condition Condition for searching the row
+     * @param  array $order associative field name -> [-1, 1]
+     * @return ProdutoPedido Self instance filled or empty
+     */
+    public function load($condition, $order = [])
+    {
+        $query = self::query($condition, $order)->limit(1);
+        $row = $query->fetch() ?: [];
+        return $this->fromArray($row);
+    }
+
+    /**
+     * Load into this object from database using, ID
+     * @param  int $id id to find Item do pedido
+     * @return ProdutoPedido Self filled instance or empty when not found
+     */
+    public function loadByID($id)
+    {
+        return $this->load([
+            'id' => intval($id),
+        ]);
+    }
+
+    /**
+     * Pedido a qual pertence esse item
+     * @return \MZ\Sale\Pedido The object fetched from database
+     */
+    public function findPedidoID()
+    {
+        return \MZ\Sale\Pedido::findByID($this->getPedidoID());
+    }
+
+    /**
+     * Funcionário que lançou esse item no pedido
+     * @return \MZ\Employee\Funcionario The object fetched from database
+     */
+    public function findFuncionarioID()
+    {
+        return \MZ\Employee\Funcionario::findByID($this->getFuncionarioID());
+    }
+
+    /**
+     * Produto vendido
+     * @return \MZ\Product\Produto The object fetched from database
+     */
+    public function findProdutoID()
+    {
+        if (is_null($this->getProdutoID())) {
+            return new \MZ\Product\Produto();
+        }
+        return \MZ\Product\Produto::findByID($this->getProdutoID());
+    }
+
+    /**
+     * Serviço cobrado ou taxa
+     * @return \MZ\Product\Servico The object fetched from database
+     */
+    public function findServicoID()
+    {
+        if (is_null($this->getServicoID())) {
+            return new \MZ\Product\Servico();
+        }
+        return \MZ\Product\Servico::findByID($this->getServicoID());
+    }
+
+    /**
+     * Pacote em que esse item faz parte
+     * @return \MZ\Sale\ProdutoPedido The object fetched from database
+     */
+    public function findProdutoPedidoID()
+    {
+        if (is_null($this->getProdutoPedidoID())) {
+            return new \MZ\Sale\ProdutoPedido();
+        }
+        return \MZ\Sale\ProdutoPedido::findByID($this->getProdutoPedidoID());
+    }
+
+    /**
      * Gets textual and translated Estado for ProdutoPedido
      * @param  int $index choose option from index
      * @return mixed A associative key -> translated representative text or text for index
@@ -887,18 +1017,6 @@ class ProdutoPedido extends \MZ\Database\Helper
             return $options[$index];
         }
         return $options;
-    }
-
-    /**
-     * Find this object on database using, ID
-     * @param  int $id id to find Item do pedido
-     * @return ProdutoPedido A filled instance or empty when not found
-     */
-    public static function findByID($id)
-    {
-        return self::find([
-            'id' => intval($id),
-        ]);
     }
 
     /**
@@ -958,19 +1076,29 @@ class ProdutoPedido extends \MZ\Database\Helper
     public static function find($condition, $order = [])
     {
         $query = self::query($condition, $order)->limit(1);
-        $row = $query->fetch();
-        if ($row === false) {
-            $row = [];
-        }
+        $row = $query->fetch() ?: [];
         return new ProdutoPedido($row);
     }
 
     /**
-     * Fetch all rows from database with matched condition critery
-     * @param  array $condition condition to filter rows
-     * @param  integer $limit number of rows to get, null for all
-     * @param  integer $offset start index to get rows, null for begining
-     * @return array All rows instanced and filled
+     * Find this object on database using, ID
+     * @param  int $id id to find Item do pedido
+     * @return ProdutoPedido A filled instance or empty when not found
+     */
+    public static function findByID($id)
+    {
+        return self::find([
+            'id' => intval($id),
+        ]);
+    }
+
+    /**
+     * Find all Item do pedido
+     * @param  array  $condition Condition to get all Item do pedido
+     * @param  array  $order     Order Item do pedido
+     * @param  int    $limit     Limit data into row count
+     * @param  int    $offset    Start offset to get rows
+     * @return array             List of all rows instanced as ProdutoPedido
      */
     public static function findAll($condition = [], $order = [], $limit = null, $offset = null)
     {
@@ -990,77 +1118,6 @@ class ProdutoPedido extends \MZ\Database\Helper
     }
 
     /**
-     * Insert a new Item do pedido into the database and fill instance from database
-     * @return ProdutoPedido Self instance
-     */
-    public function insert()
-    {
-        $values = $this->validate();
-        unset($values['id']);
-        try {
-            $id = self::getDB()->insertInto('Produtos_Pedidos')->values($values)->execute();
-            $produto_pedido = self::findByID($id);
-            $this->fromArray($produto_pedido->toArray());
-        } catch (\Exception $e) {
-            throw $this->translate($e);
-        }
-        return $this;
-    }
-
-    /**
-     * Update Item do pedido with instance values into database for ID
-     * @return ProdutoPedido Self instance
-     */
-    public function update()
-    {
-        $values = $this->validate();
-        if (!$this->exists()) {
-            throw new \Exception('O identificador do item do pedido não foi informado');
-        }
-        unset($values['id']);
-        try {
-            self::getDB()
-                ->update('Produtos_Pedidos')
-                ->set($values)
-                ->where('id', $this->getID())
-                ->execute();
-            $produto_pedido = self::findByID($this->getID());
-            $this->fromArray($produto_pedido->toArray());
-        } catch (\Exception $e) {
-            throw $this->translate($e);
-        }
-        return $this;
-    }
-
-    /**
-     * Save the Item do pedido into the database
-     * @return ProdutoPedido Self instance
-     */
-    public function save()
-    {
-        if ($this->exists()) {
-            return $this->update();
-        }
-        return $this->insert();
-    }
-
-    /**
-     * Delete this instance from database using ID
-     * @return integer Number of rows deleted (Max 1)
-     */
-    public function delete()
-    {
-        if (!$this->exists()) {
-            throw new \Exception('O identificador do item do pedido não foi informado');
-        }
-        $result = self::getDB()
-            ->deleteFrom('Produtos_Pedidos')
-            ->where('id', $this->getID())
-            ->execute();
-        return $result;
-    }
-
-    /**
      * Count all rows from database with matched condition critery
      * @param  array $condition condition to filter rows
      * @return integer Quantity of rows
@@ -1069,59 +1126,5 @@ class ProdutoPedido extends \MZ\Database\Helper
     {
         $query = self::query($condition);
         return $query->count();
-    }
-
-    /**
-     * Pedido a qual pertence esse item
-     * @return \MZ\Sale\Pedido The object fetched from database
-     */
-    public function findPedidoID()
-    {
-        return \MZ\Sale\Pedido::findByID($this->getPedidoID());
-    }
-
-    /**
-     * Funcionário que lançou esse item no pedido
-     * @return \MZ\Employee\Funcionario The object fetched from database
-     */
-    public function findFuncionarioID()
-    {
-        return \MZ\Employee\Funcionario::findByID($this->getFuncionarioID());
-    }
-
-    /**
-     * Produto vendido
-     * @return \MZ\Product\Produto The object fetched from database
-     */
-    public function findProdutoID()
-    {
-        if (is_null($this->getProdutoID())) {
-            return new \MZ\Product\Produto();
-        }
-        return \MZ\Product\Produto::findByID($this->getProdutoID());
-    }
-
-    /**
-     * Serviço cobrado ou taxa
-     * @return \MZ\Product\Servico The object fetched from database
-     */
-    public function findServicoID()
-    {
-        if (is_null($this->getServicoID())) {
-            return new \MZ\Product\Servico();
-        }
-        return \MZ\Product\Servico::findByID($this->getServicoID());
-    }
-
-    /**
-     * Pacote em que esse item faz parte
-     * @return \MZ\Sale\ProdutoPedido The object fetched from database
-     */
-    public function findProdutoPedidoID()
-    {
-        if (is_null($this->getProdutoPedidoID())) {
-            return new \MZ\Sale\ProdutoPedido();
-        }
-        return \MZ\Sale\ProdutoPedido::findByID($this->getProdutoPedidoID());
     }
 }

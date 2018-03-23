@@ -445,9 +445,7 @@ class Funcionario extends \MZ\Database\Helper
         if (is_null($this->getAtivo())) {
             $errors['ativo'] = 'O ativo não pode ser vazio';
         }
-        if (!is_null($this->getAtivo()) &&
-            !array_key_exists($this->getAtivo(), self::getBooleanOptions())
-        ) {
+        if (!Validator::checkBoolean($this->getAtivo(), true)) {
             $errors['ativo'] = 'O ativo é inválido';
         }
         if (is_null($this->getDataCadastro())) {
@@ -494,39 +492,130 @@ class Funcionario extends \MZ\Database\Helper
     }
 
     /**
-     * Find this object on database using, ID
-     * @param  int $id código to find Funcionário
-     * @return Funcionario A filled instance or empty when not found
+     * Insert a new Funcionário into the database and fill instance from database
+     * @return Funcionario Self instance
      */
-    public static function findByID($id)
+    public function insert()
     {
-        return self::find([
+        $values = $this->validate();
+        unset($values['id']);
+        try {
+            $id = self::getDB()->insertInto('Funcionarios')->values($values)->execute();
+            $funcionario = self::findByID($id);
+            $this->fromArray($funcionario->toArray());
+        } catch (\Exception $e) {
+            throw $this->translate($e);
+        }
+        return $this;
+    }
+
+    /**
+     * Update Funcionário with instance values into database for Código
+     * @return Funcionario Self instance
+     */
+    public function update()
+    {
+        $values = $this->validate();
+        if (!$this->exists()) {
+            throw new \Exception('O identificador do funcionário não foi informado');
+        }
+        unset($values['id']);
+        try {
+            self::getDB()
+                ->update('Funcionarios')
+                ->set($values)
+                ->where('id', $this->getID())
+                ->execute();
+            $funcionario = self::findByID($this->getID());
+            $this->fromArray($funcionario->toArray());
+        } catch (\Exception $e) {
+            throw $this->translate($e);
+        }
+        return $this;
+    }
+
+    /**
+     * Delete this instance from database using Código
+     * @return integer Number of rows deleted (Max 1)
+     */
+    public function delete()
+    {
+        if (!$this->exists()) {
+            throw new \Exception('O identificador do funcionário não foi informado');
+        }
+        $result = self::getDB()
+            ->deleteFrom('Funcionarios')
+            ->where('id', $this->getID())
+            ->execute();
+        return $result;
+    }
+
+    /**
+     * Load one register for it self with a condition
+     * @param  array $condition Condition for searching the row
+     * @param  array $order associative field name -> [-1, 1]
+     * @return Funcionario Self instance filled or empty
+     */
+    public function load($condition, $order = [])
+    {
+        $query = self::query($condition, $order)->limit(1);
+        $row = $query->fetch() ?: [];
+        return $this->fromArray($row);
+    }
+
+    /**
+     * Load into this object from database using, ID
+     * @param  int $id código to find Funcionário
+     * @return Funcionario Self filled instance or empty when not found
+     */
+    public function loadByID($id)
+    {
+        return $this->load([
             'id' => intval($id),
         ]);
     }
 
     /**
-     * Find this object on database using, ClienteID
+     * Load into this object from database using, ClienteID
      * @param  int $cliente_id cliente to find Funcionário
-     * @return Funcionario A filled instance or empty when not found
+     * @return Funcionario Self filled instance or empty when not found
      */
-    public static function findByClienteID($cliente_id)
+    public function loadByClienteID($cliente_id)
     {
-        return self::find([
+        return $this->load([
             'clienteid' => intval($cliente_id),
         ]);
     }
 
     /**
-     * Find this object on database using, CodigoBarras
+     * Load into this object from database using, CodigoBarras
      * @param  string $codigo_barras código de barras to find Funcionário
-     * @return Funcionario A filled instance or empty when not found
+     * @return Funcionario Self filled instance or empty when not found
      */
-    public static function findByCodigoBarras($codigo_barras)
+    public function loadByCodigoBarras($codigo_barras)
     {
-        return self::find([
+        return $this->load([
             'codigobarras' => strval($codigo_barras),
         ]);
+    }
+
+    /**
+     * Função do funcionário na empresa
+     * @return \MZ\Employee\Funcao The object fetched from database
+     */
+    public function findFuncaoID()
+    {
+        return \MZ\Employee\Funcao::findByID($this->getFuncaoID());
+    }
+
+    /**
+     * Cliente que representa esse funcionário, único no cadastro de
+     * funcionários
+     * @return \MZ\Account\Cliente The object fetched from database
+     */
+    public function findClienteID()
+    {
+        return \MZ\Account\Cliente::findByID($this->getClienteID());
     }
 
     /**
@@ -586,19 +675,53 @@ class Funcionario extends \MZ\Database\Helper
     public static function find($condition, $order = [])
     {
         $query = self::query($condition, $order)->limit(1);
-        $row = $query->fetch();
-        if ($row === false) {
-            $row = [];
-        }
+        $row = $query->fetch() ?: [];
         return new Funcionario($row);
     }
 
     /**
-     * Fetch all rows from database with matched condition critery
-     * @param  array $condition condition to filter rows
-     * @param  integer $limit number of rows to get, null for all
-     * @param  integer $offset start index to get rows, null for begining
-     * @return array All rows instanced and filled
+     * Find this object on database using, ID
+     * @param  int $id código to find Funcionário
+     * @return Funcionario A filled instance or empty when not found
+     */
+    public static function findByID($id)
+    {
+        return self::find([
+            'id' => intval($id),
+        ]);
+    }
+
+    /**
+     * Find this object on database using, ClienteID
+     * @param  int $cliente_id cliente to find Funcionário
+     * @return Funcionario A filled instance or empty when not found
+     */
+    public static function findByClienteID($cliente_id)
+    {
+        return self::find([
+            'clienteid' => intval($cliente_id),
+        ]);
+    }
+
+    /**
+     * Find this object on database using, CodigoBarras
+     * @param  string $codigo_barras código de barras to find Funcionário
+     * @return Funcionario A filled instance or empty when not found
+     */
+    public static function findByCodigoBarras($codigo_barras)
+    {
+        return self::find([
+            'codigobarras' => strval($codigo_barras),
+        ]);
+    }
+
+    /**
+     * Find all Funcionário
+     * @param  array  $condition Condition to get all Funcionário
+     * @param  array  $order     Order Funcionário
+     * @param  int    $limit     Limit data into row count
+     * @param  int    $offset    Start offset to get rows
+     * @return array             List of all rows instanced as Funcionario
      */
     public static function findAll($condition = [], $order = [], $limit = null, $offset = null)
     {
@@ -618,77 +741,6 @@ class Funcionario extends \MZ\Database\Helper
     }
 
     /**
-     * Insert a new Funcionário into the database and fill instance from database
-     * @return Funcionario Self instance
-     */
-    public function insert()
-    {
-        $values = $this->validate();
-        unset($values['id']);
-        try {
-            $id = self::getDB()->insertInto('Funcionarios')->values($values)->execute();
-            $funcionario = self::findByID($id);
-            $this->fromArray($funcionario->toArray());
-        } catch (\Exception $e) {
-            throw $this->translate($e);
-        }
-        return $this;
-    }
-
-    /**
-     * Update Funcionário with instance values into database for Código
-     * @return Funcionario Self instance
-     */
-    public function update()
-    {
-        $values = $this->validate();
-        if (!$this->exists()) {
-            throw new \Exception('O identificador do funcionário não foi informado');
-        }
-        unset($values['id']);
-        try {
-            self::getDB()
-                ->update('Funcionarios')
-                ->set($values)
-                ->where('id', $this->getID())
-                ->execute();
-            $funcionario = self::findByID($this->getID());
-            $this->fromArray($funcionario->toArray());
-        } catch (\Exception $e) {
-            throw $this->translate($e);
-        }
-        return $this;
-    }
-
-    /**
-     * Save the Funcionário into the database
-     * @return Funcionario Self instance
-     */
-    public function save()
-    {
-        if ($this->exists()) {
-            return $this->update();
-        }
-        return $this->insert();
-    }
-
-    /**
-     * Delete this instance from database using Código
-     * @return integer Number of rows deleted (Max 1)
-     */
-    public function delete()
-    {
-        if (!$this->exists()) {
-            throw new \Exception('O identificador do funcionário não foi informado');
-        }
-        $result = self::getDB()
-            ->deleteFrom('Funcionarios')
-            ->where('id', $this->getID())
-            ->execute();
-        return $result;
-    }
-
-    /**
      * Count all rows from database with matched condition critery
      * @param  array $condition condition to filter rows
      * @return integer Quantity of rows
@@ -697,24 +749,5 @@ class Funcionario extends \MZ\Database\Helper
     {
         $query = self::query($condition);
         return $query->count();
-    }
-
-    /**
-     * Função do funcionário na empresa
-     * @return \MZ\Employee\Funcao The object fetched from database
-     */
-    public function findFuncaoID()
-    {
-        return \MZ\Employee\Funcao::findByID($this->getFuncaoID());
-    }
-
-    /**
-     * Cliente que representa esse funcionário, único no cadastro de
-     * funcionários
-     * @return \MZ\Account\Cliente The object fetched from database
-     */
-    public function findClienteID()
-    {
-        return \MZ\Account\Cliente::findByID($this->getClienteID());
     }
 }

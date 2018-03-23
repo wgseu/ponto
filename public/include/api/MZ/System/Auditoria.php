@@ -340,17 +340,13 @@ class Auditoria extends \MZ\Database\Helper
         if (is_null($this->getTipo())) {
             $errors['tipo'] = 'O tipo não pode ser vazio';
         }
-        if (!is_null($this->getTipo()) &&
-            !array_key_exists($this->getTipo(), self::getTipoOptions())
-        ) {
+        if (!Validator::checkInSet($this->getTipo(), self::getTipoOptions(), true)) {
             $errors['tipo'] = 'O tipo é inválido';
         }
         if (is_null($this->getPrioridade())) {
             $errors['prioridade'] = 'A prioridade não pode ser vazia';
         }
-        if (!is_null($this->getPrioridade()) &&
-            !array_key_exists($this->getPrioridade(), self::getPrioridadeOptions())
-        ) {
+        if (!Validator::checkInSet($this->getPrioridade(), self::getPrioridadeOptions(), true)) {
             $errors['prioridade'] = 'A prioridade é inválida';
         }
         if (is_null($this->getDescricao())) {
@@ -381,6 +377,108 @@ class Auditoria extends \MZ\Database\Helper
             ]);
         }
         return parent::translate($e);
+    }
+
+    /**
+     * Insert a new Auditoria into the database and fill instance from database
+     * @return Auditoria Self instance
+     */
+    public function insert()
+    {
+        $values = $this->validate();
+        unset($values['id']);
+        try {
+            $id = self::getDB()->insertInto('Auditoria')->values($values)->execute();
+            $auditoria = self::findByID($id);
+            $this->fromArray($auditoria->toArray());
+        } catch (\Exception $e) {
+            throw $this->translate($e);
+        }
+        return $this;
+    }
+
+    /**
+     * Update Auditoria with instance values into database for ID
+     * @return Auditoria Self instance
+     */
+    public function update()
+    {
+        $values = $this->validate();
+        if (!$this->exists()) {
+            throw new \Exception('O identificador da auditoria não foi informado');
+        }
+        unset($values['id']);
+        try {
+            self::getDB()
+                ->update('Auditoria')
+                ->set($values)
+                ->where('id', $this->getID())
+                ->execute();
+            $auditoria = self::findByID($this->getID());
+            $this->fromArray($auditoria->toArray());
+        } catch (\Exception $e) {
+            throw $this->translate($e);
+        }
+        return $this;
+    }
+
+    /**
+     * Delete this instance from database using ID
+     * @return integer Number of rows deleted (Max 1)
+     */
+    public function delete()
+    {
+        if (!$this->exists()) {
+            throw new \Exception('O identificador da auditoria não foi informado');
+        }
+        $result = self::getDB()
+            ->deleteFrom('Auditoria')
+            ->where('id', $this->getID())
+            ->execute();
+        return $result;
+    }
+
+    /**
+     * Load one register for it self with a condition
+     * @param  array $condition Condition for searching the row
+     * @param  array $order associative field name -> [-1, 1]
+     * @return Auditoria Self instance filled or empty
+     */
+    public function load($condition, $order = [])
+    {
+        $query = self::query($condition, $order)->limit(1);
+        $row = $query->fetch() ?: [];
+        return $this->fromArray($row);
+    }
+
+    /**
+     * Load into this object from database using, ID
+     * @param  int $id id to find Auditoria
+     * @return Auditoria Self filled instance or empty when not found
+     */
+    public function loadByID($id)
+    {
+        return $this->load([
+            'id' => intval($id),
+        ]);
+    }
+
+    /**
+     * Funcionário que exerceu a atividade
+     * @return \MZ\Employee\Funcionario The object fetched from database
+     */
+    public function findFuncionarioID()
+    {
+        return \MZ\Employee\Funcionario::findByID($this->getFuncionarioID());
+    }
+
+    /**
+     * Funcionário que autorizou o acesso ao recurso descrito
+     * @return \MZ\Employee\Funcionario The object fetched from database
+     */
+    public function findAutorizadorID()
+    {
+        return \MZ\Employee\Funcionario::findByID($this->getAutorizadorID());
     }
 
     /**
@@ -416,18 +514,6 @@ class Auditoria extends \MZ\Database\Helper
             return $options[$index];
         }
         return $options;
-    }
-
-    /**
-     * Find this object on database using, ID
-     * @param  int $id id to find Auditoria
-     * @return Auditoria A filled instance or empty when not found
-     */
-    public static function findByID($id)
-    {
-        return self::find([
-            'id' => intval($id),
-        ]);
     }
 
     /**
@@ -495,19 +581,29 @@ class Auditoria extends \MZ\Database\Helper
     public static function find($condition, $order = [])
     {
         $query = self::query($condition, $order)->limit(1);
-        $row = $query->fetch();
-        if ($row === false) {
-            $row = [];
-        }
+        $row = $query->fetch() ?: [];
         return new Auditoria($row);
     }
 
     /**
-     * Fetch all rows from database with matched condition critery
-     * @param  array $condition condition to filter rows
-     * @param  integer $limit number of rows to get, null for all
-     * @param  integer $offset start index to get rows, null for begining
-     * @return array All rows instanced and filled
+     * Find this object on database using, ID
+     * @param  int $id id to find Auditoria
+     * @return Auditoria A filled instance or empty when not found
+     */
+    public static function findByID($id)
+    {
+        return self::find([
+            'id' => intval($id),
+        ]);
+    }
+
+    /**
+     * Find all Auditoria
+     * @param  array  $condition Condition to get all Auditoria
+     * @param  array  $order     Order Auditoria
+     * @param  int    $limit     Limit data into row count
+     * @param  int    $offset    Start offset to get rows
+     * @return array             List of all rows instanced as Auditoria
      */
     public static function findAll($condition = [], $order = [], $limit = null, $offset = null)
     {
@@ -527,77 +623,6 @@ class Auditoria extends \MZ\Database\Helper
     }
 
     /**
-     * Insert a new Auditoria into the database and fill instance from database
-     * @return Auditoria Self instance
-     */
-    public function insert()
-    {
-        $values = $this->validate();
-        unset($values['id']);
-        try {
-            $id = self::getDB()->insertInto('Auditoria')->values($values)->execute();
-            $auditoria = self::findByID($id);
-            $this->fromArray($auditoria->toArray());
-        } catch (\Exception $e) {
-            throw $this->translate($e);
-        }
-        return $this;
-    }
-
-    /**
-     * Update Auditoria with instance values into database for ID
-     * @return Auditoria Self instance
-     */
-    public function update()
-    {
-        $values = $this->validate();
-        if (!$this->exists()) {
-            throw new \Exception('O identificador da auditoria não foi informado');
-        }
-        unset($values['id']);
-        try {
-            self::getDB()
-                ->update('Auditoria')
-                ->set($values)
-                ->where('id', $this->getID())
-                ->execute();
-            $auditoria = self::findByID($this->getID());
-            $this->fromArray($auditoria->toArray());
-        } catch (\Exception $e) {
-            throw $this->translate($e);
-        }
-        return $this;
-    }
-
-    /**
-     * Save the Auditoria into the database
-     * @return Auditoria Self instance
-     */
-    public function save()
-    {
-        if ($this->exists()) {
-            return $this->update();
-        }
-        return $this->insert();
-    }
-
-    /**
-     * Delete this instance from database using ID
-     * @return integer Number of rows deleted (Max 1)
-     */
-    public function delete()
-    {
-        if (!$this->exists()) {
-            throw new \Exception('O identificador da auditoria não foi informado');
-        }
-        $result = self::getDB()
-            ->deleteFrom('Auditoria')
-            ->where('id', $this->getID())
-            ->execute();
-        return $result;
-    }
-
-    /**
      * Count all rows from database with matched condition critery
      * @param  array $condition condition to filter rows
      * @return integer Quantity of rows
@@ -606,23 +631,5 @@ class Auditoria extends \MZ\Database\Helper
     {
         $query = self::query($condition);
         return $query->count();
-    }
-
-    /**
-     * Funcionário que exerceu a atividade
-     * @return \MZ\Employee\Funcionario The object fetched from database
-     */
-    public function findFuncionarioID()
-    {
-        return \MZ\Employee\Funcionario::findByID($this->getFuncionarioID());
-    }
-
-    /**
-     * Funcionário que autorizou o acesso ao recurso descrito
-     * @return \MZ\Employee\Funcionario The object fetched from database
-     */
-    public function findAutorizadorID()
-    {
-        return \MZ\Employee\Funcionario::findByID($this->getAutorizadorID());
     }
 }

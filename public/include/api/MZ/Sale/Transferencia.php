@@ -495,17 +495,13 @@ class Transferencia extends \MZ\Database\Helper
         if (is_null($this->getTipo())) {
             $errors['tipo'] = 'O tipo não pode ser vazio';
         }
-        if (!is_null($this->getTipo()) &&
-            !array_key_exists($this->getTipo(), self::getTipoOptions())
-        ) {
+        if (!Validator::checkInSet($this->getTipo(), self::getTipoOptions(), true)) {
             $errors['tipo'] = 'O tipo é inválido';
         }
         if (is_null($this->getModulo())) {
             $errors['modulo'] = 'O módulo não pode ser vazio';
         }
-        if (!is_null($this->getModulo()) &&
-            !array_key_exists($this->getModulo(), self::getModuloOptions())
-        ) {
+        if (!Validator::checkInSet($this->getModulo(), self::getModuloOptions(), true)) {
             $errors['modulo'] = 'O módulo é inválido';
         }
         if (is_null($this->getFuncionarioID())) {
@@ -536,140 +532,6 @@ class Transferencia extends \MZ\Database\Helper
             ]);
         }
         return parent::translate($e);
-    }
-
-    /**
-     * Gets textual and translated Tipo for Transferencia
-     * @param  int $index choose option from index
-     * @return mixed A associative key -> translated representative text or text for index
-     */
-    public static function getTipoOptions($index = null)
-    {
-        $options = [
-            self::TIPO_PEDIDO => 'Pedido',
-            self::TIPO_PRODUTO => 'Produto',
-        ];
-        if (!is_null($index)) {
-            return $options[$index];
-        }
-        return $options;
-    }
-
-    /**
-     * Gets textual and translated Modulo for Transferencia
-     * @param  int $index choose option from index
-     * @return mixed A associative key -> translated representative text or text for index
-     */
-    public static function getModuloOptions($index = null)
-    {
-        $options = [
-            self::MODULO_MESA => 'Mesa',
-            self::MODULO_COMANDA => 'Comanda',
-        ];
-        if (!is_null($index)) {
-            return $options[$index];
-        }
-        return $options;
-    }
-
-    /**
-     * Find this object on database using, ID
-     * @param  int $id id to find Transferência
-     * @return Transferencia A filled instance or empty when not found
-     */
-    public static function findByID($id)
-    {
-        return self::find([
-            'id' => intval($id),
-        ]);
-    }
-
-    /**
-     * Get allowed keys array
-     * @return array allowed keys array
-     */
-    private static function getAllowedKeys()
-    {
-        $transferencia = new Transferencia();
-        $allowed = Filter::concatKeys('t.', $transferencia->toArray());
-        return $allowed;
-    }
-
-    /**
-     * Filter order array
-     * @param  mixed $order order string or array to parse and filter allowed
-     * @return array allowed associative order
-     */
-    private static function filterOrder($order)
-    {
-        $allowed = self::getAllowedKeys();
-        return Filter::orderBy($order, $allowed, 't.');
-    }
-
-    /**
-     * Filter condition array with allowed fields
-     * @param  array $condition condition to filter rows
-     * @return array allowed condition
-     */
-    private static function filterCondition($condition)
-    {
-        $allowed = self::getAllowedKeys();
-        return Filter::keys($condition, $allowed, 't.');
-    }
-
-    /**
-     * Fetch data from database with a condition
-     * @param  array $condition condition to filter rows
-     * @param  array $order order rows
-     * @return SelectQuery query object with condition statement
-     */
-    private static function query($condition = [], $order = [])
-    {
-        $query = self::getDB()->from('Transferencias t');
-        $condition = self::filterCondition($condition);
-        $query = self::buildOrderBy($query, self::filterOrder($order));
-        $query = $query->orderBy('t.id ASC');
-        return self::buildCondition($query, $condition);
-    }
-
-    /**
-     * Search one register with a condition
-     * @param  array $condition Condition for searching the row
-     * @param  array $order order rows
-     * @return Transferencia A filled Transferência or empty instance
-     */
-    public static function find($condition, $order = [])
-    {
-        $query = self::query($condition, $order)->limit(1);
-        $row = $query->fetch();
-        if ($row === false) {
-            $row = [];
-        }
-        return new Transferencia($row);
-    }
-
-    /**
-     * Fetch all rows from database with matched condition critery
-     * @param  array $condition condition to filter rows
-     * @param  integer $limit number of rows to get, null for all
-     * @param  integer $offset start index to get rows, null for begining
-     * @return array All rows instanced and filled
-     */
-    public static function findAll($condition = [], $order = [], $limit = null, $offset = null)
-    {
-        $query = self::query($condition, $order);
-        if (!is_null($limit)) {
-            $query = $query->limit($limit);
-        }
-        if (!is_null($offset)) {
-            $query = $query->offset($offset);
-        }
-        $rows = $query->fetchAll();
-        $result = [];
-        foreach ($rows as $row) {
-            $result[] = new Transferencia($row);
-        }
-        return $result;
     }
 
     /**
@@ -716,18 +578,6 @@ class Transferencia extends \MZ\Database\Helper
     }
 
     /**
-     * Save the Transferência into the database
-     * @return Transferencia Self instance
-     */
-    public function save()
-    {
-        if ($this->exists()) {
-            return $this->update();
-        }
-        return $this->insert();
-    }
-
-    /**
      * Delete this instance from database using ID
      * @return integer Number of rows deleted (Max 1)
      */
@@ -744,14 +594,28 @@ class Transferencia extends \MZ\Database\Helper
     }
 
     /**
-     * Count all rows from database with matched condition critery
-     * @param  array $condition condition to filter rows
-     * @return integer Quantity of rows
+     * Load one register for it self with a condition
+     * @param  array $condition Condition for searching the row
+     * @param  array $order associative field name -> [-1, 1]
+     * @return Transferencia Self instance filled or empty
      */
-    public static function count($condition = [])
+    public function load($condition, $order = [])
     {
-        $query = self::query($condition);
-        return $query->count();
+        $query = self::query($condition, $order)->limit(1);
+        $row = $query->fetch() ?: [];
+        return $this->fromArray($row);
+    }
+
+    /**
+     * Load into this object from database using, ID
+     * @param  int $id id to find Transferência
+     * @return Transferencia Self filled instance or empty when not found
+     */
+    public function loadByID($id)
+    {
+        return $this->load([
+            'id' => intval($id),
+        ]);
     }
 
     /**
@@ -839,5 +703,148 @@ class Transferencia extends \MZ\Database\Helper
     public function findFuncionarioID()
     {
         return \MZ\Employee\Funcionario::findByID($this->getFuncionarioID());
+    }
+
+    /**
+     * Gets textual and translated Tipo for Transferencia
+     * @param  int $index choose option from index
+     * @return mixed A associative key -> translated representative text or text for index
+     */
+    public static function getTipoOptions($index = null)
+    {
+        $options = [
+            self::TIPO_PEDIDO => 'Pedido',
+            self::TIPO_PRODUTO => 'Produto',
+        ];
+        if (!is_null($index)) {
+            return $options[$index];
+        }
+        return $options;
+    }
+
+    /**
+     * Gets textual and translated Modulo for Transferencia
+     * @param  int $index choose option from index
+     * @return mixed A associative key -> translated representative text or text for index
+     */
+    public static function getModuloOptions($index = null)
+    {
+        $options = [
+            self::MODULO_MESA => 'Mesa',
+            self::MODULO_COMANDA => 'Comanda',
+        ];
+        if (!is_null($index)) {
+            return $options[$index];
+        }
+        return $options;
+    }
+
+    /**
+     * Get allowed keys array
+     * @return array allowed keys array
+     */
+    private static function getAllowedKeys()
+    {
+        $transferencia = new Transferencia();
+        $allowed = Filter::concatKeys('t.', $transferencia->toArray());
+        return $allowed;
+    }
+
+    /**
+     * Filter order array
+     * @param  mixed $order order string or array to parse and filter allowed
+     * @return array allowed associative order
+     */
+    private static function filterOrder($order)
+    {
+        $allowed = self::getAllowedKeys();
+        return Filter::orderBy($order, $allowed, 't.');
+    }
+
+    /**
+     * Filter condition array with allowed fields
+     * @param  array $condition condition to filter rows
+     * @return array allowed condition
+     */
+    private static function filterCondition($condition)
+    {
+        $allowed = self::getAllowedKeys();
+        return Filter::keys($condition, $allowed, 't.');
+    }
+
+    /**
+     * Fetch data from database with a condition
+     * @param  array $condition condition to filter rows
+     * @param  array $order order rows
+     * @return SelectQuery query object with condition statement
+     */
+    private static function query($condition = [], $order = [])
+    {
+        $query = self::getDB()->from('Transferencias t');
+        $condition = self::filterCondition($condition);
+        $query = self::buildOrderBy($query, self::filterOrder($order));
+        $query = $query->orderBy('t.id ASC');
+        return self::buildCondition($query, $condition);
+    }
+
+    /**
+     * Search one register with a condition
+     * @param  array $condition Condition for searching the row
+     * @param  array $order order rows
+     * @return Transferencia A filled Transferência or empty instance
+     */
+    public static function find($condition, $order = [])
+    {
+        $query = self::query($condition, $order)->limit(1);
+        $row = $query->fetch() ?: [];
+        return new Transferencia($row);
+    }
+
+    /**
+     * Find this object on database using, ID
+     * @param  int $id id to find Transferência
+     * @return Transferencia A filled instance or empty when not found
+     */
+    public static function findByID($id)
+    {
+        return self::find([
+            'id' => intval($id),
+        ]);
+    }
+
+    /**
+     * Find all Transferência
+     * @param  array  $condition Condition to get all Transferência
+     * @param  array  $order     Order Transferência
+     * @param  int    $limit     Limit data into row count
+     * @param  int    $offset    Start offset to get rows
+     * @return array             List of all rows instanced as Transferencia
+     */
+    public static function findAll($condition = [], $order = [], $limit = null, $offset = null)
+    {
+        $query = self::query($condition, $order);
+        if (!is_null($limit)) {
+            $query = $query->limit($limit);
+        }
+        if (!is_null($offset)) {
+            $query = $query->offset($offset);
+        }
+        $rows = $query->fetchAll();
+        $result = [];
+        foreach ($rows as $row) {
+            $result[] = new Transferencia($row);
+        }
+        return $result;
+    }
+
+    /**
+     * Count all rows from database with matched condition critery
+     * @param  array $condition condition to filter rows
+     * @return integer Quantity of rows
+     */
+    public static function count($condition = [])
+    {
+        $query = self::query($condition);
+        return $query->count();
     }
 }

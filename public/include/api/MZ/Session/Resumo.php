@@ -274,9 +274,7 @@ class Resumo extends \MZ\Database\Helper
         if (is_null($this->getTipo())) {
             $errors['tipo'] = 'O tipo não pode ser vazio';
         }
-        if (!is_null($this->getTipo()) &&
-            !array_key_exists($this->getTipo(), self::getTipoOptions())
-        ) {
+        if (!Validator::checkInSet($this->getTipo(), self::getTipoOptions(), true)) {
             $errors['tipo'] = 'O tipo é inválido';
         }
         if (is_null($this->getValor())) {
@@ -323,6 +321,127 @@ class Resumo extends \MZ\Database\Helper
     }
 
     /**
+     * Insert a new Resumo into the database and fill instance from database
+     * @return Resumo Self instance
+     */
+    public function insert()
+    {
+        $values = $this->validate();
+        unset($values['id']);
+        try {
+            $id = self::getDB()->insertInto('Resumos')->values($values)->execute();
+            $resumo = self::findByID($id);
+            $this->fromArray($resumo->toArray());
+        } catch (\Exception $e) {
+            throw $this->translate($e);
+        }
+        return $this;
+    }
+
+    /**
+     * Update Resumo with instance values into database for ID
+     * @return Resumo Self instance
+     */
+    public function update()
+    {
+        $values = $this->validate();
+        if (!$this->exists()) {
+            throw new \Exception('O identificador do resumo não foi informado');
+        }
+        unset($values['id']);
+        try {
+            self::getDB()
+                ->update('Resumos')
+                ->set($values)
+                ->where('id', $this->getID())
+                ->execute();
+            $resumo = self::findByID($this->getID());
+            $this->fromArray($resumo->toArray());
+        } catch (\Exception $e) {
+            throw $this->translate($e);
+        }
+        return $this;
+    }
+
+    /**
+     * Delete this instance from database using ID
+     * @return integer Number of rows deleted (Max 1)
+     */
+    public function delete()
+    {
+        if (!$this->exists()) {
+            throw new \Exception('O identificador do resumo não foi informado');
+        }
+        $result = self::getDB()
+            ->deleteFrom('Resumos')
+            ->where('id', $this->getID())
+            ->execute();
+        return $result;
+    }
+
+    /**
+     * Load one register for it self with a condition
+     * @param  array $condition Condition for searching the row
+     * @param  array $order associative field name -> [-1, 1]
+     * @return Resumo Self instance filled or empty
+     */
+    public function load($condition, $order = [])
+    {
+        $query = self::query($condition, $order)->limit(1);
+        $row = $query->fetch() ?: [];
+        return $this->fromArray($row);
+    }
+
+    /**
+     * Load into this object from database using, ID
+     * @param  int $id id to find Resumo
+     * @return Resumo Self filled instance or empty when not found
+     */
+    public function loadByID($id)
+    {
+        return $this->load([
+            'id' => intval($id),
+        ]);
+    }
+
+    /**
+     * Load into this object from database using, MovimentacaoID, Tipo, CartaoID
+     * @param  int $movimentacao_id movimentação to find Resumo
+     * @param  string $tipo tipo to find Resumo
+     * @param  int $cartao_id cartão to find Resumo
+     * @return Resumo Self filled instance or empty when not found
+     */
+    public function loadByMovimentacaoIDTipoCartaoID($movimentacao_id, $tipo, $cartao_id)
+    {
+        return $this->load([
+            'movimentacaoid' => intval($movimentacao_id),
+            'tipo' => strval($tipo),
+            'cartaoid' => intval($cartao_id),
+        ]);
+    }
+
+    /**
+     * Movimentação do caixa referente ao resumo
+     * @return \MZ\Session\Movimentacao The object fetched from database
+     */
+    public function findMovimentacaoID()
+    {
+        return \MZ\Session\Movimentacao::findByID($this->getMovimentacaoID());
+    }
+
+    /**
+     * Cartão da forma de pagamento
+     * @return \MZ\Payment\Cartao The object fetched from database
+     */
+    public function findCartaoID()
+    {
+        if (is_null($this->getCartaoID())) {
+            return new \MZ\Payment\Cartao();
+        }
+        return \MZ\Payment\Cartao::findByID($this->getCartaoID());
+    }
+
+    /**
      * Gets textual and translated Tipo for Resumo
      * @param  int $index choose option from index
      * @return mixed A associative key -> translated representative text or text for index
@@ -341,34 +460,6 @@ class Resumo extends \MZ\Database\Helper
             return $options[$index];
         }
         return $options;
-    }
-
-    /**
-     * Find this object on database using, ID
-     * @param  int $id id to find Resumo
-     * @return Resumo A filled instance or empty when not found
-     */
-    public static function findByID($id)
-    {
-        return self::find([
-            'id' => intval($id),
-        ]);
-    }
-
-    /**
-     * Find this object on database using, MovimentacaoID, Tipo, CartaoID
-     * @param  int $movimentacao_id movimentação to find Resumo
-     * @param  string $tipo tipo to find Resumo
-     * @param  int $cartao_id cartão to find Resumo
-     * @return Resumo A filled instance or empty when not found
-     */
-    public static function findByMovimentacaoIDTipoCartaoID($movimentacao_id, $tipo, $cartao_id)
-    {
-        return self::find([
-            'movimentacaoid' => intval($movimentacao_id),
-            'tipo' => strval($tipo),
-            'cartaoid' => intval($cartao_id),
-        ]);
     }
 
     /**
@@ -428,19 +519,45 @@ class Resumo extends \MZ\Database\Helper
     public static function find($condition, $order = [])
     {
         $query = self::query($condition, $order)->limit(1);
-        $row = $query->fetch();
-        if ($row === false) {
-            $row = [];
-        }
+        $row = $query->fetch() ?: [];
         return new Resumo($row);
     }
 
     /**
-     * Fetch all rows from database with matched condition critery
-     * @param  array $condition condition to filter rows
-     * @param  integer $limit number of rows to get, null for all
-     * @param  integer $offset start index to get rows, null for begining
-     * @return array All rows instanced and filled
+     * Find this object on database using, ID
+     * @param  int $id id to find Resumo
+     * @return Resumo A filled instance or empty when not found
+     */
+    public static function findByID($id)
+    {
+        return self::find([
+            'id' => intval($id),
+        ]);
+    }
+
+    /**
+     * Find this object on database using, MovimentacaoID, Tipo, CartaoID
+     * @param  int $movimentacao_id movimentação to find Resumo
+     * @param  string $tipo tipo to find Resumo
+     * @param  int $cartao_id cartão to find Resumo
+     * @return Resumo A filled instance or empty when not found
+     */
+    public static function findByMovimentacaoIDTipoCartaoID($movimentacao_id, $tipo, $cartao_id)
+    {
+        return self::find([
+            'movimentacaoid' => intval($movimentacao_id),
+            'tipo' => strval($tipo),
+            'cartaoid' => intval($cartao_id),
+        ]);
+    }
+
+    /**
+     * Find all Resumo
+     * @param  array  $condition Condition to get all Resumo
+     * @param  array  $order     Order Resumo
+     * @param  int    $limit     Limit data into row count
+     * @param  int    $offset    Start offset to get rows
+     * @return array             List of all rows instanced as Resumo
      */
     public static function findAll($condition = [], $order = [], $limit = null, $offset = null)
     {
@@ -460,77 +577,6 @@ class Resumo extends \MZ\Database\Helper
     }
 
     /**
-     * Insert a new Resumo into the database and fill instance from database
-     * @return Resumo Self instance
-     */
-    public function insert()
-    {
-        $values = $this->validate();
-        unset($values['id']);
-        try {
-            $id = self::getDB()->insertInto('Resumos')->values($values)->execute();
-            $resumo = self::findByID($id);
-            $this->fromArray($resumo->toArray());
-        } catch (\Exception $e) {
-            throw $this->translate($e);
-        }
-        return $this;
-    }
-
-    /**
-     * Update Resumo with instance values into database for ID
-     * @return Resumo Self instance
-     */
-    public function update()
-    {
-        $values = $this->validate();
-        if (!$this->exists()) {
-            throw new \Exception('O identificador do resumo não foi informado');
-        }
-        unset($values['id']);
-        try {
-            self::getDB()
-                ->update('Resumos')
-                ->set($values)
-                ->where('id', $this->getID())
-                ->execute();
-            $resumo = self::findByID($this->getID());
-            $this->fromArray($resumo->toArray());
-        } catch (\Exception $e) {
-            throw $this->translate($e);
-        }
-        return $this;
-    }
-
-    /**
-     * Save the Resumo into the database
-     * @return Resumo Self instance
-     */
-    public function save()
-    {
-        if ($this->exists()) {
-            return $this->update();
-        }
-        return $this->insert();
-    }
-
-    /**
-     * Delete this instance from database using ID
-     * @return integer Number of rows deleted (Max 1)
-     */
-    public function delete()
-    {
-        if (!$this->exists()) {
-            throw new \Exception('O identificador do resumo não foi informado');
-        }
-        $result = self::getDB()
-            ->deleteFrom('Resumos')
-            ->where('id', $this->getID())
-            ->execute();
-        return $result;
-    }
-
-    /**
      * Count all rows from database with matched condition critery
      * @param  array $condition condition to filter rows
      * @return integer Quantity of rows
@@ -539,26 +585,5 @@ class Resumo extends \MZ\Database\Helper
     {
         $query = self::query($condition);
         return $query->count();
-    }
-
-    /**
-     * Movimentação do caixa referente ao resumo
-     * @return \MZ\Session\Movimentacao The object fetched from database
-     */
-    public function findMovimentacaoID()
-    {
-        return \MZ\Session\Movimentacao::findByID($this->getMovimentacaoID());
-    }
-
-    /**
-     * Cartão da forma de pagamento
-     * @return \MZ\Payment\Cartao The object fetched from database
-     */
-    public function findCartaoID()
-    {
-        if (is_null($this->getCartaoID())) {
-            return new \MZ\Payment\Cartao();
-        }
-        return \MZ\Payment\Cartao::findByID($this->getCartaoID());
     }
 }

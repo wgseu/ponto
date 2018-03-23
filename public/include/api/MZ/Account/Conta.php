@@ -735,17 +735,13 @@ class Conta extends \MZ\Database\Helper
         if (is_null($this->getAutoAcrescimo())) {
             $errors['autoacrescimo'] = 'O acréscimo automático não pode ser vazio';
         }
-        if (!is_null($this->getAutoAcrescimo()) &&
-            !array_key_exists($this->getAutoAcrescimo(), self::getBooleanOptions())
-        ) {
+        if (!Validator::checkBoolean($this->getAutoAcrescimo(), true)) {
             $errors['autoacrescimo'] = 'O acréscimo automático é inválido';
         }
         if (is_null($this->getCancelada())) {
             $errors['cancelada'] = 'A cancelada não pode ser vazia';
         }
-        if (!is_null($this->getCancelada()) &&
-            !array_key_exists($this->getCancelada(), self::getBooleanOptions())
-        ) {
+        if (!Validator::checkBoolean($this->getCancelada(), true)) {
             $errors['cancelada'] = 'A cancelada é inválida';
         }
         if (is_null($this->getDataCadastro())) {
@@ -776,15 +772,141 @@ class Conta extends \MZ\Database\Helper
     }
 
     /**
-     * Find this object on database using, ID
-     * @param  int $id id to find Conta
-     * @return Conta A filled instance or empty when not found
+     * Insert a new Conta into the database and fill instance from database
+     * @return Conta Self instance
      */
-    public static function findByID($id)
+    public function insert()
     {
-        return self::find([
+        $values = $this->validate();
+        unset($values['id']);
+        try {
+            $id = self::getDB()->insertInto('Contas')->values($values)->execute();
+            $conta = self::findByID($id);
+            $this->fromArray($conta->toArray());
+        } catch (\Exception $e) {
+            throw $this->translate($e);
+        }
+        return $this;
+    }
+
+    /**
+     * Update Conta with instance values into database for ID
+     * @return Conta Self instance
+     */
+    public function update()
+    {
+        $values = $this->validate();
+        if (!$this->exists()) {
+            throw new \Exception('O identificador da conta não foi informado');
+        }
+        unset($values['id']);
+        try {
+            self::getDB()
+                ->update('Contas')
+                ->set($values)
+                ->where('id', $this->getID())
+                ->execute();
+            $conta = self::findByID($this->getID());
+            $this->fromArray($conta->toArray());
+        } catch (\Exception $e) {
+            throw $this->translate($e);
+        }
+        return $this;
+    }
+
+    /**
+     * Delete this instance from database using ID
+     * @return integer Number of rows deleted (Max 1)
+     */
+    public function delete()
+    {
+        if (!$this->exists()) {
+            throw new \Exception('O identificador da conta não foi informado');
+        }
+        $result = self::getDB()
+            ->deleteFrom('Contas')
+            ->where('id', $this->getID())
+            ->execute();
+        return $result;
+    }
+
+    /**
+     * Load one register for it self with a condition
+     * @param  array $condition Condition for searching the row
+     * @param  array $order associative field name -> [-1, 1]
+     * @return Conta Self instance filled or empty
+     */
+    public function load($condition, $order = [])
+    {
+        $query = self::query($condition, $order)->limit(1);
+        $row = $query->fetch() ?: [];
+        return $this->fromArray($row);
+    }
+
+    /**
+     * Load into this object from database using, ID
+     * @param  int $id id to find Conta
+     * @return Conta Self filled instance or empty when not found
+     */
+    public function loadByID($id)
+    {
+        return $this->load([
             'id' => intval($id),
         ]);
+    }
+
+    /**
+     * Classificação da conta
+     * @return \MZ\Account\Classificacao The object fetched from database
+     */
+    public function findClassificacaoID()
+    {
+        return \MZ\Account\Classificacao::findByID($this->getClassificacaoID());
+    }
+
+    /**
+     * Funcionário que lançou a conta
+     * @return \MZ\Employee\Funcionario The object fetched from database
+     */
+    public function findFuncionarioID()
+    {
+        return \MZ\Employee\Funcionario::findByID($this->getFuncionarioID());
+    }
+
+    /**
+     * Subclassificação da conta
+     * @return \MZ\Account\Classificacao The object fetched from database
+     */
+    public function findSubClassificacaoID()
+    {
+        if (is_null($this->getSubClassificacaoID())) {
+            return new \MZ\Account\Classificacao();
+        }
+        return \MZ\Account\Classificacao::findByID($this->getSubClassificacaoID());
+    }
+
+    /**
+     * Cliente a qual a conta pertence
+     * @return \MZ\Account\Cliente The object fetched from database
+     */
+    public function findClienteID()
+    {
+        if (is_null($this->getClienteID())) {
+            return new \MZ\Account\Cliente();
+        }
+        return \MZ\Account\Cliente::findByID($this->getClienteID());
+    }
+
+    /**
+     * Pedido da qual essa conta foi gerada
+     * @return \MZ\Sale\Pedido The object fetched from database
+     */
+    public function findPedidoID()
+    {
+        if (is_null($this->getPedidoID())) {
+            return new \MZ\Sale\Pedido();
+        }
+        return \MZ\Sale\Pedido::findByID($this->getPedidoID());
     }
 
     /**
@@ -852,19 +974,29 @@ class Conta extends \MZ\Database\Helper
     public static function find($condition, $order = [])
     {
         $query = self::query($condition, $order)->limit(1);
-        $row = $query->fetch();
-        if ($row === false) {
-            $row = [];
-        }
+        $row = $query->fetch() ?: [];
         return new Conta($row);
     }
 
     /**
-     * Fetch all rows from database with matched condition critery
-     * @param  array $condition condition to filter rows
-     * @param  integer $limit number of rows to get, null for all
-     * @param  integer $offset start index to get rows, null for begining
-     * @return array All rows instanced and filled
+     * Find this object on database using, ID
+     * @param  int $id id to find Conta
+     * @return Conta A filled instance or empty when not found
+     */
+    public static function findByID($id)
+    {
+        return self::find([
+            'id' => intval($id),
+        ]);
+    }
+
+    /**
+     * Find all Conta
+     * @param  array  $condition Condition to get all Conta
+     * @param  array  $order     Order Conta
+     * @param  int    $limit     Limit data into row count
+     * @param  int    $offset    Start offset to get rows
+     * @return array             List of all rows instanced as Conta
      */
     public static function findAll($condition = [], $order = [], $limit = null, $offset = null)
     {
@@ -884,77 +1016,6 @@ class Conta extends \MZ\Database\Helper
     }
 
     /**
-     * Insert a new Conta into the database and fill instance from database
-     * @return Conta Self instance
-     */
-    public function insert()
-    {
-        $values = $this->validate();
-        unset($values['id']);
-        try {
-            $id = self::getDB()->insertInto('Contas')->values($values)->execute();
-            $conta = self::findByID($id);
-            $this->fromArray($conta->toArray());
-        } catch (\Exception $e) {
-            throw $this->translate($e);
-        }
-        return $this;
-    }
-
-    /**
-     * Update Conta with instance values into database for ID
-     * @return Conta Self instance
-     */
-    public function update()
-    {
-        $values = $this->validate();
-        if (!$this->exists()) {
-            throw new \Exception('O identificador da conta não foi informado');
-        }
-        unset($values['id']);
-        try {
-            self::getDB()
-                ->update('Contas')
-                ->set($values)
-                ->where('id', $this->getID())
-                ->execute();
-            $conta = self::findByID($this->getID());
-            $this->fromArray($conta->toArray());
-        } catch (\Exception $e) {
-            throw $this->translate($e);
-        }
-        return $this;
-    }
-
-    /**
-     * Save the Conta into the database
-     * @return Conta Self instance
-     */
-    public function save()
-    {
-        if ($this->exists()) {
-            return $this->update();
-        }
-        return $this->insert();
-    }
-
-    /**
-     * Delete this instance from database using ID
-     * @return integer Number of rows deleted (Max 1)
-     */
-    public function delete()
-    {
-        if (!$this->exists()) {
-            throw new \Exception('O identificador da conta não foi informado');
-        }
-        $result = self::getDB()
-            ->deleteFrom('Contas')
-            ->where('id', $this->getID())
-            ->execute();
-        return $result;
-    }
-
-    /**
      * Count all rows from database with matched condition critery
      * @param  array $condition condition to filter rows
      * @return integer Quantity of rows
@@ -963,59 +1024,5 @@ class Conta extends \MZ\Database\Helper
     {
         $query = self::query($condition);
         return $query->count();
-    }
-
-    /**
-     * Classificação da conta
-     * @return \MZ\Account\Classificacao The object fetched from database
-     */
-    public function findClassificacaoID()
-    {
-        return \MZ\Account\Classificacao::findByID($this->getClassificacaoID());
-    }
-
-    /**
-     * Funcionário que lançou a conta
-     * @return \MZ\Employee\Funcionario The object fetched from database
-     */
-    public function findFuncionarioID()
-    {
-        return \MZ\Employee\Funcionario::findByID($this->getFuncionarioID());
-    }
-
-    /**
-     * Subclassificação da conta
-     * @return \MZ\Account\Classificacao The object fetched from database
-     */
-    public function findSubClassificacaoID()
-    {
-        if (is_null($this->getSubClassificacaoID())) {
-            return new \MZ\Account\Classificacao();
-        }
-        return \MZ\Account\Classificacao::findByID($this->getSubClassificacaoID());
-    }
-
-    /**
-     * Cliente a qual a conta pertence
-     * @return \MZ\Account\Cliente The object fetched from database
-     */
-    public function findClienteID()
-    {
-        if (is_null($this->getClienteID())) {
-            return new \MZ\Account\Cliente();
-        }
-        return \MZ\Account\Cliente::findByID($this->getClienteID());
-    }
-
-    /**
-     * Pedido da qual essa conta foi gerada
-     * @return \MZ\Sale\Pedido The object fetched from database
-     */
-    public function findPedidoID()
-    {
-        if (is_null($this->getPedidoID())) {
-            return new \MZ\Sale\Pedido();
-        }
-        return \MZ\Sale\Pedido::findByID($this->getPedidoID());
     }
 }

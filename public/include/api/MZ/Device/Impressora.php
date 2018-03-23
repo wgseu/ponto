@@ -463,9 +463,7 @@ class Impressora extends \MZ\Database\Helper
         if (is_null($this->getModo())) {
             $errors['modo'] = 'O modo não pode ser vazio';
         }
-        if (!is_null($this->getModo()) &&
-            !array_key_exists($this->getModo(), self::getModoOptions())
-        ) {
+        if (!Validator::checkInSet($this->getModo(), self::getModoOptions(), true)) {
             $errors['modo'] = 'O modo é inválido';
         }
         if (is_null($this->getOpcoes())) {
@@ -530,6 +528,141 @@ class Impressora extends \MZ\Database\Helper
     }
 
     /**
+     * Insert a new Impressora into the database and fill instance from database
+     * @return Impressora Self instance
+     */
+    public function insert()
+    {
+        $values = $this->validate();
+        unset($values['id']);
+        try {
+            $id = self::getDB()->insertInto('Impressoras')->values($values)->execute();
+            $impressora = self::findByID($id);
+            $this->fromArray($impressora->toArray());
+        } catch (\Exception $e) {
+            throw $this->translate($e);
+        }
+        return $this;
+    }
+
+    /**
+     * Update Impressora with instance values into database for ID
+     * @return Impressora Self instance
+     */
+    public function update()
+    {
+        $values = $this->validate();
+        if (!$this->exists()) {
+            throw new \Exception('O identificador da impressora não foi informado');
+        }
+        unset($values['id']);
+        try {
+            self::getDB()
+                ->update('Impressoras')
+                ->set($values)
+                ->where('id', $this->getID())
+                ->execute();
+            $impressora = self::findByID($this->getID());
+            $this->fromArray($impressora->toArray());
+        } catch (\Exception $e) {
+            throw $this->translate($e);
+        }
+        return $this;
+    }
+
+    /**
+     * Delete this instance from database using ID
+     * @return integer Number of rows deleted (Max 1)
+     */
+    public function delete()
+    {
+        if (!$this->exists()) {
+            throw new \Exception('O identificador da impressora não foi informado');
+        }
+        $result = self::getDB()
+            ->deleteFrom('Impressoras')
+            ->where('id', $this->getID())
+            ->execute();
+        return $result;
+    }
+
+    /**
+     * Load one register for it self with a condition
+     * @param  array $condition Condition for searching the row
+     * @param  array $order associative field name -> [-1, 1]
+     * @return Impressora Self instance filled or empty
+     */
+    public function load($condition, $order = [])
+    {
+        $query = self::query($condition, $order)->limit(1);
+        $row = $query->fetch() ?: [];
+        return $this->fromArray($row);
+    }
+
+    /**
+     * Load into this object from database using, ID
+     * @param  int $id id to find Impressora
+     * @return Impressora Self filled instance or empty when not found
+     */
+    public function loadByID($id)
+    {
+        return $this->load([
+            'id' => intval($id),
+        ]);
+    }
+
+    /**
+     * Load into this object from database using, SetorID, DispositivoID, Modo
+     * @param  int $setor_id setor de impressão to find Impressora
+     * @param  int $dispositivo_id dispositivo to find Impressora
+     * @param  string $modo modo to find Impressora
+     * @return Impressora Self filled instance or empty when not found
+     */
+    public function loadBySetorIDDispositivoIDModo($setor_id, $dispositivo_id, $modo)
+    {
+        return $this->load([
+            'setorid' => intval($setor_id),
+            'dispositivoid' => intval($dispositivo_id),
+            'modo' => strval($modo),
+        ]);
+    }
+
+    /**
+     * Load into this object from database using, DispositivoID, Descricao
+     * @param  int $dispositivo_id dispositivo to find Impressora
+     * @param  string $descricao descrição to find Impressora
+     * @return Impressora Self filled instance or empty when not found
+     */
+    public function loadByDispositivoIDDescricao($dispositivo_id, $descricao)
+    {
+        return $this->load([
+            'dispositivoid' => intval($dispositivo_id),
+            'descricao' => strval($descricao),
+        ]);
+    }
+
+    /**
+     * Setor de impressão
+     * @return \MZ\Environment\Setor The object fetched from database
+     */
+    public function findSetorID()
+    {
+        return \MZ\Environment\Setor::findByID($this->getSetorID());
+    }
+
+    /**
+     * Dispositivo que contém a impressora
+     * @return \MZ\Device\Dispositivo The object fetched from database
+     */
+    public function findDispositivoID()
+    {
+        if (is_null($this->getDispositivoID())) {
+            return new \MZ\Device\Dispositivo();
+        }
+        return \MZ\Device\Dispositivo::findByID($this->getDispositivoID());
+    }
+
+    /**
      * Gets textual and translated Modo for Impressora
      * @param  int $index choose option from index
      * @return mixed A associative key -> translated representative text or text for index
@@ -546,48 +679,6 @@ class Impressora extends \MZ\Database\Helper
             return $options[$index];
         }
         return $options;
-    }
-
-    /**
-     * Find this object on database using, ID
-     * @param  int $id id to find Impressora
-     * @return Impressora A filled instance or empty when not found
-     */
-    public static function findByID($id)
-    {
-        return self::find([
-            'id' => intval($id),
-        ]);
-    }
-
-    /**
-     * Find this object on database using, SetorID, DispositivoID, Modo
-     * @param  int $setor_id setor de impressão to find Impressora
-     * @param  int $dispositivo_id dispositivo to find Impressora
-     * @param  string $modo modo to find Impressora
-     * @return Impressora A filled instance or empty when not found
-     */
-    public static function findBySetorIDDispositivoIDModo($setor_id, $dispositivo_id, $modo)
-    {
-        return self::find([
-            'setorid' => intval($setor_id),
-            'dispositivoid' => intval($dispositivo_id),
-            'modo' => strval($modo),
-        ]);
-    }
-
-    /**
-     * Find this object on database using, DispositivoID, Descricao
-     * @param  int $dispositivo_id dispositivo to find Impressora
-     * @param  string $descricao descrição to find Impressora
-     * @return Impressora A filled instance or empty when not found
-     */
-    public static function findByDispositivoIDDescricao($dispositivo_id, $descricao)
-    {
-        return self::find([
-            'dispositivoid' => intval($dispositivo_id),
-            'descricao' => strval($descricao),
-        ]);
     }
 
     /**
@@ -655,19 +746,59 @@ class Impressora extends \MZ\Database\Helper
     public static function find($condition, $order = [])
     {
         $query = self::query($condition, $order)->limit(1);
-        $row = $query->fetch();
-        if ($row === false) {
-            $row = [];
-        }
+        $row = $query->fetch() ?: [];
         return new Impressora($row);
     }
 
     /**
-     * Fetch all rows from database with matched condition critery
-     * @param  array $condition condition to filter rows
-     * @param  integer $limit number of rows to get, null for all
-     * @param  integer $offset start index to get rows, null for begining
-     * @return array All rows instanced and filled
+     * Find this object on database using, ID
+     * @param  int $id id to find Impressora
+     * @return Impressora A filled instance or empty when not found
+     */
+    public static function findByID($id)
+    {
+        return self::find([
+            'id' => intval($id),
+        ]);
+    }
+
+    /**
+     * Find this object on database using, SetorID, DispositivoID, Modo
+     * @param  int $setor_id setor de impressão to find Impressora
+     * @param  int $dispositivo_id dispositivo to find Impressora
+     * @param  string $modo modo to find Impressora
+     * @return Impressora A filled instance or empty when not found
+     */
+    public static function findBySetorIDDispositivoIDModo($setor_id, $dispositivo_id, $modo)
+    {
+        return self::find([
+            'setorid' => intval($setor_id),
+            'dispositivoid' => intval($dispositivo_id),
+            'modo' => strval($modo),
+        ]);
+    }
+
+    /**
+     * Find this object on database using, DispositivoID, Descricao
+     * @param  int $dispositivo_id dispositivo to find Impressora
+     * @param  string $descricao descrição to find Impressora
+     * @return Impressora A filled instance or empty when not found
+     */
+    public static function findByDispositivoIDDescricao($dispositivo_id, $descricao)
+    {
+        return self::find([
+            'dispositivoid' => intval($dispositivo_id),
+            'descricao' => strval($descricao),
+        ]);
+    }
+
+    /**
+     * Find all Impressora
+     * @param  array  $condition Condition to get all Impressora
+     * @param  array  $order     Order Impressora
+     * @param  int    $limit     Limit data into row count
+     * @param  int    $offset    Start offset to get rows
+     * @return array             List of all rows instanced as Impressora
      */
     public static function findAll($condition = [], $order = [], $limit = null, $offset = null)
     {
@@ -687,77 +818,6 @@ class Impressora extends \MZ\Database\Helper
     }
 
     /**
-     * Insert a new Impressora into the database and fill instance from database
-     * @return Impressora Self instance
-     */
-    public function insert()
-    {
-        $values = $this->validate();
-        unset($values['id']);
-        try {
-            $id = self::getDB()->insertInto('Impressoras')->values($values)->execute();
-            $impressora = self::findByID($id);
-            $this->fromArray($impressora->toArray());
-        } catch (\Exception $e) {
-            throw $this->translate($e);
-        }
-        return $this;
-    }
-
-    /**
-     * Update Impressora with instance values into database for ID
-     * @return Impressora Self instance
-     */
-    public function update()
-    {
-        $values = $this->validate();
-        if (!$this->exists()) {
-            throw new \Exception('O identificador da impressora não foi informado');
-        }
-        unset($values['id']);
-        try {
-            self::getDB()
-                ->update('Impressoras')
-                ->set($values)
-                ->where('id', $this->getID())
-                ->execute();
-            $impressora = self::findByID($this->getID());
-            $this->fromArray($impressora->toArray());
-        } catch (\Exception $e) {
-            throw $this->translate($e);
-        }
-        return $this;
-    }
-
-    /**
-     * Save the Impressora into the database
-     * @return Impressora Self instance
-     */
-    public function save()
-    {
-        if ($this->exists()) {
-            return $this->update();
-        }
-        return $this->insert();
-    }
-
-    /**
-     * Delete this instance from database using ID
-     * @return integer Number of rows deleted (Max 1)
-     */
-    public function delete()
-    {
-        if (!$this->exists()) {
-            throw new \Exception('O identificador da impressora não foi informado');
-        }
-        $result = self::getDB()
-            ->deleteFrom('Impressoras')
-            ->where('id', $this->getID())
-            ->execute();
-        return $result;
-    }
-
-    /**
      * Count all rows from database with matched condition critery
      * @param  array $condition condition to filter rows
      * @return integer Quantity of rows
@@ -766,26 +826,5 @@ class Impressora extends \MZ\Database\Helper
     {
         $query = self::query($condition);
         return $query->count();
-    }
-
-    /**
-     * Setor de impressão
-     * @return \MZ\Environment\Setor The object fetched from database
-     */
-    public function findSetorID()
-    {
-        return \MZ\Environment\Setor::findByID($this->getSetorID());
-    }
-
-    /**
-     * Dispositivo que contém a impressora
-     * @return \MZ\Device\Dispositivo The object fetched from database
-     */
-    public function findDispositivoID()
-    {
-        if (is_null($this->getDispositivoID())) {
-            return new \MZ\Device\Dispositivo();
-        }
-        return \MZ\Device\Dispositivo::findByID($this->getDispositivoID());
     }
 }

@@ -482,17 +482,13 @@ class Servico extends \MZ\Database\Helper
         if (is_null($this->getTipo())) {
             $errors['tipo'] = 'O tipo não pode ser vazio';
         }
-        if (!is_null($this->getTipo()) &&
-            !array_key_exists($this->getTipo(), self::getTipoOptions())
-        ) {
+        if (!Validator::checkInSet($this->getTipo(), self::getTipoOptions(), true)) {
             $errors['tipo'] = 'O tipo é inválido';
         }
         if (is_null($this->getObrigatorio())) {
             $errors['obrigatorio'] = 'O obrigatório não pode ser vazio';
         }
-        if (!is_null($this->getObrigatorio()) &&
-            !array_key_exists($this->getObrigatorio(), self::getBooleanOptions())
-        ) {
+        if (!Validator::checkBoolean($this->getObrigatorio(), true)) {
             $errors['obrigatorio'] = 'O obrigatório é inválido';
         }
         if (is_null($this->getValor())) {
@@ -501,17 +497,13 @@ class Servico extends \MZ\Database\Helper
         if (is_null($this->getIndividual())) {
             $errors['individual'] = 'O individual não pode ser vazio';
         }
-        if (!is_null($this->getIndividual()) &&
-            !array_key_exists($this->getIndividual(), self::getBooleanOptions())
-        ) {
+        if (!Validator::checkBoolean($this->getIndividual(), true)) {
             $errors['individual'] = 'O individual é inválido';
         }
         if (is_null($this->getAtivo())) {
             $errors['ativo'] = 'O ativo não pode ser vazio';
         }
-        if (!is_null($this->getAtivo()) &&
-            !array_key_exists($this->getAtivo(), self::getBooleanOptions())
-        ) {
+        if (!Validator::checkBoolean($this->getAtivo(), true)) {
             $errors['ativo'] = 'O ativo é inválido';
         }
         if (!empty($errors)) {
@@ -539,6 +531,90 @@ class Servico extends \MZ\Database\Helper
     }
 
     /**
+     * Insert a new Serviço into the database and fill instance from database
+     * @return Servico Self instance
+     */
+    public function insert()
+    {
+        $values = $this->validate();
+        unset($values['id']);
+        try {
+            $id = self::getDB()->insertInto('Servicos')->values($values)->execute();
+            $servico = self::findByID($id);
+            $this->fromArray($servico->toArray());
+        } catch (\Exception $e) {
+            throw $this->translate($e);
+        }
+        return $this;
+    }
+
+    /**
+     * Update Serviço with instance values into database for ID
+     * @return Servico Self instance
+     */
+    public function update()
+    {
+        $values = $this->validate();
+        if (!$this->exists()) {
+            throw new \Exception('O identificador do serviço não foi informado');
+        }
+        unset($values['id']);
+        try {
+            self::getDB()
+                ->update('Servicos')
+                ->set($values)
+                ->where('id', $this->getID())
+                ->execute();
+            $servico = self::findByID($this->getID());
+            $this->fromArray($servico->toArray());
+        } catch (\Exception $e) {
+            throw $this->translate($e);
+        }
+        return $this;
+    }
+
+    /**
+     * Delete this instance from database using ID
+     * @return integer Number of rows deleted (Max 1)
+     */
+    public function delete()
+    {
+        if (!$this->exists()) {
+            throw new \Exception('O identificador do serviço não foi informado');
+        }
+        $result = self::getDB()
+            ->deleteFrom('Servicos')
+            ->where('id', $this->getID())
+            ->execute();
+        return $result;
+    }
+
+    /**
+     * Load one register for it self with a condition
+     * @param  array $condition Condition for searching the row
+     * @param  array $order associative field name -> [-1, 1]
+     * @return Servico Self instance filled or empty
+     */
+    public function load($condition, $order = [])
+    {
+        $query = self::query($condition, $order)->limit(1);
+        $row = $query->fetch() ?: [];
+        return $this->fromArray($row);
+    }
+
+    /**
+     * Load into this object from database using, ID
+     * @param  int $id id to find Serviço
+     * @return Servico Self filled instance or empty when not found
+     */
+    public function loadByID($id)
+    {
+        return $this->load([
+            'id' => intval($id),
+        ]);
+    }
+
+    /**
      * Gets textual and translated Tipo for Servico
      * @param  int $index choose option from index
      * @return mixed A associative key -> translated representative text or text for index
@@ -553,18 +629,6 @@ class Servico extends \MZ\Database\Helper
             return $options[$index];
         }
         return $options;
-    }
-
-    /**
-     * Find this object on database using, ID
-     * @param  int $id id to find Serviço
-     * @return Servico A filled instance or empty when not found
-     */
-    public static function findByID($id)
-    {
-        return self::find([
-            'id' => intval($id),
-        ]);
     }
 
     /**
@@ -632,19 +696,29 @@ class Servico extends \MZ\Database\Helper
     public static function find($condition, $order = [])
     {
         $query = self::query($condition, $order)->limit(1);
-        $row = $query->fetch();
-        if ($row === false) {
-            $row = [];
-        }
+        $row = $query->fetch() ?: [];
         return new Servico($row);
     }
 
     /**
-     * Fetch all rows from database with matched condition critery
-     * @param  array $condition condition to filter rows
-     * @param  integer $limit number of rows to get, null for all
-     * @param  integer $offset start index to get rows, null for begining
-     * @return array All rows instanced and filled
+     * Find this object on database using, ID
+     * @param  int $id id to find Serviço
+     * @return Servico A filled instance or empty when not found
+     */
+    public static function findByID($id)
+    {
+        return self::find([
+            'id' => intval($id),
+        ]);
+    }
+
+    /**
+     * Find all Serviço
+     * @param  array  $condition Condition to get all Serviço
+     * @param  array  $order     Order Serviço
+     * @param  int    $limit     Limit data into row count
+     * @param  int    $offset    Start offset to get rows
+     * @return array             List of all rows instanced as Servico
      */
     public static function findAll($condition = [], $order = [], $limit = null, $offset = null)
     {
@@ -660,77 +734,6 @@ class Servico extends \MZ\Database\Helper
         foreach ($rows as $row) {
             $result[] = new Servico($row);
         }
-        return $result;
-    }
-
-    /**
-     * Insert a new Serviço into the database and fill instance from database
-     * @return Servico Self instance
-     */
-    public function insert()
-    {
-        $values = $this->validate();
-        unset($values['id']);
-        try {
-            $id = self::getDB()->insertInto('Servicos')->values($values)->execute();
-            $servico = self::findByID($id);
-            $this->fromArray($servico->toArray());
-        } catch (\Exception $e) {
-            throw $this->translate($e);
-        }
-        return $this;
-    }
-
-    /**
-     * Update Serviço with instance values into database for ID
-     * @return Servico Self instance
-     */
-    public function update()
-    {
-        $values = $this->validate();
-        if (!$this->exists()) {
-            throw new \Exception('O identificador do serviço não foi informado');
-        }
-        unset($values['id']);
-        try {
-            self::getDB()
-                ->update('Servicos')
-                ->set($values)
-                ->where('id', $this->getID())
-                ->execute();
-            $servico = self::findByID($this->getID());
-            $this->fromArray($servico->toArray());
-        } catch (\Exception $e) {
-            throw $this->translate($e);
-        }
-        return $this;
-    }
-
-    /**
-     * Save the Serviço into the database
-     * @return Servico Self instance
-     */
-    public function save()
-    {
-        if ($this->exists()) {
-            return $this->update();
-        }
-        return $this->insert();
-    }
-
-    /**
-     * Delete this instance from database using ID
-     * @return integer Number of rows deleted (Max 1)
-     */
-    public function delete()
-    {
-        if (!$this->exists()) {
-            throw new \Exception('O identificador do serviço não foi informado');
-        }
-        $result = self::getDB()
-            ->deleteFrom('Servicos')
-            ->where('id', $this->getID())
-            ->execute();
         return $result;
     }
 

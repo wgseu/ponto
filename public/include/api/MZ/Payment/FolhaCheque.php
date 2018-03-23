@@ -482,9 +482,7 @@ class FolhaCheque extends \MZ\Database\Helper
         if (is_null($this->getRecolhido())) {
             $errors['recolhido'] = 'O recolhido não pode ser vazio';
         }
-        if (!is_null($this->getRecolhido()) &&
-            !array_key_exists($this->getRecolhido(), self::getBooleanOptions())
-        ) {
+        if (!Validator::checkBoolean($this->getRecolhido(), true)) {
             $errors['recolhido'] = 'O recolhido é inválido';
         }
         if (!empty($errors)) {
@@ -524,29 +522,110 @@ class FolhaCheque extends \MZ\Database\Helper
     }
 
     /**
-     * Find this object on database using, ID
-     * @param  int $id id to find Folha de cheque
-     * @return FolhaCheque A filled instance or empty when not found
+     * Insert a new Folha de cheque into the database and fill instance from database
+     * @return FolhaCheque Self instance
      */
-    public static function findByID($id)
+    public function insert()
     {
-        return self::find([
+        $values = $this->validate();
+        unset($values['id']);
+        try {
+            $id = self::getDB()->insertInto('Folhas_Cheques')->values($values)->execute();
+            $folha_cheque = self::findByID($id);
+            $this->fromArray($folha_cheque->toArray());
+        } catch (\Exception $e) {
+            throw $this->translate($e);
+        }
+        return $this;
+    }
+
+    /**
+     * Update Folha de cheque with instance values into database for ID
+     * @return FolhaCheque Self instance
+     */
+    public function update()
+    {
+        $values = $this->validate();
+        if (!$this->exists()) {
+            throw new \Exception('O identificador da folha de cheque não foi informado');
+        }
+        unset($values['id']);
+        try {
+            self::getDB()
+                ->update('Folhas_Cheques')
+                ->set($values)
+                ->where('id', $this->getID())
+                ->execute();
+            $folha_cheque = self::findByID($this->getID());
+            $this->fromArray($folha_cheque->toArray());
+        } catch (\Exception $e) {
+            throw $this->translate($e);
+        }
+        return $this;
+    }
+
+    /**
+     * Delete this instance from database using ID
+     * @return integer Number of rows deleted (Max 1)
+     */
+    public function delete()
+    {
+        if (!$this->exists()) {
+            throw new \Exception('O identificador da folha de cheque não foi informado');
+        }
+        $result = self::getDB()
+            ->deleteFrom('Folhas_Cheques')
+            ->where('id', $this->getID())
+            ->execute();
+        return $result;
+    }
+
+    /**
+     * Load one register for it self with a condition
+     * @param  array $condition Condition for searching the row
+     * @param  array $order associative field name -> [-1, 1]
+     * @return FolhaCheque Self instance filled or empty
+     */
+    public function load($condition, $order = [])
+    {
+        $query = self::query($condition, $order)->limit(1);
+        $row = $query->fetch() ?: [];
+        return $this->fromArray($row);
+    }
+
+    /**
+     * Load into this object from database using, ID
+     * @param  int $id id to find Folha de cheque
+     * @return FolhaCheque Self filled instance or empty when not found
+     */
+    public function loadByID($id)
+    {
+        return $this->load([
             'id' => intval($id),
         ]);
     }
 
     /**
-     * Find this object on database using, ChequeID, Numero
+     * Load into this object from database using, ChequeID, Numero
      * @param  int $cheque_id cheque to find Folha de cheque
      * @param  string $numero número to find Folha de cheque
-     * @return FolhaCheque A filled instance or empty when not found
+     * @return FolhaCheque Self filled instance or empty when not found
      */
-    public static function findByChequeIDNumero($cheque_id, $numero)
+    public function loadByChequeIDNumero($cheque_id, $numero)
     {
-        return self::find([
+        return $this->load([
             'chequeid' => intval($cheque_id),
             'numero' => strval($numero),
         ]);
+    }
+
+    /**
+     * Cheque a qual pertence esssa folha
+     * @return \MZ\Payment\Cheque The object fetched from database
+     */
+    public function findChequeID()
+    {
+        return \MZ\Payment\Cheque::findByID($this->getChequeID());
     }
 
     /**
@@ -614,19 +693,43 @@ class FolhaCheque extends \MZ\Database\Helper
     public static function find($condition, $order = [])
     {
         $query = self::query($condition, $order)->limit(1);
-        $row = $query->fetch();
-        if ($row === false) {
-            $row = [];
-        }
+        $row = $query->fetch() ?: [];
         return new FolhaCheque($row);
     }
 
     /**
-     * Fetch all rows from database with matched condition critery
-     * @param  array $condition condition to filter rows
-     * @param  integer $limit number of rows to get, null for all
-     * @param  integer $offset start index to get rows, null for begining
-     * @return array All rows instanced and filled
+     * Find this object on database using, ID
+     * @param  int $id id to find Folha de cheque
+     * @return FolhaCheque A filled instance or empty when not found
+     */
+    public static function findByID($id)
+    {
+        return self::find([
+            'id' => intval($id),
+        ]);
+    }
+
+    /**
+     * Find this object on database using, ChequeID, Numero
+     * @param  int $cheque_id cheque to find Folha de cheque
+     * @param  string $numero número to find Folha de cheque
+     * @return FolhaCheque A filled instance or empty when not found
+     */
+    public static function findByChequeIDNumero($cheque_id, $numero)
+    {
+        return self::find([
+            'chequeid' => intval($cheque_id),
+            'numero' => strval($numero),
+        ]);
+    }
+
+    /**
+     * Find all Folha de cheque
+     * @param  array  $condition Condition to get all Folha de cheque
+     * @param  array  $order     Order Folha de cheque
+     * @param  int    $limit     Limit data into row count
+     * @param  int    $offset    Start offset to get rows
+     * @return array             List of all rows instanced as FolhaCheque
      */
     public static function findAll($condition = [], $order = [], $limit = null, $offset = null)
     {
@@ -646,77 +749,6 @@ class FolhaCheque extends \MZ\Database\Helper
     }
 
     /**
-     * Insert a new Folha de cheque into the database and fill instance from database
-     * @return FolhaCheque Self instance
-     */
-    public function insert()
-    {
-        $values = $this->validate();
-        unset($values['id']);
-        try {
-            $id = self::getDB()->insertInto('Folhas_Cheques')->values($values)->execute();
-            $folha_cheque = self::findByID($id);
-            $this->fromArray($folha_cheque->toArray());
-        } catch (\Exception $e) {
-            throw $this->translate($e);
-        }
-        return $this;
-    }
-
-    /**
-     * Update Folha de cheque with instance values into database for ID
-     * @return FolhaCheque Self instance
-     */
-    public function update()
-    {
-        $values = $this->validate();
-        if (!$this->exists()) {
-            throw new \Exception('O identificador da folha de cheque não foi informado');
-        }
-        unset($values['id']);
-        try {
-            self::getDB()
-                ->update('Folhas_Cheques')
-                ->set($values)
-                ->where('id', $this->getID())
-                ->execute();
-            $folha_cheque = self::findByID($this->getID());
-            $this->fromArray($folha_cheque->toArray());
-        } catch (\Exception $e) {
-            throw $this->translate($e);
-        }
-        return $this;
-    }
-
-    /**
-     * Save the Folha de cheque into the database
-     * @return FolhaCheque Self instance
-     */
-    public function save()
-    {
-        if ($this->exists()) {
-            return $this->update();
-        }
-        return $this->insert();
-    }
-
-    /**
-     * Delete this instance from database using ID
-     * @return integer Number of rows deleted (Max 1)
-     */
-    public function delete()
-    {
-        if (!$this->exists()) {
-            throw new \Exception('O identificador da folha de cheque não foi informado');
-        }
-        $result = self::getDB()
-            ->deleteFrom('Folhas_Cheques')
-            ->where('id', $this->getID())
-            ->execute();
-        return $result;
-    }
-
-    /**
      * Count all rows from database with matched condition critery
      * @param  array $condition condition to filter rows
      * @return integer Quantity of rows
@@ -725,14 +757,5 @@ class FolhaCheque extends \MZ\Database\Helper
     {
         $query = self::query($condition);
         return $query->count();
-    }
-
-    /**
-     * Cheque a qual pertence esssa folha
-     * @return \MZ\Payment\Cheque The object fetched from database
-     */
-    public function findChequeID()
-    {
-        return \MZ\Payment\Cheque::findByID($this->getChequeID());
     }
 }

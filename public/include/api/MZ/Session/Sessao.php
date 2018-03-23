@@ -242,9 +242,7 @@ class Sessao extends \MZ\Database\Helper
         if (is_null($this->getAberta())) {
             $errors['aberta'] = 'A aberta não pode ser vazia';
         }
-        if (!is_null($this->getAberta()) &&
-            !array_key_exists($this->getAberta(), self::getBooleanOptions())
-        ) {
+        if (!Validator::checkBoolean($this->getAberta(), true)) {
             $errors['aberta'] = 'A aberta é inválida';
         }
         if (!empty($errors)) {
@@ -272,13 +270,85 @@ class Sessao extends \MZ\Database\Helper
     }
 
     /**
-     * Find this object on database using, ID
-     * @param  int $id id to find Sessão
-     * @return Sessao A filled instance or empty when not found
+     * Insert a new Sessão into the database and fill instance from database
+     * @return Sessao Self instance
      */
-    public static function findByID($id)
+    public function insert()
     {
-        return self::find([
+        $values = $this->validate();
+        unset($values['id']);
+        try {
+            $id = self::getDB()->insertInto('Sessoes')->values($values)->execute();
+            $sessao = self::findByID($id);
+            $this->fromArray($sessao->toArray());
+        } catch (\Exception $e) {
+            throw $this->translate($e);
+        }
+        return $this;
+    }
+
+    /**
+     * Update Sessão with instance values into database for ID
+     * @return Sessao Self instance
+     */
+    public function update()
+    {
+        $values = $this->validate();
+        if (!$this->exists()) {
+            throw new \Exception('O identificador da sessão não foi informado');
+        }
+        unset($values['id']);
+        try {
+            self::getDB()
+                ->update('Sessoes')
+                ->set($values)
+                ->where('id', $this->getID())
+                ->execute();
+            $sessao = self::findByID($this->getID());
+            $this->fromArray($sessao->toArray());
+        } catch (\Exception $e) {
+            throw $this->translate($e);
+        }
+        return $this;
+    }
+
+    /**
+     * Delete this instance from database using ID
+     * @return integer Number of rows deleted (Max 1)
+     */
+    public function delete()
+    {
+        if (!$this->exists()) {
+            throw new \Exception('O identificador da sessão não foi informado');
+        }
+        $result = self::getDB()
+            ->deleteFrom('Sessoes')
+            ->where('id', $this->getID())
+            ->execute();
+        return $result;
+    }
+
+    /**
+     * Load one register for it self with a condition
+     * @param  array $condition Condition for searching the row
+     * @param  array $order associative field name -> [-1, 1]
+     * @return Sessao Self instance filled or empty
+     */
+    public function load($condition, $order = [])
+    {
+        $query = self::query($condition, $order)->limit(1);
+        $row = $query->fetch() ?: [];
+        return $this->fromArray($row);
+    }
+
+    /**
+     * Load into this object from database using, ID
+     * @param  int $id id to find Sessão
+     * @return Sessao Self filled instance or empty when not found
+     */
+    public function loadByID($id)
+    {
+        return $this->load([
             'id' => intval($id),
         ]);
     }
@@ -340,19 +410,29 @@ class Sessao extends \MZ\Database\Helper
     public static function find($condition, $order = [])
     {
         $query = self::query($condition, $order)->limit(1);
-        $row = $query->fetch();
-        if ($row === false) {
-            $row = [];
-        }
+        $row = $query->fetch() ?: [];
         return new Sessao($row);
     }
 
     /**
-     * Fetch all rows from database with matched condition critery
-     * @param  array $condition condition to filter rows
-     * @param  integer $limit number of rows to get, null for all
-     * @param  integer $offset start index to get rows, null for begining
-     * @return array All rows instanced and filled
+     * Find this object on database using, ID
+     * @param  int $id id to find Sessão
+     * @return Sessao A filled instance or empty when not found
+     */
+    public static function findByID($id)
+    {
+        return self::find([
+            'id' => intval($id),
+        ]);
+    }
+
+    /**
+     * Find all Sessão
+     * @param  array  $condition Condition to get all Sessão
+     * @param  array  $order     Order Sessão
+     * @param  int    $limit     Limit data into row count
+     * @param  int    $offset    Start offset to get rows
+     * @return array             List of all rows instanced as Sessao
      */
     public static function findAll($condition = [], $order = [], $limit = null, $offset = null)
     {
@@ -368,77 +448,6 @@ class Sessao extends \MZ\Database\Helper
         foreach ($rows as $row) {
             $result[] = new Sessao($row);
         }
-        return $result;
-    }
-
-    /**
-     * Insert a new Sessão into the database and fill instance from database
-     * @return Sessao Self instance
-     */
-    public function insert()
-    {
-        $values = $this->validate();
-        unset($values['id']);
-        try {
-            $id = self::getDB()->insertInto('Sessoes')->values($values)->execute();
-            $sessao = self::findByID($id);
-            $this->fromArray($sessao->toArray());
-        } catch (\Exception $e) {
-            throw $this->translate($e);
-        }
-        return $this;
-    }
-
-    /**
-     * Update Sessão with instance values into database for ID
-     * @return Sessao Self instance
-     */
-    public function update()
-    {
-        $values = $this->validate();
-        if (!$this->exists()) {
-            throw new \Exception('O identificador da sessão não foi informado');
-        }
-        unset($values['id']);
-        try {
-            self::getDB()
-                ->update('Sessoes')
-                ->set($values)
-                ->where('id', $this->getID())
-                ->execute();
-            $sessao = self::findByID($this->getID());
-            $this->fromArray($sessao->toArray());
-        } catch (\Exception $e) {
-            throw $this->translate($e);
-        }
-        return $this;
-    }
-
-    /**
-     * Save the Sessão into the database
-     * @return Sessao Self instance
-     */
-    public function save()
-    {
-        if ($this->exists()) {
-            return $this->update();
-        }
-        return $this->insert();
-    }
-
-    /**
-     * Delete this instance from database using ID
-     * @return integer Number of rows deleted (Max 1)
-     */
-    public function delete()
-    {
-        if (!$this->exists()) {
-            throw new \Exception('O identificador da sessão não foi informado');
-        }
-        $result = self::getDB()
-            ->deleteFrom('Sessoes')
-            ->where('id', $this->getID())
-            ->execute();
         return $result;
     }
 

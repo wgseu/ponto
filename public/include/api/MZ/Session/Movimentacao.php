@@ -371,9 +371,7 @@ class Movimentacao extends \MZ\Database\Helper
         if (is_null($this->getAberta())) {
             $errors['aberta'] = 'A aberta não pode ser vazia';
         }
-        if (!is_null($this->getAberta()) &&
-            !array_key_exists($this->getAberta(), self::getBooleanOptions())
-        ) {
+        if (!Validator::checkBoolean($this->getAberta(), true)) {
             $errors['aberta'] = 'A aberta é inválida';
         }
         if (is_null($this->getFuncionarioAberturaID())) {
@@ -407,15 +405,127 @@ class Movimentacao extends \MZ\Database\Helper
     }
 
     /**
-     * Find this object on database using, ID
-     * @param  int $id id to find Movimentação
-     * @return Movimentacao A filled instance or empty when not found
+     * Insert a new Movimentação into the database and fill instance from database
+     * @return Movimentacao Self instance
      */
-    public static function findByID($id)
+    public function insert()
     {
-        return self::find([
+        $values = $this->validate();
+        unset($values['id']);
+        try {
+            $id = self::getDB()->insertInto('Movimentacoes')->values($values)->execute();
+            $movimentacao = self::findByID($id);
+            $this->fromArray($movimentacao->toArray());
+        } catch (\Exception $e) {
+            throw $this->translate($e);
+        }
+        return $this;
+    }
+
+    /**
+     * Update Movimentação with instance values into database for ID
+     * @return Movimentacao Self instance
+     */
+    public function update()
+    {
+        $values = $this->validate();
+        if (!$this->exists()) {
+            throw new \Exception('O identificador da movimentação não foi informado');
+        }
+        unset($values['id']);
+        try {
+            self::getDB()
+                ->update('Movimentacoes')
+                ->set($values)
+                ->where('id', $this->getID())
+                ->execute();
+            $movimentacao = self::findByID($this->getID());
+            $this->fromArray($movimentacao->toArray());
+        } catch (\Exception $e) {
+            throw $this->translate($e);
+        }
+        return $this;
+    }
+
+    /**
+     * Delete this instance from database using ID
+     * @return integer Number of rows deleted (Max 1)
+     */
+    public function delete()
+    {
+        if (!$this->exists()) {
+            throw new \Exception('O identificador da movimentação não foi informado');
+        }
+        $result = self::getDB()
+            ->deleteFrom('Movimentacoes')
+            ->where('id', $this->getID())
+            ->execute();
+        return $result;
+    }
+
+    /**
+     * Load one register for it self with a condition
+     * @param  array $condition Condition for searching the row
+     * @param  array $order associative field name -> [-1, 1]
+     * @return Movimentacao Self instance filled or empty
+     */
+    public function load($condition, $order = [])
+    {
+        $query = self::query($condition, $order)->limit(1);
+        $row = $query->fetch() ?: [];
+        return $this->fromArray($row);
+    }
+
+    /**
+     * Load into this object from database using, ID
+     * @param  int $id id to find Movimentação
+     * @return Movimentacao Self filled instance or empty when not found
+     */
+    public function loadByID($id)
+    {
+        return $this->load([
             'id' => intval($id),
         ]);
+    }
+
+    /**
+     * Sessão do dia, permite abrir vários caixas no mesmo dia com o mesmo
+     * código da sessão
+     * @return \MZ\Session\Sessao The object fetched from database
+     */
+    public function findSessaoID()
+    {
+        return \MZ\Session\Sessao::findByID($this->getSessaoID());
+    }
+
+    /**
+     * Caixa a qual pertence essa movimentação
+     * @return \MZ\Session\Caixa The object fetched from database
+     */
+    public function findCaixaID()
+    {
+        return \MZ\Session\Caixa::findByID($this->getCaixaID());
+    }
+
+    /**
+     * Funcionário que abriu o caixa
+     * @return \MZ\Employee\Funcionario The object fetched from database
+     */
+    public function findFuncionarioAberturaID()
+    {
+        return \MZ\Employee\Funcionario::findByID($this->getFuncionarioAberturaID());
+    }
+
+    /**
+     * Funcionário que fechou o caixa
+     * @return \MZ\Employee\Funcionario The object fetched from database
+     */
+    public function findFuncionarioFechamentoID()
+    {
+        if (is_null($this->getFuncionarioFechamentoID())) {
+            return new \MZ\Employee\Funcionario();
+        }
+        return \MZ\Employee\Funcionario::findByID($this->getFuncionarioFechamentoID());
     }
 
     /**
@@ -475,19 +585,29 @@ class Movimentacao extends \MZ\Database\Helper
     public static function find($condition, $order = [])
     {
         $query = self::query($condition, $order)->limit(1);
-        $row = $query->fetch();
-        if ($row === false) {
-            $row = [];
-        }
+        $row = $query->fetch() ?: [];
         return new Movimentacao($row);
     }
 
     /**
-     * Fetch all rows from database with matched condition critery
-     * @param  array $condition condition to filter rows
-     * @param  integer $limit number of rows to get, null for all
-     * @param  integer $offset start index to get rows, null for begining
-     * @return array All rows instanced and filled
+     * Find this object on database using, ID
+     * @param  int $id id to find Movimentação
+     * @return Movimentacao A filled instance or empty when not found
+     */
+    public static function findByID($id)
+    {
+        return self::find([
+            'id' => intval($id),
+        ]);
+    }
+
+    /**
+     * Find all Movimentação
+     * @param  array  $condition Condition to get all Movimentação
+     * @param  array  $order     Order Movimentação
+     * @param  int    $limit     Limit data into row count
+     * @param  int    $offset    Start offset to get rows
+     * @return array             List of all rows instanced as Movimentacao
      */
     public static function findAll($condition = [], $order = [], $limit = null, $offset = null)
     {
@@ -507,77 +627,6 @@ class Movimentacao extends \MZ\Database\Helper
     }
 
     /**
-     * Insert a new Movimentação into the database and fill instance from database
-     * @return Movimentacao Self instance
-     */
-    public function insert()
-    {
-        $values = $this->validate();
-        unset($values['id']);
-        try {
-            $id = self::getDB()->insertInto('Movimentacoes')->values($values)->execute();
-            $movimentacao = self::findByID($id);
-            $this->fromArray($movimentacao->toArray());
-        } catch (\Exception $e) {
-            throw $this->translate($e);
-        }
-        return $this;
-    }
-
-    /**
-     * Update Movimentação with instance values into database for ID
-     * @return Movimentacao Self instance
-     */
-    public function update()
-    {
-        $values = $this->validate();
-        if (!$this->exists()) {
-            throw new \Exception('O identificador da movimentação não foi informado');
-        }
-        unset($values['id']);
-        try {
-            self::getDB()
-                ->update('Movimentacoes')
-                ->set($values)
-                ->where('id', $this->getID())
-                ->execute();
-            $movimentacao = self::findByID($this->getID());
-            $this->fromArray($movimentacao->toArray());
-        } catch (\Exception $e) {
-            throw $this->translate($e);
-        }
-        return $this;
-    }
-
-    /**
-     * Save the Movimentação into the database
-     * @return Movimentacao Self instance
-     */
-    public function save()
-    {
-        if ($this->exists()) {
-            return $this->update();
-        }
-        return $this->insert();
-    }
-
-    /**
-     * Delete this instance from database using ID
-     * @return integer Number of rows deleted (Max 1)
-     */
-    public function delete()
-    {
-        if (!$this->exists()) {
-            throw new \Exception('O identificador da movimentação não foi informado');
-        }
-        $result = self::getDB()
-            ->deleteFrom('Movimentacoes')
-            ->where('id', $this->getID())
-            ->execute();
-        return $result;
-    }
-
-    /**
      * Count all rows from database with matched condition critery
      * @param  array $condition condition to filter rows
      * @return integer Quantity of rows
@@ -586,45 +635,5 @@ class Movimentacao extends \MZ\Database\Helper
     {
         $query = self::query($condition);
         return $query->count();
-    }
-
-    /**
-     * Sessão do dia, permite abrir vários caixas no mesmo dia com o mesmo
-     * código da sessão
-     * @return \MZ\Session\Sessao The object fetched from database
-     */
-    public function findSessaoID()
-    {
-        return \MZ\Session\Sessao::findByID($this->getSessaoID());
-    }
-
-    /**
-     * Caixa a qual pertence essa movimentação
-     * @return \MZ\Session\Caixa The object fetched from database
-     */
-    public function findCaixaID()
-    {
-        return \MZ\Session\Caixa::findByID($this->getCaixaID());
-    }
-
-    /**
-     * Funcionário que abriu o caixa
-     * @return \MZ\Employee\Funcionario The object fetched from database
-     */
-    public function findFuncionarioAberturaID()
-    {
-        return \MZ\Employee\Funcionario::findByID($this->getFuncionarioAberturaID());
-    }
-
-    /**
-     * Funcionário que fechou o caixa
-     * @return \MZ\Employee\Funcionario The object fetched from database
-     */
-    public function findFuncionarioFechamentoID()
-    {
-        if (is_null($this->getFuncionarioFechamentoID())) {
-            return new \MZ\Employee\Funcionario();
-        }
-        return \MZ\Employee\Funcionario::findByID($this->getFuncionarioFechamentoID());
     }
 }

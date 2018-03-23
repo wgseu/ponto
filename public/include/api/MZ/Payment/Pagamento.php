@@ -767,17 +767,13 @@ class Pagamento extends \MZ\Database\Helper
         if (is_null($this->getCancelado())) {
             $errors['cancelado'] = 'O cancelado não pode ser vazio';
         }
-        if (!is_null($this->getCancelado()) &&
-            !array_key_exists($this->getCancelado(), self::getBooleanOptions())
-        ) {
+        if (!Validator::checkBoolean($this->getCancelado(), true)) {
             $errors['cancelado'] = 'O cancelado é inválido';
         }
         if (is_null($this->getAtivo())) {
             $errors['ativo'] = 'O ativo não pode ser vazio';
         }
-        if (!is_null($this->getAtivo()) &&
-            !array_key_exists($this->getAtivo(), self::getBooleanOptions())
-        ) {
+        if (!Validator::checkBoolean($this->getAtivo(), true)) {
             $errors['ativo'] = 'O ativo é inválido';
         }
         if (is_null($this->getDataCompensacao())) {
@@ -808,106 +804,6 @@ class Pagamento extends \MZ\Database\Helper
             ]);
         }
         return parent::translate($e);
-    }
-
-    /**
-     * Find this object on database using, ID
-     * @param  int $id id to find Pagamento
-     * @return Pagamento A filled instance or empty when not found
-     */
-    public static function findByID($id)
-    {
-        return self::find([
-            'id' => intval($id),
-        ]);
-    }
-
-    /**
-     * Get allowed keys array
-     * @return array allowed keys array
-     */
-    private static function getAllowedKeys()
-    {
-        $pagamento = new Pagamento();
-        $allowed = Filter::concatKeys('p.', $pagamento->toArray());
-        return $allowed;
-    }
-
-    /**
-     * Filter order array
-     * @param  mixed $order order string or array to parse and filter allowed
-     * @return array allowed associative order
-     */
-    private static function filterOrder($order)
-    {
-        $allowed = self::getAllowedKeys();
-        return Filter::orderBy($order, $allowed, 'p.');
-    }
-
-    /**
-     * Filter condition array with allowed fields
-     * @param  array $condition condition to filter rows
-     * @return array allowed condition
-     */
-    private static function filterCondition($condition)
-    {
-        $allowed = self::getAllowedKeys();
-        return Filter::keys($condition, $allowed, 'p.');
-    }
-
-    /**
-     * Fetch data from database with a condition
-     * @param  array $condition condition to filter rows
-     * @param  array $order order rows
-     * @return SelectQuery query object with condition statement
-     */
-    private static function query($condition = [], $order = [])
-    {
-        $query = self::getDB()->from('Pagamentos p');
-        $condition = self::filterCondition($condition);
-        $query = self::buildOrderBy($query, self::filterOrder($order));
-        $query = $query->orderBy('p.id ASC');
-        return self::buildCondition($query, $condition);
-    }
-
-    /**
-     * Search one register with a condition
-     * @param  array $condition Condition for searching the row
-     * @param  array $order order rows
-     * @return Pagamento A filled Pagamento or empty instance
-     */
-    public static function find($condition, $order = [])
-    {
-        $query = self::query($condition, $order)->limit(1);
-        $row = $query->fetch();
-        if ($row === false) {
-            $row = [];
-        }
-        return new Pagamento($row);
-    }
-
-    /**
-     * Fetch all rows from database with matched condition critery
-     * @param  array $condition condition to filter rows
-     * @param  integer $limit number of rows to get, null for all
-     * @param  integer $offset start index to get rows, null for begining
-     * @return array All rows instanced and filled
-     */
-    public static function findAll($condition = [], $order = [], $limit = null, $offset = null)
-    {
-        $query = self::query($condition, $order);
-        if (!is_null($limit)) {
-            $query = $query->limit($limit);
-        }
-        if (!is_null($offset)) {
-            $query = $query->offset($offset);
-        }
-        $rows = $query->fetchAll();
-        $result = [];
-        foreach ($rows as $row) {
-            $result[] = new Pagamento($row);
-        }
-        return $result;
     }
 
     /**
@@ -954,18 +850,6 @@ class Pagamento extends \MZ\Database\Helper
     }
 
     /**
-     * Save the Pagamento into the database
-     * @return Pagamento Self instance
-     */
-    public function save()
-    {
-        if ($this->exists()) {
-            return $this->update();
-        }
-        return $this->insert();
-    }
-
-    /**
      * Delete this instance from database using ID
      * @return integer Number of rows deleted (Max 1)
      */
@@ -982,14 +866,28 @@ class Pagamento extends \MZ\Database\Helper
     }
 
     /**
-     * Count all rows from database with matched condition critery
-     * @param  array $condition condition to filter rows
-     * @return integer Quantity of rows
+     * Load one register for it self with a condition
+     * @param  array $condition Condition for searching the row
+     * @param  array $order associative field name -> [-1, 1]
+     * @return Pagamento Self instance filled or empty
      */
-    public static function count($condition = [])
+    public function load($condition, $order = [])
     {
-        $query = self::query($condition);
-        return $query->count();
+        $query = self::query($condition, $order)->limit(1);
+        $row = $query->fetch() ?: [];
+        return $this->fromArray($row);
+    }
+
+    /**
+     * Load into this object from database using, ID
+     * @param  int $id id to find Pagamento
+     * @return Pagamento Self filled instance or empty when not found
+     */
+    public function loadByID($id)
+    {
+        return $this->load([
+            'id' => intval($id),
+        ]);
     }
 
     /**
@@ -1102,5 +1000,114 @@ class Pagamento extends \MZ\Database\Helper
             return new \MZ\Account\Credito();
         }
         return \MZ\Account\Credito::findByID($this->getCreditoID());
+    }
+
+    /**
+     * Get allowed keys array
+     * @return array allowed keys array
+     */
+    private static function getAllowedKeys()
+    {
+        $pagamento = new Pagamento();
+        $allowed = Filter::concatKeys('p.', $pagamento->toArray());
+        return $allowed;
+    }
+
+    /**
+     * Filter order array
+     * @param  mixed $order order string or array to parse and filter allowed
+     * @return array allowed associative order
+     */
+    private static function filterOrder($order)
+    {
+        $allowed = self::getAllowedKeys();
+        return Filter::orderBy($order, $allowed, 'p.');
+    }
+
+    /**
+     * Filter condition array with allowed fields
+     * @param  array $condition condition to filter rows
+     * @return array allowed condition
+     */
+    private static function filterCondition($condition)
+    {
+        $allowed = self::getAllowedKeys();
+        return Filter::keys($condition, $allowed, 'p.');
+    }
+
+    /**
+     * Fetch data from database with a condition
+     * @param  array $condition condition to filter rows
+     * @param  array $order order rows
+     * @return SelectQuery query object with condition statement
+     */
+    private static function query($condition = [], $order = [])
+    {
+        $query = self::getDB()->from('Pagamentos p');
+        $condition = self::filterCondition($condition);
+        $query = self::buildOrderBy($query, self::filterOrder($order));
+        $query = $query->orderBy('p.id ASC');
+        return self::buildCondition($query, $condition);
+    }
+
+    /**
+     * Search one register with a condition
+     * @param  array $condition Condition for searching the row
+     * @param  array $order order rows
+     * @return Pagamento A filled Pagamento or empty instance
+     */
+    public static function find($condition, $order = [])
+    {
+        $query = self::query($condition, $order)->limit(1);
+        $row = $query->fetch() ?: [];
+        return new Pagamento($row);
+    }
+
+    /**
+     * Find this object on database using, ID
+     * @param  int $id id to find Pagamento
+     * @return Pagamento A filled instance or empty when not found
+     */
+    public static function findByID($id)
+    {
+        return self::find([
+            'id' => intval($id),
+        ]);
+    }
+
+    /**
+     * Find all Pagamento
+     * @param  array  $condition Condition to get all Pagamento
+     * @param  array  $order     Order Pagamento
+     * @param  int    $limit     Limit data into row count
+     * @param  int    $offset    Start offset to get rows
+     * @return array             List of all rows instanced as Pagamento
+     */
+    public static function findAll($condition = [], $order = [], $limit = null, $offset = null)
+    {
+        $query = self::query($condition, $order);
+        if (!is_null($limit)) {
+            $query = $query->limit($limit);
+        }
+        if (!is_null($offset)) {
+            $query = $query->offset($offset);
+        }
+        $rows = $query->fetchAll();
+        $result = [];
+        foreach ($rows as $row) {
+            $result[] = new Pagamento($row);
+        }
+        return $result;
+    }
+
+    /**
+     * Count all rows from database with matched condition critery
+     * @param  array $condition condition to filter rows
+     * @return integer Quantity of rows
+     */
+    public static function count($condition = [])
+    {
+        $query = self::query($condition);
+        return $query->count();
     }
 }

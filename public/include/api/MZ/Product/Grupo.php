@@ -392,17 +392,13 @@ class Grupo extends \MZ\Database\Helper
         if (is_null($this->getMultiplo())) {
             $errors['multiplo'] = 'O múltiplo não pode ser vazio';
         }
-        if (!is_null($this->getMultiplo()) &&
-            !array_key_exists($this->getMultiplo(), self::getBooleanOptions())
-        ) {
+        if (!Validator::checkBoolean($this->getMultiplo(), true)) {
             $errors['multiplo'] = 'O múltiplo é inválido';
         }
         if (is_null($this->getTipo())) {
             $errors['tipo'] = 'O tipo não pode ser vazio';
         }
-        if (!is_null($this->getTipo()) &&
-            !array_key_exists($this->getTipo(), self::getTipoOptions())
-        ) {
+        if (!Validator::checkInSet($this->getTipo(), self::getTipoOptions(), true)) {
             $errors['tipo'] = 'O tipo é inválido';
         }
         if (is_null($this->getQuantidadeMinima())) {
@@ -414,9 +410,7 @@ class Grupo extends \MZ\Database\Helper
         if (is_null($this->getFuncao())) {
             $errors['funcao'] = 'A função de preço não pode ser vazia';
         }
-        if (!is_null($this->getFuncao()) &&
-            !array_key_exists($this->getFuncao(), self::getFuncaoOptions())
-        ) {
+        if (!Validator::checkInSet($this->getFuncao(), self::getFuncaoOptions(), true)) {
             $errors['funcao'] = 'A função de preço é inválida';
         }
         if (!empty($errors)) {
@@ -456,6 +450,113 @@ class Grupo extends \MZ\Database\Helper
     }
 
     /**
+     * Insert a new Grupo into the database and fill instance from database
+     * @return Grupo Self instance
+     */
+    public function insert()
+    {
+        $values = $this->validate();
+        unset($values['id']);
+        try {
+            $id = self::getDB()->insertInto('Grupos')->values($values)->execute();
+            $grupo = self::findByID($id);
+            $this->fromArray($grupo->toArray());
+        } catch (\Exception $e) {
+            throw $this->translate($e);
+        }
+        return $this;
+    }
+
+    /**
+     * Update Grupo with instance values into database for ID
+     * @return Grupo Self instance
+     */
+    public function update()
+    {
+        $values = $this->validate();
+        if (!$this->exists()) {
+            throw new \Exception('O identificador do grupo não foi informado');
+        }
+        unset($values['id']);
+        try {
+            self::getDB()
+                ->update('Grupos')
+                ->set($values)
+                ->where('id', $this->getID())
+                ->execute();
+            $grupo = self::findByID($this->getID());
+            $this->fromArray($grupo->toArray());
+        } catch (\Exception $e) {
+            throw $this->translate($e);
+        }
+        return $this;
+    }
+
+    /**
+     * Delete this instance from database using ID
+     * @return integer Number of rows deleted (Max 1)
+     */
+    public function delete()
+    {
+        if (!$this->exists()) {
+            throw new \Exception('O identificador do grupo não foi informado');
+        }
+        $result = self::getDB()
+            ->deleteFrom('Grupos')
+            ->where('id', $this->getID())
+            ->execute();
+        return $result;
+    }
+
+    /**
+     * Load one register for it self with a condition
+     * @param  array $condition Condition for searching the row
+     * @param  array $order associative field name -> [-1, 1]
+     * @return Grupo Self instance filled or empty
+     */
+    public function load($condition, $order = [])
+    {
+        $query = self::query($condition, $order)->limit(1);
+        $row = $query->fetch() ?: [];
+        return $this->fromArray($row);
+    }
+
+    /**
+     * Load into this object from database using, ID
+     * @param  int $id id to find Grupo
+     * @return Grupo Self filled instance or empty when not found
+     */
+    public function loadByID($id)
+    {
+        return $this->load([
+            'id' => intval($id),
+        ]);
+    }
+
+    /**
+     * Load into this object from database using, ProdutoID, Descricao
+     * @param  int $produto_id pacote to find Grupo
+     * @param  string $descricao descrição to find Grupo
+     * @return Grupo Self filled instance or empty when not found
+     */
+    public function loadByProdutoIDDescricao($produto_id, $descricao)
+    {
+        return $this->load([
+            'produtoid' => intval($produto_id),
+            'descricao' => strval($descricao),
+        ]);
+    }
+
+    /**
+     * Informa o pacote base da formação
+     * @return \MZ\Product\Produto The object fetched from database
+     */
+    public function findProdutoID()
+    {
+        return \MZ\Product\Produto::findByID($this->getProdutoID());
+    }
+
+    /**
      * Gets textual and translated Tipo for Grupo
      * @param  int $index choose option from index
      * @return mixed A associative key -> translated representative text or text for index
@@ -489,32 +590,6 @@ class Grupo extends \MZ\Database\Helper
             return $options[$index];
         }
         return $options;
-    }
-
-    /**
-     * Find this object on database using, ID
-     * @param  int $id id to find Grupo
-     * @return Grupo A filled instance or empty when not found
-     */
-    public static function findByID($id)
-    {
-        return self::find([
-            'id' => intval($id),
-        ]);
-    }
-
-    /**
-     * Find this object on database using, ProdutoID, Descricao
-     * @param  int $produto_id pacote to find Grupo
-     * @param  string $descricao descrição to find Grupo
-     * @return Grupo A filled instance or empty when not found
-     */
-    public static function findByProdutoIDDescricao($produto_id, $descricao)
-    {
-        return self::find([
-            'produtoid' => intval($produto_id),
-            'descricao' => strval($descricao),
-        ]);
     }
 
     /**
@@ -582,19 +657,43 @@ class Grupo extends \MZ\Database\Helper
     public static function find($condition, $order = [])
     {
         $query = self::query($condition, $order)->limit(1);
-        $row = $query->fetch();
-        if ($row === false) {
-            $row = [];
-        }
+        $row = $query->fetch() ?: [];
         return new Grupo($row);
     }
 
     /**
-     * Fetch all rows from database with matched condition critery
-     * @param  array $condition condition to filter rows
-     * @param  integer $limit number of rows to get, null for all
-     * @param  integer $offset start index to get rows, null for begining
-     * @return array All rows instanced and filled
+     * Find this object on database using, ID
+     * @param  int $id id to find Grupo
+     * @return Grupo A filled instance or empty when not found
+     */
+    public static function findByID($id)
+    {
+        return self::find([
+            'id' => intval($id),
+        ]);
+    }
+
+    /**
+     * Find this object on database using, ProdutoID, Descricao
+     * @param  int $produto_id pacote to find Grupo
+     * @param  string $descricao descrição to find Grupo
+     * @return Grupo A filled instance or empty when not found
+     */
+    public static function findByProdutoIDDescricao($produto_id, $descricao)
+    {
+        return self::find([
+            'produtoid' => intval($produto_id),
+            'descricao' => strval($descricao),
+        ]);
+    }
+
+    /**
+     * Find all Grupo
+     * @param  array  $condition Condition to get all Grupo
+     * @param  array  $order     Order Grupo
+     * @param  int    $limit     Limit data into row count
+     * @param  int    $offset    Start offset to get rows
+     * @return array             List of all rows instanced as Grupo
      */
     public static function findAll($condition = [], $order = [], $limit = null, $offset = null)
     {
@@ -614,77 +713,6 @@ class Grupo extends \MZ\Database\Helper
     }
 
     /**
-     * Insert a new Grupo into the database and fill instance from database
-     * @return Grupo Self instance
-     */
-    public function insert()
-    {
-        $values = $this->validate();
-        unset($values['id']);
-        try {
-            $id = self::getDB()->insertInto('Grupos')->values($values)->execute();
-            $grupo = self::findByID($id);
-            $this->fromArray($grupo->toArray());
-        } catch (\Exception $e) {
-            throw $this->translate($e);
-        }
-        return $this;
-    }
-
-    /**
-     * Update Grupo with instance values into database for ID
-     * @return Grupo Self instance
-     */
-    public function update()
-    {
-        $values = $this->validate();
-        if (!$this->exists()) {
-            throw new \Exception('O identificador do grupo não foi informado');
-        }
-        unset($values['id']);
-        try {
-            self::getDB()
-                ->update('Grupos')
-                ->set($values)
-                ->where('id', $this->getID())
-                ->execute();
-            $grupo = self::findByID($this->getID());
-            $this->fromArray($grupo->toArray());
-        } catch (\Exception $e) {
-            throw $this->translate($e);
-        }
-        return $this;
-    }
-
-    /**
-     * Save the Grupo into the database
-     * @return Grupo Self instance
-     */
-    public function save()
-    {
-        if ($this->exists()) {
-            return $this->update();
-        }
-        return $this->insert();
-    }
-
-    /**
-     * Delete this instance from database using ID
-     * @return integer Number of rows deleted (Max 1)
-     */
-    public function delete()
-    {
-        if (!$this->exists()) {
-            throw new \Exception('O identificador do grupo não foi informado');
-        }
-        $result = self::getDB()
-            ->deleteFrom('Grupos')
-            ->where('id', $this->getID())
-            ->execute();
-        return $result;
-    }
-
-    /**
      * Count all rows from database with matched condition critery
      * @param  array $condition condition to filter rows
      * @return integer Quantity of rows
@@ -693,14 +721,5 @@ class Grupo extends \MZ\Database\Helper
     {
         $query = self::query($condition);
         return $query->count();
-    }
-
-    /**
-     * Informa o pacote base da formação
-     * @return \MZ\Product\Produto The object fetched from database
-     */
-    public function findProdutoID()
-    {
-        return \MZ\Product\Produto::findByID($this->getProdutoID());
     }
 }

@@ -804,6 +804,20 @@ class Cliente extends \MZ\Database\Helper
     }
 
     /**
+     * Get relative foto path or default foto
+     * @param boolean $default If true return default image, otherwise check field
+     * @return string relative web path for cliente foto
+     */
+    public function makeImagem($default = false)
+    {
+        $imagem = $this->getImagem();
+        if ($default) {
+            $imagem = null;
+        }
+        return get_image_url($imagem, 'cliente', 'cliente.png');
+    }
+
+    /**
      * Convert this instance into array associated key -> value with only public fields
      * @return array All public field and values into array format
      */
@@ -811,9 +825,9 @@ class Cliente extends \MZ\Database\Helper
     {
         $cliente = parent::publish();
         unset($cliente['senha']);
-        $cliente['cpf'] = \MZ\Util\Mask::cep($cliente['cpf']);
-        $cliente['fone1'] = \MZ\Util\Mask::cep($cliente['fone1']);
-        $cliente['fone2'] = \MZ\Util\Mask::cep($cliente['fone2']);
+        $cliente['cpf'] = \MZ\Util\Mask::cpf($cliente['cpf']);
+        $cliente['fone1'] = \MZ\Util\Mask::phone($cliente['fone1']);
+        $cliente['fone2'] = \MZ\Util\Mask::phone($cliente['fone2']);
         unset($cliente['secreto']);
         $cliente['imagem'] = $this->makeImagem();
         return $cliente;
@@ -861,7 +875,7 @@ class Cliente extends \MZ\Database\Helper
     public function clean($dependency)
     {
         if (!is_null($this->getImagem()) && $dependency->getImagem() != $this->getImagem()) {
-            unlink(get_image_path($this->getImagem(), 'cliente'));
+            @unlink(get_image_path($this->getImagem(), 'cliente'));
         }
         $this->setImagem($dependency->getImagem());
     }
@@ -876,9 +890,7 @@ class Cliente extends \MZ\Database\Helper
         if (is_null($this->getTipo())) {
             $errors['tipo'] = 'O tipo não pode ser vazio';
         }
-        if (!is_null($this->getTipo()) &&
-            !array_key_exists($this->getTipo(), self::getTipoOptions())
-        ) {
+        if (!Validator::checkInSet($this->getTipo(), self::getTipoOptions(), true)) {
             $errors['tipo'] = 'O tipo é inválido';
         }
         if (!Validator::checkUsername($this->getLogin(), true)) {
@@ -890,9 +902,7 @@ class Cliente extends \MZ\Database\Helper
         if (is_null($this->getNome())) {
             $errors['nome'] = 'O nome não pode ser vazio';
         }
-        if (!is_null($this->getGenero()) &&
-            !array_key_exists($this->getGenero(), self::getGeneroOptions())
-        ) {
+        if (!Validator::checkInSet($this->getGenero(), self::getGeneroOptions(), true)) {
             $errors['genero'] = 'O gênero é inválido';
         }
         if (!Validator::checkCPF($this->getCPF(), true)) {
@@ -978,17 +988,160 @@ class Cliente extends \MZ\Database\Helper
     }
 
     /**
-     * Get relative foto path or default foto
-     * @param boolean $default If true return default image, otherwise check field
-     * @return string relative web path for cliente foto
+     * Insert a new Cliente into the database and fill instance from database
+     * @return Cliente Self instance
      */
-    public function makeImagem($default = false)
+    public function insert()
     {
-        $imagem = $this->getImagem();
-        if ($default) {
-            $imagem = null;
+        $values = $this->validate();
+        unset($values['id']);
+        try {
+            $id = self::getDB()->insertInto('Clientes')->values($values)->execute();
+            $cliente = self::findByID($id);
+            $this->fromArray($cliente->toArray());
+        } catch (\Exception $e) {
+            throw $this->translate($e);
         }
-        return get_image_url($imagem, 'cliente', 'cliente.png');
+        return $this;
+    }
+
+    /**
+     * Update Cliente with instance values into database for ID
+     * @return Cliente Self instance
+     */
+    public function update()
+    {
+        $values = $this->validate();
+        if (!$this->exists()) {
+            throw new \Exception('O identificador do cliente não foi informado');
+        }
+        unset($values['id']);
+        try {
+            self::getDB()
+                ->update('Clientes')
+                ->set($values)
+                ->where('id', $this->getID())
+                ->execute();
+            $cliente = self::findByID($this->getID());
+            $this->fromArray($cliente->toArray());
+        } catch (\Exception $e) {
+            throw $this->translate($e);
+        }
+        return $this;
+    }
+
+    /**
+     * Delete this instance from database using ID
+     * @return integer Number of rows deleted (Max 1)
+     */
+    public function delete()
+    {
+        if (!$this->exists()) {
+            throw new \Exception('O identificador do cliente não foi informado');
+        }
+        $result = self::getDB()
+            ->deleteFrom('Clientes')
+            ->where('id', $this->getID())
+            ->execute();
+        return $result;
+    }
+
+    /**
+     * Load one register for it self with a condition
+     * @param  array $condition Condition for searching the row
+     * @param  array $order associative field name -> [-1, 1]
+     * @return Cliente Self instance filled or empty
+     */
+    public function load($condition, $order = [])
+    {
+        $query = self::query($condition, $order)->limit(1);
+        $row = $query->fetch() ?: [];
+        return $this->fromArray($row);
+    }
+
+    /**
+     * Load into this object from database using, ID
+     * @param  int $id id to find Cliente
+     * @return Cliente Self filled instance or empty when not found
+     */
+    public function loadByID($id)
+    {
+        return $this->load([
+            'id' => intval($id),
+        ]);
+    }
+
+    /**
+     * Load into this object from database using, Fone
+     * @param  string $fone telefone to find Cliente
+     * @return Cliente Self filled instance or empty when not found
+     */
+    public function loadByFone($fone)
+    {
+        return $this->load([
+            'fone1' => strval($fone),
+        ]);
+    }
+
+    /**
+     * Load into this object from database using, Email
+     * @param  string $email e-mail to find Cliente
+     * @return Cliente Self filled instance or empty when not found
+     */
+    public function loadByEmail($email)
+    {
+        return $this->load([
+            'email' => strval($email),
+        ]);
+    }
+
+    /**
+     * Load into this object from database using, CPF
+     * @param  string $cpf cpf to find Cliente
+     * @return Cliente Self filled instance or empty when not found
+     */
+    public function loadByCPF($cpf)
+    {
+        return $this->load([
+            'cpf' => strval($cpf),
+        ]);
+    }
+
+    /**
+     * Load into this object from database using, Login
+     * @param  string $login login to find Cliente
+     * @return Cliente Self filled instance or empty when not found
+     */
+    public function loadByLogin($login)
+    {
+        return $this->load([
+            'login' => strval($login),
+        ]);
+    }
+
+    /**
+     * Load into this object from database using, Secreto
+     * @param  string $secreto código de recuperação to find Cliente
+     * @return Cliente Self filled instance or empty when not found
+     */
+    public function loadBySecreto($secreto)
+    {
+        return $this->load([
+            'secreto' => strval($secreto),
+        ]);
+    }
+
+    /**
+     * Informa quem é o acionista principal da empresa, obrigatoriamente o
+     * cliente deve ser uma pessoa jurídica e o acionista uma pessoa física
+     * @return \MZ\Account\Cliente The object fetched from database
+     */
+    public function findAcionistaID()
+    {
+        if (is_null($this->getAcionistaID())) {
+            return new \MZ\Account\Cliente();
+        }
+        return \MZ\Account\Cliente::findByID($this->getAcionistaID());
     }
 
     /**
@@ -1023,6 +1176,75 @@ class Cliente extends \MZ\Database\Helper
             return $options[$index];
         }
         return $options;
+    }
+
+    /**
+     * Get allowed keys array
+     * @return array allowed keys array
+     */
+    private static function getAllowedKeys()
+    {
+        $cliente = new Cliente();
+        $allowed = Filter::concatKeys('c.', $cliente->toArray());
+        return $allowed;
+    }
+
+    /**
+     * Filter order array
+     * @param  mixed $order order string or array to parse and filter allowed
+     * @return array allowed associative order
+     */
+    private static function filterOrder($order)
+    {
+        $allowed = self::getAllowedKeys();
+        return Filter::orderBy($order, $allowed, 'c.');
+    }
+
+    /**
+     * Filter condition array with allowed fields
+     * @param  array $condition condition to filter rows
+     * @return array allowed condition
+     */
+    private static function filterCondition($condition)
+    {
+        $allowed = self::getAllowedKeys();
+        if (isset($condition['search'])) {
+            $search = $condition['search'];
+            $field = 'c.nome LIKE ?';
+            $condition[$field] = '%'.$search.'%';
+            $allowed[$field] = true;
+            unset($condition['search']);
+        }
+        return Filter::keys($condition, $allowed, 'c.');
+    }
+
+    /**
+     * Fetch data from database with a condition
+     * @param  array $condition condition to filter rows
+     * @param  array $order order rows
+     * @return SelectQuery query object with condition statement
+     */
+    private static function query($condition = [], $order = [])
+    {
+        $query = self::getDB()->from('Clientes c');
+        $condition = self::filterCondition($condition);
+        $query = self::buildOrderBy($query, self::filterOrder($order));
+        $query = $query->orderBy('c.nome ASC');
+        $query = $query->orderBy('c.id ASC');
+        return self::buildCondition($query, $condition);
+    }
+
+    /**
+     * Search one register with a condition
+     * @param  array $condition Condition for searching the row
+     * @param  array $order order rows
+     * @return Cliente A filled Cliente or empty instance
+     */
+    public static function find($condition, $order = [])
+    {
+        $query = self::query($condition, $order)->limit(1);
+        $row = $query->fetch() ?: [];
+        return new Cliente($row);
     }
 
     /**
@@ -1098,83 +1320,12 @@ class Cliente extends \MZ\Database\Helper
     }
 
     /**
-     * Get allowed keys array
-     * @return array allowed keys array
-     */
-    private static function getAllowedKeys()
-    {
-        $cliente = new Cliente();
-        $allowed = Filter::concatKeys('c.', $cliente->toArray());
-        return $allowed;
-    }
-
-    /**
-     * Filter order array
-     * @param  mixed $order order string or array to parse and filter allowed
-     * @return array allowed associative order
-     */
-    private static function filterOrder($order)
-    {
-        $allowed = self::getAllowedKeys();
-        return Filter::orderBy($order, $allowed, 'c.');
-    }
-
-    /**
-     * Filter condition array with allowed fields
-     * @param  array $condition condition to filter rows
-     * @return array allowed condition
-     */
-    private static function filterCondition($condition)
-    {
-        $allowed = self::getAllowedKeys();
-        if (isset($condition['search'])) {
-            $search = $condition['search'];
-            $field = 'c.nome LIKE ?';
-            $condition[$field] = '%'.$search.'%';
-            $allowed[$field] = true;
-            unset($condition['search']);
-        }
-        return Filter::keys($condition, $allowed, 'c.');
-    }
-
-    /**
-     * Fetch data from database with a condition
-     * @param  array $condition condition to filter rows
-     * @param  array $order order rows
-     * @return SelectQuery query object with condition statement
-     */
-    private static function query($condition = [], $order = [])
-    {
-        $query = self::getDB()->from('Clientes c');
-        $condition = self::filterCondition($condition);
-        $query = self::buildOrderBy($query, self::filterOrder($order));
-        $query = $query->orderBy('c.nome ASC');
-        $query = $query->orderBy('c.id ASC');
-        return self::buildCondition($query, $condition);
-    }
-
-    /**
-     * Search one register with a condition
-     * @param  array $condition Condition for searching the row
-     * @param  array $order order rows
-     * @return Cliente A filled Cliente or empty instance
-     */
-    public static function find($condition, $order = [])
-    {
-        $query = self::query($condition, $order)->limit(1);
-        $row = $query->fetch();
-        if ($row === false) {
-            $row = [];
-        }
-        return new Cliente($row);
-    }
-
-    /**
-     * Fetch all rows from database with matched condition critery
-     * @param  array $condition condition to filter rows
-     * @param  integer $limit number of rows to get, null for all
-     * @param  integer $offset start index to get rows, null for begining
-     * @return array All rows instanced and filled
+     * Find all Cliente
+     * @param  array  $condition Condition to get all Cliente
+     * @param  array  $order     Order Cliente
+     * @param  int    $limit     Limit data into row count
+     * @param  int    $offset    Start offset to get rows
+     * @return array             List of all rows instanced as Cliente
      */
     public static function findAll($condition = [], $order = [], $limit = null, $offset = null)
     {
@@ -1194,77 +1345,6 @@ class Cliente extends \MZ\Database\Helper
     }
 
     /**
-     * Insert a new Cliente into the database and fill instance from database
-     * @return Cliente Self instance
-     */
-    public function insert()
-    {
-        $values = $this->validate();
-        unset($values['id']);
-        try {
-            $id = self::getDB()->insertInto('Clientes')->values($values)->execute();
-            $cliente = self::findByID($id);
-            $this->fromArray($cliente->toArray());
-        } catch (\Exception $e) {
-            throw $this->translate($e);
-        }
-        return $this;
-    }
-
-    /**
-     * Update Cliente with instance values into database for ID
-     * @return Cliente Self instance
-     */
-    public function update()
-    {
-        $values = $this->validate();
-        if (!$this->exists()) {
-            throw new \Exception('O identificador do cliente não foi informado');
-        }
-        unset($values['id']);
-        try {
-            self::getDB()
-                ->update('Clientes')
-                ->set($values)
-                ->where('id', $this->getID())
-                ->execute();
-            $cliente = self::findByID($this->getID());
-            $this->fromArray($cliente->toArray());
-        } catch (\Exception $e) {
-            throw $this->translate($e);
-        }
-        return $this;
-    }
-
-    /**
-     * Save the Cliente into the database
-     * @return Cliente Self instance
-     */
-    public function save()
-    {
-        if ($this->exists()) {
-            return $this->update();
-        }
-        return $this->insert();
-    }
-
-    /**
-     * Delete this instance from database using ID
-     * @return integer Number of rows deleted (Max 1)
-     */
-    public function delete()
-    {
-        if (!$this->exists()) {
-            throw new \Exception('O identificador do cliente não foi informado');
-        }
-        $result = self::getDB()
-            ->deleteFrom('Clientes')
-            ->where('id', $this->getID())
-            ->execute();
-        return $result;
-    }
-
-    /**
      * Count all rows from database with matched condition critery
      * @param  array $condition condition to filter rows
      * @return integer Quantity of rows
@@ -1273,18 +1353,5 @@ class Cliente extends \MZ\Database\Helper
     {
         $query = self::query($condition);
         return $query->count();
-    }
-
-    /**
-     * Informa quem é o acionista principal da empresa, obrigatoriamente o
-     * cliente deve ser uma pessoa jurídica e o acionista uma pessoa física
-     * @return \MZ\Account\Cliente The object fetched from database
-     */
-    public function findAcionistaID()
-    {
-        if (is_null($this->getAcionistaID())) {
-            return new \MZ\Account\Cliente();
-        }
-        return \MZ\Account\Cliente::findByID($this->getAcionistaID());
     }
 }

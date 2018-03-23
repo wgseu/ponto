@@ -210,9 +210,7 @@ class Mesa extends \MZ\Database\Helper
         if (is_null($this->getAtiva())) {
             $errors['ativa'] = 'A ativa não pode ser vazia';
         }
-        if (!is_null($this->getAtiva()) &&
-            !array_key_exists($this->getAtiva(), self::getBooleanOptions())
-        ) {
+        if (!Validator::checkBoolean($this->getAtiva(), true)) {
             $errors['ativa'] = 'A ativa é inválida';
         }
         if (!empty($errors)) {
@@ -248,25 +246,97 @@ class Mesa extends \MZ\Database\Helper
     }
 
     /**
-     * Find this object on database using, ID
-     * @param  int $id número to find Mesa
-     * @return Mesa A filled instance or empty when not found
+     * Insert a new Mesa into the database and fill instance from database
+     * @return Mesa Self instance
      */
-    public static function findByID($id)
+    public function insert()
     {
-        return self::find([
+        $values = $this->validate();
+        unset($values['id']);
+        try {
+            $id = self::getDB()->insertInto('Mesas')->values($values)->execute();
+            $mesa = self::findByID($id);
+            $this->fromArray($mesa->toArray());
+        } catch (\Exception $e) {
+            throw $this->translate($e);
+        }
+        return $this;
+    }
+
+    /**
+     * Update Mesa with instance values into database for Número
+     * @return Mesa Self instance
+     */
+    public function update()
+    {
+        $values = $this->validate();
+        if (!$this->exists()) {
+            throw new \Exception('O identificador da mesa não foi informado');
+        }
+        unset($values['id']);
+        try {
+            self::getDB()
+                ->update('Mesas')
+                ->set($values)
+                ->where('id', $this->getID())
+                ->execute();
+            $mesa = self::findByID($this->getID());
+            $this->fromArray($mesa->toArray());
+        } catch (\Exception $e) {
+            throw $this->translate($e);
+        }
+        return $this;
+    }
+
+    /**
+     * Delete this instance from database using Número
+     * @return integer Number of rows deleted (Max 1)
+     */
+    public function delete()
+    {
+        if (!$this->exists()) {
+            throw new \Exception('O identificador da mesa não foi informado');
+        }
+        $result = self::getDB()
+            ->deleteFrom('Mesas')
+            ->where('id', $this->getID())
+            ->execute();
+        return $result;
+    }
+
+    /**
+     * Load one register for it self with a condition
+     * @param  array $condition Condition for searching the row
+     * @param  array $order associative field name -> [-1, 1]
+     * @return Mesa Self instance filled or empty
+     */
+    public function load($condition, $order = [])
+    {
+        $query = self::query($condition, $order)->limit(1);
+        $row = $query->fetch() ?: [];
+        return $this->fromArray($row);
+    }
+
+    /**
+     * Load into this object from database using, ID
+     * @param  int $id número to find Mesa
+     * @return Mesa Self filled instance or empty when not found
+     */
+    public function loadByID($id)
+    {
+        return $this->load([
             'id' => intval($id),
         ]);
     }
 
     /**
-     * Find this object on database using, Nome
+     * Load into this object from database using, Nome
      * @param  string $nome nome to find Mesa
-     * @return Mesa A filled instance or empty when not found
+     * @return Mesa Self filled instance or empty when not found
      */
-    public static function findByNome($nome)
+    public function loadByNome($nome)
     {
-        return self::find([
+        return $this->load([
             'nome' => strval($nome),
         ]);
     }
@@ -336,19 +406,41 @@ class Mesa extends \MZ\Database\Helper
     public static function find($condition, $order = [])
     {
         $query = self::query($condition, $order)->limit(1);
-        $row = $query->fetch();
-        if ($row === false) {
-            $row = [];
-        }
+        $row = $query->fetch() ?: [];
         return new Mesa($row);
     }
 
     /**
-     * Fetch all rows from database with matched condition critery
-     * @param  array $condition condition to filter rows
-     * @param  integer $limit number of rows to get, null for all
-     * @param  integer $offset start index to get rows, null for begining
-     * @return array All rows instanced and filled
+     * Find this object on database using, ID
+     * @param  int $id número to find Mesa
+     * @return Mesa A filled instance or empty when not found
+     */
+    public static function findByID($id)
+    {
+        return self::find([
+            'id' => intval($id),
+        ]);
+    }
+
+    /**
+     * Find this object on database using, Nome
+     * @param  string $nome nome to find Mesa
+     * @return Mesa A filled instance or empty when not found
+     */
+    public static function findByNome($nome)
+    {
+        return self::find([
+            'nome' => strval($nome),
+        ]);
+    }
+
+    /**
+     * Find all Mesa
+     * @param  array  $condition Condition to get all Mesa
+     * @param  array  $order     Order Mesa
+     * @param  int    $limit     Limit data into row count
+     * @param  int    $offset    Start offset to get rows
+     * @return array             List of all rows instanced as Mesa
      */
     public static function findAll($condition = [], $order = [], $limit = null, $offset = null)
     {
@@ -364,77 +456,6 @@ class Mesa extends \MZ\Database\Helper
         foreach ($rows as $row) {
             $result[] = new Mesa($row);
         }
-        return $result;
-    }
-
-    /**
-     * Insert a new Mesa into the database and fill instance from database
-     * @return Mesa Self instance
-     */
-    public function insert()
-    {
-        $values = $this->validate();
-        unset($values['id']);
-        try {
-            $id = self::getDB()->insertInto('Mesas')->values($values)->execute();
-            $mesa = self::findByID($id);
-            $this->fromArray($mesa->toArray());
-        } catch (\Exception $e) {
-            throw $this->translate($e);
-        }
-        return $this;
-    }
-
-    /**
-     * Update Mesa with instance values into database for Número
-     * @return Mesa Self instance
-     */
-    public function update()
-    {
-        $values = $this->validate();
-        if (!$this->exists()) {
-            throw new \Exception('O identificador da mesa não foi informado');
-        }
-        unset($values['id']);
-        try {
-            self::getDB()
-                ->update('Mesas')
-                ->set($values)
-                ->where('id', $this->getID())
-                ->execute();
-            $mesa = self::findByID($this->getID());
-            $this->fromArray($mesa->toArray());
-        } catch (\Exception $e) {
-            throw $this->translate($e);
-        }
-        return $this;
-    }
-
-    /**
-     * Save the Mesa into the database
-     * @return Mesa Self instance
-     */
-    public function save()
-    {
-        if ($this->exists()) {
-            return $this->update();
-        }
-        return $this->insert();
-    }
-
-    /**
-     * Delete this instance from database using Número
-     * @return integer Number of rows deleted (Max 1)
-     */
-    public function delete()
-    {
-        if (!$this->exists()) {
-            throw new \Exception('O identificador da mesa não foi informado');
-        }
-        $result = self::getDB()
-            ->deleteFrom('Mesas')
-            ->where('id', $this->getID())
-            ->execute();
         return $result;
     }
 

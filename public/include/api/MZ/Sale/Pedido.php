@@ -799,17 +799,13 @@ class Pedido extends \MZ\Database\Helper
         if (is_null($this->getTipo())) {
             $errors['tipo'] = 'O tipo não pode ser vazio';
         }
-        if (!is_null($this->getTipo()) &&
-            !array_key_exists($this->getTipo(), self::getTipoOptions())
-        ) {
+        if (!Validator::checkInSet($this->getTipo(), self::getTipoOptions(), true)) {
             $errors['tipo'] = 'O tipo é inválido';
         }
         if (is_null($this->getEstado())) {
             $errors['estado'] = 'O estado não pode ser vazio';
         }
-        if (!is_null($this->getEstado()) &&
-            !array_key_exists($this->getEstado(), self::getEstadoOptions())
-        ) {
+        if (!Validator::checkInSet($this->getEstado(), self::getEstadoOptions(), true)) {
             $errors['estado'] = 'O estado é inválido';
         }
         if (is_null($this->getPessoas())) {
@@ -818,9 +814,7 @@ class Pedido extends \MZ\Database\Helper
         if (is_null($this->getCancelado())) {
             $errors['cancelado'] = 'O cancelado não pode ser vazio';
         }
-        if (!is_null($this->getCancelado()) &&
-            !array_key_exists($this->getCancelado(), self::getBooleanOptions())
-        ) {
+        if (!Validator::checkBoolean($this->getCancelado(), true)) {
             $errors['cancelado'] = 'O cancelado é inválido';
         }
         if (is_null($this->getDataCriacao())) {
@@ -848,145 +842,6 @@ class Pedido extends \MZ\Database\Helper
             ]);
         }
         return parent::translate($e);
-    }
-
-    /**
-     * Gets textual and translated Tipo for Pedido
-     * @param  int $index choose option from index
-     * @return mixed A associative key -> translated representative text or text for index
-     */
-    public static function getTipoOptions($index = null)
-    {
-        $options = [
-            self::TIPO_MESA => 'Mesa',
-            self::TIPO_COMANDA => 'Comanda',
-            self::TIPO_AVULSO => 'Balcão',
-            self::TIPO_ENTREGA => 'Entrega',
-        ];
-        if (!is_null($index)) {
-            return $options[$index];
-        }
-        return $options;
-    }
-
-    /**
-     * Gets textual and translated Estado for Pedido
-     * @param  int $index choose option from index
-     * @return mixed A associative key -> translated representative text or text for index
-     */
-    public static function getEstadoOptions($index = null)
-    {
-        $options = [
-            self::ESTADO_FINALIZADO => 'Finalizado',
-            self::ESTADO_ATIVO => 'Ativo',
-            self::ESTADO_AGENDADO => 'Agendado',
-            self::ESTADO_ENTREGA => 'Entrega',
-            self::ESTADO_FECHADO => 'Fechado',
-        ];
-        if (!is_null($index)) {
-            return $options[$index];
-        }
-        return $options;
-    }
-
-    /**
-     * Find this object on database using, ID
-     * @param  int $id código to find Pedido
-     * @return Pedido A filled instance or empty when not found
-     */
-    public static function findByID($id)
-    {
-        return self::find([
-            'id' => intval($id),
-        ]);
-    }
-
-    /**
-     * Get allowed keys array
-     * @return array allowed keys array
-     */
-    private static function getAllowedKeys()
-    {
-        $pedido = new Pedido();
-        $allowed = Filter::concatKeys('p.', $pedido->toArray());
-        return $allowed;
-    }
-
-    /**
-     * Filter order array
-     * @param  mixed $order order string or array to parse and filter allowed
-     * @return array allowed associative order
-     */
-    private static function filterOrder($order)
-    {
-        $allowed = self::getAllowedKeys();
-        return Filter::orderBy($order, $allowed, 'p.');
-    }
-
-    /**
-     * Filter condition array with allowed fields
-     * @param  array $condition condition to filter rows
-     * @return array allowed condition
-     */
-    private static function filterCondition($condition)
-    {
-        $allowed = self::getAllowedKeys();
-        return Filter::keys($condition, $allowed, 'p.');
-    }
-
-    /**
-     * Fetch data from database with a condition
-     * @param  array $condition condition to filter rows
-     * @param  array $order order rows
-     * @return SelectQuery query object with condition statement
-     */
-    private static function query($condition = [], $order = [])
-    {
-        $query = self::getDB()->from('Pedidos p');
-        $condition = self::filterCondition($condition);
-        $query = self::buildOrderBy($query, self::filterOrder($order));
-        $query = $query->orderBy('p.id ASC');
-        return self::buildCondition($query, $condition);
-    }
-
-    /**
-     * Search one register with a condition
-     * @param  array $condition Condition for searching the row
-     * @param  array $order order rows
-     * @return Pedido A filled Pedido or empty instance
-     */
-    public static function find($condition, $order = [])
-    {
-        $query = self::query($condition, $order)->limit(1);
-        $row = $query->fetch();
-        if ($row === false) {
-            $row = [];
-        }
-        return new Pedido($row);
-    }
-
-    /**
-     * Fetch all rows from database with matched condition critery
-     * @param  array $condition condition to filter rows
-     * @param  integer $limit number of rows to get, null for all
-     * @param  integer $offset start index to get rows, null for begining
-     * @return array All rows instanced and filled
-     */
-    public static function findAll($condition = [], $order = [], $limit = null, $offset = null)
-    {
-        $query = self::query($condition, $order);
-        if (!is_null($limit)) {
-            $query = $query->limit($limit);
-        }
-        if (!is_null($offset)) {
-            $query = $query->offset($offset);
-        }
-        $rows = $query->fetchAll();
-        $result = [];
-        foreach ($rows as $row) {
-            $result[] = new Pedido($row);
-        }
-        return $result;
     }
 
     /**
@@ -1033,18 +888,6 @@ class Pedido extends \MZ\Database\Helper
     }
 
     /**
-     * Save the Pedido into the database
-     * @return Pedido Self instance
-     */
-    public function save()
-    {
-        if ($this->exists()) {
-            return $this->update();
-        }
-        return $this->insert();
-    }
-
-    /**
      * Delete this instance from database using Código
      * @return integer Number of rows deleted (Max 1)
      */
@@ -1061,14 +904,28 @@ class Pedido extends \MZ\Database\Helper
     }
 
     /**
-     * Count all rows from database with matched condition critery
-     * @param  array $condition condition to filter rows
-     * @return integer Quantity of rows
+     * Load one register for it self with a condition
+     * @param  array $condition Condition for searching the row
+     * @param  array $order associative field name -> [-1, 1]
+     * @return Pedido Self instance filled or empty
      */
-    public static function count($condition = [])
+    public function load($condition, $order = [])
     {
-        $query = self::query($condition);
-        return $query->count();
+        $query = self::query($condition, $order)->limit(1);
+        $row = $query->fetch() ?: [];
+        return $this->fromArray($row);
+    }
+
+    /**
+     * Load into this object from database using, ID
+     * @param  int $id código to find Pedido
+     * @return Pedido Self filled instance or empty when not found
+     */
+    public function loadByID($id)
+    {
+        return $this->load([
+            'id' => intval($id),
+        ]);
     }
 
     /**
@@ -1173,5 +1030,153 @@ class Pedido extends \MZ\Database\Helper
             return new \MZ\Employee\Funcionario();
         }
         return \MZ\Employee\Funcionario::findByID($this->getFechadorID());
+    }
+
+    /**
+     * Gets textual and translated Tipo for Pedido
+     * @param  int $index choose option from index
+     * @return mixed A associative key -> translated representative text or text for index
+     */
+    public static function getTipoOptions($index = null)
+    {
+        $options = [
+            self::TIPO_MESA => 'Mesa',
+            self::TIPO_COMANDA => 'Comanda',
+            self::TIPO_AVULSO => 'Balcão',
+            self::TIPO_ENTREGA => 'Entrega',
+        ];
+        if (!is_null($index)) {
+            return $options[$index];
+        }
+        return $options;
+    }
+
+    /**
+     * Gets textual and translated Estado for Pedido
+     * @param  int $index choose option from index
+     * @return mixed A associative key -> translated representative text or text for index
+     */
+    public static function getEstadoOptions($index = null)
+    {
+        $options = [
+            self::ESTADO_FINALIZADO => 'Finalizado',
+            self::ESTADO_ATIVO => 'Ativo',
+            self::ESTADO_AGENDADO => 'Agendado',
+            self::ESTADO_ENTREGA => 'Entrega',
+            self::ESTADO_FECHADO => 'Fechado',
+        ];
+        if (!is_null($index)) {
+            return $options[$index];
+        }
+        return $options;
+    }
+
+    /**
+     * Get allowed keys array
+     * @return array allowed keys array
+     */
+    private static function getAllowedKeys()
+    {
+        $pedido = new Pedido();
+        $allowed = Filter::concatKeys('p.', $pedido->toArray());
+        return $allowed;
+    }
+
+    /**
+     * Filter order array
+     * @param  mixed $order order string or array to parse and filter allowed
+     * @return array allowed associative order
+     */
+    private static function filterOrder($order)
+    {
+        $allowed = self::getAllowedKeys();
+        return Filter::orderBy($order, $allowed, 'p.');
+    }
+
+    /**
+     * Filter condition array with allowed fields
+     * @param  array $condition condition to filter rows
+     * @return array allowed condition
+     */
+    private static function filterCondition($condition)
+    {
+        $allowed = self::getAllowedKeys();
+        return Filter::keys($condition, $allowed, 'p.');
+    }
+
+    /**
+     * Fetch data from database with a condition
+     * @param  array $condition condition to filter rows
+     * @param  array $order order rows
+     * @return SelectQuery query object with condition statement
+     */
+    private static function query($condition = [], $order = [])
+    {
+        $query = self::getDB()->from('Pedidos p');
+        $condition = self::filterCondition($condition);
+        $query = self::buildOrderBy($query, self::filterOrder($order));
+        $query = $query->orderBy('p.id ASC');
+        return self::buildCondition($query, $condition);
+    }
+
+    /**
+     * Search one register with a condition
+     * @param  array $condition Condition for searching the row
+     * @param  array $order order rows
+     * @return Pedido A filled Pedido or empty instance
+     */
+    public static function find($condition, $order = [])
+    {
+        $query = self::query($condition, $order)->limit(1);
+        $row = $query->fetch() ?: [];
+        return new Pedido($row);
+    }
+
+    /**
+     * Find this object on database using, ID
+     * @param  int $id código to find Pedido
+     * @return Pedido A filled instance or empty when not found
+     */
+    public static function findByID($id)
+    {
+        return self::find([
+            'id' => intval($id),
+        ]);
+    }
+
+    /**
+     * Find all Pedido
+     * @param  array  $condition Condition to get all Pedido
+     * @param  array  $order     Order Pedido
+     * @param  int    $limit     Limit data into row count
+     * @param  int    $offset    Start offset to get rows
+     * @return array             List of all rows instanced as Pedido
+     */
+    public static function findAll($condition = [], $order = [], $limit = null, $offset = null)
+    {
+        $query = self::query($condition, $order);
+        if (!is_null($limit)) {
+            $query = $query->limit($limit);
+        }
+        if (!is_null($offset)) {
+            $query = $query->offset($offset);
+        }
+        $rows = $query->fetchAll();
+        $result = [];
+        foreach ($rows as $row) {
+            $result[] = new Pedido($row);
+        }
+        return $result;
+    }
+
+    /**
+     * Count all rows from database with matched condition critery
+     * @param  array $condition condition to filter rows
+     * @return integer Quantity of rows
+     */
+    public static function count($condition = [])
+    {
+        $query = self::query($condition);
+        return $query->count();
     }
 }

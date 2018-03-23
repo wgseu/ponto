@@ -331,27 +331,117 @@ class Compra extends \MZ\Database\Helper
     }
 
     /**
-     * Find this object on database using, ID
-     * @param  int $id id to find Compra
-     * @return Compra A filled instance or empty when not found
+     * Insert a new Compra into the database and fill instance from database
+     * @return Compra Self instance
      */
-    public static function findByID($id)
+    public function insert()
     {
-        return self::find([
+        $values = $this->validate();
+        unset($values['id']);
+        try {
+            $id = self::getDB()->insertInto('Compras')->values($values)->execute();
+            $compra = self::findByID($id);
+            $this->fromArray($compra->toArray());
+        } catch (\Exception $e) {
+            throw $this->translate($e);
+        }
+        return $this;
+    }
+
+    /**
+     * Update Compra with instance values into database for ID
+     * @return Compra Self instance
+     */
+    public function update()
+    {
+        $values = $this->validate();
+        if (!$this->exists()) {
+            throw new \Exception('O identificador da compra não foi informado');
+        }
+        unset($values['id']);
+        try {
+            self::getDB()
+                ->update('Compras')
+                ->set($values)
+                ->where('id', $this->getID())
+                ->execute();
+            $compra = self::findByID($this->getID());
+            $this->fromArray($compra->toArray());
+        } catch (\Exception $e) {
+            throw $this->translate($e);
+        }
+        return $this;
+    }
+
+    /**
+     * Delete this instance from database using ID
+     * @return integer Number of rows deleted (Max 1)
+     */
+    public function delete()
+    {
+        if (!$this->exists()) {
+            throw new \Exception('O identificador da compra não foi informado');
+        }
+        $result = self::getDB()
+            ->deleteFrom('Compras')
+            ->where('id', $this->getID())
+            ->execute();
+        return $result;
+    }
+
+    /**
+     * Load one register for it self with a condition
+     * @param  array $condition Condition for searching the row
+     * @param  array $order associative field name -> [-1, 1]
+     * @return Compra Self instance filled or empty
+     */
+    public function load($condition, $order = [])
+    {
+        $query = self::query($condition, $order)->limit(1);
+        $row = $query->fetch() ?: [];
+        return $this->fromArray($row);
+    }
+
+    /**
+     * Load into this object from database using, ID
+     * @param  int $id id to find Compra
+     * @return Compra Self filled instance or empty when not found
+     */
+    public function loadByID($id)
+    {
+        return $this->load([
             'id' => intval($id),
         ]);
     }
 
     /**
-     * Find this object on database using, Numero
+     * Load into this object from database using, Numero
      * @param  string $numero número da compra to find Compra
-     * @return Compra A filled instance or empty when not found
+     * @return Compra Self filled instance or empty when not found
      */
-    public static function findByNumero($numero)
+    public function loadByNumero($numero)
     {
-        return self::find([
+        return $this->load([
             'numero' => strval($numero),
         ]);
+    }
+
+    /**
+     * Informa o funcionário que comprou os produtos da lista
+     * @return \MZ\Employee\Funcionario The object fetched from database
+     */
+    public function findCompradorID()
+    {
+        return \MZ\Employee\Funcionario::findByID($this->getCompradorID());
+    }
+
+    /**
+     * Fornecedor em que os produtos foram compras
+     * @return \MZ\Stock\Fornecedor The object fetched from database
+     */
+    public function findFornecedorID()
+    {
+        return \MZ\Stock\Fornecedor::findByID($this->getFornecedorID());
     }
 
     /**
@@ -411,19 +501,41 @@ class Compra extends \MZ\Database\Helper
     public static function find($condition, $order = [])
     {
         $query = self::query($condition, $order)->limit(1);
-        $row = $query->fetch();
-        if ($row === false) {
-            $row = [];
-        }
+        $row = $query->fetch() ?: [];
         return new Compra($row);
     }
 
     /**
-     * Fetch all rows from database with matched condition critery
-     * @param  array $condition condition to filter rows
-     * @param  integer $limit number of rows to get, null for all
-     * @param  integer $offset start index to get rows, null for begining
-     * @return array All rows instanced and filled
+     * Find this object on database using, ID
+     * @param  int $id id to find Compra
+     * @return Compra A filled instance or empty when not found
+     */
+    public static function findByID($id)
+    {
+        return self::find([
+            'id' => intval($id),
+        ]);
+    }
+
+    /**
+     * Find this object on database using, Numero
+     * @param  string $numero número da compra to find Compra
+     * @return Compra A filled instance or empty when not found
+     */
+    public static function findByNumero($numero)
+    {
+        return self::find([
+            'numero' => strval($numero),
+        ]);
+    }
+
+    /**
+     * Find all Compra
+     * @param  array  $condition Condition to get all Compra
+     * @param  array  $order     Order Compra
+     * @param  int    $limit     Limit data into row count
+     * @param  int    $offset    Start offset to get rows
+     * @return array             List of all rows instanced as Compra
      */
     public static function findAll($condition = [], $order = [], $limit = null, $offset = null)
     {
@@ -443,77 +555,6 @@ class Compra extends \MZ\Database\Helper
     }
 
     /**
-     * Insert a new Compra into the database and fill instance from database
-     * @return Compra Self instance
-     */
-    public function insert()
-    {
-        $values = $this->validate();
-        unset($values['id']);
-        try {
-            $id = self::getDB()->insertInto('Compras')->values($values)->execute();
-            $compra = self::findByID($id);
-            $this->fromArray($compra->toArray());
-        } catch (\Exception $e) {
-            throw $this->translate($e);
-        }
-        return $this;
-    }
-
-    /**
-     * Update Compra with instance values into database for ID
-     * @return Compra Self instance
-     */
-    public function update()
-    {
-        $values = $this->validate();
-        if (!$this->exists()) {
-            throw new \Exception('O identificador da compra não foi informado');
-        }
-        unset($values['id']);
-        try {
-            self::getDB()
-                ->update('Compras')
-                ->set($values)
-                ->where('id', $this->getID())
-                ->execute();
-            $compra = self::findByID($this->getID());
-            $this->fromArray($compra->toArray());
-        } catch (\Exception $e) {
-            throw $this->translate($e);
-        }
-        return $this;
-    }
-
-    /**
-     * Save the Compra into the database
-     * @return Compra Self instance
-     */
-    public function save()
-    {
-        if ($this->exists()) {
-            return $this->update();
-        }
-        return $this->insert();
-    }
-
-    /**
-     * Delete this instance from database using ID
-     * @return integer Number of rows deleted (Max 1)
-     */
-    public function delete()
-    {
-        if (!$this->exists()) {
-            throw new \Exception('O identificador da compra não foi informado');
-        }
-        $result = self::getDB()
-            ->deleteFrom('Compras')
-            ->where('id', $this->getID())
-            ->execute();
-        return $result;
-    }
-
-    /**
      * Count all rows from database with matched condition critery
      * @param  array $condition condition to filter rows
      * @return integer Quantity of rows
@@ -522,23 +563,5 @@ class Compra extends \MZ\Database\Helper
     {
         $query = self::query($condition);
         return $query->count();
-    }
-
-    /**
-     * Informa o funcionário que comprou os produtos da lista
-     * @return \MZ\Employee\Funcionario The object fetched from database
-     */
-    public function findCompradorID()
-    {
-        return \MZ\Employee\Funcionario::findByID($this->getCompradorID());
-    }
-
-    /**
-     * Fornecedor em que os produtos foram compras
-     * @return \MZ\Stock\Fornecedor The object fetched from database
-     */
-    public function findFornecedorID()
-    {
-        return \MZ\Stock\Fornecedor::findByID($this->getFornecedorID());
     }
 }

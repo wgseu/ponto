@@ -269,7 +269,7 @@ class Endereco extends \MZ\Database\Helper
             $errors['logradouro'] = 'O logradouro não pode ser vazio';
         }
         if (is_null($this->getCEP())) {
-            $errors['cep'] = sprintf('O %s não pode ser vazio', _p('Titulo', 'CEP'));
+            $errors['cep'] = 'O cep não pode ser vazio';
         }
         if (!Validator::checkCEP($this->getCEP())) {
             $errors['cep'] = sprintf('O %s é inválido', _p('Titulo', 'CEP'));
@@ -319,41 +319,131 @@ class Endereco extends \MZ\Database\Helper
     }
 
     /**
-     * Find this object on database using, ID
-     * @param  int $id id to find Endereço
-     * @return Endereco A filled instance or empty when not found
+     * Insert a new Endereço into the database and fill instance from database
+     * @return Endereco Self instance
      */
-    public static function findByID($id)
+    public function insert()
     {
-        return self::find([
+        $values = $this->validate();
+        unset($values['id']);
+        try {
+            $id = self::getDB()->insertInto('Enderecos')->values($values)->execute();
+            $endereco = self::findByID($id);
+            $this->fromArray($endereco->toArray());
+        } catch (\Exception $e) {
+            throw $this->translate($e);
+        }
+        return $this;
+    }
+
+    /**
+     * Update Endereço with instance values into database for ID
+     * @return Endereco Self instance
+     */
+    public function update()
+    {
+        $values = $this->validate();
+        if (!$this->exists()) {
+            throw new \Exception('O identificador do endereço não foi informado');
+        }
+        unset($values['id']);
+        try {
+            self::getDB()
+                ->update('Enderecos')
+                ->set($values)
+                ->where('id', $this->getID())
+                ->execute();
+            $endereco = self::findByID($this->getID());
+            $this->fromArray($endereco->toArray());
+        } catch (\Exception $e) {
+            throw $this->translate($e);
+        }
+        return $this;
+    }
+
+    /**
+     * Delete this instance from database using ID
+     * @return integer Number of rows deleted (Max 1)
+     */
+    public function delete()
+    {
+        if (!$this->exists()) {
+            throw new \Exception('O identificador do endereço não foi informado');
+        }
+        $result = self::getDB()
+            ->deleteFrom('Enderecos')
+            ->where('id', $this->getID())
+            ->execute();
+        return $result;
+    }
+
+    /**
+     * Load one register for it self with a condition
+     * @param  array $condition Condition for searching the row
+     * @param  array $order associative field name -> [-1, 1]
+     * @return Endereco Self instance filled or empty
+     */
+    public function load($condition, $order = [])
+    {
+        $query = self::query($condition, $order)->limit(1);
+        $row = $query->fetch() ?: [];
+        return $this->fromArray($row);
+    }
+
+    /**
+     * Load into this object from database using, ID
+     * @param  int $id id to find Endereço
+     * @return Endereco Self filled instance or empty when not found
+     */
+    public function loadByID($id)
+    {
+        return $this->load([
             'id' => intval($id),
         ]);
     }
 
     /**
-     * Find this object on database using, CEP
+     * Load into this object from database using, CEP
      * @param  string $cep cep to find Endereço
-     * @return Endereco A filled instance or empty when not found
+     * @return Endereco Self filled instance or empty when not found
      */
-    public static function findByCEP($cep)
+    public function loadByCEP($cep)
     {
-        return self::find([
+        return $this->load([
             'cep' => strval($cep),
         ]);
     }
 
     /**
-     * Find this object on database using, BairroID, Logradouro
+     * Load into this object from database using, BairroID, Logradouro
      * @param  int $bairro_id bairro to find Endereço
      * @param  string $logradouro logradouro to find Endereço
-     * @return Endereco A filled instance or empty when not found
+     * @return Endereco Self filled instance or empty when not found
      */
-    public static function findByBairroIDLogradouro($bairro_id, $logradouro)
+    public function loadByBairroIDLogradouro($bairro_id, $logradouro)
     {
-        return self::find([
+        return $this->load([
             'bairroid' => intval($bairro_id),
             'logradouro' => strval($logradouro),
         ]);
+    }
+
+    /**
+     * Cidade a qual o endereço pertence
+     * @return \MZ\Location\Cidade The object fetched from database
+     */
+    public function findCidadeID()
+    {
+        return \MZ\Location\Cidade::findByID($this->getCidadeID());
+    }
+
+    /**
+     * Bairro a qual o endereço está localizado
+     * @return \MZ\Location\Bairro The object fetched from database
+     */
+    public function findBairroID()
+    {
+        return \MZ\Location\Bairro::findByID($this->getBairroID());
     }
 
     /**
@@ -421,19 +511,55 @@ class Endereco extends \MZ\Database\Helper
     public static function find($condition, $order = [])
     {
         $query = self::query($condition, $order)->limit(1);
-        $row = $query->fetch();
-        if ($row === false) {
-            $row = [];
-        }
+        $row = $query->fetch() ?: [];
         return new Endereco($row);
     }
 
     /**
-     * Fetch all rows from database with matched condition critery
-     * @param  array $condition condition to filter rows
-     * @param  integer $limit number of rows to get, null for all
-     * @param  integer $offset start index to get rows, null for begining
-     * @return array All rows instanced and filled
+     * Find this object on database using, ID
+     * @param  int $id id to find Endereço
+     * @return Endereco A filled instance or empty when not found
+     */
+    public static function findByID($id)
+    {
+        return self::find([
+            'id' => intval($id),
+        ]);
+    }
+
+    /**
+     * Find this object on database using, CEP
+     * @param  string $cep cep to find Endereço
+     * @return Endereco A filled instance or empty when not found
+     */
+    public static function findByCEP($cep)
+    {
+        return self::find([
+            'cep' => strval($cep),
+        ]);
+    }
+
+    /**
+     * Find this object on database using, BairroID, Logradouro
+     * @param  int $bairro_id bairro to find Endereço
+     * @param  string $logradouro logradouro to find Endereço
+     * @return Endereco A filled instance or empty when not found
+     */
+    public static function findByBairroIDLogradouro($bairro_id, $logradouro)
+    {
+        return self::find([
+            'bairroid' => intval($bairro_id),
+            'logradouro' => strval($logradouro),
+        ]);
+    }
+
+    /**
+     * Find all Endereço
+     * @param  array  $condition Condition to get all Endereço
+     * @param  array  $order     Order Endereço
+     * @param  int    $limit     Limit data into row count
+     * @param  int    $offset    Start offset to get rows
+     * @return array             List of all rows instanced as Endereco
      */
     public static function findAll($condition = [], $order = [], $limit = null, $offset = null)
     {
@@ -453,77 +579,6 @@ class Endereco extends \MZ\Database\Helper
     }
 
     /**
-     * Insert a new Endereço into the database and fill instance from database
-     * @return Endereco Self instance
-     */
-    public function insert()
-    {
-        $values = $this->validate();
-        unset($values['id']);
-        try {
-            $id = self::getDB()->insertInto('Enderecos')->values($values)->execute();
-            $endereco = self::findByID($id);
-            $this->fromArray($endereco->toArray());
-        } catch (\Exception $e) {
-            throw $this->translate($e);
-        }
-        return $this;
-    }
-
-    /**
-     * Update Endereço with instance values into database for ID
-     * @return Endereco Self instance
-     */
-    public function update()
-    {
-        $values = $this->validate();
-        if (!$this->exists()) {
-            throw new \Exception('O identificador do endereço não foi informado');
-        }
-        unset($values['id']);
-        try {
-            self::getDB()
-                ->update('Enderecos')
-                ->set($values)
-                ->where('id', $this->getID())
-                ->execute();
-            $endereco = self::findByID($this->getID());
-            $this->fromArray($endereco->toArray());
-        } catch (\Exception $e) {
-            throw $this->translate($e);
-        }
-        return $this;
-    }
-
-    /**
-     * Save the Endereço into the database
-     * @return Endereco Self instance
-     */
-    public function save()
-    {
-        if ($this->exists()) {
-            return $this->update();
-        }
-        return $this->insert();
-    }
-
-    /**
-     * Delete this instance from database using ID
-     * @return integer Number of rows deleted (Max 1)
-     */
-    public function delete()
-    {
-        if (!$this->exists()) {
-            throw new \Exception('O identificador do endereço não foi informado');
-        }
-        $result = self::getDB()
-            ->deleteFrom('Enderecos')
-            ->where('id', $this->getID())
-            ->execute();
-        return $result;
-    }
-
-    /**
      * Count all rows from database with matched condition critery
      * @param  array $condition condition to filter rows
      * @return integer Quantity of rows
@@ -532,23 +587,5 @@ class Endereco extends \MZ\Database\Helper
     {
         $query = self::query($condition);
         return $query->count();
-    }
-
-    /**
-     * Cidade a qual o endereço pertence
-     * @return \MZ\Location\Cidade The object fetched from database
-     */
-    public function findCidadeID()
-    {
-        return \MZ\Location\Cidade::findByID($this->getCidadeID());
-    }
-
-    /**
-     * Bairro a qual o endereço está localizado
-     * @return \MZ\Location\Bairro The object fetched from database
-     */
-    public function findBairroID()
-    {
-        return \MZ\Location\Bairro::findByID($this->getBairroID());
     }
 }

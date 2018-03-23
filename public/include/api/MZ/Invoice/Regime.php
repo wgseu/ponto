@@ -235,25 +235,97 @@ class Regime extends \MZ\Database\Helper
     }
 
     /**
-     * Find this object on database using, ID
-     * @param  int $id id to find Regime
-     * @return Regime A filled instance or empty when not found
+     * Insert a new Regime into the database and fill instance from database
+     * @return Regime Self instance
      */
-    public static function findByID($id)
+    public function insert()
     {
-        return self::find([
+        $values = $this->validate();
+        unset($values['id']);
+        try {
+            $id = self::getDB()->insertInto('Regimes')->values($values)->execute();
+            $regime = self::findByID($id);
+            $this->fromArray($regime->toArray());
+        } catch (\Exception $e) {
+            throw $this->translate($e);
+        }
+        return $this;
+    }
+
+    /**
+     * Update Regime with instance values into database for ID
+     * @return Regime Self instance
+     */
+    public function update()
+    {
+        $values = $this->validate();
+        if (!$this->exists()) {
+            throw new \Exception('O identificador do regime não foi informado');
+        }
+        unset($values['id']);
+        try {
+            self::getDB()
+                ->update('Regimes')
+                ->set($values)
+                ->where('id', $this->getID())
+                ->execute();
+            $regime = self::findByID($this->getID());
+            $this->fromArray($regime->toArray());
+        } catch (\Exception $e) {
+            throw $this->translate($e);
+        }
+        return $this;
+    }
+
+    /**
+     * Delete this instance from database using ID
+     * @return integer Number of rows deleted (Max 1)
+     */
+    public function delete()
+    {
+        if (!$this->exists()) {
+            throw new \Exception('O identificador do regime não foi informado');
+        }
+        $result = self::getDB()
+            ->deleteFrom('Regimes')
+            ->where('id', $this->getID())
+            ->execute();
+        return $result;
+    }
+
+    /**
+     * Load one register for it self with a condition
+     * @param  array $condition Condition for searching the row
+     * @param  array $order associative field name -> [-1, 1]
+     * @return Regime Self instance filled or empty
+     */
+    public function load($condition, $order = [])
+    {
+        $query = self::query($condition, $order)->limit(1);
+        $row = $query->fetch() ?: [];
+        return $this->fromArray($row);
+    }
+
+    /**
+     * Load into this object from database using, ID
+     * @param  int $id id to find Regime
+     * @return Regime Self filled instance or empty when not found
+     */
+    public function loadByID($id)
+    {
+        return $this->load([
             'id' => intval($id),
         ]);
     }
 
     /**
-     * Find this object on database using, Codigo
+     * Load into this object from database using, Codigo
      * @param  int $codigo código to find Regime
-     * @return Regime A filled instance or empty when not found
+     * @return Regime Self filled instance or empty when not found
      */
-    public static function findByCodigo($codigo)
+    public function loadByCodigo($codigo)
     {
-        return self::find([
+        return $this->load([
             'codigo' => intval($codigo),
         ]);
     }
@@ -323,19 +395,41 @@ class Regime extends \MZ\Database\Helper
     public static function find($condition, $order = [])
     {
         $query = self::query($condition, $order)->limit(1);
-        $row = $query->fetch();
-        if ($row === false) {
-            $row = [];
-        }
+        $row = $query->fetch() ?: [];
         return new Regime($row);
     }
 
     /**
-     * Fetch all rows from database with matched condition critery
-     * @param  array $condition condition to filter rows
-     * @param  integer $limit number of rows to get, null for all
-     * @param  integer $offset start index to get rows, null for begining
-     * @return array All rows instanced and filled
+     * Find this object on database using, ID
+     * @param  int $id id to find Regime
+     * @return Regime A filled instance or empty when not found
+     */
+    public static function findByID($id)
+    {
+        return self::find([
+            'id' => intval($id),
+        ]);
+    }
+
+    /**
+     * Find this object on database using, Codigo
+     * @param  int $codigo código to find Regime
+     * @return Regime A filled instance or empty when not found
+     */
+    public static function findByCodigo($codigo)
+    {
+        return self::find([
+            'codigo' => intval($codigo),
+        ]);
+    }
+
+    /**
+     * Find all Regime
+     * @param  array  $condition Condition to get all Regime
+     * @param  array  $order     Order Regime
+     * @param  int    $limit     Limit data into row count
+     * @param  int    $offset    Start offset to get rows
+     * @return array             List of all rows instanced as Regime
      */
     public static function findAll($condition = [], $order = [], $limit = null, $offset = null)
     {
@@ -351,77 +445,6 @@ class Regime extends \MZ\Database\Helper
         foreach ($rows as $row) {
             $result[] = new Regime($row);
         }
-        return $result;
-    }
-
-    /**
-     * Insert a new Regime into the database and fill instance from database
-     * @return Regime Self instance
-     */
-    public function insert()
-    {
-        $values = $this->validate();
-        unset($values['id']);
-        try {
-            $id = self::getDB()->insertInto('Regimes')->values($values)->execute();
-            $regime = self::findByID($id);
-            $this->fromArray($regime->toArray());
-        } catch (\Exception $e) {
-            throw $this->translate($e);
-        }
-        return $this;
-    }
-
-    /**
-     * Update Regime with instance values into database for ID
-     * @return Regime Self instance
-     */
-    public function update()
-    {
-        $values = $this->validate();
-        if (!$this->exists()) {
-            throw new \Exception('O identificador do regime não foi informado');
-        }
-        unset($values['id']);
-        try {
-            self::getDB()
-                ->update('Regimes')
-                ->set($values)
-                ->where('id', $this->getID())
-                ->execute();
-            $regime = self::findByID($this->getID());
-            $this->fromArray($regime->toArray());
-        } catch (\Exception $e) {
-            throw $this->translate($e);
-        }
-        return $this;
-    }
-
-    /**
-     * Save the Regime into the database
-     * @return Regime Self instance
-     */
-    public function save()
-    {
-        if ($this->exists()) {
-            return $this->update();
-        }
-        return $this->insert();
-    }
-
-    /**
-     * Delete this instance from database using ID
-     * @return integer Number of rows deleted (Max 1)
-     */
-    public function delete()
-    {
-        if (!$this->exists()) {
-            throw new \Exception('O identificador do regime não foi informado');
-        }
-        $result = self::getDB()
-            ->deleteFrom('Regimes')
-            ->where('id', $this->getID())
-            ->execute();
         return $result;
     }
 

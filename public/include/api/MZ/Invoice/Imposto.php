@@ -316,25 +316,19 @@ class Imposto extends \MZ\Database\Helper
         if (is_null($this->getGrupo())) {
             $errors['grupo'] = 'O grupo não pode ser vazio';
         }
-        if (!is_null($this->getGrupo()) &&
-            !array_key_exists($this->getGrupo(), self::getGrupoOptions())
-        ) {
+        if (!Validator::checkInSet($this->getGrupo(), self::getGrupoOptions(), true)) {
             $errors['grupo'] = 'O grupo é inválido';
         }
         if (is_null($this->getSimples())) {
             $errors['simples'] = 'O simples nacional não pode ser vazio';
         }
-        if (!is_null($this->getSimples()) &&
-            !array_key_exists($this->getSimples(), self::getBooleanOptions())
-        ) {
+        if (!Validator::checkBoolean($this->getSimples(), true)) {
             $errors['simples'] = 'O simples nacional é inválido';
         }
         if (is_null($this->getSubstituicao())) {
             $errors['substituicao'] = 'A substituição tributária não pode ser vazia';
         }
-        if (!is_null($this->getSubstituicao()) &&
-            !array_key_exists($this->getSubstituicao(), self::getBooleanOptions())
-        ) {
+        if (!Validator::checkBoolean($this->getSubstituicao(), true)) {
             $errors['substituicao'] = 'A substituição tributária é inválida';
         }
         if (is_null($this->getCodigo())) {
@@ -388,6 +382,108 @@ class Imposto extends \MZ\Database\Helper
     }
 
     /**
+     * Insert a new Imposto into the database and fill instance from database
+     * @return Imposto Self instance
+     */
+    public function insert()
+    {
+        $values = $this->validate();
+        unset($values['id']);
+        try {
+            $id = self::getDB()->insertInto('Impostos')->values($values)->execute();
+            $imposto = self::findByID($id);
+            $this->fromArray($imposto->toArray());
+        } catch (\Exception $e) {
+            throw $this->translate($e);
+        }
+        return $this;
+    }
+
+    /**
+     * Update Imposto with instance values into database for ID
+     * @return Imposto Self instance
+     */
+    public function update()
+    {
+        $values = $this->validate();
+        if (!$this->exists()) {
+            throw new \Exception('O identificador do imposto não foi informado');
+        }
+        unset($values['id']);
+        try {
+            self::getDB()
+                ->update('Impostos')
+                ->set($values)
+                ->where('id', $this->getID())
+                ->execute();
+            $imposto = self::findByID($this->getID());
+            $this->fromArray($imposto->toArray());
+        } catch (\Exception $e) {
+            throw $this->translate($e);
+        }
+        return $this;
+    }
+
+    /**
+     * Delete this instance from database using ID
+     * @return integer Number of rows deleted (Max 1)
+     */
+    public function delete()
+    {
+        if (!$this->exists()) {
+            throw new \Exception('O identificador do imposto não foi informado');
+        }
+        $result = self::getDB()
+            ->deleteFrom('Impostos')
+            ->where('id', $this->getID())
+            ->execute();
+        return $result;
+    }
+
+    /**
+     * Load one register for it self with a condition
+     * @param  array $condition Condition for searching the row
+     * @param  array $order associative field name -> [-1, 1]
+     * @return Imposto Self instance filled or empty
+     */
+    public function load($condition, $order = [])
+    {
+        $query = self::query($condition, $order)->limit(1);
+        $row = $query->fetch() ?: [];
+        return $this->fromArray($row);
+    }
+
+    /**
+     * Load into this object from database using, ID
+     * @param  int $id id to find Imposto
+     * @return Imposto Self filled instance or empty when not found
+     */
+    public function loadByID($id)
+    {
+        return $this->load([
+            'id' => intval($id),
+        ]);
+    }
+
+    /**
+     * Load into this object from database using, Grupo, Simples, Substituicao, Codigo
+     * @param  string $grupo grupo to find Imposto
+     * @param  string $simples simples nacional to find Imposto
+     * @param  string $substituicao substituição tributária to find Imposto
+     * @param  int $codigo código to find Imposto
+     * @return Imposto Self filled instance or empty when not found
+     */
+    public function loadByGrupoSimplesSubstituicaoCodigo($grupo, $simples, $substituicao, $codigo)
+    {
+        return $this->load([
+            'grupo' => strval($grupo),
+            'simples' => strval($simples),
+            'substituicao' => strval($substituicao),
+            'codigo' => intval($codigo),
+        ]);
+    }
+
+    /**
      * Gets textual and translated Grupo for Imposto
      * @param  int $index choose option from index
      * @return mixed A associative key -> translated representative text or text for index
@@ -405,36 +501,6 @@ class Imposto extends \MZ\Database\Helper
             return $options[$index];
         }
         return $options;
-    }
-
-    /**
-     * Find this object on database using, ID
-     * @param  int $id id to find Imposto
-     * @return Imposto A filled instance or empty when not found
-     */
-    public static function findByID($id)
-    {
-        return self::find([
-            'id' => intval($id),
-        ]);
-    }
-
-    /**
-     * Find this object on database using, Grupo, Simples, Substituicao, Codigo
-     * @param  string $grupo grupo to find Imposto
-     * @param  string $simples simples nacional to find Imposto
-     * @param  string $substituicao substituição tributária to find Imposto
-     * @param  int $codigo código to find Imposto
-     * @return Imposto A filled instance or empty when not found
-     */
-    public static function findByGrupoSimplesSubstituicaoCodigo($grupo, $simples, $substituicao, $codigo)
-    {
-        return self::find([
-            'grupo' => strval($grupo),
-            'simples' => strval($simples),
-            'substituicao' => strval($substituicao),
-            'codigo' => intval($codigo),
-        ]);
     }
 
     /**
@@ -502,19 +568,47 @@ class Imposto extends \MZ\Database\Helper
     public static function find($condition, $order = [])
     {
         $query = self::query($condition, $order)->limit(1);
-        $row = $query->fetch();
-        if ($row === false) {
-            $row = [];
-        }
+        $row = $query->fetch() ?: [];
         return new Imposto($row);
     }
 
     /**
-     * Fetch all rows from database with matched condition critery
-     * @param  array $condition condition to filter rows
-     * @param  integer $limit number of rows to get, null for all
-     * @param  integer $offset start index to get rows, null for begining
-     * @return array All rows instanced and filled
+     * Find this object on database using, ID
+     * @param  int $id id to find Imposto
+     * @return Imposto A filled instance or empty when not found
+     */
+    public static function findByID($id)
+    {
+        return self::find([
+            'id' => intval($id),
+        ]);
+    }
+
+    /**
+     * Find this object on database using, Grupo, Simples, Substituicao, Codigo
+     * @param  string $grupo grupo to find Imposto
+     * @param  string $simples simples nacional to find Imposto
+     * @param  string $substituicao substituição tributária to find Imposto
+     * @param  int $codigo código to find Imposto
+     * @return Imposto A filled instance or empty when not found
+     */
+    public static function findByGrupoSimplesSubstituicaoCodigo($grupo, $simples, $substituicao, $codigo)
+    {
+        return self::find([
+            'grupo' => strval($grupo),
+            'simples' => strval($simples),
+            'substituicao' => strval($substituicao),
+            'codigo' => intval($codigo),
+        ]);
+    }
+
+    /**
+     * Find all Imposto
+     * @param  array  $condition Condition to get all Imposto
+     * @param  array  $order     Order Imposto
+     * @param  int    $limit     Limit data into row count
+     * @param  int    $offset    Start offset to get rows
+     * @return array             List of all rows instanced as Imposto
      */
     public static function findAll($condition = [], $order = [], $limit = null, $offset = null)
     {
@@ -530,77 +624,6 @@ class Imposto extends \MZ\Database\Helper
         foreach ($rows as $row) {
             $result[] = new Imposto($row);
         }
-        return $result;
-    }
-
-    /**
-     * Insert a new Imposto into the database and fill instance from database
-     * @return Imposto Self instance
-     */
-    public function insert()
-    {
-        $values = $this->validate();
-        unset($values['id']);
-        try {
-            $id = self::getDB()->insertInto('Impostos')->values($values)->execute();
-            $imposto = self::findByID($id);
-            $this->fromArray($imposto->toArray());
-        } catch (\Exception $e) {
-            throw $this->translate($e);
-        }
-        return $this;
-    }
-
-    /**
-     * Update Imposto with instance values into database for ID
-     * @return Imposto Self instance
-     */
-    public function update()
-    {
-        $values = $this->validate();
-        if (!$this->exists()) {
-            throw new \Exception('O identificador do imposto não foi informado');
-        }
-        unset($values['id']);
-        try {
-            self::getDB()
-                ->update('Impostos')
-                ->set($values)
-                ->where('id', $this->getID())
-                ->execute();
-            $imposto = self::findByID($this->getID());
-            $this->fromArray($imposto->toArray());
-        } catch (\Exception $e) {
-            throw $this->translate($e);
-        }
-        return $this;
-    }
-
-    /**
-     * Save the Imposto into the database
-     * @return Imposto Self instance
-     */
-    public function save()
-    {
-        if ($this->exists()) {
-            return $this->update();
-        }
-        return $this->insert();
-    }
-
-    /**
-     * Delete this instance from database using ID
-     * @return integer Number of rows deleted (Max 1)
-     */
-    public function delete()
-    {
-        if (!$this->exists()) {
-            throw new \Exception('O identificador do imposto não foi informado');
-        }
-        $result = self::getDB()
-            ->deleteFrom('Impostos')
-            ->where('id', $this->getID())
-            ->execute();
         return $result;
     }
 

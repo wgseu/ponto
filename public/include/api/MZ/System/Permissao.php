@@ -269,27 +269,108 @@ class Permissao extends \MZ\Database\Helper
     }
 
     /**
-     * Find this object on database using, ID
-     * @param  int $id id to find Permissão
-     * @return Permissao A filled instance or empty when not found
+     * Insert a new Permissão into the database and fill instance from database
+     * @return Permissao Self instance
      */
-    public static function findByID($id)
+    public function insert()
     {
-        return self::find([
+        $values = $this->validate();
+        unset($values['id']);
+        try {
+            $id = self::getDB()->insertInto('Permissoes')->values($values)->execute();
+            $permissao = self::findByID($id);
+            $this->fromArray($permissao->toArray());
+        } catch (\Exception $e) {
+            throw $this->translate($e);
+        }
+        return $this;
+    }
+
+    /**
+     * Update Permissão with instance values into database for ID
+     * @return Permissao Self instance
+     */
+    public function update()
+    {
+        $values = $this->validate();
+        if (!$this->exists()) {
+            throw new \Exception('O identificador da permissão não foi informado');
+        }
+        unset($values['id']);
+        try {
+            self::getDB()
+                ->update('Permissoes')
+                ->set($values)
+                ->where('id', $this->getID())
+                ->execute();
+            $permissao = self::findByID($this->getID());
+            $this->fromArray($permissao->toArray());
+        } catch (\Exception $e) {
+            throw $this->translate($e);
+        }
+        return $this;
+    }
+
+    /**
+     * Delete this instance from database using ID
+     * @return integer Number of rows deleted (Max 1)
+     */
+    public function delete()
+    {
+        if (!$this->exists()) {
+            throw new \Exception('O identificador da permissão não foi informado');
+        }
+        $result = self::getDB()
+            ->deleteFrom('Permissoes')
+            ->where('id', $this->getID())
+            ->execute();
+        return $result;
+    }
+
+    /**
+     * Load one register for it self with a condition
+     * @param  array $condition Condition for searching the row
+     * @param  array $order associative field name -> [-1, 1]
+     * @return Permissao Self instance filled or empty
+     */
+    public function load($condition, $order = [])
+    {
+        $query = self::query($condition, $order)->limit(1);
+        $row = $query->fetch() ?: [];
+        return $this->fromArray($row);
+    }
+
+    /**
+     * Load into this object from database using, ID
+     * @param  int $id id to find Permissão
+     * @return Permissao Self filled instance or empty when not found
+     */
+    public function loadByID($id)
+    {
+        return $this->load([
             'id' => intval($id),
         ]);
     }
 
     /**
-     * Find this object on database using, Nome
+     * Load into this object from database using, Nome
      * @param  string $nome nome to find Permissão
-     * @return Permissao A filled instance or empty when not found
+     * @return Permissao Self filled instance or empty when not found
      */
-    public static function findByNome($nome)
+    public function loadByNome($nome)
     {
-        return self::find([
+        return $this->load([
             'nome' => strval($nome),
         ]);
+    }
+
+    /**
+     * Categoriza um grupo de permissões
+     * @return \MZ\System\Funcionalidade The object fetched from database
+     */
+    public function findFuncionalidadeID()
+    {
+        return \MZ\System\Funcionalidade::findByID($this->getFuncionalidadeID());
     }
 
     /**
@@ -357,19 +438,41 @@ class Permissao extends \MZ\Database\Helper
     public static function find($condition, $order = [])
     {
         $query = self::query($condition, $order)->limit(1);
-        $row = $query->fetch();
-        if ($row === false) {
-            $row = [];
-        }
+        $row = $query->fetch() ?: [];
         return new Permissao($row);
     }
 
     /**
-     * Fetch all rows from database with matched condition critery
-     * @param  array $condition condition to filter rows
-     * @param  integer $limit number of rows to get, null for all
-     * @param  integer $offset start index to get rows, null for begining
-     * @return array All rows instanced and filled
+     * Find this object on database using, ID
+     * @param  int $id id to find Permissão
+     * @return Permissao A filled instance or empty when not found
+     */
+    public static function findByID($id)
+    {
+        return self::find([
+            'id' => intval($id),
+        ]);
+    }
+
+    /**
+     * Find this object on database using, Nome
+     * @param  string $nome nome to find Permissão
+     * @return Permissao A filled instance or empty when not found
+     */
+    public static function findByNome($nome)
+    {
+        return self::find([
+            'nome' => strval($nome),
+        ]);
+    }
+
+    /**
+     * Find all Permissão
+     * @param  array  $condition Condition to get all Permissão
+     * @param  array  $order     Order Permissão
+     * @param  int    $limit     Limit data into row count
+     * @param  int    $offset    Start offset to get rows
+     * @return array             List of all rows instanced as Permissao
      */
     public static function findAll($condition = [], $order = [], $limit = null, $offset = null)
     {
@@ -389,77 +492,6 @@ class Permissao extends \MZ\Database\Helper
     }
 
     /**
-     * Insert a new Permissão into the database and fill instance from database
-     * @return Permissao Self instance
-     */
-    public function insert()
-    {
-        $values = $this->validate();
-        unset($values['id']);
-        try {
-            $id = self::getDB()->insertInto('Permissoes')->values($values)->execute();
-            $permissao = self::findByID($id);
-            $this->fromArray($permissao->toArray());
-        } catch (\Exception $e) {
-            throw $this->translate($e);
-        }
-        return $this;
-    }
-
-    /**
-     * Update Permissão with instance values into database for ID
-     * @return Permissao Self instance
-     */
-    public function update()
-    {
-        $values = $this->validate();
-        if (!$this->exists()) {
-            throw new \Exception('O identificador da permissão não foi informado');
-        }
-        unset($values['id']);
-        try {
-            self::getDB()
-                ->update('Permissoes')
-                ->set($values)
-                ->where('id', $this->getID())
-                ->execute();
-            $permissao = self::findByID($this->getID());
-            $this->fromArray($permissao->toArray());
-        } catch (\Exception $e) {
-            throw $this->translate($e);
-        }
-        return $this;
-    }
-
-    /**
-     * Save the Permissão into the database
-     * @return Permissao Self instance
-     */
-    public function save()
-    {
-        if ($this->exists()) {
-            return $this->update();
-        }
-        return $this->insert();
-    }
-
-    /**
-     * Delete this instance from database using ID
-     * @return integer Number of rows deleted (Max 1)
-     */
-    public function delete()
-    {
-        if (!$this->exists()) {
-            throw new \Exception('O identificador da permissão não foi informado');
-        }
-        $result = self::getDB()
-            ->deleteFrom('Permissoes')
-            ->where('id', $this->getID())
-            ->execute();
-        return $result;
-    }
-
-    /**
      * Count all rows from database with matched condition critery
      * @param  array $condition condition to filter rows
      * @return integer Quantity of rows
@@ -468,14 +500,5 @@ class Permissao extends \MZ\Database\Helper
     {
         $query = self::query($condition);
         return $query->count();
-    }
-
-    /**
-     * Categoriza um grupo de permissões
-     * @return \MZ\System\Funcionalidade The object fetched from database
-     */
-    public function findFuncionalidadeID()
-    {
-        return \MZ\System\Funcionalidade::findByID($this->getFuncionalidadeID());
     }
 }

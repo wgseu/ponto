@@ -512,15 +512,125 @@ class Sistema extends \MZ\Database\Helper
     }
 
     /**
-     * Find this object on database using, ID
-     * @param  string $id id to find Sistema
-     * @return Sistema A filled instance or empty when not found
+     * Insert a new Sistema into the database and fill instance from database
+     * @return Sistema Self instance
      */
-    public static function findByID($id)
+    public function insert()
     {
-        return self::find([
+        $values = $this->validate();
+        unset($values['id']);
+        try {
+            $id = self::getDB()->insertInto('Sistema')->values($values)->execute();
+            $sistema = self::findByID($id);
+            $this->fromArray($sistema->toArray());
+        } catch (\Exception $e) {
+            throw $this->translate($e);
+        }
+        return $this;
+    }
+
+    /**
+     * Update Sistema with instance values into database for ID
+     * @return Sistema Self instance
+     */
+    public function update()
+    {
+        $values = $this->validate();
+        if (!$this->exists()) {
+            throw new \Exception('O identificador do sistema não foi informado');
+        }
+        unset($values['id']);
+        try {
+            self::getDB()
+                ->update('Sistema')
+                ->set($values)
+                ->where('id', $this->getID())
+                ->execute();
+            $sistema = self::findByID($this->getID());
+            $this->fromArray($sistema->toArray());
+        } catch (\Exception $e) {
+            throw $this->translate($e);
+        }
+        return $this;
+    }
+
+    /**
+     * Delete this instance from database using ID
+     * @return integer Number of rows deleted (Max 1)
+     */
+    public function delete()
+    {
+        if (!$this->exists()) {
+            throw new \Exception('O identificador do sistema não foi informado');
+        }
+        $result = self::getDB()
+            ->deleteFrom('Sistema')
+            ->where('id', $this->getID())
+            ->execute();
+        return $result;
+    }
+
+    /**
+     * Load one register for it self with a condition
+     * @param  array $condition Condition for searching the row
+     * @param  array $order associative field name -> [-1, 1]
+     * @return Sistema Self instance filled or empty
+     */
+    public function load($condition, $order = [])
+    {
+        $query = self::query($condition, $order)->limit(1);
+        $row = $query->fetch() ?: [];
+        return $this->fromArray($row);
+    }
+
+    /**
+     * Load into this object from database using, ID
+     * @param  string $id id to find Sistema
+     * @return Sistema Self filled instance or empty when not found
+     */
+    public function loadByID($id)
+    {
+        return $this->load([
             'id' => strval($id),
         ]);
+    }
+
+    /**
+     * País em que o sistema está sendo utilizado
+     * @return \MZ\Location\Pais The object fetched from database
+     */
+    public function findPaisID()
+    {
+        if (is_null($this->getPaisID())) {
+            return new \MZ\Location\Pais();
+        }
+        return \MZ\Location\Pais::findByID($this->getPaisID());
+    }
+
+    /**
+     * Informa qual a empresa que gerencia o sistema, a empresa deve ser um
+     * cliente do tipo pessoa jurídica
+     * @return \MZ\Account\Cliente The object fetched from database
+     */
+    public function findEmpresaID()
+    {
+        if (is_null($this->getEmpresaID())) {
+            return new \MZ\Account\Cliente();
+        }
+        return \MZ\Account\Cliente::findByID($this->getEmpresaID());
+    }
+
+    /**
+     * Informa quem realiza o suporte do sistema, deve ser um cliente do tipo
+     * empresa que possua um acionista como representante
+     * @return \MZ\Account\Cliente The object fetched from database
+     */
+    public function findParceiroID()
+    {
+        if (is_null($this->getParceiroID())) {
+            return new \MZ\Account\Cliente();
+        }
+        return \MZ\Account\Cliente::findByID($this->getParceiroID());
     }
 
     /**
@@ -588,19 +698,29 @@ class Sistema extends \MZ\Database\Helper
     public static function find($condition, $order = [])
     {
         $query = self::query($condition, $order)->limit(1);
-        $row = $query->fetch();
-        if ($row === false) {
-            $row = [];
-        }
+        $row = $query->fetch() ?: [];
         return new Sistema($row);
     }
 
     /**
-     * Fetch all rows from database with matched condition critery
-     * @param  array $condition condition to filter rows
-     * @param  integer $limit number of rows to get, null for all
-     * @param  integer $offset start index to get rows, null for begining
-     * @return array All rows instanced and filled
+     * Find this object on database using, ID
+     * @param  string $id id to find Sistema
+     * @return Sistema A filled instance or empty when not found
+     */
+    public static function findByID($id)
+    {
+        return self::find([
+            'id' => strval($id),
+        ]);
+    }
+
+    /**
+     * Find all Sistema
+     * @param  array  $condition Condition to get all Sistema
+     * @param  array  $order     Order Sistema
+     * @param  int    $limit     Limit data into row count
+     * @param  int    $offset    Start offset to get rows
+     * @return array             List of all rows instanced as Sistema
      */
     public static function findAll($condition = [], $order = [], $limit = null, $offset = null)
     {
@@ -620,77 +740,6 @@ class Sistema extends \MZ\Database\Helper
     }
 
     /**
-     * Insert a new Sistema into the database and fill instance from database
-     * @return Sistema Self instance
-     */
-    public function insert()
-    {
-        $values = $this->validate();
-        unset($values['id']);
-        try {
-            $id = self::getDB()->insertInto('Sistema')->values($values)->execute();
-            $sistema = self::findByID($id);
-            $this->fromArray($sistema->toArray());
-        } catch (\Exception $e) {
-            throw $this->translate($e);
-        }
-        return $this;
-    }
-
-    /**
-     * Update Sistema with instance values into database for ID
-     * @return Sistema Self instance
-     */
-    public function update()
-    {
-        $values = $this->validate();
-        if (!$this->exists()) {
-            throw new \Exception('O identificador do sistema não foi informado');
-        }
-        unset($values['id']);
-        try {
-            self::getDB()
-                ->update('Sistema')
-                ->set($values)
-                ->where('id', $this->getID())
-                ->execute();
-            $sistema = self::findByID($this->getID());
-            $this->fromArray($sistema->toArray());
-        } catch (\Exception $e) {
-            throw $this->translate($e);
-        }
-        return $this;
-    }
-
-    /**
-     * Save the Sistema into the database
-     * @return Sistema Self instance
-     */
-    public function save()
-    {
-        if ($this->exists()) {
-            return $this->update();
-        }
-        return $this->insert();
-    }
-
-    /**
-     * Delete this instance from database using ID
-     * @return integer Number of rows deleted (Max 1)
-     */
-    public function delete()
-    {
-        if (!$this->exists()) {
-            throw new \Exception('O identificador do sistema não foi informado');
-        }
-        $result = self::getDB()
-            ->deleteFrom('Sistema')
-            ->where('id', $this->getID())
-            ->execute();
-        return $result;
-    }
-
-    /**
      * Count all rows from database with matched condition critery
      * @param  array $condition condition to filter rows
      * @return integer Quantity of rows
@@ -699,43 +748,5 @@ class Sistema extends \MZ\Database\Helper
     {
         $query = self::query($condition);
         return $query->count();
-    }
-
-    /**
-     * País em que o sistema está sendo utilizado
-     * @return \MZ\Location\Pais The object fetched from database
-     */
-    public function findPaisID()
-    {
-        if (is_null($this->getPaisID())) {
-            return new \MZ\Location\Pais();
-        }
-        return \MZ\Location\Pais::findByID($this->getPaisID());
-    }
-
-    /**
-     * Informa qual a empresa que gerencia o sistema, a empresa deve ser um
-     * cliente do tipo pessoa jurídica
-     * @return \MZ\Account\Cliente The object fetched from database
-     */
-    public function findEmpresaID()
-    {
-        if (is_null($this->getEmpresaID())) {
-            return new \MZ\Account\Cliente();
-        }
-        return \MZ\Account\Cliente::findByID($this->getEmpresaID());
-    }
-
-    /**
-     * Informa quem realiza o suporte do sistema, deve ser um cliente do tipo
-     * empresa que possua um acionista como representante
-     * @return \MZ\Account\Cliente The object fetched from database
-     */
-    public function findParceiroID()
-    {
-        if (is_null($this->getParceiroID())) {
-            return new \MZ\Account\Cliente();
-        }
-        return \MZ\Account\Cliente::findByID($this->getParceiroID());
     }
 }

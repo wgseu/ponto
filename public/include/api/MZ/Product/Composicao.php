@@ -355,9 +355,7 @@ class Composicao extends \MZ\Database\Helper
         if (is_null($this->getTipo())) {
             $errors['tipo'] = 'O tipo não pode ser vazio';
         }
-        if (!is_null($this->getTipo()) &&
-            !array_key_exists($this->getTipo(), self::getTipoOptions())
-        ) {
+        if (!Validator::checkInSet($this->getTipo(), self::getTipoOptions(), true)) {
             $errors['tipo'] = 'O tipo é inválido';
         }
         if (is_null($this->getQuantidade())) {
@@ -369,9 +367,7 @@ class Composicao extends \MZ\Database\Helper
         if (is_null($this->getAtiva())) {
             $errors['ativa'] = 'A ativa não pode ser vazia';
         }
-        if (!is_null($this->getAtiva()) &&
-            !array_key_exists($this->getAtiva(), self::getBooleanOptions())
-        ) {
+        if (!Validator::checkBoolean($this->getAtiva(), true)) {
             $errors['ativa'] = 'A ativa é inválida';
         }
         if (!empty($errors)) {
@@ -415,6 +411,126 @@ class Composicao extends \MZ\Database\Helper
     }
 
     /**
+     * Insert a new Composição into the database and fill instance from database
+     * @return Composicao Self instance
+     */
+    public function insert()
+    {
+        $values = $this->validate();
+        unset($values['id']);
+        try {
+            $id = self::getDB()->insertInto('Composicoes')->values($values)->execute();
+            $composicao = self::findByID($id);
+            $this->fromArray($composicao->toArray());
+        } catch (\Exception $e) {
+            throw $this->translate($e);
+        }
+        return $this;
+    }
+
+    /**
+     * Update Composição with instance values into database for ID
+     * @return Composicao Self instance
+     */
+    public function update()
+    {
+        $values = $this->validate();
+        if (!$this->exists()) {
+            throw new \Exception('O identificador da composição não foi informado');
+        }
+        unset($values['id']);
+        try {
+            self::getDB()
+                ->update('Composicoes')
+                ->set($values)
+                ->where('id', $this->getID())
+                ->execute();
+            $composicao = self::findByID($this->getID());
+            $this->fromArray($composicao->toArray());
+        } catch (\Exception $e) {
+            throw $this->translate($e);
+        }
+        return $this;
+    }
+
+    /**
+     * Delete this instance from database using ID
+     * @return integer Number of rows deleted (Max 1)
+     */
+    public function delete()
+    {
+        if (!$this->exists()) {
+            throw new \Exception('O identificador da composição não foi informado');
+        }
+        $result = self::getDB()
+            ->deleteFrom('Composicoes')
+            ->where('id', $this->getID())
+            ->execute();
+        return $result;
+    }
+
+    /**
+     * Load one register for it self with a condition
+     * @param  array $condition Condition for searching the row
+     * @param  array $order associative field name -> [-1, 1]
+     * @return Composicao Self instance filled or empty
+     */
+    public function load($condition, $order = [])
+    {
+        $query = self::query($condition, $order)->limit(1);
+        $row = $query->fetch() ?: [];
+        return $this->fromArray($row);
+    }
+
+    /**
+     * Load into this object from database using, ID
+     * @param  int $id id to find Composição
+     * @return Composicao Self filled instance or empty when not found
+     */
+    public function loadByID($id)
+    {
+        return $this->load([
+            'id' => intval($id),
+        ]);
+    }
+
+    /**
+     * Load into this object from database using, ComposicaoID, ProdutoID, Tipo
+     * @param  int $composicao_id composição to find Composição
+     * @param  int $produto_id produto da composição to find Composição
+     * @param  string $tipo tipo to find Composição
+     * @return Composicao Self filled instance or empty when not found
+     */
+    public function loadByComposicaoIDProdutoIDTipo($composicao_id, $produto_id, $tipo)
+    {
+        return $this->load([
+            'composicaoid' => intval($composicao_id),
+            'produtoid' => intval($produto_id),
+            'tipo' => strval($tipo),
+        ]);
+    }
+
+    /**
+     * Informa a qual produto pertence essa composição, deve sempre ser um
+     * produto do tipo Composição
+     * @return \MZ\Product\Produto The object fetched from database
+     */
+    public function findComposicaoID()
+    {
+        return \MZ\Product\Produto::findByID($this->getComposicaoID());
+    }
+
+    /**
+     * Produto ou composição que faz parte dessa composição, Obs: Não pode ser
+     * um pacote
+     * @return \MZ\Product\Produto The object fetched from database
+     */
+    public function findProdutoID()
+    {
+        return \MZ\Product\Produto::findByID($this->getProdutoID());
+    }
+
+    /**
      * Gets textual and translated Tipo for Composicao
      * @param  int $index choose option from index
      * @return mixed A associative key -> translated representative text or text for index
@@ -430,34 +546,6 @@ class Composicao extends \MZ\Database\Helper
             return $options[$index];
         }
         return $options;
-    }
-
-    /**
-     * Find this object on database using, ID
-     * @param  int $id id to find Composição
-     * @return Composicao A filled instance or empty when not found
-     */
-    public static function findByID($id)
-    {
-        return self::find([
-            'id' => intval($id),
-        ]);
-    }
-
-    /**
-     * Find this object on database using, ComposicaoID, ProdutoID, Tipo
-     * @param  int $composicao_id composição to find Composição
-     * @param  int $produto_id produto da composição to find Composição
-     * @param  string $tipo tipo to find Composição
-     * @return Composicao A filled instance or empty when not found
-     */
-    public static function findByComposicaoIDProdutoIDTipo($composicao_id, $produto_id, $tipo)
-    {
-        return self::find([
-            'composicaoid' => intval($composicao_id),
-            'produtoid' => intval($produto_id),
-            'tipo' => strval($tipo),
-        ]);
     }
 
     /**
@@ -517,19 +605,45 @@ class Composicao extends \MZ\Database\Helper
     public static function find($condition, $order = [])
     {
         $query = self::query($condition, $order)->limit(1);
-        $row = $query->fetch();
-        if ($row === false) {
-            $row = [];
-        }
+        $row = $query->fetch() ?: [];
         return new Composicao($row);
     }
 
     /**
-     * Fetch all rows from database with matched condition critery
-     * @param  array $condition condition to filter rows
-     * @param  integer $limit number of rows to get, null for all
-     * @param  integer $offset start index to get rows, null for begining
-     * @return array All rows instanced and filled
+     * Find this object on database using, ID
+     * @param  int $id id to find Composição
+     * @return Composicao A filled instance or empty when not found
+     */
+    public static function findByID($id)
+    {
+        return self::find([
+            'id' => intval($id),
+        ]);
+    }
+
+    /**
+     * Find this object on database using, ComposicaoID, ProdutoID, Tipo
+     * @param  int $composicao_id composição to find Composição
+     * @param  int $produto_id produto da composição to find Composição
+     * @param  string $tipo tipo to find Composição
+     * @return Composicao A filled instance or empty when not found
+     */
+    public static function findByComposicaoIDProdutoIDTipo($composicao_id, $produto_id, $tipo)
+    {
+        return self::find([
+            'composicaoid' => intval($composicao_id),
+            'produtoid' => intval($produto_id),
+            'tipo' => strval($tipo),
+        ]);
+    }
+
+    /**
+     * Find all Composição
+     * @param  array  $condition Condition to get all Composição
+     * @param  array  $order     Order Composição
+     * @param  int    $limit     Limit data into row count
+     * @param  int    $offset    Start offset to get rows
+     * @return array             List of all rows instanced as Composicao
      */
     public static function findAll($condition = [], $order = [], $limit = null, $offset = null)
     {
@@ -549,77 +663,6 @@ class Composicao extends \MZ\Database\Helper
     }
 
     /**
-     * Insert a new Composição into the database and fill instance from database
-     * @return Composicao Self instance
-     */
-    public function insert()
-    {
-        $values = $this->validate();
-        unset($values['id']);
-        try {
-            $id = self::getDB()->insertInto('Composicoes')->values($values)->execute();
-            $composicao = self::findByID($id);
-            $this->fromArray($composicao->toArray());
-        } catch (\Exception $e) {
-            throw $this->translate($e);
-        }
-        return $this;
-    }
-
-    /**
-     * Update Composição with instance values into database for ID
-     * @return Composicao Self instance
-     */
-    public function update()
-    {
-        $values = $this->validate();
-        if (!$this->exists()) {
-            throw new \Exception('O identificador da composição não foi informado');
-        }
-        unset($values['id']);
-        try {
-            self::getDB()
-                ->update('Composicoes')
-                ->set($values)
-                ->where('id', $this->getID())
-                ->execute();
-            $composicao = self::findByID($this->getID());
-            $this->fromArray($composicao->toArray());
-        } catch (\Exception $e) {
-            throw $this->translate($e);
-        }
-        return $this;
-    }
-
-    /**
-     * Save the Composição into the database
-     * @return Composicao Self instance
-     */
-    public function save()
-    {
-        if ($this->exists()) {
-            return $this->update();
-        }
-        return $this->insert();
-    }
-
-    /**
-     * Delete this instance from database using ID
-     * @return integer Number of rows deleted (Max 1)
-     */
-    public function delete()
-    {
-        if (!$this->exists()) {
-            throw new \Exception('O identificador da composição não foi informado');
-        }
-        $result = self::getDB()
-            ->deleteFrom('Composicoes')
-            ->where('id', $this->getID())
-            ->execute();
-        return $result;
-    }
-
-    /**
      * Count all rows from database with matched condition critery
      * @param  array $condition condition to filter rows
      * @return integer Quantity of rows
@@ -628,25 +671,5 @@ class Composicao extends \MZ\Database\Helper
     {
         $query = self::query($condition);
         return $query->count();
-    }
-
-    /**
-     * Informa a qual produto pertence essa composição, deve sempre ser um
-     * produto do tipo Composição
-     * @return \MZ\Product\Produto The object fetched from database
-     */
-    public function findComposicaoID()
-    {
-        return \MZ\Product\Produto::findByID($this->getComposicaoID());
-    }
-
-    /**
-     * Produto ou composição que faz parte dessa composição, Obs: Não pode ser
-     * um pacote
-     * @return \MZ\Product\Produto The object fetched from database
-     */
-    public function findProdutoID()
-    {
-        return \MZ\Product\Produto::findByID($this->getProdutoID());
     }
 }

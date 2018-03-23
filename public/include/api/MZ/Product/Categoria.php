@@ -263,6 +263,20 @@ class Categoria extends \MZ\Database\Helper
     }
 
     /**
+     * Get relative imagem path or default imagem
+     * @param boolean $default If true return default image, otherwise check field
+     * @return string relative web path for categoria imagem
+     */
+    public function makeImagem($default = false)
+    {
+        $imagem = $this->getImagem();
+        if ($default) {
+            $imagem = null;
+        }
+        return get_image_url($imagem, 'categoria', 'categoria.png');
+    }
+
+    /**
      * Convert this instance into array associated key -> value with only public fields
      * @return array All public field and values into array format
      */
@@ -298,7 +312,7 @@ class Categoria extends \MZ\Database\Helper
     public function clean($dependency)
     {
         if (!is_null($this->getImagem()) && $dependency->getImagem() != $this->getImagem()) {
-            unlink(get_image_path($this->getImagem(), 'categoria'));
+            @unlink(get_image_path($this->getImagem(), 'categoria'));
         }
         $this->setImagem($dependency->getImagem());
     }
@@ -316,9 +330,7 @@ class Categoria extends \MZ\Database\Helper
         if (is_null($this->getServico())) {
             $errors['servico'] = 'O serviço não pode ser vazio';
         }
-        if (!is_null($this->getServico()) &&
-            !array_key_exists($this->getServico(), self::getBooleanOptions())
-        ) {
+        if (!Validator::checkBoolean($this->getServico(), true)) {
             $errors['servico'] = 'O serviço é inválido';
         }
         if (is_null($this->getDataAtualizacao())) {
@@ -357,41 +369,112 @@ class Categoria extends \MZ\Database\Helper
     }
 
     /**
-     * Get relative imagem path or default imagem
-     * @param boolean $default If true return default image, otherwise check field
-     * @return string relative web path for categoria imagem
+     * Insert a new Categoria into the database and fill instance from database
+     * @return Categoria Self instance
      */
-    public function makeImagem($default = false)
+    public function insert()
     {
-        $imagem = $this->getImagem();
-        if ($default) {
-            $imagem = null;
+        $values = $this->validate();
+        unset($values['id']);
+        try {
+            $id = self::getDB()->insertInto('Categorias')->values($values)->execute();
+            $categoria = self::findByID($id);
+            $this->fromArray($categoria->toArray());
+        } catch (\Exception $e) {
+            throw $this->translate($e);
         }
-        return get_image_url($imagem, 'categoria', 'categoria.png');
+        return $this;
     }
 
     /**
-     * Find this object on database using, ID
-     * @param  int $id id to find Categoria
-     * @return Categoria A filled instance or empty when not found
+     * Update Categoria with instance values into database for ID
+     * @return Categoria Self instance
      */
-    public static function findByID($id)
+    public function update()
     {
-        return self::find([
+        $values = $this->validate();
+        if (!$this->exists()) {
+            throw new \Exception('O identificador da categoria não foi informado');
+        }
+        unset($values['id']);
+        try {
+            self::getDB()
+                ->update('Categorias')
+                ->set($values)
+                ->where('id', $this->getID())
+                ->execute();
+            $categoria = self::findByID($this->getID());
+            $this->fromArray($categoria->toArray());
+        } catch (\Exception $e) {
+            throw $this->translate($e);
+        }
+        return $this;
+    }
+
+    /**
+     * Delete this instance from database using ID
+     * @return integer Number of rows deleted (Max 1)
+     */
+    public function delete()
+    {
+        if (!$this->exists()) {
+            throw new \Exception('O identificador da categoria não foi informado');
+        }
+        $result = self::getDB()
+            ->deleteFrom('Categorias')
+            ->where('id', $this->getID())
+            ->execute();
+        return $result;
+    }
+
+    /**
+     * Load one register for it self with a condition
+     * @param  array $condition Condition for searching the row
+     * @param  array $order associative field name -> [-1, 1]
+     * @return Categoria Self instance filled or empty
+     */
+    public function load($condition, $order = [])
+    {
+        $query = self::query($condition, $order)->limit(1);
+        $row = $query->fetch() ?: [];
+        return $this->fromArray($row);
+    }
+
+    /**
+     * Load into this object from database using, ID
+     * @param  int $id id to find Categoria
+     * @return Categoria Self filled instance or empty when not found
+     */
+    public function loadByID($id)
+    {
+        return $this->load([
             'id' => intval($id),
         ]);
     }
 
     /**
-     * Find this object on database using, Descricao
+     * Load into this object from database using, Descricao
      * @param  string $descricao descrição to find Categoria
-     * @return Categoria A filled instance or empty when not found
+     * @return Categoria Self filled instance or empty when not found
      */
-    public static function findByDescricao($descricao)
+    public function loadByDescricao($descricao)
     {
-        return self::find([
+        return $this->load([
             'descricao' => strval($descricao),
         ]);
+    }
+
+    /**
+     * Informa a categoria pai da categoria atual, a categoria atual é uma
+     * subcategoria
+     * @return \MZ\Product\Categoria The object fetched from database
+     */
+    public function findCategoriaID()
+    {
+        if (is_null($this->getCategoriaID())) {
+            return new \MZ\Product\Categoria();
+        }
+        return \MZ\Product\Categoria::findByID($this->getCategoriaID());
     }
 
     /**
@@ -459,19 +542,41 @@ class Categoria extends \MZ\Database\Helper
     public static function find($condition, $order = [])
     {
         $query = self::query($condition, $order)->limit(1);
-        $row = $query->fetch();
-        if ($row === false) {
-            $row = [];
-        }
+        $row = $query->fetch() ?: [];
         return new Categoria($row);
     }
 
     /**
-     * Fetch all rows from database with matched condition critery
-     * @param  array $condition condition to filter rows
-     * @param  integer $limit number of rows to get, null for all
-     * @param  integer $offset start index to get rows, null for begining
-     * @return array All rows instanced and filled
+     * Find this object on database using, ID
+     * @param  int $id id to find Categoria
+     * @return Categoria A filled instance or empty when not found
+     */
+    public static function findByID($id)
+    {
+        return self::find([
+            'id' => intval($id),
+        ]);
+    }
+
+    /**
+     * Find this object on database using, Descricao
+     * @param  string $descricao descrição to find Categoria
+     * @return Categoria A filled instance or empty when not found
+     */
+    public static function findByDescricao($descricao)
+    {
+        return self::find([
+            'descricao' => strval($descricao),
+        ]);
+    }
+
+    /**
+     * Find all Categoria
+     * @param  array  $condition Condition to get all Categoria
+     * @param  array  $order     Order Categoria
+     * @param  int    $limit     Limit data into row count
+     * @param  int    $offset    Start offset to get rows
+     * @return array             List of all rows instanced as Categoria
      */
     public static function findAll($condition = [], $order = [], $limit = null, $offset = null)
     {
@@ -491,77 +596,6 @@ class Categoria extends \MZ\Database\Helper
     }
 
     /**
-     * Insert a new Categoria into the database and fill instance from database
-     * @return Categoria Self instance
-     */
-    public function insert()
-    {
-        $values = $this->validate();
-        unset($values['id']);
-        try {
-            $id = self::getDB()->insertInto('Categorias')->values($values)->execute();
-            $categoria = self::findByID($id);
-            $this->fromArray($categoria->toArray());
-        } catch (\Exception $e) {
-            throw $this->translate($e);
-        }
-        return $this;
-    }
-
-    /**
-     * Update Categoria with instance values into database for ID
-     * @return Categoria Self instance
-     */
-    public function update()
-    {
-        $values = $this->validate();
-        if (!$this->exists()) {
-            throw new \Exception('O identificador da categoria não foi informado');
-        }
-        unset($values['id']);
-        try {
-            self::getDB()
-                ->update('Categorias')
-                ->set($values)
-                ->where('id', $this->getID())
-                ->execute();
-            $categoria = self::findByID($this->getID());
-            $this->fromArray($categoria->toArray());
-        } catch (\Exception $e) {
-            throw $this->translate($e);
-        }
-        return $this;
-    }
-
-    /**
-     * Save the Categoria into the database
-     * @return Categoria Self instance
-     */
-    public function save()
-    {
-        if ($this->exists()) {
-            return $this->update();
-        }
-        return $this->insert();
-    }
-
-    /**
-     * Delete this instance from database using ID
-     * @return integer Number of rows deleted (Max 1)
-     */
-    public function delete()
-    {
-        if (!$this->exists()) {
-            throw new \Exception('O identificador da categoria não foi informado');
-        }
-        $result = self::getDB()
-            ->deleteFrom('Categorias')
-            ->where('id', $this->getID())
-            ->execute();
-        return $result;
-    }
-
-    /**
      * Count all rows from database with matched condition critery
      * @param  array $condition condition to filter rows
      * @return integer Quantity of rows
@@ -570,18 +604,5 @@ class Categoria extends \MZ\Database\Helper
     {
         $query = self::query($condition);
         return $query->count();
-    }
-
-    /**
-     * Informa a categoria pai da categoria atual, a categoria atual é uma
-     * subcategoria
-     * @return \MZ\Product\Categoria The object fetched from database
-     */
-    public function findCategoriaID()
-    {
-        if (is_null($this->getCategoriaID())) {
-            return new \MZ\Product\Categoria();
-        }
-        return \MZ\Product\Categoria::findByID($this->getCategoriaID());
     }
 }

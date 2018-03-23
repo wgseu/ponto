@@ -870,6 +870,20 @@ class Produto extends \MZ\Database\Helper
     }
 
     /**
+     * Get relative imagem path or default imagem
+     * @param boolean $default If true return default image, otherwise check field
+     * @return string relative web path for produto imagem
+     */
+    public function makeImagem($default = false)
+    {
+        $imagem = $this->getImagem();
+        if ($default) {
+            $imagem = null;
+        }
+        return get_image_url($imagem, 'produto', 'produto.png');
+    }
+
+    /**
      * Convert this instance into array associated key -> value with only public fields
      * @return array All public field and values into array format
      */
@@ -918,7 +932,7 @@ class Produto extends \MZ\Database\Helper
     public function clean($dependency)
     {
         if (!is_null($this->getImagem()) && $dependency->getImagem() != $this->getImagem()) {
-            unlink(get_image_path($this->getImagem(), 'produto'));
+            @unlink(get_image_path($this->getImagem(), 'produto'));
         }
         $this->setImagem($dependency->getImagem());
     }
@@ -954,41 +968,31 @@ class Produto extends \MZ\Database\Helper
         if (is_null($this->getTipo())) {
             $errors['tipo'] = 'O tipo não pode ser vazio';
         }
-        if (!is_null($this->getTipo()) &&
-            !array_key_exists($this->getTipo(), self::getTipoOptions())
-        ) {
+        if (!Validator::checkInSet($this->getTipo(), self::getTipoOptions(), true)) {
             $errors['tipo'] = 'O tipo é inválido';
         }
         if (is_null($this->getCobrarServico())) {
             $errors['cobrarservico'] = 'A cobrança de serviço não pode ser vazia';
         }
-        if (!is_null($this->getCobrarServico()) &&
-            !array_key_exists($this->getCobrarServico(), self::getBooleanOptions())
-        ) {
+        if (!Validator::checkBoolean($this->getCobrarServico(), true)) {
             $errors['cobrarservico'] = 'A cobrança de serviço é inválida';
         }
         if (is_null($this->getDivisivel())) {
             $errors['divisivel'] = 'O divisível não pode ser vazio';
         }
-        if (!is_null($this->getDivisivel()) &&
-            !array_key_exists($this->getDivisivel(), self::getBooleanOptions())
-        ) {
+        if (!Validator::checkBoolean($this->getDivisivel(), true)) {
             $errors['divisivel'] = 'O divisível é inválido';
         }
         if (is_null($this->getPesavel())) {
             $errors['pesavel'] = 'O pesável não pode ser vazio';
         }
-        if (!is_null($this->getPesavel()) &&
-            !array_key_exists($this->getPesavel(), self::getBooleanOptions())
-        ) {
+        if (!Validator::checkBoolean($this->getPesavel(), true)) {
             $errors['pesavel'] = 'O pesável é inválido';
         }
         if (is_null($this->getPerecivel())) {
             $errors['perecivel'] = 'O perecível não pode ser vazio';
         }
-        if (!is_null($this->getPerecivel()) &&
-            !array_key_exists($this->getPerecivel(), self::getBooleanOptions())
-        ) {
+        if (!Validator::checkBoolean($this->getPerecivel(), true)) {
             $errors['perecivel'] = 'O perecível é inválido';
         }
         if (is_null($this->getTempoPreparo())) {
@@ -997,9 +1001,7 @@ class Produto extends \MZ\Database\Helper
         if (is_null($this->getVisivel())) {
             $errors['visivel'] = 'O visível não pode ser vazio';
         }
-        if (!is_null($this->getVisivel()) &&
-            !array_key_exists($this->getVisivel(), self::getBooleanOptions())
-        ) {
+        if (!Validator::checkBoolean($this->getVisivel(), true)) {
             $errors['visivel'] = 'O visível é inválido';
         }
         if (is_null($this->getDataAtualizacao())) {
@@ -1046,17 +1048,166 @@ class Produto extends \MZ\Database\Helper
     }
 
     /**
-     * Get relative imagem path or default imagem
-     * @param boolean $default If true return default image, otherwise check field
-     * @return string relative web path for produto imagem
+     * Insert a new Produto into the database and fill instance from database
+     * @return Produto Self instance
      */
-    public function makeImagem($default = false)
+    public function insert()
     {
-        $imagem = $this->getImagem();
-        if ($default) {
-            $imagem = null;
+        $values = $this->validate();
+        unset($values['id']);
+        try {
+            $id = self::getDB()->insertInto('Produtos')->values($values)->execute();
+            $produto = self::findByID($id);
+            $this->fromArray($produto->toArray());
+        } catch (\Exception $e) {
+            throw $this->translate($e);
         }
-        return get_image_url($imagem, 'produto', 'produto.png');
+        return $this;
+    }
+
+    /**
+     * Update Produto with instance values into database for ID
+     * @return Produto Self instance
+     */
+    public function update()
+    {
+        $values = $this->validate();
+        if (!$this->exists()) {
+            throw new \Exception('O identificador do produto não foi informado');
+        }
+        unset($values['id']);
+        try {
+            self::getDB()
+                ->update('Produtos')
+                ->set($values)
+                ->where('id', $this->getID())
+                ->execute();
+            $produto = self::findByID($this->getID());
+            $this->fromArray($produto->toArray());
+        } catch (\Exception $e) {
+            throw $this->translate($e);
+        }
+        return $this;
+    }
+
+    /**
+     * Delete this instance from database using ID
+     * @return integer Number of rows deleted (Max 1)
+     */
+    public function delete()
+    {
+        if (!$this->exists()) {
+            throw new \Exception('O identificador do produto não foi informado');
+        }
+        $result = self::getDB()
+            ->deleteFrom('Produtos')
+            ->where('id', $this->getID())
+            ->execute();
+        return $result;
+    }
+
+    /**
+     * Load one register for it self with a condition
+     * @param  array $condition Condition for searching the row
+     * @param  array $order associative field name -> [-1, 1]
+     * @return Produto Self instance filled or empty
+     */
+    public function load($condition, $order = [])
+    {
+        $query = self::query($condition, $order)->limit(1);
+        $row = $query->fetch() ?: [];
+        return $this->fromArray($row);
+    }
+
+    /**
+     * Load into this object from database using, ID
+     * @param  int $id id to find Produto
+     * @return Produto Self filled instance or empty when not found
+     */
+    public function loadByID($id)
+    {
+        return $this->load([
+            'id' => intval($id),
+        ]);
+    }
+
+    /**
+     * Load into this object from database using, Descricao
+     * @param  string $descricao descrição to find Produto
+     * @return Produto Self filled instance or empty when not found
+     */
+    public function loadByDescricao($descricao)
+    {
+        return $this->load([
+            'descricao' => strval($descricao),
+        ]);
+    }
+
+    /**
+     * Load into this object from database using, CodigoBarras
+     * @param  string $codigo_barras código de barras to find Produto
+     * @return Produto Self filled instance or empty when not found
+     */
+    public function loadByCodigoBarras($codigo_barras)
+    {
+        return $this->load([
+            'codigobarras' => strval($codigo_barras),
+        ]);
+    }
+
+    /**
+     * Categoria do produto, permite a rápida localização ao utilizar tablets
+     * @return \MZ\Product\Categoria The object fetched from database
+     */
+    public function findCategoriaID()
+    {
+        return \MZ\Product\Categoria::findByID($this->getCategoriaID());
+    }
+
+    /**
+     * Informa a unidade do produtos, Ex.: Grama, Litro.
+     * @return \MZ\Product\Unidade The object fetched from database
+     */
+    public function findUnidadeID()
+    {
+        return \MZ\Product\Unidade::findByID($this->getUnidadeID());
+    }
+
+    /**
+     * Informa de qual setor o produto será retirado após a venda
+     * @return \MZ\Environment\Setor The object fetched from database
+     */
+    public function findSetorEstoqueID()
+    {
+        if (is_null($this->getSetorEstoqueID())) {
+            return new \MZ\Environment\Setor();
+        }
+        return \MZ\Environment\Setor::findByID($this->getSetorEstoqueID());
+    }
+
+    /**
+     * Informa em qual setor de preparo será enviado o ticket de preparo ou
+     * autorização, se nenhum for informado nada será impresso
+     * @return \MZ\Environment\Setor The object fetched from database
+     */
+    public function findSetorPreparoID()
+    {
+        if (is_null($this->getSetorPreparoID())) {
+            return new \MZ\Environment\Setor();
+        }
+        return \MZ\Environment\Setor::findByID($this->getSetorPreparoID());
+    }
+
+    /**
+     * Informações de tributação do produto
+     * @return \MZ\Invoice\Tributacao The object fetched from database
+     */
+    public function findTributacaoID()
+    {
+        if (is_null($this->getTributacaoID())) {
+            return new \MZ\Invoice\Tributacao();
+        }
+        return \MZ\Invoice\Tributacao::findByID($this->getTributacaoID());
     }
 
     /**
@@ -1075,42 +1226,6 @@ class Produto extends \MZ\Database\Helper
             return $options[$index];
         }
         return $options;
-    }
-
-    /**
-     * Find this object on database using, ID
-     * @param  int $id id to find Produto
-     * @return Produto A filled instance or empty when not found
-     */
-    public static function findByID($id)
-    {
-        return self::find([
-            'id' => intval($id),
-        ]);
-    }
-
-    /**
-     * Find this object on database using, Descricao
-     * @param  string $descricao descrição to find Produto
-     * @return Produto A filled instance or empty when not found
-     */
-    public static function findByDescricao($descricao)
-    {
-        return self::find([
-            'descricao' => strval($descricao),
-        ]);
-    }
-
-    /**
-     * Find this object on database using, CodigoBarras
-     * @param  string $codigo_barras código de barras to find Produto
-     * @return Produto A filled instance or empty when not found
-     */
-    public static function findByCodigoBarras($codigo_barras)
-    {
-        return self::find([
-            'codigobarras' => strval($codigo_barras),
-        ]);
     }
 
     /**
@@ -1178,19 +1293,53 @@ class Produto extends \MZ\Database\Helper
     public static function find($condition, $order = [])
     {
         $query = self::query($condition, $order)->limit(1);
-        $row = $query->fetch();
-        if ($row === false) {
-            $row = [];
-        }
+        $row = $query->fetch() ?: [];
         return new Produto($row);
     }
 
     /**
-     * Fetch all rows from database with matched condition critery
-     * @param  array $condition condition to filter rows
-     * @param  integer $limit number of rows to get, null for all
-     * @param  integer $offset start index to get rows, null for begining
-     * @return array All rows instanced and filled
+     * Find this object on database using, ID
+     * @param  int $id id to find Produto
+     * @return Produto A filled instance or empty when not found
+     */
+    public static function findByID($id)
+    {
+        return self::find([
+            'id' => intval($id),
+        ]);
+    }
+
+    /**
+     * Find this object on database using, Descricao
+     * @param  string $descricao descrição to find Produto
+     * @return Produto A filled instance or empty when not found
+     */
+    public static function findByDescricao($descricao)
+    {
+        return self::find([
+            'descricao' => strval($descricao),
+        ]);
+    }
+
+    /**
+     * Find this object on database using, CodigoBarras
+     * @param  string $codigo_barras código de barras to find Produto
+     * @return Produto A filled instance or empty when not found
+     */
+    public static function findByCodigoBarras($codigo_barras)
+    {
+        return self::find([
+            'codigobarras' => strval($codigo_barras),
+        ]);
+    }
+
+    /**
+     * Find all Produto
+     * @param  array  $condition Condition to get all Produto
+     * @param  array  $order     Order Produto
+     * @param  int    $limit     Limit data into row count
+     * @param  int    $offset    Start offset to get rows
+     * @return array             List of all rows instanced as Produto
      */
     public static function findAll($condition = [], $order = [], $limit = null, $offset = null)
     {
@@ -1210,77 +1359,6 @@ class Produto extends \MZ\Database\Helper
     }
 
     /**
-     * Insert a new Produto into the database and fill instance from database
-     * @return Produto Self instance
-     */
-    public function insert()
-    {
-        $values = $this->validate();
-        unset($values['id']);
-        try {
-            $id = self::getDB()->insertInto('Produtos')->values($values)->execute();
-            $produto = self::findByID($id);
-            $this->fromArray($produto->toArray());
-        } catch (\Exception $e) {
-            throw $this->translate($e);
-        }
-        return $this;
-    }
-
-    /**
-     * Update Produto with instance values into database for ID
-     * @return Produto Self instance
-     */
-    public function update()
-    {
-        $values = $this->validate();
-        if (!$this->exists()) {
-            throw new \Exception('O identificador do produto não foi informado');
-        }
-        unset($values['id']);
-        try {
-            self::getDB()
-                ->update('Produtos')
-                ->set($values)
-                ->where('id', $this->getID())
-                ->execute();
-            $produto = self::findByID($this->getID());
-            $this->fromArray($produto->toArray());
-        } catch (\Exception $e) {
-            throw $this->translate($e);
-        }
-        return $this;
-    }
-
-    /**
-     * Save the Produto into the database
-     * @return Produto Self instance
-     */
-    public function save()
-    {
-        if ($this->exists()) {
-            return $this->update();
-        }
-        return $this->insert();
-    }
-
-    /**
-     * Delete this instance from database using ID
-     * @return integer Number of rows deleted (Max 1)
-     */
-    public function delete()
-    {
-        if (!$this->exists()) {
-            throw new \Exception('O identificador do produto não foi informado');
-        }
-        $result = self::getDB()
-            ->deleteFrom('Produtos')
-            ->where('id', $this->getID())
-            ->execute();
-        return $result;
-    }
-
-    /**
      * Count all rows from database with matched condition critery
      * @param  array $condition condition to filter rows
      * @return integer Quantity of rows
@@ -1289,60 +1367,5 @@ class Produto extends \MZ\Database\Helper
     {
         $query = self::query($condition);
         return $query->count();
-    }
-
-    /**
-     * Categoria do produto, permite a rápida localização ao utilizar tablets
-     * @return \MZ\Product\Categoria The object fetched from database
-     */
-    public function findCategoriaID()
-    {
-        return \MZ\Product\Categoria::findByID($this->getCategoriaID());
-    }
-
-    /**
-     * Informa a unidade do produtos, Ex.: Grama, Litro.
-     * @return \MZ\Product\Unidade The object fetched from database
-     */
-    public function findUnidadeID()
-    {
-        return \MZ\Product\Unidade::findByID($this->getUnidadeID());
-    }
-
-    /**
-     * Informa de qual setor o produto será retirado após a venda
-     * @return \MZ\Environment\Setor The object fetched from database
-     */
-    public function findSetorEstoqueID()
-    {
-        if (is_null($this->getSetorEstoqueID())) {
-            return new \MZ\Environment\Setor();
-        }
-        return \MZ\Environment\Setor::findByID($this->getSetorEstoqueID());
-    }
-
-    /**
-     * Informa em qual setor de preparo será enviado o ticket de preparo ou
-     * autorização, se nenhum for informado nada será impresso
-     * @return \MZ\Environment\Setor The object fetched from database
-     */
-    public function findSetorPreparoID()
-    {
-        if (is_null($this->getSetorPreparoID())) {
-            return new \MZ\Environment\Setor();
-        }
-        return \MZ\Environment\Setor::findByID($this->getSetorPreparoID());
-    }
-
-    /**
-     * Informações de tributação do produto
-     * @return \MZ\Invoice\Tributacao The object fetched from database
-     */
-    public function findTributacaoID()
-    {
-        if (is_null($this->getTributacaoID())) {
-            return new \MZ\Invoice\Tributacao();
-        }
-        return \MZ\Invoice\Tributacao::findByID($this->getTributacaoID());
     }
 }

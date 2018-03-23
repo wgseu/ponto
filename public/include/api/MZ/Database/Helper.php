@@ -141,6 +141,18 @@ abstract class Helper
     abstract public function delete();
 
     /**
+     * Save a new or a existing instance into the database and fill instance from database
+     * @return Helper Self instance
+     */
+    public function save()
+    {
+        if ($this->exists()) {
+            return $this->update();
+        }
+        return $this->insert();
+    }
+
+    /**
      * Retorn current date and time on database format
      * @return string current date and time database formatted
      */
@@ -178,7 +190,6 @@ abstract class Helper
         return $options;
     }
 
-
     /**
      * Add order statement into query object
      * @param  SelectQuery $query FluentPDO query
@@ -205,6 +216,12 @@ abstract class Helper
         return $query;
     }
 
+    /**
+     * Add where statement into query object
+     * @param  SelectQuery $query FluentPDO query
+     * @param  array $condition associative field -> value, accepts multiple fields and values
+     * @return SelectQuery query object with where statement
+     */
     public static function buildCondition($query, $condition)
     {
         foreach ($condition as $field => $value) {
@@ -223,6 +240,13 @@ abstract class Helper
         return $query;
     }
 
+    /**
+     * Construct search statement from string
+     * @param string $search String to search
+     * @param string $field  field name to match
+     * @param SelectQuery $query query object
+     * @return SelectQuery query object with where and order statement
+     */
     public static function buildSearch($search, $field, $query)
     {
         $keywords = preg_split('/[\s,]+/', $search);

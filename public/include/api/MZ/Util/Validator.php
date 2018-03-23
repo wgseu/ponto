@@ -238,4 +238,33 @@ class Validator
         $mask_len = strlen(Filter::digits($mask));
         return strlen($cep) == $mask_len;
     }
+
+    /**
+     * Check if entry is in array set as key
+     * @param  string  $entry key name
+     * @param  array   $set array as key set
+     * @param  boolean $empty allow null entry as valid
+     * @return boolean True if entry is in set or false otherwise
+     */
+    public static function checkInSet($entry, $set, $empty = false)
+    {
+        if (is_null($entry) && $empty) {
+            return true;
+        }
+        return array_key_exists($entry, $set);
+    }
+
+    /**
+     * Check if value is a valid boolean database
+     * @param  string  $value boolean value
+     * @param  boolean $empty allow null as valid boolean
+     * @return boolean True if value is a valid boolean value or false otherwise
+     */
+    public static function checkBoolean($value, $empty = false)
+    {
+        if (is_null($value) && $empty) {
+            return true;
+        }
+        return self::checkInSet($value, \MZ\Database\Helper::getBooleanOptions(), $empty);
+    }
 }

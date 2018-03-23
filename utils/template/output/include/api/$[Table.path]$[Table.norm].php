@@ -205,6 +205,24 @@ $[field.end]
 $[field.end]
         return $this;
     }
+$[field.each(all)]
+$[field.if(image|blob)]
+
+    /**
+     * Get relative $[field.name] path or default $[field.name]
+     * @param boolean $default If true return default image, otherwise check field
+     * @return string relative web path for $[table.name] $[field.name]
+     */
+    public function make$[Field.norm]($default = false)
+    {
+        $$[field.unix] = $this->get$[Field.norm]();
+        if ($default) {
+            $$[field.unix] = null;
+        }
+        return get_image_url($$[field.unix], '$[field.image.folder]', '$[table.unix].png');
+    }
+$[field.end]
+$[field.end]
 
     /**
      * Convert this instance into array associated key -> value with only public fields
@@ -357,15 +375,11 @@ $[field.else.match(senha|password)]
         }
 $[field.end]
 $[field.if(enum)]
-        if (!is_null($this->get$[Field.norm]($[field.if(array)]$[field.array.number]$[field.end])) &&
-            !array_key_exists($this->get$[Field.norm]($[field.if(array)]$[field.array.number]$[field.end]), self::get$[Field.norm]Options())
-        ) {
+        if (!Validator::checkInSet($this->get$[Field.norm]($[field.if(array)]$[field.array.number]$[field.end]), self::get$[Field.norm]Options(), true)) {
             $errors['$[field]'] = '$[FIELD.gender] $[field.name] é inválid$[field.gender]';
         }
 $[field.else.if(boolean)]
-        if (!is_null($this->get$[Field.norm]($[field.if(array)]$[field.array.number]$[field.end])) &&
-            !array_key_exists($this->get$[Field.norm]($[field.if(array)]$[field.array.number]$[field.end]), self::getBooleanOptions())
-        ) {
+        if (!Validator::checkBoolean($this->get$[Field.norm]($[field.if(array)]$[field.array.number]$[field.end]), true)) {
             $errors['$[field]'] = '$[FIELD.gender] $[field.name] é inválid$[field.gender]';
         }
 $[field.end]
@@ -402,21 +416,128 @@ $[table.else]
         return $e;
 $[table.end]
     }
-$[field.each(all)]
-$[field.if(image|blob)]
 
     /**
-     * Get relative $[field.name] path or default $[field.name]
-     * @param boolean $default If true return default image, otherwise check field
-     * @return string relative web path for $[table.name] $[field.name]
+     * Insert a new $[Table.name] into the database and fill instance from database
+     * @return $[Table.norm] Self instance
      */
-    public function make$[Field.norm]($default = false)
+    public function insert()
     {
-        $$[field.unix] = $this->get$[Field.norm]();
-        if ($default) {
-            $$[field.unix] = null;
+        $values = $this->validate();
+        unset($values['$[primary]']);
+        try {
+            $$[primary.unix] = self::getDB()->insertInto('$[Table]')->values($values)->execute();
+            $$[table.unix] = self::findBy$[Primary.norm]($$[primary.unix]);
+            $this->fromArray($$[table.unix]->toArray());
+        } catch (\Exception $e) {
+            throw $this->translate($e);
         }
-        return get_image_url($$[field.unix], '$[field.image.folder]', '$[table.unix].png');
+        return $this;
+    }
+
+    /**
+     * Update $[Table.name] with instance values into database for $[Primary.name]
+     * @return $[Table.norm] Self instance
+     */
+    public function update()
+    {
+        $values = $this->validate();
+        if (!$this->exists()) {
+            throw new \Exception('O identificador d$[table.gender] $[table.name] não foi informado');
+        }
+        unset($values['$[primary]']);
+        try {
+            self::getDB()
+                ->update('$[Table]')
+                ->set($values)
+                ->where('$[primary]', $this->get$[Primary.norm]())
+                ->execute();
+            $$[table.unix] = self::findBy$[Primary.norm]($this->get$[Primary.norm]());
+            $this->fromArray($$[table.unix]->toArray());
+        } catch (\Exception $e) {
+            throw $this->translate($e);
+        }
+        return $this;
+    }
+
+    /**
+     * Delete this instance from database using $[Primary.name]
+     * @return integer Number of rows deleted (Max 1)
+     */
+    public function delete()
+    {
+        if (!$this->exists()) {
+            throw new \Exception('O identificador d$[table.gender] $[table.name] não foi informado');
+        }
+        $result = self::getDB()
+            ->deleteFrom('$[Table]')
+            ->where('$[primary]', $this->get$[Primary.norm]())
+            ->execute();
+        return $result;
+    }
+
+    /**
+     * Load one register for it self with a condition
+     * @param  array $condition Condition for searching the row
+     * @param  array $order associative field name -> [-1, 1]
+     * @return $[Table.norm] Self instance filled or empty
+     */
+    public function load($condition, $order = [])
+    {
+        $query = self::query($condition, $order)->limit(1);
+        $row = $query->fetch() ?: [];
+        return $this->fromArray($row);
+    }
+$[table.each(unique)]
+
+    /**
+     * Load into this object from database using$[unique.each(all)], $[Field.norm]$[unique.end]
+
+$[unique.each(all)]
+$[field.if(integer|bigint)]
+     * @param  int $$[field.unix] $[field.name] to find $[Table.name]
+$[field.else.if(float|double)]
+     * @param  float $$[field.unix] $[field.name] to find $[Table.name]
+$[field.else]
+     * @param  string $$[field.unix] $[field.name] to find $[Table.name]
+$[field.end]
+$[unique.end]
+     * @return $[Table.norm] Self filled instance or empty when not found
+     */
+    public function loadBy$[unique.each(all)]$[Field.norm]$[unique.end]($[unique.each(all)]$[field.if(first)]$[field.else], $[field.end]$$[field.unix]$[unique.end])
+    {
+        return $this->load([
+$[unique.each(all)]
+$[field.if(integer|bigint)]
+            '$[field]' => intval($$[field.unix]),
+$[field.else.if(float|double)]
+            '$[field]' => floatval($$[field.unix]),
+$[field.else]
+            '$[field]' => strval($$[field.unix]),
+$[field.end]
+$[unique.end]
+        ]);
+    }
+$[table.end]
+$[field.each(all)]
+$[field.if(reference)]
+
+$[field.if(comment)]
+    /**
+$[field.each(comment)]
+     * $[Field.comment]
+$[field.end]
+     * @return \$[Reference.package]\$[Reference.norm] The object fetched from database
+     */
+$[field.end]
+    public function find$[Field.norm]($[field.if(array)]$index$[field.end])
+    {
+$[field.if(null)]
+        if (is_null($this->get$[Field.norm]($[field.if(array)]$index$[field.end]))) {
+            return new \$[Reference.package]\$[Reference.norm]();
+        }
+$[field.end]
+        return \$[Reference.package]\$[Reference.norm]::findBy$[Reference.pk.norm]($this->get$[Field.norm]($[field.if(array)]$index$[field.end]));
     }
 $[field.end]
 $[field.end]
@@ -443,37 +564,6 @@ $[field.end]
     }
 $[field.end]
 $[field.end]
-$[table.each(unique)]
-
-    /**
-     * Find this object on database using$[unique.each(all)], $[Field.norm]$[unique.end]
-
-$[unique.each(all)]
-$[field.if(integer|bigint)]
-     * @param  int $$[field.unix] $[field.name] to find $[Table.name]
-$[field.else.if(float|double)]
-     * @param  float $$[field.unix] $[field.name] to find $[Table.name]
-$[field.else]
-     * @param  string $$[field.unix] $[field.name] to find $[Table.name]
-$[field.end]
-$[unique.end]
-     * @return $[Table.norm] A filled instance or empty when not found
-     */
-    public static function findBy$[unique.each(all)]$[Field.norm]$[unique.end]($[unique.each(all)]$[field.if(first)]$[field.else], $[field.end]$$[field.unix]$[unique.end])
-    {
-        return self::find([
-$[unique.each(all)]
-$[field.if(integer|bigint)]
-            '$[field]' => intval($$[field.unix]),
-$[field.else.if(float|double)]
-            '$[field]' => floatval($$[field.unix]),
-$[field.else]
-            '$[field]' => strval($$[field.unix]),
-$[field.end]
-$[unique.end]
-        ]);
-    }
-$[table.end]
 
     /**
      * Get allowed keys array
@@ -544,19 +634,48 @@ $[descriptor.end]
     public static function find($condition, $order = [])
     {
         $query = self::query($condition, $order)->limit(1);
-        $row = $query->fetch();
-        if ($row === false) {
-            $row = [];
-        }
+        $row = $query->fetch() ?: [];
         return new $[Table.norm]($row);
     }
+$[table.each(unique)]
 
     /**
-     * Fetch all rows from database with matched condition critery
-     * @param  array $condition condition to filter rows
-     * @param  integer $limit number of rows to get, null for all
-     * @param  integer $offset start index to get rows, null for begining
-     * @return array All rows instanced and filled
+     * Find this object on database using$[unique.each(all)], $[Field.norm]$[unique.end]
+
+$[unique.each(all)]
+$[field.if(integer|bigint)]
+     * @param  int $$[field.unix] $[field.name] to find $[Table.name]
+$[field.else.if(float|double)]
+     * @param  float $$[field.unix] $[field.name] to find $[Table.name]
+$[field.else]
+     * @param  string $$[field.unix] $[field.name] to find $[Table.name]
+$[field.end]
+$[unique.end]
+     * @return $[Table.norm] A filled instance or empty when not found
+     */
+    public static function findBy$[unique.each(all)]$[Field.norm]$[unique.end]($[unique.each(all)]$[field.if(first)]$[field.else], $[field.end]$$[field.unix]$[unique.end])
+    {
+        return self::find([
+$[unique.each(all)]
+$[field.if(integer|bigint)]
+            '$[field]' => intval($$[field.unix]),
+$[field.else.if(float|double)]
+            '$[field]' => floatval($$[field.unix]),
+$[field.else]
+            '$[field]' => strval($$[field.unix]),
+$[field.end]
+$[unique.end]
+        ]);
+    }
+$[table.end]
+
+    /**
+     * Find all $[Table.name]
+     * @param  array  $condition Condition to get all $[Table.name]
+     * @param  array  $order     Order $[Table.name]
+     * @param  int    $limit     Limit data into row count
+     * @param  int    $offset    Start offset to get rows
+     * @return array             List of all rows instanced as $[Table.norm]
      */
     public static function findAll($condition = [], $order = [], $limit = null, $offset = null)
     {
@@ -576,77 +695,6 @@ $[descriptor.end]
     }
 
     /**
-     * Insert a new $[Table.name] into the database and fill instance from database
-     * @return $[Table.norm] Self instance
-     */
-    public function insert()
-    {
-        $values = $this->validate();
-        unset($values['$[primary]']);
-        try {
-            $$[primary.unix] = self::getDB()->insertInto('$[Table]')->values($values)->execute();
-            $$[table.unix] = self::findBy$[Primary.norm]($$[primary.unix]);
-            $this->fromArray($$[table.unix]->toArray());
-        } catch (\Exception $e) {
-            throw $this->translate($e);
-        }
-        return $this;
-    }
-
-    /**
-     * Update $[Table.name] with instance values into database for $[Primary.name]
-     * @return $[Table.norm] Self instance
-     */
-    public function update()
-    {
-        $values = $this->validate();
-        if (!$this->exists()) {
-            throw new \Exception('O identificador d$[table.gender] $[table.name] não foi informado');
-        }
-        unset($values['$[primary]']);
-        try {
-            self::getDB()
-                ->update('$[Table]')
-                ->set($values)
-                ->where('$[primary]', $this->get$[Primary.norm]())
-                ->execute();
-            $$[table.unix] = self::findBy$[Primary.norm]($this->get$[Primary.norm]());
-            $this->fromArray($$[table.unix]->toArray());
-        } catch (\Exception $e) {
-            throw $this->translate($e);
-        }
-        return $this;
-    }
-
-    /**
-     * Save the $[Table.name] into the database
-     * @return $[Table.norm] Self instance
-     */
-    public function save()
-    {
-        if ($this->exists()) {
-            return $this->update();
-        }
-        return $this->insert();
-    }
-
-    /**
-     * Delete this instance from database using $[Primary.name]
-     * @return integer Number of rows deleted (Max 1)
-     */
-    public function delete()
-    {
-        if (!$this->exists()) {
-            throw new \Exception('O identificador d$[table.gender] $[table.name] não foi informado');
-        }
-        $result = self::getDB()
-            ->deleteFrom('$[Table]')
-            ->where('$[primary]', $this->get$[Primary.norm]())
-            ->execute();
-        return $result;
-    }
-
-    /**
      * Count all rows from database with matched condition critery
      * @param  array $condition condition to filter rows
      * @return integer Quantity of rows
@@ -656,26 +704,4 @@ $[descriptor.end]
         $query = self::query($condition);
         return $query->count();
     }
-$[field.each(all)]
-$[field.if(reference)]
-
-$[field.if(comment)]
-    /**
-$[field.each(comment)]
-     * $[Field.comment]
-$[field.end]
-     * @return \$[Reference.package]\$[Reference.norm] The object fetched from database
-     */
-$[field.end]
-    public function find$[Field.norm]($[field.if(array)]$index$[field.end])
-    {
-$[field.if(null)]
-        if (is_null($this->get$[Field.norm]($[field.if(array)]$index$[field.end]))) {
-            return new \$[Reference.package]\$[Reference.norm]();
-        }
-$[field.end]
-        return \$[Reference.package]\$[Reference.norm]::findBy$[Reference.pk.norm]($this->get$[Field.norm]($[field.if(array)]$index$[field.end]));
-    }
-$[field.end]
-$[field.end]
 }

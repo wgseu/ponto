@@ -104,16 +104,16 @@ class ZPagina
 
     public static function getPeloID($id)
     {
-        $query = DB::$pdo->from('Paginas')
+        $query = \DB::$pdo->from('Paginas')
                          ->where(['id' => $id]);
-        return new ZPagina($query->fetch());
+        return new Pagina($query->fetch());
     }
 
     public static function getPeloNomeLinguagemID($nome, $linguagem_id)
     {
-        $query = DB::$pdo->from('Paginas')
+        $query = \DB::$pdo->from('Paginas')
                          ->where(['nome' => $nome, 'linguagemid' => $linguagem_id]);
-        return new ZPagina($query->fetch());
+        return new Pagina($query->fetch());
     }
 
     private static function validarCampos(&$pagina)
@@ -160,12 +160,12 @@ class ZPagina
         $_pagina = $pagina->toArray();
         self::validarCampos($_pagina);
         try {
-            $_pagina['id'] = DB::$pdo->insertInto('Paginas')->values($_pagina)->execute();
+            $_pagina['id'] = \DB::$pdo->insertInto('Paginas')->values($_pagina)->execute();
         } catch (Exception $e) {
             self::handleException($e);
             throw $e;
         }
-        return self::getPeloID($_pagina['id']);
+        return self::findByID($_pagina['id']);
     }
 
     public static function atualizar($pagina)
@@ -181,7 +181,7 @@ class ZPagina
             'conteudo',
         ];
         try {
-            $query = DB::$pdo->update('Paginas');
+            $query = \DB::$pdo->update('Paginas');
             $query = $query->set(array_intersect_key($_pagina, array_flip($campos)));
             $query = $query->where('id', $_pagina['id']);
             $query->execute();
@@ -189,22 +189,22 @@ class ZPagina
             self::handleException($e);
             throw $e;
         }
-        return self::getPeloID($_pagina['id']);
+        return self::findByID($_pagina['id']);
     }
 
     public static function excluir($id)
     {
         if (!$id) {
-            throw new Exception('Não foi possível excluir a pagina, o id da pagina não foi informado');
+            throw new \Exception('Não foi possível excluir a pagina, o id da pagina não foi informado');
         }
-        $query = DB::$pdo->deleteFrom('Paginas')
+        $query = \DB::$pdo->deleteFrom('Paginas')
                          ->where(['id' => $id]);
         return $query->execute();
     }
 
     private static function initSearch($nome, $linguagemid)
     {
-        $query = DB::$pdo->from('Paginas')
+        $query = \DB::$pdo->from('Paginas')
                          ->orderBy('id ASC');
         $nome = trim($nome);
         if ($nome != '') {
@@ -226,7 +226,7 @@ class ZPagina
         $_paginas = $query->fetchAll();
         $paginas = [];
         foreach ($_paginas as $pagina) {
-            $paginas[] = new ZPagina($pagina);
+            $paginas[] = new Pagina($pagina);
         }
         return $paginas;
     }

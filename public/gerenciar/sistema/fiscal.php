@@ -1,7 +1,7 @@
 <?php
 require_once(dirname(__DIR__) . '/app.php');
 
-need_permission(PermissaoNome::ALTERARCONFIGURACOES);
+need_permission(Permissao::NOME_ALTERARCONFIGURACOES);
 
 $fieldfocus = 'fiscal_timeout';
 $tab_fiscal = 'active';
@@ -19,12 +19,12 @@ if (is_post()) {
         set_int_config('Sistema', 'Fiscal.Timeout', $fiscal_timeout);
         $__sistema__->salvarOpcoes($__options__);
         try {
-            $appsync = new AppSync();
+            $appsync = new \MZ\System\Synchronizer();
             $appsync->systemOptionsChanged();
         } catch (Exception $e) {
             Log::error($e->getMessage());
         }
-        Thunder::success('Opções fiscais atualizadas com sucesso!', true);
+        \Thunder::success('Opções fiscais atualizadas com sucesso!', true);
         redirect('/gerenciar/sistema/fiscal');
     } catch (ValidationException $e) {
         $erros = $e->getErrors();
@@ -33,7 +33,7 @@ if (is_post()) {
     }
     foreach ($erros as $key => $value) {
         $fieldfocus = $key;
-        Thunder::error($erros[$fieldfocus]);
+        \Thunder::error($erros[$fieldfocus]);
         break;
     }
 }

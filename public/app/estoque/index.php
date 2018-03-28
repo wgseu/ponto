@@ -26,12 +26,12 @@ if (!is_login()) {
 }
 $_estoque = $_POST['estoque'];
 try {
-    if (!have_permission(PermissaoNome::ESTOQUE)) {
-        throw new Exception('Você não tem permissão para inserir no estoque');
+    if (!$login_funcionario->has(Permissao::NOME_ESTOQUE)) {
+        throw new \Exception('Você não tem permissão para inserir no estoque');
     }
-    $estoque = new ZEstoque($_estoque);
+    $estoque = new Estoque($_estoque);
     $estoque->setFuncionarioID($login_funcionario->getID());
-    $estoque = ZEstoque::inserir($estoque);
+    $estoque = Estoque::inserir($estoque);
     json(['status' => 'ok', 'estoque' => $estoque->toArray()]);
 } catch (Exception $e) {
     json($e->getMessage());

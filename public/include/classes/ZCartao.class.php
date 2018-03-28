@@ -224,16 +224,16 @@ class ZCartao
 
     public static function getPeloID($id)
     {
-        $query = DB::$pdo->from('Cartoes')
+        $query = \DB::$pdo->from('Cartoes')
                          ->where(['id' => $id]);
-        return new ZCartao($query->fetch());
+        return new Cartao($query->fetch());
     }
 
     public static function getPelaDescricao($descricao)
     {
-        $query = DB::$pdo->from('Cartoes')
+        $query = \DB::$pdo->from('Cartoes')
                          ->where(['descricao' => $descricao]);
-        return new ZCartao($query->fetch());
+        return new Cartao($query->fetch());
     }
 
     private static function validarCampos(&$cartao)
@@ -321,12 +321,12 @@ class ZCartao
         $_cartao = $cartao->toArray();
         self::validarCampos($_cartao);
         try {
-            $_cartao['id'] = DB::$pdo->insertInto('Cartoes')->values($_cartao)->execute();
+            $_cartao['id'] = \DB::$pdo->insertInto('Cartoes')->values($_cartao)->execute();
         } catch (Exception $e) {
             self::handleException($e);
             throw $e;
         }
-        return self::getPeloID($_cartao['id']);
+        return self::findByID($_cartao['id']);
     }
 
     public static function atualizar($cartao)
@@ -348,7 +348,7 @@ class ZCartao
             'ativo',
         ];
         try {
-            $query = DB::$pdo->update('Cartoes');
+            $query = \DB::$pdo->update('Cartoes');
             $query = $query->set(array_intersect_key($_cartao, array_flip($campos)));
             $query = $query->where('id', $_cartao['id']);
             $query->execute();
@@ -356,22 +356,22 @@ class ZCartao
             self::handleException($e);
             throw $e;
         }
-        return self::getPeloID($_cartao['id']);
+        return self::findByID($_cartao['id']);
     }
 
     public static function excluir($id)
     {
         if (!$id) {
-            throw new Exception('Não foi possível excluir o cartao, o id do cartao não foi informado');
+            throw new \Exception('Não foi possível excluir o cartao, o id do cartao não foi informado');
         }
-        $query = DB::$pdo->deleteFrom('Cartoes')
+        $query = \DB::$pdo->deleteFrom('Cartoes')
                          ->where(['id' => $id]);
         return $query->execute();
     }
 
     private static function initSearch($busca, $ativo)
     {
-        $query = DB::$pdo->from('Cartoes')
+        $query = \DB::$pdo->from('Cartoes')
                          ->orderBy('ativo ASC, descricao ASC');
         $busca = trim($busca);
         if ($busca != '') {
@@ -393,7 +393,7 @@ class ZCartao
         $_cartaos = $query->fetchAll();
         $cartaos = [];
         foreach ($_cartaos as $cartao) {
-            $cartaos[] = new ZCartao($cartao);
+            $cartaos[] = new Cartao($cartao);
         }
         return $cartaos;
     }
@@ -406,7 +406,7 @@ class ZCartao
 
     private static function initSearchDaCarteiraID($carteira_id)
     {
-        return   DB::$pdo->from('Cartoes')
+        return   \DB::$pdo->from('Cartoes')
                          ->where(['carteiraid' => $carteira_id])
                          ->orderBy('id ASC');
     }
@@ -420,7 +420,7 @@ class ZCartao
         $_cartaos = $query->fetchAll();
         $cartaos = [];
         foreach ($_cartaos as $cartao) {
-            $cartaos[] = new ZCartao($cartao);
+            $cartaos[] = new Cartao($cartao);
         }
         return $cartaos;
     }
@@ -433,7 +433,7 @@ class ZCartao
 
     private static function initSearchDoCarteiraPagtoID($carteira_pagto_id)
     {
-        return   DB::$pdo->from('Cartoes')
+        return   \DB::$pdo->from('Cartoes')
                          ->where(['carteirapagtoid' => $carteira_pagto_id])
                          ->orderBy('id ASC');
     }
@@ -447,7 +447,7 @@ class ZCartao
         $_cartaos = $query->fetchAll();
         $cartaos = [];
         foreach ($_cartaos as $cartao) {
-            $cartaos[] = new ZCartao($cartao);
+            $cartaos[] = new Cartao($cartao);
         }
         return $cartaos;
     }

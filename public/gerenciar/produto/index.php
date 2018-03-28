@@ -21,9 +21,9 @@
 */
 require_once(dirname(__DIR__) . '/app.php');
 
-need_permission(PermissaoNome::CADASTROPRODUTOS);
+need_permission(Permissao::NOME_CADASTROPRODUTOS);
 
-$count = ZProduto::getCount(
+$count = Produto::getCount(
     $_GET['query'],
     $_GET['categoria_id'],
     $_GET['unidade_id'],
@@ -36,7 +36,7 @@ $count = ZProduto::getCount(
     null  // pesável
 );
 list($pagesize, $offset, $pagestring) = pagestring($count, 10);
-$produtos = ZProduto::getTodos(
+$produtos = Produto::getTodos(
     $_GET['query'],
     $_GET['categoria_id'],
     $_GET['unidade_id'],
@@ -52,14 +52,14 @@ $produtos = ZProduto::getTodos(
     $pagesize
 );
 
-$tipos = ZProduto::getTipoOptions();
+$tipos = Produto::getTipoOptions();
 $categorias = [];
-$_categorias = ZCategoria::getTodas(true);
+$_categorias = Categoria::getTodas(true);
 foreach ($_categorias as $categoria) {
     $categorias[$categoria->getID()] = $categoria->getDescricao();
 }
 $unidades = [];
-$_unidades = ZUnidade::getTodas();
+$_unidades = Unidade::findAll();
 foreach ($_unidades as $unidade) {
     $unidades[$unidade->getID()] = $unidade->getNome();
 }

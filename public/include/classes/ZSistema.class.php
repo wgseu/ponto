@@ -297,9 +297,9 @@ class ZSistema
 
     public static function getPeloID($id)
     {
-        $query = DB::$pdo->from('Sistema')
+        $query = \DB::$pdo->from('Sistema')
                          ->where(['id' => $id]);
-        return new ZSistema($query->fetch());
+        return new Sistema($query->fetch());
     }
 
     private static function validarCampos(&$sistema)
@@ -394,7 +394,7 @@ class ZSistema
             ];
         }
         try {
-            $query = DB::$pdo->update('Sistema');
+            $query = \DB::$pdo->update('Sistema');
             $query = $query->set(array_intersect_key($_sistema, array_flip($_campos)));
             $query = $query->where('id', $_sistema['id']);
             $query->execute();
@@ -402,12 +402,12 @@ class ZSistema
             self::handleException($e);
             throw $e;
         }
-        return self::getPeloID($_sistema['id']);
+        return self::findByID($_sistema['id']);
     }
 
     private static function initSearchDaEmpresaID($empresa_id)
     {
-        return   DB::$pdo->from('Sistema')
+        return   \DB::$pdo->from('Sistema')
                          ->where(['empresaid' => $empresa_id])
                          ->orderBy('id ASC');
     }
@@ -421,7 +421,7 @@ class ZSistema
         $_sistemas = $query->fetchAll();
         $sistemas = [];
         foreach ($_sistemas as $sistema) {
-            $sistemas[] = new ZSistema($sistema);
+            $sistemas[] = new Sistema($sistema);
         }
         return $sistemas;
     }
@@ -434,7 +434,7 @@ class ZSistema
 
     private static function initSearchDoParceiroID($parceiro_id)
     {
-        return   DB::$pdo->from('Sistema')
+        return   \DB::$pdo->from('Sistema')
                          ->where(['parceiroid' => $parceiro_id])
                          ->orderBy('id ASC');
     }
@@ -448,7 +448,7 @@ class ZSistema
         $_sistemas = $query->fetchAll();
         $sistemas = [];
         foreach ($_sistemas as $sistema) {
-            $sistemas[] = new ZSistema($sistema);
+            $sistemas[] = new Sistema($sistema);
         }
         return $sistemas;
     }
@@ -461,7 +461,7 @@ class ZSistema
 
     private static function initSearchDaPaisID($pais_id)
     {
-        return   DB::$pdo->from('Sistema')
+        return   \DB::$pdo->from('Sistema')
                          ->where(['paisid' => $pais_id])
                          ->orderBy('id ASC');
     }
@@ -475,7 +475,7 @@ class ZSistema
         $_sistemas = $query->fetchAll();
         $sistemas = [];
         foreach ($_sistemas as $sistema) {
-            $sistemas[] = new ZSistema($sistema);
+            $sistemas[] = new Sistema($sistema);
         }
         return $sistemas;
     }
@@ -491,7 +491,7 @@ class ZSistema
         $opcoes = to_ini($options);
         $opcoes = base64_encode($opcoes);
         $this->setOpcoes($opcoes);
-        return ZSistema::atualizar($this);
+        return Sistema::atualizar($this);
     }
 
     public static function getINI()

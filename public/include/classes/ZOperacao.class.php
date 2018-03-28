@@ -109,16 +109,16 @@ class ZOperacao
 
     public static function getPeloID($id)
     {
-        $query = DB::$pdo->from('Operacoes')
+        $query = \DB::$pdo->from('Operacoes')
                          ->where(['id' => $id]);
-        return new ZOperacao($query->fetch());
+        return new Operacao($query->fetch());
     }
 
     public static function getPeloCodigo($codigo)
     {
-        $query = DB::$pdo->from('Operacoes')
+        $query = \DB::$pdo->from('Operacoes')
                          ->where(['codigo' => $codigo]);
-        return new ZOperacao($query->fetch());
+        return new Operacao($query->fetch());
     }
 
     private static function validarCampos(&$operacao)
@@ -155,12 +155,12 @@ class ZOperacao
         $_operacao = $operacao->toArray();
         self::validarCampos($_operacao);
         try {
-            $_operacao['id'] = DB::$pdo->insertInto('Operacoes')->values($_operacao)->execute();
+            $_operacao['id'] = \DB::$pdo->insertInto('Operacoes')->values($_operacao)->execute();
         } catch (Exception $e) {
             self::handleException($e);
             throw $e;
         }
-        return self::getPeloID($_operacao['id']);
+        return self::findByID($_operacao['id']);
     }
 
     public static function atualizar($operacao)
@@ -176,7 +176,7 @@ class ZOperacao
             'detalhes',
         ];
         try {
-            $query = DB::$pdo->update('Operacoes');
+            $query = \DB::$pdo->update('Operacoes');
             $query = $query->set(array_intersect_key($_operacao, array_flip($campos)));
             $query = $query->where('id', $_operacao['id']);
             $query->execute();
@@ -184,22 +184,22 @@ class ZOperacao
             self::handleException($e);
             throw $e;
         }
-        return self::getPeloID($_operacao['id']);
+        return self::findByID($_operacao['id']);
     }
 
     public static function excluir($id)
     {
         if (!$id) {
-            throw new Exception('Não foi possível excluir a operacao, o id da operacao não foi informado');
+            throw new \Exception('Não foi possível excluir a operacao, o id da operacao não foi informado');
         }
-        $query = DB::$pdo->deleteFrom('Operacoes')
+        $query = \DB::$pdo->deleteFrom('Operacoes')
                          ->where(['id' => $id]);
         return $query->execute();
     }
 
     private static function initSearch()
     {
-        return   DB::$pdo->from('Operacoes')
+        return   \DB::$pdo->from('Operacoes')
                          ->orderBy('id ASC');
     }
 
@@ -212,7 +212,7 @@ class ZOperacao
         $_operacaos = $query->fetchAll();
         $operacaos = [];
         foreach ($_operacaos as $operacao) {
-            $operacaos[] = new ZOperacao($operacao);
+            $operacaos[] = new Operacao($operacao);
         }
         return $operacaos;
     }

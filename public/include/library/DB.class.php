@@ -61,7 +61,7 @@ class DB
     public static function Commit()
     {
         if (self::$transactionCounter <= 0) {
-            throw new Exception('No transaction active');
+            throw new \Exception('No transaction active');
         }
         self::$transactionCounter--;
         if (self::$transactionCounter == 0) {
@@ -73,7 +73,7 @@ class DB
     public static function RollBack()
     {
         if (self::$transactionCounter <= 0) {
-            throw new Exception('No transaction active');
+            throw new \Exception('No transaction active');
         }
         self::$transactionCounter--;
         if (self::$transactionCounter == 0) {

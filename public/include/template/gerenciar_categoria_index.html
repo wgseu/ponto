@@ -51,7 +51,7 @@
 <!--{loop $categorias $categoria}-->
 							<tr>
 								<td class="product-cell"><strong><a href="/gerenciar/categoria/editar?id={$categoria->getID()}" title="Editar categoria '{$categoria->getDescricao()}'"><img src="${get_image_url($categoria->getImagem(), 'categoria', 'categoria.png')}" height="48" alt="Imagem" title="Imagem"/>{$categoria->getDescricao()}</a></strong>
-<!--${$_categoria = ZCategoria::getPeloID($categoria->getCategoriaID())}-->
+<!--${$_categoria = $categoria->findCategoriaID()}-->
 									<small><a href="/gerenciar/categoria/editar?id={$_categoria->getID()}" title="Editar categoria '{$_categoria->getDescricao()}'">{$_categoria->getDescricao()}</a></small>
 								</td>
 								<td>${$categoria->getServico() == 'Y'?'Sim':'Não'}</td>

@@ -21,17 +21,24 @@
 */
 require_once(dirname(__DIR__) . '/app.php');
 
-need_permission(PermissaoNome::CADASTROSERVICOS);
-$servico = ZServico::getPeloID($_GET['id']);
-if (is_null($servico->getID())) {
-    Thunder::warning('A serviço de id "'.$_GET['id'].'" não existe!');
+use MZ\__TODO_NAMESPACE__\Servico;
+
+need_permission(\Permissao::NOME_CADASTROSERVICOS, is_output('json'));
+$id = isset($_GET['id']) ? $_GET['id'] : null;
+$servico = Servico::findByID($id);
+if (!$servico->exists()) {
+    $msg = 'A serviço informada não existe!';
+    if (is_output('json')) {
+        json($msg);
+    }
+    \Thunder::warning($msg);
     redirect('/gerenciar/servico/');
 }
 $focusctrl = 'descricao';
 $errors = [];
 $old_servico = $servico;
 if (is_post()) {
-    $servico = new ZServico($_POST);
+    $servico = new Servico($_POST);
     try {
         $servico->setID($old_servico->getID());
         $_data_inicio = date_create_from_format('d/m/Y H:i', $servico->getDataInicio());
@@ -39,18 +46,33 @@ if (is_post()) {
         $_data_fim = date_create_from_format('d/m/Y H:i', $servico->getDataFim());
         $servico->setDataFim($_data_fim===false?null:date_format($_data_fim, 'Y-m-d H:i:s'));
         $servico->setValor(moneyval($servico->getValor()));
-        $servico = ZServico::atualizar($servico);
-        Thunder::success('Serviço "'.$servico->getDescricao().'" atualizada com sucesso!', true);
+        $servico->filter($old_servico);
+        $servico->update();
+        $old_servico->clean($servico);
+        $msg = sprintf(
+            'Serviço "%s" atualizada com sucesso!',
+            $servico->getDescricao()
+        );
+        if (is_output('json')) {
+            json(null, ['item' => $servico->publish(), 'msg' => $msg]);
+        }
+        \Thunder::success($msg, true);
         redirect('/gerenciar/servico/');
-    } catch (ValidationException $e) {
-        $errors = $e->getErrors();
-    } catch (Exception $e) {
-        $errors['unknow'] = $e->getMessage();
+    } catch (\Exception $e) {
+        $servico->clean($old_servico);
+        if ($e instanceof \MZ\Exception\ValidationException) {
+            $errors = $e->getErrors();
+        }
+        if (is_output('json')) {
+            json($e->getMessage(), null, ['errors' => $errors]);
+        }
+        \Thunder::error($e->getMessage());
+        foreach ($errors as $key => $value) {
+            $focusctrl = $key;
+            break;
+        }
     }
-    foreach ($errors as $key => $value) {
-        $focusctrl = $key;
-        Thunder::error($value);
-        break;
-    }
+} elseif (is_output('json')) {
+    json('Nenhum dado foi enviado');
 }
 include template('gerenciar_servico_editar');

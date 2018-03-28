@@ -2,25 +2,25 @@
 require_once(__DIR__. '/include/application.php');
 
 Session::Init();
-$INI = ZSistema::getINI();
-$__instance__ = DB::Instance();
-$__sistema__  = ZSistema::getPeloID('1');
-$__empresa__  = ZCliente::getPeloID($__sistema__->getEmpresaID());
+$INI = Sistema::getINI();
+$__instance__ = \DB::Instance();
+$__sistema__  = Sistema::findByID('1');
+$__empresa__  = $__sistema__->findEmpresaID();
 $__localizacao__ = \MZ\Location\Localizacao::find(['clienteid' => $__empresa__->getID()]);
 $__bairro__ = $__localizacao__->findBairroID();
 $__cidade__ = $__bairro__->findCidadeID();
 $__estado__ = $__cidade__->findEstadoID();
-$__pais__ = \MZ\Location\Pais::findByID($__sistema__->getPaisID());
+$__pais__ = $__sistema__->findPaisID();
 $__moeda__ = $__pais__->findMoedaID();
 $__options__  = parse_ini_string(base64_decode($__sistema__->getOpcoes()), true, INI_SCANNER_RAW);
 $__entries__  = parse_ini_string(base64_decode($__pais__->getEntradas()), true, INI_SCANNER_RAW);
 set_timezone_for($__estado__->getUF(), $__pais__->getSigla());
 
-$login_cliente = ZAutenticacao::getCliente();
+$login_cliente = Authentication::getCliente();
 $login_cliente_id = $login_cliente->getID();
-$login_funcionario = ZFuncionario::getPeloClienteID($login_cliente_id);
+$login_funcionario = Funcionario::findByClienteID($login_cliente_id);
 $login_funcionario_id = $login_funcionario->getID();
-$__permissoes__ = ZAcesso::getPermissoes($login_funcionario->getID());
+$__permissoes__ = Acesso::getPermissoes($login_funcionario->getID());
 
 /* not allow access app.php */
 $script_filename = str_replace('\\','/', __FILE__);

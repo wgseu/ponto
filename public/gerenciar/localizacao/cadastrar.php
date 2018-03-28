@@ -23,7 +23,7 @@ require_once(dirname(__DIR__) . '/app.php');
 
 use MZ\Location\Localizacao;
 
-need_permission(\PermissaoNome::CADASTROCLIENTES, true);
+need_permission(\Permissao::NOME_CADASTROCLIENTES, true);
 $localizacao = new Localizacao();
 $old_localizacao = $localizacao;
 if (is_post()) {
@@ -32,7 +32,7 @@ if (is_post()) {
         \DB::BeginTransaction();
         $old_localizacao->setClienteID($localizacao->getClienteID());
         if ($localizacao->getClienteID() == $__empresa__->getID() &&
-            !have_permission(PermissaoNome::ALTERARCONFIGURACOES)) {
+            !$login_funcionario->has(Permissao::NOME_ALTERARCONFIGURACOES)) {
             throw new \Exception('Você não tem permissão para atribuir um endereço a essa empresa!');
         }
         $localizacao->filter($old_localizacao);

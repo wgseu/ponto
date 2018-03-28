@@ -21,22 +21,23 @@
 */
 require_once(dirname(__DIR__) . '/app.php');
 
-need_permission(PermissaoNome::CADASTROCLIENTES, is_output('json'));
+need_permission(Permissao::NOME_CADASTROCLIENTES, is_output('json'));
 $focusctrl = 'tipo';
 $errors = [];
+$old_cliente = $cliente;
 if (is_post()) {
-    $cliente = new ZCliente($_POST);
+    $cliente = new Cliente($_POST);
     try {
-        DB::BeginTransaction();
+        \DB::BeginTransaction();
         $cliente->setID(null);
-        if (intval($_GET['sistema']) == 1 && $cliente->getTipo() != ClienteTipo::JURIDICA) {
+        if (intval($_GET['sistema']) == 1 && $cliente->getTipo() != Cliente::TIPO_JURIDICA) {
             throw new ValidationException(['tipo' => 'O tipo da empresa deve ser jurídica']);
         }
         if (intval($_GET['sistema']) == 1 && !is_null($__sistema__->getEmpresaID())) {
-            throw new Exception('Você deve alterar a empresa "' . $__empresa__->getNomeCompleto() . '" em vez de cadastrar uma nova');
+            throw new \Exception('Você deve alterar a empresa "' . $__empresa__->getNomeCompleto() . '" em vez de cadastrar uma nova');
         }
         $cliente->setAcionistaID(numberval($cliente->getAcionistaID()));
-        if ($cliente->getTipo() == ClienteTipo::JURIDICA) {
+        if ($cliente->getTipo() == Cliente::TIPO_JURIDICA) {
             $cliente->setCPF(\MZ\Util\Filter::unmask($cliente->getCPF(), _p('Mascara', 'CNPJ')));
         } else {
             $cliente->setCPF(\MZ\Util\Filter::unmask($cliente->getCPF(), _p('Mascara', 'CPF')));
@@ -47,7 +48,7 @@ if (is_post()) {
         $cliente->setFone(2, \MZ\Util\Filter::unmask($cliente->getFone(2), _p('Mascara', 'Telefone')));
         $cliente->setLimiteCompra(moneyval($cliente->getLimiteCompra()));
         $width = 256;
-        if ($cliente->getTipo() == ClienteTipo::JURIDICA) {
+        if ($cliente->getTipo() == Cliente::TIPO_JURIDICA) {
             $width = 640;
         }
         $imagem = upload_image('raw_imagem', 'cliente', null, $width, 256, true);
@@ -57,47 +58,49 @@ if (is_post()) {
         } else {
             $cliente->setImagem(null);
         }
-        $cliente = ZCliente::cadastrar($cliente);
+        $cliente->filter($old_cliente);
+        $cliente->insert();
+        $old_cliente->clean($cliente);
         if (intval($_GET['sistema']) == 1) {
             $__sistema__->setEmpresaID($cliente->getID());
-            $__sistema__ = ZSistema::atualizar($__sistema__, ['empresaid']);
+            $__sistema__ = Sistema::atualizar($__sistema__, ['empresaid']);
 
             try {
-                $appsync = new AppSync();
+                $appsync = new \MZ\System\Synchronizer();
                 $appsync->systemOptionsChanged();
                 $appsync->enterpriseChanged();
             } catch (Exception $e) {
                 Log::error($e->getMessage());
             }
         }
-        DB::Commit();
+        \DB::Commit();
         $msg = 'Cliente "'.$cliente->getNomeCompleto().'" cadastrado com sucesso!';
         if (is_output('json')) {
             json(['status' => 'ok', 'item' => $cliente->toArray(['secreto', 'senha']), 'msg' => $msg]);
         }
-        Thunder::success($msg, true);
+        \Thunder::success($msg, true);
         redirect('/gerenciar/cliente/');
     } catch (ValidationException $e) {
         $errors = $e->getErrors();
     } catch (Exception $e) {
         $errors['unknow'] = $e->getMessage();
     }
-    DB::RollBack();
+    \DB::RollBack();
     // remove a foto enviada
     $cliente->setImagem(null);
     foreach ($errors as $key => $value) {
         $focusctrl = $key;
         if ($focusctrl == 'genero') {
-            $focusctrl = $focusctrl . '-' . strtolower(ClienteGenero::MASCULINO);
+            $focusctrl = $focusctrl . '-' . strtolower(Cliente::GENERO_MASCULINO);
         }
         if (is_output('json')) {
             json($value, null, ['field' => $focusctrl]);
         }
-        Thunder::error($value);
+        \Thunder::error($value);
         break;
     }
 } else {
-    $cliente = new ZCliente();
+    $cliente = new Cliente();
 }
 if (is_output('json')) {
     json('Nenhum dado foi enviado');

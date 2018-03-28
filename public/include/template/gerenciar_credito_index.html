@@ -61,10 +61,10 @@
 							<tr ${$credito->isCancelado()?'class="active"':''}>
 								<td>{$credito->getDetalhes()}</td>
 								<td>${\MZ\Util\Mask::money($credito->getValor(), true)}</td>
-<!--${$_cliente = ZCliente::getPeloID($credito->getClienteID())}-->
+<!--${$_cliente = $credito->findClienteID()}-->
 								<td><a href="/gerenciar/cliente/editar?id={$_cliente->getID()}" title="Editar cliente '{$_cliente->getNomeCompleto()}'">{$_cliente->getNomeCompleto()}</a></td>
-<!--${$_funcionario = ZFuncionario::getPeloID($credito->getFuncionarioID())}-->
-<!--${$_cliente = ZCliente::getPeloID($_funcionario->getClienteID())}-->
+<!--${$_funcionario = $credito->findFuncionarioID()}-->
+<!--${$_cliente = $_funcionario->findClienteID()}-->
 								<td><a href="/gerenciar/funcionario/editar?id={$_funcionario->getID()}" title="Editar funcionário '{$_cliente->getNomeCompleto()}'">{$_cliente->getNomeCompleto()}</a></td>
 								<td>${is_null($credito->getDataCadastro())?'':date('d/m/Y H:i', strtotime($credito->getDataCadastro()))}</td>
 								<td class="text-center">

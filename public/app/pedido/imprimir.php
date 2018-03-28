@@ -25,48 +25,48 @@ if (!is_login()) {
     json('Usuário não autenticado!');
 }
 try {
-    DB::BeginTransaction();
-    $sessao = ZSessao::getPorAberta();
+    \DB::BeginTransaction();
+    $sessao = Sessao::getPorAberta();
     if (is_null($sessao->getID())) {
-        throw new Exception('A sessão ainda não foi aberta');
+        throw new \Exception('A sessão ainda não foi aberta');
     }
-    $tipo = PedidoTipo::MESA;
+    $tipo = Pedido::TIPO_MESA;
     if ($_GET['tipo'] == 'comanda') {
-        $tipo = PedidoTipo::COMANDA;
+        $tipo = Pedido::TIPO_COMANDA;
     }
     /* else if($_GET['tipo'] == 'avulso')
-		$tipo = PedidoTipo::AVULSO;
+		$tipo = Pedido::TIPO_AVULSO;
 	else if($_GET['tipo'] == 'entrega')
-		$tipo = PedidoTipo::ENTREGA; */
-    if ($tipo == PedidoTipo::MESA && !have_permission(PermissaoNome::PEDIDOMESA)) {
-        throw new Exception('Você não tem permissão para acessar mesas');
-    } elseif ($tipo == PedidoTipo::COMANDA && !have_permission(PermissaoNome::PEDIDOCOMANDA)) {
-        throw new Exception('Você não tem permissão para acessar comandas');
+		$tipo = Pedido::TIPO_ENTREGA; */
+    if ($tipo == Pedido::TIPO_MESA && !$login_funcionario->has(Permissao::NOME_PEDIDOMESA)) {
+        throw new \Exception('Você não tem permissão para acessar mesas');
+    } elseif ($tipo == Pedido::TIPO_COMANDA && !$login_funcionario->has(Permissao::NOME_PEDIDOCOMANDA)) {
+        throw new \Exception('Você não tem permissão para acessar comandas');
     }
-    $mesa = ZMesa::getPeloID($_GET['mesa']);
-    if (is_null($mesa->getID()) && $tipo == PedidoTipo::MESA) {
-        throw new Exception('A mesa não foi informada ou não existe');
+    $mesa = Mesa::findByID($_GET['mesa']);
+    if (is_null($mesa->getID()) && $tipo == Pedido::TIPO_MESA) {
+        throw new \Exception('A mesa não foi informada ou não existe');
     }
     $comanda = \MZ\Sale\Comanda::findByID($_GET['comanda']);
-    if (is_null($comanda->getID()) && $tipo == PedidoTipo::COMANDA) {
-        throw new Exception('A comanda não foi informada ou não existe');
+    if (is_null($comanda->getID()) && $tipo == Pedido::TIPO_COMANDA) {
+        throw new \Exception('A comanda não foi informada ou não existe');
     }
-    $pedido = ZPedido::getPeloLocal($tipo, $mesa->getID(), $comanda->getID());
+    $pedido = Pedido::findByLocal($tipo, $mesa->getID(), $comanda->getID());
     if (is_null($pedido->getID())) {
-        throw new Exception('A mesa ou comanda informada não está aberta');
+        throw new \Exception('A mesa ou comanda informada não está aberta');
     }
-    if ($pedido->getEstado() != PedidoEstado::FECHADO) {
+    if ($pedido->getEstado() != Pedido::ESTADO_FECHADO) {
         $pedido->setFechadorID($login_funcionario->getID());
         $pedido->setDataImpressao(date('Y-m-d H:i:s'));
-        $pedido->setEstado(PedidoEstado::FECHADO);
-        $pedido = ZPedido::atualizar($pedido);
+        $pedido->setEstado(Pedido::ESTADO_FECHADO);
+        $pedido->update();
     }
-    $appsync = new AppSync();
+    $appsync = new \MZ\System\Synchronizer();
     $appsync->printOrder($pedido->getID(), $login_funcionario->getID());
-    $appsync->updateOrder($pedido->getID(), $pedido->getTipo(), $pedido->getMesaID(), $pedido->getComandaID(), AppSync::ACTION_STATE);
-    DB::Commit();
+    $appsync->updateOrder($pedido->getID(), $pedido->getTipo(), $pedido->getMesaID(), $pedido->getComandaID(), \MZ\System\Synchronizer::ACTION_STATE);
+    \DB::Commit();
 } catch (Exception $e) {
-    DB::RollBack();
+    \DB::RollBack();
     Log::error($e->getMessage());
     json($e->getMessage());
 }

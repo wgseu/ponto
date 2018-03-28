@@ -23,7 +23,7 @@ require_once(dirname(__DIR__) . '/app.php');
 
 use MZ\Sale\Comanda;
 
-need_permission(PermissaoNome::CADASTROCOMANDAS);
+need_permission(Permissao::NOME_CADASTROCOMANDAS);
 
 $condition = [];
 $condition['ativa'] = isset($_GET['ativa'])?$_GET['ativa']:null;

@@ -21,32 +21,54 @@
 */
 require_once(dirname(__DIR__) . '/app.php');
 
-need_permission(PermissaoNome::CADASTROCONTAS);
-$classificacao = ZClassificacao::getPeloID($_GET['id']);
-if (is_null($classificacao->getID())) {
-    Thunder::warning('A classificação de id "'.$_GET['id'].'" não existe!');
+use MZ\__TODO_NAMESPACE__\Classificacao;
+
+need_permission(\Permissao::NOME_CADASTROCONTAS, is_output('json'));
+$id = isset($_GET['id']) ? $_GET['id'] : null;
+$classificacao = Classificacao::findByID($id);
+if (!$classificacao->exists()) {
+    $msg = 'A classificação informada não existe!';
+    if (is_output('json')) {
+        json($msg);
+    }
+    \Thunder::warning($msg);
     redirect('/gerenciar/classificacao/');
 }
 $focusctrl = 'descricao';
 $errors = [];
 $old_classificacao = $classificacao;
 if (is_post()) {
-    $classificacao = new ZClassificacao($_POST);
+    $classificacao = new Classificacao($_POST);
     try {
         $classificacao->setID($old_classificacao->getID());
-        $classificacao = ZClassificacao::atualizar($classificacao);
-        Thunder::success('Classificação "'.$classificacao->getDescricao().'" atualizada com sucesso!', true);
+        $classificacao->filter($old_classificacao);
+        $classificacao->update();
+        $old_classificacao->clean($classificacao);
+        $msg = sprintf(
+            'Classificação "%s" atualizada com sucesso!',
+            $classificacao->getDescricao()
+        );
+        if (is_output('json')) {
+            json(null, ['item' => $classificacao->publish(), 'msg' => $msg]);
+        }
+        \Thunder::success($msg, true);
         redirect('/gerenciar/classificacao/');
-    } catch (ValidationException $e) {
-        $errors = $e->getErrors();
-    } catch (Exception $e) {
-        $errors['unknow'] = $e->getMessage();
+    } catch (\Exception $e) {
+        $classificacao->clean($old_classificacao);
+        if ($e instanceof \MZ\Exception\ValidationException) {
+            $errors = $e->getErrors();
+        }
+        if (is_output('json')) {
+            json($e->getMessage(), null, ['errors' => $errors]);
+        }
+        \Thunder::error($e->getMessage());
+        foreach ($errors as $key => $value) {
+            $focusctrl = $key;
+            break;
+        }
     }
-    foreach ($errors as $key => $value) {
-        $focusctrl = $key;
-        Thunder::error($value);
-        break;
-    }
+} elseif (is_output('json')) {
+    json('Nenhum dado foi enviado');
 }
-$_classificacoes = ZClassificacao::getTodas(true);
+$_classificacoes = Classificacao::getTodas(true);
 include template('gerenciar_classificacao_editar');

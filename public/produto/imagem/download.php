@@ -32,7 +32,7 @@ if (!isset($_GET['produto']) || !is_numeric($_GET['produto'])) {
     exitNotFound();
 }
 if (isset($_SERVER['HTTP_IF_MODIFIED_SINCE'])) {
-    $imagem = ZProduto::getImagemPeloID(intval($_GET['produto']), true);
+    $imagem = Produto::getImagemPeloID(intval($_GET['produto']), true);
     if (strtotime($_SERVER['HTTP_IF_MODIFIED_SINCE']) >= strtotime($imagem['dataatualizacao'])) {
         header('HTTP/1.0 304 Not Modified');
         header('Cache-Control: max-age=12096000, public');
@@ -40,7 +40,7 @@ if (isset($_SERVER['HTTP_IF_MODIFIED_SINCE'])) {
         exit;
     }
 }
-$imagem = ZProduto::getImagemPeloID(intval($_GET['produto']));
+$imagem = Produto::getImagemPeloID(intval($_GET['produto']));
 $imagebytes = $imagem['imagem'];
 if ($imagebytes == null) {
     exitNotFound();

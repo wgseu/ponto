@@ -21,17 +21,17 @@
 */
 require_once(dirname(__DIR__) . '/app.php');
 
-need_permission(PermissaoNome::CADASTRARCREDITOS);
+need_permission(Permissao::NOME_CADASTRARCREDITOS);
 $id = $_GET['id'];
-$credito = ZCredito::getPeloID($id);
+$credito = Credito::findByID($id);
 if (is_null($credito->getID())) {
-    Thunder::warning('O crédito de id "'.$id.'" não existe!');
+    \Thunder::warning('O crédito de id "'.$id.'" não existe!');
     redirect('/gerenciar/credito/');
 }
 try {
-    ZCredito::excluir($id);
-    Thunder::success('Crédito "' . $credito->getDetalhes() . '" excluído com sucesso!', true);
+    Credito::excluir($id);
+    \Thunder::success('Crédito "' . $credito->getDetalhes() . '" excluído com sucesso!', true);
 } catch (Exception $e) {
-    Thunder::error('Não foi possível excluir o crédito "' . $credito->getDetalhes() . '"!');
+    \Thunder::error('Não foi possível excluir o crédito "' . $credito->getDetalhes() . '"!');
 }
 redirect('/gerenciar/credito/');

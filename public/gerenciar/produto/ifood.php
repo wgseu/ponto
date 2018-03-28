@@ -31,7 +31,7 @@ $association = new \MZ\Association\Product($integracao);
 if (isset($_GET['action'])) {
     if (is_post() && $_GET['action'] == 'upload') {
         if (!isset($_GET['token']) || $_GET['token'] != INTGR_TOKEN) {
-            need_permission(PermissaoNome::CADASTROPRODUTOS, true);
+            need_permission(Permissao::NOME_CADASTROPRODUTOS, true);
         }
         try {
             if (!isset($_FILES['raw_arquivo']) || $_FILES['raw_arquivo']['error'] === UPLOAD_ERR_NO_FILE) {
@@ -98,7 +98,7 @@ if (isset($_GET['action'])) {
             json($e->getMessage());
         }
     } elseif (is_post() && $_GET['action'] == 'update') {
-        need_permission(PermissaoNome::CADASTROPRODUTOS, true);
+        need_permission(Permissao::NOME_CADASTROPRODUTOS, true);
         try {
             $codigo = isset($_POST['codigo'])?$_POST['codigo']:null;
             $association->update(
@@ -111,7 +111,7 @@ if (isset($_GET['action'])) {
             json($e->getMessage());
         }
     } elseif (is_post() && $_GET['action'] == 'delete') {
-        need_permission(PermissaoNome::CADASTROPRODUTOS, true);
+        need_permission(Permissao::NOME_CADASTROPRODUTOS, true);
         try {
             $codigo = isset($_POST['codigo'])?$_POST['codigo']:null;
             $subcodigo = isset($_POST['subcodigo'])?$_POST['subcodigo']:null;
@@ -126,7 +126,7 @@ if (isset($_GET['action'])) {
             json($e->getMessage());
         }
     } elseif (is_post() && $_GET['action'] == 'mount') {
-        need_permission(PermissaoNome::CADASTROPRODUTOS, true);
+        need_permission(Permissao::NOME_CADASTROPRODUTOS, true);
         try {
             $codigo = isset($_POST['codigo'])?$_POST['codigo']:null;
             $subcodigo = isset($_POST['subcodigo'])?$_POST['subcodigo']:null;
@@ -138,7 +138,7 @@ if (isset($_GET['action'])) {
             json($e->getMessage());
         }
     } elseif ($_GET['action'] == 'package') {
-        need_permission(PermissaoNome::CADASTROPRODUTOS, true);
+        need_permission(Permissao::NOME_CADASTROPRODUTOS, true);
         try {
             $codigo = isset($_GET['codigo'])?$_GET['codigo']:null;
             $package = $association->findPackage($codigo);
@@ -148,7 +148,7 @@ if (isset($_GET['action'])) {
         }
     } elseif ($_GET['action'] == 'download') {
         if (!isset($_GET['token']) || $_GET['token'] != INTGR_TOKEN) {
-            need_permission(PermissaoNome::CADASTROPRODUTOS, true);
+            need_permission(Permissao::NOME_CADASTROPRODUTOS, true);
         }
         $card = new MZ\Association\Card($integracao);
         $cartoes = $card->getCartoes();
@@ -190,7 +190,7 @@ if (isset($_GET['action'])) {
         exit;
     }
 }
-need_permission(PermissaoNome::CADASTROPRODUTOS);
+need_permission(Permissao::NOME_CADASTROPRODUTOS);
 
 $produtos = $association->findAll();
 

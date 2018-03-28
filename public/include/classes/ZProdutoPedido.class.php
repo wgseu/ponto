@@ -527,11 +527,23 @@ class ZProdutoPedido
         return $produto_pedido;
     }
 
+    /**
+     * Produto vendido
+     * @return \MZ\Product\Produto The object fetched from database
+     */
+    public function findProdutoID()
+    {
+        if (is_null($this->getProdutoID())) {
+            return new Produto();
+        }
+        return Produto::findByID($this->getProdutoID());
+    }
+
     public static function getPeloID($id)
     {
-        $query = DB::$pdo->from('Produtos_Pedidos')
+        $query = \DB::$pdo->from('Produtos_Pedidos')
                          ->where(['id' => $id]);
-        return new ZProdutoPedido($query->fetch());
+        return new ProdutoPedido($query->fetch());
     }
 
     private static function validarCampos(&$produto_pedido)
@@ -639,42 +651,44 @@ class ZProdutoPedido
                 // aplica o desconto dos opcionais e acrescenta o valor dos adicionais
                 // apenas nas composições fora de pacotes
                 foreach ($formacoes as $key => $_formacao) {
-                    $formacao = new ZFormacao($_formacao);
-                    if ($formacao->getTipo() != FormacaoTipo::COMPOSICAO) {
+                    $formacao = new Formacao($_formacao);
+                    if ($formacao->getTipo() != Formacao::TIPO_COMPOSICAO) {
                         continue;
                     }
-                    $composicao = ZComposicao::getPeloID($formacao->getComposicaoID());
+                    $composicao = $formacao->findComposicaoID();
                     if (is_null($composicao->getID())) {
                         throw new ValidationException(['formacao' => 'A composição formada não existe']);
                     }
                     $operacao = -1;
-                    if ($composicao->getTipo() == ComposicaoTipo::ADICIONAL) {
+                    if ($composicao->getTipo() == Composicao::TIPO_ADICIONAL) {
                         $operacao = 1;
                     }
                     $_produto_pedido['precovenda'] += $operacao * $composicao->getValor();
                     $_produto_pedido['preco'] += $operacao * $composicao->getValor();
                 }
             }
-            $_produto_pedido['id'] = DB::$pdo->insertInto('Produtos_Pedidos')->values($_produto_pedido)->execute();
-            $produto_pedido = self::getPeloID($_produto_pedido['id']);
+            $_produto_pedido['id'] = \DB::$pdo->insertInto('Produtos_Pedidos')->values($_produto_pedido)->execute();
+            $produto_pedido = self::findByID($_produto_pedido['id']);
             // TODO: verificar se o preço informado está correto
             $composicoes = [];
             foreach ($formacoes as $key => $_formacao) {
-                $formacao = new ZFormacao($_formacao);
+                $formacao = new Formacao($_formacao);
                 $formacao->setProdutoPedidoID($produto_pedido->getID());
-                $formacao = ZFormacao::cadastrar($formacao);
-                if ($formacao->getTipo() == FormacaoTipo::COMPOSICAO) {
+                $formacao->filter($old_formacao);
+                $formacao->insert();
+                $formacao->clean($old_formacao);
+                if ($formacao->getTipo() == Formacao::TIPO_COMPOSICAO) {
                     $composicoes[$formacao->getComposicaoID()] = $formacao->getID();
                 }
             }
-            ZEstoque::retirar($produto_pedido, $composicoes);
+            Estoque::retirar($produto_pedido, $composicoes);
         } catch (PDOException $e) {
             self::handleException($e);
             $msg = $e->getMessage();
             if (preg_match('/SQLSTATE\[\w+\]: <<[^>]+>>: \d+ (.*)/', $msg, $matches)) {
                 $msg = $matches[1];
             }
-            throw new Exception($msg, 45000);
+            throw new \Exception($msg, 45000);
         }
         return $produto_pedido;
     }
@@ -709,7 +723,7 @@ class ZProdutoPedido
             'datahora',
         ];
         try {
-            $query = DB::$pdo->update('Produtos_Pedidos');
+            $query = \DB::$pdo->update('Produtos_Pedidos');
             $query = $query->set(array_intersect_key($_produto_pedido, array_flip($campos)));
             $query = $query->where('id', $_produto_pedido['id']);
             $query->execute();
@@ -717,15 +731,15 @@ class ZProdutoPedido
             self::handleException($e);
             throw $e;
         }
-        return self::getPeloID($_produto_pedido['id']);
+        return self::findByID($_produto_pedido['id']);
     }
 
     public static function excluir($id)
     {
         if (!$id) {
-            throw new Exception('Não foi possível excluir o produtopedido, o id do produtopedido não foi informado');
+            throw new \Exception('Não foi possível excluir o produtopedido, o id do produtopedido não foi informado');
         }
-        $query = DB::$pdo->deleteFrom('Produtos_Pedidos')
+        $query = \DB::$pdo->deleteFrom('Produtos_Pedidos')
                          ->where(['id' => $id]);
         return $query->execute();
     }
@@ -742,7 +756,7 @@ class ZProdutoPedido
         $data_inicio,
         $data_fim
     ) {
-        $query = DB::$pdo->from('Produtos_Pedidos pdp')
+        $query = \DB::$pdo->from('Produtos_Pedidos pdp')
                          ->select('p.tipo as pedido_tipo')
                          ->select('cf.login as funcionario_login')
                          ->select('COALESCE(sc.descricao, COALESCE(pdp.descricao, pd.descricao)) as produto_descricao')
@@ -847,7 +861,7 @@ class ZProdutoPedido
         }
         $produto_pedidos = [];
         foreach ($_produto_pedidos as $produto_pedido) {
-            $produto_pedidos[] = new ZProdutoPedido($produto_pedido);
+            $produto_pedidos[] = new ProdutoPedido($produto_pedido);
         }
         return $produto_pedidos;
     }
@@ -881,7 +895,7 @@ class ZProdutoPedido
 
     private static function initSearchDoPedidoID($pedido_id)
     {
-        return   DB::$pdo->from('Produtos_Pedidos')
+        return   \DB::$pdo->from('Produtos_Pedidos')
                          ->where('cancelado', 'N')
                          ->where('pedidoid', $pedido_id)
                          ->orderBy('id ASC');
@@ -896,7 +910,7 @@ class ZProdutoPedido
         $_produto_pedidos = $query->fetchAll();
         $produto_pedidos = [];
         foreach ($_produto_pedidos as $produto_pedido) {
-            $produto_pedidos[] = new ZProdutoPedido($produto_pedido);
+            $produto_pedidos[] = new ProdutoPedido($produto_pedido);
         }
         return $produto_pedidos;
     }
@@ -909,7 +923,7 @@ class ZProdutoPedido
 
     private static function initSearchDoProdutoID($produto_id)
     {
-        return   DB::$pdo->from('Produtos_Pedidos')
+        return   \DB::$pdo->from('Produtos_Pedidos')
                          ->where(['produtoid' => $produto_id])
                          ->orderBy('id ASC');
     }
@@ -923,7 +937,7 @@ class ZProdutoPedido
         $_produto_pedidos = $query->fetchAll();
         $produto_pedidos = [];
         foreach ($_produto_pedidos as $produto_pedido) {
-            $produto_pedidos[] = new ZProdutoPedido($produto_pedido);
+            $produto_pedidos[] = new ProdutoPedido($produto_pedido);
         }
         return $produto_pedidos;
     }
@@ -936,7 +950,7 @@ class ZProdutoPedido
 
     private static function initSearchDoFuncionarioID($funcionario_id)
     {
-        return   DB::$pdo->from('Produtos_Pedidos')
+        return   \DB::$pdo->from('Produtos_Pedidos')
                          ->where(['funcionarioid' => $funcionario_id])
                          ->orderBy('id ASC');
     }
@@ -950,7 +964,7 @@ class ZProdutoPedido
         $_produto_pedidos = $query->fetchAll();
         $produto_pedidos = [];
         foreach ($_produto_pedidos as $produto_pedido) {
-            $produto_pedidos[] = new ZProdutoPedido($produto_pedido);
+            $produto_pedidos[] = new ProdutoPedido($produto_pedido);
         }
         return $produto_pedidos;
     }
@@ -963,7 +977,7 @@ class ZProdutoPedido
 
     private static function initSearchPorCategoria($sessao_id)
     {
-        $query = DB::$pdo->from('Produtos_Pedidos pp')
+        $query = \DB::$pdo->from('Produtos_Pedidos pp')
                          ->select(null)
                          ->select('SUM(pp.preco * pp.quantidade) as total')
                          ->select('COALESCE(c.descricao, "Taxas e Serviços") as descricao')
@@ -1003,7 +1017,7 @@ class ZProdutoPedido
 
     private static function initSearchDoLocal($tipo, $mesa_id, $comanda_id)
     {
-        $query = DB::$pdo->from('Produtos_Pedidos pp')
+        $query = \DB::$pdo->from('Produtos_Pedidos pp')
                          ->select(null)
                          ->select(
                              'IF(COUNT(pp.id) = 1, pp.id, 0) as id, '.
@@ -1045,10 +1059,10 @@ class ZProdutoPedido
                                 'p.cancelado' => 'N',
                                 'pp.cancelado' => 'N',
                             ])
-                         ->where('p.estado <> ?', PedidoEstado::FINALIZADO)
+                         ->where('p.estado <> ?', Pedido::ESTADO_FINALIZADO)
                          ->orderBy('pp.id ASC')
                          ->groupBy('pp.produtoid, pp.preco, pp.detalhes');
-        if ($tipo == PedidoTipo::COMANDA) {
+        if ($tipo == Pedido::TIPO_COMANDA) {
             $query = $query->where([
                                 'p.comandaid' => $comanda_id,
                                 'p.tipo' => PedidoTipo::COMANDA,

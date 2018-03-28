@@ -21,30 +21,38 @@
 */
 require_once(dirname(__DIR__) . '/app.php');
 
-need_permission(PermissaoNome::ALTERARPAGINAS);
+need_permission(Permissao::NOME_ALTERARPAGINAS);
 $focusctrl = 'nome';
 $errors = [];
 $nomes = get_pages_info();
 $linguagens = get_languages_info();
 if (is_post()) {
-    $pagina = new ZPagina($_POST);
+    $pagina = new Pagina($_POST);
     try {
         $pagina->setID(null);
         $pagina->setLinguagemID(numberval($pagina->getLinguagemID()));
-        $pagina = ZPagina::cadastrar($pagina);
-        Thunder::success('Página "'.$nomes[$pagina->getNome()] . ' - ' . $linguagens[$pagina->getLinguagemID()].'" cadastrada com sucesso!', true);
+        $pagina->filter($old_pagina);
+        $pagina->insert();
+        $old_pagina->clean($pagina);
+        \Thunder::success('Página "'.$nomes[$pagina->getNome()] . ' - ' . $linguagens[$pagina->getLinguagemID()].'" cadastrada com sucesso!', true);
         redirect('/gerenciar/pagina/');
-    } catch (ValidationException $e) {
-        $errors = $e->getErrors();
-    } catch (Exception $e) {
-        $errors['unknow'] = $e->getMessage();
+    } catch (\Exception $e) {
+        $pagina->clean($old_pagina);
+        if ($e instanceof \MZ\Exception\ValidationException) {
+            $errors = $e->getErrors();
+        }
+        if (is_output('json')) {
+            json($e->getMessage(), null, ['errors' => $errors]);
+        }
+        \Thunder::error($e->getMessage());
+        foreach ($errors as $key => $value) {
+            $focusctrl = $key;
+            break;
+        }
     }
-    foreach ($errors as $key => $value) {
-        $focusctrl = $key;
-        Thunder::error($value);
-        break;
-    }
+} elseif (is_output('json')) {
+    json('Nenhum dado foi enviado');
 } else {
-    $pagina = new ZPagina();
+    $pagina = new Pagina();
 }
 include template('gerenciar_pagina_cadastrar');

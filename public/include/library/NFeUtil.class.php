@@ -19,6 +19,9 @@
 	O Cliente adquire apenas o direito de usar o software e não adquire qualquer outros
 	direitos, expressos ou implícitos no GrandChef diferentes dos especificados nesta Licença.
 */
+
+use MZ\Payment\FormaPagto;
+
 class NFeUtil extends \NFe\Common\Util
 {
 
@@ -37,13 +40,13 @@ class NFeUtil extends \NFe\Common\Util
     {
         switch ($imposto->getGrupo()) {
             case ImpostoGrupo::PIS:
-                throw new Exception('Imposto "PIS" não suportado', 500);
+                throw new \Exception('Imposto "PIS" não suportado', 500);
             case ImpostoGrupo::COFINS:
-                throw new Exception('Imposto "COFINS" não suportado', 500);
+                throw new \Exception('Imposto "COFINS" não suportado', 500);
             case ImpostoGrupo::IPI:
-                throw new Exception('Imposto "IPI" não suportado', 500);
+                throw new \Exception('Imposto "IPI" não suportado', 500);
             case ImpostoGrupo::II:
-                throw new Exception('Imposto "II" não suportado', 500);
+                throw new \Exception('Imposto "II" não suportado', 500);
             default: // ImpostoGrupo::ICMS:
                 $nome = 'ICMS';
                 $codigo = $imposto->getCodigo();
@@ -81,17 +84,17 @@ class NFeUtil extends \NFe\Common\Util
     public static function toFormaPagamento($forma)
     {
         switch ($forma) {
-            case FormaPagtoTipo::DINHEIRO:
+            case FormaPagto::TIPO_DINHEIRO:
                 return \NFe\Entity\Pagamento::FORMA_DINHEIRO;
-            case FormaPagtoTipo::CARTAO:
+            case FormaPagto::TIPO_CARTAO:
                 return \NFe\Entity\Pagamento::FORMA_CREDITO;
-            case FormaPagtoTipo::CHEQUE:
+            case FormaPagto::TIPO_CHEQUE:
                 return \NFe\Entity\Pagamento::FORMA_CHEQUE;
-            case FormaPagtoTipo::CONTA:
+            case FormaPagto::TIPO_CONTA:
                 return \NFe\Entity\Pagamento::FORMA_CREDIARIO;
-            case FormaPagtoTipo::CREDITO:
+            case FormaPagto::TIPO_CREDITO:
                 return \NFe\Entity\Pagamento::FORMA_CREDIARIO;
-            case FormaPagtoTipo::TRANSFERENCIA:
+            case FormaPagto::TIPO_TRANSFERENCIA:
                 return \NFe\Entity\Pagamento::FORMA_DEBITO;
         }
         return \NFe\Entity\Pagamento::FORMA_OUTROS;

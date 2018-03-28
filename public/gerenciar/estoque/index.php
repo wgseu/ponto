@@ -21,14 +21,14 @@
 */
 require_once(dirname(__DIR__) . '/app.php');
 
-need_permission(PermissaoNome::ESTOQUE);
+need_permission(Permissao::NOME_ESTOQUE);
 
-$_produto = ZProduto::getPeloID($_GET['produtoid']);
-$_fornecedor = ZFornecedor::getPeloID($_GET['fornecedorid']);
+$_produto = Produto::findByID($_GET['produtoid']);
+$_fornecedor = Fornecedor::findByID($_GET['fornecedorid']);
 
-$count = ZEstoque::getCount($_produto->getID(), $_fornecedor->getID(), $_GET['tipo']);
+$count = Estoque::getCount($_produto->getID(), $_fornecedor->getID(), $_GET['tipo']);
 list($pagesize, $offset, $pagestring) = pagestring($count, 10);
-$estoques = ZEstoque::getTodos($_produto->getID(), $_fornecedor->getID(), $_GET['tipo'], $offset, $pagesize);
+$estoques = Estoque::getTodos($_produto->getID(), $_fornecedor->getID(), $_GET['tipo'], $offset, $pagesize);
 
 
 $tipos = [

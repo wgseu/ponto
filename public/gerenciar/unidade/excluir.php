@@ -21,17 +21,17 @@
 */
 require_once(dirname(__DIR__) . '/app.php');
 
-need_permission(PermissaoNome::CADASTROPRODUTOS);
+need_permission(Permissao::NOME_CADASTROPRODUTOS);
 $id = $_GET['id'];
-$unidade = ZUnidade::getPeloID($id);
+$unidade = Unidade::findByID($id);
 if (is_null($unidade->getID())) {
-    Thunder::warning('A unidade de id "'.$id.'" não existe!');
+    \Thunder::warning('A unidade de id "'.$id.'" não existe!');
     redirect('/gerenciar/unidade/');
 }
 try {
-    ZUnidade::excluir($id);
-    Thunder::success('Unidade "' . $unidade->getNome() . '" excluída com sucesso!', true);
+    Unidade::excluir($id);
+    \Thunder::success('Unidade "' . $unidade->getNome() . '" excluída com sucesso!', true);
 } catch (Exception $e) {
-    Thunder::error('Não foi possível excluir a unidade "' . $unidade->getNome() . '"!');
+    \Thunder::error('Não foi possível excluir a unidade "' . $unidade->getNome() . '"!');
 }
 redirect('/gerenciar/unidade/');

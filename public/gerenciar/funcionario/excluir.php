@@ -21,18 +21,18 @@
 */
 require_once(dirname(__DIR__) . '/app.php');
 
-need_permission(PermissaoNome::CADASTROFUNCIONARIOS);
+need_permission(Permissao::NOME_CADASTROFUNCIONARIOS);
 $id = $_GET['id'];
-$funcionario = ZFuncionario::getPeloID($id);
+$funcionario = Funcionario::findByID($id);
 if (is_null($funcionario->getID())) {
-    Thunder::warning('O funcionário de id "'.$id.'" não existe!');
+    \Thunder::warning('O funcionário de id "'.$id.'" não existe!');
     redirect('/gerenciar/funcionario/');
 }
-$cliente = ZCliente::getPeloID($funcionario->getClienteID());
+$cliente = $funcionario->findClienteID();
 try {
-    ZFuncionario::excluir($funcionario);
-    Thunder::success('Funcionário "' . $cliente->getLogin() . '" excluído com sucesso!', true);
+    Funcionario::excluir($funcionario);
+    \Thunder::success('Funcionário "' . $cliente->getLogin() . '" excluído com sucesso!', true);
 } catch (Exception $e) {
-    Thunder::error('Não foi possível excluir o funcionário "' . $cliente->getLogin() . '"!');
+    \Thunder::error('Não foi possível excluir o funcionário "' . $cliente->getLogin() . '"!');
 }
 redirect('/gerenciar/funcionario/');

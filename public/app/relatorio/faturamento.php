@@ -24,7 +24,7 @@ require_once(dirname(dirname(__DIR__)) . '/app.php');
 if (!is_login()) {
     json('Usuário não autenticado!');
 }
-if (!have_permission(PermissaoNome::RELATORIOCAIXA)) {
+if (!$login_funcionario->has(Permissao::NOME_RELATORIOCAIXA)) {
     json('Você não tem permissão para acessar o faturamento da empresa');
 }
 $response = ['status' => 'ok'];
@@ -34,7 +34,7 @@ for ($i = $mes; $i < $mes + 4; $i++) {
     $data = strtotime(date('Y-m').' -'.$i.' month');
     $meses[] = [
             'mes' => human_date(date('Y-m-d', $data), true),
-            'total' => ZPagamento::getFaturamento(null, -$i, -$i)
+            'total' => Pagamento::getFaturamento(null, -$i, -$i)
         ];
 }
 $response['mensal'] = $meses;

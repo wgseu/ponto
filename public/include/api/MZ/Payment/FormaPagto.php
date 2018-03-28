@@ -484,11 +484,42 @@ class FormaPagto extends \MZ\Database\Helper
         if (is_null($this->getDescricao())) {
             $errors['descricao'] = 'A descrição não pode ser vazia';
         }
+        if (in_array($this->getTipo(), [self::TIPO_CARTAO, self::TIPO_CHEQUE])) {
+            $this->setParcelado('Y');
+        } else {
+            $this->setParcelado('N');
+        }
         if (is_null($this->getParcelado())) {
             $errors['parcelado'] = 'O parcelado não pode ser vazio';
         }
         if (!Validator::checkBoolean($this->getParcelado(), true)) {
             $errors['parcelado'] = 'O parcelado é inválido';
+        }
+        if (!is_null($this->getMinParcelas()) && $this->getMinParcelas() < 0) {
+            $errors['minparcelas'] = 'O mínimo de parcelas não pode ser negativo';
+        }
+        if (!is_null($this->getMaxParcelas()) && $this->getMaxParcelas() < 0) {
+            $errors['maxparcelas'] = 'O máximo de parcelas não pode ser negativo';
+        }
+        if (
+            !is_null($this->getMinParcelas()) &&
+            !is_null($this->getMaxParcelas()) &&
+            $this->getMinParcelas() > $this->getMaxParcelas()
+        ) {
+            $errors['maxparcelas'] = 'O máximo de parcelas não pode ser menor que o mínimo de parcelas';
+        }
+        if (!is_null($this->getParcelasSemJuros()) && $this->getParcelasSemJuros() < 0) {
+            $errors['parcelassemjuros'] = 'As parcelas sem juros não podem ser negativas';
+        }
+        if (
+            !is_null($this->getParcelasSemJuros()) &&
+            !is_null($this->getMinParcelas()) &&
+            $this->getParcelasSemJuros() < $this->getMinParcelas()
+        ) {
+            $errors['parcelassemjuros'] = 'As parcelas sem juros não pode ser menor que o mínimo de parcelas';
+        }
+        if (!is_null($this->getJuros()) && $this->getJuros() < 0) {
+            $errors['juros'] = 'O juros não pode ser negativo';
         }
         if (is_null($this->getAtiva())) {
             $errors['ativa'] = 'A ativa não pode ser vazia';
@@ -714,8 +745,8 @@ class FormaPagto extends \MZ\Database\Helper
         $query = self::getDB()->from('Formas_Pagto f');
         $condition = self::filterCondition($condition);
         $query = self::buildOrderBy($query, self::filterOrder($order));
+        $query = $query->orderBy('f.ativa ASC');
         $query = $query->orderBy('f.descricao ASC');
-        $query = $query->orderBy('f.id ASC');
         return self::buildCondition($query, $condition);
     }
 

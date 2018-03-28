@@ -213,16 +213,16 @@ class ZPermissao
 
     public static function getPeloID($id)
     {
-        $query = DB::$pdo->from('Permissoes')
+        $query = \DB::$pdo->from('Permissoes')
                          ->where(['id' => $id]);
-        return new ZPermissao($query->fetch());
+        return new Permissao($query->fetch());
     }
 
     public static function getPeloNome($nome)
     {
-        $query = DB::$pdo->from('Permissoes')
+        $query = \DB::$pdo->from('Permissoes')
                          ->where(['nome' => $nome]);
-        return new ZPermissao($query->fetch());
+        return new Permissao($query->fetch());
     }
 
     private static function validarCampos(&$permissao)
@@ -256,7 +256,7 @@ class ZPermissao
 
     private static function initSearch($busca)
     {
-        $query = DB::$pdo->from('Permissoes')
+        $query = \DB::$pdo->from('Permissoes')
                          ->orderBy('funcionalidadeid ASC, descricao ASC');
         $busca = trim($busca);
         if ($busca != '') {
@@ -274,7 +274,7 @@ class ZPermissao
         $_permissaos = $query->fetchAll();
         $permissaos = [];
         foreach ($_permissaos as $permissao) {
-            $permissaos[] = new ZPermissao($permissao);
+            $permissaos[] = new Permissao($permissao);
         }
         return $permissaos;
     }
@@ -287,7 +287,7 @@ class ZPermissao
 
     private static function initSearchDaFuncionalidadeID($funcionalidade_id)
     {
-        return   DB::$pdo->from('Permissoes')
+        return   \DB::$pdo->from('Permissoes')
                          ->where(['funcionalidadeid' => $funcionalidade_id])
                          ->orderBy('id ASC');
     }
@@ -301,7 +301,7 @@ class ZPermissao
         $_permissaos = $query->fetchAll();
         $permissaos = [];
         foreach ($_permissaos as $permissao) {
-            $permissaos[] = new ZPermissao($permissao);
+            $permissaos[] = new Permissao($permissao);
         }
         return $permissaos;
     }

@@ -551,7 +551,7 @@ class ZProduto
     private static function initGet($setor_id = null, $promocao = 'Y')
     {
         $promocao = $promocao == 'N'?'N':'Y';
-        return DB::$pdo->from('Produtos p')
+        return \DB::$pdo->from('Produtos p')
             ->select(null)
             ->select('p.id')
             ->select('p.codigobarras')
@@ -590,24 +590,24 @@ class ZProduto
     public static function getPeloID($id)
     {
         $query = self::initGet()->where(['p.id' => $id]);
-        return new ZProduto($query->fetch());
+        return new Produto($query->fetch());
     }
 
     public static function getPelaDescricao($descricao)
     {
         $query = self::initGet()->where(['p.descricao' => $descricao]);
-        return new ZProduto($query->fetch());
+        return new Produto($query->fetch());
     }
 
     public static function getPeloCodigoBarras($codigo_barras)
     {
         $query = self::initGet()->where(['p.codigobarras' => $codigo_barras]);
-        return new ZProduto($query->fetch());
+        return new Produto($query->fetch());
     }
 
     public static function getImagemPeloID($produto_id, $dataSomente = false)
     {
-        $query = DB::$pdo->from('Produtos p')
+        $query = \DB::$pdo->from('Produtos p')
                          ->select(null)
                          ->select('p.dataatualizacao')
                          ->where(['p.id' => $produto_id]);
@@ -679,7 +679,7 @@ class ZProduto
             $erros['conteudo'] = 'O conteúdo não foi informado';
         } else {
             $produto['conteudo'] = floatval($produto['conteudo']);
-            $unidade = ZUnidade::getPeloID($produto['unidadeid']);
+            $unidade = Unidade::findByID($produto['unidadeid']);
             if (is_equal($produto['conteudo'], 0, 0.0001)) {
                 $erros['conteudo'] = 'O conteúdo não pode ser nulo';
             } elseif ($produto['conteudo'] != 1 && strtoupper($unidade->getSigla()) == 'UN') {
@@ -706,7 +706,7 @@ class ZProduto
             $erros['tipo'] = 'O tipo informado não é válido';
         }
         if (
-            $produto['tipo'] == ProdutoTipo::PACOTE &&
+            $produto['tipo'] == Produto::TIPO_PACOTE &&
             Pacote::count(['produtoid' => $produto['id']]) > 0
         ) {
             $erros['tipo'] = 'O produto não pode ser um pacote pois já faz parte de um';
@@ -735,7 +735,7 @@ class ZProduto
         } elseif (!in_array($produto['perecivel'], ['Y', 'N'])) {
             $erros['perecivel'] = 'O perecível informado não é válido';
         }
-        if ($produto['tipo'] != ProdutoTipo::COMPOSICAO) {
+        if ($produto['tipo'] != Produto::TIPO_COMPOSICAO) {
             $produto['tempopreparo'] = 0;
         }
         if (!is_numeric($produto['tempopreparo'])) {
@@ -779,12 +779,12 @@ class ZProduto
         $_produto = $produto->toArray();
         self::validarCampos($_produto);
         try {
-            $_produto['id'] = DB::$pdo->insertInto('Produtos')->values($_produto)->execute();
+            $_produto['id'] = \DB::$pdo->insertInto('Produtos')->values($_produto)->execute();
         } catch (Exception $e) {
             self::handleException($e);
             throw $e;
         }
-        return self::getPeloID($_produto['id']);
+        return self::findByID($_produto['id']);
     }
 
     public static function atualizar($produto)
@@ -822,7 +822,7 @@ class ZProduto
             $campos[] = 'imagem';
         }
         try {
-            $query = DB::$pdo->update('Produtos');
+            $query = \DB::$pdo->update('Produtos');
             $query = $query->set(array_intersect_key($_produto, array_flip($campos)));
             $query = $query->where('id', $_produto['id']);
             $query->execute();
@@ -830,15 +830,15 @@ class ZProduto
             self::handleException($e);
             throw $e;
         }
-        return self::getPeloID($_produto['id']);
+        return self::findByID($_produto['id']);
     }
 
     public static function excluir($id)
     {
         if (!$id) {
-            throw new Exception('Não foi possível excluir o produto, o id do produto não foi informado');
+            throw new \Exception('Não foi possível excluir o produto, o id do produto não foi informado');
         }
-        $query = DB::$pdo->deleteFrom('Produtos')
+        $query = \DB::$pdo->deleteFrom('Produtos')
                          ->where(['id' => $id]);
         return $query->execute();
     }
@@ -846,9 +846,9 @@ class ZProduto
     public static function getTipoOptions($index = null)
     {
         $tipos = [
-            ProdutoTipo::PRODUTO => 'Produto',
-            ProdutoTipo::COMPOSICAO => 'Composição',
-            ProdutoTipo::PACOTE => 'Pacote',
+            Produto::TIPO_PRODUTO => 'Produto',
+            Produto::TIPO_COMPOSICAO => 'Composição',
+            Produto::TIPO_PACOTE => 'Pacote',
         ];
         if (in_array($index, $tipos)) {
             return $tipos[$index];
@@ -872,7 +872,7 @@ class ZProduto
         if (!is_null($estoque)) {
             $estoque = intval($estoque);
             if ($estoque) {
-                $tipo = ProdutoTipo::PRODUTO;
+                $tipo = Produto::TIPO_PRODUTO;
             } else {
                 $visivel = 'Y';
             }
@@ -962,7 +962,7 @@ class ZProduto
         }
         $produtos = [];
         foreach ($_produtos as $produto) {
-            $produtos[] = new ZProduto($produto);
+            $produtos[] = new Produto($produto);
         }
         return $produtos;
     }

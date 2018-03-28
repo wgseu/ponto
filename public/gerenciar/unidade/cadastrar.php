@@ -21,27 +21,48 @@
 */
 require_once(dirname(__DIR__) . '/app.php');
 
-need_permission(PermissaoNome::CADASTROPRODUTOS);
+use MZ\__TODO_NAMESPACE__\Unidade;
+
+need_permission(\Permissao::NOME_CADASTROPRODUTOS, is_output('json'));
+$id = isset($_GET['id']) ? $_GET['id'] : null;
+$unidade = Unidade::findByID($id);
+$unidade->setID(null);
+
 $focusctrl = 'nome';
 $errors = [];
+$old_unidade = $unidade;
 if (is_post()) {
-    $unidade = new ZUnidade($_POST);
+    $unidade = new Unidade($_POST);
     try {
-        $unidade->setID(null);
-        $unidade = ZUnidade::cadastrar($unidade);
-        Thunder::success('Unidade "'.$unidade->getNome().'" cadastrada com sucesso!', true);
+        $unidade->filter($old_unidade);
+        $unidade->insert();
+        $old_unidade->clean($unidade);
+        $msg = sprintf(
+            'Unidade "%s" cadastrada com sucesso!',
+            $unidade->getNome()
+        );
+        if (is_output('json')) {
+            json(null, ['item' => $unidade->publish(), 'msg' => $msg]);
+        }
+        \Thunder::success($msg, true);
         redirect('/gerenciar/unidade/');
-    } catch (ValidationException $e) {
-        $errors = $e->getErrors();
-    } catch (Exception $e) {
-        $errors['unknow'] = $e->getMessage();
+    } catch (\Exception $e) {
+        $unidade->clean($old_unidade);
+        if ($e instanceof \MZ\Exception\ValidationException) {
+            $errors = $e->getErrors();
+        }
+        if (is_output('json')) {
+            json($e->getMessage(), null, ['errors' => $errors]);
+        }
+        \Thunder::error($e->getMessage());
+        foreach ($errors as $key => $value) {
+            $focusctrl = $key;
+            break;
+        }
     }
-    foreach ($errors as $key => $value) {
-        $focusctrl = $key;
-        Thunder::error($value);
-        break;
-    }
+} elseif (is_output('json')) {
+    json('Nenhum dado foi enviado');
 } else {
-    $unidade = new ZUnidade();
+    $unidade = new Unidade();
 }
 include template('gerenciar_unidade_cadastrar');

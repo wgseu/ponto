@@ -1,7 +1,7 @@
 <?php
 require_once(dirname(__DIR__) . '/app.php');
 
-need_permission(PermissaoNome::ALTERARCONFIGURACOES);
+need_permission(Permissao::NOME_ALTERARCONFIGURACOES);
 
 $fieldfocus = 'mapskey';
 $tab_avancado = 'active';
@@ -17,12 +17,12 @@ if (is_post()) {
         set_string_config('Sistema', 'Dropbox.AccessKey', $dropbox_token);
         $__sistema__->salvarOpcoes($__options__);
         try {
-            $appsync = new AppSync();
+            $appsync = new \MZ\System\Synchronizer();
             $appsync->systemOptionsChanged();
         } catch (Exception $e) {
             Log::error($e->getMessage());
         }
-        Thunder::success('Opções avançadas atualizadas com sucesso!', true);
+        \Thunder::success('Opções avançadas atualizadas com sucesso!', true);
         redirect('/gerenciar/sistema/avancado');
     } catch (ValidationException $e) {
         $erro = $e->getErrors();
@@ -31,7 +31,7 @@ if (is_post()) {
     }
     foreach ($erro as $key => $value) {
         $fieldfocus = $key;
-        Thunder::error($erro[$fieldfocus]);
+        \Thunder::error($erro[$fieldfocus]);
         break;
     }
 }

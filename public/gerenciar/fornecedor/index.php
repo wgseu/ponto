@@ -21,10 +21,10 @@
 */
 require_once(dirname(__DIR__) . '/app.php');
 
-need_permission(PermissaoNome::CADASTROFORNECEDORES);
+need_permission(Permissao::NOME_CADASTROFORNECEDORES);
 
-$count = ZFornecedor::getCount($_GET['query']);
+$count = Fornecedor::getCount($_GET['query']);
 list($pagesize, $offset, $pagestring) = pagestring($count, 10);
-$fornecedores = ZFornecedor::getTodos($_GET['query'], $offset, $pagesize);
+$fornecedores = Fornecedor::getTodos($_GET['query'], $offset, $pagesize);
 
 include template('gerenciar_fornecedor_index');

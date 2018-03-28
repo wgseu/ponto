@@ -249,9 +249,9 @@ class ZServico
 
     public static function getPeloID($id)
     {
-        $query = DB::$pdo->from('Servicos')
+        $query = \DB::$pdo->from('Servicos')
                          ->where(['id' => $id]);
-        return new ZServico($query->fetch());
+        return new Servico($query->fetch());
     }
 
     private static function validarCampos(&$servico)
@@ -279,7 +279,7 @@ class ZServico
         } elseif (!in_array($servico['obrigatorio'], ['Y', 'N'])) {
             $erros['obrigatorio'] = 'O obrigatório informado não é válido';
         }
-        if ($servico['tipo'] == ServicoTipo::EVENTO) {
+        if ($servico['tipo'] == Servico::TIPO_EVENTO) {
             $datainicio = strtotime($servico['datainicio']);
             if ($datainicio === false) {
                 $erros['datainicio'] = 'A data de ínicio do evento é inválida';
@@ -335,12 +335,12 @@ class ZServico
         $_servico = $servico->toArray();
         self::validarCampos($_servico);
         try {
-            $_servico['id'] = DB::$pdo->insertInto('Servicos')->values($_servico)->execute();
+            $_servico['id'] = \DB::$pdo->insertInto('Servicos')->values($_servico)->execute();
         } catch (Exception $e) {
             self::handleException($e);
             throw $e;
         }
-        return self::getPeloID($_servico['id']);
+        return self::findByID($_servico['id']);
     }
 
     public static function atualizar($servico)
@@ -350,7 +350,7 @@ class ZServico
             throw new ValidationException(['id' => 'O id do servico não foi informado']);
         }
         if ($_servico['id'] >= self::DESCONTO_ID && $_servico['id'] <= self::ENTREGA_ID) {
-            throw new Exception('Não é possível alterar esse serviço, o serviço é utilizado internamente pelo sistema');
+            throw new \Exception('Não é possível alterar esse serviço, o serviço é utilizado internamente pelo sistema');
         }
         self::validarCampos($_servico);
         $campos = [
@@ -366,7 +366,7 @@ class ZServico
             'ativo',
         ];
         try {
-            $query = DB::$pdo->update('Servicos');
+            $query = \DB::$pdo->update('Servicos');
             $query = $query->set(array_intersect_key($_servico, array_flip($campos)));
             $query = $query->where('id', $_servico['id']);
             $query->execute();
@@ -374,25 +374,25 @@ class ZServico
             self::handleException($e);
             throw $e;
         }
-        return self::getPeloID($_servico['id']);
+        return self::findByID($_servico['id']);
     }
 
     public static function excluir($id)
     {
         if (!$id) {
-            throw new Exception('Não foi possível excluir o servico, o id do serviço não foi informado');
+            throw new \Exception('Não foi possível excluir o servico, o id do serviço não foi informado');
         }
         if ($id >= self::DESCONTO_ID && $id <= self::ENTREGA_ID) {
-            throw new Exception('Não é possível excluir esse serviço, o serviço é utilizado internamente pelo sistema');
+            throw new \Exception('Não é possível excluir esse serviço, o serviço é utilizado internamente pelo sistema');
         }
-        $query = DB::$pdo->deleteFrom('Servicos')
+        $query = \DB::$pdo->deleteFrom('Servicos')
                          ->where(['id' => $id]);
         return $query->execute();
     }
 
     private static function initSearch($busca, $tipo)
     {
-        $query = DB::$pdo->from('Servicos')
+        $query = \DB::$pdo->from('Servicos')
                          ->orderBy('id ASC');
         $busca = trim($busca);
         if ($busca != '') {
@@ -414,7 +414,7 @@ class ZServico
         $_servicos = $query->fetchAll();
         $servicos = [];
         foreach ($_servicos as $servico) {
-            $servicos[] = new ZServico($servico);
+            $servicos[] = new Servico($servico);
         }
         return $servicos;
     }

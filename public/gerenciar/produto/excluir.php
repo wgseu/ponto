@@ -21,17 +21,17 @@
 */
 require_once(dirname(__DIR__) . '/app.php');
 
-need_permission(PermissaoNome::CADASTROPRODUTOS);
+need_permission(Permissao::NOME_CADASTROPRODUTOS);
 $id = $_GET['id'];
-$produto = ZProduto::getPeloID($id);
+$produto = Produto::findByID($id);
 if (is_null($produto->getID())) {
-    Thunder::warning('O produto de id "'.$id.'" não existe!');
+    \Thunder::warning('O produto de id "'.$id.'" não existe!');
     redirect('/gerenciar/produto/');
 }
 try {
-    ZProduto::excluir($id);
-    Thunder::success('Produto "' . $produto->getDescricao() . '" excluído com sucesso!', true);
+    Produto::excluir($id);
+    \Thunder::success('Produto "' . $produto->getDescricao() . '" excluído com sucesso!', true);
 } catch (Exception $e) {
-    Thunder::error('Não foi possível excluir o produto "' . $produto->getDescricao() . '"!');
+    \Thunder::error('Não foi possível excluir o produto "' . $produto->getDescricao() . '"!');
 }
 redirect('/gerenciar/produto/');

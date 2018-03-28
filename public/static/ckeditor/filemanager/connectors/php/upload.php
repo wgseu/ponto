@@ -33,7 +33,7 @@ function SendError( $number, $text )
 {
 	SendUploadResults( $number, '', '', $text ) ;
 }
-if(!have_permission(PermissaoNome::ALTERARPAGINAS))
+if(!$login_funcionario->has(Permissao::NOME_ALTERARPAGINAS))
 	SendError( 1, 'Você não tem permissão para fazer uploads' );
 
 // Check if this uploader has been enabled.

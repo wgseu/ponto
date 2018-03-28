@@ -21,17 +21,24 @@
 */
 require_once(dirname(__DIR__) . '/app.php');
 
-need_permission(PermissaoNome::CADASTROPRODUTOS);
-$categoria = ZCategoria::getPeloID($_GET['id']);
-if (is_null($categoria->getID())) {
-    Thunder::warning('A categoria de id "'.$_GET['id'].'" não existe!');
+use MZ\__TODO_NAMESPACE__\Categoria;
+
+need_permission(\Permissao::NOME_CADASTROPRODUTOS, is_output('json'));
+$id = isset($_GET['id']) ? $_GET['id'] : null;
+$categoria = Categoria::findByID($id);
+if (!$categoria->exists()) {
+    $msg = 'A categoria informada não existe!';
+    if (is_output('json')) {
+        json($msg);
+    }
+    \Thunder::warning($msg);
     redirect('/gerenciar/categoria/');
 }
 $focusctrl = 'descricao';
 $errors = [];
 $old_categoria = $categoria;
 if (is_post()) {
-    $categoria = new ZCategoria($_POST);
+    $categoria = new Categoria($_POST);
     try {
         $categoria->setID($old_categoria->getID());
         $imagem = upload_image('raw_imagem', 'categoria', null, 256, 256, true);
@@ -42,8 +49,17 @@ if (is_post()) {
             $categoria->setImagem(true);
         }
         $categoria->setDataAtualizacao(date('Y-m-d H:i:s', time()));
-        $categoria = ZCategoria::atualizar($categoria);
-        Thunder::success('Categoria "'.$categoria->getDescricao().'" atualizada com sucesso!', true);
+        $categoria->filter($old_categoria);
+        $categoria->update();
+        $old_categoria->clean($categoria);
+        $msg = sprintf(
+            'Categoria "%s" atualizada com sucesso!',
+            $categoria->getDescricao()
+        );
+        if (is_output('json')) {
+            json(null, ['item' => $categoria->publish(), 'msg' => $msg]);
+        }
+        \Thunder::success($msg, true);
         redirect('/gerenciar/categoria/');
     } catch (ValidationException $e) {
         $errors = $e->getErrors();
@@ -54,9 +70,9 @@ if (is_post()) {
     $categoria->setImagem($old_categoria->getImagem());
     foreach ($errors as $key => $value) {
         $focusctrl = $key;
-        Thunder::error($value);
+        \Thunder::error($value);
         break;
     }
 }
-$_categorias = ZCategoria::getTodas(true, true);
+$_categorias = Categoria::getTodas(true, true);
 include template('gerenciar_categoria_editar');

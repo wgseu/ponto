@@ -22,7 +22,7 @@
 require_once(dirname(__DIR__) . '/app.php');
 
 need_manager();
-$funcao = ZFuncao::getPeloID($_GET['funcao']);
+$funcao = Funcao::findByID($_GET['funcao']);
 if ($_GET['estado'] == 'ativo') {
     $estado = 'Y';
 } elseif ($_GET['estado'] == 'inativo') {
@@ -31,11 +31,11 @@ if ($_GET['estado'] == 'ativo') {
     $estado = null;
 }
 $funcoes = [];
-if (have_permission(PermissaoNome::CADASTROFUNCIONARIOS)) {
-    $count = ZFuncionario::getCount($_GET['query'], $funcao->getID(), $_GET['genero'], $estado);
+if ($login_funcionario->has(Permissao::NOME_CADASTROFUNCIONARIOS)) {
+    $count = Funcionario::getCount($_GET['query'], $funcao->getID(), $_GET['genero'], $estado);
     list($pagesize, $offset, $pagestring) = pagestring($count, 10);
-    $funcionarios = ZFuncionario::getTodos($_GET['query'], $funcao->getID(), $_GET['genero'], $estado, $offset, $pagesize);
-    $_funcoes = ZFuncao::getTodas();
+    $funcionarios = Funcionario::getTodos($_GET['query'], $funcao->getID(), $_GET['genero'], $estado, $offset, $pagesize);
+    $_funcoes = Funcao::findAll();
     foreach ($_funcoes as $funcao) {
         $funcoes[$funcao->getID()] = $funcao->getDescricao();
     }
@@ -44,8 +44,8 @@ if (have_permission(PermissaoNome::CADASTROFUNCIONARIOS)) {
     $funcionarios[] = $login_funcionario;
 }
 $generos = [
-    ClienteGenero::MASCULINO => 'Masculino',
-    ClienteGenero::FEMININO => 'Feminino',
+    Cliente::GENERO_MASCULINO => 'Masculino',
+    Cliente::GENERO_FEMININO => 'Feminino',
 ];
 $estados = [
     'ativo' => 'Ativo',

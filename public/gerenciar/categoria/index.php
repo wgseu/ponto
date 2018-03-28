@@ -21,13 +21,13 @@
 */
 require_once(dirname(__DIR__) . '/app.php');
 
-need_permission(PermissaoNome::CADASTROPRODUTOS);
+need_permission(Permissao::NOME_CADASTROPRODUTOS);
 
-$count = ZCategoria::getCount(true, $_GET['categoria'], $_GET['query']);
+$count = Categoria::getCount(true, $_GET['categoria'], $_GET['query']);
 list($pagesize, $offset, $pagestring) = pagestring($count, 10);
-$categorias = ZCategoria::getTodas(true, $_GET['categoria'], $_GET['query'], $offset, $pagesize);
+$categorias = Categoria::getTodas(true, $_GET['categoria'], $_GET['query'], $offset, $pagesize);
 
-$_sup_categorias = ZCategoria::getTodas(true, true);
+$_sup_categorias = Categoria::getTodas(true, true);
 $sup_categorias = [];
 foreach ($_sup_categorias as $categoria) {
     $sup_categorias[$categoria->getID()] = $categoria->getDescricao();

@@ -3,8 +3,8 @@ require_once(dirname(__DIR__) . '/app.php');
 
 need_permission(
     [
-        \PermissaoNome::RELATORIOFLUXO,
-        \PermissaoNome::EXCLUIRPEDIDO,
+        \Permissao::NOME_RELATORIOFLUXO,
+        \Permissao::NOME_EXCLUIRPEDIDO,
     ],
     isset($_GET['saida']) && is_output('json')
 );
@@ -25,7 +25,7 @@ try {
     $lancamento_inicio = isset($_GET['lancamento_inicio'])?strtotime($_GET['lancamento_inicio']):false;
     $lancamento_fim = isset($_GET['lancamento_fim'])?strtotime($_GET['lancamento_fim']):false;
 
-    $notas = \ZNota::getTodas(
+    $notas = \Nota::getTodas(
         $busca,
         $estado,
         $acao,
@@ -55,7 +55,7 @@ try {
             exit;
         }
     }
-    $zipfile = \ZNota::zip($notas);
+    $zipfile = \Nota::zip($notas);
     $zipname = 'notas.zip';
     header("Pragma: public");
     header("Expires: 0");

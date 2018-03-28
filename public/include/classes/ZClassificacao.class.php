@@ -88,16 +88,16 @@ class ZClassificacao
 
     public static function getPeloID($id)
     {
-        $query = DB::$pdo->from('Classificacoes')
+        $query = \DB::$pdo->from('Classificacoes')
                          ->where(['id' => $id]);
-        return new ZClassificacao($query->fetch());
+        return new Classificacao($query->fetch());
     }
 
     public static function getPelaDescricao($descricao)
     {
-        $query = DB::$pdo->from('Classificacoes')
+        $query = \DB::$pdo->from('Classificacoes')
                          ->where(['descricao' => $descricao]);
-        return new ZClassificacao($query->fetch());
+        return new Classificacao($query->fetch());
     }
 
     private static function validarCampos(&$classificacao)
@@ -133,12 +133,12 @@ class ZClassificacao
         $_classificacao = $classificacao->toArray();
         self::validarCampos($_classificacao);
         try {
-            $_classificacao['id'] = DB::$pdo->insertInto('Classificacoes')->values($_classificacao)->execute();
+            $_classificacao['id'] = \DB::$pdo->insertInto('Classificacoes')->values($_classificacao)->execute();
         } catch (Exception $e) {
             self::handleException($e);
             throw $e;
         }
-        return self::getPeloID($_classificacao['id']);
+        return self::findByID($_classificacao['id']);
     }
 
     public static function atualizar($classificacao)
@@ -153,7 +153,7 @@ class ZClassificacao
             'descricao',
         ];
         try {
-            $query = DB::$pdo->update('Classificacoes');
+            $query = \DB::$pdo->update('Classificacoes');
             $query = $query->set(array_intersect_key($_classificacao, array_flip($campos)));
             $query = $query->where('id', $_classificacao['id']);
             $query->execute();
@@ -161,22 +161,22 @@ class ZClassificacao
             self::handleException($e);
             throw $e;
         }
-        return self::getPeloID($_classificacao['id']);
+        return self::findByID($_classificacao['id']);
     }
 
     public static function excluir($id)
     {
         if (!$id) {
-            throw new Exception('Não foi possível excluir a classificacao, o id da classificacao não foi informado');
+            throw new \Exception('Não foi possível excluir a classificacao, o id da classificacao não foi informado');
         }
-        $query = DB::$pdo->deleteFrom('Classificacoes')
+        $query = \DB::$pdo->deleteFrom('Classificacoes')
                          ->where(['id' => $id]);
         return $query->execute();
     }
 
     private static function initSearch($superiores, $classificacao_id, $busca)
     {
-        $query = DB::$pdo->from('Classificacoes')
+        $query = \DB::$pdo->from('Classificacoes')
                          ->orderBy('descricao ASC');
         if ($superiores) {
             $query = $query->where('classificacaoid', null);
@@ -204,7 +204,7 @@ class ZClassificacao
         $_classificacaos = $query->fetchAll();
         $classificacaos = [];
         foreach ($_classificacaos as $classificacao) {
-            $classificacaos[] = new ZClassificacao($classificacao);
+            $classificacaos[] = new Classificacao($classificacao);
         }
         return $classificacaos;
     }
@@ -217,7 +217,7 @@ class ZClassificacao
 
     private static function initSearchDaClassificacaoID($classificacao_id)
     {
-        return   DB::$pdo->from('Classificacoes')
+        return   \DB::$pdo->from('Classificacoes')
                          ->where(['classificacaoid' => $classificacao_id])
                          ->orderBy('id ASC');
     }
@@ -231,7 +231,7 @@ class ZClassificacao
         $_classificacaos = $query->fetchAll();
         $classificacaos = [];
         foreach ($_classificacaos as $classificacao) {
-            $classificacaos[] = new ZClassificacao($classificacao);
+            $classificacaos[] = new Classificacao($classificacao);
         }
         return $classificacaos;
     }

@@ -21,7 +21,7 @@
 */
 require_once(dirname(__DIR__) . '/app.php');
 
-need_permission(PermissaoNome::RELATORIOVENDAS, isset($_GET['saida']) && is_output('json'));
+need_permission(Permissao::NOME_RELATORIOVENDAS, isset($_GET['saida']) && is_output('json'));
 
 try {
     $query = isset($_GET['query'])?$_GET['query']:null;
@@ -36,7 +36,7 @@ try {
     $tipo = isset($_GET['tipo'])?$_GET['tipo']:null;
     $formato = isset($_GET['formato'])?$_GET['formato']:null;
 
-    $pedidos = ZPedido::getTodos(
+    $pedidos = Pedido::getTodos(
         $query,
         $cliente_id,
         $funcionario_id,
@@ -71,7 +71,7 @@ try {
     $line = 3;
     $column = 'B';
     $i = $line;
-    $value = new ZPedido();
+    $value = new Pedido();
     foreach ($pedidos as $key => $item) {
         $i++;
         $value->fromArray($item);

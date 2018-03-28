@@ -23,17 +23,17 @@ require_once(dirname(__DIR__) . '/app.php');
 
 use MZ\Wallet\Banco;
 
-need_permission(PermissaoNome::CADASTROBANCOS);
+need_permission(Permissao::NOME_CADASTROBANCOS);
 $id = $_GET['id'];
 $banco = Banco::findByID($id);
 if (is_null($banco->getID())) {
-    Thunder::warning('O banco de id "'.$id.'" não existe!');
+    \Thunder::warning('O banco de id "'.$id.'" não existe!');
     redirect('/gerenciar/banco/');
 }
 try {
     $banco->delete();
-    Thunder::success('Banco "' . $banco->getRazaoSocial() . '" excluído com sucesso!', true);
+    \Thunder::success('Banco "' . $banco->getRazaoSocial() . '" excluído com sucesso!', true);
 } catch (Exception $e) {
-    Thunder::error('Não foi possível excluir o banco "' . $banco->getRazaoSocial() . '"!');
+    \Thunder::error('Não foi possível excluir o banco "' . $banco->getRazaoSocial() . '"!');
 }
 redirect('/gerenciar/banco/');

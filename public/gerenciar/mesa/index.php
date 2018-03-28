@@ -21,11 +21,11 @@
 */
 require_once(dirname(__DIR__) . '/app.php');
 
-need_permission(PermissaoNome::CADASTROMESAS);
+need_permission(Permissao::NOME_CADASTROMESAS);
 
-$count = ZMesa::getCount(null, $_GET['ativa'], $_GET['query']);
+$count = Mesa::getCount(null, $_GET['ativa'], $_GET['query']);
 list($pagesize, $offset, $pagestring) = pagestring($count, 10);
-$mesas = ZMesa::getTodas(null, $_GET['ativa'], $_GET['query'], $offset, $pagesize);
+$mesas = Mesa::getTodas(null, $_GET['ativa'], $_GET['query'], $offset, $pagesize);
 
 $ativas = [
     'Y' => 'Ativas',

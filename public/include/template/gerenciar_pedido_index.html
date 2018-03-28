@@ -26,8 +26,8 @@
 				<label for="fim">Data final:</label>
 				<input type="text" id="fim" name="fim" class="datetime-picker form-control" value="{$_GET['fim']}">
 			</div>
-<!--${$_funcao = ZFuncao::getPeloID($_funcionario->getFuncaoID())}-->
-<!--${$_cliente_func = ZCliente::getPeloID($_funcionario->getClienteID())}-->
+<!--${$_funcao = $_funcionario->findFuncaoID()}-->
+<!--${$_cliente_func = $_funcionario->findClienteID()}-->
 			<input type="hidden" id="funcionarioid" name="funcionarioid" data-content="{$_cliente_func->getNomeCompleto()}" value="{$_funcionario->getID()}">
 			<div class="form-group col-lg-3 col-md-3 col-sm-3 col-xs-6 col-lg-offset-2">
 				<label for="funcionario">Atendente: <span class="identifier">{$_funcao->getDescricao()}<span></label>
@@ -80,27 +80,27 @@
 <!--{loop $pedidos $pedido}-->
 							<tr ${$pedido->isCancelado()?'class="danger"':''}>
 								<td><div title="{$_tipo_names[$pedido->getTipo()]}" class="cell-icon pedido-icons" style="background-position: -{$_pedido_icon[$pedido->getTipo()]}px 0px;"></div><a href="/gerenciar/produto_pedido/?query={$pedido->getID()}" title="Visualizar produtos e serviços">{$pedido->getID()}</a></td>
-<!--${$_comanda = \MZ\Sale\Comanda::findByID($pedido->getComandaID())}-->
-<!--${$_mesa = ZMesa::getPeloID($pedido->getMesaID())}-->
-								<td>${$pedido->getTipo() == PedidoTipo::ENTREGA && is_null($pedido->getLocalizacaoID())?'Viagem':($pedido->getTipo() == PedidoTipo::MESA?$_mesa->getNome():($pedido->getTipo() == PedidoTipo::COMANDA?$_comanda->getNome():$_tipo_names[$pedido->getTipo()]))}</td>
-<!--${$_info = ZPedido::getTotalDetalhado($pedido->getID(), $pedido->getCancelado())}-->
+<!--${$_comanda = $pedido->findComandaID()}-->
+<!--${$_mesa = $pedido->findMesaID()}-->
+								<td>${$pedido->getTipo() == Pedido::TIPO_ENTREGA && is_null($pedido->getLocalizacaoID())?'Viagem':($pedido->getTipo() == PedidoTipo::MESA?$_mesa->getNome():($pedido->getTipo() == PedidoTipo::COMANDA?$_comanda->getNome():$_tipo_names[$pedido->getTipo()]))}</td>
+<!--${$_info = Pedido::getTotalDetalhado($pedido->getID(), $pedido->getCancelado())}-->
 								<td class="text-right">${\MZ\Util\Mask::money($_info['produtos'], true)}</td>
 								<td class="text-right">${\MZ\Util\Mask::money($_info['comissao'], true)}</td>
 								<td class="text-right">${\MZ\Util\Mask::money($_info['servicos'], true)}</td>
 								<td class="text-right">${\MZ\Util\Mask::money($_info['subtotal'], true)}</td>
 								<td class="text-right">${\MZ\Util\Mask::money($_info['descontos'], true)}</td>
 								<td class="text-right"><strong>${\MZ\Util\Mask::money($_info['total'], true)}</strong></td>
-<!--${$_cliente = ZCliente::getPeloID($pedido->getClienteID())}-->
+<!--${$_cliente = $pedido->findClienteID()}-->
 								<td><a href="/gerenciar/cliente/editar?id={$_cliente->getID()}" title="Editar cliente '{$_cliente->getNomeCompleto()}'">{$_cliente->getNomeCompleto()}</a></td>
-<!--${$_sessao = ZSessao::getPeloID($pedido->getSessaoID())}-->
+<!--${$_sessao = $pedido->findSessaoID()}-->
 								<td class="text-center">
 									<strong><a href="/gerenciar/pedido/?query=%23{$_sessao->getID()}" title="Pedidos da sessão '{$_sessao->getID()}'">{$_sessao->getID()}</a></strong>
-<!--${$_movimentacao = ZMovimentacao::getPeloID($pedido->getMovimentacaoID())}-->
-<!--${$_caixa = ZCaixa::getPeloID($_movimentacao->getCaixaID())}-->
+<!--${$_movimentacao = $pedido->findMovimentacaoID()}-->
+<!--${$_caixa = $_movimentacao->findCaixaID()}-->
 									<small><a href="/gerenciar/caixa/editar?id={$_caixa->getID()}" title="Editar caixa '{$_caixa->getDescricao()}'">{$_caixa->getDescricao()}</a></small>
 								</td>
-<!--${$_funcionario = ZFuncionario::getPeloID($pedido->getFuncionarioID())}-->
-<!--${$_cliente = ZCliente::getPeloID($_funcionario->getClienteID())}-->
+<!--${$_funcionario = $pedido->findFuncionarioID()}-->
+<!--${$_cliente = $_funcionario->findClienteID()}-->
 								<td class="text-center"><a href="/gerenciar/funcionario/editar?id={$_funcionario->getID()}" title="Editar funcionário '{$_cliente->getNomeCompleto()}'">{$_cliente->getNomeCompleto()}</a></td>
 								<td class="text-center">${is_null($pedido->getDataCriacao())?'':date('d/m/Y H:i:s', strtotime($pedido->getDataCriacao()))}</td>
 							</tr>

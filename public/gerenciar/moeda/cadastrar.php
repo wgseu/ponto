@@ -23,7 +23,7 @@ require_once(dirname(__DIR__) . '/app.php');
 
 use MZ\Wallet\Moeda;
 
-need_permission(\PermissaoNome::CADASTROMOEDAS, is_output('json'));
+need_permission(\Permissao::NOME_CADASTROMOEDAS, is_output('json'));
 $id = isset($_GET['id'])?$_GET['id']:null;
 $moeda = Moeda::findByID($id);
 $moeda->setID(null);

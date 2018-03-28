@@ -23,7 +23,7 @@ require_once(dirname(__DIR__) . '/app.php');
 
 use MZ\Wallet\Carteira;
 
-need_permission(PermissaoNome::CADASTROCARTEIRAS);
+need_permission(Permissao::NOME_CADASTROCARTEIRAS);
 $focusctrl = 'descricao';
 $errors = [];
 $carteira = new Carteira();
@@ -33,18 +33,31 @@ if (is_post()) {
     try {
         $carteira->filter($old_carteira);
         $carteira->insert();
-        Thunder::success('Carteira "'.$carteira->getDescricao().'" cadastrada com sucesso!', true);
+        $msg = sprintf(
+            'Carteira "%s" cadastrada com sucesso!',
+            $carteira->getDescricao()
+        );
+        if (is_output('json')) {
+            json(null, ['item' => $carteira->publish(), 'msg' => $msg]);
+        }
+        \Thunder::success($msg, true);
         redirect('/gerenciar/carteira/');
-    } catch (ValidationException $e) {
-        $errors = $e->getErrors();
-    } catch (Exception $e) {
-        $errors['unknow'] = $e->getMessage();
+    } catch (\Exception $e) {
+        $__replace__me__->clean($old___replace__me__);
+        if ($e instanceof \MZ\Exception\ValidationException) {
+            $errors = $e->getErrors();
+        }
+        if (is_output('json')) {
+            json($e->getMessage(), null, ['errors' => $errors]);
+        }
+        \Thunder::error($e->getMessage());
+        foreach ($errors as $key => $value) {
+            $focusctrl = $key;
+            break;
+        }
     }
-    foreach ($errors as $key => $value) {
-        $focusctrl = $key;
-        Thunder::error($value);
-        break;
-    }
+} elseif (is_output('json')) {
+    json('Nenhum dado foi enviado');
 } else {
     $carteira->setAtiva('Y');
 }

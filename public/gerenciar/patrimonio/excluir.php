@@ -21,21 +21,21 @@
 */
 require_once(dirname(__DIR__) . '/app.php');
 
-need_permission(PermissaoNome::CADASTROPATRIMONIO);
+need_permission(Permissao::NOME_CADASTROPATRIMONIO);
 $id = $_GET['id'];
-$patrimonio = ZPatrimonio::getPeloID($id);
+$patrimonio = Patrimonio::findByID($id);
 if (is_null($patrimonio->getID())) {
-    Thunder::warning('O patrimônio de id "'.$id.'" não existe!');
+    \Thunder::warning('O patrimônio de id "'.$id.'" não existe!');
     redirect('/gerenciar/patrimonio/');
 }
 try {
-    ZPatrimonio::excluir($id);
+    Patrimonio::excluir($id);
     // exclui a foto do bem enviada
     if (!is_null($patrimonio->getImagemAnexada())) {
         unlink(WWW_ROOT . get_image_url($patrimonio->getImagemAnexada(), 'patrimonio'));
     }
-    Thunder::success('Patrimônio "' . $patrimonio->getDescricao() . '" excluído com sucesso!', true);
+    \Thunder::success('Patrimônio "' . $patrimonio->getDescricao() . '" excluído com sucesso!', true);
 } catch (Exception $e) {
-    Thunder::error('Não foi possível excluir o patrimônio "' . $patrimonio->getDescricao() . '"!');
+    \Thunder::error('Não foi possível excluir o patrimônio "' . $patrimonio->getDescricao() . '"!');
 }
 redirect('/gerenciar/patrimonio/');

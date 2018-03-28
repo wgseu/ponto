@@ -22,7 +22,7 @@
 require_once(dirname(__DIR__) . '/app.php');
 
 if (is_login()) {
-    Thunder::information('Você já está cadastrado e autenticado!', true);
+    \Thunder::information('Você já está cadastrado e autenticado!', true);
     redirect('/');
 }
 $fieldfocus = 'nome';
@@ -30,7 +30,7 @@ $gerenciando = false;
 $cadastrar_cliente = true;
 $erro = [];
 if (is_post()) {
-    $cliente = new ZCliente($_POST);
+    $cliente = new Cliente($_POST);
     $cliente->setImagem(null);
     $cliente->setSlogan(null);
     $aceitar = $_POST['aceitar'];
@@ -44,15 +44,15 @@ if (is_post()) {
         if (trim($_POST['email']) == '') {
             throw new ValidationException(['email' => 'O E-mail não foi informado']);
         }
-        if ($cliente->getTipo() == ClienteTipo::JURIDICA) {
+        if ($cliente->getTipo() == Cliente::TIPO_JURIDICA) {
             $cliente->setCPF(\MZ\Util\Filter::unmask($cliente->getCPF(), _p('Mascara', 'CNPJ')));
         } else {
             $cliente->setCPF(\MZ\Util\Filter::unmask($cliente->getCPF(), _p('Mascara', 'CPF')));
         }
-        $cliente = ZCliente::cadastrar($cliente, true);
+        $cliente = Cliente::cadastrar($cliente, true);
         $login_cliente = $cliente;
         $login_cliente_id = $cliente->getID();
-        ZAutenticacao::login($cliente->getID());
+        Authentication::login($cliente->getID());
         redirect(get_redirect_page());
     } catch (ValidationException $e) {
         $erro = $e->getErrors();
@@ -60,14 +60,14 @@ if (is_post()) {
         $erro['unknow'] = $e->getMessage();
     }
 } else {
-    $cliente = new ZCliente();
+    $cliente = new Cliente();
 }
 foreach ($erro as $key => $value) {
     $fieldfocus = $key;
     break;
 }
 if (array_key_exists($fieldfocus, $erro)) {
-    Thunder::error($erro[$fieldfocus]);
+    \Thunder::error($erro[$fieldfocus]);
 }
 if ($fieldfocus == 'genero') {
     $fieldfocus .= '_m';

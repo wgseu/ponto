@@ -211,9 +211,9 @@ class ZEmitente
 
     public static function getPeloID($id)
     {
-        $query = DB::$pdo->from('Emitentes')
+        $query = \DB::$pdo->from('Emitentes')
                          ->where(['id' => $id]);
-        return new ZEmitente($query->fetch());
+        return new Emitente($query->fetch());
     }
 
     private static function validarCampos(&$emitente)
@@ -276,12 +276,12 @@ class ZEmitente
         $_emitente = $emitente->toArray();
         self::validarCampos($_emitente);
         try {
-            $_emitente['id'] = DB::$pdo->insertInto('Emitentes')->values($_emitente)->execute();
+            $_emitente['id'] = \DB::$pdo->insertInto('Emitentes')->values($_emitente)->execute();
         } catch (Exception $e) {
             self::handleException($e);
             throw $e;
         }
-        return self::getPeloID($_emitente['id']);
+        return self::findByID($_emitente['id']);
     }
 
     public static function atualizar($emitente)
@@ -303,7 +303,7 @@ class ZEmitente
             'dataexpiracao',
         ];
         try {
-            $query = DB::$pdo->update('Emitentes');
+            $query = \DB::$pdo->update('Emitentes');
             $query = $query->set(array_intersect_key($_emitente, array_flip($campos)));
             $query = $query->where('id', $_emitente['id']);
             $query->execute();
@@ -311,22 +311,22 @@ class ZEmitente
             self::handleException($e);
             throw $e;
         }
-        return self::getPeloID($_emitente['id']);
+        return self::findByID($_emitente['id']);
     }
 
     public static function excluir($id)
     {
         if (!$id) {
-            throw new Exception('Não foi possível excluir o emitente, o id do emitente não foi informado');
+            throw new \Exception('Não foi possível excluir o emitente, o id do emitente não foi informado');
         }
-        $query = DB::$pdo->deleteFrom('Emitentes')
+        $query = \DB::$pdo->deleteFrom('Emitentes')
                          ->where(['id' => $id]);
         return $query->execute();
     }
 
     private static function initSearchDoContadorID($contador_id)
     {
-        return   DB::$pdo->from('Emitentes')
+        return   \DB::$pdo->from('Emitentes')
                          ->where(['contadorid' => $contador_id])
                          ->orderBy('id ASC');
     }
@@ -340,7 +340,7 @@ class ZEmitente
         $_emitentes = $query->fetchAll();
         $emitentes = [];
         foreach ($_emitentes as $emitente) {
-            $emitentes[] = new ZEmitente($emitente);
+            $emitentes[] = new Emitente($emitente);
         }
         return $emitentes;
     }
@@ -353,7 +353,7 @@ class ZEmitente
 
     private static function initSearchDoRegimeID($regime_id)
     {
-        return   DB::$pdo->from('Emitentes')
+        return   \DB::$pdo->from('Emitentes')
                          ->where(['regimeid' => $regime_id])
                          ->orderBy('id ASC');
     }
@@ -367,7 +367,7 @@ class ZEmitente
         $_emitentes = $query->fetchAll();
         $emitentes = [];
         foreach ($_emitentes as $emitente) {
-            $emitentes[] = new ZEmitente($emitente);
+            $emitentes[] = new Emitente($emitente);
         }
         return $emitentes;
     }

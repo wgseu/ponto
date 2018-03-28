@@ -22,24 +22,24 @@
 require_once(dirname(__DIR__) . '/app.php');
 
 need_manager();
-$funcionario = ZFuncionario::getPeloID($_GET['id']);
+$funcionario = Funcionario::findByID($_GET['id']);
 if (is_null($funcionario->getID())) {
-    Thunder::warning('O(a) funcionário(a) de id "'.$_GET['id'].'" não existe!');
+    \Thunder::warning('O(a) funcionário(a) de id "'.$_GET['id'].'" não existe!');
     redirect('/gerenciar/funcionario/');
 }
-if ((!have_permission(PermissaoNome::CADASTROFUNCIONARIOS) &&
+if ((!$login_funcionario->has(Permissao::NOME_CADASTROFUNCIONARIOS) &&
     !is_self($funcionario)) ||
-   ( have_permission(PermissaoNome::CADASTROFUNCIONARIOS, $funcionario) &&
+   ( have_permission(Permissao::NOME_CADASTROFUNCIONARIOS, $funcionario) &&
     !is_self($funcionario) && !is_owner()) ) {
-    Thunder::warning('Você não tem permissão para alterar as informações desse(a) funcionário(a)!');
+    \Thunder::warning('Você não tem permissão para alterar as informações desse(a) funcionário(a)!');
     redirect('/gerenciar/funcionario/');
 }
-$cliente_func = ZCliente::getPeloID($funcionario->getClienteID());
+$cliente_func = $funcionario->findClienteID();
 $focusctrl = 'clienteid';
 $errors = [];
 $old_funcionario = $funcionario;
 if (is_post()) {
-    $funcionario = new ZFuncionario($_POST);
+    $funcionario = new Funcionario($_POST);
     try {
         $funcionario->setPorcentagem(moneyval($funcionario->getPorcentagem()));
         $funcionario->setLinguagemID(numberval($funcionario->getLinguagemID()));
@@ -56,23 +56,38 @@ if (is_post()) {
                 $funcionario->setPontuacao($old_funcionario->getPontuacao());
             }
         }
-        $funcionario = ZFuncionario::atualizar($funcionario);
-        Thunder::success('Funcionário(a) "'.$cliente_func->getLogin().'" atualizado(a) com sucesso!', true);
+        $funcionario->filter($old_funcionario);
+        $funcionario->update();
+        $old_funcionario->clean($funcionario);
+        $msg = sprintf(
+            'Funcionário(a) "%s" atualizado(a) com sucesso!',
+            $cliente_func->getLogin()
+        );
+        if (is_output('json')) {
+            json(null, ['item' => $cliente_func->publish(), 'msg' => $msg]);
+        }
+        \Thunder::success($msg, true);
         redirect('/gerenciar/funcionario/');
-    } catch (ValidationException $e) {
-        $errors = $e->getErrors();
-    } catch (Exception $e) {
-        $errors['unknow'] = $e->getMessage();
+    } catch (\Exception $e) {
+        $funcionario->clean($old_funcionario);
+        if ($e instanceof \MZ\Exception\ValidationException) {
+            $errors = $e->getErrors();
+        }
+        if (is_output('json')) {
+            json($e->getMessage(), null, ['errors' => $errors]);
+        }
+        \Thunder::error($e->getMessage());
+        foreach ($errors as $key => $value) {
+            $focusctrl = $key;
+            break;
+        }
     }
-    foreach ($errors as $key => $value) {
-        $focusctrl = $key;
-        Thunder::error($value);
-        break;
-    }
+} elseif (is_output('json')) {
+    json('Nenhum dado foi enviado');
 }
 if ($focusctrl == 'clienteid') {
     $focusctrl = 'cliente';
 }
-$_funcoes = ZFuncao::getTodas();
+$_funcoes = Funcao::findAll();
 $linguagens = get_languages_info();
 include template('gerenciar_funcionario_editar');

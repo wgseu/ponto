@@ -19,6 +19,9 @@
 	O Cliente adquire apenas o direito de usar o software e não adquire qualquer outros
 	direitos, expressos ou implícitos no GrandChef diferentes dos especificados nesta Licença.
 */
+
+use MZ\Payment\FormaPagto;
+
 class NFeDB extends \NFe\Database\Estatico
 {
     const CANCEL_SUFFIX = '-procEventoNFe';
@@ -57,7 +60,7 @@ class NFeDB extends \NFe\Database\Estatico
                 $path = $config->getPastaXmlInutilizado($ambiente);
                 break;
             default:
-                throw new Exception('Não existe XML salvo para o estado "'.
+                throw new \Exception('Não existe XML salvo para o estado "'.
                     $_nota->getEstado().'" da nota "'.$_nota->getChave().'"', 404);
         }
         return $path . '/' . $_nota->getChave() . '.xml';
@@ -66,18 +69,18 @@ class NFeDB extends \NFe\Database\Estatico
     private function criarNFCe($_nota)
     {
         /* Informações do pedido */
-        $_pedido = ZPedido::getPeloID($_nota->getPedidoID());
+        $_pedido = $_nota->findPedidoID();
         /* Pagamentos */
-        $_pagamentos = ZPagamento::getTodosDoPedidoID($_pedido->getID());
+        $_pagamentos = Pagamento::getTodosDoPedidoID($_pedido->getID());
         /* Itens do pedido */
-        $_itens = ZProdutoPedido::getTodosDoPedidoID($_pedido->getID());
+        $_itens = ProdutoPedido::getTodosDoPedidoID($_pedido->getID());
         /* Informações de entrega */
-        $_localizacao_entrega = \MZ\Location\Localizacao::findByID($_pedido->getLocalizacaoID());
+        $_localizacao_entrega = $_pedido->findLocalizacaoID();
         $_bairro_entrega = $_localizacao_entrega->findBairroID();
         $_cidade_entrega = $_bairro_entrega->findCidadeID();
         $_estado_entrega = $_cidade_entrega->findEstadoID();
         /* Informações do cliente */
-        $_cliente = ZCliente::getPeloID($_pedido->getClienteID());
+        $_cliente = $_pedido->findClienteID();
 
         $config = \NFe\Core\SEFAZ::getInstance()->getConfiguracao();
         /** Preenchimento da nota **/
@@ -100,16 +103,16 @@ class NFeDB extends \NFe\Database\Estatico
         } else {
             $nota->setPresenca(\NFe\Core\Nota::PRESENCA_PRESENCIAL);
         }
-        $_atendente_funcionario = ZFuncionario::getPeloID($_pedido->getFuncionarioID());
-        $_atendente = ZCliente::getPeloID($_atendente_funcionario->getClienteID());
+        $_atendente_funcionario = $_pedido->findFuncionarioID();
+        $_atendente = $_atendente_funcionario->findClienteID();
         $nota->addObservacao('Operador', $_atendente->getAssinatura());
         switch ($_pedido->getTipo()) {
             case PedidoTipo::MESA:
-                $_mesa = ZMesa::getPeloID($_pedido->getMesaID());
+                $_mesa = $_pedido->findMesaID();
                 $nota->addObservacao('Local', $_mesa->getNome());
                 break;
             case PedidoTipo::COMANDA:
-                $_comanda = \MZ\Sale\Comanda::findByID($_pedido->getComandaID());
+                $_comanda = $_pedido->findComandaID();
                 $nota->addObservacao('Local', $_comanda->getNome());
                 break;
             case PedidoTipo::AVULSO:
@@ -117,8 +120,8 @@ class NFeDB extends \NFe\Database\Estatico
                 break;
             case PedidoTipo::ENTREGA:
                 if ($_pedido->isDelivery()) {
-                    $_entregador_funcionario = ZFuncionario::getPeloID($_pedido->getEntregadorID());
-                    $_entregador = ZCliente::getPeloID($_entregador_funcionario->getClienteID());
+                    $_entregador_funcionario = $_pedido->findEntregadorID();
+                    $_entregador = $_entregador_funcionario->findClienteID();
                     $nota->addObservacao('Local', 'Pedido para Entrega');
                     $nota->addObservacao('Entregador', $_entregador->getAssinatura());
                 } else {
@@ -128,12 +131,12 @@ class NFeDB extends \NFe\Database\Estatico
         }
         $nota->setAmbiente(NFeUtil::toAmbiente($_nota->getAmbiente()));
         $_nota->setDataEmissao($nota->getDataEmissao());
-        $_nota = ZNota::atualizar($_nota);
+        $_nota->update();
         /* Destinatário */
         $destinatario = null;
         if (!is_null($_cliente->getID()) && (!is_null($_cliente->getCPF()) || $_pedido->isDelivery())) {
             $destinatario = new \NFe\Entity\Destinatario();
-            if ($_cliente->getTipo() == ClienteTipo::FISICA) {
+            if ($_cliente->getTipo() == Cliente::TIPO_FISICA) {
                 $destinatario->setNome($_cliente->getNomeCompleto());
                 $destinatario->setCPF($_cliente->getCPF());
             } else {
@@ -189,19 +192,19 @@ class NFeDB extends \NFe\Database\Estatico
             }
             // serviços e taxas
             if ($_item->isServico()) {
-                if ($_item->getServicoID() == ZServico::ENTREGA_ID) {
+                if ($_item->getServicoID() == Servico::ENTREGA_ID) {
                     $frete += $_item->getSubtotal();
                 } else {
                     $servicos += $_item->getSubtotal();
                 }
                 continue;
             }
-            $_produto = ZProduto::getPeloID($_item->getProdutoID());
-            $_tributacao = ZTributacao::getPeloID($_produto->getTributacaoID());
-            $_unidade = ZUnidade::getPeloID($_produto->getUnidadeID());
-            $_origem = ZOrigem::getPeloID($_tributacao->getOrigemID());
-            $_operacao = ZOperacao::getPeloID($_tributacao->getOperacaoID());
-            $_imposto = ZImposto::getPeloID($_tributacao->getImpostoID());
+            $_produto = $_item->findProdutoID();
+            $_tributacao = $_produto->findTributacaoID();
+            $_unidade = $_produto->findUnidadeID();
+            $_origem = $_tributacao->findOrigemID();
+            $_operacao = $_tributacao->findOperacaoID();
+            $_imposto = $_tributacao->findImpostoID();
             $produto = new \NFe\Entity\Produto();
             $produto->setPedido($_pedido->getID());
             $produto->setCodigo($_produto->getID());
@@ -277,7 +280,7 @@ class NFeDB extends \NFe\Database\Estatico
         $outros = []; // guarda os outros pagamentos
         $pagamentos = [];
         foreach ($_pagamentos as $key => $_pagamento) {
-            $_forma = ZFormaPagto::getPeloID($_pagamento->getFormaPagtoID());
+            $_forma = $_pagamento->findFormaPagtoID();
             if (is_less($_pagamento->getTotal(), 0.00)) {
                 $troco += $_pagamento->getTotal();
                 continue;
@@ -287,14 +290,14 @@ class NFeDB extends \NFe\Database\Estatico
             $pagamento->setForma(NFeUtil::toFormaPagamento($_forma->getTipo()));
             $pagamento->setValor($_pagamento->getTotal());
             // $pagamento->setCredenciadora('60889128000422');
-            if ($_forma->getTipo() == FormaPagtoTipo::CARTAO) {
-                $_cartao = ZCartao::getPeloID($_pagamento->getCartaoID());
+            if ($_forma->getTipo() == FormaPagto::TIPO_CARTAO) {
+                $_cartao = $_pagamento->findCartaoID();
                 $pagamento->setBandeira(NFeUtil::toBandeira($_cartao->getDescricao()));
             }
             // $pagamento->setAutorizacao('110011');
             $new_key = 'pg_' . $key;
             $pagamentos[$new_key] = $pagamento;
-            if ($_forma->getTipo() == FormaPagtoTipo::DINHEIRO) {
+            if ($_forma->getTipo() == FormaPagto::TIPO_DINHEIRO) {
                 $dinheiro[$new_key] = $pagamento;
             } else {
                 $outros[$new_key] = $pagamento;
@@ -329,12 +332,12 @@ class NFeDB extends \NFe\Database\Estatico
     {
         $notas = [];
         $config = \NFe\Core\SEFAZ::getInstance()->getConfiguracao();
-        $_notas = ZNota::getAbertas($inicio, $quantidade);
+        $_notas = Nota::getAbertas($inicio, $quantidade);
         foreach ($_notas as $_nota) {
             try {
                 /** Notas em contingência **/
                 // Só envia o mesmo XML se não tiver ocorrido rejeição
-                if ($_nota->isContingencia() && $_nota->getEstado() == NotaEstado::ASSINADO) {
+                if ($_nota->isContingencia() && $_nota->getEstado() == Nota::ESTADO_ASSINADO) {
                     // não tenta enviar notas em contingência quando estiver offline
                     if ($config->isOffline()) {
                         continue;
@@ -351,8 +354,8 @@ class NFeDB extends \NFe\Database\Estatico
                 $notas[] = $nota;
             } catch (Exception $e) {
                 $_nota->setCorrigido('N');
-                $_nota = ZNota::atualizar($_nota);
-                $_evento = ZEvento::log(
+                $_nota->update();
+                $_evento = Evento::log(
                     $_nota->getID(),
                     $_nota->getEstado(),
                     $e->getMessage(),
@@ -373,7 +376,7 @@ class NFeDB extends \NFe\Database\Estatico
         if ($config->isOffline()) {
             return $tarefas;
         }
-        $_notas = ZNota::getPendentes($inicio, $quantidade);
+        $_notas = Nota::getPendentes($inicio, $quantidade);
         foreach ($_notas as $_nota) {
             try {
                 $xmlfile = self::getCaminhoXmlAtual($_nota);
@@ -395,8 +398,8 @@ class NFeDB extends \NFe\Database\Estatico
                 $tarefas[] = $tarefa;
             } catch (Exception $e) {
                 $_nota->setCorrigido('N');
-                $_nota = ZNota::atualizar($_nota);
-                $_evento = ZEvento::log(
+                $_nota->update();
+                $_evento = Evento::log(
                     $_nota->getID(),
                     $_nota->getEstado(),
                     $e->getMessage(),
@@ -420,7 +423,7 @@ class NFeDB extends \NFe\Database\Estatico
         }
         $emitente = $config->getEmitente();
         $estado = $emitente->getEndereco()->getMunicipio()->getEstado();
-        $_notas = ZNota::getTarefas($inicio, $quantidade);
+        $_notas = Nota::getTarefas($inicio, $quantidade);
         foreach ($_notas as $_nota) {
             try {
                 $nota = new \NFe\Core\NFCe();
@@ -442,7 +445,7 @@ class NFeDB extends \NFe\Database\Estatico
 
                         // cancelamento sem protocolo significa:
                         // consulta para posterior cancelamento ou inutilização
-                        if (is_null($_nota->getProtocolo()) || $_nota->getEstado() == NotaEstado::REJEITADO) {
+                        if (is_null($_nota->getProtocolo()) || $_nota->getEstado() == Nota::ESTADO_REJEITADO) {
                             $tarefa->setAcao(\NFe\Task\Tarefa::ACAO_CONSULTAR);
                         } else {
                             $tarefa->setAcao(\NFe\Task\Tarefa::ACAO_CANCELAR);
@@ -472,8 +475,8 @@ class NFeDB extends \NFe\Database\Estatico
                 }
             } catch (Exception $e) {
                 $_nota->setCorrigido('N');
-                $_nota = ZNota::atualizar($_nota);
-                $_evento = ZEvento::log(
+                $_nota->update();
+                $_evento = Evento::log(
                     $_nota->getID(),
                     $_nota->getEstado(),
                     $e->getMessage(),

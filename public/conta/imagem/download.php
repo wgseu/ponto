@@ -32,7 +32,7 @@ if (!isset($_GET['cliente']) || !is_numeric($_GET['cliente'])) {
     exitNotFound();
 }
 if (isset($_SERVER['HTTP_IF_MODIFIED_SINCE'])) {
-    $imagem = ZCliente::getImagemPeloID(intval($_GET['cliente']), true);
+    $imagem = Cliente::getImagemPeloID(intval($_GET['cliente']), true);
     if (strtotime($_SERVER['HTTP_IF_MODIFIED_SINCE']) >= strtotime($imagem['dataatualizacao'])) {
         header('HTTP/1.0 304 Not Modified');
         header('Cache-Control: max-age=12096000, public');
@@ -40,7 +40,7 @@ if (isset($_SERVER['HTTP_IF_MODIFIED_SINCE'])) {
         exit;
     }
 }
-$imagem = ZCliente::getImagemPeloID(intval($_GET['cliente']));
+$imagem = Cliente::getImagemPeloID(intval($_GET['cliente']));
 $imagebytes = $imagem['imagem'];
 if ($imagebytes == null) {
     exitNotFound();

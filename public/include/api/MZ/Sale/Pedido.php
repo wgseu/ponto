@@ -798,9 +798,20 @@ class Pedido extends \MZ\Database\Helper
         }
         if (is_null($this->getTipo())) {
             $errors['tipo'] = 'O tipo não pode ser vazio';
-        }
-        if (!Validator::checkInSet($this->getTipo(), self::getTipoOptions(), true)) {
+        } elseif (!Validator::checkInSet($this->getTipo(), self::getTipoOptions(), true)) {
             $errors['tipo'] = 'O tipo é inválido';
+        }
+        if (is_null($this->getMesaID()) && $this->getTipo() == self::TIPO_MESA) {
+            $errors['mesaid'] = 'A mesa não foi informada';
+        } elseif (!is_null($this->getMesaID()) &&
+            !in_array($this->getTipo(), [self::TIPO_MESA, self::TIPO_COMANDA])
+        ) {
+            $errors['mesaid'] = 'Esse tipo de venda não aceita informar mesa';
+        }
+        if (is_null($this->getComandaID()) && $this->getTipo() == self::TIPO_COMANDA) {
+            $errors['comandaid'] = 'A comanda não foi informada';
+        } elseif (!is_null($this->getComandaID()) && $this->getTipo() != self::TIPO_COMANDA) {
+            $errors['comandaid'] = 'Esse tipo de venda não aceita informar comanda';
         }
         if (is_null($this->getEstado())) {
             $errors['estado'] = 'O estado não pode ser vazio';
@@ -824,6 +835,73 @@ class Pedido extends \MZ\Database\Helper
             throw new \MZ\Exception\ValidationException($errors);
         }
         return $this->toArray();
+    }
+
+    public function validaAcesso($operador)
+    {
+        if ($this->getTipo() == self::TIPO_MESA) {
+            if (!$operador->has(Permissao::NOME_PEDIDOMESA)) {
+                throw new \Exception('Você não tem permissão para acessar mesas');
+            }
+        } elseif ($this->getTipo() == self::TIPO_COMANDA) {
+            if (!$operador->has(Permissao::NOME_PEDIDOCOMANDA)) {
+                throw new \Exception('Você não tem permissão para acessar comandas');
+            }
+        } elseif ($this->getTipo() == self::TIPO_ENTREGA) {
+            if (!$operador->has(Permissao::NOME_ENTREGAPEDIDOS)) {
+                throw new \Exception('Você não tem permissão para criar pedidos para entrega');
+            } elseif (!$operador->has(Permissao::ENTREGAADICIONAR) && $this->exists()) {
+                throw new \Exception('Você não tem permissão para adicionar produtos no pedido para entrega');
+            }
+        } else {
+            // AVULSA
+            if (!$operador->has(Permissao::NOME_PAGAMENTO)) {
+                throw new \Exception('Você não tem permissão para criar pedidos para balcão');
+            }
+        }
+        if (!$this->exists()) {
+            return;
+        }
+        if (!in_array($this->getTipo(), [self::TIPO_MESA, self::TIPO_COMANDA])) {
+            return;
+        }
+        if ($this->getFuncionarioID() == $operador->getID()) {
+            return;
+        }
+        if ($this->getTipo() == self::TIPO_MESA && !$operador->has(Permissao::NOME_MESAS)) {
+            $cliente = $this->findFuncionarioID()->findClienteID();
+            $msg = sprintf(
+                'Apenas o(a) funcionário(a) "%s" poderá realizar pedidos para essa mesa.',
+                $cliente->getAssinatura()
+            );
+            throw new \Exception($msg);
+        }
+        if ($this->getTipo() == self::TIPO_COMANDA && !$operador->has(Permissao::NOME_COMANDAS)) {
+            $cliente = $this->findFuncionarioID()->findClienteID();
+            $msg = sprintf(
+                'Apenas o(a) funcionário(a) "%s" poderá realizar pedidos para essa comanda.',
+                $cliente->getAssinatura()
+            );
+            throw new \Exception($msg);
+        }
+    }
+
+    public function checkSaldo($subtotal)
+    {
+        if ($this->getTipo() == self::TIPO_COMANDA && is_boolean_config('Comandas', 'PrePaga')) {
+            $itens_total = $this->getTotalItens();
+            $total = $subtotal + $itens_total;
+            $pagamentos_total = $this->getTotalPagamentos();
+            $restante = $itens_total - $pagamentos_total;
+            $msg = 'Saldo insuficiente para a realização do pedido, Necessário: %s, Saldo atual: %s';
+            if ($total > $pagamentos_total) {
+                throw new \Exception(sprintf(
+                    $msg,
+                    \MZ\Util\Mask::money($subtotal, true),
+                    \MZ\Util\Mask::money(-$restante, true)
+                ));
+            }
+        }
     }
 
     /**

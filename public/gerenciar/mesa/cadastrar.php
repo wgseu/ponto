@@ -21,28 +21,50 @@
 */
 require_once(dirname(__DIR__) . '/app.php');
 
-need_permission(PermissaoNome::CADASTROMESAS);
+use MZ\__TODO_NAMESPACE__\Mesa;
+
+need_permission(\Permissao::NOME_CADASTROMESAS, is_output('json'));
+$id = isset($_GET['id']) ? $_GET['id'] : null;
+$mesa = Mesa::findByID($id);
+$mesa->setID(null);
+
 $focusctrl = 'nome';
 $errors = [];
+$old_mesa = $mesa;
 if (is_post()) {
-    $mesa = new ZMesa($_POST);
+    $mesa = new Mesa($_POST);
     try {
-        $mesa = ZMesa::cadastrar($mesa);
-        Thunder::success('Mesa "'.$mesa->getNome().'" cadastrada com sucesso!', true);
+        $mesa->filter($old_mesa);
+        $mesa->insert();
+        $old_mesa->clean($mesa);
+        $msg = sprintf(
+            'Mesa "%s" cadastrada com sucesso!',
+            $mesa->getNome()
+        );
+        if (is_output('json')) {
+            json(null, ['item' => $mesa->publish(), 'msg' => $msg]);
+        }
+        \Thunder::success($msg, true);
         redirect('/gerenciar/mesa/');
-    } catch (ValidationException $e) {
-        $errors = $e->getErrors();
-    } catch (Exception $e) {
-        $errors['unknow'] = $e->getMessage();
+    } catch (\Exception $e) {
+        $mesa->clean($old_mesa);
+        if ($e instanceof \MZ\Exception\ValidationException) {
+            $errors = $e->getErrors();
+        }
+        if (is_output('json')) {
+            json($e->getMessage(), null, ['errors' => $errors]);
+        }
+        \Thunder::error($e->getMessage());
+        foreach ($errors as $key => $value) {
+            $focusctrl = $key;
+            break;
+        }
     }
-    foreach ($errors as $key => $value) {
-        $focusctrl = $key;
-        Thunder::error($value);
-        break;
-    }
+} elseif (is_output('json')) {
+    json('Nenhum dado foi enviado');
 } else {
-    $mesa = new ZMesa();
-    $mesa->setID(ZMesa::getProximoID());
+    $mesa = new Mesa();
+    $mesa->setID(Mesa::getProximoID());
     $mesa->setNome('Mesa ' . $mesa->getID());
     $mesa->setAtiva('Y');
 }

@@ -23,15 +23,15 @@ require_once(dirname(__DIR__) . '/app.php');
 
 need_owner();
 $id = $_GET['id'];
-$funcao = ZFuncao::getPeloID($id);
+$funcao = Funcao::findByID($id);
 if (is_null($funcao->getID())) {
-    Thunder::warning('A função de id "'.$id.'" não existe!');
+    \Thunder::warning('A função de id "'.$id.'" não existe!');
     redirect('/gerenciar/funcao/');
 }
 try {
-    ZFuncao::excluir($id);
-    Thunder::success('Função "' . $funcao->getDescricao() . '" excluída com sucesso!', true);
+    Funcao::excluir($id);
+    \Thunder::success('Função "' . $funcao->getDescricao() . '" excluída com sucesso!', true);
 } catch (Exception $e) {
-    Thunder::error('Não foi possível excluir a função "' . $funcao->getDescricao() . '"!');
+    \Thunder::error('Não foi possível excluir a função "' . $funcao->getDescricao() . '"!');
 }
 redirect('/gerenciar/funcao/');

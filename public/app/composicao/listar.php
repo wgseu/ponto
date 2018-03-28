@@ -28,7 +28,7 @@ $limite = isset($_GET['limite'])?intval($_GET['limite']):null;
 if (!is_null($limite) && $limite < 1) {
     $limite = null;
 }
-$composicoes = ZComposicao::getTodasDaComposicaoIDEx(
+$composicoes = Composicao::getTodasDaComposicaoIDEx(
     strval(isset($_GET['busca'])?$_GET['busca']:null),
     isset($_GET['produto'])?$_GET['produto']:null,
     intval(isset($_GET['selecionaveis'])?$_GET['selecionaveis']:0) != 0,

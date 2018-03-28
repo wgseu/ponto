@@ -21,16 +21,16 @@
 */
 require_once(dirname(__DIR__) . '/app.php');
 
-need_permission(PermissaoNome::CADASTROCONTAS, is_output('json'));
+need_permission(Permissao::NOME_CADASTROCONTAS, is_output('json'));
 
 $limite = trim($_GET['limite']);
 if (!is_numeric($limite) || $limite > 100 || $limite < 0) {
     $limite = 10;
 }
 $superiores = isset($_GET['superior'])? $_GET['superior'] == 'Y': false;
-$count = ZClassificacao::getCount($superiores, $_GET['classificacao'], $_GET['query']);
+$count = Classificacao::getCount($superiores, $_GET['classificacao'], $_GET['query']);
 list($pagesize, $offset, $pagestring) = pagestring($count, $limite);
-$classificacoes = ZClassificacao::getTodas($superiores, $_GET['classificacao'], $_GET['query'], $offset, $pagesize);
+$classificacoes = Classificacao::getTodas($superiores, $_GET['classificacao'], $_GET['query'], $offset, $pagesize);
 
 if (is_output('json')) {
     $_classificacoes = [];
@@ -39,7 +39,7 @@ if (is_output('json')) {
     }
     json(['status' => 'ok', 'items' => $_classificacoes]);
 }
-$classificacoes_sup = ZClassificacao::getTodas(true);
+$classificacoes_sup = Classificacao::getTodas(true);
 $_classificacao_names = [];
 foreach ($classificacoes_sup as $classificacao) {
     $_classificacao_names[$classificacao->getID()] = $classificacao->getDescricao();

@@ -21,11 +21,11 @@
 */
 require_once(dirname(__DIR__) . '/app.php');
 
-need_permission(PermissaoNome::CADASTROFORMASPAGTO);
+need_permission(Permissao::NOME_CADASTROFORMASPAGTO);
 
-$count = ZFormaPagto::getCount($_GET['query'], $_GET['tipo'], $_GET['estado']);
+$count = FormaPagto::getCount($_GET['query'], $_GET['tipo'], $_GET['estado']);
 list($pagesize, $offset, $pagestring) = pagestring($count, 10);
-$formas_de_pagamento = ZFormaPagto::getTodos($_GET['query'], $_GET['tipo'], $_GET['estado'], $offset, $pagesize);
+$formas_de_pagamento = FormaPagto::getTodos($_GET['query'], $_GET['tipo'], $_GET['estado'], $offset, $pagesize);
 
 $estados = [
     'Y' => 'Ativos',

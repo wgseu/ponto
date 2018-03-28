@@ -21,51 +21,51 @@
 */
 require_once(dirname(__DIR__) . '/app.php');
 
-need_permission(PermissaoNome::CADASTROCLIENTES);
+need_permission(Permissao::NOME_CADASTROCLIENTES);
 $id = $_GET['id'];
-$cliente = ZCliente::getPeloID($id);
+$cliente = Cliente::findByID($id);
 if (is_null($cliente->getID())) {
     $msg = 'O cliente de id "'.$id.'" não existe!';
     if (is_output('json')) {
         json($msg);
     }
-    Thunder::warning($msg);
+    \Thunder::warning($msg);
     redirect('/gerenciar/cliente/');
 }
 if ($cliente->getID() == $__empresa__->getID() &&
-    !have_permission(PermissaoNome::ALTERARCONFIGURACOES)) {
+    !$login_funcionario->has(Permissao::NOME_ALTERARCONFIGURACOES)) {
     $msg = 'Você não tem permissão para excluir essa empresa!';
     if (is_output('json')) {
         json($msg);
     }
-    Thunder::warning($msg);
+    \Thunder::warning($msg);
     redirect('/gerenciar/cliente/');
 }
-$funcionario = ZFuncionario::getPeloClienteID($cliente->getID());
+$funcionario = Funcionario::findByClienteID($cliente->getID());
 if (!is_null($funcionario->getID()) && (
-    (!have_permission(PermissaoNome::CADASTROFUNCIONARIOS) &&
+    (!$login_funcionario->has(Permissao::NOME_CADASTROFUNCIONARIOS) &&
      $login_funcionario->getID() != $funcionario->getID()) ||
-    ( have_permission(PermissaoNome::CADASTROFUNCIONARIOS, $funcionario) &&
+    ( have_permission(Permissao::NOME_CADASTROFUNCIONARIOS, $funcionario) &&
      $login_funcionario->getID() != $funcionario->getID() && !is_owner()) ) ) {
     $msg = 'Você não tem permissão para excluir esse cliente!';
     if (is_output('json')) {
         json($msg);
     }
-    Thunder::warning($msg);
+    \Thunder::warning($msg);
     redirect('/gerenciar/cliente/');
 }
 try {
-    ZCliente::excluir($id);
+    Cliente::excluir($id);
     $msg = 'Cliente "' . $cliente->getNomeCompleto() . '" excluído com sucesso!';
     if (is_output('json')) {
         json('msg', $msg);
     }
-    Thunder::success($msg, true);
+    \Thunder::success($msg, true);
 } catch (Exception $e) {
     $msg = 'Não foi possível excluir o cliente "' . $cliente->getNomeCompleto() . '"!';
     if (is_output('json')) {
         json($msg);
     }
-    Thunder::error($msg);
+    \Thunder::error($msg);
 }
 redirect('/gerenciar/cliente/');

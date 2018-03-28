@@ -24,7 +24,8 @@
  */
 namespace MZ\Integrator;
 
-use \Curl\Curl;
+use Curl\Curl;
+use MZ\Employee\Funcionario;
 
 /**
  * Kromax Service and Task
@@ -32,6 +33,28 @@ use \Curl\Curl;
 class Kromax extends \MZ\System\Task
 {
     const NAME = 'kromax';
+
+    const CARDS = [
+        'RAM' => ['name' => 'AMERICAN EXPRESS (Crédito)'],
+        'DNREST' => ['name' => 'DINERS (Crédito)'],
+        'REC' => ['name' => 'ELO (Crédito)'],
+        'RHIP' => ['name' => 'HIPERCARD (Crédito)'],
+        'RDREST' => ['name' => 'MASTERCARD (Crédito)'],
+        'VSREST' => ['name' => 'VISA (Crédito)'],
+        'RED' => ['name' => 'ELO (Débito)'],
+        'MEREST' => ['name' => 'MASTERCARD (Débito)'],
+        'VIREST' => ['name' => 'VISA (Débito)'],
+        'VVREST' => ['name' => 'ALELO REFEICAO (Vale)'],
+        'RSODEX' => ['name' => 'SODEXO (Vale)'],
+        'TRE' => ['name' => 'TICKET RESTAURANTE (Vale)'],
+        'VALECA' => ['name' => 'VALE CARD (Vale)'],
+        'VR_SMA' => ['name' => 'VR SMART (Vale)'],
+        'AM' => ['name' => 'AMEX (Online)'],
+        'DNR' => ['name' => 'DINERS (Online)'],
+        'ELO' => ['name' => 'ELO (Online)'],
+        'MC' => ['name' => 'MASTERCARD (Online)'],
+        'VIS' => ['name' => 'VISA (Online)']
+    ];
 
     /**
      * Execute task
@@ -41,7 +64,10 @@ class Kromax extends \MZ\System\Task
     {
         $dom = $this->request();
         $this->setPending(0);
-        $order = new \MZ\Association\Order($this->getData());
+        $order = new \MZ\Association\Order();
+        $order->setIntegracao($this->getData());
+        $order->setCardNames(self::CARDS);
+        $order->setEmployee(Funcionario::findByID(1));
         if (!$this->checkReponse($dom, 0)) {
             // TODO atualizar tabela de produtos por outro meio mais rápido
             $product = new \MZ\Association\Product($this->getData());

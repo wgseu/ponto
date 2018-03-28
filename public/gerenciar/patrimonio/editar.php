@@ -21,17 +21,24 @@
 */
 require_once(dirname(__DIR__) . '/app.php');
 
-need_permission(PermissaoNome::CADASTROPATRIMONIO);
-$patrimonio = ZPatrimonio::getPeloID($_GET['id']);
-if (is_null($patrimonio->getID())) {
-    Thunder::warning('O patrimônio de id "'.$_GET['id'].'" não existe!');
+use MZ\__TODO_NAMESPACE__\Patrimonio;
+
+need_permission(\Permissao::NOME_CADASTROPATRIMONIO, is_output('json'));
+$id = isset($_GET['id']) ? $_GET['id'] : null;
+$patrimonio = Patrimonio::findByID($id);
+if (!$patrimonio->exists()) {
+    $msg = 'O patrimônio informado não existe!';
+    if (is_output('json')) {
+        json($msg);
+    }
+    \Thunder::warning($msg);
     redirect('/gerenciar/patrimonio/');
 }
 $focusctrl = 'descricao';
 $errors = [];
 $old_patrimonio = $patrimonio;
 if (is_post()) {
-    $patrimonio = new ZPatrimonio($_POST);
+    $patrimonio = new Patrimonio($_POST);
     try {
         $patrimonio->setID($old_patrimonio->getID());
         $patrimonio->setQuantidade(moneyval($patrimonio->getQuantidade()));
@@ -47,14 +54,23 @@ if (is_post()) {
         } elseif (trim($patrimonio->getImagemAnexada()) != '') { // evita sobrescrever
             $patrimonio->setImagemAnexada($old_patrimonio->getImagemAnexada());
         }
-        $patrimonio = ZPatrimonio::atualizar($patrimonio);
+        $patrimonio->filter($old_patrimonio);
+        $patrimonio->update();
+        $old_patrimonio->clean($patrimonio);
         // exclui a foto do bem antiga
         if (!is_null($old_patrimonio->getImagemAnexada()) &&
             $patrimonio->getImagemAnexada() != $old_patrimonio->getImagemAnexada() &&
             !is_local_path($old_patrimonio->getImagemAnexada())) {
             unlink(WWW_ROOT . get_image_url($old_patrimonio->getImagemAnexada(), 'patrimonio'));
         }
-        Thunder::success('Patrimônio "'.$patrimonio->getDescricao().'" atualizado com sucesso!', true);
+        $msg = sprintf(
+            'Patrimônio "%s" atualizado com sucesso!',
+            $patrimonio->getDescricao()
+        );
+        if (is_output('json')) {
+            json(null, ['item' => $patrimonio->publish(), 'msg' => $msg]);
+        }
+        \Thunder::success($msg, true);
         redirect('/gerenciar/patrimonio/');
     } catch (ValidationException $e) {
         $errors = $e->getErrors();
@@ -69,7 +85,7 @@ if (is_post()) {
     $patrimonio->setImagemAnexada($old_patrimonio->getImagemAnexada());
     foreach ($errors as $key => $value) {
         $focusctrl = $key;
-        Thunder::error($value);
+        \Thunder::error($value);
         break;
     }
 }

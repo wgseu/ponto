@@ -23,34 +23,14 @@ require_once(dirname(dirname(__DIR__)) . '/app.php');
 
 use MZ\System\Integracao;
 
-need_permission(PermissaoNome::CADASTROCARTOES);
+need_permission(Permissao::NOME_CADASTROCARTOES);
 
 $integracao = Integracao::findByAcessoURL(\MZ\Integrator\Kromax::NAME);
-$codigos = [
-    'RAM' => ['name' => 'AMERICAN EXPRESS (Crédito)'],
-    'DNREST' => ['name' => 'DINERS (Crédito)'],
-    'REC' => ['name' => 'ELO (Crédito)'],
-    'RHIP' => ['name' => 'HIPERCARD (Crédito)'],
-    'RDREST' => ['name' => 'MASTERCARD (Crédito)'],
-    'VSREST' => ['name' => 'VISA (Crédito)'],
-    'RED' => ['name' => 'ELO (Débito)'],
-    'MEREST' => ['name' => 'MASTERCARD (Débito)'],
-    'VIREST' => ['name' => 'VISA (Débito)'],
-    'VVREST' => ['name' => 'ALELO REFEICAO (Vale)'],
-    'RSODEX' => ['name' => 'SODEXO (Vale)'],
-    'TRE' => ['name' => 'TICKET RESTAURANTE (Vale)'],
-    'VALECA' => ['name' => 'VALE CARD (Vale)'],
-    'VR_SMA' => ['name' => 'VR SMART (Vale)'],
-    'AM' => ['name' => 'AMEX (Online)'],
-    'DNR' => ['name' => 'DINERS (Online)'],
-    'ELO' => ['name' => 'ELO (Online)'],
-    'MC' => ['name' => 'MASTERCARD (Online)'],
-    'VIS' => ['name' => 'VISA (Online)']
-];
+$codigos = \MZ\Integrator\Kromax::CARDS;
 $association = new \MZ\Association\Card($integracao, $codigos);
 
 if (isset($_GET['action']) && is_post() && $_GET['action'] == 'update') {
-    need_permission(PermissaoNome::CADASTROCARTOES, true);
+    need_permission(Permissao::NOME_CADASTROCARTOES, true);
     try {
         $codigo = isset($_POST['codigo'])?$_POST['codigo']:null;
         $id = array_key_exists('id', $_POST)?$_POST['id']:null;
@@ -61,5 +41,5 @@ if (isset($_GET['action']) && is_post() && $_GET['action'] == 'update') {
     }
 }
 $codigos = $association->findAll();
-$_imagens = \ZCartao::getImages();
+$_imagens = Cartao::getImages();
 include template('gerenciar_cartao_associar');

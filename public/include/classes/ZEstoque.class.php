@@ -257,14 +257,14 @@ class ZEstoque
 
     public static function getPeloID($id)
     {
-        $query = DB::$pdo->from('Estoque')
+        $query = \DB::$pdo->from('Estoque')
                          ->where(['id' => $id]);
-        return new ZEstoque($query->fetch());
+        return new Estoque($query->fetch());
     }
 
     public static function getUltimoPrecoCompra($produtoid)
     {
-        $query = DB::$pdo->from('Estoque')
+        $query = \DB::$pdo->from('Estoque')
                          ->select(null)
                          ->select('precocompra')
                          ->where([
@@ -278,7 +278,7 @@ class ZEstoque
 
     public static function getEntradaDisponivel(&$estoque)
     {
-        $query = DB::$pdo->from('Estoque ee')
+        $query = \DB::$pdo->from('Estoque ee')
                          ->select('ROUND(ee.quantidade + SUM(COALESCE(es.quantidade, 0)), 6) as quantidaderestante')
                          ->leftJoin('Estoque es ON es.entradaid = ee.id AND es.cancelado = ?', 'N')
                          ->where([
@@ -291,7 +291,7 @@ class ZEstoque
                          ->having('quantidaderestante > 0')
                          ->limit(1);
         $array = $query->fetch();
-        $_estoque = new ZEstoque($array);
+        $_estoque = new Estoque($array);
         $_estoque->setQuantidade($array['quantidaderestante']);
         return $_estoque;
     }
@@ -396,12 +396,12 @@ class ZEstoque
         $_estoque = $estoque->toArray();
         self::validarCampos($_estoque);
         try {
-            $_estoque['id'] = DB::$pdo->insertInto('Estoque')->values($_estoque)->execute();
+            $_estoque['id'] = \DB::$pdo->insertInto('Estoque')->values($_estoque)->execute();
         } catch (Exception $e) {
             self::handleException($e);
             throw $e;
         }
-        return self::getPeloID($_estoque['id']);
+        return self::findByID($_estoque['id']);
     }
 
     public static function atualizar($estoque)
@@ -429,7 +429,7 @@ class ZEstoque
             'datamovimento',
         ];
         try {
-            $query = DB::$pdo->update('Estoque');
+            $query = \DB::$pdo->update('Estoque');
             $query = $query->set(array_intersect_key($_estoque, array_flip($campos)));
             $query = $query->where('id', $_estoque['id']);
             $query->execute();
@@ -437,15 +437,15 @@ class ZEstoque
             self::handleException($e);
             throw $e;
         }
-        return self::getPeloID($_estoque['id']);
+        return self::findByID($_estoque['id']);
     }
 
     public static function excluir($id)
     {
         if (!$id) {
-            throw new Exception('Não foi possível excluir o estoque, o id do estoque não foi informado');
+            throw new \Exception('Não foi possível excluir o estoque, o id do estoque não foi informado');
         }
-        $query = DB::$pdo->deleteFrom('Estoque')
+        $query = \DB::$pdo->deleteFrom('Estoque')
                          ->where(['id' => $id]);
         return $query->execute();
     }
@@ -453,41 +453,41 @@ class ZEstoque
     public function cancelar()
     {
         if ($this->isCancelado()) {
-            throw new Exception('A entrada no estoque para esse produto já está cancelada');
+            throw new \Exception('A entrada no estoque para esse produto já está cancelada');
         }
-        $query = DB::$pdo->from('Estoque')
+        $query = \DB::$pdo->from('Estoque')
                          ->where('entradaid', $this->getID());
         if ($query->count() > 0) {
-            throw new Exception('Não foi possível cancelar a entrada no estoque, uma ou mais vendas já foram realizadas');
+            throw new \Exception('Não foi possível cancelar a entrada no estoque, uma ou mais vendas já foram realizadas');
         }
-        $query = DB::$pdo->update('Estoque')
+        $query = \DB::$pdo->update('Estoque')
                          ->set('cancelado', 'Y')
                          ->where('id', $this->getID());
         try {
             $query->execute();
         } catch (Exception $e) {
-            $produto = ZProduto::getPeloID($estoque->getProdutoID());
-            throw new Exception('Não foi possível cancelar a entrada do produto "' . $produto->getDescricao() . '"!');
+            $produto = $estoque->findProdutoID();
+            throw new \Exception('Não foi possível cancelar a entrada do produto "' . $produto->getDescricao() . '"!');
         }
         $this->setCancelado('Y');
     }
 
     public static function inserir($estoque)
     {
-        $setor = ZSetor::getPeloNome('Vendas');
+        $setor = Setor::findByNome('Vendas');
         if (is_null($setor->getID())) {
-            $setor = ZSetor::getPrimeiro();
+            $setor = Setor::getPrimeiro();
         }
         $estoque->setTransacaoID(null);
         $estoque->setEntradaID(null);
-        $estoque->setTipoMovimento(EstoqueTipoMovimento::ENTRADA);
+        $estoque->setTipoMovimento(EstoqueTipo::MOVIMENTO_ENTRADA);
         $estoque->setCancelado('N');
         $estoque->setSetorID($setor->getID());
-        $produto = ZProduto::getPeloID($estoque->getProdutoID());
+        $produto = $estoque->findProdutoID();
         if (is_null($produto->getID())) {
             throw new ValidationException(['produtoid' => 'O produto informado não existe']);
         }
-        if ($produto->getTipo() != ProdutoTipo::PRODUTO) {
+        if ($produto->getTipo() != Produto::TIPO_PRODUTO) {
             throw new ValidationException(['produtoid' => 'O produto informado não é do tipo produto']);
         }
         if (!is_null($produto->getSetorEstoqueID())) {
@@ -498,37 +498,37 @@ class ZEstoque
 
     public static function retirar(&$produto_pedido, $ignore_composicoes)
     {
-        $setor = ZSetor::getPeloNome('Vendas');
+        $setor = Setor::findByNome('Vendas');
         if (is_null($setor->getID())) {
-            $setor = ZSetor::getPrimeiro();
+            $setor = Setor::getPrimeiro();
         }
-        $estoque = new ZEstoque();
+        $estoque = new Estoque();
         $estoque->setTransacaoID($produto_pedido->getID());
         $estoque->setFuncionarioID($produto_pedido->getFuncionarioID());
-        $estoque->setTipoMovimento(EstoqueTipoMovimento::VENDA);
+        $estoque->setTipoMovimento(EstoqueTipo::MOVIMENTO_VENDA);
         $estoque->setCancelado('N');
         $stack = new SplStack();
-        $composicao = new ZComposicao();
+        $composicao = new Composicao();
         $composicao->setProdutoID($produto_pedido->getProdutoID());
         $composicao->setQuantidade($produto_pedido->getQuantidade());
         $stack->push($composicao);
         while (!$stack->isEmpty()) {
             $composicao = $stack->pop();
-            $produto = ZProduto::getPeloID($composicao->getProdutoID());
-            if ($produto->getTipo() == ProdutoTipo::PACOTE) {
+            $produto = $composicao->findProdutoID();
+            if ($produto->getTipo() == Produto::TIPO_PACOTE) {
                 break;
             }
-            if ($produto->getTipo() == ProdutoTipo::COMPOSICAO) {
-                $composicoes = ZComposicao::getTodasDaComposicaoID(null, $composicao->getProdutoID());
+            if ($produto->getTipo() == Produto::TIPO_COMPOSICAO) {
+                $composicoes = Composicao::getTodasDaComposicaoID(null, $composicao->getProdutoID());
                 foreach ($composicoes as $_composicao) {
                     $_composicao->setQuantidade($_composicao->getQuantidade() * $composicao->getQuantidade());
                     $existe = isset($ignore_composicoes[$_composicao->getID()]);
-                    if ($existe && $_composicao->getTipo() != ComposicaoTipo::ADICIONAL) {
+                    if ($existe && $_composicao->getTipo() != Composicao::TIPO_ADICIONAL) {
                         unset($ignore_composicoes[$_composicao->getID()]);
-                    } elseif ($existe && $_composicao->getTipo() == ComposicaoTipo::ADICIONAL) {
+                    } elseif ($existe && $_composicao->getTipo() == Composicao::TIPO_ADICIONAL) {
                         unset($ignore_composicoes[$_composicao->getID()]);
                         $stack->push($_composicao);
-                    } elseif ($_composicao->getTipo() != ComposicaoTipo::ADICIONAL) {
+                    } elseif ($_composicao->getTipo() != Composicao::TIPO_ADICIONAL) {
                         $stack->push($_composicao);
                     }
                 }
@@ -555,7 +555,7 @@ class ZEstoque
                     $entrada->setQuantidade(-$restante);
                     $entrada->setPrecoCompra(0.0000);
                 } else {
-                    throw new Exception('Não há estoque para o produto "' . $produto->getDescricao() . '"');
+                    throw new \Exception('Não há estoque para o produto "' . $produto->getDescricao() . '"');
                 }
             }
             if ($entrada->getQuantidade() < -$estoque->getQuantidade()) {
@@ -579,7 +579,7 @@ class ZEstoque
 
     private static function initSearch($produto_id, $fornecedor_id, $tipo)
     {
-        $query = DB::$pdo->from('Estoque')
+        $query = \DB::$pdo->from('Estoque')
                          ->orderBy('id DESC');
         if (is_numeric($produto_id)) {
             $query = $query->where('produtoid', $produto_id);
@@ -603,7 +603,7 @@ class ZEstoque
         $_estoques = $query->fetchAll();
         $estoques = [];
         foreach ($_estoques as $estoque) {
-            $estoques[] = new ZEstoque($estoque);
+            $estoques[] = new Estoque($estoque);
         }
         return $estoques;
     }
@@ -616,7 +616,7 @@ class ZEstoque
 
     private static function initSearchDoProdutoID($produto_id)
     {
-        return   DB::$pdo->from('Estoque')
+        return   \DB::$pdo->from('Estoque')
                          ->where(['produtoid' => $produto_id])
                          ->orderBy('id ASC');
     }
@@ -630,7 +630,7 @@ class ZEstoque
         $_estoques = $query->fetchAll();
         $estoques = [];
         foreach ($_estoques as $estoque) {
-            $estoques[] = new ZEstoque($estoque);
+            $estoques[] = new Estoque($estoque);
         }
         return $estoques;
     }
@@ -643,7 +643,7 @@ class ZEstoque
 
     private static function initSearchDaTransacaoID($transacao_id)
     {
-        return   DB::$pdo->from('Estoque')
+        return   \DB::$pdo->from('Estoque')
                          ->where(['transacaoid' => $transacao_id])
                          ->orderBy('id ASC');
     }
@@ -657,7 +657,7 @@ class ZEstoque
         $_estoques = $query->fetchAll();
         $estoques = [];
         foreach ($_estoques as $estoque) {
-            $estoques[] = new ZEstoque($estoque);
+            $estoques[] = new Estoque($estoque);
         }
         return $estoques;
     }
@@ -670,7 +670,7 @@ class ZEstoque
 
     private static function initSearchDoFornecedorID($fornecedor_id)
     {
-        return   DB::$pdo->from('Estoque')
+        return   \DB::$pdo->from('Estoque')
                          ->where(['fornecedorid' => $fornecedor_id])
                          ->orderBy('id ASC');
     }
@@ -684,7 +684,7 @@ class ZEstoque
         $_estoques = $query->fetchAll();
         $estoques = [];
         foreach ($_estoques as $estoque) {
-            $estoques[] = new ZEstoque($estoque);
+            $estoques[] = new Estoque($estoque);
         }
         return $estoques;
     }
@@ -697,7 +697,7 @@ class ZEstoque
 
     private static function initSearchDoFuncionarioID($funcionario_id)
     {
-        return   DB::$pdo->from('Estoque')
+        return   \DB::$pdo->from('Estoque')
                          ->where(['funcionarioid' => $funcionario_id])
                          ->orderBy('id ASC');
     }
@@ -711,7 +711,7 @@ class ZEstoque
         $_estoques = $query->fetchAll();
         $estoques = [];
         foreach ($_estoques as $estoque) {
-            $estoques[] = new ZEstoque($estoque);
+            $estoques[] = new Estoque($estoque);
         }
         return $estoques;
     }
@@ -724,7 +724,7 @@ class ZEstoque
 
     private static function initSearchDoSetorID($setor_id)
     {
-        return   DB::$pdo->from('Estoque')
+        return   \DB::$pdo->from('Estoque')
                          ->where(['setorid' => $setor_id])
                          ->orderBy('id ASC');
     }
@@ -738,7 +738,7 @@ class ZEstoque
         $_estoques = $query->fetchAll();
         $estoques = [];
         foreach ($_estoques as $estoque) {
-            $estoques[] = new ZEstoque($estoque);
+            $estoques[] = new Estoque($estoque);
         }
         return $estoques;
     }
@@ -751,7 +751,7 @@ class ZEstoque
 
     private static function initSearchDaEntradaID($entrada_id)
     {
-        return   DB::$pdo->from('Estoque')
+        return   \DB::$pdo->from('Estoque')
                          ->where(['entradaid' => $entrada_id])
                          ->orderBy('id ASC');
     }
@@ -765,7 +765,7 @@ class ZEstoque
         $_estoques = $query->fetchAll();
         $estoques = [];
         foreach ($_estoques as $estoque) {
-            $estoques[] = new ZEstoque($estoque);
+            $estoques[] = new Estoque($estoque);
         }
         return $estoques;
     }

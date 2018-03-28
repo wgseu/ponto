@@ -23,7 +23,7 @@ require_once(dirname(__DIR__) . '/app.php');
 
 use MZ\Location\Cidade;
 
-need_permission(\PermissaoNome::CADASTROCIDADES, is_output('json'));
+need_permission(\Permissao::NOME_CADASTROCIDADES, is_output('json'));
 $id = isset($_GET['id'])?$_GET['id']:null;
 $cidade = Cidade::findByID($id);
 $cidade->setID(null);

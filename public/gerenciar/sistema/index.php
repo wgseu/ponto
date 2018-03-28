@@ -21,12 +21,12 @@
 */
 require_once(dirname(__DIR__) . '/app.php');
 
-need_permission(PermissaoNome::ALTERARCONFIGURACOES);
+need_permission(Permissao::NOME_ALTERARCONFIGURACOES);
 
 $tab_empresa = 'active';
 $cliente = $__empresa__;
 if (is_null($cliente->getID())) {
-	$cliente->setTipo(\ClienteTipo::JURIDICA);
+	$cliente->setTipo(Cliente::TIPO_JURIDICA);
 }
 $localizacao = \MZ\Location\Localizacao::find(['clienteid' => $__empresa__->getID()]);
 $bairro = $localizacao->findBairroID();

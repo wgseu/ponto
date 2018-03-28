@@ -23,14 +23,14 @@ require_once(dirname(__DIR__) . '/app.php');
 
 use MZ\Wallet\Banco;
 
-need_permission(PermissaoNome::PAGAMENTO);
+need_permission(Permissao::NOME_PAGAMENTO);
 
-$count = ZFolhaCheque::getCount($_GET['bancoid'], $_GET['clienteid'], $_GET['estado']);
+$count = FolhaCheque::getCount($_GET['bancoid'], $_GET['clienteid'], $_GET['estado']);
 list($pagesize, $offset, $pagestring) = pagestring($count, 10);
-$folhas_de_cheques = ZFolhaCheque::getTodos($_GET['bancoid'], $_GET['clienteid'], $_GET['estado'], $offset, $pagesize);
+$folhas_de_cheques = FolhaCheque::getTodos($_GET['bancoid'], $_GET['clienteid'], $_GET['estado'], $offset, $pagesize);
 
 $_banco = Banco::findByID($_GET['bancoid']);
-$_cliente = ZCliente::getPeloID($_GET['clienteid']);
+$_cliente = Cliente::findByID($_GET['clienteid']);
 $estados = [
     'N' => 'A compensar',
     'Y' => 'Recolhido',

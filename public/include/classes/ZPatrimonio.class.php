@@ -294,16 +294,16 @@ class ZPatrimonio
 
     public static function getPeloID($id)
     {
-        $query = DB::$pdo->from('Patrimonios')
+        $query = \DB::$pdo->from('Patrimonios')
                          ->where(['id' => $id]);
-        return new ZPatrimonio($query->fetch());
+        return new Patrimonio($query->fetch());
     }
 
     public static function getPeloNumeroEstado($numero, $estado)
     {
-        $query = DB::$pdo->from('Patrimonios')
+        $query = \DB::$pdo->from('Patrimonios')
                          ->where(['numero' => $numero, 'estado' => $estado]);
-        return new ZPatrimonio($query->fetch());
+        return new Patrimonio($query->fetch());
     }
 
     private static function validarCampos(&$patrimonio)
@@ -408,12 +408,12 @@ class ZPatrimonio
         $_patrimonio = $patrimonio->toArray();
         self::validarCampos($_patrimonio);
         try {
-            $_patrimonio['id'] = DB::$pdo->insertInto('Patrimonios')->values($_patrimonio)->execute();
+            $_patrimonio['id'] = \DB::$pdo->insertInto('Patrimonios')->values($_patrimonio)->execute();
         } catch (Exception $e) {
             self::handleException($e);
             throw $e;
         }
-        return self::getPeloID($_patrimonio['id']);
+        return self::findByID($_patrimonio['id']);
     }
 
     public static function atualizar($patrimonio)
@@ -440,7 +440,7 @@ class ZPatrimonio
             'dataatualizacao',
         ];
         try {
-            $query = DB::$pdo->update('Patrimonios');
+            $query = \DB::$pdo->update('Patrimonios');
             $query = $query->set(array_intersect_key($_patrimonio, array_flip($campos)));
             $query = $query->where('id', $_patrimonio['id']);
             $query->execute();
@@ -448,22 +448,22 @@ class ZPatrimonio
             self::handleException($e);
             throw $e;
         }
-        return self::getPeloID($_patrimonio['id']);
+        return self::findByID($_patrimonio['id']);
     }
 
     public static function excluir($id)
     {
         if (!$id) {
-            throw new Exception('Não foi possível excluir o patrimonio, o id do patrimonio não foi informado');
+            throw new \Exception('Não foi possível excluir o patrimonio, o id do patrimonio não foi informado');
         }
-        $query = DB::$pdo->deleteFrom('Patrimonios')
+        $query = \DB::$pdo->deleteFrom('Patrimonios')
                          ->where(['id' => $id]);
         return $query->execute();
     }
 
     private static function initSearch($empresa, $fornecedor, $estado, $busca)
     {
-        $query = DB::$pdo->from('Patrimonios')
+        $query = \DB::$pdo->from('Patrimonios')
                          ->orderBy('descricao ASC');
         if (is_numeric($empresa)) {
             $query = $query->where('empresaid', $empresa);
@@ -491,7 +491,7 @@ class ZPatrimonio
         $_patrimonios = $query->fetchAll();
         $patrimonios = [];
         foreach ($_patrimonios as $patrimonio) {
-            $patrimonios[] = new ZPatrimonio($patrimonio);
+            $patrimonios[] = new Patrimonio($patrimonio);
         }
         return $patrimonios;
     }
@@ -504,7 +504,7 @@ class ZPatrimonio
 
     private static function initSearchDoFornecedorID($fornecedor_id)
     {
-        return   DB::$pdo->from('Patrimonios')
+        return   \DB::$pdo->from('Patrimonios')
                          ->where(['fornecedorid' => $fornecedor_id])
                          ->orderBy('id ASC');
     }
@@ -518,7 +518,7 @@ class ZPatrimonio
         $_patrimonios = $query->fetchAll();
         $patrimonios = [];
         foreach ($_patrimonios as $patrimonio) {
-            $patrimonios[] = new ZPatrimonio($patrimonio);
+            $patrimonios[] = new Patrimonio($patrimonio);
         }
         return $patrimonios;
     }
@@ -531,7 +531,7 @@ class ZPatrimonio
 
     private static function initSearchDaEmpresaID($empresa_id)
     {
-        return   DB::$pdo->from('Patrimonios')
+        return   \DB::$pdo->from('Patrimonios')
                          ->where(['empresaid' => $empresa_id])
                          ->orderBy('id ASC');
     }
@@ -545,7 +545,7 @@ class ZPatrimonio
         $_patrimonios = $query->fetchAll();
         $patrimonios = [];
         foreach ($_patrimonios as $patrimonio) {
-            $patrimonios[] = new ZPatrimonio($patrimonio);
+            $patrimonios[] = new Patrimonio($patrimonio);
         }
         return $patrimonios;
     }

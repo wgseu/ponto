@@ -23,7 +23,7 @@ require_once(dirname(__DIR__) . '/app.php');
 
 use MZ\Location\Estado;
 
-need_permission(\PermissaoNome::CADASTROESTADOS, is_output('json'));
+need_permission(\Permissao::NOME_CADASTROESTADOS, is_output('json'));
 $id = isset($_GET['id'])?$_GET['id']:null;
 $estado = Estado::findByID($id);
 $estado->setID(null);

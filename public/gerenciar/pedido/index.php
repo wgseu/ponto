@@ -21,7 +21,7 @@
 */
 require_once(dirname(__DIR__) . '/app.php');
 
-need_permission(PermissaoNome::PAGAMENTO);
+need_permission(Permissao::NOME_PAGAMENTO);
 
 $estado = trim($_GET['estado']);
 $cancelado = null;
@@ -39,7 +39,7 @@ $data_inicio = $data_inicio===false?null:$data_inicio->getTimestamp();
 $data_fim = date_create_from_format('d/m/Y', $_GET['fim']);
 $data_fim = $data_fim===false?null:$data_fim->getTimestamp();
 
-$count = ZPedido::getCount(
+$count = Pedido::getCount(
     $_GET['query'],
     $_GET['clienteid'],
     $_GET['funcionarioid'],
@@ -53,7 +53,7 @@ $count = ZPedido::getCount(
     null
 );
 list($pagesize, $offset, $pagestring) = pagestring($count, 10);
-$pedidos = ZPedido::getTodos(
+$pedidos = Pedido::getTodos(
     $_GET['query'],
     $_GET['clienteid'],
     $_GET['funcionarioid'],
@@ -93,6 +93,6 @@ $_pedido_icon = [
     'Entrega' => 48,
 ];
 
-$_cliente = ZCliente::getPeloID($_GET['clienteid']);
-$_funcionario = ZFuncionario::getPeloID($_GET['funcionarioid']);
+$_cliente = Cliente::findByID($_GET['clienteid']);
+$_funcionario = Funcionario::findByID($_GET['funcionarioid']);
 include template('gerenciar_pedido_index');

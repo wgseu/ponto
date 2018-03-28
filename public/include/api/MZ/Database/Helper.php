@@ -85,8 +85,8 @@ abstract class Helper
 
     /**
      * Translate SQL exception into application exception
-     * @param  Exception $e exception to translate into a readable error
-     * @return Exception new exception translated
+     * @param  \Exception $e exception to translate into a readable error
+     * @return \Exception new exception translated
      */
     protected function translate($e)
     {

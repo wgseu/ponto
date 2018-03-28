@@ -130,7 +130,7 @@ class ZUnidade
         $index = intval(log10($conteudo));
         $remain = $conteudo / pow(10, $index);
         if (!array_key_exists($index, $grandezas)) {
-            throw new Exception('Não existe grandeza para o conteudo '.$conteudo.' da unidade '.$unidade, 404);
+            throw new \Exception('Não existe grandeza para o conteudo '.$conteudo.' da unidade '.$unidade, 404);
         }
         $unidade = $grandezas[$index].$unidade;
         return [
@@ -159,16 +159,16 @@ class ZUnidade
 
     public static function getPeloID($id)
     {
-        $query = DB::$pdo->from('Unidades')
+        $query = \DB::$pdo->from('Unidades')
                          ->where(['id' => $id]);
-        return new ZUnidade($query->fetch());
+        return new Unidade($query->fetch());
     }
 
     public static function getPelaSigla($sigla)
     {
-        $query = DB::$pdo->from('Unidades')
+        $query = \DB::$pdo->from('Unidades')
                          ->where(['sigla' => $sigla]);
-        return new ZUnidade($query->fetch());
+        return new Unidade($query->fetch());
     }
 
     private static function validarCampos(&$unidade)
@@ -206,12 +206,12 @@ class ZUnidade
         $_unidade = $unidade->toArray();
         self::validarCampos($_unidade);
         try {
-            $_unidade['id'] = DB::$pdo->insertInto('Unidades')->values($_unidade)->execute();
+            $_unidade['id'] = \DB::$pdo->insertInto('Unidades')->values($_unidade)->execute();
         } catch (Exception $e) {
             self::handleException($e);
             throw $e;
         }
-        return self::getPeloID($_unidade['id']);
+        return self::findByID($_unidade['id']);
     }
 
     public static function atualizar($unidade)
@@ -227,7 +227,7 @@ class ZUnidade
             'sigla',
         ];
         try {
-            $query = DB::$pdo->update('Unidades');
+            $query = \DB::$pdo->update('Unidades');
             $query = $query->set(array_intersect_key($_unidade, array_flip($campos)));
             $query = $query->where('id', $_unidade['id']);
             $query->execute();
@@ -235,22 +235,22 @@ class ZUnidade
             self::handleException($e);
             throw $e;
         }
-        return self::getPeloID($_unidade['id']);
+        return self::findByID($_unidade['id']);
     }
 
     public static function excluir($id)
     {
         if (!$id) {
-            throw new Exception('Não foi possível excluir a unidade, o id da unidade não foi informado');
+            throw new \Exception('Não foi possível excluir a unidade, o id da unidade não foi informado');
         }
-        $query = DB::$pdo->deleteFrom('Unidades')
+        $query = \DB::$pdo->deleteFrom('Unidades')
                          ->where(['id' => $id]);
         return $query->execute();
     }
 
     private static function initSearch($busca)
     {
-        $query = DB::$pdo->from('Unidades')
+        $query = \DB::$pdo->from('Unidades')
                          ->orderBy('nome ASC');
         $busca = trim($busca);
         if ($busca != '') {
@@ -268,7 +268,7 @@ class ZUnidade
         $_unidades = $query->fetchAll();
         $unidades = [];
         foreach ($_unidades as $unidade) {
-            $unidades[] = new ZUnidade($unidade);
+            $unidades[] = new Unidade($unidade);
         }
         return $unidades;
     }

@@ -869,6 +869,15 @@ class Produto extends \MZ\Database\Helper
         return $this;
     }
 
+    /* Obtém a descrição do produto abreviada */
+    public function getAbreviado()
+    {
+        if (trim($this->abreviacao) == '') {
+            return $this->descricao;
+        }
+        return $this->abreviacao;
+    }
+
     /**
      * Get relative imagem path or default imagem
      * @param boolean $default If true return default image, otherwise check field

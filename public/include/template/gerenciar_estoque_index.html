@@ -12,13 +12,13 @@
 					${Utility::Option($tipos, $_GET['tipo'], 'Todos')}
 				</select>
 			</div>
-<!--${$_cliente_fornecedor = ZCliente::getPeloID($_fornecedor->getEmpresaID())}-->
+<!--${$_cliente_fornecedor = $_fornecedor->findEmpresaID()}-->
 			<input type="hidden" id="fornecedorid" name="fornecedorid" data-nome="{$_cliente_fornecedor->getNome()}" value="{$_fornecedor->getID()}">
 			<div class="form-group col-lg-3 col-md-6 col-sm-6 col-xs-12">
 				<label for="fornecedor">Fornecedor: <span class="identifier">${\MZ\Util\Mask::phone($_cliente_fornecedor->getFone(1))}<span></label>
 				<input type="text" id="fornecedor" class="form-control" value="{$_cliente_fornecedor->getNome()}">
 			</div>
-<!--${$_categoria = ZCategoria::getPeloID($_produto->getCategoriaID())}-->
+<!--${$_categoria = $_produto->findCategoriaID()}-->
 			<input type="hidden" id="produtoid" name="produtoid" data-descricao="{$_produto->getDescricao()}" value="{$_produto->getID()}">
 			<div class="form-group col-lg-3 col-md-6 col-sm-6 col-xs-12">
 				<label for="produto">Produto: <span class="identifier">{$_categoria->getDescricao()}<span></label>
@@ -59,17 +59,17 @@
 						<tbody>
 <!--{loop $estoques $estoque}-->
 							<tr ${$estoque->isCancelado()?'class="active"':''}>
-<!--${$_produto = ZProduto::getPeloID($estoque->getProdutoID())}-->
+<!--${$_produto = $estoque->findProdutoID()}-->
 								<td class="product-cell">
 									<strong><a href="/gerenciar/produto/editar?id={$_produto->getID()}" title="Editar produto '{$_produto->getDescricao()}'"><img src="${get_image_url($_produto->getImagem(), 'produto', 'produto.png')}" height="48" alt="Imagem" title="Imagem"/>{$_produto->getDescricao()}</a></strong>
 									<small>{$_produto->getAbreviacao()}</small></td>
-<!--${$_fornecedor = ZFornecedor::getPeloID($estoque->getFornecedorID())}-->
-<!--${$_empresa = ZCliente::getPeloID($_fornecedor->getEmpresaID())}-->
+<!--${$_fornecedor = $estoque->findFornecedorID()}-->
+<!--${$_empresa = $_fornecedor->findEmpresaID()}-->
 								<td class="product-cell">
 <!--{if !is_null($_fornecedor->getID())}-->
 									<strong><a href="/gerenciar/fornecedor/editar?id={$_fornecedor->getID()}" title="Editar fornecedor '{$_empresa->getNomeCompleto()}'"><img src="${get_image_url($_empresa->getImagem(), 'cliente', 'empresa.png')}" height="48" alt="Foto" title="Foto"/>{$_empresa->getNomeCompleto()}</a></strong>
 <!--{/if}-->
-<!--${$_setor = ZSetor::getPeloID($estoque->getSetorID())}-->
+<!--${$_setor = $estoque->findSetorID()}-->
 									<small title="Setor de entrada/saída"><a href="/gerenciar/setor/editar?id={$_setor->getID()}" title="Editar setor '{$_setor->getNome()}'">{$_setor->getNome()}</a></small>
 								</td>
 								<td>{$tipos[$estoque->getTipoMovimento()]}</td>
@@ -84,7 +84,7 @@
 								<td>${is_null($estoque->getDataMovimento())?'':date('d/m/Y H:i', strtotime($estoque->getDataMovimento()))}</td>
 								<td class="text-center">
 									<ul class="nav panel_toolbox">
-<!--{if $estoque->getTipoMovimento() == EstoqueTipoMovimento::ENTRADA && !$estoque->isCancelado()}-->
+<!--{if $estoque->getTipoMovimento() == Estoque::TIPO_MOVIMENTO_ENTRADA && !$estoque->isCancelado()}-->
 										<li>
 											<a href="/gerenciar/estoque/cancelar?id={$estoque->getID()}" title="Cancelar estoque '{$_produto->getDescricao()}'" class="ajaxlink" ask="Deseja cancelar a entrada no estoque '{$_produto->getDescricao()}'?"><i class="fa fa-ban"></i></a>
 										</li>

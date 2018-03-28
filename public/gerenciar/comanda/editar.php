@@ -23,10 +23,10 @@ require_once(dirname(__DIR__) . '/app.php');
 
 use MZ\Sale\Comanda;
 
-need_permission(PermissaoNome::CADASTROCOMANDAS);
+need_permission(Permissao::NOME_CADASTROCOMANDAS);
 $comanda = Comanda::findByID($_GET['id']);
 if (is_null($comanda->getID())) {
-    Thunder::warning('A comanda de id "'.$_GET['id'].'" não existe!');
+    \Thunder::warning('A comanda de id "'.$_GET['id'].'" não existe!');
     redirect('/gerenciar/comanda/');
 }
 $focusctrl = 'nome';
@@ -37,17 +37,30 @@ if (is_post()) {
     try {
         $comanda->filter($old_comanda);
         $comanda->update();
-        Thunder::success('Comanda "'.$comanda->getNome().'" atualizada com sucesso!', true);
+        $msg = sprintf(
+            'Comanda "%s" atualizada com sucesso!',
+            $comanda->getNome()
+        );
+        if (is_output('json')) {
+            json(null, ['item' => $comanda->publish(), 'msg' => $msg]);
+        }
+        \Thunder::success($msg, true);
         redirect('/gerenciar/comanda/');
-    } catch (ValidationException $e) {
-        $errors = $e->getErrors();
-    } catch (Exception $e) {
-        $errors['unknow'] = $e->getMessage();
+    } catch (\Exception $e) {
+        $__replace__me__->clean($old___replace__me__);
+        if ($e instanceof \MZ\Exception\ValidationException) {
+            $errors = $e->getErrors();
+        }
+        if (is_output('json')) {
+            json($e->getMessage(), null, ['errors' => $errors]);
+        }
+        \Thunder::error($e->getMessage());
+        foreach ($errors as $key => $value) {
+            $focusctrl = $key;
+            break;
+        }
     }
-    foreach ($errors as $key => $value) {
-        $focusctrl = $key;
-        Thunder::error($value);
-        break;
-    }
+} elseif (is_output('json')) {
+    json('Nenhum dado foi enviado');
 }
 include template('gerenciar_comanda_editar');

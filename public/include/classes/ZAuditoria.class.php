@@ -163,9 +163,9 @@ class ZAuditoria
 
     public static function getPeloID($id)
     {
-        $query = DB::$pdo->from('Auditoria')
+        $query = \DB::$pdo->from('Auditoria')
                          ->where(['id' => $id]);
-        return new ZAuditoria($query->fetch());
+        return new Auditoria($query->fetch());
     }
 
     private static function validarCampos(&$auditoria)
@@ -207,17 +207,17 @@ class ZAuditoria
         $_auditoria = $auditoria->toArray();
         self::validarCampos($_auditoria);
         try {
-            $_auditoria['id'] = DB::$pdo->insertInto('Auditoria')->values($_auditoria)->execute();
+            $_auditoria['id'] = \DB::$pdo->insertInto('Auditoria')->values($_auditoria)->execute();
         } catch (Exception $e) {
             self::handleException($e);
             throw $e;
         }
-        return self::getPeloID($_auditoria['id']);
+        return self::findByID($_auditoria['id']);
     }
 
     private static function initSearch($busca, $funcionario_id, $tipo, $prioridade)
     {
-        $query = DB::$pdo->from('Auditoria')
+        $query = \DB::$pdo->from('Auditoria')
                          ->orderBy('id DESC');
         $busca = trim($busca);
         if ($busca != '') {
@@ -253,7 +253,7 @@ class ZAuditoria
         $_auditorias = $query->fetchAll();
         $auditorias = [];
         foreach ($_auditorias as $auditoria) {
-            $auditorias[] = new ZAuditoria($auditoria);
+            $auditorias[] = new Auditoria($auditoria);
         }
         return $auditorias;
     }
@@ -266,7 +266,7 @@ class ZAuditoria
 
     private static function initSearchDoFuncionarioID($funcionario_id)
     {
-        return   DB::$pdo->from('Auditoria')
+        return   \DB::$pdo->from('Auditoria')
                          ->where(['funcionarioid' => $funcionario_id])
                          ->orderBy('id ASC');
     }
@@ -280,7 +280,7 @@ class ZAuditoria
         $_auditorias = $query->fetchAll();
         $auditorias = [];
         foreach ($_auditorias as $auditoria) {
-            $auditorias[] = new ZAuditoria($auditoria);
+            $auditorias[] = new Auditoria($auditoria);
         }
         return $auditorias;
     }
@@ -293,7 +293,7 @@ class ZAuditoria
 
     private static function initSearchDoAutorizadorID($autorizador_id)
     {
-        return   DB::$pdo->from('Auditoria')
+        return   \DB::$pdo->from('Auditoria')
                          ->where(['autorizadorid' => $autorizador_id])
                          ->orderBy('id ASC');
     }
@@ -307,7 +307,7 @@ class ZAuditoria
         $_auditorias = $query->fetchAll();
         $auditorias = [];
         foreach ($_auditorias as $auditoria) {
-            $auditorias[] = new ZAuditoria($auditoria);
+            $auditorias[] = new Auditoria($auditoria);
         }
         return $auditorias;
     }

@@ -30,9 +30,9 @@ $lembrar = strval($_POST['lembrar']);
 $metodo = strval($_POST['metodo']);
 $token = strval($_POST['token']);
 if ($metodo == 'desktop') {
-    $cliente = ZCliente::getPeloToken($token);
+    $cliente = Cliente::findByToken($token);
 } else {
-    $cliente = ZCliente::getPeloLoginSenha($usuario, $senha);
+    $cliente = Cliente::findByLoginSenha($usuario, $senha);
 }
 if (is_null($cliente->getID())) {
     if ($metodo == 'desktop') {
@@ -41,15 +41,15 @@ if (is_null($cliente->getID())) {
         $msg = 'Usuário ou senha incorretos!';
     }
     if ($weblogin) {
-        Thunder::error($msg);
+        \Thunder::error($msg);
         exit(include template('conta_entrar'));
     } else {
         json($msg);
     }
 }
-$funcionario = ZFuncionario::getPeloClienteID($cliente->getID());
+$funcionario = Funcionario::findByClienteID($cliente->getID());
 if ((is_null($weblogin) || !$weblogin) && !is_null($funcionario->getID())) {
-    if (!ZAcesso::temPermissao($funcionario->getFuncaoID(), PermissaoNome::SISTEMA)) {
+    if (!Acesso::temPermissao($funcionario->getFuncaoID(), Permissao::NOME_SISTEMA)) {
         json('Você não tem permissão para acessar o sistema!');
     }
     try {
@@ -58,26 +58,26 @@ if ((is_null($weblogin) || !$weblogin) && !is_null($funcionario->getID())) {
         json($e->getMessage());
     }
 } else {
-    $dispositivo = new ZDispositivo();
+    $dispositivo = new Dispositivo();
 }
 
 if (is_login()) {
-    ZAutenticacao::logout();
+    Authentication::logout();
 }
 $login_cliente = $cliente;
 $login_cliente_id = $cliente->getID();
 $login_funcionario = $funcionario;
 $login_funcionario_id = $funcionario->getID();
-ZAutenticacao::login($cliente->getID());
+Authentication::login($cliente->getID());
 if ($lembrar == 'true') {
-    ZAutenticacao::lembrar($login_cliente);
+    Authentication::lembrar($login_cliente);
 }
 if ($weblogin) {
     $url = is_null($_POST['redirect'])?'/':strval($_POST['redirect']);
     redirect($url);
 }
 $status = ['status' => 'ok', 'msg' => 'Login efetuado com sucesso!'];
-$status['versao'] = ZSistema::VERSAO;
+$status['versao'] = Sistema::VERSAO;
 $status['cliente'] = $login_cliente->getID();
 $status['info'] = [
     'usuario' => [
@@ -97,5 +97,5 @@ if (is_manager()) {
 } else {
     $status['acesso'] = 'visitante';
 }
-$status['permissoes'] = ZAcesso::getPermissoes($login_funcionario->getID());
+$status['permissoes'] = Acesso::getPermissoes($login_funcionario->getID());
 json($status);

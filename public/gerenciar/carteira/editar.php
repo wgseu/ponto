@@ -23,10 +23,10 @@ require_once(dirname(__DIR__) . '/app.php');
 
 use MZ\Wallet\Carteira;
 
-need_permission(PermissaoNome::CADASTROCARTEIRAS);
+need_permission(Permissao::NOME_CADASTROCARTEIRAS);
 $carteira = Carteira::findByID($_GET['id']);
 if (is_null($carteira->getID())) {
-    Thunder::warning('A carteira de id "'.$_GET['id'].'" não existe!');
+    \Thunder::warning('A carteira de id "'.$_GET['id'].'" não existe!');
     redirect('/gerenciar/carteira/');
 }
 $focusctrl = 'descricao';
@@ -37,18 +37,32 @@ if (is_post()) {
     try {
         $carteira->filter($old_carteira);
         $carteira->update();
-        Thunder::success('Carteira "'.$carteira->getDescricao().'" atualizada com sucesso!', true);
+        $old_carteira->clean($carteira);
+        $msg = sprintf(
+            'Carteira "%s" atualizada com sucesso!',
+            $carteira->getDescricao()
+        );
+        if (is_output('json')) {
+            json(null, ['item' => $carteira->publish(), 'msg' => $msg]);
+        }
+        \Thunder::success($msg, true);
         redirect('/gerenciar/carteira/');
-    } catch (ValidationException $e) {
-        $errors = $e->getErrors();
-    } catch (Exception $e) {
-        $errors['unknow'] = $e->getMessage();
+    } catch (\Exception $e) {
+        $carteira->clean($old_carteira);
+        if ($e instanceof \MZ\Exception\ValidationException) {
+            $errors = $e->getErrors();
+        }
+        if (is_output('json')) {
+            json($e->getMessage(), null, ['errors' => $errors]);
+        }
+        \Thunder::error($e->getMessage());
+        foreach ($errors as $key => $value) {
+            $focusctrl = $key;
+            break;
+        }
     }
-    foreach ($errors as $key => $value) {
-        $focusctrl = $key;
-        Thunder::error($value);
-        break;
-    }
+} elseif (is_output('json')) {
+    json('Nenhum dado foi enviado');
 }
 $_banco = $carteira->findBancoID();
 include template('gerenciar_carteira_editar');

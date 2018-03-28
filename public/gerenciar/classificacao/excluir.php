@@ -21,17 +21,17 @@
 */
 require_once(dirname(__DIR__) . '/app.php');
 
-need_permission(PermissaoNome::CADASTROCONTAS);
+need_permission(Permissao::NOME_CADASTROCONTAS);
 $id = $_GET['id'];
-$classificacao = ZClassificacao::getPeloID($id);
+$classificacao = Classificacao::findByID($id);
 if (is_null($classificacao->getID())) {
-    Thunder::warning('A classificação de id "'.$id.'" não existe!');
+    \Thunder::warning('A classificação de id "'.$id.'" não existe!');
     redirect('/gerenciar/classificacao/');
 }
 try {
-    ZClassificacao::excluir($id);
-    Thunder::success('Classificação "' . $classificacao->getDescricao() . '" excluída com sucesso!', true);
+    Classificacao::excluir($id);
+    \Thunder::success('Classificação "' . $classificacao->getDescricao() . '" excluída com sucesso!', true);
 } catch (Exception $e) {
-    Thunder::error('Não foi possível excluir a classificação "' . $classificacao->getDescricao() . '"!');
+    \Thunder::error('Não foi possível excluir a classificação "' . $classificacao->getDescricao() . '"!');
 }
 redirect('/gerenciar/classificacao/');

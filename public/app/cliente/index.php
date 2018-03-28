@@ -24,15 +24,19 @@ require_once(dirname(dirname(__DIR__)) . '/app.php');
 if (!is_login()) {
     json('Usuário não autenticado!');
 }
-$_cliente = $_POST['cliente'];
+$_cliente = isset($_POST['cliente']) ? $_POST['cliente'] : [];
+$old_cliente = new Cliente();
 try {
-    if (!have_permission(PermissaoNome::PEDIDOMESA) && !have_permission(PermissaoNome::PEDIDOCOMANDA) &&
-        !have_permission(PermissaoNome::PAGAMENTO) && !have_permission(PermissaoNome::CADASTROCLIENTES)) {
-        throw new Exception('Você não tem permissão para cadastrar clientes');
+    if (!$login_funcionario->has(Permissao::NOME_PEDIDOMESA) && !$login_funcionario->has(Permissao::NOME_PEDIDOCOMANDA) &&
+		!$login_funcionario->has(Permissao::NOME_PAGAMENTO) && !$login_funcionario->has(Permissao::NOME_CADASTROCLIENTES)
+	) {
+        throw new \Exception('Você não tem permissão para cadastrar clientes');
     }
-    $cliente = new ZCliente($_cliente);
-    $cliente = ZCliente::cadastrar($cliente);
-    $_cliente = $cliente->toArray();
+    $cliente = new Cliente($_cliente);
+    $cliente->filter($old_cliente);
+    $cliente->insert();
+    $cliente->clean($old_cliente);
+    $_cliente = $cliente->publish();
     $_cliente['imagemurl'] = get_image_url($_cliente['imagem'], 'cliente', null);
     json(['status' => 'ok', 'cliente' => $_cliente]);
 } catch (Exception $e) {

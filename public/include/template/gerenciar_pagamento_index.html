@@ -6,8 +6,8 @@
 			<h3>Pagamentos</h3>
 		</div>
 		<form method="get" action="/gerenciar/pagamento/" id="search-form">
-<!--${$_funcao = ZFuncao::getPeloID($_funcionario->getFuncaoID())}-->
-<!--${$_cliente_func = ZCliente::getPeloID($_funcionario->getClienteID())}-->
+<!--${$_funcao = $_funcionario->findFuncaoID()}-->
+<!--${$_cliente_func = $_funcionario->findClienteID()}-->
 			<input type="hidden" id="funcionarioid" name="funcionarioid" data-content="{$_cliente_func->getNomeCompleto()}" value="{$_funcionario->getID()}">
 			<div class="form-group col-lg-4 col-md-5 col-sm-5 col-xs-12">
 				<label for="funcionario">Funcionário(a): <span class="identifier">{$_funcao->getDescricao()}<span></label>
@@ -83,16 +83,16 @@
 <!--{loop $pagamentos $pagamento}-->
 							<tr ${$pagamento->isCancelado()?'class="danger"':($pagamento->isAtivo()?'':'class="warning"')}>
 								<td>
-<!--${$_forma_pagto = ZFormaPagto::getPeloID($pagamento->getFormaPagtoID())}-->
+<!--${$_forma_pagto = $pagamento->findFormaPagtoID()}-->
 									<div class="cell-icon pagamento-icons" style="background-position: -{$_pagamento_icon[$_forma_pagto->getTipo()]}px 0px;"></div>
-<!--${$_conta = ZConta::getPeloID($pagamento->getPagtoContaID())}-->
-<!--${$_pedido = ZPedido::getPeloID($pagamento->getPedidoID())}-->
+<!--${$_conta = $pagamento->findPagtoContaID()}-->
+<!--${$_pedido = $pagamento->findPedidoID()}-->
 <!--{if is_null($pagamento->getPedidoID())}-->
 									<a href="/gerenciar/conta/editar?id={$_conta->getID()}" title="Editar conta '{$_conta->getDescricao()}'">${$_conta->getID() != 1?$_conta->getDescricao():$pagamento->getDetalhes()}</a>
 <!--{else}-->
-<!--${$_comanda = \MZ\Sale\Comanda::findByID($_pedido->getComandaID())}-->
-<!--${$_mesa = ZMesa::getPeloID($_pedido->getMesaID())}-->
-									<a href="/gerenciar/pedido/?query={$_pedido->getID()}" title="Visualizar pedido '{$_pedido->getID()}'">Pedido {$_pedido->getID()}: ${$_pedido->getTipo() == PedidoTipo::ENTREGA && is_null($_pedido->getLocalizacaoID())?'Viagem':($_pedido->getTipo() == PedidoTipo::MESA?$_mesa->getNome():($_pedido->getTipo() == PedidoTipo::COMANDA?$_comanda->getNome():$_tipo_names[$_pedido->getTipo()]))}</a>
+<!--${$_comanda = $_pedido->findComandaID()}-->
+<!--${$_mesa = $_pedido->findMesaID()}-->
+									<a href="/gerenciar/pedido/?query={$_pedido->getID()}" title="Visualizar pedido '{$_pedido->getID()}'">Pedido {$_pedido->getID()}: ${$_pedido->getTipo() == Pedido::TIPO_ENTREGA && is_null($_pedido->getLocalizacaoID())?'Viagem':($_pedido->getTipo() == PedidoTipo::MESA?$_mesa->getNome():($_pedido->getTipo() == PedidoTipo::COMANDA?$_comanda->getNome():$_tipo_names[$_pedido->getTipo()]))}</a>
 <!--{/if}-->
 								</td>
 								<td class="text-right">
@@ -102,24 +102,24 @@
 <!--{/if}-->
 								</td>
 								<td class="text-center"><strong>
-<!--{if $_forma_pagto->getTipo() != FormaPagtoTipo::CARTAO}-->
+<!--{if $_forma_pagto->getTipo() != \MZ\Payment\FormaPagto::TIPO_CARTAO}-->
 									<a href="/gerenciar/forma_pagto/editar?id={$_forma_pagto->getID()}" title="Editar forma de pagamento '{$_forma_pagto->getDescricao()}'">{$_forma_pagto->getDescricao()}</a>
 <!--{else}-->
-<!--${$_cartao = ZCartao::getPeloID($pagamento->getCartaoID())}-->
+<!--${$_cartao = $pagamento->findCartaoID()}-->
 									<a href="/gerenciar/cartao/editar?id={$_cartao->getID()}" title="Editar cartão '{$_cartao->getDescricao()}'">Cartão {$_cartao->getDescricao()}</a>
 <!--{/if}-->
 								</strong>
-<!--${$_carteira = \MZ\Wallet\Carteira::findByID($pagamento->getCarteiraID())}-->
+<!--${$_carteira = $pagamento->findCarteiraID()}-->
 								<small><a href="/gerenciar/carteira/editar?id={$_carteira->getID()}" title="Editar carteira '{$_carteira->getDescricao()}'">{$_carteira->getDescricao()}</a></small></td>
-<!--${$_funcionario = ZFuncionario::getPeloID($pagamento->getFuncionarioID())}-->
-<!--${$_cliente = ZCliente::getPeloID($_funcionario->getClienteID())}-->
+<!--${$_funcionario = $pagamento->findFuncionarioID()}-->
+<!--${$_cliente = $_funcionario->findClienteID()}-->
 								<td class="text-center"><a href="/gerenciar/funcionario/editar?id={$_funcionario->getID()}" title="Editar funcionário '{$_cliente->getNomeCompleto()}'">{$_cliente->getNomeCompleto()}</a></td>
 								<td class="text-center">
 <!--{if $pagamento->getParcelas() > 0}-->
 									{$pagamento->getParcelas()} x ${\MZ\Util\Mask::money($pagamento->getValorParcela(), true)}</td>
 <!--{/if}-->
 								</td>
-<!--${$_movimentacao = ZMovimentacao::getPeloID($pagamento->getMovimentacaoID())}-->
+<!--${$_movimentacao = $pagamento->findMovimentacaoID()}-->
 								<td class="text-center">
 									<strong>{$_movimentacao->getID()}</strong>
 									<small>Sessão {$_movimentacao->getSessaoID()}</small>

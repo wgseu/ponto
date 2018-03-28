@@ -103,16 +103,16 @@ class ZFornecedor
 
     public static function getPeloID($id)
     {
-        $query = DB::$pdo->from('Fornecedores')
+        $query = \DB::$pdo->from('Fornecedores')
                          ->where(['id' => $id]);
-        return new ZFornecedor($query->fetch());
+        return new Fornecedor($query->fetch());
     }
 
     public static function getPelaEmpresaID($empresa_id)
     {
-        $query = DB::$pdo->from('Fornecedores')
+        $query = \DB::$pdo->from('Fornecedores')
                          ->where(['empresaid' => $empresa_id]);
-        return new ZFornecedor($query->fetch());
+        return new Fornecedor($query->fetch());
     }
 
     private static function validarCampos(&$fornecedor)
@@ -121,8 +121,8 @@ class ZFornecedor
         if (!is_numeric($fornecedor['empresaid'])) {
             $erros['empresaid'] = 'A empresa não foi informada';
         } else {
-            $cliente = ZCliente::getPeloID($fornecedor['empresaid']);
-            if ($cliente->getTipo() != ClienteTipo::JURIDICA) {
+            $cliente = Cliente::findByID($fornecedor['empresaid']);
+            if ($cliente->getTipo() != Cliente::TIPO_JURIDICA) {
                 $erros['empresaid'] = 'A empresa deve ser do tipo jurídica';
             }
         }
@@ -152,12 +152,12 @@ class ZFornecedor
         $_fornecedor = $fornecedor->toArray();
         self::validarCampos($_fornecedor);
         try {
-            $_fornecedor['id'] = DB::$pdo->insertInto('Fornecedores')->values($_fornecedor)->execute();
+            $_fornecedor['id'] = \DB::$pdo->insertInto('Fornecedores')->values($_fornecedor)->execute();
         } catch (Exception $e) {
             self::handleException($e);
             throw $e;
         }
-        return self::getPeloID($_fornecedor['id']);
+        return self::findByID($_fornecedor['id']);
     }
 
     public static function atualizar($fornecedor)
@@ -172,7 +172,7 @@ class ZFornecedor
             'prazopagamento',
         ];
         try {
-            $query = DB::$pdo->update('Fornecedores');
+            $query = \DB::$pdo->update('Fornecedores');
             $query = $query->set(array_intersect_key($_fornecedor, array_flip($campos)));
             $query = $query->where('id', $_fornecedor['id']);
             $query->execute();
@@ -180,22 +180,22 @@ class ZFornecedor
             self::handleException($e);
             throw $e;
         }
-        return self::getPeloID($_fornecedor['id']);
+        return self::findByID($_fornecedor['id']);
     }
 
     public static function excluir($id)
     {
         if (!$id) {
-            throw new Exception('Não foi possível excluir o fornecedor, o id do fornecedor não foi informado');
+            throw new \Exception('Não foi possível excluir o fornecedor, o id do fornecedor não foi informado');
         }
-        $query = DB::$pdo->deleteFrom('Fornecedores')
+        $query = \DB::$pdo->deleteFrom('Fornecedores')
                          ->where(['id' => $id]);
         return $query->execute();
     }
 
     private static function initSearch($nome)
     {
-        $query = DB::$pdo->from('Fornecedores f')
+        $query = \DB::$pdo->from('Fornecedores f')
                          ->leftJoin('Clientes c ON c.id = f.empresaid');
         $nome = trim($nome);
         if ($nome == '') {
@@ -245,7 +245,7 @@ class ZFornecedor
         $_fornecedores = $query->fetchAll();
         $fornecedores = [];
         foreach ($_fornecedores as $fornecedor) {
-            $fornecedores[] = new ZFornecedor($fornecedor);
+            $fornecedores[] = new Fornecedor($fornecedor);
         }
         return $fornecedores;
     }
@@ -258,7 +258,7 @@ class ZFornecedor
 
     private static function initSearchDaEmpresaID($empresa_id)
     {
-        return   DB::$pdo->from('Fornecedores')
+        return   \DB::$pdo->from('Fornecedores')
                          ->where(['empresaid' => $empresa_id])
                          ->orderBy('id ASC');
     }
@@ -272,7 +272,7 @@ class ZFornecedor
         $_fornecedores = $query->fetchAll();
         $fornecedores = [];
         foreach ($_fornecedores as $fornecedor) {
-            $fornecedores[] = new ZFornecedor($fornecedor);
+            $fornecedores[] = new Fornecedor($fornecedor);
         }
         return $fornecedores;
     }

@@ -64,9 +64,9 @@
 						<tbody>
 <!--{loop $funcionarios $funcionario}-->
 							<tr ${$funcionario->isAtivo()?'':'class="active"'}>
-<!--${$_cliente = ZCliente::getPeloID($funcionario->getClienteID())}-->
+<!--${$_cliente = $funcionario->findClienteID()}-->
 								<td><a href="/gerenciar/cliente/editar?id={$_cliente->getID()}" title="Editar cliente '{$_cliente->getNomeCompleto()}'"><img src="${get_image_url($_cliente->getImagem(), 'cliente', 'cliente.png')}" class="${$_cliente->getTipo() == ClienteTipo::FISICA?'rounded':''}" height="48" alt="Foto" title="Foto"/><strong>{$_cliente->getNomeCompleto()}</strong></a></td>
-<!--${$_funcao = ZFuncao::getPeloID($funcionario->getFuncaoID())}-->
+<!--${$_funcao = $funcionario->findFuncaoID()}-->
 								<td><a href="/gerenciar/funcao/editar?id={$_funcao->getID()}" title="Editar função '{$_funcao->getDescricao()}'">{$_funcao->getDescricao()}</a></td>
 								<td>{$linguagens[$funcionario->getLinguagemID()]}</td>
 								<td class="text-center">

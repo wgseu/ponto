@@ -19,7 +19,7 @@
 	O Cliente adquire apenas o direito de usar o software e não adquire qualquer outros
 	direitos, expressos ou implícitos no GrandChef diferentes dos especificados nesta Licença.
 */
-class ZAutenticacao
+class Authentication
 {
     public static $cookie_name = 'ru';
 
@@ -27,14 +27,14 @@ class ZAutenticacao
     {
         $cliente_id = abs(intval(Session::Get('cliente_id')));
         if (!$cliente_id) {
-            $cliente = ZCliente::getPeloCookie(self::$cookie_name);
+            $cliente = Cliente::findByCookie(self::$cookie_name);
             if (!is_null($cliente->getID())) {
                 self::login($cliente->getID());
                 return $cliente;
             }
-            return new ZCliente();
+            return new Cliente();
         }
-        return ZCliente::getPeloID($cliente_id);
+        return Cliente::findByID($cliente_id);
     }
 
     public static function login($cliente_id)

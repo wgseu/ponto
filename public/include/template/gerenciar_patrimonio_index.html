@@ -11,7 +11,7 @@
 				<label for="empresa">Empresa: <span class="identifier">${\MZ\Util\Mask::phone($_empresa->getFone(1))}<span></label>
 				<input type="text" id="empresa" class="form-control" value="{$_empresa->getNome()}">
 			</div>
-<!--${$_cliente_fornecedor = ZCliente::getPeloID($_fornecedor->getEmpresaID())}-->
+<!--${$_cliente_fornecedor = $_fornecedor->findEmpresaID()}-->
 			<input type="hidden" id="fornecedorid" name="fornecedorid" data-nome="{$_cliente_fornecedor->getNome()}" value="{$_fornecedor->getID()}">
 			<div class="form-group col-lg-3 col-md-4 col-sm-4 col-xs-12">
 				<label for="fornecedor">Fornecedor: <span class="identifier">${\MZ\Util\Mask::phone($_cliente_fornecedor->getFone(1))}<span></label>
@@ -74,9 +74,9 @@
 								<td><a href="/gerenciar/patrimonio/editar?id={$patrimonio->getID()}" title="Editar patrimônio '{$patrimonio->getDescricao()}'"><img src="${get_image_url(is_local_path($patrimonio->getImagemAnexada())?null:$patrimonio->getImagemAnexada(), 'patrimonio', 'patrimonio.png')}" height="48" alt="Foto do bem" title="Foto do bem"/></a></td>
 								<td><strong>{$patrimonio->getDescricao()}</strong><small title="Número identificador do bem">{$patrimonio->getNumero()}</small></td>
 								<td class="text-center">{$patrimonio->getQuantidade()}</td>
-<!--${$_cliente = ZCliente::getPeloID($patrimonio->getEmpresaID())}-->
-<!--${$_fornecedor = ZFornecedor::getPeloID($patrimonio->getFornecedorID())}-->
-<!--${$_fornecedor_cli = ZCliente::getPeloID($_fornecedor->getEmpresaID())}-->
+<!--${$_cliente = $patrimonio->findEmpresaID()}-->
+<!--${$_fornecedor = $patrimonio->findFornecedorID()}-->
+<!--${$_fornecedor_cli = $_fornecedor->findEmpresaID()}-->
 								<td><strong><a href="/gerenciar/cliente/editar?id={$_cliente->getID()}" title="Editar cliente '{$_cliente->getNome()}'">{$_cliente->getNome()}</a></strong><small><a href="/gerenciar/fornecedor/editar?id={$_fornecedor->getID()}" title="Editar fornecedor '{$_fornecedor_cli->getNome()}'">{$_fornecedor_cli->getNome()}</a></small></td>
 								<td class="text-center" title="Altura x Largura x Comprimento">{$patrimonio->getAltura()} x {$patrimonio->getLargura()} x {$patrimonio->getComprimento()}</td>
 								<td class="text-center"><strong>{$_estado_names[$patrimonio->getEstado()]}</strong><small title="Data de atualização">${date('d/m/Y H:i', strtotime($patrimonio->getDataAtualizacao()))}</small></td>

@@ -23,7 +23,7 @@ require_once(dirname(__DIR__) . '/app.php');
 
 use MZ\Location\Pais;
 
-need_permission(\PermissaoNome::CADASTROPAISES, is_output('json'));
+need_permission(\Permissao::NOME_CADASTROPAISES, is_output('json'));
 $id = isset($_GET['id'])?$_GET['id']:null;
 $pais = Pais::findByID($id);
 if (!$pais->exists()) {

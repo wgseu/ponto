@@ -23,7 +23,7 @@ require_once(dirname(__DIR__) . '/app.php');
 
 use MZ\Location\Localizacao;
 
-need_permission(\PermissaoNome::CADASTROCLIENTES, true);
+need_permission(\Permissao::NOME_CADASTROCLIENTES, true);
 $id = isset($_GET['id'])?$_GET['id']:null;
 $localizacao = Localizacao::findByID($id);
 if (!$localizacao->exists()) {
@@ -31,7 +31,7 @@ if (!$localizacao->exists()) {
     json($msg);
 }
 if ($localizacao->getClienteID() == $__empresa__->getID() &&
-    !have_permission(PermissaoNome::ALTERARCONFIGURACOES)) {
+    !$login_funcionario->has(Permissao::NOME_ALTERARCONFIGURACOES)) {
     $msg = 'Você não tem permissão para alterar o endereço dessa empresa!';
     json($msg);
 }
@@ -55,7 +55,7 @@ if (is_post()) {
         \DB::Commit();
         try {
             if ($localizacao->getClienteID() == $__empresa__->getID()) {
-                $appsync = new AppSync();
+                $appsync = new \MZ\System\Synchronizer();
                 $appsync->enterpriseChanged();
             }
         } catch (\Exception $e) {

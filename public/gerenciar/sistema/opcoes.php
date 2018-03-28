@@ -1,7 +1,7 @@
 <?php
 require_once(dirname(dirname(__DIR__)) . '/app.php'); // main app file
 
-need_permission(PermissaoNome::ALTERARCONFIGURACOES, isset($_POST));
+need_permission(Permissao::NOME_ALTERARCONFIGURACOES, isset($_POST));
 
 $tab_opcoes = 'active';
 $opcoes_comportamento = [
@@ -26,12 +26,12 @@ $opcoes_comportamento = [
 if (is_post()) {
     try {
         if (!config_values_exists($opcoes_comportamento, $_POST['secao'], $_POST['chave'])) {
-            throw new Exception('A opção de comportamento informada não existe', 1);
+            throw new \Exception('A opção de comportamento informada não existe', 1);
         }
         set_boolean_config($_POST['secao'], $_POST['chave'], $_POST['marcado'] == 'Y');
         $__sistema__->salvarOpcoes($__options__);
         try {
-            $appsync = new AppSync();
+            $appsync = new \MZ\System\Synchronizer();
             $appsync->systemOptionsChanged();
         } catch (Exception $e) {
             Log::error($e->getMessage());

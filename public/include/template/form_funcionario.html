@@ -6,7 +6,7 @@
 <!--{/loop}-->
 	</select>
 </div>
-<!--${$_cliente = ZCliente::getPeloID($funcionario->getClienteID())}-->
+<!--${$_cliente = $funcionario->findClienteID()}-->
 <input type="hidden" id="clienteid" name="clienteid" data-nome="{$_cliente->getNomeCompleto()}" value="{$funcionario->getClienteID()}">
 <div class="form-group col-lg-3 col-md-4 col-sm-6 col-xs-12">
 	<label for="cliente">Cliente: <span class="identifier">${\MZ\Util\Mask::phone($_cliente->getFone(1))}<span></label>

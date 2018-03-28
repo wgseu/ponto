@@ -1,7 +1,7 @@
 <?php
 require_once(dirname(__DIR__) . '/app.php');
 
-need_permission(PermissaoNome::ALTERARCONFIGURACOES);
+need_permission(Permissao::NOME_ALTERARCONFIGURACOES);
 
 $fieldfocus = 'bemvindo';
 $base_url = 'header';
@@ -83,7 +83,7 @@ if (is_post()) {
                 unlink(WWW_ROOT . get_image_url($value['url'], $base_url));
             }
         }
-        Thunder::success('Layout atualizado com sucesso!', true);
+        \Thunder::success('Layout atualizado com sucesso!', true);
         redirect('/gerenciar/sistema/layout');
     } catch (ValidationException $e) {
         $erro = $e->getErrors();
@@ -103,7 +103,7 @@ foreach ($erro as $key => $value) {
     break;
 }
 if (array_key_exists($fieldfocus, $erro)) {
-    Thunder::error($erro[$fieldfocus]);
+    \Thunder::error($erro[$fieldfocus]);
 }
 
 include template('gerenciar_sistema_layout');

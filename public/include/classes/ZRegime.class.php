@@ -93,16 +93,16 @@ class ZRegime
 
     public static function getPeloID($id)
     {
-        $query = DB::$pdo->from('Regimes')
+        $query = \DB::$pdo->from('Regimes')
                          ->where(['id' => $id]);
-        return new ZRegime($query->fetch());
+        return new Regime($query->fetch());
     }
 
     public static function getPeloCodigo($codigo)
     {
-        $query = DB::$pdo->from('Regimes')
+        $query = \DB::$pdo->from('Regimes')
                          ->where(['codigo' => $codigo]);
-        return new ZRegime($query->fetch());
+        return new Regime($query->fetch());
     }
 
     private static function validarCampos(&$regime)
@@ -135,12 +135,12 @@ class ZRegime
         $_regime = $regime->toArray();
         self::validarCampos($_regime);
         try {
-            $_regime['id'] = DB::$pdo->insertInto('Regimes')->values($_regime)->execute();
+            $_regime['id'] = \DB::$pdo->insertInto('Regimes')->values($_regime)->execute();
         } catch (Exception $e) {
             self::handleException($e);
             throw $e;
         }
-        return self::getPeloID($_regime['id']);
+        return self::findByID($_regime['id']);
     }
 
     public static function atualizar($regime)
@@ -155,7 +155,7 @@ class ZRegime
             'descricao',
         ];
         try {
-            $query = DB::$pdo->update('Regimes');
+            $query = \DB::$pdo->update('Regimes');
             $query = $query->set(array_intersect_key($_regime, array_flip($campos)));
             $query = $query->where('id', $_regime['id']);
             $query->execute();
@@ -163,22 +163,22 @@ class ZRegime
             self::handleException($e);
             throw $e;
         }
-        return self::getPeloID($_regime['id']);
+        return self::findByID($_regime['id']);
     }
 
     public static function excluir($id)
     {
         if (!$id) {
-            throw new Exception('Não foi possível excluir o regime, o id do regime não foi informado');
+            throw new \Exception('Não foi possível excluir o regime, o id do regime não foi informado');
         }
-        $query = DB::$pdo->deleteFrom('Regimes')
+        $query = \DB::$pdo->deleteFrom('Regimes')
                          ->where(['id' => $id]);
         return $query->execute();
     }
 
     private static function initSearch()
     {
-        return   DB::$pdo->from('Regimes')
+        return   \DB::$pdo->from('Regimes')
                          ->orderBy('id ASC');
     }
 
@@ -191,7 +191,7 @@ class ZRegime
         $_regimes = $query->fetchAll();
         $regimes = [];
         foreach ($_regimes as $regime) {
-            $regimes[] = new ZRegime($regime);
+            $regimes[] = new Regime($regime);
         }
         return $regimes;
     }

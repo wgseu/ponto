@@ -21,17 +21,24 @@
 */
 require_once(dirname(__DIR__) . '/app.php');
 
-need_permission(PermissaoNome::CADASTROPRODUTOS);
-$produto = ZProduto::getPeloID($_GET['id']);
-if (is_null($produto->getID())) {
-    Thunder::warning('O produto de id "'.$_GET['id'].'" não existe!');
+use MZ\__TODO_NAMESPACE__\Produto;
+
+need_permission(\Permissao::NOME_CADASTROPRODUTOS, is_output('json'));
+$id = isset($_GET['id']) ? $_GET['id'] : null;
+$produto = Produto::findByID($id);
+if (!$produto->exists()) {
+    $msg = 'O produto informado não existe!';
+    if (is_output('json')) {
+        json($msg);
+    }
+    \Thunder::warning($msg);
     redirect('/gerenciar/produto/');
 }
 $focusctrl = 'descricao';
 $errors = [];
 $old_produto = $produto;
 if (is_post()) {
-    $produto = new ZProduto($_POST);
+    $produto = new Produto($_POST);
     try {
         $produto->setID($old_produto->getID());
         $produto->setTributacaoID($old_produto->getTributacaoID());
@@ -50,8 +57,17 @@ if (is_post()) {
             $produto->setImagem(true);
         }
         $produto->setDataAtualizacao(date('Y-m-d H:i:s', time()));
-        $produto = ZProduto::atualizar($produto);
-        Thunder::success('Produto "'.$produto->getDescricao().'" atualizado com sucesso!', true);
+        $produto->filter($old_produto);
+        $produto->update();
+        $old_produto->clean($produto);
+        $msg = sprintf(
+            'Produto "%s" atualizado com sucesso!',
+            $produto->getDescricao()
+        );
+        if (is_output('json')) {
+            json(null, ['item' => $produto->publish(), 'msg' => $msg]);
+        }
+        \Thunder::success($msg, true);
         redirect('/gerenciar/produto/');
     } catch (ValidationException $e) {
         $errors = $e->getErrors();
@@ -62,11 +78,11 @@ if (is_post()) {
     $produto->setImagem($old_produto->getImagem());
     foreach ($errors as $key => $value) {
         $focusctrl = $key;
-        Thunder::error($value);
+        \Thunder::error($value);
         break;
     }
 }
-$_categorias = ZCategoria::getTodas(true);
-$_unidades = ZUnidade::getTodas();
-$_setores = ZSetor::getTodos();
+$_categorias = Categoria::getTodas(true);
+$_unidades = Unidade::findAll();
+$_setores = Setor::findAll();
 include template('gerenciar_produto_editar');

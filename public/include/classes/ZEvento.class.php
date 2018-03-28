@@ -156,9 +156,9 @@ class ZEvento
 
     public static function getPeloID($id)
     {
-        $query = DB::$pdo->from('Eventos')
+        $query = \DB::$pdo->from('Eventos')
                          ->where(['id' => $id]);
-        return new ZEvento($query->fetch());
+        return new Evento($query->fetch());
     }
 
     private static function validarCampos(&$evento)
@@ -197,12 +197,12 @@ class ZEvento
         $_evento = $evento->toArray();
         self::validarCampos($_evento);
         try {
-            $_evento['id'] = DB::$pdo->insertInto('Eventos')->values($_evento)->execute();
+            $_evento['id'] = \DB::$pdo->insertInto('Eventos')->values($_evento)->execute();
         } catch (Exception $e) {
             self::handleException($e);
             throw $e;
         }
-        return self::getPeloID($_evento['id']);
+        return self::findByID($_evento['id']);
     }
 
     public static function atualizar($evento)
@@ -219,7 +219,7 @@ class ZEvento
             'codigo',
         ];
         try {
-            $query = DB::$pdo->update('Eventos');
+            $query = \DB::$pdo->update('Eventos');
             $query = $query->set(array_intersect_key($_evento, array_flip($campos)));
             $query = $query->where('id', $_evento['id']);
             $query->execute();
@@ -227,15 +227,15 @@ class ZEvento
             self::handleException($e);
             throw $e;
         }
-        return self::getPeloID($_evento['id']);
+        return self::findByID($_evento['id']);
     }
 
     public static function excluir($id)
     {
         if (!$id) {
-            throw new Exception('Não foi possível excluir o evento, o id do evento não foi informado');
+            throw new \Exception('Não foi possível excluir o evento, o id do evento não foi informado');
         }
-        $query = DB::$pdo->deleteFrom('Eventos')
+        $query = \DB::$pdo->deleteFrom('Eventos')
                          ->where(['id' => $id]);
         return $query->execute();
     }
@@ -245,7 +245,7 @@ class ZEvento
      */
     public static function log($nota_id, $estado, $mensagem, $codigo)
     {
-        $_evento = new ZEvento();
+        $_evento = new Evento();
         $_evento->setNotaID($nota_id);
         $_evento->setEstado($estado);
         $_evento->setMensagem($mensagem);
@@ -255,7 +255,7 @@ class ZEvento
 
     private static function initSearch()
     {
-        return   DB::$pdo->from('Eventos')
+        return   \DB::$pdo->from('Eventos')
                          ->orderBy('id ASC');
     }
 
@@ -268,7 +268,7 @@ class ZEvento
         $_eventos = $query->fetchAll();
         $eventos = [];
         foreach ($_eventos as $evento) {
-            $eventos[] = new ZEvento($evento);
+            $eventos[] = new Evento($evento);
         }
         return $eventos;
     }
@@ -281,7 +281,7 @@ class ZEvento
 
     private static function initSearchDaNotaID($nota_id)
     {
-        return   DB::$pdo->from('Eventos')
+        return   \DB::$pdo->from('Eventos')
                          ->where(['notaid' => $nota_id])
                          ->orderBy('id ASC');
     }
@@ -295,7 +295,7 @@ class ZEvento
         $_eventos = $query->fetchAll();
         $eventos = [];
         foreach ($_eventos as $evento) {
-            $eventos[] = new ZEvento($evento);
+            $eventos[] = new Evento($evento);
         }
         return $eventos;
     }

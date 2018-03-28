@@ -6,8 +6,8 @@
 			<h3>Auditoria</h3>
 		</div>
 		<form method="get" action="/gerenciar/auditoria/" id="search-form">
-<!--${$_funcao = ZFuncao::getPeloID($_funcionario->getFuncaoID())}-->
-<!--${$_cliente_func = ZCliente::getPeloID($_funcionario->getClienteID())}-->
+<!--${$_funcao = $_funcionario->findFuncaoID()}-->
+<!--${$_cliente_func = $_funcionario->findClienteID()}-->
 			<input type="hidden" id="funcionarioid" name="funcionarioid" data-content="{$_cliente_func->getNomeCompleto()}" value="{$_funcionario->getID()}">
 			<div class="col-lg-3 col-md-4 col-sm-4 col-xs-6 form-group">
 				<label>Funcionário: <span class="identifier">{$_funcao->getDescricao()}<span></label>
@@ -59,11 +59,11 @@
 <!--{loop $auditorias $auditoria}-->
 							<tr class="{$_prioridade_classe[$auditoria->getPrioridade()]}">
 								<td><div title="{$_tipo_names[$auditoria->getTipo()]}" class="cell-icon auditoria-icons" style="background-position: -{$_tipo_icon[$auditoria->getTipo()]}px 0px;"></div>{$auditoria->getDescricao()}</td>
-<!--${$_funcionario = ZFuncionario::getPeloID($auditoria->getFuncionarioID())}-->
-<!--${$_cliente = ZCliente::getPeloID($_funcionario->getClienteID())}-->
+<!--${$_funcionario = $auditoria->findFuncionarioID()}-->
+<!--${$_cliente = $_funcionario->findClienteID()}-->
 								<td><a href="/gerenciar/funcionario/editar?id={$_funcionario->getID()}" title="Editar funcionário '{$_cliente->getNomeCompleto()}'">{$_cliente->getNome()}</a></td>
-<!--${$_funcionario = ZFuncionario::getPeloID($auditoria->getAutorizadorID())}-->
-<!--${$_cliente = ZCliente::getPeloID($_funcionario->getClienteID())}-->
+<!--${$_funcionario = $auditoria->findAutorizadorID()}-->
+<!--${$_cliente = $_funcionario->findClienteID()}-->
 								<td><a href="/gerenciar/funcionario/editar?id={$_funcionario->getID()}" title="Editar funcionário '{$_cliente->getNomeCompleto()}'">{$_cliente->getNome()}</a></td>
 								<td class="text-right" title="Prioridade {$_prioridade_names[$auditoria->getPrioridade()]}">${date('d/m/Y H:i', strtotime($auditoria->getDataHora()))}</td>
 							</tr>

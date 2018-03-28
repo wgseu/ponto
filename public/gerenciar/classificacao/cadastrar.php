@@ -21,28 +21,49 @@
 */
 require_once(dirname(__DIR__) . '/app.php');
 
-need_permission(PermissaoNome::CADASTROCONTAS);
+use MZ\__TODO_NAMESPACE__\Classificacao;
+
+need_permission(\Permissao::NOME_CADASTROCONTAS, is_output('json'));
+$id = isset($_GET['id']) ? $_GET['id'] : null;
+$classificacao = Classificacao::findByID($id);
+$classificacao->setID(null);
+
 $focusctrl = 'descricao';
 $errors = [];
+$old_classificacao = $classificacao;
 if (is_post()) {
-    $classificacao = new ZClassificacao($_POST);
+    $classificacao = new Classificacao($_POST);
     try {
-        $classificacao->setID(null);
-        $classificacao = ZClassificacao::cadastrar($classificacao);
-        Thunder::success('Classificação "'.$classificacao->getDescricao().'" cadastrada com sucesso!', true);
+        $classificacao->filter($old_classificacao);
+        $classificacao->insert();
+        $old_classificacao->clean($classificacao);
+        $msg = sprintf(
+            'Classificação "%s" cadastrada com sucesso!',
+            $classificacao->getDescricao()
+        );
+        if (is_output('json')) {
+            json(null, ['item' => $classificacao->publish(), 'msg' => $msg]);
+        }
+        \Thunder::success($msg, true);
         redirect('/gerenciar/classificacao/');
-    } catch (ValidationException $e) {
-        $errors = $e->getErrors();
-    } catch (Exception $e) {
-        $errors['unknow'] = $e->getMessage();
+    } catch (\Exception $e) {
+        $classificacao->clean($old_classificacao);
+        if ($e instanceof \MZ\Exception\ValidationException) {
+            $errors = $e->getErrors();
+        }
+        if (is_output('json')) {
+            json($e->getMessage(), null, ['errors' => $errors]);
+        }
+        \Thunder::error($e->getMessage());
+        foreach ($errors as $key => $value) {
+            $focusctrl = $key;
+            break;
+        }
     }
-    foreach ($errors as $key => $value) {
-        $focusctrl = $key;
-        Thunder::error($value);
-        break;
-    }
+} elseif (is_output('json')) {
+    json('Nenhum dado foi enviado');
 } else {
-    $classificacao = new ZClassificacao();
+    $classificacao = new Classificacao();
 }
-$_classificacoes = ZClassificacao::getTodas(true);
+$_classificacoes = Classificacao::getTodas(true);
 include template('gerenciar_classificacao_cadastrar');

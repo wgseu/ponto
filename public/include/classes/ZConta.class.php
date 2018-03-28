@@ -329,9 +329,9 @@ class ZConta
 
     public static function getPeloID($id)
     {
-        $query = DB::$pdo->from('Contas')
+        $query = \DB::$pdo->from('Contas')
                          ->where(['id' => $id]);
-        return new ZConta($query->fetch());
+        return new Conta($query->fetch());
     }
 
     public static function getTotalAbertas(
@@ -354,7 +354,7 @@ class ZConta
             $data_fim = strtotime(date('Y-m').' '.$mes_fim.' month');
             $data_fim = strtotime('last day of this month', $data_fim);
         }
-        $db = DB::$pdo->getPdo();
+        $db = \DB::$pdo->getPdo();
         $sql = '';
         $data = [];
         $descricao = trim($descricao);
@@ -530,20 +530,20 @@ class ZConta
         if (is_numeric($conta['id'])) {
             $info = self::getTotalAbertas($conta['id']);
             if (is_equal($info['receitas'], 0) && is_equal($info['despesas'], 0)) {
-                throw new Exception('A conta informada já foi consolidada e não '.
+                throw new \Exception('A conta informada já foi consolidada e não '.
                     'pode ser alterada, você ainda pode cancelar os pagamentos e alterar essa conta');
             }
             if ($conta['valor'] > 0 && is_greater($info['recebido'], $conta['valor'])) {
-                throw new Exception('O total recebido é maior que o valor da conta');
+                throw new \Exception('O total recebido é maior que o valor da conta');
             }
             if ($conta['valor'] <= 0 && is_greater(-$info['pago'], -$conta['valor'])) {
-                throw new Exception('O total pago é maior que o valor da conta');
+                throw new \Exception('O total pago é maior que o valor da conta');
             }
-            $_conta = ZConta::getPeloID($conta['id']);
+            $_conta = Conta::findByID($conta['id']);
             $receitas = $_conta->getTotal();
         }
         if (is_numeric($conta['clienteid']) && $conta['valor'] > 0) {
-            $cliente = ZCliente::getPeloID($conta['clienteid']);
+            $cliente = Cliente::findByID($conta['clienteid']);
             if ($cliente->getLimiteCompra() > 0) {
                 $info_total = self::getTotalAbertas(null, $conta['clienteid']);
                 $utilizado = ($info_total['receitas'] - $info_total['recebido']) +
@@ -582,12 +582,12 @@ class ZConta
         $_conta = $conta->toArray();
         self::validarCampos($_conta);
         try {
-            $_conta['id'] = DB::$pdo->insertInto('Contas')->values($_conta)->execute();
+            $_conta['id'] = \DB::$pdo->insertInto('Contas')->values($_conta)->execute();
         } catch (Exception $e) {
             self::handleException($e);
             throw $e;
         }
-        return self::getPeloID($_conta['id']);
+        return self::findByID($_conta['id']);
     }
 
     public static function atualizar($conta)
@@ -597,7 +597,7 @@ class ZConta
             throw new ValidationException(['id' => 'O id da conta não foi informado']);
         }
         if ($_conta['id'] == 1) {
-            throw new Exception('Não é possível atualizar essa conta, a conta informada é utilizada internamente pelo sistema');
+            throw new \Exception('Não é possível atualizar essa conta, a conta informada é utilizada internamente pelo sistema');
         }
         self::validarCampos($_conta);
         $campos = [
@@ -620,7 +620,7 @@ class ZConta
             'datapagamento',
         ];
         try {
-            $query = DB::$pdo->update('Contas');
+            $query = \DB::$pdo->update('Contas');
             $query = $query->set(array_intersect_key($_conta, array_flip($campos)));
             $query = $query->where('id', $_conta['id']);
             $query->execute();
@@ -628,25 +628,25 @@ class ZConta
             self::handleException($e);
             throw $e;
         }
-        return self::getPeloID($_conta['id']);
+        return self::findByID($_conta['id']);
     }
 
     public static function excluir($id)
     {
         if (!$id) {
-            throw new Exception('Não foi possível excluir a conta, o id da conta não foi informado');
+            throw new \Exception('Não foi possível excluir a conta, o id da conta não foi informado');
         }
         if ($id == 1) {
-            throw new Exception('Não é possível excluir essa conta, a conta informada é utilizada internamente pelo sistema');
+            throw new \Exception('Não é possível excluir essa conta, a conta informada é utilizada internamente pelo sistema');
         }
-        $query = DB::$pdo->deleteFrom('Contas')
+        $query = \DB::$pdo->deleteFrom('Contas')
                          ->where(['id' => $id]);
         return $query->execute();
     }
 
     private static function initSearch($busca, $cliente_id, $classificacao_id)
     {
-        $query = DB::$pdo->from('Contas')
+        $query = \DB::$pdo->from('Contas')
                          ->orderBy('id DESC');
         $busca = trim($busca);
         if (is_numeric($busca)) {
@@ -674,7 +674,7 @@ class ZConta
         $_contas = $query->fetchAll();
         $contas = [];
         foreach ($_contas as $conta) {
-            $contas[] = new ZConta($conta);
+            $contas[] = new Conta($conta);
         }
         return $contas;
     }
@@ -687,7 +687,7 @@ class ZConta
 
     private static function initSearchDoClienteID($cliente_id)
     {
-        return   DB::$pdo->from('Contas')
+        return   \DB::$pdo->from('Contas')
                          ->where(['clienteid' => $cliente_id])
                          ->orderBy('id ASC');
     }
@@ -701,7 +701,7 @@ class ZConta
         $_contas = $query->fetchAll();
         $contas = [];
         foreach ($_contas as $conta) {
-            $contas[] = new ZConta($conta);
+            $contas[] = new Conta($conta);
         }
         return $contas;
     }
@@ -714,7 +714,7 @@ class ZConta
 
     private static function initSearchDoFuncionarioID($funcionario_id)
     {
-        return   DB::$pdo->from('Contas')
+        return   \DB::$pdo->from('Contas')
                          ->where(['funcionarioid' => $funcionario_id])
                          ->orderBy('id ASC');
     }
@@ -728,7 +728,7 @@ class ZConta
         $_contas = $query->fetchAll();
         $contas = [];
         foreach ($_contas as $conta) {
-            $contas[] = new ZConta($conta);
+            $contas[] = new Conta($conta);
         }
         return $contas;
     }
@@ -741,7 +741,7 @@ class ZConta
 
     private static function initSearchDoPedidoID($pedido_id)
     {
-        return   DB::$pdo->from('Contas')
+        return   \DB::$pdo->from('Contas')
                          ->where(['pedidoid' => $pedido_id])
                          ->orderBy('id ASC');
     }
@@ -755,7 +755,7 @@ class ZConta
         $_contas = $query->fetchAll();
         $contas = [];
         foreach ($_contas as $conta) {
-            $contas[] = new ZConta($conta);
+            $contas[] = new Conta($conta);
         }
         return $contas;
     }
@@ -768,7 +768,7 @@ class ZConta
 
     private static function initSearchDaClassificacaoID($classificacao_id)
     {
-        return   DB::$pdo->from('Contas')
+        return   \DB::$pdo->from('Contas')
                          ->where(['classificacaoid' => $classificacao_id])
                          ->orderBy('id ASC');
     }
@@ -782,7 +782,7 @@ class ZConta
         $_contas = $query->fetchAll();
         $contas = [];
         foreach ($_contas as $conta) {
-            $contas[] = new ZConta($conta);
+            $contas[] = new Conta($conta);
         }
         return $contas;
     }
@@ -795,7 +795,7 @@ class ZConta
 
     private static function initSearchDaSubClassificacaoID($sub_classificacao_id)
     {
-        return   DB::$pdo->from('Contas')
+        return   \DB::$pdo->from('Contas')
                          ->where(['subclassificacaoid' => $sub_classificacao_id])
                          ->orderBy('id ASC');
     }
@@ -809,7 +809,7 @@ class ZConta
         $_contas = $query->fetchAll();
         $contas = [];
         foreach ($_contas as $conta) {
-            $contas[] = new ZConta($conta);
+            $contas[] = new Conta($conta);
         }
         return $contas;
     }

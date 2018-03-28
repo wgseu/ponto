@@ -24,25 +24,41 @@ require_once(dirname(__DIR__) . '/app.php');
 need_owner();
 $focusctrl = 'descricao';
 $errors = [];
+$old_funcao = $funcao;
 if (is_post()) {
-    $funcao = new ZFuncao($_POST);
+    $funcao = new Funcao($_POST);
     try {
         $funcao->setID(null);
         $funcao->setSalarioBase(moneyval($funcao->getSalarioBase()));
-        $funcao = ZFuncao::cadastrar($funcao);
-        Thunder::success('Função "'.$funcao->getDescricao().'" cadastrada com sucesso!', true);
+        $funcao->filter($old_funcao);
+        $funcao->insert();
+        $old_funcao->clean($funcao);
+        $msg = sprintf(
+            'Função "%s" cadastrada com sucesso!',
+            $funcao->getDescricao()
+        );
+        if (is_output('json')) {
+            json(null, ['item' => $funcao->publish(), 'msg' => $msg]);
+        }
+        \Thunder::success($msg, true);
         redirect('/gerenciar/funcao/');
-    } catch (ValidationException $e) {
-        $errors = $e->getErrors();
-    } catch (Exception $e) {
-        $errors['unknow'] = $e->getMessage();
+    } catch (\Exception $e) {
+        $funcao->clean($old_funcao);
+        if ($e instanceof \MZ\Exception\ValidationException) {
+            $errors = $e->getErrors();
+        }
+        if (is_output('json')) {
+            json($e->getMessage(), null, ['errors' => $errors]);
+        }
+        \Thunder::error($e->getMessage());
+        foreach ($errors as $key => $value) {
+            $focusctrl = $key;
+            break;
+        }
     }
-    foreach ($errors as $key => $value) {
-        $focusctrl = $key;
-        Thunder::error($value);
-        break;
-    }
+} elseif (is_output('json')) {
+    json('Nenhum dado foi enviado');
 } else {
-    $funcao = new ZFuncao();
+    $funcao = new Funcao();
 }
 include template('gerenciar_funcao_cadastrar');

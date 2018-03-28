@@ -21,11 +21,11 @@
 */
 require_once(dirname(__DIR__) . '/app.php');
 
-need_permission(PermissaoNome::CADASTROSERVICOS);
+need_permission(Permissao::NOME_CADASTROSERVICOS);
 
-$count = ZServico::getCount($_GET['query'], $_GET['tipo']);
+$count = Servico::getCount($_GET['query'], $_GET['tipo']);
 list($pagesize, $offset, $pagestring) = pagestring($count, 10);
-$servicos = ZServico::getTodos($_GET['query'], $_GET['tipo'], $offset, $pagesize);
+$servicos = Servico::getTodos($_GET['query'], $_GET['tipo'], $offset, $pagesize);
 
 $tipos = [
     'Evento' => 'Evento',

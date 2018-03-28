@@ -8,7 +8,7 @@ define('TASK_TOKEN', 'WWHxIdzDakrea921zGveQkKccrf80mDp');
 set_time_limit(0);
 
 if (!isset($_GET['token']) || $_GET['token'] != TASK_TOKEN) {
-    need_permission(PermissaoNome::ENTREGAPEDIDOS, true);
+    need_permission(Permissao::NOME_ENTREGAPEDIDOS, true);
 }
 try {
     $runner = new Runner();

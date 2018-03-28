@@ -274,7 +274,7 @@ function need_login($json = false)
     if ($json) {
         json('Necessário autenticação');
     }
-    Thunder::warning('Necessário autenticação, faça login para continuar');
+    \Thunder::warning('Necessário autenticação, faça login para continuar');
     if (is_get()) {
         Session::Set('redirect', $_SERVER['REQUEST_URI']);
     } else {
@@ -290,7 +290,7 @@ function need_manager($json = false)
         if ($json) {
             json('Necessário nível de funcionário');
         }
-        Thunder::warning('Somente funcionários poderão acessar as páginas de gerenciamento');
+        \Thunder::warning('Somente funcionários poderão acessar as páginas de gerenciamento');
         redirect('/');
     }
     return $_SESSION['cliente_id'];
@@ -303,7 +303,7 @@ function need_owner($json = false)
         if ($json) {
             json('Necessário permissão de administrador');
         }
-        Thunder::warning('Somente administradores poderão acessar essas páginas');
+        \Thunder::warning('Somente administradores poderão acessar essas páginas');
         redirect('/gerenciar/');
     }
     return $_SESSION['cliente_id'];
@@ -315,7 +315,7 @@ function need_permission($array, $json = false)
         if ($json) {
             json('Você não possui permissão para acessar essa função');
         }
-        Thunder::warning('Você não possui permissão para acessar essa função');
+        \Thunder::warning('Você não possui permissão para acessar essa função');
         redirect('/gerenciar/');
     }
     return $_SESSION['cliente_id'];
@@ -389,7 +389,7 @@ function have_permission($array, $funcionario = null)
     settype($array, 'array');
     $permissoes = $__permissoes__;
     if ($funcionario->getID() != $login_funcionario->getID()) {
-        $permissoes = ZAcesso::getPermissoes($funcionario->getID());
+        $permissoes = Acesso::getPermissoes($funcionario->getID());
     }
     $allow = true;
     $operator = '&&';
@@ -470,9 +470,9 @@ function current_language_id()
 
 function get_site_page($page_name)
 {
-    $pagina = ZPagina::getPeloNomeLinguagemID($page_name, current_language_id());
+    $pagina = Pagina::findByNomeLinguagemID($page_name, current_language_id());
     if (is_null($pagina->getID())) {
-        $pagina = ZPagina::getPeloNomeLinguagemID($page_name, 1046);
+        $pagina = Pagina::findByNomeLinguagemID($page_name, 1046);
     }
     return $pagina;
 }
@@ -707,46 +707,46 @@ function _p($section, $key)
 function register_device($device, $serial)
 {
     if (!isset($device) || trim(strval($device)) == '') {
-        throw new Exception("O nome do dispositivo não foi informado");
+        throw new \Exception("O nome do dispositivo não foi informado");
     }
     if (!isset($serial) || trim(strval($serial)) == '') {
-        throw new Exception("O identificador do dispositivo não foi informado");
+        throw new \Exception("O identificador do dispositivo não foi informado");
     }
-    $dispositivo = ZDispositivo::getPeloNome($device);
+    $dispositivo = Dispositivo::findByNome($device);
     if (is_null($dispositivo->getID())) {
-        $dispositivo = ZDispositivo::getPelaSerial($serial);
+        $dispositivo = Dispositivo::getPelaSerial($serial);
     }
     global $__sistema__;
     if (is_null($__sistema__->getID())) {
-        throw new Exception("Não há dados na tabela do sistema");
+        throw new \Exception("Não há dados na tabela do sistema");
     }
-    $tablet_count = ZDispositivo::getCountDoTablet();
+    $tablet_count = Dispositivo::getCountDoTablet();
     if ($tablet_count > $__sistema__->getTablets()) {
-        throw new Exception("Limite de Tablets excedido, remova os tablets excedentes para continuar");
+        throw new \Exception("Limite de Tablets excedido, remova os tablets excedentes para continuar");
     }
     if (is_null($dispositivo->getID()) && $tablet_count >= $__sistema__->getTablets()) {
         // tenta sobrescrever um tablet não validado
-        $dispositivo = ZDispositivo::getNaoValidado();
+        $dispositivo = Dispositivo::getNaoValidado();
         if (is_null($dispositivo->getID())) {
-            throw new Exception("Limite de Tablets esgotado, verifique sua licença");
+            throw new \Exception("Limite de Tablets esgotado, verifique sua licença");
         }
         // permite a atualização das informações para o novo dispositivo
         $dispositivo->setValidacao(null);
     }
     if (is_null($dispositivo->getID())) {
-        $dispositivo->setTipo(DispositivoTipo::TABLET);
+        $dispositivo->setTipo(Dispositivo::TIPO_TABLET);
         $dispositivo->setDescricao('Tablet '.$device);
         $dispositivo->setNome($device);
         $dispositivo->setSerial($serial);
         $dispositivo->setOpcoes(0);
-        $setor = ZSetor::getPeloNome('Vendas');
+        $setor = Setor::findByNome('Vendas');
         if (is_null($setor->getID())) {
-            $setor = ZSetor::getPrimeiro();
+            $setor = Setor::getPrimeiro();
         }
         $dispositivo->setSetorID($setor->getID());
-        $dispositivo = ZDispositivo::cadastrar($dispositivo);
+        $dispositivo->insert();
         try {
-            $appsync = new AppSync();
+            $appsync = new \MZ\System\Synchronizer();
             $appsync->deviceAdded($dispositivo->getNome(), $dispositivo->getCaixaID());
         } catch (\Exception $e) {
             \Log::warning($e->getMessage());
@@ -756,9 +756,9 @@ function register_device($device, $serial)
         // atualiza as informações do dispositivo
         $dispositivo->setNome($device);
         $dispositivo->setSerial($serial);
-        $dispositivo = ZDispositivo::atualizar($dispositivo);
+        $dispositivo->update();
         try {
-            $appsync = new AppSync();
+            $appsync = new \MZ\System\Synchronizer();
             $appsync->deviceUpdated($dispositivo->getNome(), $dispositivo->getCaixaID());
         } catch (\Exception $e) {
             \Log::warning($e->getMessage());
@@ -899,7 +899,7 @@ function upload_file($inputname, $dir, $name, $def_ext, $allow_ext, $force_ext =
         $error_msg = 'Não foi possível salvar o arquivo no servidor';
     }
     if (!move_uploaded_file($file['tmp_name'], $path)) {
-        throw new Exception($error_msg);
+        throw new \Exception($error_msg);
     }
     xchmod($path, 0644);
     return $name;
@@ -918,12 +918,12 @@ function upload_image($inputname, $type, $name = null, $width = null, $height = 
     }
     $file = $_FILES[$inputname];
     if (strpos($file['type'], 'image') !== 0) {
-        throw new Exception('O arquivo informado não é uma imagem');
+        throw new \Exception('O arquivo informado não é uma imagem');
     }
     $path = $dir . $name;
     if (!Image::convert($path, $path, $width, $height, $mode)) {
         unlink($path);
-        throw new Exception('Falha ao processar imagem');
+        throw new \Exception('Falha ao processar imagem');
     }
     xchmod($path, 0644);
     return $name;
@@ -1007,11 +1007,11 @@ function zip_extract_folder($zip, $redirect)
 function create_zip($files = [], $destination = '', $overwrite = false)
 {
     if (file_exists($destination) && !$overwrite) {
-        throw new Exception('O arquivo zip de destino já existe');
+        throw new \Exception('O arquivo zip de destino já existe');
     }
     $zip = new ZipArchive();
-    if ($zip->open($destination, $overwrite ? ZipArchive::OVERWRITE : ZipArchive::CREATE) !== true) {
-        throw new Exception('Não foi possível criar ou sobrescrever o arquivo zip');
+    if ($zip->open($destination, $overwrite ? Zip::ARCHIVE_OVERWRITE : Zip::ARCHIVE_CREATE) !== true) {
+        throw new \Exception('Não foi possível criar ou sobrescrever o arquivo zip');
     }
     foreach ($files as $name => $path) {
         $zip->addFile($path, $name);

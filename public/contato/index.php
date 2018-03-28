@@ -56,7 +56,7 @@ if (is_post()) {
             throw new ValidationException($erros);
         }
         if (!mail_contato($email, $nome, $assunto, $mensagem)) {
-            throw new Exception("Não foi possível enviar o E-mail, por favor tente novamente mais tarde");
+            throw new \Exception("Não foi possível enviar o E-mail, por favor tente novamente mais tarde");
         }
         include template('contato_sucesso');
         exit;
@@ -69,7 +69,7 @@ if (is_post()) {
         $fieldfocus = $key;
         break;
     }
-    Thunder::error($erro[$fieldfocus]);
+    \Thunder::error($erro[$fieldfocus]);
 }
 
 $pagetitle = 'Contato';

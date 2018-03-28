@@ -93,25 +93,25 @@ class ZSessao
 
     public static function getPeloID($id)
     {
-        $query = DB::$pdo->from('Sessoes')
+        $query = \DB::$pdo->from('Sessoes')
                          ->where(['id' => $id]);
-        return new ZSessao($query->fetch());
+        return new Sessao($query->fetch());
     }
 
     public static function getPorAberta()
     {
-        $query = DB::$pdo->from('Sessoes')
+        $query = \DB::$pdo->from('Sessoes')
                          ->where(['aberta' => 'Y'])
                          ->limit(1);
-        return new ZSessao($query->fetch());
+        return new Sessao($query->fetch());
     }
 
     public static function getAbertaOuUltima()
     {
-        $query = DB::$pdo->from('Sessoes')
+        $query = \DB::$pdo->from('Sessoes')
                          ->orderBy('IF(aberta = "Y", 1, 0) DESC, id DESC')
                          ->limit(1);
-        return new ZSessao($query->fetch());
+        return new Sessao($query->fetch());
     }
 
     private static function validarCampos(&$sessao)
@@ -140,12 +140,12 @@ class ZSessao
         $_sessao = $sessao->toArray();
         self::validarCampos($_sessao);
         try {
-            $_sessao['id'] = DB::$pdo->insertInto('Sessoes')->values($_sessao)->execute();
+            $_sessao['id'] = \DB::$pdo->insertInto('Sessoes')->values($_sessao)->execute();
         } catch (Exception $e) {
             self::handleException($e);
             throw $e;
         }
-        return self::getPeloID($_sessao['id']);
+        return self::findByID($_sessao['id']);
     }
 
     public static function atualizar($sessao)
@@ -160,7 +160,7 @@ class ZSessao
             'aberta',
         ];
         try {
-            $query = DB::$pdo->update('Sessoes');
+            $query = \DB::$pdo->update('Sessoes');
             $query = $query->set(array_intersect_key($_sessao, array_flip($campos)));
             $query = $query->where('id', $_sessao['id']);
             $query->execute();
@@ -168,12 +168,12 @@ class ZSessao
             self::handleException($e);
             throw $e;
         }
-        return self::getPeloID($_sessao['id']);
+        return self::findByID($_sessao['id']);
     }
 
     private static function initSearch()
     {
-        return   DB::$pdo->from('Sessoes')
+        return   \DB::$pdo->from('Sessoes')
                          ->orderBy('id ASC');
     }
 
@@ -186,7 +186,7 @@ class ZSessao
         $_sessaos = $query->fetchAll();
         $sessaos = [];
         foreach ($_sessaos as $sessao) {
-            $sessaos[] = new ZSessao($sessao);
+            $sessaos[] = new Sessao($sessao);
         }
         return $sessaos;
     }

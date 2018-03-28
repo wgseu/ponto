@@ -21,30 +21,52 @@
 */
 require_once(dirname(__DIR__) . '/app.php');
 
-need_permission(PermissaoNome::CADASTRARCREDITOS);
+use MZ\__TODO_NAMESPACE__\Credito;
+
+need_permission(\Permissao::NOME_CADASTRARCREDITOS, is_output('json'));
+$id = isset($_GET['id']) ? $_GET['id'] : null;
+$credito = Credito::findByID($id);
+$credito->setID(null);
+
 $focusctrl = 'detalhes';
 $errors = [];
+$old_credito = $credito;
 if (is_post()) {
-    $credito = new ZCredito($_POST);
+    $credito = new Credito($_POST);
     try {
         $credito->setID(null);
         $credito->setValor(moneyval($credito->getValor()));
         $credito->setFuncionarioID($login_funcionario->getID());
         $credito->setCancelado('N');
-        $credito = ZCredito::cadastrar($credito);
-        Thunder::success('Crédito "'.$credito->getDetalhes().'" cadastrado com sucesso!', true);
+        $credito->filter($old_credito);
+        $credito->insert();
+        $old_credito->clean($credito);
+        $msg = sprintf(
+            'Crédito "%s" cadastrado com sucesso!',
+            $credito->getDetalhes()
+        );
+        if (is_output('json')) {
+            json(null, ['item' => $credito->publish(), 'msg' => $msg]);
+        }
+        \Thunder::success($msg, true);
         redirect('/gerenciar/credito/');
-    } catch (ValidationException $e) {
-        $errors = $e->getErrors();
-    } catch (Exception $e) {
-        $errors['unknow'] = $e->getMessage();
+    } catch (\Exception $e) {
+        $credito->clean($old_credito);
+        if ($e instanceof \MZ\Exception\ValidationException) {
+            $errors = $e->getErrors();
+        }
+        if (is_output('json')) {
+            json($e->getMessage(), null, ['errors' => $errors]);
+        }
+        \Thunder::error($e->getMessage());
+        foreach ($errors as $key => $value) {
+            $focusctrl = $key;
+            break;
+        }
     }
-    foreach ($errors as $key => $value) {
-        $focusctrl = $key;
-        Thunder::error($value);
-        break;
-    }
+} elseif (is_output('json')) {
+    json('Nenhum dado foi enviado');
 } else {
-    $credito = new ZCredito();
+    $credito = new Credito();
 }
 include template('gerenciar_credito_cadastrar');

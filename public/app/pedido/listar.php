@@ -24,17 +24,17 @@ require_once(dirname(dirname(__DIR__)) . '/app.php');
 if (!is_login()) {
     json('Usuário não autenticado!');
 }
-if (!is_null($_GET['comanda']) && !have_permission(PermissaoNome::PEDIDOCOMANDA)) {
+if (!is_null($_GET['comanda']) && !$login_funcionario->has(Permissao::NOME_PEDIDOCOMANDA)) {
     json('Você não tem permissão para acessar os produtos das comandas');
-} elseif (!have_permission(PermissaoNome::PEDIDOMESA)) {
+} elseif (!$login_funcionario->has(Permissao::NOME_PEDIDOMESA)) {
     json('Você não tem permissão para acessar os produtos das mesas');
 }
 
-$tipo = PedidoTipo::MESA;
+$tipo = Pedido::TIPO_MESA;
 if (!is_null($_GET['comanda'])) {
-    $tipo = PedidoTipo::COMANDA;
+    $tipo = Pedido::TIPO_COMANDA;
 }
-$pedidos = ZProdutoPedido::getTodosDoLocal($tipo, $_GET['mesa'], $_GET['comanda']);
+$pedidos = ProdutoPedido::getTodosDoLocal($tipo, $_GET['mesa'], $_GET['comanda']);
 $response = ['status' => 'ok'];
 $campos = [
             'id',
@@ -63,6 +63,6 @@ foreach ($pedidos as $pedido) {
     $_pedido['imagemurl'] = get_image_url($_pedido['imagemurl'], 'produto', null);
     $_pedidos[] = $_pedido;
 }
-$response['total'] = ZPedido::getTotalDoLocal($tipo, $_GET['mesa'], $_GET['comanda']);
+$response['total'] = Pedido::getTotalDoLocal($tipo, $_GET['mesa'], $_GET['comanda']);
 $response['pedidos'] = $_pedidos;
 json($response);

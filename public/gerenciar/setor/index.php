@@ -21,10 +21,10 @@
 */
 require_once(dirname(__DIR__) . '/app.php');
 
-need_permission(PermissaoNome::ESTOQUE);
+need_permission(Permissao::NOME_ESTOQUE);
 
-$count = ZSetor::getCount($_GET['query']);
+$count = Setor::getCount($_GET['query']);
 list($pagesize, $offset, $pagestring) = pagestring($count, 10);
-$setores = ZSetor::getTodos($_GET['query'], $offset, $pagesize);
+$setores = Setor::getTodos($_GET['query'], $offset, $pagesize);
 
 include template('gerenciar_setor_index');

@@ -13,7 +13,7 @@
 	<label for="valor">Valor:</label>
 	<input type="text" id="valor" name="valor" class="numeric form-control text-right" data-a-sep="." data-a-dec="," data-a-sign="{$__moeda__->getSimbolo()} " value="${abs($conta->getValor())}">
 </div>
-<!--${$_cliente = ZCliente::getPeloID($conta->getClienteID())}-->
+<!--${$_cliente = $conta->findClienteID()}-->
 <input type="hidden" id="clienteid" name="clienteid" data-nome="{$_cliente->getNomeCompleto()}" value="{$_cliente->getID()}">
 <div class="form-group col-lg-3 col-md-4 col-sm-6 col-xs-12">
 	<label for="cliente"><span id="cliente-label">Cliente: </span><span class="identifier">${\MZ\Util\Mask::phone($_cliente->getFone(1))}<span></label>

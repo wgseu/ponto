@@ -153,7 +153,7 @@ class ZCategoria
 
     private static function initGet()
     {
-        return DB::$pdo->from('Categorias c')
+        return \DB::$pdo->from('Categorias c')
                          ->select(null)
                          ->select('c.id')
                          ->select('c.categoriaid')
@@ -166,12 +166,12 @@ class ZCategoria
     public static function getPeloID($categoria_id)
     {
         $query = self::initGet()->where(['c.id' => $categoria_id]);
-        return new ZCategoria($query->fetch());
+        return new Categoria($query->fetch());
     }
 
     public static function getImagemPeloID($categoria_id, $dataSomente = false)
     {
-        $query = DB::$pdo->from('Categorias c')
+        $query = \DB::$pdo->from('Categorias c')
                          ->select(null)
                          ->select('c.dataatualizacao')
                          ->where(['c.id' => $categoria_id]);
@@ -190,7 +190,7 @@ class ZCategoria
         } elseif (!is_numeric($categoria['categoriaid'])) {
             $erros['categoriaid'] = 'A categoria superior é inválida';
         } else {
-            $_categoria = self::getPeloID($categoria['categoriaid']);
+            $_categoria = self::findByID($categoria['categoriaid']);
             if (is_null($_categoria->getID())) {
                 $erros['categoriaid'] = 'A categoria informada não existe';
             } elseif (!is_null($_categoria->getCategoriaID())) {
@@ -233,12 +233,12 @@ class ZCategoria
         $_categoria = $categoria->toArray();
         self::validarCampos($_categoria);
         try {
-            $_categoria['id'] = DB::$pdo->insertInto('Categorias')->values($_categoria)->execute();
+            $_categoria['id'] = \DB::$pdo->insertInto('Categorias')->values($_categoria)->execute();
         } catch (Exception $e) {
             self::handleException($e);
             throw $e;
         }
-        return self::getPeloID($_categoria['id']);
+        return self::findByID($_categoria['id']);
     }
 
     public static function atualizar($categoria)
@@ -258,7 +258,7 @@ class ZCategoria
             $campos[] = 'imagem';
         }
         try {
-            $query = DB::$pdo->update('Categorias');
+            $query = \DB::$pdo->update('Categorias');
             $query = $query->set(array_intersect_key($_categoria, array_flip($campos)));
             $query = $query->where('id', $_categoria['id']);
             $query->execute();
@@ -266,15 +266,15 @@ class ZCategoria
             self::handleException($e);
             throw $e;
         }
-        return self::getPeloID($_categoria['id']);
+        return self::findByID($_categoria['id']);
     }
 
     public static function excluir($id)
     {
         if (!$id) {
-            throw new Exception('Não foi possível excluir a categoria, o id da categoria não foi informado');
+            throw new \Exception('Não foi possível excluir a categoria, o id da categoria não foi informado');
         }
-        $query = DB::$pdo->deleteFrom('Categorias')
+        $query = \DB::$pdo->deleteFrom('Categorias')
                          ->where(['id' => $id]);
         return $query->execute();
     }
@@ -318,7 +318,7 @@ class ZCategoria
         $_categorias = $query->fetchAll();
         $categorias = [];
         foreach ($_categorias as $categoria) {
-            $categorias[] = new ZCategoria($categoria);
+            $categorias[] = new Categoria($categoria);
         }
         return $categorias;
     }

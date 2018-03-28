@@ -24,7 +24,7 @@ require_once(dirname(dirname(__DIR__)) . '/app.php');
 if (!is_login()) {
     json('Usuário não autenticado!');
 }
-if (!have_permission(PermissaoNome::PEDIDOMESA)) {
+if (!$login_funcionario->has(Permissao::NOME_PEDIDOMESA)) {
     json('Você não tem permissão para acessar mesas');
 }
 /* verifica se deve ordenar pelo número da mesa ou pelo funcionário */
@@ -32,7 +32,7 @@ $funcionario_id = null;
 if (!isset($_GET['ordenar']) && $_GET['ordenar'] != 'mesa') {
     $funcionario_id = $login_funcionario_id;
 }
-$mesas = ZMesa::getTodas($funcionario_id);
+$mesas = Mesa::getTodas($funcionario_id);
 $response = ['status' => 'ok'];
 $mesas_array = [];
 foreach ($mesas as $mesa) {

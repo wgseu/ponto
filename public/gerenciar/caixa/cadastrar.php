@@ -21,28 +21,49 @@
 */
 require_once(dirname(__DIR__) . '/app.php');
 
-need_permission(PermissaoNome::CADASTROCAIXAS);
+use MZ\__TODO_NAMESPACE__\Caixa;
+
+need_permission(\Permissao::NOME_CADASTROCAIXAS, is_output('json'));
+$id = isset($_GET['id']) ? $_GET['id'] : null;
+$caixa = Caixa::findByID($id);
+$caixa->setID(null);
+
 $focusctrl = 'descricao';
 $errors = [];
+$old_caixa = $caixa;
 if (is_post()) {
-    $caixa = new ZCaixa($_POST);
+    $caixa = new Caixa($_POST);
     try {
-        $caixa->setID(null);
-        $caixa = ZCaixa::cadastrar($caixa);
-        Thunder::success('Caixa "'.$caixa->getDescricao().'" cadastrado com sucesso!', true);
+        $caixa->filter($old_caixa);
+        $caixa->insert();
+        $old_caixa->clean($caixa);
+        $msg = sprintf(
+            'Caixa "%s" cadastrado com sucesso!',
+            $caixa->getDescricao()
+        );
+        if (is_output('json')) {
+            json(null, ['item' => $caixa->publish(), 'msg' => $msg]);
+        }
+        \Thunder::success($msg, true);
         redirect('/gerenciar/caixa/');
-    } catch (ValidationException $e) {
-        $errors = $e->getErrors();
-    } catch (Exception $e) {
-        $errors['unknow'] = $e->getMessage();
+    } catch (\Exception $e) {
+        $caixa->clean($old_caixa);
+        if ($e instanceof \MZ\Exception\ValidationException) {
+            $errors = $e->getErrors();
+        }
+        if (is_output('json')) {
+            json($e->getMessage(), null, ['errors' => $errors]);
+        }
+        \Thunder::error($e->getMessage());
+        foreach ($errors as $key => $value) {
+            $focusctrl = $key;
+            break;
+        }
     }
-    foreach ($errors as $key => $value) {
-        $focusctrl = $key;
-        Thunder::error($value);
-        break;
-    }
+} elseif (is_output('json')) {
+    json('Nenhum dado foi enviado');
 } else {
-    $caixa = new ZCaixa();
+    $caixa = new Caixa();
     $caixa->setAtivo('Y');
 }
 include template('gerenciar_caixa_cadastrar');

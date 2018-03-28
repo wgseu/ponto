@@ -21,17 +21,24 @@
 */
 require_once(dirname(__DIR__) . '/app.php');
 
-need_permission(PermissaoNome::CADASTROCONTAS);
-$conta = ZConta::getPeloID($_GET['id']);
-if (is_null($conta->getID())) {
-    Thunder::warning('A conta de id "'.$_GET['id'].'" não existe!');
+use MZ\__TODO_NAMESPACE__\Conta;
+
+need_permission(\Permissao::NOME_CADASTROCONTAS, is_output('json'));
+$id = isset($_GET['id']) ? $_GET['id'] : null;
+$conta = Conta::findByID($id);
+if (!$conta->exists()) {
+    $msg = 'A conta informada não existe!';
+    if (is_output('json')) {
+        json($msg);
+    }
+    \Thunder::warning($msg);
     redirect('/gerenciar/conta/');
 }
 $focusctrl = 'descricao';
 $errors = [];
 $old_conta = $conta;
 if (is_post()) {
-    $conta = new ZConta($_POST);
+    $conta = new Conta($_POST);
     try {
         // não deixa alterar esses dados
         $conta->setID($old_conta->getID());
@@ -60,13 +67,22 @@ if (is_post()) {
         } elseif (trim($conta->getAnexoCaminho()) != '') { // evita sobrescrever
             $conta->setAnexoCaminho($old_conta->getAnexoCaminho());
         }
-        $conta = ZConta::atualizar($conta);
+        $conta->filter($old_conta);
+        $conta->update();
+        $old_conta->clean($conta);
         // exclui o documento antigo
         if (!is_null($old_conta->getAnexoCaminho()) &&
             $conta->getAnexoCaminho() != $old_conta->getAnexoCaminho() && !is_local_path($old_conta->getAnexoCaminho())) {
             unlink(WWW_ROOT . get_document_url($old_conta->getAnexoCaminho(), 'conta'));
         }
-        Thunder::success('Conta "'.$conta->getDescricao().'" atualizada com sucesso!', true);
+        $msg = sprintf(
+            'Conta "%s" atualizada com sucesso!',
+            $conta->getDescricao()
+        );
+        if (is_output('json')) {
+            json(null, ['item' => $conta->publish(), 'msg' => $msg]);
+        }
+        \Thunder::success($msg, true);
         redirect('/gerenciar/conta/');
     } catch (ValidationException $e) {
         $errors = $e->getErrors();
@@ -81,11 +97,11 @@ if (is_post()) {
     $conta->setAnexoCaminho($old_conta->getAnexoCaminho());
     foreach ($errors as $key => $value) {
         $focusctrl = $key;
-        Thunder::error($value);
+        \Thunder::error($value);
         break;
     }
 }
 
-$classificacao_id_obj = \ZClassificacao::getPeloID($conta->getClassificacaoID());
-$sub_classificacao_id_obj = \ZClassificacao::getPeloID($conta->getSubClassificacaoID());
+$classificacao_id_obj = $conta->findClassificacaoID();
+$sub_classificacao_id_obj = $conta->findSubClassificacaoID();
 include template('gerenciar_conta_editar');

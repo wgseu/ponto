@@ -21,10 +21,17 @@
 */
 require_once(dirname(__DIR__) . '/app.php');
 
-need_permission(PermissaoNome::ALTERARPAGINAS);
-$pagina = ZPagina::getPeloID($_GET['id']);
-if (is_null($pagina->getID())) {
-    Thunder::warning('A página de id "'.$_GET['id'].'" não existe!');
+use MZ\__TODO_NAMESPACE__\Pagina;
+
+need_permission(\Permissao::NOME_ALTERARPAGINAS, is_output('json'));
+$id = isset($_GET['id']) ? $_GET['id'] : null;
+$pagina = Pagina::findByID($id);
+if (!$pagina->exists()) {
+    $msg = 'A página informada não existe!';
+    if (is_output('json')) {
+        json($msg);
+    }
+    \Thunder::warning($msg);
     redirect('/gerenciar/pagina/');
 }
 $focusctrl = 'nome';
@@ -33,22 +40,30 @@ $old_pagina = $pagina;
 $nomes = get_pages_info();
 $linguagens = get_languages_info();
 if (is_post()) {
-    $pagina = new ZPagina($_POST);
+    $pagina = new Pagina($_POST);
     try {
         $pagina->setID($old_pagina->getID());
         $pagina->setLinguagemID(numberval($pagina->getLinguagemID()));
-        $pagina = ZPagina::atualizar($pagina);
-        Thunder::success('Página "'.$nomes[$pagina->getNome()] . ' - ' . $linguagens[$pagina->getLinguagemID()].'" atualizada com sucesso!', true);
+        $pagina->filter($old_pagina);
+        $pagina->update();
+        $old_pagina->clean($pagina);
+        \Thunder::success('Página "'.$nomes[$pagina->getNome()] . ' - ' . $linguagens[$pagina->getLinguagemID()].'" atualizada com sucesso!', true);
         redirect('/gerenciar/pagina/');
-    } catch (ValidationException $e) {
-        $errors = $e->getErrors();
-    } catch (Exception $e) {
-        $errors['unknow'] = $e->getMessage();
+    } catch (\Exception $e) {
+        $pagina->clean($old_pagina);
+        if ($e instanceof \MZ\Exception\ValidationException) {
+            $errors = $e->getErrors();
+        }
+        if (is_output('json')) {
+            json($e->getMessage(), null, ['errors' => $errors]);
+        }
+        \Thunder::error($e->getMessage());
+        foreach ($errors as $key => $value) {
+            $focusctrl = $key;
+            break;
+        }
     }
-    foreach ($errors as $key => $value) {
-        $focusctrl = $key;
-        Thunder::error($value);
-        break;
-    }
+} elseif (is_output('json')) {
+    json('Nenhum dado foi enviado');
 }
 include template('gerenciar_pagina_editar');

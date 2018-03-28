@@ -72,14 +72,14 @@
 									<small title="Valor inicial da conta">${\MZ\Util\Mask::money($conta->getValor(), true)}</small>
 <!--{/if}-->
 								</td>
-<!--${$_cliente = ZCliente::getPeloID($conta->getClienteID())}-->
+<!--${$_cliente = $conta->findClienteID()}-->
 								<td><a href="/gerenciar/cliente/editar?id={$_cliente->getID()}" title="Editar cliente '{$_cliente->getNomeCompleto()}'">{$_cliente->getNomeCompleto()}</a></td>
-<!--${$_classificacao = ZClassificacao::getPeloID($conta->getClassificacaoID())}-->
+<!--${$_classificacao = $conta->findClassificacaoID()}-->
 								<td><strong><a href="/gerenciar/classificacao/editar?id={$_classificacao->getID()}" title="Editar classificação '{$_classificacao->getDescricao()}'">{$_classificacao->getDescricao()}</a></strong>
-<!--${$_classificacao = ZClassificacao::getPeloID($conta->getSubClassificacaoID())}-->
+<!--${$_classificacao = $conta->findSubClassificacaoID()}-->
 								<small><a href="/gerenciar/classificacao/editar?id={$_classificacao->getID()}" title="Editar classificação '{$_classificacao->getDescricao()}'">{$_classificacao->getDescricao()}</a></small></td>
-<!--${$_funcionario = ZFuncionario::getPeloID($conta->getFuncionarioID())}-->
-<!--${$_cliente_fun = ZCliente::getPeloID($_funcionario->getClienteID())}-->
+<!--${$_funcionario = $conta->findFuncionarioID()}-->
+<!--${$_cliente_fun = $_funcionario->findClienteID()}-->
 								<td><a href="/gerenciar/funcionario/editar?id={$_funcionario->getID()}" title="Editar funcionário '{$_cliente_fun->getNomeCompleto()}'">{$_cliente_fun->getNomeCompleto()}</a></td>
 								<td>
 <!--{if $conta->isAutoAcrescimo()}-->

@@ -25,9 +25,9 @@ use MZ\Location\Localizacao;
 
 need_permission(
     [
-        PermissaoNome::CADASTROCLIENTES,
+        Permissao::NOME_CADASTROCLIENTES,
         ['||'],
-        PermissaoNome::RELATORIOCLIENTES
+        Permissao::NOME_RELATORIOCLIENTES
     ],
     isset($_GET['saida']) && is_output('json')
 );
@@ -43,7 +43,7 @@ try {
     $aniversariantes = isset($_GET['aniversariantes'])?$_GET['aniversariantes']:null;
     $formato = isset($_GET['formato'])?$_GET['formato']:null;
 
-    $clientes = ZCliente::getTodos(
+    $clientes = Cliente::getTodos(
         $query,
         null, // tipo
         $genero,
@@ -98,19 +98,19 @@ try {
         $row[] = $value->getEmail();
         if (is_null($value->getDataAniversario())) {
             $row[] = null;
-        } elseif ($value->getTipo() == ClienteTipo::FISICA) {
+        } elseif ($value->getTipo() == Cliente::TIPO_FISICA) {
             $row[] = human_date($value->getDataAniversario());
         } else {
             $row[] = $value->getDataAniversario();
         }
-        if ($value->getTipo() == ClienteTipo::FISICA) {
+        if ($value->getTipo() == Cliente::TIPO_FISICA) {
             $row[] = \MZ\Util\Mask::cpf($value->getCPF());
         } else {
             $row[] = \MZ\Util\Mask::cnpj($value->getCPF());
         }
         $row[] = $value->getRG();
-        if ($value->getTipo() == ClienteTipo::FISICA) {
-            $row[] = ZCliente::getGeneroOptions($value->getGenero());
+        if ($value->getTipo() == Cliente::TIPO_FISICA) {
+            $row[] = Cliente::getGeneroOptions($value->getGenero());
         } else {
             $row[] = 'Empresa';
         }

@@ -280,7 +280,7 @@ class ZCliente
     public function getFone($index)
     {
         if ($index < 1 || $index > 2) {
-            throw new Exception('Índice '.$index.' inválido, aceito somente de 1 até 2');
+            throw new \Exception('Índice '.$index.' inválido, aceito somente de 1 até 2');
         }
         return $this->fone[$index];
     }
@@ -291,7 +291,7 @@ class ZCliente
     public function setFone($index, $value)
     {
         if ($index < 1 || $index > 2) {
-            throw new Exception('Índice '.$index.' inválido, aceito somente de 1 até 2');
+            throw new \Exception('Índice '.$index.' inválido, aceito somente de 1 até 2');
         }
         $this->fone[$index] = $value;
     }
@@ -447,7 +447,7 @@ class ZCliente
      */
     public function getNomeCompleto()
     {
-        if ($this->getTipo() == ClienteTipo::JURIDICA) {
+        if ($this->getTipo() == Cliente::TIPO_JURIDICA) {
             return $this->getNome();
         }
         return trim($this->getNome() . ' ' . $this->getSobrenome());
@@ -689,7 +689,7 @@ class ZCliente
 
     private static function initSelect()
     {
-        $query = DB::$pdo->from('Clientes c');
+        $query = \DB::$pdo->from('Clientes c');
         return self::initSelectFields($query);
     }
 
@@ -697,14 +697,14 @@ class ZCliente
     {
         $query = self::initSelect()
                          ->where(['id' => $id]);
-        return new ZCliente($query->fetch());
+        return new Cliente($query->fetch());
     }
 
     public static function getPeloFone($fone)
     {
         $_fone = \MZ\Util\Filter::digits($fone);
         if (strlen($_fone) == 0) {
-            return new ZCliente();
+            return new Cliente();
         }
         $_ddd = substr($_fone, 0, 2).'%';
         if (strlen($_fone) == 10) {
@@ -718,35 +718,35 @@ class ZCliente
                      ->where('c.fone1 LIKE ? OR c.fone2 LIKE ?', $_fone, $_fone)
                      ->orderBy('IF(c.fone1 LIKE ?, 0, 1)', $_fone)
                      ->limit(1);
-        return new ZCliente($query->fetch());
+        return new Cliente($query->fetch());
     }
 
     public static function getPelaEmail($email)
     {
         $query = self::initSelect()
                          ->where(['email' => $email]);
-        return new ZCliente($query->fetch());
+        return new Cliente($query->fetch());
     }
 
     public static function getPeloCPF($cpf)
     {
         $query = self::initSelect()
                          ->where(['cpf' => $cpf]);
-        return new ZCliente($query->fetch());
+        return new Cliente($query->fetch());
     }
 
     public static function getPeloLogin($login)
     {
         $query = self::initSelect()
                          ->where(['login' => $login]);
-        return new ZCliente($query->fetch());
+        return new Cliente($query->fetch());
     }
 
     public static function getPeloSecreto($secreto)
     {
         $query = self::initSelect()
                          ->where(['secreto' => $secreto]);
-        return new ZCliente($query->fetch());
+        return new Cliente($query->fetch());
     }
 
     public static function getPeloToken($token)
@@ -754,7 +754,7 @@ class ZCliente
         $token = base64_decode($token);
         $len = strlen($token);
         if ($len <= 62 || $len > 100) {
-            return new ZCliente();
+            return new Cliente();
         }
         $plen = $len - 48;
         $hlen = 40;
@@ -782,14 +782,14 @@ class ZCliente
         ));
         $i = round(abs($tm - $stm) / 60);
         if ($i > 5 || $sm === false || strcasecmp($crc, $ccrc) != 0) {
-            return new ZCliente();
+            return new Cliente();
         }
         $id = substr($id, 0, -14);
         $query = self::initSelect()->where([
                                 'c.id' => intval($id),
                                 'c.senha' => $hash,
                             ]);
-        return new ZCliente($query->fetch());
+        return new Cliente($query->fetch());
     }
 
     public static function getPeloCookie($cname = 'ru')
@@ -802,9 +802,9 @@ class ZCliente
                                 'c.id' => $p[0],
                                 'c.senha' => $p[1],
                             ]);
-            return new ZCliente($query->fetch());
+            return new Cliente($query->fetch());
         }
-        return new ZCliente();
+        return new Cliente();
     }
 
     public static function getPeloLoginSenha($email, $unpass)
@@ -819,12 +819,12 @@ class ZCliente
                             $field => $email,
                             'c.senha' => $senha,
                         ]);
-        return new ZCliente($query->fetch());
+        return new Cliente($query->fetch());
     }
 
     public static function getImagemPeloID($cliente_id, $dataSomente = false)
     {
-        $query = DB::$pdo->from('Clientes c')
+        $query = \DB::$pdo->from('Clientes c')
                          ->select(null)
                          ->select('c.dataatualizacao')
                          ->where(['c.id' => $cliente_id]);
@@ -837,10 +837,10 @@ class ZCliente
     private static function validarCampos(&$cliente)
     {
         $erros = [];
-        $funcionario = ZFuncionario::getPeloClienteID($cliente['id']);
+        $funcionario = Funcionario::findByClienteID($cliente['id']);
         $cliente['tipo'] = trim($cliente['tipo']);
         if (strlen($cliente['tipo']) == 0) {
-            $cliente['tipo'] = ClienteTipo::FISICA;
+            $cliente['tipo'] = Cliente::TIPO_FISICA;
         } elseif (!in_array($cliente['tipo'], ['Fisica', 'Juridica'])) {
             $erros['tipo'] = 'O tipo de cliente informado não é válido';
         }
@@ -873,8 +873,8 @@ class ZCliente
             $cliente['sobrenome'] = null;
         }
         $cliente['genero'] = strval($cliente['genero']);
-        if ($cliente['tipo'] == ClienteTipo::JURIDICA) {
-            $cliente['genero'] = ClienteGenero::FEMININO;
+        if ($cliente['tipo'] == Cliente::TIPO_JURIDICA) {
+            $cliente['genero'] = Cliente::GENERO_FEMININO;
         }
         if (!in_array($cliente['genero'], ['Masculino', 'Feminino'])) {
             $erros['genero'] = 'O gênero informado não é válido';
@@ -882,9 +882,9 @@ class ZCliente
         $cliente['cpf'] = \MZ\Util\Filter::digits($cliente['cpf']);
         if (strlen($cliente['cpf']) == 0) {
             $cliente['cpf'] = null;
-        } elseif (!check_cpf($cliente['cpf']) && $cliente['tipo'] == ClienteTipo::FISICA) {
+        } elseif (!check_cpf($cliente['cpf']) && $cliente['tipo'] == Cliente::TIPO_FISICA) {
             $erros['cpf'] = vsprintf('%s inválido', [_p('Titulo', 'CPF')]);
-        } elseif (!check_cnpj($cliente['cpf']) && $cliente['tipo'] == ClienteTipo::JURIDICA) {
+        } elseif (!check_cnpj($cliente['cpf']) && $cliente['tipo'] == Cliente::TIPO_JURIDICA) {
             $erros['cpf'] = vsprintf('%s inválido', [_p('Titulo', 'CNPJ')]);
         }
         $cliente['rg'] = strip_tags(trim($cliente['rg']));
@@ -996,12 +996,12 @@ class ZCliente
         }
         $_cliente['senha'] = self::gerarSenha($_cliente['senha']);
         try {
-            $_cliente['id'] = DB::$pdo->insertInto('Clientes')->values($_cliente)->execute();
+            $_cliente['id'] = \DB::$pdo->insertInto('Clientes')->values($_cliente)->execute();
         } catch (Exception $e) {
             self::handleException($e);
             throw $e;
         }
-        return self::getPeloID($_cliente['id']);
+        return self::findByID($_cliente['id']);
     }
 
     public static function atualizar($cliente)
@@ -1042,7 +1042,7 @@ class ZCliente
             $campos[] = 'fone'.$i;
         }
         try {
-            $query = DB::$pdo->update('Clientes');
+            $query = \DB::$pdo->update('Clientes');
             $query = $query->set(array_intersect_key($_cliente, array_flip($campos)));
             $query = $query->where('id', $_cliente['id']);
             $query->execute();
@@ -1050,15 +1050,15 @@ class ZCliente
             self::handleException($e);
             throw $e;
         }
-        return self::getPeloID($_cliente['id']);
+        return self::findByID($_cliente['id']);
     }
 
     public static function excluir($id)
     {
         if (!$id) {
-            throw new Exception('Não foi possível excluir o cliente, o id do cliente não foi informado');
+            throw new \Exception('Não foi possível excluir o cliente, o id do cliente não foi informado');
         }
-        $query = DB::$pdo->deleteFrom('Clientes')
+        $query = \DB::$pdo->deleteFrom('Clientes')
                          ->where(['id' => $id]);
         return $query->execute();
     }
@@ -1070,8 +1070,8 @@ class ZCliente
     public static function getTipoOptions()
     {
         return [
-            ClienteTipo::FISICA => 'Física',
-            ClienteTipo::JURIDICA => 'Jurídica',
+            Cliente::TIPO_FISICA => 'Física',
+            Cliente::TIPO_JURIDICA => 'Jurídica',
         ];
     }
 
@@ -1083,8 +1083,8 @@ class ZCliente
     public static function getGeneroOptions($index = null)
     {
         $options = [
-            ClienteGenero::MASCULINO => 'Masculino',
-            ClienteGenero::FEMININO => 'Feminino',
+            Cliente::GENERO_MASCULINO => 'Masculino',
+            Cliente::GENERO_FEMININO => 'Feminino',
         ];
         if (!is_null($index)) {
             return $options[$index];
@@ -1188,7 +1188,7 @@ class ZCliente
         $_clientes = $query->fetchAll();
         $clientes = [];
         foreach ($_clientes as $cliente) {
-            $clientes[] = new ZCliente($cliente);
+            $clientes[] = new Cliente($cliente);
         }
         return $clientes;
     }
@@ -1210,14 +1210,14 @@ class ZCliente
 
     private static function initSearchCompradores($mes_inicio, $mes_fim)
     {
-        $query = DB::$pdo->from('Pedidos p');
+        $query = \DB::$pdo->from('Pedidos p');
         $query = self::initSelectFields($query)
                          ->select('COUNT(DISTINCT p.id) as pedidos')
                          ->select('SUM(pp.quantidade * pp.preco * (1 + pp.porcentagem/100)) as total')
                          ->leftJoin('Produtos_Pedidos pp ON pp.pedidoid = p.id AND pp.cancelado = ?', 'N')
                          ->leftJoin('Clientes c ON c.id = p.clienteid')
                          ->where('p.cancelado', 'N')
-                         ->where('p.estado', PedidoEstado::FINALIZADO)
+                         ->where('p.estado', Pedido::ESTADO_FINALIZADO)
                          ->where('NOT ISNULL(p.clienteid)')
                          ->orderBy('total DESC')
                          ->groupBy('p.clienteid');

@@ -21,15 +21,15 @@
 */
 require_once(dirname(__DIR__) . '/app.php');
 
-need_permission(PermissaoNome::PAGAMENTO, is_output('json'));
+need_permission(Permissao::NOME_PAGAMENTO, is_output('json'));
 $id = $_GET['id'];
-$folha_cheque = ZFolhaCheque::getPeloID($id);
+$folha_cheque = FolhaCheque::findByID($id);
 if (is_null($folha_cheque->getID())) {
     $msg = 'A folha de cheque de id "'.$id.'" não existe!';
     if (is_output('json')) {
         json($msg);
     }
-    Thunder::warning($msg);
+    \Thunder::warning($msg);
     redirect('/gerenciar/folha_cheque/');
 }
 try {
@@ -38,12 +38,12 @@ try {
     if (is_output('json')) {
         json('msg', $msg);
     }
-    Thunder::success($msg, true);
+    \Thunder::success($msg, true);
 } catch (Exception $e) {
     $msg = 'Não foi possível recolher a folha de cheque "' . $folha_cheque->getNumero() . '"!';
     if (is_output('json')) {
         json($msg);
     }
-    Thunder::error($msg);
+    \Thunder::error($msg);
 }
 redirect('/gerenciar/folha_cheque/');

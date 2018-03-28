@@ -31,7 +31,7 @@ if ($_GET['primeiro'] || check_fone($_GET['busca'], true)) {
 } elseif ($limit > 20) {
     $limit = 20;
 }
-$fornecedores = ZFornecedor::getTodos($_GET['busca'], 0, $limit);
+$fornecedores = Fornecedor::getTodos($_GET['busca'], 0, $limit);
 $response = ['status' => 'ok'];
 $campos = [
             'id',
@@ -45,8 +45,8 @@ $campos = [
 $_fornecedores = [];
 $domask = intval($_GET['format']) != 0;
 foreach ($fornecedores as $fornecedor) {
-    $_fornecedor = $fornecedor->toArray();
-    $cliente = ZCliente::getPeloID($fornecedor->getEmpresaID());
+    $_fornecedor = $fornecedor->publish();
+    $cliente = $fornecedor->findEmpresaID();
     $_fornecedor['nome'] = $cliente->getNome();
     $_fornecedor['fone1'] = $cliente->getFone(1);
     $_fornecedor['cnpj'] = $cliente->getCPF();

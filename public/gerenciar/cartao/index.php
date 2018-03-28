@@ -21,16 +21,16 @@
 */
 require_once(dirname(__DIR__) . '/app.php');
 
-need_permission(PermissaoNome::CADASTROCARTOES, is_output('json'));
+need_permission(Permissao::NOME_CADASTROCARTOES, is_output('json'));
 
 $limite = isset($_GET['limite'])?intval($_GET['limite']):10;
 if ($limite > 100 || $limite < 1) {
 	$limite = 10;
 }
 
-$count = ZCartao::getCount($_GET['query'], $_GET['estado']);
+$count = Cartao::getCount($_GET['query'], $_GET['estado']);
 list($pagesize, $offset, $pagestring) = pagestring($count, $limite);
-$cartoes = ZCartao::getTodos($_GET['query'], $_GET['estado'], $offset, $pagesize);
+$cartoes = Cartao::getTodos($_GET['query'], $_GET['estado'], $offset, $pagesize);
 
 if (is_output('json')) {
 	$items = [];
@@ -44,5 +44,5 @@ $estados = [
     'Y' => 'Ativos',
     'N' => 'Inativos',
 ];
-$_imagens = ZCartao::getImages();
+$_imagens = Cartao::getImages();
 include template('gerenciar_cartao_index');

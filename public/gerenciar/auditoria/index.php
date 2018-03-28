@@ -21,16 +21,16 @@
 */
 require_once(dirname(__DIR__) . '/app.php');
 
-need_permission(PermissaoNome::RELATORIOAUDITORIA);
+need_permission(Permissao::NOME_RELATORIOAUDITORIA);
 
-$count = ZAuditoria::getCount($_GET['query'], $_GET['funcionarioid'], $_GET['tipo'], $_GET['prioridade']);
+$count = Auditoria::getCount($_GET['query'], $_GET['funcionarioid'], $_GET['tipo'], $_GET['prioridade']);
 list($pagesize, $offset, $pagestring) = pagestring($count, 10);
-$auditorias = ZAuditoria::getTodas($_GET['query'], $_GET['funcionarioid'], $_GET['tipo'], $_GET['prioridade'], $offset, $pagesize);
+$auditorias = Auditoria::getTodas($_GET['query'], $_GET['funcionarioid'], $_GET['tipo'], $_GET['prioridade'], $offset, $pagesize);
 
-$funcionarios = ZFuncionario::getTodos();
+$funcionarios = Funcionario::findAll();
 $_funcionario_names = [];
 foreach ($funcionarios as $funcionario) {
-    $_cliente = ZCliente::getPeloID($funcionario->getClienteID());
+    $_cliente = $funcionario->findClienteID();
     $_funcionario_names[$funcionario->getID()] = $_cliente->getLogin();
 }
 
@@ -53,5 +53,5 @@ $_tipo_icon = [
     'Financeiro' => 0,
     'Administrativo' => 16
 ];
-$_funcionario = ZFuncionario::getPeloID($_GET['funcionarioid']);
+$_funcionario = Funcionario::findByID($_GET['funcionarioid']);
 include template('gerenciar_auditoria_index');

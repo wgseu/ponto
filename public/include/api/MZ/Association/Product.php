@@ -143,7 +143,7 @@ class Product
         $this->dados['produtos'] = $this->produtos;
         $this->integracao->write($this->dados);
         try {
-            $appsync = new \AppSync();
+            $appsync = new \MZ\System\Synchronizer();
             $appsync->integratorChanged();
         } catch (\Exception $e) {
             \Log::error($e->getMessage());
@@ -171,7 +171,7 @@ class Product
         $this->dados['produtos'] = $this->produtos;
         $this->integracao->write($this->dados);
         try {
-            $appsync = new \AppSync();
+            $appsync = new \MZ\System\Synchronizer();
             $appsync->integratorChanged();
         } catch (\Exception $e) {
             \Log::error($e->getMessage());
@@ -195,7 +195,7 @@ class Product
         $this->dados['produtos'] = $this->produtos;
         $this->integracao->write($this->dados);
         try {
-            $appsync = new \AppSync();
+            $appsync = new \MZ\System\Synchronizer();
             $appsync->integratorChanged();
         } catch (\Exception $e) {
             \Log::error($e->getMessage());
@@ -212,15 +212,15 @@ class Product
             throw new \Exception('O produto informado não existe', 404);
         }
         $produto = $this->produtos[$codigo];
-        $associado = \ZProduto::getPeloID(isset($produto['id'])?$produto['id']:$produto['codigo_pdv']);
+        $associado = \Produto::findByID(isset($produto['id'])?$produto['id']:$produto['codigo_pdv']);
         if (is_null($associado->getID())) {
             throw new \Exception('O produto informado não foi associado', 401);
         }
-        if ($associado->getTipo() == \ProdutoTipo::PRODUTO) {
+        if ($associado->getTipo() == Produto::TIPO_PRODUTO) {
             throw new \Exception('O produto associado não permite formação', 401);
         }
         $produto['tipo'] = $associado->getTipo();
-        $_grupos = \ZGrupo::getTodosDoProdutoID($associado->getID());
+        $_grupos = \Grupo::getTodosDoProdutoID($associado->getID());
         $grupos = [];
         $contagem = [];
         $total_pacotes = 0;
@@ -235,7 +235,7 @@ class Product
         $grupo = new \ZGrupo();
         $grupo->setID(0);
         $grupo->setDescricao('Adicionais');
-        if ($associado->getTipo() == \ProdutoTipo::PACOTE) {
+        if ($associado->getTipo() == Produto::TIPO_PACOTE) {
             $grupo->setDescricao('Sem grupo');
         }
         $total_igual = count($produto['itens']) == $total_pacotes;
@@ -246,7 +246,7 @@ class Product
         $total_pacotes = 0;
         $grupo_index = 0;
         foreach ($produto['itens'] as $subcodigo => $subproduto) {
-            if ($associado->getTipo() == \ProdutoTipo::PACOTE) {
+            if ($associado->getTipo() == Produto::TIPO_PACOTE) {
                 $subassociado = Pacote::findByID(
                     isset($subproduto['id'])?$subproduto['id']:$subproduto['codigo_pdv']
                 );
@@ -268,19 +268,19 @@ class Product
                     $total_pacotes = 0;
                 }
                 if (!is_null($subassociado->getPropriedadeID())) {
-                    $item = \ZPropriedade::getPeloID($subassociado->getPropriedadeID());
+                    $item = $subassociado->findPropriedadeID();
                 } else {
-                    $item = \ZProduto::getPeloID($subassociado->getProdutoID());
+                    $item = $subassociado->findProdutoID();
                 }
             } else {
-                $subassociado = \ZComposicao::getPeloID(
+                $subassociado = \Composicao::findByID(
                     isset($subproduto['id'])?$subproduto['id']:$subproduto['codigo_pdv']
                 );
                 if ($subassociado->getComposicaoID() != $associado->getID()) {
                     $subassociado = new \ZComposicao();
                 }
                 $produto['itens'][$subcodigo]['grupoid'] = 0;
-                $item = \ZProduto::getPeloID($subassociado->getProdutoID());
+                $item = $subassociado->findProdutoID();
             }
             $produto['itens'][$subcodigo]['associado'] = $item->toArray();
         }
@@ -291,28 +291,28 @@ class Product
     {
         $produtos = $this->produtos;
         foreach ($produtos as $codigo => $produto) {
-            $associado = \ZProduto::getPeloID(isset($produto['id'])?$produto['id']:$produto['codigo_pdv']);
+            $associado = \Produto::findByID(isset($produto['id'])?$produto['id']:$produto['codigo_pdv']);
             $produtos[$codigo]['produto'] = $associado;
             $associados = 0;
             foreach ($produto['itens'] as $subcodigo => $subproduto) {
-                if ($associado->getTipo() == \ProdutoTipo::PACOTE) {
+                if ($associado->getTipo() == Produto::TIPO_PACOTE) {
                     $subassociado = Pacote::findByID(isset($subproduto['id'])?$subproduto['id']:$subproduto['codigo_pdv']);
                     if ($subassociado->getPacoteID() != $associado->getID()) {
                         $subassociado = new Pacote();
                     }
                     if (!is_null($subassociado->getPropriedadeID())) {
-                        $item = \ZPropriedade::getPeloID($subassociado->getPropriedadeID());
+                        $item = $subassociado->findPropriedadeID();
                     } else {
-                        $item = \ZProduto::getPeloID($subassociado->getProdutoID());
+                        $item = $subassociado->findProdutoID();
                     }
                 } else {
-                    $subassociado = \ZComposicao::getPeloID(
+                    $subassociado = \Composicao::findByID(
                         isset($subproduto['id'])?$subproduto['id']:$subproduto['codigo_pdv']
                     );
                     if ($subassociado->getComposicaoID() != $associado->getID()) {
                         $subassociado = new \ZComposicao();
                     }
-                    $item = \ZProduto::getPeloID($subassociado->getProdutoID());
+                    $item = $subassociado->findProdutoID();
                 }
                 if (!is_null($item->getID())) {
                     $associados++;
@@ -322,7 +322,7 @@ class Product
             $status = '';
             if (is_null($associado->getID())) {
                 $status = 'empty';
-            } elseif ($associado->getTipo() == \ProdutoTipo::PRODUTO && count($produto['itens']) > 0) {
+            } elseif ($associado->getTipo() == Produto::TIPO_PRODUTO && count($produto['itens']) > 0) {
                 $status = 'error';
             } elseif (count($produto['itens']) != $associados) {
                 $status = 'incomplete';

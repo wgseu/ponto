@@ -124,21 +124,21 @@ class ZMesa
 
     public static function getPeloID($mesa_id)
     {
-        $query = DB::$pdo->from('Mesas')
+        $query = \DB::$pdo->from('Mesas')
                          ->where(['id' => $mesa_id]);
-        return new ZMesa($query->fetch());
+        return new Mesa($query->fetch());
     }
 
     public static function getPeloNome($nome)
     {
-        $query = DB::$pdo->from('Mesas')
+        $query = \DB::$pdo->from('Mesas')
                          ->where(['nome' => $nome]);
-        return new ZMesa($query->fetch());
+        return new Mesa($query->fetch());
     }
 
     public static function getProximoID()
     {
-        $query = DB::$pdo->from('Mesas')
+        $query = \DB::$pdo->from('Mesas')
                          ->select(null)
                          ->select('MAX(id) as id');
         return $query->fetch('id') + 1;
@@ -157,9 +157,9 @@ class ZMesa
         } elseif (!in_array($mesa['ativa'], ['Y', 'N'])) {
             $erros['ativa'] = 'O estado de ativação da mesa não é válido';
         }
-        $old_mesa = self::getPeloID($mesa['id']);
+        $old_mesa = self::findByID($mesa['id']);
         if (!is_null($old_mesa->getID()) && $old_mesa->isAtiva() && $mesa['ativa'] == 'N') {
-            $pedido = ZPedido::getPelaMesaID($old_mesa->getID());
+            $pedido = Pedido::getPelaMesaID($old_mesa->getID());
             if (!is_null($pedido->getID())) {
                 $erros['ativa'] = 'A mesa não pode ser desativada porque possui um pedido em aberto';
             }
@@ -188,12 +188,12 @@ class ZMesa
         $_mesa = $mesa->toArray();
         self::validarCampos($_mesa);
         try {
-            $_mesa['id'] = DB::$pdo->insertInto('Mesas')->values($_mesa)->execute();
+            $_mesa['id'] = \DB::$pdo->insertInto('Mesas')->values($_mesa)->execute();
         } catch (Exception $e) {
             self::handleException($e);
             throw $e;
         }
-        return self::getPeloID($_mesa['id']);
+        return self::findByID($_mesa['id']);
     }
 
     public static function atualizar($mesa)
@@ -208,7 +208,7 @@ class ZMesa
             'ativa',
         ];
         try {
-            $query = DB::$pdo->update('Mesas');
+            $query = \DB::$pdo->update('Mesas');
             $query = $query->set(array_intersect_key($_mesa, array_flip($campos)));
             $query = $query->where('id', $_mesa['id']);
             $query->execute();
@@ -216,22 +216,22 @@ class ZMesa
             self::handleException($e);
             throw $e;
         }
-        return self::getPeloID($_mesa['id']);
+        return self::findByID($_mesa['id']);
     }
 
     public static function excluir($id)
     {
         if (!$id) {
-            throw new Exception('Não foi possível excluir a mesa, o id da mesa não foi informado');
+            throw new \Exception('Não foi possível excluir a mesa, o id da mesa não foi informado');
         }
-        $query = DB::$pdo->deleteFrom('Mesas')
+        $query = \DB::$pdo->deleteFrom('Mesas')
                          ->where(['id' => $id]);
         return $query->execute();
     }
 
     private static function initSearch($funcionario_id, $ativa, $busca)
     {
-        $query = DB::$pdo->from('Mesas m')
+        $query = \DB::$pdo->from('Mesas m')
                          ->select('(CASE WHEN ISNULL(p.id) THEN "livre" WHEN p.estado = "Fechado" THEN "fechado" WHEN p.estado = "Agendado" THEN "reservado" ELSE "ocupado" END) as estado')
                          ->select('pj.mesaid as juntaid')
                          ->select('mj.nome as juntanome')
@@ -266,7 +266,7 @@ class ZMesa
         $_mesas = $query->fetchAll();
         $mesas = [];
         foreach ($_mesas as $mesa) {
-            $mesas[] = new ZMesa($mesa);
+            $mesas[] = new Mesa($mesa);
         }
         return $mesas;
     }

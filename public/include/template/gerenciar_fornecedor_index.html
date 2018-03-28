@@ -44,7 +44,7 @@
 						<tbody>
 <!--{loop $fornecedores $fornecedor}-->
 							<tr>
-<!--${$_cliente = ZCliente::getPeloID($fornecedor->getEmpresaID())}-->
+<!--${$_cliente = $fornecedor->findEmpresaID()}-->
 								<td><a href="/gerenciar/cliente/editar?id={$_cliente->getID()}" title="Editar cliente '{$_cliente->getNomeCompleto()}'"><img src="${get_image_url($_cliente->getImagem(), 'cliente', 'empresa.png')}" height="48" alt="Foto" title="Foto"/><strong>{$_cliente->getNome()}</strong></a></td>
 								<td>{$fornecedor->getPrazoPagamento()}</td>
 								<td>${is_null($fornecedor->getDataCadastro())?'':date('d/m/Y H:i', strtotime($fornecedor->getDataCadastro()))}</td>

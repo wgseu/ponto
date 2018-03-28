@@ -22,55 +22,55 @@
 require_once(dirname(__DIR__) . '/app.php');
 
 need_manager(is_output('json'));
-$cliente = ZCliente::getPeloID($_GET['id']);
+$cliente = Cliente::findByID($_GET['id']);
 if (is_null($cliente->getID())) {
     $msg = 'O cliente de id "'.$id.'" não existe!';
     if (is_output('json')) {
         json($msg);
     }
-    Thunder::warning($msg);
+    \Thunder::warning($msg);
     redirect('/gerenciar/cliente/');
 }
 if ($cliente->getID() != $login_cliente->getID()) {
-    need_permission(PermissaoNome::CADASTROCLIENTES, is_output('json'));
+    need_permission(Permissao::NOME_CADASTROCLIENTES, is_output('json'));
 }
 if ($cliente->getID() == $__empresa__->getID() &&
-    !have_permission(PermissaoNome::ALTERARCONFIGURACOES)) {
+    !$login_funcionario->has(Permissao::NOME_ALTERARCONFIGURACOES)) {
     $msg = 'Você não tem permissão para alterar essa empresa!';
     if (is_output('json')) {
         json($msg);
     }
-    Thunder::warning($msg);
+    \Thunder::warning($msg);
     redirect('/gerenciar/cliente/');
 }
-$funcionario = ZFuncionario::getPeloClienteID($cliente->getID());
+$funcionario = Funcionario::findByClienteID($cliente->getID());
 if (!is_null($funcionario->getID()) && (
-    (!have_permission(PermissaoNome::CADASTROFUNCIONARIOS) &&
+    (!$login_funcionario->has(Permissao::NOME_CADASTROFUNCIONARIOS) &&
      $login_funcionario->getID() != $funcionario->getID()) ||
-    ( have_permission(PermissaoNome::CADASTROFUNCIONARIOS, $funcionario) &&
+    ( have_permission(Permissao::NOME_CADASTROFUNCIONARIOS, $funcionario) &&
      $login_funcionario->getID() != $funcionario->getID() && !is_owner()) ) ) {
     $msg = 'Você não tem permissão para alterar as informações desse cliente!';
     if (is_output('json')) {
         json($msg);
     }
-    Thunder::warning($msg);
+    \Thunder::warning($msg);
     redirect('/gerenciar/cliente/');
 }
 $focusctrl = 'nome';
 $errors = [];
 $old_cliente = $cliente;
 if (is_post()) {
-    $cliente = new ZCliente($_POST);
+    $cliente = new Cliente($_POST);
     try {
         $cliente->setID($old_cliente->getID());
-        if ($cliente->getID() == $__empresa__->getID() && $cliente->getTipo() != ClienteTipo::JURIDICA) {
+        if ($cliente->getID() == $__empresa__->getID() && $cliente->getTipo() != Cliente::TIPO_JURIDICA) {
             throw new ValidationException(['tipo' => 'O tipo da empresa deve ser jurídica']);
         }
         if (strlen($cliente->getSenha()) > 0 && $cliente->getSenha() != $_POST['confirmarsenha']) {
             throw new ValidationException(['senha' => 'As senhas não são iguais']);
         }
         $cliente->setAcionistaID(numberval($cliente->getAcionistaID()));
-        if ($cliente->getTipo() == ClienteTipo::JURIDICA) {
+        if ($cliente->getTipo() == Cliente::TIPO_JURIDICA) {
             $cliente->setCPF(\MZ\Util\Filter::unmask($cliente->getCPF(), _p('Mascara', 'CNPJ')));
         } else {
             $cliente->setCPF(\MZ\Util\Filter::unmask($cliente->getCPF(), _p('Mascara', 'CPF')));
@@ -81,7 +81,7 @@ if (is_post()) {
         $cliente->setFone(2, \MZ\Util\Filter::unmask($cliente->getFone(2), _p('Mascara', 'Telefone')));
         $cliente->setLimiteCompra(moneyval($cliente->getLimiteCompra()));
         $width = 256;
-        if ($cliente->getTipo() == ClienteTipo::JURIDICA) {
+        if ($cliente->getTipo() == Cliente::TIPO_JURIDICA) {
             $width = 640;
         }
         $imagem = upload_image('raw_imagem', 'cliente', null, $width, 256, true);
@@ -91,10 +91,12 @@ if (is_post()) {
         } elseif (trim($cliente->getImagem()) != '') { // evita sobrescrever
             $cliente->setImagem(true);
         }
-        $cliente = ZCliente::atualizar($cliente);
+        $cliente->filter($old_cliente);
+        $cliente->update();
+        $old_cliente->clean($cliente);
         try {
             if ($cliente->getID() == $__empresa__->getID()) {
-                $appsync = new AppSync();
+                $appsync = new \MZ\System\Synchronizer();
                 $appsync->enterpriseChanged();
             }
         } catch (Exception $e) {
@@ -104,7 +106,7 @@ if (is_post()) {
         if (is_output('json')) {
             json(['status' => 'ok', 'item' => $cliente->toArray(['secreto', 'senha']), 'msg' => $msg]);
         }
-        Thunder::success($msg, true);
+        \Thunder::success($msg, true);
         redirect('/gerenciar/cliente/');
     } catch (ValidationException $e) {
         $errors = $e->getErrors();
@@ -118,7 +120,7 @@ if (is_post()) {
         if (is_output('json')) {
             json($value, null, ['field' => $focusctrl]);
         }
-        Thunder::error($value);
+        \Thunder::error($value);
         break;
     }
 }

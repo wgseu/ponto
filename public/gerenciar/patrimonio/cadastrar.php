@@ -21,11 +21,18 @@
 */
 require_once(dirname(__DIR__) . '/app.php');
 
-need_permission(PermissaoNome::CADASTROPATRIMONIO);
+use MZ\__TODO_NAMESPACE__\Patrimonio;
+
+need_permission(\Permissao::NOME_CADASTROPATRIMONIO, is_output('json'));
+$id = isset($_GET['id']) ? $_GET['id'] : null;
+$patrimonio = Patrimonio::findByID($id);
+$patrimonio->setID(null);
+
 $focusctrl = 'descricao';
 $errors = [];
+$old_patrimonio = $patrimonio;
 if (is_post()) {
-    $patrimonio = new ZPatrimonio($_POST);
+    $patrimonio = new Patrimonio($_POST);
     try {
         $patrimonio->setID(null);
         $patrimonio->setQuantidade(moneyval($patrimonio->getQuantidade()));
@@ -37,8 +44,17 @@ if (is_post()) {
         $patrimonio->setDataAtualizacao(date('Y-m-d H:i:s', time()));
         $imagem_anexada = upload_image('raw_imagemanexada', 'patrimonio');
         $patrimonio->setImagemAnexada($imagem_anexada);
-        $patrimonio = ZPatrimonio::cadastrar($patrimonio);
-        Thunder::success('Patrimônio "'.$patrimonio->getDescricao().'" cadastrado com sucesso!', true);
+        $patrimonio->filter($old_patrimonio);
+        $patrimonio->insert();
+        $old_patrimonio->clean($patrimonio);
+        $msg = sprintf(
+            'Patrimônio "%s" cadastrado com sucesso!',
+            $patrimonio->getDescricao()
+        );
+        if (is_output('json')) {
+            json(null, ['item' => $patrimonio->publish(), 'msg' => $msg]);
+        }
+        \Thunder::success($msg, true);
         redirect('/gerenciar/patrimonio/');
     } catch (ValidationException $e) {
         $errors = $e->getErrors();
@@ -52,11 +68,11 @@ if (is_post()) {
     $patrimonio->setImagemAnexada(null);
     foreach ($errors as $key => $value) {
         $focusctrl = $key;
-        Thunder::error($value);
+        \Thunder::error($value);
         break;
     }
 } else {
-    $patrimonio = new ZPatrimonio();
+    $patrimonio = new Patrimonio();
     $patrimonio->setAtivo('Y');
 }
 if ($focusctrl == 'empresaid') {

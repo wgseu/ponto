@@ -23,7 +23,7 @@ require_once(dirname(__DIR__) . '/app.php');
 
 use MZ\Wallet\Banco;
 
-need_permission(PermissaoNome::CADASTROBANCOS, is_output('json'));
+need_permission(Permissao::NOME_CADASTROBANCOS, is_output('json'));
 
 $limite = trim($_GET['limite']);
 if (!is_numeric($limite) || $limite > 100 || $limite < 1) {

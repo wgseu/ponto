@@ -24,7 +24,7 @@ require_once(dirname(__DIR__) . '/app.php');
 use $[Table.package]\$[Table.norm];
 use MZ\Util\Filter;
 
-need_permission(\PermissaoNome::$[TABLE.style], is_output('json'));
+need_permission(\Permissao::NOME_$[TABLE.style], is_output('json'));
 
 $limite = isset($_GET['limite'])?intval($_GET['limite']):10;
 if ($limite > 100 || $limite < 1) {

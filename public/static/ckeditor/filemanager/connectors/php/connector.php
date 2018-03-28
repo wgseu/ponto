@@ -35,7 +35,7 @@ require('./phpcompat.php') ;
 if ( !$Config['Enabled'] )
 	SendError( 1, 'This connector is disabled. Please check the "editor/filemanager/connectors/php/config.php" file' ) ;
 
-if(!have_permission(PermissaoNome::ALTERARPAGINAS))
+if(!$login_funcionario->has(Permissao::NOME_ALTERARPAGINAS))
 	SendError( 1, 'Você não tem permissão para fazer uploads' );
 
 DoResponse() ;

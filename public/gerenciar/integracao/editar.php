@@ -23,7 +23,7 @@ require_once(dirname(__DIR__) . '/app.php');
 
 use MZ\System\Integracao;
 
-need_permission(\PermissaoNome::ALTERARCONFIGURACOES, is_output('json'));
+need_permission(\Permissao::NOME_ALTERARCONFIGURACOES, is_output('json'));
 $id = isset($_GET['id'])?$_GET['id']:null;
 $integracao = Integracao::findByID($id);
 if (!$integracao->exists()) {

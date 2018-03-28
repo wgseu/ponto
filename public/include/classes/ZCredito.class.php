@@ -159,9 +159,9 @@ class ZCredito
 
     public static function getPeloID($id)
     {
-        $query = DB::$pdo->from('Creditos')
+        $query = \DB::$pdo->from('Creditos')
                          ->where(['id' => $id]);
-        return new ZCredito($query->fetch());
+        return new Credito($query->fetch());
     }
 
     private static function validarCampos(&$credito)
@@ -206,12 +206,12 @@ class ZCredito
         $_credito = $credito->toArray();
         self::validarCampos($_credito);
         try {
-            $_credito['id'] = DB::$pdo->insertInto('Creditos')->values($_credito)->execute();
+            $_credito['id'] = \DB::$pdo->insertInto('Creditos')->values($_credito)->execute();
         } catch (Exception $e) {
             self::handleException($e);
             throw $e;
         }
-        return self::getPeloID($_credito['id']);
+        return self::findByID($_credito['id']);
     }
 
     public static function atualizar($credito)
@@ -232,7 +232,7 @@ class ZCredito
             'cancelado',
         ];
         try {
-            $query = DB::$pdo->update('Creditos');
+            $query = \DB::$pdo->update('Creditos');
             $query = $query->set(array_intersect_key($_credito, array_flip($campos)));
             $query = $query->where('id', $_credito['id']);
             $query->execute();
@@ -240,15 +240,15 @@ class ZCredito
             self::handleException($e);
             throw $e;
         }
-        return self::getPeloID($_credito['id']);
+        return self::findByID($_credito['id']);
     }
 
     public function cancelar()
     {
         if ($this->isCancelado()) {
-            throw new Exception('O crédito informado já está cancelado');
+            throw new \Exception('O crédito informado já está cancelado');
         }
-        $query = DB::$pdo->update('Creditos')
+        $query = \DB::$pdo->update('Creditos')
                          ->set('cancelado', 'Y')
                          ->where('id', $this->getID());
         $query->execute();
@@ -258,16 +258,16 @@ class ZCredito
     public static function excluir($id)
     {
         if (!$id) {
-            throw new Exception('Não foi possível excluir o credito, o id do credito não foi informado');
+            throw new \Exception('Não foi possível excluir o credito, o id do credito não foi informado');
         }
-        $query = DB::$pdo->deleteFrom('Creditos')
+        $query = \DB::$pdo->deleteFrom('Creditos')
                          ->where(['id' => $id]);
         return $query->execute();
     }
 
     private static function initSearch($busca, $cliente_id, $cancelado)
     {
-        $query = DB::$pdo->from('Creditos')
+        $query = \DB::$pdo->from('Creditos')
                          ->orderBy('id DESC');
         $busca = trim($busca);
         if ($busca != '') {
@@ -292,7 +292,7 @@ class ZCredito
         $_creditos = $query->fetchAll();
         $creditos = [];
         foreach ($_creditos as $credito) {
-            $creditos[] = new ZCredito($credito);
+            $creditos[] = new Credito($credito);
         }
         return $creditos;
     }
@@ -305,7 +305,7 @@ class ZCredito
 
     private static function initSearchDoClienteID($cliente_id)
     {
-        return   DB::$pdo->from('Creditos')
+        return   \DB::$pdo->from('Creditos')
                          ->where(['clienteid' => $cliente_id])
                          ->orderBy('id ASC');
     }
@@ -319,7 +319,7 @@ class ZCredito
         $_creditos = $query->fetchAll();
         $creditos = [];
         foreach ($_creditos as $credito) {
-            $creditos[] = new ZCredito($credito);
+            $creditos[] = new Credito($credito);
         }
         return $creditos;
     }
@@ -332,7 +332,7 @@ class ZCredito
 
     private static function initSearchDoFuncionarioID($funcionario_id)
     {
-        return   DB::$pdo->from('Creditos')
+        return   \DB::$pdo->from('Creditos')
                          ->where(['funcionarioid' => $funcionario_id])
                          ->orderBy('id ASC');
     }
@@ -346,7 +346,7 @@ class ZCredito
         $_creditos = $query->fetchAll();
         $creditos = [];
         foreach ($_creditos as $credito) {
-            $creditos[] = new ZCredito($credito);
+            $creditos[] = new Credito($credito);
         }
         return $creditos;
     }

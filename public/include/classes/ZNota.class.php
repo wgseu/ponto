@@ -483,58 +483,58 @@ class ZNota
 
     public function isAutorizada()
     {
-        $result = ($this->getTipo() == NotaTipo::NOTA) && ($this->getAcao() == NotaAcao::AUTORIZAR);
+        $result = ($this->getTipo() == Nota::TIPO_NOTA) && ($this->getAcao() == Nota::ACAO_AUTORIZAR);
         if (!$result) {
             return $result;
         }
-        $result = $this->isCorrigido() && $this->isConcluido() && ($this->getEstado() == NotaEstado::AUTORIZADO);
+        $result = $this->isCorrigido() && $this->isConcluido() && ($this->getEstado() == Nota::ESTADO_AUTORIZADO);
         if ($result) {
             return $result;
         }
-        $result = $this->isContingencia() && $this->isCorrigido() && ($this->getEstado() == NotaEstado::ASSINADO);
+        $result = $this->isContingencia() && $this->isCorrigido() && ($this->getEstado() == Nota::ESTADO_ASSINADO);
         return $result;
     }
 
     public static function getPeloID($id)
     {
-        $query = DB::$pdo->from('Notas')
+        $query = \DB::$pdo->from('Notas')
                          ->where(['id' => $id]);
-        return new ZNota($query->fetch());
+        return new Nota($query->fetch());
     }
 
     public static function getPelaChave($chave, $todos = false)
     {
-        $query = DB::$pdo->from('Notas')
+        $query = \DB::$pdo->from('Notas')
                          ->where(['chave' => $chave])
                          ->orderBy('concluido ASC, corrigido DESC, datalancamento DESC')
                          ->limit(1);
         if (!$todos) {
             $query = $query->where('concluido', 'N');
         }
-        return new ZNota($query->fetch());
+        return new Nota($query->fetch());
     }
 
     public static function getPeloPedidoID($pedido_id, $todos = false)
     {
-        $query = DB::$pdo->from('Notas')
+        $query = \DB::$pdo->from('Notas')
                          ->where('pedidoid', intval($pedido_id))
                          ->orderBy('concluido ASC, corrigido DESC, datalancamento DESC')
                          ->limit(1);
         if (!$todos) {
             $query = $query->where('concluido', 'N');
         }
-        return new ZNota($query->fetch());
+        return new Nota($query->fetch());
     }
 
     public static function getValida($pedido_id)
     {
-        $query = DB::$pdo->from('Notas')
+        $query = \DB::$pdo->from('Notas')
                          ->where('pedidoid', intval($pedido_id))
-                         ->where('tipo', NotaTipo::NOTA)
-                         ->where('acao', NotaAcao::AUTORIZAR)
+                         ->where('tipo', Nota::TIPO_NOTA)
+                         ->where('acao', Nota::ACAO_AUTORIZAR)
                          ->orderBy('sequencia DESC, numerofinal DESC')
                          ->limit(1);
-        return new ZNota($query->fetch());
+        return new Nota($query->fetch());
     }
 
     private static function validarCampos(&$nota)
@@ -666,12 +666,12 @@ class ZNota
         $_nota = $nota->toArray();
         self::validarCampos($_nota);
         try {
-            $_nota['id'] = DB::$pdo->insertInto('Notas')->values($_nota)->execute();
+            $_nota['id'] = \DB::$pdo->insertInto('Notas')->values($_nota)->execute();
         } catch (Exception $e) {
             self::handleException($e);
             throw $e;
         }
-        return self::getPeloID($_nota['id']);
+        return self::findByID($_nota['id']);
     }
 
     public static function atualizar($nota)
@@ -707,7 +707,7 @@ class ZNota
             'datalancamento',
         ];
         try {
-            $query = DB::$pdo->update('Notas');
+            $query = \DB::$pdo->update('Notas');
             $query = $query->set(array_intersect_key($_nota, array_flip($campos)));
             $query = $query->where('id', $_nota['id']);
             $query->execute();
@@ -715,15 +715,15 @@ class ZNota
             self::handleException($e);
             throw $e;
         }
-        return self::getPeloID($_nota['id']);
+        return self::findByID($_nota['id']);
     }
 
     public static function excluir($id)
     {
         if (!$id) {
-            throw new Exception('Não foi possível excluir a nota, o id da nota não foi informado');
+            throw new \Exception('Não foi possível excluir a nota, o id da nota não foi informado');
         }
-        $query = DB::$pdo->deleteFrom('Notas')
+        $query = \DB::$pdo->deleteFrom('Notas')
                          ->where(['id' => $id]);
         return $query->execute();
     }
@@ -731,12 +731,12 @@ class ZNota
     public static function criarProxima($base)
     {
         // procura o último número da nota e a última sequencia de repetições
-        $query = DB::$pdo->from('Notas')
+        $query = \DB::$pdo->from('Notas')
                          ->where('ambiente', $base->getAmbiente())
                          ->where('serie', $base->getSerie())
                          ->orderBy('sequencia DESC, numerofinal DESC')
                          ->limit(1);
-        $ultima = new ZNota($query->fetch());
+        $ultima = new Nota($query->fetch());
         if (is_null($ultima->getID())) {
             // não existe nenhuma nota ou inutilização para essa série ou ambiente
             $ultima->fromArray($base->toArray()); // copia a série e ambiente
@@ -746,9 +746,9 @@ class ZNota
         }
         // retira os dados da última nota
         $ultima->setID(null);
-        $ultima->setTipo(NotaTipo::NOTA);
-        $ultima->setAcao(NotaAcao::AUTORIZAR);
-        $ultima->setEstado(NotaEstado::ABERTO);
+        $ultima->setTipo(Nota::TIPO_NOTA);
+        $ultima->setAcao(Nota::ACAO_AUTORIZAR);
+        $ultima->setEstado(Nota::ESTADO_ABERTO);
         $ultima->setChave(null);
         $ultima->setRecibo(null);
         $ultima->setProtocolo(null);
@@ -766,7 +766,7 @@ class ZNota
         // utiliza o pedido da base
         $ultima->setPedidoID($base->getPedidoID());
         // verifica se o número inicial do caixa deve ser o próximo
-        $caixa = ZCaixa::getPelaSerie($ultima->getSerie());
+        $caixa = Caixa::getPelaSerie($ultima->getSerie());
         if ($caixa->getNumeroInicial() > $ultima->getNumeroFinal()) {
             $ultima->setNumeroFinal($caixa->getNumeroInicial() - 1);
         }
@@ -775,7 +775,7 @@ class ZNota
             // inicia uma nova sequência
             $ultima->setSequencia($ultima->getSequencia() + 1);
             $ultima->setNumeroFinal(0);
-            ZCaixa::resetaInicios($ultima->getSerie());
+            Caixa::resetaInicios($ultima->getSerie());
         }
         // incrementa para o próximo número
         $ultima->setNumeroFinal($ultima->getNumeroFinal() + 1);
@@ -806,7 +806,7 @@ class ZNota
         $files = [];
         foreach ($notas as $_nota) {
             // Notas abertas não possuem arquivo XML
-            if ($_nota->getEstado() == NotaEstado::ABERTO) {
+            if ($_nota->getEstado() == Nota::ESTADO_ABERTO) {
                 continue;
             }
             // a nota cancelada tem 2 XML
@@ -841,7 +841,7 @@ class ZNota
         $lancamento_inicio,
         $lancamento_fim
     ) {
-        $query = DB::$pdo->from('Notas')
+        $query = \DB::$pdo->from('Notas')
                          ->orderBy('id ASC');
         $chave = null;
         $protocolo = null;
@@ -952,7 +952,7 @@ class ZNota
         $_notas = $query->fetchAll();
         $notas = [];
         foreach ($_notas as $nota) {
-            $notas[] = new ZNota($nota);
+            $notas[] = new Nota($nota);
         }
         return $notas;
     }
@@ -990,10 +990,10 @@ class ZNota
 
     private static function initSearchAbertas()
     {
-        return   DB::$pdo->from('Notas')
-                         ->where('tipo', NotaTipo::NOTA)
-                         ->where('acao', NotaAcao::AUTORIZAR)
-                         ->where('estado <> ?', NotaEstado::PROCESSAMENTO)
+        return   \DB::$pdo->from('Notas')
+                         ->where('tipo', Nota::TIPO_NOTA)
+                         ->where('acao', Nota::ACAO_AUTORIZAR)
+                         ->where('estado <> ?', Nota::ESTADO_PROCESSAMENTO)
                          ->where('(estado <> ? OR contingencia = ?)', NotaEstado::PENDENTE, 'N')
                          ->where('corrigido', 'Y')
                          ->where('concluido', 'N')
@@ -1009,7 +1009,7 @@ class ZNota
         $_notas = $query->fetchAll();
         $notas = [];
         foreach ($_notas as $nota) {
-            $notas[] = new ZNota($nota);
+            $notas[] = new Nota($nota);
         }
         return $notas;
     }
@@ -1022,10 +1022,10 @@ class ZNota
 
     private static function initSearchPendentes()
     {
-        return   DB::$pdo->from('Notas')
-                         ->where('tipo', NotaTipo::NOTA)
-                         ->where('acao', NotaAcao::AUTORIZAR)
-                         ->where('estado', NotaEstado::PROCESSAMENTO)
+        return   \DB::$pdo->from('Notas')
+                         ->where('tipo', Nota::TIPO_NOTA)
+                         ->where('acao', Nota::ACAO_AUTORIZAR)
+                         ->where('estado', Nota::ESTADO_PROCESSAMENTO)
                          ->where('corrigido', 'Y')
                          ->where('concluido', 'N')
                          ->orderBy('id DESC');
@@ -1040,7 +1040,7 @@ class ZNota
         $_notas = $query->fetchAll();
         $notas = [];
         foreach ($_notas as $nota) {
-            $notas[] = new ZNota($nota);
+            $notas[] = new Nota($nota);
         }
         return $notas;
     }
@@ -1053,8 +1053,8 @@ class ZNota
 
     private static function initSearchTarefas()
     {
-        return   DB::$pdo->from('Notas')
-                         ->where('(acao <> ? OR (contingencia = ? AND estado = ?))', NotaAcao::AUTORIZAR, 'Y', NotaEstado::PENDENTE)
+        return   \DB::$pdo->from('Notas')
+                         ->where('(acao <> ? OR (contingencia = ? AND estado = ?))', NotaAcao::AUTORIZAR, 'Y', Nota::ESTADO_PENDENTE)
                          ->where('corrigido', 'Y')
                          ->where('concluido', 'N')
                          ->orderBy('id DESC');
@@ -1069,7 +1069,7 @@ class ZNota
         $_notas = $query->fetchAll();
         $notas = [];
         foreach ($_notas as $nota) {
-            $notas[] = new ZNota($nota);
+            $notas[] = new Nota($nota);
         }
         return $notas;
     }
@@ -1082,7 +1082,7 @@ class ZNota
 
     private static function initSearchDoPedidoID($pedido_id)
     {
-        return   DB::$pdo->from('Notas')
+        return   \DB::$pdo->from('Notas')
                          ->where(['pedidoid' => $pedido_id])
                          ->orderBy('id ASC');
     }
@@ -1096,7 +1096,7 @@ class ZNota
         $_notas = $query->fetchAll();
         $notas = [];
         foreach ($_notas as $nota) {
-            $notas[] = new ZNota($nota);
+            $notas[] = new Nota($nota);
         }
         return $notas;
     }

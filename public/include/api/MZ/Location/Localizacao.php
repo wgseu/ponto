@@ -934,7 +934,7 @@ class Localizacao extends \MZ\Database\Helper
      */
     public function findClienteID()
     {
-        return \ZCliente::getPeloID($this->getClienteID());
+        return \Cliente::findByID($this->getClienteID());
     }
 
     /**

@@ -87,16 +87,16 @@ class ZFuncao
 
     public static function getPeloID($id)
     {
-        $query = DB::$pdo->from('Funcoes')
+        $query = \DB::$pdo->from('Funcoes')
                          ->where(['id' => $id]);
-        return new ZFuncao($query->fetch());
+        return new Funcao($query->fetch());
     }
 
     public static function getPelaDescricao($descricao)
     {
-        $query = DB::$pdo->from('Funcoes')
+        $query = \DB::$pdo->from('Funcoes')
                          ->where(['descricao' => $descricao]);
-        return new ZFuncao($query->fetch());
+        return new Funcao($query->fetch());
     }
 
     private static function validarCampos(&$funcao)
@@ -131,12 +131,12 @@ class ZFuncao
         $_funcao = $funcao->toArray();
         self::validarCampos($_funcao);
         try {
-            $_funcao['id'] = DB::$pdo->insertInto('Funcoes')->values($_funcao)->execute();
+            $_funcao['id'] = \DB::$pdo->insertInto('Funcoes')->values($_funcao)->execute();
         } catch (Exception $e) {
             self::handleException($e);
             throw $e;
         }
-        return self::getPeloID($_funcao['id']);
+        return self::findByID($_funcao['id']);
     }
 
     public static function atualizar($funcao)
@@ -151,7 +151,7 @@ class ZFuncao
             'salariobase',
         ];
         try {
-            $query = DB::$pdo->update('Funcoes');
+            $query = \DB::$pdo->update('Funcoes');
             $query = $query->set(array_intersect_key($_funcao, array_flip($campos)));
             $query = $query->where('id', $_funcao['id']);
             $query->execute();
@@ -159,22 +159,22 @@ class ZFuncao
             self::handleException($e);
             throw $e;
         }
-        return self::getPeloID($_funcao['id']);
+        return self::findByID($_funcao['id']);
     }
 
     public static function excluir($id)
     {
         if (!$id) {
-            throw new Exception('Não foi possível excluir a funcao, o id da funcao não foi informado');
+            throw new \Exception('Não foi possível excluir a funcao, o id da funcao não foi informado');
         }
-        $query = DB::$pdo->deleteFrom('Funcoes')
+        $query = \DB::$pdo->deleteFrom('Funcoes')
                          ->where(['id' => $id]);
         return $query->execute();
     }
 
     private static function initSearch($busca)
     {
-        $query = DB::$pdo->from('Funcoes')
+        $query = \DB::$pdo->from('Funcoes')
                          ->orderBy('id ASC');
         $busca = trim($busca);
         if ($busca != '') {
@@ -192,7 +192,7 @@ class ZFuncao
         $_funcaos = $query->fetchAll();
         $funcaos = [];
         foreach ($_funcaos as $funcao) {
-            $funcaos[] = new ZFuncao($funcao);
+            $funcaos[] = new Funcao($funcao);
         }
         return $funcaos;
     }

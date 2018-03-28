@@ -65,7 +65,7 @@ class Card
         if (!array_key_exists($codigo, $this->codigos)) {
             throw new \Exception('O cartão informado não existe no iFood', 404);
         }
-        $cartao = \ZCartao::getPeloID($id);
+        $cartao = \Cartao::findByID($id);
         if (is_null($cartao->getID()) && is_numeric($id)) {
             throw new \Exception('Cartão não encontrado', 401);
         }
@@ -74,7 +74,7 @@ class Card
         $this->dados['cartoes'] = $this->cartoes;
         $this->integracao->write($this->dados);
         try {
-            $appsync = new \AppSync();
+            $appsync = new \MZ\System\Synchronizer();
             $appsync->integratorChanged();
         } catch (\Exception $e) {
             \Log::error($e->getMessage());
@@ -91,7 +91,7 @@ class Card
             $codigos[$index]['icon'] = 'save';
         }
         foreach ($this->cartoes as $index => $id) {
-            $cartao = \ZCartao::getPeloID($id);
+            $cartao = \Cartao::findByID($id);
             $status = '';
             if (is_null($cartao->getID())) {
                 $status = 'empty';

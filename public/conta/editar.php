@@ -31,7 +31,7 @@ $aceitar = 'true';
 $erro = [];
 if (is_post()) {
     $old_cliente = $cliente;
-    $cliente = new ZCliente($_POST);
+    $cliente = new Cliente($_POST);
     try {
         // não deixa o usuário alterar os dados abaixo
         $cliente->setID($old_cliente->getID());
@@ -42,7 +42,7 @@ if (is_post()) {
         $cliente->setLimiteCompra($old_cliente->getLimiteCompra());
         $cliente->setSlogan($old_cliente->getSlogan());
 
-        if ($cliente->getTipo() == ClienteTipo::JURIDICA) {
+        if ($cliente->getTipo() == Cliente::TIPO_JURIDICA) {
             $cliente->setCPF(\MZ\Util\Filter::unmask($cliente->getCPF(), _p('Mascara', 'CNPJ')));
         } else {
             $cliente->setCPF(\MZ\Util\Filter::unmask($cliente->getCPF(), _p('Mascara', 'CPF')));
@@ -52,7 +52,7 @@ if (is_post()) {
         $cliente->setFone(1, \MZ\Util\Filter::unmask($cliente->getFone(1), _p('Mascara', 'Telefone')));
         $cliente->setFone(2, \MZ\Util\Filter::unmask($cliente->getFone(2), _p('Mascara', 'Telefone')));
         $width = 256;
-        if ($cliente->getTipo() == ClienteTipo::JURIDICA) {
+        if ($cliente->getTipo() == Cliente::TIPO_JURIDICA) {
             $width = 640;
         }
         $imagem = upload_image('raw_imagem', 'cliente', null, $width, 256, true);
@@ -65,12 +65,14 @@ if (is_post()) {
         if ($_POST['confirmarsenha'] != $_POST['senha']) {
             throw new ValidationException(['senha' => 'As senhas não são iguais', 'confirmarsenha' => 'As senhas não são iguais']);
         }
-        $cliente = ZCliente::atualizar($cliente);
+        $cliente->filter($old_cliente);
+        $cliente->update();
+        $old_cliente->clean($cliente);
         $msg = 'Conta atualizada com sucesso!';
         if (is_output('json')) {
             json(['status' => 'ok', 'item' => $cliente->toArray(['secreto', 'senha', 'slogan']), 'msg' => $msg]);
         }
-        Thunder::success($msg, true);
+        \Thunder::success($msg, true);
         redirect('/conta/editar');
     } catch (ValidationException $e) {
         $erro = $e->getErrors();
@@ -84,7 +86,7 @@ if (is_post()) {
         if (is_output('json')) {
             json($value);
         }
-        Thunder::error($value);
+        \Thunder::error($value);
         break;
     }
 }

@@ -62,9 +62,9 @@
 									<small>{$tipos[$forma_pagto->getTipo()]}</small>
 								</td>
 								<td>
-<!--${$_carteira = \MZ\Wallet\Carteira::findByID($forma_pagto->getCarteiraID())}-->
+<!--${$_carteira = $forma_pagto->findCarteiraID()}-->
 									<strong><a href="/gerenciar/carteira/editar?id={$_carteira->getID()}" title="Editar carteira de entrada '{$_carteira->getDescricao()}'">{$_carteira->getDescricao()}</a></strong>
-<!--${$_carteira = \MZ\Wallet\Carteira::findByID($forma_pagto->getCarteiraPagtoID())}-->
+<!--${$_carteira = $forma_pagto->findCarteiraPagtoID()}-->
 									<small><a href="/gerenciar/carteira/editar?id={$_carteira->getID()}" title="Editar carteira de saída '{$_carteira->getDescricao()}'">{$_carteira->getDescricao()}</a></small>
 								</td>
 								<td>

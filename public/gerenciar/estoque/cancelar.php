@@ -21,30 +21,30 @@
 */
 require_once(dirname(__DIR__) . '/app.php');
 
-need_permission([PermissaoNome::ESTOQUE, PermissaoNome::RETIRARDOESTOQUE], is_output('json'));
+need_permission([Permissao::NOME_ESTOQUE, Permissao::NOME_RETIRARDOESTOQUE], is_output('json'));
 $id = $_GET['id'];
-$estoque = ZEstoque::getPeloID($id);
+$estoque = Estoque::findByID($id);
 if (is_null($estoque->getID())) {
     $msg = 'O estoque de id "'.$id.'" não existe!';
     if (is_output('json')) {
         json($msg);
     }
-    Thunder::warning($msg);
+    \Thunder::warning($msg);
     redirect('/gerenciar/estoque/');
 }
 try {
-    $produto = ZProduto::getPeloID($estoque->getProdutoID());
+    $produto = $estoque->findProdutoID();
     $estoque->cancelar();
     $msg = 'Entrada do produto "' . $produto->getDescricao() . '" e quantidade ' . $estoque->getQuantidade() . ' cancelada com sucesso!';
     if (is_output('json')) {
         json('msg', $msg);
     }
-    Thunder::success($msg, true);
+    \Thunder::success($msg, true);
 } catch (Exception $e) {
     $msg = $e->getMessage();
     if (is_output('json')) {
         json($msg);
     }
-    Thunder::error($msg);
+    \Thunder::error($msg);
 }
 redirect('/gerenciar/estoque/');

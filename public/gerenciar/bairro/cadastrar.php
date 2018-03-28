@@ -23,7 +23,7 @@ require_once(dirname(__DIR__) . '/app.php');
 
 use MZ\Location\Bairro;
 
-need_permission(\PermissaoNome::CADASTROBAIRROS, is_output('json'));
+need_permission(\Permissao::NOME_CADASTROBAIRROS, is_output('json'));
 $id = isset($_GET['id'])?$_GET['id']:null;
 $bairro = Bairro::findByID($id);
 $bairro->setID(null);

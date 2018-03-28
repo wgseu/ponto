@@ -84,7 +84,7 @@ function mail_nota($email, $nome, $modo, $filters, $files = [])
 
     $pass = get_string_config('Email', 'Senha', '');
     if ($pass == '') {
-        throw new Exception('O serviço de E-mail não foi configurado', 500);
+        throw new \Exception('O serviço de E-mail não foi configurado', 500);
     }
     $assunto = 'Nota fiscal eletrônica';
     $user = get_string_config('Email', 'Usuario');
@@ -114,6 +114,6 @@ function mail_nota($email, $nome, $modo, $filters, $files = [])
     /* end test */
     $reply = "{$empresa_nome} <{$from}>";
     if (!mail_custom($to, $assunto, $message, $reply, $files)) {
-        throw new Exception('Não foi possível enviar o E-mail', 500);
+        throw new \Exception('Não foi possível enviar o E-mail', 500);
     }
 }

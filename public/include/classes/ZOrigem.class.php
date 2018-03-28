@@ -93,16 +93,16 @@ class ZOrigem
 
     public static function getPeloID($id)
     {
-        $query = DB::$pdo->from('Origens')
+        $query = \DB::$pdo->from('Origens')
                          ->where(['id' => $id]);
-        return new ZOrigem($query->fetch());
+        return new Origem($query->fetch());
     }
 
     public static function getPeloCodigo($codigo)
     {
-        $query = DB::$pdo->from('Origens')
+        $query = \DB::$pdo->from('Origens')
                          ->where(['codigo' => $codigo]);
-        return new ZOrigem($query->fetch());
+        return new Origem($query->fetch());
     }
 
     private static function validarCampos(&$origem)
@@ -135,12 +135,12 @@ class ZOrigem
         $_origem = $origem->toArray();
         self::validarCampos($_origem);
         try {
-            $_origem['id'] = DB::$pdo->insertInto('Origens')->values($_origem)->execute();
+            $_origem['id'] = \DB::$pdo->insertInto('Origens')->values($_origem)->execute();
         } catch (Exception $e) {
             self::handleException($e);
             throw $e;
         }
-        return self::getPeloID($_origem['id']);
+        return self::findByID($_origem['id']);
     }
 
     public static function atualizar($origem)
@@ -155,7 +155,7 @@ class ZOrigem
             'descricao',
         ];
         try {
-            $query = DB::$pdo->update('Origens');
+            $query = \DB::$pdo->update('Origens');
             $query = $query->set(array_intersect_key($_origem, array_flip($campos)));
             $query = $query->where('id', $_origem['id']);
             $query->execute();
@@ -163,22 +163,22 @@ class ZOrigem
             self::handleException($e);
             throw $e;
         }
-        return self::getPeloID($_origem['id']);
+        return self::findByID($_origem['id']);
     }
 
     public static function excluir($id)
     {
         if (!$id) {
-            throw new Exception('Não foi possível excluir a origem, o id da origem não foi informado');
+            throw new \Exception('Não foi possível excluir a origem, o id da origem não foi informado');
         }
-        $query = DB::$pdo->deleteFrom('Origens')
+        $query = \DB::$pdo->deleteFrom('Origens')
                          ->where(['id' => $id]);
         return $query->execute();
     }
 
     private static function initSearch()
     {
-        return   DB::$pdo->from('Origens')
+        return   \DB::$pdo->from('Origens')
                          ->orderBy('id ASC');
     }
 
@@ -191,7 +191,7 @@ class ZOrigem
         $_origems = $query->fetchAll();
         $origems = [];
         foreach ($_origems as $origem) {
-            $origems[] = new ZOrigem($origem);
+            $origems[] = new Origem($origem);
         }
         return $origems;
     }

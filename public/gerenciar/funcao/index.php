@@ -23,8 +23,8 @@ require_once(dirname(__DIR__) . '/app.php');
 
 need_owner();
 
-$count = ZFuncao::getCount($_GET['query']);
+$count = Funcao::getCount($_GET['query']);
 list($pagesize, $offset, $pagestring) = pagestring($count, 10);
-$funcoes = ZFuncao::getTodas($_GET['query'], $offset, $pagesize);
+$funcoes = Funcao::getTodas($_GET['query'], $offset, $pagesize);
 
 include template('gerenciar_funcao_index');

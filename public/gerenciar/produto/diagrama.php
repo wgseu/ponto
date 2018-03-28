@@ -21,19 +21,26 @@
 */
 require_once(dirname(__DIR__) . '/app.php');
 
-need_permission(PermissaoNome::CADASTROPRODUTOS);
-$produto = ZProduto::getPeloID($_GET['id']);
-if (is_null($produto->getID())) {
-    Thunder::warning('O produto de id "'.$_GET['id'].'" não existe!');
+use MZ\__TODO_NAMESPACE__\Produto;
+
+need_permission(\Permissao::NOME_CADASTROPRODUTOS, is_output('json'));
+$id = isset($_GET['id']) ? $_GET['id'] : null;
+$produto = Produto::findByID($id);
+if (!$produto->exists()) {
+    $msg = 'O produto informado não existe!';
+    if (is_output('json')) {
+        json($msg);
+    }
+    \Thunder::warning($msg);
     redirect('/gerenciar/produto/');
 }
-if ($produto->getTipo() != ProdutoTipo::COMPOSICAO) {
-    Thunder::warning('O produto "'.$produto->getDescricao().'" não é uma composição!');
+if ($produto->getTipo() != Produto::TIPO_COMPOSICAO) {
+    \Thunder::warning('O produto "'.$produto->getDescricao().'" não é uma composição!');
     redirect('/gerenciar/produto/');
 }
 $nos = [];
 $stack = new SplStack();
-$composicao = new ZComposicao();
+$composicao = new Composicao();
 $composicao->setID(0); // código do pai
 $composicao->setComposicaoID(null); // não possui pai
 $composicao->setProdutoID($produto->getID());
@@ -41,15 +48,15 @@ $composicao->setQuantidade($produto->getConteudo());
 $stack->push($composicao);
 while (!$stack->isEmpty()) {
     $composicao = $stack->pop();
-    $_produto = ZProduto::getPeloID($composicao->getProdutoID());
-    if ($_produto->getTipo() == ProdutoTipo::PACOTE) {
+    $_produto = $composicao->findProdutoID();
+    if ($_produto->getTipo() == Produto::TIPO_PACOTE) {
         continue;
     }
-    if ($_produto->getTipo() == ProdutoTipo::COMPOSICAO) {
+    if ($_produto->getTipo() == Produto::TIPO_COMPOSICAO) {
         $valor = 0.0;
-        $composicoes = ZComposicao::getTodasDaComposicaoID(null, $composicao->getProdutoID());
+        $composicoes = Composicao::getTodasDaComposicaoID(null, $composicao->getProdutoID());
         foreach ($composicoes as $_composicao) {
-            if ($_composicao->getTipo() == ComposicaoTipo::ADICIONAL) {
+            if ($_composicao->getTipo() == Composicao::TIPO_ADICIONAL) {
                 continue;
             }
             $_composicao->setQuantidade($_composicao->getQuantidade() * $composicao->getQuantidade());
@@ -57,7 +64,7 @@ while (!$stack->isEmpty()) {
             $stack->push($_composicao);
         }
     } else { // o composto é um produto
-        $valor = ZEstoque::getUltimoPrecoCompra($_produto->getID());
+        $valor = Estoque::getUltimoPrecoCompra($_produto->getID());
     }
     $composicao->setValor($valor);
     $no = [];

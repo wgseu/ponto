@@ -21,29 +21,29 @@
 */
 require_once(dirname(__DIR__) . '/app.php');
 
-need_permission(PermissaoNome::CADASTROMESAS, is_output('json'));
+need_permission(Permissao::NOME_CADASTROMESAS, is_output('json'));
 $id = $_GET['id'];
-$mesa = ZMesa::getPeloID($id);
+$mesa = Mesa::findByID($id);
 if (is_null($mesa->getID())) {
     $msg = 'A mesa de id "'.$id.'" não existe!';
     if (is_output('json')) {
         json($msg);
     }
-    Thunder::warning($msg);
+    \Thunder::warning($msg);
     redirect('/gerenciar/mesa/');
 }
 try {
-    ZMesa::excluir($id);
+    Mesa::excluir($id);
     $msg = 'Mesa "' . $mesa->getNome() . '" excluída com sucesso!';
     if (is_output('json')) {
         json('msg', $msg);
     }
-    Thunder::success($msg, true);
+    \Thunder::success($msg, true);
 } catch (Exception $e) {
     $msg = 'Não foi possível excluir a mesa "' . $mesa->getNome() . '"!';
     if (is_output('json')) {
         json($msg);
     }
-    Thunder::error($msg);
+    \Thunder::error($msg);
 }
 redirect('/gerenciar/mesa/');

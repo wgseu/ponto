@@ -191,9 +191,9 @@ class ZCheque
 
     public static function getPeloID($id)
     {
-        $query = DB::$pdo->from('Cheques')
+        $query = \DB::$pdo->from('Cheques')
                          ->where(['id' => $id]);
-        return new ZCheque($query->fetch());
+        return new Cheque($query->fetch());
     }
 
     private static function validarCampos(&$cheque)
@@ -243,12 +243,12 @@ class ZCheque
         $_cheque = $cheque->toArray();
         self::validarCampos($_cheque);
         try {
-            $_cheque['id'] = DB::$pdo->insertInto('Cheques')->values($_cheque)->execute();
+            $_cheque['id'] = \DB::$pdo->insertInto('Cheques')->values($_cheque)->execute();
         } catch (Exception $e) {
             self::handleException($e);
             throw $e;
         }
-        return self::getPeloID($_cheque['id']);
+        return self::findByID($_cheque['id']);
     }
 
     public static function atualizar($cheque)
@@ -268,7 +268,7 @@ class ZCheque
             'cancelado',
         ];
         try {
-            $query = DB::$pdo->update('Cheques');
+            $query = \DB::$pdo->update('Cheques');
             $query = $query->set(array_intersect_key($_cheque, array_flip($campos)));
             $query = $query->where('id', $_cheque['id']);
             $query->execute();
@@ -276,12 +276,12 @@ class ZCheque
             self::handleException($e);
             throw $e;
         }
-        return self::getPeloID($_cheque['id']);
+        return self::findByID($_cheque['id']);
     }
 
     private static function initSearch()
     {
-        return   DB::$pdo->from('Cheques')
+        return   \DB::$pdo->from('Cheques')
                          ->orderBy('id ASC');
     }
 
@@ -294,7 +294,7 @@ class ZCheque
         $_cheques = $query->fetchAll();
         $cheques = [];
         foreach ($_cheques as $cheque) {
-            $cheques[] = new ZCheque($cheque);
+            $cheques[] = new Cheque($cheque);
         }
         return $cheques;
     }
@@ -307,7 +307,7 @@ class ZCheque
 
     private static function initSearchDoBancoID($banco_id)
     {
-        return   DB::$pdo->from('Cheques')
+        return   \DB::$pdo->from('Cheques')
                          ->where(['bancoid' => $banco_id])
                          ->orderBy('id ASC');
     }
@@ -321,7 +321,7 @@ class ZCheque
         $_cheques = $query->fetchAll();
         $cheques = [];
         foreach ($_cheques as $cheque) {
-            $cheques[] = new ZCheque($cheque);
+            $cheques[] = new Cheque($cheque);
         }
         return $cheques;
     }
@@ -334,7 +334,7 @@ class ZCheque
 
     private static function initSearchDoClienteID($cliente_id)
     {
-        return   DB::$pdo->from('Cheques')
+        return   \DB::$pdo->from('Cheques')
                          ->where(['clienteid' => $cliente_id])
                          ->orderBy('id ASC');
     }
@@ -348,7 +348,7 @@ class ZCheque
         $_cheques = $query->fetchAll();
         $cheques = [];
         foreach ($_cheques as $cheque) {
-            $cheques[] = new ZCheque($cheque);
+            $cheques[] = new Cheque($cheque);
         }
         return $cheques;
     }

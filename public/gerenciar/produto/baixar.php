@@ -21,7 +21,7 @@
 */
 require_once(dirname(__DIR__) . '/app.php');
 
-need_permission(PermissaoNome::CADASTROPRODUTOS, isset($_GET['saida']) && is_output('json'));
+need_permission(Permissao::NOME_CADASTROPRODUTOS, isset($_GET['saida']) && is_output('json'));
 
 set_time_limit(0);
 
@@ -36,7 +36,7 @@ try {
     $tipo = isset($_GET['tipo'])?$_GET['tipo']:null;
     $formato = isset($_GET['formato'])?$_GET['formato']:null;
 
-    $produtos = ZProduto::getTodos(
+    $produtos = Produto::getTodos(
         $query,
         $categoria_id,
         null, // unidade
@@ -79,8 +79,8 @@ try {
     $last = chr(ord($column) + count($columns) - 1);
     $line = 3;
     $i = $line;
-    $value = new ZProduto();
-    $unidade = new ZUnidade();
+    $value = new Produto();
+    $unidade = new Unidade();
     foreach ($produtos as $key => $item) {
         $i++;
         $value->fromArray($item);
@@ -91,7 +91,7 @@ try {
         $row[] = $value->getDescricao($item);
         $row[] = $value->getPrecoVenda();
         $row[] = $item['categoria'];
-        $row[] = ZProduto::getTipoOptions($value->getTipo());
+        $row[] = Produto::getTipoOptions($value->getTipo());
         $row[] = $item['estoque'];
         $row[] = $unidade->formatar($item['estoque'], $value->getConteudo());
         $row[] = $value->isDivisivel()?'Sim':'Não';

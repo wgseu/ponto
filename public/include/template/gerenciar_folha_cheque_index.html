@@ -60,10 +60,10 @@
 						</thead>
 						<tbody>
 <!--{loop $folhas_de_cheques $folha_cheque}-->
-<!--${$_cheque = ZCheque::getPeloID($folha_cheque->getChequeID())}-->
+<!--${$_cheque = $folha_cheque->findChequeID()}-->
 							<tr ${$_cheque->isCancelado()?'class="active"':($folha_cheque->isRecolhido()?'class="success"':'')}>
-<!--${$_banco = Banco::findByID($_cheque->getBancoID())}-->
-<!--${$_cliente = ZCliente::getPeloID($_cheque->getClienteID())}-->
+<!--${$_banco = $_cheque->findBancoID()}-->
+<!--${$_cliente = $_cheque->findClienteID()}-->
 								<td>{$_cliente->getNomeCompleto()}</td>
 								<td><a href="/gerenciar/banco/editar?id={$_banco->getID()}" title="Editar banco '{$_banco->getRazaoSocial()}'">{$_banco->getRazaoSocial()}</a></td>
 								<td>{$_cheque->getAgencia()}</td>

@@ -21,13 +21,13 @@
 */
 require_once(dirname(__DIR__) . '/app.php');
 
-need_permission(PermissaoNome::PAGAMENTO);
+need_permission(Permissao::NOME_PAGAMENTO);
 
 $data_inicio = date_create_from_format('d/m/Y', $_GET['datahora_inicio']);
 $data_inicio = $data_inicio===false?null:$data_inicio->getTimestamp();
 $data_fim = date_create_from_format('d/m/Y', $_GET['datahora_fim']);
 $data_fim = $data_fim===false?null:$data_fim->getTimestamp();
-$count = ZProdutoPedido::getCount(
+$count = ProdutoPedido::getCount(
     $_GET['query'],
     $_GET['produto_id'],
     $_GET['funcionario_id'],
@@ -40,7 +40,7 @@ $count = ZProdutoPedido::getCount(
     $data_fim
 );
 list($pagesize, $offset, $pagestring) = pagestring($count, 10);
-$itens_do_pedido = ZProdutoPedido::getTodos(
+$itens_do_pedido = ProdutoPedido::getTodos(
     $_GET['query'],
     $_GET['produto_id'],
     $_GET['funcionario_id'],
@@ -92,6 +92,6 @@ $_pedido_icon = [
     'Entrega' => 48,
 ];
 
-$_produto = ZProduto::getPeloID($_GET['produto_id']);
-$_funcionario = ZFuncionario::getPeloID($_GET['funcionario_id']);
+$_produto = Produto::findByID($_GET['produto_id']);
+$_funcionario = Funcionario::findByID($_GET['funcionario_id']);
 include template('gerenciar_produto_pedido_index');

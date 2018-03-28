@@ -23,36 +23,51 @@ require_once(dirname(__DIR__) . '/app.php');
 
 use MZ\Wallet\Carteira;
 
-need_permission(PermissaoNome::CADASTROFORMASPAGTO);
-$forma_pagto = ZFormaPagto::getPeloID($_GET['id']);
+need_permission(Permissao::NOME_CADASTROFORMASPAGTO);
+$forma_pagto = FormaPagto::findByID($_GET['id']);
 if (is_null($forma_pagto->getID())) {
-    Thunder::warning('A forma de pagamento de id "'.$_GET['id'].'" não existe!');
+    \Thunder::warning('A forma de pagamento de id "'.$_GET['id'].'" não existe!');
     redirect('/gerenciar/forma_pagto/');
 }
 $focusctrl = 'descricao';
 $errors = [];
 $old_forma_pagto = $forma_pagto;
 if (is_post()) {
-    $forma_pagto = new ZFormaPagto($_POST);
+    $forma_pagto = new FormaPagto($_POST);
     try {
         $forma_pagto->setID($old_forma_pagto->getID());
         $forma_pagto->setMinParcelas(numberval($forma_pagto->getMinParcelas()));
         $forma_pagto->setMaxParcelas(numberval($forma_pagto->getMaxParcelas()));
         $forma_pagto->setParcelasSemJuros(numberval($forma_pagto->getParcelasSemJuros()));
         $forma_pagto->setJuros(moneyval($forma_pagto->getJuros()));
-        $forma_pagto = ZFormaPagto::atualizar($forma_pagto);
-        Thunder::success('Forma de pagamento "'.$forma_pagto->getDescricao().'" atualizada com sucesso!', true);
+        $forma_pagto->filter($old_forma_pagto);
+        $forma_pagto->update();
+        $old_forma_pagto->clean($forma_pagto);
+        $msg = sprintf(
+            'Forma de pagamento "%s" atualizada com sucesso!',
+            $forma_pagto->getDescricao()
+        );
+        if (is_output('json')) {
+            json(null, ['item' => $forma_pagto->publish(), 'msg' => $msg]);
+        }
+        \Thunder::success($msg, true);
         redirect('/gerenciar/forma_pagto/');
-    } catch (ValidationException $e) {
-        $errors = $e->getErrors();
-    } catch (Exception $e) {
-        $errors['unknow'] = $e->getMessage();
+    } catch (\Exception $e) {
+        $forma_pagto->clean($old_forma_pagto);
+        if ($e instanceof \MZ\Exception\ValidationException) {
+            $errors = $e->getErrors();
+        }
+        if (is_output('json')) {
+            json($e->getMessage(), null, ['errors' => $errors]);
+        }
+        \Thunder::error($e->getMessage());
+        foreach ($errors as $key => $value) {
+            $focusctrl = $key;
+            break;
+        }
     }
-    foreach ($errors as $key => $value) {
-        $focusctrl = $key;
-        Thunder::error($value);
-        break;
-    }
+} elseif (is_output('json')) {
+    json('Nenhum dado foi enviado');
 }
 $_carteiras = Carteira::findAll();
 include template('gerenciar_forma_pagto_editar');

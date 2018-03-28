@@ -21,35 +21,57 @@
 */
 require_once(dirname(__DIR__) . '/app.php');
 
-need_permission(PermissaoNome::CADASTROCAIXAS);
-$caixa = ZCaixa::getPeloID($_GET['id']);
-if (is_null($caixa->getID())) {
-    Thunder::warning('O caixa de id "'.$_GET['id'].'" não existe!');
+use MZ\__TODO_NAMESPACE__\Caixa;
+
+need_permission(\Permissao::NOME_CADASTROCAIXAS, is_output('json'));
+$id = isset($_GET['id']) ? $_GET['id'] : null;
+$caixa = Caixa::findByID($id);
+if (!$caixa->exists()) {
+    $msg = 'O caixa informado não existe!';
+    if (is_output('json')) {
+        json($msg);
+    }
+    \Thunder::warning($msg);
     redirect('/gerenciar/caixa/');
 }
 $focusctrl = 'descricao';
 $errors = [];
 $old_caixa = $caixa;
 if (is_post()) {
-    $caixa = new ZCaixa($_POST);
+    $caixa = new Caixa($_POST);
     try {
         $caixa->setID($old_caixa->getID());
         if (!$__sistema__->isFiscalVisible()) {
             $caixa->setNumeroInicial($old_caixa->getNumeroInicial());
             $caixa->setSerie($old_caixa->getSerie());
         }
-        $caixa = ZCaixa::atualizar($caixa);
-        Thunder::success('Caixa "'.$caixa->getDescricao().'" atualizado com sucesso!', true);
+        $caixa->filter($old_caixa);
+        $caixa->update();
+        $old_caixa->clean($caixa);
+        $msg = sprintf(
+            'Caixa "%s" atualizado com sucesso!',
+            $caixa->getDescricao()
+        );
+        if (is_output('json')) {
+            json(null, ['item' => $caixa->publish(), 'msg' => $msg]);
+        }
+        \Thunder::success($msg, true);
         redirect('/gerenciar/caixa/');
-    } catch (ValidationException $e) {
-        $errors = $e->getErrors();
-    } catch (Exception $e) {
-        $errors['unknow'] = $e->getMessage();
+    } catch (\Exception $e) {
+        $caixa->clean($old_caixa);
+        if ($e instanceof \MZ\Exception\ValidationException) {
+            $errors = $e->getErrors();
+        }
+        if (is_output('json')) {
+            json($e->getMessage(), null, ['errors' => $errors]);
+        }
+        \Thunder::error($e->getMessage());
+        foreach ($errors as $key => $value) {
+            $focusctrl = $key;
+            break;
+        }
     }
-    foreach ($errors as $key => $value) {
-        $focusctrl = $key;
-        Thunder::error($value);
-        break;
-    }
+} elseif (is_output('json')) {
+    json('Nenhum dado foi enviado');
 }
 include template('gerenciar_caixa_editar');

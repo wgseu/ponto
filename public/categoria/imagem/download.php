@@ -32,7 +32,7 @@ if (!isset($_GET['categoria']) || !is_numeric($_GET['categoria'])) {
     exitNotFound();
 }
 if (isset($_SERVER['HTTP_IF_MODIFIED_SINCE'])) {
-    $imagem = ZCategoria::getImagemPeloID(intval($_GET['categoria']), true);
+    $imagem = Categoria::getImagemPeloID(intval($_GET['categoria']), true);
     if (strtotime($_SERVER['HTTP_IF_MODIFIED_SINCE']) >= strtotime($imagem['dataatualizacao'])) {
         header('HTTP/1.0 304 Not Modified');
         header('Cache-Control: max-age=12096000, public');
@@ -40,7 +40,7 @@ if (isset($_SERVER['HTTP_IF_MODIFIED_SINCE'])) {
         exit;
     }
 }
-$imagem = ZCategoria::getImagemPeloID(intval($_GET['categoria']));
+$imagem = Categoria::getImagemPeloID(intval($_GET['categoria']));
 $imagebytes = $imagem['imagem'];
 if ($imagebytes == null) {
     exitNotFound();

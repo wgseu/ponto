@@ -24,7 +24,7 @@ require_once(dirname(dirname(__DIR__)) . '/app.php');
 if (!is_login()) {
     json('Usuário não autenticado!');
 }
-if (!have_permission(PermissaoNome::PEDIDOCOMANDA)) {
+if (!$login_funcionario->has(Permissao::NOME_PEDIDOCOMANDA)) {
     json('Você não tem permissão para acessar comandas');
 }
 /* verifica se deve ordenar pelo número da comanda ou pelo funcionário */
@@ -32,7 +32,7 @@ $funcionario_id = null;
 if (!isset($_GET['ordenar']) || $_GET['ordenar'] != 'comanda') {
     $funcionario_id = $login_funcionario_id;
 }
-$comandas = ZPedido::getTodasComandas($funcionario_id);
+$comandas = Pedido::getTodasComandas($funcionario_id);
 $items = [];
 $obs_name = is_boolean_config('Vendas', 'Comanda.Observacao');
 foreach ($comandas as $_comanda) {

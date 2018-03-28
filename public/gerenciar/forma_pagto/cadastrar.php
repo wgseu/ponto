@@ -23,32 +23,48 @@ require_once(dirname(__DIR__) . '/app.php');
 
 use MZ\Wallet\Carteira;
 
-need_permission(PermissaoNome::CADASTROFORMASPAGTO);
+need_permission(Permissao::NOME_CADASTROFORMASPAGTO);
 $focusctrl = 'descricao';
 $errors = [];
+$old_forma_pagto = $forma_pagto;
 if (is_post()) {
-    $forma_pagto = new ZFormaPagto($_POST);
+    $forma_pagto = new FormaPagto($_POST);
     try {
         $forma_pagto->setID(null);
         $forma_pagto->setMinParcelas(numberval($forma_pagto->getMinParcelas()));
         $forma_pagto->setMaxParcelas(numberval($forma_pagto->getMaxParcelas()));
         $forma_pagto->setParcelasSemJuros(numberval($forma_pagto->getParcelasSemJuros()));
         $forma_pagto->setJuros(moneyval($forma_pagto->getJuros()));
-        $forma_pagto = ZFormaPagto::cadastrar($forma_pagto);
-        Thunder::success('Forma de pagamento "'.$forma_pagto->getDescricao().'" cadastrada com sucesso!', true);
+        $forma_pagto->filter($old_forma_pagto);
+        $forma_pagto->insert();
+        $old_forma_pagto->clean($forma_pagto);
+        $msg = sprintf(
+            'Forma de pagamento "%s" cadastrada com sucesso!',
+            $forma_pagto->getDescricao()
+        );
+        if (is_output('json')) {
+            json(null, ['item' => $forma_pagto->publish(), 'msg' => $msg]);
+        }
+        \Thunder::success($msg, true);
         redirect('/gerenciar/forma_pagto/');
-    } catch (ValidationException $e) {
-        $errors = $e->getErrors();
-    } catch (Exception $e) {
-        $errors['unknow'] = $e->getMessage();
+    } catch (\Exception $e) {
+        $forma_pagto->clean($old_forma_pagto);
+        if ($e instanceof \MZ\Exception\ValidationException) {
+            $errors = $e->getErrors();
+        }
+        if (is_output('json')) {
+            json($e->getMessage(), null, ['errors' => $errors]);
+        }
+        \Thunder::error($e->getMessage());
+        foreach ($errors as $key => $value) {
+            $focusctrl = $key;
+            break;
+        }
     }
-    foreach ($errors as $key => $value) {
-        $focusctrl = $key;
-        Thunder::error($value);
-        break;
-    }
+} elseif (is_output('json')) {
+    json('Nenhum dado foi enviado');
 } else {
-    $forma_pagto = new ZFormaPagto();
+    $forma_pagto = new FormaPagto();
     $forma_pagto->setAtiva('Y');
 }
 $_carteiras = Carteira::findAll();

@@ -30,7 +30,7 @@ $association = new \MZ\Association\Product($integracao);
 
 if (isset($_GET['action'])) {
     if (is_post() && $_GET['action'] == 'update') {
-        need_permission(PermissaoNome::CADASTROPRODUTOS, true);
+        need_permission(Permissao::NOME_CADASTROPRODUTOS, true);
         try {
             $codigo = isset($_POST['codigo'])?$_POST['codigo']:null;
             $association->update(
@@ -43,7 +43,7 @@ if (isset($_GET['action'])) {
             json($e->getMessage());
         }
     } elseif (is_post() && $_GET['action'] == 'delete') {
-        need_permission(PermissaoNome::CADASTROPRODUTOS, true);
+        need_permission(Permissao::NOME_CADASTROPRODUTOS, true);
         try {
             $codigo = isset($_POST['codigo'])?$_POST['codigo']:null;
             $subcodigo = isset($_POST['subcodigo'])?$_POST['subcodigo']:null;
@@ -58,7 +58,7 @@ if (isset($_GET['action'])) {
             json($e->getMessage());
         }
     } elseif (is_post() && $_GET['action'] == 'mount') {
-        need_permission(PermissaoNome::CADASTROPRODUTOS, true);
+        need_permission(Permissao::NOME_CADASTROPRODUTOS, true);
         try {
             $codigo = isset($_POST['codigo'])?$_POST['codigo']:null;
             $subcodigo = isset($_POST['subcodigo'])?$_POST['subcodigo']:null;
@@ -70,7 +70,7 @@ if (isset($_GET['action'])) {
             json($e->getMessage());
         }
     } elseif ($_GET['action'] == 'package') {
-        need_permission(PermissaoNome::CADASTROPRODUTOS, true);
+        need_permission(Permissao::NOME_CADASTROPRODUTOS, true);
         try {
             $codigo = isset($_GET['codigo'])?$_GET['codigo']:null;
             $package = $association->findPackage($codigo);
@@ -80,7 +80,7 @@ if (isset($_GET['action'])) {
         }
     }
 }
-need_permission(PermissaoNome::CADASTROPRODUTOS);
+need_permission(Permissao::NOME_CADASTROPRODUTOS);
 
 $produtos = $association->findAll();
 

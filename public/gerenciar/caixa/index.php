@@ -21,11 +21,11 @@
 */
 require_once(dirname(__DIR__) . '/app.php');
 
-need_permission(PermissaoNome::CADASTROCAIXAS);
+need_permission(Permissao::NOME_CADASTROCAIXAS);
 
-$count = ZCaixa::getCount($_GET['query'], $_GET['estado']);
+$count = Caixa::getCount($_GET['query'], $_GET['estado']);
 list($pagesize, $offset, $pagestring) = pagestring($count, 10);
-$caixas = ZCaixa::getTodas($_GET['query'], $_GET['estado'], $offset, $pagesize);
+$caixas = Caixa::getTodas($_GET['query'], $_GET['estado'], $offset, $pagesize);
 
 $estados = [
     'Y' => 'Ativos',

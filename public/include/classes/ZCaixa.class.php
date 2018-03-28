@@ -134,25 +134,25 @@ class ZCaixa
 
     public static function getPeloID($id)
     {
-        $query = DB::$pdo->from('Caixas')
+        $query = \DB::$pdo->from('Caixas')
                          ->where(['id' => $id]);
-        return new ZCaixa($query->fetch());
+        return new Caixa($query->fetch());
     }
 
     public static function getPelaDescricao($descricao)
     {
-        $query = DB::$pdo->from('Caixas')
+        $query = \DB::$pdo->from('Caixas')
                          ->where(['descricao' => $descricao]);
-        return new ZCaixa($query->fetch());
+        return new Caixa($query->fetch());
     }
 
     public static function getPelaSerie($serie)
     {
-        $query = DB::$pdo->from('Caixas')
+        $query = \DB::$pdo->from('Caixas')
                          ->where(['serie' => $serie])
                          ->orderBy('numeroinicial DESC')
                          ->limit(1);
-        return new ZCaixa($query->fetch());
+        return new Caixa($query->fetch());
     }
 
     private static function validarCampos(&$caixa)
@@ -160,7 +160,7 @@ class ZCaixa
         global $__sistema__;
 
         $erros = [];
-        $old_caixa = self::getPeloID($caixa['id']);
+        $old_caixa = self::findByID($caixa['id']);
         $caixa['descricao'] = strip_tags(trim($caixa['descricao']));
         if (strlen($caixa['descricao']) == 0) {
             $erros['descricao'] = 'A descrição não pode ser vazia';
@@ -185,7 +185,7 @@ class ZCaixa
         } elseif (!in_array($caixa['ativo'], ['Y', 'N'])) {
             $erros['ativo'] = 'O ativo informado não é válido';
         }
-        if ($caixa['ativo'] == 'N' && ZMovimentacao::existe($caixa['id'])) {
+        if ($caixa['ativo'] == 'N' && Movimentacao::existe($caixa['id'])) {
             $erros['ativo'] = 'O caixa está aberto e não pode ser desativado';
         }
         if (!empty($erros)) {
@@ -208,12 +208,12 @@ class ZCaixa
         $_caixa = $caixa->toArray();
         self::validarCampos($_caixa);
         try {
-            $_caixa['id'] = DB::$pdo->insertInto('Caixas')->values($_caixa)->execute();
+            $_caixa['id'] = \DB::$pdo->insertInto('Caixas')->values($_caixa)->execute();
         } catch (Exception $e) {
             self::handleException($e);
             throw $e;
         }
-        return self::getPeloID($_caixa['id']);
+        return self::findByID($_caixa['id']);
     }
 
     public static function atualizar($caixa)
@@ -230,7 +230,7 @@ class ZCaixa
             'ativo',
         ];
         try {
-            $query = DB::$pdo->update('Caixas');
+            $query = \DB::$pdo->update('Caixas');
             $query = $query->set(array_intersect_key($_caixa, array_flip($campos)));
             $query = $query->where('id', $_caixa['id']);
             $query->execute();
@@ -238,13 +238,13 @@ class ZCaixa
             self::handleException($e);
             throw $e;
         }
-        return self::getPeloID($_caixa['id']);
+        return self::findByID($_caixa['id']);
     }
 
     public static function resetaInicios($serie)
     {
         try {
-            $query = DB::$pdo->update('Caixas');
+            $query = \DB::$pdo->update('Caixas');
             $query = $query->set('numeroinicial', '1');
             $query = $query->where('serie', $serie);
             $query->execute();
@@ -257,16 +257,16 @@ class ZCaixa
     public static function excluir($id)
     {
         if (!$id) {
-            throw new Exception('Não foi possível excluir a caixa, o id da caixa não foi informado');
+            throw new \Exception('Não foi possível excluir a caixa, o id da caixa não foi informado');
         }
-        $query = DB::$pdo->deleteFrom('Caixas')
+        $query = \DB::$pdo->deleteFrom('Caixas')
                          ->where(['id' => $id]);
         return $query->execute();
     }
 
     private static function initSearch($busca, $ativo)
     {
-        $query = DB::$pdo->from('Caixas')
+        $query = \DB::$pdo->from('Caixas')
                          ->orderBy('id ASC');
         $busca = trim($busca);
         if ($busca != '') {
@@ -288,7 +288,7 @@ class ZCaixa
         $_caixas = $query->fetchAll();
         $caixas = [];
         foreach ($_caixas as $caixa) {
-            $caixas[] = new ZCaixa($caixa);
+            $caixas[] = new Caixa($caixa);
         }
         return $caixas;
     }

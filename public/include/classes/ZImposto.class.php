@@ -166,16 +166,16 @@ class ZImposto
 
     public static function getPeloID($id)
     {
-        $query = DB::$pdo->from('Impostos')
+        $query = \DB::$pdo->from('Impostos')
                          ->where(['id' => $id]);
-        return new ZImposto($query->fetch());
+        return new Imposto($query->fetch());
     }
 
     public static function getPeloGrupoSimplesSubstituicaoCodigo($grupo, $simples, $substituicao, $codigo)
     {
-        $query = DB::$pdo->from('Impostos')
+        $query = \DB::$pdo->from('Impostos')
                          ->where(['grupo' => $grupo, 'simples' => $simples, 'substituicao' => $substituicao, 'codigo' => $codigo]);
-        return new ZImposto($query->fetch());
+        return new Imposto($query->fetch());
     }
 
     private static function validarCampos(&$imposto)
@@ -224,12 +224,12 @@ class ZImposto
         $_imposto = $imposto->toArray();
         self::validarCampos($_imposto);
         try {
-            $_imposto['id'] = DB::$pdo->insertInto('Impostos')->values($_imposto)->execute();
+            $_imposto['id'] = \DB::$pdo->insertInto('Impostos')->values($_imposto)->execute();
         } catch (Exception $e) {
             self::handleException($e);
             throw $e;
         }
-        return self::getPeloID($_imposto['id']);
+        return self::findByID($_imposto['id']);
     }
 
     public static function atualizar($imposto)
@@ -247,7 +247,7 @@ class ZImposto
             'descricao',
         ];
         try {
-            $query = DB::$pdo->update('Impostos');
+            $query = \DB::$pdo->update('Impostos');
             $query = $query->set(array_intersect_key($_imposto, array_flip($campos)));
             $query = $query->where('id', $_imposto['id']);
             $query->execute();
@@ -255,22 +255,22 @@ class ZImposto
             self::handleException($e);
             throw $e;
         }
-        return self::getPeloID($_imposto['id']);
+        return self::findByID($_imposto['id']);
     }
 
     public static function excluir($id)
     {
         if (!$id) {
-            throw new Exception('Não foi possível excluir o imposto, o id do imposto não foi informado');
+            throw new \Exception('Não foi possível excluir o imposto, o id do imposto não foi informado');
         }
-        $query = DB::$pdo->deleteFrom('Impostos')
+        $query = \DB::$pdo->deleteFrom('Impostos')
                          ->where(['id' => $id]);
         return $query->execute();
     }
 
     private static function initSearch()
     {
-        return   DB::$pdo->from('Impostos')
+        return   \DB::$pdo->from('Impostos')
                          ->orderBy('id ASC');
     }
 
@@ -283,7 +283,7 @@ class ZImposto
         $_impostos = $query->fetchAll();
         $impostos = [];
         foreach ($_impostos as $imposto) {
-            $impostos[] = new ZImposto($imposto);
+            $impostos[] = new Imposto($imposto);
         }
         return $impostos;
     }

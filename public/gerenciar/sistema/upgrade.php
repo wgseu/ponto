@@ -1,17 +1,17 @@
 <?php
 require_once(dirname(dirname(__DIR__)) . '/app.php'); // main app file
 
-need_permission(PermissaoNome::ALTERARCONFIGURACOES, true);
+need_permission(Permissao::NOME_ALTERARCONFIGURACOES, true);
 
 try {
     $outputs = [];
     $products = [];
-    $produtos = ZProduto::getTodos();
+    $produtos = Produto::findAll();
     foreach ($produtos as $produto) {
         if (is_null($produto->getImagem())) {
             continue;
         }
-        $imagem = ZProduto::getImagemPeloID($produto->getID());
+        $imagem = Produto::getImagemPeloID($produto->getID());
         $imagebytes = $imagem['imagem'];
         $name = $produto->getDescricao().'.png';
         $name = iconv("UTF-8//IGNORE", "WINDOWS-1252//IGNORE", $name);

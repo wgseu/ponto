@@ -128,16 +128,16 @@ class ZFormacao
 
     public static function getPeloID($id)
     {
-        $query = DB::$pdo->from('Formacoes')
+        $query = \DB::$pdo->from('Formacoes')
                          ->where(['id' => $id]);
-        return new ZFormacao($query->fetch());
+        return new Formacao($query->fetch());
     }
 
     public static function getPeloProdutoPedidoIDPacoteID($produto_pedido_id, $pacote_id)
     {
-        $query = DB::$pdo->from('Formacoes')
+        $query = \DB::$pdo->from('Formacoes')
                          ->where(['produtopedidoid' => $produto_pedido_id, 'pacoteid' => $pacote_id]);
-        return new ZFormacao($query->fetch());
+        return new Formacao($query->fetch());
     }
 
     private static function validarCampos(&$formacao)
@@ -184,12 +184,12 @@ class ZFormacao
         $_formacao = $formacao->toArray();
         self::validarCampos($_formacao);
         try {
-            $_formacao['id'] = DB::$pdo->insertInto('Formacoes')->values($_formacao)->execute();
+            $_formacao['id'] = \DB::$pdo->insertInto('Formacoes')->values($_formacao)->execute();
         } catch (Exception $e) {
             self::handleException($e);
             throw $e;
         }
-        return self::getPeloID($_formacao['id']);
+        return self::findByID($_formacao['id']);
     }
 
     public static function atualizar($formacao)
@@ -206,7 +206,7 @@ class ZFormacao
             'composicaoid',
         ];
         try {
-            $query = DB::$pdo->update('Formacoes');
+            $query = \DB::$pdo->update('Formacoes');
             $query = $query->set(array_intersect_key($_formacao, array_flip($campos)));
             $query = $query->where('id', $_formacao['id']);
             $query->execute();
@@ -214,12 +214,12 @@ class ZFormacao
             self::handleException($e);
             throw $e;
         }
-        return self::getPeloID($_formacao['id']);
+        return self::findByID($_formacao['id']);
     }
 
     private static function initSearch()
     {
-        return   DB::$pdo->from('Formacoes')
+        return   \DB::$pdo->from('Formacoes')
                          ->orderBy('id ASC');
     }
 
@@ -232,7 +232,7 @@ class ZFormacao
         $_formacaos = $query->fetchAll();
         $formacaos = [];
         foreach ($_formacaos as $formacao) {
-            $formacaos[] = new ZFormacao($formacao);
+            $formacaos[] = new Formacao($formacao);
         }
         return $formacaos;
     }
@@ -245,7 +245,7 @@ class ZFormacao
 
     private static function initSearchDoProdutoPedidoID($produto_pedido_id)
     {
-        return   DB::$pdo->from('Formacoes')
+        return   \DB::$pdo->from('Formacoes')
                          ->where(['produtopedidoid' => $produto_pedido_id])
                          ->orderBy('id ASC');
     }
@@ -259,7 +259,7 @@ class ZFormacao
         $_formacaos = $query->fetchAll();
         $formacaos = [];
         foreach ($_formacaos as $formacao) {
-            $formacaos[] = new ZFormacao($formacao);
+            $formacaos[] = new Formacao($formacao);
         }
         return $formacaos;
     }
@@ -272,7 +272,7 @@ class ZFormacao
 
     private static function initSearchDoPacoteID($pacote_id)
     {
-        return   DB::$pdo->from('Formacoes')
+        return   \DB::$pdo->from('Formacoes')
                          ->where(['pacoteid' => $pacote_id])
                          ->orderBy('id ASC');
     }
@@ -286,7 +286,7 @@ class ZFormacao
         $_formacaos = $query->fetchAll();
         $formacaos = [];
         foreach ($_formacaos as $formacao) {
-            $formacaos[] = new ZFormacao($formacao);
+            $formacaos[] = new Formacao($formacao);
         }
         return $formacaos;
     }
@@ -299,7 +299,7 @@ class ZFormacao
 
     private static function initSearchDaComposicaoID($composicao_id)
     {
-        return   DB::$pdo->from('Formacoes')
+        return   \DB::$pdo->from('Formacoes')
                          ->where(['composicaoid' => $composicao_id])
                          ->orderBy('id ASC');
     }
@@ -313,7 +313,7 @@ class ZFormacao
         $_formacaos = $query->fetchAll();
         $formacaos = [];
         foreach ($_formacaos as $formacao) {
-            $formacaos[] = new ZFormacao($formacao);
+            $formacaos[] = new Formacao($formacao);
         }
         return $formacaos;
     }

@@ -21,33 +21,35 @@
 */
 require_once(dirname(__DIR__) . '/app.php');
 
-need_permission(PermissaoNome::ALTERARCONFIGURACOES, isset($_POST));
+need_permission(Permissao::NOME_ALTERARCONFIGURACOES, isset($_POST));
 
 if (is_post()) {
     try {
-        DB::BeginTransaction();
-        $modulo = ZModulo::getPeloID($_POST['id']);
+        \DB::BeginTransaction();
+        $modulo = Modulo::findByID($_POST['id']);
         if (is_null($modulo->getID())) {
-            throw new Exception('O módulo informado não existe', 1);
+            throw new \Exception('O módulo informado não existe', 1);
         }
         $modulo->setHabilitado($_POST['marcado']);
-        $modulo = ZModulo::atualizar($modulo);
+        $modulo->filter($old_modulo);
+        $modulo->update();
+        $old_modulo->clean($modulo);
         try {
-            $appsync = new AppSync();
+            $appsync = new \MZ\System\Synchronizer();
             $appsync->systemOptionsChanged();
         } catch (Exception $e) {
             Log::error($e->getMessage());
         }
-        DB::Commit();
+        \DB::Commit();
         json(['status' => 'ok']);
     } catch (Exception $e) {
-        DB::Rollback();
+        \DB::Rollback();
         json($e->getMessage());
     }
 }
 
-$count = ZModulo::getCount($_GET['query']);
+$count = Modulo::getCount($_GET['query']);
 list($pagesize, $offset, $pagestring) = pagestring($count, 10);
-$modulos = ZModulo::getTodos($_GET['query'], $offset, $pagesize);
+$modulos = Modulo::getTodos($_GET['query'], $offset, $pagesize);
 
 include template('gerenciar_modulo_index');

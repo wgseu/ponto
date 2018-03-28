@@ -1,7 +1,7 @@
 <?php
 require_once(dirname(dirname(__DIR__)) . '/app.php');
 
-need_permission(PermissaoNome::BACKUP, true);
+need_permission(Permissao::NOME_BACKUP, true);
 
 try {
     set_time_limit(0);

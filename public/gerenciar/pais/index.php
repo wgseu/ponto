@@ -24,7 +24,7 @@ require_once(dirname(__DIR__) . '/app.php');
 use MZ\Location\Pais;
 use MZ\Util\Filter;
 
-need_permission(\PermissaoNome::CADASTROPAISES, is_output('json'));
+need_permission(\Permissao::NOME_CADASTROPAISES, is_output('json'));
 
 $limite = isset($_GET['limite'])?intval($_GET['limite']):10;
 if ($limite > 100 || $limite < 1) {

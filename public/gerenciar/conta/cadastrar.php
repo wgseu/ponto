@@ -21,11 +21,18 @@
 */
 require_once(dirname(__DIR__) . '/app.php');
 
-need_permission(PermissaoNome::CADASTROCONTAS);
+use MZ\__TODO_NAMESPACE__\Conta;
+
+need_permission(\Permissao::NOME_CADASTROCONTAS, is_output('json'));
+$id = isset($_GET['id']) ? $_GET['id'] : null;
+$conta = Conta::findByID($id);
+$conta->setID(null);
+
 $focusctrl = 'descricao';
 $errors = [];
+$old_conta = $conta;
 if (is_post()) {
-    $conta = new ZConta($_POST);
+    $conta = new Conta($_POST);
     try {
         $conta->setID(null);
         $conta->setFuncionarioID($login_funcionario->getID());
@@ -48,8 +55,17 @@ if (is_post()) {
         $conta->setDataPagamento($_data_pagamento===false?null:date_format($_data_pagamento, 'Y-m-d'));
         $anexocaminho = upload_document('raw_anexocaminho', 'conta');
         $conta->setAnexoCaminho($anexocaminho);
-        $conta = ZConta::cadastrar($conta);
-        Thunder::success('Conta "'.$conta->getDescricao().'" cadastrada com sucesso!', true);
+        $conta->filter($old_conta);
+        $conta->insert();
+        $old_conta->clean($conta);
+        $msg = sprintf(
+            'Conta "%s" cadastrada com sucesso!',
+            $conta->getDescricao()
+        );
+        if (is_output('json')) {
+            json(null, ['item' => $conta->publish(), 'msg' => $msg]);
+        }
+        \Thunder::success($msg, true);
         redirect('/gerenciar/conta/');
     } catch (ValidationException $e) {
         $errors = $e->getErrors();
@@ -63,14 +79,14 @@ if (is_post()) {
     $conta->setAnexoCaminho(null);
     foreach ($errors as $key => $value) {
         $focusctrl = $key;
-        Thunder::error($value);
+        \Thunder::error($value);
         break;
     }
 } else {
-    $conta = new ZConta();
+    $conta = new Conta();
     $conta->setVencimento(date('Y-m-d', time()));
     $conta->setDataEmissao(date('Y-m-d', time()));
 }
-$classificacao_id_obj = \ZClassificacao::getPeloID($conta->getClassificacaoID());
-$sub_classificacao_id_obj = \ZClassificacao::getPeloID($conta->getSubClassificacaoID());
+$classificacao_id_obj = $conta->findClassificacaoID();
+$sub_classificacao_id_obj = $conta->findSubClassificacaoID();
 include template('gerenciar_conta_cadastrar');

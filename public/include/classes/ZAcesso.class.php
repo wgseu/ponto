@@ -96,30 +96,30 @@ class ZAcesso
 
     public static function getPeloID($id)
     {
-        $query = DB::$pdo->from('Acessos')
+        $query = \DB::$pdo->from('Acessos')
                          ->where(['id' => $id]);
-        return new ZAcesso($query->fetch());
+        return new Acesso($query->fetch());
     }
 
     public static function getPelaFuncaoIDPermissaoID($funcao_id, $permissao_id)
     {
-        $query = DB::$pdo->from('Acessos')
+        $query = \DB::$pdo->from('Acessos')
                          ->where(['funcaoid' => $funcao_id, 'permissaoid' => $permissao_id]);
-        return new ZAcesso($query->fetch());
+        return new Acesso($query->fetch());
     }
 
     public static function temPermissao($funcao_id, $permissao_nome)
     {
-        $query = DB::$pdo->from('Acessos a')
+        $query = \DB::$pdo->from('Acessos a')
                          ->leftJoin('Permissoes p ON p.id = a.permissaoid')
                          ->where(['a.funcaoid' => $funcao_id, 'p.nome' => $permissao_nome]);
-        $acesso = new ZAcesso($query->fetch());
+        $acesso = new Acesso($query->fetch());
         return !is_null($acesso->getID());
     }
 
     public static function getPermissoes($functionario_id)
     {
-        $query = DB::$pdo->from('Funcionarios f')
+        $query = \DB::$pdo->from('Funcionarios f')
                          ->select(null)
                          ->select('pr.nome')
                          ->leftJoin('Acessos ac ON ac.funcaoid = f.funcaoid')
@@ -163,12 +163,12 @@ class ZAcesso
         $_acesso = $acesso->toArray();
         self::validarCampos($_acesso);
         try {
-            $_acesso['id'] = DB::$pdo->insertInto('Acessos')->values($_acesso)->execute();
+            $_acesso['id'] = \DB::$pdo->insertInto('Acessos')->values($_acesso)->execute();
         } catch (Exception $e) {
             self::handleException($e);
             throw $e;
         }
-        return self::getPeloID($_acesso['id']);
+        return self::findByID($_acesso['id']);
     }
 
     public static function atualizar($acesso)
@@ -183,7 +183,7 @@ class ZAcesso
             'permissaoid',
         ];
         try {
-            $query = DB::$pdo->update('Acessos');
+            $query = \DB::$pdo->update('Acessos');
             $query = $query->set(array_intersect_key($_acesso, array_flip($campos)));
             $query = $query->where('id', $_acesso['id']);
             $query->execute();
@@ -191,22 +191,22 @@ class ZAcesso
             self::handleException($e);
             throw $e;
         }
-        return self::getPeloID($_acesso['id']);
+        return self::findByID($_acesso['id']);
     }
 
     public static function excluir($id)
     {
         if (!$id) {
-            throw new Exception('Não foi possível excluir o acesso, o id do acesso não foi informado');
+            throw new \Exception('Não foi possível excluir o acesso, o id do acesso não foi informado');
         }
-        $query = DB::$pdo->deleteFrom('Acessos')
+        $query = \DB::$pdo->deleteFrom('Acessos')
                          ->where(['id' => $id]);
         return $query->execute();
     }
 
     private static function initSearch()
     {
-        return   DB::$pdo->from('Acessos')
+        return   \DB::$pdo->from('Acessos')
                          ->orderBy('id ASC');
     }
 
@@ -219,7 +219,7 @@ class ZAcesso
         $_acessos = $query->fetchAll();
         $acessos = [];
         foreach ($_acessos as $acesso) {
-            $acessos[] = new ZAcesso($acesso);
+            $acessos[] = new Acesso($acesso);
         }
         return $acessos;
     }
@@ -232,7 +232,7 @@ class ZAcesso
 
     private static function initSearchDaFuncaoID($funcao_id)
     {
-        return   DB::$pdo->from('Acessos')
+        return   \DB::$pdo->from('Acessos')
                          ->where(['funcaoid' => $funcao_id])
                          ->orderBy('id ASC');
     }
@@ -246,7 +246,7 @@ class ZAcesso
         $_acessos = $query->fetchAll();
         $acessos = [];
         foreach ($_acessos as $acesso) {
-            $acessos[] = new ZAcesso($acesso);
+            $acessos[] = new Acesso($acesso);
         }
         return $acessos;
     }
@@ -259,7 +259,7 @@ class ZAcesso
 
     private static function initSearchDaPermissaoID($permissao_id)
     {
-        return   DB::$pdo->from('Acessos')
+        return   \DB::$pdo->from('Acessos')
                          ->where(['permissaoid' => $permissao_id])
                          ->orderBy('id ASC');
     }
@@ -273,7 +273,7 @@ class ZAcesso
         $_acessos = $query->fetchAll();
         $acessos = [];
         foreach ($_acessos as $acesso) {
-            $acessos[] = new ZAcesso($acesso);
+            $acessos[] = new Acesso($acesso);
         }
         return $acessos;
     }

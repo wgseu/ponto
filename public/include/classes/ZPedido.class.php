@@ -312,7 +312,7 @@ class ZPedido
      */
     public function isDelivery()
     {
-        return $this->getTipo() == PedidoTipo::ENTREGA && !is_null($this->getLocalizacaoID());
+        return $this->getTipo() == Pedido::TIPO_ENTREGA && !is_null($this->getLocalizacaoID());
     }
 
     public function toArray()
@@ -343,41 +343,41 @@ class ZPedido
 
     public static function getPeloID($id)
     {
-        $query = DB::$pdo->from('Pedidos')
+        $query = \DB::$pdo->from('Pedidos')
                          ->where(['id' => $id]);
-        return new ZPedido($query->fetch());
+        return new Pedido($query->fetch());
     }
 
     public static function getPelaMesaID($mesa_id)
     {
-        $query = DB::$pdo->from('Pedidos')
+        $query = \DB::$pdo->from('Pedidos')
                          ->where(['mesaid' => $mesa_id, 'cancelado' => 'N', 'tipo' => PedidoTipo::MESA])
-                         ->where('estado <> ?', PedidoEstado::FINALIZADO);
-        return new ZPedido($query->fetch());
+                         ->where('estado <> ?', Pedido::ESTADO_FINALIZADO);
+        return new Pedido($query->fetch());
     }
 
     public static function getPelaComandaID($comanda_id)
     {
-        $query = DB::$pdo->from('Pedidos')
+        $query = \DB::$pdo->from('Pedidos')
                          ->where(['comandaid' => $comanda_id, 'cancelado' => 'N', 'tipo' => PedidoTipo::COMANDA])
-                         ->where('estado <> ?', PedidoEstado::FINALIZADO);
-        return new ZPedido($query->fetch());
+                         ->where('estado <> ?', Pedido::ESTADO_FINALIZADO);
+        return new Pedido($query->fetch());
     }
 
     public static function getPeloLocal($tipo, $mesa_id, $comanda_id)
     {
-        if ($tipo == PedidoTipo::MESA) {
+        if ($tipo == Pedido::TIPO_MESA) {
             return self::getPelaMesaID($mesa_id);
         }
-        if ($tipo == PedidoTipo::COMANDA) {
+        if ($tipo == Pedido::TIPO_COMANDA) {
             return self::getPelaComandaID($comanda_id);
         }
-        return new ZPedido();
+        return new Pedido();
     }
 
     public static function getTicketMedio($sessao_id, $data_inicio = null, $data_fim = null)
     {
-        $query = DB::$pdo->from('Pedidos p')
+        $query = \DB::$pdo->from('Pedidos p')
                          ->select(null)
                          ->select('SUM(TIME_TO_SEC(TIMEDIFF(COALESCE(p.dataconclusao, NOW()), p.datacriacao))) as segundos')
                          ->select('COUNT(p.id) as quantidade')
@@ -409,12 +409,12 @@ class ZPedido
 
     public static function getTotalPessoas($sessao_id, $data_inicio = null, $data_fim = null)
     {
-        $query = DB::$pdo->from('Pedidos p')
+        $query = \DB::$pdo->from('Pedidos p')
                          ->select(null)
                          ->select('SUM(p.pessoas) as total')
-                         ->select('SUM(IF(p.estado = ?, 0, p.pessoas)) as atual', PedidoEstado::FINALIZADO)
+                         ->select('SUM(IF(p.estado = ?, 0, p.pessoas)) as atual', Pedido::ESTADO_FINALIZADO)
                          ->where(['p.cancelado' => 'N'])
-                         ->where('p.tipo <> ?', PedidoTipo::ENTREGA);
+                         ->where('p.tipo <> ?', Pedido::TIPO_ENTREGA);
         if (!is_null($sessao_id)) {
             $query = $query->where(['p.sessaoid' => $sessao_id]);
         }
@@ -430,7 +430,7 @@ class ZPedido
 
     public static function getTotal($sessao_id, $data_inicio = null, $data_fim = null)
     {
-        $query = DB::$pdo->from('Pedidos p')
+        $query = \DB::$pdo->from('Pedidos p')
                          ->select(null)
                          ->select('ROUND(SUM(pdp.preco * pdp.quantidade), 4) as subtotal')
                          ->select('ROUND(SUM(pdp.preco * pdp.quantidade * (pdp.porcentagem / 100 + 1)), 4) as total')
@@ -462,7 +462,7 @@ class ZPedido
 
     public static function getTotalDetalhado($id, $cancelado = null)
     {
-        $query = DB::$pdo->from('Pedidos p')
+        $query = \DB::$pdo->from('Pedidos p')
                          ->select(null)
                          ->select('SUM(pdp.precocompra * pdp.quantidade) as custo')
                          ->select('SUM(IF(NOT ISNULL(pdp.produtoid), pdp.preco * pdp.quantidade, 0)) as produtos')
@@ -479,7 +479,7 @@ class ZPedido
 
     public static function getTotalDoLocal($tipo, $mesa_id, $comanda_id)
     {
-        if ($tipo == PedidoTipo::COMANDA) {
+        if ($tipo == Pedido::TIPO_COMANDA) {
             $pedido = self::getPelaComandaID($comanda_id);
         } else {
             $pedido = self::getPelaMesaID($mesa_id);
@@ -599,18 +599,18 @@ class ZPedido
         if (trim($__sistema__->getLicenseKey()) == '') {
             $count = self::getCount();
             if ($count >= 20) {
-                throw new Exception('Quantidade de pedidos excedido, adquira uma licença para continuar', 401);
+                throw new \Exception('Quantidade de pedidos excedido, adquira uma licença para continuar', 401);
             }
         }
         $_pedido = $pedido->toArray();
         self::validarCampos($_pedido);
         try {
-            $_pedido['id'] = DB::$pdo->insertInto('Pedidos')->values($_pedido)->execute();
+            $_pedido['id'] = \DB::$pdo->insertInto('Pedidos')->values($_pedido)->execute();
         } catch (Exception $e) {
             self::handleException($e);
             throw $e;
         }
-        return self::getPeloID($_pedido['id']);
+        return self::findByID($_pedido['id']);
     }
 
     public static function atualizar($pedido)
@@ -641,7 +641,7 @@ class ZPedido
             // 'dataconclusao',
         ];
         try {
-            $query = DB::$pdo->update('Pedidos');
+            $query = \DB::$pdo->update('Pedidos');
             $query = $query->set(array_intersect_key($_pedido, array_flip($campos)));
             $query = $query->where('id', $_pedido['id']);
             $query->execute();
@@ -649,7 +649,7 @@ class ZPedido
             self::handleException($e);
             throw $e;
         }
-        return self::getPeloID($_pedido['id']);
+        return self::findByID($_pedido['id']);
     }
 
     public function validaAcesso($funcionario = null)
@@ -657,10 +657,10 @@ class ZPedido
         if (is_null($funcionario)) {
             $funcionario = $GLOBALS['login_funcionario'];
         }
-        if ($this->getTipo() == PedidoTipo::MESA && !have_permission(PermissaoNome::PEDIDOMESA, $funcionario)) {
-            throw new Exception('Você não tem permissão para acessar mesas');
-        } elseif ($this->getTipo() == PedidoTipo::COMANDA && !have_permission(PermissaoNome::PEDIDOCOMANDA, $funcionario)) {
-            throw new Exception('Você não tem permissão para acessar comandas');
+        if ($this->getTipo() == Pedido::TIPO_MESA && !have_permission(Permissao::NOME_PEDIDOMESA, $funcionario)) {
+            throw new \Exception('Você não tem permissão para acessar mesas');
+        } elseif ($this->getTipo() == Pedido::TIPO_COMANDA && !have_permission(Permissao::NOME_PEDIDOCOMANDA, $funcionario)) {
+            throw new \Exception('Você não tem permissão para acessar comandas');
         }
         if (is_null($this->getID())) {
             return;
@@ -671,17 +671,17 @@ class ZPedido
         if ($this->getFuncionarioID() == $funcionario->getID()) {
             return;
         }
-        if ($this->getTipo() == PedidoTipo::MESA && !have_permission(PermissaoNome::MESAS, $funcionario)) {
-            $funcionario_pedido = ZFuncionario::getPeloID($this->getFuncionarioID());
-            $cliente_funcionario_pedido = ZCliente::getPeloID($funcionario_pedido->getClienteID());
+        if ($this->getTipo() == Pedido::TIPO_MESA && !have_permission(Permissao::NOME_MESAS, $funcionario)) {
+            $funcionario_pedido = $this->findFuncionarioID();
+            $cliente_funcionario_pedido = $funcionario_pedido->findClienteID();
             $msg = 'Apenas o(a) funcionário(a) "'.$cliente_funcionario_pedido->getLogin().'" poderá realizar pedidos para essa mesa.';
-            throw new Exception($msg);
+            throw new \Exception($msg);
         }
-        if ($this->getTipo() == PedidoTipo::COMANDA && !have_permission(PermissaoNome::COMANDAS, $funcionario)) {
-            $funcionario_pedido = ZFuncionario::getPeloID($this->getFuncionarioID());
-            $cliente_funcionario_pedido = ZCliente::getPeloID($funcionario_pedido->getClienteID());
+        if ($this->getTipo() == Pedido::TIPO_COMANDA && !have_permission(Permissao::NOME_COMANDAS, $funcionario)) {
+            $funcionario_pedido = $this->findFuncionarioID();
+            $cliente_funcionario_pedido = $funcionario_pedido->findClienteID();
             $msg = 'Apenas o(a) funcionário(a) "'.$cliente_funcionario_pedido->getLogin().'" poderá realizar pedidos para essa comanda.';
-            throw new Exception($msg);
+            throw new \Exception($msg);
         }
     }
 
@@ -698,7 +698,7 @@ class ZPedido
         $caixa_id,
         $movimentacao_id
     ) {
-        $query = DB::$pdo->from('Pedidos p')
+        $query = \DB::$pdo->from('Pedidos p')
                          ->orderBy('p.id DESC');
         $sessaoid = null;
         $busca = trim($busca);
@@ -777,7 +777,7 @@ class ZPedido
         $_pedidos = $query->fetchAll();
         $pedidos = [];
         foreach ($_pedidos as $pedido) {
-            $pedidos[] = new ZPedido($pedido);
+            $pedidos[] = new Pedido($pedido);
         }
         return $pedidos;
     }
@@ -813,7 +813,7 @@ class ZPedido
 
     private static function initSearchDaMesaID($mesa_id)
     {
-        return   DB::$pdo->from('Pedidos')
+        return   \DB::$pdo->from('Pedidos')
                          ->where(['mesaid' => $mesa_id])
                          ->orderBy('id ASC');
     }
@@ -827,7 +827,7 @@ class ZPedido
         $_pedidos = $query->fetchAll();
         $pedidos = [];
         foreach ($_pedidos as $pedido) {
-            $pedidos[] = new ZPedido($pedido);
+            $pedidos[] = new Pedido($pedido);
         }
         return $pedidos;
     }
@@ -840,7 +840,7 @@ class ZPedido
 
     private static function initSearchDaSessaoID($sessao_id)
     {
-        return   DB::$pdo->from('Pedidos')
+        return   \DB::$pdo->from('Pedidos')
                          ->where(['sessaoid' => $sessao_id])
                          ->orderBy('id ASC');
     }
@@ -854,7 +854,7 @@ class ZPedido
         $_pedidos = $query->fetchAll();
         $pedidos = [];
         foreach ($_pedidos as $pedido) {
-            $pedidos[] = new ZPedido($pedido);
+            $pedidos[] = new Pedido($pedido);
         }
         return $pedidos;
     }
@@ -867,7 +867,7 @@ class ZPedido
 
     private static function initSearchDoFuncionarioID($funcionario_id)
     {
-        return   DB::$pdo->from('Pedidos')
+        return   \DB::$pdo->from('Pedidos')
                          ->where(['funcionarioid' => $funcionario_id])
                          ->orderBy('id ASC');
     }
@@ -881,7 +881,7 @@ class ZPedido
         $_pedidos = $query->fetchAll();
         $pedidos = [];
         foreach ($_pedidos as $pedido) {
-            $pedidos[] = new ZPedido($pedido);
+            $pedidos[] = new Pedido($pedido);
         }
         return $pedidos;
     }
@@ -894,7 +894,7 @@ class ZPedido
 
     private static function initSearchDoClienteID($cliente_id)
     {
-        return   DB::$pdo->from('Pedidos')
+        return   \DB::$pdo->from('Pedidos')
                          ->where(['clienteid' => $cliente_id])
                          ->orderBy('id ASC');
     }
@@ -908,7 +908,7 @@ class ZPedido
         $_pedidos = $query->fetchAll();
         $pedidos = [];
         foreach ($_pedidos as $pedido) {
-            $pedidos[] = new ZPedido($pedido);
+            $pedidos[] = new Pedido($pedido);
         }
         return $pedidos;
     }
@@ -921,7 +921,7 @@ class ZPedido
 
     private static function initSearchDoEntregadorID($entregador_id)
     {
-        return   DB::$pdo->from('Pedidos')
+        return   \DB::$pdo->from('Pedidos')
                          ->where(['entregadorid' => $entregador_id])
                          ->orderBy('id ASC');
     }
@@ -935,7 +935,7 @@ class ZPedido
         $_pedidos = $query->fetchAll();
         $pedidos = [];
         foreach ($_pedidos as $pedido) {
-            $pedidos[] = new ZPedido($pedido);
+            $pedidos[] = new Pedido($pedido);
         }
         return $pedidos;
     }
@@ -948,7 +948,7 @@ class ZPedido
 
     private static function initSearchDaLocalizacaoID($localizacao_id)
     {
-        return   DB::$pdo->from('Pedidos')
+        return   \DB::$pdo->from('Pedidos')
                          ->where(['localizacaoid' => $localizacao_id])
                          ->orderBy('id ASC');
     }
@@ -962,7 +962,7 @@ class ZPedido
         $_pedidos = $query->fetchAll();
         $pedidos = [];
         foreach ($_pedidos as $pedido) {
-            $pedidos[] = new ZPedido($pedido);
+            $pedidos[] = new Pedido($pedido);
         }
         return $pedidos;
     }
@@ -975,7 +975,7 @@ class ZPedido
 
     private static function initSearchDaComandaID($comanda_id)
     {
-        return   DB::$pdo->from('Pedidos')
+        return   \DB::$pdo->from('Pedidos')
                          ->where(['comandaid' => $comanda_id])
                          ->orderBy('id ASC');
     }
@@ -989,7 +989,7 @@ class ZPedido
         $_pedidos = $query->fetchAll();
         $pedidos = [];
         foreach ($_pedidos as $pedido) {
-            $pedidos[] = new ZPedido($pedido);
+            $pedidos[] = new Pedido($pedido);
         }
         return $pedidos;
     }
@@ -1002,7 +1002,7 @@ class ZPedido
 
     private static function initSearchDaMovimentacaoID($movimentacao_id)
     {
-        return   DB::$pdo->from('Pedidos')
+        return   \DB::$pdo->from('Pedidos')
                          ->where(['movimentacaoid' => $movimentacao_id])
                          ->orderBy('id ASC');
     }
@@ -1016,7 +1016,7 @@ class ZPedido
         $_pedidos = $query->fetchAll();
         $pedidos = [];
         foreach ($_pedidos as $pedido) {
-            $pedidos[] = new ZPedido($pedido);
+            $pedidos[] = new Pedido($pedido);
         }
         return $pedidos;
     }
@@ -1029,7 +1029,7 @@ class ZPedido
 
     private static function initSearchDoFechadorID($fechador_id)
     {
-        return   DB::$pdo->from('Pedidos')
+        return   \DB::$pdo->from('Pedidos')
                          ->where(['fechadorid' => $fechador_id])
                          ->orderBy('id ASC');
     }
@@ -1043,7 +1043,7 @@ class ZPedido
         $_pedidos = $query->fetchAll();
         $pedidos = [];
         foreach ($_pedidos as $pedido) {
-            $pedidos[] = new ZPedido($pedido);
+            $pedidos[] = new Pedido($pedido);
         }
         return $pedidos;
     }
@@ -1056,7 +1056,7 @@ class ZPedido
 
     private static function initSearchComandas($funcionario_id, $inativas, $busca)
     {
-        $query = DB::$pdo->from('Pedidos p')
+        $query = \DB::$pdo->from('Pedidos p')
                          ->select(null)
                          ->select('cm.*')
                          ->select('p.estado')

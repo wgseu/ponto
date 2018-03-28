@@ -4,7 +4,7 @@
 <!--{loop $nos $index $no}-->
 <!--${$_produto = $no['produto']}-->
 <!--${$_composicao = $no['composicao']}-->
-<!--${$_unidade = ZUnidade::getPeloID($_produto->getUnidadeID())}-->
+<!--${$_unidade = $_produto->findUnidadeID()}-->
 <!--${$ref = 'pai'.$index}-->
 		{$ref} = {
 <!--{if !is_null($_composicao->getComposicaoID())}-->

@@ -21,13 +21,13 @@
 */
 require_once(dirname(__DIR__) . '/app.php');
 
-need_permission(PermissaoNome::CADASTRARCREDITOS);
+need_permission(Permissao::NOME_CADASTRARCREDITOS);
 
-$count = ZCredito::getCount($_GET['query'], $_GET['clienteid'], $_GET['estado']);
+$count = Credito::getCount($_GET['query'], $_GET['clienteid'], $_GET['estado']);
 list($pagesize, $offset, $pagestring) = pagestring($count, 10);
-$creditos = ZCredito::getTodos($_GET['query'], $_GET['clienteid'], $_GET['estado'], $offset, $pagesize);
+$creditos = Credito::getTodos($_GET['query'], $_GET['clienteid'], $_GET['estado'], $offset, $pagesize);
 
-$_cliente = ZCliente::getPeloID($_GET['clienteid']);
+$_cliente = Cliente::findByID($_GET['clienteid']);
 $estados = [
     'Y' => 'Cancelados',
     'N' => 'Válidos',

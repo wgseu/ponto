@@ -21,15 +21,15 @@
 */
 require_once(dirname(__DIR__) . '/app.php');
 
-need_permission(PermissaoNome::CADASTROCONTAS);
+need_permission(Permissao::NOME_CADASTROCONTAS);
 
-$count = ZConta::getCount($_GET['query'], $_GET['clienteid'], $_GET['classificacao']);
+$count = Conta::getCount($_GET['query'], $_GET['clienteid'], $_GET['classificacao']);
 list($pagesize, $offset, $pagestring) = pagestring($count, 10);
-$contas = ZConta::getTodas($_GET['query'], $_GET['clienteid'], $_GET['classificacao'], $offset, $pagesize);
+$contas = Conta::getTodas($_GET['query'], $_GET['clienteid'], $_GET['classificacao'], $offset, $pagesize);
 
-$_cliente = ZCliente::getPeloID($_GET['clienteid']);
-$_classificacao = ZClassificacao::getPeloID($_GET['classificacao']);
-$classificacoes = ZClassificacao::getTodas();
+$_cliente = Cliente::findByID($_GET['clienteid']);
+$_classificacao = Classificacao::findByID($_GET['classificacao']);
+$classificacoes = Classificacao::findAll();
 $_classificacoes = [];
 foreach ($classificacoes as $classificacao) {
     $_classificacoes[$classificacao->getID()] = $classificacao->getDescricao();

@@ -21,17 +21,17 @@
 */
 require_once(dirname(__DIR__) . '/app.php');
 
-need_permission(PermissaoNome::ESTOQUE);
+need_permission(Permissao::NOME_ESTOQUE);
 $id = $_GET['id'];
-$setor = ZSetor::getPeloID($id);
+$setor = Setor::findByID($id);
 if (is_null($setor->getID())) {
-    Thunder::warning('O setor de id "'.$id.'" não existe!');
+    \Thunder::warning('O setor de id "'.$id.'" não existe!');
     redirect('/gerenciar/setor/');
 }
 try {
-    ZSetor::excluir($id);
-    Thunder::success('Setor "' . $setor->getNome() . '" excluído com sucesso!', true);
+    Setor::excluir($id);
+    \Thunder::success('Setor "' . $setor->getNome() . '" excluído com sucesso!', true);
 } catch (Exception $e) {
-    Thunder::error('Não foi possível excluir o setor "' . $setor->getNome() . '"!');
+    \Thunder::error('Não foi possível excluir o setor "' . $setor->getNome() . '"!');
 }
 redirect('/gerenciar/setor/');

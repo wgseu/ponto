@@ -21,5 +21,5 @@
 */
 require_once(dirname(__DIR__) . '/app.php');
 
-ZAutenticacao::logout();
+Authentication::logout();
 redirect('/conta/entrar');

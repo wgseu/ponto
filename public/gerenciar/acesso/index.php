@@ -22,7 +22,7 @@
 require_once(dirname(__DIR__) . '/app.php');
 
 need_owner(is_output('json'));
-$funcao = ZFuncao::getPeloID($_GET['funcao']?:$_POST['funcao']);
+$funcao = Funcao::findByID($_GET['funcao']?:$_POST['funcao']);
 if (is_null($funcao->getID())) {
     if (is_output('json')) {
         json('A função não foi informada ou não existe');
@@ -32,18 +32,20 @@ if (is_null($funcao->getID())) {
 $errors = [];
 if (is_post()) {
     try {
-        $permissao = ZPermissao::getPeloID($_POST['permissao']);
+        $permissao = Permissao::findByID($_POST['permissao']);
         if (is_null($permissao->getID())) {
-            throw new Exception('A permissão informada não existe', 1);
+            throw new \Exception('A permissão informada não existe', 1);
         }
         if ($_POST['marcado'] == 'Y') {
-            $acesso = new ZAcesso();
+            $acesso = new Acesso();
             $acesso->setFuncaoID($funcao->getID());
             $acesso->setPermissaoID($permissao->getID());
-            $acesso = ZAcesso::cadastrar($acesso);
+            $acesso->filter($old_acesso);
+            $acesso->insert();
+            $acesso->clean($old_acesso);
         } else {
-            $acesso = ZAcesso::getPelaFuncaoIDPermissaoID($funcao->getID(), $permissao->getID());
-            ZAcesso::excluir($acesso->getID());
+            $acesso = Acesso::getPelaFuncaoIDPermissaoID($funcao->getID(), $permissao->getID());
+            Acesso::excluir($acesso->getID());
         }
         if (is_output('json')) {
             json(['status' => 'ok']);
@@ -57,16 +59,16 @@ if (is_post()) {
         if (is_output('json')) {
             json($value);
         }
-        Thunder::error($value);
+        \Thunder::error($value);
         break;
     }
 }
-$permissoes = ZPermissao::getTodas($_GET['query']);
+$permissoes = Permissao::getTodas($_GET['query']);
 if (is_output('json')) {
     $_permissoes = [];
     foreach ($permissoes as $permissao) {
-        $_permissao = $permissao->toArray();
-        $_acesso = ZAcesso::getPelaFuncaoIDPermissaoID($funcao->getID(), $permissao->getID());
+        $_permissao = $permissao->publish();
+        $_acesso = Acesso::getPelaFuncaoIDPermissaoID($funcao->getID(), $permissao->getID());
         $_permissao['marcado'] = is_null($_acesso->getID())?'N':'Y';
         $_permissoes[] = $_permissao;
     }

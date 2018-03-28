@@ -21,17 +21,17 @@
 */
 require_once(dirname(__DIR__) . '/app.php');
 
-need_permission(PermissaoNome::CADASTROCAIXAS);
+need_permission(Permissao::NOME_CADASTROCAIXAS);
 $id = $_GET['id'];
-$caixa = ZCaixa::getPeloID($id);
+$caixa = Caixa::findByID($id);
 if (is_null($caixa->getID())) {
-    Thunder::warning('O caixa de id "'.$id.'" não existe!');
+    \Thunder::warning('O caixa de id "'.$id.'" não existe!');
     redirect('/gerenciar/caixa/');
 }
 try {
-    ZCaixa::excluir($id);
-    Thunder::success('Caixa "' . $caixa->getDescricao() . '" excluído com sucesso!', true);
+    Caixa::excluir($id);
+    \Thunder::success('Caixa "' . $caixa->getDescricao() . '" excluído com sucesso!', true);
 } catch (Exception $e) {
-    Thunder::error('Não foi possível excluir o caixa "' . $caixa->getDescricao() . '"!');
+    \Thunder::error('Não foi possível excluir o caixa "' . $caixa->getDescricao() . '"!');
 }
 redirect('/gerenciar/caixa/');

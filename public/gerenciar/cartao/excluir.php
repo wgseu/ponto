@@ -21,17 +21,17 @@
 */
 require_once(dirname(__DIR__) . '/app.php');
 
-need_permission(PermissaoNome::CADASTROCARTOES);
+need_permission(Permissao::NOME_CADASTROCARTOES);
 $id = $_GET['id'];
-$cartao = ZCartao::getPeloID($id);
+$cartao = Cartao::findByID($id);
 if (is_null($cartao->getID())) {
-    Thunder::warning('O cartão de id "'.$id.'" não existe!');
+    \Thunder::warning('O cartão de id "'.$id.'" não existe!');
     redirect('/gerenciar/cartao/');
 }
 try {
-    ZCartao::excluir($id);
-    Thunder::success('Cartão "' . $cartao->getDescricao() . '" excluído com sucesso!', true);
+    Cartao::excluir($id);
+    \Thunder::success('Cartão "' . $cartao->getDescricao() . '" excluído com sucesso!', true);
 } catch (Exception $e) {
-    Thunder::error('Não foi possível excluir o cartão "' . $cartao->getDescricao() . '"!');
+    \Thunder::error('Não foi possível excluir o cartão "' . $cartao->getDescricao() . '"!');
 }
 redirect('/gerenciar/cartao/');

@@ -215,39 +215,39 @@ class ZDispositivo
 
     public static function getPeloID($id)
     {
-        $query = DB::$pdo->from('Dispositivos')
+        $query = \DB::$pdo->from('Dispositivos')
                          ->where(['id' => $id]);
-        return new ZDispositivo($query->fetch());
+        return new Dispositivo($query->fetch());
     }
 
     public static function getPeloNome($nome)
     {
-        $query = DB::$pdo->from('Dispositivos')
+        $query = \DB::$pdo->from('Dispositivos')
                          ->where(['nome' => $nome]);
-        return new ZDispositivo($query->fetch());
+        return new Dispositivo($query->fetch());
     }
 
     public static function getNaoValidado()
     {
-        $query = DB::$pdo->from('Dispositivos')
+        $query = \DB::$pdo->from('Dispositivos')
                          ->where(['validacao' => null,
                                        'tipo' => DispositivoTipo::TABLET])
                          ->limit(1)->offset(0);
-        return new ZDispositivo($query->fetch());
+        return new Dispositivo($query->fetch());
     }
 
     public static function getPelaCaixaID($caixa_id)
     {
-        $query = DB::$pdo->from('Dispositivos')
+        $query = \DB::$pdo->from('Dispositivos')
                          ->where(['caixaid' => $caixa_id]);
-        return new ZDispositivo($query->fetch());
+        return new Dispositivo($query->fetch());
     }
 
     public static function getPelaSerial($serial)
     {
-        $query = DB::$pdo->from('Dispositivos')
+        $query = \DB::$pdo->from('Dispositivos')
                          ->where(['serial' => $serial]);
-        return new ZDispositivo($query->fetch());
+        return new Dispositivo($query->fetch());
     }
 
     private static function validarCampos(&$dispositivo)
@@ -315,12 +315,12 @@ class ZDispositivo
         $_dispositivo = $dispositivo->toArray();
         self::validarCampos($_dispositivo);
         try {
-            $_dispositivo['id'] = DB::$pdo->insertInto('Dispositivos')->values($_dispositivo)->execute();
+            $_dispositivo['id'] = \DB::$pdo->insertInto('Dispositivos')->values($_dispositivo)->execute();
         } catch (Exception $e) {
             self::handleException($e);
             throw $e;
         }
-        return self::getPeloID($_dispositivo['id']);
+        return self::findByID($_dispositivo['id']);
     }
 
     public static function atualizar($dispositivo)
@@ -341,7 +341,7 @@ class ZDispositivo
             'validacao',
         ];
         try {
-            $query = DB::$pdo->update('Dispositivos');
+            $query = \DB::$pdo->update('Dispositivos');
             $query = $query->set(array_intersect_key($_dispositivo, array_flip($campos)));
             $query = $query->where('id', $_dispositivo['id']);
             $query->execute();
@@ -349,22 +349,22 @@ class ZDispositivo
             self::handleException($e);
             throw $e;
         }
-        return self::getPeloID($_dispositivo['id']);
+        return self::findByID($_dispositivo['id']);
     }
 
     public static function excluir($id)
     {
         if (!$id) {
-            throw new Exception('Não foi possível excluir o dispositivo, o id do dispositivo não foi informado');
+            throw new \Exception('Não foi possível excluir o dispositivo, o id do dispositivo não foi informado');
         }
-        $query = DB::$pdo->deleteFrom('Dispositivos')
+        $query = \DB::$pdo->deleteFrom('Dispositivos')
                          ->where(['id' => $id]);
         return $query->execute();
     }
 
     private static function initSearch()
     {
-        return   DB::$pdo->from('Dispositivos')
+        return   \DB::$pdo->from('Dispositivos')
                          ->orderBy('id ASC');
     }
 
@@ -377,7 +377,7 @@ class ZDispositivo
         $_dispositivos = $query->fetchAll();
         $dispositivos = [];
         foreach ($_dispositivos as $dispositivo) {
-            $dispositivos[] = new ZDispositivo($dispositivo);
+            $dispositivos[] = new Dispositivo($dispositivo);
         }
         return $dispositivos;
     }
@@ -390,7 +390,7 @@ class ZDispositivo
 
     private static function initSearchDoTablet()
     {
-        return   DB::$pdo->from('Dispositivos')
+        return   \DB::$pdo->from('Dispositivos')
                          ->where(['tipo' => DispositivoTipo::TABLET])
                          ->orderBy('id ASC');
     }
@@ -403,7 +403,7 @@ class ZDispositivo
 
     private static function initSearchDoSetorID($setor_id)
     {
-        return   DB::$pdo->from('Dispositivos')
+        return   \DB::$pdo->from('Dispositivos')
                          ->where(['setorid' => $setor_id])
                          ->orderBy('id ASC');
     }
@@ -417,7 +417,7 @@ class ZDispositivo
         $_dispositivos = $query->fetchAll();
         $dispositivos = [];
         foreach ($_dispositivos as $dispositivo) {
-            $dispositivos[] = new ZDispositivo($dispositivo);
+            $dispositivos[] = new Dispositivo($dispositivo);
         }
         return $dispositivos;
     }
@@ -430,7 +430,7 @@ class ZDispositivo
 
     private static function initSearchDaCaixaID($caixa_id)
     {
-        return   DB::$pdo->from('Dispositivos')
+        return   \DB::$pdo->from('Dispositivos')
                          ->where(['caixaid' => $caixa_id])
                          ->orderBy('id ASC');
     }
@@ -444,7 +444,7 @@ class ZDispositivo
         $_dispositivos = $query->fetchAll();
         $dispositivos = [];
         foreach ($_dispositivos as $dispositivo) {
-            $dispositivos[] = new ZDispositivo($dispositivo);
+            $dispositivos[] = new Dispositivo($dispositivo);
         }
         return $dispositivos;
     }

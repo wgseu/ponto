@@ -21,10 +21,10 @@
 */
 require_once(dirname(__DIR__) . '/app.php');
 
-need_permission(PermissaoNome::CADASTROPRODUTOS);
+need_permission(Permissao::NOME_CADASTROPRODUTOS);
 
-$count = ZUnidade::getCount($_GET['query']);
+$count = Unidade::getCount($_GET['query']);
 list($pagesize, $offset, $pagestring) = pagestring($count, 10);
-$unidades = ZUnidade::getTodas($_GET['query'], $offset, $pagesize);
+$unidades = Unidade::getTodas($_GET['query'], $offset, $pagesize);
 
 include template('gerenciar_unidade_index');

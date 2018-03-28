@@ -32,14 +32,14 @@
 				<label for="fim">Data final:</label>
 				<input type="text" id="fim" name="datahora_fim" class="datetime-picker form-control" value="{$_GET['datahora_fim']}">
 			</div>
-<!--${$_funcao = ZFuncao::getPeloID($_funcionario->getFuncaoID())}-->
-<!--${$_cliente_func = ZCliente::getPeloID($_funcionario->getClienteID())}-->
+<!--${$_funcao = $_funcionario->findFuncaoID()}-->
+<!--${$_cliente_func = $_funcionario->findClienteID()}-->
 			<input type="hidden" id="funcionarioid" name="funcionario_id" data-content="{$_cliente_func->getNomeCompleto()}" value="{$_funcionario->getID()}">
 			<div class="form-group col-lg-3 col-md-4 col-sm-4 col-xs-6 col-lg-offset-2">
 				<label for="funcionario">Atendente: <span class="identifier">{$_funcao->getDescricao()}<span></label>
 				<input type="text" id="funcionario" class="form-control" value="{$_cliente_func->getNomeCompleto()}">
 			</div>
-<!--${$_categoria = ZCategoria::getPeloID($_produto->getCategoriaID())}-->
+<!--${$_categoria = $_produto->findCategoriaID()}-->
 			<input type="hidden" id="produtoid" name="produto_id" data-descricao="{$_produto->getDescricao()}" value="{$_produto->getID()}">
 			<div class="form-group col-lg-3 col-md-6 col-sm-6 col-xs-6">
 				<label for="produto">Produto: <span class="identifier">{$_categoria->getDescricao()}<span></label>
@@ -85,13 +85,13 @@
 						<tbody>
 <!--{loop $itens_do_pedido $produto_pedido}-->
 							<tr ${$produto_pedido->isCancelado()?'class="danger"':''}>
-<!--${$_pedido = ZPedido::getPeloID($produto_pedido->getPedidoID())}-->
+<!--${$_pedido = $produto_pedido->findPedidoID()}-->
 								<td><div title="{$_modulo_names[$_pedido->getTipo()]}" class="cell-icon pedido-icons" style="background-position: -{$_pedido_icon[$_pedido->getTipo()]}px 0px;"></div><a href="/gerenciar/pedido/?query={$produto_pedido->getPedidoID()}" title="Visualizar pedido '{$produto_pedido->getPedidoID()}'">{$produto_pedido->getPedidoID()}</a></td>
-<!--${$_comanda = \MZ\Sale\Comanda::findByID($_pedido->getComandaID())}-->
-<!--${$_mesa = ZMesa::getPeloID($_pedido->getMesaID())}-->
-								<td>${$_pedido->getTipo() == PedidoTipo::ENTREGA && is_null($_pedido->getLocalizacaoID())?'Viagem':($_pedido->getTipo() == PedidoTipo::MESA?$_mesa->getNome():($_pedido->getTipo() == PedidoTipo::COMANDA?$_comanda->getNome():$_modulo_names[$_pedido->getTipo()]))}</td>
-<!--${$_produto = ZProduto::getPeloID($produto_pedido->getProdutoID())}-->
-<!--${$_servico = ZServico::getPeloID($produto_pedido->getServicoID())}-->
+<!--${$_comanda = $_pedido->findComandaID()}-->
+<!--${$_mesa = $_pedido->findMesaID()}-->
+								<td>${$_pedido->getTipo() == Pedido::TIPO_ENTREGA && is_null($_pedido->getLocalizacaoID())?'Viagem':($_pedido->getTipo() == PedidoTipo::MESA?$_mesa->getNome():($_pedido->getTipo() == PedidoTipo::COMANDA?$_comanda->getNome():$_modulo_names[$_pedido->getTipo()]))}</td>
+<!--${$_produto = $produto_pedido->findProdutoID()}-->
+<!--${$_servico = $produto_pedido->findServicoID()}-->
 								<td><strong>
 <!--{if is_null($produto_pedido->getServicoID())}-->
 									<a href="/gerenciar/produto/editar?id={$_produto->getID()}" title="Editar produto '{$_produto->getDescricao()}'">{$_produto->getDescricao()}</a>
@@ -106,8 +106,8 @@
 								<td class="text-right">${\MZ\Util\Mask::money($produto_pedido->getTotal(), true)}</td>
 								<td class="text-right">${\MZ\Util\Mask::money($produto_pedido->getCusto(), true)}</td>
 								<td class="text-right">${\MZ\Util\Mask::money($produto_pedido->getLucro(), true)}</td>
-<!--${$_funcionario = ZFuncionario::getPeloID($produto_pedido->getFuncionarioID())}-->
-<!--${$_cliente = ZCliente::getPeloID($_funcionario->getClienteID())}-->
+<!--${$_funcionario = $produto_pedido->findFuncionarioID()}-->
+<!--${$_cliente = $_funcionario->findClienteID()}-->
 								<td class="text-center"><a href="/gerenciar/funcionario/editar?id={$_funcionario->getID()}" title="Editar funcionário '{$_cliente->getNomeCompleto()}'">{$_cliente->getNomeCompleto()}</a></td>
 								<td class="text-center">${is_null($produto_pedido->getDataHora())?'':date('d/m/Y H:i', strtotime($produto_pedido->getDataHora()))}</td>
 							</tr>

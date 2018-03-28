@@ -33,7 +33,7 @@ if ((isset($_GET['primeiro'])?$_GET['primeiro']:false) ||
 } elseif ($limit > 20) {
     $limit = 20;
 }
-$clientes = ZCliente::getTodos(
+$clientes = Cliente::getTodos(
     isset($_GET['busca'])?$_GET['busca']:null,
     isset($_GET['tipo'])?$_GET['tipo']:null,
     null, // genero
@@ -61,7 +61,7 @@ $campos = [
 $_clientes = [];
 $domask = intval(isset($_GET['formatar'])?$_GET['formatar']:0) != 0;
 foreach ($clientes as $cliente) {
-    $_cliente = $cliente->toArray();
+    $_cliente = $cliente->publish();
     if ($domask) {
         $_cliente['fone1'] = \MZ\Util\Mask::phone($_cliente['fone1']);
     }

@@ -21,17 +21,17 @@
 */
 require_once(dirname(__DIR__) . '/app.php');
 
-need_permission(PermissaoNome::CADASTROPRODUTOS);
+need_permission(Permissao::NOME_CADASTROPRODUTOS);
 $id = $_GET['id'];
-$categoria = ZCategoria::getPeloID($id);
+$categoria = Categoria::findByID($id);
 if (is_null($categoria->getID())) {
-    Thunder::warning('A categoria de id "'.$id.'" não existe!');
+    \Thunder::warning('A categoria de id "'.$id.'" não existe!');
     redirect('/gerenciar/categoria/');
 }
 try {
-    ZCategoria::excluir($id);
-    Thunder::success('Categoria "' . $categoria->getDescricao() . '" excluída com sucesso!', true);
+    Categoria::excluir($id);
+    \Thunder::success('Categoria "' . $categoria->getDescricao() . '" excluída com sucesso!', true);
 } catch (Exception $e) {
-    Thunder::error('Não foi possível excluir a categoria "' . $categoria->getDescricao() . '"!');
+    \Thunder::error('Não foi possível excluir a categoria "' . $categoria->getDescricao() . '"!');
 }
 redirect('/gerenciar/categoria/');

@@ -21,29 +21,51 @@
 */
 require_once(dirname(__DIR__) . '/app.php');
 
-need_permission(PermissaoNome::CADASTROFORNECEDORES);
+use MZ\__TODO_NAMESPACE__\Fornecedor;
+
+need_permission(\Permissao::NOME_CADASTROFORNECEDORES, is_output('json'));
+$id = isset($_GET['id']) ? $_GET['id'] : null;
+$fornecedor = Fornecedor::findByID($id);
+$fornecedor->setID(null);
+
 $focusctrl = 'empresa';
 $errors = [];
+$old_fornecedor = $fornecedor;
 if (is_post()) {
-    $fornecedor = new ZFornecedor($_POST);
+    $fornecedor = new Fornecedor($_POST);
     try {
         $fornecedor->setID(null);
         $fornecedor->setPrazoPagamento(numberval($fornecedor->getPrazoPagamento()));
-        $fornecedor = ZFornecedor::cadastrar($fornecedor);
-        Thunder::success('Fornecedor "'.$fornecedor->getEmpresaID().'" cadastrado com sucesso!', true);
+        $fornecedor->filter($old_fornecedor);
+        $fornecedor->insert();
+        $old_fornecedor->clean($fornecedor);
+        $msg = sprintf(
+            'Fornecedor "%s" cadastrado com sucesso!',
+            $fornecedor->getEmpresaID()
+        );
+        if (is_output('json')) {
+            json(null, ['item' => $fornecedor->publish(), 'msg' => $msg]);
+        }
+        \Thunder::success($msg, true);
         redirect('/gerenciar/fornecedor/');
-    } catch (ValidationException $e) {
-        $errors = $e->getErrors();
-    } catch (Exception $e) {
-        $errors['unknow'] = $e->getMessage();
+    } catch (\Exception $e) {
+        $fornecedor->clean($old_fornecedor);
+        if ($e instanceof \MZ\Exception\ValidationException) {
+            $errors = $e->getErrors();
+        }
+        if (is_output('json')) {
+            json($e->getMessage(), null, ['errors' => $errors]);
+        }
+        \Thunder::error($e->getMessage());
+        foreach ($errors as $key => $value) {
+            $focusctrl = $key;
+            break;
+        }
     }
-    foreach ($errors as $key => $value) {
-        $focusctrl = $key;
-        Thunder::error($value);
-        break;
-    }
+} elseif (is_output('json')) {
+    json('Nenhum dado foi enviado');
 } else {
-    $fornecedor = new ZFornecedor();
+    $fornecedor = new Fornecedor();
     $fornecedor->setPrazoPagamento(30);
 }
 if ($focusctrl == 'empresaid') {

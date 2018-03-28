@@ -23,13 +23,13 @@ require_once(dirname(__DIR__) . '/app.php');
 
 use MZ\Wallet\Carteira;
 
-need_permission(PermissaoNome::PAGAMENTO);
+need_permission(Permissao::NOME_PAGAMENTO);
 
 $data_inicio = date_create_from_format('d/m/Y', $_GET['inicio']);
 $data_inicio = $data_inicio===false?null:$data_inicio->getTimestamp();
 $data_fim = date_create_from_format('d/m/Y', $_GET['fim']);
 $data_fim = $data_fim===false?null:$data_fim->getTimestamp();
-$count = ZPagamento::getCount(
+$count = Pagamento::getCount(
     $_GET['query'],
     $_GET['formapagtoid'],
     $_GET['cartaoid'],
@@ -40,7 +40,7 @@ $count = ZPagamento::getCount(
     $data_fim
 );
 list($pagesize, $offset, $pagestring) = pagestring($count, 10);
-$pagamentos = ZPagamento::getTodos(
+$pagamentos = Pagamento::getTodos(
     $_GET['query'],
     $_GET['formapagtoid'],
     $_GET['cartaoid'],
@@ -75,12 +75,12 @@ $_pagamento_icon = [
     'Transferencia' => 80,
 ];
 
-$formas_de_pagamento = ZFormaPagto::getTodos();
+$formas_de_pagamento = FormaPagto::findAll();
 $_forma_names = [];
 foreach ($formas_de_pagamento as $forma) {
     $_forma_names[$forma->getID()] = $forma->getDescricao();
 }
-$cartoes = ZCartao::getTodos();
+$cartoes = Cartao::findAll();
 $_cartao_names = [];
 foreach ($cartoes as $cartao) {
     $_cartao_names[$cartao->getID()] = $cartao->getDescricao();
@@ -90,5 +90,5 @@ $_carteira_names = [];
 foreach ($carteiras as $carteira) {
     $_carteira_names[$carteira->getID()] = $carteira->getDescricao();
 }
-$_funcionario = ZFuncionario::getPeloID($_GET['funcionarioid']);
+$_funcionario = Funcionario::findByID($_GET['funcionarioid']);
 include template('gerenciar_pagamento_index');

@@ -360,7 +360,8 @@ class Bairro extends \MZ\Database\Helper
         if ($bairro->exists()) {
             return $bairro;
         }
-        if (!have_permission(\PermissaoNome::CADASTROBAIRROS)) {
+        global $login_funcionario;
+        if (!$login_funcionario->has(\Permissao::NOME_CADASTROBAIRROS)) {
             throw new \Exception('O bairro não está cadastrada e você não tem permissão para cadastrar um');
         }
         $bairro->setCidadeID($cidade_id);

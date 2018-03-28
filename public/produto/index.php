@@ -22,10 +22,10 @@
 require_once(dirname(__DIR__) . '/app.php');
 
 $pagetitle = 'Produtos';
-$categorias = ZCategoria::getTodas();
+$categorias = Categoria::findAll();
 if (count($categorias) > 0) {
     $categoria_atual = current($categorias);
-    $produtos = ZProduto::getTodos(
+    $produtos = Produto::getTodos(
         null, // busca
         $categoria_atual->getID(),
         null, // unidade
@@ -40,6 +40,6 @@ if (count($categorias) > 0) {
     );
 } else {
     $produtos = [];
-    $categoria_atual = new ZCategoria();
+    $categoria_atual = new Categoria();
 }
 include template('produto_index');

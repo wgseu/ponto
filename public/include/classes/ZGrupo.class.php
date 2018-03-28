@@ -222,16 +222,16 @@ class ZGrupo
 
     public static function getPeloID($id)
     {
-        $query = DB::$pdo->from('Grupos')
+        $query = \DB::$pdo->from('Grupos')
                          ->where(['id' => $id]);
-        return new ZGrupo($query->fetch());
+        return new Grupo($query->fetch());
     }
 
     public static function getPeloProdutoIDDescricao($produto_id, $descricao)
     {
-        $query = DB::$pdo->from('Grupos')
+        $query = \DB::$pdo->from('Grupos')
                          ->where(['produtoid' => $produto_id, 'descricao' => $descricao]);
-        return new ZGrupo($query->fetch());
+        return new Grupo($query->fetch());
     }
 
     private static function validarCampos(&$grupo)
@@ -294,12 +294,12 @@ class ZGrupo
         $_grupo = $grupo->toArray();
         self::validarCampos($_grupo);
         try {
-            $_grupo['id'] = DB::$pdo->insertInto('Grupos')->values($_grupo)->execute();
+            $_grupo['id'] = \DB::$pdo->insertInto('Grupos')->values($_grupo)->execute();
         } catch (Exception $e) {
             self::handleException($e);
             throw $e;
         }
-        return self::getPeloID($_grupo['id']);
+        return self::findByID($_grupo['id']);
     }
 
     public static function atualizar($grupo)
@@ -319,7 +319,7 @@ class ZGrupo
             'funcao',
         ];
         try {
-            $query = DB::$pdo->update('Grupos');
+            $query = \DB::$pdo->update('Grupos');
             $query = $query->set(array_intersect_key($_grupo, array_flip($campos)));
             $query = $query->where('id', $_grupo['id']);
             $query->execute();
@@ -327,22 +327,22 @@ class ZGrupo
             self::handleException($e);
             throw $e;
         }
-        return self::getPeloID($_grupo['id']);
+        return self::findByID($_grupo['id']);
     }
 
     public static function excluir($id)
     {
         if (!$id) {
-            throw new Exception('Não foi possível excluir o grupo, o id do grupo não foi informado');
+            throw new \Exception('Não foi possível excluir o grupo, o id do grupo não foi informado');
         }
-        $query = DB::$pdo->deleteFrom('Grupos')
+        $query = \DB::$pdo->deleteFrom('Grupos')
                          ->where(['id' => $id]);
         return $query->execute();
     }
 
     private static function initSearch()
     {
-        return   DB::$pdo->from('Grupos')
+        return   \DB::$pdo->from('Grupos')
                          ->orderBy('id ASC');
     }
 
@@ -355,7 +355,7 @@ class ZGrupo
         $_grupos = $query->fetchAll();
         $grupos = [];
         foreach ($_grupos as $grupo) {
-            $grupos[] = new ZGrupo($grupo);
+            $grupos[] = new Grupo($grupo);
         }
         return $grupos;
     }
@@ -368,7 +368,7 @@ class ZGrupo
 
     private static function initSearchDoProdutoID($produto_id)
     {
-        return   DB::$pdo->from('Grupos g')
+        return   \DB::$pdo->from('Grupos g')
                          ->select('pca.grupoid as grupoassociadoid')
                          ->innerJoin('Pacotes pc ON pc.grupoid = g.id')
                          ->leftJoin('Pacotes pcf ON pcf.grupoid = pc.grupoid AND pcf.id > pc.id')
@@ -386,7 +386,7 @@ class ZGrupo
         $_grupos = $query->fetchAll();
         $grupos = [];
         foreach ($_grupos as $grupo) {
-            $grupos[] = new ZGrupo($grupo);
+            $grupos[] = new Grupo($grupo);
         }
         return $grupos;
     }

@@ -14,7 +14,7 @@ if ($action == 'faturamento') {
     if (abs($end - $start) > 60 * 60 * 24 * 90) {
         $end = strtotime('+3 month', $start);
     }
-    $faturamentos = ZPagamento::getTodosFaturamentos(date('Y-m-d', $start), date('Y-m-d', $end));
+    $faturamentos = Pagamento::getTodosFaturamentos(date('Y-m-d', $start), date('Y-m-d', $end));
     $data = [];
     foreach ($faturamentos as $faturamento) {
         $data[] = ['data' => strtotime($faturamento['data']), 'total' => $faturamento['total']];
@@ -52,8 +52,8 @@ if ($action == 'faturamento') {
             $base_ate = -1;
             break;
     }
-    $atual = ZPagamento::getFaturamento(null, $atual_de, $atual_ate);
-    $base = ZPagamento::getFaturamento(null, $base_de, $base_ate);
+    $atual = Pagamento::getFaturamento(null, $atual_de, $atual_ate);
+    $base = Pagamento::getFaturamento(null, $base_de, $base_ate);
     json([
         'status' => 'ok',
         'atual' => $atual,

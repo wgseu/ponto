@@ -31,7 +31,7 @@ if ($_GET['primeiro'] || check_fone($_GET['busca'], true)) {
 } elseif ($limit > 20) {
     $limit = 20;
 }
-$funcionarios = ZFuncionario::getTodos($_GET['busca'], null, null, $_GET['ativo'], 0, $limit);
+$funcionarios = Funcionario::getTodos($_GET['busca'], null, null, $_GET['ativo'], 0, $limit);
 $response = ['status' => 'ok'];
 $campos = [
             'id',
@@ -45,9 +45,9 @@ $campos = [
 $_funcionarios = [];
 $domask = intval($_GET['format']) != 0;
 foreach ($funcionarios as $funcionario) {
-    $_funcionario = $funcionario->toArray();
-    $funcao = ZFuncao::getPeloID($funcionario->getFuncaoID());
-    $cliente = ZCliente::getPeloID($funcionario->getClienteID());
+    $_funcionario = $funcionario->publish();
+    $funcao = $funcionario->findFuncaoID();
+    $cliente = $funcionario->findClienteID();
     $_funcionario['nome'] = $cliente->getNomeCompleto();
     $_funcionario['fone1'] = $cliente->getFone(1);
     $_funcionario['cpf'] = $cliente->getCPF();

@@ -23,11 +23,12 @@ require_once(dirname(__DIR__) . '/app.php');
 
 use MZ\Wallet\Carteira;
 
-need_permission(PermissaoNome::CADASTROCARTOES);
+need_permission(Permissao::NOME_CADASTROCARTOES);
 $focusctrl = 'descricao';
 $errors = [];
+$old_cartao = $cartao;
 if (is_post()) {
-    $cartao = new ZCartao($_POST);
+    $cartao = new Cartao($_POST);
     try {
         $cartao->setID(null);
         $cartao->setImageIndex(numberval($cartao->getImageIndex()));
@@ -35,23 +36,38 @@ if (is_post()) {
         $cartao->setTransacao(moneyval($cartao->getTransacao()));
         $cartao->setTaxa(moneyval($cartao->getTaxa()));
         $cartao->setDiasRepasse(numberval($cartao->getDiasRepasse()));
-        $cartao = ZCartao::cadastrar($cartao);
-        Thunder::success('Cartão "'.$cartao->getDescricao().'" cadastrado com sucesso!', true);
+        $cartao->filter($old_cartao);
+        $cartao->insert();
+        $old_cartao->clean($cartao);
+        $msg = sprintf(
+            'Cartão "%s" cadastrado com sucesso!',
+            $cartao->getDescricao()
+        );
+        if (is_output('json')) {
+            json(null, ['item' => $cartao->publish(), 'msg' => $msg]);
+        }
+        \Thunder::success($msg, true);
         redirect('/gerenciar/cartao/');
-    } catch (ValidationException $e) {
-        $errors = $e->getErrors();
-    } catch (Exception $e) {
-        $errors['unknow'] = $e->getMessage();
+    } catch (\Exception $e) {
+        $cartao->clean($old_cartao);
+        if ($e instanceof \MZ\Exception\ValidationException) {
+            $errors = $e->getErrors();
+        }
+        if (is_output('json')) {
+            json($e->getMessage(), null, ['errors' => $errors]);
+        }
+        \Thunder::error($e->getMessage());
+        foreach ($errors as $key => $value) {
+            $focusctrl = $key;
+            break;
+        }
     }
-    foreach ($errors as $key => $value) {
-        $focusctrl = $key;
-        Thunder::error($value);
-        break;
-    }
+} elseif (is_output('json')) {
+    json('Nenhum dado foi enviado');
 } else {
-    $cartao = new ZCartao();
+    $cartao = new Cartao();
     $cartao->setAtivo('Y');
 }
 $_carteiras = Carteira::findAll();
-$_imagens = ZCartao::getImages();
+$_imagens = Cartao::getImages();
 include template('gerenciar_cartao_cadastrar');

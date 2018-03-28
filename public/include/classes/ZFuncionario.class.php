@@ -238,19 +238,19 @@ class ZFuncionario
 
     private static function initGet()
     {
-        return   DB::$pdo->from('Funcionarios f');
+        return   \DB::$pdo->from('Funcionarios f');
     }
 
     public static function getPeloID($id)
     {
         $query = self::initGet()->where(['f.id' => $id]);
-        return new ZFuncionario($query->fetch());
+        return new Funcionario($query->fetch());
     }
 
     public static function getPeloLogin($login)
     {
         $query = self::initGet()->where(['c.login' => $login]);
-        return new ZFuncionario($query->fetch());
+        return new Funcionario($query->fetch());
     }
 
     public static function getPeloClienteID($cliente_id, $todos = false)
@@ -259,13 +259,13 @@ class ZFuncionario
         if (!$todos) {
             $query = $query->where(['f.ativo' => 'Y']);
         }
-        return new ZFuncionario($query->fetch());
+        return new Funcionario($query->fetch());
     }
 
     public static function getPeloCodigoBarras($codigo_barras)
     {
         $query = self::initGet()->where(['f.codigobarras' => $codigo_barras]);
-        return new ZFuncionario($query->fetch());
+        return new Funcionario($query->fetch());
     }
 
     private static function validarCampos(&$funcionario)
@@ -277,10 +277,10 @@ class ZFuncionario
         if (!is_numeric($funcionario['clienteid'])) {
             $erros['clienteid'] = 'O cliente não foi informado';
         } else {
-            $cliente = ZCliente::getPeloID($funcionario['clienteid']);
+            $cliente = Cliente::findByID($funcionario['clienteid']);
             if (trim($cliente->getLogin()) == '') {
                 $erros['clienteid'] = 'O cliente não possui nome de login';
-            } elseif ($cliente->getTipo() != ClienteTipo::FISICA) {
+            } elseif ($cliente->getTipo() != Cliente::TIPO_FISICA) {
                 $erros['clienteid'] = 'O cliente precisa ser uma pessoa física';
             } elseif (is_null($cliente->getSenha())) {
                 $erros['clienteid'] = 'O cliente precisa possuir uma senha';
@@ -348,12 +348,12 @@ class ZFuncionario
         $_funcionario = $funcionario->toArray();
         self::validarCampos($_funcionario);
         try {
-            $_funcionario['id'] = DB::$pdo->insertInto('Funcionarios')->values($_funcionario)->execute();
+            $_funcionario['id'] = \DB::$pdo->insertInto('Funcionarios')->values($_funcionario)->execute();
         } catch (Exception $e) {
             self::handleException($e);
             throw $e;
         }
-        return self::getPeloID($_funcionario['id']);
+        return self::findByID($_funcionario['id']);
     }
 
     public static function atualizar($funcionario)
@@ -374,7 +374,7 @@ class ZFuncionario
             'datasaida',
         ];
         try {
-            $query = DB::$pdo->update('Funcionarios');
+            $query = \DB::$pdo->update('Funcionarios');
             $query = $query->set(array_intersect_key($_funcionario, array_flip($campos)));
             $query = $query->where('id', $_funcionario['id']);
             $query->execute();
@@ -382,24 +382,24 @@ class ZFuncionario
             self::handleException($e);
             throw $e;
         }
-        return self::getPeloID($_funcionario['id']);
+        return self::findByID($_funcionario['id']);
     }
 
     public static function excluir($funcionario)
     {
         if (is_null($funcionario->getID())) {
-            throw new Exception('Não foi possível excluir o funcionário, o id do funcionário não foi informado');
+            throw new \Exception('Não foi possível excluir o funcionário, o id do funcionário não foi informado');
         }
-        if (have_permission(PermissaoNome::CADASTROFUNCIONARIOS, $funcionario) && !is_owner()) {
-            throw new Exception('Você não tem permissão para excluir esse funcionário!');
+        if (have_permission(Permissao::NOME_CADASTROFUNCIONARIOS, $funcionario) && !is_owner()) {
+            throw new \Exception('Você não tem permissão para excluir esse funcionário!');
         }
         if (is_self($funcionario)) {
-            throw new Exception('Você não pode excluir a si mesmo!');
+            throw new \Exception('Você não pode excluir a si mesmo!');
         }
         if (is_owner($funcionario)) {
-            throw new Exception('Esse funcionário não pode ser excluído!');
+            throw new \Exception('Esse funcionário não pode ser excluído!');
         }
-        $query = DB::$pdo->deleteFrom('Funcionarios')
+        $query = \DB::$pdo->deleteFrom('Funcionarios')
                          ->where(['id' => $funcionario->getID()]);
         return $query->execute();
     }
@@ -469,7 +469,7 @@ class ZFuncionario
         $_funcionarios = $query->fetchAll();
         $funcionarios = [];
         foreach ($_funcionarios as $funcionario) {
-            $funcionarios[] = new ZFuncionario($funcionario);
+            $funcionarios[] = new Funcionario($funcionario);
         }
         return $funcionarios;
     }
@@ -495,7 +495,7 @@ class ZFuncionario
         $_funcionarios = $query->fetchAll();
         $funcionarios = [];
         foreach ($_funcionarios as $funcionario) {
-            $funcionarios[] = new ZFuncionario($funcionario);
+            $funcionarios[] = new Funcionario($funcionario);
         }
         return $funcionarios;
     }
@@ -521,7 +521,7 @@ class ZFuncionario
         $_funcionarios = $query->fetchAll();
         $funcionarios = [];
         foreach ($_funcionarios as $funcionario) {
-            $funcionarios[] = new ZFuncionario($funcionario);
+            $funcionarios[] = new Funcionario($funcionario);
         }
         return $funcionarios;
     }

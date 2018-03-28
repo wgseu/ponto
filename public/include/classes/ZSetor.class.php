@@ -97,24 +97,24 @@ class ZSetor
 
     public static function getPeloID($id)
     {
-        $query = DB::$pdo->from('Setores')
+        $query = \DB::$pdo->from('Setores')
                          ->where(['id' => $id]);
-        return new ZSetor($query->fetch());
+        return new Setor($query->fetch());
     }
 
     public static function getPrimeiro()
     {
-        $query = DB::$pdo->from('Setores')
+        $query = \DB::$pdo->from('Setores')
                          ->limit(1)->offset(0);
-        return new ZSetor($query->fetch());
+        return new Setor($query->fetch());
     }
 
     public static function getPeloNome($nome)
     {
-        $query = DB::$pdo->from('Setores')
+        $query = \DB::$pdo->from('Setores')
                          ->where(['nome' => $nome])
                          ->limit(1)->offset(0);
-        return new ZSetor($query->fetch());
+        return new Setor($query->fetch());
     }
 
     private static function validarCampos(&$setor)
@@ -148,12 +148,12 @@ class ZSetor
         $_setor = $setor->toArray();
         self::validarCampos($_setor);
         try {
-            $_setor['id'] = DB::$pdo->insertInto('Setores')->values($_setor)->execute();
+            $_setor['id'] = \DB::$pdo->insertInto('Setores')->values($_setor)->execute();
         } catch (Exception $e) {
             self::handleException($e);
             throw $e;
         }
-        return self::getPeloID($_setor['id']);
+        return self::findByID($_setor['id']);
     }
 
     public static function atualizar($setor)
@@ -168,7 +168,7 @@ class ZSetor
             'descricao',
         ];
         try {
-            $query = DB::$pdo->update('Setores');
+            $query = \DB::$pdo->update('Setores');
             $query = $query->set(array_intersect_key($_setor, array_flip($campos)));
             $query = $query->where('id', $_setor['id']);
             $query->execute();
@@ -176,22 +176,22 @@ class ZSetor
             self::handleException($e);
             throw $e;
         }
-        return self::getPeloID($_setor['id']);
+        return self::findByID($_setor['id']);
     }
 
     public static function excluir($id)
     {
         if (!$id) {
-            throw new Exception('Não foi possível excluir o setor, o id do setor não foi informado');
+            throw new \Exception('Não foi possível excluir o setor, o id do setor não foi informado');
         }
-        $query = DB::$pdo->deleteFrom('Setores')
+        $query = \DB::$pdo->deleteFrom('Setores')
                          ->where(['id' => $id]);
         return $query->execute();
     }
 
     private static function initSearch($busca)
     {
-        $query = DB::$pdo->from('Setores')
+        $query = \DB::$pdo->from('Setores')
                          ->orderBy('nome ASC');
         $busca = trim($busca);
         if ($busca != '') {
@@ -209,7 +209,7 @@ class ZSetor
         $_setors = $query->fetchAll();
         $setors = [];
         foreach ($_setors as $setor) {
-            $setors[] = new ZSetor($setor);
+            $setors[] = new Setor($setor);
         }
         return $setors;
     }

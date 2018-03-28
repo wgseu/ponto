@@ -56,9 +56,9 @@
 							<tr ${$cartao->isAtivo()?'':'class="active"'}>
 								<td><a href="/gerenciar/cartao/editar?id={$cartao->getID()}" title="Editar cartão '{$cartao->getDescricao()}'"><div title="{$_imagens[$cartao->getImageIndex()]['name']}" class="cell-icon cartao-icons" style="background-position: -{$_imagens[$cartao->getImageIndex()]['id'] * 50}px 0px;"></div><strong>{$cartao->getDescricao()}</strong></a></td>
 								<td>
-<!--${$_carteira = \MZ\Wallet\Carteira::findByID($cartao->getCarteiraID())}-->
+<!--${$_carteira = $cartao->findCarteiraID()}-->
 									<strong><a href="/gerenciar/carteira/editar?id={$_carteira->getID()}" title="Editar carteira '{$_carteira->getDescricao()}'">{$_carteira->getDescricao()}</a></strong>
-<!--${$_carteira = \MZ\Wallet\Carteira::findByID($cartao->getCarteiraPagtoID())}-->
+<!--${$_carteira = $cartao->findCarteiraPagtoID()}-->
 									<small><a href="/gerenciar/carteira/editar?id={$_carteira->getID()}" title="Editar carteira '{$_carteira->getDescricao()}'">{$_carteira->getDescricao()}</a></small>
 								</td>
 								<td>${\MZ\Util\Mask::money($cartao->getMensalidade(), true)}</td>

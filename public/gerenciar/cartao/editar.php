@@ -23,17 +23,22 @@ require_once(dirname(__DIR__) . '/app.php');
 
 use MZ\Wallet\Carteira;
 
-need_permission(PermissaoNome::CADASTROCARTOES);
-$cartao = ZCartao::getPeloID($_GET['id']);
-if (is_null($cartao->getID())) {
-    Thunder::warning('O cartão de id "'.$_GET['id'].'" não existe!');
+need_permission(\Permissao::NOME_CADASTROCARTOES, is_output('json'));
+$id = isset($_GET['id']) ? $_GET['id'] : null;
+$cartao = Cartao::findByID($id);
+if (!$cartao->exists()) {
+    $msg = 'O cartão informado não existe!';
+    if (is_output('json')) {
+        json($msg);
+    }
+    \Thunder::warning($msg);
     redirect('/gerenciar/cartao/');
 }
 $focusctrl = 'descricao';
 $errors = [];
 $old_cartao = $cartao;
 if (is_post()) {
-    $cartao = new ZCartao($_POST);
+    $cartao = new Cartao($_POST);
     try {
         $cartao->setID($old_cartao->getID());
         $cartao->setImageIndex(numberval($cartao->getImageIndex()));
@@ -41,20 +46,35 @@ if (is_post()) {
         $cartao->setTransacao(moneyval($cartao->getTransacao()));
         $cartao->setTaxa(moneyval($cartao->getTaxa()));
         $cartao->setDiasRepasse(numberval($cartao->getDiasRepasse()));
-        $cartao = ZCartao::atualizar($cartao);
-        Thunder::success('Cartão "'.$cartao->getDescricao().'" atualizado com sucesso!', true);
+        $cartao->filter($old_cartao);
+        $cartao->update();
+        $old_cartao->clean($cartao);
+        $msg = sprintf(
+            'Cartão "%s" atualizado com sucesso!',
+            $cartao->getDescricao()
+        );
+        if (is_output('json')) {
+            json(null, ['item' => $cartao->publish(), 'msg' => $msg]);
+        }
+        \Thunder::success($msg, true);
         redirect('/gerenciar/cartao/');
-    } catch (ValidationException $e) {
-        $errors = $e->getErrors();
-    } catch (Exception $e) {
-        $errors['unknow'] = $e->getMessage();
+    } catch (\Exception $e) {
+        $cartao->clean($old_cartao);
+        if ($e instanceof \MZ\Exception\ValidationException) {
+            $errors = $e->getErrors();
+        }
+        if (is_output('json')) {
+            json($e->getMessage(), null, ['errors' => $errors]);
+        }
+        \Thunder::error($e->getMessage());
+        foreach ($errors as $key => $value) {
+            $focusctrl = $key;
+            break;
+        }
     }
-    foreach ($errors as $key => $value) {
-        $focusctrl = $key;
-        Thunder::error($value);
-        break;
-    }
+} elseif (is_output('json')) {
+    json('Nenhum dado foi enviado');
 }
 $_carteiras = Carteira::findAll();
-$_imagens = ZCartao::getImages();
+$_imagens = Cartao::getImages();
 include template('gerenciar_cartao_editar');

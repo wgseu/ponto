@@ -2,7 +2,7 @@
 require_once(dirname(__DIR__) . '/app.php');
 
 need_permission(
-    PermissaoNome::PAGAMENTO,
+    Permissao::NOME_PAGAMENTO,
     is_output('json')
 );
 
@@ -25,9 +25,9 @@ try {
     $lancamento_fim = strtotime($_GET['lancamento_fim']);
 
     if (!in_array($modo, ['contador', 'consumidor'])) {
-        throw new Exception('O modo de envio "'.$modo.'" é inválido', 500);
+        throw new \Exception('O modo de envio "'.$modo.'" é inválido', 500);
     }
-    $notas = ZNota::getTodas(
+    $notas = Nota::getTodas(
         $busca,
         $estado,
         $acao,
@@ -42,32 +42,32 @@ try {
         $lancamento_fim
     );
     if (count($notas) == 0) {
-        throw new Exception('Nenhuma nota no resultado da busca', 404);
+        throw new \Exception('Nenhuma nota no resultado da busca', 404);
     }
     if (count($notas) > 1 && $modo == 'consumidor') {
-        throw new Exception('Apenas um E-mail por vez pode ser enviado para um consumidor', 500);
+        throw new \Exception('Apenas um E-mail por vez pode ser enviado para um consumidor', 500);
     }
     $_nota = current($notas);
     $nfe_api = new NFeAPI();
     $nfe_api->init();
     $destinatario_id = $nfe_api->getExternalEmitente()->getContadorID();
     if ($modo == 'consumidor') {
-        $pedido = ZPedido::getPeloID($_nota->getPedidoID());
+        $pedido = $_nota->findPedidoID();
         $destinatario_id = $pedido->getClienteID();
     }
-    $destinatario = ZCliente::getPeloID($destinatario_id);
+    $destinatario = Cliente::findByID($destinatario_id);
     if (is_null($destinatario->getID())) {
         if ($modo == 'contador') {
-            throw new Exception('O contador não foi informado nas configurações do emitente', 500);
+            throw new \Exception('O contador não foi informado nas configurações do emitente', 500);
         } else {
-            throw new Exception('O consumidor não foi informado no pedido', 500);
+            throw new \Exception('O consumidor não foi informado no pedido', 500);
         }
     }
     if (!check_email($destinatario->getEmail())) {
         if ($modo == 'contador') {
-            throw new Exception('O E-mail do contador não foi informado no cadastro', 500);
+            throw new \Exception('O E-mail do contador não foi informado no cadastro', 500);
         } else {
-            throw new Exception('O E-mail do consumidor não foi informado no cadastro', 500);
+            throw new \Exception('O E-mail do consumidor não foi informado no cadastro', 500);
         }
     }
     $sufixo = '';
@@ -103,12 +103,12 @@ try {
     }
     need_permission(
         [
-            PermissaoNome::RELATORIOFLUXO,
-            PermissaoNome::EXCLUIRPEDIDO,
+            Permissao::NOME_RELATORIOFLUXO,
+            Permissao::NOME_EXCLUIRPEDIDO,
         ],
         is_output('json')
     );
-    $zipfile = ZNota::zip($notas);
+    $zipfile = Nota::zip($notas);
     $zipname = 'Notas'.$sufixo.'.zip';
     try {
         mail_nota($destinatario->getEmail(), $destinatario->getNome(), $modo, $filters, [$zipname => $zipfile]);

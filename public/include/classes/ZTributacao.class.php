@@ -141,9 +141,9 @@ class ZTributacao
 
     public static function getPeloID($id)
     {
-        $query = DB::$pdo->from('Tributacoes')
+        $query = \DB::$pdo->from('Tributacoes')
                          ->where(['id' => $id]);
-        return new ZTributacao($query->fetch());
+        return new Tributacao($query->fetch());
     }
 
     private static function validarCampos(&$tributacao)
@@ -183,12 +183,12 @@ class ZTributacao
         $_tributacao = $tributacao->toArray();
         self::validarCampos($_tributacao);
         try {
-            $_tributacao['id'] = DB::$pdo->insertInto('Tributacoes')->values($_tributacao)->execute();
+            $_tributacao['id'] = \DB::$pdo->insertInto('Tributacoes')->values($_tributacao)->execute();
         } catch (Exception $e) {
             self::handleException($e);
             throw $e;
         }
-        return self::getPeloID($_tributacao['id']);
+        return self::findByID($_tributacao['id']);
     }
 
     public static function atualizar($tributacao)
@@ -206,7 +206,7 @@ class ZTributacao
             'impostoid',
         ];
         try {
-            $query = DB::$pdo->update('Tributacoes');
+            $query = \DB::$pdo->update('Tributacoes');
             $query = $query->set(array_intersect_key($_tributacao, array_flip($campos)));
             $query = $query->where('id', $_tributacao['id']);
             $query->execute();
@@ -214,22 +214,22 @@ class ZTributacao
             self::handleException($e);
             throw $e;
         }
-        return self::getPeloID($_tributacao['id']);
+        return self::findByID($_tributacao['id']);
     }
 
     public static function excluir($id)
     {
         if (!$id) {
-            throw new Exception('Não foi possível excluir a tributacao, o id da tributacao não foi informado');
+            throw new \Exception('Não foi possível excluir a tributacao, o id da tributacao não foi informado');
         }
-        $query = DB::$pdo->deleteFrom('Tributacoes')
+        $query = \DB::$pdo->deleteFrom('Tributacoes')
                          ->where(['id' => $id]);
         return $query->execute();
     }
 
     private static function initSearch()
     {
-        return   DB::$pdo->from('Tributacoes')
+        return   \DB::$pdo->from('Tributacoes')
                          ->orderBy('id ASC');
     }
 
@@ -242,7 +242,7 @@ class ZTributacao
         $_tributacaos = $query->fetchAll();
         $tributacaos = [];
         foreach ($_tributacaos as $tributacao) {
-            $tributacaos[] = new ZTributacao($tributacao);
+            $tributacaos[] = new Tributacao($tributacao);
         }
         return $tributacaos;
     }
@@ -255,7 +255,7 @@ class ZTributacao
 
     private static function initSearchDaOrigemID($origem_id)
     {
-        return   DB::$pdo->from('Tributacoes')
+        return   \DB::$pdo->from('Tributacoes')
                          ->where(['origemid' => $origem_id])
                          ->orderBy('id ASC');
     }
@@ -269,7 +269,7 @@ class ZTributacao
         $_tributacaos = $query->fetchAll();
         $tributacaos = [];
         foreach ($_tributacaos as $tributacao) {
-            $tributacaos[] = new ZTributacao($tributacao);
+            $tributacaos[] = new Tributacao($tributacao);
         }
         return $tributacaos;
     }
@@ -282,7 +282,7 @@ class ZTributacao
 
     private static function initSearchDaOperacaoID($operacao_id)
     {
-        return   DB::$pdo->from('Tributacoes')
+        return   \DB::$pdo->from('Tributacoes')
                          ->where(['operacaoid' => $operacao_id])
                          ->orderBy('id ASC');
     }
@@ -296,7 +296,7 @@ class ZTributacao
         $_tributacaos = $query->fetchAll();
         $tributacaos = [];
         foreach ($_tributacaos as $tributacao) {
-            $tributacaos[] = new ZTributacao($tributacao);
+            $tributacaos[] = new Tributacao($tributacao);
         }
         return $tributacaos;
     }
@@ -309,7 +309,7 @@ class ZTributacao
 
     private static function initSearchDoImpostoID($imposto_id)
     {
-        return   DB::$pdo->from('Tributacoes')
+        return   \DB::$pdo->from('Tributacoes')
                          ->where(['impostoid' => $imposto_id])
                          ->orderBy('id ASC');
     }
@@ -323,7 +323,7 @@ class ZTributacao
         $_tributacaos = $query->fetchAll();
         $tributacaos = [];
         foreach ($_tributacaos as $tributacao) {
-            $tributacaos[] = new ZTributacao($tributacao);
+            $tributacaos[] = new Tributacao($tributacao);
         }
         return $tributacaos;
     }

@@ -21,11 +21,11 @@
 */
 require_once(dirname(__DIR__) . '/app.php');
 
-need_permission(PermissaoNome::ALTERARPAGINAS);
+need_permission(Permissao::NOME_ALTERARPAGINAS);
 
-$count = ZPagina::getCount($_GET['nome'], $_GET['linguagemid']);
+$count = Pagina::getCount($_GET['nome'], $_GET['linguagemid']);
 list($pagesize, $offset, $pagestring) = pagestring($count, 10);
-$paginas = ZPagina::getTodas($_GET['nome'], $_GET['linguagemid'], $offset, $pagesize);
+$paginas = Pagina::getTodas($_GET['nome'], $_GET['linguagemid'], $offset, $pagesize);
 
 $nomes = get_pages_info();
 $linguagens = get_languages_info();

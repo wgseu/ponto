@@ -21,35 +21,57 @@
 */
 require_once(dirname(__DIR__) . '/app.php');
 
-need_permission(PermissaoNome::CADASTRARCREDITOS);
-$credito = ZCredito::getPeloID($_GET['id']);
-if (is_null($credito->getID())) {
-    Thunder::warning('O crédito de id "'.$_GET['id'].'" não existe!');
+use MZ\__TODO_NAMESPACE__\Credito;
+
+need_permission(\Permissao::NOME_CADASTRARCREDITOS, is_output('json'));
+$id = isset($_GET['id']) ? $_GET['id'] : null;
+$credito = Credito::findByID($id);
+if (!$credito->exists()) {
+    $msg = 'O crédito informado não existe!';
+    if (is_output('json')) {
+        json($msg);
+    }
+    \Thunder::warning($msg);
     redirect('/gerenciar/credito/');
 }
 $focusctrl = 'detalhes';
 $errors = [];
 $old_credito = $credito;
 if (is_post()) {
-    $credito = new ZCredito($_POST);
+    $credito = new Credito($_POST);
     try {
         $credito->setID($old_credito->getID());
         $credito->setFuncionarioID($old_credito->getFuncionarioID());
         $credito->setCancelado($old_credito->getCancelado());
 
         $credito->setValor(moneyval($credito->getValor()));
-        $credito = ZCredito::atualizar($credito);
-        Thunder::success('Crédito "'.$credito->getDetalhes().'" atualizado com sucesso!', true);
+        $credito->filter($old_credito);
+        $credito->update();
+        $old_credito->clean($credito);
+        $msg = sprintf(
+            'Crédito "%s" atualizado com sucesso!',
+            $credito->getDetalhes()
+        );
+        if (is_output('json')) {
+            json(null, ['item' => $credito->publish(), 'msg' => $msg]);
+        }
+        \Thunder::success($msg, true);
         redirect('/gerenciar/credito/');
-    } catch (ValidationException $e) {
-        $errors = $e->getErrors();
-    } catch (Exception $e) {
-        $errors['unknow'] = $e->getMessage();
+    } catch (\Exception $e) {
+        $credito->clean($old_credito);
+        if ($e instanceof \MZ\Exception\ValidationException) {
+            $errors = $e->getErrors();
+        }
+        if (is_output('json')) {
+            json($e->getMessage(), null, ['errors' => $errors]);
+        }
+        \Thunder::error($e->getMessage());
+        foreach ($errors as $key => $value) {
+            $focusctrl = $key;
+            break;
+        }
     }
-    foreach ($errors as $key => $value) {
-        $focusctrl = $key;
-        Thunder::error($value);
-        break;
-    }
+} elseif (is_output('json')) {
+    json('Nenhum dado foi enviado');
 }
 include template('gerenciar_credito_editar');

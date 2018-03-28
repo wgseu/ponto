@@ -26,8 +26,8 @@ $[table.exists(date|datetime)]
 use MZ\Database\Helper;
 $[table.end]
 
-need_permission(\PermissaoNome::$[TABLE.style], is_output('json'));
-$$[primary.unix] = isset($_GET['$[primary.unix]'])?$_GET['$[primary.unix]']:null;
+need_permission(\Permissao::NOME_$[TABLE.style], is_output('json'));
+$$[primary.unix] = isset($_GET['$[primary.unix]']) ? $_GET['$[primary.unix]'] : null;
 $$[table.unix] = $[Table.norm]::findBy$[Primary.norm]($$[primary.unix]);
 $[field.each(all)]
 $[field.if(blob|image|primary)]

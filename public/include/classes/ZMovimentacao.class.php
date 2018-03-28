@@ -176,9 +176,9 @@ class ZMovimentacao
 
     public static function getPeloID($id)
     {
-        $query = DB::$pdo->from('Movimentacoes')
+        $query = \DB::$pdo->from('Movimentacoes')
                          ->where(['id' => $id]);
-        return new ZMovimentacao($query->fetch());
+        return new Movimentacao($query->fetch());
     }
 
     private static function validarCampos(&$movimentacao)
@@ -224,12 +224,12 @@ class ZMovimentacao
         $_movimentacao = $movimentacao->toArray();
         self::validarCampos($_movimentacao);
         try {
-            $_movimentacao['id'] = DB::$pdo->insertInto('Movimentacoes')->values($_movimentacao)->execute();
+            $_movimentacao['id'] = \DB::$pdo->insertInto('Movimentacoes')->values($_movimentacao)->execute();
         } catch (Exception $e) {
             self::handleException($e);
             throw $e;
         }
-        return self::getPeloID($_movimentacao['id']);
+        return self::findByID($_movimentacao['id']);
     }
 
     public static function atualizar($movimentacao)
@@ -248,7 +248,7 @@ class ZMovimentacao
             'datafechamento',
         ];
         try {
-            $query = DB::$pdo->update('Movimentacoes');
+            $query = \DB::$pdo->update('Movimentacoes');
             $query = $query->set(array_intersect_key($_movimentacao, array_flip($campos)));
             $query = $query->where('id', $_movimentacao['id']);
             $query->execute();
@@ -256,19 +256,19 @@ class ZMovimentacao
             self::handleException($e);
             throw $e;
         }
-        return self::getPeloID($_movimentacao['id']);
+        return self::findByID($_movimentacao['id']);
     }
 
     public static function existe($caixa_id)
     {
-        $query = DB::$pdo->from('Movimentacoes')
+        $query = \DB::$pdo->from('Movimentacoes')
                          ->where('caixaid', $caixa_id);
         return $query->count() > 0;
     }
 
     private static function initSearch($caixa_id, $aberta, $inicializador_id)
     {
-        $query = DB::$pdo->from('Movimentacoes')
+        $query = \DB::$pdo->from('Movimentacoes')
                          ->orderBy('id DESC');
         if (is_numeric($caixa_id)) {
             $query = $query->where('caixaid', intval($caixa_id));
@@ -297,7 +297,7 @@ class ZMovimentacao
         $_movimentacaos = $query->fetchAll();
         $movimentacaos = [];
         foreach ($_movimentacaos as $movimentacao) {
-            $movimentacaos[] = new ZMovimentacao($movimentacao);
+            $movimentacaos[] = new Movimentacao($movimentacao);
         }
         return $movimentacaos;
     }
@@ -310,7 +310,7 @@ class ZMovimentacao
 
     private static function initSearchDaSessaoID($sessao_id)
     {
-        return   DB::$pdo->from('Movimentacoes')
+        return   \DB::$pdo->from('Movimentacoes')
                          ->where(['sessaoid' => $sessao_id])
                          ->orderBy('id ASC');
     }
@@ -324,7 +324,7 @@ class ZMovimentacao
         $_movimentacaos = $query->fetchAll();
         $movimentacaos = [];
         foreach ($_movimentacaos as $movimentacao) {
-            $movimentacaos[] = new ZMovimentacao($movimentacao);
+            $movimentacaos[] = new Movimentacao($movimentacao);
         }
         return $movimentacaos;
     }
@@ -337,7 +337,7 @@ class ZMovimentacao
 
     private static function initSearchDaCaixaID($caixa_id)
     {
-        return   DB::$pdo->from('Movimentacoes')
+        return   \DB::$pdo->from('Movimentacoes')
                          ->where(['caixaid' => $caixa_id])
                          ->orderBy('id ASC');
     }
@@ -351,7 +351,7 @@ class ZMovimentacao
         $_movimentacaos = $query->fetchAll();
         $movimentacaos = [];
         foreach ($_movimentacaos as $movimentacao) {
-            $movimentacaos[] = new ZMovimentacao($movimentacao);
+            $movimentacaos[] = new Movimentacao($movimentacao);
         }
         return $movimentacaos;
     }
@@ -364,7 +364,7 @@ class ZMovimentacao
 
     private static function initSearchDaFuncionarioAberturaID($funcionario_abertura_id)
     {
-        return   DB::$pdo->from('Movimentacoes')
+        return   \DB::$pdo->from('Movimentacoes')
                          ->where(['funcionarioaberturaid' => $funcionario_abertura_id])
                          ->orderBy('id ASC');
     }
@@ -378,7 +378,7 @@ class ZMovimentacao
         $_movimentacaos = $query->fetchAll();
         $movimentacaos = [];
         foreach ($_movimentacaos as $movimentacao) {
-            $movimentacaos[] = new ZMovimentacao($movimentacao);
+            $movimentacaos[] = new Movimentacao($movimentacao);
         }
         return $movimentacaos;
     }
@@ -391,7 +391,7 @@ class ZMovimentacao
 
     private static function initSearchDoFuncionarioFechamentoID($funcionario_fechamento_id)
     {
-        return   DB::$pdo->from('Movimentacoes')
+        return   \DB::$pdo->from('Movimentacoes')
                          ->where(['funcionariofechamentoid' => $funcionario_fechamento_id])
                          ->orderBy('id ASC');
     }
@@ -405,7 +405,7 @@ class ZMovimentacao
         $_movimentacaos = $query->fetchAll();
         $movimentacaos = [];
         foreach ($_movimentacaos as $movimentacao) {
-            $movimentacaos[] = new ZMovimentacao($movimentacao);
+            $movimentacaos[] = new Movimentacao($movimentacao);
         }
         return $movimentacaos;
     }

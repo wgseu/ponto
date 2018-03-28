@@ -21,39 +21,61 @@
 */
 require_once(dirname(__DIR__) . '/app.php');
 
-need_permission(PermissaoNome::CADASTROFUNCIONARIOS);
+use MZ\__TODO_NAMESPACE__\Funcionario;
+
+need_permission(\Permissao::NOME_CADASTROFUNCIONARIOS, is_output('json'));
+$id = isset($_GET['id']) ? $_GET['id'] : null;
+$funcionario = Funcionario::findByID($id);
+$funcionario->setID(null);
+
 $focusctrl = 'funcaoid';
 $errors = [];
+$old_funcionario = $funcionario;
 if (is_post()) {
-    $funcionario = new ZFuncionario($_POST);
+    $funcionario = new Funcionario($_POST);
     try {
         $funcionario->setID(null);
         $funcionario->setPorcentagem(moneyval($funcionario->getPorcentagem()));
         $funcionario->setLinguagemID(numberval($funcionario->getLinguagemID()));
         $funcionario->setPontuacao(numberval($funcionario->getPontuacao()));
         $funcionario->setAtivo('Y');
-        $funcionario = ZFuncionario::cadastrar($funcionario);
-        $cliente = ZCliente::getPeloID($funcionario->getClienteID());
-        Thunder::success('Funcionário "'.$cliente->getLogin().'" cadastrado com sucesso!', true);
+        $funcionario->filter($old_funcionario);
+        $funcionario->insert();
+        $old_funcionario->clean($funcionario);
+        $cliente = $funcionario->findClienteID();
+        $msg = sprintf(
+            'Funcionário "%s" cadastrado com sucesso!',
+            $cliente->getLogin()
+        );
+        if (is_output('json')) {
+            json(null, ['item' => $cliente->publish(), 'msg' => $msg]);
+        }
+        \Thunder::success($msg, true);
         redirect('/gerenciar/funcionario/');
-    } catch (ValidationException $e) {
-        $errors = $e->getErrors();
-    } catch (Exception $e) {
-        $errors['unknow'] = $e->getMessage();
+    } catch (\Exception $e) {
+        $funcionario->clean($old_funcionario);
+        if ($e instanceof \MZ\Exception\ValidationException) {
+            $errors = $e->getErrors();
+        }
+        if (is_output('json')) {
+            json($e->getMessage(), null, ['errors' => $errors]);
+        }
+        \Thunder::error($e->getMessage());
+        foreach ($errors as $key => $value) {
+            $focusctrl = $key;
+            break;
+        }
     }
-    foreach ($errors as $key => $value) {
-        $focusctrl = $key;
-        Thunder::error($value);
-        break;
-    }
+} elseif (is_output('json')) {
+    json('Nenhum dado foi enviado');
 } else {
-    $funcionario = new ZFuncionario();
+    $funcionario = new Funcionario();
     $funcionario->setPontuacao(0);
     $funcionario->setAtivo('Y');
 }
 if ($focusctrl == 'clienteid') {
     $focusctrl = 'cliente';
 }
-$_funcoes = ZFuncao::getTodas();
+$_funcoes = Funcao::findAll();
 $linguagens = get_languages_info();
 include template('gerenciar_funcionario_cadastrar');

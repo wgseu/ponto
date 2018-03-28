@@ -36,7 +36,7 @@
 						</thead>
 						<tbody>
 <!--{loop $permissoes $permissao}-->
-<!--${$_acesso = ZAcesso::getPelaFuncaoIDPermissaoID($funcao->getID(), $permissao->getID())}-->
+<!--${$_acesso = Acesso::getPelaFuncaoIDPermissaoID($funcao->getID(), $permissao->getID())}-->
 							<tr ${!is_null($_acesso->getID())?'':'class="active"'}>
 								<td>
 									<div class="">
@@ -45,7 +45,7 @@
 											<strong>{$permissao->getDescricao()}</strong>
 										</label>
 									</div>
-<!--${$_funcionalidade = ZFuncionalidade::getPeloID($permissao->getFuncionalidadeID())}-->
+<!--${$_funcionalidade = $permissao->findFuncionalidadeID()}-->
 									<small>{$_funcionalidade->getDescricao()}</small>
 								</td>
 							</tr>

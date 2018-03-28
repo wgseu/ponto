@@ -128,16 +128,16 @@ class ZModulo
 
     public static function getPeloID($id)
     {
-        $query = DB::$pdo->from('Modulos')
+        $query = \DB::$pdo->from('Modulos')
                          ->where(['id' => $id]);
-        return new ZModulo($query->fetch());
+        return new Modulo($query->fetch());
     }
 
     public static function getPeloNome($nome)
     {
-        $query = DB::$pdo->from('Modulos')
+        $query = \DB::$pdo->from('Modulos')
                          ->where(['nome' => $nome]);
-        return new ZModulo($query->fetch());
+        return new Modulo($query->fetch());
     }
 
     private static function validarCampos(&$modulo)
@@ -180,12 +180,12 @@ class ZModulo
         $_modulo = $modulo->toArray();
         self::validarCampos($_modulo);
         try {
-            $_modulo['id'] = DB::$pdo->insertInto('Modulos')->values($_modulo)->execute();
+            $_modulo['id'] = \DB::$pdo->insertInto('Modulos')->values($_modulo)->execute();
         } catch (Exception $e) {
             self::handleException($e);
             throw $e;
         }
-        return self::getPeloID($_modulo['id']);
+        return self::findByID($_modulo['id']);
     }
 
     public static function atualizar($modulo)
@@ -202,7 +202,7 @@ class ZModulo
             'habilitado',
         ];
         try {
-            $query = DB::$pdo->update('Modulos');
+            $query = \DB::$pdo->update('Modulos');
             $query = $query->set(array_intersect_key($_modulo, array_flip($campos)));
             $query = $query->where('id', $_modulo['id']);
             $query->execute();
@@ -210,22 +210,22 @@ class ZModulo
             self::handleException($e);
             throw $e;
         }
-        return self::getPeloID($_modulo['id']);
+        return self::findByID($_modulo['id']);
     }
 
     public static function excluir($id)
     {
         if (!$id) {
-            throw new Exception('Não foi possível excluir o modulo, o id do modulo não foi informado');
+            throw new \Exception('Não foi possível excluir o modulo, o id do modulo não foi informado');
         }
-        $query = DB::$pdo->deleteFrom('Modulos')
+        $query = \DB::$pdo->deleteFrom('Modulos')
                          ->where(['id' => $id]);
         return $query->execute();
     }
 
     private static function initSearch($busca)
     {
-        $query = DB::$pdo->from('Modulos')
+        $query = \DB::$pdo->from('Modulos')
                          ->orderBy('id ASC');
         $busca = trim($busca);
         if ($busca != '') {
@@ -243,7 +243,7 @@ class ZModulo
         $_modulos = $query->fetchAll();
         $modulos = [];
         foreach ($_modulos as $modulo) {
-            $modulos[] = new ZModulo($modulo);
+            $modulos[] = new Modulo($modulo);
         }
         return $modulos;
     }

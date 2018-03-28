@@ -21,17 +21,17 @@
 */
 require_once(dirname(__DIR__) . '/app.php');
 
-need_permission(PermissaoNome::CADASTROCONTAS);
+need_permission(Permissao::NOME_CADASTROCONTAS);
 $id = $_GET['id'];
-$conta = ZConta::getPeloID($id);
+$conta = Conta::findByID($id);
 if (is_null($conta->getID())) {
-    Thunder::warning('A conta de id "'.$id.'" não existe!');
+    \Thunder::warning('A conta de id "'.$id.'" não existe!');
     redirect('/gerenciar/conta/');
 }
 try {
-    ZConta::excluir($id);
-    Thunder::success('Conta "' . $conta->getDescricao() . '" excluída com sucesso!', true);
+    Conta::excluir($id);
+    \Thunder::success('Conta "' . $conta->getDescricao() . '" excluída com sucesso!', true);
 } catch (Exception $e) {
-    Thunder::error('Não foi possível excluir a conta "' . $conta->getDescricao() . '"!');
+    \Thunder::error('Não foi possível excluir a conta "' . $conta->getDescricao() . '"!');
 }
 redirect('/gerenciar/conta/');

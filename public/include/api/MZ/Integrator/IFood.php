@@ -30,7 +30,28 @@ namespace MZ\Integrator;
 class IFood extends \MZ\System\Task
 {
     const NAME = 'ifood';
-    
+    const CARDS = [
+        'RAM' => ['name' => 'AMERICAN EXPRESS (Crédito)'],
+        'DNREST' => ['name' => 'DINERS (Crédito)'],
+        'REC' => ['name' => 'ELO (Crédito)'],
+        'RHIP' => ['name' => 'HIPERCARD (Crédito)'],
+        'RDREST' => ['name' => 'MASTERCARD (Crédito)'],
+        'VSREST' => ['name' => 'VISA (Crédito)'],
+        'RED' => ['name' => 'ELO (Débito)'],
+        'MEREST' => ['name' => 'MASTERCARD (Débito)'],
+        'VIREST' => ['name' => 'VISA (Débito)'],
+        'VVREST' => ['name' => 'ALELO REFEICAO (Vale)'],
+        'RSODEX' => ['name' => 'SODEXO (Vale)'],
+        'TRE' => ['name' => 'TICKET RESTAURANTE (Vale)'],
+        'VALECA' => ['name' => 'VALE CARD (Vale)'],
+        'VR_SMA' => ['name' => 'VR SMART (Vale)'],
+        'AM' => ['name' => 'AMEX (Online)'],
+        'DNR' => ['name' => 'DINERS (Online)'],
+        'ELO' => ['name' => 'ELO (Online)'],
+        'MC' => ['name' => 'MASTERCARD (Online)'],
+        'VIS' => ['name' => 'VISA (Online)']
+    ];
+
     /**
      * Execute task
      * @return integer Number of pending work

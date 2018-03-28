@@ -21,31 +21,53 @@
 */
 require_once(dirname(__DIR__) . '/app.php');
 
-need_permission(PermissaoNome::ESTOQUE);
-$setor = ZSetor::getPeloID($_GET['id']);
-if (is_null($setor->getID())) {
-    Thunder::warning('O setor de id "'.$_GET['id'].'" não existe!');
+use MZ\__TODO_NAMESPACE__\Setor;
+
+need_permission(\Permissao::NOME_ESTOQUE, is_output('json'));
+$id = isset($_GET['id']) ? $_GET['id'] : null;
+$setor = Setor::findByID($id);
+if (!$setor->exists()) {
+    $msg = 'O setor informado não existe!';
+    if (is_output('json')) {
+        json($msg);
+    }
+    \Thunder::warning($msg);
     redirect('/gerenciar/setor/');
 }
 $focusctrl = 'nome';
 $errors = [];
 $old_setor = $setor;
 if (is_post()) {
-    $setor = new ZSetor($_POST);
+    $setor = new Setor($_POST);
     try {
         $setor->setID($old_setor->getID());
-        $setor = ZSetor::atualizar($setor);
-        Thunder::success('Setor "'.$setor->getNome().'" atualizado com sucesso!', true);
+        $setor->filter($old_setor);
+        $setor->update();
+        $old_setor->clean($setor);
+        $msg = sprintf(
+            'Setor "%s" atualizado com sucesso!',
+            $setor->getNome()
+        );
+        if (is_output('json')) {
+            json(null, ['item' => $setor->publish(), 'msg' => $msg]);
+        }
+        \Thunder::success($msg, true);
         redirect('/gerenciar/setor/');
-    } catch (ValidationException $e) {
-        $errors = $e->getErrors();
-    } catch (Exception $e) {
-        $errors['unknow'] = $e->getMessage();
+    } catch (\Exception $e) {
+        $setor->clean($old_setor);
+        if ($e instanceof \MZ\Exception\ValidationException) {
+            $errors = $e->getErrors();
+        }
+        if (is_output('json')) {
+            json($e->getMessage(), null, ['errors' => $errors]);
+        }
+        \Thunder::error($e->getMessage());
+        foreach ($errors as $key => $value) {
+            $focusctrl = $key;
+            break;
+        }
     }
-    foreach ($errors as $key => $value) {
-        $focusctrl = $key;
-        Thunder::error($value);
-        break;
-    }
+} elseif (is_output('json')) {
+    json('Nenhum dado foi enviado');
 }
 include template('gerenciar_setor_editar');

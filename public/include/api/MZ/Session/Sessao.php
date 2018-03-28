@@ -427,6 +427,22 @@ class Sessao extends \MZ\Database\Helper
     }
 
     /**
+     * Find open session
+     * @param  boolean $required when true and none sesstion open found throw an exception
+     * @return Sessao A filled instance or empty when not found
+     */
+    public static function findByAberta($required = false)
+    {
+        $sessao = self::find([
+            'aberta' => 'Y',
+        ]);
+        if ($required && !$sessao->exists()) {
+            throw new \Exception('O caixa ainda não foi aberto');
+        }
+        return $sessao;
+    }
+
+    /**
      * Find all Sessão
      * @param  array  $condition Condition to get all Sessão
      * @param  array  $order     Order Sessão

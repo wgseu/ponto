@@ -21,11 +21,11 @@
 */
 require_once(dirname(__DIR__) . '/app.php');
 
-need_permission(PermissaoNome::CADASTROPATRIMONIO);
+need_permission(Permissao::NOME_CADASTROPATRIMONIO);
 
-$count = ZPatrimonio::getCount($_GET['empresaid'], $_GET['fornecedorid'], $_GET['estado'], $_GET['query']);
+$count = Patrimonio::getCount($_GET['empresaid'], $_GET['fornecedorid'], $_GET['estado'], $_GET['query']);
 list($pagesize, $offset, $pagestring) = pagestring($count, 10);
-$patrimonios = ZPatrimonio::getTodos($_GET['empresaid'], $_GET['fornecedorid'], $_GET['estado'], $_GET['query'], $offset, $pagesize);
+$patrimonios = Patrimonio::getTodos($_GET['empresaid'], $_GET['fornecedorid'], $_GET['estado'], $_GET['query'], $offset, $pagesize);
 
 $_estado_names = [
     'Novo' => 'Novo',
@@ -33,6 +33,6 @@ $_estado_names = [
     'Ruim' => 'Ruim',
 ];
 
-$_empresa = ZCliente::getPeloID($_GET['empresaid']);
-$_fornecedor = ZFornecedor::getPeloID($_GET['fornecedorid']);
+$_empresa = Cliente::findByID($_GET['empresaid']);
+$_fornecedor = Fornecedor::findByID($_GET['fornecedorid']);
 include template('gerenciar_patrimonio_index');

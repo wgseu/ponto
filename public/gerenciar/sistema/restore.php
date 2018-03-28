@@ -1,7 +1,7 @@
 <?php
 require_once(dirname(dirname(__DIR__)) . '/app.php'); // main app file
 
-need_permission(PermissaoNome::RESTAURACAO, true);
+need_permission(Permissao::NOME_RESTAURACAO, true);
 
 try {
     set_time_limit(0);

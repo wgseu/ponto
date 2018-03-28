@@ -21,7 +21,7 @@
 */
 require_once(dirname(__DIR__) . '/app.php');
 
-need_permission(PermissaoNome::RELATORIOVENDAS, isset($_GET['saida']) && is_output('json'));
+need_permission(Permissao::NOME_RELATORIOVENDAS, isset($_GET['saida']) && is_output('json'));
 
 try {
     $funcionario_id = isset($_GET['funcionario_id'])?intval($_GET['funcionario_id']):null;
@@ -45,7 +45,7 @@ try {
     if ($servicos == 'Y') {
         $tipo = null;
     }
-    $itens_do_pedido = ZProdutoPedido::getTodos(
+    $itens_do_pedido = ProdutoPedido::getTodos(
         $pedido_id,
         $produto_id,
         $funcionario_id,
@@ -82,7 +82,7 @@ try {
     $line = 3;
     $column = 'B';
     $i = $line;
-    $value = new ZProdutoPedido();
+    $value = new ProdutoPedido();
     foreach ($itens_do_pedido as $key => $item) {
         $i++;
         $value->fromArray($item);

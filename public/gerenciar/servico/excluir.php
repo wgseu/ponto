@@ -21,17 +21,17 @@
 */
 require_once(dirname(__DIR__) . '/app.php');
 
-need_permission(PermissaoNome::CADASTROSERVICOS);
+need_permission(Permissao::NOME_CADASTROSERVICOS);
 $id = $_GET['id'];
-$servico = ZServico::getPeloID($id);
+$servico = Servico::findByID($id);
 if (is_null($servico->getID())) {
-    Thunder::warning('O serviço de id "'.$id.'" não existe!');
+    \Thunder::warning('O serviço de id "'.$id.'" não existe!');
     redirect('/gerenciar/servico/');
 }
 try {
-    ZServico::excluir($id);
-    Thunder::success('Serviço "' . $servico->getDescricao() . '" excluído com sucesso!', true);
+    Servico::excluir($id);
+    \Thunder::success('Serviço "' . $servico->getDescricao() . '" excluído com sucesso!', true);
 } catch (Exception $e) {
-    Thunder::error('Não foi possível excluir o serviço "' . $servico->getDescricao() . '"!');
+    \Thunder::error('Não foi possível excluir o serviço "' . $servico->getDescricao() . '"!');
 }
 redirect('/gerenciar/servico/');

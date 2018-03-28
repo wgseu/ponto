@@ -137,7 +137,7 @@ class ZFolhaCheque
     public function getC($index)
     {
         if ($index < 1 || $index > 3) {
-            throw new Exception('Índice '.$index.' inválido, aceito somente de 1 até 3');
+            throw new \Exception('Índice '.$index.' inválido, aceito somente de 1 até 3');
         }
         return $this->c[$index];
     }
@@ -145,7 +145,7 @@ class ZFolhaCheque
     public function setC($index, $value)
     {
         if ($index < 1 || $index > 3) {
-            throw new Exception('Índice '.$index.' inválido, aceito somente de 1 até 3');
+            throw new \Exception('Índice '.$index.' inválido, aceito somente de 1 até 3');
         }
         $this->c[$index] = $value;
     }
@@ -217,16 +217,16 @@ class ZFolhaCheque
 
     public static function getPeloID($id)
     {
-        $query = DB::$pdo->from('Folhas_Cheques')
+        $query = \DB::$pdo->from('Folhas_Cheques')
                          ->where(['id' => $id]);
-        return new ZFolhaCheque($query->fetch());
+        return new FolhaCheque($query->fetch());
     }
 
     public static function getPeloChequeIDNumero($cheque_id, $numero)
     {
-        $query = DB::$pdo->from('Folhas_Cheques')
+        $query = \DB::$pdo->from('Folhas_Cheques')
                          ->where(['chequeid' => $cheque_id, 'numero' => $numero]);
-        return new ZFolhaCheque($query->fetch());
+        return new FolhaCheque($query->fetch());
     }
 
     private static function validarCampos(&$folha_cheque)
@@ -283,12 +283,12 @@ class ZFolhaCheque
         $_folha_cheque = $folha_cheque->toArray();
         self::validarCampos($_folha_cheque);
         try {
-            $_folha_cheque['id'] = DB::$pdo->insertInto('Folhas_Cheques')->values($_folha_cheque)->execute();
+            $_folha_cheque['id'] = \DB::$pdo->insertInto('Folhas_Cheques')->values($_folha_cheque)->execute();
         } catch (Exception $e) {
             self::handleException($e);
             throw $e;
         }
-        return self::getPeloID($_folha_cheque['id']);
+        return self::findByID($_folha_cheque['id']);
     }
 
     public static function atualizar($folha_cheque)
@@ -312,7 +312,7 @@ class ZFolhaCheque
             $campos[] = 'c'.$i;
         }
         try {
-            $query = DB::$pdo->update('Folhas_Cheques');
+            $query = \DB::$pdo->update('Folhas_Cheques');
             $query = $query->set(array_intersect_key($_folha_cheque, array_flip($campos)));
             $query = $query->where('id', $_folha_cheque['id']);
             $query->execute();
@@ -320,16 +320,16 @@ class ZFolhaCheque
             self::handleException($e);
             throw $e;
         }
-        return self::getPeloID($_folha_cheque['id']);
+        return self::findByID($_folha_cheque['id']);
     }
 
     public function recolher()
     {
         if ($this->isRecolhido()) {
-            throw new Exception('Essa folha de cheque já foi recolhida');
+            throw new \Exception('Essa folha de cheque já foi recolhida');
         }
         $recolhimento = date('Y-m-d H:i:s');
-        $query = DB::$pdo->update('Folhas_Cheques')
+        $query = \DB::$pdo->update('Folhas_Cheques')
                          ->set('recolhido', 'Y')
                          ->set('recolhimento', $recolhimento)
                          ->where('id', $this->getID());
@@ -340,7 +340,7 @@ class ZFolhaCheque
 
     private static function initSearch($banco_id, $cliente_id, $recolhido)
     {
-        $query = DB::$pdo->from('Folhas_Cheques f')
+        $query = \DB::$pdo->from('Folhas_Cheques f')
                          ->leftJoin('Cheques c ON c.id = f.chequeid')
                          ->orderBy('f.id DESC');
         if (is_numeric($banco_id)) {
@@ -365,7 +365,7 @@ class ZFolhaCheque
         $_folha_cheques = $query->fetchAll();
         $folha_cheques = [];
         foreach ($_folha_cheques as $folha_cheque) {
-            $folha_cheques[] = new ZFolhaCheque($folha_cheque);
+            $folha_cheques[] = new FolhaCheque($folha_cheque);
         }
         return $folha_cheques;
     }
@@ -378,7 +378,7 @@ class ZFolhaCheque
 
     private static function initSearchDoChequeID($cheque_id)
     {
-        return   DB::$pdo->from('Folhas_Cheques')
+        return   \DB::$pdo->from('Folhas_Cheques')
                          ->where(['chequeid' => $cheque_id])
                          ->orderBy('id ASC');
     }
@@ -392,7 +392,7 @@ class ZFolhaCheque
         $_folha_cheques = $query->fetchAll();
         $folha_cheques = [];
         foreach ($_folha_cheques as $folha_cheque) {
-            $folha_cheques[] = new ZFolhaCheque($folha_cheque);
+            $folha_cheques[] = new FolhaCheque($folha_cheque);
         }
         return $folha_cheques;
     }

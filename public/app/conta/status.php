@@ -29,7 +29,7 @@ $status['info'] = [
         'imagemurl' => get_image_url($__empresa__->getImagem(), 'cliente', null)
     ]
 ];
-$status['versao'] = ZSistema::VERSAO;
+$status['versao'] = Sistema::VERSAO;
 $status['validacao'] = '';
 $status['autologout'] = is_boolean_config('Sistema', 'Tablet.Logout');
 if (is_manager()) {
@@ -49,14 +49,14 @@ if (is_login()) {
     ];
     $status['funcionario'] = intval($login_funcionario->getID());
     try {
-        $status['permissoes'] = ZAcesso::getPermissoes($login_funcionario->getID());
+        $status['permissoes'] = Acesso::getPermissoes($login_funcionario->getID());
         if (is_manager()) {
             $dispositivo = register_device(
                 isset($_GET['device'])?$_GET['device']:null,
                 isset($_GET['serial'])?$_GET['serial']:null
             );
         } else {
-            $dispositivo = new ZDispositivo();
+            $dispositivo = new Dispositivo();
         }
         $status['validacao'] = $dispositivo->getValidacao();
     } catch (Exception $e) {

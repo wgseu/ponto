@@ -45,12 +45,12 @@ class NFeAPI extends \NFe\Common\Ajuste
         global $__cidade__;
         global $__estado__;
 
-        $this->external_emitente = ZEmitente::getPeloID('1');
+        $this->external_emitente = Emitente::findByID('1');
         if (is_null($this->external_emitente->getID())) {
             throw new \Exception('As configurações fiscais do emitente não foram ajustadas', 500);
         }
         \NFe\Log\Logger::getInstance()->setDirectory(dirname(__DIR__).'/logs');
-        $this->external_regime = ZRegime::getPeloID($this->external_emitente->getRegimeID());
+        $this->external_regime = $this->external_emitente->findRegimeID();
         $this->sefaz = \NFe\Core\SEFAZ::getInstance();
         $this->sefaz->setConfiguracao($this);
         $this->setBanco(new NFeDB());
@@ -130,12 +130,12 @@ class NFeAPI extends \NFe\Common\Ajuste
      */
     public function onNotaGerada($nota, $xml)
     {
-        $_nota = ZNota::getPelaChave($nota->getID());
+        $_nota = Nota::getPelaChave($nota->getID());
         // o código é truncado quando em contingência e pode devolver uma nota diferente
         if (is_null($_nota->getID())) {
-            $_nota = ZNota::getPeloPedidoID($nota->getCodigo());
+            $_nota = Nota::findByPedidoID($nota->getCodigo());
         }
-        $_evento = ZEvento::log(
+        $_evento = Evento::log(
             $_nota->getID(),
             EventoEstado::ABERTO,
             'XML da nota gerado com sucesso',
@@ -147,8 +147,8 @@ class NFeAPI extends \NFe\Common\Ajuste
         $_nota->setConsultaURL(null);
         $_nota->setDataEmissao($nota->getDataEmissao());
         $_nota->setChave($nota->getID());
-        $_nota->setEstado(NotaEstado::ABERTO);
-        $_nota = ZNota::atualizar($_nota);
+        $_nota->setEstado(Nota::ESTADO_ABERTO);
+        $_nota->update();
     }
 
     /**
@@ -156,8 +156,8 @@ class NFeAPI extends \NFe\Common\Ajuste
      */
     public function onNotaAssinada($nota, $xml)
     {
-        $_nota = ZNota::getPelaChave($nota->getID());
-        $_evento = ZEvento::log(
+        $_nota = Nota::getPelaChave($nota->getID());
+        $_evento = Evento::log(
             $_nota->getID(),
             EventoEstado::ASSINADO,
             'XML da nota assinado com sucesso',
@@ -176,14 +176,14 @@ class NFeAPI extends \NFe\Common\Ajuste
         xmkdir($path, 0711);
         file_put_contents($filename, $xml->saveXML());
 
-        $_nota = ZNota::getPelaChave($nota->getID());
-        $_nota->setEstado(NotaEstado::ASSINADO);
+        $_nota = Nota::getPelaChave($nota->getID());
+        $_nota->setEstado(Nota::ESTADO_ASSINADO);
         $_nota->setQRCode($nota->getQRCodeURL());
         $_nota->setConsultaURL($nota->getConsultaURL());
         $_nota->setTributos($nota->getTotal()->getTributos());
         $_nota->setDetalhes($nota->getTotal()->getComplemento());
-        $_nota = ZNota::atualizar($_nota);
-        $_evento = ZEvento::log(
+        $_nota->update();
+        $_evento = Evento::log(
             $_nota->getID(),
             EventoEstado::VALIDADO,
             'XML da nota validado com sucesso',
@@ -205,13 +205,13 @@ class NFeAPI extends \NFe\Common\Ajuste
      */
     public function onNotaContingencia($nota, $offline, $exception)
     {
-        $_nota = ZNota::getPelaChave($nota->getID());
+        $_nota = Nota::getPelaChave($nota->getID());
         $this->deleteXmlAnteriores($nota);
         $_nota->setMotivo($nota->getJustificativa());
         $_nota->setContingencia('Y');
         $_nota->setDataLancamento($nota->getDataContingencia());
-        $_nota = ZNota::atualizar($_nota);
-        $_evento = ZEvento::log(
+        $_nota->update();
+        $_evento = Evento::log(
             $_nota->getID(),
             EventoEstado::CONTINGENCIA,
             $exception->getMessage(),
@@ -224,14 +224,14 @@ class NFeAPI extends \NFe\Common\Ajuste
      */
     public function onNotaAutorizada($nota, $xml, $retorno)
     {
-        $_nota = ZNota::getPelaChave($nota->getID());
+        $_nota = Nota::getPelaChave($nota->getID());
         $this->deleteXmlAnteriores($nota);
         $path = $this->getPastaXmlAutorizado($nota->getAmbiente());
         $filename = $path . '/' . $nota->getID() . '.xml';
         xmkdir($path, 0711);
         file_put_contents($filename, $xml->saveXML());
 
-        $_evento = ZEvento::log(
+        $_evento = Evento::log(
             $_nota->getID(),
             EventoEstado::AUTORIZADO,
             $retorno->getMotivo(),
@@ -239,13 +239,13 @@ class NFeAPI extends \NFe\Common\Ajuste
         );
         // condição para quando tenta cancelar uma nota autorizada, sem saber se ela está autorizada
         // dessa forma a ação de cancelar continua, mas agora com um protocolo para que seja possível
-        if ($_nota->getAcao() != NotaAcao::CANCELAR) {
+        if ($_nota->getAcao() != Nota::ACAO_CANCELAR) {
             $_nota->setConcluido('Y');
         }
         $_nota->setDataAutorizacao($nota->getProtocolo()->getDataRecebimento());
         $_nota->setProtocolo($nota->getProtocolo()->getNumero());
-        $_nota->setEstado(NotaEstado::AUTORIZADO);
-        $_nota = ZNota::atualizar($_nota);
+        $_nota->setEstado(Nota::ESTADO_AUTORIZADO);
+        $_nota->update();
     }
 
     /**
@@ -262,7 +262,7 @@ class NFeAPI extends \NFe\Common\Ajuste
      */
     public function onNotaRejeitada($nota, $xml, $retorno)
     {
-        $_nota = ZNota::getPelaChave($nota->getID());
+        $_nota = Nota::getPelaChave($nota->getID());
         $this->deleteXmlAnteriores($nota);
         $path = $this->getPastaXmlRejeitado($nota->getAmbiente());
         $filename = $path . '/' . $nota->getID() . '.xml';
@@ -270,19 +270,19 @@ class NFeAPI extends \NFe\Common\Ajuste
         file_put_contents($filename, $xml->saveXML());
 
         // não salva o evento, pois será salvo no onNotaErro
-        if ($_nota->getAcao() == NotaAcao::CANCELAR && is_null($_nota->getProtocolo())) {
+        if ($_nota->getAcao() == Nota::ACAO_CANCELAR && is_null($_nota->getProtocolo())) {
             $data_emissao = strtotime($_nota->getDataEmissao());
             // só deveria inutilizar depois de 10 min após a tentativa de autorizar a nota
             // se a intenção era cancelar uma nota sem protocolo, então muda para inutilização
             // pois a rejeição foi resultante de uma consulta do status da nota pela chave de acesso
-            $_nota->setAcao(NotaAcao::INUTILIZAR);
+            $_nota->setAcao(Nota::ACAO_INUTILIZAR);
             // mantém o XML rejeitado, pois pode acontecer da nota estar em processamento e não ser reconhecida ainda
         } else {
             // evita de ficar enviando uma mesma nota rejeitada a todo momento
             $_nota->setCorrigido('N');
         }
-        $_nota->setEstado(NotaEstado::REJEITADO);
-        $_nota = ZNota::atualizar($_nota);
+        $_nota->setEstado(Nota::ESTADO_REJEITADO);
+        $_nota->update();
     }
 
     /**
@@ -291,26 +291,26 @@ class NFeAPI extends \NFe\Common\Ajuste
      */
     public function onNotaDenegada($nota, $xml, $retorno)
     {
-        $_nota = ZNota::getPelaChave($nota->getID());
+        $_nota = Nota::getPelaChave($nota->getID());
         $this->deleteXmlAnteriores($nota);
         $path = $this->getPastaXmlDenegado($nota->getAmbiente());
         $filename = $path . '/' . $nota->getID() . '.xml';
         xmkdir($path, 0711);
         file_put_contents($filename, $xml->saveXML());
 
-        $_evento = ZEvento::log(
+        $_evento = Evento::log(
             $_nota->getID(),
             EventoEstado::DENEGADO,
             $retorno->getMotivo(),
             $retorno->getStatus()
         );
         // não precisa analisar a denegação se a intenção era cancelar
-        if ($_nota->getAcao() != NotaAcao::CANCELAR) {
+        if ($_nota->getAcao() != Nota::ACAO_CANCELAR) {
             $_nota->setCorrigido('N');
         }
         $_nota->setConcluido('Y');
-        $_nota->setEstado(NotaEstado::DENEGADO);
-        $_nota = ZNota::atualizar($_nota);
+        $_nota->setEstado(Nota::ESTADO_DENEGADO);
+        $_nota->update();
     }
 
     /**
@@ -320,14 +320,14 @@ class NFeAPI extends \NFe\Common\Ajuste
      */
     public function onNotaPendente($nota, $xml, $exception)
     {
-        $_nota = ZNota::getPelaChave($nota->getID());
+        $_nota = Nota::getPelaChave($nota->getID());
         $this->deleteXmlAnteriores($nota);
         $path = $this->getPastaXmlPendente($nota->getAmbiente());
         $filename = $path . '/' . $nota->getID() . '.xml';
         xmkdir($path, 0711);
         file_put_contents($filename, $xml->saveXML());
 
-        $_evento = ZEvento::log(
+        $_evento = Evento::log(
             $_nota->getID(),
             EventoEstado::PENDENTE,
             $exception->getMessage(),
@@ -342,22 +342,22 @@ class NFeAPI extends \NFe\Common\Ajuste
             // Caso a nota tenha sido autorizada, ela será autorizada normalmente
             // mas depois será cancelada pois a acão da nota continua sendo CANCELAR
             $_nota->setMotivo('Falha no retorno do status, problema de rede');
-            $_nota->setAcao(NotaAcao::CANCELAR);
+            $_nota->setAcao(Nota::ACAO_CANCELAR);
         }
-        $_nota->setEstado(NotaEstado::PENDENTE);
-        $_nota = ZNota::atualizar($_nota);
+        $_nota->setEstado(Nota::ESTADO_PENDENTE);
+        $_nota->update();
         // Não cria outra nota pois já está em contingência
         if ($_nota->isContingencia()) {
             return;
         }
         // cria outra nota, pois a nota atual pode ter sido recebida e autorizada
-        $_nota = ZNota::criarProxima($_nota);
+        $_nota = Nota::criarProxima($_nota);
         // atualiza a chave da nova nota, evita de obter a _nota que será cancelada
         // pois a contingência é otimizada para ser executada logo após a falha
         $nota->setNumero($_nota->getNumeroInicial());
         $nota->setID($nota->gerarID());
         $_nota->setChave($nota->getID());
-        $_nota = ZNota::atualizar($_nota);
+        $_nota->update();
     }
 
     /**
@@ -366,22 +366,22 @@ class NFeAPI extends \NFe\Common\Ajuste
      */
     public function onNotaProcessando($nota, $xml, $retorno)
     {
-        $_nota = ZNota::getPelaChave($nota->getID());
+        $_nota = Nota::getPelaChave($nota->getID());
         $this->deleteXmlAnteriores($nota);
         $path = $this->getPastaXmlProcessamento($nota->getAmbiente());
         $filename = $path . '/' . $nota->getID() . '.xml';
         xmkdir($path, 0711);
         file_put_contents($filename, $xml->saveXML());
 
-        $_evento = ZEvento::log(
+        $_evento = Evento::log(
             $_nota->getID(),
             EventoEstado::PROCESSAMENTO,
             $retorno->getMotivo(),
             $retorno->getStatus()
         );
         $_nota->setRecibo($retorno->getNumero());
-        $_nota->setEstado(NotaEstado::PROCESSAMENTO);
-        $_nota = ZNota::atualizar($_nota);
+        $_nota->setEstado(Nota::ESTADO_PROCESSAMENTO);
+        $_nota->update();
     }
 
     /**
@@ -389,14 +389,14 @@ class NFeAPI extends \NFe\Common\Ajuste
      */
     public function onNotaCancelada($nota, $xml, $retorno)
     {
-        $_nota = ZNota::getPelaChave($nota->getID());
+        $_nota = Nota::getPelaChave($nota->getID());
         $this->deleteXmlAnteriores($nota);
         $path = $this->getPastaXmlCancelado($nota->getAmbiente());
         $filename = $path . '/' . $nota->getID() . '.xml';
         xmkdir($path, 0711);
         file_put_contents($filename, $xml->saveXML());
 
-        $_evento = ZEvento::log(
+        $_evento = Evento::log(
             $_nota->getID(),
             EventoEstado::CANCELADO,
             $retorno->getMotivo(),
@@ -404,9 +404,9 @@ class NFeAPI extends \NFe\Common\Ajuste
         );
         // sobrescreve o protocolo de autorização da nota pelo protocolo de cancelamento
         $_nota->setProtocolo($retorno->getNumero());
-        $_nota->setEstado(NotaEstado::CANCELADO);
+        $_nota->setEstado(Nota::ESTADO_CANCELADO);
         $_nota->setConcluido('Y');
-        $_nota = ZNota::atualizar($_nota);
+        $_nota->update();
     }
 
     /**
@@ -415,11 +415,11 @@ class NFeAPI extends \NFe\Common\Ajuste
      */
     public function onNotaErro($nota, $exception)
     {
-        $_nota = ZNota::getPelaChave($nota->getID());
+        $_nota = Nota::getPelaChave($nota->getID());
         if (is_null($_nota->getID())) {
-            $_nota = ZNota::getPeloPedidoID($nota->getCodigo());
+            $_nota = Nota::findByPedidoID($nota->getCodigo());
         }
-        $_evento = ZEvento::log(
+        $_evento = Evento::log(
             $_nota->getID(),
             $_nota->getEstado(),
             $exception->getMessage(),
@@ -431,7 +431,7 @@ class NFeAPI extends \NFe\Common\Ajuste
         }
         // Evita de ficar toda hora enviando a mesma nota com erro
         $_nota->setCorrigido('N');
-        $_nota = ZNota::atualizar($_nota);
+        $_nota->update();
     }
 
     /**
@@ -450,13 +450,13 @@ class NFeAPI extends \NFe\Common\Ajuste
      */
     public function onTarefaExecutada($tarefa, $retorno)
     {
-        $_nota = ZNota::getPeloID($tarefa->getID());
+        $_nota = Nota::findByID($tarefa->getID());
         switch ($tarefa->getAcao()) {
             case \NFe\Task\Tarefa::ACAO_INUTILIZAR:
                 // implementado aqui pois o evento de inutilização não devolve o ID da _nota
                 // e não possui a nota para consulta pela chave
                 $inutilizacao = $tarefa->getAgente();
-                $_evento = ZEvento::log(
+                $_evento = Evento::log(
                     $_nota->getID(),
                     EventoEstado::INUTILIZADO,
                     $inutilizacao->getMotivo(),
@@ -466,8 +466,8 @@ class NFeAPI extends \NFe\Common\Ajuste
                 $_nota->setProtocolo($inutilizacao->getNumero());
                 $_nota->setDataAutorizacao($inutilizacao->getDataRecebimento());
                 $_nota->setConcluido('Y');
-                $_nota->setEstado(NotaEstado::INUTILIZADO);
-                $_nota = ZNota::atualizar($_nota);
+                $_nota->setEstado(Nota::ESTADO_INUTILIZADO);
+                $_nota->update();
                 break;
             case \NFe\Task\Tarefa::ACAO_CONSULTAR:
                 // não precisa implementar, pois a consulta já processa a nota internamente
@@ -494,12 +494,12 @@ class NFeAPI extends \NFe\Common\Ajuste
      */
     public function onTarefaErro($tarefa, $exception)
     {
-        $_nota = ZNota::getPeloID($tarefa->getID());
+        $_nota = Nota::findByID($tarefa->getID());
         // não bloqueia a tarefa quando mudar de cancelamento para inutilização
-        if ($tarefa->getAcao() != \NFe\Task\Tarefa::ACAO_INUTILIZAR && $_nota->getAcao() == NotaAcao::INUTILIZAR) {
+        if ($tarefa->getAcao() != \NFe\Task\Tarefa::ACAO_INUTILIZAR && $_nota->getAcao() == Nota::ACAO_INUTILIZAR) {
             return;
         }
-        $_evento = ZEvento::log(
+        $_evento = Evento::log(
             $_nota->getID(),
             $_nota->getEstado(),
             $exception->getMessage(),
@@ -511,6 +511,6 @@ class NFeAPI extends \NFe\Common\Ajuste
         }
         // Evita de ficar toda hora enviando a mesma nota com erro
         $_nota->setCorrigido('N');
-        $_nota = ZNota::atualizar($_nota);
+        $_nota->update();
     }
 }

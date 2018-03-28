@@ -23,17 +23,17 @@ require_once(dirname(__DIR__) . '/app.php');
 
 use MZ\Sale\Comanda;
 
-need_permission(PermissaoNome::CADASTROCOMANDAS);
+need_permission(Permissao::NOME_CADASTROCOMANDAS);
 $id = $_GET['id'];
 $comanda = Comanda::findByID($id);
 if (is_null($comanda->getID())) {
-    Thunder::warning('A comanda de id "'.$id.'" não existe!');
+    \Thunder::warning('A comanda de id "'.$id.'" não existe!');
     redirect('/gerenciar/comanda/');
 }
 try {
     $comanda->delete();
-    Thunder::success('Comanda "' . $comanda->getNome() . '" excluída com sucesso!', true);
+    \Thunder::success('Comanda "' . $comanda->getNome() . '" excluída com sucesso!', true);
 } catch (Exception $e) {
-    Thunder::error('Não foi possível excluir a comanda "' . $comanda->getNome() . '"!');
+    \Thunder::error('Não foi possível excluir a comanda "' . $comanda->getNome() . '"!');
 }
 redirect('/gerenciar/comanda/');

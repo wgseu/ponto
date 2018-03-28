@@ -21,31 +21,53 @@
 */
 require_once(dirname(__DIR__) . '/app.php');
 
-need_permission(PermissaoNome::CADASTROPRODUTOS);
-$unidade = ZUnidade::getPeloID($_GET['id']);
-if (is_null($unidade->getID())) {
-    Thunder::warning('A unidade de id "'.$_GET['id'].'" não existe!');
+use MZ\__TODO_NAMESPACE__\Unidade;
+
+need_permission(\Permissao::NOME_CADASTROPRODUTOS, is_output('json'));
+$id = isset($_GET['id']) ? $_GET['id'] : null;
+$unidade = Unidade::findByID($id);
+if (!$unidade->exists()) {
+    $msg = 'A unidade informada não existe!';
+    if (is_output('json')) {
+        json($msg);
+    }
+    \Thunder::warning($msg);
     redirect('/gerenciar/unidade/');
 }
 $focusctrl = 'nome';
 $errors = [];
 $old_unidade = $unidade;
 if (is_post()) {
-    $unidade = new ZUnidade($_POST);
+    $unidade = new Unidade($_POST);
     try {
         $unidade->setID($old_unidade->getID());
-        $unidade = ZUnidade::atualizar($unidade);
-        Thunder::success('Unidade "'.$unidade->getNome().'" atualizada com sucesso!', true);
+        $unidade->filter($old_unidade);
+        $unidade->update();
+        $old_unidade->clean($unidade);
+        $msg = sprintf(
+            'Unidade "%s" atualizada com sucesso!',
+            $unidade->getNome()
+        );
+        if (is_output('json')) {
+            json(null, ['item' => $unidade->publish(), 'msg' => $msg]);
+        }
+        \Thunder::success($msg, true);
         redirect('/gerenciar/unidade/');
-    } catch (ValidationException $e) {
-        $errors = $e->getErrors();
-    } catch (Exception $e) {
-        $errors['unknow'] = $e->getMessage();
+    } catch (\Exception $e) {
+        $unidade->clean($old_unidade);
+        if ($e instanceof \MZ\Exception\ValidationException) {
+            $errors = $e->getErrors();
+        }
+        if (is_output('json')) {
+            json($e->getMessage(), null, ['errors' => $errors]);
+        }
+        \Thunder::error($e->getMessage());
+        foreach ($errors as $key => $value) {
+            $focusctrl = $key;
+            break;
+        }
     }
-    foreach ($errors as $key => $value) {
-        $focusctrl = $key;
-        Thunder::error($value);
-        break;
-    }
+} elseif (is_output('json')) {
+    json('Nenhum dado foi enviado');
 }
 include template('gerenciar_unidade_editar');

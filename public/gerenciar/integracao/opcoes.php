@@ -23,7 +23,7 @@ require_once(dirname(__DIR__) . '/app.php');
 
 use MZ\System\Integracao;
 
-need_permission(\PermissaoNome::ALTERARCONFIGURACOES, true);
+need_permission(\Permissao::NOME_ALTERARCONFIGURACOES, true);
 if (!is_post()) {
     json('Nenhum dado foi enviado');
 }

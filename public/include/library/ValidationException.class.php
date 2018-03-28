@@ -19,7 +19,7 @@
 	O Cliente adquire apenas o direito de usar o software e não adquire qualquer outros
 	direitos, expressos ou implícitos no GrandChef diferentes dos especificados nesta Licença.
 */
-class ValidationException extends Exception
+class ValidationException extends \Exception
 {
     private $errors = [];
 

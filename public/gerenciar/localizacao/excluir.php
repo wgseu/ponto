@@ -23,7 +23,7 @@ require_once(dirname(__DIR__) . '/app.php');
 
 use MZ\Location\Localizacao;
 
-need_permission(\PermissaoNome::CADASTROCLIENTES, true);
+need_permission(\Permissao::NOME_CADASTROCLIENTES, true);
 $id = isset($_GET['id'])?$_GET['id']:null;
 $localizacao = Localizacao::findByID($id);
 if (!$localizacao->exists()) {

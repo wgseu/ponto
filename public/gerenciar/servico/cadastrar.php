@@ -21,11 +21,18 @@
 */
 require_once(dirname(__DIR__) . '/app.php');
 
-need_permission(PermissaoNome::CADASTROSERVICOS);
+use MZ\__TODO_NAMESPACE__\Servico;
+
+need_permission(\Permissao::NOME_CADASTROSERVICOS, is_output('json'));
+$id = isset($_GET['id']) ? $_GET['id'] : null;
+$servico = Servico::findByID($id);
+$servico->setID(null);
+
 $focusctrl = 'nome';
 $errors = [];
+$old_servico = $servico;
 if (is_post()) {
-    $servico = new ZServico($_POST);
+    $servico = new Servico($_POST);
     try {
         $servico->setID(null);
         $_data_inicio = date_create_from_format('d/m/Y H:i', $servico->getDataInicio());
@@ -33,21 +40,36 @@ if (is_post()) {
         $_data_fim = date_create_from_format('d/m/Y H:i', $servico->getDataFim());
         $servico->setDataFim($_data_fim===false?null:date_format($_data_fim, 'Y-m-d H:i:00'));
         $servico->setValor(moneyval($servico->getValor()));
-        $servico = ZServico::cadastrar($servico);
-        Thunder::success('Serviço "'.$servico->getDescricao().'" cadastrada com sucesso!', true);
+        $servico->filter($old_servico);
+        $servico->insert();
+        $old_servico->clean($servico);
+        $msg = sprintf(
+            'Serviço "%s" cadastrada com sucesso!',
+            $servico->getDescricao()
+        );
+        if (is_output('json')) {
+            json(null, ['item' => $servico->publish(), 'msg' => $msg]);
+        }
+        \Thunder::success($msg, true);
         redirect('/gerenciar/servico/');
-    } catch (ValidationException $e) {
-        $errors = $e->getErrors();
-    } catch (Exception $e) {
-        $errors['unknow'] = $e->getMessage();
+    } catch (\Exception $e) {
+        $servico->clean($old_servico);
+        if ($e instanceof \MZ\Exception\ValidationException) {
+            $errors = $e->getErrors();
+        }
+        if (is_output('json')) {
+            json($e->getMessage(), null, ['errors' => $errors]);
+        }
+        \Thunder::error($e->getMessage());
+        foreach ($errors as $key => $value) {
+            $focusctrl = $key;
+            break;
+        }
     }
-    foreach ($errors as $key => $value) {
-        $focusctrl = $key;
-        Thunder::error($value);
-        break;
-    }
+} elseif (is_output('json')) {
+    json('Nenhum dado foi enviado');
 } else {
-    $servico = new ZServico();
+    $servico = new Servico();
     $servico->setDataInicio(date('Y-m-d H:i:s', time()));
     $servico->setDataFim(date('Y-m-d H:i:s', time()));
     $servico->setAtivo('Y');

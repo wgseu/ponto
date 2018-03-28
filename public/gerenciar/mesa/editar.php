@@ -21,31 +21,53 @@
 */
 require_once(dirname(__DIR__) . '/app.php');
 
-need_permission(PermissaoNome::CADASTROMESAS);
-$mesa = ZMesa::getPeloID($_GET['id']);
-if (is_null($mesa->getID())) {
-    Thunder::warning('A mesa de id "'.$_GET['id'].'" não existe!');
+use MZ\__TODO_NAMESPACE__\Mesa;
+
+need_permission(\Permissao::NOME_CADASTROMESAS, is_output('json'));
+$id = isset($_GET['id']) ? $_GET['id'] : null;
+$mesa = Mesa::findByID($id);
+if (!$mesa->exists()) {
+    $msg = 'A mesa informada não existe!';
+    if (is_output('json')) {
+        json($msg);
+    }
+    \Thunder::warning($msg);
     redirect('/gerenciar/mesa/');
 }
 $focusctrl = 'nome';
 $errors = [];
 $old_mesa = $mesa;
 if (is_post()) {
-    $mesa = new ZMesa($_POST);
+    $mesa = new Mesa($_POST);
     try {
         $mesa->setID($old_mesa->getID());
-        $mesa = ZMesa::atualizar($mesa);
-        Thunder::success('Mesa "'.$mesa->getNome().'" atualizada com sucesso!', true);
+        $mesa->filter($old_mesa);
+        $mesa->update();
+        $old_mesa->clean($mesa);
+        $msg = sprintf(
+            'Mesa "%s" atualizada com sucesso!',
+            $mesa->getNome()
+        );
+        if (is_output('json')) {
+            json(null, ['item' => $mesa->publish(), 'msg' => $msg]);
+        }
+        \Thunder::success($msg, true);
         redirect('/gerenciar/mesa/');
-    } catch (ValidationException $e) {
-        $errors = $e->getErrors();
-    } catch (Exception $e) {
-        $errors['unknow'] = $e->getMessage();
+    } catch (\Exception $e) {
+        $mesa->clean($old_mesa);
+        if ($e instanceof \MZ\Exception\ValidationException) {
+            $errors = $e->getErrors();
+        }
+        if (is_output('json')) {
+            json($e->getMessage(), null, ['errors' => $errors]);
+        }
+        \Thunder::error($e->getMessage());
+        foreach ($errors as $key => $value) {
+            $focusctrl = $key;
+            break;
+        }
     }
-    foreach ($errors as $key => $value) {
-        $focusctrl = $key;
-        Thunder::error($value);
-        break;
-    }
+} elseif (is_output('json')) {
+    json('Nenhum dado foi enviado');
 }
 include template('gerenciar_mesa_editar');

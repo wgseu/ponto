@@ -49,7 +49,7 @@
 						<tbody>
 <!--{loop $classificacoes $classificacao}-->
 							<tr>
-<!--${$_classificacao = ZClassificacao::getPeloID($classificacao->getClassificacaoID())}-->
+<!--${$_classificacao = $classificacao->findClassificacaoID()}-->
 								<td><strong>{$classificacao->getDescricao()}</strong><small><a href="/gerenciar/classificacao/editar?id={$_classificacao->getID()}" title="Editar classificação '{$_classificacao->getDescricao()}'">{$_classificacao->getDescricao()}</a></small></td>
 								<td class="text-center">
 									<ul class="nav panel_toolbox">

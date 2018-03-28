@@ -87,16 +87,16 @@ class ZFuncionalidade
 
     public static function getPeloID($id)
     {
-        $query = DB::$pdo->from('Funcionalidades')
+        $query = \DB::$pdo->from('Funcionalidades')
                          ->where(['id' => $id]);
-        return new ZFuncionalidade($query->fetch());
+        return new Funcionalidade($query->fetch());
     }
 
     public static function getPeloNome($nome)
     {
-        $query = DB::$pdo->from('Funcionalidades')
+        $query = \DB::$pdo->from('Funcionalidades')
                          ->where(['nome' => $nome]);
-        return new ZFuncionalidade($query->fetch());
+        return new Funcionalidade($query->fetch());
     }
 
     private static function validarCampos(&$funcionalidade)
@@ -127,7 +127,7 @@ class ZFuncionalidade
 
     private static function initSearch()
     {
-        return   DB::$pdo->from('Funcionalidades')
+        return   \DB::$pdo->from('Funcionalidades')
                          ->orderBy('id ASC');
     }
 
@@ -140,7 +140,7 @@ class ZFuncionalidade
         $_funcionalidades = $query->fetchAll();
         $funcionalidades = [];
         foreach ($_funcionalidades as $funcionalidade) {
-            $funcionalidades[] = new ZFuncionalidade($funcionalidade);
+            $funcionalidades[] = new Funcionalidade($funcionalidade);
         }
         return $funcionalidades;
     }

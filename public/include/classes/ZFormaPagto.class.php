@@ -241,16 +241,16 @@ class ZFormaPagto
 
     public static function getPeloID($id)
     {
-        $query = DB::$pdo->from('Formas_Pagto')
+        $query = \DB::$pdo->from('Formas_Pagto')
                          ->where(['id' => $id]);
-        return new ZFormaPagto($query->fetch());
+        return new FormaPagto($query->fetch());
     }
 
     public static function getPelaDescricao($descricao)
     {
-        $query = DB::$pdo->from('Formas_Pagto')
+        $query = \DB::$pdo->from('Formas_Pagto')
                          ->where(['descricao' => $descricao]);
-        return new ZFormaPagto($query->fetch());
+        return new FormaPagto($query->fetch());
     }
 
     private static function validarCampos(&$forma_pagto)
@@ -337,12 +337,12 @@ class ZFormaPagto
         $_forma_pagto = $forma_pagto->toArray();
         self::validarCampos($_forma_pagto);
         try {
-            $_forma_pagto['id'] = DB::$pdo->insertInto('Formas_Pagto')->values($_forma_pagto)->execute();
+            $_forma_pagto['id'] = \DB::$pdo->insertInto('Formas_Pagto')->values($_forma_pagto)->execute();
         } catch (Exception $e) {
             self::handleException($e);
             throw $e;
         }
-        return self::getPeloID($_forma_pagto['id']);
+        return self::findByID($_forma_pagto['id']);
     }
 
     public static function atualizar($forma_pagto)
@@ -365,7 +365,7 @@ class ZFormaPagto
             'ativa',
         ];
         try {
-            $query = DB::$pdo->update('Formas_Pagto');
+            $query = \DB::$pdo->update('Formas_Pagto');
             $query = $query->set(array_intersect_key($_forma_pagto, array_flip($campos)));
             $query = $query->where('id', $_forma_pagto['id']);
             $query->execute();
@@ -373,22 +373,22 @@ class ZFormaPagto
             self::handleException($e);
             throw $e;
         }
-        return self::getPeloID($_forma_pagto['id']);
+        return self::findByID($_forma_pagto['id']);
     }
 
     public static function excluir($id)
     {
         if (!$id) {
-            throw new Exception('Não foi possível excluir o formapagto, o id do formapagto não foi informado');
+            throw new \Exception('Não foi possível excluir o formapagto, o id do formapagto não foi informado');
         }
-        $query = DB::$pdo->deleteFrom('Formas_Pagto')
+        $query = \DB::$pdo->deleteFrom('Formas_Pagto')
                          ->where(['id' => $id]);
         return $query->execute();
     }
 
     private static function initSearch($busca, $tipo, $ativa)
     {
-        $query = DB::$pdo->from('Formas_Pagto')
+        $query = \DB::$pdo->from('Formas_Pagto')
                          ->orderBy('ativa ASC, descricao ASC');
         $busca = trim($busca);
         if ($busca != '') {
@@ -414,7 +414,7 @@ class ZFormaPagto
         $_forma_pagtos = $query->fetchAll();
         $forma_pagtos = [];
         foreach ($_forma_pagtos as $forma_pagto) {
-            $forma_pagtos[] = new ZFormaPagto($forma_pagto);
+            $forma_pagtos[] = new FormaPagto($forma_pagto);
         }
         return $forma_pagtos;
     }
@@ -427,7 +427,7 @@ class ZFormaPagto
 
     private static function initSearchDaCarteiraID($carteira_id)
     {
-        return   DB::$pdo->from('Formas_Pagto')
+        return   \DB::$pdo->from('Formas_Pagto')
                          ->where(['carteiraid' => $carteira_id])
                          ->orderBy('id ASC');
     }
@@ -441,7 +441,7 @@ class ZFormaPagto
         $_forma_pagtos = $query->fetchAll();
         $forma_pagtos = [];
         foreach ($_forma_pagtos as $forma_pagto) {
-            $forma_pagtos[] = new ZFormaPagto($forma_pagto);
+            $forma_pagtos[] = new FormaPagto($forma_pagto);
         }
         return $forma_pagtos;
     }
@@ -454,7 +454,7 @@ class ZFormaPagto
 
     private static function initSearchDoCarteiraPagtoID($carteira_pagto_id)
     {
-        return   DB::$pdo->from('Formas_Pagto')
+        return   \DB::$pdo->from('Formas_Pagto')
                          ->where(['carteirapagtoid' => $carteira_pagto_id])
                          ->orderBy('id ASC');
     }
@@ -468,7 +468,7 @@ class ZFormaPagto
         $_forma_pagtos = $query->fetchAll();
         $forma_pagtos = [];
         foreach ($_forma_pagtos as $forma_pagto) {
-            $forma_pagtos[] = new ZFormaPagto($forma_pagto);
+            $forma_pagtos[] = new FormaPagto($forma_pagto);
         }
         return $forma_pagtos;
     }

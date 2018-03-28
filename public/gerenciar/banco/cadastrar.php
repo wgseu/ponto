@@ -23,7 +23,7 @@ require_once(dirname(__DIR__) . '/app.php');
 
 use MZ\Wallet\Banco;
 
-need_permission(PermissaoNome::CADASTROBANCOS);
+need_permission(Permissao::NOME_CADASTROBANCOS);
 $focusctrl = 'numero';
 $errors = [];
 $banco = new Banco();
@@ -33,17 +33,30 @@ if (is_post()) {
     try {
         $banco->filter($old_banco);
         $banco->insert();
-        Thunder::success('Banco "'.$banco->getRazaoSocial().'" cadastrado com sucesso!', true);
+        $msg = sprintf(
+            'Banco "%s" cadastrado com sucesso!',
+            $banco->getRazaoSocial()
+        );
+        if (is_output('json')) {
+            json(null, ['item' => $banco->publish(), 'msg' => $msg]);
+        }
+        \Thunder::success($msg, true);
         redirect('/gerenciar/banco/');
-    } catch (ValidationException $e) {
-        $errors = $e->getErrors();
-    } catch (Exception $e) {
-        $errors['unknow'] = $e->getMessage();
+    } catch (\Exception $e) {
+        $__replace__me__->clean($old___replace__me__);
+        if ($e instanceof \MZ\Exception\ValidationException) {
+            $errors = $e->getErrors();
+        }
+        if (is_output('json')) {
+            json($e->getMessage(), null, ['errors' => $errors]);
+        }
+        \Thunder::error($e->getMessage());
+        foreach ($errors as $key => $value) {
+            $focusctrl = $key;
+            break;
+        }
     }
-    foreach ($errors as $key => $value) {
-        $focusctrl = $key;
-        Thunder::error($value);
-        break;
-    }
+} elseif (is_output('json')) {
+    json('Nenhum dado foi enviado');
 }
 include template('gerenciar_banco_cadastrar');

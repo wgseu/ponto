@@ -21,27 +21,48 @@
 */
 require_once(dirname(__DIR__) . '/app.php');
 
-need_permission(PermissaoNome::ESTOQUE);
+use MZ\__TODO_NAMESPACE__\Setor;
+
+need_permission(\Permissao::NOME_ESTOQUE, is_output('json'));
+$id = isset($_GET['id']) ? $_GET['id'] : null;
+$setor = Setor::findByID($id);
+$setor->setID(null);
+
 $focusctrl = 'nome';
 $errors = [];
+$old_setor = $setor;
 if (is_post()) {
-    $setor = new ZSetor($_POST);
+    $setor = new Setor($_POST);
     try {
-        $setor->setID(null);
-        $setor = ZSetor::cadastrar($setor);
-        Thunder::success('Setor "'.$setor->getNome().'" cadastrado com sucesso!', true);
+        $setor->filter($old_setor);
+        $setor->insert();
+        $old_setor->clean($setor);
+        $msg = sprintf(
+            'Setor "%s" cadastrado com sucesso!',
+            $setor->getNome()
+        );
+        if (is_output('json')) {
+            json(null, ['item' => $setor->publish(), 'msg' => $msg]);
+        }
+        \Thunder::success($msg, true);
         redirect('/gerenciar/setor/');
-    } catch (ValidationException $e) {
-        $errors = $e->getErrors();
-    } catch (Exception $e) {
-        $errors['unknow'] = $e->getMessage();
+    } catch (\Exception $e) {
+        $setor->clean($old_setor);
+        if ($e instanceof \MZ\Exception\ValidationException) {
+            $errors = $e->getErrors();
+        }
+        if (is_output('json')) {
+            json($e->getMessage(), null, ['errors' => $errors]);
+        }
+        \Thunder::error($e->getMessage());
+        foreach ($errors as $key => $value) {
+            $focusctrl = $key;
+            break;
+        }
     }
-    foreach ($errors as $key => $value) {
-        $focusctrl = $key;
-        Thunder::error($value);
-        break;
-    }
+} elseif (is_output('json')) {
+    json('Nenhum dado foi enviado');
 } else {
-    $setor = new ZSetor();
+    $setor = new Setor();
 }
 include template('gerenciar_setor_cadastrar');

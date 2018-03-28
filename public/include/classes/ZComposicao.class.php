@@ -182,16 +182,16 @@ class ZComposicao
 
     public static function getPeloID($id)
     {
-        $query = DB::$pdo->from('Composicoes')
+        $query = \DB::$pdo->from('Composicoes')
                          ->where(['id' => $id]);
-        return new ZComposicao($query->fetch());
+        return new Composicao($query->fetch());
     }
 
     public static function getPelaComposicaoIDProdutoID($composicao_id, $produto_id)
     {
-        $query = DB::$pdo->from('Composicoes')
+        $query = \DB::$pdo->from('Composicoes')
                          ->where(['composicaoid' => $composicao_id, 'produtoid' => $produto_id]);
-        return new ZComposicao($query->fetch());
+        return new Composicao($query->fetch());
     }
 
     private static function validarCampos(&$composicao)
@@ -243,12 +243,12 @@ class ZComposicao
         $_composicao = $composicao->toArray();
         self::validarCampos($_composicao);
         try {
-            $_composicao['id'] = DB::$pdo->insertInto('Composicoes')->values($_composicao)->execute();
+            $_composicao['id'] = \DB::$pdo->insertInto('Composicoes')->values($_composicao)->execute();
         } catch (Exception $e) {
             self::handleException($e);
             throw $e;
         }
-        return self::getPeloID($_composicao['id']);
+        return self::findByID($_composicao['id']);
     }
 
     public static function atualizar($composicao)
@@ -267,7 +267,7 @@ class ZComposicao
             'ativa',
         ];
         try {
-            $query = DB::$pdo->update('Composicoes');
+            $query = \DB::$pdo->update('Composicoes');
             $query = $query->set(array_intersect_key($_composicao, array_flip($campos)));
             $query = $query->where('id', $_composicao['id']);
             $query->execute();
@@ -275,22 +275,22 @@ class ZComposicao
             self::handleException($e);
             throw $e;
         }
-        return self::getPeloID($_composicao['id']);
+        return self::findByID($_composicao['id']);
     }
 
     public static function excluir($id)
     {
         if (!$id) {
-            throw new Exception('Não foi possível excluir a composicao, o id da composicao não foi informado');
+            throw new \Exception('Não foi possível excluir a composicao, o id da composicao não foi informado');
         }
-        $query = DB::$pdo->deleteFrom('Composicoes')
+        $query = \DB::$pdo->deleteFrom('Composicoes')
                          ->where(['id' => $id]);
         return $query->execute();
     }
 
     private static function initSearch()
     {
-        return   DB::$pdo->from('Composicoes')
+        return   \DB::$pdo->from('Composicoes')
                          ->orderBy('id ASC');
     }
 
@@ -303,7 +303,7 @@ class ZComposicao
         $_composicaos = $query->fetchAll();
         $composicaos = [];
         foreach ($_composicaos as $composicao) {
-            $composicaos[] = new ZComposicao($composicao);
+            $composicaos[] = new Composicao($composicao);
         }
         return $composicaos;
     }
@@ -321,20 +321,20 @@ class ZComposicao
         $incluir_adicionais,
         $sem_opcionais
     ) {
-        $query = DB::$pdo->from('Composicoes c')
+        $query = \DB::$pdo->from('Composicoes c')
                          ->leftJoin('Produtos p ON p.id = c.produtoid')
                          ->where(['c.ativa' => 'Y', 'c.composicaoid' => intval($composicao_id)]);
         if (!is_null($busca) && strlen($busca) > 0) {
             $query = \MZ\Database\Helper::buildSearch($busca, 'p.descricao', $query);
         }
         if ($somente_selecionaveis) {
-            $query = $query->where('c.tipo <> ?', ComposicaoTipo::COMPOSICAO);
+            $query = $query->where('c.tipo <> ?', Composicao::TIPO_COMPOSICAO);
         }
         if ($somente_selecionaveis && !$incluir_adicionais) {
-            $query = $query->where('c.tipo <> ?', ComposicaoTipo::ADICIONAL);
+            $query = $query->where('c.tipo <> ?', Composicao::TIPO_ADICIONAL);
         }
         if ($somente_selecionaveis && $sem_opcionais) {
-            $query = $query->where('c.tipo <> ?', ComposicaoTipo::OPCIONAL);
+            $query = $query->where('c.tipo <> ?', Composicao::TIPO_OPCIONAL);
         }
         return $query;
     }
@@ -361,7 +361,7 @@ class ZComposicao
         $_composicaos = $query->fetchAll();
         $composicaos = [];
         foreach ($_composicaos as $composicao) {
-            $composicaos[] = new ZComposicao($composicao);
+            $composicaos[] = new Composicao($composicao);
         }
         return $composicaos;
     }
@@ -388,7 +388,7 @@ class ZComposicao
                        ->select('u.sigla as unidadesigla')
                        ->select('IF(ISNULL(p.imagem), NULL, CONCAT(p.id, ".png")) as imagemurl')
                        ->select('p.dataatualizacao as produtodataatualizacao')
-                       ->select('IF(c.tipo = ?, "N", "Y") as selecionavel', ComposicaoTipo::COMPOSICAO)
+                       ->select('IF(c.tipo = ?, "N", "Y") as selecionavel', Composicao::TIPO_COMPOSICAO)
                        ->leftJoin('Produtos p ON p.id = c.produtoid')
                        ->leftJoin('Unidades u ON u.id = p.unidadeid');
         if (!is_null($inicio) && !is_null($quantidade)) {
@@ -416,7 +416,7 @@ class ZComposicao
 
     private static function initSearchDoProdutoID($produto_id)
     {
-        return   DB::$pdo->from('Composicoes')
+        return   \DB::$pdo->from('Composicoes')
                          ->where(['produtoid' => $produto_id])
                          ->orderBy('id ASC');
     }
@@ -430,7 +430,7 @@ class ZComposicao
         $_composicaos = $query->fetchAll();
         $composicaos = [];
         foreach ($_composicaos as $composicao) {
-            $composicaos[] = new ZComposicao($composicao);
+            $composicaos[] = new Composicao($composicao);
         }
         return $composicaos;
     }

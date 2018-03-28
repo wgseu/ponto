@@ -25,7 +25,7 @@ use MZ\Wallet\Carteira;
 use MZ\Wallet\Banco;
 use MZ\Util\Filter;
 
-need_permission(PermissaoNome::CADASTROCARTEIRAS);
+need_permission(Permissao::NOME_CADASTROCARTEIRAS);
 
 $_banco = Banco::findByID($_GET['bancoid']);
 $condition = [

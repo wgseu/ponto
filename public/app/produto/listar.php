@@ -37,7 +37,7 @@ if (isset($_GET['categoria']) && is_numeric($_GET['categoria'])) {
     $limit = null;
     $categoria_id = intval($_GET['categoria']);
 }
-$produtos = ZProduto::getTodos(
+$produtos = Produto::getTodos(
     $_GET['busca'],
     $categoria_id,
     null, // unidade_id

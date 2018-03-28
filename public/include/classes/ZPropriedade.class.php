@@ -136,16 +136,16 @@ class ZPropriedade
 
     public static function getPeloID($id)
     {
-        $query = DB::$pdo->from('Propriedades')
+        $query = \DB::$pdo->from('Propriedades')
                          ->where(['id' => $id]);
-        return new ZPropriedade($query->fetch());
+        return new Propriedade($query->fetch());
     }
 
     public static function getPeloGrupoIDNome($grupo_id, $nome)
     {
-        $query = DB::$pdo->from('Propriedades')
+        $query = \DB::$pdo->from('Propriedades')
                          ->where(['grupoid' => $grupo_id, 'nome' => $nome]);
-        return new ZPropriedade($query->fetch());
+        return new Propriedade($query->fetch());
     }
 
     private static function validarCampos(&$propriedade)
@@ -186,12 +186,12 @@ class ZPropriedade
         $_propriedade = $propriedade->toArray();
         self::validarCampos($_propriedade);
         try {
-            $_propriedade['id'] = DB::$pdo->insertInto('Propriedades')->values($_propriedade)->execute();
+            $_propriedade['id'] = \DB::$pdo->insertInto('Propriedades')->values($_propriedade)->execute();
         } catch (Exception $e) {
             self::handleException($e);
             throw $e;
         }
-        return self::getPeloID($_propriedade['id']);
+        return self::findByID($_propriedade['id']);
     }
 
     public static function atualizar($propriedade)
@@ -211,7 +211,7 @@ class ZPropriedade
             $campos[] = 'imagem';
         }
         try {
-            $query = DB::$pdo->update('Propriedades');
+            $query = \DB::$pdo->update('Propriedades');
             $query = $query->set(array_intersect_key($_propriedade, array_flip($campos)));
             $query = $query->where('id', $_propriedade['id']);
             $query->execute();
@@ -219,22 +219,22 @@ class ZPropriedade
             self::handleException($e);
             throw $e;
         }
-        return self::getPeloID($_propriedade['id']);
+        return self::findByID($_propriedade['id']);
     }
 
     public static function excluir($id)
     {
         if (!$id) {
-            throw new Exception('Não foi possível excluir a propriedade, o id da propriedade não foi informado');
+            throw new \Exception('Não foi possível excluir a propriedade, o id da propriedade não foi informado');
         }
-        $query = DB::$pdo->deleteFrom('Propriedades')
+        $query = \DB::$pdo->deleteFrom('Propriedades')
                          ->where(['id' => $id]);
         return $query->execute();
     }
 
     private static function initSearch()
     {
-        return   DB::$pdo->from('Propriedades')
+        return   \DB::$pdo->from('Propriedades')
                          ->orderBy('id ASC');
     }
 
@@ -247,7 +247,7 @@ class ZPropriedade
         $_propriedades = $query->fetchAll();
         $propriedades = [];
         foreach ($_propriedades as $propriedade) {
-            $propriedades[] = new ZPropriedade($propriedade);
+            $propriedades[] = new Propriedade($propriedade);
         }
         return $propriedades;
     }
@@ -260,7 +260,7 @@ class ZPropriedade
 
     private static function initSearchDoGrupoID($grupo_id)
     {
-        return   DB::$pdo->from('Propriedades')
+        return   \DB::$pdo->from('Propriedades')
                          ->where(['grupoid' => $grupo_id])
                          ->orderBy('id ASC');
     }
@@ -274,7 +274,7 @@ class ZPropriedade
         $_propriedades = $query->fetchAll();
         $propriedades = [];
         foreach ($_propriedades as $propriedade) {
-            $propriedades[] = new ZPropriedade($propriedade);
+            $propriedades[] = new Propriedade($propriedade);
         }
         return $propriedades;
     }

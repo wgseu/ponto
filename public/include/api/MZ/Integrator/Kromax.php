@@ -20,7 +20,7 @@
  * O Cliente adquire apenas o direito de usar o software e não adquire qualquer outros
  * direitos, expressos ou implícitos no GrandChef diferentes dos especificados nesta Licença.
  *
- * @author  Francimar Alves <mazinsw@gmail.com>
+ * @author Equipe GrandChef <desenvolvimento@mzsw.com.br>
  */
 namespace MZ\Integrator;
 
@@ -75,7 +75,7 @@ class Kromax extends \MZ\System\Task
 
             $order->loadDOM($dom);
             $order->findOrder();
-            if (is_null($order->getID())) {
+            if (!$order->exists()) {
                 $order->process();
             }
             $changes = $order->store();

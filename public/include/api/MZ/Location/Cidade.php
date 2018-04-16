@@ -20,7 +20,7 @@
  * O Cliente adquire apenas o direito de usar o software e não adquire qualquer outros
  * direitos, expressos ou implícitos no GrandChef diferentes dos especificados nesta Licença.
  *
- * @author  Francimar Alves <mazinsw@gmail.com>
+ * @author Equipe GrandChef <desenvolvimento@mzsw.com.br>
  */
 namespace MZ\Location;
 
@@ -250,15 +250,7 @@ class Cidade extends \MZ\Database\Helper
      */
     protected function translate($e)
     {
-        if (stripos($e->getMessage(), 'PRIMARY') !== false) {
-            return new \MZ\Exception\ValidationException([
-                'id' => vsprintf(
-                    'O id "%s" já está cadastrado',
-                    [$this->getID()]
-                ),
-            ]);
-        }
-        if (stripos($e->getMessage(), 'EstadoID_Nome_UNIQUE') !== false) {
+        if (contains(['EstadoID', 'Nome', 'UNIQUE'], $e->getMessage())) {
             return new \MZ\Exception\ValidationException([
                 'estadoid' => vsprintf(
                     'O estado "%s" já está cadastrado',
@@ -270,7 +262,7 @@ class Cidade extends \MZ\Database\Helper
                 ),
             ]);
         }
-        if (stripos($e->getMessage(), 'CEP_UNIQUE') !== false) {
+        if (contains(['CEP', 'UNIQUE'], $e->getMessage())) {
             return new \MZ\Exception\ValidationException([
                 'cep' => vsprintf(
                     'O %s "%s" já está cadastrado',
@@ -337,8 +329,7 @@ class Cidade extends \MZ\Database\Helper
         if ($cidade->exists()) {
             return $cidade;
         }
-        global $login_funcionario;
-        if (!$login_funcionario->has(\Permissao::NOME_CADASTROCIDADES)) {
+        if (!logged_employee()->has(\Permissao::NOME_CADASTROCIDADES)) {
             throw new \Exception('A cidade não está cadastrada e você não tem permissão para cadastrar uma');
         }
         $cidade->setEstadoID($estado_id);
@@ -465,39 +456,28 @@ class Cidade extends \MZ\Database\Helper
 
     /**
      * Update Cidade with instance values into database for ID
+     * @param  array $only Save these fields only, when empty save all fields except id
+     * @param  boolean $except When true, saves all fields except $only
      * @return Cidade Self instance
      */
-    public function update()
+    public function update($only = [], $except = false)
     {
         $values = $this->validate();
         if (!$this->exists()) {
             throw new \Exception('O identificador da cidade não foi informado');
         }
-        unset($values['id']);
+        $values = self::filterValues($values, $only, $except);
         try {
             self::getDB()
                 ->update('Cidades')
                 ->set($values)
                 ->where('id', $this->getID())
                 ->execute();
-            $cidade = self::findByID($this->getID());
-            $this->fromArray($cidade->toArray());
+            $this->loadByID($this->getID());
         } catch (\Exception $e) {
             throw $this->translate($e);
         }
         return $this;
-    }
-
-    /**
-     * Save the Cidade into the database
-     * @return Cidade Self instance
-     */
-    public function save()
-    {
-        if ($this->exists()) {
-            return $this->update();
-        }
-        return $this->insert();
     }
 
     /**
@@ -514,6 +494,45 @@ class Cidade extends \MZ\Database\Helper
             ->where('id', $this->getID())
             ->execute();
         return $result;
+    }
+
+    /**
+     * Load one register for it self with a condition
+     * @param  array $condition Condition for searching the row
+     * @param  array $order associative field name -> [-1, 1]
+     * @return Cidade Self instance filled or empty
+     */
+    public function load($condition, $order = [])
+    {
+        $query = self::query($condition, $order)->limit(1);
+        $row = $query->fetch() ?: [];
+        return $this->fromArray($row);
+    }
+
+    /**
+     * Load into this object from database using, EstadoID, Nome
+     * @param  int $estado_id estado to find Cidade
+     * @param  string $nome nome to find Cidade
+     * @return Cidade Self filled instance or empty when not found
+     */
+    public function loadByEstadoIDNome($estado_id, $nome)
+    {
+        return $this->load([
+            'estadoid' => intval($estado_id),
+            'nome' => strval($nome),
+        ]);
+    }
+
+    /**
+     * Load into this object from database using, CEP
+     * @param  string $cep cep to find Cidade
+     * @return Cidade Self filled instance or empty when not found
+     */
+    public function loadByCEP($cep)
+    {
+        return $this->load([
+            'cep' => strval($cep),
+        ]);
     }
 
     /**

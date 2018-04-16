@@ -20,12 +20,13 @@
  * O Cliente adquire apenas o direito de usar o software e não adquire qualquer outros
  * direitos, expressos ou implícitos no GrandChef diferentes dos especificados nesta Licença.
  *
- * @author  Francimar Alves <mazinsw@gmail.com>
+ * @author Equipe GrandChef <desenvolvimento@mzsw.com.br>
  */
 namespace MZ\Account;
 
 use MZ\Util\Filter;
 use MZ\Util\Validator;
+use MZ\Employee\Funcionario;
 
 /**
  * Informações de cliente físico ou jurídico. Clientes, empresas,
@@ -33,6 +34,7 @@ use MZ\Util\Validator;
  */
 class Cliente extends \MZ\Database\Helper
 {
+    const CHAVE_SECRETA = '%#@87GhÃ¨¬';
 
     /**
      * Informa o tipo de pessoa, que pode ser física ou jurídica
@@ -686,7 +688,7 @@ class Cliente extends \MZ\Database\Helper
             $this->setID($cliente['id']);
         }
         if (!isset($cliente['tipo'])) {
-            $this->setTipo(null);
+            $this->setTipo(self::TIPO_FISICA);
         } else {
             $this->setTipo($cliente['tipo']);
         }
@@ -701,7 +703,7 @@ class Cliente extends \MZ\Database\Helper
             $this->setLogin($cliente['login']);
         }
         if (!array_key_exists('senha', $cliente)) {
-            $this->setSenha(null);
+            $this->setSenha('');
         } else {
             $this->setSenha($cliente['senha']);
         }
@@ -791,12 +793,12 @@ class Cliente extends \MZ\Database\Helper
             $this->setImagem($cliente['imagem']);
         }
         if (!isset($cliente['dataatualizacao'])) {
-            $this->setDataAtualizacao(null);
+            $this->setDataAtualizacao(self::now());
         } else {
             $this->setDataAtualizacao($cliente['dataatualizacao']);
         }
         if (!isset($cliente['datacadastro'])) {
-            $this->setDataCadastro(null);
+            $this->setDataCadastro(self::now());
         } else {
             $this->setDataCadastro($cliente['datacadastro']);
         }
@@ -815,6 +817,54 @@ class Cliente extends \MZ\Database\Helper
             $imagem = null;
         }
         return get_image_url($imagem, 'cliente', 'cliente.png');
+    }
+
+    /**
+     * Obtém o nome completo da pessoa física ou o nome fantasia da empresa
+     */
+    public function getNomeCompleto()
+    {
+        if ($this->getTipo() == self::TIPO_JURIDICA) {
+            return $this->getNome();
+        }
+        return trim($this->getNome() . ' ' . $this->getSobrenome());
+    }
+
+    /**
+     * Obtém o nome completo da pessoa física ou o nome fantasia da empresa
+     */
+    public function setNomeCompleto($nome)
+    {
+        $pos = strpos($nome, ' ');
+        if ($pos === false) {
+            $this->setSobrenome(null);
+            return $this->setNome($nome);
+        }
+        $this->setNome(substr($nome, 0, $pos));
+        return $this->setSobrenome(substr($nome, $pos + 1, strlen($nome) - $pos - 1));
+    }
+
+    /**
+     * Retorna a assinatura do cliente
+     */
+    public function getAssinatura()
+    {
+        $nomes = preg_split('/[\s,]+/', $this->getSobrenome());
+        $sobrenome = $this->getSobrenome();
+        foreach ($nomes as $nome) {
+            if (in_array($nome, ['da', 'de', 'do', 'das', 'dos'])) {
+                continue;
+            }
+            $sobrenome = $nome;
+            break;
+        }
+        return trim($this->getNome().' '.$sobrenome);
+    }
+
+    private function gerarSenha()
+    {
+        $this->setSenha(sha1(utf8_decode(self::CHAVE_SECRETA . $this->getSenha())));
+        return $this;
     }
 
     /**
@@ -839,33 +889,51 @@ class Cliente extends \MZ\Database\Helper
      */
     public function filter($original)
     {
+        global $app;
+
         $this->setID($original->getID());
+        $this->setSecreto($original->getSecreto());
+        $this->setDataCadastro($original->getDataCadastro());
+        $this->setLimiteCompra($original->getLimiteCompra());
+        $this->setLimiteCompra(Filter::float($this->getLimiteCompra()));
         $this->setAcionistaID(Filter::number($this->getAcionistaID()));
         $this->setLogin(Filter::string($this->getLogin()));
-        $this->setSenha(Filter::string($this->getSenha()));
+        $this->setSenha(Filter::text($this->getSenha()));
         $this->setNome(Filter::string($this->getNome()));
         $this->setSobrenome(Filter::string($this->getSobrenome()));
-        $this->setCPF(Filter::unmask($this->getCPF(), _p('Mascara', 'CPF')));
-        $this->setRG(Filter::string($this->getRG()));
-        $this->setIM(Filter::string($this->getIM()));
+        if ($this->getTipo() == self::TIPO_JURIDICA) {
+            $this->setCPF(Filter::unmask($this->getCPF(), _p('Mascara', 'CNPJ')));
+            $this->setGenero(self::GENERO_FEMININO);
+        } else {
+            $this->setCPF(Filter::unmask($this->getCPF(), _p('Mascara', 'CPF')));
+        }
+        $this->setRG(Filter::digits($this->getRG()));
+        $this->setIM(Filter::digits($this->getIM()));
         $this->setEmail(Filter::string($this->getEmail()));
         $this->setDataAniversario(Filter::date($this->getDataAniversario()));
         $this->setFone(1, Filter::unmask($this->getFone(1), _p('Mascara', 'Fone')));
         $this->setFone(2, Filter::unmask($this->getFone(2), _p('Mascara', 'Fone')));
         $this->setSlogan(Filter::string($this->getSlogan()));
-        $this->setSecreto(Filter::string($this->getSecreto()));
-        $this->setLimiteCompra(Filter::money($this->getLimiteCompra()));
         $this->setFacebookURL(Filter::string($this->getFacebookURL()));
         $this->setTwitterURL(Filter::string($this->getTwitterURL()));
         $this->setLinkedInURL(Filter::string($this->getLinkedInURL()));
-        $imagem = upload_image('raw_imagem', 'cliente');
+
+        $width = 256;
+        if ($cliente->getTipo() == Cliente::TIPO_JURIDICA) {
+            $width = 640;
+        }
+        $imagem = upload_image('raw_imagem', 'cliente', null, $width, 256, true);
         if (is_null($imagem) && trim($this->getImagem()) != '') {
-            $this->setImagem($original->getImagem());
+            $this->setImagem(true);
         } else {
             $this->setImagem($imagem);
+            $imagem_path = $app->getPath('public') . $this->makeImagem();
+            if (!is_null($imagem)) {
+                $this->setImagem(file_get_contents($imagem_path));
+                unlink($imagem_path);
+            }
         }
-        $this->setDataAtualizacao(Filter::datetime($this->getDataAtualizacao()));
-        $this->setDataCadastro(Filter::datetime($this->getDataCadastro()));
+        $this->setDataAtualizacao(self::now());
     }
 
     /**
@@ -874,9 +942,6 @@ class Cliente extends \MZ\Database\Helper
      */
     public function clean($dependency)
     {
-        if (!is_null($this->getImagem()) && $dependency->getImagem() != $this->getImagem()) {
-            @unlink(get_image_path($this->getImagem(), 'cliente'));
-        }
         $this->setImagem($dependency->getImagem());
     }
 
@@ -887,32 +952,58 @@ class Cliente extends \MZ\Database\Helper
     public function validate()
     {
         $errors = [];
+        $funcionario = Funcionario::findByClienteID($this->getID());
         if (is_null($this->getTipo())) {
             $errors['tipo'] = 'O tipo não pode ser vazio';
         }
         if (!Validator::checkInSet($this->getTipo(), self::getTipoOptions(), true)) {
             $errors['tipo'] = 'O tipo é inválido';
         }
+        if (is_manager($funcionario) && $this->getTipo() != self::TIPO_FISICA) {
+            $errors['tipo'] = 'O funcionário deve ser uma pessoa física';
+        }
         if (!Validator::checkUsername($this->getLogin(), true)) {
             $errors['login'] = 'O login é inválido';
         }
-        if (!Validator::checkPassword($this->getSenha(), true)) {
-            $errors['senha'] = 'A senha informada não é segura';
+        if (is_manager($funcionario) && is_null($this->getLogin())) {
+            $errors['tipo'] = 'Login obrigatório para o tipo de conta';
+        }
+        if (!Validator::checkPassword($this->getSenha(), $this->exists())) {
+            $errors['senha'] = 'A senha deve possuir no mínimo 4 caracteres';
+        }
+        if (!is_null($this->getSenha())) {
+            $this->gerarSenha();
         }
         if (is_null($this->getNome())) {
             $errors['nome'] = 'O nome não pode ser vazio';
         }
+        if (strlen($this->getNome()) < 2) {
+            $errors['nome'] = 'Nome inválido';
+        }
         if (!Validator::checkInSet($this->getGenero(), self::getGeneroOptions(), true)) {
             $errors['genero'] = 'O gênero é inválido';
         }
-        if (!Validator::checkCPF($this->getCPF(), true)) {
-            $errors['cpf'] = sprintf('O %s é inválido', _p('Titulo', 'CPF'));
+        if ($this->getTipo() == self::TIPO_FISICA) {
+            if (!Validator::checkCPF($this->getCPF(), true)) {
+                $errors['cpf'] = sprintf('O %s é inválido', _p('Titulo', 'CPF'));
+            }
+        } else {
+            if (!Validator::checkCNPJ($this->getCPF(), true)) {
+                $errors['cpf'] = sprintf('O %s é inválido', _p('Titulo', 'CNPJ'));
+            }
         }
         if (!Validator::checkEmail($this->getEmail(), true)) {
             $errors['email'] = 'O e-mail é inválido';
         }
         if (!Validator::checkPhone($this->getFone(1), true)) {
             $errors['fone1'] = 'O Telefone é inválido';
+        }
+        if (is_null($this->getCPF()) && is_null($this->getFone(1)) && is_null($this->getEmail())) {
+            $cpf_title = _p('Titulo', 'CPF');
+            if ($this->getTipo() == self::TIPO_JURIDICA) {
+                $cpf_title = _p('Titulo', 'CNPJ');
+            }
+            $errors['fone1'] = sprintf('Nenhum dado chave foi informado, informe um Telefone, E-mail ou %s', $cpf_title);
         }
         if (!Validator::checkPhone($this->getFone(2), true)) {
             $errors['fone2'] = 'O Celular é inválido';
@@ -923,10 +1014,35 @@ class Cliente extends \MZ\Database\Helper
         if (is_null($this->getDataCadastro())) {
             $errors['datacadastro'] = 'A data de cadastro não pode ser vazia';
         }
+        if (!is_null($this->getLimiteCompra()) && $this->getLimiteCompra() < 0) {
+            $errors['limitecompra'] = 'O limite de compra não pode ser negativo';
+        }
         if (!empty($errors)) {
             throw new \MZ\Exception\ValidationException($errors);
         }
-        return $this->toArray();
+        $values = $this->toArray();
+        if (is_null($this->getSenha())) {
+            unset($values['senha']);
+        }
+        if ($this->getImagem() === true) {
+            unset($values['imagem']);
+        }
+        return $values;
+    }
+
+    /**
+     * Check if password match
+     * @param  string $password password to compare
+     * @throws \MZ\Exception\ValidationException When password does't match
+     */
+    public function passwordMatch($password)
+    {
+        if ($password != $this->getSenha()) {
+            throw new \MZ\Exception\ValidationException([
+                'senha' => 'As senhas não são iguais',
+                'confirmarsenha' => 'As senhas não são iguais'
+            ]);
+        }
     }
 
     /**
@@ -936,15 +1052,7 @@ class Cliente extends \MZ\Database\Helper
      */
     protected function translate($e)
     {
-        if (stripos($e->getMessage(), 'PRIMARY') !== false) {
-            return new \MZ\Exception\ValidationException([
-                'id' => sprintf(
-                    'O id "%s" já está cadastrado',
-                    $this->getID()
-                ),
-            ]);
-        }
-        if (stripos($e->getMessage(), 'Fone1_UNIQUE') !== false) {
+        if (contains(['Fone1', 'UNIQUE'], $e->getMessage())) {
             return new \MZ\Exception\ValidationException([
                 'fone1' => sprintf(
                     'O telefone "%s" já está cadastrado',
@@ -952,7 +1060,7 @@ class Cliente extends \MZ\Database\Helper
                 ),
             ]);
         }
-        if (stripos($e->getMessage(), 'Email_UNIQUE') !== false) {
+        if (contains(['Email', 'UNIQUE'], $e->getMessage())) {
             return new \MZ\Exception\ValidationException([
                 'email' => sprintf(
                     'O e-mail "%s" já está cadastrado',
@@ -960,7 +1068,7 @@ class Cliente extends \MZ\Database\Helper
                 ),
             ]);
         }
-        if (stripos($e->getMessage(), 'CPF_UNIQUE') !== false) {
+        if (contains(['CPF', 'UNIQUE'], $e->getMessage())) {
             return new \MZ\Exception\ValidationException([
                 'cpf' => sprintf(
                     'O cpf "%s" já está cadastrado',
@@ -968,7 +1076,7 @@ class Cliente extends \MZ\Database\Helper
                 ),
             ]);
         }
-        if (stripos($e->getMessage(), 'Login_UNIQUE') !== false) {
+        if (contains(['Login', 'UNIQUE'], $e->getMessage())) {
             return new \MZ\Exception\ValidationException([
                 'login' => sprintf(
                     'O login "%s" já está cadastrado',
@@ -976,7 +1084,7 @@ class Cliente extends \MZ\Database\Helper
                 ),
             ]);
         }
-        if (stripos($e->getMessage(), 'Secreto_UNIQUE') !== false) {
+        if (contains(['Secreto', 'UNIQUE'], $e->getMessage())) {
             return new \MZ\Exception\ValidationException([
                 'secreto' => sprintf(
                     'O código de recuperação "%s" já está cadastrado',
@@ -1007,23 +1115,24 @@ class Cliente extends \MZ\Database\Helper
 
     /**
      * Update Cliente with instance values into database for ID
+     * @param  array $only Save these fields only, when empty save all fields except id
+     * @param  boolean $except When true, saves all fields except $only
      * @return Cliente Self instance
      */
-    public function update()
+    public function update($only = [], $except = false)
     {
         $values = $this->validate();
         if (!$this->exists()) {
             throw new \Exception('O identificador do cliente não foi informado');
         }
-        unset($values['id']);
+        $values = self::filterValues($values, $only, $except);
         try {
             self::getDB()
                 ->update('Clientes')
                 ->set($values)
                 ->where('id', $this->getID())
                 ->execute();
-            $cliente = self::findByID($this->getID());
-            $this->fromArray($cliente->toArray());
+            $this->loadByID($this->getID());
         } catch (\Exception $e) {
             throw $this->translate($e);
         }
@@ -1060,18 +1169,6 @@ class Cliente extends \MZ\Database\Helper
     }
 
     /**
-     * Load into this object from database using, ID
-     * @param  int $id id to find Cliente
-     * @return Cliente Self filled instance or empty when not found
-     */
-    public function loadByID($id)
-    {
-        return $this->load([
-            'id' => intval($id),
-        ]);
-    }
-
-    /**
      * Load into this object from database using, Fone
      * @param  string $fone telefone to find Cliente
      * @return Cliente Self filled instance or empty when not found
@@ -1079,7 +1176,7 @@ class Cliente extends \MZ\Database\Helper
     public function loadByFone($fone)
     {
         return $this->load([
-            'fone1' => strval($fone),
+            'fone' => strval($fone),
         ]);
     }
 
@@ -1189,6 +1286,20 @@ class Cliente extends \MZ\Database\Helper
         return $allowed;
     }
 
+    public static function buildFoneSearch($fone)
+    {
+        $fone = Filter::digits($fone);
+        $ddd = substr($fone, 0, 2).'%';
+        if (strlen($fone) == 10) {
+            $fone = $ddd . substr($fone, 2, 8);
+        } elseif (strlen($fone) <= 9) {
+            $fone = '%' . $fone;
+        } else {
+            $fone = $ddd . substr($fone, 3);
+        }
+        return $fone;
+    }
+
     /**
      * Filter order array
      * @param  mixed $order order string or array to parse and filter allowed
@@ -1215,6 +1326,14 @@ class Cliente extends \MZ\Database\Helper
             $allowed[$field] = true;
             unset($condition['search']);
         }
+        if (isset($condition['fone'])) {
+            $fone = $condition['fone'];
+            $fone = self::buildFoneSearch($fone);
+            $field = '(c.fone1 LIKE ? OR c.fone2 LIKE ?)';
+            $condition[$field] = [$fone, $fone];
+            $allowed[$field] = true;
+            unset($condition['fone']);
+        }
         return Filter::keys($condition, $allowed, 'c.');
     }
 
@@ -1226,11 +1345,44 @@ class Cliente extends \MZ\Database\Helper
      */
     private static function query($condition = [], $order = [])
     {
-        $query = self::getDB()->from('Clientes c');
+        $query = self::getDB()->from('Clientes c')
+            ->select(null)
+            ->select('c.id')
+            ->select('c.tipo')
+            ->select('c.acionistaid')
+            ->select('c.login')
+            ->select('c.senha')
+            ->select('c.nome')
+            ->select('c.sobrenome')
+            ->select('c.genero')
+            ->select('c.cpf')
+            ->select('c.rg')
+            ->select('c.im')
+            ->select('c.email')
+            ->select('c.dataaniversario')
+            ->select('c.fone1')
+            ->select('c.fone2')
+            ->select('c.slogan')
+            ->select('c.secreto')
+            ->select('c.limitecompra')
+            ->select('c.facebookurl')
+            ->select('c.twitterurl')
+            ->select('c.linkedinurl')
+            ->select(
+                '(CASE WHEN c.imagem IS NULL THEN NULL ELSE '.
+                self::concat(['c.id', '".png"']).
+                ' END) as imagem'
+            )
+            ->select('c.dataatualizacao')
+            ->select('c.datacadastro');
+        if (isset($condition['fone'])) {
+            $fone = $condition['fone'];
+            $fone = self::buildFoneSearch($fone);
+            $query = $query->orderBy('IF(c.fone1 LIKE ?, 0, 1)', $fone);
+        }
         $condition = self::filterCondition($condition);
         $query = self::buildOrderBy($query, self::filterOrder($order));
-        $query = $query->orderBy('c.nome ASC');
-        $query = $query->orderBy('c.id ASC');
+        $query = $query->orderBy('c.id DESC');
         return self::buildCondition($query, $condition);
     }
 
@@ -1267,7 +1419,7 @@ class Cliente extends \MZ\Database\Helper
     public static function findByFone($fone)
     {
         return self::find([
-            'fone1' => strval($fone),
+            'fone' => strval($fone),
         ]);
     }
 
@@ -1317,6 +1469,35 @@ class Cliente extends \MZ\Database\Helper
         return self::find([
             'secreto' => strval($secreto),
         ]);
+    }
+
+    /**
+     * Find this object on database using login and password
+     * @param  string $login email, CPF, CNPJ, phone or username to find Cliente
+     * @param  string $senha password to check
+     * @return Cliente A filled instance or empty when not found
+     */
+    public static function findByLoginSenha($login, $senha)
+    {
+        if (strpos($login, '@') !== false) {
+            $field = 'email';
+        } elseif (Validator::checkCPF($login) || Validator::checkCNPJ($login)) {
+            $field = 'cpf';
+        } elseif (Validator::checkPhone($login)) {
+            $field = 'fone1';
+        } else {
+            $field = 'login';
+        }
+        $cliente = self::find([
+            $field => strval($login),
+        ]);
+        $hash = $cliente->getSenha();
+        $cliente->setSenha($senha);
+        $cliente->gerarSenha();
+        if ($hash == $cliente->getSenha() && strval($login) != '') {
+            return $cliente;
+        }
+        return new Cliente();
     }
 
     /**

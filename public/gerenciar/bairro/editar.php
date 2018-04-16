@@ -22,9 +22,10 @@
 require_once(dirname(__DIR__) . '/app.php');
 
 use MZ\Location\Bairro;
+use MZ\System\Permissao;
 
-need_permission(\Permissao::NOME_CADASTROBAIRROS, is_output('json'));
-$id = isset($_GET['id'])?$_GET['id']:null;
+need_permission(Permissao::NOME_CADASTROBAIRROS, is_output('json'));
+$id = isset($_GET['id']) ? $_GET['id'] : null;
 $bairro = Bairro::findByID($id);
 if (!$bairro->exists()) {
     $msg = 'Não existe Bairro com o ID informado!';
@@ -80,4 +81,4 @@ if ($estado->exists()) {
     $pais = new \MZ\Location\Pais();
 }
 $_estados = \MZ\Location\Estado::findAll(['paisid' => $pais->getID()]);
-include template('gerenciar_bairro_editar');
+$app->getResponse('html')->output('gerenciar_bairro_editar');

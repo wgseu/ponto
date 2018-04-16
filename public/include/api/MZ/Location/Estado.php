@@ -20,7 +20,7 @@
  * O Cliente adquire apenas o direito de usar o software e não adquire qualquer outros
  * direitos, expressos ou implícitos no GrandChef diferentes dos especificados nesta Licença.
  *
- * @author  Francimar Alves <mazinsw@gmail.com>
+ * @author Equipe GrandChef <desenvolvimento@mzsw.com.br>
  */
 namespace MZ\Location;
 
@@ -249,15 +249,7 @@ class Estado extends \MZ\Database\Helper
      */
     protected function translate($e)
     {
-        if (stripos($e->getMessage(), 'PRIMARY') !== false) {
-            return new \MZ\Exception\ValidationException([
-                'id' => vsprintf(
-                    'O id "%s" já está cadastrado',
-                    [$this->getID()]
-                ),
-            ]);
-        }
-        if (stripos($e->getMessage(), 'PaisID_Nome_UNIQUE') !== false) {
+        if (contains(['PaisID', 'Nome', 'UNIQUE'], $e->getMessage())) {
             return new \MZ\Exception\ValidationException([
                 'paisid' => vsprintf(
                     'O país "%s" já está cadastrado',
@@ -269,7 +261,7 @@ class Estado extends \MZ\Database\Helper
                 ),
             ]);
         }
-        if (stripos($e->getMessage(), 'PaisID_UF_UNIQUE') !== false) {
+        if (contains(['PaisID', 'UF', 'UNIQUE'], $e->getMessage())) {
             return new \MZ\Exception\ValidationException([
                 'paisid' => vsprintf(
                     'O país "%s" já está cadastrado',
@@ -440,39 +432,28 @@ class Estado extends \MZ\Database\Helper
 
     /**
      * Update Estado with instance values into database for ID
+     * @param  array $only Save these fields only, when empty save all fields except id
+     * @param  boolean $except When true, saves all fields except $only
      * @return Estado Self instance
      */
-    public function update()
+    public function update($only = [], $except = false)
     {
         $values = $this->validate();
         if (!$this->exists()) {
             throw new \Exception('O identificador do estado não foi informado');
         }
-        unset($values['id']);
+        $values = self::filterValues($values, $only, $except);
         try {
             self::getDB()
                 ->update('Estados')
                 ->set($values)
                 ->where('id', $this->getID())
                 ->execute();
-            $estado = self::findByID($this->getID());
-            $this->fromArray($estado->toArray());
+            $this->loadByID($this->getID());
         } catch (\Exception $e) {
             throw $this->translate($e);
         }
         return $this;
-    }
-
-    /**
-     * Save the Estado into the database
-     * @return Estado Self instance
-     */
-    public function save()
-    {
-        if ($this->exists()) {
-            return $this->update();
-        }
-        return $this->insert();
     }
 
     /**
@@ -489,6 +470,47 @@ class Estado extends \MZ\Database\Helper
             ->where('id', $this->getID())
             ->execute();
         return $result;
+    }
+
+    /**
+     * Load one register for it self with a condition
+     * @param  array $condition Condition for searching the row
+     * @param  array $order associative field name -> [-1, 1]
+     * @return Estado Self instance filled or empty
+     */
+    public function load($condition, $order = [])
+    {
+        $query = self::query($condition, $order)->limit(1);
+        $row = $query->fetch() ?: [];
+        return $this->fromArray($row);
+    }
+
+    /**
+     * Load into this object from database using, PaisID, Nome
+     * @param  int $pais_id país to find Estado
+     * @param  string $nome nome to find Estado
+     * @return Estado Self filled instance or empty when not found
+     */
+    public function loadByPaisIDNome($pais_id, $nome)
+    {
+        return $this->load([
+            'paisid' => intval($pais_id),
+            'nome' => strval($nome),
+        ]);
+    }
+
+    /**
+     * Load into this object from database using, PaisID, UF
+     * @param  int $pais_id país to find Estado
+     * @param  string $uf uf to find Estado
+     * @return Estado Self filled instance or empty when not found
+     */
+    public function loadByPaisIDUF($pais_id, $uf)
+    {
+        return $this->load([
+            'paisid' => intval($pais_id),
+            'uf' => strval($uf),
+        ]);
     }
 
     /**

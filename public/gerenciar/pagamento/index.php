@@ -1,64 +1,56 @@
 <?php
 /*
-	Copyright 2016 da MZ Software - MZ Desenvolvimento de Sistemas LTDA
-	Este arquivo é parte do programa GrandChef - Sistema para Gerenciamento de Churrascarias, Bares e Restaurantes.
-	O GrandChef é um software proprietário; você não pode redistribuí-lo e/ou modificá-lo.
-	DISPOSIÇÕES GERAIS
-	O cliente não deverá remover qualquer identificação do produto, avisos de direitos autorais,
-	ou outros avisos ou restrições de propriedade do GrandChef.
+    Copyright 2016 da MZ Software - MZ Desenvolvimento de Sistemas LTDA
+    Este arquivo é parte do programa GrandChef - Sistema para Gerenciamento de Churrascarias, Bares e Restaurantes.
+    O GrandChef é um software proprietário; você não pode redistribuí-lo e/ou modificá-lo.
+    DISPOSIÇÕES GERAIS
+    O cliente não deverá remover qualquer identificação do produto, avisos de direitos autorais,
+    ou outros avisos ou restrições de propriedade do GrandChef.
 
-	O cliente não deverá causar ou permitir a engenharia reversa, desmontagem,
-	ou descompilação do GrandChef.
+    O cliente não deverá causar ou permitir a engenharia reversa, desmontagem,
+    ou descompilação do GrandChef.
 
-	PROPRIEDADE DOS DIREITOS AUTORAIS DO PROGRAMA
+    PROPRIEDADE DOS DIREITOS AUTORAIS DO PROGRAMA
 
-	GrandChef é a especialidade do desenvolvedor e seus
-	licenciadores e é protegido por direitos autorais, segredos comerciais e outros direitos
-	de leis de propriedade.
+    GrandChef é a especialidade do desenvolvedor e seus
+    licenciadores e é protegido por direitos autorais, segredos comerciais e outros direitos
+    de leis de propriedade.
 
-	O Cliente adquire apenas o direito de usar o software e não adquire qualquer outros
-	direitos, expressos ou implícitos no GrandChef diferentes dos especificados nesta Licença.
+    O Cliente adquire apenas o direito de usar o software e não adquire qualquer outros
+    direitos, expressos ou implícitos no GrandChef diferentes dos especificados nesta Licença.
 */
 require_once(dirname(__DIR__) . '/app.php');
 
+use MZ\Payment\Pagamento;
+use MZ\System\Permissao;
+use MZ\Util\Filter;
 use MZ\Wallet\Carteira;
+use MZ\Payment\Cartao;
+use MZ\Payment\FormaPagto;
 
-need_permission(Permissao::NOME_PAGAMENTO);
+need_permission(Permissao::NOME_PAGAMENTO, is_output('json'));
 
-$data_inicio = date_create_from_format('d/m/Y', $_GET['inicio']);
-$data_inicio = $data_inicio===false?null:$data_inicio->getTimestamp();
-$data_fim = date_create_from_format('d/m/Y', $_GET['fim']);
-$data_fim = $data_fim===false?null:$data_fim->getTimestamp();
-$count = Pagamento::getCount(
-    $_GET['query'],
-    $_GET['formapagtoid'],
-    $_GET['cartaoid'],
-    $_GET['funcionarioid'],
-    $_GET['carteiraid'],
-    $_GET['estado'],
-    $data_inicio,
-    $data_fim
-);
-list($pagesize, $offset, $pagestring) = pagestring($count, 10);
-$pagamentos = Pagamento::getTodos(
-    $_GET['query'],
-    $_GET['formapagtoid'],
-    $_GET['cartaoid'],
-    $_GET['funcionarioid'],
-    $_GET['carteiraid'],
-    $_GET['estado'],
-    $data_inicio,
-    $data_fim,
-    $offset,
-    $pagesize
-);
+$limite = isset($_GET['limite']) ? intval($_GET['limite']) : 10;
+if ($limite > 100 || $limite < 1) {
+    $limite = 10;
+}
+$condition = Filter::query($_GET);
+unset($condition['ordem']);
+$pagamento = new Pagamento($condition);
+$order = Filter::order(isset($_GET['ordem']) ? $_GET['ordem'] : '');
+$count = Pagamento::count($condition);
+list($pagesize, $offset, $pagestring) = pagestring($count, $limite);
+$pagamentos = Pagamento::findAll($condition, $order, $pagesize, $offset);
 
-$_tipo_names = [
-    'Mesa' => 'Mesa',
-    'Comanda' => 'Comanda',
-    'Avulso' => 'Balcão',
-    'Entrega' => 'Entrega',
-];
+if (is_output('json')) {
+    $items = [];
+    foreach ($pagamentos as $_pagamento) {
+        $items[] = $_pagamento->publish();
+    }
+    json(['status' => 'ok', 'items' => $items]);
+}
+
+$_tipo_names = Pedido::getTipoOptions();
 $_estado_names = [
     'Valido' => 'Válido',
     'Ativo' => 'Ativo',
@@ -90,5 +82,5 @@ $_carteira_names = [];
 foreach ($carteiras as $carteira) {
     $_carteira_names[$carteira->getID()] = $carteira->getDescricao();
 }
-$_funcionario = Funcionario::findByID($_GET['funcionarioid']);
-include template('gerenciar_pagamento_index');
+$_funcionario = $pagamento->findFuncionarioID();
+$app->getResponse('html')->output('gerenciar_pagamento_index');

@@ -20,7 +20,7 @@
  * O Cliente adquire apenas o direito de usar o software e não adquire qualquer outros
  * direitos, expressos ou implícitos no GrandChef diferentes dos especificados nesta Licença.
  *
- * @author  Francimar Alves <mazinsw@gmail.com>
+ * @author Equipe GrandChef <desenvolvimento@mzsw.com.br>
  */
 namespace MZ\Location;
 
@@ -296,15 +296,7 @@ class Bairro extends \MZ\Database\Helper
      */
     protected function translate($e)
     {
-        if (stripos($e->getMessage(), 'PRIMARY') !== false) {
-            return new \MZ\Exception\ValidationException([
-                'id' => vsprintf(
-                    'O ID "%s" já está cadastrado',
-                    [$this->getID()]
-                ),
-            ]);
-        }
-        if (stripos($e->getMessage(), 'CidadeID_Nome_UNIQUE') !== false) {
+        if (contains(['CidadeID', 'Nome', 'UNIQUE'], $e->getMessage())) {
             return new \MZ\Exception\ValidationException([
                 'cidadeid' => vsprintf(
                     'A cidade "%s" já está cadastrada',
@@ -360,8 +352,7 @@ class Bairro extends \MZ\Database\Helper
         if ($bairro->exists()) {
             return $bairro;
         }
-        global $login_funcionario;
-        if (!$login_funcionario->has(\Permissao::NOME_CADASTROBAIRROS)) {
+        if (!logged_employee()->has(\Permissao::NOME_CADASTROBAIRROS)) {
             throw new \Exception('O bairro não está cadastrada e você não tem permissão para cadastrar um');
         }
         $bairro->setCidadeID($cidade_id);
@@ -491,39 +482,28 @@ class Bairro extends \MZ\Database\Helper
 
     /**
      * Update Bairro with instance values into database for ID
+     * @param  array $only Save these fields only, when empty save all fields except id
+     * @param  boolean $except When true, saves all fields except $only
      * @return Bairro Self instance
      */
-    public function update()
+    public function update($only = [], $except = false)
     {
         $values = $this->validate();
         if (!$this->exists()) {
             throw new \Exception('O identificador do bairro não foi informado');
         }
-        unset($values['id']);
+        $values = self::filterValues($values, $only, $except);
         try {
             self::getDB()
                 ->update('Bairros')
                 ->set($values)
                 ->where('id', $this->getID())
                 ->execute();
-            $bairro = self::findByID($this->getID());
-            $this->fromArray($bairro->toArray());
+            $this->loadByID($this->getID());
         } catch (\Exception $e) {
             throw $this->translate($e);
         }
         return $this;
-    }
-
-    /**
-     * Save the Bairro into the database
-     * @return Bairro Self instance
-     */
-    public function save()
-    {
-        if ($this->exists()) {
-            return $this->update();
-        }
-        return $this->insert();
     }
 
     /**
@@ -540,6 +520,33 @@ class Bairro extends \MZ\Database\Helper
             ->where('id', $this->getID())
             ->execute();
         return $result;
+    }
+
+    /**
+     * Load one register for it self with a condition
+     * @param  array $condition Condition for searching the row
+     * @param  array $order associative field name -> [-1, 1]
+     * @return Bairro Self instance filled or empty
+     */
+    public function load($condition, $order = [])
+    {
+        $query = self::query($condition, $order)->limit(1);
+        $row = $query->fetch() ?: [];
+        return $this->fromArray($row);
+    }
+
+    /**
+     * Load into this object from database using, CidadeID, Nome
+     * @param  int $cidade_id cidade to find Bairro
+     * @param  string $nome nome to find Bairro
+     * @return Bairro Self filled instance or empty when not found
+     */
+    public function loadByCidadeIDNome($cidade_id, $nome)
+    {
+        return $this->load([
+            'cidadeid' => intval($cidade_id),
+            'nome' => strval($nome),
+        ]);
     }
 
     /**

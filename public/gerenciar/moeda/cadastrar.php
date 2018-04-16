@@ -22,9 +22,10 @@
 require_once(dirname(__DIR__) . '/app.php');
 
 use MZ\Wallet\Moeda;
+use MZ\System\Permissao;
 
-need_permission(\Permissao::NOME_CADASTROMOEDAS, is_output('json'));
-$id = isset($_GET['id'])?$_GET['id']:null;
+need_permission(Permissao::NOME_CADASTROMOEDAS, is_output('json'));
+$id = isset($_GET['id']) ? $_GET['id'] : null;
 $moeda = Moeda::findByID($id);
 $moeda->setID(null);
 
@@ -63,4 +64,4 @@ if (is_post()) {
 } elseif (is_output('json')) {
     json('Nenhum dado foi enviado');
 }
-include template('gerenciar_moeda_cadastrar');
+$app->getResponse('html')->output('gerenciar_moeda_cadastrar');

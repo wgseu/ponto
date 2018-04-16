@@ -1,7 +1,9 @@
 <?php
 require_once(dirname(__DIR__) . '/app.php');
 
-need_permission(Permissao::NOME_ALTERARCONFIGURACOES, is_output('json'));
+use MZ\System\Permissao;
+
+need_permission(Permissao::NOME_ALTERARCONFIGURACOES, true);
 
 if (!is_post()) {
     json('Nenhum dado foi enviado');
@@ -12,7 +14,7 @@ try {
     if (is_null($cert_file)) {
         throw new \Exception('O certificado não foi enviado', 404);
     }
-    $cert_path = WWW_ROOT . get_document_url($cert_file, 'cert');
+    $cert_path = $app->getPath('public') . get_document_url($cert_file, 'cert');
     $cert_store = file_get_contents($cert_path);
     unlink($cert_path);
     if ($cert_store === false) {
@@ -22,13 +24,13 @@ try {
         throw new \Exception('Senha incorreta', 1);
     }
     $certinfo = openssl_x509_parse($cert_info['cert']);
-    file_put_contents(WWW_ROOT . get_document_url('public.pem', 'cert'), $cert_info['cert']);
-    file_put_contents(WWW_ROOT . get_document_url('private.pem', 'cert'), $cert_info['pkey']);
+    file_put_contents($app->getPath('public') . get_document_url('public.pem', 'cert'), $cert_info['cert']);
+    file_put_contents($app->getPath('public') . get_document_url('private.pem', 'cert'), $cert_info['pkey']);
     json('chave', [
         'publica' => 'public.pem',
         'privada' => 'private.pem',
         'expiracao' => date('Y-m-d H:i:s', $certinfo['validTo_time_t']),
     ]);
-} catch (Exception $e) {
+} catch (\Exception $e) {
     json($e->getMessage());
 }

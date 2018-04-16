@@ -20,7 +20,7 @@
  * O Cliente adquire apenas o direito de usar o software e não adquire qualquer outros
  * direitos, expressos ou implícitos no GrandChef diferentes dos especificados nesta Licença.
  *
- * @author  Francimar Alves <mazinsw@gmail.com>
+ * @author Equipe GrandChef <desenvolvimento@mzsw.com.br>
  */
 namespace MZ\Util;
 
@@ -79,14 +79,15 @@ class Mask
      */
     public static function money($value, $format = false)
     {
-        global $__moeda__;
+        global $app;
 
         $value = round($value, 2);
         $sep = '.';
         $dec = ',';
         $number =  number_format($value, 2, $dec, $sep);
         if ($format) {
-            return vsprintf($__moeda__->getFormato(), [$number]);
+            $currency = $app->getSystem()->getCurrency();
+            return sprintf($currency->getFormato(), $number);
         }
         return $number;
     }

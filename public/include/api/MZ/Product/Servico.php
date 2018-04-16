@@ -20,7 +20,7 @@
  * O Cliente adquire apenas o direito de usar o software e não adquire qualquer outros
  * direitos, expressos ou implícitos no GrandChef diferentes dos especificados nesta Licença.
  *
- * @author  Francimar Alves <mazinsw@gmail.com>
+ * @author Equipe GrandChef <desenvolvimento@mzsw.com.br>
  */
 namespace MZ\Product;
 
@@ -32,6 +32,8 @@ use MZ\Util\Validator;
  */
 class Servico extends \MZ\Database\Helper
 {
+    const DESCONTO_ID = 1;
+    const ENTREGA_ID = 2;
 
     /**
      * Tipo de serviço, Evento: Eventos como show no estabelecimento
@@ -426,7 +428,7 @@ class Servico extends \MZ\Database\Helper
             $this->setIndividual($servico['individual']);
         }
         if (!isset($servico['ativo'])) {
-            $this->setAtivo(null);
+            $this->setAtivo('Y');
         } else {
             $this->setAtivo($servico['ativo']);
         }
@@ -479,37 +481,52 @@ class Servico extends \MZ\Database\Helper
         if (is_null($this->getDescricao())) {
             $errors['descricao'] = 'A descrição não pode ser vazia';
         }
-        if (is_null($this->getTipo())) {
-            $errors['tipo'] = 'O tipo não pode ser vazio';
+        if (!Validator::checkInSet($this->getTipo(), self::getTipoOptions())) {
+            $errors['tipo'] = 'O tipo é inválido ou vazio';
         }
-        if (!Validator::checkInSet($this->getTipo(), self::getTipoOptions(), true)) {
-            $errors['tipo'] = 'O tipo é inválido';
-        }
-        if (is_null($this->getObrigatorio())) {
-            $errors['obrigatorio'] = 'O obrigatório não pode ser vazio';
-        }
-        if (!Validator::checkBoolean($this->getObrigatorio(), true)) {
-            $errors['obrigatorio'] = 'O obrigatório é inválido';
+        if (!Validator::checkBoolean($this->getObrigatorio())) {
+            $errors['obrigatorio'] = 'O obrigatório é inválido ou vazio';
         }
         if (is_null($this->getValor())) {
             $errors['valor'] = 'O valor não pode ser vazio';
+        } elseif ($this->getValor() < 0) {
+            $errors['valor'] = 'O valor não pode ser negativo';
+        } elseif (is_equal($this->getValor(), 0)) {
+            $errors['valor'] = 'O valor não pode ser nulo';
         }
-        if (is_null($this->getIndividual())) {
-            $errors['individual'] = 'O individual não pode ser vazio';
+        if (!Validator::checkBoolean($this->getIndividual())) {
+            $errors['individual'] = 'O individual é inválido ou vazio';
         }
-        if (!Validator::checkBoolean($this->getIndividual(), true)) {
-            $errors['individual'] = 'O individual é inválido';
+        if (!Validator::checkBoolean($this->getAtivo())) {
+            $errors['ativo'] = 'O ativo é inválido ou vazio';
         }
-        if (is_null($this->getAtivo())) {
-            $errors['ativo'] = 'O ativo não pode ser vazio';
-        }
-        if (!Validator::checkBoolean($this->getAtivo(), true)) {
-            $errors['ativo'] = 'O ativo é inválido';
+        if ($this->getTipo() == self::TIPO_EVENTO) {
+            if (is_null($this->getDataInicio())) {
+                $errors['datainicio'] = 'A data de ínicio do evento é inválida';
+            }
+            if (is_null($this->getDataFim())) {
+                $errors['datafim'] = 'A data final do evento é inválida';
+            }
+        } else {
+            if (!is_null($this->getDataInicio())) {
+                $errors['datainicio'] = 'A data de ínicio não deveria ser informada';
+            }
+            if (!is_null($this->getDataFim())) {
+                $errors['datafim'] = 'A data final não deveria ser informada';
+            }
         }
         if (!empty($errors)) {
             throw new \MZ\Exception\ValidationException($errors);
         }
+        $this->checkAccess();
         return $this->toArray();
+    }
+
+    private function checkAccess()
+    {
+        if ($this->getID() >= self::DESCONTO_ID && $this->getID() <= self::ENTREGA_ID) {
+            throw new \Exception('Esse serviço é interno do sistema e não pode ser alterado');
+        }
     }
 
     /**
@@ -519,14 +536,6 @@ class Servico extends \MZ\Database\Helper
      */
     protected function translate($e)
     {
-        if (stripos($e->getMessage(), 'PRIMARY') !== false) {
-            return new \MZ\Exception\ValidationException([
-                'id' => sprintf(
-                    'O id "%s" já está cadastrado',
-                    $this->getID()
-                ),
-            ]);
-        }
         return parent::translate($e);
     }
 
@@ -550,23 +559,24 @@ class Servico extends \MZ\Database\Helper
 
     /**
      * Update Serviço with instance values into database for ID
+     * @param  array $only Save these fields only, when empty save all fields except id
+     * @param  boolean $except When true, saves all fields except $only
      * @return Servico Self instance
      */
-    public function update()
+    public function update($only = [], $except = false)
     {
         $values = $this->validate();
         if (!$this->exists()) {
             throw new \Exception('O identificador do serviço não foi informado');
         }
-        unset($values['id']);
+        $values = self::filterValues($values, $only, $except);
         try {
             self::getDB()
                 ->update('Servicos')
                 ->set($values)
                 ->where('id', $this->getID())
                 ->execute();
-            $servico = self::findByID($this->getID());
-            $this->fromArray($servico->toArray());
+            $this->loadByID($this->getID());
         } catch (\Exception $e) {
             throw $this->translate($e);
         }
@@ -582,6 +592,7 @@ class Servico extends \MZ\Database\Helper
         if (!$this->exists()) {
             throw new \Exception('O identificador do serviço não foi informado');
         }
+        $this->checkAccess();
         $result = self::getDB()
             ->deleteFrom('Servicos')
             ->where('id', $this->getID())
@@ -600,18 +611,6 @@ class Servico extends \MZ\Database\Helper
         $query = self::query($condition, $order)->limit(1);
         $row = $query->fetch() ?: [];
         return $this->fromArray($row);
-    }
-
-    /**
-     * Load into this object from database using, ID
-     * @param  int $id id to find Serviço
-     * @return Servico Self filled instance or empty when not found
-     */
-    public function loadByID($id)
-    {
-        return $this->load([
-            'id' => intval($id),
-        ]);
     }
 
     /**
@@ -663,8 +662,8 @@ class Servico extends \MZ\Database\Helper
         $allowed = self::getAllowedKeys();
         if (isset($condition['search'])) {
             $search = $condition['search'];
-            $field = 's.descricao LIKE ?';
-            $condition[$field] = '%'.$search.'%';
+            $field = '(s.nome LIKE ? OR s.descricao LIKE ? OR s.detalhes LIKE ?)';
+            $condition[$field] = ['%'.$search.'%', '%'.$search.'%', '%'.$search.'%'];
             $allowed[$field] = true;
             unset($condition['search']);
         }
@@ -682,7 +681,6 @@ class Servico extends \MZ\Database\Helper
         $query = self::getDB()->from('Servicos s');
         $condition = self::filterCondition($condition);
         $query = self::buildOrderBy($query, self::filterOrder($order));
-        $query = $query->orderBy('s.descricao ASC');
         $query = $query->orderBy('s.id ASC');
         return self::buildCondition($query, $condition);
     }

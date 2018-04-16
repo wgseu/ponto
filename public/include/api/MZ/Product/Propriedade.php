@@ -20,7 +20,7 @@
  * O Cliente adquire apenas o direito de usar o software e não adquire qualquer outros
  * direitos, expressos ou implícitos no GrandChef diferentes dos especificados nesta Licença.
  *
- * @author  Francimar Alves <mazinsw@gmail.com>
+ * @author Equipe GrandChef <desenvolvimento@mzsw.com.br>
  */
 namespace MZ\Product;
 
@@ -245,7 +245,7 @@ class Propriedade extends \MZ\Database\Helper
             $this->setImagem($propriedade['imagem']);
         }
         if (!isset($propriedade['dataatualizacao'])) {
-            $this->setDataAtualizacao(null);
+            $this->setDataAtualizacao(self::now());
         } else {
             $this->setDataAtualizacao($propriedade['dataatualizacao']);
         }
@@ -287,13 +287,18 @@ class Propriedade extends \MZ\Database\Helper
         $this->setGrupoID(Filter::number($this->getGrupoID()));
         $this->setNome(Filter::string($this->getNome()));
         $this->setAbreviacao(Filter::string($this->getAbreviacao()));
-        $imagem = upload_image('raw_imagem', 'propriedade');
+        $imagem = upload_image('raw_imagem', 'propriedade', null, 256, 256, true, 'crop');
         if (is_null($imagem) && trim($this->getImagem()) != '') {
-            $this->setImagem($original->getImagem());
+            $this->setImagem(true);
         } else {
             $this->setImagem($imagem);
+            $image_path = $app->getPath('public') . $this->makeImagem();
+            if (!is_null($imagem)) {
+                $this->setImagem(file_get_contents($image_path));
+                @unlink($image_path);
+            }
         }
-        $this->setDataAtualizacao(Filter::datetime($this->getDataAtualizacao()));
+        $this->setDataAtualizacao(self::now());
     }
 
     /**
@@ -302,9 +307,6 @@ class Propriedade extends \MZ\Database\Helper
      */
     public function clean($dependency)
     {
-        if (!is_null($this->getImagem()) && $dependency->getImagem() != $this->getImagem()) {
-            @unlink(get_image_path($this->getImagem(), 'propriedade'));
-        }
         $this->setImagem($dependency->getImagem());
     }
 
@@ -321,13 +323,15 @@ class Propriedade extends \MZ\Database\Helper
         if (is_null($this->getNome())) {
             $errors['nome'] = 'O nome não pode ser vazio';
         }
-        if (is_null($this->getDataAtualizacao())) {
-            $errors['dataatualizacao'] = 'A data de atualização não pode ser vazia';
-        }
+        $this->setDataAtualizacao(self::now());
         if (!empty($errors)) {
             throw new \MZ\Exception\ValidationException($errors);
         }
-        return $this->toArray();
+        $values = $this->toArray();
+        if ($this->getImagem() === true) {
+            unset($values['imagem']);
+        }
+        return $values;
     }
 
     /**
@@ -337,15 +341,7 @@ class Propriedade extends \MZ\Database\Helper
      */
     protected function translate($e)
     {
-        if (stripos($e->getMessage(), 'PRIMARY') !== false) {
-            return new \MZ\Exception\ValidationException([
-                'id' => sprintf(
-                    'O id "%s" já está cadastrado',
-                    $this->getID()
-                ),
-            ]);
-        }
-        if (stripos($e->getMessage(), 'GrupoID_Nome_UNIQUE') !== false) {
+        if (contains(['GrupoID', 'Nome', 'UNIQUE'], $e->getMessage())) {
             return new \MZ\Exception\ValidationException([
                 'grupoid' => sprintf(
                     'O grupo "%s" já está cadastrado',
@@ -380,23 +376,24 @@ class Propriedade extends \MZ\Database\Helper
 
     /**
      * Update Propriedade with instance values into database for ID
+     * @param  array $only Save these fields only, when empty save all fields except id
+     * @param  boolean $except When true, saves all fields except $only
      * @return Propriedade Self instance
      */
-    public function update()
+    public function update($only = [], $except = false)
     {
         $values = $this->validate();
         if (!$this->exists()) {
             throw new \Exception('O identificador da propriedade não foi informado');
         }
-        unset($values['id']);
+        $values = self::filterValues($values, $only, $except);
         try {
             self::getDB()
                 ->update('Propriedades')
                 ->set($values)
                 ->where('id', $this->getID())
                 ->execute();
-            $propriedade = self::findByID($this->getID());
-            $this->fromArray($propriedade->toArray());
+            $this->loadByID($this->getID());
         } catch (\Exception $e) {
             throw $this->translate($e);
         }
@@ -433,18 +430,6 @@ class Propriedade extends \MZ\Database\Helper
     }
 
     /**
-     * Load into this object from database using, ID
-     * @param  int $id id to find Propriedade
-     * @return Propriedade Self filled instance or empty when not found
-     */
-    public function loadByID($id)
-    {
-        return $this->load([
-            'id' => intval($id),
-        ]);
-    }
-
-    /**
      * Load into this object from database using, GrupoID, Nome
      * @param  int $grupo_id grupo to find Propriedade
      * @param  string $nome nome to find Propriedade
@@ -456,6 +441,20 @@ class Propriedade extends \MZ\Database\Helper
             'grupoid' => intval($grupo_id),
             'nome' => strval($nome),
         ]);
+    }
+
+    /**
+     * Load image data from blob field on database
+     * @return Produto Self instance with imagem field filled
+     */
+    public function loadImagem()
+    {
+        $data = self::getDB()->from('Propriedades p')
+            ->select(null)
+            ->select('p.imagem')
+            ->where('p.id', $this->getID());
+        $this->setImagem($data);
+        return $this;
     }
 
     /**
@@ -515,10 +514,20 @@ class Propriedade extends \MZ\Database\Helper
      */
     private static function query($condition = [], $order = [])
     {
-        $query = self::getDB()->from('Propriedades p');
+        $query = self::getDB()->from('Propriedades p')
+            ->select(null)
+            ->select('p.id')
+            ->select('p.grupoid')
+            ->select('p.nome')
+            ->select('p.abreviacao')
+            ->select(
+                '(CASE WHEN p.imagem IS NULL THEN NULL ELSE '.
+                self::concat(['p.id', '".png"']).
+                ' END) as imagem'
+            )
+            ->select('p.dataatualizacao');
         $condition = self::filterCondition($condition);
         $query = self::buildOrderBy($query, self::filterOrder($order));
-        $query = $query->orderBy('p.nome ASC');
         $query = $query->orderBy('p.id ASC');
         return self::buildCondition($query, $condition);
     }

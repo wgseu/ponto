@@ -20,7 +20,7 @@
  * O Cliente adquire apenas o direito de usar o software e não adquire qualquer outros
  * direitos, expressos ou implícitos no GrandChef diferentes dos especificados nesta Licença.
  *
- * @author  Francimar Alves <mazinsw@gmail.com>
+ * @author Equipe GrandChef <desenvolvimento@mzsw.com.br>
  */
 namespace MZ\Wallet;
 
@@ -352,14 +352,6 @@ class Moeda extends \MZ\Database\Helper
      */
     protected function translate($e)
     {
-        if (stripos($e->getMessage(), 'PRIMARY') !== false) {
-            return new \MZ\Exception\ValidationException([
-                'id' => vsprintf(
-                    'O ID "%s" já está cadastrado',
-                    [$this->getID()]
-                ),
-            ]);
-        }
         return parent::translate($e);
     }
 
@@ -480,39 +472,28 @@ class Moeda extends \MZ\Database\Helper
 
     /**
      * Update Moeda with instance values into database for ID
+     * @param  array $only Save these fields only, when empty save all fields except id
+     * @param  boolean $except When true, saves all fields except $only
      * @return Moeda Self instance
      */
-    public function update()
+    public function update($only = [], $except = false)
     {
         $values = $this->validate();
         if (!$this->exists()) {
             throw new \Exception('O identificador da moeda não foi informado');
         }
-        unset($values['id']);
+        $values = self::filterValues($values, $only, $except);
         try {
             self::getDB()
                 ->update('Moedas')
                 ->set($values)
                 ->where('id', $this->getID())
                 ->execute();
-            $moeda = self::findByID($this->getID());
-            $this->fromArray($moeda->toArray());
+            $this->loadByID($this->getID());
         } catch (\Exception $e) {
             throw $this->translate($e);
         }
         return $this;
-    }
-
-    /**
-     * Save the Moeda into the database
-     * @return Moeda Self instance
-     */
-    public function save()
-    {
-        if ($this->exists()) {
-            return $this->update();
-        }
-        return $this->insert();
     }
 
     /**
@@ -529,6 +510,19 @@ class Moeda extends \MZ\Database\Helper
             ->where('id', $this->getID())
             ->execute();
         return $result;
+    }
+
+    /**
+     * Load one register for it self with a condition
+     * @param  array $condition Condition for searching the row
+     * @param  array $order associative field name -> [-1, 1]
+     * @return Moeda Self instance filled or empty
+     */
+    public function load($condition, $order = [])
+    {
+        $query = self::query($condition, $order)->limit(1);
+        $row = $query->fetch() ?: [];
+        return $this->fromArray($row);
     }
 
     /**

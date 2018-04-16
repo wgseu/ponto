@@ -1,40 +1,51 @@
 <?php
-/*
-	Copyright 2014 da MZ Software - MZ Desenvolvimento de Sistemas LTDA
-	Este arquivo é parte do programa GrandChef - Sistema para Gerenciamento de Churrascarias, Bares e Restaurantes.
-	O GrandChef é um software proprietário; você não pode redistribuí-lo e/ou modificá-lo.
-	DISPOSIÇÕES GERAIS
-	O cliente não deverá remover qualquer identificação do produto, avisos de direitos autorais,
-	ou outros avisos ou restrições de propriedade do GrandChef.
-
-	O cliente não deverá causar ou permitir a engenharia reversa, desmontagem,
-	ou descompilação do GrandChef.
-
-	PROPRIEDADE DOS DIREITOS AUTORAIS DO PROGRAMA
-
-	GrandChef é a especialidade do desenvolvedor e seus
-	licenciadores e é protegido por direitos autorais, segredos comerciais e outros direitos
-	de leis de propriedade.
-
-	O Cliente adquire apenas o direito de usar o software e não adquire qualquer outros
-	direitos, expressos ou implícitos no GrandChef diferentes dos especificados nesta Licença.
-*/
+/**
+ * Copyright 2014 da MZ Software - MZ Desenvolvimento de Sistemas LTDA
+ *
+ * Este arquivo é parte do programa GrandChef - Sistema para Gerenciamento de Churrascarias, Bares e Restaurantes.
+ * O GrandChef é um software proprietário; você não pode redistribuí-lo e/ou modificá-lo.
+ * DISPOSIÇÕES GERAIS
+ * O cliente não deverá remover qualquer identificação do produto, avisos de direitos autorais,
+ * ou outros avisos ou restrições de propriedade do GrandChef.
+ *
+ * O cliente não deverá causar ou permitir a engenharia reversa, desmontagem,
+ * ou descompilação do GrandChef.
+ *
+ * PROPRIEDADE DOS DIREITOS AUTORAIS DO PROGRAMA
+ *
+ * GrandChef é a especialidade do desenvolvedor e seus
+ * licenciadores e é protegido por direitos autorais, segredos comerciais e outros direitos
+ * de leis de propriedade.
+ *
+ * O Cliente adquire apenas o direito de usar o software e não adquire qualquer outros
+ * direitos, expressos ou implícitos no GrandChef diferentes dos especificados nesta Licença.
+ *
+ * @author Equipe GrandChef <desenvolvimento@mzsw.com.br>
+ */
 require_once(dirname(dirname(__DIR__)) . '/app.php');
+
+use MZ\Account\Cliente;
+use MZ\Employee\Funcionario;
+use MZ\Device\Dispositivo;
+use MZ\System\Permissao;
+use MZ\Account\Authentication;
+use MZ\System\Sistema;
+use MZ\Employee\Acesso;
 
 if (!is_post()) {
     json('Método incorreto');
 }
-$usuario = strval($_POST['usuario']);
-$senha = strval($_POST['senha']);
-$lembrar = strval($_POST['lembrar']);
-$metodo = strval($_POST['metodo']);
-$token = strval($_POST['token']);
+$usuario = isset($_POST['usuario']) ? strval($_POST['usuario']) : null;
+$senha = isset($_POST['senha']) ? strval($_POST['senha']) : null;
+$lembrar = isset($_POST['lembrar']) ? strval($_POST['lembrar']) : null;
+$metodo = isset($_POST['metodo']) ? strval($_POST['metodo']) : null;
+$token = isset($_POST['token']) ? strval($_POST['token']) : null;
 if ($metodo == 'desktop') {
     $cliente = Cliente::findByToken($token);
 } else {
     $cliente = Cliente::findByLoginSenha($usuario, $senha);
 }
-if (is_null($cliente->getID())) {
+if (!$cliente->exists()) {
     if ($metodo == 'desktop') {
         $msg = 'Token inválido!';
     } else {
@@ -42,19 +53,21 @@ if (is_null($cliente->getID())) {
     }
     if ($weblogin) {
         \Thunder::error($msg);
-        exit(include template('conta_entrar'));
+        exit($app->getResponse('html')->output('conta_entrar'));
     } else {
         json($msg);
     }
 }
 $funcionario = Funcionario::findByClienteID($cliente->getID());
-if ((is_null($weblogin) || !$weblogin) && !is_null($funcionario->getID())) {
-    if (!Acesso::temPermissao($funcionario->getFuncaoID(), Permissao::NOME_SISTEMA)) {
+if ((is_null($weblogin) || !$weblogin) && $funcionario->exists()) {
+    if (!$funcionario->has(Permissao::NOME_SISTEMA)) {
         json('Você não tem permissão para acessar o sistema!');
     }
     try {
-        $dispositivo = register_device($_POST['device'], $_POST['serial']);
-    } catch (Exception $e) {
+        $device = isset($_POST['device']) ? $_POST['device'] : null;
+        $serial = isset($_POST['serial']) ? $_POST['serial'] : null;
+        $dispositivo = register_device($device, $serial);
+    } catch (\Exception $e) {
         json($e->getMessage());
     }
 } else {
@@ -62,32 +75,28 @@ if ((is_null($weblogin) || !$weblogin) && !is_null($funcionario->getID())) {
 }
 
 if (is_login()) {
-    Authentication::logout();
+    $app->getAuthentication()->logout();
 }
-$login_cliente = $cliente;
-$login_cliente_id = $cliente->getID();
-$login_funcionario = $funcionario;
-$login_funcionario_id = $funcionario->getID();
-Authentication::login($cliente->getID());
+$app->getAuthentication()->login($cliente);
 if ($lembrar == 'true') {
-    Authentication::lembrar($login_cliente);
+    $app->getAuthentication()->remember();
 }
 if ($weblogin) {
-    $url = is_null($_POST['redirect'])?'/':strval($_POST['redirect']);
+    $url = isset($_POST['redirect']) ? strval($_POST['redirect']) : '/';
     redirect($url);
 }
 $status = ['status' => 'ok', 'msg' => 'Login efetuado com sucesso!'];
 $status['versao'] = Sistema::VERSAO;
-$status['cliente'] = $login_cliente->getID();
+$status['cliente'] = logged_user()->getID();
 $status['info'] = [
     'usuario' => [
-        'nome' => $login_cliente->getNome(),
-        'email' => $login_cliente->getEmail(),
-        'login' => $login_cliente->getLogin(),
-        'imagemurl' => get_image_url($login_cliente->getImagem(), 'cliente', null)
+        'nome' => logged_user()->getNome(),
+        'email' => logged_user()->getEmail(),
+        'login' => logged_user()->getLogin(),
+        'imagemurl' => get_image_url(logged_user()->getImagem(), 'cliente', null)
     ]
 ];
-$status['funcionario'] = intval($login_funcionario->getID());
+$status['funcionario'] = intval(logged_employee()->getID());
 $status['validacao'] = $dispositivo->getValidacao();
 $status['autologout'] = is_boolean_config('Sistema', 'Tablet.Logout');
 if (is_manager()) {
@@ -97,5 +106,5 @@ if (is_manager()) {
 } else {
     $status['acesso'] = 'visitante';
 }
-$status['permissoes'] = Acesso::getPermissoes($login_funcionario->getID());
+$status['permissoes'] = $app->getAuthentication()->getPermissions();
 json($status);

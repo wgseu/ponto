@@ -20,7 +20,7 @@
  * O Cliente adquire apenas o direito de usar o software e não adquire qualquer outros
  * direitos, expressos ou implícitos no GrandChef diferentes dos especificados nesta Licença.
  *
- * @author  Francimar Alves <mazinsw@gmail.com>
+ * @author Equipe GrandChef <desenvolvimento@mzsw.com.br>
  */
 namespace MZ\Product;
 
@@ -32,6 +32,7 @@ use MZ\Util\Validator;
  */
 class Unidade extends \MZ\Database\Helper
 {
+    const SIGLA_UNITARIA = 'UN';
 
     /**
      * Identificador da unidade
@@ -200,6 +201,62 @@ class Unidade extends \MZ\Database\Helper
         return $unidade;
     }
 
+    private function processaUnidade($quantidade, $conteudo)
+    {
+        $unidade = $this->getSigla();
+        $grandezas = [
+            -24 => 'y',
+            -21 => 'z',
+            -18 => 'a',
+            -15 => 'f',
+            -12 => 'p',
+            -9  => 'n',
+            -6  => 'µ',
+            -3  => 'm',
+            -2  => 'c',
+            -1  => 'd',
+             0  => '',
+             1  => 'da',
+             2  => 'h',
+             3  => 'k',
+             6  => 'M',
+             9  => 'G',
+             12 => 'T',
+             15 => 'P',
+             18 => 'E',
+             21 => 'Z',
+             24 => 'Y'
+        ];
+        $index = intval(log10($conteudo));
+        $remain = $conteudo / pow(10, $index);
+        if (!array_key_exists($index, $grandezas)) {
+            throw new \Exception('Não existe grandeza para o conteudo '.$conteudo.' da unidade '.$unidade, 404);
+        }
+        $unidade = $grandezas[$index].$unidade;
+        return [
+            'unidade' => $unidade,
+            'quantidade' => $quantidade * $remain
+        ];
+    }
+
+    public function processaSigla($quantidade, $conteudo)
+    {
+        $data = $this->processaUnidade($quantidade, $conteudo);
+        return $data['unidade'];
+    }
+
+    public function processaQuantidade($quantidade, $conteudo)
+    {
+        $data = $this->processaUnidade($quantidade, $conteudo);
+        return $data['quantidade'];
+    }
+
+    public function formatar($quantidade, $conteudo)
+    {
+        $data = $this->processaUnidade($quantidade, $conteudo);
+        return strval($data['quantidade']) . ' ' . $data['unidade'];
+    }
+
     /**
      * Filter fields, upload data and keep key data
      * @param Unidade $original Original instance without modifications
@@ -246,15 +303,7 @@ class Unidade extends \MZ\Database\Helper
      */
     protected function translate($e)
     {
-        if (stripos($e->getMessage(), 'PRIMARY') !== false) {
-            return new \MZ\Exception\ValidationException([
-                'id' => sprintf(
-                    'O id "%s" já está cadastrado',
-                    $this->getID()
-                ),
-            ]);
-        }
-        if (stripos($e->getMessage(), 'Sigla_UNIQUE') !== false) {
+        if (contains(['Sigla', 'UNIQUE'], $e->getMessage())) {
             return new \MZ\Exception\ValidationException([
                 'sigla' => sprintf(
                     'A sigla "%s" já está cadastrada',
@@ -285,23 +334,24 @@ class Unidade extends \MZ\Database\Helper
 
     /**
      * Update Unidade with instance values into database for ID
+     * @param  array $only Save these fields only, when empty save all fields except id
+     * @param  boolean $except When true, saves all fields except $only
      * @return Unidade Self instance
      */
-    public function update()
+    public function update($only = [], $except = false)
     {
         $values = $this->validate();
         if (!$this->exists()) {
             throw new \Exception('O identificador da unidade não foi informado');
         }
-        unset($values['id']);
+        $values = self::filterValues($values, $only, $except);
         try {
             self::getDB()
                 ->update('Unidades')
                 ->set($values)
                 ->where('id', $this->getID())
                 ->execute();
-            $unidade = self::findByID($this->getID());
-            $this->fromArray($unidade->toArray());
+            $this->loadByID($this->getID());
         } catch (\Exception $e) {
             throw $this->translate($e);
         }
@@ -335,18 +385,6 @@ class Unidade extends \MZ\Database\Helper
         $query = self::query($condition, $order)->limit(1);
         $row = $query->fetch() ?: [];
         return $this->fromArray($row);
-    }
-
-    /**
-     * Load into this object from database using, ID
-     * @param  int $id id to find Unidade
-     * @return Unidade Self filled instance or empty when not found
-     */
-    public function loadByID($id)
-    {
-        return $this->load([
-            'id' => intval($id),
-        ]);
     }
 
     /**
@@ -393,8 +431,8 @@ class Unidade extends \MZ\Database\Helper
         $allowed = self::getAllowedKeys();
         if (isset($condition['search'])) {
             $search = $condition['search'];
-            $field = 'u.nome LIKE ?';
-            $condition[$field] = '%'.$search.'%';
+            $field = '(u.nome LIKE ? OR u.descricao LIKE ?)';
+            $condition[$field] = ['%'.$search.'%', '%'.$search.'%'];
             $allowed[$field] = true;
             unset($condition['search']);
         }

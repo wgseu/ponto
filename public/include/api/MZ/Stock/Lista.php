@@ -20,7 +20,7 @@
  * O Cliente adquire apenas o direito de usar o software e não adquire qualquer outros
  * direitos, expressos ou implícitos no GrandChef diferentes dos especificados nesta Licença.
  *
- * @author  Francimar Alves <mazinsw@gmail.com>
+ * @author Equipe GrandChef <desenvolvimento@mzsw.com.br>
  */
 namespace MZ\Stock;
 
@@ -332,14 +332,6 @@ class Lista extends \MZ\Database\Helper
      */
     protected function translate($e)
     {
-        if (stripos($e->getMessage(), 'PRIMARY') !== false) {
-            return new \MZ\Exception\ValidationException([
-                'id' => sprintf(
-                    'O id "%s" já está cadastrado',
-                    $this->getID()
-                ),
-            ]);
-        }
         return parent::translate($e);
     }
 
@@ -365,21 +357,20 @@ class Lista extends \MZ\Database\Helper
      * Update Lista de compra with instance values into database for ID
      * @return Lista Self instance
      */
-    public function update()
+    public function update($only = [], $except = false)
     {
         $values = $this->validate();
         if (!$this->exists()) {
             throw new \Exception('O identificador da lista de compra não foi informado');
         }
-        unset($values['id']);
+        $values = self::filterValues($values, $only, $except);
         try {
             self::getDB()
                 ->update('Listas')
                 ->set($values)
                 ->where('id', $this->getID())
                 ->execute();
-            $lista = self::findByID($this->getID());
-            $this->fromArray($lista->toArray());
+            $this->loadByID($this->getID());
         } catch (\Exception $e) {
             throw $this->translate($e);
         }
@@ -413,18 +404,6 @@ class Lista extends \MZ\Database\Helper
         $query = self::query($condition, $order)->limit(1);
         $row = $query->fetch() ?: [];
         return $this->fromArray($row);
-    }
-
-    /**
-     * Load into this object from database using, ID
-     * @param  int $id id to find Lista de compra
-     * @return Lista Self filled instance or empty when not found
-     */
-    public function loadByID($id)
-    {
-        return $this->load([
-            'id' => intval($id),
-        ]);
     }
 
     /**

@@ -20,7 +20,7 @@
  * O Cliente adquire apenas o direito de usar o software e não adquire qualquer outros
  * direitos, expressos ou implícitos no GrandChef diferentes dos especificados nesta Licença.
  *
- * @author  Francimar Alves <mazinsw@gmail.com>
+ * @author Equipe GrandChef <desenvolvimento@mzsw.com.br>
  */
 namespace MZ\System;
 
@@ -33,6 +33,9 @@ use MZ\Util\Validator;
  */
 class Pagina extends \MZ\Database\Helper
 {
+    const NOME_SOBRE = 'sobre';
+    const NOME_PRIVACIDADE = 'privacidade';
+    const NOME_TERMOS = 'termos';
 
     /**
      * Identificador da página
@@ -228,11 +231,11 @@ class Pagina extends \MZ\Database\Helper
     public function validate()
     {
         $errors = [];
-        if (is_null($this->getNome())) {
-            $errors['nome'] = 'O nome não pode ser vazio';
+        if (!Validator::checkInSet($this->getNome(), self::getNomeOptions())) {
+            $errors['nome'] = 'A página não foi informada ou não existe no site';
         }
-        if (is_null($this->getLinguagemID())) {
-            $errors['linguagemid'] = 'A linguagem não pode ser vazia';
+        if (!Validator::checkInSet($this->getLinguagemID(), get_languages_info())) {
+            $errors['linguagemid'] = 'A linguagem não foi informada ou ainda não é suportada';
         }
         if (!empty($errors)) {
             throw new \MZ\Exception\ValidationException($errors);
@@ -247,15 +250,7 @@ class Pagina extends \MZ\Database\Helper
      */
     protected function translate($e)
     {
-        if (stripos($e->getMessage(), 'PRIMARY') !== false) {
-            return new \MZ\Exception\ValidationException([
-                'id' => sprintf(
-                    'O id "%s" já está cadastrado',
-                    $this->getID()
-                ),
-            ]);
-        }
-        if (stripos($e->getMessage(), 'Nome_LinguagemID_UNIQUE') !== false) {
+        if (contains(['Nome', 'LinguagemID', 'UNIQUE'], $e->getMessage())) {
             return new \MZ\Exception\ValidationException([
                 'nome' => sprintf(
                     'O nome "%s" já está cadastrado',
@@ -290,23 +285,24 @@ class Pagina extends \MZ\Database\Helper
 
     /**
      * Update Página with instance values into database for ID
+     * @param  array $only Save these fields only, when empty save all fields except id
+     * @param  boolean $except When true, saves all fields except $only
      * @return Pagina Self instance
      */
-    public function update()
+    public function update($only = [], $except = false)
     {
         $values = $this->validate();
         if (!$this->exists()) {
             throw new \Exception('O identificador da página não foi informado');
         }
-        unset($values['id']);
+        $values = self::filterValues($values, $only, $except);
         try {
             self::getDB()
                 ->update('Paginas')
                 ->set($values)
                 ->where('id', $this->getID())
                 ->execute();
-            $pagina = self::findByID($this->getID());
-            $this->fromArray($pagina->toArray());
+            $this->loadByID($this->getID());
         } catch (\Exception $e) {
             throw $this->translate($e);
         }
@@ -343,18 +339,6 @@ class Pagina extends \MZ\Database\Helper
     }
 
     /**
-     * Load into this object from database using, ID
-     * @param  int $id id to find Página
-     * @return Pagina Self filled instance or empty when not found
-     */
-    public function loadByID($id)
-    {
-        return $this->load([
-            'id' => intval($id),
-        ]);
-    }
-
-    /**
      * Load into this object from database using, Nome, LinguagemID
      * @param  string $nome nome to find Página
      * @param  int $linguagem_id linguagem to find Página
@@ -366,6 +350,24 @@ class Pagina extends \MZ\Database\Helper
             'nome' => strval($nome),
             'linguagemid' => intval($linguagem_id),
         ]);
+    }
+
+    /**
+     * Gets textual and translated Nome for Pagina
+     * @param  int $index choose option from index
+     * @return mixed A associative key -> translated representative text or text for index
+     */
+    public static function getNomeOptions($index = null)
+    {
+        $options = [
+            self::NOME_SOBRE => 'Sobre a empresa',
+            self::NOME_PRIVACIDADE => 'Privacidade',
+            self::NOME_TERMOS => 'Termos de uso',
+        ];
+        if (!is_null($index)) {
+            return $options[$index];
+        }
+        return $options;
     }
 
     /**
@@ -461,6 +463,21 @@ class Pagina extends \MZ\Database\Helper
             'nome' => strval($nome),
             'linguagemid' => intval($linguagem_id),
         ]);
+    }
+
+
+    /**
+     * Find this object on database using, Nome and current LinguagemID
+     * @param  string $nome nome to find página
+     * @return Pagina A filled instance or empty when not found
+     */
+    public static function findByName($page_name)
+    {
+        $pagina = Pagina::findByNomeLinguagemID($page_name, current_language_id());
+        if (!$pagina->exists()) {
+            $pagina = Pagina::findByNomeLinguagemID($page_name, 1046);
+        }
+        return $pagina;
     }
 
     /**

@@ -1,14 +1,17 @@
 <?php
-
-$content = file_get_contents(dirname(dirname(dirname(__DIR__))) . '/.env');
-# remove comments
-$content = preg_replace('/[ \t]*#[^\n]*\n/', '', $content);
-$env  = parse_ini_string($content, true, INI_SCANNER_RAW);
+$env_file = '.env';
+$env_dir = dirname(dirname(dirname(__DIR__)));
+if (getenv('APP_ENV') == 'testing') {
+    $env_file .= '.testing';
+}
+$dotenv = new \Dotenv\Dotenv($env_dir, $env_file);
+$dotenv->load();
 
 $value = array (
-	'host' => $env['MYSQL_HOST'],
-	'port' => $env['MYSQL_PORT'],
-	'user' => $env['MYSQL_USER'],
-	'pass' => $env['MYSQL_PASSWORD'],
-	'name' => $env['MYSQL_DATABASE']
+    'driver' => getenv('DB_DRIVER'),
+    'host' => getenv('DB_HOST'),
+    'port' => getenv('DB_PORT'),
+    'user' => getenv('DB_USER'),
+    'pass' => getenv('DB_PASSWORD'),
+    'name' => getenv('DB_NAME')
 );

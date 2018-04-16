@@ -566,14 +566,14 @@ class ZConta
             }
         }
         if (!empty($erros)) {
-            throw new ValidationException($erros);
+            throw new \MZ\Exception\ValidationException($erros);
         }
     }
 
     private static function handleException(&$e)
     {
         if (stripos($e->getMessage(), 'PRIMARY') !== false) {
-            throw new ValidationException(['id' => 'O ID informado já está cadastrado']);
+            throw new \MZ\Exception\ValidationException(['id' => 'O ID informado já está cadastrado']);
         }
     }
 
@@ -583,7 +583,7 @@ class ZConta
         self::validarCampos($_conta);
         try {
             $_conta['id'] = \DB::$pdo->insertInto('Contas')->values($_conta)->execute();
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             self::handleException($e);
             throw $e;
         }
@@ -594,7 +594,7 @@ class ZConta
     {
         $_conta = $conta->toArray();
         if (!$_conta['id']) {
-            throw new ValidationException(['id' => 'O id da conta não foi informado']);
+            throw new \MZ\Exception\ValidationException(['id' => 'O id da conta não foi informado']);
         }
         if ($_conta['id'] == 1) {
             throw new \Exception('Não é possível atualizar essa conta, a conta informada é utilizada internamente pelo sistema');
@@ -624,7 +624,7 @@ class ZConta
             $query = $query->set(array_intersect_key($_conta, array_flip($campos)));
             $query = $query->where('id', $_conta['id']);
             $query->execute();
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             self::handleException($e);
             throw $e;
         }

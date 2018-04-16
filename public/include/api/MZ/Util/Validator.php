@@ -20,7 +20,7 @@
  * O Cliente adquire apenas o direito de usar o software e não adquire qualquer outros
  * direitos, expressos ou implícitos no GrandChef diferentes dos especificados nesta Licença.
  *
- * @author  Francimar Alves <mazinsw@gmail.com>
+ * @author Equipe GrandChef <desenvolvimento@mzsw.com.br>
  */
 namespace MZ\Util;
 
@@ -72,8 +72,8 @@ class Validator
         $mask = _p('Mascara', 'Telefone');
         $phone = Filter::unmask($phone, $mask);
         $mask_len = strlen(Filter::digits($mask));
-        global $__pais__;
-        if ($__pais__->getSigla() != 'BRA') {
+        global $app;
+        if ($app->getSystem()->getCountry()->getSigla() != 'BRA') {
             return strlen($phone) == $mask_len;
         }
         // Somente Brasil (Nono dígito)
@@ -98,8 +98,8 @@ class Validator
         if (strlen($cpf) != $mask_len) {
             return false;
         }
-        global $__pais__;
-        if ($__pais__->getSigla() != 'BRA') {
+        global $app;
+        if ($app->getSystem()->getCountry()->getSigla() != 'BRA') {
             return true;
         }
         // Somente Brasil
@@ -139,8 +139,8 @@ class Validator
         if (strlen($cnpj) != $mask_len) {
             return false;
         }
-        global $__pais__;
-        if ($__pais__->getSigla() != 'BRA') {
+        global $app;
+        if ($app->getSystem()->getCountry()->getSigla() != 'BRA') {
             return true;
         }
         // Somente Brasil
@@ -179,17 +179,8 @@ class Validator
         if (is_null($password) && $empty) {
             return true;
         }
-        if (strlen($password) < 8) {
+        if (strlen($password) < 4) {
             return false; // Password too short
-        }
-        if (!preg_match("#[0-9]+#", $password)) {
-            return false; // Password must include at least one number
-        }
-        if (!preg_match("#[A-Z]+#", $password)) {
-            return false; // Password must include at least one CAPS
-        }
-        if (!preg_match("#[a-z]+#", $password) && !preg_match("#\W+#", $password)) {
-            return false; // Password must include at least one letter or symbol
         }
         return true;
     }

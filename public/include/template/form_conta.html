@@ -11,7 +11,7 @@
 </div>
 <div class="form-group col-lg-2 col-md-4 col-sm-6 col-xs-12">
 	<label for="valor">Valor:</label>
-	<input type="text" id="valor" name="valor" class="numeric form-control text-right" data-a-sep="." data-a-dec="," data-a-sign="{$__moeda__->getSimbolo()} " value="${abs($conta->getValor())}">
+	<input type="text" id="valor" name="valor" class="numeric form-control text-right" data-a-sep="." data-a-dec="," data-a-sign="{$currency->getSimbolo()} " value="${abs($conta->getValor())}">
 </div>
 <!--${$_cliente = $conta->findClienteID()}-->
 <input type="hidden" id="clienteid" name="clienteid" data-nome="{$_cliente->getNomeCompleto()}" value="{$_cliente->getID()}">
@@ -21,11 +21,11 @@
 </div>
 <div class="form-group col-lg-3 col-md-4 col-sm-6 col-xs-12">
 	<label>Acréscimo: <input type="checkbox" style="margin: 0px;" id="autoacrescimo" name="autoacrescimo" value="Y" ${$conta->getAutoAcrescimo() == 'Y'?'checked':''}> Automático</label>
-	<input type="text" id="acrescimo" name="acrescimo" class="numeric form-control text-right" data-a-sep="." data-a-dec="," data-a-sign="{$__moeda__->getSimbolo()} " value="${abs($conta->getAcrescimo())}">
+	<input type="text" id="acrescimo" name="acrescimo" class="numeric form-control text-right" data-a-sep="." data-a-dec="," data-a-sign="{$currency->getSimbolo()} " value="${abs($conta->getAcrescimo())}">
 </div>
 <div class="form-group col-lg-2 col-md-4 col-sm-6 col-xs-12">
 	<label for="multa">Multa:</label>
-	<input type="text" id="multa" name="multa" class="numeric form-control text-right" data-a-sep="." data-a-dec="," data-a-sign="{$__moeda__->getSimbolo()} " value="${abs($conta->getMulta())}">
+	<input type="text" id="multa" name="multa" class="numeric form-control text-right" data-a-sep="." data-a-dec="," data-a-sign="{$currency->getSimbolo()} " value="${abs($conta->getMulta())}">
 </div>
 <div class="form-group col-lg-2 col-md-4 col-sm-6 col-xs-12">
 	<label for="juros">Juros:</label>

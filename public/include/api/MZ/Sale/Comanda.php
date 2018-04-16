@@ -20,7 +20,7 @@
  * O Cliente adquire apenas o direito de usar o software e não adquire qualquer outros
  * direitos, expressos ou implícitos no GrandChef diferentes dos especificados nesta Licença.
  *
- * @author  Francimar Alves <mazinsw@gmail.com>
+ * @author Equipe GrandChef <desenvolvimento@mzsw.com.br>
  */
 namespace MZ\Sale;
 
@@ -213,7 +213,7 @@ class Comanda extends \MZ\Database\Helper
         $old_comanda = self::findByID($this->getID());
         if ($old_comanda->exists() && $old_comanda->isAtiva() && !$this->isAtiva()) {
             $pedido = \Pedido::getPelaComandaID($old_comanda->getID());
-            if (!is_null($pedido->getID())) {
+            if ($pedido->exists()) {
                 $errors['ativa'] = 'A comanda não pode ser desativada porque possui um pedido em aberto';
             }
         }
@@ -238,7 +238,7 @@ class Comanda extends \MZ\Database\Helper
                 ),
             ]);
         }
-        if (stripos($e->getMessage(), 'Nome_UNIQUE') !== false) {
+        if (contains(['Nome', 'UNIQUE'], $e->getMessage())) {
             return new \MZ\Exception\ValidationException([
                 'nome' => vsprintf(
                     'O Nome "%s" já está cadastrado',
@@ -369,37 +369,24 @@ class Comanda extends \MZ\Database\Helper
      * Update Comanda with instance values into database for Número
      * @return Comanda Self instance
      */
-    public function update()
+    public function update($only = [], $except = false)
     {
         $values = $this->validate();
         if (!$this->exists()) {
             throw new \Exception('O identificador da comanda não foi informado');
         }
-        unset($values['id']);
+        $values = self::filterValues($values, $only, $except);
         try {
             self::getDB()
                 ->update('Comandas')
                 ->set($values)
                 ->where('id', $this->getID())
                 ->execute();
-            $comanda = self::findByID($this->getID());
-            $this->fromArray($comanda->toArray());
+            $this->loadByID($this->getID());
         } catch (\Exception $e) {
             throw $this->translate($e);
         }
         return $this;
-    }
-
-    /**
-     * Save the Comanda into the database
-     * @return Comanda Self instance
-     */
-    public function save()
-    {
-        if ($this->exists()) {
-            return $this->update();
-        }
-        return $this->insert();
     }
 
     /**
@@ -416,6 +403,31 @@ class Comanda extends \MZ\Database\Helper
             ->where('id', $this->getID())
             ->execute();
         return $result;
+    }
+
+    /**
+     * Load one register for it self with a condition
+     * @param  array $condition Condition for searching the row
+     * @param  array $order associative field name -> [-1, 1]
+     * @return Comanda Self instance filled or empty
+     */
+    public function load($condition, $order = [])
+    {
+        $query = self::query($condition, $order)->limit(1);
+        $row = $query->fetch() ?: [];
+        return $this->fromArray($row);
+    }
+
+    /**
+     * Load into this object from database using, Nome
+     * @param  string $nome nome to find Comanda
+     * @return Comanda Self filled instance or empty when not found
+     */
+    public function loadByNome($nome)
+    {
+        return $this->load([
+            'nome' => strval($nome),
+        ]);
     }
 
     /**

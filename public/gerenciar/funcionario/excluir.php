@@ -1,38 +1,57 @@
 <?php
 /*
-	Copyright 2016 da MZ Software - MZ Desenvolvimento de Sistemas LTDA
-	Este arquivo é parte do programa GrandChef - Sistema para Gerenciamento de Churrascarias, Bares e Restaurantes.
-	O GrandChef é um software proprietário; você não pode redistribuí-lo e/ou modificá-lo.
-	DISPOSIÇÕES GERAIS
-	O cliente não deverá remover qualquer identificação do produto, avisos de direitos autorais,
-	ou outros avisos ou restrições de propriedade do GrandChef.
+    Copyright 2016 da MZ Software - MZ Desenvolvimento de Sistemas LTDA
+    Este arquivo é parte do programa GrandChef - Sistema para Gerenciamento de Churrascarias, Bares e Restaurantes.
+    O GrandChef é um software proprietário; você não pode redistribuí-lo e/ou modificá-lo.
+    DISPOSIÇÕES GERAIS
+    O cliente não deverá remover qualquer identificação do produto, avisos de direitos autorais,
+    ou outros avisos ou restrições de propriedade do GrandChef.
 
-	O cliente não deverá causar ou permitir a engenharia reversa, desmontagem,
-	ou descompilação do GrandChef.
+    O cliente não deverá causar ou permitir a engenharia reversa, desmontagem,
+    ou descompilação do GrandChef.
 
-	PROPRIEDADE DOS DIREITOS AUTORAIS DO PROGRAMA
+    PROPRIEDADE DOS DIREITOS AUTORAIS DO PROGRAMA
 
-	GrandChef é a especialidade do desenvolvedor e seus
-	licenciadores e é protegido por direitos autorais, segredos comerciais e outros direitos
-	de leis de propriedade.
+    GrandChef é a especialidade do desenvolvedor e seus
+    licenciadores e é protegido por direitos autorais, segredos comerciais e outros direitos
+    de leis de propriedade.
 
-	O Cliente adquire apenas o direito de usar o software e não adquire qualquer outros
-	direitos, expressos ou implícitos no GrandChef diferentes dos especificados nesta Licença.
+    O Cliente adquire apenas o direito de usar o software e não adquire qualquer outros
+    direitos, expressos ou implícitos no GrandChef diferentes dos especificados nesta Licença.
 */
 require_once(dirname(__DIR__) . '/app.php');
 
-need_permission(Permissao::NOME_CADASTROFUNCIONARIOS);
-$id = $_GET['id'];
+use MZ\Employee\Funcionario;
+use MZ\System\Permissao;
+
+need_permission(Permissao::NOME_CADASTROFUNCIONARIOS, is_output('json'));
+$id = isset($_GET['id']) ? $_GET['id'] : null;
 $funcionario = Funcionario::findByID($id);
-if (is_null($funcionario->getID())) {
-    \Thunder::warning('O funcionário de id "'.$id.'" não existe!');
+if (!$funcionario->exists()) {
+    $msg = 'O funcionário não foi informado ou não existe';
+    if (is_output('json')) {
+        json($msg);
+    }
+    \Thunder::warning($msg);
     redirect('/gerenciar/funcionario/');
 }
 $cliente = $funcionario->findClienteID();
 try {
-    Funcionario::excluir($funcionario);
-    \Thunder::success('Funcionário "' . $cliente->getLogin() . '" excluído com sucesso!', true);
-} catch (Exception $e) {
-    \Thunder::error('Não foi possível excluir o funcionário "' . $cliente->getLogin() . '"!');
+    $funcionario->delete();
+    $funcionario->clean(new Funcionario());
+    $msg = sprintf('Funcionário "%s" excluído com sucesso!', $cliente->getAssinatura());
+    if (is_output('json')) {
+        json('msg', $msg);
+    }
+    \Thunder::success($msg, true);
+} catch (\Exception $e) {
+    $msg = sprintf(
+        'Não foi possível excluir o funcionário "%s"',
+        $cliente->getAssinatura()
+    );
+    if (is_output('json')) {
+        json($msg);
+    }
+    \Thunder::error($msg);
 }
 redirect('/gerenciar/funcionario/');

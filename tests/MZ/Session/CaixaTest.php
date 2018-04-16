@@ -26,6 +26,36 @@ namespace MZ\Session;
 
 class CaixaTest extends \PHPUnit_Framework_TestCase
 {
+    public function testFromArray()
+    {
+        $old_caixa = new Caixa(['descricao' => 'Caixa 1']);
+        $caixa = new Caixa();
+        $caixa->fromArray($old_caixa);
+        $this->assertEquals($caixa, $old_caixa);
+        $caixa->fromArray(null);
+        $this->assertEquals($caixa, new Caixa());
+        // clean nothing
+        $caixa->clean($old_caixa);
+    }
+
+    public function testFilter()
+    {
+        $old_caixa = new Caixa([
+            'id' => 1,
+            'descricao' => 'Caixa 1',
+            'serie' => 12,
+            'numeroinicial' => 53,
+        ]);
+        $caixa = new Caixa([
+            'id' => 32,
+            'descricao' => 'Caixa <script>1<script>',
+            'serie' => 'a1t2',
+            'numeroinicial' => 'b5a3',
+        ]);
+        $caixa->filter($old_caixa);
+        $this->assertEquals($old_caixa, $caixa);
+    }
+
     public function testPublish()
     {
         $caixa = new Caixa();
@@ -38,5 +68,184 @@ class CaixaTest extends \PHPUnit_Framework_TestCase
             'ativo',
         ];
         $this->assertEquals($allowed, array_keys($values));
+    }
+
+    public function testInsert()
+    {
+        $caixa = new Caixa();
+        $caixa->setDescricao('Caixa 2');
+        $caixa->insert();
+        $this->setExpectedException('\MZ\Exception\ValidationException');
+        try {
+            $caixa->insert();
+        } catch (\MZ\Exception\ValidationException $e) {
+            $this->assertEquals(['descricao'], array_keys($e->getErrors()));
+            throw $e;
+        }
+    }
+
+    public function testUpdate()
+    {
+        $caixa = new Caixa();
+        $caixa->setDescricao('Caixa 3');
+        $caixa->insert();
+
+        $caixa->setDescricao('Cash register 3');
+        $caixa->update();
+    }
+
+    public function testFind()
+    {
+        $caixa = new Caixa();
+        $caixa->setDescricao('Caixa 4');
+        $caixa->insert();
+
+        $found_caixa = Caixa::findByID($caixa->getID());
+        $this->assertEquals($caixa, $found_caixa);
+        $found_caixa->loadByID($caixa->getID());
+        $this->assertEquals($caixa, $found_caixa);
+        $found_caixa = Caixa::findByDescricao('Caixa 4');
+        $this->assertEquals($caixa, $found_caixa);
+        $found_caixa->loadByDescricao('Caixa 4');
+        $this->assertEquals($caixa, $found_caixa);
+
+        $caixa_sec = new Caixa();
+        $caixa_sec->setDescricao('Caixa 48');
+        $caixa_sec->insert();
+
+        $caixas = Caixa::findAll(['search' => 'Caixa 4'], [], 2, 0);
+        $this->assertEquals([$caixa, $caixa_sec], $caixas);
+
+        $count = Caixa::count(['search' => 'Caixa 4']);
+        $this->assertEquals(2, $count);
+    }
+
+    public function testSerie()
+    {
+        global $app;
+
+        $old_value = $app->getSystem()->getSettings()->getValue('Sistema', 'Fiscal.Mostrar');
+        $app->getSystem()->getSettings()->setValue('Sistema', 'Fiscal.Mostrar', true);
+        $caixa = new Caixa();
+        $caixa->setDescricao('Caixa 6');
+        $caixa->setSerie(4);
+        $caixa->setNumeroInicial(100);
+        $caixa->insert();
+        $app->getSystem()->getSettings()->setValue('Sistema', 'Fiscal.Mostrar', $old_value);
+
+        $found_caixa = Caixa::findBySerie(4);
+        $this->assertEquals($caixa, $found_caixa);
+
+        $caixa->setAtivo('N');
+        $caixa->update();
+
+        $found_caixa = Caixa::findBySerie(4);
+        $this->assertEquals(new Caixa(), $found_caixa);
+
+        Caixa::resetBySerie(4);
+        $found_caixa = Caixa::findByID($caixa->getID());
+        $this->assertEquals($caixa, $found_caixa);
+
+        $caixa->setAtivo('Y');
+        $caixa->update();
+        Caixa::resetBySerie(4);
+        $found_caixa = Caixa::findBySerie(4);
+        $new_caixa = new Caixa($caixa);
+        $new_caixa->setNumeroInicial(1);
+        $this->assertEquals($new_caixa, $found_caixa);
+    }
+
+    public function testSearch()
+    {
+        $caixa = new Caixa();
+        $caixa->setDescricao('Caixa 5');
+        $caixa->insert();
+
+        $found_caixa = Caixa::find(['search' => 'xa 5']);
+        $this->assertEquals($caixa, $found_caixa);
+    }
+
+    public function testValidate()
+    {
+        global $app;
+        
+        $old_value = $app->getSystem()->getSettings()->getValue('Sistema', 'Fiscal.Mostrar');
+        $app->getSystem()->getSettings()->setValue('Sistema', 'Fiscal.Mostrar', true);
+        $this->setExpectedException('\MZ\Exception\ValidationException');
+        try {
+            $caixa = new Caixa();
+            $caixa->setAtivo('A');
+            $caixa->insert();
+        } catch (\MZ\Exception\ValidationException $e) {
+            $this->assertEquals(
+                ['descricao', 'serie', 'numeroinicial', 'ativo'],
+                array_keys($e->getErrors())
+            );
+            throw $e;
+        } finally {
+            $app->getSystem()->getSettings()->setValue('Sistema', 'Fiscal.Mostrar', $old_value);
+        }
+    }
+
+    public function testDesativarEmUso()
+    {
+        $caixa = new Caixa();
+        $caixa->setDescricao('Caixa 7');
+        $caixa->insert();
+
+        $sessao = new Sessao();
+        $sessao->insert();
+
+        $cliente = new \MZ\Account\Cliente();
+        $cliente->setNomeCompleto('Fulano da Silva');
+        $cliente->setEmail('fulano@email.com');
+        $cliente->setSenha('1234');
+        $cliente->insert();
+
+        $funcao = \MZ\Employee\Funcao::find([], ['id' => 1]);
+
+        $funcionario = new \MZ\Employee\Funcionario();
+        $funcionario->setFuncaoID($funcao->getID());
+        $funcionario->setClienteID($cliente->getID());
+        $funcionario->insert();
+
+        $movimentacao = new Movimentacao();
+        $movimentacao->setSessaoID($sessao->getID());
+        $movimentacao->setCaixaID($caixa->getID());
+        $movimentacao->setFuncionarioAberturaID($funcionario->getID());
+        $movimentacao->insert();
+
+        $this->setExpectedException('\MZ\Exception\ValidationException');
+        try {
+            $caixa->setAtivo('N');
+            $caixa->update();
+        } catch (\MZ\Exception\ValidationException $e) {
+            $this->assertEquals(['ativo'], array_keys($e->getErrors()));
+            throw $e;
+        } finally {
+            try {
+                $movimentacao->setDataFechamento(\MZ\Database\Helper::now());
+                $movimentacao->setFuncionarioFechamentoID($funcionario->getID());
+                $movimentacao->update();
+        
+                $sessao->setAberta('N');
+                $sessao->update();
+            } catch (\Exception $e) {
+                $this->fail($e->getMessage());
+            }
+        }
+    }
+
+    public function testDelete()
+    {
+        $caixa = new Caixa();
+        $caixa->setDescricao('Caixa 9');
+        $caixa->insert();
+        $caixa->delete();
+        $found_caixa = Caixa::findByID($caixa->getID());
+        $this->assertEquals(new Caixa(), $found_caixa);
+        $caixa->setID('');
+        $this->setExpectedException('\Exception');
+        $caixa->delete();
     }
 }

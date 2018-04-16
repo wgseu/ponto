@@ -1,32 +1,36 @@
 <?php
-/*
-    Copyright 2016 da MZ Software - MZ Desenvolvimento de Sistemas LTDA
-    Este arquivo é parte do programa GrandChef - Sistema para Gerenciamento de Churrascarias, Bares e Restaurantes.
-    O GrandChef é um software proprietário; você não pode redistribuí-lo e/ou modificá-lo.
-    DISPOSIÇÕES GERAIS
-    O cliente não deverá remover qualquer identificação do produto, avisos de direitos autorais,
-    ou outros avisos ou restrições de propriedade do GrandChef.
-
-    O cliente não deverá causar ou permitir a engenharia reversa, desmontagem,
-    ou descompilação do GrandChef.
-
-    PROPRIEDADE DOS DIREITOS AUTORAIS DO PROGRAMA
-
-    GrandChef é a especialidade do desenvolvedor e seus
-    licenciadores e é protegido por direitos autorais, segredos comerciais e outros direitos
-    de leis de propriedade.
-
-    O Cliente adquire apenas o direito de usar o software e não adquire qualquer outros
-    direitos, expressos ou implícitos no GrandChef diferentes dos especificados nesta Licença.
-*/
+/**
+ * Copyright 2014 da MZ Software - MZ Desenvolvimento de Sistemas LTDA
+ *
+ * Este arquivo é parte do programa GrandChef - Sistema para Gerenciamento de Churrascarias, Bares e Restaurantes.
+ * O GrandChef é um software proprietário; você não pode redistribuí-lo e/ou modificá-lo.
+ * DISPOSIÇÕES GERAIS
+ * O cliente não deverá remover qualquer identificação do produto, avisos de direitos autorais,
+ * ou outros avisos ou restrições de propriedade do GrandChef.
+ *
+ * O cliente não deverá causar ou permitir a engenharia reversa, desmontagem,
+ * ou descompilação do GrandChef.
+ *
+ * PROPRIEDADE DOS DIREITOS AUTORAIS DO PROGRAMA
+ *
+ * GrandChef é a especialidade do desenvolvedor e seus
+ * licenciadores e é protegido por direitos autorais, segredos comerciais e outros direitos
+ * de leis de propriedade.
+ *
+ * O Cliente adquire apenas o direito de usar o software e não adquire qualquer outros
+ * direitos, expressos ou implícitos no GrandChef diferentes dos especificados nesta Licença.
+ *
+ * @author Equipe GrandChef <desenvolvimento@mzsw.com.br>
+ */
 require_once(dirname(__DIR__) . '/app.php');
 
 use $[Table.package]\$[Table.norm];
+use MZ\System\Permissao;
 $[table.exists(date|datetime)]
 use MZ\Database\Helper;
 $[table.end]
 
-need_permission(\Permissao::NOME_$[TABLE.style], is_output('json'));
+need_permission(Permissao::NOME_$[TABLE.style], is_output('json'));
 $$[primary.unix] = isset($_GET['$[primary.unix]']) ? $_GET['$[primary.unix]'] : null;
 $$[table.unix] = $[Table.norm]::findBy$[Primary.norm]($$[primary.unix]);
 $[field.each(all)]
@@ -46,10 +50,10 @@ if (is_post()) {
     $$[table.unix] = new $[Table.norm]($_POST);
     try {
         $$[table.unix]->filter($old_$[table.unix]);
-        $$[table.unix]->save();
+        $$[table.unix]->insert();
         $old_$[table.unix]->clean($$[table.unix]);
         $msg = sprintf(
-            '$[Table.name] "%s" atualizad$[table.gender] com sucesso!',
+            '$[Table.name] "%s" cadastrad$[table.gender] com sucesso!',
             $$[table.unix]->get$[Descriptor.norm]()
         );
         if (is_output('json')) {
@@ -81,4 +85,4 @@ $[field.else]
 $$[reference.unix.plural] = \$[Reference.package]\$[Reference.norm]::findAll();
 $[field.end]
 $[field.end]
-include template('gerenciar_$[table.unix]_cadastrar');
+$app->getResponse('html')->output('gerenciar_$[table.unix]_cadastrar');

@@ -23,6 +23,9 @@
  */
 
 require_once(dirname(dirname(dirname(dirname(dirname(__DIR__))))) . '/app.php');
+
+use MZ\System\Permissao;
+
 require('./config.php') ;
 require('./util.php') ;
 require('./io.php') ;
@@ -31,14 +34,14 @@ require('./phpcompat.php') ;
 
 function SendError( $number, $text )
 {
-	SendUploadResults( $number, '', '', $text ) ;
+    SendUploadResults( $number, '', '', $text ) ;
 }
-if(!$login_funcionario->has(Permissao::NOME_ALTERARPAGINAS))
-	SendError( 1, 'Você não tem permissão para fazer uploads' );
+if(!logged_employee()->has(Permissao::NOME_ALTERARPAGINAS))
+    SendError( 1, 'Você não tem permissão para fazer uploads' );
 
 // Check if this uploader has been enabled.
 if ( !$Config['Enabled'] )
-	SendError( 1, 'This file uploader is disabled. Please check the "editor/filemanager/connectors/php/config.php" file' ) ;
+    SendError( 1, 'This file uploader is disabled. Please check the "editor/filemanager/connectors/php/config.php" file' ) ;
 
 $sCommand = 'FileUpload' ;
 
@@ -49,10 +52,10 @@ $sCurrentFolder	= '/';
 
 // Is enabled the upload?
 if ( ! IsAllowedCommand( $sCommand ) )
-	SendError( 1, 'The ""' . $sCommand . '"" command isn\'t allowed' ) ;
+    SendError( 1, 'The ""' . $sCommand . '"" command isn\'t allowed' ) ;
 
 // Check if it is an allowed type.
 if ( !IsAllowedType( $sType ) )
-		SendError( 1, 'Invalid type specified' ) ;
+    SendError( 1, 'Invalid type specified' ) ;
 
 FileUpload($sType, $sCurrentFolder, $sCommand);

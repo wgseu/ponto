@@ -20,7 +20,7 @@
  * O Cliente adquire apenas o direito de usar o software e não adquire qualquer outros
  * direitos, expressos ou implícitos no GrandChef diferentes dos especificados nesta Licença.
  *
- * @author  Francimar Alves <mazinsw@gmail.com>
+ * @author Equipe GrandChef <desenvolvimento@mzsw.com.br>
  */
 namespace MZ\Integrator;
 
@@ -40,6 +40,7 @@ class IFood extends \MZ\System\Task
         'RED' => ['name' => 'ELO (Débito)'],
         'MEREST' => ['name' => 'MASTERCARD (Débito)'],
         'VIREST' => ['name' => 'VISA (Débito)'],
+        'BANRD' => ['name' => 'BANRICOMPRAS (Débito)'],
         'VVREST' => ['name' => 'ALELO REFEICAO (Vale)'],
         'RSODEX' => ['name' => 'SODEXO (Vale)'],
         'TRE' => ['name' => 'TICKET RESTAURANTE (Vale)'],

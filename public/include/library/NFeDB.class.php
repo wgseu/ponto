@@ -1,26 +1,36 @@
 <?php
-/*
-	Copyright 2014 da MZ Software - MZ Desenvolvimento de Sistemas LTDA
-	Este arquivo é parte do programa GrandChef - Sistema para Gerenciamento de Churrascarias, Bares e Restaurantes.
-	O GrandChef é um software proprietário; você não pode redistribuí-lo e/ou modificá-lo.
-	DISPOSIÇÕES GERAIS
-	O cliente não deverá remover qualquer identificação do produto, avisos de direitos autorais,
-	ou outros avisos ou restrições de propriedade do GrandChef.
+/**
+ * Copyright 2014 da MZ Software - MZ Desenvolvimento de Sistemas LTDA
+ *
+ * Este arquivo é parte do programa GrandChef - Sistema para Gerenciamento de Churrascarias, Bares e Restaurantes.
+ * O GrandChef é um software proprietário; você não pode redistribuí-lo e/ou modificá-lo.
+ * DISPOSIÇÕES GERAIS
+ * O cliente não deverá remover qualquer identificação do produto, avisos de direitos autorais,
+ * ou outros avisos ou restrições de propriedade do GrandChef.
+ *
+ * O cliente não deverá causar ou permitir a engenharia reversa, desmontagem,
+ * ou descompilação do GrandChef.
+ *
+ * PROPRIEDADE DOS DIREITOS AUTORAIS DO PROGRAMA
+ *
+ * GrandChef é a especialidade do desenvolvedor e seus
+ * licenciadores e é protegido por direitos autorais, segredos comerciais e outros direitos
+ * de leis de propriedade.
+ *
+ * O Cliente adquire apenas o direito de usar o software e não adquire qualquer outros
+ * direitos, expressos ou implícitos no GrandChef diferentes dos especificados nesta Licença.
+ *
+ * @author Equipe GrandChef <desenvolvimento@mzsw.com.br>
+ */
 
-	O cliente não deverá causar ou permitir a engenharia reversa, desmontagem,
-	ou descompilação do GrandChef.
-
-	PROPRIEDADE DOS DIREITOS AUTORAIS DO PROGRAMA
-
-	GrandChef é a especialidade do desenvolvedor e seus
-	licenciadores e é protegido por direitos autorais, segredos comerciais e outros direitos
-	de leis de propriedade.
-
-	O Cliente adquire apenas o direito de usar o software e não adquire qualquer outros
-	direitos, expressos ou implícitos no GrandChef diferentes dos especificados nesta Licença.
-*/
-
+use MZ\Product\Servico;
+use MZ\Account\Cliente;
 use MZ\Payment\FormaPagto;
+use MZ\Payment\Pagamento;
+use MZ\Sale\ProdutoPedido;
+use MZ\Sale\Pedido;
+use MZ\Invoice\Evento;
+use MZ\Invoice\Nota;
 
 class NFeDB extends \NFe\Database\Estatico
 {
@@ -28,40 +38,46 @@ class NFeDB extends \NFe\Database\Estatico
 
     public static function getCaminhoXmlAtual($_nota)
     {
-        $ambiente = NFeUtil::toAmbiente($_nota->getAmbiente());
+        $ambiente = \NFeUtil::toAmbiente($_nota->getAmbiente());
         $config = \NFe\Core\SEFAZ::getInstance()->getConfiguracao();
         switch ($_nota->getEstado()) {
-            case NotaEstado::ASSINADO:
+            case Nota::ESTADO_ASSINADO:
                 $path = $config->getPastaXmlAssinado($ambiente);
                 break;
-            case NotaEstado::PENDENTE:
+            case Nota::ESTADO_PENDENTE:
                 $path = $config->getPastaXmlPendente($ambiente);
                 break;
-            case NotaEstado::PROCESSAMENTO:
+            case Nota::ESTADO_PROCESSAMENTO:
                 $path = $config->getPastaXmlProcessamento($ambiente);
                 break;
-            case NotaEstado::DENEGADO:
+            case Nota::ESTADO_DENEGADO:
                 $path = $config->getPastaXmlDenegado($ambiente);
                 break;
-            case NotaEstado::REJEITADO:
+            case Nota::ESTADO_REJEITADO:
                 $path = $config->getPastaXmlRejeitado($ambiente);
                 break;
-            case NotaEstado::CANCELADO:
+            case Nota::ESTADO_CANCELADO:
                 $path = $config->getPastaXmlCancelado($ambiente);
                 $arquivos = [
                     'nota' => $path . '/' . $_nota->getChave() . '.xml',
                     'evento' => $path . '/' . $_nota->getChave() . self::CANCEL_SUFFIX . '.xml'
                 ];
                 return $arquivos;
-            case NotaEstado::AUTORIZADO:
+            case Nota::ESTADO_AUTORIZADO:
                 $path = $config->getPastaXmlAutorizado($ambiente);
                 break;
-            case NotaEstado::INUTILIZADO:
+            case Nota::ESTADO_INUTILIZADO:
                 $path = $config->getPastaXmlInutilizado($ambiente);
                 break;
             default:
-                throw new \Exception('Não existe XML salvo para o estado "'.
-                    $_nota->getEstado().'" da nota "'.$_nota->getChave().'"', 404);
+                throw new \Exception(
+                    sprintf(
+                        'Não existe XML salvo para o estado "%s" da nota "%s"', 
+                        $_nota->getEstado(),
+                        $_nota->getChave()
+                    ),
+                    404
+                );
         }
         return $path . '/' . $_nota->getChave() . '.xml';
     }
@@ -107,18 +123,18 @@ class NFeDB extends \NFe\Database\Estatico
         $_atendente = $_atendente_funcionario->findClienteID();
         $nota->addObservacao('Operador', $_atendente->getAssinatura());
         switch ($_pedido->getTipo()) {
-            case PedidoTipo::MESA:
+            case Pedido::TIPO_MESA:
                 $_mesa = $_pedido->findMesaID();
                 $nota->addObservacao('Local', $_mesa->getNome());
                 break;
-            case PedidoTipo::COMANDA:
+            case Pedido::TIPO_COMANDA:
                 $_comanda = $_pedido->findComandaID();
                 $nota->addObservacao('Local', $_comanda->getNome());
                 break;
-            case PedidoTipo::AVULSO:
+            case Pedido::TIPO_AVULSO:
                 $nota->addObservacao('Local', 'Venda Balcão');
                 break;
-            case PedidoTipo::ENTREGA:
+            case Pedido::TIPO_ENTREGA:
                 if ($_pedido->isDelivery()) {
                     $_entregador_funcionario = $_pedido->findEntregadorID();
                     $_entregador = $_entregador_funcionario->findClienteID();
@@ -129,12 +145,12 @@ class NFeDB extends \NFe\Database\Estatico
                 }
                 break;
         }
-        $nota->setAmbiente(NFeUtil::toAmbiente($_nota->getAmbiente()));
+        $nota->setAmbiente(\NFeUtil::toAmbiente($_nota->getAmbiente()));
         $_nota->setDataEmissao($nota->getDataEmissao());
         $_nota->update();
         /* Destinatário */
         $destinatario = null;
-        if (!is_null($_cliente->getID()) && (!is_null($_cliente->getCPF()) || $_pedido->isDelivery())) {
+        if ($_cliente->exists() && (!is_null($_cliente->getCPF()) || $_pedido->isDelivery())) {
             $destinatario = new \NFe\Entity\Destinatario();
             if ($_cliente->getTipo() == Cliente::TIPO_FISICA) {
                 $destinatario->setNome($_cliente->getNomeCompleto());
@@ -146,7 +162,7 @@ class NFeDB extends \NFe\Database\Estatico
             $destinatario->setEmail($_cliente->getEmail());
             $destinatario->setTelefone($_cliente->getFone(1));
             $endereco = null;
-            if (!is_null($_localizacao_entrega->getID())) {
+            if ($_localizacao_entrega->exists()) {
                 $endereco = new \NFe\Entity\Endereco();
                 $endereco->setCEP($_localizacao_entrega->getCEP());
                 $endereco->getMunicipio()
@@ -225,7 +241,7 @@ class NFeDB extends \NFe\Database\Estatico
             $produto->setCEST($_tributacao->getCEST());
             $produto->setCFOP($_operacao->getCodigo());
             /* Impostos */
-            $imposto = NFeUtil::toImposto($_imposto);
+            $imposto = \NFeUtil::toImposto($_imposto);
             if ($imposto instanceof \NFe\Entity\Imposto\ICMS\Base) {
                 $imposto->setOrigem($_origem->getCodigo());
             }
@@ -287,12 +303,12 @@ class NFeDB extends \NFe\Database\Estatico
             }
             $total_pago += $_pagamento->getTotal();
             $pagamento = new \NFe\Entity\Pagamento();
-            $pagamento->setForma(NFeUtil::toFormaPagamento($_forma->getTipo()));
+            $pagamento->setForma(\NFeUtil::toFormaPagamento($_forma->getTipo()));
             $pagamento->setValor($_pagamento->getTotal());
             // $pagamento->setCredenciadora('60889128000422');
             if ($_forma->getTipo() == FormaPagto::TIPO_CARTAO) {
                 $_cartao = $_pagamento->findCartaoID();
-                $pagamento->setBandeira(NFeUtil::toBandeira($_cartao->getDescricao()));
+                $pagamento->setBandeira(\NFeUtil::toBandeira($_cartao->getDescricao()));
             }
             // $pagamento->setAutorizacao('110011');
             $new_key = 'pg_' . $key;
@@ -352,7 +368,7 @@ class NFeDB extends \NFe\Database\Estatico
                 /** Novos envios e correções **/
                 $nota = $this->criarNFCe($_nota);
                 $notas[] = $nota;
-            } catch (Exception $e) {
+            } catch (\Exception $e) {
                 $_nota->setCorrigido('N');
                 $_nota->update();
                 $_evento = Evento::log(
@@ -396,7 +412,7 @@ class NFeDB extends \NFe\Database\Estatico
                 $tarefa->setDocumento($dom);
                 
                 $tarefas[] = $tarefa;
-            } catch (Exception $e) {
+            } catch (\Exception $e) {
                 $_nota->setCorrigido('N');
                 $_nota->update();
                 $_evento = Evento::log(
@@ -430,7 +446,7 @@ class NFeDB extends \NFe\Database\Estatico
                 $tarefa = new \NFe\Task\Tarefa();
                 $tarefa->setID($_nota->getID());
                 switch ($_nota->getAcao()) {
-                    case NotaAcao::AUTORIZAR:
+                    case Nota::ACAO_AUTORIZAR:
                         $xmlfile = self::getCaminhoXmlAtual($_nota);
                         $dom = $nota->load($xmlfile);
                         // Notas em contingência podem precisar de consultas quando não se sabe o status
@@ -439,7 +455,7 @@ class NFeDB extends \NFe\Database\Estatico
                         $tarefa->setDocumento($dom);
                         $tarefas[] = $tarefa;
                         break;
-                    case NotaAcao::CANCELAR:
+                    case Nota::ACAO_CANCELAR:
                         $xmlfile = self::getCaminhoXmlAtual($_nota);
                         $dom = $nota->load($xmlfile);
 
@@ -455,8 +471,8 @@ class NFeDB extends \NFe\Database\Estatico
                         $tarefa->setDocumento($dom);
                         $tarefas[] = $tarefa;
                         break;
-                    case NotaAcao::INUTILIZAR:
-                        $ambiente = NFeUtil::toAmbiente($_nota->getAmbiente());
+                    case Nota::ACAO_INUTILIZAR:
+                        $ambiente = \NFeUtil::toAmbiente($_nota->getAmbiente());
                         $inutilizacao = new \NFe\Task\Inutilizacao();
                         $inutilizacao->setUF($estado->getUF());
                         $inutilizacao->setCNPJ($emitente->getCNPJ());
@@ -473,7 +489,7 @@ class NFeDB extends \NFe\Database\Estatico
                         $tarefas[] = $tarefa;
                         break;
                 }
-            } catch (Exception $e) {
+            } catch (\Exception $e) {
                 $_nota->setCorrigido('N');
                 $_nota->update();
                 $_evento = Evento::log(

@@ -20,12 +20,13 @@
  * O Cliente adquire apenas o direito de usar o software e não adquire qualquer outros
  * direitos, expressos ou implícitos no GrandChef diferentes dos especificados nesta Licença.
  *
- * @author  Francimar Alves <mazinsw@gmail.com>
+ * @author Equipe GrandChef <desenvolvimento@mzsw.com.br>
  */
 namespace MZ\Stock;
 
 use MZ\Util\Filter;
 use MZ\Util\Validator;
+use MZ\Account\Cliente;
 
 /**
  * Fornecedores de produtos
@@ -183,7 +184,7 @@ class Fornecedor extends \MZ\Database\Helper
             $this->setPrazoPagamento($fornecedor['prazopagamento']);
         }
         if (!isset($fornecedor['datacadastro'])) {
-            $this->setDataCadastro(null);
+            $this->setDataCadastro(self::now());
         } else {
             $this->setDataCadastro($fornecedor['datacadastro']);
         }
@@ -207,9 +208,9 @@ class Fornecedor extends \MZ\Database\Helper
     public function filter($original)
     {
         $this->setID($original->getID());
+        $this->setDataCadastro($original->getDataCadastro());
         $this->setEmpresaID(Filter::number($this->getEmpresaID()));
         $this->setPrazoPagamento(Filter::number($this->getPrazoPagamento()));
-        $this->setDataCadastro(Filter::datetime($this->getDataCadastro()));
     }
 
     /**
@@ -233,9 +234,11 @@ class Fornecedor extends \MZ\Database\Helper
         if (is_null($this->getPrazoPagamento())) {
             $errors['prazopagamento'] = 'O prazo de pagamento não pode ser vazio';
         }
-        if (is_null($this->getDataCadastro())) {
-            $errors['datacadastro'] = 'A data de cadastro não pode ser vazia';
+        $cliente = $this->findEmpresaID();
+        if ($cliente->getTipo() != Cliente::TIPO_JURIDICA) {
+            $errors['empresaid'] = 'A empresa deve ser do tipo jurídica';
         }
+        $this->setDataCadastro(self::now());
         if (!empty($errors)) {
             throw new \MZ\Exception\ValidationException($errors);
         }
@@ -249,15 +252,7 @@ class Fornecedor extends \MZ\Database\Helper
      */
     protected function translate($e)
     {
-        if (stripos($e->getMessage(), 'PRIMARY') !== false) {
-            return new \MZ\Exception\ValidationException([
-                'id' => sprintf(
-                    'O id "%s" já está cadastrado',
-                    $this->getID()
-                ),
-            ]);
-        }
-        if (stripos($e->getMessage(), 'EmpresaID_UNIQUE') !== false) {
+        if (contains(['EmpresaID', 'UNIQUE'], $e->getMessage())) {
             return new \MZ\Exception\ValidationException([
                 'empresaid' => sprintf(
                     'A empresa "%s" já está cadastrada',
@@ -288,23 +283,25 @@ class Fornecedor extends \MZ\Database\Helper
 
     /**
      * Update Fornecedor with instance values into database for ID
+     * @param  array $only Save these fields only, when empty save all fields except id
+     * @param  boolean $except When true, saves all fields except $only
      * @return Fornecedor Self instance
      */
-    public function update()
+    public function update($only = [], $except = false)
     {
         $values = $this->validate();
         if (!$this->exists()) {
             throw new \Exception('O identificador do fornecedor não foi informado');
         }
-        unset($values['id']);
+        $values = self::filterValues($values, $only, $except);
+        unset($values['datacadastro']);
         try {
             self::getDB()
                 ->update('Fornecedores')
                 ->set($values)
                 ->where('id', $this->getID())
                 ->execute();
-            $fornecedor = self::findByID($this->getID());
-            $this->fromArray($fornecedor->toArray());
+            $this->loadByID($this->getID());
         } catch (\Exception $e) {
             throw $this->translate($e);
         }
@@ -338,18 +335,6 @@ class Fornecedor extends \MZ\Database\Helper
         $query = self::query($condition, $order)->limit(1);
         $row = $query->fetch() ?: [];
         return $this->fromArray($row);
-    }
-
-    /**
-     * Load into this object from database using, ID
-     * @param  int $id id to find Fornecedor
-     * @return Fornecedor Self filled instance or empty when not found
-     */
-    public function loadByID($id)
-    {
-        return $this->load([
-            'id' => intval($id),
-        ]);
     }
 
     /**
@@ -414,9 +399,29 @@ class Fornecedor extends \MZ\Database\Helper
      */
     private static function query($condition = [], $order = [])
     {
-        $query = self::getDB()->from('Fornecedores f');
+        $query = self::getDB()->from('Fornecedores f')
+            ->leftJoin('Clientes c ON c.id = f.empresaid');
+        if (isset($condition['search'])) {
+            $search = trim($condition['search']);
+            if (Validator::checkEmail($search)) {
+                $query = $query->where('c.email', $search);
+            } elseif (Validator::checkCNPJ($search)) {
+                $query = $query->where('c.cpf', Filter::digits($search));
+            } elseif (Validator::checkPhone($search)) {
+                $fone = Cliente::buildFoneSearch($search);
+                $query = $query->orderBy('IF(c.fone1 LIKE ?, 0, 1)', $fone);
+            } else {
+                $query = self::buildSearch(
+                    $search,
+                    self::concat(['c.nome', '" "', 'COALESCE(c.sobrenome, "")']),
+                    $query
+                );
+            }
+            unset($condition['search']);
+        }
         $condition = self::filterCondition($condition);
         $query = self::buildOrderBy($query, self::filterOrder($order));
+        $query = $query->orderBy('c.nome ASC');
         $query = $query->orderBy('f.id ASC');
         return self::buildCondition($query, $condition);
     }

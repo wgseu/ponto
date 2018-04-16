@@ -7,7 +7,7 @@
 		</div>
 		<form id="search-form" action="/gerenciar/estado/" method="get">
 			<div class="form-group col-lg-4 col-md-4 col-sm-4 col-xs-6">
-				<label for="paisid"><div id="flag-filter" class="cell-icon pais-icons" style="background-position: ${-(is_null($pais->getID())?-1:$pais->getBandeiraIndex()) * 16}px 0px;"></div>País:</label>
+				<label for="paisid"><div id="flag-filter" class="cell-icon pais-icons" style="background-position: ${-(!$pais->exists()?-1:$pais->getBandeiraIndex()) * 16}px 0px;"></div>País:</label>
 				<select class="form-control" id="paisid" name="paisid">
 					<option value="" data-bandeira="-1">Todos</option>
 <!--{loop $_paises $_pais}-->

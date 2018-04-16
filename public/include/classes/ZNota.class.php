@@ -1,24 +1,27 @@
 <?php
-/*
-	Copyright 2014 da MZ Software - MZ Desenvolvimento de Sistemas LTDA
-	Este arquivo é parte do programa GrandChef - Sistema para Gerenciamento de Churrascarias, Bares e Restaurantes.
-	O GrandChef é um software proprietário; você não pode redistribuí-lo e/ou modificá-lo.
-	DISPOSIÇÕES GERAIS
-	O cliente não deverá remover qualquer identificação do produto, avisos de direitos autorais,
-	ou outros avisos ou restrições de propriedade do GrandChef.
-
-	O cliente não deverá causar ou permitir a engenharia reversa, desmontagem,
-	ou descompilação do GrandChef.
-
-	PROPRIEDADE DOS DIREITOS AUTORAIS DO PROGRAMA
-
-	GrandChef é a especialidade do desenvolvedor e seus
-	licenciadores e é protegido por direitos autorais, segredos comerciais e outros direitos
-	de leis de propriedade.
-
-	O Cliente adquire apenas o direito de usar o software e não adquire qualquer outros
-	direitos, expressos ou implícitos no GrandChef diferentes dos especificados nesta Licença.
-*/
+/**
+ * Copyright 2014 da MZ Software - MZ Desenvolvimento de Sistemas LTDA
+ *
+ * Este arquivo é parte do programa GrandChef - Sistema para Gerenciamento de Churrascarias, Bares e Restaurantes.
+ * O GrandChef é um software proprietário; você não pode redistribuí-lo e/ou modificá-lo.
+ * DISPOSIÇÕES GERAIS
+ * O cliente não deverá remover qualquer identificação do produto, avisos de direitos autorais,
+ * ou outros avisos ou restrições de propriedade do GrandChef.
+ *
+ * O cliente não deverá causar ou permitir a engenharia reversa, desmontagem,
+ * ou descompilação do GrandChef.
+ *
+ * PROPRIEDADE DOS DIREITOS AUTORAIS DO PROGRAMA
+ *
+ * GrandChef é a especialidade do desenvolvedor e seus
+ * licenciadores e é protegido por direitos autorais, segredos comerciais e outros direitos
+ * de leis de propriedade.
+ *
+ * O Cliente adquire apenas o direito de usar o software e não adquire qualquer outros
+ * direitos, expressos ou implícitos no GrandChef diferentes dos especificados nesta Licença.
+ *
+ * @author Equipe GrandChef <desenvolvimento@mzsw.com.br>
+ */
 class NotaTipo
 {
     const NOTA = 'Nota';
@@ -650,14 +653,14 @@ class ZNota
         }
         $nota['datalancamento'] = $datalancamento;
         if (!empty($erros)) {
-            throw new ValidationException($erros);
+            throw new \MZ\Exception\ValidationException($erros);
         }
     }
 
     private static function handleException(&$e)
     {
         if (stripos($e->getMessage(), 'PRIMARY') !== false) {
-            throw new ValidationException(['id' => 'O id informado já está cadastrado']);
+            throw new \MZ\Exception\ValidationException(['id' => 'O id informado já está cadastrado']);
         }
     }
 
@@ -667,7 +670,7 @@ class ZNota
         self::validarCampos($_nota);
         try {
             $_nota['id'] = \DB::$pdo->insertInto('Notas')->values($_nota)->execute();
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             self::handleException($e);
             throw $e;
         }
@@ -678,7 +681,7 @@ class ZNota
     {
         $_nota = $nota->toArray();
         if (!$_nota['id']) {
-            throw new ValidationException(['id' => 'O id da nota não foi informado']);
+            throw new \MZ\Exception\ValidationException(['id' => 'O id da nota não foi informado']);
         }
         self::validarCampos($_nota);
         $campos = [
@@ -711,7 +714,7 @@ class ZNota
             $query = $query->set(array_intersect_key($_nota, array_flip($campos)));
             $query = $query->where('id', $_nota['id']);
             $query->execute();
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             self::handleException($e);
             throw $e;
         }
@@ -737,7 +740,7 @@ class ZNota
                          ->orderBy('sequencia DESC, numerofinal DESC')
                          ->limit(1);
         $ultima = new Nota($query->fetch());
-        if (is_null($ultima->getID())) {
+        if (!$ultima->exists()) {
             // não existe nenhuma nota ou inutilização para essa série ou ambiente
             $ultima->fromArray($base->toArray()); // copia a série e ambiente
             // inicia a numeração e sequência
@@ -766,7 +769,7 @@ class ZNota
         // utiliza o pedido da base
         $ultima->setPedidoID($base->getPedidoID());
         // verifica se o número inicial do caixa deve ser o próximo
-        $caixa = Caixa::getPelaSerie($ultima->getSerie());
+        $caixa = Caixa::findBySerie($ultima->getSerie());
         if ($caixa->getNumeroInicial() > $ultima->getNumeroFinal()) {
             $ultima->setNumeroFinal($caixa->getNumeroInicial() - 1);
         }
@@ -775,7 +778,7 @@ class ZNota
             // inicia uma nova sequência
             $ultima->setSequencia($ultima->getSequencia() + 1);
             $ultima->setNumeroFinal(0);
-            Caixa::resetaInicios($ultima->getSerie());
+            Caixa::resetBySerie($ultima->getSerie());
         }
         // incrementa para o próximo número
         $ultima->setNumeroFinal($ultima->getNumeroFinal() + 1);

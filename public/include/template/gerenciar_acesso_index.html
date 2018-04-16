@@ -10,7 +10,7 @@
 				<input type="hidden" name="funcao" value="{$funcao->getID()}">
 				<div class="col-md-5 col-sm-5 col-xs-12 form-group pull-right">
 					<div class="input-group">
-						<input type="text" class="form-control" id="query" name="query" placeholder="Procurar..." value="${\MZ\Util\Filter::input($_GET, 'query')}">
+						<input type="text" class="form-control" id="query" name="search" placeholder="Procurar..." value="${\MZ\Util\Filter::input($_GET, 'search')}">
 						<span class="input-group-btn">
 							<button class="btn btn-default" type="submit"><i class="fa fa-search"></i></button>
 						</span>
@@ -36,12 +36,12 @@
 						</thead>
 						<tbody>
 <!--{loop $permissoes $permissao}-->
-<!--${$_acesso = Acesso::getPelaFuncaoIDPermissaoID($funcao->getID(), $permissao->getID())}-->
-							<tr ${!is_null($_acesso->getID())?'':'class="active"'}>
+<!--${$_acesso = Acesso::findByFuncaoIDPermissaoID($funcao->getID(), $permissao->getID())}-->
+							<tr ${$_acesso->exists()?'':'class="active"'}>
 								<td>
 									<div class="">
 										<label>
-											<input type="checkbox" class="js-switch" name="marcado" data-funcao="{$funcao->getID()}" data-permissao="{$permissao->getID()}" value="Y" ${!is_null($_acesso->getID())?'checked':''}/>
+											<input type="checkbox" class="js-switch" name="marcado" data-funcao="{$funcao->getID()}" data-permissao="{$permissao->getID()}" value="Y" ${$_acesso->exists()?'checked':''}/>
 											<strong>{$permissao->getDescricao()}</strong>
 										</label>
 									</div>

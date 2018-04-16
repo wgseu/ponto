@@ -1,24 +1,27 @@
 <?php
-/*
-	Copyright 2014 da MZ Software - MZ Desenvolvimento de Sistemas LTDA
-	Este arquivo é parte do programa GrandChef - Sistema para Gerenciamento de Churrascarias, Bares e Restaurantes.
-	O GrandChef é um software proprietário; você não pode redistribuí-lo e/ou modificá-lo.
-	DISPOSIÇÕES GERAIS
-	O cliente não deverá remover qualquer identificação do produto, avisos de direitos autorais,
-	ou outros avisos ou restrições de propriedade do GrandChef.
-
-	O cliente não deverá causar ou permitir a engenharia reversa, desmontagem,
-	ou descompilação do GrandChef.
-
-	PROPRIEDADE DOS DIREITOS AUTORAIS DO PROGRAMA
-
-	GrandChef é a especialidade do desenvolvedor e seus
-	licenciadores e é protegido por direitos autorais, segredos comerciais e outros direitos
-	de leis de propriedade.
-
-	O Cliente adquire apenas o direito de usar o software e não adquire qualquer outros
-	direitos, expressos ou implícitos no GrandChef diferentes dos especificados nesta Licença.
-*/
+/**
+ * Copyright 2014 da MZ Software - MZ Desenvolvimento de Sistemas LTDA
+ *
+ * Este arquivo é parte do programa GrandChef - Sistema para Gerenciamento de Churrascarias, Bares e Restaurantes.
+ * O GrandChef é um software proprietário; você não pode redistribuí-lo e/ou modificá-lo.
+ * DISPOSIÇÕES GERAIS
+ * O cliente não deverá remover qualquer identificação do produto, avisos de direitos autorais,
+ * ou outros avisos ou restrições de propriedade do GrandChef.
+ *
+ * O cliente não deverá causar ou permitir a engenharia reversa, desmontagem,
+ * ou descompilação do GrandChef.
+ *
+ * PROPRIEDADE DOS DIREITOS AUTORAIS DO PROGRAMA
+ *
+ * GrandChef é a especialidade do desenvolvedor e seus
+ * licenciadores e é protegido por direitos autorais, segredos comerciais e outros direitos
+ * de leis de propriedade.
+ *
+ * O Cliente adquire apenas o direito de usar o software e não adquire qualquer outros
+ * direitos, expressos ou implícitos no GrandChef diferentes dos especificados nesta Licença.
+ *
+ * @author Equipe GrandChef <desenvolvimento@mzsw.com.br>
+ */
 class ProdutoPedidoEstado
 {
     const ADICIONADO = 'Adicionado';
@@ -631,14 +634,14 @@ class ZProdutoPedido
         }
         $produto_pedido['datahora'] = date('Y-m-d H:i:s');
         if (!empty($erros)) {
-            throw new ValidationException($erros);
+            throw new \MZ\Exception\ValidationException($erros);
         }
     }
 
     private static function handleException(&$e)
     {
         if (stripos($e->getMessage(), 'PRIMARY') !== false) {
-            throw new ValidationException(['id' => 'O ID informado já está cadastrado']);
+            throw new \MZ\Exception\ValidationException(['id' => 'O ID informado já está cadastrado']);
         }
     }
 
@@ -656,8 +659,8 @@ class ZProdutoPedido
                         continue;
                     }
                     $composicao = $formacao->findComposicaoID();
-                    if (is_null($composicao->getID())) {
-                        throw new ValidationException(['formacao' => 'A composição formada não existe']);
+                    if (!$composicao->exists()) {
+                        throw new \MZ\Exception\ValidationException(['formacao' => 'A composição formada não existe']);
                     }
                     $operacao = -1;
                     if ($composicao->getTipo() == Composicao::TIPO_ADICIONAL) {
@@ -697,7 +700,7 @@ class ZProdutoPedido
     {
         $_produto_pedido = $produto_pedido->toArray();
         if (!$_produto_pedido['id']) {
-            throw new ValidationException(['id' => 'O id do produtopedido não foi informado']);
+            throw new \MZ\Exception\ValidationException(['id' => 'O id do produtopedido não foi informado']);
         }
         self::validarCampos($_produto_pedido);
         $campos = [
@@ -727,7 +730,7 @@ class ZProdutoPedido
             $query = $query->set(array_intersect_key($_produto_pedido, array_flip($campos)));
             $query = $query->where('id', $_produto_pedido['id']);
             $query->execute();
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             self::handleException($e);
             throw $e;
         }

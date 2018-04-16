@@ -22,38 +22,23 @@
 require_once(dirname(__DIR__) . '/app.php');
 
 use MZ\Location\Localizacao;
+use MZ\System\Permissao;
+use MZ\Account\Cliente;
+use MZ\Util\Filter;
+use MZ\Util\Mask;
 
-need_permission(
-    [
-        Permissao::NOME_CADASTROCLIENTES,
-        ['||'],
-        Permissao::NOME_RELATORIOCLIENTES
-    ],
-    isset($_GET['saida']) && is_output('json')
-);
+need_permission(Permissao::NOME_RELATORIOCLIENTES, is_output('json'));
 
 set_time_limit(0);
 
 try {
-    $query = isset($_GET['query'])?$_GET['query']:null;
-    $cpf = isset($_GET['cpf'])?$_GET['cpf']:null;
-    $fone = isset($_GET['fone'])?$_GET['fone']:null;
-    $email = isset($_GET['email'])?$_GET['email']:null;
-    $genero = isset($_GET['genero'])?$_GET['genero']:null;
-    $aniversariantes = isset($_GET['aniversariantes'])?$_GET['aniversariantes']:null;
-    $formato = isset($_GET['formato'])?$_GET['formato']:null;
-
-    $clientes = Cliente::getTodos(
-        $query,
-        null, // tipo
-        $genero,
-        null, // mes_inicio
-        null, // mes_fim
-        $cpf,
-        $fone,
-        $email,
-        $aniversariantes
-    );
+    $formato = isset($_GET['formato']) ? $_GET['formato'] : null;
+    $condition = Filter::query($_GET);
+    unset($condition['ordem']);
+    unset($condition['formato']);
+    $cliente = new Cliente($condition);
+    $order = Filter::order(isset($_GET['ordem']) ? $_GET['ordem'] : '');
+    $clientes = Cliente::findAll($condition, $order);
     // Coluna dos dados
     $columns = [
         'Nome/Fantasia',
@@ -61,7 +46,7 @@ try {
         'Celular',
         'E-mail',
         'Aniversário/Fundação',
-        vsprintf('%s/%s', [_p('Titulo', 'CPF'), _p('Titulo', 'CNPJ')]),
+        sprintf('%s/%s', _p('Titulo', 'CPF'), _p('Titulo', 'CNPJ')),
         'RG/IE',
         'Gênero',
         'Apelido',
@@ -93,8 +78,8 @@ try {
 
         $row = [];
         $row[] = $value->getNomeCompleto();
-        $row[] = \MZ\Util\Mask::phone($value->getFone(1));
-        $row[] = \MZ\Util\Mask::phone($value->getFone(2));
+        $row[] = Mask::phone($value->getFone(1));
+        $row[] = Mask::phone($value->getFone(2));
         $row[] = $value->getEmail();
         if (is_null($value->getDataAniversario())) {
             $row[] = null;
@@ -104,9 +89,9 @@ try {
             $row[] = $value->getDataAniversario();
         }
         if ($value->getTipo() == Cliente::TIPO_FISICA) {
-            $row[] = \MZ\Util\Mask::cpf($value->getCPF());
+            $row[] = Mask::cpf($value->getCPF());
         } else {
-            $row[] = \MZ\Util\Mask::cnpj($value->getCPF());
+            $row[] = Mask::cnpj($value->getCPF());
         }
         $row[] = $value->getRG();
         if ($value->getTipo() == Cliente::TIPO_FISICA) {
@@ -115,7 +100,7 @@ try {
             $row[] = 'Empresa';
         }
         $row[] = $localizacao->getApelido();
-        $row[] = \MZ\Util\Mask::cep($localizacao->getCEP());
+        $row[] = Mask::cep($localizacao->getCEP());
         $row[] = $bairro->getNome();
         $row[] = $localizacao->getLogradouro();
         $row[] = $localizacao->getNumero();
@@ -127,7 +112,7 @@ try {
         $row[] = $localizacao->getReferencia();
         $row[] = $cidade->getNome();
         $row[] = $estado->getNome();
-        $row[] = $localizacao->isMostrar()?'Sim':'Não';
+        $row[] = $localizacao->isMostrar() ? 'Sim' : 'Não';
         $data[] = $row;
     }
     // footer

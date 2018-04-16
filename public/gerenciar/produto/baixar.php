@@ -1,59 +1,46 @@
 <?php
 /*
-	Copyright 2016 da MZ Software - MZ Desenvolvimento de Sistemas LTDA
-	Este arquivo é parte do programa GrandChef - Sistema para Gerenciamento de Churrascarias, Bares e Restaurantes.
-	O GrandChef é um software proprietário; você não pode redistribuí-lo e/ou modificá-lo.
-	DISPOSIÇÕES GERAIS
-	O cliente não deverá remover qualquer identificação do produto, avisos de direitos autorais,
-	ou outros avisos ou restrições de propriedade do GrandChef.
+    Copyright 2016 da MZ Software - MZ Desenvolvimento de Sistemas LTDA
+    Este arquivo é parte do programa GrandChef - Sistema para Gerenciamento de Churrascarias, Bares e Restaurantes.
+    O GrandChef é um software proprietário; você não pode redistribuí-lo e/ou modificá-lo.
+    DISPOSIÇÕES GERAIS
+    O cliente não deverá remover qualquer identificação do produto, avisos de direitos autorais,
+    ou outros avisos ou restrições de propriedade do GrandChef.
 
-	O cliente não deverá causar ou permitir a engenharia reversa, desmontagem,
-	ou descompilação do GrandChef.
+    O cliente não deverá causar ou permitir a engenharia reversa, desmontagem,
+    ou descompilação do GrandChef.
 
-	PROPRIEDADE DOS DIREITOS AUTORAIS DO PROGRAMA
+    PROPRIEDADE DOS DIREITOS AUTORAIS DO PROGRAMA
 
-	GrandChef é a especialidade do desenvolvedor e seus
-	licenciadores e é protegido por direitos autorais, segredos comerciais e outros direitos
-	de leis de propriedade.
+    GrandChef é a especialidade do desenvolvedor e seus
+    licenciadores e é protegido por direitos autorais, segredos comerciais e outros direitos
+    de leis de propriedade.
 
-	O Cliente adquire apenas o direito de usar o software e não adquire qualquer outros
-	direitos, expressos ou implícitos no GrandChef diferentes dos especificados nesta Licença.
+    O Cliente adquire apenas o direito de usar o software e não adquire qualquer outros
+    direitos, expressos ou implícitos no GrandChef diferentes dos especificados nesta Licença.
 */
 require_once(dirname(__DIR__) . '/app.php');
+
+use MZ\Product\Produto;
+use MZ\Stock\Estoque;
+use MZ\Product\Unidade;
+use MZ\System\Permissao;
+use MZ\Util\Mask;
+use MZ\Util\Filter;
 
 need_permission(Permissao::NOME_CADASTROPRODUTOS, isset($_GET['saida']) && is_output('json'));
 
 set_time_limit(0);
 
 try {
-    $query = isset($_GET['query'])?$_GET['query']:null;
-    $setor_id = isset($_GET['setor_id'])?intval($_GET['setor_id']):null;
-    $categoria_id = isset($_GET['categoria_id'])?intval($_GET['categoria_id']):null;
-    $promocao = isset($_GET['promocao'])?$_GET['promocao']:null;
-    $visivel = isset($_GET['visivel'])?$_GET['visivel']:null;
-    $limitado = isset($_GET['limitado'])?$_GET['limitado']:null;
-    $pesavel = isset($_GET['pesavel'])?$_GET['pesavel']:null;
-    $tipo = isset($_GET['tipo'])?$_GET['tipo']:null;
-    $formato = isset($_GET['formato'])?$_GET['formato']:null;
-
-    $produtos = Produto::getTodos(
-        $query,
-        $categoria_id,
-        null, // unidade
-        $tipo,
-        null, // estoque?
-        $setor_id,
-        $promocao,
-        $visivel,
-        $limitado,
-        $pesavel,
-        true // raw
-    );
+    $formato = isset($_GET['formato']) ? $_GET['formato'] : null;
+    $condition = Filter::query($_GET);
+    $produtos = Produto::findAll($condition);
     // Coluna dos dados
     $columns = [
         'Código',
         'Descrição',
-        'Preço de Venda ('. $__moeda__->getSimbolo() . ')',
+        'Preço de Venda ('. $app->getSystem()->getCurrency()->getSimbolo() . ')',
         'Categoria',
         'Tipo',
         'Unidades',
@@ -79,36 +66,36 @@ try {
     $last = chr(ord($column) + count($columns) - 1);
     $line = 3;
     $i = $line;
-    $value = new Produto();
     $unidade = new Unidade();
-    foreach ($produtos as $key => $item) {
+    foreach ($produtos as $value) {
         $i++;
-        $value->fromArray($item);
-        $unidade->setSigla($item['unidade']);
-
+        $unidade = $value->findUnidadeID();
+        $setor_estoque = $value->findSetorEstoqueID();
+        $setor_preparo = $value->findSetorPreparoID();
+        $estoque = Estoque::sumByProdutoID($value->getID());
         $row = [];
         $row[] = $value->getID();
-        $row[] = $value->getDescricao($item);
+        $row[] = $value->getDescricao();
         $row[] = $value->getPrecoVenda();
-        $row[] = $item['categoria'];
+        $row[] = $value->findCategoriaID()->getDescricao();
         $row[] = Produto::getTipoOptions($value->getTipo());
-        $row[] = $item['estoque'];
-        $row[] = $unidade->formatar($item['estoque'], $value->getConteudo());
-        $row[] = $value->isDivisivel()?'Sim':'Não';
-        $row[] = $value->isCobrarServico()?'Sim':'Não';
+        $row[] = $estoque;
+        $row[] = $unidade->formatar($estoque, $value->getConteudo());
+        $row[] = Mask::bool($value->isDivisivel());
+        $row[] = Mask::bool($value->isCobrarServico());
         $row[] = $value->getCodigoBarras();
         $row[] = $value->getConteudo();
         $row[] = $value->getQuantidadeLimite();
         $row[] = $value->getQuantidadeMaxima();
         $row[] = $value->getCustoProducao();
-        $row[] = $value->isPerecivel()?'Sim':'Não';
-        $row[] = $item['unidade_nome'];
-        $row[] = $value->isPesavel()?'Sim':'Não';
-        $row[] = isset($item['setor_estoque'])?$item['setor_estoque']:'Automático';
-        $row[] = isset($item['setor_preparo'])?$item['setor_preparo']:'Não imprimir';
+        $row[] = Mask::bool($value->isPerecivel());
+        $row[] = $unidade->getNome();
+        $row[] = Mask::bool($value->isPesavel());
+        $row[] = $setor_estoque->getNome() ?: 'Automático';
+        $row[] = $setor_preparo->getNome() ?: 'Não imprimir';
         $row[] = $value->getAbreviacao();
         $row[] = $value->getDetalhes();
-        $row[] = $value->isVisivel()?'Sim':'Não';
+        $row[] = Mask::bool($value->isVisivel());
         $data[] = $row;
     }
     // footer
@@ -140,7 +127,7 @@ try {
 
     $title = 'Relatório de Produtos';
     // Create new PHPExcel object
-    $objPHPExcel = new PHPExcel();
+    $objPHPExcel = new \PHPExcel();
     // Set document properties
     $objPHPExcel->getProperties()->setCreator('GrandChef')
                                  ->setTitle($title);
@@ -158,62 +145,62 @@ try {
     // Format styles
     // Format Title
     $objPHPExcel->getActiveSheet()->getStyle('B2')->getAlignment()
-        ->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER)
-        ->setVertical(PHPExcel_Style_Alignment::VERTICAL_CENTER)
+        ->setHorizontal(\PHPExcel_Style_Alignment::HORIZONTAL_CENTER)
+        ->setVertical(\PHPExcel_Style_Alignment::VERTICAL_CENTER)
         ->setWrapText(true);
     $objPHPExcel->getActiveSheet()->getRowDimension(2)->setRowHeight(30);
     $objPHPExcel->getActiveSheet()->getStyle('B2')->getFont()
         ->setName('Tahoma')->setBold(true)->setSize(16);
     // Align cells
     $objPHPExcel->getActiveSheet()->getStyle("B3:C{$j}")->getAlignment()
-        ->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+        ->setHorizontal(\PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
     $objPHPExcel->getActiveSheet()->getStyle("D3:D{$j}")->getAlignment()
-        ->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_RIGHT);
+        ->setHorizontal(\PHPExcel_Style_Alignment::HORIZONTAL_RIGHT);
     $objPHPExcel->getActiveSheet()->getStyle("E3:N{$j}")->getAlignment()
-        ->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+        ->setHorizontal(\PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
     $objPHPExcel->getActiveSheet()->getStyle("O3:O{$j}")->getAlignment()
-        ->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_RIGHT);
+        ->setHorizontal(\PHPExcel_Style_Alignment::HORIZONTAL_RIGHT);
     $objPHPExcel->getActiveSheet()->getStyle("P3:{$last}{$j}")->getAlignment()
-        ->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+        ->setHorizontal(\PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
     // Format header
     $objPHPExcel->getActiveSheet()->getStyle("B3:{$last}3")->getFont()->setBold(true);
     $objPHPExcel->getActiveSheet()->getStyle("B3:{$last}3")->getBorders()->applyFromArray([
-        'allborders' => ['style' => PHPExcel_Style_Border::BORDER_MEDIUM]
+        'allborders' => ['style' => \PHPExcel_Style_Border::BORDER_MEDIUM]
     ]);
     // Format footer
     $objPHPExcel->getActiveSheet()->getStyle("B{$j}:{$last}{$j}")->getFont()->setBold(true);
     $objPHPExcel->getActiveSheet()->getStyle("B{$j}:{$last}{$j}")->getBorders()->applyFromArray([
-        'allborders' => ['style' => PHPExcel_Style_Border::BORDER_MEDIUM]
+        'allborders' => ['style' => \PHPExcel_Style_Border::BORDER_MEDIUM]
     ]);
     // Format Currency data columns
     $objPHPExcel->getActiveSheet()->getStyle("D4:D{$i}")->getNumberFormat()->setFormatCode(
-        PHPExcel_Style_NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED2
+        \PHPExcel_Style_NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED2
     );
     $objPHPExcel->getActiveSheet()->getStyle("O4:O{$j}")->getNumberFormat()->setFormatCode(
-        PHPExcel_Style_NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED2
+        \PHPExcel_Style_NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED2
     );
     foreach ($columns as $value) {
         $objPHPExcel->getActiveSheet()->getColumnDimension($column)->setAutoSize(true);
         $objPHPExcel->getActiveSheet()->getStyle("{$column}4:{$column}{$i}")->getBorders()->applyFromArray([
-            'left' => ['style' => PHPExcel_Style_Border::BORDER_MEDIUM],
-            'right' => ['style' => PHPExcel_Style_Border::BORDER_MEDIUM]
+            'left' => ['style' => \PHPExcel_Style_Border::BORDER_MEDIUM],
+            'right' => ['style' => \PHPExcel_Style_Border::BORDER_MEDIUM]
         ]);
         $column++;
     }
     if ($formato == 'xlsx') {
         // Redirect output to a client’s web browser (Excel2007)
         $filename = $title . '.xlsx';
-        $objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel2007');
+        $objWriter = \PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel2007');
         header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
     } elseif ($formato == 'ods') {
         // Redirect output to a client’s web browser (OpenDocument)
         $filename = $title . '.ods';
-        $objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'OpenDocument');
+        $objWriter = \PHPExcel_IOFactory::createWriter($objPHPExcel, 'OpenDocument');
         header('Content-Type: application/vnd.oasis.opendocument.spreadsheet');
     } else {
         // Redirect output to a client’s web browser (Excel5)
         $filename = $title . '.xls';
-        $objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel5');
+        $objWriter = \PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel5');
         header('Content-Type: application/vnd.ms-excel');
     }
     header("Content-Disposition: attachment; filename*=UTF-8''" . rawurlencode($filename));

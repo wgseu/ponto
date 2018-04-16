@@ -20,7 +20,7 @@
  * O Cliente adquire apenas o direito de usar o software e não adquire qualquer outros
  * direitos, expressos ou implícitos no GrandChef diferentes dos especificados nesta Licença.
  *
- * @author  Francimar Alves <mazinsw@gmail.com>
+ * @author Equipe GrandChef <desenvolvimento@mzsw.com.br>
  */
 namespace MZ\Invoice;
 
@@ -290,13 +290,13 @@ class Tributacao extends \MZ\Database\Helper
     {
         $errors = [];
         if (is_null($this->getNCM())) {
-            $errors['ncm'] = 'O ncm não pode ser vazio';
+            $errors['ncm'] = 'O NCM não pode ser vazio';
         }
         if (is_null($this->getOrigemID())) {
             $errors['origemid'] = 'A origem não pode ser vazia';
         }
         if (is_null($this->getOperacaoID())) {
-            $errors['operacaoid'] = 'O cfop não pode ser vazio';
+            $errors['operacaoid'] = 'O CFOP não pode ser vazio';
         }
         if (is_null($this->getImpostoID())) {
             $errors['impostoid'] = 'O imposto não pode ser vazio';
@@ -314,14 +314,6 @@ class Tributacao extends \MZ\Database\Helper
      */
     protected function translate($e)
     {
-        if (stripos($e->getMessage(), 'PRIMARY') !== false) {
-            return new \MZ\Exception\ValidationException([
-                'id' => sprintf(
-                    'O id "%s" já está cadastrado',
-                    $this->getID()
-                ),
-            ]);
-        }
         return parent::translate($e);
     }
 
@@ -345,23 +337,24 @@ class Tributacao extends \MZ\Database\Helper
 
     /**
      * Update Tributação with instance values into database for ID
+     * @param  array $only Save these fields only, when empty save all fields except id
+     * @param  boolean $except When true, saves all fields except $only
      * @return Tributacao Self instance
      */
-    public function update()
+    public function update($only = [], $except = false)
     {
         $values = $this->validate();
         if (!$this->exists()) {
             throw new \Exception('O identificador da tributação não foi informado');
         }
-        unset($values['id']);
+        $values = self::filterValues($values, $only, $except);
         try {
             self::getDB()
                 ->update('Tributacoes')
                 ->set($values)
                 ->where('id', $this->getID())
                 ->execute();
-            $tributacao = self::findByID($this->getID());
-            $this->fromArray($tributacao->toArray());
+            $this->loadByID($this->getID());
         } catch (\Exception $e) {
             throw $this->translate($e);
         }
@@ -395,18 +388,6 @@ class Tributacao extends \MZ\Database\Helper
         $query = self::query($condition, $order)->limit(1);
         $row = $query->fetch() ?: [];
         return $this->fromArray($row);
-    }
-
-    /**
-     * Load into this object from database using, ID
-     * @param  int $id id to find Tributação
-     * @return Tributacao Self filled instance or empty when not found
-     */
-    public function loadByID($id)
-    {
-        return $this->load([
-            'id' => intval($id),
-        ]);
     }
 
     /**

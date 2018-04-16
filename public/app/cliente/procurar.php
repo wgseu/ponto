@@ -25,7 +25,7 @@ need_manager(true);
 
 $limit = intval(isset($_GET['limite'])?$_GET['limite']:5);
 if ((isset($_GET['primeiro'])?$_GET['primeiro']:false) ||
-    check_fone(isset($_GET['busca'])?$_GET['busca']:null, true)
+    check_fone(isset($_GET['busca']) ? $_GET['busca'] : null, true)
 ) {
     $limit = 1;
 } elseif ($limit < 1) {
@@ -34,8 +34,8 @@ if ((isset($_GET['primeiro'])?$_GET['primeiro']:false) ||
     $limit = 20;
 }
 $clientes = Cliente::getTodos(
-    isset($_GET['busca'])?$_GET['busca']:null,
-    isset($_GET['tipo'])?$_GET['tipo']:null,
+    isset($_GET['busca']) ? $_GET['busca'] : null,
+    isset($_GET['tipo']) ? $_GET['tipo'] : null,
     null, // genero
     null, // mes_inicio
     null, // mes_fim

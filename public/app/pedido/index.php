@@ -1,24 +1,27 @@
 <?php
-/*
-	Copyright 2014 da MZ Software - MZ Desenvolvimento de Sistemas LTDA
-	Este arquivo é parte do programa GrandChef - Sistema para Gerenciamento de Churrascarias, Bares e Restaurantes.
-	O GrandChef é um software proprietário; você não pode redistribuí-lo e/ou modificá-lo.
-	DISPOSIÇÕES GERAIS
-	O cliente não deverá remover qualquer identificação do produto, avisos de direitos autorais,
-	ou outros avisos ou restrições de propriedade do GrandChef.
-
-	O cliente não deverá causar ou permitir a engenharia reversa, desmontagem,
-	ou descompilação do GrandChef.
-
-	PROPRIEDADE DOS DIREITOS AUTORAIS DO PROGRAMA
-
-	GrandChef é a especialidade do desenvolvedor e seus
-	licenciadores e é protegido por direitos autorais, segredos comerciais e outros direitos
-	de leis de propriedade.
-
-	O Cliente adquire apenas o direito de usar o software e não adquire qualquer outros
-	direitos, expressos ou implícitos no GrandChef diferentes dos especificados nesta Licença.
-*/
+/**
+ * Copyright 2014 da MZ Software - MZ Desenvolvimento de Sistemas LTDA
+ *
+ * Este arquivo é parte do programa GrandChef - Sistema para Gerenciamento de Churrascarias, Bares e Restaurantes.
+ * O GrandChef é um software proprietário; você não pode redistribuí-lo e/ou modificá-lo.
+ * DISPOSIÇÕES GERAIS
+ * O cliente não deverá remover qualquer identificação do produto, avisos de direitos autorais,
+ * ou outros avisos ou restrições de propriedade do GrandChef.
+ *
+ * O cliente não deverá causar ou permitir a engenharia reversa, desmontagem,
+ * ou descompilação do GrandChef.
+ *
+ * PROPRIEDADE DOS DIREITOS AUTORAIS DO PROGRAMA
+ *
+ * GrandChef é a especialidade do desenvolvedor e seus
+ * licenciadores e é protegido por direitos autorais, segredos comerciais e outros direitos
+ * de leis de propriedade.
+ *
+ * O Cliente adquire apenas o direito de usar o software e não adquire qualquer outros
+ * direitos, expressos ou implícitos no GrandChef diferentes dos especificados nesta Licença.
+ *
+ * @author Equipe GrandChef <desenvolvimento@mzsw.com.br>
+ */
 require_once(dirname(dirname(__DIR__)) . '/app.php');
 
 if (!is_login()) {
@@ -30,7 +33,7 @@ $action = \MZ\System\Synchronizer::ACTION_ADDED;
 try {
     \DB::BeginTransaction();
     $sessao = Sessao::getPorAberta();
-    if (is_null($sessao->getID())) {
+    if (!$sessao->exists()) {
         throw new \Exception('A sessão ainda não foi aberta');
     }
     $tipo = Pedido::TIPO_MESA;
@@ -42,23 +45,23 @@ try {
 	else if($_POST['tipo'] == 'entrega')
 		$tipo = Pedido::TIPO_ENTREGA; */
     $mesa = Mesa::findByID($_POST['mesa']);
-    if (is_null($mesa->getID()) && $tipo == Pedido::TIPO_MESA) {
+    if (!$mesa->exists() && $tipo == Pedido::TIPO_MESA) {
         throw new \Exception('A mesa não foi informada ou não existe');
     }
     $comanda = \MZ\Sale\Comanda::findByID($_POST['comanda']);
-    if (is_null($comanda->getID()) && $tipo == Pedido::TIPO_COMANDA) {
+    if (!$comanda->exists() && $tipo == Pedido::TIPO_COMANDA) {
         throw new \Exception('A comanda não foi informada ou não existe');
     }
     $pedido = Pedido::findByLocal($tipo, $mesa->getID(), $comanda->getID());
     $pedido->setTipo($tipo);
-    $pedido->validaAcesso($login_funcionario);
-    if (is_null($pedido->getID())) {
+    $pedido->validaAcesso(logged_employee());
+    if (!$pedido->exists()) {
         // não existe pedido ainda, cadastra um novo
         $cliente = Cliente::findByFone($_POST['cliente']);
         $pedido->setMesaID($mesa->getID());
         $pedido->setComandaID($comanda->getID());
         $pedido->setSessaoID($sessao->getID());
-        $pedido->setFuncionarioID($login_funcionario->getID());
+        $pedido->setFuncionarioID(logged_employee()->getID());
         $pedido->setClienteID($cliente->getID());
         $pedido->setPessoas(1);
         $pedido->setCancelado('N');
@@ -72,14 +75,14 @@ try {
     foreach ($_pedidos as $index => $_produto_pedido) {
         $produto_pedido = new ProdutoPedido($_produto_pedido);
         $produto = $produto_pedido->findProdutoID();
-        if (is_null($produto->getID())) {
+        if (!$produto->exists()) {
             throw new \Exception('O produto informado não existe');
         }
         $produto_pedido->setPedidoID($pedido->getID());
-        $produto_pedido->setFuncionarioID($login_funcionario->getID());
+        $produto_pedido->setFuncionarioID(logged_employee()->getID());
         $produto_pedido->setProdutoID($produto->getID());
         if ($produto->isCobrarServico()) {
-            $produto_pedido->setPorcentagem($login_funcionario->getPorcentagem());
+            $produto_pedido->setPorcentagem(logged_employee()->getPorcentagem());
         }
         if (is_null($produto_pedido->getPorcentagem())) {
             $produto_pedido->setPorcentagem(0);
@@ -145,7 +148,7 @@ try {
         }
     }
     \DB::Commit();
-} catch (Exception $e) {
+} catch (\Exception $e) {
     \DB::RollBack();
     json($e->getMessage());
 }

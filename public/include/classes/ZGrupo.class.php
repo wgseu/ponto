@@ -1,24 +1,27 @@
 <?php
-/*
-	Copyright 2014 da MZ Software - MZ Desenvolvimento de Sistemas LTDA
-	Este arquivo é parte do programa GrandChef - Sistema para Gerenciamento de Churrascarias, Bares e Restaurantes.
-	O GrandChef é um software proprietário; você não pode redistribuí-lo e/ou modificá-lo.
-	DISPOSIÇÕES GERAIS
-	O cliente não deverá remover qualquer identificação do produto, avisos de direitos autorais,
-	ou outros avisos ou restrições de propriedade do GrandChef.
-
-	O cliente não deverá causar ou permitir a engenharia reversa, desmontagem,
-	ou descompilação do GrandChef.
-
-	PROPRIEDADE DOS DIREITOS AUTORAIS DO PROGRAMA
-
-	GrandChef é a especialidade do desenvolvedor e seus
-	licenciadores e é protegido por direitos autorais, segredos comerciais e outros direitos
-	de leis de propriedade.
-
-	O Cliente adquire apenas o direito de usar o software e não adquire qualquer outros
-	direitos, expressos ou implícitos no GrandChef diferentes dos especificados nesta Licença.
-*/
+/**
+ * Copyright 2014 da MZ Software - MZ Desenvolvimento de Sistemas LTDA
+ *
+ * Este arquivo é parte do programa GrandChef - Sistema para Gerenciamento de Churrascarias, Bares e Restaurantes.
+ * O GrandChef é um software proprietário; você não pode redistribuí-lo e/ou modificá-lo.
+ * DISPOSIÇÕES GERAIS
+ * O cliente não deverá remover qualquer identificação do produto, avisos de direitos autorais,
+ * ou outros avisos ou restrições de propriedade do GrandChef.
+ *
+ * O cliente não deverá causar ou permitir a engenharia reversa, desmontagem,
+ * ou descompilação do GrandChef.
+ *
+ * PROPRIEDADE DOS DIREITOS AUTORAIS DO PROGRAMA
+ *
+ * GrandChef é a especialidade do desenvolvedor e seus
+ * licenciadores e é protegido por direitos autorais, segredos comerciais e outros direitos
+ * de leis de propriedade.
+ *
+ * O Cliente adquire apenas o direito de usar o software e não adquire qualquer outros
+ * direitos, expressos ou implícitos no GrandChef diferentes dos especificados nesta Licença.
+ *
+ * @author Equipe GrandChef <desenvolvimento@mzsw.com.br>
+ */
 class GrupoTipo
 {
     const INTEIRO = 'Inteiro';
@@ -275,17 +278,17 @@ class ZGrupo
         // extra
         unset($grupo['grupoassociadoid']);
         if (!empty($erros)) {
-            throw new ValidationException($erros);
+            throw new \MZ\Exception\ValidationException($erros);
         }
     }
 
     private static function handleException(&$e)
     {
         if (stripos($e->getMessage(), 'PRIMARY') !== false) {
-            throw new ValidationException(['id' => 'O ID informado já está cadastrado']);
+            throw new \MZ\Exception\ValidationException(['id' => 'O ID informado já está cadastrado']);
         }
         if (stripos($e->getMessage(), 'UK_Grupos_Produto_Descricao') !== false) {
-            throw new ValidationException(['descricao' => 'A descrição informada já está cadastrada']);
+            throw new \MZ\Exception\ValidationException(['descricao' => 'A descrição informada já está cadastrada']);
         }
     }
 
@@ -295,7 +298,7 @@ class ZGrupo
         self::validarCampos($_grupo);
         try {
             $_grupo['id'] = \DB::$pdo->insertInto('Grupos')->values($_grupo)->execute();
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             self::handleException($e);
             throw $e;
         }
@@ -306,7 +309,7 @@ class ZGrupo
     {
         $_grupo = $grupo->toArray();
         if (!$_grupo['id']) {
-            throw new ValidationException(['id' => 'O id do grupo não foi informado']);
+            throw new \MZ\Exception\ValidationException(['id' => 'O id do grupo não foi informado']);
         }
         self::validarCampos($_grupo);
         $campos = [
@@ -323,7 +326,7 @@ class ZGrupo
             $query = $query->set(array_intersect_key($_grupo, array_flip($campos)));
             $query = $query->where('id', $_grupo['id']);
             $query->execute();
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             self::handleException($e);
             throw $e;
         }

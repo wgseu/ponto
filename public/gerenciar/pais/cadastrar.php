@@ -22,9 +22,11 @@
 require_once(dirname(__DIR__) . '/app.php');
 
 use MZ\Location\Pais;
+use MZ\System\Permissao;
+use MZ\Wallet\Moeda;
 
-need_permission(\Permissao::NOME_CADASTROPAISES, is_output('json'));
-$id = isset($_GET['id'])?$_GET['id']:null;
+need_permission(Permissao::NOME_CADASTROPAISES, is_output('json'));
+$id = isset($_GET['id']) ? $_GET['id'] : null;
 $pais = Pais::findByID($id);
 $pais->setID(null);
 
@@ -63,6 +65,6 @@ if (is_post()) {
 } elseif (is_output('json')) {
     json('Nenhum dado foi enviado');
 }
-$moedas = \MZ\Wallet\Moeda::findAll();
+$moedas = Moeda::findAll();
 $flags_images = Pais::getImageIndexOptions();
-include template('gerenciar_pais_cadastrar');
+$app->getResponse('html')->output('gerenciar_pais_cadastrar');

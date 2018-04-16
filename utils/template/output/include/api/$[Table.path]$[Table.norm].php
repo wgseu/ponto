@@ -20,7 +20,7 @@
  * O Cliente adquire apenas o direito de usar o software e não adquire qualquer outros
  * direitos, expressos ou implícitos no GrandChef diferentes dos especificados nesta Licença.
  *
- * @author  Francimar Alves <mazinsw@gmail.com>
+ * @author Equipe GrandChef <desenvolvimento@mzsw.com.br>
  */
 $[table.if(package)]
 namespace $[Table.package];
@@ -196,6 +196,8 @@ $[field.else]
 $[field.end]
 $[field.if(info)]
             $this->set$[Field.norm]($[field.if(array)]$[field.array.number], $[field.end]$[Field.info]);
+$[field.else.if(boolean)]
+            $this->set$[Field.norm]($[field.if(array)]$[field.array.number], $[field.end]'N');
 $[field.else]
             $this->set$[Field.norm]($[field.if(array)]$[field.array.number], $[field.end]null);
 $[field.end]
@@ -276,13 +278,6 @@ $[field.else.if(masked)]
         $this->set$[Field.norm]($[field.if(array)]$[field.array.number], $[field.end]Filter::unmask($this->get$[Field.norm]($[field.if(array)]$[field.array.number]$[field.end]), _p('Mascara', '$[Field.norm]')));
 $[field.else.if(integer|bigint)]
         $this->set$[Field.norm]($[field.if(array)]$[field.array.number], $[field.end]Filter::number($this->get$[Field.norm]($[field.if(array)]$[field.array.number]$[field.end])));
-$[field.else.if(image)]
-        $$[field.unix] = upload_image('raw_$[field]', '$[field.image.folder]');
-        if (is_null($$[field.unix]) && trim($this->get$[Field.norm]($[field.if(array)]$[field.array.number]$[field.end])) != '') {
-            $this->set$[Field.norm]($[field.if(array)]$[field.array.number], $[field.end]$original->get$[Field.norm]($[field.if(array)]$[field.array.number]$[field.end]));
-        } else {
-            $this->set$[Field.norm]($[field.if(array)]$[field.array.number], $[field.end]$$[field.unix]);
-        }
 $[field.else.if(blob)]
         $$[field.unix] = upload_image('raw_$[field]', '$[field.image.folder]');
         if (!is_null($$[field.unix])) {
@@ -291,6 +286,13 @@ $[field.else.if(blob)]
             unlink($$[field.unix]_path);
         } elseif (trim($this->get$[Field.norm]($[field.if(array)]$[field.array.number]$[field.end])) != '') {
             $this->set$[Field.norm]($[field.if(array)]$[field.array.number], $[field.end]true);
+        }
+$[field.else.if(image)]
+        $$[field.unix] = upload_image('raw_$[field]', '$[field.image.folder]');
+        if (is_null($$[field.unix]) && trim($this->get$[Field.norm]($[field.if(array)]$[field.array.number]$[field.end])) != '') {
+            $this->set$[Field.norm]($[field.if(array)]$[field.array.number], $[field.end]$original->get$[Field.norm]($[field.if(array)]$[field.array.number]$[field.end]));
+        } else {
+            $this->set$[Field.norm]($[field.if(array)]$[field.array.number], $[field.end]$$[field.unix]);
         }
 $[field.else.if(text)]
         $this->set$[Field.norm]($[field.if(array)]$[field.array.number], $[field.end]Filter::text($this->get$[Field.norm]($[field.if(array)]$[field.array.number]$[field.end])));
@@ -307,12 +309,12 @@ $[field.end]
     public function clean($dependency)
     {
 $[field.each(all)]
-$[field.if(image)]
+$[field.if(blob)]
+        $this->set$[Field.norm]($[field.if(array)]$[field.array.number], $[field.end]$dependency->get$[Field.norm]($[field.if(array)]$[field.array.number]$[field.end]));
+$[field.else.if(image)]
         if (!is_null($this->get$[Field.norm]($[field.if(array)]$[field.array.number]$[field.end])) && $dependency->get$[Field.norm]($[field.if(array)]$[field.array.number]$[field.end]) != $this->get$[Field.norm]($[field.if(array)]$[field.array.number]$[field.end])) {
             @unlink(get_image_path($this->get$[Field.norm]($[field.if(array)]$[field.array.number]$[field.end]), '$[field.image.folder]'));
         }
-        $this->set$[Field.norm]($[field.if(array)]$[field.array.number], $[field.end]$dependency->get$[Field.norm]($[field.if(array)]$[field.array.number]$[field.end]));
-$[field.else.if(blob)]
         $this->set$[Field.norm]($[field.if(array)]$[field.array.number], $[field.end]$dependency->get$[Field.norm]($[field.if(array)]$[field.array.number]$[field.end]));
 $[field.end]
 $[field.end]
@@ -327,31 +329,7 @@ $[field.end]
         $errors = [];
 $[field.each(all)]
 $[field.if(primary)]
-$[field.else]
-$[field.if(null)]
-$[field.if(info)]
-        if (is_null($this->get$[Field.norm]($[field.if(array)]$[field.array.number]$[field.end]))) {
-$[field.if(boolean)]
-            $this->set$[Field.norm]($[field.if(array)]$[field.array.number], $[field.end]'N');
-$[field.else]
-            $this->set$[Field.norm]($[field.if(array)]$[field.array.number], $[field.end]$[Field.info]);
-$[field.end]
-        }
-$[field.end]
-$[field.else]
-        if (is_null($this->get$[Field.norm]($[field.if(array)]$[field.array.number]$[field.end]))) {
-$[field.if(info)]
-$[field.if(boolean)]
-            $this->set$[Field.norm]($[field.if(array)]$[field.array.number], $[field.end]'N');
-$[field.else]
-            $this->set$[Field.norm]($[field.if(array)]$[field.array.number], $[field.end]$[Field.info]);
-$[field.end]
-$[field.else]
-            $errors['$[field]'] = '$[FIELD.gender] $[field.name] não pode ser vazi$[field.gender]';
-$[field.end]
-        }
-$[field.end]
-$[field.contains(fone)]
+$[field.else.contains(fone)]
         if (!Validator::checkPhone($this->get$[Field.norm]($[field.if(array)]$[field.array.number]$[field.end])$[field.if(null)], true$[field.end])) {
             $errors['$[field]'] = '$[FIELD.gender] $[Field.name] é inválid$[field.gender]';
         }
@@ -380,10 +358,9 @@ $[field.else.match(ip)]
             $errors['$[field]'] = '$[FIELD.gender] $[Field.name] é inválid$[field.gender]';
         }
 $[field.else.match(senha|password)]
-        if (!Validator::checkPassword($this->get$[Field.norm]($[field.if(array)]$[field.array.number]$[field.end]), true)) {
+        if (!Validator::checkPassword($this->get$[Field.norm]($[field.if(array)]$[field.array.number]$[field.end]), $this->exists())) {
             $errors['$[field]'] = '$[FIELD.gender] $[field.name] informad$[field.gender] não é segur$[field.gender]';
         }
-$[field.end]
 $[field.if(enum)]
         if (!Validator::checkInSet($this->get$[Field.norm]($[field.if(array)]$[field.array.number]$[field.end]), self::get$[Field.norm]Options(), true)) {
             $errors['$[field]'] = '$[FIELD.gender] $[field.name] é inválid$[field.gender]';
@@ -392,7 +369,11 @@ $[field.else.if(boolean)]
         if (!Validator::checkBoolean($this->get$[Field.norm]($[field.if(array)]$[field.array.number]$[field.end]), true)) {
             $errors['$[field]'] = '$[FIELD.gender] $[field.name] é inválid$[field.gender]';
         }
-$[field.end]
+$[field.else.if(null)]
+$[field.else]
+        if (is_null($this->get$[Field.norm]($[field.if(array)]$[field.array.number]$[field.end]))) {
+            $errors['$[field]'] = '$[FIELD.gender] $[field.name] não pode ser vazi$[field.gender]';
+        }
 $[field.end]
 $[field.end]
         if (!empty($errors)) {
@@ -409,7 +390,7 @@ $[field.end]
     protected function translate($e)
     {
 $[table.each(unique)]
-        if (stripos($e->getMessage(), '$[Unique.name]') !== false) {
+        if (contains([$[unique.each(all)]'$[Field]', $[unique.end]'UNIQUE'], $e->getMessage())) {
             return new \MZ\Exception\ValidationException([
 $[unique.each(all)]
                 '$[field]' => sprintf(
@@ -437,8 +418,7 @@ $[table.end]
         unset($values['$[primary]']);
         try {
             $$[primary.unix] = self::getDB()->insertInto('$[Table]')->values($values)->execute();
-            $$[table.unix] = self::findBy$[Primary.norm]($$[primary.unix]);
-            $this->fromArray($$[table.unix]->toArray());
+            $this->loadBy$[Primary.norm]($$[primary.unix]);
         } catch (\Exception $e) {
             throw $this->translate($e);
         }
@@ -447,27 +427,45 @@ $[table.end]
 
     /**
      * Update $[Table.name] with instance values into database for $[Primary.name]
-     * @return $[Table.norm] Self instance
+     * @param  array $only Save these fields only, when empty save all fields except id
+     * @param  boolean $all When true, updates all rows by getID condition array
+     * @return int rows affected
      */
-    public function update()
+    public function update($only = [], $all = false)
     {
         $values = $this->validate();
-        if (!$this->exists()) {
+        if ($all && is_array($this->get$[Primary.norm]())) {
+            $condition = $this->get$[Primary.norm]();
+        } elseif (!$this->exists()) {
             throw new \Exception('O identificador d$[table.gender] $[table.name] não foi informado');
+        } else {
+            $condition = ['$[primary]' => $this->get$[Primary.norm]()];
         }
-        unset($values['$[primary]']);
+        $values = self::filterValues($values, $only, false);
+$[field.each(all)]
+$[field.if(blob)]
+        if ($this->get$[Field.norm]($[field.if(array)]$[field.array.number]$[field.end]) === true) {
+            unset($values['$[field]']);
+        }
+$[field.else.if(datetime)]
+$[field.match(.*cadastro|.*criacao|.*lancamento|.*envio)]
+        unset($values['$[field]']);
+$[field.end]
+$[field.end]
+$[field.end]
         try {
-            self::getDB()
+            $affected = self::getDB()
                 ->update('$[Table]')
                 ->set($values)
-                ->where('$[primary]', $this->get$[Primary.norm]())
+                ->where($condition)
                 ->execute();
-            $$[table.unix] = self::findBy$[Primary.norm]($this->get$[Primary.norm]());
-            $this->fromArray($$[table.unix]->toArray());
+            if (!$all || !is_array($this->get$[Primary.norm]())) {
+                $this->loadBy$[Primary.norm]($this->get$[Primary.norm]());
+            }
         } catch (\Exception $e) {
             throw $this->translate($e);
         }
-        return $this;
+        return $affected;
     }
 
     /**

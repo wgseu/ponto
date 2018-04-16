@@ -1,41 +1,47 @@
 <?php
 /*
-	Copyright 2016 da MZ Software - MZ Desenvolvimento de Sistemas LTDA
-	Este arquivo é parte do programa GrandChef - Sistema para Gerenciamento de Churrascarias, Bares e Restaurantes.
-	O GrandChef é um software proprietário; você não pode redistribuí-lo e/ou modificá-lo.
-	DISPOSIÇÕES GERAIS
-	O cliente não deverá remover qualquer identificação do produto, avisos de direitos autorais,
-	ou outros avisos ou restrições de propriedade do GrandChef.
+    Copyright 2016 da MZ Software - MZ Desenvolvimento de Sistemas LTDA
+    Este arquivo é parte do programa GrandChef - Sistema para Gerenciamento de Churrascarias, Bares e Restaurantes.
+    O GrandChef é um software proprietário; você não pode redistribuí-lo e/ou modificá-lo.
+    DISPOSIÇÕES GERAIS
+    O cliente não deverá remover qualquer identificação do produto, avisos de direitos autorais,
+    ou outros avisos ou restrições de propriedade do GrandChef.
 
-	O cliente não deverá causar ou permitir a engenharia reversa, desmontagem,
-	ou descompilação do GrandChef.
+    O cliente não deverá causar ou permitir a engenharia reversa, desmontagem,
+    ou descompilação do GrandChef.
 
-	PROPRIEDADE DOS DIREITOS AUTORAIS DO PROGRAMA
+    PROPRIEDADE DOS DIREITOS AUTORAIS DO PROGRAMA
 
-	GrandChef é a especialidade do desenvolvedor e seus
-	licenciadores e é protegido por direitos autorais, segredos comerciais e outros direitos
-	de leis de propriedade.
+    GrandChef é a especialidade do desenvolvedor e seus
+    licenciadores e é protegido por direitos autorais, segredos comerciais e outros direitos
+    de leis de propriedade.
 
-	O Cliente adquire apenas o direito de usar o software e não adquire qualquer outros
-	direitos, expressos ou implícitos no GrandChef diferentes dos especificados nesta Licença.
+    O Cliente adquire apenas o direito de usar o software e não adquire qualquer outros
+    direitos, expressos ou implícitos no GrandChef diferentes dos especificados nesta Licença.
 */
 require_once(dirname(__DIR__) . '/app.php');
 
+use MZ\Account\Cliente;
+use MZ\System\Permissao;
+use MZ\Employee\Funcionario;
+
 need_manager(is_output('json'));
-$cliente = Cliente::findByID($_GET['id']);
-if (is_null($cliente->getID())) {
-    $msg = 'O cliente de id "'.$id.'" não existe!';
+$id = isset($_GET['id']) ? $_GET['id'] : null;
+$cliente = Cliente::findByID($id);
+if (!$cliente->exists()) {
+    $msg = 'O cliente não foi informado ou não existe!';
     if (is_output('json')) {
         json($msg);
     }
     \Thunder::warning($msg);
     redirect('/gerenciar/cliente/');
 }
-if ($cliente->getID() != $login_cliente->getID()) {
+if ($cliente->getID() != logged_user()->getID()) {
     need_permission(Permissao::NOME_CADASTROCLIENTES, is_output('json'));
 }
-if ($cliente->getID() == $__empresa__->getID() &&
-    !$login_funcionario->has(Permissao::NOME_ALTERARCONFIGURACOES)) {
+if ($cliente->getID() == $app->getSystem()->getCompany()->getID() &&
+    !logged_employee()->has(Permissao::NOME_ALTERARCONFIGURACOES)
+) {
     $msg = 'Você não tem permissão para alterar essa empresa!';
     if (is_output('json')) {
         json($msg);
@@ -44,11 +50,17 @@ if ($cliente->getID() == $__empresa__->getID() &&
     redirect('/gerenciar/cliente/');
 }
 $funcionario = Funcionario::findByClienteID($cliente->getID());
-if (!is_null($funcionario->getID()) && (
-    (!$login_funcionario->has(Permissao::NOME_CADASTROFUNCIONARIOS) &&
-     $login_funcionario->getID() != $funcionario->getID()) ||
-    ( have_permission(Permissao::NOME_CADASTROFUNCIONARIOS, $funcionario) &&
-     $login_funcionario->getID() != $funcionario->getID() && !is_owner()) ) ) {
+if ($funcionario->exists() &&
+    (
+        (!logged_employee()->has(Permissao::NOME_CADASTROFUNCIONARIOS) &&
+            logged_employee()->getID() != $funcionario->getID()
+        ) ||
+        ($funcionario->has(Permissao::NOME_CADASTROFUNCIONARIOS) &&
+            logged_employee()->getID() != $funcionario->getID() &&
+            !is_owner()
+        )
+    )
+) {
     $msg = 'Você não tem permissão para alterar as informações desse cliente!';
     if (is_output('json')) {
         json($msg);
@@ -62,69 +74,49 @@ $old_cliente = $cliente;
 if (is_post()) {
     $cliente = new Cliente($_POST);
     try {
-        $cliente->setID($old_cliente->getID());
-        if ($cliente->getID() == $__empresa__->getID() && $cliente->getTipo() != Cliente::TIPO_JURIDICA) {
-            throw new ValidationException(['tipo' => 'O tipo da empresa deve ser jurídica']);
+        if ($cliente->getID() == $app->getSystem()->getCompany()->getID() && $cliente->getTipo() != Cliente::TIPO_JURIDICA) {
+            throw new \MZ\Exception\ValidationException(['tipo' => 'O tipo da empresa deve ser jurídica']);
         }
-        if (strlen($cliente->getSenha()) > 0 && $cliente->getSenha() != $_POST['confirmarsenha']) {
-            throw new ValidationException(['senha' => 'As senhas não são iguais']);
-        }
-        $cliente->setAcionistaID(numberval($cliente->getAcionistaID()));
-        if ($cliente->getTipo() == Cliente::TIPO_JURIDICA) {
-            $cliente->setCPF(\MZ\Util\Filter::unmask($cliente->getCPF(), _p('Mascara', 'CNPJ')));
-        } else {
-            $cliente->setCPF(\MZ\Util\Filter::unmask($cliente->getCPF(), _p('Mascara', 'CPF')));
-        }
-        $_data_aniversario = date_create_from_format('d/m/Y', $cliente->getDataAniversario());
-        $cliente->setDataAniversario($_data_aniversario===false?null:date_format($_data_aniversario, 'Y-m-d'));
-        $cliente->setFone(1, \MZ\Util\Filter::unmask($cliente->getFone(1), _p('Mascara', 'Telefone')));
-        $cliente->setFone(2, \MZ\Util\Filter::unmask($cliente->getFone(2), _p('Mascara', 'Telefone')));
-        $cliente->setLimiteCompra(moneyval($cliente->getLimiteCompra()));
-        $width = 256;
-        if ($cliente->getTipo() == Cliente::TIPO_JURIDICA) {
-            $width = 640;
-        }
-        $imagem = upload_image('raw_imagem', 'cliente', null, $width, 256, true);
-        if (!is_null($imagem)) {
-            $cliente->setImagem(file_get_contents(WWW_ROOT . get_image_url($imagem, 'cliente')));
-            unlink(WWW_ROOT . get_image_url($imagem, 'cliente'));
-        } elseif (trim($cliente->getImagem()) != '') { // evita sobrescrever
-            $cliente->setImagem(true);
-        }
+        $senha = isset($_POST['confirmarsenha']) ? $_POST['confirmarsenha'] : '';
+        $cliente->passwordMatch($senha);
         $cliente->filter($old_cliente);
         $cliente->update();
         $old_cliente->clean($cliente);
         try {
-            if ($cliente->getID() == $__empresa__->getID()) {
+            if ($cliente->getID() == $app->getSystem()->getCompany()->getID()) {
                 $appsync = new \MZ\System\Synchronizer();
                 $appsync->enterpriseChanged();
             }
-        } catch (Exception $e) {
-            Log::error($e->getMessage());
+        } catch (\Exception $e) {
+            \Log::error($e->getMessage());
         }
-        $msg = 'Cliente "'.$cliente->getNomeCompleto().'" atualizado com sucesso!';
+        $msg = sprintf(
+            'Cliente "%s" atualizado com sucesso!',
+            $cliente->getNomeCompleto()
+        );
         if (is_output('json')) {
-            json(['status' => 'ok', 'item' => $cliente->toArray(['secreto', 'senha']), 'msg' => $msg]);
+            json(null, ['item' => $cliente->publish(), 'msg' => $msg]);
         }
         \Thunder::success($msg, true);
         redirect('/gerenciar/cliente/');
-    } catch (ValidationException $e) {
-        $errors = $e->getErrors();
-    } catch (Exception $e) {
-        $errors['unknow'] = $e->getMessage();
-    }
-    // restaura a foto original
-    $cliente->setImagem($old_cliente->getImagem());
-    foreach ($errors as $key => $value) {
-        $focusctrl = $key;
-        if (is_output('json')) {
-            json($value, null, ['field' => $focusctrl]);
+    } catch (\Exception $e) {
+        $cliente->clean($old_cliente);
+        if ($e instanceof \MZ\Exception\ValidationException) {
+            $errors = $e->getErrors();
         }
-        \Thunder::error($value);
-        break;
+        if (is_output('json')) {
+            json($e->getMessage(), null, ['errors' => $errors]);
+        }
+        \Thunder::error($e->getMessage());
+        foreach ($errors as $key => $value) {
+            $focusctrl = $key;
+            break;
+        }
+        if ($focusctrl == 'genero') {
+            $focusctrl = $focusctrl . '-' . strtolower($cliente->getGenero());
+        }
     }
-}
-if (is_output('json')) {
+} elseif (is_output('json')) {
     json('Nenhum dado foi enviado');
 }
-include template('gerenciar_cliente_editar');
+$app->getResponse('html')->output('gerenciar_cliente_editar');

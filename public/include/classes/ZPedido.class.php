@@ -1,24 +1,27 @@
 <?php
-/*
-	Copyright 2014 da MZ Software - MZ Desenvolvimento de Sistemas LTDA
-	Este arquivo é parte do programa GrandChef - Sistema para Gerenciamento de Churrascarias, Bares e Restaurantes.
-	O GrandChef é um software proprietário; você não pode redistribuí-lo e/ou modificá-lo.
-	DISPOSIÇÕES GERAIS
-	O cliente não deverá remover qualquer identificação do produto, avisos de direitos autorais,
-	ou outros avisos ou restrições de propriedade do GrandChef.
-
-	O cliente não deverá causar ou permitir a engenharia reversa, desmontagem,
-	ou descompilação do GrandChef.
-
-	PROPRIEDADE DOS DIREITOS AUTORAIS DO PROGRAMA
-
-	GrandChef é a especialidade do desenvolvedor e seus
-	licenciadores e é protegido por direitos autorais, segredos comerciais e outros direitos
-	de leis de propriedade.
-
-	O Cliente adquire apenas o direito de usar o software e não adquire qualquer outros
-	direitos, expressos ou implícitos no GrandChef diferentes dos especificados nesta Licença.
-*/
+/**
+ * Copyright 2014 da MZ Software - MZ Desenvolvimento de Sistemas LTDA
+ *
+ * Este arquivo é parte do programa GrandChef - Sistema para Gerenciamento de Churrascarias, Bares e Restaurantes.
+ * O GrandChef é um software proprietário; você não pode redistribuí-lo e/ou modificá-lo.
+ * DISPOSIÇÕES GERAIS
+ * O cliente não deverá remover qualquer identificação do produto, avisos de direitos autorais,
+ * ou outros avisos ou restrições de propriedade do GrandChef.
+ *
+ * O cliente não deverá causar ou permitir a engenharia reversa, desmontagem,
+ * ou descompilação do GrandChef.
+ *
+ * PROPRIEDADE DOS DIREITOS AUTORAIS DO PROGRAMA
+ *
+ * GrandChef é a especialidade do desenvolvedor e seus
+ * licenciadores e é protegido por direitos autorais, segredos comerciais e outros direitos
+ * de leis de propriedade.
+ *
+ * O Cliente adquire apenas o direito de usar o software e não adquire qualquer outros
+ * direitos, expressos ou implícitos no GrandChef diferentes dos especificados nesta Licença.
+ *
+ * @author Equipe GrandChef <desenvolvimento@mzsw.com.br>
+ */
 class PedidoTipo
 {
     const MESA = 'Mesa';
@@ -312,7 +315,7 @@ class ZPedido
      */
     public function isDelivery()
     {
-        return $this->getTipo() == Pedido::TIPO_ENTREGA && !is_null($this->getLocalizacaoID());
+        return $this->getTipo() == self::TIPO_ENTREGA && !is_null($this->getLocalizacaoID());
     }
 
     public function toArray()
@@ -351,7 +354,7 @@ class ZPedido
     public static function getPelaMesaID($mesa_id)
     {
         $query = \DB::$pdo->from('Pedidos')
-                         ->where(['mesaid' => $mesa_id, 'cancelado' => 'N', 'tipo' => PedidoTipo::MESA])
+                         ->where(['mesaid' => $mesa_id, 'cancelado' => 'N', 'tipo' => self::TIPO_MESA])
                          ->where('estado <> ?', Pedido::ESTADO_FINALIZADO);
         return new Pedido($query->fetch());
     }
@@ -359,17 +362,17 @@ class ZPedido
     public static function getPelaComandaID($comanda_id)
     {
         $query = \DB::$pdo->from('Pedidos')
-                         ->where(['comandaid' => $comanda_id, 'cancelado' => 'N', 'tipo' => PedidoTipo::COMANDA])
+                         ->where(['comandaid' => $comanda_id, 'cancelado' => 'N', 'tipo' => self::TIPO_COMANDA])
                          ->where('estado <> ?', Pedido::ESTADO_FINALIZADO);
         return new Pedido($query->fetch());
     }
 
     public static function getPeloLocal($tipo, $mesa_id, $comanda_id)
     {
-        if ($tipo == Pedido::TIPO_MESA) {
+        if ($tipo == self::TIPO_MESA) {
             return self::getPelaMesaID($mesa_id);
         }
-        if ($tipo == Pedido::TIPO_COMANDA) {
+        if ($tipo == self::TIPO_COMANDA) {
             return self::getPelaComandaID($comanda_id);
         }
         return new Pedido();
@@ -414,7 +417,7 @@ class ZPedido
                          ->select('SUM(p.pessoas) as total')
                          ->select('SUM(IF(p.estado = ?, 0, p.pessoas)) as atual', Pedido::ESTADO_FINALIZADO)
                          ->where(['p.cancelado' => 'N'])
-                         ->where('p.tipo <> ?', Pedido::TIPO_ENTREGA);
+                         ->where('p.tipo <> ?', self::TIPO_ENTREGA);
         if (!is_null($sessao_id)) {
             $query = $query->where(['p.sessaoid' => $sessao_id]);
         }
@@ -479,7 +482,7 @@ class ZPedido
 
     public static function getTotalDoLocal($tipo, $mesa_id, $comanda_id)
     {
-        if ($tipo == Pedido::TIPO_COMANDA) {
+        if ($tipo == self::TIPO_COMANDA) {
             $pedido = self::getPelaComandaID($comanda_id);
         } else {
             $pedido = self::getPelaMesaID($mesa_id);
@@ -582,21 +585,22 @@ class ZPedido
         $pedido['dataentrega'] = null;
         $pedido['dataconclusao'] = null;
         if (!empty($erros)) {
-            throw new ValidationException($erros);
+            throw new \MZ\Exception\ValidationException($erros);
         }
     }
 
     private static function handleException(&$e)
     {
         if (stripos($e->getMessage(), 'PRIMARY') !== false) {
-            throw new ValidationException(['id' => 'O ID informado já está cadastrado']);
+            throw new \MZ\Exception\ValidationException(['id' => 'O ID informado já está cadastrado']);
         }
     }
 
     public static function cadastrar($pedido)
     {
-        global $__sistema__;
-        if (trim($__sistema__->getLicenseKey()) == '') {
+        global $app;
+
+        if (trim($app->getSystem()->getLicenseKey()) == '') {
             $count = self::getCount();
             if ($count >= 20) {
                 throw new \Exception('Quantidade de pedidos excedido, adquira uma licença para continuar', 401);
@@ -606,7 +610,7 @@ class ZPedido
         self::validarCampos($_pedido);
         try {
             $_pedido['id'] = \DB::$pdo->insertInto('Pedidos')->values($_pedido)->execute();
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             self::handleException($e);
             throw $e;
         }
@@ -617,7 +621,7 @@ class ZPedido
     {
         $_pedido = $pedido->toArray();
         if (!$_pedido['id']) {
-            throw new ValidationException(['id' => 'O id do pedido não foi informado']);
+            throw new \MZ\Exception\ValidationException(['id' => 'O id do pedido não foi informado']);
         }
         self::validarCampos($_pedido);
         $campos = [
@@ -645,7 +649,7 @@ class ZPedido
             $query = $query->set(array_intersect_key($_pedido, array_flip($campos)));
             $query = $query->where('id', $_pedido['id']);
             $query->execute();
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             self::handleException($e);
             throw $e;
         }
@@ -655,32 +659,38 @@ class ZPedido
     public function validaAcesso($funcionario = null)
     {
         if (is_null($funcionario)) {
-            $funcionario = $GLOBALS['login_funcionario'];
+            $funcionario = logged_employee();
         }
-        if ($this->getTipo() == Pedido::TIPO_MESA && !have_permission(Permissao::NOME_PEDIDOMESA, $funcionario)) {
+        if ($this->getTipo() == self::TIPO_MESA && !$funcionario->has(Permissao::NOME_PEDIDOMESA)) {
             throw new \Exception('Você não tem permissão para acessar mesas');
-        } elseif ($this->getTipo() == Pedido::TIPO_COMANDA && !have_permission(Permissao::NOME_PEDIDOCOMANDA, $funcionario)) {
+        } elseif ($this->getTipo() == self::TIPO_COMANDA && !$funcionario->has(Permissao::NOME_PEDIDOCOMANDA)) {
             throw new \Exception('Você não tem permissão para acessar comandas');
         }
-        if (is_null($this->getID())) {
+        if (!$this->exists()) {
             return;
         }
-        if (!in_array($this->getTipo(), [PedidoTipo::MESA, PedidoTipo::COMANDA])) {
+        if (!in_array($this->getTipo(), [self::TIPO_MESA, self::TIPO_COMANDA])) {
             return;
         }
         if ($this->getFuncionarioID() == $funcionario->getID()) {
             return;
         }
-        if ($this->getTipo() == Pedido::TIPO_MESA && !have_permission(Permissao::NOME_MESAS, $funcionario)) {
+        if ($this->getTipo() == self::TIPO_MESA && !$funcionario->has(Permissao::NOME_MESAS)) {
             $funcionario_pedido = $this->findFuncionarioID();
             $cliente_funcionario_pedido = $funcionario_pedido->findClienteID();
-            $msg = 'Apenas o(a) funcionário(a) "'.$cliente_funcionario_pedido->getLogin().'" poderá realizar pedidos para essa mesa.';
+            $msg = sprintf(
+                'Apenas o(a) funcionário(a) "%s" poderá realizar pedidos para essa mesa.',
+                $cliente_funcionario_pedido->getAssinatura()
+            );
             throw new \Exception($msg);
         }
-        if ($this->getTipo() == Pedido::TIPO_COMANDA && !have_permission(Permissao::NOME_COMANDAS, $funcionario)) {
+        if ($this->getTipo() == self::TIPO_COMANDA && !$funcionario->has(Permissao::NOME_COMANDAS)) {
             $funcionario_pedido = $this->findFuncionarioID();
             $cliente_funcionario_pedido = $funcionario_pedido->findClienteID();
-            $msg = 'Apenas o(a) funcionário(a) "'.$cliente_funcionario_pedido->getLogin().'" poderá realizar pedidos para essa comanda.';
+            $msg = sprintf(
+                'Apenas o(a) funcionário(a) "%s" poderá realizar pedidos para essa comanda.',
+                $cliente_funcionario_pedido->getAssinatura()
+            );
             throw new \Exception($msg);
         }
     }

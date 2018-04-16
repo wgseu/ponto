@@ -1,25 +1,27 @@
 <?php
 /*
-	Copyright 2014 da MZ Software - MZ Desenvolvimento de Sistemas LTDA
-	Este arquivo é parte do programa GrandChef - Sistema para Gerenciamento de Churrascarias, Bares e Restaurantes.
-	O GrandChef é um software proprietário; você não pode redistribuí-lo e/ou modificá-lo.
-	DISPOSIÇÕES GERAIS
-	O cliente não deverá remover qualquer identificação do produto, avisos de direitos autorais,
-	ou outros avisos ou restrições de propriedade do GrandChef.
+    Copyright 2014 da MZ Software - MZ Desenvolvimento de Sistemas LTDA
+    Este arquivo é parte do programa GrandChef - Sistema para Gerenciamento de Churrascarias, Bares e Restaurantes.
+    O GrandChef é um software proprietário; você não pode redistribuí-lo e/ou modificá-lo.
+    DISPOSIÇÕES GERAIS
+    O cliente não deverá remover qualquer identificação do cliente, avisos de direitos autorais,
+    ou outros avisos ou restrições de propriedade do GrandChef.
 
-	O cliente não deverá causar ou permitir a engenharia reversa, desmontagem,
-	ou descompilação do GrandChef.
+    O cliente não deverá causar ou permitir a engenharia reversa, desmontagem,
+    ou descompilação do GrandChef.
 
-	PROPRIEDADE DOS DIREITOS AUTORAIS DO PROGRAMA
+    PROPRIEDADE DOS DIREITOS AUTORAIS DO PROGRAMA
 
-	GrandChef é a especialidade do desenvolvedor e seus
-	licenciadores e é protegido por direitos autorais, segredos comerciais e outros direitos
-	de leis de propriedade.
+    GrandChef é a especialidade do desenvolvedor e seus
+    licenciadores e é protegido por direitos autorais, segredos comerciais e outros direitos
+    de leis de propriedade.
 
-	O Cliente adquire apenas o direito de usar o software e não adquire qualquer outros
-	direitos, expressos ou implícitos no GrandChef diferentes dos especificados nesta Licença.
+    O Cliente adquire apenas o direito de usar o software e não adquire qualquer outros
+    direitos, expressos ou implícitos no GrandChef diferentes dos especificados nesta Licença.
 */
 require_once(dirname(dirname(__DIR__)) . '/app.php');
+
+use MZ\Account\Cliente;
 
 function exitNotFound()
 {
@@ -28,26 +30,27 @@ function exitNotFound()
     echo "A imagem ou o cliente não existe.";
     exit;
 }
-if (!isset($_GET['cliente']) || !is_numeric($_GET['cliente'])) {
+$id = isset($_GET['cliente']) ? $_GET['cliente'] : null;
+$cliente = Cliente::findByID($id);
+
+if (!$cliente->exists()) {
     exitNotFound();
 }
 if (isset($_SERVER['HTTP_IF_MODIFIED_SINCE'])) {
-    $imagem = Cliente::getImagemPeloID(intval($_GET['cliente']), true);
-    if (strtotime($_SERVER['HTTP_IF_MODIFIED_SINCE']) >= strtotime($imagem['dataatualizacao'])) {
+    if (strtotime($_SERVER['HTTP_IF_MODIFIED_SINCE']) >= strtotime($cliente->getDataAtualizacao())) {
         header('HTTP/1.0 304 Not Modified');
         header('Cache-Control: max-age=12096000, public');
         header('Expires: ' . gmdate('D, d M Y H:i:s T', time() + 12096000));
         exit;
     }
 }
-$imagem = Cliente::getImagemPeloID(intval($_GET['cliente']));
-$imagebytes = $imagem['imagem'];
-if ($imagebytes == null) {
+$cliente->loadImagem();
+if (is_null($cliente->getImagem())) {
     exitNotFound();
 }
 header('Content-type: image/png');
-header('Last-Modified: ' . gmdate('D, d M Y H:i:s T', strtotime($imagem['dataatualizacao'])));
+header('Last-Modified: ' . gmdate('D, d M Y H:i:s T', strtotime($cliente->getDataAtualizacao())));
 header('Cache-Control: max-age=12096000, public');
 header('Expires: ' . gmdate('D, d M Y H:i:s T', time() + 12096000));
 header('Pragma: cache');
-print $imagebytes;
+print($cliente->getImagem());

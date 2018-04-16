@@ -35,12 +35,7 @@ class SistemaTest extends \PHPUnit_Framework_TestCase
             'paisid',
             'empresaid',
             'parceiroid',
-            'accesskey',
-            'registrykey',
-            'licensekey',
             'computadores',
-            'guid',
-            'opcoes',
             'ultimobackup',
             'versaodb',
         ];

@@ -20,7 +20,7 @@
  * O Cliente adquire apenas o direito de usar o software e não adquire qualquer outros
  * direitos, expressos ou implícitos no GrandChef diferentes dos especificados nesta Licença.
  *
- * @author  Francimar Alves <mazinsw@gmail.com>
+ * @author Equipe GrandChef <desenvolvimento@mzsw.com.br>
  */
 namespace MZ\Environment;
 
@@ -519,7 +519,7 @@ class Patrimonio extends \MZ\Database\Helper
             $this->setValor($patrimonio['valor']);
         }
         if (!isset($patrimonio['ativo'])) {
-            $this->setAtivo(null);
+            $this->setAtivo('Y');
         } else {
             $this->setAtivo($patrimonio['ativo']);
         }
@@ -529,7 +529,7 @@ class Patrimonio extends \MZ\Database\Helper
             $this->setImagemAnexada($patrimonio['imagemanexada']);
         }
         if (!isset($patrimonio['dataatualizacao'])) {
-            $this->setDataAtualizacao(null);
+            $this->setDataAtualizacao(self::now());
         } else {
             $this->setDataAtualizacao($patrimonio['dataatualizacao']);
         }
@@ -584,7 +584,7 @@ class Patrimonio extends \MZ\Database\Helper
         } else {
             $this->setImagemAnexada($imagem_anexada);
         }
-        $this->setDataAtualizacao(Filter::datetime($this->getDataAtualizacao()));
+        $this->setDataAtualizacao(self::now());
     }
 
     /**
@@ -617,37 +617,41 @@ class Patrimonio extends \MZ\Database\Helper
         }
         if (is_null($this->getQuantidade())) {
             $errors['quantidade'] = 'A quantidade não pode ser vazia';
+        } elseif ($this->getQuantidade() < 1) {
+            $errors['quantidade'] = 'A quantidade não pode ser nula ou negativa';
         }
         if (is_null($this->getAltura())) {
             $errors['altura'] = 'A altura não pode ser vazia';
+        } elseif ($this->getAltura() < 0) {
+            $errors['altura'] = 'A altura não pode ser nula ou negativa';
         }
         if (is_null($this->getLargura())) {
             $errors['largura'] = 'A largura não pode ser vazia';
+        } elseif ($this->getLargura() < 0) {
+            $errors['largura'] = 'A largura não pode ser nula ou negativa';
         }
         if (is_null($this->getComprimento())) {
             $errors['comprimento'] = 'O comprimento não pode ser vazio';
+        } elseif ($this->getComprimento() < 0) {
+            $errors['comprimento'] = 'O comprimento não pode ser nulo ou negativo';
         }
-        if (is_null($this->getEstado())) {
-            $errors['estado'] = 'O estado não pode ser vazio';
-        }
-        if (!Validator::checkInSet($this->getEstado(), self::getEstadoOptions(), true)) {
+        if (!Validator::checkInSet($this->getEstado(), self::getEstadoOptions())) {
             $errors['estado'] = 'O estado é inválido';
         }
         if (is_null($this->getCusto())) {
             $errors['custo'] = 'O custo não pode ser vazio';
+        } elseif ($this->getCusto() < 0) {
+            $errors['custo'] = 'O custo não pode ser nulo ou negativo';
         }
         if (is_null($this->getValor())) {
             $errors['valor'] = 'O valor não pode ser vazio';
+        } elseif ($this->getValor() < 0) {
+            $errors['valor'] = 'O valor não pode ser negativo';
         }
-        if (is_null($this->getAtivo())) {
-            $errors['ativo'] = 'O ativo não pode ser vazio';
-        }
-        if (!Validator::checkBoolean($this->getAtivo(), true)) {
+        if (!Validator::checkBoolean($this->getAtivo())) {
             $errors['ativo'] = 'O ativo é inválido';
         }
-        if (is_null($this->getDataAtualizacao())) {
-            $errors['dataatualizacao'] = 'A data de atualização não pode ser vazia';
-        }
+        $this->setDataAtualizacao(self::now());
         if (!empty($errors)) {
             throw new \MZ\Exception\ValidationException($errors);
         }
@@ -661,15 +665,7 @@ class Patrimonio extends \MZ\Database\Helper
      */
     protected function translate($e)
     {
-        if (stripos($e->getMessage(), 'PRIMARY') !== false) {
-            return new \MZ\Exception\ValidationException([
-                'id' => sprintf(
-                    'O id "%s" já está cadastrado',
-                    $this->getID()
-                ),
-            ]);
-        }
-        if (stripos($e->getMessage(), 'Numero_Estado_UNIQUE') !== false) {
+        if (contains(['Numero', 'Estado', 'UNIQUE'], $e->getMessage())) {
             return new \MZ\Exception\ValidationException([
                 'numero' => sprintf(
                     'O número "%s" já está cadastrado',
@@ -704,23 +700,24 @@ class Patrimonio extends \MZ\Database\Helper
 
     /**
      * Update Patrimônio with instance values into database for ID
+     * @param  array $only Save these fields only, when empty save all fields except id
+     * @param  boolean $except When true, saves all fields except $only
      * @return Patrimonio Self instance
      */
-    public function update()
+    public function update($only = [], $except = false)
     {
         $values = $this->validate();
         if (!$this->exists()) {
             throw new \Exception('O identificador do patrimônio não foi informado');
         }
-        unset($values['id']);
+        $values = self::filterValues($values, $only, $except);
         try {
             self::getDB()
                 ->update('Patrimonios')
                 ->set($values)
                 ->where('id', $this->getID())
                 ->execute();
-            $patrimonio = self::findByID($this->getID());
-            $this->fromArray($patrimonio->toArray());
+            $this->loadByID($this->getID());
         } catch (\Exception $e) {
             throw $this->translate($e);
         }
@@ -754,18 +751,6 @@ class Patrimonio extends \MZ\Database\Helper
         $query = self::query($condition, $order)->limit(1);
         $row = $query->fetch() ?: [];
         return $this->fromArray($row);
-    }
-
-    /**
-     * Load into this object from database using, ID
-     * @param  int $id id to find Patrimônio
-     * @return Patrimonio Self filled instance or empty when not found
-     */
-    public function loadByID($id)
-    {
-        return $this->load([
-            'id' => intval($id),
-        ]);
     }
 
     /**

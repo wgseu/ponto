@@ -20,7 +20,7 @@
  * O Cliente adquire apenas o direito de usar o software e não adquire qualquer outros
  * direitos, expressos ou implícitos no GrandChef diferentes dos especificados nesta Licença.
  *
- * @author  Francimar Alves <mazinsw@gmail.com>
+ * @author Equipe GrandChef <desenvolvimento@mzsw.com.br>
  */
 namespace MZ\Wallet;
 
@@ -277,15 +277,7 @@ class Banco extends \MZ\Database\Helper
      */
     protected function translate($e)
     {
-        if (stripos($e->getMessage(), 'PRIMARY') !== false) {
-            return new \MZ\Exception\ValidationException([
-                'id' => vsprintf(
-                    'O ID "%s" já está cadastrado',
-                    [$this->getID()]
-                ),
-            ]);
-        }
-        if (stripos($e->getMessage(), 'RazaoSocial_UNIQUE') !== false) {
+        if (contains(['RazaoSocial', 'UNIQUE'], $e->getMessage())) {
             return new \MZ\Exception\ValidationException([
                 'razaosocial' => vsprintf(
                     'A Razão social "%s" já está cadastrada',
@@ -293,7 +285,7 @@ class Banco extends \MZ\Database\Helper
                 ),
             ]);
         }
-        if (stripos($e->getMessage(), 'Numero_UNIQUE') !== false) {
+        if (contains(['Numero', 'UNIQUE'], $e->getMessage())) {
             return new \MZ\Exception\ValidationException([
                 'numero' => vsprintf(
                     'O Número "%s" já está cadastrado',
@@ -419,39 +411,28 @@ class Banco extends \MZ\Database\Helper
 
     /**
      * Update Banco with instance values into database for ID
+     * @param  array $only Save these fields only, when empty save all fields except id
+     * @param  boolean $except When true, saves all fields except $only
      * @return Banco Self instance
      */
-    public function update()
+    public function update($only = [], $except = false)
     {
         $values = $this->validate();
         if (!$this->exists()) {
             throw new \Exception('O identificador do banco não foi informado');
         }
-        unset($values['id']);
+        $values = self::filterValues($values, $only, $except);
         try {
             self::getDB()
                 ->update('Bancos')
                 ->set($values)
                 ->where('id', $this->getID())
                 ->execute();
-            $banco = self::findByID($this->getID());
-            $this->fromArray($banco->toArray());
+            $this->loadByID($this->getID());
         } catch (\Exception $e) {
             throw $this->translate($e);
         }
         return $this;
-    }
-
-    /**
-     * Save the Banco into the database
-     * @return Banco Self instance
-     */
-    public function save()
-    {
-        if ($this->exists()) {
-            return $this->update();
-        }
-        return $this->insert();
     }
 
     /**
@@ -468,6 +449,43 @@ class Banco extends \MZ\Database\Helper
             ->where('id', $this->getID())
             ->execute();
         return $result;
+    }
+
+    /**
+     * Load one register for it self with a condition
+     * @param  array $condition Condition for searching the row
+     * @param  array $order associative field name -> [-1, 1]
+     * @return Banco Self instance filled or empty
+     */
+    public function load($condition, $order = [])
+    {
+        $query = self::query($condition, $order)->limit(1);
+        $row = $query->fetch() ?: [];
+        return $this->fromArray($row);
+    }
+
+    /**
+     * Load into this object from database using, RazaoSocial
+     * @param  string $razao_social razão social to find Banco
+     * @return Banco Self filled instance or empty when not found
+     */
+    public function loadByRazaoSocial($razao_social)
+    {
+        return $this->load([
+            'razaosocial' => strval($razao_social),
+        ]);
+    }
+
+    /**
+     * Load into this object from database using, Numero
+     * @param  string $numero número to find Banco
+     * @return Banco Self filled instance or empty when not found
+     */
+    public function loadByNumero($numero)
+    {
+        return $this->load([
+            'numero' => strval($numero),
+        ]);
     }
 
     /**

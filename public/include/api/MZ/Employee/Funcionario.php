@@ -20,7 +20,7 @@
  * O Cliente adquire apenas o direito de usar o software e não adquire qualquer outros
  * direitos, expressos ou implícitos no GrandChef diferentes dos especificados nesta Licença.
  *
- * @author  Francimar Alves <mazinsw@gmail.com>
+ * @author Equipe GrandChef <desenvolvimento@mzsw.com.br>
  */
 namespace MZ\Employee;
 
@@ -353,22 +353,22 @@ class Funcionario extends \MZ\Database\Helper
             $this->setCodigoBarras($funcionario['codigobarras']);
         }
         if (!isset($funcionario['porcentagem'])) {
-            $this->setPorcentagem(null);
+            $this->setPorcentagem(0);
         } else {
             $this->setPorcentagem($funcionario['porcentagem']);
         }
         if (!isset($funcionario['linguagemid'])) {
-            $this->setLinguagemID(null);
+            $this->setLinguagemID(1046);
         } else {
             $this->setLinguagemID($funcionario['linguagemid']);
         }
         if (!isset($funcionario['pontuacao'])) {
-            $this->setPontuacao(null);
+            $this->setPontuacao(0);
         } else {
             $this->setPontuacao($funcionario['pontuacao']);
         }
         if (!isset($funcionario['ativo'])) {
-            $this->setAtivo(null);
+            $this->setAtivo('Y');
         } else {
             $this->setAtivo($funcionario['ativo']);
         }
@@ -378,7 +378,7 @@ class Funcionario extends \MZ\Database\Helper
             $this->setDataSaida($funcionario['datasaida']);
         }
         if (!isset($funcionario['datacadastro'])) {
-            $this->setDataCadastro(null);
+            $this->setDataCadastro(self::now());
         } else {
             $this->setDataCadastro($funcionario['datacadastro']);
         }
@@ -408,8 +408,18 @@ class Funcionario extends \MZ\Database\Helper
         $this->setPorcentagem(Filter::float($this->getPorcentagem()));
         $this->setLinguagemID(Filter::number($this->getLinguagemID()));
         $this->setPontuacao(Filter::number($this->getPontuacao()));
-        $this->setDataSaida(Filter::datetime($this->getDataSaida()));
-        $this->setDataCadastro(Filter::datetime($this->getDataCadastro()));
+        $this->setDataSaida($original->getDataSaida());
+        $this->setDataCadastro($original->getDataCadastro());
+        if (is_owner($original) || is_self($original)) {
+            $this->setClienteID($original->getClienteID());
+            $this->setFuncaoID($original->getFuncaoID());
+            $this->setAtivo($original->getAtivo());
+        }
+        if (!is_owner($original) && is_self($original)) {
+            $this->setPorcentagem($original->getPorcentagem());
+            $this->setCodigoBarras($original->getCodigoBarras());
+            $this->setPontuacao($original->getPontuacao());
+        }
     }
 
     /**
@@ -480,7 +490,7 @@ class Funcionario extends \MZ\Database\Helper
                 ),
             ]);
         }
-        if (stripos($e->getMessage(), 'CodigoBarras_UNIQUE') !== false) {
+        if (contains(['CodigoBarras', 'UNIQUE'], $e->getMessage())) {
             return new \MZ\Exception\ValidationException([
                 'codigobarras' => sprintf(
                     'O código de barras "%s" já está cadastrado',
@@ -513,21 +523,20 @@ class Funcionario extends \MZ\Database\Helper
      * Update Funcionário with instance values into database for Código
      * @return Funcionario Self instance
      */
-    public function update()
+    public function update($only = [], $except = false)
     {
         $values = $this->validate();
         if (!$this->exists()) {
             throw new \Exception('O identificador do funcionário não foi informado');
         }
-        unset($values['id']);
+        $values = self::filterValues($values, $only, $except);
         try {
             self::getDB()
                 ->update('Funcionarios')
                 ->set($values)
                 ->where('id', $this->getID())
                 ->execute();
-            $funcionario = self::findByID($this->getID());
-            $this->fromArray($funcionario->toArray());
+            $this->loadByID($this->getID());
         } catch (\Exception $e) {
             throw $this->translate($e);
         }
@@ -550,6 +559,46 @@ class Funcionario extends \MZ\Database\Helper
         return $result;
     }
 
+    public function isOwner()
+    {
+        return $this->getID() == 1;
+    }
+
+    /**
+     * Check if this employee have permission
+     * @param array|string $permission permission to check
+     * @return boolean true when has all permission passed or false otherwise
+     */
+    public function has($permission)
+    {
+        global $app;
+        if (!$this->exists()) {
+            return false;
+        }
+        if ($this->isOwner()) {
+            return true;
+        }
+        settype($permission, 'array');
+        $permissoes = $app->getAuthentication()->getPermissions();
+        if ($this->getID() != logged_employee()->getID()) {
+            $permissoes = Acesso::getPermissoes($this->getFuncaoID());
+        }
+        $allow = true;
+        $operator = '&&';
+        foreach ($permission as $value) {
+            if (is_array($value)) {
+                $operator = current($value);
+                continue;
+            }
+            if ($operator == '||') {
+                $allow = $allow || in_array($value, $permissoes);
+            } else {
+                $allow = $allow && in_array($value, $permissoes);
+            }
+        }
+        return ($allow && count($permission) > 0);
+    }
+
     /**
      * Load one register for it self with a condition
      * @param  array $condition Condition for searching the row
@@ -561,18 +610,6 @@ class Funcionario extends \MZ\Database\Helper
         $query = self::query($condition, $order)->limit(1);
         $row = $query->fetch() ?: [];
         return $this->fromArray($row);
-    }
-
-    /**
-     * Load into this object from database using, ID
-     * @param  int $id código to find Funcionário
-     * @return Funcionario Self filled instance or empty when not found
-     */
-    public function loadByID($id)
-    {
-        return $this->load([
-            'id' => intval($id),
-        ]);
     }
 
     /**

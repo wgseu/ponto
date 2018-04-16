@@ -20,7 +20,7 @@
  * O Cliente adquire apenas o direito de usar o software e não adquire qualquer outros
  * direitos, expressos ou implícitos no GrandChef diferentes dos especificados nesta Licença.
  *
- * @author  Francimar Alves <mazinsw@gmail.com>
+ * @author Equipe GrandChef <desenvolvimento@mzsw.com.br>
  */
 namespace MZ\System;
 
@@ -32,6 +32,101 @@ use MZ\Util\Validator;
  */
 class Permissao extends \MZ\Database\Helper
 {
+    const NOME_SISTEMA = 'Sistema'; // Permitir acesso ao sistema
+    const NOME_RESTAURACAO = 'Restauracao'; // Permitir restaurar o banco de dados
+    const NOME_BACKUP = 'Backup'; // Permitir realização de cópia de segurança do banco de dados
+    const NOME_PEDIDOMESA = 'PedidoMesa'; // Permitir realizar pedidos para uma mesa
+    const NOME_PAGAMENTO = 'Pagamento'; // Permitir realizar um pagamento e efetuar vendas rápidas
+    const NOME_MUDARDEMESA = 'MudarDeMesa'; // Permitir mudar os pedidos de uma mesa para outra
+    const NOME_EXCLUIRPEDIDO = 'ExcluirPedido'; // Permitir cancelar produtos de um pedido
+    const NOME_RESERVARMESA = 'ReservarMesa'; // Permitir reservar uma mesa
+    const NOME_LIBERARMESA = 'LiberarMesa'; // Permitir liberar mesa reservada por outro funcionário
+    const NOME_SELECIONARCAIXA = 'SelecionarCaixa'; // Permitir selecionar outro caixa aberto
+    const NOME_ABRIRCAIXA = 'AbrirCaixa'; // Permitir abrir o caixa
+    const NOME_INSERIRNOCAIXA = 'InserirNoCaixa'; // Permitir inserir dinheiro no caixa
+    const NOME_RETIRARDOCAIXA = 'RetirarDoCaixa'; // Permitir retirar dinheiro do caixa
+    const NOME_FECHARCAIXA = 'FecharCaixa'; // Permitir fechar qualquer caixa aberto
+    const NOME_ALTERARPRECO = 'AlterarPreco'; // Permitir alterar o preço de um produto no momento da venda
+    const NOME_MESAS = 'Mesas'; // Permitir acesso à venda para todas as mesas
+    const NOME_ESTOQUE = 'Estoque'; // Permitir dar entrada de produtos no estoque
+    const NOME_OPCOESIMPRESSAO = 'OpcoesImpressao'; // Permitir alteração das opções de impressão de relatórios
+    const NOME_TROCARPLANO = 'TrocarPlano'; // Permitir trocar plano de fundo da aplicação
+    const NOME_MODOTELA = 'ModoTela'; // Permitir trocar o modo de tela da aplicação
+    const NOME_RELATORIOVENDAS = 'RelatorioVendas'; // Permitir visualizar todas as vendas
+    const NOME_RELATORIOVENDEDOR = 'RelatorioVendedor'; // Permitir visualizar o total das vendas de todos vendedores
+    const NOME_RELATORIOCAIXA = 'RelatorioCaixa'; // Permitir visualizar o relatório de vendas por caixa
+    const NOME_RELATORIOSESSAO = 'RelatorioSessao'; // Permitir visualizar o total de vendas de cada sessão
+    const NOME_RELATORIOCONSUMO = 'RelatorioConsumo'; // Permitir a impressão do relatório de consumo da mesa
+    const NOME_RELATORIOCOZINHA = 'RelatorioCozinha'; // Permitir a reimpressão dos pedidos enviados para a cozinha
+    const NOME_RANKDEVENDAS = 'RankDeVendas'; // Permitir visualizar o ranking dos funcionários nas vendas
+    const NOME_CADASTROPRODUTOS = 'CadastroProdutos'; // Permitir cadastrar ou alterar um produto
+    const NOME_CADASTROFORNECEDORES = 'CadastroFornecedores'; // Permitir cadastrar ou alterar um fornecedor
+    const NOME_CADASTROMESAS = 'CadastroMesas'; // Permitir cadastrar ou alterar uma mesa
+    const NOME_CADASTROFUNCIONARIOS = 'CadastroFuncionarios'; // Permitir cadastrar ou alterar um funcionário
+    const NOME_CADASTROFORMASPAGTO = 'CadastroFormasPagto'; // Permitir cadastrar ou alterar uma forma de pagamento
+    const NOME_CADASTROPROMOCOES = 'CadastroPromocoes'; // Permitir cadastrar ou alterar uma promoção
+    const NOME_CADASTROCARTOES = 'CadastroCartoes'; // Permitir cadastrar ou alterar um cartão
+    const NOME_CADASTROBANCOS = 'CadastroBancos'; // Permitir cadastrar ou alterar um banco
+    const NOME_CADASTROCAIXAS = 'CadastroCaixas'; // Permitir cadastrar ou alterar um caixa
+    const NOME_CADASTROTIPOSDECONTAS = 'CadastroTiposDeContas'; // Permitir cadastrar ou alterar um tipo de conta
+    const NOME_CADASTROIMPRESSORAS = 'CadastroImpressoras'; // Permitir cadastrar ou alterar uma impressora
+    const NOME_CADASTROCOMPUTADORES = 'CadastroComputadores'; // Permitir cadastrar ou alterar um computador
+    const NOME_COMPUTADORCAIXA = 'ComputadorCaixa'; // Permitir acessar computadores reservados para o caixa
+    const NOME_CADASTROCLIENTES = 'CadastroClientes'; // Permitir cadastrar ou alterar um cliente
+    const NOME_ENTREGAPEDIDOS = 'EntregaPedidos'; // Permitir acessar os pedidos de produtos que são para entrega
+    const NOME_ALTERARATENDENTE = 'AlterarAtendente'; // Permitir alterar o atendente no momento da venda
+    const NOME_PEDIDOCOMANDA = 'PedidoComanda'; // Permitir realizar pedidos para cartões de consumo
+    const NOME_CADASTROBAIRROS = 'CadastroBairros'; // Permitir cadastrar ou alterar informações de um bairro
+    const NOME_CADASTROCONTAS = 'CadastroContas'; // Permitir cadastrar ou alterar contas a pagar ou a receber
+    const NOME_RELATORIOCONTAS = 'RelatorioContas'; // Permitir visualizar relatórios de contas
+    const NOME_RELATORIOPRODUTOS = 'RelatorioProdutos'; // Permitir visualizar relatórios de vendas de produtos
+    const NOME_RELATORIOCOMPRAS = 'RelatorioCompras'; // Permitir visualizar relatórios de compras de produtos
+    const NOME_CADASTROCOMANDAS = 'CadastroComandas'; // Permitir cadastrar ou alterar um número de comanda
+    const NOME_CADASTROSERVICOS = 'CadastroServicos'; // Permitir cadastrar ou alterar uma taxa ou evento
+    const NOME_REALIZARDESCONTOS = 'RealizarDescontos'; // Permitir realizar desconto nas vendas
+    const NOME_COMANDAS = 'Comandas'; // Permitir acesso à venda para todas as comandas
+    const NOME_EXCLUIRPEDIDOFINALIZADO = 'ExcluirPedidoFinalizado'; // Permitir excluir um pedido que já foi finalizado
+    const NOME_RELATORIOFUNCIONARIOS = 'RelatorioFuncionarios'; // Permitir visualizar relatório de funcionários
+    const NOME_RELATORIOCLIENTES = 'RelatorioClientes'; // Permitir visualizar relatório de clientes
+    const NOME_REVOGARCOMISSAO = 'RevogarComissao'; // Permitir retirar a comissão de um pedido
+    const NOME_SELECIONARENTREGADOR = 'SelecionarEntregador'; // Permitir selecionar outro entregador na entrega de pedidos para entrega
+    const NOME_TRANSFERIRPRODUTOS = 'TransferirProdutos'; // Permitir transferir produtos de uma mesa para outra
+    const NOME_RELATORIOPEDIDOS = 'RelatorioPedidos'; // Permitir visualizar relatório de pedidos
+    const NOME_ALTERARCONFIGURACOES = 'AlterarConfiguracoes'; // Permitir alterar informações da empresa e configurações do sistema
+    const NOME_LISTACOMPRAS = 'ListaCompras'; // Permitir cadastrar lista de compras de produtos
+    const NOME_RELATORIOMENSAL = 'RelatorioMensal'; // Permitir visualizar e emitir relatórios de vendas mensais
+    const NOME_CADASTROCIDADES = 'CadastroCidades'; // Permitir cadastrar ou alterar as cidades dos estados
+    const NOME_RETIRARDOESTOQUE = 'RetirarDoEstoque'; // Permitir retirar produtos do estoque
+    const NOME_RELATORIOBAIRROS = 'RelatorioBairros'; // Permitir visualizar relatórios de bairros
+    const NOME_ALTERARHORARIO = 'AlterarHorario'; // Permitir alterar o horário de funcionamento do estabelecimento
+    const NOME_CADASTRARCREDITOS = 'CadastrarCreditos'; // Permitir cadastrar e alterar créditos de clientes
+    const NOME_ALTERARSTATUS = 'AlterarStatus'; // Permitir alterar os estados de preparo dos produtos
+    const NOME_RELATORIOENTREGA = 'RelatorioEntrega'; // Permitir visualizar relatório de entrega por entregador
+    const NOME_RELATORIOFORNECEDORES = 'RelatorioFornecedores'; // Permitir visualizar relatório de fornecedores
+    const NOME_MUDARDECOMANDA = 'MudarDeComanda'; // Permitir mudar os pedidos de uma comanda para comanda
+    const NOME_RELATORIOAUDITORIA = 'RelatorioAuditoria'; // Permitir visualizar o relatório de auditoria
+    const NOME_RELATORIOCONSUMIDOR = 'RelatorioConsumidor'; // Permitir visualizar o relatório de vendas por cliente
+    const NOME_RELATORIOCREDITOS = 'RelatorioCreditos'; // Permitir visualizar o relatório de créditos de clientes
+    const NOME_CADASTROCARTEIRAS = 'CadastroCarteiras'; // Permitir cadastrar carteiras e contas bancárias
+    const NOME_RELATORIOFLUXO = 'RelatorioFluxo'; // Permitir visualizar o relatório de fluxo de caixa
+    const NOME_TRANSFERIRVALORES = 'TransferirValores'; // Permitir transferir dinheiro de um caixa para outro
+    const NOME_CADASTROPATRIMONIO = 'CadastroPatrimonio'; // Permitir cadastrar e atualizar a quantidade de bens de uma empresa
+    const NOME_RELATORIOPATRIMONIO = 'RelatorioPatrimonio'; // Permitir visualizar a lista de bens de uma empresa
+    const NOME_RELATORIOCARTEIRAS = 'RelatorioCarteiras'; // Permitir visualizar o relatório de carteiras
+    const NOME_RELATORIOCHEQUES = 'RelatorioCheques'; // Permitir visualizar o relatório de cheques
+    const NOME_PAGAMENTOCONTA = 'PagamentoConta'; // Permitir pagar um pedido na forma de pagamento Conta
+    const NOME_CADASTROPAISES = 'CadastroPaises'; // Permitir cadastrar ou alterar paises
+    const NOME_CADASTROESTADOS = 'CadastroEstados'; // Permitir cadastrar ou alterar os estados de um país
+    const NOME_CADASTROMOEDAS = 'CadastroMoedas'; // Permitir cadastrar ou alterar os tipos de moedas
+    const NOME_ALTERARPAGINAS = 'AlterarPaginas'; // Permitir alterar as páginas do site da empresa
+    const NOME_ALTERARENTREGADOR = 'AlterarEntregador'; // Permitir alterar o entregador após enviar os pedidos
+    const NOME_RELATORIOBALANCO = 'RelatorioBalanco'; // Permitir visualizar o relatório de balanço de contas
+    const NOME_TRANSFORMARENTREGA = 'TransformarEntrega'; // Permitir transformar um pedido de entrega para viagem e vice versa
+    const NOME_CONFERIRCAIXA = 'ConferirCaixa'; // Permitir alterar os valores de conferência de um caixa
+    const NOME_CONTAVIAGEM = 'ContaViagem'; // Permitir imprimir conta de pedidos para viagem
+    const NOME_ENTREGAADICIONAR = 'EntregaAdicionar'; // Permitir adicionar produtos na tela de entrega
+    const NOME_ENTREGARPEDIDOS = 'EntregarPedidos'; // Permitir realizar entrega de pedidos
+    const NOME_INFORMARDESPERDICIO = 'InformarDesperdicio'; // Permitir informar um desperdício ao cancelar um produto
 
     /**
      * Identificador da permissão
@@ -249,15 +344,7 @@ class Permissao extends \MZ\Database\Helper
      */
     protected function translate($e)
     {
-        if (stripos($e->getMessage(), 'PRIMARY') !== false) {
-            return new \MZ\Exception\ValidationException([
-                'id' => sprintf(
-                    'O id "%s" já está cadastrado',
-                    $this->getID()
-                ),
-            ]);
-        }
-        if (stripos($e->getMessage(), 'Nome_UNIQUE') !== false) {
+        if (contains(['Nome', 'UNIQUE'], $e->getMessage())) {
             return new \MZ\Exception\ValidationException([
                 'nome' => sprintf(
                     'A nome "%s" já está cadastrada',
@@ -288,23 +375,24 @@ class Permissao extends \MZ\Database\Helper
 
     /**
      * Update Permissão with instance values into database for ID
+     * @param  array $only Save these fields only, when empty save all fields except id
+     * @param  boolean $except When true, saves all fields except $only
      * @return Permissao Self instance
      */
-    public function update()
+    public function update($only = [], $except = false)
     {
         $values = $this->validate();
         if (!$this->exists()) {
             throw new \Exception('O identificador da permissão não foi informado');
         }
-        unset($values['id']);
+        $values = self::filterValues($values, $only, $except);
         try {
             self::getDB()
                 ->update('Permissoes')
                 ->set($values)
                 ->where('id', $this->getID())
                 ->execute();
-            $permissao = self::findByID($this->getID());
-            $this->fromArray($permissao->toArray());
+            $this->loadByID($this->getID());
         } catch (\Exception $e) {
             throw $this->translate($e);
         }
@@ -338,18 +426,6 @@ class Permissao extends \MZ\Database\Helper
         $query = self::query($condition, $order)->limit(1);
         $row = $query->fetch() ?: [];
         return $this->fromArray($row);
-    }
-
-    /**
-     * Load into this object from database using, ID
-     * @param  int $id id to find Permissão
-     * @return Permissao Self filled instance or empty when not found
-     */
-    public function loadByID($id)
-    {
-        return $this->load([
-            'id' => intval($id),
-        ]);
     }
 
     /**
@@ -424,6 +500,7 @@ class Permissao extends \MZ\Database\Helper
         $query = self::getDB()->from('Permissoes p');
         $condition = self::filterCondition($condition);
         $query = self::buildOrderBy($query, self::filterOrder($order));
+        $query = $query->orderBy('p.funcionalidadeid ASC');
         $query = $query->orderBy('p.descricao ASC');
         $query = $query->orderBy('p.id ASC');
         return self::buildCondition($query, $condition);

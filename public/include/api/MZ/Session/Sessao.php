@@ -20,7 +20,7 @@
  * O Cliente adquire apenas o direito de usar o software e não adquire qualquer outros
  * direitos, expressos ou implícitos no GrandChef diferentes dos especificados nesta Licença.
  *
- * @author  Francimar Alves <mazinsw@gmail.com>
+ * @author Equipe GrandChef <desenvolvimento@mzsw.com.br>
  */
 namespace MZ\Session;
 
@@ -33,6 +33,8 @@ use MZ\Util\Validator;
  */
 class Sessao extends \MZ\Database\Helper
 {
+    const DESCONTO_ID = 1;
+    const ENTREGA_ID = 2;
 
     /**
      * Código da sessão
@@ -183,7 +185,7 @@ class Sessao extends \MZ\Database\Helper
             $this->setID($sessao['id']);
         }
         if (!isset($sessao['datainicio'])) {
-            $this->setDataInicio(null);
+            $this->setDataInicio(self::now());
         } else {
             $this->setDataInicio($sessao['datainicio']);
         }
@@ -193,7 +195,7 @@ class Sessao extends \MZ\Database\Helper
             $this->setDataTermino($sessao['datatermino']);
         }
         if (!isset($sessao['aberta'])) {
-            $this->setAberta(null);
+            $this->setAberta('Y');
         } else {
             $this->setAberta($sessao['aberta']);
         }
@@ -258,14 +260,6 @@ class Sessao extends \MZ\Database\Helper
      */
     protected function translate($e)
     {
-        if (stripos($e->getMessage(), 'PRIMARY') !== false) {
-            return new \MZ\Exception\ValidationException([
-                'id' => sprintf(
-                    'O id "%s" já está cadastrado',
-                    $this->getID()
-                ),
-            ]);
-        }
         return parent::translate($e);
     }
 
@@ -289,23 +283,24 @@ class Sessao extends \MZ\Database\Helper
 
     /**
      * Update Sessão with instance values into database for ID
+     * @param  array $only Save these fields only, when empty save all fields except id
+     * @param  boolean $except When true, saves all fields except $only
      * @return Sessao Self instance
      */
-    public function update()
+    public function update($only = [], $except = false)
     {
         $values = $this->validate();
         if (!$this->exists()) {
             throw new \Exception('O identificador da sessão não foi informado');
         }
-        unset($values['id']);
+        $values = self::filterValues($values, $only, $except);
         try {
             self::getDB()
                 ->update('Sessoes')
                 ->set($values)
                 ->where('id', $this->getID())
                 ->execute();
-            $sessao = self::findByID($this->getID());
-            $this->fromArray($sessao->toArray());
+            $this->loadByID($this->getID());
         } catch (\Exception $e) {
             throw $this->translate($e);
         }
@@ -339,18 +334,6 @@ class Sessao extends \MZ\Database\Helper
         $query = self::query($condition, $order)->limit(1);
         $row = $query->fetch() ?: [];
         return $this->fromArray($row);
-    }
-
-    /**
-     * Load into this object from database using, ID
-     * @param  int $id id to find Sessão
-     * @return Sessao Self filled instance or empty when not found
-     */
-    public function loadByID($id)
-    {
-        return $this->load([
-            'id' => intval($id),
-        ]);
     }
 
     /**
@@ -438,6 +421,20 @@ class Sessao extends \MZ\Database\Helper
         ]);
         if ($required && !$sessao->exists()) {
             throw new \Exception('O caixa ainda não foi aberto');
+        }
+        return $sessao;
+    }
+
+    /**
+     * Find open session
+     * @param  boolean $required when true and none sesstion open found throw an exception
+     * @return Sessao A filled instance or empty when not found
+     */
+    public static function findLastAberta($required = false)
+    {
+        $sessao = self::find([], ['aberta' => -1, 'id' => -1]);
+        if ($required && !$sessao->exists()) {
+            throw new \Exception('Nenhum caixa aberto ou fechado');
         }
         return $sessao;
     }

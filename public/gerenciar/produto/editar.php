@@ -1,33 +1,37 @@
 <?php
 /*
-	Copyright 2016 da MZ Software - MZ Desenvolvimento de Sistemas LTDA
-	Este arquivo é parte do programa GrandChef - Sistema para Gerenciamento de Churrascarias, Bares e Restaurantes.
-	O GrandChef é um software proprietário; você não pode redistribuí-lo e/ou modificá-lo.
-	DISPOSIÇÕES GERAIS
-	O cliente não deverá remover qualquer identificação do produto, avisos de direitos autorais,
-	ou outros avisos ou restrições de propriedade do GrandChef.
+    Copyright 2016 da MZ Software - MZ Desenvolvimento de Sistemas LTDA
+    Este arquivo é parte do programa GrandChef - Sistema para Gerenciamento de Churrascarias, Bares e Restaurantes.
+    O GrandChef é um software proprietário; você não pode redistribuí-lo e/ou modificá-lo.
+    DISPOSIÇÕES GERAIS
+    O cliente não deverá remover qualquer identificação do produto, avisos de direitos autorais,
+    ou outros avisos ou restrições de propriedade do GrandChef.
 
-	O cliente não deverá causar ou permitir a engenharia reversa, desmontagem,
-	ou descompilação do GrandChef.
+    O cliente não deverá causar ou permitir a engenharia reversa, desmontagem,
+    ou descompilação do GrandChef.
 
-	PROPRIEDADE DOS DIREITOS AUTORAIS DO PROGRAMA
+    PROPRIEDADE DOS DIREITOS AUTORAIS DO PROGRAMA
 
-	GrandChef é a especialidade do desenvolvedor e seus
-	licenciadores e é protegido por direitos autorais, segredos comerciais e outros direitos
-	de leis de propriedade.
+    GrandChef é a especialidade do desenvolvedor e seus
+    licenciadores e é protegido por direitos autorais, segredos comerciais e outros direitos
+    de leis de propriedade.
 
-	O Cliente adquire apenas o direito de usar o software e não adquire qualquer outros
-	direitos, expressos ou implícitos no GrandChef diferentes dos especificados nesta Licença.
+    O Cliente adquire apenas o direito de usar o software e não adquire qualquer outros
+    direitos, expressos ou implícitos no GrandChef diferentes dos especificados nesta Licença.
 */
 require_once(dirname(__DIR__) . '/app.php');
 
-use MZ\__TODO_NAMESPACE__\Produto;
+use MZ\Product\Produto;
+use MZ\Product\Categoria;
+use MZ\Product\Unidade;
+use MZ\Environment\Setor;
+use MZ\System\Permissao;
 
-need_permission(\Permissao::NOME_CADASTROPRODUTOS, is_output('json'));
+need_permission(Permissao::NOME_CADASTROPRODUTOS, is_output('json'));
 $id = isset($_GET['id']) ? $_GET['id'] : null;
 $produto = Produto::findByID($id);
 if (!$produto->exists()) {
-    $msg = 'O produto informado não existe!';
+    $msg = 'O produto não foi informado ou não existe';
     if (is_output('json')) {
         json($msg);
     }
@@ -40,23 +44,6 @@ $old_produto = $produto;
 if (is_post()) {
     $produto = new Produto($_POST);
     try {
-        $produto->setID($old_produto->getID());
-        $produto->setTributacaoID($old_produto->getTributacaoID());
-
-        $produto->setQuantidadeLimite(moneyval($produto->getQuantidadeLimite()));
-        $produto->setQuantidadeMaxima(moneyval($produto->getQuantidadeMaxima()));
-        $produto->setConteudo(moneyval($produto->getConteudo()));
-        $produto->setPrecoVenda(moneyval($produto->getPrecoVenda()));
-        $produto->setCustoProducao(moneyval($produto->getCustoProducao()));
-        $produto->setTempoPreparo(numberval($produto->getTempoPreparo()));
-        $imagem = upload_image('raw_imagem', 'produto', null, 256, 256, true, 'crop');
-        if (!is_null($imagem)) {
-            $produto->setImagem(file_get_contents(WWW_ROOT . get_image_url($imagem, 'produto')));
-            unlink(WWW_ROOT . get_image_url($imagem, 'produto'));
-        } elseif (trim($produto->getImagem()) != '') { // evita sobrescrever
-            $produto->setImagem(true);
-        }
-        $produto->setDataAtualizacao(date('Y-m-d H:i:s', time()));
         $produto->filter($old_produto);
         $produto->update();
         $old_produto->clean($produto);
@@ -69,20 +56,24 @@ if (is_post()) {
         }
         \Thunder::success($msg, true);
         redirect('/gerenciar/produto/');
-    } catch (ValidationException $e) {
-        $errors = $e->getErrors();
-    } catch (Exception $e) {
-        $errors['unknow'] = $e->getMessage();
+    } catch (\Exception $e) {
+        $produto->clean($old_produto);
+        if ($e instanceof \MZ\Exception\ValidationException) {
+            $errors = $e->getErrors();
+        }
+        if (is_output('json')) {
+            json($e->getMessage(), null, ['errors' => $errors]);
+        }
+        \Thunder::error($e->getMessage());
+        foreach ($errors as $key => $value) {
+            $focusctrl = $key;
+            break;
+        }
     }
-    // restaura a imagem original
-    $produto->setImagem($old_produto->getImagem());
-    foreach ($errors as $key => $value) {
-        $focusctrl = $key;
-        \Thunder::error($value);
-        break;
-    }
+} elseif (is_output('json')) {
+    json('Nenhum dado foi enviado');
 }
-$_categorias = Categoria::getTodas(true);
+$_categorias = Categoria::findAll();
 $_unidades = Unidade::findAll();
 $_setores = Setor::findAll();
-include template('gerenciar_produto_editar');
+$app->getResponse('html')->output('gerenciar_produto_editar');

@@ -20,7 +20,7 @@
  * O Cliente adquire apenas o direito de usar o software e não adquire qualquer outros
  * direitos, expressos ou implícitos no GrandChef diferentes dos especificados nesta Licença.
  *
- * @author  Francimar Alves <mazinsw@gmail.com>
+ * @author Equipe GrandChef <desenvolvimento@mzsw.com.br>
  */
 namespace MZ\Employee;
 
@@ -215,14 +215,6 @@ class Acesso extends \MZ\Database\Helper
      */
     protected function translate($e)
     {
-        if (stripos($e->getMessage(), 'PRIMARY') !== false) {
-            return new \MZ\Exception\ValidationException([
-                'id' => sprintf(
-                    'O id "%s" já está cadastrado',
-                    $this->getID()
-                ),
-            ]);
-        }
         if (stripos($e->getMessage(), 'UK_Acessos_FuncaoID_PermissaoID') !== false) {
             return new \MZ\Exception\ValidationException([
                 'funcaoid' => sprintf(
@@ -258,23 +250,24 @@ class Acesso extends \MZ\Database\Helper
 
     /**
      * Update Acesso with instance values into database for ID
+     * @param  array $only Save these fields only, when empty save all fields except id
+     * @param  boolean $except When true, saves all fields except $only
      * @return Acesso Self instance
      */
-    public function update()
+    public function update($only = [], $except = false)
     {
         $values = $this->validate();
         if (!$this->exists()) {
             throw new \Exception('O identificador do acesso não foi informado');
         }
-        unset($values['id']);
+        $values = self::filterValues($values, $only, $except);
         try {
             self::getDB()
                 ->update('Acessos')
                 ->set($values)
                 ->where('id', $this->getID())
                 ->execute();
-            $acesso = self::findByID($this->getID());
-            $this->fromArray($acesso->toArray());
+            $this->loadByID($this->getID());
         } catch (\Exception $e) {
             throw $this->translate($e);
         }
@@ -308,18 +301,6 @@ class Acesso extends \MZ\Database\Helper
         $query = self::query($condition, $order)->limit(1);
         $row = $query->fetch() ?: [];
         return $this->fromArray($row);
-    }
-
-    /**
-     * Load into this object from database using, ID
-     * @param  int $id id to find Acesso
-     * @return Acesso Self filled instance or empty when not found
-     */
-    public function loadByID($id)
-    {
-        return $this->load([
-            'id' => intval($id),
-        ]);
     }
 
     /**
@@ -439,6 +420,20 @@ class Acesso extends \MZ\Database\Helper
             'funcaoid' => intval($funcao_id),
             'permissaoid' => intval($permissao_id),
         ]);
+    }
+
+    public static function getPermissoes($funcao_id)
+    {
+        $rows = self::query(['funcaoid' => $funcao_id])
+            ->select(null)
+            ->select('p.nome')
+            ->leftJoin('Permissoes p ON p.id = a.permissaoid')
+            ->fetchAll();
+        $permissoes = [];
+        foreach ($rows as $row) {
+            $permissoes[] = $row['nome'];
+        }
+        return $permissoes;
     }
 
     /**

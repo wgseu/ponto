@@ -20,7 +20,7 @@
  * O Cliente adquire apenas o direito de usar o software e não adquire qualquer outros
  * direitos, expressos ou implícitos no GrandChef diferentes dos especificados nesta Licença.
  *
- * @author  Francimar Alves <mazinsw@gmail.com>
+ * @author Equipe GrandChef <desenvolvimento@mzsw.com.br>
  */
 namespace MZ\Invoice;
 
@@ -258,7 +258,7 @@ class Evento extends \MZ\Database\Helper
             $this->setCodigo($evento['codigo']);
         }
         if (!isset($evento['datacriacao'])) {
-            $this->setDataCriacao(null);
+            $this->setDataCriacao(self::now());
         } else {
             $this->setDataCriacao($evento['datacriacao']);
         }
@@ -334,14 +334,6 @@ class Evento extends \MZ\Database\Helper
      */
     protected function translate($e)
     {
-        if (stripos($e->getMessage(), 'PRIMARY') !== false) {
-            return new \MZ\Exception\ValidationException([
-                'id' => sprintf(
-                    'O id "%s" já está cadastrado',
-                    $this->getID()
-                ),
-            ]);
-        }
         return parent::translate($e);
     }
 
@@ -365,23 +357,24 @@ class Evento extends \MZ\Database\Helper
 
     /**
      * Update Evento with instance values into database for ID
+     * @param  array $only Save these fields only, when empty save all fields except id
+     * @param  boolean $except When true, saves all fields except $only
      * @return Evento Self instance
      */
-    public function update()
+    public function update($only = [], $except = false)
     {
         $values = $this->validate();
         if (!$this->exists()) {
             throw new \Exception('O identificador do evento não foi informado');
         }
-        unset($values['id']);
+        $values = self::filterValues($values, $only, $except);
         try {
             self::getDB()
                 ->update('Eventos')
                 ->set($values)
                 ->where('id', $this->getID())
                 ->execute();
-            $evento = self::findByID($this->getID());
-            $this->fromArray($evento->toArray());
+            $this->loadByID($this->getID());
         } catch (\Exception $e) {
             throw $this->translate($e);
         }
@@ -418,24 +411,25 @@ class Evento extends \MZ\Database\Helper
     }
 
     /**
-     * Load into this object from database using, ID
-     * @param  int $id id to find Evento
-     * @return Evento Self filled instance or empty when not found
-     */
-    public function loadByID($id)
-    {
-        return $this->load([
-            'id' => intval($id),
-        ]);
-    }
-
-    /**
      * Nota a qual o evento foi criado
      * @return \MZ\Invoice\Nota The object fetched from database
      */
     public function findNotaID()
     {
         return \MZ\Invoice\Nota::findByID($this->getNotaID());
+    }
+
+    /**
+     * Chamado quando ocorre uma falha na execução de uma tarefa
+     */
+    public static function log($nota_id, $estado, $mensagem, $codigo)
+    {
+        $_evento = new Evento();
+        $_evento->setNotaID($nota_id);
+        $_evento->setEstado($estado);
+        $_evento->setMensagem($mensagem);
+        $_evento->setCodigo($codigo);
+        return $_evento->insert();
     }
 
     /**

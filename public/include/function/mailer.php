@@ -1,7 +1,6 @@
 <?php
 function mail_custom($emails = [], $subject, $message, $reply = null, $attachment = [])
 {
-    global $__empresa__;
     settype($emails, 'array');
 
     $options = [
@@ -14,15 +13,16 @@ function mail_custom($emails = [], $subject, $message, $reply = null, $attachmen
 
 function mail_recuperar($cliente)
 {
-    global $__empresa__;
+    global $app;
 
+    $company = $app->getSystem()->getCompany();
     $vars = [
         'cliente_secreto' => $cliente->getSecreto(),
         'cliente_nome' => $cliente->getNome(),
         'automatico' => true,
-        'from_name' => $__empresa__->getNome(),
-        'sitename' => $__empresa__->getNome(),
-        'sitelogo' => get_image_url($__empresa__->getImagem(), 'cliente', 'empresa.png'),
+        'from_name' => $company->getNome(),
+        'sitename' => $company->getNome(),
+        'sitelogo' => get_image_url($company->getImagem(), 'cliente', 'empresa.png'),
     ];
     $message = render('email_recuperar', $vars);
     /* begin test */
@@ -35,15 +35,16 @@ function mail_recuperar($cliente)
 
 function mail_confirmacao($cliente)
 {
-    global $__empresa__;
+    global $app;
 
+    $company = $app->getSystem()->getCompany();
     $vars = [
         'cliente_secreto' => $cliente->getSecreto(),
         'cliente_nome' => $cliente->getNome(),
         'automatico' => true,
-        'from_name' => $__empresa__->getNome(),
-        'sitename' => $__empresa__->getNome(),
-        'sitelogo' => get_image_url($__empresa__->getImagem(), 'cliente', 'empresa.png'),
+        'from_name' => $company->getNome(),
+        'sitename' => $company->getNome(),
+        'sitelogo' => get_image_url($company->getImagem(), 'cliente', 'empresa.png'),
     ];
     $message = render('email_confirmacao', $vars);
     /* begin test */
@@ -56,18 +57,19 @@ function mail_confirmacao($cliente)
 
 function mail_contato($email, $nome, $assunto, $mensagem)
 {
-    global $__empresa__;
+    global $app;
 
+    $company = $app->getSystem()->getCompany();
     $user = get_string_config('Email', 'Usuario');
     $from = get_string_config('Email', 'From', $user);
-    $to = $__empresa__->getNome().' <'.$from.'>';
+    $to = $company->getNome().' <'.$from.'>';
     $vars = [
         'clientphone' => $fone,
         'message' => $mensagem,
         'automatico' => false,
         'from_name' => $nome.' - '.$email,
-        'sitename' => $__empresa__->getNome(),
-        'sitelogo' => get_image_url($__empresa__->getImagem(), 'cliente', 'empresa.png'),
+        'sitename' => $company->getNome(),
+        'sitelogo' => get_image_url($company->getImagem(), 'cliente', 'empresa.png'),
     ];
     $message = render('email_contato', $vars);
     /* begin test */
@@ -80,8 +82,9 @@ function mail_contato($email, $nome, $assunto, $mensagem)
 
 function mail_nota($email, $nome, $modo, $filters, $files = [])
 {
-    global $__empresa__;
+    global $app;
 
+    $company = $app->getSystem()->getCompany();
     $pass = get_string_config('Email', 'Senha', '');
     if ($pass == '') {
         throw new \Exception('O serviço de E-mail não foi configurado', 500);
@@ -89,7 +92,7 @@ function mail_nota($email, $nome, $modo, $filters, $files = [])
     $assunto = 'Nota fiscal eletrônica';
     $user = get_string_config('Email', 'Usuario');
     $from = get_string_config('Email', 'From', $user);
-    $empresa_nome = $__empresa__->getNome();
+    $empresa_nome = $company->getNome();
     $to = $empresa_nome.' <'.$from.'>';
     $msg = 'Segue em anexo nota fiscal';
     if ($modo == 'contador') {
@@ -101,7 +104,7 @@ function mail_nota($email, $nome, $modo, $filters, $files = [])
         'filters' => $filters,
         'from_name' => $empresa_nome.' - '.$from,
         'sitename' => $empresa_nome,
-        'sitelogo' => get_image_url($__empresa__->getImagem(), 'cliente', 'empresa.png'),
+        'sitelogo' => get_image_url($company->getImagem(), 'cliente', 'empresa.png'),
     ];
     if ($modo == 'contador') {
         $message = render('email_nota_contador', $vars);

@@ -1,24 +1,27 @@
 <?php
-/*
-	Copyright 2014 da MZ Software - MZ Desenvolvimento de Sistemas LTDA
-	Este arquivo é parte do programa GrandChef - Sistema para Gerenciamento de Churrascarias, Bares e Restaurantes.
-	O GrandChef é um software proprietário; você não pode redistribuí-lo e/ou modificá-lo.
-	DISPOSIÇÕES GERAIS
-	O cliente não deverá remover qualquer identificação do produto, avisos de direitos autorais,
-	ou outros avisos ou restrições de propriedade do GrandChef.
-
-	O cliente não deverá causar ou permitir a engenharia reversa, desmontagem,
-	ou descompilação do GrandChef.
-
-	PROPRIEDADE DOS DIREITOS AUTORAIS DO PROGRAMA
-
-	GrandChef é a especialidade do desenvolvedor e seus
-	licenciadores e é protegido por direitos autorais, segredos comerciais e outros direitos
-	de leis de propriedade.
-
-	O Cliente adquire apenas o direito de usar o software e não adquire qualquer outros
-	direitos, expressos ou implícitos no GrandChef diferentes dos especificados nesta Licença.
-*/
+/**
+ * Copyright 2014 da MZ Software - MZ Desenvolvimento de Sistemas LTDA
+ *
+ * Este arquivo é parte do programa GrandChef - Sistema para Gerenciamento de Churrascarias, Bares e Restaurantes.
+ * O GrandChef é um software proprietário; você não pode redistribuí-lo e/ou modificá-lo.
+ * DISPOSIÇÕES GERAIS
+ * O cliente não deverá remover qualquer identificação do produto, avisos de direitos autorais,
+ * ou outros avisos ou restrições de propriedade do GrandChef.
+ *
+ * O cliente não deverá causar ou permitir a engenharia reversa, desmontagem,
+ * ou descompilação do GrandChef.
+ *
+ * PROPRIEDADE DOS DIREITOS AUTORAIS DO PROGRAMA
+ *
+ * GrandChef é a especialidade do desenvolvedor e seus
+ * licenciadores e é protegido por direitos autorais, segredos comerciais e outros direitos
+ * de leis de propriedade.
+ *
+ * O Cliente adquire apenas o direito de usar o software e não adquire qualquer outros
+ * direitos, expressos ou implícitos no GrandChef diferentes dos especificados nesta Licença.
+ *
+ * @author Equipe GrandChef <desenvolvimento@mzsw.com.br>
+ */
 class ZCategoria
 {
 
@@ -191,7 +194,7 @@ class ZCategoria
             $erros['categoriaid'] = 'A categoria superior é inválida';
         } else {
             $_categoria = self::findByID($categoria['categoriaid']);
-            if (is_null($_categoria->getID())) {
+            if (!$_categoria->exists()) {
                 $erros['categoriaid'] = 'A categoria informada não existe';
             } elseif (!is_null($_categoria->getCategoriaID())) {
                 $erros['categoriaid'] = 'A categoria informada já é uma subcategoria';
@@ -214,17 +217,17 @@ class ZCategoria
         }
         $categoria['dataatualizacao'] = date('Y-m-d H:i:s');
         if (!empty($erros)) {
-            throw new ValidationException($erros);
+            throw new \MZ\Exception\ValidationException($erros);
         }
     }
 
     private static function handleException(&$e)
     {
         if (stripos($e->getMessage(), 'PRIMARY') !== false) {
-            throw new ValidationException(['id' => 'O ID informado já está cadastrado']);
+            throw new \MZ\Exception\ValidationException(['id' => 'O ID informado já está cadastrado']);
         }
-        if (stripos($e->getMessage(), 'Descricao_UNIQUE') !== false) {
-            throw new ValidationException(['descricao' => 'A descrição informada já está cadastrada']);
+        if (contains(['Descricao', 'UNIQUE'], $e->getMessage())) {
+            throw new \MZ\Exception\ValidationException(['descricao' => 'A descrição informada já está cadastrada']);
         }
     }
 
@@ -234,7 +237,7 @@ class ZCategoria
         self::validarCampos($_categoria);
         try {
             $_categoria['id'] = \DB::$pdo->insertInto('Categorias')->values($_categoria)->execute();
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             self::handleException($e);
             throw $e;
         }
@@ -245,7 +248,7 @@ class ZCategoria
     {
         $_categoria = $categoria->toArray();
         if (!$_categoria['id']) {
-            throw new ValidationException(['id' => 'O id da categoria não foi informado']);
+            throw new \MZ\Exception\ValidationException(['id' => 'O id da categoria não foi informado']);
         }
         self::validarCampos($_categoria);
         $campos = [
@@ -262,7 +265,7 @@ class ZCategoria
             $query = $query->set(array_intersect_key($_categoria, array_flip($campos)));
             $query = $query->where('id', $_categoria['id']);
             $query->execute();
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             self::handleException($e);
             throw $e;
         }

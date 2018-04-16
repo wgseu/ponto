@@ -20,7 +20,7 @@
  * O Cliente adquire apenas o direito de usar o software e não adquire qualquer outros
  * direitos, expressos ou implícitos no GrandChef diferentes dos especificados nesta Licença.
  *
- * @author  Francimar Alves <mazinsw@gmail.com>
+ * @author Equipe GrandChef <desenvolvimento@mzsw.com.br>
  */
 namespace MZ\Device;
 
@@ -331,7 +331,7 @@ class Dispositivo extends \MZ\Database\Helper
             $this->setDescricao($dispositivo['descricao']);
         }
         if (!isset($dispositivo['opcoes'])) {
-            $this->setOpcoes(null);
+            $this->setOpcoes(0);
         } else {
             $this->setOpcoes($dispositivo['opcoes']);
         }
@@ -395,11 +395,8 @@ class Dispositivo extends \MZ\Database\Helper
         if (is_null($this->getNome())) {
             $errors['nome'] = 'O nome não pode ser vazio';
         }
-        if (is_null($this->getTipo())) {
-            $errors['tipo'] = 'O tipo não pode ser vazio';
-        }
-        if (!Validator::checkInSet($this->getTipo(), self::getTipoOptions(), true)) {
-            $errors['tipo'] = 'O tipo é inválido';
+        if (!Validator::checkInSet($this->getTipo(), self::getTipoOptions())) {
+            $errors['tipo'] = 'O tipo não foi informado ou é inválido';
         }
         if (is_null($this->getOpcoes())) {
             $errors['opcoes'] = 'A opções não pode ser vazia';
@@ -417,15 +414,7 @@ class Dispositivo extends \MZ\Database\Helper
      */
     protected function translate($e)
     {
-        if (stripos($e->getMessage(), 'PRIMARY') !== false) {
-            return new \MZ\Exception\ValidationException([
-                'id' => sprintf(
-                    'O id "%s" já está cadastrado',
-                    $this->getID()
-                ),
-            ]);
-        }
-        if (stripos($e->getMessage(), 'Nome_UNIQUE') !== false) {
+        if (contains(['Nome', 'UNIQUE'], $e->getMessage())) {
             return new \MZ\Exception\ValidationException([
                 'nome' => sprintf(
                     'O nome "%s" já está cadastrado',
@@ -433,7 +422,7 @@ class Dispositivo extends \MZ\Database\Helper
                 ),
             ]);
         }
-        if (stripos($e->getMessage(), 'CaixaID_UNIQUE') !== false) {
+        if (contains(['CaixaID', 'UNIQUE'], $e->getMessage())) {
             return new \MZ\Exception\ValidationException([
                 'caixaid' => sprintf(
                     'O caixa "%s" já está cadastrado',
@@ -441,7 +430,7 @@ class Dispositivo extends \MZ\Database\Helper
                 ),
             ]);
         }
-        if (stripos($e->getMessage(), 'Serial_UNIQUE') !== false) {
+        if (contains(['Serial', 'UNIQUE'], $e->getMessage())) {
             return new \MZ\Exception\ValidationException([
                 'serial' => sprintf(
                     'O serial "%s" já está cadastrado',
@@ -472,23 +461,24 @@ class Dispositivo extends \MZ\Database\Helper
 
     /**
      * Update Dispositivo with instance values into database for ID
+     * @param  array $only Save these fields only, when empty save all fields except id
+     * @param  boolean $except When true, saves all fields except $only
      * @return Dispositivo Self instance
      */
-    public function update()
+    public function update($only = [], $except = false)
     {
         $values = $this->validate();
         if (!$this->exists()) {
             throw new \Exception('O identificador do dispositivo não foi informado');
         }
-        unset($values['id']);
+        $values = self::filterValues($values, $only, $except);
         try {
             self::getDB()
                 ->update('Dispositivos')
                 ->set($values)
                 ->where('id', $this->getID())
                 ->execute();
-            $dispositivo = self::findByID($this->getID());
-            $this->fromArray($dispositivo->toArray());
+            $this->loadByID($this->getID());
         } catch (\Exception $e) {
             throw $this->translate($e);
         }
@@ -522,18 +512,6 @@ class Dispositivo extends \MZ\Database\Helper
         $query = self::query($condition, $order)->limit(1);
         $row = $query->fetch() ?: [];
         return $this->fromArray($row);
-    }
-
-    /**
-     * Load into this object from database using, ID
-     * @param  int $id id to find Dispositivo
-     * @return Dispositivo Self filled instance or empty when not found
-     */
-    public function loadByID($id)
-    {
-        return $this->load([
-            'id' => intval($id),
-        ]);
     }
 
     /**
@@ -725,6 +703,18 @@ class Dispositivo extends \MZ\Database\Helper
     {
         return self::find([
             'serial' => strval($serial),
+        ]);
+    }
+
+    /**
+     * Find not validated tablet
+     * @return Dispositivo A filled instance or empty when not found
+     */
+    public static function findNotValidated()
+    {
+        return self::find([
+            'validacao' => null,
+            'tipo' => self::TIPO_TABLET
         ]);
     }
 

@@ -20,7 +20,7 @@
  * O Cliente adquire apenas o direito de usar o software e não adquire qualquer outros
  * direitos, expressos ou implícitos no GrandChef diferentes dos especificados nesta Licença.
  *
- * @author  Francimar Alves <mazinsw@gmail.com>
+ * @author Equipe GrandChef <desenvolvimento@mzsw.com.br>
  */
 namespace MZ\Account;
 
@@ -277,12 +277,12 @@ class Credito extends \MZ\Database\Helper
             $this->setFuncionarioID($credito['funcionarioid']);
         }
         if (!isset($credito['cancelado'])) {
-            $this->setCancelado(null);
+            $this->setCancelado('N');
         } else {
             $this->setCancelado($credito['cancelado']);
         }
         if (!isset($credito['datacadastro'])) {
-            $this->setDataCadastro(null);
+            $this->setDataCadastro(self::now());
         } else {
             $this->setDataCadastro($credito['datacadastro']);
         }
@@ -306,11 +306,12 @@ class Credito extends \MZ\Database\Helper
     public function filter($original)
     {
         $this->setID($original->getID());
-        $this->setClienteID(Filter::number($this->getClienteID()));
+        $this->setFuncionarioID($original->getFuncionarioID());
+        $this->setCancelado($original->getCancelado());
+        $this->setDataCadastro($original->getDataCadastro());
+        $this->setClienteID(Filter::number($original->getClienteID()));
         $this->setValor(Filter::money($this->getValor()));
         $this->setDetalhes(Filter::string($this->getDetalhes()));
-        $this->setFuncionarioID(Filter::number($this->getFuncionarioID()));
-        $this->setDataCadastro(Filter::datetime($this->getDataCadastro()));
     }
 
     /**
@@ -328,6 +329,7 @@ class Credito extends \MZ\Database\Helper
     public function validate()
     {
         $errors = [];
+        $old_credito = self::findByID($this->getID());
         if (is_null($this->getClienteID())) {
             $errors['clienteid'] = 'O cliente não pode ser vazio';
         }
@@ -339,9 +341,10 @@ class Credito extends \MZ\Database\Helper
         }
         if (is_null($this->getCancelado())) {
             $errors['cancelado'] = 'O cancelado não pode ser vazio';
-        }
-        if (!Validator::checkBoolean($this->getCancelado(), true)) {
-            $errors['cancelado'] = 'O cancelado é inválido';
+        } elseif (!Validator::checkBoolean($this->getCancelado())) {
+            $errors['cancelado'] = 'A informação se cancelado é inválida';
+        } elseif ($this->isCancelado() && $old_credito->exists() && $old_credito->isCancelado()) {
+            $errors['cancelado'] = 'O crédito informado já está cancelado';
         }
         if (is_null($this->getDataCadastro())) {
             $errors['datacadastro'] = 'A data de cadastro não pode ser vazia';
@@ -359,14 +362,6 @@ class Credito extends \MZ\Database\Helper
      */
     protected function translate($e)
     {
-        if (stripos($e->getMessage(), 'PRIMARY') !== false) {
-            return new \MZ\Exception\ValidationException([
-                'id' => sprintf(
-                    'O id "%s" já está cadastrado',
-                    $this->getID()
-                ),
-            ]);
-        }
         return parent::translate($e);
     }
 
@@ -390,27 +385,34 @@ class Credito extends \MZ\Database\Helper
 
     /**
      * Update Crédito with instance values into database for ID
+     * @param  array $only Save these fields only, when empty save all fields except id
+     * @param  boolean $except When true, saves all fields except $only
      * @return Credito Self instance
      */
-    public function update()
+    public function update($only = [], $except = false)
     {
         $values = $this->validate();
         if (!$this->exists()) {
             throw new \Exception('O identificador do crédito não foi informado');
         }
-        unset($values['id']);
+        $values = self::filterValues($values, $only, $except);
         try {
             self::getDB()
                 ->update('Creditos')
                 ->set($values)
                 ->where('id', $this->getID())
                 ->execute();
-            $credito = self::findByID($this->getID());
-            $this->fromArray($credito->toArray());
+            $this->loadByID($this->getID());
         } catch (\Exception $e) {
             throw $this->translate($e);
         }
         return $this;
+    }
+
+    public function cancel()
+    {
+        $this->setCancelado('Y');
+        return $this->update(['cancelado']);
     }
 
     /**
@@ -440,18 +442,6 @@ class Credito extends \MZ\Database\Helper
         $query = self::query($condition, $order)->limit(1);
         $row = $query->fetch() ?: [];
         return $this->fromArray($row);
-    }
-
-    /**
-     * Load into this object from database using, ID
-     * @param  int $id id to find Crédito
-     * @return Credito Self filled instance or empty when not found
-     */
-    public function loadByID($id)
-    {
-        return $this->load([
-            'id' => intval($id),
-        ]);
     }
 
     /**

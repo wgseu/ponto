@@ -20,7 +20,7 @@
  * O Cliente adquire apenas o direito de usar o software e não adquire qualquer outros
  * direitos, expressos ou implícitos no GrandChef diferentes dos especificados nesta Licença.
  *
- * @author  Francimar Alves <mazinsw@gmail.com>
+ * @author Equipe GrandChef <desenvolvimento@mzsw.com.br>
  */
 namespace MZ\Session;
 
@@ -224,7 +224,7 @@ class Caixa extends \MZ\Database\Helper
             $this->setNumeroInicial($caixa['numeroinicial']);
         }
         if (!isset($caixa['ativo'])) {
-            $this->setAtivo(null);
+            $this->setAtivo('Y');
         } else {
             $this->setAtivo($caixa['ativo']);
         }
@@ -267,34 +267,27 @@ class Caixa extends \MZ\Database\Helper
      */
     public function validate()
     {
-        global $__sistema__;
+        global $app;
 
         $errors = [];
         if (is_null($this->getDescricao())) {
             $errors['descricao'] = 'A descrição não pode ser vazia';
         }
         $old_caixa = self::findByID($this->getID());
-        if (!$__sistema__->isFiscalVisible()) {
-            $this->setSerie($old_caixa->exists() ? 1 : $old_caixa->getSerie());
-        } elseif (!is_numeric($caixa['serie'])) {
-            $erros['serie'] = 'A série não foi informada';
-        } else {
-            $caixa['serie'] = intval($caixa['serie']);
-        }
-
-        if (is_null($this->getSerie())) {
+        if (!$app->getSystem()->isFiscalVisible()) {
+            $this->setSerie($old_caixa->exists() ? $old_caixa->getSerie() : 1);
+        } elseif (!Validator::checkDigits($this->getSerie())) {
             $errors['serie'] = 'A série não pode ser vazia';
         }
-        if (is_null($this->getNumeroInicial())) {
+        if (!$app->getSystem()->isFiscalVisible()) {
+            $this->setNumeroInicial($old_caixa->exists() ? $old_caixa->getNumeroInicial() : 1);
+        } elseif (!Validator::checkDigits($this->getNumeroInicial())) {
             $errors['numeroinicial'] = 'O número inicial não pode ser vazio';
         }
-        if (is_null($this->getAtivo())) {
-            $errors['ativo'] = 'O ativo não pode ser vazio';
-        }
-        if (!is_null($this->getAtivo()) &&
-            !array_key_exists($this->getAtivo(), self::getBooleanOptions())
-        ) {
-            $errors['ativo'] = 'O ativo é inválido';
+        if (!Validator::checkBoolean($this->getAtivo())) {
+            $errors['ativo'] = 'O estado de ativação é inválido';
+        } elseif (!$this->isAtivo() && Movimentacao::isCaixaOpen($this->getID())) {
+            $errors['ativo'] = 'O caixa está aberto e não pode ser desativado';
         }
         if (!empty($errors)) {
             throw new \MZ\Exception\ValidationException($errors);
@@ -309,15 +302,7 @@ class Caixa extends \MZ\Database\Helper
      */
     protected function translate($e)
     {
-        if (stripos($e->getMessage(), 'PRIMARY') !== false) {
-            return new \MZ\Exception\ValidationException([
-                'id' => sprintf(
-                    'O id "%s" já está cadastrado',
-                    $this->getID()
-                ),
-            ]);
-        }
-        if (stripos($e->getMessage(), 'Descricao_UNIQUE') !== false) {
+        if (contains(['Descricao', 'UNIQUE'], $e->getMessage())) {
             return new \MZ\Exception\ValidationException([
                 'descricao' => sprintf(
                     'A descrição "%s" já está cadastrada',
@@ -329,38 +314,106 @@ class Caixa extends \MZ\Database\Helper
     }
 
     /**
-     * Find this object on database using, ID
-     * @param  int $id id to find Caixa
-     * @return Caixa A filled instance or empty when not found
+     * Insert a new Caixa into the database and fill instance from database
+     * @return Caixa Self instance
      */
-    public static function findByID($id)
+    public function insert()
     {
-        return self::find([
-            'id' => intval($id),
-        ]);
+        $values = $this->validate();
+        unset($values['id']);
+        try {
+            $id = self::getDB()->insertInto('Caixas')->values($values)->execute();
+            $caixa = self::findByID($id);
+            $this->fromArray($caixa->toArray());
+        } catch (\Exception $e) {
+            throw $this->translate($e);
+        }
+        return $this;
     }
 
     /**
-     * Find this object on database using, Serie
-     * @param  string $serie série to find Caixa
-     * @return Caixa A filled instance or empty when not found
+     * Update Caixa with instance values into database for ID
+     * @param  array $only Save these fields only, when empty save all fields except id
+     * @param  boolean $except When true, saves all fields except $only
+     * @return Caixa Self instance
      */
-    public static function findBySerie($serie)
+    public function update($only = [], $except = false)
     {
-        return self::find(
-            ['serie' => intval($serie)],
-            ['numeroinicial' => -1]
-        );
+        $values = $this->validate();
+        if (!$this->exists()) {
+            throw new \Exception('O identificador do caixa não foi informado');
+        }
+        $values = self::filterValues($values, $only, $except);
+        try {
+            self::getDB()
+                ->update('Caixas')
+                ->set($values)
+                ->where('id', $this->getID())
+                ->execute();
+            $this->loadByID($this->getID());
+        } catch (\Exception $e) {
+            throw $this->translate($e);
+        }
+        return $this;
     }
 
     /**
-     * Find this object on database using, Descricao
+     * Reset invoice initial number to 1 because reached the maximum
+     * @param  int $serie affect only this serie
+     * @return Caixa Self instance
+     */
+    public static function resetBySerie($serie)
+    {
+        try {
+            self::getDB()
+                ->update('Caixas')
+                ->set('numeroinicial', '1')
+                ->where('serie', $serie)
+                ->where('ativo', 'Y')
+                ->execute();
+        } catch (\Exception $e) {
+            $caixa = new Caixa();
+            throw $caixa->translate($e);
+        }
+    }
+
+    /**
+     * Delete this instance from database using ID
+     * @return integer Number of rows deleted (Max 1)
+     */
+    public function delete()
+    {
+        if (!$this->exists()) {
+            throw new \Exception('O identificador do caixa não foi informado');
+        }
+        $result = self::getDB()
+            ->deleteFrom('Caixas')
+            ->where('id', $this->getID())
+            ->execute();
+        return $result;
+    }
+
+    /**
+     * Load one register for it self with a condition
+     * @param  array $condition Condition for searching the row
+     * @param  array $order associative field name -> [-1, 1]
+     * @return Caixa Self instance filled or empty
+     */
+    public function load($condition, $order = [])
+    {
+        $query = self::query($condition, $order)->limit(1);
+        $row = $query->fetch() ?: [];
+        return $this->fromArray($row);
+    }
+
+    /**
+     * Load into this object from database using, Descricao
      * @param  string $descricao descrição to find Caixa
-     * @return Caixa A filled instance or empty when not found
+     * @return Caixa Self filled instance or empty when not found
      */
-    public static function findByDescricao($descricao)
+    public function loadByDescricao($descricao)
     {
-        return self::find([
+        return $this->load([
             'descricao' => strval($descricao),
         ]);
     }
@@ -430,19 +483,54 @@ class Caixa extends \MZ\Database\Helper
     public static function find($condition, $order = [])
     {
         $query = self::query($condition, $order)->limit(1);
-        $row = $query->fetch();
-        if ($row === false) {
-            $row = [];
-        }
+        $row = $query->fetch() ?: [];
         return new Caixa($row);
     }
 
     /**
-     * Fetch all rows from database with matched condition critery
-     * @param  array $condition condition to filter rows
-     * @param  integer $limit number of rows to get, null for all
-     * @param  integer $offset start index to get rows, null for begining
-     * @return array All rows instanced and filled
+     * Find this object on database using, ID
+     * @param  int $id id to find Caixa
+     * @return Caixa A filled instance or empty when not found
+     */
+    public static function findByID($id)
+    {
+        return self::find([
+            'id' => intval($id),
+        ]);
+    }
+
+    /**
+     * Find this object on database using, Descricao
+     * @param  string $descricao descrição to find Caixa
+     * @return Caixa A filled instance or empty when not found
+     */
+    public static function findByDescricao($descricao)
+    {
+        return self::find([
+            'descricao' => strval($descricao),
+        ]);
+    }
+
+    /**
+     * Find this object as active on database using, Serie
+     * @param  string $serie série to find Caixa
+     * @return Caixa An active filled instance or empty when not found
+     */
+    public static function findBySerie($serie)
+    {
+        return self::find(
+            ['serie' => intval($serie), 'ativo' => 'Y'],
+            ['numeroinicial' => -1]
+        );
+    }
+
+    /**
+     * Find all Caixa
+     * @param  array  $condition Condition to get all Caixa
+     * @param  array  $order     Order Caixa
+     * @param  int    $limit     Limit data into row count
+     * @param  int    $offset    Start offset to get rows
+     * @return array             List of all rows instanced as Caixa
      */
     public static function findAll($condition = [], $order = [], $limit = null, $offset = null)
     {
@@ -458,77 +546,6 @@ class Caixa extends \MZ\Database\Helper
         foreach ($rows as $row) {
             $result[] = new Caixa($row);
         }
-        return $result;
-    }
-
-    /**
-     * Insert a new Caixa into the database and fill instance from database
-     * @return Caixa Self instance
-     */
-    public function insert()
-    {
-        $values = $this->validate();
-        unset($values['id']);
-        try {
-            $id = self::getDB()->insertInto('Caixas')->values($values)->execute();
-            $caixa = self::findByID($id);
-            $this->fromArray($caixa->toArray());
-        } catch (\Exception $e) {
-            throw $this->translate($e);
-        }
-        return $this;
-    }
-
-    /**
-     * Update Caixa with instance values into database for ID
-     * @return Caixa Self instance
-     */
-    public function update()
-    {
-        $values = $this->validate();
-        if (!$this->exists()) {
-            throw new \Exception('O identificador do caixa não foi informado');
-        }
-        unset($values['id']);
-        try {
-            self::getDB()
-                ->update('Caixas')
-                ->set($values)
-                ->where('id', $this->getID())
-                ->execute();
-            $caixa = self::findByID($this->getID());
-            $this->fromArray($caixa->toArray());
-        } catch (\Exception $e) {
-            throw $this->translate($e);
-        }
-        return $this;
-    }
-
-    /**
-     * Save the Caixa into the database
-     * @return Caixa Self instance
-     */
-    public function save()
-    {
-        if ($this->exists()) {
-            return $this->update();
-        }
-        return $this->insert();
-    }
-
-    /**
-     * Delete this instance from database using ID
-     * @return integer Number of rows deleted (Max 1)
-     */
-    public function delete()
-    {
-        if (!$this->exists()) {
-            throw new \Exception('O identificador do caixa não foi informado');
-        }
-        $result = self::getDB()
-            ->deleteFrom('Caixas')
-            ->where('id', $this->getID())
-            ->execute();
         return $result;
     }
 

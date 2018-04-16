@@ -20,7 +20,7 @@
  * O Cliente adquire apenas o direito de usar o software e não adquire qualquer outros
  * direitos, expressos ou implícitos no GrandChef diferentes dos especificados nesta Licença.
  *
- * @author  Francimar Alves <mazinsw@gmail.com>
+ * @author Equipe GrandChef <desenvolvimento@mzsw.com.br>
  */
 namespace MZ\Product;
 
@@ -293,16 +293,22 @@ class Categoria extends \MZ\Database\Helper
      */
     public function filter($original)
     {
+        global $app;
+
         $this->setID($original->getID());
         $this->setCategoriaID(Filter::number($this->getCategoriaID()));
         $this->setDescricao(Filter::string($this->getDescricao()));
-        $imagem = upload_image('raw_imagem', 'categoria');
+        $imagem = upload_image('raw_imagem', 'categoria', null, 256, 256, true);
         if (is_null($imagem) && trim($this->getImagem()) != '') {
-            $this->setImagem($original->getImagem());
+            $this->setImagem(true);
         } else {
             $this->setImagem($imagem);
+            $image_path = $app->getPath('public') . $this->makeImagem();
+            if (!is_null($imagem)) {
+                $this->setImagem(file_get_contents($image_path));
+                @unlink($image_path);
+            }
         }
-        $this->setDataAtualizacao(Filter::datetime($this->getDataAtualizacao()));
     }
 
     /**
@@ -311,9 +317,6 @@ class Categoria extends \MZ\Database\Helper
      */
     public function clean($dependency)
     {
-        if (!is_null($this->getImagem()) && $dependency->getImagem() != $this->getImagem()) {
-            @unlink(get_image_path($this->getImagem(), 'categoria'));
-        }
         $this->setImagem($dependency->getImagem());
     }
 
@@ -324,22 +327,31 @@ class Categoria extends \MZ\Database\Helper
     public function validate()
     {
         $errors = [];
+        if (!is_null($this->getCategoriaID())) {
+            $_categoria = $this->findCategoriaID();
+            if (!$_categoria->exists()) {
+                $errors['categoriaid'] = 'A categoria informada não existe';
+            } elseif (!is_null($_categoria->getCategoriaID())) {
+                $errors['categoriaid'] = 'A categoria informada já é uma subcategoria';
+            } elseif ($_categoria->getID() == $this->getID()) {
+                $errors['categoriaid'] = 'A categoria superior não pode ser a própria categoria';
+            }
+        }
         if (is_null($this->getDescricao())) {
             $errors['descricao'] = 'A descrição não pode ser vazia';
         }
-        if (is_null($this->getServico())) {
-            $errors['servico'] = 'O serviço não pode ser vazio';
+        if (!Validator::checkBoolean($this->getServico())) {
+            $errors['servico'] = 'O serviço é inválido ou está vazio';
         }
-        if (!Validator::checkBoolean($this->getServico(), true)) {
-            $errors['servico'] = 'O serviço é inválido';
-        }
-        if (is_null($this->getDataAtualizacao())) {
-            $errors['dataatualizacao'] = 'A data de atualização não pode ser vazia';
-        }
+        $this->setDataAtualizacao(self::now());
         if (!empty($errors)) {
             throw new \MZ\Exception\ValidationException($errors);
         }
-        return $this->toArray();
+        $values = $this->toArray();
+        if ($this->getImagem() === true) {
+            unset($values['imagem']);
+        }
+        return $values;
     }
 
     /**
@@ -349,15 +361,7 @@ class Categoria extends \MZ\Database\Helper
      */
     protected function translate($e)
     {
-        if (stripos($e->getMessage(), 'PRIMARY') !== false) {
-            return new \MZ\Exception\ValidationException([
-                'id' => sprintf(
-                    'O id "%s" já está cadastrado',
-                    $this->getID()
-                ),
-            ]);
-        }
-        if (stripos($e->getMessage(), 'Descricao_UNIQUE') !== false) {
+        if (contains(['Descricao', 'UNIQUE'], $e->getMessage())) {
             return new \MZ\Exception\ValidationException([
                 'descricao' => sprintf(
                     'A descrição "%s" já está cadastrada',
@@ -388,23 +392,24 @@ class Categoria extends \MZ\Database\Helper
 
     /**
      * Update Categoria with instance values into database for ID
+     * @param  array $only Save these fields only, when empty save all fields except id
+     * @param  boolean $except When true, saves all fields except $only
      * @return Categoria Self instance
      */
-    public function update()
+    public function update($only = [], $except = false)
     {
         $values = $this->validate();
         if (!$this->exists()) {
             throw new \Exception('O identificador da categoria não foi informado');
         }
-        unset($values['id']);
+        $values = self::filterValues($values, $only, $except);
         try {
             self::getDB()
                 ->update('Categorias')
                 ->set($values)
                 ->where('id', $this->getID())
                 ->execute();
-            $categoria = self::findByID($this->getID());
-            $this->fromArray($categoria->toArray());
+            $this->loadByID($this->getID());
         } catch (\Exception $e) {
             throw $this->translate($e);
         }
@@ -441,18 +446,6 @@ class Categoria extends \MZ\Database\Helper
     }
 
     /**
-     * Load into this object from database using, ID
-     * @param  int $id id to find Categoria
-     * @return Categoria Self filled instance or empty when not found
-     */
-    public function loadByID($id)
-    {
-        return $this->load([
-            'id' => intval($id),
-        ]);
-    }
-
-    /**
      * Load into this object from database using, Descricao
      * @param  string $descricao descrição to find Categoria
      * @return Categoria Self filled instance or empty when not found
@@ -462,6 +455,20 @@ class Categoria extends \MZ\Database\Helper
         return $this->load([
             'descricao' => strval($descricao),
         ]);
+    }
+
+    /**
+     * Load imagem into this object from database using
+     * @return Categoria Self instance
+     */
+    public function loadImagem()
+    {
+        $imagem = self::getDB()->from('Categorias c')
+            ->select(null)
+            ->select('c.imagem')
+            ->where('c.id', $this->getID())
+            ->fetchColumn();
+        return $this->setImagem($imagem);
     }
 
     /**
@@ -525,7 +532,18 @@ class Categoria extends \MZ\Database\Helper
      */
     private static function query($condition = [], $order = [])
     {
-        $query = self::getDB()->from('Categorias c');
+        $query = self::getDB()->from('Categorias c')
+            ->select(null)
+            ->select('c.id')
+            ->select('c.categoriaid')
+            ->select('c.descricao')
+            ->select('c.servico')
+            ->select(
+                '(CASE WHEN c.imagem IS NULL THEN NULL ELSE '.
+                self::concat(['c.id', '".png"']).
+                ' END) as imagem'
+            )
+            ->select('c.dataatualizacao');
         $condition = self::filterCondition($condition);
         $query = self::buildOrderBy($query, self::filterOrder($order));
         $query = $query->orderBy('c.descricao ASC');

@@ -22,9 +22,10 @@
 require_once(dirname(__DIR__) . '/app.php');
 
 use MZ\Location\Estado;
+use MZ\System\Permissao;
 
-need_permission(\Permissao::NOME_CADASTROESTADOS, is_output('json'));
-$id = isset($_GET['id'])?$_GET['id']:null;
+need_permission(Permissao::NOME_CADASTROESTADOS, is_output('json'));
+$id = isset($_GET['id']) ? $_GET['id'] : null;
 $estado = Estado::findByID($id);
 $estado->setID(null);
 
@@ -64,4 +65,4 @@ if (is_post()) {
     json('Nenhum dado foi enviado');
 }
 $_paises = \MZ\Location\Pais::findAll();
-include template('gerenciar_estado_cadastrar');
+$app->getResponse('html')->output('gerenciar_estado_cadastrar');

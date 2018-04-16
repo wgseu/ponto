@@ -1,9 +1,11 @@
 <?php
 require_once(dirname(__DIR__) . '/app.php');
 
-need_permission(Permissao::NOME_ALTERARCONFIGURACOES);
+use MZ\System\Permissao;
 
-$fieldfocus = 'bemvindo';
+need_permission(Permissao::NOME_ALTERARCONFIGURACOES, is_output('json'));
+
+$focusctrl = 'bemvindo';
 $base_url = 'header';
 $tab_layout = 'active';
 
@@ -61,7 +63,7 @@ if (is_post()) {
     }
     try {
         foreach ($images_info as $key => &$value) {
-            $old_url = trim($_POST[$value['field']]);
+            $old_url = isset($_POST[$value['field']]) ? trim($_POST[$value['field']]) : null;
             $value['save'] = upload_image($value['image'], $base_url);
             if (!is_null($value['save'])) {
                 set_string_config('Site', $value['section'], $value['save']);
@@ -71,39 +73,50 @@ if (is_post()) {
                 $value['save'] = $value['url'];
             }
         }
-        $text_bemvindo = trim($_POST['bemvindo']);
+        $text_bemvindo = isset($_POST['bemvindo']) ? trim($_POST['bemvindo']) : null;
         set_string_config('Site', 'Text.BemVindo', $text_bemvindo);
-        $text_chamada = trim($_POST['chamada']);
+        $text_chamada = isset($_POST['chamada']) ? trim($_POST['chamada']) : null;
         set_string_config('Site', 'Text.Chamada', $text_chamada);
-        $__sistema__->salvarOpcoes($__options__);
-        foreach ($images_info as $key => &$value) {
+        $app->getSystem()->filter($app->getSystem());
+        $app->getSystem()->update(['opcoes']);
+        foreach ($images_info as $key => $value) {
             // exclui a imagem antiga, pois uma nova foi informada
             if (!is_null($value['url']) &&
-                $value['save'] != $value['url']) {
-                unlink(WWW_ROOT . get_image_url($value['url'], $base_url));
+                $value['save'] != $value['url']
+            ) {
+                unlink($app->getPath('public') . get_image_url($value['url'], $base_url));
             }
         }
-        \Thunder::success('Layout atualizado com sucesso!', true);
+        $msg = 'Layout atualizado com sucesso!';
+        if (is_output('json')) {
+            json(null, ['item' => $sistema->publish(), 'msg' => $msg]);
+        }
+        \Thunder::success($msg, true);
         redirect('/gerenciar/sistema/layout');
-    } catch (ValidationException $e) {
-        $erro = $e->getErrors();
-    } catch (Exception $e) {
-        $erro['unknow'] = $e->getMessage();
-    }
-    foreach ($images_info as $key => &$value) {
-        // remove imagem enviada
-        if (!is_null($value['save']) &&
-            $value['url'] != $value['save']) {
-            unlink(WWW_ROOT . get_image_url($value['save'], $base_url));
+    } catch (\Exception $e) {
+        $sistema->clean($old_sistema);
+        if ($e instanceof \MZ\Exception\ValidationException) {
+            $errors = $e->getErrors();
+        }
+        foreach ($images_info as $key => $value) {
+            // remove imagem enviada
+            if (!is_null($value['save']) &&
+                $value['url'] != $value['save']
+            ) {
+                unlink($app->getPath('public') . get_image_url($value['save'], $base_url));
+            }
+        }
+        if (is_output('json')) {
+            json($e->getMessage(), null, ['errors' => $errors]);
+        }
+        \Thunder::error($e->getMessage());
+        foreach ($errors as $key => $value) {
+            $focusctrl = $key;
+            break;
         }
     }
-}
-foreach ($erro as $key => $value) {
-    $fieldfocus = $key;
-    break;
-}
-if (array_key_exists($fieldfocus, $erro)) {
-    \Thunder::error($erro[$fieldfocus]);
+} elseif (is_output('json')) {
+    json('Nenhum dado foi enviado');
 }
 
-include template('gerenciar_sistema_layout');
+$app->getResponse('html')->output('gerenciar_sistema_layout');

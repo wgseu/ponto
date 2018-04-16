@@ -9,7 +9,7 @@
 			<div class="form-group col-lg-4 col-md-6 col-sm-6 col-xs-12">
 				<label for="query">Busca:</label>
 				<div class="input-group">
-					<input type="text" class="form-control" id="query" name="query" placeholder="Descrição ou Código..." value="${\MZ\Util\Filter::input($_GET, 'query')}">
+					<input type="text" class="form-control" id="query" name="search" placeholder="Descrição ou Código..." value="${\MZ\Util\Filter::input($_GET, 'search')}">
 					<span class="input-group-btn">
 						<button class="btn btn-default" type="submit"><i class="fa fa-search"></i></button>
 					</span>
@@ -47,7 +47,7 @@
 									<div class="input-group">
 										<input type="text" id="produto_{$produto['codigo']}_input" class="form-control assoc-input" value="${\MZ\Util\Filter::input($associado->getDescricao())}">
 										<span class="input-group-btn">
-											<button class="btn btn-default ${is_null($associado->getID()) || count($produto['itens']) == 0?'disabled':''}" tabindex="-1"><i class="fa fa-{$produto['icon']}"></i></button>
+											<button class="btn btn-default ${!$associado->exists() || count($produto['itens']) == 0?'disabled':''}" tabindex="-1"><i class="fa fa-{$produto['icon']}"></i></button>
 										</span>
 									</div>
 								</div>

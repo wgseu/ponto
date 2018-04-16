@@ -1,24 +1,27 @@
 <?php
-/*
-	Copyright 2014 da MZ Software - MZ Desenvolvimento de Sistemas LTDA
-	Este arquivo é parte do programa GrandChef - Sistema para Gerenciamento de Churrascarias, Bares e Restaurantes.
-	O GrandChef é um software proprietário; você não pode redistribuí-lo e/ou modificá-lo.
-	DISPOSIÇÕES GERAIS
-	O cliente não deverá remover qualquer identificação do produto, avisos de direitos autorais,
-	ou outros avisos ou restrições de propriedade do GrandChef.
-
-	O cliente não deverá causar ou permitir a engenharia reversa, desmontagem,
-	ou descompilação do GrandChef.
-
-	PROPRIEDADE DOS DIREITOS AUTORAIS DO PROGRAMA
-
-	GrandChef é a especialidade do desenvolvedor e seus
-	licenciadores e é protegido por direitos autorais, segredos comerciais e outros direitos
-	de leis de propriedade.
-
-	O Cliente adquire apenas o direito de usar o software e não adquire qualquer outros
-	direitos, expressos ou implícitos no GrandChef diferentes dos especificados nesta Licença.
-*/
+/**
+ * Copyright 2014 da MZ Software - MZ Desenvolvimento de Sistemas LTDA
+ *
+ * Este arquivo é parte do programa GrandChef - Sistema para Gerenciamento de Churrascarias, Bares e Restaurantes.
+ * O GrandChef é um software proprietário; você não pode redistribuí-lo e/ou modificá-lo.
+ * DISPOSIÇÕES GERAIS
+ * O cliente não deverá remover qualquer identificação do produto, avisos de direitos autorais,
+ * ou outros avisos ou restrições de propriedade do GrandChef.
+ *
+ * O cliente não deverá causar ou permitir a engenharia reversa, desmontagem,
+ * ou descompilação do GrandChef.
+ *
+ * PROPRIEDADE DOS DIREITOS AUTORAIS DO PROGRAMA
+ *
+ * GrandChef é a especialidade do desenvolvedor e seus
+ * licenciadores e é protegido por direitos autorais, segredos comerciais e outros direitos
+ * de leis de propriedade.
+ *
+ * O Cliente adquire apenas o direito de usar o software e não adquire qualquer outros
+ * direitos, expressos ou implícitos no GrandChef diferentes dos especificados nesta Licença.
+ *
+ * @author Equipe GrandChef <desenvolvimento@mzsw.com.br>
+ */
 class ProdutoTipo
 {
     const PRODUTO = 'Produto';
@@ -682,7 +685,7 @@ class ZProduto
             $unidade = Unidade::findByID($produto['unidadeid']);
             if (is_equal($produto['conteudo'], 0, 0.0001)) {
                 $erros['conteudo'] = 'O conteúdo não pode ser nulo';
-            } elseif ($produto['conteudo'] != 1 && strtoupper($unidade->getSigla()) == 'UN') {
+            } elseif ($produto['conteudo'] != 1 && strtoupper($unidade->getSigla()) == Unidade::SIGLA_UNITARIA) {
                 $erros['conteudo'] = 'O conteúdo deve ser unitário com valor 1';
             }
         }
@@ -757,20 +760,20 @@ class ZProduto
         }
         $produto['dataatualizacao'] = date('Y-m-d H:i:s');
         if (!empty($erros)) {
-            throw new ValidationException($erros);
+            throw new \MZ\Exception\ValidationException($erros);
         }
     }
 
     private static function handleException(&$e)
     {
         if (stripos($e->getMessage(), 'PRIMARY') !== false) {
-            throw new ValidationException(['id' => 'O ID informado já está cadastrado']);
+            throw new \MZ\Exception\ValidationException(['id' => 'O ID informado já está cadastrado']);
         }
-        if (stripos($e->getMessage(), 'Descricao_UNIQUE') !== false) {
-            throw new ValidationException(['descricao' => 'A descrição informada já está cadastrada']);
+        if (contains(['Descricao', 'UNIQUE'], $e->getMessage())) {
+            throw new \MZ\Exception\ValidationException(['descricao' => 'A descrição informada já está cadastrada']);
         }
-        if (stripos($e->getMessage(), 'CodBarras_UNIQUE') !== false) {
-            throw new ValidationException(['codigobarras' => 'O código de barras informado já está cadastrado']);
+        if (contains(['CodBarras', 'UNIQUE'], $e->getMessage())) {
+            throw new \MZ\Exception\ValidationException(['codigobarras' => 'O código de barras informado já está cadastrado']);
         }
     }
 
@@ -780,7 +783,7 @@ class ZProduto
         self::validarCampos($_produto);
         try {
             $_produto['id'] = \DB::$pdo->insertInto('Produtos')->values($_produto)->execute();
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             self::handleException($e);
             throw $e;
         }
@@ -791,7 +794,7 @@ class ZProduto
     {
         $_produto = $produto->toArray();
         if (!$_produto['id']) {
-            throw new ValidationException(['id' => 'O id do produto não foi informado']);
+            throw new \MZ\Exception\ValidationException(['id' => 'O id do produto não foi informado']);
         }
         self::validarCampos($_produto);
         $campos = [
@@ -826,7 +829,7 @@ class ZProduto
             $query = $query->set(array_intersect_key($_produto, array_flip($campos)));
             $query = $query->where('id', $_produto['id']);
             $query->execute();
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             self::handleException($e);
             throw $e;
         }

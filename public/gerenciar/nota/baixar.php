@@ -1,44 +1,23 @@
 <?php
 require_once(dirname(__DIR__) . '/app.php');
 
+use MZ\Invoice\Nota;
+use MZ\System\Permissao;
+use MZ\Util\Filter;
+
 need_permission(
     [
-        \Permissao::NOME_RELATORIOFLUXO,
-        \Permissao::NOME_EXCLUIRPEDIDO,
+        Permissao::NOME_RELATORIOFLUXO,
+        Permissao::NOME_EXCLUIRPEDIDO,
     ],
-    isset($_GET['saida']) && is_output('json')
+    true
 );
 
 set_time_limit(0);
 
 try {
-    $busca = isset($_GET['query'])?$_GET['query']:null;
-    $estado = isset($_GET['estado'])?$_GET['estado']:null;
-    $acao = isset($_GET['acao'])?$_GET['acao']:null;
-    $ambiente = isset($_GET['ambiente'])?$_GET['ambiente']:null;
-    $serie = isset($_GET['serie'])?$_GET['serie']:null;
-    $pedido_id = isset($_GET['pedido_id'])?$_GET['pedido_id']:null;
-    $tipo = isset($_GET['tipo'])?$_GET['tipo']:null;
-    $contingencia = isset($_GET['contingencia'])?$_GET['contingencia']:null;
-    $emissao_inicio = isset($_GET['emissao_inicio'])?strtotime($_GET['emissao_inicio']):false;
-    $emissao_fim = isset($_GET['emissao_fim'])?strtotime($_GET['emissao_fim']):false;
-    $lancamento_inicio = isset($_GET['lancamento_inicio'])?strtotime($_GET['lancamento_inicio']):false;
-    $lancamento_fim = isset($_GET['lancamento_fim'])?strtotime($_GET['lancamento_fim']):false;
-
-    $notas = \Nota::getTodas(
-        $busca,
-        $estado,
-        $acao,
-        $ambiente,
-        $serie,
-        $pedido_id,
-        $tipo,
-        $contingencia,
-        $emissao_inicio,
-        $emissao_fim,
-        $lancamento_inicio,
-        $lancamento_fim
-    );
+    $condition = Filter::query($_GET);
+    $notas = Nota::findAll($condition);
     if (count($notas) == 0) {
         throw new \Exception('Nenhuma nota no resultado da busca', 404);
     }
@@ -55,7 +34,7 @@ try {
             exit;
         }
     }
-    $zipfile = \Nota::zip($notas);
+    $zipfile = Nota::zip($notas);
     $zipname = 'notas.zip';
     header("Pragma: public");
     header("Expires: 0");

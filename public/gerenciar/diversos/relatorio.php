@@ -1,13 +1,13 @@
 <?php
 require_once(dirname(__DIR__) . '/app.php');
 need_owner(true);
-$action = $_GET['action'];
+$action = isset($_GET['action']) ? $_GET['action'] : null;
 if ($action == 'faturamento') {
-    $start = strtotime($_GET['start']);
+    $start = strtotime(isset($_GET['start']) ? $_GET['start'] : null);
     if ($start === false) {
         $start = time();
     }
-    $end = strtotime($_GET['end']);
+    $end = strtotime(isset($_GET['end']) ? $_GET['end'] : null);
     if ($end === false) {
         $end = time();
     }
@@ -24,7 +24,7 @@ if ($action == 'faturamento') {
         'faturamento' => $data,
     ]);
 } elseif ($action == 'meta') {
-    $intervalo = strtolower($_GET['intervalo']);
+    $intervalo = strtolower(isset($_GET['intervalo']) ? $_GET['intervalo'] : null);
     switch ($intervalo) {
         case 'anual':
             $year = date('Y') - 1;

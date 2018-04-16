@@ -1,24 +1,32 @@
 <?php
-/*
-	Copyright 2014 da MZ Software - MZ Desenvolvimento de Sistemas LTDA
-	Este arquivo é parte do programa GrandChef - Sistema para Gerenciamento de Churrascarias, Bares e Restaurantes.
-	O GrandChef é um software proprietário; você não pode redistribuí-lo e/ou modificá-lo.
-	DISPOSIÇÕES GERAIS
-	O cliente não deverá remover qualquer identificação do produto, avisos de direitos autorais,
-	ou outros avisos ou restrições de propriedade do GrandChef.
+/**
+ * Copyright 2014 da MZ Software - MZ Desenvolvimento de Sistemas LTDA
+ *
+ * Este arquivo é parte do programa GrandChef - Sistema para Gerenciamento de Churrascarias, Bares e Restaurantes.
+ * O GrandChef é um software proprietário; você não pode redistribuí-lo e/ou modificá-lo.
+ * DISPOSIÇÕES GERAIS
+ * O cliente não deverá remover qualquer identificação do produto, avisos de direitos autorais,
+ * ou outros avisos ou restrições de propriedade do GrandChef.
+ *
+ * O cliente não deverá causar ou permitir a engenharia reversa, desmontagem,
+ * ou descompilação do GrandChef.
+ *
+ * PROPRIEDADE DOS DIREITOS AUTORAIS DO PROGRAMA
+ *
+ * GrandChef é a especialidade do desenvolvedor e seus
+ * licenciadores e é protegido por direitos autorais, segredos comerciais e outros direitos
+ * de leis de propriedade.
+ *
+ * O Cliente adquire apenas o direito de usar o software e não adquire qualquer outros
+ * direitos, expressos ou implícitos no GrandChef diferentes dos especificados nesta Licença.
+ *
+ * @author Equipe GrandChef <desenvolvimento@mzsw.com.br>
+ */
 
-	O cliente não deverá causar ou permitir a engenharia reversa, desmontagem,
-	ou descompilação do GrandChef.
+use MZ\Invoice\Evento;
+use MZ\Invoice\Nota;
+use MZ\Invoice\Emitente;
 
-	PROPRIEDADE DOS DIREITOS AUTORAIS DO PROGRAMA
-
-	GrandChef é a especialidade do desenvolvedor e seus
-	licenciadores e é protegido por direitos autorais, segredos comerciais e outros direitos
-	de leis de propriedade.
-
-	O Cliente adquire apenas o direito de usar o software e não adquire qualquer outros
-	direitos, expressos ou implícitos no GrandChef diferentes dos especificados nesta Licença.
-*/
 class NFeAPI extends \NFe\Common\Ajuste
 {
 
@@ -39,27 +47,29 @@ class NFeAPI extends \NFe\Common\Ajuste
     public function init()
     {
 
-        global $__empresa__;
-        global $__localizacao__;
-        global $__bairro__;
-        global $__cidade__;
-        global $__estado__;
+        global $app;
+
+        $empresa = $app->getSystem()->getCompany();
+        $localizacao = $app->getSystem()->getLocalization();
+        $bairro = $app->getSystem()->getDistrict();
+        $cidade = $app->getSystem()->getCity();
+        $estado = $app->getSystem()->getState();
 
         $this->external_emitente = Emitente::findByID('1');
-        if (is_null($this->external_emitente->getID())) {
+        if (!$this->external_emitente->exists()) {
             throw new \Exception('As configurações fiscais do emitente não foram ajustadas', 500);
         }
         \NFe\Log\Logger::getInstance()->setDirectory(dirname(__DIR__).'/logs');
         $this->external_regime = $this->external_emitente->findRegimeID();
         $this->sefaz = \NFe\Core\SEFAZ::getInstance();
         $this->sefaz->setConfiguracao($this);
-        $this->setBanco(new NFeDB());
+        $this->setBanco(new \NFeDB());
         $this->getBanco()->getIBPT()->setOffline($this->isOffline());
-        $chave_publica = WWW_ROOT . get_document_url($this->external_emitente->getChavePublica(), 'cert');
+        $chave_publica = $app->getPath('public') . get_document_url($this->external_emitente->getChavePublica(), 'cert');
         $this->setArquivoChavePublica($chave_publica);
-        $chave_privada = WWW_ROOT . get_document_url($this->external_emitente->getChavePrivada(), 'cert');
+        $chave_privada = $app->getPath('public') . get_document_url($this->external_emitente->getChavePrivada(), 'cert');
         $this->setArquivoChavePrivada($chave_privada);
-        $xml_base = WWW_ROOT . get_document_url('', 'xml');
+        $xml_base = $app->getPath('public') . get_document_url('', 'xml');
         $this->setPastaXmlBase($xml_base);
         $this->setToken($this->external_emitente->getToken());
         $this->setCSC($this->external_emitente->getCSC());
@@ -69,24 +79,24 @@ class NFeAPI extends \NFe\Common\Ajuste
 
         /* Emitente */
         $emitente = new \NFe\Entity\Emitente();
-        $emitente->setRazaoSocial($__empresa__->getSobrenome());
-        $emitente->setFantasia($__empresa__->getNome());
-        $emitente->setCNPJ($__empresa__->getCPF());
-        $emitente->setTelefone($__empresa__->getFone(1));
-        $emitente->setIE($__empresa__->getRG());
-        $emitente->setIM($__empresa__->getIM());
+        $emitente->setRazaoSocial($empresa->getSobrenome());
+        $emitente->setFantasia($empresa->getNome());
+        $emitente->setCNPJ($empresa->getCPF());
+        $emitente->setTelefone($empresa->getFone(1));
+        $emitente->setIE($empresa->getRG());
+        $emitente->setIM($empresa->getIM());
         $emitente->setRegime($this->external_regime->getCodigo());
 
         $endereco = new \NFe\Entity\Endereco();
-        $endereco->setCEP($__localizacao__->getCEP());
+        $endereco->setCEP($localizacao->getCEP());
         $endereco->getMunicipio()
-                 ->setNome($__cidade__->getNome())
+                 ->setNome($cidade->getNome())
                  ->getEstado()
-                 ->setNome($__estado__->getNome())
-                 ->setUF($__estado__->getUF());
-        $endereco->setBairro($__bairro__->getNome());
-        $endereco->setLogradouro($__localizacao__->getLogradouro());
-        $endereco->setNumero($__localizacao__->getNumero());
+                 ->setNome($estado->getNome())
+                 ->setUF($estado->getUF());
+        $endereco->setBairro($bairro->getNome());
+        $endereco->setLogradouro($localizacao->getLogradouro());
+        $endereco->setNumero($localizacao->getNumero());
 
         $emitente->setEndereco($endereco);
         $this->setEmitente($emitente);
@@ -132,12 +142,12 @@ class NFeAPI extends \NFe\Common\Ajuste
     {
         $_nota = Nota::getPelaChave($nota->getID());
         // o código é truncado quando em contingência e pode devolver uma nota diferente
-        if (is_null($_nota->getID())) {
+        if (!$_nota->exists()) {
             $_nota = Nota::findByPedidoID($nota->getCodigo());
         }
         $_evento = Evento::log(
             $_nota->getID(),
-            EventoEstado::ABERTO,
+            Evento::ESTADO_ABERTO,
             'XML da nota gerado com sucesso',
             0
         );
@@ -159,7 +169,7 @@ class NFeAPI extends \NFe\Common\Ajuste
         $_nota = Nota::getPelaChave($nota->getID());
         $_evento = Evento::log(
             $_nota->getID(),
-            EventoEstado::ASSINADO,
+            Evento::ESTADO_ASSINADO,
             'XML da nota assinado com sucesso',
             0
         );
@@ -185,7 +195,7 @@ class NFeAPI extends \NFe\Common\Ajuste
         $_nota->update();
         $_evento = Evento::log(
             $_nota->getID(),
-            EventoEstado::VALIDADO,
+            Evento::ESTADO_VALIDADO,
             'XML da nota validado com sucesso',
             0
         );
@@ -213,7 +223,7 @@ class NFeAPI extends \NFe\Common\Ajuste
         $_nota->update();
         $_evento = Evento::log(
             $_nota->getID(),
-            EventoEstado::CONTINGENCIA,
+            Evento::ESTADO_CONTINGENCIA,
             $exception->getMessage(),
             $exception->getCode()
         );
@@ -233,7 +243,7 @@ class NFeAPI extends \NFe\Common\Ajuste
 
         $_evento = Evento::log(
             $_nota->getID(),
-            EventoEstado::AUTORIZADO,
+            Evento::ESTADO_AUTORIZADO,
             $retorno->getMotivo(),
             $retorno->getStatus()
         );
@@ -300,7 +310,7 @@ class NFeAPI extends \NFe\Common\Ajuste
 
         $_evento = Evento::log(
             $_nota->getID(),
-            EventoEstado::DENEGADO,
+            Evento::ESTADO_DENEGADO,
             $retorno->getMotivo(),
             $retorno->getStatus()
         );
@@ -329,7 +339,7 @@ class NFeAPI extends \NFe\Common\Ajuste
 
         $_evento = Evento::log(
             $_nota->getID(),
-            EventoEstado::PENDENTE,
+            Evento::ESTADO_PENDENTE,
             $exception->getMessage(),
             $exception->getCode()
         );
@@ -375,7 +385,7 @@ class NFeAPI extends \NFe\Common\Ajuste
 
         $_evento = Evento::log(
             $_nota->getID(),
-            EventoEstado::PROCESSAMENTO,
+            Evento::ESTADO_PROCESSAMENTO,
             $retorno->getMotivo(),
             $retorno->getStatus()
         );
@@ -398,7 +408,7 @@ class NFeAPI extends \NFe\Common\Ajuste
 
         $_evento = Evento::log(
             $_nota->getID(),
-            EventoEstado::CANCELADO,
+            Evento::ESTADO_CANCELADO,
             $retorno->getMotivo(),
             $retorno->getStatus()
         );
@@ -416,7 +426,7 @@ class NFeAPI extends \NFe\Common\Ajuste
     public function onNotaErro($nota, $exception)
     {
         $_nota = Nota::getPelaChave($nota->getID());
-        if (is_null($_nota->getID())) {
+        if (!$_nota->exists()) {
             $_nota = Nota::findByPedidoID($nota->getCodigo());
         }
         $_evento = Evento::log(
@@ -458,7 +468,7 @@ class NFeAPI extends \NFe\Common\Ajuste
                 $inutilizacao = $tarefa->getAgente();
                 $_evento = Evento::log(
                     $_nota->getID(),
-                    EventoEstado::INUTILIZADO,
+                    Evento::ESTADO_INUTILIZADO,
                     $inutilizacao->getMotivo(),
                     $inutilizacao->getStatus()
                 );

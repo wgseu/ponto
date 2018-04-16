@@ -20,7 +20,7 @@
  * O Cliente adquire apenas o direito de usar o software e não adquire qualquer outros
  * direitos, expressos ou implícitos no GrandChef diferentes dos especificados nesta Licença.
  *
- * @author  Francimar Alves <mazinsw@gmail.com>
+ * @author Equipe GrandChef <desenvolvimento@mzsw.com.br>
  */
 namespace MZ\Product;
 
@@ -503,14 +503,6 @@ class Pacote extends \MZ\Database\Helper
      */
     protected function translate($e)
     {
-        if (stripos($e->getMessage(), 'PRIMARY') !== false) {
-            return new \MZ\Exception\ValidationException([
-                'id' => vsprintf(
-                    'O ID "%s" já está cadastrado',
-                    [$this->getID()]
-                ),
-            ]);
-        }
         return parent::translate($e);
     }
 
@@ -609,13 +601,21 @@ class Pacote extends \MZ\Database\Helper
             ->select('p.tipo as produtotipo')
             ->select('p.conteudo as produtoconteudo')
             ->select('u.sigla as unidadesigla')
-            ->select('IF(ISNULL(p.imagem) AND ISNULL(pr.imagem), NULL, CONCAT(COALESCE(pr.id, p.id), ".png")) as imagemurl')
+            ->select(
+                '(CASE WHEN p.imagem IS NULL AND pr.imagem IS NULL THEN NULL ELSE '.
+                self::concat(['COALESCE(pr.id, p.id)', '".png"']).
+                ' END) as imagemurl'
+            )
             ->select('COALESCE(pr.dataatualizacao, p.dataatualizacao) as dataatualizacao');
         if (isset($condition['query'])) {
             $busca = $condition['query'];
             $query = self::buildSearch(
                 $busca,
-                'CONCAT(COALESCE(p.abreviacao, pr.abreviacao, ""), " ", COALESCE(p.descricao, pr.nome))',
+                self::concat([
+                    'COALESCE(p.abreviacao, pr.abreviacao, "")',
+                    '" "',
+                    'COALESCE(p.descricao, pr.nome)'
+                ]),
                 $query
             );
             unset($condition['query']);
@@ -711,39 +711,28 @@ class Pacote extends \MZ\Database\Helper
 
     /**
      * Update Pacote with instance values into database for ID
+     * @param  array $only Save these fields only, when empty save all fields except id
+     * @param  boolean $except When true, saves all fields except $only
      * @return Pacote Self instance
      */
-    public function update()
+    public function update($only = [], $except = false)
     {
         $values = $this->validate();
         if (!$this->exists()) {
             throw new \Exception('O identificador do pacote não foi informado');
         }
-        unset($values['id']);
+        $values = self::filterValues($values, $only, $except);
         try {
             self::getDB()
                 ->update('Pacotes')
                 ->set($values)
                 ->where('id', $this->getID())
                 ->execute();
-            $pacote = self::findByID($this->getID());
-            $this->fromArray($pacote->toArray());
+            $this->loadByID($this->getID());
         } catch (\Exception $e) {
             throw $this->translate($e);
         }
         return $this;
-    }
-
-    /**
-     * Save the Pacote into the database
-     * @return Pacote Self instance
-     */
-    public function save()
-    {
-        if ($this->exists()) {
-            return $this->update();
-        }
-        return $this->insert();
     }
 
     /**
@@ -760,6 +749,19 @@ class Pacote extends \MZ\Database\Helper
             ->where('id', $this->getID())
             ->execute();
         return $result;
+    }
+
+    /**
+     * Load one register for it self with a condition
+     * @param  array $condition Condition for searching the row
+     * @param  array $order associative field name -> [-1, 1]
+     * @return Pacote Self instance filled or empty
+     */
+    public function load($condition, $order = [])
+    {
+        $query = self::query($condition, $order)->limit(1);
+        $row = $query->fetch() ?: [];
+        return $this->fromArray($row);
     }
 
     /**

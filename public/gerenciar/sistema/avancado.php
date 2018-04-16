@@ -1,9 +1,12 @@
 <?php
 require_once(dirname(__DIR__) . '/app.php');
 
-need_permission(Permissao::NOME_ALTERARCONFIGURACOES);
+use MZ\System\Sistema;
+use MZ\System\Permissao;
 
-$fieldfocus = 'mapskey';
+need_permission(Permissao::NOME_ALTERARCONFIGURACOES, is_output('json'));
+
+$focusctrl = 'mapskey';
 $tab_avancado = 'active';
 
 $erro = [];
@@ -11,29 +14,30 @@ $maps_api = get_string_config('Site', 'Maps.API');
 $dropbox_token = get_string_config('Sistema', 'Dropbox.AccessKey');
 if (is_post()) {
     try {
-        $maps_api = trim($_POST['mapskey']);
+        $maps_api = isset($_POST['mapskey']) ? trim($_POST['mapskey']) : null;
         set_string_config('Site', 'Maps.API', $maps_api);
-        $dropbox_token = trim($_POST['dropboxtoken']);
+        $dropbox_token = isset($_POST['dropboxtoken']) ? trim($_POST['dropboxtoken']) : null;
         set_string_config('Sistema', 'Dropbox.AccessKey', $dropbox_token);
-        $__sistema__->salvarOpcoes($__options__);
+        $app->getSystem()->filter($app->getSystem());
+        $app->getSystem()->update(['opcoes']);
         try {
             $appsync = new \MZ\System\Synchronizer();
             $appsync->systemOptionsChanged();
-        } catch (Exception $e) {
-            Log::error($e->getMessage());
+        } catch (\Exception $e) {
+            \Log::error($e->getMessage());
         }
         \Thunder::success('Opções avançadas atualizadas com sucesso!', true);
         redirect('/gerenciar/sistema/avancado');
-    } catch (ValidationException $e) {
+    } catch (\ValidationException $e) {
         $erro = $e->getErrors();
-    } catch (Exception $e) {
+    } catch (\Exception $e) {
         $erro['unknow'] = $e->getMessage();
     }
     foreach ($erro as $key => $value) {
-        $fieldfocus = $key;
-        \Thunder::error($erro[$fieldfocus]);
+        $focusctrl = $key;
+        \Thunder::error($erro[$focusctrl]);
         break;
     }
 }
 
-include template('gerenciar_sistema_avancado');
+$app->getResponse('html')->output('gerenciar_sistema_avancado');

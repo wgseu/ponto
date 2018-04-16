@@ -20,7 +20,7 @@
  * O Cliente adquire apenas o direito de usar o software e não adquire qualquer outros
  * direitos, expressos ou implícitos no GrandChef diferentes dos especificados nesta Licença.
  *
- * @author  Francimar Alves <mazinsw@gmail.com>
+ * @author Equipe GrandChef <desenvolvimento@mzsw.com.br>
  */
 namespace MZ\Environment;
 
@@ -212,15 +212,7 @@ class Setor extends \MZ\Database\Helper
      */
     protected function translate($e)
     {
-        if (stripos($e->getMessage(), 'PRIMARY') !== false) {
-            return new \MZ\Exception\ValidationException([
-                'id' => sprintf(
-                    'O id "%s" já está cadastrado',
-                    $this->getID()
-                ),
-            ]);
-        }
-        if (stripos($e->getMessage(), 'Nome_UNIQUE') !== false) {
+        if (contains(['Nome', 'UNIQUE'], $e->getMessage())) {
             return new \MZ\Exception\ValidationException([
                 'nome' => sprintf(
                     'O nome "%s" já está cadastrado',
@@ -251,23 +243,24 @@ class Setor extends \MZ\Database\Helper
 
     /**
      * Update Setor with instance values into database for ID
+     * @param  array $only Save these fields only, when empty save all fields except id
+     * @param  boolean $except When true, saves all fields except $only
      * @return Setor Self instance
      */
-    public function update()
+    public function update($only = [], $except = false)
     {
         $values = $this->validate();
         if (!$this->exists()) {
             throw new \Exception('O identificador do setor não foi informado');
         }
-        unset($values['id']);
+        $values = self::filterValues($values, $only, $except);
         try {
             self::getDB()
                 ->update('Setores')
                 ->set($values)
                 ->where('id', $this->getID())
                 ->execute();
-            $setor = self::findByID($this->getID());
-            $this->fromArray($setor->toArray());
+            $this->loadByID($this->getID());
         } catch (\Exception $e) {
             throw $this->translate($e);
         }
@@ -301,18 +294,6 @@ class Setor extends \MZ\Database\Helper
         $query = self::query($condition, $order)->limit(1);
         $row = $query->fetch() ?: [];
         return $this->fromArray($row);
-    }
-
-    /**
-     * Load into this object from database using, ID
-     * @param  int $id id to find Setor
-     * @return Setor Self filled instance or empty when not found
-     */
-    public function loadByID($id)
-    {
-        return $this->load([
-            'id' => intval($id),
-        ]);
     }
 
     /**
@@ -359,8 +340,8 @@ class Setor extends \MZ\Database\Helper
         $allowed = self::getAllowedKeys();
         if (isset($condition['search'])) {
             $search = $condition['search'];
-            $field = 's.nome LIKE ?';
-            $condition[$field] = '%'.$search.'%';
+            $field = '(s.nome LIKE ? OR s.descricao LIKE ?)';
+            $condition[$field] = ['%'.$search.'%', '%'.$search.'%'];
             $allowed[$field] = true;
             unset($condition['search']);
         }

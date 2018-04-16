@@ -75,7 +75,7 @@
 				<div class="x_content">
 					<div class="col-md-9 col-sm-12 col-xs-12">
 						<div class="demo-container" style="height:380px">
-							<div id="placeholder33x" class="demo-placeholder" data-symbol="{$__moeda__->getSimbolo()}"></div>
+							<div id="placeholder33x" class="demo-placeholder" data-symbol="{$currency->getSimbolo()}"></div>
 						</div>
 					</div>
 					<div class="col-md-3 col-sm-12 col-xs-12">
@@ -88,7 +88,7 @@
 <!--{loop $top_clientes $top_cliente}-->
 								<li class="media event">
 									<a href="/gerenciar/cliente/editar?id={$top_cliente['id']}" class="pull-left border-aero profile_thumb">
-										<img src="${get_image_url($top_cliente['imagem'], 'cliente', $top_cliente['tipo'] == ClienteTipo::JURIDICA?'empresa.png':'cliente.png')}" alt="..." class="img-circle costumer_img" height="48px">
+										<img src="${get_image_url($top_cliente['imagem'], 'cliente', $top_cliente['tipo'] == \MZ\Account\Cliente::TIPO_JURIDICA?'empresa.png':'cliente.png')}" alt="..." class="img-circle costumer_img" height="48px">
 									</a>
 									<div class="media-body">
 										<a class="title" href="/gerenciar/cliente/editar?id={$top_cliente['id']}">{$top_cliente['nome']}</a>
@@ -247,9 +247,9 @@
 							<h4>Progresso atual</h4>
 							<canvas width="150" height="80" id="foo" class="" style="width: 160px; height: 100px;"></canvas>
 							<div class="goal-wrapper">
-								<span class="gauge-value pull-left">{$__moeda__->getSimbolo()}</span>
+								<span class="gauge-value pull-left">{$currency->getSimbolo()}</span>
 								<span id="gauge-text" class="gauge-value pull-left">${\MZ\Util\Mask::money(round($faturamento['atual']))}</span>
-								<span id="goal-text" class="goal-value pull-right">{$__moeda__->getSimbolo()}${\MZ\Util\Mask::money(round($faturamento['base']))}</span>
+								<span id="goal-text" class="goal-value pull-right">{$currency->getSimbolo()}${\MZ\Util\Mask::money(round($faturamento['base']))}</span>
 							</div>
 						</div>
 					</div>

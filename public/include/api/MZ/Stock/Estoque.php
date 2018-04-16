@@ -20,7 +20,7 @@
  * O Cliente adquire apenas o direito de usar o software e não adquire qualquer outros
  * direitos, expressos ou implícitos no GrandChef diferentes dos especificados nesta Licença.
  *
- * @author  Francimar Alves <mazinsw@gmail.com>
+ * @author Equipe GrandChef <desenvolvimento@mzsw.com.br>
  */
 namespace MZ\Stock;
 
@@ -668,14 +668,6 @@ class Estoque extends \MZ\Database\Helper
      */
     protected function translate($e)
     {
-        if (stripos($e->getMessage(), 'PRIMARY') !== false) {
-            return new \MZ\Exception\ValidationException([
-                'id' => sprintf(
-                    'O id "%s" já está cadastrado',
-                    $this->getID()
-                ),
-            ]);
-        }
         return parent::translate($e);
     }
 
@@ -699,23 +691,24 @@ class Estoque extends \MZ\Database\Helper
 
     /**
      * Update Estoque with instance values into database for ID
+     * @param  array $only Save these fields only, when empty save all fields except id
+     * @param  boolean $except When true, saves all fields except $only
      * @return Estoque Self instance
      */
-    public function update()
+    public function update($only = [], $except = false)
     {
         $values = $this->validate();
         if (!$this->exists()) {
             throw new \Exception('O identificador do estoque não foi informado');
         }
-        unset($values['id']);
+        $values = self::filterValues($values, $only, $except);
         try {
             self::getDB()
                 ->update('Estoque')
                 ->set($values)
                 ->where('id', $this->getID())
                 ->execute();
-            $estoque = self::findByID($this->getID());
-            $this->fromArray($estoque->toArray());
+            $this->loadByID($this->getID());
         } catch (\Exception $e) {
             throw $this->translate($e);
         }
@@ -749,18 +742,6 @@ class Estoque extends \MZ\Database\Helper
         $query = self::query($condition, $order)->limit(1);
         $row = $query->fetch() ?: [];
         return $this->fromArray($row);
-    }
-
-    /**
-     * Load into this object from database using, ID
-     * @param  int $id id to find Estoque
-     * @return Estoque Self filled instance or empty when not found
-     */
-    public function loadByID($id)
-    {
-        return $this->load([
-            'id' => intval($id),
-        ]);
     }
 
     /**
@@ -869,6 +850,17 @@ class Estoque extends \MZ\Database\Helper
     }
 
     /**
+     * Filter select array with allowed fields
+     * @param  array $select selectable fields
+     * @return array allowed select fields
+     */
+    private static function filterSelect($select)
+    {
+        $allowed = self::getAllowedKeys();
+        return Filter::keys($select, $allowed, 'e.');
+    }
+
+    /**
      * Filter condition array with allowed fields
      * @param  array $condition condition to filter rows
      * @return array allowed condition
@@ -917,6 +909,40 @@ class Estoque extends \MZ\Database\Helper
         return self::find([
             'id' => intval($id),
         ]);
+    }
+
+    /**
+     * Search one register with a condition
+     * @param  array $condition Condition for searching the row
+     * @param  array $order order rows
+     * @return Estoque A filled Estoque or empty instance
+     */
+    public static function sum($condition, $field)
+    {
+        $query = self::query($condition);
+        $fields = self::filterSelect([strval($field) => 1]);
+        if (empty($fields)) {
+            return null;
+        }
+        reset($fields);
+        $field = key($fields);
+        return $query->select(null)->select("SUM($field)")->fetchColumn();
+    }
+
+    /**
+     * Sum quantity of product id
+     * @param  int $produto_id product id to sum stock quantity
+     * @return float A sum of quantity
+     */
+    public static function sumByProdutoID($produto_id)
+    {
+        return (float)self::sum(
+            [
+                'produtoid' => intval($produto_id),
+                'cancelado' => 'N'
+            ],
+            'quantidade'
+        );
     }
 
     /**

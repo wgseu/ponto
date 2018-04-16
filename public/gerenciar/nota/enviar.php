@@ -1,62 +1,47 @@
 <?php
 require_once(dirname(__DIR__) . '/app.php');
 
+use MZ\Invoice\Nota;
+use MZ\System\Permissao;
+use MZ\Util\Filter;
+
 need_permission(
     Permissao::NOME_PAGAMENTO,
-    is_output('json')
+    true
 );
 
 set_time_limit(0);
 
 try {
-    $modo = $_GET['modo'];
+    $condition = Filter::query($_GET);
+    $notas = Nota::findAll($condition);
+    $nota = new Nota($condition);
 
-    $busca = $_GET['query'];
-    $estado = $_GET['estado'];
-    $acao = $_GET['acao'];
-    $ambiente = $_GET['ambiente'];
-    $serie = $_GET['serie'];
-    $pedido_id = $_GET['pedido_id'];
-    $tipo = $_GET['tipo'];
-    $contingencia = $_GET['contingencia'];
-    $emissao_inicio = strtotime($_GET['emissao_inicio']);
-    $emissao_fim = strtotime($_GET['emissao_fim']);
-    $lancamento_inicio = strtotime($_GET['lancamento_inicio']);
-    $lancamento_fim = strtotime($_GET['lancamento_fim']);
+    $modo = isset($condition['modo']) ? $condition['modo'] : null;
+
+    $emissao_inicio = isset($condition['emissao_inicio']) ? strtotime($condition['emissao_inicio']) : null;
+    $emissao_fim = isset($condition['emissao_fim']) ? strtotime($condition['emissao_fim']) : null;
+    $lancamento_inicio = isset($condition['lancamento_inicio']) ? strtotime($condition['lancamento_inicio']) : null;
+    $lancamento_fim = isset($condition['lancamento_fim']) ? strtotime($condition['lancamento_fim']) : null;
 
     if (!in_array($modo, ['contador', 'consumidor'])) {
-        throw new \Exception('O modo de envio "'.$modo.'" é inválido', 500);
+        throw new \Exception('O modo de envio informado é inválido', 500);
     }
-    $notas = Nota::getTodas(
-        $busca,
-        $estado,
-        $acao,
-        $ambiente,
-        $serie,
-        $pedido_id,
-        $tipo,
-        $contingencia,
-        $emissao_inicio,
-        $emissao_fim,
-        $lancamento_inicio,
-        $lancamento_fim
-    );
     if (count($notas) == 0) {
         throw new \Exception('Nenhuma nota no resultado da busca', 404);
     }
     if (count($notas) > 1 && $modo == 'consumidor') {
-        throw new \Exception('Apenas um E-mail por vez pode ser enviado para um consumidor', 500);
+        throw new \Exception('Apenas uma nota por vez pode ser enviada para um consumidor', 500);
     }
     $_nota = current($notas);
-    $nfe_api = new NFeAPI();
+    $nfe_api = new \NFeAPI();
     $nfe_api->init();
-    $destinatario_id = $nfe_api->getExternalEmitente()->getContadorID();
+    $destinatario = $nfe_api->getExternalEmitente()->findContadorID();
     if ($modo == 'consumidor') {
         $pedido = $_nota->findPedidoID();
-        $destinatario_id = $pedido->getClienteID();
+        $destinatario = $pedido->findClienteID();
     }
-    $destinatario = Cliente::findByID($destinatario_id);
-    if (is_null($destinatario->getID())) {
+    if (!$destinatario->exists()) {
         if ($modo == 'contador') {
             throw new \Exception('O contador não foi informado nas configurações do emitente', 500);
         } else {
@@ -80,18 +65,18 @@ try {
         $sufixo .= ' lançamento '.human_range($emissao_inicio, $emissao_fim, '-');
         $filters['Período de lançamento'] = human_range($lancamento_inicio, $lancamento_fim);
     }
-    if (is_numeric($serie)) {
-        $filters['Série'] = intval($serie);
+    if (is_numeric($nota->getSerie())) {
+        $filters['Série'] = intval($nota->getSerie());
     }
-    if (trim($ambiente) != '') {
-        $filters['Ambiente'] = $ambiente;
+    if (trim($nota->getAmbiente()) != '') {
+        $filters['Ambiente'] = Nota::getAmbienteOptions($nota->getAmbiente());;
     }
-    if (trim($contingencia) == 'Y') {
+    if ($nota->isContingencia()) {
         $filters['Contingência'] = 'Sim';
     }
-    if (trim($estado) != '') {
-        $sufixo .= ' '.$estado;
-        $filters['Estado da nota'] = $estado;
+    if (trim($nota->getEstado()) != '') {
+        $sufixo .= ' ' . Nota::getEstadoOptions($nota->getEstado());
+        $filters['Estado da nota'] = Nota::getEstadoOptions($nota->getEstado());
     }
     if (count($notas) == 1) {
         $xmlfile = $_nota->getCaminhoXml();
@@ -112,13 +97,13 @@ try {
     $zipname = 'Notas'.$sufixo.'.zip';
     try {
         mail_nota($destinatario->getEmail(), $destinatario->getNome(), $modo, $filters, [$zipname => $zipfile]);
-    } catch (Exception $e) {
+    } catch (\Exception $e) {
         unlink($zipfile);
         throw $e;
     }
     unlink($zipfile);
     json(null, []);
-} catch (Exception $e) {
-    Log::error($e->getMessage());
+} catch (\Exception $e) {
+    \Log::error($e->getMessage());
     json($e->getMessage());
 }

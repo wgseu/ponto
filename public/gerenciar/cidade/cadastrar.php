@@ -22,9 +22,10 @@
 require_once(dirname(__DIR__) . '/app.php');
 
 use MZ\Location\Cidade;
+use MZ\System\Permissao;
 
-need_permission(\Permissao::NOME_CADASTROCIDADES, is_output('json'));
-$id = isset($_GET['id'])?$_GET['id']:null;
+need_permission(Permissao::NOME_CADASTROCIDADES, is_output('json'));
+$id = isset($_GET['id']) ? $_GET['id'] : null;
 $cidade = Cidade::findByID($id);
 $cidade->setID(null);
 
@@ -64,7 +65,7 @@ if (is_post()) {
     json('Nenhum dado foi enviado');
 }
 if (is_null($cidade->getEstadoID())) {
-    $cidade->setEstadoID($__estado__->getID());
+    $cidade->setEstadoID($app->getSystem()->getState()->getID());
 }
 $_estado = $cidade->findEstadoID();
 $_paises = \MZ\Location\Pais::findAll();
@@ -76,4 +77,4 @@ if ($_estado->exists()) {
     $pais = new \MZ\Location\Pais();
 }
 $_estados = \MZ\Location\Estado::findAll();
-include template('gerenciar_cidade_cadastrar');
+$app->getResponse('html')->output('gerenciar_cidade_cadastrar');

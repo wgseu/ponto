@@ -20,7 +20,7 @@
  * O Cliente adquire apenas o direito de usar o software e não adquire qualquer outros
  * direitos, expressos ou implícitos no GrandChef diferentes dos especificados nesta Licença.
  *
- * @author  Francimar Alves <mazinsw@gmail.com>
+ * @author Equipe GrandChef <desenvolvimento@mzsw.com.br>
  */
 namespace MZ\Sale;
 
@@ -750,6 +750,25 @@ class Pedido extends \MZ\Database\Helper
     }
 
     /**
+     * Retorna a descrição do local do pedido
+     * @param \MZ\Environment\Mesa $mesa Mesa de onde será obtido o nome
+     * @param \MZ\Environment\Comanda $comanda Comanda de onde será obtido o nome
+     * @return string Nome do local de destino do pedido
+     */
+    public function getDestino($mesa = null, $comanda = null)
+    {
+        if ($this->getTipo() == self::TIPO_MESA) {
+            $mesa = !is_null($mesa) ? $mesa : $this->findMesaID();
+            return $mesa->getNome();
+        } elseif ($this->getTipo() == self::TIPO_COMANDA) {
+            $comanda = !is_null($comanda) ? $comanda : $this->findComandaID();
+            return $comanda->getNome();
+        } else {
+            return self::getTipoOptions($this->getTipo());
+        }
+    }
+
+    /**
      * Filter fields, upload data and keep key data
      * @param Pedido $original Original instance without modifications
      */
@@ -850,7 +869,7 @@ class Pedido extends \MZ\Database\Helper
         } elseif ($this->getTipo() == self::TIPO_ENTREGA) {
             if (!$operador->has(Permissao::NOME_ENTREGAPEDIDOS)) {
                 throw new \Exception('Você não tem permissão para criar pedidos para entrega');
-            } elseif (!$operador->has(Permissao::ENTREGAADICIONAR) && $this->exists()) {
+            } elseif (!$operador->has(Permissao::NOME_ENTREGAADICIONAR) && $this->exists()) {
                 throw new \Exception('Você não tem permissão para adicionar produtos no pedido para entrega');
             }
         } else {
@@ -944,21 +963,20 @@ class Pedido extends \MZ\Database\Helper
      * Update Pedido with instance values into database for Código
      * @return Pedido Self instance
      */
-    public function update()
+    public function update($only = [], $except = false)
     {
         $values = $this->validate();
         if (!$this->exists()) {
             throw new \Exception('O identificador do pedido não foi informado');
         }
-        unset($values['id']);
+        $values = self::filterValues($values, $only, $except);
         try {
             self::getDB()
                 ->update('Pedidos')
                 ->set($values)
                 ->where('id', $this->getID())
                 ->execute();
-            $pedido = self::findByID($this->getID());
-            $this->fromArray($pedido->toArray());
+            $this->loadByID($this->getID());
         } catch (\Exception $e) {
             throw $this->translate($e);
         }
@@ -992,18 +1010,6 @@ class Pedido extends \MZ\Database\Helper
         $query = self::query($condition, $order)->limit(1);
         $row = $query->fetch() ?: [];
         return $this->fromArray($row);
-    }
-
-    /**
-     * Load into this object from database using, ID
-     * @param  int $id código to find Pedido
-     * @return Pedido Self filled instance or empty when not found
-     */
-    public function loadByID($id)
-    {
-        return $this->load([
-            'id' => intval($id),
-        ]);
     }
 
     /**

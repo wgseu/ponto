@@ -22,12 +22,14 @@
 require_once(dirname(__DIR__) . '/app.php');
 
 use MZ\Location\Pais;
+use MZ\Wallet\Moeda;
+use MZ\System\Permissao;
 
-need_permission(\Permissao::NOME_CADASTROPAISES, is_output('json'));
-$id = isset($_GET['id'])?$_GET['id']:null;
+need_permission(Permissao::NOME_CADASTROPAISES, is_output('json'));
+$id = isset($_GET['id']) ? $_GET['id'] : null;
 $pais = Pais::findByID($id);
 if (!$pais->exists()) {
-    $msg = 'Não existe País com o ID informado!';
+    $msg = 'O país não foi informado ou não existe';
     if (is_output('json')) {
         json($msg);
     }
@@ -69,6 +71,6 @@ if (is_post()) {
 } elseif (is_output('json')) {
     json('Nenhum dado foi enviado');
 }
-$moedas = \MZ\Wallet\Moeda::findAll();
+$moedas = Moeda::findAll();
 $flags_images = Pais::getImageIndexOptions();
-include template('gerenciar_pais_editar');
+$app->getResponse('html')->output('gerenciar_pais_editar');

@@ -509,14 +509,14 @@ class ZPagamento
         $pagamento['datacompensacao'] = date('Y-m-d H:i:s');
         $pagamento['datahora'] = date('Y-m-d H:i:s');
         if (!empty($erros)) {
-            throw new ValidationException($erros);
+            throw new \MZ\Exception\ValidationException($erros);
         }
     }
 
     private static function handleException(&$e)
     {
         if (stripos($e->getMessage(), 'PRIMARY') !== false) {
-            throw new ValidationException(['id' => 'O ID informado já está cadastrado']);
+            throw new \MZ\Exception\ValidationException(['id' => 'O ID informado já está cadastrado']);
         }
     }
 
@@ -526,7 +526,7 @@ class ZPagamento
         self::validarCampos($_pagamento);
         try {
             $_pagamento['id'] = \DB::$pdo->insertInto('Pagamentos')->values($_pagamento)->execute();
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             self::handleException($e);
             throw $e;
         }
@@ -537,7 +537,7 @@ class ZPagamento
     {
         $_pagamento = $pagamento->toArray();
         if (!$_pagamento['id']) {
-            throw new ValidationException(['id' => 'O id do pagamento não foi informado']);
+            throw new \MZ\Exception\ValidationException(['id' => 'O id do pagamento não foi informado']);
         }
         self::validarCampos($_pagamento);
         $campos = [
@@ -566,7 +566,7 @@ class ZPagamento
             $query = $query->set(array_intersect_key($_pagamento, array_flip($campos)));
             $query = $query->where('id', $_pagamento['id']);
             $query->execute();
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             self::handleException($e);
             throw $e;
         }

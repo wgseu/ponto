@@ -20,7 +20,7 @@
  * O Cliente adquire apenas o direito de usar o software e não adquire qualquer outros
  * direitos, expressos ou implícitos no GrandChef diferentes dos especificados nesta Licença.
  *
- * @author  Francimar Alves <mazinsw@gmail.com>
+ * @author Equipe GrandChef <desenvolvimento@mzsw.com.br>
  */
 namespace MZ\Session;
 
@@ -295,7 +295,7 @@ class Movimentacao extends \MZ\Database\Helper
             $this->setCaixaID($movimentacao['caixaid']);
         }
         if (!isset($movimentacao['aberta'])) {
-            $this->setAberta(null);
+            $this->setAberta('Y');
         } else {
             $this->setAberta($movimentacao['aberta']);
         }
@@ -305,7 +305,7 @@ class Movimentacao extends \MZ\Database\Helper
             $this->setFuncionarioAberturaID($movimentacao['funcionarioaberturaid']);
         }
         if (!isset($movimentacao['dataabertura'])) {
-            $this->setDataAbertura(null);
+            $this->setDataAbertura(self::now());
         } else {
             $this->setDataAbertura($movimentacao['dataabertura']);
         }
@@ -371,11 +371,11 @@ class Movimentacao extends \MZ\Database\Helper
         if (is_null($this->getAberta())) {
             $errors['aberta'] = 'A aberta não pode ser vazia';
         }
-        if (!Validator::checkBoolean($this->getAberta(), true)) {
-            $errors['aberta'] = 'A aberta é inválida';
+        if (!Validator::checkBoolean($this->getAberta())) {
+            $errors['aberta'] = 'A informação de abertura é inválida';
         }
         if (is_null($this->getFuncionarioAberturaID())) {
-            $errors['funcionarioaberturaid'] = 'A funcionário inicializador não pode ser vazia';
+            $errors['funcionarioaberturaid'] = 'O(A) funcionário(a) inicializador(a) não pode ser vazio(a)';
         }
         if (is_null($this->getDataAbertura())) {
             $errors['dataabertura'] = 'A data de abertura não pode ser vazia';
@@ -393,14 +393,6 @@ class Movimentacao extends \MZ\Database\Helper
      */
     protected function translate($e)
     {
-        if (stripos($e->getMessage(), 'PRIMARY') !== false) {
-            return new \MZ\Exception\ValidationException([
-                'id' => sprintf(
-                    'O id "%s" já está cadastrado',
-                    $this->getID()
-                ),
-            ]);
-        }
         return parent::translate($e);
     }
 
@@ -424,23 +416,24 @@ class Movimentacao extends \MZ\Database\Helper
 
     /**
      * Update Movimentação with instance values into database for ID
+     * @param  array $only Save these fields only, when empty save all fields except id
+     * @param  boolean $except When true, saves all fields except $only
      * @return Movimentacao Self instance
      */
-    public function update()
+    public function update($only = [], $except = false)
     {
         $values = $this->validate();
         if (!$this->exists()) {
             throw new \Exception('O identificador da movimentação não foi informado');
         }
-        unset($values['id']);
+        $values = self::filterValues($values, $only, $except);
         try {
             self::getDB()
                 ->update('Movimentacoes')
                 ->set($values)
                 ->where('id', $this->getID())
                 ->execute();
-            $movimentacao = self::findByID($this->getID());
-            $this->fromArray($movimentacao->toArray());
+            $this->loadByID($this->getID());
         } catch (\Exception $e) {
             throw $this->translate($e);
         }
@@ -474,18 +467,6 @@ class Movimentacao extends \MZ\Database\Helper
         $query = self::query($condition, $order)->limit(1);
         $row = $query->fetch() ?: [];
         return $this->fromArray($row);
-    }
-
-    /**
-     * Load into this object from database using, ID
-     * @param  int $id id to find Movimentação
-     * @return Movimentacao Self filled instance or empty when not found
-     */
-    public function loadByID($id)
-    {
-        return $this->load([
-            'id' => intval($id),
-        ]);
     }
 
     /**
@@ -599,6 +580,19 @@ class Movimentacao extends \MZ\Database\Helper
         return self::find([
             'id' => intval($id),
         ]);
+    }
+
+    /**
+     * Check if cash register is open
+     * @param  int $caixa_id cash register id to find open cash register
+     * @return bool true when cash register is open, false otherwise
+     */
+    public static function isCaixaOpen($caixa_id)
+    {
+        return self::count([
+            'caixaid' => $caixa_id,
+            'aberta' => 'Y'
+        ]) > 0;
     }
 
     /**

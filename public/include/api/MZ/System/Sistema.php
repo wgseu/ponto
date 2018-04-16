@@ -20,12 +20,13 @@
  * O Cliente adquire apenas o direito de usar o software e não adquire qualquer outros
  * direitos, expressos ou implícitos no GrandChef diferentes dos especificados nesta Licença.
  *
- * @author  Francimar Alves <mazinsw@gmail.com>
+ * @author Equipe GrandChef <desenvolvimento@mzsw.com.br>
  */
 namespace MZ\System;
 
 use MZ\Util\Filter;
 use MZ\Util\Validator;
+use MZ\Location\Localizacao;
 
 /**
  * Classe que informa detalhes da empresa, parceiro e opções do sistema
@@ -33,6 +34,7 @@ use MZ\Util\Validator;
  */
 class Sistema extends \MZ\Database\Helper
 {
+    const VERSAO = '1935';
 
     /**
      * Identificador único do sistema, valor 1
@@ -87,6 +89,33 @@ class Sistema extends \MZ\Database\Helper
      */
     private $versao_db;
 
+    /* system fields */
+
+    /**
+     * Enterprise that manages this system
+     * @var Cliente
+     */
+    private $company;
+    private $localization;
+    private $district;
+    private $city;
+    private $state;
+    private $country;
+    private $currency;
+    private $entries;
+    /**
+     * System settings
+     * @var Settings
+     */
+    private $settings;
+    /**
+     * Website URL
+     * @var string
+     */
+    private $url;
+
+    /* end system fields */
+
     /**
      * Constructor for a new empty instance of Sistema
      * @param array $sistema All field and values to fill the instance
@@ -94,6 +123,10 @@ class Sistema extends \MZ\Database\Helper
     public function __construct($sistema = [])
     {
         parent::__construct($sistema);
+        $this->company = new \MZ\Account\Cliente();
+        $this->settings = new \MZ\Core\Settings(
+            isset($sistema['settings']) ? $sistema['settings'] : []
+        );
     }
 
     /**
@@ -377,7 +410,7 @@ class Sistema extends \MZ\Database\Helper
         }
         parent::fromArray($sistema);
         if (!isset($sistema['id'])) {
-            $this->setID(null);
+            $this->setID('1');
         } else {
             $this->setID($sistema['id']);
         }
@@ -446,7 +479,38 @@ class Sistema extends \MZ\Database\Helper
     public function publish()
     {
         $sistema = parent::publish();
+        unset($sistema['accesskey']);
+        unset($sistema['registrykey']);
+        unset($sistema['licensekey']);
+        unset($sistema['guid']);
+        unset($sistema['opcoes']);
         return $sistema;
+    }
+
+    /**
+     * Quantidade de tablets permitido para uso em rede
+     */
+    public function getTablets()
+    {
+        return $this->getComputadores() * 2;
+    }
+
+    /**
+     * Informa se o sistema está operando no modo fiscal
+     * @return boolean true para modo fiscal, false caso contrário
+     */
+    public function isFiscal()
+    {
+        return !is_null(get_string_config('Licenca', 'Modulo.Fiscal', null));
+    }
+
+    /**
+     * Informa se o sistema dve exibir configurações fiscais
+     * @return boolean true para exibir, false caso contrário
+     */
+    public function isFiscalVisible()
+    {
+        return $this->isFiscal() || is_boolean_config('Sistema', 'Fiscal.Mostrar', false);
     }
 
     /**
@@ -459,12 +523,16 @@ class Sistema extends \MZ\Database\Helper
         $this->setPaisID(Filter::number($this->getPaisID()));
         $this->setEmpresaID(Filter::number($this->getEmpresaID()));
         $this->setParceiroID(Filter::number($this->getParceiroID()));
-        $this->setAccessKey(Filter::string($this->getAccessKey()));
+        $this->setAccessKey(Filter::text($this->getAccessKey()));
         $this->setRegistryKey(Filter::text($this->getRegistryKey()));
         $this->setLicenseKey(Filter::text($this->getLicenseKey()));
         $this->setComputadores(Filter::number($this->getComputadores()));
         $this->setGUID(Filter::string($this->getGUID()));
-        $this->setOpcoes(Filter::text($this->getOpcoes()));
+
+        $opcoes = to_ini($this->getSettings()->getValues());
+        $opcoes = base64_encode($opcoes);
+        $this->setOpcoes($opcoes);
+
         $this->setUltimoBackup(Filter::datetime($this->getUltimoBackup()));
         $this->setVersaoDB(Filter::string($this->getVersaoDB()));
     }
@@ -484,6 +552,9 @@ class Sistema extends \MZ\Database\Helper
     public function validate()
     {
         $errors = [];
+        if ($this->getID() != '1') {
+            $errors['id'] = 'O id do sistema não foi informado';
+        }
         if (is_null($this->getVersaoDB())) {
             $errors['versaodb'] = 'A versão do banco de dados não pode ser vazia';
         }
@@ -494,20 +565,86 @@ class Sistema extends \MZ\Database\Helper
     }
 
     /**
+     * Company that manages this system
+     * @return Empresa company of this system
+     */
+    public function getCompany()
+    {
+        return $this->company;
+    }
+
+    public function getLocalization()
+    {
+        return $this->localization;
+    }
+
+    public function getDistrict()
+    {
+        return $this->district;
+    }
+
+    public function getCity()
+    {
+        return $this->city;
+    }
+
+    public function getState()
+    {
+        return $this->state;
+    }
+
+    public function getCountry()
+    {
+        return $this->country;
+    }
+
+    public function getCurrency()
+    {
+        return $this->currency;
+    }
+
+    public function getEntries()
+    {
+        return $this->entries;
+    }
+
+    /**
+     * Get the system settings
+     * @return Settings system settings
+     */
+    public function getSettings()
+    {
+        return $this->settings;
+    }
+
+    /**
+     * Get the current URL for this application system
+     * @return string URL with protocol for this system
+     */
+    public function getURL()
+    {
+        return $this->url;
+    }
+
+    public function initialize($app_path)
+    {
+        $this->getSettings()->load($app_path  . '/public/include/configure');
+        $host = isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : null;
+        if (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] != 'off') {
+            $protocol = 'https';
+        } else {
+            $protocol = 'http';
+        }
+        $this->url = "{$protocol}://{$host}";
+    }
+
+    /**
      * Translate SQL exception into application exception
      * @param  \Exception $e exception to translate into a readable error
      * @return \MZ\Exception\ValidationException new exception translated
      */
     protected function translate($e)
     {
-        if (stripos($e->getMessage(), 'PRIMARY') !== false) {
-            return new \MZ\Exception\ValidationException([
-                'id' => sprintf(
-                    'O id "%s" já está cadastrado',
-                    $this->getID()
-                ),
-            ]);
-        }
         return parent::translate($e);
     }
 
@@ -517,37 +654,32 @@ class Sistema extends \MZ\Database\Helper
      */
     public function insert()
     {
-        $values = $this->validate();
-        unset($values['id']);
-        try {
-            $id = self::getDB()->insertInto('Sistema')->values($values)->execute();
-            $sistema = self::findByID($id);
-            $this->fromArray($sistema->toArray());
-        } catch (\Exception $e) {
-            throw $this->translate($e);
-        }
-        return $this;
+        throw new \Exception(
+            'Nenhuma informação sobre o sistema, contacte seu fornecedor para resolve o problema',
+            500
+        );
     }
 
     /**
      * Update Sistema with instance values into database for ID
+     * @param  array $only Save these fields only, when empty save all fields except id
+     * @param  boolean $except When true, saves all fields except $only
      * @return Sistema Self instance
      */
-    public function update()
+    public function update($only = [], $except = false)
     {
         $values = $this->validate();
         if (!$this->exists()) {
             throw new \Exception('O identificador do sistema não foi informado');
         }
-        unset($values['id']);
+        $values = self::filterValues($values, $only, $except);
         try {
             self::getDB()
                 ->update('Sistema')
                 ->set($values)
                 ->where('id', $this->getID())
                 ->execute();
-            $sistema = self::findByID($this->getID());
-            $this->fromArray($sistema->toArray());
+            $this->loadByID($this->getID());
         } catch (\Exception $e) {
             throw $this->translate($e);
         }
@@ -583,16 +715,23 @@ class Sistema extends \MZ\Database\Helper
         return $this->fromArray($row);
     }
 
-    /**
-     * Load into this object from database using, ID
-     * @param  string $id id to find Sistema
-     * @return Sistema Self filled instance or empty when not found
-     */
-    public function loadByID($id)
+    public function loadAll()
     {
-        return $this->load([
-            'id' => strval($id),
-        ]);
+        $this->company  = $this->findEmpresaID();
+        $this->localization = Localizacao::find(['clienteid' => $this->company->getID()]);
+        $this->district = $this->localization->findBairroID();
+        $this->city = $this->district->findCidadeID();
+        $this->state = $this->city->findEstadoID();
+        $this->country = $this->findPaisID();
+        $this->currency = $this->country->findMoedaID();
+
+        set_timezone_for($this->state->getUF(), $this->country->getSigla());
+
+        $values = parse_ini_string(base64_decode($this->getOpcoes()), true, INI_SCANNER_RAW);
+        settype($values, 'array');
+        $this->getSettings()->addValues($values);
+        $this->entries = parse_ini_string(base64_decode($this->country->getEntradas()), true, INI_SCANNER_RAW);
+        settype($this->entries, 'array');
     }
 
     /**

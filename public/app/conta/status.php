@@ -1,32 +1,40 @@
 <?php
-/*
-	Copyright 2014 da MZ Software - MZ Desenvolvimento de Sistemas LTDA
-	Este arquivo é parte do programa GrandChef - Sistema para Gerenciamento de Churrascarias, Bares e Restaurantes.
-	O GrandChef é um software proprietário; você não pode redistribuí-lo e/ou modificá-lo.
-	DISPOSIÇÕES GERAIS
-	O cliente não deverá remover qualquer identificação do produto, avisos de direitos autorais,
-	ou outros avisos ou restrições de propriedade do GrandChef.
-
-	O cliente não deverá causar ou permitir a engenharia reversa, desmontagem,
-	ou descompilação do GrandChef.
-
-	PROPRIEDADE DOS DIREITOS AUTORAIS DO PROGRAMA
-
-	GrandChef é a especialidade do desenvolvedor e seus
-	licenciadores e é protegido por direitos autorais, segredos comerciais e outros direitos
-	de leis de propriedade.
-
-	O Cliente adquire apenas o direito de usar o software e não adquire qualquer outros
-	direitos, expressos ou implícitos no GrandChef diferentes dos especificados nesta Licença.
-*/
+/**
+ * Copyright 2014 da MZ Software - MZ Desenvolvimento de Sistemas LTDA
+ *
+ * Este arquivo é parte do programa GrandChef - Sistema para Gerenciamento de Churrascarias, Bares e Restaurantes.
+ * O GrandChef é um software proprietário; você não pode redistribuí-lo e/ou modificá-lo.
+ * DISPOSIÇÕES GERAIS
+ * O cliente não deverá remover qualquer identificação do produto, avisos de direitos autorais,
+ * ou outros avisos ou restrições de propriedade do GrandChef.
+ *
+ * O cliente não deverá causar ou permitir a engenharia reversa, desmontagem,
+ * ou descompilação do GrandChef.
+ *
+ * PROPRIEDADE DOS DIREITOS AUTORAIS DO PROGRAMA
+ *
+ * GrandChef é a especialidade do desenvolvedor e seus
+ * licenciadores e é protegido por direitos autorais, segredos comerciais e outros direitos
+ * de leis de propriedade.
+ *
+ * O Cliente adquire apenas o direito de usar o software e não adquire qualquer outros
+ * direitos, expressos ou implícitos no GrandChef diferentes dos especificados nesta Licença.
+ *
+ * @author Equipe GrandChef <desenvolvimento@mzsw.com.br>
+ */
 require_once(dirname(dirname(__DIR__)) . '/app.php');
 
+use MZ\System\Sistema;
+use MZ\Employee\Acesso;
+use MZ\Device\Dispositivo;
+
+$company = $app->getSystem()->getCompany();
 $status = [];
 $status['status'] = 'ok';
 $status['info'] = [
     'empresa' => [
-        'nome' => $__empresa__->getNome(),
-        'imagemurl' => get_image_url($__empresa__->getImagem(), 'cliente', null)
+        'nome' => $company->getNome(),
+        'imagemurl' => get_image_url($company->getImagem(), 'cliente', null)
     ]
 ];
 $status['versao'] = Sistema::VERSAO;
@@ -40,26 +48,26 @@ if (is_manager()) {
     $status['acesso'] = 'visitante';
 }
 if (is_login()) {
-    $status['cliente'] = $login_cliente->getID();
+    $status['cliente'] = logged_user()->getID();
     $status['info']['usuario'] = [
-        'nome' => $login_cliente->getNome(),
-        'email' => $login_cliente->getEmail(),
-        'login' => $login_cliente->getLogin(),
-        'imagemurl' => get_image_url($login_cliente->getImagem(), 'cliente', null)
+        'nome' => logged_user()->getNome(),
+        'email' => logged_user()->getEmail(),
+        'login' => logged_user()->getLogin(),
+        'imagemurl' => get_image_url(logged_user()->getImagem(), 'cliente', null)
     ];
-    $status['funcionario'] = intval($login_funcionario->getID());
+    $status['funcionario'] = intval(logged_employee()->getID());
     try {
-        $status['permissoes'] = Acesso::getPermissoes($login_funcionario->getID());
+        $status['permissoes'] = $app->getAuthentication()->getPermissions();
         if (is_manager()) {
             $dispositivo = register_device(
-                isset($_GET['device'])?$_GET['device']:null,
-                isset($_GET['serial'])?$_GET['serial']:null
+                isset($_GET['device']) ? $_GET['device'] : null,
+                isset($_GET['serial']) ? $_GET['serial'] : null
             );
         } else {
             $dispositivo = new Dispositivo();
         }
         $status['validacao'] = $dispositivo->getValidacao();
-    } catch (Exception $e) {
+    } catch (\Exception $e) {
         $status['status'] = 'error';
         $status['msg'] = $e->getMessage();
     }

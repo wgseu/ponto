@@ -23,11 +23,11 @@ require_once(dirname(__DIR__) . '/app.php');
 
 use MZ\System\Integracao;
 
-need_permission(\Permissao::NOME_ALTERARCONFIGURACOES, is_output('json'));
-$id = isset($_GET['id'])?$_GET['id']:null;
+need_permission(Permissao::NOME_ALTERARCONFIGURACOES, is_output('json'));
+$id = isset($_GET['id']) ? $_GET['id'] : null;
 $integracao = Integracao::findByID($id);
 if (!$integracao->exists()) {
-    $msg = 'Não existe Integração com o ID informado!';
+    $msg = 'A integração não foi informada ou não existe';
     if (is_output('json')) {
         json($msg);
     }
@@ -40,9 +40,8 @@ $old_integracao = $integracao;
 if (is_post()) {
     $integracao = new Integracao($_POST);
     try {
-        $integracao->setAtivo($old_integracao->getAtivo());
         $integracao->filter($old_integracao);
-        $integracao->save();
+        $integracao->save(array_keys($_POST));
         $old_integracao->clean($integracao);
         $msg = sprintf(
             'Integração "%s" atualizada com sucesso!',
@@ -55,7 +54,7 @@ if (is_post()) {
         redirect('/gerenciar/integracao/');
     } catch (\Exception $e) {
         $integracao->clean($old_integracao);
-        if ($e instanceof \ValidationException) {
+        if ($e instanceof \MZ\Exception\ValidationException) {
             $errors = $e->getErrors();
         }
         if (is_output('json')) {
@@ -70,4 +69,4 @@ if (is_post()) {
 } elseif (is_output('json')) {
     json('Nenhum dado foi enviado');
 }
-include template('gerenciar_integracao_editar');
+$app->getResponse('html')->output('gerenciar_integracao_editar');

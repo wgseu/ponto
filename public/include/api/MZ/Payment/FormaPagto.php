@@ -20,7 +20,7 @@
  * O Cliente adquire apenas o direito de usar o software e não adquire qualquer outros
  * direitos, expressos ou implícitos no GrandChef diferentes dos especificados nesta Licença.
  *
- * @author  Francimar Alves <mazinsw@gmail.com>
+ * @author Equipe GrandChef <desenvolvimento@mzsw.com.br>
  */
 namespace MZ\Payment;
 
@@ -469,11 +469,8 @@ class FormaPagto extends \MZ\Database\Helper
     public function validate()
     {
         $errors = [];
-        if (is_null($this->getTipo())) {
-            $errors['tipo'] = 'O tipo não pode ser vazio';
-        }
-        if (!Validator::checkInSet($this->getTipo(), self::getTipoOptions(), true)) {
-            $errors['tipo'] = 'O tipo é inválido';
+        if (!Validator::checkInSet($this->getTipo(), self::getTipoOptions())) {
+            $errors['tipo'] = 'O tipo não foi informado ou é inválido';
         }
         if (is_null($this->getCarteiraID())) {
             $errors['carteiraid'] = 'A carteira de entrada não pode ser vazia';
@@ -489,11 +486,8 @@ class FormaPagto extends \MZ\Database\Helper
         } else {
             $this->setParcelado('N');
         }
-        if (is_null($this->getParcelado())) {
-            $errors['parcelado'] = 'O parcelado não pode ser vazio';
-        }
-        if (!Validator::checkBoolean($this->getParcelado(), true)) {
-            $errors['parcelado'] = 'O parcelado é inválido';
+        if (!Validator::checkBoolean($this->getParcelado())) {
+            $errors['parcelado'] = 'O parcelamento não foi informado ou é inválido';
         }
         if (!is_null($this->getMinParcelas()) && $this->getMinParcelas() < 0) {
             $errors['minparcelas'] = 'O mínimo de parcelas não pode ser negativo';
@@ -501,8 +495,7 @@ class FormaPagto extends \MZ\Database\Helper
         if (!is_null($this->getMaxParcelas()) && $this->getMaxParcelas() < 0) {
             $errors['maxparcelas'] = 'O máximo de parcelas não pode ser negativo';
         }
-        if (
-            !is_null($this->getMinParcelas()) &&
+        if (!is_null($this->getMinParcelas()) &&
             !is_null($this->getMaxParcelas()) &&
             $this->getMinParcelas() > $this->getMaxParcelas()
         ) {
@@ -511,21 +504,17 @@ class FormaPagto extends \MZ\Database\Helper
         if (!is_null($this->getParcelasSemJuros()) && $this->getParcelasSemJuros() < 0) {
             $errors['parcelassemjuros'] = 'As parcelas sem juros não podem ser negativas';
         }
-        if (
-            !is_null($this->getParcelasSemJuros()) &&
+        if (!is_null($this->getParcelasSemJuros()) &&
             !is_null($this->getMinParcelas()) &&
             $this->getParcelasSemJuros() < $this->getMinParcelas()
         ) {
-            $errors['parcelassemjuros'] = 'As parcelas sem juros não pode ser menor que o mínimo de parcelas';
+            $errors['parcelassemjuros'] = 'As parcelas sem juros não podem ser menores que o mínimo de parcelas';
         }
         if (!is_null($this->getJuros()) && $this->getJuros() < 0) {
             $errors['juros'] = 'O juros não pode ser negativo';
         }
-        if (is_null($this->getAtiva())) {
-            $errors['ativa'] = 'A ativa não pode ser vazia';
-        }
-        if (!Validator::checkBoolean($this->getAtiva(), true)) {
-            $errors['ativa'] = 'A ativa é inválida';
+        if (!Validator::checkBoolean($this->getAtiva())) {
+            $errors['ativa'] = 'A ativação não foi informada ou é inválida';
         }
         if (!empty($errors)) {
             throw new \MZ\Exception\ValidationException($errors);
@@ -540,15 +529,7 @@ class FormaPagto extends \MZ\Database\Helper
      */
     protected function translate($e)
     {
-        if (stripos($e->getMessage(), 'PRIMARY') !== false) {
-            return new \MZ\Exception\ValidationException([
-                'id' => sprintf(
-                    'O id "%s" já está cadastrado',
-                    $this->getID()
-                ),
-            ]);
-        }
-        if (stripos($e->getMessage(), 'Descricao_UNIQUE') !== false) {
+        if (contains(['Descricao', 'UNIQUE'], $e->getMessage())) {
             return new \MZ\Exception\ValidationException([
                 'descricao' => sprintf(
                     'A descrição "%s" já está cadastrada',
@@ -581,21 +562,20 @@ class FormaPagto extends \MZ\Database\Helper
      * Update Forma de pagamento with instance values into database for ID
      * @return FormaPagto Self instance
      */
-    public function update()
+    public function update($only = [], $except = false)
     {
         $values = $this->validate();
         if (!$this->exists()) {
             throw new \Exception('O identificador da forma de pagamento não foi informado');
         }
-        unset($values['id']);
+        $values = self::filterValues($values, $only, $except);
         try {
             self::getDB()
                 ->update('Formas_Pagto')
                 ->set($values)
                 ->where('id', $this->getID())
                 ->execute();
-            $forma_pagto = self::findByID($this->getID());
-            $this->fromArray($forma_pagto->toArray());
+            $this->loadByID($this->getID());
         } catch (\Exception $e) {
             throw $this->translate($e);
         }
@@ -629,18 +609,6 @@ class FormaPagto extends \MZ\Database\Helper
         $query = self::query($condition, $order)->limit(1);
         $row = $query->fetch() ?: [];
         return $this->fromArray($row);
-    }
-
-    /**
-     * Load into this object from database using, ID
-     * @param  int $id id to find Forma de pagamento
-     * @return FormaPagto Self filled instance or empty when not found
-     */
-    public function loadByID($id)
-    {
-        return $this->load([
-            'id' => intval($id),
-        ]);
     }
 
     /**

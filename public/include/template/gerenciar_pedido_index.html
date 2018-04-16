@@ -20,11 +20,11 @@
 			</div>
 			<div class="form-group col-lg-3 col-md-4 col-sm-4 col-xs-6">
 				<label for="inicio">Data inicial:</label>
-				<input type="text" id="inicio" name="inicio" class="datetime-picker form-control" value="{$_GET['inicio']}">
+				<input type="text" id="inicio" name="inicio" class="datetime-picker form-control" value="${\MZ\Util\Filter::input($_GET, 'inicio')}">
 			</div>
 			<div class="form-group col-lg-3 col-md-2 col-sm-2 col-xs-6">
 				<label for="fim">Data final:</label>
-				<input type="text" id="fim" name="fim" class="datetime-picker form-control" value="{$_GET['fim']}">
+				<input type="text" id="fim" name="fim" class="datetime-picker form-control" value="${\MZ\Util\Filter::input($_GET, 'fim')}">
 			</div>
 <!--${$_funcao = $_funcionario->findFuncaoID()}-->
 <!--${$_cliente_func = $_funcionario->findClienteID()}-->
@@ -41,7 +41,7 @@
 			<div class=" form-group col-lg-4 col-md-4 col-sm-4 col-xs-12">
 				<label>Busca:</label>
 				<div class="input-group">
-					<input type="text" class="form-control" id="query" name="query" placeholder="Código, #Sessão ou Observação..." value="${\MZ\Util\Filter::input($_GET, 'query')}">
+					<input type="text" class="form-control" id="query" name="search" placeholder="Código, #Sessão ou Observação..." value="${\MZ\Util\Filter::input($_GET, 'search')}">
 					<span class="input-group-btn">
 						<button class="btn btn-default" type="submit"><i class="fa fa-search"></i></button>
 					</span>

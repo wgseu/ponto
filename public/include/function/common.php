@@ -1,24 +1,27 @@
 <?php
-/*
-	Copyright 2014 da MZ Software - MZ Desenvolvimento de Sistemas LTDA
-	Este arquivo é parte do programa GrandChef - Sistema para Gerenciamento de Churrascarias, Bares e Restaurantes.
-	O GrandChef é um software proprietário; você não pode redistribuí-lo e/ou modificá-lo.
-	DISPOSIÇÕES GERAIS
-	O cliente não deverá remover qualquer identificação do produto, avisos de direitos autorais,
-	ou outros avisos ou restrições de propriedade do GrandChef.
-
-	O cliente não deverá causar ou permitir a engenharia reversa, desmontagem,
-	ou descompilação do GrandChef.
-
-	PROPRIEDADE DOS DIREITOS AUTORAIS DO PROGRAMA
-
-	GrandChef é a especialidade do desenvolvedor e seus
-	licenciadores e é protegido por direitos autorais, segredos comerciais e outros direitos
-	de leis de propriedade.
-
-	O Cliente adquire apenas o direito de usar o software e não adquire qualquer outros
-	direitos, expressos ou implícitos no GrandChef diferentes dos especificados nesta Licença.
-*/
+/**
+ * Copyright 2014 da MZ Software - MZ Desenvolvimento de Sistemas LTDA
+ *
+ * Este arquivo é parte do programa GrandChef - Sistema para Gerenciamento de Churrascarias, Bares e Restaurantes.
+ * O GrandChef é um software proprietário; você não pode redistribuí-lo e/ou modificá-lo.
+ * DISPOSIÇÕES GERAIS
+ * O cliente não deverá remover qualquer identificação do produto, avisos de direitos autorais,
+ * ou outros avisos ou restrições de propriedade do GrandChef.
+ *
+ * O cliente não deverá causar ou permitir a engenharia reversa, desmontagem,
+ * ou descompilação do GrandChef.
+ *
+ * PROPRIEDADE DOS DIREITOS AUTORAIS DO PROGRAMA
+ *
+ * GrandChef é a especialidade do desenvolvedor e seus
+ * licenciadores e é protegido por direitos autorais, segredos comerciais e outros direitos
+ * de leis de propriedade.
+ *
+ * O Cliente adquire apenas o direito de usar o software e não adquire qualquer outros
+ * direitos, expressos ou implícitos no GrandChef diferentes dos especificados nesta Licença.
+ *
+ * @author Equipe GrandChef <desenvolvimento@mzsw.com.br>
+ */
 
 function numberval($str)
 {
@@ -201,10 +204,12 @@ function human_range($inicio, $fim, $sep = '/')
  */
 function auto_version($file)
 {
-    if (strpos($file, '/') != 0 || !file_exists(WWW_ROOT . $file)) {
+    global $app;
+
+    if (strpos($file, '/') != 0 || !file_exists($app->getPath('public') . $file)) {
         return $file;
     }
-    return $file . '?' . filemtime(WWW_ROOT . $file);
+    return $file . '?' . filemtime($app->getPath('public') . $file);
 }
 
 function redirect($url = null)
@@ -212,7 +217,8 @@ function redirect($url = null)
     if (is_null($url)) {
         $url = get_redirect_page();
     }
-    Utility::Redirect(WEB_ROOT . $url);
+    Header("Location: {$url}");
+    exit;
 }
 
 function get_redirect_page($default = null)
@@ -237,30 +243,46 @@ function set_redirect_page($url = null)
 
 function template($tFile)
 {
-    return __template($tFile);
+    global $app;
+
+    return $app->getResponse('html')->output($tFile);
 }
 
-function render($tFile, $vs = [])
+function render($tFile, $vs=[], $hook = true)
 {
-    ob_start();
-    foreach ($GLOBALS as $_k => $_v) {
-        ${$_k} = $_v;
-    }
+    global $app;
+
+    $render = new \MZ\Template\Custom($app->getSystem()->getSettings());
     foreach ($vs as $_k => $_v) {
-        ${$_k} = $_v;
+        $render->{$_k} = $_v;
     }
-    include template($tFile);
-    return render_hook(ob_get_clean());
+    $content = $render->render($tFile);
+    if ($hook) {
+        $content = render_hook($content);
+    }
+    return $content;
 }
 
 function render_hook($c)
 {
-    global $INI;
+    global $app;
 
-    $c = preg_replace('#href="/#i', 'href="'.$INI['system']['wwwprefix'].'/', $c);
-    $c = preg_replace('#src="/#i', 'src="'.$INI['system']['wwwprefix'].'/', $c);
-    $c = preg_replace('#action="/#i', 'action="'.$INI['system']['wwwprefix'].'/', $c);
+    $c = preg_replace('#href="/#i', 'href="'.$app->makeURL('/'), $c);
+    $c = preg_replace('#src="/#i', 'src="'.$app->makeURL('/'), $c);
+    $c = preg_replace('#action="/#i', 'action="'.$app->makeURL('/'), $c);
     return $c;
+}
+
+function logged_user()
+{
+    global $app;
+    return $app->getAuthentication()->getUser();
+}
+
+function logged_employee()
+{
+    global $app;
+    return $app->getAuthentication()->getEmployee();
 }
 
 function need_login($json = false)
@@ -311,7 +333,7 @@ function need_owner($json = false)
 
 function need_permission($array, $json = false)
 {
-    if (!have_permission($array)) {
+    if (!logged_employee()->has($array)) {
         if ($json) {
             json('Você não possui permissão para acessar essa função');
         }
@@ -323,17 +345,15 @@ function need_permission($array, $json = false)
 
 function is_login()
 {
-    global $login_cliente;
-    return isset($_SESSION['cliente_id']) && !is_null($login_cliente->getID());
+    return isset($_SESSION['cliente_id']) && !is_null(logged_user()->getID());
 }
 
 function is_manager($funcionario = null)
 {
     if (!is_null($funcionario)) {
-        return !is_null($funcionario->getID());
+        return $funcionario->exists();
     }
-    global $login_funcionario;
-    return is_login() && !is_null($login_funcionario->getID());
+    return is_login() && !is_null(logged_employee()->getID());
 }
 
 function is_owner($funcionario = null)
@@ -341,14 +361,12 @@ function is_owner($funcionario = null)
     if (!is_null($funcionario)) {
         return is_manager($funcionario) && $funcionario->getID() == 1;
     }
-    global $login_funcionario;
-    return is_manager() && $login_funcionario->getID() == 1;
+    return is_manager() && logged_employee()->getID() == 1;
 }
 
 function is_self($funcionario)
 {
-    global $login_funcionario;
-    return is_manager() && !is_null($funcionario->getID()) && $funcionario->getID() == $login_funcionario->getID();
+    return is_manager() && $funcionario->exists() && $funcionario->getID() == logged_employee()->getID();
 }
 
 function is_get()
@@ -371,49 +389,6 @@ function is_output($format)
         default:
             return false;
     }
-}
-
-function have_permission($array, $funcionario = null)
-{
-    global $login_funcionario;
-    global $__permissoes__;
-    if (is_null($funcionario)) {
-        $funcionario = $login_funcionario;
-    }
-    if (!is_manager($funcionario)) {
-        return false;
-    }
-    if (is_owner($funcionario)) {
-        return true;
-    }
-    settype($array, 'array');
-    $permissoes = $__permissoes__;
-    if ($funcionario->getID() != $login_funcionario->getID()) {
-        $permissoes = Acesso::getPermissoes($funcionario->getID());
-    }
-    $allow = true;
-    $operator = '&&';
-    foreach ($array as $value) {
-        if (is_array($value)) {
-            $operator = current($value);
-            continue;
-        }
-        if ($operator == '||') {
-            $allow = $allow || in_array($value, $permissoes);
-        } else {
-            $allow = $allow && in_array($value, $permissoes);
-        }
-    }
-    return ($allow && count($array) > 0);
-}
-
-function get_pages_info()
-{
-    return [
-        'sobre' => 'Sobre a empresa',
-        'privacidade' => 'Privacidade',
-        'termos' => 'Termos de uso',
-    ];
 }
 
 function get_languages_info()
@@ -460,82 +435,49 @@ function set_timezone_for($uf, $pais = 'Brasil')
 
 function current_language_id()
 {
-    global $login_funcionario;
-    $lang_id = $login_funcionario->getLinguagemID();
+    $lang_id = logged_employee()->getLinguagemID();
     if (is_null($lang_id)) {
         $lang_id = 1046;
     }
     return $lang_id;
 }
 
-function get_site_page($page_name)
-{
-    $pagina = Pagina::findByNomeLinguagemID($page_name, current_language_id());
-    if (is_null($pagina->getID())) {
-        $pagina = Pagina::findByNomeLinguagemID($page_name, 1046);
-    }
-    return $pagina;
-}
-
-
-function is_boolean_config($section, $key, $default = false)
-{
-    global $__options__;
-    $value = $__options__[$section][$key];
-    if (is_null($value)) {
-        return $default;
-    }
-    return intval($value) && 1;
-}
-
-function set_boolean_config($section, $key, $value)
-{
-    global $__options__;
-    if (is_null($value)) {
-        unset($__options__[$section][$key]);
-    } else {
-        $__options__[$section][$key] = ($value?1:0);
-    }
-}
-
 function get_string_config($section, $key, $default = null)
 {
-    global $__options__;
-    $value = $__options__[$section][$key];
-    if (is_null($value)) {
-        return $default;
-    }
-    return strval($value);
+    global $app;
+
+    return $app->getSystem()->getSettings()->getValue($section, $key, $default);
 }
 
 function set_string_config($section, $key, $value)
 {
-    global $__options__;
+    global $app;
+
     if (is_null($value)) {
-        unset($__options__[$section][$key]);
+        $app->getSystem()->getSettings()->deleteEntry($section, $key);
     } else {
-        $__options__[$section][$key] = $value;
+        $app->getSystem()->getSettings()->setValue($section, $key, $value);
     }
+}
+
+function is_boolean_config($section, $key, $default = false)
+{
+    return !!intval(get_string_config($section, $key, $default));
+}
+
+function set_boolean_config($section, $key, $value)
+{
+    set_string_config($section, $key, !is_null($value) ? ($value ? 1 : 0) : null);
 }
 
 function get_int_config($section, $key, $default = null)
 {
-    global $__options__;
-    $value = $__options__[$section][$key];
-    if (is_null($value)) {
-        return $default;
-    }
-    return intval($value);
+    return intval(get_string_config($section, $key, $default));
 }
 
 function set_int_config($section, $key, $value)
 {
-    global $__options__;
-    if (is_null($value)) {
-        unset($__options__[$section][$key]);
-    } else {
-        $__options__[$section][$key] = intval($value);
-    }
+    set_string_config($section, $key, !is_null($value) ? intval($value) : null);
 }
 
 function config_values_exists($array, $section, $key)
@@ -550,7 +492,7 @@ function config_values_exists($array, $section, $key)
 
 function _p($section, $key)
 {
-    global $__entries__;
+    global $app;
 
     $entries = [
         'Titulo.CNPJ' => 'CNPJ',
@@ -695,11 +637,12 @@ function _p($section, $key)
         'Cupom.Restante' => 'Restante',
         'Cupom.TotalJuros' => 'Total(J)'
     ];
-    if (is_array($__entries__) &&
-        array_key_exists($section, $__entries__) &&
-        array_key_exists($key, $__entries__[$section])
+    $country_entries = $app->getSystem()->getEntries();
+    if (is_array($country_entries) &&
+        array_key_exists($section, $country_entries) &&
+        array_key_exists($key, $country_entries[$section])
     ) {
-        return $__entries__[$section][$key];
+        return $country_entries[$section][$key];
     }
     return $entries[$section.'.'.$key];
 }
@@ -713,34 +656,34 @@ function register_device($device, $serial)
         throw new \Exception("O identificador do dispositivo não foi informado");
     }
     $dispositivo = Dispositivo::findByNome($device);
-    if (is_null($dispositivo->getID())) {
+    if (!$dispositivo->exists()) {
         $dispositivo = Dispositivo::getPelaSerial($serial);
     }
-    global $__sistema__;
-    if (is_null($__sistema__->getID())) {
+    global $app;
+    if (!$app->getSystem()->exists()) {
         throw new \Exception("Não há dados na tabela do sistema");
     }
     $tablet_count = Dispositivo::getCountDoTablet();
-    if ($tablet_count > $__sistema__->getTablets()) {
+    if ($tablet_count > $app->getSystem()->getTablets()) {
         throw new \Exception("Limite de Tablets excedido, remova os tablets excedentes para continuar");
     }
-    if (is_null($dispositivo->getID()) && $tablet_count >= $__sistema__->getTablets()) {
+    if (!$dispositivo->exists() && $tablet_count >= $app->getSystem()->getTablets()) {
         // tenta sobrescrever um tablet não validado
-        $dispositivo = Dispositivo::getNaoValidado();
-        if (is_null($dispositivo->getID())) {
+        $dispositivo = Dispositivo::findNotValidated();
+        if (!$dispositivo->exists()) {
             throw new \Exception("Limite de Tablets esgotado, verifique sua licença");
         }
         // permite a atualização das informações para o novo dispositivo
         $dispositivo->setValidacao(null);
     }
-    if (is_null($dispositivo->getID())) {
+    if (!$dispositivo->exists()) {
         $dispositivo->setTipo(Dispositivo::TIPO_TABLET);
         $dispositivo->setDescricao('Tablet '.$device);
         $dispositivo->setNome($device);
         $dispositivo->setSerial($serial);
         $dispositivo->setOpcoes(0);
         $setor = Setor::findByNome('Vendas');
-        if (is_null($setor->getID())) {
+        if (!$setor->exists()) {
             $setor = Setor::getPrimeiro();
         }
         $dispositivo->setSetorID($setor->getID());
@@ -803,7 +746,8 @@ function get_tempo($seg)
 
 function cookieset($k, $v, $expire = 0)
 {
-    $pre = substr(md5($_SERVER['HTTP_HOST']), 0, 4);
+    $host = isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : 'localhost';
+    $pre = substr(md5($host), 0, 4);
     $k = "{$pre}_{$k}";
     if ($expire==0) {
         $expire = time() + 365 * 86400;
@@ -815,7 +759,8 @@ function cookieset($k, $v, $expire = 0)
 
 function cookieget($k, $default = '')
 {
-    $pre = substr(md5($_SERVER['HTTP_HOST']), 0, 4);
+    $host = isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : 'localhost';
+    $pre = substr(md5($host), 0, 4);
     $k = "{$pre}_{$k}";
     return isset($_COOKIE[$k]) ? strval($_COOKIE[$k]) : $default;
 }
@@ -884,7 +829,7 @@ function upload_file($inputname, $dir, $name, $def_ext, $allow_ext, $force_ext =
         return null; // no file
     }
     if ($file['error'] !== UPLOAD_ERR_OK) {
-        throw new UploadException($file['error']);
+        throw new \MZ\Exception\UploadException($file['error']);
     }
     $ext = $def_ext;
     if (preg_match('/\.(' . $allow_ext . ')$/i', $file['name'], $matches)) {
@@ -907,11 +852,13 @@ function upload_file($inputname, $dir, $name, $def_ext, $allow_ext, $force_ext =
 
 function upload_image($inputname, $type, $name = null, $width = null, $height = null, $png = false, $mode = null)
 {
+    global $app;
+
     $force_ext = null;
     if ($png) {
         $force_ext = '.png';
     }
-    $dir = IMG_ROOT . '/' . $type . '/';
+    $dir = $app->getPath('image') . '/' . $type . '/';
     $name = upload_file($inputname, $dir, $name, '.jpg', 'gif|bmp|png|jpg|jpeg', $force_ext);
     if (is_null($name)) {
         return null;
@@ -931,7 +878,9 @@ function upload_image($inputname, $type, $name = null, $width = null, $height = 
 
 function upload_document($inputname, $type, $name = null)
 {
-    $dir = DOC_ROOT . '/' . $type . '/';
+    global $app;
+
+    $dir = $app->getPath('docs') . '/' . $type . '/';
     return upload_file(
         $inputname,
         $dir,
@@ -1038,10 +987,12 @@ function get_image_url($name, $namespace, $default = null)
 
 function get_image_path($name, $namespace)
 {
+    global $app;
+
     if (is_null($name)) {
         return null;
     }
-    return WWW_ROOT . get_image_url($name, $namespace);
+    return $app->getPath('public') . get_image_url($name, $namespace);
 }
 
 function get_document_url($name, $namespace, $default = null)
@@ -1051,15 +1002,28 @@ function get_document_url($name, $namespace, $default = null)
 
 function get_document_path($name, $namespace)
 {
+    global $app;
+
     if (is_null($name)) {
         return null;
     }
-    return WWW_ROOT . get_document_url($name, $namespace);
+    return $app->getPath('public') . get_document_url($name, $namespace);
 }
 
 function is_local_path($name)
 {
     return strpos($name, '\\') !== false;
+}
+
+function contains($needles, $haystack, $some = false)
+{
+    foreach($needles as $needle){
+        $found = stripos($haystack, $needle) !== false;
+        if ($found === $some) {
+            return $some;
+        }
+    }
+    return !$some;
 }
 
 function get_site_image_url($key, $default = false)

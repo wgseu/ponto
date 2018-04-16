@@ -20,7 +20,7 @@
  * O Cliente adquire apenas o direito de usar o software e não adquire qualquer outros
  * direitos, expressos ou implícitos no GrandChef diferentes dos especificados nesta Licença.
  *
- * @author  Francimar Alves <mazinsw@gmail.com>
+ * @author Equipe GrandChef <desenvolvimento@mzsw.com.br>
  */
 namespace MZ\Product;
 
@@ -909,13 +909,15 @@ class Produto extends \MZ\Database\Helper
      */
     public function filter($original)
     {
+        global $app;
+
         $this->setID($original->getID());
+        $this->setTributacaoID($original->getTributacaoID());
         $this->setCodigoBarras(Filter::string($this->getCodigoBarras()));
         $this->setCategoriaID(Filter::number($this->getCategoriaID()));
         $this->setUnidadeID(Filter::number($this->getUnidadeID()));
         $this->setSetorEstoqueID(Filter::number($this->getSetorEstoqueID()));
         $this->setSetorPreparoID(Filter::number($this->getSetorPreparoID()));
-        $this->setTributacaoID(Filter::number($this->getTributacaoID()));
         $this->setDescricao(Filter::string($this->getDescricao()));
         $this->setAbreviacao(Filter::string($this->getAbreviacao()));
         $this->setDetalhes(Filter::string($this->getDetalhes()));
@@ -925,13 +927,18 @@ class Produto extends \MZ\Database\Helper
         $this->setPrecoVenda(Filter::money($this->getPrecoVenda()));
         $this->setCustoProducao(Filter::money($this->getCustoProducao()));
         $this->setTempoPreparo(Filter::number($this->getTempoPreparo()));
-        $imagem = upload_image('raw_imagem', 'produto');
+        $imagem = upload_image('raw_imagem', 'produto', null, 256, 256, true, 'crop');
         if (is_null($imagem) && trim($this->getImagem()) != '') {
-            $this->setImagem($original->getImagem());
+            $this->setImagem(true);
         } else {
             $this->setImagem($imagem);
+            $image_path = $app->getPath('public') . $this->makeImagem();
+            if (!is_null($imagem)) {
+                $this->setImagem(file_get_contents($image_path));
+                @unlink($image_path);
+            }
         }
-        $this->setDataAtualizacao(Filter::datetime($this->getDataAtualizacao()));
+        $this->setDataAtualizacao(self::now());
     }
 
     /**
@@ -940,9 +947,6 @@ class Produto extends \MZ\Database\Helper
      */
     public function clean($dependency)
     {
-        if (!is_null($this->getImagem()) && $dependency->getImagem() != $this->getImagem()) {
-            @unlink(get_image_path($this->getImagem(), 'produto'));
-        }
         $this->setImagem($dependency->getImagem());
     }
 
@@ -974,52 +978,36 @@ class Produto extends \MZ\Database\Helper
         if (is_null($this->getPrecoVenda())) {
             $errors['precovenda'] = 'O preço de venda não pode ser vazio';
         }
-        if (is_null($this->getTipo())) {
-            $errors['tipo'] = 'O tipo não pode ser vazio';
-        }
-        if (!Validator::checkInSet($this->getTipo(), self::getTipoOptions(), true)) {
+        if (!Validator::checkInSet($this->getTipo(), self::getTipoOptions())) {
             $errors['tipo'] = 'O tipo é inválido';
         }
-        if (is_null($this->getCobrarServico())) {
-            $errors['cobrarservico'] = 'A cobrança de serviço não pode ser vazia';
-        }
-        if (!Validator::checkBoolean($this->getCobrarServico(), true)) {
+        if (!Validator::checkBoolean($this->getCobrarServico())) {
             $errors['cobrarservico'] = 'A cobrança de serviço é inválida';
         }
-        if (is_null($this->getDivisivel())) {
-            $errors['divisivel'] = 'O divisível não pode ser vazio';
-        }
-        if (!Validator::checkBoolean($this->getDivisivel(), true)) {
+        if (!Validator::checkBoolean($this->getDivisivel())) {
             $errors['divisivel'] = 'O divisível é inválido';
         }
-        if (is_null($this->getPesavel())) {
-            $errors['pesavel'] = 'O pesável não pode ser vazio';
-        }
-        if (!Validator::checkBoolean($this->getPesavel(), true)) {
+        if (!Validator::checkBoolean($this->getPesavel())) {
             $errors['pesavel'] = 'O pesável é inválido';
         }
-        if (is_null($this->getPerecivel())) {
-            $errors['perecivel'] = 'O perecível não pode ser vazio';
-        }
-        if (!Validator::checkBoolean($this->getPerecivel(), true)) {
+        if (!Validator::checkBoolean($this->getPerecivel())) {
             $errors['perecivel'] = 'O perecível é inválido';
         }
         if (is_null($this->getTempoPreparo())) {
             $errors['tempopreparo'] = 'O tempo de preparo não pode ser vazio';
         }
-        if (is_null($this->getVisivel())) {
-            $errors['visivel'] = 'O visível não pode ser vazio';
-        }
-        if (!Validator::checkBoolean($this->getVisivel(), true)) {
+        if (!Validator::checkBoolean($this->getVisivel())) {
             $errors['visivel'] = 'O visível é inválido';
         }
-        if (is_null($this->getDataAtualizacao())) {
-            $errors['dataatualizacao'] = 'A data de atualização não pode ser vazia';
-        }
+        $this->setDataAtualizacao(self::now());
         if (!empty($errors)) {
             throw new \MZ\Exception\ValidationException($errors);
         }
-        return $this->toArray();
+        $values = $this->toArray();
+        if ($this->getImagem() === true) {
+            unset($values['imagem']);
+        }
+        return $values;
     }
 
     /**
@@ -1029,15 +1017,7 @@ class Produto extends \MZ\Database\Helper
      */
     protected function translate($e)
     {
-        if (stripos($e->getMessage(), 'PRIMARY') !== false) {
-            return new \MZ\Exception\ValidationException([
-                'id' => sprintf(
-                    'O id "%s" já está cadastrado',
-                    $this->getID()
-                ),
-            ]);
-        }
-        if (stripos($e->getMessage(), 'Descricao_UNIQUE') !== false) {
+        if (contains(['Descricao', 'UNIQUE'], $e->getMessage())) {
             return new \MZ\Exception\ValidationException([
                 'descricao' => sprintf(
                     'A descrição "%s" já está cadastrada',
@@ -1045,7 +1025,7 @@ class Produto extends \MZ\Database\Helper
                 ),
             ]);
         }
-        if (stripos($e->getMessage(), 'CodBarras_UNIQUE') !== false) {
+        if (contains(['CodBarras', 'UNIQUE'], $e->getMessage())) {
             return new \MZ\Exception\ValidationException([
                 'codigobarras' => sprintf(
                     'O código de barras "%s" já está cadastrado',
@@ -1076,23 +1056,24 @@ class Produto extends \MZ\Database\Helper
 
     /**
      * Update Produto with instance values into database for ID
+     * @param  array $only Save these fields only, when empty save all fields except id
+     * @param  boolean $except When true, saves all fields except $only
      * @return Produto Self instance
      */
-    public function update()
+    public function update($only = [], $except = false)
     {
         $values = $this->validate();
         if (!$this->exists()) {
             throw new \Exception('O identificador do produto não foi informado');
         }
-        unset($values['id']);
+        $values = self::filterValues($values, $only, $except);
         try {
             self::getDB()
                 ->update('Produtos')
                 ->set($values)
                 ->where('id', $this->getID())
                 ->execute();
-            $produto = self::findByID($this->getID());
-            $this->fromArray($produto->toArray());
+            $this->loadByID($this->getID());
         } catch (\Exception $e) {
             throw $this->translate($e);
         }
@@ -1129,18 +1110,6 @@ class Produto extends \MZ\Database\Helper
     }
 
     /**
-     * Load into this object from database using, ID
-     * @param  int $id id to find Produto
-     * @return Produto Self filled instance or empty when not found
-     */
-    public function loadByID($id)
-    {
-        return $this->load([
-            'id' => intval($id),
-        ]);
-    }
-
-    /**
      * Load into this object from database using, Descricao
      * @param  string $descricao descrição to find Produto
      * @return Produto Self filled instance or empty when not found
@@ -1162,6 +1131,20 @@ class Produto extends \MZ\Database\Helper
         return $this->load([
             'codigobarras' => strval($codigo_barras),
         ]);
+    }
+
+    /**
+     * Load image data from blob field on database
+     * @return Produto Self instance with imagem field filled
+     */
+    public function loadImagem()
+    {
+        $data = self::getDB()->from('Produtos p')
+            ->select(null)
+            ->select('p.imagem')
+            ->where('p.id', $this->getID());
+        $this->setImagem($data);
+        return $this;
     }
 
     /**
@@ -1285,7 +1268,36 @@ class Produto extends \MZ\Database\Helper
      */
     private static function query($condition = [], $order = [])
     {
-        $query = self::getDB()->from('Produtos p');
+        $query = self::getDB()->from('Produtos p')
+            ->select(null)
+            ->select('p.id')
+            ->select('p.codigobarras')
+            ->select('p.categoriaid')
+            ->select('p.unidadeid')
+            ->select('p.setorestoqueid')
+            ->select('p.setorpreparoid')
+            ->select('p.tributacaoid')
+            ->select('p.descricao')
+            ->select('p.abreviacao')
+            ->select('p.detalhes')
+            ->select('p.quantidadelimite')
+            ->select('p.quantidademaxima')
+            ->select('p.conteudo')
+            ->select('p.precovenda')
+            ->select('p.custoproducao')
+            ->select('p.tipo')
+            ->select('p.cobrarservico')
+            ->select('p.divisivel')
+            ->select('p.pesavel')
+            ->select('p.perecivel')
+            ->select('p.tempopreparo')
+            ->select('p.visivel')
+            ->select(
+                '(CASE WHEN p.imagem IS NULL THEN NULL ELSE '.
+                self::concat(['p.id', '".png"']).
+                ' END) as imagem'
+            )
+            ->select('p.dataatualizacao');
         $condition = self::filterCondition($condition);
         $query = self::buildOrderBy($query, self::filterOrder($order));
         $query = $query->orderBy('p.descricao ASC');

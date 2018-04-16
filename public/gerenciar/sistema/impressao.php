@@ -1,7 +1,9 @@
 <?php
 require_once(dirname(dirname(__DIR__)) . '/app.php'); // main app file
 
-need_permission(Permissao::NOME_ALTERARCONFIGURACOES, isset($_POST));
+use MZ\System\Permissao;
+
+need_permission(Permissao::NOME_ALTERARCONFIGURACOES, is_post() || is_output('json'));
 
 $tab_impressao = 'active';
 $opcoes_aparencia = [
@@ -52,21 +54,27 @@ $opcoes_impressao = array_merge($opcoes_aparencia, $opcoes_guias, $opcoes_compor
 
 if (is_post()) {
     try {
-        if (!config_values_exists($opcoes_impressao, $_POST['secao'], $_POST['chave'])) {
+        $secao = isset($_POST['secao']) ? $_POST['secao'] : null;
+        $chave = isset($_POST['chave']) ? $_POST['chave'] : null;
+        if (!config_values_exists($opcoes_impressao, $secao, $chave)) {
             throw new \Exception('A opção de impressão informada não existe', 1);
         }
-        set_boolean_config($_POST['secao'], $_POST['chave'], $_POST['marcado'] == 'Y');
-        $__sistema__->salvarOpcoes($__options__);
+        $marcado = isset($_POST['marcado']) ? $_POST['marcado'] : null;
+        set_boolean_config($secao, $chave, $marcado == 'Y');
+        $app->getSystem()->filter($app->getSystem());
+        $app->getSystem()->update(['opcoes']);
         try {
             $appsync = new \MZ\System\Synchronizer();
             $appsync->printOptionsChanged();
-        } catch (Exception $e) {
-            Log::error($e->getMessage());
+        } catch (\Exception $e) {
+            \Log::error($e->getMessage());
         }
         json(['status' => 'ok']);
-    } catch (Exception $e) {
+    } catch (\Exception $e) {
         json($e->getMessage());
     }
+} elseif (is_output('json')) {
+    json('Nenhum dado foi enviado');
 }
 
-include template('gerenciar_sistema_impressao');
+$app->getResponse('html')->output('gerenciar_sistema_impressao');

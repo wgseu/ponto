@@ -23,15 +23,20 @@ require_once(dirname(dirname(__DIR__)) . '/app.php');
 
 need_manager(true);
 
-$limit = intval($_GET['limite']);
-if ($_GET['primeiro'] || check_fone($_GET['busca'], true)) {
-    $limit = 1;
-} elseif ($limit < 1) {
-    $limit = 5;
-} elseif ($limit > 20) {
-    $limit = 20;
+$limite = isset($_GET['limite']) ? intval($_GET['limite']) : 5;
+$primeiro = isset($_GET['primeiro']) ? $_GET['primeiro'] : null;
+if ($primeiro || check_fone($_GET['busca'], true)) {
+    $limite = 1;
+} elseif ($limite < 1) {
+    $limite = 5;
+} elseif ($limite > 20) {
+    $limite = 20;
 }
-$fornecedores = Fornecedor::getTodos($_GET['busca'], 0, $limit);
+$condition = [];
+if (isset($_GET['busca'])) {
+    $condition['search'] = $_GET['busca'];
+}
+$fornecedores = Fornecedor::findAll($condition, [], $limite);
 $response = ['status' => 'ok'];
 $campos = [
             'id',

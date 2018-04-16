@@ -1,9 +1,11 @@
 <?php
 require_once(dirname(__DIR__) . '/app.php');
 
-need_permission(Permissao::NOME_ALTERARCONFIGURACOES);
+use MZ\System\Permissao;
 
-$fieldfocus = 'fiscal_timeout';
+need_permission(Permissao::NOME_ALTERARCONFIGURACOES, is_output('json'));
+
+$focusctrl = 'fiscal_timeout';
 $tab_fiscal = 'active';
 
 $erros = [];
@@ -17,25 +19,32 @@ if (is_post()) {
             );
         }
         set_int_config('Sistema', 'Fiscal.Timeout', $fiscal_timeout);
-        $__sistema__->salvarOpcoes($__options__);
+        $app->getSystem()->filter($app->getSystem());
+        $app->getSystem()->update(['opcoes']);
         try {
             $appsync = new \MZ\System\Synchronizer();
             $appsync->systemOptionsChanged();
-        } catch (Exception $e) {
-            Log::error($e->getMessage());
+        } catch (\Exception $e) {
+            \Log::error($e->getMessage());
         }
         \Thunder::success('Opções fiscais atualizadas com sucesso!', true);
         redirect('/gerenciar/sistema/fiscal');
-    } catch (ValidationException $e) {
-        $erros = $e->getErrors();
-    } catch (Exception $e) {
-        $erros['unknow'] = $e->getMessage();
+    } catch (\Exception $e) {
+        $sistema->clean($old_sistema);
+        if ($e instanceof \MZ\Exception\ValidationException) {
+            $errors = $e->getErrors();
+        }
+        if (is_output('json')) {
+            json($e->getMessage(), null, ['errors' => $errors]);
+        }
+        \Thunder::error($e->getMessage());
+        foreach ($errors as $key => $value) {
+            $focusctrl = $key;
+            break;
+        }
     }
-    foreach ($erros as $key => $value) {
-        $fieldfocus = $key;
-        \Thunder::error($erros[$fieldfocus]);
-        break;
-    }
+} elseif (is_output('json')) {
+    json('Nenhum dado foi enviado');
 }
 
-include template('gerenciar_sistema_fiscal');
+$app->getResponse('html')->output('gerenciar_sistema_fiscal');

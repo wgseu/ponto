@@ -20,7 +20,7 @@
  * O Cliente adquire apenas o direito de usar o software e não adquire qualquer outros
  * direitos, expressos ou implícitos no GrandChef diferentes dos especificados nesta Licença.
  *
- * @author  Francimar Alves <mazinsw@gmail.com>
+ * @author Equipe GrandChef <desenvolvimento@mzsw.com.br>
  */
 namespace MZ\Payment;
 
@@ -399,7 +399,7 @@ class FolhaCheque extends \MZ\Database\Helper
             $this->setSerie($folha_cheque['serie']);
         }
         if (!isset($folha_cheque['recolhido'])) {
-            $this->setRecolhido(null);
+            $this->setRecolhido('N');
         } else {
             $this->setRecolhido($folha_cheque['recolhido']);
         }
@@ -455,6 +455,7 @@ class FolhaCheque extends \MZ\Database\Helper
     public function validate()
     {
         $errors = [];
+        $old_folha = self::findByID($this->getID());
         if (is_null($this->getChequeID())) {
             $errors['chequeid'] = 'O cheque não pode ser vazio';
         }
@@ -471,19 +472,18 @@ class FolhaCheque extends \MZ\Database\Helper
             $errors['vencimento'] = 'O vencimento não pode ser vazio';
         }
         if (is_null($this->getC(1))) {
-            $errors['c1'] = 'O c1 não pode ser vazio';
+            $errors['c1'] = 'O C1 não pode ser vazio';
         }
         if (is_null($this->getC(2))) {
-            $errors['c2'] = 'O c2 não pode ser vazio';
+            $errors['c2'] = 'O C2 não pode ser vazio';
         }
         if (is_null($this->getC(3))) {
-            $errors['c3'] = 'O c3 não pode ser vazio';
+            $errors['c3'] = 'O C3 não pode ser vazio';
         }
-        if (is_null($this->getRecolhido())) {
-            $errors['recolhido'] = 'O recolhido não pode ser vazio';
-        }
-        if (!Validator::checkBoolean($this->getRecolhido(), true)) {
-            $errors['recolhido'] = 'O recolhido é inválido';
+        if (!Validator::checkBoolean($this->getRecolhido())) {
+            $errors['recolhido'] = 'A informação de recolhimento é inválida';
+        } elseif ($this->isRecolhido() && $old_folha->exists() && $old_folha->isRecolhido()) {
+            $errors['recolhido'] = 'Essa folha de cheque já foi recolhida';
         }
         if (!empty($errors)) {
             throw new \MZ\Exception\ValidationException($errors);
@@ -498,14 +498,6 @@ class FolhaCheque extends \MZ\Database\Helper
      */
     protected function translate($e)
     {
-        if (stripos($e->getMessage(), 'PRIMARY') !== false) {
-            return new \MZ\Exception\ValidationException([
-                'id' => sprintf(
-                    'O id "%s" já está cadastrado',
-                    $this->getID()
-                ),
-            ]);
-        }
         if (stripos($e->getMessage(), 'UK_Folhas_Cheques_ChequeID_Numero') !== false) {
             return new \MZ\Exception\ValidationException([
                 'chequeid' => sprintf(
@@ -543,25 +535,31 @@ class FolhaCheque extends \MZ\Database\Helper
      * Update Folha de cheque with instance values into database for ID
      * @return FolhaCheque Self instance
      */
-    public function update()
+    public function update($only = [], $except = false)
     {
         $values = $this->validate();
         if (!$this->exists()) {
             throw new \Exception('O identificador da folha de cheque não foi informado');
         }
-        unset($values['id']);
+        $values = self::filterValues($values, $only, $except);
         try {
             self::getDB()
                 ->update('Folhas_Cheques')
                 ->set($values)
                 ->where('id', $this->getID())
                 ->execute();
-            $folha_cheque = self::findByID($this->getID());
-            $this->fromArray($folha_cheque->toArray());
+            $this->loadByID($this->getID());
         } catch (\Exception $e) {
             throw $this->translate($e);
         }
         return $this;
+    }
+
+    public function recolher()
+    {
+        $this->setRecolhido('Y');
+        $this->setRecolhimento(self::now());
+        return $this->update();
     }
 
     /**
@@ -591,18 +589,6 @@ class FolhaCheque extends \MZ\Database\Helper
         $query = self::query($condition, $order)->limit(1);
         $row = $query->fetch() ?: [];
         return $this->fromArray($row);
-    }
-
-    /**
-     * Load into this object from database using, ID
-     * @param  int $id id to find Folha de cheque
-     * @return FolhaCheque Self filled instance or empty when not found
-     */
-    public function loadByID($id)
-    {
-        return $this->load([
-            'id' => intval($id),
-        ]);
     }
 
     /**
@@ -647,7 +633,7 @@ class FolhaCheque extends \MZ\Database\Helper
     private static function filterOrder($order)
     {
         $allowed = self::getAllowedKeys();
-        return Filter::orderBy($order, $allowed, 'f.');
+        return Filter::orderBy($order, $allowed, ['f.', 'c.']);
     }
 
     /**
@@ -665,7 +651,7 @@ class FolhaCheque extends \MZ\Database\Helper
             $allowed[$field] = true;
             unset($condition['search']);
         }
-        return Filter::keys($condition, $allowed, 'f.');
+        return Filter::keys($condition, $allowed, ['f.', 'c.']);
     }
 
     /**
@@ -676,7 +662,8 @@ class FolhaCheque extends \MZ\Database\Helper
      */
     private static function query($condition = [], $order = [])
     {
-        $query = self::getDB()->from('Folhas_Cheques f');
+        $query = self::getDB()->from('Folhas_Cheques f')
+            ->leftJoin('Cheques c ON c.id = f.chequeid');
         $condition = self::filterCondition($condition);
         $query = self::buildOrderBy($query, self::filterOrder($order));
         $query = $query->orderBy('f.numero ASC');

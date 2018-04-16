@@ -2,8 +2,8 @@
 
 include .env
 
-# MySQL
-MYSQL_DUMPS_DIR=storage/db/dumps
+# Database dumps
+DB_DUMPS_DIR=storage/db/dumps
 
 help:
 	@echo ""
@@ -27,7 +27,7 @@ help:
 
 init:
 	@echo "Initializing..."
-	@mkdir -p $(MYSQL_DUMPS_DIR)
+	@mkdir -p $(DB_DUMPS_DIR)
 	@mkdir -p public/include/compiled
 	@mkdir -p public/static/doc/conta
 	@mkdir -p public/static/doc/cert
@@ -69,8 +69,7 @@ autoload:
 
 start: init reset
 	@cp etc/nginx/default.conf.template etc/nginx/grandchef.location
-	@sed -i "s/\"%PUBLIC_PATH%\"/\/var\/www\/html\/public/g" etc/nginx/grandchef.location
-	@sed -i "s/127.0.0.1:9456;/php:9000;/g" etc/nginx/grandchef.location
+	@npm run fix-loc
 	docker-compose up -d
 
 stop:
@@ -80,23 +79,22 @@ logs:
 	@docker-compose logs -f
 
 populate:
-	@$(shell mkdir -p $(MYSQL_DUMPS_DIR))
-	@$(shell echo "SET NAMES 'utf8' COLLATE 'utf8_unicode_ci';" > $(MYSQL_DUMPS_DIR)/populate.sql)
-	@$(shell cat database/model/script.sql >> $(MYSQL_DUMPS_DIR)/populate.sql)
-	@$(shell cat database/model/insert.sql >> $(MYSQL_DUMPS_DIR)/populate.sql)
-	@$(shell cat database/model/populate.sql >> $(MYSQL_DUMPS_DIR)/populate.sql)
-	@$(shell perl -0777 -i.original -pe "s/\`GrandChef\`/\`$(MYSQL_DATABASE)\`/igs" $(MYSQL_DUMPS_DIR)/populate.sql)
-	@rm -f $(MYSQL_DUMPS_DIR)/populate.sql.original
+	@mkdir -p $(DB_DUMPS_DIR)
+	@echo "SET NAMES 'utf8' COLLATE 'utf8_unicode_ci';" > $(DB_DUMPS_DIR)/populate.sql
+	@cat database/model/script.sql >> $(DB_DUMPS_DIR)/populate.sql
+	@cat database/model/insert.sql >> $(DB_DUMPS_DIR)/populate.sql
+	@cat database/model/populate.sql >> $(DB_DUMPS_DIR)/populate.sql
+	@npm run fix-pop "$(DB_NAME)"
 	@make -s reset
-	@docker exec -i $(shell docker-compose ps -q gmysqldb) mysql -u"$(MYSQL_ROOT_USER)" -p"$(MYSQL_ROOT_PASSWORD)" < $(MYSQL_DUMPS_DIR)/populate.sql 2>/dev/null
+	@docker exec -i $(shell docker-compose ps -q gmysqldb) mysql -u"$(DB_ROOT_USER)" -p"$(DB_ROOT_PASSWORD)" < $(DB_DUMPS_DIR)/populate.sql 2>/dev/null
 
 dump:
-	@mkdir -p $(MYSQL_DUMPS_DIR)
-	@docker exec $(shell docker-compose ps -q gmysqldb) mysqldump -B "$(MYSQL_DATABASE)" -u"$(MYSQL_ROOT_USER)" -p"$(MYSQL_ROOT_PASSWORD)" --add-drop-database > $(MYSQL_DUMPS_DIR)/db.sql 2>/dev/null
+	@mkdir -p $(DB_DUMPS_DIR)
+	@docker exec $(shell docker-compose ps -q gmysqldb) mysqldump -B "$(DB_NAME)" -u"$(DB_ROOT_USER)" -p"$(DB_ROOT_PASSWORD)" --add-drop-database > $(DB_DUMPS_DIR)/db.sql 2>/dev/null
 	@make -s reset
 
 restore:
-	@docker exec -i $(shell docker-compose ps -q gmysqldb) mysql -u"$(MYSQL_ROOT_USER)" -p"$(MYSQL_ROOT_PASSWORD)" < $(MYSQL_DUMPS_DIR)/db.sql 2>/dev/null
+	@docker exec -i $(shell docker-compose ps -q gmysqldb) mysql -u"$(DB_ROOT_USER)" -p"$(DB_ROOT_PASSWORD)" < $(DB_DUMPS_DIR)/db.sql 2>/dev/null
 
 test:
 	@docker-compose exec -T php ./public/include/vendor/bin/phpunit --configuration ./ --no-coverage
@@ -105,16 +103,9 @@ cover:
 	@docker-compose exec -T php ./public/include/vendor/bin/phpunit --configuration ./
 
 class:
-	@mkdir -p $(MYSQL_DUMPS_DIR)
-	@cp -f database/model/script.sql 														$(MYSQL_DUMPS_DIR)/script_no_trigger.sql
-	@perl -0777 -i.original -pe "s/USE \`GrandChef\`\\$$\\\$$\r?\n//igs" 					$(MYSQL_DUMPS_DIR)/script_no_trigger.sql
-	@perl -0777 -i.original -pe "s/USE \`GrandChef\`;\r?\n//igs" 							$(MYSQL_DUMPS_DIR)/script_no_trigger.sql
-	@perl -0777 -i.original -pe "s/END\\\$$\\\$$\r?\n/END \\\$$\\\$$/igs" 					$(MYSQL_DUMPS_DIR)/script_no_trigger.sql
-	@perl -0777 -i.original -pe "s/\`GrandChef\`\.//igs" 									$(MYSQL_DUMPS_DIR)/script_no_trigger.sql
-	@perl -0777 -i.original -pe "s/\r?\nDELIMITER \\\$$\\\$$.*?DELIMITER ;\r?\n\r?\n//igs" 	$(MYSQL_DUMPS_DIR)/script_no_trigger.sql
-	@perl -0777 -i.original -pe "s/' \/\* comment truncated \*\/ \/\*([^\*]+)\*\//\1'/igs"	$(MYSQL_DUMPS_DIR)/script_no_trigger.sql
-	@perl -0777 -i.original -pe "s/([^\\\\\][\\\\\])([^\\\\\'])/\1\\\\\\\\\2/igs"			$(MYSQL_DUMPS_DIR)/script_no_trigger.sql
-	@rm -f $(MYSQL_DUMPS_DIR)/script_no_trigger.sql.original
+	@mkdir -p $(DB_DUMPS_DIR)
+	@cp -f database/model/script.sql $(DB_DUMPS_DIR)/script_no_trigger.sql
+	@npm run fix-sql
 	@java -jar utils/SQLtoClass.jar -p utils/config.properties -t utils/template -o storage/app/generated
 
 reset:

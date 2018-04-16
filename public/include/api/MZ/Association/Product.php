@@ -1,23 +1,23 @@
 <?php
 /*
-	Copyright 2016 da MZ Software - MZ Desenvolvimento de Sistemas LTDA
-	Este arquivo é parte do programa GrandChef - Sistema para Gerenciamento de Churrascarias, Bares e Restaurantes.
-	O GrandChef é um software proprietário; você não pode redistribuí-lo e/ou modificá-lo.
-	DISPOSIÇÕES GERAIS
-	O cliente não deverá remover qualquer identificação do produto, avisos de direitos autorais,
-	ou outros avisos ou restrições de propriedade do GrandChef.
+    Copyright 2016 da MZ Software - MZ Desenvolvimento de Sistemas LTDA
+    Este arquivo é parte do programa GrandChef - Sistema para Gerenciamento de Churrascarias, Bares e Restaurantes.
+    O GrandChef é um software proprietário; você não pode redistribuí-lo e/ou modificá-lo.
+    DISPOSIÇÕES GERAIS
+    O cliente não deverá remover qualquer identificação do produto, avisos de direitos autorais,
+    ou outros avisos ou restrições de propriedade do GrandChef.
 
-	O cliente não deverá causar ou permitir a engenharia reversa, desmontagem,
-	ou descompilação do GrandChef.
+    O cliente não deverá causar ou permitir a engenharia reversa, desmontagem,
+    ou descompilação do GrandChef.
 
-	PROPRIEDADE DOS DIREITOS AUTORAIS DO PROGRAMA
+    PROPRIEDADE DOS DIREITOS AUTORAIS DO PROGRAMA
 
-	GrandChef é a especialidade do desenvolvedor e seus
-	licenciadores e é protegido por direitos autorais, segredos comerciais e outros direitos
-	de leis de propriedade.
+    GrandChef é a especialidade do desenvolvedor e seus
+    licenciadores e é protegido por direitos autorais, segredos comerciais e outros direitos
+    de leis de propriedade.
 
-	O Cliente adquire apenas o direito de usar o software e não adquire qualquer outros
-	direitos, expressos ou implícitos no GrandChef diferentes dos especificados nesta Licença.
+    O Cliente adquire apenas o direito de usar o software e não adquire qualquer outros
+    direitos, expressos ou implícitos no GrandChef diferentes dos especificados nesta Licença.
 */
 namespace MZ\Association;
 
@@ -213,7 +213,7 @@ class Product
         }
         $produto = $this->produtos[$codigo];
         $associado = \Produto::findByID(isset($produto['id'])?$produto['id']:$produto['codigo_pdv']);
-        if (is_null($associado->getID())) {
+        if (!$associado->exists()) {
             throw new \Exception('O produto informado não foi associado', 401);
         }
         if ($associado->getTipo() == Produto::TIPO_PRODUTO) {
@@ -314,13 +314,13 @@ class Product
                     }
                     $item = $subassociado->findProdutoID();
                 }
-                if (!is_null($item->getID())) {
+                if ($item->exists()) {
                     $associados++;
                 }
                 $produtos[$codigo]['itens'][$subcodigo]['associado'] = $item->toArray();
             }
             $status = '';
-            if (is_null($associado->getID())) {
+            if (!$associado->exists()) {
                 $status = 'empty';
             } elseif ($associado->getTipo() == Produto::TIPO_PRODUTO && count($produto['itens']) > 0) {
                 $status = 'error';
@@ -328,7 +328,7 @@ class Product
                 $status = 'incomplete';
             }
             $produtos[$codigo]['status'] = $status;
-            $produtos[$codigo]['icon'] = count($produto['itens']) > 0 && !is_null($associado->getID())?'edit':'save';
+            $produtos[$codigo]['icon'] = count($produto['itens']) > 0 && $associado->exists()?'edit':'save';
         }
         return $produtos;
     }

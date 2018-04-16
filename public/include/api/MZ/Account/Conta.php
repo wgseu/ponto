@@ -20,7 +20,7 @@
  * O Cliente adquire apenas o direito de usar o software e não adquire qualquer outros
  * direitos, expressos ou implícitos no GrandChef diferentes dos especificados nesta Licença.
  *
- * @author  Francimar Alves <mazinsw@gmail.com>
+ * @author Equipe GrandChef <desenvolvimento@mzsw.com.br>
  */
 namespace MZ\Account;
 
@@ -677,6 +677,53 @@ class Conta extends \MZ\Database\Helper
      */
     public function filter($original)
     {
+        // não deixa alterar esses dados
+        $conta->setID($old_conta->getID());
+        $conta->setFuncionarioID($old_conta->getFuncionarioID());
+        $conta->setPedidoID($old_conta->getPedidoID());
+        $conta->setCancelada($old_conta->getCancelada());
+
+        $conta->setValor(abs(moneyval($conta->getValor())));
+        $conta->setAcrescimo(abs(moneyval($conta->getAcrescimo())));
+        $conta->setMulta(abs(moneyval($conta->getMulta())));
+        if (intval($_POST['tipo']) < 0) {
+            $conta->setValor(-$conta->getValor());
+            $conta->setAcrescimo(-$conta->getAcrescimo());
+            $conta->setMulta(-$conta->getMulta());
+        }
+        $conta->setJuros(moneyval($conta->getJuros()) / 100.0);
+        $_vencimento = date_create_from_format('d/m/Y', $conta->getVencimento());
+        $conta->setVencimento($_vencimento===false?null:date_format($_vencimento, 'Y-m-d'));
+        $_data_emissao = date_create_from_format('d/m/Y', $conta->getDataEmissao());
+        $conta->setDataEmissao($_data_emissao===false?null:date_format($_data_emissao, 'Y-m-d'));
+        $_data_pagamento = date_create_from_format('d/m/Y', $conta->getDataPagamento());
+        $conta->setDataPagamento($_data_pagamento===false?null:date_format($_data_pagamento, 'Y-m-d'));
+        $anexocaminho = upload_document('raw_anexocaminho', 'conta');
+        if (!is_null($anexocaminho)) {
+            $conta->setAnexoCaminho($anexocaminho);
+        } elseif (trim($conta->getAnexoCaminho()) != '') { // evita sobrescrever
+            $conta->setAnexoCaminho($old_conta->getAnexoCaminho());
+        }
+
+        $conta->setCancelada('N');
+        $conta->setValor(abs(moneyval($conta->getValor())));
+        $conta->setAcrescimo(abs(moneyval($conta->getAcrescimo())));
+        $conta->setMulta(abs(moneyval($conta->getMulta())));
+        if (intval($_POST['tipo']) < 0) {
+            $conta->setValor(-$conta->getValor());
+            $conta->setAcrescimo(-$conta->getAcrescimo());
+            $conta->setMulta(-$conta->getMulta());
+        }
+        $conta->setJuros(moneyval($conta->getJuros()) / 100.0);
+        $_vencimento = date_create_from_format('d/m/Y', $conta->getVencimento());
+        $conta->setVencimento($_vencimento===false?null:date_format($_vencimento, 'Y-m-d'));
+        $_data_emissao = date_create_from_format('d/m/Y', $conta->getDataEmissao());
+        $conta->setDataEmissao($_data_emissao===false?null:date_format($_data_emissao, 'Y-m-d'));
+        $_data_pagamento = date_create_from_format('d/m/Y', $conta->getDataPagamento());
+        $conta->setDataPagamento($_data_pagamento===false?null:date_format($_data_pagamento, 'Y-m-d'));
+        $anexocaminho = upload_document('raw_anexocaminho', 'conta');
+        $conta->setAnexoCaminho($anexocaminho);
+
         $this->setID($original->getID());
         $this->setClassificacaoID(Filter::number($this->getClassificacaoID()));
         $this->setFuncionarioID(Filter::number($this->getFuncionarioID()));
@@ -702,6 +749,19 @@ class Conta extends \MZ\Database\Helper
      */
     public function clean($dependency)
     {
+        global $app;
+
+        // exclui o documento antigo
+        if (!is_null($old_conta->getAnexoCaminho()) &&
+            $conta->getAnexoCaminho() != $old_conta->getAnexoCaminho() && !is_local_path($old_conta->getAnexoCaminho())) {
+            unlink($app->getPath('public') . get_document_url($old_conta->getAnexoCaminho(), 'conta'));
+        }
+        // exclui o documento enviado
+        if (!is_null($conta->getAnexoCaminho()) &&
+            $old_conta->getAnexoCaminho() != $conta->getAnexoCaminho()) {
+            unlink($app->getPath('public') . get_document_url($conta->getAnexoCaminho(), 'conta'));
+        }
+        $conta->setAnexoCaminho($old_conta->getAnexoCaminho());
     }
 
     /**
@@ -760,14 +820,6 @@ class Conta extends \MZ\Database\Helper
      */
     protected function translate($e)
     {
-        if (stripos($e->getMessage(), 'PRIMARY') !== false) {
-            return new \MZ\Exception\ValidationException([
-                'id' => sprintf(
-                    'O id "%s" já está cadastrado',
-                    $this->getID()
-                ),
-            ]);
-        }
         return parent::translate($e);
     }
 
@@ -791,23 +843,24 @@ class Conta extends \MZ\Database\Helper
 
     /**
      * Update Conta with instance values into database for ID
+     * @param  array $only Save these fields only, when empty save all fields except id
+     * @param  boolean $except When true, saves all fields except $only
      * @return Conta Self instance
      */
-    public function update()
+    public function update($only = [], $except = false)
     {
         $values = $this->validate();
         if (!$this->exists()) {
             throw new \Exception('O identificador da conta não foi informado');
         }
-        unset($values['id']);
+        $values = self::filterValues($values, $only, $except);
         try {
             self::getDB()
                 ->update('Contas')
                 ->set($values)
                 ->where('id', $this->getID())
                 ->execute();
-            $conta = self::findByID($this->getID());
-            $this->fromArray($conta->toArray());
+            $this->loadByID($this->getID());
         } catch (\Exception $e) {
             throw $this->translate($e);
         }
@@ -841,18 +894,6 @@ class Conta extends \MZ\Database\Helper
         $query = self::query($condition, $order)->limit(1);
         $row = $query->fetch() ?: [];
         return $this->fromArray($row);
-    }
-
-    /**
-     * Load into this object from database using, ID
-     * @param  int $id id to find Conta
-     * @return Conta Self filled instance or empty when not found
-     */
-    public function loadByID($id)
-    {
-        return $this->load([
-            'id' => intval($id),
-        ]);
     }
 
     /**

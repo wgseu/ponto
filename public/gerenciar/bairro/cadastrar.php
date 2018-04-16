@@ -22,9 +22,10 @@
 require_once(dirname(__DIR__) . '/app.php');
 
 use MZ\Location\Bairro;
+use MZ\System\Permissao;
 
-need_permission(\Permissao::NOME_CADASTROBAIRROS, is_output('json'));
-$id = isset($_GET['id'])?$_GET['id']:null;
+need_permission(Permissao::NOME_CADASTROBAIRROS, is_output('json'));
+$id = isset($_GET['id']) ? $_GET['id'] : null;
 $bairro = Bairro::findByID($id);
 $bairro->setID(null);
 
@@ -38,7 +39,7 @@ if (is_post()) {
         $bairro->save();
         $old_bairro->clean($bairro);
         $msg = sprintf(
-            'Bairro "%s" atualizado com sucesso!',
+            'Bairro "%s" cadastrado com sucesso!',
             $bairro->getNome()
         );
         if (is_output('json')) {
@@ -64,7 +65,7 @@ if (is_post()) {
     json('Nenhum dado foi enviado');
 }
 if (is_null($bairro->getCidadeID())) {
-    $bairro->setCidadeID($__cidade__->getID());
+    $bairro->setCidadeID($app->getSystem()->getCity()->getID());
 }
 $cidade = $bairro->findCidadeID();
 $estado = $cidade->findEstadoID();
@@ -78,4 +79,4 @@ if ($estado->exists()) {
 }
 $_estados = \MZ\Location\Estado::findAll(['paisid' => $pais->getID()]);
 
-include template('gerenciar_bairro_cadastrar');
+$app->getResponse('html')->output('gerenciar_bairro_cadastrar');

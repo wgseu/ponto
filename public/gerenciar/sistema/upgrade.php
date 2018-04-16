@@ -1,6 +1,9 @@
 <?php
 require_once(dirname(dirname(__DIR__)) . '/app.php'); // main app file
 
+use MZ\System\Permissao;
+use MZ\Product\Produto;
+
 need_permission(Permissao::NOME_ALTERARCONFIGURACOES, true);
 
 try {
@@ -11,12 +14,12 @@ try {
         if (is_null($produto->getImagem())) {
             continue;
         }
-        $imagem = Produto::getImagemPeloID($produto->getID());
-        $imagebytes = $imagem['imagem'];
+        $produto->loadImagem();
+        $imagebytes = $produto->getImagem();
         $name = $produto->getDescricao().'.png';
         $name = iconv("UTF-8//IGNORE", "WINDOWS-1252//IGNORE", $name);
         $type = 'produto';
-        $dir = IMG_ROOT . '/' . $type . '/';
+        $dir = $app->getPath('image') . '/' . $type . '/';
         $name = generate_file_name($dir, '.png', $name, true);
         $path = $dir . $name;
         file_put_contents($path, $imagebytes);
@@ -26,6 +29,6 @@ try {
     }
     $outputs['produtos'] = $products;
     json(null, $outputs);
-} catch (Exception $e) {
+} catch (\Exception $e) {
     json($e->getMessage());
 }

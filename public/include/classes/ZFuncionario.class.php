@@ -1,24 +1,27 @@
 <?php
-/*
-	Copyright 2014 da MZ Software - MZ Desenvolvimento de Sistemas LTDA
-	Este arquivo é parte do programa GrandChef - Sistema para Gerenciamento de Churrascarias, Bares e Restaurantes.
-	O GrandChef é um software proprietário; você não pode redistribuí-lo e/ou modificá-lo.
-	DISPOSIÇÕES GERAIS
-	O cliente não deverá remover qualquer identificação do produto, avisos de direitos autorais,
-	ou outros avisos ou restrições de propriedade do GrandChef.
-
-	O cliente não deverá causar ou permitir a engenharia reversa, desmontagem,
-	ou descompilação do GrandChef.
-
-	PROPRIEDADE DOS DIREITOS AUTORAIS DO PROGRAMA
-
-	GrandChef é a especialidade do desenvolvedor e seus
-	licenciadores e é protegido por direitos autorais, segredos comerciais e outros direitos
-	de leis de propriedade.
-
-	O Cliente adquire apenas o direito de usar o software e não adquire qualquer outros
-	direitos, expressos ou implícitos no GrandChef diferentes dos especificados nesta Licença.
-*/
+/**
+ * Copyright 2014 da MZ Software - MZ Desenvolvimento de Sistemas LTDA
+ *
+ * Este arquivo é parte do programa GrandChef - Sistema para Gerenciamento de Churrascarias, Bares e Restaurantes.
+ * O GrandChef é um software proprietário; você não pode redistribuí-lo e/ou modificá-lo.
+ * DISPOSIÇÕES GERAIS
+ * O cliente não deverá remover qualquer identificação do produto, avisos de direitos autorais,
+ * ou outros avisos ou restrições de propriedade do GrandChef.
+ *
+ * O cliente não deverá causar ou permitir a engenharia reversa, desmontagem,
+ * ou descompilação do GrandChef.
+ *
+ * PROPRIEDADE DOS DIREITOS AUTORAIS DO PROGRAMA
+ *
+ * GrandChef é a especialidade do desenvolvedor e seus
+ * licenciadores e é protegido por direitos autorais, segredos comerciais e outros direitos
+ * de leis de propriedade.
+ *
+ * O Cliente adquire apenas o direito de usar o software e não adquire qualquer outros
+ * direitos, expressos ou implícitos no GrandChef diferentes dos especificados nesta Licença.
+ *
+ * @author Equipe GrandChef <desenvolvimento@mzsw.com.br>
+ */
 
 /**
  * Funcionário que trabalha na empresa e possui uma determinada função
@@ -326,20 +329,20 @@ class ZFuncionario
         }
         $funcionario['datacadastro'] = date('Y-m-d H:i:s');
         if (!empty($erros)) {
-            throw new ValidationException($erros);
+            throw new \MZ\Exception\ValidationException($erros);
         }
     }
 
     private static function handleException(&$e)
     {
         if (stripos($e->getMessage(), 'PRIMARY') !== false) {
-            throw new ValidationException(['id' => 'O ID informado já está cadastrado']);
+            throw new \MZ\Exception\ValidationException(['id' => 'O ID informado já está cadastrado']);
         }
         if (stripos($e->getMessage(), 'UK_ClienteID') !== false) {
-            throw new ValidationException(['clienteid' => 'O cliente informado já é um funcionário']);
+            throw new \MZ\Exception\ValidationException(['clienteid' => 'O cliente informado já é um funcionário']);
         }
-        if (stripos($e->getMessage(), 'CodigoBarras_UNIQUE') !== false) {
-            throw new ValidationException(['codigobarras' => 'O código de barras informado já está cadastrado']);
+        if (contains(['CodigoBarras', 'UNIQUE'], $e->getMessage())) {
+            throw new \MZ\Exception\ValidationException(['codigobarras' => 'O código de barras informado já está cadastrado']);
         }
     }
 
@@ -349,7 +352,7 @@ class ZFuncionario
         self::validarCampos($_funcionario);
         try {
             $_funcionario['id'] = \DB::$pdo->insertInto('Funcionarios')->values($_funcionario)->execute();
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             self::handleException($e);
             throw $e;
         }
@@ -360,7 +363,7 @@ class ZFuncionario
     {
         $_funcionario = $funcionario->toArray();
         if (!$_funcionario['id']) {
-            throw new ValidationException(['id' => 'O id do funcionário não foi informado']);
+            throw new \MZ\Exception\ValidationException(['id' => 'O id do funcionário não foi informado']);
         }
         self::validarCampos($_funcionario);
         $campos = [
@@ -378,7 +381,7 @@ class ZFuncionario
             $query = $query->set(array_intersect_key($_funcionario, array_flip($campos)));
             $query = $query->where('id', $_funcionario['id']);
             $query->execute();
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             self::handleException($e);
             throw $e;
         }
@@ -387,10 +390,10 @@ class ZFuncionario
 
     public static function excluir($funcionario)
     {
-        if (is_null($funcionario->getID())) {
+        if (!$funcionario->exists()) {
             throw new \Exception('Não foi possível excluir o funcionário, o id do funcionário não foi informado');
         }
-        if (have_permission(Permissao::NOME_CADASTROFUNCIONARIOS, $funcionario) && !is_owner()) {
+        if ($funcionario->has(Permissao::NOME_CADASTROFUNCIONARIOS) && !is_owner()) {
             throw new \Exception('Você não tem permissão para excluir esse funcionário!');
         }
         if (is_self($funcionario)) {

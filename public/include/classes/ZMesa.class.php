@@ -1,24 +1,27 @@
 <?php
-/*
-	Copyright 2014 da MZ Software - MZ Desenvolvimento de Sistemas LTDA
-	Este arquivo é parte do programa GrandChef - Sistema para Gerenciamento de Churrascarias, Bares e Restaurantes.
-	O GrandChef é um software proprietário; você não pode redistribuí-lo e/ou modificá-lo.
-	DISPOSIÇÕES GERAIS
-	O cliente não deverá remover qualquer identificação do produto, avisos de direitos autorais,
-	ou outros avisos ou restrições de propriedade do GrandChef.
-
-	O cliente não deverá causar ou permitir a engenharia reversa, desmontagem,
-	ou descompilação do GrandChef.
-
-	PROPRIEDADE DOS DIREITOS AUTORAIS DO PROGRAMA
-
-	GrandChef é a especialidade do desenvolvedor e seus
-	licenciadores e é protegido por direitos autorais, segredos comerciais e outros direitos
-	de leis de propriedade.
-
-	O Cliente adquire apenas o direito de usar o software e não adquire qualquer outros
-	direitos, expressos ou implícitos no GrandChef diferentes dos especificados nesta Licença.
-*/
+/**
+ * Copyright 2014 da MZ Software - MZ Desenvolvimento de Sistemas LTDA
+ *
+ * Este arquivo é parte do programa GrandChef - Sistema para Gerenciamento de Churrascarias, Bares e Restaurantes.
+ * O GrandChef é um software proprietário; você não pode redistribuí-lo e/ou modificá-lo.
+ * DISPOSIÇÕES GERAIS
+ * O cliente não deverá remover qualquer identificação do produto, avisos de direitos autorais,
+ * ou outros avisos ou restrições de propriedade do GrandChef.
+ *
+ * O cliente não deverá causar ou permitir a engenharia reversa, desmontagem,
+ * ou descompilação do GrandChef.
+ *
+ * PROPRIEDADE DOS DIREITOS AUTORAIS DO PROGRAMA
+ *
+ * GrandChef é a especialidade do desenvolvedor e seus
+ * licenciadores e é protegido por direitos autorais, segredos comerciais e outros direitos
+ * de leis de propriedade.
+ *
+ * O Cliente adquire apenas o direito de usar o software e não adquire qualquer outros
+ * direitos, expressos ou implícitos no GrandChef diferentes dos especificados nesta Licença.
+ *
+ * @author Equipe GrandChef <desenvolvimento@mzsw.com.br>
+ */
 class ZMesa
 {
     
@@ -158,14 +161,14 @@ class ZMesa
             $erros['ativa'] = 'O estado de ativação da mesa não é válido';
         }
         $old_mesa = self::findByID($mesa['id']);
-        if (!is_null($old_mesa->getID()) && $old_mesa->isAtiva() && $mesa['ativa'] == 'N') {
+        if ($old_mesa->exists() && $old_mesa->isAtiva() && $mesa['ativa'] == 'N') {
             $pedido = Pedido::getPelaMesaID($old_mesa->getID());
-            if (!is_null($pedido->getID())) {
+            if ($pedido->exists()) {
                 $erros['ativa'] = 'A mesa não pode ser desativada porque possui um pedido em aberto';
             }
         }
         if (!empty($erros)) {
-            throw new ValidationException($erros);
+            throw new \MZ\Exception\ValidationException($erros);
         }
         // extra
         unset($mesa['estado']);
@@ -176,10 +179,10 @@ class ZMesa
     private static function handleException(&$e)
     {
         if (stripos($e->getMessage(), 'PRIMARY') !== false) {
-            throw new ValidationException(['id' => 'O ID informado já está cadastrado']);
+            throw new \MZ\Exception\ValidationException(['id' => 'O ID informado já está cadastrado']);
         }
-        if (stripos($e->getMessage(), 'Nome_UNIQUE') !== false) {
-            throw new ValidationException(['nome' => 'O nome informado já está cadastrado']);
+        if (contains(['Nome', 'UNIQUE'], $e->getMessage())) {
+            throw new \MZ\Exception\ValidationException(['nome' => 'O nome informado já está cadastrado']);
         }
     }
 
@@ -189,7 +192,7 @@ class ZMesa
         self::validarCampos($_mesa);
         try {
             $_mesa['id'] = \DB::$pdo->insertInto('Mesas')->values($_mesa)->execute();
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             self::handleException($e);
             throw $e;
         }
@@ -200,7 +203,7 @@ class ZMesa
     {
         $_mesa = $mesa->toArray();
         if (!$_mesa['id']) {
-            throw new ValidationException(['id' => 'O id da mesa não foi informado']);
+            throw new \MZ\Exception\ValidationException(['id' => 'O id da mesa não foi informado']);
         }
         self::validarCampos($_mesa);
         $campos = [
@@ -212,7 +215,7 @@ class ZMesa
             $query = $query->set(array_intersect_key($_mesa, array_flip($campos)));
             $query = $query->where('id', $_mesa['id']);
             $query->execute();
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             self::handleException($e);
             throw $e;
         }

@@ -66,7 +66,7 @@
 <!--${$_fornecedor = $estoque->findFornecedorID()}-->
 <!--${$_empresa = $_fornecedor->findEmpresaID()}-->
 								<td class="product-cell">
-<!--{if !is_null($_fornecedor->getID())}-->
+<!--{if $_fornecedor->exists()}-->
 									<strong><a href="/gerenciar/fornecedor/editar?id={$_fornecedor->getID()}" title="Editar fornecedor '{$_empresa->getNomeCompleto()}'"><img src="${get_image_url($_empresa->getImagem(), 'cliente', 'empresa.png')}" height="48" alt="Foto" title="Foto"/>{$_empresa->getNomeCompleto()}</a></strong>
 <!--{/if}-->
 <!--${$_setor = $estoque->findSetorID()}-->

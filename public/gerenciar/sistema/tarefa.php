@@ -1,7 +1,8 @@
 <?php
-require_once(dirname(dirname(__DIR__)) . '/app.php');
+require_once(dirname(dirname(__DIR__)) . '/app.php'); // main app file
 
 use MZ\Task\Runner;
+use MZ\System\Permissao;
 
 define('TASK_TOKEN', 'WWHxIdzDakrea921zGveQkKccrf80mDp');
 
@@ -22,6 +23,6 @@ try {
         ]
     );
 } catch (\Exception $e) {
-    Log::error($e->getMessage());
+    \Log::error($e->getMessage());
     json($e->getMessage());
 }

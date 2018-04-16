@@ -22,12 +22,13 @@
 require_once(dirname(__DIR__) . '/app.php');
 
 use MZ\Location\Cidade;
+use MZ\System\Permissao;
 
-need_permission(\Permissao::NOME_CADASTROCIDADES, is_output('json'));
-$id = isset($_GET['id'])?$_GET['id']:null;
+need_permission(Permissao::NOME_CADASTROCIDADES, is_output('json'));
+$id = isset($_GET['id']) ? $_GET['id'] : null;
 $cidade = Cidade::findByID($id);
 if (!$cidade->exists()) {
-    $msg = 'Não existe Cidade com o ID informado!';
+    $msg = 'A cidade não foi informada ou não existe!';
     if (is_output('json')) {
         json($msg);
     }
@@ -80,4 +81,4 @@ if ($_estado->exists()) {
     $pais = new \MZ\Location\Pais();
 }
 $_estados = \MZ\Location\Estado::findAll();
-include template('gerenciar_cidade_editar');
+$app->getResponse('html')->output('gerenciar_cidade_editar');

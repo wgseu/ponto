@@ -20,7 +20,7 @@
  * O Cliente adquire apenas o direito de usar o software e não adquire qualquer outros
  * direitos, expressos ou implícitos no GrandChef diferentes dos especificados nesta Licença.
  *
- * @author  Francimar Alves <mazinsw@gmail.com>
+ * @author Equipe GrandChef <desenvolvimento@mzsw.com.br>
  */
 namespace MZ\Location;
 
@@ -427,15 +427,7 @@ class Pais extends \MZ\Database\Helper
      */
     protected function translate($e)
     {
-        if (stripos($e->getMessage(), 'PRIMARY') !== false) {
-            return new \MZ\Exception\ValidationException([
-                'id' => vsprintf(
-                    'O ID "%s" já está cadastrado',
-                    [$this->getID()]
-                ),
-            ]);
-        }
-        if (stripos($e->getMessage(), 'Nome_UNIQUE') !== false) {
+        if (contains(['Nome', 'UNIQUE'], $e->getMessage())) {
             return new \MZ\Exception\ValidationException([
                 'nome' => vsprintf(
                     'O Nome "%s" já está cadastrado',
@@ -443,7 +435,7 @@ class Pais extends \MZ\Database\Helper
                 ),
             ]);
         }
-        if (stripos($e->getMessage(), 'Sigla_UNIQUE') !== false) {
+        if (contains(['Sigla', 'UNIQUE'], $e->getMessage())) {
             return new \MZ\Exception\ValidationException([
                 'sigla' => vsprintf(
                     'A Sigla "%s" já está cadastrada',
@@ -451,7 +443,7 @@ class Pais extends \MZ\Database\Helper
                 ),
             ]);
         }
-        if (stripos($e->getMessage(), 'Codigo_UNIQUE') !== false) {
+        if (contains(['Codigo', 'UNIQUE'], $e->getMessage())) {
             return new \MZ\Exception\ValidationException([
                 'codigo' => vsprintf(
                     'O Código "%s" já está cadastrado',
@@ -615,39 +607,28 @@ class Pais extends \MZ\Database\Helper
 
     /**
      * Update País with instance values into database for ID
+     * @param  array $only Save these fields only, when empty save all fields except id
+     * @param  boolean $except When true, saves all fields except $only
      * @return Pais Self instance
      */
-    public function update()
+    public function update($only = [], $except = false)
     {
         $values = $this->validate();
         if (!$this->exists()) {
             throw new \Exception('O identificador do país não foi informado');
         }
-        unset($values['id']);
+        $values = self::filterValues($values, $only, $except);
         try {
             self::getDB()
                 ->update('Paises')
                 ->set($values)
                 ->where('id', $this->getID())
                 ->execute();
-            $pais = self::findByID($this->getID());
-            $this->fromArray($pais->toArray());
+            $this->loadByID($this->getID());
         } catch (\Exception $e) {
             throw $this->translate($e);
         }
         return $this;
-    }
-
-    /**
-     * Save the País into the database
-     * @return Pais Self instance
-     */
-    public function save()
-    {
-        if ($this->exists()) {
-            return $this->update();
-        }
-        return $this->insert();
     }
 
     /**
@@ -664,6 +645,55 @@ class Pais extends \MZ\Database\Helper
             ->where('id', $this->getID())
             ->execute();
         return $result;
+    }
+
+    /**
+     * Load one register for it self with a condition
+     * @param  array $condition Condition for searching the row
+     * @param  array $order associative field name -> [-1, 1]
+     * @return Pais Self instance filled or empty
+     */
+    public function load($condition, $order = [])
+    {
+        $query = self::query($condition, $order)->limit(1);
+        $row = $query->fetch() ?: [];
+        return $this->fromArray($row);
+    }
+
+    /**
+     * Load into this object from database using, Nome
+     * @param  string $nome nome to find País
+     * @return Pais Self filled instance or empty when not found
+     */
+    public function loadByNome($nome)
+    {
+        return $this->load([
+            'nome' => strval($nome),
+        ]);
+    }
+
+    /**
+     * Load into this object from database using, Sigla
+     * @param  string $sigla sigla to find País
+     * @return Pais Self filled instance or empty when not found
+     */
+    public function loadBySigla($sigla)
+    {
+        return $this->load([
+            'sigla' => strval($sigla),
+        ]);
+    }
+
+    /**
+     * Load into this object from database using, Codigo
+     * @param  string $codigo código to find País
+     * @return Pais Self filled instance or empty when not found
+     */
+    public function loadByCodigo($codigo)
+    {
+        return $this->load([
+            'codigo' => strval($codigo),
+        ]);
     }
 
     /**

@@ -22,22 +22,23 @@
 require_once(dirname(__DIR__) . '/app.php');
 
 use MZ\System\Integracao;
+use MZ\System\Permissao;
 
-need_permission(\Permissao::NOME_ALTERARCONFIGURACOES, true);
+need_permission(Permissao::NOME_ALTERARCONFIGURACOES, true);
 if (!is_post()) {
     json('Nenhum dado foi enviado');
 }
 $id = isset($_POST['id'])?$_POST['id']:null;
 $integracao = Integracao::findByID($id);
 if (!$integracao->exists()) {
-    $msg = 'Não existe Integração com o ID informado!';
+    $msg = 'A integração não foi informada ou não existe';
     json($msg);
 }
 $old_integracao = $integracao;
-    $integracao = new Integracao($_POST);
 try {
+    $integracao = new Integracao($_POST);
     $integracao->filter($old_integracao);
-    $integracao->save();
+    $integracao->save(array_keys($_POST));
     $old_integracao->clean($integracao);
     $msg = sprintf(
         'Integração "%s" atualizada com sucesso!',
@@ -47,7 +48,7 @@ try {
 } catch (\Exception $e) {
     $integracao->clean($old_integracao);
     $errors = [];
-    if ($e instanceof \ValidationException) {
+    if ($e instanceof \MZ\Exception\ValidationException) {
         $errors = $e->getErrors();
     }
     json($e->getMessage(), null, ['errors' => $errors]);

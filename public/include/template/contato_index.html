@@ -1,6 +1,6 @@
 <!--{include header}-->
-    <script type="text/javascript">$(function(){$('#' + '{$fieldfocus}').focus();});</script>
-<!--{if !is_login() || is_null($login_cliente->getEmail())}-->
+    <script type="text/javascript">$(function(){$('#' + '{$focusctrl}').focus();});</script>
+<!--{if !is_login() || is_null(logged_user()->getEmail())}-->
     <!--${$col = array(
         'col-md-6',
         'col-md-6',
@@ -24,21 +24,21 @@
                     <form name="contato" id="contato-form" method="post" action="/contato/">
                         <div class="row">
                             <div class="{$col[0]}">
-<!--{if !is_login() || is_null($login_cliente->getEmail())}-->
+<!--{if !is_login() || is_null(logged_user()->getEmail())}-->
                                 <div class="form-group">
-                                    <input type="text" class="form-control" placeholder="Seu nome *" id="nome" name="nome" value="${$_POST['nome'] ?: $login_cliente->getNomeCompleto()}">
+                                    <input type="text" class="form-control" placeholder="Seu nome *" id="nome" name="nome" value="${\MZ\Util\Filter::input($_POST, 'nome') ?: logged_user()->getNomeCompleto()}">
                                 </div>
                                 <div class="form-group">
-                                    <input type="email" class="form-control" placeholder="Seu E-mail *" id="email" name="email" value="{$_POST['email']}">
+                                    <input type="email" class="form-control" placeholder="Seu E-mail *" id="email" name="email" value="${\MZ\Util\Filter::input($_POST, 'email')}">
                                 </div>
 <!--{/if}-->
                                 <div class="form-group">
-                                    <input type="text" class="form-control" placeholder="Assunto *" id="assunto" name="assunto" value="{$_POST['assunto']}">
+                                    <input type="text" class="form-control" placeholder="Assunto *" id="assunto" name="assunto" value="${\MZ\Util\Filter::input($_POST, 'assunto')}">
                                 </div>
                             </div>
                             <div class="{$col[1]}">
                                 <div class="form-group">
-                                    <textarea class="form-control" placeholder="Sua Mensagem *" id="mensagem" name="mensagem">${strip_tags($_POST['mensagem'])}</textarea>
+                                    <textarea class="form-control" placeholder="Sua Mensagem *" id="mensagem" name="mensagem">${strip_tags(isset($_POST['mensagem']) ? $_POST['mensagem'] : null)}</textarea>
                                 </div>
                             </div>
                             <div class="clearfix"></div>

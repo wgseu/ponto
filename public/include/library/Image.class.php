@@ -56,7 +56,7 @@ class Image
             $layer->resizeInPixel($width, $height, true, 0, 0, 'MM');
             $layer->save(dirname($destFile), basename($destFile), false, null, self::SAVE_QUALITY);
             return true;
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             return false;
         }
     }
@@ -76,7 +76,7 @@ class Image
             $stringdata = ob_get_contents(); // read from buffer
             ob_end_clean(); // delete buffer
             return base64_encode($stringdata);
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             return null;
         }
     }

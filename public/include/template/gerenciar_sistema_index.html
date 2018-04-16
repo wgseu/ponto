@@ -12,11 +12,11 @@
 					</div>
 				</div>
 				<div class="x_content">
-					<form id="cliente-form" class="form-horizontal form-label-left" method="post" action="/gerenciar/cliente/${!is_null($cliente->getID())?'editar?id='.$cliente->getID().'&':'cadastrar?sistema=1'}" enctype="multipart/form-data" data-cliente-id="{$cliente->getID()}">
+					<form id="cliente-form" class="form-horizontal form-label-left" method="post" action="/gerenciar/cliente/${$cliente->exists()?'editar?id='.$cliente->getID().'&':'cadastrar?sistema=1'}" enctype="multipart/form-data" data-cliente-id="{$cliente->getID()}">
 						<span class="section col-md-12 col-sm-12 col-xs-12">Empresa</span>
 <!--{include form_cliente}-->
 					</form>
-					<form id="localizacao-form" class="form-horizontal form-label-left" method="post" action="/gerenciar/localizacao/${!is_null($localizacao->getID())?'editar?id='.$localizacao->getID():'cadastrar'}">
+					<form id="localizacao-form" class="form-horizontal form-label-left" method="post" action="/gerenciar/localizacao/${$localizacao->exists()?'editar?id='.$localizacao->getID():'cadastrar'}">
 						<span class="section col-md-12 col-sm-12 col-xs-12">Endereço</span>
 <!--{include form_localizacao}-->
 					</form>

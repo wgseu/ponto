@@ -24,7 +24,9 @@
         "mazinsw/nfe-api": "@stable",
         "phpoffice/phpexcel": "@stable",
         "setasign/fpdf": "1.8.1",
-        "php-curl-class/php-curl-class": "^8.0"
+        "php-curl-class/php-curl-class": "^8.0",
+        "vlucas/phpdotenv": "^2.4",
+        "ircmaxell/password-compat": "^1.0"
     },
     "require-dev": {
         "phpunit/phpunit": "^4.8|^5.0",
@@ -43,9 +45,7 @@
         ],
         "files": [
             "public/include/function/common.php",
-            "public/include/function/configure.php",
-            "public/include/function/mailer.php",
-            "public/include/function/template.php"
+            "public/include/function/mailer.php"
         ]
     },
     "scripts": {

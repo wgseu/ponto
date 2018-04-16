@@ -20,7 +20,7 @@
  * O Cliente adquire apenas o direito de usar o software e não adquire qualquer outros
  * direitos, expressos ou implícitos no GrandChef diferentes dos especificados nesta Licença.
  *
- * @author  Francimar Alves <mazinsw@gmail.com>
+ * @author Equipe GrandChef <desenvolvimento@mzsw.com.br>
  */
 namespace MZ\Payment;
 
@@ -426,17 +426,28 @@ class Cartao extends \MZ\Database\Helper
         if (is_null($this->getDescricao())) {
             $errors['descricao'] = 'A descrição não pode ser vazia';
         }
+        if ($this->getImageIndex() < 0 || $this->getImageIndex() > count(self::getImages())) {
+            $errors['imageindex'] = 'O índice da imagem não é válido';
+        }
         if (is_null($this->getMensalidade())) {
             $errors['mensalidade'] = 'A mensalidade não pode ser vazia';
+        } elseif ($this->getMensalidade() < 0) {
+            $errors['mensalidade'] = 'A mensalidade não pode ser negativa';
         }
         if (is_null($this->getTransacao())) {
             $errors['transacao'] = 'A transação não pode ser vazia';
+        } elseif ($this->getTransacao() < 0) {
+            $errors['transacao'] = 'O valor da transação não pode ser negativo';
         }
         if (is_null($this->getTaxa())) {
             $errors['taxa'] = 'A taxa não pode ser vazia';
+        } elseif ($this->getTaxa() < 0) {
+            $errors['taxa'] = 'A taxa não pode ser negativa';
         }
         if (is_null($this->getDiasRepasse())) {
             $errors['diasrepasse'] = 'O dias para repasse não pode ser vazio';
+        } elseif ($this->getDiasRepasse() < 0) {
+            $errors['diasrepasse'] = 'Os dias para repasse não pode ser negativo';
         }
         if (is_null($this->getAtivo())) {
             $errors['ativo'] = 'O ativo não pode ser vazio';
@@ -457,15 +468,7 @@ class Cartao extends \MZ\Database\Helper
      */
     protected function translate($e)
     {
-        if (stripos($e->getMessage(), 'PRIMARY') !== false) {
-            return new \MZ\Exception\ValidationException([
-                'id' => sprintf(
-                    'O id "%s" já está cadastrado',
-                    $this->getID()
-                ),
-            ]);
-        }
-        if (stripos($e->getMessage(), 'Descricao_UNIQUE') !== false) {
+        if (contains(['Descricao', 'UNIQUE'], $e->getMessage())) {
             return new \MZ\Exception\ValidationException([
                 'descricao' => sprintf(
                     'A descrição "%s" já está cadastrada',
@@ -496,23 +499,24 @@ class Cartao extends \MZ\Database\Helper
 
     /**
      * Update Cartão with instance values into database for ID
+     * @param  array $only Save these fields only, when empty save all fields except id
+     * @param  boolean $except When true, saves all fields except $only
      * @return Cartao Self instance
      */
-    public function update()
+    public function update($only = [], $except = false)
     {
         $values = $this->validate();
         if (!$this->exists()) {
             throw new \Exception('O identificador do cartão não foi informado');
         }
-        unset($values['id']);
+        $values = self::filterValues($values, $only, $except);
         try {
             self::getDB()
                 ->update('Cartoes')
                 ->set($values)
                 ->where('id', $this->getID())
                 ->execute();
-            $cartao = self::findByID($this->getID());
-            $this->fromArray($cartao->toArray());
+            $this->loadByID($this->getID());
         } catch (\Exception $e) {
             throw $this->translate($e);
         }
@@ -546,18 +550,6 @@ class Cartao extends \MZ\Database\Helper
         $query = self::query($condition, $order)->limit(1);
         $row = $query->fetch() ?: [];
         return $this->fromArray($row);
-    }
-
-    /**
-     * Load into this object from database using, ID
-     * @param  int $id id to find Cartão
-     * @return Cartao Self filled instance or empty when not found
-     */
-    public function loadByID($id)
-    {
-        return $this->load([
-            'id' => intval($id),
-        ]);
     }
 
     /**
@@ -647,6 +639,7 @@ class Cartao extends \MZ\Database\Helper
         $query = self::getDB()->from('Cartoes c');
         $condition = self::filterCondition($condition);
         $query = self::buildOrderBy($query, self::filterOrder($order));
+        $query = $query->orderBy('c.ativo ASC');
         $query = $query->orderBy('c.descricao ASC');
         $query = $query->orderBy('c.id ASC');
         return self::buildCondition($query, $condition);
@@ -663,6 +656,23 @@ class Cartao extends \MZ\Database\Helper
         $query = self::query($condition, $order)->limit(1);
         $row = $query->fetch() ?: [];
         return new Cartao($row);
+    }
+
+    public static function getImages()
+    {
+        return [
+            1 => ['id' => 1, 'name' => 'Credishop'],
+            2 => ['id' => 2, 'name' => 'Hipercard'],
+            3 => ['id' => 3, 'name' => 'Visa'],
+            4 => ['id' => 4, 'name' => 'MasterCard'],
+            5 => ['id' => 5, 'name' => 'American Express'],
+            6 => ['id' => 6, 'name' => 'Diners Club'],
+            7 => ['id' => 7, 'name' => 'Elo'],
+            8 => ['id' => 8, 'name' => 'Sodexo'],
+            9 => ['id' => 9, 'name' => 'Maestro'],
+            10 => ['id' => 10, 'name' => 'Ticket'],
+            11 => ['id' => 11, 'name' => 'Visa Electron'],
+        ];
     }
 
     /**

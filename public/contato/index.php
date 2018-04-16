@@ -1,44 +1,47 @@
 <?php
-/*
-	Copyright 2014 da MZ Software - MZ Desenvolvimento de Sistemas LTDA
-	Este arquivo é parte do programa GrandChef - Sistema para Gerenciamento de Churrascarias, Bares e Restaurantes.
-	O GrandChef é um software proprietário; você não pode redistribuí-lo e/ou modificá-lo.
-	DISPOSIÇÕES GERAIS
-	O cliente não deverá remover qualquer identificação do produto, avisos de direitos autorais,
-	ou outros avisos ou restrições de propriedade do GrandChef.
-
-	O cliente não deverá causar ou permitir a engenharia reversa, desmontagem,
-	ou descompilação do GrandChef.
-
-	PROPRIEDADE DOS DIREITOS AUTORAIS DO PROGRAMA
-
-	GrandChef é a especialidade do desenvolvedor e seus
-	licenciadores e é protegido por direitos autorais, segredos comerciais e outros direitos
-	de leis de propriedade.
-
-	O Cliente adquire apenas o direito de usar o software e não adquire qualquer outros
-	direitos, expressos ou implícitos no GrandChef diferentes dos especificados nesta Licença.
-*/
+/**
+ * Copyright 2014 da MZ Software - MZ Desenvolvimento de Sistemas LTDA
+ *
+ * Este arquivo é parte do programa GrandChef - Sistema para Gerenciamento de Churrascarias, Bares e Restaurantes.
+ * O GrandChef é um software proprietário; você não pode redistribuí-lo e/ou modificá-lo.
+ * DISPOSIÇÕES GERAIS
+ * O cliente não deverá remover qualquer identificação do produto, avisos de direitos autorais,
+ * ou outros avisos ou restrições de propriedade do GrandChef.
+ *
+ * O cliente não deverá causar ou permitir a engenharia reversa, desmontagem,
+ * ou descompilação do GrandChef.
+ *
+ * PROPRIEDADE DOS DIREITOS AUTORAIS DO PROGRAMA
+ *
+ * GrandChef é a especialidade do desenvolvedor e seus
+ * licenciadores e é protegido por direitos autorais, segredos comerciais e outros direitos
+ * de leis de propriedade.
+ *
+ * O Cliente adquire apenas o direito de usar o software e não adquire qualquer outros
+ * direitos, expressos ou implícitos no GrandChef diferentes dos especificados nesta Licença.
+ *
+ * @author Equipe GrandChef <desenvolvimento@mzsw.com.br>
+ */
 require_once(dirname(__DIR__) . '/app.php');
 
-$fieldfocus = 'nome';
+$focusctrl = 'nome';
 if (is_login()) {
-    if (is_null($login_cliente->getEmail())) {
-        $fieldfocus = 'email';
+    if (is_null(logged_user()->getEmail())) {
+        $focusctrl = 'email';
     } else {
-        $fieldfocus = 'assunto';
+        $focusctrl = 'assunto';
     }
 }
 $erro = [];
 if (is_post()) {
-    $email = strip_tags(trim($_POST['email']));
-    $nome = strip_tags(trim($_POST['nome']));
+    $email = isset($_POST['email']) ? strip_tags(trim($_POST['email'])) : null;
+    $nome = isset($_POST['nome']) ? strip_tags(trim($_POST['nome'])) : null;
     if (is_login()) {
-        $email = $email ?: $login_cliente->getEmail();
-        $nome = $nome ?: $login_cliente->getNome();
+        $email = $email ?: logged_user()->getEmail();
+        $nome = $nome ?: logged_user()->getNome();
     }
-    $assunto = strip_tags(trim($_POST['assunto']));
-    $mensagem = strip_tags(trim($_POST['mensagem']));
+    $assunto = isset($_POST['assunto']) ? strip_tags(trim($_POST['assunto'])) : null;
+    $mensagem = isset($_POST['mensagem']) ? strip_tags(trim($_POST['mensagem'])) : null;
     if ($nome == '') {
         $erros['nome'] = 'O nome não pode ser vazio';
     }
@@ -53,24 +56,24 @@ if (is_post()) {
     }
     try {
         if (!empty($erros)) {
-            throw new ValidationException($erros);
+            throw new \MZ\Exception\ValidationException($erros);
         }
         if (!mail_contato($email, $nome, $assunto, $mensagem)) {
             throw new \Exception("Não foi possível enviar o E-mail, por favor tente novamente mais tarde");
         }
-        include template('contato_sucesso');
+        $app->getResponse('html')->output('contato_sucesso');
         exit;
-    } catch (ValidationException $e) {
+    } catch (\ValidationException $e) {
         $erro = $e->getErrors();
-    } catch (Exception $e) {
+    } catch (\Exception $e) {
         $erro['unknow'] = $e->getMessage();
     }
     foreach ($erro as $key => $value) {
-        $fieldfocus = $key;
+        $focusctrl = $key;
         break;
     }
-    \Thunder::error($erro[$fieldfocus]);
+    \Thunder::error($erro[$focusctrl]);
 }
 
 $pagetitle = 'Contato';
-include template('contato_index');
+$app->getResponse('html')->output('contato_index');

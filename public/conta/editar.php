@@ -1,100 +1,81 @@
 <?php
-/*
-	Copyright 2014 da MZ Software - MZ Desenvolvimento de Sistemas LTDA
-	Este arquivo é parte do programa GrandChef - Sistema para Gerenciamento de Churrascarias, Bares e Restaurantes.
-	O GrandChef é um software proprietário; você não pode redistribuí-lo e/ou modificá-lo.
-	DISPOSIÇÕES GERAIS
-	O cliente não deverá remover qualquer identificação do produto, avisos de direitos autorais,
-	ou outros avisos ou restrições de propriedade do GrandChef.
-
-	O cliente não deverá causar ou permitir a engenharia reversa, desmontagem,
-	ou descompilação do GrandChef.
-
-	PROPRIEDADE DOS DIREITOS AUTORAIS DO PROGRAMA
-
-	GrandChef é a especialidade do desenvolvedor e seus
-	licenciadores e é protegido por direitos autorais, segredos comerciais e outros direitos
-	de leis de propriedade.
-
-	O Cliente adquire apenas o direito de usar o software e não adquire qualquer outros
-	direitos, expressos ou implícitos no GrandChef diferentes dos especificados nesta Licença.
-*/
+/**
+ * Copyright 2014 da MZ Software - MZ Desenvolvimento de Sistemas LTDA
+ *
+ * Este arquivo é parte do programa GrandChef - Sistema para Gerenciamento de Churrascarias, Bares e Restaurantes.
+ * O GrandChef é um software proprietário; você não pode redistribuí-lo e/ou modificá-lo.
+ * DISPOSIÇÕES GERAIS
+ * O cliente não deverá remover qualquer identificação do produto, avisos de direitos autorais,
+ * ou outros avisos ou restrições de propriedade do GrandChef.
+ *
+ * O cliente não deverá causar ou permitir a engenharia reversa, desmontagem,
+ * ou descompilação do GrandChef.
+ *
+ * PROPRIEDADE DOS DIREITOS AUTORAIS DO PROGRAMA
+ *
+ * GrandChef é a especialidade do desenvolvedor e seus
+ * licenciadores e é protegido por direitos autorais, segredos comerciais e outros direitos
+ * de leis de propriedade.
+ *
+ * O Cliente adquire apenas o direito de usar o software e não adquire qualquer outros
+ * direitos, expressos ou implícitos no GrandChef diferentes dos especificados nesta Licença.
+ *
+ * @author Equipe GrandChef <desenvolvimento@mzsw.com.br>
+ */
 require_once(dirname(__DIR__) . '/app.php');
 
 need_login(is_output('json'));
-$cliente = $login_cliente;
+$cliente = logged_user();
+
 $tab_dados = 'selected';
-$fieldfocus = 'nome';
 $gerenciando = false;
 $cadastrar_cliente = false;
 $aceitar = 'true';
-$erro = [];
+
+$focusctrl = 'nome';
+$errors = [];
+$old_cliente = $cliente;
 if (is_post()) {
-    $old_cliente = $cliente;
     $cliente = new Cliente($_POST);
     try {
         // não deixa o usuário alterar os dados abaixo
-        $cliente->setID($old_cliente->getID());
         $cliente->setEmail($old_cliente->getEmail());
-        $cliente->setSecreto($old_cliente->getSecreto());
         $cliente->setTipo($old_cliente->getTipo());
         $cliente->setAcionistaID($old_cliente->getAcionistaID());
-        $cliente->setLimiteCompra($old_cliente->getLimiteCompra());
         $cliente->setSlogan($old_cliente->getSlogan());
 
-        if ($cliente->getTipo() == Cliente::TIPO_JURIDICA) {
-            $cliente->setCPF(\MZ\Util\Filter::unmask($cliente->getCPF(), _p('Mascara', 'CNPJ')));
-        } else {
-            $cliente->setCPF(\MZ\Util\Filter::unmask($cliente->getCPF(), _p('Mascara', 'CPF')));
-        }
-        $_data_aniversario = date_create_from_format('d/m/Y', $cliente->getDataAniversario());
-        $cliente->setDataAniversario($_data_aniversario===false?null:date_format($_data_aniversario, 'Y-m-d'));
-        $cliente->setFone(1, \MZ\Util\Filter::unmask($cliente->getFone(1), _p('Mascara', 'Telefone')));
-        $cliente->setFone(2, \MZ\Util\Filter::unmask($cliente->getFone(2), _p('Mascara', 'Telefone')));
-        $width = 256;
-        if ($cliente->getTipo() == Cliente::TIPO_JURIDICA) {
-            $width = 640;
-        }
-        $imagem = upload_image('raw_imagem', 'cliente', null, $width, 256, true);
-        if (!is_null($imagem)) {
-            $cliente->setImagem(file_get_contents(WWW_ROOT . get_image_url($imagem, 'cliente')));
-            unlink(WWW_ROOT . get_image_url($imagem, 'cliente'));
-        } elseif (trim($cliente->getImagem()) != '') { // evita sobrescrever
-            $cliente->setImagem(true);
-        }
-        if ($_POST['confirmarsenha'] != $_POST['senha']) {
-            throw new ValidationException(['senha' => 'As senhas não são iguais', 'confirmarsenha' => 'As senhas não são iguais']);
-        }
+        $senha = isset($_POST['confirmarsenha']) ? $_POST['confirmarsenha'] : '';
+        $cliente->passwordMatch($senha);
+
         $cliente->filter($old_cliente);
         $cliente->update();
         $old_cliente->clean($cliente);
         $msg = 'Conta atualizada com sucesso!';
         if (is_output('json')) {
-            json(['status' => 'ok', 'item' => $cliente->toArray(['secreto', 'senha', 'slogan']), 'msg' => $msg]);
+            json(null, ['item' => $cliente->publish(), 'msg' => $msg]);
         }
         \Thunder::success($msg, true);
         redirect('/conta/editar');
-    } catch (ValidationException $e) {
-        $erro = $e->getErrors();
-    } catch (Exception $e) {
-        $erro['unknow'] = $e->getMessage();
-    }
-    // restaura a foto original
-    $cliente->setImagem($old_cliente->getImagem());
-    foreach ($erro as $key => $value) {
-        $fieldfocus = $key;
-        if (is_output('json')) {
-            json($value);
+    } catch (\Exception $e) {
+        $cliente->clean($old_cliente);
+        if ($e instanceof \MZ\Exception\ValidationException) {
+            $errors = $e->getErrors();
         }
-        \Thunder::error($value);
-        break;
+        if (is_output('json')) {
+            json($e->getMessage(), null, ['errors' => $errors]);
+        }
+        \Thunder::error($e->getMessage());
+        foreach ($errors as $key => $value) {
+            $focusctrl = $key;
+            break;
+        }
+        if ($focusctrl == 'genero') {
+            $focusctrl = $focusctrl . '-' . strtolower($cliente->getGenero());
+        }
     }
-}
-if ($fieldfocus == 'sexo') {
-    $fieldfocus .= '_m';
-}
-if (is_output('json')) {
+} elseif (is_output('json')) {
     json('Nenhum dado foi enviado');
 }
+
 $pagetitle = 'Editar Conta';
-include template('conta_editar');
+$app->getResponse('html')->output('conta_editar');

@@ -20,7 +20,7 @@
  * O Cliente adquire apenas o direito de usar o software e não adquire qualquer outros
  * direitos, expressos ou implícitos no GrandChef diferentes dos especificados nesta Licença.
  *
- * @author  Francimar Alves <mazinsw@gmail.com>
+ * @author Equipe GrandChef <desenvolvimento@mzsw.com.br>
  */
 namespace MZ\System;
 
@@ -422,15 +422,7 @@ class Integracao extends \MZ\Database\Helper
      */
     protected function translate($e)
     {
-        if (stripos($e->getMessage(), 'PRIMARY') !== false) {
-            return new \MZ\Exception\ValidationException([
-                'id' => vsprintf(
-                    'O ID "%s" já está cadastrado',
-                    [$this->getID()]
-                ),
-            ]);
-        }
-        if (stripos($e->getMessage(), 'Nome_UNIQUE') !== false) {
+        if (contains(['Nome', 'UNIQUE'], $e->getMessage())) {
             return new \MZ\Exception\ValidationException([
                 'nome' => vsprintf(
                     'O Nome "%s" já está cadastrado',
@@ -438,7 +430,7 @@ class Integracao extends \MZ\Database\Helper
                 ),
             ]);
         }
-        if (stripos($e->getMessage(), 'AcessoURL_UNIQUE') !== false) {
+        if (contains(['AcessoURL', 'UNIQUE'], $e->getMessage())) {
             return new \MZ\Exception\ValidationException([
                 'acessourl' => vsprintf(
                     'A URL "%s" já está cadastrada',
@@ -483,7 +475,9 @@ class Integracao extends \MZ\Database\Helper
      */
     public function read()
     {
-        $filename = WWW_ROOT . $this->makeDataURL();
+        global $app;
+
+        $filename = $app->getPath('public') . $this->makeDataURL();
         if (!file_exists($filename)) {
             return [];
         }
@@ -496,7 +490,9 @@ class Integracao extends \MZ\Database\Helper
      */
     public function write($data)
     {
-        $filename = WWW_ROOT . $this->makeDataURL();
+        global $app;
+
+        $filename = $app->getPath('public') . $this->makeDataURL();
         xmkdir(dirname($filename), 0711);
         if (file_put_contents($filename, json_encode($data)) === false) {
             throw new \Exception(
@@ -574,7 +570,11 @@ class Integracao extends \MZ\Database\Helper
     {
         $query = self::getDB()->from('Integracoes');
         if (isset($condition['query'])) {
-            $query = self::buildSearch($condition['query'], 'CONCAT(nome, " ", descricao)', $query);
+            $query = self::buildSearch(
+                $condition['query'],
+                self::concat(['nome', '" "', 'descricao']),
+                $query
+            );
             unset($condition['query']);
         }
         return self::buildCondition($query, $condition);
@@ -639,39 +639,28 @@ class Integracao extends \MZ\Database\Helper
 
     /**
      * Update Integração with instance values into database for ID
+     * @param  array $only Save these fields only, when empty save all fields except id
+     * @param  boolean $except When true, saves all fields except $only
      * @return Integracao Self instance
      */
-    public function update()
+    public function update($only = [], $except = false)
     {
         $values = $this->validate();
         if (!$this->exists()) {
             throw new \Exception('O identificador da integração não foi informado');
         }
-        unset($values['id']);
+        $values = self::filterValues($values, $only, $except);
         try {
             self::getDB()
                 ->update('Integracoes')
                 ->set($values)
                 ->where('id', $this->getID())
                 ->execute();
-            $integracao = self::findByID($this->getID());
-            $this->fromArray($integracao->toArray());
+            $this->loadByID($this->getID());
         } catch (\Exception $e) {
             throw $this->translate($e);
         }
         return $this;
-    }
-
-    /**
-     * Save the Integração into the database
-     * @return Integracao Self instance
-     */
-    public function save()
-    {
-        if ($this->exists()) {
-            return $this->update();
-        }
-        return $this->insert();
     }
 
     /**
@@ -688,6 +677,43 @@ class Integracao extends \MZ\Database\Helper
             ->where('id', $this->getID())
             ->execute();
         return $result;
+    }
+
+    /**
+     * Load one register for it self with a condition
+     * @param  array $condition Condition for searching the row
+     * @param  array $order associative field name -> [-1, 1]
+     * @return Integracao Self instance filled or empty
+     */
+    public function load($condition, $order = [])
+    {
+        $query = self::query($condition, $order)->limit(1);
+        $row = $query->fetch() ?: [];
+        return $this->fromArray($row);
+    }
+
+    /**
+     * Load into this object from database using, Nome
+     * @param  string $nome nome to find Integração
+     * @return Integracao Self filled instance or empty when not found
+     */
+    public function loadByNome($nome)
+    {
+        return $this->load([
+            'nome' => strval($nome),
+        ]);
+    }
+
+    /**
+     * Load into this object from database using, AcessoURL
+     * @param  string $acesso_url url to find Integração
+     * @return Integracao Self filled instance or empty when not found
+     */
+    public function loadByAcessoURL($acesso_url)
+    {
+        return $this->load([
+            'acessourl' => strval($acesso_url),
+        ]);
     }
 
     /**

@@ -20,7 +20,7 @@
  * O Cliente adquire apenas o direito de usar o software e não adquire qualquer outros
  * direitos, expressos ou implícitos no GrandChef diferentes dos especificados nesta Licença.
  *
- * @author  Francimar Alves <mazinsw@gmail.com>
+ * @author Equipe GrandChef <desenvolvimento@mzsw.com.br>
  */
 namespace MZ\Database;
 
@@ -123,6 +123,14 @@ abstract class Helper
     abstract public function validate();
 
     /**
+     * Load one register for it self with a condition
+     * @param  array $condition Condition for searching the row
+     * @param  array $order associative field name -> [-1, 1]
+     * @return Setor Self instance filled or empty
+     */
+    abstract public function load($condition, $order = []);
+
+    /**
      * Insert a new registry into the database and fill instance from database
      * @return mixed Self instance
      */
@@ -130,9 +138,11 @@ abstract class Helper
 
     /**
      * Update registry with instance values into database for ID
+     * @param  array $only Save these fields only, when empty save all fields except id
+     * @param  boolean $except When true, saves all fields except $only
      * @return mixed Self instance
      */
-    abstract public function update();
+    abstract public function update($only = [], $except = false);
 
     /**
      * Delete this instance from database using ID
@@ -142,14 +152,28 @@ abstract class Helper
 
     /**
      * Save a new or a existing instance into the database and fill instance from database
+     * @param  array $only Save these fields only, when empty save all fields except id
+     * @param  boolean $except When true, saves all fields except $only
      * @return Helper Self instance
      */
-    public function save()
+    public function save($only = [], $except = false)
     {
         if ($this->exists()) {
-            return $this->update();
+            return $this->update($only, $except);
         }
         return $this->insert();
+    }
+
+    /**
+     * Load into this object from database using id
+     * @param  int $id id to find this object on database
+     * @return Helper Self filled instance or empty when not found
+     */
+    public function loadByID($id)
+    {
+        return $this->load([
+            'id' => intval($id),
+        ]);
     }
 
     /**
@@ -252,9 +276,41 @@ abstract class Helper
         $keywords = preg_split('/[\s,]+/', $search);
         foreach ($keywords as $word) {
             $query = $query->where($field . ' LIKE ?', '%'.$word.'%');
-            $query = $query->orderBy('COALESCE(NULLIF(LOCATE(?, CONCAT(" ", ' . $field . ')), 0), 65535) ASC', ' '.$word);
+            $query = $query->orderBy(
+                'COALESCE(NULLIF(LOCATE(?, '.
+                self::concat(['" "', $field]).
+                '), 0), 65535) ASC',
+                ' '.$word
+            );
             $query = $query->orderBy('COALESCE(NULLIF(LOCATE(?, ' . $field . '), 0), 65535) ASC', $word);
         }
         return $query;
+    }
+
+    /**
+     * Filter values array
+     * @param  array $only Save these fields only, when empty save all fields except id
+     * @param  boolean $except When true, saves all fields except $only
+     * @return aarray filtered array
+     */
+    public static function filterValues($values, $only, $except)
+    {
+        $keep = array_keys($values);
+        $ignore = [];
+        if (is_array($only) && !empty($only)) {
+            $ignore = $except ? $only : $ignore;
+            $keep = $except ? $keep : $only;
+        }
+        $ignore[] = 'id';
+        $values = array_intersect_key($values, array_flip($keep));
+        return array_diff_key($values, array_flip($ignore));
+    }
+
+    public static function concat($values)
+    {
+        if (getenv('DB_DRIVER') == 'sqlite') {
+            return '(' . implode(' || ', $values) . ')';
+        }
+        return 'CONCAT(' . implode(', ', $values) . ')';
     }
 }

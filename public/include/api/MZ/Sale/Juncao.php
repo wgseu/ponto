@@ -308,8 +308,7 @@ class Juncao extends \MZ\Database\Helper
         unset($values['id']);
         try {
             $id = self::getDB()->insertInto('Juncoes')->values($values)->execute();
-            $juncao = self::findByID($id);
-            $this->fromArray($juncao->toArray());
+            $this->loadByID($id);
         } catch (\Exception $e) {
             throw $this->translate($e);
         }

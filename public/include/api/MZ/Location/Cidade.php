@@ -446,8 +446,7 @@ class Cidade extends \MZ\Database\Helper
         unset($values['id']);
         try {
             $id = self::getDB()->insertInto('Cidades')->values($values)->execute();
-            $cidade = self::findByID($id);
-            $this->fromArray($cidade->toArray());
+            $this->loadByID($id);
         } catch (\Exception $e) {
             throw $this->translate($e);
         }

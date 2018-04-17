@@ -24,14 +24,12 @@
  */
 require_once(dirname(dirname(__DIR__)) . '/app.php');
 
-if (!isset($_GET['produto']) || !is_numeric($_GET['produto'])) {
+use MZ\Product\Produto;
+
+$produto_id = isset($_GET['produto']) ? $_GET['produto'] : null;
+$produto = Produto::findByID($produto_id);
+if (!$produto->exists()) {
     json('Produto não informado!');
 }
-$grupos = Grupo::getTodosDoProdutoID(intval($_GET['produto']));
-$response = ['status' => 'ok'];
-$grupos_array = [];
-foreach ($grupos as $grupo) {
-    $grupos_array[] = $grupo->toArray();
-}
-$response['grupos'] = $grupos_array;
-json($response);
+$grupos = Grupo::rawFindAll(['produtoid' => $produto->getID()]);
+json('grupos', $grupos);

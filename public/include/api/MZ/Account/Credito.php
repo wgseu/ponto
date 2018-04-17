@@ -375,8 +375,7 @@ class Credito extends \MZ\Database\Helper
         unset($values['id']);
         try {
             $id = self::getDB()->insertInto('Creditos')->values($values)->execute();
-            $credito = self::findByID($id);
-            $this->fromArray($credito->toArray());
+            $this->loadByID($id);
         } catch (\Exception $e) {
             throw $this->translate($e);
         }

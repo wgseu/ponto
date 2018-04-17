@@ -462,8 +462,7 @@ class Moeda extends \MZ\Database\Helper
         unset($values['id']);
         try {
             $id = self::getDB()->insertInto('Moedas')->values($values)->execute();
-            $moeda = self::findByID($id);
-            $this->fromArray($moeda->toArray());
+            $this->loadByID($id);
         } catch (\Exception $e) {
             throw $this->translate($e);
         }

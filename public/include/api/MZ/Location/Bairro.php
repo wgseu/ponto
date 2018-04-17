@@ -472,8 +472,7 @@ class Bairro extends \MZ\Database\Helper
         unset($values['id']);
         try {
             $id = self::getDB()->insertInto('Bairros')->values($values)->execute();
-            $bairro = self::findByID($id);
-            $this->fromArray($bairro->toArray());
+            $this->loadByID($id);
         } catch (\Exception $e) {
             throw $this->translate($e);
         }

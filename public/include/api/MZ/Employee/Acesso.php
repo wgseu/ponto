@@ -240,8 +240,7 @@ class Acesso extends \MZ\Database\Helper
         unset($values['id']);
         try {
             $id = self::getDB()->insertInto('Acessos')->values($values)->execute();
-            $acesso = self::findByID($id);
-            $this->fromArray($acesso->toArray());
+            $this->loadByID($id);
         } catch (\Exception $e) {
             throw $this->translate($e);
         }

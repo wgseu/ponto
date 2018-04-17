@@ -22,6 +22,7 @@
 namespace MZ\Association;
 
 use MZ\Product\Pacote;
+use MZ\Product\Composicao;
 
 class Product
 {
@@ -232,7 +233,7 @@ class Product
             $contagem[] = $qtd_pacotes;
             $total_pacotes += $qtd_pacotes;
         }
-        $grupo = new \ZGrupo();
+        $grupo = new \Grupo();
         $grupo->setID(0);
         $grupo->setDescricao('Adicionais');
         if ($associado->getTipo() == Produto::TIPO_PACOTE) {
@@ -273,7 +274,7 @@ class Product
                     $item = $subassociado->findProdutoID();
                 }
             } else {
-                $subassociado = \Composicao::findByID(
+                $subassociado = Composicao::findByID(
                     isset($subproduto['id'])?$subproduto['id']:$subproduto['codigo_pdv']
                 );
                 if ($subassociado->getComposicaoID() != $associado->getID()) {
@@ -306,7 +307,7 @@ class Product
                         $item = $subassociado->findProdutoID();
                     }
                 } else {
-                    $subassociado = \Composicao::findByID(
+                    $subassociado = Composicao::findByID(
                         isset($subproduto['id'])?$subproduto['id']:$subproduto['codigo_pdv']
                     );
                     if ($subassociado->getComposicaoID() != $associado->getID()) {

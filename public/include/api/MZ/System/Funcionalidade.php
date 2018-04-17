@@ -236,8 +236,7 @@ class Funcionalidade extends \MZ\Database\Helper
         unset($values['id']);
         try {
             $id = self::getDB()->insertInto('Funcionalidades')->values($values)->execute();
-            $funcionalidade = self::findByID($id);
-            $this->fromArray($funcionalidade->toArray());
+            $this->loadByID($id);
         } catch (\Exception $e) {
             throw $this->translate($e);
         }

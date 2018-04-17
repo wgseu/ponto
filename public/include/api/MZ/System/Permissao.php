@@ -365,8 +365,7 @@ class Permissao extends \MZ\Database\Helper
         unset($values['id']);
         try {
             $id = self::getDB()->insertInto('Permissoes')->values($values)->execute();
-            $permissao = self::findByID($id);
-            $this->fromArray($permissao->toArray());
+            $this->loadByID($id);
         } catch (\Exception $e) {
             throw $this->translate($e);
         }

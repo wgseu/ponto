@@ -412,8 +412,7 @@ class Composicao extends \MZ\Database\Helper
         unset($values['id']);
         try {
             $id = self::getDB()->insertInto('Composicoes')->values($values)->execute();
-            $composicao = self::findByID($id);
-            $this->fromArray($composicao->toArray());
+            $this->loadByID($id);
         } catch (\Exception $e) {
             throw $this->translate($e);
         }
@@ -573,6 +572,7 @@ class Composicao extends \MZ\Database\Helper
         $query = self::getDB()->from('Composicoes c');
         $condition = self::filterCondition($condition);
         $query = self::buildOrderBy($query, self::filterOrder($order));
+        $query = $query->orderBy('c.tipo ASC');
         $query = $query->orderBy('c.id ASC');
         return self::buildCondition($query, $condition);
     }

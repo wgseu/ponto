@@ -468,8 +468,7 @@ class Emitente extends \MZ\Database\Helper
         unset($values['id']);
         try {
             $id = self::getDB()->insertInto('Emitentes')->values($values)->execute();
-            $emitente = self::findByID($id);
-            $this->fromArray($emitente->toArray());
+            $this->loadByID($id);
         } catch (\Exception $e) {
             throw $this->translate($e);
         }

@@ -236,8 +236,7 @@ class Origem extends \MZ\Database\Helper
         unset($values['id']);
         try {
             $id = self::getDB()->insertInto('Origens')->values($values)->execute();
-            $origem = self::findByID($id);
-            $this->fromArray($origem->toArray());
+            $this->loadByID($id);
         } catch (\Exception $e) {
             throw $this->translate($e);
         }

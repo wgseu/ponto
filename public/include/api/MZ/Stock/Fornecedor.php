@@ -273,8 +273,7 @@ class Fornecedor extends \MZ\Database\Helper
         unset($values['id']);
         try {
             $id = self::getDB()->insertInto('Fornecedores')->values($values)->execute();
-            $fornecedor = self::findByID($id);
-            $this->fromArray($fornecedor->toArray());
+            $this->loadByID($id);
         } catch (\Exception $e) {
             throw $this->translate($e);
         }

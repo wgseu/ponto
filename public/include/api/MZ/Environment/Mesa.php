@@ -255,8 +255,7 @@ class Mesa extends \MZ\Database\Helper
         unset($values['id']);
         try {
             $id = self::getDB()->insertInto('Mesas')->values($values)->execute();
-            $mesa = self::findByID($id);
-            $this->fromArray($mesa->toArray());
+            $this->loadByID($id);
         } catch (\Exception $e) {
             throw $this->translate($e);
         }

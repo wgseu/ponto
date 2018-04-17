@@ -550,8 +550,7 @@ class FormaPagto extends \MZ\Database\Helper
         unset($values['id']);
         try {
             $id = self::getDB()->insertInto('Formas_Pagto')->values($values)->execute();
-            $forma_pagto = self::findByID($id);
-            $this->fromArray($forma_pagto->toArray());
+            $this->loadByID($id);
         } catch (\Exception $e) {
             throw $this->translate($e);
         }

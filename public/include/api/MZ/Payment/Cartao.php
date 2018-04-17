@@ -489,8 +489,7 @@ class Cartao extends \MZ\Database\Helper
         unset($values['id']);
         try {
             $id = self::getDB()->insertInto('Cartoes')->values($values)->execute();
-            $cartao = self::findByID($id);
-            $this->fromArray($cartao->toArray());
+            $this->loadByID($id);
         } catch (\Exception $e) {
             throw $this->translate($e);
         }

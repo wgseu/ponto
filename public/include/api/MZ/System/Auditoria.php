@@ -381,8 +381,7 @@ class Auditoria extends \MZ\Database\Helper
         unset($values['id']);
         try {
             $id = self::getDB()->insertInto('Auditoria')->values($values)->execute();
-            $auditoria = self::findByID($id);
-            $this->fromArray($auditoria->toArray());
+            $this->loadByID($id);
         } catch (\Exception $e) {
             throw $this->translate($e);
         }

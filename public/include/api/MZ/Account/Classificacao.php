@@ -239,8 +239,7 @@ class Classificacao extends \MZ\Database\Helper
         unset($values['id']);
         try {
             $id = self::getDB()->insertInto('Classificacoes')->values($values)->execute();
-            $classificacao = self::findByID($id);
-            $this->fromArray($classificacao->toArray());
+            $this->loadByID($id);
         } catch (\Exception $e) {
             throw $this->translate($e);
         }

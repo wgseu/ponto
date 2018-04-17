@@ -238,8 +238,7 @@ class Funcao extends \MZ\Database\Helper
         unset($values['id']);
         try {
             $id = self::getDB()->insertInto('Funcoes')->values($values)->execute();
-            $funcao = self::findByID($id);
-            $this->fromArray($funcao->toArray());
+            $this->loadByID($id);
         } catch (\Exception $e) {
             throw $this->translate($e);
         }

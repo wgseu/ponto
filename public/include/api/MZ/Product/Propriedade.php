@@ -366,8 +366,7 @@ class Propriedade extends \MZ\Database\Helper
         unset($values['id']);
         try {
             $id = self::getDB()->insertInto('Propriedades')->values($values)->execute();
-            $propriedade = self::findByID($id);
-            $this->fromArray($propriedade->toArray());
+            $this->loadByID($id);
         } catch (\Exception $e) {
             throw $this->translate($e);
         }

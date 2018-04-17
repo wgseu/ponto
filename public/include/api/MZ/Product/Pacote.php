@@ -701,8 +701,7 @@ class Pacote extends \MZ\Database\Helper
         unset($values['id']);
         try {
             $id = self::getDB()->insertInto('Pacotes')->values($values)->execute();
-            $pacote = self::findByID($id);
-            $this->fromArray($pacote->toArray());
+            $this->loadByID($id);
         } catch (\Exception $e) {
             throw $this->translate($e);
         }

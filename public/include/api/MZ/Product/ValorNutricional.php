@@ -341,8 +341,7 @@ class ValorNutricional extends \MZ\Database\Helper
         unset($values['id']);
         try {
             $id = self::getDB()->insertInto('Valores_Nutricionais')->values($values)->execute();
-            $valor_nutricional = self::findByID($id);
-            $this->fromArray($valor_nutricional->toArray());
+            $this->loadByID($id);
         } catch (\Exception $e) {
             throw $this->translate($e);
         }

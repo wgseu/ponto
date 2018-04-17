@@ -26,6 +26,8 @@ namespace MZ\Employee;
 
 use MZ\Util\Filter;
 use MZ\Util\Validator;
+use MZ\Account\Cliente;
+use MZ\System\Permissao;
 
 /**
  * Funcionário que trabalha na empresa e possui uma determinada função
@@ -409,7 +411,6 @@ class Funcionario extends \MZ\Database\Helper
         $this->setLinguagemID(Filter::number($this->getLinguagemID()));
         $this->setPontuacao(Filter::number($this->getPontuacao()));
         $this->setDataSaida($original->getDataSaida());
-        $this->setDataCadastro($original->getDataCadastro());
         if (is_owner($original) || is_self($original)) {
             $this->setClienteID($original->getClienteID());
             $this->setFuncaoID($original->getFuncaoID());
@@ -441,26 +442,34 @@ class Funcionario extends \MZ\Database\Helper
             $errors['funcaoid'] = 'A função não pode ser vazia';
         }
         if (is_null($this->getClienteID())) {
-            $errors['clienteid'] = 'O cliente não pode ser vazio';
+            $errors['clienteid'] = 'O funcionário não foi identificado';
+        } else {
+            $cliente = $this->findClienteID();
+            if (trim($cliente->getLogin()) == '') {
+                $errors['clienteid'] = 'O cliente não possui nome de login';
+            } elseif ($cliente->getTipo() != Cliente::TIPO_FISICA) {
+                $errors['clienteid'] = 'O cliente precisa ser uma pessoa física';
+            } elseif (is_null($cliente->getSenha())) {
+                $errors['clienteid'] = 'O cliente precisa possuir uma senha';
+            }
         }
         if (is_null($this->getPorcentagem())) {
             $errors['porcentagem'] = 'A comissão não pode ser vazia';
+        } elseif ($this->getPorcentagem() < 0) {
+            $errors['porcentagem'] = 'A comissão não pode ser negativa';
         }
         if (is_null($this->getLinguagemID())) {
             $errors['linguagemid'] = 'A linguagem não pode ser vazia';
         }
         if (is_null($this->getPontuacao())) {
             $errors['pontuacao'] = 'A pontuação não pode ser vazia';
+        } elseif ($this->getPontuacao() < 0) {
+            $errors['pontuacao'] = 'A pontuação não pode ser negativa';
         }
-        if (is_null($this->getAtivo())) {
-            $errors['ativo'] = 'O ativo não pode ser vazio';
+        if (!Validator::checkBoolean($this->getAtivo())) {
+            $errors['ativo'] = 'A informação se está ativo(a) não foi informada ou é inválida';
         }
-        if (!Validator::checkBoolean($this->getAtivo(), true)) {
-            $errors['ativo'] = 'O ativo é inválido';
-        }
-        if (is_null($this->getDataCadastro())) {
-            $errors['datacadastro'] = 'A data de cadastro não pode ser vazia';
-        }
+        $this->setDataCadastro(self::now());
         if (!empty($errors)) {
             throw new \MZ\Exception\ValidationException($errors);
         }
@@ -511,8 +520,7 @@ class Funcionario extends \MZ\Database\Helper
         unset($values['id']);
         try {
             $id = self::getDB()->insertInto('Funcionarios')->values($values)->execute();
-            $funcionario = self::findByID($id);
-            $this->fromArray($funcionario->toArray());
+            $this->loadByID($id);
         } catch (\Exception $e) {
             throw $this->translate($e);
         }
@@ -530,6 +538,7 @@ class Funcionario extends \MZ\Database\Helper
             throw new \Exception('O identificador do funcionário não foi informado');
         }
         $values = self::filterValues($values, $only, $except);
+        unset($values['datacadastro']);
         try {
             self::getDB()
                 ->update('Funcionarios')
@@ -551,6 +560,15 @@ class Funcionario extends \MZ\Database\Helper
     {
         if (!$this->exists()) {
             throw new \Exception('O identificador do funcionário não foi informado');
+        }
+        if ($this->has(Permissao::NOME_CADASTROFUNCIONARIOS) && !is_owner()) {
+            throw new \Exception('Você não tem permissão para excluir esse funcionário!');
+        }
+        if (is_self($this)) {
+            throw new \Exception('Você não pode excluir a si mesmo!');
+        }
+        if (is_owner($this)) {
+            throw new \Exception('Esse funcionário não pode ser excluído!');
         }
         $result = self::getDB()
             ->deleteFrom('Funcionarios')
@@ -685,7 +703,8 @@ class Funcionario extends \MZ\Database\Helper
     private static function filterCondition($condition)
     {
         $allowed = self::getAllowedKeys();
-        return Filter::keys($condition, $allowed, 'f.');
+        $allowed['c.genero'] = true;
+        return Filter::keys($condition, $allowed, ['f.', 'c.']);
     }
 
     /**
@@ -696,7 +715,33 @@ class Funcionario extends \MZ\Database\Helper
      */
     private static function query($condition = [], $order = [])
     {
-        $query = self::getDB()->from('Funcionarios f');
+        $query = self::getDB()->from('Funcionarios f')
+            ->leftJoin('Clientes c ON c.id = f.clienteid');
+        if (isset($condition['search'])) {
+            $search = trim($condition['search']);
+            if (Validator::checkEmail($search)) {
+                $query = $query->where('c.email', $search);
+            } elseif (Validator::checkCPF($search)) {
+                $query = $query->where('c.cpf', Filter::digits($search));
+            } elseif (check_fone($search, true)) {
+                $fone = Cliente::buildFoneSearch($search);
+                $query = $query->where('(c.fone1 LIKE ? OR c.fone2 LIKE ?)', $fone, $fone);
+                $query = $query->orderBy('IF(c.fone1 LIKE ?, 0, 1)', $fone);
+            } elseif (Validator::checkDigits($search)) {
+                $query = $query->where('f.id', intval($search));
+            } else {
+                $query = self::buildSearch(
+                    $search,
+                    self::concat([
+                        'c.nome',
+                        '" "',
+                        'COALESCE(c.sobrenome, "")'
+                    ]),
+                    $query
+                );
+            }
+            unset($condition['search']);
+        }
         $condition = self::filterCondition($condition);
         $query = self::buildOrderBy($query, self::filterOrder($order));
         $query = $query->orderBy('f.id ASC');

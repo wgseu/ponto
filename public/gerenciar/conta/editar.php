@@ -41,7 +41,8 @@ $old_conta = $conta;
 if (is_post()) {
     $conta = new Conta($_POST);
     try {
-        $conta->filter($old_conta);
+        $despesa = isset($_POST['tipo']) ? $_POST['tipo'] < 0 : false;
+        $conta->filter($old_conta, $despesa);
         $conta->update();
         $old_conta->clean($conta);
         $msg = sprintf(

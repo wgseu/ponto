@@ -233,8 +233,7 @@ class Setor extends \MZ\Database\Helper
         unset($values['id']);
         try {
             $id = self::getDB()->insertInto('Setores')->values($values)->execute();
-            $setor = self::findByID($id);
-            $this->fromArray($setor->toArray());
+            $this->loadByID($id);
         } catch (\Exception $e) {
             throw $this->translate($e);
         }

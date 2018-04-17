@@ -322,8 +322,7 @@ class Resumo extends \MZ\Database\Helper
         unset($values['id']);
         try {
             $id = self::getDB()->insertInto('Resumos')->values($values)->execute();
-            $resumo = self::findByID($id);
-            $this->fromArray($resumo->toArray());
+            $this->loadByID($id);
         } catch (\Exception $e) {
             throw $this->translate($e);
         }

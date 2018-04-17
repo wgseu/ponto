@@ -838,8 +838,7 @@ class Localizacao extends \MZ\Database\Helper
         unset($values['id']);
         try {
             $id = self::getDB()->insertInto('Localizacoes')->values($values)->execute();
-            $localizacao = self::findByID($id);
-            $this->fromArray($localizacao->toArray());
+            $this->loadByID($id);
         } catch (\Exception $e) {
             throw $this->translate($e);
         }

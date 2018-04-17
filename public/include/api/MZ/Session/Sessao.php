@@ -273,8 +273,7 @@ class Sessao extends \MZ\Database\Helper
         unset($values['id']);
         try {
             $id = self::getDB()->insertInto('Sessoes')->values($values)->execute();
-            $sessao = self::findByID($id);
-            $this->fromArray($sessao->toArray());
+            $this->loadByID($id);
         } catch (\Exception $e) {
             throw $this->translate($e);
         }

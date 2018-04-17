@@ -383,8 +383,7 @@ class Imposto extends \MZ\Database\Helper
         unset($values['id']);
         try {
             $id = self::getDB()->insertInto('Impostos')->values($values)->execute();
-            $imposto = self::findByID($id);
-            $this->fromArray($imposto->toArray());
+            $this->loadByID($id);
         } catch (\Exception $e) {
             throw $this->translate($e);
         }

@@ -327,8 +327,7 @@ class Tributacao extends \MZ\Database\Helper
         unset($values['id']);
         try {
             $id = self::getDB()->insertInto('Tributacoes')->values($values)->execute();
-            $tributacao = self::findByID($id);
-            $this->fromArray($tributacao->toArray());
+            $this->loadByID($id);
         } catch (\Exception $e) {
             throw $this->translate($e);
         }

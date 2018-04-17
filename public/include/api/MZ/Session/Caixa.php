@@ -323,8 +323,7 @@ class Caixa extends \MZ\Database\Helper
         unset($values['id']);
         try {
             $id = self::getDB()->insertInto('Caixas')->values($values)->execute();
-            $caixa = self::findByID($id);
-            $this->fromArray($caixa->toArray());
+            $this->loadByID($id);
         } catch (\Exception $e) {
             throw $this->translate($e);
         }

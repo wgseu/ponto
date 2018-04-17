@@ -320,8 +320,7 @@ class Endereco extends \MZ\Database\Helper
         unset($values['id']);
         try {
             $id = self::getDB()->insertInto('Enderecos')->values($values)->execute();
-            $endereco = self::findByID($id);
-            $this->fromArray($endereco->toArray());
+            $this->loadByID($id);
         } catch (\Exception $e) {
             throw $this->translate($e);
         }

@@ -48,7 +48,7 @@ $categoria->loadImagem();
 if (is_null($categoria->getImagem())) {
     exitNotFound();
 }
-header('Content-type: image/png');
+header('Content-Type: image/png');
 header('Last-Modified: ' . gmdate('D, d M Y H:i:s T', strtotime($categoria->getDataAtualizacao())));
 header('Cache-Control: max-age=12096000, public');
 header('Expires: ' . gmdate('D, d M Y H:i:s T', time() + 12096000));

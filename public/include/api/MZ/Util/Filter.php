@@ -275,6 +275,20 @@ class Filter
     }
 
     /**
+     * Parse a date string for current country
+     * @param  string $value humman date value
+     * @return string database date format
+     */
+    public static function date($value)
+    {
+        $d = \DateTime::createFromFormat('d/m/Y', $value);
+        if ($d === false) {
+            return null;
+        }
+        return $d->format('Y-m-d');
+    }
+
+    /**
      * Escape single and double quotes
      * @param  mixed $value Text to be escaped or array
      * @param  string $key Key to access array

@@ -597,8 +597,7 @@ class Pais extends \MZ\Database\Helper
         unset($values['id']);
         try {
             $id = self::getDB()->insertInto('Paises')->values($values)->execute();
-            $pais = self::findByID($id);
-            $this->fromArray($pais->toArray());
+            $this->loadByID($id);
         } catch (\Exception $e) {
             throw $this->translate($e);
         }

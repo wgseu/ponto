@@ -361,12 +361,12 @@ $[field.else.match(senha|password)]
         if (!Validator::checkPassword($this->get$[Field.norm]($[field.if(array)]$[field.array.number]$[field.end]), $this->exists())) {
             $errors['$[field]'] = '$[FIELD.gender] $[field.name] informad$[field.gender] não é segur$[field.gender]';
         }
-$[field.if(enum)]
-        if (!Validator::checkInSet($this->get$[Field.norm]($[field.if(array)]$[field.array.number]$[field.end]), self::get$[Field.norm]Options(), true)) {
+$[field.else.if(enum)]
+        if (!Validator::checkInSet($this->get$[Field.norm]($[field.if(array)]$[field.array.number]$[field.end]), self::get$[Field.norm]Options())) {
             $errors['$[field]'] = '$[FIELD.gender] $[field.name] é inválid$[field.gender]';
         }
 $[field.else.if(boolean)]
-        if (!Validator::checkBoolean($this->get$[Field.norm]($[field.if(array)]$[field.array.number]$[field.end]), true)) {
+        if (!Validator::checkBoolean($this->get$[Field.norm]($[field.if(array)]$[field.array.number]$[field.end]))) {
             $errors['$[field]'] = '$[FIELD.gender] $[field.name] é inválid$[field.gender]';
         }
 $[field.else.if(null)]

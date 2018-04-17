@@ -324,8 +324,7 @@ class Unidade extends \MZ\Database\Helper
         unset($values['id']);
         try {
             $id = self::getDB()->insertInto('Unidades')->values($values)->execute();
-            $unidade = self::findByID($id);
-            $this->fromArray($unidade->toArray());
+            $this->loadByID($id);
         } catch (\Exception $e) {
             throw $this->translate($e);
         }

@@ -1046,8 +1046,7 @@ class Produto extends \MZ\Database\Helper
         unset($values['id']);
         try {
             $id = self::getDB()->insertInto('Produtos')->values($values)->execute();
-            $produto = self::findByID($id);
-            $this->fromArray($produto->toArray());
+            $this->loadByID($id);
         } catch (\Exception $e) {
             throw $this->translate($e);
         }
@@ -1139,12 +1138,12 @@ class Produto extends \MZ\Database\Helper
      */
     public function loadImagem()
     {
-        $data = self::getDB()->from('Produtos p')
+        $imagem = self::getDB()->from('Produtos p')
             ->select(null)
             ->select('p.imagem')
-            ->where('p.id', $this->getID());
-        $this->setImagem($data);
-        return $this;
+            ->where('p.id', $this->getID())
+            ->fetchColumn();
+        return $this->setImagem($imagem);
     }
 
     /**

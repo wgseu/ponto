@@ -451,8 +451,7 @@ class Dispositivo extends \MZ\Database\Helper
         unset($values['id']);
         try {
             $id = self::getDB()->insertInto('Dispositivos')->values($values)->execute();
-            $dispositivo = self::findByID($id);
-            $this->fromArray($dispositivo->toArray());
+            $this->loadByID($id);
         } catch (\Exception $e) {
             throw $this->translate($e);
         }

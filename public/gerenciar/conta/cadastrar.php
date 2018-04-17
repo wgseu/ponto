@@ -39,8 +39,9 @@ $old_conta = $conta;
 if (is_post()) {
     $conta = new Conta($_POST);
     try {
-        $conta->setFuncionarioID(logged_employee()->getID());
-        $conta->filter($old_conta);
+        $old_conta->setFuncionarioID(logged_employee()->getID());
+        $despesa = isset($_POST['tipo']) ? $_POST['tipo'] < 0 : false;
+        $conta->filter($old_conta, $despesa);
         $conta->insert();
         $old_conta->clean($conta);
         $msg = sprintf(

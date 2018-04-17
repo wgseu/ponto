@@ -951,8 +951,7 @@ class Pedido extends \MZ\Database\Helper
         unset($values['id']);
         try {
             $id = self::getDB()->insertInto('Pedidos')->values($values)->execute();
-            $pedido = self::findByID($id);
-            $this->fromArray($pedido->toArray());
+            $this->loadByID($id);
         } catch (\Exception $e) {
             throw $this->translate($e);
         }

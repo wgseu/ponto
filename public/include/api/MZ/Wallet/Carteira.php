@@ -470,8 +470,7 @@ class Carteira extends \MZ\Database\Helper
         unset($values['id']);
         try {
             $id = self::getDB()->insertInto('Carteiras')->values($values)->execute();
-            $carteira = self::findByID($id);
-            $this->fromArray($carteira->toArray());
+            $this->loadByID($id);
         } catch (\Exception $e) {
             throw $this->translate($e);
         }

@@ -267,8 +267,7 @@ class Operacao extends \MZ\Database\Helper
         unset($values['id']);
         try {
             $id = self::getDB()->insertInto('Operacoes')->values($values)->execute();
-            $operacao = self::findByID($id);
-            $this->fromArray($operacao->toArray());
+            $this->loadByID($id);
         } catch (\Exception $e) {
             throw $this->translate($e);
         }

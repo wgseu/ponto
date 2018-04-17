@@ -342,8 +342,7 @@ class Promocao extends \MZ\Database\Helper
         unset($values['id']);
         try {
             $id = self::getDB()->insertInto('Promocoes')->values($values)->execute();
-            $promocao = self::findByID($id);
-            $this->fromArray($promocao->toArray());
+            $this->loadByID($id);
         } catch (\Exception $e) {
             throw $this->translate($e);
         }

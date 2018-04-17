@@ -681,8 +681,7 @@ class Estoque extends \MZ\Database\Helper
         unset($values['id']);
         try {
             $id = self::getDB()->insertInto('Estoque')->values($values)->execute();
-            $estoque = self::findByID($id);
-            $this->fromArray($estoque->toArray());
+            $this->loadByID($id);
         } catch (\Exception $e) {
             throw $this->translate($e);
         }

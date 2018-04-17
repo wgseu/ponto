@@ -66,9 +66,6 @@ while (!$stack->isEmpty()) {
             'ativa' => 'Y'
         ]);
         foreach ($composicoes as $_composicao) {
-            if ($_composicao->getTipo() == Composicao::TIPO_ADICIONAL) {
-                continue;
-            }
             $_composicao->setQuantidade($_composicao->getQuantidade() * $composicao->getQuantidade());
             $_composicao->setComposicaoID($composicao->getID()); // salva o código do pai
             $stack->push($_composicao);

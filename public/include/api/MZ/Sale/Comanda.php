@@ -357,8 +357,7 @@ class Comanda extends \MZ\Database\Helper
         unset($values['id']);
         try {
             $id = self::getDB()->insertInto('Comandas')->values($values)->execute();
-            $comanda = self::findByID($id);
-            $this->fromArray($comanda->toArray());
+            $this->loadByID($id);
         } catch (\Exception $e) {
             throw $this->translate($e);
         }

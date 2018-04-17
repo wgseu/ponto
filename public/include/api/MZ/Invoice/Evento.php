@@ -347,8 +347,7 @@ class Evento extends \MZ\Database\Helper
         unset($values['id']);
         try {
             $id = self::getDB()->insertInto('Eventos')->values($values)->execute();
-            $evento = self::findByID($id);
-            $this->fromArray($evento->toArray());
+            $this->loadByID($id);
         } catch (\Exception $e) {
             throw $this->translate($e);
         }

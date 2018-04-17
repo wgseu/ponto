@@ -382,8 +382,7 @@ class Categoria extends \MZ\Database\Helper
         unset($values['id']);
         try {
             $id = self::getDB()->insertInto('Categorias')->values($values)->execute();
-            $categoria = self::findByID($id);
-            $this->fromArray($categoria->toArray());
+            $this->loadByID($id);
         } catch (\Exception $e) {
             throw $this->translate($e);
         }

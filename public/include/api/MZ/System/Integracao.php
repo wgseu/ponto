@@ -629,8 +629,7 @@ class Integracao extends \MZ\Database\Helper
         unset($values['id']);
         try {
             $id = self::getDB()->insertInto('Integracoes')->values($values)->execute();
-            $integracao = self::findByID($id);
-            $this->fromArray($integracao->toArray());
+            $this->loadByID($id);
         } catch (\Exception $e) {
             throw $this->translate($e);
         }

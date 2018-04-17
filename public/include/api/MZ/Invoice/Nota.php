@@ -989,8 +989,7 @@ class Nota extends \MZ\Database\Helper
         unset($values['id']);
         try {
             $id = self::getDB()->insertInto('Notas')->values($values)->execute();
-            $nota = self::findByID($id);
-            $this->fromArray($nota->toArray());
+            $this->loadByID($id);
         } catch (\Exception $e) {
             throw $this->translate($e);
         }

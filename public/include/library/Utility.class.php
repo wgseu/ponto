@@ -501,7 +501,7 @@ class Utility
         $in .= "Accept: */*\r\n";
         $in .= "Host: " . $url2["host"] . "\r\n";
         $in .= "User-Agent: Lowell-Agent\r\n";
-        $in .= "Content-type: application/x-www-form-urlencoded\r\n";
+        $in .= "Content-Type: application/x-www-form-urlencoded\r\n";
         $in .= "Content-Length: " . strlen($post_data2) . "\r\n";
         $in .= "Connection: Close\r\n\r\n";
         $in .= $post_data2 . "\r\n\r\n";

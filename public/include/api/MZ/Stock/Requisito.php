@@ -490,8 +490,7 @@ class Requisito extends \MZ\Database\Helper
         unset($values['id']);
         try {
             $id = self::getDB()->insertInto('Requisitos')->values($values)->execute();
-            $requisito = self::findByID($id);
-            $this->fromArray($requisito->toArray());
+            $this->loadByID($id);
         } catch (\Exception $e) {
             throw $this->translate($e);
         }

@@ -236,8 +236,7 @@ class Regime extends \MZ\Database\Helper
         unset($values['id']);
         try {
             $id = self::getDB()->insertInto('Regimes')->values($values)->execute();
-            $regime = self::findByID($id);
-            $this->fromArray($regime->toArray());
+            $this->loadByID($id);
         } catch (\Exception $e) {
             throw $this->translate($e);
         }

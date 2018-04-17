@@ -1105,8 +1105,7 @@ class Cliente extends \MZ\Database\Helper
         unset($values['id']);
         try {
             $id = self::getDB()->insertInto('Clientes')->values($values)->execute();
-            $cliente = self::findByID($id);
-            $this->fromArray($cliente->toArray());
+            $this->loadByID($id);
         } catch (\Exception $e) {
             throw $this->translate($e);
         }

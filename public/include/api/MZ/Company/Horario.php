@@ -265,8 +265,7 @@ class Horario extends \MZ\Database\Helper
         unset($values['id']);
         try {
             $id = self::getDB()->insertInto('Horarios')->values($values)->execute();
-            $horario = self::findByID($id);
-            $this->fromArray($horario->toArray());
+            $this->loadByID($id);
         } catch (\Exception $e) {
             throw $this->translate($e);
         }

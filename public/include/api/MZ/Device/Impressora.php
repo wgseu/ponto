@@ -529,8 +529,7 @@ class Impressora extends \MZ\Database\Helper
         unset($values['id']);
         try {
             $id = self::getDB()->insertInto('Impressoras')->values($values)->execute();
-            $impressora = self::findByID($id);
-            $this->fromArray($impressora->toArray());
+            $this->loadByID($id);
         } catch (\Exception $e) {
             throw $this->translate($e);
         }

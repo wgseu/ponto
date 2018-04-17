@@ -24,27 +24,55 @@
  */
 require_once(dirname(dirname(__DIR__)) . '/app.php');
 
-if (!isset($_GET['produto']) || !is_numeric($_GET['produto'])) {
-    json('Produto não informado!');
+use MZ\Product\Composicao;
+use MZ\Product\Produto;
+use MZ\Product\Unidade;
+
+$produto_id = isset($_GET['produto']) ? $_GET['produto'] : null;
+$produto = Produto::findByID($produto_id);
+if (!$produto->exists()) {
+    json('O produto não informado ou não existe');
 }
-$limite = isset($_GET['limite'])?intval($_GET['limite']):null;
+$limite = isset($_GET['limite']) ? intval($_GET['limite']) : null;
 if (!is_null($limite) && $limite < 1) {
     $limite = null;
 }
-$composicoes = Composicao::getTodasDaComposicaoIDEx(
-    strval(isset($_GET['busca']) ? $_GET['busca'] : null),
-    isset($_GET['produto']) ? $_GET['produto'] : null,
-    intval(isset($_GET['selecionaveis'])?$_GET['selecionaveis']:0) != 0,
-    intval(isset($_GET['adicionais'])?$_GET['adicionais']:0) != 0,
-    intval(isset($_GET['sem_opcionais'])?$_GET['sem_opcionais']:0) != 0,
-    0,
-    $limite
-);
-$response = ['status' => 'ok'];
-$_composicoes = [];
-foreach ($composicoes as $composicao) {
-    $composicao['imagemurl'] = get_image_url($composicao['imagemurl'], 'produto', null);
-    $_composicoes[] = $composicao;
+$selecionaveis = isset($_GET['selecionaveis']) ? $_GET['selecionaveis'] : false;
+$adicionais = isset($_GET['adicionais']) ? $_GET['adicionais'] : false;
+$sem_opcionais = isset($_GET['sem_opcionais']) ? $_GET['sem_opcionais'] : false;
+$tipo = [
+    Composicao::TIPO_COMPOSICAO => true,
+    Composicao::TIPO_ADICIONAL => true,
+    Composicao::TIPO_OPCIONAL => true
+];
+if ($selecionaveis) {
+    unset($tipo[Composicao::TIPO_COMPOSICAO]);
 }
-$response['composicoes'] = $_composicoes;
-json($response);
+if ($selecionaveis && !$adicionais) {
+    unset($tipo[Composicao::TIPO_ADICIONAL]);
+}
+if ($selecionaveis && $sem_opcionais) {
+    unset($tipo[Composicao::TIPO_OPCIONAL]);
+}
+$tipo = array_keys($tipo);
+$condition = [];
+$condition['search'] = isset($_GET['busca']) ? $_GET['busca'] : null;
+$condition['tipo'] = $tipo;
+$condition['composicaoid'] = $produto->getID();
+$condition['ativa'] = 'Y';
+$composicoes = Composicao::findAll($condition, [], $limite);
+$items = [];
+foreach ($composicoes as $composicao) {
+    $produto = $composicao->findProdutoID();
+    $unidade = $produto->findUnidadeID();
+    $item = $composicao->publish();
+    $item['imagemurl'] = $produto->makeImagem();
+    $item['produtodescricao'] = $produto->getDescricao();
+    $item['produtoabreviacao'] = $produto->getAbreviacao();
+    $item['produtoconteudo'] = $produto->getConteudo();
+    $item['unidadesigla'] = $unidade->getSigla();
+    $item['produtodataatualizacao'] = $produto->getDataAtualizacao();
+    $item['selecionavel'] = $composicao->getTipo() == Composicao::TIPO_COMPOSICAO ? 'N' : 'Y';
+    $items[] = $item;
+}
+json('composicoes', $items);

@@ -878,8 +878,7 @@ class ProdutoPedido extends \MZ\Database\Helper
         unset($values['id']);
         try {
             $id = self::getDB()->insertInto('Produtos_Pedidos')->values($values)->execute();
-            $produto_pedido = self::findByID($id);
-            $this->fromArray($produto_pedido->toArray());
+            $this->loadByID($id);
         } catch (\Exception $e) {
             throw $this->translate($e);
         }

@@ -314,8 +314,7 @@ class Modulo extends \MZ\Database\Helper
         unset($values['id']);
         try {
             $id = self::getDB()->insertInto('Modulos')->values($values)->execute();
-            $modulo = self::findByID($id);
-            $this->fromArray($modulo->toArray());
+            $this->loadByID($id);
         } catch (\Exception $e) {
             throw $this->translate($e);
         }

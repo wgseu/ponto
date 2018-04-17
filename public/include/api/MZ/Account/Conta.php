@@ -654,7 +654,7 @@ class Conta extends \MZ\Database\Helper
             $this->setDataPagamento($conta['datapagamento']);
         }
         if (!isset($conta['datacadastro'])) {
-            $this->setDataCadastro(null);
+            $this->setDataCadastro(self::now());
         } else {
             $this->setDataCadastro($conta['datacadastro']);
         }
@@ -675,72 +675,37 @@ class Conta extends \MZ\Database\Helper
      * Filter fields, upload data and keep key data
      * @param Conta $original Original instance without modifications
      */
-    public function filter($original)
+    public function filter($original, $despesa = false)
     {
         // não deixa alterar esses dados
-        $conta->setID($old_conta->getID());
-        $conta->setFuncionarioID($old_conta->getFuncionarioID());
-        $conta->setPedidoID($old_conta->getPedidoID());
-        $conta->setCancelada($old_conta->getCancelada());
-
-        $conta->setValor(abs(moneyval($conta->getValor())));
-        $conta->setAcrescimo(abs(moneyval($conta->getAcrescimo())));
-        $conta->setMulta(abs(moneyval($conta->getMulta())));
-        if (intval($_POST['tipo']) < 0) {
-            $conta->setValor(-$conta->getValor());
-            $conta->setAcrescimo(-$conta->getAcrescimo());
-            $conta->setMulta(-$conta->getMulta());
-        }
-        $conta->setJuros(moneyval($conta->getJuros()) / 100.0);
-        $_vencimento = date_create_from_format('d/m/Y', $conta->getVencimento());
-        $conta->setVencimento($_vencimento===false?null:date_format($_vencimento, 'Y-m-d'));
-        $_data_emissao = date_create_from_format('d/m/Y', $conta->getDataEmissao());
-        $conta->setDataEmissao($_data_emissao===false?null:date_format($_data_emissao, 'Y-m-d'));
-        $_data_pagamento = date_create_from_format('d/m/Y', $conta->getDataPagamento());
-        $conta->setDataPagamento($_data_pagamento===false?null:date_format($_data_pagamento, 'Y-m-d'));
-        $anexocaminho = upload_document('raw_anexocaminho', 'conta');
-        if (!is_null($anexocaminho)) {
-            $conta->setAnexoCaminho($anexocaminho);
-        } elseif (trim($conta->getAnexoCaminho()) != '') { // evita sobrescrever
-            $conta->setAnexoCaminho($old_conta->getAnexoCaminho());
-        }
-
-        $conta->setCancelada('N');
-        $conta->setValor(abs(moneyval($conta->getValor())));
-        $conta->setAcrescimo(abs(moneyval($conta->getAcrescimo())));
-        $conta->setMulta(abs(moneyval($conta->getMulta())));
-        if (intval($_POST['tipo']) < 0) {
-            $conta->setValor(-$conta->getValor());
-            $conta->setAcrescimo(-$conta->getAcrescimo());
-            $conta->setMulta(-$conta->getMulta());
-        }
-        $conta->setJuros(moneyval($conta->getJuros()) / 100.0);
-        $_vencimento = date_create_from_format('d/m/Y', $conta->getVencimento());
-        $conta->setVencimento($_vencimento===false?null:date_format($_vencimento, 'Y-m-d'));
-        $_data_emissao = date_create_from_format('d/m/Y', $conta->getDataEmissao());
-        $conta->setDataEmissao($_data_emissao===false?null:date_format($_data_emissao, 'Y-m-d'));
-        $_data_pagamento = date_create_from_format('d/m/Y', $conta->getDataPagamento());
-        $conta->setDataPagamento($_data_pagamento===false?null:date_format($_data_pagamento, 'Y-m-d'));
-        $anexocaminho = upload_document('raw_anexocaminho', 'conta');
-        $conta->setAnexoCaminho($anexocaminho);
-
         $this->setID($original->getID());
+        $this->setFuncionarioID($original->getFuncionarioID());
+        $this->setPedidoID($original->getPedidoID());
+        $this->setCancelada($original->getCancelada());
+        $anexocaminho = upload_document('raw_anexocaminho', 'conta');
+        if (is_null($anexocaminho) && trim($this->getAnexoCaminho()) != '') {
+            $this->setAnexoCaminho($original->getAnexoCaminho());
+        } else {
+            $this->setAnexoCaminho($anexocaminho);
+        }
         $this->setClassificacaoID(Filter::number($this->getClassificacaoID()));
-        $this->setFuncionarioID(Filter::number($this->getFuncionarioID()));
         $this->setSubClassificacaoID(Filter::number($this->getSubClassificacaoID()));
         $this->setClienteID(Filter::number($this->getClienteID()));
-        $this->setPedidoID(Filter::number($this->getPedidoID()));
         $this->setDescricao(Filter::string($this->getDescricao()));
-        $this->setValor(Filter::money($this->getValor()));
-        $this->setAcrescimo(Filter::money($this->getAcrescimo()));
-        $this->setMulta(Filter::money($this->getMulta()));
-        $this->setJuros(Filter::float($this->getJuros()));
-        $this->setVencimento(Filter::datetime($this->getVencimento()));
-        $this->setDataEmissao(Filter::datetime($this->getDataEmissao()));
+        $this->setValor(abs(Filter::money($this->getValor())));
+        $this->setAcrescimo(abs(Filter::money($this->getAcrescimo())));
+        $this->setMulta(abs(Filter::money($this->getMulta())));
+        if ($despesa) {
+            $this->setValor(-$this->getValor());
+            $this->setAcrescimo(-$this->getAcrescimo());
+            $this->setMulta(-$this->getMulta());
+        }
+        $this->setJuros(Filter::float($this->getJuros()) / 100.0);
+        $this->setVencimento(Filter::date($this->getVencimento()));
+        $this->setDataEmissao(Filter::date($this->getDataEmissao()));
         $this->setNumeroDoc(Filter::string($this->getNumeroDoc()));
         $this->setAnexoCaminho(Filter::string($this->getAnexoCaminho()));
-        $this->setDataPagamento(Filter::datetime($this->getDataPagamento()));
-        $this->setDataCadastro(Filter::datetime($this->getDataCadastro()));
+        $this->setDataPagamento(Filter::date($this->getDataPagamento()));
     }
 
     /**
@@ -754,12 +719,12 @@ class Conta extends \MZ\Database\Helper
         // exclui o documento antigo
         if (!is_null($old_conta->getAnexoCaminho()) &&
             $conta->getAnexoCaminho() != $old_conta->getAnexoCaminho() && !is_local_path($old_conta->getAnexoCaminho())) {
-            unlink($app->getPath('public') . get_document_url($old_conta->getAnexoCaminho(), 'conta'));
+            @unlink($app->getPath('public') . get_document_url($old_conta->getAnexoCaminho(), 'conta'));
         }
         // exclui o documento enviado
         if (!is_null($conta->getAnexoCaminho()) &&
             $old_conta->getAnexoCaminho() != $conta->getAnexoCaminho()) {
-            unlink($app->getPath('public') . get_document_url($conta->getAnexoCaminho(), 'conta'));
+            @unlink($app->getPath('public') . get_document_url($conta->getAnexoCaminho(), 'conta'));
         }
         $conta->setAnexoCaminho($old_conta->getAnexoCaminho());
     }
@@ -782,31 +747,71 @@ class Conta extends \MZ\Database\Helper
         }
         if (is_null($this->getValor())) {
             $errors['valor'] = 'O valor não pode ser vazio';
+        } elseif (is_equal($this->getValor(), 0)) {
+            $errors['valor'] = 'O valor não pode ser nulo';
         }
         if (is_null($this->getAcrescimo())) {
             $errors['acrescimo'] = 'O acréscimo não pode ser vazio';
+        } elseif ($this->getValor() > 0 && $this->getAcrescimo() < 0) {
+            $errors['acrescimo'] = 'O acréscimo não pode ser negativo';
+        } elseif ($this->getValor() <= 0 && $this->getAcrescimo() > 0) {
+            $errors['acrescimo'] = 'O acréscimo não pode ser positivo';
         }
         if (is_null($this->getMulta())) {
             $errors['multa'] = 'A multa não pode ser vazia';
+        } elseif ($this->getValor() > 0 && $this->getMulta() < 0) {
+            $errors['multa'] = 'A multa não pode ser negativa';
+        } elseif ($this->getValor() <= 0 && $this->getMulta() > 0) {
+            $errors['multa'] = 'A multa não pode ser positiva';
         }
         if (is_null($this->getJuros())) {
             $errors['juros'] = 'O juros não pode ser vazio';
+        } elseif ($this->getJuros() < 0) {
+            $errors['juros'] = 'O juros não pode ser negativo';
         }
-        if (is_null($this->getAutoAcrescimo())) {
-            $errors['autoacrescimo'] = 'O acréscimo automático não pode ser vazio';
+        if (!Validator::checkBoolean($this->getAutoAcrescimo())) {
+            $errors['autoacrescimo'] = 'O acréscimo automático não foi informado ou é inválido';
         }
-        if (!Validator::checkBoolean($this->getAutoAcrescimo(), true)) {
-            $errors['autoacrescimo'] = 'O acréscimo automático é inválido';
+        if (!Validator::checkBoolean($this->getCancelada())) {
+            $errors['cancelada'] = 'A informação de cancelamento não foi informada ou é inválida';
         }
-        if (is_null($this->getCancelada())) {
-            $errors['cancelada'] = 'A cancelada não pode ser vazia';
+        $receitas = 0;
+        if ($this->exists()) {
+            $info = self::getTotalAbertas($this->getID());
+            if (is_equal($info['receitas'], 0) && is_equal($info['despesas'], 0)) {
+                $errors['id'] = 'A conta informada já foi consolidada e não pode ser alterada';
+            }
+            if ($this->getValor() > 0 && is_greater($info['recebido'], $this->getValor())) {
+                $errors['valor'] = 'O total recebido é maior que o valor da conta';
+            }
+            if ($this->getValor() <= 0 && is_greater(-$info['pago'], -$this->getValor())) {
+                $errors['valor'] = 'O total pago é maior que o valor da conta';
+            }
+            $_conta = self::findByID($this->getID());
+            $receitas = $_conta->getTotal();
         }
-        if (!Validator::checkBoolean($this->getCancelada(), true)) {
-            $errors['cancelada'] = 'A cancelada é inválida';
+        if (!is_null($this->getClienteID()) && $this->getValor() > 0) {
+            $cliente = $this->findClienteID();
+            if ($cliente->getLimiteCompra() > 0) {
+                $info_total = self::getTotalAbertas(null, $this->getClienteID());
+                $utilizado = ($info_total['receitas'] - $info_total['recebido']) +
+                    ($info_total['despesas'] - $info_total['pago']) - $receitas;
+                if ($this->getValor() + $utilizado > $cliente->getLimiteCompra()) {
+                    $restante = ($this->getValor() + $utilizado) - $cliente->getLimiteCompra();
+                    $msg = 'O cliente "%s" não possui limite de crédito '.
+                        'suficiente para concluir a operação, necessário %s, limite '.
+                        'utilizado %s de %s';
+                    $errors['valor'] = sprintf(
+                        $msg,
+                        $cliente->getNomeCompleto(),
+                        \MZ\Util\Mask::money($restante, true),
+                        \MZ\Util\Mask::money($utilizado, true),
+                        \MZ\Util\Mask::money($cliente->getLimiteCompra(), true)
+                    );
+                }
+            }
         }
-        if (is_null($this->getDataCadastro())) {
-            $errors['datacadastro'] = 'A data de cadastro não pode ser vazia';
-        }
+        $this->setDataCadastro(self::now());
         if (!empty($errors)) {
             throw new \MZ\Exception\ValidationException($errors);
         }
@@ -833,8 +838,7 @@ class Conta extends \MZ\Database\Helper
         unset($values['id']);
         try {
             $id = self::getDB()->insertInto('Contas')->values($values)->execute();
-            $conta = self::findByID($id);
-            $this->fromArray($conta->toArray());
+            $this->loadByID($id);
         } catch (\Exception $e) {
             throw $this->translate($e);
         }
@@ -853,7 +857,11 @@ class Conta extends \MZ\Database\Helper
         if (!$this->exists()) {
             throw new \Exception('O identificador da conta não foi informado');
         }
+        if ($this->getID() == 1) {
+            throw new \Exception('A conta informada é utilizada internamente pelo sistema e não pode ser alterada');
+        }
         $values = self::filterValues($values, $only, $except);
+        unset($values['datacadastro']);
         try {
             self::getDB()
                 ->update('Contas')
@@ -875,6 +883,9 @@ class Conta extends \MZ\Database\Helper
     {
         if (!$this->exists()) {
             throw new \Exception('O identificador da conta não foi informado');
+        }
+        if ($this->getID() == 1) {
+            throw new \Exception('A conta informada é utilizada internamente pelo sistema e não pode ser excluída');
         }
         $result = self::getDB()
             ->deleteFrom('Contas')
@@ -981,11 +992,22 @@ class Conta extends \MZ\Database\Helper
     {
         $allowed = self::getAllowedKeys();
         if (isset($condition['search'])) {
-            $search = $condition['search'];
-            $field = 'c.descricao LIKE ?';
-            $condition[$field] = '%'.$search.'%';
-            $allowed[$field] = true;
+            $search = trim($condition['search']);
+            if (substr($search, 0, 1) == '#') {
+                $condition['numerodoc'] = substr($search, 1);
+            } elseif ($search != '') {
+                $field = 'c.descricao LIKE ?';
+                $condition[$field] = '%'.$search.'%';
+                $allowed[$field] = true;
+            }
             unset($condition['search']);
+        }
+        if (isset($condition['classificacao'])) {
+            $classificacao = intval($condition['classificacao']);
+            $field = '(c.classificacaoid = ? OR c.subclassificacaoid = ?)';
+            $condition[$field] = [$classificacao, $classificacao];
+            $allowed[$field] = true;
+            unset($condition['classificacao']);
         }
         return Filter::keys($condition, $allowed, 'c.');
     }
@@ -1001,8 +1023,7 @@ class Conta extends \MZ\Database\Helper
         $query = self::getDB()->from('Contas c');
         $condition = self::filterCondition($condition);
         $query = self::buildOrderBy($query, self::filterOrder($order));
-        $query = $query->orderBy('c.descricao ASC');
-        $query = $query->orderBy('c.id ASC');
+        $query = $query->orderBy('c.id DESC');
         return self::buildCondition($query, $condition);
     }
 

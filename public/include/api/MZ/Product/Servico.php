@@ -549,8 +549,7 @@ class Servico extends \MZ\Database\Helper
         unset($values['id']);
         try {
             $id = self::getDB()->insertInto('Servicos')->values($values)->execute();
-            $servico = self::findByID($id);
-            $this->fromArray($servico->toArray());
+            $this->loadByID($id);
         } catch (\Exception $e) {
             throw $this->translate($e);
         }

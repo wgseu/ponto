@@ -332,8 +332,7 @@ class Compra extends \MZ\Database\Helper
         unset($values['id']);
         try {
             $id = self::getDB()->insertInto('Compras')->values($values)->execute();
-            $compra = self::findByID($id);
-            $this->fromArray($compra->toArray());
+            $this->loadByID($id);
         } catch (\Exception $e) {
             throw $this->translate($e);
         }

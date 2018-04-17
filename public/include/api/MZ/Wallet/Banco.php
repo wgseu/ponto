@@ -401,8 +401,7 @@ class Banco extends \MZ\Database\Helper
         unset($values['id']);
         try {
             $id = self::getDB()->insertInto('Bancos')->values($values)->execute();
-            $banco = self::findByID($id);
-            $this->fromArray($banco->toArray());
+            $this->loadByID($id);
         } catch (\Exception $e) {
             throw $this->translate($e);
         }

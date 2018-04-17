@@ -422,8 +422,7 @@ class Estado extends \MZ\Database\Helper
         unset($values['id']);
         try {
             $id = self::getDB()->insertInto('Estados')->values($values)->execute();
-            $estado = self::findByID($id);
-            $this->fromArray($estado->toArray());
+            $this->loadByID($id);
         } catch (\Exception $e) {
             throw $this->translate($e);
         }

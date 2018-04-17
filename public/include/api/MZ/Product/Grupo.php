@@ -389,17 +389,11 @@ class Grupo extends \MZ\Database\Helper
         if (is_null($this->getDescricao())) {
             $errors['descricao'] = 'A descrição não pode ser vazia';
         }
-        if (is_null($this->getMultiplo())) {
-            $errors['multiplo'] = 'O múltiplo não pode ser vazio';
+        if (!Validator::checkBoolean($this->getMultiplo())) {
+            $errors['multiplo'] = 'A informação de múltiplo não foi informada ou é inválida';
         }
-        if (!Validator::checkBoolean($this->getMultiplo(), true)) {
-            $errors['multiplo'] = 'O múltiplo é inválido';
-        }
-        if (is_null($this->getTipo())) {
-            $errors['tipo'] = 'O tipo não pode ser vazio';
-        }
-        if (!Validator::checkInSet($this->getTipo(), self::getTipoOptions(), true)) {
-            $errors['tipo'] = 'O tipo é inválido';
+        if (!Validator::checkInSet($this->getTipo(), self::getTipoOptions())) {
+            $errors['tipo'] = 'O tipo não foi informado ou é inválido';
         }
         if (is_null($this->getQuantidadeMinima())) {
             $errors['quantidademinima'] = 'A quantidade mínima não pode ser vazia';
@@ -407,11 +401,8 @@ class Grupo extends \MZ\Database\Helper
         if (is_null($this->getQuantidadeMaxima())) {
             $errors['quantidademaxima'] = 'A quantidade máxima não pode ser vazia';
         }
-        if (is_null($this->getFuncao())) {
-            $errors['funcao'] = 'A função de preço não pode ser vazia';
-        }
-        if (!Validator::checkInSet($this->getFuncao(), self::getFuncaoOptions(), true)) {
-            $errors['funcao'] = 'A função de preço é inválida';
+        if (!Validator::checkInSet($this->getFuncao(), self::getFuncaoOptions())) {
+            $errors['funcao'] = 'A função de preço não foi informada ou é inválida';
         }
         if (!empty($errors)) {
             throw new \MZ\Exception\ValidationException($errors);
@@ -451,8 +442,7 @@ class Grupo extends \MZ\Database\Helper
         unset($values['id']);
         try {
             $id = self::getDB()->insertInto('Grupos')->values($values)->execute();
-            $grupo = self::findByID($id);
-            $this->fromArray($grupo->toArray());
+            $this->loadByID($id);
         } catch (\Exception $e) {
             throw $this->translate($e);
         }
@@ -624,7 +614,26 @@ class Grupo extends \MZ\Database\Helper
         $query = self::getDB()->from('Grupos g');
         $condition = self::filterCondition($condition);
         $query = self::buildOrderBy($query, self::filterOrder($order));
-        $query = $query->orderBy('g.descricao ASC');
+        $query = $query->orderBy('g.id ASC');
+        return self::buildCondition($query, $condition);
+    }
+
+    /**
+     * Fetch data from database with a condition
+     * @param  array $condition condition to filter rows
+     * @param  array $order order rows
+     * @return SelectQuery query object with condition statement
+     */
+    private static function queryEx($condition = [], $order = [])
+    {
+        $query = self::getDB()->from('Grupos g')
+            ->select('a.grupoid as grupoassociadoid')
+            ->innerJoin('Pacotes c ON c.grupoid = g.id')
+            ->leftJoin('Pacotes p ON p.grupoid = c.grupoid AND p.id > c.id')
+            ->leftJoin('Pacotes a ON a.id = c.associacaoid')
+            ->where(['p.id' => null]);
+        $condition = self::filterCondition($condition);
+        $query = self::buildOrderBy($query, self::filterOrder($order));
         $query = $query->orderBy('g.id ASC');
         return self::buildCondition($query, $condition);
     }
@@ -691,6 +700,26 @@ class Grupo extends \MZ\Database\Helper
             $result[] = new Grupo($row);
         }
         return $result;
+    }
+
+    /**
+     * Find all Grupo
+     * @param  array  $condition Condition to get all Grupo
+     * @param  array  $order     Order Grupo
+     * @param  int    $limit     Limit data into row count
+     * @param  int    $offset    Start offset to get rows
+     * @return array             List of all rows instanced as Grupo
+     */
+    public static function rawFindAll($condition = [], $order = [], $limit = null, $offset = null)
+    {
+        $query = self::queryEx($condition, $order);
+        if (!is_null($limit)) {
+            $query = $query->limit($limit);
+        }
+        if (!is_null($offset)) {
+            $query = $query->offset($offset);
+        }
+        return $query->fetchAll();
     }
 
     /**

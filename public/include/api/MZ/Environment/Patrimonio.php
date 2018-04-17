@@ -690,8 +690,7 @@ class Patrimonio extends \MZ\Database\Helper
         unset($values['id']);
         try {
             $id = self::getDB()->insertInto('Patrimonios')->values($values)->execute();
-            $patrimonio = self::findByID($id);
-            $this->fromArray($patrimonio->toArray());
+            $this->loadByID($id);
         } catch (\Exception $e) {
             throw $this->translate($e);
         }

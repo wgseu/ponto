@@ -337,8 +337,7 @@ class Informacao extends \MZ\Database\Helper
         unset($values['id']);
         try {
             $id = self::getDB()->insertInto('Informacoes')->values($values)->execute();
-            $informacao = self::findByID($id);
-            $this->fromArray($informacao->toArray());
+            $this->loadByID($id);
         } catch (\Exception $e) {
             throw $this->translate($e);
         }

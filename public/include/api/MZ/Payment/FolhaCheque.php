@@ -523,8 +523,7 @@ class FolhaCheque extends \MZ\Database\Helper
         unset($values['id']);
         try {
             $id = self::getDB()->insertInto('Folhas_Cheques')->values($values)->execute();
-            $folha_cheque = self::findByID($id);
-            $this->fromArray($folha_cheque->toArray());
+            $this->loadByID($id);
         } catch (\Exception $e) {
             throw $this->translate($e);
         }

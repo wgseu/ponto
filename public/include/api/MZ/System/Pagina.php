@@ -275,8 +275,7 @@ class Pagina extends \MZ\Database\Helper
         unset($values['id']);
         try {
             $id = self::getDB()->insertInto('Paginas')->values($values)->execute();
-            $pagina = self::findByID($id);
-            $this->fromArray($pagina->toArray());
+            $this->loadByID($id);
         } catch (\Exception $e) {
             throw $this->translate($e);
         }

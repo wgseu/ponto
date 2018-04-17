@@ -522,7 +522,7 @@ class ZEstoque
                 break;
             }
             if ($produto->getTipo() == Produto::TIPO_COMPOSICAO) {
-                $composicoes = Composicao::getTodasDaComposicaoID(null, $composicao->getProdutoID());
+                $composicoes = Composicao::findAll(['composicaoid' => $composicao->getProdutoID()]);
                 foreach ($composicoes as $_composicao) {
                     $_composicao->setQuantidade($_composicao->getQuantidade() * $composicao->getQuantidade());
                     $existe = isset($ignore_composicoes[$_composicao->getID()]);

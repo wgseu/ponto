@@ -440,8 +440,7 @@ class Catalogo extends \MZ\Database\Helper
         unset($values['id']);
         try {
             $id = self::getDB()->insertInto('Catalogos')->values($values)->execute();
-            $catalogo = self::findByID($id);
-            $this->fromArray($catalogo->toArray());
+            $this->loadByID($id);
         } catch (\Exception $e) {
             throw $this->translate($e);
         }

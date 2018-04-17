@@ -316,8 +316,7 @@ class Formacao extends \MZ\Database\Helper
         unset($values['id']);
         try {
             $id = self::getDB()->insertInto('Formacoes')->values($values)->execute();
-            $formacao = self::findByID($id);
-            $this->fromArray($formacao->toArray());
+            $this->loadByID($id);
         } catch (\Exception $e) {
             throw $this->translate($e);
         }

@@ -536,8 +536,7 @@ class Transferencia extends \MZ\Database\Helper
         unset($values['id']);
         try {
             $id = self::getDB()->insertInto('Transferencias')->values($values)->execute();
-            $transferencia = self::findByID($id);
-            $this->fromArray($transferencia->toArray());
+            $this->loadByID($id);
         } catch (\Exception $e) {
             throw $this->translate($e);
         }

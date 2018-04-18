@@ -797,22 +797,22 @@ class Produto extends \MZ\Database\Helper
             $this->setDetalhes($produto['detalhes']);
         }
         if (!isset($produto['quantidadelimite'])) {
-            $this->setQuantidadeLimite(null);
+            $this->setQuantidadeLimite(0);
         } else {
             $this->setQuantidadeLimite($produto['quantidadelimite']);
         }
         if (!isset($produto['quantidademaxima'])) {
-            $this->setQuantidadeMaxima(null);
+            $this->setQuantidadeMaxima(0);
         } else {
             $this->setQuantidadeMaxima($produto['quantidademaxima']);
         }
         if (!isset($produto['conteudo'])) {
-            $this->setConteudo(null);
+            $this->setConteudo(1);
         } else {
             $this->setConteudo($produto['conteudo']);
         }
         if (!isset($produto['precovenda'])) {
-            $this->setPrecoVenda(null);
+            $this->setPrecoVenda(0);
         } else {
             $this->setPrecoVenda($produto['precovenda']);
         }
@@ -827,32 +827,32 @@ class Produto extends \MZ\Database\Helper
             $this->setTipo($produto['tipo']);
         }
         if (!isset($produto['cobrarservico'])) {
-            $this->setCobrarServico(null);
+            $this->setCobrarServico('Y');
         } else {
             $this->setCobrarServico($produto['cobrarservico']);
         }
         if (!isset($produto['divisivel'])) {
-            $this->setDivisivel(null);
+            $this->setDivisivel('Y');
         } else {
             $this->setDivisivel($produto['divisivel']);
         }
         if (!isset($produto['pesavel'])) {
-            $this->setPesavel(null);
+            $this->setPesavel('N');
         } else {
             $this->setPesavel($produto['pesavel']);
         }
         if (!isset($produto['perecivel'])) {
-            $this->setPerecivel(null);
+            $this->setPerecivel('N');
         } else {
             $this->setPerecivel($produto['perecivel']);
         }
         if (!isset($produto['tempopreparo'])) {
-            $this->setTempoPreparo(null);
+            $this->setTempoPreparo(0);
         } else {
             $this->setTempoPreparo($produto['tempopreparo']);
         }
         if (!isset($produto['visivel'])) {
-            $this->setVisivel(null);
+            $this->setVisivel('Y');
         } else {
             $this->setVisivel($produto['visivel']);
         }
@@ -1297,6 +1297,7 @@ class Produto extends \MZ\Database\Helper
     private static function query($condition = [], $order = [])
     {
         $promocao = isset($condition['promocao']) ? strval($condition['promocao']) : 'N';
+        $week_offset = (1 + date('w')) * 1440 + (int)((time() - strtotime('00:00')) / 60);
         $query = self::getDB()->from('Produtos p')
             ->select(null)
             ->select('p.id')
@@ -1330,10 +1331,10 @@ class Produto extends \MZ\Database\Helper
                 ' END) as imagem'
             )
             ->select('p.dataatualizacao')
-            ->leftJoin('Promocoes r ON r.produtoid = p.id AND ' .
-                'NOW() BETWEEN '.
-                'DATE_ADD(CURDATE(), INTERVAL r.inicio - DAYOFWEEK(CURDATE()) * 1440 MINUTE) AND '.
-                'DATE_ADD(CURDATE(), INTERVAL r.fim - DAYOFWEEK(CURDATE()) * 1440 MINUTE)'
+            ->leftJoin(
+                'Promocoes r ON r.produtoid = p.id AND ' .
+                '? BETWEEN r.inicio AND r.fim',
+                $week_offset
             )
             ->leftJoin('Categorias c ON c.id = p.categoriaid');
         if (isset($condition['search'])) {

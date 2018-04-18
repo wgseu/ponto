@@ -245,7 +245,7 @@ class Categoria extends \MZ\Database\Helper
             $this->setDescricao($categoria['descricao']);
         }
         if (!isset($categoria['servico'])) {
-            $this->setServico(null);
+            $this->setServico('Y');
         } else {
             $this->setServico($categoria['servico']);
         }
@@ -502,6 +502,12 @@ class Categoria extends \MZ\Database\Helper
     private static function filterOrder($order)
     {
         $allowed = self::getAllowedKeys();
+        $order = Filter::order($order);
+        if (isset($order['vendas'])) {
+            $field = 'SUM(r.quantidade)';
+            $order = replace_key($order, 'vendas', $field);
+            $allowed[$field] = true;
+        }
         return Filter::orderBy($order, $allowed, 'c.');
     }
 
@@ -543,10 +549,23 @@ class Categoria extends \MZ\Database\Helper
                 ' END) as imagem'
             )
             ->select('c.dataatualizacao');
+        $order = Filter::order($order);
+        if (isset($condition['disponivel'])) {
+            $disponivel = $condition['disponivel'];
+            $query = $query->leftJoin('Produtos p ON p.categoriaid = c.id AND p.visivel = "Y"')
+                ->having('(CASE WHEN COUNT(p.id) > 0 THEN "Y" ELSE "N" END) = ?', $disponivel);
+        }
+        if (isset($order['vendas'])) {
+            $query = $query->leftJoin(
+                'Produtos_Pedidos r ON r.produtoid = p.id AND r.datahora > ?',
+                self::now('-1 month')
+            );
+        }
         $condition = self::filterCondition($condition);
         $query = self::buildOrderBy($query, self::filterOrder($order));
         $query = $query->orderBy('c.descricao ASC');
         $query = $query->orderBy('c.id ASC');
+        $query = $query->groupBy('c.id');
         return self::buildCondition($query, $condition);
     }
 
@@ -620,6 +639,7 @@ class Categoria extends \MZ\Database\Helper
     public static function count($condition = [])
     {
         $query = self::query($condition);
-        return $query->count();
+        $query = $query->select(null)->groupBy(null)->select('COUNT(DISTINCT c.id)');
+        return (int) $query->fetchColumn();
     }
 }

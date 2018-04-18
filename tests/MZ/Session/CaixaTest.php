@@ -199,6 +199,7 @@ class CaixaTest extends \PHPUnit_Framework_TestCase
         $cliente = new \MZ\Account\Cliente();
         $cliente->setNomeCompleto('Fulano da Silva');
         $cliente->setEmail('fulano@email.com');
+        $cliente->setLogin('fulano');
         $cliente->setSenha('1234');
         $cliente->insert();
 

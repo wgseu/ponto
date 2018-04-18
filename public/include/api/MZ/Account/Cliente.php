@@ -27,6 +27,7 @@ namespace MZ\Account;
 use MZ\Util\Filter;
 use MZ\Util\Validator;
 use MZ\Employee\Funcionario;
+use MZ\Sale\Pedido;
 
 /**
  * Informações de cliente físico ou jurídico. Clientes, empresas,
@@ -893,9 +894,7 @@ class Cliente extends \MZ\Database\Helper
 
         $this->setID($original->getID());
         $this->setSecreto($original->getSecreto());
-        $this->setDataCadastro($original->getDataCadastro());
-        $this->setLimiteCompra($original->getLimiteCompra());
-        $this->setLimiteCompra(Filter::float($this->getLimiteCompra()));
+        $this->setLimiteCompra(Filter::float($original->getLimiteCompra()));
         $this->setAcionistaID(Filter::number($this->getAcionistaID()));
         $this->setLogin(Filter::string($this->getLogin()));
         $this->setSenha(Filter::text($this->getSenha()));
@@ -933,7 +932,6 @@ class Cliente extends \MZ\Database\Helper
                 unlink($imagem_path);
             }
         }
-        $this->setDataAtualizacao(self::now());
     }
 
     /**
@@ -1008,15 +1006,11 @@ class Cliente extends \MZ\Database\Helper
         if (!Validator::checkPhone($this->getFone(2), true)) {
             $errors['fone2'] = 'O Celular é inválido';
         }
-        if (is_null($this->getDataAtualizacao())) {
-            $errors['dataatualizacao'] = 'A data de atualização não pode ser vazia';
-        }
-        if (is_null($this->getDataCadastro())) {
-            $errors['datacadastro'] = 'A data de cadastro não pode ser vazia';
-        }
         if (!is_null($this->getLimiteCompra()) && $this->getLimiteCompra() < 0) {
             $errors['limitecompra'] = 'O limite de compra não pode ser negativo';
         }
+        $this->setDataCadastro(self::now());
+        $this->setDataAtualizacao(self::now());
         if (!empty($errors)) {
             throw new \MZ\Exception\ValidationException($errors);
         }
@@ -1125,6 +1119,7 @@ class Cliente extends \MZ\Database\Helper
             throw new \Exception('O identificador do cliente não foi informado');
         }
         $values = self::filterValues($values, $only, $except);
+        unset($values['data_cadastro']);
         try {
             self::getDB()
                 ->update('Clientes')
@@ -1318,13 +1313,6 @@ class Cliente extends \MZ\Database\Helper
     private static function filterCondition($condition)
     {
         $allowed = self::getAllowedKeys();
-        if (isset($condition['search'])) {
-            $search = $condition['search'];
-            $field = 'c.nome LIKE ?';
-            $condition[$field] = '%'.$search.'%';
-            $allowed[$field] = true;
-            unset($condition['search']);
-        }
         if (isset($condition['fone'])) {
             $fone = $condition['fone'];
             $fone = self::buildFoneSearch($fone);
@@ -1332,6 +1320,24 @@ class Cliente extends \MZ\Database\Helper
             $condition[$field] = [$fone, $fone];
             $allowed[$field] = true;
             unset($condition['fone']);
+        }
+        if (isset($condition['apartir_cadastro'])) {
+            $field = 'c.datacadastro >= ?';
+            $condition[$field] = $condition['apartir_cadastro'];
+            $allowed[$field] = true;
+            unset($condition['apartir_cadastro']);
+        }
+        if (isset($condition['ate_cadastro'])) {
+            $field = 'c.datacadastro <= ?';
+            $condition[$field] = $condition['ate_cadastro'];
+            $allowed[$field] = true;
+            unset($condition['ate_cadastro']);
+        }
+        if (isset($condition['aniversariante'])) {
+            $field = self::strftime('2000-%m-%d', 'c.dataaniversario');
+            $condition[$field] = self::date(date('2000-m-d'));
+            $allowed[$field] = true;
+            unset($condition['aniversariante']);
         }
         return Filter::keys($condition, $allowed, 'c.');
     }
@@ -1344,9 +1350,30 @@ class Cliente extends \MZ\Database\Helper
      */
     private static function query($condition = [], $order = [])
     {
-        $query = self::getDB()->from('Clientes c')
-            ->select(null)
-            ->select('c.id')
+        $order = Filter::order($order);
+        if (isset($condition['comprador'])) {
+            $query = self::getDB()->from('Pedidos p')
+                ->select(null)
+                ->select('COUNT(DISTINCT p.id) as pedidos')
+                ->select('SUM(r.quantidade * r.preco * (1 + r.porcentagem / 100)) as total')
+                ->leftJoin('Produtos_Pedidos r ON r.pedidoid = p.id AND r.cancelado = ?', 'N')
+                ->leftJoin('Clientes c ON c.id = p.clienteid')
+                ->where('p.cancelado', 'N')
+                ->where('p.estado', Pedido::ESTADO_FINALIZADO)
+                ->where('NOT p.clienteid IS NULL')
+                ->orderBy('total DESC')
+                ->groupBy('p.clienteid');
+            if (isset($condition['apartir_compra'])) {
+                $query = $query->where('p.datacriacao >= ?', $condition['apartir_compra']);
+            }
+            if (isset($condition['ate_compra'])) {
+                $query = $query->where('p.datacriacao <= ?', $condition['ate_compra']);
+            }
+        } else {
+            $query = self::getDB()->from('Clientes c')
+                ->select(null);
+        }
+        $query = $query->select('c.id')
             ->select('c.tipo')
             ->select('c.acionistaid')
             ->select('c.login')
@@ -1374,6 +1401,28 @@ class Cliente extends \MZ\Database\Helper
             )
             ->select('c.dataatualizacao')
             ->select('c.datacadastro');
+        if (isset($condition['search'])) {
+            $search = trim($condition['search']);
+            if (Validator::checkEmail($search)) {
+                $query = $query->where('c.email', $search);
+            } elseif (Validator::checkCPF($search) || Validator::checkCNPJ($search)) {
+                $query = $query->where('c.cpf', Filter::digits($search));
+            } elseif (check_fone($search, true)) {
+                $condition['fone'] = $search;
+            } else {
+                $query = self::buildSearch(
+                    $search,
+                    self::concat([
+                        'c.nome',
+                        '" "',
+                        'COALESCE(c.sobrenome, "")'
+                    ]),
+                    'p.descricao',
+                    $query
+                );
+            }
+            unset($condition['search']);
+        }
         if (isset($condition['fone'])) {
             $fone = $condition['fone'];
             $fone = self::buildFoneSearch($fone);
@@ -1381,7 +1430,8 @@ class Cliente extends \MZ\Database\Helper
         }
         $condition = self::filterCondition($condition);
         $query = self::buildOrderBy($query, self::filterOrder($order));
-        $query = $query->orderBy('c.id DESC');
+        $query = $query->orderBy(self::concat(['c.nome', '" "', 'COALESCE(c.sobrenome, "")']).' ASC');
+        $query = $query->orderBy('c.id ASC');
         return self::buildCondition($query, $condition);
     }
 
@@ -1522,6 +1572,26 @@ class Cliente extends \MZ\Database\Helper
             $result[] = new Cliente($row);
         }
         return $result;
+    }
+
+    /**
+     * Find all Cliente
+     * @param  array  $condition Condition to get all Cliente
+     * @param  array  $order     Order Cliente
+     * @param  int    $limit     Limit data into row count
+     * @param  int    $offset    Start offset to get rows
+     * @return array  List of all rows
+     */
+    public static function rawFindAll($condition = [], $order = [], $limit = null, $offset = null)
+    {
+        $query = self::query($condition, $order);
+        if (!is_null($limit)) {
+            $query = $query->limit($limit);
+        }
+        if (!is_null($offset)) {
+            $query = $query->offset($offset);
+        }
+        return $query->fetchAll();
     }
 
     /**

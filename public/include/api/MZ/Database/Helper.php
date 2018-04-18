@@ -313,4 +313,12 @@ abstract class Helper
         }
         return 'CONCAT(' . implode(', ', $values) . ')';
     }
+
+    public static function strftime($fmt, $value)
+    {
+        if (getenv('DB_DRIVER') == 'sqlite') {
+            return "strftime('" . $fmt . "', " . $value .")";
+        }
+        return "DATE_FORMAT(" . $value . ", '" . $fmt ."')";
+    }
 }

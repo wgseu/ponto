@@ -862,7 +862,7 @@ class Produto extends \MZ\Database\Helper
             $this->setImagem($produto['imagem']);
         }
         if (!isset($produto['dataatualizacao'])) {
-            $this->setDataAtualizacao(null);
+            $this->setDataAtualizacao(self::now());
         } else {
             $this->setDataAtualizacao($produto['dataatualizacao']);
         }
@@ -938,7 +938,6 @@ class Produto extends \MZ\Database\Helper
                 @unlink($image_path);
             }
         }
-        $this->setDataAtualizacao(self::now());
     }
 
     /**
@@ -968,18 +967,39 @@ class Produto extends \MZ\Database\Helper
         }
         if (is_null($this->getQuantidadeLimite())) {
             $errors['quantidadelimite'] = 'A quantidade limite não pode ser vazia';
+        } elseif ($this->getQuantidadeLimite() < 0) {
+            $errors['quantidadelimite'] = 'A quantidade limite não pode ser negativa';
         }
         if (is_null($this->getQuantidadeMaxima())) {
             $errors['quantidademaxima'] = 'A quantidade máxima não pode ser vazia';
+        } elseif ($this->getQuantidadeMaxima() < 0) {
+            $errors['quantidademaxima'] = 'A quantidade máxima não pode ser negativa';
         }
         if (is_null($this->getConteudo())) {
             $errors['conteudo'] = 'O conteúdo não pode ser vazio';
+        } else {
+            $unidade = $this->findUnidadeID();
+            if (is_equal($this->getConteudo(), 0, 0.0001)) {
+                $errors['conteudo'] = 'O conteúdo não pode ser nulo';
+            } elseif ($this->getConteudo() != 1 && strtoupper($unidade->getSigla()) == Unidade::SIGLA_UNITARIA) {
+                $errors['conteudo'] = 'O conteúdo deve ser unitário com valor 1';
+            }
         }
         if (is_null($this->getPrecoVenda())) {
             $errors['precovenda'] = 'O preço de venda não pode ser vazio';
+        } elseif ($this->getPrecoVenda() < 0) {
+            $errors['precovenda'] = 'O preço de venda não pode ser negativo';
+        }
+        if ($this->getCustoProducao() < 0) {
+            $errors['custoproducao'] = 'O custo de produção não pode ser negativo';
         }
         if (!Validator::checkInSet($this->getTipo(), self::getTipoOptions())) {
             $errors['tipo'] = 'O tipo é inválido';
+        }
+        if ($this->getTipo() == self::TIPO_PACOTE &&
+            Pacote::count(['produtoid' => $this->getID()]) > 0
+        ) {
+            $errors['tipo'] = 'O produto não pode ser um pacote pois já faz parte de um';
         }
         if (!Validator::checkBoolean($this->getCobrarServico())) {
             $errors['cobrarservico'] = 'A cobrança de serviço é inválida';
@@ -995,6 +1015,8 @@ class Produto extends \MZ\Database\Helper
         }
         if (is_null($this->getTempoPreparo())) {
             $errors['tempopreparo'] = 'O tempo de preparo não pode ser vazio';
+        } elseif ($this->getTempoPreparo() < 0) {
+            $errors['tempopreparo'] = 'O tempo de preparo não pode ser negativo';
         }
         if (!Validator::checkBoolean($this->getVisivel())) {
             $errors['visivel'] = 'O visível é inválido';
@@ -1249,12 +1271,19 @@ class Produto extends \MZ\Database\Helper
     private static function filterCondition($condition)
     {
         $allowed = self::getAllowedKeys();
-        if (isset($condition['search'])) {
-            $search = $condition['search'];
-            $field = 'p.descricao LIKE ?';
-            $condition[$field] = '%'.$search.'%';
+        if (isset($condition['categoria'])) {
+            $categoria = Filter::number($condition['categoria']);
+            $field = '(p.categoriaid = ? OR c.categoriaid = ?)';
+            $condition[$field] = [$categoria, $categoria];
             $allowed[$field] = true;
-            unset($condition['search']);
+            unset($condition['categoria']);
+        }
+        if (isset($condition['permitido'])) {
+            $permitido = trim($condition['permitido']);
+            $field = 'COALESCE(r.proibir, "N") <> ?';
+            $condition[$field] = $permitido;
+            $allowed[$field] = true;
+            unset($condition['permitido']);
         }
         return Filter::keys($condition, $allowed, 'p.');
     }
@@ -1267,6 +1296,7 @@ class Produto extends \MZ\Database\Helper
      */
     private static function query($condition = [], $order = [])
     {
+        $promocao = isset($condition['promocao']) ? strval($condition['promocao']) : 'N';
         $query = self::getDB()->from('Produtos p')
             ->select(null)
             ->select('p.id')
@@ -1282,7 +1312,10 @@ class Produto extends \MZ\Database\Helper
             ->select('p.quantidadelimite')
             ->select('p.quantidademaxima')
             ->select('p.conteudo')
-            ->select('p.precovenda')
+            ->select(
+                '(p.precovenda + (CASE WHEN ? = "Y" THEN COALESCE(r.valor, 0) ELSE 0 END)) as precovenda',
+                $promocao
+            )
             ->select('p.custoproducao')
             ->select('p.tipo')
             ->select('p.cobrarservico')
@@ -1296,12 +1329,74 @@ class Produto extends \MZ\Database\Helper
                 self::concat(['p.id', '".png"']).
                 ' END) as imagem'
             )
-            ->select('p.dataatualizacao');
+            ->select('p.dataatualizacao')
+            ->leftJoin('Promocoes r ON r.produtoid = p.id AND ' .
+                'NOW() BETWEEN '.
+                'DATE_ADD(CURDATE(), INTERVAL r.inicio - DAYOFWEEK(CURDATE()) * 1440 MINUTE) AND '.
+                'DATE_ADD(CURDATE(), INTERVAL r.fim - DAYOFWEEK(CURDATE()) * 1440 MINUTE)'
+            )
+            ->leftJoin('Categorias c ON c.id = p.categoriaid');
+        if (isset($condition['search'])) {
+            $search = trim($condition['search']);
+            if (Validator::checkDigits($search)) {
+                $query = $query->where(
+                    '(p.id = ? OR p.codigobarras = ?)',
+                    intval($search),
+                    Filter::digits($search)
+                );
+            } else {
+                $query = self::buildSearch($search, 'p.descricao', $query);
+            }
+            unset($condition['search']);
+        }
         $condition = self::filterCondition($condition);
         $query = self::buildOrderBy($query, self::filterOrder($order));
         $query = $query->orderBy('p.descricao ASC');
         $query = $query->orderBy('p.id ASC');
         return self::buildCondition($query, $condition);
+    }
+
+    /**
+     * Fetch data from database with a condition
+     * @param  array $condition condition to filter rows
+     * @param  array $order order rows
+     * @return SelectQuery query object with condition statement
+     */
+    private static function queryEx($condition = [], $order = [])
+    {
+        $setorestoque = isset($condition['setorestoque']) ? $condition['setorestoque'] : null;
+        $query = self::query($condition, $order)
+            ->select('COALESCE(SUM(e.quantidade), 0) as estoque')
+            ->select('c.descricao as categoria')
+            ->select('u.sigla as unidade')
+            ->select('u.nome as unidade_nome')
+            ->select('se.nome as setor_estoque')
+            ->select('sp.nome as setor_preparo')
+            ->leftJoin(
+                'Estoque e ON e.produtoid = p.id AND e.cancelado = "N" AND '.
+                'e.setorid = IFNULL(?, IFNULL(p.setorestoqueid, e.setorid))',
+                $setorestoque
+            )
+            ->leftJoin('Unidades u ON u.id = p.unidadeid')
+            ->leftJoin('Setores se ON se.id = p.setorestoqueid')
+            ->leftJoin('Setores sp ON sp.id = p.setorpreparoid')
+            ->groupBy('p.id');
+        if (isset($condition['disponivel'])) {
+            $disponivel = $condition['disponivel'];
+            $query = $query->having(
+                '(p.tipo <> ? OR (CASE WHEN estoque > 0 THEN "Y" ELSE "N" END) = ?)',
+                self::TIPO_PRODUTO,
+                $disponivel
+            );
+        }
+        if (isset($condition['limitado'])) {
+            $limitado = $condition['limitado'];
+            $query = $query->having(
+                '(CASE WHEN COALESCE(estoque, 0) <= p.quantidadelimite THEN "Y" ELSE "N" END) = ?',
+                $limitado
+            );
+        }
+        return $query;
     }
 
     /**
@@ -1376,6 +1471,26 @@ class Produto extends \MZ\Database\Helper
             $result[] = new Produto($row);
         }
         return $result;
+    }
+
+    /**
+     * Find all Produto
+     * @param  array  $condition Condition to get all Produto
+     * @param  array  $order     Order Produto
+     * @param  int    $limit     Limit data into row count
+     * @param  int    $offset    Start offset to get rows
+     * @return array             List of all rows
+     */
+    public static function rawFindAll($condition = [], $order = [], $limit = null, $offset = null)
+    {
+        $query = self::queryEx($condition, $order);
+        if (!is_null($limit)) {
+            $query = $query->limit($limit);
+        }
+        if (!is_null($offset)) {
+            $query = $query->offset($offset);
+        }
+        return $query->fetchAll();
     }
 
     /**

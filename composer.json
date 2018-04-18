@@ -40,7 +40,6 @@
     "autoload": {
         "classmap": [
             "public/include/api",
-            "public/include/classes",
             "public/include/library"
         ],
         "files": [

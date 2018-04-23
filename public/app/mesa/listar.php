@@ -28,15 +28,13 @@ if (!logged_employee()->has(Permissao::NOME_PEDIDOMESA)) {
     json('Você não tem permissão para acessar mesas');
 }
 /* verifica se deve ordenar pelo número da mesa ou pelo funcionário */
-$funcionario_id = null;
-if (!isset($_GET['ordenar']) && $_GET['ordenar'] != 'mesa') {
-    $funcionario_id = logged_employee()->getID();
+$order = [];
+if (isset($_GET['ordenar']) && $_GET['ordenar'] != 'mesa') {
+    $order = ['atendente' => 1];
 }
-$mesas = Mesa::getTodas($funcionario_id);
-$response = ['status' => 'ok'];
-$mesas_array = [];
-foreach ($mesas as $mesa) {
-    $mesas_array[] = $mesa->toArray();
-}
-$response['mesas'] = $mesas_array;
-json($response);
+$condition = [
+    'ativa' => 'Y',
+    'pedidos' => true
+];
+$mesas = Mesa::rawFindAll($condition, $order);
+json('mesas', $mesas);

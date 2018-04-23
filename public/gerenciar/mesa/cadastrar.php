@@ -65,7 +65,7 @@ if (is_post()) {
     json('Nenhum dado foi enviado');
 } else {
     $mesa = new Mesa();
-    $mesa->setID(Mesa::getProximoID());
+    $mesa->loadNextID();
     $mesa->setNome('Mesa ' . $mesa->getID());
     $mesa->setAtiva('Y');
 }

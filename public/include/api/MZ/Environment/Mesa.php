@@ -207,11 +207,15 @@ class Mesa extends \MZ\Database\Helper
         if (is_null($this->getNome())) {
             $errors['nome'] = 'O nome não pode ser vazio';
         }
-        if (is_null($this->getAtiva())) {
-            $errors['ativa'] = 'A ativa não pode ser vazia';
+        if (!Validator::checkBoolean($this->getAtiva())) {
+            $errors['ativa'] = 'A disponibilidade não foi informada';
         }
-        if (!Validator::checkBoolean($this->getAtiva(), true)) {
-            $errors['ativa'] = 'A ativa é inválida';
+        $old_mesa = self::findByID($this->getID());
+        if ($old_mesa->exists() && $old_mesa->isAtiva() && !$this->isAtiva()) {
+            $pedido = \Pedido::getPelaMesaID($old_mesa->getID());
+            if ($pedido->exists()) {
+                $errors['ativa'] = 'A mesa não pode ser desativada porque possui um pedido em aberto';
+            }
         }
         if (!empty($errors)) {
             throw new \MZ\Exception\ValidationException($errors);
@@ -328,6 +332,18 @@ class Mesa extends \MZ\Database\Helper
     }
 
     /**
+     * Load next available id from database into this object id field
+     * @return Mesa Self id filled instance with next id
+     */
+    public function loadNextID()
+    {
+        $query = self::query()
+            ->select(null)
+            ->select('MAX(id) as id');
+        return $this->setID($query->fetchColumn() + 1);
+    }
+
+    /**
      * Get allowed keys array
      * @return array allowed keys array
      */
@@ -359,9 +375,13 @@ class Mesa extends \MZ\Database\Helper
         $allowed = self::getAllowedKeys();
         if (isset($condition['search'])) {
             $search = $condition['search'];
-            $field = 'm.nome LIKE ?';
-            $condition[$field] = '%'.$search.'%';
-            $allowed[$field] = true;
+            if (Validator::checkDigits($search)) {
+                $condition['m.id'] = Filter::number($search);
+            } else {
+                $field = 'm.nome LIKE ?';
+                $condition[$field] = '%'.$search.'%';
+                $allowed[$field] = true;
+            }
             unset($condition['search']);
         }
         return Filter::keys($condition, $allowed, 'm.');
@@ -376,9 +396,27 @@ class Mesa extends \MZ\Database\Helper
     private static function query($condition = [], $order = [])
     {
         $query = self::getDB()->from('Mesas m');
+        $order = Filter::order($order);
+        if (isset($condition['pedidos'])) {
+            $query = $query->select('(CASE WHEN ISNULL(p.id) THEN "livre" WHEN p.estado = "Fechado" THEN "fechado" WHEN p.estado = "Agendado" THEN "reservado" ELSE "ocupado" END) as estado')
+                ->select('pj.mesaid as juntaid')
+                ->select('mj.nome as juntanome')
+                ->leftJoin('Pedidos p ON p.mesaid = m.id AND p.tipo = "Mesa" AND p.cancelado = "N" AND p.estado <> "Finalizado"')
+                ->leftJoin('Produtos_Pedidos pp ON pp.pedidoid = p.id')
+                ->leftJoin('Juncoes j ON j.mesaid = m.id AND j.estado = "Associado"')
+                ->leftJoin('Pedidos pj ON pj.id = j.pedidoid')
+                ->leftJoin('Mesas mj ON mj.id = pj.mesaid')
+                ->groupBy('m.id');
+            if (isset($order['atendente'])) {
+                global $app;
+                $query = $query->orderBy(
+                    'IF(p.funcionarioid = ?, 1, 0) DESC',
+                    intval($app->getAuthentication()->getEmployee()->getID())
+                );
+            }
+        }
         $condition = self::filterCondition($condition);
         $query = self::buildOrderBy($query, self::filterOrder($order));
-        $query = $query->orderBy('m.nome ASC');
         $query = $query->orderBy('m.id ASC');
         return self::buildCondition($query, $condition);
     }
@@ -443,6 +481,26 @@ class Mesa extends \MZ\Database\Helper
             $result[] = new Mesa($row);
         }
         return $result;
+    }
+
+    /**
+     * Find all Mesa
+     * @param  array  $condition Condition to get all Mesa
+     * @param  array  $order     Order Mesa
+     * @param  int    $limit     Limit data into row count
+     * @param  int    $offset    Start offset to get rows
+     * @return array  List of all rows
+     */
+    public static function rawFindAll($condition = [], $order = [], $limit = null, $offset = null)
+    {
+        $query = self::query($condition, $order);
+        if (!is_null($limit)) {
+            $query = $query->limit($limit);
+        }
+        if (!is_null($offset)) {
+            $query = $query->offset($offset);
+        }
+        return $query->fetchAll();
     }
 
     /**

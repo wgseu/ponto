@@ -25,14 +25,14 @@ class JsonResponse extends Response
     public function error($message, $code = null, $errors = [])
     {
         $response = [
-            'resposta' => 'erro',
-            'mensagem' => $message
+            'status' => 'error',
+            'msg' => $message
         ];
         if (!is_null($code)) {
-            $response['codigo'] = $code;
+            $response['code'] = $code;
         }
         if (!empty($errors)) {
-            $response['erros'] = $errors;
+            $response['errors'] = $errors;
         }
         $this->output($response);
     }
@@ -40,11 +40,11 @@ class JsonResponse extends Response
     public function warning($message, $content = [], $code = null)
     {
         $response = [
-            'resposta' => 'aviso',
-            'mensagem' => $message
+            'status' => 'warning',
+            'msg' => $message
         ];
         if (!is_null($code)) {
-            $response['codigo'] = $code;
+            $response['code'] = $code;
         }
         $this->output(array_merge($response, $content));
     }
@@ -52,10 +52,10 @@ class JsonResponse extends Response
     public function success($content = [], $message = null)
     {
         $response = [
-            'resposta' => 'ok'
+            'status' => 'ok'
         ];
         if (!is_null($message)) {
-            $response['mensagem'] = $message;
+            $response['msg'] = $message;
         }
         $this->output(array_merge($response, $content));
     }

@@ -32,6 +32,7 @@ use MZ\Payment\FormaPagto;
 use MZ\Payment\Pagamento;
 use MZ\Payment\Cartao;
 use MZ\Account\Cliente;
+use MZ\Sale\Pedido;
 use MZ\Sale\ProdutoPedido;
 use MZ\Product\Servico;
 use MZ\Product\Produto;
@@ -275,7 +276,8 @@ class Order extends Pedido
                         }
                         $pagamento->setParcelas(1);
                         $pagamento->setValorParcela($pagamento->getTotal());
-                        $pagamento->setTaxas(-1 * $pagamento->getParcelas() *
+                        $pagamento->setTaxas(
+                            -1 * $pagamento->getParcelas() *
                             $pagamento->getValorParcela() * ($cartao->getTaxa() / 100.0) -
                             $cartao->getTransacao()
                         );
@@ -644,7 +646,7 @@ class Order extends Pedido
     {
         $changes = [];
         //TODO
-        $changes[] = ['code' => 2981, 'estado' => \PedidoEstado::AGENDADO];
+        $changes[] = ['code' => 2981, 'estado' => Pedido::ESTADO_AGENDADO];
         return $changes;
     }
 

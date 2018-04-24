@@ -22,6 +22,7 @@
 require_once(dirname(__DIR__) . '/app.php');
 
 use MZ\System\Integracao;
+use MZ\System\Permissao;
 
 need_permission(Permissao::NOME_ALTERARCONFIGURACOES, is_output('json'));
 $id = isset($_GET['id']) ? $_GET['id'] : null;

@@ -90,6 +90,15 @@ abstract class Helper
      */
     protected function translate($e)
     {
+        if ($e instanceof \PDOException &&
+            preg_match(
+                '/SQLSTATE\[\w+\]: <<[^>]+>>: \d+ (.*)/',
+                $e->getMessage(),
+                $matches
+            )
+        ) {
+            return new \Exception($matches[1], 45000);
+        }
         return $e;
     }
 

@@ -26,6 +26,7 @@ namespace MZ\Integrator;
 
 use Curl\Curl;
 use MZ\Employee\Funcionario;
+use MZ\Sale\Pedido;
 
 /**
  * Kromax Service and Task
@@ -119,19 +120,19 @@ class Kromax extends \MZ\System\Task
     {
         // build request
         switch ($estado) {
-            case \PedidoEstado::AGENDADO:
+            case Pedido::ESTADO_AGENDADO:
                 $status = 6;
                 $mensagem = 'Pedido recebido';
                 break;
-            case \PedidoEstado::ATIVO:
+            case Pedido::ESTADO_ATIVO:
                 $status = 0;
                 $mensagem = 'Chegou na cozinha';
                 break;
-            case \PedidoEstado::ENTREGA:
+            case Pedido::ESTADO_ENTREGA:
                 $status = 2;
                 $mensagem = 'Motoboy a caminho';
                 break;
-            case \PedidoEstado::FINALIZADO:
+            case Pedido::ESTADO_FINALIZADO:
                 $status = 5;
                 $mensagem = 'Encomenda entregue';
                 break;

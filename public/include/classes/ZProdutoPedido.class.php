@@ -372,11 +372,11 @@ class ZProdutoPedido
     public function getDestino($values)
     {
         switch ($values['pedido_tipo']) {
-            case \PedidoTipo::MESA:
+            case \Pedido::TIPO_MESA:
                 return $values['mesa_nome'];
-            case \PedidoTipo::COMANDA:
+            case \Pedido::TIPO_COMANDA:
                 return $values['comanda_nome'];
-            case \PedidoTipo::AVULSO:
+            case \Pedido::TIPO_AVULSO:
                 return 'Balcão';
             default:
                 return 'Entrega';
@@ -684,6 +684,11 @@ class ZProdutoPedido
                     $composicoes[$formacao->getComposicaoID()] = $formacao->getID();
                 }
             }
+        // $estoque = new Estoque();
+        // $estoque->setTransacaoID($produto_pedido->getID());
+        // $estoque->setProdutoID($produto_pedido->getProdutoID());
+        // $estoque->setFuncionarioID($produto_pedido->getFuncionarioID());
+        // $estoque->setQuantidade($produto_pedido->getQuantidade());
             Estoque::retirar($produto_pedido, $composicoes);
         } catch (PDOException $e) {
             self::handleException($e);
@@ -1068,12 +1073,12 @@ class ZProdutoPedido
         if ($tipo == Pedido::TIPO_COMANDA) {
             $query = $query->where([
                                 'p.comandaid' => $comanda_id,
-                                'p.tipo' => PedidoTipo::COMANDA,
+                                'p.tipo' => Pedido::TIPO_COMANDA,
                             ]);
         } else {
             $query = $query->where([
                                 'p.mesaid' => $mesa_id,
-                                'p.tipo' => PedidoTipo::MESA,
+                                'p.tipo' => Pedido::TIPO_MESA,
                             ]);
         }
         return $query;

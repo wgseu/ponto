@@ -24,18 +24,27 @@
  */
 require_once(dirname(dirname(__DIR__)) . '/app.php');
 
+use MZ\Stock\Estoque;
+use MZ\Environment\Setor;
+use MZ\System\Permissao;
+
 if (!is_login()) {
     json('Usuário não autenticado!');
 }
-$_estoque = $_POST['estoque'];
+$values = isset($_POST['estoque']) ? $_POST['estoque'] : [];
 try {
     if (!logged_employee()->has(Permissao::NOME_ESTOQUE)) {
         throw new \Exception('Você não tem permissão para inserir no estoque');
     }
-    $estoque = new Estoque($_estoque);
+    $setor = Setor::findDefault();
+    $estoque = new Estoque($values);
+    $estoque->filter(new Estoque());
+    $estoque->setTipoMovimento(Estoque::TIPO_MOVIMENTO_ENTRADA);
+    $estoque->setSetorID($setor->getID());
     $estoque->setFuncionarioID(logged_employee()->getID());
-    $estoque = Estoque::inserir($estoque);
-    json(['status' => 'ok', 'estoque' => $estoque->toArray()]);
+    $estoque->setCancelado('N');
+    $estoque->insert();
+    json('estoque', $estoque->publish());
 } catch (\Exception $e) {
     json($e->getMessage());
 }

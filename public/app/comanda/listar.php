@@ -40,10 +40,10 @@ $items = [];
 $obs_name = is_boolean_config('Vendas', 'Comanda.Observacao');
 foreach ($comandas as $_comanda) {
     switch ($_comanda['estado']) {
-        case PedidoEstado::ATIVO:
+        case Pedido::ESTADO_ATIVO:
             $_comanda['estado'] = 'ocupado';
             break;
-        case PedidoEstado::AGENDADO:
+        case Pedido::ESTADO_AGENDADO:
             $_comanda['estado'] = 'reservado';
             break;
         default:

@@ -34,70 +34,70 @@
 							<h3></h3>
 							<ul class="nav side-menu">
 								<li><a href="/gerenciar/"><i class="fa fa-home"></i><span class="nav-text"> Início </span><span class="fa"></span></a></li>
-<!--{if logged_employee()->has(Permissao::NOME_PAGAMENTO) || logged_employee()->has(Permissao::NOME_ABRIRCAIXA)}-->
+<!--{if logged_employee()->has(\MZ\System\Permissao::NOME_PAGAMENTO) || logged_employee()->has(\MZ\System\Permissao::NOME_ABRIRCAIXA)}-->
 								<li>
 									<a><i class="fa fa-area-chart"></i><span class="nav-text"> Vendas </span><span class="fa fa-chevron-down"></span></a>
 									<ul class="nav child_menu" style="display: none">
-<!--{if logged_employee()->has(Permissao::NOME_PAGAMENTO)}-->
+<!--{if logged_employee()->has(\MZ\System\Permissao::NOME_PAGAMENTO)}-->
 										<li><a href="/gerenciar/pedido/"><i class="fa fa-check"></i><span class="nav-text"> Pedidos </span><span class="fa"></span></a></li>
 <!--{/if}-->
-<!--{if logged_employee()->has(Permissao::NOME_PAGAMENTO)}-->
+<!--{if logged_employee()->has(\MZ\System\Permissao::NOME_PAGAMENTO)}-->
 										<li><a href="/gerenciar/produto_pedido/"><i class="fa fa-bars"></i><span class="nav-text"> Produtos e Serviços </span><span class="fa"></span></a></li>
 <!--{/if}-->
-<!--{if logged_employee()->has(Permissao::NOME_PAGAMENTO)}-->
+<!--{if logged_employee()->has(\MZ\System\Permissao::NOME_PAGAMENTO)}-->
 										<li><a href="/gerenciar/pagamento/"><i class="fa fa-money"></i><span class="nav-text"> Pagamentos </span><span class="fa"></span></a></li>
 <!--{/if}-->
-<!--{if logged_employee()->has(Permissao::NOME_ABRIRCAIXA)}-->
+<!--{if logged_employee()->has(\MZ\System\Permissao::NOME_ABRIRCAIXA)}-->
 										<li><a href="/gerenciar/movimentacao/"><i class="fa fa-suitcase"></i><span class="nav-text"> Movimentações </span><span class="fa"></span></a></li>
 <!--{/if}-->
 									</ul>
 								</li>
 <!--{/if}-->
-<!--{if logged_employee()->has(Permissao::NOME_CADASTROCAIXAS) || logged_employee()->has(Permissao::NOME_CADASTROBANCOS) || logged_employee()->has(Permissao::NOME_CADASTROCARTEIRAS) || logged_employee()->has(Permissao::NOME_CADASTROFORMASPAGTO) || logged_employee()->has(Permissao::NOME_CADASTROCARTOES) || logged_employee()->has(Permissao::NOME_CADASTROCONTAS) || logged_employee()->has(Permissao::NOME_CADASTRARCREDITOS) || logged_employee()->has(Permissao::NOME_PAGAMENTO)}-->
+<!--{if logged_employee()->has(\MZ\System\Permissao::NOME_CADASTROCAIXAS) || logged_employee()->has(\MZ\System\Permissao::NOME_CADASTROBANCOS) || logged_employee()->has(\MZ\System\Permissao::NOME_CADASTROCARTEIRAS) || logged_employee()->has(\MZ\System\Permissao::NOME_CADASTROFORMASPAGTO) || logged_employee()->has(\MZ\System\Permissao::NOME_CADASTROCARTOES) || logged_employee()->has(\MZ\System\Permissao::NOME_CADASTROCONTAS) || logged_employee()->has(\MZ\System\Permissao::NOME_CADASTRARCREDITOS) || logged_employee()->has(\MZ\System\Permissao::NOME_PAGAMENTO)}-->
 								<li>
 									<a><i class="fa fa-money"></i><span class="nav-text"> Financeiro </span><span class="fa fa-chevron-down"></span></a>
 									<ul class="nav child_menu" style="display: none">
-<!--{if logged_employee()->has(Permissao::NOME_CADASTROCAIXAS)}-->
+<!--{if logged_employee()->has(\MZ\System\Permissao::NOME_CADASTROCAIXAS)}-->
 										<li><a href="/gerenciar/caixa/"><i class="fa fa-shopping-cart"></i><span class="nav-text"> Caixas </span><span class="fa"></span></a></li>
 <!--{/if}-->
-<!--{if logged_employee()->has(Permissao::NOME_CADASTROBANCOS)}-->
+<!--{if logged_employee()->has(\MZ\System\Permissao::NOME_CADASTROBANCOS)}-->
 										<li><a href="/gerenciar/banco/"><i class="fa fa-bank"></i><span class="nav-text"> Bancos </span><span class="fa"></span></a></li>
 <!--{/if}-->
-<!--{if logged_employee()->has(Permissao::NOME_CADASTROCARTEIRAS)}-->
+<!--{if logged_employee()->has(\MZ\System\Permissao::NOME_CADASTROCARTEIRAS)}-->
 										<li><a href="/gerenciar/carteira/"><i class="fa fa-money"></i><span class="nav-text"> Carteiras </span><span class="fa"></span></a></li>
 <!--{/if}-->
-<!--{if logged_employee()->has(Permissao::NOME_CADASTROFORMASPAGTO)}-->
+<!--{if logged_employee()->has(\MZ\System\Permissao::NOME_CADASTROFORMASPAGTO)}-->
 										<li><a href="/gerenciar/forma_pagto/"><i class="fa fa-ticket"></i><span class="nav-text"> Formas de pagamento </span><span class="fa"></span></a></li>
 <!--{/if}-->
-<!--{if logged_employee()->has(Permissao::NOME_CADASTROCARTOES)}-->
+<!--{if logged_employee()->has(\MZ\System\Permissao::NOME_CADASTROCARTOES)}-->
 										<li><a href="/gerenciar/cartao/"><i class="fa fa-credit-card"></i><span class="nav-text"> Cartões </span><span class="fa"></span></a></li>
 <!--{/if}-->
-<!--{if logged_employee()->has(Permissao::NOME_CADASTROCONTAS)}-->
+<!--{if logged_employee()->has(\MZ\System\Permissao::NOME_CADASTROCONTAS)}-->
 										<li><a href="/gerenciar/conta/"><i class="fa fa-shield"></i><span class="nav-text"> Contas </span><span class="fa"></span></a></li>
 <!--{/if}-->
-<!--{if logged_employee()->has(Permissao::NOME_CADASTRARCREDITOS)}-->
+<!--{if logged_employee()->has(\MZ\System\Permissao::NOME_CADASTRARCREDITOS)}-->
 										<li><a href="/gerenciar/credito/"><i class="fa fa-gift"></i><span class="nav-text"> Créditos </span><span class="fa"></span></a></li>
 <!--{/if}-->
-<!--{if logged_employee()->has(Permissao::NOME_PAGAMENTO)}-->
+<!--{if logged_employee()->has(\MZ\System\Permissao::NOME_PAGAMENTO)}-->
 										<li><a href="/gerenciar/folha_cheque/"><i class="fa fa-keyboard-o"></i><span class="nav-text"> Cheques </span><span class="fa"></span></a></li>
 <!--{/if}-->
 									</ul>
 								</li>
 <!--{/if}-->
-<!--{if logged_employee()->has(Permissao::NOME_CADASTROPRODUTOS) || logged_employee()->has(Permissao::NOME_CADASTROSERVICOS) || logged_employee()->has(Permissao::NOME_ESTOQUE)}-->
+<!--{if logged_employee()->has(\MZ\System\Permissao::NOME_CADASTROPRODUTOS) || logged_employee()->has(\MZ\System\Permissao::NOME_CADASTROSERVICOS) || logged_employee()->has(\MZ\System\Permissao::NOME_ESTOQUE)}-->
 								<li>
 									<a><i class="fa fa-cube"></i><span class="nav-text"> Produtos </span><span class="fa fa-chevron-down"></span></a>
 									<ul class="nav child_menu" style="display: none">
-<!--{if logged_employee()->has(Permissao::NOME_CADASTROPRODUTOS)}-->
+<!--{if logged_employee()->has(\MZ\System\Permissao::NOME_CADASTROPRODUTOS)}-->
 										<li><a href="/gerenciar/produto/"><i class="fa fa-cube"></i><span class="nav-text"> Produtos </span><span class="fa"></span></a></li>
 <!--{/if}-->
-<!--{if logged_employee()->has(Permissao::NOME_CADASTROSERVICOS)}-->
+<!--{if logged_employee()->has(\MZ\System\Permissao::NOME_CADASTROSERVICOS)}-->
 										<li><a href="/gerenciar/servico/"><i class="fa fa-coffee"></i><span class="nav-text"> Serviços </span><span class="fa"></span></a></li>
 <!--{/if}-->
-<!--{if logged_employee()->has(Permissao::NOME_CADASTROPRODUTOS)}-->
+<!--{if logged_employee()->has(\MZ\System\Permissao::NOME_CADASTROPRODUTOS)}-->
 										<li><a href="/gerenciar/categoria/"><i class="fa fa-list"></i><span class="nav-text"> Categorias </span><span class="fa"></span></a></li>
 <!--{/if}-->
-<!--{if logged_employee()->has(Permissao::NOME_ESTOQUE)}-->
+<!--{if logged_employee()->has(\MZ\System\Permissao::NOME_ESTOQUE)}-->
 										<li><a href="/gerenciar/estoque/"><i class="fa fa-cubes"></i><span class="nav-text"> Estoque </span><span class="fa"></span></a></li>
 <!--{/if}-->
 									</ul>
@@ -106,10 +106,10 @@
 								<li>
 									<a><i class="fa fa-users"></i><span class="nav-text"> Pessoas e Empresas </span><span class="fa fa-chevron-down"></span></a>
 									<ul class="nav child_menu" style="display: none">
-<!--{if logged_employee()->has(Permissao::NOME_CADASTROCLIENTES)}-->
+<!--{if logged_employee()->has(\MZ\System\Permissao::NOME_CADASTROCLIENTES)}-->
 										<li><a href="/gerenciar/cliente/"><i class="fa fa-user"></i><span class="nav-text"> Clientes </span><span class="fa"></span></a></li>
 <!--{/if}-->
-<!--{if logged_employee()->has(Permissao::NOME_CADASTROFORNECEDORES)}-->
+<!--{if logged_employee()->has(\MZ\System\Permissao::NOME_CADASTROFORNECEDORES)}-->
 										<li><a href="/gerenciar/fornecedor/"><i class="fa fa-building"></i><span class="nav-text"> Fornecedores </span><span class="fa"></span></a></li>
 <!--{/if}-->
 										<li><a href="/gerenciar/funcionario/"><i class="fa fa-newspaper-o"></i><span class="nav-text"> Funcionários </span><span class="fa"></span></a></li>
@@ -118,77 +118,77 @@
 <!--{/if}-->
 									</ul>
 								</li>
-<!--{if logged_employee()->has(Permissao::NOME_CADASTROPAISES) || logged_employee()->has(Permissao::NOME_CADASTROESTADOS) || logged_employee()->has(Permissao::NOME_CADASTROCIDADES) || logged_employee()->has(Permissao::NOME_CADASTROBAIRROS)}-->
+<!--{if logged_employee()->has(\MZ\System\Permissao::NOME_CADASTROPAISES) || logged_employee()->has(\MZ\System\Permissao::NOME_CADASTROESTADOS) || logged_employee()->has(\MZ\System\Permissao::NOME_CADASTROCIDADES) || logged_employee()->has(\MZ\System\Permissao::NOME_CADASTROBAIRROS)}-->
 								<li>
 									<a><i class="fa fa-flag"></i><span class="nav-text"> Locais </span><span class="fa fa-chevron-down"></span></a>
 									<ul class="nav child_menu" style="display: none">
-<!--{if logged_employee()->has(Permissao::NOME_CADASTROPAISES)}-->
+<!--{if logged_employee()->has(\MZ\System\Permissao::NOME_CADASTROPAISES)}-->
 										<li><a href="/gerenciar/pais/"><i class="fa fa-globe"></i><span class="nav-text"> Paises </span><span class="fa"></span></a></li>
 <!--{/if}-->
-<!--{if logged_employee()->has(Permissao::NOME_CADASTROESTADOS)}-->
+<!--{if logged_employee()->has(\MZ\System\Permissao::NOME_CADASTROESTADOS)}-->
 										<li><a href="/gerenciar/estado/"><i class="fa fa-flag"></i><span class="nav-text"> Estados </span><span class="fa"></span></a></li>
 <!--{/if}-->
-<!--{if logged_employee()->has(Permissao::NOME_CADASTROCIDADES)}-->
+<!--{if logged_employee()->has(\MZ\System\Permissao::NOME_CADASTROCIDADES)}-->
 										<li><a href="/gerenciar/cidade/"><i class="fa fa-university"></i><span class="nav-text"> Cidades </span><span class="fa"></span></a></li>
 <!--{/if}-->
-<!--{if logged_employee()->has(Permissao::NOME_CADASTROBAIRROS)}-->
+<!--{if logged_employee()->has(\MZ\System\Permissao::NOME_CADASTROBAIRROS)}-->
 										<li><a href="/gerenciar/bairro/"><i class="fa fa-tag"></i><span class="nav-text"> Bairros </span><span class="fa"></span></a></li>
 <!--{/if}-->
 									</ul>
 								</li>
 <!--{/if}-->
-<!--{if logged_employee()->has(Permissao::NOME_CADASTROMESAS) || logged_employee()->has(Permissao::NOME_CADASTROCOMANDAS) || logged_employee()->has(Permissao::NOME_ESTOQUE) || logged_employee()->has(Permissao::NOME_CADASTROCONTAS) || logged_employee()->has(Permissao::NOME_CADASTROPATRIMONIO)}-->
+<!--{if logged_employee()->has(\MZ\System\Permissao::NOME_CADASTROMESAS) || logged_employee()->has(\MZ\System\Permissao::NOME_CADASTROCOMANDAS) || logged_employee()->has(\MZ\System\Permissao::NOME_ESTOQUE) || logged_employee()->has(\MZ\System\Permissao::NOME_CADASTROCONTAS) || logged_employee()->has(\MZ\System\Permissao::NOME_CADASTROPATRIMONIO)}-->
 								<li>
 									<a><i class="fa fa-sitemap"></i><span class="nav-text"> Ambiente e Objetos </span><span class="fa fa-chevron-down"></span></a>
 									<ul class="nav child_menu" style="display: none">
-<!--{if logged_employee()->has(Permissao::NOME_CADASTROMESAS)}-->
+<!--{if logged_employee()->has(\MZ\System\Permissao::NOME_CADASTROMESAS)}-->
 										<li><a href="/gerenciar/mesa/"><i class="fa fa-table"></i><span class="nav-text"> Mesas </span><span class="fa"></span></a></li>
 <!--{/if}-->
-<!--{if logged_employee()->has(Permissao::NOME_CADASTROCOMANDAS)}-->
+<!--{if logged_employee()->has(\MZ\System\Permissao::NOME_CADASTROCOMANDAS)}-->
 										<li><a href="/gerenciar/comanda/"><i class="fa fa-credit-card"></i><span class="nav-text"> Comandas </span><span class="fa"></span></a></li>
 <!--{/if}-->
-<!--{if logged_employee()->has(Permissao::NOME_ESTOQUE)}-->
+<!--{if logged_employee()->has(\MZ\System\Permissao::NOME_ESTOQUE)}-->
 										<li><a href="/gerenciar/setor/"><i class="fa fa-sitemap"></i><span class="nav-text"> Setores </span><span class="fa"></span></a></li>
 <!--{/if}-->
-<!--{if logged_employee()->has(Permissao::NOME_CADASTROCONTAS)}-->
+<!--{if logged_employee()->has(\MZ\System\Permissao::NOME_CADASTROCONTAS)}-->
 										<li><a href="/gerenciar/classificacao/"><i class="fa fa-folder"></i><span class="nav-text"> Classificações </span><span class="fa"></span></a></li>
 <!--{/if}-->
-<!--{if logged_employee()->has(Permissao::NOME_CADASTROPATRIMONIO)}-->
+<!--{if logged_employee()->has(\MZ\System\Permissao::NOME_CADASTROPATRIMONIO)}-->
 										<li><a href="/gerenciar/patrimonio/"><i class="fa fa-camera"></i><span class="nav-text"> Patrimônios </span><span class="fa"></span></a></li>
 <!--{/if}-->
 									</ul>
 								</li>
 <!--{/if}-->
-<!--{if logged_employee()->has(Permissao::NOME_CADASTROMOEDAS) || logged_employee()->has(Permissao::NOME_CADASTROPRODUTOS)}-->
+<!--{if logged_employee()->has(\MZ\System\Permissao::NOME_CADASTROMOEDAS) || logged_employee()->has(\MZ\System\Permissao::NOME_CADASTROPRODUTOS)}-->
 								<li>
 									<a><i class="fa fa-filter"></i><span class="nav-text"> Unidades e Medidas </span><span class="fa fa-chevron-down"></span></a>
 									<ul class="nav child_menu" style="display: none">
-<!--{if logged_employee()->has(Permissao::NOME_CADASTROMOEDAS)}-->
+<!--{if logged_employee()->has(\MZ\System\Permissao::NOME_CADASTROMOEDAS)}-->
 										<li><a href="/gerenciar/moeda/"><i class="fa fa-dollar"></i><span class="nav-text"> Moedas </span><span class="fa"></span></a></li>
 <!--{/if}-->
-<!--{if logged_employee()->has(Permissao::NOME_CADASTROPRODUTOS)}-->
+<!--{if logged_employee()->has(\MZ\System\Permissao::NOME_CADASTROPRODUTOS)}-->
 										<li><a href="/gerenciar/unidade/"><i class="fa fa-filter"></i><span class="nav-text"> Unidades </span><span class="fa"></span></a></li>
 <!--{/if}-->
 									</ul>
 								</li>
 <!--{/if}-->
-<!--{if logged_employee()->has(Permissao::NOME_ALTERARCONFIGURACOES) || logged_employee()->has(Permissao::NOME_RELATORIOAUDITORIA) || logged_employee()->has(Permissao::NOME_ALTERARPAGINAS)}-->
+<!--{if logged_employee()->has(\MZ\System\Permissao::NOME_ALTERARCONFIGURACOES) || logged_employee()->has(\MZ\System\Permissao::NOME_RELATORIOAUDITORIA) || logged_employee()->has(\MZ\System\Permissao::NOME_ALTERARPAGINAS)}-->
 								<li>
 									<a><i class="fa fa-cog"></i><span class="nav-text"> Configurações </span><span class="fa fa-chevron-down"></span></a>
 									<ul class="nav child_menu" style="display: none">
-<!--{if logged_employee()->has(Permissao::NOME_ALTERARCONFIGURACOES)}-->
+<!--{if logged_employee()->has(\MZ\System\Permissao::NOME_ALTERARCONFIGURACOES)}-->
 										<li><a href="/gerenciar/integracao/"><i class="fa fa-exchange"></i><span class="nav-text"> Integrações </span><span class="fa"></span></a></li>
 <!--{/if}-->
-<!--{if logged_employee()->has(Permissao::NOME_ALTERARCONFIGURACOES)}-->
+<!--{if logged_employee()->has(\MZ\System\Permissao::NOME_ALTERARCONFIGURACOES)}-->
 										<li><a href="/gerenciar/sistema/"><i class="fa fa-wrench"></i><span class="nav-text"> Sistema </span><span class="fa"></span></a></li>
 <!--{/if}-->
-<!--{if logged_employee()->has(Permissao::NOME_ALTERARPAGINAS)}-->
+<!--{if logged_employee()->has(\MZ\System\Permissao::NOME_ALTERARPAGINAS)}-->
 										<li><a href="/gerenciar/pagina/"><i class="fa fa-file-image-o"></i><span class="nav-text"> Páginas </span><span class="fa"></span></a></li>
 <!--{/if}-->
-<!--{if logged_employee()->has(Permissao::NOME_RELATORIOAUDITORIA)}-->
+<!--{if logged_employee()->has(\MZ\System\Permissao::NOME_RELATORIOAUDITORIA)}-->
 										<li><a href="/gerenciar/auditoria/"><i class="fa fa-key"></i><span class="nav-text"> Auditoria </span><span class="fa"></span></a></li>
 <!--{/if}-->
-<!--{if logged_employee()->has(Permissao::NOME_ALTERARCONFIGURACOES)}-->
+<!--{if logged_employee()->has(\MZ\System\Permissao::NOME_ALTERARCONFIGURACOES)}-->
 										<li><a href="/gerenciar/modulo/"><i class="fa fa-check-square"></i><span class="nav-text"> Módulos </span><span class="fa"></span></a></li>
 <!--{/if}-->
 									</ul>
@@ -202,12 +202,12 @@
 
 					<!-- /menu footer buttons -->
 					<div class="sidebar-footer hidden-small">
-<!--{if logged_employee()->has(Permissao::NOME_ALTERARCONFIGURACOES)}-->
+<!--{if logged_employee()->has(\MZ\System\Permissao::NOME_ALTERARCONFIGURACOES)}-->
 						<a href="/gerenciar/sistema/"  data-toggle="tooltip" data-placement="top" title="Configurações">
 							<span class="glyphicon glyphicon-cog" aria-hidden="true"></span>
 						</a>
 <!--{else}-->
-						<a href="/gerenciar/funcionario/editar?id={logged_employee()->getID()}"  data-toggle="tooltip" data-placement="top" title="Configurações">
+						<a href="/gerenciar/funcionario/editar?id=${logged_employee()->getID()}"  data-toggle="tooltip" data-placement="top" title="Configurações">
 							<span class="glyphicon glyphicon-cog" aria-hidden="true"></span>
 						</a>
 <!--{/if}-->
@@ -237,14 +237,14 @@
 						<ul class="nav navbar-nav navbar-right">
 							<li class="">
 								<a href="javascript:;" class="user-profile dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
-									<img src="${get_image_url(logged_user()->getImagem(), 'cliente', 'cliente.png')}" alt="">{logged_user()->getNome()}
+									<img src="${get_image_url(logged_user()->getImagem(), 'cliente', 'cliente.png')}" alt="">${logged_user()->getNome()}
 									<span class=" fa fa-angle-down"></span>
 								</a>
 								<ul class="dropdown-menu dropdown-usermenu animated fadeInDown pull-right">
 									<li>
 										<a href="/conta/editar">Perfil</a>
 									</li>
-<!--{if logged_employee()->has(Permissao::NOME_ALTERARCONFIGURACOES)}-->
+<!--{if logged_employee()->has(\MZ\System\Permissao::NOME_ALTERARCONFIGURACOES)}-->
 									<li>
 										<a href="/gerenciar/sistema/"><span>Configurações</span></a>
 									</li>

@@ -26,6 +26,9 @@ namespace MZ\Stock;
 
 use MZ\Util\Filter;
 use MZ\Util\Validator;
+use MZ\Product\Composicao;
+use MZ\Environment\Setor;
+use MZ\Product\Produto;
 
 /**
  * Estoque de produtos por setor
@@ -571,11 +574,22 @@ class Estoque extends \MZ\Database\Helper
             $this->setCancelado($estoque['cancelado']);
         }
         if (!isset($estoque['datamovimento'])) {
-            $this->setDataMovimento(null);
+            $this->setDataMovimento(self::now());
         } else {
             $this->setDataMovimento($estoque['datamovimento']);
         }
         return $this;
+    }
+
+    /**
+     * Get last buy price for informed product
+     * @param int $produtoid Product id to get last price
+     * @return float the last buy price
+     */
+    public static function getUltimoPrecoCompra($produtoid)
+    {
+        $estoque = self::find(['produtoid' => $produtoid, 'cancelado' => 'N'], ['id' => -1]);
+        return $estoque->getPrecoCompra() + 0.0;
     }
 
     /**
@@ -595,19 +609,19 @@ class Estoque extends \MZ\Database\Helper
     public function filter($original)
     {
         $this->setID($original->getID());
+        $this->setTransacaoID(Filter::number($original->getTransacaoID()));
+        $this->setEntradaID(Filter::number($original->getEntradaID()));
+        $this->setFuncionarioID(Filter::number($original->getFuncionarioID()));
         $this->setProdutoID(Filter::number($this->getProdutoID()));
-        $this->setTransacaoID(Filter::number($this->getTransacaoID()));
-        $this->setEntradaID(Filter::number($this->getEntradaID()));
         $this->setFornecedorID(Filter::number($this->getFornecedorID()));
         $this->setSetorID(Filter::number($this->getSetorID()));
-        $this->setFuncionarioID(Filter::number($this->getFuncionarioID()));
         $this->setQuantidade(Filter::float($this->getQuantidade()));
         $this->setPrecoCompra(Filter::money($this->getPrecoCompra()));
         $this->setLote(Filter::string($this->getLote()));
         $this->setDataFabricacao(Filter::datetime($this->getDataFabricacao()));
         $this->setDataVencimento(Filter::datetime($this->getDataVencimento()));
         $this->setDetalhes(Filter::string($this->getDetalhes()));
-        $this->setDataMovimento(Filter::datetime($this->getDataMovimento()));
+        $this->setDataMovimento(self::now());
     }
 
     /**
@@ -625,8 +639,11 @@ class Estoque extends \MZ\Database\Helper
     public function validate()
     {
         $errors = [];
+        $produto = $this->findProdutoID();
         if (is_null($this->getProdutoID())) {
             $errors['produtoid'] = 'O produto não pode ser vazio';
+        } elseif ($produto->getTipo() != Produto::TIPO_PRODUTO) {
+            $errors['produtoid'] = 'O produto informado não é do tipo produto';
         }
         if (is_null($this->getSetorID())) {
             $errors['setorid'] = 'O setor não pode ser vazio';
@@ -634,27 +651,29 @@ class Estoque extends \MZ\Database\Helper
         if (is_null($this->getFuncionarioID())) {
             $errors['funcionarioid'] = 'O funcionário não pode ser vazio';
         }
-        if (is_null($this->getTipoMovimento())) {
-            $errors['tipomovimento'] = 'O tipo de movimento não pode ser vazio';
-        }
-        if (!Validator::checkInSet($this->getTipoMovimento(), self::getTipoMovimentoOptions(), true)) {
-            $errors['tipomovimento'] = 'O tipo de movimento é inválido';
+        if (!Validator::checkInSet($this->getTipoMovimento(), self::getTipoMovimentoOptions())) {
+            $errors['tipomovimento'] = 'O tipo de movimento não foi informado ou é inválido';
         }
         if (is_null($this->getQuantidade())) {
             $errors['quantidade'] = 'A quantidade não pode ser vazia';
+        } elseif ($this->getQuantidade() <= 0 && $this->getTipoMovimento() == self::TIPO_MOVIMENTO_ENTRADA) {
+            $errors['quantidade'] = 'A quantidade não pode ser nula ou negativa';
         }
         if (is_null($this->getPrecoCompra())) {
             $errors['precocompra'] = 'O preço de compra não pode ser vazio';
         }
-        if (is_null($this->getCancelado())) {
-            $errors['cancelado'] = 'O cancelado não pode ser vazio';
+        if (!Validator::checkBoolean($this->getCancelado())) {
+            $errors['cancelado'] = 'O cancelamento não foi informado ou é inválido';
+        } elseif ($this->exists() && $this->isCancelado()) {
+            $old_estoque = self::findByID($this->getID());
+            if ($old_estoque->isCancelado()) {
+                $errors['cancelado'] = 'Essa movimentação está cancelada e não pode ser alterada';
+            } else {
+                $count = self::count(['entradaid' => $this->getID()]);
+                $errors['cancelado'] = 'Essa entrada já foi movimentada e não pode ser cancelada';
+            }
         }
-        if (!Validator::checkBoolean($this->getCancelado(), true)) {
-            $errors['cancelado'] = 'O cancelado é inválido';
-        }
-        if (is_null($this->getDataMovimento())) {
-            $errors['datamovimento'] = 'A data de movimento não pode ser vazia';
-        }
+        $this->setDataMovimento(self::now());
         if (!empty($errors)) {
             throw new \MZ\Exception\ValidationException($errors);
         }
@@ -701,6 +720,7 @@ class Estoque extends \MZ\Database\Helper
             throw new \Exception('O identificador do estoque não foi informado');
         }
         $values = self::filterValues($values, $only, $except);
+        unset($values['datamovimento']);
         try {
             self::getDB()
                 ->update('Estoque')
@@ -728,6 +748,100 @@ class Estoque extends \MZ\Database\Helper
             ->where('id', $this->getID())
             ->execute();
         return $result;
+    }
+
+    public function cancelar()
+    {
+        $old_cancelado = $this->getCancelado();
+        $this->setCancelado('Y');
+        try {
+            $this->update();
+        } catch (\Exception $e) {
+            $this->setCancelado($old_cancelado);
+            throw $e;
+        }
+    }
+
+    public function retirarFIFO()
+    {
+        $negativo = is_boolean_config('Estoque', 'Estoque.Negativo');
+        $restante = $this->getQuantidade();
+        $produto = $this->findProdutoID();
+        while (true) {
+            $entrada = $this->findAvailableEntry();
+            if (!$entrada->exists()) {
+                if ($negativo) {
+                    $entrada->setQuantidade(-$restante);
+                    $entrada->setPrecoCompra(0.0000);
+                } else {
+                    throw new \Exception(sprintf(
+                        'Não há estoque para o produto "%s"',
+                        $produto->getDescricao()
+                    ));
+                }
+            }
+            if ($entrada->getQuantidade() < -$this->getQuantidade()) {
+                $this->setQuantidade(-$entrada->getQuantidade());
+            }
+            $this->setID(null);
+            $this->setPrecoCompra($entrada->getPrecoCompra());
+            $this->setEntradaID($entrada->getID());
+            $this->setFornecedorID($entrada->getFornecedorID());
+            $this->setLote($entrada->getLote());
+            $this->setDataFabricacao($entrada->getDataFabricacao());
+            $this->setDataVencimento($entrada->getDataVencimento());
+            $this->setCancelado('N');
+            $this->insert();
+            $restante = $restante - $this->getQuantidade();
+            if ($restante > -0.0005) {
+                break;
+            }
+            $this->setQuantidade($restante);
+        }
+    }
+
+    public function retirar($opcionais)
+    {
+        $setor = Setor::findDefault();
+        $this->setTipoMovimento(self::TIPO_MOVIMENTO_VENDA);
+        $stack = new \SplStack();
+        $composicao = new Composicao();
+        $composicao->setProdutoID($this->getProdutoID());
+        $composicao->setQuantidade($this->getQuantidade());
+        $stack->push($composicao);
+        while (!$stack->isEmpty()) {
+            $composicao = $stack->pop();
+            $produto = $composicao->findProdutoID();
+            if ($produto->getTipo() == Produto::TIPO_PACOTE) {
+                break;
+            }
+            if ($produto->getTipo() == Produto::TIPO_COMPOSICAO) {
+                // empilha todas as composições que não foram retiradas na venda
+                $composicoes = Composicao::findAll(['composicaoid' => $composicao->getProdutoID()]);
+                foreach ($composicoes as $_composicao) {
+                    // aplica a quantidade em profundidade
+                    $_composicao->setQuantidade($_composicao->getQuantidade() * $composicao->getQuantidade());
+                    $existe = isset($opcionais[$_composicao->getID()]);
+                    if ($existe && $_composicao->getTipo() != Composicao::TIPO_ADICIONAL) {
+                        unset($opcionais[$_composicao->getID()]);
+                    } elseif ($existe && $_composicao->getTipo() == Composicao::TIPO_ADICIONAL) {
+                        unset($opcionais[$_composicao->getID()]);
+                        $stack->push($_composicao);
+                    } elseif ($_composicao->getTipo() != Composicao::TIPO_ADICIONAL) {
+                        $stack->push($_composicao);
+                    }
+                }
+            } else {
+                // o composto é um produto
+                $this->setSetorID($produto->getSetorEstoqueID());
+                if (is_null($this->getSetorID())) {
+                    $this->setSetorID($setor->getID());
+                }
+                $this->setProdutoID($produto->getID());
+                $this->setQuantidade(-$composicao->getQuantidade());
+                $this->retirarFIFO();
+            }
+        }
     }
 
     /**
@@ -805,6 +919,30 @@ class Estoque extends \MZ\Database\Helper
     public function findFuncionarioID()
     {
         return \MZ\Employee\Funcionario::findByID($this->getFuncionarioID());
+    }
+
+    /**
+     * Find first available stock entry
+     * @return Estoque Self instance filled or empty when not found
+     */
+    public function findAvailableEntry()
+    {
+        $query = self::query([
+                'e.produtoid' => $this->getProdutoID(),
+                'e.setorid' => $this->getSetorID(),
+                'e.cancelado' => 'N',
+            ])
+            ->select('ROUND(e.quantidade + SUM(COALESCE(t.quantidade, 0)), 6) as restante')
+            ->leftJoin('Estoque t ON t.entradaid = e.id AND t.cancelado = ?', 'N')
+            ->where('e.quantidade > ?', 0)
+            ->groupBy('e.id')
+            ->having('restante > 0')
+            ->limit(1);
+        $data = $query->fetch() ?: [];
+        $restante = isset($data['restante']) ? $data['restante'] : 0.0;
+        $estoque = new Estoque($data);
+        $estoque->setQuantidade($restante + 0.0);
+        return $estoque;
     }
 
     /**

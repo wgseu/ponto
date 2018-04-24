@@ -401,6 +401,20 @@ class Setor extends \MZ\Database\Helper
     }
 
     /**
+     * Find default sector
+     * @return Setor A filled instance or empty when not found
+     */
+    public static function findDefault()
+    {
+        // <TODO:>Mudar busca por setor Vendas para o setor do dispositivo</TODO:>
+        $setor = self::findByNome('Vendas');
+        if ($setor->exists()) {
+            return $setor;
+        }
+        return self::find();
+    }
+
+    /**
      * Find all Setor
      * @param  array  $condition Condition to get all Setor
      * @param  array  $order     Order Setor

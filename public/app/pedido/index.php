@@ -109,7 +109,7 @@ try {
         }
         if ($pedido->getTipo() == Pedido::TIPO_COMANDA && is_boolean_config('Comandas', 'PrePaga')) {
             $subtotal = $produto_pedido->getTotal();
-            $pedido_total = Pedido::getTotalDoLocal(PedidoTipo::COMANDA, null, $pedido->getComandaID());
+            $pedido_total = Pedido::getTotalDoLocal(Pedido::TIPO_COMANDA, null, $pedido->getComandaID());
             $total = $subtotal + $pedido_total;
             $pagamentos = Pagamento::getTotalPedido($pedido->getID());
             $restante = $pedido_total - $pagamentos;

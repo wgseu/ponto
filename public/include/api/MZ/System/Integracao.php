@@ -329,7 +329,7 @@ class Integracao extends \MZ\Database\Helper
             $this->setIconeURL($integracao['iconeurl']);
         }
         if (!isset($integracao['ativo'])) {
-            $this->setAtivo(null);
+            $this->setAtivo('N');
         } else {
             $this->setAtivo($integracao['ativo']);
         }
@@ -344,7 +344,7 @@ class Integracao extends \MZ\Database\Helper
             $this->setSecret($integracao['secret']);
         }
         if (!isset($integracao['dataatualizacao'])) {
-            $this->setDataAtualizacao(null);
+            $this->setDataAtualizacao(self::now());
         } else {
             $this->setDataAtualizacao($integracao['dataatualizacao']);
         }

@@ -111,7 +111,7 @@ try {
             $subtotal = $produto_pedido->getTotal();
             $pedido_total = Pedido::getTotalDoLocal(Pedido::TIPO_COMANDA, null, $pedido->getComandaID());
             $total = $subtotal + $pedido_total;
-            $pagamentos = Pagamento::getTotalPedido($pedido->getID());
+            $pagamentos = Pagamento::rawFindTotal(['pedidoid' => $pedido->getID()]);
             $restante = $pedido_total - $pagamentos;
             $msg = 'Saldo insuficiente para a realização do pedido, Necessário: %s, Saldo atual: %s';
             if ($total > $pagamentos) {

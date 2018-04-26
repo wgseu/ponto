@@ -46,7 +46,6 @@ class NFeAPI extends \NFe\Common\Ajuste
 
     public function init()
     {
-
         global $app;
 
         $empresa = $app->getSystem()->getCompany();
@@ -140,7 +139,7 @@ class NFeAPI extends \NFe\Common\Ajuste
      */
     public function onNotaGerada($nota, $xml)
     {
-        $_nota = Nota::getPelaChave($nota->getID());
+        $_nota = Nota::findByChave($nota->getID());
         // o código é truncado quando em contingência e pode devolver uma nota diferente
         if (!$_nota->exists()) {
             $_nota = Nota::findByPedidoID($nota->getCodigo());
@@ -166,7 +165,7 @@ class NFeAPI extends \NFe\Common\Ajuste
      */
     public function onNotaAssinada($nota, $xml)
     {
-        $_nota = Nota::getPelaChave($nota->getID());
+        $_nota = Nota::findByChave($nota->getID());
         $_evento = Evento::log(
             $_nota->getID(),
             Evento::ESTADO_ASSINADO,
@@ -186,7 +185,7 @@ class NFeAPI extends \NFe\Common\Ajuste
         xmkdir($path, 0711);
         file_put_contents($filename, $xml->saveXML());
 
-        $_nota = Nota::getPelaChave($nota->getID());
+        $_nota = Nota::findByChave($nota->getID());
         $_nota->setEstado(Nota::ESTADO_ASSINADO);
         $_nota->setQRCode($nota->getQRCodeURL());
         $_nota->setConsultaURL($nota->getConsultaURL());
@@ -215,7 +214,7 @@ class NFeAPI extends \NFe\Common\Ajuste
      */
     public function onNotaContingencia($nota, $offline, $exception)
     {
-        $_nota = Nota::getPelaChave($nota->getID());
+        $_nota = Nota::findByChave($nota->getID());
         $this->deleteXmlAnteriores($nota);
         $_nota->setMotivo($nota->getJustificativa());
         $_nota->setContingencia('Y');
@@ -234,7 +233,7 @@ class NFeAPI extends \NFe\Common\Ajuste
      */
     public function onNotaAutorizada($nota, $xml, $retorno)
     {
-        $_nota = Nota::getPelaChave($nota->getID());
+        $_nota = Nota::findByChave($nota->getID());
         $this->deleteXmlAnteriores($nota);
         $path = $this->getPastaXmlAutorizado($nota->getAmbiente());
         $filename = $path . '/' . $nota->getID() . '.xml';
@@ -272,7 +271,7 @@ class NFeAPI extends \NFe\Common\Ajuste
      */
     public function onNotaRejeitada($nota, $xml, $retorno)
     {
-        $_nota = Nota::getPelaChave($nota->getID());
+        $_nota = Nota::findByChave($nota->getID());
         $this->deleteXmlAnteriores($nota);
         $path = $this->getPastaXmlRejeitado($nota->getAmbiente());
         $filename = $path . '/' . $nota->getID() . '.xml';
@@ -301,7 +300,7 @@ class NFeAPI extends \NFe\Common\Ajuste
      */
     public function onNotaDenegada($nota, $xml, $retorno)
     {
-        $_nota = Nota::getPelaChave($nota->getID());
+        $_nota = Nota::findByChave($nota->getID());
         $this->deleteXmlAnteriores($nota);
         $path = $this->getPastaXmlDenegado($nota->getAmbiente());
         $filename = $path . '/' . $nota->getID() . '.xml';
@@ -330,7 +329,7 @@ class NFeAPI extends \NFe\Common\Ajuste
      */
     public function onNotaPendente($nota, $xml, $exception)
     {
-        $_nota = Nota::getPelaChave($nota->getID());
+        $_nota = Nota::findByChave($nota->getID());
         $this->deleteXmlAnteriores($nota);
         $path = $this->getPastaXmlPendente($nota->getAmbiente());
         $filename = $path . '/' . $nota->getID() . '.xml';
@@ -361,7 +360,7 @@ class NFeAPI extends \NFe\Common\Ajuste
             return;
         }
         // cria outra nota, pois a nota atual pode ter sido recebida e autorizada
-        $_nota = Nota::criarProxima($_nota);
+        $_nota = $_nota->criarProxima();
         // atualiza a chave da nova nota, evita de obter a _nota que será cancelada
         // pois a contingência é otimizada para ser executada logo após a falha
         $nota->setNumero($_nota->getNumeroInicial());
@@ -376,7 +375,7 @@ class NFeAPI extends \NFe\Common\Ajuste
      */
     public function onNotaProcessando($nota, $xml, $retorno)
     {
-        $_nota = Nota::getPelaChave($nota->getID());
+        $_nota = Nota::findByChave($nota->getID());
         $this->deleteXmlAnteriores($nota);
         $path = $this->getPastaXmlProcessamento($nota->getAmbiente());
         $filename = $path . '/' . $nota->getID() . '.xml';
@@ -399,7 +398,7 @@ class NFeAPI extends \NFe\Common\Ajuste
      */
     public function onNotaCancelada($nota, $xml, $retorno)
     {
-        $_nota = Nota::getPelaChave($nota->getID());
+        $_nota = Nota::findByChave($nota->getID());
         $this->deleteXmlAnteriores($nota);
         $path = $this->getPastaXmlCancelado($nota->getAmbiente());
         $filename = $path . '/' . $nota->getID() . '.xml';
@@ -425,7 +424,7 @@ class NFeAPI extends \NFe\Common\Ajuste
      */
     public function onNotaErro($nota, $exception)
     {
-        $_nota = Nota::getPelaChave($nota->getID());
+        $_nota = Nota::findByChave($nota->getID());
         if (!$_nota->exists()) {
             $_nota = Nota::findByPedidoID($nota->getCodigo());
         }

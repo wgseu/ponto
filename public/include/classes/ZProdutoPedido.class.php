@@ -684,12 +684,12 @@ class ZProdutoPedido
                     $composicoes[$formacao->getComposicaoID()] = $formacao->getID();
                 }
             }
-        // $estoque = new Estoque();
-        // $estoque->setTransacaoID($produto_pedido->getID());
-        // $estoque->setProdutoID($produto_pedido->getProdutoID());
-        // $estoque->setFuncionarioID($produto_pedido->getFuncionarioID());
-        // $estoque->setQuantidade($produto_pedido->getQuantidade());
-            Estoque::retirar($produto_pedido, $composicoes);
+            $estoque = new Estoque();
+            $estoque->setTransacaoID($produto_pedido->getID());
+            $estoque->setProdutoID($produto_pedido->getProdutoID());
+            $estoque->setFuncionarioID($produto_pedido->getFuncionarioID());
+            $estoque->setQuantidade($produto_pedido->getQuantidade());
+            $estoque->retirar($composicoes);
         } catch (PDOException $e) {
             self::handleException($e);
             $msg = $e->getMessage();

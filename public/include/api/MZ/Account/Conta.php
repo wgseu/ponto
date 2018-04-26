@@ -32,6 +32,7 @@ use MZ\Util\Validator;
  */
 class Conta extends \MZ\Database\Helper
 {
+    const MOVIMENTACAO_ID = 1;
 
     /**
      * Código da conta
@@ -857,7 +858,7 @@ class Conta extends \MZ\Database\Helper
         if (!$this->exists()) {
             throw new \Exception('O identificador da conta não foi informado');
         }
-        if ($this->getID() == 1) {
+        if ($this->getID() == self::MOVIMENTACAO_ID) {
             throw new \Exception('A conta informada é utilizada internamente pelo sistema e não pode ser alterada');
         }
         $values = self::filterValues($values, $only, $except);
@@ -884,7 +885,7 @@ class Conta extends \MZ\Database\Helper
         if (!$this->exists()) {
             throw new \Exception('O identificador da conta não foi informado');
         }
-        if ($this->getID() == 1) {
+        if ($this->getID() == self::MOVIMENTACAO_ID) {
             throw new \Exception('A conta informada é utilizada internamente pelo sistema e não pode ser excluída');
         }
         $result = self::getDB()

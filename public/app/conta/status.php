@@ -58,13 +58,11 @@ if (is_login()) {
     $status['funcionario'] = intval(logged_employee()->getID());
     try {
         $status['permissoes'] = $app->getAuthentication()->getPermissions();
+        $dispositivo = new Dispositivo();
         if (is_manager()) {
-            $dispositivo = register_device(
-                isset($_GET['device']) ? $_GET['device'] : null,
-                isset($_GET['serial']) ? $_GET['serial'] : null
-            );
-        } else {
-            $dispositivo = new Dispositivo();
+            $dispositivo->setNome(isset($_GET['device']) ? $_GET['device'] : null);
+            $dispositivo->setSerial(isset($_GET['serial']) ? $_GET['serial'] : null);
+            $dispositivo->register();
         }
         $status['validacao'] = $dispositivo->getValidacao();
     } catch (\Exception $e) {

@@ -20,7 +20,7 @@ try {
     if (!$pedido->exists()) {
         throw new \Exception('O pedido não foi informado ou não existe', 404);
     }
-    $_nota = Nota::getValida($pedido->getID());
+    $_nota = Nota::findValida($pedido->getID());
     if (!$_nota->exists()) {
         throw new \Exception('Não existe nota para o pedido informado', 404);
     }

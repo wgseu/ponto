@@ -137,18 +137,6 @@ function quantify($quantity, $unity = 'UN', $content = 1)
     return $split[0].rtrim(','.$split[1], ',0').$result;
 }
 
-function relative_day($window, $date = null)
-{
-    if (is_null($date)) {
-        $date = time();
-    }
-    $days = date('t', $date);
-    $month_begin = strtotime(date('Y-m', $date).' '.$window.' month');
-    $prev_days = date('t', $month_begin);
-    $percent = date('j', $date) / $days;
-    return max(1, round($prev_days * $percent));
-}
-
 function human_date($date, $year = false)
 {
     $_date = date_create($date);
@@ -223,7 +211,7 @@ function redirect($url = null)
 
 function get_redirect_page($default = null)
 {
-    $redirect_page = Session::Get('redirect', true);
+    $redirect_page = \Session::Get('redirect', true);
     if ($redirect_page) {
         return $redirect_page;
     }
@@ -238,7 +226,7 @@ function set_redirect_page($url = null)
     if (is_null($url)) {
         $url = $_SERVER['REQUEST_URI'];
     }
-    Session::Set('redirect', $url);
+    \Session::Set('redirect', $url);
 }
 
 function template($tFile)
@@ -298,9 +286,9 @@ function need_login($json = false)
     }
     \Thunder::warning('Necessário autenticação, faça login para continuar');
     if (is_get()) {
-        Session::Set('redirect', $_SERVER['REQUEST_URI']);
+        \Session::Set('redirect', $_SERVER['REQUEST_URI']);
     } else {
-        Session::Set('redirect', $_SERVER['HTTP_REFERER']);
+        \Session::Set('redirect', $_SERVER['HTTP_REFERER']);
     }
     redirect('/conta/entrar');
 }
@@ -647,69 +635,6 @@ function _p($section, $key)
     return $entries[$section.'.'.$key];
 }
 
-function register_device($device, $serial)
-{
-    if (!isset($device) || trim(strval($device)) == '') {
-        throw new \Exception("O nome do dispositivo não foi informado");
-    }
-    if (!isset($serial) || trim(strval($serial)) == '') {
-        throw new \Exception("O identificador do dispositivo não foi informado");
-    }
-    $dispositivo = Dispositivo::findByNome($device);
-    if (!$dispositivo->exists()) {
-        $dispositivo = Dispositivo::getPelaSerial($serial);
-    }
-    global $app;
-    if (!$app->getSystem()->exists()) {
-        throw new \Exception("Não há dados na tabela do sistema");
-    }
-    $tablet_count = Dispositivo::getCountDoTablet();
-    if ($tablet_count > $app->getSystem()->getTablets()) {
-        throw new \Exception("Limite de Tablets excedido, remova os tablets excedentes para continuar");
-    }
-    if (!$dispositivo->exists() && $tablet_count >= $app->getSystem()->getTablets()) {
-        // tenta sobrescrever um tablet não validado
-        $dispositivo = Dispositivo::findNotValidated();
-        if (!$dispositivo->exists()) {
-            throw new \Exception("Limite de Tablets esgotado, verifique sua licença");
-        }
-        // permite a atualização das informações para o novo dispositivo
-        $dispositivo->setValidacao(null);
-    }
-    if (!$dispositivo->exists()) {
-        $dispositivo->setTipo(Dispositivo::TIPO_TABLET);
-        $dispositivo->setDescricao('Tablet '.$device);
-        $dispositivo->setNome($device);
-        $dispositivo->setSerial($serial);
-        $dispositivo->setOpcoes(0);
-        $setor = Setor::findByNome('Vendas');
-        if (!$setor->exists()) {
-            $setor = Setor::getPrimeiro();
-        }
-        $dispositivo->setSetorID($setor->getID());
-        $dispositivo->insert();
-        try {
-            $appsync = new \MZ\System\Synchronizer();
-            $appsync->deviceAdded($dispositivo->getNome(), $dispositivo->getCaixaID());
-        } catch (\Exception $e) {
-            \Log::warning($e->getMessage());
-        }
-    }
-    if ($dispositivo->getSerial() != $serial || $dispositivo->getNome() != $device) {
-        // atualiza as informações do dispositivo
-        $dispositivo->setNome($device);
-        $dispositivo->setSerial($serial);
-        $dispositivo->update();
-        try {
-            $appsync = new \MZ\System\Synchronizer();
-            $appsync->deviceUpdated($dispositivo->getNome(), $dispositivo->getCaixaID());
-        } catch (\Exception $e) {
-            \Log::warning($e->getMessage());
-        }
-    }
-    return $dispositivo;
-}
-
 function get_aumento($anterior, $atual, $trunc)
 {
     if ($anterior >= -0.005 && $anterior <= 0.005) {
@@ -868,7 +793,7 @@ function upload_image($inputname, $type, $name = null, $width = null, $height = 
         throw new \Exception('O arquivo informado não é uma imagem');
     }
     $path = $dir . $name;
-    if (!Image::convert($path, $path, $width, $height, $mode)) {
+    if (!\Image::convert($path, $path, $width, $height, $mode)) {
         unlink($path);
         throw new \Exception('Falha ao processar imagem');
     }
@@ -896,10 +821,10 @@ function zip_add_folder($zip, $folder, $inside = null)
         return;
     }
     // Create recursive directory iterator
-    /** @var SplFileInfo[] $files */
-    $files = new RecursiveIteratorIterator(
-        new RecursiveDirectoryIterator($folder),
-        RecursiveIteratorIterator::LEAVES_ONLY
+    /** @var \SplFileInfo[] $files */
+    $files = new \RecursiveIteratorIterator(
+        new \RecursiveDirectoryIterator($folder),
+        \RecursiveIteratorIterator::LEAVES_ONLY
     );
     $folder = str_replace('\\', '/', $folder);
     $inside = str_replace('\\', '/', $inside);
@@ -958,8 +883,8 @@ function create_zip($files = [], $destination = '', $overwrite = false)
     if (file_exists($destination) && !$overwrite) {
         throw new \Exception('O arquivo zip de destino já existe');
     }
-    $zip = new ZipArchive();
-    if ($zip->open($destination, $overwrite ? Zip::ARCHIVE_OVERWRITE : Zip::ARCHIVE_CREATE) !== true) {
+    $zip = new \ZipArchive();
+    if ($zip->open($destination, $overwrite ? \Zip::ARCHIVE_OVERWRITE : \Zip::ARCHIVE_CREATE) !== true) {
         throw new \Exception('Não foi possível criar ou sobrescrever o arquivo zip');
     }
     foreach ($files as $name => $path) {

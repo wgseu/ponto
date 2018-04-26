@@ -26,6 +26,7 @@ namespace MZ\Payment;
 
 use MZ\Util\Filter;
 use MZ\Util\Validator;
+use MZ\Account\Conta;
 
 /**
  * Pagamentos de contas e pedidos
@@ -1012,7 +1013,56 @@ class Pagamento extends \MZ\Database\Helper
     private static function filterCondition($condition)
     {
         $allowed = self::getAllowedKeys();
-        return Filter::keys($condition, $allowed, 'p.');
+        if (isset($condition['search'])) {
+            $search = trim($condition['search']);
+            if (Validator::checkDigits($search)) {
+                $condition['pedidoid'] = Filter::number($search);
+            } elseif (substr($search, 0, 1) == '#') {
+                $condition['movimentacaoid'] = Filter::number($search);
+            } else {
+                $field = 'p.detalhes LIKE ?';
+                $condition[$field] = '%'.$search.'%';
+                $allowed[$field] = true;
+            }
+        }
+        if (isset($condition['apartir_datahora'])) {
+            $field = 'p.datahora >= ?';
+            $condition[$field] = $condition['apartir_datahora'];
+            $allowed[$field] = true;
+        }
+        if (isset($condition['ate_datahora'])) {
+            $field = 'p.datahora <= ?';
+            $condition[$field] = $condition['ate_datahora'];
+            $allowed[$field] = true;
+        }
+        if (array_key_exists('!pedidoid', $condition)) {
+            $field = 'NOT p.pedidoid';
+            $condition[$field] = $condition['!pedidoid'];
+            $allowed[$field] = true;
+        }
+        if (array_key_exists('!pagtocontaid', $condition)) {
+            $field = 'NOT p.pagtocontaid';
+            $condition[$field] = $condition['!pagtocontaid'];
+            $allowed[$field] = true;
+        }
+        if (isset($condition['ate_datahora'])) {
+            $field = 'p.datahora <= ?';
+            $condition[$field] = $condition['ate_datahora'];
+            $allowed[$field] = true;
+        }
+        if (isset($condition['ate_total'])) {
+            $field = 'p.total <= ?';
+            $condition[$field] = $condition['ate_total'];
+            $allowed[$field] = true;
+        }
+        if (isset($condition['receitas'])) {
+            $field = '(NOT p.pedidoid IS NULL OR '.
+                '(p.total >= 0 AND NOT p.pagtocontaid IS NULL AND p.pagtocontaid <> ?))';
+            $condition[$field] = Conta::MOVIMENTACAO_ID;
+            $allowed[$field] = true;
+        }
+        $allowed['m.sessaoid'] = true;
+        return Filter::keys($condition, $allowed, ['p.', 'm.']);
     }
 
     /**
@@ -1023,11 +1073,33 @@ class Pagamento extends \MZ\Database\Helper
      */
     private static function query($condition = [], $order = [])
     {
-        $query = self::getDB()->from('Pagamentos p');
         $condition = self::filterCondition($condition);
+        $query = self::getDB()->from('Pagamentos p');
+        if (array_key_exists('m.sessaoid', $condition)) {
+            $query = $query->leftJoin('Movimentacoes m ON m.id = p.movimentacaoid');
+        }
         $query = self::buildOrderBy($query, self::filterOrder($order));
-        $query = $query->orderBy('p.id ASC');
+        $query = $query->orderBy('p.id DESC');
         return self::buildCondition($query, $condition);
+    }
+
+    private static function queryTotal($condition, $group = [])
+    {
+        $condition['cancelado'] = 'N';
+        $condition['ativo'] = 'Y';
+        $query = self::query($condition)
+            ->select(null)
+            ->select('ROUND(SUM(p.total), 4) as total');
+        if (isset($group['dia'])) {
+            $query = $query->select(self::strftime('%Y-%m-%d', 'p.datahora').' as data')
+                ->groupBy(self::strftime('%Y-%m-%d', 'p.datahora'));
+        } elseif (isset($group['forma_tipo'])) {
+            $query = $query->leftJoin('Formas_Pagto f ON f.id = p.formapagtoid')
+                ->select('LOWER(f.tipo) as tipo')
+                ->orderBy('total DESC')
+                ->groupBy('f.tipo');
+        }
+        return $query;
     }
 
     /**
@@ -1044,6 +1116,18 @@ class Pagamento extends \MZ\Database\Helper
     }
 
     /**
+     * Search one register with a condition
+     * @param  array $condition Condition for searching the row
+     * @return Pagamento A filled Pagamento or empty instance
+     */
+    public static function rawFindTotal($condition)
+    {
+        $query = self::queryTotal($condition)->limit(1);
+        $total = $query->fetchColumn() ?: 0;
+        return floatval($total);
+    }
+
+    /**
      * Find this object on database using, ID
      * @param  int $id id to find Pagamento
      * @return Pagamento A filled instance or empty when not found
@@ -1053,6 +1137,45 @@ class Pagamento extends \MZ\Database\Helper
         return self::find([
             'id' => intval($id),
         ]);
+    }
+
+    public static function getReceitas($condition)
+    {
+        $condition['receitas'] = true;
+        return self::rawFindTotal($condition);
+    }
+
+    public static function getDespesas($condition)
+    {
+        $condition['ate_total'] = 0.0;
+        $condition['!pagtocontaid'] = null;
+        return self::rawFindTotal($condition);
+    }
+
+    public static function getFaturamento($condition)
+    {
+        $condition['!pedidoid'] = null;
+        return self::rawFindTotal($condition);
+    }
+
+    /**
+     * Find total grouping by total, payment method type or day
+     * @param  array  $condition Condition to get all Pagamento
+     * @param  array  $group group results
+     * @param  int    $limit     Limit data into row count
+     * @param  int    $offset    Start offset to get rows
+     * @return array             List of all rows instanced as Pagamento
+     */
+    public static function rawFindAllTotal($condition = [], $group = [], $limit = null, $offset = null)
+    {
+        $query = self::queryTotal($condition, $group);
+        if (!is_null($limit)) {
+            $query = $query->limit($limit);
+        }
+        if (!is_null($offset)) {
+            $query = $query->offset($offset);
+        }
+        return $query->fetchAll();
     }
 
     /**

@@ -87,7 +87,13 @@ class NFeDB extends \NFe\Database\Estatico
         /* Informações do pedido */
         $_pedido = $_nota->findPedidoID();
         /* Pagamentos */
-        $_pagamentos = Pagamento::getTodosDoPedidoID($_pedido->getID());
+        $_pagamentos = Pagamento::findAll(
+            [
+                'pedidoid' => $_pedido->getID(),
+                'cancelado' => 'N'
+            ],
+            ['id' => 1]
+        );
         /* Itens do pedido */
         $_itens = ProdutoPedido::getTodosDoPedidoID($_pedido->getID());
         /* Informações de entrega */
@@ -348,7 +354,7 @@ class NFeDB extends \NFe\Database\Estatico
     {
         $notas = [];
         $config = \NFe\Core\SEFAZ::getInstance()->getConfiguracao();
-        $_notas = Nota::getAbertas($inicio, $quantidade);
+        $_notas = Nota::findAllOpen($quantidade, $inicio);
         foreach ($_notas as $_nota) {
             try {
                 /** Notas em contingência **/
@@ -392,7 +398,7 @@ class NFeDB extends \NFe\Database\Estatico
         if ($config->isOffline()) {
             return $tarefas;
         }
-        $_notas = Nota::getPendentes($inicio, $quantidade);
+        $_notas = Nota::findAllPending($quantidade, $inicio);
         foreach ($_notas as $_nota) {
             try {
                 $xmlfile = self::getCaminhoXmlAtual($_nota);
@@ -439,7 +445,7 @@ class NFeDB extends \NFe\Database\Estatico
         }
         $emitente = $config->getEmitente();
         $estado = $emitente->getEndereco()->getMunicipio()->getEstado();
-        $_notas = Nota::getTarefas($inicio, $quantidade);
+        $_notas = Nota::findAllTasks($quantidade, $inicio);
         foreach ($_notas as $_nota) {
             try {
                 $nota = new \NFe\Core\NFCe();

@@ -717,6 +717,7 @@ class Sistema extends \MZ\Database\Helper
 
     public function loadAll()
     {
+        $this->loadByID('1');
         $this->company  = $this->findEmpresaID();
         $this->localization = Localizacao::find(['clienteid' => $this->company->getID()]);
         $this->district = $this->localization->findBairroID();

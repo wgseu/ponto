@@ -388,15 +388,32 @@ class Dispositivo extends \MZ\Database\Helper
      */
     public function validate()
     {
+        global $app;
+        if (!$app->getSystem()->exists()) {
+            $errors['sistemaid'] = 'Não há dados na tabela do sistema';
+        }
         $errors = [];
         if (is_null($this->getSetorID())) {
             $errors['setorid'] = 'O setor não pode ser vazio';
         }
         if (is_null($this->getNome())) {
-            $errors['nome'] = 'O nome não pode ser vazio';
+            $errors['nome'] = 'O nome do dispositivo não foi informado';
+        }
+        if (is_null($this->getSerial())) {
+            $errors['serial'] = 'O identificador do dispositivo não foi informado';
         }
         if (!Validator::checkInSet($this->getTipo(), self::getTipoOptions())) {
             $errors['tipo'] = 'O tipo não foi informado ou é inválido';
+        }
+        $tablet_count = self::count(['tipo' => self::TIPO_TABLET]);
+        if ($this->getTipo() == self::TIPO_TABLET && $tablet_count > $app->getSystem()->getTablets()) {
+            $errors['tipo'] = 'Limite de Tablets excedido, remova os tablets excedentes para continuar';
+        }
+        if ($this->getTipo() == self::TIPO_TABLET &&
+            !$this->exists() &&
+            $tablet_count >= $app->getSystem()->getTablets()
+        ) {
+            $errors['tipo'] = 'Limite de Tablets esgotado, verifique sua licença';
         }
         if (is_null($this->getOpcoes())) {
             $errors['opcoes'] = 'A opções não pode ser vazia';
@@ -498,6 +515,43 @@ class Dispositivo extends \MZ\Database\Helper
             ->where('id', $this->getID())
             ->execute();
         return $result;
+    }
+
+    public function register()
+    {
+        $setor = \MZ\Environment\Setor::findDefault();
+        $this->setSetorID($setor->getID());
+        $this->setTipo(self::TIPO_TABLET);
+        $this->setDescricao('Tablet ' . $this->getNome());
+        $this->setOpcoes(0);
+        $dispositivo = self::findByNome($this->getNome());
+        if (!$dispositivo->exists()) {
+            $dispositivo = self::findBySerial($this->getSerial());
+        }
+        // permite a atualização das informações para o novo dispositivo
+        $this->setID($dispositivo->getID());
+        $this->validate();
+        if ($this->exists() &&
+            $this->getSerial() == $dispositivo->getSerial() &&
+            $this->getNome() == $dispositivo->getNome() &&
+            $dispositivo->getTipo() == self::TIPO_TABLET
+        ) {
+            $this->fromArray($dispositivo->toArray());
+            return $this;
+        }
+        $exists = $this->exists();
+        $this->save();
+        try {
+            $sync = new \MZ\System\Synchronizer();
+            if ($exists) {
+                $sync->deviceUpdated($this->getNome(), $this->getCaixaID());
+            } else {
+                $sync->deviceAdded($this->getNome(), $this->getCaixaID());
+            }
+        } catch (\Exception $e) {
+            \Log::warning($e->getMessage());
+        }
+        return $this;
     }
 
     /**
@@ -702,18 +756,6 @@ class Dispositivo extends \MZ\Database\Helper
     {
         return self::find([
             'serial' => strval($serial),
-        ]);
-    }
-
-    /**
-     * Find not validated tablet
-     * @return Dispositivo A filled instance or empty when not found
-     */
-    public static function findNotValidated()
-    {
-        return self::find([
-            'validacao' => null,
-            'tipo' => self::TIPO_TABLET
         ]);
     }
 

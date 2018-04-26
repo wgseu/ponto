@@ -26,6 +26,7 @@ namespace MZ\Invoice;
 
 use MZ\Util\Filter;
 use MZ\Util\Validator;
+use MZ\Session\Caixa;
 
 /**
  * Notas fiscais e inutilizações
@@ -853,6 +854,37 @@ class Nota extends \MZ\Database\Helper
         return $this;
     }
 
+    public function isAutorizada()
+    {
+        $result = ($this->getTipo() == self::TIPO_NOTA) && ($this->getAcao() == self::ACAO_AUTORIZAR);
+        if (!$result) {
+            return $result;
+        }
+        $result = $this->isCorrigido() && $this->isConcluido() && ($this->getEstado() == self::ESTADO_AUTORIZADO);
+        if ($result) {
+            return $result;
+        }
+        $result = $this->isContingencia() && $this->isCorrigido() && ($this->getEstado() == self::ESTADO_ASSINADO);
+        return $result;
+    }
+
+    public function getCaminhoXml()
+    {
+        $xmlfile = \NFeDB::getCaminhoXmlAtual($this);
+        if (is_array($xmlfile)) {
+            $files = $xmlfile;
+        } else {
+            $files = ['nota' => $xmlfile];
+        }
+        foreach ($files as $name => $path) {
+            if (!file_exists($path)) {
+                $msg = 'Não existe XML para a(o) ' . $name . ' de número "' . $this->getNumeroInicial() . '"';
+                throw new \Exception($msg, 404);
+            }
+        }
+        return $xmlfile;
+    }
+
     /**
      * Convert this instance into array associated key -> value with only public fields
      * @return array All public field and values into array format
@@ -1038,6 +1070,60 @@ class Nota extends \MZ\Database\Helper
         return $result;
     }
 
+    public function criarProxima()
+    {
+        // procura o último número da nota e a última sequencia de repetições
+        $nota = self::find(
+            ['ambiente' => $this->getAmbiente(), 'serie' => $this->getSerie()],
+            ['sequencia' => -1, 'numerofinal' => -1]
+        );
+        if (!$nota->exists()) {
+            // não existe nenhuma nota ou inutilização para essa série ou ambiente
+            $nota->fromArray($this->toArray()); // copia a série e ambiente
+            // inicia a numeração e sequência
+            $nota->setNumeroFinal(0);
+            $nota->setSequencia(1);
+        }
+        // retira os dados da última nota
+        $nota->setID(null);
+        $nota->setTipo(self::TIPO_NOTA);
+        $nota->setAcao(self::ACAO_AUTORIZAR);
+        $nota->setEstado(self::ESTADO_ABERTO);
+        $nota->setChave(null);
+        $nota->setRecibo(null);
+        $nota->setProtocolo(null);
+        $nota->setMotivo(null);
+        $nota->setContingencia('N');
+        $nota->setConsultaURL(null);
+        $nota->setQRCode(null);
+        $nota->setTributos(null);
+        $nota->setDetalhes(null);
+        $nota->setCorrigido('Y');
+        $nota->setConcluido('N');
+        $nota->setDataEmissao(null);
+        $nota->setDataAutorizacao(null);
+        $nota->setDataLancamento(null);
+        // utiliza o pedido da base
+        $nota->setPedidoID($this->getPedidoID());
+        // verifica se o número inicial do caixa deve ser o próximo
+        $caixa = Caixa::findBySerie($nota->getSerie());
+        if ($caixa->getNumeroInicial() > $nota->getNumeroFinal()) {
+            $nota->setNumeroFinal($caixa->getNumeroInicial() - 1);
+        }
+        // verifica se alcançou o último número da nota permitido na SEFAZ
+        if ($nota->getNumeroFinal() == 999999999) {
+            // inicia uma nova sequência
+            $nota->setSequencia($nota->getSequencia() + 1);
+            $nota->setNumeroFinal(0);
+            Caixa::resetBySerie($nota->getSerie());
+        }
+        // incrementa para o próximo número
+        $nota->setNumeroFinal($nota->getNumeroFinal() + 1);
+        $nota->setNumeroInicial($nota->getNumeroFinal());
+        // cadastra a nota como aberta
+        return $nota->insert();
+    }
+
     /**
      * Load one register for it self with a condition
      * @param  array $condition Condition for searching the row
@@ -1169,6 +1255,79 @@ class Nota extends \MZ\Database\Helper
     private static function filterCondition($condition)
     {
         $allowed = self::getAllowedKeys();
+        if (isset($condition['search'])) {
+            $search = trim($condition['search']);
+            $parts = explode('-', $search);
+            $motivo = false;
+            if ($parts !== false &&
+                count($parts) > 0 &&
+                count($parts) <= 2 &&
+                Validator::checkDigits($parts[0])
+            ) {
+                if (strlen($parts[0]) == 44) {
+                    $chave = $parts[0];
+                    $condition['chave'] = $chave;
+                } elseif (strlen($parts[0]) > 9) {
+                    $protocolo = $parts[0];
+                    $condition['protocolo'] = $protocolo;
+                } elseif (strlen($parts[0]) > 0) {
+                    $numero_inicial = intval($parts[0]);
+                    if (count($parts) == 2 && strlen($parts[1]) <= 9 && Validator::checkDigits($parts[1])) {
+                        $numero_final = intval($parts[1]);
+                        $field = '(n.numeroinicial BETWEEN ? AND ?)';
+                        $condition[$field] = [$numero_inicial, $numero_final];
+                        $allowed[$field] = true;
+                    } else {
+                        $condition['numeroinicial'] = $numero_inicial;
+                    }
+                } else {
+                    $motivo = true;
+                }
+            } else {
+                $motivo = true;
+            }
+            if ($motivo) {
+                $search = '%'.preg_replace(' ', '%', $search).'%';
+                $field = 'n.motivo LIKE ?';
+                $condition[$field] = [$search, $search];
+                $allowed[$field] = true;
+            }
+        }
+        if (isset($condition['apartir_emissao'])) {
+            $field = 'n.dataemissao >= ?';
+            $condition[$field] = $condition['apartir_emissao'];
+            $allowed[$field] = true;
+        }
+        if (isset($condition['ate_emissao'])) {
+            $field = 'n.dataemissao <= ?';
+            $condition[$field] = $condition['ate_emissao'];
+            $allowed[$field] = true;
+        }
+        if (isset($condition['apartir_lancamento'])) {
+            $field = 'n.datalancamento >= ?';
+            $condition[$field] = $condition['apartir_lancamento'];
+            $allowed[$field] = true;
+        }
+        if (isset($condition['ate_lancamento'])) {
+            $field = 'n.datalancamento <= ?';
+            $condition[$field] = $condition['ate_lancamento'];
+            $allowed[$field] = true;
+        }
+        if (isset($condition['!estado'])) {
+            $field = 'n.estado <> ?';
+            $condition[$field] = $condition['!estado'];
+            $allowed[$field] = true;
+        }
+        if (isset($condition['disponivel'])) {
+            $field = '(n.estado <> ? OR n.contingencia = ?)';
+            $condition[$field] = [self::ESTADO_PENDENTE, 'N'];
+            $allowed[$field] = true;
+        }
+        if (isset($condition['tarefas'])) {
+            $field = '(n.acao <> ? OR (n.contingencia = ? AND n.estado = ?))';
+            $condition[$field] = [self::ACAO_AUTORIZAR, 'Y', self::ESTADO_PENDENTE];
+            $allowed[$field] = true;
+        }
         return Filter::keys($condition, $allowed, 'n.');
     }
 
@@ -1183,7 +1342,7 @@ class Nota extends \MZ\Database\Helper
         $query = self::getDB()->from('Notas n');
         $condition = self::filterCondition($condition);
         $query = self::buildOrderBy($query, self::filterOrder($order));
-        $query = $query->orderBy('n.id ASC');
+        $query = $query->orderBy('n.id DESC');
         return self::buildCondition($query, $condition);
     }
 
@@ -1213,6 +1372,80 @@ class Nota extends \MZ\Database\Helper
     }
 
     /**
+     * Find invoice by key
+     * @param  string $chave key to find Nota
+     * @param  boolean $todos find all invoice finished or not
+     * @return Nota A filled instance or empty when not found
+     */
+    public static function findByChave($chave, $todos = false)
+    {
+        $condition = ['chave' => $chave];
+        if (!$todos) {
+            $condition['concluido'] = 'N';
+        }
+        $order = ['concluido' => 1, 'corrigido' => -1, 'datalancamento' => -1];
+        return self::find($condition, $order);
+    }
+
+    /**
+     * Find invoice by order id
+     * @param  string $pedido_id order id to find Nota
+     * @param  boolean $todos find all invoice finished or not
+     * @return Nota A filled instance or empty when not found
+     */
+    public static function findByPedidoID($pedido_id, $todos = false)
+    {
+        $condition = ['pedidoid' => intval($pedido_id)];
+        if (!$todos) {
+            $condition['concluido'] = 'N';
+        }
+        $order = ['concluido' => 1, 'corrigido' => -1, 'datalancamento' => -1];
+        return self::find($condition, $order);
+    }
+
+    /**
+     * Find valid invoice by order id
+     * @param  string $pedido_id order id to find Nota
+     * @return Nota A filled instance or empty when not found
+     */
+    public static function findValida($pedido_id)
+    {
+        $condition = [
+            'pedidoid' => intval($pedido_id),
+            'tipo' => self::TIPO_NOTA,
+            'acao' => self::ACAO_AUTORIZAR
+        ];
+        $order = ['sequencia' => -1, 'numerofinal' => -1];
+        return self::find($condition, $order);
+    }
+
+    public static function zip($notas)
+    {
+        $files = [];
+        foreach ($notas as $_nota) {
+            // Notas abertas não possuem arquivo XML
+            if ($_nota->getEstado() == self::ESTADO_ABERTO) {
+                continue;
+            }
+            // a nota cancelada tem 2 XML
+            $xmlfile = $_nota->getCaminhoXml();
+            if (is_array($xmlfile)) {
+                $_files = $xmlfile;
+            } else {
+                $_files = ['nota' => $xmlfile];
+            }
+            foreach ($_files as $xmlfile) {
+                $xmlname = basename($xmlfile);
+                $directory = basename(dirname($xmlfile));
+                $files[$directory . '/' . $xmlname] = $xmlfile;
+            }
+        }
+        $zipfile = tempnam(sys_get_temp_dir(), 'xml');
+        create_zip($files, $zipfile, true);
+        return $zipfile;
+    }
+
+    /**
      * Find all Nota
      * @param  array  $condition Condition to get all Nota
      * @param  array  $order     Order Nota
@@ -1235,6 +1468,60 @@ class Nota extends \MZ\Database\Helper
             $result[] = new Nota($row);
         }
         return $result;
+    }
+
+    /**
+     * Find all open invoice
+     * @param  int    $limit     Limit data into row count
+     * @param  int    $offset    Start offset to get rows
+     * @return array             List of all open invoice
+     */
+    public static function findAllOpen($limit = null, $offset = null)
+    {
+        $condition = [
+            'tipo' => self::TIPO_NOTA,
+            'acao' => self::ACAO_AUTORIZAR,
+            '!estado' => self::ESTADO_PROCESSAMENTO,
+            'disponivel' => 'Y',
+            'corrigido' => 'Y',
+            'concluido' => 'N'
+        ];
+        return self::findAll($condition, [], $limit, $offset);
+    }
+
+    /**
+     * Find all pending invoice
+     * @param  int    $limit     Limit data into row count
+     * @param  int    $offset    Start offset to get rows
+     * @return array             List of all pending invoice
+     */
+    public static function findAllPending($limit = null, $offset = null)
+    {
+        $condition = [
+            'tipo' => self::TIPO_NOTA,
+            'acao' => self::ACAO_AUTORIZAR,
+            'estado' => self::ESTADO_PROCESSAMENTO,
+            'disponivel' => 'Y',
+            'corrigido' => 'Y',
+            'concluido' => 'N'
+        ];
+        return self::findAll($condition, [], $limit, $offset);
+    }
+
+    /**
+     * Find all invoice tasks
+     * @param  int    $limit     Limit data into row count
+     * @param  int    $offset    Start offset to get rows
+     * @return array             List of all invoice tasks
+     */
+    public static function findAllTasks($limit = null, $offset = null)
+    {
+        $condition = [
+            'tarefas' => 'Y',
+            'corrigido' => 'Y',
+            'concluido' => 'N'
+        ];
+        return self::findAll($condition, [], $limit, $offset);
     }
 
     /**

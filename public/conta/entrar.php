@@ -28,7 +28,6 @@ if (is_login()) {
     $url = (is_post() && isset($_POST['redirect'])) ? strval($_POST['redirect']) : null;
     redirect($url);
 }
-$weblogin = true;
 if (is_post()) {
     require_once(dirname(__DIR__) . '/app/conta/entrar.php');
 } else {

@@ -1,5 +1,9 @@
 <?php
 require_once(dirname(__DIR__) . '/app.php');
+
+use MZ\Database\Helper;
+use MZ\Payment\Pagamento;
+
 need_owner(true);
 $action = isset($_GET['action']) ? $_GET['action'] : null;
 if ($action == 'faturamento') {
@@ -14,7 +18,14 @@ if ($action == 'faturamento') {
     if (abs($end - $start) > 60 * 60 * 24 * 90) {
         $end = strtotime('+3 month', $start);
     }
-    $faturamentos = Pagamento::getTodosFaturamentos(date('Y-m-d', $start), date('Y-m-d', $end));
+    $faturamentos = Pagamento::rawFindAllTotal(
+        [
+            'apartir_datahora' => Helper::date($start),
+            'ate_datahora' => Helper::now(strtotime('-1 sec tomorrow', $end)),
+            '!pedidoid' => null
+        ],
+        ['dia' => true]
+    );
     $data = [];
     foreach ($faturamentos as $faturamento) {
         $data[] = ['data' => strtotime($faturamento['data']), 'total' => $faturamento['total']];
@@ -27,33 +38,32 @@ if ($action == 'faturamento') {
     $intervalo = strtolower(isset($_GET['intervalo']) ? $_GET['intervalo'] : null);
     switch ($intervalo) {
         case 'anual':
-            $year = date('Y') - 1;
-            $atual_de = date('Y-01-01');
-            $atual_ate = date('Y-m-d');
-            $base_de = date('Y-m-d', mktime(0, 0, 0, 1, 1, $year));
-            $base_ate = date('Y-m-d', mktime(0, 0, 0, 12, 31, $year));
+            $atual_de = Helper::date('first day of jan');
+            $atual_ate = null;
+            $base_de = Helper::date('first day of jan last year');
+            $base_ate = Helper::now('-1 sec first day of jan');
             break;
         case 'semanal':
-            $atual_de = date('Y-m-d', strtotime('monday this week'));
-            $atual_ate = date('Y-m-d');
-            $base_de = date('Y-m-d', strtotime('monday last week'));
-            $base_ate = date('Y-m-d', strtotime('sunday last week'));
+            $atual_de = Helper::date('monday this week');
+            $atual_ate = null;
+            $base_de = Helper::date('monday last week');
+            $base_ate = Helper::now('-1 sec monday this week');
             break;
         case 'diaria':
-            $atual_de = date('Y-m-d');
-            $atual_ate = $atual_de;
-            $base_de = date('Y-m-d', strtotime('-1 week'));
-            $base_ate = $base_de;
+            $atual_de = Helper::date('today');
+            $atual_ate = null;
+            $base_de = Helper::date('-1 week');
+            $base_ate = Helper::now('-1 sec tomorrow -1 week');
             break;
         default: // mensal
-            $atual_de = date('Y-m-01');
+            $atual_de = Helper::date('first day of this month');
             $atual_ate = null;
-            $base_de = -1;
-            $base_ate = -1;
+            $base_de = Helper::date('first day of last month');
+            $base_ate = Helper::now('-1 sec today first day of this month');
             break;
     }
-    $atual = Pagamento::getFaturamento(null, $atual_de, $atual_ate);
-    $base = Pagamento::getFaturamento(null, $base_de, $base_ate);
+    $atual = Pagamento::getFaturamento(['apartir_datahora' => $atual_de, 'ate_datahora' => $atual_ate]);
+    $base  = Pagamento::getFaturamento(['apartir_datahora' => $base_de, 'ate_datahora' => $base_ate]);
     json([
         'status' => 'ok',
         'atual' => $atual,

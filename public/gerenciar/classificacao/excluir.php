@@ -31,29 +31,29 @@ need_permission(Permissao::NOME_CADASTROCONTAS, is_output('json'));
 $id = isset($_GET['id']) ? $_GET['id'] : null;
 $classificacao = Classificacao::findByID($id);
 if (!$classificacao->exists()) {
-	$msg = 'A classificação não foi informada ou não existe!';
-	if (is_output('json')) {
-		json($msg);
-	}
-	\Thunder::warning($msg);
-	redirect('/gerenciar/classificacao/');
+    $msg = 'A classificação não foi informada ou não existe!';
+    if (is_output('json')) {
+        json($msg);
+    }
+    \Thunder::warning($msg);
+    redirect('/gerenciar/classificacao/');
 }
 try {
-	$classificacao->delete();
-	$classificacao->clean(new Classificacao());
-	$msg = sprintf('Classificação "%s" excluída com sucesso!', $classificacao->getDescricao());
-	if (is_output('json')) {
-		json('msg', $msg);
-	}
-	\Thunder::success($msg, true);
+    $classificacao->delete();
+    $classificacao->clean(new Classificacao());
+    $msg = sprintf('Classificação "%s" excluída com sucesso!', $classificacao->getDescricao());
+    if (is_output('json')) {
+        json('msg', $msg);
+    }
+    \Thunder::success($msg, true);
 } catch (\Exception $e) {
-	$msg = sprintf(
-		'Não foi possível excluir a classificação "%s"!',
-		$classificacao->getDescricao()
-	);
-	if (is_output('json')) {
-		json($msg);
-	}
-	\Thunder::error($msg);
+    $msg = sprintf(
+        'Não foi possível excluir a classificação "%s"!',
+        $classificacao->getDescricao()
+    );
+    if (is_output('json')) {
+        json($msg);
+    }
+    \Thunder::error($msg);
 }
 redirect('/gerenciar/classificacao/');

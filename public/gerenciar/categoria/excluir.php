@@ -31,29 +31,29 @@ need_permission(Permissao::NOME_CADASTROPRODUTOS, is_output('json'));
 $id = isset($_GET['id']) ? $_GET['id'] : null;
 $categoria = Categoria::findByID($id);
 if (!$categoria->exists()) {
-	$msg = 'A categoria não foi informada ou não existe!';
-	if (is_output('json')) {
-		json($msg);
-	}
-	\Thunder::warning($msg);
-	redirect('/gerenciar/categoria/');
+    $msg = 'A categoria não foi informada ou não existe!';
+    if (is_output('json')) {
+        json($msg);
+    }
+    \Thunder::warning($msg);
+    redirect('/gerenciar/categoria/');
 }
 try {
-	$categoria->delete();
-	$categoria->clean(new Categoria());
-	$msg = sprintf('Categoria "%s" excluída com sucesso!', $categoria->getDescricao());
-	if (is_output('json')) {
-		json('msg', $msg);
-	}
-	\Thunder::success($msg, true);
+    $categoria->delete();
+    $categoria->clean(new Categoria());
+    $msg = sprintf('Categoria "%s" excluída com sucesso!', $categoria->getDescricao());
+    if (is_output('json')) {
+        json('msg', $msg);
+    }
+    \Thunder::success($msg, true);
 } catch (\Exception $e) {
-	$msg = sprintf(
-		'Não foi possível excluir a categoria "%s"!',
-		$categoria->getDescricao()
-	);
-	if (is_output('json')) {
-		json($msg);
-	}
-	\Thunder::error($msg);
+    $msg = sprintf(
+        'Não foi possível excluir a categoria "%s"!',
+        $categoria->getDescricao()
+    );
+    if (is_output('json')) {
+        json($msg);
+    }
+    \Thunder::error($msg);
 }
 redirect('/gerenciar/categoria/');

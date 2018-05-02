@@ -32,28 +32,28 @@ $id = isset($_GET['id']) ? $_GET['id'] : null;
 $estado = Estado::findByID($id);
 if (!$estado->exists()) {
     $msg = 'O estado não foi informado ou não existe';
-	if (is_output('json')) {
-		json($msg);
-	}
-	\Thunder::warning($msg);
-	redirect('/gerenciar/estado/');
+    if (is_output('json')) {
+        json($msg);
+    }
+    \Thunder::warning($msg);
+    redirect('/gerenciar/estado/');
 }
 try {
-	$estado->delete();
-	$estado->clean(new Estado());
-	$msg = sprintf('Estado "%s" excluído com sucesso!', $estado->getNome());
-	if (is_output('json')) {
-		json('msg', $msg);
-	}
-	\Thunder::success($msg, true);
+    $estado->delete();
+    $estado->clean(new Estado());
+    $msg = sprintf('Estado "%s" excluído com sucesso!', $estado->getNome());
+    if (is_output('json')) {
+        json('msg', $msg);
+    }
+    \Thunder::success($msg, true);
 } catch (\Exception $e) {
-	$msg = sprintf(
-		'Não foi possível excluir o Estado "%s"',
-		$estado->getNome()
-	);
-	if (is_output('json')) {
-		json($msg);
-	}
-	\Thunder::error($msg);
+    $msg = sprintf(
+        'Não foi possível excluir o Estado "%s"',
+        $estado->getNome()
+    );
+    if (is_output('json')) {
+        json($msg);
+    }
+    \Thunder::error($msg);
 }
 redirect('/gerenciar/estado/');

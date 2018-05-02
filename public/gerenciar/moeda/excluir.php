@@ -32,28 +32,28 @@ $id = isset($_GET['id']) ? $_GET['id'] : null;
 $moeda = Moeda::findByID($id);
 if (!$moeda->exists()) {
     $msg = 'A moeda não foi informada ou não existe';
-	if (is_output('json')) {
-		json($msg);
-	}
-	\Thunder::warning($msg);
-	redirect('/gerenciar/moeda/');
+    if (is_output('json')) {
+        json($msg);
+    }
+    \Thunder::warning($msg);
+    redirect('/gerenciar/moeda/');
 }
 try {
-	$moeda->delete();
-	$moeda->clean(new Moeda());
+    $moeda->delete();
+    $moeda->clean(new Moeda());
     $msg = sprintf('Moeda "%s" excluída com sucesso!', $moeda->getNome());
-	if (is_output('json')) {
-		json('msg', $msg);
-	}
-	\Thunder::success($msg, true);
+    if (is_output('json')) {
+        json('msg', $msg);
+    }
+    \Thunder::success($msg, true);
 } catch (\Exception $e) {
-	$msg = sprintf(
-		'Não foi possível excluir a moeda "%s"',
-		$moeda->getNome()
-	);
-	if (is_output('json')) {
-		json($msg);
-	}
-	\Thunder::error($msg);
+    $msg = sprintf(
+        'Não foi possível excluir a moeda "%s"',
+        $moeda->getNome()
+    );
+    if (is_output('json')) {
+        json($msg);
+    }
+    \Thunder::error($msg);
 }
 redirect('/gerenciar/moeda/');

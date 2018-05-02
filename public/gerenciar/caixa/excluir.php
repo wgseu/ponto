@@ -31,29 +31,29 @@ need_permission(Permissao::NOME_CADASTROCAIXAS, is_output('json'));
 $id = isset($_GET['id']) ? $_GET['id'] : null;
 $caixa = Caixa::findByID($id);
 if (!$caixa->exists()) {
-	$msg = 'O caixa não foi informado ou não existe!';
-	if (is_output('json')) {
-		json($msg);
-	}
-	\Thunder::warning($msg);
-	redirect('/gerenciar/caixa/');
+    $msg = 'O caixa não foi informado ou não existe!';
+    if (is_output('json')) {
+        json($msg);
+    }
+    \Thunder::warning($msg);
+    redirect('/gerenciar/caixa/');
 }
 try {
-	$caixa->delete();
-	$caixa->clean(new Caixa());
-	$msg = sprintf('Caixa "%s" excluído com sucesso!', $caixa->getDescricao());
-	if (is_output('json')) {
-		json('msg', $msg);
-	}
-	\Thunder::success($msg, true);
+    $caixa->delete();
+    $caixa->clean(new Caixa());
+    $msg = sprintf('Caixa "%s" excluído com sucesso!', $caixa->getDescricao());
+    if (is_output('json')) {
+        json('msg', $msg);
+    }
+    \Thunder::success($msg, true);
 } catch (\Exception $e) {
-	$msg = sprintf(
-		'Não foi possível excluir o caixa "%s"!',
-		$caixa->getDescricao()
-	);
-	if (is_output('json')) {
-		json($msg);
-	}
-	\Thunder::error($msg);
+    $msg = sprintf(
+        'Não foi possível excluir o caixa "%s"!',
+        $caixa->getDescricao()
+    );
+    if (is_output('json')) {
+        json($msg);
+    }
+    \Thunder::error($msg);
 }
 redirect('/gerenciar/caixa/');

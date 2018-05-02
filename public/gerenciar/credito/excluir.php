@@ -31,29 +31,29 @@ need_permission(Permissao::NOME_CADASTRARCREDITOS, is_output('json'));
 $id = isset($_GET['id']) ? $_GET['id'] : null;
 $credito = Credito::findByID($id);
 if (!$credito->exists()) {
-	$msg = 'O crédito não foi informado ou não existe';
-	if (is_output('json')) {
-		json($msg);
-	}
-	\Thunder::warning($msg);
-	redirect('/gerenciar/credito/');
+    $msg = 'O crédito não foi informado ou não existe';
+    if (is_output('json')) {
+        json($msg);
+    }
+    \Thunder::warning($msg);
+    redirect('/gerenciar/credito/');
 }
 try {
-	$credito->delete();
-	$credito->clean(new Credito());
-	$msg = sprintf('Crédito "%s" excluído com sucesso!', $credito->getDetalhes());
-	if (is_output('json')) {
-		json('msg', $msg);
-	}
-	\Thunder::success($msg, true);
+    $credito->delete();
+    $credito->clean(new Credito());
+    $msg = sprintf('Crédito "%s" excluído com sucesso!', $credito->getDetalhes());
+    if (is_output('json')) {
+        json('msg', $msg);
+    }
+    \Thunder::success($msg, true);
 } catch (\Exception $e) {
-	$msg = sprintf(
-		'Não foi possível excluir o crédito "%s"',
-		$credito->getDetalhes()
-	);
-	if (is_output('json')) {
-		json($msg);
-	}
-	\Thunder::error($msg);
+    $msg = sprintf(
+        'Não foi possível excluir o crédito "%s"',
+        $credito->getDetalhes()
+    );
+    if (is_output('json')) {
+        json($msg);
+    }
+    \Thunder::error($msg);
 }
 redirect('/gerenciar/credito/');

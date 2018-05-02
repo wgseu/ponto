@@ -32,29 +32,29 @@ $id = isset($_GET['id']) ? $_GET['id'] : null;
 $fornecedor = Fornecedor::findByID($id);
 if (!$fornecedor->exists()) {
     $msg = 'O fornecedor não foi informado ou não existe';
-	if (is_output('json')) {
-		json($msg);
-	}
-	\Thunder::warning($msg);
-	redirect('/gerenciar/fornecedor/');
+    if (is_output('json')) {
+        json($msg);
+    }
+    \Thunder::warning($msg);
+    redirect('/gerenciar/fornecedor/');
 }
 $empresa_id_obj = $fornecedor->findEmpresaID();
 try {
-	$fornecedor->delete();
-	$fornecedor->clean(new Fornecedor());
-	$msg = sprintf('Fornecedor "%s" excluído com sucesso!', $empresa_id_obj->getNomeCompleto());
-	if (is_output('json')) {
-		json('msg', $msg);
-	}
-	\Thunder::success($msg, true);
+    $fornecedor->delete();
+    $fornecedor->clean(new Fornecedor());
+    $msg = sprintf('Fornecedor "%s" excluído com sucesso!', $empresa_id_obj->getNomeCompleto());
+    if (is_output('json')) {
+        json('msg', $msg);
+    }
+    \Thunder::success($msg, true);
 } catch (\Exception $e) {
-	$msg = sprintf(
-		'Não foi possível excluir o fornecedor "%s"',
-		$empresa_id_obj->getNomeCompleto()
-	);
-	if (is_output('json')) {
-		json($msg);
-	}
-	\Thunder::error($msg);
+    $msg = sprintf(
+        'Não foi possível excluir o fornecedor "%s"',
+        $empresa_id_obj->getNomeCompleto()
+    );
+    if (is_output('json')) {
+        json($msg);
+    }
+    \Thunder::error($msg);
 }
 redirect('/gerenciar/fornecedor/');

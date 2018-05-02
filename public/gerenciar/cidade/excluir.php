@@ -32,28 +32,28 @@ $id = isset($_GET['id']) ? $_GET['id'] : null;
 $cidade = Cidade::findByID($id);
 if (!$cidade->exists()) {
     $msg = 'A cidade não foi informada ou não existe!';
-	if (is_output('json')) {
-		json($msg);
-	}
-	\Thunder::warning($msg);
-	redirect('/gerenciar/cidade/');
+    if (is_output('json')) {
+        json($msg);
+    }
+    \Thunder::warning($msg);
+    redirect('/gerenciar/cidade/');
 }
 try {
-	$cidade->delete();
-	$cidade->clean(new Cidade());
-	$msg = sprintf('Cidade "%s" excluída com sucesso!', $cidade->getNome());
-	if (is_output('json')) {
-		json('msg', $msg);
-	}
-	\Thunder::success($msg, true);
+    $cidade->delete();
+    $cidade->clean(new Cidade());
+    $msg = sprintf('Cidade "%s" excluída com sucesso!', $cidade->getNome());
+    if (is_output('json')) {
+        json('msg', $msg);
+    }
+    \Thunder::success($msg, true);
 } catch (\Exception $e) {
-	$msg = sprintf(
-		'Não foi possível excluir a cidade "%s"!',
-		$cidade->getNome()
-	);
-	if (is_output('json')) {
-		json($msg);
-	}
-	\Thunder::error($msg);
+    $msg = sprintf(
+        'Não foi possível excluir a cidade "%s"!',
+        $cidade->getNome()
+    );
+    if (is_output('json')) {
+        json($msg);
+    }
+    \Thunder::error($msg);
 }
 redirect('/gerenciar/cidade/');

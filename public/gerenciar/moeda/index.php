@@ -32,7 +32,7 @@ need_permission(Permissao::NOME_CADASTROMOEDAS, is_output('json'));
 
 $limite = isset($_GET['limite']) ? intval($_GET['limite']) : 10;
 if ($limite > 100 || $limite < 1) {
-	$limite = 10;
+    $limite = 10;
 }
 $condition = Filter::query($_GET);
 unset($condition['ordem']);
@@ -43,11 +43,11 @@ list($pagesize, $offset, $pagestring) = pagestring($count, $limite);
 $moedas = Moeda::findAll($condition, $order, $pagesize, $offset);
 
 if (is_output('json')) {
-	$items = [];
-	foreach ($moedas as $_moeda) {
-		$items[] = $_moeda->publish();
-	}
-	json(['status' => 'ok', 'items' => $items]);
+    $items = [];
+    foreach ($moedas as $_moeda) {
+        $items[] = $_moeda->publish();
+    }
+    json(['status' => 'ok', 'items' => $items]);
 }
 
 $app->getResponse('html')->output('gerenciar_moeda_index');

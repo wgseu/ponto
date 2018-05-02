@@ -31,29 +31,29 @@ need_permission(Permissao::NOME_CADASTROCONTAS, is_output('json'));
 $id = isset($_GET['id']) ? $_GET['id'] : null;
 $conta = Conta::findByID($id);
 if (!$conta->exists()) {
-	$msg = 'A conta não foi informada ou não existe';
-	if (is_output('json')) {
-		json($msg);
-	}
-	\Thunder::warning($msg);
-	redirect('/gerenciar/conta/');
+    $msg = 'A conta não foi informada ou não existe';
+    if (is_output('json')) {
+        json($msg);
+    }
+    \Thunder::warning($msg);
+    redirect('/gerenciar/conta/');
 }
 try {
-	$conta->delete();
-	$conta->clean(new Conta());
-	$msg = sprintf('Conta "%s" excluída com sucesso!', $conta->getDescricao());
-	if (is_output('json')) {
-		json('msg', $msg);
-	}
-	\Thunder::success($msg, true);
+    $conta->delete();
+    $conta->clean(new Conta());
+    $msg = sprintf('Conta "%s" excluída com sucesso!', $conta->getDescricao());
+    if (is_output('json')) {
+        json('msg', $msg);
+    }
+    \Thunder::success($msg, true);
 } catch (\Exception $e) {
-	$msg = sprintf(
-		'Não foi possível excluir a conta "%s"!',
-		$conta->getDescricao()
-	);
-	if (is_output('json')) {
-		json($msg);
-	}
-	\Thunder::error($msg);
+    $msg = sprintf(
+        'Não foi possível excluir a conta "%s"!',
+        $conta->getDescricao()
+    );
+    if (is_output('json')) {
+        json($msg);
+    }
+    \Thunder::error($msg);
 }
 redirect('/gerenciar/conta/');

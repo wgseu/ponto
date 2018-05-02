@@ -9,7 +9,7 @@
 			<div class="form-group col-lg-4 col-md-6 col-sm-6 col-xs-12">
 				<label for="query">Busca:</label>
 				<div class="input-group">
-					<input type="text" class="form-control" id="query" name="search" placeholder="Descrição..." value="${\MZ\Util\Filter::input($_GET, 'search')}">
+					<input type="text" class="form-control" id="search" name="search" placeholder="Descrição..." value="${\MZ\Util\Filter::input($_GET, 'search')}">
 					<span class="input-group-btn">
 						<button class="btn btn-default" type="submit"><i class="fa fa-search"></i></button>
 					</span>
@@ -35,10 +35,11 @@
 				<div class="x_content">
 <!--{loop $codigos $codigo $cartao}-->
 <!--${$associado = $cartao['cartao']}-->
+<!--${$img = isset($_imagens[$associado->getImageIndex()]) ? $_imagens[$associado->getImageIndex()] : ['name' => '', 'id' => 0]}-->
 					<div class="col-md-6 col-sm-6 col-xs-12 top-row">
 						<div class="assoc-item {$cartao['status']}">
 							<div class="assoc-img">
-								<div title="{$_imagens[$associado->getImageIndex()]['name']}" class="cell-icon cartao-icons" style="background-position: -{$_imagens[$associado->getImageIndex()]['id'] * 50}px 0px;"></div>
+								<div title="{$img['name']}" class="cell-icon cartao-icons" style="background-position: -{$img['id'] * 50}px 0px;"></div>
 							</div>
 							<div class="assoc-info">
 								<input type="hidden" id="cartao_{$codigo}" name="cartao[{$codigo}]" data-descricao="${\MZ\Util\Filter::input($associado->getDescricao())}" data-codigo="{$codigo}" data-id="{$associado->getID()}" value="{$associado->getID()}">

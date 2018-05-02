@@ -556,6 +556,7 @@ class Categoria extends \MZ\Database\Helper
                 ->having('(CASE WHEN COUNT(p.id) > 0 THEN "Y" ELSE "N" END) = ?', $disponivel);
         }
         if (isset($order['vendas'])) {
+            $query = $query->leftJoin('Produtos p ON p.categoriaid = c.id AND p.visivel = "Y"');
             $query = $query->leftJoin(
                 'Produtos_Pedidos r ON r.produtoid = p.id AND r.datahora > ?',
                 self::now('-1 month')

@@ -1296,6 +1296,9 @@ class Produto extends \MZ\Database\Helper
      */
     private static function query($condition = [], $order = [])
     {
+        $estoque = isset($condition['disponivel']) || isset($condition['limitado']) ||
+            isset($condition['estoque']);
+        $setorestoque = isset($condition['setorestoque']) ? $condition['setorestoque'] : null;
         $promocao = isset($condition['promocao']) ? strval($condition['promocao']) : 'N';
         $week_offset = (1 + date('w')) * 1440 + (int)((time() - strtotime('00:00')) / 60);
         $query = self::getDB()->from('Produtos p')
@@ -1337,6 +1340,30 @@ class Produto extends \MZ\Database\Helper
                 $week_offset
             )
             ->leftJoin('Categorias c ON c.id = p.categoriaid');
+        if ($estoque) {
+            $query = $query->select('COALESCE(SUM(e.quantidade), 0) as estoque');
+            $query = $query->leftJoin(
+                'Estoque e ON e.produtoid = p.id AND e.cancelado = "N" AND '.
+                'e.setorid = IFNULL(?, IFNULL(p.setorestoqueid, e.setorid))',
+                $setorestoque
+            );
+            $query = $query->groupBy('p.id');
+        }
+        if (isset($condition['disponivel'])) {
+            $disponivel = $condition['disponivel'];
+            $query = $query->having(
+                '(p.tipo <> ? OR (CASE WHEN estoque > 0 THEN "Y" ELSE "N" END) = ?)',
+                self::TIPO_PRODUTO,
+                $disponivel
+            );
+        }
+        if (isset($condition['limitado'])) {
+            $limitado = $condition['limitado'];
+            $query = $query->having(
+                '(CASE WHEN COALESCE(estoque, 0) <= p.quantidadelimite THEN "Y" ELSE "N" END) = ?',
+                $limitado
+            );
+        }
         if (isset($condition['search'])) {
             $search = trim($condition['search']);
             if (Validator::checkDigits($search)) {
@@ -1365,38 +1392,16 @@ class Produto extends \MZ\Database\Helper
      */
     private static function queryEx($condition = [], $order = [])
     {
-        $setorestoque = isset($condition['setorestoque']) ? $condition['setorestoque'] : null;
+        $condition['estoque'] = true;
         $query = self::query($condition, $order)
-            ->select('COALESCE(SUM(e.quantidade), 0) as estoque')
             ->select('c.descricao as categoria')
             ->select('u.sigla as unidade')
             ->select('u.nome as unidade_nome')
             ->select('se.nome as setor_estoque')
             ->select('sp.nome as setor_preparo')
-            ->leftJoin(
-                'Estoque e ON e.produtoid = p.id AND e.cancelado = "N" AND '.
-                'e.setorid = IFNULL(?, IFNULL(p.setorestoqueid, e.setorid))',
-                $setorestoque
-            )
             ->leftJoin('Unidades u ON u.id = p.unidadeid')
             ->leftJoin('Setores se ON se.id = p.setorestoqueid')
-            ->leftJoin('Setores sp ON sp.id = p.setorpreparoid')
-            ->groupBy('p.id');
-        if (isset($condition['disponivel'])) {
-            $disponivel = $condition['disponivel'];
-            $query = $query->having(
-                '(p.tipo <> ? OR (CASE WHEN estoque > 0 THEN "Y" ELSE "N" END) = ?)',
-                self::TIPO_PRODUTO,
-                $disponivel
-            );
-        }
-        if (isset($condition['limitado'])) {
-            $limitado = $condition['limitado'];
-            $query = $query->having(
-                '(CASE WHEN COALESCE(estoque, 0) <= p.quantidadelimite THEN "Y" ELSE "N" END) = ?',
-                $limitado
-            );
-        }
+            ->leftJoin('Setores sp ON sp.id = p.setorpreparoid');
         return $query;
     }
 

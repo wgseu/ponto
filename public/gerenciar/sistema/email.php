@@ -5,7 +5,7 @@ use MZ\System\Permissao;
 
 need_permission(Permissao::NOME_ALTERARCONFIGURACOES, is_output('json'));
 
-$tab_email = 'active';
+$tab = 'email';
 $focusctrl = 'destinatario';
 $errors = [];
 

@@ -95,7 +95,10 @@ class NFeDB extends \NFe\Database\Estatico
             ['id' => 1]
         );
         /* Itens do pedido */
-        $_itens = ProdutoPedido::getTodosDoPedidoID($_pedido->getID());
+        $_itens = ProdutoPedido::findAll([
+            'pedidoid' => $_pedido->getID(),
+            'cancelado' => 'N'
+        ]);
         /* Informações de entrega */
         $_localizacao_entrega = $_pedido->findLocalizacaoID();
         $_bairro_entrega = $_localizacao_entrega->findBairroID();

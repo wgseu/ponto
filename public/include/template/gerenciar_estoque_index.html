@@ -84,7 +84,7 @@
 								<td>${is_null($estoque->getDataMovimento())?'':date('d/m/Y H:i', strtotime($estoque->getDataMovimento()))}</td>
 								<td class="text-center">
 									<ul class="nav panel_toolbox">
-<!--{if $estoque->getTipoMovimento() == Estoque::TIPO_MOVIMENTO_ENTRADA && !$estoque->isCancelado()}-->
+<!--{if $estoque->getTipoMovimento() == \MZ\Stock\Estoque::TIPO_MOVIMENTO_ENTRADA && !$estoque->isCancelado()}-->
 										<li>
 											<a href="/gerenciar/estoque/cancelar?id={$estoque->getID()}" title="Cancelar estoque '{$_produto->getDescricao()}'" class="ajaxlink" ask="Deseja cancelar a entrada no estoque '{$_produto->getDescricao()}'?"><i class="fa fa-ban"></i></a>
 										</li>

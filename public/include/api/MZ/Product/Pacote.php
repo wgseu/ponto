@@ -32,7 +32,6 @@ use MZ\Util\Validator;
  */
 class Pacote extends \MZ\Database\Helper
 {
-
     /**
      * Identificador do pacote
      */
@@ -507,15 +506,131 @@ class Pacote extends \MZ\Database\Helper
     }
 
     /**
-     * Find this object on database using, ID
-     * @param  int $id id to find Pacote
-     * @return Pacote A filled instance or empty when not found
+     * Insert a new Pacote into the database and fill instance from database
+     * @return Pacote Self instance
      */
-    public static function findByID($id)
+    public function insert()
     {
-        return self::find([
-            'id' => intval($id),
-        ]);
+        $values = $this->validate();
+        unset($values['id']);
+        try {
+            $id = self::getDB()->insertInto('Pacotes')->values($values)->execute();
+            $this->loadByID($id);
+        } catch (\Exception $e) {
+            throw $this->translate($e);
+        }
+        return $this;
+    }
+
+    /**
+     * Update Pacote with instance values into database for ID
+     * @param  array $only Save these fields only, when empty save all fields except id
+     * @param  boolean $except When true, saves all fields except $only
+     * @return Pacote Self instance
+     */
+    public function update($only = [], $except = false)
+    {
+        $values = $this->validate();
+        if (!$this->exists()) {
+            throw new \Exception('O identificador do pacote não foi informado');
+        }
+        $values = self::filterValues($values, $only, $except);
+        try {
+            self::getDB()
+                ->update('Pacotes')
+                ->set($values)
+                ->where('id', $this->getID())
+                ->execute();
+            $this->loadByID($this->getID());
+        } catch (\Exception $e) {
+            throw $this->translate($e);
+        }
+        return $this;
+    }
+
+    /**
+     * Delete this instance from database using ID
+     * @return integer Number of rows deleted (Max 1)
+     */
+    public function delete()
+    {
+        if (!$this->exists()) {
+            throw new \Exception('O identificador do pacote não foi informado');
+        }
+        $result = self::getDB()
+            ->deleteFrom('Pacotes')
+            ->where('id', $this->getID())
+            ->execute();
+        return $result;
+    }
+
+    /**
+     * Load one register for it self with a condition
+     * @param  array $condition Condition for searching the row
+     * @param  array $order associative field name -> [-1, 1]
+     * @return Pacote Self instance filled or empty
+     */
+    public function load($condition, $order = [])
+    {
+        $query = self::query($condition, $order)->limit(1);
+        $row = $query->fetch() ?: [];
+        return $this->fromArray($row);
+    }
+
+    /**
+     * Pacote a qual pertence as informações de formação do produto final
+     * @return \MZ\Product\Produto The object fetched from database
+     */
+    public function findPacoteID()
+    {
+        return \MZ\Product\Produto::findByID($this->getPacoteID());
+    }
+
+    /**
+     * Grupo de formação, Ex.: Tamanho, Sabores e Complementos.
+     * @return \MZ\Product\Grupo The object fetched from database
+     */
+    public function findGrupoID()
+    {
+        return \MZ\Product\Grupo::findByID($this->getGrupoID());
+    }
+
+    /**
+     * Produto selecionável do grupo. Não pode conter propriedade.
+     * @return \MZ\Product\Produto The object fetched from database
+     */
+    public function findProdutoID()
+    {
+        if (is_null($this->getProdutoID())) {
+            return new \MZ\Product\Produto();
+        }
+        return \MZ\Product\Produto::findByID($this->getProdutoID());
+    }
+
+    /**
+     * Propriedade selecionável do grupo. Não pode conter produto.
+     * @return \MZ\Product\Propriedade The object fetched from database
+     */
+    public function findPropriedadeID()
+    {
+        if (is_null($this->getPropriedadeID())) {
+            return new \MZ\Product\Propriedade();
+        }
+        return \MZ\Product\Propriedade::findByID($this->getPropriedadeID());
+    }
+
+    /**
+     * Informa a propriedade pai de um complemento, permite atribuir preços
+     * diferentes dependendo da propriedade, Ex.: Tamanho -> Sabor, onde
+     * Tamanho é pai de Sabor
+     * @return \MZ\Product\Pacote The object fetched from database
+     */
+    public function findAssociacaoID()
+    {
+        if (is_null($this->getAssociacaoID())) {
+            return new \MZ\Product\Pacote();
+        }
+        return \MZ\Product\Pacote::findByID($this->getAssociacaoID());
     }
 
     /**
@@ -607,8 +722,8 @@ class Pacote extends \MZ\Database\Helper
                 ' END) as imagemurl'
             )
             ->select('COALESCE(pr.dataatualizacao, p.dataatualizacao) as dataatualizacao');
-        if (isset($condition['query'])) {
-            $busca = $condition['query'];
+        if (isset($condition['search'])) {
+            $busca = $condition['search'];
             $query = self::buildSearch(
                 $busca,
                 self::concat([
@@ -618,7 +733,7 @@ class Pacote extends \MZ\Database\Helper
                 ]),
                 $query
             );
-            unset($condition['query']);
+            unset($condition['search']);
         }
         $condition = self::filterConditionEx($condition);
         if (
@@ -646,6 +761,18 @@ class Pacote extends \MZ\Database\Helper
             $row = [];
         }
         return new Pacote($row);
+    }
+
+    /**
+     * Find this object on database using, ID
+     * @param  int $id id to find Pacote
+     * @return Pacote A filled instance or empty when not found
+     */
+    public static function findByID($id)
+    {
+        return self::find([
+            'id' => intval($id),
+        ]);
     }
 
     /**
@@ -692,78 +819,6 @@ class Pacote extends \MZ\Database\Helper
     }
 
     /**
-     * Insert a new Pacote into the database and fill instance from database
-     * @return Pacote Self instance
-     */
-    public function insert()
-    {
-        $values = $this->validate();
-        unset($values['id']);
-        try {
-            $id = self::getDB()->insertInto('Pacotes')->values($values)->execute();
-            $this->loadByID($id);
-        } catch (\Exception $e) {
-            throw $this->translate($e);
-        }
-        return $this;
-    }
-
-    /**
-     * Update Pacote with instance values into database for ID
-     * @param  array $only Save these fields only, when empty save all fields except id
-     * @param  boolean $except When true, saves all fields except $only
-     * @return Pacote Self instance
-     */
-    public function update($only = [], $except = false)
-    {
-        $values = $this->validate();
-        if (!$this->exists()) {
-            throw new \Exception('O identificador do pacote não foi informado');
-        }
-        $values = self::filterValues($values, $only, $except);
-        try {
-            self::getDB()
-                ->update('Pacotes')
-                ->set($values)
-                ->where('id', $this->getID())
-                ->execute();
-            $this->loadByID($this->getID());
-        } catch (\Exception $e) {
-            throw $this->translate($e);
-        }
-        return $this;
-    }
-
-    /**
-     * Delete this instance from database using ID
-     * @return integer Number of rows deleted (Max 1)
-     */
-    public function delete()
-    {
-        if (!$this->exists()) {
-            throw new \Exception('O identificador do pacote não foi informado');
-        }
-        $result = self::getDB()
-            ->deleteFrom('Pacotes')
-            ->where('id', $this->getID())
-            ->execute();
-        return $result;
-    }
-
-    /**
-     * Load one register for it self with a condition
-     * @param  array $condition Condition for searching the row
-     * @param  array $order associative field name -> [-1, 1]
-     * @return Pacote Self instance filled or empty
-     */
-    public function load($condition, $order = [])
-    {
-        $query = self::query($condition, $order)->limit(1);
-        $row = $query->fetch() ?: [];
-        return $this->fromArray($row);
-    }
-
-    /**
      * Count all rows from database with matched condition critery
      * @param  array $condition condition to filter rows
      * @return integer Quantity of rows
@@ -772,19 +827,5 @@ class Pacote extends \MZ\Database\Helper
     {
         $query = self::query($condition);
         return $query->count();
-    }
-
-    /**
-     * Informa a propriedade pai de um complemento, permite atribuir preços
-     * diferentes dependendo da propriedade, Ex.: Tamanho -> Sabor, onde
-     * Tamanho é pai de Sabor
-     * @return \MZ\Product\Pacote The object fetched from database
-     */
-    public function findAssociacaoID()
-    {
-        if (is_null($this->getAssociacaoID())) {
-            return new \MZ\Product\Pacote();
-        }
-        return \MZ\Product\Pacote::findByID($this->getAssociacaoID());
     }
 }

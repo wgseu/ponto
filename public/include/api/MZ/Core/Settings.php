@@ -97,7 +97,7 @@ class Settings
      */
     public function addValues($values)
     {
-        $values = array_intersect_key($values, array_flip($this->getKeys()));
+        $values = array_diff_key($values, array_flip($this->getConfigKeys()));
         $this->values = array_merge($this->values, $values);
         return $this;
     }
@@ -108,7 +108,7 @@ class Settings
      */
     public function getValues()
     {
-        return array_intersect_key($this->values, array_flip($this->getKeys()));
+        return array_diff_key($this->values, array_flip($this->getConfigKeys()));
     }
 
     /**
@@ -137,15 +137,6 @@ class Settings
             'db',
             'path',
         ];
-    }
-
-    /**
-     * Return dynamic configuration entries
-     * @return array Set of keys available to save
-     */
-    private function getKeys()
-    {
-        return array_keys(array_diff_key($this->values, array_flip($this->getConfigKeys())));
     }
 
     /**

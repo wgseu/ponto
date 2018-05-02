@@ -6,7 +6,7 @@ use MZ\System\Permissao;
 need_permission(Permissao::NOME_ALTERARCONFIGURACOES, is_output('json'));
 
 $focusctrl = 'fiscal_timeout';
-$tab_fiscal = 'active';
+$tab = 'fiscal';
 
 $erros = [];
 $fiscal_timeout = get_int_config('Sistema', 'Fiscal.Timeout', 30);

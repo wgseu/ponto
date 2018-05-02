@@ -7,7 +7,7 @@ use MZ\System\Permissao;
 need_permission(Permissao::NOME_ALTERARCONFIGURACOES, is_output('json'));
 
 $focusctrl = 'mapskey';
-$tab_avancado = 'active';
+$tab = 'avancado';
 
 $erro = [];
 $maps_api = get_string_config('Site', 'Maps.API');

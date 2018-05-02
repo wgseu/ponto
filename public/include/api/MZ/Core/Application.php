@@ -120,7 +120,7 @@ class Application
      */
     public function getPath($name)
     {
-        return $this->getSettings()->getValue('path', $name);
+        return $this->getSystem()->getSettings()->getValue('path', $name);
     }
 
     /**

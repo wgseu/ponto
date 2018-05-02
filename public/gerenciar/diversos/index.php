@@ -19,8 +19,12 @@ $faturamentos = Pagamento::rawFindAllTotal(
     ],
     ['dia' => true]
 );
-$top_clientes = Cliente::getTodosCompradores(-6, 0, 0, 5);
-$sessao = Sessao::findAbertaOuUltima();
+$top_clientes = Cliente::rawFindAll(
+    ['apartir_cadastro' => Helper::date('first day of -6 month')],
+    [],
+    5
+);
+$sessao = Sessao::findLastAberta();
 $pessoas = Pedido::getTotalPessoas($sessao->getID());
 $stats = Pedido::getTicketMedio($sessao->getID());
 $permanencia = $stats['permanencia'];

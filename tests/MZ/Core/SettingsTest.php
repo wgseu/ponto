@@ -90,4 +90,15 @@ class SettingsTest extends \PHPUnit_Framework_TestCase
         }
         $settings->deleteEntry('path', null);
     }
+
+    public function testAddValues()
+    {
+        $settings = new Settings(['path' => '123456']);
+        $settings->addValues([
+            'path' => 'teste',
+            'value' => 'new value',
+        ]);
+        $this->assertEquals('123456', $settings->getValue('path', null, '123456'));
+        $this->assertEquals('new value', $settings->getValue('value'));
+    }
 }

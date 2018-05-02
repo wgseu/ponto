@@ -281,14 +281,14 @@ class Comanda extends \MZ\Database\Helper
     private static function query($condition = [], $order = [])
     {
         $query = self::getDB()->from('Comandas');
-        if (array_key_exists('query', $condition)) {
-            $busca = trim($condition['query']);
+        if (array_key_exists('search', $condition)) {
+            $busca = trim($condition['search']);
             if (is_numeric($busca)) {
                 $query = $query->where('id', $busca);
             } elseif ($busca != '') {
                 $query = $query->where('nome LIKE ?', '%'.$busca.'%');
             }
-            unset($condition['query']);
+            unset($condition['search']);
         }
         if (empty($order)) {
             $query = $query->orderBy('id ASC');

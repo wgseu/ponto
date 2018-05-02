@@ -7,7 +7,7 @@ need_permission(Permissao::NOME_ALTERARCONFIGURACOES, is_output('json'));
 
 $focusctrl = 'bemvindo';
 $base_url = 'header';
-$tab_layout = 'active';
+$tab = 'layout';
 
 $erro = [];
 $images_info = [

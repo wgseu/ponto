@@ -409,14 +409,14 @@ class Carteira extends \MZ\Database\Helper
     private static function query($condition = [], $order = [])
     {
         $query = self::getDB()->from('Carteiras');
-        if (array_key_exists('query', $condition)) {
-            $busca = trim($condition['query']);
+        if (array_key_exists('search', $condition)) {
+            $busca = trim($condition['search']);
             if (is_numeric($busca)) {
                 $query = $query->where('numero', $busca);
             } elseif ($busca != '') {
                 $query = $query->where('descricao LIKE ?', '%'.$busca.'%');
             }
-            unset($condition['query']);
+            unset($condition['search']);
         }
         return self::buildCondition($query, $condition);
     }

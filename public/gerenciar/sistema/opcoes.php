@@ -2,10 +2,11 @@
 require_once(dirname(dirname(__DIR__)) . '/app.php'); // main app file
 
 use MZ\System\Permissao;
+use MZ\System\Synchronizer;
 
 need_permission(Permissao::NOME_ALTERARCONFIGURACOES, is_post() || is_output('json'));
 
-$tab_opcoes = 'active';
+$tab = 'opcoes';
 $opcoes_comportamento = [
     ['section' => 'Sistema', 'key' => 'Auto.Logout', 'default' => false, 'title' => 'Fazer logout automaticamente após inatividade'],
     ['section' => 'Comandas', 'key' => 'PrePaga', 'default' => false, 'title' => 'Comanda pré-paga'],
@@ -37,8 +38,8 @@ if (is_post()) {
         $app->getSystem()->filter($app->getSystem());
         $app->getSystem()->update(['opcoes']);
         try {
-            $appsync = new \MZ\System\Synchronizer();
-            $appsync->systemOptionsChanged();
+            $sync = new Synchronizer();
+            $sync->systemOptionsChanged();
         } catch (\Exception $e) {
             \Log::error($e->getMessage());
         }

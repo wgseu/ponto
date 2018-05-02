@@ -22,6 +22,8 @@
  *
  * @author Equipe GrandChef <desenvolvimento@mzsw.com.br>
  */
+namespace MZ\System;
+
 class Synchronizer
 {
     const ACTION_ADDED = 'adicao_itens';
@@ -39,7 +41,7 @@ class Synchronizer
     public function __construct()
     {
         // open socket
-        $this->socket = fsockopen('127.0.0.1', 6219, $errno, $errstr);
+        $this->socket = @fsockopen('127.0.0.1', 6219, $errno, $errstr);
         if ($this->socket === false) {
             throw new \Exception('O servidor do GrandChef está fechado', $errno);
         }
@@ -48,13 +50,13 @@ class Synchronizer
     public function __destruct()
     {
         // close socket
-        fclose($this->socket);
+        @fclose($this->socket);
     }
 
     private function write($message)
     {
         // send message to server
-        $result = fwrite($this->socket, $message);
+        $result = @fwrite($this->socket, $message);
         if ($result === false) {
             throw new \Exception('Falha ao notificar ao servidor do GrandChef');
         }
@@ -62,7 +64,7 @@ class Synchronizer
 
     private function read()
     {
-        $result = fgets($this->socket);
+        $result = @fgets($this->socket);
         if ($result === false) {
             throw new \Exception('Falha ao receber uma notificação do servidor do GrandChef');
         }

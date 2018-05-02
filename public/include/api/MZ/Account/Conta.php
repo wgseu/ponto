@@ -662,6 +662,61 @@ class Conta extends \MZ\Database\Helper
         return $this;
     }
 
+    public function getAcrescimoAtual()
+    {
+        $datapagto = strtotime($this->getDataPagamento());
+        if ($datapagto === false) {
+            $datapagto = time();
+        }
+        $vencimento = strtotime("tomorrow", strtotime($this->getVencimento())) - 1;
+        $is_vencida = !is_null($this->getVencimento()) && $vencimento < $datapagto;
+        if (!$is_vencida) {
+            return $this->getAcrescimo();
+        }
+        if (is_equal($this->getJuros(), 0, 0.000005)) {
+            // ainda não incluiu a multa
+            if (abs($this->getAcrescimo()) < abs($this->getMulta())) {
+                return $this->getAcrescimo() + $this->getMulta();
+            }
+            return $this->getAcrescimo();
+        }
+        if (!$this->exists()) {
+            $info = [
+                'quantidade' => 0,
+                'despesas' => 0,
+                'receitas' => 0,
+                'pago' => 0,
+                'recebido' => 0,
+                'datapagto' => null,
+            ];
+        } else {
+            $info = self::getTotalAbertas($this->getID());
+        }
+        $is_paga = is_equal($this->getValor() + $this->getAcrescimo(), $info['pago']);
+        if ($is_paga) {
+            return $this->getAcrescimo();
+        }
+        $restante = $this->getValor() + $this->getAcrescimo() - $info['pago'];
+        $datavenc = strtotime($info['datapagto']);
+        if ($datavenc === false) {
+            $datavenc = strtotime($this->getVencimento());
+        }
+        $dias = floor(($datapagto - $datavenc) / (60 * 60 * 24));
+        $juros = $restante * pow(1 + $this->getJuros(), $dias) - $restante;
+        if (abs($this->getAcrescimo()) < abs($this->getMulta())) { // ainda não incluiu a multa
+            return $this->getAcrescimo() + $this->getMulta() + $juros;
+        }
+        return $this->getAcrescimo() + $juros;
+    }
+
+    public function getTotal()
+    {
+        if (!$this->isAutoAcrescimo()) {
+            return $this->getValor() + $this->getAcrescimo();
+        }
+        return $this->getValor() + $this->getAcrescimoAtual();
+    }
+
     /**
      * Convert this instance into array associated key -> value with only public fields
      * @return array All public field and values into array format
@@ -1051,6 +1106,80 @@ class Conta extends \MZ\Database\Helper
         return self::find([
             'id' => intval($id),
         ]);
+    }
+
+    public static function getTotalAbertas(
+        $descricao = null,
+        $cliente_id = null,
+        $tipo = 0,
+        $mes_inicio = null,
+        $mes_fim = null
+    ) {
+        $data_inicio = null;
+        if (!is_null($mes_inicio) && !is_numeric($mes_inicio)) {
+            $data_inicio = strtotime($mes_inicio);
+        } elseif (!is_null($mes_inicio)) {
+            $data_inicio = strtotime(date('Y-m').' '.$mes_inicio.' month');
+        }
+        $data_fim = null;
+        if (!is_null($mes_fim) && !is_numeric($mes_fim)) {
+            $data_fim = strtotime($mes_fim);
+        } elseif (!is_null($mes_fim)) {
+            $data_fim = strtotime(date('Y-m').' '.$mes_fim.' month');
+            $data_fim = strtotime('last day of this month', $data_fim);
+        }
+        $db = self::getDB()->getPdo();
+        $sql = '';
+        $data = [];
+        $descricao = trim($descricao);
+        if (is_numeric($descricao)) {
+            $sql .= 'AND c.id = :codigo ';
+            $data[':codigo'] = intval($descricao);
+        } elseif ($descricao != '') {
+            $sql .= 'AND c.descricao LIKE :descricao ';
+            $data[':descricao'] = '%'.$descricao.'%';
+        }
+        if (!is_null($cliente_id)) {
+            $sql .= 'AND c.clienteid = :cliente ';
+            $data[':cliente'] = $cliente_id;
+        }
+        if (is_numeric($tipo) && $tipo != 0) {
+            if ($tipo < 0) {
+                $sql .= 'AND c.valor <= 0 ';
+            } else {
+                $sql .= 'AND c.valor > 0 ';
+            }
+        }
+        if (!is_null($data_inicio)) {
+            $sql .= 'AND c.vencimento >= :inicio ';
+            $data[':inicio'] = date('Y-m-d', $data_inicio);
+        }
+        if (!is_null($data_fim)) {
+            $sql .= 'AND c.vencimento <= :fim ';
+            $data[':fim'] = date('Y-m-d 23:59:59', $data_fim);
+        }
+        $stmt = $db->prepare('SELECT COUNT(id) as quantidade, SUM(IF(valor <= 0, valor + acrescimo, 0)) as despesas, '.
+                             '  SUM(IF(valor > 0, valor + acrescimo, 0)) as receitas, SUM(pago) as pago, '.
+                             '  SUM(recebido) as recebido, MAX(datapagto) as datapagto '.
+                             'FROM ('.
+                                'SELECT c.id, c.valor, c.acrescimo, MAX(pg.datahora) as datapagto, '.
+                                '  COALESCE(IF(c.valor <= 0, SUM(pg.total), 0), 0) as pago, '.
+                                '  COALESCE(IF(c.valor > 0, SUM(pg.total), 0), 0) as recebido '.
+                                'FROM Contas c '.
+                                'LEFT JOIN Pagamentos pg ON pg.pagtocontaid = c.id AND pg.cancelado = "N" AND pg.ativo = "Y" '.
+                                'WHERE c.id <> 1 AND c.cancelada = "N" '.$sql.
+                                'GROUP BY c.id '.
+                                'HAVING (ABS(valor + acrescimo) - ABS(pago + recebido)) >= 0.005) a');
+        $stmt->execute($data);
+        $info = $stmt->fetch();
+        return [
+            'quantidade' => $info['quantidade'] + 0,
+            'despesas' => $info['despesas'] + 0,
+            'receitas' => $info['receitas'] + 0,
+            'pago' => $info['pago'] + 0,
+            'recebido' => $info['recebido'] + 0,
+            'datapagto' => $info['datapagto'],
+        ];
     }
 
     /**

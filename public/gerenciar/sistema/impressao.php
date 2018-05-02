@@ -5,7 +5,7 @@ use MZ\System\Permissao;
 
 need_permission(Permissao::NOME_ALTERARCONFIGURACOES, is_post() || is_output('json'));
 
-$tab_impressao = 'active';
+$tab = 'impressao';
 $opcoes_aparencia = [
     ['section' => 'Imprimir', 'key' => 'Empresa.CNPJ', 'default' => true, 'title' => vsprintf('Imprimir o %s', [_p('Titulo', 'CNPJ')])],
     ['section' => 'Imprimir', 'key' => 'Empresa.Endereco', 'default' => true, 'title' => 'Imprimir o endereço'],

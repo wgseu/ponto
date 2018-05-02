@@ -24,37 +24,42 @@
  */
 require_once(dirname(dirname(__DIR__)) . '/app.php');
 
-$estoque = intval($_GET['estoque']);
-if ($estoque < 0 && is_manager()) {
-    $estoque = null;
-}
-$limit = isset($_GET['limite'])?intval($_GET['limite']):5;
+use MZ\Product\Produto;
+
+$limit = isset($_GET['limite']) ? intval($_GET['limite']) : 5;
 if ($limit < 1 || $limit > 10) {
     $limit = 5;
 }
-if ($_GET['primeiro']) {
+$primeiro = isset($_GET['primeiro']) ? $_GET['primeiro'] : null;
+if ($primeiro) {
     $limit = 1;
 }
-$categoria_id = null;
+$condition = [
+    'promocao' => 'Y'
+];
 if (isset($_GET['categoria']) && is_numeric($_GET['categoria'])) {
     $limit = null;
-    $categoria_id = intval($_GET['categoria']);
+    $condition['categoria'] = intval($_GET['categoria']);
 }
-$produtos = Produto::getTodos(
-    $_GET['busca'],
-    $categoria_id,
-    null, // unidade_id
-    null, // tipo
-    $estoque,
-    null, // setor de estoque
-    null, // incluir promoção
-    null, // visibilidade
-    null, // mostrar com estoque limitado
-    null, // pesável
-    true, // raw mode
-    0, // offset
-    $limit
-);
+if (isset($_GET['busca'])) {
+    $condition['search'] = $_GET['busca'];
+}
+$estoque = isset($_GET['estoque']) ? intval($_GET['estoque']) : 0;
+$negativo = is_boolean_config('Estoque', 'Estoque.Negativo');
+if ($estoque > 0) {
+    $condition['permitido'] = 'Y';
+    $condition['visivel'] = 'Y';
+    $condition['tipo'] = Produto::TIPO_PRODUTO;
+} elseif ($estoque < 0 && is_manager()) {
+} else {
+    if (!$negativo) {
+        $condition['disponivel'] = 'Y';
+    }
+    $condition['permitido'] = 'Y';
+    $condition['visivel'] = 'Y';
+}
+$produtos = Produto::rawFindAll($condition, [], $limit);
+
 $response = ['status' => 'ok'];
 $campos = [
     'id',

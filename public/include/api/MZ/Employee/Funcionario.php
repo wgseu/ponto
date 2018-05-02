@@ -387,6 +387,15 @@ class Funcionario extends \MZ\Database\Helper
         return $this;
     }
 
+    public function getLinguagemName()
+    {
+        $linguagens = get_languages_info();
+        if (isset($linguagens[$this->getLinguagemID()])) {
+            return $linguagens[$this->getLinguagemID()];
+        }
+        return null;
+    }
+
     /**
      * Convert this instance into array associated key -> value with only public fields
      * @return array All public field and values into array format

@@ -569,13 +569,13 @@ class Integracao extends \MZ\Database\Helper
     private static function query($condition = [], $order = [])
     {
         $query = self::getDB()->from('Integracoes');
-        if (isset($condition['query'])) {
+        if (isset($condition['search'])) {
             $query = self::buildSearch(
-                $condition['query'],
+                $condition['search'],
                 self::concat(['nome', '" "', 'descricao']),
                 $query
             );
-            unset($condition['query']);
+            unset($condition['search']);
         }
         return self::buildCondition($query, $condition);
     }

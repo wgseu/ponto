@@ -27,7 +27,7 @@ require_once(dirname(__DIR__) . '/app.php');
 need_login(is_output('json'));
 $cliente = logged_user();
 
-$tab_dados = 'selected';
+$tab = 'dados';
 $gerenciando = false;
 $cadastrar_cliente = false;
 $aceitar = 'true';

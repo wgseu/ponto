@@ -28,13 +28,20 @@ use MZ\Product\Produto;
 use MZ\Product\Categoria;
 
 $pagetitle = 'Produtos';
-$categorias = Categoria::findAll(['vazia' => 'N'], ['vendas' => -1]);
+$categorias = Categoria::findAll(['disponivel' => 'Y'], ['vendas' => -1]);
 if (count($categorias) > 0) {
     $categoria_atual = current($categorias);
-    $produtos = Produto::findAll([
+    $negativo = is_boolean_config('Estoque', 'Estoque.Negativo');
+    $condition = [
         'categoriaid' => $categoria_atual->getID(),
-        'disponivel' => 'Y'
-    ]);
+        'visivel' => 'Y',
+        'permitido' => 'Y',
+        'promocao' => 'Y'
+    ];
+    if (!$negativo) {
+        $condition['disponivel'] = 'Y';
+    }
+    $produtos = Produto::findAll($condition);
 } else {
     $produtos = [];
     $categoria_atual = new Categoria();

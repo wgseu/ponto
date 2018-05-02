@@ -1,28 +1,34 @@
 <?php
-/*
-    Copyright 2016 da MZ Software - MZ Desenvolvimento de Sistemas LTDA
-    Este arquivo é parte do programa GrandChef - Sistema para Gerenciamento de Churrascarias, Bares e Restaurantes.
-    O GrandChef é um software proprietário; você não pode redistribuí-lo e/ou modificá-lo.
-    DISPOSIÇÕES GERAIS
-    O cliente não deverá remover qualquer identificação do produto, avisos de direitos autorais,
-    ou outros avisos ou restrições de propriedade do GrandChef.
-
-    O cliente não deverá causar ou permitir a engenharia reversa, desmontagem,
-    ou descompilação do GrandChef.
-
-    PROPRIEDADE DOS DIREITOS AUTORAIS DO PROGRAMA
-
-    GrandChef é a especialidade do desenvolvedor e seus
-    licenciadores e é protegido por direitos autorais, segredos comerciais e outros direitos
-    de leis de propriedade.
-
-    O Cliente adquire apenas o direito de usar o software e não adquire qualquer outros
-    direitos, expressos ou implícitos no GrandChef diferentes dos especificados nesta Licença.
-*/
+/**
+ * Copyright 2014 da MZ Software - MZ Desenvolvimento de Sistemas LTDA
+ *
+ * Este arquivo é parte do programa GrandChef - Sistema para Gerenciamento de Churrascarias, Bares e Restaurantes.
+ * O GrandChef é um software proprietário; você não pode redistribuí-lo e/ou modificá-lo.
+ * DISPOSIÇÕES GERAIS
+ * O cliente não deverá remover qualquer identificação do produto, avisos de direitos autorais,
+ * ou outros avisos ou restrições de propriedade do GrandChef.
+ *
+ * O cliente não deverá causar ou permitir a engenharia reversa, desmontagem,
+ * ou descompilação do GrandChef.
+ *
+ * PROPRIEDADE DOS DIREITOS AUTORAIS DO PROGRAMA
+ *
+ * GrandChef é a especialidade do desenvolvedor e seus
+ * licenciadores e é protegido por direitos autorais, segredos comerciais e outros direitos
+ * de leis de propriedade.
+ *
+ * O Cliente adquire apenas o direito de usar o software e não adquire qualquer outros
+ * direitos, expressos ou implícitos no GrandChef diferentes dos especificados nesta Licença.
+ *
+ * @author Equipe GrandChef <desenvolvimento@mzsw.com.br>
+ */
 namespace MZ\Association;
 
 use MZ\Product\Pacote;
 use MZ\Product\Composicao;
+use MZ\Product\Produto;
+use MZ\Product\Grupo;
+use MZ\System\Synchronizer;
 
 class Product
 {
@@ -144,7 +150,7 @@ class Product
         $this->dados['produtos'] = $this->produtos;
         $this->integracao->write($this->dados);
         try {
-            $appsync = new \MZ\System\Synchronizer();
+            $appsync = new Synchronizer();
             $appsync->integratorChanged();
         } catch (\Exception $e) {
             \Log::error($e->getMessage());
@@ -172,7 +178,7 @@ class Product
         $this->dados['produtos'] = $this->produtos;
         $this->integracao->write($this->dados);
         try {
-            $appsync = new \MZ\System\Synchronizer();
+            $appsync = new Synchronizer();
             $appsync->integratorChanged();
         } catch (\Exception $e) {
             \Log::error($e->getMessage());
@@ -196,7 +202,7 @@ class Product
         $this->dados['produtos'] = $this->produtos;
         $this->integracao->write($this->dados);
         try {
-            $appsync = new \MZ\System\Synchronizer();
+            $appsync = new Synchronizer();
             $appsync->integratorChanged();
         } catch (\Exception $e) {
             \Log::error($e->getMessage());
@@ -213,7 +219,7 @@ class Product
             throw new \Exception('O produto informado não existe', 404);
         }
         $produto = $this->produtos[$codigo];
-        $associado = \Produto::findByID(isset($produto['id'])?$produto['id']:$produto['codigo_pdv']);
+        $associado = Produto::findByID(isset($produto['id'])?$produto['id']:$produto['codigo_pdv']);
         if (!$associado->exists()) {
             throw new \Exception('O produto informado não foi associado', 401);
         }
@@ -221,7 +227,7 @@ class Product
             throw new \Exception('O produto associado não permite formação', 401);
         }
         $produto['tipo'] = $associado->getTipo();
-        $_grupos = \Grupo::getTodosDoProdutoID($associado->getID());
+        $_grupos = Grupo::findAll(['produtoid' => $associado->getID()]);
         $grupos = [];
         $contagem = [];
         $total_pacotes = 0;
@@ -233,7 +239,7 @@ class Product
             $contagem[] = $qtd_pacotes;
             $total_pacotes += $qtd_pacotes;
         }
-        $grupo = new \Grupo();
+        $grupo = new Grupo();
         $grupo->setID(0);
         $grupo->setDescricao('Adicionais');
         if ($associado->getTipo() == Produto::TIPO_PACOTE) {
@@ -278,7 +284,7 @@ class Product
                     isset($subproduto['id'])?$subproduto['id']:$subproduto['codigo_pdv']
                 );
                 if ($subassociado->getComposicaoID() != $associado->getID()) {
-                    $subassociado = new \ZComposicao();
+                    $subassociado = new Composicao();
                 }
                 $produto['itens'][$subcodigo]['grupoid'] = 0;
                 $item = $subassociado->findProdutoID();
@@ -292,12 +298,16 @@ class Product
     {
         $produtos = $this->produtos;
         foreach ($produtos as $codigo => $produto) {
-            $associado = \Produto::findByID(isset($produto['id'])?$produto['id']:$produto['codigo_pdv']);
+            $associado = Produto::findByID(
+                isset($produto['id']) ? $produto['id'] : $produto['codigo_pdv']
+            );
             $produtos[$codigo]['produto'] = $associado;
             $associados = 0;
             foreach ($produto['itens'] as $subcodigo => $subproduto) {
                 if ($associado->getTipo() == Produto::TIPO_PACOTE) {
-                    $subassociado = Pacote::findByID(isset($subproduto['id'])?$subproduto['id']:$subproduto['codigo_pdv']);
+                    $subassociado = Pacote::findByID(
+                        isset($subproduto['id'])?$subproduto['id']:$subproduto['codigo_pdv']
+                    );
                     if ($subassociado->getPacoteID() != $associado->getID()) {
                         $subassociado = new Pacote();
                     }
@@ -311,7 +321,7 @@ class Product
                         isset($subproduto['id'])?$subproduto['id']:$subproduto['codigo_pdv']
                     );
                     if ($subassociado->getComposicaoID() != $associado->getID()) {
-                        $subassociado = new \ZComposicao();
+                        $subassociado = new Composicao();
                     }
                     $item = $subassociado->findProdutoID();
                 }

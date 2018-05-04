@@ -185,7 +185,7 @@ class Comanda extends \MZ\Database\Helper
      */
     public function filter($original)
     {
-        $this->setID($original->getID());
+        $this->setID(Filter::number($this->getID()));
         $this->setNome(Filter::string($this->getNome()));
     }
 
@@ -250,111 +250,12 @@ class Comanda extends \MZ\Database\Helper
     }
 
     /**
-     * Find this object on database using, ID
-     * @param  int $id número to find Comanda
-     * @return Comanda A filled instance or empty when not found
-     */
-    public static function findByID($id)
-    {
-        return self::find([
-            'id' => intval($id),
-        ]);
-    }
-
-    /**
-     * Find this object on database using, Nome
-     * @param  string $nome nome to find Comanda
-     * @return Comanda A filled instance or empty when not found
-     */
-    public static function findByNome($nome)
-    {
-        return self::find([
-            'nome' => strval($nome),
-        ]);
-    }
-
-    /**
-     * Fetch data from database with a condition
-     * @param  array $condition condition to filter rows
-     * @return SelectQuery query object with condition statement
-     */
-    private static function query($condition = [], $order = [])
-    {
-        $query = self::getDB()->from('Comandas');
-        if (array_key_exists('search', $condition)) {
-            $busca = trim($condition['search']);
-            if (is_numeric($busca)) {
-                $query = $query->where('id', $busca);
-            } elseif ($busca != '') {
-                $query = $query->where('nome LIKE ?', '%'.$busca.'%');
-            }
-            unset($condition['search']);
-        }
-        if (empty($order)) {
-            $query = $query->orderBy('id ASC');
-        }
-        return self::buildCondition($query, $condition);
-    }
-
-    /**
-     * Search one register with a condition
-     * @param  array $condition Condition for searching the row
-     * @return Comanda A filled Comanda or empty instance
-     */
-    public static function find($condition)
-    {
-        $query = self::query($condition)->limit(1);
-        $row = $query->fetch();
-        if ($row === false) {
-            $row = [];
-        }
-        return new Comanda($row);
-    }
-
-    /**
-     * Get next available Comanda id
-     * @return int available Comanda id
-     */
-    public static function getNextID()
-    {
-        $query = self::query()
-            ->select(null)
-            ->select('MAX(id) as id');
-        return $query->fetch('id') + 1;
-    }
-
-    /**
-     * Fetch all rows from database with matched condition critery
-     * @param  array $condition condition to filter rows
-     * @param  integer $limit number of rows to get, null for all
-     * @param  integer $offset start index to get rows, null for begining
-     * @return array All rows instanced and filled
-     */
-    public static function findAll($condition = [], $order = [], $limit = null, $offset = null)
-    {
-        $query = self::query($condition, $order);
-        if (!is_null($limit)) {
-            $query = $query->limit($limit);
-        }
-        if (!is_null($offset)) {
-            $query = $query->offset($offset);
-        }
-        $rows = $query->fetchAll();
-        $result = [];
-        foreach ($rows as $row) {
-            $result[] = new Comanda($row);
-        }
-        return $result;
-    }
-
-    /**
      * Insert a new Comanda into the database and fill instance from database
      * @return Comanda Self instance
      */
     public function insert()
     {
         $values = $this->validate();
-        unset($values['id']);
         try {
             $id = self::getDB()->insertInto('Comandas')->values($values)->execute();
             $this->loadByID($id);
@@ -427,6 +328,175 @@ class Comanda extends \MZ\Database\Helper
         return $this->load([
             'nome' => strval($nome),
         ]);
+    }
+
+    /**
+     * Find this object on database using, ID
+     * @param  int $id número to find Comanda
+     * @return Comanda A filled instance or empty when not found
+     */
+    public static function findByID($id)
+    {
+        return self::find([
+            'id' => intval($id),
+        ]);
+    }
+
+    /**
+     * Find this object on database using, Nome
+     * @param  string $nome nome to find Comanda
+     * @return Comanda A filled instance or empty when not found
+     */
+    public static function findByNome($nome)
+    {
+        return self::find([
+            'nome' => strval($nome),
+        ]);
+    }
+
+    /**
+     * Get allowed keys array
+     * @return array allowed keys array
+     */
+    private static function getAllowedKeys()
+    {
+        $comanda = new Comanda();
+        $allowed = Filter::concatKeys('c.', $comanda->toArray());
+        return $allowed;
+    }
+
+    /**
+     * Filter order array
+     * @param  mixed $order order string or array to parse and filter allowed
+     * @return array allowed associative order
+     */
+    private static function filterOrder($order)
+    {
+        $allowed = self::getAllowedKeys();
+        return Filter::orderBy($order, $allowed, 'c.');
+    }
+
+    /**
+     * Filter condition array with allowed fields
+     * @param  array $condition condition to filter rows
+     * @return array allowed condition
+     */
+    private static function filterCondition($condition)
+    {
+        $allowed = self::getAllowedKeys();
+        if (isset($condition['search'])) {
+            $search = $condition['search'];
+            if (Validator::checkDigits($search)) {
+                $condition['id'] = intval($search);
+            } else {
+                $field = 'c.nome LIKE ?';
+                $condition[$field] = '%'.$search.'%';
+                $allowed[$field] = true;
+            }
+        }
+        return Filter::keys($condition, $allowed, 'c.');
+    }
+
+    /**
+     * Fetch data from database with a condition
+     * @param  array $condition condition to filter rows
+     * @return SelectQuery query object with condition statement
+     */
+    private static function query($condition = [], $order = [])
+    {
+        $order = Filter::order($order);
+        $query = self::getDB()->from('Comandas c');
+        if (isset($condition['pedidos'])) {
+            $query = $query->select('p.estado')
+                ->select('l.nome as cliente')
+                ->select('p.descricao as observacao')
+                ->leftJoin(
+                    'Pedidos p ON p.comandaid = c.id AND p.tipo = ? AND p.cancelado = ? AND p.estado <> ?',
+                    Pedido::TIPO_COMANDA,
+                    'N',
+                    Pedido::ESTADO_FINALIZADO
+                )
+                ->leftJoin('Clientes l ON l.id = p.clienteid');
+            if (isset($order['funcionario'])) {
+                $funcionario_id = intval($order['funcionario']);
+                $query = $query->orderBy('IF(p.funcionarioid = ?, 1, 0) DESC', $funcionario_id);
+            }
+        }
+        $condition = self::filterCondition($condition);
+        $order = Filter::order($order);
+        $query = self::buildOrderBy($query, self::filterOrder($order));
+        $query = $query->orderBy('c.id ASC');
+        return self::buildCondition($query, $condition);
+    }
+
+    /**
+     * Search one register with a condition
+     * @param  array $condition Condition for searching the row
+     * @return Comanda A filled Comanda or empty instance
+     */
+    public static function find($condition)
+    {
+        $query = self::query($condition)->limit(1);
+        $row = $query->fetch();
+        if ($row === false) {
+            $row = [];
+        }
+        return new Comanda($row);
+    }
+
+    /**
+     * Get next available Comanda id
+     * @return int available Comanda id
+     */
+    public static function getNextID()
+    {
+        $query = self::query()
+            ->select(null)
+            ->select('MAX(id) as id');
+        return $query->fetch('id') + 1;
+    }
+
+    /**
+     * Fetch all rows from database with matched condition critery
+     * @param  array $condition condition to filter rows
+     * @param  integer $limit number of rows to get, null for all
+     * @param  integer $offset start index to get rows, null for begining
+     * @return array All rows instanced and filled
+     */
+    public static function findAll($condition = [], $order = [], $limit = null, $offset = null)
+    {
+        $query = self::query($condition, $order);
+        if (!is_null($limit)) {
+            $query = $query->limit($limit);
+        }
+        if (!is_null($offset)) {
+            $query = $query->offset($offset);
+        }
+        $rows = $query->fetchAll();
+        $result = [];
+        foreach ($rows as $row) {
+            $result[] = new Comanda($row);
+        }
+        return $result;
+    }
+
+    /**
+     * Fetch all rows from database with matched condition critery
+     * @param  array $condition condition to filter rows
+     * @param  integer $limit number of rows to get, null for all
+     * @param  integer $offset start index to get rows, null for begining
+     * @return array All rows
+     */
+    public static function rawFindAll($condition = [], $order = [], $limit = null, $offset = null)
+    {
+        $query = self::query($condition, $order);
+        if (!is_null($limit)) {
+            $query = $query->limit($limit);
+        }
+        if (!is_null($offset)) {
+            $query = $query->offset($offset);
+        }
+        return $query->fetchAll();
     }
 
     /**

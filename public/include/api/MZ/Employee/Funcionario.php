@@ -412,7 +412,7 @@ class Funcionario extends \MZ\Database\Helper
      */
     public function filter($original)
     {
-        $this->setID($original->getID());
+        $this->setID(Filter::number($this->getID()));
         $this->setFuncaoID(Filter::number($this->getFuncaoID()));
         $this->setClienteID(Filter::number($this->getClienteID()));
         $this->setCodigoBarras(Filter::string($this->getCodigoBarras()));
@@ -526,7 +526,6 @@ class Funcionario extends \MZ\Database\Helper
     public function insert()
     {
         $values = $this->validate();
-        unset($values['id']);
         try {
             $id = self::getDB()->insertInto('Funcionarios')->values($values)->execute();
             $this->loadByID($id);

@@ -717,7 +717,7 @@ class Pedido extends \MZ\Database\Helper
             $this->setMotivo($pedido['motivo']);
         }
         if (!isset($pedido['datacriacao'])) {
-            $this->setDataCriacao(null);
+            $this->setDataCriacao(self::now());
         } else {
             $this->setDataCriacao($pedido['datacriacao']);
         }
@@ -740,16 +740,6 @@ class Pedido extends \MZ\Database\Helper
     }
 
     /**
-     * Convert this instance into array associated key -> value with only public fields
-     * @return array All public field and values into array format
-     */
-    public function publish()
-    {
-        $pedido = parent::publish();
-        return $pedido;
-    }
-
-    /**
      * Retorna a descrição do local do pedido
      * @param \MZ\Environment\Mesa $mesa Mesa de onde será obtido o nome
      * @param \MZ\Environment\Comanda $comanda Comanda de onde será obtido o nome
@@ -766,6 +756,24 @@ class Pedido extends \MZ\Database\Helper
         } else {
             return self::getTipoOptions($this->getTipo());
         }
+    }
+
+    /**
+     * Informa se o pedido é para entrega
+     */
+    public function isDelivery()
+    {
+        return $this->getTipo() == self::TIPO_ENTREGA && !is_null($this->getLocalizacaoID());
+    }
+
+    /**
+     * Convert this instance into array associated key -> value with only public fields
+     * @return array All public field and values into array format
+     */
+    public function publish()
+    {
+        $pedido = parent::publish();
+        return $pedido;
     }
 
     /**
@@ -788,7 +796,7 @@ class Pedido extends \MZ\Database\Helper
         $this->setFechadorID(Filter::number($this->getFechadorID()));
         $this->setDataImpressao(Filter::datetime($this->getDataImpressao()));
         $this->setMotivo(Filter::string($this->getMotivo()));
-        $this->setDataCriacao(Filter::datetime($this->getDataCriacao()));
+        $this->setDataCriacao(self::now());
         $this->setDataAgendamento(Filter::datetime($this->getDataAgendamento()));
         $this->setDataEntrega(Filter::datetime($this->getDataEntrega()));
         $this->setDataConclusao(Filter::datetime($this->getDataConclusao()));
@@ -808,6 +816,8 @@ class Pedido extends \MZ\Database\Helper
      */
     public function validate()
     {
+        global $app;
+
         $errors = [];
         if (is_null($this->getSessaoID())) {
             $errors['sessaoid'] = 'A sessão não pode ser vazia';
@@ -815,10 +825,8 @@ class Pedido extends \MZ\Database\Helper
         if (is_null($this->getFuncionarioID())) {
             $errors['funcionarioid'] = 'O funcionário não pode ser vazio';
         }
-        if (is_null($this->getTipo())) {
-            $errors['tipo'] = 'O tipo não pode ser vazio';
-        } elseif (!Validator::checkInSet($this->getTipo(), self::getTipoOptions(), true)) {
-            $errors['tipo'] = 'O tipo é inválido';
+        if (!Validator::checkInSet($this->getTipo(), self::getTipoOptions())) {
+            $errors['tipo'] = 'O tipo não foi informado ou é inválido';
         }
         if (is_null($this->getMesaID()) && $this->getTipo() == self::TIPO_MESA) {
             $errors['mesaid'] = 'A mesa não foi informada';
@@ -832,31 +840,29 @@ class Pedido extends \MZ\Database\Helper
         } elseif (!is_null($this->getComandaID()) && $this->getTipo() != self::TIPO_COMANDA) {
             $errors['comandaid'] = 'Esse tipo de venda não aceita informar comanda';
         }
-        if (is_null($this->getEstado())) {
-            $errors['estado'] = 'O estado não pode ser vazio';
-        }
-        if (!Validator::checkInSet($this->getEstado(), self::getEstadoOptions(), true)) {
-            $errors['estado'] = 'O estado é inválido';
+        if (!Validator::checkInSet($this->getEstado(), self::getEstadoOptions())) {
+            $errors['estado'] = 'O estado não foi informado ou é inválido';
         }
         if (is_null($this->getPessoas())) {
-            $errors['pessoas'] = 'A pessoas não pode ser vazia';
+            $errors['pessoas'] = 'A quantidade de pessoas não foi informada';
         }
-        if (is_null($this->getCancelado())) {
-            $errors['cancelado'] = 'O cancelado não pode ser vazio';
+        if (!Validator::checkBoolean($this->getCancelado())) {
+            $errors['cancelado'] = 'A informação de cancelamento não foi informado';
         }
-        if (!Validator::checkBoolean($this->getCancelado(), true)) {
-            $errors['cancelado'] = 'O cancelado é inválido';
+        if (!$this->exists() && trim($app->getSystem()->getLicenseKey()) == '') {
+            $count = self::count();
+            if ($count >= 20) {
+                $errors['id'] = 'Quantidade de pedidos excedido, adquira uma licença para continuar';
+            }
         }
-        if (is_null($this->getDataCriacao())) {
-            $errors['datacriacao'] = 'A data de criação não pode ser vazia';
-        }
+        $this->setDataCriacao(self::now());
         if (!empty($errors)) {
             throw new \MZ\Exception\ValidationException($errors);
         }
         return $this->toArray();
     }
 
-    public function validaAcesso($operador)
+    public function checkAccess($operador)
     {
         if ($this->getTipo() == self::TIPO_MESA) {
             if (!$operador->has(Permissao::NOME_PEDIDOMESA)) {
@@ -878,6 +884,12 @@ class Pedido extends \MZ\Database\Helper
                 throw new \Exception('Você não tem permissão para criar pedidos para balcão');
             }
         }
+        return $this;
+    }
+
+    public function validaAcesso($operador)
+    {
+        $this->checkAccess($operador);
         if (!$this->exists()) {
             return;
         }
@@ -947,6 +959,7 @@ class Pedido extends \MZ\Database\Helper
      */
     public function insert()
     {
+        $this->setID(null);
         $values = $this->validate();
         unset($values['id']);
         try {
@@ -969,6 +982,7 @@ class Pedido extends \MZ\Database\Helper
             throw new \Exception('O identificador do pedido não foi informado');
         }
         $values = self::filterValues($values, $only, $except);
+        unset($values['datacriacao']);
         try {
             self::getDB()
                 ->update('Pedidos')
@@ -1009,6 +1023,22 @@ class Pedido extends \MZ\Database\Helper
         $query = self::query($condition, $order)->limit(1);
         $row = $query->fetch() ?: [];
         return $this->fromArray($row);
+    }
+
+    /**
+     * Load open order by type into this object
+     * @return Pedido The object fetched from database or empty when not found
+     */
+    public function loadByLocal()
+    {
+        $pedido = new Pedido();
+        if ($this->getTipo() == self::TIPO_MESA) {
+            $pedido = self::findByMesaID($this->getMesaID());
+        } elseif ($this->getTipo() == self::TIPO_COMANDA) {
+            $pedido = self::findByComandaID($this->getComandaID());
+        }
+        $this->fromArray($pedido->toArray());
+        return $this;
     }
 
     /**
@@ -1184,6 +1214,35 @@ class Pedido extends \MZ\Database\Helper
     private static function filterCondition($condition)
     {
         $allowed = self::getAllowedKeys();
+
+        if (isset($condition['search'])) {
+            $search = trim($condition['search']);
+            if (is_numeric($search)) {
+                $condition['id'] = intval($search);
+            } elseif (substr($search, 0, 1) == '#') {
+                $sessaoid = intval(substr($search, 1));
+                $condition['sessaoid'] = intval($sessaoid);
+            } else {
+                $field = 'p.descricao LIKE ?';
+                $condition[$field] = '%'.$search.'%';
+                $allowed[$field] = true;
+            }
+        }
+        if (isset($condition['!estado'])) {
+            $field = 'p.estado <> ?';
+            $condition[$field] = $condition['!estado'];
+            $allowed[$field] = true;
+        }
+        if (isset($condition['apartir_criacao'])) {
+            $field = 'p.datacriacao >= ?';
+            $condition[$field] = $condition['apartir_criacao'];
+            $allowed[$field] = true;
+        }
+        if (isset($condition['ate_criacao'])) {
+            $field = 'p.datacriacao <= ?';
+            $condition[$field] = $condition['ate_criacao'];
+            $allowed[$field] = true;
+        }
         return Filter::keys($condition, $allowed, 'p.');
     }
 
@@ -1198,7 +1257,7 @@ class Pedido extends \MZ\Database\Helper
         $query = self::getDB()->from('Pedidos p');
         $condition = self::filterCondition($condition);
         $query = self::buildOrderBy($query, self::filterOrder($order));
-        $query = $query->orderBy('p.id ASC');
+        $query = $query->orderBy('p.id DESC');
         return self::buildCondition($query, $condition);
     }
 
@@ -1225,6 +1284,149 @@ class Pedido extends \MZ\Database\Helper
         return self::find([
             'id' => intval($id),
         ]);
+    }
+
+    /**
+     * Find this object on database using, ID
+     * @param  int $id código to find Pedido
+     * @return Pedido A filled instance or empty when not found
+     */
+    public static function findByMesaID($mesa_id)
+    {
+        return self::find([
+            'mesaid' => intval($mesa_id),
+            'cancelado' => 'N',
+            'tipo' => self::TIPO_MESA,
+            '!estado', self::ESTADO_FINALIZADO
+        ]);
+    }
+
+    /**
+     * Find this object on database using, ID
+     * @param  int $id código to find Pedido
+     * @return Pedido A filled instance or empty when not found
+     */
+    public static function findByComandaID($comanda_id)
+    {
+        return self::find([
+            'comandaid' => intval($comanda_id),
+            'cancelado' => 'N',
+            'tipo' => self::TIPO_COMANDA,
+            '!estado', self::ESTADO_FINALIZADO
+        ]);
+    }
+
+    public static function getTicketMedio($sessao_id, $data_inicio = null, $data_fim = null)
+    {
+        $query = \DB::$pdo->from('Pedidos p')
+                         ->select(null)
+                         ->select('SUM(TIME_TO_SEC(TIMEDIFF(COALESCE(p.dataconclusao, NOW()), p.datacriacao))) as segundos')
+                         ->select('COUNT(p.id) as quantidade')
+                         ->where(['p.cancelado' => 'N']);
+        if (!is_null($sessao_id)) {
+            $query = $query->where(['p.sessaoid' => $sessao_id]);
+        }
+        if (!is_null($data_inicio) && is_null($sessao_id)) {
+            $query = $query->where('p.datacriacao >= ?', date('Y-m-d', $data_inicio));
+        }
+        if (!is_null($data_fim) && is_null($sessao_id)) {
+            $query = $query->where('p.datacriacao <= ?', date('Y-m-d H:i:s', $data_fim));
+        }
+        $row = $query->fetch();
+        $result = [
+            'permanencia' => intval($row['segundos']),
+            'pedidos' => intval($row['quantidade'])
+        ];
+        $total = self::getTotal($sessao_id, $data_inicio, $data_fim);
+        if ($result['pedidos'] > 0) {
+            $result['permanencia'] = (int)($result['permanencia'] / $result['pedidos']);
+            $result['total'] = $total['subtotal'] / $result['pedidos'];
+        } else {
+            $result['permanencia'] = 0;
+            $result['total'] = 0;
+        }
+        return $result;
+    }
+
+    public static function getTotalPessoas($sessao_id, $data_inicio = null, $data_fim = null)
+    {
+        $query = \DB::$pdo->from('Pedidos p')
+                         ->select(null)
+                         ->select('SUM(p.pessoas) as total')
+                         ->select('SUM(IF(p.estado = ?, 0, p.pessoas)) as atual', Pedido::ESTADO_FINALIZADO)
+                         ->where(['p.cancelado' => 'N'])
+                         ->where('p.tipo <> ?', self::TIPO_ENTREGA);
+        if (!is_null($sessao_id)) {
+            $query = $query->where(['p.sessaoid' => $sessao_id]);
+        }
+        if (!is_null($data_inicio) && is_null($sessao_id)) {
+            $query = $query->where('p.datacriacao >= ?', date('Y-m-d', $data_inicio));
+        }
+        if (!is_null($data_fim) && is_null($sessao_id)) {
+            $query = $query->where('p.datacriacao <= ?', date('Y-m-d H:i:s', $data_fim));
+        }
+        $row = $query->fetch();
+        return ['total' => $row['total'] + 0, 'atual' => $row['atual'] + 0];
+    }
+
+    public static function getTotal($sessao_id, $data_inicio = null, $data_fim = null)
+    {
+        $query = \DB::$pdo->from('Pedidos p')
+                         ->select(null)
+                         ->select('ROUND(SUM(pdp.preco * pdp.quantidade), 4) as subtotal')
+                         ->select('ROUND(SUM(pdp.preco * pdp.quantidade * (pdp.porcentagem / 100 + 1)), 4) as total')
+                         ->select('ROUND(SUM(IF(p.tipo = "Mesa", pdp.preco * pdp.quantidade * (pdp.porcentagem / 100 + 1), 0)), 4) as mesa')
+                         ->select('ROUND(SUM(IF(p.tipo = "Comanda", pdp.preco * pdp.quantidade * (pdp.porcentagem / 100 + 1), 0)), 4) as comanda')
+                         ->select('ROUND(SUM(IF(p.tipo = "Avulso", pdp.preco * pdp.quantidade * (pdp.porcentagem / 100 + 1), 0)), 4) as avulso')
+                         ->select('ROUND(SUM(IF(p.tipo = "Entrega", pdp.preco * pdp.quantidade * (pdp.porcentagem / 100 + 1), 0)), 4) as entrega')
+                         ->leftJoin('Produtos_Pedidos pdp ON pdp.pedidoid = p.id AND pdp.cancelado = "N"')
+                         ->where(['p.cancelado' => 'N']);
+        if (!is_null($sessao_id)) {
+            $query = $query->where(['p.sessaoid' => $sessao_id]);
+        }
+        if (!is_null($data_inicio) && is_null($sessao_id)) {
+            $query = $query->where('p.datacriacao >= ?', date('Y-m-d', $data_inicio));
+        }
+        if (!is_null($data_fim) && is_null($sessao_id)) {
+            $query = $query->where('p.datacriacao <= ?', date('Y-m-d H:i:s', $data_fim));
+        }
+        $row = $query->fetch();
+        return ['total' => $row['total'] + 0,
+                     'subtotal' => $row['total'] + 0,
+                     'tipo' => [
+                        'mesa' => $row['mesa'] + 0,
+                        'comanda' => $row['comanda'] + 0,
+                        'avulso' => $row['avulso'] + 0,
+                        'entrega' => $row['entrega'] + 0]
+                    ];
+    }
+
+    public static function getTotalDetalhado($id, $cancelado = null)
+    {
+        $query = \DB::$pdo->from('Pedidos p')
+                         ->select(null)
+                         ->select('SUM(pdp.precocompra * pdp.quantidade) as custo')
+                         ->select('SUM(IF(NOT ISNULL(pdp.produtoid), pdp.preco * pdp.quantidade, 0)) as produtos')
+                         ->select('SUM(IF(NOT ISNULL(pdp.produtoid), pdp.preco * pdp.quantidade * pdp.porcentagem / 100, 0)) as comissao')
+                         ->select('SUM(IF(NOT ISNULL(pdp.servicoid) AND pdp.preco >= 0, pdp.preco * pdp.quantidade, 0)) as servicos')
+                         ->select('SUM(IF(NOT ISNULL(pdp.servicoid) AND pdp.preco < 0, pdp.preco * pdp.quantidade, 0)) as descontos')
+                         ->leftJoin('Produtos_Pedidos pdp ON pdp.pedidoid = p.id AND (? = "" OR pdp.cancelado = ?)', strval($cancelado), strval($cancelado))
+                         ->where('p.id', $id);
+        $row = $query->fetch();
+        $row['subtotal'] = $row['servicos'] + $row['produtos'] + $row['comissao'];
+        $row['total'] = $row['descontos'] + $row['subtotal'];
+        return $row;
+    }
+
+    public static function getTotalDoLocal($tipo, $mesa_id, $comanda_id)
+    {
+        if ($tipo == self::TIPO_COMANDA) {
+            $pedido = self::getPelaComandaID($comanda_id);
+        } else {
+            $pedido = self::getPelaMesaID($mesa_id);
+        }
+        $info = self::getTotalDetalhado($pedido->getID(), 'N');
+        return $info['total'];
     }
 
     /**

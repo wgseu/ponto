@@ -24,7 +24,9 @@
  */
 require_once(dirname(dirname(__DIR__)) . '/app.php');
 
-$categorias = Categoria::findAll();
+use MZ\Product\Categoria;
+
+$categorias = Categoria::findAll(['disponivel' => 'Y'], ['vendas' => -1]);
 $response = ['status' => 'ok'];
 $_categorias = [];
 foreach ($categorias as $categoria) {

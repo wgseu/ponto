@@ -545,6 +545,7 @@ class Servico extends \MZ\Database\Helper
      */
     public function insert()
     {
+        $this->setID(null);
         $values = $this->validate();
         unset($values['id']);
         try {

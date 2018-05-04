@@ -911,7 +911,7 @@ class Produto extends \MZ\Database\Helper
     {
         global $app;
 
-        $this->setID($original->getID());
+        $this->setID(Filter::number($this->getID()));
         $this->setTributacaoID($original->getTributacaoID());
         $this->setCodigoBarras(Filter::string($this->getCodigoBarras()));
         $this->setCategoriaID(Filter::number($this->getCategoriaID()));
@@ -1065,7 +1065,6 @@ class Produto extends \MZ\Database\Helper
     public function insert()
     {
         $values = $this->validate();
-        unset($values['id']);
         try {
             $id = self::getDB()->insertInto('Produtos')->values($values)->execute();
             $this->loadByID($id);

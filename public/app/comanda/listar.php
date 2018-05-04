@@ -24,18 +24,28 @@
  */
 require_once(dirname(dirname(__DIR__)) . '/app.php');
 
+use MZ\Sale\Comanda;
+use MZ\Sale\Pedido;
+use MZ\System\Permissao;
+
 if (!is_login()) {
     json('Usuário não autenticado!');
 }
 if (!logged_employee()->has(Permissao::NOME_PEDIDOCOMANDA)) {
     json('Você não tem permissão para acessar comandas');
 }
-/* verifica se deve ordenar pelo número da comanda ou pelo funcionário */
-$funcionario_id = null;
-if (!isset($_GET['ordenar']) || $_GET['ordenar'] != 'comanda') {
-    $funcionario_id = logged_employee()->getID();
+$condition = [
+    'ativa' => 'Y',
+    'pedidos' => true
+];
+$order = [
+    'funcionario' => logged_employee()->getID()
+];
+/* verifica se deve ordenar pelo número da comanda */
+if (isset($_GET['ordenar']) && $_GET['ordenar'] == 'comanda') {
+    unset($order['funcionario']);
 }
-$comandas = Pedido::getTodasComandas($funcionario_id);
+$comandas = Comanda::rawFindAll($condition, $order);
 $items = [];
 $obs_name = is_boolean_config('Vendas', 'Comanda.Observacao');
 foreach ($comandas as $_comanda) {

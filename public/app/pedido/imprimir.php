@@ -30,6 +30,7 @@ use MZ\Sale\Pedido;
 use MZ\Environment\Mesa;
 use MZ\Sale\Comanda;
 use MZ\System\Synchronizer;
+use MZ\Database\Helper;
 
 if (!is_login()) {
     json('Usuário não autenticado!');
@@ -40,6 +41,7 @@ try {
     if (!$sessao->exists()) {
         throw new \Exception('A sessão ainda não foi aberta');
     }
+    $pedido = new Pedido();
     $tipo = isset($_GET['tipo']) ? $_GET['tipo'] : null;
     if ($tipo == 'comanda') {
         $tipo = Pedido::TIPO_COMANDA;
@@ -50,32 +52,23 @@ try {
     } else {
         $tipo = Pedido::TIPO_MESA;
     }
-    if ($tipo == Pedido::TIPO_MESA && !logged_employee()->has(Permissao::NOME_PEDIDOMESA)) {
-        throw new \Exception('Você não tem permissão para acessar mesas');
-    } elseif ($tipo == Pedido::TIPO_COMANDA && !logged_employee()->has(Permissao::NOME_PEDIDOCOMANDA)) {
-        throw new \Exception('Você não tem permissão para acessar comandas');
-    }
-    $mesa = Mesa::findByID(isset($_GET['mesa']) ? $_GET['mesa'] : null);
-    if (!$mesa->exists() && $tipo == Pedido::TIPO_MESA) {
-        throw new \Exception('A mesa não foi informada ou não existe');
-    }
-    $comanda = Comanda::findByID(isset($_GET['comanda']) ? $_GET['comanda'] : null);
-    if (!$comanda->exists() && $tipo == Pedido::TIPO_COMANDA) {
-        throw new \Exception('A comanda não foi informada ou não existe');
-    }
-    $pedido = Pedido::findByLocal($tipo, $mesa->getID(), $comanda->getID());
+    $pedido->setTipo($tipo);
+    $pedido->setMesaID(isset($_GET['mesa']) ? $_GET['mesa'] : null);
+    $pedido->setComandaID(isset($_GET['comanda']) ? $_GET['comanda'] : null);
+    $pedido->checkAccess(logged_employee());
+    $pedido->loadByLocal();
     if (!$pedido->exists()) {
         throw new \Exception('A mesa ou comanda informada não está aberta');
     }
     if ($pedido->getEstado() != Pedido::ESTADO_FECHADO) {
         $pedido->setFechadorID(logged_employee()->getID());
-        $pedido->setDataImpressao(date('Y-m-d H:i:s'));
+        $pedido->setDataImpressao(Helper::now());
         $pedido->setEstado(Pedido::ESTADO_FECHADO);
         $pedido->update();
     }
-    $appsync = new Synchronizer();
-    $appsync->printOrder($pedido->getID(), logged_employee()->getID());
-    $appsync->updateOrder(
+    $sync = new Synchronizer();
+    $sync->printOrder($pedido->getID(), logged_employee()->getID());
+    $sync->updateOrder(
         $pedido->getID(),
         $pedido->getTipo(),
         $pedido->getMesaID(),

@@ -24,12 +24,14 @@
  */
 require_once(dirname(dirname(__DIR__)) . '/app.php');
 
+use MZ\System\Synchronizer;
+
 if (!is_login()) {
     json('Usuário não autenticado!');
 }
-$_pedidos = $_POST['pedidos'];
-$sync = $_POST['sync'];
-$action = \MZ\System\Synchronizer::ACTION_ADDED;
+$_pedidos = isset($_POST['pedidos']) ? $_POST['pedidos'] : [];
+$sync = isset($_POST['sync']) ? $_POST['sync'] : false;
+$action = Synchronizer::ACTION_ADDED;
 try {
     \DB::BeginTransaction();
     $sessao = Sessao::getPorAberta();
@@ -41,9 +43,9 @@ try {
         $tipo = Pedido::TIPO_COMANDA;
     }
     /* else if($_POST['tipo'] == 'avulso')
-		$tipo = Pedido::TIPO_AVULSO;
-	else if($_POST['tipo'] == 'entrega')
-		$tipo = Pedido::TIPO_ENTREGA; */
+        $tipo = Pedido::TIPO_AVULSO;
+    else if($_POST['tipo'] == 'entrega')
+        $tipo = Pedido::TIPO_ENTREGA; */
     $mesa = Mesa::findByID($_POST['mesa']);
     if (!$mesa->exists() && $tipo == Pedido::TIPO_MESA) {
         throw new \Exception('A mesa não foi informada ou não existe');
@@ -68,7 +70,7 @@ try {
         $pedido->setDescricao($_POST['descricao']);
         $pedido->setEstado(Pedido::ESTADO_ATIVO);
         $pedido->insert();
-        $action = \MZ\System\Synchronizer::ACTION_OPEN;
+        $action = Synchronizer::ACTION_OPEN;
     }
     $added = 0;
     $pacote_pedido = new ProdutoPedido();
@@ -124,27 +126,27 @@ try {
         }
         $added++;
     }
-    if ($added > 0 && $action != \MZ\System\Synchronizer::ACTION_OPEN && $pedido->getEstado() != Pedido::ESTADO_ATIVO) {
-        $action = \MZ\System\Synchronizer::ACTION_STATE;
+    if ($added > 0 && $action != Synchronizer::ACTION_OPEN && $pedido->getEstado() != Pedido::ESTADO_ATIVO) {
+        $action = Synchronizer::ACTION_STATE;
         $pedido->setEstado(Pedido::ESTADO_ATIVO);
         $pedido->update();
     }
     if ($sync) {
-        $appsync = new \MZ\System\Synchronizer();
-        if ($action != \MZ\System\Synchronizer::ACTION_ADDED) {
-            $appsync->updateOrder($pedido->getID(), $pedido->getTipo(), $pedido->getMesaID(), $pedido->getComandaID(), $action);
+        $sync = new Synchronizer();
+        if ($action != Synchronizer::ACTION_ADDED) {
+            $sync->updateOrder($pedido->getID(), $pedido->getTipo(), $pedido->getMesaID(), $pedido->getComandaID(), $action);
         }
-        if ($action == \MZ\System\Synchronizer::ACTION_OPEN) {
+        if ($action == Synchronizer::ACTION_OPEN) {
             $senha_balcao = is_boolean_config('Imprimir', 'Senha.Paineis');
             $comanda_senha = is_boolean_config('Imprimir', 'Comanda.Senha');
             if (($senha_balcao && $pedido->getTipo() == Pedido::TIPO_AVULSO) ||
                ($comanda_senha && $pedido->getTipo() == Pedido::TIPO_COMANDA)) {
-                $appsync->printQueue($pedido->getID());
+                $sync->printQueue($pedido->getID());
             }
         }
         if ($added > 0) {
-            $appsync->updateOrder($pedido->getID(), $pedido->getTipo(), $pedido->getMesaID(), $pedido->getComandaID(), \MZ\System\Synchronizer::ACTION_ADDED);
-            $appsync->printServices($pedido->getID());
+            $sync->updateOrder($pedido->getID(), $pedido->getTipo(), $pedido->getMesaID(), $pedido->getComandaID(), Synchronizer::ACTION_ADDED);
+            $sync->printServices($pedido->getID());
         }
     }
     \DB::Commit();

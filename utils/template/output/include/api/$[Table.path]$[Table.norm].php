@@ -414,6 +414,7 @@ $[table.end]
      */
     public function insert()
     {
+        $this->set$[Primary.norm](null);
         $values = $this->validate();
         unset($values['$[primary]']);
         try {

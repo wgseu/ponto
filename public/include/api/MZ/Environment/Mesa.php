@@ -185,7 +185,7 @@ class Mesa extends \MZ\Database\Helper
      */
     public function filter($original)
     {
-        $this->setID($original->getID());
+        $this->setID(Filter::number($this->getID()));
         $this->setNome(Filter::string($this->getNome()));
     }
 
@@ -256,7 +256,6 @@ class Mesa extends \MZ\Database\Helper
     public function insert()
     {
         $values = $this->validate();
-        unset($values['id']);
         try {
             $id = self::getDB()->insertInto('Mesas')->values($values)->execute();
             $this->loadByID($id);

@@ -24,42 +24,61 @@
  */
 require_once(dirname(dirname(__DIR__)) . '/app.php');
 
+use MZ\Sale\Pedido;
+use MZ\Sale\ProdutoPedido;
+
 if (!is_login()) {
     json('Usuário não autenticado!');
 }
-if (!is_null($_GET['comanda']) && !logged_employee()->has(Permissao::NOME_PEDIDOCOMANDA)) {
-    json('Você não tem permissão para acessar os produtos das comandas');
-} elseif (!logged_employee()->has(Permissao::NOME_PEDIDOMESA)) {
-    json('Você não tem permissão para acessar os produtos das mesas');
-}
-
+$pedido = new Pedido();
 $tipo = Pedido::TIPO_MESA;
-if (!is_null($_GET['comanda'])) {
+if (isset($_GET['comanda'])) {
     $tipo = Pedido::TIPO_COMANDA;
 }
-$pedidos = ProdutoPedido::getTodosDoLocal($tipo, $_GET['mesa'], $_GET['comanda']);
+$pedido->setTipo($tipo);
+$pedido->setMesaID(isset($_GET['mesa']) ? $_GET['mesa'] : null);
+$pedido->setComandaID(isset($_GET['comanda']) ? $_GET['comanda'] : null);
+$pedido->checkAccess(logged_employee());
+$pedido->loadByLocal();
+$pedidos = ProdutoPedido::rawFindAll(
+    [
+        'detalhado' => true,
+        'pedidoid' => $pedido->getID(),
+        '!produtoid' => null,
+        'cancelamento' => 'N',
+        'cancelado' => 'N',
+        '!status' => Pedido::ESTADO_FINALIZADO
+    ],
+    [],
+    [],
+    [
+        'produtoid',
+        'preco',
+        'detalhes'
+    ]
+);
 $response = ['status' => 'ok'];
 $campos = [
-            'id',
-            'produtopedidoid',
-            'tipo',
-            'mesaid',
-            'comandaid',
-            'produtoid',
-            'produtotipo',
-            'produtodescricao',
-            'produtoconteudo',
-            'unidadesigla',
-            'preco',
-            'quantidade',
-            'precovenda',
-            'porcentagem',
-            'detalhes',
-            'descricao',
-            'imagemurl',
-            'produtodataatualizacao',
-            'datahora',
-        ];
+    'id',
+    'produtopedidoid',
+    'tipo',
+    'mesaid',
+    'comandaid',
+    'produtoid',
+    'produtotipo',
+    'produtodescricao',
+    'produtoconteudo',
+    'unidadesigla',
+    'preco',
+    'quantidade',
+    'precovenda',
+    'porcentagem',
+    'detalhes',
+    'descricao',
+    'imagemurl',
+    'produtodataatualizacao',
+    'datahora',
+];
 $_pedidos = [];
 foreach ($pedidos as $pedido) {
     $_pedido = array_intersect_key($pedido, array_flip($campos));

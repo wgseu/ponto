@@ -120,7 +120,7 @@ try {
                 throw new \Exception(vsprintf($msg, [\MZ\Util\Mask::money($subtotal, true), \MZ\Util\Mask::money(-$restante, true)]));
             }
         }
-        $produto_pedido = ProdutoPedido::cadastrar($produto_pedido, $produto, $formacoes);
+        $produto_pedido->register($produto, $formacoes);
         if ($produto->getTipo() == Produto::TIPO_PACOTE) {
             $pacote_pedido = $produto_pedido;
         }

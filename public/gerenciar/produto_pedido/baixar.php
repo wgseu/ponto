@@ -33,6 +33,7 @@ need_permission(Permissao::NOME_RELATORIOVENDAS, true);
 try {
     $formato = isset($_GET['formato']) ? $_GET['formato'] : null;
     $condition = Filter::query($_GET);
+    $condition['detalhado'] = true;
     $itens_do_pedido = ProdutoPedido::findAll($condition);
     // Coluna dos dados
     $columns = [

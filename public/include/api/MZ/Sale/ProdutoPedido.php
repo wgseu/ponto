@@ -701,7 +701,7 @@ class ProdutoPedido extends \MZ\Database\Helper
             $this->setEstado($produto_pedido['estado']);
         }
         if (!isset($produto_pedido['visualizado'])) {
-            $this->setVisualizado(null);
+            $this->setVisualizado('N');
         } else {
             $this->setVisualizado($produto_pedido['visualizado']);
         }
@@ -711,12 +711,12 @@ class ProdutoPedido extends \MZ\Database\Helper
             $this->setDataVisualizacao($produto_pedido['datavisualizacao']);
         }
         if (!array_key_exists('dataatualizacao', $produto_pedido)) {
-            $this->setDataAtualizacao(null);
+            $this->setDataAtualizacao(self::now());
         } else {
             $this->setDataAtualizacao($produto_pedido['dataatualizacao']);
         }
         if (!isset($produto_pedido['cancelado'])) {
-            $this->setCancelado(null);
+            $this->setCancelado('N');
         } else {
             $this->setCancelado($produto_pedido['cancelado']);
         }
@@ -726,12 +726,12 @@ class ProdutoPedido extends \MZ\Database\Helper
             $this->setMotivo($produto_pedido['motivo']);
         }
         if (!isset($produto_pedido['desperdicado'])) {
-            $this->setDesperdicado(null);
+            $this->setDesperdicado('N');
         } else {
             $this->setDesperdicado($produto_pedido['desperdicado']);
         }
         if (!isset($produto_pedido['datahora'])) {
-            $this->setDataHora(null);
+            $this->setDataHora(self::now());
         } else {
             $this->setDataHora($produto_pedido['datahora']);
         }
@@ -748,8 +748,77 @@ class ProdutoPedido extends \MZ\Database\Helper
         return $produto_pedido;
     }
 
+    public function getSubvenda()
+    {
+        return $this->getPrecoVenda() * $this->getQuantidade();
+    }
+
+    public function getSubtotal()
+    {
+        return $this->getPreco() * $this->getQuantidade();
+    }
+
     /**
-     * 
+     * Obtém o desconto de uma unidade
+     * @return float valor de desconto unitário
+     */
+    public function getDesconto()
+    {
+        return $this->getPrecoVenda() - $this->getPreco();
+    }
+
+    /**
+     * Obtém o desconto desse lançamento, inclui todas as quantidades
+     * @return float desconto geral do lançamento
+     */
+    public function getDescontos()
+    {
+        return $this->getSubvenda() - $this->getSubtotal();
+    }
+
+    public function getComissao()
+    {
+        return $this->getSubtotal() * $this->getPorcentagem() / 100.0;
+    }
+
+    public function getTotal()
+    {
+        return $this->getSubtotal() + $this->getComissao();
+    }
+
+    public function getCusto()
+    {
+        return $this->getQuantidade() * $this->getPrecoCompra();
+    }
+
+    public function getLucro()
+    {
+        return $this->getSubtotal() - $this->getCusto();
+    }
+
+    public function isServico()
+    {
+        return !is_null($this->getServicoID()) && is_greater($this->getPreco(), 0.00);
+    }
+
+    public function getDestino($values)
+    {
+        switch ($values['pedido_tipo']) {
+            case \Pedido::TIPO_MESA:
+                return $values['mesa_nome'];
+            case \Pedido::TIPO_COMANDA:
+                return $values['comanda_nome'];
+            case \Pedido::TIPO_AVULSO:
+                return 'Balcão';
+            default:
+                return 'Entrega';
+        }
+    }
+
+    /**
+     * Retorna a descrição dinâmica do item, utilizada em pacotes com propriedades
+     * @param \MZ\Product\Produto $produto Produto pré-carregado do item
+     * @param \MZ\Product\Servico $servico Serviço pré-carregado do item
      */
     public function getDescricaoAtual($produto = null, $servico = null)
     {
@@ -784,9 +853,9 @@ class ProdutoPedido extends \MZ\Database\Helper
         $this->setPrecoCompra(Filter::money($this->getPrecoCompra()));
         $this->setDetalhes(Filter::string($this->getDetalhes()));
         $this->setDataVisualizacao(Filter::datetime($this->getDataVisualizacao()));
-        $this->setDataAtualizacao(Filter::datetime($this->getDataAtualizacao()));
+        $this->setDataAtualizacao(self::now());
         $this->setMotivo(Filter::string($this->getMotivo()));
-        $this->setDataHora(Filter::datetime($this->getDataHora()));
+        $this->setDataHora(self::now());
     }
 
     /**
@@ -815,6 +884,8 @@ class ProdutoPedido extends \MZ\Database\Helper
         }
         if (is_null($this->getQuantidade())) {
             $errors['quantidade'] = 'A quantidade não pode ser vazia';
+        } elseif ($this->getQuantidade() > 10000) {
+            $errors['quantidade'] = 'Quantidade muito elevada, faça multiplos lançamentos menores';
         }
         if (is_null($this->getPorcentagem())) {
             $errors['porcentagem'] = 'A porcentagem não pode ser vazia';
@@ -825,33 +896,20 @@ class ProdutoPedido extends \MZ\Database\Helper
         if (is_null($this->getPrecoCompra())) {
             $errors['precocompra'] = 'O preço de compra não pode ser vazio';
         }
-        if (is_null($this->getEstado())) {
-            $errors['estado'] = 'O estado não pode ser vazio';
+        if (!Validator::checkInSet($this->getEstado(), self::getEstadoOptions())) {
+            $errors['estado'] = 'O estado do item não foi informado ou é inválido';
         }
-        if (!Validator::checkInSet($this->getEstado(), self::getEstadoOptions(), true)) {
-            $errors['estado'] = 'O estado é inválido';
+        if (!Validator::checkBoolean($this->getVisualizado())) {
+            $errors['visualizado'] = 'A informação de visualização não foi informada ou é inválida';
         }
-        if (is_null($this->getVisualizado())) {
-            $errors['visualizado'] = 'O visualizado não pode ser vazio';
-        }
-        if (!Validator::checkBoolean($this->getVisualizado(), true)) {
-            $errors['visualizado'] = 'O visualizado é inválido';
-        }
-        if (is_null($this->getCancelado())) {
-            $errors['cancelado'] = 'O cancelado não pode ser vazio';
-        }
-        if (!Validator::checkBoolean($this->getCancelado(), true)) {
-            $errors['cancelado'] = 'O cancelado é inválido';
-        }
-        if (is_null($this->getDesperdicado())) {
-            $errors['desperdicado'] = 'O desperdiçado não pode ser vazio';
+        if (!Validator::checkBoolean($this->getCancelado())) {
+            $errors['cancelado'] = 'O cancelamento não foi informado ou é inválido';
         }
         if (!Validator::checkBoolean($this->getDesperdicado(), true)) {
-            $errors['desperdicado'] = 'O desperdiçado é inválido';
+            $errors['desperdicado'] = 'O desperdício não foi informado ou é inválido';
         }
-        if (is_null($this->getDataHora())) {
-            $errors['datahora'] = 'A data e hora não pode ser vazia';
-        }
+        $this->setDataAtualizacao(self::now());
+        $this->setDataHora(self::now());
         if (!empty($errors)) {
             throw new \MZ\Exception\ValidationException($errors);
         }
@@ -897,6 +955,7 @@ class ProdutoPedido extends \MZ\Database\Helper
             throw new \Exception('O identificador do item do pedido não foi informado');
         }
         $values = self::filterValues($values, $only, $except);
+        unset($values['datahora']);
         try {
             self::getDB()
                 ->update('Produtos_Pedidos')
@@ -924,6 +983,54 @@ class ProdutoPedido extends \MZ\Database\Helper
             ->where('id', $this->getID())
             ->execute();
         return $result;
+    }
+
+    public function register($produto, $formacoes)
+    {
+        try {
+            if (is_null($this->getProdutoPedidoID())) {
+                // aplica o desconto dos opcionais e acrescenta o valor dos adicionais
+                // apenas nas composições fora de pacotes
+                foreach ($formacoes as $key => $_formacao) {
+                    $formacao = new Formacao($_formacao);
+                    if ($formacao->getTipo() != Formacao::TIPO_COMPOSICAO) {
+                        continue;
+                    }
+                    $composicao = $formacao->findComposicaoID();
+                    if (!$composicao->exists()) {
+                        throw new \MZ\Exception\ValidationException(['formacao' => 'A composição formada não existe']);
+                    }
+                    $operacao = -1;
+                    if ($composicao->getTipo() == Composicao::TIPO_ADICIONAL) {
+                        $operacao = 1;
+                    }
+                    $this->setPrecoVenda($this->getPrecoVenda() + $operacao * $composicao->getValor());
+                    $this->setPreco($this->getPreco() + $operacao * $composicao->getValor());
+                }
+            }
+            $this->filter(new self());
+            $this->insert();
+            // TODO: verificar se o preço informado está correto
+            $composicoes = [];
+            foreach ($formacoes as $_formacao) {
+                $formacao = new Formacao($_formacao);
+                $formacao->setProdutoPedidoID($this->getID());
+                $formacao->filter(new Formacao());
+                $formacao->insert();
+                if ($formacao->getTipo() == Formacao::TIPO_COMPOSICAO) {
+                    $composicoes[$formacao->getComposicaoID()] = $formacao->getID();
+                }
+            }
+            $estoque = new Estoque();
+            $estoque->setTransacaoID($this->getID());
+            $estoque->setProdutoID($this->getProdutoID());
+            $estoque->setFuncionarioID($this->getFuncionarioID());
+            $estoque->setQuantidade($this->getQuantidade());
+            $estoque->retirar($composicoes);
+        } catch (\Exception $e) {
+            throw $this->translate($e);
+        }
+        return $this;
     }
 
     /**
@@ -1044,33 +1151,178 @@ class ProdutoPedido extends \MZ\Database\Helper
     private static function filterCondition($condition)
     {
         $allowed = self::getAllowedKeys();
-        return Filter::keys($condition, $allowed, 'p.');
+        if (isset($condition['!produtoid'])) {
+            $field = 'NOT p.produtoid';
+            $condition[$field] = $condition['!produtoid'];
+            $allowed[$field] = true;
+        }
+        if (isset($condition['!servicoid'])) {
+            $field = 'NOT p.servicoid';
+            $condition[$field] = $condition['!servicoid'];
+            $allowed[$field] = true;
+        }
+        if (isset($condition['apartir_preco'])) {
+            $field = 'p.preco >= ?';
+            $condition[$field] = $condition['apartir_preco'];
+            $allowed[$field] = true;
+        }
+        if (isset($condition['ate_preco'])) {
+            $field = 'p.preco < ?';
+            $condition[$field] = $condition['ate_preco'];
+            $allowed[$field] = true;
+        }
+        if (isset($condition['apartir_datahora'])) {
+            $field = 'p.datahora >= ?';
+            $condition[$field] = $condition['apartir_datahora'];
+            $allowed[$field] = true;
+        }
+        if (isset($condition['ate_datahora'])) {
+            $field = 'c.datahora <= ?';
+            $condition[$field] = $condition['ate_datahora'];
+            $allowed[$field] = true;
+        }
+        if (isset($condition['search'])) {
+            $search = trim($condition['search']);
+            if (Validator::checkDigits($search)) {
+                $condition['pedidoid'] = Filter::number($search);
+            } else {
+                $field = 'p.detalhes LIKE ?';
+                $condition[$field] = '%'.$search.'%';
+                $allowed[$field] = true;
+            }
+        }
+        if (isset($condition['modulo'])) {
+            $field = 'e.tipo';
+            $condition[$field] = $condition['modulo'];
+        }
+        if (isset($condition['servico'])) {
+            $field = 's.tipo';
+            $condition[$field] = $condition['servico'];
+        }
+        if (isset($condition['cancelamento'])) {
+            $field = 'e.cancelado';
+            $condition[$field] = $condition['cancelamento'];
+        }
+        $prefix = ['p.'];
+        $detalhado = isset($condition['detalhado']);
+        $categorizado = isset($condition['categorizado']);
+        if ($detalhado || $categorizado) {
+            if (isset($condition['!status'])) {
+                $field = 'NOT e.estado';
+                $condition[$field] = $condition['!status'];
+                $allowed[$field] = true;
+            }
+            $prefix[] = 'd.';
+            $prefix[] = 'e.';
+            $allowed['d.tipo'] = true;
+            $allowed['e.tipo'] = true;
+            $allowed['e.sessaoid'] = true;
+            $allowed['e.cancelado'] = true;
+            $allowed['e.movimentacaoid'] = true;
+        }
+        if ($detalhado) {
+            $prefix[] = 's.';
+            $allowed['s.tipo'] = true;
+        }
+        return Filter::keys($condition, $allowed, $prefix);
     }
 
     /**
      * Fetch data from database with a condition
      * @param  array $condition condition to filter rows
      * @param  array $order order rows
+     * @param  array $select select fields, empty to all fields
+     * @param  array $group group rows
      * @return SelectQuery query object with condition statement
      */
-    private static function query($condition = [], $order = [])
+    private static function query($condition = [], $order = [], $select = [], $group = [])
     {
         $query = self::getDB()->from('Produtos_Pedidos p');
+        $detalhado = isset($condition['detalhado']);
+        $categorizado = isset($condition['categorizado']);
+        if ($detalhado) {
+            $query = $query->select(null)
+                ->select('IF(COUNT(p.id) = 1, p.id, 0) as id')
+                ->select('p.pedidoid')
+                ->select('p.funcionarioid')
+                ->select('p.produtoid')
+                ->select('p.servicoid')
+                ->select('p.produtopedidoid')
+                ->select('p.descricao')
+                ->select('p.preco')
+                ->select('SUM(p.quantidade) as quantidade')
+                ->select('p.porcentagem')
+                ->select('p.precovenda')
+                ->select('p.precocompra')
+                ->select('p.detalhes')
+                ->select('p.estado')
+                ->select('p.visualizado')
+                ->select('p.datavisualizacao')
+                ->select('p.dataatualizacao')
+                ->select('p.cancelado')
+                ->select('p.motivo')
+                ->select('p.desperdicado')
+                ->select('p.datahora')
+
+                ->select('l.login as funcionariologin')
+                ->select('COALESCE(s.descricao, COALESCE(p.descricao, d.descricao)) as produtodescricao')
+                ->select('d.dataatualizacao as produtodataatualizacao')
+                ->select('e.tipo as pedido_tipo')
+                ->select('d.tipo as produtotipo')
+                ->select('d.conteudo as produtoconteudo')
+                ->select('u.sigla as unidadesigla')
+                ->select('e.mesaid')
+                ->select('e.comandaid')
+                ->select(
+                    '(CASE WHEN d.imagem IS NULL THEN NULL ELSE '.
+                    self::concat(['d.id', '".png"']).
+                    ' END) as imagemurl'
+                )
+                ->select('m.nome as mesa_nome')
+                ->select('c.nome as comanda_nome')
+
+                ->leftJoin('Produtos d ON d.id = p.produtoid')
+                ->leftJoin('Servicos s ON s.id = p.servicoid')
+                ->leftJoin('Unidades u ON u.id = d.unidadeid')
+                ->leftJoin('Funcionarios f ON f.id = p.funcionarioid')
+                ->leftJoin('Clientes l ON l.id = f.clienteid')
+                ->leftJoin('Pedidos e ON e.id = p.pedidoid')
+                ->leftJoin('Mesas m ON m.id = e.mesaid')
+                ->leftJoin('Comandas c ON c.id = e.comandaid');
+        }
+        if ($categorizado) {
+            $query = $query->select(null)
+                ->select('SUM(p.preco * p.quantidade) as total')
+                ->select('COALESCE(t.descricao, ?) as descricao', 'Taxas e Serviços')
+                ->leftJoin('Produtos d ON d.id = p.produtoid')
+                ->leftJoin('Categorias t ON t.id = d.categoriaid')
+                ->leftJoin('Pedidos e ON e.id = p.pedidoid')
+                ->groupBy('d.categoriaid')
+                ->orderBy('total DESC');
+        }
         $condition = self::filterCondition($condition);
         $query = self::buildOrderBy($query, self::filterOrder($order));
         $query = $query->orderBy('p.id ASC');
+        foreach ($select as $value) {
+            $query = $query->select($value);
+        }
+        foreach ($group as $value) {
+            $query = $query->groupBy($value);
+        }
         return self::buildCondition($query, $condition);
     }
 
     /**
      * Search one register with a condition
      * @param  array $condition Condition for searching the row
-     * @param  array $order order rows
+     * @param  array $order associative field name -> [-1, 1]
+     * @param  array $select select fields, empty to all fields
+     * @param  array $group group rows
      * @return ProdutoPedido A filled Item do pedido or empty instance
      */
-    public static function find($condition, $order = [])
+    public static function find($condition, $order = [], $select = [], $group = [])
     {
-        $query = self::query($condition, $order)->limit(1);
+        $query = self::query($condition, $order, $select, $group)->limit(1);
         $row = $query->fetch() ?: [];
         return new ProdutoPedido($row);
     }
@@ -1093,11 +1345,19 @@ class ProdutoPedido extends \MZ\Database\Helper
      * @param  array  $order     Order Item do pedido
      * @param  int    $limit     Limit data into row count
      * @param  int    $offset    Start offset to get rows
-     * @return array             List of all rows instanced as ProdutoPedido
+     * @param  array  $select select fields, empty to all fields
+     * @param  array  $group group rows
+     * @return array  List of all rows instanced as ProdutoPedido
      */
-    public static function findAll($condition = [], $order = [], $limit = null, $offset = null)
-    {
-        $query = self::query($condition, $order);
+    public static function findAll(
+        $condition = [],
+        $order = [],
+        $limit = null,
+        $offset = null,
+        $select = [],
+        $group = []
+    ) {
+        $query = self::query($condition, $order, $select, $group);
         if (!is_null($limit)) {
             $query = $query->limit($limit);
         }
@@ -1110,6 +1370,34 @@ class ProdutoPedido extends \MZ\Database\Helper
             $result[] = new ProdutoPedido($row);
         }
         return $result;
+    }
+
+    /**
+     * Find all Item do pedido
+     * @param  array  $condition Condition to get all Item do pedido
+     * @param  array  $order     Order Item do pedido
+     * @param  int    $limit     Limit data into row count
+     * @param  int    $offset    Start offset to get rows
+     * @param  array  $select select fields, empty to all fields
+     * @param  array  $group group rows
+     * @return array  List of all rows
+     */
+    public static function rawFindAll(
+        $condition = [],
+        $order = [],
+        $limit = null,
+        $offset = null,
+        $select = [],
+        $group = []
+    ) {
+        $query = self::query($condition, $order, $select, $group);
+        if (!is_null($limit)) {
+            $query = $query->limit($limit);
+        }
+        if (!is_null($offset)) {
+            $query = $query->offset($offset);
+        }
+        return $query->fetchAll();
     }
 
     /**

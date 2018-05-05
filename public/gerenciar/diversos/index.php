@@ -59,5 +59,17 @@ $pagamentos = Pagamento::rawFindAllTotal(
     ],
     ['forma_tipo' => true]
 );
-$categorias = ProdutoPedido::getTodosPorCategoria($sessao->getID(), 0, 6);
+$condition = [
+    'categorizado' => true,
+    'cancelado' => 'N',
+    'cancelamento' => 'N'
+];
+if ($sessao->exists()) {
+    $condition['sessaoid'] = $sessao->getID();
+}
+$categorias = ProdutoPedido::rawFindAll(
+    $condition,
+    [],
+    6
+);
 $app->getResponse('html')->output('gerenciar_diversos_index');

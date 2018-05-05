@@ -41,7 +41,7 @@ services:
         depends_on:
             - gmysqldb
     gmysqldb:
-        image: mysql
+        image: mysql:5.7
         command: mysqld --sql_mode=""
         container_name: ${DB_HOST}
         restart: always

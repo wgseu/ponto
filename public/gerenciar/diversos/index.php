@@ -30,7 +30,7 @@ $stats = Pedido::getTicketMedio($sessao->getID());
 $permanencia = $stats['permanencia'];
 $ticket_medio = $stats['total'];
 $receitas = Pagamento::getReceitas(['sessaoid' => $sessao->getID()]);
-$vendas = Pedido::getTotal($sessao->getID());
+$vendas = Pedido::fetchTotal($sessao->getID());
 $faturamento = [];
 $faturamento['atual'] = Pagamento::getFaturamento(
     ['apartir_datahora' => Helper::date('first day of this month')]

@@ -75,7 +75,7 @@ class Kromax extends \MZ\System\Task
             $product->populateFromXML($dom);
 
             $order->loadDOM($dom);
-            $order->findOrder();
+            $order->search();
             if (!$order->exists()) {
                 $order->process();
             }

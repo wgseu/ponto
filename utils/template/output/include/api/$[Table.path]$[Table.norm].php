@@ -213,15 +213,16 @@ $[field.if(image|blob)]
     /**
      * Get relative $[field.name] path or default $[field.name]
      * @param boolean $default If true return default image, otherwise check field
+     * @param string  $default_name Default image name
      * @return string relative web path for $[table.name] $[field.name]
      */
-    public function make$[Field.norm]($default = false)
+    public function make$[Field.norm]($default = false, $default_name = '$[table.unix].png')
     {
         $$[field.unix] = $this->get$[Field.norm]();
         if ($default) {
             $$[field.unix] = null;
         }
-        return get_image_url($$[field.unix], '$[field.image.folder]', '$[table.unix].png');
+        return get_image_url($$[field.unix], '$[field.image.folder]', $default_name);
     }
 $[field.end]
 $[field.end]

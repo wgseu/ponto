@@ -41,7 +41,7 @@ $lembrar = isset($_POST['lembrar']) ? strval($_POST['lembrar']) : null;
 $metodo = isset($_POST['metodo']) ? strval($_POST['metodo']) : null;
 $token = isset($_POST['token']) ? strval($_POST['token']) : null;
 if ($metodo == 'desktop') {
-    $cliente = Cliente::findByToken($token);
+    $cliente = Authentication::findByToken($token);
 } else {
     $cliente = Cliente::findByLoginSenha($usuario, $senha);
 }

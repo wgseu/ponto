@@ -50,8 +50,7 @@ if ($estoque > 0) {
     $condition['permitido'] = 'Y';
     $condition['visivel'] = 'Y';
     $condition['tipo'] = Produto::TIPO_PRODUTO;
-} elseif ($estoque < 0 && is_manager()) {
-} else {
+} elseif ($estoque == 0 || !is_manager()) {
     if (!$negativo) {
         $condition['disponivel'] = 'Y';
     }
@@ -59,8 +58,6 @@ if ($estoque > 0) {
     $condition['visivel'] = 'Y';
 }
 $produtos = Produto::rawFindAll($condition, [], $limit);
-
-$response = ['status' => 'ok'];
 $campos = [
     'id',
     'categoriaid',
@@ -78,12 +75,11 @@ $campos = [
     'categoria',
     'unidade',
 ];
-$_produtos = [];
-foreach ($produtos as $produto) {
+$items = [];
+foreach ($produtos as $item) {
     // TODO implementar estrelas de mais vendido
-    $produto['estrelas'] = 3;
-    $produto['imagemurl'] = get_image_url($produto['imagem'], 'produto', null);
-    $_produtos[] = array_intersect_key($produto, array_flip($campos));
+    $item['estrelas'] = 3;
+    $item['imagemurl'] = get_image_url($item['imagem'], 'produto', null);
+    $items[] = array_intersect_key($item, array_flip($campos));
 }
-$response['produtos'] = $_produtos;
-json($response);
+json('produtos', $items);

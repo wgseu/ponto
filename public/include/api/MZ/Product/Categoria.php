@@ -265,15 +265,16 @@ class Categoria extends \MZ\Database\Helper
     /**
      * Get relative imagem path or default imagem
      * @param boolean $default If true return default image, otherwise check field
+     * @param string $default_name Default image name
      * @return string relative web path for categoria imagem
      */
-    public function makeImagem($default = false)
+    public function makeImagem($default = false, $default_name = 'categoria.png')
     {
         $imagem = $this->getImagem();
         if ($default) {
             $imagem = null;
         }
-        return get_image_url($imagem, 'categoria', 'categoria.png');
+        return get_image_url($imagem, 'categoria', $default_name);
     }
 
     /**
@@ -283,7 +284,7 @@ class Categoria extends \MZ\Database\Helper
     public function publish()
     {
         $categoria = parent::publish();
-        $categoria['imagem'] = $this->makeImagem();
+        $categoria['imagem'] = $this->makeImagem(false, null);
         return $categoria;
     }
 
@@ -551,13 +552,15 @@ class Categoria extends \MZ\Database\Helper
             )
             ->select('c.dataatualizacao');
         $order = Filter::order($order);
+        if (isset($condition['disponivel']) || isset($order['vendas'])) {
+            $query = $query->leftJoin('Produtos p ON p.categoriaid = c.id AND p.visivel = "Y"');
+            $query = $query->groupBy('c.id');
+        }
         if (isset($condition['disponivel'])) {
             $disponivel = $condition['disponivel'];
-            $query = $query->leftJoin('Produtos p ON p.categoriaid = c.id AND p.visivel = "Y"')
-                ->having('(CASE WHEN COUNT(p.id) > 0 THEN "Y" ELSE "N" END) = ?', $disponivel);
+            $query = $query->having('(CASE WHEN COUNT(p.id) > 0 THEN "Y" ELSE "N" END) = ?', $disponivel);
         }
         if (isset($order['vendas'])) {
-            $query = $query->leftJoin('Produtos p ON p.categoriaid = c.id AND p.visivel = "Y"');
             $query = $query->leftJoin(
                 'Produtos_Pedidos r ON r.produtoid = p.id AND r.datahora > ?',
                 self::now('-1 month')
@@ -567,7 +570,6 @@ class Categoria extends \MZ\Database\Helper
         $query = self::buildOrderBy($query, self::filterOrder($order));
         $query = $query->orderBy('c.descricao ASC');
         $query = $query->orderBy('c.id ASC');
-        $query = $query->groupBy('c.id');
         return self::buildCondition($query, $condition);
     }
 

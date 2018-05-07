@@ -83,7 +83,7 @@
 <!--${$_comanda = $pedido->findComandaID()}-->
 <!--${$_mesa = $pedido->findMesaID()}-->
 								<td>${$pedido->getTipo() == Pedido::TIPO_ENTREGA && is_null($pedido->getLocalizacaoID())?'Viagem':($pedido->getTipo() == Pedido::TIPO_MESA?$_mesa->getNome():($pedido->getTipo() == Pedido::TIPO_COMANDA?$_comanda->getNome():$_tipo_names[$pedido->getTipo()]))}</td>
-<!--${$_info = Pedido::getTotalDetalhado($pedido->getID(), $pedido->getCancelado())}-->
+<!--${$_info = $pedido->findTotal()}-->
 								<td class="text-right">${\MZ\Util\Mask::money($_info['produtos'], true)}</td>
 								<td class="text-right">${\MZ\Util\Mask::money($_info['comissao'], true)}</td>
 								<td class="text-right">${\MZ\Util\Mask::money($_info['servicos'], true)}</td>

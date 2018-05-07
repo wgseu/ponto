@@ -1042,6 +1042,16 @@ class Pedido extends \MZ\Database\Helper
     }
 
     /**
+     * Load open order by customer and date
+     * @return Pedido The object fetched from database or empty when not found
+     */
+    public function loadAproximado()
+    {
+        // TODO implementar
+        return $this;
+    }
+
+    /**
      * Identificador da mesa, único quando o pedido não está fechado
      * @return \MZ\Environment\Mesa The object fetched from database
      */
@@ -1143,6 +1153,26 @@ class Pedido extends \MZ\Database\Helper
             return new \MZ\Employee\Funcionario();
         }
         return \MZ\Employee\Funcionario::findByID($this->getFechadorID());
+    }
+
+    public function findTotal($resumido = false)
+    {
+        $query = self::getDB()->from('Pedidos p')
+            ->select(null)
+            ->select('SUM(r.precocompra * r.quantidade) as custo')
+            ->select('SUM(IF(NOT ISNULL(r.produtoid), r.preco * r.quantidade, 0)) as produtos')
+            ->select('SUM(IF(NOT ISNULL(r.produtoid), r.preco * r.quantidade * r.porcentagem / 100, 0)) as comissao')
+            ->select('SUM(IF(NOT ISNULL(r.servicoid) AND r.preco >= 0, r.preco * r.quantidade, 0)) as servicos')
+            ->select('SUM(IF(NOT ISNULL(r.servicoid) AND r.preco < 0, r.preco * r.quantidade, 0)) as descontos')
+            ->leftJoin('Produtos_Pedidos pdp ON r.pedidoid = p.id AND r.cancelado = ?', $this->getCancelado())
+            ->where('p.id', $this->getID());
+        $row = $query->fetch();
+        $row['subtotal'] = $row['servicos'] + $row['produtos'] + $row['comissao'];
+        $row['total'] = $row['descontos'] + $row['subtotal'];
+        if ($resumido) {
+            return $row['total'];
+        }
+        return $row;
     }
 
     /**
@@ -1318,11 +1348,11 @@ class Pedido extends \MZ\Database\Helper
 
     public static function getTicketMedio($sessao_id, $data_inicio = null, $data_fim = null)
     {
-        $query = \DB::$pdo->from('Pedidos p')
-                         ->select(null)
-                         ->select('SUM(TIME_TO_SEC(TIMEDIFF(COALESCE(p.dataconclusao, NOW()), p.datacriacao))) as segundos')
-                         ->select('COUNT(p.id) as quantidade')
-                         ->where(['p.cancelado' => 'N']);
+        $query = self::getDB()->from('Pedidos p')
+            ->select(null)
+            ->select('SUM(TIME_TO_SEC(TIMEDIFF(COALESCE(p.dataconclusao, NOW()), p.datacriacao))) as segundos')
+            ->select('COUNT(p.id) as quantidade')
+            ->where(['p.cancelado' => 'N']);
         if (!is_null($sessao_id)) {
             $query = $query->where(['p.sessaoid' => $sessao_id]);
         }
@@ -1337,7 +1367,7 @@ class Pedido extends \MZ\Database\Helper
             'permanencia' => intval($row['segundos']),
             'pedidos' => intval($row['quantidade'])
         ];
-        $total = self::getTotal($sessao_id, $data_inicio, $data_fim);
+        $total = self::fetchTotal($sessao_id, $data_inicio, $data_fim);
         if ($result['pedidos'] > 0) {
             $result['permanencia'] = (int)($result['permanencia'] / $result['pedidos']);
             $result['total'] = $total['subtotal'] / $result['pedidos'];
@@ -1350,12 +1380,12 @@ class Pedido extends \MZ\Database\Helper
 
     public static function getTotalPessoas($sessao_id, $data_inicio = null, $data_fim = null)
     {
-        $query = \DB::$pdo->from('Pedidos p')
-                         ->select(null)
-                         ->select('SUM(p.pessoas) as total')
-                         ->select('SUM(IF(p.estado = ?, 0, p.pessoas)) as atual', Pedido::ESTADO_FINALIZADO)
-                         ->where(['p.cancelado' => 'N'])
-                         ->where('p.tipo <> ?', self::TIPO_ENTREGA);
+        $query = self::getDB()->from('Pedidos p')
+            ->select(null)
+            ->select('SUM(p.pessoas) as total')
+            ->select('SUM(IF(p.estado = ?, 0, p.pessoas)) as atual', Pedido::ESTADO_FINALIZADO)
+            ->where(['p.cancelado' => 'N'])
+            ->where('p.tipo <> ?', self::TIPO_ENTREGA);
         if (!is_null($sessao_id)) {
             $query = $query->where(['p.sessaoid' => $sessao_id]);
         }
@@ -1369,18 +1399,18 @@ class Pedido extends \MZ\Database\Helper
         return ['total' => $row['total'] + 0, 'atual' => $row['atual'] + 0];
     }
 
-    public static function getTotal($sessao_id, $data_inicio = null, $data_fim = null)
+    public static function fetchTotal($sessao_id, $data_inicio = null, $data_fim = null)
     {
-        $query = \DB::$pdo->from('Pedidos p')
-                         ->select(null)
-                         ->select('ROUND(SUM(pdp.preco * pdp.quantidade), 4) as subtotal')
-                         ->select('ROUND(SUM(pdp.preco * pdp.quantidade * (pdp.porcentagem / 100 + 1)), 4) as total')
-                         ->select('ROUND(SUM(IF(p.tipo = "Mesa", pdp.preco * pdp.quantidade * (pdp.porcentagem / 100 + 1), 0)), 4) as mesa')
-                         ->select('ROUND(SUM(IF(p.tipo = "Comanda", pdp.preco * pdp.quantidade * (pdp.porcentagem / 100 + 1), 0)), 4) as comanda')
-                         ->select('ROUND(SUM(IF(p.tipo = "Avulso", pdp.preco * pdp.quantidade * (pdp.porcentagem / 100 + 1), 0)), 4) as avulso')
-                         ->select('ROUND(SUM(IF(p.tipo = "Entrega", pdp.preco * pdp.quantidade * (pdp.porcentagem / 100 + 1), 0)), 4) as entrega')
-                         ->leftJoin('Produtos_Pedidos pdp ON pdp.pedidoid = p.id AND pdp.cancelado = "N"')
-                         ->where(['p.cancelado' => 'N']);
+        $query = self::getDB()->from('Pedidos p')
+            ->select(null)
+            ->select('ROUND(SUM(r.preco * r.quantidade), 4) as subtotal')
+            ->select('ROUND(SUM(r.preco * r.quantidade * (r.porcentagem / 100 + 1)), 4) as total')
+            ->select('ROUND(SUM(IF(p.tipo = "Mesa", r.preco * r.quantidade * (r.porcentagem / 100 + 1), 0)), 4) as mesa')
+            ->select('ROUND(SUM(IF(p.tipo = "Comanda", r.preco * r.quantidade * (r.porcentagem / 100 + 1), 0)), 4) as comanda')
+            ->select('ROUND(SUM(IF(p.tipo = "Avulso", r.preco * r.quantidade * (r.porcentagem / 100 + 1), 0)), 4) as avulso')
+            ->select('ROUND(SUM(IF(p.tipo = "Entrega", r.preco * r.quantidade * (r.porcentagem / 100 + 1), 0)), 4) as entrega')
+            ->leftJoin('Produtos_Pedidos pdp ON r.pedidoid = p.id AND r.cancelado = "N"')
+            ->where(['p.cancelado' => 'N']);
         if (!is_null($sessao_id)) {
             $query = $query->where(['p.sessaoid' => $sessao_id]);
         }
@@ -1391,42 +1421,16 @@ class Pedido extends \MZ\Database\Helper
             $query = $query->where('p.datacriacao <= ?', date('Y-m-d H:i:s', $data_fim));
         }
         $row = $query->fetch();
-        return ['total' => $row['total'] + 0,
-                     'subtotal' => $row['total'] + 0,
-                     'tipo' => [
-                        'mesa' => $row['mesa'] + 0,
-                        'comanda' => $row['comanda'] + 0,
-                        'avulso' => $row['avulso'] + 0,
-                        'entrega' => $row['entrega'] + 0]
-                    ];
-    }
-
-    public static function getTotalDetalhado($id, $cancelado = null)
-    {
-        $query = \DB::$pdo->from('Pedidos p')
-                         ->select(null)
-                         ->select('SUM(pdp.precocompra * pdp.quantidade) as custo')
-                         ->select('SUM(IF(NOT ISNULL(pdp.produtoid), pdp.preco * pdp.quantidade, 0)) as produtos')
-                         ->select('SUM(IF(NOT ISNULL(pdp.produtoid), pdp.preco * pdp.quantidade * pdp.porcentagem / 100, 0)) as comissao')
-                         ->select('SUM(IF(NOT ISNULL(pdp.servicoid) AND pdp.preco >= 0, pdp.preco * pdp.quantidade, 0)) as servicos')
-                         ->select('SUM(IF(NOT ISNULL(pdp.servicoid) AND pdp.preco < 0, pdp.preco * pdp.quantidade, 0)) as descontos')
-                         ->leftJoin('Produtos_Pedidos pdp ON pdp.pedidoid = p.id AND (? = "" OR pdp.cancelado = ?)', strval($cancelado), strval($cancelado))
-                         ->where('p.id', $id);
-        $row = $query->fetch();
-        $row['subtotal'] = $row['servicos'] + $row['produtos'] + $row['comissao'];
-        $row['total'] = $row['descontos'] + $row['subtotal'];
-        return $row;
-    }
-
-    public static function getTotalDoLocal($tipo, $mesa_id, $comanda_id)
-    {
-        if ($tipo == self::TIPO_COMANDA) {
-            $pedido = self::getPelaComandaID($comanda_id);
-        } else {
-            $pedido = self::getPelaMesaID($mesa_id);
-        }
-        $info = self::getTotalDetalhado($pedido->getID(), 'N');
-        return $info['total'];
+        return [
+            'total' => $row['total'] + 0,
+            'subtotal' => $row['total'] + 0,
+            'tipo' => [
+                'mesa' => $row['mesa'] + 0,
+                'comanda' => $row['comanda'] + 0,
+                'avulso' => $row['avulso'] + 0,
+                'entrega' => $row['entrega'] + 0
+            ]
+        ];
     }
 
     /**

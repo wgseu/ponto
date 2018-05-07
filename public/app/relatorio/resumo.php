@@ -25,6 +25,10 @@
 require_once(dirname(dirname(__DIR__)) . '/app.php');
 
 use MZ\Database\Helper;
+use MZ\Payment\Pagamento;
+use MZ\Session\Sessao;
+use MZ\Sale\Pedido;
+use MZ\System\Permissao;
 
 if (!is_login()) {
     json('Usuário não autenticado!');
@@ -35,7 +39,7 @@ if (!logged_employee()->has(Permissao::NOME_RELATORIOCAIXA)) {
 $sessao = Sessao::findLastAberta();
 $data_inicio = !$sessao->exists() ? Helper::date('today') : null;
 $response = ['status' => 'ok'];
-$response['vendas'] = Pedido::getTotal($sessao->getID(), $data_inicio);
+$response['vendas'] = Pedido::fetchTotal($sessao->getID(), $data_inicio);
 $response['receitas'] = Pagamento::getReceitas(
     ['sessaoid' => $sessao->getID(), 'apartir_datahora' => $data_inicio]
 );

@@ -1,24 +1,27 @@
 <?php
-/*
-    Copyright 2014 da MZ Software - MZ Desenvolvimento de Sistemas LTDA
-    Este arquivo é parte do programa GrandChef - Sistema para Gerenciamento de Churrascarias, Bares e Restaurantes.
-    O GrandChef é um software proprietário; você não pode redistribuí-lo e/ou modificá-lo.
-    DISPOSIÇÕES GERAIS
-    O cliente não deverá remover qualquer identificação do produto, avisos de direitos autorais,
-    ou outros avisos ou restrições de propriedade do GrandChef.
-
-    O cliente não deverá causar ou permitir a engenharia reversa, desmontagem,
-    ou descompilação do GrandChef.
-
-    PROPRIEDADE DOS DIREITOS AUTORAIS DO PROGRAMA
-
-    GrandChef é a especialidade do desenvolvedor e seus
-    licenciadores e é protegido por direitos autorais, segredos comerciais e outros direitos
-    de leis de propriedade.
-
-    O Cliente adquire apenas o direito de usar o software e não adquire qualquer outros
-    direitos, expressos ou implícitos no GrandChef diferentes dos especificados nesta Licença.
-*/
+/**
+ * Copyright 2014 da MZ Software - MZ Desenvolvimento de Sistemas LTDA
+ *
+ * Este arquivo é parte do programa GrandChef - Sistema para Gerenciamento de Churrascarias, Bares e Restaurantes.
+ * O GrandChef é um software proprietário; você não pode redistribuí-lo e/ou modificá-lo.
+ * DISPOSIÇÕES GERAIS
+ * O cliente não deverá remover qualquer identificação do produto, avisos de direitos autorais,
+ * ou outros avisos ou restrições de propriedade do GrandChef.
+ *
+ * O cliente não deverá causar ou permitir a engenharia reversa, desmontagem,
+ * ou descompilação do GrandChef.
+ *
+ * PROPRIEDADE DOS DIREITOS AUTORAIS DO PROGRAMA
+ *
+ * GrandChef é a especialidade do desenvolvedor e seus
+ * licenciadores e é protegido por direitos autorais, segredos comerciais e outros direitos
+ * de leis de propriedade.
+ *
+ * O Cliente adquire apenas o direito de usar o software e não adquire qualquer outros
+ * direitos, expressos ou implícitos no GrandChef diferentes dos especificados nesta Licença.
+ *
+ * @author Equipe GrandChef <desenvolvimento@mzsw.com.br>
+ */
 namespace MZ\Account;
 
 class Authentication
@@ -130,13 +133,13 @@ class Authentication
         return $this;
     }
 
-    public function findByToken($token)
+    public static function findByToken($token)
     {
+        $cliente = new Cliente();
         $token = base64_decode($token);
         $len = strlen($token);
         if ($len <= 62 || $len > 100) {
-            $this->getUser()->fromArray([]);
-            return $this;
+            return $cliente;
         }
         $plen = $len - 48;
         $hlen = 40;
@@ -164,15 +167,14 @@ class Authentication
         ));
         $i = round(abs($tm - $stm) / 60);
         if ($i > 5 || $sm === false || strcasecmp($crc, $ccrc) != 0) {
-            $this->getUser()->fromArray([]);
-            return $this;
+            return $cliente;
         }
         $id = substr($id, 0, -14);
-        $this->getUser()->load([
-            'id' => intval($id),
-            'senha' => $hash,
-        ]);
-        return $this;
+        $cliente->loadByID(intval($id));
+        if ($hash != $cliente->getSenha()) {
+            return new Cliente();
+        }
+        return $cliente;
     }
 
     private function findByCookie($cname = 'ru')

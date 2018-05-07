@@ -40,7 +40,7 @@ use MZ\Sale\ProdutoPedido;
 use MZ\Product\Servico;
 use MZ\Product\Produto;
 use MZ\Sale\Formacao;
-use MZ\Sale\Pedido;
+use MZ\System\Synchronizer;
 
 class Order extends Pedido
 {
@@ -536,9 +536,9 @@ class Order extends Pedido
         }
     }
 
-    public function process($sync = true)
+    public function process($synchronize = true)
     {
-        $action = \MZ\System\Synchronizer::ACTION_ADDED;
+        $action = Synchronizer::ACTION_ADDED;
         try {
             \DB::BeginTransaction();
             $this->validaAcesso($this->employee);
@@ -558,7 +558,7 @@ class Order extends Pedido
                 $this->setFuncionarioID($this->employee->getID());
                 $this->filter(new Pedido());
                 $this->insert();
-                $action = \MZ\System\Synchronizer::ACTION_OPEN;
+                $action = Synchronizer::ACTION_OPEN;
             }
             $added = 0;
             $pacote_pedido = new ProdutoPedido();
@@ -594,23 +594,23 @@ class Order extends Pedido
                 $produto_pedido->setVisualizado('N');
                 $this->checkSaldo($produto_pedido->getTotal());
                 $produto_pedido->filter(new ProdutoPedido()); // limpa o ID
-                $produto_pedido->register($item_info['formacoes'] ?: []);
+                $produto_pedido->register($item_info['formacoes']);
                 if ($produto->exists() && $produto->getTipo() == Produto::TIPO_PACOTE) {
                     $pacote_pedido = $produto_pedido;
                 }
                 $added++;
             }
-            if ($added > 0 && $action != \MZ\System\Synchronizer::ACTION_OPEN && $this->getEstado() != self::ESTADO_ATIVO) {
-                $action = \MZ\System\Synchronizer::ACTION_STATE;
+            if ($added > 0 && $action != Synchronizer::ACTION_OPEN && $this->getEstado() != self::ESTADO_ATIVO) {
+                $action = Synchronizer::ACTION_STATE;
                 if (in_array($this->getTipo(), [self::TIPO_MESA, self::TIPO_COMANDA])) {
                     $this->setEstado(self::ESTADO_ATIVO);
                     $this->update();
                 }
             }
-            if ($sync) {
-                $appsync = new \MZ\System\Synchronizer();
-                if ($action != \MZ\System\Synchronizer::ACTION_ADDED) {
-                    $appsync->updateOrder(
+            if ($synchronize) {
+                $sync = new Synchronizer();
+                if ($action != Synchronizer::ACTION_ADDED) {
+                    $sync->updateOrder(
                         $this->getID(),
                         $this->getTipo(),
                         $this->getMesaID(),
@@ -618,24 +618,24 @@ class Order extends Pedido
                         $action
                     );
                 }
-                if ($action == \MZ\System\Synchronizer::ACTION_OPEN) {
+                if ($action == Synchronizer::ACTION_OPEN) {
                     $senha_balcao = is_boolean_config('Imprimir', 'Senha.Paineis');
                     $comanda_senha = is_boolean_config('Imprimir', 'Comanda.Senha');
                     if (($senha_balcao && $this->getTipo() == self::TIPO_AVULSO) ||
                         ($comanda_senha && $this->getTipo() == self::TIPO_COMANDA)
                     ) {
-                        $appsync->printQueue($this->getID());
+                        $sync->printQueue($this->getID());
                     }
                 }
                 if ($added > 0) {
-                    $appsync->updateOrder(
+                    $sync->updateOrder(
                         $this->getID(),
                         $this->getTipo(),
                         $this->getMesaID(),
                         $this->getComandaID(),
-                        \MZ\System\Synchronizer::ACTION_ADDED
+                        Synchronizer::ACTION_ADDED
                     );
-                    $appsync->printServices($this->getID());
+                    $sync->printServices($this->getID());
                 }
             }
             \DB::Commit();
@@ -643,6 +643,7 @@ class Order extends Pedido
             \DB::RollBack();
             throw $e;
         }
+        return $action;
     }
 
     public function store()

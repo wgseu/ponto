@@ -24,18 +24,21 @@
  */
 require_once(dirname(dirname(__DIR__)) . '/app.php');
 
-use \MZ\Location\Localizacao;
+use MZ\Location\Localizacao;
+use MZ\Location\Estado;
+use MZ\Location\Cidade;
+use MZ\Util\Filter;
 
 $estado_id = isset($_GET['estadoid']) ? $_GET['estadoid'] : null;
-$estado = \MZ\Location\Estado::findByID($estado_id);
+$estado = Estado::findByID($estado_id);
 if (!$estado->exists()) {
     json('O estado não foi informado ou não existe!');
 }
-$cidade = \MZ\Location\Cidade::findByEstadoIDNome($estado_id, isset($_GET['cidade'])?trim($_GET['cidade']):null);
+$cidade = Cidade::findByEstadoIDNome($estado_id, isset($_GET['cidade'])?trim($_GET['cidade']):null);
 if (!$cidade->exists()) {
     json('A cidade informada não existe!');
 }
-$condition = \MZ\Util\Filter::query($_GET);
+$condition = Filter::query($_GET);
 $condition['cidadeid'] = $cidade->getID();
 // filter remove empty entry
 if (array_key_exists('typesearch', $_GET)) {
@@ -52,10 +55,10 @@ if (isset($_GET['tipo']) && $_GET['tipo'] == Localizacao::TIPO_APARTAMENTO) {
 }
 $items = [];
 foreach ($localizacoes as $localizacao) {
+    $bairro = $localizacao->findBairroID();
     $item = $localizacao->publish();
     $item = array_intersect_key($item, array_flip($campos));
-    $bairro = $localizacao->findBairroID();
     $item['bairro'] = $bairro->getNome();
     $items[] = $item;
 }
-json(['status' => 'ok', 'items' => $items]);
+json('items', $items);

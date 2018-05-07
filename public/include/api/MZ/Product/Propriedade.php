@@ -255,15 +255,16 @@ class Propriedade extends \MZ\Database\Helper
     /**
      * Get relative imagem path or default imagem
      * @param boolean $default If true return default image, otherwise check field
+     * @param string $default_name Default image name
      * @return string relative web path for propriedade imagem
      */
-    public function makeImagem($default = false)
+    public function makeImagem($default = false, $default_name = 'propriedade.png')
     {
         $imagem = $this->getImagem();
         if ($default) {
             $imagem = null;
         }
-        return get_image_url($imagem, 'propriedade', 'propriedade.png');
+        return get_image_url($imagem, 'propriedade', $default_name);
     }
 
     /**
@@ -273,7 +274,7 @@ class Propriedade extends \MZ\Database\Helper
     public function publish()
     {
         $propriedade = parent::publish();
-        $propriedade['imagem'] = $this->makeImagem();
+        $propriedade['imagem'] = $this->makeImagem(false, null);
         return $propriedade;
     }
 

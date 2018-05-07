@@ -79,12 +79,12 @@ $campos = [
     'produtodataatualizacao',
     'datahora',
 ];
-$_pedidos = [];
-foreach ($pedidos as $pedido) {
-    $_pedido = array_intersect_key($pedido, array_flip($campos));
-    $_pedido['imagemurl'] = get_image_url($_pedido['imagemurl'], 'produto', null);
-    $_pedidos[] = $_pedido;
+$items = [];
+foreach ($pedidos as $_pedido) {
+    $item = array_intersect_key($_pedido, array_flip($campos));
+    $item['imagemurl'] = get_image_url($item['imagemurl'], 'produto', null);
+    $items[] = $item;
 }
-$response['total'] = Pedido::getTotalDoLocal($tipo, $_GET['mesa'], $_GET['comanda']);
-$response['pedidos'] = $_pedidos;
+$response['total'] = $pedido->findTotal(true);
+$response['pedidos'] = $items;
 json($response);

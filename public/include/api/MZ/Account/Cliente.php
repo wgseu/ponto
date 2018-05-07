@@ -26,6 +26,7 @@ namespace MZ\Account;
 
 use MZ\Util\Filter;
 use MZ\Util\Validator;
+use MZ\Util\Mask;
 use MZ\Employee\Funcionario;
 use MZ\Sale\Pedido;
 
@@ -809,15 +810,16 @@ class Cliente extends \MZ\Database\Helper
     /**
      * Get relative foto path or default foto
      * @param boolean $default If true return default image, otherwise check field
+     * @param string $default_name Default image name
      * @return string relative web path for cliente foto
      */
-    public function makeImagem($default = false)
+    public function makeImagem($default = false, $default_name = 'cliente.png')
     {
         $imagem = $this->getImagem();
         if ($default) {
             $imagem = null;
         }
-        return get_image_url($imagem, 'cliente', 'cliente.png');
+        return get_image_url($imagem, 'cliente', $default_name);
     }
 
     /**
@@ -876,11 +878,15 @@ class Cliente extends \MZ\Database\Helper
     {
         $cliente = parent::publish();
         unset($cliente['senha']);
-        $cliente['cpf'] = \MZ\Util\Mask::cpf($cliente['cpf']);
-        $cliente['fone1'] = \MZ\Util\Mask::phone($cliente['fone1']);
-        $cliente['fone2'] = \MZ\Util\Mask::phone($cliente['fone2']);
+        if ($this->getTipo() == self::TIPO_FISICA) {
+            $cliente['cpf'] = Mask::cpf($cliente['cpf']);
+        } else {
+            $cliente['cpf'] = Mask::cnpj($cliente['cpf']);
+        }
+        $cliente['fone1'] = Mask::phone($cliente['fone1']);
+        $cliente['fone2'] = Mask::phone($cliente['fone2']);
         unset($cliente['secreto']);
-        $cliente['imagem'] = $this->makeImagem();
+        $cliente['imagem'] = $this->makeImagem(false, null);
         return $cliente;
     }
 

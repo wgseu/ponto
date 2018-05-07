@@ -881,15 +881,16 @@ class Produto extends \MZ\Database\Helper
     /**
      * Get relative imagem path or default imagem
      * @param boolean $default If true return default image, otherwise check field
+     * @param string $default_name Default image name
      * @return string relative web path for produto imagem
      */
-    public function makeImagem($default = false)
+    public function makeImagem($default = false, $default_name = 'produto.png')
     {
         $imagem = $this->getImagem();
         if ($default) {
             $imagem = null;
         }
-        return get_image_url($imagem, 'produto', 'produto.png');
+        return get_image_url($imagem, 'produto', $default_name);
     }
 
     /**
@@ -899,7 +900,7 @@ class Produto extends \MZ\Database\Helper
     public function publish()
     {
         $produto = parent::publish();
-        $produto['imagem'] = $this->makeImagem();
+        $produto['imagem'] = $this->makeImagem(false, null);
         return $produto;
     }
 

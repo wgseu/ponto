@@ -24,11 +24,8 @@
  */
 require_once(dirname(dirname(__DIR__)) . '/app.php');
 
-use MZ\System\Permissao;
 use MZ\Session\Sessao;
 use MZ\Sale\Pedido;
-use MZ\Environment\Mesa;
-use MZ\Sale\Comanda;
 use MZ\System\Synchronizer;
 use MZ\Database\Helper;
 
@@ -37,10 +34,7 @@ if (!is_login()) {
 }
 try {
     \DB::BeginTransaction();
-    $sessao = Sessao::getPorAberta();
-    if (!$sessao->exists()) {
-        throw new \Exception('A sessão ainda não foi aberta');
-    }
+    $sessao = Sessao::findByAberta(true);
     $pedido = new Pedido();
     $tipo = isset($_GET['tipo']) ? $_GET['tipo'] : null;
     if ($tipo == 'comanda') {

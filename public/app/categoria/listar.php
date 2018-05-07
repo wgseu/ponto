@@ -27,12 +27,11 @@ require_once(dirname(dirname(__DIR__)) . '/app.php');
 use MZ\Product\Categoria;
 
 $categorias = Categoria::findAll(['disponivel' => 'Y'], ['vendas' => -1]);
-$response = ['status' => 'ok'];
-$_categorias = [];
+$items = [];
 foreach ($categorias as $categoria) {
-    $_categoria = $categoria->publish();
-    $_categoria['imagemurl'] = get_image_url($_categoria['imagem'], 'categoria', null);
-    $_categorias[] = $_categoria;
+    $item = $categoria->publish();
+    $item['imagemurl'] = is_null($categoria->getImagem()) ? null: $item['imagem'];
+    unset($item['imagem']);
+    $items[] = $item;
 }
-$response['categorias'] = $_categorias;
-json($response);
+json('categorias', $items);

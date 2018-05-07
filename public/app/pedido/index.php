@@ -24,134 +24,17 @@
  */
 require_once(dirname(dirname(__DIR__)) . '/app.php');
 
-use MZ\System\Synchronizer;
+use MZ\Association\Order;
 
-if (!is_login()) {
-    json('Usuário não autenticado!');
-}
-$_pedidos = isset($_POST['pedidos']) ? $_POST['pedidos'] : [];
-$sync = isset($_POST['sync']) ? $_POST['sync'] : false;
-$action = Synchronizer::ACTION_ADDED;
+need_login(true);
+$order = new Order();
+$order->setEmployee(logged_employee());
+$synchronize = isset($_POST['sync']) ? $_POST['sync'] : false;
 try {
-    \DB::BeginTransaction();
-    $sessao = Sessao::getPorAberta();
-    if (!$sessao->exists()) {
-        throw new \Exception('A sessão ainda não foi aberta');
-    }
-    $tipo = Pedido::TIPO_MESA;
-    if ($_POST['tipo'] == 'comanda') {
-        $tipo = Pedido::TIPO_COMANDA;
-    }
-    /* else if($_POST['tipo'] == 'avulso')
-        $tipo = Pedido::TIPO_AVULSO;
-    else if($_POST['tipo'] == 'entrega')
-        $tipo = Pedido::TIPO_ENTREGA; */
-    $mesa = Mesa::findByID($_POST['mesa']);
-    if (!$mesa->exists() && $tipo == Pedido::TIPO_MESA) {
-        throw new \Exception('A mesa não foi informada ou não existe');
-    }
-    $comanda = \MZ\Sale\Comanda::findByID($_POST['comanda']);
-    if (!$comanda->exists() && $tipo == Pedido::TIPO_COMANDA) {
-        throw new \Exception('A comanda não foi informada ou não existe');
-    }
-    $pedido = Pedido::findByLocal($tipo, $mesa->getID(), $comanda->getID());
-    $pedido->setTipo($tipo);
-    $pedido->validaAcesso(logged_employee());
-    if (!$pedido->exists()) {
-        // não existe pedido ainda, cadastra um novo
-        $cliente = Cliente::findByFone($_POST['cliente']);
-        $pedido->setMesaID($mesa->getID());
-        $pedido->setComandaID($comanda->getID());
-        $pedido->setSessaoID($sessao->getID());
-        $pedido->setFuncionarioID(logged_employee()->getID());
-        $pedido->setClienteID($cliente->getID());
-        $pedido->setPessoas(1);
-        $pedido->setCancelado('N');
-        $pedido->setDescricao($_POST['descricao']);
-        $pedido->setEstado(Pedido::ESTADO_ATIVO);
-        $pedido->insert();
-        $action = Synchronizer::ACTION_OPEN;
-    }
-    $added = 0;
-    $pacote_pedido = new ProdutoPedido();
-    foreach ($_pedidos as $index => $_produto_pedido) {
-        $produto_pedido = new ProdutoPedido($_produto_pedido);
-        $produto = $produto_pedido->findProdutoID();
-        if (!$produto->exists()) {
-            throw new \Exception('O produto informado não existe');
-        }
-        $produto_pedido->setPedidoID($pedido->getID());
-        $produto_pedido->setFuncionarioID(logged_employee()->getID());
-        $produto_pedido->setProdutoID($produto->getID());
-        if ($produto->isCobrarServico()) {
-            $produto_pedido->setPorcentagem(logged_employee()->getPorcentagem());
-        }
-        if (is_null($produto_pedido->getPorcentagem())) {
-            $produto_pedido->setPorcentagem(0);
-        }
-        if (!is_null($produto_pedido->getProdutoPedidoID())) {
-            // TODO atribuir preço e verificar preços das composições
-            $produto_pedido->setProdutoPedidoID($pacote_pedido->getID());
-        } elseif ($produto->getTipo() != Produto::TIPO_PACOTE) {
-            // TODO atribuir preço padrão e verificar preços das propriedades
-            $produto_pedido->setPreco($produto->getPrecoVenda());
-            $produto_pedido->setPrecoVenda($produto->getPrecoVenda());
-            $pacote_pedido = new ProdutoPedido();
-        }
-        $produto_pedido->setPrecoCompra(0);
-        if (!is_null($produto->getCustoProducao())) {
-            $produto_pedido->setPrecoCompra($produto->getCustoProducao());
-        }
-        $produto_pedido->setEstado(ProdutoPedido::ESTADO_ADICIONADO);
-        $produto_pedido->setCancelado('N');
-        $produto_pedido->setVisualizado('N');
-        $formacoes = $_produto_pedido['formacoes'];
-        if (is_null($formacoes)) {
-            $formacoes = [];
-        }
-        if ($pedido->getTipo() == Pedido::TIPO_COMANDA && is_boolean_config('Comandas', 'PrePaga')) {
-            $subtotal = $produto_pedido->getTotal();
-            $pedido_total = Pedido::getTotalDoLocal(Pedido::TIPO_COMANDA, null, $pedido->getComandaID());
-            $total = $subtotal + $pedido_total;
-            $pagamentos = Pagamento::rawFindTotal(['pedidoid' => $pedido->getID()]);
-            $restante = $pedido_total - $pagamentos;
-            $msg = 'Saldo insuficiente para a realização do pedido, Necessário: %s, Saldo atual: %s';
-            if ($total > $pagamentos) {
-                throw new \Exception(vsprintf($msg, [\MZ\Util\Mask::money($subtotal, true), \MZ\Util\Mask::money(-$restante, true)]));
-            }
-        }
-        $produto_pedido->register($produto, $formacoes);
-        if ($produto->getTipo() == Produto::TIPO_PACOTE) {
-            $pacote_pedido = $produto_pedido;
-        }
-        $added++;
-    }
-    if ($added > 0 && $action != Synchronizer::ACTION_OPEN && $pedido->getEstado() != Pedido::ESTADO_ATIVO) {
-        $action = Synchronizer::ACTION_STATE;
-        $pedido->setEstado(Pedido::ESTADO_ATIVO);
-        $pedido->update();
-    }
-    if ($sync) {
-        $sync = new Synchronizer();
-        if ($action != Synchronizer::ACTION_ADDED) {
-            $sync->updateOrder($pedido->getID(), $pedido->getTipo(), $pedido->getMesaID(), $pedido->getComandaID(), $action);
-        }
-        if ($action == Synchronizer::ACTION_OPEN) {
-            $senha_balcao = is_boolean_config('Imprimir', 'Senha.Paineis');
-            $comanda_senha = is_boolean_config('Imprimir', 'Comanda.Senha');
-            if (($senha_balcao && $pedido->getTipo() == Pedido::TIPO_AVULSO) ||
-               ($comanda_senha && $pedido->getTipo() == Pedido::TIPO_COMANDA)) {
-                $sync->printQueue($pedido->getID());
-            }
-        }
-        if ($added > 0) {
-            $sync->updateOrder($pedido->getID(), $pedido->getTipo(), $pedido->getMesaID(), $pedido->getComandaID(), Synchronizer::ACTION_ADDED);
-            $sync->printServices($pedido->getID());
-        }
-    }
-    \DB::Commit();
+    $order->loadData($_POST);
+    $order->search();
+    $action = $order->process($synchronize);
 } catch (\Exception $e) {
-    \DB::RollBack();
     json($e->getMessage());
 }
-json(['status' => 'ok', 'action' => $action]);
+json('action', $action);

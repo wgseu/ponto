@@ -26,12 +26,11 @@ require_once(dirname(dirname(__DIR__)) . '/app.php');
 
 use MZ\Product\Composicao;
 use MZ\Product\Produto;
-use MZ\Product\Unidade;
 
 $produto_id = isset($_GET['produto']) ? $_GET['produto'] : null;
 $produto = Produto::findByID($produto_id);
 if (!$produto->exists()) {
-    json('O produto não informado ou não existe');
+    json('O produto não foi informado ou não existe');
 }
 $limite = isset($_GET['limite']) ? intval($_GET['limite']) : null;
 if (!is_null($limite) && $limite < 1) {
@@ -66,7 +65,7 @@ foreach ($composicoes as $composicao) {
     $produto = $composicao->findProdutoID();
     $unidade = $produto->findUnidadeID();
     $item = $composicao->publish();
-    $item['imagemurl'] = $produto->makeImagem();
+    $item['imagemurl'] = $produto->makeImagem(false, null);
     $item['produtodescricao'] = $produto->getDescricao();
     $item['produtoabreviacao'] = $produto->getAbreviacao();
     $item['produtoconteudo'] = $produto->getConteudo();

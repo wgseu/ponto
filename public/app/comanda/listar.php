@@ -48,24 +48,19 @@ if (isset($_GET['ordenar']) && $_GET['ordenar'] == 'comanda') {
 $comandas = Comanda::rawFindAll($condition, $order);
 $items = [];
 $obs_name = is_boolean_config('Vendas', 'Comanda.Observacao');
-foreach ($comandas as $_comanda) {
-    switch ($_comanda['estado']) {
-        case Pedido::ESTADO_ATIVO:
-            $_comanda['estado'] = 'ocupado';
-            break;
-        case Pedido::ESTADO_AGENDADO:
-            $_comanda['estado'] = 'reservado';
-            break;
-        default:
-            if (is_null($_comanda['estado'])) {
-                $_comanda['estado'] = 'livre';
-            } else {
-                $_comanda['estado'] = strtolower($_comanda['estado']);
-            }
+foreach ($comandas as $item) {
+    if ($item['estado'] == Pedido::ESTADO_ATIVO) {
+        $item['estado'] = 'ocupado';
+    } elseif ($item['estado'] == Pedido::ESTADO_AGENDADO) {
+        $item['estado'] = 'reservado';
+    } elseif (is_null($item['estado'])) {
+        $item['estado'] = 'livre';
+    } else {
+        $item['estado'] = strtolower($item['estado']);
     }
-    if ($obs_name && trim($_comanda['observacao']) != '') {
-        $_comanda['nome'] = $_comanda['observacao'];
+    if ($obs_name && trim($item['observacao']) != '') {
+        $item['nome'] = $item['observacao'];
     }
-    $items[] = $_comanda;
+    $items[] = $item;
 }
 json('comandas', $items);

@@ -212,7 +212,7 @@ class Comanda extends \MZ\Database\Helper
         }
         $old_comanda = self::findByID($this->getID());
         if ($old_comanda->exists() && $old_comanda->isAtiva() && !$this->isAtiva()) {
-            $pedido = \Pedido::getPelaComandaID($old_comanda->getID());
+            $pedido = Pedido::findByComandaID($old_comanda->getID());
             if ($pedido->exists()) {
                 $errors['ativa'] = 'A comanda não pode ser desativada porque possui um pedido em aberto';
             }

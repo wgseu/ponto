@@ -26,29 +26,29 @@ require_once(dirname(dirname(__DIR__)) . '/app.php');
 
 use MZ\Product\Pacote;
 
-if (!isset($_GET['grupo']) || !is_numeric($_GET['grupo'])) {
-    json('Grupo não informado!');
+$grupo_id = isset($_GET['grupo']) ? intval($_GET['grupo']) : null;
+if (is_null($grupo_id)) {
+    json('Grupo não informado');
 }
-$limite = isset($_GET['limite'])?intval($_GET['limite']):null;
+$limite = isset($_GET['limite']) ? intval($_GET['limite']): null;
 if (!is_null($limite) && $limite < 1) {
     $limite = null;
 }
-$associacoes = isset($_POST['pacote'])?$_POST['pacote']:[];
-$pacotes = Pacote::rawFindAll(
-	[
-		'pc.grupoid' => intval($_GET['grupo']),
-		'pc.associacaoid' => $associacoes,
-		'pc.visivel' => 'Y',
-		'search' => strval($_GET['busca'])
-	],
-	['pc.id' => 1],
-	$limite
-);
-$response = ['status' => 'ok'];
-$_pacotes = [];
-foreach ($pacotes as $pacote) {
-    $pacote['imagemurl'] = get_image_url($pacote['imagemurl'], (is_null($pacote['produtoid'])?'propriedade':'produto'), null);
-    $_pacotes[] = $pacote;
+$busca = isset($_GET['busca']) ? strval($_GET['busca']) : null;
+$associacoes = isset($_POST['pacote']) ? $_POST['pacote']: [];
+$condition = [
+    'grupoid' => $grupo_id,
+    'visivel' => 'Y',
+    'search' => $busca
+];
+if (is_array($associacoes) && count($associacoes) > 0) {
+    $condition['associacaoid'] = $associacoes;
 }
-$response['pacotes'] = $_pacotes;
-json($response);
+$pacotes = Pacote::rawFindAll($condition, [], $limite);
+$items = [];
+foreach ($pacotes as $item) {
+    $folder = is_null($item['produtoid']) ? 'propriedade': 'produto';
+    $item['imagemurl'] = get_image_url($item['imagemurl'], $folder, null);
+    $items[] = $item;
+}
+json('pacotes', $items);

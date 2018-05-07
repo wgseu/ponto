@@ -1240,7 +1240,7 @@ Gerenciar.localizacao.initForm = function (focus_ctrl) {
   Gerenciar.cidade.autocomplete('#cidade', '#estadoid', false);
   $('#bairro').autocomplete({
     lookup: function (search, done) {
-      $.get('/app/bairro/', { nome: search, estadoid: $('#estadoid').val(), cidade: $('#cidade').val() },
+      $.get('/app/bairro/', { search: search, estadoid: $('#estadoid').val(), cidade: $('#cidade').val() },
         function (response) {
           var result = { suggestions: [] };
           if (response.status == 'ok') {

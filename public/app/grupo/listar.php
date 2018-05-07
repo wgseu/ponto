@@ -25,11 +25,12 @@
 require_once(dirname(dirname(__DIR__)) . '/app.php');
 
 use MZ\Product\Produto;
+use MZ\Product\Grupo;
 
 $produto_id = isset($_GET['produto']) ? $_GET['produto'] : null;
 $produto = Produto::findByID($produto_id);
 if (!$produto->exists()) {
-    json('Produto não informado!');
+    json('Produto não informado ou não existente');
 }
 $grupos = Grupo::rawFindAll(['produtoid' => $produto->getID()]);
 json('grupos', $grupos);

@@ -25,49 +25,39 @@
 require_once(dirname(dirname(__DIR__)) . '/app.php');
 
 use MZ\Account\Cliente;
-use MZ\Util\Mask;
+use MZ\Util\Filter;
 
 need_manager(true);
 
 $limit = intval(isset($_GET['limite'])?$_GET['limite']:5);
-if ((isset($_GET['primeiro'])?$_GET['primeiro']:false) ||
-    check_fone(isset($_GET['busca']) ? $_GET['busca'] : null, true)
-) {
+$primeiro = isset($_GET['primeiro']) ? $_GET['primeiro']: false;
+$busca = isset($_GET['busca']) ? $_GET['busca'] : null;
+if ($primeiro || check_fone($busca, true)) {
     $limit = 1;
 } elseif ($limit < 1) {
     $limit = 5;
 } elseif ($limit > 20) {
     $limit = 20;
 }
-$condition = [];
+$order = Filter::order(isset($_GET['ordem']) ? $_GET['ordem']: '');
+$condition = Filter::query($_GET);
+unset($condition['limite']);
+unset($condition['primeiro']);
+unset($condition['ordem']);
 if (isset($_GET['busca'])) {
     $condition['search'] = $_GET['busca'];
 }
-if (isset($_GET['tipo'])) {
-    $condition['tipo'] = $_GET['tipo'];
-}
-$clientes = Cliente::findAll($condition, [], $limit);
-$response = ['status' => 'ok'];
-$campos = [
-    'id',
-    'tipo',
-    'genero',
-    'nome',
-    'sobrenome',
-    'fone1',
-    'email',
-    'cpf',
-    'imagemurl',
-];
-$_clientes = [];
+$clientes = Cliente::findAll($condition, $order, $limit);
+$items = [];
 $domask = intval(isset($_GET['formatar']) ? $_GET['formatar'] : 0) != 0;
 foreach ($clientes as $cliente) {
-    $_cliente = $cliente->publish();
-    if ($domask) {
-        $_cliente['fone1'] = Mask::phone($cliente->getFone(1));
+    $item = $cliente->publish();
+    if (!$domask) {
+        $item['fone1'] = $cliente->getFone(1);
+        $item['fone2'] = $cliente->getFone(2);
+        $item['cpf'] = $cliente->getCPF();
     }
-    $_cliente['imagemurl'] = $_cliente['imagem'];
-    $_clientes[] = array_intersect_key($_cliente, array_flip($campos));
+    $item['imagemurl'] = $item['imagem'];
+    $items[] = $item;
 }
-$response['clientes'] = $_clientes;
-json($response);
+json('clientes', $items);

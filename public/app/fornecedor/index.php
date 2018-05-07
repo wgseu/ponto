@@ -24,11 +24,14 @@
  */
 require_once(dirname(dirname(__DIR__)) . '/app.php');
 
+use MZ\Stock\Fornecedor;
+
 need_manager(true);
 
 $limite = isset($_GET['limite']) ? intval($_GET['limite']) : 5;
 $primeiro = isset($_GET['primeiro']) ? $_GET['primeiro'] : null;
-if ($primeiro || check_fone($_GET['busca'], true)) {
+$search = isset($_GET['busca']) ? $_GET['busca'] : null;
+if ($primeiro || check_fone($search, true)) {
     $limite = 1;
 } elseif ($limite < 1) {
     $limite = 5;
@@ -37,33 +40,24 @@ if ($primeiro || check_fone($_GET['busca'], true)) {
 }
 $condition = [];
 if (isset($_GET['busca'])) {
-    $condition['search'] = $_GET['busca'];
+    $condition['search'] = $search;
 }
 $fornecedores = Fornecedor::findAll($condition, [], $limite);
-$response = ['status' => 'ok'];
-$campos = [
-            'id',
-            'nome',
-            'fone1',
-            'cnpj',
-            'email',
-            'prazopagamento',
-            'imagemurl',
-        ];
-$_fornecedores = [];
-$domask = intval($_GET['format']) != 0;
+$items = [];
+$domask = isset($_GET['format']) ? intval($_GET['format']) != 0: false;
 foreach ($fornecedores as $fornecedor) {
-    $_fornecedor = $fornecedor->publish();
     $cliente = $fornecedor->findEmpresaID();
-    $_fornecedor['nome'] = $cliente->getNome();
-    $_fornecedor['fone1'] = $cliente->getFone(1);
-    $_fornecedor['cnpj'] = $cliente->getCPF();
-    $_fornecedor['email'] = $cliente->getEmail();
+    $cliente_item = $cliente->publish();
+    $item = $fornecedor->publish();
+    $item['nome'] = $cliente->getNome();
+    $item['fone1'] = $cliente->getFone(1);
+    $item['cnpj'] = $cliente->getCPF();
     if ($domask) {
-        $_fornecedor['fone1'] = \MZ\Util\Mask::phone($_fornecedor['fone1']);
+        $item['fone1'] = $cliente_item['fone1'];
+        $item['cnpj'] = $cliente_item['cpf'];
     }
-    $_fornecedor['imagemurl'] = get_image_url($cliente->getImagem(), 'cliente', null);
-    $_fornecedores[] = array_intersect_key($_fornecedor, array_flip($campos));
+    $item['email'] = $cliente->getEmail();
+    $item['imagemurl'] = $cliente_item['imagem'];
+    $items[] = $item;
 }
-$response['items'] = $_fornecedores;
-json($response);
+json('items', $items);

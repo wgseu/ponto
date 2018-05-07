@@ -26,6 +26,8 @@ namespace MZ\Environment;
 
 use MZ\Util\Filter;
 use MZ\Util\Validator;
+use MZ\Sale\Pedido;
+use MZ\Sale\Juncao;
 
 /**
  * Mesas para lançamento de pedidos
@@ -212,7 +214,7 @@ class Mesa extends \MZ\Database\Helper
         }
         $old_mesa = self::findByID($this->getID());
         if ($old_mesa->exists() && $old_mesa->isAtiva() && !$this->isAtiva()) {
-            $pedido = \Pedido::getPelaMesaID($old_mesa->getID());
+            $pedido = Pedido::findByMesaID($old_mesa->getID());
             if ($pedido->exists()) {
                 $errors['ativa'] = 'A mesa não pode ser desativada porque possui um pedido em aberto';
             }
@@ -375,13 +377,12 @@ class Mesa extends \MZ\Database\Helper
         if (isset($condition['search'])) {
             $search = $condition['search'];
             if (Validator::checkDigits($search)) {
-                $condition['m.id'] = Filter::number($search);
+                $condition['id'] = Filter::number($search);
             } else {
                 $field = 'm.nome LIKE ?';
                 $condition[$field] = '%'.$search.'%';
                 $allowed[$field] = true;
             }
-            unset($condition['search']);
         }
         return Filter::keys($condition, $allowed, 'm.');
     }
@@ -394,24 +395,25 @@ class Mesa extends \MZ\Database\Helper
      */
     private static function query($condition = [], $order = [])
     {
-        $query = self::getDB()->from('Mesas m');
         $order = Filter::order($order);
+        $query = self::getDB()->from('Mesas m');
         if (isset($condition['pedidos'])) {
-            $query = $query->select('(CASE WHEN ISNULL(p.id) THEN "livre" WHEN p.estado = "Fechado" THEN "fechado" WHEN p.estado = "Agendado" THEN "reservado" ELSE "ocupado" END) as estado')
-                ->select('pj.mesaid as juntaid')
-                ->select('mj.nome as juntanome')
-                ->leftJoin('Pedidos p ON p.mesaid = m.id AND p.tipo = "Mesa" AND p.cancelado = "N" AND p.estado <> "Finalizado"')
-                ->leftJoin('Produtos_Pedidos pp ON pp.pedidoid = p.id')
-                ->leftJoin('Juncoes j ON j.mesaid = m.id AND j.estado = "Associado"')
-                ->leftJoin('Pedidos pj ON pj.id = j.pedidoid')
-                ->leftJoin('Mesas mj ON mj.id = pj.mesaid')
+            $query = $query->select('p.estado')
+                ->select('e.mesaid as juntaid')
+                ->select('s.nome as juntanome')
+                ->leftJoin(
+                    'Pedidos p ON p.mesaid = m.id AND p.tipo = ? AND p.cancelado = ? AND p.estado <> ?',
+                    Pedido::TIPO_COMANDA,
+                    'N',
+                    Pedido::ESTADO_FINALIZADO
+                )
+                ->leftJoin('Juncoes j ON j.mesaid = m.id AND j.estado = ?', Juncao::ESTADO_ASSOCIADO)
+                ->leftJoin('Pedidos e ON e.id = j.pedidoid')
+                ->leftJoin('Mesas s ON s.id = e.mesaid')
                 ->groupBy('m.id');
-            if (isset($order['atendente'])) {
-                global $app;
-                $query = $query->orderBy(
-                    'IF(p.funcionarioid = ?, 1, 0) DESC',
-                    intval($app->getAuthentication()->getEmployee()->getID())
-                );
+            if (isset($order['funcionario'])) {
+                $funcionario_id = intval($order['funcionario']);
+                $query = $query->orderBy('IF(p.funcionarioid = ?, 1, 0) DESC', $funcionario_id);
             }
         }
         $condition = self::filterCondition($condition);

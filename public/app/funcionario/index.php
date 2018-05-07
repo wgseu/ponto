@@ -26,7 +26,6 @@ require_once(dirname(dirname(__DIR__)) . '/app.php');
 
 use MZ\Employee\Funcionario;
 use MZ\Util\Filter;
-use MZ\Util\Mask;
 
 need_manager(true);
 
@@ -41,7 +40,6 @@ if (check_fone($search, true)) {
 }
 $condition = Filter::query($_GET);
 $funcionarios = Funcionario::findAll($condition, [], $limit);
-$response = ['status' => 'ok'];
 $campos = [
     'id',
     'nome',
@@ -53,16 +51,16 @@ $campos = [
 ];
 $items = [];
 foreach ($funcionarios as $funcionario) {
-    $item = $funcionario->publish();
     $funcao = $funcionario->findFuncaoID();
     $cliente = $funcionario->findClienteID();
+    $cliente_item = $cliente->publish();
+    $item = $funcionario->publish();
     $item['nome'] = $cliente->getNomeCompleto();
-    $item['fone1'] = Mask::phone($cliente->getFone(1));
-    $item['cpf'] = Mask::cpf($cliente->getCPF());
+    $item['fone1'] = $cliente_item['fone1'];
+    $item['cpf'] = $cliente_item['cpf'];
     $item['email'] = $cliente->getEmail();
     $item['funcao'] = $funcao->getDescricao();
-    $item['imagemurl'] = get_image_url($cliente->getImagem(), 'cliente', null);
+    $item['imagemurl'] = $cliente_item['imagem'];
     $items[] = array_intersect_key($item, array_flip($campos));
 }
-$response['items'] = $items;
-json($response);
+json('items', $items);

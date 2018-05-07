@@ -635,27 +635,25 @@ class Pacote extends \MZ\Database\Helper
     }
 
     /**
+     * Get allowed keys array
+     * @return array allowed keys array
+     */
+    private static function getAllowedKeys()
+    {
+        $pacote = new Pacote();
+        $allowed = Filter::concatKeys('p.', $pacote->toArray());
+        return $allowed;
+    }
+
+    /**
      * Filter order array
      * @param  mixed $order order string or array to parse and filter allowed
      * @return array allowed associative order
      */
     private static function filterOrder($order)
     {
-        $pacote = new Pacote();
-        $allowed = $pacote->toArray();
-        return Filter::orderBy($order, $allowed);
-    }
-
-    /**
-     * Fetch data from database with a condition
-     * @param  array $condition condition to filter rows
-     * @return SelectQuery query object with condition statement
-     */
-    private static function filterOrderEx($order)
-    {
-        $pacote = new Pacote();
-        $allowed = Filter::concatKeys('pc.', $pacote->toArray());
-        return Filter::orderBy($order, $allowed);
+        $allowed = self::getAllowedKeys();
+        return Filter::orderBy($order, $allowed, 'p.');
     }
 
     /**
@@ -665,21 +663,8 @@ class Pacote extends \MZ\Database\Helper
      */
     private static function filterCondition($condition)
     {
-        $pacote = new Pacote();
-        $allowed = $pacote->toArray();
-        return Filter::keys($condition, $allowed);
-    }
-
-    /**
-     * Filter condition array with allowed fields
-     * @param  array $condition condition to filter rows
-     * @return array allowed condition
-     */
-    private static function filterConditionEx($condition)
-    {
-        $pacote = new Pacote();
-        $allowed = Filter::concatKeys('pc.', $pacote->toArray());
-        return Filter::keys($condition, $allowed);
+        $allowed = self::getAllowedKeys();
+        return Filter::keys($condition, $allowed, 'p.');
     }
 
     /**
@@ -690,9 +675,10 @@ class Pacote extends \MZ\Database\Helper
      */
     private static function query($condition = [], $order = [])
     {
-        $query = self::getDB()->from('Pacotes');
+        $query = self::getDB()->from('Pacotes p');
         $condition = self::filterCondition($condition);
         $query = self::buildOrderBy($query, self::filterOrder($order));
+        $query = $query->orderBy('p.id ASC');
         return self::buildCondition($query, $condition);
     }
 
@@ -703,48 +689,46 @@ class Pacote extends \MZ\Database\Helper
      */
     private static function queryEx($condition = [], $order = [])
     {
-        $query = self::getDB()->from('Pacotes pc')
-            ->leftJoin('Produtos p ON p.id = pc.produtoid')
-            ->leftJoin('Propriedades pr ON pr.id = pc.propriedadeid')
-            ->leftJoin('Pacotes pca ON pca.id = pc.associacaoid')
-            ->leftJoin('Unidades u ON u.id = p.unidadeid')
-            ->leftJoin('Promocoes prm ON prm.produtoid = p.id AND NOW() BETWEEN DATE_ADD(CURDATE(), INTERVAL prm.inicio - DAYOFWEEK(CURDATE()) * 1440 MINUTE) AND DATE_ADD(CURDATE(), INTERVAL prm.fim - DAYOFWEEK(CURDATE()) * 1440 MINUTE)')
-            ->select('pca.grupoid as associacaogrupoid')
-            ->select('COALESCE(p.precovenda + COALESCE(prm.valor, 0), 0) as precobase')
-            ->select('COALESCE(p.descricao, pr.nome) as descricao')
-            ->select('COALESCE(p.abreviacao, pr.abreviacao) as abreviacao')
-            ->select('p.detalhes')
-            ->select('p.tipo as produtotipo')
-            ->select('p.conteudo as produtoconteudo')
+        $week_offset = (1 + date('w')) * 1440 + (int)((time() - strtotime('00:00')) / 60);
+        $query = self::getDB()->from('Pacotes p')
+            ->leftJoin('Produtos d ON d.id = p.produtoid')
+            ->leftJoin('Propriedades r ON r.id = p.propriedadeid')
+            ->leftJoin('Pacotes a ON a.id = p.associacaoid')
+            ->leftJoin('Unidades u ON u.id = d.unidadeid')
+            ->leftJoin(
+                'Promocoes m ON m.produtoid = d.id AND ' .
+                '? BETWEEN m.inicio AND m.fim',
+                $week_offset
+            )
+            ->select('a.grupoid as associacaogrupoid')
+            ->select('COALESCE(d.precovenda + COALESCE(m.valor, 0), 0) as precobase')
+            ->select('COALESCE(d.descricao, r.nome) as descricao')
+            ->select('COALESCE(d.abreviacao, r.abreviacao) as abreviacao')
+            ->select('d.detalhes')
+            ->select('d.tipo as produtotipo')
+            ->select('d.conteudo as produtoconteudo')
             ->select('u.sigla as unidadesigla')
             ->select(
-                '(CASE WHEN p.imagem IS NULL AND pr.imagem IS NULL THEN NULL ELSE '.
-                self::concat(['COALESCE(pr.id, p.id)', '".png"']).
+                '(CASE WHEN d.imagem IS NULL AND r.imagem IS NULL THEN NULL ELSE '.
+                self::concat(['COALESCE(r.id, d.id)', '".png"']).
                 ' END) as imagemurl'
             )
-            ->select('COALESCE(pr.dataatualizacao, p.dataatualizacao) as dataatualizacao');
+            ->select('COALESCE(r.dataatualizacao, d.dataatualizacao) as dataatualizacao');
         if (isset($condition['search'])) {
             $busca = $condition['search'];
             $query = self::buildSearch(
                 $busca,
                 self::concat([
-                    'COALESCE(p.abreviacao, pr.abreviacao, "")',
+                    'COALESCE(d.abreviacao, r.abreviacao, "")',
                     '" "',
-                    'COALESCE(p.descricao, pr.nome)'
+                    'COALESCE(d.descricao, r.nome)'
                 ]),
                 $query
             );
-            unset($condition['search']);
         }
-        $condition = self::filterConditionEx($condition);
-        if (
-            isset($condition['pc.associacaoid']) &&
-            is_array($condition['pc.associacaoid']) &&
-            count($condition['pc.associacaoid']) == 0
-        ) {
-            unset($condition['pc.associacaoid']);
-        }
-        $query = self::buildOrderBy($query, self::filterOrderEx($order));
+        $condition = self::filterCondition($condition);
+        $query = self::buildOrderBy($query, self::filterOrder($order));
+        $query = $query->orderBy('p.id ASC');
         return self::buildCondition($query, $condition);
     }
 
@@ -757,10 +741,7 @@ class Pacote extends \MZ\Database\Helper
     public static function find($condition, $order = [])
     {
         $query = self::query($condition, $order)->limit(1);
-        $row = $query->fetch();
-        if ($row === false) {
-            $row = [];
-        }
+        $row = $query->fetch() ?: [];
         return new Pacote($row);
     }
 

@@ -25,7 +25,6 @@
 require_once(dirname(dirname(__DIR__)) . '/app.php');
 
 use MZ\System\Sistema;
-use MZ\Employee\Acesso;
 use MZ\Device\Dispositivo;
 
 $company = $app->getSystem()->getCompany();
@@ -34,7 +33,7 @@ $status['status'] = 'ok';
 $status['info'] = [
     'empresa' => [
         'nome' => $company->getNome(),
-        'imagemurl' => get_image_url($company->getImagem(), 'cliente', null)
+        'imagemurl' => $company->makeImagem(false, null)
     ]
 ];
 $status['versao'] = Sistema::VERSAO;

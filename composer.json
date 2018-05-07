@@ -17,12 +17,12 @@
         "vendor-dir": "public/include/vendor"
     },
     "require": {
-        "php": ">=5.3.0",
+        "php": ">= 5.6.0",
         "fpdo/fluentpdo": "1.1.1",
-        "sybio/image-workshop": "@stable",
+        "sybio/image-workshop": "^2.1.0",
         "phpmailer/phpmailer": "~5.2",
-        "mazinsw/nfe-api": "@stable",
-        "phpoffice/phpexcel": "@stable",
+        "mazinsw/nfe-api": "^1.0",
+        "phpoffice/phpexcel": "^1.8",
         "setasign/fpdf": "1.8.1",
         "php-curl-class/php-curl-class": "^8.0",
         "vlucas/phpdotenv": "^2.4",
@@ -31,11 +31,11 @@
     "require-dev": {
         "phpunit/phpunit": "^4.8|^5.0",
         "squizlabs/php_codesniffer": ">=2.8",
-        "pdepend/pdepend" : "@stable",
-        "phpmd/phpmd" : "@stable",
-        "sebastian/phpcpd": "*",
-        "phpdocumentor/phpdocumentor": ">=2.9",
-        "phploc/phploc": "*"
+        "pdepend/pdepend" : "^2.5",
+        "phpmd/phpmd" : "^2.6",
+        "sebastian/phpcpd": "^3.0",
+        "phpdocumentor/phpdocumentor": "^2.9",
+        "phploc/phploc": "^4.0"
     },
     "autoload": {
         "classmap": [

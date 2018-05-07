@@ -25,18 +25,19 @@
 require_once(dirname(dirname(__DIR__)) . '/app.php');
 
 use MZ\Location\Cidade;
+use MZ\Util\Filter;
 
-$limite = isset($_GET['limite'])?intval($_GET['limite']):10;
+$limite = isset($_GET['limite']) ? intval($_GET['limite']) : 10;
 if ($limite > 100 || $limite < 1) {
-	$limite = 10;
+    $limite = 10;
 }
-$condition = \MZ\Util\Filter::query($_GET);
+$order = Filter::order(isset($_GET['ordem']) ? $_GET['ordem']: '');
+$condition = Filter::query($_GET);
 unset($condition['ordem']);
-$order = \MZ\Util\Filter::order(isset($_GET['ordem'])?$_GET['ordem']:'');
 $cidades = Cidade::findAll($condition, $order, $limite);
 
 $items = [];
 foreach ($cidades as $cidade) {
     $items[] = $cidade->publish();
 }
-json(['status' => 'ok', 'items' => $items]);
+json('items', $items);

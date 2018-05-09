@@ -1173,12 +1173,12 @@ class ProdutoPedido extends \MZ\Database\Helper
         }
         if (isset($condition['apartir_datahora'])) {
             $field = 'p.datahora >= ?';
-            $condition[$field] = $condition['apartir_datahora'];
+            $condition[$field] = Filter::datetime($condition['apartir_datahora']);
             $allowed[$field] = true;
         }
         if (isset($condition['ate_datahora'])) {
             $field = 'c.datahora <= ?';
-            $condition[$field] = $condition['ate_datahora'];
+            $condition[$field] = Filter::datetime($condition['ate_datahora'], '23:59:59');
             $allowed[$field] = true;
         }
         if (isset($condition['search'])) {

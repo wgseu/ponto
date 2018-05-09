@@ -25,6 +25,7 @@
 require_once(dirname(__DIR__) . '/app.php');
 
 use MZ\Employee\Funcionario;
+use MZ\Employee\Funcao;
 use MZ\System\Permissao;
 
 need_manager();

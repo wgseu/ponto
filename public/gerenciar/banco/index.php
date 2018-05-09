@@ -40,7 +40,7 @@ $banco = new Banco($condition);
 $order = Filter::order(isset($_GET['ordem']) ? $_GET['ordem'] : '');
 $count = Banco::count($condition);
 list($pagesize, $offset, $pagestring) = pagestring($count, $limite);
-$bancos = Banco::findAll($condition, [], $pagesize, $offset);
+$bancos = Banco::findAll($condition, $order, $pagesize, $offset);
 
 if (is_output('json')) {
     $items = [];

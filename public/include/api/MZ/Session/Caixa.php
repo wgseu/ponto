@@ -224,7 +224,7 @@ class Caixa extends \MZ\Database\Helper
             $this->setNumeroInicial($caixa['numeroinicial']);
         }
         if (!isset($caixa['ativo'])) {
-            $this->setAtivo('Y');
+            $this->setAtivo('N');
         } else {
             $this->setAtivo($caixa['ativo']);
         }

@@ -13,17 +13,17 @@
 	</div>
 </div>
 <!--${$_empresa = $patrimonio->findEmpresaID()}-->
-<input type="hidden" id="empresaid" name="empresaid" data-nome="{$_empresa->getNome()}" value="{$patrimonio->getEmpresaID()}">
+<input type="hidden" id="empresaid_ref" name="empresaid" data-nome="{$_empresa->getNome()}" value="{$patrimonio->getEmpresaID()}">
 <div class="form-group col-lg-3 col-md-6 col-sm-6 col-xs-12">
-	<label for="empresa">Empresa: <span class="identifier">${\MZ\Util\Mask::phone($_empresa->getFone(1))}<span></label>
-	<input type="text" id="empresa" class="form-control" value="{$_empresa->getNome()}">
+	<label for="empresaid">Empresa: <span class="identifier">${\MZ\Util\Mask::phone($_empresa->getFone(1))}<span></label>
+	<input type="text" id="empresaid" class="form-control" value="{$_empresa->getNome()}">
 </div>
 <!--${$_fornecedor = $patrimonio->findFornecedorID()}-->
 <!--${$_fornecedor = $_fornecedor->findEmpresaID()}-->
-<input type="hidden" id="fornecedorid" name="fornecedorid" data-nome="{$_fornecedor->getNome()}" value="{$patrimonio->getFornecedorID()}">
+<input type="hidden" id="fornecedorid_ref" name="fornecedorid" data-nome="{$_fornecedor->getNome()}" value="{$patrimonio->getFornecedorID()}">
 <div class="form-group col-lg-3 col-md-6 col-sm-6 col-xs-12">
-	<label for="fornecedor">Fornecedor: <span class="identifier">${\MZ\Util\Mask::phone($_fornecedor->getFone(1))}<span></label>
-	<input type="text" id="fornecedor" class="form-control" value="{$_fornecedor->getNome()}">
+	<label for="fornecedorid">Fornecedor: <span class="identifier">${\MZ\Util\Mask::phone($_fornecedor->getFone(1))}<span></label>
+	<input type="text" id="fornecedorid" class="form-control" value="{$_fornecedor->getNome()}">
 </div>
 <div class="form-group col-lg-4 col-md-6 col-sm-6 col-xs-12">
 	<label for="descricao">Descrição:</label>

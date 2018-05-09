@@ -53,8 +53,6 @@ if (is_output('json')) {
     json(['status' => 'ok', 'items' => $items]);
 }
 
-$_modulo_names = Pedido::getTipoOptions();
-
 $_estado_names = ['Valido' => 'Válido'] +
     ProdutoPedido::getEstadoOptions() +
     ['Cancelado' => 'Cancelado'];

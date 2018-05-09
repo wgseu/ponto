@@ -352,6 +352,53 @@ class Integracao extends \MZ\Database\Helper
     }
 
     /**
+     * Get relative ícone path or default ícone
+     * @param boolean $default If true return default image, otherwise check field
+     * @return string relative web path for integração ícone
+     */
+    public function makeIconeURL($default = false)
+    {
+        $icone_url = $this->getIconeURL();
+        if ($default) {
+            $icone_url = null;
+        }
+        return get_image_url($icone_url, 'integracao', 'integracao.png');
+    }
+
+    /**
+     * Get relative data filename path or default data filename
+     * @param boolean $default If true return default data filename, otherwise check field
+     * @return string relative web path for integração data filename
+     */
+    public function makeDataURL($default = false)
+    {
+        $data_url = $this->getAcessoURL() . '.json';
+        if ($default) {
+            $data_url = null;
+        }
+        return get_document_url($data_url, 'integracao', $this->getAcessoURL() . '.json');
+    }
+
+    public function getTask()
+    {
+        switch ($this->getAcessoURL()) {
+            case IFood::NAME:
+                $ifood = new IFood();
+                $ifood->setData($this);
+                return $ifood;
+            case Kromax::NAME:
+                $kromax = new Kromax();
+                $kromax->setData($this);
+                return $kromax;
+            default:
+                throw new \Exception(
+                    sprintf('Integração com "%s" não implementada', $this->getNome()),
+                    404
+                );
+        }
+    }
+
+    /**
      * Convert this instance into array associated key -> value with only public fields
      * @return array All public field and values into array format
      */
@@ -442,184 +489,6 @@ class Integracao extends \MZ\Database\Helper
     }
 
     /**
-     * Get relative ícone path or default ícone
-     * @param boolean $default If true return default image, otherwise check field
-     * @return string relative web path for integração ícone
-     */
-    public function makeIconeURL($default = false)
-    {
-        $icone_url = $this->getIconeURL();
-        if ($default) {
-            $icone_url = null;
-        }
-        return get_image_url($icone_url, 'integracao', 'integracao.png');
-    }
-
-    /**
-     * Get relative data filename path or default data filename
-     * @param boolean $default If true return default data filename, otherwise check field
-     * @return string relative web path for integração data filename
-     */
-    public function makeDataURL($default = false)
-    {
-        $data_url = $this->getAcessoURL() . '.json';
-        if ($default) {
-            $data_url = null;
-        }
-        return get_document_url($data_url, 'integracao', $this->getAcessoURL() . '.json');
-    }
-
-    /**
-     * Decodifica os dados e retorna o array
-     * @return array array contendo as integrações
-     */
-    public function read()
-    {
-        global $app;
-
-        $filename = $app->getPath('public') . $this->makeDataURL();
-        if (!file_exists($filename)) {
-            return [];
-        }
-        return json_decode(file_get_contents($filename), true);
-    }
-
-    /**
-     * Codifica os dados e salvar no arquivo
-     * @return Integracao Self instance
-     */
-    public function write($data)
-    {
-        global $app;
-
-        $filename = $app->getPath('public') . $this->makeDataURL();
-        xmkdir(dirname($filename), 0711);
-        if (file_put_contents($filename, json_encode($data)) === false) {
-            throw new \Exception(
-                sprintf(
-                    'Falha ao escrever o arquivo "%s" com os dados da integração',
-                    $filename
-                ),
-                500
-            );
-        }
-        xchmod($filename, 0644);
-    }
-
-    public function getTask()
-    {
-        switch ($this->getAcessoURL()) {
-            case IFood::NAME:
-                $ifood = new IFood();
-                $ifood->setData($this);
-                return $ifood;
-            case Kromax::NAME:
-                $kromax = new Kromax();
-                $kromax->setData($this);
-                return $kromax;
-            default:
-                throw new \Exception(
-                    sprintf('Integração com "%s" não implementada', $this->getNome()),
-                    404
-                );
-        }
-    }
-
-    /**
-     * Find this object on database using, ID
-     * @param  int $id id to find Integração
-     * @return Integracao A filled instance or empty when not found
-     */
-    public static function findByID($id)
-    {
-        return self::find([
-            'id' => intval($id),
-        ]);
-    }
-
-    /**
-     * Find this object on database using, Nome
-     * @param  string $nome nome to find Integração
-     * @return Integracao A filled instance or empty when not found
-     */
-    public static function findByNome($nome)
-    {
-        return self::find([
-            'nome' => strval($nome),
-        ]);
-    }
-
-    /**
-     * Find this object on database using, AcessoURL
-     * @param  string $acesso_url url to find Integração
-     * @return Integracao A filled instance or empty when not found
-     */
-    public static function findByAcessoURL($acesso_url)
-    {
-        return self::find([
-            'acessourl' => strval($acesso_url),
-        ]);
-    }
-
-    /**
-     * Fetch data from database with a condition
-     * @param  array $condition condition to filter rows
-     * @return SelectQuery query object with condition statement
-     */
-    private static function query($condition = [], $order = [])
-    {
-        $query = self::getDB()->from('Integracoes');
-        if (isset($condition['search'])) {
-            $query = self::buildSearch(
-                $condition['search'],
-                self::concat(['nome', '" "', 'descricao']),
-                $query
-            );
-            unset($condition['search']);
-        }
-        return self::buildCondition($query, $condition);
-    }
-
-    /**
-     * Search one register with a condition
-     * @param  array $condition Condition for searching the row
-     * @return Integracao A filled Integração or empty instance
-     */
-    public static function find($condition)
-    {
-        $query = self::query($condition)->limit(1);
-        $row = $query->fetch();
-        if ($row === false) {
-            $row = [];
-        }
-        return new Integracao($row);
-    }
-
-    /**
-     * Fetch all rows from database with matched condition critery
-     * @param  array $condition condition to filter rows
-     * @param  integer $limit number of rows to get, null for all
-     * @param  integer $offset start index to get rows, null for begining
-     * @return array All rows instanced and filled
-     */
-    public static function findAll($condition = [], $order = [], $limit = null, $offset = null)
-    {
-        $query = self::query($condition, $order);
-        if (!is_null($limit)) {
-            $query = $query->limit($limit);
-        }
-        if (!is_null($offset)) {
-            $query = $query->offset($offset);
-        }
-        $rows = $query->fetchAll();
-        $result = [];
-        foreach ($rows as $row) {
-            $result[] = new Integracao($row);
-        }
-        return $result;
-    }
-
-    /**
      * Insert a new Integração into the database and fill instance from database
      * @return Integracao Self instance
      */
@@ -680,6 +549,43 @@ class Integracao extends \MZ\Database\Helper
     }
 
     /**
+     * Decodifica os dados e retorna o array
+     * @return array array contendo as integrações
+     */
+    public function read()
+    {
+        global $app;
+
+        $filename = $app->getPath('public') . $this->makeDataURL();
+        if (!file_exists($filename)) {
+            return [];
+        }
+        return json_decode(file_get_contents($filename), true);
+    }
+
+    /**
+     * Codifica os dados e salvar no arquivo
+     * @return Integracao Self instance
+     */
+    public function write($data)
+    {
+        global $app;
+
+        $filename = $app->getPath('public') . $this->makeDataURL();
+        xmkdir(dirname($filename), 0711);
+        if (file_put_contents($filename, json_encode($data)) === false) {
+            throw new \Exception(
+                sprintf(
+                    'Falha ao escrever o arquivo "%s" com os dados da integração',
+                    $filename
+                ),
+                500
+            );
+        }
+        xchmod($filename, 0644);
+    }
+
+    /**
      * Load one register for it self with a condition
      * @param  array $condition Condition for searching the row
      * @param  array $order associative field name -> [-1, 1]
@@ -714,6 +620,135 @@ class Integracao extends \MZ\Database\Helper
         return $this->load([
             'acessourl' => strval($acesso_url),
         ]);
+    }
+
+    /**
+     * Get allowed keys array
+     * @return array allowed keys array
+     */
+    private static function getAllowedKeys()
+    {
+        $integracao = new Integracao();
+        $allowed = Filter::concatKeys('i.', $integracao->toArray());
+        return $allowed;
+    }
+
+    /**
+     * Filter order array
+     * @param  mixed $order order string or array to parse and filter allowed
+     * @return array allowed associative order
+     */
+    private static function filterOrder($order)
+    {
+        $allowed = self::getAllowedKeys();
+        return Filter::orderBy($order, $allowed, 'i.');
+    }
+
+    /**
+     * Filter condition array with allowed fields
+     * @param  array $condition condition to filter rows
+     * @return array allowed condition
+     */
+    private static function filterCondition($condition)
+    {
+        $allowed = self::getAllowedKeys();
+        if (isset($condition['search'])) {
+            $search = $condition['search'];
+            $field = '(i.nome LIKE ? OR i.descricao LIKE ?)';
+            $condition[$field] = ['%'.$search.'%', '%'.$search.'%'];
+            $allowed[$field] = true;
+            unset($condition['search']);
+        }
+        return Filter::keys($condition, $allowed, 'i.');
+    }
+
+    /**
+     * Fetch data from database with a condition
+     * @param  array $condition condition to filter rows
+     * @param  array $order order rows
+     * @return SelectQuery query object with condition statement
+     */
+    private static function query($condition = [], $order = [])
+    {
+        $query = self::getDB()->from('Integracoes i');
+        $condition = self::filterCondition($condition);
+        $query = self::buildOrderBy($query, self::filterOrder($order));
+        $query = $query->orderBy('i.nome ASC');
+        $query = $query->orderBy('i.id ASC');
+        return self::buildCondition($query, $condition);
+    }
+
+    /**
+     * Search one register with a condition
+     * @param  array $condition Condition for searching the row
+     * @param  array $order order rows
+     * @return Integracao A filled Integração or empty instance
+     */
+    public static function find($condition, $order = [])
+    {
+        $query = self::query($condition, $order)->limit(1);
+        $row = $query->fetch() ?: [];
+        return new Integracao($row);
+    }
+
+    /**
+     * Find this object on database using, ID
+     * @param  int $id id to find Integração
+     * @return Integracao A filled instance or empty when not found
+     */
+    public static function findByID($id)
+    {
+        return self::find([
+            'id' => intval($id),
+        ]);
+    }
+
+    /**
+     * Find this object on database using, Nome
+     * @param  string $nome nome to find Integração
+     * @return Integracao A filled instance or empty when not found
+     */
+    public static function findByNome($nome)
+    {
+        return self::find([
+            'nome' => strval($nome),
+        ]);
+    }
+
+    /**
+     * Find this object on database using, AcessoURL
+     * @param  string $acesso_url url to find Integração
+     * @return Integracao A filled instance or empty when not found
+     */
+    public static function findByAcessoURL($acesso_url)
+    {
+        return self::find([
+            'acessourl' => strval($acesso_url),
+        ]);
+    }
+
+    /**
+     * Fetch all rows from database with matched condition critery
+     * @param  array $condition condition to filter rows
+     * @param  integer $limit number of rows to get, null for all
+     * @param  integer $offset start index to get rows, null for begining
+     * @return array All rows instanced and filled
+     */
+    public static function findAll($condition = [], $order = [], $limit = null, $offset = null)
+    {
+        $query = self::query($condition, $order);
+        if (!is_null($limit)) {
+            $query = $query->limit($limit);
+        }
+        if (!is_null($offset)) {
+            $query = $query->offset($offset);
+        }
+        $rows = $query->fetchAll();
+        $result = [];
+        foreach ($rows as $row) {
+            $result[] = new Integracao($row);
+        }
+        return $result;
     }
 
     /**

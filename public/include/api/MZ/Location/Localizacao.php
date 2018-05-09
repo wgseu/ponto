@@ -583,7 +583,7 @@ class Localizacao extends \MZ\Database\Helper
     public function filter($original)
     {
         $this->setID($original->getID());
-        $this->setClienteID($original->getClienteID());
+        $this->setClienteID(Filter::number($original->getClienteID()));
         $this->setBairroID(Filter::number($this->getBairroID()));
         $this->setCEP(Filter::unmask($this->getCEP(), _p('Mascara', 'CEP')));
         $this->setLogradouro(Filter::string($this->getLogradouro()));

@@ -9,25 +9,34 @@
 			<div class="form-group col-lg-2 col-md-5 col-sm-5 col-xs-6">
 				<label for="funcao">Função:</label>
 				<select class="form-control" id="funcao" name="funcao">
-					${Utility::Option($funcoes, $_GET['funcao'], 'Todas')}
+					<option value="" ${!array_key_exists($this->get('funcao'), $funcoes) ? 'selected': ''}>Todas</option>
+<!--{loop $funcoes $value $text}-->
+					<option value="{$value}" ${$this->get('funcao') == $value ? 'selected': ''}>{$text}</option>
+<!--{/loop}-->
 				</select>
 			</div>
 			<div class="form-group col-lg-2 col-md-3 col-sm-3 col-xs-6">
 				<label for="genero">Genero:</label>
 				<select class="form-control" id="genero" name="genero">
-					${Utility::Option($generos, $_GET['genero'], 'Todos')}
+					<option value="" ${!array_key_exists($this->get('genero'), $generos) ? 'selected': ''}>Todos</option>
+<!--{loop $generos $value $text}-->
+					<option value="{$value}" ${$this->get('genero') == $value ? 'selected': ''}>{$text}</option>
+<!--{/loop}-->
 				</select>
 			</div>
 			<div class="form-group col-lg-2 col-md-2 col-sm-2 col-xs-6">
 				<label for="estado">Estado:</label>
 				<select class="form-control" id="estado" name="estado">
-					${Utility::Option($estados, $_GET['estado'], 'Todos')}
+					<option value="" ${!array_key_exists($this->get('estado'), $estados) ? 'selected': ''}>Todos</option>
+<!--{loop $estados $value $text}-->
+					<option value="{$value}" ${$this->get('estado') == $value ? 'selected': ''}>{$text}</option>
+<!--{/loop}-->
 				</select>
 			</div>
 			<div class="form-group col-lg-4 col-md-12 col-sm-12 col-xs-6">
-				<label for="query">Busca:</label>
+				<label for="search">Busca:</label>
 				<div class="input-group">
-					<input type="text" class="form-control" id="search" name="search" placeholder="Nome, Telefone, E-mail ou ${_p('Titulo', 'CPF')}..." value="${\MZ\Util\Filter::input($_GET, 'search')}">
+					<input type="text" class="form-control" id="search" name="search" placeholder="Nome, Telefone, E-mail ou ${_p('Titulo', 'CPF')}..." value="{$this->get('search')}">
 					<span class="input-group-btn">
 						<button class="btn btn-default" type="submit"><i class="fa fa-search"></i></button>
 					</span>

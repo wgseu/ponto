@@ -11,7 +11,10 @@ $[field.if(enum)]
 			<div class="form-group col-lg-3 col-md-4 col-sm-4 col-xs-6">
 				<label>$[Field.name]:</label>
 				<select class="form-control" id="$[field]" name="$[field]">
-					${\Utility::Option($$[field.unix]_options, isset($_GET['$[field]'])?$_GET['$[field]']:null, 'Tod$[field.gender]s')}
+						<option value="" ${!array_key_exists($this->get('$[field]'), $tipos) ? 'selected': ''}>Tod$[field.gender]s</option>
+<!--{loop $$[field.unix]_options $value $text}-->
+						<option value="{$value}" ${$this->get('$[field]') == $value ? 'selected': ''}>{$text}</option>
+<!--{/loop}-->
 				</select>
 			</div>
 $[field.end]
@@ -19,7 +22,7 @@ $[field.end]
 			<div class="form-group col-lg-3 col-md-4 col-sm-12 col-xs-12">
 				<label for="search">$[Descriptor.name]:</label>
 				<div class="input-group">
-					<input type="text" class="form-control" id="search" name="search" placeholder="Procurar..." value="${\MZ\Util\Filter::input($_GET, 'search')}">
+					<input type="text" class="form-control" id="search" name="search" placeholder="Procurar..." value="{$this->get('search')}">
 					<span class="input-group-btn">
 						<button class="btn btn-default" type="submit"><i class="fa fa-search"></i></button>
 					</span>

@@ -620,7 +620,7 @@ class Conta extends \MZ\Database\Helper
             $this->setJuros($conta['juros']);
         }
         if (!isset($conta['autoacrescimo'])) {
-            $this->setAutoAcrescimo(null);
+            $this->setAutoAcrescimo('N');
         } else {
             $this->setAutoAcrescimo($conta['autoacrescimo']);
         }
@@ -645,7 +645,7 @@ class Conta extends \MZ\Database\Helper
             $this->setAnexoCaminho($conta['anexocaminho']);
         }
         if (!isset($conta['cancelada'])) {
-            $this->setCancelada(null);
+            $this->setCancelada('N');
         } else {
             $this->setCancelada($conta['cancelada']);
         }
@@ -738,12 +738,6 @@ class Conta extends \MZ\Database\Helper
         $this->setFuncionarioID($original->getFuncionarioID());
         $this->setPedidoID($original->getPedidoID());
         $this->setCancelada($original->getCancelada());
-        $anexocaminho = upload_document('raw_anexocaminho', 'conta');
-        if (is_null($anexocaminho) && trim($this->getAnexoCaminho()) != '') {
-            $this->setAnexoCaminho($original->getAnexoCaminho());
-        } else {
-            $this->setAnexoCaminho($anexocaminho);
-        }
         $this->setClassificacaoID(Filter::number($this->getClassificacaoID()));
         $this->setSubClassificacaoID(Filter::number($this->getSubClassificacaoID()));
         $this->setClienteID(Filter::number($this->getClienteID()));
@@ -762,6 +756,12 @@ class Conta extends \MZ\Database\Helper
         $this->setNumeroDoc(Filter::string($this->getNumeroDoc()));
         $this->setAnexoCaminho(Filter::string($this->getAnexoCaminho()));
         $this->setDataPagamento(Filter::date($this->getDataPagamento()));
+        $anexocaminho = upload_document('raw_anexocaminho', 'conta');
+        if (is_null($anexocaminho) && trim($this->getAnexoCaminho()) != '') {
+            $this->setAnexoCaminho($original->getAnexoCaminho());
+        } else {
+            $this->setAnexoCaminho($anexocaminho);
+        }
     }
 
     /**
@@ -773,16 +773,13 @@ class Conta extends \MZ\Database\Helper
         global $app;
 
         // exclui o documento antigo
-        if (!is_null($old_conta->getAnexoCaminho()) &&
-            $conta->getAnexoCaminho() != $old_conta->getAnexoCaminho() && !is_local_path($old_conta->getAnexoCaminho())) {
-            @unlink($app->getPath('public') . get_document_url($old_conta->getAnexoCaminho(), 'conta'));
+        if (!is_null($this->getAnexoCaminho()) &&
+            $dependency->getAnexoCaminho() != $this->getAnexoCaminho() &&
+            !is_local_path($this->getAnexoCaminho())
+        ) {
+            @unlink($app->getPath('public') . get_document_url($this->getAnexoCaminho(), 'conta'));
         }
-        // exclui o documento enviado
-        if (!is_null($conta->getAnexoCaminho()) &&
-            $old_conta->getAnexoCaminho() != $conta->getAnexoCaminho()) {
-            @unlink($app->getPath('public') . get_document_url($conta->getAnexoCaminho(), 'conta'));
-        }
-        $conta->setAnexoCaminho($old_conta->getAnexoCaminho());
+        $this->setAnexoCaminho($dependency->getAnexoCaminho());
     }
 
     /**

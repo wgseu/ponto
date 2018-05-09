@@ -32,15 +32,16 @@ need_permission(Permissao::NOME_ALTERARCONFIGURACOES, is_output('json'));
 $tab = 'empresa';
 $cliente = $app->getSystem()->getCompany();
 if (!$cliente->exists()) {
-	$cliente->setTipo(Cliente::TIPO_JURIDICA);
+    $cliente->setTipo(Cliente::TIPO_JURIDICA);
 }
 $localizacao = \MZ\Location\Localizacao::find(['clienteid' => $app->getSystem()->getCompany()->getID()]);
+$localizacao->setClienteID($cliente->getID());
 $bairro = $localizacao->findBairroID();
 $cidade = $bairro->findCidadeID();
 $estado = $cidade->findEstadoID();
 $_paises = \MZ\Location\Pais::findAll();
 if (!$estado->exists() && count($_paises) > 0) {
-	$estado->setPaisID(reset($_paises)->getID());
+    $estado->setPaisID(reset($_paises)->getID());
 }
 $pais_id = $estado->getPaisID();
 $focusctrl = 'nome';

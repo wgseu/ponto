@@ -26,19 +26,19 @@
                             <div class="{$col[0]}">
 <!--{if !is_login() || is_null(logged_user()->getEmail())}-->
                                 <div class="form-group">
-                                    <input type="text" class="form-control" placeholder="Seu nome *" id="nome" name="nome" value="${\MZ\Util\Filter::input($_POST, 'nome') ?: logged_user()->getNomeCompleto()}">
+                                    <input type="text" class="form-control" placeholder="Seu nome *" id="nome" name="nome" value="${$this->post('nome') ?: logged_user()->getNomeCompleto()}">
                                 </div>
                                 <div class="form-group">
-                                    <input type="email" class="form-control" placeholder="Seu E-mail *" id="email" name="email" value="${\MZ\Util\Filter::input($_POST, 'email')}">
+                                    <input type="email" class="form-control" placeholder="Seu E-mail *" id="email" name="email" value="{$this->post('email')}">
                                 </div>
 <!--{/if}-->
                                 <div class="form-group">
-                                    <input type="text" class="form-control" placeholder="Assunto *" id="assunto" name="assunto" value="${\MZ\Util\Filter::input($_POST, 'assunto')}">
+                                    <input type="text" class="form-control" placeholder="Assunto *" id="assunto" name="assunto" value="{$this->post('assunto')}">
                                 </div>
                             </div>
                             <div class="{$col[1]}">
                                 <div class="form-group">
-                                    <textarea class="form-control" placeholder="Sua Mensagem *" id="mensagem" name="mensagem">${strip_tags(isset($_POST['mensagem']) ? $_POST['mensagem'] : null)}</textarea>
+                                    <textarea class="form-control" placeholder="Sua Mensagem *" id="mensagem" name="mensagem">{$this->post('mensagem')}</textarea>
                                 </div>
                             </div>
                             <div class="clearfix"></div>

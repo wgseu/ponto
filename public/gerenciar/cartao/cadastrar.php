@@ -68,7 +68,6 @@ if (is_post()) {
 } elseif (is_output('json')) {
     json('Nenhum dado foi enviado');
 } else {
-    $cartao = new Cartao();
     $cartao->setAtivo('Y');
 }
 $_carteiras = Carteira::findAll();

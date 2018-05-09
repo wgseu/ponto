@@ -6,27 +6,30 @@
 			<h3>Patrimônios</h3>
 		</div>
 		<form method="get" action="/gerenciar/patrimonio/" id="search-form">
-			<input type="hidden" id="empresaid" name="empresaid" data-nome="{$_empresa->getNome()}" value="{$_empresa->getID()}">
+			<input type="hidden" id="empresaid_ref" name="empresaid" data-nome="{$_empresa->getNome()}" value="{$_empresa->getID()}">
 			<div class="form-group col-lg-3 col-md-4 col-sm-4 col-xs-12">
-				<label for="empresa">Empresa: <span class="identifier">${\MZ\Util\Mask::phone($_empresa->getFone(1))}<span></label>
-				<input type="text" id="empresa" class="form-control" value="{$_empresa->getNome()}">
+				<label for="empresaid">Empresa: <span class="identifier">${\MZ\Util\Mask::phone($_empresa->getFone(1))}<span></label>
+				<input type="text" id="empresaid" class="form-control" value="{$_empresa->getNome()}">
 			</div>
 <!--${$_cliente_fornecedor = $_fornecedor->findEmpresaID()}-->
-			<input type="hidden" id="fornecedorid" name="fornecedorid" data-nome="{$_cliente_fornecedor->getNome()}" value="{$_fornecedor->getID()}">
+			<input type="hidden" id="fornecedorid_ref" name="fornecedorid" data-nome="{$_cliente_fornecedor->getNome()}" value="{$_fornecedor->getID()}">
 			<div class="form-group col-lg-3 col-md-4 col-sm-4 col-xs-12">
-				<label for="fornecedor">Fornecedor: <span class="identifier">${\MZ\Util\Mask::phone($_cliente_fornecedor->getFone(1))}<span></label>
-				<input type="text" id="fornecedor" class="form-control" value="{$_cliente_fornecedor->getNome()}">
+				<label for="fornecedorid">Fornecedor: <span class="identifier">${\MZ\Util\Mask::phone($_cliente_fornecedor->getFone(1))}<span></label>
+				<input type="text" id="fornecedorid" class="form-control" value="{$_cliente_fornecedor->getNome()}">
 			</div>
 			<div class="form-group col-lg-2 col-md-6 col-sm-6 col-xs-12">
 				<label for="estado">Estado:</label>
 				<select id="estado" name="estado" class="form-control">
-					${Utility::Option($_estado_names, $_GET['estado'], 'Todos')}
+					<option value="" ${!array_key_exists($this->get('estado'), $_estado_names) ? 'selected': ''}>Todos</option>
+<!--{loop $_estado_names $value $text}-->
+					<option value="{$value}" ${$this->get('estado') == $value ? 'selected': ''}>{$text}</option>
+<!--{/loop}-->
 				</select>
 			</div>
 			<div class="form-group col-lg-2 col-md-6 col-sm-6 col-xs-12">
-				<label for="query">Descrição:</label>
+				<label for="search">Descrição:</label>
 				<div class="input-group">
-					<input type="text" class="form-control" id="search" name="search" placeholder="Procurar..." value="${\MZ\Util\Filter::input($_GET, 'search')}">
+					<input type="text" class="form-control" id="search" name="search" placeholder="Procurar..." value="{$this->get('search')}">
 					<span class="input-group-btn">
 						<button class="btn btn-default" type="submit"><i class="fa fa-search"></i></button>
 					</span>

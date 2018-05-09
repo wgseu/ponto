@@ -374,7 +374,7 @@ class Cartao extends \MZ\Database\Helper
             $this->setDiasRepasse($cartao['diasrepasse']);
         }
         if (!isset($cartao['ativo'])) {
-            $this->setAtivo(null);
+            $this->setAtivo('N');
         } else {
             $this->setAtivo($cartao['ativo']);
         }

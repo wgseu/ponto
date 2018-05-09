@@ -421,7 +421,7 @@ class FormaPagto extends \MZ\Database\Helper
             $this->setJuros($forma_pagto['juros']);
         }
         if (!isset($forma_pagto['ativa'])) {
-            $this->setAtiva(null);
+            $this->setAtiva('N');
         } else {
             $this->setAtiva($forma_pagto['ativa']);
         }

@@ -26,6 +26,7 @@ require_once(dirname(__DIR__) . '/app.php');
 
 use MZ\System\Modulo;
 use MZ\System\Permissao;
+use MZ\System\Synchronizer;
 
 need_permission(Permissao::NOME_ALTERARCONFIGURACOES, true);
 $id = isset($_GET['id']) ? $_GET['id'] : null;
@@ -45,10 +46,10 @@ if (is_post()) {
         $modulo->update();
         $old_modulo->clean($modulo);
         try {
-            $appsync = new \MZ\System\Synchronizer();
-            $appsync->systemOptionsChanged();
+            $sync = new Synchronizer();
+            $sync->systemOptionsChanged();
         } catch (\Exception $e) {
-            Log::error($e->getMessage());
+            \Log::error($e->getMessage());
         }
         \DB::Commit();
         $msg = sprintf(

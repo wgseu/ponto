@@ -9,13 +9,16 @@
 			<div class="form-group col-lg-2 col-md-3 col-sm-3 col-xs-6">
 				<label for="tipo">Tipo:</label>
 				<select class="form-control" id="tipo" name="tipo">
-					${Utility::Option($tipos, $_GET['tipo'], 'Todos')}
+					<option value="" ${!array_key_exists($this->get('tipo'), $tipos) ? 'selected': ''}>Todos</option>
+<!--{loop $tipos $value $text}-->
+					<option value="{$value}" ${$this->get('tipo') == $value ? 'selected': ''}>{$text}</option>
+<!--{/loop}-->
 				</select>
 			</div>
 			<div class="form-group col-lg-4 col-md-5 col-sm-6 col-xs-12">
-				<label for="query">Busca:</label>
+				<label for="search">Busca:</label>
 				<div class="input-group">
-					<input type="text" class="form-control" id="search" name="search" placeholder="Procurar..." value="${\MZ\Util\Filter::input($_GET, 'search')}">
+					<input type="text" class="form-control" id="search" name="search" placeholder="Procurar..." value="{$this->get('search')}">
 					<span class="input-group-btn">
 						<button class="btn btn-default" type="submit"><i class="fa fa-search"></i></button>
 					</span>

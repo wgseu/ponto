@@ -1296,22 +1296,22 @@ class Nota extends \MZ\Database\Helper
         }
         if (isset($condition['apartir_emissao'])) {
             $field = 'n.dataemissao >= ?';
-            $condition[$field] = $condition['apartir_emissao'];
+            $condition[$field] = Filter::datetime($condition['apartir_emissao']);
             $allowed[$field] = true;
         }
         if (isset($condition['ate_emissao'])) {
             $field = 'n.dataemissao <= ?';
-            $condition[$field] = $condition['ate_emissao'];
+            $condition[$field] = Filter::datetime($condition['ate_emissao'], '23:59:59');
             $allowed[$field] = true;
         }
         if (isset($condition['apartir_lancamento'])) {
             $field = 'n.datalancamento >= ?';
-            $condition[$field] = $condition['apartir_lancamento'];
+            $condition[$field] = Filter::datetime($condition['apartir_lancamento']);
             $allowed[$field] = true;
         }
         if (isset($condition['ate_lancamento'])) {
             $field = 'n.datalancamento <= ?';
-            $condition[$field] = $condition['ate_lancamento'];
+            $condition[$field] = Filter::datetime($condition['ate_lancamento'], '23:59:59');
             $allowed[$field] = true;
         }
         if (isset($condition['!estado'])) {

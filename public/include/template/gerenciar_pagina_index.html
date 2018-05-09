@@ -10,13 +10,19 @@
 				<div class="form-group col-lg-6 col-md-6 col-sm-12 col-xs-12">
 					<label for="nome">Página:</label>
 					<select class="form-control" id="nome" name="nome">
-						${Utility::Option($nomes, $_GET['nome'], 'Todas')}
+						<option value="" ${!array_key_exists($this->get('nome'), $nomes) ? 'selected': ''}>Todas</option>
+<!--{loop $nomes $value $text}-->
+						<option value="{$value}" ${$this->get('nome') == $value ? 'selected': ''}>{$text}</option>
+<!--{/loop}-->
 					</select>
 				</div>
 				<div class="form-group col-lg-6 col-md-6 col-sm-12 col-xs-12">
 					<label for="linguagemid">Idioma:</label>
 					<select class="form-control" id="linguagemid" name="linguagemid">
-						${Utility::Option($linguagens, $_GET['linguagemid'], 'Todos')}
+						<option value="" ${!array_key_exists($this->get('linguagemid'), $linguagens) ? 'selected': ''}>Todos</option>
+<!--{loop $linguagens $value $text}-->
+						<option value="{$value}" ${$this->get('linguagemid') == $value ? 'selected': ''}>{$text}</option>
+<!--{/loop}-->
 					</select>
 				</div>
 			</form>

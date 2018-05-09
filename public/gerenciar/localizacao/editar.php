@@ -24,9 +24,15 @@
  */
 require_once(dirname(__DIR__) . '/app.php');
 
+use MZ\Location\Estado;
+use MZ\Location\Cidade;
+use MZ\Location\Bairro;
+use MZ\System\Permissao;
+use MZ\System\Synchronizer;
 use MZ\Location\Localizacao;
 
 need_permission(Permissao::NOME_CADASTROCLIENTES, true);
+
 $id = isset($_GET['id']) ? $_GET['id'] : null;
 $localizacao = Localizacao::findByID($id);
 if (!$localizacao->exists()) {
@@ -46,23 +52,23 @@ if (is_post()) {
         \DB::BeginTransaction();
         $localizacao->filter($old_localizacao);
         $estado_id = isset($_POST['estadoid']) ? $_POST['estadoid'] : null;
-        $estado = \MZ\Location\Estado::findByID($estado_id);
+        $estado = Estado::findByID($estado_id);
         if (!$estado->exists()) {
             throw new \MZ\Exception\ValidationException(
                 ['estadoid' => 'O estado não foi informado ou não existe!']
             );
         }
         $cidade_id = isset($_POST['cidade']) ? $_POST['cidade'] : null;
-        $cidade = \MZ\Location\Cidade::findOrInsert($estado->getID(), $cidade_id);
+        $cidade = Cidade::findOrInsert($estado->getID(), $cidade_id);
         $bairro_id = isset($_POST['bairro']) ? $_POST['bairro'] : null;
-        $bairro = \MZ\Location\Bairro::findOrInsert($cidade->getID(), $bairro_id);
+        $bairro = Bairro::findOrInsert($cidade->getID(), $bairro_id);
         $localizacao->setBairroID($bairro->getID());
         $localizacao->save();
         $old_localizacao->clean($localizacao);
         \DB::Commit();
         try {
             if ($localizacao->getClienteID() == $app->getSystem()->getCompany()->getID()) {
-                $appsync = new \MZ\System\Synchronizer();
+                $appsync = new Synchronizer();
                 $appsync->enterpriseChanged();
             }
         } catch (\Exception $e) {

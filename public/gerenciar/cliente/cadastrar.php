@@ -27,6 +27,7 @@ require_once(dirname(__DIR__) . '/app.php');
 use MZ\Account\Cliente;
 use MZ\System\Permissao;
 use MZ\Database\Helper;
+use MZ\System\Synchronizer;
 
 need_permission(Permissao::NOME_CADASTROCLIENTES, is_output('json'));
 $focusctrl = 'tipo';
@@ -59,9 +60,9 @@ if (is_post()) {
             $app->getSystem()->update();
 
             try {
-                $appsync = new \MZ\System\Synchronizer();
-                $appsync->systemOptionsChanged();
-                $appsync->enterpriseChanged();
+                $sync = new Synchronizer();
+                $sync->systemOptionsChanged();
+                $sync->enterpriseChanged();
             } catch (\Exception $e) {
                 \Log::error($e->getMessage());
             }

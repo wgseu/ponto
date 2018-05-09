@@ -248,9 +248,9 @@ class Modulo extends \MZ\Database\Helper
     public function filter($original)
     {
         $this->setID($original->getID());
-        $this->setNome(Filter::string($this->getNome()));
-        $this->setDescricao(Filter::string($this->getDescricao()));
-        $this->setImageIndex(Filter::number($this->getImageIndex()));
+        $this->setNome($original->getNome());
+        $this->setDescricao($original->getDescricao());
+        $this->setImageIndex($original->getImageIndex());
     }
 
     /**

@@ -7,9 +7,9 @@
 		</div>
 		<form method="get" action="/gerenciar/produto/{$integracao->getAcessoURL()}" id="search-form">
 			<div class="form-group col-lg-4 col-md-6 col-sm-6 col-xs-12">
-				<label for="query">Busca:</label>
+				<label for="search">Busca:</label>
 				<div class="input-group">
-					<input type="text" class="form-control" id="search" name="search" placeholder="Descrição ou Código..." value="${\MZ\Util\Filter::input($_GET, 'search')}">
+					<input type="text" class="form-control" id="search" name="search" placeholder="Descrição ou Código..." value="{$this->get('search')}">
 					<span class="input-group-btn">
 						<button class="btn btn-default" type="submit"><i class="fa fa-search"></i></button>
 					</span>
@@ -41,11 +41,11 @@
 								<img src="${get_image_url($associado->getImagem(), 'produto', 'produto.png')}" height="48" alt="Imagem"/>
 							</div>
 							<div class="assoc-info">
-								<input type="hidden" id="produto_{$produto['codigo']}" name="produto[{$produto['codigo']}]" data-descricao="${\MZ\Util\Filter::input($associado->getDescricao())}" data-codigo="{$produto['codigo']}" data-id="{$associado->getID()}" data-item-count="${count($produto['itens'])}" value="{$associado->getID()}">
+								<input type="hidden" id="produto_{$produto['codigo']}_ref" name="produto[{$produto['codigo']}]" data-descricao="${\MZ\Util\Filter::input($associado->getDescricao())}" data-codigo="{$produto['codigo']}" data-id="{$associado->getID()}" data-item-count="${count($produto['itens'])}" value="{$associado->getID()}">
 								<div class="form-group">
-									<label for="produto">Produto: <span class="identifier">{$produto['descricao']}</span><i class="fa fa-remove remove-item" title="Excluir produto da associação"></i></label>
+									<label for="produto_{$produto['codigo']}">Produto: <span class="identifier">{$produto['descricao']}</span><i class="fa fa-remove remove-item" title="Excluir produto da associação"></i></label>
 									<div class="input-group">
-										<input type="text" id="produto_{$produto['codigo']}_input" class="form-control assoc-input" value="${\MZ\Util\Filter::input($associado->getDescricao())}">
+										<input type="text" id="produto_{$produto['codigo']}" class="form-control assoc-input" value="${\MZ\Util\Filter::input($associado->getDescricao())}">
 										<span class="input-group-btn">
 											<button class="btn btn-default ${!$associado->exists() || count($produto['itens']) == 0?'disabled':''}" tabindex="-1"><i class="fa fa-{$produto['icon']}"></i></button>
 										</span>
@@ -79,4 +79,28 @@
 		</div>
 	</div>
 </div>
+<script id="item-template" type="text/x-custom-template">
+	<div class="col-md-6 col-sm-12 col-xs-12 ui-state-default top-row">
+		<div class="assoc-item">
+			<div class="assoc-img">
+				<img src="/static/img/produto.png" height="48" alt="Imagem"/>
+			</div>
+			<div class="assoc-info">
+				<input type="hidden" id="" name="" data-descricao="" data-codigo="" value="">
+				<div class="form-group">
+					<label for="produto">Produto: <span class="identifier"></span><i class="fa fa-remove remove-item" title="Excluir item do pacote da associação"></i></label>
+					<div class="input-group">
+						<input type="text" id="" class="form-control assoc-input" value="">
+						<span class="input-group-btn">
+							<button class="btn btn-default disabled" tabindex="-1"><i class="fa fa-save"></i></button>
+						</span>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</script>
+<script id="group-template" type="text/x-custom-template">
+	<span class="section col-md-12 col-sm-12 col-xs-12"></span>
+</script>
 <!--{include footer_gerenciar}-->

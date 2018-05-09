@@ -9,20 +9,26 @@
 			<div class="form-group col-lg-3 col-md-2 col-sm-2 col-xs-6">
 				<label for="aberto">Estado:</label>
 				<select class="form-control" id="aberto" name="aberto">
-					${Utility::Option($estados, $_GET['aberto'], 'Todos')}
+					<option value="" ${!array_key_exists($this->get('aberto'), $estados) ? 'selected': ''}>Todos</option>
+<!--{loop $estados $value $text}-->
+					<option value="{$value}" ${$this->get('aberto') == $value ? 'selected': ''}>{$text}</option>
+<!--{/loop}-->
 				</select>
 			</div>
 <!--${$_funcao = $_funcionario->findFuncaoID()}-->
 <!--${$_cliente_func = $_funcionario->findClienteID()}-->
-			<input type="hidden" id="inicializadorid" name="inicializadorid" data-content="{$_cliente_func->getNomeCompleto()}" value="{$_funcionario->getID()}">
+			<input type="hidden" id="funcionarioaberturaid_ref" name="funcionarioaberturaid" data-content="{$_cliente_func->getNomeCompleto()}" value="{$_funcionario->getID()}">
 			<div class="form-group col-lg-3 col-md-4 col-sm-4 col-xs-6">
-				<label for="inicializador">Inicializador: <span class="identifier">{$_funcao->getDescricao()}<span></label>
-				<input type="text" id="inicializador" class="form-control" value="{$_cliente_func->getNomeCompleto()}">
+				<label for="funcionarioaberturaid">Inicializador: <span class="identifier">{$_funcao->getDescricao()}<span></label>
+				<input type="text" id="funcionarioaberturaid" class="form-control" value="{$_cliente_func->getNomeCompleto()}">
 			</div>
 			<div class="form-group col-lg-3 col-md-3 col-sm-3 col-xs-6">
 				<label for="caixaid">Caixa:</label>
 				<select class="form-control" id="caixaid" name="caixaid">
-					${Utility::Option($_caixa_names, $_GET['caixaid'], 'Todos')}
+					<option value="" ${!array_key_exists($this->get('caixaid'), $_caixa_names) ? 'selected': ''}>Todos</option>
+<!--{loop $_caixa_names $value $text}-->
+					<option value="{$value}" ${$this->get('caixaid') == $value ? 'selected': ''}>{$text}</option>
+<!--{/loop}-->
 				</select>
 			</div>
 		</form>
@@ -49,8 +55,8 @@
 						<tbody>
 <!--{loop $movimentacoes $movimentacao}-->
 							<tr ${$movimentacao->isAberta()?'class="success"':''}>
-								<td><div title="${$movimentacao->isAberta()?'Caixa aberto':'Caixa fechado'}" class="cell-icon movimentacao-icons" style="background-position: -{$_movimentacao_icon[$movimentacao->getAberta()]}px 0px;"></div><a href="/gerenciar/pagamento/?query=%23{$movimentacao->getID()}" title="Visualizar pagamentos da movimentação '{$movimentacao->getID()}'">{$movimentacao->getID()}</a></td>
-								<td class="text-center"><a href="/gerenciar/pedido/?query=%23{$movimentacao->getSessaoID()}" title="Visualizar pedidos da sessão '{$movimentacao->getSessaoID()}'">{$movimentacao->getSessaoID()}</a></td>
+								<td><div title="${$movimentacao->isAberta()?'Caixa aberto':'Caixa fechado'}" class="cell-icon movimentacao-icons" style="background-position: -{$_movimentacao_icon[$movimentacao->getAberta()]}px 0px;"></div><a href="/gerenciar/pagamento/?search=%23{$movimentacao->getID()}" title="Visualizar pagamentos da movimentação '{$movimentacao->getID()}'">{$movimentacao->getID()}</a></td>
+								<td class="text-center"><a href="/gerenciar/pedido/?search=%23{$movimentacao->getSessaoID()}" title="Visualizar pedidos da sessão '{$movimentacao->getSessaoID()}'">{$movimentacao->getSessaoID()}</a></td>
 <!--${$_caixa = $movimentacao->findCaixaID()}-->
 								<td class="text-center"><a href="/gerenciar/caixa/editar?id={$_caixa->getID()}" title="Editar caixa '{$_caixa->getDescricao()}'">{$_caixa->getDescricao()}</a></td>
 <!--${$_funcionario = $movimentacao->findFuncionarioAberturaID()}-->

@@ -9,39 +9,45 @@
 			<div class="col-lg-2 col-md-3 col-sm-3 col-xs-6 form-group">
 				<label>Módulo:</label>
 				<select class="form-control" id="tipo" name="tipo">
-					${Utility::Option($_tipo_names, $_GET['tipo'], 'Todos')}
+					<option value="" ${!array_key_exists($this->get('tipo'), $_tipo_names) ? 'selected': ''}>Todos</option>
+<!--{loop $_tipo_names $value $text}-->
+					<option value="{$value}" ${$this->get('tipo') == $value ? 'selected': ''}>{$text}</option>
+<!--{/loop}-->
 				</select>
 			</div>
 			<div class="col-lg-2 col-md-3 col-sm-3 col-xs-6 form-group">
 				<label>Estado:</label>
 				<select class="form-control" id="estado" name="estado">
-					${Utility::Option($_estado_names, $_GET['estado'], 'Todos')}
+					<option value="" ${!array_key_exists($this->get('estado'), $_estado_names) ? 'selected': ''}>Todos</option>
+<!--{loop $_estado_names $value $text}-->
+					<option value="{$value}" ${$this->get('estado') == $value ? 'selected': ''}>{$text}</option>
+<!--{/loop}-->
 				</select>
 			</div>
 			<div class="form-group col-lg-3 col-md-4 col-sm-4 col-xs-6">
 				<label for="inicio">Data inicial:</label>
-				<input type="text" id="inicio" name="inicio" class="datetime-picker form-control" value="${\MZ\Util\Filter::input($_GET, 'inicio')}">
+				<input type="text" id="inicio" name="apartir_criacao" class="datetime-picker form-control" value="{$this->get('apartir_criacao')}">
 			</div>
 			<div class="form-group col-lg-3 col-md-2 col-sm-2 col-xs-6">
 				<label for="fim">Data final:</label>
-				<input type="text" id="fim" name="fim" class="datetime-picker form-control" value="${\MZ\Util\Filter::input($_GET, 'fim')}">
+				<input type="text" id="fim" name="ate_criacao" class="datetime-picker form-control" value="{$this->get('ate_criacao')}">
 			</div>
 <!--${$_funcao = $_funcionario->findFuncaoID()}-->
 <!--${$_cliente_func = $_funcionario->findClienteID()}-->
-			<input type="hidden" id="funcionarioid" name="funcionarioid" data-content="{$_cliente_func->getNomeCompleto()}" value="{$_funcionario->getID()}">
+			<input type="hidden" id="funcionarioid_ref" name="funcionarioid" data-content="{$_cliente_func->getNomeCompleto()}" value="{$_funcionario->getID()}">
 			<div class="form-group col-lg-3 col-md-3 col-sm-3 col-xs-6 col-lg-offset-2">
-				<label for="funcionario">Atendente: <span class="identifier">{$_funcao->getDescricao()}<span></label>
-				<input type="text" id="funcionario" class="form-control" value="{$_cliente_func->getNomeCompleto()}">
+				<label for="funcionarioid">Atendente: <span class="identifier">{$_funcao->getDescricao()}<span></label>
+				<input type="text" id="funcionarioid" class="form-control" value="{$_cliente_func->getNomeCompleto()}">
 			</div>
-			<input type="hidden" id="clienteid" name="clienteid" data-nome="{$_cliente->getNomeCompleto()}" value="{$_cliente->getID()}">
+			<input type="hidden" id="clienteid_ref" name="clienteid" data-nome="{$_cliente->getNomeCompleto()}" value="{$_cliente->getID()}">
 			<div class="form-group col-lg-3 col-md-3 col-sm-3 col-xs-6">
-				<label for="cliente">Cliente: <span class="identifier">${\MZ\Util\Mask::phone($_cliente->getFone(1))}<span></label>
-				<input type="text" id="cliente" class="form-control" value="{$_cliente->getNomeCompleto()}">
+				<label for="clienteid">Cliente: <span class="identifier">${\MZ\Util\Mask::phone($_cliente->getFone(1))}<span></label>
+				<input type="text" id="clienteid" class="form-control" value="{$_cliente->getNomeCompleto()}">
 			</div>
 			<div class=" form-group col-lg-4 col-md-4 col-sm-4 col-xs-12">
 				<label>Busca:</label>
 				<div class="input-group">
-					<input type="text" class="form-control" id="search" name="search" placeholder="Código, #Sessão ou Observação..." value="${\MZ\Util\Filter::input($_GET, 'search')}">
+					<input type="text" class="form-control" id="search" name="search" placeholder="Código, #Sessão ou Observação..." value="{$this->get('search')}">
 					<span class="input-group-btn">
 						<button class="btn btn-default" type="submit"><i class="fa fa-search"></i></button>
 					</span>
@@ -79,10 +85,10 @@
 						<tbody>
 <!--{loop $pedidos $pedido}-->
 							<tr ${$pedido->isCancelado()?'class="danger"':''}>
-								<td><div title="{$_tipo_names[$pedido->getTipo()]}" class="cell-icon pedido-icons" style="background-position: -{$_pedido_icon[$pedido->getTipo()]}px 0px;"></div><a href="/gerenciar/produto_pedido/?query={$pedido->getID()}" title="Visualizar produtos e serviços">{$pedido->getID()}</a></td>
+								<td><div title="{$_tipo_names[$pedido->getTipo()]}" class="cell-icon pedido-icons" style="background-position: -{$_pedido_icon[$pedido->getTipo()]}px 0px;"></div><a href="/gerenciar/produto_pedido/?search={$pedido->getID()}" title="Visualizar produtos e serviços">{$pedido->getID()}</a></td>
 <!--${$_comanda = $pedido->findComandaID()}-->
 <!--${$_mesa = $pedido->findMesaID()}-->
-								<td>${$pedido->getTipo() == Pedido::TIPO_ENTREGA && is_null($pedido->getLocalizacaoID())?'Viagem':($pedido->getTipo() == Pedido::TIPO_MESA?$_mesa->getNome():($pedido->getTipo() == Pedido::TIPO_COMANDA?$_comanda->getNome():$_tipo_names[$pedido->getTipo()]))}</td>
+								<td>${$pedido->getTipo() == \MZ\Sale\Pedido::TIPO_ENTREGA && is_null($pedido->getLocalizacaoID())?'Viagem':($pedido->getTipo() == \MZ\Sale\Pedido::TIPO_MESA?$_mesa->getNome():($pedido->getTipo() == \MZ\Sale\Pedido::TIPO_COMANDA?$_comanda->getNome():$_tipo_names[$pedido->getTipo()]))}</td>
 <!--${$_info = $pedido->findTotal()}-->
 								<td class="text-right">${\MZ\Util\Mask::money($_info['produtos'], true)}</td>
 								<td class="text-right">${\MZ\Util\Mask::money($_info['comissao'], true)}</td>
@@ -94,7 +100,7 @@
 								<td><a href="/gerenciar/cliente/editar?id={$_cliente->getID()}" title="Editar cliente '{$_cliente->getNomeCompleto()}'">{$_cliente->getNomeCompleto()}</a></td>
 <!--${$_sessao = $pedido->findSessaoID()}-->
 								<td class="text-center">
-									<strong><a href="/gerenciar/pedido/?query=%23{$_sessao->getID()}" title="Pedidos da sessão '{$_sessao->getID()}'">{$_sessao->getID()}</a></strong>
+									<strong><a href="/gerenciar/pedido/?search=%23{$_sessao->getID()}" title="Pedidos da sessão '{$_sessao->getID()}'">{$_sessao->getID()}</a></strong>
 <!--${$_movimentacao = $pedido->findMovimentacaoID()}-->
 <!--${$_caixa = $_movimentacao->findCaixaID()}-->
 									<small><a href="/gerenciar/caixa/editar?id={$_caixa->getID()}" title="Editar caixa '{$_caixa->getDescricao()}'">{$_caixa->getDescricao()}</a></small>

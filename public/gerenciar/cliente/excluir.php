@@ -24,6 +24,10 @@
  */
 require_once(dirname(__DIR__) . '/app.php');
 
+use MZ\System\Permissao;
+use MZ\Account\Cliente;
+use MZ\Employee\Funcionario;
+
 need_permission(Permissao::NOME_CADASTROCLIENTES, is_output('json'));
 $id = isset($_GET['id']) ? $_GET['id'] : null;
 $cliente = Cliente::findByID($id);

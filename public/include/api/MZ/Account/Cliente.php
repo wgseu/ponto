@@ -870,6 +870,14 @@ class Cliente extends \MZ\Database\Helper
         return $this;
     }
 
+    public function getGeneroName()
+    {
+        if ($this->getGenero() == self::TIPO_JURIDICA) {
+            return 'Empresa';
+        }
+        return self::getGeneroOptions()[$this->getGenero()];
+    }
+
     /**
      * Convert this instance into array associated key -> value with only public fields
      * @return array All public field and values into array format
@@ -916,15 +924,15 @@ class Cliente extends \MZ\Database\Helper
         $this->setIM(Filter::digits($this->getIM()));
         $this->setEmail(Filter::string($this->getEmail()));
         $this->setDataAniversario(Filter::date($this->getDataAniversario()));
-        $this->setFone(1, Filter::unmask($this->getFone(1), _p('Mascara', 'Fone')));
-        $this->setFone(2, Filter::unmask($this->getFone(2), _p('Mascara', 'Fone')));
+        $this->setFone(1, Filter::unmask($this->getFone(1), _p('Mascara', 'Telefone')));
+        $this->setFone(2, Filter::unmask($this->getFone(2), _p('Mascara', 'Telefone')));
         $this->setSlogan(Filter::string($this->getSlogan()));
         $this->setFacebookURL(Filter::string($this->getFacebookURL()));
         $this->setTwitterURL(Filter::string($this->getTwitterURL()));
         $this->setLinkedInURL(Filter::string($this->getLinkedInURL()));
 
         $width = 256;
-        if ($cliente->getTipo() == Cliente::TIPO_JURIDICA) {
+        if ($this->getTipo() == Cliente::TIPO_JURIDICA) {
             $width = 640;
         }
         $imagem = upload_image('raw_imagem', 'cliente', null, $width, 256, true);
@@ -1330,13 +1338,13 @@ class Cliente extends \MZ\Database\Helper
         }
         if (isset($condition['apartir_cadastro'])) {
             $field = 'c.datacadastro >= ?';
-            $condition[$field] = $condition['apartir_cadastro'];
+            $condition[$field] = Filter::datetime($condition['apartir_cadastro']);
             $allowed[$field] = true;
             unset($condition['apartir_cadastro']);
         }
         if (isset($condition['ate_cadastro'])) {
             $field = 'c.datacadastro <= ?';
-            $condition[$field] = $condition['ate_cadastro'];
+            $condition[$field] = Filter::datetime($condition['ate_cadastro'], '23:59:59');
             $allowed[$field] = true;
             unset($condition['ate_cadastro']);
         }
@@ -1371,10 +1379,10 @@ class Cliente extends \MZ\Database\Helper
                 ->orderBy('total DESC')
                 ->groupBy('p.clienteid');
             if (isset($condition['apartir_compra'])) {
-                $query = $query->where('p.datacriacao >= ?', $condition['apartir_compra']);
+                $query = $query->where('p.datacriacao >= ?', Filter::datetime($condition['apartir_compra']));
             }
             if (isset($condition['ate_compra'])) {
-                $query = $query->where('p.datacriacao <= ?', $condition['ate_compra']);
+                $query = $query->where('p.datacriacao <= ?', Filter::datetime($condition['ate_compra'], '23:59:59'));
             }
         } else {
             $query = self::getDB()->from('Clientes c')
@@ -1424,7 +1432,6 @@ class Cliente extends \MZ\Database\Helper
                         '" "',
                         'COALESCE(c.sobrenome, "")'
                     ]),
-                    'p.descricao',
                     $query
                 );
             }

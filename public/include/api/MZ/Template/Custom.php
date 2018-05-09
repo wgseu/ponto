@@ -24,6 +24,8 @@
  */
 namespace MZ\Template;
 
+use MZ\Util\Filter;
+
 /**
  * Proccess template files
  */
@@ -47,19 +49,62 @@ class Custom extends Engine
         return ob_get_clean();
     }
 
+    /**
+     * Get values from _GET variable
+     * @param  string $key key to retrieve value
+     * @param  string $default default value when key not found
+     * @return mixed string or default value
+     */
+    public function get($key, $default = null)
+    {
+        if (!array_key_exists($key, $_GET)) {
+            return $default;
+        }
+        return $_GET[$key];
+    }
+
+    /**
+     * Get values from _POST variable
+     * @param  string $key key to retrieve value
+     * @param  string $default default value when key not found
+     * @return mixed string or default value
+     */
+    public function post($key, $default = null)
+    {
+        if (!array_key_exists($key, $_POST)) {
+            return $default;
+        }
+        return $_POST[$key];
+    }
+
+    /**
+     * Escape value for secure echo
+     * @param  string $value value to be escaped
+     * @return string value escaped
+     */
+    public function escape($value)
+    {
+        return htmlspecialchars($value, ENT_QUOTES, 'UTF-8');
+    }
+
     private function __parseecho($matches)
     {
-        return $this->__replace("<?php echo $matches[1]; ?>");
+        return $this->__replace('<?php echo $this->escape(' . $matches[1] . '); ?>');
+    }
+
+    private function __parseraw($matches)
+    {
+        return $this->__replace('<?php echo ' . $matches[1] . '; ?>');
     }
 
     private function __parsestmt($matches)
     {
-        return $this->__replace("<?php $matches[1]; ?>");
+        return $this->__replace('<?php ' . $matches[1] . '; ?>');
     }
 
     private function __parseelseif($matches)
     {
-        return $this->__replace("<?php } else if($matches[1]) { ?>");
+        return $this->__replace('<?php } else if(' . $matches[1] . ') { ?>');
     }
 
     private function __parseloop($matches)
@@ -96,10 +141,16 @@ class Custom extends Engine
         );
         $fileContent = preg_replace(
             "/\{(\\\$[a-zA-Z0-9_\[\]\\\ \-\'\,\%\*\/\.\(\)\>\'\"\$\x7f-\xff]+)\}/s",
-            "<?php echo \\1; ?>",
+            '<?php echo $this->escape(\\1); ?>',
+            $fileContent
+        );
+        $fileContent = preg_replace(
+            "/\{\{(\\\$[a-zA-Z0-9_\[\]\\\ \-\'\,\%\*\/\.\(\)\>\'\"\$\x7f-\xff]+)\}\}/s",
+            '<?php echo \\1; ?>',
             $fileContent
         );
         $fileContent = preg_replace_callback("/\\\$\{(.+?)\}/is", [$this, '__parseecho'], $fileContent);
+        $fileContent = preg_replace_callback("/\\\$\{\{(.+?)\}\}/is", [$this, '__parseraw'], $fileContent);
         $fileContent = preg_replace_callback(
             "/\<\!\-\-\s*\{else\s*if\s+(.+?)\}\s*\-\-\>/is",
             [$this, '__parseelseif'],
@@ -131,7 +182,7 @@ class Custom extends Engine
         //Add for call <!--{include othertpl}-->
         $fileContent = preg_replace(
             "#<!--\s*{\s*include\s+([^\{\}]+)\s*\}\s*-->#i",
-            '<?php include $this->__template("\\1"); ?>',
+            '<?php include $this->__template(\'\1\'); ?>',
             $fileContent
         );
         xmkdir(dirname($cFile), 0775);

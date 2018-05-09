@@ -26,6 +26,7 @@ namespace MZ\Location;
 
 use MZ\Util\Filter;
 use MZ\Util\Validator;
+use MZ\System\Permissao;
 
 /**
  * Cidade de um estado, contém bairros
@@ -329,7 +330,7 @@ class Cidade extends \MZ\Database\Helper
         if ($cidade->exists()) {
             return $cidade;
         }
-        if (!logged_employee()->has(\Permissao::NOME_CADASTROCIDADES)) {
+        if (!logged_employee()->has(Permissao::NOME_CADASTROCIDADES)) {
             throw new \Exception('A cidade não está cadastrada e você não tem permissão para cadastrar uma');
         }
         $cidade->setEstadoID($estado_id);

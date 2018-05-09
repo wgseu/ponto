@@ -26,6 +26,7 @@ namespace MZ\Location;
 
 use MZ\Util\Filter;
 use MZ\Util\Validator;
+use MZ\System\Permissao;
 
 /**
  * Bairro de uma cidade
@@ -352,7 +353,7 @@ class Bairro extends \MZ\Database\Helper
         if ($bairro->exists()) {
             return $bairro;
         }
-        if (!logged_employee()->has(\Permissao::NOME_CADASTROBAIRROS)) {
+        if (!logged_employee()->has(Permissao::NOME_CADASTROBAIRROS)) {
             throw new \Exception('O bairro não está cadastrada e você não tem permissão para cadastrar um');
         }
         $bairro->setCidadeID($cidade_id);

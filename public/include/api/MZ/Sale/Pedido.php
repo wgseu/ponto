@@ -753,6 +753,10 @@ class Pedido extends \MZ\Database\Helper
         } elseif ($this->getTipo() == self::TIPO_COMANDA) {
             $comanda = !is_null($comanda) ? $comanda : $this->findComandaID();
             return $comanda->getNome();
+        } elseif ($this->getTipo() == self::TIPO_ENTREGA &&
+            is_null($this->getLocalizacaoID())
+        ) {
+            return 'Viagem';
         } else {
             return self::getTipoOptions($this->getTipo());
         }
@@ -1164,7 +1168,7 @@ class Pedido extends \MZ\Database\Helper
             ->select('SUM(IF(NOT ISNULL(r.produtoid), r.preco * r.quantidade * r.porcentagem / 100, 0)) as comissao')
             ->select('SUM(IF(NOT ISNULL(r.servicoid) AND r.preco >= 0, r.preco * r.quantidade, 0)) as servicos')
             ->select('SUM(IF(NOT ISNULL(r.servicoid) AND r.preco < 0, r.preco * r.quantidade, 0)) as descontos')
-            ->leftJoin('Produtos_Pedidos pdp ON r.pedidoid = p.id AND r.cancelado = ?', $this->getCancelado())
+            ->leftJoin('Produtos_Pedidos r ON r.pedidoid = p.id AND r.cancelado = ?', $this->getCancelado())
             ->where('p.id', $this->getID());
         $row = $query->fetch();
         $row['subtotal'] = $row['servicos'] + $row['produtos'] + $row['comissao'];
@@ -1265,12 +1269,12 @@ class Pedido extends \MZ\Database\Helper
         }
         if (isset($condition['apartir_criacao'])) {
             $field = 'p.datacriacao >= ?';
-            $condition[$field] = $condition['apartir_criacao'];
+            $condition[$field] = Filter::datetime($condition['apartir_criacao']);
             $allowed[$field] = true;
         }
         if (isset($condition['ate_criacao'])) {
             $field = 'p.datacriacao <= ?';
-            $condition[$field] = $condition['ate_criacao'];
+            $condition[$field] = Filter::datetime($condition['ate_criacao'], '23:59:59');
             $allowed[$field] = true;
         }
         return Filter::keys($condition, $allowed, 'p.');
@@ -1409,7 +1413,7 @@ class Pedido extends \MZ\Database\Helper
             ->select('ROUND(SUM(IF(p.tipo = "Comanda", r.preco * r.quantidade * (r.porcentagem / 100 + 1), 0)), 4) as comanda')
             ->select('ROUND(SUM(IF(p.tipo = "Avulso", r.preco * r.quantidade * (r.porcentagem / 100 + 1), 0)), 4) as avulso')
             ->select('ROUND(SUM(IF(p.tipo = "Entrega", r.preco * r.quantidade * (r.porcentagem / 100 + 1), 0)), 4) as entrega')
-            ->leftJoin('Produtos_Pedidos pdp ON r.pedidoid = p.id AND r.cancelado = "N"')
+            ->leftJoin('Produtos_Pedidos r ON r.pedidoid = p.id AND r.cancelado = ?', 'N')
             ->where(['p.cancelado' => 'N']);
         if (!is_null($sessao_id)) {
             $query = $query->where(['p.sessaoid' => $sessao_id]);

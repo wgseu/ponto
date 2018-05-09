@@ -513,8 +513,8 @@ class Credito extends \MZ\Database\Helper
         $query = self::getDB()->from('Creditos c');
         $condition = self::filterCondition($condition);
         $query = self::buildOrderBy($query, self::filterOrder($order));
-        $query = $query->orderBy('c.detalhes ASC');
-        $query = $query->orderBy('c.id ASC');
+        $query = $query->orderBy('c.cancelado DESC');
+        $query = $query->orderBy('c.id DESC');
         return self::buildCondition($query, $condition);
     }
 

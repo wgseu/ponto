@@ -261,13 +261,42 @@ class Filter
     }
 
     /**
-     * Parse a datetime string for current country
+     * Parse a date or datetime string for current country
      * @param  string $value humman datetime value
+     * @param  string $time default time value
      * @return string        database datetime format
      */
-    public static function datetime($value)
+    public static function parseTime($value, $time)
     {
         $d = \DateTime::createFromFormat('d/m/Y H:i', $value);
+        if ($d !== false) {
+            return $d;
+        }
+        $d = \DateTime::createFromFormat('d/m/Y H:i:s', $value);
+        if ($d !== false) {
+            return $d;
+        }
+        $d = \DateTime::createFromFormat('d/m/Y', $value);
+        if ($d === false) {
+            $d = \DateTime::createFromFormat('Y-m-d', $value);
+        }
+        if ($d !== false) {
+            $t = strtotime($time);
+            $d->setTime(intval(date('G', $t)), intval(date('i', $t)), intval(date('s', $t)));
+            return $d;
+        }
+        return new \DateTime($value);
+    }
+
+    /**
+     * Parse a datetime string for current country
+     * @param  string $value humman datetime value
+     * @param  string $time default time value
+     * @return string        database datetime format
+     */
+    public static function datetime($value, $time = null)
+    {
+        $d = self::parseTime($value, $time);
         if ($d === false) {
             return null;
         }
@@ -281,11 +310,28 @@ class Filter
      */
     public static function date($value)
     {
-        $d = \DateTime::createFromFormat('d/m/Y', $value);
+        $d = self::parseTime($value, null);
         if ($d === false) {
             return null;
         }
         return $d->format('Y-m-d');
+    }
+
+    /**
+     * Parse a date or datetime string for current country
+     * @param  string $value humman date value
+     * @return string database date format
+     */
+    public static function time($value)
+    {
+        $result = self::date($value);
+        if (is_null($result)) {
+            $result = self::datetime($value);
+        }
+        if (is_null($result)) {
+            $result = $value;
+        }
+        return $result;
     }
 
     /**

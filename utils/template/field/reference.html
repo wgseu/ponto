@@ -1,8 +1,8 @@
 $[field.if(searchable)]
-<input type="hidden" id="$[field]" name="$[field]" data-content="{$$[field.unix]_obj->get$[Reference.desc.norm]()}" value="{$$[table.unix]->get$[Field.norm]()}">
+<input type="hidden" id="$[field]_ref" name="$[field]" data-content="{$$[field.unix]_obj->get$[Reference.desc.norm]()}" value="{$$[table.unix]->get$[Field.norm]()}">
 <div class="form-group col-lg-3 col-md-4 col-sm-6 col-xs-12">
-	<label for="$[field]_input">$[Field.name]: <span class="identifier">{$$[field.unix]_obj->get$[Reference.pk.norm]()}<span></label>
-	<input type="text" id="$[field]_input" class="form-control" placeholder="Procurar pel$[reference.desc.gender] $[Reference.desc.name]..." value="{$$[field.unix]_obj->get$[Reference.desc.norm]()}">
+	<label for="$[field]"><span>$[Field.name]: </span><span class="identifier">{$$[field.unix]_obj->get$[Reference.pk.norm]()}<span></label>
+	<input type="text" id="$[field]" class="form-control" placeholder="Procurar pel$[reference.desc.gender] $[Reference.desc.name]..." value="{$$[field.unix]_obj->get$[Reference.desc.norm]()}">
 </div>$[field.else]
 <div class="form-group col-lg-3 col-md-4 col-sm-6 col-xs-12">
 	<label for="$[field]">$[Field.name]:</label>

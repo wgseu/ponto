@@ -8,14 +8,17 @@
 		<form method="get" action="/gerenciar/classificacao/" id="search-form">
 			<div class="form-group col-lg-4 col-md-4 col-sm-4 col-xs-6">
 				<label for="classificacaoid">Classificação superior:</label>
-				<select class="form-control" id="classificacaoid" name="classificacao">
-					${Utility::Option($_classificacao_names, $_GET['classificacao'], 'Não informada')}
+				<select class="form-control" id="classificacaoid" name="classificacaoid">
+					<option value="" ${!array_key_exists($this->get('classificacaoid'), $_classificacao_names) ? 'selected': ''}>Não informada</option>
+<!--{loop $_classificacao_names $value $text}-->
+					<option value="{$value}" ${$this->get('classificacaoid') == $value ? 'selected': ''}>{$text}</option>
+<!--{/loop}-->
 				</select>
 			</div>
 			<div class="form-group col-lg-5 col-md-5 col-sm-5 col-xs-12">
-				<label for="query">Descrição:</label>
+				<label for="search">Descrição:</label>
 				<div class="input-group">
-					<input type="text" class="form-control" id="search" name="search" placeholder="Procurar..." value="${\MZ\Util\Filter::input($_GET, 'search')}">
+					<input type="text" class="form-control" id="search" name="search" placeholder="Procurar..." value="{$this->get('search')}">
 					<span class="input-group-btn">
 						<button class="btn btn-default" type="submit"><i class="fa fa-search"></i></button>
 					</span>

@@ -39,6 +39,7 @@ if (is_post()) {
         ) {
             throw new \Exception('Você não tem permissão para atribuir um endereço a essa empresa!');
         }
+        $old_localizacao->setClienteID($localizacao->getClienteID());
         $localizacao->filter($old_localizacao);
         $estado_id = isset($_POST['estadoid']) ? $_POST['estadoid'] : null;
         $estado = \MZ\Location\Estado::findByID($estado_id);
@@ -52,7 +53,7 @@ if (is_post()) {
         $bairro_id = isset($_POST['bairro']) ? $_POST['bairro'] : null;
         $bairro = \MZ\Location\Bairro::findOrInsert($cidade->getID(), $bairro_id);
         $localizacao->setBairroID($bairro->getID());
-        $localizacao->save();
+        $localizacao->insert();
         $old_localizacao->clean($localizacao);
         \DB::Commit();
         $msg = sprintf(

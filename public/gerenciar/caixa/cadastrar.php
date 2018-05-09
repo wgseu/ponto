@@ -67,7 +67,6 @@ if (is_post()) {
 } elseif (is_output('json')) {
     json('Nenhum dado foi enviado');
 } else {
-    $caixa = new Caixa();
     $caixa->setAtivo('Y');
 }
 $app->getResponse('html')->output('gerenciar_caixa_cadastrar');

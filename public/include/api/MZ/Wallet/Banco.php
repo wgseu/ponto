@@ -297,101 +297,6 @@ class Banco extends \MZ\Database\Helper
     }
 
     /**
-     * Find this object on database using, ID
-     * @param  int $id id to find Banco
-     * @return Banco A filled instance or empty when not found
-     */
-    public static function findByID($id)
-    {
-        return self::find([
-            'id' => intval($id),
-        ]);
-    }
-
-    /**
-     * Find this object on database using, RazaoSocial
-     * @param  string $razao_social razão social to find Banco
-     * @return Banco A filled instance or empty when not found
-     */
-    public static function findByRazaoSocial($razao_social)
-    {
-        return self::find([
-            'razaosocial' => strval($razao_social),
-        ]);
-    }
-
-    /**
-     * Find this object on database using, Numero
-     * @param  string $numero número to find Banco
-     * @return Banco A filled instance or empty when not found
-     */
-    public static function findByNumero($numero)
-    {
-        return self::find([
-            'numero' => strval($numero),
-        ]);
-    }
-
-    /**
-     * Fetch data from database with a condition
-     * @param  array $condition condition to filter rows
-     * @return SelectQuery query object with condition statement
-     */
-    private static function query($condition = [], $order = [])
-    {
-        $query = self::getDB()->from('Bancos');
-        if (array_key_exists('search', $condition)) {
-            $busca = trim($condition['search']);
-            if (is_numeric($busca)) {
-                $query = $query->where('numero', $busca);
-            } elseif ($busca != '') {
-                $query = $query->where('razaosocial LIKE ?', '%'.$busca.'%');
-            }
-            unset($condition['search']);
-        }
-        return self::buildCondition($query, $condition);
-    }
-
-    /**
-     * Search one register with a condition
-     * @param  array $condition Condition for searching the row
-     * @return Banco A filled Banco or empty instance
-     */
-    public static function find($condition)
-    {
-        $query = self::query($condition)->limit(1);
-        $row = $query->fetch();
-        if ($row === false) {
-            $row = [];
-        }
-        return new Banco($row);
-    }
-
-    /**
-     * Fetch all rows from database with matched condition critery
-     * @param  array $condition condition to filter rows
-     * @param  integer $limit number of rows to get, null for all
-     * @param  integer $offset start index to get rows, null for begining
-     * @return array All rows instanced and filled
-     */
-    public static function findAll($condition = [], $order = [], $limit = null, $offset = null)
-    {
-        $query = self::query($condition, $order);
-        if (!is_null($limit)) {
-            $query = $query->limit($limit);
-        }
-        if (!is_null($offset)) {
-            $query = $query->offset($offset);
-        }
-        $rows = $query->fetchAll();
-        $result = [];
-        foreach ($rows as $row) {
-            $result[] = new Banco($row);
-        }
-        return $result;
-    }
-
-    /**
      * Insert a new Banco into the database and fill instance from database
      * @return Banco Self instance
      */
@@ -484,6 +389,141 @@ class Banco extends \MZ\Database\Helper
     public function loadByNumero($numero)
     {
         return $this->load([
+            'numero' => strval($numero),
+        ]);
+    }
+
+    /**
+     * Get allowed keys array
+     * @return array allowed keys array
+     */
+    private static function getAllowedKeys()
+    {
+        $banco = new Banco();
+        $allowed = Filter::concatKeys('b.', $banco->toArray());
+        return $allowed;
+    }
+
+    /**
+     * Filter order array
+     * @param  mixed $order order string or array to parse and filter allowed
+     * @return array allowed associative order
+     */
+    private static function filterOrder($order)
+    {
+        $allowed = self::getAllowedKeys();
+        return Filter::orderBy($order, $allowed, 'b.');
+    }
+
+    /**
+     * Filter condition array with allowed fields
+     * @param  array $condition condition to filter rows
+     * @return array allowed condition
+     */
+    private static function filterCondition($condition)
+    {
+        $allowed = self::getAllowedKeys();
+        if (isset($condition['search'])) {
+            $search = $condition['search'];
+            if (is_numeric($search)) {
+                $condition['numero'] = Filter::digits($search);
+            } else {
+                $field = 'b.razaosocial LIKE ?';
+                $condition[$field] = '%'.$search.'%';
+                $allowed[$field] = true;
+            }
+            unset($condition['search']);
+        }
+        return Filter::keys($condition, $allowed, 'b.');
+    }
+
+    /**
+     * Fetch data from database with a condition
+     * @param  array $condition condition to filter rows
+     * @param  array $order order rows
+     * @return SelectQuery query object with condition statement
+     */
+    private static function query($condition = [], $order = [])
+    {
+        $query = self::getDB()->from('Bancos b');
+        $condition = self::filterCondition($condition);
+        $query = self::buildOrderBy($query, self::filterOrder($order));
+        $query = $query->orderBy('b.razaosocial ASC');
+        $query = $query->orderBy('b.id ASC');
+        return self::buildCondition($query, $condition);
+    }
+
+    /**
+     * Search one register with a condition
+     * @param  array $condition Condition for searching the row
+     * @return Banco A filled Banco or empty instance
+     */
+    public static function find($condition)
+    {
+        $query = self::query($condition)->limit(1);
+        $row = $query->fetch();
+        if ($row === false) {
+            $row = [];
+        }
+        return new Banco($row);
+    }
+
+    /**
+     * Fetch all rows from database with matched condition critery
+     * @param  array $condition condition to filter rows
+     * @param  integer $limit number of rows to get, null for all
+     * @param  integer $offset start index to get rows, null for begining
+     * @return array All rows instanced and filled
+     */
+    public static function findAll($condition = [], $order = [], $limit = null, $offset = null)
+    {
+        $query = self::query($condition, $order);
+        if (!is_null($limit)) {
+            $query = $query->limit($limit);
+        }
+        if (!is_null($offset)) {
+            $query = $query->offset($offset);
+        }
+        $rows = $query->fetchAll();
+        $result = [];
+        foreach ($rows as $row) {
+            $result[] = new Banco($row);
+        }
+        return $result;
+    }
+
+    /**
+     * Find this object on database using, ID
+     * @param  int $id id to find Banco
+     * @return Banco A filled instance or empty when not found
+     */
+    public static function findByID($id)
+    {
+        return self::find([
+            'id' => intval($id),
+        ]);
+    }
+
+    /**
+     * Find this object on database using, RazaoSocial
+     * @param  string $razao_social razão social to find Banco
+     * @return Banco A filled instance or empty when not found
+     */
+    public static function findByRazaoSocial($razao_social)
+    {
+        return self::find([
+            'razaosocial' => strval($razao_social),
+        ]);
+    }
+
+    /**
+     * Find this object on database using, Numero
+     * @param  string $numero número to find Banco
+     * @return Banco A filled instance or empty when not found
+     */
+    public static function findByNumero($numero)
+    {
+        return self::find([
             'numero' => strval($numero),
         ]);
     }

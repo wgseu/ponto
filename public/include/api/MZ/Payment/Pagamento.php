@@ -1028,12 +1028,12 @@ class Pagamento extends \MZ\Database\Helper
         }
         if (isset($condition['apartir_datahora'])) {
             $field = 'p.datahora >= ?';
-            $condition[$field] = $condition['apartir_datahora'];
+            $condition[$field] = Filter::datetime($condition['apartir_datahora']);
             $allowed[$field] = true;
         }
         if (isset($condition['ate_datahora'])) {
             $field = 'p.datahora <= ?';
-            $condition[$field] = $condition['ate_datahora'];
+            $condition[$field] = Filter::datetime($condition['ate_datahora'], '23:59:59');
             $allowed[$field] = true;
         }
         if (array_key_exists('!pedidoid', $condition)) {
@@ -1046,9 +1046,9 @@ class Pagamento extends \MZ\Database\Helper
             $condition[$field] = $condition['!pagtocontaid'];
             $allowed[$field] = true;
         }
-        if (isset($condition['ate_datahora'])) {
-            $field = 'p.datahora <= ?';
-            $condition[$field] = $condition['ate_datahora'];
+        if (isset($condition['apartir_total'])) {
+            $field = 'p.total >= ?';
+            $condition[$field] = $condition['apartir_total'];
             $allowed[$field] = true;
         }
         if (isset($condition['ate_total'])) {

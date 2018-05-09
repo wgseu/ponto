@@ -24,6 +24,9 @@
  */
 require_once(dirname(__DIR__) . '/app.php');
 
+use MZ\Payment\FormaPagto;
+use MZ\System\Permissao;
+
 need_permission(Permissao::NOME_CADASTROFORMASPAGTO, is_output('json'));
 $id = isset($_GET['id']) ? $_GET['id'] : null;
 $forma_pagto = FormaPagto::findByID($id);

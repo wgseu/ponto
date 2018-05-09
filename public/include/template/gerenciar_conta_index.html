@@ -6,21 +6,24 @@
 			<h3>Contas</h3>
 		</div>
 		<form method="get" action="/gerenciar/conta/" id="search-form">
-			<input type="hidden" id="clienteid" name="clienteid" data-nome="{$_cliente->getNomeCompleto()}" value="{$_cliente->getID()}">
+			<input type="hidden" id="clienteid_ref" name="clienteid" data-nome="{$_cliente->getNomeCompleto()}" value="{$_cliente->getID()}">
 			<div class="form-group col-lg-3 col-md-6 col-sm-6 col-xs-12">
-				<label for="cliente">Cliente: <span class="identifier">${\MZ\Util\Mask::phone($_cliente->getFone(1))}<span></label>
-				<input type="text" id="cliente" class="form-control" value="{$_cliente->getNomeCompleto()}">
+				<label for="clienteid">Cliente: <span class="identifier">${\MZ\Util\Mask::phone($_cliente->getFone(1))}<span></label>
+				<input type="text" id="clienteid" class="form-control" value="{$_cliente->getNomeCompleto()}">
 			</div>
 			<div class="form-group col-lg-3 col-md-6 col-sm-6 col-xs-12">
 				<label for="classificacaoid">Classificação:</label>
-				<select class="form-control" id="classificacao" name="classificacao">
-					${Utility::Option($_classificacoes, $_GET['classificacao'], 'Todas')}
+				<select class="form-control" id="classificacaoid" name="classificacaoid">
+					<option value="" ${!array_key_exists($this->get('classificacaoid'), $_classificacoes) ? 'selected': ''}>Todas</option>
+<!--{loop $_classificacoes $value $text}-->
+					<option value="{$value}" ${$this->get('classificacaoid') == $value ? 'selected': ''}>{$text}</option>
+<!--{/loop}-->
 				</select>
 			</div>
 			<div class="form-group col-lg-3 col-md-6 col-sm-6 col-xs-12">
-				<label for="query">Busca:</label>
+				<label for="search">Busca:</label>
 				<div class="input-group">
-					<input type="text" class="form-control" id="search" name="search" placeholder="Descrição, #Numero ou Código..." value="${\MZ\Util\Filter::input($_GET, 'search')}">
+					<input type="text" class="form-control" id="search" name="search" placeholder="Descrição, #Numero ou Código..." value="{$this->get('search')}">
 					<span class="input-group-btn">
 						<button class="btn btn-default" type="submit"><i class="fa fa-search"></i></button>
 					</span>

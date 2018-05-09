@@ -8,47 +8,59 @@
 		<form method="get" action="/gerenciar/pagamento/" id="search-form">
 <!--${$_funcao = $_funcionario->findFuncaoID()}-->
 <!--${$_cliente_func = $_funcionario->findClienteID()}-->
-			<input type="hidden" id="funcionarioid" name="funcionarioid" data-content="{$_cliente_func->getNomeCompleto()}" value="{$_funcionario->getID()}">
+			<input type="hidden" id="funcionarioid_ref" name="funcionarioid" data-content="{$_cliente_func->getNomeCompleto()}" value="{$_funcionario->getID()}">
 			<div class="form-group col-lg-4 col-md-5 col-sm-5 col-xs-12">
-				<label for="funcionario">Funcionário(a): <span class="identifier">{$_funcao->getDescricao()}<span></label>
-				<input type="text" id="funcionario" class="form-control" value="{$_cliente_func->getNomeCompleto()}">
+				<label for="funcionarioid">Funcionário(a): <span class="identifier">{$_funcao->getDescricao()}<span></label>
+				<input type="text" id="funcionarioid" class="form-control" value="{$_cliente_func->getNomeCompleto()}">
 			</div>
 			<div class="form-group col-lg-3 col-md-4 col-sm-4 col-xs-6">
 				<label for="formapagtoid">Forma de pagamento:</label>
 				<select class="form-control" id="formapagtoid" name="formapagtoid">
-					${Utility::Option($_forma_names, $_GET['formapagtoid'], 'Todas')}
+					<option value="" ${!array_key_exists($this->get('formapagtoid'), $_forma_names) ? 'selected': ''}>Todas</option>
+<!--{loop $_forma_names $value $text}-->
+					<option value="{$value}" ${$this->get('formapagtoid') == $value ? 'selected': ''}>{$text}</option>
+<!--{/loop}-->
 				</select>
 			</div>
 			<div class="form-group col-lg-3 col-md-3 col-sm-3 col-xs-6">
 				<label for="cartaoid">Cartão:</label>
 				<select class="form-control" id="cartaoid" name="cartaoid">
-					${Utility::Option($_cartao_names, $_GET['cartaoid'], 'Todos')}
+					<option value="" ${!array_key_exists($this->get('cartaoid'), $_cartao_names) ? 'selected': ''}>Todos</option>
+<!--{loop $_cartao_names $value $text}-->
+					<option value="{$value}" ${$this->get('cartaoid') == $value ? 'selected': ''}>{$text}</option>
+<!--{/loop}-->
 				</select>
 			</div>
 			<div class="form-group col-lg-2 col-md-3 col-sm-3 col-xs-6">
 				<label for="estado">Estado:</label>
 				<select class="form-control" id="estado" name="estado">
-					${Utility::Option($_estado_names, $_GET['estado'], 'Todos')}
+					<option value="" ${!array_key_exists($this->get('estado'), $_estado_names) ? 'selected': ''}>Todos</option>
+<!--{loop $_estado_names $value $text}-->
+					<option value="{$value}" ${$this->get('estado') == $value ? 'selected': ''}>{$text}</option>
+<!--{/loop}-->
 				</select>
 			</div>
 			<div class="form-group col-lg-3 col-md-3 col-sm-3 col-xs-6">
 				<label for="carteiraid">Carteira:</label>
 				<select class="form-control" id="carteiraid" name="carteiraid">
-					${Utility::Option($_carteira_names, $_GET['carteiraid'], 'Todas')}
+					<option value="" ${!array_key_exists($this->get('carteiraid'), $_carteira_names) ? 'selected': ''}>Todas</option>
+<!--{loop $_carteira_names $value $text}-->
+					<option value="{$value}" ${$this->get('carteiraid') == $value ? 'selected': ''}>{$text}</option>
+<!--{/loop}-->
 				</select>
 			</div>
 			<div class="form-group col-lg-2 col-md-3 col-sm-3 col-xs-6">
 				<label for="inicio">Data inicial:</label>
-				<input type="text" id="inicio" name="inicio" class="datetime-picker form-control" value="${\MZ\Util\Filter::input($_GET, 'inicio')}">
+				<input type="text" id="inicio" name="inicio" class="datetime-picker form-control" value="{$this->get('inicio')}">
 			</div>
 			<div class="form-group col-lg-2 col-md-3 col-sm-3 col-xs-6">
 				<label for="fim">Data final:</label>
-				<input type="text" id="fim" name="fim" class="datetime-picker form-control" value="${\MZ\Util\Filter::input($_GET, 'fim')}">
+				<input type="text" id="fim" name="fim" class="datetime-picker form-control" value="{$this->get('fim')}">
 			</div>
 			<div class=" form-group col-lg-3 col-md-9 col-sm-9 col-xs-12">
 				<label>Busca:</label>
 				<div class="input-group">
-					<input type="text" class="form-control" id="search" name="search" placeholder="Detalhes, Pedido ou #Movimentação..." value="${\MZ\Util\Filter::input($_GET, 'search')}">
+					<input type="text" class="form-control" id="search" name="search" placeholder="Detalhes, Pedido ou #Movimentação..." value="{$this->get('search')}">
 					<span class="input-group-btn">
 						<button class="btn btn-default" type="submit"><i class="fa fa-search"></i></button>
 					</span>
@@ -92,7 +104,7 @@
 <!--{else}-->
 <!--${$_comanda = $_pedido->findComandaID()}-->
 <!--${$_mesa = $_pedido->findMesaID()}-->
-									<a href="/gerenciar/pedido/?query={$_pedido->getID()}" title="Visualizar pedido '{$_pedido->getID()}'">Pedido {$_pedido->getID()}: ${$_pedido->getTipo() == Pedido::TIPO_ENTREGA && is_null($_pedido->getLocalizacaoID())?'Viagem':($_pedido->getTipo() == Pedido::TIPO_MESA?$_mesa->getNome():($_pedido->getTipo() == Pedido::TIPO_COMANDA?$_comanda->getNome():$_tipo_names[$_pedido->getTipo()]))}</a>
+									<a href="/gerenciar/pedido/?search={$_pedido->getID()}" title="Visualizar pedido '{$_pedido->getID()}'">Pedido {$_pedido->getID()}: ${$_pedido->getTipo() == Pedido::TIPO_ENTREGA && is_null($_pedido->getLocalizacaoID())?'Viagem':($_pedido->getTipo() == Pedido::TIPO_MESA?$_mesa->getNome():($_pedido->getTipo() == Pedido::TIPO_COMANDA?$_comanda->getNome():$_tipo_names[$_pedido->getTipo()]))}</a>
 <!--{/if}-->
 								</td>
 								<td class="text-right">

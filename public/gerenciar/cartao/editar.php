@@ -24,7 +24,7 @@
  */
 require_once(dirname(__DIR__) . '/app.php');
 
-use MZ\Session\Caixa;
+use MZ\Payment\Cartao;
 use MZ\Wallet\Carteira;
 use MZ\System\Permissao;
 

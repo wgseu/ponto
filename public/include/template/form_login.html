@@ -1,6 +1,6 @@
 <div class="col-md-6">
 	<div class="form-group">
-		<input type="text" class="form-control" placeholder="Seu Usuário *" id="email" name="usuario" maxlength="160" value="${\MZ\Util\Filter::input($_POST, 'usuario')}"/>
+		<input type="text" class="form-control" placeholder="Seu Usuário *" id="email" name="usuario" maxlength="160" value="{$this->post('usuario')}"/>
 		<p class="help-block text-danger"></p>
 	</div>
 </div>
@@ -13,7 +13,7 @@
 <div class="col-md-12">
 	<div class="checkbox">
 		<label>
-			<input type="checkbox" class="inlradio" id="lembrar" name="lembrar" value="true" ${\MZ\Util\Filter::input($_POST, 'lembrar') == 'true'? 'checked': ''}>Manter conectado
+			<input type="checkbox" class="inlradio" id="lembrar" name="lembrar" value="true" ${$this->post('lembrar') == 'true' ? 'checked': ''}>Manter conectado
 		</label>
 	</div>
 </div>

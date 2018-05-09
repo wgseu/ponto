@@ -455,139 +455,6 @@ class Pais extends \MZ\Database\Helper
     }
 
     /**
-     * Find this object on database using, ID
-     * @param  int $id id to find País
-     * @return Pais A filled instance or empty when not found
-     */
-    public static function findByID($id)
-    {
-        return self::find([
-            'id' => intval($id),
-        ]);
-    }
-
-    /**
-     * Find this object on database using, Nome
-     * @param  string $nome nome to find País
-     * @return Pais A filled instance or empty when not found
-     */
-    public static function findByNome($nome)
-    {
-        return self::find([
-            'nome' => strval($nome),
-        ]);
-    }
-
-    /**
-     * Find this object on database using, Sigla
-     * @param  string $sigla sigla to find País
-     * @return Pais A filled instance or empty when not found
-     */
-    public static function findBySigla($sigla)
-    {
-        return self::find([
-            'sigla' => strval($sigla),
-        ]);
-    }
-
-    /**
-     * Find this object on database using, Codigo
-     * @param  string $codigo código to find País
-     * @return Pais A filled instance or empty when not found
-     */
-    public static function findByCodigo($codigo)
-    {
-        return self::find([
-            'codigo' => strval($codigo),
-        ]);
-    }
-
-    /**
-     * Filter order array
-     * @param  mixed $order order string or array to parse and filter allowed
-     * @return array allowed associative order
-     */
-    private static function filterOrder($order)
-    {
-        $pais = new Pais();
-        $allowed = $pais->toArray();
-        return Filter::orderBy($order, $allowed);
-    }
-
-    /**
-     * Filter condition array with allowed fields
-     * @param  array $condition condition to filter rows
-     * @return array allowed condition
-     */
-    private static function filterCondition($condition)
-    {
-        $pais = new Pais();
-        $allowed = $pais->toArray();
-        if (isset($condition['search'])) {
-            $search = $condition['search'];
-            $field = '(nome LIKE ? OR sigla = ? OR codigo = ?)';
-            $condition[$field] = ['%'.$search.'%', $search, $search];
-            $allowed[$field] = true;
-            unset($condition['search']);
-        }
-        return Filter::keys($condition, $allowed);
-    }
-
-    /**
-     * Fetch data from database with a condition
-     * @param  array $condition condition to filter rows
-     * @param  array $order order rows
-     * @return SelectQuery query object with condition statement
-     */
-    private static function query($condition = [], $order = [])
-    {
-        $query = self::getDB()->from('Paises');
-        $condition = self::filterCondition($condition);
-        $query = self::buildOrderBy($query, self::filterOrder($order));
-        return self::buildCondition($query, $condition);
-    }
-
-    /**
-     * Search one register with a condition
-     * @param  array $condition Condition for searching the row
-     * @param  array $order order rows
-     * @return Pais A filled País or empty instance
-     */
-    public static function find($condition, $order = [])
-    {
-        $query = self::query($condition, $order)->limit(1);
-        $row = $query->fetch();
-        if ($row === false) {
-            $row = [];
-        }
-        return new Pais($row);
-    }
-
-    /**
-     * Fetch all rows from database with matched condition critery
-     * @param  array $condition condition to filter rows
-     * @param  integer $limit number of rows to get, null for all
-     * @param  integer $offset start index to get rows, null for begining
-     * @return array All rows instanced and filled
-     */
-    public static function findAll($condition = [], $order = [], $limit = null, $offset = null)
-    {
-        $query = self::query($condition, $order);
-        if (!is_null($limit)) {
-            $query = $query->limit($limit);
-        }
-        if (!is_null($offset)) {
-            $query = $query->offset($offset);
-        }
-        $rows = $query->fetchAll();
-        $result = [];
-        foreach ($rows as $row) {
-            $result[] = new Pais($row);
-        }
-        return $result;
-    }
-
-    /**
      * Insert a new País into the database and fill instance from database
      * @return Pais Self instance
      */
@@ -697,6 +564,15 @@ class Pais extends \MZ\Database\Helper
     }
 
     /**
+     * Informa a moeda principal do país
+     * @return \MZ\Wallet\Moeda The object fetched from database
+     */
+    public function findMoedaID()
+    {
+        return \MZ\Wallet\Moeda::findByID($this->getMoedaID());
+    }
+
+    /**
      * Flag image index list
      */
     public static function getImageIndexOptions()
@@ -709,6 +585,147 @@ class Pais extends \MZ\Database\Helper
     }
 
     /**
+     * Get allowed keys array
+     * @return array allowed keys array
+     */
+    private static function getAllowedKeys()
+    {
+        $pais = new Pais();
+        $allowed = Filter::concatKeys('p.', $pais->toArray());
+        return $allowed;
+    }
+
+    /**
+     * Filter order array
+     * @param  mixed $order order string or array to parse and filter allowed
+     * @return array allowed associative order
+     */
+    private static function filterOrder($order)
+    {
+        $allowed = self::getAllowedKeys();
+        return Filter::orderBy($order, $allowed, 'p.');
+    }
+
+    /**
+     * Filter condition array with allowed fields
+     * @param  array $condition condition to filter rows
+     * @return array allowed condition
+     */
+    private static function filterCondition($condition)
+    {
+        $allowed = self::getAllowedKeys();
+        if (isset($condition['search'])) {
+            $search = $condition['search'];
+            $field = '(p.nome LIKE ? OR p.sigla = ? OR p.codigo = ?)';
+            $condition[$field] = ['%'.$search.'%', $search, $search];
+            $allowed[$field] = true;
+            unset($condition['search']);
+        }
+        return Filter::keys($condition, $allowed, 'p.');
+    }
+
+    /**
+     * Fetch data from database with a condition
+     * @param  array $condition condition to filter rows
+     * @param  array $order order rows
+     * @return SelectQuery query object with condition statement
+     */
+    private static function query($condition = [], $order = [])
+    {
+        $query = self::getDB()->from('Paises p');
+        $condition = self::filterCondition($condition);
+        $query = self::buildOrderBy($query, self::filterOrder($order));
+        $query = $query->orderBy('p.nome ASC');
+        $query = $query->orderBy('p.id ASC');
+        return self::buildCondition($query, $condition);
+    }
+
+    /**
+     * Search one register with a condition
+     * @param  array $condition Condition for searching the row
+     * @param  array $order order rows
+     * @return Pais A filled País or empty instance
+     */
+    public static function find($condition, $order = [])
+    {
+        $query = self::query($condition, $order)->limit(1);
+        $row = $query->fetch() ?: [];
+        return new Pais($row);
+    }
+
+    /**
+     * Find this object on database using, ID
+     * @param  int $id id to find País
+     * @return Pais A filled instance or empty when not found
+     */
+    public static function findByID($id)
+    {
+        return self::find([
+            'id' => intval($id),
+        ]);
+    }
+
+    /**
+     * Find this object on database using, Nome
+     * @param  string $nome nome to find País
+     * @return Pais A filled instance or empty when not found
+     */
+    public static function findByNome($nome)
+    {
+        return self::find([
+            'nome' => strval($nome),
+        ]);
+    }
+
+    /**
+     * Find this object on database using, Sigla
+     * @param  string $sigla sigla to find País
+     * @return Pais A filled instance or empty when not found
+     */
+    public static function findBySigla($sigla)
+    {
+        return self::find([
+            'sigla' => strval($sigla),
+        ]);
+    }
+
+    /**
+     * Find this object on database using, Codigo
+     * @param  string $codigo código to find País
+     * @return Pais A filled instance or empty when not found
+     */
+    public static function findByCodigo($codigo)
+    {
+        return self::find([
+            'codigo' => strval($codigo),
+        ]);
+    }
+
+    /**
+     * Fetch all rows from database with matched condition critery
+     * @param  array $condition condition to filter rows
+     * @param  integer $limit number of rows to get, null for all
+     * @param  integer $offset start index to get rows, null for begining
+     * @return array All rows instanced and filled
+     */
+    public static function findAll($condition = [], $order = [], $limit = null, $offset = null)
+    {
+        $query = self::query($condition, $order);
+        if (!is_null($limit)) {
+            $query = $query->limit($limit);
+        }
+        if (!is_null($offset)) {
+            $query = $query->offset($offset);
+        }
+        $rows = $query->fetchAll();
+        $result = [];
+        foreach ($rows as $row) {
+            $result[] = new Pais($row);
+        }
+        return $result;
+    }
+
+    /**
      * Count all rows from database with matched condition critery
      * @param  array $condition condition to filter rows
      * @return integer Quantity of rows
@@ -717,14 +734,5 @@ class Pais extends \MZ\Database\Helper
     {
         $query = self::query($condition);
         return $query->count();
-    }
-
-    /**
-     * Informa a moeda principal do país
-     * @return \MZ\Wallet\Moeda The object fetched from database
-     */
-    public function findMoedaID()
-    {
-        return \MZ\Wallet\Moeda::findByID($this->getMoedaID());
     }
 }

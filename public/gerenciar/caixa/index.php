@@ -39,7 +39,7 @@ unset($condition['ordem']);
 $caixa = new Caixa($condition);
 $order = Filter::order(isset($_GET['ordem']) ? $_GET['ordem'] : '');
 $count = Caixa::count($condition);
-list($pagesize, $offset, $pagestring) = pagestring($count, $limite);
+list($pagesize, $offset, $pagination) = pagestring($count, $limite);
 $caixas = Caixa::findAll($condition, $order, $pagesize, $offset);
 
 if (is_output('json')) {

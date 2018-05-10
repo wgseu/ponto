@@ -39,7 +39,7 @@ unset($condition['ordem']);
 $pagina = new Pagina($condition);
 $order = Filter::order(isset($_GET['ordem']) ? $_GET['ordem'] : '');
 $count = Pagina::count($condition);
-list($pagesize, $offset, $pagestring) = pagestring($count, $limite);
+list($pagesize, $offset, $pagination) = pagestring($count, $limite);
 $paginas = Pagina::findAll($condition, $order, $pagesize, $offset);
 
 if (is_output('json')) {

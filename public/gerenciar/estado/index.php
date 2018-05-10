@@ -39,7 +39,7 @@ unset($condition['ordem']);
 $estado = new Estado($condition);
 $order = Filter::order(isset($_GET['ordem'])?$_GET['ordem']:'');
 $count = Estado::count($condition);
-list($pagesize, $offset, $pagestring) = pagestring($count, $limite);
+list($pagesize, $offset, $pagination) = pagestring($count, $limite);
 $estados = Estado::findAll($condition, $order, $pagesize, $offset);
 
 if (is_output('json')) {

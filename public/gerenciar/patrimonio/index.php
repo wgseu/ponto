@@ -39,7 +39,7 @@ unset($condition['ordem']);
 $patrimonio = new Patrimonio($condition);
 $order = Filter::order(isset($_GET['ordem']) ? $_GET['ordem'] : '');
 $count = Patrimonio::count($condition);
-list($pagesize, $offset, $pagestring) = pagestring($count, $limite);
+list($pagesize, $offset, $pagination) = pagestring($count, $limite);
 $patrimonios = Patrimonio::findAll($condition, $order, $pagesize, $offset);
 
 if (is_output('json')) {

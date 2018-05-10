@@ -38,7 +38,7 @@ $condition = Filter::query($_GET);
 unset($condition['ordem']);
 $order = Filter::order(isset($_GET['ordem'])?$_GET['ordem']:'');
 $count = Cidade::count($condition);
-list($pagesize, $offset, $pagestring) = pagestring($count, $limite);
+list($pagesize, $offset, $pagination) = pagestring($count, $limite);
 $cidades = Cidade::findAll($condition, $order, $pagesize, $offset);
 
 if (is_output('json')) {

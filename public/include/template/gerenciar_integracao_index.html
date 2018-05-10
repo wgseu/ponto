@@ -51,7 +51,7 @@
 											<a href="/gerenciar/cartao/{{ $integracao->getAcessoURL() }}" title="Associar cartões"><i class="fa fa-credit-card"></i></a>
 										</li>
 										<li>
-											<a href="/gerenciar/integracao/editar?id={{ $integracao->getID() }}" title="Editar Integração '{{ \MZ\Util\Filter::input($integracao->getNome()) }}'"><i class="fa fa-edit"></i></a>
+											<a href="/gerenciar/integracao/editar?id={{ $integracao->getID() }}" title="Editar Integração '{{ $integracao->getNome() }}'"><i class="fa fa-edit"></i></a>
 										</li>
 									</ul>
 								</td>
@@ -59,7 +59,7 @@
 {% endfor %}
 						</tbody>
 					</table>
-					{{ $pagestring }}
+					{{ include('pagination') }}
 				</div>
 			</div>
 		</div>

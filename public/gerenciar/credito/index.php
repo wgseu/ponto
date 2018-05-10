@@ -39,7 +39,7 @@ unset($condition['ordem']);
 $credito = new Credito($condition);
 $order = Filter::order(isset($_GET['ordem']) ? $_GET['ordem'] : '');
 $count = Credito::count($condition);
-list($pagesize, $offset, $pagestring) = pagestring($count, $limite);
+list($pagesize, $offset, $pagination) = pagestring($count, $limite);
 $creditos = Credito::findAll($condition, $order, $pagesize, $offset);
 
 if (is_output('json')) {

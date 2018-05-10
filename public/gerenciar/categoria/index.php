@@ -40,7 +40,7 @@ $condition['categoriaid'] = isset($condition['categoriaid']) ? $condition['categ
 $categoria = new Categoria($condition);
 $order = Filter::order(isset($_GET['ordem']) ? $_GET['ordem'] : '');
 $count = Categoria::count($condition);
-list($pagesize, $offset, $pagestring) = pagestring($count, $limite);
+list($pagesize, $offset, $pagination) = pagestring($count, $limite);
 $categorias = Categoria::findAll($condition, $order, $pagesize, $offset);
 
 if (is_output('json')) {

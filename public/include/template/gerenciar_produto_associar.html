@@ -41,11 +41,11 @@
 								<img src="{{ get_image_url($associado->getImagem(), 'produto', 'produto.png') }}" height="48" alt="Imagem"/>
 							</div>
 							<div class="assoc-info">
-								<input type="hidden" id="produto_{{ $produto['codigo'] }}_ref" name="produto[{{ $produto['codigo'] }}]" data-descricao="{{ \MZ\Util\Filter::input($associado->getDescricao()) }}" data-codigo="{{ $produto['codigo'] }}" data-id="{{ $associado->getID() }}" data-item-count="{{ count($produto['itens']) }}" value="{{ $associado->getID() }}">
+								<input type="hidden" id="produto_{{ $produto['codigo'] }}_ref" name="produto[{{ $produto['codigo'] }}]" data-descricao="{{ $associado->getDescricao() }}" data-codigo="{{ $produto['codigo'] }}" data-id="{{ $associado->getID() }}" data-item-count="{{ count($produto['itens']) }}" value="{{ $associado->getID() }}">
 								<div class="form-group">
 									<label for="produto_{{ $produto['codigo'] }}">Produto: <span class="identifier">{{ $produto['descricao'] }}</span><i class="fa fa-remove remove-item" title="Excluir produto da associação"></i></label>
 									<div class="input-group">
-										<input type="text" id="produto_{{ $produto['codigo'] }}" class="form-control assoc-input" value="{{ \MZ\Util\Filter::input($associado->getDescricao()) }}">
+										<input type="text" id="produto_{{ $produto['codigo'] }}" class="form-control assoc-input" value="{{ $associado->getDescricao() }}">
 										<span class="input-group-btn">
 											<button class="btn btn-default {{ !$associado->exists() || count($produto['itens']) == 0?'disabled':'' }}" tabindex="-1"><i class="fa fa-{{ $produto['icon'] }}"></i></button>
 										</span>

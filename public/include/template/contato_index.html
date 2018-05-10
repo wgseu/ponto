@@ -1,5 +1,5 @@
 {{ include('header') }}
-    <script type="text/javascript">$(function(){{ $('#' + '{$focusctrl }}').focus();});</script>
+    <script type="text/javascript">$(function(){ $('#' + '{{ $focusctrl }}').focus();});</script>
 {% if !is_login() || is_null(logged_user()->getEmail()) %}
     {% $col = array(
         'col-md-6',

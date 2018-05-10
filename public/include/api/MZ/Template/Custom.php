@@ -109,6 +109,16 @@ class Custom extends Engine
     }
 
     /**
+     * Convert database time format into user country time format
+     * @param  string $value time into database format
+     * @return string        time into readable user
+     */
+    public function time($value)
+    {
+        return Mask::time($value);
+    }
+
+    /**
      * Humman elapsed time
      * @param  string $value date or datetime to be converted
      * @return string humman elapsed time
@@ -136,6 +146,27 @@ class Custom extends Engine
     public function currency($value)
     {
         return Mask::money($value, true);
+    }
+
+    /**
+     * Convert boolean value into yes no text
+     * @param  mixed $value boolean value
+     * @return string boolean value into yes no text
+     */
+    public function bool($value)
+    {
+        return Mask::bool($value, true);
+    }
+
+    /**
+     * Mask any text using a mask format
+     * @param  string $str  texto to be masked
+     * @param  string $mask mask to apply
+     * @return string       Text with mask applied
+     */
+    public function mask($value, $mask)
+    {
+        return Mask::mask($value, $mask);
     }
 
     private function __parseecho($matches)
@@ -184,7 +215,7 @@ class Custom extends Engine
         if ($fileContent === false) {
             throw new \Exception('Can\'t get content of template file "'.$tFile.'"', 500);
         }
-        //Add for call <!--{include othertpl}-->
+        //Add for call {{ include('othertpl') }}
         $fileContent = preg_replace(
             '/{{\s*include\s*\(\s*\'([^\']+)\'\s*\)\s*}}/i',
             '<?php include $this->__template(\'\1\'); ?>',
@@ -220,6 +251,7 @@ class Custom extends Engine
             [$this, '__parsestmt'],
             $fileContent
         );
+        $fileContent = trim(preg_replace('/>\s+</m', '><', $fileContent));
         xmkdir(dirname($cFile), 0775);
         if (file_put_contents($cFile, $fileContent) === false) {
             throw new \Exception('Can\'t write parsed template into file "'.$cFile.'"', 500);

@@ -99,7 +99,7 @@ class Mask
      */
     public static function bool($value)
     {
-        if ($value) {
+        if ($value && $value !== 'N') {
             return 'Sim';
         }
         return 'Não';

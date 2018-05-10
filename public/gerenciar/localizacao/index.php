@@ -44,7 +44,7 @@ if (!$cliente->exists()) {
 }
 $order = Filter::order(isset($_GET['ordem']) ? $_GET['ordem'] : '');
 $count = Localizacao::count($condition);
-list($pagesize, $offset, $pagestring) = pagestring($count, $limite);
+list($pagesize, $offset, $pagination) = pagestring($count, $limite);
 $localizacoes = Localizacao::findAll($condition, $order, $pagesize, $offset);
 
 $items = [];

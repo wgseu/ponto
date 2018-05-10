@@ -44,7 +44,7 @@ if ($genero == 'Empresa') {
 $cliente = new Cliente($condition);
 $order = Filter::order(isset($_GET['ordem']) ? $_GET['ordem'] : '');
 $count = Cliente::count($condition);
-list($pagesize, $offset, $pagestring) = pagestring($count, $limite);
+list($pagesize, $offset, $pagination) = pagestring($count, $limite);
 $clientes = Cliente::findAll($condition, $order, $pagesize, $offset);
 
 if (is_output('json')) {

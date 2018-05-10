@@ -40,7 +40,7 @@ unset($condition['ordem']);
 $pais = new Pais($condition);
 $order = Filter::order(isset($_GET['ordem'])?$_GET['ordem']:'');
 $count = Pais::count($condition);
-list($pagesize, $offset, $pagestring) = pagestring($count, $limite);
+list($pagesize, $offset, $pagination) = pagestring($count, $limite);
 $paises = Pais::findAll($condition, $order, $pagesize, $offset);
 
 if (is_output('json')) {

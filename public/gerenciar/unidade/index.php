@@ -39,7 +39,7 @@ unset($condition['ordem']);
 $unidade = new Unidade($condition);
 $order = Filter::order(isset($_GET['ordem']) ? $_GET['ordem'] : '');
 $count = Unidade::count($condition);
-list($pagesize, $offset, $pagestring) = pagestring($count, $limite);
+list($pagesize, $offset, $pagination) = pagestring($count, $limite);
 $unidades = Unidade::findAll($condition, $order, $pagesize, $offset);
 
 if (is_output('json')) {

@@ -1011,7 +1011,7 @@ function get_forma_pagto($type)
 function pagestring($count, $pagesize, $field = 'pagina')
 {
     $p = new Pager($count, $pagesize, $field);
-    return [$pagesize, $p->offset, $p->genBasic()];
+    return [$pagesize, $p->offset, $p->genPages()];
 }
 
 function to_ini($array)

@@ -41,7 +41,7 @@ unset($condition['ordem']);
 $produto = new Produto($condition);
 $order = Filter::order(isset($_GET['ordem']) ? $_GET['ordem'] : '');
 $count = Produto::count($condition);
-list($pagesize, $offset, $pagestring) = pagestring($count, $limite);
+list($pagesize, $offset, $pagination) = pagestring($count, $limite);
 $produtos = Produto::findAll($condition, $order, $pagesize, $offset);
 
 if (is_output('json')) {

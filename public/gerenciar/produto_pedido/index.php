@@ -70,7 +70,7 @@ if (isset($condition['tipo'])) {
 $produto_pedido = new ProdutoPedido($condition);
 $order = Filter::order(isset($_GET['ordem']) ? $_GET['ordem'] : '');
 $count = ProdutoPedido::count($condition);
-list($pagesize, $offset, $pagestring) = pagestring($count, $limite);
+list($pagesize, $offset, $pagination) = pagestring($count, $limite);
 $itens_do_pedido = ProdutoPedido::findAll($condition, $order, $pagesize, $offset);
 
 if (is_output('json')) {

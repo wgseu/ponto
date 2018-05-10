@@ -44,7 +44,7 @@ if (!logged_employee()->has(Permissao::NOME_CADASTROFUNCIONARIOS)) {
 $funcionario = new Funcionario($condition);
 $order = Filter::order(isset($_GET['ordem']) ? $_GET['ordem'] : '');
 $count = Funcionario::count($condition);
-list($pagesize, $offset, $pagestring) = pagestring($count, $limite);
+list($pagesize, $offset, $pagination) = pagestring($count, $limite);
 $funcionarios = Funcionario::findAll($condition, $order, $pagesize, $offset);
 
 if (is_output('json')) {

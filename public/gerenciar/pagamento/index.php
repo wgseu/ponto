@@ -43,7 +43,7 @@ unset($condition['ordem']);
 $pagamento = new Pagamento($condition);
 $order = Filter::order(isset($_GET['ordem']) ? $_GET['ordem'] : '');
 $count = Pagamento::count($condition);
-list($pagesize, $offset, $pagestring) = pagestring($count, $limite);
+list($pagesize, $offset, $pagination) = pagestring($count, $limite);
 $pagamentos = Pagamento::findAll($condition, $order, $pagesize, $offset);
 
 if (is_output('json')) {

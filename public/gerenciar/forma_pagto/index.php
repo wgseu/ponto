@@ -39,7 +39,7 @@ unset($condition['ordem']);
 $forma_pagto = new FormaPagto($condition);
 $order = Filter::order(isset($_GET['ordem']) ? $_GET['ordem'] : '');
 $count = FormaPagto::count($condition);
-list($pagesize, $offset, $pagestring) = pagestring($count, $limite);
+list($pagesize, $offset, $pagination) = pagestring($count, $limite);
 $formas_de_pagamento = FormaPagto::findAll($condition, $order, $pagesize, $offset);
 
 if (is_output('json')) {

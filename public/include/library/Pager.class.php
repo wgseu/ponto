@@ -36,6 +36,7 @@ class Pager
     {
         $valueArray = $this->valueArray;
         $valueArray[$param] = $value;
+        unset($valueArray['mode']);
         return $this->script . '?' . http_build_query($valueArray);
     }
 
@@ -77,7 +78,7 @@ class Pager
         ];
     }
 
-    public function GenBasic()
+    public function genPages()
     {
         $r = $this->paginate();
         $buffer = null;
@@ -104,26 +105,50 @@ class Pager
             $min = ($min>1) ? $min : 1;
             $range = range($min, $max);
         }
-        $buffer .= '<nav class="navbar-right">'."\r\n\t".'<ul class="pagination">'."\r\n";
+        $pages = [];
         if ($this->pageNo > 1 && $this->pageCount > 2) {
-            $buffer .= "\t\t<li><a href='".$this->genURL($this->pageString, 1)."'>{$index}</a></li>\r\n";
+            $pages[] = [
+                'url' => $this->genURL($this->pageString, 1),
+                'title' => $index,
+                'active' => false
+            ];
             if ($this->pageNo > 2) {
-                $buffer .= "\t\t<li><a href='".$this->genURL($this->pageString, $this->pageNo-1)."'>{$pre}</a></li>\r\n";
+                $pages[] = [
+                    'url' => $this->genURL($this->pageString, $this->pageNo - 1),
+                    'title' => $pre,
+                    'active' => false
+                ];
             }
         }
         foreach ($range as $one) {
             if ($one == $this->pageNo) {
-                $buffer .= "\t\t".'<li class="active"><a href="#">'.$one.'</a></li>'."\r\n";
+                $pages[] = [
+                    'url' => '#',
+                    'title' => $one,
+                    'active' => true
+                ];
             } else {
-                $buffer .= "\t\t<li><a href='".$this->genURL($this->pageString, $one)."'>{$one}</a></li>\r\n";
+                $pages[] = [
+                    'url' => $this->genURL($this->pageString, $one),
+                    'title' => $one,
+                    'active' => false
+                ];
             }
         }
         if ($this->pageNo < $this->pageCount && $this->pageCount > 2) {
             if ($this->pageNo < $this->pageCount - 1) {
-                $buffer .= "\t\t<li><a href='".$this->genURL($this->pageString, $this->pageNo+1)."'>{$next}</a></li>\r\n";
+                $pages[] = [
+                    'url' => $this->genURL($this->pageString, $this->pageNo + 1),
+                    'title' => $next,
+                    'active' => false
+                ];
             }
-            $buffer .= "\t\t<li><a href='".$this->genURL($this->pageString, $this->pageCount)."'>{$last}</a></li>\r\n";
+            $pages[] = [
+                'url' => $this->genURL($this->pageString, $this->pageCount),
+                'title' => $last,
+                'active' => false
+            ];
         }
-        return $buffer ."\t". '</ul>'."\r\n".'</nav>'."\r\n";
+        return $pages;
     }
 }

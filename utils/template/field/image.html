@@ -1,14 +1,14 @@
 <div class="form-group col-lg-6 col-md-6 col-sm-6 col-xs-12">
-	<label for="set_$[field]">$[Field.name]:</label>
-	<div id="$[field]_container" class="image-view third-effect" style="height: $[field.image.height]px;">
-		<label for="image_header" class="lbltitle">
-			<img src="{$$[table.unix]->make$[Field.norm]()}" no-picture="{$$[table.unix]->make$[Field.norm](true)}" height="$[field.image.height]" alt="$[Field.name]" title="$[Field.info]"/>
-		</label>
-		<input class="upload" type="file" id="raw_$[field]" name="raw_$[field]" accept="image/x-png, image/jpeg"/>
-		<input type="hidden" name="$[field]" value="{$$[table.unix]->get$[Field.norm]()}" />
-		<div class="mask">
-			<a href="#" class="img-open" id="set_$[field]" title="Selecionar imagem do computador">Abrir</a>
-			<a href="#" class="img-remove" title="Remover imagem">Remover</a>
-		</div>
-	</div>
+  <label for="set_$[field]">$[Field.name]:</label>
+  <div id="$[field]_container" class="image-view third-effect" style="height: $[field.image.height]px;">
+    <label for="image_header" class="lbltitle">
+      <img src="{{ $$[table.unix]->make$[Field.norm]() }}" no-picture="{{ $$[table.unix]->make$[Field.norm](true) }}" height="$[field.image.height]" alt="$[Field.name]" title="$[Field.info]"/>
+    </label>
+    <input class="upload" type="file" id="raw_$[field]" name="raw_$[field]" accept="image/x-png, image/jpeg"/>
+    <input type="hidden" name="$[field]" value="{{ $$[table.unix]->get$[Field.norm]() }}" />
+    <div class="mask">
+      <a href="#" class="img-open" id="set_$[field]" title="Selecionar imagem do computador">Abrir</a>
+      <a href="#" class="img-remove" title="Remover imagem">Remover</a>
+    </div>
+  </div>
 </div>

@@ -42,11 +42,11 @@
 								<div title="{{ $img['name'] }}" class="cell-icon cartao-icons" style="background-position: -{{ $img['id'] * 50 }}px 0px;"></div>
 							</div>
 							<div class="assoc-info">
-								<input type="hidden" id="cartao_{{ $codigo }}_ref" name="cartao[{{ $codigo }}]" data-descricao="{{ \MZ\Util\Filter::input($associado->getDescricao()) }}" data-codigo="{{ $codigo }}" data-id="{{ $associado->getID() }}" value="{{ $associado->getID() }}">
+								<input type="hidden" id="cartao_{{ $codigo }}_ref" name="cartao[{{ $codigo }}]" data-descricao="{{ $associado->getDescricao() }}" data-codigo="{{ $codigo }}" data-id="{{ $associado->getID() }}" value="{{ $associado->getID() }}">
 								<div class="form-group">
 									<label for="cartao_{{ $codigo }}">Cartão: <span class="identifier">{{ $cartao['name'] }}</span></label>
 									<div class="input-group">
-										<input type="text" id="cartao_{{ $codigo }}" class="form-control assoc-input" value="{{ \MZ\Util\Filter::input($associado->getDescricao()) }}">
+										<input type="text" id="cartao_{{ $codigo }}" class="form-control assoc-input" value="{{ $associado->getDescricao() }}">
 										<span class="input-group-btn">
 											<button class="btn btn-default disabled" tabindex="-1"><i class="fa fa-{{ $cartao['icon'] }}"></i></button>
 										</span>

@@ -39,7 +39,7 @@ unset($condition['ordem']);
 $fornecedor = new Fornecedor($condition);
 $order = Filter::order(isset($_GET['ordem']) ? $_GET['ordem'] : '');
 $count = Fornecedor::count($condition);
-list($pagesize, $offset, $pagestring) = pagestring($count, $limite);
+list($pagesize, $offset, $pagination) = pagestring($count, $limite);
 $fornecedores = Fornecedor::findAll($condition, $order, $pagesize, $offset);
 
 if (is_output('json')) {

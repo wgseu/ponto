@@ -39,7 +39,7 @@ unset($condition['ordem']);
 $comanda = new Comanda($condition);
 $order = Filter::order(isset($_GET['ordem']) ? $_GET['ordem'] : '');
 $count = Comanda::count($condition);
-list($pagesize, $offset, $pagestring) = pagestring($count, $limite);
+list($pagesize, $offset, $pagination) = pagestring($count, $limite);
 $comandas = Comanda::findAll($condition, $order, $pagesize, $offset);
 
 if (is_output('json')) {

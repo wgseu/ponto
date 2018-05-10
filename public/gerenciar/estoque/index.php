@@ -39,7 +39,7 @@ unset($condition['ordem']);
 $estoque = new Estoque($condition);
 $order = Filter::order(isset($_GET['ordem']) ? $_GET['ordem'] : '');
 $count = Estoque::count($condition);
-list($pagesize, $offset, $pagestring) = pagestring($count, $limite);
+list($pagesize, $offset, $pagination) = pagestring($count, $limite);
 $estoques = Estoque::findAll($condition, $order, $pagesize, $offset);
 
 if (is_output('json')) {

@@ -42,7 +42,7 @@ $folha_cheque = new FolhaCheque($condition);
 $cheque = new Cheque($condition);
 $order = Filter::order(isset($_GET['ordem']) ? $_GET['ordem'] : '');
 $count = FolhaCheque::count($condition);
-list($pagesize, $offset, $pagestring) = pagestring($count, $limite);
+list($pagesize, $offset, $pagination) = pagestring($count, $limite);
 $folhas_de_cheques = FolhaCheque::findAll($condition, $order, $pagesize, $offset);
 
 if (is_output('json')) {

@@ -51,7 +51,7 @@ if ($estado == 'Cancelado') {
 $pedido = new Pedido($condition);
 $order = Filter::order(isset($_GET['ordem']) ? $_GET['ordem'] : '');
 $count = Pedido::count($condition);
-list($pagesize, $offset, $pagestring) = pagestring($count, $limite);
+list($pagesize, $offset, $pagination) = pagestring($count, $limite);
 $pedidos = Pedido::findAll($condition, $order, $pagesize, $offset);
 
 if (is_output('json')) {

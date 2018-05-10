@@ -40,7 +40,7 @@ unset($condition['ordem']);
 $auditoria = new Auditoria($condition);
 $order = Filter::order(isset($_GET['ordem']) ? $_GET['ordem'] : '');
 $count = Auditoria::count($condition);
-list($pagesize, $offset, $pagestring) = pagestring($count, $limite);
+list($pagesize, $offset, $pagination) = pagestring($count, $limite);
 $auditorias = Auditoria::findAll($condition, $order, $pagesize, $offset);
 
 if (is_output('json')) {

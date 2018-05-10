@@ -40,7 +40,7 @@ $condition['classificacaoid'] = isset($condition['classificacaoid']) ? $conditio
 $classificacao = new Classificacao($condition);
 $order = Filter::order(isset($_GET['ordem']) ? $_GET['ordem'] : '');
 $count = Classificacao::count($condition);
-list($pagesize, $offset, $pagestring) = pagestring($count, $limite);
+list($pagesize, $offset, $pagination) = pagestring($count, $limite);
 $classificacoes = Classificacao::findAll($condition, $order, $pagesize, $offset);
 
 if (is_output('json')) {

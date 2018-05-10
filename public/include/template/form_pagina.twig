@@ -1,0 +1,20 @@
+<div class="form-group col-lg-6 col-md-6 col-sm-6 col-xs-12">
+  <label for="nome">Nome:</label>
+  <select class="form-control" id="nome" name="nome">
+    {% for $value, $text in $nomes %}
+      <option value="{{ $value }}" {{ $pagina->getNome() == $value ? 'selected': '' }}>{{ $text }}</option>
+    {% endfor %}
+  </select>
+</div>
+<div class="form-group col-lg-6 col-md-6 col-sm-6 col-xs-12">
+  <label for="linguagemid">Linguagem:</label>
+  <select class="form-control" id="linguagemid" name="linguagemid">
+    {% for $value, $text in $linguagens %}
+      <option value="{{ $value }}" {{ $pagina->getLinguagemID() == $value ? 'selected': '' }}>{{ $text }}</option>
+    {% endfor %}
+  </select>
+</div>
+<div class="form-group col-lg-12 col-md-12 col-sm-12 col-xs-12">
+  <label for="conteudo">Conteúdo:</label>
+  <textarea id="conteudo" name="conteudo" class="ckeditor">{{ $pagina->getConteudo() | raw }}</textarea>
+</div>

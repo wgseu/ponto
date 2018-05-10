@@ -1,0 +1,68 @@
+{{ include('header_gerenciar.twig') }}
+<script type="text/javascript">
+  $(function () {
+    Gerenciar.modulo.init();
+  });
+</script>
+<div class="">
+  <div class="page-title">
+    <div class="title_left">
+      <h3>Módulos
+        <small>Visualizar módulos</small>
+      </h3>
+    </div>
+    <div class="title_right">
+      <form method="get" action="/gerenciar/modulo/" id="search-form">
+        <div class="col-md-5 col-sm-5 col-xs-12 form-group pull-right">
+          <div class="input-group">
+            <input type="text" class="form-control" id="search" name="search" placeholder="Procurar..." value="{{ $this->get('search') }}">
+            <span class="input-group-btn">
+              <button class="btn btn-default" type="submit">
+                <i class="fa fa-search"></i>
+              </button>
+            </span>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+  <div class="clearfix"></div>
+  <div class="row">
+    <div class="col-md-12 col-sm-12 col-xs-12">
+      <div class="x_panel">
+        <div class="x_title">
+          <h2>Módulos<small></small>
+          </h2>
+          <div class="clearfix"></div>
+        </div>
+        <div class="x_content x_scroll">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Nome</th>
+                <th>Descrição</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for $modulo in $modulos %}
+                <tr class="{{ !$modulo->isHabilitado() ? 'active': '' }}">
+                  <td>
+                    <div class="">
+                      <label>
+                        <input type="checkbox" class="js-switch" name="marcado" data-id="{{ $modulo->getID() }}" value="Y" {{ $modulo->isHabilitado()?'checked':'' }}/>
+                        {{ $modulo->getNome() }}
+                      </label>
+                    </div>
+                  </td>
+                  <td>{{ $modulo->getDescricao() }}</td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+          {{ include('pagination.twig') }}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{{ include('footer_gerenciar.twig') }}

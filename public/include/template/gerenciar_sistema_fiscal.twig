@@ -1,0 +1,33 @@
+{{ include('header_gerenciar_sistema.twig') }}
+<script type="text/javascript">
+  $(function () {
+    Gerenciar.sistema.initFiscal('{{ $focusctrl }}');
+  });
+</script>
+<div role="tabpanel" class="tab-pane fade active in" id="tab_avancado" aria-labelledby="avancado-tab">
+  <div class="row">
+    <div class="col-md-12 col-sm-12 col-xs-12">
+      <div class="x_panel">
+        <div class="row x_title">
+          <h2>Opções fiscais</h2>
+        </div>
+        <div class="x_content">
+          <form id="avancado-form" method="POST" action="/gerenciar/sistema/fiscal">
+            <div class="form-group col-xs-12">
+              <label for="fiscal_timeout">Tempo limite de espera:</label>
+              <input type="text" id="fiscal_timeout" class="numeric form-control text-right" data-a-sep="" data-m-dec="0" name="fiscal_timeout" value="{{ $fiscal_timeout }}" autocomplete="off"/>
+            </div>
+            <div class="form-group">
+              <div class="col-md-12 col-sm-12 col-xs-12 text-center">
+                <div class="ln_solid"></div>
+                <button type="submit" class="btn btn-success">Salvar</button>
+              </div>
+            </div>
+          </form>
+        </div>
+        <div class="clearfix"></div>
+      </div>
+    </div>
+  </div>
+</div>
+{{ include('footer_gerenciar_sistema.twig') }}

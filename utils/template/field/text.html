@@ -1,4 +1,4 @@
 <div class="form-group col-lg-12 col-md-12 col-sm-12 col-xs-12">
   <label for="$[field]">$[Field.name]:</label>
-  <textarea id="$[field]" name="$[field]" class="ckeditor">{!! $$[table.unix]->get$[Field.norm]()) !!}</textarea>
+  <textarea id="$[field]" name="$[field]" class="ckeditor">{{ $$[table.unix]->get$[Field.norm]()) | raw }}</textarea>
 </div>

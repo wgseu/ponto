@@ -1,9 +1,0 @@
-<div class="form-group col-lg-9 col-md-9 col-sm-9 col-xs-9">
-	<label for="nome">Nome:</label>
-	<input type="text" id="nome" name="nome" class="form-control" value="{{ $mesa->getNome() }}">
-</div>
-<div class="checkbox col-lg-3 col-md-3 col-sm-3 col-xs-3">
-	<label>
-		<input type="checkbox" id="ativa" name="ativa" value="Y" {{ $mesa->getAtiva() == 'Y'?'checked':'' }}> Ativa
-	</label>
-</div>

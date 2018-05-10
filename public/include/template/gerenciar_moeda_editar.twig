@@ -1,15 +1,22 @@
 {{ include('header_gerenciar.twig') }}
-<script type="text/javascript">$(function(){Gerenciar.$[table.unix].initForm('{{ $focusctrl }}');});</script>
+<script type="text/javascript">
+  $(function () {
+    Gerenciar.moeda.initForm('{{ $focusctrl }}');
+  });
+</script>
 <div class="row">
   <div class="col-md-12 col-sm-12 col-xs-12">
     <div class="x_panel">
       <div class="x_title">
-        <h2>$[Table.name] <small>{{ $old_$[table.unix]->get$[Descriptor.norm]() }}</small></h2>
+        <h2>Moeda
+          <small>Editando moeda:
+            {{ $old_moeda->getNome() }}</small>
+        </h2>
         <div class="clearfix"></div>
       </div>
       <div class="x_content">
-        <form id="$[table.unix]-form" class="form-horizontal form-label-left" method="post" action="/gerenciar/$[table.unix]/editar?$[primary.unix]={{ $$[table.unix]->get$[Primary.norm]() }}" enctype="multipart/form-data">
-{{ include('form_$[table.unix].twig') }}
+        <form id="moeda-form" class="form-horizontal form-label-left" method="post" action="/gerenciar/moeda/editar?id={{ $moeda->getID() }}" enctype="multipart/form-data">
+          {{ include('form_moeda.twig') }}
           <div class="form-group">
             <div class="col-md-12 col-sm-12 col-xs-12 text-center">
               <div class="ln_solid"></div>

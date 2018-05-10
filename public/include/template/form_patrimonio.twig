@@ -1,0 +1,79 @@
+<div class="form-group col-lg-6 col-md-6 col-sm-6 col-xs-12">
+  <label for="set_imagemanexada">Foto do bem:</label>
+  <div id="imagemanexada_container" class="image-view third-effect" style="height: 512px;">
+    <label for="image_header" class="lbltitle">
+      <img src="{{ get_image_url(is_local_path($patrimonio->getImagemAnexada())?null:$patrimonio->getImagemAnexada(), 'patrimonio', 'patrimonio.png') }}" no-picture="{{ get_image_url(null, 'patrimonio', 'patrimonio.png') }}" height="512" alt="Foto do bem" title="Foto do bem"/>
+    </label>
+    <input class="upload" type="file" id="raw_imagemanexada" name="raw_imagemanexada" accept="image/x-png, image/jpeg"/>
+    <input type="hidden" name="imagemanexada" value="{{ $patrimonio->getImagemAnexada() }}"/>
+    <div class="mask">
+      <a href="#" class="img-open" id="set_imagemanexada" title="Selecionar imagem do computador">Abrir</a>
+      <a href="#" class="img-remove" title="Remover imagem">Remover</a>
+    </div>
+  </div>
+</div>
+{% $_empresa = $patrimonio->findEmpresaID() %}
+<input type="hidden" id="empresaid_ref" name="empresaid" data-nome="{{ $_empresa->getNome() }}" value="{{ $patrimonio->getEmpresaID() }}">
+<div class="form-group col-lg-3 col-md-6 col-sm-6 col-xs-12">
+  <label for="empresaid">Empresa:
+    <span class="identifier">{{ \MZ\Util\Mask::phone($_empresa->getFone(1)) }}
+    </span>
+  </label>
+  <input type="text" id="empresaid" class="form-control" value="{{ $_empresa->getNome() }}">
+</div>
+{% $_fornecedor = $patrimonio->findFornecedorID() %}
+{% $_fornecedor = $_fornecedor->findEmpresaID() %}
+<input type="hidden" id="fornecedorid_ref" name="fornecedorid" data-nome="{{ $_fornecedor->getNome() }}" value="{{ $patrimonio->getFornecedorID() }}">
+<div class="form-group col-lg-3 col-md-6 col-sm-6 col-xs-12">
+  <label for="fornecedorid">Fornecedor:
+    <span class="identifier">{{ \MZ\Util\Mask::phone($_fornecedor->getFone(1)) }}
+    </span>
+  </label>
+  <input type="text" id="fornecedorid" class="form-control" value="{{ $_fornecedor->getNome() }}">
+</div>
+<div class="form-group col-lg-4 col-md-6 col-sm-6 col-xs-12">
+  <label for="descricao">Descrição:</label>
+  <input type="text" id="descricao" name="descricao" class="form-control" value="{{ $patrimonio->getDescricao() }}">
+</div>
+<div class="form-group col-lg-2 col-md-3 col-sm-3 col-xs-12">
+  <label for="estado">Estado:</label>
+  <select id="estado" name="estado" class="form-control">
+    <option value="Novo" {{ $patrimonio->getEstado() == 'Novo'?'selected':'' }}>Novo</option>
+    <option value="Conservado" {{ $patrimonio->getEstado() == 'Conservado'?'selected':'' }}>Conservado</option>
+    <option value="Ruim" {{ $patrimonio->getEstado() == 'Ruim'?'selected':'' }}>Ruim</option>
+  </select>
+</div>
+<div class="form-group col-lg-2 col-md-3 col-sm-3 col-xs-6">
+  <label for="quantidade">Quantidade:</label>
+  <input type="text" id="quantidade" name="quantidade" class="numeric form-control text-right" data-a-sep="" data-m-dec="0" value="{{ $patrimonio->getQuantidade() }}">
+</div>
+<div class="form-group col-lg-2 col-md-3 col-sm-3 col-xs-6">
+  <label for="numero">Número:</label>
+  <input type="text" id="numero" name="numero" class="form-control text-right" value="{{ $patrimonio->getNumero() }}">
+</div>
+<div class="form-group col-lg-2 col-md-3 col-sm-3 col-xs-6">
+  <label for="altura">Altura:</label>
+  <input type="text" id="altura" name="altura" class="numeric form-control text-right" data-a-sep="." data-a-dec="," data-v-min="0.00000" data-a-pad="false" value="{{ $patrimonio->getAltura() }}">
+</div>
+<div class="form-group col-lg-2 col-md-3 col-sm-3 col-xs-6">
+  <label for="largura">Largura:</label>
+  <input type="text" id="largura" name="largura" class="numeric form-control text-right" data-a-sep="." data-a-dec="," data-v-min="0.00000" data-a-pad="false" value="{{ $patrimonio->getLargura() }}">
+</div>
+<div class="form-group col-lg-2 col-md-3 col-sm-3 col-xs-6">
+  <label for="comprimento">Comprimento:</label>
+  <input type="text" id="comprimento" name="comprimento" class="numeric form-control text-right" data-a-sep="." data-a-dec="," data-v-min="0.00000" data-a-pad="false" value="{{ $patrimonio->getComprimento() }}">
+</div>
+<div class="form-group col-lg-2 col-md-3 col-sm-3 col-xs-6">
+  <label for="custo">Custo:</label>
+  <input type="text" id="custo" name="custo" class="numeric form-control text-right" data-a-sep="." data-a-dec="," data-a-sign="{{ $currency->getSimbolo() }} " value="{{ $patrimonio->getCusto() }}">
+</div>
+<div class="form-group col-lg-2 col-md-3 col-sm-3 col-xs-6">
+  <label for="valor">Valor:</label>
+  <input type="text" id="valor" name="valor" class="numeric form-control text-right" data-a-sep="." data-a-dec="," data-a-sign="{{ $currency->getSimbolo() }} " value="{{ $patrimonio->getValor() }}">
+</div>
+<div class="checkbox col-lg-3 col-md-6 col-sm-6 col-xs-6">
+  <label>
+    <input type="checkbox" id="ativo" name="ativo" value="Y" {{ $patrimonio->getAtivo() == 'Y'?'checked':'' }}>
+    Ativo
+  </label>
+</div>

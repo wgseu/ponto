@@ -79,7 +79,7 @@ class HtmlResponse extends Response
      */
     public function output($template)
     {
-        $ext = 'html';
+        $ext = '';
         $pattern = '/\.(\w+)$/';
         if (preg_match($pattern, $template, $matches)) {
             $ext = $matches[1];
@@ -91,12 +91,12 @@ class HtmlResponse extends Response
             case 'txt':
                 $this->getProcessor()->header('Content-Type', 'text/plain; charset=UTF-8');
                 break;
-            case 'html':
+            default:
                 $this->engine->retrocompatibility();
                 $this->getProcessor()->header('Content-Type', 'text/html; charset=UTF-8');
                 break;
         }
         $this->engine->pagetitle = $this->title;
-        parent::output($this->engine->render($template));
+        parent::output($this->engine->render($template . '.twig'));
     }
 }

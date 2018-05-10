@@ -1,0 +1,26 @@
+<div class="form-group col-lg-3 col-md-4 col-sm-4 col-xs-12">
+  {% $_pais = $_estado->findPaisID() %}
+  <label for="paisid">
+    <div class="cell-icon pais-icons" style="background-position: -{{ $_pais->getBandeiraIndex() * 16 }}px 0px;"></div>País:</label>
+  <select class="form-control" id="paisid">
+    {% for $_pais in $_paises %}
+      <option value="{{ $_pais->getID() }}" data-bandeira="{{ $_pais->getBandeiraIndex() }}" data-codigo="{{ $_pais->getCodigo() }}" data-sigla="{{ $_pais->getSigla() }}" {{ $_estado->getPaisID() == $_pais->getID()?'selected':'' }}>{{ $_pais->getNome() }}</option>
+    {% endfor %}
+  </select>
+</div>
+<div class="form-group col-lg-3 col-md-4 col-sm-6 col-xs-12">
+  <label for="estadoid">Estado:</label>
+  <select class="form-control" id="estadoid" name="estadoid">
+    {% for $_estado in $_estados %}
+      <option value="{{ $_estado->getID() }}" {{ $cidade->getEstadoID() == $_estado->getID()?'selected':'' }}>{{ $_estado->getNome() }}</option>
+    {% endfor %}
+  </select>
+</div>
+<div class="form-group col-lg-3 col-md-4 col-sm-6 col-xs-12">
+  <label for="nome">Nome:</label>
+  <input type="text" id="nome" name="nome" class="form-control" value="{{ $cidade->getNome() }}">
+</div>
+<div class="form-group col-lg-3 col-md-4 col-sm-6 col-xs-12">
+  <label for="cep">{{ _p('Titulo', 'CEP') }}:</label>
+  <input type="text" id="cep" name="cep" class="form-control masked" mask="{{ _p('Mascara', 'CEP') }}" value="{{ \MZ\Util\Mask::cep($cidade->getCEP()) }}">
+</div>

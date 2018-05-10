@@ -1,0 +1,9 @@
+{{ include('email_header.twig') }}
+<p>{{ $message }}</p>
+{% for $title, $subject in $filters %}
+  <p>
+    <b>{{ $title }}:</b>
+    {{ $subject }}
+  </p>
+{% endfor %}
+{{ include('email_footer.twig') }}

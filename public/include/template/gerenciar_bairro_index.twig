@@ -1,0 +1,116 @@
+{{ include('header_gerenciar.twig') }}
+<script type="text/javascript">
+  $(function () {
+    Gerenciar.bairro.init();
+  });
+</script>
+<div class="row">
+  <div class="page-title">
+    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-6">
+      <h3>Bairros</h3>
+    </div>
+    <form id="search-form" method="get" action="/gerenciar/bairro/">
+      <div class="form-group col-lg-2 col-md-5 col-sm-5 col-xs-12">
+        <label for="paisid">
+          <div class="cell-icon pais-icons" style="background-position: {{ -(!$pais->exists()?-1:$pais->getBandeiraIndex()) * 16 }}px 0px;"></div>País:</label>
+        <select class="form-control" id="paisid" name="paisid">
+          <option value="" data-bandeira="-1">Todos</option>
+          {% for $_pais in $_paises %}
+            <option value="{{ $_pais->getID() }}" data-id="{{ $_pais->getID() }}" data-bandeira="{{ $_pais->getBandeiraIndex() }}" data-codigo="{{ $_pais->getCodigo() }}" data-sigla="{{ $_pais->getSigla() }}" {{ $pais->getID() == $_pais->getID()?'selected':'' }}>{{ $_pais->getNome() }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="form-group col-lg-3 col-md-5 col-sm-5 col-xs-12">
+        <label for="estadoid">Estado:</label>
+        <select class="form-control" id="estadoid" name="estadoid">
+          <option value="" data-sigla="">Todos</option>
+          {% for $_estado in $_estados %}
+            <option value="{{ $_estado->getID() }}" data-id="{{ $_estado->getID() }}" data-sigla="{{ $_estado->getUF() }}" {{ $estado->getID() == $_estado->getID()?'selected':'' }}>{{ $_estado->getNome() }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <input type="hidden" id="cidadeid_ref" name="cidadeid" class="form-control" value="{{ $cidade->getID() }}">
+      <div class="form-group col-lg-2 col-md-6 col-sm-4 col-xs-12">
+        <label for="cidadeid">Cidade:</label>
+        <input type="text" id="cidadeid" class="form-control" value="{{ $cidade->getNome() }}">
+      </div>
+      <div class="form-group col-lg-3 col-md-6 col-sm-8 col-xs-12">
+        <label for="search">Nome:</label>
+        <div class="input-group">
+          <input type="text" class="form-control" id="search" name="search" placeholder="Procurar..." value="{{ $this->get('search') }}">
+          <span class="input-group-btn">
+            <button class="btn btn-default" type="submit">
+              <i class="fa fa-search"></i>
+            </button>
+          </span>
+        </div>
+      </div>
+      <input type="submit" style="position: absolute; left: -9999px; width: 1px; height: 1px;" tabindex="-1"/>
+    </form>
+  </div>
+  <div class="clearfix"></div>
+  <div class="">
+    <div class="col-md-12 col-sm-12 col-xs-12">
+      <div class="x_panel">
+        <div class="x_title">
+          <h2>Bairros<small></small>
+          </h2>
+          <ul class="nav navbar-right panel_toolbox hidden-print">
+            <li>
+              <a href="/gerenciar/bairro/cadastrar" title="Novo bairro">
+                <i class="fa fa-plus-square"></i>
+              </a>
+            </li>
+          </ul>
+          <div class="clearfix"></div>
+        </div>
+        <div class="x_content x_scroll">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Nome</th>
+                <th>Valor da entrega</th>
+                <th>Cidade</th>
+                <th width="10%" style="text-align: center;">Ações</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for $bairro in $bairros %}
+                <tr class="{{ !$bairro->isDisponivel() ? 'active': '' }}">
+                  {% $_cidade = $bairro->findCidadeID() %}
+                  {% $_estado = $_cidade->findEstadoID() %}
+                  <td>{{ $bairro->getNome() }}</td>
+                  <td>{{ $this->currency($bairro->getValorEntrega()) }}</td>
+                  <td>
+                    <strong>
+                      <a href="/gerenciar/cidade/editar?id={{ $_cidade->getID() }}" title="Editar cidade '{{ $_cidade->getNome() }}'">{{ $_cidade->getNome() }}</a>
+                    </strong>
+                    <small>
+                      <a href="/gerenciar/estado/editar?id={{ $_estado->getID() }}" title="Editar estado '{{ $_estado->getNome() }}'">{{ $_estado->getNome() }}</a>
+                    </small>
+                  </td>
+                  <td class="text-center">
+                    <ul class="nav panel_toolbox">
+                      <li>
+                        <a href="/gerenciar/bairro/editar?id={{ $bairro->getID() }}" title="Editar bairro '{{ $bairro->getNome() }}'">
+                          <i class="fa fa-edit"></i>
+                        </a>
+                      </li>
+                      <li>
+                        <a href="/gerenciar/bairro/excluir?id={{ $bairro->getID() }}" title="Excluir bairro '{{ $bairro->getNome() }}'" class="ajaxlink" ask="Deseja excluir o bairro '{{ $bairro->getNome() }}'?">
+                          <i class="fa fa-close"></i>
+                        </a>
+                      </li>
+                    </ul>
+                  </td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+          {{ include('pagination.twig') }}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{{ include('footer_gerenciar.twig') }}

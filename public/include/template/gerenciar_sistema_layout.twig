@@ -1,0 +1,215 @@
+{{ include('header_gerenciar_sistema.twig') }}
+<script type="text/javascript">
+  $(function () {
+    Gerenciar.sistema.initLayout('{{ $focusctrl }}');
+  });
+</script>
+<div role="tabpanel" class="tab-pane fade active in" id="tab_layout" aria-labelledby="layout-tab">
+  <form id="layout-form" method="POST" action="/gerenciar/sistema/layout" enctype="multipart/form-data">
+    <div class="row">
+
+      <div class="col-md-12 col-sm-12 col-xs-12">
+        <div class="x_panel">
+          <div class="row x_title">
+            <h2>Textos diversos</h2>
+          </div>
+          <div class="clearfix"></div>
+          <div class="x_content">
+            <div class="form-group col-lg-6 col-md-12 col-sm-12 col-xs-12">
+              <label for="bemvindo">Mensagem de bem-vindo:</label>
+              <input type="text" id="bemvindo" class="form-control" name="bemvindo" value="{{ $text_bemvindo }}"/>
+            </div>
+            <div class="form-group col-lg-6 col-md-12 col-sm-12 col-xs-12">
+              <label for="chamada">Mensagem de chamada:</label>
+              <input type="text" id="chamada" class="form-control" name="chamada" value="{{ $text_chamada }}"/>
+            </div>
+            <div class="form-group">
+              <div class="col-md-12 col-sm-12 col-xs-12 text-center">
+                <div class="ln_solid"></div>
+                <button type="submit" class="btn btn-success btn-lg">Salvar</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-6 col-xs-12">
+        <div class="x_panel">
+          <div class="row x_title">
+            <h2>Imagem principal
+              <small>Tamanho ideal ( 1900 x 1250 )</small>
+            </h2>
+          </div>
+          <div class="image-view third-effect" style="height: 328px;">
+            <label for="image_header" class="lbltitle">
+              <img src="{{ get_site_image_url('Image.Header') }}" no-picture="{{ get_site_image_url('Image.Header', true) }}" width="500" height="328" alt="Header"/>
+            </label>
+            <input class="upload" type="file" id="image_header" name="image_header" accept="image/x-png, image/jpeg"/>
+            <input type="hidden" name="header_url" value="{{ $images_info['header']['url'] }}"/>
+            <div class="mask">
+              <a href="#" class="img-open" title="Selecionar imagem do computador">Abrir</a>
+              <a href="#" class="img-remove" title="Remover imagem">Remover</a>
+            </div>
+          </div>
+          <div class="clearfix"></div>
+        </div>
+      </div>
+
+      <div class="col-md-6 col-xs-12">
+        <div class="x_panel">
+          <div class="row x_title">
+            <h2>Fundo de Entrar
+              <small>Tamanho ideal ( 1900 x 1250 )</small>
+            </h2>
+          </div>
+          <div class="image-view third-effect" style="height: 328px;">
+            <label for="image_login" class="lbltitle">
+              <img src="{{ get_site_image_url('Image.Login') }}" no-picture="{{ get_site_image_url('Image.Login', true) }}" width="500" height="328" alt="Entrar" style="background-color: black;"/>
+            </label>
+            <input class="upload" type="file" id="image_login" name="image_login" accept="image/x-png, image/jpeg"/>
+            <input type="hidden" name="login_url" value="{{ $images_info['login']['url'] }}"/>
+            <div class="mask">
+              <a href="#" class="img-open" title="Selecionar imagem do computador">Abrir</a>
+              <a href="#" class="img-remove" title="Remover imagem">Remover</a>
+            </div>
+          </div>
+          <div class="clearfix"></div>
+        </div>
+      </div>
+
+      <div class="col-md-6 col-xs-12">
+        <div class="x_panel">
+          <div class="row x_title">
+            <h2>Fundo de Cadastrar
+              <small>Tamanho ideal ( 1900 x 1250 )</small>
+            </h2>
+          </div>
+          <div class="image-view third-effect" style="height: 328px;">
+            <label for="image_cadastrar" class="lbltitle">
+              <img src="{{ get_site_image_url('Image.Cadastrar') }}" no-picture="{{ get_site_image_url('Image.Cadastrar', true) }}" width="500" height="328" alt="Cadastrar" style="background-color: black;"/>
+            </label>
+            <input class="upload" type="file" id="image_cadastrar" name="image_cadastrar" accept="image/x-png, image/jpeg"/>
+            <input type="hidden" name="cadastrar_url" value="{{ $images_info['cadastrar']['url'] }}"/>
+            <div class="mask">
+              <a href="#" class="img-open" title="Selecionar imagem do computador">Abrir</a>
+              <a href="#" class="img-remove" title="Remover imagem">Remover</a>
+            </div>
+          </div>
+          <div class="clearfix"></div>
+        </div>
+      </div>
+
+      <div class="col-md-6 col-xs-12">
+        <div class="x_panel">
+          <div class="row x_title">
+            <h2>Fundo de Produtos
+              <small>Tamanho ideal ( 1900 x 1250 )</small>
+            </h2>
+          </div>
+          <div class="image-view third-effect" style="height: 328px;">
+            <label for="image_produtos" class="lbltitle">
+              <img src="{{ get_site_image_url('Image.Produtos') }}" no-picture="{{ get_site_image_url('Image.Produtos', true) }}" width="500" height="328" alt="Produtos" style="background-color: black;"/>
+            </label>
+            <input class="upload" type="file" id="image_produtos" name="image_produtos" accept="image/x-png, image/jpeg"/>
+            <input type="hidden" name="produtos_url" value="{{ $images_info['produtos']['url'] }}"/>
+            <div class="mask">
+              <a href="#" class="img-open" title="Selecionar imagem do computador">Abrir</a>
+              <a href="#" class="img-remove" title="Remover imagem">Remover</a>
+            </div>
+          </div>
+          <div class="clearfix"></div>
+        </div>
+      </div>
+
+      <div class="col-md-6 col-xs-12">
+        <div class="x_panel">
+          <div class="row x_title">
+            <h2>Fundo de Sobre a empresa
+              <small>Tamanho ideal ( 1900 x 1250 )</small>
+            </h2>
+          </div>
+          <div class="image-view third-effect" style="height: 328px;">
+            <label for="image_sobre" class="lbltitle">
+              <img src="{{ get_site_image_url('Image.Sobre') }}" no-picture="{{ get_site_image_url('Image.Sobre', true) }}" width="500" height="328" alt="Sobre" style="background-color: black;"/>
+            </label>
+            <input class="upload" type="file" id="image_sobre" name="image_sobre" accept="image/x-png, image/jpeg"/>
+            <input type="hidden" name="sobre_url" value="{{ $images_info['sobre']['url'] }}"/>
+            <div class="mask">
+              <a href="#" class="img-open" title="Selecionar imagem do computador">Abrir</a>
+              <a href="#" class="img-remove" title="Remover imagem">Remover</a>
+            </div>
+          </div>
+          <div class="clearfix"></div>
+        </div>
+      </div>
+
+      <div class="col-md-6 col-xs-12">
+        <div class="x_panel">
+          <div class="row x_title">
+            <h2>Fundo de Privacidade
+              <small>Tamanho ideal ( 1900 x 1250 )</small>
+            </h2>
+          </div>
+          <div class="image-view third-effect" style="height: 328px;">
+            <label for="image_privacidade" class="lbltitle">
+              <img src="{{ get_site_image_url('Image.Privacidade') }}" no-picture="{{ get_site_image_url('Image.Privacidade', true) }}" width="500" height="328" alt="Privacidade" style="background-color: black;"/>
+            </label>
+            <input class="upload" type="file" id="image_privacidade" name="image_privacidade" accept="image/x-png, image/jpeg"/>
+            <input type="hidden" name="privacidade_url" value="{{ $images_info['privacidade']['url'] }}"/>
+            <div class="mask">
+              <a href="#" class="img-open" title="Selecionar imagem do computador">Abrir</a>
+              <a href="#" class="img-remove" title="Remover imagem">Remover</a>
+            </div>
+          </div>
+          <div class="clearfix"></div>
+        </div>
+      </div>
+
+      <div class="col-md-6 col-xs-12">
+        <div class="x_panel">
+          <div class="row x_title">
+            <h2>Fundo de Termos de uso
+              <small>Tamanho ideal ( 1900 x 1250 )</small>
+            </h2>
+          </div>
+          <div class="image-view third-effect" style="height: 328px;">
+            <label for="image_termos" class="lbltitle">
+              <img src="{{ get_site_image_url('Image.Termos') }}" no-picture="{{ get_site_image_url('Image.Termos', true) }}" width="500" height="328" alt="Termos" style="background-color: black;"/>
+            </label>
+            <input class="upload" type="file" id="image_termos" name="image_termos" accept="image/x-png, image/jpeg"/>
+            <input type="hidden" name="termos_url" value="{{ $images_info['termos']['url'] }}"/>
+            <div class="mask">
+              <a href="#" class="img-open" title="Selecionar imagem do computador">Abrir</a>
+              <a href="#" class="img-remove" title="Remover imagem">Remover</a>
+            </div>
+          </div>
+          <div class="clearfix"></div>
+        </div>
+      </div>
+
+      <div class="col-md-6 col-xs-12">
+        <div class="x_panel">
+          <div class="row x_title">
+            <h2>Fundo de Contato
+              <small>Tamanho ideal ( 1900 x 1250 )</small>
+            </h2>
+          </div>
+          <div class="image-view third-effect" style="height: 328px;">
+            <label for="image_contato" class="lbltitle">
+              <img src="{{ get_site_image_url('Image.Contato') }}" no-picture="{{ get_site_image_url('Image.Contato', true) }}" width="500" height="328" alt="Contato" style="background-color: black;"/>
+            </label>
+            <input class="upload" type="file" id="image_contato" name="image_contato" accept="image/x-png, image/jpeg"/>
+            <input type="hidden" name="contato_url" value="{{ $images_info['contato']['url'] }}"/>
+            <div class="mask">
+              <a href="#" class="img-open" title="Selecionar imagem do computador">Abrir</a>
+              <a href="#" class="img-remove" title="Remover imagem">Remover</a>
+            </div>
+          </div>
+          <div class="clearfix"></div>
+        </div>
+      </div>
+
+    </div>
+  </form>
+</div>
+{{ include('footer_gerenciar_sistema.twig') }}

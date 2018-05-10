@@ -1,0 +1,53 @@
+<div class="form-group col-lg-3 col-md-4 col-sm-6 col-xs-12">
+  <label for="descricao">Descrição:</label>
+  <input type="text" id="descricao" name="descricao" class="form-control" value="{{ $forma_pagto->getDescricao() }}">
+</div>
+<div class="form-group col-lg-3 col-md-4 col-sm-6 col-xs-12">
+  <label for="tipo">Tipo:</label>
+  <select id="tipo" name="tipo" class="form-control">
+    <option value="Dinheiro" {{ $forma_pagto->getTipo() == 'Dinheiro'?'selected':'' }}>Dinheiro</option>
+    <option value="Cartao" {{ $forma_pagto->getTipo() == 'Cartao'?'selected':'' }}>Cartão</option>
+    <option value="Cheque" {{ $forma_pagto->getTipo() == 'Cheque'?'selected':'' }}>Cheque</option>
+    <option value="Conta" {{ $forma_pagto->getTipo() == 'Conta'?'selected':'' }}>Conta</option>
+    <option value="Credito" {{ $forma_pagto->getTipo() == 'Credito'?'selected':'' }}>Crédito</option>
+    <option value="Transferencia" {{ $forma_pagto->getTipo() == 'Transferencia'?'selected':'' }}>Transferência</option>
+  </select>
+</div>
+<div class="form-group col-lg-3 col-md-4 col-sm-6 col-xs-12">
+  <label for="carteiraid">Carteira de entrada:</label>
+  <select class="form-control" id="carteiraid" name="carteiraid">
+    {% for $_carteira in $_carteiras %}
+      <option value="{{ $_carteira->getID() }}" {{ $forma_pagto->getCarteiraID() == $_carteira->getID()?'selected':'' }}>{{ $_carteira->getDescricao() }}</option>
+    {% endfor %}
+  </select>
+</div>
+<div class="form-group col-lg-3 col-md-4 col-sm-6 col-xs-12">
+  <label for="carteirapagtoid">Carteira de saída:</label>
+  <select class="form-control" id="carteirapagtoid" name="carteirapagtoid">
+    {% for $_carteira in $_carteiras %}
+      <option value="{{ $_carteira->getID() }}" {{ $forma_pagto->getCarteiraPagtoID() == $_carteira->getID()?'selected':'' }}>{{ $_carteira->getDescricao() }}</option>
+    {% endfor %}
+  </select>
+</div>
+<div class="form-group col-lg-3 col-md-4 col-sm-6 col-xs-12">
+  <label for="minparcelas">Minimo de parcelas:</label>
+  <input type="text" id="minparcelas" name="minparcelas" class="numeric form-control text-right" data-a-sep="" data-m-dec="0" value="{{ $forma_pagto->getMinParcelas() }}">
+</div>
+<div class="form-group col-lg-3 col-md-4 col-sm-6 col-xs-12">
+  <label for="maxparcelas">Máximo de parcelas:</label>
+  <input type="text" id="maxparcelas" name="maxparcelas" class="numeric form-control text-right" data-a-sep="" data-m-dec="0" value="{{ $forma_pagto->getMaxParcelas() }}">
+</div>
+<div class="form-group col-lg-3 col-md-4 col-sm-6 col-xs-12">
+  <label for="parcelassemjuros">Parcelas sem juros:</label>
+  <input type="text" id="parcelassemjuros" name="parcelassemjuros" class="numeric form-control text-right" data-a-sep="" data-m-dec="0" value="{{ $forma_pagto->getParcelasSemJuros() }}">
+</div>
+<div class="form-group col-lg-3 col-md-4 col-sm-6 col-xs-12">
+  <label for="juros">Juros:</label>
+  <input type="text" id="juros" name="juros" class="numeric form-control text-right" data-a-sep="." data-a-dec="," data-a-sign=" %" data-p-sign="s" data-a-pad="false" value="{{ $forma_pagto->getJuros() }}">
+</div>
+<div class="checkbox col-lg-3 col-md-4 col-sm-6 col-xs-12">
+  <label>
+    <input type="checkbox" id="ativa" name="ativa" value="Y" {{ $forma_pagto->getAtiva() == 'Y'?'checked':'' }}>
+    Ativa
+  </label>
+</div>

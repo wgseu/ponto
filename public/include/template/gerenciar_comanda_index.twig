@@ -1,0 +1,91 @@
+{{ include('header_gerenciar.twig') }}
+<script type="text/javascript">
+  $(function () {
+    Gerenciar.comanda.init();
+  });
+</script>
+<div class="">
+  <div class="page-title">
+    <div class="title_left">
+      <h3>Comandas
+        <small>Visualizar comandas</small>
+      </h3>
+    </div>
+    <div class="title_right">
+      <form method="get" action="/gerenciar/comanda/" id="search-form">
+        <div class="form-group col-lg-6 col-md-6 col-sm-12 col-xs-12">
+          <label for="nome">Estado:</label>
+          <select class="form-control" id="ativa" name="ativa">
+            <option value="" {{ !array_key_exists($this->get('ativa'), $ativas) ? 'selected': '' }}>Todas</option>
+            {% for $value, $text in $ativas %}
+              <option value="{{ $value }}" {{ $this->get('ativa') == $value ? 'selected': '' }}>{{ $text }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="form-group col-lg-6 col-md-6 col-sm-6 col-xs-12">
+          <label>Nome ou Código:</label>
+          <div class="input-group">
+            <input type="text" class="form-control" id="search" name="search" placeholder="Procurar..." value="{{ $this->get('search') }}">
+            <span class="input-group-btn">
+              <button class="btn btn-default" type="submit">
+                <i class="fa fa-search"></i>
+              </button>
+            </span>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+  <div class="clearfix"></div>
+  <div class="row">
+    <div class="col-md-12 col-sm-12 col-xs-12">
+      <div class="x_panel">
+        <div class="x_title">
+          <h2>Comandas<small></small>
+          </h2>
+          <ul class="nav navbar-right panel_toolbox hidden-print">
+            <li>
+              <a href="/gerenciar/comanda/cadastrar" title="Nova comanda">
+                <i class="fa fa-plus-square"></i>
+              </a>
+            </li>
+          </ul>
+          <div class="clearfix"></div>
+        </div>
+        <div class="x_content x_scroll">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Nome</th>
+                <th width="10%" style="text-align: center;">Ações</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for $comanda in $comandas %}
+                <tr class="{{ $comanda->getAtiva() == 'N'?'active':'' }}">
+                  <td>{{ $comanda->getNome() }}</td>
+                  <td class="text-center">
+                    <ul class="nav panel_toolbox">
+                      <li>
+                        <a href="/gerenciar/comanda/editar?id={{ $comanda->getID() }}" title="Editar comanda '{{ $comanda->getNome() }}'">
+                          <i class="fa fa-edit"></i>
+                        </a>
+                      </li>
+                      <li>
+                        <a href="/gerenciar/comanda/excluir?id={{ $comanda->getID() }}" title="Excluir comanda '{{ $comanda->getNome() }}'" class="ajaxlink" ask="Deseja excluir a comanda '{{ $comanda->getNome() }}'?">
+                          <i class="fa fa-close"></i>
+                        </a>
+                      </li>
+                    </ul>
+                  </td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+          {{ include('pagination.twig') }}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{{ include('footer_gerenciar.twig') }}

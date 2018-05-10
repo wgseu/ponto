@@ -1,0 +1,61 @@
+{{ include('header_gerenciar_sistema.twig') }}
+<script type="text/javascript">
+  $(function () {
+    Gerenciar.sistema.initEmail('{{ $focusctrl }}');
+  });
+</script>
+<div role="tabpanel" class="tab-pane fade active in" id="tab_email" aria-labelledby="email-tab">
+  <div class="row">
+    <div class="col-md-12 col-sm-12 col-xs-12">
+      <div class="x_panel">
+        <div class="row x_title">
+          <div class="col-md-12">
+            <h3>E-mail
+              <small>alterar E-mail de serviço</small>
+            </h3>
+          </div>
+        </div>
+        <div class="x_content">
+          <form id="email-form" method="POST" action="/gerenciar/sistema/email">
+            <div class="form-group col-lg-2 col-md-4 col-sm-6 col-xs-12">
+              <label for="destinatario">Destinatário:</label>
+              <input type="text" id="destinatario" name="destinatario" class="form-control" value="{{ $destinatario }}">
+            </div>
+            <div class="form-group col-lg-2 col-md-4 col-sm-6 col-xs-12">
+              <label for="usuario">Usuário:</label>
+              <input type="text" id="usuario" name="usuario" class="form-control" value="{{ $usuario }}">
+            </div>
+            <div class="form-group col-lg-2 col-md-4 col-sm-6 col-xs-12">
+              <label for="senha">Senha:</label>
+              <input type="password" id="senha" name="senha" class="form-control" value="">
+            </div>
+            <div class="form-group col-lg-3 col-md-4 col-sm-6 col-xs-12">
+              <label for="servidor">Servidor:</label>
+              <input type="text" id="servidor" name="servidor" class="form-control" value="{{ $servidor }}">
+            </div>
+            <div class="form-group col-lg-1 col-md-4 col-sm-6 col-xs-12">
+              <label for="porta">Porta:</label>
+              <input type="text" id="porta" name="porta" class="numeric form-control text-right" data-a-sep="" data-m-dec="0" value="{{ $porta }}">
+            </div>
+            <div class="form-group col-lg-2 col-md-4 col-sm-6 col-xs-12">
+              <label for="encriptacao">Encriptação:</label>
+              <select id="encriptacao" name="encriptacao" class="form-control">
+                <option value="0" {{ $encriptacao == '0'?'selected':'' }}>Nenhuma</option>
+                <option value="1" {{ $encriptacao == '1'?'selected':'' }}>SSL</option>
+                <option value="2" {{ $encriptacao == '2'?'selected':'' }}>TLS</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <div class="col-md-12 col-sm-12 col-xs-12 text-center">
+                <div class="ln_solid"></div>
+                <button type="submit" class="btn btn-success">Salvar</button>
+              </div>
+            </div>
+          </form>
+        </div>
+        <div class="clearfix"></div>
+      </div>
+    </div>
+  </div>
+</div>
+{{ include('footer_gerenciar_sistema.twig') }}

@@ -1,4 +1,4 @@
-{{ include('header_gerenciar') }}
+{{ include('header_gerenciar.twig') }}
 <script type="text/javascript">$(function(){Gerenciar.$[table.unix].init();});</script>
 <div class="row">
   <div class="page-title">
@@ -103,10 +103,10 @@ $[field.end]
 {% endfor %}
             </tbody>
           </table>
-          {{ include('pagination') }}
+          {{ include('pagination.twig') }}
         </div>
       </div>
     </div>
   </div>
 </div>
-{{ include('footer_gerenciar') }}
+{{ include('footer_gerenciar.twig') }}

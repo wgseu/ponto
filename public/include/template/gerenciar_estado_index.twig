@@ -1,0 +1,96 @@
+{{ include('header_gerenciar.twig') }}
+<script type="text/javascript">
+  $(function () {
+    Gerenciar.estado.init();
+  });
+</script>
+<div class="row">
+  <div class="page-title">
+    <div class="col-lg-3 col-md-3 col-sm-3 col-xs-6">
+      <h3>Estados</h3>
+    </div>
+    <form id="search-form" action="/gerenciar/estado/" method="get">
+      <div class="form-group col-lg-4 col-md-4 col-sm-4 col-xs-6">
+        <label for="paisid">
+          <div id="flag-filter" class="cell-icon pais-icons" style="background-position: {{ -(!$pais->exists()?-1:$pais->getBandeiraIndex()) * 16 }}px 0px;"></div>País:</label>
+        <select class="form-control" id="paisid" name="paisid">
+          <option value="" data-bandeira="-1">Todos</option>
+          {% for $_pais in $_paises %}
+            <option value="{{ $_pais->getID() }}" data-bandeira="{{ $_pais->getBandeiraIndex() }}" {{ $pais->getID() == $_pais->getID()?'selected':'' }}>{{ $_pais->getNome() }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="form-group col-lg-5 col-md-5 col-sm-5 col-xs-12">
+        <label>Nome ou UF:</label>
+        <div class="input-group">
+          <input type="text" class="form-control" id="search" name="search" placeholder="Procurar..." value="{{ $this->get('search') }}">
+          <span class="input-group-btn">
+            <button class="btn btn-default" type="submit">
+              <i class="fa fa-search"></i>
+            </button>
+          </span>
+        </div>
+      </div>
+    </form>
+  </div>
+  <div class="clearfix"></div>
+  <div class="">
+    <div class="col-md-12 col-sm-12 col-xs-12">
+      <div class="x_panel">
+        <div class="x_title">
+          <h2>Estados<small></small>
+          </h2>
+          <ul class="nav navbar-right panel_toolbox hidden-print">
+            <li>
+              <a href="/gerenciar/estado/cadastrar" title="Novo estado">
+                <i class="fa fa-plus-square"></i>
+              </a>
+            </li>
+          </ul>
+          <div class="clearfix"></div>
+        </div>
+        <div class="x_content x_scroll">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Nome</th>
+                <th>UF</th>
+                <th>País</th>
+                <th width="10%" style="text-align: center;">Ações</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for $estado in $estados %}
+                <tr>
+                  <td>{{ $estado->getNome() }}</td>
+                  <td>{{ $estado->getUF() }}</td>
+                  {% $_pais = $estado->findPaisID() %}
+                  <td>
+                    <a href="/gerenciar/pais/editar?id={{ $_pais->getID() }}" title="Editar país '{{ $_pais->getNome() }}'">
+                      <div class="cell-icon pais-icons" style="background-position: -{{ $_pais->getBandeiraIndex() * 16 }}px 0px;"></div>{{ $_pais->getNome() }}</a>
+                  </td>
+                  <td class="text-center">
+                    <ul class="nav panel_toolbox">
+                      <li>
+                        <a href="/gerenciar/estado/editar?id={{ $estado->getID() }}" title="Editar estado '{{ $estado->getNome() }}'">
+                          <i class="fa fa-edit"></i>
+                        </a>
+                      </li>
+                      <li>
+                        <a href="/gerenciar/estado/excluir?id={{ $estado->getID() }}" title="Excluir estado '{{ $estado->getNome() }}'" class="ajaxlink" ask="Deseja excluir o estado '{{ $estado->getNome() }}'?">
+                          <i class="fa fa-close"></i>
+                        </a>
+                      </li>
+                    </ul>
+                  </td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+          {{ include('pagination.twig') }}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{{ include('footer_gerenciar.twig') }}

@@ -1,0 +1,37 @@
+{{ include('header_gerenciar_sistema.twig') }}
+<script type="text/javascript">
+  $(function () {
+    Gerenciar.sistema.initAvancado('{{ $focusctrl }}');
+  });
+</script>
+<div role="tabpanel" class="tab-pane fade active in" id="tab_avancado" aria-labelledby="avancado-tab">
+  <div class="row">
+    <div class="col-md-12 col-sm-12 col-xs-12">
+      <div class="x_panel">
+        <div class="row x_title">
+          <h2>Opções avançadas</h2>
+        </div>
+        <div class="x_content">
+          <form id="avancado-form" method="POST" action="/gerenciar/sistema/avancado">
+            <div class="form-group col-xs-12">
+              <label for="mapskey">Chave da API do Google Mapas:</label>
+              <input type="text" id="mapskey" class="form-control" name="mapskey" value="{{ $maps_api }}" autocomplete="off"/>
+            </div>
+            <div class="form-group col-xs-12">
+              <label for="dropboxtoken">Dropbox (Token de acesso):</label>
+              <input type="text" id="dropboxtoken" class="form-control" name="dropboxtoken" value="{{ $dropbox_token }}" autocomplete="off"/>
+            </div>
+            <div class="form-group">
+              <div class="col-md-12 col-sm-12 col-xs-12 text-center">
+                <div class="ln_solid"></div>
+                <button type="submit" class="btn btn-success">Salvar</button>
+              </div>
+            </div>
+          </form>
+        </div>
+        <div class="clearfix"></div>
+      </div>
+    </div>
+  </div>
+</div>
+{{ include('footer_gerenciar_sistema.twig') }}

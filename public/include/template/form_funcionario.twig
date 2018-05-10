@@ -1,0 +1,44 @@
+<input type="hidden" id="id" name="id" value="{{ $funcionario->getID() }}">
+<div class="form-group col-lg-3 col-md-4 col-sm-6 col-xs-12">
+  <label for="funcaoid">Função:</label>
+  <select class="form-control" id="funcaoid" name="funcaoid">
+    {% for $_funcao in $_funcoes %}
+      <option value="{{ $_funcao->getID() }}" {{ $funcionario->getFuncaoID() == $_funcao->getID()?'selected':'' }}>{{ $_funcao->getDescricao() }}</option>
+    {% endfor %}
+  </select>
+</div>
+{% $_cliente = $funcionario->findClienteID() %}
+<input type="hidden" id="clienteid_ref" name="clienteid" data-nome="{{ $_cliente->getNomeCompleto() }}" value="{{ $funcionario->getClienteID() }}">
+<div class="form-group col-lg-3 col-md-4 col-sm-6 col-xs-12">
+  <label for="clienteid">Cliente:
+    <span class="identifier">{{ \MZ\Util\Mask::phone($_cliente->getFone(1)) }}
+    </span>
+  </label>
+  <input type="text" id="clienteid" class="form-control" value="{{ $_cliente->getNomeCompleto() }}">
+</div>
+<div class="form-group col-lg-3 col-md-4 col-sm-6 col-xs-12">
+  <label for="codigobarras">Código de barras:</label>
+  <input type="text" id="codigobarras" name="codigobarras" class="form-control text-right" data-a-sep="" data-m-dec="0" value="{{ $funcionario->getCodigoBarras() }}">
+</div>
+<div class="form-group col-lg-3 col-md-4 col-sm-6 col-xs-12">
+  <label for="porcentagem">Porcentagem:</label>
+  <input type="text" id="porcentagem" name="porcentagem" class="numeric form-control text-right" data-a-sign=" %" data-p-sign="s" data-a-sep="." data-a-dec="," data-a-pad="false" value="{{ $funcionario->getPorcentagem() }}">
+</div>
+<div class="form-group col-lg-3 col-md-4 col-sm-6 col-xs-12">
+  <label for="linguagemid">Linguagem:</label>
+  <select class="form-control" id="linguagemid" name="linguagemid">
+    {% for $value, $text in $linguagens %}
+      <option value="{{ $value }}" {{ $funcionario->getLinguagemID() == $value ? 'selected': '' }}>{{ $text }}</option>
+    {% endfor %}
+  </select>
+</div>
+<div class="form-group col-lg-3 col-md-4 col-sm-6 col-xs-12">
+  <label for="pontuacao">Pontuação:</label>
+  <input type="text" id="pontuacao" name="pontuacao" class="numeric form-control text-right" data-a-sep="" data-m-dec="0" value="{{ $funcionario->getPontuacao() }}">
+</div>
+<div class="checkbox col-lg-3 col-md-4 col-sm-6 col-xs-12">
+  <label>
+    <input type="checkbox" id="ativo" name="ativo" value="Y" {{ $funcionario->getAtivo() == 'Y'?'checked':'' }}>
+    Ativo
+  </label>
+</div>

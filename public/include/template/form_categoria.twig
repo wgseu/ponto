@@ -1,0 +1,35 @@
+<div class="form-group col-lg-3 col-md-4 col-sm-6 col-xs-12">
+  <label for="set_imagem">Imagem:</label>
+  <div id="imagem_container" class="image-view third-effect" style="height: 256px;">
+    <label for="image_header" class="lbltitle">
+      <img src="{{ get_image_url($categoria->getImagem(), 'categoria', 'categoria.png') }}" no-picture="{{ get_image_url(null, 'categoria', 'categoria.png') }}" height="256" alt="Imagem" title="Imagem"/>
+    </label>
+    <input class="upload" type="file" id="raw_imagem" name="raw_imagem" accept="image/x-png, image/jpeg"/>
+    <input type="hidden" name="imagem" value="{{ $categoria->getImagem() }}"/>
+    <div class="mask">
+      <a href="#" class="img-open" id="set_imagem" title="Selecionar imagem do computador">Abrir</a>
+      <a href="#" class="img-remove" title="Remover imagem">Remover</a>
+    </div>
+  </div>
+</div>
+<div class="form-group col-lg-3 col-md-4 col-sm-6 col-xs-12">
+  <label for="categoriaid">Categoria superior:</label>
+  <select class="form-control" id="categoriaid" name="categoriaid">
+    <option value="" {{ is_null($categoria->getCategoriaID())?'selected':'' }}>Não informada</option>
+    {% for $_categoria in $_categorias %}
+      {% if $categoria->getID() == $_categoria->getID() %}{% continue %}
+      {% endif %}
+      <option value="{{ $_categoria->getID() }}" {{ $categoria->getCategoriaID() == $_categoria->getID()?'selected':'' }}>{{ $_categoria->getDescricao() }}</option>
+    {% endfor %}
+  </select>
+</div>
+<div class="form-group col-lg-3 col-md-4 col-sm-6 col-xs-12">
+  <label for="descricao">Descrição:</label>
+  <input type="text" id="descricao" name="descricao" class="form-control" value="{{ $categoria->getDescricao() }}">
+</div>
+<div class="checkbox col-lg-3 col-md-4 col-sm-6 col-xs-12">
+  <label>
+    <input type="checkbox" id="servico" name="servico" value="Y" {{ $categoria->getServico() == 'Y'?'checked':'' }}>
+    Serviço
+  </label>
+</div>

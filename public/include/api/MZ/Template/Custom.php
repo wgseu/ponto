@@ -171,12 +171,13 @@ class Custom extends Engine
 
     private function __parseecho($matches)
     {
+        if (count($matches) <= 2) {
+            return $this->__replace('<?php echo $this->escape(' . $matches[1] . '); ?>');
+        }
+        if ($matches[2] == 'raw') {
+            return $this->__replace('<?php echo ' . $matches[1] . '; ?>');
+        }
         return $this->__replace('<?php echo $this->escape(' . $matches[1] . '); ?>');
-    }
-
-    private function __parseraw($matches)
-    {
-        return $this->__replace('<?php echo ' . $matches[1] . '; ?>');
     }
 
     private function __parsestmt($matches)
@@ -215,14 +216,18 @@ class Custom extends Engine
         if ($fileContent === false) {
             throw new \Exception('Can\'t get content of template file "'.$tFile.'"', 500);
         }
-        //Add for call {{ include('othertpl') }}
+        $fileContent = trim(preg_replace('/(}}|%}|>)\s+({{|{%|<)/', '$1$2', $fileContent));
+                //Add for call {{ include('othertpl.twig') }}
         $fileContent = preg_replace(
             '/{{\s*include\s*\(\s*\'([^\']+)\'\s*\)\s*}}/i',
             '<?php include $this->__template(\'\1\'); ?>',
             $fileContent
         );
-        $fileContent = preg_replace_callback('/{{\s*(.+?)\s*}}/is', [$this, '__parseecho'], $fileContent);
-        $fileContent = preg_replace_callback('/{!!\s*(.+?)\s*!!}/is', [$this, '__parseraw'], $fileContent);
+        $fileContent = preg_replace_callback(
+            '/{{\s*(.+?)\s*(?:\|\s*(\S+)\s*)?}}/is',
+            [$this, '__parseecho'],
+            $fileContent
+        );
         $fileContent = preg_replace_callback(
             '/{%\s*elseif\s+(.+?)\s*%}/is',
             [$this, '__parseelseif'],
@@ -251,7 +256,6 @@ class Custom extends Engine
             [$this, '__parsestmt'],
             $fileContent
         );
-        $fileContent = trim(preg_replace('/>\s+</m', '><', $fileContent));
         xmkdir(dirname($cFile), 0775);
         if (file_put_contents($cFile, $fileContent) === false) {
             throw new \Exception('Can\'t write parsed template into file "'.$cFile.'"', 500);

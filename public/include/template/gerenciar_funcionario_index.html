@@ -1,4 +1,4 @@
-<!--{include header_gerenciar}-->
+{{ include('header_gerenciar') }}
 <script type="text/javascript">$(function(){Gerenciar.funcionario.init();});</script>
 <div class="row">
 	<div class="page-title">
@@ -9,34 +9,34 @@
 			<div class="form-group col-lg-2 col-md-5 col-sm-5 col-xs-6">
 				<label for="funcao">Função:</label>
 				<select class="form-control" id="funcao" name="funcao">
-					<option value="" ${!array_key_exists($this->get('funcao'), $funcoes) ? 'selected': ''}>Todas</option>
-<!--{loop $funcoes $value $text}-->
-					<option value="{$value}" ${$this->get('funcao') == $value ? 'selected': ''}>{$text}</option>
-<!--{/loop}-->
+					<option value="" {{ !array_key_exists($this->get('funcao'), $funcoes) ? 'selected': '' }}>Todas</option>
+{% for $value, $text in $funcoes %}
+					<option value="{{ $value }}" {{ $this->get('funcao') == $value ? 'selected': '' }}>{{ $text }}</option>
+{% endfor %}
 				</select>
 			</div>
 			<div class="form-group col-lg-2 col-md-3 col-sm-3 col-xs-6">
 				<label for="genero">Genero:</label>
 				<select class="form-control" id="genero" name="genero">
-					<option value="" ${!array_key_exists($this->get('genero'), $generos) ? 'selected': ''}>Todos</option>
-<!--{loop $generos $value $text}-->
-					<option value="{$value}" ${$this->get('genero') == $value ? 'selected': ''}>{$text}</option>
-<!--{/loop}-->
+					<option value="" {{ !array_key_exists($this->get('genero'), $generos) ? 'selected': '' }}>Todos</option>
+{% for $value, $text in $generos %}
+					<option value="{{ $value }}" {{ $this->get('genero') == $value ? 'selected': '' }}>{{ $text }}</option>
+{% endfor %}
 				</select>
 			</div>
 			<div class="form-group col-lg-2 col-md-2 col-sm-2 col-xs-6">
 				<label for="estado">Estado:</label>
 				<select class="form-control" id="estado" name="estado">
-					<option value="" ${!array_key_exists($this->get('estado'), $estados) ? 'selected': ''}>Todos</option>
-<!--{loop $estados $value $text}-->
-					<option value="{$value}" ${$this->get('estado') == $value ? 'selected': ''}>{$text}</option>
-<!--{/loop}-->
+					<option value="" {{ !array_key_exists($this->get('estado'), $estados) ? 'selected': '' }}>Todos</option>
+{% for $value, $text in $estados %}
+					<option value="{{ $value }}" {{ $this->get('estado') == $value ? 'selected': '' }}>{{ $text }}</option>
+{% endfor %}
 				</select>
 			</div>
 			<div class="form-group col-lg-4 col-md-12 col-sm-12 col-xs-6">
 				<label for="search">Busca:</label>
 				<div class="input-group">
-					<input type="text" class="form-control" id="search" name="search" placeholder="Nome, Telefone, E-mail ou ${_p('Titulo', 'CPF')}..." value="{$this->get('search')}">
+					<input type="text" class="form-control" id="search" name="search" placeholder="Nome, Telefone, E-mail ou {{ _p('Titulo', 'CPF') }}..." value="{{ $this->get('search') }}">
 					<span class="input-group-btn">
 						<button class="btn btn-default" type="submit"><i class="fa fa-search"></i></button>
 					</span>
@@ -71,35 +71,35 @@
 							</tr>
 						</thead>
 						<tbody>
-<!--{loop $funcionarios $funcionario}-->
-							<tr ${$funcionario->isAtivo()?'':'class="active"'}>
-<!--${$_cliente = $funcionario->findClienteID()}-->
-								<td><a href="/gerenciar/cliente/editar?id={$_cliente->getID()}" title="Editar cliente '{$_cliente->getNomeCompleto()}'"><img src="${get_image_url($_cliente->getImagem(), 'cliente', 'cliente.png')}" class="${$_cliente->getTipo() == \MZ\Account\Cliente::TIPO_FISICA?'rounded':''}" height="48" alt="Foto" title="Foto"/><strong>{$_cliente->getNomeCompleto()}</strong></a></td>
-<!--${$_funcao = $funcionario->findFuncaoID()}-->
-								<td><a href="/gerenciar/funcao/editar?id={$_funcao->getID()}" title="Editar função '{$_funcao->getDescricao()}'">{$_funcao->getDescricao()}</a></td>
-								<td>{$funcionario->getLinguagemName()}</td>
+{% for $funcionario in $funcionarios %}
+							<tr class="{{ !$funcionario->isAtivo() ? 'active': '' }}">
+{% $_cliente = $funcionario->findClienteID() %}
+								<td><a href="/gerenciar/cliente/editar?id={{ $_cliente->getID() }}" title="Editar cliente '{{ $_cliente->getNomeCompleto() }}'"><img src="{{ get_image_url($_cliente->getImagem(), 'cliente', 'cliente.png') }}" class="{{ $_cliente->getTipo() == \MZ\Account\Cliente::TIPO_FISICA?'rounded':'' }}" height="48" alt="Foto" title="Foto"/><strong>{{ $_cliente->getNomeCompleto() }}</strong></a></td>
+{% $_funcao = $funcionario->findFuncaoID() %}
+								<td><a href="/gerenciar/funcao/editar?id={{ $_funcao->getID() }}" title="Editar função '{{ $_funcao->getDescricao() }}'">{{ $_funcao->getDescricao() }}</a></td>
+								<td>{{ $funcionario->getLinguagemName() }}</td>
 								<td class="text-center">
-									<strong title="Data de cadastro">${is_null($funcionario->getDataCadastro())?'':date('d/m/Y H:i', strtotime($funcionario->getDataCadastro()))}</strong>
-									<small title="Data de saída">${is_null($funcionario->getDataSaida())?'':date('d/m/Y H:i', strtotime($funcionario->getDataSaida()))}</small>
+									<strong title="Data de cadastro">{{ $this->datetime($funcionario->getDataCadastro()) }}</strong>
+									<small title="Data de saída">{{ $this->datetime($funcionario->getDataSaida()) }}</small>
 								</td>
 								<td class="text-center">
 									<ul class="nav panel_toolbox">
 										<li>
-											<a href="/gerenciar/funcionario/editar?id={$funcionario->getID()}" title="Editar funcionário '{$_cliente->getNomeCompleto()}'"><i class="fa fa-edit"></i></a>
+											<a href="/gerenciar/funcionario/editar?id={{ $funcionario->getID() }}" title="Editar funcionário '{{ $_cliente->getNomeCompleto() }}'"><i class="fa fa-edit"></i></a>
 										</li>
 										<li>
-											<a href="/gerenciar/funcionario/excluir?id={$funcionario->getID()}" title="Excluir funcionário '{$_cliente->getNomeCompleto()}'" class="ajaxlink" ask="Deseja excluir o funcionário '{$_cliente->getNomeCompleto()}'?"><i class="fa fa-close"></i></a>
+											<a href="/gerenciar/funcionario/excluir?id={{ $funcionario->getID() }}" title="Excluir funcionário '{{ $_cliente->getNomeCompleto() }}'" class="ajaxlink" ask="Deseja excluir o funcionário '{{ $_cliente->getNomeCompleto() }}'?"><i class="fa fa-close"></i></a>
 										</li>
 									</ul>
 								</td>
 							</tr>
-<!--{/loop}-->
+{% endfor %}
 						</tbody>
 					</table>
-					{$pagestring}
+					{{ $pagestring }}
 				</div>
 			</div>
 		</div>
 	</div>
 </div>	
-<!--{include footer_gerenciar}-->
+{{ include('footer_gerenciar') }}

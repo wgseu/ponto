@@ -992,7 +992,7 @@ class Cliente extends \MZ\Database\Helper
         if (strlen($this->getNome()) < 2) {
             $errors['nome'] = 'Nome inválido';
         }
-        if (!Validator::checkInSet($this->getGenero(), self::getGeneroOptions(), true)) {
+        if (!Validator::checkInSet($this->getGenero(), self::getGeneroOptions())) {
             $errors['genero'] = 'O gênero é inválido';
         }
         if ($this->getTipo() == self::TIPO_FISICA) {

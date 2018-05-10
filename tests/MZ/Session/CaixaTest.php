@@ -24,6 +24,8 @@
  */
 namespace MZ\Session;
 
+use MZ\Account\Cliente;
+
 class CaixaTest extends \PHPUnit_Framework_TestCase
 {
     public function testFromArray()
@@ -130,6 +132,7 @@ class CaixaTest extends \PHPUnit_Framework_TestCase
         $caixa->setDescricao('Caixa 6');
         $caixa->setSerie(4);
         $caixa->setNumeroInicial(100);
+        $caixa->setAtivo('Y');
         $caixa->insert();
         $app->getSystem()->getSettings()->setValue('Sistema', 'Fiscal.Mostrar', $old_value);
 
@@ -196,8 +199,9 @@ class CaixaTest extends \PHPUnit_Framework_TestCase
         $sessao = new Sessao();
         $sessao->insert();
 
-        $cliente = new \MZ\Account\Cliente();
+        $cliente = new Cliente();
         $cliente->setNomeCompleto('Fulano da Silva');
+        $cliente->setGenero(Cliente::GENERO_MASCULINO);
         $cliente->setEmail('fulano@email.com');
         $cliente->setLogin('fulano');
         $cliente->setSenha('1234');

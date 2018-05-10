@@ -1,16 +1,16 @@
-<!--{include header_gerenciar}-->
+{{ include('header_gerenciar') }}
 <script type="text/javascript">$(function(){Gerenciar.acesso.init();});</script>
 <div class="">
 	<div class="page-title">
 		<div class="title_left">
-		<h3>{$funcao->getDescricao()} <small>permissões da função</small></h3>
+		<h3>{{ $funcao->getDescricao() }} <small>permissões da função</small></h3>
 		</div>
 		<div class="title_right">
 			<form method="get" action="/gerenciar/acesso/" id="search-form">
-				<input type="hidden" name="funcao" value="{$funcao->getID()}">
+				<input type="hidden" name="funcao" value="{{ $funcao->getID() }}">
 				<div class="col-md-5 col-sm-5 col-xs-12 form-group pull-right">
 					<div class="input-group">
-						<input type="text" class="form-control" id="search" name="search" placeholder="Procurar..." value="{$this->get('search')}">
+						<input type="text" class="form-control" id="search" name="search" placeholder="Procurar..." value="{{ $this->get('search') }}">
 						<span class="input-group-btn">
 							<button class="btn btn-default" type="submit"><i class="fa fa-search"></i></button>
 						</span>
@@ -35,21 +35,21 @@
 							</tr>
 						</thead>
 						<tbody>
-<!--{loop $permissoes $permissao}-->
-<!--${$_acesso = Acesso::findByFuncaoIDPermissaoID($funcao->getID(), $permissao->getID())}-->
-							<tr ${$_acesso->exists()?'':'class="active"'}>
+{% for $permissao in $permissoes %}
+{% $_acesso = Acesso::findByFuncaoIDPermissaoID($funcao->getID(), $permissao->getID()) %}
+							<tr class="{{ !$_acesso->exists() ? 'active': '' }}">
 								<td>
 									<div class="">
 										<label>
-											<input type="checkbox" class="js-switch" name="marcado" data-funcao="{$funcao->getID()}" data-permissao="{$permissao->getID()}" value="Y" ${$_acesso->exists()?'checked':''}/>
-											<strong>{$permissao->getDescricao()}</strong>
+											<input type="checkbox" class="js-switch" name="marcado" data-funcao="{{ $funcao->getID() }}" data-permissao="{{ $permissao->getID() }}" value="Y" {{ $_acesso->exists()?'checked':'' }}/>
+											<strong>{{ $permissao->getDescricao() }}</strong>
 										</label>
 									</div>
-<!--${$_funcionalidade = $permissao->findFuncionalidadeID()}-->
-									<small>{$_funcionalidade->getDescricao()}</small>
+{% $_funcionalidade = $permissao->findFuncionalidadeID() %}
+									<small>{{ $_funcionalidade->getDescricao() }}</small>
 								</td>
 							</tr>
-<!--{/loop}-->
+{% endfor %}
 						</tbody>
 					</table>
 				</div>
@@ -57,4 +57,4 @@
 		</div>
 	</div>
 </div>	
-<!--{include footer_gerenciar}-->
+{{ include('footer_gerenciar') }}

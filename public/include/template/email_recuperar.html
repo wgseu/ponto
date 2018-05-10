@@ -1,5 +1,5 @@
-<!--{include email_header}-->
-<p>Olá {$cliente_nome},</p>
-<p>Você solicitou a recuperação de sua conta, para alterar sua senha clique <a href="/conta/recuperar/{$cliente_secreto}">aqui</a>.
+{{ include('email_header') }}
+<p>Olá {{ $cliente_nome }},</p>
+<p>Você solicitou a recuperação de sua conta, para alterar sua senha clique <a href="/conta/recuperar/{{ $cliente_secreto }}">aqui</a>.
 Se você não fez essa solicitação, favor desconsiderar o aviso.</p>
-<!--{include email_footer}-->
+{{ include('email_footer') }}

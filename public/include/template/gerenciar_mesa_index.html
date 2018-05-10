@@ -1,4 +1,4 @@
-<!--{include header_gerenciar}-->
+{{ include('header_gerenciar') }}
 <script type="text/javascript">$(function(){Gerenciar.mesa.init();});</script>
 <div class="">
 	<div class="page-title">
@@ -10,16 +10,16 @@
 				<div class="form-group col-lg-6 col-md-6 col-sm-12 col-xs-12">
 					<label for="nome">Estado:</label>
 					<select class="form-control" id="ativa" name="ativa">
-						<option value="" ${!array_key_exists($this->get('ativa'), $ativas) ? 'selected': ''}>Todas</option>
-<!--{loop $ativas $value $text}-->
-						<option value="{$value}" ${$this->get('ativa') == $value ? 'selected': ''}>{$text}</option>
-<!--{/loop}-->
+						<option value="" {{ !array_key_exists($this->get('ativa'), $ativas) ? 'selected': '' }}>Todas</option>
+{% for $value, $text in $ativas %}
+						<option value="{{ $value }}" {{ $this->get('ativa') == $value ? 'selected': '' }}>{{ $text }}</option>
+{% endfor %}
 					</select>
 				</div>
 				<div class="form-group col-lg-6 col-md-6 col-sm-6 col-xs-12">
 					<label>Nome ou Código:</label>
 					<div class="input-group">
-						<input type="text" class="form-control" id="search" name="search" placeholder="Procurar..." value="{$this->get('search')}">
+						<input type="text" class="form-control" id="search" name="search" placeholder="Procurar..." value="{{ $this->get('search') }}">
 						<span class="input-group-btn">
 							<button class="btn btn-default" type="submit"><i class="fa fa-search"></i></button>
 						</span>
@@ -52,27 +52,27 @@
 							</tr>
 						</thead>
 						<tbody>
-<!--{loop $mesas $mesa}-->
-							<tr class="${$mesa->getAtiva() == 'N'?'active':''}">
-								<td>{$mesa->getNome()}</td>
+{% for $mesa in $mesas %}
+							<tr class="{{ $mesa->getAtiva() == 'N'?'active':'' }}">
+								<td>{{ $mesa->getNome() }}</td>
 								<td class="text-center">
 									<ul class="nav panel_toolbox">
 										<li>
-											<a href="/gerenciar/mesa/editar?id={$mesa->getID()}" title="Editar mesa '{$mesa->getNome()}'"><i class="fa fa-edit"></i></a>
+											<a href="/gerenciar/mesa/editar?id={{ $mesa->getID() }}" title="Editar mesa '{{ $mesa->getNome() }}'"><i class="fa fa-edit"></i></a>
 										</li>
 										<li>
-											<a href="/gerenciar/mesa/excluir?id={$mesa->getID()}" title="Excluir mesa '{$mesa->getNome()}'" class="ajaxlink" ask="Deseja excluir a mesa '{$mesa->getNome()}'?"><i class="fa fa-close"></i></a>
+											<a href="/gerenciar/mesa/excluir?id={{ $mesa->getID() }}" title="Excluir mesa '{{ $mesa->getNome() }}'" class="ajaxlink" ask="Deseja excluir a mesa '{{ $mesa->getNome() }}'?"><i class="fa fa-close"></i></a>
 										</li>
 									</ul>
 								</td>
 							</tr>
-<!--{/loop}-->
+{% endfor %}
 						</tbody>
 					</table>
-					{$pagestring}
+					{{ $pagestring }}
 				</div>
 			</div>
 		</div>
 	</div>
 </div>	
-<!--{include footer_gerenciar}-->
+{{ include('footer_gerenciar') }}

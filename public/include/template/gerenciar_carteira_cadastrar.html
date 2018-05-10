@@ -1,5 +1,5 @@
-<!--{include header_gerenciar}-->
-<script type="text/javascript">$(function(){Gerenciar.carteira.initForm('{$focusctrl}');});</script>
+{{ include('header_gerenciar') }}
+<script type="text/javascript">$(function(){Gerenciar.carteira.initForm('{{ $focusctrl }}');});</script>
 <div class="row">
 	<div class="col-md-12 col-sm-12 col-xs-12">
 		<div class="x_panel">
@@ -19,7 +19,7 @@
 			<div class="x_content">
 				<br />
 				<form id="carteira-form" class="form-horizontal form-label-left" method="post" action="/gerenciar/carteira/cadastrar" enctype="multipart/form-data">
-<!--{include form_carteira}-->
+{{ include('form_carteira') }}
 					<div class="form-group">
 						<div class="col-md-12 col-sm-12 col-xs-12 text-center">
 							<div class="ln_solid"></div>
@@ -31,4 +31,4 @@
 		</div>
 	</div>
 </div>
-<!--{include footer_gerenciar}-->
+{{ include('footer_gerenciar') }}

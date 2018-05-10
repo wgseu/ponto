@@ -1,4 +1,4 @@
-<!--{include header_gerenciar}-->
+{{ include('header_gerenciar') }}
 <script type="text/javascript">$(function(){Gerenciar.funcao.init();});</script>
 <div class="">
 	<div class="page-title">
@@ -9,7 +9,7 @@
 			<form method="get" action="/gerenciar/funcao/" id="search-form">
 				<div class="col-md-5 col-sm-5 col-xs-12 form-group pull-right">
 					<div class="input-group">
-						<input type="text" class="form-control" id="search" name="search" placeholder="Procurar..." value="{$this->get('search')}">
+						<input type="text" class="form-control" id="search" name="search" placeholder="Procurar..." value="{{ $this->get('search') }}">
 						<span class="input-group-btn">
 							<button class="btn btn-default" type="submit"><i class="fa fa-search"></i></button>
 						</span>
@@ -43,31 +43,31 @@
 							</tr>
 						</thead>
 						<tbody>
-<!--{loop $funcoes $funcao}-->
+{% for $funcao in $funcoes %}
 							<tr>
-								<td><a href="/gerenciar/acesso/?funcao={$funcao->getID()}">{$funcao->getDescricao()}</a></td>
-								<td>${\MZ\Util\Mask::money($funcao->getSalarioBase(), true)}</td>
+								<td><a href="/gerenciar/acesso/?funcao={{ $funcao->getID() }}">{{ $funcao->getDescricao() }}</a></td>
+								<td>{{ $this->currency($funcao->getSalarioBase()) }}</td>
 								<td class="text-center">
 									<ul class="nav panel_toolbox">
 										<li>
-											<a href="/gerenciar/acesso/?funcao={$funcao->getID()}" title="Alterar permissões da função '{$funcao->getDescricao()}'"><i class="fa fa-lock"></i></a>
+											<a href="/gerenciar/acesso/?funcao={{ $funcao->getID() }}" title="Alterar permissões da função '{{ $funcao->getDescricao() }}'"><i class="fa fa-lock"></i></a>
 										</li>
 										<li>
-											<a href="/gerenciar/funcao/editar?id={$funcao->getID()}" title="Editar função '{$funcao->getDescricao()}'"><i class="fa fa-edit"></i></a>
+											<a href="/gerenciar/funcao/editar?id={{ $funcao->getID() }}" title="Editar função '{{ $funcao->getDescricao() }}'"><i class="fa fa-edit"></i></a>
 										</li>
 										<li>
-											<a href="/gerenciar/funcao/excluir?id={$funcao->getID()}" title="Excluir função '{$funcao->getDescricao()}'" class="ajaxlink" ask="Deseja excluir a função '{$funcao->getDescricao()}'?"><i class="fa fa-close"></i></a>
+											<a href="/gerenciar/funcao/excluir?id={{ $funcao->getID() }}" title="Excluir função '{{ $funcao->getDescricao() }}'" class="ajaxlink" ask="Deseja excluir a função '{{ $funcao->getDescricao() }}'?"><i class="fa fa-close"></i></a>
 										</li>
 									</ul>
 								</td>
 							</tr>
-<!--{/loop}-->
+{% endfor %}
 						</tbody>
 					</table>
-					{$pagestring}
+					{{ $pagestring }}
 				</div>
 			</div>
 		</div>
 	</div>
 </div>	
-<!--{include footer_gerenciar}-->
+{{ include('footer_gerenciar') }}

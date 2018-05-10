@@ -1,6 +1,6 @@
-<!--{include header}-->
+{{ include('header') }}
     <!-- Terms Section -->
-    <section id="terms" style="background-image: url('${get_site_image_url('Image.Termos')}');">
+    <section id="terms" style="background-image: url('{{ get_site_image_url('Image.Termos') }}');">
         <div class="container">
             <div class="row">
                 <div class="col-lg-12 text-center">
@@ -9,9 +9,9 @@
             </div>
             <div class="row">
                 <div class="col-lg-12">
-                   {{ $pagina->getConteudo() }}
+                   {!! $pagina->getConteudo() !!}
                 </div>
             </div>
         </div>
     </section>
-<!--{include footer}-->
+{{ include('footer') }}

@@ -1,4 +1,4 @@
-<!--{include header_gerenciar}-->
+{{ include('header_gerenciar') }}
 <script type="text/javascript">$(function(){Gerenciar.folha_cheque.init();});</script>
 <div class="row">
 	<div class="page-title">
@@ -9,22 +9,22 @@
 			<div class="form-group col-lg-2 col-md-6 col-sm-6 col-xs-6">
 				<label for="estado">Estado:</label>
 				<select class="form-control" id="estado" name="estado">
-					<option value="" ${!array_key_exists($this->get('estado'), $estados) ? 'selected': ''}>Todos</option>
-<!--{loop $estados $value $text}-->
-					<option value="{$value}" ${$this->get('estado') == $value ? 'selected': ''}>{$text}</option>
-<!--{/loop}-->
+					<option value="" {{ !array_key_exists($this->get('estado'), $estados) ? 'selected': '' }}>Todos</option>
+{% for $value, $text in $estados %}
+					<option value="{{ $value }}" {{ $this->get('estado') == $value ? 'selected': '' }}>{{ $text }}</option>
+{% endfor %}
 				</select>
 			</div>
-			<input type="hidden" id="bancoid_ref" name="bancoid" data-content="{$_banco->getRazaoSocial()}" value="{$_banco->getID()}">
+			<input type="hidden" id="bancoid_ref" name="bancoid" data-content="{{ $_banco->getRazaoSocial() }}" value="{{ $_banco->getID() }}">
 			<div class="form-group col-lg-3 col-md-6 col-sm-6 col-xs-12">
-				<label for="bancoid">Banco: <span class="identifier">{$_banco->getNumero()}<span></label>
-				<input type="text" id="bancoid" class="form-control" value="{$_banco->getRazaoSocial()}">
+				<label for="bancoid">Banco: <span class="identifier">{{ $_banco->getNumero() }}<span></label>
+				<input type="text" id="bancoid" class="form-control" value="{{ $_banco->getRazaoSocial() }}">
 			</div>
-			<input type="hidden" id="clienteid_ref" name="clienteid" data-nome="{$_cliente->getNomeCompleto()}" value="{$_cliente->getID()}">
+			<input type="hidden" id="clienteid_ref" name="clienteid" data-nome="{{ $_cliente->getNomeCompleto() }}" value="{{ $_cliente->getID() }}">
 			<div class="form-group col-lg-3 col-md-6 col-sm-6 col-xs-12">
-				<label for="clienteid">Cliente: <span class="identifier">${\MZ\Util\Mask::phone($_cliente->getFone(1))}<span></label>
+				<label for="clienteid">Cliente: <span class="identifier">{{ \MZ\Util\Mask::phone($_cliente->getFone(1)) }}<span></label>
 				<div class="input-group">
-					<input type="text" id="clienteid" class="form-control" value="{$_cliente->getNomeCompleto()}">
+					<input type="text" id="clienteid" class="form-control" value="{{ $_cliente->getNomeCompleto() }}">
 					<span class="input-group-btn">
 						<button class="btn btn-default" type="submit"><i class="fa fa-search"></i></button>
 					</span>
@@ -62,42 +62,42 @@
 							</tr>
 						</thead>
 						<tbody>
-<!--{loop $folhas_de_cheques $folha_cheque}-->
-<!--${$_cheque = $folha_cheque->findChequeID()}-->
-							<tr ${$_cheque->isCancelado()?'class="active"':($folha_cheque->isRecolhido()?'class="success"':'')}>
-<!--${$_banco = $_cheque->findBancoID()}-->
-<!--${$_cliente = $_cheque->findClienteID()}-->
-								<td>{$_cliente->getNomeCompleto()}</td>
-								<td><a href="/gerenciar/banco/editar?id={$_banco->getID()}" title="Editar banco '{$_banco->getRazaoSocial()}'">{$_banco->getRazaoSocial()}</a></td>
-								<td>{$_cheque->getAgencia()}</td>
-								<td>{$_cheque->getConta()}</td>
-								<td>${\MZ\Util\Mask::money($folha_cheque->getValor(), true)}</td>
-								<td>{$folha_cheque->getCompensacao()}</td>
-								<td>{$folha_cheque->getNumero()}</td>
-								<td>${is_null($folha_cheque->getVencimento())?'':date('d/m/Y H:i', strtotime($folha_cheque->getVencimento()))}</td>
-								<td>{$folha_cheque->getC(1)}</td>
-								<td>{$folha_cheque->getC(2)}</td>
-								<td>{$folha_cheque->getC(3)}</td>
-								<td>{$folha_cheque->getSerie()}</td>
+{% for $folha_cheque in $folhas_de_cheques %}
+{% $_cheque = $folha_cheque->findChequeID() %}
+							<tr class="{{ $_cheque->isCancelado() ? 'active': ($folha_cheque->isRecolhido() ? 'success': '') }}">
+{% $_banco = $_cheque->findBancoID() %}
+{% $_cliente = $_cheque->findClienteID() %}
+								<td>{{ $_cliente->getNomeCompleto() }}</td>
+								<td><a href="/gerenciar/banco/editar?id={{ $_banco->getID() }}" title="Editar banco '{{ $_banco->getRazaoSocial() }}'">{{ $_banco->getRazaoSocial() }}</a></td>
+								<td>{{ $_cheque->getAgencia() }}</td>
+								<td>{{ $_cheque->getConta() }}</td>
+								<td>{{ $this->currency($folha_cheque->getValor()) }}</td>
+								<td>{{ $folha_cheque->getCompensacao() }}</td>
+								<td>{{ $folha_cheque->getNumero() }}</td>
+								<td>{{ $this->datetime($folha_cheque->getVencimento()) }}</td>
+								<td>{{ $folha_cheque->getC(1) }}</td>
+								<td>{{ $folha_cheque->getC(2) }}</td>
+								<td>{{ $folha_cheque->getC(3) }}</td>
+								<td>{{ $folha_cheque->getSerie() }}</td>
 								<td>
-									<strong>${$folha_cheque->getRecolhido() == 'Y'?'Sim':'Não'}</strong>
-									<small>${is_null($folha_cheque->getRecolhimento())?'':date('d/m/Y H:i', strtotime($folha_cheque->getRecolhimento()))}</small>
+									<strong>{{ $folha_cheque->getRecolhido() == 'Y'?'Sim':'Não' }}</strong>
+									<small>{{ $this->datetime($folha_cheque->getRecolhimento()) }}</small>
 								</td>
 								<td class="text-center">
 									<ul class="nav panel_toolbox">
 										<li>
-											<a href="/gerenciar/folha_cheque/recolher?id={$folha_cheque->getID()}" title="Recolher folha de cheque '{$folha_cheque->getNumero()}' do cliente {$_cliente->getNomeCompleto()}" class="ajaxlink" ask="Deseja recolher a folha de cheque '{$folha_cheque->getNumero()}' do cliente {$_cliente->getNomeCompleto()}?"><i class="fa fa-university"></i></a>
+											<a href="/gerenciar/folha_cheque/recolher?id={{ $folha_cheque->getID() }}" title="Recolher folha de cheque '{{ $folha_cheque->getNumero() }}' do cliente {{ $_cliente->getNomeCompleto() }}" class="ajaxlink" ask="Deseja recolher a folha de cheque '{{ $folha_cheque->getNumero() }}' do cliente {{ $_cliente->getNomeCompleto() }}?"><i class="fa fa-university"></i></a>
 										</li>
 									</ul>
 								</td>
 							</tr>
-<!--{/loop}-->
+{% endfor %}
 						</tbody>
 					</table>
-					{$pagestring}
+					{{ $pagestring }}
 				</div>
 			</div>
 		</div>
 	</div>
 </div>	
-<!--{include footer_gerenciar}-->
+{{ include('footer_gerenciar') }}

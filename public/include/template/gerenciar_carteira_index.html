@@ -1,4 +1,4 @@
-<!--{include header_gerenciar}-->
+{{ include('header_gerenciar') }}
 <script type="text/javascript">$(function(){Gerenciar.carteira.init();});</script>
 <div class="row">
 	<div class="page-title">
@@ -9,21 +9,21 @@
 			<div class="form-group col-lg-2 col-md-6 col-sm-6 col-xs-6">
 				<label for="tipo">Tipo:</label>
 				<select id="tipo" name="tipo" class="form-control">
-					<option value="" ${!array_key_exists($this->get('tipo'), $tipos) ? 'selected': ''}>Todos</option>
-<!--{loop $tipos $value $text}-->
-					<option value="{$value}" ${$this->get('tipo') == $value ? 'selected': ''}>{$text}</option>
-<!--{/loop}-->
+					<option value="" {{ !array_key_exists($this->get('tipo'), $tipos) ? 'selected': '' }}>Todos</option>
+{% for $value, $text in $tipos %}
+					<option value="{{ $value }}" {{ $this->get('tipo') == $value ? 'selected': '' }}>{{ $text }}</option>
+{% endfor %}
 				</select>
 			</div>
-			<input type="hidden" id="bancoid_ref" name="bancoid" data-content="{$_banco->getRazaoSocial()}" value="{$_banco->getID()}">
+			<input type="hidden" id="bancoid_ref" name="bancoid" data-content="{{ $_banco->getRazaoSocial() }}" value="{{ $_banco->getID() }}">
 			<div class="form-group col-lg-3 col-md-6 col-sm-6 col-xs-12">
-				<label for="bancoid">Banco: <span class="identifier">{$_banco->getNumero()}<span></label>
-				<input type="text" id="bancoid" class="form-control" value="{$_banco->getRazaoSocial()}">
+				<label for="bancoid">Banco: <span class="identifier">{{ $_banco->getNumero() }}<span></label>
+				<input type="text" id="bancoid" class="form-control" value="{{ $_banco->getRazaoSocial() }}">
 			</div>
 			<div class="form-group col-lg-4 col-md-6 col-sm-6 col-xs-12">
 				<label for="search">Busca:</label>
 				<div class="input-group">
-					<input type="text" class="form-control" id="search" name="search" placeholder="Procurar..." value="{$this->get('search')}">
+					<input type="text" class="form-control" id="search" name="search" placeholder="Procurar..." value="{{ $this->get('search') }}">
 					<span class="input-group-btn">
 						<button class="btn btn-default" type="submit"><i class="fa fa-search"></i></button>
 					</span>
@@ -60,32 +60,32 @@
 							</tr>
 						</thead>
 						<tbody>
-<!--{loop $carteiras $carteira}-->
-							<tr ${$carteira->isAtiva()?'':'class="active"'}>
-								<td>{$carteira->getDescricao()}</td>
-								<td>{$tipos[$carteira->getTipo()]}</td>
-<!--${$_banco = $carteira->findBancoID()}-->
-								<td><a href="/gerenciar/banco/editar?id={$_banco->getID()}" title="Editar banco '{$_banco->getRazaoSocial()}'">{$_banco->getRazaoSocial()}</a></td>
-								<td>{$carteira->getConta()}</td>
-								<td>{$carteira->getAgencia()}</td>
+{% for $carteira in $carteiras %}
+							<tr class="{{ !$carteira->isAtiva() ? 'active': '' }}">
+								<td>{{ $carteira->getDescricao() }}</td>
+								<td>{{ $tipos[$carteira->getTipo()] }}</td>
+{% $_banco = $carteira->findBancoID() %}
+								<td><a href="/gerenciar/banco/editar?id={{ $_banco->getID() }}" title="Editar banco '{{ $_banco->getRazaoSocial() }}'">{{ $_banco->getRazaoSocial() }}</a></td>
+								<td>{{ $carteira->getConta() }}</td>
+								<td>{{ $carteira->getAgencia() }}</td>
 								<td class="text-center">
 									<ul class="nav panel_toolbox">
 										<li>
-											<a href="/gerenciar/carteira/editar?id={$carteira->getID()}" title="Editar carteira '{$carteira->getDescricao()}'"><i class="fa fa-edit"></i></a>
+											<a href="/gerenciar/carteira/editar?id={{ $carteira->getID() }}" title="Editar carteira '{{ $carteira->getDescricao() }}'"><i class="fa fa-edit"></i></a>
 										</li>
 										<li>
-											<a href="/gerenciar/carteira/excluir?id={$carteira->getID()}" title="Excluir carteira '{$carteira->getDescricao()}'" class="ajaxlink" ask="Deseja excluir a carteira '{$carteira->getDescricao()}'?"><i class="fa fa-close"></i></a>
+											<a href="/gerenciar/carteira/excluir?id={{ $carteira->getID() }}" title="Excluir carteira '{{ $carteira->getDescricao() }}'" class="ajaxlink" ask="Deseja excluir a carteira '{{ $carteira->getDescricao() }}'?"><i class="fa fa-close"></i></a>
 										</li>
 									</ul>
 								</td>
 							</tr>
-<!--{/loop}-->
+{% endfor %}
 						</tbody>
 					</table>
-					{$pagestring}
+					{{ $pagestring }}
 				</div>
 			</div>
 		</div>
 	</div>
 </div>	
-<!--{include footer_gerenciar}-->
+{{ include('footer_gerenciar') }}

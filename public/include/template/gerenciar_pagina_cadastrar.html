@@ -1,5 +1,5 @@
-<!--{include header_gerenciar}-->
-<script type="text/javascript">$(function(){Gerenciar.pagina.initForm('{$focusctrl}');});</script>
+{{ include('header_gerenciar') }}
+<script type="text/javascript">$(function(){Gerenciar.pagina.initForm('{{ $focusctrl }}');});</script>
 <div class="row">
 	<div class="col-md-12 col-sm-12 col-xs-12">
 		<div class="x_panel">
@@ -9,7 +9,7 @@
 			</div>
 			<div class="x_content">
 				<form id="pagina-form" class="form-horizontal form-label-left" method="post" action="/gerenciar/pagina/cadastrar" enctype="multipart/form-data">
-<!--{include form_pagina}-->
+{{ include('form_pagina') }}
 					<div class="form-group">
 						<div class="col-md-12 col-sm-12 col-xs-12 text-center">
 							<div class="ln_solid"></div>
@@ -21,4 +21,4 @@
 		</div>
 	</div>
 </div>
-<!--{include footer_gerenciar}-->
+{{ include('footer_gerenciar') }}

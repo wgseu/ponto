@@ -1,15 +1,15 @@
-<!--{include header_gerenciar}-->
-<script type="text/javascript">$(function(){Gerenciar.integracao.productInit('{$integracao->getAcessoURL()}');});</script>
+{{ include('header_gerenciar') }}
+<script type="text/javascript">$(function(){Gerenciar.integracao.productInit('{{ $integracao->getAcessoURL() }}');});</script>
 <div class="row">
 	<div class="page-title">
 		<div class="col-lg-8 col-md-6 col-sm-6 col-xs-12">
-			<h3>Produtos {$integracao->getNome()}</h3>
+			<h3>Produtos {{ $integracao->getNome() }}</h3>
 		</div>
-		<form method="get" action="/gerenciar/produto/{$integracao->getAcessoURL()}" id="search-form">
+		<form method="get" action="/gerenciar/produto/{{ $integracao->getAcessoURL() }}" id="search-form">
 			<div class="form-group col-lg-4 col-md-6 col-sm-6 col-xs-12">
 				<label for="search">Busca:</label>
 				<div class="input-group">
-					<input type="text" class="form-control" id="search" name="search" placeholder="Descrição ou Código..." value="{$this->get('search')}">
+					<input type="text" class="form-control" id="search" name="search" placeholder="Descrição ou Código..." value="{{ $this->get('search') }}">
 					<span class="input-group-btn">
 						<button class="btn btn-default" type="submit"><i class="fa fa-search"></i></button>
 					</span>
@@ -25,7 +25,7 @@
 					<h2>Produtos<small>Associar produtos</small></h2>
 					<ul class="nav navbar-right panel_toolbox hidden-print">
 						<li>
-							<a href="/gerenciar/cartao/{$integracao->getAcessoURL()}" title="Associar cartões">
+							<a href="/gerenciar/cartao/{{ $integracao->getAcessoURL() }}" title="Associar cartões">
 								<i class="fa fa-credit-card"></i>
 							</a>
 						</li>
@@ -33,28 +33,28 @@
 					<div class="clearfix"></div>
 				</div>
 				<div class="x_content">
-<!--{loop $produtos $produto}-->
-<!--${$associado = $produto['produto']}-->
+{% for $produto in $produtos %}
+{% $associado = $produto['produto'] %}
 					<div class="col-md-6 col-sm-6 col-xs-12 top-row">
-						<div class="assoc-item {$produto['status']}">
+						<div class="assoc-item {{ $produto['status'] }}">
 							<div class="assoc-img">
-								<img src="${get_image_url($associado->getImagem(), 'produto', 'produto.png')}" height="48" alt="Imagem"/>
+								<img src="{{ get_image_url($associado->getImagem(), 'produto', 'produto.png') }}" height="48" alt="Imagem"/>
 							</div>
 							<div class="assoc-info">
-								<input type="hidden" id="produto_{$produto['codigo']}_ref" name="produto[{$produto['codigo']}]" data-descricao="${\MZ\Util\Filter::input($associado->getDescricao())}" data-codigo="{$produto['codigo']}" data-id="{$associado->getID()}" data-item-count="${count($produto['itens'])}" value="{$associado->getID()}">
+								<input type="hidden" id="produto_{{ $produto['codigo'] }}_ref" name="produto[{{ $produto['codigo'] }}]" data-descricao="{{ \MZ\Util\Filter::input($associado->getDescricao()) }}" data-codigo="{{ $produto['codigo'] }}" data-id="{{ $associado->getID() }}" data-item-count="{{ count($produto['itens']) }}" value="{{ $associado->getID() }}">
 								<div class="form-group">
-									<label for="produto_{$produto['codigo']}">Produto: <span class="identifier">{$produto['descricao']}</span><i class="fa fa-remove remove-item" title="Excluir produto da associação"></i></label>
+									<label for="produto_{{ $produto['codigo'] }}">Produto: <span class="identifier">{{ $produto['descricao'] }}</span><i class="fa fa-remove remove-item" title="Excluir produto da associação"></i></label>
 									<div class="input-group">
-										<input type="text" id="produto_{$produto['codigo']}" class="form-control assoc-input" value="${\MZ\Util\Filter::input($associado->getDescricao())}">
+										<input type="text" id="produto_{{ $produto['codigo'] }}" class="form-control assoc-input" value="{{ \MZ\Util\Filter::input($associado->getDescricao()) }}">
 										<span class="input-group-btn">
-											<button class="btn btn-default ${!$associado->exists() || count($produto['itens']) == 0?'disabled':''}" tabindex="-1"><i class="fa fa-{$produto['icon']}"></i></button>
+											<button class="btn btn-default {{ !$associado->exists() || count($produto['itens']) == 0?'disabled':'' }}" tabindex="-1"><i class="fa fa-{{ $produto['icon'] }}"></i></button>
 										</span>
 									</div>
 								</div>
 							</div>
 						</div>
 					</div>
-<!--{/loop}-->
+{% endfor %}
 				</div>
 			</div>
 		</div>
@@ -103,4 +103,4 @@
 <script id="group-template" type="text/x-custom-template">
 	<span class="section col-md-12 col-sm-12 col-xs-12"></span>
 </script>
-<!--{include footer_gerenciar}-->
+{{ include('footer_gerenciar') }}

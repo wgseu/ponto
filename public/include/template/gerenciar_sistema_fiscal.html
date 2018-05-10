@@ -1,5 +1,5 @@
-<!--{include header_gerenciar_sistema}-->
-<script type="text/javascript">$(function(){Gerenciar.sistema.initFiscal('{$focusctrl}');});</script>
+{{ include('header_gerenciar_sistema') }}
+<script type="text/javascript">$(function(){Gerenciar.sistema.initFiscal('{{ $focusctrl }}');});</script>
 <div role="tabpanel" class="tab-pane fade active in" id="tab_avancado" aria-labelledby="avancado-tab">
 	<div class="row">
 		<div class="col-md-12 col-sm-12 col-xs-12">
@@ -11,7 +11,7 @@
 					<form id="avancado-form" method="POST" action="/gerenciar/sistema/fiscal">
 						<div class="form-group col-xs-12">
 							<label for="fiscal_timeout">Tempo limite de espera:</label>
-							<input type="text" id="fiscal_timeout" class="numeric form-control text-right" data-a-sep="" data-m-dec="0" name="fiscal_timeout" value="{$fiscal_timeout}" autocomplete="off"/>
+							<input type="text" id="fiscal_timeout" class="numeric form-control text-right" data-a-sep="" data-m-dec="0" name="fiscal_timeout" value="{{ $fiscal_timeout }}" autocomplete="off"/>
 						</div>
 						<div class="form-group">
 							<div class="col-md-12 col-sm-12 col-xs-12 text-center">
@@ -26,4 +26,4 @@
 		</div>
 	</div>
 </div>
-<!--{include footer_gerenciar_sistema}-->
+{{ include('footer_gerenciar_sistema') }}

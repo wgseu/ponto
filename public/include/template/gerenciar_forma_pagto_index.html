@@ -1,4 +1,4 @@
-<!--{include header_gerenciar}-->
+{{ include('header_gerenciar') }}
 <script type="text/javascript">$(function(){Gerenciar.forma_pagto.init();});</script>
 <div class="row">
 	<div class="page-title">
@@ -9,25 +9,25 @@
 			<div class="form-group col-lg-2 col-md-3 col-sm-6 col-xs-6">
 				<label for="estado">Estado:</label>
 				<select class="form-control" id="estado" name="ativa">
-					<option value="" ${!array_key_exists($this->get('ativa'), $estados) ? 'selected': ''}>Todos</option>
-<!--{loop $estados $value $text}-->
-					<option value="{$value}" ${$this->get('ativa') == $value ? 'selected': ''}>{$text}</option>
-<!--{/loop}-->
+					<option value="" {{ !array_key_exists($this->get('ativa'), $estados) ? 'selected': '' }}>Todos</option>
+{% for $value, $text in $estados %}
+					<option value="{{ $value }}" {{ $this->get('ativa') == $value ? 'selected': '' }}>{{ $text }}</option>
+{% endfor %}
 				</select>
 			</div>
 			<div class="form-group col-lg-2 col-md-3 col-sm-6 col-xs-12">
 				<label for="tipo">Tipo:</label>
 				<select class="form-control" id="tipo" name="tipo">
-					<option value="" ${!array_key_exists($this->get('tipo'), $tipos) ? 'selected': ''}>Todos</option>
-<!--{loop $tipos $value $text}-->
-					<option value="{$value}" ${$this->get('tipo') == $value ? 'selected': ''}>{$text}</option>
-<!--{/loop}-->
+					<option value="" {{ !array_key_exists($this->get('tipo'), $tipos) ? 'selected': '' }}>Todos</option>
+{% for $value, $text in $tipos %}
+					<option value="{{ $value }}" {{ $this->get('tipo') == $value ? 'selected': '' }}>{{ $text }}</option>
+{% endfor %}
 				</select>
 			</div>
 			<div class="form-group col-lg-4 col-md-12 col-sm-6 col-xs-12">
 				<label for="search">Descrição:</label>
 				<div class="input-group">
-					<input type="text" class="form-control" id="search" name="search" placeholder="Procurar..." value="{$this->get('search')}">
+					<input type="text" class="form-control" id="search" name="search" placeholder="Procurar..." value="{{ $this->get('search') }}">
 					<span class="input-group-btn">
 						<button class="btn btn-default" type="submit"><i class="fa fa-search"></i></button>
 					</span>
@@ -61,44 +61,44 @@
 							</tr>
 						</thead>
 						<tbody>
-<!--{loop $formas_de_pagamento $forma_pagto}-->
-							<tr ${$forma_pagto->isAtiva()?'':'class="active"'}>
+{% for $forma_pagto in $formas_de_pagamento %}
+							<tr class="{{ !$forma_pagto->isAtiva() ? 'active': '' }}">
 								<td>
-									<strong>{$forma_pagto->getDescricao()}</strong>
-									<small>{$tipos[$forma_pagto->getTipo()]}</small>
+									<strong>{{ $forma_pagto->getDescricao() }}</strong>
+									<small>{{ $tipos[$forma_pagto->getTipo()] }}</small>
 								</td>
 								<td>
-<!--${$_carteira = $forma_pagto->findCarteiraID()}-->
-									<strong><a href="/gerenciar/carteira/editar?id={$_carteira->getID()}" title="Editar carteira de entrada '{$_carteira->getDescricao()}'">{$_carteira->getDescricao()}</a></strong>
-<!--${$_carteira = $forma_pagto->findCarteiraPagtoID()}-->
-									<small><a href="/gerenciar/carteira/editar?id={$_carteira->getID()}" title="Editar carteira de saída '{$_carteira->getDescricao()}'">{$_carteira->getDescricao()}</a></small>
+{% $_carteira = $forma_pagto->findCarteiraID() %}
+									<strong><a href="/gerenciar/carteira/editar?id={{ $_carteira->getID() }}" title="Editar carteira de entrada '{{ $_carteira->getDescricao() }}'">{{ $_carteira->getDescricao() }}</a></strong>
+{% $_carteira = $forma_pagto->findCarteiraPagtoID() %}
+									<small><a href="/gerenciar/carteira/editar?id={{ $_carteira->getID() }}" title="Editar carteira de saída '{{ $_carteira->getDescricao() }}'">{{ $_carteira->getDescricao() }}</a></small>
 								</td>
 								<td>
-<!--{if $forma_pagto->isParcelado()}-->
-									<strong>de {$forma_pagto->getMinParcelas()} até {$forma_pagto->getMaxParcelas()}</strong>
-									<small>Após {$forma_pagto->getParcelasSemJuros()}, juros de {$forma_pagto->getJuros()}%</small>
-<!--{else}-->
+{% if $forma_pagto->isParcelado() %}
+									<strong>de {{ $forma_pagto->getMinParcelas() }} até {{ $forma_pagto->getMaxParcelas() }}</strong>
+									<small>Após {{ $forma_pagto->getParcelasSemJuros() }}, juros de {{ $forma_pagto->getJuros() }}%</small>
+{% else %}
 									Não parcelado
-<!--{/if}-->
+{% endif %}
 								</td>
 								<td class="text-center">
 									<ul class="nav panel_toolbox">
 										<li>
-											<a href="/gerenciar/forma_pagto/editar?id={$forma_pagto->getID()}" title="Editar forma de pagamento '{$forma_pagto->getDescricao()}'"><i class="fa fa-edit"></i></a>
+											<a href="/gerenciar/forma_pagto/editar?id={{ $forma_pagto->getID() }}" title="Editar forma de pagamento '{{ $forma_pagto->getDescricao() }}'"><i class="fa fa-edit"></i></a>
 										</li>
 										<li>
-											<a href="/gerenciar/forma_pagto/excluir?id={$forma_pagto->getID()}" title="Excluir forma de pagamento '{$forma_pagto->getDescricao()}'" class="ajaxlink" ask="Deseja excluir a forma de pagamento '{$forma_pagto->getDescricao()}'?"><i class="fa fa-close"></i></a>
+											<a href="/gerenciar/forma_pagto/excluir?id={{ $forma_pagto->getID() }}" title="Excluir forma de pagamento '{{ $forma_pagto->getDescricao() }}'" class="ajaxlink" ask="Deseja excluir a forma de pagamento '{{ $forma_pagto->getDescricao() }}'?"><i class="fa fa-close"></i></a>
 										</li>
 									</ul>
 								</td>
 							</tr>
-<!--{/loop}-->
+{% endfor %}
 						</tbody>
 					</table>
-					{$pagestring}
+					{{ $pagestring }}
 				</div>
 			</div>
 		</div>
 	</div>
 </div>	
-<!--{include footer_gerenciar}-->
+{{ include('footer_gerenciar') }}

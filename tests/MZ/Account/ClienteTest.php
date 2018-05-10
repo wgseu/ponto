@@ -103,6 +103,7 @@ class ClienteTest extends \PHPUnit_Framework_TestCase
         $cliente->setNomeCompleto('Cicrano da Silva');
         $cliente->setEmail('cicrano@email.com');
         $cliente->setLogin('cicrano');
+        $cliente->setGenero(Cliente::GENERO_MASCULINO);
         $cliente->setSenha('1234');
         $cliente->insert();
     }
@@ -111,6 +112,7 @@ class ClienteTest extends \PHPUnit_Framework_TestCase
     {
         $cliente = new Cliente();
         $cliente->setNomeCompleto('Beltrano da Silva');
+        $cliente->setGenero(Cliente::GENERO_MASCULINO);
         $cliente->setEmail('beltrano@email.com');
         $cliente->setLogin('beltrano');
         $cliente->setDataAniversario(Helper::date());

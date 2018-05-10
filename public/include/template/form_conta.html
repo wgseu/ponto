@@ -1,59 +1,59 @@
 <div class="form-group col-lg-4 col-md-4 col-sm-6 col-xs-12">
 	<label for="descricao">Descrição:</label>
-	<input type="text" id="descricao" name="descricao" class="form-control" value="{$conta->getDescricao()}">
+	<input type="text" id="descricao" name="descricao" class="form-control" value="{{ $conta->getDescricao() }}">
 </div>
 <div class="form-group col-lg-3 col-md-4 col-sm-6 col-xs-12">
 	<label for="tipo">Tipo de conta:</label>
 	<select id="tipo" name="tipo" class="form-control">
-		<option value="1" ${$conta->getValor() > 0?'selected':''}>Receita</option>
-		<option value="-1" ${$conta->getValor() <= 0?'selected':''}>Despesa</option>
+		<option value="1" {{ $conta->getValor() > 0?'selected':'' }}>Receita</option>
+		<option value="-1" {{ $conta->getValor() <= 0?'selected':'' }}>Despesa</option>
 	</select>
 </div>
 <div class="form-group col-lg-2 col-md-4 col-sm-6 col-xs-12">
 	<label for="valor">Valor:</label>
-	<input type="text" id="valor" name="valor" class="numeric form-control text-right" data-a-sep="." data-a-dec="," data-a-sign="{$currency->getSimbolo()} " value="${abs($conta->getValor())}">
+	<input type="text" id="valor" name="valor" class="numeric form-control text-right" data-a-sep="." data-a-dec="," data-a-sign="{{ $currency->getSimbolo() }} " value="{{ abs($conta->getValor()) }}">
 </div>
-<!--${$_cliente = $conta->findClienteID()}-->
-<input type="hidden" id="clienteid_ref" name="clienteid" data-nome="{$_cliente->getNomeCompleto()}" value="{$_cliente->getID()}">
+{% $_cliente = $conta->findClienteID() %}
+<input type="hidden" id="clienteid_ref" name="clienteid" data-nome="{{ $_cliente->getNomeCompleto() }}" value="{{ $_cliente->getID() }}">
 <div class="form-group col-lg-3 col-md-4 col-sm-6 col-xs-12">
-	<label for="clienteid"><span id="cliente-label">Cliente: </span><span class="identifier">${\MZ\Util\Mask::phone($_cliente->getFone(1))}<span></label>
-	<input type="text" id="clienteid" class="form-control" value="{$_cliente->getNomeCompleto()}">
+	<label for="clienteid"><span id="cliente-label">Cliente: </span><span class="identifier">{{ \MZ\Util\Mask::phone($_cliente->getFone(1)) }}<span></label>
+	<input type="text" id="clienteid" class="form-control" value="{{ $_cliente->getNomeCompleto() }}">
 </div>
 <div class="form-group col-lg-3 col-md-4 col-sm-6 col-xs-12">
-	<label>Acréscimo: <input type="checkbox" style="margin: 0px;" id="autoacrescimo" name="autoacrescimo" value="Y" ${$conta->getAutoAcrescimo() == 'Y'?'checked':''}> Automático</label>
-	<input type="text" id="acrescimo" name="acrescimo" class="numeric form-control text-right" data-a-sep="." data-a-dec="," data-a-sign="{$currency->getSimbolo()} " value="${abs($conta->getAcrescimo())}">
+	<label>Acréscimo: <input type="checkbox" style="margin: 0px;" id="autoacrescimo" name="autoacrescimo" value="Y" {{ $conta->getAutoAcrescimo() == 'Y'?'checked':'' }}> Automático</label>
+	<input type="text" id="acrescimo" name="acrescimo" class="numeric form-control text-right" data-a-sep="." data-a-dec="," data-a-sign="{{ $currency->getSimbolo() }} " value="{{ abs($conta->getAcrescimo()) }}">
 </div>
 <div class="form-group col-lg-2 col-md-4 col-sm-6 col-xs-12">
 	<label for="multa">Multa:</label>
-	<input type="text" id="multa" name="multa" class="numeric form-control text-right" data-a-sep="." data-a-dec="," data-a-sign="{$currency->getSimbolo()} " value="${abs($conta->getMulta())}">
+	<input type="text" id="multa" name="multa" class="numeric form-control text-right" data-a-sep="." data-a-dec="," data-a-sign="{{ $currency->getSimbolo() }} " value="{{ abs($conta->getMulta()) }}">
 </div>
 <div class="form-group col-lg-2 col-md-4 col-sm-6 col-xs-12">
 	<label for="juros">Juros:</label>
-	<input type="text" id="juros" name="juros" class="numeric form-control text-right" data-a-sign=" %" data-p-sign="s" data-a-sep="." data-a-dec="," data-a-pad="false" value="{$conta->getJuros() * 100}">
+	<input type="text" id="juros" name="juros" class="numeric form-control text-right" data-a-sign=" %" data-p-sign="s" data-a-sep="." data-a-dec="," data-a-pad="false" value="{{ $conta->getJuros() * 100 }}">
 </div>
-<input type="hidden" id="classificacaoid_ref" name="classificacaoid" data-content="{$classificacao_id_obj->getDescricao()}" value="{$conta->getClassificacaoID()}">
+<input type="hidden" id="classificacaoid_ref" name="classificacaoid" data-content="{{ $classificacao_id_obj->getDescricao() }}" value="{{ $conta->getClassificacaoID() }}">
 <div class="form-group col-lg-5 col-md-4 col-sm-6 col-xs-12">
-	<label for="classificacaoid">Classificação: <span class="identifier">{$classificacao_id_obj->getID()}<span></label>
-	<input type="text" id="classificacaoid" class="form-control" placeholder="Procurar pela Descrição..." value="{$classificacao_id_obj->getDescricao()}">
+	<label for="classificacaoid">Classificação: <span class="identifier">{{ $classificacao_id_obj->getID() }}<span></label>
+	<input type="text" id="classificacaoid" class="form-control" placeholder="Procurar pela Descrição..." value="{{ $classificacao_id_obj->getDescricao() }}">
 </div>
-<input type="hidden" id="subclassificacaoid_ref" name="subclassificacaoid" data-content="{$sub_classificacao_id_obj->getDescricao()}" value="{$conta->getSubClassificacaoID()}">
+<input type="hidden" id="subclassificacaoid_ref" name="subclassificacaoid" data-content="{{ $sub_classificacao_id_obj->getDescricao() }}" value="{{ $conta->getSubClassificacaoID() }}">
 <div class="form-group col-lg-3 col-md-4 col-sm-6 col-xs-12">
-	<label for="subclassificacaoid">Subclassificação: <span class="identifier">{$sub_classificacao_id_obj->getID()}<span></label>
-	<input type="text" id="subclassificacaoid" class="form-control" placeholder="Procurar pela Descrição..." value="{$sub_classificacao_id_obj->getDescricao()}">
+	<label for="subclassificacaoid">Subclassificação: <span class="identifier">{{ $sub_classificacao_id_obj->getID() }}<span></label>
+	<input type="text" id="subclassificacaoid" class="form-control" placeholder="Procurar pela Descrição..." value="{{ $sub_classificacao_id_obj->getDescricao() }}">
 </div>
 <div class="form-group col-lg-3 col-md-4 col-sm-6 col-xs-12">
 	<label for="vencimento">Data de vencimento:</label>
-	<input type="text" id="vencimento" name="vencimento" class="datetime-picker form-control" value="${is_empty($conta->getVencimento())?'':date('d/m/Y', strtotime($conta->getVencimento()))}">
+	<input type="text" id="vencimento" name="vencimento" class="datetime-picker form-control" value="{{ $this->date($conta->getVencimento()) }}">
 </div>
 <div class="form-group col-lg-3 col-md-4 col-sm-6 col-xs-12">
 	<label for="dataemissao">Data de emissão:</label>
-	<input type="text" id="dataemissao" name="dataemissao" class="datetime-picker form-control" value="${is_empty($conta->getDataEmissao())?'':date('d/m/Y', strtotime($conta->getDataEmissao()))}">
+	<input type="text" id="dataemissao" name="dataemissao" class="datetime-picker form-control" value="{{ $this->date($conta->getDataEmissao()) }}">
 </div>
 <div class="form-group col-lg-3 col-md-4 col-sm-6 col-xs-12">
 	<label for="numerodoc">Número do documento:</label>
-	<input type="text" id="numerodoc" name="numerodoc" class="form-control" value="{$conta->getNumeroDoc()}">
+	<input type="text" id="numerodoc" name="numerodoc" class="form-control" value="{{ $conta->getNumeroDoc() }}">
 </div>
-<input type="hidden" id="anexocaminho" name="anexocaminho" value="{$conta->getAnexoCaminho()}">
+<input type="hidden" id="anexocaminho" name="anexocaminho" value="{{ $conta->getAnexoCaminho() }}">
 <div class="form-group col-lg-9 col-md-8 col-sm-6 col-xs-12">
 	<label for="raw_anexocaminho">Anexo:</label>
 	<div class="input-group">
@@ -62,7 +62,7 @@
                 Selecionar… <input type="file" id="raw_anexocaminho" name="raw_anexocaminho" style="display: none;">
             </span>
         </label>
-        <input type="text" class="form-control" readonly="" value="{$conta->getAnexoCaminho()}">
+        <input type="text" class="form-control" readonly="" value="{{ $conta->getAnexoCaminho() }}">
 		<span class="input-group-btn">
 			<button class="btn btn-default" id="clear_anexocaminho" type="button">Remover</button>
 		</span>
@@ -70,5 +70,5 @@
 </div>
 <div class="form-group col-lg-3 col-md-4 col-sm-6 col-xs-12">
 	<label for="datapagamento">Data de pagamento:</label>
-	<input type="text" id="datapagamento" name="datapagamento" class="datetime-picker form-control" value="${is_empty($conta->getDataPagamento())?'':date('d/m/Y', strtotime($conta->getDataPagamento()))}">
+	<input type="text" id="datapagamento" name="datapagamento" class="datetime-picker form-control" value="{{ $this->date($conta->getDataPagamento()) }}">
 </div>

@@ -1151,12 +1151,12 @@ class ProdutoPedido extends \MZ\Database\Helper
     private static function filterCondition($condition)
     {
         $allowed = self::getAllowedKeys();
-        if (isset($condition['!produtoid'])) {
+        if (array_key_exists('!produtoid', $condition)) {
             $field = 'NOT p.produtoid';
             $condition[$field] = $condition['!produtoid'];
             $allowed[$field] = true;
         }
-        if (isset($condition['!servicoid'])) {
+        if (array_key_exists('!servicoid', $condition)) {
             $field = 'NOT p.servicoid';
             $condition[$field] = $condition['!servicoid'];
             $allowed[$field] = true;
@@ -1199,31 +1199,26 @@ class ProdutoPedido extends \MZ\Database\Helper
             $field = 's.tipo';
             $condition[$field] = $condition['servico'];
         }
+        if (isset($condition['produto'])) {
+            $field = 'd.tipo';
+            $condition[$field] = $condition['produto'];
+        }
         if (isset($condition['cancelamento'])) {
             $field = 'e.cancelado';
             $condition[$field] = $condition['cancelamento'];
         }
-        $prefix = ['p.'];
-        $detalhado = isset($condition['detalhado']);
-        $categorizado = isset($condition['categorizado']);
-        if ($detalhado || $categorizado) {
-            if (isset($condition['!status'])) {
-                $field = 'NOT e.estado';
-                $condition[$field] = $condition['!status'];
-                $allowed[$field] = true;
-            }
-            $prefix[] = 'd.';
-            $prefix[] = 'e.';
-            $allowed['d.tipo'] = true;
-            $allowed['e.tipo'] = true;
-            $allowed['e.sessaoid'] = true;
-            $allowed['e.cancelado'] = true;
-            $allowed['e.movimentacaoid'] = true;
+        if (array_key_exists('!status', $condition)) {
+            $field = 'NOT e.estado';
+            $condition[$field] = $condition['!status'];
+            $allowed[$field] = true;
         }
-        if ($detalhado) {
-            $prefix[] = 's.';
-            $allowed['s.tipo'] = true;
-        }
+        $prefix = ['p.', 'e.', 'd.', 's.'];
+        $allowed['d.tipo'] = true;
+        $allowed['s.tipo'] = true;
+        $allowed['e.tipo'] = true;
+        $allowed['e.sessaoid'] = true;
+        $allowed['e.cancelado'] = true;
+        $allowed['e.movimentacaoid'] = true;
         return Filter::keys($condition, $allowed, $prefix);
     }
 
@@ -1237,7 +1232,11 @@ class ProdutoPedido extends \MZ\Database\Helper
      */
     private static function query($condition = [], $order = [], $select = [], $group = [])
     {
-        $query = self::getDB()->from('Produtos_Pedidos p');
+        $query = self::getDB()->from('Produtos_Pedidos p')
+            ->leftJoin('Pedidos e ON e.id = p.pedidoid')
+            ->leftJoin('Produtos d ON d.id = p.produtoid')
+            ->leftJoin('Servicos s ON s.id = p.servicoid');
+
         $detalhado = isset($condition['detalhado']);
         $categorizado = isset($condition['categorizado']);
         if ($detalhado) {
@@ -1281,12 +1280,9 @@ class ProdutoPedido extends \MZ\Database\Helper
                 ->select('m.nome as mesa_nome')
                 ->select('c.nome as comanda_nome')
 
-                ->leftJoin('Produtos d ON d.id = p.produtoid')
-                ->leftJoin('Servicos s ON s.id = p.servicoid')
                 ->leftJoin('Unidades u ON u.id = d.unidadeid')
                 ->leftJoin('Funcionarios f ON f.id = p.funcionarioid')
                 ->leftJoin('Clientes l ON l.id = f.clienteid')
-                ->leftJoin('Pedidos e ON e.id = p.pedidoid')
                 ->leftJoin('Mesas m ON m.id = e.mesaid')
                 ->leftJoin('Comandas c ON c.id = e.comandaid');
         }
@@ -1294,15 +1290,13 @@ class ProdutoPedido extends \MZ\Database\Helper
             $query = $query->select(null)
                 ->select('SUM(p.preco * p.quantidade) as total')
                 ->select('COALESCE(t.descricao, ?) as descricao', 'Taxas e Serviços')
-                ->leftJoin('Produtos d ON d.id = p.produtoid')
                 ->leftJoin('Categorias t ON t.id = d.categoriaid')
-                ->leftJoin('Pedidos e ON e.id = p.pedidoid')
                 ->groupBy('d.categoriaid')
                 ->orderBy('total DESC');
         }
         $condition = self::filterCondition($condition);
         $query = self::buildOrderBy($query, self::filterOrder($order));
-        $query = $query->orderBy('p.id ASC');
+        $query = $query->orderBy('p.id DESC');
         foreach ($select as $value) {
             $query = $query->select($value);
         }

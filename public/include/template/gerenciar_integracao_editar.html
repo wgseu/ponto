@@ -1,14 +1,14 @@
-<!--{include header_gerenciar}-->
+{{ include('header_gerenciar') }}
 <div class="row">
 	<div class="col-md-12 col-sm-12 col-xs-12">
 		<div class="x_panel">
 			<div class="x_title">
-				<h2>Integração {$old_integracao->getNome()}</h2>
+				<h2>Integração {{ $old_integracao->getNome() }}</h2>
 				<div class="clearfix"></div>
 			</div>
 			<div class="x_content">
-				<form id="integracao-form" class="form-horizontal form-label-left" method="post" action="/gerenciar/integracao/editar?id={$integracao->getID()}" enctype="multipart/form-data">
-<!--{include form_integracao}-->
+				<form id="integracao-form" class="form-horizontal form-label-left" method="post" action="/gerenciar/integracao/editar?id={{ $integracao->getID() }}" enctype="multipart/form-data">
+{{ include('form_integracao') }}
 					<div class="form-group">
 						<div class="col-md-12 col-sm-12 col-xs-12 text-center">
 							<div class="ln_solid"></div>
@@ -20,4 +20,4 @@
 		</div>
 	</div>
 </div>
-<!--{include footer_gerenciar}-->
+{{ include('footer_gerenciar') }}

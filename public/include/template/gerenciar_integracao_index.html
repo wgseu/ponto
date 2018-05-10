@@ -1,4 +1,4 @@
-<!--{include header_gerenciar}-->
+{{ include('header_gerenciar') }}
 <script type="text/javascript">$(function(){Gerenciar.integracao.init();});</script>
 <div class="row">
 	<div class="page-title">
@@ -9,7 +9,7 @@
 			<div class="form-group col-lg-6 col-md-5 col-sm-6 col-xs-6">
 				<label for="search">Nome:</label>
 				<div class="input-group">
-					<input type="text" class="form-control" id="search" name="search" placeholder="Procurar..." value="{$this->get('search')}">
+					<input type="text" class="form-control" id="search" name="search" placeholder="Procurar..." value="{{ $this->get('search') }}">
 					<span class="input-group-btn">
 						<button class="btn btn-default" type="submit"><i class="fa fa-search"></i></button>
 					</span>
@@ -31,38 +31,38 @@
 							</tr>
 						</thead>
 						<tbody>
-<!--{loop $integracoes $integracao}-->
-							<tr ${$integracao->isAtivo()?'':'class="active"'}>
+{% for $integracao in $integracoes %}
+							<tr class="{{ !$integracao->isAtivo() ? 'active': '' }}">
 								<td>
-									<img src="{$integracao->makeIconeURL()}" height="48" alt="Imagem"/></a>
+									<img src="{{ $integracao->makeIconeURL() }}" height="48" alt="Imagem"/></a>
 									<div style="display: inline-block;">
 										<label>
-											<input type="checkbox" class="js-switch" name="ativo" data-id="{$integracao->getID()}" value="Y" ${$integracao->isAtivo()?'checked':''}/> {$integracao->getNome()}
+											<input type="checkbox" class="js-switch" name="ativo" data-id="{{ $integracao->getID() }}" value="Y" {{ $integracao->isAtivo()?'checked':'' }}/> {{ $integracao->getNome() }}
 										</label>
 									</div>
 								</td>
-								<td>{$integracao->getDescricao()}</td>
+								<td>{{ $integracao->getDescricao() }}</td>
 								<td class="text-center">
 									<ul class="nav panel_toolbox">
 										<li>
-											<a href="/gerenciar/produto/{$integracao->getAcessoURL()}" title="Associar produtos"><i class="fa fa-cube"></i></a>
+											<a href="/gerenciar/produto/{{ $integracao->getAcessoURL() }}" title="Associar produtos"><i class="fa fa-cube"></i></a>
 										</li>
 										<li>
-											<a href="/gerenciar/cartao/{$integracao->getAcessoURL()}" title="Associar cartões"><i class="fa fa-credit-card"></i></a>
+											<a href="/gerenciar/cartao/{{ $integracao->getAcessoURL() }}" title="Associar cartões"><i class="fa fa-credit-card"></i></a>
 										</li>
 										<li>
-											<a href="/gerenciar/integracao/editar?id={$integracao->getID()}" title="Editar Integração '${\MZ\Util\Filter::input($integracao->getNome())}'"><i class="fa fa-edit"></i></a>
+											<a href="/gerenciar/integracao/editar?id={{ $integracao->getID() }}" title="Editar Integração '{{ \MZ\Util\Filter::input($integracao->getNome()) }}'"><i class="fa fa-edit"></i></a>
 										</li>
 									</ul>
 								</td>
 							</tr>
-<!--{/loop}-->
+{% endfor %}
 						</tbody>
 					</table>
-					{$pagestring}
+					{{ $pagestring }}
 				</div>
 			</div>
 		</div>
 	</div>
 </div>	
-<!--{include footer_gerenciar}-->
+{{ include('footer_gerenciar') }}

@@ -1,14 +1,14 @@
 <div class="form-group col-lg-6 col-md-6 col-sm-6 col-xs-12">
 	<label for="classificacaoid">Classificação superior:</label>
 	<select class="form-control" id="classificacaoid" name="classificacaoid">
-		<option value="" ${is_null($classificacao->getClassificacaoID())?'selected':''}>Não informada</option>
-<!--{loop $_classificacoes $_classificacao}-->
-<!--{if $classificacao->getID() == $_classificacao->getID()}--><!--${continue}--><!--{/if}-->
-		<option value="{$_classificacao->getID()}" ${$classificacao->getClassificacaoID() == $_classificacao->getID()?'selected':''}>{$_classificacao->getDescricao()}</option>
-<!--{/loop}-->
+		<option value="" {{ is_null($classificacao->getClassificacaoID())?'selected':'' }}>Não informada</option>
+{% for $_classificacao in $_classificacoes %}
+{% if $classificacao->getID() == $_classificacao->getID() %}{% continue %}{% endif %}
+		<option value="{{ $_classificacao->getID() }}" {{ $classificacao->getClassificacaoID() == $_classificacao->getID()?'selected':'' }}>{{ $_classificacao->getDescricao() }}</option>
+{% endfor %}
 	</select>
 </div>
 <div class="form-group col-lg-6 col-md-6 col-sm-6 col-xs-12">
 	<label for="descricao">Descrição:</label>
-	<input type="text" id="descricao" name="descricao" class="form-control" value="{$classificacao->getDescricao()}">
+	<input type="text" id="descricao" name="descricao" class="form-control" value="{{ $classificacao->getDescricao() }}">
 </div>

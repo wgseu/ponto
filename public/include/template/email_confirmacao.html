@@ -1,4 +1,4 @@
-<!--{include email_header}-->
-<p>Olá {$cliente_nome},</p>
-<p>Estamos quase lá, para concluir seu cadastro acesse o site clicando <a href="/conta/completar/{$cliente_secreto}">aqui</a></p>
-<!--{include email_footer}-->
+{{ include('email_header') }}
+<p>Olá {{ $cliente_nome }},</p>
+<p>Estamos quase lá, para concluir seu cadastro acesse o site clicando <a href="/conta/completar/{{ $cliente_secreto }}">aqui</a></p>
+{{ include('email_footer') }}

@@ -1,15 +1,15 @@
-<!--{include header_gerenciar}-->
-<script type="text/javascript">$(function(){Gerenciar.patrimonio.initForm('{$focusctrl}');});</script>
+{{ include('header_gerenciar') }}
+<script type="text/javascript">$(function(){Gerenciar.patrimonio.initForm('{{ $focusctrl }}');});</script>
 <div class="row">
 	<div class="col-md-12 col-sm-12 col-xs-12">
 		<div class="x_panel">
 			<div class="x_title">
-				<h2>Patrimônio <small>Editando patrimônio: {$old_patrimonio->getDescricao()}</small></h2>
+				<h2>Patrimônio <small>Editando patrimônio: {{ $old_patrimonio->getDescricao() }}</small></h2>
 				<div class="clearfix"></div>
 			</div>
 			<div class="x_content">
-				<form id="patrimonio-form" class="form-horizontal form-label-left" method="post" action="/gerenciar/patrimonio/editar?id={$patrimonio->getID()}" enctype="multipart/form-data">
-<!--{include form_patrimonio}-->
+				<form id="patrimonio-form" class="form-horizontal form-label-left" method="post" action="/gerenciar/patrimonio/editar?id={{ $patrimonio->getID() }}" enctype="multipart/form-data">
+{{ include('form_patrimonio') }}
 					<div class="form-group">
 						<div class="col-md-12 col-sm-12 col-xs-12 text-center">
 							<div class="ln_solid"></div>
@@ -21,4 +21,4 @@
 		</div>
 	</div>
 </div>
-<!--{include footer_gerenciar}-->
+{{ include('footer_gerenciar') }}

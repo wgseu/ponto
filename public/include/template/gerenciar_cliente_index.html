@@ -1,4 +1,4 @@
-<!--{include header_gerenciar}-->
+{{ include('header_gerenciar') }}
 <script type="text/javascript">$(function(){Gerenciar.cliente.init();});</script>
 <div class="row">
 	<div class="page-title">
@@ -9,16 +9,16 @@
 			<div class="form-group col-lg-2 col-md-4 col-sm-4 col-xs-6">
 				<label for="tipo">Genero:</label>
 				<select class="form-control" id="tipo" name="genero">
-					<option value="" ${!array_key_exists($this->get('genero'), $tipos) ? 'selected': ''}>Todos</option>
-<!--{loop $tipos $value $text}-->
-					<option value="{$value}" ${$this->get('genero') == $value ? 'selected': ''}>{$text}</option>
-<!--{/loop}-->
+					<option value="" {{ !array_key_exists($this->get('genero'), $tipos) ? 'selected': '' }}>Todos</option>
+{% for $value, $text in $tipos %}
+					<option value="{{ $value }}" {{ $this->get('genero') == $value ? 'selected': '' }}>{{ $text }}</option>
+{% endfor %}
 				</select>
 			</div>
 			<div class="form-group col-lg-4 col-md-4 col-sm-4 col-xs-12">
 				<label>Busca:</label>
 				<div class="input-group">
-					<input type="text" class="form-control" id="search" name="search" placeholder="Nome, Telefone, E-mail ou CPF..." value="{$this->get('search')}">
+					<input type="text" class="form-control" id="search" name="search" placeholder="Nome, Telefone, E-mail ou CPF..." value="{{ $this->get('search') }}">
 					<span class="input-group-btn">
 						<button class="btn btn-default" type="submit"><i class="fa fa-search"></i></button>
 					</span>
@@ -48,63 +48,63 @@
 								<th>Nome</th>
 								<th class="text-center">Telefone</th>
 								<th class="text-center">Login/E-mail</th>
-<!--${$_genero_names = array()}-->
-<!--${$_genero_names['Masculino'] = 'Masculino'}-->
-<!--${$_genero_names['Feminino'] = 'Feminino'}-->
+{% $_genero_names = [] %}
+{% $_genero_names['Masculino'] = 'Masculino' %}
+{% $_genero_names['Feminino'] = 'Feminino' %}
 								<th>Gênero</th>
-								<th class="text-center">${_p('Titulo', 'CPF')}/${_p('Titulo', 'CNPJ')}</th>
+								<th class="text-center">{{ _p('Titulo', 'CPF') }}/{{ _p('Titulo', 'CNPJ') }}</th>
 								<th class="text-center">Data de cadastro</th>
 								<th width="10%" style="text-align: center;">Ações</th>
 							</tr>
 						</thead>
 						<tbody>
-<!--{loop $clientes $cliente}-->
+{% for $cliente in $clientes %}
 							<tr>
-								<td><a href="/gerenciar/cliente/editar?id={$cliente->getID()}" title="Editar cliente '{$cliente->getNomeCompleto()}'"><img src="${get_image_url($cliente->getImagem(), 'cliente', $cliente->getTipo() == \MZ\Account\Cliente::TIPO_JURIDICA?'empresa.png':'cliente.png')}" class="${$cliente->getTipo() == \MZ\Account\Cliente::TIPO_FISICA?'rounded':''}" height="48" alt="Foto" title="Foto"/><strong>{$cliente->getNomeCompleto()}</strong></a></td>
+								<td><a href="/gerenciar/cliente/editar?id={{ $cliente->getID() }}" title="Editar cliente '{{ $cliente->getNomeCompleto() }}'"><img src="{{ get_image_url($cliente->getImagem(), 'cliente', $cliente->getTipo() == \MZ\Account\Cliente::TIPO_JURIDICA?'empresa.png':'cliente.png') }}" class="{{ $cliente->getTipo() == \MZ\Account\Cliente::TIPO_FISICA?'rounded':'' }}" height="48" alt="Foto" title="Foto"/><strong>{{ $cliente->getNomeCompleto() }}</strong></a></td>
 								<td class="text-center">
-									<strong>${\MZ\Util\Mask::phone($cliente->getFone(1))}</strong>
-									<small title="Celular">${\MZ\Util\Mask::phone($cliente->getFone(2))}</small>
+									<strong>{{ \MZ\Util\Mask::phone($cliente->getFone(1)) }}</strong>
+									<small title="Celular">{{ \MZ\Util\Mask::phone($cliente->getFone(2)) }}</small>
 								</td>
 								<td class="text-center">
-									<strong>{$cliente->getLogin()}</strong>
-									<small>{$cliente->getEmail()}</small>
+									<strong>{{ $cliente->getLogin() }}</strong>
+									<small>{{ $cliente->getEmail() }}</small>
 								</td>
-								<td>{$cliente->getGeneroName()}</td>
+								<td>{{ $cliente->getGeneroName() }}</td>
 								<td class="text-center">
-<!--{if $cliente->getTipo() == \MZ\Account\Cliente::TIPO_JURIDICA}-->
-									<strong>${\MZ\Util\Mask::cnpj($cliente->getCPF())}</strong>
-									<small title="Inscrição estadual">{$cliente->getRG()}</small>
-<!--{else}-->
-									<strong>${\MZ\Util\Mask::cpf($cliente->getCPF())}</strong>
-									<small title="RG">{$cliente->getRG()}</small>
-<!--{/if}-->
+{% if $cliente->getTipo() == \MZ\Account\Cliente::TIPO_JURIDICA %}
+									<strong>{{ \MZ\Util\Mask::cnpj($cliente->getCPF()) }}</strong>
+									<small title="Inscrição estadual">{{ $cliente->getRG() }}</small>
+{% else %}
+									<strong>{{ \MZ\Util\Mask::cpf($cliente->getCPF()) }}</strong>
+									<small title="RG">{{ $cliente->getRG() }}</small>
+{% endif %}
 								</td>
 								<td class="text-center">
-									<strong title="Data de cadastro">${is_null($cliente->getDataCadastro())?'':date('d/m/Y H:i', strtotime($cliente->getDataCadastro()))}</strong>
-<!--{if $cliente->getTipo() == \MZ\Account\Cliente::TIPO_JURIDICA}-->
-									<small title="Data de fundação">${is_null($cliente->getDataAniversario())?'':date('d/m/Y', strtotime($cliente->getDataAniversario()))}</small>
-<!--{else}-->
-									<small title="Data de aniversário">${is_null($cliente->getDataAniversario())?'':human_date($cliente->getDataAniversario())}</small>
-<!--{/if}-->
+									<strong title="Data de cadastro">{{ $this->datetime($cliente->getDataCadastro()) }}</strong>
+{% if $cliente->getTipo() == \MZ\Account\Cliente::TIPO_JURIDICA %}
+									<small title="Data de fundação">{{ $this->date($cliente->getDataAniversario()) }}</small>
+{% else %}
+									<small title="Data de aniversário">{{ $this->elapsed($cliente->getDataAniversario()) }}</small>
+{% endif %}
 								</td>
 								<td class="text-center">
 									<ul class="nav panel_toolbox">
 										<li>
-											<a href="/gerenciar/cliente/editar?id={$cliente->getID()}" title="Editar cliente '{$cliente->getNomeCompleto()}'"><i class="fa fa-edit"></i></a>
+											<a href="/gerenciar/cliente/editar?id={{ $cliente->getID() }}" title="Editar cliente '{{ $cliente->getNomeCompleto() }}'"><i class="fa fa-edit"></i></a>
 										</li>
 										<li>
-											<a href="/gerenciar/cliente/excluir?id={$cliente->getID()}" title="Excluir cliente '{$cliente->getNomeCompleto()}'" class="ajaxlink" ask="Deseja excluir o cliente '{$cliente->getNomeCompleto()}'?"><i class="fa fa-close"></i></a>
+											<a href="/gerenciar/cliente/excluir?id={{ $cliente->getID() }}" title="Excluir cliente '{{ $cliente->getNomeCompleto() }}'" class="ajaxlink" ask="Deseja excluir o cliente '{{ $cliente->getNomeCompleto() }}'?"><i class="fa fa-close"></i></a>
 										</li>
 									</ul>
 								</td>
 							</tr>
-<!--{/loop}-->
+{% endfor %}
 						</tbody>
 					</table>
-					{$pagestring}
+					{{ $pagestring }}
 				</div>
 			</div>
 		</div>
 	</div>
 </div>	
-<!--{include footer_gerenciar}-->
+{{ include('footer_gerenciar') }}

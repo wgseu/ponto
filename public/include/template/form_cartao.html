@@ -1,51 +1,51 @@
 <div class="form-group col-lg-3 col-md-4 col-sm-6 col-xs-12">
 	<label for="descricao">Descrição:</label>
-	<input type="text" id="descricao" name="descricao" class="form-control" value="{$cartao->getDescricao()}">
+	<input type="text" id="descricao" name="descricao" class="form-control" value="{{ $cartao->getDescricao() }}">
 </div>
 <div class="form-group col-lg-3 col-md-4 col-sm-6 col-xs-12">
 	<label for="carteiraid">Carteira de entrada:</label>
 	<select class="form-control" id="carteiraid" name="carteiraid">
-		<option value="" ${is_null($cartao->getCarteiraID())?'selected':''}>Não informada</option>
-<!--{loop $_carteiras $_carteira}-->
-		<option value="{$_carteira->getID()}" ${$cartao->getCarteiraID() == $_carteira->getID()?'selected':''}>{$_carteira->getDescricao()}</option>
-<!--{/loop}-->
+		<option value="" {{ is_null($cartao->getCarteiraID())?'selected':'' }}>Não informada</option>
+{% for $_carteira in $_carteiras %}
+		<option value="{{ $_carteira->getID() }}" {{ $cartao->getCarteiraID() == $_carteira->getID()?'selected':'' }}>{{ $_carteira->getDescricao() }}</option>
+{% endfor %}
 	</select>
 </div>
 <div class="form-group col-lg-3 col-md-4 col-sm-6 col-xs-12">
 	<label for="carteirapagtoid">Carteira de saída:</label>
 	<select class="form-control" id="carteirapagtoid" name="carteirapagtoid">
-		<option value="" ${is_null($cartao->getCarteiraPagtoID())?'selected':''}>Não informada</option>
-<!--{loop $_carteiras $_carteira}-->
-		<option value="{$_carteira->getID()}" ${$cartao->getCarteiraPagtoID() == $_carteira->getID()?'selected':''}>{$_carteira->getDescricao()}</option>
-<!--{/loop}-->
+		<option value="" {{ is_null($cartao->getCarteiraPagtoID())?'selected':'' }}>Não informada</option>
+{% for $_carteira in $_carteiras %}
+		<option value="{{ $_carteira->getID() }}" {{ $cartao->getCarteiraPagtoID() == $_carteira->getID()?'selected':'' }}>{{ $_carteira->getDescricao() }}</option>
+{% endfor %}
 	</select>
 </div>
 <div class="form-group col-lg-3 col-md-4 col-sm-6 col-xs-12">
 	<label for="mensalidade">Mensalidade:</label>
-	<input type="text" id="mensalidade" name="mensalidade" class="numeric form-control" data-a-sep="." data-a-dec="," data-a-sign="{$currency->getSimbolo()} " value="{$cartao->getMensalidade()}">
+	<input type="text" id="mensalidade" name="mensalidade" class="numeric form-control" data-a-sep="." data-a-dec="," data-a-sign="{{ $currency->getSimbolo() }} " value="{{ $cartao->getMensalidade() }}">
 </div>
 <div class="form-group col-lg-2 col-md-4 col-sm-6 col-xs-12">
 	<label for="transacao">Transação:</label>
-	<input type="text" id="transacao" name="transacao" class="numeric form-control" data-a-sep="." data-a-dec="," data-a-sign="{$currency->getSimbolo()} " value="{$cartao->getTransacao()}">
+	<input type="text" id="transacao" name="transacao" class="numeric form-control" data-a-sep="." data-a-dec="," data-a-sign="{{ $currency->getSimbolo() }} " value="{{ $cartao->getTransacao() }}">
 </div>
 <div class="form-group col-lg-2 col-md-4 col-sm-6 col-xs-12">
 	<label for="taxa">Taxa:</label>
-	<input type="text" id="taxa" name="taxa" class="numeric form-control text-right" data-a-sign=" %" data-p-sign="s" data-a-sep="." data-a-dec="," data-a-pad="false" value="{$cartao->getTaxa()}">
+	<input type="text" id="taxa" name="taxa" class="numeric form-control text-right" data-a-sign=" %" data-p-sign="s" data-a-sep="." data-a-dec="," data-a-pad="false" value="{{ $cartao->getTaxa() }}">
 </div>
 <div class="form-group col-lg-3 col-md-4 col-sm-6 col-xs-12">
 	<label for="diasrepasse">Dias para repasse:</label>
-	<input type="text" id="diasrepasse" name="diasrepasse" class="numeric form-control" data-a-sep="" data-m-dec="0" value="{$cartao->getDiasRepasse()}">
+	<input type="text" id="diasrepasse" name="diasrepasse" class="numeric form-control" data-a-sep="" data-m-dec="0" value="{{ $cartao->getDiasRepasse() }}">
 </div>
 <div class="form-group col-lg-3 col-md-4 col-sm-6 col-xs-12">
 	<select class="form-control" id="imageindex" name="imageindex" data-imagesrc="/static/img/cartoes.png">
-		<option value="" ${intval($cartao->getImageIndex()) == 0?'selected':''}>Sem imagem</option>
-<!--{loop $_imagens $_imagem}-->
-		<option value="{$_imagem['id']}" data-imageindex="{$_imagem['id']}" ${$cartao->getImageIndex() == $_imagem['id']?'selected':''}>{$_imagem['name']}</option>
-<!--{/loop}-->
+		<option value="" {{ intval($cartao->getImageIndex()) == 0?'selected':'' }}>Sem imagem</option>
+{% for $_imagem in $_imagens %}
+		<option value="{{ $_imagem['id'] }}" data-imageindex="{{ $_imagem['id'] }}" {{ $cartao->getImageIndex() == $_imagem['id']?'selected':'' }}>{{ $_imagem['name'] }}</option>
+{% endfor %}
 	</select>
 </div>
 <div class="checkbox col-lg-2 col-md-4 col-sm-6 col-xs-12">
 	<label>
-		<input type="checkbox" id="ativo" name="ativo" value="Y" ${$cartao->getAtivo() == 'Y'?'checked':''}> Ativo
+		<input type="checkbox" id="ativo" name="ativo" value="Y" {{ $cartao->getAtivo() == 'Y'?'checked':'' }}> Ativo
 	</label>
 </div>

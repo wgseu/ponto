@@ -1,18 +1,18 @@
-<!--{include header}-->
-    <script type="text/javascript">$(function(){$('#' + '{$focusctrl}').focus();});</script>
-<!--{if !is_login() || is_null(logged_user()->getEmail())}-->
-    <!--${$col = array(
+{{ include('header') }}
+    <script type="text/javascript">$(function(){{ $('#' + '{$focusctrl }}').focus();});</script>
+{% if !is_login() || is_null(logged_user()->getEmail()) %}
+    {% $col = array(
         'col-md-6',
         'col-md-6',
-    );}-->
-<!--{else}-->
-    <!--${$col = array(
+    ); %}
+{% else %}
+    {% $col = array(
         'col-md-12',
         'col-md-12',
-    );}-->
-<!--{/if}-->
+    ); %}
+{% endif %}
     <!-- Contact Section -->
-    <section id="contact" style="background-image: url('${get_site_image_url('Image.Contato')}');">
+    <section id="contact" style="background-image: url('{{ get_site_image_url('Image.Contato') }}');">
         <div class="container">
             <div class="row">
                 <div class="col-lg-12 text-center">
@@ -23,22 +23,22 @@
                 <div class="col-lg-12">
                     <form name="contato" id="contato-form" method="post" action="/contato/">
                         <div class="row">
-                            <div class="{$col[0]}">
-<!--{if !is_login() || is_null(logged_user()->getEmail())}-->
+                            <div class="{{ $col[0] }}">
+{% if !is_login() || is_null(logged_user()->getEmail()) %}
                                 <div class="form-group">
-                                    <input type="text" class="form-control" placeholder="Seu nome *" id="nome" name="nome" value="${$this->post('nome') ?: logged_user()->getNomeCompleto()}">
+                                    <input type="text" class="form-control" placeholder="Seu nome *" id="nome" name="nome" value="{{ $this->post('nome') ?: logged_user()->getNomeCompleto() }}">
                                 </div>
                                 <div class="form-group">
-                                    <input type="email" class="form-control" placeholder="Seu E-mail *" id="email" name="email" value="{$this->post('email')}">
+                                    <input type="email" class="form-control" placeholder="Seu E-mail *" id="email" name="email" value="{{ $this->post('email') }}">
                                 </div>
-<!--{/if}-->
+{% endif %}
                                 <div class="form-group">
-                                    <input type="text" class="form-control" placeholder="Assunto *" id="assunto" name="assunto" value="{$this->post('assunto')}">
+                                    <input type="text" class="form-control" placeholder="Assunto *" id="assunto" name="assunto" value="{{ $this->post('assunto') }}">
                                 </div>
                             </div>
-                            <div class="{$col[1]}">
+                            <div class="{{ $col[1] }}">
                                 <div class="form-group">
-                                    <textarea class="form-control" placeholder="Sua Mensagem *" id="mensagem" name="mensagem">{$this->post('mensagem')}</textarea>
+                                    <textarea class="form-control" placeholder="Sua Mensagem *" id="mensagem" name="mensagem">{{ $this->post('mensagem') }}</textarea>
                                 </div>
                             </div>
                             <div class="clearfix"></div>
@@ -52,4 +52,4 @@
             </div>
         </div>
     </section>
-<!--{include footer}-->
+{{ include('footer') }}

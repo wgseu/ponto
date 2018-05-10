@@ -1,4 +1,4 @@
-<!--{include header_gerenciar}-->
+{{ include('header_gerenciar') }}
 <script type="text/javascript">$(function(){Gerenciar.conta.init();});</script>
 <div class="row">
 	<div class="page-title">
@@ -6,24 +6,24 @@
 			<h3>Contas</h3>
 		</div>
 		<form method="get" action="/gerenciar/conta/" id="search-form">
-			<input type="hidden" id="clienteid_ref" name="clienteid" data-nome="{$_cliente->getNomeCompleto()}" value="{$_cliente->getID()}">
+			<input type="hidden" id="clienteid_ref" name="clienteid" data-nome="{{ $_cliente->getNomeCompleto() }}" value="{{ $_cliente->getID() }}">
 			<div class="form-group col-lg-3 col-md-6 col-sm-6 col-xs-12">
-				<label for="clienteid">Cliente: <span class="identifier">${\MZ\Util\Mask::phone($_cliente->getFone(1))}<span></label>
-				<input type="text" id="clienteid" class="form-control" value="{$_cliente->getNomeCompleto()}">
+				<label for="clienteid">Cliente: <span class="identifier">{{ \MZ\Util\Mask::phone($_cliente->getFone(1)) }}<span></label>
+				<input type="text" id="clienteid" class="form-control" value="{{ $_cliente->getNomeCompleto() }}">
 			</div>
 			<div class="form-group col-lg-3 col-md-6 col-sm-6 col-xs-12">
 				<label for="classificacaoid">Classificação:</label>
 				<select class="form-control" id="classificacaoid" name="classificacaoid">
-					<option value="" ${!array_key_exists($this->get('classificacaoid'), $_classificacoes) ? 'selected': ''}>Todas</option>
-<!--{loop $_classificacoes $value $text}-->
-					<option value="{$value}" ${$this->get('classificacaoid') == $value ? 'selected': ''}>{$text}</option>
-<!--{/loop}-->
+					<option value="" {{ !array_key_exists($this->get('classificacaoid'), $_classificacoes) ? 'selected': '' }}>Todas</option>
+{% for $value, $text in $_classificacoes %}
+					<option value="{{ $value }}" {{ $this->get('classificacaoid') == $value ? 'selected': '' }}>{{ $text }}</option>
+{% endfor %}
 				</select>
 			</div>
 			<div class="form-group col-lg-3 col-md-6 col-sm-6 col-xs-12">
 				<label for="search">Busca:</label>
 				<div class="input-group">
-					<input type="text" class="form-control" id="search" name="search" placeholder="Descrição, #Numero ou Código..." value="{$this->get('search')}">
+					<input type="text" class="form-control" id="search" name="search" placeholder="Descrição, #Numero ou Código..." value="{{ $this->get('search') }}">
 					<span class="input-group-btn">
 						<button class="btn btn-default" type="submit"><i class="fa fa-search"></i></button>
 					</span>
@@ -65,70 +65,70 @@
 							</tr>
 						</thead>
 						<tbody>
-<!--{loop $contas $conta}-->
-							<tr ${$conta->isCancelada()?'class="danger"':''}>
-								<td><div title="${$conta->getValor() > 0?'Receita':'Despesa'}" class="cell-icon conta-icons" style="background-position: -${$conta->getValor() > 0?0:16}px 0px;"></div><a href="/gerenciar/conta/editar?id={$conta->getID()}" title="Editar conta '{$conta->getDescricao()}'">{$conta->getDescricao()}</a></td>
+{% for $conta in $contas %}
+							<tr class="{{ $conta->isCancelada() ? 'danger': '' }}">
+								<td><div title="{{ $conta->getValor() > 0 ? 'Receita': 'Despesa' }}" class="cell-icon conta-icons" style="background-position: -{{ $conta->getValor() > 0?0:16 }}px 0px;"></div><a href="/gerenciar/conta/editar?id={{ $conta->getID() }}" title="Editar conta '{{ $conta->getDescricao() }}'">{{ $conta->getDescricao() }}</a></td>
 								<td>
-<!--${$_conta_total = $conta->getTotal()}-->
-									<strong title="Valor + Acréscimos + Multa + Juros">${\MZ\Util\Mask::money($_conta_total, true)}</strong>
-<!--{if !is_equal($_conta_total, $conta->getValor())}-->
-									<small title="Valor inicial da conta">${\MZ\Util\Mask::money($conta->getValor(), true)}</small>
-<!--{/if}-->
+{% $_conta_total = $conta->getTotal() %}
+									<strong title="Valor + Acréscimos + Multa + Juros">{{ $this->currency($_conta_total) }}</strong>
+{% if !is_equal($_conta_total, $conta->getValor()) %}
+									<small title="Valor inicial da conta">{{ $this->currency($conta->getValor()) }}</small>
+{% endif %}
 								</td>
-<!--${$_cliente = $conta->findClienteID()}-->
-								<td><a href="/gerenciar/cliente/editar?id={$_cliente->getID()}" title="Editar cliente '{$_cliente->getNomeCompleto()}'">{$_cliente->getNomeCompleto()}</a></td>
-<!--${$_classificacao = $conta->findClassificacaoID()}-->
-								<td><strong><a href="/gerenciar/classificacao/editar?id={$_classificacao->getID()}" title="Editar classificação '{$_classificacao->getDescricao()}'">{$_classificacao->getDescricao()}</a></strong>
-<!--${$_classificacao = $conta->findSubClassificacaoID()}-->
-								<small><a href="/gerenciar/classificacao/editar?id={$_classificacao->getID()}" title="Editar classificação '{$_classificacao->getDescricao()}'">{$_classificacao->getDescricao()}</a></small></td>
-<!--${$_funcionario = $conta->findFuncionarioID()}-->
-<!--${$_cliente_fun = $_funcionario->findClienteID()}-->
-								<td><a href="/gerenciar/funcionario/editar?id={$_funcionario->getID()}" title="Editar funcionário '{$_cliente_fun->getNomeCompleto()}'">{$_cliente_fun->getNomeCompleto()}</a></td>
+{% $_cliente = $conta->findClienteID() %}
+								<td><a href="/gerenciar/cliente/editar?id={{ $_cliente->getID() }}" title="Editar cliente '{{ $_cliente->getNomeCompleto() }}'">{{ $_cliente->getNomeCompleto() }}</a></td>
+{% $_classificacao = $conta->findClassificacaoID() %}
+								<td><strong><a href="/gerenciar/classificacao/editar?id={{ $_classificacao->getID() }}" title="Editar classificação '{{ $_classificacao->getDescricao() }}'">{{ $_classificacao->getDescricao() }}</a></strong>
+{% $_classificacao = $conta->findSubClassificacaoID() %}
+								<small><a href="/gerenciar/classificacao/editar?id={{ $_classificacao->getID() }}" title="Editar classificação '{{ $_classificacao->getDescricao() }}'">{{ $_classificacao->getDescricao() }}</a></small></td>
+{% $_funcionario = $conta->findFuncionarioID() %}
+{% $_cliente_fun = $_funcionario->findClienteID() %}
+								<td><a href="/gerenciar/funcionario/editar?id={{ $_funcionario->getID() }}" title="Editar funcionário '{{ $_cliente_fun->getNomeCompleto() }}'">{{ $_cliente_fun->getNomeCompleto() }}</a></td>
 								<td>
-<!--{if $conta->isAutoAcrescimo()}-->
+{% if $conta->isAutoAcrescimo() %}
 									<div title="Acréscimo automático" class="cell-icon conta-icons" style="background-position: -48px 0px;"></div>
-<!--{/if}-->
-									${\MZ\Util\Mask::money($conta->getAcrescimo(), true)}
+{% endif %}
+									{{ $this->currency($conta->getAcrescimo()) }}
 								</td>
 								<td class="text-center">
-									<strong title="Multa">${\MZ\Util\Mask::money($conta->getMulta(), true)}</strong>
-									<small title="Juros">{$conta->getJuros() * 100}%</small>
+									<strong title="Multa">{{ $this->currency($conta->getMulta()) }}</strong>
+									<small title="Juros">{{ $conta->getJuros() * 100 }}%</small>
 								</td>
-								<td>${is_null($conta->getVencimento())?'':date('d/m/Y', strtotime($conta->getVencimento()))}</td>
+								<td>{{ $this->date($conta->getVencimento()) }}</td>
 								<td>
-<!--{if !is_null($conta->getAnexoCaminho())}-->
-<!--{if !is_local_path($conta->getAnexoCaminho())}-->
-									<a href="${get_document_url($conta->getAnexoCaminho(), 'conta')}" target="_blank">
-<!--{/if}-->
+{% if !is_null($conta->getAnexoCaminho()) %}
+{% if !is_local_path($conta->getAnexoCaminho()) %}
+									<a href="{{ get_document_url($conta->getAnexoCaminho(), 'conta') }}" target="_blank">
+{% endif %}
 									<div title="Anexo" class="cell-icon conta-icons" style="background-position: -32px 0px;"></div>
-<!--{if !is_local_path($conta->getAnexoCaminho())}-->
-<!--{/if}-->
+{% if !is_local_path($conta->getAnexoCaminho()) %}
+{% endif %}
 									</a>
-<!--{/if}-->
-									{$conta->getNumeroDoc()}
+{% endif %}
+									{{ $conta->getNumeroDoc() }}
 								</td>
 								<td class="text-center">
-									<strong title="Data de cadastro">${is_null($conta->getDataCadastro())?'':date('d/m/Y H:i:s', strtotime($conta->getDataCadastro()))}</strong>
-									<small title="Data de emissão">${is_null($conta->getDataEmissao())?'':date('d/m/Y', strtotime($conta->getDataEmissao()))}</small>
+									<strong title="Data de cadastro">{{ $this->date($conta->getDataCadastro()) }}</strong>
+									<small title="Data de emissão">{{ $this->date($conta->getDataEmissao()) }}</small>
 								</td>
 								<td class="text-center">
 									<ul class="nav panel_toolbox">
 										<li>
-											<a href="/gerenciar/conta/editar?id={$conta->getID()}" title="Editar conta '{$conta->getDescricao()}'"><i class="fa fa-edit"></i></a>
+											<a href="/gerenciar/conta/editar?id={{ $conta->getID() }}" title="Editar conta '{{ $conta->getDescricao() }}'"><i class="fa fa-edit"></i></a>
 										</li>
 										<li>
-											<a href="/gerenciar/conta/excluir?id={$conta->getID()}" title="Excluir conta '{$conta->getDescricao()}'" class="ajaxlink" ask="Deseja excluir a conta '{$conta->getDescricao()}'?"><i class="fa fa-close"></i></a>
+											<a href="/gerenciar/conta/excluir?id={{ $conta->getID() }}" title="Excluir conta '{{ $conta->getDescricao() }}'" class="ajaxlink" ask="Deseja excluir a conta '{{ $conta->getDescricao() }}'?"><i class="fa fa-close"></i></a>
 										</li>
 									</ul>
 								</td>
 							</tr>
-<!--{/loop}-->
+{% endfor %}
 						</tbody>
 					</table>
-					{$pagestring}
+					{{ $pagestring }}
 				</div>
 			</div>
 		</div>
 	</div>
 </div>	
-<!--{include footer_gerenciar}-->
+{{ include('footer_gerenciar') }}

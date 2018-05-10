@@ -1,10 +1,10 @@
-<!--{include header_gerenciar}-->
-<script type="text/javascript">$(function(){Gerenciar.forma_pagto.initForm('{$focusctrl}');});</script>
+{{ include('header_gerenciar') }}
+<script type="text/javascript">$(function(){Gerenciar.forma_pagto.initForm('{{ $focusctrl }}');});</script>
 <div class="row">
 	<div class="col-md-12 col-sm-12 col-xs-12">
 		<div class="x_panel">
 			<div class="x_title">
-				<h2>Forma de pagamento <small>Editando forma de pagamento: {$old_forma_pagto->getDescricao()}</small></h2>
+				<h2>Forma de pagamento <small>Editando forma de pagamento: {{ $old_forma_pagto->getDescricao() }}</small></h2>
 				<ul class="nav navbar-right panel_toolbox">
 					<li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
 					</li>
@@ -18,8 +18,8 @@
 			</div>
 			<div class="x_content">
 				<br />
-				<form id="forma_pagto-form" class="form-horizontal form-label-left" method="post" action="/gerenciar/forma_pagto/editar?id={$forma_pagto->getID()}" enctype="multipart/form-data">
-<!--{include form_forma_pagto}-->
+				<form id="forma_pagto-form" class="form-horizontal form-label-left" method="post" action="/gerenciar/forma_pagto/editar?id={{ $forma_pagto->getID() }}" enctype="multipart/form-data">
+{{ include('form_forma_pagto') }}
 					<div class="form-group">
 						<div class="col-md-12 col-sm-12 col-xs-12 text-center">
 							<div class="ln_solid"></div>
@@ -31,4 +31,4 @@
 		</div>
 	</div>
 </div>
-<!--{include footer_gerenciar}-->
+{{ include('footer_gerenciar') }}

@@ -1,4 +1,4 @@
-<!--{include header_gerenciar}-->
+{{ include('header_gerenciar') }}
 <script type="text/javascript">$(function(){Gerenciar.estoque.init();});</script>
 <div class="row">
 	<div class="page-title">
@@ -9,24 +9,24 @@
 			<div class="form-group col-lg-2 col-md-4 col-sm-4 col-xs-6">
 				<label for="tipo">Tipo de movimento:</label>
 				<select id="tipo" name="tipo" class="form-control">
-					<option value="" ${!array_key_exists($this->get('tipo'), $tipos) ? 'selected': ''}>Todos</option>
-<!--{loop $tipos $value $text}-->
-					<option value="{$value}" ${$this->get('tipo') == $value ? 'selected': ''}>{$text}</option>
-<!--{/loop}-->
+					<option value="" {{ !array_key_exists($this->get('tipo'), $tipos) ? 'selected': '' }}>Todos</option>
+{% for $value, $text in $tipos %}
+					<option value="{{ $value }}" {{ $this->get('tipo') == $value ? 'selected': '' }}>{{ $text }}</option>
+{% endfor %}
 				</select>
 			</div>
-<!--${$_cliente_fornecedor = $_fornecedor->findEmpresaID()}-->
-			<input type="hidden" id="fornecedorid_ref" name="fornecedorid" data-nome="{$_cliente_fornecedor->getNome()}" value="{$_fornecedor->getID()}">
+{% $_cliente_fornecedor = $_fornecedor->findEmpresaID() %}
+			<input type="hidden" id="fornecedorid_ref" name="fornecedorid" data-nome="{{ $_cliente_fornecedor->getNome() }}" value="{{ $_fornecedor->getID() }}">
 			<div class="form-group col-lg-3 col-md-6 col-sm-6 col-xs-12">
-				<label for="fornecedorid">Fornecedor: <span class="identifier">${\MZ\Util\Mask::phone($_cliente_fornecedor->getFone(1))}<span></label>
-				<input type="text" id="fornecedorid" class="form-control" value="{$_cliente_fornecedor->getNome()}">
+				<label for="fornecedorid">Fornecedor: <span class="identifier">{{ \MZ\Util\Mask::phone($_cliente_fornecedor->getFone(1)) }}<span></label>
+				<input type="text" id="fornecedorid" class="form-control" value="{{ $_cliente_fornecedor->getNome() }}">
 			</div>
-<!--${$_categoria = $_produto->findCategoriaID()}-->
-			<input type="hidden" id="produtoid_ref" name="produtoid" data-descricao="{$_produto->getDescricao()}" value="{$_produto->getID()}">
+{% $_categoria = $_produto->findCategoriaID() %}
+			<input type="hidden" id="produtoid_ref" name="produtoid" data-descricao="{{ $_produto->getDescricao() }}" value="{{ $_produto->getID() }}">
 			<div class="form-group col-lg-3 col-md-6 col-sm-6 col-xs-12">
-				<label for="produtoid">Produto: <span class="identifier">{$_categoria->getDescricao()}<span></label>
+				<label for="produtoid">Produto: <span class="identifier">{{ $_categoria->getDescricao() }}<span></label>
 				<div class="input-group">
-					<input type="text" id="produtoid" class="form-control" value="{$_produto->getDescricao()}">
+					<input type="text" id="produtoid" class="form-control" value="{{ $_produto->getDescricao() }}">
 					<span class="input-group-btn">
 						<button class="btn btn-default" type="submit"><i class="fa fa-search"></i></button>
 					</span>
@@ -60,48 +60,48 @@
 							</tr>
 						</thead>
 						<tbody>
-<!--{loop $estoques $estoque}-->
-							<tr ${$estoque->isCancelado()?'class="active"':''}>
-<!--${$_produto = $estoque->findProdutoID()}-->
+{% for $estoque in $estoques %}
+							<tr class="{{ $estoque->isCancelado() ? 'active': '' }}">
+{% $_produto = $estoque->findProdutoID() %}
 								<td class="product-cell">
-									<strong><a href="/gerenciar/produto/editar?id={$_produto->getID()}" title="Editar produto '{$_produto->getDescricao()}'"><img src="${get_image_url($_produto->getImagem(), 'produto', 'produto.png')}" height="48" alt="Imagem" title="Imagem"/>{$_produto->getDescricao()}</a></strong>
-									<small>{$_produto->getAbreviacao()}</small></td>
-<!--${$_fornecedor = $estoque->findFornecedorID()}-->
-<!--${$_empresa = $_fornecedor->findEmpresaID()}-->
+									<strong><a href="/gerenciar/produto/editar?id={{ $_produto->getID() }}" title="Editar produto '{{ $_produto->getDescricao() }}'"><img src="{{ get_image_url($_produto->getImagem(), 'produto', 'produto.png') }}" height="48" alt="Imagem" title="Imagem"/>{{ $_produto->getDescricao() }}</a></strong>
+									<small>{{ $_produto->getAbreviacao() }}</small></td>
+{% $_fornecedor = $estoque->findFornecedorID() %}
+{% $_empresa = $_fornecedor->findEmpresaID() %}
 								<td class="product-cell">
-<!--{if $_fornecedor->exists()}-->
-									<strong><a href="/gerenciar/fornecedor/editar?id={$_fornecedor->getID()}" title="Editar fornecedor '{$_empresa->getNomeCompleto()}'"><img src="${get_image_url($_empresa->getImagem(), 'cliente', 'empresa.png')}" height="48" alt="Foto" title="Foto"/>{$_empresa->getNomeCompleto()}</a></strong>
-<!--{/if}-->
-<!--${$_setor = $estoque->findSetorID()}-->
-									<small title="Setor de entrada/saída"><a href="/gerenciar/setor/editar?id={$_setor->getID()}" title="Editar setor '{$_setor->getNome()}'">{$_setor->getNome()}</a></small>
+{% if $_fornecedor->exists() %}
+									<strong><a href="/gerenciar/fornecedor/editar?id={{ $_fornecedor->getID() }}" title="Editar fornecedor '{{ $_empresa->getNomeCompleto() }}'"><img src="{{ get_image_url($_empresa->getImagem(), 'cliente', 'empresa.png') }}" height="48" alt="Foto" title="Foto"/>{{ $_empresa->getNomeCompleto() }}</a></strong>
+{% endif %}
+{% $_setor = $estoque->findSetorID() %}
+									<small title="Setor de entrada/saída"><a href="/gerenciar/setor/editar?id={{ $_setor->getID() }}" title="Editar setor '{{ $_setor->getNome() }}'">{{ $_setor->getNome() }}</a></small>
 								</td>
-								<td>{$tipos[$estoque->getTipoMovimento()]}</td>
-								<td>{$estoque->getQuantidade()}</td>
-								<td>${\MZ\Util\Mask::money($estoque->getPrecoCompra(), true)}</td>
-								<td>{$estoque->getLote()}</td>
+								<td>{{ $tipos[$estoque->getTipoMovimento()] }}</td>
+								<td>{{ $estoque->getQuantidade() }}</td>
+								<td>{{ $this->currency($estoque->getPrecoCompra()) }}</td>
+								<td>{{ $estoque->getLote() }}</td>
 								<td>
-									<strong title="Data de fabricação">${is_null($estoque->getDataFabricacao())?'':date('d/m/Y H:i', strtotime($estoque->getDataFabricacao()))}</strong>
-									<small title="Data de vencimento">${is_null($estoque->getDataVencimento())?'':date('d/m/Y H:i', strtotime($estoque->getDataVencimento()))}</small>
+									<strong title="Data de fabricação">{{ $this->datetime($estoque->getDataFabricacao()) }}</strong>
+									<small title="Data de vencimento">{{ $this->datetime($estoque->getDataVencimento()) }}</small>
 								</td>
-								<td>{$estoque->getDetalhes()}</td>
-								<td>${is_null($estoque->getDataMovimento())?'':date('d/m/Y H:i', strtotime($estoque->getDataMovimento()))}</td>
+								<td>{{ $estoque->getDetalhes() }}</td>
+								<td>{{ $this->datetime($estoque->getDataMovimento()) }}</td>
 								<td class="text-center">
 									<ul class="nav panel_toolbox">
-<!--{if $estoque->getTipoMovimento() == \MZ\Stock\Estoque::TIPO_MOVIMENTO_ENTRADA && !$estoque->isCancelado()}-->
+{% if $estoque->getTipoMovimento() == \MZ\Stock\Estoque::TIPO_MOVIMENTO_ENTRADA && !$estoque->isCancelado() %}
 										<li>
-											<a href="/gerenciar/estoque/cancelar?id={$estoque->getID()}" title="Cancelar estoque '{$_produto->getDescricao()}'" class="ajaxlink" ask="Deseja cancelar a entrada no estoque '{$_produto->getDescricao()}'?"><i class="fa fa-ban"></i></a>
+											<a href="/gerenciar/estoque/cancelar?id={{ $estoque->getID() }}" title="Cancelar estoque '{{ $_produto->getDescricao() }}'" class="ajaxlink" ask="Deseja cancelar a entrada no estoque '{{ $_produto->getDescricao() }}'?"><i class="fa fa-ban"></i></a>
 										</li>
-<!--{/if}-->
+{% endif %}
 									</ul>
 								</td>
 							</tr>
-<!--{/loop}-->
+{% endfor %}
 						</tbody>
 					</table>
-					{$pagestring}
+					{{ $pagestring }}
 				</div>
 			</div>
 		</div>
 	</div>
 </div>	
-<!--{include footer_gerenciar}-->
+{{ include('footer_gerenciar') }}

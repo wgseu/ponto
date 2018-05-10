@@ -1,4 +1,4 @@
-<!--{include header_gerenciar_sistema}-->
+{{ include('header_gerenciar_sistema') }}
 <script type="text/javascript">$(function(){Gerenciar.sistema.optionInit();});</script><div role="tabpanel" class="tab-pane fade active in" id="tab_opcoes" aria-labelledby="opcoes-tab">
   <div class="row">
     <div class="col-md-12 col-sm-12 col-xs-12">
@@ -11,17 +11,17 @@
         <div class="col-lg-12 col-sm-12 col-xs-12">
           <div class="form-group">
             <div class="col-lg-4 col-sm-6 col-xs-12">
-<!--{loop $opcoes_comportamento $index $opcao}-->
-<!--{if $index % 5 == 0 && $index > 0}-->
+{% for $index, $opcao in $opcoes_comportamento %}
+{% if $index % 5 == 0 && $index > 0 %}
             </div>
             <div class="col-lg-4 col-sm-6 col-xs-12">
-<!--{/if}-->
+{% endif %}
               <div class="">
                 <label>
-                  <input type="checkbox" class="js-switch" name="marcado" data-section="{$opcao['section']}" data-key="{$opcao['key']}" value="Y" ${is_boolean_config($opcao['section'], $opcao['key'], $opcao['default'])?'checked':''}/> {$opcao['title']}
+                  <input type="checkbox" class="js-switch" name="marcado" data-section="{{ $opcao['section'] }}" data-key="{{ $opcao['key'] }}" value="Y" {{ is_boolean_config($opcao['section'], $opcao['key'], $opcao['default'])?'checked':'' }}/> {{ $opcao['title'] }}
                 </label>
               </div>
-<!--{/loop}-->
+{% endfor %}
             </div>
           </div>
         </div>
@@ -30,4 +30,4 @@
     </div>
   </div>
 </div>
-<!--{include footer_gerenciar_sistema}-->
+{{ include('footer_gerenciar_sistema') }}

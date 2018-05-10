@@ -39,6 +39,34 @@ if ($limite > 100 || $limite < 1) {
 }
 $condition = Filter::query($_GET);
 unset($condition['ordem']);
+if (isset($condition['estado'])) {
+    if ($condition['estado'] == 'Valido') {
+        unset($condition['estado']);
+        $condition['cancelado'] = 'N';
+    } elseif ($condition['estado'] == 'Cancelado') {
+        unset($condition['estado']);
+        $condition['cancelado'] = 'Y';
+    }
+}
+if (isset($condition['tipo'])) {
+    if ($condition['tipo'] == 'Produtos') {
+        unset($condition['tipo']);
+        $condition['!produtoid'] = null;
+    } elseif ($condition['tipo'] == 'Servico') {
+        unset($condition['tipo']);
+        $condition['!servicoid'] = null;
+    } elseif ($condition['tipo'] == 'Desconto') {
+        unset($condition['tipo']);
+        $condition['ate_preco'] = 0;
+        $condition['!servicoid'] = null;
+    } elseif (array_key_exists($condition['tipo'], Produto::getTipoOptions())) {
+        $condition['produto'] = $condition['tipo'];
+        unset($condition['tipo']);
+    } elseif (array_key_exists($condition['tipo'], Servico::getTipoOptions())) {
+        $condition['servico'] = $condition['tipo'];
+        unset($condition['tipo']);
+    }
+}
 $produto_pedido = new ProdutoPedido($condition);
 $order = Filter::order(isset($_GET['ordem']) ? $_GET['ordem'] : '');
 $count = ProdutoPedido::count($condition);
@@ -52,6 +80,8 @@ if (is_output('json')) {
     }
     json(['status' => 'ok', 'items' => $items]);
 }
+
+$_modulo_names = Pedido::getTipoOptions();
 
 $_estado_names = ['Valido' => 'Válido'] +
     ProdutoPedido::getEstadoOptions() +

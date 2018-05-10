@@ -1,4 +1,4 @@
-<!--{include header_gerenciar}-->
+{{ include('header_gerenciar') }}
 <script type="text/javascript">$(function(){Gerenciar.cartao.init();});</script>
 <div class="row">
 	<div class="page-title">
@@ -9,16 +9,16 @@
 			<div class="form-group col-lg-2 col-md-2 col-sm-2 col-xs-6">
 				<label for="estado">Estado:</label>
 				<select class="form-control" id="estado" name="ativo">
-					<option value="" ${!array_key_exists($this->get('ativo'), $estados) ? 'selected': ''}>Todos</option>
-<!--{loop $estados $value $text}-->
-					<option value="{$value}" ${$this->get('ativo') == $value ? 'selected': ''}>{$text}</option>
-<!--{/loop}-->
+					<option value="" {{ !array_key_exists($this->get('ativo'), $estados) ? 'selected': '' }}>Todos</option>
+{% for $value, $text in $estados %}
+					<option value="{{ $value }}" {{ $this->get('ativo') == $value ? 'selected': '' }}>{{ $text }}</option>
+{% endfor %}
 				</select>
 			</div>
 			<div class="form-group col-lg-4 col-md-4 col-sm-4 col-xs-12">
 				<label for="search">Descrição:</label>
 				<div class="input-group">
-					<input type="text" class="form-control" id="search" name="search" placeholder="Procurar..." value="{$this->get('search')}">
+					<input type="text" class="form-control" id="search" name="search" placeholder="Procurar..." value="{{ $this->get('search') }}">
 					<span class="input-group-btn">
 						<button class="btn btn-default" type="submit"><i class="fa fa-search"></i></button>
 					</span>
@@ -55,37 +55,37 @@
 							</tr>
 						</thead>
 						<tbody>
-<!--{loop $cartoes $cartao}-->
-							<tr ${$cartao->isAtivo()?'':'class="active"'}>
-								<td><a href="/gerenciar/cartao/editar?id={$cartao->getID()}" title="Editar cartão '{$cartao->getDescricao()}'"><div title="{$_imagens[$cartao->getImageIndex()]['name']}" class="cell-icon cartao-icons" style="background-position: -{$_imagens[$cartao->getImageIndex()]['id'] * 50}px 0px;"></div><strong>{$cartao->getDescricao()}</strong></a></td>
+{% for $cartao in $cartoes %}
+							<tr class="{{ !$cartao->isAtivo() ? 'active': '' }}">
+								<td><a href="/gerenciar/cartao/editar?id={{ $cartao->getID() }}" title="Editar cartão '{{ $cartao->getDescricao() }}'"><div title="{{ $_imagens[$cartao->getImageIndex()]['name'] }}" class="cell-icon cartao-icons" style="background-position: -{{ $_imagens[$cartao->getImageIndex()]['id'] * 50 }}px 0px;"></div><strong>{{ $cartao->getDescricao() }}</strong></a></td>
 								<td>
-<!--${$_carteira = $cartao->findCarteiraID()}-->
-									<strong><a href="/gerenciar/carteira/editar?id={$_carteira->getID()}" title="Editar carteira '{$_carteira->getDescricao()}'">{$_carteira->getDescricao()}</a></strong>
-<!--${$_carteira = $cartao->findCarteiraPagtoID()}-->
-									<small><a href="/gerenciar/carteira/editar?id={$_carteira->getID()}" title="Editar carteira '{$_carteira->getDescricao()}'">{$_carteira->getDescricao()}</a></small>
+{% $_carteira = $cartao->findCarteiraID() %}
+									<strong><a href="/gerenciar/carteira/editar?id={{ $_carteira->getID() }}" title="Editar carteira '{{ $_carteira->getDescricao() }}'">{{ $_carteira->getDescricao() }}</a></strong>
+{% $_carteira = $cartao->findCarteiraPagtoID() %}
+									<small><a href="/gerenciar/carteira/editar?id={{ $_carteira->getID() }}" title="Editar carteira '{{ $_carteira->getDescricao() }}'">{{ $_carteira->getDescricao() }}</a></small>
 								</td>
-								<td>${\MZ\Util\Mask::money($cartao->getMensalidade(), true)}</td>
-								<td>${\MZ\Util\Mask::money($cartao->getTransacao(), true)}</td>
-								<td>{$cartao->getTaxa()}%</td>
-								<td>{$cartao->getDiasRepasse()} dias</td>
+								<td>{{ $this->currency($cartao->getMensalidade()) }}</td>
+								<td>{{ $this->currency($cartao->getTransacao()) }}</td>
+								<td>{{ $cartao->getTaxa() }}%</td>
+								<td>{{ $cartao->getDiasRepasse() }} dias</td>
 								<td class="text-center">
 									<ul class="nav panel_toolbox">
 										<li>
-											<a href="/gerenciar/cartao/editar?id={$cartao->getID()}" title="Editar cartão '{$cartao->getDescricao()}'"><i class="fa fa-edit"></i></a>
+											<a href="/gerenciar/cartao/editar?id={{ $cartao->getID() }}" title="Editar cartão '{{ $cartao->getDescricao() }}'"><i class="fa fa-edit"></i></a>
 										</li>
 										<li>
-											<a href="/gerenciar/cartao/excluir?id={$cartao->getID()}" title="Excluir cartão '{$cartao->getDescricao()}'" class="ajaxlink" ask="Deseja excluir o cartão '{$cartao->getDescricao()}'?"><i class="fa fa-close"></i></a>
+											<a href="/gerenciar/cartao/excluir?id={{ $cartao->getID() }}" title="Excluir cartão '{{ $cartao->getDescricao() }}'" class="ajaxlink" ask="Deseja excluir o cartão '{{ $cartao->getDescricao() }}'?"><i class="fa fa-close"></i></a>
 										</li>
 									</ul>
 								</td>
 							</tr>
-<!--{/loop}-->
+{% endfor %}
 						</tbody>
 					</table>
-					{$pagestring}
+					{{ $pagestring }}
 				</div>
 			</div>
 		</div>
 	</div>
 </div>	
-<!--{include footer_gerenciar}-->
+{{ include('footer_gerenciar') }}

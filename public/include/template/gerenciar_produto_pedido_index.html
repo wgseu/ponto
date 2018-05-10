@@ -1,4 +1,4 @@
-<!--{include header_gerenciar}-->
+{{ include('header_gerenciar') }}
 <script type="text/javascript">$(function(){Gerenciar.produto_pedido.init();});</script>
 <div class="row">
 	<div class="page-title">
@@ -9,55 +9,55 @@
 			<div class="col-lg-2 col-md-3 col-sm-3 col-xs-6 form-group">
 				<label for="modulo">Módulo:</label>
 				<select class="form-control" id="modulo" name="modulo">
-					<option value="" ${!array_key_exists($this->get('modulo'), $_modulo_names) ? 'selected': ''}>Todos</option>
-<!--{loop $_modulo_names $value $text}-->
-					<option value="{$value}" ${$this->get('modulo') == $value ? 'selected': ''}>{$text}</option>
-<!--{/loop}-->
+					<option value="" {{ !array_key_exists($this->get('modulo'), $_modulo_names) ? 'selected': '' }}>Todos</option>
+{% for $value, $text in $_modulo_names %}
+					<option value="{{ $value }}" {{ $this->get('modulo') == $value ? 'selected': '' }}>{{ $text }}</option>
+{% endfor %}
 				</select>
 			</div>
 			<div class="col-lg-2 col-md-3 col-sm-3 col-xs-6 form-group">
 				<label for="estado">Estado:</label>
 				<select class="form-control" id="estado" name="estado">
-					<option value="" ${!array_key_exists($this->get('estado'), $_estado_names) ? 'selected': ''}>Todos</option>
-<!--{loop $_estado_names $value $text}-->
-					<option value="{$value}" ${$this->get('estado') == $value ? 'selected': ''}>{$text}</option>
-<!--{/loop}-->
+					<option value="" {{ !array_key_exists($this->get('estado'), $_estado_names) ? 'selected': '' }}>Todos</option>
+{% for $value, $text in $_estado_names %}
+					<option value="{{ $value }}" {{ $this->get('estado') == $value ? 'selected': '' }}>{{ $text }}</option>
+{% endfor %}
 				</select>
 			</div>
 			<div class="col-lg-2 col-md-3 col-sm-3 col-xs-6 form-group">
 				<label for="tipo">Tipo:</label>
 				<select class="form-control" id="tipo" name="tipo">
-					<option value="" ${!array_key_exists($this->get('tipo'), $_tipo_names) ? 'selected': ''}>Todos</option>
-<!--{loop $_tipo_names $value $text}-->
-					<option value="{$value}" ${$this->get('tipo') == $value ? 'selected': ''}>{$text}</option>
-<!--{/loop}-->
+					<option value="" {{ !array_key_exists($this->get('tipo'), $_tipo_names) ? 'selected': '' }}>Todos</option>
+{% for $value, $text in $_tipo_names %}
+					<option value="{{ $value }}" {{ $this->get('tipo') == $value ? 'selected': '' }}>{{ $text }}</option>
+{% endfor %}
 				</select>
 			</div>
 			<div class="form-group col-lg-2 col-md-4 col-sm-4 col-xs-6">
 				<label for="inicio">Data inicial:</label>
-				<input type="text" id="inicio" name="datahora_inicio" class="datetime-picker form-control" value="{$this->get('datahora_inicio')}">
+				<input type="text" id="inicio" name="datahora_inicio" class="datetime-picker form-control" value="{{ $this->get('datahora_inicio') }}">
 			</div>
 			<div class="form-group col-lg-2 col-md-4 col-sm-4 col-xs-6">
 				<label for="fim">Data final:</label>
-				<input type="text" id="fim" name="datahora_fim" class="datetime-picker form-control" value="{$this->get('datahora_fim')}">
+				<input type="text" id="fim" name="datahora_fim" class="datetime-picker form-control" value="{{ $this->get('datahora_fim') }}">
 			</div>
-<!--${$_funcao = $_funcionario->findFuncaoID()}-->
-<!--${$_cliente_func = $_funcionario->findClienteID()}-->
-			<input type="hidden" id="funcionarioid_ref" name="funcionarioid" data-content="{$_cliente_func->getNomeCompleto()}" value="{$_funcionario->getID()}">
+{% $_funcao = $_funcionario->findFuncaoID() %}
+{% $_cliente_func = $_funcionario->findClienteID() %}
+			<input type="hidden" id="funcionarioid_ref" name="funcionarioid" data-content="{{ $_cliente_func->getNomeCompleto() }}" value="{{ $_funcionario->getID() }}">
 			<div class="form-group col-lg-3 col-md-4 col-sm-4 col-xs-6 col-lg-offset-2">
-				<label for="funcionarioid">Atendente: <span class="identifier">{$_funcao->getDescricao()}<span></label>
-				<input type="text" id="funcionarioid" class="form-control" value="{$_cliente_func->getNomeCompleto()}">
+				<label for="funcionarioid">Atendente: <span class="identifier">{{ $_funcao->getDescricao() }}<span></label>
+				<input type="text" id="funcionarioid" class="form-control" value="{{ $_cliente_func->getNomeCompleto() }}">
 			</div>
-<!--${$_categoria = $_produto->findCategoriaID()}-->
-			<input type="hidden" id="produtoid_ref" name="produtoid" data-descricao="{$_produto->getDescricao()}" value="{$_produto->getID()}">
+{% $_categoria = $_produto->findCategoriaID() %}
+			<input type="hidden" id="produtoid_ref" name="produtoid" data-descricao="{{ $_produto->getDescricao() }}" value="{{ $_produto->getID() }}">
 			<div class="form-group col-lg-3 col-md-6 col-sm-6 col-xs-6">
-				<label for="produtoid">Produto: <span class="identifier">{$_categoria->getDescricao()}<span></label>
-				<input type="text" id="produtoid" class="form-control" value="{$_produto->getDescricao()}">
+				<label for="produtoid">Produto: <span class="identifier">{{ $_categoria->getDescricao() }}<span></label>
+				<input type="text" id="produtoid" class="form-control" value="{{ $_produto->getDescricao() }}">
 			</div>
 			<div class=" form-group col-lg-4 col-md-6 col-sm-6 col-xs-12">
 				<label>Busca:</label>
 				<div class="input-group">
-					<input type="text" class="form-control" id="search" name="search" placeholder="Pedido ou Observação..." value="{$this->get('search')}">
+					<input type="text" class="form-control" id="search" name="search" placeholder="Pedido ou Observação..." value="{{ $this->get('search') }}">
 					<span class="input-group-btn">
 						<button class="btn btn-default" type="submit"><i class="fa fa-search"></i></button>
 					</span>
@@ -92,41 +92,41 @@
 							</tr>
 						</thead>
 						<tbody>
-<!--{loop $itens_do_pedido $produto_pedido}-->
-							<tr ${$produto_pedido->isCancelado()?'class="danger"':''}>
-<!--${$_pedido = $produto_pedido->findPedidoID()}-->
-								<td><div title="{$_modulo_names[$_pedido->getTipo()]}" class="cell-icon pedido-icons" style="background-position: -{$_pedido_icon[$_pedido->getTipo()]}px 0px;"></div><a href="/gerenciar/pedido/?search={$produto_pedido->getPedidoID()}" title="Visualizar pedido '{$produto_pedido->getPedidoID()}'">{$produto_pedido->getPedidoID()}</a></td>
-<!--${$_comanda = $_pedido->findComandaID()}-->
-<!--${$_mesa = $_pedido->findMesaID()}-->
-								<td>${$_pedido->getDestino($_mesa, $_comanda)}</td>
-<!--${$_produto = $produto_pedido->findProdutoID()}-->
-<!--${$_servico = $produto_pedido->findServicoID()}-->
+{% for $produto_pedido in $itens_do_pedido %}
+							<tr class="{{ $produto_pedido->isCancelado() ? 'danger': '' }}">
+{% $_pedido = $produto_pedido->findPedidoID() %}
+{% $_comanda = $_pedido->findComandaID() %}
+{% $_mesa = $_pedido->findMesaID() %}
+								<td><div title="{{ $_pedido->getDestino($_mesa, $_comanda) }}" class="cell-icon pedido-icons" style="background-position: -{{ $_pedido_icon[$_pedido->getTipo()] }}px 0px;"></div><a href="/gerenciar/pedido/?search={{ $produto_pedido->getPedidoID() }}" title="Visualizar pedido '{{ $produto_pedido->getPedidoID() }}'">{{ $produto_pedido->getPedidoID() }}</a></td>
+								<td>{{ $_pedido->getDestino($_mesa, $_comanda) }}</td>
+{% $_produto = $produto_pedido->findProdutoID() %}
+{% $_servico = $produto_pedido->findServicoID() %}
 								<td><strong>
-<!--{if is_null($produto_pedido->getServicoID())}-->
-									<a href="/gerenciar/produto/editar?id={$_produto->getID()}" title="Editar produto '{$_produto->getDescricao()}'">{$_produto->getDescricao()}</a>
-<!--{else}-->
-									<a href="/gerenciar/servico/editar?id={$_servico->getID()}" title="Editar serviço '{$_servico->getDescricao()}'">{$_servico->getDescricao()}</a>
-<!--{/if}-->
-									</strong><small>{$produto_pedido->getDetalhes()}</small>
+{% if is_null($produto_pedido->getServicoID()) %}
+									<a href="/gerenciar/produto/editar?id={{ $_produto->getID() }}" title="Editar produto '{{ $_produto->getDescricao() }}'">{{ $_produto->getDescricao() }}</a>
+{% else %}
+									<a href="/gerenciar/servico/editar?id={{ $_servico->getID() }}" title="Editar serviço '{{ $_servico->getDescricao() }}'">{{ $_servico->getDescricao() }}</a>
+{% endif %}
+									</strong><small>{{ $produto_pedido->getDetalhes() }}</small>
 								</td>
-								<td class="text-right">${\MZ\Util\Mask::money($produto_pedido->getPreco(), true)}</td>
-								<td class="text-center">{$produto_pedido->getQuantidade()}</td>
-								<td class="text-right">${\MZ\Util\Mask::money($produto_pedido->getComissao(), true)}</td>
-								<td class="text-right">${\MZ\Util\Mask::money($produto_pedido->getTotal(), true)}</td>
-								<td class="text-right">${\MZ\Util\Mask::money($produto_pedido->getCusto(), true)}</td>
-								<td class="text-right">${\MZ\Util\Mask::money($produto_pedido->getLucro(), true)}</td>
-<!--${$_funcionario = $produto_pedido->findFuncionarioID()}-->
-<!--${$_cliente = $_funcionario->findClienteID()}-->
-								<td class="text-center"><a href="/gerenciar/funcionario/editar?id={$_funcionario->getID()}" title="Editar funcionário '{$_cliente->getNomeCompleto()}'">{$_cliente->getNomeCompleto()}</a></td>
-								<td class="text-center">${is_null($produto_pedido->getDataHora())?'':date('d/m/Y H:i', strtotime($produto_pedido->getDataHora()))}</td>
+								<td class="text-right">{{ $this->currency($produto_pedido->getPreco()) }}</td>
+								<td class="text-center">{{ $produto_pedido->getQuantidade() }}</td>
+								<td class="text-right">{{ $this->currency($produto_pedido->getComissao()) }}</td>
+								<td class="text-right">{{ $this->currency($produto_pedido->getTotal()) }}</td>
+								<td class="text-right">{{ $this->currency($produto_pedido->getCusto()) }}</td>
+								<td class="text-right">{{ $this->currency($produto_pedido->getLucro()) }}</td>
+{% $_funcionario = $produto_pedido->findFuncionarioID() %}
+{% $_cliente = $_funcionario->findClienteID() %}
+								<td class="text-center"><a href="/gerenciar/funcionario/editar?id={{ $_funcionario->getID() }}" title="Editar funcionário '{{ $_cliente->getNomeCompleto() }}'">{{ $_cliente->getNomeCompleto() }}</a></td>
+								<td class="text-center">{{ $this->datetime($produto_pedido->getDataHora()) }}</td>
 							</tr>
-<!--{/loop}-->
+{% endfor %}
 						</tbody>
 					</table>
-					{$pagestring}
+					{{ $pagestring }}
 				</div>
 			</div>
 		</div>
 	</div>
 </div>	
-<!--{include footer_gerenciar}-->
+{{ include('footer_gerenciar') }}

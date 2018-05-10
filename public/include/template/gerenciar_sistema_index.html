@@ -1,7 +1,7 @@
-<!--{include header_gerenciar_sistema}-->
-<script type="text/javascript">$(function(){Gerenciar.cliente.initForm('{$focusctrl}');});</script>
-<script type="text/javascript">$(function(){Gerenciar.localizacao.initForm('{$focusctrl}');});</script>
-<script type="text/javascript">$(function(){Gerenciar.sistema.initEmpresa('{$focusctrl}');});</script>
+{{ include('header_gerenciar_sistema') }}
+<script type="text/javascript">$(function(){Gerenciar.cliente.initForm('{{ $focusctrl }}');});</script>
+<script type="text/javascript">$(function(){Gerenciar.localizacao.initForm('{{ $focusctrl }}');});</script>
+<script type="text/javascript">$(function(){Gerenciar.sistema.initEmpresa('{{ $focusctrl }}');});</script>
 <div role="tabpanel" class="tab-pane fade active in" id="tab_enterprise" aria-labelledby="enterprise-tab">
 	<div class="row">
 		<div class="col-md-12 col-sm-12 col-xs-12">
@@ -12,13 +12,13 @@
 					</div>
 				</div>
 				<div class="x_content">
-					<form id="cliente-form" class="form-horizontal form-label-left" method="post" action="/gerenciar/cliente/${$cliente->exists()?'editar?id='.$cliente->getID().'&':'cadastrar?sistema=1'}" enctype="multipart/form-data" data-cliente-id="{$cliente->getID()}">
+					<form id="cliente-form" class="form-horizontal form-label-left" method="post" action="/gerenciar/cliente/{{ $cliente->exists()?'editar?id='.$cliente->getID().'&':'cadastrar?sistema=1' }}" enctype="multipart/form-data" data-cliente-id="{{ $cliente->getID() }}">
 						<span class="section col-md-12 col-sm-12 col-xs-12">Empresa</span>
-<!--{include form_cliente}-->
+{{ include('form_cliente') }}
 					</form>
-					<form id="localizacao-form" class="form-horizontal form-label-left" method="post" action="/gerenciar/localizacao/${$localizacao->exists()?'editar?id='.$localizacao->getID():'cadastrar'}">
+					<form id="localizacao-form" class="form-horizontal form-label-left" method="post" action="/gerenciar/localizacao/{{ $localizacao->exists()?'editar?id='.$localizacao->getID():'cadastrar' }}">
 						<span class="section col-md-12 col-sm-12 col-xs-12">Endereço</span>
-<!--{include form_localizacao}-->
+{{ include('form_localizacao') }}
 					</form>
 					<div class="form-group">
 						<div class="col-md-12 col-sm-12 col-xs-12 text-center">
@@ -32,4 +32,4 @@
 		</div>
 	</div>
 </div>
-<!--{include footer_gerenciar_sistema}-->
+{{ include('footer_gerenciar_sistema') }}

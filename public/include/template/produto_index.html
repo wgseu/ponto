@@ -1,11 +1,11 @@
-<!--{include header}-->
+{{ include('header') }}
 	<script type="text/javascript">$(function(){Gerenciar.produto.initView([
-<!--{loop $categorias $categoria}-->
-		{id: {$categoria->getID()}, descricao: '${single_quotes($categoria->getDescricao())}'},
-<!--{/loop}-->
+{% for $categoria in $categorias %}
+		{id: {{ $categoria->getID() }}, descricao: '{{ single_quotes($categoria->getDescricao()) }}'},
+{% endfor %}
 	]);});</script>
 	<!-- Products Section -->
-	<section id="product" style="background-image: url('${get_site_image_url('Image.Produtos')}');">
+	<section id="product" style="background-image: url('{{ get_site_image_url('Image.Produtos') }}');">
 		<div class="container">
 			<div class="row">
 				<div class="col-lg-12 text-center">
@@ -19,39 +19,39 @@
 				<div class="categoria-box">
 					<div class="categoria-nav hide prev">&lt;</div>
 					<ul class="categoria-list">
-<!--{loop $categorias $index $categoria}-->
-						<li class="col-md-3 col-sm-3 col-xs-6 ${$categoria_atual->getID() == $categoria->getID()?'active':''}" title="{$categoria->getDescricao()}">
-							<a href="#" data-categoria="{$categoria->getID()}">{$categoria->getDescricao()}</a>
+{% for $index, $categoria in $categorias %}
+						<li class="col-md-3 col-sm-3 col-xs-6 {{ $categoria_atual->getID() == $categoria->getID()?'active':'' }}" title="{{ $categoria->getDescricao() }}">
+							<a href="#" data-categoria="{{ $categoria->getID() }}">{{ $categoria->getDescricao() }}</a>
 						</li>
-<!--{if $index == 3}--><!--${break}--><!--{/if}-->
-<!--{/loop}-->
+{% if $index == 3 %}{% break %}{% endif %}
+{% endfor %}
 					</ul>
-					<div class="categoria-nav${count($categorias) < 5?'hide':''} next">&gt;</div>
+					<div class="categoria-nav{{ count($categorias) < 5?'hide':'' }} next">&gt;</div>
 				</div>
 			</div>
-			<div class="row" id="product-list" data-symbol="{$currency->getSimbolo()}">
-<!--{loop $produtos $produto}-->
+			<div class="row" id="product-list" data-symbol="{{ $currency->getSimbolo() }}">
+{% for $produto in $produtos %}
 				<div class="col-md-3 col-sm-4 col-xs-6 ofertas">
-					<div class="item" data-produto="{$produto->getID()}" data-detalhes="{$produto->getDetalhes()}">
+					<div class="item" data-produto="{{ $produto->getID() }}" data-detalhes="{{ $produto->getDetalhes() }}">
 						<div class="imagem border-color">
-							<img src="${get_image_url($produto->getImagem(), 'produto', 'produto.png')}" title="{$produto->getDescricao()}" height="128">
+							<img src="{{ get_image_url($produto->getImagem(), 'produto', 'produto.png') }}" title="{{ $produto->getDescricao() }}" height="128">
 						</div>
 						<div class="anuncio">
 							<div class="limite">
-								<div class="alinhamento">{$produto->getDescricao()}</div>
+								<div class="alinhamento">{{ $produto->getDescricao() }}</div>
 							</div>
 						</div>
 						<div class="detalhes">
 							<div class="limite">
 								<div class="preco">
-									<div class="por"><span>{$currency->getSimbolo()} </span><strong>${\MZ\Util\Mask::money($produto->getPrecoVenda())}</strong></div>
+									<div class="por"><span>{{ $currency->getSimbolo() }} </span><strong>{{ \MZ\Util\Mask::money($produto->getPrecoVenda()) }}</strong></div>
 								</div>
 								<button>Detalhes</button>
 							</div>
 						</div>
 					</div>
 				</div>
-<!--{/loop}-->
+{% endfor %}
 			</div>
 		</div>
 	</section>
@@ -69,7 +69,7 @@
 		  	<div class="product-details">
 			  	<div class="description"></div>
 			  	<div class="details"></div>
-			  	<div class="price"><span>{$currency->getSimbolo()} </span><strong>0,00</strong></div>
+			  	<div class="price"><span>{{ $currency->getSimbolo() }} </span><strong>0,00</strong></div>
 			</div>
 		  </div>
 		  <div class="modal-footer">
@@ -101,4 +101,4 @@
 			</div>
 		</div>
 	</script>
-<!--{include footer}-->
+{{ include('footer') }}

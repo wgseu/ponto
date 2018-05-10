@@ -25,6 +25,7 @@
 namespace MZ\Template;
 
 use MZ\Util\Filter;
+use MZ\Util\Mask;
 
 /**
  * Proccess template files
@@ -87,6 +88,56 @@ class Custom extends Engine
         return htmlspecialchars($value, ENT_QUOTES, 'UTF-8');
     }
 
+    /**
+     * Format datetime string
+     * @param  string $value value to be formatted
+     * @return string datetime formatted
+     */
+    public function datetime($value)
+    {
+        return Mask::datetime($value);
+    }
+
+    /**
+     * Format date or datetime string
+     * @param  string $value value to be formatted
+     * @return string date formatted
+     */
+    public function date($value)
+    {
+        return Mask::date($value);
+    }
+
+    /**
+     * Humman elapsed time
+     * @param  string $value date or datetime to be converted
+     * @return string humman elapsed time
+     */
+    public function elapsed($value)
+    {
+        return human_date($value);
+    }
+
+    /**
+     * Format float value to money format
+     * @param  string $value value to be formatted
+     * @return string money formatted
+     */
+    public function money($value)
+    {
+        return Mask::money($value);
+    }
+
+    /**
+     * Format float value to country currency format
+     * @param  string $value value to be formatted
+     * @return string currency formatted
+     */
+    public function currency($value)
+    {
+        return Mask::money($value, true);
+    }
+
     private function __parseecho($matches)
     {
         return $this->__replace('<?php echo $this->escape(' . $matches[1] . '); ?>');
@@ -110,15 +161,15 @@ class Custom extends Engine
     private function __parseloop($matches)
     {
         return $this->__replace(
-            "<?php if(is_array($matches[1])){foreach($matches[1] AS $matches[2]) { ?>$matches[3]<?php }} ?>"
+            "<?php if(is_array($matches[2])){foreach($matches[2] AS $matches[1]) { ?>$matches[3]<?php }} ?>"
         );
     }
 
     private function __parseloopkeyval($matches)
     {
         return $this->__replace(
-            "<?php if(is_array($matches[1])){".
-            "foreach($matches[1] AS $matches[2]=>$matches[3]) { ?>$matches[4]<?php }} ?>"
+            "<?php if(is_array($matches[3])){".
+            "foreach($matches[3] AS $matches[1]=>$matches[2]) { ?>$matches[4]<?php }} ?>"
         );
     }
 
@@ -133,56 +184,40 @@ class Custom extends Engine
         if ($fileContent === false) {
             throw new \Exception('Can\'t get content of template file "'.$tFile.'"', 500);
         }
-        $fileContent = preg_replace('/^(\xef\xbb\xbf)/', '', $fileContent); //EFBBBF
-        $fileContent = preg_replace_callback(
-            "/\<\!\-\-\s*\\\$\{(.+?)\}\s*\-\-\>/is",
-            [$this, '__parsestmt'],
-            $fileContent
-        );
+        //Add for call <!--{include othertpl}-->
         $fileContent = preg_replace(
-            "/\{(\\\$[a-zA-Z0-9_\[\]\\\ \-\'\,\%\*\/\.\(\)\>\'\"\$\x7f-\xff]+)\}/s",
-            '<?php echo $this->escape(\\1); ?>',
+            '/{{\s*include\s*\(\s*\'([^\']+)\'\s*\)\s*}}/i',
+            '<?php include $this->__template(\'\1\'); ?>',
             $fileContent
         );
-        $fileContent = preg_replace(
-            "/\{\{(\\\$[a-zA-Z0-9_\[\]\\\ \-\'\,\%\*\/\.\(\)\>\'\"\$\x7f-\xff]+)\}\}/s",
-            '<?php echo \\1; ?>',
-            $fileContent
-        );
-        $fileContent = preg_replace_callback("/\\\$\{(.+?)\}/is", [$this, '__parseecho'], $fileContent);
-        $fileContent = preg_replace_callback("/\\\$\{\{(.+?)\}\}/is", [$this, '__parseraw'], $fileContent);
+        $fileContent = preg_replace_callback('/{{\s*(.+?)\s*}}/is', [$this, '__parseecho'], $fileContent);
+        $fileContent = preg_replace_callback('/{!!\s*(.+?)\s*!!}/is', [$this, '__parseraw'], $fileContent);
         $fileContent = preg_replace_callback(
-            "/\<\!\-\-\s*\{else\s*if\s+(.+?)\}\s*\-\-\>/is",
+            '/{%\s*elseif\s+(.+?)\s*%}/is',
             [$this, '__parseelseif'],
             $fileContent
         );
-        $fileContent = preg_replace_callback(
-            "/\<\!\-\-\s*\{elif\s+(.+?)\}\s*\-\-\>/is",
-            [$this, '__parseelseif'],
-            $fileContent
-        );
-        $fileContent = preg_replace("/\<\!\-\-\s*\{else\}\s*\-\-\>/is", '<?php } else { ?>', $fileContent);
+        $fileContent = preg_replace('/{%\s*else\s*%}/is', '<?php } else { ?>', $fileContent);
         for ($i = 0; $i < 5; ++$i) {
             $fileContent = preg_replace_callback(
-                "/\<\!\-\-\s*\{loop\s+(\S+)\s+(\S+)\s+(\S+)\s*\}\s*\-\-\>(.+?)\<\!\-\-\s*\{\/loop\}\s*\-\-\>/is",
+                '/{%\s*for\s+(\S+)\s*,\s*(\S+)\s+in\s+(\S+)\s*%}(.+?){%\s*endfor\s*%}/is',
                 [$this, '__parseloopkeyval'],
                 $fileContent
             );
             $fileContent = preg_replace_callback(
-                "/\<\!\-\-\s*\{loop\s+(\S+)\s+(\S+)\s*\}\s*\-\-\>(.+?)\<\!\-\-\s*\{\/loop\}\s*\-\-\>/is",
+                '/{%\s*for\s+(\S+)\s+in\s+(\S+)\s*%}(.+?){%\s*endfor\s*%}/is',
                 [$this, '__parseloop'],
                 $fileContent
             );
             $fileContent = preg_replace_callback(
-                "/\<\!\-\-\s*\{if\s+(.+?)\}\s*\-\-\>(.+?)\<\!\-\-\s*\{\/if\}\s*\-\-\>/is",
+                '/{%\s*if\s+(.+?)\s*%}(.+?){%\s*endif\s*%}/is',
                 [$this, '__parseif'],
                 $fileContent
             );
         }
-        //Add for call <!--{include othertpl}-->
-        $fileContent = preg_replace(
-            "#<!--\s*{\s*include\s+([^\{\}]+)\s*\}\s*-->#i",
-            '<?php include $this->__template(\'\1\'); ?>',
+        $fileContent = preg_replace_callback(
+            '/{%\s*(.+?)\s*%}/is',
+            [$this, '__parsestmt'],
             $fileContent
         );
         xmkdir(dirname($cFile), 0775);

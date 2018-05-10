@@ -1,4 +1,4 @@
-<!--{include header_gerenciar}-->
+{{ include('header_gerenciar') }}
 <script type="text/javascript">$(function(){Gerenciar.patrimonio.init();});</script>
 <div class="row">
 	<div class="page-title">
@@ -6,30 +6,30 @@
 			<h3>Patrimônios</h3>
 		</div>
 		<form method="get" action="/gerenciar/patrimonio/" id="search-form">
-			<input type="hidden" id="empresaid_ref" name="empresaid" data-nome="{$_empresa->getNome()}" value="{$_empresa->getID()}">
+			<input type="hidden" id="empresaid_ref" name="empresaid" data-nome="{{ $_empresa->getNome() }}" value="{{ $_empresa->getID() }}">
 			<div class="form-group col-lg-3 col-md-4 col-sm-4 col-xs-12">
-				<label for="empresaid">Empresa: <span class="identifier">${\MZ\Util\Mask::phone($_empresa->getFone(1))}<span></label>
-				<input type="text" id="empresaid" class="form-control" value="{$_empresa->getNome()}">
+				<label for="empresaid">Empresa: <span class="identifier">{{ \MZ\Util\Mask::phone($_empresa->getFone(1)) }}<span></label>
+				<input type="text" id="empresaid" class="form-control" value="{{ $_empresa->getNome() }}">
 			</div>
-<!--${$_cliente_fornecedor = $_fornecedor->findEmpresaID()}-->
-			<input type="hidden" id="fornecedorid_ref" name="fornecedorid" data-nome="{$_cliente_fornecedor->getNome()}" value="{$_fornecedor->getID()}">
+{% $_cliente_fornecedor = $_fornecedor->findEmpresaID() %}
+			<input type="hidden" id="fornecedorid_ref" name="fornecedorid" data-nome="{{ $_cliente_fornecedor->getNome() }}" value="{{ $_fornecedor->getID() }}">
 			<div class="form-group col-lg-3 col-md-4 col-sm-4 col-xs-12">
-				<label for="fornecedorid">Fornecedor: <span class="identifier">${\MZ\Util\Mask::phone($_cliente_fornecedor->getFone(1))}<span></label>
-				<input type="text" id="fornecedorid" class="form-control" value="{$_cliente_fornecedor->getNome()}">
+				<label for="fornecedorid">Fornecedor: <span class="identifier">{{ \MZ\Util\Mask::phone($_cliente_fornecedor->getFone(1)) }}<span></label>
+				<input type="text" id="fornecedorid" class="form-control" value="{{ $_cliente_fornecedor->getNome() }}">
 			</div>
 			<div class="form-group col-lg-2 col-md-6 col-sm-6 col-xs-12">
 				<label for="estado">Estado:</label>
 				<select id="estado" name="estado" class="form-control">
-					<option value="" ${!array_key_exists($this->get('estado'), $_estado_names) ? 'selected': ''}>Todos</option>
-<!--{loop $_estado_names $value $text}-->
-					<option value="{$value}" ${$this->get('estado') == $value ? 'selected': ''}>{$text}</option>
-<!--{/loop}-->
+					<option value="" {{ !array_key_exists($this->get('estado'), $_estado_names) ? 'selected': '' }}>Todos</option>
+{% for $value, $text in $_estado_names %}
+					<option value="{{ $value }}" {{ $this->get('estado') == $value ? 'selected': '' }}>{{ $text }}</option>
+{% endfor %}
 				</select>
 			</div>
 			<div class="form-group col-lg-2 col-md-6 col-sm-6 col-xs-12">
 				<label for="search">Descrição:</label>
 				<div class="input-group">
-					<input type="text" class="form-control" id="search" name="search" placeholder="Procurar..." value="{$this->get('search')}">
+					<input type="text" class="form-control" id="search" name="search" placeholder="Procurar..." value="{{ $this->get('search') }}">
 					<span class="input-group-btn">
 						<button class="btn btn-default" type="submit"><i class="fa fa-search"></i></button>
 					</span>
@@ -62,46 +62,46 @@
 								<th class="text-center">Quantidade</th>
 								<th>Empresa</th>
 								<th class="text-center">Dimensão</th>
-<!--${$_estado_names = array()}-->
-<!--${$_estado_names['Novo'] = 'Novo'}-->
-<!--${$_estado_names['Conservado'] = 'Conservado'}-->
-<!--${$_estado_names['Ruim'] = 'Ruim'}-->
+{% $_estado_names = array() %}
+{% $_estado_names['Novo'] = 'Novo' %}
+{% $_estado_names['Conservado'] = 'Conservado' %}
+{% $_estado_names['Ruim'] = 'Ruim' %}
 								<th class="text-center">Estado</th>
 								<th>Custo/Valor</th>
 								<th width="10%" style="text-align: center;">Ações</th>
 							</tr>
 						</thead>
 						<tbody>
-<!--{loop $patrimonios $patrimonio}-->
+{% for $patrimonio in $patrimonios %}
 							<tr>
-								<td><a href="/gerenciar/patrimonio/editar?id={$patrimonio->getID()}" title="Editar patrimônio '{$patrimonio->getDescricao()}'"><img src="${get_image_url(is_local_path($patrimonio->getImagemAnexada())?null:$patrimonio->getImagemAnexada(), 'patrimonio', 'patrimonio.png')}" height="48" alt="Foto do bem" title="Foto do bem"/></a></td>
-								<td><strong>{$patrimonio->getDescricao()}</strong><small title="Número identificador do bem">{$patrimonio->getNumero()}</small></td>
-								<td class="text-center">{$patrimonio->getQuantidade()}</td>
-<!--${$_cliente = $patrimonio->findEmpresaID()}-->
-<!--${$_fornecedor = $patrimonio->findFornecedorID()}-->
-<!--${$_fornecedor_cli = $_fornecedor->findEmpresaID()}-->
-								<td><strong><a href="/gerenciar/cliente/editar?id={$_cliente->getID()}" title="Editar cliente '{$_cliente->getNome()}'">{$_cliente->getNome()}</a></strong><small><a href="/gerenciar/fornecedor/editar?id={$_fornecedor->getID()}" title="Editar fornecedor '{$_fornecedor_cli->getNome()}'">{$_fornecedor_cli->getNome()}</a></small></td>
-								<td class="text-center" title="Altura x Largura x Comprimento">{$patrimonio->getAltura()} x {$patrimonio->getLargura()} x {$patrimonio->getComprimento()}</td>
-								<td class="text-center"><strong>{$_estado_names[$patrimonio->getEstado()]}</strong><small title="Data de atualização">${date('d/m/Y H:i', strtotime($patrimonio->getDataAtualizacao()))}</small></td>
-								<td><strong title="Custo">${\MZ\Util\Mask::money($patrimonio->getCusto(), true)}</strong><small title="Valor">${\MZ\Util\Mask::money($patrimonio->getValor(), true)}</small></td>
+								<td><a href="/gerenciar/patrimonio/editar?id={{ $patrimonio->getID() }}" title="Editar patrimônio '{{ $patrimonio->getDescricao() }}'"><img src="{{ get_image_url(is_local_path($patrimonio->getImagemAnexada())?null:$patrimonio->getImagemAnexada(), 'patrimonio', 'patrimonio.png') }}" height="48" alt="Foto do bem" title="Foto do bem"/></a></td>
+								<td><strong>{{ $patrimonio->getDescricao() }}</strong><small title="Número identificador do bem">{{ $patrimonio->getNumero() }}</small></td>
+								<td class="text-center">{{ $patrimonio->getQuantidade() }}</td>
+{% $_cliente = $patrimonio->findEmpresaID() %}
+{% $_fornecedor = $patrimonio->findFornecedorID() %}
+{% $_fornecedor_cli = $_fornecedor->findEmpresaID() %}
+								<td><strong><a href="/gerenciar/cliente/editar?id={{ $_cliente->getID() }}" title="Editar cliente '{{ $_cliente->getNome() }}'">{{ $_cliente->getNome() }}</a></strong><small><a href="/gerenciar/fornecedor/editar?id={{ $_fornecedor->getID() }}" title="Editar fornecedor '{{ $_fornecedor_cli->getNome() }}'">{{ $_fornecedor_cli->getNome() }}</a></small></td>
+								<td class="text-center" title="Altura x Largura x Comprimento">{{ $patrimonio->getAltura() }} x {{ $patrimonio->getLargura() }} x {{ $patrimonio->getComprimento() }}</td>
+								<td class="text-center"><strong>{{ $_estado_names[$patrimonio->getEstado()] }}</strong><small title="Data de atualização">{{ $this->datetime($patrimonio->getDataAtualizacao()) }}</small></td>
+								<td><strong title="Custo">{{ $this->currency($patrimonio->getCusto()) }}</strong><small title="Valor">{{ $this->currency($patrimonio->getValor()) }}</small></td>
 								<td class="text-center">
 									<ul class="nav panel_toolbox">
 										<li>
-											<a href="/gerenciar/patrimonio/editar?id={$patrimonio->getID()}" title="Editar patrimônio '{$patrimonio->getDescricao()}'"><i class="fa fa-edit"></i></a>
+											<a href="/gerenciar/patrimonio/editar?id={{ $patrimonio->getID() }}" title="Editar patrimônio '{{ $patrimonio->getDescricao() }}'"><i class="fa fa-edit"></i></a>
 										</li>
 										<li>
-											<a href="/gerenciar/patrimonio/excluir?id={$patrimonio->getID()}" title="Excluir patrimônio '{$patrimonio->getDescricao()}'" class="ajaxlink" ask="Deseja excluir o patrimônio '{$patrimonio->getDescricao()}'?"><i class="fa fa-close"></i></a>
+											<a href="/gerenciar/patrimonio/excluir?id={{ $patrimonio->getID() }}" title="Excluir patrimônio '{{ $patrimonio->getDescricao() }}'" class="ajaxlink" ask="Deseja excluir o patrimônio '{{ $patrimonio->getDescricao() }}'?"><i class="fa fa-close"></i></a>
 										</li>
 									</ul>
 								</td>
 							</tr>
-<!--{/loop}-->
+{% endfor %}
 						</tbody>
 					</table>
-					{$pagestring}
+					{{ $pagestring }}
 				</div>
 			</div>
 		</div>
 	</div>
 </div>	
-<!--{include footer_gerenciar}-->
+{{ include('footer_gerenciar') }}

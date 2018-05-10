@@ -1,4 +1,4 @@
-<!--{include header_gerenciar}-->
+{{ include('header_gerenciar') }}
 <script type="text/javascript">$(function(){Gerenciar.caixa.init();});</script>
 <div class="row">
 	<div class="page-title">
@@ -9,16 +9,16 @@
 			<div class="form-group col-lg-2 col-md-3 col-sm-4 col-xs-6">
 				<label for="estado">Estado:</label>
 				<select class="form-control" id="estado" name="ativo">
-					<option value="" ${!array_key_exists($this->get('ativo'), $estados) ? 'selected': ''}>Todos</option>
-<!--{loop $estados $value $text}-->
-					<option value="{$value}" ${$this->get('ativo') == $value ? 'selected': ''}>{$text}</option>
-<!--{/loop}-->
+					<option value="" {{ !array_key_exists($this->get('ativo'), $estados) ? 'selected': '' }}>Todos</option>
+{% for $value, $text in $estados %}
+					<option value="{{ $value }}" {{ $this->get('ativo') == $value ? 'selected': '' }}>{{ $text }}</option>
+{% endfor %}
 				</select>
 			</div>
 			<div class="form-group col-lg-4 col-md-4 col-sm-5 col-xs-12">
 				<label for="search">Busca:</label>
 				<div class="input-group">
-					<input type="text" class="form-control" id="search" name="search" placeholder="Procurar..." value="{$this->get('search')}">
+					<input type="text" class="form-control" id="search" name="search" placeholder="Procurar..." value="{{ $this->get('search') }}">
 					<span class="input-group-btn">
 						<button class="btn btn-default" type="submit"><i class="fa fa-search"></i></button>
 					</span>
@@ -50,27 +50,27 @@
 							</tr>
 						</thead>
 						<tbody>
-<!--{loop $caixas $caixa}-->
-							<tr ${$caixa->isAtivo()?'':'class="active"'}>
-								<td>{$caixa->getDescricao()}</td>
+{% for $caixa in $caixas %}
+							<tr class="{{ !$caixa->isAtivo() ? 'active': '' }}">
+								<td>{{ $caixa->getDescricao() }}</td>
 								<td class="text-center">
 									<ul class="nav panel_toolbox">
 										<li>
-											<a href="/gerenciar/caixa/editar?id={$caixa->getID()}" title="Editar caixa '{$caixa->getDescricao()}'"><i class="fa fa-edit"></i></a>
+											<a href="/gerenciar/caixa/editar?id={{ $caixa->getID() }}" title="Editar caixa '{{ $caixa->getDescricao() }}'"><i class="fa fa-edit"></i></a>
 										</li>
 										<li>
-											<a href="/gerenciar/caixa/excluir?id={$caixa->getID()}" title="Excluir caixa '{$caixa->getDescricao()}'" class="ajaxlink" ask="Deseja excluir o caixa '{$caixa->getDescricao()}'?"><i class="fa fa-close"></i></a>
+											<a href="/gerenciar/caixa/excluir?id={{ $caixa->getID() }}" title="Excluir caixa '{{ $caixa->getDescricao() }}'" class="ajaxlink" ask="Deseja excluir o caixa '{{ $caixa->getDescricao() }}'?"><i class="fa fa-close"></i></a>
 										</li>
 									</ul>
 								</td>
 							</tr>
-<!--{/loop}-->
+{% endfor %}
 						</tbody>
 					</table>
-					{$pagestring}
+					{{ $pagestring }}
 				</div>
 			</div>
 		</div>
 	</div>
 </div>	
-<!--{include footer_gerenciar}-->
+{{ include('footer_gerenciar') }}

@@ -26,6 +26,7 @@ namespace MZ\Sale;
 
 use MZ\Util\Filter;
 use MZ\Util\Validator;
+use MZ\Stock\Estoque;
 
 /**
  * Produtos, taxas e serviços do pedido, a alteração do estado permite o
@@ -985,7 +986,7 @@ class ProdutoPedido extends \MZ\Database\Helper
         return $result;
     }
 
-    public function register($produto, $formacoes)
+    public function register($formacoes)
     {
         try {
             if (is_null($this->getProdutoPedidoID())) {

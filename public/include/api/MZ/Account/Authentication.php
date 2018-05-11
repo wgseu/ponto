@@ -165,7 +165,7 @@ class Authentication
             "$1-$2-$3 $4:$5:$6",
             substr($id, -14)
         ));
-        $i = round(abs($tm - $stm) / 60);
+        $i = round(abs($m - $sm) / 60);
         if ($i > 5 || $sm === false || strcasecmp($crc, $ccrc) != 0) {
             return $cliente;
         }

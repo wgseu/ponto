@@ -48,6 +48,5 @@ try {
     readfile($zipfile);
     unlink($zipfile);
 } catch (\Exception $e) {
-    \Log::error($e->getMessage());
     json($e->getMessage());
 }

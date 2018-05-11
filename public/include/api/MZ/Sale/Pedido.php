@@ -26,6 +26,7 @@ namespace MZ\Sale;
 
 use MZ\Util\Filter;
 use MZ\Util\Validator;
+use MZ\System\Permissao;
 
 /**
  * Informações do pedido de venda

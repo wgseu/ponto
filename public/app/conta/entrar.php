@@ -51,7 +51,7 @@ if (!$cliente->exists()) {
     } else {
         $msg = 'Usuário ou senha incorretos!';
     }
-    if (isset($_POST['weblogin'])) {
+    if (isset($_POST['metodo'])) {
         \Thunder::error($msg);
         exit($app->getResponse('html')->output('conta_entrar'));
     } else {
@@ -60,7 +60,7 @@ if (!$cliente->exists()) {
 }
 $funcionario = Funcionario::findByClienteID($cliente->getID());
 $dispositivo = new Dispositivo();
-if (!isset($_POST['weblogin']) && $funcionario->exists()) {
+if (!isset($_POST['metodo']) && $funcionario->exists()) {
     if (!$funcionario->has(Permissao::NOME_SISTEMA)) {
         json('Você não tem permissão para acessar o sistema!');
     }
@@ -82,7 +82,7 @@ $app->getAuthentication()->login($cliente);
 if ($lembrar == 'true') {
     $app->getAuthentication()->remember();
 }
-if (isset($_POST['weblogin'])) {
+if (isset($_POST['metodo'])) {
     $url = isset($_POST['redirect']) ? strval($_POST['redirect']) : '/';
     redirect($url);
 }

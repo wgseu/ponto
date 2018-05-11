@@ -40,6 +40,7 @@ use MZ\Sale\ProdutoPedido;
 use MZ\Product\Servico;
 use MZ\Product\Produto;
 use MZ\Sale\Formacao;
+use MZ\Session\Sessao;
 use MZ\System\Synchronizer;
 
 class Order extends Pedido
@@ -475,7 +476,7 @@ class Order extends Pedido
         $parent_products = [];
         foreach ($_pedidos as $_produto_pedido) {
             $produto_pedido = new ProdutoPedido($_produto_pedido);
-            if (!is_null($produto_pedido->setProdutoPedidoID())) {
+            if (!is_null($produto_pedido->getProdutoPedidoID())) {
                 if (isset($parent_products[$produto_pedido->getProdutoPedidoID()])) {
                     $parent_index = $parent_products[$produto_pedido->getProdutoPedidoID()];
                 } elseif (is_null($parent_index)) {
@@ -593,7 +594,16 @@ class Order extends Pedido
                 $produto_pedido->setCancelado('N');
                 $produto_pedido->setVisualizado('N');
                 $this->checkSaldo($produto_pedido->getTotal());
+                $save_item = new ProdutoPedido($produto_pedido);
                 $produto_pedido->filter(new ProdutoPedido()); // limpa o ID
+
+                // corrige a aplicação de filtro acima
+                $produto_pedido->setPreco(floatval($save_item->getPreco()));
+                $produto_pedido->setQuantidade(floatval($save_item->getQuantidade()));
+                $produto_pedido->setPorcentagem(floatval($save_item->getPorcentagem()));
+                $produto_pedido->setPrecoVenda(floatval($save_item->getPrecoVenda()));
+                $produto_pedido->setPrecoCompra(floatval($save_item->getPrecoCompra()));
+
                 $produto_pedido->register($item_info['formacoes']);
                 if ($produto->exists() && $produto->getTipo() == Produto::TIPO_PACOTE) {
                     $pacote_pedido = $produto_pedido;

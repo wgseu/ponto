@@ -35,7 +35,7 @@ if (!logged_employee()->has(Permissao::NOME_RELATORIOCAIXA)) {
     json('Você não tem permissão para acessar o faturamento da empresa');
 }
 $response = ['status' => 'ok'];
-$mes = abs(intval($_GET['mes']));
+$mes = isset($_GET['mes']) ? abs(intval($_GET['mes'])): 0;
 $meses = [];
 for ($i = $mes; $i < $mes + 4; $i++) {
     $data = Helper::date("first day of -$i month");

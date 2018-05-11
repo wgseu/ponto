@@ -50,6 +50,8 @@ $pedidos = ProdutoPedido::rawFindAll(
         '!status' => Pedido::ESTADO_FINALIZADO
     ],
     [],
+    null,
+    null,
     [],
     [
         'produtoid',

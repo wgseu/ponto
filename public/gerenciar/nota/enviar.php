@@ -104,6 +104,5 @@ try {
     unlink($zipfile);
     json(null, []);
 } catch (\Exception $e) {
-    \Log::error($e->getMessage());
     json($e->getMessage());
 }

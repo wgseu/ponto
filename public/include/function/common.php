@@ -749,7 +749,7 @@ function generate_file_name($dir, $ext, $name = null, $makedir = false)
 
 function upload_file($inputname, $dir, $name, $def_ext, $allow_ext, $force_ext = null, $error_msg = null)
 {
-    $file = $_FILES[$inputname];
+    $file = isset($_FILES[$inputname]) ? $_FILES[$inputname] : null;
     if (!$file || $file['error'] === UPLOAD_ERR_NO_FILE) {
         return null; // no file
     }

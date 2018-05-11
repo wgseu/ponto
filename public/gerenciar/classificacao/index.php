@@ -36,7 +36,11 @@ if ($limite > 100 || $limite < 1) {
 }
 $condition = Filter::query($_GET);
 unset($condition['ordem']);
-$condition['classificacaoid'] = isset($condition['classificacaoid']) ? $condition['classificacaoid'] : null;
+if (isset($condition['classificacaoid']) && intval($condition['classificacaoid']) < 0) {
+    unset($condition['classificacaoid']);
+} elseif (array_key_exists('classificacaoid', $_GET)) {
+    $condition['classificacaoid'] = isset($condition['classificacaoid']) ? $condition['classificacaoid'] : null;
+}
 $classificacao = new Classificacao($condition);
 $order = Filter::order(isset($_GET['ordem']) ? $_GET['ordem'] : '');
 $count = Classificacao::count($condition);

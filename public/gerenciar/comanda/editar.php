@@ -25,6 +25,7 @@
 require_once(dirname(__DIR__) . '/app.php');
 
 use MZ\Sale\Comanda;
+use MZ\System\Permissao;
 
 need_permission(Permissao::NOME_CADASTROCOMANDAS, is_output('json'));
 $id = isset($_GET['id']) ? $_GET['id'] : null;

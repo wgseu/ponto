@@ -13,7 +13,7 @@
       <div class="form-group col-lg-4 col-md-4 col-sm-4 col-xs-6">
         <label for="classificacaoid">Classificação superior:</label>
         <select class="form-control" id="classificacaoid" name="classificacaoid">
-          <option value="" {{ !array_key_exists($this->get('classificacaoid'), $_classificacao_names) ? 'selected': '' }}>Não informada</option>
+          <option value="-1" {{ !array_key_exists($this->get('classificacaoid'), $_classificacao_names) ? 'selected': '' }}>Não informada</option>
           {% for $value, $text in $_classificacao_names %}
             <option value="{{ $value }}" {{ $this->get('classificacaoid') == $value ? 'selected': '' }}>{{ $text }}</option>
           {% endfor %}

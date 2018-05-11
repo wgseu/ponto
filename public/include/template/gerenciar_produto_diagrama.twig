@@ -8,7 +8,7 @@
       {% $ref = 'pai'.$index %}
       {{ $ref }} = {
         {% if !is_null($_composicao->getComposicaoID()) %}
-          parent: pai {{ $_composicao->getComposicaoID() }},
+          parent: {{ 'pai' . $_composicao->getComposicaoID() }},
         {% endif %}
         text: {
           name: '{{ single_quotes($_produto->getAbreviado()) }}',

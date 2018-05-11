@@ -519,7 +519,7 @@ class Patrimonio extends \MZ\Database\Helper
             $this->setValor($patrimonio['valor']);
         }
         if (!isset($patrimonio['ativo'])) {
-            $this->setAtivo('Y');
+            $this->setAtivo('N');
         } else {
             $this->setAtivo($patrimonio['ativo']);
         }

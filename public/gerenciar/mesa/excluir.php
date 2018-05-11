@@ -24,6 +24,9 @@
  */
 require_once(dirname(__DIR__) . '/app.php');
 
+use MZ\Environment\Mesa;
+use MZ\System\Permissao;
+
 need_permission(Permissao::NOME_CADASTROMESAS, is_output('json'));
 $id = isset($_GET['id']) ? $_GET['id'] : null;
 $mesa = Mesa::findByID($id);

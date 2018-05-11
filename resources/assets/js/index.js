@@ -945,9 +945,7 @@ Gerenciar.cartao.initFieldSelect = function(input, field, selectFn) {
     function(search) {
       return { search: search, saida: 'json', limite: 5 };
     },
-    function(response) {
-      return response.cartoes;
-    },
+    undefined,
     field,
     'data-descricao'
   );

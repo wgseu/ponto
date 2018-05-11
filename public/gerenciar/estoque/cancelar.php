@@ -42,9 +42,9 @@ try {
     $produto = $estoque->findProdutoID();
     $estoque->cancelar();
     $msg = sprintf(
-        'Entrada do produto "%s" e quantidade %f cancelada com sucesso!',
+        'Entrada do produto "%s" e quantidade %s cancelada com sucesso!',
         $produto->getDescricao(),
-        $estoque->getQuantidade()
+        strval($estoque->getQuantidade())
     );
     if (is_output('json')) {
         json('msg', $msg);

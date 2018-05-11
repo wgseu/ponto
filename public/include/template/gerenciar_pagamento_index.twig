@@ -116,7 +116,7 @@
                       {% $_mesa = $_pedido->findMesaID() %}
                       <a href="/gerenciar/pedido/?search={{ $_pedido->getID() }}" title="Visualizar pedido '{{ $_pedido->getID() }}'">Pedido
                         {{ $_pedido->getID() }}:
-                        {{ $_pedido->getTipo() == Pedido::TIPO_ENTREGA && is_null($_pedido->getLocalizacaoID())?'Viagem':($_pedido->getTipo() == Pedido::TIPO_MESA?$_mesa->getNome():($_pedido->getTipo() == Pedido::TIPO_COMANDA?$_comanda->getNome():$_tipo_names[$_pedido->getTipo()])) }}</a>
+                        {{ $_pedido->getDestino($_mesa, $_comanda) }}</a>
                     {% endif %}
                   </td>
                   <td class="text-right">

@@ -68,5 +68,12 @@ if (is_post()) {
     }
 } elseif (is_output('json')) {
     json('Nenhum dado foi enviado');
+} elseif (is_null($patrimonio->getDescricao())) {
+    $patrimonio->setCusto(0.0);
+    $patrimonio->setAltura(0.0);
+    $patrimonio->setLargura(0.0);
+    $patrimonio->setComprimento(0.0);
+    $patrimonio->setValor(0.0);
+    $patrimonio->setAtivo('N');
 }
 $app->getResponse('html')->output('gerenciar_patrimonio_cadastrar');

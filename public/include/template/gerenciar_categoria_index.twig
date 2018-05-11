@@ -13,7 +13,7 @@
       <div class="form-group col-lg-4 col-md-4 col-sm-3 col-xs-12">
         <label for="categoria">Categoria:</label>
         <select class="form-control" id="categoria" name="categoriaid">
-          <option value="" {{ !array_key_exists($this->get('categoriaid'), $sup_categorias) ? 'selected': '' }}>Todas</option>
+          <option value="-1" {{ !array_key_exists($this->get('categoriaid'), $sup_categorias) ? 'selected': '' }}>Todas</option>
           {% for $value, $text in $sup_categorias %}
             <option value="{{ $value }}" {{ $this->get('categoriaid') == $value ? 'selected': '' }}>{{ $text }}</option>
           {% endfor %}

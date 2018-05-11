@@ -39,43 +39,43 @@
             <tbody>
               {% for $integracao in $integracoes %}
                 <tr class="{{ !$integracao->isAtivo() ? 'active': '' }}">
-                  <td>
-                    <img src="{{ $integracao->makeIconeURL() }}" height="48" alt="Imagem"/></a>
-                  <div style="display: inline-block;">
-                    <label>
-                      <input type="checkbox" class="js-switch" name="ativo" data-id="{{ $integracao->getID() }}" value="Y" {{ $integracao->isAtivo()?'checked':'' }}/>
-                      {{ $integracao->getNome() }}
-                    </label>
-                  </div>
-                </td>
-                <td>{{ $integracao->getDescricao() }}</td>
-                <td class="text-center">
-                  <ul class="nav panel_toolbox">
-                    <li>
-                      <a href="/gerenciar/produto/{{ $integracao->getAcessoURL() }}" title="Associar produtos">
-                        <i class="fa fa-cube"></i>
-                      </a>
-                    </li>
-                    <li>
-                      <a href="/gerenciar/cartao/{{ $integracao->getAcessoURL() }}" title="Associar cartões">
-                        <i class="fa fa-credit-card"></i>
-                      </a>
-                    </li>
-                    <li>
-                      <a href="/gerenciar/integracao/editar?id={{ $integracao->getID() }}" title="Editar Integração '{{ $integracao->getNome() }}'">
-                        <i class="fa fa-edit"></i>
-                      </a>
-                    </li>
-                  </ul>
-                </td>
-              </tr>
-            {% endfor %}
-          </tbody>
-        </table>
-        {{ include('pagination.twig') }}
+                  <td class="integrator">
+                    <img src="{{ $integracao->makeIconeURL() }}" height="48" alt="Imagem"/>
+                    <div>
+                      <label>
+                        <input type="checkbox" class="js-switch" name="ativo" data-id="{{ $integracao->getID() }}" value="Y" {{ $integracao->isAtivo()?'checked':'' }}/>
+                        {{ $integracao->getNome() }}
+                      </label>
+                    </div>
+                  </td>
+                  <td>{{ $integracao->getDescricao() }}</td>
+                  <td class="text-center">
+                    <ul class="nav panel_toolbox">
+                      <li>
+                        <a href="/gerenciar/produto/{{ $integracao->getAcessoURL() }}" title="Associar produtos">
+                          <i class="fa fa-cube"></i>
+                        </a>
+                      </li>
+                      <li>
+                        <a href="/gerenciar/cartao/{{ $integracao->getAcessoURL() }}" title="Associar cartões">
+                          <i class="fa fa-credit-card"></i>
+                        </a>
+                      </li>
+                      <li>
+                        <a href="/gerenciar/integracao/editar?id={{ $integracao->getID() }}" title="Editar Integração '{{ $integracao->getNome() }}'">
+                          <i class="fa fa-edit"></i>
+                        </a>
+                      </li>
+                    </ul>
+                  </td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+          {{ include('pagination.twig') }}
+        </div>
       </div>
     </div>
   </div>
-</div>
 </div>
 {{ include('footer_gerenciar.twig') }}

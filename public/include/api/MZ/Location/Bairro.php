@@ -223,7 +223,7 @@ class Bairro extends \MZ\Database\Helper
             $this->setValorEntrega($bairro['valorentrega']);
         }
         if (!isset($bairro['disponivel'])) {
-            $this->setDisponivel('Y');
+            $this->setDisponivel('N');
         } else {
             $this->setDisponivel($bairro['disponivel']);
         }

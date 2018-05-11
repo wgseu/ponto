@@ -66,6 +66,8 @@ if (is_post()) {
     }
 } elseif (is_output('json')) {
     json('Nenhum dado foi enviado');
+} else {
+    $bairro->setDisponivel('Y');
 }
 if (is_null($bairro->getCidadeID())) {
     $bairro->setCidadeID($app->getSystem()->getCity()->getID());

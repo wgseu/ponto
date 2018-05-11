@@ -36,7 +36,11 @@ if ($limite > 100 || $limite < 1) {
 }
 $condition = Filter::query($_GET);
 unset($condition['ordem']);
-$condition['categoriaid'] = isset($condition['categoriaid']) ? $condition['categoriaid'] : null;
+if (isset($condition['categoriaid']) && intval($condition['categoriaid']) < 0) {
+    unset($condition['categoriaid']);
+} elseif (array_key_exists('categoriaid', $_GET)) {
+    $condition['categoriaid'] = isset($condition['categoriaid']) ? $condition['categoriaid'] : null;
+}
 $categoria = new Categoria($condition);
 $order = Filter::order(isset($_GET['ordem']) ? $_GET['ordem'] : '');
 $count = Categoria::count($condition);

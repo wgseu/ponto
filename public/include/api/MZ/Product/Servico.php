@@ -403,7 +403,7 @@ class Servico extends \MZ\Database\Helper
             $this->setTipo($servico['tipo']);
         }
         if (!isset($servico['obrigatorio'])) {
-            $this->setObrigatorio(null);
+            $this->setObrigatorio('N');
         } else {
             $this->setObrigatorio($servico['obrigatorio']);
         }
@@ -423,12 +423,12 @@ class Servico extends \MZ\Database\Helper
             $this->setValor($servico['valor']);
         }
         if (!isset($servico['individual'])) {
-            $this->setIndividual(null);
+            $this->setIndividual('N');
         } else {
             $this->setIndividual($servico['individual']);
         }
         if (!isset($servico['ativo'])) {
-            $this->setAtivo('Y');
+            $this->setAtivo('N');
         } else {
             $this->setAtivo($servico['ativo']);
         }

@@ -164,7 +164,7 @@ class Mesa extends \MZ\Database\Helper
             $this->setNome($mesa['nome']);
         }
         if (!isset($mesa['ativa'])) {
-            $this->setAtiva(null);
+            $this->setAtiva('N');
         } else {
             $this->setAtiva($mesa['ativa']);
         }

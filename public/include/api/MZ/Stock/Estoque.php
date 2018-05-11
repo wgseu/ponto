@@ -670,7 +670,9 @@ class Estoque extends \MZ\Database\Helper
                 $errors['cancelado'] = 'Essa movimentação está cancelada e não pode ser alterada';
             } else {
                 $count = self::count(['entradaid' => $this->getID()]);
-                $errors['cancelado'] = 'Essa entrada já foi movimentada e não pode ser cancelada';
+                if ($count > 0) {
+                    $errors['cancelado'] = 'Essa entrada já foi movimentada e não pode ser cancelada';
+                }
             }
         }
         $this->setDataMovimento(self::now());

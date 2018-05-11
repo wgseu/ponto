@@ -66,5 +66,7 @@ if (is_post()) {
     }
 } elseif (is_output('json')) {
     json('Nenhum dado foi enviado');
+} else {
+    $servico->setAtivo('Y');
 }
 $app->getResponse('html')->output('gerenciar_servico_cadastrar');

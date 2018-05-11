@@ -268,6 +268,9 @@ class Filter
      */
     public static function parseTime($value, $time)
     {
+        if (trim($value) == '') {
+            return false;
+        }
         $d = \DateTime::createFromFormat('d/m/Y H:i', $value);
         if ($d !== false) {
             return $d;

@@ -1270,7 +1270,7 @@ class Pedido extends \MZ\Database\Helper
         }
         if (isset($condition['apartir_criacao'])) {
             $field = 'p.datacriacao >= ?';
-            $condition[$field] = Filter::datetime($condition['apartir_criacao']);
+            $condition[$field] = Filter::datetime($condition['apartir_criacao'], '00:00:00');
             $allowed[$field] = true;
         }
         if (isset($condition['ate_criacao'])) {

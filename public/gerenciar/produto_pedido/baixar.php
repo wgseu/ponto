@@ -33,8 +33,14 @@ need_permission(Permissao::NOME_RELATORIOVENDAS, true);
 try {
     $formato = isset($_GET['formato']) ? $_GET['formato'] : null;
     $condition = Filter::query($_GET);
+    if (array_key_exists('!produtoid', $_GET)) {
+        $condition['!produtoid'] = isset($condition['!produtoid']) ? $condition['!produtoid'] : null;
+    }
+    if (array_key_exists('!servicoid', $_GET)) {
+        $condition['!servicoid'] = isset($condition['!servicoid']) ? $condition['!servicoid'] : null;
+    }
     $condition['detalhado'] = true;
-    $itens_do_pedido = ProdutoPedido::findAll($condition);
+    $itens_do_pedido = ProdutoPedido::findAll($condition, [], null, null, [], ['p.id']);
     // Coluna dos dados
     $columns = [
         'Pedido',
@@ -196,6 +202,5 @@ try {
     header('Pragma: public'); // HTTP/1.0
     $objWriter->save('php://output');
 } catch (\Exception $e) {
-    \Log::error($e->getMessage());
     json($e->getMessage());
 }

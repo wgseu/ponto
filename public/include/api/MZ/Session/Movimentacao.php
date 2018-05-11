@@ -539,6 +539,18 @@ class Movimentacao extends \MZ\Database\Helper
     private static function filterCondition($condition)
     {
         $allowed = self::getAllowedKeys();
+        if (isset($condition['apartir_abertura'])) {
+            $field = 'm.dataabertura >= ?';
+            $condition[$field] = Filter::datetime($condition['apartir_abertura'], '00:00:00');
+            $allowed[$field] = true;
+            unset($condition['apartir_abertura']);
+        }
+        if (isset($condition['ate_abertura'])) {
+            $field = 'm.dataabertura <= ?';
+            $condition[$field] = Filter::datetime($condition['ate_abertura'], '23:59:59');
+            $allowed[$field] = true;
+            unset($condition['ate_abertura']);
+        }
         return Filter::keys($condition, $allowed, 'm.');
     }
 

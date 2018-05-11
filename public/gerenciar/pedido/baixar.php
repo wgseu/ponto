@@ -193,6 +193,5 @@ try {
     header('Pragma: public'); // HTTP/1.0
     $objWriter->save('php://output');
 } catch (\Exception $e) {
-    \Log::error($e->getMessage());
     json($e->getMessage());
 }

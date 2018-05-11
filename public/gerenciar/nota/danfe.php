@@ -15,7 +15,7 @@ need_permission(
 );
 
 try {
-    $pedido_id = isset($_GET['pedido_id']) ? $_GET['pedido_id'] : null;
+    $pedido_id = isset($_GET['pedidoid']) ? $_GET['pedidoid'] : null;
     $pedido = Pedido::findByID($pedido_id);
     if (!$pedido->exists()) {
         throw new \Exception('O pedido não foi informado ou não existe', 404);

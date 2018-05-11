@@ -89,7 +89,7 @@ try {
         } elseif ($value->getTipo() == Cliente::TIPO_FISICA) {
             $row[] = human_date($value->getDataAniversario());
         } else {
-            $row[] = $value->getDataAniversario();
+            $row[] = Mask::date($value->getDataAniversario());
         }
         if ($value->getTipo() == Cliente::TIPO_FISICA) {
             $row[] = Mask::cpf($value->getCPF());

@@ -14,14 +14,14 @@ if (!is_post()) {
 }
 
 try {
-    $caixa = Caixa::findByID(isset($_POST['caixa_id']) ? $_POST['caixa_id'] : null);
+    $caixa = Caixa::findByID(isset($_POST['caixaid']) ? $_POST['caixaid'] : null);
     if (!$caixa->exists()) {
         throw new \Exception('O caixa informado não existe', 404);
     }
     if (!$caixa->isAtivo()) {
         throw new \Exception(sprintf('O caixa "%s" não está ativo', $caixa->getDescricao()), 500);
     }
-    $pedido = Pedido::findByID(isset($_POST['pedido_id']) ? $_POST['pedido_id'] : null);
+    $pedido = Pedido::findByID(isset($_POST['pedidoid']) ? $_POST['pedidoid'] : null);
     if (!$pedido->exists()) {
         throw new \Exception('O pedido informado não existe', 404);
     }
@@ -52,15 +52,15 @@ try {
         }
         $notified = 1;
     } catch (\Exception $e) {
-        Log::error($e->getMessage());
+        \Log::error($e->getMessage());
     }
     json('nota', [
         'id' => $nota->getID(),
-        'pedido_id' => $nota->getPedidoID(),
+        'pedidoid' => $nota->getPedidoID(),
         'notificado' => $notified,
         'adicionado' => $added
     ]);
 } catch (\Exception $e) {
-    Log::error($e->getMessage());
+    \Log::error($e->getMessage());
     json($e->getMessage());
 }

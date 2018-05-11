@@ -1174,11 +1174,11 @@ class ProdutoPedido extends \MZ\Database\Helper
         }
         if (isset($condition['apartir_datahora'])) {
             $field = 'p.datahora >= ?';
-            $condition[$field] = Filter::datetime($condition['apartir_datahora']);
+            $condition[$field] = Filter::datetime($condition['apartir_datahora'], '00:00:00');
             $allowed[$field] = true;
         }
         if (isset($condition['ate_datahora'])) {
-            $field = 'c.datahora <= ?';
+            $field = 'p.datahora <= ?';
             $condition[$field] = Filter::datetime($condition['ate_datahora'], '23:59:59');
             $allowed[$field] = true;
         }
@@ -1297,6 +1297,7 @@ class ProdutoPedido extends \MZ\Database\Helper
         }
         $condition = self::filterCondition($condition);
         $query = self::buildOrderBy($query, self::filterOrder($order));
+        $query = $query->orderBy('p.datahora DESC');
         $query = $query->orderBy('p.id DESC');
         foreach ($select as $value) {
             $query = $query->select($value);

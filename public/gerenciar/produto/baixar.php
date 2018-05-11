@@ -38,7 +38,8 @@ set_time_limit(0);
 try {
     $formato = isset($_GET['formato']) ? $_GET['formato'] : null;
     $condition = Filter::query($_GET);
-    $produtos = Produto::findAll($condition);
+    $order = Filter::order(isset($_GET['ordem']) ? $_GET['ordem'] : '');
+    $produtos = Produto::findAll($condition, $order);
     // Coluna dos dados
     $columns = [
         'Código',

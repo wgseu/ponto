@@ -1296,7 +1296,7 @@ class Nota extends \MZ\Database\Helper
         }
         if (isset($condition['apartir_emissao'])) {
             $field = 'n.dataemissao >= ?';
-            $condition[$field] = Filter::datetime($condition['apartir_emissao']);
+            $condition[$field] = Filter::datetime($condition['apartir_emissao'], '00:00:00');
             $allowed[$field] = true;
         }
         if (isset($condition['ate_emissao'])) {
@@ -1306,7 +1306,7 @@ class Nota extends \MZ\Database\Helper
         }
         if (isset($condition['apartir_lancamento'])) {
             $field = 'n.datalancamento >= ?';
-            $condition[$field] = Filter::datetime($condition['apartir_lancamento']);
+            $condition[$field] = Filter::datetime($condition['apartir_lancamento'], '00:00:00');
             $allowed[$field] = true;
         }
         if (isset($condition['ate_lancamento'])) {

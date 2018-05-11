@@ -1338,7 +1338,7 @@ class Cliente extends \MZ\Database\Helper
         }
         if (isset($condition['apartir_cadastro'])) {
             $field = 'c.datacadastro >= ?';
-            $condition[$field] = Filter::datetime($condition['apartir_cadastro']);
+            $condition[$field] = Filter::datetime($condition['apartir_cadastro'], '00:00:00');
             $allowed[$field] = true;
             unset($condition['apartir_cadastro']);
         }
@@ -1379,7 +1379,10 @@ class Cliente extends \MZ\Database\Helper
                 ->orderBy('total DESC')
                 ->groupBy('p.clienteid');
             if (isset($condition['apartir_compra'])) {
-                $query = $query->where('p.datacriacao >= ?', Filter::datetime($condition['apartir_compra']));
+                $query = $query->where(
+                    'p.datacriacao >= ?',
+                    Filter::datetime($condition['apartir_compra'], '00:00:00')
+                );
             }
             if (isset($condition['ate_compra'])) {
                 $query = $query->where('p.datacriacao <= ?', Filter::datetime($condition['ate_compra'], '23:59:59'));

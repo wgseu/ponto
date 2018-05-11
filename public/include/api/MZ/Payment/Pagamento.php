@@ -1028,7 +1028,7 @@ class Pagamento extends \MZ\Database\Helper
         }
         if (isset($condition['apartir_datahora'])) {
             $field = 'p.datahora >= ?';
-            $condition[$field] = Filter::datetime($condition['apartir_datahora']);
+            $condition[$field] = Filter::datetime($condition['apartir_datahora'], '00:00:00');
             $allowed[$field] = true;
         }
         if (isset($condition['ate_datahora'])) {

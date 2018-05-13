@@ -50,7 +50,7 @@ class CaixaTest extends \PHPUnit_Framework_TestCase
         ]);
         $caixa = new Caixa([
             'id' => 32,
-            'descricao' => 'Caixa <script>1<script>',
+            'descricao' => 'Caixa <script>1</script>',
             'serie' => 'a1t2',
             'numeroinicial' => 'b5a3',
         ]);

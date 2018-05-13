@@ -50,6 +50,9 @@
     "scripts": {
         "test": [
             "phpunit"
+        ],
+        "cover": [
+            "phpunit --coverage-html storage/coverage"
         ]
     }
 }

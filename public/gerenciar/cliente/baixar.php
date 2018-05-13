@@ -53,7 +53,7 @@ try {
         'RG/IE',
         'Gênero',
         'Apelido',
-        'CEP',
+        _p('Titulo', 'CEP'),
         'Bairro',
         'Logradouro',
         'Numero',

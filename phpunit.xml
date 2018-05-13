@@ -13,9 +13,8 @@
     <filter>
         <whitelist processUncoveredFilesFromWhitelist="true">
             <directory suffix=".php">public/include/api</directory>
-            <directory suffix=".php">public/include/library</directory>
-            <directory suffix=".php">public/include/classes</directory>
             <directory suffix=".php">public/include/function</directory>
+            <directory suffix=".php">public/include/library</directory>
         </whitelist>
     </filter>
     <php>

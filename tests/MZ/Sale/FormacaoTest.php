@@ -36,6 +36,7 @@ class FormacaoTest extends \PHPUnit_Framework_TestCase
             'tipo',
             'pacoteid',
             'composicaoid',
+            'quantidade',
         ];
         $this->assertEquals($allowed, array_keys($values));
     }

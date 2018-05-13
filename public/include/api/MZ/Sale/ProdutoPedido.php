@@ -27,6 +27,7 @@ namespace MZ\Sale;
 use MZ\Util\Filter;
 use MZ\Util\Validator;
 use MZ\Stock\Estoque;
+use MZ\Exception\ValidationException;
 
 /**
  * Produtos, taxas e serviços do pedido, a alteração do estado permite o
@@ -912,7 +913,7 @@ class ProdutoPedido extends \MZ\Database\Helper
         $this->setDataAtualizacao(self::now());
         $this->setDataHora(self::now());
         if (!empty($errors)) {
-            throw new \MZ\Exception\ValidationException($errors);
+            throw new ValidationException($errors);
         }
         return $this->toArray();
     }
@@ -920,7 +921,7 @@ class ProdutoPedido extends \MZ\Database\Helper
     /**
      * Translate SQL exception into application exception
      * @param  \Exception $e exception to translate into a readable error
-     * @return \MZ\Exception\ValidationException new exception translated
+     * @return ValidationException new exception translated
      */
     protected function translate($e)
     {
@@ -992,14 +993,13 @@ class ProdutoPedido extends \MZ\Database\Helper
             if (is_null($this->getProdutoPedidoID())) {
                 // aplica o desconto dos opcionais e acrescenta o valor dos adicionais
                 // apenas nas composições fora de pacotes
-                foreach ($formacoes as $key => $_formacao) {
-                    $formacao = new Formacao($_formacao);
+                foreach ($formacoes as $formacao) {
                     if ($formacao->getTipo() != Formacao::TIPO_COMPOSICAO) {
                         continue;
                     }
                     $composicao = $formacao->findComposicaoID();
                     if (!$composicao->exists()) {
-                        throw new \MZ\Exception\ValidationException(['formacao' => 'A composição formada não existe']);
+                        throw new ValidationException(['formacao' => 'A composição formada não existe']);
                     }
                     $operacao = -1;
                     if ($composicao->getTipo() == Composicao::TIPO_ADICIONAL) {
@@ -1009,12 +1009,10 @@ class ProdutoPedido extends \MZ\Database\Helper
                     $this->setPreco($this->getPreco() + $operacao * $composicao->getValor());
                 }
             }
-            $this->filter(new self());
             $this->insert();
             // TODO: verificar se o preço informado está correto
             $composicoes = [];
-            foreach ($formacoes as $_formacao) {
-                $formacao = new Formacao($_formacao);
+            foreach ($formacoes as $formacao) {
                 $formacao->setProdutoPedidoID($this->getID());
                 $formacao->filter(new Formacao());
                 $formacao->insert();

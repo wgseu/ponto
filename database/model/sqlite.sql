@@ -2,7 +2,7 @@
 -- Author:        Mazin
 -- Caption:       GrandChef Model
 -- Project:       GrandChef
--- Changed:       2018-03-13 16:26
+-- Changed:       2018-05-12 09:52
 -- Created:       2012-09-05 23:08
 PRAGMA foreign_keys = OFF;
 
@@ -1276,6 +1276,7 @@ CREATE TABLE "Formacoes"(
   "Tipo" TEXT NOT NULL CHECK("Tipo" IN('Pacote', 'Composicao')) DEFAULT 'Pacote',-- Informa qual tipo de formação foi escolhida, Pacote: O produto ou propriedade faz parte de um pacote, Composição: O produto é uma composição e esse item foi retirado ou adicionado na venda[N:Tipo][G:o]
   "PacoteID" INTEGER DEFAULT NULL,-- Informa qual pacote foi selecionado no momento da venda[N:Pacote][G:o][S]
   "ComposicaoID" INTEGER DEFAULT NULL,-- Informa qual composição foi retirada ou adicionada no momento da venda[N:Composição][G:a]
+  "Quantidade" DOUBLE NOT NULL DEFAULT 1,-- Quantidade de itens selecionados[N:Quantidade][G:a]
   CONSTRAINT "UK_Formacoes_ProdutoPedidoID_PacoteID"
     UNIQUE("ProdutoPedidoID","PacoteID"),
   CONSTRAINT "FK_Formacoes_ProdPed_ProdutoPedidoID"

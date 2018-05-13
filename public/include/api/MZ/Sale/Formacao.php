@@ -64,6 +64,10 @@ class Formacao extends \MZ\Database\Helper
      * Informa qual composição foi retirada ou adicionada no momento da venda
      */
     private $composicao_id;
+    /**
+     * Quantidade de itens selecionados
+     */
+    private $quantidade;
 
     /**
      * Constructor for a new empty instance of Formacao
@@ -177,6 +181,26 @@ class Formacao extends \MZ\Database\Helper
     }
 
     /**
+     * Quantidade de itens selecionados
+     * @return mixed Quantidade of Formacao
+     */
+    public function getQuantidade()
+    {
+        return $this->quantidade;
+    }
+
+    /**
+     * Set Quantidade value to new on param
+     * @param  mixed $quantidade new value for Quantidade
+     * @return Formacao Self instance
+     */
+    public function setQuantidade($quantidade)
+    {
+        $this->quantidade = $quantidade;
+        return $this;
+    }
+
+    /**
      * Convert this instance to array associated key -> value
      * @param  boolean $recursive Allow rescursive conversion of fields
      * @return array All field and values into array format
@@ -189,6 +213,7 @@ class Formacao extends \MZ\Database\Helper
         $formacao['tipo'] = $this->getTipo();
         $formacao['pacoteid'] = $this->getPacoteID();
         $formacao['composicaoid'] = $this->getComposicaoID();
+        $formacao['quantidade'] = $this->getQuantidade();
         return $formacao;
     }
 
@@ -230,6 +255,11 @@ class Formacao extends \MZ\Database\Helper
         } else {
             $this->setComposicaoID($formacao['composicaoid']);
         }
+        if (!isset($formacao['quantidade'])) {
+            $this->setQuantidade(1);
+        } else {
+            $this->setQuantidade($formacao['quantidade']);
+        }
         return $this;
     }
 
@@ -253,6 +283,7 @@ class Formacao extends \MZ\Database\Helper
         $this->setProdutoPedidoID(Filter::number($this->getProdutoPedidoID()));
         $this->setPacoteID(Filter::number($this->getPacoteID()));
         $this->setComposicaoID(Filter::number($this->getComposicaoID()));
+        $this->setQuantidade(Filter::float($this->getQuantidade()));
     }
 
     /**
@@ -273,10 +304,11 @@ class Formacao extends \MZ\Database\Helper
         if (is_null($this->getProdutoPedidoID())) {
             $errors['produtopedidoid'] = 'O item do pedido não pode ser vazio';
         }
-        if (is_null($this->getTipo())) {
-            $errors['tipo'] = 'O tipo não pode ser vazio';
-        } elseif (!Validator::checkInSet($this->getTipo(), self::getTipoOptions())) {
-            $errors['tipo'] = 'O tipo é inválido';
+        if (!Validator::checkInSet($this->getTipo(), self::getTipoOptions())) {
+            $errors['tipo'] = 'O tipo não foi informado ou é inválido';
+        }
+        if (is_null($this->getQuantidade())) {
+            $errors['quantidade'] = 'A quantidade não pode ser vazia';
         }
         if (!empty($errors)) {
             throw new \MZ\Exception\ValidationException($errors);

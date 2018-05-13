@@ -1635,7 +1635,7 @@ Gerenciar.movimentacao = {};
 Gerenciar.movimentacao.init = function() {
   ajaxLink();
   $('#search').focus();
-  $('#aberto, #caixaid').change(function() {
+  $('#aberta, #caixaid').change(function() {
     $(this)
       .closest('form')
       .submit();

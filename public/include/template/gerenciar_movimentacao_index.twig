@@ -11,11 +11,11 @@
     </div>
     <form method="get" action="/gerenciar/movimentacao/" id="search-form">
       <div class="form-group col-lg-3 col-md-2 col-sm-2 col-xs-6">
-        <label for="aberto">Estado:</label>
-        <select class="form-control" id="aberto" name="aberto">
-          <option value="" {{ !array_key_exists($this->get('aberto'), $estados) ? 'selected': '' }}>Todos</option>
+        <label for="aberta">Estado:</label>
+        <select class="form-control" id="aberta" name="aberta">
+          <option value="" {{ !array_key_exists($this->get('aberta'), $estados) ? 'selected': '' }}>Todos</option>
           {% for $value, $text in $estados %}
-            <option value="{{ $value }}" {{ $this->get('aberto') == $value ? 'selected': '' }}>{{ $text }}</option>
+            <option value="{{ $value }}" {{ $this->get('aberta') == $value ? 'selected': '' }}>{{ $text }}</option>
           {% endfor %}
         </select>
       </div>

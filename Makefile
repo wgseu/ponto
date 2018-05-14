@@ -10,6 +10,7 @@ help:
 	@echo "usage: make COMMAND"
 	@echo ""
 	@echo "Commands:"
+	@echo "  term         Open docker terminal (Windows 7 Only)"
 	@echo "  start        Create and start containers"
 	@echo "  populate     Recreate and populate database"
 	@echo "  update       Update PHP dependencies with composer"
@@ -40,6 +41,9 @@ init:
 doc:
 	@docker-compose exec -T php ./public/include/vendor/bin/apigen generate app --destination docs/api
 	@make -s reset
+
+term:
+	@utils\docker-term $(CURDIR)
 
 clean: stop
 	@rm -Rf storage
@@ -110,6 +114,7 @@ class:
 
 reset:
 	@chmod 777 public/include/compiled
+	@chmod 777 public/include/logs
 	@chmod 777 public/static/doc/conta
 	@chmod 777 public/static/doc/cert
 	@chmod 777 public/static/img/categoria

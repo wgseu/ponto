@@ -28,6 +28,7 @@ $[table.end]
 
 use MZ\Util\Filter;
 use MZ\Util\Validator;
+use MZ\Exception\ValidationException;
 
 $[table.if(comment)]
 /**
@@ -378,7 +379,7 @@ $[field.else]
 $[field.end]
 $[field.end]
         if (!empty($errors)) {
-            throw new \MZ\Exception\ValidationException($errors);
+            throw new ValidationException($errors);
         }
         return $this->toArray();
     }
@@ -392,7 +393,7 @@ $[field.end]
     {
 $[table.each(unique)]
         if (contains([$[unique.each(all)]'$[Field]', $[unique.end]'UNIQUE'], $e->getMessage())) {
-            return new \MZ\Exception\ValidationException([
+            return new ValidationException([
 $[unique.each(all)]
                 '$[field]' => sprintf(
                     '$[FIELD.gender] $[field.name] "%s" já está cadastrad$[field.gender]',

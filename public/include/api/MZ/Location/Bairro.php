@@ -27,6 +27,7 @@ namespace MZ\Location;
 use MZ\Util\Filter;
 use MZ\Util\Validator;
 use MZ\System\Permissao;
+use MZ\Exception\ValidationException;
 
 /**
  * Bairro de uma cidade
@@ -285,7 +286,7 @@ class Bairro extends \MZ\Database\Helper
             $errors['disponivel'] = 'A disponibilidade de entrega é inválida';
         }
         if (!empty($errors)) {
-            throw new \MZ\Exception\ValidationException($errors);
+            throw new ValidationException($errors);
         }
         return $this->toArray();
     }
@@ -293,12 +294,12 @@ class Bairro extends \MZ\Database\Helper
     /**
      * Translate SQL exception into application exception
      * @param  \Exception $e exception to translate into a readable error
-     * @return \MZ\Exception\ValidationException new exception translated
+     * @return ValidationException new exception translated
      */
     protected function translate($e)
     {
         if (contains(['CidadeID', 'Nome', 'UNIQUE'], $e->getMessage())) {
-            return new \MZ\Exception\ValidationException([
+            return new ValidationException([
                 'cidadeid' => vsprintf(
                     'A cidade "%s" já está cadastrada',
                     [$this->getCidadeID()]
@@ -360,7 +361,17 @@ class Bairro extends \MZ\Database\Helper
         $bairro->setNome($nome);
         $bairro->setValorEntrega(0.0);
         $bairro->filter(new Bairro());
-        return $bairro->insert();
+        try {
+            $bairro->insert();
+        } catch (ValidationException $e) {
+            $errors = $e->getErrors();
+            if (isset($errors['nome'])) {
+                $errors['bairro'] = $errors['nome'];
+                unset($errors['nome']);
+            }
+            throw new ValidationException($errors);
+        }
+        return $bairro;
     }
 
     /**

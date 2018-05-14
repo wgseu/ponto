@@ -27,6 +27,7 @@ namespace MZ\Location;
 use MZ\Util\Filter;
 use MZ\Util\Validator;
 use MZ\System\Permissao;
+use MZ\Exception\ValidationException;
 
 /**
  * Cidade de um estado, contém bairros
@@ -239,7 +240,7 @@ class Cidade extends \MZ\Database\Helper
             $errors['cep'] = sprintf('O %s é inválido', _p('Titulo', 'CEP'));
         }
         if (!empty($errors)) {
-            throw new \MZ\Exception\ValidationException($errors);
+            throw new ValidationException($errors);
         }
         return $this->toArray();
     }
@@ -247,12 +248,12 @@ class Cidade extends \MZ\Database\Helper
     /**
      * Translate SQL exception into application exception
      * @param  \Exception $e exception to translate into a readable error
-     * @return \MZ\Exception\ValidationException new exception translated
+     * @return ValidationException new exception translated
      */
     protected function translate($e)
     {
         if (contains(['EstadoID', 'Nome', 'UNIQUE'], $e->getMessage())) {
-            return new \MZ\Exception\ValidationException([
+            return new ValidationException([
                 'estadoid' => vsprintf(
                     'O estado "%s" já está cadastrado',
                     [$this->getEstadoID()]
@@ -264,7 +265,7 @@ class Cidade extends \MZ\Database\Helper
             ]);
         }
         if (contains(['CEP', 'UNIQUE'], $e->getMessage())) {
-            return new \MZ\Exception\ValidationException([
+            return new ValidationException([
                 'cep' => vsprintf(
                     'O %s "%s" já está cadastrado',
                     [
@@ -336,7 +337,17 @@ class Cidade extends \MZ\Database\Helper
         $cidade->setEstadoID($estado_id);
         $cidade->setNome($nome);
         $cidade->filter(new Cidade());
-        return $cidade->insert();
+        try {
+            $cidade->insert();
+        } catch (ValidationException $e) {
+            $errors = $e->getErrors();
+            if (isset($errors['nome'])) {
+                $errors['cidade'] = $errors['nome'];
+                unset($errors['nome']);
+            }
+            throw new ValidationException($errors);
+        }
+        return $cidade;
     }
 
     /**

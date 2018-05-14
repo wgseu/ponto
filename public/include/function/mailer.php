@@ -64,7 +64,6 @@ function mail_contato($email, $nome, $assunto, $mensagem)
     $from = get_string_config('Email', 'From', $user);
     $to = $company->getNome().' <'.$from.'>';
     $vars = [
-        'clientphone' => $fone,
         'message' => $mensagem,
         'automatico' => false,
         'from_name' => $nome.' - '.$email,

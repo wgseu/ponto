@@ -1238,6 +1238,20 @@ class Cliente extends \MZ\Database\Helper
     }
 
     /**
+     * Load image data from blob field on database
+     * @return Cliente Self instance with imagem field filled
+     */
+    public function loadImagem()
+    {
+        $imagem = self::getDB()->from('Clientes c')
+            ->select(null)
+            ->select('c.imagem')
+            ->where('c.id', $this->getID())
+            ->fetchColumn();
+        return $this->setImagem($imagem);
+    }
+
+    /**
      * Informa quem é o acionista principal da empresa, obrigatoriamente o
      * cliente deve ser uma pessoa jurídica e o acionista uma pessoa física
      * @return \MZ\Account\Cliente The object fetched from database

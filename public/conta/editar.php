@@ -24,6 +24,8 @@
  */
 require_once(dirname(__DIR__) . '/app.php');
 
+use MZ\Account\Cliente;
+
 need_login(is_output('json'));
 $cliente = logged_user();
 

@@ -236,7 +236,7 @@ function template($tFile)
     return $app->getResponse('html')->output($tFile);
 }
 
-function render($tFile, $vs=[], $hook = true)
+function render($tFile, $vs = [], $hook = true)
 {
     global $app;
 
@@ -244,7 +244,7 @@ function render($tFile, $vs=[], $hook = true)
     foreach ($vs as $_k => $_v) {
         $render->{$_k} = $_v;
     }
-    $content = $render->render($tFile);
+    $content = $render->render($tFile . '.twig');
     if ($hook) {
         $content = render_hook($content);
     }

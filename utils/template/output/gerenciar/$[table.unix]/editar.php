@@ -26,6 +26,7 @@ require_once(dirname(__DIR__) . '/app.php');
 
 use $[Table.package]\$[Table.norm];
 use MZ\System\Permissao;
+use MZ\Exception\ValidationException;
 
 need_permission(Permissao::NOME_$[TABLE.style], is_output('json'));
 $$[primary.unix] = isset($_GET['$[primary.unix]']) ? $_GET['$[primary.unix]'] : null;
@@ -58,7 +59,7 @@ if (is_post()) {
         redirect('/gerenciar/$[table.unix]/');
     } catch (\Exception $e) {
         $$[table.unix]->clean($old_$[table.unix]);
-        if ($e instanceof \MZ\Exception\ValidationException) {
+        if ($e instanceof ValidationException) {
             $errors = $e->getErrors();
         }
         if (is_output('json')) {

@@ -26,6 +26,7 @@ require_once(dirname(__DIR__) . '/app.php');
 
 use $[Table.package]\$[Table.norm];
 use MZ\System\Permissao;
+use MZ\Exception\ValidationException;
 $[table.exists(date|datetime)]
 use MZ\Database\Helper;
 $[table.end]
@@ -63,7 +64,7 @@ if (is_post()) {
         redirect('/gerenciar/$[table.unix]/');
     } catch (\Exception $e) {
         $$[table.unix]->clean($old_$[table.unix]);
-        if ($e instanceof \MZ\Exception\ValidationException) {
+        if ($e instanceof ValidationException) {
             $errors = $e->getErrors();
         }
         if (is_output('json')) {

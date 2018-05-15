@@ -156,7 +156,7 @@ class NFeDB extends \NFe\Database\Estatico
                 break;
         }
         $nota->setAmbiente(\NFeUtil::toAmbiente($_nota->getAmbiente()));
-        $_nota->setDataEmissao($nota->getDataEmissao());
+        $_nota->setDataEmissao(Helper::now($nota->getDataEmissao()));
         $_nota->update();
         /* Destinatário */
         $destinatario = null;

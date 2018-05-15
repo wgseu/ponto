@@ -225,7 +225,7 @@ Gerenciar.common.autocomplete = function(
     $(field).val('');
     $(field).removeAttr(attribute);
     var spanId = $(input)
-      .closest('div')
+      .closest('.form-group')
       .find('label .identifier');
     spanId.text('');
     if (selectfn != undefined && selectfn != null) selectfn(null);
@@ -255,7 +255,7 @@ Gerenciar.common.autocomplete = function(
       $(field).val(suggestion.data.id);
       $(field).attr(attribute, display.value);
       var spanId = $(input)
-        .closest('div')
+        .closest('.form-group')
         .find('label .identifier');
       spanId.text(display.title);
       if (selectfn != undefined && selectfn != null) selectfn(suggestion.data);
@@ -2688,7 +2688,7 @@ Gerenciar.sistema.initEmail = function(focus_ctrl) {
     case '2':
       port = 587;
       break;
-    // default: 25
+      // default: 25
     }
     $('#porta').val(port);
   });
@@ -3248,6 +3248,15 @@ Gerenciar.integracao.cardInit = function(service) {
       } else {
         imgdiv.css('background-position', '0px 0px');
       }
+    });
+  });
+};
+
+var Notification = {};
+Notification.show = function(notifications) {
+  notifications.forEach(function(notify) {
+    $('.thunder-container').message(notify.type, notify.msg, {
+      autoClose: { enable: notify.auto_close }
     });
   });
 };

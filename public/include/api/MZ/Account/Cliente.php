@@ -1563,8 +1563,10 @@ class Cliente extends \MZ\Database\Helper
             $field = 'email';
         } elseif (Validator::checkCPF($login) || Validator::checkCNPJ($login)) {
             $field = 'cpf';
+            $login = Filter::digits($login);
         } elseif (Validator::checkPhone($login)) {
             $field = 'fone1';
+            $login = Filter::digits($login);
         } else {
             $field = 'login';
         }

@@ -364,6 +364,7 @@ class Caixa extends \MZ\Database\Helper
      */
     public static function resetBySerie($serie)
     {
+        // TODO: convert to incremental version
         try {
             self::getDB()
                 ->update('Caixas')

@@ -45,10 +45,11 @@ if (isset($_GET['busca'])) {
     $condition['search'] = $_GET['busca'];
 }
 $estoque = isset($_GET['estoque']) ? intval($_GET['estoque']) : 0;
+// estoque == -1 mostra todos os produtos para funcionários
+// estoque ==  0 mostra todos os produtos disponíveis
+// estoque ==  1 mostra apenas produtos de estoque para funcionários
 $negativo = is_boolean_config('Estoque', 'Estoque.Negativo');
-if ($estoque > 0) {
-    $condition['permitido'] = 'Y';
-    $condition['visivel'] = 'Y';
+if ($estoque > 0 && is_manager()) {
     $condition['tipo'] = Produto::TIPO_PRODUTO;
 } elseif ($estoque == 0 || !is_manager()) {
     if (!$negativo) {

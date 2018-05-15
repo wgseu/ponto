@@ -280,7 +280,6 @@ class NFeAPI extends \NFe\Common\Ajuste
 
         // não salva o evento, pois será salvo no onNotaErro
         if ($_nota->getAcao() == Nota::ACAO_CANCELAR && is_null($_nota->getProtocolo())) {
-            $data_emissao = strtotime($_nota->getDataEmissao());
             // só deveria inutilizar depois de 10 min após a tentativa de autorizar a nota
             // se a intenção era cancelar uma nota sem protocolo, então muda para inutilização
             // pois a rejeição foi resultante de uma consulta do status da nota pela chave de acesso

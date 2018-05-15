@@ -74,6 +74,6 @@ if (is_post()) {
     $patrimonio->setLargura(0.0);
     $patrimonio->setComprimento(0.0);
     $patrimonio->setValor(0.0);
-    $patrimonio->setAtivo('N');
+    $patrimonio->setAtivo('Y');
 }
 $app->getResponse('html')->output('gerenciar_patrimonio_cadastrar');

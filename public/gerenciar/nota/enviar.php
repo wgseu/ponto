@@ -69,7 +69,7 @@ try {
         $filters['Série'] = intval($nota->getSerie());
     }
     if (trim($nota->getAmbiente()) != '') {
-        $filters['Ambiente'] = Nota::getAmbienteOptions($nota->getAmbiente());;
+        $filters['Ambiente'] = Nota::getAmbienteOptions($nota->getAmbiente());
     }
     if ($nota->isContingencia()) {
         $filters['Contingência'] = 'Sim';

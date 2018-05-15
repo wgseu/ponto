@@ -29,5 +29,20 @@
     </div>
   </footer>
   <script src="/static/js/index.min.js"></script>
+  <script type="text/javascript">
+    {% $thunder = \Thunder::execute() %}
+    var n = [
+      {% for $message in $thunder %}
+        {
+          type: '{{ $message['type'] }}',
+          msg: '{{ $message['text'] }}',
+          auto_close: {{ $message['auto_close'] }}
+        },
+      {% endfor %}
+    ];
+    $(function () {
+      Notification.show(n);
+    });
+  </script>
 </body>
 </html>

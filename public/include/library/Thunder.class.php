@@ -24,35 +24,12 @@
  */
 class Thunder
 {
-    private static $idRefMap = [];
-    
-    private static function ShowMessage($type, $msg, $auto_close, $execute)
-    {
-        $div_id = '';
-        if (isset(self::$idRefMap[$type]) && self::$idRefMap[$type] > 0) {
-            $div_id = '_'.self::$idRefMap[$type];
-        } else {
-            self::$idRefMap[$type] = 0;
-        }
-        echo '<div id="thunder-'.$type.$div_id.'" class="thunder-notify thunder-container"></div>'."\r\n";
-        if (!$execute) {
-            return;
-        }
-        echo '<script type="text/javascript">$(function () { $("#thunder-'.$type.$div_id.'").message("'.$type.'", '.$msg;
-        if ($auto_close) {
-            echo ', { autoClose: { enable: true } }';
-        }
-        echo ');});</script>'."\r\n";
-        self::$idRefMap[$type]++;
-    }
-    
     private static function message($type, $msg, $auto_close)
     {
         $messages = [];
         if (Session::Get('thunder') != null) {
             $messages = unserialize(Session::Get('thunder', true));
         }
-        $msg = json_encode($msg);
         $messages[] = ['type' => $type, 'data' => ['message' => $msg, 'auto_close' => $auto_close]];
         Session::Set('thunder', serialize($messages));
     }
@@ -77,18 +54,20 @@ class Thunder
         self::message('information', $msg, $auto_close);
     }
 
-    public static function Execute()
+    public static function execute()
     {
         $messages = [];
         if (Session::Get('thunder') != null) {
             $messages = unserialize(Session::Get('thunder', true));
         }
+        $values = [];
         foreach ($messages as $type => $value) {
-            self::ShowMessage($value['type'], $value['data']['message'], $value['data']['auto_close'], true);
+            $values[] = [
+                'type' => $value['type'],
+                'text' => $value['data']['message'],
+                'auto_close' => $value['data']['auto_close'] ? 'true': 'false'
+            ];
         }
-        if (count($messages) == 0) {
-            self::ShowMessage('information', null, false, false);
-        }
-        self::$idRefMap = [];
+        return $values;
     }
 }

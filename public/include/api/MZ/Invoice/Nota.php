@@ -802,7 +802,7 @@ class Nota extends \MZ\Database\Helper
             $this->setMotivo($nota['motivo']);
         }
         if (!isset($nota['contingencia'])) {
-            $this->setContingencia(null);
+            $this->setContingencia('N');
         } else {
             $this->setContingencia($nota['contingencia']);
         }
@@ -827,12 +827,12 @@ class Nota extends \MZ\Database\Helper
             $this->setDetalhes($nota['detalhes']);
         }
         if (!isset($nota['corrigido'])) {
-            $this->setCorrigido(null);
+            $this->setCorrigido('N');
         } else {
             $this->setCorrigido($nota['corrigido']);
         }
         if (!isset($nota['concluido'])) {
-            $this->setConcluido(null);
+            $this->setConcluido('N');
         } else {
             $this->setConcluido($nota['concluido']);
         }
@@ -842,12 +842,12 @@ class Nota extends \MZ\Database\Helper
             $this->setDataAutorizacao($nota['dataautorizacao']);
         }
         if (!isset($nota['dataemissao'])) {
-            $this->setDataEmissao(null);
+            $this->setDataEmissao(self::now());
         } else {
             $this->setDataEmissao($nota['dataemissao']);
         }
         if (!isset($nota['datalancamento'])) {
-            $this->setDataLancamento(null);
+            $this->setDataLancamento(self::now());
         } else {
             $this->setDataLancamento($nota['datalancamento']);
         }
@@ -935,29 +935,17 @@ class Nota extends \MZ\Database\Helper
     public function validate()
     {
         $errors = [];
-        if (is_null($this->getTipo())) {
-            $errors['tipo'] = 'O tipo não pode ser vazio';
+        if (!Validator::checkInSet($this->getTipo(), self::getTipoOptions())) {
+            $errors['tipo'] = 'O tipo não foi informado ou é inválido';
         }
-        if (!Validator::checkInSet($this->getTipo(), self::getTipoOptions(), true)) {
-            $errors['tipo'] = 'O tipo é inválido';
+        if (!Validator::checkInSet($this->getAmbiente(), self::getAmbienteOptions())) {
+            $errors['ambiente'] = 'O ambiente não foi informado ou é inválido';
         }
-        if (is_null($this->getAmbiente())) {
-            $errors['ambiente'] = 'O ambiente não pode ser vazio';
+        if (!Validator::checkInSet($this->getAcao(), self::getAcaoOptions())) {
+            $errors['acao'] = 'A ação não foi informada ou é inválida';
         }
-        if (!Validator::checkInSet($this->getAmbiente(), self::getAmbienteOptions(), true)) {
-            $errors['ambiente'] = 'O ambiente é inválido';
-        }
-        if (is_null($this->getAcao())) {
-            $errors['acao'] = 'A ação não pode ser vazia';
-        }
-        if (!Validator::checkInSet($this->getAcao(), self::getAcaoOptions(), true)) {
-            $errors['acao'] = 'A ação é inválida';
-        }
-        if (is_null($this->getEstado())) {
-            $errors['estado'] = 'O estado não pode ser vazio';
-        }
-        if (!Validator::checkInSet($this->getEstado(), self::getEstadoOptions(), true)) {
-            $errors['estado'] = 'O estado é inválido';
+        if (!Validator::checkInSet($this->getEstado(), self::getEstadoOptions())) {
+            $errors['estado'] = 'O estado não foi informado ou é inválido';
         }
         if (is_null($this->getSerie())) {
             $errors['serie'] = 'A série não pode ser vazia';
@@ -966,28 +954,22 @@ class Nota extends \MZ\Database\Helper
             $errors['numeroinicial'] = 'O número não pode ser vazio';
         }
         if (is_null($this->getNumeroFinal())) {
-            $errors['numerofinal'] = 'O número inicial não pode ser vazio';
+            $errors['numerofinal'] = 'O número final não pode ser vazio';
         }
         if (is_null($this->getSequencia())) {
-            $errors['sequencia'] = 'O sequencia não pode ser vazio';
+            $errors['sequencia'] = 'A sequencia não pode ser vazia';
         }
-        if (is_null($this->getContingencia())) {
-            $errors['contingencia'] = 'A contingência não pode ser vazia';
+        if (!Validator::checkBoolean($this->getContingencia())) {
+            $errors['contingencia'] = 'A contingência não foi informada ou é inválida';
         }
-        if (!Validator::checkBoolean($this->getContingencia(), true)) {
-            $errors['contingencia'] = 'A contingência é inválida';
-        }
-        if (is_null($this->getCorrigido())) {
-            $errors['corrigido'] = 'O corrigido não pode ser vazio';
-        }
-        if (!Validator::checkBoolean($this->getCorrigido(), true)) {
-            $errors['corrigido'] = 'O corrigido é inválido';
+        if (!Validator::checkBoolean($this->getCorrigido())) {
+            $errors['corrigido'] = 'A correção não foi informada ou é inválida';
         }
         if (is_null($this->getConcluido())) {
             $errors['concluido'] = 'O concluído não pode ser vazio';
         }
-        if (!Validator::checkBoolean($this->getConcluido(), true)) {
-            $errors['concluido'] = 'O concluído é inválido';
+        if (!Validator::checkBoolean($this->getConcluido())) {
+            $errors['concluido'] = 'A conclusão não foi informada ou é inválida';
         }
         if (is_null($this->getDataEmissao())) {
             $errors['dataemissao'] = 'A data de emissão não pode ser vazia';
@@ -1101,9 +1083,9 @@ class Nota extends \MZ\Database\Helper
         $nota->setDetalhes(null);
         $nota->setCorrigido('Y');
         $nota->setConcluido('N');
-        $nota->setDataEmissao(null);
         $nota->setDataAutorizacao(null);
-        $nota->setDataLancamento(null);
+        $nota->setDataEmissao(self::now());
+        $nota->setDataLancamento(self::now());
         // utiliza o pedido da base
         $nota->setPedidoID($this->getPedidoID());
         // verifica se o número inicial do caixa deve ser o próximo

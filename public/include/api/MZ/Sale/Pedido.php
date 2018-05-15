@@ -27,6 +27,7 @@ namespace MZ\Sale;
 use MZ\Util\Filter;
 use MZ\Util\Validator;
 use MZ\System\Permissao;
+use MZ\Payment\Pagamento;
 
 /**
  * Informações do pedido de venda
@@ -925,9 +926,9 @@ class Pedido extends \MZ\Database\Helper
     public function checkSaldo($subtotal)
     {
         if ($this->getTipo() == self::TIPO_COMANDA && is_boolean_config('Comandas', 'PrePaga')) {
-            $itens_total = $this->getTotalItens();
+            $itens_total = $this->findTotal(true);
             $total = $subtotal + $itens_total;
-            $pagamentos_total = $this->getTotalPagamentos();
+            $pagamentos_total = $this->findPagamentoTotal();
             $restante = $itens_total - $pagamentos_total;
             $msg = 'Saldo insuficiente para a realização do pedido, Necessário: %s, Saldo atual: %s';
             if ($total > $pagamentos_total) {
@@ -1160,6 +1161,11 @@ class Pedido extends \MZ\Database\Helper
         return \MZ\Employee\Funcionario::findByID($this->getFechadorID());
     }
 
+    /**
+     * Retorna o total vendido do pedido com informações detalhadas ou resumida
+     * @param  bool $resumido informa se deve retornar apenas o total do pedido
+     * @return mixed array com os totais detalhados ou apenas o total se for resumido
+     */
     public function findTotal($resumido = false)
     {
         $query = self::getDB()->from('Pedidos p')
@@ -1178,6 +1184,14 @@ class Pedido extends \MZ\Database\Helper
             return $row['total'];
         }
         return $row;
+    }
+
+    /**
+     * Obtem o total pago para esse pedido
+     */
+    public function findPagamentoTotal()
+    {
+        return Pagamento::rawFindTotal(['pedidoid' => $this->getID()]);
     }
 
     /**

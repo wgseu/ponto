@@ -59,4 +59,4 @@ foreach ($mesas as $item) {
     }
     $items[] = $item;
 }
-json('mesas', $mesas);
+json('mesas', $items);

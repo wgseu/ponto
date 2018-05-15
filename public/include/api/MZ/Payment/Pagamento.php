@@ -1117,9 +1117,9 @@ class Pagamento extends \MZ\Database\Helper
     }
 
     /**
-     * Search one register with a condition
-     * @param  array $condition Condition for searching the row
-     * @return Pagamento A filled Pagamento or empty instance
+     * Retorna a soma dos pagamentos válidos com base na condição informada
+     * @param  array $condition Condition for sum payments
+     * @return float A soma total dos pagamentos
      */
     public static function rawFindTotal($condition)
     {

@@ -41,7 +41,8 @@ class Synchronizer
     public function __construct()
     {
         // open socket
-        $this->socket = @fsockopen('127.0.0.1', 6219, $errno, $errstr);
+        $host = getenv('SYNC_HOST') ?: '127.0.0.1';
+        $this->socket = @fsockopen($host, 6219, $errno, $errstr);
         if ($this->socket === false) {
             throw new \Exception('O servidor do GrandChef está fechado', $errno);
         }

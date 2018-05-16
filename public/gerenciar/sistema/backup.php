@@ -8,7 +8,7 @@ need_permission(Permissao::NOME_BACKUP, true);
 try {
     set_time_limit(0);
     // Prepare File
-    $file = tempnam("tmp", "zip");
+    $file = tempnam(sys_get_temp_dir(), 'zip');
     $zip = new \ZipArchive();
     $zip->open($file, \ZipArchive::OVERWRITE);
 

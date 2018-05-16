@@ -27,6 +27,7 @@ namespace MZ\Sale;
 use MZ\Util\Filter;
 use MZ\Util\Validator;
 use MZ\Stock\Estoque;
+use MZ\Product\Composicao;
 use MZ\Exception\ValidationException;
 
 /**
@@ -805,11 +806,11 @@ class ProdutoPedido extends \MZ\Database\Helper
 
     public function getDestino($values)
     {
-        switch ($values['pedido_tipo']) {
+        switch ($values['pedidotipo']) {
             case \Pedido::TIPO_MESA:
-                return $values['mesa_nome'];
+                return $values['mesanome'];
             case \Pedido::TIPO_COMANDA:
-                return $values['comanda_nome'];
+                return $values['comandanome'];
             case \Pedido::TIPO_AVULSO:
                 return 'Balcão';
             default:
@@ -1265,7 +1266,7 @@ class ProdutoPedido extends \MZ\Database\Helper
                 ->select('l.login as funcionariologin')
                 ->select('COALESCE(s.descricao, COALESCE(p.descricao, d.descricao)) as produtodescricao')
                 ->select('d.dataatualizacao as produtodataatualizacao')
-                ->select('e.tipo as pedido_tipo')
+                ->select('e.tipo as pedidotipo')
                 ->select('d.tipo as produtotipo')
                 ->select('d.conteudo as produtoconteudo')
                 ->select('u.sigla as unidadesigla')
@@ -1276,8 +1277,8 @@ class ProdutoPedido extends \MZ\Database\Helper
                     self::concat(['d.id', '".png"']).
                     ' END) as imagemurl'
                 )
-                ->select('m.nome as mesa_nome')
-                ->select('c.nome as comanda_nome')
+                ->select('m.nome as mesanome')
+                ->select('c.nome as comandanome')
 
                 ->leftJoin('Unidades u ON u.id = d.unidadeid')
                 ->leftJoin('Funcionarios f ON f.id = p.funcionarioid')

@@ -83,6 +83,7 @@ $campos = [
 ];
 $items = [];
 foreach ($pedidos as $_pedido) {
+    $_pedido['tipo'] = $_pedido['pedidotipo'];
     $item = array_intersect_key($_pedido, array_flip($campos));
     $item['imagemurl'] = get_image_url($item['imagemurl'], 'produto', null);
     $items[] = $item;

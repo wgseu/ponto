@@ -403,7 +403,7 @@ class Mesa extends \MZ\Database\Helper
                 ->select('s.nome as juntanome')
                 ->leftJoin(
                     'Pedidos p ON p.mesaid = m.id AND p.tipo = ? AND p.cancelado = ? AND p.estado <> ?',
-                    Pedido::TIPO_COMANDA,
+                    Pedido::TIPO_MESA,
                     'N',
                     Pedido::ESTADO_FINALIZADO
                 )

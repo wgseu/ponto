@@ -48,6 +48,7 @@ $pacotes = Pacote::rawFindAll($condition, [], $limite);
 $items = [];
 foreach ($pacotes as $item) {
     $folder = is_null($item['produtoid']) ? 'propriedade': 'produto';
+    $item['quantidade'] = 1;
     $item['imagemurl'] = get_image_url($item['imagemurl'], $folder, null);
     $items[] = $item;
 }

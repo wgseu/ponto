@@ -456,9 +456,9 @@ class Order extends Pedido
                 throw new \Exception('Tipo de lançamento não suportado nessa versão', 500);
             }
         }
-        $this->setMesaID(isset($data['mesa']) ? intval($data['mesa']) : null);
+        $this->setMesaID(isset($data['mesa']) && $data['mesa'] ? intval($data['mesa']) : null);
         $this->setComandaID(isset($data['comanda']) ? intval($data['comanda']) : null);
-        if (isset($data['cliente'])) {
+        if (isset($data['cliente']) && check_fone($data['cliente'], true)) {
             $this->customer = Cliente::findByFone($data['cliente']);
             if (!$this->customer->exists()) {
                 $this->customer = null;

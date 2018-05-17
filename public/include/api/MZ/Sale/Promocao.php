@@ -24,6 +24,8 @@
  */
 namespace MZ\Sale;
 
+use MZ\Database\Model;
+use MZ\Database\DB;
 use MZ\Util\Filter;
 use MZ\Util\Validator;
 
@@ -31,7 +33,7 @@ use MZ\Util\Validator;
  * Informa se há descontos nos produtos em determinados dias da semana, o
  * preço pode subir ou descer
  */
-class Promocao extends \MZ\Database\Helper
+class Promocao extends Model
 {
 
     /**
@@ -342,7 +344,7 @@ class Promocao extends \MZ\Database\Helper
         $values = $this->validate();
         unset($values['id']);
         try {
-            $id = self::getDB()->insertInto('Promocoes')->values($values)->execute();
+            $id = DB::insertInto('Promocoes')->values($values)->execute();
             $this->loadByID($id);
         } catch (\Exception $e) {
             throw $this->translate($e);
@@ -362,10 +364,9 @@ class Promocao extends \MZ\Database\Helper
         if (!$this->exists()) {
             throw new \Exception('O identificador da promoção não foi informado');
         }
-        $values = self::filterValues($values, $only, $except);
+        $values = DB::filterValues($values, $only, $except);
         try {
-            self::getDB()
-                ->update('Promocoes')
+            DB::update('Promocoes')
                 ->set($values)
                 ->where('id', $this->getID())
                 ->execute();
@@ -385,8 +386,7 @@ class Promocao extends \MZ\Database\Helper
         if (!$this->exists()) {
             throw new \Exception('O identificador da promoção não foi informado');
         }
-        $result = self::getDB()
-            ->deleteFrom('Promocoes')
+        $result = DB::deleteFrom('Promocoes')
             ->where('id', $this->getID())
             ->execute();
         return $result;
@@ -455,11 +455,11 @@ class Promocao extends \MZ\Database\Helper
      */
     private static function query($condition = [], $order = [])
     {
-        $query = self::getDB()->from('Promocoes p');
+        $query = DB::from('Promocoes p');
         $condition = self::filterCondition($condition);
-        $query = self::buildOrderBy($query, self::filterOrder($order));
+        $query = DB::buildOrderBy($query, self::filterOrder($order));
         $query = $query->orderBy('p.id ASC');
-        return self::buildCondition($query, $condition);
+        return DB::buildCondition($query, $condition);
     }
 
     /**
@@ -482,9 +482,8 @@ class Promocao extends \MZ\Database\Helper
      */
     public static function findByID($id)
     {
-        return self::find([
-            'id' => intval($id),
-        ]);
+        $result = new self();
+        return $result->loadByID($id);
     }
 
     /**

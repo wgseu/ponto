@@ -24,6 +24,8 @@
  */
 namespace MZ\Product;
 
+use MZ\Database\Model;
+use MZ\Database\DB;
 use MZ\Util\Filter;
 use MZ\Util\Validator;
 
@@ -31,7 +33,7 @@ use MZ\Util\Validator;
  * Grupos de pacotes, permite criar grupos como Tamanho, Sabores para
  * formações de produtos
  */
-class Grupo extends \MZ\Database\Helper
+class Grupo extends Model
 {
 
     /**
@@ -442,7 +444,7 @@ class Grupo extends \MZ\Database\Helper
         $values = $this->validate();
         unset($values['id']);
         try {
-            $id = self::getDB()->insertInto('Grupos')->values($values)->execute();
+            $id = DB::insertInto('Grupos')->values($values)->execute();
             $this->loadByID($id);
         } catch (\Exception $e) {
             throw $this->translate($e);
@@ -462,10 +464,9 @@ class Grupo extends \MZ\Database\Helper
         if (!$this->exists()) {
             throw new \Exception('O identificador do grupo não foi informado');
         }
-        $values = self::filterValues($values, $only, $except);
+        $values = DB::filterValues($values, $only, $except);
         try {
-            self::getDB()
-                ->update('Grupos')
+            DB::update('Grupos')
                 ->set($values)
                 ->where('id', $this->getID())
                 ->execute();
@@ -485,8 +486,7 @@ class Grupo extends \MZ\Database\Helper
         if (!$this->exists()) {
             throw new \Exception('O identificador do grupo não foi informado');
         }
-        $result = self::getDB()
-            ->deleteFrom('Grupos')
+        $result = DB::deleteFrom('Grupos')
             ->where('id', $this->getID())
             ->execute();
         return $result;
@@ -612,11 +612,11 @@ class Grupo extends \MZ\Database\Helper
      */
     private static function query($condition = [], $order = [])
     {
-        $query = self::getDB()->from('Grupos g');
+        $query = DB::from('Grupos g');
         $condition = self::filterCondition($condition);
-        $query = self::buildOrderBy($query, self::filterOrder($order));
+        $query = DB::buildOrderBy($query, self::filterOrder($order));
         $query = $query->orderBy('g.id ASC');
-        return self::buildCondition($query, $condition);
+        return DB::buildCondition($query, $condition);
     }
 
     /**
@@ -627,16 +627,16 @@ class Grupo extends \MZ\Database\Helper
      */
     private static function queryEx($condition = [], $order = [])
     {
-        $query = self::getDB()->from('Grupos g')
+        $query = DB::from('Grupos g')
             ->select('a.grupoid as grupoassociadoid')
             ->innerJoin('Pacotes c ON c.grupoid = g.id')
             ->leftJoin('Pacotes p ON p.grupoid = c.grupoid AND p.id > c.id')
             ->leftJoin('Pacotes a ON a.id = c.associacaoid')
             ->where(['p.id' => null]);
         $condition = self::filterCondition($condition);
-        $query = self::buildOrderBy($query, self::filterOrder($order));
+        $query = DB::buildOrderBy($query, self::filterOrder($order));
         $query = $query->orderBy('g.id ASC');
-        return self::buildCondition($query, $condition);
+        return DB::buildCondition($query, $condition);
     }
 
     /**
@@ -659,9 +659,8 @@ class Grupo extends \MZ\Database\Helper
      */
     public static function findByID($id)
     {
-        return self::find([
-            'id' => intval($id),
-        ]);
+        $result = new self();
+        return $result->loadByID($id);
     }
 
     /**
@@ -672,10 +671,8 @@ class Grupo extends \MZ\Database\Helper
      */
     public static function findByProdutoIDDescricao($produto_id, $descricao)
     {
-        return self::find([
-            'produtoid' => intval($produto_id),
-            'descricao' => strval($descricao),
-        ]);
+        $result = new self();
+        return $result->loadByProdutoIDDescricao($produto_id, $descricao);
     }
 
     /**

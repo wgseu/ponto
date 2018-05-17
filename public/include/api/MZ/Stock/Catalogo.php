@@ -24,13 +24,15 @@
  */
 namespace MZ\Stock;
 
+use MZ\Database\Model;
+use MZ\Database\DB;
 use MZ\Util\Filter;
 use MZ\Util\Validator;
 
 /**
  * Informa a lista de produtos disponíveis nos fornecedores
  */
-class Catalogo extends \MZ\Database\Helper
+class Catalogo extends Model
 {
 
     /**
@@ -440,7 +442,7 @@ class Catalogo extends \MZ\Database\Helper
         $values = $this->validate();
         unset($values['id']);
         try {
-            $id = self::getDB()->insertInto('Catalogos')->values($values)->execute();
+            $id = DB::insertInto('Catalogos')->values($values)->execute();
             $this->loadByID($id);
         } catch (\Exception $e) {
             throw $this->translate($e);
@@ -458,10 +460,9 @@ class Catalogo extends \MZ\Database\Helper
         if (!$this->exists()) {
             throw new \Exception('O identificador do catálogo de produtos não foi informado');
         }
-        $values = self::filterValues($values, $only, $except);
+        $values = DB::filterValues($values, $only, $except);
         try {
-            self::getDB()
-                ->update('Catalogos')
+            DB::update('Catalogos')
                 ->set($values)
                 ->where('id', $this->getID())
                 ->execute();
@@ -481,8 +482,7 @@ class Catalogo extends \MZ\Database\Helper
         if (!$this->exists()) {
             throw new \Exception('O identificador do catálogo de produtos não foi informado');
         }
-        $result = self::getDB()
-            ->deleteFrom('Catalogos')
+        $result = DB::deleteFrom('Catalogos')
             ->where('id', $this->getID())
             ->execute();
         return $result;
@@ -560,11 +560,11 @@ class Catalogo extends \MZ\Database\Helper
      */
     private static function query($condition = [], $order = [])
     {
-        $query = self::getDB()->from('Catalogos c');
+        $query = DB::from('Catalogos c');
         $condition = self::filterCondition($condition);
-        $query = self::buildOrderBy($query, self::filterOrder($order));
+        $query = DB::buildOrderBy($query, self::filterOrder($order));
         $query = $query->orderBy('c.id ASC');
-        return self::buildCondition($query, $condition);
+        return DB::buildCondition($query, $condition);
     }
 
     /**
@@ -587,9 +587,8 @@ class Catalogo extends \MZ\Database\Helper
      */
     public static function findByID($id)
     {
-        return self::find([
-            'id' => intval($id),
-        ]);
+        $result = new self();
+        return $result->loadByID($id);
     }
 
     /**

@@ -24,6 +24,8 @@
  */
 namespace MZ\System;
 
+use MZ\Database\Model;
+use MZ\Database\DB;
 use MZ\Util\Filter;
 use MZ\Util\Validator;
 
@@ -31,7 +33,7 @@ use MZ\Util\Validator;
  * Página WEB que contém informações de contato, termos e outras
  * informações da empresa
  */
-class Pagina extends \MZ\Database\Helper
+class Pagina extends Model
 {
     const NOME_SOBRE = 'sobre';
     const NOME_PRIVACIDADE = 'privacidade';
@@ -275,7 +277,7 @@ class Pagina extends \MZ\Database\Helper
         $values = $this->validate();
         unset($values['id']);
         try {
-            $id = self::getDB()->insertInto('Paginas')->values($values)->execute();
+            $id = DB::insertInto('Paginas')->values($values)->execute();
             $this->loadByID($id);
         } catch (\Exception $e) {
             throw $this->translate($e);
@@ -295,10 +297,9 @@ class Pagina extends \MZ\Database\Helper
         if (!$this->exists()) {
             throw new \Exception('O identificador da página não foi informado');
         }
-        $values = self::filterValues($values, $only, $except);
+        $values = DB::filterValues($values, $only, $except);
         try {
-            self::getDB()
-                ->update('Paginas')
+            DB::update('Paginas')
                 ->set($values)
                 ->where('id', $this->getID())
                 ->execute();
@@ -318,8 +319,7 @@ class Pagina extends \MZ\Database\Helper
         if (!$this->exists()) {
             throw new \Exception('O identificador da página não foi informado');
         }
-        $result = self::getDB()
-            ->deleteFrom('Paginas')
+        $result = DB::deleteFrom('Paginas')
             ->where('id', $this->getID())
             ->execute();
         return $result;
@@ -418,12 +418,12 @@ class Pagina extends \MZ\Database\Helper
      */
     private static function query($condition = [], $order = [])
     {
-        $query = self::getDB()->from('Paginas p');
+        $query = DB::from('Paginas p');
         $condition = self::filterCondition($condition);
-        $query = self::buildOrderBy($query, self::filterOrder($order));
+        $query = DB::buildOrderBy($query, self::filterOrder($order));
         $query = $query->orderBy('p.nome ASC');
         $query = $query->orderBy('p.id ASC');
-        return self::buildCondition($query, $condition);
+        return DB::buildCondition($query, $condition);
     }
 
     /**
@@ -446,9 +446,8 @@ class Pagina extends \MZ\Database\Helper
      */
     public static function findByID($id)
     {
-        return self::find([
-            'id' => intval($id),
-        ]);
+        $result = new self();
+        return $result->loadByID($id);
     }
 
     /**
@@ -459,10 +458,8 @@ class Pagina extends \MZ\Database\Helper
      */
     public static function findByNomeLinguagemID($nome, $linguagem_id)
     {
-        return self::find([
-            'nome' => strval($nome),
-            'linguagemid' => intval($linguagem_id),
-        ]);
+        $result = new self();
+        return $result->loadByNomeLinguagemID($nome, $linguagem_id);
     }
 
 

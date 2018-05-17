@@ -24,6 +24,8 @@
  */
 namespace MZ\Environment;
 
+use MZ\Database\Model;
+use MZ\Database\DB;
 use MZ\Util\Filter;
 use MZ\Util\Validator;
 use MZ\Sale\Pedido;
@@ -32,7 +34,7 @@ use MZ\Sale\Juncao;
 /**
  * Mesas para lançamento de pedidos
  */
-class Mesa extends \MZ\Database\Helper
+class Mesa extends Model
 {
 
     /**
@@ -259,7 +261,7 @@ class Mesa extends \MZ\Database\Helper
     {
         $values = $this->validate();
         try {
-            $id = self::getDB()->insertInto('Mesas')->values($values)->execute();
+            $id = DB::insertInto('Mesas')->values($values)->execute();
             $this->loadByID($id);
         } catch (\Exception $e) {
             throw $this->translate($e);
@@ -277,10 +279,9 @@ class Mesa extends \MZ\Database\Helper
         if (!$this->exists()) {
             throw new \Exception('O identificador da mesa não foi informado');
         }
-        $values = self::filterValues($values, $only, $except);
+        $values = DB::filterValues($values, $only, $except);
         try {
-            self::getDB()
-                ->update('Mesas')
+            DB::update('Mesas')
                 ->set($values)
                 ->where('id', $this->getID())
                 ->execute();
@@ -300,8 +301,7 @@ class Mesa extends \MZ\Database\Helper
         if (!$this->exists()) {
             throw new \Exception('O identificador da mesa não foi informado');
         }
-        $result = self::getDB()
-            ->deleteFrom('Mesas')
+        $result = DB::deleteFrom('Mesas')
             ->where('id', $this->getID())
             ->execute();
         return $result;
@@ -396,7 +396,7 @@ class Mesa extends \MZ\Database\Helper
     private static function query($condition = [], $order = [])
     {
         $order = Filter::order($order);
-        $query = self::getDB()->from('Mesas m');
+        $query = DB::from('Mesas m');
         if (isset($condition['pedidos'])) {
             $query = $query->select('p.estado')
                 ->select('e.mesaid as juntaid')
@@ -417,9 +417,9 @@ class Mesa extends \MZ\Database\Helper
             }
         }
         $condition = self::filterCondition($condition);
-        $query = self::buildOrderBy($query, self::filterOrder($order));
+        $query = DB::buildOrderBy($query, self::filterOrder($order));
         $query = $query->orderBy('m.id ASC');
-        return self::buildCondition($query, $condition);
+        return DB::buildCondition($query, $condition);
     }
 
     /**
@@ -442,9 +442,8 @@ class Mesa extends \MZ\Database\Helper
      */
     public static function findByID($id)
     {
-        return self::find([
-            'id' => intval($id),
-        ]);
+        $result = new self();
+        return $result->loadByID($id);
     }
 
     /**
@@ -454,9 +453,8 @@ class Mesa extends \MZ\Database\Helper
      */
     public static function findByNome($nome)
     {
-        return self::find([
-            'nome' => strval($nome),
-        ]);
+        $result = new self();
+        return $result->loadByNome($nome);
     }
 
     /**

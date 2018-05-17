@@ -26,7 +26,7 @@ require_once(dirname(__DIR__) . '/app.php');
 
 use MZ\Product\Categoria;
 use MZ\System\Permissao;
-use MZ\Database\Helper;
+use MZ\Database\DB;
 
 need_permission(Permissao::NOME_CADASTROPRODUTOS, is_output('json'));
 $id = isset($_GET['id']) ? $_GET['id'] : null;

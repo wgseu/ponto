@@ -24,13 +24,15 @@
  */
 namespace MZ\Device;
 
+use MZ\Database\Model;
+use MZ\Database\DB;
 use MZ\Util\Filter;
 use MZ\Util\Validator;
 
 /**
  * Computadores e tablets com opções de acesso
  */
-class Dispositivo extends \MZ\Database\Helper
+class Dispositivo extends Model
 {
 
     /**
@@ -468,7 +470,7 @@ class Dispositivo extends \MZ\Database\Helper
         $values = $this->validate();
         unset($values['id']);
         try {
-            $id = self::getDB()->insertInto('Dispositivos')->values($values)->execute();
+            $id = DB::insertInto('Dispositivos')->values($values)->execute();
             $this->loadByID($id);
         } catch (\Exception $e) {
             throw $this->translate($e);
@@ -488,10 +490,9 @@ class Dispositivo extends \MZ\Database\Helper
         if (!$this->exists()) {
             throw new \Exception('O identificador do dispositivo não foi informado');
         }
-        $values = self::filterValues($values, $only, $except);
+        $values = DB::filterValues($values, $only, $except);
         try {
-            self::getDB()
-                ->update('Dispositivos')
+            DB::update('Dispositivos')
                 ->set($values)
                 ->where('id', $this->getID())
                 ->execute();
@@ -511,8 +512,7 @@ class Dispositivo extends \MZ\Database\Helper
         if (!$this->exists()) {
             throw new \Exception('O identificador do dispositivo não foi informado');
         }
-        $result = self::getDB()
-            ->deleteFrom('Dispositivos')
+        $result = DB::deleteFrom('Dispositivos')
             ->where('id', $this->getID())
             ->execute();
         return $result;
@@ -691,12 +691,12 @@ class Dispositivo extends \MZ\Database\Helper
      */
     private static function query($condition = [], $order = [])
     {
-        $query = self::getDB()->from('Dispositivos d');
+        $query = DB::from('Dispositivos d');
         $condition = self::filterCondition($condition);
-        $query = self::buildOrderBy($query, self::filterOrder($order));
+        $query = DB::buildOrderBy($query, self::filterOrder($order));
         $query = $query->orderBy('d.nome ASC');
         $query = $query->orderBy('d.id ASC');
-        return self::buildCondition($query, $condition);
+        return DB::buildCondition($query, $condition);
     }
 
     /**
@@ -719,9 +719,8 @@ class Dispositivo extends \MZ\Database\Helper
      */
     public static function findByID($id)
     {
-        return self::find([
-            'id' => intval($id),
-        ]);
+        $result = new self();
+        return $result->loadByID($id);
     }
 
     /**
@@ -731,9 +730,8 @@ class Dispositivo extends \MZ\Database\Helper
      */
     public static function findByNome($nome)
     {
-        return self::find([
-            'nome' => strval($nome),
-        ]);
+        $result = new self();
+        return $result->loadByNome($nome);
     }
 
     /**
@@ -743,9 +741,8 @@ class Dispositivo extends \MZ\Database\Helper
      */
     public static function findByCaixaID($caixa_id)
     {
-        return self::find([
-            'caixaid' => intval($caixa_id),
-        ]);
+        $result = new self();
+        return $result->loadByCaixaID($caixa_id);
     }
 
     /**
@@ -755,9 +752,8 @@ class Dispositivo extends \MZ\Database\Helper
      */
     public static function findBySerial($serial)
     {
-        return self::find([
-            'serial' => strval($serial),
-        ]);
+        $result = new self();
+        return $result->loadBySerial($serial);
     }
 
     /**

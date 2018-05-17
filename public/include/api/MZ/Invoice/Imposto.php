@@ -24,13 +24,15 @@
  */
 namespace MZ\Invoice;
 
+use MZ\Database\Model;
+use MZ\Database\DB;
 use MZ\Util\Filter;
 use MZ\Util\Validator;
 
 /**
  * Impostos disponíveis para informar no produto
  */
-class Imposto extends \MZ\Database\Helper
+class Imposto extends Model
 {
 
     /**
@@ -383,7 +385,7 @@ class Imposto extends \MZ\Database\Helper
         $values = $this->validate();
         unset($values['id']);
         try {
-            $id = self::getDB()->insertInto('Impostos')->values($values)->execute();
+            $id = DB::insertInto('Impostos')->values($values)->execute();
             $this->loadByID($id);
         } catch (\Exception $e) {
             throw $this->translate($e);
@@ -403,10 +405,9 @@ class Imposto extends \MZ\Database\Helper
         if (!$this->exists()) {
             throw new \Exception('O identificador do imposto não foi informado');
         }
-        $values = self::filterValues($values, $only, $except);
+        $values = DB::filterValues($values, $only, $except);
         try {
-            self::getDB()
-                ->update('Impostos')
+            DB::update('Impostos')
                 ->set($values)
                 ->where('id', $this->getID())
                 ->execute();
@@ -426,8 +427,7 @@ class Imposto extends \MZ\Database\Helper
         if (!$this->exists()) {
             throw new \Exception('O identificador do imposto não foi informado');
         }
-        $result = self::getDB()
-            ->deleteFrom('Impostos')
+        $result = DB::deleteFrom('Impostos')
             ->where('id', $this->getID())
             ->execute();
         return $result;
@@ -532,12 +532,12 @@ class Imposto extends \MZ\Database\Helper
      */
     private static function query($condition = [], $order = [])
     {
-        $query = self::getDB()->from('Impostos i');
+        $query = DB::from('Impostos i');
         $condition = self::filterCondition($condition);
-        $query = self::buildOrderBy($query, self::filterOrder($order));
+        $query = DB::buildOrderBy($query, self::filterOrder($order));
         $query = $query->orderBy('i.descricao ASC');
         $query = $query->orderBy('i.id ASC');
-        return self::buildCondition($query, $condition);
+        return DB::buildCondition($query, $condition);
     }
 
     /**
@@ -560,9 +560,8 @@ class Imposto extends \MZ\Database\Helper
      */
     public static function findByID($id)
     {
-        return self::find([
-            'id' => intval($id),
-        ]);
+        $result = new self();
+        return $result->loadByID($id);
     }
 
     /**
@@ -575,12 +574,8 @@ class Imposto extends \MZ\Database\Helper
      */
     public static function findByGrupoSimplesSubstituicaoCodigo($grupo, $simples, $substituicao, $codigo)
     {
-        return self::find([
-            'grupo' => strval($grupo),
-            'simples' => strval($simples),
-            'substituicao' => strval($substituicao),
-            'codigo' => intval($codigo),
-        ]);
+        $result = new self();
+        return $result->loadByGrupoSimplesSubstituicaoCodigo($grupo, $simples, $substituicao, $codigo);
     }
 
     /**

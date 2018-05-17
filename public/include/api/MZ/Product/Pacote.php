@@ -24,13 +24,15 @@
  */
 namespace MZ\Product;
 
+use MZ\Database\Model;
+use MZ\Database\DB;
 use MZ\Util\Filter;
 use MZ\Util\Validator;
 
 /**
  * Contém todos as opções para a formação do produto final
  */
-class Pacote extends \MZ\Database\Helper
+class Pacote extends Model
 {
     /**
      * Identificador do pacote
@@ -515,7 +517,7 @@ class Pacote extends \MZ\Database\Helper
         $values = $this->validate();
         unset($values['id']);
         try {
-            $id = self::getDB()->insertInto('Pacotes')->values($values)->execute();
+            $id = DB::insertInto('Pacotes')->values($values)->execute();
             $this->loadByID($id);
         } catch (\Exception $e) {
             throw $this->translate($e);
@@ -535,10 +537,9 @@ class Pacote extends \MZ\Database\Helper
         if (!$this->exists()) {
             throw new \Exception('O identificador do pacote não foi informado');
         }
-        $values = self::filterValues($values, $only, $except);
+        $values = DB::filterValues($values, $only, $except);
         try {
-            self::getDB()
-                ->update('Pacotes')
+            DB::update('Pacotes')
                 ->set($values)
                 ->where('id', $this->getID())
                 ->execute();
@@ -558,8 +559,7 @@ class Pacote extends \MZ\Database\Helper
         if (!$this->exists()) {
             throw new \Exception('O identificador do pacote não foi informado');
         }
-        $result = self::getDB()
-            ->deleteFrom('Pacotes')
+        $result = DB::deleteFrom('Pacotes')
             ->where('id', $this->getID())
             ->execute();
         return $result;
@@ -675,11 +675,11 @@ class Pacote extends \MZ\Database\Helper
      */
     private static function query($condition = [], $order = [])
     {
-        $query = self::getDB()->from('Pacotes p');
+        $query = DB::from('Pacotes p');
         $condition = self::filterCondition($condition);
-        $query = self::buildOrderBy($query, self::filterOrder($order));
+        $query = DB::buildOrderBy($query, self::filterOrder($order));
         $query = $query->orderBy('p.id ASC');
-        return self::buildCondition($query, $condition);
+        return DB::buildCondition($query, $condition);
     }
 
     /**
@@ -690,7 +690,7 @@ class Pacote extends \MZ\Database\Helper
     private static function queryEx($condition = [], $order = [])
     {
         $week_offset = (1 + date('w')) * 1440 + (int)((time() - strtotime('00:00')) / 60);
-        $query = self::getDB()->from('Pacotes p')
+        $query = DB::from('Pacotes p')
             ->leftJoin('Produtos d ON d.id = p.produtoid')
             ->leftJoin('Propriedades r ON r.id = p.propriedadeid')
             ->leftJoin('Pacotes a ON a.id = p.associacaoid')
@@ -710,15 +710,15 @@ class Pacote extends \MZ\Database\Helper
             ->select('u.sigla as unidadesigla')
             ->select(
                 '(CASE WHEN d.imagem IS NULL AND r.imagem IS NULL THEN NULL ELSE '.
-                self::concat(['COALESCE(r.id, d.id)', '".png"']).
+                DB::concat(['COALESCE(r.id, d.id)', '".png"']).
                 ' END) as imagemurl'
             )
             ->select('COALESCE(r.dataatualizacao, d.dataatualizacao) as dataatualizacao');
         if (isset($condition['search'])) {
             $busca = $condition['search'];
-            $query = self::buildSearch(
+            $query = DB::buildSearch(
                 $busca,
-                self::concat([
+                DB::concat([
                     'COALESCE(d.abreviacao, r.abreviacao, "")',
                     '" "',
                     'COALESCE(d.descricao, r.nome)'
@@ -727,9 +727,9 @@ class Pacote extends \MZ\Database\Helper
             );
         }
         $condition = self::filterCondition($condition);
-        $query = self::buildOrderBy($query, self::filterOrder($order));
+        $query = DB::buildOrderBy($query, self::filterOrder($order));
         $query = $query->orderBy('p.id ASC');
-        return self::buildCondition($query, $condition);
+        return DB::buildCondition($query, $condition);
     }
 
     /**
@@ -752,9 +752,8 @@ class Pacote extends \MZ\Database\Helper
      */
     public static function findByID($id)
     {
-        return self::find([
-            'id' => intval($id),
-        ]);
+        $result = new self();
+        return $result->loadByID($id);
     }
 
     /**

@@ -24,13 +24,15 @@
  */
 namespace MZ\Location;
 
+use MZ\Database\Model;
+use MZ\Database\DB;
 use MZ\Util\Filter;
 use MZ\Util\Validator;
 
 /**
  * Informações de um páis com sua moeda e língua nativa
  */
-class Pais extends \MZ\Database\Helper
+class Pais extends Model
 {
 
     /**
@@ -464,7 +466,7 @@ class Pais extends \MZ\Database\Helper
         $values = $this->validate();
         unset($values['id']);
         try {
-            $id = self::getDB()->insertInto('Paises')->values($values)->execute();
+            $id = DB::insertInto('Paises')->values($values)->execute();
             $this->loadByID($id);
         } catch (\Exception $e) {
             throw $this->translate($e);
@@ -484,10 +486,9 @@ class Pais extends \MZ\Database\Helper
         if (!$this->exists()) {
             throw new \Exception('O identificador do país não foi informado');
         }
-        $values = self::filterValues($values, $only, $except);
+        $values = DB::filterValues($values, $only, $except);
         try {
-            self::getDB()
-                ->update('Paises')
+            DB::update('Paises')
                 ->set($values)
                 ->where('id', $this->getID())
                 ->execute();
@@ -507,8 +508,7 @@ class Pais extends \MZ\Database\Helper
         if (!$this->exists()) {
             throw new \Exception('O identificador do país não foi informado');
         }
-        $result = self::getDB()
-            ->deleteFrom('Paises')
+        $result = DB::deleteFrom('Paises')
             ->where('id', $this->getID())
             ->execute();
         return $result;
@@ -632,12 +632,12 @@ class Pais extends \MZ\Database\Helper
      */
     private static function query($condition = [], $order = [])
     {
-        $query = self::getDB()->from('Paises p');
+        $query = DB::from('Paises p');
         $condition = self::filterCondition($condition);
-        $query = self::buildOrderBy($query, self::filterOrder($order));
+        $query = DB::buildOrderBy($query, self::filterOrder($order));
         $query = $query->orderBy('p.nome ASC');
         $query = $query->orderBy('p.id ASC');
-        return self::buildCondition($query, $condition);
+        return DB::buildCondition($query, $condition);
     }
 
     /**
@@ -660,9 +660,8 @@ class Pais extends \MZ\Database\Helper
      */
     public static function findByID($id)
     {
-        return self::find([
-            'id' => intval($id),
-        ]);
+        $result = new self();
+        return $result->loadByID($id);
     }
 
     /**
@@ -672,9 +671,8 @@ class Pais extends \MZ\Database\Helper
      */
     public static function findByNome($nome)
     {
-        return self::find([
-            'nome' => strval($nome),
-        ]);
+        $result = new self();
+        return $result->loadByNome($nome);
     }
 
     /**
@@ -684,9 +682,8 @@ class Pais extends \MZ\Database\Helper
      */
     public static function findBySigla($sigla)
     {
-        return self::find([
-            'sigla' => strval($sigla),
-        ]);
+        $result = new self();
+        return $result->loadBySigla($sigla);
     }
 
     /**
@@ -696,9 +693,8 @@ class Pais extends \MZ\Database\Helper
      */
     public static function findByCodigo($codigo)
     {
-        return self::find([
-            'codigo' => strval($codigo),
-        ]);
+        $result = new self();
+        return $result->loadByCodigo($codigo);
     }
 
     /**

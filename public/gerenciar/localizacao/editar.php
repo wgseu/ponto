@@ -49,7 +49,7 @@ $old_localizacao = $localizacao;
 if (is_post()) {
     $localizacao = new Localizacao($_POST);
     try {
-        \DB::BeginTransaction();
+        DB::beginTransaction();
         $localizacao->filter($old_localizacao);
         $estado_id = isset($_POST['estadoid']) ? $_POST['estadoid'] : null;
         $estado = Estado::findByID($estado_id);
@@ -65,7 +65,7 @@ if (is_post()) {
         $localizacao->setBairroID($bairro->getID());
         $localizacao->save();
         $old_localizacao->clean($localizacao);
-        \DB::Commit();
+        DB::commit();
         try {
             if ($localizacao->getClienteID() == $app->getSystem()->getCompany()->getID()) {
                 $appsync = new Synchronizer();
@@ -80,7 +80,7 @@ if (is_post()) {
         );
         json(null, ['item' => $localizacao->publish(), 'msg' => $msg]);
     } catch (\Exception $e) {
-        \DB::RollBack();
+        DB::rollBack();
         $localizacao->clean($old_localizacao);
         $errors = [];
         if ($e instanceof \MZ\Exception\ValidationException) {

@@ -24,13 +24,15 @@
  */
 namespace MZ\Account;
 
+use MZ\Database\Model;
+use MZ\Database\DB;
 use MZ\Util\Filter;
 use MZ\Util\Validator;
 
 /**
  * Classificação se contas, permite atribuir um grupo de contas
  */
-class Classificacao extends \MZ\Database\Helper
+class Classificacao extends Model
 {
 
     /**
@@ -239,7 +241,7 @@ class Classificacao extends \MZ\Database\Helper
         $values = $this->validate();
         unset($values['id']);
         try {
-            $id = self::getDB()->insertInto('Classificacoes')->values($values)->execute();
+            $id = DB::insertInto('Classificacoes')->values($values)->execute();
             $this->loadByID($id);
         } catch (\Exception $e) {
             throw $this->translate($e);
@@ -259,10 +261,9 @@ class Classificacao extends \MZ\Database\Helper
         if (!$this->exists()) {
             throw new \Exception('O identificador da classificação não foi informado');
         }
-        $values = self::filterValues($values, $only, $except);
+        $values = DB::filterValues($values, $only, $except);
         try {
-            self::getDB()
-                ->update('Classificacoes')
+            DB::update('Classificacoes')
                 ->set($values)
                 ->where('id', $this->getID())
                 ->execute();
@@ -282,8 +283,7 @@ class Classificacao extends \MZ\Database\Helper
         if (!$this->exists()) {
             throw new \Exception('O identificador da classificação não foi informado');
         }
-        $result = self::getDB()
-            ->deleteFrom('Classificacoes')
+        $result = DB::deleteFrom('Classificacoes')
             ->where('id', $this->getID())
             ->execute();
         return $result;
@@ -375,12 +375,12 @@ class Classificacao extends \MZ\Database\Helper
      */
     private static function query($condition = [], $order = [])
     {
-        $query = self::getDB()->from('Classificacoes c');
+        $query = DB::from('Classificacoes c');
         $condition = self::filterCondition($condition);
-        $query = self::buildOrderBy($query, self::filterOrder($order));
+        $query = DB::buildOrderBy($query, self::filterOrder($order));
         $query = $query->orderBy('c.descricao ASC');
         $query = $query->orderBy('c.id ASC');
-        return self::buildCondition($query, $condition);
+        return DB::buildCondition($query, $condition);
     }
 
     /**
@@ -397,27 +397,14 @@ class Classificacao extends \MZ\Database\Helper
     }
 
     /**
-     * Find this object on database using, ID
-     * @param  int $id id to find Classificação
-     * @return Classificacao A filled instance or empty when not found
-     */
-    public static function findByID($id)
-    {
-        return self::find([
-            'id' => intval($id),
-        ]);
-    }
-
-    /**
      * Find this object on database using, Descricao
      * @param  string $descricao descrição to find Classificação
      * @return Classificacao A filled instance or empty when not found
      */
     public static function findByDescricao($descricao)
     {
-        return self::find([
-            'descricao' => strval($descricao),
-        ]);
+        $result = new self();
+        return $result->loadByDescricao($descricao);
     }
 
     /**

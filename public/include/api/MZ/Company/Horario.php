@@ -24,13 +24,15 @@
  */
 namespace MZ\Company;
 
+use MZ\Database\Model;
+use MZ\Database\DB;
 use MZ\Util\Filter;
 use MZ\Util\Validator;
 
 /**
  * Informa o horário de funcionamento do estabelecimento
  */
-class Horario extends \MZ\Database\Helper
+class Horario extends Model
 {
 
     /**
@@ -265,7 +267,7 @@ class Horario extends \MZ\Database\Helper
         $values = $this->validate();
         unset($values['id']);
         try {
-            $id = self::getDB()->insertInto('Horarios')->values($values)->execute();
+            $id = DB::insertInto('Horarios')->values($values)->execute();
             $this->loadByID($id);
         } catch (\Exception $e) {
             throw $this->translate($e);
@@ -285,10 +287,9 @@ class Horario extends \MZ\Database\Helper
         if (!$this->exists()) {
             throw new \Exception('O identificador do horário não foi informado');
         }
-        $values = self::filterValues($values, $only, $except);
+        $values = DB::filterValues($values, $only, $except);
         try {
-            self::getDB()
-                ->update('Horarios')
+            DB::update('Horarios')
                 ->set($values)
                 ->where('id', $this->getID())
                 ->execute();
@@ -308,8 +309,7 @@ class Horario extends \MZ\Database\Helper
         if (!$this->exists()) {
             throw new \Exception('O identificador do horário não foi informado');
         }
-        $result = self::getDB()
-            ->deleteFrom('Horarios')
+        $result = DB::deleteFrom('Horarios')
             ->where('id', $this->getID())
             ->execute();
         return $result;
@@ -369,11 +369,11 @@ class Horario extends \MZ\Database\Helper
      */
     private static function query($condition = [], $order = [])
     {
-        $query = self::getDB()->from('Horarios h');
+        $query = DB::from('Horarios h');
         $condition = self::filterCondition($condition);
-        $query = self::buildOrderBy($query, self::filterOrder($order));
+        $query = DB::buildOrderBy($query, self::filterOrder($order));
         $query = $query->orderBy('h.id ASC');
-        return self::buildCondition($query, $condition);
+        return DB::buildCondition($query, $condition);
     }
 
     /**
@@ -396,9 +396,8 @@ class Horario extends \MZ\Database\Helper
      */
     public static function findByID($id)
     {
-        return self::find([
-            'id' => intval($id),
-        ]);
+        $result = new self();
+        return $result->loadByID($id);
     }
 
     /**

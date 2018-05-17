@@ -24,13 +24,15 @@
  */
 namespace MZ\Wallet;
 
+use MZ\Database\Model;
+use MZ\Database\DB;
 use MZ\Util\Filter;
 use MZ\Util\Validator;
 
 /**
  * Bancos disponíveis no país
  */
-class Banco extends \MZ\Database\Helper
+class Banco extends Model
 {
 
     /**
@@ -306,7 +308,7 @@ class Banco extends \MZ\Database\Helper
         $values = $this->validate();
         unset($values['id']);
         try {
-            $id = self::getDB()->insertInto('Bancos')->values($values)->execute();
+            $id = DB::insertInto('Bancos')->values($values)->execute();
             $this->loadByID($id);
         } catch (\Exception $e) {
             throw $this->translate($e);
@@ -326,10 +328,9 @@ class Banco extends \MZ\Database\Helper
         if (!$this->exists()) {
             throw new \Exception('O identificador do banco não foi informado');
         }
-        $values = self::filterValues($values, $only, $except);
+        $values = DB::filterValues($values, $only, $except);
         try {
-            self::getDB()
-                ->update('Bancos')
+            DB::update('Bancos')
                 ->set($values)
                 ->where('id', $this->getID())
                 ->execute();
@@ -349,8 +350,7 @@ class Banco extends \MZ\Database\Helper
         if (!$this->exists()) {
             throw new \Exception('O identificador do banco não foi informado');
         }
-        $result = self::getDB()
-            ->deleteFrom('Bancos')
+        $result = DB::deleteFrom('Bancos')
             ->where('id', $this->getID())
             ->execute();
         return $result;
@@ -445,12 +445,12 @@ class Banco extends \MZ\Database\Helper
      */
     private static function query($condition = [], $order = [])
     {
-        $query = self::getDB()->from('Bancos b');
+        $query = DB::from('Bancos b');
         $condition = self::filterCondition($condition);
-        $query = self::buildOrderBy($query, self::filterOrder($order));
+        $query = DB::buildOrderBy($query, self::filterOrder($order));
         $query = $query->orderBy('b.razaosocial ASC');
         $query = $query->orderBy('b.id ASC');
-        return self::buildCondition($query, $condition);
+        return DB::buildCondition($query, $condition);
     }
 
     /**
@@ -499,9 +499,8 @@ class Banco extends \MZ\Database\Helper
      */
     public static function findByID($id)
     {
-        return self::find([
-            'id' => intval($id),
-        ]);
+        $result = new self();
+        return $result->loadByID($id);
     }
 
     /**
@@ -511,9 +510,8 @@ class Banco extends \MZ\Database\Helper
      */
     public static function findByRazaoSocial($razao_social)
     {
-        return self::find([
-            'razaosocial' => strval($razao_social),
-        ]);
+        $result = new self();
+        return $result->loadByRazaoSocial($razao_social);
     }
 
     /**
@@ -523,9 +521,8 @@ class Banco extends \MZ\Database\Helper
      */
     public static function findByNumero($numero)
     {
-        return self::find([
-            'numero' => strval($numero),
-        ]);
+        $result = new self();
+        return $result->loadByNumero($numero);
     }
 
     /**

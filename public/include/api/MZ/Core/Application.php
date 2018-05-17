@@ -24,6 +24,8 @@
  */
 namespace MZ\Core;
 
+use MZ\Database\DB;
+
 class Application
 {
     private $authentication;
@@ -38,6 +40,7 @@ class Application
         $this->path = $path;
         $this->system = new \MZ\System\Sistema();
         $this->authentication = new \MZ\Account\Authentication();
+        $this->database = new DB();
     }
 
     /**
@@ -60,7 +63,7 @@ class Application
 
     /**
      * Get database object
-     * @return \DB database object
+     * @return \MZ\Database\DB database object
      */
     public function getDatabase()
     {
@@ -147,7 +150,7 @@ class Application
      */
     private function connect()
     {
-        $this->database = \DB::Instance($this->getSystem()->getSettings()->getValue('db'));
+        $this->getDatabase()->connect($this->getSystem()->getSettings()->getValue('db'));
     }
 
     /**

@@ -24,165 +24,45 @@
  */
 namespace MZ\Database;
 
+use PDO;
+use FluentPDO;
+
 /**
  * Implement common operations on database CRUD and searches
  */
-abstract class Helper
+class DB
 {
+    private $fpdo = null;
+    private $transactionCounter = 0;
 
-    /**
-     * Constructor for a new empty instance of Helper
-     * @param array $helper All field and values to fill the instance
-     */
-    public function __construct($helper = [])
+    public function connect($config)
     {
-        $this->fromArray($helper);
-    }
-
-    /**
-     * Get the primary key for this entry
-     * @return integer key of register
-     */
-    abstract public function getID();
-
-    /**
-     * Convert this instance to array associated key -> value
-     * @param  boolean $recursive Allow rescursive conversion of fields
-     * @return array All field and values into array format
-     */
-    public function toArray($recursive = false)
-    {
-        return [];
-    }
-
-    /**
-     * Fill this instance with from array values, you can pass instance to
-     * @param  mixed $helper Associated key -> value to assign into this instance
-     * @return Helper Self instance
-     */
-    public function fromArray($helper = [])
-    {
-        return $this;
-    }
-
-    /**
-     * Convert this instance into array associated key -> value with only public fields
-     * @return array All public field and values into array format
-     */
-    public function publish()
-    {
-        return $this->toArray(true);
-    }
-
-    /**
-     * Check if this instance have a valid primary key
-     * @return boolean true if have a valid primary key, false otherwise
-     */
-    public function exists()
-    {
-        return !is_null($this->getID()) && is_numeric($this->getID());
-    }
-
-    /**
-     * Translate SQL exception into application exception
-     * @param  \Exception $e exception to translate into a readable error
-     * @return \Exception new exception translated
-     */
-    protected function translate($e)
-    {
-        if ($e instanceof \PDOException &&
-            preg_match(
-                '/SQLSTATE\[\w+\]: <<[^>]+>>: \d+ (.*)/',
-                $e->getMessage(),
-                $matches
-            )
-        ) {
-            return new \Exception($matches[1], 45000);
+        $driver = isset($config['driver']) ? $config['driver'] : 'mysql';
+        $values = [];
+        $values[] = $driver . ':' . (
+            $driver == 'sqlite'?
+            $config['name']:
+            'dbname=' . $config['name']
+        );
+        if ($driver != 'sqlite') {
+            $values[] =  'host=' . $config['host'];
+            $values[] =  'port=' . $config['port'];
+            $values[] = 'charset=utf8';
         }
-        return $e;
+        $dsn = implode(';', $values);
+        $pdo = new PDO($dsn, $config['user'], $config['pass']);
+        $pdo->setAttribute(PDO::ATTR_CASE, PDO::CASE_LOWER);
+        $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        $this->fpdo = new FluentPDO($pdo);
     }
 
     /**
-     * Get FluentPDO instance
-     * @return FluentPDO connected PDO instance
+     * Get PDO instance
+     * @return \PDO connected PDO instance
      */
-    public static function getDB()
+    protected function __getPdo()
     {
-        return \DB::$pdo;
-    }
-
-    /**
-     * Filter fields, upload data and keep key data
-     * @param mixed $original Original instance without modifications
-     * @return mixed Self instance
-     */
-    abstract public function filter($original);
-
-    /**
-     * Clean instance resources like images and docs
-     * @param  mixed $dependency Don't clean when dependency use same resources
-     * @return mixed Self instance
-     */
-    abstract public function clean($dependency);
-
-    /**
-     * Validate fields updating them and throw exception when invalid data has found
-     * @return array All field of Helper in array format
-     */
-    abstract public function validate();
-
-    /**
-     * Load one register for it self with a condition
-     * @param  array $condition Condition for searching the row
-     * @param  array $order associative field name -> [-1, 1]
-     * @return Setor Self instance filled or empty
-     */
-    abstract public function load($condition, $order = []);
-
-    /**
-     * Insert a new registry into the database and fill instance from database
-     * @return mixed Self instance
-     */
-    abstract public function insert();
-
-    /**
-     * Update registry with instance values into database for ID
-     * @param  array $only Save these fields only, when empty save all fields except id
-     * @param  boolean $except When true, saves all fields except $only
-     * @return mixed Self instance
-     */
-    abstract public function update($only = [], $except = false);
-
-    /**
-     * Delete this instance from database using ID
-     * @return integer Number of rows deleted (Max 1)
-     */
-    abstract public function delete();
-
-    /**
-     * Save a new or a existing instance into the database and fill instance from database
-     * @param  array $only Save these fields only, when empty save all fields except id
-     * @param  boolean $except When true, saves all fields except $only
-     * @return Helper Self instance
-     */
-    public function save($only = [], $except = false)
-    {
-        if ($this->exists()) {
-            return $this->update($only, $except);
-        }
-        return $this->insert();
-    }
-
-    /**
-     * Load into this object from database using id
-     * @param  int $id id to find this object on database
-     * @return Helper Self filled instance or empty when not found
-     */
-    public function loadByID($id)
-    {
-        return $this->load([
-            'id' => intval($id),
-        ]);
+        return $this->fpdo->getPdo();
     }
 
     /**
@@ -286,12 +166,18 @@ abstract class Helper
         foreach ($keywords as $word) {
             $query = $query->where($field . ' LIKE ?', '%'.$word.'%');
             $query = $query->orderBy(
-                'COALESCE(NULLIF(LOCATE(?, '.
-                self::concat(['" "', $field]).
-                '), 0), 65535) ASC',
+                'COALESCE(NULLIF(' .
+                self::sqlLocate(
+                    '?',
+                    DB::concat(['" "', $field])
+                ). ', 0), 65535) ASC',
                 ' '.$word
             );
-            $query = $query->orderBy('COALESCE(NULLIF(LOCATE(?, ' . $field . '), 0), 65535) ASC', $word);
+            $query = $query->orderBy(
+                'COALESCE(NULLIF(' .
+                    self::sqlLocate('?', $field) . ', 0), 65535) ASC',
+                $word
+            );
         }
         return $query;
     }
@@ -323,11 +209,75 @@ abstract class Helper
         return 'CONCAT(' . implode(', ', $values) . ')';
     }
 
+    public static function sqlLocate($search, $string)
+    {
+        if (getenv('DB_DRIVER') == 'sqlite') {
+            return 'instr(' . $search . ', ' . $string . ')';
+        }
+        return 'LOCATE(' . $search . ', ' . $string . ')';
+    }
+
     public static function strftime($fmt, $value)
     {
         if (getenv('DB_DRIVER') == 'sqlite') {
             return "strftime('" . $fmt . "', " . $value .")";
         }
         return "DATE_FORMAT(" . $value . ", '" . $fmt ."')";
+    }
+
+    /**
+     * In depth begin transaction
+     */
+    protected function __beginTransaction()
+    {
+        $this->transactionCounter++;
+        if ($this->transactionCounter == 1) {
+            return $this->__getPdo()->beginTransaction();
+        }
+        return $this->transactionCounter == 1;
+    }
+
+    /**
+     * In depth commit transaction
+     */
+    protected function __commit()
+    {
+        if ($this->transactionCounter <= 0) {
+            throw new \Exception('No transaction active');
+        }
+        $this->transactionCounter--;
+        if ($this->transactionCounter == 0) {
+            return $this->__getPdo()->commit();
+        }
+        return $this->transactionCounter == 0;
+    }
+
+    /**
+     * In depth rollback transaction
+     */
+    protected function __rollBack()
+    {
+        if ($this->transactionCounter <= 0) {
+            throw new \Exception('No transaction active');
+        }
+        $this->transactionCounter--;
+        if ($this->transactionCounter == 0) {
+            return $this->__getPdo()->rollBack();
+        }
+        return $this->transactionCounter == 0;
+    }
+
+    public function __call($name, $arguments)
+    {
+        if (method_exists($this, '__' . $name)) {
+            return call_user_func_array(array($this, '__' . $name), $arguments);
+        }
+        return call_user_func_array(array($this->fpdo, $name), $arguments);
+    }
+
+    public static function __callStatic($name, $arguments)
+    {
+        global $app;
+        return call_user_func_array(array($app->getDatabase(), $name), $arguments);
     }
 }

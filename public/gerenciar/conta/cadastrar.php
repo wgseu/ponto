@@ -26,14 +26,14 @@ require_once(dirname(__DIR__) . '/app.php');
 
 use MZ\Account\Conta;
 use MZ\System\Permissao;
-use MZ\Database\Helper;
+use MZ\Database\DB;
 
 need_permission(Permissao::NOME_CADASTROCONTAS, is_output('json'));
 $id = isset($_GET['id']) ? $_GET['id'] : null;
 $conta = Conta::findByID($id);
 $conta->setID(null);
-$conta->setVencimento(Helper::now());
-$conta->setDataEmissao(Helper::now());
+$conta->setVencimento(DB::now());
+$conta->setDataEmissao(DB::now());
 $conta->setDataPagamento(null);
 
 $focusctrl = 'descricao';

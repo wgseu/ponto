@@ -24,13 +24,15 @@
  */
 namespace MZ\Employee;
 
+use MZ\Database\Model;
+use MZ\Database\DB;
 use MZ\Util\Filter;
 use MZ\Util\Validator;
 
 /**
  * Permite acesso à uma determinada funcionalidade da lista de permissões
  */
-class Acesso extends \MZ\Database\Helper
+class Acesso extends Model
 {
 
     /**
@@ -240,7 +242,7 @@ class Acesso extends \MZ\Database\Helper
         $values = $this->validate();
         unset($values['id']);
         try {
-            $id = self::getDB()->insertInto('Acessos')->values($values)->execute();
+            $id = DB::insertInto('Acessos')->values($values)->execute();
             $this->loadByID($id);
         } catch (\Exception $e) {
             throw $this->translate($e);
@@ -260,10 +262,9 @@ class Acesso extends \MZ\Database\Helper
         if (!$this->exists()) {
             throw new \Exception('O identificador do acesso não foi informado');
         }
-        $values = self::filterValues($values, $only, $except);
+        $values = DB::filterValues($values, $only, $except);
         try {
-            self::getDB()
-                ->update('Acessos')
+            DB::update('Acessos')
                 ->set($values)
                 ->where('id', $this->getID())
                 ->execute();
@@ -283,8 +284,7 @@ class Acesso extends \MZ\Database\Helper
         if (!$this->exists()) {
             throw new \Exception('O identificador do acesso não foi informado');
         }
-        $result = self::getDB()
-            ->deleteFrom('Acessos')
+        $result = DB::deleteFrom('Acessos')
             ->where('id', $this->getID())
             ->execute();
         return $result;
@@ -376,11 +376,11 @@ class Acesso extends \MZ\Database\Helper
      */
     private static function query($condition = [], $order = [])
     {
-        $query = self::getDB()->from('Acessos a');
+        $query = DB::from('Acessos a');
         $condition = self::filterCondition($condition);
-        $query = self::buildOrderBy($query, self::filterOrder($order));
+        $query = DB::buildOrderBy($query, self::filterOrder($order));
         $query = $query->orderBy('a.id ASC');
-        return self::buildCondition($query, $condition);
+        return DB::buildCondition($query, $condition);
     }
 
     /**
@@ -403,9 +403,8 @@ class Acesso extends \MZ\Database\Helper
      */
     public static function findByID($id)
     {
-        return self::find([
-            'id' => intval($id),
-        ]);
+        $result = new self();
+        return $result->loadByID($id);
     }
 
     /**
@@ -416,10 +415,8 @@ class Acesso extends \MZ\Database\Helper
      */
     public static function findByFuncaoIDPermissaoID($funcao_id, $permissao_id)
     {
-        return self::find([
-            'funcaoid' => intval($funcao_id),
-            'permissaoid' => intval($permissao_id),
-        ]);
+        $result = new self();
+        return $result->loadByFuncaoIDPermissaoID($funcao_id, $permissao_id);
     }
 
     public static function getPermissoes($funcao_id)

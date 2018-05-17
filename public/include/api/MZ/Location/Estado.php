@@ -24,13 +24,15 @@
  */
 namespace MZ\Location;
 
+use MZ\Database\Model;
+use MZ\Database\DB;
 use MZ\Util\Filter;
 use MZ\Util\Validator;
 
 /**
  * Estado federativo de um país
  */
-class Estado extends \MZ\Database\Helper
+class Estado extends Model
 {
 
     /**
@@ -283,9 +285,8 @@ class Estado extends \MZ\Database\Helper
      */
     public static function findByID($id)
     {
-        return self::find([
-            'id' => intval($id),
-        ]);
+        $result = new self();
+        return $result->loadByID($id);
     }
 
     /**
@@ -296,10 +297,8 @@ class Estado extends \MZ\Database\Helper
      */
     public static function findByPaisIDNome($pais_id, $nome)
     {
-        return self::find([
-            'paisid' => intval($pais_id),
-            'nome' => strval($nome),
-        ]);
+        $result = new self();
+        return $result->loadByPaisIDNome($pais_id, $nome);
     }
 
     /**
@@ -310,10 +309,8 @@ class Estado extends \MZ\Database\Helper
      */
     public static function findByPaisIDUF($pais_id, $uf)
     {
-        return self::find([
-            'paisid' => intval($pais_id),
-            'uf' => strval($uf),
-        ]);
+        $result = new self();
+        return $result->loadByPaisIDUF($pais_id, $uf);
     }
 
     /**
@@ -364,12 +361,12 @@ class Estado extends \MZ\Database\Helper
      */
     private static function query($condition = [], $order = [])
     {
-        $query = self::getDB()->from('Estados e');
+        $query = DB::from('Estados e');
         $condition = self::filterCondition($condition);
-        $query = self::buildOrderBy($query, self::filterOrder($order));
+        $query = DB::buildOrderBy($query, self::filterOrder($order));
         $query = $query->orderBy('e.nome ASC');
         $query = $query->orderBy('e.id ASC');
-        return self::buildCondition($query, $condition);
+        return DB::buildCondition($query, $condition);
     }
 
     /**
@@ -422,7 +419,7 @@ class Estado extends \MZ\Database\Helper
         $values = $this->validate();
         unset($values['id']);
         try {
-            $id = self::getDB()->insertInto('Estados')->values($values)->execute();
+            $id = DB::insertInto('Estados')->values($values)->execute();
             $this->loadByID($id);
         } catch (\Exception $e) {
             throw $this->translate($e);
@@ -442,10 +439,9 @@ class Estado extends \MZ\Database\Helper
         if (!$this->exists()) {
             throw new \Exception('O identificador do estado não foi informado');
         }
-        $values = self::filterValues($values, $only, $except);
+        $values = DB::filterValues($values, $only, $except);
         try {
-            self::getDB()
-                ->update('Estados')
+            DB::update('Estados')
                 ->set($values)
                 ->where('id', $this->getID())
                 ->execute();
@@ -465,8 +461,7 @@ class Estado extends \MZ\Database\Helper
         if (!$this->exists()) {
             throw new \Exception('O identificador do estado não foi informado');
         }
-        $result = self::getDB()
-            ->deleteFrom('Estados')
+        $result = DB::deleteFrom('Estados')
             ->where('id', $this->getID())
             ->execute();
         return $result;

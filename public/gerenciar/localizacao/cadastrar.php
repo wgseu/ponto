@@ -33,7 +33,7 @@ $old_localizacao = $localizacao;
 if (is_post()) {
     $localizacao = new Localizacao($_POST);
     try {
-        \DB::BeginTransaction();
+        DB::beginTransaction();
         if ($localizacao->getClienteID() == $app->getSystem()->getCompany()->getID() &&
             !logged_employee()->has(Permissao::NOME_ALTERARCONFIGURACOES)
         ) {
@@ -55,14 +55,14 @@ if (is_post()) {
         $localizacao->setBairroID($bairro->getID());
         $localizacao->insert();
         $old_localizacao->clean($localizacao);
-        \DB::Commit();
+        DB::commit();
         $msg = sprintf(
             'Localização "%s" atualizada com sucesso!',
             $localizacao->getLogradouro()
         );
         json(null, ['item' => $localizacao->publish(), 'msg' => $msg]);
     } catch (\Exception $e) {
-        \DB::RollBack();
+        DB::rollBack();
         $localizacao->clean($old_localizacao);
         $errors = [];
         if ($e instanceof \MZ\Exception\ValidationException) {

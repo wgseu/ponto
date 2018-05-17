@@ -24,6 +24,8 @@
  */
 namespace MZ\Employee;
 
+use MZ\Database\Model;
+use MZ\Database\DB;
 use MZ\Util\Filter;
 use MZ\Util\Validator;
 use MZ\Account\Cliente;
@@ -32,7 +34,7 @@ use MZ\System\Permissao;
 /**
  * Funcionário que trabalha na empresa e possui uma determinada função
  */
-class Funcionario extends \MZ\Database\Helper
+class Funcionario extends Model
 {
 
     /**
@@ -380,7 +382,7 @@ class Funcionario extends \MZ\Database\Helper
             $this->setDataSaida($funcionario['datasaida']);
         }
         if (!isset($funcionario['datacadastro'])) {
-            $this->setDataCadastro(self::now());
+            $this->setDataCadastro(DB::now());
         } else {
             $this->setDataCadastro($funcionario['datacadastro']);
         }
@@ -478,7 +480,7 @@ class Funcionario extends \MZ\Database\Helper
         if (!Validator::checkBoolean($this->getAtivo())) {
             $errors['ativo'] = 'A informação se está ativo(a) não foi informada ou é inválida';
         }
-        $this->setDataCadastro(self::now());
+        $this->setDataCadastro(DB::now());
         if (!empty($errors)) {
             throw new \MZ\Exception\ValidationException($errors);
         }
@@ -527,7 +529,7 @@ class Funcionario extends \MZ\Database\Helper
     {
         $values = $this->validate();
         try {
-            $id = self::getDB()->insertInto('Funcionarios')->values($values)->execute();
+            $id = DB::insertInto('Funcionarios')->values($values)->execute();
             $this->loadByID($id);
         } catch (\Exception $e) {
             throw $this->translate($e);
@@ -545,11 +547,10 @@ class Funcionario extends \MZ\Database\Helper
         if (!$this->exists()) {
             throw new \Exception('O identificador do funcionário não foi informado');
         }
-        $values = self::filterValues($values, $only, $except);
+        $values = DB::filterValues($values, $only, $except);
         unset($values['datacadastro']);
         try {
-            self::getDB()
-                ->update('Funcionarios')
+            DB::update('Funcionarios')
                 ->set($values)
                 ->where('id', $this->getID())
                 ->execute();
@@ -578,8 +579,7 @@ class Funcionario extends \MZ\Database\Helper
         if (is_owner($this)) {
             throw new \Exception('Esse funcionário não pode ser excluído!');
         }
-        $result = self::getDB()
-            ->deleteFrom('Funcionarios')
+        $result = DB::deleteFrom('Funcionarios')
             ->where('id', $this->getID())
             ->execute();
         return $result;
@@ -723,7 +723,7 @@ class Funcionario extends \MZ\Database\Helper
      */
     private static function query($condition = [], $order = [])
     {
-        $query = self::getDB()->from('Funcionarios f')
+        $query = DB::from('Funcionarios f')
             ->leftJoin('Clientes c ON c.id = f.clienteid');
         if (isset($condition['search'])) {
             $search = trim($condition['search']);
@@ -738,9 +738,9 @@ class Funcionario extends \MZ\Database\Helper
             } elseif (Validator::checkDigits($search)) {
                 $query = $query->where('f.id', intval($search));
             } else {
-                $query = self::buildSearch(
+                $query = DB::buildSearch(
                     $search,
-                    self::concat([
+                    DB::concat([
                         'c.nome',
                         '" "',
                         'COALESCE(c.sobrenome, "")'
@@ -751,9 +751,9 @@ class Funcionario extends \MZ\Database\Helper
             unset($condition['search']);
         }
         $condition = self::filterCondition($condition);
-        $query = self::buildOrderBy($query, self::filterOrder($order));
+        $query = DB::buildOrderBy($query, self::filterOrder($order));
         $query = $query->orderBy('f.id ASC');
-        return self::buildCondition($query, $condition);
+        return DB::buildCondition($query, $condition);
     }
 
     /**
@@ -776,9 +776,8 @@ class Funcionario extends \MZ\Database\Helper
      */
     public static function findByID($id)
     {
-        return self::find([
-            'id' => intval($id),
-        ]);
+        $result = new self();
+        return $result->loadByID($id);
     }
 
     /**
@@ -788,9 +787,8 @@ class Funcionario extends \MZ\Database\Helper
      */
     public static function findByClienteID($cliente_id)
     {
-        return self::find([
-            'clienteid' => intval($cliente_id),
-        ]);
+        $result = new self();
+        return $result->loadByClienteID($cliente_id);
     }
 
     /**
@@ -800,9 +798,8 @@ class Funcionario extends \MZ\Database\Helper
      */
     public static function findByCodigoBarras($codigo_barras)
     {
-        return self::find([
-            'codigobarras' => strval($codigo_barras),
-        ]);
+        $result = new self();
+        return $result->loadByCodigoBarras($codigo_barras);
     }
 
     /**

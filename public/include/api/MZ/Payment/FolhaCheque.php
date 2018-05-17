@@ -24,13 +24,15 @@
  */
 namespace MZ\Payment;
 
+use MZ\Database\Model;
+use MZ\Database\DB;
 use MZ\Util\Filter;
 use MZ\Util\Validator;
 
 /**
  * Folhas de cheque de um pagamento
  */
-class FolhaCheque extends \MZ\Database\Helper
+class FolhaCheque extends Model
 {
 
     /**
@@ -523,7 +525,7 @@ class FolhaCheque extends \MZ\Database\Helper
         $values = $this->validate();
         unset($values['id']);
         try {
-            $id = self::getDB()->insertInto('Folhas_Cheques')->values($values)->execute();
+            $id = DB::insertInto('Folhas_Cheques')->values($values)->execute();
             $this->loadByID($id);
         } catch (\Exception $e) {
             throw $this->translate($e);
@@ -541,10 +543,9 @@ class FolhaCheque extends \MZ\Database\Helper
         if (!$this->exists()) {
             throw new \Exception('O identificador da folha de cheque não foi informado');
         }
-        $values = self::filterValues($values, $only, $except);
+        $values = DB::filterValues($values, $only, $except);
         try {
-            self::getDB()
-                ->update('Folhas_Cheques')
+            DB::update('Folhas_Cheques')
                 ->set($values)
                 ->where('id', $this->getID())
                 ->execute();
@@ -558,7 +559,7 @@ class FolhaCheque extends \MZ\Database\Helper
     public function recolher()
     {
         $this->setRecolhido('Y');
-        $this->setRecolhimento(self::now());
+        $this->setRecolhimento(DB::now());
         return $this->update();
     }
 
@@ -571,8 +572,7 @@ class FolhaCheque extends \MZ\Database\Helper
         if (!$this->exists()) {
             throw new \Exception('O identificador da folha de cheque não foi informado');
         }
-        $result = self::getDB()
-            ->deleteFrom('Folhas_Cheques')
+        $result = DB::deleteFrom('Folhas_Cheques')
             ->where('id', $this->getID())
             ->execute();
         return $result;
@@ -662,13 +662,13 @@ class FolhaCheque extends \MZ\Database\Helper
      */
     private static function query($condition = [], $order = [])
     {
-        $query = self::getDB()->from('Folhas_Cheques f')
+        $query = DB::from('Folhas_Cheques f')
             ->leftJoin('Cheques c ON c.id = f.chequeid');
         $condition = self::filterCondition($condition);
-        $query = self::buildOrderBy($query, self::filterOrder($order));
+        $query = DB::buildOrderBy($query, self::filterOrder($order));
         $query = $query->orderBy('f.numero ASC');
         $query = $query->orderBy('f.id ASC');
-        return self::buildCondition($query, $condition);
+        return DB::buildCondition($query, $condition);
     }
 
     /**
@@ -691,9 +691,8 @@ class FolhaCheque extends \MZ\Database\Helper
      */
     public static function findByID($id)
     {
-        return self::find([
-            'id' => intval($id),
-        ]);
+        $result = new self();
+        return $result->loadByID($id);
     }
 
     /**
@@ -704,10 +703,8 @@ class FolhaCheque extends \MZ\Database\Helper
      */
     public static function findByChequeIDNumero($cheque_id, $numero)
     {
-        return self::find([
-            'chequeid' => intval($cheque_id),
-            'numero' => strval($numero),
-        ]);
+        $result = new self();
+        return $result->loadByChequeIDNumero($cheque_id, $numero);
     }
 
     /**

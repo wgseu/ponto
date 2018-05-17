@@ -24,6 +24,8 @@
  */
 namespace MZ\Session;
 
+use MZ\Database\Model;
+use MZ\Database\DB;
 use MZ\Util\Filter;
 use MZ\Util\Validator;
 
@@ -31,7 +33,7 @@ use MZ\Util\Validator;
  * Movimentação do caixa, permite abrir diversos caixas na conta de
  * operadores
  */
-class Movimentacao extends \MZ\Database\Helper
+class Movimentacao extends Model
 {
 
     /**
@@ -305,7 +307,7 @@ class Movimentacao extends \MZ\Database\Helper
             $this->setFuncionarioAberturaID($movimentacao['funcionarioaberturaid']);
         }
         if (!isset($movimentacao['dataabertura'])) {
-            $this->setDataAbertura(self::now());
+            $this->setDataAbertura(DB::now());
         } else {
             $this->setDataAbertura($movimentacao['dataabertura']);
         }
@@ -406,7 +408,7 @@ class Movimentacao extends \MZ\Database\Helper
         $values = $this->validate();
         unset($values['id']);
         try {
-            $id = self::getDB()->insertInto('Movimentacoes')->values($values)->execute();
+            $id = DB::insertInto('Movimentacoes')->values($values)->execute();
             $this->loadByID($id);
         } catch (\Exception $e) {
             throw $this->translate($e);
@@ -426,10 +428,9 @@ class Movimentacao extends \MZ\Database\Helper
         if (!$this->exists()) {
             throw new \Exception('O identificador da movimentação não foi informado');
         }
-        $values = self::filterValues($values, $only, $except);
+        $values = DB::filterValues($values, $only, $except);
         try {
-            self::getDB()
-                ->update('Movimentacoes')
+            DB::update('Movimentacoes')
                 ->set($values)
                 ->where('id', $this->getID())
                 ->execute();
@@ -449,8 +450,7 @@ class Movimentacao extends \MZ\Database\Helper
         if (!$this->exists()) {
             throw new \Exception('O identificador da movimentação não foi informado');
         }
-        $result = self::getDB()
-            ->deleteFrom('Movimentacoes')
+        $result = DB::deleteFrom('Movimentacoes')
             ->where('id', $this->getID())
             ->execute();
         return $result;
@@ -562,11 +562,11 @@ class Movimentacao extends \MZ\Database\Helper
      */
     private static function query($condition = [], $order = [])
     {
-        $query = self::getDB()->from('Movimentacoes m');
+        $query = DB::from('Movimentacoes m');
         $condition = self::filterCondition($condition);
-        $query = self::buildOrderBy($query, self::filterOrder($order));
+        $query = DB::buildOrderBy($query, self::filterOrder($order));
         $query = $query->orderBy('m.id ASC');
-        return self::buildCondition($query, $condition);
+        return DB::buildCondition($query, $condition);
     }
 
     /**
@@ -589,9 +589,8 @@ class Movimentacao extends \MZ\Database\Helper
      */
     public static function findByID($id)
     {
-        return self::find([
-            'id' => intval($id),
-        ]);
+        $result = new self();
+        return $result->loadByID($id);
     }
 
     /**

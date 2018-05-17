@@ -24,6 +24,8 @@
  */
 namespace MZ\System;
 
+use MZ\Database\Model;
+use MZ\Database\DB;
 use MZ\Util\Filter;
 use MZ\Util\Validator;
 use MZ\Location\Localizacao;
@@ -32,7 +34,7 @@ use MZ\Location\Localizacao;
  * Classe que informa detalhes da empresa, parceiro e opções do sistema
  * como a versão do banco de dados e a licença de uso
  */
-class Sistema extends \MZ\Database\Helper
+class Sistema extends Model
 {
     const VERSAO = '1935';
 
@@ -672,10 +674,9 @@ class Sistema extends \MZ\Database\Helper
         if (!$this->exists()) {
             throw new \Exception('O identificador do sistema não foi informado');
         }
-        $values = self::filterValues($values, $only, $except);
+        $values = DB::filterValues($values, $only, $except);
         try {
-            self::getDB()
-                ->update('Sistema')
+            DB::update('Sistema')
                 ->set($values)
                 ->where('id', $this->getID())
                 ->execute();
@@ -695,8 +696,7 @@ class Sistema extends \MZ\Database\Helper
         if (!$this->exists()) {
             throw new \Exception('O identificador do sistema não foi informado');
         }
-        $result = self::getDB()
-            ->deleteFrom('Sistema')
+        $result = DB::deleteFrom('Sistema')
             ->where('id', $this->getID())
             ->execute();
         return $result;
@@ -821,12 +821,12 @@ class Sistema extends \MZ\Database\Helper
      */
     private static function query($condition = [], $order = [])
     {
-        $query = self::getDB()->from('Sistema s');
+        $query = DB::from('Sistema s');
         $condition = self::filterCondition($condition);
-        $query = self::buildOrderBy($query, self::filterOrder($order));
+        $query = DB::buildOrderBy($query, self::filterOrder($order));
         $query = $query->orderBy('s.versaodb ASC');
         $query = $query->orderBy('s.id ASC');
-        return self::buildCondition($query, $condition);
+        return DB::buildCondition($query, $condition);
     }
 
     /**
@@ -849,9 +849,8 @@ class Sistema extends \MZ\Database\Helper
      */
     public static function findByID($id)
     {
-        return self::find([
-            'id' => strval($id),
-        ]);
+        $result = new self();
+        return $result->loadByID($id);
     }
 
     /**

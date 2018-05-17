@@ -24,6 +24,8 @@
  */
 namespace MZ\Session;
 
+use MZ\Database\Model;
+use MZ\Database\DB;
 use MZ\Util\Filter;
 use MZ\Util\Validator;
 
@@ -31,7 +33,7 @@ use MZ\Util\Validator;
  * Sessão de trabalho do dia, permite que vários caixas sejam abertos
  * utilizando uma mesma sessão
  */
-class Sessao extends \MZ\Database\Helper
+class Sessao extends Model
 {
     const DESCONTO_ID = 1;
     const ENTREGA_ID = 2;
@@ -185,7 +187,7 @@ class Sessao extends \MZ\Database\Helper
             $this->setID($sessao['id']);
         }
         if (!isset($sessao['datainicio'])) {
-            $this->setDataInicio(self::now());
+            $this->setDataInicio(DB::now());
         } else {
             $this->setDataInicio($sessao['datainicio']);
         }
@@ -273,7 +275,7 @@ class Sessao extends \MZ\Database\Helper
         $values = $this->validate();
         unset($values['id']);
         try {
-            $id = self::getDB()->insertInto('Sessoes')->values($values)->execute();
+            $id = DB::insertInto('Sessoes')->values($values)->execute();
             $this->loadByID($id);
         } catch (\Exception $e) {
             throw $this->translate($e);
@@ -293,10 +295,9 @@ class Sessao extends \MZ\Database\Helper
         if (!$this->exists()) {
             throw new \Exception('O identificador da sessão não foi informado');
         }
-        $values = self::filterValues($values, $only, $except);
+        $values = DB::filterValues($values, $only, $except);
         try {
-            self::getDB()
-                ->update('Sessoes')
+            DB::update('Sessoes')
                 ->set($values)
                 ->where('id', $this->getID())
                 ->execute();
@@ -316,8 +317,7 @@ class Sessao extends \MZ\Database\Helper
         if (!$this->exists()) {
             throw new \Exception('O identificador da sessão não foi informado');
         }
-        $result = self::getDB()
-            ->deleteFrom('Sessoes')
+        $result = DB::deleteFrom('Sessoes')
             ->where('id', $this->getID())
             ->execute();
         return $result;
@@ -377,11 +377,11 @@ class Sessao extends \MZ\Database\Helper
      */
     private static function query($condition = [], $order = [])
     {
-        $query = self::getDB()->from('Sessoes s');
+        $query = DB::from('Sessoes s');
         $condition = self::filterCondition($condition);
-        $query = self::buildOrderBy($query, self::filterOrder($order));
+        $query = DB::buildOrderBy($query, self::filterOrder($order));
         $query = $query->orderBy('s.id ASC');
-        return self::buildCondition($query, $condition);
+        return DB::buildCondition($query, $condition);
     }
 
     /**
@@ -404,9 +404,8 @@ class Sessao extends \MZ\Database\Helper
      */
     public static function findByID($id)
     {
-        return self::find([
-            'id' => intval($id),
-        ]);
+        $result = new self();
+        return $result->loadByID($id);
     }
 
     /**

@@ -24,13 +24,15 @@
  */
 namespace MZ\Device;
 
+use MZ\Database\Model;
+use MZ\Database\DB;
 use MZ\Util\Filter;
 use MZ\Util\Validator;
 
 /**
  * Impressora para impressão de serviços e contas
  */
-class Impressora extends \MZ\Database\Helper
+class Impressora extends Model
 {
 
     /**
@@ -529,7 +531,7 @@ class Impressora extends \MZ\Database\Helper
         $values = $this->validate();
         unset($values['id']);
         try {
-            $id = self::getDB()->insertInto('Impressoras')->values($values)->execute();
+            $id = DB::insertInto('Impressoras')->values($values)->execute();
             $this->loadByID($id);
         } catch (\Exception $e) {
             throw $this->translate($e);
@@ -549,10 +551,9 @@ class Impressora extends \MZ\Database\Helper
         if (!$this->exists()) {
             throw new \Exception('O identificador da impressora não foi informado');
         }
-        $values = self::filterValues($values, $only, $except);
+        $values = DB::filterValues($values, $only, $except);
         try {
-            self::getDB()
-                ->update('Impressoras')
+            DB::update('Impressoras')
                 ->set($values)
                 ->where('id', $this->getID())
                 ->execute();
@@ -572,8 +573,7 @@ class Impressora extends \MZ\Database\Helper
         if (!$this->exists()) {
             throw new \Exception('O identificador da impressora não foi informado');
         }
-        $result = self::getDB()
-            ->deleteFrom('Impressoras')
+        $result = DB::deleteFrom('Impressoras')
             ->where('id', $this->getID())
             ->execute();
         return $result;
@@ -710,12 +710,12 @@ class Impressora extends \MZ\Database\Helper
      */
     private static function query($condition = [], $order = [])
     {
-        $query = self::getDB()->from('Impressoras i');
+        $query = DB::from('Impressoras i');
         $condition = self::filterCondition($condition);
-        $query = self::buildOrderBy($query, self::filterOrder($order));
+        $query = DB::buildOrderBy($query, self::filterOrder($order));
         $query = $query->orderBy('i.descricao ASC');
         $query = $query->orderBy('i.id ASC');
-        return self::buildCondition($query, $condition);
+        return DB::buildCondition($query, $condition);
     }
 
     /**
@@ -738,9 +738,8 @@ class Impressora extends \MZ\Database\Helper
      */
     public static function findByID($id)
     {
-        return self::find([
-            'id' => intval($id),
-        ]);
+        $result = new self();
+        return $result->loadByID($id);
     }
 
     /**
@@ -752,11 +751,8 @@ class Impressora extends \MZ\Database\Helper
      */
     public static function findBySetorIDDispositivoIDModo($setor_id, $dispositivo_id, $modo)
     {
-        return self::find([
-            'setorid' => intval($setor_id),
-            'dispositivoid' => intval($dispositivo_id),
-            'modo' => strval($modo),
-        ]);
+        $result = new self();
+        return $result->loadBySetorIDDispositivoIDModo($setor_id, $dispositivo_id, $modo);
     }
 
     /**
@@ -767,10 +763,8 @@ class Impressora extends \MZ\Database\Helper
      */
     public static function findByDispositivoIDDescricao($dispositivo_id, $descricao)
     {
-        return self::find([
-            'dispositivoid' => intval($dispositivo_id),
-            'descricao' => strval($descricao),
-        ]);
+        $result = new self();
+        return $result->loadByDispositivoIDDescricao($dispositivo_id, $descricao);
     }
 
     /**

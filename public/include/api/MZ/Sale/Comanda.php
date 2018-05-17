@@ -24,13 +24,15 @@
  */
 namespace MZ\Sale;
 
+use MZ\Database\Model;
+use MZ\Database\DB;
 use MZ\Util\Filter;
 use MZ\Util\Validator;
 
 /**
  * Comanda individual, permite lançar pedidos em cartões de consumo
  */
-class Comanda extends \MZ\Database\Helper
+class Comanda extends Model
 {
 
     /**
@@ -257,7 +259,7 @@ class Comanda extends \MZ\Database\Helper
     {
         $values = $this->validate();
         try {
-            $id = self::getDB()->insertInto('Comandas')->values($values)->execute();
+            $id = DB::insertInto('Comandas')->values($values)->execute();
             $this->loadByID($id);
         } catch (\Exception $e) {
             throw $this->translate($e);
@@ -275,10 +277,9 @@ class Comanda extends \MZ\Database\Helper
         if (!$this->exists()) {
             throw new \Exception('O identificador da comanda não foi informado');
         }
-        $values = self::filterValues($values, $only, $except);
+        $values = DB::filterValues($values, $only, $except);
         try {
-            self::getDB()
-                ->update('Comandas')
+            DB::update('Comandas')
                 ->set($values)
                 ->where('id', $this->getID())
                 ->execute();
@@ -298,8 +299,7 @@ class Comanda extends \MZ\Database\Helper
         if (!$this->exists()) {
             throw new \Exception('O identificador da comanda não foi informado');
         }
-        $result = self::getDB()
-            ->deleteFrom('Comandas')
+        $result = DB::deleteFrom('Comandas')
             ->where('id', $this->getID())
             ->execute();
         return $result;
@@ -337,9 +337,8 @@ class Comanda extends \MZ\Database\Helper
      */
     public static function findByID($id)
     {
-        return self::find([
-            'id' => intval($id),
-        ]);
+        $result = new self();
+        return $result->loadByID($id);
     }
 
     /**
@@ -349,9 +348,8 @@ class Comanda extends \MZ\Database\Helper
      */
     public static function findByNome($nome)
     {
-        return self::find([
-            'nome' => strval($nome),
-        ]);
+        $result = new self();
+        return $result->loadByNome($nome);
     }
 
     /**
@@ -405,7 +403,7 @@ class Comanda extends \MZ\Database\Helper
     private static function query($condition = [], $order = [])
     {
         $order = Filter::order($order);
-        $query = self::getDB()->from('Comandas c');
+        $query = DB::from('Comandas c');
         if (isset($condition['pedidos'])) {
             $query = $query->select('p.estado')
                 ->select('l.nome as cliente')
@@ -424,9 +422,9 @@ class Comanda extends \MZ\Database\Helper
         }
         $condition = self::filterCondition($condition);
         $order = Filter::order($order);
-        $query = self::buildOrderBy($query, self::filterOrder($order));
+        $query = DB::buildOrderBy($query, self::filterOrder($order));
         $query = $query->orderBy('c.id ASC');
-        return self::buildCondition($query, $condition);
+        return DB::buildCondition($query, $condition);
     }
 
     /**

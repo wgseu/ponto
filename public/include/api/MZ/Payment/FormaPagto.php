@@ -24,13 +24,15 @@
  */
 namespace MZ\Payment;
 
+use MZ\Database\Model;
+use MZ\Database\DB;
 use MZ\Util\Filter;
 use MZ\Util\Validator;
 
 /**
  * Formas de pagamento disponíveis para pedido e contas
  */
-class FormaPagto extends \MZ\Database\Helper
+class FormaPagto extends Model
 {
 
     /**
@@ -550,7 +552,7 @@ class FormaPagto extends \MZ\Database\Helper
         $values = $this->validate();
         unset($values['id']);
         try {
-            $id = self::getDB()->insertInto('Formas_Pagto')->values($values)->execute();
+            $id = DB::insertInto('Formas_Pagto')->values($values)->execute();
             $this->loadByID($id);
         } catch (\Exception $e) {
             throw $this->translate($e);
@@ -568,10 +570,9 @@ class FormaPagto extends \MZ\Database\Helper
         if (!$this->exists()) {
             throw new \Exception('O identificador da forma de pagamento não foi informado');
         }
-        $values = self::filterValues($values, $only, $except);
+        $values = DB::filterValues($values, $only, $except);
         try {
-            self::getDB()
-                ->update('Formas_Pagto')
+            DB::update('Formas_Pagto')
                 ->set($values)
                 ->where('id', $this->getID())
                 ->execute();
@@ -591,8 +592,7 @@ class FormaPagto extends \MZ\Database\Helper
         if (!$this->exists()) {
             throw new \Exception('O identificador da forma de pagamento não foi informado');
         }
-        $result = self::getDB()
-            ->deleteFrom('Formas_Pagto')
+        $result = DB::deleteFrom('Formas_Pagto')
             ->where('id', $this->getID())
             ->execute();
         return $result;
@@ -710,12 +710,12 @@ class FormaPagto extends \MZ\Database\Helper
      */
     private static function query($condition = [], $order = [])
     {
-        $query = self::getDB()->from('Formas_Pagto f');
+        $query = DB::from('Formas_Pagto f');
         $condition = self::filterCondition($condition);
-        $query = self::buildOrderBy($query, self::filterOrder($order));
+        $query = DB::buildOrderBy($query, self::filterOrder($order));
         $query = $query->orderBy('f.ativa ASC');
         $query = $query->orderBy('f.descricao ASC');
-        return self::buildCondition($query, $condition);
+        return DB::buildCondition($query, $condition);
     }
 
     /**
@@ -738,9 +738,8 @@ class FormaPagto extends \MZ\Database\Helper
      */
     public static function findByID($id)
     {
-        return self::find([
-            'id' => intval($id),
-        ]);
+        $result = new self();
+        return $result->loadByID($id);
     }
 
     /**
@@ -750,9 +749,8 @@ class FormaPagto extends \MZ\Database\Helper
      */
     public static function findByDescricao($descricao)
     {
-        return self::find([
-            'descricao' => strval($descricao),
-        ]);
+        $result = new self();
+        return $result->loadByDescricao($descricao);
     }
 
     /**

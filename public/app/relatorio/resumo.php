@@ -24,7 +24,7 @@
  */
 require_once(dirname(dirname(__DIR__)) . '/app.php');
 
-use MZ\Database\Helper;
+use MZ\Database\DB;
 use MZ\Payment\Pagamento;
 use MZ\Session\Sessao;
 use MZ\Sale\Pedido;
@@ -37,7 +37,7 @@ if (!logged_employee()->has(Permissao::NOME_RELATORIOCAIXA)) {
     json('Você não tem permissão para acessar o resumo de valores');
 }
 $sessao = Sessao::findLastAberta();
-$data_inicio = !$sessao->exists() ? Helper::date('today') : null;
+$data_inicio = !$sessao->exists() ? DB::date('today') : null;
 $response = ['status' => 'ok'];
 $response['vendas'] = Pedido::fetchTotal($sessao->getID(), $data_inicio);
 $response['receitas'] = Pagamento::getReceitas(
@@ -47,16 +47,16 @@ $response['despesas'] = Pagamento::getDespesas(
     ['sessaoid' => $sessao->getID(), 'apartir_datahora' => $data_inicio]
 );
 $response['faturamento']['atual'] = Pagamento::getFaturamento(
-    ['apartir_datahora' => Helper::date('first day of this month')]
+    ['apartir_datahora' => DB::date('first day of this month')]
 );
 $response['faturamento']['base'] = Pagamento::getFaturamento([
-    'apartir_datahora' => Helper::date('first day of last month'),
-    'ate_datahora' => Helper::now('-1 month')
+    'apartir_datahora' => DB::date('first day of last month'),
+    'ate_datahora' => DB::now('-1 month')
 ]);
 $response['faturamento']['estimado'] = round(($response['faturamento']['atual'] / date('j')) * date('t'), 4);
 $response['faturamento']['anterior'] = Pagamento::getFaturamento([
-    'apartir_datahora' => Helper::date('first day of last month'),
-    'ate_datahora' => Helper::now('-1 sec today first day of this month')
+    'apartir_datahora' => DB::date('first day of last month'),
+    'ate_datahora' => DB::now('-1 sec today first day of this month')
 ]);
 $response['faturamento']['restante'] = $response['faturamento']['anterior'] - $response['faturamento']['atual'];
 if ($response['faturamento']['anterior'] < 0.01) {
@@ -74,7 +74,7 @@ if ($response['faturamento']['anterior'] < 0.01) {
 }
 $response['faturamento']['pagamentos'] = Pagamento::rawFindAllTotal(
     [
-        'apartir_datahora' => Helper::date('first day of this month'),
+        'apartir_datahora' => DB::date('first day of this month'),
         '!pedidoid' => null
     ],
     ['forma_tipo' => true]
@@ -82,12 +82,12 @@ $response['faturamento']['pagamentos'] = Pagamento::rawFindAllTotal(
 $mes = abs(intval(isset($_GET['mes']) ? $_GET['mes'] : null));
 $meses = [];
 for ($i = $mes; $i < $mes + 4; $i++) {
-    $data = Helper::date("first day of -$i month");
+    $data = DB::date("first day of -$i month");
     $meses[] = [
         'mes' => human_date($data, true),
         'total' => Pagamento::getFaturamento([
             'apartir_datahora' => $data,
-            'ate_datahora' => Helper::now("last day of -$i month 23:59:59")
+            'ate_datahora' => DB::now("last day of -$i month 23:59:59")
         ])
     ];
 }

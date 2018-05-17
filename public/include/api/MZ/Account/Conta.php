@@ -24,13 +24,15 @@
  */
 namespace MZ\Account;
 
+use MZ\Database\Model;
+use MZ\Database\DB;
 use MZ\Util\Filter;
 use MZ\Util\Validator;
 
 /**
  * Contas a pagar e ou receber
  */
-class Conta extends \MZ\Database\Helper
+class Conta extends Model
 {
     const MOVIMENTACAO_ID = 1;
 
@@ -655,7 +657,7 @@ class Conta extends \MZ\Database\Helper
             $this->setDataPagamento($conta['datapagamento']);
         }
         if (!isset($conta['datacadastro'])) {
-            $this->setDataCadastro(self::now());
+            $this->setDataCadastro(DB::now());
         } else {
             $this->setDataCadastro($conta['datacadastro']);
         }
@@ -864,7 +866,7 @@ class Conta extends \MZ\Database\Helper
                 }
             }
         }
-        $this->setDataCadastro(self::now());
+        $this->setDataCadastro(DB::now());
         if (!empty($errors)) {
             throw new \MZ\Exception\ValidationException($errors);
         }
@@ -891,7 +893,7 @@ class Conta extends \MZ\Database\Helper
         $values = $this->validate();
         unset($values['id']);
         try {
-            $id = self::getDB()->insertInto('Contas')->values($values)->execute();
+            $id = DB::insertInto('Contas')->values($values)->execute();
             $this->loadByID($id);
         } catch (\Exception $e) {
             throw $this->translate($e);
@@ -914,11 +916,10 @@ class Conta extends \MZ\Database\Helper
         if ($this->getID() == self::MOVIMENTACAO_ID) {
             throw new \Exception('A conta informada é utilizada internamente pelo sistema e não pode ser alterada');
         }
-        $values = self::filterValues($values, $only, $except);
+        $values = DB::filterValues($values, $only, $except);
         unset($values['datacadastro']);
         try {
-            self::getDB()
-                ->update('Contas')
+            DB::update('Contas')
                 ->set($values)
                 ->where('id', $this->getID())
                 ->execute();
@@ -941,8 +942,7 @@ class Conta extends \MZ\Database\Helper
         if ($this->getID() == self::MOVIMENTACAO_ID) {
             throw new \Exception('A conta informada é utilizada internamente pelo sistema e não pode ser excluída');
         }
-        $result = self::getDB()
-            ->deleteFrom('Contas')
+        $result = DB::deleteFrom('Contas')
             ->where('id', $this->getID())
             ->execute();
         return $result;
@@ -1074,11 +1074,11 @@ class Conta extends \MZ\Database\Helper
      */
     private static function query($condition = [], $order = [])
     {
-        $query = self::getDB()->from('Contas c');
+        $query = DB::from('Contas c');
         $condition = self::filterCondition($condition);
-        $query = self::buildOrderBy($query, self::filterOrder($order));
+        $query = DB::buildOrderBy($query, self::filterOrder($order));
         $query = $query->orderBy('c.id DESC');
-        return self::buildCondition($query, $condition);
+        return DB::buildCondition($query, $condition);
     }
 
     /**
@@ -1101,9 +1101,8 @@ class Conta extends \MZ\Database\Helper
      */
     public static function findByID($id)
     {
-        return self::find([
-            'id' => intval($id),
-        ]);
+        $result = new self();
+        return $result->loadByID($id);
     }
 
     public static function getTotalAbertas(
@@ -1126,7 +1125,7 @@ class Conta extends \MZ\Database\Helper
             $data_fim = strtotime(date('Y-m').' '.$mes_fim.' month');
             $data_fim = strtotime('last day of this month', $data_fim);
         }
-        $db = self::getDB()->getPdo();
+        $db = DB::getPdo();
         $sql = '';
         $data = [];
         $descricao = trim($descricao);

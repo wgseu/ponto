@@ -27,13 +27,13 @@ require_once(dirname(dirname(__DIR__)) . '/app.php');
 use MZ\Session\Sessao;
 use MZ\Sale\Pedido;
 use MZ\System\Synchronizer;
-use MZ\Database\Helper;
+use MZ\Database\DB;
 
 if (!is_login()) {
     json('Usuário não autenticado!');
 }
 try {
-    \DB::BeginTransaction();
+    DB::beginTransaction();
     $sessao = Sessao::findByAberta(true);
     $pedido = new Pedido();
     $tipo = isset($_GET['tipo']) ? $_GET['tipo'] : null;
@@ -56,7 +56,7 @@ try {
     }
     if ($pedido->getEstado() != Pedido::ESTADO_FECHADO) {
         $pedido->setFechadorID(logged_employee()->getID());
-        $pedido->setDataImpressao(Helper::now());
+        $pedido->setDataImpressao(DB::now());
         $pedido->setEstado(Pedido::ESTADO_FECHADO);
         $pedido->update();
     }
@@ -69,10 +69,10 @@ try {
         $pedido->getComandaID(),
         Synchronizer::ACTION_STATE
     );
-    \DB::Commit();
+    DB::commit();
     json(['status' => 'ok']);
 } catch (\Exception $e) {
-    \DB::RollBack();
+    DB::rollBack();
     \Log::error($e->getMessage());
     json($e->getMessage());
 }

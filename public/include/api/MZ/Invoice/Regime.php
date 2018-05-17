@@ -24,13 +24,15 @@
  */
 namespace MZ\Invoice;
 
+use MZ\Database\Model;
+use MZ\Database\DB;
 use MZ\Util\Filter;
 use MZ\Util\Validator;
 
 /**
  * Regimes tributários
  */
-class Regime extends \MZ\Database\Helper
+class Regime extends Model
 {
 
     /**
@@ -236,7 +238,7 @@ class Regime extends \MZ\Database\Helper
         $values = $this->validate();
         unset($values['id']);
         try {
-            $id = self::getDB()->insertInto('Regimes')->values($values)->execute();
+            $id = DB::insertInto('Regimes')->values($values)->execute();
             $this->loadByID($id);
         } catch (\Exception $e) {
             throw $this->translate($e);
@@ -256,10 +258,9 @@ class Regime extends \MZ\Database\Helper
         if (!$this->exists()) {
             throw new \Exception('O identificador do regime não foi informado');
         }
-        $values = self::filterValues($values, $only, $except);
+        $values = DB::filterValues($values, $only, $except);
         try {
-            self::getDB()
-                ->update('Regimes')
+            DB::update('Regimes')
                 ->set($values)
                 ->where('id', $this->getID())
                 ->execute();
@@ -279,8 +280,7 @@ class Regime extends \MZ\Database\Helper
         if (!$this->exists()) {
             throw new \Exception('O identificador do regime não foi informado');
         }
-        $result = self::getDB()
-            ->deleteFrom('Regimes')
+        $result = DB::deleteFrom('Regimes')
             ->where('id', $this->getID())
             ->execute();
         return $result;
@@ -359,12 +359,12 @@ class Regime extends \MZ\Database\Helper
      */
     private static function query($condition = [], $order = [])
     {
-        $query = self::getDB()->from('Regimes r');
+        $query = DB::from('Regimes r');
         $condition = self::filterCondition($condition);
-        $query = self::buildOrderBy($query, self::filterOrder($order));
+        $query = DB::buildOrderBy($query, self::filterOrder($order));
         $query = $query->orderBy('r.descricao ASC');
         $query = $query->orderBy('r.id ASC');
-        return self::buildCondition($query, $condition);
+        return DB::buildCondition($query, $condition);
     }
 
     /**
@@ -387,9 +387,8 @@ class Regime extends \MZ\Database\Helper
      */
     public static function findByID($id)
     {
-        return self::find([
-            'id' => intval($id),
-        ]);
+        $result = new self();
+        return $result->loadByID($id);
     }
 
     /**
@@ -399,9 +398,8 @@ class Regime extends \MZ\Database\Helper
      */
     public static function findByCodigo($codigo)
     {
-        return self::find([
-            'codigo' => intval($codigo),
-        ]);
+        $result = new self();
+        return $result->loadByCodigo($codigo);
     }
 
     /**

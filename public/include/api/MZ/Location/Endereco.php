@@ -24,13 +24,15 @@
  */
 namespace MZ\Location;
 
+use MZ\Database\Model;
+use MZ\Database\DB;
 use MZ\Util\Filter;
 use MZ\Util\Validator;
 
 /**
  * Endereços de ruas e avenidas com informação de CEP
  */
-class Endereco extends \MZ\Database\Helper
+class Endereco extends Model
 {
 
     /**
@@ -320,7 +322,7 @@ class Endereco extends \MZ\Database\Helper
         $values = $this->validate();
         unset($values['id']);
         try {
-            $id = self::getDB()->insertInto('Enderecos')->values($values)->execute();
+            $id = DB::insertInto('Enderecos')->values($values)->execute();
             $this->loadByID($id);
         } catch (\Exception $e) {
             throw $this->translate($e);
@@ -340,10 +342,9 @@ class Endereco extends \MZ\Database\Helper
         if (!$this->exists()) {
             throw new \Exception('O identificador do endereço não foi informado');
         }
-        $values = self::filterValues($values, $only, $except);
+        $values = DB::filterValues($values, $only, $except);
         try {
-            self::getDB()
-                ->update('Enderecos')
+            DB::update('Enderecos')
                 ->set($values)
                 ->where('id', $this->getID())
                 ->execute();
@@ -363,8 +364,7 @@ class Endereco extends \MZ\Database\Helper
         if (!$this->exists()) {
             throw new \Exception('O identificador do endereço não foi informado');
         }
-        $result = self::getDB()
-            ->deleteFrom('Enderecos')
+        $result = DB::deleteFrom('Enderecos')
             ->where('id', $this->getID())
             ->execute();
         return $result;
@@ -475,12 +475,12 @@ class Endereco extends \MZ\Database\Helper
      */
     private static function query($condition = [], $order = [])
     {
-        $query = self::getDB()->from('Enderecos e');
+        $query = DB::from('Enderecos e');
         $condition = self::filterCondition($condition);
-        $query = self::buildOrderBy($query, self::filterOrder($order));
+        $query = DB::buildOrderBy($query, self::filterOrder($order));
         $query = $query->orderBy('e.logradouro ASC');
         $query = $query->orderBy('e.id ASC');
-        return self::buildCondition($query, $condition);
+        return DB::buildCondition($query, $condition);
     }
 
     /**
@@ -503,9 +503,8 @@ class Endereco extends \MZ\Database\Helper
      */
     public static function findByID($id)
     {
-        return self::find([
-            'id' => intval($id),
-        ]);
+        $result = new self();
+        return $result->loadByID($id);
     }
 
     /**
@@ -515,9 +514,8 @@ class Endereco extends \MZ\Database\Helper
      */
     public static function findByCEP($cep)
     {
-        return self::find([
-            'cep' => strval($cep),
-        ]);
+        $result = new self();
+        return $result->loadByCEP($cep);
     }
 
     /**
@@ -528,10 +526,8 @@ class Endereco extends \MZ\Database\Helper
      */
     public static function findByBairroIDLogradouro($bairro_id, $logradouro)
     {
-        return self::find([
-            'bairroid' => intval($bairro_id),
-            'logradouro' => strval($logradouro),
-        ]);
+        $result = new self();
+        return $result->loadByBairroIDLogradouro($bairro_id, $logradouro);
     }
 
     /**

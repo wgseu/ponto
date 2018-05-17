@@ -24,6 +24,8 @@
  */
 namespace MZ\Util;
 
+use MZ\Database\DB;
+
 /**
  * Validate common data
  */
@@ -256,6 +258,6 @@ class Validator
         if (is_null($value) && $empty) {
             return true;
         }
-        return self::checkInSet($value, \MZ\Database\Helper::getBooleanOptions(), $empty);
+        return self::checkInSet($value, DB::getBooleanOptions(), $empty);
     }
 }

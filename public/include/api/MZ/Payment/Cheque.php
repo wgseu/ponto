@@ -24,13 +24,15 @@
  */
 namespace MZ\Payment;
 
+use MZ\Database\Model;
+use MZ\Database\DB;
 use MZ\Util\Filter;
 use MZ\Util\Validator;
 
 /**
  * Cheques lançados como pagamentos
  */
-class Cheque extends \MZ\Database\Helper
+class Cheque extends Model
 {
 
     /**
@@ -443,7 +445,7 @@ class Cheque extends \MZ\Database\Helper
         $values = $this->validate();
         unset($values['id']);
         try {
-            $id = self::getDB()->insertInto('Cheques')->values($values)->execute();
+            $id = DB::insertInto('Cheques')->values($values)->execute();
             $this->loadByID($id);
         } catch (\Exception $e) {
             throw $this->translate($e);
@@ -463,10 +465,9 @@ class Cheque extends \MZ\Database\Helper
         if (!$this->exists()) {
             throw new \Exception('O identificador do cheque não foi informado');
         }
-        $values = self::filterValues($values, $only, $except);
+        $values = DB::filterValues($values, $only, $except);
         try {
-            self::getDB()
-                ->update('Cheques')
+            DB::update('Cheques')
                 ->set($values)
                 ->where('id', $this->getID())
                 ->execute();
@@ -486,8 +487,7 @@ class Cheque extends \MZ\Database\Helper
         if (!$this->exists()) {
             throw new \Exception('O identificador do cheque não foi informado');
         }
-        $result = self::getDB()
-            ->deleteFrom('Cheques')
+        $result = DB::deleteFrom('Cheques')
             ->where('id', $this->getID())
             ->execute();
         return $result;
@@ -565,11 +565,11 @@ class Cheque extends \MZ\Database\Helper
      */
     private static function query($condition = [], $order = [])
     {
-        $query = self::getDB()->from('Cheques c');
+        $query = DB::from('Cheques c');
         $condition = self::filterCondition($condition);
-        $query = self::buildOrderBy($query, self::filterOrder($order));
+        $query = DB::buildOrderBy($query, self::filterOrder($order));
         $query = $query->orderBy('c.id ASC');
-        return self::buildCondition($query, $condition);
+        return DB::buildCondition($query, $condition);
     }
 
     /**
@@ -592,9 +592,8 @@ class Cheque extends \MZ\Database\Helper
      */
     public static function findByID($id)
     {
-        return self::find([
-            'id' => intval($id),
-        ]);
+        $result = new self();
+        return $result->loadByID($id);
     }
 
     /**

@@ -24,6 +24,8 @@
  */
 namespace MZ\Location;
 
+use MZ\Database\Model;
+use MZ\Database\DB;
 use MZ\Util\Filter;
 use MZ\Util\Validator;
 use MZ\System\Permissao;
@@ -32,7 +34,7 @@ use MZ\Exception\ValidationException;
 /**
  * Bairro de uma cidade
  */
-class Bairro extends \MZ\Database\Helper
+class Bairro extends Model
 {
 
     /**
@@ -282,7 +284,7 @@ class Bairro extends \MZ\Database\Helper
         if (is_null($this->getDisponivel())) {
             $this->setDisponivel('N');
         }
-        if (!array_key_exists($this->getDisponivel(), self::getBooleanOptions())) {
+        if (!array_key_exists($this->getDisponivel(), DB::getBooleanOptions())) {
             $errors['disponivel'] = 'A disponibilidade de entrega é inválida';
         }
         if (!empty($errors)) {
@@ -320,9 +322,8 @@ class Bairro extends \MZ\Database\Helper
      */
     public static function findByID($id)
     {
-        return self::find([
-            'id' => intval($id),
-        ]);
+        $result = new self();
+        return $result->loadByID($id);
     }
 
     /**
@@ -333,10 +334,8 @@ class Bairro extends \MZ\Database\Helper
      */
     public static function findByCidadeIDNome($cidade_id, $nome)
     {
-        return self::find([
-            'cidadeid' => intval($cidade_id),
-            'nome' => strval($nome),
-        ]);
+        $result = new self();
+        return $result->loadByCidadeIDNome($cidade_id, $nome);
     }
 
     /**
@@ -424,14 +423,14 @@ class Bairro extends \MZ\Database\Helper
      */
     private static function query($condition = [], $order = [])
     {
-        $query = self::getDB()->from('Bairros b')
+        $query = DB::from('Bairros b')
             ->leftJoin('Cidades c ON c.id = b.cidadeid')
             ->leftJoin('Estados e ON e.id = c.estadoid');
         $condition = self::filterCondition($condition);
-        $query = self::buildOrderBy($query, self::filterOrder($order));
+        $query = DB::buildOrderBy($query, self::filterOrder($order));
         $query = $query->orderBy('b.nome ASC');
         $query = $query->orderBy('b.id ASC');
-        return self::buildCondition($query, $condition);
+        return DB::buildCondition($query, $condition);
     }
 
     /**
@@ -484,7 +483,7 @@ class Bairro extends \MZ\Database\Helper
         $values = $this->validate();
         unset($values['id']);
         try {
-            $id = self::getDB()->insertInto('Bairros')->values($values)->execute();
+            $id = DB::insertInto('Bairros')->values($values)->execute();
             $this->loadByID($id);
         } catch (\Exception $e) {
             throw $this->translate($e);
@@ -504,10 +503,9 @@ class Bairro extends \MZ\Database\Helper
         if (!$this->exists()) {
             throw new \Exception('O identificador do bairro não foi informado');
         }
-        $values = self::filterValues($values, $only, $except);
+        $values = DB::filterValues($values, $only, $except);
         try {
-            self::getDB()
-                ->update('Bairros')
+            DB::update('Bairros')
                 ->set($values)
                 ->where('id', $this->getID())
                 ->execute();
@@ -527,8 +525,7 @@ class Bairro extends \MZ\Database\Helper
         if (!$this->exists()) {
             throw new \Exception('O identificador do bairro não foi informado');
         }
-        $result = self::getDB()
-            ->deleteFrom('Bairros')
+        $result = DB::deleteFrom('Bairros')
             ->where('id', $this->getID())
             ->execute();
         return $result;

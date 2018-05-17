@@ -25,6 +25,8 @@
 namespace MZ\Association;
 
 use MZ\Util\Document;
+use MZ\Database\Model;
+use MZ\Database\DB;
 use MZ\Util\Filter;
 use MZ\Location\Localizacao;
 use MZ\Location\Cidade;
@@ -143,7 +145,7 @@ class Order extends Pedido
         // $obs = str_replace("\r", '', str_replace("\n", ', ', trim($obs)));
         $this->setDescricao($obs);
         $data_criacao = Document::childValue($body_pedido, 'dataPedidoComanda');
-        $this->setDataCriacao(self::now($data_criacao));
+        $this->setDataCriacao(DB::now($data_criacao));
         $this->setTipo(self::TIPO_ENTREGA);
         $this->setEstado(self::ESTADO_AGENDADO);
         $this->setPessoas(1);
@@ -293,7 +295,7 @@ class Order extends Pedido
                         if ($debito) {
                             $pagamento->setDetalhes('Cartão de débito');
                         }
-                        $pagamento->setDataCompensacao(self::now('+' . intval($cartao->getDiasRepasse()) . ' day'));
+                        $pagamento->setDataCompensacao(DB::now('+' . intval($cartao->getDiasRepasse()) . ' day'));
                     } elseif ($forma_pagto->getTipo() != FormaPagto::TIPO_DINHEIRO) {
                         throw new \Exception('Apenas dinheiro e cartão são aceitos', 500);
                     }
@@ -541,7 +543,7 @@ class Order extends Pedido
     {
         $action = Synchronizer::ACTION_ADDED;
         try {
-            \DB::BeginTransaction();
+            DB::beginTransaction();
             $this->validaAcesso($this->employee);
             if (!$this->exists()) {
                 $sessao = Sessao::findByAberta(true);
@@ -648,9 +650,9 @@ class Order extends Pedido
                     $sync->printServices($this->getID());
                 }
             }
-            \DB::Commit();
+            DB::commit();
         } catch (\Exception $e) {
-            \DB::RollBack();
+            DB::rollBack();
             throw $e;
         }
         return $action;

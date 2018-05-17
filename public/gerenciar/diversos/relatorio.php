@@ -1,7 +1,7 @@
 <?php
 require_once(dirname(__DIR__) . '/app.php');
 
-use MZ\Database\Helper;
+use MZ\Database\DB;
 use MZ\Payment\Pagamento;
 
 need_owner(true);
@@ -20,8 +20,8 @@ if ($action == 'faturamento') {
     }
     $faturamentos = Pagamento::rawFindAllTotal(
         [
-            'apartir_datahora' => Helper::date($start),
-            'ate_datahora' => Helper::now(strtotime('-1 sec tomorrow', $end)),
+            'apartir_datahora' => DB::date($start),
+            'ate_datahora' => DB::now(strtotime('-1 sec tomorrow', $end)),
             '!pedidoid' => null
         ],
         ['dia' => true]
@@ -38,28 +38,28 @@ if ($action == 'faturamento') {
     $intervalo = strtolower(isset($_GET['intervalo']) ? $_GET['intervalo'] : null);
     switch ($intervalo) {
         case 'anual':
-            $atual_de = Helper::date('first day of jan');
+            $atual_de = DB::date('first day of jan');
             $atual_ate = null;
-            $base_de = Helper::date('first day of jan last year');
-            $base_ate = Helper::now('-1 sec first day of jan');
+            $base_de = DB::date('first day of jan last year');
+            $base_ate = DB::now('-1 sec first day of jan');
             break;
         case 'semanal':
-            $atual_de = Helper::date('monday this week');
+            $atual_de = DB::date('monday this week');
             $atual_ate = null;
-            $base_de = Helper::date('monday last week');
-            $base_ate = Helper::now('-1 sec monday this week');
+            $base_de = DB::date('monday last week');
+            $base_ate = DB::now('-1 sec monday this week');
             break;
         case 'diaria':
-            $atual_de = Helper::date('today');
+            $atual_de = DB::date('today');
             $atual_ate = null;
-            $base_de = Helper::date('-1 week');
-            $base_ate = Helper::now('-1 sec tomorrow -1 week');
+            $base_de = DB::date('-1 week');
+            $base_ate = DB::now('-1 sec tomorrow -1 week');
             break;
         default: // mensal
-            $atual_de = Helper::date('first day of this month');
+            $atual_de = DB::date('first day of this month');
             $atual_ate = null;
-            $base_de = Helper::date('first day of last month');
-            $base_ate = Helper::now('-1 sec today first day of this month');
+            $base_de = DB::date('first day of last month');
+            $base_ate = DB::now('-1 sec today first day of this month');
             break;
     }
     $atual = Pagamento::getFaturamento(['apartir_datahora' => $atual_de, 'ate_datahora' => $atual_ate]);

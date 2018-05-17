@@ -24,13 +24,15 @@
  */
 namespace MZ\Invoice;
 
+use MZ\Database\Model;
+use MZ\Database\DB;
 use MZ\Util\Filter;
 use MZ\Util\Validator;
 
 /**
  * Eventos de envio das notas
  */
-class Evento extends \MZ\Database\Helper
+class Evento extends Model
 {
 
     /**
@@ -258,7 +260,7 @@ class Evento extends \MZ\Database\Helper
             $this->setCodigo($evento['codigo']);
         }
         if (!isset($evento['datacriacao'])) {
-            $this->setDataCriacao(self::now());
+            $this->setDataCriacao(DB::now());
         } else {
             $this->setDataCriacao($evento['datacriacao']);
         }
@@ -347,7 +349,7 @@ class Evento extends \MZ\Database\Helper
         $values = $this->validate();
         unset($values['id']);
         try {
-            $id = self::getDB()->insertInto('Eventos')->values($values)->execute();
+            $id = DB::insertInto('Eventos')->values($values)->execute();
             $this->loadByID($id);
         } catch (\Exception $e) {
             throw $this->translate($e);
@@ -367,10 +369,9 @@ class Evento extends \MZ\Database\Helper
         if (!$this->exists()) {
             throw new \Exception('O identificador do evento não foi informado');
         }
-        $values = self::filterValues($values, $only, $except);
+        $values = DB::filterValues($values, $only, $except);
         try {
-            self::getDB()
-                ->update('Eventos')
+            DB::update('Eventos')
                 ->set($values)
                 ->where('id', $this->getID())
                 ->execute();
@@ -390,8 +391,7 @@ class Evento extends \MZ\Database\Helper
         if (!$this->exists()) {
             throw new \Exception('O identificador do evento não foi informado');
         }
-        $result = self::getDB()
-            ->deleteFrom('Eventos')
+        $result = DB::deleteFrom('Eventos')
             ->where('id', $this->getID())
             ->execute();
         return $result;
@@ -499,11 +499,11 @@ class Evento extends \MZ\Database\Helper
      */
     private static function query($condition = [], $order = [])
     {
-        $query = self::getDB()->from('Eventos e');
+        $query = DB::from('Eventos e');
         $condition = self::filterCondition($condition);
-        $query = self::buildOrderBy($query, self::filterOrder($order));
+        $query = DB::buildOrderBy($query, self::filterOrder($order));
         $query = $query->orderBy('e.id ASC');
-        return self::buildCondition($query, $condition);
+        return DB::buildCondition($query, $condition);
     }
 
     /**
@@ -526,9 +526,8 @@ class Evento extends \MZ\Database\Helper
      */
     public static function findByID($id)
     {
-        return self::find([
-            'id' => intval($id),
-        ]);
+        $result = new self();
+        return $result->loadByID($id);
     }
 
     /**

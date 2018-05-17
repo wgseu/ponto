@@ -24,13 +24,15 @@
  */
 namespace MZ\Invoice;
 
+use MZ\Database\Model;
+use MZ\Database\DB;
 use MZ\Util\Filter;
 use MZ\Util\Validator;
 
 /**
  * Código Fiscal de Operações e Prestações (CFOP)
  */
-class Operacao extends \MZ\Database\Helper
+class Operacao extends Model
 {
 
     /**
@@ -267,7 +269,7 @@ class Operacao extends \MZ\Database\Helper
         $values = $this->validate();
         unset($values['id']);
         try {
-            $id = self::getDB()->insertInto('Operacoes')->values($values)->execute();
+            $id = DB::insertInto('Operacoes')->values($values)->execute();
             $this->loadByID($id);
         } catch (\Exception $e) {
             throw $this->translate($e);
@@ -287,10 +289,9 @@ class Operacao extends \MZ\Database\Helper
         if (!$this->exists()) {
             throw new \Exception('O identificador da operação não foi informado');
         }
-        $values = self::filterValues($values, $only, $except);
+        $values = DB::filterValues($values, $only, $except);
         try {
-            self::getDB()
-                ->update('Operacoes')
+            DB::update('Operacoes')
                 ->set($values)
                 ->where('id', $this->getID())
                 ->execute();
@@ -310,8 +311,7 @@ class Operacao extends \MZ\Database\Helper
         if (!$this->exists()) {
             throw new \Exception('O identificador da operação não foi informado');
         }
-        $result = self::getDB()
-            ->deleteFrom('Operacoes')
+        $result = DB::deleteFrom('Operacoes')
             ->where('id', $this->getID())
             ->execute();
         return $result;
@@ -390,12 +390,12 @@ class Operacao extends \MZ\Database\Helper
      */
     private static function query($condition = [], $order = [])
     {
-        $query = self::getDB()->from('Operacoes o');
+        $query = DB::from('Operacoes o');
         $condition = self::filterCondition($condition);
-        $query = self::buildOrderBy($query, self::filterOrder($order));
+        $query = DB::buildOrderBy($query, self::filterOrder($order));
         $query = $query->orderBy('o.descricao ASC');
         $query = $query->orderBy('o.id ASC');
-        return self::buildCondition($query, $condition);
+        return DB::buildCondition($query, $condition);
     }
 
     /**
@@ -418,9 +418,8 @@ class Operacao extends \MZ\Database\Helper
      */
     public static function findByID($id)
     {
-        return self::find([
-            'id' => intval($id),
-        ]);
+        $result = new self();
+        return $result->loadByID($id);
     }
 
     /**
@@ -430,9 +429,8 @@ class Operacao extends \MZ\Database\Helper
      */
     public static function findByCodigo($codigo)
     {
-        return self::find([
-            'codigo' => intval($codigo),
-        ]);
+        $result = new self();
+        return $result->loadByCodigo($codigo);
     }
 
     /**

@@ -24,6 +24,8 @@
  */
 namespace MZ\Sale;
 
+use MZ\Database\Model;
+use MZ\Database\DB;
 use MZ\Util\Filter;
 use MZ\Util\Validator;
 
@@ -31,7 +33,7 @@ use MZ\Util\Validator;
  * Informa qual foi a formação que gerou esse produto, assim como quais
  * item foram retirados/adicionados da composição
  */
-class Formacao extends \MZ\Database\Helper
+class Formacao extends Model
 {
 
     /**
@@ -348,7 +350,7 @@ class Formacao extends \MZ\Database\Helper
         $values = $this->validate();
         unset($values['id']);
         try {
-            $id = self::getDB()->insertInto('Formacoes')->values($values)->execute();
+            $id = DB::insertInto('Formacoes')->values($values)->execute();
             $this->loadByID($id);
         } catch (\Exception $e) {
             throw $this->translate($e);
@@ -368,10 +370,9 @@ class Formacao extends \MZ\Database\Helper
         if (!$this->exists()) {
             throw new \Exception('O identificador da formação não foi informado');
         }
-        $values = self::filterValues($values, $only, $except);
+        $values = DB::filterValues($values, $only, $except);
         try {
-            self::getDB()
-                ->update('Formacoes')
+            DB::update('Formacoes')
                 ->set($values)
                 ->where('id', $this->getID())
                 ->execute();
@@ -391,8 +392,7 @@ class Formacao extends \MZ\Database\Helper
         if (!$this->exists()) {
             throw new \Exception('O identificador da formação não foi informado');
         }
-        $result = self::getDB()
-            ->deleteFrom('Formacoes')
+        $result = DB::deleteFrom('Formacoes')
             ->where('id', $this->getID())
             ->execute();
         return $result;
@@ -516,11 +516,11 @@ class Formacao extends \MZ\Database\Helper
      */
     private static function query($condition = [], $order = [])
     {
-        $query = self::getDB()->from('Formacoes f');
+        $query = DB::from('Formacoes f');
         $condition = self::filterCondition($condition);
-        $query = self::buildOrderBy($query, self::filterOrder($order));
+        $query = DB::buildOrderBy($query, self::filterOrder($order));
         $query = $query->orderBy('f.id ASC');
-        return self::buildCondition($query, $condition);
+        return DB::buildCondition($query, $condition);
     }
 
     /**
@@ -543,9 +543,8 @@ class Formacao extends \MZ\Database\Helper
      */
     public static function findByID($id)
     {
-        return self::find([
-            'id' => intval($id),
-        ]);
+        $result = new self();
+        return $result->loadByID($id);
     }
 
     /**
@@ -556,10 +555,8 @@ class Formacao extends \MZ\Database\Helper
      */
     public static function findByProdutoPedidoIDPacoteID($produto_pedido_id, $pacote_id)
     {
-        return self::find([
-            'produtopedidoid' => intval($produto_pedido_id),
-            'pacoteid' => intval($pacote_id),
-        ]);
+        $result = new self();
+        return $result->loadByProdutoPedidoIDPacoteID($produto_pedido_id, $pacote_id);
     }
 
     /**

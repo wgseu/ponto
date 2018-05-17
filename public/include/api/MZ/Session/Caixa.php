@@ -24,13 +24,15 @@
  */
 namespace MZ\Session;
 
+use MZ\Database\Model;
+use MZ\Database\DB;
 use MZ\Util\Filter;
 use MZ\Util\Validator;
 
 /**
  * Caixas de movimentação financeira
  */
-class Caixa extends \MZ\Database\Helper
+class Caixa extends Model
 {
 
     /**
@@ -323,7 +325,7 @@ class Caixa extends \MZ\Database\Helper
         $values = $this->validate();
         unset($values['id']);
         try {
-            $id = self::getDB()->insertInto('Caixas')->values($values)->execute();
+            $id = DB::insertInto('Caixas')->values($values)->execute();
             $this->loadByID($id);
         } catch (\Exception $e) {
             throw $this->translate($e);
@@ -343,10 +345,9 @@ class Caixa extends \MZ\Database\Helper
         if (!$this->exists()) {
             throw new \Exception('O identificador do caixa não foi informado');
         }
-        $values = self::filterValues($values, $only, $except);
+        $values = DB::filterValues($values, $only, $except);
         try {
-            self::getDB()
-                ->update('Caixas')
+            DB::update('Caixas')
                 ->set($values)
                 ->where('id', $this->getID())
                 ->execute();
@@ -366,8 +367,7 @@ class Caixa extends \MZ\Database\Helper
     {
         // TODO: convert to incremental version
         try {
-            self::getDB()
-                ->update('Caixas')
+            DB::update('Caixas')
                 ->set('numeroinicial', '1')
                 ->where('serie', $serie)
                 ->where('ativo', 'Y')
@@ -387,8 +387,7 @@ class Caixa extends \MZ\Database\Helper
         if (!$this->exists()) {
             throw new \Exception('O identificador do caixa não foi informado');
         }
-        $result = self::getDB()
-            ->deleteFrom('Caixas')
+        $result = DB::deleteFrom('Caixas')
             ->where('id', $this->getID())
             ->execute();
         return $result;
@@ -467,12 +466,12 @@ class Caixa extends \MZ\Database\Helper
      */
     private static function query($condition = [], $order = [])
     {
-        $query = self::getDB()->from('Caixas c');
+        $query = DB::from('Caixas c');
         $condition = self::filterCondition($condition);
-        $query = self::buildOrderBy($query, self::filterOrder($order));
+        $query = DB::buildOrderBy($query, self::filterOrder($order));
         $query = $query->orderBy('c.descricao ASC');
         $query = $query->orderBy('c.id ASC');
-        return self::buildCondition($query, $condition);
+        return DB::buildCondition($query, $condition);
     }
 
     /**
@@ -495,9 +494,8 @@ class Caixa extends \MZ\Database\Helper
      */
     public static function findByID($id)
     {
-        return self::find([
-            'id' => intval($id),
-        ]);
+        $result = new self();
+        return $result->loadByID($id);
     }
 
     /**
@@ -507,9 +505,8 @@ class Caixa extends \MZ\Database\Helper
      */
     public static function findByDescricao($descricao)
     {
-        return self::find([
-            'descricao' => strval($descricao),
-        ]);
+        $result = new self();
+        return $result->loadByDescricao($descricao);
     }
 
     /**

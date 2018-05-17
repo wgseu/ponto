@@ -24,6 +24,8 @@
  */
 namespace MZ\Location;
 
+use MZ\Database\Model;
+use MZ\Database\DB;
 use MZ\Util\Filter;
 use MZ\Util\Validator;
 use MZ\System\Permissao;
@@ -32,7 +34,7 @@ use MZ\Exception\ValidationException;
 /**
  * Cidade de um estado, contém bairros
  */
-class Cidade extends \MZ\Database\Helper
+class Cidade extends Model
 {
 
     /**
@@ -285,9 +287,8 @@ class Cidade extends \MZ\Database\Helper
      */
     public static function findByID($id)
     {
-        return self::find([
-            'id' => intval($id),
-        ]);
+        $result = new self();
+        return $result->loadByID($id);
     }
 
     /**
@@ -298,10 +299,8 @@ class Cidade extends \MZ\Database\Helper
      */
     public static function findByEstadoIDNome($estado_id, $nome)
     {
-        return self::find([
-            'estadoid' => intval($estado_id),
-            'nome' => strval($nome),
-        ]);
+        $result = new self();
+        return $result->loadByEstadoIDNome($estado_id, $nome);
     }
 
     /**
@@ -311,9 +310,8 @@ class Cidade extends \MZ\Database\Helper
      */
     public static function findByCEP($cep)
     {
-        return self::find([
-            'cep' => strval($cep),
-        ]);
+        $result = new self();
+        return $result->loadByCEP($cep);
     }
 
     /**
@@ -399,13 +397,13 @@ class Cidade extends \MZ\Database\Helper
      */
     private static function query($condition = [], $order = [])
     {
-        $query = self::getDB()->from('Cidades c');
+        $query = DB::from('Cidades c');
         $query = $query->leftJoin('Estados e ON e.id = c.estadoid');
         $condition = self::filterCondition($condition);
-        $query = self::buildOrderBy($query, self::filterOrder($order));
+        $query = DB::buildOrderBy($query, self::filterOrder($order));
         $query = $query->orderBy('c.nome ASC');
         $query = $query->orderBy('c.id ASC');
-        return self::buildCondition($query, $condition);
+        return DB::buildCondition($query, $condition);
     }
 
     /**
@@ -458,7 +456,7 @@ class Cidade extends \MZ\Database\Helper
         $values = $this->validate();
         unset($values['id']);
         try {
-            $id = self::getDB()->insertInto('Cidades')->values($values)->execute();
+            $id = DB::insertInto('Cidades')->values($values)->execute();
             $this->loadByID($id);
         } catch (\Exception $e) {
             throw $this->translate($e);
@@ -478,10 +476,9 @@ class Cidade extends \MZ\Database\Helper
         if (!$this->exists()) {
             throw new \Exception('O identificador da cidade não foi informado');
         }
-        $values = self::filterValues($values, $only, $except);
+        $values = DB::filterValues($values, $only, $except);
         try {
-            self::getDB()
-                ->update('Cidades')
+            DB::update('Cidades')
                 ->set($values)
                 ->where('id', $this->getID())
                 ->execute();
@@ -501,8 +498,7 @@ class Cidade extends \MZ\Database\Helper
         if (!$this->exists()) {
             throw new \Exception('O identificador da cidade não foi informado');
         }
-        $result = self::getDB()
-            ->deleteFrom('Cidades')
+        $result = DB::deleteFrom('Cidades')
             ->where('id', $this->getID())
             ->execute();
         return $result;

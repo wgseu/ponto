@@ -24,13 +24,15 @@
  */
 namespace MZ\Employee;
 
+use MZ\Database\Model;
+use MZ\Database\DB;
 use MZ\Util\Filter;
 use MZ\Util\Validator;
 
 /**
  * Função ou cargo de um funcionário
  */
-class Funcao extends \MZ\Database\Helper
+class Funcao extends Model
 {
 
     /**
@@ -238,7 +240,7 @@ class Funcao extends \MZ\Database\Helper
         $values = $this->validate();
         unset($values['id']);
         try {
-            $id = self::getDB()->insertInto('Funcoes')->values($values)->execute();
+            $id = DB::insertInto('Funcoes')->values($values)->execute();
             $this->loadByID($id);
         } catch (\Exception $e) {
             throw $this->translate($e);
@@ -258,10 +260,9 @@ class Funcao extends \MZ\Database\Helper
         if (!$this->exists()) {
             throw new \Exception('O identificador da função não foi informado');
         }
-        $values = self::filterValues($values, $only, $except);
+        $values = DB::filterValues($values, $only, $except);
         try {
-            self::getDB()
-                ->update('Funcoes')
+            DB::update('Funcoes')
                 ->set($values)
                 ->where('id', $this->getID())
                 ->execute();
@@ -281,8 +282,7 @@ class Funcao extends \MZ\Database\Helper
         if (!$this->exists()) {
             throw new \Exception('O identificador da função não foi informado');
         }
-        $result = self::getDB()
-            ->deleteFrom('Funcoes')
+        $result = DB::deleteFrom('Funcoes')
             ->where('id', $this->getID())
             ->execute();
         return $result;
@@ -361,12 +361,12 @@ class Funcao extends \MZ\Database\Helper
      */
     private static function query($condition = [], $order = [])
     {
-        $query = self::getDB()->from('Funcoes f');
+        $query = DB::from('Funcoes f');
         $condition = self::filterCondition($condition);
-        $query = self::buildOrderBy($query, self::filterOrder($order));
+        $query = DB::buildOrderBy($query, self::filterOrder($order));
         $query = $query->orderBy('f.descricao ASC');
         $query = $query->orderBy('f.id ASC');
-        return self::buildCondition($query, $condition);
+        return DB::buildCondition($query, $condition);
     }
 
     /**
@@ -389,9 +389,8 @@ class Funcao extends \MZ\Database\Helper
      */
     public static function findByID($id)
     {
-        return self::find([
-            'id' => intval($id),
-        ]);
+        $result = new self();
+        return $result->loadByID($id);
     }
 
     /**
@@ -401,9 +400,8 @@ class Funcao extends \MZ\Database\Helper
      */
     public static function findByDescricao($descricao)
     {
-        return self::find([
-            'descricao' => strval($descricao),
-        ]);
+        $result = new self();
+        return $result->loadByDescricao($descricao);
     }
 
     /**

@@ -41,7 +41,7 @@ $old_modulo = $modulo;
 if (is_post()) {
     $modulo = new Modulo($_POST);
     try {
-        \DB::BeginTransaction();
+        DB::beginTransaction();
         $modulo->filter($old_modulo);
         $modulo->update();
         $old_modulo->clean($modulo);
@@ -51,14 +51,14 @@ if (is_post()) {
         } catch (\Exception $e) {
             \Log::error($e->getMessage());
         }
-        \DB::Commit();
+        DB::commit();
         $msg = sprintf(
             'Módulo "%s" atualizado com sucesso!',
             $modulo->getNome()
         );
         json(null, ['item' => $modulo->publish(), 'msg' => $msg]);
     } catch (\Exception $e) {
-        \DB::Rollback();
+        DB::Rollback();
         $modulo->clean($old_modulo);
         if ($e instanceof \MZ\Exception\ValidationException) {
             $errors = $e->getErrors();

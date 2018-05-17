@@ -24,13 +24,15 @@
  */
 namespace MZ\Product;
 
+use MZ\Database\Model;
+use MZ\Database\DB;
 use MZ\Util\Filter;
 use MZ\Util\Validator;
 
 /**
  * Informações sobre o produto, composição ou pacote
  */
-class Produto extends \MZ\Database\Helper
+class Produto extends Model
 {
 
     /**
@@ -862,7 +864,7 @@ class Produto extends \MZ\Database\Helper
             $this->setImagem($produto['imagem']);
         }
         if (!isset($produto['dataatualizacao'])) {
-            $this->setDataAtualizacao(self::now());
+            $this->setDataAtualizacao(DB::now());
         } else {
             $this->setDataAtualizacao($produto['dataatualizacao']);
         }
@@ -1022,7 +1024,7 @@ class Produto extends \MZ\Database\Helper
         if (!Validator::checkBoolean($this->getVisivel())) {
             $errors['visivel'] = 'O visível é inválido';
         }
-        $this->setDataAtualizacao(self::now());
+        $this->setDataAtualizacao(DB::now());
         if (!empty($errors)) {
             throw new \MZ\Exception\ValidationException($errors);
         }
@@ -1067,7 +1069,7 @@ class Produto extends \MZ\Database\Helper
     {
         $values = $this->validate();
         try {
-            $id = self::getDB()->insertInto('Produtos')->values($values)->execute();
+            $id = DB::insertInto('Produtos')->values($values)->execute();
             $this->loadByID($id);
         } catch (\Exception $e) {
             throw $this->translate($e);
@@ -1087,10 +1089,9 @@ class Produto extends \MZ\Database\Helper
         if (!$this->exists()) {
             throw new \Exception('O identificador do produto não foi informado');
         }
-        $values = self::filterValues($values, $only, $except);
+        $values = DB::filterValues($values, $only, $except);
         try {
-            self::getDB()
-                ->update('Produtos')
+            DB::update('Produtos')
                 ->set($values)
                 ->where('id', $this->getID())
                 ->execute();
@@ -1110,8 +1111,7 @@ class Produto extends \MZ\Database\Helper
         if (!$this->exists()) {
             throw new \Exception('O identificador do produto não foi informado');
         }
-        $result = self::getDB()
-            ->deleteFrom('Produtos')
+        $result = DB::deleteFrom('Produtos')
             ->where('id', $this->getID())
             ->execute();
         return $result;
@@ -1160,7 +1160,7 @@ class Produto extends \MZ\Database\Helper
      */
     public function loadImagem()
     {
-        $imagem = self::getDB()->from('Produtos p')
+        $imagem = DB::from('Produtos p')
             ->select(null)
             ->select('p.imagem')
             ->where('p.id', $this->getID())
@@ -1301,7 +1301,7 @@ class Produto extends \MZ\Database\Helper
         $setorestoque = isset($condition['setorestoque']) ? $condition['setorestoque'] : null;
         $promocao = isset($condition['promocao']) ? strval($condition['promocao']) : 'N';
         $week_offset = (1 + date('w')) * 1440 + (int)((time() - strtotime('00:00')) / 60);
-        $query = self::getDB()->from('Produtos p')
+        $query = DB::from('Produtos p')
             ->select(null)
             ->select('p.id')
             ->select('p.codigobarras')
@@ -1330,7 +1330,7 @@ class Produto extends \MZ\Database\Helper
             ->select('p.visivel')
             ->select(
                 '(CASE WHEN p.imagem IS NULL THEN NULL ELSE '.
-                self::concat(['p.id', '".png"']).
+                DB::concat(['p.id', '".png"']).
                 ' END) as imagem'
             )
             ->select('p.dataatualizacao')
@@ -1373,15 +1373,15 @@ class Produto extends \MZ\Database\Helper
                     Filter::digits($search)
                 );
             } else {
-                $query = self::buildSearch($search, 'p.descricao', $query);
+                $query = DB::buildSearch($search, 'p.descricao', $query);
             }
             unset($condition['search']);
         }
         $condition = self::filterCondition($condition);
-        $query = self::buildOrderBy($query, self::filterOrder($order));
+        $query = DB::buildOrderBy($query, self::filterOrder($order));
         $query = $query->orderBy('p.descricao ASC');
         $query = $query->orderBy('p.id ASC');
-        return self::buildCondition($query, $condition);
+        return DB::buildCondition($query, $condition);
     }
 
     /**
@@ -1425,9 +1425,8 @@ class Produto extends \MZ\Database\Helper
      */
     public static function findByID($id)
     {
-        return self::find([
-            'id' => intval($id),
-        ]);
+        $result = new self();
+        return $result->loadByID($id);
     }
 
     /**
@@ -1437,9 +1436,8 @@ class Produto extends \MZ\Database\Helper
      */
     public static function findByDescricao($descricao)
     {
-        return self::find([
-            'descricao' => strval($descricao),
-        ]);
+        $result = new self();
+        return $result->loadByDescricao($descricao);
     }
 
     /**
@@ -1449,9 +1447,8 @@ class Produto extends \MZ\Database\Helper
      */
     public static function findByCodigoBarras($codigo_barras)
     {
-        return self::find([
-            'codigobarras' => strval($codigo_barras),
-        ]);
+        $result = new self();
+        return $result->loadByCodigoBarras($codigo_barras);
     }
 
     /**

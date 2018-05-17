@@ -24,13 +24,15 @@
  */
 namespace MZ\System;
 
+use MZ\Database\Model;
+use MZ\Database\DB;
 use MZ\Util\Filter;
 use MZ\Util\Validator;
 
 /**
  * Informa a listagem de todas as funções do sistema
  */
-class Permissao extends \MZ\Database\Helper
+class Permissao extends Model
 {
     const NOME_SISTEMA = 'Sistema'; // Permitir acesso ao sistema
     const NOME_RESTAURACAO = 'Restauracao'; // Permitir restaurar o banco de dados
@@ -365,7 +367,7 @@ class Permissao extends \MZ\Database\Helper
         $values = $this->validate();
         unset($values['id']);
         try {
-            $id = self::getDB()->insertInto('Permissoes')->values($values)->execute();
+            $id = DB::insertInto('Permissoes')->values($values)->execute();
             $this->loadByID($id);
         } catch (\Exception $e) {
             throw $this->translate($e);
@@ -385,10 +387,9 @@ class Permissao extends \MZ\Database\Helper
         if (!$this->exists()) {
             throw new \Exception('O identificador da permissão não foi informado');
         }
-        $values = self::filterValues($values, $only, $except);
+        $values = DB::filterValues($values, $only, $except);
         try {
-            self::getDB()
-                ->update('Permissoes')
+            DB::update('Permissoes')
                 ->set($values)
                 ->where('id', $this->getID())
                 ->execute();
@@ -408,8 +409,7 @@ class Permissao extends \MZ\Database\Helper
         if (!$this->exists()) {
             throw new \Exception('O identificador da permissão não foi informado');
         }
-        $result = self::getDB()
-            ->deleteFrom('Permissoes')
+        $result = DB::deleteFrom('Permissoes')
             ->where('id', $this->getID())
             ->execute();
         return $result;
@@ -497,13 +497,13 @@ class Permissao extends \MZ\Database\Helper
      */
     private static function query($condition = [], $order = [])
     {
-        $query = self::getDB()->from('Permissoes p');
+        $query = DB::from('Permissoes p');
         $condition = self::filterCondition($condition);
-        $query = self::buildOrderBy($query, self::filterOrder($order));
+        $query = DB::buildOrderBy($query, self::filterOrder($order));
         $query = $query->orderBy('p.funcionalidadeid ASC');
         $query = $query->orderBy('p.descricao ASC');
         $query = $query->orderBy('p.id ASC');
-        return self::buildCondition($query, $condition);
+        return DB::buildCondition($query, $condition);
     }
 
     /**
@@ -526,9 +526,8 @@ class Permissao extends \MZ\Database\Helper
      */
     public static function findByID($id)
     {
-        return self::find([
-            'id' => intval($id),
-        ]);
+        $result = new self();
+        return $result->loadByID($id);
     }
 
     /**
@@ -538,9 +537,8 @@ class Permissao extends \MZ\Database\Helper
      */
     public static function findByNome($nome)
     {
-        return self::find([
-            'nome' => strval($nome),
-        ]);
+        $result = new self();
+        return $result->loadByNome($nome);
     }
 
     /**

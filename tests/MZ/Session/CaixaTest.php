@@ -25,6 +25,7 @@
 namespace MZ\Session;
 
 use MZ\Account\Cliente;
+use \MZ\Database\DB;
 
 class CaixaTest extends \PHPUnit_Framework_TestCase
 {
@@ -229,7 +230,7 @@ class CaixaTest extends \PHPUnit_Framework_TestCase
             throw $e;
         } finally {
             try {
-                $movimentacao->setDataFechamento(\MZ\Database\Helper::now());
+                $movimentacao->setDataFechamento(DB::now());
                 $movimentacao->setFuncionarioFechamentoID($funcionario->getID());
                 $movimentacao->update();
         

@@ -666,17 +666,8 @@ $[unique.end]
      */
     public static function findBy$[unique.each(all)]$[Field.norm]$[unique.end]($[unique.each(all)]$[field.if(first)]$[field.else], $[field.end]$$[field.unix]$[unique.end])
     {
-        return self::find([
-$[unique.each(all)]
-$[field.if(integer|bigint)]
-            '$[field]' => intval($$[field.unix]),
-$[field.else.if(float|double)]
-            '$[field]' => floatval($$[field.unix]),
-$[field.else]
-            '$[field]' => strval($$[field.unix]),
-$[field.end]
-$[unique.end]
-        ]);
+        $result = new self();
+        return $result->loadBy$[unique.each(all)]$[Field.norm]$[unique.end]($[unique.each(all)]$[field.if(first)]$[field.else], $[field.end]$$[field.unix]$[unique.end]);
     }
 $[table.end]
 

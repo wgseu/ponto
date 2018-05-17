@@ -24,6 +24,8 @@
  */
 namespace MZ\Template;
 
+use MZ\Database\Model;
+use MZ\Database\DB;
 use MZ\Util\Filter;
 use MZ\Util\Mask;
 

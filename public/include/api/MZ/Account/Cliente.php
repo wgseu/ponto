@@ -24,6 +24,8 @@
  */
 namespace MZ\Account;
 
+use MZ\Database\Model;
+use MZ\Database\DB;
 use MZ\Util\Filter;
 use MZ\Util\Validator;
 use MZ\Util\Mask;
@@ -34,7 +36,7 @@ use MZ\Sale\Pedido;
  * Informações de cliente físico ou jurídico. Clientes, empresas,
  * funcionários, fornecedores e parceiros são cadastrados aqui
  */
-class Cliente extends \MZ\Database\Helper
+class Cliente extends Model
 {
     const CHAVE_SECRETA = '%#@87GhÃ¨¬';
 
@@ -795,12 +797,12 @@ class Cliente extends \MZ\Database\Helper
             $this->setImagem($cliente['imagem']);
         }
         if (!isset($cliente['dataatualizacao'])) {
-            $this->setDataAtualizacao(self::now());
+            $this->setDataAtualizacao(DB::now());
         } else {
             $this->setDataAtualizacao($cliente['dataatualizacao']);
         }
         if (!isset($cliente['datacadastro'])) {
-            $this->setDataCadastro(self::now());
+            $this->setDataCadastro(DB::now());
         } else {
             $this->setDataCadastro($cliente['datacadastro']);
         }
@@ -872,7 +874,7 @@ class Cliente extends \MZ\Database\Helper
 
     public function getGeneroName()
     {
-        if ($this->getGenero() == self::TIPO_JURIDICA) {
+        if ($this->getTipo() == self::TIPO_JURIDICA) {
             return 'Empresa';
         }
         return self::getGeneroOptions()[$this->getGenero()];
@@ -965,11 +967,8 @@ class Cliente extends \MZ\Database\Helper
     {
         $errors = [];
         $funcionario = Funcionario::findByClienteID($this->getID());
-        if (is_null($this->getTipo())) {
-            $errors['tipo'] = 'O tipo não pode ser vazio';
-        }
-        if (!Validator::checkInSet($this->getTipo(), self::getTipoOptions(), true)) {
-            $errors['tipo'] = 'O tipo é inválido';
+        if (!Validator::checkInSet($this->getTipo(), self::getTipoOptions())) {
+            $errors['tipo'] = 'O tipo não foi informado ou é inválido';
         }
         if (is_manager($funcionario) && $this->getTipo() != self::TIPO_FISICA) {
             $errors['tipo'] = 'O funcionário deve ser uma pessoa física';
@@ -978,7 +977,7 @@ class Cliente extends \MZ\Database\Helper
             $errors['login'] = 'O login é inválido';
         }
         if (is_manager($funcionario) && is_null($this->getLogin())) {
-            $errors['tipo'] = 'Login obrigatório para o tipo de conta';
+            $errors['login'] = 'Login obrigatório para o tipo de conta';
         }
         if (!Validator::checkPassword($this->getSenha(), $this->exists())) {
             $errors['senha'] = 'A senha deve possuir no mínimo 4 caracteres';
@@ -1023,8 +1022,8 @@ class Cliente extends \MZ\Database\Helper
         if (!is_null($this->getLimiteCompra()) && $this->getLimiteCompra() < 0) {
             $errors['limitecompra'] = 'O limite de compra não pode ser negativo';
         }
-        $this->setDataCadastro(self::now());
-        $this->setDataAtualizacao(self::now());
+        $this->setDataCadastro(DB::now());
+        $this->setDataAtualizacao(DB::now());
         if (!empty($errors)) {
             throw new \MZ\Exception\ValidationException($errors);
         }
@@ -1113,7 +1112,7 @@ class Cliente extends \MZ\Database\Helper
         $values = $this->validate();
         unset($values['id']);
         try {
-            $id = self::getDB()->insertInto('Clientes')->values($values)->execute();
+            $id = DB::insertInto('Clientes')->values($values)->execute();
             $this->loadByID($id);
         } catch (\Exception $e) {
             throw $this->translate($e);
@@ -1133,11 +1132,10 @@ class Cliente extends \MZ\Database\Helper
         if (!$this->exists()) {
             throw new \Exception('O identificador do cliente não foi informado');
         }
-        $values = self::filterValues($values, $only, $except);
+        $values = DB::filterValues($values, $only, $except);
         unset($values['data_cadastro']);
         try {
-            self::getDB()
-                ->update('Clientes')
+            DB::update('Clientes')
                 ->set($values)
                 ->where('id', $this->getID())
                 ->execute();
@@ -1157,8 +1155,7 @@ class Cliente extends \MZ\Database\Helper
         if (!$this->exists()) {
             throw new \Exception('O identificador do cliente não foi informado');
         }
-        $result = self::getDB()
-            ->deleteFrom('Clientes')
+        $result = DB::deleteFrom('Clientes')
             ->where('id', $this->getID())
             ->execute();
         return $result;
@@ -1243,7 +1240,7 @@ class Cliente extends \MZ\Database\Helper
      */
     public function loadImagem()
     {
-        $imagem = self::getDB()->from('Clientes c')
+        $imagem = DB::from('Clientes c')
             ->select(null)
             ->select('c.imagem')
             ->where('c.id', $this->getID())
@@ -1363,8 +1360,8 @@ class Cliente extends \MZ\Database\Helper
             unset($condition['ate_cadastro']);
         }
         if (isset($condition['aniversariante'])) {
-            $field = self::strftime('2000-%m-%d', 'c.dataaniversario');
-            $condition[$field] = self::date(date('2000-m-d'));
+            $field = DB::strftime('2000-%m-%d', 'c.dataaniversario');
+            $condition[$field] = DB::date(date('2000-m-d'));
             $allowed[$field] = true;
             unset($condition['aniversariante']);
         }
@@ -1381,7 +1378,7 @@ class Cliente extends \MZ\Database\Helper
     {
         $order = Filter::order($order);
         if (isset($condition['comprador'])) {
-            $query = self::getDB()->from('Pedidos p')
+            $query = DB::from('Pedidos p')
                 ->select(null)
                 ->select('COUNT(DISTINCT p.id) as pedidos')
                 ->select('SUM(r.quantidade * r.preco * (1 + r.porcentagem / 100)) as total')
@@ -1402,7 +1399,7 @@ class Cliente extends \MZ\Database\Helper
                 $query = $query->where('p.datacriacao <= ?', Filter::datetime($condition['ate_compra'], '23:59:59'));
             }
         } else {
-            $query = self::getDB()->from('Clientes c')
+            $query = DB::from('Clientes c')
                 ->select(null);
         }
         $query = $query->select('c.id')
@@ -1428,7 +1425,7 @@ class Cliente extends \MZ\Database\Helper
             ->select('c.linkedinurl')
             ->select(
                 '(CASE WHEN c.imagem IS NULL THEN NULL ELSE '.
-                self::concat(['c.id', '".png"']).
+                DB::concat(['c.id', '".png"']).
                 ' END) as imagem'
             )
             ->select('c.dataatualizacao')
@@ -1442,9 +1439,9 @@ class Cliente extends \MZ\Database\Helper
             } elseif (check_fone($search, true)) {
                 $condition['fone'] = $search;
             } else {
-                $query = self::buildSearch(
+                $query = DB::buildSearch(
                     $search,
-                    self::concat([
+                    DB::concat([
                         'c.nome',
                         '" "',
                         'COALESCE(c.sobrenome, "")'
@@ -1457,13 +1454,13 @@ class Cliente extends \MZ\Database\Helper
         if (isset($condition['fone'])) {
             $fone = $condition['fone'];
             $fone = self::buildFoneSearch($fone);
-            $query = $query->orderBy('IF(c.fone1 LIKE ?, 0, 1)', $fone);
+            $query = $query->orderBy('(c.fone1 LIKE ?) DESC', $fone);
         }
         $condition = self::filterCondition($condition);
-        $query = self::buildOrderBy($query, self::filterOrder($order));
-        $query = $query->orderBy(self::concat(['c.nome', '" "', 'COALESCE(c.sobrenome, "")']).' ASC');
+        $query = DB::buildOrderBy($query, self::filterOrder($order));
+        $query = $query->orderBy(DB::concat(['c.nome', '" "', 'COALESCE(c.sobrenome, "")']).' ASC');
         $query = $query->orderBy('c.id ASC');
-        return self::buildCondition($query, $condition);
+        return DB::buildCondition($query, $condition);
     }
 
     /**
@@ -1486,9 +1483,8 @@ class Cliente extends \MZ\Database\Helper
      */
     public static function findByID($id)
     {
-        return self::find([
-            'id' => intval($id),
-        ]);
+        $result = new self();
+        return $result->loadByID($id);
     }
 
     /**
@@ -1498,9 +1494,8 @@ class Cliente extends \MZ\Database\Helper
      */
     public static function findByFone($fone)
     {
-        return self::find([
-            'fone' => strval($fone),
-        ]);
+        $result = new self();
+        return $result->loadByFone($fone);
     }
 
     /**
@@ -1510,9 +1505,8 @@ class Cliente extends \MZ\Database\Helper
      */
     public static function findByEmail($email)
     {
-        return self::find([
-            'email' => strval($email),
-        ]);
+        $result = new self();
+        return $result->loadByEmail($email);
     }
 
     /**
@@ -1522,9 +1516,8 @@ class Cliente extends \MZ\Database\Helper
      */
     public static function findByCPF($cpf)
     {
-        return self::find([
-            'cpf' => strval($cpf),
-        ]);
+        $result = new self();
+        return $result->loadByCPF($cpf);
     }
 
     /**
@@ -1534,9 +1527,8 @@ class Cliente extends \MZ\Database\Helper
      */
     public static function findByLogin($login)
     {
-        return self::find([
-            'login' => strval($login),
-        ]);
+        $result = new self();
+        return $result->loadByLogin($login);
     }
 
     /**
@@ -1546,9 +1538,8 @@ class Cliente extends \MZ\Database\Helper
      */
     public static function findBySecreto($secreto)
     {
-        return self::find([
-            'secreto' => strval($secreto),
-        ]);
+        $result = new self();
+        return $result->loadBySecreto($secreto);
     }
 
     /**

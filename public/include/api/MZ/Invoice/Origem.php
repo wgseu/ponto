@@ -24,13 +24,15 @@
  */
 namespace MZ\Invoice;
 
+use MZ\Database\Model;
+use MZ\Database\DB;
 use MZ\Util\Filter;
 use MZ\Util\Validator;
 
 /**
  * Origem da mercadoria
  */
-class Origem extends \MZ\Database\Helper
+class Origem extends Model
 {
 
     /**
@@ -236,7 +238,7 @@ class Origem extends \MZ\Database\Helper
         $values = $this->validate();
         unset($values['id']);
         try {
-            $id = self::getDB()->insertInto('Origens')->values($values)->execute();
+            $id = DB::insertInto('Origens')->values($values)->execute();
             $this->loadByID($id);
         } catch (\Exception $e) {
             throw $this->translate($e);
@@ -256,10 +258,9 @@ class Origem extends \MZ\Database\Helper
         if (!$this->exists()) {
             throw new \Exception('O identificador da origem não foi informado');
         }
-        $values = self::filterValues($values, $only, $except);
+        $values = DB::filterValues($values, $only, $except);
         try {
-            self::getDB()
-                ->update('Origens')
+            DB::update('Origens')
                 ->set($values)
                 ->where('id', $this->getID())
                 ->execute();
@@ -279,8 +280,7 @@ class Origem extends \MZ\Database\Helper
         if (!$this->exists()) {
             throw new \Exception('O identificador da origem não foi informado');
         }
-        $result = self::getDB()
-            ->deleteFrom('Origens')
+        $result = DB::deleteFrom('Origens')
             ->where('id', $this->getID())
             ->execute();
         return $result;
@@ -359,12 +359,12 @@ class Origem extends \MZ\Database\Helper
      */
     private static function query($condition = [], $order = [])
     {
-        $query = self::getDB()->from('Origens o');
+        $query = DB::from('Origens o');
         $condition = self::filterCondition($condition);
-        $query = self::buildOrderBy($query, self::filterOrder($order));
+        $query = DB::buildOrderBy($query, self::filterOrder($order));
         $query = $query->orderBy('o.descricao ASC');
         $query = $query->orderBy('o.id ASC');
-        return self::buildCondition($query, $condition);
+        return DB::buildCondition($query, $condition);
     }
 
     /**
@@ -387,9 +387,8 @@ class Origem extends \MZ\Database\Helper
      */
     public static function findByID($id)
     {
-        return self::find([
-            'id' => intval($id),
-        ]);
+        $result = new self();
+        return $result->loadByID($id);
     }
 
     /**
@@ -399,9 +398,8 @@ class Origem extends \MZ\Database\Helper
      */
     public static function findByCodigo($codigo)
     {
-        return self::find([
-            'codigo' => intval($codigo),
-        ]);
+        $result = new self();
+        return $result->loadByCodigo($codigo);
     }
 
     /**

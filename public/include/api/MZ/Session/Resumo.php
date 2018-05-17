@@ -24,6 +24,8 @@
  */
 namespace MZ\Session;
 
+use MZ\Database\Model;
+use MZ\Database\DB;
 use MZ\Util\Filter;
 use MZ\Util\Validator;
 
@@ -31,7 +33,7 @@ use MZ\Util\Validator;
  * Resumo de fechamento de caixa, informa o valor contado no fechamento do
  * caixa para cada forma de pagamento
  */
-class Resumo extends \MZ\Database\Helper
+class Resumo extends Model
 {
 
     /**
@@ -322,7 +324,7 @@ class Resumo extends \MZ\Database\Helper
         $values = $this->validate();
         unset($values['id']);
         try {
-            $id = self::getDB()->insertInto('Resumos')->values($values)->execute();
+            $id = DB::insertInto('Resumos')->values($values)->execute();
             $this->loadByID($id);
         } catch (\Exception $e) {
             throw $this->translate($e);
@@ -342,10 +344,9 @@ class Resumo extends \MZ\Database\Helper
         if (!$this->exists()) {
             throw new \Exception('O identificador do resumo não foi informado');
         }
-        $values = self::filterValues($values, $only, $except);
+        $values = DB::filterValues($values, $only, $except);
         try {
-            self::getDB()
-                ->update('Resumos')
+            DB::update('Resumos')
                 ->set($values)
                 ->where('id', $this->getID())
                 ->execute();
@@ -365,8 +366,7 @@ class Resumo extends \MZ\Database\Helper
         if (!$this->exists()) {
             throw new \Exception('O identificador do resumo não foi informado');
         }
-        $result = self::getDB()
-            ->deleteFrom('Resumos')
+        $result = DB::deleteFrom('Resumos')
             ->where('id', $this->getID())
             ->execute();
         return $result;
@@ -484,11 +484,11 @@ class Resumo extends \MZ\Database\Helper
      */
     private static function query($condition = [], $order = [])
     {
-        $query = self::getDB()->from('Resumos r');
+        $query = DB::from('Resumos r');
         $condition = self::filterCondition($condition);
-        $query = self::buildOrderBy($query, self::filterOrder($order));
+        $query = DB::buildOrderBy($query, self::filterOrder($order));
         $query = $query->orderBy('r.id ASC');
-        return self::buildCondition($query, $condition);
+        return DB::buildCondition($query, $condition);
     }
 
     /**
@@ -511,9 +511,8 @@ class Resumo extends \MZ\Database\Helper
      */
     public static function findByID($id)
     {
-        return self::find([
-            'id' => intval($id),
-        ]);
+        $result = new self();
+        return $result->loadByID($id);
     }
 
     /**
@@ -525,11 +524,8 @@ class Resumo extends \MZ\Database\Helper
      */
     public static function findByMovimentacaoIDTipoCartaoID($movimentacao_id, $tipo, $cartao_id)
     {
-        return self::find([
-            'movimentacaoid' => intval($movimentacao_id),
-            'tipo' => strval($tipo),
-            'cartaoid' => intval($cartao_id),
-        ]);
+        $result = new self();
+        return $result->loadByMovimentacaoIDTipoCartaoID($movimentacao_id, $tipo, $cartao_id);
     }
 
     /**

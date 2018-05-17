@@ -24,13 +24,15 @@
  */
 namespace MZ\Invoice;
 
+use MZ\Database\Model;
+use MZ\Database\DB;
 use MZ\Util\Filter;
 use MZ\Util\Validator;
 
 /**
  * Dados do emitente das notas fiscais
  */
-class Emitente extends \MZ\Database\Helper
+class Emitente extends Model
 {
 
     /**
@@ -468,7 +470,7 @@ class Emitente extends \MZ\Database\Helper
         $values = $this->validate();
         unset($values['id']);
         try {
-            $id = self::getDB()->insertInto('Emitentes')->values($values)->execute();
+            $id = DB::insertInto('Emitentes')->values($values)->execute();
             $this->loadByID($id);
         } catch (\Exception $e) {
             throw $this->translate($e);
@@ -488,10 +490,9 @@ class Emitente extends \MZ\Database\Helper
         if (!$this->exists()) {
             throw new \Exception('O identificador do emitente não foi informado');
         }
-        $values = self::filterValues($values, $only, $except);
+        $values = DB::filterValues($values, $only, $except);
         try {
-            self::getDB()
-                ->update('Emitentes')
+            DB::update('Emitentes')
                 ->set($values)
                 ->where('id', $this->getID())
                 ->execute();
@@ -511,8 +512,7 @@ class Emitente extends \MZ\Database\Helper
         if (!$this->exists()) {
             throw new \Exception('O identificador do emitente não foi informado');
         }
-        $result = self::getDB()
-            ->deleteFrom('Emitentes')
+        $result = DB::deleteFrom('Emitentes')
             ->where('id', $this->getID())
             ->execute();
         return $result;
@@ -610,11 +610,11 @@ class Emitente extends \MZ\Database\Helper
      */
     private static function query($condition = [], $order = [])
     {
-        $query = self::getDB()->from('Emitentes e');
+        $query = DB::from('Emitentes e');
         $condition = self::filterCondition($condition);
-        $query = self::buildOrderBy($query, self::filterOrder($order));
+        $query = DB::buildOrderBy($query, self::filterOrder($order));
         $query = $query->orderBy('e.id ASC');
-        return self::buildCondition($query, $condition);
+        return DB::buildCondition($query, $condition);
     }
 
     /**
@@ -637,9 +637,8 @@ class Emitente extends \MZ\Database\Helper
      */
     public static function findByID($id)
     {
-        return self::find([
-            'id' => strval($id),
-        ]);
+        $result = new self();
+        return $result->loadByID($id);
     }
 
     /**

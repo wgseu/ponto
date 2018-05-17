@@ -24,6 +24,8 @@
  */
 namespace MZ\Product;
 
+use MZ\Database\Model;
+use MZ\Database\DB;
 use MZ\Util\Filter;
 use MZ\Util\Validator;
 
@@ -31,7 +33,7 @@ use MZ\Util\Validator;
  * Informa qual a categoria dos produtos e permite a rápida localização dos
  * mesmos
  */
-class Categoria extends \MZ\Database\Helper
+class Categoria extends Model
 {
 
     /**
@@ -344,7 +346,7 @@ class Categoria extends \MZ\Database\Helper
         if (!Validator::checkBoolean($this->getServico())) {
             $errors['servico'] = 'O serviço é inválido ou está vazio';
         }
-        $this->setDataAtualizacao(self::now());
+        $this->setDataAtualizacao(DB::now());
         if (!empty($errors)) {
             throw new \MZ\Exception\ValidationException($errors);
         }
@@ -383,7 +385,7 @@ class Categoria extends \MZ\Database\Helper
         $values = $this->validate();
         unset($values['id']);
         try {
-            $id = self::getDB()->insertInto('Categorias')->values($values)->execute();
+            $id = DB::insertInto('Categorias')->values($values)->execute();
             $this->loadByID($id);
         } catch (\Exception $e) {
             throw $this->translate($e);
@@ -403,10 +405,9 @@ class Categoria extends \MZ\Database\Helper
         if (!$this->exists()) {
             throw new \Exception('O identificador da categoria não foi informado');
         }
-        $values = self::filterValues($values, $only, $except);
+        $values = DB::filterValues($values, $only, $except);
         try {
-            self::getDB()
-                ->update('Categorias')
+            DB::update('Categorias')
                 ->set($values)
                 ->where('id', $this->getID())
                 ->execute();
@@ -426,8 +427,7 @@ class Categoria extends \MZ\Database\Helper
         if (!$this->exists()) {
             throw new \Exception('O identificador da categoria não foi informado');
         }
-        $result = self::getDB()
-            ->deleteFrom('Categorias')
+        $result = DB::deleteFrom('Categorias')
             ->where('id', $this->getID())
             ->execute();
         return $result;
@@ -464,7 +464,7 @@ class Categoria extends \MZ\Database\Helper
      */
     public function loadImagem()
     {
-        $imagem = self::getDB()->from('Categorias c')
+        $imagem = DB::from('Categorias c')
             ->select(null)
             ->select('c.imagem')
             ->where('c.id', $this->getID())
@@ -539,7 +539,7 @@ class Categoria extends \MZ\Database\Helper
      */
     private static function query($condition = [], $order = [])
     {
-        $query = self::getDB()->from('Categorias c')
+        $query = DB::from('Categorias c')
             ->select(null)
             ->select('c.id')
             ->select('c.categoriaid')
@@ -547,7 +547,7 @@ class Categoria extends \MZ\Database\Helper
             ->select('c.servico')
             ->select(
                 '(CASE WHEN c.imagem IS NULL THEN NULL ELSE '.
-                self::concat(['c.id', '".png"']).
+                DB::concat(['c.id', '".png"']).
                 ' END) as imagem'
             )
             ->select('c.dataatualizacao');
@@ -563,14 +563,14 @@ class Categoria extends \MZ\Database\Helper
         if (isset($order['vendas'])) {
             $query = $query->leftJoin(
                 'Produtos_Pedidos r ON r.produtoid = p.id AND r.datahora > ?',
-                self::now('-1 month')
+                DB::now('-1 month')
             );
         }
         $condition = self::filterCondition($condition);
-        $query = self::buildOrderBy($query, self::filterOrder($order));
+        $query = DB::buildOrderBy($query, self::filterOrder($order));
         $query = $query->orderBy('c.descricao ASC');
         $query = $query->orderBy('c.id ASC');
-        return self::buildCondition($query, $condition);
+        return DB::buildCondition($query, $condition);
     }
 
     /**
@@ -593,9 +593,8 @@ class Categoria extends \MZ\Database\Helper
      */
     public static function findByID($id)
     {
-        return self::find([
-            'id' => intval($id),
-        ]);
+        $result = new self();
+        return $result->loadByID($id);
     }
 
     /**
@@ -605,9 +604,8 @@ class Categoria extends \MZ\Database\Helper
      */
     public static function findByDescricao($descricao)
     {
-        return self::find([
-            'descricao' => strval($descricao),
-        ]);
+        $result = new self();
+        return $result->loadByDescricao($descricao);
     }
 
     /**

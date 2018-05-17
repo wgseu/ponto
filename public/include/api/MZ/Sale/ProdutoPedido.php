@@ -24,6 +24,8 @@
  */
 namespace MZ\Sale;
 
+use MZ\Database\Model;
+use MZ\Database\DB;
 use MZ\Util\Filter;
 use MZ\Util\Validator;
 use MZ\Stock\Estoque;
@@ -34,7 +36,7 @@ use MZ\Exception\ValidationException;
  * Produtos, taxas e serviços do pedido, a alteração do estado permite o
  * controle de produção
  */
-class ProdutoPedido extends \MZ\Database\Helper
+class ProdutoPedido extends Model
 {
 
     /**
@@ -714,7 +716,7 @@ class ProdutoPedido extends \MZ\Database\Helper
             $this->setDataVisualizacao($produto_pedido['datavisualizacao']);
         }
         if (!array_key_exists('dataatualizacao', $produto_pedido)) {
-            $this->setDataAtualizacao(self::now());
+            $this->setDataAtualizacao(DB::now());
         } else {
             $this->setDataAtualizacao($produto_pedido['dataatualizacao']);
         }
@@ -734,7 +736,7 @@ class ProdutoPedido extends \MZ\Database\Helper
             $this->setDesperdicado($produto_pedido['desperdicado']);
         }
         if (!isset($produto_pedido['datahora'])) {
-            $this->setDataHora(self::now());
+            $this->setDataHora(DB::now());
         } else {
             $this->setDataHora($produto_pedido['datahora']);
         }
@@ -856,9 +858,9 @@ class ProdutoPedido extends \MZ\Database\Helper
         $this->setPrecoCompra(Filter::money($this->getPrecoCompra()));
         $this->setDetalhes(Filter::string($this->getDetalhes()));
         $this->setDataVisualizacao(Filter::datetime($this->getDataVisualizacao()));
-        $this->setDataAtualizacao(self::now());
+        $this->setDataAtualizacao(DB::now());
         $this->setMotivo(Filter::string($this->getMotivo()));
-        $this->setDataHora(self::now());
+        $this->setDataHora(DB::now());
     }
 
     /**
@@ -911,8 +913,8 @@ class ProdutoPedido extends \MZ\Database\Helper
         if (!Validator::checkBoolean($this->getDesperdicado(), true)) {
             $errors['desperdicado'] = 'O desperdício não foi informado ou é inválido';
         }
-        $this->setDataAtualizacao(self::now());
-        $this->setDataHora(self::now());
+        $this->setDataAtualizacao(DB::now());
+        $this->setDataHora(DB::now());
         if (!empty($errors)) {
             throw new ValidationException($errors);
         }
@@ -939,7 +941,7 @@ class ProdutoPedido extends \MZ\Database\Helper
         $values = $this->validate();
         unset($values['id']);
         try {
-            $id = self::getDB()->insertInto('Produtos_Pedidos')->values($values)->execute();
+            $id = DB::insertInto('Produtos_Pedidos')->values($values)->execute();
             $this->loadByID($id);
         } catch (\Exception $e) {
             throw $this->translate($e);
@@ -957,11 +959,10 @@ class ProdutoPedido extends \MZ\Database\Helper
         if (!$this->exists()) {
             throw new \Exception('O identificador do item do pedido não foi informado');
         }
-        $values = self::filterValues($values, $only, $except);
+        $values = DB::filterValues($values, $only, $except);
         unset($values['datahora']);
         try {
-            self::getDB()
-                ->update('Produtos_Pedidos')
+            DB::update('Produtos_Pedidos')
                 ->set($values)
                 ->where('id', $this->getID())
                 ->execute();
@@ -981,8 +982,7 @@ class ProdutoPedido extends \MZ\Database\Helper
         if (!$this->exists()) {
             throw new \Exception('O identificador do item do pedido não foi informado');
         }
-        $result = self::getDB()
-            ->deleteFrom('Produtos_Pedidos')
+        $result = DB::deleteFrom('Produtos_Pedidos')
             ->where('id', $this->getID())
             ->execute();
         return $result;
@@ -1232,7 +1232,7 @@ class ProdutoPedido extends \MZ\Database\Helper
      */
     private static function query($condition = [], $order = [], $select = [], $group = [])
     {
-        $query = self::getDB()->from('Produtos_Pedidos p')
+        $query = DB::from('Produtos_Pedidos p')
             ->leftJoin('Pedidos e ON e.id = p.pedidoid')
             ->leftJoin('Produtos d ON d.id = p.produtoid')
             ->leftJoin('Servicos s ON s.id = p.servicoid');
@@ -1274,7 +1274,7 @@ class ProdutoPedido extends \MZ\Database\Helper
                 ->select('e.comandaid')
                 ->select(
                     '(CASE WHEN d.imagem IS NULL THEN NULL ELSE '.
-                    self::concat(['d.id', '".png"']).
+                    DB::concat(['d.id', '".png"']).
                     ' END) as imagemurl'
                 )
                 ->select('m.nome as mesanome')
@@ -1295,7 +1295,7 @@ class ProdutoPedido extends \MZ\Database\Helper
                 ->orderBy('total DESC');
         }
         $condition = self::filterCondition($condition);
-        $query = self::buildOrderBy($query, self::filterOrder($order));
+        $query = DB::buildOrderBy($query, self::filterOrder($order));
         $query = $query->orderBy('p.datahora DESC');
         $query = $query->orderBy('p.id DESC');
         foreach ($select as $value) {
@@ -1304,7 +1304,7 @@ class ProdutoPedido extends \MZ\Database\Helper
         foreach ($group as $value) {
             $query = $query->groupBy($value);
         }
-        return self::buildCondition($query, $condition);
+        return DB::buildCondition($query, $condition);
     }
 
     /**
@@ -1329,9 +1329,8 @@ class ProdutoPedido extends \MZ\Database\Helper
      */
     public static function findByID($id)
     {
-        return self::find([
-            'id' => intval($id),
-        ]);
+        $result = new self();
+        return $result->loadByID($id);
     }
 
     /**

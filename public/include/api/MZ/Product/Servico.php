@@ -24,13 +24,15 @@
  */
 namespace MZ\Product;
 
+use MZ\Database\Model;
+use MZ\Database\DB;
 use MZ\Util\Filter;
 use MZ\Util\Validator;
 
 /**
  * Taxas, eventos e serviço cobrado nos pedidos
  */
-class Servico extends \MZ\Database\Helper
+class Servico extends Model
 {
     const DESCONTO_ID = 1;
     const ENTREGA_ID = 2;
@@ -549,7 +551,7 @@ class Servico extends \MZ\Database\Helper
         $values = $this->validate();
         unset($values['id']);
         try {
-            $id = self::getDB()->insertInto('Servicos')->values($values)->execute();
+            $id = DB::insertInto('Servicos')->values($values)->execute();
             $this->loadByID($id);
         } catch (\Exception $e) {
             throw $this->translate($e);
@@ -569,10 +571,9 @@ class Servico extends \MZ\Database\Helper
         if (!$this->exists()) {
             throw new \Exception('O identificador do serviço não foi informado');
         }
-        $values = self::filterValues($values, $only, $except);
+        $values = DB::filterValues($values, $only, $except);
         try {
-            self::getDB()
-                ->update('Servicos')
+            DB::update('Servicos')
                 ->set($values)
                 ->where('id', $this->getID())
                 ->execute();
@@ -593,8 +594,7 @@ class Servico extends \MZ\Database\Helper
             throw new \Exception('O identificador do serviço não foi informado');
         }
         $this->checkAccess();
-        $result = self::getDB()
-            ->deleteFrom('Servicos')
+        $result = DB::deleteFrom('Servicos')
             ->where('id', $this->getID())
             ->execute();
         return $result;
@@ -678,11 +678,11 @@ class Servico extends \MZ\Database\Helper
      */
     private static function query($condition = [], $order = [])
     {
-        $query = self::getDB()->from('Servicos s');
+        $query = DB::from('Servicos s');
         $condition = self::filterCondition($condition);
-        $query = self::buildOrderBy($query, self::filterOrder($order));
+        $query = DB::buildOrderBy($query, self::filterOrder($order));
         $query = $query->orderBy('s.id ASC');
-        return self::buildCondition($query, $condition);
+        return DB::buildCondition($query, $condition);
     }
 
     /**
@@ -705,9 +705,8 @@ class Servico extends \MZ\Database\Helper
      */
     public static function findByID($id)
     {
-        return self::find([
-            'id' => intval($id),
-        ]);
+        $result = new self();
+        return $result->loadByID($id);
     }
 
     /**

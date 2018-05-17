@@ -24,6 +24,8 @@
  */
 namespace MZ\Core;
 
+use MZ\Database\DB;
+
 class ApplicationTest extends \PHPUnit_Framework_TestCase
 {
     public function testGlobalApp()
@@ -33,6 +35,6 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
     }
     public function testAssignedDB()
     {
-        $this->assertNotNull(\DB::$pdo);
+        $this->assertNotNull(DB::getPdo());
     }
 }

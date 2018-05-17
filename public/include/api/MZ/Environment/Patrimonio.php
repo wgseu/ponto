@@ -24,13 +24,15 @@
  */
 namespace MZ\Environment;
 
+use MZ\Database\Model;
+use MZ\Database\DB;
 use MZ\Util\Filter;
 use MZ\Util\Validator;
 
 /**
  * Informa detalhadamente um bem da empresa
  */
-class Patrimonio extends \MZ\Database\Helper
+class Patrimonio extends Model
 {
 
     /**
@@ -529,7 +531,7 @@ class Patrimonio extends \MZ\Database\Helper
             $this->setImagemAnexada($patrimonio['imagemanexada']);
         }
         if (!isset($patrimonio['dataatualizacao'])) {
-            $this->setDataAtualizacao(self::now());
+            $this->setDataAtualizacao(DB::now());
         } else {
             $this->setDataAtualizacao($patrimonio['dataatualizacao']);
         }
@@ -584,7 +586,7 @@ class Patrimonio extends \MZ\Database\Helper
         } else {
             $this->setImagemAnexada($imagem_anexada);
         }
-        $this->setDataAtualizacao(self::now());
+        $this->setDataAtualizacao(DB::now());
     }
 
     /**
@@ -651,7 +653,7 @@ class Patrimonio extends \MZ\Database\Helper
         if (!Validator::checkBoolean($this->getAtivo())) {
             $errors['ativo'] = 'O ativo é inválido';
         }
-        $this->setDataAtualizacao(self::now());
+        $this->setDataAtualizacao(DB::now());
         if (!empty($errors)) {
             throw new \MZ\Exception\ValidationException($errors);
         }
@@ -690,7 +692,7 @@ class Patrimonio extends \MZ\Database\Helper
         $values = $this->validate();
         unset($values['id']);
         try {
-            $id = self::getDB()->insertInto('Patrimonios')->values($values)->execute();
+            $id = DB::insertInto('Patrimonios')->values($values)->execute();
             $this->loadByID($id);
         } catch (\Exception $e) {
             throw $this->translate($e);
@@ -710,10 +712,9 @@ class Patrimonio extends \MZ\Database\Helper
         if (!$this->exists()) {
             throw new \Exception('O identificador do patrimônio não foi informado');
         }
-        $values = self::filterValues($values, $only, $except);
+        $values = DB::filterValues($values, $only, $except);
         try {
-            self::getDB()
-                ->update('Patrimonios')
+            DB::update('Patrimonios')
                 ->set($values)
                 ->where('id', $this->getID())
                 ->execute();
@@ -733,8 +734,7 @@ class Patrimonio extends \MZ\Database\Helper
         if (!$this->exists()) {
             throw new \Exception('O identificador do patrimônio não foi informado');
         }
-        $result = self::getDB()
-            ->deleteFrom('Patrimonios')
+        $result = DB::deleteFrom('Patrimonios')
             ->where('id', $this->getID())
             ->execute();
         return $result;
@@ -854,12 +854,12 @@ class Patrimonio extends \MZ\Database\Helper
      */
     private static function query($condition = [], $order = [])
     {
-        $query = self::getDB()->from('Patrimonios p');
+        $query = DB::from('Patrimonios p');
         $condition = self::filterCondition($condition);
-        $query = self::buildOrderBy($query, self::filterOrder($order));
+        $query = DB::buildOrderBy($query, self::filterOrder($order));
         $query = $query->orderBy('p.descricao ASC');
         $query = $query->orderBy('p.id ASC');
-        return self::buildCondition($query, $condition);
+        return DB::buildCondition($query, $condition);
     }
 
     /**
@@ -882,9 +882,8 @@ class Patrimonio extends \MZ\Database\Helper
      */
     public static function findByID($id)
     {
-        return self::find([
-            'id' => intval($id),
-        ]);
+        $result = new self();
+        return $result->loadByID($id);
     }
 
     /**
@@ -895,10 +894,8 @@ class Patrimonio extends \MZ\Database\Helper
      */
     public static function findByNumeroEstado($numero, $estado)
     {
-        return self::find([
-            'numero' => strval($numero),
-            'estado' => strval($estado),
-        ]);
+        $result = new self();
+        return $result->loadByNumeroEstado($numero, $estado);
     }
 
     /**

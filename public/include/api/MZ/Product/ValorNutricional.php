@@ -24,13 +24,15 @@
  */
 namespace MZ\Product;
 
+use MZ\Database\Model;
+use MZ\Database\DB;
 use MZ\Util\Filter;
 use MZ\Util\Validator;
 
 /**
  * Informa todos os valores nutricionais da tabela nutricional
  */
-class ValorNutricional extends \MZ\Database\Helper
+class ValorNutricional extends Model
 {
 
     /**
@@ -341,7 +343,7 @@ class ValorNutricional extends \MZ\Database\Helper
         $values = $this->validate();
         unset($values['id']);
         try {
-            $id = self::getDB()->insertInto('Valores_Nutricionais')->values($values)->execute();
+            $id = DB::insertInto('Valores_Nutricionais')->values($values)->execute();
             $this->loadByID($id);
         } catch (\Exception $e) {
             throw $this->translate($e);
@@ -359,10 +361,9 @@ class ValorNutricional extends \MZ\Database\Helper
         if (!$this->exists()) {
             throw new \Exception('O identificador do valor nutricional não foi informado');
         }
-        $values = self::filterValues($values, $only, $except);
+        $values = DB::filterValues($values, $only, $except);
         try {
-            self::getDB()
-                ->update('Valores_Nutricionais')
+            DB::update('Valores_Nutricionais')
                 ->set($values)
                 ->where('id', $this->getID())
                 ->execute();
@@ -382,8 +383,7 @@ class ValorNutricional extends \MZ\Database\Helper
         if (!$this->exists()) {
             throw new \Exception('O identificador do valor nutricional não foi informado');
         }
-        $result = self::getDB()
-            ->deleteFrom('Valores_Nutricionais')
+        $result = DB::deleteFrom('Valores_Nutricionais')
             ->where('id', $this->getID())
             ->execute();
         return $result;
@@ -483,12 +483,12 @@ class ValorNutricional extends \MZ\Database\Helper
      */
     private static function query($condition = [], $order = [])
     {
-        $query = self::getDB()->from('Valores_Nutricionais v');
+        $query = DB::from('Valores_Nutricionais v');
         $condition = self::filterCondition($condition);
-        $query = self::buildOrderBy($query, self::filterOrder($order));
+        $query = DB::buildOrderBy($query, self::filterOrder($order));
         $query = $query->orderBy('v.nome ASC');
         $query = $query->orderBy('v.id ASC');
-        return self::buildCondition($query, $condition);
+        return DB::buildCondition($query, $condition);
     }
 
     /**
@@ -511,9 +511,8 @@ class ValorNutricional extends \MZ\Database\Helper
      */
     public static function findByID($id)
     {
-        return self::find([
-            'id' => intval($id),
-        ]);
+        $result = new self();
+        return $result->loadByID($id);
     }
 
     /**
@@ -524,10 +523,8 @@ class ValorNutricional extends \MZ\Database\Helper
      */
     public static function findByInformacaoIDNome($informacao_id, $nome)
     {
-        return self::find([
-            'informacaoid' => intval($informacao_id),
-            'nome' => strval($nome),
-        ]);
+        $result = new self();
+        return $result->loadByInformacaoIDNome($informacao_id, $nome);
     }
 
     /**

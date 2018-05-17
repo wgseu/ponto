@@ -24,13 +24,15 @@
  */
 namespace MZ\Location;
 
+use MZ\Database\Model;
+use MZ\Database\DB;
 use MZ\Util\Filter;
 use MZ\Util\Validator;
 
 /**
  * Endereço detalhado de um cliente
  */
-class Localizacao extends \MZ\Database\Helper
+class Localizacao extends Model
 {
 
     /**
@@ -640,7 +642,7 @@ class Localizacao extends \MZ\Database\Helper
             $this->setMostrar('N');
         }
         if (!is_null($this->getMostrar()) &&
-            !array_key_exists($this->getMostrar(), self::getBooleanOptions())
+            !array_key_exists($this->getMostrar(), DB::getBooleanOptions())
         ) {
             $errors['mostrar'] = 'A exibição do endereço é inválida';
         }
@@ -696,9 +698,8 @@ class Localizacao extends \MZ\Database\Helper
      */
     public static function findByID($id)
     {
-        return self::find([
-            'id' => intval($id),
-        ]);
+        $result = new self();
+        return $result->loadByID($id);
     }
 
     /**
@@ -709,10 +710,8 @@ class Localizacao extends \MZ\Database\Helper
      */
     public static function findByClienteIDApelido($cliente_id, $apelido)
     {
-        return self::find([
-            'clienteid' => intval($cliente_id),
-            'apelido' => strval($apelido),
-        ]);
+        $result = new self();
+        return $result->loadByClienteIDApelido($cliente_id, $apelido);
     }
 
     /**
@@ -769,11 +768,11 @@ class Localizacao extends \MZ\Database\Helper
      */
     private static function query($condition = [], $order = [])
     {
-        $query = self::getDB()->from('Localizacoes l');
+        $query = DB::from('Localizacoes l');
         $query = $query->leftJoin('Bairros b ON b.id = l.bairroid');
         $typesearch = array_key_exists('typesearch', $condition);
         $condition = self::filterCondition($condition);
-        $query = self::buildOrderBy($query, self::filterOrder($order));
+        $query = DB::buildOrderBy($query, self::filterOrder($order));
         if ($typesearch) {
             if (isset($condition['l.tipo']) && $condition['l.tipo'] == self::TIPO_APARTAMENTO) {
                 $query = $query->orderBy('l.condominio ASC');
@@ -785,7 +784,7 @@ class Localizacao extends \MZ\Database\Helper
         }
         $query = $query->orderBy('l.mostrar ASC');
         $query = $query->orderBy('l.id ASC');
-        return self::buildCondition($query, $condition);
+        return DB::buildCondition($query, $condition);
     }
 
     /**
@@ -838,7 +837,7 @@ class Localizacao extends \MZ\Database\Helper
         $values = $this->validate();
         unset($values['id']);
         try {
-            $id = self::getDB()->insertInto('Localizacoes')->values($values)->execute();
+            $id = DB::insertInto('Localizacoes')->values($values)->execute();
             $this->loadByID($id);
         } catch (\Exception $e) {
             throw $this->translate($e);
@@ -858,10 +857,9 @@ class Localizacao extends \MZ\Database\Helper
         if (!$this->exists()) {
             throw new \Exception('O identificador da localização não foi informado');
         }
-        $values = self::filterValues($values, $only, $except);
+        $values = DB::filterValues($values, $only, $except);
         try {
-            self::getDB()
-                ->update('Localizacoes')
+            DB::update('Localizacoes')
                 ->set($values)
                 ->where('id', $this->getID())
                 ->execute();
@@ -881,8 +879,7 @@ class Localizacao extends \MZ\Database\Helper
         if (!$this->exists()) {
             throw new \Exception('O identificador da localização não foi informado');
         }
-        $result = self::getDB()
-            ->deleteFrom('Localizacoes')
+        $result = DB::deleteFrom('Localizacoes')
             ->where('id', $this->getID())
             ->execute();
         return $result;

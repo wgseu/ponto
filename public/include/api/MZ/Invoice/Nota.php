@@ -24,6 +24,8 @@
  */
 namespace MZ\Invoice;
 
+use MZ\Database\Model;
+use MZ\Database\DB;
 use MZ\Util\Filter;
 use MZ\Util\Validator;
 use MZ\Session\Caixa;
@@ -31,7 +33,7 @@ use MZ\Session\Caixa;
 /**
  * Notas fiscais e inutilizações
  */
-class Nota extends \MZ\Database\Helper
+class Nota extends Model
 {
 
     /**
@@ -842,12 +844,12 @@ class Nota extends \MZ\Database\Helper
             $this->setDataAutorizacao($nota['dataautorizacao']);
         }
         if (!isset($nota['dataemissao'])) {
-            $this->setDataEmissao(self::now());
+            $this->setDataEmissao(DB::now());
         } else {
             $this->setDataEmissao($nota['dataemissao']);
         }
         if (!isset($nota['datalancamento'])) {
-            $this->setDataLancamento(self::now());
+            $this->setDataLancamento(DB::now());
         } else {
             $this->setDataLancamento($nota['datalancamento']);
         }
@@ -1003,7 +1005,7 @@ class Nota extends \MZ\Database\Helper
         $values = $this->validate();
         unset($values['id']);
         try {
-            $id = self::getDB()->insertInto('Notas')->values($values)->execute();
+            $id = DB::insertInto('Notas')->values($values)->execute();
             $this->loadByID($id);
         } catch (\Exception $e) {
             throw $this->translate($e);
@@ -1023,10 +1025,9 @@ class Nota extends \MZ\Database\Helper
         if (!$this->exists()) {
             throw new \Exception('O identificador da nota não foi informado');
         }
-        $values = self::filterValues($values, $only, $except);
+        $values = DB::filterValues($values, $only, $except);
         try {
-            self::getDB()
-                ->update('Notas')
+            DB::update('Notas')
                 ->set($values)
                 ->where('id', $this->getID())
                 ->execute();
@@ -1046,8 +1047,7 @@ class Nota extends \MZ\Database\Helper
         if (!$this->exists()) {
             throw new \Exception('O identificador da nota não foi informado');
         }
-        $result = self::getDB()
-            ->deleteFrom('Notas')
+        $result = DB::deleteFrom('Notas')
             ->where('id', $this->getID())
             ->execute();
         return $result;
@@ -1084,8 +1084,8 @@ class Nota extends \MZ\Database\Helper
         $nota->setCorrigido('Y');
         $nota->setConcluido('N');
         $nota->setDataAutorizacao(null);
-        $nota->setDataEmissao(self::now());
-        $nota->setDataLancamento(self::now());
+        $nota->setDataEmissao(DB::now());
+        $nota->setDataLancamento(DB::now());
         // utiliza o pedido da base
         $nota->setPedidoID($this->getPedidoID());
         // verifica se o número inicial do caixa deve ser o próximo
@@ -1322,11 +1322,11 @@ class Nota extends \MZ\Database\Helper
      */
     private static function query($condition = [], $order = [])
     {
-        $query = self::getDB()->from('Notas n');
+        $query = DB::from('Notas n');
         $condition = self::filterCondition($condition);
-        $query = self::buildOrderBy($query, self::filterOrder($order));
+        $query = DB::buildOrderBy($query, self::filterOrder($order));
         $query = $query->orderBy('n.id DESC');
-        return self::buildCondition($query, $condition);
+        return DB::buildCondition($query, $condition);
     }
 
     /**
@@ -1349,9 +1349,8 @@ class Nota extends \MZ\Database\Helper
      */
     public static function findByID($id)
     {
-        return self::find([
-            'id' => intval($id),
-        ]);
+        $result = new self();
+        return $result->loadByID($id);
     }
 
     /**

@@ -24,6 +24,8 @@
  */
 namespace MZ\Payment;
 
+use MZ\Database\Model;
+use MZ\Database\DB;
 use MZ\Util\Filter;
 use MZ\Util\Validator;
 use MZ\Account\Conta;
@@ -31,7 +33,7 @@ use MZ\Account\Conta;
 /**
  * Pagamentos de contas e pedidos
  */
-class Pagamento extends \MZ\Database\Helper
+class Pagamento extends Model
 {
 
     /**
@@ -809,7 +811,7 @@ class Pagamento extends \MZ\Database\Helper
         $values = $this->validate();
         unset($values['id']);
         try {
-            $id = self::getDB()->insertInto('Pagamentos')->values($values)->execute();
+            $id = DB::insertInto('Pagamentos')->values($values)->execute();
             $this->loadByID($id);
         } catch (\Exception $e) {
             throw $this->translate($e);
@@ -829,10 +831,9 @@ class Pagamento extends \MZ\Database\Helper
         if (!$this->exists()) {
             throw new \Exception('O identificador do pagamento não foi informado');
         }
-        $values = self::filterValues($values, $only, $except);
+        $values = DB::filterValues($values, $only, $except);
         try {
-            self::getDB()
-                ->update('Pagamentos')
+            DB::update('Pagamentos')
                 ->set($values)
                 ->where('id', $this->getID())
                 ->execute();
@@ -852,8 +853,7 @@ class Pagamento extends \MZ\Database\Helper
         if (!$this->exists()) {
             throw new \Exception('O identificador do pagamento não foi informado');
         }
-        $result = self::getDB()
-            ->deleteFrom('Pagamentos')
+        $result = DB::deleteFrom('Pagamentos')
             ->where('id', $this->getID())
             ->execute();
         return $result;
@@ -1075,13 +1075,13 @@ class Pagamento extends \MZ\Database\Helper
     private static function query($condition = [], $order = [])
     {
         $condition = self::filterCondition($condition);
-        $query = self::getDB()->from('Pagamentos p');
+        $query = DB::from('Pagamentos p');
         if (array_key_exists('m.sessaoid', $condition)) {
             $query = $query->leftJoin('Movimentacoes m ON m.id = p.movimentacaoid');
         }
-        $query = self::buildOrderBy($query, self::filterOrder($order));
+        $query = DB::buildOrderBy($query, self::filterOrder($order));
         $query = $query->orderBy('p.id DESC');
-        return self::buildCondition($query, $condition);
+        return DB::buildCondition($query, $condition);
     }
 
     private static function queryTotal($condition, $group = [])
@@ -1092,8 +1092,8 @@ class Pagamento extends \MZ\Database\Helper
             ->select(null)
             ->select('ROUND(SUM(p.total), 4) as total');
         if (isset($group['dia'])) {
-            $query = $query->select(self::strftime('%Y-%m-%d', 'p.datahora').' as data')
-                ->groupBy(self::strftime('%Y-%m-%d', 'p.datahora'));
+            $query = $query->select(DB::strftime('%Y-%m-%d', 'p.datahora').' as data')
+                ->groupBy(DB::strftime('%Y-%m-%d', 'p.datahora'));
         } elseif (isset($group['forma_tipo'])) {
             $query = $query->leftJoin('Formas_Pagto f ON f.id = p.formapagtoid')
                 ->select('LOWER(f.tipo) as tipo')
@@ -1135,9 +1135,8 @@ class Pagamento extends \MZ\Database\Helper
      */
     public static function findByID($id)
     {
-        return self::find([
-            'id' => intval($id),
-        ]);
+        $result = new self();
+        return $result->loadByID($id);
     }
 
     public static function getReceitas($condition)

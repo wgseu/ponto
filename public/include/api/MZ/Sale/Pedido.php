@@ -24,6 +24,8 @@
  */
 namespace MZ\Sale;
 
+use MZ\Database\Model;
+use MZ\Database\DB;
 use MZ\Util\Filter;
 use MZ\Util\Validator;
 use MZ\System\Permissao;
@@ -32,7 +34,7 @@ use MZ\Payment\Pagamento;
 /**
  * Informações do pedido de venda
  */
-class Pedido extends \MZ\Database\Helper
+class Pedido extends Model
 {
 
     /**
@@ -719,7 +721,7 @@ class Pedido extends \MZ\Database\Helper
             $this->setMotivo($pedido['motivo']);
         }
         if (!isset($pedido['datacriacao'])) {
-            $this->setDataCriacao(self::now());
+            $this->setDataCriacao(DB::now());
         } else {
             $this->setDataCriacao($pedido['datacriacao']);
         }
@@ -802,7 +804,7 @@ class Pedido extends \MZ\Database\Helper
         $this->setFechadorID(Filter::number($this->getFechadorID()));
         $this->setDataImpressao(Filter::datetime($this->getDataImpressao()));
         $this->setMotivo(Filter::string($this->getMotivo()));
-        $this->setDataCriacao(self::now());
+        $this->setDataCriacao(DB::now());
         $this->setDataAgendamento(Filter::datetime($this->getDataAgendamento()));
         $this->setDataEntrega(Filter::datetime($this->getDataEntrega()));
         $this->setDataConclusao(Filter::datetime($this->getDataConclusao()));
@@ -861,7 +863,7 @@ class Pedido extends \MZ\Database\Helper
                 $errors['id'] = 'Quantidade de pedidos excedido, adquira uma licença para continuar';
             }
         }
-        $this->setDataCriacao(self::now());
+        $this->setDataCriacao(DB::now());
         if (!empty($errors)) {
             throw new \MZ\Exception\ValidationException($errors);
         }
@@ -969,7 +971,7 @@ class Pedido extends \MZ\Database\Helper
         $values = $this->validate();
         unset($values['id']);
         try {
-            $id = self::getDB()->insertInto('Pedidos')->values($values)->execute();
+            $id = DB::insertInto('Pedidos')->values($values)->execute();
             $this->loadByID($id);
         } catch (\Exception $e) {
             throw $this->translate($e);
@@ -987,11 +989,10 @@ class Pedido extends \MZ\Database\Helper
         if (!$this->exists()) {
             throw new \Exception('O identificador do pedido não foi informado');
         }
-        $values = self::filterValues($values, $only, $except);
+        $values = DB::filterValues($values, $only, $except);
         unset($values['datacriacao']);
         try {
-            self::getDB()
-                ->update('Pedidos')
+            DB::update('Pedidos')
                 ->set($values)
                 ->where('id', $this->getID())
                 ->execute();
@@ -1011,8 +1012,7 @@ class Pedido extends \MZ\Database\Helper
         if (!$this->exists()) {
             throw new \Exception('O identificador do pedido não foi informado');
         }
-        $result = self::getDB()
-            ->deleteFrom('Pedidos')
+        $result = DB::deleteFrom('Pedidos')
             ->where('id', $this->getID())
             ->execute();
         return $result;
@@ -1168,7 +1168,7 @@ class Pedido extends \MZ\Database\Helper
      */
     public function findTotal($resumido = false)
     {
-        $query = self::getDB()->from('Pedidos p')
+        $query = DB::from('Pedidos p')
             ->select(null)
             ->select('SUM(r.precocompra * r.quantidade) as custo')
             ->select('SUM(IF(NOT ISNULL(r.produtoid), r.preco * r.quantidade, 0)) as produtos')
@@ -1303,11 +1303,11 @@ class Pedido extends \MZ\Database\Helper
      */
     private static function query($condition = [], $order = [])
     {
-        $query = self::getDB()->from('Pedidos p');
+        $query = DB::from('Pedidos p');
         $condition = self::filterCondition($condition);
-        $query = self::buildOrderBy($query, self::filterOrder($order));
+        $query = DB::buildOrderBy($query, self::filterOrder($order));
         $query = $query->orderBy('p.id DESC');
-        return self::buildCondition($query, $condition);
+        return DB::buildCondition($query, $condition);
     }
 
     /**
@@ -1330,9 +1330,8 @@ class Pedido extends \MZ\Database\Helper
      */
     public static function findByID($id)
     {
-        return self::find([
-            'id' => intval($id),
-        ]);
+        $result = new self();
+        return $result->loadByID($id);
     }
 
     /**
@@ -1342,12 +1341,8 @@ class Pedido extends \MZ\Database\Helper
      */
     public static function findByMesaID($mesa_id)
     {
-        return self::find([
-            'mesaid' => intval($mesa_id),
-            'cancelado' => 'N',
-            'tipo' => self::TIPO_MESA,
-            '!estado', self::ESTADO_FINALIZADO
-        ]);
+        $result = new self();
+        return $result->loadByMesaID($mesa_id);
     }
 
     /**
@@ -1357,17 +1352,13 @@ class Pedido extends \MZ\Database\Helper
      */
     public static function findByComandaID($comanda_id)
     {
-        return self::find([
-            'comandaid' => intval($comanda_id),
-            'cancelado' => 'N',
-            'tipo' => self::TIPO_COMANDA,
-            '!estado', self::ESTADO_FINALIZADO
-        ]);
+        $result = new self();
+        return $result->loadByComandaID($comanda_id);
     }
 
     public static function getTicketMedio($sessao_id, $data_inicio = null, $data_fim = null)
     {
-        $query = self::getDB()->from('Pedidos p')
+        $query = DB::from('Pedidos p')
             ->select(null)
             ->select('SUM(TIME_TO_SEC(TIMEDIFF(COALESCE(p.dataconclusao, NOW()), p.datacriacao))) as segundos')
             ->select('COUNT(p.id) as quantidade')
@@ -1399,7 +1390,7 @@ class Pedido extends \MZ\Database\Helper
 
     public static function getTotalPessoas($sessao_id, $data_inicio = null, $data_fim = null)
     {
-        $query = self::getDB()->from('Pedidos p')
+        $query = DB::from('Pedidos p')
             ->select(null)
             ->select('SUM(p.pessoas) as total')
             ->select('SUM(IF(p.estado = ?, 0, p.pessoas)) as atual', Pedido::ESTADO_FINALIZADO)
@@ -1420,7 +1411,7 @@ class Pedido extends \MZ\Database\Helper
 
     public static function fetchTotal($sessao_id, $data_inicio = null, $data_fim = null)
     {
-        $query = self::getDB()->from('Pedidos p')
+        $query = DB::from('Pedidos p')
             ->select(null)
             ->select('ROUND(SUM(r.preco * r.quantidade), 4) as subtotal')
             ->select('ROUND(SUM(r.preco * r.quantidade * (r.porcentagem / 100 + 1)), 4) as total')

@@ -26,7 +26,7 @@ require_once(dirname(dirname(__DIR__)) . '/app.php');
 
 use MZ\System\Permissao;
 use MZ\Payment\Pagamento;
-use MZ\Database\Helper;
+use MZ\Database\DB;
 
 if (!is_login()) {
     json('Usuário não autenticado!');
@@ -38,12 +38,12 @@ $response = ['status' => 'ok'];
 $mes = isset($_GET['mes']) ? abs(intval($_GET['mes'])): 0;
 $meses = [];
 for ($i = $mes; $i < $mes + 4; $i++) {
-    $data = Helper::date("first day of -$i month");
+    $data = DB::date("first day of -$i month");
     $meses[] = [
         'mes' => human_date($data, true),
         'total' => Pagamento::getFaturamento([
             'apartir_datahora' => $data,
-            'ate_datahora' => Helper::now("last day of -$i month 23:59:59")
+            'ate_datahora' => DB::now("last day of -$i month 23:59:59")
         ])
     ];
 }

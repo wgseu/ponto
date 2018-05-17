@@ -26,7 +26,7 @@ require_once(dirname(__DIR__) . '/app.php');
 
 use MZ\Account\Cliente;
 use MZ\System\Permissao;
-use MZ\Database\Helper;
+use MZ\Database\DB;
 use MZ\System\Synchronizer;
 
 need_permission(Permissao::NOME_CADASTROCLIENTES, is_output('json'));
@@ -37,7 +37,7 @@ $old_cliente = $cliente;
 if (is_post()) {
     $cliente = new Cliente($_POST);
     try {
-        \DB::BeginTransaction();
+        DB::beginTransaction();
         if (isset($_GET['sistema']) &&
             intval($_GET['sistema']) == 1 &&
             $cliente->getTipo() != Cliente::TIPO_JURIDICA
@@ -67,7 +67,7 @@ if (is_post()) {
                 \Log::error($e->getMessage());
             }
         }
-        \DB::Commit();
+        DB::commit();
         $msg = sprintf(
             'Cliente "%s" cadastrado com sucesso!',
             $cliente->getNomeCompleto()
@@ -78,7 +78,7 @@ if (is_post()) {
         \Thunder::success($msg, true);
         redirect('/gerenciar/cliente/');
     } catch (\Exception $e) {
-        \DB::RollBack();
+        DB::rollBack();
         $cliente->clean($old_cliente);
         if ($e instanceof \MZ\Exception\ValidationException) {
             $errors = $e->getErrors();

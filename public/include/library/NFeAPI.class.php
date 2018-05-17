@@ -26,7 +26,7 @@
 use MZ\Invoice\Evento;
 use MZ\Invoice\Nota;
 use MZ\Invoice\Emitente;
-use MZ\Database\Helper;
+use MZ\Database\DB;
 
 class NFeAPI extends \NFe\Common\Ajuste
 {
@@ -155,7 +155,7 @@ class NFeAPI extends \NFe\Common\Ajuste
         $_nota->setRecibo(null);
         $_nota->setQRCode(null);
         $_nota->setConsultaURL(null);
-        $_nota->setDataEmissao(Helper::now($nota->getDataEmissao()));
+        $_nota->setDataEmissao(DB::now($nota->getDataEmissao()));
         $_nota->setChave($nota->getID());
         $_nota->setEstado(Nota::ESTADO_ABERTO);
         $_nota->update();
@@ -219,7 +219,7 @@ class NFeAPI extends \NFe\Common\Ajuste
         $this->deleteXmlAnteriores($nota);
         $_nota->setMotivo($nota->getJustificativa());
         $_nota->setContingencia('Y');
-        $_nota->setDataLancamento(Helper::now($nota->getDataContingencia()));
+        $_nota->setDataLancamento(DB::now($nota->getDataContingencia()));
         $_nota->update();
         $_evento = Evento::log(
             $_nota->getID(),
@@ -252,7 +252,7 @@ class NFeAPI extends \NFe\Common\Ajuste
         if ($_nota->getAcao() != Nota::ACAO_CANCELAR) {
             $_nota->setConcluido('Y');
         }
-        $_nota->setDataAutorizacao(Helper::now($nota->getProtocolo()->getDataRecebimento()));
+        $_nota->setDataAutorizacao(DB::now($nota->getProtocolo()->getDataRecebimento()));
         $_nota->setProtocolo($nota->getProtocolo()->getNumero());
         $_nota->setEstado(Nota::ESTADO_AUTORIZADO);
         $_nota->update();
@@ -473,7 +473,7 @@ class NFeAPI extends \NFe\Common\Ajuste
                 );
                 $_nota->setChave($inutilizacao->getID());
                 $_nota->setProtocolo($inutilizacao->getNumero());
-                $_nota->setDataAutorizacao(Helper::now($inutilizacao->getDataRecebimento()));
+                $_nota->setDataAutorizacao(DB::now($inutilizacao->getDataRecebimento()));
                 $_nota->setConcluido('Y');
                 $_nota->setEstado(Nota::ESTADO_INUTILIZADO);
                 $_nota->update();

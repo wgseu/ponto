@@ -24,6 +24,8 @@
  */
 namespace MZ\Stock;
 
+use MZ\Database\Model;
+use MZ\Database\DB;
 use MZ\Util\Filter;
 use MZ\Util\Validator;
 use MZ\Account\Cliente;
@@ -31,7 +33,7 @@ use MZ\Account\Cliente;
 /**
  * Fornecedores de produtos
  */
-class Fornecedor extends \MZ\Database\Helper
+class Fornecedor extends Model
 {
 
     /**
@@ -184,7 +186,7 @@ class Fornecedor extends \MZ\Database\Helper
             $this->setPrazoPagamento($fornecedor['prazopagamento']);
         }
         if (!isset($fornecedor['datacadastro'])) {
-            $this->setDataCadastro(self::now());
+            $this->setDataCadastro(DB::now());
         } else {
             $this->setDataCadastro($fornecedor['datacadastro']);
         }
@@ -238,7 +240,7 @@ class Fornecedor extends \MZ\Database\Helper
         if ($cliente->getTipo() != Cliente::TIPO_JURIDICA) {
             $errors['empresaid'] = 'A empresa deve ser do tipo jurídica';
         }
-        $this->setDataCadastro(self::now());
+        $this->setDataCadastro(DB::now());
         if (!empty($errors)) {
             throw new \MZ\Exception\ValidationException($errors);
         }
@@ -273,7 +275,7 @@ class Fornecedor extends \MZ\Database\Helper
         $values = $this->validate();
         unset($values['id']);
         try {
-            $id = self::getDB()->insertInto('Fornecedores')->values($values)->execute();
+            $id = DB::insertInto('Fornecedores')->values($values)->execute();
             $this->loadByID($id);
         } catch (\Exception $e) {
             throw $this->translate($e);
@@ -293,11 +295,10 @@ class Fornecedor extends \MZ\Database\Helper
         if (!$this->exists()) {
             throw new \Exception('O identificador do fornecedor não foi informado');
         }
-        $values = self::filterValues($values, $only, $except);
+        $values = DB::filterValues($values, $only, $except);
         unset($values['datacadastro']);
         try {
-            self::getDB()
-                ->update('Fornecedores')
+            DB::update('Fornecedores')
                 ->set($values)
                 ->where('id', $this->getID())
                 ->execute();
@@ -317,8 +318,7 @@ class Fornecedor extends \MZ\Database\Helper
         if (!$this->exists()) {
             throw new \Exception('O identificador do fornecedor não foi informado');
         }
-        $result = self::getDB()
-            ->deleteFrom('Fornecedores')
+        $result = DB::deleteFrom('Fornecedores')
             ->where('id', $this->getID())
             ->execute();
         return $result;
@@ -399,7 +399,7 @@ class Fornecedor extends \MZ\Database\Helper
      */
     private static function query($condition = [], $order = [])
     {
-        $query = self::getDB()->from('Fornecedores f')
+        $query = DB::from('Fornecedores f')
             ->leftJoin('Clientes c ON c.id = f.empresaid');
         if (isset($condition['search'])) {
             $search = trim($condition['search']);
@@ -411,19 +411,19 @@ class Fornecedor extends \MZ\Database\Helper
                 $fone = Cliente::buildFoneSearch($search);
                 $query = $query->orderBy('IF(c.fone1 LIKE ?, 0, 1)', $fone);
             } else {
-                $query = self::buildSearch(
+                $query = DB::buildSearch(
                     $search,
-                    self::concat(['c.nome', '" "', 'COALESCE(c.sobrenome, "")']),
+                    DB::concat(['c.nome', '" "', 'COALESCE(c.sobrenome, "")']),
                     $query
                 );
             }
             unset($condition['search']);
         }
         $condition = self::filterCondition($condition);
-        $query = self::buildOrderBy($query, self::filterOrder($order));
+        $query = DB::buildOrderBy($query, self::filterOrder($order));
         $query = $query->orderBy('c.nome ASC');
         $query = $query->orderBy('f.id ASC');
-        return self::buildCondition($query, $condition);
+        return DB::buildCondition($query, $condition);
     }
 
     /**
@@ -446,9 +446,8 @@ class Fornecedor extends \MZ\Database\Helper
      */
     public static function findByID($id)
     {
-        return self::find([
-            'id' => intval($id),
-        ]);
+        $result = new self();
+        return $result->loadByID($id);
     }
 
     /**
@@ -458,9 +457,8 @@ class Fornecedor extends \MZ\Database\Helper
      */
     public static function findByEmpresaID($empresa_id)
     {
-        return self::find([
-            'empresaid' => intval($empresa_id),
-        ]);
+        $result = new self();
+        return $result->loadByEmpresaID($empresa_id);
     }
 
     /**

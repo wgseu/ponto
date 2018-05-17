@@ -31,7 +31,7 @@ use MZ\Sale\ProdutoPedido;
 use MZ\Sale\Pedido;
 use MZ\Invoice\Evento;
 use MZ\Invoice\Nota;
-use MZ\Database\Helper;
+use MZ\Database\DB;
 
 class NFeDB extends \NFe\Database\Estatico
 {
@@ -122,7 +122,7 @@ class NFeDB extends \NFe\Database\Estatico
             $nota->setJustificativa($_nota->getMotivo());
         } else {
             $nota->setEmissao(\NFe\Core\Nota::EMISSAO_NORMAL);
-            $nota->setDataEmissao(Helper::now());
+            $nota->setDataEmissao(DB::now());
         }
         if ($_pedido->isDelivery()) {
             $nota->setPresenca(\NFe\Core\Nota::PRESENCA_ENTREGA);
@@ -156,7 +156,7 @@ class NFeDB extends \NFe\Database\Estatico
                 break;
         }
         $nota->setAmbiente(\NFeUtil::toAmbiente($_nota->getAmbiente()));
-        $_nota->setDataEmissao(Helper::now($nota->getDataEmissao()));
+        $_nota->setDataEmissao(DB::now($nota->getDataEmissao()));
         $_nota->update();
         /* Destinatário */
         $destinatario = null;

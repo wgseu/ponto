@@ -24,13 +24,15 @@
  */
 namespace MZ\Product;
 
+use MZ\Database\Model;
+use MZ\Database\DB;
 use MZ\Util\Filter;
 use MZ\Util\Validator;
 
 /**
  * Informa tamanhos de pizzas e opções de peso do produto
  */
-class Propriedade extends \MZ\Database\Helper
+class Propriedade extends Model
 {
 
     /**
@@ -245,7 +247,7 @@ class Propriedade extends \MZ\Database\Helper
             $this->setImagem($propriedade['imagem']);
         }
         if (!isset($propriedade['dataatualizacao'])) {
-            $this->setDataAtualizacao(self::now());
+            $this->setDataAtualizacao(DB::now());
         } else {
             $this->setDataAtualizacao($propriedade['dataatualizacao']);
         }
@@ -299,7 +301,7 @@ class Propriedade extends \MZ\Database\Helper
                 @unlink($image_path);
             }
         }
-        $this->setDataAtualizacao(self::now());
+        $this->setDataAtualizacao(DB::now());
     }
 
     /**
@@ -324,7 +326,7 @@ class Propriedade extends \MZ\Database\Helper
         if (is_null($this->getNome())) {
             $errors['nome'] = 'O nome não pode ser vazio';
         }
-        $this->setDataAtualizacao(self::now());
+        $this->setDataAtualizacao(DB::now());
         if (!empty($errors)) {
             throw new \MZ\Exception\ValidationException($errors);
         }
@@ -367,7 +369,7 @@ class Propriedade extends \MZ\Database\Helper
         $values = $this->validate();
         unset($values['id']);
         try {
-            $id = self::getDB()->insertInto('Propriedades')->values($values)->execute();
+            $id = DB::insertInto('Propriedades')->values($values)->execute();
             $this->loadByID($id);
         } catch (\Exception $e) {
             throw $this->translate($e);
@@ -387,10 +389,9 @@ class Propriedade extends \MZ\Database\Helper
         if (!$this->exists()) {
             throw new \Exception('O identificador da propriedade não foi informado');
         }
-        $values = self::filterValues($values, $only, $except);
+        $values = DB::filterValues($values, $only, $except);
         try {
-            self::getDB()
-                ->update('Propriedades')
+            DB::update('Propriedades')
                 ->set($values)
                 ->where('id', $this->getID())
                 ->execute();
@@ -410,8 +411,7 @@ class Propriedade extends \MZ\Database\Helper
         if (!$this->exists()) {
             throw new \Exception('O identificador da propriedade não foi informado');
         }
-        $result = self::getDB()
-            ->deleteFrom('Propriedades')
+        $result = DB::deleteFrom('Propriedades')
             ->where('id', $this->getID())
             ->execute();
         return $result;
@@ -450,7 +450,7 @@ class Propriedade extends \MZ\Database\Helper
      */
     public function loadImagem()
     {
-        $data = self::getDB()->from('Propriedades p')
+        $data = DB::from('Propriedades p')
             ->select(null)
             ->select('p.imagem')
             ->where('p.id', $this->getID());
@@ -515,7 +515,7 @@ class Propriedade extends \MZ\Database\Helper
      */
     private static function query($condition = [], $order = [])
     {
-        $query = self::getDB()->from('Propriedades p')
+        $query = DB::from('Propriedades p')
             ->select(null)
             ->select('p.id')
             ->select('p.grupoid')
@@ -523,14 +523,14 @@ class Propriedade extends \MZ\Database\Helper
             ->select('p.abreviacao')
             ->select(
                 '(CASE WHEN p.imagem IS NULL THEN NULL ELSE '.
-                self::concat(['p.id', '".png"']).
+                DB::concat(['p.id', '".png"']).
                 ' END) as imagem'
             )
             ->select('p.dataatualizacao');
         $condition = self::filterCondition($condition);
-        $query = self::buildOrderBy($query, self::filterOrder($order));
+        $query = DB::buildOrderBy($query, self::filterOrder($order));
         $query = $query->orderBy('p.id ASC');
-        return self::buildCondition($query, $condition);
+        return DB::buildCondition($query, $condition);
     }
 
     /**
@@ -553,9 +553,8 @@ class Propriedade extends \MZ\Database\Helper
      */
     public static function findByID($id)
     {
-        return self::find([
-            'id' => intval($id),
-        ]);
+        $result = new self();
+        return $result->loadByID($id);
     }
 
     /**
@@ -566,10 +565,8 @@ class Propriedade extends \MZ\Database\Helper
      */
     public static function findByGrupoIDNome($grupo_id, $nome)
     {
-        return self::find([
-            'grupoid' => intval($grupo_id),
-            'nome' => strval($nome),
-        ]);
+        $result = new self();
+        return $result->loadByGrupoIDNome($grupo_id, $nome);
     }
 
     /**

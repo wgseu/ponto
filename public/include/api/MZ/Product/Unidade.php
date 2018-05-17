@@ -24,13 +24,15 @@
  */
 namespace MZ\Product;
 
+use MZ\Database\Model;
+use MZ\Database\DB;
 use MZ\Util\Filter;
 use MZ\Util\Validator;
 
 /**
  * Unidades de medidas aplicadas aos produtos
  */
-class Unidade extends \MZ\Database\Helper
+class Unidade extends Model
 {
     const SIGLA_UNITARIA = 'UN';
 
@@ -324,7 +326,7 @@ class Unidade extends \MZ\Database\Helper
         $values = $this->validate();
         unset($values['id']);
         try {
-            $id = self::getDB()->insertInto('Unidades')->values($values)->execute();
+            $id = DB::insertInto('Unidades')->values($values)->execute();
             $this->loadByID($id);
         } catch (\Exception $e) {
             throw $this->translate($e);
@@ -344,10 +346,9 @@ class Unidade extends \MZ\Database\Helper
         if (!$this->exists()) {
             throw new \Exception('O identificador da unidade não foi informado');
         }
-        $values = self::filterValues($values, $only, $except);
+        $values = DB::filterValues($values, $only, $except);
         try {
-            self::getDB()
-                ->update('Unidades')
+            DB::update('Unidades')
                 ->set($values)
                 ->where('id', $this->getID())
                 ->execute();
@@ -367,8 +368,7 @@ class Unidade extends \MZ\Database\Helper
         if (!$this->exists()) {
             throw new \Exception('O identificador da unidade não foi informado');
         }
-        $result = self::getDB()
-            ->deleteFrom('Unidades')
+        $result = DB::deleteFrom('Unidades')
             ->where('id', $this->getID())
             ->execute();
         return $result;
@@ -447,12 +447,12 @@ class Unidade extends \MZ\Database\Helper
      */
     private static function query($condition = [], $order = [])
     {
-        $query = self::getDB()->from('Unidades u');
+        $query = DB::from('Unidades u');
         $condition = self::filterCondition($condition);
-        $query = self::buildOrderBy($query, self::filterOrder($order));
+        $query = DB::buildOrderBy($query, self::filterOrder($order));
         $query = $query->orderBy('u.nome ASC');
         $query = $query->orderBy('u.id ASC');
-        return self::buildCondition($query, $condition);
+        return DB::buildCondition($query, $condition);
     }
 
     /**
@@ -475,9 +475,8 @@ class Unidade extends \MZ\Database\Helper
      */
     public static function findByID($id)
     {
-        return self::find([
-            'id' => intval($id),
-        ]);
+        $result = new self();
+        return $result->loadByID($id);
     }
 
     /**
@@ -487,9 +486,8 @@ class Unidade extends \MZ\Database\Helper
      */
     public static function findBySigla($sigla)
     {
-        return self::find([
-            'sigla' => strval($sigla),
-        ]);
+        $result = new self();
+        return $result->loadBySigla($sigla);
     }
 
     /**

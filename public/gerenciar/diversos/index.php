@@ -8,13 +8,13 @@ use MZ\Sale\Pedido;
 use MZ\Session\Sessao;
 use MZ\Account\Conta;
 use MZ\Sale\ProdutoPedido;
-use MZ\Database\Helper;
+use MZ\Database\DB;
 
 $data_inicio = strtotime('first day of last month 0:00');
 $data_fim = strtotime('-1 sec tomorrow');
 $faturamentos = Pagamento::rawFindAllTotal(
     [
-        'apartir_datahora' => Helper::date('first day of last month'),
+        'apartir_datahora' => DB::date('first day of last month'),
         '!pedidoid' => null
     ],
     ['dia' => true]
@@ -22,7 +22,7 @@ $faturamentos = Pagamento::rawFindAllTotal(
 $top_clientes = Cliente::rawFindAll(
     [
         'comprador' => true,
-        'apartir_cadastro' => Helper::date('first day of -6 month')
+        'apartir_cadastro' => DB::date('first day of -6 month')
     ],
     [],
     5
@@ -36,22 +36,22 @@ $receitas = Pagamento::getReceitas(['sessaoid' => $sessao->getID()]);
 $vendas = Pedido::fetchTotal($sessao->getID());
 $faturamento = [];
 $faturamento['atual'] = Pagamento::getFaturamento(
-    ['apartir_datahora' => Helper::date('first day of this month')]
+    ['apartir_datahora' => DB::date('first day of this month')]
 );
 $faturamento['anterior'] = Pagamento::getFaturamento([
-    'apartir_datahora' => Helper::date('first day of last month'),
-    'ate_datahora' => Helper::now('-1 month')
+    'apartir_datahora' => DB::date('first day of last month'),
+    'ate_datahora' => DB::now('-1 month')
 ]);
 $faturamento['base'] = Pagamento::getFaturamento([
-    'apartir_datahora' => Helper::date('first day of last month'),
-    'ate_datahora' => Helper::now('-1 sec today first day of this month')
+    'apartir_datahora' => DB::date('first day of last month'),
+    'ate_datahora' => DB::now('-1 sec today first day of this month')
 ]);
 $clientes = [];
 $clientes['total'] = Cliente::count();
-$clientes['hoje'] = Cliente::count(['apartir_cadastro' => Helper::date()]);
+$clientes['hoje'] = Cliente::count(['apartir_cadastro' => DB::date()]);
 $despesas = [];
 $despesas['pagas'] = Pagamento::getDespesas(
-    ['apartir_datahora' => Helper::date('first day of this month')]
+    ['apartir_datahora' => DB::date('first day of this month')]
 );
 $conta_info = Conta::getTotalAbertas(null, null, -1, null, date('Y-m-d', $data_fim));
 $despesas['apagar'] = $conta_info['despesas'] - $conta_info['pago'];

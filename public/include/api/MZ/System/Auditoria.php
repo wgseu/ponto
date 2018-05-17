@@ -24,13 +24,15 @@
  */
 namespace MZ\System;
 
+use MZ\Database\Model;
+use MZ\Database\DB;
 use MZ\Util\Filter;
 use MZ\Util\Validator;
 
 /**
  * Registra todas as atividades importantes do sistema
  */
-class Auditoria extends \MZ\Database\Helper
+class Auditoria extends Model
 {
 
     /**
@@ -381,7 +383,7 @@ class Auditoria extends \MZ\Database\Helper
         $values = $this->validate();
         unset($values['id']);
         try {
-            $id = self::getDB()->insertInto('Auditoria')->values($values)->execute();
+            $id = DB::insertInto('Auditoria')->values($values)->execute();
             $this->loadByID($id);
         } catch (\Exception $e) {
             throw $this->translate($e);
@@ -401,10 +403,9 @@ class Auditoria extends \MZ\Database\Helper
         if (!$this->exists()) {
             throw new \Exception('O identificador da auditoria não foi informado');
         }
-        $values = self::filterValues($values, $only, $except);
+        $values = DB::filterValues($values, $only, $except);
         try {
-            self::getDB()
-                ->update('Auditoria')
+            DB::update('Auditoria')
                 ->set($values)
                 ->where('id', $this->getID())
                 ->execute();
@@ -424,8 +425,7 @@ class Auditoria extends \MZ\Database\Helper
         if (!$this->exists()) {
             throw new \Exception('O identificador da auditoria não foi informado');
         }
-        $result = self::getDB()
-            ->deleteFrom('Auditoria')
+        $result = DB::deleteFrom('Auditoria')
             ->where('id', $this->getID())
             ->execute();
         return $result;
@@ -545,12 +545,12 @@ class Auditoria extends \MZ\Database\Helper
      */
     private static function query($condition = [], $order = [])
     {
-        $query = self::getDB()->from('Auditoria a');
+        $query = DB::from('Auditoria a');
         $condition = self::filterCondition($condition);
-        $query = self::buildOrderBy($query, self::filterOrder($order));
+        $query = DB::buildOrderBy($query, self::filterOrder($order));
         $query = $query->orderBy('a.descricao ASC');
         $query = $query->orderBy('a.id ASC');
-        return self::buildCondition($query, $condition);
+        return DB::buildCondition($query, $condition);
     }
 
     /**
@@ -573,9 +573,8 @@ class Auditoria extends \MZ\Database\Helper
      */
     public static function findByID($id)
     {
-        return self::find([
-            'id' => intval($id),
-        ]);
+        $result = new self();
+        return $result->loadByID($id);
     }
 
     /**

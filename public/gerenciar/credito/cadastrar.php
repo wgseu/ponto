@@ -26,13 +26,13 @@ require_once(dirname(__DIR__) . '/app.php');
 
 use MZ\Account\Credito;
 use MZ\System\Permissao;
-use MZ\Database\Helper;
+use MZ\Database\DB;
 
 need_permission(Permissao::NOME_CADASTRARCREDITOS, is_output('json'));
 $id = isset($_GET['id']) ? $_GET['id'] : null;
 $credito = Credito::findByID($id);
 $credito->setID(null);
-$credito->setDataCadastro(Helper::now());
+$credito->setDataCadastro(DB::now());
 
 $focusctrl = 'detalhes';
 $errors = [];

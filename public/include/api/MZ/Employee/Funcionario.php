@@ -372,7 +372,7 @@ class Funcionario extends Model
             $this->setPontuacao($funcionario['pontuacao']);
         }
         if (!isset($funcionario['ativo'])) {
-            $this->setAtivo('Y');
+            $this->setAtivo('N');
         } else {
             $this->setAtivo($funcionario['ativo']);
         }

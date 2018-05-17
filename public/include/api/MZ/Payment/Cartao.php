@@ -356,22 +356,22 @@ class Cartao extends Model
             $this->setImageIndex($cartao['imageindex']);
         }
         if (!isset($cartao['mensalidade'])) {
-            $this->setMensalidade(null);
+            $this->setMensalidade(0);
         } else {
             $this->setMensalidade($cartao['mensalidade']);
         }
         if (!isset($cartao['transacao'])) {
-            $this->setTransacao(null);
+            $this->setTransacao(0);
         } else {
             $this->setTransacao($cartao['transacao']);
         }
         if (!isset($cartao['taxa'])) {
-            $this->setTaxa(null);
+            $this->setTaxa(0);
         } else {
             $this->setTaxa($cartao['taxa']);
         }
         if (!isset($cartao['diasrepasse'])) {
-            $this->setDiasRepasse(null);
+            $this->setDiasRepasse(0);
         } else {
             $this->setDiasRepasse($cartao['diasrepasse']);
         }

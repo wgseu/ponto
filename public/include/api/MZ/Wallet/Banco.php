@@ -423,17 +423,6 @@ class Banco extends Model
     private static function filterCondition($condition)
     {
         $allowed = self::getAllowedKeys();
-        if (isset($condition['search'])) {
-            $search = $condition['search'];
-            if (is_numeric($search)) {
-                $condition['numero'] = Filter::digits($search);
-            } else {
-                $field = 'b.razaosocial LIKE ?';
-                $condition[$field] = '%'.$search.'%';
-                $allowed[$field] = true;
-            }
-            unset($condition['search']);
-        }
         return Filter::keys($condition, $allowed, 'b.');
     }
 
@@ -446,6 +435,14 @@ class Banco extends Model
     private static function query($condition = [], $order = [])
     {
         $query = DB::from('Bancos b');
+        if (isset($condition['search'])) {
+            $search = $condition['search'];
+            if (is_numeric($search)) {
+                $condition['numero'] = Filter::digits($search);
+            } else {
+                $query = DB::buildSearch($search, 'b.razaosocial', $query);
+            }
+        }
         $condition = self::filterCondition($condition);
         $query = DB::buildOrderBy($query, self::filterOrder($order));
         $query = $query->orderBy('b.razaosocial ASC');

@@ -21,7 +21,8 @@
   <label for="categoriaid">Categoria:</label>
   <select class="form-control" id="categoriaid" name="categoriaid">
     {% for $_categoria in $_categorias %}
-      <option value="{{ $_categoria->getID() }}" {{ $produto->getCategoriaID() == $_categoria->getID()?'selected':'' }}>{{ $_categoria->getDescricao() }}</option>
+      {% $_supercategoria = $_categoria->findCategoriaID() %}
+      <option value="{{ $_categoria->getID() }}" {{ $produto->getCategoriaID() == $_categoria->getID()?'selected':'' }}>{{ $_categoria->getDescricao() }}{% if $_supercategoria->exists() %} - {{ $_supercategoria->getDescricao() }}{% endif %}</option>
     {% endfor %}
   </select>
 </div>

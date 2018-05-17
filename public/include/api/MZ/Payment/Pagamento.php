@@ -678,7 +678,7 @@ class Pagamento extends Model
             $this->setCancelado($pagamento['cancelado']);
         }
         if (!isset($pagamento['ativo'])) {
-            $this->setAtivo(null);
+            $this->setAtivo('N');
         } else {
             $this->setAtivo($pagamento['ativo']);
         }

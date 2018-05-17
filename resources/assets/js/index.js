@@ -206,6 +206,16 @@ Gerenciar.common.load = function(
     }
   });
 };
+Gerenciar.common.cleanInput = function(input, field, attribute, selectfn) {
+  $(input).val('');
+  $(field).val('');
+  $(field).removeAttr(attribute);
+  var spanId = $(input)
+    .closest('.form-group')
+    .find('label .identifier');
+  spanId.text('');
+  if (selectfn != undefined && selectfn != null) selectfn(null);
+};
 Gerenciar.common.autocomplete = function(
   url,
   input,
@@ -219,17 +229,6 @@ Gerenciar.common.autocomplete = function(
 ) {
   if (attribute == undefined) attribute = 'data-content';
   if (field == undefined) field = input + '_ref';
-
-  function clearInput() {
-    $(input).val('');
-    $(field).val('');
-    $(field).removeAttr(attribute);
-    var spanId = $(input)
-      .closest('.form-group')
-      .find('label .identifier');
-    spanId.text('');
-    if (selectfn != undefined && selectfn != null) selectfn(null);
-  }
 
   $(input).autocomplete({
     lookup: function(search, done) {
@@ -305,11 +304,11 @@ Gerenciar.common.autocomplete = function(
   });
   $(input).blur(function() {
     if ($(input).val() == $(field).attr(attribute)) return;
-    clearInput();
+    Gerenciar.common.cleanInput(input, field, attribute, selectfn);
   });
   $(input).bind('input', function() {
     if ($(input).val() != '') return;
-    clearInput();
+    Gerenciar.common.cleanInput(input, field, attribute, selectfn);
   });
 };
 
@@ -769,42 +768,36 @@ Gerenciar.carteira.initForm = function(focus_ctrl) {
   function applyMask() {
     $('#conta').unmask();
     $('#agencia').unmask();
-    $('#conta').mask(
-      $('#bancoid')
-        .data()
-        .agenciamascara.replace(/>a/, '*')
-    );
-    $('#agencia').mask(
-      $('#bancoid')
-        .data()
-        .contamascara.replace(/>a/, '*')
-    );
+    var conta_mask = ($('#bancoid_ref').data('contamascara') || '') + '';
+    var agencia_mask = ($('#bancoid_ref').data('agenciamascara') || '') + '';
+    $('#conta').mask(conta_mask.replace(/>a/, '*'));
+    $('#agencia').mask(agencia_mask.replace(/>a/, '*'));
+  }
+
+  function fillMask(banco) {
+    $('#bancoid_ref').data('agenciamascara', banco && banco.agenciamascara);
+    $('#bancoid_ref').data('contamascara', banco && banco.contamascara);
+    applyMask();
   }
 
   function tipoAlterado(tipo) {
     if (tipo == 'Financeira') {
-      $('#banco')
+      $('#bancoid').val('');
+      Gerenciar.common.cleanInput('#bancoid', '#bancoid_ref', 'data-content', fillMask);
+      $('#bancoid')
         .closest('.form-group')
         .addClass('hidden');
-      var label = $('#conta')
+      var label = $('#agencia')
         .closest('.form-group')
         .find('label');
       label.text(label.attr('data-servico'));
-      label = $('#agencia')
-        .closest('.form-group')
-        .find('label');
-      label.text(label.attr('data-conta'));
       $('#conta').unmask();
       $('#agencia').unmask();
     } else {
-      $('#banco')
+      $('#bancoid')
         .closest('.form-group')
         .removeClass('hidden');
-      var label = $('#conta')
-        .closest('.form-group')
-        .find('label');
-      label.text(label.attr('data-conta'));
-      label = $('#agencia')
+      var label = $('#agencia')
         .closest('.form-group')
         .find('label');
       label.text(label.attr('data-agencia'));
@@ -813,11 +806,7 @@ Gerenciar.carteira.initForm = function(focus_ctrl) {
   }
 
   if (focus_ctrl != undefined) $('#' + focus_ctrl).focus();
-  Gerenciar.banco.initField('#bancoid', function(banco) {
-    $('#bancoid_ref').data('agenciamascara', banco.agenciamascara);
-    $('#bancoid_ref').data('contamascara', banco.contamascara);
-    applyMask();
-  });
+  Gerenciar.banco.initField('#bancoid', fillMask);
   $('#tipo').change(function() {
     tipoAlterado(
       $(this)

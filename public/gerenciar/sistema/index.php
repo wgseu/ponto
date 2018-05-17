@@ -36,6 +36,9 @@ if (!$cliente->exists()) {
 }
 $localizacao = \MZ\Location\Localizacao::find(['clienteid' => $app->getSystem()->getCompany()->getID()]);
 $localizacao->setClienteID($cliente->getID());
+if (!$localizacao->exists()) {
+    $localizacao->setMostrar('Y');
+}
 $bairro = $localizacao->findBairroID();
 $cidade = $bairro->findCidadeID();
 $estado = $cidade->findEstadoID();

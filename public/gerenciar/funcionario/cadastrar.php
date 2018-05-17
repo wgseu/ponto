@@ -69,6 +69,8 @@ if (is_post()) {
     }
 } elseif (is_output('json')) {
     json('Nenhum dado foi enviado');
+} elseif (is_null($funcionario->getClienteID())) {
+    $funcionario->setAtivo('Y');
 }
 $cliente_id_obj = $funcionario->findClienteID();
 $_funcoes = Funcao::findAll();

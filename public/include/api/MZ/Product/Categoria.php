@@ -247,7 +247,7 @@ class Categoria extends Model
             $this->setDescricao($categoria['descricao']);
         }
         if (!isset($categoria['servico'])) {
-            $this->setServico('Y');
+            $this->setServico('N');
         } else {
             $this->setServico($categoria['servico']);
         }

@@ -30,6 +30,7 @@ use MZ\Location\Bairro;
 use MZ\System\Permissao;
 use MZ\System\Synchronizer;
 use MZ\Location\Localizacao;
+use MZ\Database\DB;
 
 need_permission(Permissao::NOME_CADASTROCLIENTES, true);
 

@@ -221,7 +221,7 @@ class Bairro extends Model
             $this->setNome($bairro['nome']);
         }
         if (!isset($bairro['valorentrega'])) {
-            $this->setValorEntrega(null);
+            $this->setValorEntrega(0);
         } else {
             $this->setValorEntrega($bairro['valorentrega']);
         }
@@ -405,13 +405,6 @@ class Bairro extends Model
     private static function filterCondition($condition)
     {
         $allowed = self::getAllowedKeys();
-        if (isset($condition['search'])) {
-            $search = $condition['search'];
-            $field = 'b.nome LIKE ?';
-            $condition[$field] = '%'.$search.'%';
-            $allowed[$field] = true;
-            unset($condition['search']);
-        }
         return Filter::keys($condition, $allowed, ['b.', 'c.', 'e.']);
     }
 
@@ -426,6 +419,10 @@ class Bairro extends Model
         $query = DB::from('Bairros b')
             ->leftJoin('Cidades c ON c.id = b.cidadeid')
             ->leftJoin('Estados e ON e.id = c.estadoid');
+        if (isset($condition['search'])) {
+            $search = $condition['search'];
+            $query = DB::buildSearch($search, 'b.nome', $query);
+        }
         $condition = self::filterCondition($condition);
         $query = DB::buildOrderBy($query, self::filterOrder($order));
         $query = $query->orderBy('b.nome ASC');

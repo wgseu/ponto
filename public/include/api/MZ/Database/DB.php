@@ -167,15 +167,15 @@ class DB
             $query = $query->where($field . ' LIKE ?', '%'.$word.'%');
             $query = $query->orderBy(
                 'COALESCE(NULLIF(' .
-                self::sqlLocate(
+                self::locate(
                     '?',
-                    DB::concat(['" "', $field])
+                    self::concat(['" "', $field])
                 ). ', 0), 65535) ASC',
                 ' '.$word
             );
             $query = $query->orderBy(
                 'COALESCE(NULLIF(' .
-                    self::sqlLocate('?', $field) . ', 0), 65535) ASC',
+                    self::locate('?', $field) . ', 0), 65535) ASC',
                 $word
             );
         }
@@ -209,7 +209,7 @@ class DB
         return 'CONCAT(' . implode(', ', $values) . ')';
     }
 
-    public static function sqlLocate($search, $string)
+    public static function locate($search, $string)
     {
         if (getenv('DB_DRIVER') == 'sqlite') {
             return 'instr(' . $search . ', ' . $string . ')';

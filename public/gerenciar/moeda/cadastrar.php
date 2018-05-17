@@ -66,5 +66,9 @@ if (is_post()) {
     }
 } elseif (is_output('json')) {
     json('Nenhum dado foi enviado');
+} elseif (is_null($moeda->getNome())) {
+    $moeda->setDivisao(100);
+    $moeda->setFracao('Centavo');
+    $moeda->setFormato('$ %s');
 }
 $app->getResponse('html')->output('gerenciar_moeda_cadastrar');

@@ -26,6 +26,7 @@ require_once(dirname(__DIR__) . '/app.php');
 
 use MZ\Location\Localizacao;
 use MZ\System\Permissao;
+use MZ\Database\DB;
 
 need_permission(Permissao::NOME_CADASTROCLIENTES, true);
 $localizacao = new Localizacao();

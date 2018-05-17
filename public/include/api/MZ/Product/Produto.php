@@ -829,12 +829,12 @@ class Produto extends Model
             $this->setTipo($produto['tipo']);
         }
         if (!isset($produto['cobrarservico'])) {
-            $this->setCobrarServico('Y');
+            $this->setCobrarServico('N');
         } else {
             $this->setCobrarServico($produto['cobrarservico']);
         }
         if (!isset($produto['divisivel'])) {
-            $this->setDivisivel('Y');
+            $this->setDivisivel('N');
         } else {
             $this->setDivisivel($produto['divisivel']);
         }
@@ -854,7 +854,7 @@ class Produto extends Model
             $this->setTempoPreparo($produto['tempopreparo']);
         }
         if (!isset($produto['visivel'])) {
-            $this->setVisivel('Y');
+            $this->setVisivel('N');
         } else {
             $this->setVisivel($produto['visivel']);
         }

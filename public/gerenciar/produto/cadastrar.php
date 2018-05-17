@@ -74,6 +74,7 @@ if (is_post()) {
     $unidade = Unidade::findBySigla(Unidade::SIGLA_UNITARIA);
     $produto->setTipo(Produto::TIPO_COMPOSICAO);
     $produto->setVisivel('Y');
+    $produto->setDivisivel('Y');
     $produto->setCobrarServico('Y');
     $produto->setConteudo(1);
     $produto->setTempoPreparo(0);

@@ -343,13 +343,6 @@ class Estado extends Model
     private static function filterCondition($condition)
     {
         $allowed = self::getAllowedKeys();
-        if (isset($condition['search'])) {
-            $search = $condition['search'];
-            $field = '(e.nome LIKE ? OR e.uf = ?)';
-            $condition[$field] = ['%'.$search.'%', $search];
-            $allowed[$field] = true;
-            unset($condition['search']);
-        }
         return Filter::keys($condition, $allowed, 'e.');
     }
 
@@ -362,6 +355,10 @@ class Estado extends Model
     private static function query($condition = [], $order = [])
     {
         $query = DB::from('Estados e');
+        if (isset($condition['search'])) {
+            $search = $condition['search'];
+            $query = DB::buildSearch($search, DB::concat(['e.nome', '" "', 'e.uf']), $query);
+        }
         $condition = self::filterCondition($condition);
         $query = DB::buildOrderBy($query, self::filterOrder($order));
         $query = $query->orderBy('e.nome ASC');

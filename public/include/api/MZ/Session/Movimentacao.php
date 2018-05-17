@@ -297,7 +297,7 @@ class Movimentacao extends Model
             $this->setCaixaID($movimentacao['caixaid']);
         }
         if (!isset($movimentacao['aberta'])) {
-            $this->setAberta('Y');
+            $this->setAberta('N');
         } else {
             $this->setAberta($movimentacao['aberta']);
         }

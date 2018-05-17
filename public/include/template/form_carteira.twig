@@ -18,12 +18,12 @@
   <input type="text" id="bancoid" class="form-control" value="{{ $_banco->getRazaoSocial() }}">
 </div>
 <div class="form-group col-lg-3 col-md-4 col-sm-6 col-xs-12">
-  <label for="conta" data-conta="Conta:" data-servico="Serviço:">Conta:</label>
-  <input type="text" id="conta" name="conta" class="form-control" value="{{ $carteira->getConta() }}">
+  <label for="agencia" data-agencia="Agência:" data-servico="Serviço:">Agência:</label>
+  <input type="text" id="agencia" name="agencia" class="form-control" value="{{ $carteira->getAgencia() }}">
 </div>
 <div class="form-group col-lg-3 col-md-4 col-sm-6 col-xs-12">
-  <label for="agencia" data-agencia="Agência:" data-conta="Conta:">Agência:</label>
-  <input type="text" id="agencia" name="agencia" class="form-control" value="{{ $carteira->getAgencia() }}">
+  <label for="conta">Conta:</label>
+  <input type="text" id="conta" name="conta" class="form-control" value="{{ $carteira->getConta() }}">
 </div>
 <div class="checkbox col-lg-3 col-md-4 col-sm-6 col-xs-12">
   <label>

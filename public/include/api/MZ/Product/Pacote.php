@@ -421,7 +421,7 @@ class Pacote extends Model
             $this->setSelecionado($pacote['selecionado']);
         }
         if (!isset($pacote['visivel'])) {
-            $this->setVisivel('Y');
+            $this->setVisivel('N');
         } else {
             $this->setVisivel($pacote['visivel']);
         }
@@ -485,11 +485,11 @@ class Pacote extends Model
         if (is_null($this->getValor())) {
             $errors['valor'] = 'O Valor não pode ser vazio';
         }
-        if (is_null($this->getSelecionado())) {
-            $this->setSelecionado('N');
+        if (!Validator::checkBoolean($this->getSelecionado())) {
+            $errors['selecionado'] = 'A seleção não foi informada ou é inválida';
         }
-        if (is_null($this->getVisivel())) {
-            $this->setVisivel('Y');
+        if (!Validator::checkBoolean($this->getVisivel())) {
+            $errors['visivel'] = 'A visíbilidade não foi informada ou é inválida';
         }
         if (!empty($errors)) {
             throw new \MZ\Exception\ValidationException($errors);

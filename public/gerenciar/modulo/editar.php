@@ -27,6 +27,7 @@ require_once(dirname(__DIR__) . '/app.php');
 use MZ\System\Modulo;
 use MZ\System\Permissao;
 use MZ\System\Synchronizer;
+use MZ\Database\DB;
 
 need_permission(Permissao::NOME_ALTERARCONFIGURACOES, true);
 $id = isset($_GET['id']) ? $_GET['id'] : null;

@@ -68,6 +68,8 @@ if (is_post()) {
     }
 } elseif (is_output('json')) {
     json('Nenhum dado foi enviado');
+} elseif (is_null($categoria->getDescricao())) {
+    $categoria->setServico('Y');
 }
 $_categorias = Categoria::findAll(['categoriaid' => null]);
 $app->getResponse('html')->output('gerenciar_categoria_cadastrar');

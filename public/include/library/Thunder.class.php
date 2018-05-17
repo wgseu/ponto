@@ -27,11 +27,11 @@ class Thunder
     private static function message($type, $msg, $auto_close)
     {
         $messages = [];
-        if (Session::Get('thunder') != null) {
-            $messages = unserialize(Session::Get('thunder', true));
+        if (\Session::Get('thunder') != null) {
+            $messages = unserialize(\Session::Get('thunder', true));
         }
         $messages[] = ['type' => $type, 'data' => ['message' => $msg, 'auto_close' => $auto_close]];
-        Session::Set('thunder', serialize($messages));
+        \Session::Set('thunder', serialize($messages));
     }
     
     public static function warning($msg, $auto_close = false)
@@ -57,8 +57,8 @@ class Thunder
     public static function execute()
     {
         $messages = [];
-        if (Session::Get('thunder') != null) {
-            $messages = unserialize(Session::Get('thunder', true));
+        if (\Session::Get('thunder') != null) {
+            $messages = unserialize(\Session::Get('thunder', true));
         }
         $values = [];
         foreach ($messages as $type => $value) {

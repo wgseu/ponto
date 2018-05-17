@@ -560,7 +560,7 @@ class Localizacao extends Model
             $this->setApelido($localizacao['apelido']);
         }
         if (!isset($localizacao['mostrar'])) {
-            $this->setMostrar('Y');
+            $this->setMostrar('N');
         } else {
             $this->setMostrar($localizacao['mostrar']);
         }

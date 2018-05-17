@@ -226,7 +226,7 @@ class Modulo extends Model
             $this->setImageIndex($modulo['imageindex']);
         }
         if (!isset($modulo['habilitado'])) {
-            $this->setHabilitado(null);
+            $this->setHabilitado('N');
         } else {
             $this->setHabilitado($modulo['habilitado']);
         }

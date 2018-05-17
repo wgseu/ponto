@@ -303,7 +303,7 @@ class Composicao extends Model
             $this->setValor($composicao['valor']);
         }
         if (!isset($composicao['ativa'])) {
-            $this->setAtiva(null);
+            $this->setAtiva('N');
         } else {
             $this->setAtiva($composicao['ativa']);
         }

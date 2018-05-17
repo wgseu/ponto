@@ -350,13 +350,23 @@ class Carteira extends Model
             $errors['bancoid'] = 'O banco não foi informado';
         }
         if ($this->getTipo() == self::TIPO_FINANCEIRA && !is_null($this->getBancoID())) {
-            $errors['bancoid'] = 'O banco '.$this->getBancoID().' não pode ser informado';
+            $errors['bancoid'] = 'O banco não pode ser informado';
         }
         if (is_null($this->getDescricao())) {
             $errors['descricao'] = 'A Descrição não pode ser vazia';
         }
+        if (is_null($this->getAgencia())) {
+            if ($this->getTipo() == self::TIPO_BANCARIA) {
+                $errors['agencia'] = 'A agência não pode ser vazia';
+            } else {
+                $errors['agencia'] = 'O serviço não pode ser vazio';
+            }
+        }
+        if (is_null($this->getConta())) {
+            $errors['conta'] = 'A conta não pode ser vazia';
+        }
         if (is_null($this->getAtiva())) {
-            $errors['ativa'] = 'A Ativa não pode ser vazia';
+            $errors['ativa'] = 'A Ativação não pode ser vazia';
         }
         if (!empty($errors)) {
             throw new \MZ\Exception\ValidationException($errors);

@@ -33,6 +33,7 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
         global $app;
         $this->assertNotNull($app);
     }
+
     public function testAssignedDB()
     {
         $this->assertNotNull(DB::getPdo());

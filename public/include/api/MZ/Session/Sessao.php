@@ -197,7 +197,7 @@ class Sessao extends Model
             $this->setDataTermino($sessao['datatermino']);
         }
         if (!isset($sessao['aberta'])) {
-            $this->setAberta('Y');
+            $this->setAberta('N');
         } else {
             $this->setAberta($sessao['aberta']);
         }

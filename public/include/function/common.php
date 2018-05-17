@@ -277,9 +277,9 @@ function need_login($json = false)
 {
     if (is_login()) {
         if (is_post()) {
-            unset($_SESSION['redirect']);
+            \Session::Get('redirect', true);
         }
-        return $_SESSION['cliente_id'];
+        return \Session::Get('cliente_id');
     }
     if ($json) {
         json('Necessário autenticação');
@@ -303,7 +303,7 @@ function need_manager($json = false)
         \Thunder::warning('Somente funcionários poderão acessar as páginas de gerenciamento');
         redirect('/');
     }
-    return $_SESSION['cliente_id'];
+    return \Session::Get('cliente_id');
 }
 
 function need_owner($json = false)
@@ -316,7 +316,7 @@ function need_owner($json = false)
         \Thunder::warning('Somente administradores poderão acessar essas páginas');
         redirect('/gerenciar/');
     }
-    return $_SESSION['cliente_id'];
+    return \Session::Get('cliente_id');
 }
 
 function need_permission($array, $json = false)
@@ -328,12 +328,13 @@ function need_permission($array, $json = false)
         \Thunder::warning('Você não possui permissão para acessar essa função');
         redirect('/gerenciar/');
     }
-    return $_SESSION['cliente_id'];
+    return \Session::Get('cliente_id');
 }
 
 function is_login()
 {
-    return isset($_SESSION['cliente_id']) && !is_null(logged_user()->getID());
+    $cliente_id = \Session::Get('cliente_id');
+    return is_numeric($cliente_id) && logged_user()->exists();
 }
 
 function is_manager($funcionario = null)

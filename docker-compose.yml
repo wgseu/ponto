@@ -42,7 +42,7 @@ services:
             - gmysqldb
     gmysqldb:
         image: mysql:5.5
-        command: mysqld --sql_mode=""
+        command: mysqld --wait_timeout=2147483 --max_allowed_packet=50M --character-set-server=latin1 --default-storage-engine=INNODB --sql-mode="STRICT_TRANS_TABLES,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION" --max_connections=300
         container_name: ${DB_HOST}
         restart: always
         env_file:

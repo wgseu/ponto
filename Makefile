@@ -95,15 +95,15 @@ populate:
 	@cat database/model/populate.sql >> $(DB_DUMPS_DIR)/populate.sql
 	@npm run fix-pop "$(DB_NAME)"
 	@make -s reset
-	@docker exec -i $(shell docker-compose ps -q gmysqldb) mysql -u"$(DB_ROOT_USER)" -p"$(DB_ROOT_PASSWORD)" < $(DB_DUMPS_DIR)/populate.sql 2>/dev/null
+	@docker exec -i $(shell docker-compose ps -q gmysqldb) mysql -u"$(DB_ROOT_USER)" -p"$(DB_ROOT_PASSWORD)" < $(DB_DUMPS_DIR)/populate.sql
 
 dump:
 	@mkdir -p $(DB_DUMPS_DIR)
-	@docker exec $(shell docker-compose ps -q gmysqldb) mysqldump -B "$(DB_NAME)" -u"$(DB_ROOT_USER)" -p"$(DB_ROOT_PASSWORD)" --add-drop-database > $(DB_DUMPS_DIR)/db.sql 2>/dev/null
+	@docker exec $(shell docker-compose ps -q gmysqldb) mysqldump -B "$(DB_NAME)" -u"$(DB_ROOT_USER)" -p"$(DB_ROOT_PASSWORD)" --add-drop-database > $(DB_DUMPS_DIR)/db.sql
 	@make -s reset
 
 restore:
-	@docker exec -i $(shell docker-compose ps -q gmysqldb) mysql -u"$(DB_ROOT_USER)" -p"$(DB_ROOT_PASSWORD)" < $(DB_DUMPS_DIR)/db.sql 2>/dev/null
+	@docker exec -i $(shell docker-compose ps -q gmysqldb) mysql -u"$(DB_ROOT_USER)" -p"$(DB_ROOT_PASSWORD)" < $(DB_DUMPS_DIR)/db.sql
 
 test:
 	@docker-compose exec -T php ./public/include/vendor/bin/phpunit --configuration ./ --no-coverage

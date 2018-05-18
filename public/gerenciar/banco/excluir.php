@@ -31,29 +31,29 @@ need_permission(Permissao::NOME_CADASTROBANCOS, is_output('json'));
 $id = isset($_GET['id']) ? $_GET['id'] : null;
 $banco = Banco::findByID($id);
 if (!$banco->exists()) {
-	$msg = 'O banco não foi informado ou não existe!';
-	if (is_output('json')) {
-		json($msg);
-	}
-	\Thunder::warning($msg);
-	redirect('/gerenciar/banco/');
+    $msg = 'O banco não foi informado ou não existe!';
+    if (is_output('json')) {
+        json($msg);
+    }
+    \Thunder::warning($msg);
+    redirect('/gerenciar/banco/');
 }
 try {
-	$banco->delete();
-	$banco->clean(new Banco());
-	$msg = sprintf('Banco "%s" excluído com sucesso!', $banco->getRazaoSocial());
-	if (is_output('json')) {
-		json('msg', $msg);
-	}
-	\Thunder::success($msg, true);
+    $banco->delete();
+    $banco->clean(new Banco());
+    $msg = sprintf('Banco "%s" excluído com sucesso!', $banco->getRazaoSocial());
+    if (is_output('json')) {
+        json('msg', $msg);
+    }
+    \Thunder::success($msg, true);
 } catch (\Exception $e) {
-	$msg = sprintf(
-		'Não foi possível excluir o banco "%s"!',
-		$banco->getRazaoSocial()
-	);
-	if (is_output('json')) {
-		json($msg);
-	}
-	\Thunder::error($msg);
+    $msg = sprintf(
+        'Não foi possível excluir o banco "%s"!',
+        $banco->getRazaoSocial()
+    );
+    if (is_output('json')) {
+        json($msg);
+    }
+    \Thunder::error($msg);
 }
 redirect('/gerenciar/banco/');

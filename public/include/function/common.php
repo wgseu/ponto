@@ -943,7 +943,7 @@ function is_local_path($name)
 
 function contains($needles, $haystack, $some = false)
 {
-    foreach($needles as $needle){
+    foreach ($needles as $needle) {
         $found = stripos($haystack, $needle) !== false;
         if ($found === $some) {
             return $some;

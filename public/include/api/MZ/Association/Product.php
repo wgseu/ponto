@@ -45,7 +45,8 @@ class Product
      */
     private $produtos;
 
-    public function __construct($integracao) {
+    public function __construct($integracao)
+    {
         $this->integracao = $integracao;
         $this->dados = $this->integracao->read();
         $this->produtos = isset($this->dados['produtos'])?$this->dados['produtos']:[];
@@ -266,11 +267,9 @@ class Product
                 }
                 $produto['itens'][$subcodigo]['grupoid'] = $grupoid;
                 $total_pacotes++;
-                if (
-                    $grupo_index < count($contagem) &&
+                if ($grupo_index < count($contagem) &&
                     $total_pacotes == $contagem[$grupo_index] &&
-                    $grupo_index < count($grupos) - 1)
-                {
+                    $grupo_index < count($grupos) - 1) {
                     $grupo_index++;
                     $total_pacotes = 0;
                 }

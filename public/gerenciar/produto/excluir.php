@@ -31,29 +31,29 @@ need_permission(Permissao::NOME_CADASTROPRODUTOS, is_output('json'));
 $id = isset($_GET['id']) ? $_GET['id'] : null;
 $produto = Produto::findByID($id);
 if (!$produto->exists()) {
-	$msg = 'O produto não foi informado ou não existe!';
-	if (is_output('json')) {
-		json($msg);
-	}
-	\Thunder::warning($msg);
-	redirect('/gerenciar/produto/');
+    $msg = 'O produto não foi informado ou não existe!';
+    if (is_output('json')) {
+        json($msg);
+    }
+    \Thunder::warning($msg);
+    redirect('/gerenciar/produto/');
 }
 try {
-	$produto->delete();
-	$produto->clean(new Produto());
-	$msg = sprintf('Produto "%s" excluído com sucesso!', $produto->getDescricao());
-	if (is_output('json')) {
-		json('msg', $msg);
-	}
-	\Thunder::success($msg, true);
+    $produto->delete();
+    $produto->clean(new Produto());
+    $msg = sprintf('Produto "%s" excluído com sucesso!', $produto->getDescricao());
+    if (is_output('json')) {
+        json('msg', $msg);
+    }
+    \Thunder::success($msg, true);
 } catch (\Exception $e) {
-	$msg = sprintf(
-		'Não foi possível excluir o produto "%s"',
-		$produto->getDescricao()
-	);
-	if (is_output('json')) {
-		json($msg);
-	}
-	\Thunder::error($msg);
+    $msg = sprintf(
+        'Não foi possível excluir o produto "%s"',
+        $produto->getDescricao()
+    );
+    if (is_output('json')) {
+        json($msg);
+    }
+    \Thunder::error($msg);
 }
 redirect('/gerenciar/produto/');

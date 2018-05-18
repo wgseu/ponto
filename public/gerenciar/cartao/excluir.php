@@ -31,29 +31,29 @@ need_permission(Permissao::NOME_CADASTROCARTOES, is_output('json'));
 $id = isset($_GET['id']) ? $_GET['id'] : null;
 $cartao = Cartao::findByID($id);
 if (!$cartao->exists()) {
-	$msg = 'O cartão não foi informado ou não existe!';
-	if (is_output('json')) {
-		json($msg);
-	}
-	\Thunder::warning($msg);
-	redirect('/gerenciar/cartao/');
+    $msg = 'O cartão não foi informado ou não existe!';
+    if (is_output('json')) {
+        json($msg);
+    }
+    \Thunder::warning($msg);
+    redirect('/gerenciar/cartao/');
 }
 try {
-	$cartao->delete();
-	$cartao->clean(new Cartao());
-	$msg = sprintf('Cartão "%s" excluído com sucesso!', $cartao->getDescricao());
-	if (is_output('json')) {
-		json('msg', $msg);
-	}
-	\Thunder::success($msg, true);
+    $cartao->delete();
+    $cartao->clean(new Cartao());
+    $msg = sprintf('Cartão "%s" excluído com sucesso!', $cartao->getDescricao());
+    if (is_output('json')) {
+        json('msg', $msg);
+    }
+    \Thunder::success($msg, true);
 } catch (\Exception $e) {
-	$msg = sprintf(
-		'Não foi possível excluir o cartão "%s"!',
-		$cartao->getDescricao()
-	);
-	if (is_output('json')) {
-		json($msg);
-	}
-	\Thunder::error($msg);
+    $msg = sprintf(
+        'Não foi possível excluir o cartão "%s"!',
+        $cartao->getDescricao()
+    );
+    if (is_output('json')) {
+        json($msg);
+    }
+    \Thunder::error($msg);
 }
 redirect('/gerenciar/cartao/');

@@ -32,28 +32,28 @@ $id = isset($_GET['id']) ? $_GET['id'] : null;
 $setor = Setor::findByID($id);
 if (!$setor->exists()) {
     $msg = 'O setor não foi informado ou não existe';
-	if (is_output('json')) {
-		json($msg);
-	}
-	\Thunder::warning($msg);
-	redirect('/gerenciar/setor/');
+    if (is_output('json')) {
+        json($msg);
+    }
+    \Thunder::warning($msg);
+    redirect('/gerenciar/setor/');
 }
 try {
-	$setor->delete();
-	$setor->clean(new Setor());
-	$msg = sprintf('Setor "%s" excluído com sucesso!', $setor->getNome());
-	if (is_output('json')) {
-		json('msg', $msg);
-	}
-	\Thunder::success($msg, true);
+    $setor->delete();
+    $setor->clean(new Setor());
+    $msg = sprintf('Setor "%s" excluído com sucesso!', $setor->getNome());
+    if (is_output('json')) {
+        json('msg', $msg);
+    }
+    \Thunder::success($msg, true);
 } catch (\Exception $e) {
-	$msg = sprintf(
+    $msg = sprintf(
         'Não foi possível excluir o setor "%s"',
-		$setor->getNome()
-	);
-	if (is_output('json')) {
-		json($msg);
-	}
-	\Thunder::error($msg);
+        $setor->getNome()
+    );
+    if (is_output('json')) {
+        json($msg);
+    }
+    \Thunder::error($msg);
 }
 redirect('/gerenciar/setor/');

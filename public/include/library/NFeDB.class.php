@@ -73,7 +73,7 @@ class NFeDB extends \NFe\Database\Estatico
             default:
                 throw new \Exception(
                     sprintf(
-                        'Não existe XML salvo para o estado "%s" da nota "%s"', 
+                        'Não existe XML salvo para o estado "%s" da nota "%s"',
                         $_nota->getEstado(),
                         $_nota->getChave()
                     ),

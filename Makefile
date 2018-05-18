@@ -52,7 +52,7 @@ clean: stop
 	@rm -Rf public/static/doc/cert
 	@rm -Rf public/static/img/categoria
 	@rm -Rf public/static/img/cliente
-	@rm -Rf public/static/img/patrimonio
+	@rm -Rf public/static/img/patrimonio/*.*
 	@rm -Rf public/static/img/produto
 	@rm -Rf public/static/img/header
 	@rm -Rf docs/api
@@ -63,13 +63,17 @@ purge: clean
 
 check:
 	@echo "Checking the standard code..."
-	@docker-compose exec -T php ./public/include/vendor/bin/phpcs --standard=PSR2 public/include/api public/include/classes public/include/function public/include/library public/app public/categoria public/conta public/contato public/gerenciar public/produto public/sobre
+	@docker-compose exec -T php ./public/include/vendor/bin/phpcs --standard=PSR2 public/include/api public/include/function public/include/library public/app public/categoria public/conta public/contato public/gerenciar public/produto public/sobre
+
+fix:
+	@echo "Fixing to standard code..."
+	@docker-compose exec -T php ./public/include/vendor/bin/phpcbf --standard=PSR2 public/include/api public/include/function public/include/library public/app public/categoria public/conta public/contato public/gerenciar public/produto public/sobre
 
 update:
-	@docker run --rm -v $(shell pwd):/app composer update
+	@docker run --rm -v $(shell pwd):/app composer update --ignore-platform-reqs --no-scripts
 
 autoload:
-	@docker run --rm -v $(shell pwd):/app composer dump-autoload
+	@docker run --rm -v $(shell pwd):/app composer dump-autoload --ignore-platform-reqs --no-scripts
 
 start: init reset
 	@cp etc/nginx/default.conf.template etc/nginx/grandchef.location

@@ -45,7 +45,8 @@ class Card
      */
     private $codigos;
 
-    public function __construct($integracao, $codigos) {
+    public function __construct($integracao, $codigos)
+    {
         $this->integracao = $integracao;
         $this->dados = $this->integracao->read();
         $this->cartoes = isset($this->dados['cartoes'])?$this->dados['cartoes']:[];

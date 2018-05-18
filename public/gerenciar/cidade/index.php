@@ -32,7 +32,7 @@ need_permission(Permissao::NOME_CADASTROCIDADES, is_output('json'));
 
 $limite = isset($_GET['limite'])?intval($_GET['limite']):10;
 if ($limite > 100 || $limite < 1) {
-	$limite = 10;
+    $limite = 10;
 }
 $condition = Filter::query($_GET);
 unset($condition['ordem']);
@@ -42,11 +42,11 @@ list($pagesize, $offset, $pagination) = pagestring($count, $limite);
 $cidades = Cidade::findAll($condition, $order, $pagesize, $offset);
 
 if (is_output('json')) {
-	$items = [];
-	foreach ($cidades as $cidade) {
-		$items[] = $cidade->publish();
-	}
-	json(['status' => 'ok', 'items' => $items]);
+    $items = [];
+    foreach ($cidades as $cidade) {
+        $items[] = $cidade->publish();
+    }
+    json(['status' => 'ok', 'items' => $items]);
 }
 
 $pais = \MZ\Location\Pais::findByID(isset($_GET['paisid']) ? $_GET['paisid'] : null);

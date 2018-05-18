@@ -31,29 +31,29 @@ need_permission(Permissao::NOME_CADASTROSERVICOS, is_output('json'));
 $id = isset($_GET['id']) ? $_GET['id'] : null;
 $servico = Servico::findByID($id);
 if (!$servico->exists()) {
-	$msg = 'O serviço não foi informado ou não existe';
-	if (is_output('json')) {
-		json($msg);
-	}
-	\Thunder::warning($msg);
-	redirect('/gerenciar/servico/');
+    $msg = 'O serviço não foi informado ou não existe';
+    if (is_output('json')) {
+        json($msg);
+    }
+    \Thunder::warning($msg);
+    redirect('/gerenciar/servico/');
 }
 try {
-	$servico->delete();
-	$servico->clean(new Servico());
-	$msg = sprintf('Serviço "%s" excluído com sucesso!', $servico->getDescricao());
-	if (is_output('json')) {
-		json('msg', $msg);
-	}
-	\Thunder::success($msg, true);
+    $servico->delete();
+    $servico->clean(new Servico());
+    $msg = sprintf('Serviço "%s" excluído com sucesso!', $servico->getDescricao());
+    if (is_output('json')) {
+        json('msg', $msg);
+    }
+    \Thunder::success($msg, true);
 } catch (\Exception $e) {
-	$msg = sprintf(
-		'Não foi possível excluir o serviço "%s"',
-		$servico->getDescricao()
-	);
-	if (is_output('json')) {
-		json($msg);
-	}
-	\Thunder::error($msg);
+    $msg = sprintf(
+        'Não foi possível excluir o serviço "%s"',
+        $servico->getDescricao()
+    );
+    if (is_output('json')) {
+        json($msg);
+    }
+    \Thunder::error($msg);
 }
 redirect('/gerenciar/servico/');

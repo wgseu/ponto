@@ -9,6 +9,7 @@
     "dev": "gulp",
     "fix-sql": "gulp fix-sql",
     "fix-loc": "gulp fix-loc",
+    "fix-script": "gulp fix-script",
     "fix-pop": "gulp fix-pop --name"
   },
   "devDependencies": {

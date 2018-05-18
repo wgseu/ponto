@@ -195,9 +195,11 @@ class CaixaTest extends \PHPUnit_Framework_TestCase
     {
         $caixa = new Caixa();
         $caixa->setDescricao('Caixa 7');
+        $caixa->setAtivo('Y');
         $caixa->insert();
 
         $sessao = new Sessao();
+        $sessao->setAberta('Y');
         $sessao->insert();
 
         $cliente = new Cliente();
@@ -219,12 +221,14 @@ class CaixaTest extends \PHPUnit_Framework_TestCase
         $movimentacao->setSessaoID($sessao->getID());
         $movimentacao->setCaixaID($caixa->getID());
         $movimentacao->setFuncionarioAberturaID($funcionario->getID());
+        $movimentacao->setAberta('Y');
         $movimentacao->insert();
 
         $this->setExpectedException('\MZ\Exception\ValidationException');
         try {
             $caixa->setAtivo('N');
             $caixa->update();
+            $this->fail('Não deveria ter desativado um caixa em uso');
         } catch (\MZ\Exception\ValidationException $e) {
             $this->assertEquals(['ativo'], array_keys($e->getErrors()));
             throw $e;

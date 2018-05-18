@@ -1,28 +1,19 @@
 <?php
 class Session
 {
-    static private $_instance = null;
-
-    public static function Init()
-    {
-        self::$_instance = new Session();
-        session_start();
-    }
-
     public static function Set($name, $v)
     {
-        $_SESSION[$name] = $v;
+        global $app;
+        $app->getSession()->set($name, $v);
     }
 
     public static function Get($name, $once = false)
     {
-        $v = null;
-        if (isset($_SESSION[$name])) {
-            $v = $_SESSION[$name];
-            if ($once) {
-                unset($_SESSION[$name]);
-            }
+        global $app;
+        $value = $app->getSession()->get($name);
+        if ($once && $app->getSession()->has($name)) {
+            $app->getSession()->remove($name);
         }
-        return $v;
+        return $value;
     }
 }

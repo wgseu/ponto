@@ -17,6 +17,7 @@ help:
 	@echo "  autoload     Update PHP autoload files"
 	@echo "  test         Test application"
 	@echo "  check        Check the API with PHP Code Sniffer (PSR2)"
+	@echo "  fix          Fix php files code standard using PSR2"
 	@echo "  dump         Create backup of whole database"
 	@echo "  restore      Restore backup from whole database"
 	@echo "  class        Generate initial code from template files"
@@ -112,6 +113,7 @@ cover:
 
 class:
 	@mkdir -p $(DB_DUMPS_DIR)
+	@npm run fix-script
 	@cp -f database/model/script.sql $(DB_DUMPS_DIR)/script_no_trigger.sql
 	@npm run fix-sql
 	@java -jar utils/SQLtoClass.jar -p utils/config.properties -t utils/template -o storage/app/generated

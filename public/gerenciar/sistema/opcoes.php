@@ -8,21 +8,95 @@ need_permission(Permissao::NOME_ALTERARCONFIGURACOES, is_post() || is_output('js
 
 $tab = 'opcoes';
 $opcoes_comportamento = [
-    ['section' => 'Sistema', 'key' => 'Auto.Logout', 'default' => false, 'title' => 'Fazer logout automaticamente após inatividade'],
-    ['section' => 'Comandas', 'key' => 'PrePaga', 'default' => false, 'title' => 'Comanda pré-paga'],
-    ['section' => 'Vendas', 'key' => 'Exibir.Cancelados', 'default' => false, 'title' => 'Mostrar produtos cancelados nas vendas'],
-    ['section' => 'Vendas', 'key' => 'Lembrar.Atendente', 'default' => false, 'title' => 'Lembrar o último atendente nas vendas'],
-    ['section' => 'Estoque', 'key' => 'Estoque.Negativo', 'default' => false, 'title' => 'Permitir estoque negativo'],
-    ['section' => 'Vendas', 'key' => 'Tela.Cheia', 'default' => true, 'title' => 'Exibir a tela de venda rápida em tela cheia'],
-    ['section' => 'Sistema', 'key' => 'Backup.Auto', 'default' => true, 'title' => 'Realizar backup automaticamente'],
-    ['section' => 'Vendas', 'key' => 'Balcao.Comissao', 'default' => false, 'title' => 'Comissão na venda balcão'],
-    ['section' => 'Sistema', 'key' => 'Tablet.Logout', 'default' => false, 'title' => 'Fazer logout no tablet após lançar pedido'],
-    ['section' => 'Vendas', 'key' => 'Mesas.Juntar', 'default' => true, 'title' => 'Reservar mesas ao juntar'],
-    ['section' => 'Vendas', 'key' => 'Mesas.Redirecionar', 'default' => false, 'title' => 'Redirecionar para a mesa principal'],
-    ['section' => 'Vendas', 'key' => 'Comanda.Observacao', 'default' => false, 'title' => 'Observação como nome de comanda'],
-    ['section' => 'Vendas', 'key' => 'Quantidade.Perguntar', 'default' => true, 'title' => 'Confirmar ao lançar quantidades elevadas'],
-    ['section' => 'Sistema', 'key' => 'Fiscal.Mostrar', 'default' => false, 'title' => 'Mostrar campos fiscais e tributários'],
-    ['section' => 'Vendas', 'key' => 'Lancar.Peso.Auto', 'default' => true, 'title' => 'Lançar produtos pesáveis automaticamente'],
+    [
+        'section' => 'Sistema',
+        'key' => 'Auto.Logout',
+        'default' => false,
+        'title' => 'Fazer logout automaticamente após inatividade'
+    ],
+    [
+        'section' => 'Comandas',
+        'key' => 'PrePaga',
+        'default' => false,
+        'title' => 'Comanda pré-paga'
+    ],
+    [
+        'section' => 'Vendas',
+        'key' => 'Exibir.Cancelados',
+        'default' => false,
+        'title' => 'Mostrar produtos cancelados nas vendas'
+    ],
+    [
+        'section' => 'Vendas',
+        'key' => 'Lembrar.Atendente',
+        'default' => false,
+        'title' => 'Lembrar o último atendente nas vendas'
+    ],
+    [
+        'section' => 'Estoque',
+        'key' => 'Estoque.Negativo',
+        'default' => false,
+        'title' => 'Permitir estoque negativo'
+    ],
+    [
+        'section' => 'Vendas',
+        'key' => 'Tela.Cheia',
+        'default' => true,
+        'title' => 'Exibir a tela de venda rápida em tela cheia'
+    ],
+    [
+        'section' => 'Sistema',
+        'key' => 'Backup.Auto',
+        'default' => true,
+        'title' => 'Realizar backup automaticamente'
+    ],
+    [
+        'section' => 'Vendas',
+        'key' => 'Balcao.Comissao',
+        'default' => false,
+        'title' => 'Comissão na venda balcão'],
+    [
+        'section' => 'Sistema',
+        'key' => 'Tablet.Logout',
+        'default' => false,
+        'title' => 'Fazer logout no tablet após lançar pedido'
+    ],
+    [
+        'section' => 'Vendas',
+        'key' => 'Mesas.Juntar',
+        'default' => true,
+        'title' => 'Reservar mesas ao juntar'
+    ],
+    [
+        'section' => 'Vendas',
+        'key' => 'Mesas.Redirecionar',
+        'default' => false,
+        'title' => 'Redirecionar para a mesa principal'
+    ],
+    [
+        'section' => 'Vendas',
+        'key' => 'Comanda.Observacao',
+        'default' => false,
+        'title' => 'Observação como nome de comanda'
+    ],
+    [
+        'section' => 'Vendas',
+        'key' => 'Quantidade.Perguntar',
+        'default' => true,
+        'title' => 'Confirmar ao lançar quantidades elevadas'
+    ],
+    [
+        'section' => 'Sistema',
+        'key' => 'Fiscal.Mostrar',
+        'default' => false,
+        'title' => 'Mostrar campos fiscais e tributários'
+    ],
+    [
+        'section' => 'Vendas',
+        'key' => 'Lancar.Peso.Auto',
+        'default' => true,
+        'title' => 'Lançar produtos pesáveis automaticamente'
+    ],
 ];
 #    ['section' => 'Sistema', 'key' => 'Logout.Timeout', 'default' => 3, 'title' => 'Minutos de inatividade'],
 

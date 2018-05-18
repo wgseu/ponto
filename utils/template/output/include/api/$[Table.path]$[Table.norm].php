@@ -26,8 +26,11 @@ $[table.if(package)]
 namespace $[Table.package];
 $[table.end]
 
+use MZ\Util\Mask;
 use MZ\Util\Filter;
 use MZ\Util\Validator;
+use MZ\Database\DB;
+use MZ\Database\Model;
 use MZ\Exception\ValidationException;
 
 $[table.if(comment)]
@@ -195,10 +198,10 @@ $[field.if(null)]
 $[field.else]
         if (!isset($$[table.unix]['$[field]'])) {
 $[field.end]
-$[field.if(info)]
-            $this->set$[Field.norm]($[field.if(array)]$[field.array.number], $[field.end]$[Field.info]);
-$[field.else.if(boolean)]
+$[field.if(boolean)]
             $this->set$[Field.norm]($[field.if(array)]$[field.array.number], $[field.end]'N');
+$[field.else.if(info)]
+            $this->set$[Field.norm]($[field.if(array)]$[field.array.number], $[field.end]$[Field.info]);
 $[field.else]
             $this->set$[Field.norm]($[field.if(array)]$[field.array.number], $[field.end]null);
 $[field.end]
@@ -240,15 +243,15 @@ $[field.if(image|blob)]
         $$[table.unix]['$[field]'] = $this->make$[Field.norm]($[field.if(array)]$[field.array.number]$[field.end]);
 $[field.else.if(masked)]
 $[field.contains(fone)]
-        $$[table.unix]['$[field]'] = \MZ\Util\Mask::phone($$[table.unix]['$[field]']);
+        $$[table.unix]['$[field]'] = Mask::phone($$[table.unix]['$[field]']);
 $[field.else.match(cpf)]
-        $$[table.unix]['$[field]'] = \MZ\Util\Mask::cpf($$[table.unix]['$[field]']);
+        $$[table.unix]['$[field]'] = Mask::cpf($$[table.unix]['$[field]']);
 $[field.else.match(cep)]
-        $$[table.unix]['$[field]'] = \MZ\Util\Mask::cep($$[table.unix]['$[field]']);
+        $$[table.unix]['$[field]'] = Mask::cep($$[table.unix]['$[field]']);
 $[field.else.match(cnpj)]
-        $$[table.unix]['$[field]'] = \MZ\Util\Mask::cnpj($$[table.unix]['$[field]']);
+        $$[table.unix]['$[field]'] = Mask::cnpj($$[table.unix]['$[field]']);
 $[field.else]
-        $$[table.unix]['$[field]'] = \MZ\Util\Mask::mask($$[table.unix]['$[field]'], _p('$[field.unix].mask'));
+        $$[table.unix]['$[field]'] = Mask::mask($$[table.unix]['$[field]'], _p('$[field.unix].mask'));
 $[field.end]
 $[field.else.match(ip|senha|password|secreto|salt|deletado)]
         unset($$[table.unix]['$[field]']);
@@ -263,6 +266,10 @@ $[field.end]
      */
     public function filter($original)
     {
+$[table.exists(blob)]
+        global $app;
+
+$[table.end]
 $[field.each(all)]
 $[field.if(primary)]
         $this->set$[Field.norm]($original->get$[Field.norm]($[field.if(array)]$[field.array.number]$[field.end]));
@@ -282,12 +289,15 @@ $[field.else.if(integer|bigint)]
         $this->set$[Field.norm]($[field.if(array)]$[field.array.number], $[field.end]Filter::number($this->get$[Field.norm]($[field.if(array)]$[field.array.number]$[field.end])));
 $[field.else.if(blob)]
         $$[field.unix] = upload_image('raw_$[field]', '$[field.image.folder]');
-        if (!is_null($$[field.unix])) {
-            $$[field.unix]_path = get_image_path($$[field.unix], '$[field.image.folder]');
-            $this->set$[Field.norm]($[field.if(array)]$[field.array.number], $[field.end]file_get_contents($$[field.unix]_path));
-            unlink($$[field.unix]_path);
-        } elseif (trim($this->get$[Field.norm]($[field.if(array)]$[field.array.number]$[field.end])) != '') {
+        if (is_null($$[field.unix]) && trim($this->get$[Field.norm]($[field.if(array)]$[field.array.number]$[field.end])) != '') {
             $this->set$[Field.norm]($[field.if(array)]$[field.array.number], $[field.end]true);
+        } else {
+            $this->set$[Field.norm]($[field.if(array)]$[field.array.number], $[field.end]$$[field.unix]);
+            $$[field.unix]_path = $app->getPath('public') . $this->make$[Field.norm]();
+            if (!is_null($$[field.unix])) {
+                $this->set$[Field.norm](file_get_contents($$[field.unix]_path));
+                @unlink($$[field.unix]_path);
+            }
         }
 $[field.else.if(image)]
         $$[field.unix] = upload_image('raw_$[field]', '$[field.image.folder]');
@@ -420,7 +430,7 @@ $[table.end]
         $values = $this->validate();
         unset($values['$[primary]']);
         try {
-            $$[primary.unix] = self::getDB()->insertInto('$[Table]')->values($values)->execute();
+            $$[primary.unix] = DB::insertInto('$[Table]')->values($values)->execute();
             $this->loadBy$[Primary.norm]($$[primary.unix]);
         } catch (\Exception $e) {
             throw $this->translate($e);
@@ -431,20 +441,15 @@ $[table.end]
     /**
      * Update $[Table.name] with instance values into database for $[Primary.name]
      * @param  array $only Save these fields only, when empty save all fields except id
-     * @param  boolean $all When true, updates all rows by getID condition array
      * @return int rows affected
      */
-    public function update($only = [], $all = false)
+    public function update($only = [])
     {
         $values = $this->validate();
-        if ($all && is_array($this->get$[Primary.norm]())) {
-            $condition = $this->get$[Primary.norm]();
-        } elseif (!$this->exists()) {
+        if (!$this->exists()) {
             throw new \Exception('O identificador d$[table.gender] $[table.name] não foi informado');
-        } else {
-            $condition = ['$[primary]' => $this->get$[Primary.norm]()];
         }
-        $values = self::filterValues($values, $only, false);
+        $values = DB::filterValues($values, $only, false);
 $[field.each(all)]
 $[field.if(blob)]
         if ($this->get$[Field.norm]($[field.if(array)]$[field.array.number]$[field.end]) === true) {
@@ -457,14 +462,11 @@ $[field.end]
 $[field.end]
 $[field.end]
         try {
-            $affected = self::getDB()
-                ->update('$[Table]')
+            $affected = DB::update('$[Table]')
                 ->set($values)
-                ->where($condition)
+                ->where(['$[primary]' => $this->get$[Primary.norm]()])
                 ->execute();
-            if (!$all || !is_array($this->get$[Primary.norm]())) {
-                $this->loadBy$[Primary.norm]($this->get$[Primary.norm]());
-            }
+            $this->loadBy$[Primary.norm]($this->get$[Primary.norm]());
         } catch (\Exception $e) {
             throw $this->translate($e);
         }
@@ -480,8 +482,7 @@ $[field.end]
         if (!$this->exists()) {
             throw new \Exception('O identificador d$[table.gender] $[table.name] não foi informado');
         }
-        $result = self::getDB()
-            ->deleteFrom('$[Table]')
+        $result = DB::deleteFrom('$[Table]')
             ->where('$[primary]', $this->get$[Primary.norm]())
             ->execute();
         return $result;
@@ -530,6 +531,24 @@ $[unique.end]
         ]);
     }
 $[table.end]
+$[field.each(all)]
+$[field.if(blob)]
+
+    /**
+     * Load $[field.name] data from blob field on database
+     * @return $[Table.norm] Self instance with $[field.name] field filled
+     */
+    public function load$[Field.norm]()
+    {
+        $data = DB::from('$[Table] $[table.letter]')
+            ->select(null)
+            ->select('$[table.letter].$[field]')
+            ->where('$[table.letter].$[primary]', $this->get$[Primary.norm]())
+            ->fetchColumn();
+        return $this->set$[Field.norm]($data);
+    }
+$[field.end]
+$[field.end]
 $[field.each(all)]
 $[field.if(reference)]
 
@@ -626,14 +645,25 @@ $[descriptor.end]
      */
     private static function query($condition = [], $order = [])
     {
-        $query = self::getDB()->from('$[Table] $[table.letter]');
+$[table.exists(blob)]
+        $query = DB::from('$[Table] $[table.letter]')
+            ->select(null)$[field.each(all)]$[field.if(blob)]
+            ->select(
+                '(CASE WHEN $[table.letter].$[field] IS NULL THEN NULL ELSE '.
+                DB::concat(['$[table.letter].$[primary]', '".png"']).
+                ' END) as imagem'
+            )$[field.else]
+            ->select('$[table.letter].$[field]')$[field.end]$[field.end];
+$[table.else]
+        $query = DB::from('$[Table] $[table.letter]');
+$[table.end]
         $condition = self::filterCondition($condition);
-        $query = self::buildOrderBy($query, self::filterOrder($order));
+        $query = DB::buildOrderBy($query, self::filterOrder($order));
 $[descriptor.if(string)]
         $query = $query->orderBy('$[table.letter].$[descriptor] ASC');
 $[descriptor.end]
         $query = $query->orderBy('$[table.letter].$[primary] ASC');
-        return self::buildCondition($query, $condition);
+        return DB::buildCondition($query, $condition);
     }
 
     /**

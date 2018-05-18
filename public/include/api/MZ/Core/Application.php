@@ -25,6 +25,7 @@
 namespace MZ\Core;
 
 use MZ\Database\DB;
+use Symfony\Component\HttpFoundation\Session\Session;
 
 class Application
 {
@@ -34,6 +35,7 @@ class Application
     private $system;
     private $path;
     private $response;
+    private $session;
 
     public function __construct($path)
     {
@@ -41,6 +43,7 @@ class Application
         $this->system = new \MZ\System\Sistema();
         $this->authentication = new \MZ\Account\Authentication();
         $this->database = new DB();
+        $this->session = new Session();
     }
 
     /**
@@ -68,6 +71,15 @@ class Application
     public function getDatabase()
     {
         return $this->database;
+    }
+
+    /**
+     * Get session management
+     * @return \Symfony\Component\HttpFoundation\Session\Session session management
+     */
+    public function getSession()
+    {
+        return $this->session;
     }
 
     /**
@@ -131,7 +143,7 @@ class Application
      */
     private function initialize()
     {
-        \Session::Init();
+        $this->getSession()->start();
         $this->getSystem()->initialize($this->path);
         $this->getAuthentication()->initialize();
     }

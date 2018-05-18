@@ -365,16 +365,18 @@ class Movimentacao extends Model
     {
         $errors = [];
         if (is_null($this->getSessaoID())) {
-            $errors['sessaoid'] = 'A sessão não pode ser vazia';
+            $errors['sessaoid'] = 'A sessão não foi informada';
         }
+        $caixa = $this->findCaixaID();
         if (is_null($this->getCaixaID())) {
-            $errors['caixaid'] = 'O caixa não pode ser vazio';
-        }
-        if (is_null($this->getAberta())) {
-            $errors['aberta'] = 'A aberta não pode ser vazia';
+            $errors['caixaid'] = 'O caixa não foi informado';
+        } elseif (!$caixa->isAtivo()) {
+            $errors['caixaid'] = sprintf('O caixa "%s" não está ativo', $caixa->getDescricao());
         }
         if (!Validator::checkBoolean($this->getAberta())) {
-            $errors['aberta'] = 'A informação de abertura é inválida';
+            $errors['aberta'] = 'A abertura não foi informada ou é inválida';
+        } elseif (!$this->exists() && !$this->isAberta()) {
+            $errors['aberta'] = 'O caixa não pode ser aberto com status fechado';
         }
         if (is_null($this->getFuncionarioAberturaID())) {
             $errors['funcionarioaberturaid'] = 'O(A) funcionário(a) inicializador(a) não pode ser vazio(a)';
@@ -600,10 +602,11 @@ class Movimentacao extends Model
      */
     public static function isCaixaOpen($caixa_id)
     {
-        return self::count([
+        $abertos = self::count([
             'caixaid' => $caixa_id,
             'aberta' => 'Y'
-        ]) > 0;
+        ]);
+        return $abertos > 0;
     }
 
     /**

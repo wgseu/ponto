@@ -21,3 +21,4 @@ node_modules/
 package-lock.json
 npm-debug.log
 *.sublime-workspace
+database/model/model.mwb.bak

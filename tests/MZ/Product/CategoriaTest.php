@@ -114,6 +114,7 @@ class CategoriaTest extends \PHPUnit_Framework_TestCase
         $produto->setCategoriaID($categoria->getID());
         $produto->setUnidadeID($unidade->getID());
         $produto->setTipo(Produto::TIPO_PRODUTO);
+        $produto->setVisivel('Y');
         $produto->insert();
         $found_categoria = Categoria::find(['id' => $categoria->getID(), 'disponivel' => 'Y']);
         $this->assertEquals($categoria, $found_categoria);

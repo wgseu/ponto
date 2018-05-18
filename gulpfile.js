@@ -113,27 +113,38 @@ gulp.task('js-manager', function () {
     .pipe(gulp.dest('public/static/js/'));
 });
 
+gulp.task('fix-script', function () {
+  replace.sync({
+    files: 'database/model/script.sql',
+    from: [
+      /USE `GrandChef`\$\$\r?\n/igm,
+      /USE `GrandChef`;\r?\n/igm,
+      /END\$\$\r?\n/igm,
+      /`GrandChef`\./igm
+    ],
+    to: [
+      '',
+      '',
+      'END $$$$',
+      ''
+    ],
+  });
+})
+
 gulp.task('fix-sql', function () {
   replace.sync({
     files: 'storage/db/dumps/script_no_trigger.sql',
     from: [
-      /USE `GrandChef`\$\$\r?\n/igm,
-      /END\$\$\r?\n/igm,
-      /`GrandChef`\./igm,
       /\r?\nDELIMITER \$\$[\s\S]*(?=DELIMITER ;)DELIMITER ;\r?\n\r?\n/igm,
       /' \/\* comment truncated \*\/ \/\*([^\*]+)\*\//igm,
       /([^\\][\\])([^\\'])/igm
     ],
     to: [
       '',
-      'END $$',
-      '',
-      '',
       '$1\'',
       '$1\\$2'
     ],
   });
-//	@perl -0777 -i.original -pe "s/USE \`GrandChef\`;\r?\n//igs" 							$(DB_DUMPS_DIR)/script_no_trigger.sql
 })
 
 gulp.task('fix-pop', function () {

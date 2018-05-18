@@ -243,11 +243,10 @@ class Sessao extends Model
         if (is_null($this->getDataInicio())) {
             $errors['datainicio'] = 'A data de início não pode ser vazia';
         }
-        if (is_null($this->getAberta())) {
-            $errors['aberta'] = 'A aberta não pode ser vazia';
-        }
-        if (!Validator::checkBoolean($this->getAberta(), true)) {
-            $errors['aberta'] = 'A aberta é inválida';
+        if (!Validator::checkBoolean($this->getAberta())) {
+            $errors['aberta'] = 'A abertura não foi informada ou é inválida';
+        } elseif (!$this->exists() && !$this->isAberta()) {
+            $errors['aberta'] = 'A sessão não pode iniciar fechada';
         }
         if (!empty($errors)) {
             throw new \MZ\Exception\ValidationException($errors);

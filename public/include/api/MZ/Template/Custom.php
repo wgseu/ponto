@@ -258,7 +258,6 @@ class Custom extends Engine
             [$this, '__parsestmt'],
             $fileContent
         );
-        xmkdir(dirname($cFile), 0775);
         if (file_put_contents($cFile, $fileContent) === false) {
             throw new \Exception('Can\'t write parsed template into file "'.$cFile.'"', 500);
         }

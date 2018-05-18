@@ -726,7 +726,6 @@ function xmkdir($dir, $access = 0711)
     if (!file_exists($dir)) {
         mkdir($dir, $access, true);
     }
-    chmod($dir, $access);
     umask($oldUmask);
 }
 

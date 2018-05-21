@@ -671,7 +671,7 @@ class Estoque extends Model
             if ($old_estoque->isCancelado()) {
                 $errors['cancelado'] = 'Essa movimentação está cancelada e não pode ser alterada';
             } else {
-                $count = self::count(['entradaid' => $this->getID()]);
+                $count = self::count(['entradaid' => $this->getID(), 'cancelado' => 'N']);
                 if ($count > 0) {
                     $errors['cancelado'] = 'Essa entrada já foi movimentada e não pode ser cancelada';
                 }
@@ -930,12 +930,14 @@ class Estoque extends Model
      */
     public function findAvailableEntry()
     {
-        $query = self::query([
-                'e.produtoid' => $this->getProdutoID(),
-                'e.setorid' => $this->getSetorID(),
-                'e.cancelado' => 'N',
-            ])
-            ->select('ROUND(e.quantidade + SUM(COALESCE(t.quantidade, 0)), 6) as restante')
+        $query = self::query(
+            [
+                'produtoid' => $this->getProdutoID(),
+                'setorid' => $this->getSetorID(),
+                'cancelado' => 'N',
+            ],
+            ['id' => 1]
+        )->select('ROUND(e.quantidade + SUM(COALESCE(t.quantidade, 0)), 6) as restante')
             ->leftJoin('Estoque t ON t.entradaid = e.id AND t.cancelado = ?', 'N')
             ->where('e.quantidade > ?', 0)
             ->groupBy('e.id')
@@ -1022,7 +1024,7 @@ class Estoque extends Model
         $query = DB::from('Estoque e');
         $condition = self::filterCondition($condition);
         $query = DB::buildOrderBy($query, self::filterOrder($order));
-        $query = $query->orderBy('e.id ASC');
+        $query = $query->orderBy('e.id DESC');
         return DB::buildCondition($query, $condition);
     }
 

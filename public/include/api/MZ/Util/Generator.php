@@ -22,33 +22,26 @@
  *
  * @author Equipe GrandChef <desenvolvimento@mzsw.com.br>
  */
-require_once(dirname(dirname(__DIR__)) . '/app.php');
+namespace MZ\Util;
 
-use MZ\System\Permissao;
-use MZ\Account\Cliente;
-use MZ\Util\Generator;
-
-if (!is_login()) {
-    json('Usuário não autenticado!');
-}
-$values = isset($_POST['cliente']) ? $_POST['cliente'] : [];
-$old_cliente = new Cliente();
-try {
-    if (!logged_employee()->has(Permissao::NOME_PEDIDOMESA) &&
-        !logged_employee()->has(Permissao::NOME_PEDIDOCOMANDA) &&
-        !logged_employee()->has(Permissao::NOME_PAGAMENTO) &&
-        !logged_employee()->has(Permissao::NOME_CADASTROCLIENTES)
-    ) {
-        throw new \Exception('Você não tem permissão para cadastrar clientes');
+/**
+ * Generate random values
+ */
+class Generator
+{
+    /**
+     * Generate token with number and letter at length characteres
+     * @param  int $length tag name to find child
+     * @return string generated token
+     */
+    public static function token($length = 10)
+    {
+        $characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+        $charactersLength = strlen($characters);
+        $randomString = '';
+        for ($i = 0; $i < $length; $i++) {
+            $randomString .= $characters[rand(0, $charactersLength - 1)];
+        }
+        return $randomString;
     }
-    $cliente = new Cliente($values);
-    $cliente->setSenha(Generator::token().'a123Z');
-    $cliente->filter($old_cliente);
-    $cliente->insert();
-    $old_cliente->clean($cliente);
-    $item = $cliente->publish();
-    $item['imagemurl'] = $item['imagem'];
-    json('cliente', $item);
-} catch (\Exception $e) {
-    json($e->getMessage());
 }

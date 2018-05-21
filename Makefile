@@ -74,7 +74,7 @@ update:
 	@docker run --rm -v $(shell pwd):/app composer update --ignore-platform-reqs --no-scripts
 
 autoload:
-	@docker run --rm -v $(shell pwd):/app composer dump-autoload --ignore-platform-reqs --no-scripts
+	@docker run --rm -v $(shell pwd):/app composer dump-autoload --no-scripts
 
 start: init reset
 	@cp etc/nginx/default.conf.template etc/nginx/grandchef.location

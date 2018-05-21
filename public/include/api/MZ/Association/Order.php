@@ -25,9 +25,10 @@
 namespace MZ\Association;
 
 use MZ\Util\Document;
+use MZ\Util\Generator;
+use MZ\Util\Filter;
 use MZ\Database\Model;
 use MZ\Database\DB;
-use MZ\Util\Filter;
 use MZ\Location\Localizacao;
 use MZ\Location\Cidade;
 use MZ\Location\Bairro;
@@ -39,9 +40,9 @@ use MZ\Payment\Cartao;
 use MZ\Account\Cliente;
 use MZ\Sale\Pedido;
 use MZ\Sale\ProdutoPedido;
+use MZ\Sale\Formacao;
 use MZ\Product\Servico;
 use MZ\Product\Produto;
-use MZ\Sale\Formacao;
 use MZ\Session\Sessao;
 use MZ\System\Synchronizer;
 
@@ -550,6 +551,7 @@ class Order extends Pedido
                 $this->setSessaoID($sessao->getID());
             }
             if (!is_null($this->customer) && !$this->customer->exists()) {
+                $this->customer->setSenha(Generator::token().'a123Z');
                 $this->customer->filter(new Cliente());
                 $this->customer->insert();
             }

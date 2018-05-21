@@ -27,11 +27,12 @@ namespace MZ\Integrator;
 use Curl\Curl;
 use MZ\Employee\Funcionario;
 use MZ\Sale\Pedido;
+use MZ\System\Task;
 
 /**
  * Kromax Service and Task
  */
-class Kromax extends \MZ\System\Task
+class Kromax extends Task
 {
     const NAME = 'kromax';
 

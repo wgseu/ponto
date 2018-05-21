@@ -1022,7 +1022,7 @@ class Pedido extends Model
      * Load one register for it self with a condition
      * @param  array $condition Condition for searching the row
      * @param  array $order associative field name -> [-1, 1]
-     * @return Pedido Self instance filled or empty
+     * @return Pedido Self instance filled or empty when not found
      */
     public function load($condition, $order = [])
     {
@@ -1032,18 +1032,49 @@ class Pedido extends Model
     }
 
     /**
+     * Load order by open table id
+     * @param  int $mesa_id id to find open table
+     * @return Pedido Self instance filled or empty when not found
+     */
+    public function loadByMesaID($mesa_id)
+    {
+        return $this->load([
+            'mesaid' => intval($mesa_id),
+            'cancelado' => 'N',
+            'tipo' => self::TIPO_MESA,
+            '!estado', self::ESTADO_FINALIZADO
+        ]);
+    }
+
+    /**
+     * Load order by open card id
+     * @param  int $comanda_id id to find open card
+     * @return Pedido Self instance filled or empty when not found
+     */
+    public function loadByComandaID($comanda_id)
+    {
+        return $this->load([
+            'comandaid' => intval($comanda_id),
+            'cancelado' => 'N',
+            'tipo' => self::TIPO_COMANDA,
+            '!estado', self::ESTADO_FINALIZADO
+        ]);
+    }
+
+    /**
      * Load open order by type into this object
      * @return Pedido The object fetched from database or empty when not found
      */
     public function loadByLocal()
     {
-        $pedido = new Pedido();
         if ($this->getTipo() == self::TIPO_MESA) {
-            $pedido = self::findByMesaID($this->getMesaID());
+            $this->loadByMesaID($this->getMesaID());
         } elseif ($this->getTipo() == self::TIPO_COMANDA) {
-            $pedido = self::findByComandaID($this->getComandaID());
+            $this->loadByComandaID($this->getComandaID());
+        } else {
+            $pedido = new self();
+            $this->fromArray($pedido->toArray());
         }
-        $this->fromArray($pedido->toArray());
         return $this;
     }
 

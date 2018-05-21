@@ -49,7 +49,7 @@ $pedidos = ProdutoPedido::rawFindAll(
         'cancelado' => 'N',
         '!status' => Pedido::ESTADO_FINALIZADO
     ],
-    [],
+    ['id' => 1],
     null,
     null,
     [],

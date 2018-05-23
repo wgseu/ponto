@@ -330,9 +330,6 @@ Gerenciar.diversos.init = function(d1, doughnutData, meta_val, meta_max) {
     chartMinDate = d1[0][0]; //first day
     chartMaxDate = d1[d1.length - 1][0]; //last day
   }
-  var tickSize = [1, 'day'];
-  var tformat = '%d/%m/%y';
-
   //graph options
   var options = {
     grid: {
@@ -378,40 +375,31 @@ Gerenciar.diversos.init = function(d1, doughnutData, meta_val, meta_max) {
     yaxis: {
       tickDecimals: 2,
       tickFormatter: function(val) {
-        return (
-          $('#placeholder33x').data('symbol') +
-          ' ' +
-          val
-            .toFixed(2)
-            .replace(/\./g, ',')
-            .replace(/\B(?=(?:\d{3})+(?!\d))/g, '.')
-        );
+        return val.toLocaleString($('#placeholder33x').data('language'), {
+          style: 'currency',
+          currency: $('#placeholder33x').data('currency')
+        });
       },
       min: 0
     },
     xaxis: {
       mode: 'time',
-      minTickSize: tickSize,
-      timeformat: tformat,
+      minTickSize: [1, 'day'],
+      timeformat: '%d/%m/%y',
       min: chartMinDate,
       max: chartMaxDate
     }
   };
-  $.plot(
-    $('#placeholder33x'),
-    [
-      {
-        data: d1,
-        lines: {
-          fillColor: 'rgba(150, 202, 89, 0.12)'
-        }, //#96CA59 rgba(150, 202, 89, 0.42)
-        points: {
-          fillColor: '#fff'
-        }
-      }
-    ],
-    options
-  );
+  var serie1 = {
+    data: d1,
+    lines: {
+      fillColor: 'rgba(150, 202, 89, 0.12)'
+    },
+    points: {
+      fillColor: '#fff'
+    }
+  };
+  $.plot('#placeholder33x', [serie1], options);
 
   var previousPoint = null,
     previousLabel = null;
@@ -427,14 +415,11 @@ Gerenciar.diversos.init = function(d1, doughnutData, meta_val, meta_max) {
           $('#tooltip').remove();
           var dat = item.datapoint[0];
           var val = item.datapoint[1];
-          var x = moment.unix(dat).format('DD/MM/YYYY');
-          var y =
-            $('#placeholder33x').data('symbol') +
-            ' ' +
-            val
-              .toFixed(2)
-              .replace(/\./g, ',')
-              .replace(/\B(?=(?:\d{3})+(?!\d))/g, '.');
+          var x = moment(dat).format('DD/MM/YYYY');
+          var y = val.toLocaleString($('#placeholder33x').data('language'), {
+            style: 'currency',
+            currency: $('#placeholder33x').data('currency')
+          });
           var color = item.series.color;
           showTooltip(
             item.pageX,
@@ -584,7 +569,7 @@ Gerenciar.diversos.init = function(d1, doughnutData, meta_val, meta_max) {
         }
         d1 = [];
         for (var i in data.faturamento) {
-          d1.push([data.faturamento[i].data, data.faturamento[i].total]);
+          d1.push([data.faturamento[i].data * 1000, data.faturamento[i].total]);
         }
         if (d1.length > 0) {
           chartMinDate = d1[0][0]; //first day
@@ -592,21 +577,11 @@ Gerenciar.diversos.init = function(d1, doughnutData, meta_val, meta_max) {
         }
         options.xaxis.min = chartMinDate;
         options.xaxis.max = chartMaxDate;
-        $.plot(
-          $('#placeholder33x'),
-          [
-            {
-              data: d1,
-              lines: {
-                fillColor: 'rgba(150, 202, 89, 0.12)'
-              }, //#96CA59 rgba(150, 202, 89, 0.42)
-              points: {
-                fillColor: '#fff'
-              }
-            }
-          ],
-          options
-        );
+        serie1.data = d1;
+        // plot.setData([serie1]);
+        // plot.setupGrid();
+        // plot.draw();
+        plot = $.plot('#placeholder33x', [serie1], options);
       }
     );
   });
@@ -783,7 +758,12 @@ Gerenciar.carteira.initForm = function(focus_ctrl) {
   function tipoAlterado(tipo) {
     if (tipo == 'Financeira') {
       $('#bancoid').val('');
-      Gerenciar.common.cleanInput('#bancoid', '#bancoid_ref', 'data-content', fillMask);
+      Gerenciar.common.cleanInput(
+        '#bancoid',
+        '#bancoid_ref',
+        'data-content',
+        fillMask
+      );
       $('#bancoid')
         .closest('.form-group')
         .addClass('hidden');

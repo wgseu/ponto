@@ -1042,7 +1042,7 @@ class Pedido extends Model
             'mesaid' => intval($mesa_id),
             'cancelado' => 'N',
             'tipo' => self::TIPO_MESA,
-            '!estado', self::ESTADO_FINALIZADO
+            '!estado' => self::ESTADO_FINALIZADO
         ]);
     }
 
@@ -1057,7 +1057,7 @@ class Pedido extends Model
             'comandaid' => intval($comanda_id),
             'cancelado' => 'N',
             'tipo' => self::TIPO_COMANDA,
-            '!estado', self::ESTADO_FINALIZADO
+            '!estado' => self::ESTADO_FINALIZADO
         ]);
     }
 
@@ -1072,8 +1072,7 @@ class Pedido extends Model
         } elseif ($this->getTipo() == self::TIPO_COMANDA) {
             $this->loadByComandaID($this->getComandaID());
         } else {
-            $pedido = new self();
-            $this->fromArray($pedido->toArray());
+            $this->fromArray([]);
         }
         return $this;
     }

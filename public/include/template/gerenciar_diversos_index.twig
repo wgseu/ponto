@@ -111,8 +111,8 @@
       </div>
       <div class="x_content">
         <div class="col-md-9 col-sm-12 col-xs-12">
-          <div class="demo-container" style="height:380px">
-            <div id="placeholder33x" class="demo-placeholder" data-symbol="{{ $currency->getSimbolo() }}"></div>
+          <div class="demo-container" style="height:379px">
+            <div id="placeholder33x" class="demo-placeholder" data-language="pt-BR" data-currency="{{ $currency->getCodigo() }}"></div>
           </div>
         </div>
         <div class="col-md-3 col-sm-12 col-xs-12">
@@ -130,7 +130,7 @@
                   <div class="media-body">
                     <a class="title" href="/gerenciar/cliente/editar?id={{ $top_cliente['id'] }}">{{ $top_cliente['nome'] }}</a>
                     <p>
-                      <a href="/gerenciar/pedido/?clienteid={{ $top_cliente['id'] }}">
+                      <a href="/gerenciar/pedido/?clienteid={{ $top_cliente['id'] }}&apartir_criacao={{ $this->date($apartir_compra) }}">
                         <strong>{{ $this->currency($top_cliente['total']) }}</strong>
                         compras no semestre
                       </a>
@@ -163,19 +163,6 @@
             <a class="collapse-link">
               <i class="fa fa-chevron-up"></i>
             </a>
-          </li>
-          <li class="dropdown">
-            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
-              <i class="fa fa-wrench"></i>
-            </a>
-            <ul class="dropdown-menu" role="menu">
-              <li>
-                <a href="#">Settings 1</a>
-              </li>
-              <li>
-                <a href="#">Settings 2</a>
-              </li>
-            </ul>
           </li>
           <li>
             <a class="close-link">
@@ -220,19 +207,6 @@
             <a class="collapse-link">
               <i class="fa fa-chevron-up"></i>
             </a>
-          </li>
-          <li class="dropdown">
-            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
-              <i class="fa fa-wrench"></i>
-            </a>
-            <ul class="dropdown-menu" role="menu">
-              <li>
-                <a href="#">Settings 1</a>
-              </li>
-              <li>
-                <a href="#">Settings 2</a>
-              </li>
-            </ul>
           </li>
           <li>
             <a class="close-link">
@@ -293,19 +267,6 @@
               <i class="fa fa-chevron-up"></i>
             </a>
           </li>
-          <li class="dropdown">
-            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
-              <i class="fa fa-wrench"></i>
-            </a>
-            <ul class="dropdown-menu" role="menu">
-              <li>
-                <a href="#">Settings 1</a>
-              </li>
-              <li>
-                <a href="#">Settings 2</a>
-              </li>
-            </ul>
-          </li>
           <li>
             <a class="close-link">
               <i class="fa fa-close"></i>
@@ -354,7 +315,7 @@
     var d1 = [
       {% for $_faturamento in $faturamentos %}
         [
-          {{ strtotime($_faturamento['data']) }}, {{ $_faturamento['total'] }}
+          {{ strtotime($_faturamento['data']) * 1000 }}, {{ $_faturamento['total'] }}
         ],
       {% endfor %}
     ];

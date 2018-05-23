@@ -1088,7 +1088,7 @@ class Pagamento extends Model
     {
         $condition['cancelado'] = 'N';
         $condition['ativo'] = 'Y';
-        $query = self::query($condition)
+        $query = self::query($condition, ['datahora' => 1])
             ->select(null)
             ->select('ROUND(SUM(p.total), 4) as total');
         if (isset($group['dia'])) {

@@ -73,7 +73,7 @@
                 <th>Descrição</th>
                 <th>Preço</th>
                 <th>Categoria</th>
-                <th>Unidade / Tipo</th>
+                <th>Unidade / Estoque</th>
                 <th width="10%" style="text-align: center;">Ações</th>
               </tr>
             </thead>
@@ -101,7 +101,9 @@
                     <strong>
                       <a href="/gerenciar/unidade/editar?id={{ $_unidade->getID() }}" title="Editar unidade '{{ $_unidade->getNome() }}'">{{ $_unidade->getNome() }}</a>
                     </strong>
-                    <small>{{ $tipos[$produto->getTipo()] }}</small>
+                    {% if $produto->getTipo() == \MZ\Product\Produto::TIPO_PRODUTO %}
+                      <small>{{ quantify($produto->getEstoque(), $_unidade->getSigla(), $produto->getConteudo()) }}</small>
+                    {% endif %}
                   </td>
                   <td class="text-center">
                     <ul class="nav panel_toolbox">

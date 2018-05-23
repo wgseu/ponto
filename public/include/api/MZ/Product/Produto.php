@@ -28,6 +28,7 @@ use MZ\Database\Model;
 use MZ\Database\DB;
 use MZ\Util\Filter;
 use MZ\Util\Validator;
+use MZ\Stock\Estoque;
 
 /**
  * Informações sobre o produto, composição ou pacote
@@ -893,6 +894,11 @@ class Produto extends Model
             $imagem = null;
         }
         return get_image_url($imagem, 'produto', $default_name);
+    }
+
+    public function getEstoque($setor_id = null)
+    {
+        return Estoque::sumByProdutoID($this->getID(), $setor_id);
     }
 
     /**

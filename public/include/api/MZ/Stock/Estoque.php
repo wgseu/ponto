@@ -1073,17 +1073,19 @@ class Estoque extends Model
     /**
      * Sum quantity of product id
      * @param  int $produto_id product id to sum stock quantity
+     * @param  int $setor_id product sector id to filter stock
      * @return float A sum of quantity
      */
-    public static function sumByProdutoID($produto_id)
+    public static function sumByProdutoID($produto_id, $setor_id = null)
     {
-        return (float)self::sum(
-            [
-                'produtoid' => intval($produto_id),
-                'cancelado' => 'N'
-            ],
-            'quantidade'
-        );
+        $condition = [
+            'produtoid' => intval($produto_id),
+            'cancelado' => 'N'
+        ];
+        if (!is_null($setor_id)) {
+            $condition['setorid'] = $setor_id;
+        }
+        return (float)self::sum($condition, 'quantidade');
     }
 
     /**

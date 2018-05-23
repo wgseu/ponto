@@ -19,10 +19,11 @@ $faturamentos = Pagamento::rawFindAllTotal(
     ],
     ['dia' => true]
 );
+$apartir_compra = DB::date('first day of -6 month');
 $top_clientes = Cliente::rawFindAll(
     [
         'comprador' => true,
-        'apartir_cadastro' => DB::date('first day of -6 month')
+        'apartir_compra' => $apartir_compra
     ],
     [],
     5

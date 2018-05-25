@@ -341,6 +341,9 @@ class Credito extends Model
         if (is_null($this->getFuncionarioID())) {
             $errors['funcionarioid'] = 'O funcionário não pode ser vazio';
         }
+        if (is_null($this->getDetalhes())) {
+            $errors['detalhes'] = 'Os detalhes não foram informados';
+        }
         if (is_null($this->getCancelado())) {
             $errors['cancelado'] = 'O cancelado não pode ser vazio';
         } elseif (!Validator::checkBoolean($this->getCancelado())) {

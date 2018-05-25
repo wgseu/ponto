@@ -430,7 +430,7 @@ class Sessao extends Model
      */
     public static function findLastAberta($required = false)
     {
-        $sessao = self::find([], ['aberta' => -1, 'id' => -1]);
+        $sessao = self::find([], ['aberta' => 1, 'id' => -1]);
         if ($required && !$sessao->exists()) {
             throw new \Exception('Nenhum caixa aberto ou fechado');
         }

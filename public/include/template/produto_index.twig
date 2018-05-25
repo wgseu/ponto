@@ -55,7 +55,7 @@
                   <div class="por">
                     <span>{{ $currency->getSimbolo() }}
                     </span>
-                    <strong>{{ \MZ\Util\Mask::money($produto->getPrecoVenda()) }}</strong>
+                    <strong>{{ $this->money($produto->getPrecoVenda()) }}</strong>
                   </div>
                 </div>
                 <button>Detalhes</button>

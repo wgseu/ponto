@@ -355,14 +355,10 @@ class Carteira extends Model
         if (is_null($this->getDescricao())) {
             $errors['descricao'] = 'A Descrição não pode ser vazia';
         }
-        if (is_null($this->getAgencia())) {
-            if ($this->getTipo() == self::TIPO_BANCARIA) {
-                $errors['agencia'] = 'A agência não pode ser vazia';
-            } else {
-                $errors['agencia'] = 'O serviço não pode ser vazio';
-            }
+        if ($this->getTipo() == self::TIPO_BANCARIA && is_null($this->getAgencia())) {
+            $errors['agencia'] = 'A agência não pode ser vazia';
         }
-        if (is_null($this->getConta())) {
+        if ($this->getTipo() == self::TIPO_BANCARIA && is_null($this->getConta())) {
             $errors['conta'] = 'A conta não pode ser vazia';
         }
         if (is_null($this->getAtiva())) {

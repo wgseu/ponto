@@ -48,7 +48,7 @@ const javascripts = [
 
 const javascripts_manager = [
   'resources/assets/js/jquery.thunder.js',
-  'resources/assets/js/gauge/gauge.min.js',
+  'node_modules/gaugeJS/dist/gauge.js',
   'resources/assets/js/moment/moment.min.js',
   'resources/assets/js/chartjs/chart.min.js',
   'resources/assets/js/progressbar/bootstrap-progressbar.min.js',

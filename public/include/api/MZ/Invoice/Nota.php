@@ -1365,7 +1365,7 @@ class Nota extends Model
         if (!$todos) {
             $condition['concluido'] = 'N';
         }
-        $order = ['concluido' => 1, 'corrigido' => -1, 'datalancamento' => -1];
+        $order = ['concluido' => -1, 'corrigido' => 1, 'datalancamento' => -1];
         return self::find($condition, $order);
     }
 
@@ -1381,7 +1381,7 @@ class Nota extends Model
         if (!$todos) {
             $condition['concluido'] = 'N';
         }
-        $order = ['concluido' => 1, 'corrigido' => -1, 'datalancamento' => -1];
+        $order = ['concluido' => -1, 'corrigido' => 1, 'datalancamento' => -1];
         return self::find($condition, $order);
     }
 

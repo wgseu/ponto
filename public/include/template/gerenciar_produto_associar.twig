@@ -52,7 +52,7 @@
                   <input type="hidden" id="produto_{{ $produto['codigo'] }}_ref" name="produto[{{ $produto['codigo'] }}]" data-descricao="{{ $associado->getDescricao() }}" data-codigo="{{ $produto['codigo'] }}" data-id="{{ $associado->getID() }}" data-item-count="{{ count($produto['itens']) }}" value="{{ $associado->getID() }}">
                   <div class="form-group">
                     <label for="produto_{{ $produto['codigo'] }}">Produto:
-                      <span class="identifier">{{ $produto['descricao'] }}</span>
+                      <span class="item-desc">{{ $produto['descricao'] }}</span>
                       <i class="fa fa-remove remove-item" title="Excluir produto da associação"></i>
                     </label>
                     <div class="input-group">
@@ -102,7 +102,7 @@
         <input type="hidden" id="" name="" data-descricao="" data-codigo="" value="">
         <div class="form-group">
           <label for="produto">Produto:
-            <span class="identifier"></span>
+            <span class="item-desc"></span>
             <i class="fa fa-remove remove-item" title="Excluir item do pacote da associação"></i>
           </label>
           <div class="input-group">

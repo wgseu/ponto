@@ -13,7 +13,6 @@
     "fix-pop": "gulp fix-pop --name"
   },
   "devDependencies": {
-    "animate.css": "^3.5.2",
     "browser-sync": "^2.23.6",
     "eslint": "^4.17.0",
     "gulp": "^3.9.1",
@@ -22,5 +21,9 @@
     "gulp-uglify": "^3.0.0",
     "gulp-util": "^3.0.8",
     "replace-in-file": "^3.4.0"
+  },
+  "dependencies": {
+    "animate.css": "^3.5.2",
+    "gaugeJS": "^1.3.6"
   }
 }

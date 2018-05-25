@@ -631,7 +631,15 @@ Gerenciar.diversos.init = function(d1, doughnutData, meta_val, meta_max) {
   gauge.maxValue = meta_max; // set max gauge value
   gauge.animationSpeed = 32; // set animation speed (32 is default value)
   gauge.set(meta_val); // set actual value
-  gauge.setTextField(document.getElementById('gauge-text'));
+  var textRenderer = new TextRenderer(document.getElementById('gauge-text'));
+  textRenderer.render = function(gauge){
+    this.el.innerHTML = gauge.displayedValue.toLocaleString(
+      $('#placeholder33x').data('language'), {
+        style: 'currency',
+        currency: $('#placeholder33x').data('currency')
+      })
+  };
+  gauge.setTextField(textRenderer, 2);
   $('.quick-list a').click(function() {
     var link = $(this);
     $.get(
@@ -648,7 +656,10 @@ Gerenciar.diversos.init = function(d1, doughnutData, meta_val, meta_max) {
         $('#meta-name').text(link.text());
         $('#gauge-text').text(Util.toMoney(data.atual));
         $('#goal-text').text(
-          $('#placeholder33x').data('symbol') + Util.toMoney(data.base)
+          data.base.toLocaleString($('#placeholder33x').data('language'), {
+            style: 'currency',
+            currency: $('#placeholder33x').data('currency')
+          })
         );
         meta_val = Math.round(data.atual);
         meta_max = Math.max(Math.round(data.base), meta_val);
@@ -2195,7 +2206,7 @@ Gerenciar.conta.initForm = function(focus_ctrl) {
   if (focus_ctrl != undefined) $('#' + focus_ctrl).focus();
   Gerenciar.cliente.initField('#clienteid', '#clienteid_ref');
   Gerenciar.classificacao.initField('#classificacaoid', function(search) {
-    return { search: search, superior: 'Y', saida: 'json' };
+    return { search: search, classificacaoid: '', saida: 'json' };
   });
   Gerenciar.classificacao.initField('#subclassificacaoid', function(search) {
     return {
@@ -2882,7 +2893,7 @@ Gerenciar.integracao.productInit = function(service) {
     function(top_item) {
       return (
         'Deseja excluir o produto "' +
-        top_item.find('.identifier').text() +
+        top_item.find('.item-desc').text() +
         '" da associação?'
       );
     },
@@ -3018,7 +3029,7 @@ Gerenciar.integracao.productInit = function(service) {
           var field = $('input[type=hidden]', item);
           var imgdiv = item.find('img');
           var btn = $('button', item);
-          $('.identifier', item).text(this.descricao);
+          $('.item-desc', item).text(this.descricao);
           field.attr('data-id', this.id);
           field.data('id', this.id);
           field.attr('id', 'produto_' + this.codigo + '_ref');
@@ -3107,7 +3118,7 @@ Gerenciar.integracao.productInit = function(service) {
           function(top_item) {
             return (
               'Deseja excluir o item "' +
-              top_item.find('.identifier').text() +
+              top_item.find('.item-desc').text() +
               '" do pacote "' +
               group_list.data('descricao') +
               '" da associação?'

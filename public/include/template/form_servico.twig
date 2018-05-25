@@ -19,11 +19,11 @@
 </div>
 <div class="form-group col-lg-3 col-md-4 col-sm-6 col-xs-6">
   <label for="datainicio">Data de início:</label>
-  <input type="text" id="datainicio" name="datainicio" class="datetime-picker form-control" value="{{ $this->datetime($servico->getDataInicio()) }}">
+  <input type="text" id="datainicio" name="datainicio" autocomplete="off" class="datetime-picker form-control" value="{{ $this->datetime($servico->getDataInicio()) }}">
 </div>
 <div class="form-group col-lg-3 col-md-4 col-sm-6 col-xs-6">
   <label for="datafim">Data final:</label>
-  <input type="text" id="datafim" name="datafim" class="datetime-picker form-control" value="{{ $this->datetime($servico->getDataFim()) }}">
+  <input type="text" id="datafim" name="datafim" autocomplete="off" class="datetime-picker form-control" value="{{ $this->datetime($servico->getDataFim()) }}">
 </div>
 <div class="form-group col-lg-2 col-md-2 col-sm-6 col-xs-6">
   <label for="valor">Valor:</label>

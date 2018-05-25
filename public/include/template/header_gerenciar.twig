@@ -16,19 +16,9 @@
         {{ $app->getSystem()->getCompany()->getNome() }}</title>
     {% endif %}
     <link href="/static/css/manager.min.css" rel="stylesheet">
-    <script>
-      if (typeof module === 'object') {
-        window.module = module;
-        module = undefined;
-      }
-    </script>
     <script src="/static/js/jquery.min.js"></script>
     <script src="/static/js/nprogress.js"></script>
     <script src="/static/ckeditor/ckeditor.js"></script>
-    <script>
-      if (window.module) 
-        module = window.module;
-    </script>
   </head>
   <body class="nav-md">
     <div class="container body">

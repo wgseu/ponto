@@ -39,11 +39,11 @@
       </div>
       <div class="form-group col-lg-2 col-md-4 col-sm-4 col-xs-6">
         <label for="inicio">Data inicial:</label>
-        <input type="text" id="inicio" name="datahora_inicio" class="datetime-picker form-control" value="{{ $this->get('datahora_inicio') }}">
+        <input type="text" id="inicio" name="datahora_inicio" autocomplete="off" class="datetime-picker form-control" value="{{ $this->get('datahora_inicio') }}">
       </div>
       <div class="form-group col-lg-2 col-md-4 col-sm-4 col-xs-6">
         <label for="fim">Data final:</label>
-        <input type="text" id="fim" name="datahora_fim" class="datetime-picker form-control" value="{{ $this->get('datahora_fim') }}">
+        <input type="text" id="fim" name="datahora_fim" autocomplete="off" class="datetime-picker form-control" value="{{ $this->get('datahora_fim') }}">
       </div>
       {% $_funcao = $_funcionario->findFuncaoID() %}
       {% $_cliente_func = $_funcionario->findClienteID() %}

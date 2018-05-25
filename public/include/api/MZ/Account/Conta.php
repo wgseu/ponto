@@ -866,6 +866,9 @@ class Conta extends Model
                 }
             }
         }
+        if (is_null($this->getVencimento())) {
+            $errors['vencimento'] = 'A data de vencimento não foi informada corretamente';
+        }
         $this->setDataCadastro(DB::now());
         if (!empty($errors)) {
             throw new \MZ\Exception\ValidationException($errors);

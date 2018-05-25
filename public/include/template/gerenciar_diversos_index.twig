@@ -33,7 +33,7 @@
       <span class="count_top">
         <i class="fa fa-money"></i>
         Receitas</span>
-      <div class="count green">{{ \MZ\Util\Mask::money($receitas) }}</div>
+      <div class="count green">{{ $this->money($receitas) }}</div>
       <span class="count_bottom">
         <i class="green">{{ $this->currency($vendas['total']) }}
         </i>
@@ -46,7 +46,7 @@
       <span class="count_top" title="Faturamento mensal">
         <i class="fa fa-area-chart"></i>
         Faturamento</span>
-      <div class="count">{{ \MZ\Util\Mask::money($faturamento['atual']) }}</div>
+      <div class="count">{{ $this->money($faturamento['atual']) }}</div>
       <span class="count_bottom" title="Comparação com o mês passado">
         {% if $faturamento['atual'] >= $faturamento['anterior'] %}
           <i class="green">
@@ -67,7 +67,7 @@
       <span class="count_top" title="Despesas do mês que ainda não foram pagas">
         <i class="fa fa-shopping-cart"></i>
         Despesas</span>
-      <div class="count">{{ \MZ\Util\Mask::money(-$despesas['apagar']) }}</div>
+      <div class="count">{{ $this->money(-$despesas['apagar']) }}</div>
       <span class="count_bottom" title="Contas pagas do mês">
         <i class="red">{{ $this->currency(-$despesas['pagas']) }}
         </i>
@@ -130,7 +130,7 @@
                   <div class="media-body">
                     <a class="title" href="/gerenciar/cliente/editar?id={{ $top_cliente['id'] }}">{{ $top_cliente['nome'] }}</a>
                     <p>
-                      <a href="/gerenciar/pedido/?clienteid={{ $top_cliente['id'] }}&apartir_criacao={{ $this->date($apartir_compra) }}">
+                      <a href="/gerenciar/pedido/?clienteid={{ $top_cliente['id'] }}&estado=Finalizado&apartir_criacao={{ $this->date($apartir_compra) }}">
                         <strong>{{ $this->currency($top_cliente['total']) }}</strong>
                         compras no semestre
                       </a>
@@ -300,9 +300,8 @@
             <h4>Progresso atual</h4>
             <canvas width="150" height="80" id="foo" class="" style="width: 160px; height: 100px;"></canvas>
             <div class="goal-wrapper">
-              <span class="gauge-value pull-left">{{ $currency->getSimbolo() }}</span>
-              <span id="gauge-text" class="gauge-value pull-left">{{ \MZ\Util\Mask::money(round($faturamento['atual'])) }}</span>
-              <span id="goal-text" class="goal-value pull-right">{{ $currency->getSimbolo() }}{{ \MZ\Util\Mask::money(round($faturamento['base'])) }}</span>
+              <span id="gauge-text" class="gauge-value pull-left">{{ $this->currency($faturamento['atual']) }}</span>
+              <span id="goal-text" class="goal-value pull-right">{{ $this->currency($faturamento['base']) }}</span>
             </div>
           </div>
         </div>

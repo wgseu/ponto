@@ -53,7 +53,7 @@
                   <input type="hidden" id="cartao_{{ $codigo }}_ref" name="cartao[{{ $codigo }}]" data-descricao="{{ $associado->getDescricao() }}" data-codigo="{{ $codigo }}" data-id="{{ $associado->getID() }}" value="{{ $associado->getID() }}">
                   <div class="form-group">
                     <label for="cartao_{{ $codigo }}">Cartão:
-                      <span class="identifier">{{ $cartao['name'] }}</span></label>
+                      <span class="item-desc">{{ $cartao['name'] }}</span></label>
                     <div class="input-group">
                       <input type="text" id="cartao_{{ $codigo }}" class="form-control assoc-input" value="{{ $associado->getDescricao() }}">
                       <span class="input-group-btn">

@@ -6838,6 +6838,9 @@ ul.notifications {
 .assoc-info label {
   width: 100%;
 }
+.assoc-info .item-desc {
+  color: blue;
+}
 .assoc-item .remove-item {
   float: right;
   cursor: pointer;

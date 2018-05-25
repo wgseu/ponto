@@ -54,5 +54,5 @@ $estados = [
     'Y' => 'Ativos',
     'N' => 'Inativos',
 ];
-$_imagens = Cartao::getImages();
+$_imagens = [0 => ['id' => 0, 'name' => 'Sem imagem']] + Cartao::getImages();
 $app->getResponse('html')->output('gerenciar_cartao_index');

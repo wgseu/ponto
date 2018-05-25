@@ -57,11 +57,11 @@
 </div>
 <div class="form-group col-lg-3 col-md-4 col-sm-6 col-xs-12">
   <label for="vencimento">Data de vencimento:</label>
-  <input type="text" id="vencimento" name="vencimento" class="datetime-picker form-control" value="{{ $this->date($conta->getVencimento()) }}">
+  <input type="text" id="vencimento" name="vencimento" autocomplete="off" class="datetime-picker form-control" value="{{ $this->date($conta->getVencimento()) }}">
 </div>
 <div class="form-group col-lg-3 col-md-4 col-sm-6 col-xs-12">
   <label for="dataemissao">Data de emissão:</label>
-  <input type="text" id="dataemissao" name="dataemissao" class="datetime-picker form-control" value="{{ $this->date($conta->getDataEmissao()) }}">
+  <input type="text" id="dataemissao" name="dataemissao" autocomplete="off" class="datetime-picker form-control" value="{{ $this->date($conta->getDataEmissao()) }}">
 </div>
 <div class="form-group col-lg-3 col-md-4 col-sm-6 col-xs-12">
   <label for="numerodoc">Número do documento:</label>
@@ -85,5 +85,5 @@
 </div>
 <div class="form-group col-lg-3 col-md-4 col-sm-6 col-xs-12">
   <label for="datapagamento">Data de pagamento:</label>
-  <input type="text" id="datapagamento" name="datapagamento" class="datetime-picker form-control" value="{{ $this->date($conta->getDataPagamento()) }}">
+  <input type="text" id="datapagamento" name="datapagamento" autocomplete="off" class="datetime-picker form-control" value="{{ $this->date($conta->getDataPagamento()) }}">
 </div>

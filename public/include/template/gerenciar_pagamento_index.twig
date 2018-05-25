@@ -58,13 +58,13 @@
       </div>
       <div class="form-group col-lg-2 col-md-3 col-sm-3 col-xs-6">
         <label for="inicio">Data inicial:</label>
-        <input type="text" id="inicio" name="inicio" class="datetime-picker form-control" value="{{ $this->get('inicio') }}">
+        <input type="text" id="inicio" name="apartir_datahora" autocomplete="off" class="datetime-picker form-control" value="{{ $this->get('apartir_datahora') }}">
       </div>
       <div class="form-group col-lg-2 col-md-3 col-sm-3 col-xs-6">
         <label for="fim">Data final:</label>
-        <input type="text" id="fim" name="fim" class="datetime-picker form-control" value="{{ $this->get('fim') }}">
+        <input type="text" id="fim" name="ate_datahora" autocomplete="off" class="datetime-picker form-control" value="{{ $this->get('ate_datahora') }}">
       </div>
-      <div class=" form-group col-lg-3 col-md-9 col-sm-9 col-xs-12">
+      <div class="form-group col-lg-3 col-md-9 col-sm-9 col-xs-12">
         <label>Busca:</label>
         <div class="input-group">
           <input type="text" class="form-control" id="search" name="search" placeholder="Detalhes, Pedido ou #Movimentação..." value="{{ $this->get('search') }}">

@@ -36,7 +36,7 @@ class Mask
      */
     public static function datetime($value)
     {
-        $date = \DateTime::createFromFormat('Y-m-d H:i:s', $value);
+        $date = Filter::parseTime($value, null);
         if ($date === false) {
             return null;
         }
@@ -50,7 +50,7 @@ class Mask
      */
     public static function date($value)
     {
-        $date = \DateTime::createFromFormat('!Y-m-d', $value);
+        $date = Filter::parseTime($value, null);
         if ($date === false) {
             return null;
         }

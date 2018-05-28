@@ -25,6 +25,7 @@
 namespace MZ\Task;
 
 use MZ\System\Integracao;
+use MZ\Exception\RedirectException;
 
 /**
  * Task runner
@@ -44,6 +45,10 @@ class Runner
      * Number of failed tasks
      */
     private $failed;
+    /**
+     * List of errors
+     */
+    private $errors;
     /**
      * List of task to run
      */
@@ -85,6 +90,15 @@ class Runner
     }
 
     /**
+     * List of exception and task errored
+     * @return array task exception array list
+     */
+    public function getErrors()
+    {
+        return $this->errors;
+    }
+
+    /**
      * Add a new task to execute
      * @param  MZ\System\Task $task task to execute
      * @return Runner Self instance
@@ -108,7 +122,16 @@ class Runner
                 $this->processed += 1;
             } catch (\Exception $e) {
                 $this->failed += 1;
-                \Log::error($e->getMessage());
+                $error = [
+                    'message' => $e->getMessage(),
+                    'code' => $e->getCode(),
+                    'task' => $task->getName()
+                ];
+                if ($e instanceof RedirectException) {
+                    $error['redirect'] = $e->getURL();
+                }
+                $this->errors[] = $error;
+                \Log::error('Task[' . $task->getName() . '] - ' . $e->getMessage());
             }
         }
         return $this->getProcessed();
@@ -135,6 +158,7 @@ class Runner
         $this->pending = 0;
         $this->failed = 0;
         $this->tasks = [];
+        $this->errors = [];
         return $this;
     }
 }

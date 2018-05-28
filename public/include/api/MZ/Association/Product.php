@@ -29,6 +29,7 @@ use MZ\Product\Composicao;
 use MZ\Product\Produto;
 use MZ\Product\Grupo;
 use MZ\System\Synchronizer;
+use MZ\Exception\RedirectException;
 
 class Product
 {
@@ -82,6 +83,8 @@ class Product
 
     public function populateFromXML($dom)
     {
+        global $app;
+
         $nodes = $dom->getElementsByTagName('response-body');
         foreach ($nodes as $list) {
             $itens = $list->getElementsByTagName('item');
@@ -92,6 +95,20 @@ class Product
                 $temp = $item->getElementsByTagName('codPai');
                 $codigo_pai = $temp->length > 0?$temp->item(0)->nodeValue:null;
                 $descricao = $item->getElementsByTagName('descricaoCardapio')->item(0)->nodeValue;
+                if ($descricao == '') {
+                    throw new RedirectException(
+                        'O produto está sem descrição no XML',
+                        500,
+                        $app->makeURL('/gerenciar/integracao/?acessourl=' . $this->integracao->getAcessoURL())
+                    );
+                }
+                if ($codigo == '') {
+                    throw new RedirectException(
+                        sprintf('O código do produto "%s" não existe no XML', $descricao),
+                        500,
+                        $app->makeURL('/gerenciar/integracao/?acessourl=' . $this->integracao->getAcessoURL())
+                    );
+                }
                 $produto = [
                     'codigo' => $codigo,
                     'codigo_pai' => $codigo_pai,

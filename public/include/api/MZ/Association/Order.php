@@ -45,6 +45,7 @@ use MZ\Product\Servico;
 use MZ\Product\Produto;
 use MZ\Session\Sessao;
 use MZ\System\Synchronizer;
+use MZ\Exception\RedirectException;
 
 class Order extends Pedido
 {
@@ -117,6 +118,8 @@ class Order extends Pedido
 
     public function loadDOM($dom)
     {
+        global $app;
+
         $dados = $this->integracao->read();
         $cartoes = isset($dados['cartoes'])?$dados['cartoes']:[];
         $produtos = isset($dados['produtos'])?$dados['produtos']:[];
@@ -237,16 +240,18 @@ class Order extends Pedido
                             $tipo_pagto = FormaPagto::TIPO_CONTA;
                             break;
                         default:
-                            throw new \Exception(
+                            throw new RedirectException(
                                 sprintf('Forma de pagamento "%s" não reconhecida', $cod_tipo_cond_pagto),
-                                500
+                                500,
+                                $app->makeURL('/gerenciar/cartao/' . $this->integracao->getAcessoURL())
                             );
                     }
                     $forma_pagto = FormaPagto::find(['tipo' => $tipo_pagto, 'ativa' => 'Y']);
                     if (!$forma_pagto->exists()) {
-                        throw new \Exception(
+                        throw new RedirectException(
                             sprintf('Não existe forma de pagamento em %s ativa', FormaPagto::getTipoOptions($tipo_pagto)),
-                            500
+                            500,
+                            'grandchef://cartao'
                         );
                     }
                     $pagamento = new Pagamento();
@@ -262,23 +267,26 @@ class Order extends Pedido
                         $cartao = new Cartao();
                         $cod_tipo_pagto = Document::childValue($pagamento_node, 'codFormaPagto');
                         if (!isset($this->card_names[$cod_tipo_pagto])) {
-                            throw new \Exception(
+                            throw new RedirectException(
                                 sprintf('O cartão de código "%s" não é suportado nessa versão', $cod_tipo_pagto),
-                                500
+                                500,
+                                $app->makeURL('/gerenciar/cartao/' . $this->integracao->getAcessoURL())
                             );
                         }
                         if (!isset($cartoes[$cod_tipo_pagto])) {
-                            throw new \Exception(
-                                sprintf('O cartão %s não foi associado', $this->card_names[$cod_tipo_pagto]),
-                                500
+                            throw new RedirectException(
+                                sprintf('O cartão "%s" não foi associado', $this->card_names[$cod_tipo_pagto]['name']),
+                                500,
+                                $app->makeURL('/gerenciar/cartao/' . $this->integracao->getAcessoURL())
                             );
                         }
                         $pagamento->setCartaoID($cartoes[$cod_tipo_pagto]);
                         $cartao = $pagamento->findCartaoID();
                         if (!$cartao->exists()) {
-                            throw new \Exception(
-                                sprintf('A associação do cartão %s está inválida', $this->card_names[$cod_tipo_pagto]),
-                                500
+                            throw new RedirectException(
+                                sprintf('A associação do cartão "%s" está inválida', $this->card_names[$cod_tipo_pagto]['name']),
+                                500,
+                                $app->makeURL('/gerenciar/cartao/' . $this->integracao->getAcessoURL())
                             );
                         }
                         $pagamento->setParcelas(1);
@@ -308,12 +316,13 @@ class Order extends Pedido
         if ($troco > 0) {
             $forma_pagto = FormaPagto::find(['tipo' => FormaPagto::TIPO_DINHEIRO, 'ativa' => 'Y']);
             if (!$forma_pagto->exists()) {
-                throw new \Exception(
+                throw new RedirectException(
                     sprintf(
                         'Não existe forma de pagamento em %s ativa',
                         FormaPagto::getTipoOptions(FormaPagto::TIPO_DINHEIRO)
                     ),
-                    500
+                    500,
+                    'grandchef://forma_pagto'
                 );
             }
             $pagamento = new Pagamento();
@@ -364,9 +373,10 @@ class Order extends Pedido
                 $produto_pedido->setProdutoID($produto_id ?: $codigo_pdv);
                 $produto = $produto_pedido->findProdutoID();
                 if (!$produto->exists()) {
-                    throw new \Exception(
+                    throw new RedirectException(
                         sprintf('O produto "%s" não foi associado corretamente', $descricao),
-                        404
+                        404,
+                        $app->makeURL('/gerenciar/produto/' . $this->integracao->getAcessoURL())
                     );
                 }
                 $this->products[$i] = [
@@ -387,13 +397,14 @@ class Order extends Pedido
                     $formacao->setComposicaoID($subitem_id ?: $codigo_pdv);
                     $composicao = $formacao->findComposicaoID();
                     if (!$composicao->exists()) {
-                        throw new \Exception(
+                        throw new RedirectException(
                             sprintf(
                                 'A composição "%s" não foi associada corretamente no produto "%s"',
                                 $descricao,
                                 $produto->getDescricao()
                             ),
-                            404
+                            404,
+                            $app->makeURL('/gerenciar/produto/' . $this->integracao->getAcessoURL())
                         );
                     }
                     $produto_pedido->setProdutoID($composicao->getProdutoID());
@@ -402,13 +413,14 @@ class Order extends Pedido
                     $formacao->setPacoteID($subitem_id ?: $codigo_pdv);
                     $pacote = $formacao->findPacoteID();
                     if (!$pacote->exists()) {
-                        throw new \Exception(
+                        throw new RedirectException(
                             sprintf(
                                 'O item "%s" não foi associado corretamente no produto "%s"',
                                 $descricao,
                                 $produto->getDescricao()
                             ),
-                            404
+                            404,
+                            $app->makeURL('/gerenciar/produto/' . $this->integracao->getAcessoURL())
                         );
                     }
                     $produto_pedido->setProdutoID($pacote->getProdutoID());
@@ -430,7 +442,11 @@ class Order extends Pedido
                 }
                 $this->products[$parent_index]['formacoes'][] = $formacao;
             } else {
-                throw new \Exception('O produto principal do pacote não foi encontrado', 404);
+                throw new RedirectException(
+                    'O produto principal do pacote não foi encontrado',
+                    404,
+                    $app->makeURL('/gerenciar/produto/' . $this->integracao->getAcessoURL())
+                );
             }
         }
         foreach ($servicos as $servico) {

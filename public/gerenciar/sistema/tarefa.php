@@ -19,7 +19,8 @@ try {
         [
             'processed' => $runner->getProcessed(),
             'pending' => $runner->getPending(),
-            'failed' => $runner->getFailed()
+            'failed' => $runner->getFailed(),
+            'errors' => $runner->getErrors()
         ]
     );
 } catch (\Exception $e) {

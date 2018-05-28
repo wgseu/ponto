@@ -83,7 +83,7 @@ if ($lembrar == 'true') {
     $app->getAuthentication()->remember();
 }
 if (isset($_POST['metodo'])) {
-    $url = isset($_POST['redirect']) ? strval($_POST['redirect']) : '/';
+    $url = isset($_POST['redirect']) ? strval($_POST['redirect']) : get_redirect_page();
     redirect($url);
 }
 $status = ['status' => 'ok', 'msg' => 'Login efetuado com sucesso!'];

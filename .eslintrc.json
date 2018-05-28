@@ -4,8 +4,7 @@
         "commonjs": true,
         "es6": true,
         "node": true,
-        "jquery": true,
-        "TextRenderer": true
+        "jquery": true
     },
     "globals": {
         "moment": true,
@@ -13,7 +12,8 @@
         "Gauge": true,
         "google": true,
         "removeDiacritics": true,
-        "Treant": true
+        "Treant": true,
+        "TextRenderer": true
     },
     "parserOptions": {
         "ecmaFeatures": {

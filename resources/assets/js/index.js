@@ -2990,11 +2990,12 @@ Gerenciar.integracao.productInit = function(service) {
           $('.thunder-container').message('error', data.msg);
           return;
         }
+        var itens_keys = Object.keys(data.produto.itens);
         group_list.attr(
           'data-item-count',
-          Object.keys(data.produto.itens).length
+          itens_keys.length
         );
-        group_list.data('item-count', Object.keys(data.produto.itens).length);
+        group_list.data('item-count', itens_keys.length);
         group_list.attr('data-descricao', data.produto.descricao);
         group_list.data('descricao', data.produto.descricao);
         group_list.attr('data-codigo', data.produto.codigo);
@@ -3022,7 +3023,10 @@ Gerenciar.integracao.productInit = function(service) {
           });
         });
         var saved_count = 0;
-        $.each(data.produto.itens, function() {
+        var itens = itens_keys.map(function (key) {
+          return data.produto.itens[key];
+        })
+        $.each(itens, function() {
           var item = $(item_template);
           var group = grupos[this.grupoid];
           var input = $('input[type=text]', item);

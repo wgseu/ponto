@@ -570,7 +570,13 @@ class Composicao extends Model
      */
     private static function query($condition = [], $order = [])
     {
-        $query = DB::from('Composicoes c');
+        $query = DB::from('Composicoes c')
+            ->leftJoin('Produtos p ON p.id = c.produtoid');
+        if (isset($condition['search'])) {
+            $search = trim($condition['search']);
+            $query = DB::buildSearch($search, 'p.descricao', $query);
+            unset($condition['search']);
+        }
         $condition = self::filterCondition($condition);
         $query = DB::buildOrderBy($query, self::filterOrder($order));
         $query = $query->orderBy('c.tipo ASC');

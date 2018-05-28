@@ -59,6 +59,16 @@ class Kromax extends Task
     ];
 
     /**
+     * Name of the task
+     * @return string task name
+     */
+    public function getName()
+    {
+        $integracao = $this->getData();
+        return $integracao->getNome();
+    }
+
+    /**
      * Execute task
      * @return integer Number of pending work
      */

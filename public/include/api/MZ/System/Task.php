@@ -91,4 +91,10 @@ abstract class Task
      * @return integer Number of pending work
      */
     abstract public function run();
+
+    /**
+     * Name of the task
+     * @return string task name
+     */
+    abstract public function getName();
 }

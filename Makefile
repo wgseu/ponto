@@ -109,7 +109,7 @@ test:
 	@docker-compose exec -T php ./public/include/vendor/bin/phpunit --configuration ./ --no-coverage
 
 cover:
-	@docker-compose exec -T php ./public/include/vendor/bin/phpunit --configuration ./
+	@docker-compose exec -T php ./public/include/vendor/bin/phpunit --configuration ./ --coverage-html storage/coverage
 
 class:
 	@mkdir -p $(DB_DUMPS_DIR)

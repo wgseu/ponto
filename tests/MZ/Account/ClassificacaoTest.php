@@ -20,12 +20,42 @@
  * O Cliente adquire apenas o direito de usar o software e não adquire qualquer outros
  * direitos, expressos ou implícitos no GrandChef diferentes dos especificados nesta Licença.
  *
- * @author  Francimar Alves <mazinsw@gmail.com>
+ * @author Equipe GrandChef <desenvolvimento@mzsw.com.br>
  */
 namespace MZ\Account;
 
 class ClassificacaoTest extends \PHPUnit_Framework_TestCase
 {
+    public function testFromArray()
+    {
+        $old_classificacao = new Classificacao([
+            'id' => 123,
+            'classificacaoid' => 123,
+            'descricao' => 'Classificação',
+        ]);
+        $classificacao = new Classificacao();
+        $classificacao->fromArray($old_classificacao);
+        $this->assertEquals($classificacao, $old_classificacao);
+        $classificacao->fromArray(null);
+        $this->assertEquals($classificacao, new Classificacao());
+    }
+
+    public function testFilter()
+    {
+        $old_classificacao = new Classificacao([
+            'id' => 1234,
+            'classificacaoid' => 1234,
+            'descricao' => 'Classificação filter',
+        ]);
+        $classificacao = new Classificacao([
+            'id' => 321,
+            'classificacaoid' => '1.234',
+            'descricao' => ' Classificação <script>filter</script> ',
+        ]);
+        $classificacao->filter($old_classificacao);
+        $this->assertEquals($old_classificacao, $classificacao);
+    }
+
     public function testPublish()
     {
         $classificacao = new Classificacao();
@@ -36,5 +66,72 @@ class ClassificacaoTest extends \PHPUnit_Framework_TestCase
             'descricao',
         ];
         $this->assertEquals($allowed, array_keys($values));
+    }
+
+    public function testInsert()
+    {
+        $classificacao = new Classificacao();
+        try {
+            $classificacao->insert();
+            $this->fail('Não deveria ter cadastrado a classificação');
+        } catch (\MZ\Exception\ValidationException $e) {
+            $this->assertEquals(
+                [
+                    'descricao',
+                ],
+                array_keys($e->getErrors())
+            );
+        }
+        $classificacao->setDescricao('Classificação to insert');
+        $classificacao->insert();
+    }
+
+    public function testUpdate()
+    {
+        $classificacao = new Classificacao();
+        $classificacao->setDescricao('Classificação to update');
+        $classificacao->insert();
+        $classificacao->setDescricao('Classificação updated');
+        $classificacao->update();
+        $found_classificacao = Classificacao::findByID($classificacao->getID());
+        $this->assertEquals($classificacao, $found_classificacao);
+    }
+
+    public function testDelete()
+    {
+        $classificacao = new Classificacao();
+        $classificacao->setDescricao('Classificação to delete');
+        $classificacao->insert();
+        $classificacao->delete();
+        $found_classificacao = Classificacao::findByID($classificacao->getID());
+        $this->assertEquals(new Classificacao(), $found_classificacao);
+        $classificacao->setID('');
+        $this->setExpectedException('\Exception');
+        $classificacao->delete();
+    }
+
+    public function testFind()
+    {
+        $classificacao = new Classificacao();
+        $classificacao->setDescricao('Classificação find');
+        $classificacao->insert();
+        $found_classificacao = Classificacao::findByID($classificacao->getID());
+        $this->assertEquals($classificacao, $found_classificacao);
+        $found_classificacao->loadByID($classificacao->getID());
+        $this->assertEquals($classificacao, $found_classificacao);
+        $found_classificacao = Classificacao::findByDescricao($classificacao->getDescricao());
+        $this->assertEquals($classificacao, $found_classificacao);
+        $found_classificacao->loadByDescricao($classificacao->getDescricao());
+        $this->assertEquals($classificacao, $found_classificacao);
+
+        $classificacao_sec = new Classificacao();
+        $classificacao_sec->setDescricao('Classificação find second');
+        $classificacao_sec->insert();
+
+        $classificacoes = Classificacao::findAll(['search' => 'Classificação find'], [], 2, 0);
+        $this->assertEquals([$classificacao, $classificacao_sec], $classificacoes);
+
+        $count = Classificacao::count(['search' => 'Classificação find']);
+        $this->assertEquals(2, $count);
     }
 }

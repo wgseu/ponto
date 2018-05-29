@@ -27,6 +27,8 @@ namespace MZ\Association;
 use MZ\Util\Document;
 use MZ\Util\Generator;
 use MZ\Util\Filter;
+use MZ\Util\Gender;
+use MZ\Util\Validator;
 use MZ\Database\Model;
 use MZ\Database\DB;
 use MZ\Location\Localizacao;
@@ -161,6 +163,7 @@ class Order extends Pedido
         $this->customer->setNomeCompleto(Filter::name($nome));
         $email = Document::childValue($body_pedido, 'email');
         $this->customer->setEmail(strtolower($email));
+        $this->customer->setGenero(Gender::detect($this->customer->getNome()));
         $telefones_node = Document::findChild($body_pedido, 'telefones', false);
         if (!is_null($telefones_node)) {
             $index = 1;
@@ -385,7 +388,7 @@ class Order extends Pedido
                 ];
                 $parent_products[$codigo] = $i;
                 $i++;
-            } elseif (array_key_exists($parent_products[$codigo_pai])) {
+            } elseif (array_key_exists($codigo_pai, $parent_products)) {
                 $subitem_id = isset($produtos[$codigo_pai]['itens'][$codigo]['id']) ?
                     $produtos[$codigo_pai]['itens'][$codigo]['id'] : null;
                 $parent_index = $parent_products[$codigo_pai];

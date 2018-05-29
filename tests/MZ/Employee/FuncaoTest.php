@@ -20,12 +20,42 @@
  * O Cliente adquire apenas o direito de usar o software e não adquire qualquer outros
  * direitos, expressos ou implícitos no GrandChef diferentes dos especificados nesta Licença.
  *
- * @author  Francimar Alves <mazinsw@gmail.com>
+ * @author Equipe GrandChef <desenvolvimento@mzsw.com.br>
  */
 namespace MZ\Employee;
 
 class FuncaoTest extends \PHPUnit_Framework_TestCase
 {
+    public function testFromArray()
+    {
+        $old_funcao = new Funcao([
+            'id' => 123,
+            'descricao' => 'Função',
+            'salariobase' => 12.3,
+        ]);
+        $funcao = new Funcao();
+        $funcao->fromArray($old_funcao);
+        $this->assertEquals($funcao, $old_funcao);
+        $funcao->fromArray(null);
+        $this->assertEquals($funcao, new Funcao());
+    }
+
+    public function testFilter()
+    {
+        $old_funcao = new Funcao([
+            'id' => 1234,
+            'descricao' => 'Função filter',
+            'salariobase' => 12.3,
+        ]);
+        $funcao = new Funcao([
+            'id' => 321,
+            'descricao' => ' Função <script>filter</script> ',
+            'salariobase' => '12,3',
+        ]);
+        $funcao->filter($old_funcao);
+        $this->assertEquals($old_funcao, $funcao);
+    }
+
     public function testPublish()
     {
         $funcao = new Funcao();
@@ -36,5 +66,79 @@ class FuncaoTest extends \PHPUnit_Framework_TestCase
             'salariobase',
         ];
         $this->assertEquals($allowed, array_keys($values));
+    }
+
+    public function testInsert()
+    {
+        $funcao = new Funcao();
+        try {
+            $funcao->insert();
+            $this->fail('Não deveria ter cadastrado a função');
+        } catch (\MZ\Exception\ValidationException $e) {
+            $this->assertEquals(
+                [
+                    'descricao',
+                    'salariobase',
+                ],
+                array_keys($e->getErrors())
+            );
+        }
+        $funcao->setDescricao('Função to insert');
+        $funcao->setSalarioBase(12.3);
+        $funcao->insert();
+    }
+
+    public function testUpdate()
+    {
+        $funcao = new Funcao();
+        $funcao->setDescricao('Função to update');
+        $funcao->setSalarioBase(12.3);
+        $funcao->insert();
+        $funcao->setDescricao('Função updated');
+        $funcao->setSalarioBase(21.4);
+        $funcao->update();
+        $found_funcao = Funcao::findByID($funcao->getID());
+        $this->assertEquals($funcao, $found_funcao);
+    }
+
+    public function testDelete()
+    {
+        $funcao = new Funcao();
+        $funcao->setDescricao('Função to delete');
+        $funcao->setSalarioBase(12.3);
+        $funcao->insert();
+        $funcao->delete();
+        $found_funcao = Funcao::findByID($funcao->getID());
+        $this->assertEquals(new Funcao(), $found_funcao);
+        $funcao->setID('');
+        $this->setExpectedException('\Exception');
+        $funcao->delete();
+    }
+
+    public function testFind()
+    {
+        $funcao = new Funcao();
+        $funcao->setDescricao('Função find');
+        $funcao->setSalarioBase(12.3);
+        $funcao->insert();
+        $found_funcao = Funcao::findByID($funcao->getID());
+        $this->assertEquals($funcao, $found_funcao);
+        $found_funcao->loadByID($funcao->getID());
+        $this->assertEquals($funcao, $found_funcao);
+        $found_funcao = Funcao::findByDescricao($funcao->getDescricao());
+        $this->assertEquals($funcao, $found_funcao);
+        $found_funcao->loadByDescricao($funcao->getDescricao());
+        $this->assertEquals($funcao, $found_funcao);
+
+        $funcao_sec = new Funcao();
+        $funcao_sec->setDescricao('Função find second');
+        $funcao_sec->setSalarioBase(12.3);
+        $funcao_sec->insert();
+
+        $funcoes = Funcao::findAll(['search' => 'Função find'], [], 2, 0);
+        $this->assertEquals([$funcao, $funcao_sec], $funcoes);
+
+        $count = Funcao::count(['search' => 'Função find']);
+        $this->assertEquals(2, $count);
     }
 }

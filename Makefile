@@ -64,11 +64,11 @@ purge: clean
 
 check:
 	@echo "Checking the standard code..."
-	@docker-compose exec -T php ./public/include/vendor/bin/phpcs --standard=PSR2 public/include/api public/include/function public/include/library public/app public/categoria public/conta public/contato public/gerenciar public/produto public/sobre
+	@docker-compose exec -T php ./public/include/vendor/bin/phpcs --standard=PSR2 public/include/api public/include/function public/include/library public/app public/categoria public/conta public/contato public/gerenciar public/produto public/sobre tests/MZ
 
 fix:
 	@echo "Fixing to standard code..."
-	@docker-compose exec -T php ./public/include/vendor/bin/phpcbf --standard=PSR2 public/include/api public/include/function public/include/library public/app public/categoria public/conta public/contato public/gerenciar public/produto public/sobre
+	@docker-compose exec -T php ./public/include/vendor/bin/phpcbf --standard=PSR2 public/include/api public/include/function public/include/library public/app public/categoria public/conta public/contato public/gerenciar public/produto public/sobre tests/MZ
 
 update:
 	@docker run --rm -v $(shell pwd):/app composer update --ignore-platform-reqs --no-scripts

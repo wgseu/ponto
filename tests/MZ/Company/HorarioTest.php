@@ -20,12 +20,45 @@
  * O Cliente adquire apenas o direito de usar o software e não adquire qualquer outros
  * direitos, expressos ou implícitos no GrandChef diferentes dos especificados nesta Licença.
  *
- * @author  Francimar Alves <mazinsw@gmail.com>
+ * @author Equipe GrandChef <desenvolvimento@mzsw.com.br>
  */
 namespace MZ\Company;
 
 class HorarioTest extends \PHPUnit_Framework_TestCase
 {
+    public function testFromArray()
+    {
+        $old_horario = new Horario([
+            'id' => 123,
+            'inicio' => 123,
+            'fim' => 123,
+            'tempoentrega' => 123,
+        ]);
+        $horario = new Horario();
+        $horario->fromArray($old_horario);
+        $this->assertEquals($horario, $old_horario);
+        $horario->fromArray(null);
+        $this->assertEquals($horario, new Horario());
+    }
+
+    public function testFilter()
+    {
+        $old_horario = new Horario([
+            'id' => 1234,
+            'inicio' => 1234,
+            'fim' => 1234,
+            'tempoentrega' => 1234,
+        ]);
+        $horario = new Horario([
+            'id' => 321,
+            'inicio' => '1.234',
+            'fim' => '1.234',
+            'tempoentrega' => '1.234',
+        ]);
+        $horario->filter($old_horario);
+        $this->assertEquals($old_horario, $horario);
+    }
+
     public function testPublish()
     {
         $horario = new Horario();
@@ -37,5 +70,76 @@ class HorarioTest extends \PHPUnit_Framework_TestCase
             'tempoentrega',
         ];
         $this->assertEquals($allowed, array_keys($values));
+    }
+
+    public function testInsert()
+    {
+        $horario = new Horario();
+        try {
+            $horario->insert();
+            $this->fail('Não deveria ter cadastrado o horário');
+        } catch (\MZ\Exception\ValidationException $e) {
+            $this->assertEquals(
+                [
+                    'inicio',
+                    'fim',
+                ],
+                array_keys($e->getErrors())
+            );
+        }
+        $horario->setInicio(123);
+        $horario->setFim(123);
+        $horario->insert();
+    }
+
+    public function testUpdate()
+    {
+        $horario = new Horario();
+        $horario->setInicio(123);
+        $horario->setFim(123);
+        $horario->insert();
+        $horario->setInicio(456);
+        $horario->setFim(456);
+        $horario->setTempoEntrega(456);
+        $horario->update();
+        $found_horario = Horario::findByID($horario->getID());
+        $this->assertEquals($horario, $found_horario);
+    }
+
+    public function testDelete()
+    {
+        $horario = new Horario();
+        $horario->setInicio(123);
+        $horario->setFim(123);
+        $horario->insert();
+        $horario->delete();
+        $found_horario = Horario::findByID($horario->getID());
+        $this->assertEquals(new Horario(), $found_horario);
+        $horario->setID('');
+        $this->setExpectedException('\Exception');
+        $horario->delete();
+    }
+
+    public function testFind()
+    {
+        $horario = new Horario();
+        $horario->setInicio(123654);
+        $horario->setFim(123656);
+        $horario->insert();
+        $found_horario = Horario::findByID($horario->getID());
+        $this->assertEquals($horario, $found_horario);
+        $found_horario->loadByID($horario->getID());
+        $this->assertEquals($horario, $found_horario);
+
+        $horario_sec = new Horario();
+        $horario_sec->setInicio(123654);
+        $horario_sec->setFim(123656);
+        $horario_sec->insert();
+
+        $horarios = Horario::findAll(['inicio' => 123654], [], 2, 0);
+        $this->assertEquals([$horario, $horario_sec], $horarios);
+
+        $count = Horario::count(['inicio' => 123654]);
+        $this->assertEquals(2, $count);
     }
 }

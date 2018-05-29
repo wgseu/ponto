@@ -22,26 +22,29 @@
  *
  * @author Equipe GrandChef <desenvolvimento@mzsw.com.br>
  */
-namespace MZ\Employee;
+namespace MZ\Util;
 
-class FuncionarioTest extends \PHPUnit_Framework_TestCase
+use MZ\Account\Cliente;
+
+/**
+ * Filter values to secure save on database
+ */
+class Gender
 {
-    public function testPublish()
+    /**
+     * Detect gender from name
+     * @param  string $name nome of person
+     * @return string gender identifier
+     */
+    public static function detect($name)
     {
-        $funcionario = new Funcionario();
-        $values = $funcionario->publish();
-        $allowed = [
-            'id',
-            'funcaoid',
-            'clienteid',
-            'codigobarras',
-            'porcentagem',
-            'linguagemid',
-            'pontuacao',
-            'ativo',
-            'datasaida',
-            'datacadastro',
-        ];
-        $this->assertEquals($allowed, array_keys($values));
+        if (\preg_match('/(?:a|ne|mem|lem|de|te|ly|ny|lu|eth|en)$/i', $name)) {
+            return Cliente::GENERO_FEMININO;
+        }
+        if (\preg_match('/(?:o|os|on|me|ur|el|us|x)$/i', $name)) {
+            return Cliente::GENERO_MASCULINO;
+        }
+        # não detectado
+        return Cliente::GENERO_MASCULINO;
     }
 }

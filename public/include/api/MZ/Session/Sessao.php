@@ -248,6 +248,10 @@ class Sessao extends Model
         } elseif (!$this->exists() && !$this->isAberta()) {
             $errors['aberta'] = 'A sessão não pode iniciar fechada';
         }
+        $sessao = self::findByAberta();
+        if ($this->isAberta() && $sessao->exists() && $this->getID() != $sessao->getID()) {
+            $errors['aberta'] = 'Já existe uma sessão aberta';
+        }
         if (!empty($errors)) {
             throw new \MZ\Exception\ValidationException($errors);
         }

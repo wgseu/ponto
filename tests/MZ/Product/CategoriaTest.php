@@ -46,6 +46,29 @@ class CategoriaTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($categoria, $new_categoria);
     }
 
+    public function testFilter()
+    {
+        $old_categoria = new Categoria([
+            'id' => 1234,
+            'categoriaid' => 1234,
+            'descricao' => 'Categoria filter',
+            'servico' => 'Y',
+            'imagem' => "\x5\x0\x3",
+            'dataatualizacao' => '2016-12-23 12:15:00',
+        ]);
+        $categoria = new Categoria([
+            'id' => 321,
+            'categoriaid' => '1.234',
+            'descricao' => ' Categoria <script>filter</script> ',
+            'servico' => 'Y',
+            'imagem' => "\x5\x0\x3",
+            'dataatualizacao' => '2016-12-23 12:15:00',
+        ]);
+        $categoria->filter($old_categoria);
+        $old_categoria->setImagem(true);
+        $this->assertEquals($old_categoria, $categoria);
+    }
+
     public function testPublish()
     {
         $categoria = new Categoria();
@@ -64,6 +87,20 @@ class CategoriaTest extends \PHPUnit_Framework_TestCase
     public function testInsert()
     {
         $categoria = new Categoria();
+        $categoria->setServico(null);
+        try {
+            $categoria->insert();
+            $this->fail('Não deveria ter cadastrado a categoria');
+        } catch (\MZ\Exception\ValidationException $e) {
+            $this->assertEquals(
+                [
+                    'descricao',
+                    'servico',
+                ],
+                array_keys($e->getErrors())
+            );
+        }
+        $categoria->setServico('Y');
         $categoria->setDescricao('Variedades');
         $categoria->insert();
         $found_categoria = Categoria::findByID($categoria->getID());
@@ -98,12 +135,35 @@ class CategoriaTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($categoria, $found_categoria);
     }
 
+    public function testDelete()
+    {
+        $categoria = new Categoria();
+        $categoria->setDescricao('Categoria to delete');
+        $categoria->setServico('Y');
+        $categoria->setDataAtualizacao('2016-12-20 12:15:00');
+        $categoria->insert();
+        $categoria->delete();
+        $found_categoria = Categoria::findByID($categoria->getID());
+        $this->assertEquals(new Categoria(), $found_categoria);
+        $categoria->setID('');
+        $this->setExpectedException('\Exception');
+        $categoria->delete();
+    }
+
     public function testFind()
     {
         $categoria = new Categoria();
-        $categoria->setDescricao('Outras categorias');
+        $categoria->setDescricao('Categoria find');
         $categoria->insert();
-        $found_categoria = Categoria::find(['search' => 'outras']);
+        $found_categoria = Categoria::findByID($categoria->getID());
+        $this->assertEquals($categoria, $found_categoria);
+        $found_categoria->loadByID($categoria->getID());
+        $this->assertEquals($categoria, $found_categoria);
+        $found_categoria = Categoria::findByDescricao($categoria->getDescricao());
+        $this->assertEquals($categoria, $found_categoria);
+        $found_categoria->loadByDescricao($categoria->getDescricao());
+        $this->assertEquals($categoria, $found_categoria);
+        $found_categoria = Categoria::find(['search' => 'find']);
         $this->assertEquals($categoria, $found_categoria);
         $unidade = new Unidade();
         $unidade->setNome('Nome da unidade');
@@ -120,5 +180,17 @@ class CategoriaTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($categoria, $found_categoria);
         $found_categoria = Categoria::find(['id' => $categoria->getID(), 'disponivel' => 'N']);
         $this->assertEquals(new Categoria(), $found_categoria);
+
+        $categoria_sec = new Categoria();
+        $categoria_sec->setDescricao('Categoria find second');
+        $categoria_sec->setServico('Y');
+        $categoria_sec->setDataAtualizacao('2016-12-25 12:15:00');
+        $categoria_sec->insert();
+
+        $categorias = Categoria::findAll(['search' => 'Categoria find'], [], 2, 0);
+        $this->assertEquals([$categoria, $categoria_sec], $categorias);
+
+        $count = Categoria::count(['search' => 'Categoria find']);
+        $this->assertEquals(2, $count);
     }
 }

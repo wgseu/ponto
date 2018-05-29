@@ -365,8 +365,8 @@ class Order extends Pedido
             $produto_pedido = new ProdutoPedido();
             $produto_pedido->setID($i);
             $produto_pedido->setQuantidade(floatval(Document::childValue($item, 'quantidade')));
-            $produto_pedido->setPreco(floatval(Document::childValue($item, 'vlrUnitBruto')));
-            $produto_pedido->setPrecoVenda(floatval(Document::childValue($item, 'vlrUnitLiq')));
+            $produto_pedido->setPreco(floatval(Document::childValue($item, 'vlrUnitLiq')));
+            $produto_pedido->setPrecoVenda(floatval(Document::childValue($item, 'vlrUnitBruto')));
             $produto_pedido->setDetalhes(Document::childValue($item, 'obsItem', false));
             if (is_null($codigo_pai)) {
                 $produto_id = isset($produtos[$codigo]['id']) ? $produtos[$codigo]['id'] : null;

@@ -26,6 +26,39 @@ namespace MZ\System;
 
 class PaginaTest extends \PHPUnit_Framework_TestCase
 {
+    public function testFromArray()
+    {
+        $old_pagina = new Pagina([
+            'id' => 123,
+            'nome' => Pagina::NOME_SOBRE,
+            'linguagemid' => 123,
+            'conteudo' => 'Página',
+        ]);
+        $pagina = new Pagina();
+        $pagina->fromArray($old_pagina);
+        $this->assertEquals($pagina, $old_pagina);
+        $pagina->fromArray(null);
+        $this->assertEquals($pagina, new Pagina());
+    }
+
+    public function testFilter()
+    {
+        $old_pagina = new Pagina([
+            'id' => 1234,
+            'nome' => Pagina::NOME_SOBRE,
+            'linguagemid' => 1234,
+            'conteudo' => ' Página <script>filter</script> ',
+        ]);
+        $pagina = new Pagina([
+            'id' => 321,
+            'nome' => ' <script>'.Pagina::NOME_SOBRE.'</script> ',
+            'linguagemid' => '1.234',
+            'conteudo' => ' Página <script>filter</script> ',
+        ]);
+        $pagina->filter($old_pagina);
+        $this->assertEquals($old_pagina, $pagina);
+    }
+
     public function testPublish()
     {
         $pagina = new Pagina();
@@ -37,5 +70,80 @@ class PaginaTest extends \PHPUnit_Framework_TestCase
             'conteudo',
         ];
         $this->assertEquals($allowed, array_keys($values));
+    }
+
+    public function testInsert()
+    {
+        $pagina = new Pagina();
+        try {
+            $pagina->insert();
+            $this->fail('Não deveria ter cadastrado a página');
+        } catch (\MZ\Exception\ValidationException $e) {
+            $this->assertEquals(
+                [
+                    'nome',
+                    'linguagemid',
+                ],
+                array_keys($e->getErrors())
+            );
+        }
+        $pagina->setNome(Pagina::NOME_TERMOS);
+        $pagina->setLinguagemID(1046);
+        $pagina->insert();
+    }
+
+    public function testUpdate()
+    {
+        $pagina = new Pagina();
+        $pagina->setNome(Pagina::NOME_PRIVACIDADE);
+        $pagina->setLinguagemID(1033);
+        $pagina->insert();
+        $pagina->setNome(Pagina::NOME_TERMOS);
+        $pagina->setLinguagemID(1034);
+        $pagina->setConteudo('Página updated');
+        $pagina->update();
+        $found_pagina = Pagina::findByID($pagina->getID());
+        $this->assertEquals($pagina, $found_pagina);
+    }
+
+    public function testDelete()
+    {
+        $pagina = new Pagina();
+        $pagina->setNome(Pagina::NOME_PRIVACIDADE);
+        $pagina->setLinguagemID(1046);
+        $pagina->insert();
+        $pagina->delete();
+        $found_pagina = Pagina::findByID($pagina->getID());
+        $this->assertEquals(new Pagina(), $found_pagina);
+        $pagina->setID('');
+        $this->setExpectedException('\Exception');
+        $pagina->delete();
+    }
+
+    public function testFind()
+    {
+        $pagina = new Pagina();
+        $pagina->setNome(Pagina::NOME_PRIVACIDADE);
+        $pagina->setLinguagemID(1046);
+        $pagina->insert();
+        $found_pagina = Pagina::findByID($pagina->getID());
+        $this->assertEquals($pagina, $found_pagina);
+        $found_pagina->loadByID($pagina->getID());
+        $this->assertEquals($pagina, $found_pagina);
+        $found_pagina = Pagina::findByNomeLinguagemID($pagina->getNome(), $pagina->getLinguagemID());
+        $this->assertEquals($pagina, $found_pagina);
+        $found_pagina->loadByNomeLinguagemID($pagina->getNome(), $pagina->getLinguagemID());
+        $this->assertEquals($pagina, $found_pagina);
+
+        $pagina_sec = new Pagina();
+        $pagina_sec->setNome(Pagina::NOME_SOBRE);
+        $pagina_sec->setLinguagemID(1033);
+        $pagina_sec->insert();
+
+        $paginas = Pagina::findAll(['search' => 'r%e'], [], 2, 0);
+        $this->assertEquals([$pagina, $pagina_sec], $paginas);
+
+        $count = Pagina::count(['search' => 'r%e']);
+        $this->assertEquals(2, $count);
     }
 }

@@ -211,7 +211,7 @@ class Operacao extends Model
         $this->setID($original->getID());
         $this->setCodigo(Filter::number($this->getCodigo()));
         $this->setDescricao(Filter::string($this->getDescricao()));
-        $this->setDetalhes(Filter::text($this->getDetalhes()));
+        $this->setDetalhes(Filter::string($this->getDetalhes()));
     }
 
     /**

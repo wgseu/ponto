@@ -26,6 +26,36 @@ namespace MZ\Invoice;
 
 class RegimeTest extends \PHPUnit_Framework_TestCase
 {
+    public function testFromArray()
+    {
+        $old_regime = new Regime([
+            'id' => 123,
+            'codigo' => 123,
+            'descricao' => 'Regime',
+        ]);
+        $regime = new Regime();
+        $regime->fromArray($old_regime);
+        $this->assertEquals($regime, $old_regime);
+        $regime->fromArray(null);
+        $this->assertEquals($regime, new Regime());
+    }
+
+    public function testFilter()
+    {
+        $old_regime = new Regime([
+            'id' => 1234,
+            'codigo' => 1234,
+            'descricao' => 'Regime filter',
+        ]);
+        $regime = new Regime([
+            'id' => 321,
+            'codigo' => '1.234',
+            'descricao' => ' Regime <script>filter</script> ',
+        ]);
+        $regime->filter($old_regime);
+        $this->assertEquals($old_regime, $regime);
+    }
+
     public function testPublish()
     {
         $regime = new Regime();
@@ -36,5 +66,79 @@ class RegimeTest extends \PHPUnit_Framework_TestCase
             'descricao',
         ];
         $this->assertEquals($allowed, array_keys($values));
+    }
+
+    public function testInsert()
+    {
+        $regime = new Regime();
+        try {
+            $regime->insert();
+            $this->fail('Não deveria ter cadastrado o regime');
+        } catch (\MZ\Exception\ValidationException $e) {
+            $this->assertEquals(
+                [
+                    'codigo',
+                    'descricao',
+                ],
+                array_keys($e->getErrors())
+            );
+        }
+        $regime->setCodigo(12345);
+        $regime->setDescricao('Regime to insert');
+        $regime->insert();
+    }
+
+    public function testUpdate()
+    {
+        $regime = new Regime();
+        $regime->setCodigo(123456);
+        $regime->setDescricao('Regime to update');
+        $regime->insert();
+        $regime->setCodigo(456);
+        $regime->setDescricao('Regime updated');
+        $regime->update();
+        $found_regime = Regime::findByID($regime->getID());
+        $this->assertEquals($regime, $found_regime);
+    }
+
+    public function testDelete()
+    {
+        $regime = new Regime();
+        $regime->setCodigo(123123);
+        $regime->setDescricao('Regime to delete');
+        $regime->insert();
+        $regime->delete();
+        $found_regime = Regime::findByID($regime->getID());
+        $this->assertEquals(new Regime(), $found_regime);
+        $regime->setID('');
+        $this->setExpectedException('\Exception');
+        $regime->delete();
+    }
+
+    public function testFind()
+    {
+        $regime = new Regime();
+        $regime->setCodigo(123321);
+        $regime->setDescricao('Regime find');
+        $regime->insert();
+        $found_regime = Regime::findByID($regime->getID());
+        $this->assertEquals($regime, $found_regime);
+        $found_regime->loadByID($regime->getID());
+        $this->assertEquals($regime, $found_regime);
+        $found_regime = Regime::findByCodigo($regime->getCodigo());
+        $this->assertEquals($regime, $found_regime);
+        $found_regime->loadByCodigo($regime->getCodigo());
+        $this->assertEquals($regime, $found_regime);
+
+        $regime_sec = new Regime();
+        $regime_sec->setCodigo(123451);
+        $regime_sec->setDescricao('Regime find second');
+        $regime_sec->insert();
+
+        $regimes = Regime::findAll(['search' => 'Regime find'], [], 2, 0);
+        $this->assertEquals([$regime, $regime_sec], $regimes);
+
+        $count = Regime::count(['search' => 'Regime find']);
+        $this->assertEquals(2, $count);
     }
 }

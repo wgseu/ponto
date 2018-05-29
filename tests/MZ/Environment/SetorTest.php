@@ -26,6 +26,36 @@ namespace MZ\Environment;
 
 class SetorTest extends \PHPUnit_Framework_TestCase
 {
+    public function testFromArray()
+    {
+        $old_setor = new Setor([
+            'id' => 123,
+            'nome' => 'Setor',
+            'descricao' => 'Setor',
+        ]);
+        $setor = new Setor();
+        $setor->fromArray($old_setor);
+        $this->assertEquals($setor, $old_setor);
+        $setor->fromArray(null);
+        $this->assertEquals($setor, new Setor());
+    }
+
+    public function testFilter()
+    {
+        $old_setor = new Setor([
+            'id' => 1234,
+            'nome' => 'Setor filter',
+            'descricao' => 'Setor filter',
+        ]);
+        $setor = new Setor([
+            'id' => 321,
+            'nome' => ' Setor <script>filter</script> ',
+            'descricao' => ' Setor <script>filter</script> ',
+        ]);
+        $setor->filter($old_setor);
+        $this->assertEquals($old_setor, $setor);
+    }
+
     public function testPublish()
     {
         $setor = new Setor();
@@ -36,5 +66,73 @@ class SetorTest extends \PHPUnit_Framework_TestCase
             'descricao',
         ];
         $this->assertEquals($allowed, array_keys($values));
+    }
+
+    public function testInsert()
+    {
+        $setor = new Setor();
+        try {
+            $setor->insert();
+            $this->fail('Não deveria ter cadastrado o setor');
+        } catch (\MZ\Exception\ValidationException $e) {
+            $this->assertEquals(
+                [
+                    'nome',
+                ],
+                array_keys($e->getErrors())
+            );
+        }
+        $setor->setNome('Setor to insert');
+        $setor->insert();
+    }
+
+    public function testUpdate()
+    {
+        $setor = new Setor();
+        $setor->setNome('Setor to update');
+        $setor->insert();
+        $setor->setNome('Setor updated');
+        $setor->setDescricao('Setor updated');
+        $setor->update();
+        $found_setor = Setor::findByID($setor->getID());
+        $this->assertEquals($setor, $found_setor);
+    }
+
+    public function testDelete()
+    {
+        $setor = new Setor();
+        $setor->setNome('Setor to delete');
+        $setor->insert();
+        $setor->delete();
+        $found_setor = Setor::findByID($setor->getID());
+        $this->assertEquals(new Setor(), $found_setor);
+        $setor->setID('');
+        $this->setExpectedException('\Exception');
+        $setor->delete();
+    }
+
+    public function testFind()
+    {
+        $setor = new Setor();
+        $setor->setNome('Setor find');
+        $setor->insert();
+        $found_setor = Setor::findByID($setor->getID());
+        $this->assertEquals($setor, $found_setor);
+        $found_setor->loadByID($setor->getID());
+        $this->assertEquals($setor, $found_setor);
+        $found_setor = Setor::findByNome($setor->getNome());
+        $this->assertEquals($setor, $found_setor);
+        $found_setor->loadByNome($setor->getNome());
+        $this->assertEquals($setor, $found_setor);
+
+        $setor_sec = new Setor();
+        $setor_sec->setNome('Setor find second');
+        $setor_sec->insert();
+
+        $setores = Setor::findAll(['search' => 'Setor find'], [], 2, 0);
+        $this->assertEquals([$setor, $setor_sec], $setores);
+
+        $count = Setor::count(['search' => 'Setor find']);
+        $this->assertEquals(2, $count);
     }
 }

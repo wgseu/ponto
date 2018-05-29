@@ -26,6 +26,36 @@ namespace MZ\Invoice;
 
 class OrigemTest extends \PHPUnit_Framework_TestCase
 {
+    public function testFromArray()
+    {
+        $old_origem = new Origem([
+            'id' => 123,
+            'codigo' => 123,
+            'descricao' => 'Origem',
+        ]);
+        $origem = new Origem();
+        $origem->fromArray($old_origem);
+        $this->assertEquals($origem, $old_origem);
+        $origem->fromArray(null);
+        $this->assertEquals($origem, new Origem());
+    }
+
+    public function testFilter()
+    {
+        $old_origem = new Origem([
+            'id' => 1234,
+            'codigo' => 1234,
+            'descricao' => 'Origem filter',
+        ]);
+        $origem = new Origem([
+            'id' => 321,
+            'codigo' => '1.234',
+            'descricao' => ' Origem <script>filter</script> ',
+        ]);
+        $origem->filter($old_origem);
+        $this->assertEquals($old_origem, $origem);
+    }
+
     public function testPublish()
     {
         $origem = new Origem();
@@ -36,5 +66,79 @@ class OrigemTest extends \PHPUnit_Framework_TestCase
             'descricao',
         ];
         $this->assertEquals($allowed, array_keys($values));
+    }
+
+    public function testInsert()
+    {
+        $origem = new Origem();
+        try {
+            $origem->insert();
+            $this->fail('Não deveria ter cadastrado a origem');
+        } catch (\MZ\Exception\ValidationException $e) {
+            $this->assertEquals(
+                [
+                    'codigo',
+                    'descricao',
+                ],
+                array_keys($e->getErrors())
+            );
+        }
+        $origem->setCodigo(123);
+        $origem->setDescricao('Origem to insert');
+        $origem->insert();
+    }
+
+    public function testUpdate()
+    {
+        $origem = new Origem();
+        $origem->setCodigo(1234);
+        $origem->setDescricao('Origem to update');
+        $origem->insert();
+        $origem->setCodigo(456);
+        $origem->setDescricao('Origem updated');
+        $origem->update();
+        $found_origem = Origem::findByID($origem->getID());
+        $this->assertEquals($origem, $found_origem);
+    }
+
+    public function testDelete()
+    {
+        $origem = new Origem();
+        $origem->setCodigo(12345);
+        $origem->setDescricao('Origem to delete');
+        $origem->insert();
+        $origem->delete();
+        $found_origem = Origem::findByID($origem->getID());
+        $this->assertEquals(new Origem(), $found_origem);
+        $origem->setID('');
+        $this->setExpectedException('\Exception');
+        $origem->delete();
+    }
+
+    public function testFind()
+    {
+        $origem = new Origem();
+        $origem->setCodigo(123456);
+        $origem->setDescricao('Origem find');
+        $origem->insert();
+        $found_origem = Origem::findByID($origem->getID());
+        $this->assertEquals($origem, $found_origem);
+        $found_origem->loadByID($origem->getID());
+        $this->assertEquals($origem, $found_origem);
+        $found_origem = Origem::findByCodigo($origem->getCodigo());
+        $this->assertEquals($origem, $found_origem);
+        $found_origem->loadByCodigo($origem->getCodigo());
+        $this->assertEquals($origem, $found_origem);
+
+        $origem_sec = new Origem();
+        $origem_sec->setCodigo(123654);
+        $origem_sec->setDescricao('Origem find second');
+        $origem_sec->insert();
+
+        $origens = Origem::findAll(['search' => 'Origem find'], [], 2, 0);
+        $this->assertEquals([$origem, $origem_sec], $origens);
+
+        $count = Origem::count(['search' => 'Origem find']);
+        $this->assertEquals(2, $count);
     }
 }

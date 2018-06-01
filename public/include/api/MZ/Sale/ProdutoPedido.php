@@ -681,7 +681,7 @@ class ProdutoPedido extends Model
             $this->setQuantidade($produto_pedido['quantidade']);
         }
         if (!isset($produto_pedido['porcentagem'])) {
-            $this->setPorcentagem(null);
+            $this->setPorcentagem(0);
         } else {
             $this->setPorcentagem($produto_pedido['porcentagem']);
         }
@@ -691,7 +691,7 @@ class ProdutoPedido extends Model
             $this->setPrecoVenda($produto_pedido['precovenda']);
         }
         if (!isset($produto_pedido['precocompra'])) {
-            $this->setPrecoCompra(null);
+            $this->setPrecoCompra(0);
         } else {
             $this->setPrecoCompra($produto_pedido['precocompra']);
         }
@@ -701,7 +701,7 @@ class ProdutoPedido extends Model
             $this->setDetalhes($produto_pedido['detalhes']);
         }
         if (!isset($produto_pedido['estado'])) {
-            $this->setEstado(null);
+            $this->setEstado(self::ESTADO_ADICIONADO);
         } else {
             $this->setEstado($produto_pedido['estado']);
         }
@@ -1021,6 +1021,9 @@ class ProdutoPedido extends Model
                     $composicoes[$formacao->getComposicaoID()] = $formacao->getID();
                 }
             }
+            if (is_null($this->getProdutoID())) {
+                return $this;
+            }
             $estoque = new Estoque();
             $estoque->setTransacaoID($this->getID());
             $estoque->setProdutoID($this->getProdutoID());
@@ -1320,17 +1323,6 @@ class ProdutoPedido extends Model
         $query = self::query($condition, $order, $select, $group)->limit(1);
         $row = $query->fetch() ?: [];
         return new ProdutoPedido($row);
-    }
-
-    /**
-     * Find this object on database using, ID
-     * @param  int $id id to find Item do pedido
-     * @return ProdutoPedido A filled instance or empty when not found
-     */
-    public static function findByID($id)
-    {
-        $result = new self();
-        return $result->loadByID($id);
     }
 
     /**

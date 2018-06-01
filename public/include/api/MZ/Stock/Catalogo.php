@@ -581,17 +581,6 @@ class Catalogo extends Model
     }
 
     /**
-     * Find this object on database using, ID
-     * @param  int $id id to find Catálogo de produtos
-     * @return Catalogo A filled instance or empty when not found
-     */
-    public static function findByID($id)
-    {
-        $result = new self();
-        return $result->loadByID($id);
-    }
-
-    /**
      * Find all Catálogo de produtos
      * @param  array  $condition Condition to get all Catálogo de produtos
      * @param  array  $order     Order Catálogo de produtos

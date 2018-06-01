@@ -123,6 +123,9 @@ class ImpostoTest extends \PHPUnit_Framework_TestCase
         $imposto->update();
         $found_imposto = Imposto::findByID($imposto->getID());
         $this->assertEquals($imposto, $found_imposto);
+        $imposto->setID('');
+        $this->setExpectedException('\Exception');
+        $imposto->update();
     }
 
     public function testDelete()
@@ -135,6 +138,7 @@ class ImpostoTest extends \PHPUnit_Framework_TestCase
         $imposto->setDescricao('Imposto to delete');
         $imposto->insert();
         $imposto->delete();
+        $imposto->clean(new Imposto());
         $found_imposto = Imposto::findByID($imposto->getID());
         $this->assertEquals(new Imposto(), $found_imposto);
         $imposto->setID('');
@@ -151,6 +155,8 @@ class ImpostoTest extends \PHPUnit_Framework_TestCase
         $imposto->setCodigo(123456);
         $imposto->setDescricao('Imposto find');
         $imposto->insert();
+        $found_imposto = Imposto::find(['id' => $imposto->getID()]);
+        $this->assertEquals($imposto, $found_imposto);
         $found_imposto = Imposto::findByID($imposto->getID());
         $this->assertEquals($imposto, $found_imposto);
         $found_imposto->loadByID($imposto->getID());

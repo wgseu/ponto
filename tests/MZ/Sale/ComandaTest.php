@@ -101,6 +101,9 @@ class ComandaTest extends \PHPUnit_Framework_TestCase
         $comanda->update();
         $found_comanda = Comanda::findByID($comanda->getID());
         $this->assertEquals($comanda, $found_comanda);
+        $comanda->setID('');
+        $this->setExpectedException('\Exception');
+        $comanda->update();
     }
 
     public function testDelete()
@@ -110,6 +113,7 @@ class ComandaTest extends \PHPUnit_Framework_TestCase
         $comanda->setAtiva('Y');
         $comanda->insert();
         $comanda->delete();
+        $comanda->clean(new Comanda());
         $found_comanda = Comanda::findByID($comanda->getID());
         $this->assertEquals(new Comanda(), $found_comanda);
         $comanda->setID('');
@@ -123,6 +127,8 @@ class ComandaTest extends \PHPUnit_Framework_TestCase
         $comanda->setNome('Comanda find');
         $comanda->setAtiva('Y');
         $comanda->insert();
+        $found_comanda = Comanda::find(['id' => $comanda->getID()]);
+        $this->assertEquals($comanda, $found_comanda);
         $found_comanda = Comanda::findByID($comanda->getID());
         $this->assertEquals($comanda, $found_comanda);
         $found_comanda->loadByID($comanda->getID());

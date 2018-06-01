@@ -143,6 +143,7 @@ class CategoriaTest extends \PHPUnit_Framework_TestCase
         $categoria->setDataAtualizacao('2016-12-20 12:15:00');
         $categoria->insert();
         $categoria->delete();
+        $categoria->clean(new Categoria());
         $found_categoria = Categoria::findByID($categoria->getID());
         $this->assertEquals(new Categoria(), $found_categoria);
         $categoria->setID('');

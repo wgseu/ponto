@@ -46,11 +46,14 @@ use MZ\Sale\Formacao;
 use MZ\Product\Servico;
 use MZ\Product\Produto;
 use MZ\Session\Sessao;
+use MZ\Session\Movimentacao;
 use MZ\System\Synchronizer;
 use MZ\Exception\RedirectException;
 
 class Order extends Pedido
 {
+    const ESTADO_CANCELADO = 'Cancelado';
+
     /**
      * Integration
      */
@@ -151,7 +154,7 @@ class Order extends Pedido
         // $obs = str_replace("\r", '', str_replace("\n", ', ', trim($obs)));
         $this->setDescricao($obs);
         $data_criacao = Document::childValue($body_pedido, 'dataPedidoComanda');
-        $this->setDataCriacao(DB::now($data_criacao));
+        $this->setDataCriacao(Filter::datetime($data_criacao));
         $this->setTipo(self::TIPO_ENTREGA);
         $this->setEstado(self::ESTADO_AGENDADO);
         $this->setPessoas(1);
@@ -252,7 +255,10 @@ class Order extends Pedido
                     $forma_pagto = FormaPagto::find(['tipo' => $tipo_pagto, 'ativa' => 'Y']);
                     if (!$forma_pagto->exists()) {
                         throw new RedirectException(
-                            sprintf('Não existe forma de pagamento em %s ativa', FormaPagto::getTipoOptions($tipo_pagto)),
+                            sprintf(
+                                'Não existe forma de pagamento em %s ativa',
+                                FormaPagto::getTipoOptions($tipo_pagto)
+                            ),
                             500,
                             'grandchef://cartao'
                         );
@@ -287,7 +293,10 @@ class Order extends Pedido
                         $cartao = $pagamento->findCartaoID();
                         if (!$cartao->exists()) {
                             throw new RedirectException(
-                                sprintf('A associação do cartão "%s" está inválida', $this->card_names[$cod_tipo_pagto]['name']),
+                                sprintf(
+                                    'A associação do cartão "%s" está inválida',
+                                    $this->card_names[$cod_tipo_pagto]['name']
+                                ),
                                 500,
                                 $app->makeURL('/gerenciar/cartao/' . $this->integracao->getAcessoURL())
                             );
@@ -300,9 +309,11 @@ class Order extends Pedido
                             $cartao->getTransacao()
                         );
                         if ($pagamento->getTotal() > 0) {
-                            $pagamento->setCarteiraID($cartao->getCarteiraID() ?: $forma_pagto->getCarteiraID());
+                            $pagamento->setCarteiraID($cartao->getCarteiraID() ?:
+                                $forma_pagto->getCarteiraID());
                         } else {
-                            $pagamento->setCarteiraID($cartao->getCarteiraPagtoID() ?: $forma_pagto->getCarteiraPagtoID());
+                            $pagamento->setCarteiraID($cartao->getCarteiraPagtoID() ?:
+                                $forma_pagto->getCarteiraPagtoID());
                         }
                         if ($debito) {
                             $pagamento->setDetalhes('Cartão de débito');
@@ -463,6 +474,12 @@ class Order extends Pedido
 
     public function loadData($data)
     {
+        $this->payments = [];
+        $this->localization = null;
+        $this->district = null;
+        $this->city = null;
+        $this->state = null;
+        $this->country = null;
         $_pedidos = isset($data['pedidos']) ? $data['pedidos'] : [];
         $this->setTipo(self::TIPO_MESA);
         if (isset($data['tipo'])) {
@@ -559,6 +576,115 @@ class Order extends Pedido
         }
     }
 
+    private function registerAddress()
+    {
+        $this->country->loadByCodigo();
+        $this->state->setPaisID($this->country->getID());
+        $this->state->loadByPaisIDUF();
+        if (!$this->state->exists()) {
+            throw new \Exception(sprintf('O estado de UF "%s" não existe', $this->state->getUF()), 401);
+        }
+        $this->city->setEstadoID($this->state->getID());
+        $find_city = new Cidade($this->city);
+        $find_city->loadByEstadoIDNome();
+        if (!$find_city->exists()) {
+            $this->city->filter(new Cidade());
+            $this->city->insert();
+        } else {
+            $this->city->fromArray($find_city->toArray());
+        }
+        $this->district->setCidadeID($this->city->getID());
+        $find_district = new Bairro($this->district);
+        $find_district->loadByCidadeIDNome();
+        if (!$find_district->exists()) {
+            foreach ($this->products as $item_info) {
+                $produto_pedido = $item_info['produto'];
+                if ($produto_pedido->getServicoID() == Servico::ENTREGA_ID) {
+                    $this->district->setValorEntrega($produto_pedido->getSubtotal());
+                    break;
+                }
+            }
+            $this->district->setDisponivel('Y');
+            $this->district->filter(new Bairro());
+            $this->district->insert();
+        } else {
+            $this->district->fromArray($find_district->toArray());
+        }
+        $this->localization->setClienteID($this->getClienteID());
+        $find_localization = new Localizacao($this->localization);
+        $find_localization->loadByCEP();
+        if (!$find_localization->isSame($this->localization)) {
+            $find_localization->fromArray($this->localization->toArray());
+            $find_localization->loadByClienteID();
+        }
+        if ($find_localization->isSame($this->localization)) {
+            $this->localization->fromArray($find_localization->toArray());
+            return $this;
+        }
+        $this->localization->setBairroID($this->district->getID());
+        $this->localization->insert();
+    }
+
+    private function insertProducts()
+    {
+        $added = 0;
+        $comissao_balcao = is_boolean_config('Vendas', 'Balcao.Comissao');
+        $pacote_pedido = new ProdutoPedido();
+        foreach ($this->products as $index => $item_info) {
+            $produto_pedido = $item_info['produto'];
+            $produto_pedido->setPedidoID($this->getID());
+            $produto_pedido->setFuncionarioID($this->employee->getID());
+            $produto_pedido->setPrecoCompra(0);
+            $produto = $produto_pedido->findProdutoID();
+            if ($produto->exists()) {
+                if ($produto->isCobrarServico() &&
+                    (
+                        in_array($this->getTipo(), [self::TIPO_MESA, self::TIPO_COMANDA]) ||
+                        ($comissao_balcao && $this->getTipo() == self::TIPO_AVULSO)
+                    )
+                ) {
+                    $produto_pedido->setPorcentagem($this->employee->getPorcentagem());
+                }
+                if (!is_null($produto_pedido->getProdutoPedidoID())) {
+                    // TODO atribuir preço e verificar preços das composições
+                    $produto_pedido->setProdutoPedidoID($pacote_pedido->getID());
+                } elseif ($produto->getTipo() != Produto::TIPO_PACOTE) {
+                    $produto_pedido->setPreco($produto->getPrecoVenda());
+                    $produto_pedido->setPrecoVenda($produto->getPrecoVenda());
+                    $pacote_pedido = new ProdutoPedido();
+                } else {
+                    // TODO atribuir preço padrão e verificar preços das propriedades
+                }
+                if (!is_null($produto->getCustoProducao())) {
+                    $produto_pedido->setPrecoCompra($produto->getCustoProducao());
+                }
+            }
+            if (is_null($produto_pedido->getPorcentagem())) {
+                $produto_pedido->setPorcentagem(0);
+            }
+            $produto_pedido->setEstado(ProdutoPedido::ESTADO_ADICIONADO);
+            $produto_pedido->setCancelado('N');
+            $produto_pedido->setVisualizado('N');
+            $this->checkSaldo($produto_pedido->getTotal());
+            $save_item = new ProdutoPedido($produto_pedido);
+            $produto_pedido->filter(new ProdutoPedido()); // limpa o ID
+
+            // corrige a aplicação de filtro acima
+            $produto_pedido->setPreco(floatval($save_item->getPreco()));
+            $produto_pedido->setQuantidade(floatval($save_item->getQuantidade()));
+            $produto_pedido->setPorcentagem(floatval($save_item->getPorcentagem()));
+            $produto_pedido->setPrecoVenda(floatval($save_item->getPrecoVenda()));
+            $produto_pedido->setPrecoCompra(floatval($save_item->getPrecoCompra()));
+
+            $produto_pedido->register($item_info['formacoes']);
+            if ($produto->exists() && $produto->getTipo() == Produto::TIPO_PACOTE) {
+                $pacote_pedido = $produto_pedido;
+            }
+            $added++;
+        }
+        return $added;
+    }
+
     public function process($synchronize = true)
     {
         $action = Synchronizer::ACTION_ADDED;
@@ -568,8 +694,14 @@ class Order extends Pedido
             if (!$this->exists()) {
                 $sessao = Sessao::findByAberta(true);
                 $this->setSessaoID($sessao->getID());
+                if ($this->needMovimentacao()) {
+                    // venda balcão e delivery precisa informar o caixa
+                    $movimentacao = Movimentacao::findByAberta($this->employee->getID());
+                    $this->setMovimentacaoID($movimentacao->getID());
+                }
             }
             if (!is_null($this->customer) && !$this->customer->exists()) {
+                // todo cliente precisa de uma senha, gera uma aleatória
                 $this->customer->setSenha(Generator::token().'a123Z');
                 $this->customer->filter(new Cliente());
                 $this->customer->insert();
@@ -584,54 +716,19 @@ class Order extends Pedido
                 $this->insert();
                 $action = Synchronizer::ACTION_OPEN;
             }
-            $added = 0;
-            $pacote_pedido = new ProdutoPedido();
-            foreach ($this->products as $index => $item_info) {
-                $produto_pedido = $item_info['produto'];
-                $produto_pedido->setPedidoID($this->getID());
-                $produto_pedido->setFuncionarioID($this->employee->getID());
-                $produto_pedido->setPrecoCompra(0);
-                $produto = $produto_pedido->findProdutoID();
-                if ($produto->exists()) {
-                    if ($produto->isCobrarServico()) {
-                        $produto_pedido->setPorcentagem($this->employee->getPorcentagem());
-                    }
-                    if (!is_null($produto_pedido->getProdutoPedidoID())) {
-                        // TODO atribuir preço e verificar preços das composições
-                        $produto_pedido->setProdutoPedidoID($pacote_pedido->getID());
-                    } elseif ($produto->getTipo() != Produto::TIPO_PACOTE) {
-                        $produto_pedido->setPreco($produto->getPrecoVenda());
-                        $produto_pedido->setPrecoVenda($produto->getPrecoVenda());
-                        $pacote_pedido = new ProdutoPedido();
-                    } else {
-                        // TODO atribuir preço padrão e verificar preços das propriedades
-                    }
-                    if (!is_null($produto->getCustoProducao())) {
-                        $produto_pedido->setPrecoCompra($produto->getCustoProducao());
-                    }
+            $viagem = !$this->getLocalizacaoID();
+            if (!is_null($this->localization) && !is_null($this->getClienteID())) {
+                $this->registerAddress();
+                $this->setLocalizacaoID($viagem ? null : $this->localization->getID());
+            }
+            $added = $this->insertProducts();
+            if (!$viagem) {
+                foreach ($this->payments as $index => $pagamento) {
+                    $pagamento->setPedidoID($this->getID());
+                    $pagamento->setFuncionarioID($this->employee->getID());
+                    $pagamento->setMovimentacaoID($this->getMovimentacaoID());
+                    $pagamento->insert();
                 }
-                if (is_null($produto_pedido->getPorcentagem())) {
-                    $produto_pedido->setPorcentagem(0);
-                }
-                $produto_pedido->setEstado(ProdutoPedido::ESTADO_ADICIONADO);
-                $produto_pedido->setCancelado('N');
-                $produto_pedido->setVisualizado('N');
-                $this->checkSaldo($produto_pedido->getTotal());
-                $save_item = new ProdutoPedido($produto_pedido);
-                $produto_pedido->filter(new ProdutoPedido()); // limpa o ID
-
-                // corrige a aplicação de filtro acima
-                $produto_pedido->setPreco(floatval($save_item->getPreco()));
-                $produto_pedido->setQuantidade(floatval($save_item->getQuantidade()));
-                $produto_pedido->setPorcentagem(floatval($save_item->getPorcentagem()));
-                $produto_pedido->setPrecoVenda(floatval($save_item->getPrecoVenda()));
-                $produto_pedido->setPrecoCompra(floatval($save_item->getPrecoCompra()));
-
-                $produto_pedido->register($item_info['formacoes']);
-                if ($produto->exists() && $produto->getTipo() == Produto::TIPO_PACOTE) {
-                    $pacote_pedido = $produto_pedido;
-                }
-                $added++;
             }
             if ($added > 0 && $action != Synchronizer::ACTION_OPEN && $this->getEstado() != self::ESTADO_ATIVO) {
                 $action = Synchronizer::ACTION_STATE;
@@ -668,7 +765,9 @@ class Order extends Pedido
                         $this->getComandaID(),
                         Synchronizer::ACTION_ADDED
                     );
-                    $sync->printServices($this->getID());
+                    if (!$this->needMovimentacao()) {
+                        $sync->printServices($this->getID());
+                    }
                 }
             }
             DB::commit();
@@ -679,22 +778,80 @@ class Order extends Pedido
         return $action;
     }
 
+    /**
+     * Store integrated order for post sync status
+     * @return array changes to submit to the web API
+     */
     public function store()
     {
+        $change = ['id' => $this->getID(), 'code' => $this->code, 'estado' => $this->getEstado()];
+        $dados = $this->integracao->read() ?: [];
+        $pedidos = isset($dados['pedidos']) ? $dados['pedidos']: [];
+        $pedidos[$this->getID()] = $change;
+        $dados['pedidos'] = $pedidos;
+        $this->integracao->write($dados);
+        return [$change];
+    }
+
+    /**
+     * Retrive orders changes to submit to web API
+     * @param int $limit limit to get first changes
+     * @return array changes to submit to the web API
+     */
+    public function changes($limit = null)
+    {
+        $dados = $this->integracao->read() ?: [];
+        $pedidos = isset($dados['pedidos']) ? $dados['pedidos']: [];
         $changes = [];
-        //TODO
-        $changes[] = ['code' => 2981, 'estado' => Pedido::ESTADO_AGENDADO];
+        foreach ($pedidos as $pedido_id => $change) {
+            $pedido = self::findByID($pedido_id);
+            if (!$pedido->exists()) {
+                continue;
+            }
+            if ($pedido->isCancelado()) {
+                $change['estado'] = self::ESTADO_CANCELADO;
+                $changes[] = $change;
+            } elseif ($pedido->getEstado() != $change['estado']) {
+                $change['estado'] = $pedido->getEstado();
+                $changes[] = $change;
+            }
+            if (count($changes) >= $limit) {
+                break;
+            }
+        }
         return $changes;
     }
 
-    public function changes($limit = null)
-    {
-        //TODO
-    }
-
+    /**
+     * Apply submited changes to web API to local storage
+     * @param array $updates list of changes to apply
+     * @return boolean true when any changes was applied
+     */
     public function apply($updates)
     {
-        //TODO
-        return count($updates) > 0;
+        $changes = 0;
+        $dados = $this->integracao->read() ?: [];
+        $pedidos = isset($dados['pedidos']) ? $dados['pedidos']: [];
+        foreach ($updates as $update) {
+            if (!isset($pedidos[$update['id']])) {
+                continue;
+            }
+            $change = $pedidos[$update['id']];
+            if ($update['estado'] == self::ESTADO_FINALIZADO ||
+                $update['estado'] == self::ESTADO_CANCELADO
+            ) {
+                unset($pedidos[$update['id']]);
+                $changes++;
+                continue;
+            }
+            $change['estado'] = $update['estado'];
+            $pedidos[$update['id']] = $change;
+            $changes++;
+        }
+        if ($changes > 0) {
+            $dados['pedidos'] = $pedidos;
+            $this->integracao->write($dados);
+        }
+        return $changes;
     }
 }

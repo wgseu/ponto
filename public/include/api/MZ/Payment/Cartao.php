@@ -676,17 +676,6 @@ class Cartao extends Model
     }
 
     /**
-     * Find this object on database using, ID
-     * @param  int $id id to find Cartão
-     * @return Cartao A filled instance or empty when not found
-     */
-    public static function findByID($id)
-    {
-        $result = new self();
-        return $result->loadByID($id);
-    }
-
-    /**
      * Find this object on database using, Descricao
      * @param  string $descricao descrição to find Cartão
      * @return Cartao A filled instance or empty when not found

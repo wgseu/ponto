@@ -568,6 +568,37 @@ class Localizacao extends Model
     }
 
     /**
+     * Check if this address are the same as informed
+     * @param Localizacao $localizacao address to check
+     * @return boolean true if address are the same
+     */
+    public function isSame($localizacao)
+    {
+        if ($this->getBairroID() == $localizacao->getBairroID()) {
+            return false;
+        }
+        if (mb_strtolower($this->getLogradouro()) != mb_strtolower($localizacao->getLogradouro())) {
+            return false;
+        }
+        if (mb_strtolower($this->getNumero()) != mb_strtolower($localizacao->getNumero())) {
+            return false;
+        }
+        if ($this->getTipo() != $localizacao->getTipo() || $this->getTipo() == self::TIPO_CASA) {
+            return true;
+        }
+        if (mb_strtolower($this->getCondominio()) != mb_strtolower($localizacao->getCondominio())) {
+            return false;
+        }
+        if (mb_strtolower($this->getBloco()) != mb_strtolower($localizacao->getBloco())) {
+            return false;
+        }
+        if (mb_strtolower($this->getApartamento()) != mb_strtolower($localizacao->getApartamento())) {
+            return false;
+        }
+        return true;
+    }
+
+    /**
      * Convert this instance into array associated key -> value with only public fields
      * @return array All public field and values into array format
      */
@@ -675,6 +706,136 @@ class Localizacao extends Model
     }
 
     /**
+     * Insert a new Localização into the database and fill instance from database
+     * @return Localizacao Self instance
+     */
+    public function insert()
+    {
+        $this->setID(null);
+        $values = $this->validate();
+        unset($values['id']);
+        try {
+            $id = DB::insertInto('Localizacoes')->values($values)->execute();
+            $this->loadByID($id);
+        } catch (\Exception $e) {
+            throw $this->translate($e);
+        }
+        return $this;
+    }
+
+    /**
+     * Update Localização with instance values into database for ID
+     * @param  array $only Save these fields only, when empty save all fields except id
+     * @param  boolean $except When true, saves all fields except $only
+     * @return Localizacao Self instance
+     */
+    public function update($only = [], $except = false)
+    {
+        $values = $this->validate();
+        if (!$this->exists()) {
+            throw new \Exception('O identificador da localização não foi informado');
+        }
+        $values = DB::filterValues($values, $only, $except);
+        try {
+            DB::update('Localizacoes')
+                ->set($values)
+                ->where('id', $this->getID())
+                ->execute();
+            $this->loadByID($this->getID());
+        } catch (\Exception $e) {
+            throw $this->translate($e);
+        }
+        return $this;
+    }
+
+    /**
+     * Delete this instance from database using ID
+     * @return integer Number of rows deleted (Max 1)
+     */
+    public function delete()
+    {
+        if (!$this->exists()) {
+            throw new \Exception('O identificador da localização não foi informado');
+        }
+        $result = DB::deleteFrom('Localizacoes')
+            ->where('id', $this->getID())
+            ->execute();
+        return $result;
+    }
+
+    /**
+     * Load one register for it self with a condition
+     * @param  array $condition Condition for searching the row
+     * @param  array $order associative field name -> [-1, 1]
+     * @return Localizacao Self instance filled or empty
+     */
+    public function load($condition, $order = [])
+    {
+        $query = self::query($condition, $order)->limit(1);
+        $row = $query->fetch() ?: [];
+        return $this->fromArray($row);
+    }
+
+    /**
+     * Load into this object from database using, ClienteID, Apelido
+     * @param  int $cliente_id cliente to find Localização
+     * @param  string $apelido apelido to find Localização
+     * @return Localizacao Self filled instance or empty when not found
+     */
+    public function loadByClienteIDApelido($cliente_id, $apelido)
+    {
+        return $this->load([
+            'clienteid' => intval($cliente_id),
+            'apelido' => strval($apelido),
+        ]);
+    }
+
+    /**
+     * Search from database customer localization from CEP
+     * @return Localizacao Self filled instance or empty when not found
+     */
+    public function loadByCEP()
+    {
+        return $this->load([
+            'cep' => strval($this->getCEP()),
+            'clienteid' => $this->getClienteID(),
+        ]);
+    }
+
+    /**
+     * Load first address from customer with preferred number
+     * @return Localizacao Self filled instance or empty when not found
+     */
+    public function loadByClienteID()
+    {
+        return $this->load(
+            ['clienteid' => $this->getClienteID()],
+            [
+                'mostrar' => 1,
+                'numero' => [-1 => $this->getNumero()]
+            ]
+        );
+    }
+
+    /**
+     * Cliente a qual esse endereço pertence
+     * @return \ZCliente The object fetched from database
+     */
+    public function findClienteID()
+    {
+        return \Cliente::findByID($this->getClienteID());
+    }
+
+    /**
+     * Bairro do endereço
+     * @return \MZ\Location\Bairro The object fetched from database
+     */
+    public function findBairroID()
+    {
+        return \MZ\Location\Bairro::findByID($this->getBairroID());
+    }
+
+    /**
      * Gets textual and translated Tipo for Localizacao
      * @param  int $index choose option from index
      * @return mixed A associative key -> translated representative text or text for index
@@ -689,29 +850,6 @@ class Localizacao extends Model
             return $options[$index];
         }
         return $options;
-    }
-
-    /**
-     * Find this object on database using, ID
-     * @param  int $id id to find Localização
-     * @return Localizacao A filled instance or empty when not found
-     */
-    public static function findByID($id)
-    {
-        $result = new self();
-        return $result->loadByID($id);
-    }
-
-    /**
-     * Find this object on database using, ClienteID, Apelido
-     * @param  int $cliente_id cliente to find Localização
-     * @param  string $apelido apelido to find Localização
-     * @return Localizacao A filled instance or empty when not found
-     */
-    public static function findByClienteIDApelido($cliente_id, $apelido)
-    {
-        $result = new self();
-        return $result->loadByClienteIDApelido($cliente_id, $apelido);
     }
 
     /**
@@ -734,6 +872,12 @@ class Localizacao extends Model
     private static function filterOrder($order)
     {
         $allowed = self::getAllowedKeys();
+        $order = Filter::order($order);
+        if (isset($order['numero']) && is_array($order['numero'])) {
+            $field = '(l.numero = ?)';
+            $order = replace_key($order, 'numero', $field);
+            $allowed[$field] = true;
+        }
         return Filter::orderBy($order, $allowed, ['l.', 'b.']);
     }
 
@@ -828,88 +972,15 @@ class Localizacao extends Model
     }
 
     /**
-     * Insert a new Localização into the database and fill instance from database
-     * @return Localizacao Self instance
-     */
-    public function insert()
-    {
-        $this->setID(null);
-        $values = $this->validate();
-        unset($values['id']);
-        try {
-            $id = DB::insertInto('Localizacoes')->values($values)->execute();
-            $this->loadByID($id);
-        } catch (\Exception $e) {
-            throw $this->translate($e);
-        }
-        return $this;
-    }
-
-    /**
-     * Update Localização with instance values into database for ID
-     * @param  array $only Save these fields only, when empty save all fields except id
-     * @param  boolean $except When true, saves all fields except $only
-     * @return Localizacao Self instance
-     */
-    public function update($only = [], $except = false)
-    {
-        $values = $this->validate();
-        if (!$this->exists()) {
-            throw new \Exception('O identificador da localização não foi informado');
-        }
-        $values = DB::filterValues($values, $only, $except);
-        try {
-            DB::update('Localizacoes')
-                ->set($values)
-                ->where('id', $this->getID())
-                ->execute();
-            $this->loadByID($this->getID());
-        } catch (\Exception $e) {
-            throw $this->translate($e);
-        }
-        return $this;
-    }
-
-    /**
-     * Delete this instance from database using ID
-     * @return integer Number of rows deleted (Max 1)
-     */
-    public function delete()
-    {
-        if (!$this->exists()) {
-            throw new \Exception('O identificador da localização não foi informado');
-        }
-        $result = DB::deleteFrom('Localizacoes')
-            ->where('id', $this->getID())
-            ->execute();
-        return $result;
-    }
-
-    /**
-     * Load one register for it self with a condition
-     * @param  array $condition Condition for searching the row
-     * @param  array $order associative field name -> [-1, 1]
-     * @return Localizacao Self instance filled or empty
-     */
-    public function load($condition, $order = [])
-    {
-        $query = self::query($condition, $order)->limit(1);
-        $row = $query->fetch() ?: [];
-        return $this->fromArray($row);
-    }
-
-    /**
-     * Load into this object from database using, ClienteID, Apelido
+     * Find this object on database using, ClienteID, Apelido
      * @param  int $cliente_id cliente to find Localização
      * @param  string $apelido apelido to find Localização
-     * @return Localizacao Self filled instance or empty when not found
+     * @return Localizacao A filled instance or empty when not found
      */
-    public function loadByClienteIDApelido($cliente_id, $apelido)
+    public static function findByClienteIDApelido($cliente_id, $apelido)
     {
-        return $this->load([
-            'clienteid' => intval($cliente_id),
-            'apelido' => strval($apelido),
-        ]);
+        $result = new self();
+        return $result->loadByClienteIDApelido($cliente_id, $apelido);
     }
 
     /**
@@ -931,23 +1002,5 @@ class Localizacao extends Model
             return (int) $query->fetchColumn();
         }
         return $query->count();
-    }
-
-    /**
-     * Cliente a qual esse endereço pertence
-     * @return \ZCliente The object fetched from database
-     */
-    public function findClienteID()
-    {
-        return \Cliente::findByID($this->getClienteID());
-    }
-
-    /**
-     * Bairro do endereço
-     * @return \MZ\Location\Bairro The object fetched from database
-     */
-    public function findBairroID()
-    {
-        return \MZ\Location\Bairro::findByID($this->getBairroID());
     }
 }

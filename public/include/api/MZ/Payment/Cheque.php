@@ -586,17 +586,6 @@ class Cheque extends Model
     }
 
     /**
-     * Find this object on database using, ID
-     * @param  int $id id to find Cheque
-     * @return Cheque A filled instance or empty when not found
-     */
-    public static function findByID($id)
-    {
-        $result = new self();
-        return $result->loadByID($id);
-    }
-
-    /**
      * Find all Cheque
      * @param  array  $condition Condition to get all Cheque
      * @param  array  $order     Order Cheque

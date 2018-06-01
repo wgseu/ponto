@@ -104,6 +104,9 @@ class PaginaTest extends \PHPUnit_Framework_TestCase
         $pagina->update();
         $found_pagina = Pagina::findByID($pagina->getID());
         $this->assertEquals($pagina, $found_pagina);
+        $pagina->setID('');
+        $this->setExpectedException('\Exception');
+        $pagina->update();
     }
 
     public function testDelete()
@@ -113,6 +116,7 @@ class PaginaTest extends \PHPUnit_Framework_TestCase
         $pagina->setLinguagemID(1046);
         $pagina->insert();
         $pagina->delete();
+        $pagina->clean(new Pagina());
         $found_pagina = Pagina::findByID($pagina->getID());
         $this->assertEquals(new Pagina(), $found_pagina);
         $pagina->setID('');
@@ -126,6 +130,8 @@ class PaginaTest extends \PHPUnit_Framework_TestCase
         $pagina->setNome(Pagina::NOME_PRIVACIDADE);
         $pagina->setLinguagemID(1046);
         $pagina->insert();
+        $found_pagina = Pagina::find(['id' => $pagina->getID()]);
+        $this->assertEquals($pagina, $found_pagina);
         $found_pagina = Pagina::findByID($pagina->getID());
         $this->assertEquals($pagina, $found_pagina);
         $found_pagina->loadByID($pagina->getID());

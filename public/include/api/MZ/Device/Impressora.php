@@ -732,17 +732,6 @@ class Impressora extends Model
     }
 
     /**
-     * Find this object on database using, ID
-     * @param  int $id id to find Impressora
-     * @return Impressora A filled instance or empty when not found
-     */
-    public static function findByID($id)
-    {
-        $result = new self();
-        return $result->loadByID($id);
-    }
-
-    /**
      * Find this object on database using, SetorID, DispositivoID, Modo
      * @param  int $setor_id setor de impressão to find Impressora
      * @param  int $dispositivo_id dispositivo to find Impressora

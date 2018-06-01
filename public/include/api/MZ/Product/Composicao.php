@@ -598,17 +598,6 @@ class Composicao extends Model
     }
 
     /**
-     * Find this object on database using, ID
-     * @param  int $id id to find Composição
-     * @return Composicao A filled instance or empty when not found
-     */
-    public static function findByID($id)
-    {
-        $result = new self();
-        return $result->loadByID($id);
-    }
-
-    /**
      * Find this object on database using, ComposicaoID, ProdutoID, Tipo
      * @param  int $composicao_id composição to find Composição
      * @param  int $produto_id produto da composição to find Composição

@@ -554,17 +554,6 @@ class Imposto extends Model
     }
 
     /**
-     * Find this object on database using, ID
-     * @param  int $id id to find Imposto
-     * @return Imposto A filled instance or empty when not found
-     */
-    public static function findByID($id)
-    {
-        $result = new self();
-        return $result->loadByID($id);
-    }
-
-    /**
      * Find this object on database using, Grupo, Simples, Substituicao, Codigo
      * @param  string $grupo grupo to find Imposto
      * @param  string $simples simples nacional to find Imposto

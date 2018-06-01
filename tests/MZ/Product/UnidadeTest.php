@@ -104,6 +104,9 @@ class UnidadeTest extends \PHPUnit_Framework_TestCase
         $unidade->update();
         $found_unidade = Unidade::findByID($unidade->getID());
         $this->assertEquals($unidade, $found_unidade);
+        $unidade->setID('');
+        $this->setExpectedException('\Exception');
+        $unidade->update();
     }
 
     public function testDelete()
@@ -113,6 +116,7 @@ class UnidadeTest extends \PHPUnit_Framework_TestCase
         $unidade->setSigla('Unidade to delete');
         $unidade->insert();
         $unidade->delete();
+        $unidade->clean(new Unidade());
         $found_unidade = Unidade::findByID($unidade->getID());
         $this->assertEquals(new Unidade(), $found_unidade);
         $unidade->setID('');
@@ -126,6 +130,8 @@ class UnidadeTest extends \PHPUnit_Framework_TestCase
         $unidade->setNome('Unidade find');
         $unidade->setSigla('Unidade find');
         $unidade->insert();
+        $found_unidade = Unidade::find(['id' => $unidade->getID()]);
+        $this->assertEquals($unidade, $found_unidade);
         $found_unidade = Unidade::findByID($unidade->getID());
         $this->assertEquals($unidade, $found_unidade);
         $found_unidade->loadByID($unidade->getID());

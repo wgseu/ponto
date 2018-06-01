@@ -390,17 +390,6 @@ class Horario extends Model
     }
 
     /**
-     * Find this object on database using, ID
-     * @param  int $id id to find Horário
-     * @return Horario A filled instance or empty when not found
-     */
-    public static function findByID($id)
-    {
-        $result = new self();
-        return $result->loadByID($id);
-    }
-
-    /**
      * Find all Horário
      * @param  array  $condition Condition to get all Horário
      * @param  array  $order     Order Horário

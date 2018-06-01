@@ -141,18 +141,30 @@ class ClienteTest extends \PHPUnit_Framework_TestCase
                 array_keys($e->getErrors())
             );
         }
-        $cliente->setFone(2, '11223399');
-        $cliente->setLimiteCompra(-6);
         $cliente->setTipo(Cliente::TIPO_JURIDICA);
         try {
             $cliente->insert();
             $this->fail('Não deveria ter cadastrado o cliente');
         } catch (ValidationException $e) {
             $this->assertEquals(
-                ['login', 'nome', 'genero', 'fone1', 'fone2', 'limitecompra'],
+                ['login', 'nome', 'genero', 'fone1'],
                 array_keys($e->getErrors())
             );
         }
+        $cliente->setTipo(Cliente::TIPO_FISICA);
+        $cliente->setFone(2, '11223399');
+        $cliente->setLimiteCompra(-6);
+        $cliente->setCPF('12663254411');
+        try {
+            $cliente->insert();
+            $this->fail('Não deveria ter cadastrado o cliente');
+        } catch (ValidationException $e) {
+            $this->assertEquals(
+                ['login', 'nome', 'genero', 'cpf', 'fone2', 'limitecompra'],
+                array_keys($e->getErrors())
+            );
+        }
+        $cliente->setTipo(Cliente::TIPO_JURIDICA);
         $cliente->setCPF('12663254411');
         $cliente->setEmail('cicrano a@email.com');
         $cliente->setFone(1, '11223399');

@@ -487,17 +487,6 @@ class Compra extends Model
     }
 
     /**
-     * Find this object on database using, ID
-     * @param  int $id id to find Compra
-     * @return Compra A filled instance or empty when not found
-     */
-    public static function findByID($id)
-    {
-        $result = new self();
-        return $result->loadByID($id);
-    }
-
-    /**
      * Find this object on database using, Numero
      * @param  string $numero número da compra to find Compra
      * @return Compra A filled instance or empty when not found

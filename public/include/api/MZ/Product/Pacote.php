@@ -746,17 +746,6 @@ class Pacote extends Model
     }
 
     /**
-     * Find this object on database using, ID
-     * @param  int $id id to find Pacote
-     * @return Pacote A filled instance or empty when not found
-     */
-    public static function findByID($id)
-    {
-        $result = new self();
-        return $result->loadByID($id);
-    }
-
-    /**
      * Fetch all rows from database with matched condition critery
      * @param  array $condition condition to filter rows
      * @param  integer $limit number of rows to get, null for all

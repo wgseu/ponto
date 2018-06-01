@@ -101,6 +101,9 @@ class MesaTest extends \PHPUnit_Framework_TestCase
         $mesa->update();
         $found_mesa = Mesa::findByID($mesa->getID());
         $this->assertEquals($mesa, $found_mesa);
+        $mesa->setID('');
+        $this->setExpectedException('\Exception');
+        $mesa->update();
     }
 
     public function testDelete()
@@ -110,6 +113,7 @@ class MesaTest extends \PHPUnit_Framework_TestCase
         $mesa->setAtiva('Y');
         $mesa->insert();
         $mesa->delete();
+        $mesa->clean(new Mesa());
         $found_mesa = Mesa::findByID($mesa->getID());
         $this->assertEquals(new Mesa(), $found_mesa);
         $mesa->setID('');
@@ -123,6 +127,8 @@ class MesaTest extends \PHPUnit_Framework_TestCase
         $mesa->setNome('Mesa find');
         $mesa->setAtiva('Y');
         $mesa->insert();
+        $found_mesa = Mesa::find(['id' => $mesa->getID()]);
+        $this->assertEquals($mesa, $found_mesa);
         $found_mesa = Mesa::findByID($mesa->getID());
         $this->assertEquals($mesa, $found_mesa);
         $found_mesa->loadByID($mesa->getID());

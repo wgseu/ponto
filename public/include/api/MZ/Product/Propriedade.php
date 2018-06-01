@@ -547,17 +547,6 @@ class Propriedade extends Model
     }
 
     /**
-     * Find this object on database using, ID
-     * @param  int $id id to find Propriedade
-     * @return Propriedade A filled instance or empty when not found
-     */
-    public static function findByID($id)
-    {
-        $result = new self();
-        return $result->loadByID($id);
-    }
-
-    /**
      * Find this object on database using, GrupoID, Nome
      * @param  int $grupo_id grupo to find Propriedade
      * @param  string $nome nome to find Propriedade

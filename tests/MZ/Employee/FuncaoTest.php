@@ -99,6 +99,9 @@ class FuncaoTest extends \PHPUnit_Framework_TestCase
         $funcao->update();
         $found_funcao = Funcao::findByID($funcao->getID());
         $this->assertEquals($funcao, $found_funcao);
+        $funcao->setID('');
+        $this->setExpectedException('\Exception');
+        $funcao->update();
     }
 
     public function testDelete()
@@ -108,6 +111,7 @@ class FuncaoTest extends \PHPUnit_Framework_TestCase
         $funcao->setSalarioBase(12.3);
         $funcao->insert();
         $funcao->delete();
+        $funcao->clean(new Funcao());
         $found_funcao = Funcao::findByID($funcao->getID());
         $this->assertEquals(new Funcao(), $found_funcao);
         $funcao->setID('');
@@ -121,6 +125,8 @@ class FuncaoTest extends \PHPUnit_Framework_TestCase
         $funcao->setDescricao('Função find');
         $funcao->setSalarioBase(12.3);
         $funcao->insert();
+        $found_funcao = Funcao::find(['id' => $funcao->getID()]);
+        $this->assertEquals($funcao, $found_funcao);
         $found_funcao = Funcao::findByID($funcao->getID());
         $this->assertEquals($funcao, $found_funcao);
         $found_funcao->loadByID($funcao->getID());

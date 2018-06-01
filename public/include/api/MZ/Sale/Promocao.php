@@ -476,17 +476,6 @@ class Promocao extends Model
     }
 
     /**
-     * Find this object on database using, ID
-     * @param  int $id id to find Promoção
-     * @return Promocao A filled instance or empty when not found
-     */
-    public static function findByID($id)
-    {
-        $result = new self();
-        return $result->loadByID($id);
-    }
-
-    /**
      * Find all Promoção
      * @param  array  $condition Condition to get all Promoção
      * @param  array  $order     Order Promoção

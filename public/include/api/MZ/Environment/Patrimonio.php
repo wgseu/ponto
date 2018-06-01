@@ -876,17 +876,6 @@ class Patrimonio extends Model
     }
 
     /**
-     * Find this object on database using, ID
-     * @param  int $id id to find Patrimônio
-     * @return Patrimonio A filled instance or empty when not found
-     */
-    public static function findByID($id)
-    {
-        $result = new self();
-        return $result->loadByID($id);
-    }
-
-    /**
      * Find this object on database using, Numero, Estado
      * @param  string $numero número to find Patrimônio
      * @param  string $estado estado to find Patrimônio

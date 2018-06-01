@@ -135,6 +135,7 @@ class SessaoTest extends \PHPUnit_Framework_TestCase
         $sessao->setAberta('Y');
         $sessao->insert();
         $sessao->delete();
+        $sessao->clean(new Sessao());
         $found_sessao = Sessao::findByID($sessao->getID());
         $this->assertEquals(new Sessao(), $found_sessao);
         $sessao->setID('');

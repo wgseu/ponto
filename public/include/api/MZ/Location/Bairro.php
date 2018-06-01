@@ -316,17 +316,6 @@ class Bairro extends Model
     }
 
     /**
-     * Find this object on database using, ID
-     * @param  int $id id to find Bairro
-     * @return Bairro A filled instance or empty when not found
-     */
-    public static function findByID($id)
-    {
-        $result = new self();
-        return $result->loadByID($id);
-    }
-
-    /**
      * Find this object on database using, CidadeID, Nome
      * @param  int $cidade_id cidade to find Bairro
      * @param  string $nome nome to find Bairro
@@ -335,7 +324,9 @@ class Bairro extends Model
     public static function findByCidadeIDNome($cidade_id, $nome)
     {
         $result = new self();
-        return $result->loadByCidadeIDNome($cidade_id, $nome);
+        $result->setCidadeID($cidade_id);
+        $result->setNome($nome);
+        return $result->loadByCidadeIDNome();
     }
 
     /**
@@ -543,15 +534,13 @@ class Bairro extends Model
 
     /**
      * Load into this object from database using, CidadeID, Nome
-     * @param  int $cidade_id cidade to find Bairro
-     * @param  string $nome nome to find Bairro
      * @return Bairro Self filled instance or empty when not found
      */
-    public function loadByCidadeIDNome($cidade_id, $nome)
+    public function loadByCidadeIDNome()
     {
         return $this->load([
-            'cidadeid' => intval($cidade_id),
-            'nome' => strval($nome),
+            'cidadeid' => intval($this->getCidadeID()),
+            'nome' => strval($this->getNome()),
         ]);
     }
 

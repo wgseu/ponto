@@ -567,17 +567,6 @@ class Auditoria extends Model
     }
 
     /**
-     * Find this object on database using, ID
-     * @param  int $id id to find Auditoria
-     * @return Auditoria A filled instance or empty when not found
-     */
-    public static function findByID($id)
-    {
-        $result = new self();
-        return $result->loadByID($id);
-    }
-
-    /**
      * Find all Auditoria
      * @param  array  $condition Condition to get all Auditoria
      * @param  array  $order     Order Auditoria

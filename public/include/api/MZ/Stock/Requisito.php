@@ -656,17 +656,6 @@ class Requisito extends Model
     }
 
     /**
-     * Find this object on database using, ID
-     * @param  int $id id to find Produtos da lista
-     * @return Requisito A filled instance or empty when not found
-     */
-    public static function findByID($id)
-    {
-        $result = new self();
-        return $result->loadByID($id);
-    }
-
-    /**
      * Find all Produtos da lista
      * @param  array  $condition Condition to get all Produtos da lista
      * @param  array  $order     Order Produtos da lista

@@ -252,6 +252,7 @@ class CaixaTest extends \PHPUnit_Framework_TestCase
         $caixa->setDescricao('Caixa 9');
         $caixa->insert();
         $caixa->delete();
+        $caixa->clean(new Caixa());
         $found_caixa = Caixa::findByID($caixa->getID());
         $this->assertEquals(new Caixa(), $found_caixa);
         $caixa->setID('');

@@ -631,17 +631,6 @@ class Emitente extends Model
     }
 
     /**
-     * Find this object on database using, ID
-     * @param  string $id id to find Emitente
-     * @return Emitente A filled instance or empty when not found
-     */
-    public static function findByID($id)
-    {
-        $result = new self();
-        return $result->loadByID($id);
-    }
-
-    /**
      * Find all Emitente
      * @param  array  $condition Condition to get all Emitente
      * @param  array  $order     Order Emitente

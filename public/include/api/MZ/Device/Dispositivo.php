@@ -713,17 +713,6 @@ class Dispositivo extends Model
     }
 
     /**
-     * Find this object on database using, ID
-     * @param  int $id id to find Dispositivo
-     * @return Dispositivo A filled instance or empty when not found
-     */
-    public static function findByID($id)
-    {
-        $result = new self();
-        return $result->loadByID($id);
-    }
-
-    /**
      * Find this object on database using, Nome
      * @param  string $nome nome to find Dispositivo
      * @return Dispositivo A filled instance or empty when not found

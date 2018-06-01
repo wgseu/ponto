@@ -552,14 +552,13 @@ class Pais extends Model
     }
 
     /**
-     * Load into this object from database using, Codigo
-     * @param  string $codigo código to find País
+     * Load into this object from database using código
      * @return Pais Self filled instance or empty when not found
      */
-    public function loadByCodigo($codigo)
+    public function loadByCodigo()
     {
         return $this->load([
-            'codigo' => strval($codigo),
+            'codigo' => strval($this->getCodigo()),
         ]);
     }
 
@@ -654,17 +653,6 @@ class Pais extends Model
     }
 
     /**
-     * Find this object on database using, ID
-     * @param  int $id id to find País
-     * @return Pais A filled instance or empty when not found
-     */
-    public static function findByID($id)
-    {
-        $result = new self();
-        return $result->loadByID($id);
-    }
-
-    /**
      * Find this object on database using, Nome
      * @param  string $nome nome to find País
      * @return Pais A filled instance or empty when not found
@@ -694,7 +682,8 @@ class Pais extends Model
     public static function findByCodigo($codigo)
     {
         $result = new self();
-        return $result->loadByCodigo($codigo);
+        $result->setCodigo($codigo);
+        return $result->loadByCodigo();
     }
 
     /**

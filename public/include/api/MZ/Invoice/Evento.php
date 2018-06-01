@@ -520,17 +520,6 @@ class Evento extends Model
     }
 
     /**
-     * Find this object on database using, ID
-     * @param  int $id id to find Evento
-     * @return Evento A filled instance or empty when not found
-     */
-    public static function findByID($id)
-    {
-        $result = new self();
-        return $result->loadByID($id);
-    }
-
-    /**
      * Find all Evento
      * @param  array  $condition Condition to get all Evento
      * @param  array  $order     Order Evento

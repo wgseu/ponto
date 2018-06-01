@@ -279,17 +279,6 @@ class Estado extends Model
     }
 
     /**
-     * Find this object on database using, ID
-     * @param  int $id id to find Estado
-     * @return Estado A filled instance or empty when not found
-     */
-    public static function findByID($id)
-    {
-        $result = new self();
-        return $result->loadByID($id);
-    }
-
-    /**
      * Find this object on database using, PaisID, Nome
      * @param  int $pais_id país to find Estado
      * @param  string $nome nome to find Estado
@@ -310,7 +299,9 @@ class Estado extends Model
     public static function findByPaisIDUF($pais_id, $uf)
     {
         $result = new self();
-        return $result->loadByPaisIDUF($pais_id, $uf);
+        $result->setPaisID($pais_id);
+        $result->setUF($uf);
+        return $result->loadByPaisIDUF();
     }
 
     /**
@@ -493,15 +484,13 @@ class Estado extends Model
 
     /**
      * Load into this object from database using, PaisID, UF
-     * @param  int $pais_id país to find Estado
-     * @param  string $uf uf to find Estado
      * @return Estado Self filled instance or empty when not found
      */
-    public function loadByPaisIDUF($pais_id, $uf)
+    public function loadByPaisIDUF()
     {
         return $this->load([
-            'paisid' => intval($pais_id),
-            'uf' => strval($uf),
+            'paisid' => intval($this->getPaisID()),
+            'uf' => strval($this->getUF()),
         ]);
     }
 

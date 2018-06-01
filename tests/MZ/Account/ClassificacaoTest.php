@@ -95,6 +95,9 @@ class ClassificacaoTest extends \PHPUnit_Framework_TestCase
         $classificacao->update();
         $found_classificacao = Classificacao::findByID($classificacao->getID());
         $this->assertEquals($classificacao, $found_classificacao);
+        $classificacao->setID('');
+        $this->setExpectedException('\Exception');
+        $classificacao->update();
     }
 
     public function testDelete()
@@ -103,6 +106,7 @@ class ClassificacaoTest extends \PHPUnit_Framework_TestCase
         $classificacao->setDescricao('Classificação to delete');
         $classificacao->insert();
         $classificacao->delete();
+        $classificacao->clean(new Classificacao());
         $found_classificacao = Classificacao::findByID($classificacao->getID());
         $this->assertEquals(new Classificacao(), $found_classificacao);
         $classificacao->setID('');
@@ -115,6 +119,8 @@ class ClassificacaoTest extends \PHPUnit_Framework_TestCase
         $classificacao = new Classificacao();
         $classificacao->setDescricao('Classificação find');
         $classificacao->insert();
+        $found_classificacao = Classificacao::find(['id' => $classificacao->getID()]);
+        $this->assertEquals($classificacao, $found_classificacao);
         $found_classificacao = Classificacao::findByID($classificacao->getID());
         $this->assertEquals($classificacao, $found_classificacao);
         $found_classificacao->loadByID($classificacao->getID());

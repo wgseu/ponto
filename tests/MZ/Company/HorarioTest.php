@@ -104,6 +104,9 @@ class HorarioTest extends \PHPUnit_Framework_TestCase
         $horario->update();
         $found_horario = Horario::findByID($horario->getID());
         $this->assertEquals($horario, $found_horario);
+        $horario->setID('');
+        $this->setExpectedException('\Exception');
+        $horario->update();
     }
 
     public function testDelete()
@@ -113,6 +116,7 @@ class HorarioTest extends \PHPUnit_Framework_TestCase
         $horario->setFim(123);
         $horario->insert();
         $horario->delete();
+        $horario->clean(new Horario());
         $found_horario = Horario::findByID($horario->getID());
         $this->assertEquals(new Horario(), $found_horario);
         $horario->setID('');
@@ -126,6 +130,8 @@ class HorarioTest extends \PHPUnit_Framework_TestCase
         $horario->setInicio(123654);
         $horario->setFim(123656);
         $horario->insert();
+        $found_horario = Horario::find(['id' => $horario->getID()]);
+        $this->assertEquals($horario, $found_horario);
         $found_horario = Horario::findByID($horario->getID());
         $this->assertEquals($horario, $found_horario);
         $found_horario->loadByID($horario->getID());

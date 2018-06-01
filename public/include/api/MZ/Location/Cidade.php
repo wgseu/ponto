@@ -281,17 +281,6 @@ class Cidade extends Model
     }
 
     /**
-     * Find this object on database using, ID
-     * @param  int $id id to find Cidade
-     * @return Cidade A filled instance or empty when not found
-     */
-    public static function findByID($id)
-    {
-        $result = new self();
-        return $result->loadByID($id);
-    }
-
-    /**
      * Find this object on database using, EstadoID, Nome
      * @param  int $estado_id estado to find Cidade
      * @param  string $nome nome to find Cidade
@@ -300,7 +289,9 @@ class Cidade extends Model
     public static function findByEstadoIDNome($estado_id, $nome)
     {
         $result = new self();
-        return $result->loadByEstadoIDNome($estado_id, $nome);
+        $result->setEstadoID($estado_id);
+        $result->setNome($nome);
+        return $result->loadByEstadoIDNome();
     }
 
     /**
@@ -519,15 +510,13 @@ class Cidade extends Model
 
     /**
      * Load into this object from database using, EstadoID, Nome
-     * @param  int $estado_id estado to find Cidade
-     * @param  string $nome nome to find Cidade
      * @return Cidade Self filled instance or empty when not found
      */
-    public function loadByEstadoIDNome($estado_id, $nome)
+    public function loadByEstadoIDNome()
     {
         return $this->load([
-            'estadoid' => intval($estado_id),
-            'nome' => strval($nome),
+            'estadoid' => intval($this->getEstadoID()),
+            'nome' => strval($this->getNome()),
         ]);
     }
 

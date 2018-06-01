@@ -99,6 +99,9 @@ class RegimeTest extends \PHPUnit_Framework_TestCase
         $regime->update();
         $found_regime = Regime::findByID($regime->getID());
         $this->assertEquals($regime, $found_regime);
+        $regime->setID('');
+        $this->setExpectedException('\Exception');
+        $regime->update();
     }
 
     public function testDelete()
@@ -108,6 +111,7 @@ class RegimeTest extends \PHPUnit_Framework_TestCase
         $regime->setDescricao('Regime to delete');
         $regime->insert();
         $regime->delete();
+        $regime->clean(new Regime());
         $found_regime = Regime::findByID($regime->getID());
         $this->assertEquals(new Regime(), $found_regime);
         $regime->setID('');
@@ -121,6 +125,8 @@ class RegimeTest extends \PHPUnit_Framework_TestCase
         $regime->setCodigo(123321);
         $regime->setDescricao('Regime find');
         $regime->insert();
+        $found_regime = Regime::find(['id' => $regime->getID()]);
+        $this->assertEquals($regime, $found_regime);
         $found_regime = Regime::findByID($regime->getID());
         $this->assertEquals($regime, $found_regime);
         $found_regime->loadByID($regime->getID());

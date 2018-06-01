@@ -472,6 +472,22 @@ class Movimentacao extends Model
     }
 
     /**
+     * Find open cash register preferred to employee informed
+     * @param  int $funcionario_id preferred to employee
+     * @return Movimentacao A filled instance or empty when not found
+     */
+    public function loadByAberta($funcionario_id = null)
+    {
+        return $this->load(
+            ['aberta' => 'Y'],
+            [
+                'inicializador' => [-1 => $funcionario_id],
+                'dataabertura' => -1
+            ]
+        );
+    }
+
+    /**
      * Sessão do dia, permite abrir vários caixas no mesmo dia com o mesmo
      * código da sessão
      * @return \MZ\Session\Sessao The object fetched from database
@@ -530,6 +546,12 @@ class Movimentacao extends Model
     private static function filterOrder($order)
     {
         $allowed = self::getAllowedKeys();
+        $order = Filter::order($order);
+        if (isset($order['inicializador'])) {
+            $field = '(m.funcionarioaberturaid = ?)';
+            $order = replace_key($order, 'inicializador', $field);
+            $allowed[$field] = true;
+        }
         return Filter::orderBy($order, $allowed, 'm.');
     }
 
@@ -585,14 +607,14 @@ class Movimentacao extends Model
     }
 
     /**
-     * Find this object on database using, ID
-     * @param  int $id id to find Movimentação
+     * Find open cash register preferred to employee informed
+     * @param  int $funcionario_id preferred to employee
      * @return Movimentacao A filled instance or empty when not found
      */
-    public static function findByID($id)
+    public static function findByAberta($funcionario_id = null)
     {
         $result = new self();
-        return $result->loadByID($id);
+        return $result->loadByAberta($funcionario_id);
     }
 
     /**

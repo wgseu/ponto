@@ -431,7 +431,8 @@ $[table.end]
         unset($values['$[primary]']);
         try {
             $$[primary.unix] = DB::insertInto('$[Table]')->values($values)->execute();
-            $this->loadBy$[Primary.norm]($$[primary.unix]);
+            $this->set$[Primary.norm]($$[primary.unix]);
+            $this->loadBy$[Primary.norm]();
         } catch (\Exception $e) {
             throw $this->translate($e);
         }
@@ -466,7 +467,7 @@ $[field.end]
                 ->set($values)
                 ->where(['$[primary]' => $this->get$[Primary.norm]()])
                 ->execute();
-            $this->loadBy$[Primary.norm]($this->get$[Primary.norm]());
+            $this->loadBy$[Primary.norm]();
         } catch (\Exception $e) {
             throw $this->translate($e);
         }
@@ -505,27 +506,18 @@ $[table.each(unique)]
     /**
      * Load into this object from database using$[unique.each(all)], $[Field.norm]$[unique.end]
 
-$[unique.each(all)]
-$[field.if(integer|bigint)]
-     * @param  int $$[field.unix] $[field.name] to find $[Table.name]
-$[field.else.if(float|double)]
-     * @param  float $$[field.unix] $[field.name] to find $[Table.name]
-$[field.else]
-     * @param  string $$[field.unix] $[field.name] to find $[Table.name]
-$[field.end]
-$[unique.end]
      * @return $[Table.norm] Self filled instance or empty when not found
      */
-    public function loadBy$[unique.each(all)]$[Field.norm]$[unique.end]($[unique.each(all)]$[field.if(first)]$[field.else], $[field.end]$$[field.unix]$[unique.end])
+    public function loadBy$[unique.each(all)]$[Field.norm]$[unique.end]()
     {
         return $this->load([
 $[unique.each(all)]
 $[field.if(integer|bigint)]
-            '$[field]' => intval($$[field.unix]),
+            '$[field]' => intval($this->get$[Field.norm]($[field.if(array)]$[field.array.number]$[field.end])),
 $[field.else.if(float|double)]
-            '$[field]' => floatval($$[field.unix]),
+            '$[field]' => floatval($this->get$[Field.norm]($[field.if(array)]$[field.array.number]$[field.end])),
 $[field.else]
-            '$[field]' => strval($$[field.unix]),
+            '$[field]' => strval($this->get$[Field.norm]($[field.if(array)]$[field.array.number]$[field.end])),
 $[field.end]
 $[unique.end]
         ]);
@@ -647,13 +639,17 @@ $[descriptor.end]
     {
 $[table.exists(blob)]
         $query = DB::from('$[Table] $[table.letter]')
-            ->select(null)$[field.each(all)]$[field.if(blob)]
+            ->select(null)$[field.each(all)]
+$[field.if(blob)]
+
             ->select(
                 '(CASE WHEN $[table.letter].$[field] IS NULL THEN NULL ELSE '.
                 DB::concat(['$[table.letter].$[primary]', '".png"']).
                 ' END) as imagem'
             )$[field.else]
-            ->select('$[table.letter].$[field]')$[field.end]$[field.end];
+
+            ->select('$[table.letter].$[field]')$[field.end]
+$[field.end];
 $[table.else]
         $query = DB::from('$[Table] $[table.letter]');
 $[table.end]
@@ -697,7 +693,10 @@ $[unique.end]
     public static function findBy$[unique.each(all)]$[Field.norm]$[unique.end]($[unique.each(all)]$[field.if(first)]$[field.else], $[field.end]$$[field.unix]$[unique.end])
     {
         $result = new self();
-        return $result->loadBy$[unique.each(all)]$[Field.norm]$[unique.end]($[unique.each(all)]$[field.if(first)]$[field.else], $[field.end]$$[field.unix]$[unique.end]);
+$[unique.each(all)]
+        $result->set$[Field.norm]($[field.if(array)]$[field.array.number], $[field.end]$$[field.unix]);
+$[unique.end]
+        return $result->loadBy$[unique.each(all)]$[Field.norm]$[unique.end]();
     }
 $[table.end]
 

@@ -469,17 +469,6 @@ class Juncao extends Model
     }
 
     /**
-     * Find this object on database using, ID
-     * @param  int $id id to find Junção
-     * @return Juncao A filled instance or empty when not found
-     */
-    public static function findByID($id)
-    {
-        $result = new self();
-        return $result->loadByID($id);
-    }
-
-    /**
      * Find all Junção
      * @param  array  $condition Condition to get all Junção
      * @param  array  $order     Order Junção

@@ -99,6 +99,9 @@ class OrigemTest extends \PHPUnit_Framework_TestCase
         $origem->update();
         $found_origem = Origem::findByID($origem->getID());
         $this->assertEquals($origem, $found_origem);
+        $origem->setID('');
+        $this->setExpectedException('\Exception');
+        $origem->update();
     }
 
     public function testDelete()
@@ -108,6 +111,7 @@ class OrigemTest extends \PHPUnit_Framework_TestCase
         $origem->setDescricao('Origem to delete');
         $origem->insert();
         $origem->delete();
+        $origem->clean(new Origem());
         $found_origem = Origem::findByID($origem->getID());
         $this->assertEquals(new Origem(), $found_origem);
         $origem->setID('');
@@ -121,6 +125,8 @@ class OrigemTest extends \PHPUnit_Framework_TestCase
         $origem->setCodigo(123456);
         $origem->setDescricao('Origem find');
         $origem->insert();
+        $found_origem = Origem::find(['id' => $origem->getID()]);
+        $this->assertEquals($origem, $found_origem);
         $found_origem = Origem::findByID($origem->getID());
         $this->assertEquals($origem, $found_origem);
         $found_origem->loadByID($origem->getID());

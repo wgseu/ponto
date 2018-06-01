@@ -1343,17 +1343,6 @@ class Nota extends Model
     }
 
     /**
-     * Find this object on database using, ID
-     * @param  int $id id to find Nota
-     * @return Nota A filled instance or empty when not found
-     */
-    public static function findByID($id)
-    {
-        $result = new self();
-        return $result->loadByID($id);
-    }
-
-    /**
      * Find invoice by key
      * @param  string $chave key to find Nota
      * @param  boolean $todos find all invoice finished or not

@@ -381,17 +381,6 @@ class Regime extends Model
     }
 
     /**
-     * Find this object on database using, ID
-     * @param  int $id id to find Regime
-     * @return Regime A filled instance or empty when not found
-     */
-    public static function findByID($id)
-    {
-        $result = new self();
-        return $result->loadByID($id);
-    }
-
-    /**
      * Find this object on database using, Codigo
      * @param  int $codigo código to find Regime
      * @return Regime A filled instance or empty when not found

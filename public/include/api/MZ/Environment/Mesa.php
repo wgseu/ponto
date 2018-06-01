@@ -436,17 +436,6 @@ class Mesa extends Model
     }
 
     /**
-     * Find this object on database using, ID
-     * @param  int $id número to find Mesa
-     * @return Mesa A filled instance or empty when not found
-     */
-    public static function findByID($id)
-    {
-        $result = new self();
-        return $result->loadByID($id);
-    }
-
-    /**
      * Find this object on database using, Nome
      * @param  string $nome nome to find Mesa
      * @return Mesa A filled instance or empty when not found

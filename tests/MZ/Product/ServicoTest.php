@@ -161,6 +161,9 @@ class ServicoTest extends \PHPUnit_Framework_TestCase
         $servico->update();
         $found_servico = Servico::findByID($servico->getID());
         $this->assertEquals($servico, $found_servico);
+        $servico->setID('');
+        $this->setExpectedException('\Exception');
+        $servico->update();
     }
 
     public function testDelete()
@@ -175,6 +178,7 @@ class ServicoTest extends \PHPUnit_Framework_TestCase
         $servico->setAtivo('Y');
         $servico->insert();
         $servico->delete();
+        $servico->clean(new Servico());
         $found_servico = Servico::findByID($servico->getID());
         $this->assertEquals(new Servico(), $found_servico);
         $servico->setID('');
@@ -195,6 +199,8 @@ class ServicoTest extends \PHPUnit_Framework_TestCase
         $servico->setIndividual('Y');
         $servico->setAtivo('Y');
         $servico->insert();
+        $found_servico = Servico::find(['id' => $servico->getID()]);
+        $this->assertEquals($servico, $found_servico);
         $found_servico = Servico::findByID($servico->getID());
         $this->assertEquals($servico, $found_servico);
         $found_servico->loadByID($servico->getID());

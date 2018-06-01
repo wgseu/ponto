@@ -28,6 +28,8 @@ use Curl\Curl;
 use MZ\Employee\Funcionario;
 use MZ\Sale\Pedido;
 use MZ\System\Task;
+use MZ\Association\Order;
+use MZ\Association\Product;
 
 /**
  * Kromax Service and Task
@@ -76,13 +78,13 @@ class Kromax extends Task
     {
         $dom = $this->request();
         $this->setPending(0);
-        $order = new \MZ\Association\Order();
+        $order = new Order();
         $order->setIntegracao($this->getData());
         $order->setCardNames(self::CARDS);
         $order->setEmployee(Funcionario::findByID(1));
         if (!$this->checkReponse($dom, 0)) {
             // TODO atualizar tabela de produtos por outro meio mais rápido
-            $product = new \MZ\Association\Product($this->getData());
+            $product = new Product($this->getData());
             $product->populateFromXML($dom);
 
             $order->loadDOM($dom);
@@ -118,7 +120,7 @@ class Kromax extends Task
         $curl->setTimeout(6);
         $curl->setXmlDecoder(function ($response) {
             $dom = new \DOMDocument();
-            $xml_obj = $dom->loadXML($response);
+            $xml_obj = @$dom->loadXML($response);
             if (!($xml_obj === false)) {
                 $response = $dom;
             }
@@ -147,7 +149,7 @@ class Kromax extends Task
                 $status = 5;
                 $mensagem = 'Encomenda entregue';
                 break;
-            case 'Cancelado':
+            case Order::ESTADO_CANCELADO:
                 $status = 3;
                 $mensagem = 'Pedido cancelado';
                 break;

@@ -125,6 +125,9 @@ class MoedaTest extends \PHPUnit_Framework_TestCase
         $moeda->update();
         $found_moeda = Moeda::findByID($moeda->getID());
         $this->assertEquals($moeda, $found_moeda);
+        $moeda->setID('');
+        $this->setExpectedException('\Exception');
+        $moeda->update();
     }
 
     public function testDelete()
@@ -136,6 +139,7 @@ class MoedaTest extends \PHPUnit_Framework_TestCase
         $moeda->setFormato('Moeda to delete');
         $moeda->insert();
         $moeda->delete();
+        $moeda->clean(new Moeda());
         $found_moeda = Moeda::findByID($moeda->getID());
         $this->assertEquals(new Moeda(), $found_moeda);
         $moeda->setID('');
@@ -151,6 +155,8 @@ class MoedaTest extends \PHPUnit_Framework_TestCase
         $moeda->setDivisao(123);
         $moeda->setFormato('Moeda find');
         $moeda->insert();
+        $found_moeda = Moeda::find(['id' => $moeda->getID()]);
+        $this->assertEquals($moeda, $found_moeda);
         $found_moeda = Moeda::findByID($moeda->getID());
         $this->assertEquals($moeda, $found_moeda);
         $found_moeda->loadByID($moeda->getID());

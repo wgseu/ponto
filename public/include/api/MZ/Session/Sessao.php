@@ -401,17 +401,6 @@ class Sessao extends Model
     }
 
     /**
-     * Find this object on database using, ID
-     * @param  int $id id to find Sessão
-     * @return Sessao A filled instance or empty when not found
-     */
-    public static function findByID($id)
-    {
-        $result = new self();
-        return $result->loadByID($id);
-    }
-
-    /**
      * Find open session
      * @param  boolean $required when true and none sesstion open found throw an exception
      * @return Sessao A filled instance or empty when not found

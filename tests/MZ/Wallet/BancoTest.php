@@ -109,6 +109,9 @@ class BancoTest extends \PHPUnit_Framework_TestCase
         $banco->update();
         $found_banco = Banco::findByID($banco->getID());
         $this->assertEquals($banco, $found_banco);
+        $banco->setID('');
+        $this->setExpectedException('\Exception');
+        $banco->update();
     }
 
     public function testDelete()
@@ -118,6 +121,7 @@ class BancoTest extends \PHPUnit_Framework_TestCase
         $banco->setRazaoSocial('Banco to delete');
         $banco->insert();
         $banco->delete();
+        $banco->clean(new Banco());
         $found_banco = Banco::findByID($banco->getID());
         $this->assertEquals(new Banco(), $found_banco);
         $banco->setID('');
@@ -131,6 +135,8 @@ class BancoTest extends \PHPUnit_Framework_TestCase
         $banco->setNumero('Banco find');
         $banco->setRazaoSocial('Banco find');
         $banco->insert();
+        $found_banco = Banco::find(['id' => $banco->getID()]);
+        $this->assertEquals($banco, $found_banco);
         $found_banco = Banco::findByID($banco->getID());
         $this->assertEquals($banco, $found_banco);
         $found_banco->loadByID($banco->getID());

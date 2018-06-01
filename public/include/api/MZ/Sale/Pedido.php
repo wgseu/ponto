@@ -775,6 +775,14 @@ class Pedido extends Model
     }
 
     /**
+     * Informa se o pedido precisa de um caixa aberto
+     */
+    public function needMovimentacao()
+    {
+        return $this->getTipo() == self::TIPO_AVULSO || $this->getTipo() == self::TIPO_ENTREGA;
+    }
+
+    /**
      * Convert this instance into array associated key -> value with only public fields
      * @return array All public field and values into array format
      */
@@ -804,10 +812,10 @@ class Pedido extends Model
         $this->setFechadorID(Filter::number($this->getFechadorID()));
         $this->setDataImpressao(Filter::datetime($this->getDataImpressao()));
         $this->setMotivo(Filter::string($this->getMotivo()));
-        $this->setDataCriacao(DB::now());
         $this->setDataAgendamento(Filter::datetime($this->getDataAgendamento()));
         $this->setDataEntrega(Filter::datetime($this->getDataEntrega()));
         $this->setDataConclusao(Filter::datetime($this->getDataConclusao()));
+        $this->setDataCriacao(Filter::datetime($this->getDataCriacao()));
     }
 
     /**
@@ -863,7 +871,6 @@ class Pedido extends Model
                 $errors['id'] = 'Quantidade de pedidos excedido, adquira uma licença para continuar';
             }
         }
-        $this->setDataCriacao(DB::now());
         if (!empty($errors)) {
             throw new \MZ\Exception\ValidationException($errors);
         }
@@ -895,17 +902,23 @@ class Pedido extends Model
         return $this;
     }
 
+    /**
+     * Check if operator has permission to sell this order
+     * @param \MZ\Employee\Funcionario $operador operator that will sale this order
+     * @return Pedido Self instance
+     * @throws \Exception when operator has not permission
+     */
     public function validaAcesso($operador)
     {
         $this->checkAccess($operador);
         if (!$this->exists()) {
-            return;
+            return $this;
         }
         if (!in_array($this->getTipo(), [self::TIPO_MESA, self::TIPO_COMANDA])) {
-            return;
+            return $this;
         }
         if ($this->getFuncionarioID() == $operador->getID()) {
-            return;
+            return $this;
         }
         if ($this->getTipo() == self::TIPO_MESA && !$operador->has(Permissao::NOME_MESAS)) {
             $cliente = $this->findFuncionarioID()->findClienteID();
@@ -923,6 +936,7 @@ class Pedido extends Model
             );
             throw new \Exception($msg);
         }
+        return $this;
     }
 
     public function checkSaldo($subtotal)
@@ -1083,8 +1097,12 @@ class Pedido extends Model
      */
     public function loadAproximado()
     {
-        // TODO implementar
-        return $this;
+        return $this->load([
+            'clienteid' => $this->getClienteID(),
+            'tipo' => self::TIPO_ENTREGA,
+            'apartir_criacao' => DB::now(strtotime('-1 min', strtotime($this->getDataCriacao()))),
+            'ate_criacao' => DB::now(strtotime('+1 min', strtotime($this->getDataCriacao())))
+        ]);
     }
 
     /**
@@ -1351,17 +1369,6 @@ class Pedido extends Model
         $query = self::query($condition, $order)->limit(1);
         $row = $query->fetch() ?: [];
         return new Pedido($row);
-    }
-
-    /**
-     * Find this object on database using, ID
-     * @param  int $id código to find Pedido
-     * @return Pedido A filled instance or empty when not found
-     */
-    public static function findByID($id)
-    {
-        $result = new self();
-        return $result->loadByID($id);
     }
 
     /**

@@ -96,6 +96,9 @@ class SetorTest extends \PHPUnit_Framework_TestCase
         $setor->update();
         $found_setor = Setor::findByID($setor->getID());
         $this->assertEquals($setor, $found_setor);
+        $setor->setID('');
+        $this->setExpectedException('\Exception');
+        $setor->update();
     }
 
     public function testDelete()
@@ -104,6 +107,7 @@ class SetorTest extends \PHPUnit_Framework_TestCase
         $setor->setNome('Setor to delete');
         $setor->insert();
         $setor->delete();
+        $setor->clean(new Setor());
         $found_setor = Setor::findByID($setor->getID());
         $this->assertEquals(new Setor(), $found_setor);
         $setor->setID('');
@@ -116,6 +120,8 @@ class SetorTest extends \PHPUnit_Framework_TestCase
         $setor = new Setor();
         $setor->setNome('Setor find');
         $setor->insert();
+        $found_setor = Setor::find(['id' => $setor->getID()]);
+        $this->assertEquals($setor, $found_setor);
         $found_setor = Setor::findByID($setor->getID());
         $this->assertEquals($setor, $found_setor);
         $found_setor->loadByID($setor->getID());

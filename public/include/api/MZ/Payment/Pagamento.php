@@ -1128,17 +1128,6 @@ class Pagamento extends Model
         return floatval($total);
     }
 
-    /**
-     * Find this object on database using, ID
-     * @param  int $id id to find Pagamento
-     * @return Pagamento A filled instance or empty when not found
-     */
-    public static function findByID($id)
-    {
-        $result = new self();
-        return $result->loadByID($id);
-    }
-
     public static function getReceitas($condition)
     {
         $condition['receitas'] = true;

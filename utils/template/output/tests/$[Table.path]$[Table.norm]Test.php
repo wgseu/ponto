@@ -157,6 +157,9 @@ $[field.end]
         $$[table.unix]->update();
         $found_$[table.unix] = $[Table.norm]::findByID($$[table.unix]->getID());
         $this->assertEquals($$[table.unix], $found_$[table.unix]);
+        $$[table.unix]->set$[Primary.norm]('');
+        $this->setExpectedException('\Exception');
+        $$[table.unix]->update();
     }
 
     public function testDelete()
@@ -183,9 +186,10 @@ $[field.end]
 $[field.end]
         $$[table.unix]->insert();
         $$[table.unix]->delete();
+        $$[table.unix]->clean(new $[Table.norm]());
         $found_$[table.unix] = $[Table.norm]::findBy$[Primary.norm]($$[table.unix]->get$[Primary.norm]());
         $this->assertEquals(new $[Table.norm](), $found_$[table.unix]);
-        $$[table.unix]->setID('');
+        $$[table.unix]->set$[Primary.norm]('');
         $this->setExpectedException('\Exception');
         $$[table.unix]->delete();
     }
@@ -213,6 +217,8 @@ $[field.else]
 $[field.end]
 $[field.end]
         $$[table.unix]->insert();
+        $found_$[table.unix] = $[Table.norm]::find(['$[primary]' => $$[table.unix]->get$[Primary.norm]()]);
+        $this->assertEquals($$[table.unix], $found_$[table.unix]);
 $[table.each(unique)]
         $found_$[table.unix] = $[Table.norm]::findBy$[unique.each(all)]$[Field.norm]$[unique.end]($[unique.each(all)]$[field.if(first)]$[field.else], $[field.end]$$[table.unix]->get$[Field.norm]($[field.if(array)]$[field.array.number]$[field.end])$[unique.end]);
         $this->assertEquals($$[table.unix], $found_$[table.unix]);

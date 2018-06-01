@@ -505,17 +505,6 @@ class ValorNutricional extends Model
     }
 
     /**
-     * Find this object on database using, ID
-     * @param  int $id id to find Valor nutricional
-     * @return ValorNutricional A filled instance or empty when not found
-     */
-    public static function findByID($id)
-    {
-        $result = new self();
-        return $result->loadByID($id);
-    }
-
-    /**
      * Find this object on database using, InformacaoID, Nome
      * @param  int $informacao_id informação to find Valor nutricional
      * @param  string $nome nome to find Valor nutricional

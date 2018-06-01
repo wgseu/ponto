@@ -104,6 +104,9 @@ class OperacaoTest extends \PHPUnit_Framework_TestCase
         $operacao->update();
         $found_operacao = Operacao::findByID($operacao->getID());
         $this->assertEquals($operacao, $found_operacao);
+        $operacao->setID('');
+        $this->setExpectedException('\Exception');
+        $operacao->update();
     }
 
     public function testDelete()
@@ -113,6 +116,7 @@ class OperacaoTest extends \PHPUnit_Framework_TestCase
         $operacao->setDescricao('Operação to delete');
         $operacao->insert();
         $operacao->delete();
+        $operacao->clean(new Operacao());
         $found_operacao = Operacao::findByID($operacao->getID());
         $this->assertEquals(new Operacao(), $found_operacao);
         $operacao->setID('');
@@ -126,6 +130,8 @@ class OperacaoTest extends \PHPUnit_Framework_TestCase
         $operacao->setCodigo(123654);
         $operacao->setDescricao('Operação find');
         $operacao->insert();
+        $found_operacao = Operacao::find(['id' => $operacao->getID()]);
+        $this->assertEquals($operacao, $found_operacao);
         $found_operacao = Operacao::findByID($operacao->getID());
         $this->assertEquals($operacao, $found_operacao);
         $found_operacao->loadByID($operacao->getID());

@@ -673,7 +673,7 @@ class Pagamento extends Model
             $this->setDetalhes($pagamento['detalhes']);
         }
         if (!isset($pagamento['cancelado'])) {
-            $this->setCancelado(null);
+            $this->setCancelado('N');
         } else {
             $this->setCancelado($pagamento['cancelado']);
         }
@@ -688,7 +688,7 @@ class Pagamento extends Model
             $this->setDataCompensacao($pagamento['datacompensacao']);
         }
         if (!isset($pagamento['datahora'])) {
-            $this->setDataHora(null);
+            $this->setDataHora(DB::now());
         } else {
             $this->setDataHora($pagamento['datahora']);
         }

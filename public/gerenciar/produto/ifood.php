@@ -170,9 +170,9 @@ if (isset($_GET['action'])) {
             }
             foreach ($produto['itens'] as $subcodigo => $subproduto) {
                 if (!is_null($subproduto['id'])) {
-                    $_produtos[$subcodigo] = $subproduto['id'];
+                    $_produtos[$codigo.'_'.$subcodigo] = $subproduto['id'];
                 } else {
-                    $_desconhecidos[$subcodigo] = $subproduto['descricao'];
+                    $_desconhecidos[$codigo.'_'.$subcodigo] = $subproduto['descricao'];
                 }
             }
         }

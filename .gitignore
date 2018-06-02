@@ -11,6 +11,7 @@ public/static/doc/conta/
 public/static/img/header/
 public/static/img/patrimonio/*.*
 public/static/img/produto/*.*
+public/static/upload/*
 *.lock
 build/
 etc/nginx/grandchef.location

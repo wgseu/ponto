@@ -1,17 +1,5 @@
-public/include/compiled/
-public/include/logs/*.txt
-public/static/doc/xml/*/*/*.xml
-public/static/doc/cert/*.pem
-public/static/doc/integracao/*.json
 utils/*.sublime-workspace
-utils/tmp/generated/
-utils/tmp/coverage/
 public/include/vendor/
-public/static/doc/conta/
-public/static/img/header/
-public/static/img/patrimonio/*.*
-public/static/img/produto/*.*
-public/static/upload/*
 *.lock
 build/
 etc/nginx/grandchef.location

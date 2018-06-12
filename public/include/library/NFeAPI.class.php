@@ -59,7 +59,7 @@ class NFeAPI extends \NFe\Common\Ajuste
         if (!$this->external_emitente->exists()) {
             throw new \Exception('As configurações fiscais do emitente não foram ajustadas', 500);
         }
-        \NFe\Log\Logger::getInstance()->setDirectory(dirname(__DIR__).'/logs');
+        \NFe\Logger\Log::getInstance()->setDirectory(dirname(__DIR__).'/logs');
         $this->external_regime = $this->external_emitente->findRegimeID();
         $this->sefaz = \NFe\Core\SEFAZ::getInstance();
         $this->sefaz->setConfiguracao($this);

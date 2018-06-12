@@ -196,7 +196,7 @@ class NFeDB extends \NFe\Database\Estatico
             $transportador->setIE($nota->getEmitente()->getIE());
             $transportador->setEndereco($nota->getEmitente()->getEndereco());
             $nota->getTransporte()
-                 ->setFrete(\NFe\Entity\Transporte::FRETE_EMITENTE)
+                 ->setFrete(\NFe\Entity\Transporte::FRETE_REMETENTE)
                  ->setRetencao(null)
                  ->setVeiculo(null)
                  ->setReboque(null)
@@ -300,10 +300,7 @@ class NFeDB extends \NFe\Database\Estatico
                 /* fim do desconto restante */
             } while ($i == $count);
         }
-        $total_pago = 0.00;
         $troco = 0.00;
-        $dinheiro = []; // guarda os pagamentos em dinheiro
-        $outros = []; // guarda os outros pagamentos
         $pagamentos = [];
         foreach ($_pagamentos as $key => $_pagamento) {
             $_forma = $_pagamento->findFormaPagtoID();
@@ -311,7 +308,6 @@ class NFeDB extends \NFe\Database\Estatico
                 $troco += $_pagamento->getTotal();
                 continue;
             }
-            $total_pago += $_pagamento->getTotal();
             $pagamento = new \NFe\Entity\Pagamento();
             $pagamento->setForma(\NFeUtil::toFormaPagamento($_forma->getTipo()));
             $pagamento->setValor($_pagamento->getTotal());
@@ -321,32 +317,14 @@ class NFeDB extends \NFe\Database\Estatico
                 $pagamento->setBandeira(\NFeUtil::toBandeira($_cartao->getDescricao()));
             }
             // $pagamento->setAutorizacao('110011');
-            $new_key = 'pg_' . $key;
-            $pagamentos[$new_key] = $pagamento;
-            if ($_forma->getTipo() == FormaPagto::TIPO_DINHEIRO) {
-                $dinheiro[$new_key] = $pagamento;
-            } else {
-                $outros[$new_key] = $pagamento;
-            }
+            $pagamentos[] = $pagamento;
         }
-        $troco_total = $troco;
-        $arrays = [$dinheiro, $outros];
-        foreach ($arrays as $array) {
-            foreach ($array as $key => $pagamento) {
-                if (!is_less($troco, 0.00)) {
-                    break;
-                }
-                if (is_greater($pagamento->getValor(), -$troco)) {
-                    $pagamento->setValor($pagamento->getValor() + $troco);
-                    $troco = 0.00;
-                } else {
-                    $troco += $pagamento->getValor();
-                    unset($pagamentos[$key]);
-                }
-            }
+        if (is_less($troco, 0.00)) {
+            $pagamento = new \NFe\Entity\Pagamento();
+            $pagamento->setValor($troco);
+            $pagamentos[] = $pagamento;
         }
         $nota->setPagamentos($pagamentos);
-        $nota->addObservacao('Troco', \NFe\Common\Util::toCurrency(-$troco_total));
         return $nota;
     }
 

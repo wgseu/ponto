@@ -21,7 +21,7 @@
         "fpdo/fluentpdo": "1.1.1",
         "sybio/image-workshop": "^2.1.0",
         "phpmailer/phpmailer": "~5.2",
-        "mazinsw/nfe-api": "^1.0",
+        "mazinsw/nfe-api": "^2.0",
         "phpoffice/phpexcel": "^1.8",
         "setasign/fpdf": "1.8.1",
         "php-curl-class/php-curl-class": "^8.0",

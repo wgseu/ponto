@@ -210,6 +210,7 @@ class NFeDB extends \NFe\Database\Estatico
         $desconto = 0.00;
         $servicos = 0.00;
         $frete = 0.00;
+        $acumulador = 0.00;
         foreach ($_itens as $_item) {
             // descontos
             if (is_less($_item->getPreco(), 0.00)) {
@@ -239,6 +240,11 @@ class NFeDB extends \NFe\Database\Estatico
             $produto->setUnidade($_unidade->processaSigla($_item->getQuantidade(), $_produto->getConteudo()));
             $produto->setPreco($_item->getSubvenda());
             $produto->setDespesas($_item->getComissao());
+            $acumulador += $produto->getPreco() - floatval($produto->getPreco(true));
+            if (!is_less(abs($acumulador), 0.01, 0.0005)) {
+                $produto->setPreco($produto->getPreco() + $acumulador);
+                $acumulador = 0.00;
+            }
             // pode acontecer de alterar o preço para mais em vez de dar desconto
             $descontos = $_item->getDescontos();
             if (is_less($descontos, 0.00)) {

@@ -16,6 +16,7 @@ help:
 	@echo "  update       Update PHP dependencies with composer"
 	@echo "  autoload     Update PHP autoload files"
 	@echo "  test         Test application"
+	@echo "  cover        Test application and generate coverage files"
 	@echo "  check        Check the API with PHP Code Sniffer (PSR2)"
 	@echo "  fix          Fix php files code standard using PSR2"
 	@echo "  dump         Create backup of whole database"
@@ -30,14 +31,12 @@ help:
 init:
 	@echo "Initializing..."
 	@mkdir -p $(DB_DUMPS_DIR)
-	@mkdir -p public/include/compiled
 	@mkdir -p public/static/doc/conta
 	@mkdir -p public/static/doc/cert
 	@mkdir -p public/static/img/categoria
 	@mkdir -p public/static/img/cliente
 	@mkdir -p public/static/img/patrimonio
 	@mkdir -p public/static/img/produto
-	@mkdir -p public/static/img/header
 
 doc:
 	@docker-compose exec -T php ./public/include/vendor/bin/apigen generate app --destination docs/api
@@ -48,14 +47,12 @@ term:
 
 clean: stop
 	@rm -Rf storage
-	@rm -Rf public/include/compiled
 	@rm -Rf public/static/doc/conta
 	@rm -Rf public/static/doc/cert
 	@rm -Rf public/static/img/categoria
 	@rm -Rf public/static/img/cliente
 	@rm -Rf public/static/img/patrimonio/*.*
 	@rm -Rf public/static/img/produto
-	@rm -Rf public/static/img/header
 	@rm -Rf docs/api
 
 purge: clean
@@ -95,15 +92,15 @@ populate:
 	@cat database/model/populate.sql >> $(DB_DUMPS_DIR)/populate.sql
 	@npm run fix-pop "$(DB_NAME)"
 	@make -s reset
-	@docker exec -i $(shell docker-compose ps -q gmysqldb) mysql -u"$(DB_ROOT_USER)" -p"$(DB_ROOT_PASSWORD)" < $(DB_DUMPS_DIR)/populate.sql
+	@docker exec -i $(shell docker-compose ps -q db) mysql -u"$(DB_ROOT_USER)" -p"$(DB_ROOT_PASSWORD)" < $(DB_DUMPS_DIR)/populate.sql
 
 dump:
 	@mkdir -p $(DB_DUMPS_DIR)
-	@docker exec $(shell docker-compose ps -q gmysqldb) mysqldump -B "$(DB_NAME)" -u"$(DB_ROOT_USER)" -p"$(DB_ROOT_PASSWORD)" --add-drop-database > $(DB_DUMPS_DIR)/db.sql
+	@docker exec $(shell docker-compose ps -q db) mysqldump -B "$(DB_NAME)" -u"$(DB_ROOT_USER)" -p"$(DB_ROOT_PASSWORD)" --add-drop-database > $(DB_DUMPS_DIR)/db.sql
 	@make -s reset
 
 restore:
-	@docker exec -i $(shell docker-compose ps -q gmysqldb) mysql -u"$(DB_ROOT_USER)" -p"$(DB_ROOT_PASSWORD)" < $(DB_DUMPS_DIR)/db.sql
+	@docker exec -i $(shell docker-compose ps -q db) mysql -u"$(DB_ROOT_USER)" -p"$(DB_ROOT_PASSWORD)" < $(DB_DUMPS_DIR)/db.sql
 
 test:
 	@docker-compose exec -T php ./public/include/vendor/bin/phpunit --configuration ./ --no-coverage

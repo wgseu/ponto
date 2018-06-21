@@ -126,7 +126,7 @@ class NFeUtil extends \NFe\Common\Util
     /**
      * Corrige a codificação do texto apenas para o estado do Mato Grosso
      */
-    public function fixEncoding($text)
+    public static function fixEncoding($text)
     {
         global $app;
 

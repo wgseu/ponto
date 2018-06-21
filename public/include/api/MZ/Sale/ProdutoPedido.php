@@ -997,7 +997,6 @@ class ProdutoPedido extends Model
                 }
             }
             $this->insert();
-            // TODO: verificar se o preço informado está correto
             $composicoes = [];
             foreach ($formacoes as $formacao) {
                 $formacao->setProdutoPedidoID($this->getID());

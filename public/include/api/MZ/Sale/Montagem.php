@@ -261,7 +261,9 @@ class Montagem extends ProdutoPedido
             } else {
                 $pacote = $formacao->findPacoteID();
                 if (is_null($pacote->getPropriedadeID())) {
-                    // TODO: testar duplicidade de pacote principal
+                    if ($pacote_principal !== null) {
+                        throw new \Exception('Muitas formações para o item principal');
+                    }
                     $pacote_principal = $pacote;
                     continue;
                 }
@@ -310,13 +312,18 @@ class Montagem extends ProdutoPedido
         foreach ($this->grupos as $grupo_index => $grupo_formado) {
             $grupo = $grupo_formado['grupo'];
             $pacotes = $grupo_formado['pacotes'];
-            $minimo = $grupo_formado['minimo'];
             $acumulado = 0;
             foreach ($pacotes as $pacote_index => $produto_formado) {
+                $pacote = $produto_formado['pacote'];
                 $item_index = $produto_formado['item_index'];
                 $item = $this->itens[$item_index]['item'];
                 $preco = $produto_formado['preco'];
+                $minimo = $grupo_formado['minimo'];
                 $quantidade = round($item->getQuantidade() / $minimo);
+                $quantidade = max($quantidade, $pacote->getQuantidadeMinima());
+                if ($pacote->getQuantidadeMaxima() > 0) {
+                    $quantidade = min($quantidade, $pacote->getQuantidadeMaxima());
+                }
                 $acumulado += $quantidade;
                 $this->grupos[$grupo_index]['pacotes'][$pacote_index]['quantidade'] = $quantidade;
             }
@@ -435,15 +442,13 @@ class Montagem extends ProdutoPedido
             $grupo = $grupo_formado['grupo'];
             $pacotes = $grupo_formado['pacotes'];
             $acumulado = $grupo_formado['quantidade'];
-            $menor = $grupo_formado['menor'];
-            $maior = $grupo_formado['maior'];
             foreach ($pacotes as $produto_formado) {
                 $pacote = $produto_formado['pacote'];
                 $preco = $produto_formado['preco'];
                 if ($grupo->getFuncao() == Grupo::FUNCAO_MAXIMO) {
-                    $preco = $maior;
+                    $preco = $grupo_formado['maior'];
                 } elseif ($grupo->getFuncao() == Grupo::FUNCAO_MINIMO) {
-                    $preco = $menor;
+                    $preco = $grupo_formado['menor'];
                 }
                 $multiplicador = $produto_formado['quantidade'];
                 if ($grupo->getTipo() == Grupo::TIPO_FRACIONADO) {
@@ -458,6 +463,36 @@ class Montagem extends ProdutoPedido
                     $produtos_formados[] = $produto_formado;
                 }
             }
+            if ($grupo->getTipo() == Grupo::TIPO_FRACIONADO) {
+                $quantidade = count($pacotes);
+            } else {
+                $quantidade = $acumulado;
+            }
+            if ($quantidade < $grupo->getQuantidadeMinima()) {
+                throw new \Exception(
+                    sprintf(
+                        'Necessário no mínimo %d itens, ' .
+                            'mas apenas %d foram selecionados no grupo "%s" do pacote "%s"',
+                        $grupo->getQuantidadeMinima(),
+                        $quantidade,
+                        $grupo->getDescricao(),
+                        $produto->getDescricao()
+                    ),
+                    401
+                );
+            }
+            if ($quantidade > $grupo->getQuantidadeMaxima() && $grupo->getQuantidadeMaxima() > 0) {
+                throw new \Exception(
+                    sprintf(
+                        'O máximo de itens para o grupo "%s" é %d, foram selecionados %d no pacote "%s"',
+                        $grupo->getDescricao(),
+                        $grupo->getQuantidadeMaxima(),
+                        $quantidade,
+                        $produto->getDescricao()
+                    ),
+                    401
+                );
+            }
         }
         // aplica o preço no item principal
         $callback(0, $this->getQuantidade(), $preco_principal, $produtos_formados);
@@ -471,13 +506,40 @@ class Montagem extends ProdutoPedido
         $this->filter(function ($index, $quantidade, $preco, $pacotes) {
             $item = $this->itens[$index]['item'];
             if (!is_equal($item->getQuantidade(), $quantidade, 0.00005)) {
-                throw new \Exception('Quantidade incorreta', 401);
+                $produto = $item->findProdutoID();
+                throw new \Exception(
+                    sprintf(
+                        'A quantidade do item "%s" deveria ser %s em vez de %s',
+                        $produto->getDescricao(),
+                        $quantidade,
+                        $item->getQuantidade()
+                    ),
+                    401
+                );
             }
             if (!is_equal($item->getPreco(), $preco)) {
-                throw new \Exception('Preço incorreto', 401);
+                $produto = $item->findProdutoID();
+                throw new \Exception(
+                    sprintf(
+                        'O preço do item "%s" deveria ser %s em vez de %s',
+                        $produto->getDescricao(),
+                        \MZ\Util\Mask::money($preco, true),
+                        \MZ\Util\Mask::money($item->getPreco(), true)
+                    ),
+                    401
+                );
             }
             if (!is_equal($item->getPrecoVenda(), $preco)) {
-                throw new \Exception('Preço de venda incorreto', 401);
+                $produto = $item->findProdutoID();
+                throw new \Exception(
+                    sprintf(
+                        'O preço de venda do item "%s" deveria ser %s em vez de %s',
+                        $produto->getDescricao(),
+                        \MZ\Util\Mask::money($preco, true),
+                        \MZ\Util\Mask::money($item->getPrecoVenda(), true)
+                    ),
+                    401
+                );
             }
             $descricao = $this->checkFormacao($index, $pacotes, function ($formacao, $quantidade) {
                 if (!is_equal($formacao->getQuantidade(), $quantidade, 0.00005)) {

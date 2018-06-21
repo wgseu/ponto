@@ -43,6 +43,7 @@ use MZ\Account\Cliente;
 use MZ\Sale\Pedido;
 use MZ\Sale\ProdutoPedido;
 use MZ\Sale\Formacao;
+use MZ\Sale\Montagem;
 use MZ\Product\Servico;
 use MZ\Product\Produto;
 use MZ\Session\Sessao;
@@ -370,6 +371,7 @@ class Order extends Pedido
         $i = 0;
         $itens = $body_list->getElementsByTagName('item');
         $this->products = [];
+        $pacotes = [];
         $parent_products = [];
         foreach ($itens as $item) {
             $codigo = Document::childValue($item, 'codCardapio');
@@ -393,8 +395,11 @@ class Order extends Pedido
                         $app->makeURL('/gerenciar/produto/' . $this->integracao->getAcessoURL())
                     );
                 }
+                if ($produto->getTipo() == Produto::TIPO_PACOTE) {
+                    $pacotes[$i] = [];
+                }
                 $this->products[$i] = [
-                    'produto' => $produto_pedido,
+                    'item' => $produto_pedido,
                     'formacoes' => []
                 ];
                 $parent_products[$codigo] = $i;
@@ -403,10 +408,10 @@ class Order extends Pedido
                 $subitem_id = isset($produtos[$codigo_pai]['itens'][$codigo]['id']) ?
                     $produtos[$codigo_pai]['itens'][$codigo]['id'] : null;
                 $parent_index = $parent_products[$codigo_pai];
-                $produto_pedido_pai = $this->products[$parent_index]['produto'];
-                $produto = $produto_pedido_pai->findProdutoID();
+                $produto_pedido_pai = $this->products[$parent_index]['item'];
+                $produto_pai = $produto_pedido_pai->findProdutoID();
                 $formacao = new Formacao();
-                if ($produto->getTipo() == Produto::TIPO_COMPOSICAO) {
+                if ($produto_pai->getTipo() == Produto::TIPO_COMPOSICAO) {
                     $formacao->setTipo(Formacao::TIPO_COMPOSICAO);
                     $formacao->setComposicaoID($subitem_id ?: $codigo_pdv);
                     $composicao = $formacao->findComposicaoID();
@@ -415,14 +420,14 @@ class Order extends Pedido
                             sprintf(
                                 'A composição "%s" não foi associada corretamente no produto "%s"',
                                 $descricao,
-                                $produto->getDescricao()
+                                $produto_pai->getDescricao()
                             ),
                             404,
                             $app->makeURL('/gerenciar/produto/' . $this->integracao->getAcessoURL())
                         );
                     }
                     $produto_pedido->setProdutoID($composicao->getProdutoID());
-                } else {
+                } elseif ($produto_pai->getTipo() == Produto::TIPO_PACOTE) {
                     $formacao->setTipo(Formacao::TIPO_PACOTE);
                     $formacao->setPacoteID($subitem_id ?: $codigo_pdv);
                     $pacote = $formacao->findPacoteID();
@@ -431,24 +436,39 @@ class Order extends Pedido
                             sprintf(
                                 'O item "%s" não foi associado corretamente no produto "%s"',
                                 $descricao,
-                                $produto->getDescricao()
+                                $produto_pai->getDescricao()
                             ),
                             404,
                             $app->makeURL('/gerenciar/produto/' . $this->integracao->getAcessoURL())
                         );
                     }
                     $produto_pedido->setProdutoID($pacote->getProdutoID());
+                } else {
+                    throw new RedirectException(
+                        sprintf(
+                            'O produto "%s" não é um pacote ou composição, não é possível adicionar "%s" nele',
+                            $produto_pai->getDescricao(),
+                            $descricao
+                        ),
+                        404,
+                        $app->makeURL('/gerenciar/produto/' . $this->integracao->getAcessoURL())
+                    );
                 }
                 if (!is_null($produto_pedido->getProdutoID())) {
+                    // aqui o produto pai pode ser uma composição ou pacote
+                    if ($produto_pai->getTipo() == Produto::TIPO_PACOTE) {
+                        $pacotes[$parent_index][] = $i;
+                    }
                     $produto_pedido->setProdutoPedidoID($produto_pedido_pai->getID());
                     $this->products[$i] = [
-                        'produto' => $produto_pedido,
+                        'item' => $produto_pedido,
                         'formacoes' => []
                     ];
+                    // permite adicionar a formação no próprio item mais abaixo
                     $parent_index = $i;
                     $i++;
                 } else {
-                    // pacote propriedade
+                    // pacote propriedade, não adiciona na lista de itens, a formação será adicionada no produto pai
                     $produto_pedido_pai->setPreco($produto_pedido_pai->getPreco() + $produto_pedido->getPreco());
                     $produto_pedido_pai->setPrecoVenda(
                         $produto_pedido_pai->getPrecoVenda() + $produto_pedido->getPrecoVenda()
@@ -463,9 +483,21 @@ class Order extends Pedido
                 );
             }
         }
+        // percorre todos os pacotes e corrige preços e quantidades
+        foreach ($pacotes as $parent_index => $itens) {
+            $pacote = $this->products[$parent_index];
+            $montagem = new Montagem($pacote['item']);
+            $montagem->initialize();
+            $montagem->addItem($pacote['item'], $pacote['formacoes']);
+            foreach ($itens as $index) {
+                $item = $this->products[$index];
+                $montagem->addItem($item['item'], $item['formacoes']);
+            }
+            $montagem->filter();
+        }
         foreach ($servicos as $servico) {
             $this->products[$i] = [
-                'produto' => $servico,
+                'item' => $servico,
                 'formacoes' => []
             ];
             $i++;
@@ -537,7 +569,7 @@ class Order extends Pedido
             }
             $produto_pedido->setID($i);
             $this->products[$i] = [
-                'produto' => $produto_pedido,
+                'item' => $produto_pedido,
                 'formacoes' => $formacoes
             ];
             $i++;
@@ -598,7 +630,7 @@ class Order extends Pedido
         $find_district->loadByCidadeIDNome();
         if (!$find_district->exists()) {
             foreach ($this->products as $item_info) {
-                $produto_pedido = $item_info['produto'];
+                $produto_pedido = $item_info['item'];
                 if ($produto_pedido->getServicoID() == Servico::ENTREGA_ID) {
                     $this->district->setValorEntrega($produto_pedido->getSubtotal());
                     break;
@@ -628,15 +660,17 @@ class Order extends Pedido
     private function insertProducts()
     {
         $added = 0;
+        $pacotes = [];
         $comissao_balcao = is_boolean_config('Vendas', 'Balcao.Comissao');
         $pacote_pedido = new ProdutoPedido();
         foreach ($this->products as $index => $item_info) {
-            $produto_pedido = $item_info['produto'];
+            $produto_pedido = $item_info['item'];
             $produto_pedido->setPedidoID($this->getID());
             $produto_pedido->setFuncionarioID($this->employee->getID());
             $produto_pedido->setPrecoCompra(0);
             $produto = $produto_pedido->findProdutoID();
             if ($produto->exists()) {
+                // se chegou aqui é porque o item é um produto e não serviço
                 if ($produto->isCobrarServico() &&
                     (
                         in_array($this->getTipo(), [self::TIPO_MESA, self::TIPO_COMANDA]) ||
@@ -646,14 +680,12 @@ class Order extends Pedido
                     $produto_pedido->setPorcentagem($this->employee->getPorcentagem());
                 }
                 if (!is_null($produto_pedido->getProdutoPedidoID())) {
-                    // TODO atribuir preço e verificar preços das composições
                     $produto_pedido->setProdutoPedidoID($pacote_pedido->getID());
+                    $pacotes[$pacote_pedido->getID()]['itens'][] = $item_info;
                 } elseif ($produto->getTipo() != Produto::TIPO_PACOTE) {
                     $produto_pedido->setPreco($produto->getPrecoVenda());
                     $produto_pedido->setPrecoVenda($produto->getPrecoVenda());
                     $pacote_pedido = new ProdutoPedido();
-                } else {
-                    // TODO atribuir preço padrão e verificar preços das propriedades
                 }
                 if (!is_null($produto->getCustoProducao())) {
                     $produto_pedido->setPrecoCompra($produto->getCustoProducao());
@@ -679,8 +711,22 @@ class Order extends Pedido
             $produto_pedido->register($item_info['formacoes']);
             if ($produto->exists() && $produto->getTipo() == Produto::TIPO_PACOTE) {
                 $pacote_pedido = $produto_pedido;
+                $pacote = $item_info;
+                $pacote['itens'] = [];
+                $pacotes[$pacote_pedido->getID()] = $pacote;
             }
             $added++;
+        }
+        // percorre todos os pacotes e valida a formação, lançando exceção quando conter erros
+        foreach ($pacotes as $pacote) {
+            $montagem = new Montagem($pacote['item']);
+            $montagem->initialize();
+            $montagem->addItem($pacote['item'], $pacote['formacoes']);
+            $itens = $pacote['itens'];
+            foreach ($itens as $item) {
+                $montagem->addItem($item['item'], $item['formacoes']);
+            }
+            $montagem->validate();
         }
         return $added;
     }

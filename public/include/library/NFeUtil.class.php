@@ -122,4 +122,32 @@ class NFeUtil extends \NFe\Common\Util
         }
         return \NFe\Entity\Pagamento::BANDEIRA_OUTROS;
     }
+
+    /**
+     * Corrige a codificação do texto apenas para o estado do Mato Grosso
+     */
+    public function fixEncoding($text)
+    {
+        global $app;
+
+        $estado = $app->getSystem()->getState();
+        if ($estado->getUF() == 'MT') {
+            return \NFeUtil::removeAccent($text);
+        }
+        return $text;
+    }
+
+    public static function removeAccent($str)
+    {
+        return iconv('UTF-8', 'ASCII//TRANSLIT', str_replace(['ª', 'º'], ['', ''], self::StripAccents($str)));
+    }
+    
+    public static function stripAccents($str)
+    {
+        return strtr(
+            utf8_decode($str),
+            utf8_decode('àáâãäçèéêëìíîïñòóôõöùúûüýÿÀÁÂÃÄÇÈÉÊËÌÍÎÏÑÒÓÔÕÖÙÚÛÜÝ'),
+            'aaaaaceeeeiiiinooooouuuuyyAAAAACEEEEIIIINOOOOOUUUUY'
+        );
+    }
 }

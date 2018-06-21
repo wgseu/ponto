@@ -653,17 +653,17 @@ class Pagamento extends Model
             $this->setTotal($pagamento['total']);
         }
         if (!isset($pagamento['parcelas'])) {
-            $this->setParcelas(null);
+            $this->setParcelas(0);
         } else {
             $this->setParcelas($pagamento['parcelas']);
         }
         if (!isset($pagamento['valorparcela'])) {
-            $this->setValorParcela(null);
+            $this->setValorParcela(0.0);
         } else {
             $this->setValorParcela($pagamento['valorparcela']);
         }
         if (!isset($pagamento['taxas'])) {
-            $this->setTaxas(null);
+            $this->setTaxas(0.0);
         } else {
             $this->setTaxas($pagamento['taxas']);
         }
@@ -683,7 +683,7 @@ class Pagamento extends Model
             $this->setAtivo($pagamento['ativo']);
         }
         if (!isset($pagamento['datacompensacao'])) {
-            $this->setDataCompensacao(null);
+            $this->setDataCompensacao(DB::now());
         } else {
             $this->setDataCompensacao($pagamento['datacompensacao']);
         }

@@ -79,8 +79,8 @@ class NFeAPI extends \NFe\Common\Ajuste
 
         /* Emitente */
         $emitente = new \NFe\Entity\Emitente();
-        $emitente->setRazaoSocial($empresa->getSobrenome());
-        $emitente->setFantasia($empresa->getNome());
+        $emitente->setRazaoSocial(\NFeUtil::fixEncoding($empresa->getSobrenome()));
+        $emitente->setFantasia(\NFeUtil::fixEncoding($empresa->getNome()));
         $emitente->setCNPJ($empresa->getCPF());
         $emitente->setTelefone($empresa->getFone(1));
         $emitente->setIE($empresa->getRG());
@@ -90,12 +90,12 @@ class NFeAPI extends \NFe\Common\Ajuste
         $endereco = new \NFe\Entity\Endereco();
         $endereco->setCEP($localizacao->getCEP());
         $endereco->getMunicipio()
-                 ->setNome($cidade->getNome())
+                 ->setNome(\NFeUtil::fixEncoding($cidade->getNome()))
                  ->getEstado()
-                 ->setNome($estado->getNome())
+                 ->setNome(\NFeUtil::fixEncoding($estado->getNome()))
                  ->setUF($estado->getUF());
-        $endereco->setBairro($bairro->getNome());
-        $endereco->setLogradouro($localizacao->getLogradouro());
+        $endereco->setBairro(\NFeUtil::fixEncoding($bairro->getNome()));
+        $endereco->setLogradouro(\NFeUtil::fixEncoding($localizacao->getLogradouro()));
         $endereco->setNumero($localizacao->getNumero());
 
         $emitente->setEndereco($endereco);

@@ -26,6 +26,7 @@ namespace MZ\Sale;
 
 use MZ\Database\Model;
 use MZ\Database\DB;
+use MZ\Util\Date;
 use MZ\Util\Filter;
 use MZ\Util\Validator;
 
@@ -406,6 +407,23 @@ class Promocao extends Model
     }
 
     /**
+     * Load current promotion for this product
+     * @return Promocao Self instance filled or empty
+     */
+    public function loadByProdutoID()
+    {
+        if ($this->getProdutoID() === null) {
+            return $this->fromArray([]);
+        }
+        $week_offset = Date::weekOffset();
+        return $this->load([
+            'produtoid' => $this->getProdutoID(),
+            'ate_inicio' => $week_offset,
+            'apartir_fim' => $week_offset
+        ]);
+    }
+
+    /**
      * Informa qual o produto que possui desconto ou acréscimo
      * @return \MZ\Product\Produto The object fetched from database
      */
@@ -444,6 +462,18 @@ class Promocao extends Model
     private static function filterCondition($condition)
     {
         $allowed = self::getAllowedKeys();
+        if (isset($condition['ate_inicio'])) {
+            $field = 'p.inicio <= ?';
+            $condition[$field] = $condition['ate_inicio'];
+            $allowed[$field] = true;
+            unset($condition['ate_inicio']);
+        }
+        if (isset($condition['apartir_fim'])) {
+            $field = 'p.fim >= ?';
+            $condition[$field] = $condition['apartir_fim'];
+            $allowed[$field] = true;
+            unset($condition['apartir_fim']);
+        }
         return Filter::keys($condition, $allowed, 'p.');
     }
 
@@ -473,6 +503,18 @@ class Promocao extends Model
         $query = self::query($condition, $order)->limit(1);
         $row = $query->fetch() ?: [];
         return new Promocao($row);
+    }
+
+    /**
+     * Find current promotion for this product
+     * @param  int $produto_id sigla to find Unidade
+     * @return Promocao A filled Promoção or empty instance
+     */
+    public static function findByProdutoID($produto_id)
+    {
+        $result = new self();
+        $result->setProdutoID($produto_id);
+        return $result->loadByProdutoID();
     }
 
     /**

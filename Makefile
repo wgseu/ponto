@@ -56,6 +56,7 @@ clean: stop
 	@rm -Rf docs/api
 
 purge: clean
+	@rm -Rf node_modules
 	@rm -Rf public/include/vendor
 	@rm -Rf composer.lock
 

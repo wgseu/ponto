@@ -26,6 +26,7 @@ namespace MZ\Product;
 
 use MZ\Database\Model;
 use MZ\Database\DB;
+use MZ\Util\Date;
 use MZ\Util\Filter;
 use MZ\Util\Validator;
 
@@ -689,7 +690,7 @@ class Pacote extends Model
      */
     private static function queryEx($condition = [], $order = [])
     {
-        $week_offset = (1 + date('w')) * 1440 + (int)((time() - strtotime('00:00')) / 60);
+        $week_offset = Date::weekOffset();
         $query = DB::from('Pacotes p')
             ->leftJoin('Produtos d ON d.id = p.produtoid')
             ->leftJoin('Propriedades r ON r.id = p.propriedadeid')
@@ -746,6 +747,18 @@ class Pacote extends Model
     }
 
     /**
+     * Search one register with a condition
+     * @param  array $condition Condition for searching the row
+     * @param  array $order order rows
+     * @return array Array with fields or empty when not found
+     */
+    public static function rawFind($condition, $order = [])
+    {
+        $query = self::queryEx($condition, $order)->limit(1);
+        return $query->fetch() ?: [];
+    }
+
+    /**
      * Fetch all rows from database with matched condition critery
      * @param  array $condition condition to filter rows
      * @param  integer $limit number of rows to get, null for all
@@ -774,7 +787,7 @@ class Pacote extends Model
      * @param  array $condition condition to filter rows
      * @param  integer $limit number of rows to get, null for all
      * @param  integer $offset start index to get rows, null for begining
-     * @return array All rows instanced and filled
+     * @return array All rows data
      */
     public static function rawFindAll($condition = [], $order = [], $limit = null, $offset = null)
     {

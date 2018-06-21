@@ -26,6 +26,7 @@ namespace MZ\Product;
 
 use MZ\Database\Model;
 use MZ\Database\DB;
+use MZ\Util\Date;
 use MZ\Util\Filter;
 use MZ\Util\Validator;
 use MZ\Stock\Estoque;
@@ -1306,7 +1307,7 @@ class Produto extends Model
             isset($condition['estoque']);
         $setorestoque = isset($condition['setorestoque']) ? $condition['setorestoque'] : null;
         $promocao = isset($condition['promocao']) ? strval($condition['promocao']) : 'N';
-        $week_offset = (1 + date('w')) * 1440 + (int)((time() - strtotime('00:00')) / 60);
+        $week_offset = Date::weekOffset();
         $query = DB::from('Produtos p')
             ->select(null)
             ->select('p.id')

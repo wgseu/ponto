@@ -55,14 +55,14 @@ try {
             throw new \Exception('O E-mail do consumidor não foi informado no cadastro', 500);
         }
     }
-    $sufixo = '';
+    $sufixo = [];
     $filters = [];
-    if ($emissao_inicio !== false || $emissao_fim !== false) {
-        $sufixo .= ' emissão '.human_range($emissao_inicio, $emissao_fim, '-');
+    if ($emissao_inicio || $emissao_fim) {
+        $sufixo[] = 'emissão '.human_range($emissao_inicio, $emissao_fim, '-');
         $filters['Período de emissão'] = human_range($emissao_inicio, $emissao_fim);
     }
-    if ($lancamento_inicio !== false || $lancamento_fim !== false) {
-        $sufixo .= ' lançamento '.human_range($emissao_inicio, $emissao_fim, '-');
+    if ($lancamento_inicio || $lancamento_fim) {
+        $sufixo[] = 'lançamento '.human_range($lancamento_inicio, $lancamento_fim, '-');
         $filters['Período de lançamento'] = human_range($lancamento_inicio, $lancamento_fim);
     }
     if (is_numeric($nota->getSerie())) {
@@ -75,7 +75,7 @@ try {
         $filters['Contingência'] = 'Sim';
     }
     if (trim($nota->getEstado()) != '') {
-        $sufixo .= ' ' . Nota::getEstadoOptions($nota->getEstado());
+        $sufixo[] = Nota::getEstadoOptions($nota->getEstado());
         $filters['Estado da nota'] = Nota::getEstadoOptions($nota->getEstado());
     }
     if (count($notas) == 1) {
@@ -93,8 +93,16 @@ try {
         ],
         is_output('json')
     );
+    $sufixo_str = '';
+    if (count($sufixo) > 1) {
+        $sufixo_str = ' e ' . array_pop($sufixo);
+    }
+    $sufixo_str = implode(', ', $sufixo) . $sufixo_str;
+    if (count($sufixo) > 0) {
+        $sufixo_str = ' ' . $sufixo_str;
+    }
     $zipfile = Nota::zip($notas);
-    $zipname = 'Notas'.$sufixo.'.zip';
+    $zipname = 'Notas'.$sufixo_str.'.zip';
     try {
         mail_nota($destinatario->getEmail(), $destinatario->getNome(), $modo, $filters, [$zipname => $zipfile]);
     } catch (\Exception $e) {

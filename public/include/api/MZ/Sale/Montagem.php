@@ -140,6 +140,11 @@ class Montagem extends ProdutoPedido
         return $this;
     }
 
+    /**
+     * Adiciona um grupo na montagem do pacote
+     * @param \MZ\Product\Grupo $grupo grupo que será adicionado
+     * @return Montagem Self instance
+     */
     public function addGroup($grupo)
     {
         $this->grupos[$grupo->getID()] = [
@@ -150,6 +155,12 @@ class Montagem extends ProdutoPedido
         return $this;
     }
 
+    /**
+     * Adiciona um pacote em um grupo e pré-calcula mínimos e máximos
+     * @param \MZ\Product\Pacote $pacote pacote que será adicionado
+     * @param array $composicoes lista de composições adicionadas e retiradas do pacote
+     * @param int $item_index índice do item ao qual esse pacote foi associado
+     */
     private function addPacote($pacote, $composicoes, $item_index)
     {
         $item = $this->itens[$item_index]['item'];
@@ -313,8 +324,16 @@ class Montagem extends ProdutoPedido
         }
     }
 
+    /**
+     * Verifica a formação de um item e retorna a descrição dele
+     * @param int $index índice do item que será verificado suas formações
+     * @param array $pacotes lista de pacotes formados que será verificado
+     * @param \Closure $callback função que será chamada para cada formação do item
+     * @return string descrição do item principal ou nulo para os outros itens
+     */
     private function checkFormacao($index, $pacotes, $callback)
     {
+        $descricao = null;
         $formacoes = $this->itens[$index]['formacoes'];
         foreach ($pacotes as $produto_formado) {
             $composicoes = $produto_formado['composicoes'];
@@ -341,12 +360,19 @@ class Montagem extends ProdutoPedido
             }
             $key = 'p' . $pacote->getID();
             if (!isset($formacoes[$key])) {
-                $produto = $pacote->findProdutoID();
+                if (is_null($pacote->getPropriedadeID())) {
+                    $msg = 'A formação do produto "%s" não foi informado no pacote "%s"';
+                    $item_descricao = $produto->getDescricao();
+                } else {
+                    $msg = 'A formação da propriedade "%s" não foi informado no pacote "%s"';
+                    $propriedade = $pacote->findPropriedadeID();
+                    $item_descricao = $propriedade->getNome();
+                }
                 $produto_pacote = $this->findProdutoID();
                 throw new \Exception(
                     sprintf(
-                        'A formação do produto "%s" não foi informado no pacote "%s"',
-                        $produto->getDescricao(),
+                        $msg,
+                        $item_descricao,
                         $produto_pacote->getDescricao()
                     ),
                     401
@@ -356,22 +382,38 @@ class Montagem extends ProdutoPedido
             $formacao = $formacoes[$key];
             $callback($formacao, $multiplicador);
             unset($formacoes[$key]);
+            if ($pacote->getPropriedadeID() !== null) {
+                $propriedade = $pacote->findPropriedadeID();
+                $descricao .= ' ' . $propriedade->getAbreviado();
+            }
         }
         if (count($formacoes)) {
             throw new \Exception('Formação excedente no pacote', 401);
         }
+        return $descricao;
     }
 
+    /**
+     * Atualiza as informações do item com base na formação
+     * @param int $index índice do item que será atualizado suas informações
+     * @param float $quantidade quantidade calculada do item
+     * @param float $preco preço de venda calculado do item
+     * @param array $pacotes lista de pacotes formados
+     */
     private function updateItem($index, $quantidade, $preco, $pacotes)
     {
         $item = $this->itens[$index]['item'];
         $item->setQuantidade($quantidade);
         $item->setPreco($preco);
         $item->setPrecoVenda($preco);
-        $this->checkFormacao($index, $pacotes, function ($formacao, $quantidade) {
+        $descricao = $this->checkFormacao($index, $pacotes, function ($formacao, $quantidade) {
             // corrige a formação
             $formacao->setQuantidade($quantidade);
         });
+        if ($index == 0) {
+            $produto = $item->findProdutoID();
+            $item->setDescricao($produto->getDescricao() . $descricao);
+        }
     }
 
     /**
@@ -437,11 +479,25 @@ class Montagem extends ProdutoPedido
             if (!is_equal($item->getPrecoVenda(), $preco)) {
                 throw new \Exception('Preço de venda incorreto', 401);
             }
-            $this->checkFormacao($index, $pacotes, function ($formacao, $quantidade) {
-                if (!is_equal($formacao->getQuantidade(), $quantidade)) {
+            $descricao = $this->checkFormacao($index, $pacotes, function ($formacao, $quantidade) {
+                if (!is_equal($formacao->getQuantidade(), $quantidade, 0.00005)) {
                     throw new \Exception('A quantidade da formação está incorreta', 401);
                 }
             });
+            if ($index == 0) {
+                $produto = $item->findProdutoID();
+                $descricao = $produto->getDescricao() . $descricao;
+                if ($descricao != $item->getDescricao()) {
+                    throw new \Exception(
+                        sprintf(
+                            'A descrição do pacote "%s" está diferente do esperado "%s"',
+                            $item->getDescricao(),
+                            $descricao
+                        ),
+                        401
+                    );
+                }
+            }
         });
         $errors = [];
         if (!is_null($this->getProdutoPedidoID())) {

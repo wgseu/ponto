@@ -52,7 +52,7 @@
 </div>
 <div class="form-group col-lg-3 col-md-4 col-sm-3 col-xs-6">
   <label for="cpf">{{ _p('Titulo', 'CPF') }}:</label>
-  <input type="text" id="cpf" name="cpf" class="form-control masked" mask="{{ _p('Mascara', 'CPF') }}" mask-cnpj="{{ _p('Mascara', 'CNPJ') }}" value="{{ $cliente->getTipo() == \MZ\Account\Cliente::TIPO_JURIDICA?\MZ\Util\Mask::cnpj($cliente->getCPF()):\MZ\Util\Mask::cpf($cliente->getCPF()) }}" data-cpf="{{ _p('Titulo', 'CPF') }}:" data-cnpj="{{ _p('Titulo', 'CNPJ') }}:">
+  <input type="text" id="cpf" name="cpf" class="form-control masked" mask="{{ _p('Mascara', 'CPF') }}" mask-cnpj="{{ _p('Mascara', 'CNPJ') }}" value="{{ $cliente->getTipo() == \MZ\Account\Cliente::TIPO_JURIDICA ? \MZ\Util\Mask::cnpj($cliente->getCPF()) : \MZ\Util\Mask::cpf($cliente->getCPF()) }}" data-cpf="{{ _p('Titulo', 'CPF') }}:" data-cnpj="{{ _p('Titulo', 'CNPJ') }}:">
 </div>
 <div class="form-group col-lg-3 col-md-4 col-sm-4 col-xs-6">
   <label for="rg">Registro geral (RG):</label>

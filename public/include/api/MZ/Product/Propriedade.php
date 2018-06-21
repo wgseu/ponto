@@ -254,6 +254,15 @@ class Propriedade extends Model
         return $this;
     }
 
+    /* Obtém a descrição da propriedade abreviada */
+    public function getAbreviado()
+    {
+        if ($this->getAbreviacao() === null) {
+            return $this->getNome();
+        }
+        return $this->getAbreviacao();
+    }
+
     /**
      * Get relative imagem path or default imagem
      * @param boolean $default If true return default image, otherwise check field

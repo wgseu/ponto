@@ -806,20 +806,6 @@ class ProdutoPedido extends Model
         return !is_null($this->getServicoID()) && is_greater($this->getPreco(), 0.00);
     }
 
-    public function getDestino($values)
-    {
-        switch ($values['pedidotipo']) {
-            case \Pedido::TIPO_MESA:
-                return $values['mesanome'];
-            case \Pedido::TIPO_COMANDA:
-                return $values['comandanome'];
-            case \Pedido::TIPO_AVULSO:
-                return 'Balcão';
-            default:
-                return 'Entrega';
-        }
-    }
-
     /**
      * Retorna a descrição dinâmica do item, utilizada em pacotes com propriedades
      * @param \MZ\Product\Produto $produto Produto pré-carregado do item

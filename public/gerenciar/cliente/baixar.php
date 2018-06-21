@@ -147,7 +147,7 @@ try {
 
     $title = 'Relatório de Clientes';
     // Create new PHPExcel object
-    $objPHPExcel = new PHPExcel();
+    $objPHPExcel = new \PHPExcel();
     // Set document properties
     $objPHPExcel->getProperties()->setCreator('GrandChef')
                                  ->setTitle($title);

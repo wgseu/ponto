@@ -333,6 +333,12 @@ class NFeDB extends \NFe\Database\Estatico
             $pagamento->setValor($troco);
             $pagamentos[] = $pagamento;
         }
+        if (count($pagamentos) == 0) {
+            $pagamento = new \NFe\Entity\Pagamento();
+            $pagamento->setForma(\NFeUtil::toFormaPagamento(FormaPagto::TIPO_DINHEIRO));
+            $pagamento->setValor(0);
+            $pagamentos[] = $pagamento;
+        }
         $nota->setPagamentos($pagamentos);
         return $nota;
     }

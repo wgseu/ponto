@@ -112,11 +112,9 @@
                     {% if is_null($pagamento->getPedidoID()) %}
                       <a href="/gerenciar/conta/editar?id={{ $_conta->getID() }}" title="Editar conta '{{ $_conta->getDescricao() }}'">{{ $_conta->getID() != 1?$_conta->getDescricao():$pagamento->getDetalhes() }}</a>
                     {% else %}
-                      {% $_comanda = $_pedido->findComandaID() %}
-                      {% $_mesa = $_pedido->findMesaID() %}
                       <a href="/gerenciar/pedido/?search={{ $_pedido->getID() }}" title="Visualizar pedido '{{ $_pedido->getID() }}'">Pedido
                         {{ $_pedido->getID() }}:
-                        {{ $_pedido->getDestino($_mesa, $_comanda) }}</a>
+                        {{ $_pedido->getDestino() }}</a>
                     {% endif %}
                   </td>
                   <td class="text-right">

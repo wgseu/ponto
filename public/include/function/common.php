@@ -159,15 +159,15 @@ function same_date($date, $other)
 
 function human_range($inicio, $fim, $sep = '/')
 {
-    if ($inicio === false && $fim === false) {
+    if (!$inicio && !$fim) {
         return null;
     }
     $months = [1 => 'janeiro', 2 => 'fevereiro', 3 => 'março', 4 => 'abril',
             5 => 'maio', 6 => 'junho', 7 => 'julho', 8 => 'agosto',
             9 => 'setembro', 10 => 'outubro', 11 => 'novembro', 12 => 'dezembro'];
-    if ($inicio === false && $fim !== false) {
+    if (!$inicio && $fim) {
         return 'até dia '.date('j', $fim).' de '.$months[date('n', $fim)].' de '.date('Y', $fim);
-    } elseif ($inicio !== false && $fim === false) {
+    } elseif ($inicio && !$fim) {
         return 'a partir do dia '.date('j', $inicio).' de '.$months[date('n', $inicio)].' de '.date('Y', $inicio);
     } else {
         $start = strtotime('first day of this month', $inicio);
@@ -820,8 +820,6 @@ function zip_add_folder($zip, $folder, $inside = null)
     if (!is_dir($folder)) {
         return;
     }
-    // Create recursive directory iterator
-    /** @var \SplFileInfo[] $files */
     $files = new \RecursiveIteratorIterator(
         new \RecursiveDirectoryIterator($folder),
         \RecursiveIteratorIterator::LEAVES_ONLY
@@ -884,7 +882,7 @@ function create_zip($files = [], $destination = '', $overwrite = false)
         throw new \Exception('O arquivo zip de destino já existe');
     }
     $zip = new \ZipArchive();
-    if ($zip->open($destination, $overwrite ? \Zip::ARCHIVE_OVERWRITE : \Zip::ARCHIVE_CREATE) !== true) {
+    if ($zip->open($destination, $overwrite ? \ZipArchive::OVERWRITE : \ZipArchive::CREATE) !== true) {
         throw new \Exception('Não foi possível criar ou sobrescrever o arquivo zip');
     }
     foreach ($files as $name => $path) {

@@ -281,7 +281,7 @@ class Custom extends Engine
             $tFileN = $tFile;
             $tFile = $dir_template . DIRECTORY_SEPARATOR . $tFileN . '.html';
         }
-        $cFile = $dir_compiled . DIRECTORY_SEPARATOR . str_replace(DIRECTORY_SEPARATOR, '_', $tFileN) . '.php';
+        $cFile = $dir_compiled . DIRECTORY_SEPARATOR . str_replace(DIRECTORY_SEPARATOR, '_', $tFileN) . '.twig.php';
         if (false === file_exists($tFile)) {
             throw new \Exception('Template file "'.$cFile.'" not found', 404);
         }

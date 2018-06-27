@@ -50,7 +50,8 @@ class IFood extends \MZ\System\Task
         'DNR' => ['name' => 'DINERS (Online)'],
         'ELO' => ['name' => 'ELO (Online)'],
         'MC' => ['name' => 'MASTERCARD (Online)'],
-        'VIS' => ['name' => 'VISA (Online)']
+        'VIS' => ['name' => 'VISA (Online)'],
+        'CRE' => ['name' => 'Crédito iFood']
     ];
 
     /**

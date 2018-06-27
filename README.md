@@ -41,12 +41,13 @@ GrandChef usa vários projetos de código aberto para funcionar apropriadamente:
 
 Instale as dependências e inicie o servidor.
 ```sh
-git clone https://git.assembla.com/churrascaria.site.git grandchef.site
-cd grandchef.site
+git clone https://git.assembla.com/churrascaria.api.git grandchef.api
+cd grandchef.api
 cp .env.example .env
 npm install
 make start
 make populate
+make update
 npm run dev
 ```
 

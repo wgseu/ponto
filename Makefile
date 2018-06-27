@@ -1,5 +1,7 @@
 # Makefile for Docker Nginx PHP Composer MySQL
 
+PATH := node_modules/.bin:$(PATH)
+
 include .env
 
 # Database dumps

@@ -154,22 +154,23 @@ if (isset($_GET['action'])) {
         if (!isset($_GET['token']) || $_GET['token'] != INTGR_TOKEN) {
             need_permission(Permissao::NOME_CADASTROPRODUTOS, true);
         }
-        $card = new MZ\Association\Card($integracao);
+        $codigos = \MZ\Integrator\IFood::CARDS;
+        $card = new \MZ\Association\Card($integracao, $codigos);
         $cartoes = $card->getCartoes();
         $produtos = $association->getProdutos();
         $_cartoes = [];
         $_produtos = [];
         $_desconhecidos = [];
         foreach ($produtos as $codigo => $produto) {
-            if (!is_null($produto['id'])) {
+            if (isset($produto['id'])) {
                 $_produtos[$codigo] = $produto['id'];
-            } elseif (!is_null($produto['codigo_pdv'])) {
+            } elseif (isset($produto['codigo_pdv'])) {
                 $_produtos[$codigo] = $produto['codigo_pdv'];
             } else {
                 $_desconhecidos[$codigo] = $produto['descricao'];
             }
             foreach ($produto['itens'] as $subcodigo => $subproduto) {
-                if (!is_null($subproduto['id'])) {
+                if (isset($subproduto['id'])) {
                     $_produtos[$codigo.'_'.$subcodigo] = $subproduto['id'];
                 } else {
                     $_desconhecidos[$codigo.'_'.$subcodigo] = $subproduto['descricao'];

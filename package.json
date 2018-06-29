@@ -20,7 +20,8 @@
     "gulp-concat": "^2.6.1",
     "gulp-uglify": "^3.0.0",
     "gulp-util": "^3.0.8",
-    "replace-in-file": "^3.4.0"
+    "replace-in-file": "^3.4.0",
+    "dotenv": "^6.0.0"
   },
   "dependencies": {
     "animate.css": "^3.5.2",

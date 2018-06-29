@@ -5,6 +5,9 @@ const uglify = require('gulp-uglify');
 const util = require('gulp-util');
 const replace = require('replace-in-file');
 const browserSync = require('browser-sync').create();
+const dotenv = require('dotenv');
+
+dotenv.config();
 const proxy_host = (process.platform == 'win32') ?'192.168.99.100': 'localhost';
 
 const stylesheets = [
@@ -188,8 +191,8 @@ gulp.task('watch', ['browser-sync'], function () {
 gulp.task('browser-sync', function () {
   browserSync.init({
     ui: false,
-    proxy: proxy_host + ':8001',
-    port: 3001
+    proxy: proxy_host + ':' + process.env.WEB_PORT,
+    port: process.env.WEB_PORT - 5000
   });
 });
 

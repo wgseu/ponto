@@ -340,6 +340,7 @@ class NFeDB extends \NFe\Database\Estatico
         if (is_less($troco, 0)) {
             $pagamento = new \NFe\Entity\Pagamento();
             $pagamento->setValor($troco);
+            $saldo -= floatval($pagamento->getValor(true));
             $pagamentos[] = $pagamento;
         }
         if (count($pagamentos) == 0) {

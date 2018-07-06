@@ -209,14 +209,15 @@ class NFeDB extends \NFe\Database\Estatico
                  ->setFrete(\NFe\Entity\Transporte::FRETE_NENHUM);
         }
         /* Produtos */
-        $total_produtos = 0.00;
-        $desconto = 0.00;
-        $servicos = 0.00;
-        $frete = 0.00;
-        $acumulador = 0.00;
+        $total_produtos = 0;
+        $desconto = 0;
+        $servicos = 0;
+        $frete = 0;
+        $acumulador = 0;
+        $produto_fracionado = null;
         foreach ($_itens as $_item) {
             // descontos
-            if (is_less($_item->getPreco(), 0.00)) {
+            if (is_less($_item->getPreco(), 0)) {
                 $desconto += -$_item->getSubtotal();
                 continue;
             }
@@ -238,19 +239,24 @@ class NFeDB extends \NFe\Database\Estatico
             $produto = new \NFe\Entity\Produto();
             $produto->setPedido($_pedido->getID());
             $produto->setCodigo($_produto->getID());
-            $produto->setCodigoBarras($_produto->getCodigoBarras());
+            $produto->setCodigoBarras(\NFeUtil::fixBarCode($_produto->getCodigoBarras()));
+            $produto->setCodigoTributario($produto->getCodigoBarras());
             $produto->setDescricao(\NFeUtil::fixEncoding($_produto->getDescricao()));
             $produto->setUnidade($_unidade->processaSigla($_item->getQuantidade(), $_produto->getConteudo()));
             $produto->setPreco($_item->getSubvenda());
             $produto->setDespesas($_item->getComissao());
-            $acumulador += $produto->getPreco() - floatval($produto->getPreco(true));
-            if (!is_less(abs($acumulador), 0.01, 0.0005)) {
-                $produto->setPreco($produto->getPreco() + $acumulador);
-                $acumulador = 0.00;
+            $diff = $produto->getPreco() - floatval($produto->getPreco(true));
+            if (abs($diff) > 0 || $produto_fracionado === null) {
+                $produto_fracionado = $produto;
+            }
+            $acumulador += $diff;
+            if (abs($acumulador) > 0.005 && abs($diff) > 0) {
+                $produto->setPreco(floatval($produto->getPreco(true)) + $acumulador);
+                $acumulador = $produto->getPreco() - floatval($produto->getPreco(true));
             }
             // pode acontecer de alterar o preço para mais em vez de dar desconto
             $descontos = $_item->getDescontos();
-            if (is_less($descontos, 0.00)) {
+            if (is_less($descontos, 0)) {
                 $produto->setDespesas($produto->getDespesas() - $descontos);
             } else {
                 $produto->setDesconto($descontos);
@@ -268,9 +274,9 @@ class NFeDB extends \NFe\Database\Estatico
             $nota->addProduto($produto);
             $total_produtos += $produto->getBase();
         }
-        $soma_desconto = 0.00;
-        $soma_servicos = 0.00;
-        $soma_frete = 0.00;
+        $soma_desconto = 0;
+        $soma_servicos = 0;
+        $soma_frete = 0;
         $count = count($nota->getProdutos());
         $i = 0;
         $produtos = $nota->getProdutos();
@@ -309,11 +315,13 @@ class NFeDB extends \NFe\Database\Estatico
                 /* fim do desconto restante */
             } while ($i == $count);
         }
-        $troco = 0.00;
+        $totais = $nota->getTotais();
+        $saldo = $totais['nota'];
+        $troco = 0;
         $pagamentos = [];
         foreach ($_pagamentos as $key => $_pagamento) {
             $_forma = $_pagamento->findFormaPagtoID();
-            if (is_less($_pagamento->getTotal(), 0.00)) {
+            if (is_less($_pagamento->getTotal(), 0)) {
                 $troco += $_pagamento->getTotal();
                 continue;
             }
@@ -326,9 +334,10 @@ class NFeDB extends \NFe\Database\Estatico
                 $pagamento->setBandeira(\NFeUtil::toBandeira($_cartao->getDescricao()));
             }
             // $pagamento->setAutorizacao('110011');
+            $saldo -= floatval($pagamento->getValor(true));
             $pagamentos[] = $pagamento;
         }
-        if (is_less($troco, 0.00)) {
+        if (is_less($troco, 0)) {
             $pagamento = new \NFe\Entity\Pagamento();
             $pagamento->setValor($troco);
             $pagamentos[] = $pagamento;
@@ -340,6 +349,10 @@ class NFeDB extends \NFe\Database\Estatico
             $pagamentos[] = $pagamento;
         }
         $nota->setPagamentos($pagamentos);
+        // corrige centavos a mais no pagamento
+        if ($produto_fracionado !== null && abs($saldo) >= 0.01) {
+            $produto_fracionado->setPreco($produto_fracionado->getPreco() - $saldo);
+        }
         return $nota;
     }
 

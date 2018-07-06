@@ -217,7 +217,7 @@ class NFeAPI extends \NFe\Common\Ajuste
     {
         $_nota = Nota::findByChave($nota->getID());
         $this->deleteXmlAnteriores($nota);
-        $_nota->setMotivo($nota->getJustificativa());
+        $_nota->setMotivo('Falha na conexão com o servidor da SEFAZ');
         $_nota->setContingencia('Y');
         $_nota->setDataLancamento(DB::now($nota->getDataContingencia()));
         $_nota->update();

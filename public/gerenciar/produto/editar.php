@@ -32,7 +32,7 @@ use MZ\System\Permissao;
 
 need_permission(Permissao::NOME_CADASTROPRODUTOS, is_output('json'));
 $id = isset($_GET['id']) ? $_GET['id'] : null;
-$produto = Produto::findByID($id);
+$produto = Produto::find(['id' => $id, 'promocao' => 'N']);
 if (!$produto->exists()) {
     $msg = 'O produto não foi informado ou não existe';
     if (is_output('json')) {
@@ -50,6 +50,7 @@ if (is_post()) {
         $produto->filter($old_produto);
         $produto->update();
         $old_produto->clean($produto);
+        $produto->load(['id' => $produto->getID(), 'promocao' => 'N']);
         $msg = sprintf(
             'Produto "%s" atualizado com sucesso!',
             $produto->getDescricao()

@@ -1306,7 +1306,7 @@ class Produto extends Model
         $estoque = isset($condition['disponivel']) || isset($condition['limitado']) ||
             isset($condition['estoque']);
         $setorestoque = isset($condition['setorestoque']) ? $condition['setorestoque'] : null;
-        $promocao = isset($condition['promocao']) ? strval($condition['promocao']) : 'N';
+        $promocao = isset($condition['promocao']) ? strval($condition['promocao']) : 'Y';
         $week_offset = Date::weekOffset();
         $query = DB::from('Produtos p')
             ->select(null)

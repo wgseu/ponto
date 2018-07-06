@@ -399,7 +399,7 @@ class Setor extends Model
         if ($setor->exists()) {
             return $setor;
         }
-        return self::find();
+        return self::find([]);
     }
 
     /**

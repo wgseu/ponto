@@ -70,6 +70,13 @@ if (!isset($_POST['metodo']) && $funcionario->exists()) {
         $dispositivo->setNome($device);
         $dispositivo->setSerial($serial);
         $dispositivo->register();
+        if (is_null($dispositivo->getValidacao())) {
+            throw new \Exception(
+                'Este dispositivo ainda não foi validado, acesse o menu "Configurações" -> "Computadores e Tablets", ' .
+                'selecione o tablet e clique no botão validar!',
+                1
+            );
+        }
     } catch (\Exception $e) {
         json($e->getMessage());
     }
@@ -98,7 +105,7 @@ $status['info'] = [
     ]
 ];
 $status['funcionario'] = intval(logged_employee()->getID());
-$status['validacao'] = $dispositivo->getValidacao();
+$status['validacao'] = strval($dispositivo->getValidacao());
 $status['autologout'] = is_boolean_config('Sistema', 'Tablet.Logout');
 if (is_manager()) {
     $status['acesso'] = 'funcionario';

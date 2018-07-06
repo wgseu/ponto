@@ -32,7 +32,7 @@ use MZ\System\Permissao;
 
 need_permission(Permissao::NOME_CADASTROPRODUTOS, is_output('json'));
 $id = isset($_GET['id']) ? $_GET['id'] : null;
-$produto = Produto::findByID($id);
+$produto = Produto::find(['id' => $id, 'promocao' => 'N']);
 $produto->setID(null);
 $produto->setImagem(null);
 
@@ -45,6 +45,7 @@ if (is_post()) {
         $produto->filter($old_produto);
         $produto->insert();
         $old_produto->clean($produto);
+        $produto->load(['id' => $produto->getID(), 'promocao' => 'N']);
         $msg = sprintf(
             'Produto "%s" cadastrado com sucesso!',
             $produto->getDescricao()

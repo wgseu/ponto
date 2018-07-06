@@ -38,6 +38,7 @@ if ($limite > 100 || $limite < 1) {
 }
 $condition = Filter::query($_GET);
 unset($condition['ordem']);
+$condition['promocao'] = 'N';
 $produto = new Produto($condition);
 $order = Filter::order(isset($_GET['ordem']) ? $_GET['ordem'] : '');
 $count = Produto::count($condition);

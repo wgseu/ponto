@@ -46,6 +46,7 @@ use MZ\Sale\Formacao;
 use MZ\Sale\Montagem;
 use MZ\Product\Servico;
 use MZ\Product\Produto;
+use MZ\Product\Composicao;
 use MZ\Session\Sessao;
 use MZ\Session\Movimentacao;
 use MZ\System\Synchronizer;
@@ -426,7 +427,12 @@ class Order extends Pedido
                             $app->makeURL('/gerenciar/produto/' . $this->integracao->getAcessoURL())
                         );
                     }
-                    $produto_pedido->setProdutoID($composicao->getProdutoID());
+                    $produto = $composicao->findProdutoID();
+                    if ($composicao->getTipo() == Composicao::TIPO_ADICIONAL) {
+                        $produto_pedido_pai->addObservacao('Com ' . $produto->getAbreviado());
+                    } else {
+                        $produto_pedido_pai->addObservacao('Sem ' . $produto->getAbreviado());
+                    }
                 } elseif ($produto_pai->getTipo() == Produto::TIPO_PACOTE) {
                     $formacao->setTipo(Formacao::TIPO_PACOTE);
                     $formacao->setPacoteID($subitem_id ?: $codigo_pdv);
@@ -455,10 +461,8 @@ class Order extends Pedido
                     );
                 }
                 if (!is_null($produto_pedido->getProdutoID())) {
-                    // aqui o produto pai pode ser uma composição ou pacote
-                    if ($produto_pai->getTipo() == Produto::TIPO_PACOTE) {
-                        $pacotes[$parent_index][] = $i;
-                    }
+                    // aqui o produto pai é um pacote e o item é um produto
+                    $pacotes[$parent_index][] = $i;
                     $produto_pedido->setProdutoPedidoID($produto_pedido_pai->getID());
                     $this->products[$i] = [
                         'item' => $produto_pedido,
@@ -468,7 +472,8 @@ class Order extends Pedido
                     $parent_index = $i;
                     $i++;
                 } else {
-                    // pacote propriedade, não adiciona na lista de itens, a formação será adicionada no produto pai
+                    // Propriedade ou adicional, não adiciona na lista de itens
+                    // a formação será adicionada no produto pai
                     $produto_pedido_pai->setPreco($produto_pedido_pai->getPreco() + $produto_pedido->getPreco());
                     $produto_pedido_pai->setPrecoVenda(
                         $produto_pedido_pai->getPrecoVenda() + $produto_pedido->getPrecoVenda()

@@ -137,6 +137,21 @@ class NFeUtil extends \NFe\Common\Util
         return $text;
     }
 
+    public static function fixBarCode($code)
+    {
+        global $app;
+
+        if ($code !== null) {
+            return $code;
+        }
+        $estado = $app->getSystem()->getState();
+        if ($estado->getUF() == 'PR') {
+            $code = 'SEM GTIN';
+        }
+        return $code;
+    }
+
+
     public static function removeAccent($str)
     {
         return iconv('UTF-8', 'ASCII//TRANSLIT', str_replace(['ª', 'º'], ['', ''], self::StripAccents($str)));

@@ -197,8 +197,7 @@ class Montagem extends ProdutoPedido
                 $minimo = $item->getQuantidade();
             }
         }
-        $promocao = Promocao::findByProdutoID($produto->getID());
-        $preco = $produto->getPrecoVenda() + $promocao->getValor() + $pacote->getValor();
+        $preco = $produto->getPrecoVenda() + $pacote->getValor();
         $preco += $composicoes['preco'];
         if (isset($this->grupos[$pacote->getGrupoID()]['menor'])) {
             $menor = $this->grupos[$pacote->getGrupoID()]['menor'];
@@ -435,8 +434,7 @@ class Montagem extends ProdutoPedido
         $this->quantify();
         // inicia o item principal
         $produto = $this->findProdutoID();
-        $promocao = Promocao::findByProdutoID($produto->getID());
-        $preco_principal = $produto->getPrecoVenda() + $promocao->getValor();
+        $preco_principal = $produto->getPrecoVenda();
         $produtos_formados = [];
         foreach ($this->grupos as $grupo_formado) {
             $grupo = $grupo_formado['grupo'];

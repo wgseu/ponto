@@ -825,6 +825,21 @@ class ProdutoPedido extends Model
     }
 
     /**
+     * Adiciona observação na frente dos detalhes
+     * @param ProdutoPedido $obs Texto da observação
+     * @return ProdutoPedido Self instance
+     */
+    public function addObservacao($obs)
+    {
+        if (trim($this->getDetalhes()) == '') {
+            $this->setDetalhes($obs);
+        } else {
+            $this->setDetalhes($obs . ', ' . $this->getDetalhes());
+        }
+        return $this;
+    }
+
+    /**
      * Filter fields, upload data and keep key data
      * @param ProdutoPedido $original Original instance without modifications
      */
@@ -997,6 +1012,9 @@ class ProdutoPedido extends Model
                 }
             }
             $this->insert();
+            if (is_null($this->getProdutoID())) {
+                return $this;
+            }
             $composicoes = [];
             foreach ($formacoes as $formacao) {
                 $formacao->setProdutoPedidoID($this->getID());
@@ -1005,9 +1023,6 @@ class ProdutoPedido extends Model
                 if ($formacao->getTipo() == Formacao::TIPO_COMPOSICAO) {
                     $composicoes[$formacao->getComposicaoID()] = $formacao->getID();
                 }
-            }
-            if (is_null($this->getProdutoID())) {
-                return $this;
             }
             $estoque = new Estoque();
             $estoque->setTransacaoID($this->getID());

@@ -24,10 +24,10 @@
  */
 namespace MZ\Account;
 
+use Firebase\JWT\JWT;
+
 class Authentication
 {
-    const COOKIE_NAME = 'ru';
-
     private $user;
     private $employee;
     private $permissions;
@@ -85,7 +85,7 @@ class Authentication
     {
         $this->getUser()->loadByID($this->getUser()->getID());
         if (!$this->getUser()->exists()) {
-            $this->findByCookie(self::COOKIE_NAME);
+            $this->findAuthorization();
             if ($this->getUser()->exists()) {
                 $this->login($this->getUser());
             }
@@ -110,22 +110,19 @@ class Authentication
         return $this;
     }
 
-    public function remember()
+    public function getAuthorization()
     {
-        $zone = $this->getUser()->getID().'@'.$this->getUser()->getSenha();
-        cookieset(self::COOKIE_NAME, base64_encode($zone), 30*86400);
-        return $this;
+        $data = [
+            'iat' => time(),
+            'exp' => time() + 30 * 86400, // expira em 30 dias
+            'id' => $this->getUser()->getID()
+        ];
+        $key = getenv('JWT_KEY');
+        return JWT::encode($data, $key);
     }
 
-    public function forget()
-    {
-        cookieset(self::COOKIE_NAME, null, -1);
-        return $this;
-    }
-    
     public function logout()
     {
-        $this->forget();
         \Session::Get('cliente_id', true);
         $this->getUser()->fromArray([]);
         $this->getEmployee()->fromArray([]);
@@ -133,63 +130,60 @@ class Authentication
         return $this;
     }
 
-    public static function findByToken($token)
+    private function findAuthorization()
     {
-        $cliente = new Cliente();
-        $token = base64_decode($token);
-        $len = strlen($token);
-        if ($len <= 62 || $len > 100) {
-            return $cliente;
-        }
-        $plen = $len - 48;
-        $hlen = 40;
-        $offset = min(max($plen * 2, 4 + $plen), 8);
-        $id = '';
-        $hash = '';
-        $crc = '';
-        for ($i = 0; $i < $len; $i++) {
-            if ($i % 2 == 1 && $plen > 0) {
-                $id .= $token[$i];
-                $plen--;
-            } elseif ($i >= $offset && $hlen > 0) {
-                $hash .= $token[$i];
-                $hlen--;
-            } else {
-                $crc .= $token[$i];
+        $token = $this->getBearerToken();
+        if ($token) {
+            $key = getenv('JWT_KEY');
+            try {
+                $decoded = JWT::decode($token, $key, ['HS256']);
+                $this->getUser()->loadByID($decoded->id);
+            } catch(\Exception $e) {
+                $this->getUser()->fromArray([]);
             }
+        } else {
+            $this->getUser()->fromArray([]);
         }
-        $ccrc = dechex(crc32($id.$hash));
-        $m = time();
-        $sm = strtotime(preg_replace(
-            "/([0-9]{4})([0-9]{2})([0-9]{2})([0-9]{2})([0-9]{2})([0-9]{2})/",
-            "$1-$2-$3 $4:$5:$6",
-            substr($id, -14)
-        ));
-        $i = round(abs($m - $sm) / 60);
-        if ($i > 5 || $sm === false || strcasecmp($crc, $ccrc) != 0) {
-            return $cliente;
-        }
-        $id = substr($id, 0, -14);
-        $cliente->loadByID(intval($id));
-        if ($hash != $cliente->getSenha()) {
-            return new Cliente();
-        }
-        return $cliente;
+        return $this;
     }
 
-    private function findByCookie($cname = 'ru')
+    /** 
+     * Get hearder Authorization
+     * */
+    private function getAuthorizationHeader()
     {
-        $cv = cookieget($cname);
-        if (!$cv) {
-            $this->getUser()->fromArray([]);
-            return $this;
+        $headers = null;
+        if (isset($_SERVER['Authorization'])) {
+            $headers = trim($_SERVER["Authorization"]);
+        } elseif (isset($_SERVER['HTTP_AUTHORIZATION'])) {
+            //Nginx or fast CGI
+            $headers = trim($_SERVER["HTTP_AUTHORIZATION"]);
+        } elseif (function_exists('apache_request_headers')) {
+            $requestHeaders = apache_request_headers();
+            // Server-side fix for bug in old Android versions
+            // (a nice side-effect of this fix means we don't care about capitalization for Authorization)
+            $requestHeaders = array_combine(
+                array_map('ucwords', array_keys($requestHeaders)),
+                array_values($requestHeaders)
+            );
+            if (isset($requestHeaders['Authorization'])) {
+                $headers = trim($requestHeaders['Authorization']);
+            }
         }
-        $zone = base64_decode($cv);
-        $p = explode('@', $zone, 2);
-        $this->getUser()->load([
-            'id' => $p[0],
-            'senha' => $p[1],
-        ]);
-        return $this;
+        return $headers;
+    }
+    /**
+    * get access token from header
+    * */
+    private function getBearerToken()
+    {
+        $headers = $this->getAuthorizationHeader();
+        // HEADER: Get the access token from the header
+        if (!empty($headers)) {
+            if (preg_match('/Bearer\s(\S+)/', $headers, $matches)) {
+                return $matches[1];
+            }
+        }
+        return null;
     }
 }

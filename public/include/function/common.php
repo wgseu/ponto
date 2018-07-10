@@ -670,27 +670,6 @@ function get_tempo($seg)
     return sprintf('%02d:%02dh', $h, $min);
 }
 
-function cookieset($k, $v, $expire = 0)
-{
-    $host = isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : 'localhost';
-    $pre = substr(md5($host), 0, 4);
-    $k = "{$pre}_{$k}";
-    if ($expire==0) {
-        $expire = time() + 365 * 86400;
-    } else {
-        $expire += time();
-    }
-    setCookie($k, $v, $expire, '/');
-}
-
-function cookieget($k, $default = '')
-{
-    $host = isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : 'localhost';
-    $pre = substr(md5($host), 0, 4);
-    $k = "{$pre}_{$k}";
-    return isset($_COOKIE[$k]) ? strval($_COOKIE[$k]) : $default;
-}
-
 function json($tag, $data = null, $field = null)
 {
     header('Content-Type: application/json');

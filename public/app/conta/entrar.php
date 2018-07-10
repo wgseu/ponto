@@ -40,11 +40,7 @@ $senha = isset($_POST['senha']) ? strval($_POST['senha']) : null;
 $lembrar = isset($_POST['lembrar']) ? strval($_POST['lembrar']) : null;
 $metodo = isset($_POST['metodo']) ? strval($_POST['metodo']) : null;
 $token = isset($_POST['token']) ? strval($_POST['token']) : null;
-if ($metodo == 'desktop') {
-    $cliente = Authentication::findByToken($token);
-} else {
-    $cliente = Cliente::findByLoginSenha($usuario, $senha);
-}
+$cliente = Cliente::findByLoginSenha($usuario, $senha);
 if (!$cliente->exists()) {
     if ($metodo == 'desktop') {
         $msg = 'Token inválido!';
@@ -85,9 +81,10 @@ if (!isset($_POST['metodo']) && $funcionario->exists()) {
 if (is_login()) {
     $app->getAuthentication()->logout();
 }
+$token = null;
 $app->getAuthentication()->login($cliente);
 if ($lembrar == 'true') {
-    $app->getAuthentication()->remember();
+    $token = $app->getAuthentication()->getAuthorization();
 }
 if (isset($_POST['metodo'])) {
     $url = isset($_POST['redirect']) ? strval($_POST['redirect']) : get_redirect_page();
@@ -115,4 +112,5 @@ if (is_manager()) {
     $status['acesso'] = 'visitante';
 }
 $status['permissoes'] = $app->getAuthentication()->getPermissions();
+$status['token'] = $token;
 json($status);

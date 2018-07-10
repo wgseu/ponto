@@ -37,6 +37,9 @@ if ($primeiro) {
 $condition = [
     'promocao' => 'Y'
 ];
+if (isset($_GET['todos']) && $_GET['todos'] == 'Y') {
+    $limit = null;
+}
 if (isset($_GET['categoria']) && is_numeric($_GET['categoria'])) {
     $limit = null;
     $condition['categoria'] = intval($_GET['categoria']);

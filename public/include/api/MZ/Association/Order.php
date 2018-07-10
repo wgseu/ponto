@@ -703,16 +703,15 @@ class Order extends Pedido
             $produto_pedido->setCancelado('N');
             $produto_pedido->setVisualizado('N');
             $this->checkSaldo($produto_pedido->getTotal());
-            $save_item = new ProdutoPedido($produto_pedido);
+            // TODO: corrigir filter para API
+            $old_produto_pedido = new ProdutoPedido($produto_pedido);
             $produto_pedido->filter(new ProdutoPedido()); // limpa o ID
-
-            // corrige a aplicação de filtro acima
-            $produto_pedido->setPreco(floatval($save_item->getPreco()));
-            $produto_pedido->setQuantidade(floatval($save_item->getQuantidade()));
-            $produto_pedido->setPorcentagem(floatval($save_item->getPorcentagem()));
-            $produto_pedido->setPrecoVenda(floatval($save_item->getPrecoVenda()));
-            $produto_pedido->setPrecoCompra(floatval($save_item->getPrecoCompra()));
-
+            $produto_pedido->setPreco(floatval($old_produto_pedido->getPreco()));
+            $produto_pedido->setQuantidade(floatval($old_produto_pedido->getQuantidade()));
+            $produto_pedido->setPorcentagem(floatval($old_produto_pedido->getPorcentagem()));
+            $produto_pedido->setPrecoVenda(floatval($old_produto_pedido->getPrecoVenda()));
+            $produto_pedido->setPrecoCompra(floatval($old_produto_pedido->getPrecoCompra()));
+            // end api fix
             $produto_pedido->register($item_info['formacoes']);
             if ($produto->exists() && $produto->getTipo() == Produto::TIPO_PACOTE) {
                 $pacote_pedido = $produto_pedido;

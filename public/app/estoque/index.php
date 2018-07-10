@@ -38,7 +38,12 @@ try {
     }
     $setor = Setor::findDefault();
     $estoque = new Estoque($values);
+    // TODO: corrigir filter para API
+    $old_estoque = new Estoque($estoque);
     $estoque->filter(new Estoque());
+    $estoque->setQuantidade(floatval($old_estoque->getQuantidade()));
+    $estoque->setPrecoCompra(floatval($old_estoque->getPrecoCompra()));
+    // end api fix
     $estoque->setTipoMovimento(Estoque::TIPO_MOVIMENTO_ENTRADA);
     $estoque->setSetorID($setor->getID());
     $estoque->setFuncionarioID(logged_employee()->getID());

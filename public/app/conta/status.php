@@ -68,6 +68,7 @@ if (is_login()) {
         $status['status'] = 'error';
         $status['msg'] = $e->getMessage();
     }
+    $status['token'] = $app->getAuthentication()->updateAuthorization();
 } else {
     $status['permissoes'] = [];
 }

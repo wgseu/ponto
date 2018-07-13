@@ -130,6 +130,24 @@ class Authentication
         return $this;
     }
 
+    public function updateAuthorization()
+    {
+        $token = $this->getBearerToken();
+        if ($token) {
+            $key = getenv('JWT_KEY');
+            try {
+                $tolerance = 15;
+                $decoded = JWT::decode($token, $key, ['HS256']);
+                if ($decoded->exp - $tolerance < time()) {
+                    throw new \Exception('Refresh the token before expires', 301);
+                }
+            } catch(\Exception $e) {
+                $token = $this->getAuthorization();
+            }
+        }
+        return $token;
+    }
+
     private function findAuthorization()
     {
         $token = $this->getBearerToken();

@@ -1,0 +1,923 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+CAUTION: Do not modify this file unless you know what you are doing.
+         Unexpected results may occur if the code is changed deliberately.
+-->
+<dbmodel pgmodeler-ver="0.8.2" last-position="0,0" last-zoom="1"
+	 default-owner="postgres">
+<database name="GrandChef">
+</database>
+
+<schema name="public" fill-color="#e1e1e1" sql-disabled="true">
+</schema>
+
+<table name="costumer">
+	<schema name="public"/>
+	<role name="postgres"/>
+	<position x="240" y="180"/>
+	<column name="id" not-null="true">
+		<type name="bigserial"/>
+	</column>
+	<constraint name="costumer_pk" type="pk-constr" table="public.costumer">
+		<columns names="id" ref-type="src-columns"/>
+	</constraint>
+</table>
+
+<table name="address">
+	<schema name="public"/>
+	<role name="postgres"/>
+	<position x="1160" y="180"/>
+	<column name="id" not-null="true">
+		<type name="bigserial"/>
+	</column>
+</table>
+
+<table name="product">
+	<schema name="public"/>
+	<role name="postgres"/>
+	<position x="240" y="360"/>
+	<column name="id" not-null="true">
+		<type name="bigserial"/>
+	</column>
+</table>
+
+<table name="item">
+	<schema name="public"/>
+	<role name="postgres"/>
+	<position x="240" y="440"/>
+	<column name="id" not-null="true">
+		<type name="bigserial"/>
+	</column>
+</table>
+
+<table name="district">
+	<schema name="public"/>
+	<role name="postgres"/>
+	<position x="1280" y="400"/>
+	<column name="id" not-null="true">
+		<type name="bigserial"/>
+	</column>
+</table>
+
+<table name="phone">
+	<schema name="public"/>
+	<role name="postgres"/>
+	<comment><![CDATA[Informa o telefone, país e cliente proprietário desse telefone]]></comment>
+	<position x="480" y="120"/>
+	<column name="id" not-null="true">
+		<type name="bigserial"/>
+	</column>
+	<constraint name="phone_pk" type="pk-constr" table="public.phone">
+		<columns names="id" ref-type="src-columns"/>
+	</constraint>
+</table>
+
+<table name="system">
+	<schema name="public"/>
+	<role name="postgres"/>
+	<position x="480" y="240"/>
+	<column name="id" not-null="true" default-value="TRUE">
+		<type name="boolean"/>
+	</column>
+	<constraint name="system_pk" type="pk-constr" table="public.system">
+		<columns names="id" ref-type="src-columns"/>
+	</constraint>
+	<constraint name="system_tpk" type="ck-constr" table="public.system">
+			<expression><![CDATA[id]]></expression>
+	</constraint>
+</table>
+
+<table name="sector">
+	<schema name="public"/>
+	<role name="postgres"/>
+	<position x="720" y="200"/>
+	<column name="id" not-null="true">
+		<type name="serial"/>
+	</column>
+</table>
+
+<table name="employee">
+	<schema name="public"/>
+	<role name="postgres"/>
+	<position x="240" y="640"/>
+	<column name="id" not-null="true">
+		<type name="serial"/>
+	</column>
+</table>
+
+<table name="device">
+	<schema name="public"/>
+	<role name="postgres"/>
+	<position x="720" y="420"/>
+	<column name="id" not-null="true">
+		<type name="serial"/>
+	</column>
+</table>
+
+<table name="role">
+	<schema name="public"/>
+	<role name="postgres"/>
+	<position x="240" y="580"/>
+	<column name="id" not-null="true">
+		<type name="serial"/>
+	</column>
+</table>
+
+<table name="country">
+	<schema name="public"/>
+	<role name="postgres"/>
+	<position x="1280" y="660"/>
+	<column name="id" not-null="true">
+		<type name="serial"/>
+	</column>
+</table>
+
+<table name="city">
+	<schema name="public"/>
+	<role name="postgres"/>
+	<position x="1280" y="480"/>
+	<column name="id" not-null="true">
+		<type name="serial"/>
+	</column>
+</table>
+
+<table name="state">
+	<schema name="public"/>
+	<role name="postgres"/>
+	<position x="1280" y="560"/>
+	<column name="id" not-null="true">
+		<type name="serial"/>
+	</column>
+</table>
+
+<table name="audit">
+	<schema name="public"/>
+	<role name="postgres"/>
+	<position x="980" y="680"/>
+	<column name="id" not-null="true">
+		<type name="bigserial"/>
+	</column>
+</table>
+
+<table name="printer">
+	<schema name="public"/>
+	<role name="postgres"/>
+	<position x="980" y="620"/>
+	<column name="id" not-null="true">
+		<type name="serial"/>
+	</column>
+</table>
+
+<table name="feature">
+	<schema name="public"/>
+	<role name="postgres"/>
+	<comment><![CDATA[Categoria de recursos dispóníveis no sistema]]></comment>
+	<position x="520" y="700"/>
+	<column name="id" not-null="true">
+		<type name="serial"/>
+	</column>
+</table>
+
+<table name="access">
+	<schema name="public"/>
+	<role name="postgres"/>
+	<comment><![CDATA[Acesso concedido à função para a permissão requerida]]></comment>
+	<position x="800" y="860"/>
+	<column name="id" not-null="true">
+		<type name="bigserial"/>
+	</column>
+</table>
+
+<table name="permission">
+	<schema name="public"/>
+	<role name="postgres"/>
+	<comment><![CDATA[Permissão requerida para acessar parte do sistema]]></comment>
+	<position x="520" y="860"/>
+	<column name="id" not-null="true">
+		<type name="serial"/>
+	</column>
+</table>
+
+<table name="page">
+	<schema name="public"/>
+	<role name="postgres"/>
+	<position x="940" y="340"/>
+	<column name="id" not-null="true">
+		<type name="serial"/>
+	</column>
+</table>
+
+<table name="integration">
+	<schema name="public"/>
+	<role name="postgres"/>
+	<comment><![CDATA[Inoformações sobre os módulos de integração com outros sistemas]]></comment>
+	<position x="1220" y="820"/>
+	<column name="id" not-null="true">
+		<type name="serial"/>
+	</column>
+</table>
+
+<table name="hour">
+	<schema name="public"/>
+	<role name="postgres"/>
+	<comment><![CDATA[Delimitação de intervalos de horas usado pelo quadro de horas]]></comment>
+	<position x="720" y="340"/>
+	<column name="id" not-null="true">
+		<type name="bigserial"/>
+	</column>
+</table>
+
+<table name="module">
+	<schema name="public"/>
+	<role name="postgres"/>
+	<comment><![CDATA[Módulos de vendas e operações disponíveis no sistema]]></comment>
+	<position x="480" y="320"/>
+	<column name="id" not-null="true">
+		<type name="serial"/>
+	</column>
+</table>
+
+<table name="patrimony">
+	<schema name="public"/>
+	<role name="postgres"/>
+	<position x="940" y="260"/>
+	<column name="id" not-null="true">
+		<type name="serial"/>
+	</column>
+</table>
+
+<table name="category">
+	<schema name="public"/>
+	<role name="postgres"/>
+	<position x="240" y="300"/>
+	<column name="id" not-null="true">
+		<type name="serial"/>
+	</column>
+</table>
+
+<table name="formation">
+	<schema name="public"/>
+	<role name="postgres"/>
+	<position x="480" y="180"/>
+	<column name="id" not-null="true">
+		<type name="bigserial"/>
+	</column>
+</table>
+
+<table name="table">
+	<schema name="public"/>
+	<role name="postgres"/>
+	<position x="300" y="800"/>
+	<column name="id" not-null="true">
+		<type name="serial"/>
+	</column>
+</table>
+
+<table name="payment">
+	<schema name="public"/>
+	<role name="postgres"/>
+	<position x="1240" y="300"/>
+	<column name="id" not-null="true">
+		<type name="bigserial"/>
+	</column>
+</table>
+
+<table name="check">
+	<schema name="public"/>
+	<role name="postgres"/>
+	<position x="1480" y="240"/>
+	<column name="id" not-null="true">
+		<type name="bigserial"/>
+	</column>
+</table>
+
+<table name="bill">
+	<schema name="public"/>
+	<role name="postgres"/>
+	<position x="1500" y="340"/>
+	<column name="id" not-null="true">
+		<type name="bigserial"/>
+	</column>
+</table>
+
+<table name="register">
+	<schema name="public"/>
+	<role name="postgres"/>
+	<comment><![CDATA[Caixa registradora]]></comment>
+	<position x="1520" y="620"/>
+	<column name="id" not-null="true">
+		<type name="serial"/>
+	</column>
+</table>
+
+<table name="moviment">
+	<schema name="public"/>
+	<role name="postgres"/>
+	<position x="1460" y="780"/>
+	<column name="id" not-null="true">
+		<type name="bigserial"/>
+	</column>
+</table>
+
+<table name="session">
+	<schema name="public"/>
+	<role name="postgres"/>
+	<comment><![CDATA[Sessão de funcionamento do estabelecimento]]></comment>
+	<position x="1460" y="860"/>
+	<column name="id" not-null="true">
+		<type name="bigserial"/>
+	</column>
+</table>
+
+<table name="wallet">
+	<schema name="public"/>
+	<role name="postgres"/>
+	<position x="1220" y="940"/>
+	<column name="id" not-null="true">
+		<type name="serial"/>
+	</column>
+</table>
+
+<table name="summary">
+	<schema name="public"/>
+	<role name="postgres"/>
+	<comment><![CDATA[Registra uma conferência de fechamento de caixa]]></comment>
+	<position x="1460" y="960"/>
+	<column name="id" not-null="true">
+		<type name="bigserial"/>
+	</column>
+</table>
+
+<table name="bank">
+	<schema name="public"/>
+	<role name="postgres"/>
+	<position x="1220" y="880"/>
+	<column name="id" not-null="true">
+		<type name="serial"/>
+	</column>
+</table>
+
+<table name="currency">
+	<schema name="public"/>
+	<role name="postgres"/>
+	<position x="1700" y="880"/>
+	<column name="id" not-null="true">
+		<type name="serial"/>
+	</column>
+</table>
+
+<table name="method">
+	<schema name="public"/>
+	<role name="postgres"/>
+	<position x="1720" y="740"/>
+	<column name="id" not-null="true">
+		<type name="serial"/>
+	</column>
+</table>
+
+<table name="card">
+	<schema name="public"/>
+	<role name="postgres"/>
+	<position x="1760" y="600"/>
+	<column name="id" not-null="true">
+		<type name="serial"/>
+	</column>
+</table>
+
+<table name="credit">
+	<schema name="public"/>
+	<role name="postgres"/>
+	<position x="1640" y="540"/>
+	<column name="id" not-null="true">
+		<type name="bigserial"/>
+	</column>
+</table>
+
+<table name="package">
+	<schema name="public"/>
+	<role name="postgres"/>
+	<position x="240" y="240"/>
+	<column name="id" not-null="true">
+		<type name="bigserial"/>
+	</column>
+</table>
+
+<table name="property">
+	<schema name="public"/>
+	<role name="postgres"/>
+	<position x="240" y="500"/>
+	<column name="id" not-null="true">
+		<type name="serial"/>
+	</column>
+</table>
+
+<table name="catalog">
+	<schema name="public"/>
+	<role name="postgres"/>
+	<comment><![CDATA[Catálogo de preços de produtos de um fornecedor]]></comment>
+	<position x="300" y="860"/>
+	<column name="id" not-null="true">
+		<type name="bigserial"/>
+	</column>
+</table>
+
+<table name="list">
+	<schema name="public"/>
+	<role name="postgres"/>
+	<comment><![CDATA[Lista de compras de produtos de insumos para suprir o estabelecimento]]></comment>
+	<position x="300" y="920"/>
+	<column name="id" not-null="true">
+		<type name="bigserial"/>
+	</column>
+</table>
+
+<table name="supplier">
+	<schema name="public"/>
+	<role name="postgres"/>
+	<position x="520" y="940"/>
+	<column name="id" not-null="true">
+		<type name="serial"/>
+	</column>
+</table>
+
+<table name="transfer">
+	<schema name="public"/>
+	<role name="postgres"/>
+	<position x="520" y="800"/>
+	<column name="id" not-null="true">
+		<type name="bigserial"/>
+	</column>
+</table>
+
+<table name="stock">
+	<schema name="public"/>
+	<role name="postgres"/>
+	<position x="800" y="800"/>
+	<column name="id" not-null="true">
+		<type name="bigserial"/>
+	</column>
+</table>
+
+<table name="purchase">
+	<schema name="public"/>
+	<role name="postgres"/>
+	<comment><![CDATA[Informa um produto da lista que deve ser comprado em um fornecedor]]></comment>
+	<position x="300" y="740"/>
+	<column name="id" not-null="true">
+		<type name="bigserial"/>
+	</column>
+</table>
+
+<table name="composition">
+	<schema name="public"/>
+	<role name="postgres"/>
+	<position x="240" y="120"/>
+	<column name="id" not-null="true">
+		<type name="bigserial"/>
+	</column>
+</table>
+
+<table name="unit">
+	<schema name="public"/>
+	<role name="postgres"/>
+	<position x="720" y="120"/>
+	<column name="id" not-null="true">
+		<type name="serial"/>
+	</column>
+</table>
+
+<table name="group">
+	<schema name="public"/>
+	<role name="postgres"/>
+	<position x="480" y="480"/>
+	<column name="id" not-null="true">
+		<type name="serial"/>
+	</column>
+</table>
+
+<table name="quotation">
+	<schema name="public"/>
+	<role name="postgres"/>
+	<comment><![CDATA[Informa a cotação atual de uma moeda para outra]]></comment>
+	<position x="1700" y="960"/>
+	<column name="id" not-null="true">
+		<type name="bigserial"/>
+	</column>
+</table>
+
+<table name="order">
+	<schema name="public"/>
+	<role name="postgres"/>
+	<position x="500" y="560"/>
+	<column name="id" not-null="true">
+		<type name="bigserial"/>
+	</column>
+</table>
+
+<table name="promotion">
+	<schema name="public"/>
+	<role name="postgres"/>
+	<position x="720" y="480"/>
+	<column name="id" not-null="true">
+		<type name="bigserial"/>
+	</column>
+</table>
+
+<table name="nutritional">
+	<schema name="public"/>
+	<role name="postgres"/>
+	<position x="500" y="620"/>
+	<column name="id" not-null="true">
+		<type name="bigserial"/>
+	</column>
+</table>
+
+<table name="rating">
+	<schema name="public"/>
+	<role name="postgres"/>
+	<position x="720" y="620"/>
+	<column name="id" not-null="true">
+		<type name="bigserial"/>
+	</column>
+</table>
+
+<table name="comment">
+	<schema name="public"/>
+	<role name="postgres"/>
+	<position x="720" y="680"/>
+	<column name="id" not-null="true">
+		<type name="bigserial"/>
+	</column>
+</table>
+
+<table name="receipt">
+	<schema name="public"/>
+	<role name="postgres"/>
+	<position x="1340" y="1140"/>
+	<column name="id" not-null="true">
+		<type name="bigserial"/>
+	</column>
+</table>
+
+<table name="issuer">
+	<schema name="public"/>
+	<role name="postgres"/>
+	<position x="1520" y="1140"/>
+	<column name="id" not-null="true">
+		<type name="bigserial"/>
+	</column>
+</table>
+
+<table name="event">
+	<schema name="public"/>
+	<role name="postgres"/>
+	<position x="1700" y="1140"/>
+	<column name="id" not-null="true">
+		<type name="bigserial"/>
+	</column>
+</table>
+
+<table name="tax">
+	<schema name="public"/>
+	<role name="postgres"/>
+	<comment><![CDATA[Informa um tipo de imposto cobrado]]></comment>
+	<position x="1160" y="1140"/>
+	<column name="id" not-null="true">
+		<type name="bigserial"/>
+	</column>
+</table>
+
+<table name="origin">
+	<schema name="public"/>
+	<role name="postgres"/>
+	<position x="1340" y="1220"/>
+	<column name="id" not-null="true">
+		<type name="bigserial"/>
+	</column>
+</table>
+
+<table name="operation">
+	<schema name="public"/>
+	<role name="postgres"/>
+	<position x="1520" y="1220"/>
+	<column name="id" not-null="true">
+		<type name="bigserial"/>
+	</column>
+</table>
+
+<table name="regime">
+	<schema name="public"/>
+	<role name="postgres"/>
+	<position x="1160" y="1220"/>
+	<column name="id" not-null="true">
+		<type name="bigserial"/>
+	</column>
+</table>
+
+<table name="tribute">
+	<schema name="public"/>
+	<role name="postgres"/>
+	<position x="1700" y="1220"/>
+	<column name="id" not-null="true">
+		<type name="bigserial"/>
+	</column>
+</table>
+
+<table name="server">
+	<schema name="public"/>
+	<role name="postgres"/>
+	<comment><![CDATA[Registra os servidores de sincronização]]></comment>
+	<position x="340" y="1100"/>
+	<column name="id" not-null="true">
+		<type name="bigserial"/>
+		<comment><![CDATA[Identificador auto gerado para cada servidor cadastrado]]></comment>
+	</column>
+	<column name="guid" not-null="true">
+		<type name="varchar" length="48"/>
+		<comment><![CDATA[Número universal que identifica um único servidor de sincronização]]></comment>
+	</column>
+	<column name="offset">
+		<type name="bigint"/>
+		<comment><![CDATA[Guarda até qual registro foi importado os dados do servidor remoto]]></comment>
+	</column>
+	<column name="token">
+		<type name="text" length="255"/>
+		<comment><![CDATA[Token de acesso que deve ser enviado para o servidor de sincronização para o mesmo aceitar os dados]]></comment>
+	</column>
+	<column name="synced">
+		<type name="timestamp"/>
+		<comment><![CDATA[Data em que o servidor sincronizou dados pela última vez]]></comment>
+	</column>
+	<column name="active" not-null="true">
+		<type name="boolean"/>
+		<comment><![CDATA[Informa se o servidor está ativo e permite sincronização]]></comment>
+	</column>
+	<constraint name="server_pk" type="pk-constr" table="public.server">
+		<columns names="id" ref-type="src-columns"/>
+	</constraint>
+</table>
+
+<table name="mapper">
+	<schema name="public"/>
+	<role name="postgres"/>
+	<comment><![CDATA[Mapeia os ids vindo de outros servidores para os dados desse servidor]]></comment>
+	<position x="40" y="1360"/>
+	<column name="id" not-null="true">
+		<type name="bigserial"/>
+		<comment><![CDATA[Identificador auto gerado]]></comment>
+	</column>
+	<column name="server_id" not-null="true">
+		<type name="bigint"/>
+		<comment><![CDATA[Informa de qual servidor foi criado esse mapeamento]]></comment>
+	</column>
+	<column name="table" not-null="true">
+		<type name="varchar" length="64"/>
+		<comment><![CDATA[Nome da tabela envolvida na associação]]></comment>
+	</column>
+	<column name="from" not-null="true">
+		<type name="bigint"/>
+		<comment><![CDATA[Informa o id vindo de fora por outros servidores]]></comment>
+	</column>
+	<column name="to" not-null="true">
+		<type name="bigint"/>
+		<comment><![CDATA[Informa qual o id local associado para permitir operações]]></comment>
+	</column>
+	<constraint name="mapper_pk" type="pk-constr" table="public.mapper">
+		<columns names="id" ref-type="src-columns"/>
+	</constraint>
+</table>
+
+<usertype name="logevent" configuration="enumeration">
+	<schema name="public"/>
+	<role name="postgres"/>
+	<enumeration values="insert,update,delete"/>
+</usertype>
+
+<table name="logger">
+	<schema name="public"/>
+	<role name="postgres"/>
+	<position x="580" y="1360"/>
+	<column name="id" not-null="true">
+		<type name="bigserial"/>
+	</column>
+	<column name="server_id" not-null="true">
+		<type name="bigint"/>
+	</column>
+	<column name="table" not-null="true">
+		<type name="varchar" length="64"/>
+	</column>
+	<column name="row" not-null="true">
+		<type name="bigint"/>
+	</column>
+	<column name="event" not-null="true">
+		<type name="public.logevent"/>
+	</column>
+	<column name="date" not-null="true">
+		<type name="timestamp"/>
+	</column>
+</table>
+
+<table name="translation">
+	<schema name="public"/>
+	<role name="postgres"/>
+	<comment><![CDATA[Informa as traduções de cada texto inserido no banco de dados do sistema]]></comment>
+	<position x="940" y="400"/>
+	<column name="id" not-null="true">
+		<type name="bigserial"/>
+	</column>
+</table>
+
+<table name="language">
+	<schema name="public"/>
+	<role name="postgres"/>
+	<position x="940" y="460"/>
+	<column name="id" not-null="true">
+		<type name="serial"/>
+	</column>
+</table>
+
+<table name="balance">
+	<schema name="public"/>
+	<role name="postgres"/>
+	<comment><![CDATA[Informa um balanço de estoque realizado num determinado dia para um setor]]></comment>
+	<position x="940" y="120"/>
+	<column name="id" not-null="true">
+		<type name="bigserial"/>
+	</column>
+</table>
+
+<table name="conference">
+	<schema name="public"/>
+	<role name="postgres"/>
+	<comment><![CDATA[Registra uma conferência de estoque para cada produto num balanço de estoque]]></comment>
+	<position x="940" y="180"/>
+	<column name="id" not-null="true">
+		<type name="bigserial"/>
+	</column>
+</table>
+
+<table name="journey">
+	<schema name="public"/>
+	<role name="postgres"/>
+	<comment><![CDATA[Quadro de horas que poderá ser utilizado como horário de funcionamento]]></comment>
+	<position x="720" y="280"/>
+	<column name="id" not-null="true">
+		<type name="bigserial"/>
+	</column>
+</table>
+
+<table name="cuisine">
+	<schema name="public"/>
+	<role name="postgres"/>
+	<comment><![CDATA[Informa com quais cozinhas o estabelecimento trabalha]]></comment>
+	<position x="480" y="400"/>
+	<column name="id" not-null="true">
+		<type name="serial"/>
+	</column>
+</table>
+
+<table name="availability">
+	<schema name="public"/>
+	<role name="postgres"/>
+	<comment><![CDATA[Informa a disponibilidade e preço de um produto nos módulos de venda ou de integração]]></comment>
+	<position x="720" y="540"/>
+	<column name="id" not-null="true">
+		<type name="bigserial"/>
+	</column>
+</table>
+
+<table name="attendance">
+	<schema name="public"/>
+	<role name="postgres"/>
+	<comment><![CDATA[Tipo de atendimento para avaliação, Ex.: Entrega, Comida, Serviço]]></comment>
+	<position x="720" y="740"/>
+	<column name="id" not-null="true">
+		<type name="serial"/>
+	</column>
+</table>
+
+<table name="favorite">
+	<schema name="public"/>
+	<role name="postgres"/>
+	<comment><![CDATA[Informa os produtos favoritos do cliente]]></comment>
+	<position x="60" y="360"/>
+	<column name="id" not-null="true">
+		<type name="bigserial"/>
+	</column>
+</table>
+
+<table name="score">
+	<schema name="public"/>
+	<role name="postgres"/>
+	<comment><![CDATA[Informa os pontos ganhos e gastos por um cliente ao comprar produtos]]></comment>
+	<position x="1360" y="120"/>
+	<column name="id" not-null="true">
+		<type name="bigserial"/>
+	</column>
+</table>
+
+<table name="status">
+	<schema name="public"/>
+	<role name="postgres"/>
+	<comment><![CDATA[Informa o estado do pedido, quando foi confirmado, se já foi entregue, etc.]]></comment>
+	<position x="60" y="720"/>
+	<column name="id" not-null="true">
+		<type name="bigserial"/>
+	</column>
+</table>
+
+<table name="production">
+	<schema name="public"/>
+	<role name="postgres"/>
+	<comment><![CDATA[Informa os estados de produção do itens]]></comment>
+	<position x="60" y="620"/>
+	<column name="id" not-null="true">
+		<type name="bigserial"/>
+	</column>
+</table>
+
+<table name="tracking">
+	<schema name="public"/>
+	<role name="postgres"/>
+	<comment><![CDATA[Informa a rota do entregador ao fazer uma entrega de um ou mais pedidos]]></comment>
+	<position x="60" y="800"/>
+	<column name="id" not-null="true">
+		<type name="bigserial"/>
+	</column>
+</table>
+
+<table name="delivery">
+	<schema name="public"/>
+	<role name="postgres"/>
+	<comment><![CDATA[Informa uma viagem de um entregador, os pedidos serão atribuídos para essa entrega]]></comment>
+	<position x="60" y="880"/>
+	<column name="id" not-null="true">
+		<type name="bigserial"/>
+	</column>
+</table>
+
+<index name="mapper_server_id_table_from_idx" table="public.mapper"
+	 concurrent="false" unique="false" fast-update="false" buffering="false"
+	 index-type="btree" factor="0">
+		<idxelement use-sorting="true" nulls-first="false" asc-order="true">
+			<column name="server_id"/>
+		</idxelement>
+		<idxelement use-sorting="true" nulls-first="false" asc-order="true">
+			<column name="&quot;table&quot;"/>
+		</idxelement>
+		<idxelement use-sorting="true" nulls-first="false" asc-order="false">
+			<column name="&quot;from&quot;"/>
+		</idxelement>
+</index>
+
+<index name="server_guid_uk" table="public.server"
+	 concurrent="false" unique="true" fast-update="false" buffering="false"
+	 index-type="btree" factor="0">
+		<idxelement use-sorting="true" nulls-first="false" asc-order="true">
+			<column name="guid"/>
+		</idxelement>
+</index>
+
+<table name="label">
+	<schema name="public"/>
+	<role name="postgres"/>
+	<comment><![CDATA[Registra os tipos de telefones, Ex.: WhatsApp, Home, Work, Custom]]></comment>
+	<position x="480" y="60"/>
+	<column name="id" not-null="true">
+		<type name="serial"/>
+	</column>
+	<constraint name="label_pk" type="pk-constr" table="public.label">
+		<columns names="id" ref-type="src-columns"/>
+	</constraint>
+</table>
+
+<table name="timezone">
+	<schema name="public"/>
+	<role name="postgres"/>
+	<comment><![CDATA[Informa a geo localização para cálculo de fuso horário]]></comment>
+	<position x="946" y="519"/>
+	<column name="id" not-null="true">
+		<type name="serial"/>
+		<comment><![CDATA[Identificador de banco de dados]]></comment>
+	</column>
+	<constraint name="timezone_pk" type="pk-constr" table="public.timezone">
+		<columns names="id" ref-type="src-columns"/>
+	</constraint>
+</table>
+
+<constraint name="mapper_server_fk" type="fk-constr" comparison-type="MATCH SIMPLE"
+	 upd-action="RESTRICT" del-action="RESTRICT" ref-table="public.server" table="public.mapper">
+	<columns names="server_id" ref-type="src-columns"/>
+	<columns names="id" ref-type="dst-columns"/>
+</constraint>
+
+<relationship name="rel_mapper_server" type="relfk"
+	 src-table="public.mapper"
+	 dst-table="public.server"
+	 src-required="false" dst-required="false">
+	<label ref-type="name-label">
+		<position x="0" y="0"/>
+	</label>
+</relationship>
+
+</dbmodel>

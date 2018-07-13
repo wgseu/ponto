@@ -92,7 +92,7 @@ function mail_nota($email, $nome, $modo, $filters, $files = [])
     $user = get_string_config('Email', 'Usuario');
     $from = get_string_config('Email', 'From', $user);
     $empresa_nome = $company->getNome();
-    $to = $empresa_nome.' <'.$from.'>';
+    $to = $nome.' <'.$email.'>';
     $msg = 'Segue em anexo nota fiscal';
     if ($modo == 'contador') {
         $msg = 'Segue em anexo os arquivos XML das notas fiscais';

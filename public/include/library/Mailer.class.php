@@ -79,6 +79,13 @@ class Mailer
         } elseif ($ssl == 'tls') {
             $mail->SMTPSecure = "tls";
         }
+        $mail->SMTPOptions = [
+            'ssl' => [
+                'verify_peer' => false,
+                'verify_peer_name' => false,
+                'allow_self_signed' => true
+            ]
+        ];
         $mail->Username = $user;
         $mail->Password = $pass;
         $mail->SetFrom($from, $site);

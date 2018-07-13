@@ -114,7 +114,7 @@ class Authentication
     {
         $data = [
             'iat' => time(),
-            'exp' => time() + 30 * 86400, // expira em 30 dias
+            'exp' => time() + 7 * 86400, // expira em 7 dias
             'id' => $this->getUser()->getID()
         ];
         $key = getenv('JWT_KEY');

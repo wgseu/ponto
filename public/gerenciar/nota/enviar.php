@@ -19,10 +19,14 @@ try {
 
     $modo = isset($condition['modo']) ? $condition['modo'] : null;
 
-    $emissao_inicio = isset($condition['emissao_inicio']) ? strtotime($condition['emissao_inicio']) : null;
-    $emissao_fim = isset($condition['emissao_fim']) ? strtotime($condition['emissao_fim']) : null;
-    $lancamento_inicio = isset($condition['lancamento_inicio']) ? strtotime($condition['lancamento_inicio']) : null;
-    $lancamento_fim = isset($condition['lancamento_fim']) ? strtotime($condition['lancamento_fim']) : null;
+    $emissao_inicio = isset($condition['apartir_emissao']) ?
+        strtotime(Filter::datetime($condition['apartir_emissao'])) : null;
+    $emissao_fim = isset($condition['ate_emissao']) ?
+        strtotime(Filter::datetime($condition['ate_emissao'])) : null;
+    $lancamento_inicio = isset($condition['apartir_lancamento']) ?
+        strtotime(Filter::datetime($condition['apartir_lancamento'])) : null;
+    $lancamento_fim = isset($condition['ate_lancamento']) ?
+        strtotime(Filter::datetime($condition['ate_lancamento'])) : null;
 
     if (!in_array($modo, ['contador', 'consumidor'])) {
         throw new \Exception('O modo de envio informado é inválido', 500);

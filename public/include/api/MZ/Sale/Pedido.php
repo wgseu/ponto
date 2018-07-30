@@ -783,6 +783,21 @@ class Pedido extends Model
     }
 
     /**
+     * Converte o nome do estado para um nome mais genérico
+     */
+    public function getEstadoSimples()
+    {
+        if ($this->getEstado() == self::ESTADO_ATIVO) {
+            return 'ocupado';
+        } elseif ($this->getEstado() == self::ESTADO_AGENDADO) {
+            return 'reservado';
+        } elseif (is_null($this->getEstado())) {
+            return 'livre';
+        }
+        return strtolower($this->getEstado());
+    }
+
+    /**
      * Convert this instance into array associated key -> value with only public fields
      * @return array All public field and values into array format
      */

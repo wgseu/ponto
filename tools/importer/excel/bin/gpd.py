@@ -14,7 +14,7 @@ from utility import *
 reload(sys)
 sys.setdefaultencoding('utf8')
 
-versao = "1.9.3.0"
+versao = "1.9.3.5"
 if len(sys.argv) > 1:
 	filename = sys.argv[1]
 	if os.path.isfile(filename):

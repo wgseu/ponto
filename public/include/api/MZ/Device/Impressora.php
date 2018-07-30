@@ -420,6 +420,29 @@ class Impressora extends Model
         return $impressora;
     }
 
+    public function getModelo()
+    {
+        switch ($this->getDriver()) {
+            case 'Thermal':
+                return 'CMP-20';
+            case 'Elgin':
+            case 'Sweda':
+            case 'Dataregis':
+                return 'VOX';
+            case 'Bematech':
+                return 'MP-4200 TH';
+            case 'Daruma':
+                return 'DR700';
+            case 'Diebold':
+                return 'IM453';
+            case 'PertoPrinter':
+                return 'PertoPrinter';
+            default:
+                // Epson based
+                return 'TM-T20';
+        }
+    }
+
     /**
      * Filter fields, upload data and keep key data
      * @param Impressora $original Original instance without modifications

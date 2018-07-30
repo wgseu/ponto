@@ -26,53 +26,83 @@ require_once(dirname(dirname(__DIR__)) . '/app.php');
 
 use MZ\Session\Sessao;
 use MZ\Sale\Pedido;
-use MZ\System\Synchronizer;
+use MZ\Sale\ProdutoPedido;
 use MZ\Database\DB;
+use MZ\Device\Impressora;
+use MZ\Device\Dispositivo;
+use MZ\Payment\Pagamento;
+
+use Thermal\Printer;
+use Thermal\Connection\Buffer;
+use Thermal\Model;
+use MZ\Coupon\Order\Receipt;
 
 if (!is_login()) {
     json('Usuário não autenticado!');
 }
+need_manager(true);
 try {
-    DB::beginTransaction();
-    $sessao = Sessao::findByAberta(true);
-    $pedido = new Pedido();
-    $tipo = isset($_GET['tipo']) ? $_GET['tipo'] : null;
-    if ($tipo == 'comanda') {
-        $tipo = Pedido::TIPO_COMANDA;
-  /*} else if($tipo == 'avulso') {
-        $tipo = Pedido::TIPO_AVULSO;
-    } else if($tipo == 'entrega') {
-        $tipo = Pedido::TIPO_ENTREGA; */
-    } else {
-        $tipo = Pedido::TIPO_MESA;
-    }
-    $pedido->setTipo($tipo);
-    $pedido->setMesaID(isset($_GET['mesa']) ? $_GET['mesa'] : null);
-    $pedido->setComandaID(isset($_GET['comanda']) ? $_GET['comanda'] : null);
-    $pedido->checkAccess(logged_employee());
-    $pedido->loadByLocal();
+    $pedido = new Pedido($_GET);
+    $pedido->loadByID($pedido->getID());
     if (!$pedido->exists()) {
-        throw new \Exception('A mesa ou comanda informada não está aberta');
+        throw new \Exception('O pedido informado não existe');
     }
+    $pedido->checkAccess(logged_employee());
     if ($pedido->getEstado() != Pedido::ESTADO_FECHADO) {
         $pedido->setFechadorID(logged_employee()->getID());
         $pedido->setDataImpressao(DB::now());
         $pedido->setEstado(Pedido::ESTADO_FECHADO);
         $pedido->update();
     }
-    $sync = new Synchronizer();
-    $sync->printOrder($pedido->getID(), logged_employee()->getID());
-    $sync->updateOrder(
-        $pedido->getID(),
-        $pedido->getTipo(),
-        $pedido->getMesaID(),
-        $pedido->getComandaID(),
-        Synchronizer::ACTION_STATE
-    );
-    DB::commit();
-    json(['status' => 'ok']);
+    $dispositivo = new Dispositivo();
+    $dispositivo->setNome(isset($_GET['device']) ? $_GET['device'] : null);
+    $dispositivo->setSerial(isset($_GET['serial']) ? $_GET['serial'] : null);
+    $dispositivo->loadBySerial($dispositivo->getSerial());
+    if (!$dispositivo->exists()) {
+        throw new \Exception('O dispositivo informado não existe ou não foi validado');
+    }
+    $impressora = Impressora::find([], [
+        'modo' => [-1 => Impressora::MODO_TERMINAL],
+        'dispositivoid' => [-1 => $dispositivo->getID()],
+        'setorid' => [-1 => $dispositivo->getSetorID()]
+    ]);
+    if (!$impressora->exists()) {
+        throw new \Exception('Nenhuma impressora cadastrada, cadastre uma impressora!');
+    }
+    $model = new Model($impressora->getModelo());
+    $connection = new Buffer();
+    $printer = new Printer($model, $connection);
+    $printer->setColumns($impressora->getColunas());
+    $receipt = new Receipt($printer);
+    $receipt->setOrder($pedido);
+    $receipt->setItems(ProdutoPedido::findAll(
+        [
+            'pedidoid' => $pedido->getID(),
+            'cancelado' => 'N'
+        ],
+        ['id' => 1]
+    ));
+    $receipt->setPayments(Pagamento::findAll(
+        [
+            'pedidoid' => $pedido->getID(),
+            'cancelado' => 'N'
+        ],
+        ['id' => 1]
+    ));
+    $receipt->printCoupon();
+    if ($impressora->getAvanco() > 0) {
+        $printer->feed($impressora->getAvanco());
+    }
+    $printer->buzzer();
+    $printer->cutter();
+    $data = $connection->getBuffer();
+    json([
+        'status' => 'ok',
+        'data' => base64_encode($data),
+        'printer' => $impressora->getNome(),
+        'name' => 'Cupom de Consumo do Pedido #' . $pedido->getID()
+    ]);
 } catch (\Exception $e) {
-    DB::rollBack();
     \Log::error($e->getMessage());
     json($e->getMessage());
 }

@@ -47,16 +47,10 @@ $condition = [
 ];
 $mesas = Mesa::rawFindAll($condition, $order);
 $items = [];
+$pedido = new Pedido();
 foreach ($mesas as $item) {
-    if ($item['estado'] == Pedido::ESTADO_ATIVO) {
-        $item['estado'] = 'ocupado';
-    } elseif ($item['estado'] == Pedido::ESTADO_AGENDADO) {
-        $item['estado'] = 'reservado';
-    } elseif (is_null($item['estado'])) {
-        $item['estado'] = 'livre';
-    } else {
-        $item['estado'] = strtolower($item['estado']);
-    }
+    $pedido->setEstado($item['estado']);
+    $item['estado'] = $pedido->getEstadoSimples();
     $items[] = $item;
 }
 json('mesas', $items);

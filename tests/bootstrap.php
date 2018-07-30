@@ -34,3 +34,16 @@ $app->run(null, function ($app) {
     $script = dirname(__DIR__) . '/database/model/sqlite_insert.sql';
     DB::getPdo()->exec(file_get_contents($script));
 });
+
+function getExpectedBuffer($name, $content)
+{
+    $ext = '';
+    if (!\preg_match('/\.\w+$/', $name)) {
+        $ext = '.bin';
+    }
+    $filename = __DIR__ . '/resources/' . $name . $ext;
+    if (!\file_exists($filename)) {
+        \file_put_contents($filename, $content);
+    }
+    return \file_get_contents($filename);
+}

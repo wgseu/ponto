@@ -807,6 +807,20 @@ class ProdutoPedido extends Model
     }
 
     /**
+     * @param \MZ\Product\Produto $produto
+     * @param \MZ\Product\Unidade $unidade
+     */
+    public function getQuantidadeFormatada($produto = null, $unidade = null)
+    {
+        if (!is_null($this->getServicoID())) {
+            return quantify($this->getQuantidade());
+        }
+        $produto = !is_null($produto) ? $produto : $this->findProdutoID();
+        $unidade = !is_null($unidade) ? $unidade : $produto->findUnidadeID();
+        return quantify($this->getQuantidade(), $unidade->getSigla(), $produto->getConteudo());
+    }
+
+    /**
      * Retorna a descrição dinâmica do item, utilizada em pacotes com propriedades
      * @param \MZ\Product\Produto $produto Produto pré-carregado do item
      * @param \MZ\Product\Servico $servico Serviço pré-carregado do item

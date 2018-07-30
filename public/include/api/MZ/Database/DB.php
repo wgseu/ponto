@@ -113,8 +113,12 @@ class DB
     {
         foreach ($order as $field => $direction) {
             if (is_array($direction)) {
+                reset($direction);
                 $param = current($direction);
                 $direction = key($direction);
+                if (substr_count($field, '?') == 0) {
+                    $field = '(' . $field .' = ?)';
+                }
                 if ($direction < 0) {
                     $query = $query->orderBy($field . ' DESC', $param);
                 } else {

@@ -1,0 +1,153 @@
+{
+  "template": [
+    { "items": "company.name", "style": "bold", "width": "2x", "align": "center" },
+    { "align": "center", "items": [
+        "company.address.street", ", Nº ", "company.address.number", " - ", "company.address.district"
+    ]},
+    { "align": "center", "items": [
+        "Fone: ", "company.phone", { "required": "company.cellphone", "items": [ " - ", "company.cellphone" ] }
+    ]},
+    { "align": "center", "items": [
+        "company.address.city", " - ", "company.address.state.code"
+    ]},
+    { "style": "bold", "items": [
+        "date.time", { "align": "right", "items": [ "Pedido: ", { "format": "%06d", "items": "order.id" } ] }
+    ]},
+    { "items": "Relatório de Consumo", "align": "center" },
+    { "whitespace": "-" },
+    [ "Código" , " Descrição", { "align": "right", "items": [ "Preço", "  Qtd", "    Total" ] } ],
+    { "whitespace": "-" },
+    { "list": "order.products", "items": [
+        { "format": "%06d", "items": "order.product.id" },
+        " ",
+        "order.product.description",
+        " ",
+        { "align": "right", "items": [
+            { "format": " % 4s", "items": "order.product.price" },
+            { "format": " % 4s", "items": "order.product.quantity" },
+            { "format": " % 8s", "items": "order.product.subtotal" }
+        ]}
+    ]},
+    { "whitespace": "-" },
+    { "required": "order.subtotal.many", "items": [
+        "Produtos ",
+        { "align": "right", "whitespace": ".", "items": [
+            "money.symbol",
+            " ",
+            { "format": "% 5s", "items": "order.products.subtotal" }
+        ]}
+    ]},
+    { "required": "order.products.commission", "items": [
+        "Comissão ",
+        { "align": "right", "whitespace": ".", "items": [
+            "money.symbol",
+            " ",
+            { "format": "% 5s", "items": "order.products.commission" }
+        ]}
+    ]},
+    { "required": "order.services.many", "whitespace": "-", "align": "center", "items":
+        " Serviços e Taxas "
+    },
+    { "list": "order.services", "required": "order.services.many", "items": [
+        "order.service.name",
+        " ",
+        { "align": "right", "whitespace": ".", "items": [
+            "money.symbol",
+            " ",
+            { "format": "% 5s", "items": "order.service.total" }
+        ]}
+    ]},
+    { "whitespace": "-", "required": "order.services.many" },
+    { "required": "order.services.many", "items": [
+        "Serviços ",
+        { "align": "right", "whitespace": ".", "items": [
+            "money.symbol",
+            " ",
+            { "format": "% 5s", "items": "order.services.total" }
+        ]}
+    ]},
+    { "required": "order.services.single", "items": [
+        "order.service.name",
+        " ",
+        { "align": "right", "whitespace": ".", "items": [
+            "money.symbol",
+            " ",
+            { "format": "% 5s", "items": "order.service.total" }
+        ]}
+    ]},
+    { "required": "order.subtotal.many", "whitespace": "-" },
+    { "required": "order.discount", "style": "bold", "items": [
+        "Subtotal ",
+        { "align": "right", "whitespace": ".", "items": [
+            "money.symbol",
+            " ",
+            { "format": "% 5s", "items": "order.subtotal" }
+        ]}
+    ]},
+    { "required": "order.discount", "items": [
+        "Descontos ",
+        { "align": "right", "whitespace": ".", "items": [
+            "money.symbol",
+            " ",
+            { "format": "% 5s", "items": "order.discount" }
+        ]}
+    ]},
+    { "whitespace": "-", "required": "order.discount" },
+    { "required": "order.payments.diff", "style": "bold", "items": [
+        "Total ",
+        { "align": "right", "whitespace": ".", "items": [
+            "money.symbol",
+            " ",
+            { "format": "% 5s", "items": "order.total" }
+        ]}
+    ]},
+    { "required": "order.payments.{empty|paid}", "style": "bold", "width": "2x", "items": [
+        "Total ",
+        { "align": "right", "whitespace": ".", "items": [
+            "money.symbol",
+            " ",
+            "order.total"
+        ]}
+    ]},
+    { "items": " Pagamentos ", "whitespace": "-", "align": "center", "required": "order.payments" },
+    { "list": "order.payments", "items": [
+        "order.payment.type",
+        { "required": "order.payment.card", "items": [ " ", "order.payment.card" ] },
+        { "required": "order.payment.note", "items": [ ": ", "order.payment.note" ] },
+        " ",
+        { "align": "right", "whitespace": ".", "items": [
+            "money.symbol",
+            " ",
+            { "format": "% 5s", "items": "order.payment.total" }
+        ]}
+    ]},
+    { "whitespace": "-", "required": "order.payments" },
+    { "required": "order.payments.many", "items": [
+        "Pago ",
+        { "align": "right", "whitespace": ".", "items": [
+            "money.symbol",
+            " ",
+            { "format": "% 5s", "items": "order.payments.total" }
+        ]}
+    ]},
+    { "required": "order.payments.remaining", "style": "bold", "width": "2x", "items": [
+        "Restante ",
+        { "align": "right", "whitespace": ".", "items": [
+            "money.symbol",
+            " ",
+            "order.payments.remaining"
+        ]}
+    ]},
+    { "required": "order.payments.balance", "style": "bold", "width": "2x", "items": [
+        "Saldo ",
+        { "align": "right", "whitespace": ".", "items": [
+            "money.symbol",
+            " ",
+            "order.payments.balance"
+        ]}
+    ]},
+    {},
+    { "align": "center", "items": "NÃO É DOCUMENTO FISCAL" },
+    { "whitespace": "=" }
+  ]
+}

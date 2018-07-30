@@ -86,8 +86,16 @@ foreach ($pedidos as $_pedido) {
     $_pedido['tipo'] = $_pedido['pedidotipo'];
     $item = array_intersect_key($_pedido, array_flip($campos));
     $item['imagemurl'] = get_image_url($item['imagemurl'], 'produto', null);
+    // TODO load formações
+    $item['formacoes'] = [];
     $items[] = $item;
 }
+if ($pedido->getClienteID()) {
+    $cliente = $pedido->findClienteID();
+    $response['cliente'] = $cliente->publish();
+}
+$response['estado'] = $pedido->getEstadoSimples();
+$response['pedidoid'] = $pedido->getID();
 $response['total'] = $pedido->findTotal(true);
 $response['pedidos'] = $items;
 json($response);

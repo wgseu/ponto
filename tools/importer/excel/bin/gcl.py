@@ -20,7 +20,7 @@ from utility import *
 reload(sys)
 sys.setdefaultencoding('utf-8')
 
-versao = "1.9.3.0"
+versao = "1.9.3.5"
 
 if len(sys.argv) > 1:
 	filename = sys.argv[1]
@@ -534,7 +534,7 @@ with open(filename, "w") as fd:
 		if referencia and len(referencia) > 200:
 			print('Referencia "' + referencia + '" truncada para o cliente: ' + fone1)
 			referencia = referencia[:197] + '...'
-		if numero and len(numero) > 20:
+		if numero and len(str(numero)) > 20:
 			print('Numero "' + numero + '" truncado para o cliente: ' + fone1)
 			numero = numero[:20]
 

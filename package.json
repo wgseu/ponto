@@ -1,7 +1,7 @@
 {
-  "name": "grandchef.site",
+  "name": "grandchef.api",
   "productName": "GrandChef",
-  "version": "1.9.2",
+  "version": "2.0.0",
   "private": true,
   "description": "Gerenciamento de Restaurantes e Afins",
   "author": "MZ Software <contato@grandchef.com.br>",

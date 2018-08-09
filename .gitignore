@@ -1,5 +1,5 @@
 utils/*.sublime-workspace
-public/include/vendor/
+vendor/
 *.lock
 build/
 etc/nginx/grandchef.location
@@ -10,3 +10,4 @@ package-lock.json
 npm-debug.log
 *.sublime-workspace
 database/model/model.mwb.bak
+**/*.pyc

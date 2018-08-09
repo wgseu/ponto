@@ -185,7 +185,7 @@ gulp.task('watch', ['browser-sync'], function () {
   gulp.watch(stylesheets_manager, ['css-manager']);
   gulp.watch(javascripts, ['js-watch']);
   gulp.watch(javascripts_manager, ['js-manager-watch']);
-  gulp.watch('public/include/template/*.twig').on('change', browserSync.reload);
+  gulp.watch('resources/views/*.*').on('change', browserSync.reload);
 });
 
 gulp.task('browser-sync', function () {

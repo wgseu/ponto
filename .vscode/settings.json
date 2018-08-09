@@ -1,4 +1,4 @@
 {
-    "better-phpunit.phpunitBinary": "${workspaceFolder}/public/include/vendor/bin/phpunit",
-    "phpcs.executablePath": "public/include/vendor/bin/phpcs"
+    "better-phpunit.phpunitBinary": "${workspaceFolder}/vendor/bin/phpunit",
+    "phpcs.executablePath": "vendor/bin/phpcs"
 }

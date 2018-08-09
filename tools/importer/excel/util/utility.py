@@ -83,46 +83,48 @@ def sql_datetime(value, default='NOW()'):
 		return default
 	if isinstance(value, datetime):
 		return '"' + value.strftime("%Y-%m-%d %H:%M:%S") + '"'
+	try:
+		p = re.compile('[\d]{2}/[\d]{2}/[\d]{4} [\d]{2}:[\d]{2}:[\d]{2}', re.I)
+		if p.search(value):
+			t = datetime.strptime(value, "%d/%m/%Y %H:%M:%S")
+			return '"' + t.strftime("%Y-%m-%d %H:%M:%S") + '"'
 
-	p = re.compile('[\d]{2}/[\d]{2}/[\d]{4} [\d]{2}:[\d]{2}:[\d]{2}', re.I)
-	if p.search(value):
-		t = datetime.strptime(value, "%d/%m/%Y %H:%M:%S")
-		return '"' + t.strftime("%Y-%m-%d %H:%M:%S") + '"'
+		p = re.compile('[\d]{2}-[\d]{2}-[\d]{4} [\d]{2}:[\d]{2}:[\d]{2}', re.I)
+		if p.search(value):
+			t = datetime.strptime(value, "%d-%m-%Y %H:%M:%S")
+			return '"' + t.strftime("%Y-%m-%d %H:%M:%S") + '"'
 
-	p = re.compile('[\d]{2}-[\d]{2}-[\d]{4} [\d]{2}:[\d]{2}:[\d]{2}', re.I)
-	if p.search(value):
-		t = datetime.strptime(value, "%d-%m-%Y %H:%M:%S")
-		return '"' + t.strftime("%Y-%m-%d %H:%M:%S") + '"'
+		p = re.compile('[\d]{4}/[\d]{2}/[\d]{2} [\d]{2}:[\d]{2}:[\d]{2}', re.I)
+		if p.search(value):
+			t = datetime.strptime(value, "%Y/%m/%d %H:%M:%S")
+			return '"' + t.strftime("%Y-%m-%d %H:%M:%S") + '"'
 
-	p = re.compile('[\d]{4}/[\d]{2}/[\d]{2} [\d]{2}:[\d]{2}:[\d]{2}', re.I)
-	if p.search(value):
-		t = datetime.strptime(value, "%Y/%m/%d %H:%M:%S")
-		return '"' + t.strftime("%Y-%m-%d %H:%M:%S") + '"'
+		p = re.compile('[\d]{4}-[\d]{2}-[\d]{2} [\d]{2}:[\d]{2}:[\d]{2}', re.I)
+		if p.search(value):
+			t = datetime.strptime(value, "%Y-%m-%d %H:%M:%S")
+			return '"' + t.strftime("%Y-%m-%d %H:%M:%S") + '"'
 
-	p = re.compile('[\d]{4}-[\d]{2}-[\d]{2} [\d]{2}:[\d]{2}:[\d]{2}', re.I)
-	if p.search(value):
-		t = datetime.strptime(value, "%Y-%m-%d %H:%M:%S")
-		return '"' + t.strftime("%Y-%m-%d %H:%M:%S") + '"'
+		p = re.compile('[\d]{2}/[\d]{2}/[\d]{4}', re.I)
+		if p.search(value):
+			t = datetime.strptime(value, "%d/%m/%Y")
+			return '"' + t.strftime("%Y-%m-%d %H:%M:%S") + '"'
 
-	p = re.compile('[\d]{2}/[\d]{2}/[\d]{4}', re.I)
-	if p.search(value):
-		t = datetime.strptime(value, "%d/%m/%Y")
-		return '"' + t.strftime("%Y-%m-%d %H:%M:%S") + '"'
+		p = re.compile('[\d]{2}-[\d]{2}-[\d]{4}', re.I)
+		if p.search(value):
+			t = datetime.strptime(value, "%d-%m-%Y")
+			return '"' + t.strftime("%Y-%m-%d %H:%M:%S") + '"'
 
-	p = re.compile('[\d]{2}-[\d]{2}-[\d]{4}', re.I)
-	if p.search(value):
-		t = datetime.strptime(value, "%d-%m-%Y")
-		return '"' + t.strftime("%Y-%m-%d %H:%M:%S") + '"'
-
-	p = re.compile('[\d]{4}/[\d]{2}/[\d]{2}', re.I)
-	if p.search(value):
-		t = datetime.strptime(value, "%Y/%m/%d")
-		return '"' + t.strftime("%Y-%m-%d %H:%M:%S") + '"'
-		
-	p = re.compile('[\d]{4}-[\d]{2}-[\d]{2}', re.I)
-	if p.search(value):
-		t = datetime.strptime(value, "%Y-%m-%d")
-		return '"' + t.strftime("%Y-%m-%d %H:%M:%S") + '"'
+		p = re.compile('[\d]{4}/[\d]{2}/[\d]{2}', re.I)
+		if p.search(value):
+			t = datetime.strptime(value, "%Y/%m/%d")
+			return '"' + t.strftime("%Y-%m-%d %H:%M:%S") + '"'
+			
+		p = re.compile('[\d]{4}-[\d]{2}-[\d]{2}', re.I)
+		if p.search(value):
+			t = datetime.strptime(value, "%Y-%m-%d")
+			return '"' + t.strftime("%Y-%m-%d %H:%M:%S") + '"'
+	except:
+		return default
 	return default
 
 def filter_digits(text):

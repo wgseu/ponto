@@ -1,37 +1,20 @@
 root "%PUBLIC_PATH%";
 
 location / {
-    try_files $uri $uri.html $uri/ @extensionless-php;
-    index index.php index.html index.htm;
-}
-
-location @extensionless-php {
-    rewrite ^(.*)$ $1.php last;
-}
-
-location ~* \.(ogg|ogv|svg|svgz|eot|otf|woff|mp4|mp3|ttf|css|rss|atom|js|jpg|jpeg|gif|png|ico|zip|tgz|gz|rar|bz2|doc|xls|exe|ppt|tar|mid|midi|wav|bmp|rtf)$ {
-    access_log off;
-    expires max;
-    add_header Pragma public;
-    add_header Cache-Control "public";
-    try_files $uri @fallback;
-}
-
-location @fallback {
-    rewrite ^/static/img/produto/(\d+).png$ /produto/imagem/download.php?produto=$1 last;
-    rewrite ^/static/img/categoria/(\d+).png$ /categoria/imagem/download.php?categoria=$1 last;
-    rewrite ^/static/img/cliente/(\d+).png$ /conta/imagem/download.php?cliente=$1 last;
+    try_files $uri /index.php?$query_string;
+    index index.html index.htm index.php;
 }
 
 location ~ \.php$ {
-    try_files $uri /erro/404.php =404;
+    try_files $uri /index.php =404;
     fastcgi_split_path_info ^(.+\.php)(/.+)$;
-    fastcgi_pass    127.0.0.1:9456;
+    fastcgi_pass 127.0.0.1:9456;
     fastcgi_send_timeout 600s;
     fastcgi_read_timeout 600s;
-    fastcgi_index  index.php;
-    fastcgi_param   SCRIPT_FILENAME  $document_root$fastcgi_script_name;
-    include         fastcgi_params;
+    fastcgi_index index.php;
+    fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+    fastcgi_param PATH_INFO $fastcgi_path_info;
+    include fastcgi_params;
 }
 
 location ~/poll/ {
@@ -46,6 +29,12 @@ location ~/poll/ {
     proxy_http_version 1.1;
     proxy_set_header Upgrade $http_upgrade;
     proxy_set_header Connection "upgrade";
+}
+
+location ~* \.(ogg|ogv|svg|svgz|eot|otf|woff|mp4|mp3|ttf|css|rss|atom|js|jpg|jpeg|gif|png|ico|zip|tgz|gz|rar|bz2|doc|xls|exe|ppt|tar|mid|midi|wav|bmp|rtf)$ {
+    access_log off;
+    log_not_found off;
+    expires max;
 }
 
 # deny access to .htaccess files, if Apache's document root

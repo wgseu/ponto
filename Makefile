@@ -41,7 +41,7 @@ init:
 	@mkdir -p public/static/img/produto
 
 doc:
-	@docker-compose exec -T php ./public/include/vendor/bin/apigen generate app --destination docs/api
+	@docker-compose exec -T php ./vendor/bin/apigen generate app --destination docs/api
 	@make -s reset
 
 term:
@@ -59,16 +59,16 @@ clean: stop
 
 purge: clean
 	@rm -Rf node_modules
-	@rm -Rf public/include/vendor
+	@rm -Rf vendor
 	@rm -Rf composer.lock
 
 check:
 	@echo "Checking the standard code..."
-	@docker-compose exec -T php ./public/include/vendor/bin/phpcs --standard=PSR2 public/include/api public/include/function public/include/library public/app public/categoria public/conta public/contato public/gerenciar public/produto public/sobre tests/MZ
+	@docker-compose exec -T php ./vendor/bin/phpcs --standard=PSR2 app tests/MZ
 
 fix:
 	@echo "Fixing to standard code..."
-	@docker-compose exec -T php ./public/include/vendor/bin/phpcbf --standard=PSR2 public/include/api public/include/function public/include/library public/app public/categoria public/conta public/contato public/gerenciar public/produto public/sobre tests/MZ
+	@docker-compose exec -T php ./vendor/bin/phpcbf --standard=PSR2 app tests/MZ
 
 update:
 	@docker run --rm -v $(shell pwd):/app composer update --ignore-platform-reqs --no-scripts
@@ -106,10 +106,10 @@ restore:
 	@docker exec -i $(shell docker-compose ps -q db) mysql -u"$(DB_ROOT_USER)" -p"$(DB_ROOT_PASSWORD)" < $(DB_DUMPS_DIR)/db.sql
 
 test:
-	@docker-compose exec -T php ./public/include/vendor/bin/phpunit --configuration ./ --no-coverage
+	@docker-compose exec -T php ./vendor/bin/phpunit --configuration ./ --no-coverage
 
 cover:
-	@docker-compose exec -T php ./public/include/vendor/bin/phpunit --configuration ./ --coverage-html storage/coverage
+	@docker-compose exec -T php ./vendor/bin/phpunit --configuration ./ --coverage-html storage/coverage
 
 class:
 	@mkdir -p $(DB_DUMPS_DIR)
@@ -119,8 +119,8 @@ class:
 	@java -jar utils/SQLtoClass.jar -p utils/config.properties -t utils/template -o storage/app/generated
 
 reset:
-	@chmod 777 public/include/compiled
-	@chmod 777 public/include/logs
+	@chmod 777 storage
+	@chmod 777 storage/logs
 	@chmod 777 public/static/doc/conta
 	@chmod 777 public/static/doc/cert
 	@chmod 777 public/static/img/categoria

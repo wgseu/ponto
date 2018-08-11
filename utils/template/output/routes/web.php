@@ -1,1 +1,1 @@
-\$[Table.path]$[Table.norm]PageController::addRoutes($collection);
+\$[Table.path]$[Table.norm]PageController::addRoutes($main_collection);

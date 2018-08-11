@@ -321,6 +321,7 @@ function need_owner($json = false)
 
 function need_permission($array, $json = false)
 {
+    need_manager($json);
     if (!logged_employee()->has($array)) {
         if ($json) {
             json('Você não possui permissão para acessar essa função');

@@ -64,11 +64,13 @@ abstract class Controller
 
     /**
      * Detect response object from context, JsonResponse or HtmlResponse
-     * @return \Symfony\Component\HttpFoundation\Response contextual response object
+     * @return \MZ\Response\HtmlResponse contextual response object
      */
     public function getResponse()
     {
-        return $this->getApplication()->getResponse();
+        return new \MZ\Response\HtmlResponse(
+            $this->getApplication()->getSystem()->getSettings()
+        );
     }
 
     public function needPermission($permission)

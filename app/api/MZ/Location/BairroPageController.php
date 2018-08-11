@@ -26,21 +26,14 @@ namespace MZ\Location;
 
 use MZ\System\Permissao;
 use MZ\Util\Filter;
-use MZ\System\Permissao;
 
 /**
  * Allow application to serve system resources
  */
 class BairroPageController extends \MZ\Core\Controller
 {
-    public function view()
-    {
-    }
-
     public function find()
     {
-        need_manager(is_output('json'));
-
         need_permission(Permissao::NOME_CADASTROBAIRROS, is_output('json'));
 
         $limite = isset($_GET['limite'])?intval($_GET['limite']):10;
@@ -69,13 +62,11 @@ class BairroPageController extends \MZ\Core\Controller
         $_paises = \MZ\Location\Pais::findAll();
         $_estados = \MZ\Location\Estado::findAll(['paisid' => $pais->getID()]);
 
-        return $app->getResponse()->output('gerenciar_bairro_index');
+        return $this->view('gerenciar_bairro_index', get_defined_vars());
     }
 
     public function add()
     {
-        need_manager(is_output('json'));
-
         need_permission(Permissao::NOME_CADASTROBAIRROS, is_output('json'));
         $id = isset($_GET['id']) ? $_GET['id'] : null;
         $bairro = Bairro::findByID($id);
@@ -119,7 +110,7 @@ class BairroPageController extends \MZ\Core\Controller
             $bairro->setDisponivel('Y');
         }
         if (is_null($bairro->getCidadeID())) {
-            $bairro->setCidadeID($app->getSystem()->getCity()->getID());
+            $bairro->setCidadeID($this->getApplication()->getSystem()->getCity()->getID());
         }
         $cidade = $bairro->findCidadeID();
         $estado = $cidade->findEstadoID();
@@ -133,13 +124,11 @@ class BairroPageController extends \MZ\Core\Controller
         }
         $_estados = \MZ\Location\Estado::findAll(['paisid' => $pais->getID()]);
 
-        return $app->getResponse()->output('gerenciar_bairro_cadastrar');
+        return $this->view('gerenciar_bairro_cadastrar', get_defined_vars());
     }
 
     public function update()
     {
-        need_manager(is_output('json'));
-
         need_permission(Permissao::NOME_CADASTROBAIRROS, is_output('json'));
         $id = isset($_GET['id']) ? $_GET['id'] : null;
         $bairro = Bairro::findByID($id);
@@ -197,13 +186,11 @@ class BairroPageController extends \MZ\Core\Controller
             $pais = new \MZ\Location\Pais();
         }
         $_estados = \MZ\Location\Estado::findAll(['paisid' => $pais->getID()]);
-        return $app->getResponse()->output('gerenciar_bairro_editar');
+        return $this->view('gerenciar_bairro_editar', get_defined_vars());
     }
 
     public function delete()
     {
-        need_manager(is_output('json'));
-
         need_permission(Permissao::NOME_CADASTROBAIRROS, is_output('json'));
         $id = isset($_GET['id']) ? $_GET['id'] : null;
         $bairro = Bairro::findByID($id);
@@ -243,12 +230,6 @@ class BairroPageController extends \MZ\Core\Controller
     public static function getRoutes()
     {
         return [
-            [
-                'name' => 'bairro_view',
-                'path' => '/bairro/',
-                'method' => 'GET',
-                'controller' => 'view',
-            ],
             [
                 'name' => 'bairro_find',
                 'path' => '/gerenciar/bairro/',

@@ -34,8 +34,6 @@ class EstoquePageController extends \MZ\Core\Controller
 {
     public function find()
     {
-        need_manager(is_output('json'));
-
         need_permission(Permissao::NOME_ESTOQUE, is_output('json'));
 
         $limite = isset($_GET['limite']) ? intval($_GET['limite']) : 10;
@@ -62,7 +60,7 @@ class EstoquePageController extends \MZ\Core\Controller
         $_fornecedor = $estoque->findFornecedorID();
 
         $tipos = Estoque::getTipoMovimentoOptions();
-        return $app->getResponse()->output('gerenciar_estoque_index');
+        return $this->view('gerenciar_estoque_index', get_defined_vars());
     }
 
     public function cancel()

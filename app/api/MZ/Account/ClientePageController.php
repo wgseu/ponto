@@ -26,7 +26,6 @@ namespace MZ\Account;
 
 use MZ\Database\DB;
 use MZ\System\Permissao;
-use MZ\System\Synchronizer;
 use MZ\Employee\Funcionario;
 use MZ\Location\Localizacao;
 use MZ\Util\Filter;
@@ -196,8 +195,6 @@ class ClientePageController extends \MZ\Core\Controller
 
     public function find()
     {
-        need_manager(is_output('json'));
-
         need_permission(Permissao::NOME_CADASTROCLIENTES, is_output('json'));
 
         $limite = isset($_GET['limite']) ? intval($_GET['limite']) : 10;
@@ -228,13 +225,11 @@ class ClientePageController extends \MZ\Core\Controller
         $tipos = Cliente::getGeneroOptions();
         $tipos = ['Empresa' => 'Empresa'] + $tipos;
 
-        return $app->getResponse()->output('gerenciar_cliente_index');
+        return $this->view('gerenciar_cliente_index', get_defined_vars());
     }
 
     public function add()
     {
-        need_manager(is_output('json'));
-
         need_permission(Permissao::NOME_CADASTROCLIENTES, is_output('json'));
         $focusctrl = 'tipo';
         $errors = [];
@@ -252,7 +247,7 @@ class ClientePageController extends \MZ\Core\Controller
                 }
                 if (isset($_GET['sistema']) &&
                     intval($_GET['sistema']) == 1 &&
-                    !is_null($app->getSystem()->getEmpresaID())
+                    !is_null($this->getApplication()->getSystem()->getEmpresaID())
                 ) {
                     throw new \Exception(
                         'Você deve alterar a empresa do sistema em vez de cadastrar uma nova'
@@ -262,16 +257,8 @@ class ClientePageController extends \MZ\Core\Controller
                 $cliente->insert();
                 $old_cliente->clean($cliente);
                 if (isset($_GET['sistema']) && intval($_GET['sistema']) == 1) {
-                    $app->getSystem()->setEmpresaID($cliente->getID());
-                    $app->getSystem()->update();
-
-                    try {
-                        $sync = new Synchronizer();
-                        $sync->systemOptionsChanged();
-                        $sync->enterpriseChanged();
-                    } catch (\Exception $e) {
-                        \Log::error($e->getMessage());
-                    }
+                    $this->getApplication()->getSystem()->setEmpresaID($cliente->getID());
+                    $this->getApplication()->getSystem()->update();
                 }
                 DB::commit();
                 $msg = sprintf(
@@ -304,7 +291,7 @@ class ClientePageController extends \MZ\Core\Controller
         } elseif (is_output('json')) {
             json('Nenhum dado foi enviado');
         }
-        return $app->getResponse()->output('gerenciar_cliente_cadastrar');
+        return $this->view('gerenciar_cliente_cadastrar', get_defined_vars());
     }
 
     public function update()
@@ -325,7 +312,7 @@ class ClientePageController extends \MZ\Core\Controller
         if ($cliente->getID() != logged_user()->getID()) {
             need_permission(Permissao::NOME_CADASTROCLIENTES, is_output('json'));
         }
-        if ($cliente->getID() == $app->getSystem()->getCompany()->getID() &&
+        if ($cliente->getID() == $this->getApplication()->getSystem()->getCompany()->getID() &&
             !logged_employee()->has(Permissao::NOME_ALTERARCONFIGURACOES)
         ) {
             $msg = 'Você não tem permissão para alterar essa empresa!';
@@ -360,7 +347,7 @@ class ClientePageController extends \MZ\Core\Controller
         if (is_post()) {
             $cliente = new Cliente($_POST);
             try {
-                if ($cliente->getID() == $app->getSystem()->getCompany()->getID() &&
+                if ($cliente->getID() == $this->getApplication()->getSystem()->getCompany()->getID() &&
                     $cliente->getTipo() != Cliente::TIPO_JURIDICA
                 ) {
                     throw new \MZ\Exception\ValidationException(['tipo' => 'O tipo da empresa deve ser jurídica']);
@@ -370,14 +357,6 @@ class ClientePageController extends \MZ\Core\Controller
                 $cliente->filter($old_cliente);
                 $cliente->update();
                 $old_cliente->clean($cliente);
-                try {
-                    if ($cliente->getID() == $app->getSystem()->getCompany()->getID()) {
-                        $appsync = new \MZ\System\Synchronizer();
-                        $appsync->enterpriseChanged();
-                    }
-                } catch (\Exception $e) {
-                    \Log::error($e->getMessage());
-                }
                 $msg = sprintf(
                     'Cliente "%s" atualizado com sucesso!',
                     $cliente->getNomeCompleto()
@@ -407,13 +386,11 @@ class ClientePageController extends \MZ\Core\Controller
         } elseif (is_output('json')) {
             json('Nenhum dado foi enviado');
         }
-        return $app->getResponse()->output('gerenciar_cliente_editar');
+        return $this->view('gerenciar_cliente_editar', get_defined_vars());
     }
 
     public function delete()
     {
-        need_manager(is_output('json'));
-
         need_permission(Permissao::NOME_CADASTROCLIENTES, is_output('json'));
         $id = isset($_GET['id']) ? $_GET['id'] : null;
         $cliente = Cliente::findByID($id);
@@ -425,7 +402,7 @@ class ClientePageController extends \MZ\Core\Controller
             \Thunder::warning($msg);
             redirect('/gerenciar/cliente/');
         }
-        if ($cliente->getID() == $app->getSystem()->getCompany()->getID()) {
+        if ($cliente->getID() == $this->getApplication()->getSystem()->getCompany()->getID()) {
             $msg = 'Essa empresa não pode ser excluída';
             if (is_output('json')) {
                 json($msg);
@@ -473,209 +450,6 @@ class ClientePageController extends \MZ\Core\Controller
             \Thunder::error($msg);
         }
         redirect('/gerenciar/cliente/');
-    }
-
-    public function export()
-    {
-        need_manager(is_output('json'));
-        need_permission(Permissao::NOME_RELATORIOCLIENTES, is_output('json'));
-        set_time_limit(0);
-        try {
-            $formato = isset($_GET['formato']) ? $_GET['formato'] : null;
-            $condition = Filter::query($_GET);
-            unset($condition['ordem']);
-            unset($condition['formato']);
-            $cliente = new Cliente($condition);
-            $order = Filter::order(isset($_GET['ordem']) ? $_GET['ordem'] : '');
-            $clientes = Cliente::findAll($condition, $order);
-            // Coluna dos dados
-            $columns = [
-                'Nome/Fantasia',
-                'Telefone',
-                'Celular',
-                'E-mail',
-                'Aniversário/Fundação',
-                sprintf('%s/%s', _p('Titulo', 'CPF'), _p('Titulo', 'CNPJ')),
-                'RG/IE',
-                'Gênero',
-                'Apelido',
-                _p('Titulo', 'CEP'),
-                'Bairro',
-                'Logradouro',
-                'Numero',
-                'Tipo',
-                'Condomínio',
-                'Bloco',
-                'Apartamento',
-                'Complemento',
-                'Referência',
-                'Cidade',
-                'Estado',
-                'Ativo'
-            ];
-            $data = [$columns];
-            $column = 'B';
-            $last = chr(ord($column) + count($columns) - 1);
-            $line = 4;
-            $i = $line;
-            foreach ($clientes as $value) {
-                $i++;
-                $localizacao = Localizacao::find(['clienteid' => $value->getID()]);
-                $bairro = $localizacao->findBairroID();
-                $cidade = $bairro->findCidadeID();
-                $estado = $cidade->findEstadoID();
-        
-                $row = [];
-                $row[] = $value->getNomeCompleto();
-                $row[] = Mask::phone($value->getFone(1));
-                $row[] = Mask::phone($value->getFone(2));
-                $row[] = $value->getEmail();
-                if (is_null($value->getDataAniversario())) {
-                    $row[] = null;
-                } elseif ($value->getTipo() == Cliente::TIPO_FISICA) {
-                    $row[] = human_date($value->getDataAniversario());
-                } else {
-                    $row[] = Mask::date($value->getDataAniversario());
-                }
-                if ($value->getTipo() == Cliente::TIPO_FISICA) {
-                    $row[] = Mask::cpf($value->getCPF());
-                } else {
-                    $row[] = Mask::cnpj($value->getCPF());
-                }
-                $row[] = $value->getRG();
-                if ($value->getTipo() == Cliente::TIPO_FISICA) {
-                    $row[] = Cliente::getGeneroOptions($value->getGenero());
-                } else {
-                    $row[] = 'Empresa';
-                }
-                $row[] = $localizacao->getApelido();
-                $row[] = Mask::cep($localizacao->getCEP());
-                $row[] = $bairro->getNome();
-                $row[] = $localizacao->getLogradouro();
-                $row[] = $localizacao->getNumero();
-                $row[] = Localizacao::getTipoOptions($localizacao->getTipo());
-                $row[] = $localizacao->getCondominio();
-                $row[] = $localizacao->getBloco();
-                $row[] = $localizacao->getApartamento();
-                $row[] = $localizacao->getComplemento();
-                $row[] = $localizacao->getReferencia();
-                $row[] = $cidade->getNome();
-                $row[] = $estado->getNome();
-                $row[] = $localizacao->isMostrar() ? 'Sim' : 'Não';
-                $data[] = $row;
-            }
-            // footer
-            $row = [];
-            $row[] = count($clientes) . ' Clientes';
-            $row[] = null;
-            $row[] = null;
-            $row[] = null;
-            $row[] = null;
-            $row[] = null;
-            $row[] = null;
-            $row[] = null;
-            $row[] = null;
-            $row[] = null;
-            $row[] = null;
-            $row[] = null;
-            $row[] = null;
-            $row[] = null;
-            $row[] = null;
-            $row[] = null;
-            $row[] = null;
-            $row[] = null;
-            $row[] = null;
-            $row[] = null;
-            $row[] = null;
-            $row[] = null;
-            $data[] = $row;
-            $j = $i + 1;
-        
-            $title = 'Relatório de Clientes';
-            // Create new PHPExcel object
-            $objPHPExcel = new \PHPExcel();
-            // Set document properties
-            $objPHPExcel->getProperties()->setCreator('GrandChef')
-                                         ->setTitle($title);
-            // Set active sheet index to the first sheet, so Excel opens this as the first sheet
-            $objPHPExcel->setActiveSheetIndex(0);
-            // Rename worksheet
-            $objPHPExcel->getActiveSheet()->setTitle('Clientes');
-            // Title
-            $objPHPExcel->getActiveSheet()->mergeCells("B2:{$last}2");
-            $objPHPExcel->getActiveSheet()->setCellValue($column . ($line - 2), $title);
-            // Merge header cells
-            $objPHPExcel->getActiveSheet()->mergeCells("B3:I3");
-            $objPHPExcel->getActiveSheet()->setCellValue($column . ($line - 1), 'Cliente');
-            $objPHPExcel->getActiveSheet()->mergeCells("J3:{$last}3");
-            $objPHPExcel->getActiveSheet()->setCellValue('J' . ($line - 1), 'Localização');
-            // Merge footer cells
-            $objPHPExcel->getActiveSheet()->mergeCells("C{$j}:{$last}{$j}");
-            $objPHPExcel->getActiveSheet()->fromArray($data, null, $column . $line);
-            // Format styles
-            // Format Title
-            $objPHPExcel->getActiveSheet()->getStyle('B2')->getAlignment()
-                ->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER)
-                ->setVertical(PHPExcel_Style_Alignment::VERTICAL_CENTER)
-                ->setWrapText(true);
-            $objPHPExcel->getActiveSheet()->getRowDimension(2)->setRowHeight(30);
-            $objPHPExcel->getActiveSheet()->getStyle('B2')->getFont()
-                ->setName('Tahoma')->setBold(true)->setSize(16);
-            // Align cells
-            $objPHPExcel->getActiveSheet()->getStyle("B2:{$last}4")->getAlignment()
-                ->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
-            $objPHPExcel->getActiveSheet()->getStyle("C5:L{$j}")->getAlignment()
-                ->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
-            $objPHPExcel->getActiveSheet()->getStyle("N5:R{$j}")->getAlignment()
-                ->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
-            $objPHPExcel->getActiveSheet()->getStyle("U5:{$last}{$j}")->getAlignment()
-                ->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
-            $objPHPExcel->getActiveSheet()->getStyle("B{$j}")->getAlignment()
-                ->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
-            // Format header
-            $objPHPExcel->getActiveSheet()->getStyle("B3:{$last}4")->getFont()->setBold(true);
-            $objPHPExcel->getActiveSheet()->getStyle("B3:{$last}4")->getBorders()->applyFromArray([
-                'allborders' => ['style' => PHPExcel_Style_Border::BORDER_MEDIUM]
-            ]);
-            // Format footer
-            $objPHPExcel->getActiveSheet()->getStyle("B{$j}:{$last}{$j}")->getFont()->setBold(true);
-            $objPHPExcel->getActiveSheet()->getStyle("B{$j}:{$last}{$j}")->getBorders()->applyFromArray([
-                'allborders' => ['style' => PHPExcel_Style_Border::BORDER_MEDIUM]
-            ]);
-            foreach ($columns as $value) {
-                $objPHPExcel->getActiveSheet()->getColumnDimension($column)->setAutoSize(true);
-                $objPHPExcel->getActiveSheet()->getStyle("{$column}4:{$column}{$i}")->getBorders()->applyFromArray([
-                    'left' => ['style' => PHPExcel_Style_Border::BORDER_MEDIUM],
-                    'right' => ['style' => PHPExcel_Style_Border::BORDER_MEDIUM]
-                ]);
-                $column++;
-            }
-            if ($formato == 'xlsx') {
-                // Redirect output to a client's web browser (Excel2007)
-                $filename = $title . '.xlsx';
-                $objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel2007');
-                header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-            } elseif ($formato == 'ods') {
-                // Redirect output to a client's web browser (OpenDocument)
-                $filename = $title . '.ods';
-                $objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'OpenDocument');
-                header('Content-Type: application/vnd.oasis.opendocument.spreadsheet');
-            } else {
-                // Redirect output to a client's web browser (Excel5)
-                $filename = $title . '.xls';
-                $objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel5');
-                header('Content-Type: application/vnd.ms-excel');
-            }
-            header("Content-Disposition: attachment; filename*=UTF-8''" . rawurlencode($filename));
-            header('Expires: Mon, 26 Jul 1997 05:00:00 GMT'); // Date in the past
-            header('Last-Modified: '.gmdate('D, d M Y H:i:s').' GMT'); // always modified
-            header('Cache-Control: cache, must-revalidate'); // HTTP/1.1
-            header('Pragma: public'); // HTTP/1.0
-            $objWriter->save('php://output');
-        } catch (\Exception $e) {
-            \Log::error($e->getMessage());
-            json($e->getMessage());
-        }
     }
 
     /**
@@ -732,12 +506,6 @@ class ClientePageController extends \MZ\Core\Controller
                 'path' => '/gerenciar/cliente/excluir',
                 'method' => 'GET',
                 'controller' => 'delete',
-            ],
-            [
-                'name' => 'cliente_export',
-                'path' => '/gerenciar/cliente/baixar',
-                'method' => 'GET',
-                'controller' => 'export',
             ],
         ];
     }

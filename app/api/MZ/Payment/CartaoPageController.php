@@ -61,13 +61,11 @@ class CartaoPageController extends \MZ\Core\Controller
         }
         $codigos = $association->findAll();
         $_imagens = Cartao::getImages();
-        return $app->getResponse()->output('gerenciar_cartao_associar');
+        return $this->view('gerenciar_cartao_associar', get_defined_vars());
     }
 
     public function find()
     {
-        need_manager(is_output('json'));
-
         need_permission(Permissao::NOME_CADASTROCARTOES, is_output('json'));
 
         $limite = isset($_GET['limite']) ? intval($_GET['limite']) : 10;
@@ -95,13 +93,11 @@ class CartaoPageController extends \MZ\Core\Controller
             'N' => 'Inativos',
         ];
         $_imagens = [0 => ['id' => 0, 'name' => 'Sem imagem']] + Cartao::getImages();
-        return $app->getResponse()->output('gerenciar_cartao_index');
+        return $this->view('gerenciar_cartao_index', get_defined_vars());
     }
 
     public function add()
     {
-        need_manager(is_output('json'));
-
         need_permission(Permissao::NOME_CADASTROCARTOES, is_output('json'));
         $id = isset($_GET['id']) ? $_GET['id'] : null;
         $cartao = Cartao::findByID($id);
@@ -146,13 +142,11 @@ class CartaoPageController extends \MZ\Core\Controller
         }
         $_carteiras = Carteira::findAll();
         $_imagens = Cartao::getImages();
-        return $app->getResponse()->output('gerenciar_cartao_cadastrar');
+        return $this->view('gerenciar_cartao_cadastrar', get_defined_vars());
     }
 
     public function update()
     {
-        need_manager(is_output('json'));
-
         need_permission(Permissao::NOME_CADASTROCARTOES, is_output('json'));
         $id = isset($_GET['id']) ? $_GET['id'] : null;
         $cartao = Cartao::findByID($id);
@@ -201,13 +195,11 @@ class CartaoPageController extends \MZ\Core\Controller
         }
         $_carteiras = Carteira::findAll();
         $_imagens = Cartao::getImages();
-        return $app->getResponse()->output('gerenciar_cartao_editar');
+        return $this->view('gerenciar_cartao_editar', get_defined_vars());
     }
 
     public function delete()
     {
-        need_manager(is_output('json'));
-
         need_permission(Permissao::NOME_CADASTROCARTOES, is_output('json'));
         $id = isset($_GET['id']) ? $_GET['id'] : null;
         $cartao = Cartao::findByID($id);

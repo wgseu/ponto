@@ -32,14 +32,8 @@ use MZ\Util\Filter;
  */
 class ComandaPageController extends \MZ\Core\Controller
 {
-    public function view()
-    {
-    }
-
     public function find()
     {
-        need_manager(is_output('json'));
-
         need_permission(Permissao::NOME_CADASTROCOMANDAS, is_output('json'));
 
         $limite = isset($_GET['limite']) ? intval($_GET['limite']) : 10;
@@ -66,13 +60,11 @@ class ComandaPageController extends \MZ\Core\Controller
             'Y' => 'Ativas',
             'N' => 'Inativas',
         ];
-        return $app->getResponse()->output('gerenciar_comanda_index');
+        return $this->view('gerenciar_comanda_index', get_defined_vars());
     }
 
     public function add()
     {
-        need_manager(is_output('json'));
-
         need_permission(Permissao::NOME_CADASTROCOMANDAS, is_output('json'));
         $id = isset($_GET['id']) ? $_GET['id'] : null;
         $comanda = Comanda::findByID($id);
@@ -117,13 +109,11 @@ class ComandaPageController extends \MZ\Core\Controller
             $comanda->setNome('Comanda ' . $comanda->getID());
             $comanda->setAtiva('Y');
         }
-        return $app->getResponse()->output('gerenciar_comanda_cadastrar');
+        return $this->view('gerenciar_comanda_cadastrar', get_defined_vars());
     }
 
     public function update()
     {
-        need_manager(is_output('json'));
-
         need_permission(Permissao::NOME_CADASTROCOMANDAS, is_output('json'));
         $id = isset($_GET['id']) ? $_GET['id'] : null;
         $comanda = Comanda::findByID($id);
@@ -170,13 +160,11 @@ class ComandaPageController extends \MZ\Core\Controller
         } elseif (is_output('json')) {
             json('Nenhum dado foi enviado');
         }
-        return $app->getResponse()->output('gerenciar_comanda_editar');
+        return $this->view('gerenciar_comanda_editar', get_defined_vars());
     }
 
     public function delete()
     {
-        need_manager(is_output('json'));
-
         need_permission(Permissao::NOME_CADASTROCOMANDAS, is_output('json'));
         $id = isset($_GET['id']) ? $_GET['id'] : null;
         $comanda = Comanda::findByID($id);
@@ -216,12 +204,6 @@ class ComandaPageController extends \MZ\Core\Controller
     public static function getRoutes()
     {
         return [
-            [
-                'name' => 'comanda_view',
-                'path' => '/comanda/',
-                'method' => 'GET',
-                'controller' => 'view',
-            ],
             [
                 'name' => 'comanda_find',
                 'path' => '/gerenciar/comanda/',

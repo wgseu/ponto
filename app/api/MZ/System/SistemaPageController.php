@@ -46,18 +46,16 @@ class SistemaPageController extends \MZ\Core\Controller
         }
     }
 
-    public function view()
+    public function display()
     {
-        need_manager(is_output('json'));
-
         need_permission(Permissao::NOME_ALTERARCONFIGURACOES, is_output('json'));
 
         $tab = 'empresa';
-        $cliente = $app->getSystem()->getCompany();
+        $cliente = $this->getApplication()->getSystem()->getCompany();
         if (!$cliente->exists()) {
             $cliente->setTipo(Cliente::TIPO_JURIDICA);
         }
-        $localizacao = \MZ\Location\Localizacao::find(['clienteid' => $app->getSystem()->getCompany()->getID()]);
+        $localizacao = \MZ\Location\Localizacao::find(['clienteid' => $this->getApplication()->getSystem()->getCompany()->getID()]);
         $localizacao->setClienteID($cliente->getID());
         if (!$localizacao->exists()) {
             $localizacao->setMostrar('Y');
@@ -73,13 +71,11 @@ class SistemaPageController extends \MZ\Core\Controller
         $focusctrl = 'nome';
         $_estados = \MZ\Location\Estado::findAll(['paisid' => $pais_id]);
 
-        return $app->getResponse()->output('gerenciar_sistema_index');
+        return $this->view('gerenciar_sistema_index', get_defined_vars());
     }
 
     public function advanced()
     {
-        $app = $this->getApplication();
-
         need_permission(Permissao::NOME_ALTERARCONFIGURACOES, is_output('json'));
 
         $focusctrl = 'mapskey';
@@ -94,14 +90,8 @@ class SistemaPageController extends \MZ\Core\Controller
                 set_string_config('Site', 'Maps.API', $maps_api);
                 $dropbox_token = isset($_POST['dropboxtoken']) ? trim($_POST['dropboxtoken']) : null;
                 set_string_config('Sistema', 'Dropbox.AccessKey', $dropbox_token);
-                $app->getSystem()->filter($app->getSystem());
-                $app->getSystem()->update(['opcoes']);
-                try {
-                    $appsync = new \MZ\System\Synchronizer();
-                    $appsync->systemOptionsChanged();
-                } catch (\Exception $e) {
-                    \Log::error($e->getMessage());
-                }
+                $this->getApplication()->getSystem()->filter($this->getApplication()->getSystem());
+                $this->getApplication()->getSystem()->update(['opcoes']);
                 \Thunder::success('Opções avançadas atualizadas com sucesso!', true);
                 redirect('/gerenciar/sistema/avancado');
             } catch (\ValidationException $e) {
@@ -116,13 +106,11 @@ class SistemaPageController extends \MZ\Core\Controller
             }
         }
 
-        return $app->getResponse()->output('gerenciar_sistema_avancado');
+        return $this->view('gerenciar_sistema_avancado', get_defined_vars());
     }
 
     public function mail()
     {
-        $app = $this->getApplication();
-
         need_permission(Permissao::NOME_ALTERARCONFIGURACOES, is_output('json'));
 
         $tab = 'email';
@@ -153,14 +141,8 @@ class SistemaPageController extends \MZ\Core\Controller
                 if (strlen($senha) > 0) {
                     set_string_config('Email', 'Senha', $senha);
                 }
-                $app->getSystem()->filter($app->getSystem());
-                $app->getSystem()->update(['opcoes']);
-                try {
-                    $appsync = new \MZ\System\Synchronizer();
-                    $appsync->systemOptionsChanged();
-                } catch (\Exception $e) {
-                    \Log::error($e->getMessage());
-                }
+                $this->getApplication()->getSystem()->filter($this->getApplication()->getSystem());
+                $this->getApplication()->getSystem()->update(['opcoes']);
                 $msg = 'E-mail atualizado com sucesso!';
                 if (is_output('json')) {
                     json(null, ['msg' => $msg]);
@@ -185,13 +167,11 @@ class SistemaPageController extends \MZ\Core\Controller
             json('Nenhum dado foi enviado');
         }
 
-        return $app->getResponse()->output('gerenciar_sistema_email');
+        return $this->view('gerenciar_sistema_email', get_defined_vars());
     }
 
     public function invoice()
     {
-        $app = $this->getApplication();
-
         need_permission(Permissao::NOME_ALTERARCONFIGURACOES, is_output('json'));
 
         $focusctrl = 'fiscal_timeout';
@@ -208,14 +188,8 @@ class SistemaPageController extends \MZ\Core\Controller
                     );
                 }
                 set_int_config('Sistema', 'Fiscal.Timeout', $fiscal_timeout);
-                $app->getSystem()->filter($app->getSystem());
-                $app->getSystem()->update(['opcoes']);
-                try {
-                    $appsync = new \MZ\System\Synchronizer();
-                    $appsync->systemOptionsChanged();
-                } catch (\Exception $e) {
-                    \Log::error($e->getMessage());
-                }
+                $this->getApplication()->getSystem()->filter($this->getApplication()->getSystem());
+                $this->getApplication()->getSystem()->update(['opcoes']);
                 \Thunder::success('Opções fiscais atualizadas com sucesso!', true);
                 redirect('/gerenciar/sistema/fiscal');
             } catch (\Exception $e) {
@@ -236,15 +210,11 @@ class SistemaPageController extends \MZ\Core\Controller
             json('Nenhum dado foi enviado');
         }
 
-        return $app->getResponse()->output('gerenciar_sistema_fiscal');
+        return $this->view('gerenciar_sistema_fiscal', get_defined_vars());
     }
 
     public function printing()
     {
-        $app = $this->getApplication();
-        require_once(dirname(dirname(__DIR__)) . '/app.php'); // main app file
-
-
         need_permission(Permissao::NOME_ALTERARCONFIGURACOES, is_post() || is_output('json'));
 
         $tab = 'impressao';
@@ -493,14 +463,8 @@ class SistemaPageController extends \MZ\Core\Controller
                 }
                 $marcado = isset($_POST['marcado']) ? $_POST['marcado'] : null;
                 set_boolean_config($secao, $chave, $marcado == 'Y');
-                $app->getSystem()->filter($app->getSystem());
-                $app->getSystem()->update(['opcoes']);
-                try {
-                    $appsync = new \MZ\System\Synchronizer();
-                    $appsync->printOptionsChanged();
-                } catch (\Exception $e) {
-                    \Log::error($e->getMessage());
-                }
+                $this->getApplication()->getSystem()->filter($this->getApplication()->getSystem());
+                $this->getApplication()->getSystem()->update(['opcoes']);
                 json(['status' => 'ok']);
             } catch (\Exception $e) {
                 json($e->getMessage());
@@ -509,13 +473,11 @@ class SistemaPageController extends \MZ\Core\Controller
             json('Nenhum dado foi enviado');
         }
 
-        return $app->getResponse()->output('gerenciar_sistema_impressao');
+        return $this->view('gerenciar_sistema_impressao', get_defined_vars());
     }
 
     public function layout()
     {
-        $app = $this->getApplication();
-
         need_permission(Permissao::NOME_ALTERARCONFIGURACOES, is_output('json'));
 
         $focusctrl = 'bemvindo';
@@ -590,14 +552,14 @@ class SistemaPageController extends \MZ\Core\Controller
                 set_string_config('Site', 'Text.BemVindo', $text_bemvindo);
                 $text_chamada = isset($_POST['chamada']) ? trim($_POST['chamada']) : null;
                 set_string_config('Site', 'Text.Chamada', $text_chamada);
-                $app->getSystem()->filter($app->getSystem());
-                $app->getSystem()->update(['opcoes']);
+                $this->getApplication()->getSystem()->filter($this->getApplication()->getSystem());
+                $this->getApplication()->getSystem()->update(['opcoes']);
                 foreach ($images_info as $key => $value) {
                     // exclui a imagem antiga, pois uma nova foi informada
                     if (!is_null($value['url']) &&
                         $value['save'] != $value['url']
                     ) {
-                        unlink($app->getPath('public') . get_image_url($value['url'], $base_url));
+                        unlink($this->getApplication()->getPath('public') . get_image_url($value['url'], $base_url));
                     }
                 }
                 $msg = 'Layout atualizado com sucesso!';
@@ -616,7 +578,7 @@ class SistemaPageController extends \MZ\Core\Controller
                     if (!is_null($value['save']) &&
                         $value['url'] != $value['save']
                     ) {
-                        unlink($app->getPath('public') . get_image_url($value['save'], $base_url));
+                        unlink($this->getApplication()->getPath('public') . get_image_url($value['save'], $base_url));
                     }
                 }
                 if (is_output('json')) {
@@ -632,15 +594,11 @@ class SistemaPageController extends \MZ\Core\Controller
             json('Nenhum dado foi enviado');
         }
 
-        return $app->getResponse()->output('gerenciar_sistema_layout');
+        return $this->view('gerenciar_sistema_layout', get_defined_vars());
     }
 
     public function options()
     {
-        $app = $this->getApplication();
-        require_once(dirname(dirname(__DIR__)) . '/app.php'); // main app file
-
-
         need_permission(Permissao::NOME_ALTERARCONFIGURACOES, is_post() || is_output('json'));
 
         $tab = 'opcoes';
@@ -746,14 +704,8 @@ class SistemaPageController extends \MZ\Core\Controller
                 }
                 $marcado = isset($_POST['marcado']) ? $_POST['marcado'] : null;
                 set_boolean_config($secao, $chave, $marcado == 'Y');
-                $app->getSystem()->filter($app->getSystem());
-                $app->getSystem()->update(['opcoes']);
-                try {
-                    $sync = new Synchronizer();
-                    $sync->systemOptionsChanged();
-                } catch (\Exception $e) {
-                    \Log::error($e->getMessage());
-                }
+                $this->getApplication()->getSystem()->filter($this->getApplication()->getSystem());
+                $this->getApplication()->getSystem()->update(['opcoes']);
                 json(['status' => 'ok']);
             } catch (\Exception $e) {
                 json($e->getMessage());
@@ -762,7 +714,7 @@ class SistemaPageController extends \MZ\Core\Controller
             json('Nenhum dado foi enviado');
         }
 
-        return $app->getResponse()->output('gerenciar_sistema_opcoes');
+        return $this->view('gerenciar_sistema_opcoes', get_defined_vars());
     }
 
     /**
@@ -779,10 +731,10 @@ class SistemaPageController extends \MZ\Core\Controller
                 'controller' => 'manage',
             ],
             [
-                'name' => 'sistema_view',
+                'name' => 'sistema_display',
                 'path' => '/gerenciar/sistema/',
                 'method' => 'GET',
-                'controller' => 'view',
+                'controller' => 'display',
             ],
             [
                 'name' => 'sistema_advanced',

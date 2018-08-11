@@ -26,7 +26,6 @@ namespace MZ\Account;
 
 use MZ\System\Permissao;
 use MZ\Database\DB;
-use MZ\System\Permissao;
 use MZ\Util\Filter;
 
 /**
@@ -34,14 +33,8 @@ use MZ\Util\Filter;
  */
 class ContaPageController extends \MZ\Core\Controller
 {
-    public function view()
-    {
-    }
-
     public function find()
     {
-        need_manager(is_output('json'));
-
         need_permission(Permissao::NOME_CADASTROCONTAS, is_output('json'));
 
         $limite = isset($_GET['limite']) ? intval($_GET['limite']) : 10;
@@ -71,13 +64,11 @@ class ContaPageController extends \MZ\Core\Controller
         foreach ($classificacoes as $classificacao) {
             $_classificacoes[$classificacao->getID()] = $classificacao->getDescricao();
         }
-        return $app->getResponse()->output('gerenciar_conta_index');
+        return $this->view('gerenciar_conta_index', get_defined_vars());
     }
 
     public function add()
     {
-        need_manager(is_output('json'));
-
         need_permission(Permissao::NOME_CADASTROCONTAS, is_output('json'));
         $id = isset($_GET['id']) ? $_GET['id'] : null;
         $conta = Conta::findByID($id);
@@ -125,13 +116,11 @@ class ContaPageController extends \MZ\Core\Controller
         }
         $classificacao_id_obj = $conta->findClassificacaoID();
         $sub_classificacao_id_obj = $conta->findSubClassificacaoID();
-        return $app->getResponse()->output('gerenciar_conta_cadastrar');
+        return $this->view('gerenciar_conta_cadastrar', get_defined_vars());
     }
 
     public function update()
     {
-        need_manager(is_output('json'));
-
         need_permission(Permissao::NOME_CADASTROCONTAS, is_output('json'));
         $id = isset($_GET['id']) ? $_GET['id'] : null;
         $conta = Conta::findByID($id);
@@ -182,13 +171,11 @@ class ContaPageController extends \MZ\Core\Controller
 
         $classificacao_id_obj = $conta->findClassificacaoID();
         $sub_classificacao_id_obj = $conta->findSubClassificacaoID();
-        return $app->getResponse()->output('gerenciar_conta_editar');
+        return $this->view('gerenciar_conta_editar', get_defined_vars());
     }
 
     public function delete()
     {
-        need_manager(is_output('json'));
-
         need_permission(Permissao::NOME_CADASTROCONTAS, is_output('json'));
         $id = isset($_GET['id']) ? $_GET['id'] : null;
         $conta = Conta::findByID($id);
@@ -228,12 +215,6 @@ class ContaPageController extends \MZ\Core\Controller
     public static function getRoutes()
     {
         return [
-            [
-                'name' => 'conta_view',
-                'path' => '/conta/',
-                'method' => 'GET',
-                'controller' => 'view',
-            ],
             [
                 'name' => 'conta_find',
                 'path' => '/gerenciar/conta/',

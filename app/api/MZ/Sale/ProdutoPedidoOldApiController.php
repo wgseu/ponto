@@ -34,8 +34,6 @@ class ProdutoPedidoOldApiController extends \MZ\Core\ApiController
 {
     public function export()
     {
-        $app = $this->getApplication();
-
         need_permission(Permissao::NOME_RELATORIOVENDAS, true);
 
         try {
@@ -56,16 +54,16 @@ class ProdutoPedidoOldApiController extends \MZ\Core\ApiController
                 'Atendente',
                 'Código',
                 'Descrição',
-                'Preço ('. $app->getSystem()->getCurrency()->getSimbolo() . ')',
+                'Preço ('. $this->getApplication()->getSystem()->getCurrency()->getSimbolo() . ')',
                 'Quantidade',
-                'Comissão ('. $app->getSystem()->getCurrency()->getSimbolo() . ')',
-                'Subtotal ('. $app->getSystem()->getCurrency()->getSimbolo() . ')',
-                'Total ('. $app->getSystem()->getCurrency()->getSimbolo() . ')',
-                'Preço de venda ('. $app->getSystem()->getCurrency()->getSimbolo() . ')',
-                'Custo ('. $app->getSystem()->getCurrency()->getSimbolo() . ')',
-                'Lucro ('. $app->getSystem()->getCurrency()->getSimbolo() . ')',
-                'Custo total ('. $app->getSystem()->getCurrency()->getSimbolo() . ')',
-                'Lucro total ('. $app->getSystem()->getCurrency()->getSimbolo() . ')',
+                'Comissão ('. $this->getApplication()->getSystem()->getCurrency()->getSimbolo() . ')',
+                'Subtotal ('. $this->getApplication()->getSystem()->getCurrency()->getSimbolo() . ')',
+                'Total ('. $this->getApplication()->getSystem()->getCurrency()->getSimbolo() . ')',
+                'Preço de venda ('. $this->getApplication()->getSystem()->getCurrency()->getSimbolo() . ')',
+                'Custo ('. $this->getApplication()->getSystem()->getCurrency()->getSimbolo() . ')',
+                'Lucro ('. $this->getApplication()->getSystem()->getCurrency()->getSimbolo() . ')',
+                'Custo total ('. $this->getApplication()->getSystem()->getCurrency()->getSimbolo() . ')',
+                'Lucro total ('. $this->getApplication()->getSystem()->getCurrency()->getSimbolo() . ')',
                 'Observações',
                 'Data do pedido'
             ];

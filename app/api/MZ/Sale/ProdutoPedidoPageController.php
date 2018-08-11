@@ -34,14 +34,8 @@ use MZ\Util\Filter;
  */
 class ProdutoPedidoPageController extends \MZ\Core\Controller
 {
-    public function view()
-    {
-    }
-
     public function find()
     {
-        need_manager(is_output('json'));
-
         need_permission(Permissao::NOME_PAGAMENTO, is_output('json'));
 
         $limite = isset($_GET['limite']) ? intval($_GET['limite']) : 10;
@@ -114,22 +108,7 @@ class ProdutoPedidoPageController extends \MZ\Core\Controller
         $_funcionario = $produto_pedido->findFuncionarioID();
         $_produto = $produto_pedido->findProdutoID();
 
-        return $app->getResponse()->output('gerenciar_produto_pedido_index');
-    }
-
-    public function add()
-    {
-        need_manager(is_output('json'));
-    }
-
-    public function update()
-    {
-        need_manager(is_output('json'));
-    }
-
-    public function delete()
-    {
-        need_manager(is_output('json'));
+        return $this->view('gerenciar_produto_pedido_index', get_defined_vars());
     }
 
     /**
@@ -140,34 +119,10 @@ class ProdutoPedidoPageController extends \MZ\Core\Controller
     {
         return [
             [
-                'name' => 'produto_pedido_view',
-                'path' => '/produto_pedido/',
-                'method' => 'GET',
-                'controller' => 'view',
-            ],
-            [
                 'name' => 'produto_pedido_find',
                 'path' => '/gerenciar/produto_pedido/',
                 'method' => 'GET',
                 'controller' => 'find',
-            ],
-            [
-                'name' => 'produto_pedido_add',
-                'path' => '/gerenciar/produto_pedido/cadastrar',
-                'method' => ['GET', 'POST'],
-                'controller' => 'add',
-            ],
-            [
-                'name' => 'produto_pedido_update',
-                'path' => '/gerenciar/produto_pedido/editar',
-                'method' => ['GET', 'POST'],
-                'controller' => 'update',
-            ],
-            [
-                'name' => 'produto_pedido_delete',
-                'path' => '/gerenciar/produto_pedido/excluir',
-                'method' => 'GET',
-                'controller' => 'delete',
             ],
         ];
     }

@@ -101,8 +101,6 @@ class ProdutoOldApiController extends \MZ\Core\ApiController
 
     public function export()
     {
-        $app = $this->getApplication();
-
         need_permission(Permissao::NOME_CADASTROPRODUTOS, isset($_GET['saida']) && is_output('json'));
 
         set_time_limit(0);
@@ -117,7 +115,7 @@ class ProdutoOldApiController extends \MZ\Core\ApiController
             $columns = [
                 'Código',
                 'Descrição',
-                'Preço de Venda ('. $app->getSystem()->getCurrency()->getSimbolo() . ')',
+                'Preço de Venda ('. $this->getApplication()->getSystem()->getCurrency()->getSimbolo() . ')',
                 'Categoria',
                 'Tipo',
                 'Unidades',

@@ -82,6 +82,21 @@ abstract class Controller
     }
 
     /**
+     * Detect response object from context, JsonResponse or HtmlResponse
+     * @param string $template template name
+     * @param array $data data to pass to template
+     * @return \MZ\Response\HtmlResponse template response object
+     */
+    public function view($template, $data = [])
+    {
+        $response = $this->getResponse();
+        foreach ($data as $key => $value) {
+            $response->getEngine()->{$key} = $value;
+        }
+        return $response->output($template);
+    }
+
+    /**
      * @param \Symfony\Component\Routing\RouteCollection $collection
      */
     public static function addRoutes($collection)

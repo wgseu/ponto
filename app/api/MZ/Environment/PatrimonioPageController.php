@@ -26,7 +26,6 @@ namespace MZ\Environment;
 
 use MZ\System\Permissao;
 use MZ\Database\DB;
-use MZ\System\Permissao;
 use MZ\Util\Filter;
 
 /**
@@ -34,14 +33,8 @@ use MZ\Util\Filter;
  */
 class PatrimonioPageController extends \MZ\Core\Controller
 {
-    public function view()
-    {
-    }
-
     public function find()
     {
-        need_manager(is_output('json'));
-
         need_permission(Permissao::NOME_CADASTROPATRIMONIO, is_output('json'));
 
         $limite = isset($_GET['limite']) ? intval($_GET['limite']) : 10;
@@ -67,13 +60,11 @@ class PatrimonioPageController extends \MZ\Core\Controller
         $_empresa =  $patrimonio->findEmpresaID();
         $_fornecedor = $patrimonio->findFornecedorID();
         $_estado_names = Patrimonio::getEstadoOptions();
-        return $app->getResponse()->output('gerenciar_patrimonio_index');
+        return $this->view('gerenciar_patrimonio_index', get_defined_vars());
     }
 
     public function add()
     {
-        need_manager(is_output('json'));
-
         need_permission(Permissao::NOME_CADASTROPATRIMONIO, is_output('json'));
         $id = isset($_GET['id']) ? $_GET['id'] : null;
         $patrimonio = Patrimonio::findByID($id);
@@ -122,13 +113,11 @@ class PatrimonioPageController extends \MZ\Core\Controller
             $patrimonio->setValor(0.0);
             $patrimonio->setAtivo('Y');
         }
-        return $app->getResponse()->output('gerenciar_patrimonio_cadastrar');
+        return $this->view('gerenciar_patrimonio_cadastrar', get_defined_vars());
     }
 
     public function update()
     {
-        need_manager(is_output('json'));
-
         need_permission(Permissao::NOME_CADASTROPATRIMONIO, is_output('json'));
         $id = isset($_GET['id']) ? $_GET['id'] : null;
         $patrimonio = Patrimonio::findByID($id);
@@ -175,13 +164,11 @@ class PatrimonioPageController extends \MZ\Core\Controller
         } elseif (is_output('json')) {
             json('Nenhum dado foi enviado');
         }
-        return $app->getResponse()->output('gerenciar_patrimonio_editar');
+        return $this->view('gerenciar_patrimonio_editar', get_defined_vars());
     }
 
     public function delete()
     {
-        need_manager(is_output('json'));
-
         need_permission(Permissao::NOME_CADASTROPATRIMONIO, is_output('json'));
         $id = isset($_GET['id']) ? $_GET['id'] : null;
         $patrimonio = Patrimonio::findByID($id);
@@ -221,12 +208,6 @@ class PatrimonioPageController extends \MZ\Core\Controller
     public static function getRoutes()
     {
         return [
-            [
-                'name' => 'patrimonio_view',
-                'path' => '/patrimonio/',
-                'method' => 'GET',
-                'controller' => 'view',
-            ],
             [
                 'name' => 'patrimonio_find',
                 'path' => '/gerenciar/patrimonio/',

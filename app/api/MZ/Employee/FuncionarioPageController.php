@@ -27,7 +27,6 @@ namespace MZ\Employee;
 use MZ\System\Permissao;
 use MZ\Database\DB;
 use MZ\Account\Cliente;
-use MZ\System\Permissao;
 use MZ\Util\Filter;
 
 /**
@@ -35,10 +34,6 @@ use MZ\Util\Filter;
  */
 class FuncionarioPageController extends \MZ\Core\Controller
 {
-    public function view()
-    {
-    }
-
     public function find()
     {
         need_manager(is_output('json'));
@@ -87,13 +82,11 @@ class FuncionarioPageController extends \MZ\Core\Controller
             'Y' => 'Ativo',
             'N' => 'Inativo',
         ];
-        return $app->getResponse()->output('gerenciar_funcionario_index');
+        return $this->view('gerenciar_funcionario_index', get_defined_vars());
     }
 
     public function add()
     {
-        need_manager(is_output('json'));
-
         need_permission(Permissao::NOME_CADASTROFUNCIONARIOS, is_output('json'));
         $id = isset($_GET['id']) ? $_GET['id'] : null;
         $funcionario = Funcionario::findByID($id);
@@ -140,7 +133,7 @@ class FuncionarioPageController extends \MZ\Core\Controller
         $cliente_id_obj = $funcionario->findClienteID();
         $_funcoes = Funcao::findAll();
         $linguagens = get_languages_info();
-        return $app->getResponse()->output('gerenciar_funcionario_cadastrar');
+        return $this->view('gerenciar_funcionario_cadastrar', get_defined_vars());
     }
 
     public function update()
@@ -213,13 +206,11 @@ class FuncionarioPageController extends \MZ\Core\Controller
         }
         $_funcoes = Funcao::findAll();
         $linguagens = get_languages_info();
-        return $app->getResponse()->output('gerenciar_funcionario_editar');
+        return $this->view('gerenciar_funcionario_editar', get_defined_vars());
     }
 
     public function delete()
     {
-        need_manager(is_output('json'));
-
         need_permission(Permissao::NOME_CADASTROFUNCIONARIOS, is_output('json'));
         $id = isset($_GET['id']) ? $_GET['id'] : null;
         $funcionario = Funcionario::findByID($id);
@@ -260,12 +251,6 @@ class FuncionarioPageController extends \MZ\Core\Controller
     public static function getRoutes()
     {
         return [
-            [
-                'name' => 'funcionario_view',
-                'path' => '/funcionario/',
-                'method' => 'GET',
-                'controller' => 'view',
-            ],
             [
                 'name' => 'funcionario_find',
                 'path' => '/gerenciar/funcionario/',

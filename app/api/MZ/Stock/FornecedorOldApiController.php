@@ -31,7 +31,6 @@ class FornecedorOldApiController extends \MZ\Core\ApiController
 {
     public function find()
     {
-
         need_manager(true);
 
         $limite = isset($_GET['limite']) ? intval($_GET['limite']) : 5;

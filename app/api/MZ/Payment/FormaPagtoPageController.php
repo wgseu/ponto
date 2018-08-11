@@ -26,9 +26,6 @@ namespace MZ\Payment;
 
 use MZ\System\Permissao;
 use MZ\Wallet\Carteira;
-use MZ\System\Permissao;
-use MZ\Wallet\Carteira;
-use MZ\System\Permissao;
 use MZ\Util\Filter;
 
 /**
@@ -36,14 +33,8 @@ use MZ\Util\Filter;
  */
 class FormaPagtoPageController extends \MZ\Core\Controller
 {
-    public function view()
-    {
-    }
-
     public function find()
     {
-        need_manager(is_output('json'));
-
         need_permission(Permissao::NOME_CADASTROFORMASPAGTO, is_output('json'));
 
         $limite = isset($_GET['limite']) ? intval($_GET['limite']) : 10;
@@ -73,13 +64,11 @@ class FormaPagtoPageController extends \MZ\Core\Controller
 
         $tipos = FormaPagto::getTipoOptions();
 
-        return $app->getResponse()->output('gerenciar_forma_pagto_index');
+        return $this->view('gerenciar_forma_pagto_index', get_defined_vars());
     }
 
     public function add()
     {
-        need_manager(is_output('json'));
-
         need_permission(Permissao::NOME_CADASTROFORMASPAGTO, is_output('json'));
         $id = isset($_GET['id']) ? $_GET['id'] : null;
         $forma_pagto = FormaPagto::findByID($id);
@@ -123,13 +112,11 @@ class FormaPagtoPageController extends \MZ\Core\Controller
             $forma_pagto->setAtiva('Y');
         }
         $_carteiras = Carteira::findAll();
-        return $app->getResponse()->output('gerenciar_forma_pagto_cadastrar');
+        return $this->view('gerenciar_forma_pagto_cadastrar', get_defined_vars());
     }
 
     public function update()
     {
-        need_manager(is_output('json'));
-
         need_permission(Permissao::NOME_CADASTROFORMASPAGTO, is_output('json'));
         $id = isset($_GET['id']) ? $_GET['id'] : null;
         $forma_pagto = FormaPagto::findByID($id);
@@ -177,13 +164,11 @@ class FormaPagtoPageController extends \MZ\Core\Controller
             json('Nenhum dado foi enviado');
         }
         $_carteiras = Carteira::findAll();
-        return $app->getResponse()->output('gerenciar_forma_pagto_editar');
+        return $this->view('gerenciar_forma_pagto_editar', get_defined_vars());
     }
 
     public function delete()
     {
-        need_manager(is_output('json'));
-
         need_permission(Permissao::NOME_CADASTROFORMASPAGTO, is_output('json'));
         $id = isset($_GET['id']) ? $_GET['id'] : null;
         $forma_pagto = FormaPagto::findByID($id);
@@ -223,12 +208,6 @@ class FormaPagtoPageController extends \MZ\Core\Controller
     public static function getRoutes()
     {
         return [
-            [
-                'name' => 'forma_pagto_view',
-                'path' => '/forma_pagto/',
-                'method' => 'GET',
-                'controller' => 'view',
-            ],
             [
                 'name' => 'forma_pagto_find',
                 'path' => '/gerenciar/forma_pagto/',

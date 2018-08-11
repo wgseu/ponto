@@ -26,7 +26,6 @@ namespace MZ\Product;
 
 use MZ\System\Permissao;
 use MZ\Database\DB;
-use MZ\System\Permissao;
 use MZ\Util\Filter;
 
 /**
@@ -34,14 +33,8 @@ use MZ\Util\Filter;
  */
 class CategoriaPageController extends \MZ\Core\Controller
 {
-    public function view()
-    {
-    }
-
     public function find()
     {
-        need_manager(is_output('json'));
-
         need_permission(Permissao::NOME_CADASTROPRODUTOS, is_output('json'));
 
         $limite = isset($_GET['limite']) ? intval($_GET['limite']) : 10;
@@ -75,13 +68,11 @@ class CategoriaPageController extends \MZ\Core\Controller
             $sup_categorias[$_categoria->getID()] = $_categoria->getDescricao();
         }
 
-        return $app->getResponse()->output('gerenciar_categoria_index');
+        return $this->view('gerenciar_categoria_index', get_defined_vars());
     }
 
     public function add()
     {
-        need_manager(is_output('json'));
-
         need_permission(Permissao::NOME_CADASTROPRODUTOS, is_output('json'));
         $id = isset($_GET['id']) ? $_GET['id'] : null;
         $categoria = Categoria::findByID($id);
@@ -126,13 +117,11 @@ class CategoriaPageController extends \MZ\Core\Controller
             $categoria->setServico('Y');
         }
         $_categorias = Categoria::findAll(['categoriaid' => null]);
-        return $app->getResponse()->output('gerenciar_categoria_cadastrar');
+        return $this->view('gerenciar_categoria_cadastrar', get_defined_vars());
     }
 
     public function update()
     {
-        need_manager(is_output('json'));
-
         need_permission(Permissao::NOME_CADASTROPRODUTOS, is_output('json'));
         $id = isset($_GET['id']) ? $_GET['id'] : null;
         $categoria = Categoria::findByID($id);
@@ -178,13 +167,11 @@ class CategoriaPageController extends \MZ\Core\Controller
             }
         }
         $_categorias = Categoria::findAll(['categoriaid' => null]);
-        return $app->getResponse()->output('gerenciar_categoria_editar');
+        return $this->view('gerenciar_categoria_editar', get_defined_vars());
     }
 
     public function delete()
     {
-        need_manager(is_output('json'));
-
         need_permission(Permissao::NOME_CADASTROPRODUTOS, is_output('json'));
         $id = isset($_GET['id']) ? $_GET['id'] : null;
         $categoria = Categoria::findByID($id);
@@ -224,12 +211,6 @@ class CategoriaPageController extends \MZ\Core\Controller
     public static function getRoutes()
     {
         return [
-            [
-                'name' => 'categoria_view',
-                'path' => '/categoria/',
-                'method' => 'GET',
-                'controller' => 'view',
-            ],
             [
                 'name' => 'categoria_find',
                 'path' => '/gerenciar/categoria/',

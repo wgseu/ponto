@@ -74,7 +74,8 @@ class HtmlResponse extends Response
 
     /**
      * Output a processed template into response
-     * @param  string $template template name
+     * @param string $template template name
+     * @return self
      */
     public function output($template)
     {

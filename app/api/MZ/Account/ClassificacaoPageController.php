@@ -32,14 +32,8 @@ use MZ\Util\Filter;
  */
 class ClassificacaoPageController extends \MZ\Core\Controller
 {
-    public function view()
-    {
-    }
-
     public function find()
     {
-        need_manager(is_output('json'));
-
         need_permission(Permissao::NOME_CADASTROCONTAS, is_output('json'));
 
         $limite = isset($_GET['limite']) ? intval($_GET['limite']) : 10;
@@ -72,13 +66,11 @@ class ClassificacaoPageController extends \MZ\Core\Controller
         foreach ($classificacoes_sup as $classificacao) {
             $_classificacao_names[$classificacao->getID()] = $classificacao->getDescricao();
         }
-        return $app->getResponse()->output('gerenciar_classificacao_index');
+        return $this->view('gerenciar_classificacao_index', get_defined_vars());
     }
 
     public function add()
     {
-        need_manager(is_output('json'));
-
         need_permission(Permissao::NOME_CADASTROCONTAS, is_output('json'));
         $id = isset($_GET['id']) ? $_GET['id'] : null;
         $classificacao = Classificacao::findByID($id);
@@ -122,13 +114,11 @@ class ClassificacaoPageController extends \MZ\Core\Controller
             $classificacao = new Classificacao();
         }
         $_classificacoes = Classificacao::findAll(['classificacaoid' => null]);
-        return $app->getResponse()->output('gerenciar_classificacao_cadastrar');
+        return $this->view('gerenciar_classificacao_cadastrar', get_defined_vars());
     }
 
     public function update()
     {
-        need_manager(is_output('json'));
-
         need_permission(Permissao::NOME_CADASTROCONTAS, is_output('json'));
         $id = isset($_GET['id']) ? $_GET['id'] : null;
         $classificacao = Classificacao::findByID($id);
@@ -177,13 +167,11 @@ class ClassificacaoPageController extends \MZ\Core\Controller
             json('Nenhum dado foi enviado');
         }
         $_classificacoes = Classificacao::findAll(['classificacaoid' => null]);
-        return $app->getResponse()->output('gerenciar_classificacao_editar');
+        return $this->view('gerenciar_classificacao_editar', get_defined_vars());
     }
 
     public function delete()
     {
-        need_manager(is_output('json'));
-
         need_permission(Permissao::NOME_CADASTROCONTAS, is_output('json'));
         $id = isset($_GET['id']) ? $_GET['id'] : null;
         $classificacao = Classificacao::findByID($id);
@@ -223,12 +211,6 @@ class ClassificacaoPageController extends \MZ\Core\Controller
     public static function getRoutes()
     {
         return [
-            [
-                'name' => 'classificacao_view',
-                'path' => '/classificacao/',
-                'method' => 'GET',
-                'controller' => 'view',
-            ],
             [
                 'name' => 'classificacao_find',
                 'path' => '/gerenciar/classificacao/',

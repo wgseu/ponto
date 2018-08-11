@@ -122,8 +122,6 @@ class PaginaPageController extends \MZ\Core\Controller
 
     public function find()
     {
-        $app = $this->getApplication();
-
         need_permission(Permissao::NOME_ALTERARPAGINAS, is_output('json'));
 
         $limite = isset($_GET['limite']) ? intval($_GET['limite']) : 10;
@@ -148,13 +146,11 @@ class PaginaPageController extends \MZ\Core\Controller
 
         $nomes = Pagina::getNomeOptions();
         $linguagens = get_languages_info();
-        return $app->getResponse()->output('gerenciar_pagina_index');
+        return $this->view('gerenciar_pagina_index', get_defined_vars());
     }
 
     public function add()
     {
-        $app = $this->getApplication();
-
         need_permission(Permissao::NOME_ALTERARPAGINAS, is_output('json'));
         $id = isset($_GET['id']) ? $_GET['id'] : null;
         $pagina = Pagina::findByID($id);
@@ -198,13 +194,11 @@ class PaginaPageController extends \MZ\Core\Controller
         } elseif (is_output('json')) {
             json('Nenhum dado foi enviado');
         }
-        return $app->getResponse()->output('gerenciar_pagina_cadastrar');
+        return $this->view('gerenciar_pagina_cadastrar', get_defined_vars());
     }
 
     public function update()
     {
-        $app = $this->getApplication();
-
         need_permission(Permissao::NOME_ALTERARPAGINAS, is_output('json'));
         $id = isset($_GET['id']) ? $_GET['id'] : null;
         $pagina = Pagina::findByID($id);
@@ -254,13 +248,11 @@ class PaginaPageController extends \MZ\Core\Controller
         } elseif (is_output('json')) {
             json('Nenhum dado foi enviado');
         }
-        return $app->getResponse()->output('gerenciar_pagina_editar');
+        return $this->view('gerenciar_pagina_editar', get_defined_vars());
     }
 
     public function delete()
     {
-        $app = $this->getApplication();
-
         need_permission(Permissao::NOME_ALTERARPAGINAS, is_output('json'));
         $id = isset($_GET['id']) ? $_GET['id'] : null;
         $pagina = Pagina::findByID($id);

@@ -31,10 +31,6 @@ use MZ\Util\Filter;
  */
 class FuncaoPageController extends \MZ\Core\Controller
 {
-    public function view()
-    {
-    }
-
     public function find()
     {
         need_manager(is_output('json'));
@@ -61,7 +57,7 @@ class FuncaoPageController extends \MZ\Core\Controller
             json(['status' => 'ok', 'items' => $items]);
         }
 
-        return $app->getResponse()->output('gerenciar_funcao_index');
+        return $this->view('gerenciar_funcao_index', get_defined_vars());
     }
 
     public function add()
@@ -108,7 +104,7 @@ class FuncaoPageController extends \MZ\Core\Controller
         } elseif (is_output('json')) {
             json('Nenhum dado foi enviado');
         }
-        return $app->getResponse()->output('gerenciar_funcao_cadastrar');
+        return $this->view('gerenciar_funcao_cadastrar', get_defined_vars());
     }
 
     public function update()
@@ -161,7 +157,7 @@ class FuncaoPageController extends \MZ\Core\Controller
         } elseif (is_output('json')) {
             json('Nenhum dado foi enviado');
         }
-        return $app->getResponse()->output('gerenciar_funcao_editar');
+        return $this->view('gerenciar_funcao_editar', get_defined_vars());
     }
 
     public function delete()
@@ -207,12 +203,6 @@ class FuncaoPageController extends \MZ\Core\Controller
     public static function getRoutes()
     {
         return [
-            [
-                'name' => 'funcao_view',
-                'path' => '/funcao/',
-                'method' => 'GET',
-                'controller' => 'view',
-            ],
             [
                 'name' => 'funcao_find',
                 'path' => '/gerenciar/funcao/',

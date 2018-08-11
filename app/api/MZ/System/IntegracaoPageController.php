@@ -31,14 +31,8 @@ use MZ\Util\Filter;
  */
 class IntegracaoPageController extends \MZ\Core\Controller
 {
-    public function view()
-    {
-    }
-
     public function find()
     {
-        need_manager(is_output('json'));
-
         need_permission(Permissao::NOME_ALTERARCONFIGURACOES, is_output('json'));
 
         $limite = isset($_GET['limite']) ? intval($_GET['limite']) : 10;
@@ -61,18 +55,11 @@ class IntegracaoPageController extends \MZ\Core\Controller
             json(['status' => 'ok', 'items' => $items]);
         }
 
-        return $app->getResponse()->output('gerenciar_integracao_index');
-    }
-
-    public function add()
-    {
-        need_manager(is_output('json'));
+        return $this->view('gerenciar_integracao_index', get_defined_vars());
     }
 
     public function update()
     {
-        need_manager(is_output('json'));
-
         need_permission(Permissao::NOME_ALTERARCONFIGURACOES, is_output('json'));
         $id = isset($_GET['id']) ? $_GET['id'] : null;
         $integracao = Integracao::findByID($id);
@@ -119,12 +106,7 @@ class IntegracaoPageController extends \MZ\Core\Controller
         } elseif (is_output('json')) {
             json('Nenhum dado foi enviado');
         }
-        return $app->getResponse()->output('gerenciar_integracao_editar');
-    }
-
-    public function delete()
-    {
-        need_manager(is_output('json'));
+        return $this->view('gerenciar_integracao_editar', get_defined_vars());
     }
 
     /**
@@ -135,34 +117,16 @@ class IntegracaoPageController extends \MZ\Core\Controller
     {
         return [
             [
-                'name' => 'integracao_view',
-                'path' => '/integracao/',
-                'method' => 'GET',
-                'controller' => 'view',
-            ],
-            [
                 'name' => 'integracao_find',
                 'path' => '/gerenciar/integracao/',
                 'method' => 'GET',
                 'controller' => 'find',
             ],
             [
-                'name' => 'integracao_add',
-                'path' => '/gerenciar/integracao/cadastrar',
-                'method' => ['GET', 'POST'],
-                'controller' => 'add',
-            ],
-            [
                 'name' => 'integracao_update',
                 'path' => '/gerenciar/integracao/editar',
                 'method' => ['GET', 'POST'],
                 'controller' => 'update',
-            ],
-            [
-                'name' => 'integracao_delete',
-                'path' => '/gerenciar/integracao/excluir',
-                'method' => 'GET',
-                'controller' => 'delete',
             ],
         ];
     }

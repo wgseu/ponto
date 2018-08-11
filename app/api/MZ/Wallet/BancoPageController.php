@@ -32,14 +32,8 @@ use MZ\Util\Filter;
  */
 class BancoPageController extends \MZ\Core\Controller
 {
-    public function view()
-    {
-    }
-
     public function find()
     {
-        need_manager(is_output('json'));
-
         need_permission(Permissao::NOME_CADASTROBANCOS, is_output('json'));
 
         $limite = isset($_GET['limite']) ? intval($_GET['limite']) : 10;
@@ -62,13 +56,11 @@ class BancoPageController extends \MZ\Core\Controller
             json('items', $items);
         }
 
-        return $app->getResponse()->output('gerenciar_banco_index');
+        return $this->view('gerenciar_banco_index', get_defined_vars());
     }
 
     public function add()
     {
-        need_manager(is_output('json'));
-
         need_permission(Permissao::NOME_CADASTROBANCOS, is_output('json'));
         $focusctrl = 'numero';
         $errors = [];
@@ -105,13 +97,11 @@ class BancoPageController extends \MZ\Core\Controller
         } elseif (is_output('json')) {
             json('Nenhum dado foi enviado');
         }
-        return $app->getResponse()->output('gerenciar_banco_cadastrar');
+        return $this->view('gerenciar_banco_cadastrar', get_defined_vars());
     }
 
     public function update()
     {
-        need_manager(is_output('json'));
-
         need_permission(Permissao::NOME_CADASTROBANCOS, is_output('json'));
         $id = isset($_GET['id']) ? $_GET['id'] : null;
         $banco = Banco::findByID($id);
@@ -157,13 +147,11 @@ class BancoPageController extends \MZ\Core\Controller
         } elseif (is_output('json')) {
             json('Nenhum dado foi enviado');
         }
-        return $app->getResponse()->output('gerenciar_banco_editar');
+        return $this->view('gerenciar_banco_editar', get_defined_vars());
     }
 
     public function delete()
     {
-        need_manager(is_output('json'));
-
         need_permission(Permissao::NOME_CADASTROBANCOS, is_output('json'));
         $id = isset($_GET['id']) ? $_GET['id'] : null;
         $banco = Banco::findByID($id);
@@ -203,12 +191,6 @@ class BancoPageController extends \MZ\Core\Controller
     public static function getRoutes()
     {
         return [
-            [
-                'name' => 'banco_view',
-                'path' => '/banco/',
-                'method' => 'GET',
-                'controller' => 'view',
-            ],
             [
                 'name' => 'banco_find',
                 'path' => '/gerenciar/banco/',

@@ -32,14 +32,8 @@ use MZ\Util\Filter;
  */
 class ServicoPageController extends \MZ\Core\Controller
 {
-    public function view()
-    {
-    }
-
     public function find()
     {
-        need_manager(is_output('json'));
-
         need_permission(Permissao::NOME_CADASTROSERVICOS, is_output('json'));
 
         $limite = isset($_GET['limite']) ? intval($_GET['limite']) : 10;
@@ -64,13 +58,11 @@ class ServicoPageController extends \MZ\Core\Controller
 
         $tipos = Servico::getTipoOptions();
 
-        return $app->getResponse()->output('gerenciar_servico_index');
+        return $this->view('gerenciar_servico_index', get_defined_vars());
     }
 
     public function add()
     {
-        need_manager(is_output('json'));
-
         need_permission(Permissao::NOME_CADASTROSERVICOS, is_output('json'));
         $id = isset($_GET['id']) ? $_GET['id'] : null;
         $servico = Servico::findByID($id);
@@ -113,13 +105,11 @@ class ServicoPageController extends \MZ\Core\Controller
         } else {
             $servico->setAtivo('Y');
         }
-        return $app->getResponse()->output('gerenciar_servico_cadastrar');
+        return $this->view('gerenciar_servico_cadastrar', get_defined_vars());
     }
 
     public function update()
     {
-        need_manager(is_output('json'));
-
         need_permission(Permissao::NOME_CADASTROSERVICOS, is_output('json'));
         $id = isset($_GET['id']) ? $_GET['id'] : null;
         $servico = Servico::findByID($id);
@@ -166,13 +156,11 @@ class ServicoPageController extends \MZ\Core\Controller
         } elseif (is_output('json')) {
             json('Nenhum dado foi enviado');
         }
-        return $app->getResponse()->output('gerenciar_servico_editar');
+        return $this->view('gerenciar_servico_editar', get_defined_vars());
     }
 
     public function delete()
     {
-        need_manager(is_output('json'));
-
         need_permission(Permissao::NOME_CADASTROSERVICOS, is_output('json'));
         $id = isset($_GET['id']) ? $_GET['id'] : null;
         $servico = Servico::findByID($id);
@@ -212,12 +200,6 @@ class ServicoPageController extends \MZ\Core\Controller
     public static function getRoutes()
     {
         return [
-            [
-                'name' => 'servico_view',
-                'path' => '/servico/',
-                'method' => 'GET',
-                'controller' => 'view',
-            ],
             [
                 'name' => 'servico_find',
                 'path' => '/gerenciar/servico/',

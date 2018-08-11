@@ -32,11 +32,7 @@ use MZ\Util\Filter;
  */
 class AcessoPageController extends \MZ\Core\Controller
 {
-    public function view()
-    {
-    }
-
-    public function find()
+    public function manage()
     {
         need_manager(is_output('json'));
 
@@ -106,22 +102,7 @@ class AcessoPageController extends \MZ\Core\Controller
             }
             json(['status' => 'ok', 'items' => $items]);
         }
-        return $app->getResponse()->output('gerenciar_acesso_index');
-    }
-
-    public function add()
-    {
-        need_manager(is_output('json'));
-    }
-
-    public function update()
-    {
-        need_manager(is_output('json'));
-    }
-
-    public function delete()
-    {
-        need_manager(is_output('json'));
+        return $this->view('gerenciar_acesso_index', get_defined_vars());
     }
 
     /**
@@ -132,34 +113,10 @@ class AcessoPageController extends \MZ\Core\Controller
     {
         return [
             [
-                'name' => 'acesso_view',
-                'path' => '/acesso/',
-                'method' => 'GET',
-                'controller' => 'view',
-            ],
-            [
-                'name' => 'acesso_find',
+                'name' => 'acesso_manage',
                 'path' => '/gerenciar/acesso/',
-                'method' => 'GET',
-                'controller' => 'find',
-            ],
-            [
-                'name' => 'acesso_add',
-                'path' => '/gerenciar/acesso/cadastrar',
                 'method' => ['GET', 'POST'],
-                'controller' => 'add',
-            ],
-            [
-                'name' => 'acesso_update',
-                'path' => '/gerenciar/acesso/editar',
-                'method' => ['GET', 'POST'],
-                'controller' => 'update',
-            ],
-            [
-                'name' => 'acesso_delete',
-                'path' => '/gerenciar/acesso/excluir',
-                'method' => 'GET',
-                'controller' => 'delete',
+                'controller' => 'manage',
             ],
         ];
     }

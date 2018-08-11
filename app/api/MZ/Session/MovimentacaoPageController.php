@@ -32,14 +32,8 @@ use MZ\Util\Filter;
  */
 class MovimentacaoPageController extends \MZ\Core\Controller
 {
-    public function view()
-    {
-    }
-
     public function find()
     {
-        need_manager(is_output('json'));
-
         need_permission(Permissao::NOME_ABRIRCAIXA, is_output('json'));
 
         $limite = isset($_GET['limite']) ? intval($_GET['limite']) : 10;
@@ -77,22 +71,7 @@ class MovimentacaoPageController extends \MZ\Core\Controller
             $_caixa_names[$caixa->getID()] = $caixa->getDescricao();
         }
         $_funcionario = $movimentacao->findFuncionarioAberturaID();
-        return $app->getResponse()->output('gerenciar_movimentacao_index');
-    }
-
-    public function add()
-    {
-        need_manager(is_output('json'));
-    }
-
-    public function update()
-    {
-        need_manager(is_output('json'));
-    }
-
-    public function delete()
-    {
-        need_manager(is_output('json'));
+        return $this->view('gerenciar_movimentacao_index', get_defined_vars());
     }
 
     /**
@@ -103,34 +82,10 @@ class MovimentacaoPageController extends \MZ\Core\Controller
     {
         return [
             [
-                'name' => 'movimentacao_view',
-                'path' => '/movimentacao/',
-                'method' => 'GET',
-                'controller' => 'view',
-            ],
-            [
                 'name' => 'movimentacao_find',
                 'path' => '/gerenciar/movimentacao/',
                 'method' => 'GET',
                 'controller' => 'find',
-            ],
-            [
-                'name' => 'movimentacao_add',
-                'path' => '/gerenciar/movimentacao/cadastrar',
-                'method' => ['GET', 'POST'],
-                'controller' => 'add',
-            ],
-            [
-                'name' => 'movimentacao_update',
-                'path' => '/gerenciar/movimentacao/editar',
-                'method' => ['GET', 'POST'],
-                'controller' => 'update',
-            ],
-            [
-                'name' => 'movimentacao_delete',
-                'path' => '/gerenciar/movimentacao/excluir',
-                'method' => 'GET',
-                'controller' => 'delete',
             ],
         ];
     }

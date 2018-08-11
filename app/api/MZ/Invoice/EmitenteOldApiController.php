@@ -44,7 +44,7 @@ class EmitenteOldApiController extends \MZ\Core\ApiController
             if (is_null($cert_file)) {
                 throw new \Exception('O certificado não foi enviado', 404);
             }
-            $cert_path = $app->getPath('public') . get_document_url($cert_file, 'cert');
+            $cert_path = $this->getApplication()->getPath('public') . get_document_url($cert_file, 'cert');
             $cert_store = file_get_contents($cert_path);
             unlink($cert_path);
             if ($cert_store === false) {
@@ -54,8 +54,8 @@ class EmitenteOldApiController extends \MZ\Core\ApiController
                 throw new \Exception('Senha incorreta', 1);
             }
             $certinfo = openssl_x509_parse($cert_info['cert']);
-            file_put_contents($app->getPath('public') . get_document_url('public.pem', 'cert'), $cert_info['cert']);
-            file_put_contents($app->getPath('public') . get_document_url('private.pem', 'cert'), $cert_info['pkey']);
+            file_put_contents($this->getApplication()->getPath('public') . get_document_url('public.pem', 'cert'), $cert_info['cert']);
+            file_put_contents($this->getApplication()->getPath('public') . get_document_url('private.pem', 'cert'), $cert_info['pkey']);
             json('chave', [
                 'publica' => 'public.pem',
                 'privada' => 'private.pem',
@@ -76,7 +76,7 @@ class EmitenteOldApiController extends \MZ\Core\ApiController
             [
                 'name' => 'emitente_certificate',
                 'path' => '/gerenciar/emitente/certificado',
-                'method' => 'GET',
+                'method' => 'POST',
                 'controller' => 'certificate',
             ]
         ];

@@ -32,14 +32,8 @@ use MZ\Employee\Funcionario;
  */
 class AuditoriaPageController extends \MZ\Core\Controller
 {
-    public function view()
-    {
-    }
-
     public function find()
     {
-        need_manager(is_output('json'));
-
         need_permission(Permissao::NOME_RELATORIOAUDITORIA, is_output('json'));
 
         $limite = isset($_GET['limite']) ? intval($_GET['limite']) : 10;
@@ -81,22 +75,7 @@ class AuditoriaPageController extends \MZ\Core\Controller
             'Financeiro' => 0,
             'Administrativo' => 16
         ];
-        return $app->getResponse()->output('gerenciar_auditoria_index');
-    }
-
-    public function add()
-    {
-        need_manager(is_output('json'));
-    }
-
-    public function update()
-    {
-        need_manager(is_output('json'));
-    }
-
-    public function delete()
-    {
-        need_manager(is_output('json'));
+        return $this->view('gerenciar_auditoria_index', get_defined_vars());
     }
 
     /**
@@ -107,34 +86,10 @@ class AuditoriaPageController extends \MZ\Core\Controller
     {
         return [
             [
-                'name' => 'auditoria_view',
-                'path' => '/auditoria/',
-                'method' => 'GET',
-                'controller' => 'view',
-            ],
-            [
                 'name' => 'auditoria_find',
                 'path' => '/gerenciar/auditoria/',
                 'method' => 'GET',
                 'controller' => 'find',
-            ],
-            [
-                'name' => 'auditoria_add',
-                'path' => '/gerenciar/auditoria/cadastrar',
-                'method' => ['GET', 'POST'],
-                'controller' => 'add',
-            ],
-            [
-                'name' => 'auditoria_update',
-                'path' => '/gerenciar/auditoria/editar',
-                'method' => ['GET', 'POST'],
-                'controller' => 'update',
-            ],
-            [
-                'name' => 'auditoria_delete',
-                'path' => '/gerenciar/auditoria/excluir',
-                'method' => 'GET',
-                'controller' => 'delete',
             ],
         ];
     }

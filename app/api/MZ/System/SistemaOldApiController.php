@@ -34,8 +34,6 @@ class SistemaOldApiController extends \MZ\Core\ApiController
 {
     public function backup()
     {
-        $app = $this->getApplication();        <?php
-
         need_permission(Permissao::NOME_BACKUP, true);
 
         try {
@@ -45,10 +43,10 @@ class SistemaOldApiController extends \MZ\Core\ApiController
             $zip = new \ZipArchive();
             $zip->open($file, \ZipArchive::OVERWRITE);
 
-            zip_add_folder($zip, $app->getPath('public') . '/static/upload', 'Site/Upload/');
-            zip_add_folder($zip, $app->getPath('docs'), 'Site/Documents/');
-            zip_add_folder($zip, $app->getPath('image') . '/header', 'Site/Images/header/');
-            zip_add_folder($zip, $app->getPath('image') . '/patrimonio', 'Site/Images/patrimonio/');
+            zip_add_folder($zip, $this->getApplication()->getPath('public') . '/static/upload', 'Site/Upload/');
+            zip_add_folder($zip, $this->getApplication()->getPath('docs'), 'Site/Documents/');
+            zip_add_folder($zip, $this->getApplication()->getPath('image') . '/header', 'Site/Images/header/');
+            zip_add_folder($zip, $this->getApplication()->getPath('image') . '/patrimonio', 'Site/Images/patrimonio/');
 
             // Close and send to users
             $zip->close();
@@ -66,10 +64,6 @@ class SistemaOldApiController extends \MZ\Core\ApiController
 
     public function restore()
     {
-        $app = $this->getApplication();        <?php
-        require_once(dirname(dirname(__DIR__)) . '/app.php'); // main app file
-
-
         need_permission(Permissao::NOME_RESTAURACAO, true);
 
         try {
@@ -91,10 +85,10 @@ class SistemaOldApiController extends \MZ\Core\ApiController
             zip_extract_folder(
                 $zip,
                 [
-                    'Site/Upload' => $app->getPath('public') . '/static/upload',
-                    'Site/Documents' => $app->getPath('docs'),
-                    'Site/Images/header' => $app->getPath('image') . '/header',
-                    'Site/Images/patrimonio' => $app->getPath('image') . '/patrimonio'
+                    'Site/Upload' => $this->getApplication()->getPath('public') . '/static/upload',
+                    'Site/Documents' => $this->getApplication()->getPath('docs'),
+                    'Site/Images/header' => $this->getApplication()->getPath('image') . '/header',
+                    'Site/Images/patrimonio' => $this->getApplication()->getPath('image') . '/patrimonio'
                 ]
             );
 
@@ -109,8 +103,6 @@ class SistemaOldApiController extends \MZ\Core\ApiController
 
     public function tasks()
     {
-        $app = $this->getApplication();        <?php
-        require_once(dirname(dirname(__DIR__)) . '/app.php'); // main app file
 
 
         define('TASK_TOKEN', 'WWHxIdzDakrea921zGveQkKccrf80mDp');
@@ -140,10 +132,6 @@ class SistemaOldApiController extends \MZ\Core\ApiController
 
     public function upgrade()
     {
-        $app = $this->getApplication();        <?php
-        require_once(dirname(dirname(__DIR__)) . '/app.php'); // main app file
-
-
         need_permission(Permissao::NOME_ALTERARCONFIGURACOES, true);
 
         try {
@@ -159,7 +147,7 @@ class SistemaOldApiController extends \MZ\Core\ApiController
                 $name = $produto->getDescricao().'.png';
                 $name = iconv("UTF-8//IGNORE", "WINDOWS-1252//IGNORE", $name);
                 $type = 'produto';
-                $dir = $app->getPath('image') . '/' . $type . '/';
+                $dir = $this->getApplication()->getPath('image') . '/' . $type . '/';
                 $name = generate_file_name($dir, '.png', $name, true);
                 $path = $dir . $name;
                 file_put_contents($path, $imagebytes);

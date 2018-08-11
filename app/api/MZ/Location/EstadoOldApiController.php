@@ -31,7 +31,6 @@ class EstadoOldApiController extends \MZ\Core\ApiController
 {
     public function find()
     {
-
         $pais_id = isset($_GET['paisid']) ? $_GET['paisid'] : null;
         $pais = Pais::findByID($pais_id);
         if (!$pais->exists()) {

@@ -33,7 +33,6 @@ class BairroOldApiController extends \MZ\Core\ApiController
 {
     public function find()
     {
-
         $estado_id = isset($_GET['estadoid']) ? $_GET['estadoid'] : null;
         $estado = Estado::findByID($estado_id);
         if (!$estado->exists()) {

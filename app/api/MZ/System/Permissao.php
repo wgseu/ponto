@@ -91,10 +91,12 @@ class Permissao extends Model
     const NOME_RELATORIOFUNCIONARIOS = 'RelatorioFuncionarios'; // Permitir visualizar relatório de funcionários
     const NOME_RELATORIOCLIENTES = 'RelatorioClientes'; // Permitir visualizar relatório de clientes
     const NOME_REVOGARCOMISSAO = 'RevogarComissao'; // Permitir retirar a comissão de um pedido
-    const NOME_SELECIONARENTREGADOR = 'SelecionarEntregador'; // Permitir selecionar outro entregador na entrega de pedidos para entrega
+    // Permitir selecionar outro entregador na entrega de pedidos para entrega
+    const NOME_SELECIONARENTREGADOR = 'SelecionarEntregador';
     const NOME_TRANSFERIRPRODUTOS = 'TransferirProdutos'; // Permitir transferir produtos de uma mesa para outra
     const NOME_RELATORIOPEDIDOS = 'RelatorioPedidos'; // Permitir visualizar relatório de pedidos
-    const NOME_ALTERARCONFIGURACOES = 'AlterarConfiguracoes'; // Permitir alterar informações da empresa e configurações do sistema
+    // Permitir alterar informações da empresa e configurações do sistema
+    const NOME_ALTERARCONFIGURACOES = 'AlterarConfiguracoes';
     const NOME_LISTACOMPRAS = 'ListaCompras'; // Permitir cadastrar lista de compras de produtos
     const NOME_RELATORIOMENSAL = 'RelatorioMensal'; // Permitir visualizar e emitir relatórios de vendas mensais
     const NOME_CADASTROCIDADES = 'CadastroCidades'; // Permitir cadastrar ou alterar as cidades dos estados
@@ -112,7 +114,8 @@ class Permissao extends Model
     const NOME_CADASTROCARTEIRAS = 'CadastroCarteiras'; // Permitir cadastrar carteiras e contas bancárias
     const NOME_RELATORIOFLUXO = 'RelatorioFluxo'; // Permitir visualizar o relatório de fluxo de caixa
     const NOME_TRANSFERIRVALORES = 'TransferirValores'; // Permitir transferir dinheiro de um caixa para outro
-    const NOME_CADASTROPATRIMONIO = 'CadastroPatrimonio'; // Permitir cadastrar e atualizar a quantidade de bens de uma empresa
+    // Permitir cadastrar e atualizar a quantidade de bens de uma empresa
+    const NOME_CADASTROPATRIMONIO = 'CadastroPatrimonio';
     const NOME_RELATORIOPATRIMONIO = 'RelatorioPatrimonio'; // Permitir visualizar a lista de bens de uma empresa
     const NOME_RELATORIOCARTEIRAS = 'RelatorioCarteiras'; // Permitir visualizar o relatório de carteiras
     const NOME_RELATORIOCHEQUES = 'RelatorioCheques'; // Permitir visualizar o relatório de cheques
@@ -123,7 +126,8 @@ class Permissao extends Model
     const NOME_ALTERARPAGINAS = 'AlterarPaginas'; // Permitir alterar as páginas do site da empresa
     const NOME_ALTERARENTREGADOR = 'AlterarEntregador'; // Permitir alterar o entregador após enviar os pedidos
     const NOME_RELATORIOBALANCO = 'RelatorioBalanco'; // Permitir visualizar o relatório de balanço de contas
-    const NOME_TRANSFORMARENTREGA = 'TransformarEntrega'; // Permitir transformar um pedido de entrega para viagem e vice versa
+    // Permitir transformar um pedido de entrega para viagem e vice versa
+    const NOME_TRANSFORMARENTREGA = 'TransformarEntrega';
     const NOME_CONFERIRCAIXA = 'ConferirCaixa'; // Permitir alterar os valores de conferência de um caixa
     const NOME_CONTAVIAGEM = 'ContaViagem'; // Permitir imprimir conta de pedidos para viagem
     const NOME_ENTREGAADICIONAR = 'EntregaAdicionar'; // Permitir adicionar produtos na tela de entrega

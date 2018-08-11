@@ -26,7 +26,6 @@ namespace MZ\Stock;
 
 use MZ\System\Permissao;
 use MZ\Database\DB;
-use MZ\System\Permissao;
 use MZ\Util\Filter;
 
 /**
@@ -34,14 +33,8 @@ use MZ\Util\Filter;
  */
 class FornecedorPageController extends \MZ\Core\Controller
 {
-    public function view()
-    {
-    }
-
     public function find()
     {
-        need_manager(is_output('json'));
-
         need_permission(Permissao::NOME_CADASTROFORNECEDORES, is_output('json'));
 
         $limite = isset($_GET['limite']) ? intval($_GET['limite']) : 10;
@@ -65,13 +58,11 @@ class FornecedorPageController extends \MZ\Core\Controller
         }
 
         $empresa_id_obj = $fornecedor->findEmpresaID();
-        return $app->getResponse()->output('gerenciar_fornecedor_index');
+        return $this->view('gerenciar_fornecedor_index', get_defined_vars());
     }
 
     public function add()
     {
-        need_manager(is_output('json'));
-
         need_permission(Permissao::NOME_CADASTROFORNECEDORES, is_output('json'));
         $id = isset($_GET['id']) ? $_GET['id'] : null;
         $fornecedor = Fornecedor::findByID($id);
@@ -115,13 +106,11 @@ class FornecedorPageController extends \MZ\Core\Controller
             $fornecedor->setPrazoPagamento(30);
         }
         $empresa_id_obj = $fornecedor->findEmpresaID();
-        return $app->getResponse()->output('gerenciar_fornecedor_cadastrar');
+        return $this->view('gerenciar_fornecedor_cadastrar', get_defined_vars());
     }
 
     public function update()
     {
-        need_manager(is_output('json'));
-
         need_permission(Permissao::NOME_CADASTROFORNECEDORES, is_output('json'));
         $id = isset($_GET['id']) ? $_GET['id'] : null;
         $fornecedor = Fornecedor::findByID($id);
@@ -169,13 +158,11 @@ class FornecedorPageController extends \MZ\Core\Controller
             json('Nenhum dado foi enviado');
         }
         $empresa_id_obj = $fornecedor->findEmpresaID();
-        return $app->getResponse()->output('gerenciar_fornecedor_editar');
+        return $this->view('gerenciar_fornecedor_editar', get_defined_vars());
     }
 
     public function delete()
     {
-        need_manager(is_output('json'));
-
         need_permission(Permissao::NOME_CADASTROFORNECEDORES, is_output('json'));
         $id = isset($_GET['id']) ? $_GET['id'] : null;
         $fornecedor = Fornecedor::findByID($id);
@@ -216,12 +203,6 @@ class FornecedorPageController extends \MZ\Core\Controller
     public static function getRoutes()
     {
         return [
-            [
-                'name' => 'fornecedor_view',
-                'path' => '/fornecedor/',
-                'method' => 'GET',
-                'controller' => 'view',
-            ],
             [
                 'name' => 'fornecedor_find',
                 'path' => '/gerenciar/fornecedor/',

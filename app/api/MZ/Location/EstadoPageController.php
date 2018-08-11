@@ -32,14 +32,8 @@ use MZ\Util\Filter;
  */
 class EstadoPageController extends \MZ\Core\Controller
 {
-    public function view()
-    {
-    }
-
     public function find()
     {
-        need_manager(is_output('json'));
-
         need_permission(Permissao::NOME_CADASTROESTADOS, is_output('json'));
 
         $limite = isset($_GET['limite'])?intval($_GET['limite']):10;
@@ -64,13 +58,11 @@ class EstadoPageController extends \MZ\Core\Controller
 
         $pais = $estado->findPaisID();
         $_paises = \MZ\Location\Pais::findAll();
-        return $app->getResponse()->output('gerenciar_estado_index');
+        return $this->view('gerenciar_estado_index', get_defined_vars());
     }
 
     public function add()
     {
-        need_manager(is_output('json'));
-
         need_permission(Permissao::NOME_CADASTROESTADOS, is_output('json'));
         $id = isset($_GET['id']) ? $_GET['id'] : null;
         $estado = Estado::findByID($id);
@@ -112,13 +104,11 @@ class EstadoPageController extends \MZ\Core\Controller
             json('Nenhum dado foi enviado');
         }
         $_paises = \MZ\Location\Pais::findAll();
-        return $app->getResponse()->output('gerenciar_estado_cadastrar');
+        return $this->view('gerenciar_estado_cadastrar', get_defined_vars());
     }
 
     public function update()
     {
-        need_manager(is_output('json'));
-
         need_permission(Permissao::NOME_CADASTROESTADOS, is_output('json'));
         $id = isset($_GET['id']) ? $_GET['id'] : null;
         $estado = Estado::findByID($id);
@@ -166,13 +156,11 @@ class EstadoPageController extends \MZ\Core\Controller
             json('Nenhum dado foi enviado');
         }
         $_paises = \MZ\Location\Pais::findAll();
-        return $app->getResponse()->output('gerenciar_estado_editar');
+        return $this->view('gerenciar_estado_editar', get_defined_vars());
     }
 
     public function delete()
     {
-        need_manager(is_output('json'));
-
         need_permission(Permissao::NOME_CADASTROESTADOS, is_output('json'));
         $id = isset($_GET['id']) ? $_GET['id'] : null;
         $estado = Estado::findByID($id);
@@ -212,12 +200,6 @@ class EstadoPageController extends \MZ\Core\Controller
     public static function getRoutes()
     {
         return [
-            [
-                'name' => 'estado_view',
-                'path' => '/estado/',
-                'method' => 'GET',
-                'controller' => 'view',
-            ],
             [
                 'name' => 'estado_find',
                 'path' => '/gerenciar/estado/',

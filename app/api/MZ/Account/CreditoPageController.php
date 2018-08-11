@@ -35,8 +35,6 @@ class CreditoPageController extends \MZ\Core\Controller
 {
     public function find()
     {
-        need_manager(is_output('json'));
-
         need_permission(Permissao::NOME_CADASTRARCREDITOS, is_output('json'));
 
         $limite = isset($_GET['limite']) ? intval($_GET['limite']) : 10;
@@ -64,13 +62,11 @@ class CreditoPageController extends \MZ\Core\Controller
             'Y' => 'Cancelados',
             'N' => 'Válidos',
         ];
-        return $app->getResponse()->output('gerenciar_credito_index');
+        return $this->view('gerenciar_credito_index', get_defined_vars());
     }
 
     public function add()
     {
-        need_manager(is_output('json'));
-
         need_permission(Permissao::NOME_CADASTRARCREDITOS, is_output('json'));
         $id = isset($_GET['id']) ? $_GET['id'] : null;
         $credito = Credito::findByID($id);
@@ -114,13 +110,11 @@ class CreditoPageController extends \MZ\Core\Controller
         } elseif (is_output('json')) {
             json('Nenhum dado foi enviado');
         }
-        return $app->getResponse()->output('gerenciar_credito_cadastrar');
+        return $this->view('gerenciar_credito_cadastrar', get_defined_vars());
     }
 
     public function update()
     {
-        need_manager(is_output('json'));
-
         need_permission(Permissao::NOME_CADASTRARCREDITOS, is_output('json'));
         $id = isset($_GET['id']) ? $_GET['id'] : null;
         $credito = Credito::findByID($id);
@@ -167,13 +161,11 @@ class CreditoPageController extends \MZ\Core\Controller
         } elseif (is_output('json')) {
             json('Nenhum dado foi enviado');
         }
-        return $app->getResponse()->output('gerenciar_credito_editar');
+        return $this->view('gerenciar_credito_editar', get_defined_vars());
     }
 
     public function delete()
     {
-        need_manager(is_output('json'));
-
         need_permission(Permissao::NOME_CADASTRARCREDITOS, is_output('json'));
         $id = isset($_GET['id']) ? $_GET['id'] : null;
         $credito = Credito::findByID($id);
@@ -208,8 +200,6 @@ class CreditoPageController extends \MZ\Core\Controller
 
     public function cancel()
     {
-        need_manager(is_output('json'));
-
         need_permission(Permissao::NOME_CADASTRARCREDITOS, is_output('json'));
         $id = isset($_GET['id']) ? $_GET['id'] : null;
         $credito = Credito::findByID($id);

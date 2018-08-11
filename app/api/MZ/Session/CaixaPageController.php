@@ -26,21 +26,14 @@ namespace MZ\Session;
 
 use MZ\System\Permissao;
 use MZ\Util\Filter;
-use MZ\System\Permissao;
 
 /**
  * Allow application to serve system resources
  */
 class CaixaPageController extends \MZ\Core\Controller
 {
-    public function view()
-    {
-    }
-
     public function find()
     {
-        need_manager(is_output('json'));
-
         need_permission(Permissao::NOME_CADASTROCAIXAS, is_output('json'));
 
         $limite = isset($_GET['limite']) ? intval($_GET['limite']) : 10;
@@ -68,13 +61,11 @@ class CaixaPageController extends \MZ\Core\Controller
             'N' => 'Inativos',
         ];
 
-        return $app->getResponse()->output('gerenciar_caixa_index');
+        return $this->view('gerenciar_caixa_index', get_defined_vars());
     }
 
     public function add()
     {
-        need_manager(is_output('json'));
-
         need_permission(Permissao::NOME_CADASTROCAIXAS, is_output('json'));
         $id = isset($_GET['id']) ? $_GET['id'] : null;
         $caixa = Caixa::findByID($id);
@@ -117,13 +108,11 @@ class CaixaPageController extends \MZ\Core\Controller
         } else {
             $caixa->setAtivo('Y');
         }
-        return $app->getResponse()->output('gerenciar_caixa_cadastrar');
+        return $this->view('gerenciar_caixa_cadastrar', get_defined_vars());
     }
 
     public function update()
     {
-        need_manager(is_output('json'));
-
         need_permission(Permissao::NOME_CADASTROCAIXAS, is_output('json'));
         $id = isset($_GET['id']) ? $_GET['id'] : null;
         $caixa = Caixa::findByID($id);
@@ -142,7 +131,7 @@ class CaixaPageController extends \MZ\Core\Controller
             $caixa = new Caixa($_POST);
             try {
                 $caixa->setID($old_caixa->getID());
-                if (!$app->getSystem()->isFiscalVisible()) {
+                if (!$this->getApplication()->getSystem()->isFiscalVisible()) {
                     $caixa->setNumeroInicial($old_caixa->getNumeroInicial());
                     $caixa->setSerie($old_caixa->getSerie());
                 }
@@ -175,13 +164,11 @@ class CaixaPageController extends \MZ\Core\Controller
         } elseif (is_output('json')) {
             json('Nenhum dado foi enviado');
         }
-        return $app->getResponse()->output('gerenciar_caixa_editar');
+        return $this->view('gerenciar_caixa_editar', get_defined_vars());
     }
 
     public function delete()
     {
-        need_manager(is_output('json'));
-
         need_permission(Permissao::NOME_CADASTROCAIXAS, is_output('json'));
         $id = isset($_GET['id']) ? $_GET['id'] : null;
         $caixa = Caixa::findByID($id);
@@ -221,12 +208,6 @@ class CaixaPageController extends \MZ\Core\Controller
     public static function getRoutes()
     {
         return [
-            [
-                'name' => 'caixa_view',
-                'path' => '/caixa/',
-                'method' => 'GET',
-                'controller' => 'view',
-            ],
             [
                 'name' => 'caixa_find',
                 'path' => '/gerenciar/caixa/',

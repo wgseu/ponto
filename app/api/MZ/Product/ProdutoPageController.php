@@ -26,12 +26,7 @@ namespace MZ\Product;
 
 use MZ\System\Integracao;
 use MZ\System\Permissao;
-use MZ\System\Integracao;
-use MZ\System\Permissao;
 use MZ\Stock\Estoque;
-use MZ\System\Permissao;
-
-use MZ\System\Permissao;
 use MZ\Environment\Setor;
 use MZ\Util\Filter;
 
@@ -40,7 +35,7 @@ use MZ\Util\Filter;
  */
 class ProdutoPageController extends \MZ\Core\Controller
 {
-    public function view()
+    public function display()
     {
         $pagetitle = 'Produtos';
         $categorias = Categoria::findAll(['disponivel' => 'Y'], ['vendas' => -1]);
@@ -70,8 +65,6 @@ class ProdutoPageController extends \MZ\Core\Controller
 
     public function find()
     {
-        need_manager(is_output('json'));
-
         need_permission(Permissao::NOME_CADASTROPRODUTOS, is_output('json'));
 
         $limite = isset($_GET['limite']) ? intval($_GET['limite']) : 10;
@@ -106,13 +99,11 @@ class ProdutoPageController extends \MZ\Core\Controller
         foreach ($_unidades as $unidade) {
             $unidades[$unidade->getID()] = $unidade->getNome();
         }
-        return $app->getResponse()->output('gerenciar_produto_index');
+        return $this->view('gerenciar_produto_index', get_defined_vars());
     }
 
     public function add()
     {
-        need_manager(is_output('json'));
-
         need_permission(Permissao::NOME_CADASTROPRODUTOS, is_output('json'));
         $id = isset($_GET['id']) ? $_GET['id'] : null;
         $produto = Produto::find(['id' => $id, 'promocao' => 'N']);
@@ -167,13 +158,11 @@ class ProdutoPageController extends \MZ\Core\Controller
         $_categorias = Categoria::findAll();
         $_unidades = Unidade::findAll();
         $_setores = Setor::findAll();
-        return $app->getResponse()->output('gerenciar_produto_cadastrar');
+        return $this->view('gerenciar_produto_cadastrar', get_defined_vars());
     }
 
     public function update()
     {
-        need_manager(is_output('json'));
-
         need_permission(Permissao::NOME_CADASTROPRODUTOS, is_output('json'));
         $id = isset($_GET['id']) ? $_GET['id'] : null;
         $produto = Produto::find(['id' => $id, 'promocao' => 'N']);
@@ -224,13 +213,11 @@ class ProdutoPageController extends \MZ\Core\Controller
         $_categorias = Categoria::findAll();
         $_unidades = Unidade::findAll();
         $_setores = Setor::findAll();
-        return $app->getResponse()->output('gerenciar_produto_editar');
+        return $this->view('gerenciar_produto_editar', get_defined_vars());
     }
 
     public function delete()
     {
-        need_manager(is_output('json'));
-
         need_permission(Permissao::NOME_CADASTROPRODUTOS, is_output('json'));
         $id = isset($_GET['id']) ? $_GET['id'] : null;
         $produto = Produto::findByID($id);
@@ -265,8 +252,6 @@ class ProdutoPageController extends \MZ\Core\Controller
 
     public function costs()
     {
-        $app = $this->getApplication();
-
         need_permission(Permissao::NOME_CADASTROPRODUTOS, is_output('json'));
         $id = isset($_GET['id']) ? $_GET['id'] : null;
         $produto = Produto::findByID($id);
@@ -331,13 +316,11 @@ class ProdutoPageController extends \MZ\Core\Controller
                 $_composicao->getValor() * $_composicao->getQuantidade();
             $composicao->setValor($total / $composicao->getQuantidade());
         }
-        return $app->getResponse()->output('gerenciar_produto_diagrama');
+        return $this->view('gerenciar_produto_diagrama', get_defined_vars());
     }
 
     public function ifood()
     {
-        $app = $this->getApplication();
-
         define('INTGR_TOKEN', 'wKPZ1ABDOO9EVHJMuORwrFogsUPU7Ca5');
 
         $integracao = Integracao::findByAcessoURL(\MZ\Integrator\IFood::NAME);
@@ -362,9 +345,7 @@ class ProdutoPageController extends \MZ\Core\Controller
                         // migrate from INI file
                         $produtos = $association->getProdutos();
                         $content = file_get_contents($file['tmp_name']);
-                        $content = preg_replace('/\/[^=\/]*\/=[^
-]*[
-]*/', '', $content);
+                        $content = preg_replace('/\/[^=\/]*\/=[^\r\n]*[\r\n]*/', '', $content);
                         $sections = parse_ini_string($content, true, INI_SCANNER_RAW);
                         if (isset($sections['Codigos'])) {
                             foreach ($sections['Codigos'] as $codigo => $value) {
@@ -512,13 +493,11 @@ class ProdutoPageController extends \MZ\Core\Controller
 
         $produtos = $association->findAll();
 
-        return $app->getResponse()->output('gerenciar_produto_associar');
+        return $this->view('gerenciar_produto_associar', get_defined_vars());
     }
 
     public function kromax()
     {
-        $app = $this->getApplication();
-
         $integracao = Integracao::findByAcessoURL(\MZ\Integrator\Kromax::NAME);
         $association = new \MZ\Association\Product($integracao);
 
@@ -578,7 +557,7 @@ class ProdutoPageController extends \MZ\Core\Controller
 
         $produtos = $association->findAll();
 
-        return $app->getResponse()->output('gerenciar_produto_associar');
+        return $this->view('gerenciar_produto_associar', get_defined_vars());
     }
 
     /**
@@ -589,10 +568,10 @@ class ProdutoPageController extends \MZ\Core\Controller
     {
         return [
             [
-                'name' => 'produto_view',
+                'name' => 'produto_display',
                 'path' => '/produto/',
                 'method' => 'GET',
-                'controller' => 'view',
+                'controller' => 'display',
             ],
             [
                 'name' => 'produto_find',

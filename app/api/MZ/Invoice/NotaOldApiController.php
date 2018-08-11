@@ -24,13 +24,7 @@
  */
 namespace MZ\Invoice;
 
-use MZ\System\Permissao;
 use MZ\Util\Filter;
-use MZ\System\Permissao;
-use MZ\Util\Filter;
-use MZ\System\Permissao;
-use MZ\Sale\Pedido;
-
 use MZ\Sale\Pedido;
 use MZ\Session\Caixa;
 use MZ\System\Permissao;
@@ -40,10 +34,8 @@ use MZ\System\Permissao;
  */
 class NotaOldApiController extends \MZ\Core\ApiController
 {
-    public function view()
+    public function display()
     {
-        $app = $this->getApplication();        <?php
-
         need_permission(
             [
                 Permissao::NOME_PAGAMENTO, ['||'],
@@ -80,8 +72,6 @@ class NotaOldApiController extends \MZ\Core\ApiController
 
     public function download()
     {
-        $app = $this->getApplication();        <?php
-
         need_permission(
             [
                 Permissao::NOME_RELATORIOFLUXO,
@@ -131,8 +121,6 @@ class NotaOldApiController extends \MZ\Core\ApiController
 
     public function send()
     {
-        $app = $this->getApplication();        <?php
-
         need_permission(
             Permissao::NOME_PAGAMENTO,
             true
@@ -250,8 +238,6 @@ class NotaOldApiController extends \MZ\Core\ApiController
 
     public function process()
     {
-        $app = $this->getApplication();        <?php
-
         need_permission(Permissao::NOME_ALTERARCONFIGURACOES, true);
 
         set_time_limit(0);
@@ -306,17 +292,6 @@ class NotaOldApiController extends \MZ\Core\ApiController
                 $nota->update();
             }
             $notified = 0;
-            try {
-                $appsync = new \MZ\System\Synchronizer();
-                if ($added) {
-                    $appsync->invoiceAdded($nota->getID(), $nota->getPedidoID());
-                } else {
-                    $appsync->invoiceRun($nota->getID(), $nota->getPedidoID());
-                }
-                $notified = 1;
-            } catch (\Exception $e) {
-                \Log::error($e->getMessage());
-            }
             json('nota', [
                 'id' => $nota->getID(),
                 'pedidoid' => $nota->getPedidoID(),
@@ -349,10 +324,10 @@ class NotaOldApiController extends \MZ\Core\ApiController
                 'controller' => 'add',
             ],
             [
-                'name' => 'nota_view',
+                'name' => 'nota_display',
                 'path' => '/gerenciar/nota/danfe',
                 'method' => 'GET',
-                'controller' => 'view',
+                'controller' => 'display',
             ],
             [
                 'name' => 'nota_send',

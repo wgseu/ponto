@@ -32,14 +32,8 @@ use MZ\Util\Filter;
  */
 class PedidoPageController extends \MZ\Core\Controller
 {
-    public function view()
-    {
-    }
-
     public function find()
     {
-        need_manager(is_output('json'));
-
         need_permission(Permissao::NOME_PAGAMENTO, is_output('json'));
 
         $limite = isset($_GET['limite']) ? intval($_GET['limite']) : 10;
@@ -85,22 +79,7 @@ class PedidoPageController extends \MZ\Core\Controller
         ];
         $_funcionario = $pedido->findFuncionarioID();
         $_cliente = $pedido->findClienteID();
-        return $app->getResponse()->output('gerenciar_pedido_index');
-    }
-
-    public function add()
-    {
-        need_manager(is_output('json'));
-    }
-
-    public function update()
-    {
-        need_manager(is_output('json'));
-    }
-
-    public function delete()
-    {
-        need_manager(is_output('json'));
+        return $this->view('gerenciar_pedido_index', get_defined_vars());
     }
 
     /**
@@ -111,34 +90,10 @@ class PedidoPageController extends \MZ\Core\Controller
     {
         return [
             [
-                'name' => 'pedido_view',
-                'path' => '/pedido/',
-                'method' => 'GET',
-                'controller' => 'view',
-            ],
-            [
                 'name' => 'pedido_find',
                 'path' => '/gerenciar/pedido/',
                 'method' => 'GET',
                 'controller' => 'find',
-            ],
-            [
-                'name' => 'pedido_add',
-                'path' => '/gerenciar/pedido/cadastrar',
-                'method' => ['GET', 'POST'],
-                'controller' => 'add',
-            ],
-            [
-                'name' => 'pedido_update',
-                'path' => '/gerenciar/pedido/editar',
-                'method' => ['GET', 'POST'],
-                'controller' => 'update',
-            ],
-            [
-                'name' => 'pedido_delete',
-                'path' => '/gerenciar/pedido/excluir',
-                'method' => 'GET',
-                'controller' => 'delete',
             ],
         ];
     }

@@ -32,14 +32,8 @@ use MZ\Util\Filter;
  */
 class CarteiraPageController extends \MZ\Core\Controller
 {
-    public function view()
-    {
-    }
-
     public function find()
     {
-        need_manager(is_output('json'));
-
         need_permission(Permissao::NOME_CADASTROCARTEIRAS, is_output('json'));
 
         $limite = isset($_GET['limite']) ? intval($_GET['limite']) : 10;
@@ -64,13 +58,11 @@ class CarteiraPageController extends \MZ\Core\Controller
         $_banco = $carteira->findBancoID();
         $tipos = Carteira::getTipoOptions();
 
-        return $app->getResponse()->output('gerenciar_carteira_index');
+        return $this->view('gerenciar_carteira_index', get_defined_vars());
     }
 
     public function add()
     {
-        need_manager(is_output('json'));
-
         need_permission(Permissao::NOME_CADASTROCARTEIRAS, is_output('json'));
         $id = isset($_GET['id']) ? $_GET['id'] : null;
         $carteira = Carteira::findByID($id);
@@ -115,13 +107,11 @@ class CarteiraPageController extends \MZ\Core\Controller
             $carteira->setAtiva('Y');
         }
         $_banco = $carteira->findBancoID();
-        return $app->getResponse()->output('gerenciar_carteira_cadastrar');
+        return $this->view('gerenciar_carteira_cadastrar', get_defined_vars());
     }
 
     public function update()
     {
-        need_manager(is_output('json'));
-
         need_permission(Permissao::NOME_CADASTROCARTEIRAS, is_output('json'));
         $id = isset($_GET['id']) ? $_GET['id'] : null;
         $carteira = Carteira::findByID($id);
@@ -169,13 +159,11 @@ class CarteiraPageController extends \MZ\Core\Controller
             json('Nenhum dado foi enviado');
         }
         $_banco = $carteira->findBancoID();
-        return $app->getResponse()->output('gerenciar_carteira_editar');
+        return $this->view('gerenciar_carteira_editar', get_defined_vars());
     }
 
     public function delete()
     {
-        need_manager(is_output('json'));
-
         need_permission(Permissao::NOME_CADASTROCARTEIRAS, is_output('json'));
         $id = isset($_GET['id']) ? $_GET['id'] : null;
         $carteira = Carteira::findByID($id);
@@ -215,12 +203,6 @@ class CarteiraPageController extends \MZ\Core\Controller
     public static function getRoutes()
     {
         return [
-            [
-                'name' => 'carteira_view',
-                'path' => '/carteira/',
-                'method' => 'GET',
-                'controller' => 'view',
-            ],
             [
                 'name' => 'carteira_find',
                 'path' => '/gerenciar/carteira/',

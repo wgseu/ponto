@@ -32,14 +32,8 @@ use MZ\Util\Filter;
  */
 class ModuloPageController extends \MZ\Core\Controller
 {
-    public function view()
-    {
-    }
-
     public function find()
     {
-        need_manager(is_output('json'));
-
         need_permission(Permissao::NOME_ALTERARCONFIGURACOES, is_output('json'));
 
         $limite = isset($_GET['limite']) ? intval($_GET['limite']) : 10;
@@ -62,18 +56,11 @@ class ModuloPageController extends \MZ\Core\Controller
             json(['status' => 'ok', 'items' => $items]);
         }
 
-        return $app->getResponse()->output('gerenciar_modulo_index');
-    }
-
-    public function add()
-    {
-        need_manager(is_output('json'));
+        return $this->view('gerenciar_modulo_index', get_defined_vars());
     }
 
     public function update()
     {
-        need_manager(is_output('json'));
-
         need_permission(Permissao::NOME_ALTERARCONFIGURACOES, true);
         $id = isset($_GET['id']) ? $_GET['id'] : null;
         $modulo = Modulo::findByID($id);
@@ -91,12 +78,6 @@ class ModuloPageController extends \MZ\Core\Controller
                 $modulo->filter($old_modulo);
                 $modulo->update();
                 $old_modulo->clean($modulo);
-                try {
-                    $sync = new Synchronizer();
-                    $sync->systemOptionsChanged();
-                } catch (\Exception $e) {
-                    \Log::error($e->getMessage());
-                }
                 DB::commit();
                 $msg = sprintf(
                     'Módulo "%s" atualizado com sucesso!',
@@ -116,11 +97,6 @@ class ModuloPageController extends \MZ\Core\Controller
         }
     }
 
-    public function delete()
-    {
-        need_manager(is_output('json'));
-    }
-
     /**
      * Get URL patterns associated with callback for use into router
      * @return array List of routes
@@ -129,34 +105,16 @@ class ModuloPageController extends \MZ\Core\Controller
     {
         return [
             [
-                'name' => 'modulo_view',
-                'path' => '/modulo/',
-                'method' => 'GET',
-                'controller' => 'view',
-            ],
-            [
                 'name' => 'modulo_find',
                 'path' => '/gerenciar/modulo/',
                 'method' => 'GET',
                 'controller' => 'find',
             ],
             [
-                'name' => 'modulo_add',
-                'path' => '/gerenciar/modulo/cadastrar',
-                'method' => ['GET', 'POST'],
-                'controller' => 'add',
-            ],
-            [
                 'name' => 'modulo_update',
                 'path' => '/gerenciar/modulo/editar',
                 'method' => ['GET', 'POST'],
                 'controller' => 'update',
-            ],
-            [
-                'name' => 'modulo_delete',
-                'path' => '/gerenciar/modulo/excluir',
-                'method' => 'GET',
-                'controller' => 'delete',
             ],
         ];
     }

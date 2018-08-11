@@ -34,7 +34,6 @@ class EstoqueOldApiController extends \MZ\Core\ApiController
 {
     public function find()
     {
-
         if (!is_login()) {
             json('Usuário não autenticado!');
         }

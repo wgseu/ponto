@@ -32,14 +32,8 @@ use MZ\Util\Filter;
  */
 class SetorPageController extends \MZ\Core\Controller
 {
-    public function view()
-    {
-    }
-
     public function find()
     {
-        need_manager(is_output('json'));
-
         need_permission(Permissao::NOME_ESTOQUE, is_output('json'));
 
         $limite = isset($_GET['limite']) ? intval($_GET['limite']) : 10;
@@ -62,13 +56,11 @@ class SetorPageController extends \MZ\Core\Controller
             json(['status' => 'ok', 'items' => $items]);
         }
 
-        return $app->getResponse()->output('gerenciar_setor_index');
+        return $this->view('gerenciar_setor_index', get_defined_vars());
     }
 
     public function add()
     {
-        need_manager(is_output('json'));
-
         need_permission(Permissao::NOME_ESTOQUE, is_output('json'));
         $id = isset($_GET['id']) ? $_GET['id'] : null;
         $setor = Setor::findByID($id);
@@ -109,13 +101,11 @@ class SetorPageController extends \MZ\Core\Controller
         } elseif (is_output('json')) {
             json('Nenhum dado foi enviado');
         }
-        return $app->getResponse()->output('gerenciar_setor_cadastrar');
+        return $this->view('gerenciar_setor_cadastrar', get_defined_vars());
     }
 
     public function update()
     {
-        need_manager(is_output('json'));
-
         need_permission(Permissao::NOME_ESTOQUE, is_output('json'));
         $id = isset($_GET['id']) ? $_GET['id'] : null;
         $setor = Setor::findByID($id);
@@ -163,13 +153,11 @@ class SetorPageController extends \MZ\Core\Controller
         } elseif (is_output('json')) {
             json('Nenhum dado foi enviado');
         }
-        return $app->getResponse()->output('gerenciar_setor_editar');
+        return $this->view('gerenciar_setor_editar', get_defined_vars());
     }
 
     public function delete()
     {
-        need_manager(is_output('json'));
-
         need_permission(Permissao::NOME_ESTOQUE, is_output('json'));
         $id = isset($_GET['id']) ? $_GET['id'] : null;
         $setor = Setor::findByID($id);
@@ -209,12 +197,6 @@ class SetorPageController extends \MZ\Core\Controller
     public static function getRoutes()
     {
         return [
-            [
-                'name' => 'setor_view',
-                'path' => '/setor/',
-                'method' => 'GET',
-                'controller' => 'view',
-            ],
             [
                 'name' => 'setor_find',
                 'path' => '/gerenciar/setor/',

@@ -25,11 +25,7 @@
 namespace MZ\Location;
 
 use MZ\System\Permissao;
-use MZ\System\Synchronizer;
 use MZ\Database\DB;
-use MZ\System\Permissao;
-use MZ\Database\DB;
-use MZ\System\Permissao;
 use MZ\Util\Filter;
 
 /**
@@ -37,14 +33,8 @@ use MZ\Util\Filter;
  */
 class LocalizacaoPageController extends \MZ\Core\Controller
 {
-    public function view()
-    {
-    }
-
     public function find()
     {
-        need_manager(is_output('json'));
-
         need_permission(Permissao::NOME_CADASTROCLIENTES, true);
 
         $limite = isset($_GET['limite']) ? intval($_GET['limite']) : 10;
@@ -73,8 +63,6 @@ class LocalizacaoPageController extends \MZ\Core\Controller
 
     public function add()
     {
-        need_manager(is_output('json'));
-
         need_permission(Permissao::NOME_CADASTROCLIENTES, true);
         $localizacao = new Localizacao();
         $old_localizacao = $localizacao;
@@ -82,7 +70,7 @@ class LocalizacaoPageController extends \MZ\Core\Controller
             $localizacao = new Localizacao($_POST);
             try {
                 DB::beginTransaction();
-                if ($localizacao->getClienteID() == $app->getSystem()->getCompany()->getID() &&
+                if ($localizacao->getClienteID() == $this->getApplication()->getSystem()->getCompany()->getID() &&
                     !logged_employee()->has(Permissao::NOME_ALTERARCONFIGURACOES)
                 ) {
                     throw new \Exception('Você não tem permissão para atribuir um endereço a essa empresa!');
@@ -125,8 +113,6 @@ class LocalizacaoPageController extends \MZ\Core\Controller
 
     public function update()
     {
-        need_manager(is_output('json'));
-
         need_permission(Permissao::NOME_CADASTROCLIENTES, true);
 
         $id = isset($_GET['id']) ? $_GET['id'] : null;
@@ -135,7 +121,7 @@ class LocalizacaoPageController extends \MZ\Core\Controller
             $msg = 'A localização não foi informada ou não existe';
             json($msg);
         }
-        if ($localizacao->getClienteID() == $app->getSystem()->getCompany()->getID() &&
+        if ($localizacao->getClienteID() == $this->getApplication()->getSystem()->getCompany()->getID() &&
             !logged_employee()->has(Permissao::NOME_ALTERARCONFIGURACOES)
         ) {
             $msg = 'Você não tem permissão para alterar o endereço dessa empresa!';
@@ -162,14 +148,6 @@ class LocalizacaoPageController extends \MZ\Core\Controller
                 $localizacao->save();
                 $old_localizacao->clean($localizacao);
                 DB::commit();
-                try {
-                    if ($localizacao->getClienteID() == $app->getSystem()->getCompany()->getID()) {
-                        $appsync = new Synchronizer();
-                        $appsync->enterpriseChanged();
-                    }
-                } catch (\Exception $e) {
-                    \Log::error($e->getMessage());
-                }
                 $msg = sprintf(
                     'Localização "%s" atualizada com sucesso!',
                     $localizacao->getLogradouro()
@@ -191,8 +169,6 @@ class LocalizacaoPageController extends \MZ\Core\Controller
 
     public function delete()
     {
-        need_manager(is_output('json'));
-
         need_permission(Permissao::NOME_CADASTROCLIENTES, true);
         $id = isset($_GET['id']) ? $_GET['id'] : null;
         $localizacao = Localizacao::findByID($id);
@@ -224,12 +200,6 @@ class LocalizacaoPageController extends \MZ\Core\Controller
     public static function getRoutes()
     {
         return [
-            [
-                'name' => 'localizacao_view',
-                'path' => '/localizacao/',
-                'method' => 'GET',
-                'controller' => 'view',
-            ],
             [
                 'name' => 'localizacao_find',
                 'path' => '/gerenciar/localizacao/',

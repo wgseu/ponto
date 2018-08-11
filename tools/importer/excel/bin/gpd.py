@@ -8,7 +8,7 @@ import sys
 import time
 import Tkinter as tk
 from tkFileDialog import askopenfilename
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))) + '/Util')
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))) + '/util')
 from utility import *
 
 reload(sys)

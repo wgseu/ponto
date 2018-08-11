@@ -33,9 +33,7 @@ class FuncionarioOldApiController extends \MZ\Core\ApiController
 {
     public function find()
     {
-
         need_manager(true);
-
         $limit = isset($_GET['limite']) ? intval($_GET['limite']) : 5;
         $search = isset($_GET['search']) ? $_GET['search']: null;
         if (check_fone($search, true)) {

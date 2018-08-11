@@ -32,14 +32,8 @@ use MZ\Util\Filter;
  */
 class MoedaPageController extends \MZ\Core\Controller
 {
-    public function view()
-    {
-    }
-
     public function find()
     {
-        need_manager(is_output('json'));
-
         need_permission(Permissao::NOME_CADASTROMOEDAS, is_output('json'));
 
         $limite = isset($_GET['limite']) ? intval($_GET['limite']) : 10;
@@ -62,13 +56,11 @@ class MoedaPageController extends \MZ\Core\Controller
             json(['status' => 'ok', 'items' => $items]);
         }
 
-        return $app->getResponse()->output('gerenciar_moeda_index');
+        return $this->view('gerenciar_moeda_index', get_defined_vars());
     }
 
     public function add()
     {
-        need_manager(is_output('json'));
-
         need_permission(Permissao::NOME_CADASTROMOEDAS, is_output('json'));
         $id = isset($_GET['id']) ? $_GET['id'] : null;
         $moeda = Moeda::findByID($id);
@@ -113,13 +105,11 @@ class MoedaPageController extends \MZ\Core\Controller
             $moeda->setFracao('Centavo');
             $moeda->setFormato('$ %s');
         }
-        return $app->getResponse()->output('gerenciar_moeda_cadastrar');
+        return $this->view('gerenciar_moeda_cadastrar', get_defined_vars());
     }
 
     public function update()
     {
-        need_manager(is_output('json'));
-
         need_permission(Permissao::NOME_CADASTROMOEDAS, is_output('json'));
         $id = isset($_GET['id']) ? $_GET['id'] : null;
         $moeda = Moeda::findByID($id);
@@ -166,13 +156,11 @@ class MoedaPageController extends \MZ\Core\Controller
         } elseif (is_output('json')) {
             json('Nenhum dado foi enviado');
         }
-        return $app->getResponse()->output('gerenciar_moeda_editar');
+        return $this->view('gerenciar_moeda_editar', get_defined_vars());
     }
 
     public function delete()
     {
-        need_manager(is_output('json'));
-
         need_permission(Permissao::NOME_CADASTROMOEDAS, is_output('json'));
         $id = isset($_GET['id']) ? $_GET['id'] : null;
         $moeda = Moeda::findByID($id);
@@ -212,12 +200,6 @@ class MoedaPageController extends \MZ\Core\Controller
     public static function getRoutes()
     {
         return [
-            [
-                'name' => 'moeda_view',
-                'path' => '/moeda/',
-                'method' => 'GET',
-                'controller' => 'view',
-            ],
             [
                 'name' => 'moeda_find',
                 'path' => '/gerenciar/moeda/',

@@ -33,7 +33,6 @@ class CidadeOldApiController extends \MZ\Core\ApiController
 {
     public function find()
     {
-
         $limite = isset($_GET['limite']) ? intval($_GET['limite']) : 10;
         if ($limite > 100 || $limite < 1) {
             $limite = 10;

@@ -109,13 +109,11 @@ class PagamentoPageController extends \MZ\Core\Controller
             [],
             6
         );
-        return $app->getResponse()->output('gerenciar_diversos_index');
+        return $this->view('gerenciar_diversos_index', get_defined_vars());
     }
 
     public function find()
     {
-        need_manager(is_output('json'));
-
         need_permission(Permissao::NOME_PAGAMENTO, is_output('json'));
 
         $limite = isset($_GET['limite']) ? intval($_GET['limite']) : 10;
@@ -171,22 +169,7 @@ class PagamentoPageController extends \MZ\Core\Controller
             $_carteira_names[$carteira->getID()] = $carteira->getDescricao();
         }
         $_funcionario = $pagamento->findFuncionarioID();
-        return $app->getResponse()->output('gerenciar_pagamento_index');
-    }
-
-    public function add()
-    {
-        need_manager(is_output('json'));
-    }
-
-    public function update()
-    {
-        need_manager(is_output('json'));
-    }
-
-    public function delete()
-    {
-        need_manager(is_output('json'));
+        return $this->view('gerenciar_pagamento_index', get_defined_vars());
     }
 
     /**
@@ -207,24 +190,6 @@ class PagamentoPageController extends \MZ\Core\Controller
                 'path' => '/gerenciar/pagamento/',
                 'method' => 'GET',
                 'controller' => 'find',
-            ],
-            [
-                'name' => 'pagamento_add',
-                'path' => '/gerenciar/pagamento/cadastrar',
-                'method' => ['GET', 'POST'],
-                'controller' => 'add',
-            ],
-            [
-                'name' => 'pagamento_update',
-                'path' => '/gerenciar/pagamento/editar',
-                'method' => ['GET', 'POST'],
-                'controller' => 'update',
-            ],
-            [
-                'name' => 'pagamento_delete',
-                'path' => '/gerenciar/pagamento/excluir',
-                'method' => 'GET',
-                'controller' => 'delete',
             ],
         ];
     }

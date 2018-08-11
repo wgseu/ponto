@@ -26,25 +26,15 @@ namespace MZ\Location;
 
 use MZ\System\Permissao;
 use MZ\Wallet\Moeda;
-use MZ\System\Permissao;
-use MZ\Wallet\Moeda;
 use MZ\Util\Filter;
-use MZ\System\Permissao;
-use MZ\Wallet\Moeda;
 
 /**
  * Allow application to serve system resources
  */
 class PaisPageController extends \MZ\Core\Controller
 {
-    public function view()
-    {
-    }
-
     public function find()
     {
-        need_manager(is_output('json'));
-
         need_permission(Permissao::NOME_CADASTROPAISES, is_output('json'));
 
         $limite = isset($_GET['limite']) ? intval($_GET['limite']) : 10;
@@ -68,13 +58,11 @@ class PaisPageController extends \MZ\Core\Controller
         }
 
         $moedas = Moeda::findAll();
-        return $app->getResponse()->output('gerenciar_pais_index');
+        return $this->view('gerenciar_pais_index', get_defined_vars());
     }
 
     public function add()
     {
-        need_manager(is_output('json'));
-
         need_permission(Permissao::NOME_CADASTROPAISES, is_output('json'));
         $id = isset($_GET['id']) ? $_GET['id'] : null;
         $pais = Pais::findByID($id);
@@ -117,13 +105,11 @@ class PaisPageController extends \MZ\Core\Controller
         }
         $moedas = Moeda::findAll();
         $flags_images = Pais::getImageIndexOptions();
-        return $app->getResponse()->output('gerenciar_pais_cadastrar');
+        return $this->view('gerenciar_pais_cadastrar', get_defined_vars());
     }
 
     public function update()
     {
-        need_manager(is_output('json'));
-
         need_permission(Permissao::NOME_CADASTROPAISES, is_output('json'));
         $id = isset($_GET['id']) ? $_GET['id'] : null;
         $pais = Pais::findByID($id);
@@ -172,13 +158,11 @@ class PaisPageController extends \MZ\Core\Controller
         }
         $moedas = Moeda::findAll();
         $flags_images = Pais::getImageIndexOptions();
-        return $app->getResponse()->output('gerenciar_pais_editar');
+        return $this->view('gerenciar_pais_editar', get_defined_vars());
     }
 
     public function delete()
     {
-        need_manager(is_output('json'));
-
         need_permission(Permissao::NOME_CADASTROPAISES, is_output('json'));
         $id = isset($_GET['id']) ? $_GET['id'] : null;
         $pais = Pais::findByID($id);
@@ -219,12 +203,6 @@ class PaisPageController extends \MZ\Core\Controller
     public static function getRoutes()
     {
         return [
-            [
-                'name' => 'pais_view',
-                'path' => '/pais/',
-                'method' => 'GET',
-                'controller' => 'view',
-            ],
             [
                 'name' => 'pais_find',
                 'path' => '/gerenciar/pais/',

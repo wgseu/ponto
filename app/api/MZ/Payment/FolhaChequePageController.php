@@ -35,8 +35,6 @@ class FolhaChequePageController extends \MZ\Core\Controller
 {
     public function find()
     {
-        need_manager(is_output('json'));
-
         need_permission(Permissao::NOME_PAGAMENTO, is_output('json'));
 
         $limite = isset($_GET['limite']) ? intval($_GET['limite']) : 10;
@@ -66,7 +64,7 @@ class FolhaChequePageController extends \MZ\Core\Controller
             'N' => 'A compensar',
             'Y' => 'Recolhido',
         ];
-        return $app->getResponse()->output('gerenciar_folha_cheque_index');
+        return $this->view('gerenciar_folha_cheque_index', get_defined_vars());
     }
 
     public function recall()

@@ -32,14 +32,8 @@ use MZ\Util\Filter;
  */
 class CidadePageController extends \MZ\Core\Controller
 {
-    public function view()
-    {
-    }
-
     public function find()
     {
-        need_manager(is_output('json'));
-
         need_permission(Permissao::NOME_CADASTROCIDADES, is_output('json'));
 
         $limite = isset($_GET['limite'])?intval($_GET['limite']):10;
@@ -66,13 +60,11 @@ class CidadePageController extends \MZ\Core\Controller
         $_paises = \MZ\Location\Pais::findAll();
         $_estados = \MZ\Location\Estado::findAll(['paisid' => $pais->getID()]);
 
-        return $app->getResponse()->output('gerenciar_cidade_index');
+        return $this->view('gerenciar_cidade_index', get_defined_vars());
     }
 
     public function add()
     {
-        need_manager(is_output('json'));
-
         need_permission(Permissao::NOME_CADASTROCIDADES, is_output('json'));
         $id = isset($_GET['id']) ? $_GET['id'] : null;
         $cidade = Cidade::findByID($id);
@@ -114,7 +106,7 @@ class CidadePageController extends \MZ\Core\Controller
             json('Nenhum dado foi enviado');
         }
         if (is_null($cidade->getEstadoID())) {
-            $cidade->setEstadoID($app->getSystem()->getState()->getID());
+            $cidade->setEstadoID($this->getApplication()->getSystem()->getState()->getID());
         }
         $_estado = $cidade->findEstadoID();
         $_paises = \MZ\Location\Pais::findAll();
@@ -126,13 +118,11 @@ class CidadePageController extends \MZ\Core\Controller
             $pais = new \MZ\Location\Pais();
         }
         $_estados = \MZ\Location\Estado::findAll();
-        return $app->getResponse()->output('gerenciar_cidade_cadastrar');
+        return $this->view('gerenciar_cidade_cadastrar', get_defined_vars());
     }
 
     public function update()
     {
-        need_manager(is_output('json'));
-
         need_permission(Permissao::NOME_CADASTROCIDADES, is_output('json'));
         $id = isset($_GET['id']) ? $_GET['id'] : null;
         $cidade = Cidade::findByID($id);
@@ -190,13 +180,11 @@ class CidadePageController extends \MZ\Core\Controller
             $pais = new \MZ\Location\Pais();
         }
         $_estados = \MZ\Location\Estado::findAll();
-        return $app->getResponse()->output('gerenciar_cidade_editar');
+        return $this->view('gerenciar_cidade_editar', get_defined_vars());
     }
 
     public function delete()
     {
-        need_manager(is_output('json'));
-
         need_permission(Permissao::NOME_CADASTROCIDADES, is_output('json'));
         $id = isset($_GET['id']) ? $_GET['id'] : null;
         $cidade = Cidade::findByID($id);
@@ -236,12 +224,6 @@ class CidadePageController extends \MZ\Core\Controller
     public static function getRoutes()
     {
         return [
-            [
-                'name' => 'cidade_view',
-                'path' => '/cidade/',
-                'method' => 'GET',
-                'controller' => 'view',
-            ],
             [
                 'name' => 'cidade_find',
                 'path' => '/gerenciar/cidade/',

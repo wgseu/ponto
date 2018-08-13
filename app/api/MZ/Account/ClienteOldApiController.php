@@ -106,9 +106,6 @@ class ClienteOldApiController extends \MZ\Core\ApiController
 
     public function login()
     {
-        if (!is_post()) {
-            return $this->json()->error('Método incorreto');
-        }
         $usuario = isset($_POST['usuario']) ? strval($_POST['usuario']) : null;
         $senha = isset($_POST['senha']) ? strval($_POST['senha']) : null;
         $lembrar = isset($_POST['lembrar']) ? strval($_POST['lembrar']) : null;
@@ -116,21 +113,11 @@ class ClienteOldApiController extends \MZ\Core\ApiController
         $token = isset($_POST['token']) ? strval($_POST['token']) : null;
         $cliente = Cliente::findByLoginSenha($usuario, $senha);
         if (!$cliente->exists()) {
-            if ($metodo == 'desktop') {
-                $msg = 'Token inválido!';
-            } else {
-                $msg = 'Usuário ou senha incorretos!';
-            }
-            if (isset($_POST['metodo'])) {
-                \Thunder::error($msg);
-                return $this->view('conta_entrar', get_defined_vars());
-            } else {
-                return $this->json()->error($msg);
-            }
+            return $this->json()->error('Usuário ou senha incorretos!');
         }
         $funcionario = Funcionario::findByClienteID($cliente->getID());
         $dispositivo = new Dispositivo();
-        if (!isset($_POST['metodo']) && $funcionario->exists()) {
+        if ($funcionario->exists()) {
             if (!$funcionario->has(Permissao::NOME_SISTEMA)) {
                 return $this->json()->error('Você não tem permissão para acessar o sistema!');
             }
@@ -145,27 +132,19 @@ class ClienteOldApiController extends \MZ\Core\ApiController
                         'Este dispositivo ainda não foi validado, ' .
                         'acesse o menu "Configurações" -> "Computadores e Tablets", ' .
                         'selecione o tablet e clique no botão validar!',
-                        1
+                        403
                     );
                 }
             } catch (\Exception $e) {
                 return $this->json()->error($e->getMessage());
             }
         }
-        
         if (is_login()) {
             $this->getApplication()->getAuthentication()->logout();
         }
-        $token = null;
         $this->getApplication()->getAuthentication()->login($cliente);
-        if ($lembrar == 'true') {
-            $token = $this->getApplication()->getAuthentication()->getAuthorization();
-        }
-        if (isset($_POST['metodo'])) {
-            $url = isset($_POST['redirect']) ? strval($_POST['redirect']) : get_redirect_page();
-            return $this->redirect($url);
-        }
         $status = [];
+        $status['token'] = $this->getApplication()->getAuthentication()->getAuthorization();
         $status['versao'] = Sistema::VERSAO;
         $status['cliente'] = logged_user()->getID();
         $status['info'] = [
@@ -187,7 +166,6 @@ class ClienteOldApiController extends \MZ\Core\ApiController
             $status['acesso'] = 'visitante';
         }
         $status['permissoes'] = $this->getApplication()->getAuthentication()->getPermissions();
-        $status['token'] = $token;
         return $this->json()->success($status, 'Login efetuado com sucesso!');
     }
 

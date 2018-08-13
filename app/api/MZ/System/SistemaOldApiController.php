@@ -104,27 +104,20 @@ class SistemaOldApiController extends \MZ\Core\ApiController
 
     public function tasks()
     {
-
-
         define('TASK_TOKEN', 'WWHxIdzDakrea921zGveQkKccrf80mDp');
-
         set_time_limit(0);
-
         if (!isset($_GET['token']) || $_GET['token'] != TASK_TOKEN) {
             need_permission(Permissao::NOME_ENTREGAPEDIDOS, true);
         }
         try {
             $runner = new Runner();
             $runner->execute();
-            return $this->json(
-                'result',
-                [
-                    'processed' => $runner->getProcessed(),
-                    'pending' => $runner->getPending(),
-                    'failed' => $runner->getFailed(),
-                    'errors' => $runner->getErrors()
-                ]
-            );
+            return $this->json()->success(['result' => [
+                'processed' => $runner->getProcessed(),
+                'pending' => $runner->getPending(),
+                'failed' => $runner->getFailed(),
+                'errors' => $runner->getErrors()
+            ]]);
         } catch (\Exception $e) {
             Log::error($e->getMessage());
             return $this->json()->error($e->getMessage());

@@ -70,7 +70,7 @@ class PacoteOldApiController extends \MZ\Core\ApiController
             [
                 'name' => 'app_pacote_find',
                 'path' => '/app/pacote/listar',
-                'method' => 'GET',
+                'method' => 'POST',
                 'controller' => 'find',
             ]
         ];

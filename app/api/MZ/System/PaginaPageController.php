@@ -141,7 +141,7 @@ class PaginaPageController extends \MZ\Core\Controller
             foreach ($paginas as $_pagina) {
                 $items[] = $_pagina->publish();
             }
-            json(['status' => 'ok', 'items' => $items]);
+            return $this->json()->success(['items' => $items]);
         }
 
         $nomes = Pagina::getNomeOptions();
@@ -173,17 +173,17 @@ class PaginaPageController extends \MZ\Core\Controller
                     $linguagens[$pagina->getLinguagemID()]
                 );
                 if (is_output('json')) {
-                    json(null, ['item' => $pagina->publish(), 'msg' => $msg]);
+                    return $this->json()->success(['item' => $pagina->publish()], $msg);
                 }
                 \Thunder::success($msg, true);
-                redirect('/gerenciar/pagina/');
+                return $this->redirect('/gerenciar/pagina/');
             } catch (\Exception $e) {
                 $pagina->clean($old_pagina);
                 if ($e instanceof \MZ\Exception\ValidationException) {
                     $errors = $e->getErrors();
                 }
                 if (is_output('json')) {
-                    json($e->getMessage(), null, ['errors' => $errors]);
+                    return $this->json()->error($e->getMessage(), null, $errors);
                 }
                 \Thunder::error($e->getMessage());
                 foreach ($errors as $key => $value) {
@@ -192,7 +192,7 @@ class PaginaPageController extends \MZ\Core\Controller
                 }
             }
         } elseif (is_output('json')) {
-            json('Nenhum dado foi enviado');
+            return $this->json()->error('Nenhum dado foi enviado');
         }
         return $this->view('gerenciar_pagina_cadastrar', get_defined_vars());
     }
@@ -205,10 +205,10 @@ class PaginaPageController extends \MZ\Core\Controller
         if (!$pagina->exists()) {
             $msg = 'A página não foi informada ou não existe';
             if (is_output('json')) {
-                json($msg);
+                return $this->json()->error($msg);
             }
             \Thunder::warning($msg);
-            redirect('/gerenciar/pagina/');
+            return $this->redirect('/gerenciar/pagina/');
         }
         $focusctrl = 'nome';
         $errors = [];
@@ -227,17 +227,17 @@ class PaginaPageController extends \MZ\Core\Controller
                     $linguagens[$pagina->getLinguagemID()]
                 );
                 if (is_output('json')) {
-                    json(null, ['item' => $pagina->publish(), 'msg' => $msg]);
+                    return $this->json()->success(['item' => $pagina->publish()], $msg);
                 }
                 \Thunder::success($msg, true);
-                redirect('/gerenciar/pagina/');
+                return $this->redirect('/gerenciar/pagina/');
             } catch (\Exception $e) {
                 $pagina->clean($old_pagina);
                 if ($e instanceof \MZ\Exception\ValidationException) {
                     $errors = $e->getErrors();
                 }
                 if (is_output('json')) {
-                    json($e->getMessage(), null, ['errors' => $errors]);
+                    return $this->json()->error($e->getMessage(), null, $errors);
                 }
                 \Thunder::error($e->getMessage());
                 foreach ($errors as $key => $value) {
@@ -246,7 +246,7 @@ class PaginaPageController extends \MZ\Core\Controller
                 }
             }
         } elseif (is_output('json')) {
-            json('Nenhum dado foi enviado');
+            return $this->json()->error('Nenhum dado foi enviado');
         }
         return $this->view('gerenciar_pagina_editar', get_defined_vars());
     }
@@ -259,10 +259,10 @@ class PaginaPageController extends \MZ\Core\Controller
         if (!$pagina->exists()) {
             $msg = 'A página não foi informada ou não existe';
             if (is_output('json')) {
-                json($msg);
+                return $this->json()->error($msg);
             }
             \Thunder::warning($msg);
-            redirect('/gerenciar/pagina/');
+            return $this->redirect('/gerenciar/pagina/');
         }
         $nomes = Pagina::getNomeOptions();
         $linguagens = get_languages_info();
@@ -275,7 +275,7 @@ class PaginaPageController extends \MZ\Core\Controller
                 $linguagens[$pagina->getLinguagemID()]
             );
             if (is_output('json')) {
-                json('msg', $msg);
+                return $this->json()->success([], $msg);
             }
             \Thunder::success($msg, true);
         } catch (\Exception $e) {
@@ -285,11 +285,11 @@ class PaginaPageController extends \MZ\Core\Controller
                 $linguagens[$pagina->getLinguagemID()]
             );
             if (is_output('json')) {
-                json($msg);
+                return $this->json()->error($msg);
             }
             \Thunder::error($msg);
         }
-        redirect('/gerenciar/pagina/');
+        return $this->redirect('/gerenciar/pagina/');
     }
 
     /**

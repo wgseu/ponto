@@ -26,6 +26,7 @@ namespace MZ\System;
 
 use MZ\Product\Produto;
 use MZ\Task\Runner;
+use MZ\Logger\Log;
 
 /**
  * Allow application to serve system resources
@@ -58,7 +59,7 @@ class SistemaOldApiController extends \MZ\Core\ApiController
             readfile($file);
             unlink($file);
         } catch (\Exception $e) {
-            json($e->getMessage());
+            return $this->json()->error($e->getMessage());
         }
     }
 
@@ -95,9 +96,9 @@ class SistemaOldApiController extends \MZ\Core\ApiController
             // Close and release file
             $zip->close();
 
-            json(null, []);
+            return $this->json()->success();
         } catch (\Exception $e) {
-            json($e->getMessage());
+            return $this->json()->error($e->getMessage());
         }
     }
 
@@ -115,7 +116,7 @@ class SistemaOldApiController extends \MZ\Core\ApiController
         try {
             $runner = new Runner();
             $runner->execute();
-            json(
+            return $this->json(
                 'result',
                 [
                     'processed' => $runner->getProcessed(),
@@ -125,8 +126,8 @@ class SistemaOldApiController extends \MZ\Core\ApiController
                 ]
             );
         } catch (\Exception $e) {
-            \Log::error($e->getMessage());
-            json($e->getMessage());
+            Log::error($e->getMessage());
+            return $this->json()->error($e->getMessage());
         }
     }
 
@@ -156,9 +157,9 @@ class SistemaOldApiController extends \MZ\Core\ApiController
                 $products[] = ['id' => $produto->getID(), 'imagemurl' => $imagemurl];
             }
             $outputs['produtos'] = $products;
-            json(null, $outputs);
+            return $this->json()->success($outputs);
         } catch (\Exception $e) {
-            json($e->getMessage());
+            return $this->json()->error($e->getMessage());
         }
     }
 
@@ -170,25 +171,25 @@ class SistemaOldApiController extends \MZ\Core\ApiController
     {
         return [
             [
-                'name' => 'sistema_backup',
+                'name' => 'app_sistema_backup',
                 'path' => '/gerenciar/sistema/backup',
                 'method' => 'GET',
                 'controller' => 'backup',
             ],
             [
-                'name' => 'sistema_restore',
+                'name' => 'app_sistema_restore',
                 'path' => '/gerenciar/sistema/restore',
                 'method' => 'POST',
                 'controller' => 'restore',
             ],
             [
-                'name' => 'sistema_tasks',
+                'name' => 'app_sistema_tasks',
                 'path' => '/gerenciar/sistema/tarefa',
                 'method' => 'GET',
                 'controller' => 'tasks',
             ],
             [
-                'name' => 'sistema_upgrade',
+                'name' => 'app_sistema_upgrade',
                 'path' => '/app/sistema/upgrade',
                 'method' => 'GET',
                 'controller' => 'upgrade',

@@ -46,7 +46,7 @@ class CidadeOldApiController extends \MZ\Core\ApiController
         foreach ($cidades as $cidade) {
             $items[] = $cidade->publish();
         }
-        json('items', $items);
+        return $this->json()->success(['items' => $items]);
     }
 
     /**
@@ -57,7 +57,7 @@ class CidadeOldApiController extends \MZ\Core\ApiController
     {
         return [
             [
-                'name' => 'cidade_find',
+                'name' => 'app_cidade_find',
                 'path' => '/app/cidade/',
                 'method' => 'GET',
                 'controller' => 'find',

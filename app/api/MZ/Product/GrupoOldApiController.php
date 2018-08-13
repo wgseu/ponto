@@ -34,10 +34,10 @@ class GrupoOldApiController extends \MZ\Core\ApiController
         $produto_id = isset($_GET['produto']) ? $_GET['produto'] : null;
         $produto = Produto::findByID($produto_id);
         if (!$produto->exists()) {
-            json('Produto não informado ou não existente');
+            return $this->json()->error('Produto não informado ou não existente');
         }
         $grupos = Grupo::rawFindAll(['produtoid' => $produto->getID()]);
-        json('grupos', $grupos);
+        return $this->json()->success(['grupos' => $grupos]);
     }
 
     /**
@@ -48,7 +48,7 @@ class GrupoOldApiController extends \MZ\Core\ApiController
     {
         return [
             [
-                'name' => 'grupo_find',
+                'name' => 'app_grupo_find',
                 'path' => '/app/grupo/listar',
                 'method' => 'GET',
                 'controller' => 'find',

@@ -28,8 +28,8 @@ use MZ\Product\Pacote;
 use MZ\Product\Composicao;
 use MZ\Product\Produto;
 use MZ\Product\Grupo;
-use MZ\System\Synchronizer;
 use MZ\Exception\RedirectException;
+use MZ\Logger\Log;
 
 class Product
 {
@@ -167,12 +167,6 @@ class Product
         $this->dados = isset($this->dados)?$this->dados:[];
         $this->dados['produtos'] = $this->produtos;
         $this->integracao->write($this->dados);
-        try {
-            $appsync = new Synchronizer();
-            $appsync->integratorChanged();
-        } catch (\Exception $e) {
-            \Log::error($e->getMessage());
-        }
         return $this;
     }
 
@@ -195,12 +189,6 @@ class Product
         $this->dados = isset($this->dados)?$this->dados:[];
         $this->dados['produtos'] = $this->produtos;
         $this->integracao->write($this->dados);
-        try {
-            $appsync = new Synchronizer();
-            $appsync->integratorChanged();
-        } catch (\Exception $e) {
-            \Log::error($e->getMessage());
-        }
         return $this;
     }
 
@@ -219,12 +207,6 @@ class Product
         $this->dados = isset($this->dados)?$this->dados:[];
         $this->dados['produtos'] = $this->produtos;
         $this->integracao->write($this->dados);
-        try {
-            $appsync = new Synchronizer();
-            $appsync->integratorChanged();
-        } catch (\Exception $e) {
-            \Log::error($e->getMessage());
-        }
         return $this;
     }
     

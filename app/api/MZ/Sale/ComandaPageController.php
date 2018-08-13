@@ -53,7 +53,7 @@ class ComandaPageController extends \MZ\Core\Controller
             foreach ($comandas as $_comanda) {
                 $items[] = $_comanda->publish();
             }
-            json(['status' => 'ok', 'items' => $items]);
+            return $this->json()->success(['items' => $items]);
         }
 
         $ativas = [
@@ -84,17 +84,17 @@ class ComandaPageController extends \MZ\Core\Controller
                     $comanda->getNome()
                 );
                 if (is_output('json')) {
-                    json(null, ['item' => $comanda->publish(), 'msg' => $msg]);
+                    return $this->json()->success(['item' => $comanda->publish()], $msg);
                 }
                 \Thunder::success($msg, true);
-                redirect('/gerenciar/comanda/');
+                return $this->redirect('/gerenciar/comanda/');
             } catch (\Exception $e) {
                 $comanda->clean($old_comanda);
                 if ($e instanceof \MZ\Exception\ValidationException) {
                     $errors = $e->getErrors();
                 }
                 if (is_output('json')) {
-                    json($e->getMessage(), null, ['errors' => $errors]);
+                    return $this->json()->error($e->getMessage(), null, $errors);
                 }
                 \Thunder::error($e->getMessage());
                 foreach ($errors as $key => $value) {
@@ -103,7 +103,7 @@ class ComandaPageController extends \MZ\Core\Controller
                 }
             }
         } elseif (is_output('json')) {
-            json('Nenhum dado foi enviado');
+            return $this->json()->error('Nenhum dado foi enviado');
         } else {
             $comanda->setID(Comanda::getNextID());
             $comanda->setNome('Comanda ' . $comanda->getID());
@@ -120,10 +120,10 @@ class ComandaPageController extends \MZ\Core\Controller
         if (!$comanda->exists()) {
             $msg = 'A comanda não foi informada ou não existe';
             if (is_output('json')) {
-                json($msg);
+                return $this->json()->error($msg);
             }
             \Thunder::warning($msg);
-            redirect('/gerenciar/comanda/');
+            return $this->redirect('/gerenciar/comanda/');
         }
         $focusctrl = 'nome';
         $errors = [];
@@ -139,17 +139,17 @@ class ComandaPageController extends \MZ\Core\Controller
                     $comanda->getNome()
                 );
                 if (is_output('json')) {
-                    json(null, ['item' => $comanda->publish(), 'msg' => $msg]);
+                    return $this->json()->success(['item' => $comanda->publish()], $msg);
                 }
                 \Thunder::success($msg, true);
-                redirect('/gerenciar/comanda/');
+                return $this->redirect('/gerenciar/comanda/');
             } catch (\Exception $e) {
                 $comanda->clean($old_comanda);
                 if ($e instanceof \MZ\Exception\ValidationException) {
                     $errors = $e->getErrors();
                 }
                 if (is_output('json')) {
-                    json($e->getMessage(), null, ['errors' => $errors]);
+                    return $this->json()->error($e->getMessage(), null, $errors);
                 }
                 \Thunder::error($e->getMessage());
                 foreach ($errors as $key => $value) {
@@ -158,7 +158,7 @@ class ComandaPageController extends \MZ\Core\Controller
                 }
             }
         } elseif (is_output('json')) {
-            json('Nenhum dado foi enviado');
+            return $this->json()->error('Nenhum dado foi enviado');
         }
         return $this->view('gerenciar_comanda_editar', get_defined_vars());
     }
@@ -171,17 +171,17 @@ class ComandaPageController extends \MZ\Core\Controller
         if (!$comanda->exists()) {
             $msg = 'A comanda não foi informada ou não existe!';
             if (is_output('json')) {
-                json($msg);
+                return $this->json()->error($msg);
             }
             \Thunder::warning($msg);
-            redirect('/gerenciar/comanda/');
+            return $this->redirect('/gerenciar/comanda/');
         }
         try {
             $comanda->delete();
             $comanda->clean(new Comanda());
             $msg = sprintf('Comanda "%s" excluída com sucesso!', $comanda->getNome());
             if (is_output('json')) {
-                json('msg', $msg);
+                return $this->json()->success([], $msg);
             }
             \Thunder::success($msg, true);
         } catch (\Exception $e) {
@@ -190,11 +190,11 @@ class ComandaPageController extends \MZ\Core\Controller
                 $comanda->getNome()
             );
             if (is_output('json')) {
-                json($msg);
+                return $this->json()->error($msg);
             }
             \Thunder::error($msg);
         }
-        redirect('/gerenciar/comanda/');
+        return $this->redirect('/gerenciar/comanda/');
     }
 
     /**

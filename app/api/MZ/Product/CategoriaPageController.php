@@ -59,7 +59,7 @@ class CategoriaPageController extends \MZ\Core\Controller
             foreach ($categorias as $_categoria) {
                 $items[] = $_categoria->publish();
             }
-            json(['status' => 'ok', 'items' => $items]);
+            return $this->json()->success(['items' => $items]);
         }
 
         $_sup_categorias = Categoria::findAll(['categoriaid' => null]);
@@ -93,17 +93,17 @@ class CategoriaPageController extends \MZ\Core\Controller
                     $categoria->getDescricao()
                 );
                 if (is_output('json')) {
-                    json(null, ['item' => $categoria->publish(), 'msg' => $msg]);
+                    return $this->json()->success(['item' => $categoria->publish()], $msg);
                 }
                 \Thunder::success($msg, true);
-                redirect('/gerenciar/categoria/');
+                return $this->redirect('/gerenciar/categoria/');
             } catch (\Exception $e) {
                 $categoria->clean($old_categoria);
                 if ($e instanceof \MZ\Exception\ValidationException) {
                     $errors = $e->getErrors();
                 }
                 if (is_output('json')) {
-                    json($e->getMessage(), null, ['errors' => $errors]);
+                    return $this->json()->error($e->getMessage(), null, $errors);
                 }
                 \Thunder::error($e->getMessage());
                 foreach ($errors as $key => $value) {
@@ -112,7 +112,7 @@ class CategoriaPageController extends \MZ\Core\Controller
                 }
             }
         } elseif (is_output('json')) {
-            json('Nenhum dado foi enviado');
+            return $this->json()->error('Nenhum dado foi enviado');
         } elseif (is_null($categoria->getDescricao())) {
             $categoria->setServico('Y');
         }
@@ -128,10 +128,10 @@ class CategoriaPageController extends \MZ\Core\Controller
         if (!$categoria->exists()) {
             $msg = 'A categoria informada não existe!';
             if (is_output('json')) {
-                json($msg);
+                return $this->json()->error($msg);
             }
             \Thunder::warning($msg);
-            redirect('/gerenciar/categoria/');
+            return $this->redirect('/gerenciar/categoria/');
         }
         $focusctrl = 'descricao';
         $errors = [];
@@ -147,17 +147,17 @@ class CategoriaPageController extends \MZ\Core\Controller
                     $categoria->getDescricao()
                 );
                 if (is_output('json')) {
-                    json(null, ['item' => $categoria->publish(), 'msg' => $msg]);
+                    return $this->json()->success(['item' => $categoria->publish()], $msg);
                 }
                 \Thunder::success($msg, true);
-                redirect('/gerenciar/categoria/');
+                return $this->redirect('/gerenciar/categoria/');
             } catch (\Exception $e) {
                 $categoria->clean($old_categoria);
                 if ($e instanceof \MZ\Exception\ValidationException) {
                     $errors = $e->getErrors();
                 }
                 if (is_output('json')) {
-                    json($e->getMessage(), null, ['errors' => $errors]);
+                    return $this->json()->error($e->getMessage(), null, $errors);
                 }
                 \Thunder::error($e->getMessage());
                 foreach ($errors as $key => $value) {
@@ -178,17 +178,17 @@ class CategoriaPageController extends \MZ\Core\Controller
         if (!$categoria->exists()) {
             $msg = 'A categoria não foi informada ou não existe!';
             if (is_output('json')) {
-                json($msg);
+                return $this->json()->error($msg);
             }
             \Thunder::warning($msg);
-            redirect('/gerenciar/categoria/');
+            return $this->redirect('/gerenciar/categoria/');
         }
         try {
             $categoria->delete();
             $categoria->clean(new Categoria());
             $msg = sprintf('Categoria "%s" excluída com sucesso!', $categoria->getDescricao());
             if (is_output('json')) {
-                json('msg', $msg);
+                return $this->json()->success([], $msg);
             }
             \Thunder::success($msg, true);
         } catch (\Exception $e) {
@@ -197,11 +197,11 @@ class CategoriaPageController extends \MZ\Core\Controller
                 $categoria->getDescricao()
             );
             if (is_output('json')) {
-                json($msg);
+                return $this->json()->error($msg);
             }
             \Thunder::error($msg);
         }
-        redirect('/gerenciar/categoria/');
+        return $this->redirect('/gerenciar/categoria/');
     }
 
     /**

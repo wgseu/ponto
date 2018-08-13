@@ -54,7 +54,7 @@ class FormaPagtoPageController extends \MZ\Core\Controller
             foreach ($formas_de_pagamento as $_forma_pagto) {
                 $items[] = $_forma_pagto->publish();
             }
-            json(['status' => 'ok', 'items' => $items]);
+            return $this->json()->success(['items' => $items]);
         }
 
         $estados = [
@@ -88,17 +88,17 @@ class FormaPagtoPageController extends \MZ\Core\Controller
                     $forma_pagto->getDescricao()
                 );
                 if (is_output('json')) {
-                    json(null, ['item' => $forma_pagto->publish(), 'msg' => $msg]);
+                    return $this->json()->success(['item' => $forma_pagto->publish()], $msg);
                 }
                 \Thunder::success($msg, true);
-                redirect('/gerenciar/forma_pagto/');
+                return $this->redirect('/gerenciar/forma_pagto/');
             } catch (\Exception $e) {
                 $forma_pagto->clean($old_forma_pagto);
                 if ($e instanceof \MZ\Exception\ValidationException) {
                     $errors = $e->getErrors();
                 }
                 if (is_output('json')) {
-                    json($e->getMessage(), null, ['errors' => $errors]);
+                    return $this->json()->error($e->getMessage(), null, $errors);
                 }
                 \Thunder::error($e->getMessage());
                 foreach ($errors as $key => $value) {
@@ -107,7 +107,7 @@ class FormaPagtoPageController extends \MZ\Core\Controller
                 }
             }
         } elseif (is_output('json')) {
-            json('Nenhum dado foi enviado');
+            return $this->json()->error('Nenhum dado foi enviado');
         } else {
             $forma_pagto->setAtiva('Y');
         }
@@ -123,10 +123,10 @@ class FormaPagtoPageController extends \MZ\Core\Controller
         if (!$forma_pagto->exists()) {
             $msg = 'A forma de pagamento não foi informada ou não existe';
             if (is_output('json')) {
-                json($msg);
+                return $this->json()->error($msg);
             }
             \Thunder::warning($msg);
-            redirect('/gerenciar/forma_pagto/');
+            return $this->redirect('/gerenciar/forma_pagto/');
         }
         $focusctrl = 'descricao';
         $errors = [];
@@ -142,17 +142,17 @@ class FormaPagtoPageController extends \MZ\Core\Controller
                     $forma_pagto->getDescricao()
                 );
                 if (is_output('json')) {
-                    json(null, ['item' => $forma_pagto->publish(), 'msg' => $msg]);
+                    return $this->json()->success(['item' => $forma_pagto->publish()], $msg);
                 }
                 \Thunder::success($msg, true);
-                redirect('/gerenciar/forma_pagto/');
+                return $this->redirect('/gerenciar/forma_pagto/');
             } catch (\Exception $e) {
                 $forma_pagto->clean($old_forma_pagto);
                 if ($e instanceof \MZ\Exception\ValidationException) {
                     $errors = $e->getErrors();
                 }
                 if (is_output('json')) {
-                    json($e->getMessage(), null, ['errors' => $errors]);
+                    return $this->json()->error($e->getMessage(), null, $errors);
                 }
                 \Thunder::error($e->getMessage());
                 foreach ($errors as $key => $value) {
@@ -161,7 +161,7 @@ class FormaPagtoPageController extends \MZ\Core\Controller
                 }
             }
         } elseif (is_output('json')) {
-            json('Nenhum dado foi enviado');
+            return $this->json()->error('Nenhum dado foi enviado');
         }
         $_carteiras = Carteira::findAll();
         return $this->view('gerenciar_forma_pagto_editar', get_defined_vars());
@@ -175,17 +175,17 @@ class FormaPagtoPageController extends \MZ\Core\Controller
         if (!$forma_pagto->exists()) {
             $msg = 'A forma de pagamento não foi informada ou não existe';
             if (is_output('json')) {
-                json($msg);
+                return $this->json()->error($msg);
             }
             \Thunder::warning($msg);
-            redirect('/gerenciar/forma_pagto/');
+            return $this->redirect('/gerenciar/forma_pagto/');
         }
         try {
             $forma_pagto->delete();
             $forma_pagto->clean(new FormaPagto());
             $msg = sprintf('Forma de pagamento "%s" excluída com sucesso!', $forma_pagto->getDescricao());
             if (is_output('json')) {
-                json('msg', $msg);
+                return $this->json()->success([], $msg);
             }
             \Thunder::success($msg, true);
         } catch (\Exception $e) {
@@ -194,11 +194,11 @@ class FormaPagtoPageController extends \MZ\Core\Controller
                 $forma_pagto->getDescricao()
             );
             if (is_output('json')) {
-                json($msg);
+                return $this->json()->error($msg);
             }
             \Thunder::error($msg);
         }
-        redirect('/gerenciar/forma_pagto/');
+        return $this->redirect('/gerenciar/forma_pagto/');
     }
 
     /**

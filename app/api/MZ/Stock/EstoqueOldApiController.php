@@ -32,10 +32,10 @@ use MZ\System\Permissao;
  */
 class EstoqueOldApiController extends \MZ\Core\ApiController
 {
-    public function find()
+    public function add()
     {
         if (!is_login()) {
-            json('Usuário não autenticado!');
+            return $this->json()->error('Usuário não autenticado!');
         }
         $values = isset($_POST['estoque']) ? $_POST['estoque'] : [];
         try {
@@ -55,9 +55,9 @@ class EstoqueOldApiController extends \MZ\Core\ApiController
             $estoque->setFuncionarioID(logged_employee()->getID());
             $estoque->setCancelado('N');
             $estoque->insert();
-            json('estoque', $estoque->publish());
+            return $this->json()->success(['estoque' => $estoque->publish()]);
         } catch (\Exception $e) {
-            json($e->getMessage());
+            return $this->json()->error($e->getMessage());
         }
     }
 
@@ -69,10 +69,10 @@ class EstoqueOldApiController extends \MZ\Core\ApiController
     {
         return [
             [
-                'name' => 'estoque_find',
+                'name' => 'app_estoque_add',
                 'path' => '/app/estoque/',
-                'method' => 'GET',
-                'controller' => 'find',
+                'method' => 'POST',
+                'controller' => 'add',
             ]
         ];
     }

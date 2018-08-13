@@ -53,7 +53,7 @@ class SetorPageController extends \MZ\Core\Controller
             foreach ($setores as $_setor) {
                 $items[] = $_setor->publish();
             }
-            json(['status' => 'ok', 'items' => $items]);
+            return $this->json()->success(['items' => $items]);
         }
 
         return $this->view('gerenciar_setor_index', get_defined_vars());
@@ -80,17 +80,17 @@ class SetorPageController extends \MZ\Core\Controller
                     $setor->getNome()
                 );
                 if (is_output('json')) {
-                    json(null, ['item' => $setor->publish(), 'msg' => $msg]);
+                    return $this->json()->success(['item' => $setor->publish()], $msg);
                 }
                 \Thunder::success($msg, true);
-                redirect('/gerenciar/setor/');
+                return $this->redirect('/gerenciar/setor/');
             } catch (\Exception $e) {
                 $setor->clean($old_setor);
                 if ($e instanceof \MZ\Exception\ValidationException) {
                     $errors = $e->getErrors();
                 }
                 if (is_output('json')) {
-                    json($e->getMessage(), null, ['errors' => $errors]);
+                    return $this->json()->error($e->getMessage(), null, $errors);
                 }
                 \Thunder::error($e->getMessage());
                 foreach ($errors as $key => $value) {
@@ -99,7 +99,7 @@ class SetorPageController extends \MZ\Core\Controller
                 }
             }
         } elseif (is_output('json')) {
-            json('Nenhum dado foi enviado');
+            return $this->json()->error('Nenhum dado foi enviado');
         }
         return $this->view('gerenciar_setor_cadastrar', get_defined_vars());
     }
@@ -112,10 +112,10 @@ class SetorPageController extends \MZ\Core\Controller
         if (!$setor->exists()) {
             $msg = 'O setor não foi informado ou não existe';
             if (is_output('json')) {
-                json($msg);
+                return $this->json()->error($msg);
             }
             \Thunder::warning($msg);
-            redirect('/gerenciar/setor/');
+            return $this->redirect('/gerenciar/setor/');
         }
         $focusctrl = 'nome';
         $errors = [];
@@ -132,17 +132,17 @@ class SetorPageController extends \MZ\Core\Controller
                     $setor->getNome()
                 );
                 if (is_output('json')) {
-                    json(null, ['item' => $setor->publish(), 'msg' => $msg]);
+                    return $this->json()->success(['item' => $setor->publish()], $msg);
                 }
                 \Thunder::success($msg, true);
-                redirect('/gerenciar/setor/');
+                return $this->redirect('/gerenciar/setor/');
             } catch (\Exception $e) {
                 $setor->clean($old_setor);
                 if ($e instanceof \MZ\Exception\ValidationException) {
                     $errors = $e->getErrors();
                 }
                 if (is_output('json')) {
-                    json($e->getMessage(), null, ['errors' => $errors]);
+                    return $this->json()->error($e->getMessage(), null, $errors);
                 }
                 \Thunder::error($e->getMessage());
                 foreach ($errors as $key => $value) {
@@ -151,7 +151,7 @@ class SetorPageController extends \MZ\Core\Controller
                 }
             }
         } elseif (is_output('json')) {
-            json('Nenhum dado foi enviado');
+            return $this->json()->error('Nenhum dado foi enviado');
         }
         return $this->view('gerenciar_setor_editar', get_defined_vars());
     }
@@ -164,17 +164,17 @@ class SetorPageController extends \MZ\Core\Controller
         if (!$setor->exists()) {
             $msg = 'O setor não foi informado ou não existe';
             if (is_output('json')) {
-                json($msg);
+                return $this->json()->error($msg);
             }
             \Thunder::warning($msg);
-            redirect('/gerenciar/setor/');
+            return $this->redirect('/gerenciar/setor/');
         }
         try {
             $setor->delete();
             $setor->clean(new Setor());
             $msg = sprintf('Setor "%s" excluído com sucesso!', $setor->getNome());
             if (is_output('json')) {
-                json('msg', $msg);
+                return $this->json()->success([], $msg);
             }
             \Thunder::success($msg, true);
         } catch (\Exception $e) {
@@ -183,11 +183,11 @@ class SetorPageController extends \MZ\Core\Controller
                 $setor->getNome()
             );
             if (is_output('json')) {
-                json($msg);
+                return $this->json()->error($msg);
             }
             \Thunder::error($msg);
         }
-        redirect('/gerenciar/setor/');
+        return $this->redirect('/gerenciar/setor/');
     }
 
     /**

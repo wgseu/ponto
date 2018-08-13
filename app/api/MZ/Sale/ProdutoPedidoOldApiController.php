@@ -208,7 +208,7 @@ class ProdutoPedidoOldApiController extends \MZ\Core\ApiController
             header('Pragma: public'); // HTTP/1.0
             $objWriter->save('php://output');
         } catch (\Exception $e) {
-            json($e->getMessage());
+            return $this->json()->error($e->getMessage());
         }
     }
 
@@ -220,7 +220,7 @@ class ProdutoPedidoOldApiController extends \MZ\Core\ApiController
     {
         return [
             [
-                'name' => 'produto_pedido_export',
+                'name' => 'app_produto_pedido_export',
                 'path' => '/gerenciar/produto_pedido/baixar',
                 'method' => 'GET',
                 'controller' => 'export',

@@ -58,7 +58,7 @@ class ClassificacaoPageController extends \MZ\Core\Controller
             foreach ($classificacoes as $_classificacao) {
                 $items[] = $_classificacao->publish();
             }
-            json(['status' => 'ok', 'items' => $items]);
+            return $this->json()->success(['items' => $items]);
         }
 
         $classificacoes_sup = Classificacao::findAll(['classificacaoid' => null]);
@@ -90,17 +90,17 @@ class ClassificacaoPageController extends \MZ\Core\Controller
                     $classificacao->getDescricao()
                 );
                 if (is_output('json')) {
-                    json(null, ['item' => $classificacao->publish(), 'msg' => $msg]);
+                    return $this->json()->success(['item' => $classificacao->publish()], $msg);
                 }
                 \Thunder::success($msg, true);
-                redirect('/gerenciar/classificacao/');
+                return $this->redirect('/gerenciar/classificacao/');
             } catch (\Exception $e) {
                 $classificacao->clean($old_classificacao);
                 if ($e instanceof \MZ\Exception\ValidationException) {
                     $errors = $e->getErrors();
                 }
                 if (is_output('json')) {
-                    json($e->getMessage(), null, ['errors' => $errors]);
+                    return $this->json()->error($e->getMessage(), null, $errors);
                 }
                 \Thunder::error($e->getMessage());
                 foreach ($errors as $key => $value) {
@@ -109,7 +109,7 @@ class ClassificacaoPageController extends \MZ\Core\Controller
                 }
             }
         } elseif (is_output('json')) {
-            json('Nenhum dado foi enviado');
+            return $this->json()->error('Nenhum dado foi enviado');
         } else {
             $classificacao = new Classificacao();
         }
@@ -125,10 +125,10 @@ class ClassificacaoPageController extends \MZ\Core\Controller
         if (!$classificacao->exists()) {
             $msg = 'A classificação não foi informada ou não existe!';
             if (is_output('json')) {
-                json($msg);
+                return $this->json()->error($msg);
             }
             \Thunder::warning($msg);
-            redirect('/gerenciar/classificacao/');
+            return $this->redirect('/gerenciar/classificacao/');
         }
         $focusctrl = 'descricao';
         $errors = [];
@@ -145,17 +145,17 @@ class ClassificacaoPageController extends \MZ\Core\Controller
                     $classificacao->getDescricao()
                 );
                 if (is_output('json')) {
-                    json(null, ['item' => $classificacao->publish(), 'msg' => $msg]);
+                    return $this->json()->success(['item' => $classificacao->publish()], $msg);
                 }
                 \Thunder::success($msg, true);
-                redirect('/gerenciar/classificacao/');
+                return $this->redirect('/gerenciar/classificacao/');
             } catch (\Exception $e) {
                 $classificacao->clean($old_classificacao);
                 if ($e instanceof \MZ\Exception\ValidationException) {
                     $errors = $e->getErrors();
                 }
                 if (is_output('json')) {
-                    json($e->getMessage(), null, ['errors' => $errors]);
+                    return $this->json()->error($e->getMessage(), null, $errors);
                 }
                 \Thunder::error($e->getMessage());
                 foreach ($errors as $key => $value) {
@@ -164,7 +164,7 @@ class ClassificacaoPageController extends \MZ\Core\Controller
                 }
             }
         } elseif (is_output('json')) {
-            json('Nenhum dado foi enviado');
+            return $this->json()->error('Nenhum dado foi enviado');
         }
         $_classificacoes = Classificacao::findAll(['classificacaoid' => null]);
         return $this->view('gerenciar_classificacao_editar', get_defined_vars());
@@ -178,17 +178,17 @@ class ClassificacaoPageController extends \MZ\Core\Controller
         if (!$classificacao->exists()) {
             $msg = 'A classificação não foi informada ou não existe!';
             if (is_output('json')) {
-                json($msg);
+                return $this->json()->error($msg);
             }
             \Thunder::warning($msg);
-            redirect('/gerenciar/classificacao/');
+            return $this->redirect('/gerenciar/classificacao/');
         }
         try {
             $classificacao->delete();
             $classificacao->clean(new Classificacao());
             $msg = sprintf('Classificação "%s" excluída com sucesso!', $classificacao->getDescricao());
             if (is_output('json')) {
-                json('msg', $msg);
+                return $this->json()->success([], $msg);
             }
             \Thunder::success($msg, true);
         } catch (\Exception $e) {
@@ -197,11 +197,11 @@ class ClassificacaoPageController extends \MZ\Core\Controller
                 $classificacao->getDescricao()
             );
             if (is_output('json')) {
-                json($msg);
+                return $this->json()->error($msg);
             }
             \Thunder::error($msg);
         }
-        redirect('/gerenciar/classificacao/');
+        return $this->redirect('/gerenciar/classificacao/');
     }
 
     /**

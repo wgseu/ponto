@@ -54,9 +54,9 @@ class CartaoPageController extends \MZ\Core\Controller
                 $codigo = isset($_POST['codigo'])?$_POST['codigo']:null;
                 $id = array_key_exists('id', $_POST)?$_POST['id']:null;
                 $cartao = $association->update($codigo, $id);
-                json(null, ['cartao' => $cartao->toArray()]);
+                return $this->json()->success(['cartao' => $cartao->toArray()]);
             } catch (\Exception $e) {
-                json($e->getMessage());
+                return $this->json()->error($e->getMessage());
             }
         }
         $codigos = $association->findAll();
@@ -85,7 +85,7 @@ class CartaoPageController extends \MZ\Core\Controller
             foreach ($cartoes as $_cartao) {
                 $items[] = $_cartao->publish();
             }
-            json(['status' => 'ok', 'items' => $items]);
+            return $this->json()->success(['items' => $items]);
         }
 
         $estados = [
@@ -117,17 +117,17 @@ class CartaoPageController extends \MZ\Core\Controller
                     $cartao->getDescricao()
                 );
                 if (is_output('json')) {
-                    json(null, ['item' => $cartao->publish(), 'msg' => $msg]);
+                    return $this->json()->success(['item' => $cartao->publish()], $msg);
                 }
                 \Thunder::success($msg, true);
-                redirect('/gerenciar/cartao/');
+                return $this->redirect('/gerenciar/cartao/');
             } catch (\Exception $e) {
                 $cartao->clean($old_cartao);
                 if ($e instanceof \MZ\Exception\ValidationException) {
                     $errors = $e->getErrors();
                 }
                 if (is_output('json')) {
-                    json($e->getMessage(), null, ['errors' => $errors]);
+                    return $this->json()->error($e->getMessage(), null, $errors);
                 }
                 \Thunder::error($e->getMessage());
                 foreach ($errors as $key => $value) {
@@ -136,7 +136,7 @@ class CartaoPageController extends \MZ\Core\Controller
                 }
             }
         } elseif (is_output('json')) {
-            json('Nenhum dado foi enviado');
+            return $this->json()->error('Nenhum dado foi enviado');
         } elseif (is_null($cartao->getDescricao())) {
             $cartao->setAtivo('Y');
         }
@@ -153,10 +153,10 @@ class CartaoPageController extends \MZ\Core\Controller
         if (!$cartao->exists()) {
             $msg = 'O cartão informado não existe!';
             if (is_output('json')) {
-                json($msg);
+                return $this->json()->error($msg);
             }
             \Thunder::warning($msg);
-            redirect('/gerenciar/cartao/');
+            return $this->redirect('/gerenciar/cartao/');
         }
         $focusctrl = 'descricao';
         $errors = [];
@@ -172,17 +172,17 @@ class CartaoPageController extends \MZ\Core\Controller
                     $cartao->getDescricao()
                 );
                 if (is_output('json')) {
-                    json(null, ['item' => $cartao->publish(), 'msg' => $msg]);
+                    return $this->json()->success(['item' => $cartao->publish()], $msg);
                 }
                 \Thunder::success($msg, true);
-                redirect('/gerenciar/cartao/');
+                return $this->redirect('/gerenciar/cartao/');
             } catch (\Exception $e) {
                 $cartao->clean($old_cartao);
                 if ($e instanceof \MZ\Exception\ValidationException) {
                     $errors = $e->getErrors();
                 }
                 if (is_output('json')) {
-                    json($e->getMessage(), null, ['errors' => $errors]);
+                    return $this->json()->error($e->getMessage(), null, $errors);
                 }
                 \Thunder::error($e->getMessage());
                 foreach ($errors as $key => $value) {
@@ -191,7 +191,7 @@ class CartaoPageController extends \MZ\Core\Controller
                 }
             }
         } elseif (is_output('json')) {
-            json('Nenhum dado foi enviado');
+            return $this->json()->error('Nenhum dado foi enviado');
         }
         $_carteiras = Carteira::findAll();
         $_imagens = Cartao::getImages();
@@ -206,17 +206,17 @@ class CartaoPageController extends \MZ\Core\Controller
         if (!$cartao->exists()) {
             $msg = 'O cartão não foi informado ou não existe!';
             if (is_output('json')) {
-                json($msg);
+                return $this->json()->error($msg);
             }
             \Thunder::warning($msg);
-            redirect('/gerenciar/cartao/');
+            return $this->redirect('/gerenciar/cartao/');
         }
         try {
             $cartao->delete();
             $cartao->clean(new Cartao());
             $msg = sprintf('Cartão "%s" excluído com sucesso!', $cartao->getDescricao());
             if (is_output('json')) {
-                json('msg', $msg);
+                return $this->json()->success([], $msg);
             }
             \Thunder::success($msg, true);
         } catch (\Exception $e) {
@@ -225,11 +225,11 @@ class CartaoPageController extends \MZ\Core\Controller
                 $cartao->getDescricao()
             );
             if (is_output('json')) {
-                json($msg);
+                return $this->json()->error($msg);
             }
             \Thunder::error($msg);
         }
-        redirect('/gerenciar/cartao/');
+        return $this->redirect('/gerenciar/cartao/');
     }
 
     /**

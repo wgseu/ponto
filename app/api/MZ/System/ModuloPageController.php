@@ -53,7 +53,7 @@ class ModuloPageController extends \MZ\Core\Controller
             foreach ($modulos as $_modulo) {
                 $items[] = $_modulo->publish();
             }
-            json(['status' => 'ok', 'items' => $items]);
+            return $this->json()->success(['items' => $items]);
         }
 
         return $this->view('gerenciar_modulo_index', get_defined_vars());
@@ -66,7 +66,7 @@ class ModuloPageController extends \MZ\Core\Controller
         $modulo = Modulo::findByID($id);
         if (!$modulo->exists()) {
             $msg = 'O módulo não foi informado ou não existe';
-            json($msg);
+            return $this->json()->error($msg);
         }
         $focusctrl = 'nome';
         $errors = [];
@@ -83,17 +83,17 @@ class ModuloPageController extends \MZ\Core\Controller
                     'Módulo "%s" atualizado com sucesso!',
                     $modulo->getNome()
                 );
-                json(null, ['item' => $modulo->publish(), 'msg' => $msg]);
+                return $this->json()->success(['item' => $modulo->publish()], $msg);
             } catch (\Exception $e) {
                 DB::Rollback();
                 $modulo->clean($old_modulo);
                 if ($e instanceof \MZ\Exception\ValidationException) {
                     $errors = $e->getErrors();
                 }
-                json($e->getMessage(), null, ['errors' => $errors]);
+                return $this->json()->error($e->getMessage(), null, $errors);
             }
         } else {
-            json('Nenhum dado foi enviado');
+            return $this->json()->error('Nenhum dado foi enviado');
         }
     }
 

@@ -37,12 +37,12 @@ class PagamentoOldApiController extends \MZ\Core\ApiController
     public function billing()
     {
         if (!is_login()) {
-            json('Usuário não autenticado!');
+            return $this->json()->error('Usuário não autenticado!');
         }
         if (!logged_employee()->has(Permissao::NOME_RELATORIOCAIXA)) {
-            json('Você não tem permissão para acessar o faturamento da empresa');
+            return $this->json()->error('Você não tem permissão para acessar o faturamento da empresa');
         }
-        $response = ['status' => 'ok'];
+        $response = [];
         $mes = isset($_GET['mes']) ? abs(intval($_GET['mes'])): 0;
         $meses = [];
         for ($i = $mes; $i < $mes + 4; $i++) {
@@ -56,20 +56,20 @@ class PagamentoOldApiController extends \MZ\Core\ApiController
             ];
         }
         $response['mensal'] = $meses;
-        json($response);
+        return $this->json()->success($response);
     }
 
     public function statement()
     {
         if (!is_login()) {
-            json('Usuário não autenticado!');
+            return $this->json()->error('Usuário não autenticado!');
         }
         if (!logged_employee()->has(Permissao::NOME_RELATORIOCAIXA)) {
-            json('Você não tem permissão para acessar o resumo de valores');
+            return $this->json()->error('Você não tem permissão para acessar o resumo de valores');
         }
         $sessao = Sessao::findLastAberta();
         $data_inicio = !$sessao->exists() ? DB::date('today') : null;
-        $response = ['status' => 'ok'];
+        $response = [];
         $response['vendas'] = Pedido::fetchTotal($sessao->getID(), $data_inicio);
         $response['receitas'] = Pagamento::getReceitas(
             ['sessaoid' => $sessao->getID(), 'apartir_datahora' => $data_inicio]
@@ -123,7 +123,7 @@ class PagamentoOldApiController extends \MZ\Core\ApiController
             ];
         }
         $response['faturamento']['mensal'] = $meses;
-        json($response);
+        return $this->json()->success($response);
     }
 
     public function actions()
@@ -154,10 +154,7 @@ class PagamentoOldApiController extends \MZ\Core\ApiController
             foreach ($faturamentos as $faturamento) {
                 $data[] = ['data' => strtotime($faturamento['data']), 'total' => $faturamento['total']];
             }
-            json([
-                'status' => 'ok',
-                'faturamento' => $data,
-            ]);
+            return $this->json()->success(['faturamento' => $data]);
         } elseif ($action == 'meta') {
             $intervalo = strtolower(isset($_GET['intervalo']) ? $_GET['intervalo'] : null);
             switch ($intervalo) {
@@ -188,8 +185,7 @@ class PagamentoOldApiController extends \MZ\Core\ApiController
             }
             $atual = Pagamento::getFaturamento(['apartir_datahora' => $atual_de, 'ate_datahora' => $atual_ate]);
             $base  = Pagamento::getFaturamento(['apartir_datahora' => $base_de, 'ate_datahora' => $base_ate]);
-            json([
-                'status' => 'ok',
+            return $this->json()->success([
                 'atual' => $atual,
                 'base' => $base,
             ]);
@@ -204,19 +200,19 @@ class PagamentoOldApiController extends \MZ\Core\ApiController
     {
         return [
             [
-                'name' => 'pagamento_billing',
+                'name' => 'app_pagamento_billing',
                 'path' => '/app/relatorio/faturamento',
                 'method' => 'GET',
                 'controller' => 'billing',
             ],
             [
-                'name' => 'pagamento_statement',
+                'name' => 'app_pagamento_statement',
                 'path' => '/app/relatorio/resumo',
                 'method' => 'GET',
                 'controller' => 'statement',
             ],
             [
-                'name' => 'pagamento_actions',
+                'name' => 'app_pagamento_actions',
                 'path' => '/gerenciar/diversos/relatorio',
                 'method' => 'GET',
                 'controller' => 'actions',

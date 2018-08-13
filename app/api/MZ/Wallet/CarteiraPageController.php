@@ -53,7 +53,7 @@ class CarteiraPageController extends \MZ\Core\Controller
             foreach ($carteiras as $_carteira) {
                 $items[] = $_carteira->publish();
             }
-            json(['status' => 'ok', 'items' => $items]);
+            return $this->json()->success(['items' => $items]);
         }
         $_banco = $carteira->findBancoID();
         $tipos = Carteira::getTipoOptions();
@@ -83,17 +83,17 @@ class CarteiraPageController extends \MZ\Core\Controller
                     $carteira->getDescricao()
                 );
                 if (is_output('json')) {
-                    json(null, ['item' => $carteira->publish(), 'msg' => $msg]);
+                    return $this->json()->success(['item' => $carteira->publish()], $msg);
                 }
                 \Thunder::success($msg, true);
-                redirect('/gerenciar/carteira/');
+                return $this->redirect('/gerenciar/carteira/');
             } catch (\Exception $e) {
                 $carteira->clean($old_carteira);
                 if ($e instanceof \MZ\Exception\ValidationException) {
                     $errors = $e->getErrors();
                 }
                 if (is_output('json')) {
-                    json($e->getMessage(), null, ['errors' => $errors]);
+                    return $this->json()->error($e->getMessage(), null, $errors);
                 }
                 \Thunder::error($e->getMessage());
                 foreach ($errors as $key => $value) {
@@ -102,7 +102,7 @@ class CarteiraPageController extends \MZ\Core\Controller
                 }
             }
         } elseif (is_output('json')) {
-            json('Nenhum dado foi enviado');
+            return $this->json()->error('Nenhum dado foi enviado');
         } else {
             $carteira->setAtiva('Y');
         }
@@ -118,10 +118,10 @@ class CarteiraPageController extends \MZ\Core\Controller
         if (!$carteira->exists()) {
             $msg = 'A carteira informada não existe!';
             if (is_output('json')) {
-                json($msg);
+                return $this->json()->error($msg);
             }
             \Thunder::warning($msg);
-            redirect('/gerenciar/carteira/');
+            return $this->redirect('/gerenciar/carteira/');
         }
         $focusctrl = 'descricao';
         $errors = [];
@@ -137,17 +137,17 @@ class CarteiraPageController extends \MZ\Core\Controller
                     $carteira->getDescricao()
                 );
                 if (is_output('json')) {
-                    json(null, ['item' => $carteira->publish(), 'msg' => $msg]);
+                    return $this->json()->success(['item' => $carteira->publish()], $msg);
                 }
                 \Thunder::success($msg, true);
-                redirect('/gerenciar/carteira/');
+                return $this->redirect('/gerenciar/carteira/');
             } catch (\Exception $e) {
                 $carteira->clean($old_carteira);
                 if ($e instanceof \MZ\Exception\ValidationException) {
                     $errors = $e->getErrors();
                 }
                 if (is_output('json')) {
-                    json($e->getMessage(), null, ['errors' => $errors]);
+                    return $this->json()->error($e->getMessage(), null, $errors);
                 }
                 \Thunder::error($e->getMessage());
                 foreach ($errors as $key => $value) {
@@ -156,7 +156,7 @@ class CarteiraPageController extends \MZ\Core\Controller
                 }
             }
         } elseif (is_output('json')) {
-            json('Nenhum dado foi enviado');
+            return $this->json()->error('Nenhum dado foi enviado');
         }
         $_banco = $carteira->findBancoID();
         return $this->view('gerenciar_carteira_editar', get_defined_vars());
@@ -170,17 +170,17 @@ class CarteiraPageController extends \MZ\Core\Controller
         if (!$carteira->exists()) {
             $msg = 'A carteira não foi informada ou não existe!';
             if (is_output('json')) {
-                json($msg);
+                return $this->json()->error($msg);
             }
             \Thunder::warning($msg);
-            redirect('/gerenciar/carteira/');
+            return $this->redirect('/gerenciar/carteira/');
         }
         try {
             $carteira->delete();
             $carteira->clean(new Carteira());
             $msg = sprintf('Carteira "%s" excluída com sucesso!', $carteira->getDescricao());
             if (is_output('json')) {
-                json('msg', $msg);
+                return $this->json()->success([], $msg);
             }
             \Thunder::success($msg, true);
         } catch (\Exception $e) {
@@ -189,11 +189,11 @@ class CarteiraPageController extends \MZ\Core\Controller
                 $carteira->getDescricao()
             );
             if (is_output('json')) {
-                json($msg);
+                return $this->json()->error($msg);
             }
             \Thunder::error($msg);
         }
-        redirect('/gerenciar/carteira/');
+        return $this->redirect('/gerenciar/carteira/');
     }
 
     /**

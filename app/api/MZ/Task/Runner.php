@@ -26,6 +26,7 @@ namespace MZ\Task;
 
 use MZ\System\Integracao;
 use MZ\Exception\RedirectException;
+use MZ\Logger\Log;
 
 /**
  * Task runner
@@ -131,7 +132,7 @@ class Runner
                     $error['redirect'] = $e->getURL();
                 }
                 $this->errors[] = $error;
-                \Log::error('Task[' . $task->getName() . '] - ' . $e->getMessage());
+                Log::error('Task[' . $task->getName() . '] - ' . $e->getMessage());
             }
         }
         return $this->getProcessed();

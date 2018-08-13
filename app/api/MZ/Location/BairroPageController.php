@@ -52,7 +52,7 @@ class BairroPageController extends \MZ\Core\Controller
             foreach ($bairros as $bairro) {
                 $items[] = $bairro->publish();
             }
-            json(['status' => 'ok', 'items' => $items]);
+            return $this->json()->success(['items' => $items]);
         }
 
         $pais = \MZ\Location\Pais::findByID(isset($_GET['paisid']) ? $_GET['paisid'] : null);
@@ -86,17 +86,17 @@ class BairroPageController extends \MZ\Core\Controller
                     $bairro->getNome()
                 );
                 if (is_output('json')) {
-                    json(null, ['item' => $bairro->publish(), 'msg' => $msg]);
+                    return $this->json()->success(['item' => $bairro->publish()], $msg);
                 }
                 \Thunder::success($msg, true);
-                redirect('/gerenciar/bairro/');
+                return $this->redirect('/gerenciar/bairro/');
             } catch (\Exception $e) {
                 $bairro->clean($old_bairro);
                 if ($e instanceof \MZ\Exception\ValidationException) {
                     $errors = $e->getErrors();
                 }
                 if (is_output('json')) {
-                    json($e->getMessage(), null, ['errors' => $errors]);
+                    return $this->json()->error($e->getMessage(), null, $errors);
                 }
                 \Thunder::error($e->getMessage());
                 foreach ($errors as $key => $value) {
@@ -105,7 +105,7 @@ class BairroPageController extends \MZ\Core\Controller
                 }
             }
         } elseif (is_output('json')) {
-            json('Nenhum dado foi enviado');
+            return $this->json()->error('Nenhum dado foi enviado');
         } elseif (is_null($bairro->getNome())) {
             $bairro->setDisponivel('Y');
         }
@@ -135,10 +135,10 @@ class BairroPageController extends \MZ\Core\Controller
         if (!$bairro->exists()) {
             $msg = 'Não existe Bairro com o ID informado!';
             if (is_output('json')) {
-                json($msg);
+                return $this->json()->error($msg);
             }
             \Thunder::warning($msg);
-            redirect('/gerenciar/bairro/');
+            return $this->redirect('/gerenciar/bairro/');
         }
         $focusctrl = 'nome';
         $errors = [];
@@ -154,17 +154,17 @@ class BairroPageController extends \MZ\Core\Controller
                     $bairro->getNome()
                 );
                 if (is_output('json')) {
-                    json(null, ['item' => $bairro->publish(), 'msg' => $msg]);
+                    return $this->json()->success(['item' => $bairro->publish()], $msg);
                 }
                 \Thunder::success($msg, true);
-                redirect('/gerenciar/bairro/');
+                return $this->redirect('/gerenciar/bairro/');
             } catch (\Exception $e) {
                 $bairro->clean($old_bairro);
                 if ($e instanceof \MZ\Exception\ValidationException) {
                     $errors = $e->getErrors();
                 }
                 if (is_output('json')) {
-                    json($e->getMessage(), null, ['errors' => $errors]);
+                    return $this->json()->error($e->getMessage(), null, $errors);
                 }
                 \Thunder::error($e->getMessage());
                 foreach ($errors as $key => $value) {
@@ -173,7 +173,7 @@ class BairroPageController extends \MZ\Core\Controller
                 }
             }
         } elseif (is_output('json')) {
-            json('Nenhum dado foi enviado');
+            return $this->json()->error('Nenhum dado foi enviado');
         }
         $cidade = $bairro->findCidadeID();
         $estado = $cidade->findEstadoID();
@@ -197,17 +197,17 @@ class BairroPageController extends \MZ\Core\Controller
         if (!$bairro->exists()) {
             $msg = 'Não existe Bairro com o ID informado!';
             if (is_output('json')) {
-                json($msg);
+                return $this->json()->error($msg);
             }
             \Thunder::warning($msg);
-            redirect('/gerenciar/bairro/');
+            return $this->redirect('/gerenciar/bairro/');
         }
         try {
             $bairro->delete();
             $bairro->clean(new Bairro());
             $msg = sprintf('Bairro "%s" excluído com sucesso!', $bairro->getNome());
             if (is_output('json')) {
-                json('msg', $msg);
+                return $this->json()->success([], $msg);
             }
             \Thunder::success($msg, true);
         } catch (\Exception $e) {
@@ -216,11 +216,11 @@ class BairroPageController extends \MZ\Core\Controller
                 $bairro->getNome()
             );
             if (is_output('json')) {
-                json($msg);
+                return $this->json()->error($msg);
             }
             \Thunder::error($msg);
         }
-        redirect('/gerenciar/bairro/');
+        return $this->redirect('/gerenciar/bairro/');
     }
 
     /**

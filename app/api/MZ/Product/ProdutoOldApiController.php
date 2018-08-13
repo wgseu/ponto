@@ -28,6 +28,7 @@ use MZ\Stock\Estoque;
 use MZ\System\Permissao;
 use MZ\Util\Mask;
 use MZ\Util\Filter;
+use MZ\Logger\Log;
 
 /**
  * Allow application to serve system resources
@@ -96,7 +97,7 @@ class ProdutoOldApiController extends \MZ\Core\ApiController
             $item['imagemurl'] = get_image_url($item['imagem'], 'produto', null);
             $items[] = array_intersect_key($item, array_flip($campos));
         }
-        json('produtos', $items);
+        return $this->json()->success(['produtos' => $items]);
     }
 
     public function export()
@@ -285,8 +286,8 @@ class ProdutoOldApiController extends \MZ\Core\ApiController
             header('Pragma: public'); // HTTP/1.0
             $objWriter->save('php://output');
         } catch (\Exception $e) {
-            \Log::error($e->getMessage());
-            json($e->getMessage());
+            Log::error($e->getMessage());
+            return $this->json()->error($e->getMessage());
         }
     }
 
@@ -298,19 +299,19 @@ class ProdutoOldApiController extends \MZ\Core\ApiController
     {
         return [
             [
-                'name' => 'produto_find',
+                'name' => 'app_produto_list',
                 'path' => '/app/produto/listar',
                 'method' => 'GET',
                 'controller' => 'find',
             ],
             [
-                'name' => 'produto_find',
+                'name' => 'app_produto_find',
                 'path' => '/app/produto/procurar',
                 'method' => 'GET',
                 'controller' => 'find',
             ],
             [
-                'name' => 'produto_export',
+                'name' => 'app_produto_export',
                 'path' => '/gerenciar/produto/baixar',
                 'method' => 'GET',
                 'controller' => 'export',

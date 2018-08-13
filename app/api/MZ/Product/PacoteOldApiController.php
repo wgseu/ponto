@@ -33,7 +33,7 @@ class PacoteOldApiController extends \MZ\Core\ApiController
     {
         $grupo_id = isset($_GET['grupo']) ? intval($_GET['grupo']) : null;
         if (is_null($grupo_id)) {
-            json('Grupo não informado');
+            return $this->json()->error('Grupo não informado');
         }
         $limite = isset($_GET['limite']) ? intval($_GET['limite']): null;
         if (!is_null($limite) && $limite < 1) {
@@ -57,7 +57,7 @@ class PacoteOldApiController extends \MZ\Core\ApiController
             $item['imagemurl'] = get_image_url($item['imagemurl'], $folder, null);
             $items[] = $item;
         }
-        json('pacotes', $items);
+        return $this->json()->success(['pacotes' => $items]);
     }
 
     /**
@@ -68,7 +68,7 @@ class PacoteOldApiController extends \MZ\Core\ApiController
     {
         return [
             [
-                'name' => 'pacote_find',
+                'name' => 'app_pacote_find',
                 'path' => '/app/pacote/listar',
                 'method' => 'GET',
                 'controller' => 'find',

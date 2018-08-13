@@ -54,7 +54,7 @@ class CreditoPageController extends \MZ\Core\Controller
             foreach ($creditos as $_credito) {
                 $items[] = $_credito->publish();
             }
-            json(['status' => 'ok', 'items' => $items]);
+            return $this->json()->success(['items' => $items]);
         }
 
         $_cliente = $credito->findClienteID();
@@ -89,17 +89,17 @@ class CreditoPageController extends \MZ\Core\Controller
                     $credito->getDetalhes()
                 );
                 if (is_output('json')) {
-                    json(null, ['item' => $credito->publish(), 'msg' => $msg]);
+                    return $this->json()->success(['item' => $credito->publish()], $msg);
                 }
                 \Thunder::success($msg, true);
-                redirect('/gerenciar/credito/');
+                return $this->redirect('/gerenciar/credito/');
             } catch (\Exception $e) {
                 $credito->clean($old_credito);
                 if ($e instanceof \MZ\Exception\ValidationException) {
                     $errors = $e->getErrors();
                 }
                 if (is_output('json')) {
-                    json($e->getMessage(), null, ['errors' => $errors]);
+                    return $this->json()->error($e->getMessage(), null, $errors);
                 }
                 \Thunder::error($e->getMessage());
                 foreach ($errors as $key => $value) {
@@ -108,7 +108,7 @@ class CreditoPageController extends \MZ\Core\Controller
                 }
             }
         } elseif (is_output('json')) {
-            json('Nenhum dado foi enviado');
+            return $this->json()->error('Nenhum dado foi enviado');
         }
         return $this->view('gerenciar_credito_cadastrar', get_defined_vars());
     }
@@ -121,10 +121,10 @@ class CreditoPageController extends \MZ\Core\Controller
         if (!$credito->exists()) {
             $msg = 'O crédito não foi informado ou não existe';
             if (is_output('json')) {
-                json($msg);
+                return $this->json()->error($msg);
             }
             \Thunder::warning($msg);
-            redirect('/gerenciar/credito/');
+            return $this->redirect('/gerenciar/credito/');
         }
         $focusctrl = 'detalhes';
         $errors = [];
@@ -140,17 +140,17 @@ class CreditoPageController extends \MZ\Core\Controller
                     $credito->getDetalhes()
                 );
                 if (is_output('json')) {
-                    json(null, ['item' => $credito->publish(), 'msg' => $msg]);
+                    return $this->json()->success(['item' => $credito->publish()], $msg);
                 }
                 \Thunder::success($msg, true);
-                redirect('/gerenciar/credito/');
+                return $this->redirect('/gerenciar/credito/');
             } catch (\Exception $e) {
                 $credito->clean($old_credito);
                 if ($e instanceof \MZ\Exception\ValidationException) {
                     $errors = $e->getErrors();
                 }
                 if (is_output('json')) {
-                    json($e->getMessage(), null, ['errors' => $errors]);
+                    return $this->json()->error($e->getMessage(), null, $errors);
                 }
                 \Thunder::error($e->getMessage());
                 foreach ($errors as $key => $value) {
@@ -159,7 +159,7 @@ class CreditoPageController extends \MZ\Core\Controller
                 }
             }
         } elseif (is_output('json')) {
-            json('Nenhum dado foi enviado');
+            return $this->json()->error('Nenhum dado foi enviado');
         }
         return $this->view('gerenciar_credito_editar', get_defined_vars());
     }
@@ -172,17 +172,17 @@ class CreditoPageController extends \MZ\Core\Controller
         if (!$credito->exists()) {
             $msg = 'O crédito não foi informado ou não existe';
             if (is_output('json')) {
-                json($msg);
+                return $this->json()->error($msg);
             }
             \Thunder::warning($msg);
-            redirect('/gerenciar/credito/');
+            return $this->redirect('/gerenciar/credito/');
         }
         try {
             $credito->delete();
             $credito->clean(new Credito());
             $msg = sprintf('Crédito "%s" excluído com sucesso!', $credito->getDetalhes());
             if (is_output('json')) {
-                json('msg', $msg);
+                return $this->json()->success([], $msg);
             }
             \Thunder::success($msg, true);
         } catch (\Exception $e) {
@@ -191,11 +191,11 @@ class CreditoPageController extends \MZ\Core\Controller
                 $credito->getDetalhes()
             );
             if (is_output('json')) {
-                json($msg);
+                return $this->json()->error($msg);
             }
             \Thunder::error($msg);
         }
-        redirect('/gerenciar/credito/');
+        return $this->redirect('/gerenciar/credito/');
     }
 
     public function cancel()
@@ -206,16 +206,16 @@ class CreditoPageController extends \MZ\Core\Controller
         if (!$credito->exists()) {
             $msg = 'O crédito não foi informado ou não existe';
             if (is_output('json')) {
-                json($msg);
+                return $this->json()->error($msg);
             }
             \Thunder::warning($msg);
-            redirect('/gerenciar/credito/');
+            return $this->redirect('/gerenciar/credito/');
         }
         try {
             $credito->cancel();
             $msg = sprintf('Crédito "%s" cancelado com sucesso!', $credito->getDetalhes());
             if (is_output('json')) {
-                json('msg', $msg);
+                return $this->json()->success([], $msg);
             }
             \Thunder::success($msg, true);
         } catch (\Exception $e) {
@@ -224,11 +224,11 @@ class CreditoPageController extends \MZ\Core\Controller
                 $credito->getDetalhes()
             );
             if (is_output('json')) {
-                json($msg);
+                return $this->json()->error($msg);
             }
             \Thunder::error($msg);
         }
-        redirect('/gerenciar/credito/');
+        return $this->redirect('/gerenciar/credito/');
     }
 
     /**

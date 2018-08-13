@@ -23,6 +23,8 @@
  * @author Equipe GrandChef <desenvolvimento@mzsw.com.br>
  */
 
+use MZ\Exception\RedirectException;
+
 function numberval($str)
 {
     return preg_replace('/[^0-9-]/', '', $str);
@@ -200,15 +202,6 @@ function auto_version($file)
     return $file . '?' . filemtime($app->getPath('public') . $file);
 }
 
-function redirect($url = null)
-{
-    if (is_null($url)) {
-        $url = get_redirect_page();
-    }
-    Header("Location: {$url}");
-    exit;
-}
-
 function get_redirect_page($default = null)
 {
     $redirect_page = \Session::Get('redirect', true);
@@ -281,55 +274,55 @@ function need_login($json = false)
         }
         return \Session::Get('cliente_id');
     }
-    if ($json) {
-        json('Necessário autenticação');
+    $msg = 'Necessário autenticação, faça login para continuar';
+    if (!$json) {
+        if (is_get()) {
+            \Session::Set('redirect', $_SERVER['REQUEST_URI']);
+        } else {
+            \Session::Set('redirect', $_SERVER['HTTP_REFERER']);
+        }
+        \Thunder::warning($msg);
     }
-    \Thunder::warning('Necessário autenticação, faça login para continuar');
-    if (is_get()) {
-        \Session::Set('redirect', $_SERVER['REQUEST_URI']);
-    } else {
-        \Session::Set('redirect', $_SERVER['HTTP_REFERER']);
-    }
-    redirect('/conta/entrar');
+    throw new RedirectException($msg, 401, '/conta/entrar');
 }
 
 function need_manager($json = false)
 {
     need_login($json);
-    if (!is_manager()) {
-        if ($json) {
-            json('Necessário nível de funcionário');
-        }
-        \Thunder::warning('Somente funcionários poderão acessar as páginas de gerenciamento');
-        redirect('/');
+    if (is_manager()) {
+        return \Session::Get('cliente_id');
     }
-    return \Session::Get('cliente_id');
+    $msg = 'Somente funcionários poderão acessar as páginas de gerenciamento';
+    if (!$json) {
+        \Thunder::warning($msg);
+    }
+    throw new RedirectException($msg, 403, '/');
 }
 
 function need_owner($json = false)
 {
     need_manager($json);
-    if (!is_owner()) {
-        if ($json) {
-            json('Necessário permissão de administrador');
-        }
-        \Thunder::warning('Somente administradores poderão acessar essas páginas');
-        redirect('/gerenciar/');
+    if (is_owner()) {
+        return \Session::Get('cliente_id');
     }
-    return \Session::Get('cliente_id');
+    $msg = 'Somente administradores poderão acessar essas páginas';
+    if (!$json) {
+        \Thunder::warning($msg);
+    }
+    throw new RedirectException($msg, 403, '/gerenciar/');
 }
 
 function need_permission($array, $json = false)
 {
     need_manager($json);
-    if (!logged_employee()->has($array)) {
-        if ($json) {
-            json('Você não possui permissão para acessar essa função');
-        }
-        \Thunder::warning('Você não possui permissão para acessar essa função');
-        redirect('/gerenciar/');
+    if (logged_employee()->has($array)) {
+        return \Session::Get('cliente_id');
     }
-    return \Session::Get('cliente_id');
+    $msg = 'Você não possui permissão para acessar essa função';
+    if (!$json) {
+        \Thunder::warning($msg);
+    }
+    throw new RedirectException($msg, 403, '/gerenciar/');
 }
 
 function is_login()
@@ -674,23 +667,6 @@ function get_tempo($seg)
     $min = $m % 60;
     $h = (int)($m / 60);
     return sprintf('%02d:%02dh', $h, $min);
-}
-
-function json($tag, $data = null, $field = null)
-{
-    header('Content-Type: application/json');
-    if (is_null($tag)) {
-        echo json_encode(array_merge(['status'=> 'ok'], $data));
-    } elseif (is_array($tag)) {
-        echo json_encode($tag);
-    } elseif (is_null($data) && !is_null($field)) {
-        echo json_encode(array_merge(['status'=> 'error', 'msg' => $tag], $field));
-    } elseif (is_null($data)) {
-        echo json_encode(['status'=> 'error', 'msg' => $tag]);
-    } else {
-        echo json_encode(['status'=> 'ok', $tag => $data]);
-    }
-    exit;
 }
 
 function to_utf8($str)

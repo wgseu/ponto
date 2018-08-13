@@ -133,7 +133,7 @@ class PagamentoPageController extends \MZ\Core\Controller
             foreach ($pagamentos as $_pagamento) {
                 $items[] = $_pagamento->publish();
             }
-            json(['status' => 'ok', 'items' => $items]);
+            return $this->json()->success(['items' => $items]);
         }
 
         $_tipo_names = Pedido::getTipoOptions();

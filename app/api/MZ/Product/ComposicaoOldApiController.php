@@ -34,7 +34,7 @@ class ComposicaoOldApiController extends \MZ\Core\ApiController
         $produto_id = isset($_GET['produto']) ? $_GET['produto'] : null;
         $produto = Produto::findByID($produto_id);
         if (!$produto->exists()) {
-            json('O produto não foi informado ou não existe');
+            return $this->json()->error('O produto não foi informado ou não existe');
         }
         $limite = isset($_GET['limite']) ? intval($_GET['limite']) : null;
         if (!is_null($limite) && $limite < 1) {
@@ -78,7 +78,7 @@ class ComposicaoOldApiController extends \MZ\Core\ApiController
             $item['selecionavel'] = $composicao->getTipo() == Composicao::TIPO_COMPOSICAO ? 'N' : 'Y';
             $items[] = $item;
         }
-        json('composicoes', $items);
+        return $this->json()->success(['composicoes' => $items]);
     }
 
     /**
@@ -89,8 +89,8 @@ class ComposicaoOldApiController extends \MZ\Core\ApiController
     {
         return [
             [
-                'name' => 'composicao_find',
-                'path' => '/app/composicao/',
+                'name' => 'app_composicao_find',
+                'path' => '/app/composicao/listar',
                 'method' => 'GET',
                 'controller' => 'find',
             ]

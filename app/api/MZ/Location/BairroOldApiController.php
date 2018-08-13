@@ -36,12 +36,12 @@ class BairroOldApiController extends \MZ\Core\ApiController
         $estado_id = isset($_GET['estadoid']) ? $_GET['estadoid'] : null;
         $estado = Estado::findByID($estado_id);
         if (!$estado->exists()) {
-            json('O estado não foi informado ou não existe!');
+            return $this->json()->error('O estado não foi informado ou não existe!');
         }
         $cidade_nome = isset($_GET['cidade']) ? trim($_GET['cidade']) : null;
         $cidade = Cidade::findByEstadoIDNome($estado_id, $cidade_nome);
         if (!$cidade->exists()) {
-            json('A cidade informada não existe!');
+            return $this->json()->error('A cidade informada não existe!');
         }
         $order = Filter::order(isset($_GET['ordem']) ? $_GET['ordem']: '');
         $condition = Filter::query($_GET);
@@ -52,7 +52,7 @@ class BairroOldApiController extends \MZ\Core\ApiController
         foreach ($bairros as $bairro) {
             $items[] = $bairro->publish();
         }
-        json('items', $items);
+        return $this->json()->success(['items' => $items]);
     }
 
     /**
@@ -63,7 +63,7 @@ class BairroOldApiController extends \MZ\Core\ApiController
     {
         return [
             [
-                'name' => 'bairro_find',
+                'name' => 'app_bairro_find',
                 'path' => '/app/bairro/',
                 'method' => 'GET',
                 'controller' => 'find',

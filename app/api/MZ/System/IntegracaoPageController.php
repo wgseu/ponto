@@ -52,7 +52,7 @@ class IntegracaoPageController extends \MZ\Core\Controller
             foreach ($integracoes as $integracao) {
                 $items[] = $integracao->publish();
             }
-            json(['status' => 'ok', 'items' => $items]);
+            return $this->json()->success(['items' => $items]);
         }
 
         return $this->view('gerenciar_integracao_index', get_defined_vars());
@@ -66,10 +66,10 @@ class IntegracaoPageController extends \MZ\Core\Controller
         if (!$integracao->exists()) {
             $msg = 'A integração não foi informada ou não existe';
             if (is_output('json')) {
-                json($msg);
+                return $this->json()->error($msg);
             }
             \Thunder::warning($msg);
-            redirect('/gerenciar/integracao/');
+            return $this->redirect('/gerenciar/integracao/');
         }
         $focusctrl = 'nome';
         $errors = [];
@@ -85,17 +85,17 @@ class IntegracaoPageController extends \MZ\Core\Controller
                     $integracao->getNome()
                 );
                 if (is_output('json')) {
-                    json(null, ['item' => $integracao->publish(), 'msg' => $msg]);
+                    return $this->json()->success(['item' => $integracao->publish()], $msg);
                 }
                 \Thunder::success($msg, true);
-                redirect('/gerenciar/integracao/');
+                return $this->redirect('/gerenciar/integracao/');
             } catch (\Exception $e) {
                 $integracao->clean($old_integracao);
                 if ($e instanceof \MZ\Exception\ValidationException) {
                     $errors = $e->getErrors();
                 }
                 if (is_output('json')) {
-                    json($e->getMessage(), null, ['errors' => $errors]);
+                    return $this->json()->error($e->getMessage(), null, $errors);
                 }
                 \Thunder::error($e->getMessage());
                 foreach ($errors as $key => $value) {
@@ -104,7 +104,7 @@ class IntegracaoPageController extends \MZ\Core\Controller
                 }
             }
         } elseif (is_output('json')) {
-            json('Nenhum dado foi enviado');
+            return $this->json()->error('Nenhum dado foi enviado');
         }
         return $this->view('gerenciar_integracao_editar', get_defined_vars());
     }

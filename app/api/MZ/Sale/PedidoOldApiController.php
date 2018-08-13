@@ -30,6 +30,7 @@ use MZ\Database\DB;
 use MZ\Device\Impressora;
 use MZ\Device\Dispositivo;
 use MZ\Payment\Pagamento;
+use MZ\Logger\Log;
 
 use Thermal\Printer;
 use Thermal\Connection\Buffer;
@@ -44,7 +45,7 @@ class PedidoOldApiController extends \MZ\Core\ApiController
     public function find()
     {
         if (!is_login()) {
-            json('Usuário não autenticado!');
+            return $this->json()->error('Usuário não autenticado!');
         }
         try {
             $pedido = new Pedido();
@@ -85,7 +86,6 @@ class PedidoOldApiController extends \MZ\Core\ApiController
                 [],
                 $group
             );
-            $response = ['status' => 'ok'];
             $campos = [
                 'id',
                 'produtopedidoid',
@@ -128,6 +128,12 @@ class PedidoOldApiController extends \MZ\Core\ApiController
                 ],
                 ['id' => 1]
             );
+            $_pagamentos = [];
+            foreach ($pagamentos as $pagamento) {
+                $item = $pagamento->publish();
+                $_pagamentos[] = $item;
+            }
+            $response = [];
             $response['estado'] = $pedido->getEstadoSimples();
             $response['pedidoid'] = $pedido->getID();
             if ($pedido->getClienteID()) {
@@ -143,17 +149,12 @@ class PedidoOldApiController extends \MZ\Core\ApiController
             ];
             $response['descontos'] = $total['descontos'];
             $response['total'] = $total['total'];
-            $_pagamentos = [];
-            foreach ($pagamentos as $pagamento) {
-                $item = $pagamento->publish();
-                $_pagamentos[] = $item;
-            }
             $response['pagamentos'] = $_pagamentos;
             $response['pago'] = $pedido->findPagamentoTotal();
             $response['pedidos'] = $items;
-            json($response);
+            return $this->json()->success($response);
         } catch (\Exception $e) {
-            json($e->getMessage());
+            return $this->json()->error($e->getMessage());
         }
     }
 
@@ -162,21 +163,28 @@ class PedidoOldApiController extends \MZ\Core\ApiController
         need_login(true);
         $order = new Order();
         $order->setEmployee(logged_employee());
-        $synchronize = isset($_POST['sync']) ? $_POST['sync'] : false;
         try {
             $order->loadData($_POST);
             $order->search();
-            $action = $order->process($synchronize);
+            $order->process();
         } catch (\Exception $e) {
-            json($e->getMessage());
+            return $this->json()->error($e->getMessage());
         }
-        json('action', $action);
+        return $this->json()->success();
     }
 
     public function coupon()
     {
+        return $this->json()->error('Atualize o aplicativo para imprimir a conta');
+    }
+
+    /**
+     * TODO: move to new Api
+     */
+    public function newCoupon()
+    {
         if (!is_login()) {
-            json('Usuário não autenticado!');
+            return $this->json()->error('Usuário não autenticado!');
         }
         need_manager(true);
         try {
@@ -234,15 +242,14 @@ class PedidoOldApiController extends \MZ\Core\ApiController
             $printer->buzzer();
             $printer->cutter();
             $data = $connection->getBuffer();
-            json([
-                'status' => 'ok',
+            return $this->json()->success([
                 'data' => base64_encode($data),
                 'printer' => $impressora->getNome(),
                 'name' => 'Cupom de Consumo do Pedido #' . $pedido->getID()
             ]);
         } catch (\Exception $e) {
-            \Log::error($e->getMessage());
-            json($e->getMessage());
+            Log::error($e->getMessage());
+            return $this->json()->error($e->getMessage());
         }
     }
 
@@ -254,19 +261,19 @@ class PedidoOldApiController extends \MZ\Core\ApiController
     {
         return [
             [
-                'name' => 'pedido_find',
+                'name' => 'app_pedido_find',
                 'path' => '/app/pedido/listar',
                 'method' => 'GET',
                 'controller' => 'find',
             ],
             [
-                'name' => 'pedido_add',
+                'name' => 'app_pedido_add',
                 'path' => '/app/pedido/',
                 'method' => 'POST',
                 'controller' => 'add',
             ],
             [
-                'name' => 'pedido_coupon',
+                'name' => 'app_pedido_coupon',
                 'path' => '/app/pedido/imprimir',
                 'method' => 'GET',
                 'controller' => 'coupon',

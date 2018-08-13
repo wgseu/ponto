@@ -93,7 +93,7 @@ class SistemaPageController extends \MZ\Core\Controller
                 $this->getApplication()->getSystem()->filter($this->getApplication()->getSystem());
                 $this->getApplication()->getSystem()->update(['opcoes']);
                 \Thunder::success('Opções avançadas atualizadas com sucesso!', true);
-                redirect('/gerenciar/sistema/avancado');
+                return $this->redirect('/gerenciar/sistema/avancado');
             } catch (\ValidationException $e) {
                 $erro = $e->getErrors();
             } catch (\Exception $e) {
@@ -145,17 +145,17 @@ class SistemaPageController extends \MZ\Core\Controller
                 $this->getApplication()->getSystem()->update(['opcoes']);
                 $msg = 'E-mail atualizado com sucesso!';
                 if (is_output('json')) {
-                    json(null, ['msg' => $msg]);
+                    return $this->json()->success([], $msg);
                 }
                 \Thunder::success($msg, true);
-                redirect('/gerenciar/sistema/email');
+                return $this->redirect('/gerenciar/sistema/email');
             } catch (\Exception $e) {
                 $sistema->clean($old_sistema);
                 if ($e instanceof \MZ\Exception\ValidationException) {
                     $errors = $e->getErrors();
                 }
                 if (is_output('json')) {
-                    json($e->getMessage(), null, ['errors' => $errors]);
+                    return $this->json()->error($e->getMessage(), null, $errors);
                 }
                 \Thunder::error($e->getMessage());
                 foreach ($errors as $key => $value) {
@@ -164,7 +164,7 @@ class SistemaPageController extends \MZ\Core\Controller
                 }
             }
         } elseif (is_output('json')) {
-            json('Nenhum dado foi enviado');
+            return $this->json()->error('Nenhum dado foi enviado');
         }
 
         return $this->view('gerenciar_sistema_email', get_defined_vars());
@@ -191,14 +191,14 @@ class SistemaPageController extends \MZ\Core\Controller
                 $this->getApplication()->getSystem()->filter($this->getApplication()->getSystem());
                 $this->getApplication()->getSystem()->update(['opcoes']);
                 \Thunder::success('Opções fiscais atualizadas com sucesso!', true);
-                redirect('/gerenciar/sistema/fiscal');
+                return $this->redirect('/gerenciar/sistema/fiscal');
             } catch (\Exception $e) {
                 $sistema->clean($old_sistema);
                 if ($e instanceof \MZ\Exception\ValidationException) {
                     $errors = $e->getErrors();
                 }
                 if (is_output('json')) {
-                    json($e->getMessage(), null, ['errors' => $errors]);
+                    return $this->json()->error($e->getMessage(), null, $errors);
                 }
                 \Thunder::error($e->getMessage());
                 foreach ($errors as $key => $value) {
@@ -207,7 +207,7 @@ class SistemaPageController extends \MZ\Core\Controller
                 }
             }
         } elseif (is_output('json')) {
-            json('Nenhum dado foi enviado');
+            return $this->json()->error('Nenhum dado foi enviado');
         }
 
         return $this->view('gerenciar_sistema_fiscal', get_defined_vars());
@@ -465,12 +465,12 @@ class SistemaPageController extends \MZ\Core\Controller
                 set_boolean_config($secao, $chave, $marcado == 'Y');
                 $this->getApplication()->getSystem()->filter($this->getApplication()->getSystem());
                 $this->getApplication()->getSystem()->update(['opcoes']);
-                json(['status' => 'ok']);
+                return $this->json()->success();
             } catch (\Exception $e) {
-                json($e->getMessage());
+                return $this->json()->error($e->getMessage());
             }
         } elseif (is_output('json')) {
-            json('Nenhum dado foi enviado');
+            return $this->json()->error('Nenhum dado foi enviado');
         }
 
         return $this->view('gerenciar_sistema_impressao', get_defined_vars());
@@ -564,10 +564,10 @@ class SistemaPageController extends \MZ\Core\Controller
                 }
                 $msg = 'Layout atualizado com sucesso!';
                 if (is_output('json')) {
-                    json(null, ['item' => $sistema->publish(), 'msg' => $msg]);
+                    return $this->json()->success(['item' => $sistema->publish()], $msg);
                 }
                 \Thunder::success($msg, true);
-                redirect('/gerenciar/sistema/layout');
+                return $this->redirect('/gerenciar/sistema/layout');
             } catch (\Exception $e) {
                 $sistema->clean($old_sistema);
                 if ($e instanceof \MZ\Exception\ValidationException) {
@@ -582,7 +582,7 @@ class SistemaPageController extends \MZ\Core\Controller
                     }
                 }
                 if (is_output('json')) {
-                    json($e->getMessage(), null, ['errors' => $errors]);
+                    return $this->json()->error($e->getMessage(), null, $errors);
                 }
                 \Thunder::error($e->getMessage());
                 foreach ($errors as $key => $value) {
@@ -591,7 +591,7 @@ class SistemaPageController extends \MZ\Core\Controller
                 }
             }
         } elseif (is_output('json')) {
-            json('Nenhum dado foi enviado');
+            return $this->json()->error('Nenhum dado foi enviado');
         }
 
         return $this->view('gerenciar_sistema_layout', get_defined_vars());
@@ -706,12 +706,12 @@ class SistemaPageController extends \MZ\Core\Controller
                 set_boolean_config($secao, $chave, $marcado == 'Y');
                 $this->getApplication()->getSystem()->filter($this->getApplication()->getSystem());
                 $this->getApplication()->getSystem()->update(['opcoes']);
-                json(['status' => 'ok']);
+                return $this->json()->success();
             } catch (\Exception $e) {
-                json($e->getMessage());
+                return $this->json()->error($e->getMessage());
             }
         } elseif (is_output('json')) {
-            json('Nenhum dado foi enviado');
+            return $this->json()->error('Nenhum dado foi enviado');
         }
 
         return $this->view('gerenciar_sistema_opcoes', get_defined_vars());

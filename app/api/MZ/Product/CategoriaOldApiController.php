@@ -48,7 +48,7 @@ class CategoriaOldApiController extends \MZ\Core\ApiController
             }
             $items[] = $item;
         }
-        json('categorias', $items);
+        return $this->json()->success(['categorias' => $items]);
     }
 
     /**
@@ -59,7 +59,7 @@ class CategoriaOldApiController extends \MZ\Core\ApiController
     {
         return [
             [
-                'name' => 'categoria_find',
+                'name' => 'app_categoria_find',
                 'path' => '/app/categoria/listar',
                 'method' => 'GET',
                 'controller' => 'find',

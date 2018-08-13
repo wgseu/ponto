@@ -34,10 +34,10 @@ class ComandaOldApiController extends \MZ\Core\ApiController
     public function find()
     {
         if (!is_login()) {
-            json('Usuário não autenticado!');
+            return $this->json()->error('Usuário não autenticado!');
         }
         if (!logged_employee()->has(Permissao::NOME_PEDIDOCOMANDA)) {
-            json('Você não tem permissão para acessar comandas');
+            return $this->json()->error('Você não tem permissão para acessar comandas');
         }
         $order = [
             'funcionario' => logged_employee()->getID()
@@ -81,7 +81,7 @@ class ComandaOldApiController extends \MZ\Core\ApiController
             }
             $items[] = $item;
         }
-        json('comandas', $items);
+        return $this->json()->success(['comandas' => $items]);
     }
 
     /**
@@ -92,7 +92,7 @@ class ComandaOldApiController extends \MZ\Core\ApiController
     {
         return [
             [
-                'name' => 'comanda_find',
+                'name' => 'app_comanda_find',
                 'path' => '/app/comanda/listar',
                 'method' => 'GET',
                 'controller' => 'find',

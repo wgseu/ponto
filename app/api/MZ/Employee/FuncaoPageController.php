@@ -54,7 +54,7 @@ class FuncaoPageController extends \MZ\Core\Controller
             foreach ($funcoes as $_funcao) {
                 $items[] = $_funcao->publish();
             }
-            json(['status' => 'ok', 'items' => $items]);
+            return $this->json()->success(['items' => $items]);
         }
 
         return $this->view('gerenciar_funcao_index', get_defined_vars());
@@ -83,17 +83,17 @@ class FuncaoPageController extends \MZ\Core\Controller
                     $funcao->getDescricao()
                 );
                 if (is_output('json')) {
-                    json(null, ['item' => $funcao->publish(), 'msg' => $msg]);
+                    return $this->json()->success(['item' => $funcao->publish()], $msg);
                 }
                 \Thunder::success($msg, true);
-                redirect('/gerenciar/funcao/');
+                return $this->redirect('/gerenciar/funcao/');
             } catch (\Exception $e) {
                 $funcao->clean($old_funcao);
                 if ($e instanceof \MZ\Exception\ValidationException) {
                     $errors = $e->getErrors();
                 }
                 if (is_output('json')) {
-                    json($e->getMessage(), null, ['errors' => $errors]);
+                    return $this->json()->error($e->getMessage(), null, $errors);
                 }
                 \Thunder::error($e->getMessage());
                 foreach ($errors as $key => $value) {
@@ -102,7 +102,7 @@ class FuncaoPageController extends \MZ\Core\Controller
                 }
             }
         } elseif (is_output('json')) {
-            json('Nenhum dado foi enviado');
+            return $this->json()->error('Nenhum dado foi enviado');
         }
         return $this->view('gerenciar_funcao_cadastrar', get_defined_vars());
     }
@@ -117,10 +117,10 @@ class FuncaoPageController extends \MZ\Core\Controller
         if (!$funcao->exists()) {
             $msg = 'A função não foi informada ou não existe';
             if (is_output('json')) {
-                json($msg);
+                return $this->json()->error($msg);
             }
             \Thunder::warning($msg);
-            redirect('/gerenciar/funcao/');
+            return $this->redirect('/gerenciar/funcao/');
         }
         $focusctrl = 'descricao';
         $errors = [];
@@ -136,17 +136,17 @@ class FuncaoPageController extends \MZ\Core\Controller
                     $funcao->getDescricao()
                 );
                 if (is_output('json')) {
-                    json(null, ['item' => $funcao->publish(), 'msg' => $msg]);
+                    return $this->json()->success(['item' => $funcao->publish()], $msg);
                 }
                 \Thunder::success($msg, true);
-                redirect('/gerenciar/funcao/');
+                return $this->redirect('/gerenciar/funcao/');
             } catch (\Exception $e) {
                 $funcao->clean($old_funcao);
                 if ($e instanceof \MZ\Exception\ValidationException) {
                     $errors = $e->getErrors();
                 }
                 if (is_output('json')) {
-                    json($e->getMessage(), null, ['errors' => $errors]);
+                    return $this->json()->error($e->getMessage(), null, $errors);
                 }
                 \Thunder::error($e->getMessage());
                 foreach ($errors as $key => $value) {
@@ -155,7 +155,7 @@ class FuncaoPageController extends \MZ\Core\Controller
                 }
             }
         } elseif (is_output('json')) {
-            json('Nenhum dado foi enviado');
+            return $this->json()->error('Nenhum dado foi enviado');
         }
         return $this->view('gerenciar_funcao_editar', get_defined_vars());
     }
@@ -170,17 +170,17 @@ class FuncaoPageController extends \MZ\Core\Controller
         if (!$funcao->exists()) {
             $msg = 'A função não foi informada ou não existe';
             if (is_output('json')) {
-                json($msg);
+                return $this->json()->error($msg);
             }
             \Thunder::warning($msg);
-            redirect('/gerenciar/funcao/');
+            return $this->redirect('/gerenciar/funcao/');
         }
         try {
             $funcao->delete();
             $funcao->clean(new Funcao());
             $msg = sprintf('Função "%s" excluída com sucesso!', $funcao->getDescricao());
             if (is_output('json')) {
-                json('msg', $msg);
+                return $this->json()->success([], $msg);
             }
             \Thunder::success($msg, true);
         } catch (\Exception $e) {
@@ -189,11 +189,11 @@ class FuncaoPageController extends \MZ\Core\Controller
                 $funcao->getDescricao()
             );
             if (is_output('json')) {
-                json($msg);
+                return $this->json()->error($msg);
             }
             \Thunder::error($msg);
         }
-        redirect('/gerenciar/funcao/');
+        return $this->redirect('/gerenciar/funcao/');
     }
 
     /**

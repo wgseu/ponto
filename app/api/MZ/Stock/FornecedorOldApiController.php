@@ -65,7 +65,7 @@ class FornecedorOldApiController extends \MZ\Core\ApiController
             $item['imagemurl'] = $cliente_item['imagem'];
             $items[] = $item;
         }
-        json('items', $items);
+        return $this->json()->success(['items' => $items]);
     }
 
     /**
@@ -76,7 +76,7 @@ class FornecedorOldApiController extends \MZ\Core\ApiController
     {
         return [
             [
-                'name' => 'fornecedor_find',
+                'name' => 'app_fornecedor_find',
                 'path' => '/app/fornecedor/',
                 'method' => 'GET',
                 'controller' => 'find',

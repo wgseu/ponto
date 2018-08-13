@@ -141,7 +141,7 @@ class Authentication
                 if ($decoded->exp - $tolerance < time()) {
                     throw new \Exception('Refresh the token before expires', 301);
                 }
-            } catch(\Exception $e) {
+            } catch (\Exception $e) {
                 $token = $this->getAuthorization();
             }
         }
@@ -156,7 +156,7 @@ class Authentication
             try {
                 $decoded = JWT::decode($token, $key, ['HS256']);
                 $this->getUser()->loadByID($decoded->id);
-            } catch(\Exception $e) {
+            } catch (\Exception $e) {
                 $this->getUser()->fromArray([]);
             }
         } else {
@@ -165,9 +165,9 @@ class Authentication
         return $this;
     }
 
-    /** 
+    /**
      * Get hearder Authorization
-     * */
+     */
     private function getAuthorizationHeader()
     {
         $headers = null;
@@ -190,9 +190,10 @@ class Authentication
         }
         return $headers;
     }
+    
     /**
-    * get access token from header
-    * */
+     * get access token from header
+     */
     private function getBearerToken()
     {
         $headers = $this->getAuthorizationHeader();

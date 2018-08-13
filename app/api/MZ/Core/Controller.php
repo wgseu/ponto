@@ -26,6 +26,8 @@ namespace MZ\Core;
 
 use Symfony\Component\Routing\Route;
 use Symfony\Component\HttpFoundation\Response;
+use MZ\Response\JsonResponse;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use MZ\Exception\AuthorizationException;
 
 /**
@@ -94,6 +96,26 @@ abstract class Controller
             $response->getEngine()->{$key} = $value;
         }
         return $response->output($template);
+    }
+
+    /**
+     * Redirect to give path
+     * @param string $path path to redirect
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse redirect response
+     */
+    public function redirect($path)
+    {
+        return new RedirectResponse($path);
+    }
+
+    /**
+     * Json response
+     * @param array $data json array
+     * @return \MZ\Response\JsonResponse json response
+     */
+    public function json($data = [])
+    {
+        return new JsonResponse($data);
     }
 
     /**

@@ -53,7 +53,7 @@ class ServicoPageController extends \MZ\Core\Controller
             foreach ($servicos as $_servico) {
                 $items[] = $_servico->publish();
             }
-            json(['status' => 'ok', 'items' => $items]);
+            return $this->json()->success(['items' => $items]);
         }
 
         $tipos = Servico::getTipoOptions();
@@ -82,17 +82,17 @@ class ServicoPageController extends \MZ\Core\Controller
                     $servico->getDescricao()
                 );
                 if (is_output('json')) {
-                    json(null, ['item' => $servico->publish(), 'msg' => $msg]);
+                    return $this->json()->success(['item' => $servico->publish()], $msg);
                 }
                 \Thunder::success($msg, true);
-                redirect('/gerenciar/servico/');
+                return $this->redirect('/gerenciar/servico/');
             } catch (\Exception $e) {
                 $servico->clean($old_servico);
                 if ($e instanceof \MZ\Exception\ValidationException) {
                     $errors = $e->getErrors();
                 }
                 if (is_output('json')) {
-                    json($e->getMessage(), null, ['errors' => $errors]);
+                    return $this->json()->error($e->getMessage(), null, $errors);
                 }
                 \Thunder::error($e->getMessage());
                 foreach ($errors as $key => $value) {
@@ -101,7 +101,7 @@ class ServicoPageController extends \MZ\Core\Controller
                 }
             }
         } elseif (is_output('json')) {
-            json('Nenhum dado foi enviado');
+            return $this->json()->error('Nenhum dado foi enviado');
         } else {
             $servico->setAtivo('Y');
         }
@@ -116,10 +116,10 @@ class ServicoPageController extends \MZ\Core\Controller
         if (!$servico->exists()) {
             $msg = 'O serviço não foi informado ou não existe';
             if (is_output('json')) {
-                json($msg);
+                return $this->json()->error($msg);
             }
             \Thunder::warning($msg);
-            redirect('/gerenciar/servico/');
+            return $this->redirect('/gerenciar/servico/');
         }
         $focusctrl = 'descricao';
         $errors = [];
@@ -135,17 +135,17 @@ class ServicoPageController extends \MZ\Core\Controller
                     $servico->getDescricao()
                 );
                 if (is_output('json')) {
-                    json(null, ['item' => $servico->publish(), 'msg' => $msg]);
+                    return $this->json()->success(['item' => $servico->publish()], $msg);
                 }
                 \Thunder::success($msg, true);
-                redirect('/gerenciar/servico/');
+                return $this->redirect('/gerenciar/servico/');
             } catch (\Exception $e) {
                 $servico->clean($old_servico);
                 if ($e instanceof \MZ\Exception\ValidationException) {
                     $errors = $e->getErrors();
                 }
                 if (is_output('json')) {
-                    json($e->getMessage(), null, ['errors' => $errors]);
+                    return $this->json()->error($e->getMessage(), null, $errors);
                 }
                 \Thunder::error($e->getMessage());
                 foreach ($errors as $key => $value) {
@@ -154,7 +154,7 @@ class ServicoPageController extends \MZ\Core\Controller
                 }
             }
         } elseif (is_output('json')) {
-            json('Nenhum dado foi enviado');
+            return $this->json()->error('Nenhum dado foi enviado');
         }
         return $this->view('gerenciar_servico_editar', get_defined_vars());
     }
@@ -167,17 +167,17 @@ class ServicoPageController extends \MZ\Core\Controller
         if (!$servico->exists()) {
             $msg = 'O serviço não foi informado ou não existe';
             if (is_output('json')) {
-                json($msg);
+                return $this->json()->error($msg);
             }
             \Thunder::warning($msg);
-            redirect('/gerenciar/servico/');
+            return $this->redirect('/gerenciar/servico/');
         }
         try {
             $servico->delete();
             $servico->clean(new Servico());
             $msg = sprintf('Serviço "%s" excluído com sucesso!', $servico->getDescricao());
             if (is_output('json')) {
-                json('msg', $msg);
+                return $this->json()->success([], $msg);
             }
             \Thunder::success($msg, true);
         } catch (\Exception $e) {
@@ -186,11 +186,11 @@ class ServicoPageController extends \MZ\Core\Controller
                 $servico->getDescricao()
             );
             if (is_output('json')) {
-                json($msg);
+                return $this->json()->error($msg);
             }
             \Thunder::error($msg);
         }
-        redirect('/gerenciar/servico/');
+        return $this->redirect('/gerenciar/servico/');
     }
 
     /**

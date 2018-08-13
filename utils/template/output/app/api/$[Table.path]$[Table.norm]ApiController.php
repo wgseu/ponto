@@ -105,26 +105,26 @@ class $[Table.norm]ApiController extends \MZ\Core\ApiController
     {
         return [
             [
-                'name' => '$[table.unix]_find',
+                'name' => 'api_$[table.unix]_find',
                 'path' => '/api/$[table.unix.plural]',
                 'method' => 'GET',
                 'controller' => 'find',
             ],
             [
-                'name' => '$[table.unix]_add',
+                'name' => 'api_$[table.unix]_add',
                 'path' => '/api/$[table.unix.plural]',
                 'method' => 'POST',
                 'controller' => 'add',
             ],
             [
-                'name' => '$[table.unix]_update',
+                'name' => 'api_$[table.unix]_update',
                 'path' => '/api/$[table.unix.plural]/{id}',
                 'method' => 'PUT',
                 'requirements' => ['id' => '\d+'],
                 'controller' => 'update',
             ],
             [
-                'name' => '$[table.unix]_delete',
+                'name' => 'api_$[table.unix]_delete',
                 'path' => '/api/$[table.unix.plural]/{id}',
                 'method' => 'DELETE',
                 'requirements' => ['id' => '\d+'],

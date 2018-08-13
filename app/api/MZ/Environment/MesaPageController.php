@@ -53,7 +53,7 @@ class MesaPageController extends \MZ\Core\Controller
             foreach ($mesas as $_mesa) {
                 $items[] = $_mesa->publish();
             }
-            json(['status' => 'ok', 'items' => $items]);
+            return $this->json()->success(['items' => $items]);
         }
 
         $ativas = [
@@ -85,17 +85,17 @@ class MesaPageController extends \MZ\Core\Controller
                     $mesa->getNome()
                 );
                 if (is_output('json')) {
-                    json(null, ['item' => $mesa->publish(), 'msg' => $msg]);
+                    return $this->json()->success(['item' => $mesa->publish()], $msg);
                 }
                 \Thunder::success($msg, true);
-                redirect('/gerenciar/mesa/');
+                return $this->redirect('/gerenciar/mesa/');
             } catch (\Exception $e) {
                 $mesa->clean($old_mesa);
                 if ($e instanceof \MZ\Exception\ValidationException) {
                     $errors = $e->getErrors();
                 }
                 if (is_output('json')) {
-                    json($e->getMessage(), null, ['errors' => $errors]);
+                    return $this->json()->error($e->getMessage(), null, $errors);
                 }
                 \Thunder::error($e->getMessage());
                 foreach ($errors as $key => $value) {
@@ -104,7 +104,7 @@ class MesaPageController extends \MZ\Core\Controller
                 }
             }
         } elseif (is_output('json')) {
-            json('Nenhum dado foi enviado');
+            return $this->json()->error('Nenhum dado foi enviado');
         } else {
             $mesa->loadNextID();
             $mesa->setNome('Mesa ' . $mesa->getID());
@@ -121,10 +121,10 @@ class MesaPageController extends \MZ\Core\Controller
         if (!$mesa->exists()) {
             $msg = 'A mesa não foi informada ou não existe';
             if (is_output('json')) {
-                json($msg);
+                return $this->json()->error($msg);
             }
             \Thunder::warning($msg);
-            redirect('/gerenciar/mesa/');
+            return $this->redirect('/gerenciar/mesa/');
         }
         $focusctrl = 'nome';
         $errors = [];
@@ -140,17 +140,17 @@ class MesaPageController extends \MZ\Core\Controller
                     $mesa->getNome()
                 );
                 if (is_output('json')) {
-                    json(null, ['item' => $mesa->publish(), 'msg' => $msg]);
+                    return $this->json()->success(['item' => $mesa->publish()], $msg);
                 }
                 \Thunder::success($msg, true);
-                redirect('/gerenciar/mesa/');
+                return $this->redirect('/gerenciar/mesa/');
             } catch (\Exception $e) {
                 $mesa->clean($old_mesa);
                 if ($e instanceof \MZ\Exception\ValidationException) {
                     $errors = $e->getErrors();
                 }
                 if (is_output('json')) {
-                    json($e->getMessage(), null, ['errors' => $errors]);
+                    return $this->json()->error($e->getMessage(), null, $errors);
                 }
                 \Thunder::error($e->getMessage());
                 foreach ($errors as $key => $value) {
@@ -159,7 +159,7 @@ class MesaPageController extends \MZ\Core\Controller
                 }
             }
         } elseif (is_output('json')) {
-            json('Nenhum dado foi enviado');
+            return $this->json()->error('Nenhum dado foi enviado');
         }
         return $this->view('gerenciar_mesa_editar', get_defined_vars());
     }
@@ -172,17 +172,17 @@ class MesaPageController extends \MZ\Core\Controller
         if (!$mesa->exists()) {
             $msg = 'A mesa não foi informada ou não existe';
             if (is_output('json')) {
-                json($msg);
+                return $this->json()->error($msg);
             }
             \Thunder::warning($msg);
-            redirect('/gerenciar/mesa/');
+            return $this->redirect('/gerenciar/mesa/');
         }
         try {
             $mesa->delete();
             $mesa->clean(new Mesa());
             $msg = sprintf('Mesa "%s" excluída com sucesso!', $mesa->getNome());
             if (is_output('json')) {
-                json('msg', $msg);
+                return $this->json()->success([], $msg);
             }
             \Thunder::success($msg, true);
         } catch (\Exception $e) {
@@ -191,11 +191,11 @@ class MesaPageController extends \MZ\Core\Controller
                 $mesa->getNome()
             );
             if (is_output('json')) {
-                json($msg);
+                return $this->json()->error($msg);
             }
             \Thunder::error($msg);
         }
-        redirect('/gerenciar/mesa/');
+        return $this->redirect('/gerenciar/mesa/');
     }
 
     /**

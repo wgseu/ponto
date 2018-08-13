@@ -28,6 +28,7 @@ use MZ\Util\Filter;
 use MZ\Sale\Pedido;
 use MZ\Session\Caixa;
 use MZ\System\Permissao;
+use MZ\Logger\Log;
 
 /**
  * Allow application to serve system resources
@@ -63,10 +64,10 @@ class NotaOldApiController extends \MZ\Core\ApiController
             $xmlfile = \NFeDB::getCaminhoXmlAtual($_nota);
             $nota = new \NFe\Core\NFCe();
             $nota->load($xmlfile);
-            json('nota', $nota->toArray(true));
+            return $this->json()->success(['nota' => $nota->toArray(true)]);
         } catch (\Exception $e) {
-            \Log::error($e->getMessage());
-            json($e->getMessage());
+            Log::error($e->getMessage());
+            return $this->json()->error($e->getMessage());
         }
     }
 
@@ -115,7 +116,7 @@ class NotaOldApiController extends \MZ\Core\ApiController
             readfile($zipfile);
             unlink($zipfile);
         } catch (\Exception $e) {
-            json($e->getMessage());
+            return $this->json()->error($e->getMessage());
         }
     }
 
@@ -203,7 +204,7 @@ class NotaOldApiController extends \MZ\Core\ApiController
                 if (!is_array($xmlfile)) {
                     $xmlname = basename($xmlfile);
                     mail_nota($destinatario->getEmail(), $destinatario->getNome(), $modo, $filters, [$xmlname => $xmlfile]);
-                    json(null, []);
+                    return $this->json()->success();
                 }
             }
             need_permission(
@@ -230,9 +231,9 @@ class NotaOldApiController extends \MZ\Core\ApiController
                 throw $e;
             }
             unlink($zipfile);
-            json(null, []);
+            return $this->json()->success();
         } catch (\Exception $e) {
-            json($e->getMessage());
+            return $this->json()->error($e->getMessage());
         }
     }
 
@@ -246,10 +247,13 @@ class NotaOldApiController extends \MZ\Core\ApiController
         try {
             $nfe_api->init();
             $result = $nfe_api->processa();
-            json('result', ['processed' => $result, 'offline_start' => $nfe_api->getOffline()]);
+            return $this->json()->success(['result' => [
+                'processed' => $result,
+                'offline_start' => $nfe_api->getOffline()
+            ]]);
         } catch (\Exception $e) {
-            \Log::error($e->getMessage());
-            json($e->getMessage());
+            Log::error($e->getMessage());
+            return $this->json()->error($e->getMessage());
         }
     }
 
@@ -259,7 +263,7 @@ class NotaOldApiController extends \MZ\Core\ApiController
         need_permission([Permissao::NOME_PAGAMENTO, ['||'], Permissao::NOME_SELECIONARCAIXA], true);
 
         if (!is_post()) {
-            json('Nenhum dado foi enviado');
+            return $this->json()->error('Nenhum dado foi enviado');
         }
 
         try {
@@ -292,15 +296,15 @@ class NotaOldApiController extends \MZ\Core\ApiController
                 $nota->update();
             }
             $notified = 0;
-            json('nota', [
+            return $this->json()->success(['nota' => [
                 'id' => $nota->getID(),
                 'pedidoid' => $nota->getPedidoID(),
                 'notificado' => $notified,
                 'adicionado' => $added
-            ]);
+            ]]);
         } catch (\Exception $e) {
-            \Log::error($e->getMessage());
-            json($e->getMessage());
+            Log::error($e->getMessage());
+            return $this->json()->error($e->getMessage());
         }
     }
 
@@ -312,31 +316,31 @@ class NotaOldApiController extends \MZ\Core\ApiController
     {
         return [
             [
-                'name' => 'nota_download',
+                'name' => 'app_nota_download',
                 'path' => '/gerenciar/nota/baixar',
                 'method' => 'GET',
                 'controller' => 'download',
             ],
             [
-                'name' => 'nota_add',
+                'name' => 'app_nota_add',
                 'path' => '/gerenciar/nota/cadastrar',
                 'method' => 'POST',
                 'controller' => 'add',
             ],
             [
-                'name' => 'nota_display',
+                'name' => 'app_nota_display',
                 'path' => '/gerenciar/nota/danfe',
                 'method' => 'GET',
                 'controller' => 'display',
             ],
             [
-                'name' => 'nota_send',
+                'name' => 'app_nota_send',
                 'path' => '/gerenciar/nota/enviar',
                 'method' => 'GET',
                 'controller' => 'send',
             ],
             [
-                'name' => 'nota_process',
+                'name' => 'app_nota_process',
                 'path' => '/gerenciar/nota/processa',
                 'method' => 'POST',
                 'controller' => 'process',

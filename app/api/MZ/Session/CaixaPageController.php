@@ -53,7 +53,7 @@ class CaixaPageController extends \MZ\Core\Controller
             foreach ($caixas as $_caixa) {
                 $items[] = $_caixa->publish();
             }
-            json(['status' => 'ok', 'items' => $items]);
+            return $this->json()->success(['items' => $items]);
         }
 
         $estados = [
@@ -85,17 +85,17 @@ class CaixaPageController extends \MZ\Core\Controller
                     $caixa->getDescricao()
                 );
                 if (is_output('json')) {
-                    json(null, ['item' => $caixa->publish(), 'msg' => $msg]);
+                    return $this->json()->success(['item' => $caixa->publish()], $msg);
                 }
                 \Thunder::success($msg, true);
-                redirect('/gerenciar/caixa/');
+                return $this->redirect('/gerenciar/caixa/');
             } catch (\Exception $e) {
                 $caixa->clean($old_caixa);
                 if ($e instanceof \MZ\Exception\ValidationException) {
                     $errors = $e->getErrors();
                 }
                 if (is_output('json')) {
-                    json($e->getMessage(), null, ['errors' => $errors]);
+                    return $this->json()->error($e->getMessage(), null, $errors);
                 }
                 \Thunder::error($e->getMessage());
                 foreach ($errors as $key => $value) {
@@ -104,7 +104,7 @@ class CaixaPageController extends \MZ\Core\Controller
                 }
             }
         } elseif (is_output('json')) {
-            json('Nenhum dado foi enviado');
+            return $this->json()->error('Nenhum dado foi enviado');
         } else {
             $caixa->setAtivo('Y');
         }
@@ -119,10 +119,10 @@ class CaixaPageController extends \MZ\Core\Controller
         if (!$caixa->exists()) {
             $msg = 'O caixa informado não existe!';
             if (is_output('json')) {
-                json($msg);
+                return $this->json()->error($msg);
             }
             \Thunder::warning($msg);
-            redirect('/gerenciar/caixa/');
+            return $this->redirect('/gerenciar/caixa/');
         }
         $focusctrl = 'descricao';
         $errors = [];
@@ -143,17 +143,17 @@ class CaixaPageController extends \MZ\Core\Controller
                     $caixa->getDescricao()
                 );
                 if (is_output('json')) {
-                    json(null, ['item' => $caixa->publish(), 'msg' => $msg]);
+                    return $this->json()->success(['item' => $caixa->publish()], $msg);
                 }
                 \Thunder::success($msg, true);
-                redirect('/gerenciar/caixa/');
+                return $this->redirect('/gerenciar/caixa/');
             } catch (\Exception $e) {
                 $caixa->clean($old_caixa);
                 if ($e instanceof \MZ\Exception\ValidationException) {
                     $errors = $e->getErrors();
                 }
                 if (is_output('json')) {
-                    json($e->getMessage(), null, ['errors' => $errors]);
+                    return $this->json()->error($e->getMessage(), null, $errors);
                 }
                 \Thunder::error($e->getMessage());
                 foreach ($errors as $key => $value) {
@@ -162,7 +162,7 @@ class CaixaPageController extends \MZ\Core\Controller
                 }
             }
         } elseif (is_output('json')) {
-            json('Nenhum dado foi enviado');
+            return $this->json()->error('Nenhum dado foi enviado');
         }
         return $this->view('gerenciar_caixa_editar', get_defined_vars());
     }
@@ -175,17 +175,17 @@ class CaixaPageController extends \MZ\Core\Controller
         if (!$caixa->exists()) {
             $msg = 'O caixa não foi informado ou não existe!';
             if (is_output('json')) {
-                json($msg);
+                return $this->json()->error($msg);
             }
             \Thunder::warning($msg);
-            redirect('/gerenciar/caixa/');
+            return $this->redirect('/gerenciar/caixa/');
         }
         try {
             $caixa->delete();
             $caixa->clean(new Caixa());
             $msg = sprintf('Caixa "%s" excluído com sucesso!', $caixa->getDescricao());
             if (is_output('json')) {
-                json('msg', $msg);
+                return $this->json()->success([], $msg);
             }
             \Thunder::success($msg, true);
         } catch (\Exception $e) {
@@ -194,11 +194,11 @@ class CaixaPageController extends \MZ\Core\Controller
                 $caixa->getDescricao()
             );
             if (is_output('json')) {
-                json($msg);
+                return $this->json()->error($msg);
             }
             \Thunder::error($msg);
         }
-        redirect('/gerenciar/caixa/');
+        return $this->redirect('/gerenciar/caixa/');
     }
 
     /**

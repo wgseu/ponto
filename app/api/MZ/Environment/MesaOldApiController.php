@@ -36,10 +36,10 @@ class MesaOldApiController extends \MZ\Core\ApiController
     public function find()
     {
         if (!is_login()) {
-            json('Usuário não autenticado!');
+            return $this->json()->error('Usuário não autenticado!');
         }
         if (!logged_employee()->has(Permissao::NOME_PEDIDOMESA)) {
-            json('Você não tem permissão para acessar mesas');
+            return $this->json()->error('Você não tem permissão para acessar mesas');
         }
         $order = [
             'funcionario' => logged_employee()->getID()
@@ -88,15 +88,9 @@ class MesaOldApiController extends \MZ\Core\ApiController
             if (is_null($item['cliente'])) {
                 unset($item['cliente']);
             }
-            if (is_null($item['juntaid'])) {
-                unset($item['juntaid']);
-            }
-            if (is_null($item['juntanome'])) {
-                unset($item['juntanome']);
-            }
             $items[] = $item;
         }
-        json('mesas', $items);
+        return $this->json()->success(['mesas' => $items]);
     }
 
     /**
@@ -107,7 +101,7 @@ class MesaOldApiController extends \MZ\Core\ApiController
     {
         return [
             [
-                'name' => 'mesa_find',
+                'name' => 'app_mesa_find',
                 'path' => '/app/mesa/listar',
                 'method' => 'GET',
                 'controller' => 'find',

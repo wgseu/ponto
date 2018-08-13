@@ -65,7 +65,7 @@ class PedidoPageController extends \MZ\Core\Controller
             foreach ($pedidos as $_pedido) {
                 $items[] = $_pedido->publish();
             }
-            json(['status' => 'ok', 'items' => $items]);
+            return $this->json()->success(['items' => $items]);
         }
 
         $_tipo_names = Pedido::getTipoOptions();

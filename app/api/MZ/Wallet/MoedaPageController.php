@@ -53,7 +53,7 @@ class MoedaPageController extends \MZ\Core\Controller
             foreach ($moedas as $_moeda) {
                 $items[] = $_moeda->publish();
             }
-            json(['status' => 'ok', 'items' => $items]);
+            return $this->json()->success(['items' => $items]);
         }
 
         return $this->view('gerenciar_moeda_index', get_defined_vars());
@@ -80,17 +80,17 @@ class MoedaPageController extends \MZ\Core\Controller
                     $moeda->getNome()
                 );
                 if (is_output('json')) {
-                    json(null, ['item' => $moeda->publish(), 'msg' => $msg]);
+                    return $this->json()->success(['item' => $moeda->publish()], $msg);
                 }
                 \Thunder::success($msg, true);
-                redirect('/gerenciar/moeda/');
+                return $this->redirect('/gerenciar/moeda/');
             } catch (\Exception $e) {
                 $moeda->clean($old_moeda);
                 if ($e instanceof \MZ\Exception\ValidationException) {
                     $errors = $e->getErrors();
                 }
                 if (is_output('json')) {
-                    json($e->getMessage(), null, ['errors' => $errors]);
+                    return $this->json()->error($e->getMessage(), null, $errors);
                 }
                 \Thunder::error($e->getMessage());
                 foreach ($errors as $key => $value) {
@@ -99,7 +99,7 @@ class MoedaPageController extends \MZ\Core\Controller
                 }
             }
         } elseif (is_output('json')) {
-            json('Nenhum dado foi enviado');
+            return $this->json()->error('Nenhum dado foi enviado');
         } elseif (is_null($moeda->getNome())) {
             $moeda->setDivisao(100);
             $moeda->setFracao('Centavo');
@@ -116,10 +116,10 @@ class MoedaPageController extends \MZ\Core\Controller
         if (!$moeda->exists()) {
             $msg = 'A moeda não foi informada ou não existe';
             if (is_output('json')) {
-                json($msg);
+                return $this->json()->error($msg);
             }
             \Thunder::warning($msg);
-            redirect('/gerenciar/moeda/');
+            return $this->redirect('/gerenciar/moeda/');
         }
         $focusctrl = 'nome';
         $errors = [];
@@ -135,17 +135,17 @@ class MoedaPageController extends \MZ\Core\Controller
                     $moeda->getNome()
                 );
                 if (is_output('json')) {
-                    json(null, ['item' => $moeda->publish(), 'msg' => $msg]);
+                    return $this->json()->success(['item' => $moeda->publish()], $msg);
                 }
                 \Thunder::success($msg, true);
-                redirect('/gerenciar/moeda/');
+                return $this->redirect('/gerenciar/moeda/');
             } catch (\Exception $e) {
                 $moeda->clean($old_moeda);
                 if ($e instanceof \MZ\Exception\ValidationException) {
                     $errors = $e->getErrors();
                 }
                 if (is_output('json')) {
-                    json($e->getMessage(), null, ['errors' => $errors]);
+                    return $this->json()->error($e->getMessage(), null, $errors);
                 }
                 \Thunder::error($e->getMessage());
                 foreach ($errors as $key => $value) {
@@ -154,7 +154,7 @@ class MoedaPageController extends \MZ\Core\Controller
                 }
             }
         } elseif (is_output('json')) {
-            json('Nenhum dado foi enviado');
+            return $this->json()->error('Nenhum dado foi enviado');
         }
         return $this->view('gerenciar_moeda_editar', get_defined_vars());
     }
@@ -167,17 +167,17 @@ class MoedaPageController extends \MZ\Core\Controller
         if (!$moeda->exists()) {
             $msg = 'A moeda não foi informada ou não existe';
             if (is_output('json')) {
-                json($msg);
+                return $this->json()->error($msg);
             }
             \Thunder::warning($msg);
-            redirect('/gerenciar/moeda/');
+            return $this->redirect('/gerenciar/moeda/');
         }
         try {
             $moeda->delete();
             $moeda->clean(new Moeda());
             $msg = sprintf('Moeda "%s" excluída com sucesso!', $moeda->getNome());
             if (is_output('json')) {
-                json('msg', $msg);
+                return $this->json()->success([], $msg);
             }
             \Thunder::success($msg, true);
         } catch (\Exception $e) {
@@ -186,11 +186,11 @@ class MoedaPageController extends \MZ\Core\Controller
                 $moeda->getNome()
             );
             if (is_output('json')) {
-                json($msg);
+                return $this->json()->error($msg);
             }
             \Thunder::error($msg);
         }
-        redirect('/gerenciar/moeda/');
+        return $this->redirect('/gerenciar/moeda/');
     }
 
     /**

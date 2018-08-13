@@ -53,7 +53,7 @@ class BancoPageController extends \MZ\Core\Controller
             foreach ($bancos as $_banco) {
                 $items[] = $_banco->publish();
             }
-            json('items', $items);
+            return $this->json()->success(['items' => $items]);
         }
 
         return $this->view('gerenciar_banco_index', get_defined_vars());
@@ -76,17 +76,17 @@ class BancoPageController extends \MZ\Core\Controller
                     $banco->getRazaoSocial()
                 );
                 if (is_output('json')) {
-                    json(null, ['item' => $banco->publish(), 'msg' => $msg]);
+                    return $this->json()->success(['item' => $banco->publish()], $msg);
                 }
                 \Thunder::success($msg, true);
-                redirect('/gerenciar/banco/');
+                return $this->redirect('/gerenciar/banco/');
             } catch (\Exception $e) {
                 $banco->clean($old_banco);
                 if ($e instanceof \MZ\Exception\ValidationException) {
                     $errors = $e->getErrors();
                 }
                 if (is_output('json')) {
-                    json($e->getMessage(), null, ['errors' => $errors]);
+                    return $this->json()->error($e->getMessage(), null, $errors);
                 }
                 \Thunder::error($e->getMessage());
                 foreach ($errors as $key => $value) {
@@ -95,7 +95,7 @@ class BancoPageController extends \MZ\Core\Controller
                 }
             }
         } elseif (is_output('json')) {
-            json('Nenhum dado foi enviado');
+            return $this->json()->error('Nenhum dado foi enviado');
         }
         return $this->view('gerenciar_banco_cadastrar', get_defined_vars());
     }
@@ -108,10 +108,10 @@ class BancoPageController extends \MZ\Core\Controller
         if (!$banco->exists()) {
             $msg = 'O banco informado não existe!';
             if (is_output('json')) {
-                json($msg);
+                return $this->json()->error($msg);
             }
             \Thunder::warning($msg);
-            redirect('/gerenciar/banco/');
+            return $this->redirect('/gerenciar/banco/');
         }
         $focusctrl = 'razaosocial';
         $errors = [];
@@ -126,17 +126,17 @@ class BancoPageController extends \MZ\Core\Controller
                     $banco->getRazaoSocial()
                 );
                 if (is_output('json')) {
-                    json(null, ['item' => $banco->publish(), 'msg' => $msg]);
+                    return $this->json()->success(['item' => $banco->publish()], $msg);
                 }
                 \Thunder::success($msg, true);
-                redirect('/gerenciar/banco/');
+                return $this->redirect('/gerenciar/banco/');
             } catch (\Exception $e) {
                 $banco->clean($old_banco);
                 if ($e instanceof \MZ\Exception\ValidationException) {
                     $errors = $e->getErrors();
                 }
                 if (is_output('json')) {
-                    json($e->getMessage(), null, ['errors' => $errors]);
+                    return $this->json()->error($e->getMessage(), null, $errors);
                 }
                 \Thunder::error($e->getMessage());
                 foreach ($errors as $key => $value) {
@@ -145,7 +145,7 @@ class BancoPageController extends \MZ\Core\Controller
                 }
             }
         } elseif (is_output('json')) {
-            json('Nenhum dado foi enviado');
+            return $this->json()->error('Nenhum dado foi enviado');
         }
         return $this->view('gerenciar_banco_editar', get_defined_vars());
     }
@@ -158,17 +158,17 @@ class BancoPageController extends \MZ\Core\Controller
         if (!$banco->exists()) {
             $msg = 'O banco não foi informado ou não existe!';
             if (is_output('json')) {
-                json($msg);
+                return $this->json()->error($msg);
             }
             \Thunder::warning($msg);
-            redirect('/gerenciar/banco/');
+            return $this->redirect('/gerenciar/banco/');
         }
         try {
             $banco->delete();
             $banco->clean(new Banco());
             $msg = sprintf('Banco "%s" excluído com sucesso!', $banco->getRazaoSocial());
             if (is_output('json')) {
-                json('msg', $msg);
+                return $this->json()->success([], $msg);
             }
             \Thunder::success($msg, true);
         } catch (\Exception $e) {
@@ -177,11 +177,11 @@ class BancoPageController extends \MZ\Core\Controller
                 $banco->getRazaoSocial()
             );
             if (is_output('json')) {
-                json($msg);
+                return $this->json()->error($msg);
             }
             \Thunder::error($msg);
         }
-        redirect('/gerenciar/banco/');
+        return $this->redirect('/gerenciar/banco/');
     }
 
     /**

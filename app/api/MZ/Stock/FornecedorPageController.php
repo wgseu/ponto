@@ -54,7 +54,7 @@ class FornecedorPageController extends \MZ\Core\Controller
             foreach ($fornecedores as $_fornecedor) {
                 $items[] = $_fornecedor->publish();
             }
-            json(['status' => 'ok', 'items' => $items]);
+            return $this->json()->success(['items' => $items]);
         }
 
         $empresa_id_obj = $fornecedor->findEmpresaID();
@@ -82,17 +82,17 @@ class FornecedorPageController extends \MZ\Core\Controller
                     $fornecedor->getEmpresaID()
                 );
                 if (is_output('json')) {
-                    json(null, ['item' => $fornecedor->publish(), 'msg' => $msg]);
+                    return $this->json()->success(['item' => $fornecedor->publish()], $msg);
                 }
                 \Thunder::success($msg, true);
-                redirect('/gerenciar/fornecedor/');
+                return $this->redirect('/gerenciar/fornecedor/');
             } catch (\Exception $e) {
                 $fornecedor->clean($old_fornecedor);
                 if ($e instanceof \MZ\Exception\ValidationException) {
                     $errors = $e->getErrors();
                 }
                 if (is_output('json')) {
-                    json($e->getMessage(), null, ['errors' => $errors]);
+                    return $this->json()->error($e->getMessage(), null, $errors);
                 }
                 \Thunder::error($e->getMessage());
                 foreach ($errors as $key => $value) {
@@ -101,7 +101,7 @@ class FornecedorPageController extends \MZ\Core\Controller
                 }
             }
         } elseif (is_output('json')) {
-            json('Nenhum dado foi enviado');
+            return $this->json()->error('Nenhum dado foi enviado');
         } else {
             $fornecedor->setPrazoPagamento(30);
         }
@@ -117,10 +117,10 @@ class FornecedorPageController extends \MZ\Core\Controller
         if (!$fornecedor->exists()) {
             $msg = 'O fornecedor não foi informado ou não existe';
             if (is_output('json')) {
-                json($msg);
+                return $this->json()->error($msg);
             }
             \Thunder::warning($msg);
-            redirect('/gerenciar/fornecedor/');
+            return $this->redirect('/gerenciar/fornecedor/');
         }
         $focusctrl = 'empresaid';
         $errors = [];
@@ -136,17 +136,17 @@ class FornecedorPageController extends \MZ\Core\Controller
                     $fornecedor->getEmpresaID()
                 );
                 if (is_output('json')) {
-                    json(null, ['item' => $fornecedor->publish(), 'msg' => $msg]);
+                    return $this->json()->success(['item' => $fornecedor->publish()], $msg);
                 }
                 \Thunder::success($msg, true);
-                redirect('/gerenciar/fornecedor/');
+                return $this->redirect('/gerenciar/fornecedor/');
             } catch (\Exception $e) {
                 $fornecedor->clean($old_fornecedor);
                 if ($e instanceof \MZ\Exception\ValidationException) {
                     $errors = $e->getErrors();
                 }
                 if (is_output('json')) {
-                    json($e->getMessage(), null, ['errors' => $errors]);
+                    return $this->json()->error($e->getMessage(), null, $errors);
                 }
                 \Thunder::error($e->getMessage());
                 foreach ($errors as $key => $value) {
@@ -155,7 +155,7 @@ class FornecedorPageController extends \MZ\Core\Controller
                 }
             }
         } elseif (is_output('json')) {
-            json('Nenhum dado foi enviado');
+            return $this->json()->error('Nenhum dado foi enviado');
         }
         $empresa_id_obj = $fornecedor->findEmpresaID();
         return $this->view('gerenciar_fornecedor_editar', get_defined_vars());
@@ -169,10 +169,10 @@ class FornecedorPageController extends \MZ\Core\Controller
         if (!$fornecedor->exists()) {
             $msg = 'O fornecedor não foi informado ou não existe';
             if (is_output('json')) {
-                json($msg);
+                return $this->json()->error($msg);
             }
             \Thunder::warning($msg);
-            redirect('/gerenciar/fornecedor/');
+            return $this->redirect('/gerenciar/fornecedor/');
         }
         $empresa_id_obj = $fornecedor->findEmpresaID();
         try {
@@ -180,7 +180,7 @@ class FornecedorPageController extends \MZ\Core\Controller
             $fornecedor->clean(new Fornecedor());
             $msg = sprintf('Fornecedor "%s" excluído com sucesso!', $empresa_id_obj->getNomeCompleto());
             if (is_output('json')) {
-                json('msg', $msg);
+                return $this->json()->success([], $msg);
             }
             \Thunder::success($msg, true);
         } catch (\Exception $e) {
@@ -189,11 +189,11 @@ class FornecedorPageController extends \MZ\Core\Controller
                 $empresa_id_obj->getNomeCompleto()
             );
             if (is_output('json')) {
-                json($msg);
+                return $this->json()->error($msg);
             }
             \Thunder::error($msg);
         }
-        redirect('/gerenciar/fornecedor/');
+        return $this->redirect('/gerenciar/fornecedor/');
     }
 
     /**

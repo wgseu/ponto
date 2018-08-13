@@ -54,7 +54,7 @@ class PaisPageController extends \MZ\Core\Controller
             foreach ($paises as $_pais) {
                 $items[] = $_pais->publish();
             }
-            json(['status' => 'ok', 'items' => $items]);
+            return $this->json()->success(['items' => $items]);
         }
 
         $moedas = Moeda::findAll();
@@ -82,17 +82,17 @@ class PaisPageController extends \MZ\Core\Controller
                     $pais->getNome()
                 );
                 if (is_output('json')) {
-                    json(null, ['item' => $pais->publish(), 'msg' => $msg]);
+                    return $this->json()->success(['item' => $pais->publish()], $msg);
                 }
                 \Thunder::success($msg, true);
-                redirect('/gerenciar/pais/');
+                return $this->redirect('/gerenciar/pais/');
             } catch (\Exception $e) {
                 $pais->clean($old_pais);
                 if ($e instanceof \MZ\Exception\ValidationException) {
                     $errors = $e->getErrors();
                 }
                 if (is_output('json')) {
-                    json($e->getMessage(), null, ['errors' => $errors]);
+                    return $this->json()->error($e->getMessage(), null, $errors);
                 }
                 \Thunder::error($e->getMessage());
                 foreach ($errors as $key => $value) {
@@ -101,7 +101,7 @@ class PaisPageController extends \MZ\Core\Controller
                 }
             }
         } elseif (is_output('json')) {
-            json('Nenhum dado foi enviado');
+            return $this->json()->error('Nenhum dado foi enviado');
         }
         $moedas = Moeda::findAll();
         $flags_images = Pais::getImageIndexOptions();
@@ -116,10 +116,10 @@ class PaisPageController extends \MZ\Core\Controller
         if (!$pais->exists()) {
             $msg = 'O país não foi informado ou não existe';
             if (is_output('json')) {
-                json($msg);
+                return $this->json()->error($msg);
             }
             \Thunder::warning($msg);
-            redirect('/gerenciar/pais/');
+            return $this->redirect('/gerenciar/pais/');
         }
         $focusctrl = 'nome';
         $errors = [];
@@ -135,17 +135,17 @@ class PaisPageController extends \MZ\Core\Controller
                     $pais->getNome()
                 );
                 if (is_output('json')) {
-                    json(null, ['item' => $pais->publish(), 'msg' => $msg]);
+                    return $this->json()->success(['item' => $pais->publish()], $msg);
                 }
                 \Thunder::success($msg, true);
-                redirect('/gerenciar/pais/');
+                return $this->redirect('/gerenciar/pais/');
             } catch (\Exception $e) {
                 $pais->clean($old_pais);
                 if ($e instanceof \MZ\Exception\ValidationException) {
                     $errors = $e->getErrors();
                 }
                 if (is_output('json')) {
-                    json($e->getMessage(), null, ['errors' => $errors]);
+                    return $this->json()->error($e->getMessage(), null, $errors);
                 }
                 \Thunder::error($e->getMessage());
                 foreach ($errors as $key => $value) {
@@ -154,7 +154,7 @@ class PaisPageController extends \MZ\Core\Controller
                 }
             }
         } elseif (is_output('json')) {
-            json('Nenhum dado foi enviado');
+            return $this->json()->error('Nenhum dado foi enviado');
         }
         $moedas = Moeda::findAll();
         $flags_images = Pais::getImageIndexOptions();
@@ -169,10 +169,10 @@ class PaisPageController extends \MZ\Core\Controller
         if (!$pais->exists()) {
             $msg = 'O país não foi informado ou não existe';
             if (is_output('json')) {
-                json($msg);
+                return $this->json()->error($msg);
             }
             \Thunder::warning($msg);
-            redirect('/gerenciar/pais/');
+            return $this->redirect('/gerenciar/pais/');
         }
         try {
             $pais->delete();
@@ -180,7 +180,7 @@ class PaisPageController extends \MZ\Core\Controller
             $msg = sprintf('País "%s" excluído com sucesso!', $pais->getNome());
             $msg = 'País "' . $pais->getNome() . '" excluído com sucesso!';
             if (is_output('json')) {
-                json('msg', $msg);
+                return $this->json()->success([], $msg);
             }
             \Thunder::success($msg, true);
         } catch (\Exception $e) {
@@ -189,11 +189,11 @@ class PaisPageController extends \MZ\Core\Controller
                 $pais->getNome()
             );
             if (is_output('json')) {
-                json($msg);
+                return $this->json()->error($msg);
             }
             \Thunder::error($msg);
         }
-        redirect('/gerenciar/pais/');
+        return $this->redirect('/gerenciar/pais/');
     }
 
     /**

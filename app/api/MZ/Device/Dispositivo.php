@@ -28,6 +28,7 @@ use MZ\Database\Model;
 use MZ\Database\DB;
 use MZ\Util\Filter;
 use MZ\Util\Validator;
+use MZ\Logger\Log;
 
 /**
  * Computadores e tablets com opções de acesso
@@ -542,16 +543,6 @@ class Dispositivo extends Model
         }
         $exists = $this->exists();
         $this->save();
-        try {
-            $sync = new \MZ\System\Synchronizer();
-            if ($exists) {
-                $sync->deviceUpdated($this->getNome(), $this->getCaixaID());
-            } else {
-                $sync->deviceAdded($this->getNome(), $this->getCaixaID());
-            }
-        } catch (\Exception $e) {
-            \Log::warning($e->getMessage());
-        }
         return $this;
     }
 

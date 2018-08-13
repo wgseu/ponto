@@ -53,7 +53,7 @@ class AuditoriaPageController extends \MZ\Core\Controller
             foreach ($auditorias as $_auditoria) {
                 $items[] = $_auditoria->publish();
             }
-            json(['status' => 'ok', 'items' => $items]);
+            return $this->json()->success(['items' => $items]);
         }
 
         $funcionarios = Funcionario::findAll();

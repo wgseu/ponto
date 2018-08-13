@@ -83,7 +83,7 @@ class ProdutoPedidoPageController extends \MZ\Core\Controller
             foreach ($itens_do_pedido as $_produto_pedido) {
                 $items[] = $_produto_pedido->publish();
             }
-            json(['status' => 'ok', 'items' => $items]);
+            return $this->json()->success(['items' => $items]);
         }
 
         $_modulo_names = Pedido::getTipoOptions();

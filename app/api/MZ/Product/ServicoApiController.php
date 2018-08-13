@@ -103,26 +103,26 @@ class ServicoApiController extends \MZ\Core\ApiController
     {
         return [
             [
-                'name' => 'servico_find',
+                'name' => 'api_servico_find',
                 'path' => '/api/servicos',
                 'method' => 'GET',
                 'controller' => 'find',
             ],
             [
-                'name' => 'servico_add',
+                'name' => 'api_servico_add',
                 'path' => '/api/servicos',
                 'method' => 'POST',
                 'controller' => 'add',
             ],
             [
-                'name' => 'servico_update',
+                'name' => 'api_servico_update',
                 'path' => '/api/servicos/{id}',
                 'method' => 'PUT',
                 'requirements' => ['id' => '\d+'],
                 'controller' => 'update',
             ],
             [
-                'name' => 'servico_delete',
+                'name' => 'api_servico_delete',
                 'path' => '/api/servicos/{id}',
                 'method' => 'DELETE',
                 'requirements' => ['id' => '\d+'],

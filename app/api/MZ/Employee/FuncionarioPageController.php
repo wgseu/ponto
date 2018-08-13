@@ -60,7 +60,7 @@ class FuncionarioPageController extends \MZ\Core\Controller
             foreach ($funcionarios as $_funcionario) {
                 $items[] = $_funcionario->publish();
             }
-            json(['status' => 'ok', 'items' => $items]);
+            return $this->json()->success(['items' => $items]);
         }
 
         $funcao = $funcionario->findFuncaoID();
@@ -107,17 +107,17 @@ class FuncionarioPageController extends \MZ\Core\Controller
                     $cliente->getAssinatura()
                 );
                 if (is_output('json')) {
-                    json(null, ['item' => $cliente->publish(), 'msg' => $msg]);
+                    return $this->json()->success(['item' => $cliente->publish()], $msg);
                 }
                 \Thunder::success($msg, true);
-                redirect('/gerenciar/funcionario/');
+                return $this->redirect('/gerenciar/funcionario/');
             } catch (\Exception $e) {
                 $funcionario->clean($old_funcionario);
                 if ($e instanceof \MZ\Exception\ValidationException) {
                     $errors = $e->getErrors();
                 }
                 if (is_output('json')) {
-                    json($e->getMessage(), null, ['errors' => $errors]);
+                    return $this->json()->error($e->getMessage(), null, $errors);
                 }
                 \Thunder::error($e->getMessage());
                 foreach ($errors as $key => $value) {
@@ -126,7 +126,7 @@ class FuncionarioPageController extends \MZ\Core\Controller
                 }
             }
         } elseif (is_output('json')) {
-            json('Nenhum dado foi enviado');
+            return $this->json()->error('Nenhum dado foi enviado');
         } elseif (is_null($funcionario->getClienteID())) {
             $funcionario->setAtivo('Y');
         }
@@ -146,10 +146,10 @@ class FuncionarioPageController extends \MZ\Core\Controller
         if (!$funcionario->exists()) {
             $msg = 'O funcionário não foi informado ou não existe';
             if (is_output('json')) {
-                json($msg);
+                return $this->json()->error($msg);
             }
             \Thunder::warning($msg);
-            redirect('/gerenciar/funcionario/');
+            return $this->redirect('/gerenciar/funcionario/');
         }
         if ((
                 !logged_employee()->has(Permissao::NOME_CADASTROFUNCIONARIOS) &&
@@ -163,10 +163,10 @@ class FuncionarioPageController extends \MZ\Core\Controller
         ) {
             $msg = 'Você não tem permissão para alterar as informações desse(a) funcionário(a)';
             if (is_output('json')) {
-                json($msg);
+                return $this->json()->error($msg);
             }
             \Thunder::warning($msg);
-            redirect('/gerenciar/funcionario/');
+            return $this->redirect('/gerenciar/funcionario/');
         }
         $cliente_func = $funcionario->findClienteID();
         $focusctrl = 'clienteid';
@@ -183,17 +183,17 @@ class FuncionarioPageController extends \MZ\Core\Controller
                     $cliente_func->getAssinatura()
                 );
                 if (is_output('json')) {
-                    json(null, ['item' => $cliente_func->publish(), 'msg' => $msg]);
+                    return $this->json()->success(['item' => $cliente_func->publish()], $msg);
                 }
                 \Thunder::success($msg, true);
-                redirect('/gerenciar/funcionario/');
+                return $this->redirect('/gerenciar/funcionario/');
             } catch (\Exception $e) {
                 $funcionario->clean($old_funcionario);
                 if ($e instanceof \MZ\Exception\ValidationException) {
                     $errors = $e->getErrors();
                 }
                 if (is_output('json')) {
-                    json($e->getMessage(), null, ['errors' => $errors]);
+                    return $this->json()->error($e->getMessage(), null, $errors);
                 }
                 \Thunder::error($e->getMessage());
                 foreach ($errors as $key => $value) {
@@ -202,7 +202,7 @@ class FuncionarioPageController extends \MZ\Core\Controller
                 }
             }
         } elseif (is_output('json')) {
-            json('Nenhum dado foi enviado');
+            return $this->json()->error('Nenhum dado foi enviado');
         }
         $_funcoes = Funcao::findAll();
         $linguagens = get_languages_info();
@@ -217,10 +217,10 @@ class FuncionarioPageController extends \MZ\Core\Controller
         if (!$funcionario->exists()) {
             $msg = 'O funcionário não foi informado ou não existe';
             if (is_output('json')) {
-                json($msg);
+                return $this->json()->error($msg);
             }
             \Thunder::warning($msg);
-            redirect('/gerenciar/funcionario/');
+            return $this->redirect('/gerenciar/funcionario/');
         }
         $cliente = $funcionario->findClienteID();
         try {
@@ -228,7 +228,7 @@ class FuncionarioPageController extends \MZ\Core\Controller
             $funcionario->clean(new Funcionario());
             $msg = sprintf('Funcionário "%s" excluído com sucesso!', $cliente->getAssinatura());
             if (is_output('json')) {
-                json('msg', $msg);
+                return $this->json()->success([], $msg);
             }
             \Thunder::success($msg, true);
         } catch (\Exception $e) {
@@ -237,11 +237,11 @@ class FuncionarioPageController extends \MZ\Core\Controller
                 $cliente->getAssinatura()
             );
             if (is_output('json')) {
-                json($msg);
+                return $this->json()->error($msg);
             }
             \Thunder::error($msg);
         }
-        redirect('/gerenciar/funcionario/');
+        return $this->redirect('/gerenciar/funcionario/');
     }
 
     /**

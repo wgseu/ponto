@@ -53,7 +53,7 @@ class MovimentacaoPageController extends \MZ\Core\Controller
             foreach ($movimentacoes as $_movimentacao) {
                 $items[] = $_movimentacao->publish();
             }
-            json(['status' => 'ok', 'items' => $items]);
+            return $this->json()->success(['items' => $items]);
         }
 
         $_movimentacao_icon = [

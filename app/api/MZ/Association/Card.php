@@ -25,6 +25,7 @@
 namespace MZ\Association;
 
 use MZ\Payment\Cartao;
+use MZ\Logger\Log;
 
 class Card
 {
@@ -79,12 +80,6 @@ class Card
         $this->dados = isset($this->dados)?$this->dados:[];
         $this->dados['cartoes'] = $this->cartoes;
         $this->integracao->write($this->dados);
-        try {
-            $appsync = new \MZ\System\Synchronizer();
-            $appsync->integratorChanged();
-        } catch (\Exception $e) {
-            \Log::error($e->getMessage());
-        }
         return $cartao;
     }
 

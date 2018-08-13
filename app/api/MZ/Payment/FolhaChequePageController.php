@@ -55,7 +55,7 @@ class FolhaChequePageController extends \MZ\Core\Controller
             foreach ($folhas_de_cheques as $_folha_cheque) {
                 $items[] = $_folha_cheque->publish();
             }
-            json(['status' => 'ok', 'items' => $items]);
+            return $this->json()->success(['items' => $items]);
         }
 
         $_banco = $cheque->findBancoID();
@@ -75,16 +75,16 @@ class FolhaChequePageController extends \MZ\Core\Controller
         if (!$folha_cheque->exists()) {
             $msg = 'A folha de cheque não foi informada ou não existe';
             if (is_output('json')) {
-                json($msg);
+                return $this->json()->error($msg);
             }
             \Thunder::warning($msg);
-            redirect('/gerenciar/folha_cheque/');
+            return $this->redirect('/gerenciar/folha_cheque/');
         }
         try {
             $folha_cheque->recolher();
             $msg = sprintf('Folha de cheque "%s" compensada com sucesso!', $folha_cheque->getNumero());
             if (is_output('json')) {
-                json('msg', $msg);
+                return $this->json()->success([], $msg);
             }
             \Thunder::success($msg, true);
         } catch (\Exception $e) {
@@ -93,11 +93,11 @@ class FolhaChequePageController extends \MZ\Core\Controller
                 $folha_cheque->getNumero()
             );
             if (is_output('json')) {
-                json($msg);
+                return $this->json()->error($msg);
             }
             \Thunder::error($msg);
         }
-        redirect('/gerenciar/folha_cheque/');
+        return $this->redirect('/gerenciar/folha_cheque/');
     }
 
     /**

@@ -53,7 +53,7 @@ class EstadoPageController extends \MZ\Core\Controller
             foreach ($estados as $estado) {
                 $items[] = $estado->publish();
             }
-            json(['status' => 'ok', 'items' => $items]);
+            return $this->json()->success(['items' => $items]);
         }
 
         $pais = $estado->findPaisID();
@@ -82,17 +82,17 @@ class EstadoPageController extends \MZ\Core\Controller
                     $estado->getNome()
                 );
                 if (is_output('json')) {
-                    json(null, ['item' => $estado->publish(), 'msg' => $msg]);
+                    return $this->json()->success(['item' => $estado->publish()], $msg);
                 }
                 \Thunder::success($msg, true);
-                redirect('/gerenciar/estado/');
+                return $this->redirect('/gerenciar/estado/');
             } catch (\Exception $e) {
                 $estado->clean($old_estado);
                 if ($e instanceof \MZ\Exception\ValidationException) {
                     $errors = $e->getErrors();
                 }
                 if (is_output('json')) {
-                    json($e->getMessage(), null, ['errors' => $errors]);
+                    return $this->json()->error($e->getMessage(), null, $errors);
                 }
                 \Thunder::error($e->getMessage());
                 foreach ($errors as $key => $value) {
@@ -101,7 +101,7 @@ class EstadoPageController extends \MZ\Core\Controller
                 }
             }
         } elseif (is_output('json')) {
-            json('Nenhum dado foi enviado');
+            return $this->json()->error('Nenhum dado foi enviado');
         }
         $_paises = \MZ\Location\Pais::findAll();
         return $this->view('gerenciar_estado_cadastrar', get_defined_vars());
@@ -115,10 +115,10 @@ class EstadoPageController extends \MZ\Core\Controller
         if (!$estado->exists()) {
             $msg = 'O estado não foi informado ou não existe';
             if (is_output('json')) {
-                json($msg);
+                return $this->json()->error($msg);
             }
             \Thunder::warning($msg);
-            redirect('/gerenciar/estado/');
+            return $this->redirect('/gerenciar/estado/');
         }
         $focusctrl = 'nome';
         $errors = [];
@@ -134,17 +134,17 @@ class EstadoPageController extends \MZ\Core\Controller
                     $estado->getNome()
                 );
                 if (is_output('json')) {
-                    json(null, ['item' => $estado->publish(), 'msg' => $msg]);
+                    return $this->json()->success(['item' => $estado->publish()], $msg);
                 }
                 \Thunder::success($msg, true);
-                redirect('/gerenciar/estado/');
+                return $this->redirect('/gerenciar/estado/');
             } catch (\Exception $e) {
                 $estado->clean($old_estado);
                 if ($e instanceof \MZ\Exception\ValidationException) {
                     $errors = $e->getErrors();
                 }
                 if (is_output('json')) {
-                    json($e->getMessage(), null, ['errors' => $errors]);
+                    return $this->json()->error($e->getMessage(), null, $errors);
                 }
                 \Thunder::error($e->getMessage());
                 foreach ($errors as $key => $value) {
@@ -153,7 +153,7 @@ class EstadoPageController extends \MZ\Core\Controller
                 }
             }
         } elseif (is_output('json')) {
-            json('Nenhum dado foi enviado');
+            return $this->json()->error('Nenhum dado foi enviado');
         }
         $_paises = \MZ\Location\Pais::findAll();
         return $this->view('gerenciar_estado_editar', get_defined_vars());
@@ -167,17 +167,17 @@ class EstadoPageController extends \MZ\Core\Controller
         if (!$estado->exists()) {
             $msg = 'O estado não foi informado ou não existe';
             if (is_output('json')) {
-                json($msg);
+                return $this->json()->error($msg);
             }
             \Thunder::warning($msg);
-            redirect('/gerenciar/estado/');
+            return $this->redirect('/gerenciar/estado/');
         }
         try {
             $estado->delete();
             $estado->clean(new Estado());
             $msg = sprintf('Estado "%s" excluído com sucesso!', $estado->getNome());
             if (is_output('json')) {
-                json('msg', $msg);
+                return $this->json()->success([], $msg);
             }
             \Thunder::success($msg, true);
         } catch (\Exception $e) {
@@ -186,11 +186,11 @@ class EstadoPageController extends \MZ\Core\Controller
                 $estado->getNome()
             );
             if (is_output('json')) {
-                json($msg);
+                return $this->json()->error($msg);
             }
             \Thunder::error($msg);
         }
-        redirect('/gerenciar/estado/');
+        return $this->redirect('/gerenciar/estado/');
     }
 
     /**

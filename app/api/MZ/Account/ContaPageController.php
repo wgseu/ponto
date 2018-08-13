@@ -54,7 +54,7 @@ class ContaPageController extends \MZ\Core\Controller
             foreach ($contas as $_conta) {
                 $items[] = $_conta->publish();
             }
-            json(['status' => 'ok', 'items' => $items]);
+            return $this->json()->success(['items' => $items]);
         }
 
         $_cliente = $conta->findClienteID();
@@ -93,17 +93,17 @@ class ContaPageController extends \MZ\Core\Controller
                     $conta->getDescricao()
                 );
                 if (is_output('json')) {
-                    json(null, ['item' => $conta->publish(), 'msg' => $msg]);
+                    return $this->json()->success(['item' => $conta->publish()], $msg);
                 }
                 \Thunder::success($msg, true);
-                redirect('/gerenciar/conta/');
+                return $this->redirect('/gerenciar/conta/');
             } catch (\Exception $e) {
                 $conta->clean($old_conta);
                 if ($e instanceof \MZ\Exception\ValidationException) {
                     $errors = $e->getErrors();
                 }
                 if (is_output('json')) {
-                    json($e->getMessage(), null, ['errors' => $errors]);
+                    return $this->json()->error($e->getMessage(), null, $errors);
                 }
                 \Thunder::error($e->getMessage());
                 foreach ($errors as $key => $value) {
@@ -112,7 +112,7 @@ class ContaPageController extends \MZ\Core\Controller
                 }
             }
         } elseif (is_output('json')) {
-            json('Nenhum dado foi enviado');
+            return $this->json()->error('Nenhum dado foi enviado');
         }
         $classificacao_id_obj = $conta->findClassificacaoID();
         $sub_classificacao_id_obj = $conta->findSubClassificacaoID();
@@ -127,10 +127,10 @@ class ContaPageController extends \MZ\Core\Controller
         if (!$conta->exists()) {
             $msg = 'A conta não foi informada ou não existe';
             if (is_output('json')) {
-                json($msg);
+                return $this->json()->error($msg);
             }
             \Thunder::warning($msg);
-            redirect('/gerenciar/conta/');
+            return $this->redirect('/gerenciar/conta/');
         }
         $focusctrl = 'descricao';
         $errors = [];
@@ -147,17 +147,17 @@ class ContaPageController extends \MZ\Core\Controller
                     $conta->getDescricao()
                 );
                 if (is_output('json')) {
-                    json(null, ['item' => $conta->publish(), 'msg' => $msg]);
+                    return $this->json()->success(['item' => $conta->publish()], $msg);
                 }
                 \Thunder::success($msg, true);
-                redirect('/gerenciar/conta/');
+                return $this->redirect('/gerenciar/conta/');
             } catch (\Exception $e) {
                 $conta->clean($old_conta);
                 if ($e instanceof \MZ\Exception\ValidationException) {
                     $errors = $e->getErrors();
                 }
                 if (is_output('json')) {
-                    json($e->getMessage(), null, ['errors' => $errors]);
+                    return $this->json()->error($e->getMessage(), null, $errors);
                 }
                 \Thunder::error($e->getMessage());
                 foreach ($errors as $key => $value) {
@@ -166,7 +166,7 @@ class ContaPageController extends \MZ\Core\Controller
                 }
             }
         } elseif (is_output('json')) {
-            json('Nenhum dado foi enviado');
+            return $this->json()->error('Nenhum dado foi enviado');
         }
 
         $classificacao_id_obj = $conta->findClassificacaoID();
@@ -182,17 +182,17 @@ class ContaPageController extends \MZ\Core\Controller
         if (!$conta->exists()) {
             $msg = 'A conta não foi informada ou não existe';
             if (is_output('json')) {
-                json($msg);
+                return $this->json()->error($msg);
             }
             \Thunder::warning($msg);
-            redirect('/gerenciar/conta/');
+            return $this->redirect('/gerenciar/conta/');
         }
         try {
             $conta->delete();
             $conta->clean(new Conta());
             $msg = sprintf('Conta "%s" excluída com sucesso!', $conta->getDescricao());
             if (is_output('json')) {
-                json('msg', $msg);
+                return $this->json()->success([], $msg);
             }
             \Thunder::success($msg, true);
         } catch (\Exception $e) {
@@ -201,11 +201,11 @@ class ContaPageController extends \MZ\Core\Controller
                 $conta->getDescricao()
             );
             if (is_output('json')) {
-                json($msg);
+                return $this->json()->error($msg);
             }
             \Thunder::error($msg);
         }
-        redirect('/gerenciar/conta/');
+        return $this->redirect('/gerenciar/conta/');
     }
 
     /**

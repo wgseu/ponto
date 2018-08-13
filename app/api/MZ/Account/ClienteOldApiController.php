@@ -31,6 +31,7 @@ use MZ\Employee\Funcionario;
 use MZ\Device\Dispositivo;
 use MZ\System\Sistema;
 use MZ\Employee\Acesso;
+use MZ\Logger\Log;
 
 /**
  * Allow application to serve system resources
@@ -72,13 +73,13 @@ class ClienteOldApiController extends \MZ\Core\ApiController
             $item['imagemurl'] = $item['imagem'];
             $items[] = $item;
         }
-        json('clientes', $items);
+        return $this->json()->success(['clientes' => $items]);
     }
 
     public function register()
     {
         if (!is_login()) {
-            json('Usuário não autenticado!');
+            return $this->json()->error('Usuário não autenticado!');
         }
         $values = isset($_POST['cliente']) ? $_POST['cliente'] : [];
         $old_cliente = new Cliente();
@@ -97,16 +98,16 @@ class ClienteOldApiController extends \MZ\Core\ApiController
             $old_cliente->clean($cliente);
             $item = $cliente->publish();
             $item['imagemurl'] = $item['imagem'];
-            json('cliente', $item);
+            return $this->json()->success(['cliente' => $item]);
         } catch (\Exception $e) {
-            json($e->getMessage());
+            return $this->json()->error($e->getMessage());
         }
     }
 
     public function login()
     {
         if (!is_post()) {
-            json('Método incorreto');
+            return $this->json()->error('Método incorreto');
         }
         $usuario = isset($_POST['usuario']) ? strval($_POST['usuario']) : null;
         $senha = isset($_POST['senha']) ? strval($_POST['senha']) : null;
@@ -124,14 +125,14 @@ class ClienteOldApiController extends \MZ\Core\ApiController
                 \Thunder::error($msg);
                 return $this->view('conta_entrar', get_defined_vars());
             } else {
-                json($msg);
+                return $this->json()->error($msg);
             }
         }
         $funcionario = Funcionario::findByClienteID($cliente->getID());
         $dispositivo = new Dispositivo();
         if (!isset($_POST['metodo']) && $funcionario->exists()) {
             if (!$funcionario->has(Permissao::NOME_SISTEMA)) {
-                json('Você não tem permissão para acessar o sistema!');
+                return $this->json()->error('Você não tem permissão para acessar o sistema!');
             }
             try {
                 $device = isset($_POST['device']) ? $_POST['device'] : null;
@@ -141,13 +142,14 @@ class ClienteOldApiController extends \MZ\Core\ApiController
                 $dispositivo->register();
                 if (is_null($dispositivo->getValidacao())) {
                     throw new \Exception(
-                        'Este dispositivo ainda não foi validado, acesse o menu "Configurações" -> "Computadores e Tablets", ' .
+                        'Este dispositivo ainda não foi validado, ' .
+                        'acesse o menu "Configurações" -> "Computadores e Tablets", ' .
                         'selecione o tablet e clique no botão validar!',
                         1
                     );
                 }
             } catch (\Exception $e) {
-                json($e->getMessage());
+                return $this->json()->error($e->getMessage());
             }
         }
         
@@ -161,9 +163,9 @@ class ClienteOldApiController extends \MZ\Core\ApiController
         }
         if (isset($_POST['metodo'])) {
             $url = isset($_POST['redirect']) ? strval($_POST['redirect']) : get_redirect_page();
-            redirect($url);
+            return $this->redirect($url);
         }
-        $status = ['status' => 'ok', 'msg' => 'Login efetuado com sucesso!'];
+        $status = [];
         $status['versao'] = Sistema::VERSAO;
         $status['cliente'] = logged_user()->getID();
         $status['info'] = [
@@ -186,20 +188,19 @@ class ClienteOldApiController extends \MZ\Core\ApiController
         }
         $status['permissoes'] = $this->getApplication()->getAuthentication()->getPermissions();
         $status['token'] = $token;
-        json($status);
+        return $this->json()->success($status, 'Login efetuado com sucesso!');
     }
 
     public function logout()
     {
         $this->getApplication()->getAuthentication()->logout();
-        json(['status' => 'ok', 'msg' => 'Logout efetuado com sucesso!']);
+        return $this->json()->success([], 'Logout efetuado com sucesso!');
     }
 
     public function status()
     {
         $company = $this->getApplication()->getSystem()->getCompany();
         $status = [];
-        $status['status'] = 'ok';
         $status['info'] = [
             'empresa' => [
                 'nome' => $company->getNome(),
@@ -235,14 +236,13 @@ class ClienteOldApiController extends \MZ\Core\ApiController
                 }
                 $status['validacao'] = $dispositivo->getValidacao();
             } catch (\Exception $e) {
-                $status['status'] = 'error';
-                $status['msg'] = $e->getMessage();
+                return $this->json()->error($e->getMessage());
             }
             $status['token'] = $this->getApplication()->getAuthentication()->updateAuthorization();
         } else {
             $status['permissoes'] = [];
         }
-        json($status);
+        return $this->json()->success($status);
     }
 
     public function export()
@@ -443,8 +443,8 @@ class ClienteOldApiController extends \MZ\Core\ApiController
             header('Pragma: public'); // HTTP/1.0
             $objWriter->save('php://output');
         } catch (\Exception $e) {
-            \Log::error($e->getMessage());
-            json($e->getMessage());
+            Log::error($e->getMessage());
+            return $this->json()->error($e->getMessage());
         }
     }
 
@@ -456,37 +456,37 @@ class ClienteOldApiController extends \MZ\Core\ApiController
     {
         return [
             [
-                'name' => 'cliente_find',
+                'name' => 'app_cliente_find',
                 'path' => '/app/cliente/procurar',
                 'method' => 'GET',
                 'controller' => 'find',
             ],
             [
-                'name' => 'cliente_register',
+                'name' => 'app_cliente_register',
                 'path' => '/app/cliente/',
                 'method' => 'POST',
                 'controller' => 'register',
             ],
             [
-                'name' => 'cliente_login',
+                'name' => 'app_cliente_login',
                 'path' => '/app/conta/entrar',
                 'method' => 'POST',
                 'controller' => 'login',
             ],
             [
-                'name' => 'cliente_logout',
+                'name' => 'app_cliente_logout',
                 'path' => '/app/conta/sair',
                 'method' => 'GET',
                 'controller' => 'logout',
             ],
             [
-                'name' => 'cliente_status',
+                'name' => 'app_cliente_status',
                 'path' => '/app/conta/status',
                 'method' => 'GET',
                 'controller' => 'status',
             ],
             [
-                'name' => 'cliente_export',
+                'name' => 'app_cliente_export',
                 'path' => '/gerenciar/cliente/baixar',
                 'method' => 'GET',
                 'controller' => 'export',

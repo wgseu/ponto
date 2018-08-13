@@ -47,7 +47,7 @@ class LocalizacaoPageController extends \MZ\Core\Controller
         $cliente = $localizacao->findClienteID();
         if (!$cliente->exists()) {
             $msg = 'O cliente não foi informado ou não existe!';
-            json($msg);
+            return $this->json()->error($msg);
         }
         $order = Filter::order(isset($_GET['ordem']) ? $_GET['ordem'] : '');
         $count = Localizacao::count($condition);
@@ -58,7 +58,7 @@ class LocalizacaoPageController extends \MZ\Core\Controller
         foreach ($localizacoes as $_localizacao) {
             $items[] = $_localizacao->publish();
         }
-        json(['status' => 'ok', 'items' => $items]);
+        return $this->json()->success(['items' => $items]);
     }
 
     public function add()
@@ -96,7 +96,7 @@ class LocalizacaoPageController extends \MZ\Core\Controller
                     'Localização "%s" atualizada com sucesso!',
                     $localizacao->getLogradouro()
                 );
-                json(null, ['item' => $localizacao->publish(), 'msg' => $msg]);
+                return $this->json()->success(['item' => $localizacao->publish()], $msg);
             } catch (\Exception $e) {
                 DB::rollBack();
                 $localizacao->clean($old_localizacao);
@@ -104,10 +104,10 @@ class LocalizacaoPageController extends \MZ\Core\Controller
                 if ($e instanceof \MZ\Exception\ValidationException) {
                     $errors = $e->getErrors();
                 }
-                json($e->getMessage(), null, ['errors' => $errors]);
+                return $this->json()->error($e->getMessage(), null, $errors);
             }
         } else {
-            json('Nenhum dado foi enviado');
+            return $this->json()->error('Nenhum dado foi enviado');
         }
     }
 
@@ -119,13 +119,13 @@ class LocalizacaoPageController extends \MZ\Core\Controller
         $localizacao = Localizacao::findByID($id);
         if (!$localizacao->exists()) {
             $msg = 'A localização não foi informada ou não existe';
-            json($msg);
+            return $this->json()->error($msg);
         }
         if ($localizacao->getClienteID() == $this->getApplication()->getSystem()->getCompany()->getID() &&
             !logged_employee()->has(Permissao::NOME_ALTERARCONFIGURACOES)
         ) {
             $msg = 'Você não tem permissão para alterar o endereço dessa empresa!';
-            json($msg);
+            return $this->json()->error($msg);
         }
         $old_localizacao = $localizacao;
         if (is_post()) {
@@ -152,7 +152,7 @@ class LocalizacaoPageController extends \MZ\Core\Controller
                     'Localização "%s" atualizada com sucesso!',
                     $localizacao->getLogradouro()
                 );
-                json(null, ['item' => $localizacao->publish(), 'msg' => $msg]);
+                return $this->json()->success(['item' => $localizacao->publish()], $msg);
             } catch (\Exception $e) {
                 DB::rollBack();
                 $localizacao->clean($old_localizacao);
@@ -160,10 +160,10 @@ class LocalizacaoPageController extends \MZ\Core\Controller
                 if ($e instanceof \MZ\Exception\ValidationException) {
                     $errors = $e->getErrors();
                 }
-                json($e->getMessage(), null, ['errors' => $errors]);
+                return $this->json()->error($e->getMessage(), null, $errors);
             }
         } else {
-            json('Nenhum dado foi enviado');
+            return $this->json()->error('Nenhum dado foi enviado');
         }
     }
 
@@ -174,7 +174,7 @@ class LocalizacaoPageController extends \MZ\Core\Controller
         $localizacao = Localizacao::findByID($id);
         if (!$localizacao->exists()) {
             $msg = 'A localização não foi informada ou não existe';
-            json($msg);
+            return $this->json()->error($msg);
         }
         try {
             $localizacao->delete();
@@ -183,13 +183,13 @@ class LocalizacaoPageController extends \MZ\Core\Controller
                 'Localização "%s" excluída com sucesso!',
                 $localizacao->getApelido() ?: $localizacao->getLogradouro()
             );
-            json('msg', $msg);
+            return $this->json()->success([], $msg);
         } catch (\Exception $e) {
             $msg = sprintf(
                 'Não foi possível excluir a Localização "%s"!',
                 $localizacao->getApelido() ?: $localizacao->getLogradouro()
             );
-            json($msg);
+            return $this->json()->error($msg);
         }
     }
 

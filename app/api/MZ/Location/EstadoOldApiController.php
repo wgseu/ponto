@@ -34,14 +34,14 @@ class EstadoOldApiController extends \MZ\Core\ApiController
         $pais_id = isset($_GET['paisid']) ? $_GET['paisid'] : null;
         $pais = Pais::findByID($pais_id);
         if (!$pais->exists()) {
-            json('O país não foi informado ou não existe!');
+            return $this->json()->error('O país não foi informado ou não existe!');
         }
         $estados = Estado::findAll(['paisid' => $pais->getID()]);
         $items = [];
         foreach ($estados as $estado) {
             $items[] = $estado->publish();
         }
-        json('items', $items);
+        return $this->json()->success(['items' => $items]);
     }
 
     /**
@@ -52,7 +52,7 @@ class EstadoOldApiController extends \MZ\Core\ApiController
     {
         return [
             [
-                'name' => 'estado_find',
+                'name' => 'app_estado_find',
                 'path' => '/app/estado/',
                 'method' => 'GET',
                 'controller' => 'find',

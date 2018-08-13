@@ -36,11 +36,11 @@ class LocalizacaoOldApiController extends \MZ\Core\ApiController
         $estado_id = isset($_GET['estadoid']) ? $_GET['estadoid'] : null;
         $estado = Estado::findByID($estado_id);
         if (!$estado->exists()) {
-            json('O estado não foi informado ou não existe!');
+            return $this->json()->error('O estado não foi informado ou não existe!');
         }
         $cidade = Cidade::findByEstadoIDNome($estado_id, isset($_GET['cidade'])?trim($_GET['cidade']):null);
         if (!$cidade->exists()) {
-            json('A cidade informada não existe!');
+            return $this->json()->error('A cidade informada não existe!');
         }
         $condition = Filter::query($_GET);
         $condition['cidadeid'] = $cidade->getID();
@@ -65,7 +65,7 @@ class LocalizacaoOldApiController extends \MZ\Core\ApiController
             $item['bairro'] = $bairro->getNome();
             $items[] = $item;
         }
-        json('items', $items);
+        return $this->json()->success(['items' => $items]);
     }
 
     /**
@@ -76,7 +76,7 @@ class LocalizacaoOldApiController extends \MZ\Core\ApiController
     {
         return [
             [
-                'name' => 'localizacao_find',
+                'name' => 'app_localizacao_find',
                 'path' => '/app/localizacao/',
                 'method' => 'GET',
                 'controller' => 'find',

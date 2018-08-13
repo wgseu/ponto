@@ -42,9 +42,9 @@ class AcessoPageController extends \MZ\Core\Controller
         $funcao = Funcao::findByID($funcao_id);
         if (!$funcao->exists()) {
             if (is_output('json')) {
-                json('A função não foi informada ou não existe');
+                return $this->json()->error('A função não foi informada ou não existe');
             }
-            redirect('/gerenciar/funcao/');
+            return $this->redirect('/gerenciar/funcao/');
         }
         $errors = [];
         if (is_post()) {
@@ -67,15 +67,15 @@ class AcessoPageController extends \MZ\Core\Controller
                     $acesso->delete();
                 }
                 if (is_output('json')) {
-                    json(['status' => 'ok']);
+                    return $this->json()->success();
                 }
-                redirect('/gerenciar/acesso/?funcao=' . $funcao->getID());
+                return $this->redirect('/gerenciar/acesso/?funcao=' . $funcao->getID());
             } catch (\Exception $e) {
                 if ($e instanceof \MZ\Exception\ValidationException) {
                     $errors = $e->getErrors();
                 }
                 if (is_output('json')) {
-                    json($e->getMessage(), null, ['errors' => $errors]);
+                    return $this->json()->error($e->getMessage(), null, $errors);
                 }
                 \Thunder::error($e->getMessage());
                 foreach ($errors as $key => $value) {
@@ -100,7 +100,7 @@ class AcessoPageController extends \MZ\Core\Controller
                 $item['marcado'] = $acesso->exists() ? 'Y' : 'N';
                 $items[] = $item;
             }
-            json(['status' => 'ok', 'items' => $items]);
+            return $this->json()->success(['items' => $items]);
         }
         return $this->view('gerenciar_acesso_index', get_defined_vars());
     }

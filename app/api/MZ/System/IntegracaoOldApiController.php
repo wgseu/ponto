@@ -33,13 +33,13 @@ class IntegracaoOldApiController extends \MZ\Core\ApiController
     {
         need_permission(Permissao::NOME_ALTERARCONFIGURACOES, true);
         if (!is_post()) {
-            json('Nenhum dado foi enviado');
+            return $this->json()->error('Nenhum dado foi enviado');
         }
         $id = isset($_POST['id'])?$_POST['id']:null;
         $integracao = Integracao::findByID($id);
         if (!$integracao->exists()) {
             $msg = 'A integração não foi informada ou não existe';
-            json($msg);
+            return $this->json()->error($msg);
         }
         $old_integracao = $integracao;
         try {
@@ -51,14 +51,14 @@ class IntegracaoOldApiController extends \MZ\Core\ApiController
                 'Integração "%s" atualizada com sucesso!',
                 $integracao->getNome()
             );
-            json(null, ['item' => $integracao->publish(), 'msg' => $msg]);
+            return $this->json()->success(['item' => $integracao->publish()], $msg);
         } catch (\Exception $e) {
             $integracao->clean($old_integracao);
             $errors = [];
             if ($e instanceof \MZ\Exception\ValidationException) {
                 $errors = $e->getErrors();
             }
-            json($e->getMessage(), null, ['errors' => $errors]);
+            return $this->json()->error($e->getMessage(), null, $errors);
         }
     }
 
@@ -70,7 +70,7 @@ class IntegracaoOldApiController extends \MZ\Core\ApiController
     {
         return [
             [
-                'name' => 'integracao_update',
+                'name' => 'app_integracao_update',
                 'path' => '/gerenciar/integracao/opcoes',
                 'method' => 'POST',
                 'controller' => 'update',

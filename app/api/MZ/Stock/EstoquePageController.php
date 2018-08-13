@@ -53,7 +53,7 @@ class EstoquePageController extends \MZ\Core\Controller
             foreach ($estoques as $_estoque) {
                 $items[] = $_estoque->publish();
             }
-            json(['status' => 'ok', 'items' => $items]);
+            return $this->json()->success(['items' => $items]);
         }
 
         $_produto = $estoque->findProdutoID();
@@ -71,10 +71,10 @@ class EstoquePageController extends \MZ\Core\Controller
         if (!$estoque->exists()) {
             $msg = 'O estoque não foi informado ou não existe';
             if (is_output('json')) {
-                json($msg);
+                return $this->json()->error($msg);
             }
             \Thunder::warning($msg);
-            redirect('/gerenciar/estoque/');
+            return $this->redirect('/gerenciar/estoque/');
         }
         try {
             $produto = $estoque->findProdutoID();
@@ -85,17 +85,17 @@ class EstoquePageController extends \MZ\Core\Controller
                 strval($estoque->getQuantidade())
             );
             if (is_output('json')) {
-                json('msg', $msg);
+                return $this->json()->success([], $msg);
             }
             \Thunder::success($msg, true);
         } catch (\Exception $e) {
             $msg = $e->getMessage();
             if (is_output('json')) {
-                json($msg);
+                return $this->json()->error($msg);
             }
             \Thunder::error($msg);
         }
-        redirect('/gerenciar/estoque/');
+        return $this->redirect('/gerenciar/estoque/');
     }
 
     /**

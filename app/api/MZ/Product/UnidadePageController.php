@@ -53,7 +53,7 @@ class UnidadePageController extends \MZ\Core\Controller
             foreach ($unidades as $_unidade) {
                 $items[] = $_unidade->publish();
             }
-            json(['status' => 'ok', 'items' => $items]);
+            return $this->json()->success(['items' => $items]);
         }
 
         return $this->view('gerenciar_unidade_index', get_defined_vars());
@@ -80,17 +80,17 @@ class UnidadePageController extends \MZ\Core\Controller
                     $unidade->getNome()
                 );
                 if (is_output('json')) {
-                    json(null, ['item' => $unidade->publish(), 'msg' => $msg]);
+                    return $this->json()->success(['item' => $unidade->publish()], $msg);
                 }
                 \Thunder::success($msg, true);
-                redirect('/gerenciar/unidade/');
+                return $this->redirect('/gerenciar/unidade/');
             } catch (\Exception $e) {
                 $unidade->clean($old_unidade);
                 if ($e instanceof \MZ\Exception\ValidationException) {
                     $errors = $e->getErrors();
                 }
                 if (is_output('json')) {
-                    json($e->getMessage(), null, ['errors' => $errors]);
+                    return $this->json()->error($e->getMessage(), null, $errors);
                 }
                 \Thunder::error($e->getMessage());
                 foreach ($errors as $key => $value) {
@@ -99,7 +99,7 @@ class UnidadePageController extends \MZ\Core\Controller
                 }
             }
         } elseif (is_output('json')) {
-            json('Nenhum dado foi enviado');
+            return $this->json()->error('Nenhum dado foi enviado');
         }
         return $this->view('gerenciar_unidade_cadastrar', get_defined_vars());
     }
@@ -112,10 +112,10 @@ class UnidadePageController extends \MZ\Core\Controller
         if (!$unidade->exists()) {
             $msg = 'A unidade não foi informada ou não existe';
             if (is_output('json')) {
-                json($msg);
+                return $this->json()->error($msg);
             }
             \Thunder::warning($msg);
-            redirect('/gerenciar/unidade/');
+            return $this->redirect('/gerenciar/unidade/');
         }
         $focusctrl = 'nome';
         $errors = [];
@@ -131,17 +131,17 @@ class UnidadePageController extends \MZ\Core\Controller
                     $unidade->getNome()
                 );
                 if (is_output('json')) {
-                    json(null, ['item' => $unidade->publish(), 'msg' => $msg]);
+                    return $this->json()->success(['item' => $unidade->publish()], $msg);
                 }
                 \Thunder::success($msg, true);
-                redirect('/gerenciar/unidade/');
+                return $this->redirect('/gerenciar/unidade/');
             } catch (\Exception $e) {
                 $unidade->clean($old_unidade);
                 if ($e instanceof \MZ\Exception\ValidationException) {
                     $errors = $e->getErrors();
                 }
                 if (is_output('json')) {
-                    json($e->getMessage(), null, ['errors' => $errors]);
+                    return $this->json()->error($e->getMessage(), null, $errors);
                 }
                 \Thunder::error($e->getMessage());
                 foreach ($errors as $key => $value) {
@@ -150,7 +150,7 @@ class UnidadePageController extends \MZ\Core\Controller
                 }
             }
         } elseif (is_output('json')) {
-            json('Nenhum dado foi enviado');
+            return $this->json()->error('Nenhum dado foi enviado');
         }
         return $this->view('gerenciar_unidade_editar', get_defined_vars());
     }
@@ -163,17 +163,17 @@ class UnidadePageController extends \MZ\Core\Controller
         if (!$unidade->exists()) {
             $msg = 'A unidade não foi informada ou não existe';
             if (is_output('json')) {
-                json($msg);
+                return $this->json()->error($msg);
             }
             \Thunder::warning($msg);
-            redirect('/gerenciar/unidade/');
+            return $this->redirect('/gerenciar/unidade/');
         }
         try {
             $unidade->delete();
             $unidade->clean(new Unidade());
             $msg = sprintf('Unidade "%s" excluída com sucesso!', $unidade->getNome());
             if (is_output('json')) {
-                json('msg', $msg);
+                return $this->json()->success([], $msg);
             }
             \Thunder::success($msg, true);
         } catch (\Exception $e) {
@@ -182,11 +182,11 @@ class UnidadePageController extends \MZ\Core\Controller
                 $unidade->getNome()
             );
             if (is_output('json')) {
-                json($msg);
+                return $this->json()->error($msg);
             }
             \Thunder::error($msg);
         }
-        redirect('/gerenciar/unidade/');
+        return $this->redirect('/gerenciar/unidade/');
     }
 
     /**

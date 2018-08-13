@@ -68,7 +68,7 @@ class FuncionarioOldApiController extends \MZ\Core\ApiController
             $item['imagemurl'] = $cliente_item['imagem'];
             $items[] = array_intersect_key($item, array_flip($campos));
         }
-        json('items', $items);
+        return $this->json()->success(['items' => $items]);
     }
 
     /**
@@ -79,7 +79,7 @@ class FuncionarioOldApiController extends \MZ\Core\ApiController
     {
         return [
             [
-                'name' => 'funcionario_find',
+                'name' => 'app_funcionario_find',
                 'path' => '/app/funcionario/',
                 'method' => 'GET',
                 'controller' => 'find',

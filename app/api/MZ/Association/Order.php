@@ -49,7 +49,6 @@ use MZ\Product\Produto;
 use MZ\Product\Composicao;
 use MZ\Session\Sessao;
 use MZ\Session\Movimentacao;
-use MZ\System\Synchronizer;
 use MZ\Exception\RedirectException;
 
 class Order extends Pedido
@@ -735,9 +734,14 @@ class Order extends Pedido
         return $added;
     }
 
-    public function process($synchronize = true)
+    /**
+     * Add items to existing order, create a new order when don't exists
+     *
+     * @return boolean true if order has created or false if already exists
+     */
+    public function process()
     {
-        $action = Synchronizer::ACTION_ADDED;
+        $new_order = false;
         try {
             DB::beginTransaction();
             $this->validaAcesso($this->employee);
@@ -764,7 +768,7 @@ class Order extends Pedido
                 $this->setFuncionarioID($this->employee->getID());
                 $this->filter(new Pedido());
                 $this->insert();
-                $action = Synchronizer::ACTION_OPEN;
+                $new_order = true;
             }
             $viagem = !$this->getLocalizacaoID();
             if (!is_null($this->localization) && !is_null($this->getClienteID())) {
@@ -780,44 +784,10 @@ class Order extends Pedido
                     $pagamento->insert();
                 }
             }
-            if ($added > 0 && $action != Synchronizer::ACTION_OPEN && $this->getEstado() != self::ESTADO_ATIVO) {
-                $action = Synchronizer::ACTION_STATE;
+            if ($added > 0 && !$new_order && $this->getEstado() != self::ESTADO_ATIVO) {
                 if (in_array($this->getTipo(), [self::TIPO_MESA, self::TIPO_COMANDA])) {
                     $this->setEstado(self::ESTADO_ATIVO);
                     $this->update();
-                }
-            }
-            if ($synchronize) {
-                $sync = new Synchronizer();
-                if ($action != Synchronizer::ACTION_ADDED) {
-                    $sync->updateOrder(
-                        $this->getID(),
-                        $this->getTipo(),
-                        $this->getMesaID(),
-                        $this->getComandaID(),
-                        $action
-                    );
-                }
-                if ($action == Synchronizer::ACTION_OPEN) {
-                    $senha_balcao = is_boolean_config('Imprimir', 'Senha.Paineis');
-                    $comanda_senha = is_boolean_config('Imprimir', 'Comanda.Senha');
-                    if (($senha_balcao && $this->getTipo() == self::TIPO_AVULSO) ||
-                        ($comanda_senha && $this->getTipo() == self::TIPO_COMANDA)
-                    ) {
-                        $sync->printQueue($this->getID());
-                    }
-                }
-                if ($added > 0) {
-                    $sync->updateOrder(
-                        $this->getID(),
-                        $this->getTipo(),
-                        $this->getMesaID(),
-                        $this->getComandaID(),
-                        Synchronizer::ACTION_ADDED
-                    );
-                    if (!$this->needMovimentacao()) {
-                        $sync->printServices($this->getID());
-                    }
                 }
             }
             DB::commit();
@@ -825,7 +795,7 @@ class Order extends Pedido
             DB::rollBack();
             throw $e;
         }
-        return $action;
+        return $new_order;
     }
 
     /**

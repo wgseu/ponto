@@ -36,7 +36,7 @@ class EmitenteOldApiController extends \MZ\Core\ApiController
         need_permission(Permissao::NOME_ALTERARCONFIGURACOES, true);
         
         if (!is_post()) {
-            json('Nenhum dado foi enviado');
+            return $this->json()->error('Nenhum dado foi enviado');
         }
         
         try {
@@ -54,15 +54,21 @@ class EmitenteOldApiController extends \MZ\Core\ApiController
                 throw new \Exception('Senha incorreta', 1);
             }
             $certinfo = openssl_x509_parse($cert_info['cert']);
-            file_put_contents($this->getApplication()->getPath('public') . get_document_url('public.pem', 'cert'), $cert_info['cert']);
-            file_put_contents($this->getApplication()->getPath('public') . get_document_url('private.pem', 'cert'), $cert_info['pkey']);
-            json('chave', [
+            file_put_contents(
+                $this->getApplication()->getPath('public') . get_document_url('public.pem', 'cert'),
+                $cert_info['cert']
+            );
+            file_put_contents(
+                $this->getApplication()->getPath('public') . get_document_url('private.pem', 'cert'),
+                $cert_info['pkey']
+            );
+            return $this->json()->success(['chave' => [
                 'publica' => 'public.pem',
                 'privada' => 'private.pem',
                 'expiracao' => date('Y-m-d H:i:s', $certinfo['validTo_time_t']),
-            ]);
+            ]]);
         } catch (\Exception $e) {
-            json($e->getMessage());
+            return $this->json()->error($e->getMessage());
         }
     }
 
@@ -74,7 +80,7 @@ class EmitenteOldApiController extends \MZ\Core\ApiController
     {
         return [
             [
-                'name' => 'emitente_certificate',
+                'name' => 'app_emitente_certificate',
                 'path' => '/gerenciar/emitente/certificado',
                 'method' => 'POST',
                 'controller' => 'certificate',

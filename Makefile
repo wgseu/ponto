@@ -33,6 +33,9 @@ help:
 init:
 	@echo "Initializing..."
 	@mkdir -p $(DB_DUMPS_DIR)
+	@mkdir -p storage/logs
+	@mkdir -p storage/app/cache
+	@mkdir -p storage/app/compiled
 	@mkdir -p public/static/doc/conta
 	@mkdir -p public/static/doc/cert
 	@mkdir -p public/static/img/categoria
@@ -121,6 +124,8 @@ class:
 reset:
 	@chmod 777 storage
 	@chmod 777 storage/logs
+	@chmod 777 storage/app/cache
+	@chmod 777 storage/app/compiled
 	@chmod 777 public/static/doc/conta
 	@chmod 777 public/static/doc/cert
 	@chmod 777 public/static/img/categoria

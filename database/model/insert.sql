@@ -1,8 +1,12 @@
-SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0;
-SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0;
 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='TRADITIONAL,ALLOW_INVALID_DATES';
 
 USE `GrandChef`;
+
+INSERT INTO `Servidores` (`ID`, `GUID`) VALUES
+	(1, UUID());
+
+INSERT INTO `Sistema` (`ID`, `ServidorID`, `VersaoDB`, `UltimoBackup`, `Computadores`) VALUES
+	('1', 1, "1.9.3.5", NOW(), 1);
 
 INSERT INTO `Moedas` (`ID`, `Nome`, `Simbolo`, `Codigo`, `Divisao`, `Fracao`, `Formato`) VALUES
 	(1, "Real", "R$", "BRL", 100, "Centavo", "R$ %s"),
@@ -15,6 +19,9 @@ INSERT INTO `Paises` (`ID`, `Nome`, `Sigla`, `Codigo`, `MoedaID`, `BandeiraIndex
 	(2, "United States of America", "USA", "US", 2, 220, 1033, 'W1RpdHVsb10NCkNFUD1aSVANCkNQRj1TU04NCg0KW01hc2NhcmFdDQpDRVA9OTk5OTkNCkNQRj05OTktOTktOTk5OQ0KVGVsZWZvbmU9KDk5OSkgOTk5LTk5OTkNCg0KW0F1ZGl0b3JpYV0NCg0K', 'N'),
 	(3, "España", "ESP", "ES", 3, 66, 1034, 'W1RpdHVsb10NCkNOUEo9UlVUDQpDUEY9TlVJUA0KQ0VQPUNPUA0KDQpbTWFzY2FyYV0NCkNQRj05Ljk5OS45OTkuOTk5DQpDRVA9OTk5OTkNCkNOUEo9OTkuOTk5Ljk5OS05DQpUZWxlZm9uZT05OTkgOTk5IDk5OQ0KDQo=', 'Y'),
 	(4, "Moçambique", "MOZ", "MZ", 4, 151, 1046, 'W1RpdHVsb10NCkNOUEo9TlVJVA0KQ0VQPUNPUA0KDQpbTWFzY2FyYV0NCkNOUEo9OS45OTk5OTk5LTkNCkNFUD05OTk5DQpUZWxlZm9uZT05OTk5LTk5OTk5DQoNCg==', 'Y');
+
+INSERT INTO `Empresas` (`ID`, `PaisID`) VALUES
+	('1', 1);
 
 INSERT INTO `Estados` (`ID`, `PaisID`, `Nome`, `UF`) VALUES
 	(1, 1, "Acre", "AC"),
@@ -335,29 +342,35 @@ INSERT INTO `Acessos` (`FuncaoID`, `PermissaoID`) VALUES
 	(7, 81),
 	(7, 96);
 
-INSERT INTO `Mesas` (`ID`, `Nome`, `Ativa`) VALUES
-	(1, "Mesa 1", 'Y'),
-	(2, "Mesa 2", 'Y'),
-	(3, "Mesa 3", 'Y'),
-	(4, "Mesa 4", 'Y'),
-	(5, "Mesa 5", 'Y'),
-	(6, "Mesa 6", 'Y'),
-	(7, "Mesa 7", 'Y'),
-	(8, "Mesa 8", 'Y'),
-	(9, "Mesa 9", 'Y'),
-	(10, "Mesa 10", 'Y');
+INSERT INTO `Setores` (`ID`, `Nome`, `Descricao`) VALUES
+	(1, "Vendas", "Setor de vendas"),
+	(2, "Cozinha", "Cozinha"),
+	(3, "Churrasqueira", "Churrasqueira"),
+	(4, "Bar", "Setor de bebidas");
+
+INSERT INTO `Mesas` (`ID`, `Numero`, `Nome`, `Ativa`) VALUES
+	(1, 1, "Mesa 1", 'Y'),
+	(2, 2, "Mesa 2", 'Y'),
+	(3, 3, "Mesa 3", 'Y'),
+	(4, 4, "Mesa 4", 'Y'),
+	(5, 5, "Mesa 5", 'Y'),
+	(6, 6, "Mesa 6", 'Y'),
+	(7, 7, "Mesa 7", 'Y'),
+	(8, 8, "Mesa 8", 'Y'),
+	(9, 9, "Mesa 9", 'Y'),
+	(10, 10, "Mesa 10", 'Y');
 	
-INSERT INTO `Comandas` (`ID`, `Nome`, `Ativa`) VALUES
-	(1, "Comanda 1", 'Y'),
-	(2, "Comanda 2", 'Y'),
-	(3, "Comanda 3", 'Y'),
-	(4, "Comanda 4", 'Y'),
-	(5, "Comanda 5", 'Y'),
-	(6, "Comanda 6", 'Y'),
-	(7, "Comanda 7", 'Y'),
-	(8, "Comanda 8", 'Y'),
-	(9, "Comanda 9", 'Y'),
-	(10, "Comanda 10", 'Y');
+INSERT INTO `Comandas` (`ID`, `Numero`, `Nome`, `Ativa`) VALUES
+	(1, 1, "Comanda 1", 'Y'),
+	(2, 2, "Comanda 2", 'Y'),
+	(3, 3, "Comanda 3", 'Y'),
+	(4, 4, "Comanda 4", 'Y'),
+	(5, 5, "Comanda 5", 'Y'),
+	(6, 6, "Comanda 6", 'Y'),
+	(7, 7, "Comanda 7", 'Y'),
+	(8, 8, "Comanda 8", 'Y'),
+	(9, 9, "Comanda 9", 'Y'),
+	(10, 10, "Comanda 10", 'Y');
 
 INSERT INTO `Clientes` (`ID`, `Tipo`, `Login`, `Senha`, `Nome`, `Sobrenome`, `Genero`, `Fone1`, `DataAtualizacao`, `DataCadastro`) VALUES
 	(1, 'Fisica', "Admin", "e14268a48adfacfdaed1d420573f69df7ce4b829", "Administrador", "do Sistema", 'Masculino', "0000000001", NOW(), NOW());
@@ -403,12 +416,6 @@ INSERT INTO `Categorias` (`ID`, `Descricao`, `Servico`, `DataAtualizacao`) VALUE
 	(10, "Lanches", 'Y', NOW()),
 	(11, "Porções", 'Y', NOW()),
 	(12, "Bebidas Tropicais", 'N', NOW());
-
-INSERT INTO `Setores` (`ID`, `Nome`, `Descricao`) VALUES
-	(1, "Vendas", "Setor de vendas"),
-	(2, "Cozinha", "Cozinha"),
-	(3, "Churrasqueira", "Churrasqueira"),
-	(4, "Bar", "Setor de bebidas");
 
 INSERT INTO `Unidades` (`Nome`, `Descricao`, `Sigla`) VALUES
 	("Unidade", "Unidade", "UN"),
@@ -631,9 +638,4 @@ INSERT INTO `Integracoes` (`Nome`, `AcessoURL`, `Descricao`, `IconeURL`, `Ativo`
 	('iFood', 'ifood', 'Módulo de integração com o iFood', 'ifood.png', 'N', NOW()),
 	('Kromax', 'kromax', 'Módulo de integração com a Kromax', 'kromax.png', 'N', NOW());
 
-INSERT INTO `Sistema` (`ID`, `PaisID`, `VersaoDB`, `UltimoBackup`, `Computadores`) VALUES
-	(1, 1, "1.9.3.5", NOW(), 1);
-
 SET SQL_MODE=@OLD_SQL_MODE;
-SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
-SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;

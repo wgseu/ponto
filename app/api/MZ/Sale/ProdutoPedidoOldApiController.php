@@ -35,6 +35,7 @@ class ProdutoPedidoOldApiController extends \MZ\Core\ApiController
     public function export()
     {
         need_permission(Permissao::NOME_RELATORIOVENDAS, true);
+        set_time_limit(0);
 
         try {
             $formato = isset($_GET['formato']) ? $_GET['formato'] : null;

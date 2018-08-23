@@ -160,8 +160,8 @@ class Order extends Pedido
         $this->setEstado(self::ESTADO_AGENDADO);
         $this->setPessoas(1);
         $this->setCancelado('N');
-        // agenda para o mesmo horário do pedido
-        $this->setDataAgendamento($this->getDataCriacao());
+        $data_entrega = Document::childValue($body_pedido, 'dataEntrega');
+        $this->setDataAgendamento(Filter::datetime($data_entrega));
         $this->customer = new Cliente();
         $nome = Document::childValue($body_pedido, 'nome');
         $this->customer->setNomeCompleto(Filter::name($nome));

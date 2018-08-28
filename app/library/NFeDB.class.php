@@ -213,8 +213,6 @@ class NFeDB extends \NFe\Database\Estatico
         $desconto = 0;
         $servicos = 0;
         $frete = 0;
-        $acumulador = 0;
-        $produto_fracionado = null;
         foreach ($_itens as $_item) {
             // descontos
             if (is_less($_item->getPreco(), 0)) {
@@ -245,15 +243,6 @@ class NFeDB extends \NFe\Database\Estatico
             $produto->setUnidade($_unidade->processaSigla($_item->getQuantidade(), $_produto->getConteudo()));
             $produto->setPreco($_item->getSubvenda());
             $produto->setDespesas($_item->getComissao());
-            $diff = $produto->getPreco() - floatval($produto->getPreco(true));
-            if (abs($diff) > 0 || $produto_fracionado === null) {
-                $produto_fracionado = $produto;
-            }
-            $acumulador += $diff;
-            if (abs($acumulador) > 0.005 && abs($diff) > 0) {
-                $produto->setPreco(floatval($produto->getPreco(true)) + $acumulador);
-                $acumulador = $produto->getPreco() - floatval($produto->getPreco(true));
-            }
             // pode acontecer de alterar o preço para mais em vez de dar desconto
             $descontos = $_item->getDescontos();
             if (is_less($descontos, 0)) {
@@ -351,8 +340,12 @@ class NFeDB extends \NFe\Database\Estatico
         }
         $nota->setPagamentos($pagamentos);
         // corrige centavos a mais no pagamento
-        if ($produto_fracionado !== null && abs($saldo) >= 0.01) {
-            $produto_fracionado->setPreco($produto_fracionado->getPreco() - $saldo);
+        if (!is_equal($saldo, 0) && !is_null($produto_maximo)) {
+            if (is_less($saldo, 0)) {
+                $produto_maximo->setDespesas($produto_maximo->getDespesas() - $saldo);
+            } else {
+                $produto_maximo->setDesconto($produto_maximo->getDesconto() + $saldo);
+            }
         }
         return $nota;
     }

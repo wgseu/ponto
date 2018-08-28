@@ -100,7 +100,7 @@ class NFeUtil extends \NFe\Common\Util
             case FormaPagto::TIPO_CREDITO:
                 return \NFe\Entity\Pagamento::FORMA_CREDIARIO;
             case FormaPagto::TIPO_TRANSFERENCIA:
-                return \NFe\Entity\Pagamento::FORMA_DEBITO;
+                return \NFe\Entity\Pagamento::FORMA_OUTROS;
         }
         return \NFe\Entity\Pagamento::FORMA_OUTROS;
     }
@@ -145,8 +145,17 @@ class NFeUtil extends \NFe\Common\Util
             return $code;
         }
         $estado = $app->getSystem()->getState();
-        if ($estado->getUF() == 'PR') {
-            $code = 'SEM GTIN';
+        switch ($estado->getUF()) {
+            case 'AM':
+            case 'CE':
+            case 'GO':
+            case 'MG':
+            case 'MS':
+            case 'SP':
+                break;
+            default:
+                $code = 'SEM GTIN';
+                break;
         }
         return $code;
     }

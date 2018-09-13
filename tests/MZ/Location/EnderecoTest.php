@@ -24,7 +24,7 @@
  */
 namespace MZ\Location;
 
-class EnderecoTest extends \PHPUnit_Framework_TestCase
+class EnderecoTest extends \MZ\Framework\TestCase
 {
     public function testPublish()
     {

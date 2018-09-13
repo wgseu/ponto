@@ -24,7 +24,7 @@
  */
 namespace MZ\Account;
 
-class ClassificacaoTest extends \PHPUnit_Framework_TestCase
+class ClassificacaoTest extends \MZ\Framework\TestCase
 {
     public function testFromArray()
     {
@@ -96,7 +96,7 @@ class ClassificacaoTest extends \PHPUnit_Framework_TestCase
         $found_classificacao = Classificacao::findByID($classificacao->getID());
         $this->assertEquals($classificacao, $found_classificacao);
         $classificacao->setID('');
-        $this->setExpectedException('\Exception');
+        $this->expectException('\Exception');
         $classificacao->update();
     }
 
@@ -110,7 +110,7 @@ class ClassificacaoTest extends \PHPUnit_Framework_TestCase
         $found_classificacao = Classificacao::findByID($classificacao->getID());
         $this->assertEquals(new Classificacao(), $found_classificacao);
         $classificacao->setID('');
-        $this->setExpectedException('\Exception');
+        $this->expectException('\Exception');
         $classificacao->delete();
     }
 

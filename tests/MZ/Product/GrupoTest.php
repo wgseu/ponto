@@ -24,7 +24,7 @@
  */
 namespace MZ\Product;
 
-class GrupoTest extends \PHPUnit_Framework_TestCase
+class GrupoTest extends \MZ\Framework\TestCase
 {
     public function testPublish()
     {

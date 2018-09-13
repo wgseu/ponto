@@ -26,7 +26,7 @@ namespace MZ\Util;
 
 use MZ\Account\Cliente;
 
-class GenderTest extends \PHPUnit_Framework_TestCase
+class GenderTest extends \MZ\Framework\TestCase
 {
     public function testDetectMasculino()
     {

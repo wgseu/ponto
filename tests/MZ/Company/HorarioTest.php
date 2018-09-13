@@ -24,7 +24,7 @@
  */
 namespace MZ\Company;
 
-class HorarioTest extends \PHPUnit_Framework_TestCase
+class HorarioTest extends \MZ\Framework\TestCase
 {
     public function testFromArray()
     {
@@ -105,7 +105,7 @@ class HorarioTest extends \PHPUnit_Framework_TestCase
         $found_horario = Horario::findByID($horario->getID());
         $this->assertEquals($horario, $found_horario);
         $horario->setID('');
-        $this->setExpectedException('\Exception');
+        $this->expectException('\Exception');
         $horario->update();
     }
 
@@ -120,7 +120,7 @@ class HorarioTest extends \PHPUnit_Framework_TestCase
         $found_horario = Horario::findByID($horario->getID());
         $this->assertEquals(new Horario(), $found_horario);
         $horario->setID('');
-        $this->setExpectedException('\Exception');
+        $this->expectException('\Exception');
         $horario->delete();
     }
 

@@ -24,7 +24,7 @@
  */
 namespace MZ\Location;
 
-class BairroTest extends \PHPUnit_Framework_TestCase
+class BairroTest extends \MZ\Framework\TestCase
 {
     public function testPublish()
     {

@@ -24,7 +24,7 @@
  */
 namespace MZ\Product;
 
-class InformacaoTest extends \PHPUnit_Framework_TestCase
+class InformacaoTest extends \MZ\Framework\TestCase
 {
     public function testPublish()
     {

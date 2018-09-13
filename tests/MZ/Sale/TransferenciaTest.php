@@ -24,7 +24,7 @@
  */
 namespace MZ\Sale;
 
-class TransferenciaTest extends \PHPUnit_Framework_TestCase
+class TransferenciaTest extends \MZ\Framework\TestCase
 {
     public function testPublish()
     {

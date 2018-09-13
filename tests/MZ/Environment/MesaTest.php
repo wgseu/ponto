@@ -24,7 +24,7 @@
  */
 namespace MZ\Environment;
 
-class MesaTest extends \PHPUnit_Framework_TestCase
+class MesaTest extends \MZ\Framework\TestCase
 {
     public function testFromArray()
     {
@@ -102,7 +102,7 @@ class MesaTest extends \PHPUnit_Framework_TestCase
         $found_mesa = Mesa::findByID($mesa->getID());
         $this->assertEquals($mesa, $found_mesa);
         $mesa->setID('');
-        $this->setExpectedException('\Exception');
+        $this->expectException('\Exception');
         $mesa->update();
     }
 
@@ -117,7 +117,7 @@ class MesaTest extends \PHPUnit_Framework_TestCase
         $found_mesa = Mesa::findByID($mesa->getID());
         $this->assertEquals(new Mesa(), $found_mesa);
         $mesa->setID('');
-        $this->setExpectedException('\Exception');
+        $this->expectException('\Exception');
         $mesa->delete();
     }
 

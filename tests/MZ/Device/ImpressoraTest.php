@@ -24,7 +24,7 @@
  */
 namespace MZ\Device;
 
-class ImpressoraTest extends \PHPUnit_Framework_TestCase
+class ImpressoraTest extends \MZ\Framework\TestCase
 {
     public function testPublish()
     {

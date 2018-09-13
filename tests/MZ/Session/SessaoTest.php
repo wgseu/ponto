@@ -24,7 +24,7 @@
  */
 namespace MZ\Session;
 
-class SessaoTest extends \PHPUnit_Framework_TestCase
+class SessaoTest extends \MZ\Framework\TestCase
 {
     public function testFromArray()
     {
@@ -139,7 +139,7 @@ class SessaoTest extends \PHPUnit_Framework_TestCase
         $found_sessao = Sessao::findByID($sessao->getID());
         $this->assertEquals(new Sessao(), $found_sessao);
         $sessao->setID('');
-        $this->setExpectedException('\Exception');
+        $this->expectException('\Exception');
         $sessao->delete();
     }
 

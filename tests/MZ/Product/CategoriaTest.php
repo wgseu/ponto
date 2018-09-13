@@ -24,7 +24,7 @@
  */
 namespace MZ\Product;
 
-class CategoriaTest extends \PHPUnit_Framework_TestCase
+class CategoriaTest extends \MZ\Framework\TestCase
 {
     public function testFromArray()
     {
@@ -114,7 +114,7 @@ class CategoriaTest extends \PHPUnit_Framework_TestCase
         $subsubcategoria = new Categoria();
         $subsubcategoria->setCategoriaID($subcategoria->getID());
         $subsubcategoria->setDescricao('Variedade mais específica');
-        $this->setExpectedException('\MZ\Exception\ValidationException');
+        $this->expectException('\MZ\Exception\ValidationException');
         try {
             $subsubcategoria->insert();
         } catch (\MZ\Exception\ValidationException $e) {
@@ -147,7 +147,7 @@ class CategoriaTest extends \PHPUnit_Framework_TestCase
         $found_categoria = Categoria::findByID($categoria->getID());
         $this->assertEquals(new Categoria(), $found_categoria);
         $categoria->setID('');
-        $this->setExpectedException('\Exception');
+        $this->expectException('\Exception');
         $categoria->delete();
     }
 

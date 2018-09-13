@@ -27,7 +27,7 @@ namespace MZ\Session;
 use MZ\Account\Cliente;
 use \MZ\Database\DB;
 
-class CaixaTest extends \PHPUnit_Framework_TestCase
+class CaixaTest extends \MZ\Framework\TestCase
 {
     public function testFromArray()
     {
@@ -78,7 +78,7 @@ class CaixaTest extends \PHPUnit_Framework_TestCase
         $caixa = new Caixa();
         $caixa->setDescricao('Caixa 2');
         $caixa->insert();
-        $this->setExpectedException('\MZ\Exception\ValidationException');
+        $this->expectException('\MZ\Exception\ValidationException');
         try {
             $caixa->insert();
         } catch (\MZ\Exception\ValidationException $e) {
@@ -175,7 +175,7 @@ class CaixaTest extends \PHPUnit_Framework_TestCase
         
         $old_value = $app->getSystem()->getSettings()->getValue('Sistema', 'Fiscal.Mostrar');
         $app->getSystem()->getSettings()->setValue('Sistema', 'Fiscal.Mostrar', true);
-        $this->setExpectedException('\MZ\Exception\ValidationException');
+        $this->expectException('\MZ\Exception\ValidationException');
         try {
             $caixa = new Caixa();
             $caixa->setAtivo('A');
@@ -224,7 +224,7 @@ class CaixaTest extends \PHPUnit_Framework_TestCase
         $movimentacao->setAberta('Y');
         $movimentacao->insert();
 
-        $this->setExpectedException('\MZ\Exception\ValidationException');
+        $this->expectException('\MZ\Exception\ValidationException');
         try {
             $caixa->setAtivo('N');
             $caixa->update();
@@ -256,7 +256,7 @@ class CaixaTest extends \PHPUnit_Framework_TestCase
         $found_caixa = Caixa::findByID($caixa->getID());
         $this->assertEquals(new Caixa(), $found_caixa);
         $caixa->setID('');
-        $this->setExpectedException('\Exception');
+        $this->expectException('\Exception');
         $caixa->delete();
     }
 }

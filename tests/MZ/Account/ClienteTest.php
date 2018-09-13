@@ -28,7 +28,7 @@ use MZ\Database\DB;
 use MZ\Exception\ValidationException;
 use MZ\Employee\Funcionario;
 
-class ClienteTest extends \PHPUnit_Framework_TestCase
+class ClienteTest extends \MZ\Framework\TestCase
 {
     public function testFromArray()
     {
@@ -235,7 +235,7 @@ class ClienteTest extends \PHPUnit_Framework_TestCase
         $cliente->setGenero(Cliente::GENERO_MASCULINO);
         $cliente->setSenha('1234');
         $cliente->setAcionistaID(0);
-        $this->setExpectedException('\PDOException');
+        $this->expectException('\PDOException');
         $cliente->insert();
     }
 
@@ -514,7 +514,7 @@ class ClienteTest extends \PHPUnit_Framework_TestCase
     {
         $cliente = new Cliente(['senha' => 'c1Cçí a']);
         $cliente->passwordMatch('c1Cçí a');
-        $this->setExpectedException('\MZ\Exception\ValidationException');
+        $this->expectException('\MZ\Exception\ValidationException');
         $cliente->passwordMatch('c1Cçí A');
     }
 

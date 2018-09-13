@@ -24,7 +24,7 @@
  */
 namespace MZ\Product;
 
-class UnidadeTest extends \PHPUnit_Framework_TestCase
+class UnidadeTest extends \MZ\Framework\TestCase
 {
     public function testFromArray()
     {
@@ -105,7 +105,7 @@ class UnidadeTest extends \PHPUnit_Framework_TestCase
         $found_unidade = Unidade::findByID($unidade->getID());
         $this->assertEquals($unidade, $found_unidade);
         $unidade->setID('');
-        $this->setExpectedException('\Exception');
+        $this->expectException('\Exception');
         $unidade->update();
     }
 
@@ -120,7 +120,7 @@ class UnidadeTest extends \PHPUnit_Framework_TestCase
         $found_unidade = Unidade::findByID($unidade->getID());
         $this->assertEquals(new Unidade(), $found_unidade);
         $unidade->setID('');
-        $this->setExpectedException('\Exception');
+        $this->expectException('\Exception');
         $unidade->delete();
     }
 

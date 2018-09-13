@@ -24,7 +24,7 @@
  */
 namespace MZ\System;
 
-class PaginaTest extends \PHPUnit_Framework_TestCase
+class PaginaTest extends \MZ\Framework\TestCase
 {
     public function testFromArray()
     {
@@ -105,7 +105,7 @@ class PaginaTest extends \PHPUnit_Framework_TestCase
         $found_pagina = Pagina::findByID($pagina->getID());
         $this->assertEquals($pagina, $found_pagina);
         $pagina->setID('');
-        $this->setExpectedException('\Exception');
+        $this->expectException('\Exception');
         $pagina->update();
     }
 
@@ -120,7 +120,7 @@ class PaginaTest extends \PHPUnit_Framework_TestCase
         $found_pagina = Pagina::findByID($pagina->getID());
         $this->assertEquals(new Pagina(), $found_pagina);
         $pagina->setID('');
-        $this->setExpectedException('\Exception');
+        $this->expectException('\Exception');
         $pagina->delete();
     }
 

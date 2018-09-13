@@ -26,7 +26,7 @@ namespace MZ\Core;
 
 use MZ\Database\DB;
 
-class ApplicationTest extends \PHPUnit_Framework_TestCase
+class ApplicationTest extends \MZ\Framework\TestCase
 {
     public function testGlobalApp()
     {

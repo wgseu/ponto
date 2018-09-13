@@ -24,7 +24,7 @@
  */
 namespace MZ\Account;
 
-class CreditoTest extends \PHPUnit_Framework_TestCase
+class CreditoTest extends \MZ\Framework\TestCase
 {
     public function testPublish()
     {

@@ -24,7 +24,7 @@
  */
 namespace MZ\Payment;
 
-class CartaoTest extends \PHPUnit_Framework_TestCase
+class CartaoTest extends \MZ\Framework\TestCase
 {
     public function testPublish()
     {

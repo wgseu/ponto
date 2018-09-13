@@ -24,7 +24,7 @@
  */
 namespace MZ\Invoice;
 
-class OperacaoTest extends \PHPUnit_Framework_TestCase
+class OperacaoTest extends \MZ\Framework\TestCase
 {
     public function testFromArray()
     {
@@ -105,7 +105,7 @@ class OperacaoTest extends \PHPUnit_Framework_TestCase
         $found_operacao = Operacao::findByID($operacao->getID());
         $this->assertEquals($operacao, $found_operacao);
         $operacao->setID('');
-        $this->setExpectedException('\Exception');
+        $this->expectException('\Exception');
         $operacao->update();
     }
 
@@ -120,7 +120,7 @@ class OperacaoTest extends \PHPUnit_Framework_TestCase
         $found_operacao = Operacao::findByID($operacao->getID());
         $this->assertEquals(new Operacao(), $found_operacao);
         $operacao->setID('');
-        $this->setExpectedException('\Exception');
+        $this->expectException('\Exception');
         $operacao->delete();
     }
 

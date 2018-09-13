@@ -24,7 +24,7 @@
  */
 namespace MZ\System;
 
-class PermissaoTest extends \PHPUnit_Framework_TestCase
+class PermissaoTest extends \MZ\Framework\TestCase
 {
     public function testPublish()
     {

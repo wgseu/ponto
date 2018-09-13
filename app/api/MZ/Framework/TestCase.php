@@ -22,20 +22,11 @@
  *
  * @author Equipe GrandChef <desenvolvimento@mzsw.com.br>
  */
-namespace MZ\Location;
+namespace MZ\Framework;
 
-class EstadoTest extends \MZ\Framework\TestCase
+/**
+ * Frontend testing helper
+ */
+class TestCase extends \PHPUnit\Framework\TestCase
 {
-    public function testPublish()
-    {
-        $estado = new Estado();
-        $values = $estado->publish();
-        $allowed = [
-            'id',
-            'paisid',
-            'nome',
-            'uf',
-        ];
-        $this->assertEquals($allowed, array_keys($values));
-    }
 }

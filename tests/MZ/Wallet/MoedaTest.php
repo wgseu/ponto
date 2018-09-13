@@ -24,7 +24,7 @@
  */
 namespace MZ\Wallet;
 
-class MoedaTest extends \PHPUnit_Framework_TestCase
+class MoedaTest extends \MZ\Framework\TestCase
 {
     public function testFromArray()
     {
@@ -126,7 +126,7 @@ class MoedaTest extends \PHPUnit_Framework_TestCase
         $found_moeda = Moeda::findByID($moeda->getID());
         $this->assertEquals($moeda, $found_moeda);
         $moeda->setID('');
-        $this->setExpectedException('\Exception');
+        $this->expectException('\Exception');
         $moeda->update();
     }
 
@@ -143,7 +143,7 @@ class MoedaTest extends \PHPUnit_Framework_TestCase
         $found_moeda = Moeda::findByID($moeda->getID());
         $this->assertEquals(new Moeda(), $found_moeda);
         $moeda->setID('');
-        $this->setExpectedException('\Exception');
+        $this->expectException('\Exception');
         $moeda->delete();
     }
 

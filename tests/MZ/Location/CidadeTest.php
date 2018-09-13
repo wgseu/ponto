@@ -24,7 +24,7 @@
  */
 namespace MZ\Location;
 
-class CidadeTest extends \PHPUnit_Framework_TestCase
+class CidadeTest extends \MZ\Framework\TestCase
 {
     public function testPublish()
     {

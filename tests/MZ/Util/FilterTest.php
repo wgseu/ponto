@@ -24,7 +24,7 @@
  */
 namespace MZ\Util;
 
-class FilterTest extends \PHPUnit_Framework_TestCase
+class FilterTest extends \MZ\Framework\TestCase
 {
     public function testConcatKeys()
     {

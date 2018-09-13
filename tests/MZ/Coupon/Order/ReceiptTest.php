@@ -29,7 +29,7 @@ use Thermal\Connection\Buffer;
 use Thermal\Model;
 use MZ\Sale\Pedido;
 
-class ReceiptTest extends \PHPUnit_Framework_TestCase
+class ReceiptTest extends \MZ\Framework\TestCase
 {
     public function testPrint()
     {

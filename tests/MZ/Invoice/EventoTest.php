@@ -24,7 +24,7 @@
  */
 namespace MZ\Invoice;
 
-class EventoTest extends \PHPUnit_Framework_TestCase
+class EventoTest extends \MZ\Framework\TestCase
 {
     public function testPublish()
     {

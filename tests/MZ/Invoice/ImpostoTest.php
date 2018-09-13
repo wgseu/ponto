@@ -24,7 +24,7 @@
  */
 namespace MZ\Invoice;
 
-class ImpostoTest extends \PHPUnit_Framework_TestCase
+class ImpostoTest extends \MZ\Framework\TestCase
 {
     public function testFromArray()
     {
@@ -124,7 +124,7 @@ class ImpostoTest extends \PHPUnit_Framework_TestCase
         $found_imposto = Imposto::findByID($imposto->getID());
         $this->assertEquals($imposto, $found_imposto);
         $imposto->setID('');
-        $this->setExpectedException('\Exception');
+        $this->expectException('\Exception');
         $imposto->update();
     }
 
@@ -142,7 +142,7 @@ class ImpostoTest extends \PHPUnit_Framework_TestCase
         $found_imposto = Imposto::findByID($imposto->getID());
         $this->assertEquals(new Imposto(), $found_imposto);
         $imposto->setID('');
-        $this->setExpectedException('\Exception');
+        $this->expectException('\Exception');
         $imposto->delete();
     }
 

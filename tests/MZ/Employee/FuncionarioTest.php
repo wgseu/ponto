@@ -24,7 +24,7 @@
  */
 namespace MZ\Employee;
 
-class FuncionarioTest extends \PHPUnit_Framework_TestCase
+class FuncionarioTest extends \MZ\Framework\TestCase
 {
     public function testPublish()
     {

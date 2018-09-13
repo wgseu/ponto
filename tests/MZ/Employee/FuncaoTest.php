@@ -24,7 +24,7 @@
  */
 namespace MZ\Employee;
 
-class FuncaoTest extends \PHPUnit_Framework_TestCase
+class FuncaoTest extends \MZ\Framework\TestCase
 {
     public function testFromArray()
     {
@@ -100,7 +100,7 @@ class FuncaoTest extends \PHPUnit_Framework_TestCase
         $found_funcao = Funcao::findByID($funcao->getID());
         $this->assertEquals($funcao, $found_funcao);
         $funcao->setID('');
-        $this->setExpectedException('\Exception');
+        $this->expectException('\Exception');
         $funcao->update();
     }
 
@@ -115,7 +115,7 @@ class FuncaoTest extends \PHPUnit_Framework_TestCase
         $found_funcao = Funcao::findByID($funcao->getID());
         $this->assertEquals(new Funcao(), $found_funcao);
         $funcao->setID('');
-        $this->setExpectedException('\Exception');
+        $this->expectException('\Exception');
         $funcao->delete();
     }
 

@@ -24,7 +24,7 @@
  */
 namespace MZ\Account;
 
-class ContaTest extends \PHPUnit_Framework_TestCase
+class ContaTest extends \MZ\Framework\TestCase
 {
     public function testPublish()
     {

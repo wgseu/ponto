@@ -24,7 +24,7 @@
  */
 namespace MZ\Invoice;
 
-class EmitenteTest extends \PHPUnit_Framework_TestCase
+class EmitenteTest extends \MZ\Framework\TestCase
 {
     public function testPublish()
     {

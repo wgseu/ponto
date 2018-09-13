@@ -24,7 +24,7 @@
  */
 namespace MZ\Payment;
 
-class FormaPagtoTest extends \PHPUnit_Framework_TestCase
+class FormaPagtoTest extends \MZ\Framework\TestCase
 {
     public function testPublish()
     {

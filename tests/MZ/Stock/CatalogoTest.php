@@ -24,7 +24,7 @@
  */
 namespace MZ\Stock;
 
-class CatalogoTest extends \PHPUnit_Framework_TestCase
+class CatalogoTest extends \MZ\Framework\TestCase
 {
     public function testPublish()
     {

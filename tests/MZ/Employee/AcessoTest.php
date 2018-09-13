@@ -24,7 +24,7 @@
  */
 namespace MZ\Employee;
 
-class AcessoTest extends \PHPUnit_Framework_TestCase
+class AcessoTest extends \MZ\Framework\TestCase
 {
     public function testPublish()
     {

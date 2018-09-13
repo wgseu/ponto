@@ -34,7 +34,7 @@ $[field.end]
 $[field.end]
 use \MZ\Database\DB;
 
-class $[Table.norm]Test extends \PHPUnit_Framework_TestCase
+class $[Table.norm]Test extends \MZ\Framework\TestCase
 {
     public function testFromArray()
     {
@@ -158,7 +158,7 @@ $[field.end]
         $found_$[table.unix] = $[Table.norm]::findByID($$[table.unix]->getID());
         $this->assertEquals($$[table.unix], $found_$[table.unix]);
         $$[table.unix]->set$[Primary.norm]('');
-        $this->setExpectedException('\Exception');
+        $this->expectException('\Exception');
         $$[table.unix]->update();
     }
 
@@ -190,7 +190,7 @@ $[field.end]
         $found_$[table.unix] = $[Table.norm]::findBy$[Primary.norm]($$[table.unix]->get$[Primary.norm]());
         $this->assertEquals(new $[Table.norm](), $found_$[table.unix]);
         $$[table.unix]->set$[Primary.norm]('');
-        $this->setExpectedException('\Exception');
+        $this->expectException('\Exception');
         $$[table.unix]->delete();
     }
 

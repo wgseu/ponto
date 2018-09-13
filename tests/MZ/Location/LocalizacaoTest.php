@@ -24,7 +24,7 @@
  */
 namespace MZ\Location;
 
-class LocalizacaoTest extends \PHPUnit_Framework_TestCase
+class LocalizacaoTest extends \MZ\Framework\TestCase
 {
     public function testPublish()
     {

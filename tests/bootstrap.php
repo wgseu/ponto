@@ -23,10 +23,12 @@
  * @author Equipe GrandChef <desenvolvimento@mzsw.com.br>
  */
 
-global $app;
-$app = require_once dirname(__DIR__) . '/public/include/application.php';
-
+require __DIR__.'/../bootstrap/autoload.php';
 use MZ\Database\DB;
+
+global $app;
+$app = require_once __DIR__.'/../bootstrap/app.php';
+
 
 $app->run(null, function ($app) {
     $script = dirname(__DIR__) . '/database/model/sqlite.sql';

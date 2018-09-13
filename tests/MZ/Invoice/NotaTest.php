@@ -24,7 +24,7 @@
  */
 namespace MZ\Invoice;
 
-class NotaTest extends \PHPUnit_Framework_TestCase
+class NotaTest extends \MZ\Framework\TestCase
 {
     public function testPublish()
     {

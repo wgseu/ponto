@@ -24,7 +24,7 @@
  */
 namespace MZ\Stock;
 
-class CompraTest extends \PHPUnit_Framework_TestCase
+class CompraTest extends \MZ\Framework\TestCase
 {
     public function testPublish()
     {

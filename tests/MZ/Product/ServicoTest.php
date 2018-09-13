@@ -26,7 +26,7 @@ namespace MZ\Product;
 
 use \MZ\Database\DB;
 
-class ServicoTest extends \PHPUnit_Framework_TestCase
+class ServicoTest extends \MZ\Framework\TestCase
 {
     public function testFromArray()
     {
@@ -162,7 +162,7 @@ class ServicoTest extends \PHPUnit_Framework_TestCase
         $found_servico = Servico::findByID($servico->getID());
         $this->assertEquals($servico, $found_servico);
         $servico->setID('');
-        $this->setExpectedException('\Exception');
+        $this->expectException('\Exception');
         $servico->update();
     }
 
@@ -182,7 +182,7 @@ class ServicoTest extends \PHPUnit_Framework_TestCase
         $found_servico = Servico::findByID($servico->getID());
         $this->assertEquals(new Servico(), $found_servico);
         $servico->setID('');
-        $this->setExpectedException('\Exception');
+        $this->expectException('\Exception');
         $servico->delete();
     }
 

@@ -24,7 +24,7 @@
  */
 namespace MZ\Payment;
 
-class ChequeTest extends \PHPUnit_Framework_TestCase
+class ChequeTest extends \MZ\Framework\TestCase
 {
     public function testPublish()
     {

@@ -24,7 +24,7 @@
  */
 namespace MZ\Sale;
 
-class JuncaoTest extends \PHPUnit_Framework_TestCase
+class JuncaoTest extends \MZ\Framework\TestCase
 {
     public function testPublish()
     {

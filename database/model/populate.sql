@@ -64,7 +64,7 @@ INSERT INTO `Composicoes` (`ID`, `ComposicaoID`, `ProdutoID`, `Tipo`, `Quantidad
 	(28, 25, 9, 'Composicao', 0.1, 0, 'Y'),
 	(29, 26, 10, 'Composicao', 0.1, 0, 'Y');
 
-INSERT INTO `Estoque` (`ID`, `ProdutoID`, `TransacaoID`, `EntradaID`, `FornecedorID`, `SetorID`, `FuncionarioID`, `TipoMovimento`, `Quantidade`, `PrecoCompra`, `Lote`, `DataFabricacao`, `DataVencimento`, `Detalhes`, `Cancelado`, `DataMovimento`) VALUES
+INSERT INTO `Estoque` (`ID`, `ProdutoID`, `TransacaoID`, `EntradaID`, `FornecedorID`, `SetorID`, `PrestadorID`, `TipoMovimento`, `Quantidade`, `PrecoCompra`, `Lote`, `DataFabricacao`, `DataVencimento`, `Detalhes`, `Cancelado`, `DataMovimento`) VALUES
 	(1, 1, NULL, NULL, NULL, 1, 1, 'Entrada', 24, 2, '546546', NOW(), NULL, NULL, 'N', NOW()),
 	(2, 3, NULL, NULL, NULL, 1, 1, 'Entrada', 4, 2, NULL, NOW(), NULL, NULL, 'N', NOW()),
 	(3, 4, NULL, NULL, NULL, 1, 1, 'Entrada', 30, 0.5, NULL, NOW(), NULL, NULL, 'N', NOW()),
@@ -112,7 +112,7 @@ INSERT INTO `Pacotes` (`ID`, `PacoteID`, `GrupoID`, `ProdutoID`, `PropriedadeID`
 INSERT INTO `Sessoes` (`ID`, `DataInicio`, `DataTermino`, `Aberta`) VALUES
 	(1, NOW(), NULL, 'Y');
 
-INSERT INTO `Movimentacoes` (`ID`, `SessaoID`, `CaixaID`, `Aberta`, `FuncionarioAberturaID`, `DataAbertura`, `FuncionarioFechamentoID`, `DataFechamento`) VALUES
-	(1, 1, 1, 'Y', 1, NOW(), NULL, NULL);
+INSERT INTO `Movimentacoes` (`ID`, `SessaoID`, `CaixaID`, `Aberta`, `IniciadorID`, `FechadorID`, `DataFechamento`, `DataAbertura`) VALUES
+	(1, 1, 1, 'Y', 1, NULL, NULL, NOW());
 
 SET SQL_MODE=@OLD_SQL_MODE;

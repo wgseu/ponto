@@ -24,7 +24,7 @@
  */
 namespace MZ\System;
 
-class IntegracaoTest extends \PHPUnit_Framework_TestCase
+class IntegracaoTest extends \MZ\Framework\TestCase
 {
     public function testPublish()
     {

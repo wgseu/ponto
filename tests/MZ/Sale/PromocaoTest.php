@@ -24,7 +24,7 @@
  */
 namespace MZ\Sale;
 
-class PromocaoTest extends \PHPUnit_Framework_TestCase
+class PromocaoTest extends \MZ\Framework\TestCase
 {
     public function testPublish()
     {

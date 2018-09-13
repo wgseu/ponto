@@ -24,7 +24,7 @@
  */
 namespace MZ\Wallet;
 
-class CarteiraTest extends \PHPUnit_Framework_TestCase
+class CarteiraTest extends \MZ\Framework\TestCase
 {
     public function testPublish()
     {

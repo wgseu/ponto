@@ -24,7 +24,7 @@
  */
 namespace MZ\Stock;
 
-class FornecedorTest extends \PHPUnit_Framework_TestCase
+class FornecedorTest extends \MZ\Framework\TestCase
 {
     public function testPublish()
     {

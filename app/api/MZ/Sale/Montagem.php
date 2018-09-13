@@ -198,7 +198,6 @@ class Montagem extends ProdutoPedido
             }
         }
         $preco = $produto->getPrecoVenda() + $pacote->getValor();
-        $preco += $composicoes['preco'];
         if (isset($this->grupos[$pacote->getGrupoID()]['menor'])) {
             $menor = $this->grupos[$pacote->getGrupoID()]['menor'];
             $menor = min($preco, $menor);
@@ -217,6 +216,7 @@ class Montagem extends ProdutoPedido
         $this->grupos[$pacote->getGrupoID()]['pacotes'][] = [
             'pacote' => $pacote,
             'preco' => $preco,
+            'adicional' => $composicoes['preco'],
             'composicoes' => $composicoes['itens'],
             'item_index' => $item_index
         ];
@@ -316,9 +316,9 @@ class Montagem extends ProdutoPedido
                 $pacote = $produto_formado['pacote'];
                 $item_index = $produto_formado['item_index'];
                 $item = $this->itens[$item_index]['item'];
-                $preco = $produto_formado['preco'];
                 $minimo = $grupo_formado['minimo'];
                 $quantidade = round($item->getQuantidade() / $minimo);
+                // TODO: Não corrigir a quantidade, mas sim, lançar uma exceção
                 $quantidade = max($quantidade, $pacote->getQuantidadeMinima());
                 if ($pacote->getQuantidadeMaxima() > 0) {
                     $quantidade = min($quantidade, $pacote->getQuantidadeMaxima());
@@ -442,12 +442,15 @@ class Montagem extends ProdutoPedido
             $acumulado = $grupo_formado['quantidade'];
             foreach ($pacotes as $produto_formado) {
                 $pacote = $produto_formado['pacote'];
-                $preco = $produto_formado['preco'];
                 if ($grupo->getFuncao() == Grupo::FUNCAO_MAXIMO) {
                     $preco = $grupo_formado['maior'];
                 } elseif ($grupo->getFuncao() == Grupo::FUNCAO_MINIMO) {
                     $preco = $grupo_formado['menor'];
+                } else {
+                    // soma e média
+                    $preco = $produto_formado['preco'];
                 }
+                $preco += $produto_formado['adicional'];
                 $multiplicador = $produto_formado['quantidade'];
                 if ($grupo->getTipo() == Grupo::TIPO_FRACIONADO) {
                     $multiplicador = $multiplicador / $acumulado;

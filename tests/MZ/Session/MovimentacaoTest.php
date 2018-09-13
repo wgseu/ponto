@@ -24,7 +24,7 @@
  */
 namespace MZ\Session;
 
-class MovimentacaoTest extends \PHPUnit_Framework_TestCase
+class MovimentacaoTest extends \MZ\Framework\TestCase
 {
     public function testPublish()
     {

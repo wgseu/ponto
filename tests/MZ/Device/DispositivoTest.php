@@ -24,7 +24,7 @@
  */
 namespace MZ\Device;
 
-class DispositivoTest extends \PHPUnit_Framework_TestCase
+class DispositivoTest extends \MZ\Framework\TestCase
 {
     public function testPublish()
     {

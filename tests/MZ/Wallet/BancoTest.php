@@ -24,7 +24,7 @@
  */
 namespace MZ\Wallet;
 
-class BancoTest extends \PHPUnit_Framework_TestCase
+class BancoTest extends \MZ\Framework\TestCase
 {
     public function testFromArray()
     {
@@ -110,7 +110,7 @@ class BancoTest extends \PHPUnit_Framework_TestCase
         $found_banco = Banco::findByID($banco->getID());
         $this->assertEquals($banco, $found_banco);
         $banco->setID('');
-        $this->setExpectedException('\Exception');
+        $this->expectException('\Exception');
         $banco->update();
     }
 
@@ -125,7 +125,7 @@ class BancoTest extends \PHPUnit_Framework_TestCase
         $found_banco = Banco::findByID($banco->getID());
         $this->assertEquals(new Banco(), $found_banco);
         $banco->setID('');
-        $this->setExpectedException('\Exception');
+        $this->expectException('\Exception');
         $banco->delete();
     }
 

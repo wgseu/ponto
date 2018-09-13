@@ -24,7 +24,7 @@
  */
 namespace MZ\Location;
 
-class PaisTest extends \PHPUnit_Framework_TestCase
+class PaisTest extends \MZ\Framework\TestCase
 {
     public function testPublish()
     {

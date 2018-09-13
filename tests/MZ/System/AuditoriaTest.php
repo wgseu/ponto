@@ -24,7 +24,7 @@
  */
 namespace MZ\System;
 
-class AuditoriaTest extends \PHPUnit_Framework_TestCase
+class AuditoriaTest extends \MZ\Framework\TestCase
 {
     public function testPublish()
     {

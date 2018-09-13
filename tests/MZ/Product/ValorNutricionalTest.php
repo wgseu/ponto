@@ -24,7 +24,7 @@
  */
 namespace MZ\Product;
 
-class ValorNutricionalTest extends \PHPUnit_Framework_TestCase
+class ValorNutricionalTest extends \MZ\Framework\TestCase
 {
     public function testPublish()
     {

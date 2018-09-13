@@ -24,7 +24,7 @@
  */
 namespace MZ\Stock;
 
-class ListaTest extends \PHPUnit_Framework_TestCase
+class ListaTest extends \MZ\Framework\TestCase
 {
     public function testPublish()
     {

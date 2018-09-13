@@ -24,7 +24,7 @@
  */
 namespace MZ\Stock;
 
-class RequisitoTest extends \PHPUnit_Framework_TestCase
+class RequisitoTest extends \MZ\Framework\TestCase
 {
     public function testPublish()
     {

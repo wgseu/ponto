@@ -24,7 +24,7 @@
  */
 namespace MZ\Invoice;
 
-class TributacaoTest extends \PHPUnit_Framework_TestCase
+class TributacaoTest extends \MZ\Framework\TestCase
 {
     public function testPublish()
     {

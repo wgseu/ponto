@@ -24,7 +24,7 @@
  */
 namespace MZ\Sale;
 
-class PedidoTest extends \PHPUnit_Framework_TestCase
+class PedidoTest extends \MZ\Framework\TestCase
 {
     public function testPublish()
     {

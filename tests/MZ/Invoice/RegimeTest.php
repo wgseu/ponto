@@ -24,7 +24,7 @@
  */
 namespace MZ\Invoice;
 
-class RegimeTest extends \PHPUnit_Framework_TestCase
+class RegimeTest extends \MZ\Framework\TestCase
 {
     public function testFromArray()
     {
@@ -100,7 +100,7 @@ class RegimeTest extends \PHPUnit_Framework_TestCase
         $found_regime = Regime::findByID($regime->getID());
         $this->assertEquals($regime, $found_regime);
         $regime->setID('');
-        $this->setExpectedException('\Exception');
+        $this->expectException('\Exception');
         $regime->update();
     }
 
@@ -115,7 +115,7 @@ class RegimeTest extends \PHPUnit_Framework_TestCase
         $found_regime = Regime::findByID($regime->getID());
         $this->assertEquals(new Regime(), $found_regime);
         $regime->setID('');
-        $this->setExpectedException('\Exception');
+        $this->expectException('\Exception');
         $regime->delete();
     }
 

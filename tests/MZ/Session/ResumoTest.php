@@ -24,7 +24,7 @@
  */
 namespace MZ\Session;
 
-class ResumoTest extends \PHPUnit_Framework_TestCase
+class ResumoTest extends \MZ\Framework\TestCase
 {
     public function testPublish()
     {

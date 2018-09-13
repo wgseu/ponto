@@ -24,7 +24,7 @@
  */
 namespace MZ\Invoice;
 
-class OrigemTest extends \PHPUnit_Framework_TestCase
+class OrigemTest extends \MZ\Framework\TestCase
 {
     public function testFromArray()
     {
@@ -100,7 +100,7 @@ class OrigemTest extends \PHPUnit_Framework_TestCase
         $found_origem = Origem::findByID($origem->getID());
         $this->assertEquals($origem, $found_origem);
         $origem->setID('');
-        $this->setExpectedException('\Exception');
+        $this->expectException('\Exception');
         $origem->update();
     }
 
@@ -115,7 +115,7 @@ class OrigemTest extends \PHPUnit_Framework_TestCase
         $found_origem = Origem::findByID($origem->getID());
         $this->assertEquals(new Origem(), $found_origem);
         $origem->setID('');
-        $this->setExpectedException('\Exception');
+        $this->expectException('\Exception');
         $origem->delete();
     }
 

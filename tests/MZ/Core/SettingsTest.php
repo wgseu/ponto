@@ -24,7 +24,7 @@
  */
 namespace MZ\Core;
 
-class SettingsTest extends \PHPUnit_Framework_TestCase
+class SettingsTest extends \MZ\Framework\TestCase
 {
     public function testInitialValues()
     {
@@ -82,7 +82,7 @@ class SettingsTest extends \PHPUnit_Framework_TestCase
         ]);
         $this->assertEquals(null, $settings->getValue('path'));
         $this->assertEquals(null, $settings->getValue('db'));
-        $this->setExpectedException('\Exception');
+        $this->expectException('\Exception');
         try {
             $settings->deleteEntry('db', null);
             $this->fail('Must trow \Exception');

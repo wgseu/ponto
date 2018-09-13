@@ -24,7 +24,7 @@
  */
 namespace MZ\Sale;
 
-class ComandaTest extends \PHPUnit_Framework_TestCase
+class ComandaTest extends \MZ\Framework\TestCase
 {
     public function testFromArray()
     {
@@ -102,7 +102,7 @@ class ComandaTest extends \PHPUnit_Framework_TestCase
         $found_comanda = Comanda::findByID($comanda->getID());
         $this->assertEquals($comanda, $found_comanda);
         $comanda->setID('');
-        $this->setExpectedException('\Exception');
+        $this->expectException('\Exception');
         $comanda->update();
     }
 
@@ -117,7 +117,7 @@ class ComandaTest extends \PHPUnit_Framework_TestCase
         $found_comanda = Comanda::findByID($comanda->getID());
         $this->assertEquals(new Comanda(), $found_comanda);
         $comanda->setID('');
-        $this->setExpectedException('\Exception');
+        $this->expectException('\Exception');
         $comanda->delete();
     }
 

@@ -24,7 +24,7 @@
  */
 namespace MZ\System;
 
-class FuncionalidadeTest extends \PHPUnit_Framework_TestCase
+class FuncionalidadeTest extends \MZ\Framework\TestCase
 {
     public function testPublish()
     {

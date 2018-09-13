@@ -24,7 +24,7 @@
  */
 namespace MZ\Environment;
 
-class SetorTest extends \PHPUnit_Framework_TestCase
+class SetorTest extends \MZ\Framework\TestCase
 {
     public function testFromArray()
     {
@@ -97,7 +97,7 @@ class SetorTest extends \PHPUnit_Framework_TestCase
         $found_setor = Setor::findByID($setor->getID());
         $this->assertEquals($setor, $found_setor);
         $setor->setID('');
-        $this->setExpectedException('\Exception');
+        $this->expectException('\Exception');
         $setor->update();
     }
 
@@ -111,7 +111,7 @@ class SetorTest extends \PHPUnit_Framework_TestCase
         $found_setor = Setor::findByID($setor->getID());
         $this->assertEquals(new Setor(), $found_setor);
         $setor->setID('');
-        $this->setExpectedException('\Exception');
+        $this->expectException('\Exception');
         $setor->delete();
     }
 

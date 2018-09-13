@@ -24,7 +24,7 @@
  */
 namespace MZ\Environment;
 
-class PatrimonioTest extends \PHPUnit_Framework_TestCase
+class PatrimonioTest extends \MZ\Framework\TestCase
 {
     public function testPublish()
     {

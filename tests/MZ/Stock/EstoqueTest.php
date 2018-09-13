@@ -24,7 +24,7 @@
  */
 namespace MZ\Stock;
 
-class EstoqueTest extends \PHPUnit_Framework_TestCase
+class EstoqueTest extends \MZ\Framework\TestCase
 {
     public function testPublish()
     {

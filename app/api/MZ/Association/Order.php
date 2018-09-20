@@ -29,7 +29,7 @@ use MZ\Util\Generator;
 use MZ\Util\Filter;
 use MZ\Util\Gender;
 use MZ\Util\Validator;
-use MZ\Database\Model;
+use MZ\Database\SyncModel;
 use MZ\Database\DB;
 use MZ\Location\Localizacao;
 use MZ\Location\Cidade;

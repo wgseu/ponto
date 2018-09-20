@@ -24,7 +24,7 @@
  */
 namespace MZ\Stock;
 
-use MZ\Database\Model;
+use MZ\Database\SyncModel;
 use MZ\Database\DB;
 use MZ\Util\Filter;
 use MZ\Util\Validator;
@@ -32,7 +32,7 @@ use MZ\Util\Validator;
 /**
  * Informa a lista de produtos disponíveis nos fornecedores
  */
-class Catalogo extends Model
+class Catalogo extends SyncModel
 {
 
     /**
@@ -454,13 +454,13 @@ class Catalogo extends Model
      * Update Catálogo de produtos with instance values into database for ID
      * @return Catalogo Self instance
      */
-    public function update($only = [], $except = false)
+    public function update($only = [])
     {
         $values = $this->validate();
         if (!$this->exists()) {
             throw new \Exception('O identificador do catálogo de produtos não foi informado');
         }
-        $values = DB::filterValues($values, $only, $except);
+        $values = DB::filterValues($values, $only, false);
         try {
             DB::update('Catalogos')
                 ->set($values)

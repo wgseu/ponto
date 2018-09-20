@@ -26,7 +26,7 @@ namespace MZ\Account;
 
 use MZ\Database\DB;
 use MZ\Exception\ValidationException;
-use MZ\Employee\Funcionario;
+use MZ\Provider\Prestador;
 
 class ClienteTest extends \MZ\Framework\TestCase
 {
@@ -46,8 +46,7 @@ class ClienteTest extends \MZ\Framework\TestCase
             'im' => '123654',
             'email' => 'cliente@email.com',
             'dataaniversario' => '2010-12-05',
-            'fone1' => '4499885544',
-            'fone2' => '4499784512',
+            'telefone' => '4499885544',
             'slogan' => 'O Cliente',
             'secreto' => 'ABC8987EFA',
             'limitecompra' => 12.5,
@@ -68,29 +67,13 @@ class ClienteTest extends \MZ\Framework\TestCase
         $this->assertEquals($cliente, $new_cliente);
     }
 
-    public function testFoneIndex()
+    public function testTelefone()
     {
         $cliente = new Cliente();
-        try {
-            $cliente->getFone(0);
-            $this->fail('O índice 0 não é válido');
-        } catch (\Exception $e) {
-        }
-        try {
-            $cliente->getFone(3);
-            $this->fail('O índice 3 não é válido');
-        } catch (\Exception $e) {
-        }
-        try {
-            $cliente->setFone(0, '44988888888');
-            $this->fail('O índice 0 não é válido para atribuição');
-        } catch (\Exception $e) {
-        }
-        try {
-            $cliente->setFone(3, '44988888888');
-            $this->fail('O índice 3 não é válido para atribuição');
-        } catch (\Exception $e) {
-        }
+        $this->assertNull($cliente->getTelefone());
+        $cliente->setTelefone('44988888888');
+        $this->assertNotNull($cliente->getTelefone());
+        $this->assertEquals($cliente->getTelefone()->getNumero(), '44988888888');
     }
 
     public function testPublish()
@@ -100,7 +83,7 @@ class ClienteTest extends \MZ\Framework\TestCase
         $allowed = [
             'id',
             'tipo',
-            'acionistaid',
+            'empresaid',
             'login',
             'nome',
             'sobrenome',
@@ -110,16 +93,16 @@ class ClienteTest extends \MZ\Framework\TestCase
             'im',
             'email',
             'dataaniversario',
-            'fone1',
-            'fone2',
             'slogan',
             'limitecompra',
             'facebookurl',
             'twitterurl',
             'linkedinurl',
-            'imagem',
+            'imagemurl',
+            'linguagem',
             'dataatualizacao',
             'datacadastro',
+            'fone1',
         ];
         $this->assertEquals($allowed, array_keys($values));
         $cliente->setTipo(Cliente::TIPO_JURIDICA);
@@ -137,7 +120,7 @@ class ClienteTest extends \MZ\Framework\TestCase
             $this->fail('Não deveria ter cadastrado o cliente');
         } catch (ValidationException $e) {
             $this->assertEquals(
-                ['tipo', 'login', 'senha', 'nome', 'genero', 'fone1'],
+                ['tipo', 'login', 'senha', 'nome', 'genero'],
                 array_keys($e->getErrors())
             );
         }
@@ -147,12 +130,11 @@ class ClienteTest extends \MZ\Framework\TestCase
             $this->fail('Não deveria ter cadastrado o cliente');
         } catch (ValidationException $e) {
             $this->assertEquals(
-                ['login', 'nome', 'genero', 'fone1'],
+                ['login', 'nome', 'genero'],
                 array_keys($e->getErrors())
             );
         }
         $cliente->setTipo(Cliente::TIPO_FISICA);
-        $cliente->setFone(2, '11223399');
         $cliente->setLimiteCompra(-6);
         $cliente->setCPF('12663254411');
         try {
@@ -160,22 +142,21 @@ class ClienteTest extends \MZ\Framework\TestCase
             $this->fail('Não deveria ter cadastrado o cliente');
         } catch (ValidationException $e) {
             $this->assertEquals(
-                ['login', 'nome', 'genero', 'cpf', 'fone2', 'limitecompra'],
+                ['login', 'nome', 'genero', 'cpf', 'limitecompra'],
                 array_keys($e->getErrors())
             );
         }
         $cliente->setTipo(Cliente::TIPO_JURIDICA);
         $cliente->setCPF('12663254411');
         $cliente->setEmail('cicrano a@email.com');
-        $cliente->setFone(1, '11223399');
-        $cliente->setFone(2, null);
+        $cliente->setTelefone('11223399');
         $cliente->setLimiteCompra(null);
         try {
             $cliente->insert();
             $this->fail('Não deveria ter cadastrado o cliente');
         } catch (ValidationException $e) {
             $this->assertEquals(
-                ['login', 'nome', 'genero', 'cpf', 'email', 'fone1'],
+                ['login', 'nome', 'genero', 'cpf', 'email'],
                 array_keys($e->getErrors())
             );
         }
@@ -184,7 +165,7 @@ class ClienteTest extends \MZ\Framework\TestCase
         $cliente->setNomeCompleto('Cicrano da Silva');
         $cliente->setEmail('cicrano@email.com');
         $cliente->setLogin('cicrano');
-        $cliente->setFone(1, '44911223399');
+        $cliente->setTelefone('44911223399');
         $cliente->setCPF('12663254410');
         $cliente->setGenero(Cliente::GENERO_MASCULINO);
         $cliente->setSenha('1234');
@@ -273,7 +254,6 @@ class ClienteTest extends \MZ\Framework\TestCase
         $cliente->setSenha('1234');
         $cliente->insert();
         $cliente->setSenha(null);
-        $cliente->setImagem(true);
         $cliente->update();
         $found_cliente = Cliente::findByID($cliente->getID());
         $this->assertEquals($cliente, $found_cliente);
@@ -298,18 +278,16 @@ class ClienteTest extends \MZ\Framework\TestCase
         $cliente->setNomeCompleto('Beltrano da Silva');
         $cliente->setGenero(Cliente::GENERO_MASCULINO);
         $cliente->setSenha('1234');
-        $cliente->setFone(1, '44967442288');
-        $cliente->setFone(2, '44988552211');
+        $cliente->setTelefone('44967442288');
         $cliente->insert();
         $first_cliente = new Cliente($cliente);
         $cliente->setEmail('beltrano@email.com');
         $cliente->setLogin('beltrano');
-        $cliente->setFone(1, '44988552211');
-        $cliente->setFone(2, '44967442288');
+        $cliente->setTelefone('44988552211');
         $cliente->setCPF('95672167624');
         $cliente->setSenha('1234');
         $cliente->setSecreto('635sd89d5f4a68d7sd6s5a4');
-        $cliente->setAcionistaID($first_cliente->getID());
+        $cliente->setEmpresaID($first_cliente->getID());
         $cliente->setDataAniversario(DB::date());
         $cliente->insert();
         $empty_cliente = new Cliente();
@@ -420,16 +398,14 @@ class ClienteTest extends \MZ\Framework\TestCase
     public function testMakeImagem()
     {
         $cliente = new Cliente();
-        $cliente->loadImagem();
-        $this->assertEquals('/static/img/cliente.png', $cliente->makeImagem(true));
-        $cliente->setImagem('imagem.png');
-        $this->assertEquals('/static/img/cliente/imagem.png', $cliente->makeImagem());
+        $this->assertEquals('/static/img/cliente.png', $cliente->makeImagemURL(true));
+        $cliente->setImagemURL('imagem.png');
+        $this->assertEquals('/static/img/cliente/imagem.png', $cliente->makeImagemURL());
     }
 
     public function testClean()
     {
         $old_cliente = new Cliente();
-        $old_cliente->setImagem('imagem.png');
         $cliente = new Cliente();
         $cliente->setDataCadastro($old_cliente->getDataCadastro());
         $cliente->setDataAtualizacao($old_cliente->getDataAtualizacao());
@@ -482,7 +458,7 @@ class ClienteTest extends \MZ\Framework\TestCase
             'cpf' => '331.196.564-70',
             'email' => 'cliente@email.com',
             'dataaniversario' => '05/12/2010',
-            'fone1' => '(44) 9988-5544',
+            'telefone' => '(44) 9988-5544',
         ]);
         $filter_cliente = new Cliente([
             'id' => null,
@@ -490,7 +466,7 @@ class ClienteTest extends \MZ\Framework\TestCase
             'cpf' => '33119656470',
             'email' => 'cliente@email.com',
             'dataaniversario' => '2010-12-05',
-            'fone1' => '4499885544',
+            'telefone' => '4499885544',
             'limitecompra' => '1.012,5'
         ]);
         $cliente = new Cliente($cliente_obj);
@@ -499,12 +475,10 @@ class ClienteTest extends \MZ\Framework\TestCase
         $this->assertEquals($filter_cliente, $cliente);
         $cliente_obj->setTipo(Cliente::TIPO_JURIDICA);
         $cliente_obj->setCPF('73.591.671/0001-48');
-        $cliente_obj->setImagem('imagem.png');
         $filter_cliente->setTipo(Cliente::TIPO_JURIDICA);
         $filter_cliente->setGenero(Cliente::GENERO_FEMININO);
         $filter_cliente->setLimiteCompra('1.012,5');
         $filter_cliente->setCPF('73591671000148');
-        $filter_cliente->setImagem(true);
         $cliente_obj->filter($filter_cliente);
         $filter_cliente->setLimiteCompra(1012.5);
         $this->assertEquals($filter_cliente, $cliente_obj);
@@ -518,17 +492,17 @@ class ClienteTest extends \MZ\Framework\TestCase
         $cliente->passwordMatch('c1Cçí A');
     }
 
-    public function testInvalidaFuncionario()
+    public function testInvalidaPrestador()
     {
-        $funcionario = Funcionario::findByID(1);
-        $cliente = $funcionario->findClienteID();
+        $prestador = Prestador::findByID(1);
+        $cliente = $prestador->findClienteID();
         $cliente->setLogin(null);
         $cliente->setTipo(Cliente::TIPO_JURIDICA);
         try {
             $cliente->update();
-            $this->fail('Não deveria ter atualizado o cliente funcionário');
+            $this->fail('Não deveria ter atualizado o cliente prestador');
         } catch (ValidationException $e) {
-            $this->assertEquals(['tipo', 'login'], array_keys($e->getErrors()));
+            $this->assertEquals(['tipo', 'login', 'email'], array_keys($e->getErrors()));
         }
     }
 }

@@ -59,9 +59,9 @@ class PedidoOldApiController extends \MZ\Core\ApiController
             $pedido->setComandaID(isset($_GET['comanda']) ? $_GET['comanda'] : null);
             if ($pedido->exists()) {
                 $pedido->loadByID();
-                $pedido->checkAccess(logged_employee());
+                $pedido->checkAccess(logged_provider());
             } else {
-                $pedido->checkAccess(logged_employee());
+                $pedido->checkAccess(logged_provider());
                 $pedido->loadByLocal();
             }
             $agrupar = isset($_GET['agrupar']) ? boolval($_GET['agrupar']) : true;
@@ -162,7 +162,7 @@ class PedidoOldApiController extends \MZ\Core\ApiController
     {
         need_login(true);
         $order = new Order();
-        $order->setEmployee(logged_employee());
+        $order->setEmployee(logged_provider());
         try {
             $order->loadData($_POST);
             $order->search();
@@ -193,9 +193,9 @@ class PedidoOldApiController extends \MZ\Core\ApiController
             if (!$pedido->exists()) {
                 throw new \Exception('O pedido informado não existe');
             }
-            $pedido->checkAccess(logged_employee());
+            $pedido->checkAccess(logged_provider());
             if ($pedido->getEstado() != Pedido::ESTADO_FECHADO) {
-                $pedido->setFechadorID(logged_employee()->getID());
+                $pedido->setFechadorID(logged_provider()->getID());
                 $pedido->setDataImpressao(DB::now());
                 $pedido->setEstado(Pedido::ESTADO_FECHADO);
                 $pedido->update();

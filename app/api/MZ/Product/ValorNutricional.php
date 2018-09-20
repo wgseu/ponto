@@ -24,7 +24,7 @@
  */
 namespace MZ\Product;
 
-use MZ\Database\Model;
+use MZ\Database\SyncModel;
 use MZ\Database\DB;
 use MZ\Util\Filter;
 use MZ\Util\Validator;
@@ -32,7 +32,7 @@ use MZ\Util\Validator;
 /**
  * Informa todos os valores nutricionais da tabela nutricional
  */
-class ValorNutricional extends Model
+class ValorNutricional extends SyncModel
 {
 
     /**
@@ -355,13 +355,13 @@ class ValorNutricional extends Model
      * Update Valor nutricional with instance values into database for ID
      * @return ValorNutricional Self instance
      */
-    public function update($only = [], $except = false)
+    public function update($only = [])
     {
         $values = $this->validate();
         if (!$this->exists()) {
             throw new \Exception('O identificador do valor nutricional não foi informado');
         }
-        $values = DB::filterValues($values, $only, $except);
+        $values = DB::filterValues($values, $only, false);
         try {
             DB::update('Valores_Nutricionais')
                 ->set($values)

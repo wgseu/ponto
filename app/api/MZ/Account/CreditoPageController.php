@@ -79,7 +79,7 @@ class CreditoPageController extends \MZ\Core\Controller
         if (is_post()) {
             $credito = new Credito($_POST);
             try {
-                $old_credito->setFuncionarioID(logged_employee()->getID());
+                $old_credito->setFuncionarioID(logged_provider()->getID());
                 $old_credito->setClienteID($credito->getClienteID());
                 $credito->filter($old_credito);
                 $credito->insert();

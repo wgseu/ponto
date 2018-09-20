@@ -27,10 +27,10 @@ namespace MZ\Account;
 use MZ\System\Permissao;
 use MZ\Util\Generator;
 use MZ\Util\Filter;
-use MZ\Employee\Funcionario;
+use MZ\Provider\Prestador;
 use MZ\Device\Dispositivo;
 use MZ\System\Sistema;
-use MZ\Employee\Acesso;
+use MZ\System\Acesso;
 use MZ\Logger\Log;
 
 /**
@@ -84,10 +84,10 @@ class ClienteOldApiController extends \MZ\Core\ApiController
         $values = isset($_POST['cliente']) ? $_POST['cliente'] : [];
         $old_cliente = new Cliente();
         try {
-            if (!logged_employee()->has(Permissao::NOME_PEDIDOMESA) &&
-                !logged_employee()->has(Permissao::NOME_PEDIDOCOMANDA) &&
-                !logged_employee()->has(Permissao::NOME_PAGAMENTO) &&
-                !logged_employee()->has(Permissao::NOME_CADASTROCLIENTES)
+            if (!logged_provider()->has(Permissao::NOME_PEDIDOMESA) &&
+                !logged_provider()->has(Permissao::NOME_PEDIDOCOMANDA) &&
+                !logged_provider()->has(Permissao::NOME_PAGAMENTO) &&
+                !logged_provider()->has(Permissao::NOME_CADASTROCLIENTES)
             ) {
                 throw new \Exception('Você não tem permissão para cadastrar clientes');
             }
@@ -115,10 +115,10 @@ class ClienteOldApiController extends \MZ\Core\ApiController
         if (!$cliente->exists()) {
             return $this->json()->error('Usuário ou senha incorretos!');
         }
-        $funcionario = Funcionario::findByClienteID($cliente->getID());
+        $prestador = Prestador::findByClienteID($cliente->getID());
         $dispositivo = new Dispositivo();
-        if ($funcionario->exists()) {
-            if (!$funcionario->has(Permissao::NOME_SISTEMA)) {
+        if ($prestador->exists()) {
+            if (!$prestador->has(Permissao::NOME_SISTEMA)) {
                 return $this->json()->error('Você não tem permissão para acessar o sistema!');
             }
             try {
@@ -155,7 +155,7 @@ class ClienteOldApiController extends \MZ\Core\ApiController
                 'imagemurl' => get_image_url(logged_user()->getImagem(), 'cliente', null)
             ]
         ];
-        $status['funcionario'] = intval(logged_employee()->getID());
+        $status['funcionario'] = intval(logged_provider()->getID());
         $status['validacao'] = strval($dispositivo->getValidacao());
         $status['autologout'] = is_boolean_config('Sistema', 'Tablet.Logout');
         if (is_manager()) {
@@ -203,7 +203,7 @@ class ClienteOldApiController extends \MZ\Core\ApiController
                 'login' => logged_user()->getLogin(),
                 'imagemurl' => get_image_url(logged_user()->getImagem(), 'cliente', null)
             ];
-            $status['funcionario'] = intval(logged_employee()->getID());
+            $status['funcionario'] = intval(logged_provider()->getID());
             try {
                 $status['permissoes'] = $this->getApplication()->getAuthentication()->getPermissions();
                 $dispositivo = new Dispositivo();

@@ -36,6 +36,9 @@ class MoedaTest extends \MZ\Framework\TestCase
             'divisao' => 123,
             'fracao' => 'Moeda',
             'formato' => 'Moeda',
+            'conversao' => '0,5',
+            'dataatualizacao' => '2016-12-25 12:15:00',
+            'ativa' => 'Y',
         ]);
         $moeda = new Moeda();
         $moeda->fromArray($old_moeda);
@@ -54,6 +57,9 @@ class MoedaTest extends \MZ\Framework\TestCase
             'divisao' => 1234,
             'fracao' => 'Moeda filter',
             'formato' => 'Moeda filter',
+            'conversao' => 0.5,
+            'dataatualizacao' => '2016-12-25 12:15:00',
+            'ativa' => 'Y',
         ]);
         $moeda = new Moeda([
             'id' => 321,
@@ -63,6 +69,9 @@ class MoedaTest extends \MZ\Framework\TestCase
             'divisao' => '1.234',
             'fracao' => ' Moeda <script>filter</script> ',
             'formato' => ' Moeda <script>filter</script> ',
+            'conversao' => '0,5',
+            'dataatualizacao' => '2016-12-25 12:15:00',
+            'ativa' => 'Y',
         ]);
         $moeda->filter($old_moeda);
         $this->assertEquals($old_moeda, $moeda);
@@ -80,6 +89,9 @@ class MoedaTest extends \MZ\Framework\TestCase
             'divisao',
             'fracao',
             'formato',
+            'conversao',
+            'dataatualizacao',
+            'ativa',
         ];
         $this->assertEquals($allowed, array_keys($values));
     }
@@ -95,6 +107,7 @@ class MoedaTest extends \MZ\Framework\TestCase
                 [
                     'nome',
                     'simbolo',
+                    'codigo',
                     'divisao',
                     'formato',
                 ],
@@ -103,6 +116,7 @@ class MoedaTest extends \MZ\Framework\TestCase
         }
         $moeda->setNome('Moeda to insert');
         $moeda->setSimbolo('Moeda to insert');
+        $moeda->setCodigo('Moeda to insert');
         $moeda->setDivisao(123);
         $moeda->setFormato('Moeda to insert');
         $moeda->insert();
@@ -113,6 +127,7 @@ class MoedaTest extends \MZ\Framework\TestCase
         $moeda = new Moeda();
         $moeda->setNome('Moeda to update');
         $moeda->setSimbolo('Moeda to update');
+        $moeda->setCodigo('Moeda to update');
         $moeda->setDivisao(123);
         $moeda->setFormato('Moeda to update');
         $moeda->insert();
@@ -135,6 +150,7 @@ class MoedaTest extends \MZ\Framework\TestCase
         $moeda = new Moeda();
         $moeda->setNome('Moeda to delete');
         $moeda->setSimbolo('Moeda to delete');
+        $moeda->setCodigo('Moeda to delete');
         $moeda->setDivisao(123);
         $moeda->setFormato('Moeda to delete');
         $moeda->insert();
@@ -152,6 +168,7 @@ class MoedaTest extends \MZ\Framework\TestCase
         $moeda = new Moeda();
         $moeda->setNome('Moeda find');
         $moeda->setSimbolo('Moeda find');
+        $moeda->setCodigo('Moeda find');
         $moeda->setDivisao(123);
         $moeda->setFormato('Moeda find');
         $moeda->insert();
@@ -165,6 +182,7 @@ class MoedaTest extends \MZ\Framework\TestCase
         $moeda_sec = new Moeda();
         $moeda_sec->setNome('Moeda find second');
         $moeda_sec->setSimbolo('Moeda find second');
+        $moeda_sec->setCodigo('Moeda find second');
         $moeda_sec->setDivisao(123);
         $moeda_sec->setFormato('Moeda find second');
         $moeda_sec->insert();

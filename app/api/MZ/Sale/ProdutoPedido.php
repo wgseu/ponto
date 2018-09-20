@@ -24,7 +24,7 @@
  */
 namespace MZ\Sale;
 
-use MZ\Database\Model;
+use MZ\Database\SyncModel;
 use MZ\Database\DB;
 use MZ\Util\Filter;
 use MZ\Util\Validator;
@@ -36,7 +36,7 @@ use MZ\Exception\ValidationException;
  * Produtos, taxas e serviços do pedido, a alteração do estado permite o
  * controle de produção
  */
-class ProdutoPedido extends Model
+class ProdutoPedido extends SyncModel
 {
 
     /**
@@ -968,13 +968,13 @@ class ProdutoPedido extends Model
      * Update Item do pedido with instance values into database for ID
      * @return ProdutoPedido Self instance
      */
-    public function update($only = [], $except = false)
+    public function update($only = [])
     {
         $values = $this->validate();
         if (!$this->exists()) {
             throw new \Exception('O identificador do item do pedido não foi informado');
         }
-        $values = DB::filterValues($values, $only, $except);
+        $values = DB::filterValues($values, $only, false);
         unset($values['datahora']);
         try {
             DB::update('Produtos_Pedidos')
@@ -1074,11 +1074,11 @@ class ProdutoPedido extends Model
 
     /**
      * Funcionário que lançou esse item no pedido
-     * @return \MZ\Employee\Funcionario The object fetched from database
+     * @return \MZ\Provider\Prestador The object fetched from database
      */
     public function findFuncionarioID()
     {
-        return \MZ\Employee\Funcionario::findByID($this->getFuncionarioID());
+        return \MZ\Provider\Prestador::findByID($this->getFuncionarioID());
     }
 
     /**

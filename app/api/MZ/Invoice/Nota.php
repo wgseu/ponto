@@ -24,7 +24,7 @@
  */
 namespace MZ\Invoice;
 
-use MZ\Database\Model;
+use MZ\Database\SyncModel;
 use MZ\Database\DB;
 use MZ\Util\Filter;
 use MZ\Util\Validator;
@@ -33,7 +33,7 @@ use MZ\Session\Caixa;
 /**
  * Notas fiscais e inutilizações
  */
-class Nota extends Model
+class Nota extends SyncModel
 {
 
     /**
@@ -1016,16 +1016,15 @@ class Nota extends Model
     /**
      * Update Nota with instance values into database for ID
      * @param  array $only Save these fields only, when empty save all fields except id
-     * @param  boolean $except When true, saves all fields except $only
      * @return Nota Self instance
      */
-    public function update($only = [], $except = false)
+    public function update($only = [])
     {
         $values = $this->validate();
         if (!$this->exists()) {
             throw new \Exception('O identificador da nota não foi informado');
         }
-        $values = DB::filterValues($values, $only, $except);
+        $values = DB::filterValues($values, $only, false);
         try {
             DB::update('Notas')
                 ->set($values)

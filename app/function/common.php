@@ -260,7 +260,7 @@ function logged_user()
     return $app->getAuthentication()->getUser();
 }
 
-function logged_employee()
+function logged_provider()
 {
     global $app;
     return $app->getAuthentication()->getEmployee();
@@ -315,7 +315,7 @@ function need_owner($json = false)
 function need_permission($array, $json = false)
 {
     need_manager($json);
-    if (logged_employee()->has($array)) {
+    if (logged_provider()->has($array)) {
         return \Session::Get('cliente_id');
     }
     $msg = 'Você não possui permissão para acessar essa função';
@@ -331,25 +331,25 @@ function is_login()
     return is_numeric($cliente_id) && logged_user()->exists();
 }
 
-function is_manager($funcionario = null)
+function is_manager($prestador = null)
 {
-    if (!is_null($funcionario)) {
-        return $funcionario->exists();
+    if (!is_null($prestador)) {
+        return $prestador->exists();
     }
-    return is_login() && !is_null(logged_employee()->getID());
+    return is_login() && !is_null(logged_provider()->getID());
 }
 
-function is_owner($funcionario = null)
+function is_owner($prestador = null)
 {
-    if (!is_null($funcionario)) {
-        return is_manager($funcionario) && $funcionario->getID() == 1;
+    if (!is_null($prestador)) {
+        return is_manager($prestador) && $prestador->getID() == 1;
     }
-    return is_manager() && logged_employee()->getID() == 1;
+    return is_manager() && logged_provider()->getID() == 1;
 }
 
-function is_self($funcionario)
+function is_self($prestador)
 {
-    return is_manager() && $funcionario->exists() && $funcionario->getID() == logged_employee()->getID();
+    return is_manager() && $prestador->exists() && $prestador->getID() == logged_provider()->getID();
 }
 
 function _t($key)
@@ -423,7 +423,7 @@ function set_timezone_for($uf, $pais = 'Brasil')
 
 function current_language_id()
 {
-    $lang_id = logged_employee()->getLinguagemID();
+    $lang_id = logged_provider()->getLinguagemID();
     if (is_null($lang_id)) {
         $lang_id = 1046;
     }
@@ -434,7 +434,7 @@ function get_string_config($section, $key, $default = null)
 {
     global $app;
 
-    return $app->getSystem()->getSettings()->getValue($section, $key, $default);
+    return $app->getSystem()->getBusiness()->getOptions()->getValue($section, $key, $default);
 }
 
 function set_string_config($section, $key, $value)
@@ -442,9 +442,9 @@ function set_string_config($section, $key, $value)
     global $app;
 
     if (is_null($value)) {
-        $app->getSystem()->getSettings()->deleteEntry($section, $key);
+        $app->getSystem()->getBusiness()->getOptions()->deleteEntry($section, $key);
     } else {
-        $app->getSystem()->getSettings()->setValue($section, $key, $value);
+        $app->getSystem()->getBusiness()->getOptions()->setValue($section, $key, $value);
     }
 }
 

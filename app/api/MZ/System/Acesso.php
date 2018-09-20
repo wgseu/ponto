@@ -22,7 +22,7 @@
  *
  * @author Equipe GrandChef <desenvolvimento@mzsw.com.br>
  */
-namespace MZ\Product;
+namespace MZ\System;
 
 use MZ\Database\SyncModel;
 use MZ\Database\DB;
@@ -30,41 +30,36 @@ use MZ\Util\Filter;
 use MZ\Util\Validator;
 
 /**
- * Unidades de medidas aplicadas aos produtos
+ * Permite acesso à uma determinada funcionalidade da lista de permissões
  */
-class Unidade extends SyncModel
+class Acesso extends SyncModel
 {
-    const SIGLA_UNITARIA = 'UN';
 
     /**
-     * Identificador da unidade
+     * Identificador do acesso
      */
     private $id;
     /**
-     * Nome da unidade de medida, Ex.: Grama, Quilo
+     * Função a que a permissão se aplica
      */
-    private $nome;
+    private $funcao_id;
     /**
-     * Detalhes sobre a unidade de medida
+     * Permissão liberada para a função
      */
-    private $descricao;
-    /**
-     * Sigla da unidade de medida, Ex.: UN, L, g
-     */
-    private $sigla;
+    private $permissao_id;
 
     /**
-     * Constructor for a new empty instance of Unidade
-     * @param array $unidade All field and values to fill the instance
+     * Constructor for a new empty instance of Acesso
+     * @param array $acesso All field and values to fill the instance
      */
-    public function __construct($unidade = [])
+    public function __construct($acesso = [])
     {
-        parent::__construct($unidade);
+        parent::__construct($acesso);
     }
 
     /**
-     * Identificador da unidade
-     * @return mixed ID of Unidade
+     * Identificador do acesso
+     * @return mixed ID of Acesso
      */
     public function getID()
     {
@@ -74,7 +69,7 @@ class Unidade extends SyncModel
     /**
      * Set ID value to new on param
      * @param  mixed $id new value for ID
-     * @return Unidade Self instance
+     * @return Acesso Self instance
      */
     public function setID($id)
     {
@@ -83,62 +78,42 @@ class Unidade extends SyncModel
     }
 
     /**
-     * Nome da unidade de medida, Ex.: Grama, Quilo
-     * @return mixed Nome of Unidade
+     * Função a que a permissão se aplica
+     * @return mixed Função of Acesso
      */
-    public function getNome()
+    public function getFuncaoID()
     {
-        return $this->nome;
+        return $this->funcao_id;
     }
 
     /**
-     * Set Nome value to new on param
-     * @param  mixed $nome new value for Nome
-     * @return Unidade Self instance
+     * Set FuncaoID value to new on param
+     * @param  mixed $funcao_id new value for FuncaoID
+     * @return Acesso Self instance
      */
-    public function setNome($nome)
+    public function setFuncaoID($funcao_id)
     {
-        $this->nome = $nome;
+        $this->funcao_id = $funcao_id;
         return $this;
     }
 
     /**
-     * Detalhes sobre a unidade de medida
-     * @return mixed Descrição of Unidade
+     * Permissão liberada para a função
+     * @return mixed Permissão of Acesso
      */
-    public function getDescricao()
+    public function getPermissaoID()
     {
-        return $this->descricao;
+        return $this->permissao_id;
     }
 
     /**
-     * Set Descricao value to new on param
-     * @param  mixed $descricao new value for Descricao
-     * @return Unidade Self instance
+     * Set PermissaoID value to new on param
+     * @param  mixed $permissao_id new value for PermissaoID
+     * @return Acesso Self instance
      */
-    public function setDescricao($descricao)
+    public function setPermissaoID($permissao_id)
     {
-        $this->descricao = $descricao;
-        return $this;
-    }
-
-    /**
-     * Sigla da unidade de medida, Ex.: UN, L, g
-     * @return mixed Sigla of Unidade
-     */
-    public function getSigla()
-    {
-        return $this->sigla;
-    }
-
-    /**
-     * Set Sigla value to new on param
-     * @param  mixed $sigla new value for Sigla
-     * @return Unidade Self instance
-     */
-    public function setSigla($sigla)
-    {
-        $this->sigla = $sigla;
+        $this->permissao_id = $permissao_id;
         return $this;
     }
 
@@ -149,46 +124,40 @@ class Unidade extends SyncModel
      */
     public function toArray($recursive = false)
     {
-        $unidade = parent::toArray($recursive);
-        $unidade['id'] = $this->getID();
-        $unidade['nome'] = $this->getNome();
-        $unidade['descricao'] = $this->getDescricao();
-        $unidade['sigla'] = $this->getSigla();
-        return $unidade;
+        $acesso = parent::toArray($recursive);
+        $acesso['id'] = $this->getID();
+        $acesso['funcaoid'] = $this->getFuncaoID();
+        $acesso['permissaoid'] = $this->getPermissaoID();
+        return $acesso;
     }
 
     /**
      * Fill this instance with from array values, you can pass instance to
-     * @param  mixed $unidade Associated key -> value to assign into this instance
-     * @return Unidade Self instance
+     * @param  mixed $acesso Associated key -> value to assign into this instance
+     * @return Acesso Self instance
      */
-    public function fromArray($unidade = [])
+    public function fromArray($acesso = [])
     {
-        if ($unidade instanceof Unidade) {
-            $unidade = $unidade->toArray();
-        } elseif (!is_array($unidade)) {
-            $unidade = [];
+        if ($acesso instanceof Acesso) {
+            $acesso = $acesso->toArray();
+        } elseif (!is_array($acesso)) {
+            $acesso = [];
         }
-        parent::fromArray($unidade);
-        if (!isset($unidade['id'])) {
+        parent::fromArray($acesso);
+        if (!isset($acesso['id'])) {
             $this->setID(null);
         } else {
-            $this->setID($unidade['id']);
+            $this->setID($acesso['id']);
         }
-        if (!isset($unidade['nome'])) {
-            $this->setNome(null);
+        if (!isset($acesso['funcaoid'])) {
+            $this->setFuncaoID(null);
         } else {
-            $this->setNome($unidade['nome']);
+            $this->setFuncaoID($acesso['funcaoid']);
         }
-        if (!array_key_exists('descricao', $unidade)) {
-            $this->setDescricao(null);
+        if (!isset($acesso['permissaoid'])) {
+            $this->setPermissaoID(null);
         } else {
-            $this->setDescricao($unidade['descricao']);
-        }
-        if (!isset($unidade['sigla'])) {
-            $this->setSigla(null);
-        } else {
-            $this->setSigla($unidade['sigla']);
+            $this->setPermissaoID($acesso['permissaoid']);
         }
         return $this;
     }
@@ -199,81 +168,24 @@ class Unidade extends SyncModel
      */
     public function publish()
     {
-        $unidade = parent::publish();
-        return $unidade;
-    }
-
-    private function processaUnidade($quantidade, $conteudo)
-    {
-        $unidade = $this->getSigla();
-        $grandezas = [
-            -24 => 'y',
-            -21 => 'z',
-            -18 => 'a',
-            -15 => 'f',
-            -12 => 'p',
-            -9  => 'n',
-            -6  => 'µ',
-            -3  => 'm',
-            -2  => 'c',
-            -1  => 'd',
-             0  => '',
-             1  => 'da',
-             2  => 'h',
-             3  => 'k',
-             6  => 'M',
-             9  => 'G',
-             12 => 'T',
-             15 => 'P',
-             18 => 'E',
-             21 => 'Z',
-             24 => 'Y'
-        ];
-        $index = intval(log10($conteudo));
-        $remain = $conteudo / pow(10, $index);
-        if (!array_key_exists($index, $grandezas)) {
-            throw new \Exception('Não existe grandeza para o conteudo '.$conteudo.' da unidade '.$unidade, 404);
-        }
-        $unidade = $grandezas[$index].$unidade;
-        return [
-            'unidade' => $unidade,
-            'quantidade' => $quantidade * $remain
-        ];
-    }
-
-    public function processaSigla($quantidade, $conteudo)
-    {
-        $data = $this->processaUnidade($quantidade, $conteudo);
-        return $data['unidade'];
-    }
-
-    public function processaQuantidade($quantidade, $conteudo)
-    {
-        $data = $this->processaUnidade($quantidade, $conteudo);
-        return $data['quantidade'];
-    }
-
-    public function formatar($quantidade, $conteudo)
-    {
-        $data = $this->processaUnidade($quantidade, $conteudo);
-        return strval($data['quantidade']) . ' ' . $data['unidade'];
+        $acesso = parent::publish();
+        return $acesso;
     }
 
     /**
      * Filter fields, upload data and keep key data
-     * @param Unidade $original Original instance without modifications
+     * @param Acesso $original Original instance without modifications
      */
     public function filter($original)
     {
         $this->setID($original->getID());
-        $this->setNome(Filter::string($this->getNome()));
-        $this->setDescricao(Filter::string($this->getDescricao()));
-        $this->setSigla(Filter::string($this->getSigla()));
+        $this->setFuncaoID(Filter::number($this->getFuncaoID()));
+        $this->setPermissaoID(Filter::number($this->getPermissaoID()));
     }
 
     /**
      * Clean instance resources like images and docs
-     * @param  Unidade $dependency Don't clean when dependency use same resources
+     * @param  Acesso $dependency Don't clean when dependency use same resources
      */
     public function clean($dependency)
     {
@@ -281,16 +193,16 @@ class Unidade extends SyncModel
 
     /**
      * Validate fields updating them and throw exception when invalid data has found
-     * @return array All field of Unidade in array format
+     * @return array All field of Acesso in array format
      */
     public function validate()
     {
         $errors = [];
-        if (is_null($this->getNome())) {
-            $errors['nome'] = 'O nome não pode ser vazio';
+        if (is_null($this->getFuncaoID())) {
+            $errors['funcaoid'] = 'A função não pode ser vazia';
         }
-        if (is_null($this->getSigla())) {
-            $errors['sigla'] = 'A sigla não pode ser vazia';
+        if (is_null($this->getPermissaoID())) {
+            $errors['permissaoid'] = 'A permissão não pode ser vazia';
         }
         if (!empty($errors)) {
             throw new \MZ\Exception\ValidationException($errors);
@@ -305,11 +217,15 @@ class Unidade extends SyncModel
      */
     protected function translate($e)
     {
-        if (contains(['Sigla', 'UNIQUE'], $e->getMessage())) {
+        if (stripos($e->getMessage(), 'UK_Acessos_FuncaoID_PermissaoID') !== false) {
             return new \MZ\Exception\ValidationException([
-                'sigla' => sprintf(
-                    'A sigla "%s" já está cadastrada',
-                    $this->getSigla()
+                'funcaoid' => sprintf(
+                    'A função "%s" já está cadastrada',
+                    $this->getFuncaoID()
+                ),
+                'permissaoid' => sprintf(
+                    'A permissão "%s" já está cadastrada',
+                    $this->getPermissaoID()
                 ),
             ]);
         }
@@ -317,8 +233,8 @@ class Unidade extends SyncModel
     }
 
     /**
-     * Insert a new Unidade into the database and fill instance from database
-     * @return Unidade Self instance
+     * Insert a new Acesso into the database and fill instance from database
+     * @return Acesso Self instance
      */
     public function insert()
     {
@@ -326,7 +242,7 @@ class Unidade extends SyncModel
         $values = $this->validate();
         unset($values['id']);
         try {
-            $id = DB::insertInto('Unidades')->values($values)->execute();
+            $id = DB::insertInto('Acessos')->values($values)->execute();
             $this->loadByID($id);
         } catch (\Exception $e) {
             throw $this->translate($e);
@@ -335,19 +251,19 @@ class Unidade extends SyncModel
     }
 
     /**
-     * Update Unidade with instance values into database for ID
+     * Update Acesso with instance values into database for ID
      * @param  array $only Save these fields only, when empty save all fields except id
-     * @return Unidade Self instance
+     * @return Acesso Self instance
      */
     public function update($only = [])
     {
         $values = $this->validate();
         if (!$this->exists()) {
-            throw new \Exception('O identificador da unidade não foi informado');
+            throw new \Exception('O identificador do acesso não foi informado');
         }
         $values = DB::filterValues($values, $only, false);
         try {
-            DB::update('Unidades')
+            DB::update('Acessos')
                 ->set($values)
                 ->where('id', $this->getID())
                 ->execute();
@@ -365,9 +281,9 @@ class Unidade extends SyncModel
     public function delete()
     {
         if (!$this->exists()) {
-            throw new \Exception('O identificador da unidade não foi informado');
+            throw new \Exception('O identificador do acesso não foi informado');
         }
-        $result = DB::deleteFrom('Unidades')
+        $result = DB::deleteFrom('Acessos')
             ->where('id', $this->getID())
             ->execute();
         return $result;
@@ -377,7 +293,7 @@ class Unidade extends SyncModel
      * Load one register for it self with a condition
      * @param  array $condition Condition for searching the row
      * @param  array $order associative field name -> [-1, 1]
-     * @return Unidade Self instance filled or empty
+     * @return Acesso Self instance filled or empty
      */
     public function load($condition, $order = [])
     {
@@ -387,15 +303,35 @@ class Unidade extends SyncModel
     }
 
     /**
-     * Load into this object from database using, Sigla
-     * @param  string $sigla sigla to find Unidade
-     * @return Unidade Self filled instance or empty when not found
+     * Load into this object from database using, FuncaoID, PermissaoID
+     * @param  int $funcao_id função to find Acesso
+     * @param  int $permissao_id permissão to find Acesso
+     * @return Acesso Self filled instance or empty when not found
      */
-    public function loadBySigla($sigla)
+    public function loadByFuncaoIDPermissaoID($funcao_id, $permissao_id)
     {
         return $this->load([
-            'sigla' => strval($sigla),
+            'funcaoid' => intval($funcao_id),
+            'permissaoid' => intval($permissao_id),
         ]);
+    }
+
+    /**
+     * Função a que a permissão se aplica
+     * @return \MZ\Provider\Funcao The object fetched from database
+     */
+    public function findFuncaoID()
+    {
+        return \MZ\Provider\Funcao::findByID($this->getFuncaoID());
+    }
+
+    /**
+     * Permissão liberada para a função
+     * @return \MZ\System\Permissao The object fetched from database
+     */
+    public function findPermissaoID()
+    {
+        return \MZ\System\Permissao::findByID($this->getPermissaoID());
     }
 
     /**
@@ -404,8 +340,8 @@ class Unidade extends SyncModel
      */
     private static function getAllowedKeys()
     {
-        $unidade = new Unidade();
-        $allowed = Filter::concatKeys('u.', $unidade->toArray());
+        $acesso = new Acesso();
+        $allowed = Filter::concatKeys('a.', $acesso->toArray());
         return $allowed;
     }
 
@@ -417,7 +353,7 @@ class Unidade extends SyncModel
     private static function filterOrder($order)
     {
         $allowed = self::getAllowedKeys();
-        return Filter::orderBy($order, $allowed, 'u.');
+        return Filter::orderBy($order, $allowed, 'a.');
     }
 
     /**
@@ -428,14 +364,7 @@ class Unidade extends SyncModel
     private static function filterCondition($condition)
     {
         $allowed = self::getAllowedKeys();
-        if (isset($condition['search'])) {
-            $search = $condition['search'];
-            $field = '(u.nome LIKE ? OR u.descricao LIKE ?)';
-            $condition[$field] = ['%'.$search.'%', '%'.$search.'%'];
-            $allowed[$field] = true;
-            unset($condition['search']);
-        }
-        return Filter::keys($condition, $allowed, 'u.');
+        return Filter::keys($condition, $allowed, 'a.');
     }
 
     /**
@@ -446,11 +375,10 @@ class Unidade extends SyncModel
      */
     private static function query($condition = [], $order = [])
     {
-        $query = DB::from('Unidades u');
+        $query = DB::from('Acessos a');
         $condition = self::filterCondition($condition);
         $query = DB::buildOrderBy($query, self::filterOrder($order));
-        $query = $query->orderBy('u.nome ASC');
-        $query = $query->orderBy('u.id ASC');
+        $query = $query->orderBy('a.id ASC');
         return DB::buildCondition($query, $condition);
     }
 
@@ -458,33 +386,48 @@ class Unidade extends SyncModel
      * Search one register with a condition
      * @param  array $condition Condition for searching the row
      * @param  array $order order rows
-     * @return Unidade A filled Unidade or empty instance
+     * @return Acesso A filled Acesso or empty instance
      */
     public static function find($condition, $order = [])
     {
         $query = self::query($condition, $order)->limit(1);
         $row = $query->fetch() ?: [];
-        return new Unidade($row);
+        return new Acesso($row);
     }
 
     /**
-     * Find this object on database using, Sigla
-     * @param  string $sigla sigla to find Unidade
-     * @return Unidade A filled instance or empty when not found
+     * Find this object on database using, FuncaoID, PermissaoID
+     * @param  int $funcao_id função to find Acesso
+     * @param  int $permissao_id permissão to find Acesso
+     * @return Acesso A filled instance or empty when not found
      */
-    public static function findBySigla($sigla)
+    public static function findByFuncaoIDPermissaoID($funcao_id, $permissao_id)
     {
         $result = new self();
-        return $result->loadBySigla($sigla);
+        return $result->loadByFuncaoIDPermissaoID($funcao_id, $permissao_id);
+    }
+
+    public static function getPermissoes($funcao_id)
+    {
+        $rows = self::query(['funcaoid' => $funcao_id])
+            ->select(null)
+            ->select('p.nome')
+            ->leftJoin('Permissoes p ON p.id = a.permissaoid')
+            ->fetchAll();
+        $permissoes = [];
+        foreach ($rows as $row) {
+            $permissoes[] = $row['nome'];
+        }
+        return $permissoes;
     }
 
     /**
-     * Find all Unidade
-     * @param  array  $condition Condition to get all Unidade
-     * @param  array  $order     Order Unidade
+     * Find all Acesso
+     * @param  array  $condition Condition to get all Acesso
+     * @param  array  $order     Order Acesso
      * @param  int    $limit     Limit data into row count
      * @param  int    $offset    Start offset to get rows
-     * @return array             List of all rows instanced as Unidade
+     * @return array             List of all rows instanced as Acesso
      */
     public static function findAll($condition = [], $order = [], $limit = null, $offset = null)
     {
@@ -498,7 +441,7 @@ class Unidade extends SyncModel
         $rows = $query->fetchAll();
         $result = [];
         foreach ($rows as $row) {
-            $result[] = new Unidade($row);
+            $result[] = new Acesso($row);
         }
         return $result;
     }

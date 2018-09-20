@@ -24,7 +24,7 @@
  */
 namespace MZ\Account;
 
-use MZ\Database\Model;
+use MZ\Database\SyncModel;
 use MZ\Database\DB;
 use MZ\Util\Filter;
 use MZ\Util\Validator;
@@ -32,7 +32,7 @@ use MZ\Util\Validator;
 /**
  * Contas a pagar e ou receber
  */
-class Conta extends Model
+class Conta extends SyncModel
 {
     const MOVIMENTACAO_ID = 1;
 
@@ -907,10 +907,9 @@ class Conta extends Model
     /**
      * Update Conta with instance values into database for ID
      * @param  array $only Save these fields only, when empty save all fields except id
-     * @param  boolean $except When true, saves all fields except $only
      * @return Conta Self instance
      */
-    public function update($only = [], $except = false)
+    public function update($only = [])
     {
         $values = $this->validate();
         if (!$this->exists()) {
@@ -919,7 +918,7 @@ class Conta extends Model
         if ($this->getID() == self::MOVIMENTACAO_ID) {
             throw new \Exception('A conta informada é utilizada internamente pelo sistema e não pode ser alterada');
         }
-        $values = DB::filterValues($values, $only, $except);
+        $values = DB::filterValues($values, $only, false);
         unset($values['datacadastro']);
         try {
             DB::update('Contas')
@@ -975,11 +974,11 @@ class Conta extends Model
 
     /**
      * Funcionário que lançou a conta
-     * @return \MZ\Employee\Funcionario The object fetched from database
+     * @return \MZ\Provider\Prestador The object fetched from database
      */
     public function findFuncionarioID()
     {
-        return \MZ\Employee\Funcionario::findByID($this->getFuncionarioID());
+        return \MZ\Provider\Prestador::findByID($this->getFuncionarioID());
     }
 
     /**

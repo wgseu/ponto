@@ -36,56 +36,38 @@ use MZ\Location\Localizacao;
  */
 class Sistema extends Model
 {
-    const VERSAO = '1935';
+    const VERSAO = '2000';
 
     /**
      * Identificador único do sistema, valor 1
      */
     private $id;
     /**
-     * País em que o sistema está sendo utilizado
+     * Servidor do sistema
      */
-    private $pais_id;
-    /**
-     * Informa qual a empresa que gerencia o sistema, a empresa deve ser um
-     * cliente do tipo pessoa jurídica
-     */
-    private $empresa_id;
-    /**
-     * Informa quem realiza o suporte do sistema, deve ser um cliente do tipo
-     * empresa que possua um acionista como representante
-     */
-    private $parceiro_id;
-    /**
-     * Chave de acesso ao sistema, a chave é atualizada sempre ao utilizar o
-     * programa
-     */
-    private $access_key;
-    /**
-     * Chave de registro, permite licenças do tipo aluguel
-     */
-    private $registry_key;
+    private $servidor_id;
     /**
      * Chave da Licença, permite licença do tipo vitalícia
      */
-    private $license_key;
+    private $licenca;
     /**
-     * Quantidade de computadores permitido para uso em rede
+     * Quantidade de tablets e computadores permitido para uso
      */
-    private $computadores;
+    private $dispositivos;
     /**
-     * Código único da empresa, permite baixar novas licenças automaticamente
+     * Código único da empresa, permite baixar novas licenças automaticamente e
+     * autorizar sincronização do servidor
      */
     private $guid;
-    /**
-     * Opções gerais do sistema como opções de impressão
-     */
-    private $opcoes;
     /**
      * Informa qual foi a data da última realização de backup do banco de dados
      * do sistema
      */
     private $ultimo_backup;
+    /**
+     * Informa qual o fuso horário
+     */
+    private $fuso_horario;
     /**
      * Informa qual a versão do banco de dados
      */
@@ -94,20 +76,61 @@ class Sistema extends Model
     /* system fields */
 
     /**
+     * Business information
+     * @var Empresa
+     */
+    private $business;
+    
+    /**
      * Enterprise that manages this system
-     * @var Cliente
+     * @var \MZ\Account\Cliente
      */
     private $company;
+
+    /**
+     * Company address
+     * @var \MZ\Location\Localizacao
+     */
     private $localization;
+
+    /**
+     * Company district location
+     * @var \MZ\Location\Bairro
+     */
     private $district;
+
+    /**
+     * Company city location
+     * @var \MZ\Location\Cidade
+     */
     private $city;
+
+    /**
+     * Company state location
+     * @var \MZ\Location\Estado
+     */
     private $state;
+
+    /**
+     * Company country location
+     * @var \MZ\Location\Pais
+     */
     private $country;
+
+    /**
+     * Country main currency
+     * @var \MZ\Wallet\Moeda
+     */
     private $currency;
+
+    /**
+     * Country region options
+     * @var mixed[]
+     */
     private $entries;
     /**
      * System settings
-     * @var Settings
+     * @var \MZ\Core\Settings
      */
     private $settings;
     /**
@@ -125,7 +148,6 @@ class Sistema extends Model
     public function __construct($sistema = [])
     {
         parent::__construct($sistema);
-        $this->company = new \MZ\Account\Cliente();
         $this->settings = new \MZ\Core\Settings(
             isset($sistema['settings']) ? $sistema['settings'] : []
         );
@@ -143,7 +165,7 @@ class Sistema extends Model
     /**
      * Set ID value to new on param
      * @param  mixed $id new value for ID
-     * @return Sistema Self instance
+     * @return self Self instance
      */
     public function setID($id)
     {
@@ -152,105 +174,22 @@ class Sistema extends Model
     }
 
     /**
-     * País em que o sistema está sendo utilizado
-     * @return mixed País of Sistema
+     * Servidor do sistema
+     * @return mixed Servidor of Sistema
      */
-    public function getPaisID()
+    public function getServidorID()
     {
-        return $this->pais_id;
+        return $this->servidor_id;
     }
 
     /**
-     * Set PaisID value to new on param
-     * @param  mixed $pais_id new value for PaisID
-     * @return Sistema Self instance
+     * Set ServidorID value to new on param
+     * @param  mixed $servidor_id new value for ServidorID
+     * @return self Self instance
      */
-    public function setPaisID($pais_id)
+    public function setServidorID($servidor_id)
     {
-        $this->pais_id = $pais_id;
-        return $this;
-    }
-
-    /**
-     * Informa qual a empresa que gerencia o sistema, a empresa deve ser um
-     * cliente do tipo pessoa jurídica
-     * @return mixed Empresa of Sistema
-     */
-    public function getEmpresaID()
-    {
-        return $this->empresa_id;
-    }
-
-    /**
-     * Set EmpresaID value to new on param
-     * @param  mixed $empresa_id new value for EmpresaID
-     * @return Sistema Self instance
-     */
-    public function setEmpresaID($empresa_id)
-    {
-        $this->empresa_id = $empresa_id;
-        return $this;
-    }
-
-    /**
-     * Informa quem realiza o suporte do sistema, deve ser um cliente do tipo
-     * empresa que possua um acionista como representante
-     * @return mixed Parceiro of Sistema
-     */
-    public function getParceiroID()
-    {
-        return $this->parceiro_id;
-    }
-
-    /**
-     * Set ParceiroID value to new on param
-     * @param  mixed $parceiro_id new value for ParceiroID
-     * @return Sistema Self instance
-     */
-    public function setParceiroID($parceiro_id)
-    {
-        $this->parceiro_id = $parceiro_id;
-        return $this;
-    }
-
-    /**
-     * Chave de acesso ao sistema, a chave é atualizada sempre ao utilizar o
-     * programa
-     * @return mixed Chave de acesso of Sistema
-     */
-    public function getAccessKey()
-    {
-        return $this->access_key;
-    }
-
-    /**
-     * Set AccessKey value to new on param
-     * @param  mixed $access_key new value for AccessKey
-     * @return Sistema Self instance
-     */
-    public function setAccessKey($access_key)
-    {
-        $this->access_key = $access_key;
-        return $this;
-    }
-
-    /**
-     * Chave de registro, permite licenças do tipo aluguel
-     * @return mixed Chave de registro of Sistema
-     */
-    public function getRegistryKey()
-    {
-        return $this->registry_key;
-    }
-
-    /**
-     * Set RegistryKey value to new on param
-     * @param  mixed $registry_key new value for RegistryKey
-     * @return Sistema Self instance
-     */
-    public function setRegistryKey($registry_key)
-    {
-        $this->registry_key = $registry_key;
+        $this->servidor_id = $servidor_id;
         return $this;
     }
 
@@ -258,44 +197,45 @@ class Sistema extends Model
      * Chave da Licença, permite licença do tipo vitalícia
      * @return mixed Chave de licença of Sistema
      */
-    public function getLicenseKey()
+    public function getLicenca()
     {
-        return $this->license_key;
+        return $this->licenca;
     }
 
     /**
-     * Set LicenseKey value to new on param
-     * @param  mixed $license_key new value for LicenseKey
-     * @return Sistema Self instance
+     * Set Licenca value to new on param
+     * @param  mixed $licenca new value for Licenca
+     * @return self Self instance
      */
-    public function setLicenseKey($license_key)
+    public function setLicenca($licenca)
     {
-        $this->license_key = $license_key;
+        $this->licenca = $licenca;
         return $this;
     }
 
     /**
-     * Quantidade de computadores permitido para uso em rede
-     * @return mixed Quantidade de computadores of Sistema
+     * Quantidade de tablets e computadores permitido para uso
+     * @return mixed Quantidade de dispositivos of Sistema
      */
-    public function getComputadores()
+    public function getDispositivos()
     {
-        return $this->computadores;
+        return $this->dispositivos;
     }
 
     /**
-     * Set Computadores value to new on param
-     * @param  mixed $computadores new value for Computadores
-     * @return Sistema Self instance
+     * Set Dispositivos value to new on param
+     * @param  mixed $dispositivos new value for Dispositivos
+     * @return self Self instance
      */
-    public function setComputadores($computadores)
+    public function setDispositivos($dispositivos)
     {
-        $this->computadores = $computadores;
+        $this->dispositivos = $dispositivos;
         return $this;
     }
 
     /**
-     * Código único da empresa, permite baixar novas licenças automaticamente
+     * Código único da empresa, permite baixar novas licenças automaticamente e
+     * autorizar sincronização do servidor
      * @return mixed Identificador da empresa of Sistema
      */
     public function getGUID()
@@ -306,31 +246,11 @@ class Sistema extends Model
     /**
      * Set GUID value to new on param
      * @param  mixed $guid new value for GUID
-     * @return Sistema Self instance
+     * @return self Self instance
      */
     public function setGUID($guid)
     {
         $this->guid = $guid;
-        return $this;
-    }
-
-    /**
-     * Opções gerais do sistema como opções de impressão
-     * @return mixed Opções do sistema of Sistema
-     */
-    public function getOpcoes()
-    {
-        return $this->opcoes;
-    }
-
-    /**
-     * Set Opcoes value to new on param
-     * @param  mixed $opcoes new value for Opcoes
-     * @return Sistema Self instance
-     */
-    public function setOpcoes($opcoes)
-    {
-        $this->opcoes = $opcoes;
         return $this;
     }
 
@@ -347,11 +267,31 @@ class Sistema extends Model
     /**
      * Set UltimoBackup value to new on param
      * @param  mixed $ultimo_backup new value for UltimoBackup
-     * @return Sistema Self instance
+     * @return self Self instance
      */
     public function setUltimoBackup($ultimo_backup)
     {
         $this->ultimo_backup = $ultimo_backup;
+        return $this;
+    }
+
+    /**
+     * Informa qual o fuso horário
+     * @return mixed FusoHorario of Sistema
+     */
+    public function getFusoHorario()
+    {
+        return $this->fuso_horario;
+    }
+
+    /**
+     * Set FusoHorario value to new on param
+     * @param  mixed $fuso_horario new value for FusoHorario
+     * @return self Self instance
+     */
+    public function setFusoHorario($fuso_horario)
+    {
+        $this->fuso_horario = $fuso_horario;
         return $this;
     }
 
@@ -367,7 +307,7 @@ class Sistema extends Model
     /**
      * Set VersaoDB value to new on param
      * @param  mixed $versao_db new value for VersaoDB
-     * @return Sistema Self instance
+     * @return self Self instance
      */
     public function setVersaoDB($versao_db)
     {
@@ -384,16 +324,12 @@ class Sistema extends Model
     {
         $sistema = parent::toArray($recursive);
         $sistema['id'] = $this->getID();
-        $sistema['paisid'] = $this->getPaisID();
-        $sistema['empresaid'] = $this->getEmpresaID();
-        $sistema['parceiroid'] = $this->getParceiroID();
-        $sistema['accesskey'] = $this->getAccessKey();
-        $sistema['registrykey'] = $this->getRegistryKey();
-        $sistema['licensekey'] = $this->getLicenseKey();
-        $sistema['computadores'] = $this->getComputadores();
+        $sistema['servidorid'] = $this->getServidorID();
+        $sistema['licenca'] = $this->getLicenca();
+        $sistema['dispositivos'] = $this->getDispositivos();
         $sistema['guid'] = $this->getGUID();
-        $sistema['opcoes'] = $this->getOpcoes();
         $sistema['ultimobackup'] = $this->getUltimoBackup();
+        $sistema['fusohorario'] = $this->getFusoHorario();
         $sistema['versaodb'] = $this->getVersaoDB();
         return $sistema;
     }
@@ -401,70 +337,50 @@ class Sistema extends Model
     /**
      * Fill this instance with from array values, you can pass instance to
      * @param  mixed $sistema Associated key -> value to assign into this instance
-     * @return Sistema Self instance
+     * @return self Self instance
      */
     public function fromArray($sistema = [])
     {
-        if ($sistema instanceof Sistema) {
+        if ($sistema instanceof self) {
             $sistema = $sistema->toArray();
         } elseif (!is_array($sistema)) {
             $sistema = [];
         }
         parent::fromArray($sistema);
         if (!isset($sistema['id'])) {
-            $this->setID('1');
+            $this->setID(null);
         } else {
             $this->setID($sistema['id']);
         }
-        if (!array_key_exists('paisid', $sistema)) {
-            $this->setPaisID(null);
+        if (!isset($sistema['servidorid'])) {
+            $this->setServidorID(null);
         } else {
-            $this->setPaisID($sistema['paisid']);
+            $this->setServidorID($sistema['servidorid']);
         }
-        if (!array_key_exists('empresaid', $sistema)) {
-            $this->setEmpresaID(null);
+        if (!array_key_exists('licenca', $sistema)) {
+            $this->setLicenca(null);
         } else {
-            $this->setEmpresaID($sistema['empresaid']);
+            $this->setLicenca($sistema['licenca']);
         }
-        if (!array_key_exists('parceiroid', $sistema)) {
-            $this->setParceiroID(null);
+        if (!array_key_exists('dispositivos', $sistema)) {
+            $this->setDispositivos(null);
         } else {
-            $this->setParceiroID($sistema['parceiroid']);
-        }
-        if (!array_key_exists('accesskey', $sistema)) {
-            $this->setAccessKey(null);
-        } else {
-            $this->setAccessKey($sistema['accesskey']);
-        }
-        if (!array_key_exists('registrykey', $sistema)) {
-            $this->setRegistryKey(null);
-        } else {
-            $this->setRegistryKey($sistema['registrykey']);
-        }
-        if (!array_key_exists('licensekey', $sistema)) {
-            $this->setLicenseKey(null);
-        } else {
-            $this->setLicenseKey($sistema['licensekey']);
-        }
-        if (!array_key_exists('computadores', $sistema)) {
-            $this->setComputadores(null);
-        } else {
-            $this->setComputadores($sistema['computadores']);
+            $this->setDispositivos($sistema['dispositivos']);
         }
         if (!array_key_exists('guid', $sistema)) {
             $this->setGUID(null);
         } else {
             $this->setGUID($sistema['guid']);
         }
-        if (!array_key_exists('opcoes', $sistema)) {
-            $this->setOpcoes(null);
-        } else {
-            $this->setOpcoes($sistema['opcoes']);
-        }
         if (!array_key_exists('ultimobackup', $sistema)) {
             $this->setUltimoBackup(null);
         } else {
             $this->setUltimoBackup($sistema['ultimobackup']);
+        }
+        if (!array_key_exists('fusohorario', $sistema)) {
+            $this->setFusoHorario(null);
+        } else {
+            $this->setFusoHorario($sistema['fusohorario']);
         }
         if (!isset($sistema['versaodb'])) {
             $this->setVersaoDB(null);
@@ -481,20 +397,9 @@ class Sistema extends Model
     public function publish()
     {
         $sistema = parent::publish();
-        unset($sistema['accesskey']);
-        unset($sistema['registrykey']);
-        unset($sistema['licensekey']);
+        unset($sistema['licenca']);
         unset($sistema['guid']);
-        unset($sistema['opcoes']);
         return $sistema;
-    }
-
-    /**
-     * Quantidade de tablets permitido para uso em rede
-     */
-    public function getTablets()
-    {
-        return $this->getComputadores() * 2;
     }
 
     /**
@@ -522,26 +427,18 @@ class Sistema extends Model
     public function filter($original)
     {
         $this->setID($original->getID());
-        $this->setPaisID(Filter::number($this->getPaisID()));
-        $this->setEmpresaID(Filter::number($this->getEmpresaID()));
-        $this->setParceiroID(Filter::number($this->getParceiroID()));
-        $this->setAccessKey(Filter::text($this->getAccessKey()));
-        $this->setRegistryKey(Filter::text($this->getRegistryKey()));
-        $this->setLicenseKey(Filter::text($this->getLicenseKey()));
-        $this->setComputadores(Filter::number($this->getComputadores()));
+        $this->setServidorID(Filter::number($this->getServidorID()));
+        $this->setLicenca(Filter::text($this->getLicenca()));
+        $this->setDispositivos(Filter::number($this->getDispositivos()));
         $this->setGUID(Filter::string($this->getGUID()));
-
-        $opcoes = to_ini($this->getSettings()->getValues());
-        $opcoes = base64_encode($opcoes);
-        $this->setOpcoes($opcoes);
-
         $this->setUltimoBackup(Filter::datetime($this->getUltimoBackup()));
+        $this->setFusoHorario(Filter::string($this->getFusoHorario()));
         $this->setVersaoDB(Filter::string($this->getVersaoDB()));
     }
 
     /**
      * Clean instance resources like images and docs
-     * @param  Sistema $dependency Don't clean when dependency use same resources
+     * @param Sistema $dependency Don't clean when dependency use same resources
      */
     public function clean($dependency)
     {
@@ -549,13 +446,16 @@ class Sistema extends Model
 
     /**
      * Validate fields updating them and throw exception when invalid data has found
-     * @return array All field of Sistema in array format
+     * @return mixed[] All field of Sistema in array format
      */
     public function validate()
     {
         $errors = [];
         if ($this->getID() != '1') {
             $errors['id'] = 'O id do sistema não foi informado';
+        }
+        if (is_null($this->getServidorID())) {
+            $errors['servidorid'] = 'O servidor não pode ser vazio';
         }
         if (is_null($this->getVersaoDB())) {
             $errors['versaodb'] = 'A versão do banco de dados não pode ser vazia';
@@ -567,44 +467,81 @@ class Sistema extends Model
     }
 
     /**
+     * Business of company
+     * @return Empresa
+     */
+    public function getBusiness()
+    {
+        return $this->business;
+    }
+
+    /**
      * Company that manages this system
-     * @return Empresa company of this system
+     * @return \MZ\Account\Cliente
      */
     public function getCompany()
     {
         return $this->company;
     }
 
+    /**
+     * Company address
+     * @return \MZ\Location\Localizacao
+     */
     public function getLocalization()
     {
         return $this->localization;
     }
 
+    /**
+     * Company district location
+     * @return \MZ\Location\Bairro
+     */
     public function getDistrict()
     {
         return $this->district;
     }
 
+    /**
+     * Company city location
+     * @return \MZ\Location\Cidade
+     */
     public function getCity()
     {
         return $this->city;
     }
 
+    /**
+     * Company state location
+     * @return \MZ\Location\Estado
+     */
     public function getState()
     {
         return $this->state;
     }
 
+    /**
+     * Company country location
+     * @return \MZ\Location\Pais
+     */
     public function getCountry()
     {
         return $this->country;
     }
 
+    /**
+     * Country main currency
+     * @return \MZ\Wallet\Moeda
+     */
     public function getCurrency()
     {
         return $this->currency;
     }
 
+    /**
+     * Country region options
+     * @var mixed[]
+     */
     public function getEntries()
     {
         return $this->entries;
@@ -612,7 +549,7 @@ class Sistema extends Model
 
     /**
      * Get the system settings
-     * @return Settings system settings
+     * @return \MZ\Core\Settings system settings
      */
     public function getSettings()
     {
@@ -630,6 +567,7 @@ class Sistema extends Model
 
     public function initialize($app_path)
     {
+        $this->business = new Empresa();
         $this->getSettings()->load($app_path  . '/config');
         $host = isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : null;
         if (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] != 'off') {
@@ -665,16 +603,15 @@ class Sistema extends Model
     /**
      * Update Sistema with instance values into database for ID
      * @param  array $only Save these fields only, when empty save all fields except id
-     * @param  boolean $except When true, saves all fields except $only
      * @return Sistema Self instance
      */
-    public function update($only = [], $except = false)
+    public function update($only = [])
     {
         $values = $this->validate();
         if (!$this->exists()) {
             throw new \Exception('O identificador do sistema não foi informado');
         }
-        $values = DB::filterValues($values, $only, $except);
+        $values = DB::filterValues($values, $only, false);
         try {
             DB::update('Sistema')
                 ->set($values)
@@ -693,13 +630,10 @@ class Sistema extends Model
      */
     public function delete()
     {
-        if (!$this->exists()) {
-            throw new \Exception('O identificador do sistema não foi informado');
-        }
-        $result = DB::deleteFrom('Sistema')
-            ->where('id', $this->getID())
-            ->execute();
-        return $result;
+        throw new \Exception(
+            'Não é possível excluir informações do sistema',
+            500
+        );
     }
 
     /**
@@ -715,62 +649,35 @@ class Sistema extends Model
         return $this->fromArray($row);
     }
 
+    /**
+     * load all system data from database and local settings
+     * @return self Self instance loaded
+     */
     public function loadAll()
     {
         $this->loadByID('1');
-        $this->company  = $this->findEmpresaID();
-        $this->localization = Localizacao::find(['clienteid' => $this->company->getID()]);
-        $this->district = $this->localization->findBairroID();
-        $this->city = $this->district->findCidadeID();
-        $this->state = $this->city->findEstadoID();
-        $this->country = $this->findPaisID();
-        $this->currency = $this->country->findMoedaID();
+        $this->getBusiness()->loadAll();
+        $this->company  = $this->getBusiness()->findEmpresaID();
+        $this->localization = Localizacao::find(['clienteid' => $this->getCompany()->getID()]);
+        $this->district = $this->getLocalization()->findBairroID();
+        $this->city = $this->getDistrict()->findCidadeID();
+        $this->state = $this->getCity()->findEstadoID();
+        $this->country = $this->getBusiness()->findPaisID();
+        $this->currency = $this->getCountry()->findMoedaID();
 
-        set_timezone_for($this->state->getUF(), $this->country->getSigla());
-
-        $values = parse_ini_string(base64_decode($this->getOpcoes()), true, INI_SCANNER_RAW);
-        settype($values, 'array');
-        $this->getSettings()->addValues($values);
-        $this->entries = parse_ini_string(base64_decode($this->country->getEntradas()), true, INI_SCANNER_RAW);
+        set_timezone_for($this->getState()->getUF(), $this->getCountry()->getSigla());
+        $this->entries = parse_ini_string(base64_decode($this->getCountry()->getEntradas()), true, INI_SCANNER_RAW);
         settype($this->entries, 'array');
+        return $this;
     }
 
     /**
-     * País em que o sistema está sendo utilizado
-     * @return \MZ\Location\Pais The object fetched from database
+     * Servidor do sistema
+     * @return Servidor The object fetched from database
      */
-    public function findPaisID()
+    public function findServidorID()
     {
-        if (is_null($this->getPaisID())) {
-            return new \MZ\Location\Pais();
-        }
-        return \MZ\Location\Pais::findByID($this->getPaisID());
-    }
-
-    /**
-     * Informa qual a empresa que gerencia o sistema, a empresa deve ser um
-     * cliente do tipo pessoa jurídica
-     * @return \MZ\Account\Cliente The object fetched from database
-     */
-    public function findEmpresaID()
-    {
-        if (is_null($this->getEmpresaID())) {
-            return new \MZ\Account\Cliente();
-        }
-        return \MZ\Account\Cliente::findByID($this->getEmpresaID());
-    }
-
-    /**
-     * Informa quem realiza o suporte do sistema, deve ser um cliente do tipo
-     * empresa que possua um acionista como representante
-     * @return \MZ\Account\Cliente The object fetched from database
-     */
-    public function findParceiroID()
-    {
-        if (is_null($this->getParceiroID())) {
-            return new \MZ\Account\Cliente();
-        }
-        return \MZ\Account\Cliente::findByID($this->getParceiroID());
+        return Servidor::findByID($this->getServidorID());
     }
 
     /**
@@ -803,13 +710,6 @@ class Sistema extends Model
     private static function filterCondition($condition)
     {
         $allowed = self::getAllowedKeys();
-        if (isset($condition['search'])) {
-            $search = $condition['search'];
-            $field = 's.versaodb LIKE ?';
-            $condition[$field] = '%'.$search.'%';
-            $allowed[$field] = true;
-            unset($condition['search']);
-        }
         return Filter::keys($condition, $allowed, 's.');
     }
 
@@ -824,8 +724,6 @@ class Sistema extends Model
         $query = DB::from('Sistema s');
         $condition = self::filterCondition($condition);
         $query = DB::buildOrderBy($query, self::filterOrder($order));
-        $query = $query->orderBy('s.versaodb ASC');
-        $query = $query->orderBy('s.id ASC');
         return DB::buildCondition($query, $condition);
     }
 

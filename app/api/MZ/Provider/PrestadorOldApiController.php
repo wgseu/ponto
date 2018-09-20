@@ -22,14 +22,14 @@
  *
  * @author Equipe GrandChef <desenvolvimento@mzsw.com.br>
  */
-namespace MZ\Employee;
+namespace MZ\Provider;
 
 use MZ\Util\Filter;
 
 /**
  * Allow application to serve system resources
  */
-class FuncionarioOldApiController extends \MZ\Core\ApiController
+class PrestadorOldApiController extends \MZ\Core\ApiController
 {
     public function find()
     {
@@ -44,7 +44,7 @@ class FuncionarioOldApiController extends \MZ\Core\ApiController
             $limit = 20;
         }
         $condition = Filter::query($_GET);
-        $funcionarios = Funcionario::findAll($condition, [], $limit);
+        $prestadores = Prestador::findAll($condition, [], $limit);
         $campos = [
             'id',
             'nome',
@@ -55,11 +55,11 @@ class FuncionarioOldApiController extends \MZ\Core\ApiController
             'imagemurl',
         ];
         $items = [];
-        foreach ($funcionarios as $funcionario) {
-            $funcao = $funcionario->findFuncaoID();
-            $cliente = $funcionario->findClienteID();
+        foreach ($prestadores as $prestador) {
+            $funcao = $prestador->findFuncaoID();
+            $cliente = $prestador->findClienteID();
             $cliente_item = $cliente->publish();
-            $item = $funcionario->publish();
+            $item = $prestador->publish();
             $item['nome'] = $cliente->getNomeCompleto();
             $item['fone1'] = $cliente_item['fone1'];
             $item['cpf'] = $cliente_item['cpf'];

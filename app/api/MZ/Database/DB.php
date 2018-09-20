@@ -66,7 +66,7 @@ class DB
     }
 
     /**
-     * Retorn current date and time on database format
+     * Return current date and time on database format
      * @return string current date and time database formatted
      */
     public static function now($timestamp = null)
@@ -78,7 +78,7 @@ class DB
     }
 
     /**
-     * Retorn current date on database format
+     * Return current date on database format
      * @return string current date database formatted
      */
     public static function date($timestamp = null)
@@ -189,7 +189,6 @@ class DB
     /**
      * Filter values array
      * @param  array $only Save these fields only, when empty save all fields except id
-     * @param  boolean $except When true, saves all fields except $only
      * @return aarray filtered array
      */
     public static function filterValues($values, $only, $except)

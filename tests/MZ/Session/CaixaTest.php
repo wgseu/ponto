@@ -92,9 +92,11 @@ class CaixaTest extends \MZ\Framework\TestCase
         $caixa = new Caixa();
         $caixa->setDescricao('Caixa 3');
         $caixa->insert();
+        $this->assertTrue($caixa->exists());
 
         $caixa->setDescricao('Cash register 3');
         $caixa->update();
+        $this->assertEquals('Cash register 3', $caixa->getDescricao());
     }
 
     public function testFind()
@@ -127,15 +129,15 @@ class CaixaTest extends \MZ\Framework\TestCase
     {
         global $app;
 
-        $old_value = $app->getSystem()->getSettings()->getValue('Sistema', 'Fiscal.Mostrar');
-        $app->getSystem()->getSettings()->setValue('Sistema', 'Fiscal.Mostrar', true);
+        $old_value = $app->getSystem()->getBusiness()->getOptions()->getValue('Sistema', 'Fiscal.Mostrar');
+        $app->getSystem()->getBusiness()->getOptions()->setValue('Sistema', 'Fiscal.Mostrar', true);
         $caixa = new Caixa();
         $caixa->setDescricao('Caixa 6');
         $caixa->setSerie(4);
         $caixa->setNumeroInicial(100);
         $caixa->setAtivo('Y');
         $caixa->insert();
-        $app->getSystem()->getSettings()->setValue('Sistema', 'Fiscal.Mostrar', $old_value);
+        $app->getSystem()->getBusiness()->getOptions()->setValue('Sistema', 'Fiscal.Mostrar', $old_value);
 
         $found_caixa = Caixa::findBySerie(4);
         $this->assertEquals($caixa, $found_caixa);
@@ -173,8 +175,8 @@ class CaixaTest extends \MZ\Framework\TestCase
     {
         global $app;
         
-        $old_value = $app->getSystem()->getSettings()->getValue('Sistema', 'Fiscal.Mostrar');
-        $app->getSystem()->getSettings()->setValue('Sistema', 'Fiscal.Mostrar', true);
+        $old_value = $app->getSystem()->getBusiness()->getOptions()->getValue('Sistema', 'Fiscal.Mostrar');
+        $app->getSystem()->getBusiness()->getOptions()->setValue('Sistema', 'Fiscal.Mostrar', true);
         $this->expectException('\MZ\Exception\ValidationException');
         try {
             $caixa = new Caixa();
@@ -187,7 +189,7 @@ class CaixaTest extends \MZ\Framework\TestCase
             );
             throw $e;
         } finally {
-            $app->getSystem()->getSettings()->setValue('Sistema', 'Fiscal.Mostrar', $old_value);
+            $app->getSystem()->getBusiness()->getOptions()->setValue('Sistema', 'Fiscal.Mostrar', $old_value);
         }
     }
 
@@ -210,9 +212,9 @@ class CaixaTest extends \MZ\Framework\TestCase
         $cliente->setSenha('1234');
         $cliente->insert();
 
-        $funcao = \MZ\Employee\Funcao::find([], ['id' => 1]);
+        $funcao = \MZ\Provider\Funcao::find([], ['id' => 1]);
 
-        $funcionario = new \MZ\Employee\Funcionario();
+        $funcionario = new \MZ\Provider\Prestador();
         $funcionario->setFuncaoID($funcao->getID());
         $funcionario->setClienteID($cliente->getID());
         $funcionario->insert();

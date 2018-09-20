@@ -24,7 +24,7 @@
  */
 namespace MZ\Sale;
 
-use MZ\Database\Model;
+use MZ\Database\SyncModel;
 use MZ\Database\DB;
 use MZ\Util\Date;
 use MZ\Util\Filter;
@@ -34,7 +34,7 @@ use MZ\Util\Validator;
  * Informa se há descontos nos produtos em determinados dias da semana, o
  * preço pode subir ou descer
  */
-class Promocao extends Model
+class Promocao extends SyncModel
 {
 
     /**
@@ -356,16 +356,15 @@ class Promocao extends Model
     /**
      * Update Promoção with instance values into database for ID
      * @param  array $only Save these fields only, when empty save all fields except id
-     * @param  boolean $except When true, saves all fields except $only
      * @return Promocao Self instance
      */
-    public function update($only = [], $except = false)
+    public function update($only = [])
     {
         $values = $this->validate();
         if (!$this->exists()) {
             throw new \Exception('O identificador da promoção não foi informado');
         }
-        $values = DB::filterValues($values, $only, $except);
+        $values = DB::filterValues($values, $only, false);
         try {
             DB::update('Promocoes')
                 ->set($values)

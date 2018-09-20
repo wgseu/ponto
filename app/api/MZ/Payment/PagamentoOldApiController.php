@@ -39,7 +39,7 @@ class PagamentoOldApiController extends \MZ\Core\ApiController
         if (!is_login()) {
             return $this->json()->error('Usuário não autenticado!');
         }
-        if (!logged_employee()->has(Permissao::NOME_RELATORIOCAIXA)) {
+        if (!logged_provider()->has(Permissao::NOME_RELATORIOCAIXA)) {
             return $this->json()->error('Você não tem permissão para acessar o faturamento da empresa');
         }
         $response = [];
@@ -64,7 +64,7 @@ class PagamentoOldApiController extends \MZ\Core\ApiController
         if (!is_login()) {
             return $this->json()->error('Usuário não autenticado!');
         }
-        if (!logged_employee()->has(Permissao::NOME_RELATORIOCAIXA)) {
+        if (!logged_provider()->has(Permissao::NOME_RELATORIOCAIXA)) {
             return $this->json()->error('Você não tem permissão para acessar o resumo de valores');
         }
         $sessao = Sessao::findLastAberta();

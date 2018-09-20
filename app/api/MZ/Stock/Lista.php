@@ -24,7 +24,7 @@
  */
 namespace MZ\Stock;
 
-use MZ\Database\Model;
+use MZ\Database\SyncModel;
 use MZ\Database\DB;
 use MZ\Util\Filter;
 use MZ\Util\Validator;
@@ -32,7 +32,7 @@ use MZ\Util\Validator;
 /**
  * Lista de compras de produtos
  */
-class Lista extends Model
+class Lista extends SyncModel
 {
 
     /**
@@ -359,13 +359,13 @@ class Lista extends Model
      * Update Lista de compra with instance values into database for ID
      * @return Lista Self instance
      */
-    public function update($only = [], $except = false)
+    public function update($only = [])
     {
         $values = $this->validate();
         if (!$this->exists()) {
             throw new \Exception('O identificador da lista de compra não foi informado');
         }
-        $values = DB::filterValues($values, $only, $except);
+        $values = DB::filterValues($values, $only, false);
         try {
             DB::update('Listas')
                 ->set($values)
@@ -408,11 +408,11 @@ class Lista extends Model
 
     /**
      * Informa o funcionário encarregado de fazer as compras
-     * @return \MZ\Employee\Funcionario The object fetched from database
+     * @return \MZ\Provider\Prestador The object fetched from database
      */
     public function findEncarregadoID()
     {
-        return \MZ\Employee\Funcionario::findByID($this->getEncarregadoID());
+        return \MZ\Provider\Prestador::findByID($this->getEncarregadoID());
     }
 
     /**

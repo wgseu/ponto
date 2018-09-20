@@ -22,13 +22,13 @@
  *
  * @author Equipe GrandChef <desenvolvimento@mzsw.com.br>
  */
-namespace MZ\Employee;
+namespace MZ\Provider;
 
-class FuncionarioTest extends \MZ\Framework\TestCase
+class PrestadorTest extends \MZ\Framework\TestCase
 {
     public function testPublish()
     {
-        $funcionario = new Funcionario();
+        $funcionario = new Prestador();
         $values = $funcionario->publish();
         $allowed = [
             'id',

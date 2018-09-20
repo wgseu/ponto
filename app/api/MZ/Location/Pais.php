@@ -24,7 +24,7 @@
  */
 namespace MZ\Location;
 
-use MZ\Database\Model;
+use MZ\Database\SyncModel;
 use MZ\Database\DB;
 use MZ\Util\Filter;
 use MZ\Util\Validator;
@@ -32,7 +32,7 @@ use MZ\Util\Validator;
 /**
  * Informações de um páis com sua moeda e língua nativa
  */
-class Pais extends Model
+class Pais extends SyncModel
 {
 
     /**
@@ -477,16 +477,15 @@ class Pais extends Model
     /**
      * Update País with instance values into database for ID
      * @param  array $only Save these fields only, when empty save all fields except id
-     * @param  boolean $except When true, saves all fields except $only
      * @return Pais Self instance
      */
-    public function update($only = [], $except = false)
+    public function update($only = [])
     {
         $values = $this->validate();
         if (!$this->exists()) {
             throw new \Exception('O identificador do país não foi informado');
         }
-        $values = DB::filterValues($values, $only, $except);
+        $values = DB::filterValues($values, $only, false);
         try {
             DB::update('Paises')
                 ->set($values)

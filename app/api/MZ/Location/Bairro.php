@@ -24,7 +24,7 @@
  */
 namespace MZ\Location;
 
-use MZ\Database\Model;
+use MZ\Database\SyncModel;
 use MZ\Database\DB;
 use MZ\Util\Filter;
 use MZ\Util\Validator;
@@ -34,7 +34,7 @@ use MZ\Exception\ValidationException;
 /**
  * Bairro de uma cidade
  */
-class Bairro extends Model
+class Bairro extends SyncModel
 {
 
     /**
@@ -344,7 +344,7 @@ class Bairro extends Model
         if ($bairro->exists()) {
             return $bairro;
         }
-        if (!logged_employee()->has(Permissao::NOME_CADASTROBAIRROS)) {
+        if (!logged_provider()->has(Permissao::NOME_CADASTROBAIRROS)) {
             throw new \Exception('O bairro não está cadastrada e você não tem permissão para cadastrar um');
         }
         $bairro->setCidadeID($cidade_id);
@@ -482,16 +482,15 @@ class Bairro extends Model
     /**
      * Update Bairro with instance values into database for ID
      * @param  array $only Save these fields only, when empty save all fields except id
-     * @param  boolean $except When true, saves all fields except $only
      * @return Bairro Self instance
      */
-    public function update($only = [], $except = false)
+    public function update($only = [])
     {
         $values = $this->validate();
         if (!$this->exists()) {
             throw new \Exception('O identificador do bairro não foi informado');
         }
-        $values = DB::filterValues($values, $only, $except);
+        $values = DB::filterValues($values, $only, false);
         try {
             DB::update('Bairros')
                 ->set($values)

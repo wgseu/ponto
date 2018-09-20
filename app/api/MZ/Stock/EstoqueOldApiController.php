@@ -39,7 +39,7 @@ class EstoqueOldApiController extends \MZ\Core\ApiController
         }
         $values = isset($_POST['estoque']) ? $_POST['estoque'] : [];
         try {
-            if (!logged_employee()->has(Permissao::NOME_ESTOQUE)) {
+            if (!logged_provider()->has(Permissao::NOME_ESTOQUE)) {
                 throw new \Exception('Você não tem permissão para inserir no estoque');
             }
             $setor = Setor::findDefault();
@@ -52,7 +52,7 @@ class EstoqueOldApiController extends \MZ\Core\ApiController
             // end api fix
             $estoque->setTipoMovimento(Estoque::TIPO_MOVIMENTO_ENTRADA);
             $estoque->setSetorID($setor->getID());
-            $estoque->setFuncionarioID(logged_employee()->getID());
+            $estoque->setFuncionarioID(logged_provider()->getID());
             $estoque->setCancelado('N');
             $estoque->insert();
             return $this->json()->success(['estoque' => $estoque->publish()]);

@@ -22,44 +22,52 @@
  *
  * @author Equipe GrandChef <desenvolvimento@mzsw.com.br>
  */
-namespace MZ\Employee;
+namespace MZ\System;
 
-use MZ\Database\Model;
-use MZ\Database\DB;
+use MZ\Util\Mask;
 use MZ\Util\Filter;
 use MZ\Util\Validator;
+use MZ\Database\DB;
+use MZ\Database\Model;
+use MZ\Exception\ValidationException;
 
 /**
- * Permite acesso à uma determinada funcionalidade da lista de permissões
+ * Lista de servidores que fazem sincronizações
  */
-class Acesso extends Model
+class Servidor extends Model
 {
 
     /**
-     * Identificador do acesso
+     * Identificador do servidor no banco de dados
      */
     private $id;
     /**
-     * Função a que a permissão se aplica
+     * Identificador único do servidor, usando para identificação na
+     * sincronização
      */
-    private $funcao_id;
+    private $guid;
     /**
-     * Permissão liberada para a função
+     * Informa até onde foi sincronzado os dados desse servidor, sempre nulo no
+     * proprio servidor
      */
-    private $permissao_id;
+    private $sincronizado_ate;
+    /**
+     * Data da última sincronização com esse servidor
+     */
+    private $ultima_sincronizacao;
 
     /**
-     * Constructor for a new empty instance of Acesso
-     * @param array $acesso All field and values to fill the instance
+     * Constructor for a new empty instance of Servidor
+     * @param array $servidor All field and values to fill the instance
      */
-    public function __construct($acesso = [])
+    public function __construct($servidor = [])
     {
-        parent::__construct($acesso);
+        parent::__construct($servidor);
     }
 
     /**
-     * Identificador do acesso
-     * @return mixed ID of Acesso
+     * Identificador do servidor no banco de dados
+     * @return mixed ID of Servidor
      */
     public function getID()
     {
@@ -69,7 +77,7 @@ class Acesso extends Model
     /**
      * Set ID value to new on param
      * @param  mixed $id new value for ID
-     * @return Acesso Self instance
+     * @return self Self instance
      */
     public function setID($id)
     {
@@ -78,42 +86,64 @@ class Acesso extends Model
     }
 
     /**
-     * Função a que a permissão se aplica
-     * @return mixed Função of Acesso
+     * Identificador único do servidor, usando para identificação na
+     * sincronização
+     * @return mixed Identificador único of Servidor
      */
-    public function getFuncaoID()
+    public function getGUID()
     {
-        return $this->funcao_id;
+        return $this->guid;
     }
 
     /**
-     * Set FuncaoID value to new on param
-     * @param  mixed $funcao_id new value for FuncaoID
-     * @return Acesso Self instance
+     * Set GUID value to new on param
+     * @param  mixed $guid new value for GUID
+     * @return self Self instance
      */
-    public function setFuncaoID($funcao_id)
+    public function setGUID($guid)
     {
-        $this->funcao_id = $funcao_id;
+        $this->guid = $guid;
         return $this;
     }
 
     /**
-     * Permissão liberada para a função
-     * @return mixed Permissão of Acesso
+     * Informa até onde foi sincronzado os dados desse servidor, sempre nulo no
+     * proprio servidor
+     * @return mixed Sincronizado até of Servidor
      */
-    public function getPermissaoID()
+    public function getSincronizadoAte()
     {
-        return $this->permissao_id;
+        return $this->sincronizado_ate;
     }
 
     /**
-     * Set PermissaoID value to new on param
-     * @param  mixed $permissao_id new value for PermissaoID
-     * @return Acesso Self instance
+     * Set SincronizadoAte value to new on param
+     * @param  mixed $sincronizado_ate new value for SincronizadoAte
+     * @return self Self instance
      */
-    public function setPermissaoID($permissao_id)
+    public function setSincronizadoAte($sincronizado_ate)
     {
-        $this->permissao_id = $permissao_id;
+        $this->sincronizado_ate = $sincronizado_ate;
+        return $this;
+    }
+
+    /**
+     * Data da última sincronização com esse servidor
+     * @return mixed Data da última sincronização of Servidor
+     */
+    public function getUltimaSincronizacao()
+    {
+        return $this->ultima_sincronizacao;
+    }
+
+    /**
+     * Set UltimaSincronizacao value to new on param
+     * @param  mixed $ultima_sincronizacao new value for UltimaSincronizacao
+     * @return self Self instance
+     */
+    public function setUltimaSincronizacao($ultima_sincronizacao)
+    {
+        $this->ultima_sincronizacao = $ultima_sincronizacao;
         return $this;
     }
 
@@ -124,40 +154,46 @@ class Acesso extends Model
      */
     public function toArray($recursive = false)
     {
-        $acesso = parent::toArray($recursive);
-        $acesso['id'] = $this->getID();
-        $acesso['funcaoid'] = $this->getFuncaoID();
-        $acesso['permissaoid'] = $this->getPermissaoID();
-        return $acesso;
+        $servidor = parent::toArray($recursive);
+        $servidor['id'] = $this->getID();
+        $servidor['guid'] = $this->getGUID();
+        $servidor['sincronizadoate'] = $this->getSincronizadoAte();
+        $servidor['ultimasincronizacao'] = $this->getUltimaSincronizacao();
+        return $servidor;
     }
 
     /**
      * Fill this instance with from array values, you can pass instance to
-     * @param  mixed $acesso Associated key -> value to assign into this instance
-     * @return Acesso Self instance
+     * @param  mixed $servidor Associated key -> value to assign into this instance
+     * @return self Self instance
      */
-    public function fromArray($acesso = [])
+    public function fromArray($servidor = [])
     {
-        if ($acesso instanceof Acesso) {
-            $acesso = $acesso->toArray();
-        } elseif (!is_array($acesso)) {
-            $acesso = [];
+        if ($servidor instanceof self) {
+            $servidor = $servidor->toArray();
+        } elseif (!is_array($servidor)) {
+            $servidor = [];
         }
-        parent::fromArray($acesso);
-        if (!isset($acesso['id'])) {
+        parent::fromArray($servidor);
+        if (!isset($servidor['id'])) {
             $this->setID(null);
         } else {
-            $this->setID($acesso['id']);
+            $this->setID($servidor['id']);
         }
-        if (!isset($acesso['funcaoid'])) {
-            $this->setFuncaoID(null);
+        if (!isset($servidor['guid'])) {
+            $this->setGUID(null);
         } else {
-            $this->setFuncaoID($acesso['funcaoid']);
+            $this->setGUID($servidor['guid']);
         }
-        if (!isset($acesso['permissaoid'])) {
-            $this->setPermissaoID(null);
+        if (!array_key_exists('sincronizadoate', $servidor)) {
+            $this->setSincronizadoAte(null);
         } else {
-            $this->setPermissaoID($acesso['permissaoid']);
+            $this->setSincronizadoAte($servidor['sincronizadoate']);
+        }
+        if (!array_key_exists('ultimasincronizacao', $servidor)) {
+            $this->setUltimaSincronizacao(null);
+        } else {
+            $this->setUltimaSincronizacao($servidor['ultimasincronizacao']);
         }
         return $this;
     }
@@ -168,24 +204,25 @@ class Acesso extends Model
      */
     public function publish()
     {
-        $acesso = parent::publish();
-        return $acesso;
+        $servidor = parent::publish();
+        return $servidor;
     }
 
     /**
      * Filter fields, upload data and keep key data
-     * @param Acesso $original Original instance without modifications
+     * @param self $original Original instance without modifications
      */
     public function filter($original)
     {
         $this->setID($original->getID());
-        $this->setFuncaoID(Filter::number($this->getFuncaoID()));
-        $this->setPermissaoID(Filter::number($this->getPermissaoID()));
+        $this->setGUID(Filter::string($this->getGUID()));
+        $this->setSincronizadoAte(Filter::number($this->getSincronizadoAte()));
+        $this->setUltimaSincronizacao(Filter::datetime($this->getUltimaSincronizacao()));
     }
 
     /**
      * Clean instance resources like images and docs
-     * @param  Acesso $dependency Don't clean when dependency use same resources
+     * @param  self $dependency Don't clean when dependency use same resources
      */
     public function clean($dependency)
     {
@@ -193,19 +230,16 @@ class Acesso extends Model
 
     /**
      * Validate fields updating them and throw exception when invalid data has found
-     * @return array All field of Acesso in array format
+     * @return mixed[] All field of Servidor in array format
      */
     public function validate()
     {
         $errors = [];
-        if (is_null($this->getFuncaoID())) {
-            $errors['funcaoid'] = 'A função não pode ser vazia';
-        }
-        if (is_null($this->getPermissaoID())) {
-            $errors['permissaoid'] = 'A permissão não pode ser vazia';
+        if (is_null($this->getGUID())) {
+            $errors['guid'] = 'O identificador único não pode ser vazio';
         }
         if (!empty($errors)) {
-            throw new \MZ\Exception\ValidationException($errors);
+            throw new ValidationException($errors);
         }
         return $this->toArray();
     }
@@ -217,15 +251,19 @@ class Acesso extends Model
      */
     protected function translate($e)
     {
-        if (stripos($e->getMessage(), 'UK_Acessos_FuncaoID_PermissaoID') !== false) {
-            return new \MZ\Exception\ValidationException([
-                'funcaoid' => sprintf(
-                    'A função "%s" já está cadastrada',
-                    $this->getFuncaoID()
+        if (contains(['ID', 'UNIQUE'], $e->getMessage())) {
+            return new ValidationException([
+                'id' => sprintf(
+                    'O id "%s" já está cadastrado',
+                    $this->getID()
                 ),
-                'permissaoid' => sprintf(
-                    'A permissão "%s" já está cadastrada',
-                    $this->getPermissaoID()
+            ]);
+        }
+        if (contains(['GUID', 'UNIQUE'], $e->getMessage())) {
+            return new ValidationException([
+                'guid' => sprintf(
+                    'O identificador único "%s" já está cadastrado',
+                    $this->getGUID()
                 ),
             ]);
         }
@@ -233,8 +271,8 @@ class Acesso extends Model
     }
 
     /**
-     * Insert a new Acesso into the database and fill instance from database
-     * @return Acesso Self instance
+     * Insert a new Servidor into the database and fill instance from database
+     * @return self Self instance
      */
     public function insert()
     {
@@ -242,7 +280,7 @@ class Acesso extends Model
         $values = $this->validate();
         unset($values['id']);
         try {
-            $id = DB::insertInto('Acessos')->values($values)->execute();
+            $id = DB::insertInto('Servidores')->values($values)->execute();
             $this->loadByID($id);
         } catch (\Exception $e) {
             throw $this->translate($e);
@@ -251,28 +289,27 @@ class Acesso extends Model
     }
 
     /**
-     * Update Acesso with instance values into database for ID
+     * Update Servidor with instance values into database for ID
      * @param  array $only Save these fields only, when empty save all fields except id
-     * @param  boolean $except When true, saves all fields except $only
-     * @return Acesso Self instance
+     * @return int rows affected
      */
-    public function update($only = [], $except = false)
+    public function update($only = [])
     {
         $values = $this->validate();
         if (!$this->exists()) {
-            throw new \Exception('O identificador do acesso não foi informado');
+            throw new \Exception('O identificador do servidor não foi informado');
         }
-        $values = DB::filterValues($values, $only, $except);
+        $values = DB::filterValues($values, $only, false);
         try {
-            DB::update('Acessos')
+            $affected = DB::update('Servidores')
                 ->set($values)
-                ->where('id', $this->getID())
+                ->where(['id' => $this->getID()])
                 ->execute();
             $this->loadByID($this->getID());
         } catch (\Exception $e) {
             throw $this->translate($e);
         }
-        return $this;
+        return $affected;
     }
 
     /**
@@ -282,9 +319,9 @@ class Acesso extends Model
     public function delete()
     {
         if (!$this->exists()) {
-            throw new \Exception('O identificador do acesso não foi informado');
+            throw new \Exception('O identificador do servidor não foi informado');
         }
-        $result = DB::deleteFrom('Acessos')
+        $result = DB::deleteFrom('Servidores')
             ->where('id', $this->getID())
             ->execute();
         return $result;
@@ -294,7 +331,7 @@ class Acesso extends Model
      * Load one register for it self with a condition
      * @param  array $condition Condition for searching the row
      * @param  array $order associative field name -> [-1, 1]
-     * @return Acesso Self instance filled or empty
+     * @return self Self instance filled or empty
      */
     public function load($condition, $order = [])
     {
@@ -304,35 +341,14 @@ class Acesso extends Model
     }
 
     /**
-     * Load into this object from database using, FuncaoID, PermissaoID
-     * @param  int $funcao_id função to find Acesso
-     * @param  int $permissao_id permissão to find Acesso
-     * @return Acesso Self filled instance or empty when not found
+     * Load into this object from database using, GUID
+     * @return self Self filled instance or empty when not found
      */
-    public function loadByFuncaoIDPermissaoID($funcao_id, $permissao_id)
+    public function loadByGUID()
     {
         return $this->load([
-            'funcaoid' => intval($funcao_id),
-            'permissaoid' => intval($permissao_id),
+            'guid' => strval($this->getGUID()),
         ]);
-    }
-
-    /**
-     * Função a que a permissão se aplica
-     * @return \MZ\Employee\Funcao The object fetched from database
-     */
-    public function findFuncaoID()
-    {
-        return \MZ\Employee\Funcao::findByID($this->getFuncaoID());
-    }
-
-    /**
-     * Permissão liberada para a função
-     * @return \MZ\System\Permissao The object fetched from database
-     */
-    public function findPermissaoID()
-    {
-        return \MZ\System\Permissao::findByID($this->getPermissaoID());
     }
 
     /**
@@ -341,8 +357,8 @@ class Acesso extends Model
      */
     private static function getAllowedKeys()
     {
-        $acesso = new Acesso();
-        $allowed = Filter::concatKeys('a.', $acesso->toArray());
+        $servidor = new self();
+        $allowed = Filter::concatKeys('s.', $servidor->toArray());
         return $allowed;
     }
 
@@ -354,7 +370,7 @@ class Acesso extends Model
     private static function filterOrder($order)
     {
         $allowed = self::getAllowedKeys();
-        return Filter::orderBy($order, $allowed, 'a.');
+        return Filter::orderBy($order, $allowed, 's.');
     }
 
     /**
@@ -365,7 +381,14 @@ class Acesso extends Model
     private static function filterCondition($condition)
     {
         $allowed = self::getAllowedKeys();
-        return Filter::keys($condition, $allowed, 'a.');
+        if (isset($condition['search'])) {
+            $search = $condition['search'];
+            $field = 's.guid LIKE ?';
+            $condition[$field] = '%'.$search.'%';
+            $allowed[$field] = true;
+            unset($condition['search']);
+        }
+        return Filter::keys($condition, $allowed, 's.');
     }
 
     /**
@@ -376,10 +399,11 @@ class Acesso extends Model
      */
     private static function query($condition = [], $order = [])
     {
-        $query = DB::from('Acessos a');
+        $query = DB::from('Servidores s');
         $condition = self::filterCondition($condition);
         $query = DB::buildOrderBy($query, self::filterOrder($order));
-        $query = $query->orderBy('a.id ASC');
+        $query = $query->orderBy('s.guid ASC');
+        $query = $query->orderBy('s.id ASC');
         return DB::buildCondition($query, $condition);
     }
 
@@ -387,48 +411,34 @@ class Acesso extends Model
      * Search one register with a condition
      * @param  array $condition Condition for searching the row
      * @param  array $order order rows
-     * @return Acesso A filled Acesso or empty instance
+     * @return self A filled Servidor or empty instance
      */
     public static function find($condition, $order = [])
     {
         $query = self::query($condition, $order)->limit(1);
         $row = $query->fetch() ?: [];
-        return new Acesso($row);
+        return new self($row);
     }
 
     /**
-     * Find this object on database using, FuncaoID, PermissaoID
-     * @param  int $funcao_id função to find Acesso
-     * @param  int $permissao_id permissão to find Acesso
-     * @return Acesso A filled instance or empty when not found
+     * Find this object on database using, GUID
+     * @param  string $guid identificador único to find Servidor
+     * @return self A filled instance or empty when not found
      */
-    public static function findByFuncaoIDPermissaoID($funcao_id, $permissao_id)
+    public static function findByGUID($guid)
     {
         $result = new self();
-        return $result->loadByFuncaoIDPermissaoID($funcao_id, $permissao_id);
-    }
-
-    public static function getPermissoes($funcao_id)
-    {
-        $rows = self::query(['funcaoid' => $funcao_id])
-            ->select(null)
-            ->select('p.nome')
-            ->leftJoin('Permissoes p ON p.id = a.permissaoid')
-            ->fetchAll();
-        $permissoes = [];
-        foreach ($rows as $row) {
-            $permissoes[] = $row['nome'];
-        }
-        return $permissoes;
+        $result->setGUID($guid);
+        return $result->loadByGUID();
     }
 
     /**
-     * Find all Acesso
-     * @param  array  $condition Condition to get all Acesso
-     * @param  array  $order     Order Acesso
+     * Find all Servidor
+     * @param  array  $condition Condition to get all Servidor
+     * @param  array  $order     Order Servidor
      * @param  int    $limit     Limit data into row count
      * @param  int    $offset    Start offset to get rows
-     * @return array             List of all rows instanced as Acesso
+     * @return self[]             List of all rows instanced as Servidor
      */
     public static function findAll($condition = [], $order = [], $limit = null, $offset = null)
     {
@@ -442,7 +452,7 @@ class Acesso extends Model
         $rows = $query->fetchAll();
         $result = [];
         foreach ($rows as $row) {
-            $result[] = new Acesso($row);
+            $result[] = new self($row);
         }
         return $result;
     }

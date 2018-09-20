@@ -24,7 +24,7 @@
  */
 namespace MZ\Stock;
 
-use MZ\Database\Model;
+use MZ\Database\SyncModel;
 use MZ\Database\DB;
 use MZ\Util\Filter;
 use MZ\Util\Validator;
@@ -35,7 +35,7 @@ use MZ\Product\Produto;
 /**
  * Estoque de produtos por setor
  */
-class Estoque extends Model
+class Estoque extends SyncModel
 {
 
     /**
@@ -715,16 +715,15 @@ class Estoque extends Model
     /**
      * Update Estoque with instance values into database for ID
      * @param  array $only Save these fields only, when empty save all fields except id
-     * @param  boolean $except When true, saves all fields except $only
      * @return Estoque Self instance
      */
-    public function update($only = [], $except = false)
+    public function update($only = [])
     {
         $values = $this->validate();
         if (!$this->exists()) {
             throw new \Exception('O identificador do estoque não foi informado');
         }
-        $values = DB::filterValues($values, $only, $except);
+        $values = DB::filterValues($values, $only, false);
         unset($values['datamovimento']);
         try {
             DB::update('Estoque')
@@ -917,11 +916,11 @@ class Estoque extends Model
 
     /**
      * Funcionário que inseriu/retirou o produto do estoque
-     * @return \MZ\Employee\Funcionario The object fetched from database
+     * @return \MZ\Provider\Prestador The object fetched from database
      */
     public function findFuncionarioID()
     {
-        return \MZ\Employee\Funcionario::findByID($this->getFuncionarioID());
+        return \MZ\Provider\Prestador::findByID($this->getFuncionarioID());
     }
 
     /**

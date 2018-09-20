@@ -36,11 +36,11 @@ class ComandaOldApiController extends \MZ\Core\ApiController
         if (!is_login()) {
             return $this->json()->error('Usuário não autenticado!');
         }
-        if (!logged_employee()->has(Permissao::NOME_PEDIDOCOMANDA)) {
+        if (!logged_provider()->has(Permissao::NOME_PEDIDOCOMANDA)) {
             return $this->json()->error('Você não tem permissão para acessar comandas');
         }
         $order = [
-            'funcionario' => logged_employee()->getID()
+            'funcionario' => logged_provider()->getID()
         ];
         /* verifica se deve ordenar pelo número da comanda */
         if (isset($_GET['ordenar']) && $_GET['ordenar'] == 'comanda') {

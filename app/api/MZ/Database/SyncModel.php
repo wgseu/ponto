@@ -22,33 +22,11 @@
  *
  * @author Equipe GrandChef <desenvolvimento@mzsw.com.br>
  */
-namespace MZ\Coupon\Order;
+namespace MZ\Database;
 
-use Thermal\Printer;
-use Thermal\Connection\Buffer;
-use Thermal\Model;
-use MZ\Sale\Pedido;
-
-class ReceiptTest extends \MZ\Framework\TestCase
+/**
+ * Implement common syncronization model operations
+ */
+abstract class SyncModel extends Model
 {
-    public function testPrint()
-    {
-        $model = new Model('MP-4200 TH');
-        $connection = new Buffer();
-        $printer = new Printer($model, $connection);
-        $receipt = new Receipt($printer);
-        $receipt->setItems([]);
-        $receipt->setOrder(new Pedido());
-        $receipt->setPayments([]);
-        $receipt->setDateTime('2018-07-25 21:11:00');
-        $receipt->printCoupon();
-        $printer->feed(6);
-        $printer->buzzer();
-        $printer->cutter();
-        $printer->drawer(Printer::DRAWER_1);
-        $this->assertEquals(
-            getExpectedBuffer('order_receipt_print', $connection->getBuffer()),
-            $connection->getBuffer()
-        );
-    }
 }

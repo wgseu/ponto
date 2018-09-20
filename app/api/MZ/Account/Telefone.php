@@ -24,58 +24,61 @@
  */
 namespace MZ\Account;
 
-use MZ\Database\SyncModel;
-use MZ\Database\DB;
+use MZ\Util\Mask;
 use MZ\Util\Filter;
 use MZ\Util\Validator;
+use MZ\Database\DB;
+use MZ\Database\SyncModel;
+use MZ\Exception\ValidationException;
 
 /**
- * Créditos de clientes
+ * Telefones dos clientes, apenas o telefone principal deve ser único por
+ * cliente
  */
-class Credito extends SyncModel
+class Telefone extends SyncModel
 {
 
     /**
-     * Identificador do crédito
+     * Identificador do telefone
      */
     private $id;
     /**
-     * Cliente a qual o crédito pertence
+     * Informa o cliente que possui esse número de telefone
      */
     private $cliente_id;
     /**
-     * Valor do crédito
+     * Informa o país desse número de telefone
      */
-    private $valor;
+    private $pais_id;
     /**
-     * Detalhes do crédito, justificativa do crédito
+     * Número de telefone com DDD
      */
-    private $detalhes;
+    private $numero;
     /**
-     * Funcionário que cadastrou o crédito
+     * Informa qual a operadora desse telefone
      */
-    private $funcionario_id;
+    private $operadora;
     /**
-     * Informa se o crédito foi cancelado
+     * Informa qual serviço está associado à esse número, Ex: WhatsApp
      */
-    private $cancelado;
+    private $servico;
     /**
-     * Data de cadastro do crédito
+     * Informa se o telefone é principal e exclusivo do cliente
      */
-    private $data_cadastro;
+    private $principal;
 
     /**
-     * Constructor for a new empty instance of Credito
-     * @param array $credito All field and values to fill the instance
+     * Constructor for a new empty instance of Telefone
+     * @param array $telefone All field and values to fill the instance
      */
-    public function __construct($credito = [])
+    public function __construct($telefone = [])
     {
-        parent::__construct($credito);
+        parent::__construct($telefone);
     }
 
     /**
-     * Identificador do crédito
-     * @return mixed ID of Credito
+     * Identificador do telefone
+     * @return mixed ID of Telefone
      */
     public function getID()
     {
@@ -85,7 +88,7 @@ class Credito extends SyncModel
     /**
      * Set ID value to new on param
      * @param  mixed $id new value for ID
-     * @return Credito Self instance
+     * @return self Self instance
      */
     public function setID($id)
     {
@@ -94,8 +97,8 @@ class Credito extends SyncModel
     }
 
     /**
-     * Cliente a qual o crédito pertence
-     * @return mixed Cliente of Credito
+     * Informa o cliente que possui esse número de telefone
+     * @return mixed Cliente of Telefone
      */
     public function getClienteID()
     {
@@ -105,7 +108,7 @@ class Credito extends SyncModel
     /**
      * Set ClienteID value to new on param
      * @param  mixed $cliente_id new value for ClienteID
-     * @return Credito Self instance
+     * @return self Self instance
      */
     public function setClienteID($cliente_id)
     {
@@ -114,111 +117,111 @@ class Credito extends SyncModel
     }
 
     /**
-     * Valor do crédito
-     * @return mixed Valor of Credito
+     * Informa o país desse número de telefone
+     * @return mixed País of Telefone
      */
-    public function getValor()
+    public function getPaisID()
     {
-        return $this->valor;
+        return $this->pais_id;
     }
 
     /**
-     * Set Valor value to new on param
-     * @param  mixed $valor new value for Valor
-     * @return Credito Self instance
+     * Set PaisID value to new on param
+     * @param  mixed $pais_id new value for PaisID
+     * @return self Self instance
      */
-    public function setValor($valor)
+    public function setPaisID($pais_id)
     {
-        $this->valor = $valor;
+        $this->pais_id = $pais_id;
         return $this;
     }
 
     /**
-     * Detalhes do crédito, justificativa do crédito
-     * @return mixed Detalhes of Credito
+     * Número de telefone com DDD
+     * @return mixed Número of Telefone
      */
-    public function getDetalhes()
+    public function getNumero()
     {
-        return $this->detalhes;
+        return $this->numero;
     }
 
     /**
-     * Set Detalhes value to new on param
-     * @param  mixed $detalhes new value for Detalhes
-     * @return Credito Self instance
+     * Set Numero value to new on param
+     * @param  mixed $numero new value for Numero
+     * @return self Self instance
      */
-    public function setDetalhes($detalhes)
+    public function setNumero($numero)
     {
-        $this->detalhes = $detalhes;
+        $this->numero = $numero;
         return $this;
     }
 
     /**
-     * Funcionário que cadastrou o crédito
-     * @return mixed Funcionário of Credito
+     * Informa qual a operadora desse telefone
+     * @return mixed Operadora of Telefone
      */
-    public function getFuncionarioID()
+    public function getOperadora()
     {
-        return $this->funcionario_id;
+        return $this->operadora;
     }
 
     /**
-     * Set FuncionarioID value to new on param
-     * @param  mixed $funcionario_id new value for FuncionarioID
-     * @return Credito Self instance
+     * Set Operadora value to new on param
+     * @param  mixed $operadora new value for Operadora
+     * @return self Self instance
      */
-    public function setFuncionarioID($funcionario_id)
+    public function setOperadora($operadora)
     {
-        $this->funcionario_id = $funcionario_id;
+        $this->operadora = $operadora;
         return $this;
     }
 
     /**
-     * Informa se o crédito foi cancelado
-     * @return mixed Cancelado of Credito
+     * Informa qual serviço está associado à esse número, Ex: WhatsApp
+     * @return mixed Serviço of Telefone
      */
-    public function getCancelado()
+    public function getServico()
     {
-        return $this->cancelado;
+        return $this->servico;
     }
 
     /**
-     * Informa se o crédito foi cancelado
-     * @return boolean Check if o of Cancelado is selected or checked
+     * Set Servico value to new on param
+     * @param  mixed $servico new value for Servico
+     * @return self Self instance
      */
-    public function isCancelado()
+    public function setServico($servico)
     {
-        return $this->cancelado == 'Y';
-    }
-
-    /**
-     * Set Cancelado value to new on param
-     * @param  mixed $cancelado new value for Cancelado
-     * @return Credito Self instance
-     */
-    public function setCancelado($cancelado)
-    {
-        $this->cancelado = $cancelado;
+        $this->servico = $servico;
         return $this;
     }
 
     /**
-     * Data de cadastro do crédito
-     * @return mixed Data de cadastro of Credito
+     * Informa se o telefone é principal e exclusivo do cliente
+     * @return mixed Principal of Telefone
      */
-    public function getDataCadastro()
+    public function getPrincipal()
     {
-        return $this->data_cadastro;
+        return $this->principal;
     }
 
     /**
-     * Set DataCadastro value to new on param
-     * @param  mixed $data_cadastro new value for DataCadastro
-     * @return Credito Self instance
+     * Informa se o telefone é principal e exclusivo do cliente
+     * @return boolean Check if o of Principal is selected or checked
      */
-    public function setDataCadastro($data_cadastro)
+    public function isPrincipal()
     {
-        $this->data_cadastro = $data_cadastro;
+        return $this->principal == 'Y';
+    }
+
+    /**
+     * Set Principal value to new on param
+     * @param  mixed $principal new value for Principal
+     * @return self Self instance
+     */
+    public function setPrincipal($principal)
+    {
+        $this->principal = $principal;
         return $this;
     }
 
@@ -229,64 +232,64 @@ class Credito extends SyncModel
      */
     public function toArray($recursive = false)
     {
-        $credito = parent::toArray($recursive);
-        $credito['id'] = $this->getID();
-        $credito['clienteid'] = $this->getClienteID();
-        $credito['valor'] = $this->getValor();
-        $credito['detalhes'] = $this->getDetalhes();
-        $credito['funcionarioid'] = $this->getFuncionarioID();
-        $credito['cancelado'] = $this->getCancelado();
-        $credito['datacadastro'] = $this->getDataCadastro();
-        return $credito;
+        $telefone = parent::toArray($recursive);
+        $telefone['id'] = $this->getID();
+        $telefone['clienteid'] = $this->getClienteID();
+        $telefone['paisid'] = $this->getPaisID();
+        $telefone['numero'] = $this->getNumero();
+        $telefone['operadora'] = $this->getOperadora();
+        $telefone['servico'] = $this->getServico();
+        $telefone['principal'] = $this->getPrincipal();
+        return $telefone;
     }
 
     /**
      * Fill this instance with from array values, you can pass instance to
-     * @param  mixed $credito Associated key -> value to assign into this instance
-     * @return Credito Self instance
+     * @param  mixed $telefone Associated key -> value to assign into this instance
+     * @return self Self instance
      */
-    public function fromArray($credito = [])
+    public function fromArray($telefone = [])
     {
-        if ($credito instanceof Credito) {
-            $credito = $credito->toArray();
-        } elseif (!is_array($credito)) {
-            $credito = [];
+        if ($telefone instanceof self) {
+            $telefone = $telefone->toArray();
+        } elseif (!is_array($telefone)) {
+            $telefone = [];
         }
-        parent::fromArray($credito);
-        if (!isset($credito['id'])) {
+        parent::fromArray($telefone);
+        if (!isset($telefone['id'])) {
             $this->setID(null);
         } else {
-            $this->setID($credito['id']);
+            $this->setID($telefone['id']);
         }
-        if (!isset($credito['clienteid'])) {
+        if (!isset($telefone['clienteid'])) {
             $this->setClienteID(null);
         } else {
-            $this->setClienteID($credito['clienteid']);
+            $this->setClienteID($telefone['clienteid']);
         }
-        if (!isset($credito['valor'])) {
-            $this->setValor(null);
+        if (!isset($telefone['paisid'])) {
+            $this->setPaisID(null);
         } else {
-            $this->setValor($credito['valor']);
+            $this->setPaisID($telefone['paisid']);
         }
-        if (!array_key_exists('detalhes', $credito)) {
-            $this->setDetalhes(null);
+        if (!isset($telefone['numero'])) {
+            $this->setNumero(null);
         } else {
-            $this->setDetalhes($credito['detalhes']);
+            $this->setNumero($telefone['numero']);
         }
-        if (!isset($credito['funcionarioid'])) {
-            $this->setFuncionarioID(null);
+        if (!array_key_exists('operadora', $telefone)) {
+            $this->setOperadora(null);
         } else {
-            $this->setFuncionarioID($credito['funcionarioid']);
+            $this->setOperadora($telefone['operadora']);
         }
-        if (!isset($credito['cancelado'])) {
-            $this->setCancelado('N');
+        if (!array_key_exists('servico', $telefone)) {
+            $this->setServico(null);
         } else {
-            $this->setCancelado($credito['cancelado']);
+            $this->setServico($telefone['servico']);
         }
-        if (!isset($credito['datacadastro'])) {
-            $this->setDataCadastro(DB::now());
+        if (!isset($telefone['principal'])) {
+            $this->setPrincipal('N');
         } else {
-            $this->setDataCadastro($credito['datacadastro']);
+            $this->setPrincipal($telefone['principal']);
         }
         return $this;
     }
@@ -297,28 +300,28 @@ class Credito extends SyncModel
      */
     public function publish()
     {
-        $credito = parent::publish();
-        return $credito;
+        $telefone = parent::publish();
+        $telefone['numero'] = Mask::mask($telefone['numero'], _p('numero.mask'));
+        return $telefone;
     }
 
     /**
      * Filter fields, upload data and keep key data
-     * @param Credito $original Original instance without modifications
+     * @param self $original Original instance without modifications
      */
     public function filter($original)
     {
         $this->setID($original->getID());
-        $this->setFuncionarioID($original->getFuncionarioID());
-        $this->setCancelado($original->getCancelado());
-        $this->setDataCadastro($original->getDataCadastro());
-        $this->setClienteID(Filter::number($original->getClienteID()));
-        $this->setValor(Filter::money($this->getValor()));
-        $this->setDetalhes(Filter::string($this->getDetalhes()));
+        $this->setClienteID($original->getClienteID());
+        $this->setPaisID(Filter::number($this->getPaisID()));
+        $this->setNumero(Filter::unmask($this->getNumero(), _p('Mascara', 'Telefone')));
+        $this->setOperadora(Filter::string($this->getOperadora()));
+        $this->setServico(Filter::string($this->getServico()));
     }
 
     /**
      * Clean instance resources like images and docs
-     * @param  Credito $dependency Don't clean when dependency use same resources
+     * @param  self $dependency Don't clean when dependency use same resources
      */
     public function clean($dependency)
     {
@@ -326,36 +329,25 @@ class Credito extends SyncModel
 
     /**
      * Validate fields updating them and throw exception when invalid data has found
-     * @return array All field of Credito in array format
+     * @return mixed[] All field of Telefone in array format
      */
     public function validate()
     {
         $errors = [];
-        $old_credito = self::findByID($this->getID());
         if (is_null($this->getClienteID())) {
             $errors['clienteid'] = 'O cliente não pode ser vazio';
         }
-        if (is_null($this->getValor())) {
-            $errors['valor'] = 'O valor não pode ser vazio';
+        if (is_null($this->getPaisID())) {
+            $errors['paisid'] = 'O país não pode ser vazio';
         }
-        if (is_null($this->getFuncionarioID())) {
-            $errors['funcionarioid'] = 'O funcionário não pode ser vazio';
+        if (is_null($this->getNumero())) {
+            $errors['numero'] = 'O número não pode ser vazio';
         }
-        if (is_null($this->getDetalhes())) {
-            $errors['detalhes'] = 'Os detalhes não foram informados';
-        }
-        if (is_null($this->getCancelado())) {
-            $errors['cancelado'] = 'O cancelado não pode ser vazio';
-        } elseif (!Validator::checkBoolean($this->getCancelado())) {
-            $errors['cancelado'] = 'A informação se cancelado é inválida';
-        } elseif ($this->isCancelado() && $old_credito->exists() && $old_credito->isCancelado()) {
-            $errors['cancelado'] = 'O crédito informado já está cancelado';
-        }
-        if (is_null($this->getDataCadastro())) {
-            $errors['datacadastro'] = 'A data de cadastro não pode ser vazia';
+        if (!Validator::checkBoolean($this->getPrincipal())) {
+            $errors['principal'] = 'O principal é inválido';
         }
         if (!empty($errors)) {
-            throw new \MZ\Exception\ValidationException($errors);
+            throw new ValidationException($errors);
         }
         return $this->toArray();
     }
@@ -371,8 +363,8 @@ class Credito extends SyncModel
     }
 
     /**
-     * Insert a new Crédito into the database and fill instance from database
-     * @return Credito Self instance
+     * Insert a new Telefone into the database and fill instance from database
+     * @return self Self instance
      */
     public function insert()
     {
@@ -380,7 +372,7 @@ class Credito extends SyncModel
         $values = $this->validate();
         unset($values['id']);
         try {
-            $id = DB::insertInto('Creditos')->values($values)->execute();
+            $id = DB::insertInto('Telefones')->values($values)->execute();
             $this->loadByID($id);
         } catch (\Exception $e) {
             throw $this->translate($e);
@@ -389,33 +381,27 @@ class Credito extends SyncModel
     }
 
     /**
-     * Update Crédito with instance values into database for ID
+     * Update Telefone with instance values into database for ID
      * @param  array $only Save these fields only, when empty save all fields except id
-     * @return Credito Self instance
+     * @return int rows affected
      */
     public function update($only = [])
     {
         $values = $this->validate();
         if (!$this->exists()) {
-            throw new \Exception('O identificador do crédito não foi informado');
+            throw new \Exception('O identificador do telefone não foi informado');
         }
         $values = DB::filterValues($values, $only, false);
         try {
-            DB::update('Creditos')
+            $affected = DB::update('Telefones')
                 ->set($values)
-                ->where('id', $this->getID())
+                ->where(['id' => $this->getID()])
                 ->execute();
             $this->loadByID($this->getID());
         } catch (\Exception $e) {
             throw $this->translate($e);
         }
-        return $this;
-    }
-
-    public function cancel()
-    {
-        $this->setCancelado('Y');
-        return $this->update(['cancelado']);
+        return $affected;
     }
 
     /**
@@ -425,9 +411,9 @@ class Credito extends SyncModel
     public function delete()
     {
         if (!$this->exists()) {
-            throw new \Exception('O identificador do crédito não foi informado');
+            throw new \Exception('O identificador do telefone não foi informado');
         }
-        $result = DB::deleteFrom('Creditos')
+        $result = DB::deleteFrom('Telefones')
             ->where('id', $this->getID())
             ->execute();
         return $result;
@@ -437,7 +423,7 @@ class Credito extends SyncModel
      * Load one register for it self with a condition
      * @param  array $condition Condition for searching the row
      * @param  array $order associative field name -> [-1, 1]
-     * @return Credito Self instance filled or empty
+     * @return self Self instance filled or empty
      */
     public function load($condition, $order = [])
     {
@@ -447,7 +433,7 @@ class Credito extends SyncModel
     }
 
     /**
-     * Cliente a qual o crédito pertence
+     * Informa o cliente que possui esse número de telefone
      * @return \MZ\Account\Cliente The object fetched from database
      */
     public function findClienteID()
@@ -456,22 +442,13 @@ class Credito extends SyncModel
     }
 
     /**
-     * Funcionário que cadastrou o crédito
-     * @return \MZ\Provider\Prestador The object fetched from database
-     */
-    public function findFuncionarioID()
-    {
-        return \MZ\Provider\Prestador::findByID($this->getFuncionarioID());
-    }
-
-    /**
      * Get allowed keys array
      * @return array allowed keys array
      */
     private static function getAllowedKeys()
     {
-        $credito = new Credito();
-        $allowed = Filter::concatKeys('c.', $credito->toArray());
+        $telefone = new self();
+        $allowed = Filter::concatKeys('t.', $telefone->toArray());
         return $allowed;
     }
 
@@ -483,7 +460,7 @@ class Credito extends SyncModel
     private static function filterOrder($order)
     {
         $allowed = self::getAllowedKeys();
-        return Filter::orderBy($order, $allowed, 'c.');
+        return Filter::orderBy($order, $allowed, 't.');
     }
 
     /**
@@ -496,12 +473,12 @@ class Credito extends SyncModel
         $allowed = self::getAllowedKeys();
         if (isset($condition['search'])) {
             $search = $condition['search'];
-            $field = 'c.detalhes LIKE ?';
+            $field = 't.numero LIKE ?';
             $condition[$field] = '%'.$search.'%';
             $allowed[$field] = true;
             unset($condition['search']);
         }
-        return Filter::keys($condition, $allowed, 'c.');
+        return Filter::keys($condition, $allowed, 't.');
     }
 
     /**
@@ -512,11 +489,11 @@ class Credito extends SyncModel
      */
     private static function query($condition = [], $order = [])
     {
-        $query = DB::from('Creditos c');
+        $query = DB::from('Telefones t');
         $condition = self::filterCondition($condition);
         $query = DB::buildOrderBy($query, self::filterOrder($order));
-        $query = $query->orderBy('c.cancelado DESC');
-        $query = $query->orderBy('c.id DESC');
+        $query = $query->orderBy('t.numero ASC');
+        $query = $query->orderBy('t.id ASC');
         return DB::buildCondition($query, $condition);
     }
 
@@ -524,22 +501,34 @@ class Credito extends SyncModel
      * Search one register with a condition
      * @param  array $condition Condition for searching the row
      * @param  array $order order rows
-     * @return Credito A filled Crédito or empty instance
+     * @return self A filled Telefone or empty instance
      */
     public static function find($condition, $order = [])
     {
         $query = self::query($condition, $order)->limit(1);
         $row = $query->fetch() ?: [];
-        return new Credito($row);
+        return new self($row);
     }
 
     /**
-     * Find all Crédito
-     * @param  array  $condition Condition to get all Crédito
-     * @param  array  $order     Order Crédito
+     * Find this object on database using, ID
+     * @param  int $id id to find Telefone
+     * @return self A filled instance or empty when not found
+     */
+    public static function findByID($id)
+    {
+        $result = new self();
+        $result->setID($id);
+        return $result->loadByID();
+    }
+
+    /**
+     * Find all Telefone
+     * @param  array  $condition Condition to get all Telefone
+     * @param  array  $order     Order Telefone
      * @param  int    $limit     Limit data into row count
      * @param  int    $offset    Start offset to get rows
-     * @return array             List of all rows instanced as Credito
+     * @return self[]             List of all rows instanced as Telefone
      */
     public static function findAll($condition = [], $order = [], $limit = null, $offset = null)
     {
@@ -553,7 +542,7 @@ class Credito extends SyncModel
         $rows = $query->fetchAll();
         $result = [];
         foreach ($rows as $row) {
-            $result[] = new Credito($row);
+            $result[] = new self($row);
         }
         return $result;
     }

@@ -24,7 +24,7 @@
  */
 namespace MZ\Product;
 
-use MZ\Database\Model;
+use MZ\Database\SyncModel;
 use MZ\Database\DB;
 use MZ\Util\Date;
 use MZ\Util\Filter;
@@ -33,7 +33,7 @@ use MZ\Util\Validator;
 /**
  * Contém todos as opções para a formação do produto final
  */
-class Pacote extends Model
+class Pacote extends SyncModel
 {
     /**
      * Identificador do pacote
@@ -529,16 +529,15 @@ class Pacote extends Model
     /**
      * Update Pacote with instance values into database for ID
      * @param  array $only Save these fields only, when empty save all fields except id
-     * @param  boolean $except When true, saves all fields except $only
      * @return Pacote Self instance
      */
-    public function update($only = [], $except = false)
+    public function update($only = [])
     {
         $values = $this->validate();
         if (!$this->exists()) {
             throw new \Exception('O identificador do pacote não foi informado');
         }
-        $values = DB::filterValues($values, $only, $except);
+        $values = DB::filterValues($values, $only, false);
         try {
             DB::update('Pacotes')
                 ->set($values)

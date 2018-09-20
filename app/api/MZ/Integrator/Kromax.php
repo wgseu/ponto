@@ -25,7 +25,7 @@
 namespace MZ\Integrator;
 
 use Curl\Curl;
-use MZ\Employee\Funcionario;
+use MZ\Provider\Prestador;
 use MZ\Sale\Pedido;
 use MZ\System\Task;
 use MZ\Association\Order;
@@ -81,7 +81,7 @@ class Kromax extends Task
         $order = new Order();
         $order->setIntegracao($this->getData());
         $order->setCardNames(self::CARDS);
-        $order->setEmployee(Funcionario::findByID(1));
+        $order->setEmployee(Prestador::findByID(1));
         if (!$this->checkReponse($dom, 0)) {
             // TODO atualizar tabela de produtos por outro meio mais rápido
             $product = new Product($this->getData());

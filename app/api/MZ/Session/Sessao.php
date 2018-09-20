@@ -24,7 +24,7 @@
  */
 namespace MZ\Session;
 
-use MZ\Database\Model;
+use MZ\Database\SyncModel;
 use MZ\Database\DB;
 use MZ\Util\Filter;
 use MZ\Util\Validator;
@@ -33,7 +33,7 @@ use MZ\Util\Validator;
  * Sessão de trabalho do dia, permite que vários caixas sejam abertos
  * utilizando uma mesma sessão
  */
-class Sessao extends Model
+class Sessao extends SyncModel
 {
     const DESCONTO_ID = 1;
     const ENTREGA_ID = 2;
@@ -289,16 +289,15 @@ class Sessao extends Model
     /**
      * Update Sessão with instance values into database for ID
      * @param  array $only Save these fields only, when empty save all fields except id
-     * @param  boolean $except When true, saves all fields except $only
      * @return Sessao Self instance
      */
-    public function update($only = [], $except = false)
+    public function update($only = [])
     {
         $values = $this->validate();
         if (!$this->exists()) {
             throw new \Exception('O identificador da sessão não foi informado');
         }
-        $values = DB::filterValues($values, $only, $except);
+        $values = DB::filterValues($values, $only, false);
         try {
             DB::update('Sessoes')
                 ->set($values)

@@ -24,7 +24,7 @@
  */
 namespace MZ\Device;
 
-use MZ\Database\Model;
+use MZ\Database\SyncModel;
 use MZ\Database\DB;
 use MZ\Util\Filter;
 use MZ\Util\Validator;
@@ -33,7 +33,7 @@ use MZ\Logger\Log;
 /**
  * Computadores e tablets com opções de acesso
  */
-class Dispositivo extends Model
+class Dispositivo extends SyncModel
 {
 
     /**
@@ -392,10 +392,10 @@ class Dispositivo extends Model
     public function validate()
     {
         global $app;
+        $errors = [];
         if (!$app->getSystem()->exists()) {
             $errors['sistemaid'] = 'Não há dados na tabela do sistema';
         }
-        $errors = [];
         if (is_null($this->getSetorID())) {
             $errors['setorid'] = 'O setor não pode ser vazio';
         }
@@ -408,15 +408,14 @@ class Dispositivo extends Model
         if (!Validator::checkInSet($this->getTipo(), self::getTipoOptions())) {
             $errors['tipo'] = 'O tipo não foi informado ou é inválido';
         }
-        $tablet_count = self::count(['tipo' => self::TIPO_TABLET]);
-        if ($this->getTipo() == self::TIPO_TABLET && $tablet_count > $app->getSystem()->getTablets()) {
-            $errors['tipo'] = 'Limite de Tablets excedido, remova os tablets excedentes para continuar';
+        $device_count = self::count();
+        if ($device_count > $app->getSystem()->getDispositivos()) {
+            $errors['tipo'] = 'Limite de dispositivos excedido, remova os dispositivos excedentes para continuar';
         }
-        if ($this->getTipo() == self::TIPO_TABLET &&
-            !$this->exists() &&
-            $tablet_count >= $app->getSystem()->getTablets()
+        if (!$this->exists() &&
+            $device_count >= $app->getSystem()->getDispositivos()
         ) {
-            $errors['tipo'] = 'Limite de Tablets esgotado, verifique sua licença';
+            $errors['tipo'] = 'Limite de dispositivos esgotado, verifique sua licença';
         }
         if (is_null($this->getOpcoes())) {
             $errors['opcoes'] = 'A opções não pode ser vazia';
@@ -482,16 +481,15 @@ class Dispositivo extends Model
     /**
      * Update Dispositivo with instance values into database for ID
      * @param  array $only Save these fields only, when empty save all fields except id
-     * @param  boolean $except When true, saves all fields except $only
      * @return Dispositivo Self instance
      */
-    public function update($only = [], $except = false)
+    public function update($only = [])
     {
         $values = $this->validate();
         if (!$this->exists()) {
             throw new \Exception('O identificador do dispositivo não foi informado');
         }
-        $values = DB::filterValues($values, $only, $except);
+        $values = DB::filterValues($values, $only, false);
         try {
             DB::update('Dispositivos')
                 ->set($values)

@@ -78,32 +78,32 @@
               </tr>
             </thead>
             <tbody>
-              {% for $funcionario in $funcionarios %}
-                <tr class="{{ !$funcionario->isAtivo() ? 'active': '' }}">
-                  {% $_cliente = $funcionario->findClienteID() %}
+              {% for $prestador in $prestadores %}
+                <tr class="{{ !$prestador->isAtivo() ? 'active': '' }}">
+                  {% $_cliente = $prestador->findClienteID() %}
                   <td>
                     <a href="/gerenciar/cliente/editar?id={{ $_cliente->getID() }}" title="Editar cliente '{{ $_cliente->getNomeCompleto() }}'"><img src="{{ get_image_url($_cliente->getImagem(), 'cliente', 'cliente.png') }}" class="{{ $_cliente->getTipo() == \MZ\Account\Cliente::TIPO_FISICA?'rounded':'' }}" height="48" alt="Foto" title="Foto"/>
                       <strong>{{ $_cliente->getNomeCompleto() }}</strong>
                     </a>
                   </td>
-                  {% $_funcao = $funcionario->findFuncaoID() %}
+                  {% $_funcao = $prestador->findFuncaoID() %}
                   <td>
                     <a href="/gerenciar/funcao/editar?id={{ $_funcao->getID() }}" title="Editar função '{{ $_funcao->getDescricao() }}'">{{ $_funcao->getDescricao() }}</a>
                   </td>
-                  <td>{{ $funcionario->getLinguagemName() }}</td>
+                  <td>{{ $prestador->getLinguagemName() }}</td>
                   <td class="text-center">
-                    <strong title="Data de cadastro">{{ $this->datetime($funcionario->getDataCadastro()) }}</strong>
-                    <small title="Data de saída">{{ $this->datetime($funcionario->getDataSaida()) }}</small>
+                    <strong title="Data de cadastro">{{ $this->datetime($prestador->getDataCadastro()) }}</strong>
+                    <small title="Data de saída">{{ $this->datetime($prestador->getDataSaida()) }}</small>
                   </td>
                   <td class="text-center">
                     <ul class="nav panel_toolbox">
                       <li>
-                        <a href="/gerenciar/funcionario/editar?id={{ $funcionario->getID() }}" title="Editar funcionário '{{ $_cliente->getNomeCompleto() }}'">
+                        <a href="/gerenciar/funcionario/editar?id={{ $prestador->getID() }}" title="Editar funcionário '{{ $_cliente->getNomeCompleto() }}'">
                           <i class="fa fa-edit"></i>
                         </a>
                       </li>
                       <li>
-                        <a href="/gerenciar/funcionario/excluir?id={{ $funcionario->getID() }}" title="Excluir funcionário '{{ $_cliente->getNomeCompleto() }}'" class="ajaxlink" ask="Deseja excluir o funcionário '{{ $_cliente->getNomeCompleto() }}'?">
+                        <a href="/gerenciar/funcionario/excluir?id={{ $prestador->getID() }}" title="Excluir funcionário '{{ $_cliente->getNomeCompleto() }}'" class="ajaxlink" ask="Deseja excluir o funcionário '{{ $_cliente->getNomeCompleto() }}'?">
                           <i class="fa fa-close"></i>
                         </a>
                       </li>

@@ -83,7 +83,7 @@ class ContaPageController extends \MZ\Core\Controller
         if (is_post()) {
             $conta = new Conta($_POST);
             try {
-                $old_conta->setFuncionarioID(logged_employee()->getID());
+                $old_conta->setFuncionarioID(logged_provider()->getID());
                 $despesa = isset($_POST['tipo']) ? $_POST['tipo'] < 0 : false;
                 $conta->filter($old_conta, $despesa);
                 $conta->insert();

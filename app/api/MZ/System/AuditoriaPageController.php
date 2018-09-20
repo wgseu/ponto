@@ -25,7 +25,7 @@
 namespace MZ\System;
 
 use MZ\Util\Filter;
-use MZ\Employee\Funcionario;
+use MZ\Provider\Prestador;
 
 /**
  * Allow application to serve system resources
@@ -56,11 +56,11 @@ class AuditoriaPageController extends \MZ\Core\Controller
             return $this->json()->success(['items' => $items]);
         }
 
-        $funcionarios = Funcionario::findAll();
+        $prestadores = Prestador::findAll();
         $_funcionario_names = [];
-        foreach ($funcionarios as $funcionario) {
-            $_cliente = $funcionario->findClienteID();
-            $_funcionario_names[$funcionario->getID()] = $_cliente->getLogin();
+        foreach ($prestadores as $prestador) {
+            $_cliente = $prestador->findClienteID();
+            $_funcionario_names[$prestador->getID()] = $_cliente->getLogin();
         }
 
         $_funcionario = $auditoria->findFuncionarioID();

@@ -24,7 +24,7 @@
  */
 namespace MZ\Session;
 
-use MZ\Database\Model;
+use MZ\Database\SyncModel;
 use MZ\Database\DB;
 use MZ\Util\Filter;
 use MZ\Util\Validator;
@@ -33,7 +33,7 @@ use MZ\Util\Validator;
  * Movimentação do caixa, permite abrir diversos caixas na conta de
  * operadores
  */
-class Movimentacao extends Model
+class Movimentacao extends SyncModel
 {
 
     /**
@@ -421,16 +421,15 @@ class Movimentacao extends Model
     /**
      * Update Movimentação with instance values into database for ID
      * @param  array $only Save these fields only, when empty save all fields except id
-     * @param  boolean $except When true, saves all fields except $only
      * @return Movimentacao Self instance
      */
-    public function update($only = [], $except = false)
+    public function update($only = [])
     {
         $values = $this->validate();
         if (!$this->exists()) {
             throw new \Exception('O identificador da movimentação não foi informado');
         }
-        $values = DB::filterValues($values, $only, $except);
+        $values = DB::filterValues($values, $only, false);
         try {
             DB::update('Movimentacoes')
                 ->set($values)
@@ -508,23 +507,23 @@ class Movimentacao extends Model
 
     /**
      * Funcionário que abriu o caixa
-     * @return \MZ\Employee\Funcionario The object fetched from database
+     * @return \MZ\Provider\Prestador The object fetched from database
      */
     public function findFuncionarioAberturaID()
     {
-        return \MZ\Employee\Funcionario::findByID($this->getFuncionarioAberturaID());
+        return \MZ\Provider\Prestador::findByID($this->getFuncionarioAberturaID());
     }
 
     /**
      * Funcionário que fechou o caixa
-     * @return \MZ\Employee\Funcionario The object fetched from database
+     * @return \MZ\Provider\Prestador The object fetched from database
      */
     public function findFuncionarioFechamentoID()
     {
         if (is_null($this->getFuncionarioFechamentoID())) {
-            return new \MZ\Employee\Funcionario();
+            return new \MZ\Provider\Prestador();
         }
-        return \MZ\Employee\Funcionario::findByID($this->getFuncionarioFechamentoID());
+        return \MZ\Provider\Prestador::findByID($this->getFuncionarioFechamentoID());
     }
 
     /**

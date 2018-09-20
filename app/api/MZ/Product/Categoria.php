@@ -24,7 +24,7 @@
  */
 namespace MZ\Product;
 
-use MZ\Database\Model;
+use MZ\Database\SyncModel;
 use MZ\Database\DB;
 use MZ\Util\Filter;
 use MZ\Util\Validator;
@@ -33,7 +33,7 @@ use MZ\Util\Validator;
  * Informa qual a categoria dos produtos e permite a rápida localização dos
  * mesmos
  */
-class Categoria extends Model
+class Categoria extends SyncModel
 {
 
     /**
@@ -401,16 +401,15 @@ class Categoria extends Model
     /**
      * Update Categoria with instance values into database for ID
      * @param  array $only Save these fields only, when empty save all fields except id
-     * @param  boolean $except When true, saves all fields except $only
      * @return Categoria Self instance
      */
-    public function update($only = [], $except = false)
+    public function update($only = [])
     {
         $values = $this->validate();
         if (!$this->exists()) {
             throw new \Exception('O identificador da categoria não foi informado');
         }
-        $values = DB::filterValues($values, $only, $except);
+        $values = DB::filterValues($values, $only, false);
         try {
             DB::update('Categorias')
                 ->set($values)

@@ -24,7 +24,7 @@
  */
 namespace MZ\Payment;
 
-use MZ\Database\Model;
+use MZ\Database\SyncModel;
 use MZ\Database\DB;
 use MZ\Util\Filter;
 use MZ\Util\Validator;
@@ -32,7 +32,7 @@ use MZ\Util\Validator;
 /**
  * Formas de pagamento disponíveis para pedido e contas
  */
-class FormaPagto extends Model
+class FormaPagto extends SyncModel
 {
 
     /**
@@ -564,13 +564,13 @@ class FormaPagto extends Model
      * Update Forma de pagamento with instance values into database for ID
      * @return FormaPagto Self instance
      */
-    public function update($only = [], $except = false)
+    public function update($only = [])
     {
         $values = $this->validate();
         if (!$this->exists()) {
             throw new \Exception('O identificador da forma de pagamento não foi informado');
         }
-        $values = DB::filterValues($values, $only, $except);
+        $values = DB::filterValues($values, $only, false);
         try {
             DB::update('Formas_Pagto')
                 ->set($values)

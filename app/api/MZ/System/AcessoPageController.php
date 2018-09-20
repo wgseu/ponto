@@ -22,7 +22,7 @@
  *
  * @author Equipe GrandChef <desenvolvimento@mzsw.com.br>
  */
-namespace MZ\Employee;
+namespace MZ\System;
 
 use MZ\System\Permissao;
 use MZ\Util\Filter;

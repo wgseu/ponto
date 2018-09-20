@@ -12,7 +12,7 @@ $collection = new RouteCollection();
 \MZ\Product\PacoteOldApiController::addRoutes($collection);
 \MZ\Sale\PedidoOldApiController::addRoutes($collection);
 \MZ\Account\ClienteOldApiController::addRoutes($collection);
-\MZ\Employee\FuncionarioOldApiController::addRoutes($collection);
+\MZ\Provider\PrestadorOldApiController::addRoutes($collection);
 \MZ\Location\EstadoOldApiController::addRoutes($collection);
 \MZ\Location\CidadeOldApiController::addRoutes($collection);
 \MZ\Location\BairroOldApiController::addRoutes($collection);

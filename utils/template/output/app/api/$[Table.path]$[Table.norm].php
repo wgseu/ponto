@@ -30,7 +30,7 @@ use MZ\Util\Mask;
 use MZ\Util\Filter;
 use MZ\Util\Validator;
 use MZ\Database\DB;
-use MZ\Database\Model;
+use MZ\Database\SyncModel;
 use MZ\Exception\ValidationException;
 
 $[table.if(comment)]
@@ -138,7 +138,7 @@ $[field.if(array)]
      * @param  integer $index index for set $[Field.norm]
 $[field.end]
      * @param  mixed $$[field.unix] new value for $[Field.norm]
-     * @return $[Table.norm] Self instance
+     * @return self Self instance
      */
     public function set$[Field.norm]($[field.if(array)]$index, $[field.end]$$[field.unix])
     {
@@ -180,11 +180,11 @@ $[field.end]
     /**
      * Fill this instance with from array values, you can pass instance to
      * @param  mixed $$[table.unix] Associated key -> value to assign into this instance
-     * @return $[Table.norm] Self instance
+     * @return self Self instance
      */
     public function fromArray($$[table.unix] = [])
     {
-        if ($$[table.unix] instanceof $[Table.norm]) {
+        if ($$[table.unix] instanceof self) {
             $$[table.unix] = $$[table.unix]->toArray();
         } elseif (!is_array($$[table.unix])) {
             $$[table.unix] = [];
@@ -240,7 +240,7 @@ $[field.end]
         $$[table.unix] = parent::publish();
 $[field.each(all)]
 $[field.if(image|blob)]
-        $$[table.unix]['$[field]'] = $this->make$[Field.norm]($[field.if(array)]$[field.array.number]$[field.end]);
+        $$[table.unix]['$[field]'] = $this->make$[Field.norm]($[field.if(array)]$[field.array.number], $[field.end]false, null);
 $[field.else.if(masked)]
 $[field.contains(fone)]
         $$[table.unix]['$[field]'] = Mask::phone($$[table.unix]['$[field]']);
@@ -262,7 +262,7 @@ $[field.end]
 
     /**
      * Filter fields, upload data and keep key data
-     * @param $[Table.norm] $original Original instance without modifications
+     * @param self $original Original instance without modifications
      */
     public function filter($original)
     {
@@ -316,7 +316,7 @@ $[field.end]
 
     /**
      * Clean instance resources like images and docs
-     * @param  $[Table.norm] $dependency Don't clean when dependency use same resources
+     * @param  self $dependency Don't clean when dependency use same resources
      */
     public function clean($dependency)
     {
@@ -334,7 +334,7 @@ $[field.end]
 
     /**
      * Validate fields updating them and throw exception when invalid data has found
-     * @return array All field of $[Table.norm] in array format
+     * @return mixed[] All field of $[Table.norm] in array format
      */
     public function validate()
     {
@@ -422,7 +422,7 @@ $[table.end]
 
     /**
      * Insert a new $[Table.name] into the database and fill instance from database
-     * @return $[Table.norm] Self instance
+     * @return self Self instance
      */
     public function insert()
     {
@@ -431,8 +431,7 @@ $[table.end]
         unset($values['$[primary]']);
         try {
             $$[primary.unix] = DB::insertInto('$[Table]')->values($values)->execute();
-            $this->set$[Primary.norm]($$[primary.unix]);
-            $this->loadBy$[Primary.norm]();
+            $this->loadBy$[Primary.norm]($$[primary.unix]);
         } catch (\Exception $e) {
             throw $this->translate($e);
         }
@@ -467,7 +466,7 @@ $[field.end]
                 ->set($values)
                 ->where(['$[primary]' => $this->get$[Primary.norm]()])
                 ->execute();
-            $this->loadBy$[Primary.norm]();
+            $this->loadBy$[Primary.norm]($this->get$[Primary.norm]());
         } catch (\Exception $e) {
             throw $this->translate($e);
         }
@@ -493,7 +492,7 @@ $[field.end]
      * Load one register for it self with a condition
      * @param  array $condition Condition for searching the row
      * @param  array $order associative field name -> [-1, 1]
-     * @return $[Table.norm] Self instance filled or empty
+     * @return self Self instance filled or empty
      */
     public function load($condition, $order = [])
     {
@@ -506,7 +505,7 @@ $[table.each(unique)]
     /**
      * Load into this object from database using$[unique.each(all)], $[Field.norm]$[unique.end]
 
-     * @return $[Table.norm] Self filled instance or empty when not found
+     * @return self Self filled instance or empty when not found
      */
     public function loadBy$[unique.each(all)]$[Field.norm]$[unique.end]()
     {
@@ -528,7 +527,7 @@ $[field.if(blob)]
 
     /**
      * Load $[field.name] data from blob field on database
-     * @return $[Table.norm] Self instance with $[field.name] field filled
+     * @return self Self instance with $[field.name] field filled
      */
     public function load$[Field.norm]()
     {
@@ -593,7 +592,7 @@ $[field.end]
      */
     private static function getAllowedKeys()
     {
-        $$[table.unix] = new $[Table.norm]();
+        $$[table.unix] = new self();
         $allowed = Filter::concatKeys('$[table.letter].', $$[table.unix]->toArray());
         return $allowed;
     }
@@ -666,13 +665,13 @@ $[descriptor.end]
      * Search one register with a condition
      * @param  array $condition Condition for searching the row
      * @param  array $order order rows
-     * @return $[Table.norm] A filled $[Table.name] or empty instance
+     * @return self A filled $[Table.name] or empty instance
      */
     public static function find($condition, $order = [])
     {
         $query = self::query($condition, $order)->limit(1);
         $row = $query->fetch() ?: [];
-        return new $[Table.norm]($row);
+        return new self($row);
     }
 $[table.each(unique)]
 
@@ -688,7 +687,7 @@ $[field.else]
      * @param  string $$[field.unix] $[field.name] to find $[Table.name]
 $[field.end]
 $[unique.end]
-     * @return $[Table.norm] A filled instance or empty when not found
+     * @return self A filled instance or empty when not found
      */
     public static function findBy$[unique.each(all)]$[Field.norm]$[unique.end]($[unique.each(all)]$[field.if(first)]$[field.else], $[field.end]$$[field.unix]$[unique.end])
     {
@@ -706,7 +705,7 @@ $[table.end]
      * @param  array  $order     Order $[Table.name]
      * @param  int    $limit     Limit data into row count
      * @param  int    $offset    Start offset to get rows
-     * @return array             List of all rows instanced as $[Table.norm]
+     * @return self[]             List of all rows instanced as $[Table.norm]
      */
     public static function findAll($condition = [], $order = [], $limit = null, $offset = null)
     {
@@ -720,7 +719,7 @@ $[table.end]
         $rows = $query->fetchAll();
         $result = [];
         foreach ($rows as $row) {
-            $result[] = new $[Table.norm]($row);
+            $result[] = new self($row);
         }
         return $result;
     }

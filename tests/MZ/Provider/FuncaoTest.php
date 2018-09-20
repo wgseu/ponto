@@ -22,7 +22,7 @@
  *
  * @author Equipe GrandChef <desenvolvimento@mzsw.com.br>
  */
-namespace MZ\Employee;
+namespace MZ\Provider;
 
 class FuncaoTest extends \MZ\Framework\TestCase
 {

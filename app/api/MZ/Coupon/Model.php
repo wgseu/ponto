@@ -65,7 +65,7 @@ abstract class Model
     public function loadTemplate($name)
     {
         global $app;
-        $path = $app->getSystem()->getSettings()->getValue('path', 'template');
+        $path = $app->getPath('template');
         $content = file_get_contents($path . '/coupon/' . $name . '.cpt');
         $template = json_decode($content, true);
         $this->setTemplate($template['template']);
@@ -96,7 +96,7 @@ abstract class Model
         global $app;
 
         if ($resource == 'company.cellphone') {
-            return $app->getSystem()->getCompany()->getFone(2) !== null;
+            return $app->getSystem()->getCompany()->getTelefone() !== null;
         }
         return false;
     }
@@ -127,10 +127,13 @@ abstract class Model
             return $app->getSystem()->getDistrict()->getNome();
         }
         if ($entry == 'company.phone') {
-            return Mask::phone($app->getSystem()->getCompany()->getFone(1));
+            if (is_null($app->getSystem()->getCompany()->getTelefone())) {
+                return null;
+            }
+            return Mask::phone($app->getSystem()->getCompany()->getTelefone()->getNumero());
         }
         if ($entry == 'company.cellphone') {
-            return Mask::phone($app->getSystem()->getCompany()->getFone(2));
+            return Mask::phone($app->getSystem()->getCompany()->getTelefone()->getNumero());
         }
         if ($entry == 'company.address.city') {
             return $app->getSystem()->getCity()->getNome();

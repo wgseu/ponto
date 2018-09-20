@@ -24,7 +24,7 @@
  */
 namespace MZ\Environment;
 
-use MZ\Database\Model;
+use MZ\Database\SyncModel;
 use MZ\Database\DB;
 use MZ\Util\Filter;
 use MZ\Util\Validator;
@@ -34,7 +34,7 @@ use MZ\Sale\Juncao;
 /**
  * Mesas para lançamento de pedidos
  */
-class Mesa extends Model
+class Mesa extends SyncModel
 {
 
     /**
@@ -273,13 +273,13 @@ class Mesa extends Model
      * Update Mesa with instance values into database for Número
      * @return Mesa Self instance
      */
-    public function update($only = [], $except = false)
+    public function update($only = [])
     {
         $values = $this->validate();
         if (!$this->exists()) {
             throw new \Exception('O identificador da mesa não foi informado');
         }
-        $values = DB::filterValues($values, $only, $except);
+        $values = DB::filterValues($values, $only, false);
         try {
             DB::update('Mesas')
                 ->set($values)

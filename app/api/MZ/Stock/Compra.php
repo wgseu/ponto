@@ -24,7 +24,7 @@
  */
 namespace MZ\Stock;
 
-use MZ\Database\Model;
+use MZ\Database\SyncModel;
 use MZ\Database\DB;
 use MZ\Util\Filter;
 use MZ\Util\Validator;
@@ -32,7 +32,7 @@ use MZ\Util\Validator;
 /**
  * Compras realizadas em uma lista num determinado fornecedor
  */
-class Compra extends Model
+class Compra extends SyncModel
 {
 
     /**
@@ -345,16 +345,15 @@ class Compra extends Model
     /**
      * Update Compra with instance values into database for ID
      * @param  array $only Save these fields only, when empty save all fields except id
-     * @param  boolean $except When true, saves all fields except $only
      * @return Compra Self instance
      */
-    public function update($only = [], $except = false)
+    public function update($only = [])
     {
         $values = $this->validate();
         if (!$this->exists()) {
             throw new \Exception('O identificador da compra não foi informado');
         }
-        $values = DB::filterValues($values, $only, $except);
+        $values = DB::filterValues($values, $only, false);
         try {
             DB::update('Compras')
                 ->set($values)
@@ -409,11 +408,11 @@ class Compra extends Model
 
     /**
      * Informa o funcionário que comprou os produtos da lista
-     * @return \MZ\Employee\Funcionario The object fetched from database
+     * @return \MZ\Provider\Prestador The object fetched from database
      */
     public function findCompradorID()
     {
-        return \MZ\Employee\Funcionario::findByID($this->getCompradorID());
+        return \MZ\Provider\Prestador::findByID($this->getCompradorID());
     }
 
     /**

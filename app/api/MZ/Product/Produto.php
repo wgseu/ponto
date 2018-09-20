@@ -24,7 +24,7 @@
  */
 namespace MZ\Product;
 
-use MZ\Database\Model;
+use MZ\Database\SyncModel;
 use MZ\Database\DB;
 use MZ\Util\Date;
 use MZ\Util\Filter;
@@ -34,7 +34,7 @@ use MZ\Stock\Estoque;
 /**
  * Informações sobre o produto, composição ou pacote
  */
-class Produto extends Model
+class Produto extends SyncModel
 {
 
     /**
@@ -1087,16 +1087,15 @@ class Produto extends Model
     /**
      * Update Produto with instance values into database for ID
      * @param  array $only Save these fields only, when empty save all fields except id
-     * @param  boolean $except When true, saves all fields except $only
      * @return Produto Self instance
      */
-    public function update($only = [], $except = false)
+    public function update($only = [])
     {
         $values = $this->validate();
         if (!$this->exists()) {
             throw new \Exception('O identificador do produto não foi informado');
         }
-        $values = DB::filterValues($values, $only, $except);
+        $values = DB::filterValues($values, $only, false);
         try {
             DB::update('Produtos')
                 ->set($values)

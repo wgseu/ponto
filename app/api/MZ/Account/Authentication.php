@@ -38,7 +38,7 @@ class Authentication
     public function __construct()
     {
         $this->user = new Cliente();
-        $this->employee = new \MZ\Employee\Funcionario();
+        $this->employee = new \MZ\Provider\Prestador();
         $this->permissions = [];
     }
 
@@ -53,7 +53,7 @@ class Authentication
 
     /**
      * Get authenticated employee
-     * @return \MZ\Employee\Funcionario authenticated user
+     * @return \MZ\Provider\Prestador authenticated user
      */
     public function getEmployee()
     {
@@ -98,7 +98,7 @@ class Authentication
     public function refresh()
     {
         $this->getEmployee()->loadByClienteID($this->getUser()->getID());
-        $this->permissions = \MZ\Employee\Acesso::getPermissoes($this->getEmployee()->getFuncaoID());
+        $this->permissions = \MZ\System\Acesso::getPermissoes($this->getEmployee()->getFuncaoID());
         return $this;
     }
 

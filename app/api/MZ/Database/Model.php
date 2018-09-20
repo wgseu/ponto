@@ -138,10 +138,9 @@ abstract class Model
     /**
      * Update registry with instance values into database for ID
      * @param  array $only Save these fields only, when empty save all fields except id
-     * @param  boolean $except When true, saves all fields except $only
      * @return mixed Self instance
      */
-    abstract public function update($only = [], $except = false);
+    abstract public function update($only = []);
 
     /**
      * Delete this instance from database using ID
@@ -152,7 +151,6 @@ abstract class Model
     /**
      * Save a new or a existing instance into the database and fill instance from database
      * @param  array $only Save these fields only, when empty save all fields except id
-     * @param  boolean $except When true, saves all fields except $only
      * @return Model Self instance
      */
     public function save($only = [], $except = false)

@@ -24,19 +24,19 @@
  */
 namespace MZ\Account;
 
-use MZ\Database\Model;
+use MZ\Database\SyncModel;
 use MZ\Database\DB;
 use MZ\Util\Filter;
 use MZ\Util\Validator;
 use MZ\Util\Mask;
-use MZ\Employee\Funcionario;
+use MZ\Provider\Prestador;
 use MZ\Sale\Pedido;
 
 /**
  * Informações de cliente físico ou jurídico. Clientes, empresas,
  * funcionários, fornecedores e parceiros são cadastrados aqui
  */
-class Cliente extends Model
+class Cliente extends SyncModel
 {
     const CHAVE_SECRETA = '%#@87GhÃ¨¬';
 
@@ -61,10 +61,9 @@ class Cliente extends Model
      */
     private $tipo;
     /**
-     * Informa quem é o acionista principal da empresa, obrigatoriamente o
-     * cliente deve ser uma pessoa jurídica e o acionista uma pessoa física
+     * Informa se esse cliente faz parte da empresa informada
      */
-    private $acionista_id;
+    private $empresa_id;
     /**
      * Nome de usuário utilizado para entrar no sistema, aplicativo ou site
      */
@@ -107,10 +106,6 @@ class Cliente extends Model
      */
     private $data_aniversario;
     /**
-     * Telefone principal do cliente, deve ser único
-     */
-    private $fone = [];
-    /**
      * Slogan ou detalhes do cliente
      */
     private $slogan;
@@ -137,7 +132,12 @@ class Cliente extends Model
     /**
      * Foto do cliente ou logo da empresa
      */
-    private $imagem;
+    private $imagem_url;
+    /**
+     * Código da linguagem utilizada pelo cliente para visualizar o aplicativo
+     * e o site, Ex: pt-BR
+     */
+    private $linguagem;
     /**
      * Data de atualização das informações do cliente
      */
@@ -146,6 +146,12 @@ class Cliente extends Model
      * Data de cadastro do cliente
      */
     private $data_cadastro;
+
+    /**
+     * Telefone principal do cliente
+     * @var Telefone
+     */
+    private $telefone;
 
     /**
      * Constructor for a new empty instance of Cliente
@@ -197,23 +203,22 @@ class Cliente extends Model
     }
 
     /**
-     * Informa quem é o acionista principal da empresa, obrigatoriamente o
-     * cliente deve ser uma pessoa jurídica e o acionista uma pessoa física
-     * @return mixed Acionista of Cliente
+     * Informa se esse cliente faz parte da empresa informada
+     * @return mixed Empresa of Cliente
      */
-    public function getAcionistaID()
+    public function getEmpresaID()
     {
-        return $this->acionista_id;
+        return $this->empresa_id;
     }
 
     /**
-     * Set AcionistaID value to new on param
-     * @param  mixed $acionista_id new value for AcionistaID
-     * @return Cliente Self instance
+     * Set EmpresaID value to new on param
+     * @param  mixed $empresa_id new value for EmpresaID
+     * @return self Self instance
      */
-    public function setAcionistaID($acionista_id)
+    public function setEmpresaID($empresa_id)
     {
-        $this->acionista_id = $acionista_id;
+        $this->empresa_id = $empresa_id;
         return $this;
     }
 
@@ -419,46 +424,6 @@ class Cliente extends Model
     }
 
     /**
-     * Telefone principal do cliente, deve ser único
-     * @param  integer $index index to get Fone
-     * @return mixed Telefone of Cliente
-     */
-    public function getFone($index)
-    {
-        if ($index < 1 || $index > 2) {
-            throw new \Exception(
-                vsprintf(
-                    'Índice %d inválido, aceito somente de %d até %d',
-                    [intval($index), 1, 2]
-                ),
-                500
-            );
-        }
-        return $this->fone[$index];
-    }
-
-    /**
-     * Set Fone value to new on param
-     * @param  integer $index index for set Fone
-     * @param  mixed $fone new value for Fone
-     * @return Cliente Self instance
-     */
-    public function setFone($index, $fone)
-    {
-        if ($index < 1 || $index > 2) {
-            throw new \Exception(
-                vsprintf(
-                    'Índice %d inválido, aceito somente de %d até %d',
-                    [intval($index), 1, 2]
-                ),
-                500
-            );
-        }
-        $this->fone[$index] = $fone;
-        return $this;
-    }
-
-    /**
      * Slogan ou detalhes do cliente
      * @return mixed Observação of Cliente
      */
@@ -582,19 +547,40 @@ class Cliente extends Model
      * Foto do cliente ou logo da empresa
      * @return mixed Foto of Cliente
      */
-    public function getImagem()
+    public function getImagemURL()
     {
-        return $this->imagem;
+        return $this->imagem_url;
     }
 
     /**
-     * Set Imagem value to new on param
-     * @param  mixed $imagem new value for Imagem
-     * @return Cliente Self instance
+     * Set ImagemURL value to new on param
+     * @param  mixed $imagem_url new value for ImagemURL
+     * @return self Self instance
      */
-    public function setImagem($imagem)
+    public function setImagemURL($imagem_url)
     {
-        $this->imagem = $imagem;
+        $this->imagem_url = $imagem_url;
+        return $this;
+    }
+
+    /**
+     * Código da linguagem utilizada pelo cliente para visualizar o aplicativo
+     * e o site, Ex: pt-BR
+     * @return mixed Linguagem of Cliente
+     */
+    public function getLinguagem()
+    {
+        return $this->linguagem;
+    }
+
+    /**
+     * Set Linguagem value to new on param
+     * @param  mixed $linguagem new value for Linguagem
+     * @return self Self instance
+     */
+    public function setLinguagem($linguagem)
+    {
+        $this->linguagem = $linguagem;
         return $this;
     }
 
@@ -638,6 +624,31 @@ class Cliente extends Model
         return $this;
     }
 
+    /** Campos Extra **/
+
+    /**
+     * Data de cadastro do cliente
+     * @return Telefone Data de cadastro of Cliente
+     */
+    public function getTelefone()
+    {
+        return $this->telefone;
+    }
+
+    /**
+     * Informa o telefone principal do cliente
+     * @param Telefone|string $telefone Telefone principal do cliente
+     * @return self A própria instância do cliente
+     */
+    public function setTelefone($telefone)
+    {
+        if (!($telefone instanceof Telefone) && !is_null($telefone)) {
+            $telefone = new Telefone(is_array($telefone) ? $telefone : ['numero' => $telefone]);
+        }
+        $this->telefone = $telefone;
+        return $this;
+    }
+
     /**
      * Convert this instance to array associated key -> value
      * @param  boolean $recursive Allow rescursive conversion of fields
@@ -648,7 +659,7 @@ class Cliente extends Model
         $cliente = parent::toArray($recursive);
         $cliente['id'] = $this->getID();
         $cliente['tipo'] = $this->getTipo();
-        $cliente['acionistaid'] = $this->getAcionistaID();
+        $cliente['empresaid'] = $this->getEmpresaID();
         $cliente['login'] = $this->getLogin();
         $cliente['senha'] = $this->getSenha();
         $cliente['nome'] = $this->getNome();
@@ -659,15 +670,14 @@ class Cliente extends Model
         $cliente['im'] = $this->getIM();
         $cliente['email'] = $this->getEmail();
         $cliente['dataaniversario'] = $this->getDataAniversario();
-        $cliente['fone1'] = $this->getFone(1);
-        $cliente['fone2'] = $this->getFone(2);
         $cliente['slogan'] = $this->getSlogan();
         $cliente['secreto'] = $this->getSecreto();
         $cliente['limitecompra'] = $this->getLimiteCompra();
         $cliente['facebookurl'] = $this->getFacebookURL();
         $cliente['twitterurl'] = $this->getTwitterURL();
         $cliente['linkedinurl'] = $this->getLinkedInURL();
-        $cliente['imagem'] = $this->getImagem();
+        $cliente['imagemurl'] = $this->getImagemURL();
+        $cliente['linguagem'] = $this->getLinguagem();
         $cliente['dataatualizacao'] = $this->getDataAtualizacao();
         $cliente['datacadastro'] = $this->getDataCadastro();
         return $cliente;
@@ -696,10 +706,10 @@ class Cliente extends Model
         } else {
             $this->setTipo($cliente['tipo']);
         }
-        if (!array_key_exists('acionistaid', $cliente)) {
-            $this->setAcionistaID(null);
+        if (!array_key_exists('empresaid', $cliente)) {
+            $this->setEmpresaID(null);
         } else {
-            $this->setAcionistaID($cliente['acionistaid']);
+            $this->setEmpresaID($cliente['empresaid']);
         }
         if (!array_key_exists('login', $cliente)) {
             $this->setLogin(null);
@@ -751,15 +761,10 @@ class Cliente extends Model
         } else {
             $this->setDataAniversario($cliente['dataaniversario']);
         }
-        if (!array_key_exists('fone1', $cliente)) {
-            $this->setFone(1, null);
+        if (!array_key_exists('telefone', $cliente)) {
+            $this->setTelefone(null);
         } else {
-            $this->setFone(1, $cliente['fone1']);
-        }
-        if (!array_key_exists('fone2', $cliente)) {
-            $this->setFone(2, null);
-        } else {
-            $this->setFone(2, $cliente['fone2']);
+            $this->setTelefone($cliente['telefone']);
         }
         if (!array_key_exists('slogan', $cliente)) {
             $this->setSlogan(null);
@@ -791,10 +796,15 @@ class Cliente extends Model
         } else {
             $this->setLinkedInURL($cliente['linkedinurl']);
         }
-        if (!array_key_exists('imagem', $cliente)) {
-            $this->setImagem(null);
+        if (!array_key_exists('imagemurl', $cliente)) {
+            $this->setImagemURL(null);
         } else {
-            $this->setImagem($cliente['imagem']);
+            $this->setImagemURL($cliente['imagemurl']);
+        }
+        if (!array_key_exists('linguagem', $cliente)) {
+            $this->setLinguagem(null);
+        } else {
+            $this->setLinguagem($cliente['linguagem']);
         }
         if (!isset($cliente['dataatualizacao'])) {
             $this->setDataAtualizacao(DB::now());
@@ -812,16 +822,16 @@ class Cliente extends Model
     /**
      * Get relative foto path or default foto
      * @param boolean $default If true return default image, otherwise check field
-     * @param string $default_name Default image name
+     * @param string  $default_name Default image name
      * @return string relative web path for cliente foto
      */
-    public function makeImagem($default = false, $default_name = 'cliente.png')
+    public function makeImagemURL($default = false, $default_name = 'cliente.png')
     {
-        $imagem = $this->getImagem();
+        $imagem_url = $this->getImagemURL();
         if ($default) {
-            $imagem = null;
+            $imagem_url = null;
         }
-        return get_image_url($imagem, 'cliente', $default_name);
+        return get_image_url($imagem_url, 'cliente', $default_name);
     }
 
     /**
@@ -893,10 +903,13 @@ class Cliente extends Model
         } else {
             $cliente['cpf'] = Mask::cnpj($cliente['cpf']);
         }
-        $cliente['fone1'] = Mask::phone($cliente['fone1']);
-        $cliente['fone2'] = Mask::phone($cliente['fone2']);
+        if (!is_null($this->getTelefone())) {
+            $cliente['fone1'] = Mask::phone($this->getTelefone()->getNumero());
+        } else {
+            $cliente['fone1'] = null;
+        }
         unset($cliente['secreto']);
-        $cliente['imagem'] = $this->makeImagem(false, null);
+        $cliente['imagemurl'] = $this->makeImagemURL(false, null);
         return $cliente;
     }
 
@@ -911,7 +924,7 @@ class Cliente extends Model
         $this->setID($original->getID());
         $this->setSecreto($original->getSecreto());
         $this->setLimiteCompra(Filter::float($original->getLimiteCompra()));
-        $this->setAcionistaID(Filter::number($this->getAcionistaID()));
+        $this->setEmpresaID(Filter::number($this->getEmpresaID()));
         $this->setLogin(Filter::string($this->getLogin()));
         $this->setSenha(Filter::text($this->getSenha()));
         $this->setNome(Filter::string($this->getNome()));
@@ -926,57 +939,54 @@ class Cliente extends Model
         $this->setIM(Filter::digits($this->getIM()));
         $this->setEmail(Filter::string($this->getEmail()));
         $this->setDataAniversario(Filter::date($this->getDataAniversario()));
-        $this->setFone(1, Filter::unmask($this->getFone(1), _p('Mascara', 'Telefone')));
-        $this->setFone(2, Filter::unmask($this->getFone(2), _p('Mascara', 'Telefone')));
         $this->setSlogan(Filter::string($this->getSlogan()));
         $this->setFacebookURL(Filter::string($this->getFacebookURL()));
         $this->setTwitterURL(Filter::string($this->getTwitterURL()));
         $this->setLinkedInURL(Filter::string($this->getLinkedInURL()));
+        $this->setLinguagem(Filter::string($this->getLinguagem()));
 
         $width = 256;
         if ($this->getTipo() == Cliente::TIPO_JURIDICA) {
             $width = 640;
         }
-        $imagem = upload_image('raw_imagem', 'cliente', null, $width, 256, true);
-        if (is_null($imagem) && trim($this->getImagem()) != '') {
-            $this->setImagem(true);
+        $imagem_url = upload_image('raw_imagemurl', 'cliente', null, $width, 256, true);
+        if (is_null($imagem_url) && trim($this->getImagemURL()) != '') {
+            $this->setImagemURL($original->getImagemURL());
         } else {
-            $this->setImagem($imagem);
-            $imagem_path = $app->getPath('public') . $this->makeImagem();
-            if (!is_null($imagem)) {
-                $this->setImagem(file_get_contents($imagem_path));
-                unlink($imagem_path);
-            }
+            $this->setImagemURL($imagem_url);
         }
     }
 
     /**
      * Clean instance resources like images and docs
-     * @param  Cliente $dependency Don't clean when dependency use same resources
+     * @param self $dependency Don't clean when dependency use same resources
      */
     public function clean($dependency)
     {
-        $this->setImagem($dependency->getImagem());
+        if (!is_null($this->getImagemURL()) && $dependency->getImagemURL() != $this->getImagemURL()) {
+            @unlink(get_image_path($this->getImagemURL(), 'cliente'));
+        }
+        $this->setImagemURL($dependency->getImagemURL());
     }
 
     /**
      * Validate fields updating them and throw exception when invalid data has found
-     * @return array All field of Cliente in array format
+     * @return mixed[] All field of Cliente in array format
      */
     public function validate()
     {
         $errors = [];
-        $funcionario = Funcionario::findByClienteID($this->getID());
+        $prestador = Prestador::findByClienteID($this->getID());
         if (!Validator::checkInSet($this->getTipo(), self::getTipoOptions())) {
             $errors['tipo'] = 'O tipo não foi informado ou é inválido';
         }
-        if (is_manager($funcionario) && $this->getTipo() != self::TIPO_FISICA) {
+        if (is_manager($prestador) && $this->getTipo() != self::TIPO_FISICA) {
             $errors['tipo'] = 'O funcionário deve ser uma pessoa física';
         }
         if (!Validator::checkUsername($this->getLogin(), true)) {
             $errors['login'] = 'O login é inválido';
         }
-        if (is_manager($funcionario) && is_null($this->getLogin())) {
+        if (is_manager($prestador) && is_null($this->getLogin())) {
             $errors['login'] = 'Login obrigatório para o tipo de conta';
         }
         if (!Validator::checkPassword($this->getSenha(), $this->exists())) {
@@ -1006,18 +1016,19 @@ class Cliente extends Model
         if (!Validator::checkEmail($this->getEmail(), true)) {
             $errors['email'] = 'O e-mail é inválido';
         }
-        if (!Validator::checkPhone($this->getFone(1), true)) {
-            $errors['fone1'] = 'O Telefone é inválido';
-        }
-        if (is_null($this->getCPF()) && is_null($this->getFone(1)) && is_null($this->getEmail())) {
+        if (is_null($this->getCPF()) &&
+            is_null($this->getTelefone()) &&
+            is_null($this->getLogin()) &&
+            is_null($this->getEmail())
+        ) {
             $cpf_title = _p('Titulo', 'CPF');
             if ($this->getTipo() == self::TIPO_JURIDICA) {
                 $cpf_title = _p('Titulo', 'CNPJ');
             }
-            $errors['fone1'] = sprintf('Nenhum dado chave foi informado, informe um Telefone, E-mail ou %s', $cpf_title);
-        }
-        if (!Validator::checkPhone($this->getFone(2), true)) {
-            $errors['fone2'] = 'O Celular é inválido';
+            $errors['email'] = sprintf(
+                'Nenhum dado chave foi informado, informe um Telefone, Usuário, E-mail ou %s',
+                $cpf_title
+            );
         }
         if (!is_null($this->getLimiteCompra()) && $this->getLimiteCompra() < 0) {
             $errors['limitecompra'] = 'O limite de compra não pode ser negativo';
@@ -1030,9 +1041,6 @@ class Cliente extends Model
         $values = $this->toArray();
         if (is_null($this->getSenha())) {
             unset($values['senha']);
-        }
-        if ($this->getImagem() === true) {
-            unset($values['imagem']);
         }
         return $values;
     }
@@ -1059,14 +1067,6 @@ class Cliente extends Model
      */
     protected function translate($e)
     {
-        if (contains(['Fone1', 'UNIQUE'], $e->getMessage())) {
-            return new \MZ\Exception\ValidationException([
-                'fone1' => sprintf(
-                    'O telefone "%s" já está cadastrado',
-                    $this->getFone(1)
-                ),
-            ]);
-        }
         if (contains(['Email', 'UNIQUE'], $e->getMessage())) {
             return new \MZ\Exception\ValidationException([
                 'email' => sprintf(
@@ -1093,10 +1093,7 @@ class Cliente extends Model
         }
         if (contains(['Secreto', 'UNIQUE'], $e->getMessage())) {
             return new \MZ\Exception\ValidationException([
-                'secreto' => sprintf(
-                    'O código de recuperação "%s" já está cadastrado',
-                    $this->getSecreto()
-                ),
+                'secreto' => 'Não foi possível gerar o código de recuperação',
             ]);
         }
         return parent::translate($e);
@@ -1104,7 +1101,7 @@ class Cliente extends Model
 
     /**
      * Insert a new Cliente into the database and fill instance from database
-     * @return Cliente Self instance
+     * @return self Self instance
      */
     public function insert()
     {
@@ -1112,9 +1109,17 @@ class Cliente extends Model
         $values = $this->validate();
         unset($values['id']);
         try {
+            DB::beginTransaction();
             $id = DB::insertInto('Clientes')->values($values)->execute();
             $this->loadByID($id);
+            if (!is_null($this->getTelefone())) {
+                $this->getTelefone()->setPrincipal('Y');
+                $this->getTelefone()->setClienteID($this->getID());
+                $this->getTelefone()->insert();
+            }
+            DB::commit();
         } catch (\Exception $e) {
+            DB::rollBack();
             throw $this->translate($e);
         }
         return $this;
@@ -1123,16 +1128,15 @@ class Cliente extends Model
     /**
      * Update Cliente with instance values into database for ID
      * @param  array $only Save these fields only, when empty save all fields except id
-     * @param  boolean $except When true, saves all fields except $only
      * @return Cliente Self instance
      */
-    public function update($only = [], $except = false)
+    public function update($only = [])
     {
         $values = $this->validate();
         if (!$this->exists()) {
             throw new \Exception('O identificador do cliente não foi informado');
         }
-        $values = DB::filterValues($values, $only, $except);
+        $values = DB::filterValues($values, $only, false);
         unset($values['data_cadastro']);
         try {
             DB::update('Clientes')
@@ -1235,30 +1239,15 @@ class Cliente extends Model
     }
 
     /**
-     * Load image data from blob field on database
-     * @return Cliente Self instance with imagem field filled
+     * Informa se esse cliente faz parte da empresa informada
+     * @return self The object fetched from database
      */
-    public function loadImagem()
+    public function findEmpresaID()
     {
-        $imagem = DB::from('Clientes c')
-            ->select(null)
-            ->select('c.imagem')
-            ->where('c.id', $this->getID())
-            ->fetchColumn();
-        return $this->setImagem($imagem);
-    }
-
-    /**
-     * Informa quem é o acionista principal da empresa, obrigatoriamente o
-     * cliente deve ser uma pessoa jurídica e o acionista uma pessoa física
-     * @return \MZ\Account\Cliente The object fetched from database
-     */
-    public function findAcionistaID()
-    {
-        if (is_null($this->getAcionistaID())) {
-            return new \MZ\Account\Cliente();
+        if (is_null($this->getEmpresaID())) {
+            return new self();
         }
-        return \MZ\Account\Cliente::findByID($this->getAcionistaID());
+        return self::findByID($this->getEmpresaID());
     }
 
     /**
@@ -1342,7 +1331,7 @@ class Cliente extends Model
         if (isset($condition['fone'])) {
             $fone = $condition['fone'];
             $fone = self::buildFoneSearch($fone);
-            $field = '(c.fone1 LIKE ? OR c.fone2 LIKE ?)';
+            $field = '(t.numero LIKE ?)';
             $condition[$field] = [$fone, $fone];
             $allowed[$field] = true;
             unset($condition['fone']);
@@ -1381,9 +1370,10 @@ class Cliente extends Model
             $query = DB::from('Pedidos p')
                 ->select(null)
                 ->select('COUNT(DISTINCT p.id) as pedidos')
-                ->select('SUM(r.quantidade * r.preco * (1 + r.porcentagem / 100)) as total')
-                ->leftJoin('Produtos_Pedidos r ON r.pedidoid = p.id AND r.cancelado = ?', 'N')
+                ->select('SUM(i.total) as total')
+                ->leftJoin('Itens i ON i.pedidoid = p.id AND i.cancelado = ?', 'N')
                 ->leftJoin('Clientes c ON c.id = p.clienteid')
+                ->leftJoin('Telefones t ON t.clienteid = c.id AND t.principal = ?', 'Y')
                 ->where('p.cancelado', 'N')
                 ->where('p.estado', Pedido::ESTADO_FINALIZADO)
                 ->where('NOT p.clienteid IS NULL')
@@ -1400,36 +1390,9 @@ class Cliente extends Model
             }
         } else {
             $query = DB::from('Clientes c')
-                ->select(null);
+                ->leftJoin('Telefones t ON t.clienteid = c.id AND t.principal = ?', 'Y');
         }
-        $query = $query->select('c.id')
-            ->select('c.tipo')
-            ->select('c.acionistaid')
-            ->select('c.login')
-            ->select('c.senha')
-            ->select('c.nome')
-            ->select('c.sobrenome')
-            ->select('c.genero')
-            ->select('c.cpf')
-            ->select('c.rg')
-            ->select('c.im')
-            ->select('c.email')
-            ->select('c.dataaniversario')
-            ->select('c.fone1')
-            ->select('c.fone2')
-            ->select('c.slogan')
-            ->select('c.secreto')
-            ->select('c.limitecompra')
-            ->select('c.facebookurl')
-            ->select('c.twitterurl')
-            ->select('c.linkedinurl')
-            ->select(
-                '(CASE WHEN c.imagem IS NULL THEN NULL ELSE '.
-                DB::concat(['c.id', '".png"']).
-                ' END) as imagem'
-            )
-            ->select('c.dataatualizacao')
-            ->select('c.datacadastro');
+        $query = $query->select('c.*');
         if (isset($condition['search'])) {
             $search = trim($condition['search']);
             if (Validator::checkEmail($search)) {
@@ -1454,7 +1417,7 @@ class Cliente extends Model
         if (isset($condition['fone'])) {
             $fone = $condition['fone'];
             $fone = self::buildFoneSearch($fone);
-            $query = $query->orderBy('(c.fone1 LIKE ?) DESC', $fone);
+            $query = $query->orderBy('(t.numero LIKE ?) DESC', $fone);
         }
         $condition = self::filterCondition($condition);
         $query = DB::buildOrderBy($query, self::filterOrder($order));
@@ -1545,7 +1508,7 @@ class Cliente extends Model
             $field = 'cpf';
             $login = Filter::digits($login);
         } elseif (Validator::checkPhone($login)) {
-            $field = 'fone1';
+            $field = 'fone';
             $login = Filter::digits($login);
         } else {
             $field = 'login';

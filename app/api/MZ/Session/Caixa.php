@@ -24,7 +24,7 @@
  */
 namespace MZ\Session;
 
-use MZ\Database\Model;
+use MZ\Database\SyncModel;
 use MZ\Database\DB;
 use MZ\Util\Filter;
 use MZ\Util\Validator;
@@ -32,7 +32,7 @@ use MZ\Util\Validator;
 /**
  * Caixas de movimentação financeira
  */
-class Caixa extends Model
+class Caixa extends SyncModel
 {
 
     /**
@@ -336,16 +336,15 @@ class Caixa extends Model
     /**
      * Update Caixa with instance values into database for ID
      * @param  array $only Save these fields only, when empty save all fields except id
-     * @param  boolean $except When true, saves all fields except $only
      * @return Caixa Self instance
      */
-    public function update($only = [], $except = false)
+    public function update($only = [])
     {
         $values = $this->validate();
         if (!$this->exists()) {
             throw new \Exception('O identificador do caixa não foi informado');
         }
-        $values = DB::filterValues($values, $only, $except);
+        $values = DB::filterValues($values, $only, false);
         try {
             DB::update('Caixas')
                 ->set($values)

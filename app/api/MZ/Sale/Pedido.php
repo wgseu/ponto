@@ -24,7 +24,7 @@
  */
 namespace MZ\Sale;
 
-use MZ\Database\Model;
+use MZ\Database\SyncModel;
 use MZ\Database\DB;
 use MZ\Util\Filter;
 use MZ\Util\Validator;
@@ -34,7 +34,7 @@ use MZ\Payment\Pagamento;
 /**
  * Informações do pedido de venda
  */
-class Pedido extends Model
+class Pedido extends SyncModel
 {
 
     /**
@@ -919,7 +919,7 @@ class Pedido extends Model
 
     /**
      * Check if operator has permission to sell this order
-     * @param \MZ\Employee\Funcionario $operador operator that will sale this order
+     * @param \MZ\Provider\Prestador $operador operator that will sale this order
      * @return Pedido Self instance
      * @throws \Exception when operator has not permission
      */
@@ -1012,13 +1012,13 @@ class Pedido extends Model
      * Update Pedido with instance values into database for Código
      * @return Pedido Self instance
      */
-    public function update($only = [], $except = false)
+    public function update($only = [])
     {
         $values = $this->validate();
         if (!$this->exists()) {
             throw new \Exception('O identificador do pedido não foi informado');
         }
-        $values = DB::filterValues($values, $only, $except);
+        $values = DB::filterValues($values, $only, false);
         unset($values['datacriacao']);
         try {
             DB::update('Pedidos')
@@ -1168,23 +1168,23 @@ class Pedido extends Model
 
     /**
      * Funcionário que criou esse pedido
-     * @return \MZ\Employee\Funcionario The object fetched from database
+     * @return \MZ\Provider\Prestador The object fetched from database
      */
     public function findFuncionarioID()
     {
-        return \MZ\Employee\Funcionario::findByID($this->getFuncionarioID());
+        return \MZ\Provider\Prestador::findByID($this->getFuncionarioID());
     }
 
     /**
      * Entregador que fez a entrega do pedido
-     * @return \MZ\Employee\Funcionario The object fetched from database
+     * @return \MZ\Provider\Prestador The object fetched from database
      */
     public function findEntregadorID()
     {
         if (is_null($this->getEntregadorID())) {
-            return new \MZ\Employee\Funcionario();
+            return new \MZ\Provider\Prestador();
         }
-        return \MZ\Employee\Funcionario::findByID($this->getEntregadorID());
+        return \MZ\Provider\Prestador::findByID($this->getEntregadorID());
     }
 
     /**
@@ -1214,14 +1214,14 @@ class Pedido extends Model
 
     /**
      * Informa quem fechou o pedido e imprimiu a conta
-     * @return \MZ\Employee\Funcionario The object fetched from database
+     * @return \MZ\Provider\Prestador The object fetched from database
      */
     public function findFechadorID()
     {
         if (is_null($this->getFechadorID())) {
-            return new \MZ\Employee\Funcionario();
+            return new \MZ\Provider\Prestador();
         }
-        return \MZ\Employee\Funcionario::findByID($this->getFechadorID());
+        return \MZ\Provider\Prestador::findByID($this->getFechadorID());
     }
 
     /**

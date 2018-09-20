@@ -2,7 +2,7 @@
 -- Author:        Mazin
 -- Caption:       GrandChef Model
 -- Project:       GrandChef
--- Changed:       2018-09-13 15:22
+-- Changed:       2018-09-13 20:20
 -- Created:       2012-09-05 23:08
 PRAGMA foreign_keys = OFF;
 
@@ -180,7 +180,7 @@ CREATE TABLE "Prestadores"(
   "Codigo" INTEGER NOT NULL,-- Código do prestador[N:Código][G:o]
   "FuncaoID" INTEGER NOT NULL,-- Função do prestada na empresa[N:Função][G:a][S:S]
   "ClienteID" INTEGER NOT NULL,-- Cliente que representa esse prestador, único no cadastro de prestadores[N:Cliente][G:o][S]
-  "PrestadorID" INTEGER,-- Informa a empresa que gerencia os colaboradores, nulo para a empresa do próprio estabelecimento[G:o][N:Prestador]
+  "PrestadorID" INTEGER DEFAULT NULL,-- Informa a empresa que gerencia os colaboradores, nulo para a empresa do próprio estabelecimento[G:o][N:Prestador]
   "Vinculo" TEXT NOT NULL CHECK("Vinculo" IN('Funcionario', 'Prestador', 'Autonomo')) DEFAULT 'Funcionario',-- Vínculo empregatício com a empresa, funcionário e autônomo são pessoas físicas, prestador é pessoa jurídica[G:o][N:Vínculo]
   "CodigoBarras" VARCHAR(13) DEFAULT NULL,-- Código de barras utilizado pelo prestador para autorizar uma operação no sistema[N:Código de barras][G:o]
   "Porcentagem" DOUBLE NOT NULL DEFAULT 0,-- Porcentagem cobrada pelo funcionário ou autônomo ao cliente, Ex.: Comissão de 10% [N:Comissão][G:a]
@@ -320,7 +320,7 @@ CREATE TABLE "Modulos"(
     UNIQUE("Nome")
 );
 CREATE TABLE "Viagens"(
---   Registro de viagem de uma entrega ou compra de insumos[N:Viagem|Viagens][G:a][L:Pagamento][K:MZ\Sale|MZ\Sale\][H:SyncModel]
+--   Registro de viagem de uma entrega ou compra de insumos[N:Viagem|Viagens][G:a][L:Pagamento][K:MZ\Location|MZ\Location\][H:SyncModel]
   "ID" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,-- Identificador da viagem[G:o]
   "ResponsavelID" INTEGER NOT NULL,-- Responsável pela entrega ou compra[N:Responsável][G:o][S:S]
   "Latitude" DOUBLE DEFAULT NULL,-- Ponto latitudinal para localização do responsável em tempo real[N:Latitude][G:a]
@@ -766,8 +766,6 @@ CREATE TABLE "Cheques"(
   "Recolhido" TEXT NOT NULL CHECK("Recolhido" IN('Y', 'N')) DEFAULT 'N',-- Informa se o cheque foi recolhido no banco[N:Recolhido][G:o]
   "Recolhimento" DATETIME DEFAULT NULL,-- Data de recolhimento do cheque[N:Data de recolhimento][G:a]
   "DataCadastro" DATETIME NOT NULL,-- Data de cadastro do cheque[N:Data de cadastro][G:a][D]
-  CONSTRAINT "UK_Folhas_Cheques_ChequeID_Numero"
-    UNIQUE("Numero"),
   CONSTRAINT "FK_Cheques_Clientes_ClienteID"
     FOREIGN KEY("ClienteID")
     REFERENCES "Clientes"("ID")
@@ -779,7 +777,7 @@ CREATE TABLE "Cheques"(
     ON DELETE RESTRICT
     ON UPDATE RESTRICT
 );
-CREATE INDEX "Cheques.IDX_Folhas_Cheques_Vencimento_Recolhido" ON "Cheques" ("Vencimento","Recolhido");
+CREATE INDEX "Cheques.IDX_Cheques_Vencimento_Recolhido" ON "Cheques" ("Vencimento","Recolhido");
 CREATE INDEX "Cheques.FK_Cheques_Clientes_ClienteID_idx" ON "Cheques" ("ClienteID");
 CREATE INDEX "Cheques.FK_Cheques_Bancos_BancoID_idx" ON "Cheques" ("BancoID");
 CREATE TABLE "Observacoes"(
@@ -802,7 +800,7 @@ CREATE TABLE "Sistema"(
   "ID" TEXT PRIMARY KEY NOT NULL CHECK("ID" IN('1')),-- Identificador único do sistema, valor 1[G:o]
   "ServidorID" INTEGER NOT NULL,-- Servidor do sistema[G:o][N:Servidor]
   "Licenca" TEXT DEFAULT NULL,-- Chave da Licença, permite licença do tipo vitalícia[N:Chave de licença][G:a]
-  "Computadores" INTEGER DEFAULT NULL,-- Quantidade de computadores permitido para uso em rede[N:Quantidade de computadores][G:a]
+  "Dispositivos" INTEGER DEFAULT NULL,-- Quantidade de tablets e computadores permitido para uso[N:Quantidade de dispositivos][G:a]
   "GUID" VARCHAR(36) DEFAULT NULL,-- Código único da empresa, permite baixar novas licenças automaticamente e autorizar sincronização do servidor[N:Identificador da empresa][G:o]
   "UltimoBackup" DATETIME DEFAULT NULL,-- Informa qual foi a data da última realização de backup do banco de dados do sistema[N:Data do último backup][G:a]
   "FusoHorario" VARCHAR(100) DEFAULT NULL,-- Informa qual o fuso horário
@@ -969,7 +967,7 @@ CREATE TABLE "Patrimonios"(
 CREATE INDEX "Patrimonios.FK_Patrimonios_Fornecedores_FornecedorID_idx" ON "Patrimonios" ("FornecedorID");
 CREATE INDEX "Patrimonios.FK_Patrimonios_Clientes_EmpresaID_idx" ON "Patrimonios" ("EmpresaID");
 CREATE TABLE "Acessos"(
---   Permite acesso à uma determinada funcionalidade da lista de permissões[N:Acesso|Acessos][G:o][L:AlterarConfiguracoes][K:MZ\Employee|MZ\Employee\][H:SyncModel]
+--   Permite acesso à uma determinada funcionalidade da lista de permissões[N:Acesso|Acessos][G:o][L:AlterarConfiguracoes][K:MZ\System|MZ\System\][H:SyncModel]
   "ID" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,-- Identificador do acesso[G:o]
   "FuncaoID" INTEGER NOT NULL,-- Função a que a permissão se aplica[N:Função][G:a][S:S]
   "PermissaoID" INTEGER NOT NULL,-- Permissão liberada para a função[N:Permissão][G:a][S]
@@ -992,7 +990,7 @@ CREATE TABLE "Formas_Pagto"(
 --   Formas de pagamento disponíveis para pedido e contas[N:Forma de pagamento|Formas de pagamento][G:a][L:CadastroFormasPagto][K:MZ\Payment|MZ\Payment\][H:SyncModel]
   "ID" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,-- Identificador da forma de pagamento[G:o]
   "Tipo" TEXT NOT NULL CHECK("Tipo" IN('Dinheiro', 'Credito', 'Debito', 'Vale', 'Cheque', 'Crediario', 'Saldo')),-- Tipo de pagamento[N:Tipo][G:o][E:Dinheiro|Cartão de credito|Cartão de débito|Vale|Cheque|Crediário|Saldo][S:S]
-  "IntegracaoID" INTEGER,
+  "IntegracaoID" INTEGER DEFAULT NULL,-- Informa se essa forma de pagamento estará disponível apenas nessa integração[G:a][N:Integração]
   "CarteiraID" INTEGER NOT NULL,-- Carteira que será usada para entrada de valores no caixa[N:Carteira de entrada][G:a]
   "Descricao" VARCHAR(50) NOT NULL,-- Descrição da forma de pagamento[N:Descrição][G:a][S]
   "Parcelado" TEXT NOT NULL CHECK("Parcelado" IN('Y', 'N')),-- Informa se a forma de pagamento permite parcelamento[N:Parcelado][G:o]
@@ -1328,7 +1326,7 @@ CREATE TABLE "Pagamentos"(
   "Lancado" DECIMAL NOT NULL,-- Valor lançado para pagamento do pedido ou conta na moeda local do país[N:Lancado][G:o]
   "Codigo" VARCHAR(100) DEFAULT NULL,-- Código do pagamento, usado em transações online[G:o][N:Código]
   "Detalhes" VARCHAR(200) DEFAULT NULL,-- Detalhes do pagamento[N:Detalhes][G:o]
-  "Estado" TEXT NOT NULL CHECK("Estado" IN('Aberto', 'Aguardando', 'Analise', 'Pago', 'Disputa', 'Devolvido', 'Cancelado')) DEFAULT 'Y',-- Informa qual o andamento do processo de pagamento[N:Estado][G:o][F:self::ESTADO_ABERTO]
+  "Estado" TEXT NOT NULL CHECK("Estado" IN('Aberto', 'Aguardando', 'Analise', 'Pago', 'Disputa', 'Devolvido', 'Cancelado')) DEFAULT 'Aberto',-- Informa qual o andamento do processo de pagamento[N:Estado][G:o][F:self::ESTADO_ABERTO]
   "DataCompensacao" DATETIME NOT NULL,-- Data de compensação do pagamento[N:Data de compensação][G:a]
   "DataLancamento" DATETIME NOT NULL,-- Data e hora do lançamento do pagamento[N:Data de lançamento][G:a]
   CONSTRAINT "FK_Pagamentos_Prestadores_FuncionarioID"
@@ -1480,15 +1478,14 @@ CREATE TABLE "Cartoes"(
   "ID" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,-- Identificador do cartão[G:o]
   "FormaPagtoID" INTEGER NOT NULL,-- Forma de pagamento associada à esse cartão ou vale[G:a][N:Forma de pagamento]
   "CarteiraID" INTEGER DEFAULT NULL,-- Carteira de entrada de valores no caixa[N:Carteira de entrada][G:a]
-  "Nome" VARCHAR(50) NOT NULL,-- Nome do cartão[N:Nome][G:a][S]
-  "Bandeira" VARCHAR(50) NOT NULL,-- Bandeira do cartão[G:a][N:Bandeira]
+  "Bandeira" VARCHAR(50) NOT NULL,-- Nome da bandeira do cartão[N:Bandeira][G:a][S]
   "Taxa" DOUBLE NOT NULL DEFAULT 0,-- Taxa em porcentagem cobrado sobre o total do pagamento, valores de 0 a 100[N:Taxa][G:a]
   "DiasRepasse" INTEGER NOT NULL CHECK("DiasRepasse">=0) DEFAULT 30,-- Quantidade de dias para repasse do valor[N:Dias para repasse][G:o]
   "TaxaAntecipacao" DOUBLE NOT NULL DEFAULT 0,-- Taxa em porcentagem para antecipação de recebimento de parcelas[N:Taxa de antecipação][G:a]
   "ImagemURL" VARCHAR(100) DEFAULT NULL,-- Imagem do cartão[N:Imagem][G:a][I:256x256|cartao|cartao.png]
   "Ativo" TEXT NOT NULL CHECK("Ativo" IN('Y', 'N')) DEFAULT 'Y',-- Informa se o cartão está ativo[N:Ativo][G:o]
-  CONSTRAINT "UK_FormaPagto_Nome"
-    UNIQUE("FormaPagtoID","Nome"),
+  CONSTRAINT "UK_FormaPagto_Bandeira"
+    UNIQUE("FormaPagtoID","Bandeira"),
   CONSTRAINT "FK_Cartoes_Carteiras_CarteiraID"
     FOREIGN KEY("CarteiraID")
     REFERENCES "Carteiras"("ID")
@@ -1955,7 +1952,7 @@ CREATE TABLE "Contas"(
   "Vencimento" DATETIME NOT NULL,-- Data de vencimento da conta[N:Data de vencimento][G:a]
   "NumeroDoc" VARCHAR(64) DEFAULT NULL,-- Número do documento que gerou a conta[N:Número do documento][G:o]
   "AnexoURL" VARCHAR(200) DEFAULT NULL,-- Caminho do anexo da conta[N:Anexo][G:o][I:512x256|conta|conta.png]
-  "Estado" TEXT NOT NULL CHECK("Estado" IN('Analise', 'Ativa', 'Paga', 'Cancelada', 'Desativada')) DEFAULT 'N',-- Informa o estado da conta, desativa quando agrupa[N:Estado][G:o]
+  "Estado" TEXT NOT NULL CHECK("Estado" IN('Analise', 'Ativa', 'Paga', 'Cancelada', 'Desativada')) DEFAULT 'Ativa',-- Informa o estado da conta, desativa quando agrupa[N:Estado][G:o]
   "DataCalculo" DATETIME DEFAULT NULL,-- Data do último cálculo de acréscimo por atraso de pagamento[N:Data de cálculo][G:a]
   "DataEmissao" DATETIME NOT NULL,-- Data de emissão da conta[N:Data de emissão][G:a]
   CONSTRAINT "FK_Contas_Clientes_ClienteID"

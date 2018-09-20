@@ -24,7 +24,7 @@
  */
 namespace MZ\Sale;
 
-use MZ\Database\Model;
+use MZ\Database\SyncModel;
 use MZ\Database\DB;
 use MZ\Util\Filter;
 use MZ\Util\Validator;
@@ -33,7 +33,7 @@ use MZ\Util\Validator;
  * Informa a transferência de uma mesa / comanda para outra, ou de um
  * produto para outra mesa / comanda
  */
-class Transferencia extends Model
+class Transferencia extends SyncModel
 {
 
     /**
@@ -549,16 +549,15 @@ class Transferencia extends Model
     /**
      * Update Transferência with instance values into database for ID
      * @param  array $only Save these fields only, when empty save all fields except id
-     * @param  boolean $except When true, saves all fields except $only
      * @return Transferencia Self instance
      */
-    public function update($only = [], $except = false)
+    public function update($only = [])
     {
         $values = $this->validate();
         if (!$this->exists()) {
             throw new \Exception('O identificador da transferência não foi informado');
         }
-        $values = DB::filterValues($values, $only, $except);
+        $values = DB::filterValues($values, $only, false);
         try {
             DB::update('Transferencias')
                 ->set($values)
@@ -679,11 +678,11 @@ class Transferencia extends Model
 
     /**
      * Funcionário que transferiu esse pedido/produto
-     * @return \MZ\Employee\Funcionario The object fetched from database
+     * @return \MZ\Provider\Prestador The object fetched from database
      */
     public function findFuncionarioID()
     {
-        return \MZ\Employee\Funcionario::findByID($this->getFuncionarioID());
+        return \MZ\Provider\Prestador::findByID($this->getFuncionarioID());
     }
 
     /**

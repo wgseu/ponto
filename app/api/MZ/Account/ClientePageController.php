@@ -26,7 +26,7 @@ namespace MZ\Account;
 
 use MZ\Database\DB;
 use MZ\System\Permissao;
-use MZ\Employee\Funcionario;
+use MZ\Provider\Prestador;
 use MZ\Location\Localizacao;
 use MZ\Util\Filter;
 use MZ\Util\Mask;
@@ -247,7 +247,7 @@ class ClientePageController extends \MZ\Core\Controller
                 }
                 if (isset($_GET['sistema']) &&
                     intval($_GET['sistema']) == 1 &&
-                    !is_null($this->getApplication()->getSystem()->getEmpresaID())
+                    !is_null($this->getApplication()->getSystem()->getBusiness()->getEmpresaID())
                 ) {
                     throw new \Exception(
                         'Você deve alterar a empresa do sistema em vez de cadastrar uma nova'
@@ -257,8 +257,8 @@ class ClientePageController extends \MZ\Core\Controller
                 $cliente->insert();
                 $old_cliente->clean($cliente);
                 if (isset($_GET['sistema']) && intval($_GET['sistema']) == 1) {
-                    $this->getApplication()->getSystem()->setEmpresaID($cliente->getID());
-                    $this->getApplication()->getSystem()->update();
+                    $this->getApplication()->getSystem()->getBusiness()->setEmpresaID($cliente->getID());
+                    $this->getApplication()->getSystem()->getBusiness()->update();
                 }
                 DB::commit();
                 $msg = sprintf(
@@ -313,7 +313,7 @@ class ClientePageController extends \MZ\Core\Controller
             need_permission(Permissao::NOME_CADASTROCLIENTES, is_output('json'));
         }
         if ($cliente->getID() == $this->getApplication()->getSystem()->getCompany()->getID() &&
-            !logged_employee()->has(Permissao::NOME_ALTERARCONFIGURACOES)
+            !logged_provider()->has(Permissao::NOME_ALTERARCONFIGURACOES)
         ) {
             $msg = 'Você não tem permissão para alterar essa empresa!';
             if (is_output('json')) {
@@ -322,14 +322,14 @@ class ClientePageController extends \MZ\Core\Controller
             \Thunder::warning($msg);
             return $this->redirect('/gerenciar/cliente/');
         }
-        $funcionario = Funcionario::findByClienteID($cliente->getID());
-        if ($funcionario->exists() &&
+        $prestador = Prestador::findByClienteID($cliente->getID());
+        if ($prestador->exists() &&
             (
-                (!logged_employee()->has(Permissao::NOME_CADASTROFUNCIONARIOS) &&
-                    logged_employee()->getID() != $funcionario->getID()
+                (!logged_provider()->has(Permissao::NOME_CADASTROFUNCIONARIOS) &&
+                    logged_provider()->getID() != $prestador->getID()
                 ) ||
-                ($funcionario->has(Permissao::NOME_CADASTROFUNCIONARIOS) &&
-                    logged_employee()->getID() != $funcionario->getID() &&
+                ($prestador->has(Permissao::NOME_CADASTROFUNCIONARIOS) &&
+                    logged_provider()->getID() != $prestador->getID() &&
                     !is_owner()
                 )
             )
@@ -410,16 +410,16 @@ class ClientePageController extends \MZ\Core\Controller
             \Thunder::warning($msg);
             return $this->redirect('/gerenciar/cliente/');
         }
-        $funcionario = Funcionario::findByClienteID($cliente->getID());
-        if ($funcionario->exists() &&
+        $prestador = Prestador::findByClienteID($cliente->getID());
+        if ($prestador->exists() &&
             (
                 (
-                    !logged_employee()->has(Permissao::NOME_CADASTROFUNCIONARIOS) &&
-                    logged_employee()->getID() != $funcionario->getID()
+                    !logged_provider()->has(Permissao::NOME_CADASTROFUNCIONARIOS) &&
+                    logged_provider()->getID() != $prestador->getID()
                 ) ||
                 (
-                    $funcionario->has(Permissao::NOME_CADASTROFUNCIONARIOS) &&
-                    logged_employee()->getID() != $funcionario->getID() &&
+                    $prestador->has(Permissao::NOME_CADASTROFUNCIONARIOS) &&
+                    logged_provider()->getID() != $prestador->getID() &&
                     !is_owner()
                 )
             )

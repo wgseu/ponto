@@ -24,15 +24,17 @@
  */
 namespace MZ\Wallet;
 
-use MZ\Database\Model;
-use MZ\Database\DB;
+use MZ\Util\Mask;
 use MZ\Util\Filter;
 use MZ\Util\Validator;
+use MZ\Database\DB;
+use MZ\Database\SyncModel;
+use MZ\Exception\ValidationException;
 
 /**
  * Moedas financeiras de um país
  */
-class Moeda extends Model
+class Moeda extends SyncModel
 {
 
     /**
@@ -64,6 +66,19 @@ class Moeda extends Model
      * Formado de exibição do valor, Ex: $ %s, para $ 3,00
      */
     private $formato;
+    /**
+     * Multiplicador para conversão para a moeda principal
+     */
+    private $conversao;
+    /**
+     * Data da última atualização do fator de conversão
+     */
+    private $data_atualizacao;
+    /**
+     * Informa se a moeda é recebida pela empresa, a moeda do país mesmo
+     * desativada sempre é aceita
+     */
+    private $ativa;
 
     /**
      * Constructor for a new empty instance of Moeda
@@ -86,7 +101,7 @@ class Moeda extends Model
     /**
      * Set ID value to new on param
      * @param  mixed $id new value for ID
-     * @return Moeda Self instance
+     * @return self Self instance
      */
     public function setID($id)
     {
@@ -106,7 +121,7 @@ class Moeda extends Model
     /**
      * Set Nome value to new on param
      * @param  mixed $nome new value for Nome
-     * @return Moeda Self instance
+     * @return self Self instance
      */
     public function setNome($nome)
     {
@@ -126,7 +141,7 @@ class Moeda extends Model
     /**
      * Set Simbolo value to new on param
      * @param  mixed $simbolo new value for Simbolo
-     * @return Moeda Self instance
+     * @return self Self instance
      */
     public function setSimbolo($simbolo)
     {
@@ -146,7 +161,7 @@ class Moeda extends Model
     /**
      * Set Codigo value to new on param
      * @param  mixed $codigo new value for Codigo
-     * @return Moeda Self instance
+     * @return self Self instance
      */
     public function setCodigo($codigo)
     {
@@ -167,7 +182,7 @@ class Moeda extends Model
     /**
      * Set Divisao value to new on param
      * @param  mixed $divisao new value for Divisao
-     * @return Moeda Self instance
+     * @return self Self instance
      */
     public function setDivisao($divisao)
     {
@@ -187,7 +202,7 @@ class Moeda extends Model
     /**
      * Set Fracao value to new on param
      * @param  mixed $fracao new value for Fracao
-     * @return Moeda Self instance
+     * @return self Self instance
      */
     public function setFracao($fracao)
     {
@@ -207,11 +222,82 @@ class Moeda extends Model
     /**
      * Set Formato value to new on param
      * @param  mixed $formato new value for Formato
-     * @return Moeda Self instance
+     * @return self Self instance
      */
     public function setFormato($formato)
     {
         $this->formato = $formato;
+        return $this;
+    }
+
+    /**
+     * Multiplicador para conversão para a moeda principal
+     * @return mixed Conversão of Moeda
+     */
+    public function getConversao()
+    {
+        return $this->conversao;
+    }
+
+    /**
+     * Set Conversao value to new on param
+     * @param  mixed $conversao new value for Conversao
+     * @return self Self instance
+     */
+    public function setConversao($conversao)
+    {
+        $this->conversao = $conversao;
+        return $this;
+    }
+
+    /**
+     * Data da última atualização do fator de conversão
+     * @return mixed Data de atualização of Moeda
+     */
+    public function getDataAtualizacao()
+    {
+        return $this->data_atualizacao;
+    }
+
+    /**
+     * Set DataAtualizacao value to new on param
+     * @param  mixed $data_atualizacao new value for DataAtualizacao
+     * @return self Self instance
+     */
+    public function setDataAtualizacao($data_atualizacao)
+    {
+        $this->data_atualizacao = $data_atualizacao;
+        return $this;
+    }
+
+    /**
+     * Informa se a moeda é recebida pela empresa, a moeda do país mesmo
+     * desativada sempre é aceita
+     * @return mixed Ativa of Moeda
+     */
+    public function getAtiva()
+    {
+        return $this->ativa;
+    }
+
+    /**
+     * Informa se a moeda é recebida pela empresa, a moeda do país mesmo
+     * desativada sempre é aceita
+     * @return boolean Check if a of Ativa is selected or checked
+     */
+    public function isAtiva()
+    {
+        return $this->ativa == 'Y';
+    }
+
+    /**
+     * Set Ativa value to new on param
+     * @param  mixed $ativa new value for Ativa
+     * @return self Self instance
+     */
+    public function setAtiva($ativa)
+    {
+        $this->ativa = $ativa;
         return $this;
     }
 
@@ -230,17 +316,20 @@ class Moeda extends Model
         $moeda['divisao'] = $this->getDivisao();
         $moeda['fracao'] = $this->getFracao();
         $moeda['formato'] = $this->getFormato();
+        $moeda['conversao'] = $this->getConversao();
+        $moeda['dataatualizacao'] = $this->getDataAtualizacao();
+        $moeda['ativa'] = $this->getAtiva();
         return $moeda;
     }
 
     /**
      * Fill this instance with from array values, you can pass instance to
      * @param  mixed $moeda Associated key -> value to assign into this instance
-     * @return Moeda Self instance
+     * @return self Self instance
      */
     public function fromArray($moeda = [])
     {
-        if ($moeda instanceof Moeda) {
+        if ($moeda instanceof self) {
             $moeda = $moeda->toArray();
         } elseif (!is_array($moeda)) {
             $moeda = [];
@@ -261,7 +350,7 @@ class Moeda extends Model
         } else {
             $this->setSimbolo($moeda['simbolo']);
         }
-        if (!array_key_exists('codigo', $moeda)) {
+        if (!isset($moeda['codigo'])) {
             $this->setCodigo(null);
         } else {
             $this->setCodigo($moeda['codigo']);
@@ -281,6 +370,21 @@ class Moeda extends Model
         } else {
             $this->setFormato($moeda['formato']);
         }
+        if (!array_key_exists('conversao', $moeda)) {
+            $this->setConversao(null);
+        } else {
+            $this->setConversao($moeda['conversao']);
+        }
+        if (!array_key_exists('dataatualizacao', $moeda)) {
+            $this->setDataAtualizacao(null);
+        } else {
+            $this->setDataAtualizacao($moeda['dataatualizacao']);
+        }
+        if (!isset($moeda['ativa'])) {
+            $this->setAtiva('N');
+        } else {
+            $this->setAtiva($moeda['ativa']);
+        }
         return $this;
     }
 
@@ -296,7 +400,7 @@ class Moeda extends Model
 
     /**
      * Filter fields, upload data and keep key data
-     * @param Moeda $original Original instance without modifications
+     * @param self $original Original instance without modifications
      */
     public function filter($original)
     {
@@ -307,11 +411,13 @@ class Moeda extends Model
         $this->setDivisao(Filter::number($this->getDivisao()));
         $this->setFracao(Filter::string($this->getFracao()));
         $this->setFormato(Filter::string($this->getFormato()));
+        $this->setConversao(Filter::float($this->getConversao()));
+        $this->setDataAtualizacao(Filter::datetime($this->getDataAtualizacao()));
     }
 
     /**
      * Clean instance resources like images and docs
-     * @param  Moeda $dependency Don't clean when dependency use same resources
+     * @param  self $dependency Don't clean when dependency use same resources
      */
     public function clean($dependency)
     {
@@ -319,30 +425,31 @@ class Moeda extends Model
 
     /**
      * Validate fields updating them and throw exception when invalid data has found
-     * @return array All field of Moeda in array format
+     * @return self[] All field of Moeda in array format
      */
     public function validate()
     {
         $errors = [];
         if (is_null($this->getNome())) {
-            $errors['nome'] = 'O Nome não pode ser vazio';
+            $errors['nome'] = 'O nome não pode ser vazio';
         }
         if (is_null($this->getSimbolo())) {
-            $errors['simbolo'] = 'O Símbolo não pode ser vazio';
+            $errors['simbolo'] = 'O símbolo não pode ser vazio';
+        }
+        if (is_null($this->getCodigo())) {
+            $errors['codigo'] = 'O código não pode ser vazio';
         }
         if (is_null($this->getDivisao())) {
-            $errors['divisao'] = 'A Divisão não pode ser vazia';
-        }
-        if ($this->getDivisao() < 0) {
-            $errors['divisao'] = 'A divisão não pode ser negativa';
-        } elseif ($this->getDivisao() < 1) {
-            $errors['divisao'] = 'A divisão não pode ser nula';
+            $errors['divisao'] = 'A divisão não pode ser vazia';
         }
         if (is_null($this->getFormato())) {
-            $errors['formato'] = 'O Formato não pode ser vazio';
+            $errors['formato'] = 'O formato não pode ser vazio';
+        }
+        if (!Validator::checkBoolean($this->getAtiva())) {
+            $errors['ativa'] = 'A ativa é inválida';
         }
         if (!empty($errors)) {
-            throw new \MZ\Exception\ValidationException($errors);
+            throw new ValidationException($errors);
         }
         return $this->toArray();
     }
@@ -354,12 +461,20 @@ class Moeda extends Model
      */
     protected function translate($e)
     {
+        if (contains(['ID', 'UNIQUE'], $e->getMessage())) {
+            return new ValidationException([
+                'id' => sprintf(
+                    'O id "%s" já está cadastrado',
+                    $this->getID()
+                ),
+            ]);
+        }
         return parent::translate($e);
     }
 
     /**
      * Insert a new Moeda into the database and fill instance from database
-     * @return Moeda Self instance
+     * @return self Self instance
      */
     public function insert()
     {
@@ -378,26 +493,25 @@ class Moeda extends Model
     /**
      * Update Moeda with instance values into database for ID
      * @param  array $only Save these fields only, when empty save all fields except id
-     * @param  boolean $except When true, saves all fields except $only
-     * @return Moeda Self instance
+     * @return int rows affected
      */
-    public function update($only = [], $except = false)
+    public function update($only = [])
     {
         $values = $this->validate();
         if (!$this->exists()) {
             throw new \Exception('O identificador da moeda não foi informado');
         }
-        $values = DB::filterValues($values, $only, $except);
+        $values = DB::filterValues($values, $only, false);
         try {
-            DB::update('Moedas')
+            $affected = DB::update('Moedas')
                 ->set($values)
-                ->where('id', $this->getID())
+                ->where(['id' => $this->getID()])
                 ->execute();
             $this->loadByID($this->getID());
         } catch (\Exception $e) {
             throw $this->translate($e);
         }
-        return $this;
+        return $affected;
     }
 
     /**
@@ -419,7 +533,7 @@ class Moeda extends Model
      * Load one register for it self with a condition
      * @param  array $condition Condition for searching the row
      * @param  array $order associative field name -> [-1, 1]
-     * @return Moeda Self instance filled or empty
+     * @return self Self instance filled or empty
      */
     public function load($condition, $order = [])
     {
@@ -434,7 +548,7 @@ class Moeda extends Model
      */
     private static function getAllowedKeys()
     {
-        $moeda = new Moeda();
+        $moeda = new self();
         $allowed = Filter::concatKeys('m.', $moeda->toArray());
         return $allowed;
     }
@@ -488,21 +602,22 @@ class Moeda extends Model
      * Search one register with a condition
      * @param  array $condition Condition for searching the row
      * @param  array $order order rows
-     * @return Moeda A filled Moeda or empty instance
+     * @return self A filled Moeda or empty instance
      */
     public static function find($condition, $order = [])
     {
         $query = self::query($condition, $order)->limit(1);
         $row = $query->fetch() ?: [];
-        return new Moeda($row);
+        return new self($row);
     }
 
     /**
-     * Fetch all rows from database with matched condition critery
-     * @param  array $condition condition to filter rows
-     * @param  integer $limit number of rows to get, null for all
-     * @param  integer $offset start index to get rows, null for begining
-     * @return array All rows instanced and filled
+     * Find all Moeda
+     * @param  array  $condition Condition to get all Moeda
+     * @param  array  $order     Order Moeda
+     * @param  int    $limit     Limit data into row count
+     * @param  int    $offset    Start offset to get rows
+     * @return self[]             List of all rows instanced as Moeda
      */
     public static function findAll($condition = [], $order = [], $limit = null, $offset = null)
     {
@@ -516,7 +631,7 @@ class Moeda extends Model
         $rows = $query->fetchAll();
         $result = [];
         foreach ($rows as $row) {
-            $result[] = new Moeda($row);
+            $result[] = new self($row);
         }
         return $result;
     }

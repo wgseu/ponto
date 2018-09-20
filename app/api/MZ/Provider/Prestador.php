@@ -22,9 +22,9 @@
  *
  * @author Equipe GrandChef <desenvolvimento@mzsw.com.br>
  */
-namespace MZ\Employee;
+namespace MZ\Provider;
 
-use MZ\Database\Model;
+use MZ\Database\SyncModel;
 use MZ\Database\DB;
 use MZ\Util\Filter;
 use MZ\Util\Validator;
@@ -34,7 +34,7 @@ use MZ\System\Permissao;
 /**
  * Funcionário que trabalha na empresa e possui uma determinada função
  */
-class Funcionario extends Model
+class Prestador extends SyncModel
 {
 
     /**
@@ -82,17 +82,17 @@ class Funcionario extends Model
     private $data_cadastro;
 
     /**
-     * Constructor for a new empty instance of Funcionario
-     * @param array $funcionario All field and values to fill the instance
+     * Constructor for a new empty instance of Prestador
+     * @param array $prestador All field and values to fill the instance
      */
-    public function __construct($funcionario = [])
+    public function __construct($prestador = [])
     {
-        parent::__construct($funcionario);
+        parent::__construct($prestador);
     }
 
     /**
      * Código do funcionário
-     * @return mixed Código of Funcionario
+     * @return mixed Código of Prestador
      */
     public function getID()
     {
@@ -102,7 +102,7 @@ class Funcionario extends Model
     /**
      * Set ID value to new on param
      * @param  mixed $id new value for ID
-     * @return Funcionario Self instance
+     * @return Prestador Self instance
      */
     public function setID($id)
     {
@@ -112,7 +112,7 @@ class Funcionario extends Model
 
     /**
      * Função do funcionário na empresa
-     * @return mixed Função of Funcionario
+     * @return mixed Função of Prestador
      */
     public function getFuncaoID()
     {
@@ -122,7 +122,7 @@ class Funcionario extends Model
     /**
      * Set FuncaoID value to new on param
      * @param  mixed $funcao_id new value for FuncaoID
-     * @return Funcionario Self instance
+     * @return Prestador Self instance
      */
     public function setFuncaoID($funcao_id)
     {
@@ -133,7 +133,7 @@ class Funcionario extends Model
     /**
      * Cliente que representa esse funcionário, único no cadastro de
      * funcionários
-     * @return mixed Cliente of Funcionario
+     * @return mixed Cliente of Prestador
      */
     public function getClienteID()
     {
@@ -143,7 +143,7 @@ class Funcionario extends Model
     /**
      * Set ClienteID value to new on param
      * @param  mixed $cliente_id new value for ClienteID
-     * @return Funcionario Self instance
+     * @return Prestador Self instance
      */
     public function setClienteID($cliente_id)
     {
@@ -154,7 +154,7 @@ class Funcionario extends Model
     /**
      * Código de barras utilizado pelo funcionário para autorizar uma operação
      * no sistema
-     * @return mixed Código de barras of Funcionario
+     * @return mixed Código de barras of Prestador
      */
     public function getCodigoBarras()
     {
@@ -164,7 +164,7 @@ class Funcionario extends Model
     /**
      * Set CodigoBarras value to new on param
      * @param  mixed $codigo_barras new value for CodigoBarras
-     * @return Funcionario Self instance
+     * @return Prestador Self instance
      */
     public function setCodigoBarras($codigo_barras)
     {
@@ -174,7 +174,7 @@ class Funcionario extends Model
 
     /**
      * Porcentagem cobrada pelo funcionário ao cliente, Ex.: Comissão de 10%
-     * @return mixed Comissão of Funcionario
+     * @return mixed Comissão of Prestador
      */
     public function getPorcentagem()
     {
@@ -184,7 +184,7 @@ class Funcionario extends Model
     /**
      * Set Porcentagem value to new on param
      * @param  mixed $porcentagem new value for Porcentagem
-     * @return Funcionario Self instance
+     * @return Prestador Self instance
      */
     public function setPorcentagem($porcentagem)
     {
@@ -195,7 +195,7 @@ class Funcionario extends Model
     /**
      * Código da linguagem utilizada pelo funcionário para visualizar o
      * programa e o site
-     * @return mixed Linguagem of Funcionario
+     * @return mixed Linguagem of Prestador
      */
     public function getLinguagemID()
     {
@@ -205,7 +205,7 @@ class Funcionario extends Model
     /**
      * Set LinguagemID value to new on param
      * @param  mixed $linguagem_id new value for LinguagemID
-     * @return Funcionario Self instance
+     * @return Prestador Self instance
      */
     public function setLinguagemID($linguagem_id)
     {
@@ -215,7 +215,7 @@ class Funcionario extends Model
 
     /**
      * Define a distribuição da porcentagem pela parcela de pontos
-     * @return mixed Pontuação of Funcionario
+     * @return mixed Pontuação of Prestador
      */
     public function getPontuacao()
     {
@@ -225,7 +225,7 @@ class Funcionario extends Model
     /**
      * Set Pontuacao value to new on param
      * @param  mixed $pontuacao new value for Pontuacao
-     * @return Funcionario Self instance
+     * @return Prestador Self instance
      */
     public function setPontuacao($pontuacao)
     {
@@ -235,7 +235,7 @@ class Funcionario extends Model
 
     /**
      * Informa se o funcionário está ativo na empresa
-     * @return mixed Ativo of Funcionario
+     * @return mixed Ativo of Prestador
      */
     public function getAtivo()
     {
@@ -254,7 +254,7 @@ class Funcionario extends Model
     /**
      * Set Ativo value to new on param
      * @param  mixed $ativo new value for Ativo
-     * @return Funcionario Self instance
+     * @return Prestador Self instance
      */
     public function setAtivo($ativo)
     {
@@ -264,7 +264,7 @@ class Funcionario extends Model
 
     /**
      * Data de saída do funcionário, informado apenas quando ativo for não
-     * @return mixed Data de saída of Funcionario
+     * @return mixed Data de saída of Prestador
      */
     public function getDataSaida()
     {
@@ -274,7 +274,7 @@ class Funcionario extends Model
     /**
      * Set DataSaida value to new on param
      * @param  mixed $data_saida new value for DataSaida
-     * @return Funcionario Self instance
+     * @return Prestador Self instance
      */
     public function setDataSaida($data_saida)
     {
@@ -284,7 +284,7 @@ class Funcionario extends Model
 
     /**
      * Data em que o funcionário foi cadastrado no sistema
-     * @return mixed Data de cadastro of Funcionario
+     * @return mixed Data de cadastro of Prestador
      */
     public function getDataCadastro()
     {
@@ -294,7 +294,7 @@ class Funcionario extends Model
     /**
      * Set DataCadastro value to new on param
      * @param  mixed $data_cadastro new value for DataCadastro
-     * @return Funcionario Self instance
+     * @return Prestador Self instance
      */
     public function setDataCadastro($data_cadastro)
     {
@@ -309,82 +309,82 @@ class Funcionario extends Model
      */
     public function toArray($recursive = false)
     {
-        $funcionario = parent::toArray($recursive);
-        $funcionario['id'] = $this->getID();
-        $funcionario['funcaoid'] = $this->getFuncaoID();
-        $funcionario['clienteid'] = $this->getClienteID();
-        $funcionario['codigobarras'] = $this->getCodigoBarras();
-        $funcionario['porcentagem'] = $this->getPorcentagem();
-        $funcionario['linguagemid'] = $this->getLinguagemID();
-        $funcionario['pontuacao'] = $this->getPontuacao();
-        $funcionario['ativo'] = $this->getAtivo();
-        $funcionario['datasaida'] = $this->getDataSaida();
-        $funcionario['datacadastro'] = $this->getDataCadastro();
-        return $funcionario;
+        $prestador = parent::toArray($recursive);
+        $prestador['id'] = $this->getID();
+        $prestador['funcaoid'] = $this->getFuncaoID();
+        $prestador['clienteid'] = $this->getClienteID();
+        $prestador['codigobarras'] = $this->getCodigoBarras();
+        $prestador['porcentagem'] = $this->getPorcentagem();
+        $prestador['linguagemid'] = $this->getLinguagemID();
+        $prestador['pontuacao'] = $this->getPontuacao();
+        $prestador['ativo'] = $this->getAtivo();
+        $prestador['datasaida'] = $this->getDataSaida();
+        $prestador['datacadastro'] = $this->getDataCadastro();
+        return $prestador;
     }
 
     /**
      * Fill this instance with from array values, you can pass instance to
-     * @param  mixed $funcionario Associated key -> value to assign into this instance
-     * @return Funcionario Self instance
+     * @param  mixed $prestador Associated key -> value to assign into this instance
+     * @return Prestador Self instance
      */
-    public function fromArray($funcionario = [])
+    public function fromArray($prestador = [])
     {
-        if ($funcionario instanceof Funcionario) {
-            $funcionario = $funcionario->toArray();
-        } elseif (!is_array($funcionario)) {
-            $funcionario = [];
+        if ($prestador instanceof Prestador) {
+            $prestador = $prestador->toArray();
+        } elseif (!is_array($prestador)) {
+            $prestador = [];
         }
-        parent::fromArray($funcionario);
-        if (!isset($funcionario['id'])) {
+        parent::fromArray($prestador);
+        if (!isset($prestador['id'])) {
             $this->setID(null);
         } else {
-            $this->setID($funcionario['id']);
+            $this->setID($prestador['id']);
         }
-        if (!isset($funcionario['funcaoid'])) {
+        if (!isset($prestador['funcaoid'])) {
             $this->setFuncaoID(null);
         } else {
-            $this->setFuncaoID($funcionario['funcaoid']);
+            $this->setFuncaoID($prestador['funcaoid']);
         }
-        if (!isset($funcionario['clienteid'])) {
+        if (!isset($prestador['clienteid'])) {
             $this->setClienteID(null);
         } else {
-            $this->setClienteID($funcionario['clienteid']);
+            $this->setClienteID($prestador['clienteid']);
         }
-        if (!array_key_exists('codigobarras', $funcionario)) {
+        if (!array_key_exists('codigobarras', $prestador)) {
             $this->setCodigoBarras(null);
         } else {
-            $this->setCodigoBarras($funcionario['codigobarras']);
+            $this->setCodigoBarras($prestador['codigobarras']);
         }
-        if (!isset($funcionario['porcentagem'])) {
+        if (!isset($prestador['porcentagem'])) {
             $this->setPorcentagem(0);
         } else {
-            $this->setPorcentagem($funcionario['porcentagem']);
+            $this->setPorcentagem($prestador['porcentagem']);
         }
-        if (!isset($funcionario['linguagemid'])) {
+        if (!isset($prestador['linguagemid'])) {
             $this->setLinguagemID(1046);
         } else {
-            $this->setLinguagemID($funcionario['linguagemid']);
+            $this->setLinguagemID($prestador['linguagemid']);
         }
-        if (!isset($funcionario['pontuacao'])) {
+        if (!isset($prestador['pontuacao'])) {
             $this->setPontuacao(0);
         } else {
-            $this->setPontuacao($funcionario['pontuacao']);
+            $this->setPontuacao($prestador['pontuacao']);
         }
-        if (!isset($funcionario['ativo'])) {
+        if (!isset($prestador['ativo'])) {
             $this->setAtivo('N');
         } else {
-            $this->setAtivo($funcionario['ativo']);
+            $this->setAtivo($prestador['ativo']);
         }
-        if (!array_key_exists('datasaida', $funcionario)) {
+        if (!array_key_exists('datasaida', $prestador)) {
             $this->setDataSaida(null);
         } else {
-            $this->setDataSaida($funcionario['datasaida']);
+            $this->setDataSaida($prestador['datasaida']);
         }
-        if (!isset($funcionario['datacadastro'])) {
+        if (!isset($prestador['datacadastro'])) {
             $this->setDataCadastro(DB::now());
         } else {
-            $this->setDataCadastro($funcionario['datacadastro']);
+            $this->setDataCadastro($prestador['datacadastro']);
         }
         return $this;
     }
@@ -404,13 +404,13 @@ class Funcionario extends Model
      */
     public function publish()
     {
-        $funcionario = parent::publish();
-        return $funcionario;
+        $prestador = parent::publish();
+        return $prestador;
     }
 
     /**
      * Filter fields, upload data and keep key data
-     * @param Funcionario $original Original instance without modifications
+     * @param Prestador $original Original instance without modifications
      */
     public function filter($original)
     {
@@ -436,7 +436,7 @@ class Funcionario extends Model
 
     /**
      * Clean instance resources like images and docs
-     * @param  Funcionario $dependency Don't clean when dependency use same resources
+     * @param  Prestador $dependency Don't clean when dependency use same resources
      */
     public function clean($dependency)
     {
@@ -444,7 +444,7 @@ class Funcionario extends Model
 
     /**
      * Validate fields updating them and throw exception when invalid data has found
-     * @return array All field of Funcionario in array format
+     * @return array All field of Prestador in array format
      */
     public function validate()
     {
@@ -523,13 +523,13 @@ class Funcionario extends Model
 
     /**
      * Insert a new Funcionário into the database and fill instance from database
-     * @return Funcionario Self instance
+     * @return Prestador Self instance
      */
     public function insert()
     {
         $values = $this->validate();
         try {
-            $id = DB::insertInto('Funcionarios')->values($values)->execute();
+            $id = DB::insertInto('Prestadores')->values($values)->execute();
             $this->loadByID($id);
         } catch (\Exception $e) {
             throw $this->translate($e);
@@ -539,18 +539,18 @@ class Funcionario extends Model
 
     /**
      * Update Funcionário with instance values into database for Código
-     * @return Funcionario Self instance
+     * @return Prestador Self instance
      */
-    public function update($only = [], $except = false)
+    public function update($only = [])
     {
         $values = $this->validate();
         if (!$this->exists()) {
             throw new \Exception('O identificador do funcionário não foi informado');
         }
-        $values = DB::filterValues($values, $only, $except);
+        $values = DB::filterValues($values, $only, false);
         unset($values['datacadastro']);
         try {
-            DB::update('Funcionarios')
+            DB::update('Prestadores')
                 ->set($values)
                 ->where('id', $this->getID())
                 ->execute();
@@ -579,7 +579,7 @@ class Funcionario extends Model
         if (is_owner($this)) {
             throw new \Exception('Esse funcionário não pode ser excluído!');
         }
-        $result = DB::deleteFrom('Funcionarios')
+        $result = DB::deleteFrom('Prestadores')
             ->where('id', $this->getID())
             ->execute();
         return $result;
@@ -606,7 +606,7 @@ class Funcionario extends Model
         }
         settype($permission, 'array');
         $permissoes = $app->getAuthentication()->getPermissions();
-        if ($this->getID() != logged_employee()->getID()) {
+        if ($this->getID() != logged_provider()->getID()) {
             $permissoes = Acesso::getPermissoes($this->getFuncaoID());
         }
         $allow = true;
@@ -629,7 +629,7 @@ class Funcionario extends Model
      * Load one register for it self with a condition
      * @param  array $condition Condition for searching the row
      * @param  array $order associative field name -> [-1, 1]
-     * @return Funcionario Self instance filled or empty
+     * @return Prestador Self instance filled or empty
      */
     public function load($condition, $order = [])
     {
@@ -641,7 +641,7 @@ class Funcionario extends Model
     /**
      * Load into this object from database using, ClienteID
      * @param  int $cliente_id cliente to find Funcionário
-     * @return Funcionario Self filled instance or empty when not found
+     * @return Prestador Self filled instance or empty when not found
      */
     public function loadByClienteID($cliente_id)
     {
@@ -653,7 +653,7 @@ class Funcionario extends Model
     /**
      * Load into this object from database using, CodigoBarras
      * @param  string $codigo_barras código de barras to find Funcionário
-     * @return Funcionario Self filled instance or empty when not found
+     * @return Prestador Self filled instance or empty when not found
      */
     public function loadByCodigoBarras($codigo_barras)
     {
@@ -664,11 +664,11 @@ class Funcionario extends Model
 
     /**
      * Função do funcionário na empresa
-     * @return \MZ\Employee\Funcao The object fetched from database
+     * @return \MZ\Provider\Funcao The object fetched from database
      */
     public function findFuncaoID()
     {
-        return \MZ\Employee\Funcao::findByID($this->getFuncaoID());
+        return \MZ\Provider\Funcao::findByID($this->getFuncaoID());
     }
 
     /**
@@ -687,8 +687,8 @@ class Funcionario extends Model
      */
     private static function getAllowedKeys()
     {
-        $funcionario = new Funcionario();
-        $allowed = Filter::concatKeys('f.', $funcionario->toArray());
+        $prestador = new Prestador();
+        $allowed = Filter::concatKeys('p.', $prestador->toArray());
         return $allowed;
     }
 
@@ -700,7 +700,7 @@ class Funcionario extends Model
     private static function filterOrder($order)
     {
         $allowed = self::getAllowedKeys();
-        return Filter::orderBy($order, $allowed, 'f.');
+        return Filter::orderBy($order, $allowed, 'p.');
     }
 
     /**
@@ -712,7 +712,7 @@ class Funcionario extends Model
     {
         $allowed = self::getAllowedKeys();
         $allowed['c.genero'] = true;
-        return Filter::keys($condition, $allowed, ['f.', 'c.']);
+        return Filter::keys($condition, $allowed, ['p.', 'c.']);
     }
 
     /**
@@ -723,8 +723,8 @@ class Funcionario extends Model
      */
     private static function query($condition = [], $order = [])
     {
-        $query = DB::from('Funcionarios f')
-            ->leftJoin('Clientes c ON c.id = f.clienteid');
+        $query = DB::from('Prestadores p')
+            ->leftJoin('Clientes c ON c.id = p.clienteid');
         if (isset($condition['search'])) {
             $search = trim($condition['search']);
             if (Validator::checkEmail($search)) {
@@ -736,7 +736,7 @@ class Funcionario extends Model
                 $query = $query->where('(c.fone1 LIKE ? OR c.fone2 LIKE ?)', $fone, $fone);
                 $query = $query->orderBy('IF(c.fone1 LIKE ?, 0, 1)', $fone);
             } elseif (Validator::checkDigits($search)) {
-                $query = $query->where('f.id', intval($search));
+                $query = $query->where('p.id', intval($search));
             } else {
                 $query = DB::buildSearch(
                     $search,
@@ -752,7 +752,7 @@ class Funcionario extends Model
         }
         $condition = self::filterCondition($condition);
         $query = DB::buildOrderBy($query, self::filterOrder($order));
-        $query = $query->orderBy('f.id ASC');
+        $query = $query->orderBy('p.id ASC');
         return DB::buildCondition($query, $condition);
     }
 
@@ -760,19 +760,19 @@ class Funcionario extends Model
      * Search one register with a condition
      * @param  array $condition Condition for searching the row
      * @param  array $order order rows
-     * @return Funcionario A filled Funcionário or empty instance
+     * @return Prestador A filled Funcionário or empty instance
      */
     public static function find($condition, $order = [])
     {
         $query = self::query($condition, $order)->limit(1);
         $row = $query->fetch() ?: [];
-        return new Funcionario($row);
+        return new Prestador($row);
     }
 
     /**
      * Find this object on database using, ClienteID
      * @param  int $cliente_id cliente to find Funcionário
-     * @return Funcionario A filled instance or empty when not found
+     * @return Prestador A filled instance or empty when not found
      */
     public static function findByClienteID($cliente_id)
     {
@@ -783,7 +783,7 @@ class Funcionario extends Model
     /**
      * Find this object on database using, CodigoBarras
      * @param  string $codigo_barras código de barras to find Funcionário
-     * @return Funcionario A filled instance or empty when not found
+     * @return Prestador A filled instance or empty when not found
      */
     public static function findByCodigoBarras($codigo_barras)
     {
@@ -797,7 +797,7 @@ class Funcionario extends Model
      * @param  array  $order     Order Funcionário
      * @param  int    $limit     Limit data into row count
      * @param  int    $offset    Start offset to get rows
-     * @return array             List of all rows instanced as Funcionario
+     * @return array             List of all rows instanced as Prestador
      */
     public static function findAll($condition = [], $order = [], $limit = null, $offset = null)
     {
@@ -811,7 +811,7 @@ class Funcionario extends Model
         $rows = $query->fetchAll();
         $result = [];
         foreach ($rows as $row) {
-            $result[] = new Funcionario($row);
+            $result[] = new Prestador($row);
         }
         return $result;
     }

@@ -24,7 +24,7 @@
  */
 namespace MZ\Sale;
 
-use MZ\Database\Model;
+use MZ\Database\SyncModel;
 use MZ\Database\DB;
 use MZ\Util\Filter;
 use MZ\Util\Validator;
@@ -32,7 +32,7 @@ use MZ\Util\Validator;
 /**
  * Comanda individual, permite lançar pedidos em cartões de consumo
  */
-class Comanda extends Model
+class Comanda extends SyncModel
 {
 
     /**
@@ -271,13 +271,13 @@ class Comanda extends Model
      * Update Comanda with instance values into database for Número
      * @return Comanda Self instance
      */
-    public function update($only = [], $except = false)
+    public function update($only = [])
     {
         $values = $this->validate();
         if (!$this->exists()) {
             throw new \Exception('O identificador da comanda não foi informado');
         }
-        $values = DB::filterValues($values, $only, $except);
+        $values = DB::filterValues($values, $only, false);
         try {
             DB::update('Comandas')
                 ->set($values)

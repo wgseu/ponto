@@ -24,7 +24,7 @@
  */
 namespace MZ\Payment;
 
-use MZ\Database\Model;
+use MZ\Database\SyncModel;
 use MZ\Database\DB;
 use MZ\Util\Filter;
 use MZ\Util\Validator;
@@ -33,7 +33,7 @@ use MZ\Account\Conta;
 /**
  * Pagamentos de contas e pedidos
  */
-class Pagamento extends Model
+class Pagamento extends SyncModel
 {
 
     /**
@@ -822,16 +822,15 @@ class Pagamento extends Model
     /**
      * Update Pagamento with instance values into database for ID
      * @param  array $only Save these fields only, when empty save all fields except id
-     * @param  boolean $except When true, saves all fields except $only
      * @return Pagamento Self instance
      */
-    public function update($only = [], $except = false)
+    public function update($only = [])
     {
         $values = $this->validate();
         if (!$this->exists()) {
             throw new \Exception('O identificador do pagamento não foi informado');
         }
-        $values = DB::filterValues($values, $only, $except);
+        $values = DB::filterValues($values, $only, false);
         try {
             DB::update('Pagamentos')
                 ->set($values)
@@ -896,11 +895,11 @@ class Pagamento extends Model
 
     /**
      * Funcionário que lançou o pagamento no sistema
-     * @return \MZ\Employee\Funcionario The object fetched from database
+     * @return \MZ\Provider\Prestador The object fetched from database
      */
     public function findFuncionarioID()
     {
-        return \MZ\Employee\Funcionario::findByID($this->getFuncionarioID());
+        return \MZ\Provider\Prestador::findByID($this->getFuncionarioID());
     }
 
     /**

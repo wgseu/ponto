@@ -24,7 +24,7 @@
  */
 namespace MZ\System;
 
-use MZ\Database\Model;
+use MZ\Database\SyncModel;
 use MZ\Database\DB;
 use MZ\Util\Filter;
 use MZ\Util\Validator;
@@ -34,7 +34,7 @@ use MZ\Integrator\Kromax;
 /**
  * Informa quais integrações estão disponíveis
  */
-class Integracao extends Model
+class Integracao extends SyncModel
 {
 
     /**
@@ -511,16 +511,15 @@ class Integracao extends Model
     /**
      * Update Integração with instance values into database for ID
      * @param  array $only Save these fields only, when empty save all fields except id
-     * @param  boolean $except When true, saves all fields except $only
      * @return Integracao Self instance
      */
-    public function update($only = [], $except = false)
+    public function update($only = [])
     {
         $values = $this->validate();
         if (!$this->exists()) {
             throw new \Exception('O identificador da integração não foi informado');
         }
-        $values = DB::filterValues($values, $only, $except);
+        $values = DB::filterValues($values, $only, false);
         try {
             DB::update('Integracoes')
                 ->set($values)

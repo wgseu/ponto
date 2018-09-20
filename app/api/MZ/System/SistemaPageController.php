@@ -37,11 +37,11 @@ class SistemaPageController extends \MZ\Core\Controller
         if (is_owner()) {
             $controller = new \MZ\Payment\PagamentoPageController($this->getApplication());
             return $controller->dashboard();
-        } elseif (logged_employee()->has(Permissao::NOME_PAGAMENTO)) {
+        } elseif (logged_provider()->has(Permissao::NOME_PAGAMENTO)) {
             $controller = new \MZ\Sale\PedidoPageController($this->getApplication());
             return $controller->find();
         } else {
-            $controller = new \MZ\Employee\FuncionarioPageController($this->getApplication());
+            $controller = new \MZ\Provider\PrestadorPageController($this->getApplication());
             return $controller->find();
         }
     }

@@ -71,7 +71,7 @@ class LocalizacaoPageController extends \MZ\Core\Controller
             try {
                 DB::beginTransaction();
                 if ($localizacao->getClienteID() == $this->getApplication()->getSystem()->getCompany()->getID() &&
-                    !logged_employee()->has(Permissao::NOME_ALTERARCONFIGURACOES)
+                    !logged_provider()->has(Permissao::NOME_ALTERARCONFIGURACOES)
                 ) {
                     throw new \Exception('Você não tem permissão para atribuir um endereço a essa empresa!');
                 }
@@ -122,7 +122,7 @@ class LocalizacaoPageController extends \MZ\Core\Controller
             return $this->json()->error($msg);
         }
         if ($localizacao->getClienteID() == $this->getApplication()->getSystem()->getCompany()->getID() &&
-            !logged_employee()->has(Permissao::NOME_ALTERARCONFIGURACOES)
+            !logged_provider()->has(Permissao::NOME_ALTERARCONFIGURACOES)
         ) {
             $msg = 'Você não tem permissão para alterar o endereço dessa empresa!';
             return $this->json()->error($msg);

@@ -6,7 +6,7 @@ INSERT INTO `Servidores` (`ID`, `GUID`) VALUES
 	(1, UUID());
 
 INSERT INTO `Sistema` (`ID`, `ServidorID`, `VersaoDB`, `UltimoBackup`, `Dispositivos`) VALUES
-	('1', 1, "1.9.3.5", NOW(), 1);
+	('1', 1, "2.0.0.0", NOW(), 1);
 
 INSERT INTO `Moedas` (`ID`, `Nome`, `Simbolo`, `Codigo`, `Divisao`, `Fracao`, `Formato`, `Ativa`) VALUES
 	(1, "Real", "R$", "BRL", 100, "Centavo", "R$ %s", 'Y'),

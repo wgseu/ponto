@@ -24,7 +24,7 @@
  */
 namespace MZ\Payment;
 
-use MZ\Database\Model;
+use MZ\Database\SyncModel;
 use MZ\Database\DB;
 use MZ\Util\Filter;
 use MZ\Util\Validator;
@@ -32,7 +32,7 @@ use MZ\Util\Validator;
 /**
  * Folhas de cheque de um pagamento
  */
-class FolhaCheque extends Model
+class FolhaCheque extends SyncModel
 {
 
     /**
@@ -537,13 +537,13 @@ class FolhaCheque extends Model
      * Update Folha de cheque with instance values into database for ID
      * @return FolhaCheque Self instance
      */
-    public function update($only = [], $except = false)
+    public function update($only = [])
     {
         $values = $this->validate();
         if (!$this->exists()) {
             throw new \Exception('O identificador da folha de cheque não foi informado');
         }
-        $values = DB::filterValues($values, $only, $except);
+        $values = DB::filterValues($values, $only, false);
         try {
             DB::update('Folhas_Cheques')
                 ->set($values)

@@ -402,7 +402,7 @@ class Moeda extends SyncModel
      * Filter fields, upload data and keep key data
      * @param self $original Original instance without modifications
      */
-    public function filter($original)
+    public function filter($original, $localized = false)
     {
         $this->setID($original->getID());
         $this->setNome(Filter::string($this->getNome()));
@@ -411,7 +411,7 @@ class Moeda extends SyncModel
         $this->setDivisao(Filter::number($this->getDivisao()));
         $this->setFracao(Filter::string($this->getFracao()));
         $this->setFormato(Filter::string($this->getFormato()));
-        $this->setConversao(Filter::float($this->getConversao()));
+        $this->setConversao(Filter::float($this->getConversao(), $localized));
         $this->setDataAtualizacao(Filter::datetime($this->getDataAtualizacao()));
     }
 

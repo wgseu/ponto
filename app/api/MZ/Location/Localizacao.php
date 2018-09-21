@@ -613,7 +613,7 @@ class Localizacao extends SyncModel
      * Filter fields, upload data and keep key data
      * @param Localizacao $original Original instance without modifications
      */
-    public function filter($original)
+    public function filter($original, $localized = false)
     {
         $this->setID($original->getID());
         $this->setClienteID(Filter::number($original->getClienteID()));
@@ -626,8 +626,8 @@ class Localizacao extends SyncModel
         $this->setBloco(Filter::string($this->getBloco()));
         $this->setApartamento(Filter::string($this->getApartamento()));
         $this->setReferencia(Filter::string($this->getReferencia()));
-        $this->setLatitude(Filter::float($this->getLatitude()));
-        $this->setLongitude(Filter::float($this->getLongitude()));
+        $this->setLatitude(Filter::float($this->getLatitude(), $localized));
+        $this->setLongitude(Filter::float($this->getLongitude(), $localized));
         $this->setApelido(Filter::string($this->getApelido()));
     }
 

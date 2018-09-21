@@ -324,13 +324,13 @@ class Composicao extends SyncModel
      * Filter fields, upload data and keep key data
      * @param Composicao $original Original instance without modifications
      */
-    public function filter($original)
+    public function filter($original, $localized = false)
     {
         $this->setID($original->getID());
         $this->setComposicaoID(Filter::number($this->getComposicaoID()));
         $this->setProdutoID(Filter::number($this->getProdutoID()));
-        $this->setQuantidade(Filter::float($this->getQuantidade()));
-        $this->setValor(Filter::money($this->getValor()));
+        $this->setQuantidade(Filter::float($this->getQuantidade(), $localized));
+        $this->setValor(Filter::money($this->getValor(), $localized));
     }
 
     /**

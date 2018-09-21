@@ -305,14 +305,14 @@ class Credito extends SyncModel
      * Filter fields, upload data and keep key data
      * @param Credito $original Original instance without modifications
      */
-    public function filter($original)
+    public function filter($original, $localized = false)
     {
         $this->setID($original->getID());
         $this->setFuncionarioID($original->getFuncionarioID());
         $this->setCancelado($original->getCancelado());
         $this->setDataCadastro($original->getDataCadastro());
         $this->setClienteID(Filter::number($original->getClienteID()));
-        $this->setValor(Filter::money($this->getValor()));
+        $this->setValor(Filter::money($this->getValor(), $localized));
         $this->setDetalhes(Filter::string($this->getDetalhes()));
     }
 

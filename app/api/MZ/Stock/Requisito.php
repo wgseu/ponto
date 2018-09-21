@@ -418,17 +418,17 @@ class Requisito extends SyncModel
      * Filter fields, upload data and keep key data
      * @param Requisito $original Original instance without modifications
      */
-    public function filter($original)
+    public function filter($original, $localized = false)
     {
         $this->setID($original->getID());
         $this->setListaID(Filter::number($this->getListaID()));
         $this->setProdutoID(Filter::number($this->getProdutoID()));
         $this->setCompraID(Filter::number($this->getCompraID()));
         $this->setFornecedorID(Filter::number($this->getFornecedorID()));
-        $this->setQuantidade(Filter::float($this->getQuantidade()));
-        $this->setComprado(Filter::float($this->getComprado()));
-        $this->setPrecoMaximo(Filter::money($this->getPrecoMaximo()));
-        $this->setPreco(Filter::money($this->getPreco()));
+        $this->setQuantidade(Filter::float($this->getQuantidade(), $localized));
+        $this->setComprado(Filter::float($this->getComprado(), $localized));
+        $this->setPrecoMaximo(Filter::money($this->getPrecoMaximo(), $localized));
+        $this->setPreco(Filter::money($this->getPreco(), $localized));
         $this->setObservacoes(Filter::string($this->getObservacoes()));
         $this->setDataRecolhimento(Filter::datetime($this->getDataRecolhimento()));
     }

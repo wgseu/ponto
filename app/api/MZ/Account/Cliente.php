@@ -918,11 +918,11 @@ class Cliente extends SyncModel
      * Filter fields, upload data and keep key data
      * @param self $original Original instance without modifications
      */
-    public function filter($original)
+    public function filter($original, $localized = false)
     {
         $this->setID($original->getID());
         $this->setSecreto($original->getSecreto());
-        $this->setLimiteCompra(Filter::float($original->getLimiteCompra()));
+        $this->setLimiteCompra(Filter::float($original->getLimiteCompra(), $localized));
         $this->setEmpresaID(Filter::number($this->getEmpresaID()));
         $this->setLogin(Filter::string($this->getLogin()));
         $this->setSenha(Filter::text($this->getSenha()));

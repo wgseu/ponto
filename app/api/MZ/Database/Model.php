@@ -121,9 +121,10 @@ abstract class Model
     /**
      * Filter fields, upload data and keep key data
      * @param mixed $original Original instance without modifications
-     * @return mixed Self instance
+     * @param boolean $localized Informs if fields are localized
+     * @return self Self instance
      */
-    abstract public function filter($original);
+    abstract public function filter($original, $localized = false);
 
     /**
      * Clean instance resources like images and docs

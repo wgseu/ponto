@@ -444,7 +444,7 @@ class FormaPagto extends SyncModel
      * Filter fields, upload data and keep key data
      * @param FormaPagto $original Original instance without modifications
      */
-    public function filter($original)
+    public function filter($original, $localized = false)
     {
         $this->setID($original->getID());
         $this->setCarteiraID(Filter::number($this->getCarteiraID()));
@@ -453,7 +453,7 @@ class FormaPagto extends SyncModel
         $this->setMinParcelas(Filter::number($this->getMinParcelas()));
         $this->setMaxParcelas(Filter::number($this->getMaxParcelas()));
         $this->setParcelasSemJuros(Filter::number($this->getParcelasSemJuros()));
-        $this->setJuros(Filter::float($this->getJuros()));
+        $this->setJuros(Filter::float($this->getJuros(), $localized));
     }
 
     /**

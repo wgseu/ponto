@@ -268,13 +268,13 @@ class Informacao extends SyncModel
      * Filter fields, upload data and keep key data
      * @param Informacao $original Original instance without modifications
      */
-    public function filter($original)
+    public function filter($original, $localized = false)
     {
         $this->setID($original->getID());
         $this->setProdutoID(Filter::number($this->getProdutoID()));
         $this->setUnidadeID(Filter::number($this->getUnidadeID()));
-        $this->setPorcao(Filter::float($this->getPorcao()));
-        $this->setDieta(Filter::float($this->getDieta()));
+        $this->setPorcao(Filter::float($this->getPorcao(), $localized));
+        $this->setDieta(Filter::float($this->getDieta(), $localized));
         $this->setIngredientes(Filter::text($this->getIngredientes()));
     }
 

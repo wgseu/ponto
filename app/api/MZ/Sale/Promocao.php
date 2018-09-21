@@ -277,13 +277,13 @@ class Promocao extends SyncModel
      * Filter fields, upload data and keep key data
      * @param Promocao $original Original instance without modifications
      */
-    public function filter($original)
+    public function filter($original, $localized = false)
     {
         $this->setID($original->getID());
         $this->setProdutoID(Filter::number($this->getProdutoID()));
         $this->setInicio(Filter::number($this->getInicio()));
         $this->setFim(Filter::number($this->getFim()));
-        $this->setValor(Filter::money($this->getValor()));
+        $this->setValor(Filter::money($this->getValor(), $localized));
     }
 
     /**

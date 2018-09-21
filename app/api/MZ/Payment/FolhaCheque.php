@@ -427,13 +427,13 @@ class FolhaCheque extends SyncModel
      * Filter fields, upload data and keep key data
      * @param FolhaCheque $original Original instance without modifications
      */
-    public function filter($original)
+    public function filter($original, $localized = false)
     {
         $this->setID($original->getID());
         $this->setChequeID(Filter::number($this->getChequeID()));
         $this->setCompensacao(Filter::string($this->getCompensacao()));
         $this->setNumero(Filter::string($this->getNumero()));
-        $this->setValor(Filter::money($this->getValor()));
+        $this->setValor(Filter::money($this->getValor(), $localized));
         $this->setVencimento(Filter::datetime($this->getVencimento()));
         $this->setC(1, Filter::number($this->getC(1)));
         $this->setC(2, Filter::number($this->getC(2)));

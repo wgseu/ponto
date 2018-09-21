@@ -513,7 +513,7 @@ class Prestador extends SyncModel
      * Filter fields, upload data and keep key data
      * @param Prestador $original Original instance without modifications
      */
-    public function filter($original)
+    public function filter($original, $localized = false)
     {
         $this->setID($original->getID());
         $this->setCodigo(Filter::number($this->getCodigo()));
@@ -521,9 +521,9 @@ class Prestador extends SyncModel
         $this->setClienteID(Filter::number($this->getClienteID()));
         $this->setPrestadorID(Filter::number($this->getPrestadorID()));
         $this->setCodigoBarras(Filter::string($this->getCodigoBarras()));
-        $this->setPorcentagem(Filter::float($this->getPorcentagem()));
+        $this->setPorcentagem(Filter::float($this->getPorcentagem(), $localized));
         $this->setPontuacao(Filter::number($this->getPontuacao()));
-        $this->setRemuneracao(Filter::money($this->getRemuneracao()));
+        $this->setRemuneracao(Filter::money($this->getRemuneracao(), $localized));
         $this->setDataTermino(Filter::datetime($this->getDataTermino()));
         if (is_owner($original) || is_self($original)) {
             $this->setClienteID($original->getClienteID());

@@ -185,7 +185,7 @@ class Comanda extends SyncModel
      * Filter fields, upload data and keep key data
      * @param Comanda $original Original instance without modifications
      */
-    public function filter($original)
+    public function filter($original, $localized = false)
     {
         $this->setID(Filter::number($this->getID()));
         $this->setNome(Filter::string($this->getNome()));

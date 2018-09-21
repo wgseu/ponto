@@ -209,7 +209,7 @@ class Cidade extends SyncModel
      * Filter fields, upload data and keep key data
      * @param Cidade $original Original instance without modifications
      */
-    public function filter($original)
+    public function filter($original, $localized = false)
     {
         $this->setID($original->getID());
         $this->setEstadoID(Filter::number($this->getEstadoID()));

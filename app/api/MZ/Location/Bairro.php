@@ -247,12 +247,12 @@ class Bairro extends SyncModel
      * Filter fields, upload data and keep key data
      * @param Bairro $original Original instance without modifications
      */
-    public function filter($original)
+    public function filter($original, $localized = false)
     {
         $this->setID($original->getID());
         $this->setCidadeID(Filter::number($this->getCidadeID()));
         $this->setNome(Filter::string($this->getNome()));
-        $this->setValorEntrega(Filter::money($this->getValorEntrega()));
+        $this->setValorEntrega(Filter::money($this->getValorEntrega(), $localized));
     }
 
     /**

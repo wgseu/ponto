@@ -608,7 +608,7 @@ class Estoque extends SyncModel
      * Filter fields, upload data and keep key data
      * @param Estoque $original Original instance without modifications
      */
-    public function filter($original)
+    public function filter($original, $localized = false)
     {
         $this->setID($original->getID());
         $this->setTransacaoID(Filter::number($original->getTransacaoID()));
@@ -617,8 +617,8 @@ class Estoque extends SyncModel
         $this->setProdutoID(Filter::number($this->getProdutoID()));
         $this->setFornecedorID(Filter::number($this->getFornecedorID()));
         $this->setSetorID(Filter::number($this->getSetorID()));
-        $this->setQuantidade(Filter::float($this->getQuantidade()));
-        $this->setPrecoCompra(Filter::money($this->getPrecoCompra()));
+        $this->setQuantidade(Filter::float($this->getQuantidade(), $localized));
+        $this->setPrecoCompra(Filter::money($this->getPrecoCompra(), $localized));
         $this->setLote(Filter::string($this->getLote()));
         $this->setDataFabricacao(Filter::datetime($this->getDataFabricacao()));
         $this->setDataVencimento(Filter::datetime($this->getDataVencimento()));

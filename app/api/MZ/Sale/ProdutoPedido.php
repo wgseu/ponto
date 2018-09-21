@@ -857,7 +857,7 @@ class ProdutoPedido extends SyncModel
      * Filter fields, upload data and keep key data
      * @param ProdutoPedido $original Original instance without modifications
      */
-    public function filter($original)
+    public function filter($original, $localized = false)
     {
         $this->setID($original->getID());
         $this->setPedidoID(Filter::number($this->getPedidoID()));
@@ -866,11 +866,11 @@ class ProdutoPedido extends SyncModel
         $this->setServicoID(Filter::number($this->getServicoID()));
         $this->setProdutoPedidoID(Filter::number($this->getProdutoPedidoID()));
         $this->setDescricao(Filter::string($this->getDescricao()));
-        $this->setPreco(Filter::money($this->getPreco()));
-        $this->setQuantidade(Filter::float($this->getQuantidade()));
-        $this->setPorcentagem(Filter::float($this->getPorcentagem()));
-        $this->setPrecoVenda(Filter::money($this->getPrecoVenda()));
-        $this->setPrecoCompra(Filter::money($this->getPrecoCompra()));
+        $this->setPreco(Filter::money($this->getPreco(), $localized));
+        $this->setQuantidade(Filter::float($this->getQuantidade(), $localized));
+        $this->setPorcentagem(Filter::float($this->getPorcentagem(), $localized));
+        $this->setPrecoVenda(Filter::money($this->getPrecoVenda(), $localized));
+        $this->setPrecoCompra(Filter::money($this->getPrecoCompra(), $localized));
         $this->setDetalhes(Filter::string($this->getDetalhes()));
         $this->setDataVisualizacao(Filter::datetime($this->getDataVisualizacao()));
         $this->setDataAtualizacao(DB::now());

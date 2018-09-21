@@ -177,11 +177,11 @@ class Funcao extends SyncModel
      * Filter fields, upload data and keep key data
      * @param self $original Original instance without modifications
      */
-    public function filter($original)
+    public function filter($original, $localized = false)
     {
         $this->setID($original->getID());
         $this->setDescricao(Filter::string($this->getDescricao()));
-        $this->setRemuneracao(Filter::money($this->getRemuneracao()));
+        $this->setRemuneracao(Filter::money($this->getRemuneracao(), $localized));
     }
 
     /**

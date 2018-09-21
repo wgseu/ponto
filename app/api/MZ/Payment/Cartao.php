@@ -397,16 +397,16 @@ class Cartao extends SyncModel
      * Filter fields, upload data and keep key data
      * @param Cartao $original Original instance without modifications
      */
-    public function filter($original)
+    public function filter($original, $localized = false)
     {
         $this->setID($original->getID());
         $this->setCarteiraID(Filter::number($this->getCarteiraID()));
         $this->setCarteiraPagtoID(Filter::number($this->getCarteiraPagtoID()));
         $this->setDescricao(Filter::string($this->getDescricao()));
         $this->setImageIndex(Filter::number($this->getImageIndex()));
-        $this->setMensalidade(Filter::money($this->getMensalidade()));
-        $this->setTransacao(Filter::money($this->getTransacao()));
-        $this->setTaxa(Filter::float($this->getTaxa()));
+        $this->setMensalidade(Filter::money($this->getMensalidade(), $localized));
+        $this->setTransacao(Filter::money($this->getTransacao(), $localized));
+        $this->setTaxa(Filter::float($this->getTaxa(), $localized));
         $this->setDiasRepasse(Filter::number($this->getDiasRepasse()));
     }
 

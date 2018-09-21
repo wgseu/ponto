@@ -744,15 +744,15 @@ class Conta extends SyncModel
         $this->setSubClassificacaoID(Filter::number($this->getSubClassificacaoID()));
         $this->setClienteID(Filter::number($this->getClienteID()));
         $this->setDescricao(Filter::string($this->getDescricao()));
-        $this->setValor(abs(Filter::money($this->getValor())));
-        $this->setAcrescimo(abs(Filter::money($this->getAcrescimo())));
-        $this->setMulta(abs(Filter::money($this->getMulta())));
+        $this->setValor(abs(Filter::money($this->getValor(), $localized)));
+        $this->setAcrescimo(abs(Filter::money($this->getAcrescimo(), $localized)));
+        $this->setMulta(abs(Filter::money($this->getMulta(), $localized)));
         if ($despesa) {
             $this->setValor(-$this->getValor());
             $this->setAcrescimo(-$this->getAcrescimo());
             $this->setMulta(-$this->getMulta());
         }
-        $this->setJuros(Filter::float($this->getJuros()) / 100.0);
+        $this->setJuros(Filter::float($this->getJuros(), $localized) / 100.0);
         $this->setVencimento(Filter::date($this->getVencimento()));
         $this->setDataEmissao(Filter::date($this->getDataEmissao()));
         $this->setNumeroDoc(Filter::string($this->getNumeroDoc()));

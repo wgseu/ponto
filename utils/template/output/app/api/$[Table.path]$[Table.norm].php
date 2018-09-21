@@ -270,6 +270,7 @@ $[field.end]
      * Filter fields, upload data and keep key data
      * @param self $original Original instance without modifications
      * @param boolean $localized Informs if fields are localized
+     * @return self Self instance
      */
     public function filter($original, $localized = false)
     {
@@ -315,6 +316,7 @@ $[field.else.if(string)]
         $this->set$[Field.norm]($[field.if(array)]$[field.array.number], $[field.end]Filter::string($this->get$[Field.norm]($[field.if(array)]$[field.array.number]$[field.end])));
 $[field.end]
 $[field.end]
+        return $this;
     }
 
     /**

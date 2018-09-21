@@ -268,14 +268,14 @@ class ValorNutricional extends SyncModel
      * Filter fields, upload data and keep key data
      * @param ValorNutricional $original Original instance without modifications
      */
-    public function filter($original)
+    public function filter($original, $localized = false)
     {
         $this->setID($original->getID());
         $this->setInformacaoID(Filter::number($this->getInformacaoID()));
         $this->setUnidadeID(Filter::number($this->getUnidadeID()));
         $this->setNome(Filter::string($this->getNome()));
-        $this->setQuantidade(Filter::float($this->getQuantidade()));
-        $this->setValorDiario(Filter::float($this->getValorDiario()));
+        $this->setQuantidade(Filter::float($this->getQuantidade(), $localized));
+        $this->setValorDiario(Filter::float($this->getValorDiario(), $localized));
     }
 
     /**

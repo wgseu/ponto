@@ -279,13 +279,13 @@ class Formacao extends SyncModel
      * Filter fields, upload data and keep key data
      * @param Formacao $original Original instance without modifications
      */
-    public function filter($original)
+    public function filter($original, $localized = false)
     {
         $this->setID($original->getID());
         $this->setProdutoPedidoID(Filter::number($this->getProdutoPedidoID()));
         $this->setPacoteID(Filter::number($this->getPacoteID()));
         $this->setComposicaoID(Filter::number($this->getComposicaoID()));
-        $this->setQuantidade(Filter::float($this->getQuantidade()));
+        $this->setQuantidade(Filter::float($this->getQuantidade(), $localized));
     }
 
     /**

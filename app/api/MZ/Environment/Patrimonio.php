@@ -567,19 +567,19 @@ class Patrimonio extends SyncModel
      * Filter fields, upload data and keep key data
      * @param Patrimonio $original Original instance without modifications
      */
-    public function filter($original)
+    public function filter($original, $localized = false)
     {
         $this->setID($original->getID());
         $this->setEmpresaID(Filter::number($this->getEmpresaID()));
         $this->setFornecedorID(Filter::number($this->getFornecedorID()));
         $this->setNumero(Filter::string($this->getNumero()));
         $this->setDescricao(Filter::string($this->getDescricao()));
-        $this->setQuantidade(Filter::float($this->getQuantidade()));
-        $this->setAltura(Filter::float($this->getAltura()));
-        $this->setLargura(Filter::float($this->getLargura()));
-        $this->setComprimento(Filter::float($this->getComprimento()));
-        $this->setCusto(Filter::money($this->getCusto()));
-        $this->setValor(Filter::money($this->getValor()));
+        $this->setQuantidade(Filter::float($this->getQuantidade(), $localized));
+        $this->setAltura(Filter::float($this->getAltura(), $localized));
+        $this->setLargura(Filter::float($this->getLargura(), $localized));
+        $this->setComprimento(Filter::float($this->getComprimento(), $localized));
+        $this->setCusto(Filter::money($this->getCusto(), $localized));
+        $this->setValor(Filter::money($this->getValor(), $localized));
         $imagem_anexada = upload_image('raw_imagemanexada', 'patrimonio');
         if (is_null($imagem_anexada) && trim($this->getImagemAnexada()) != '') {
             $this->setImagemAnexada($original->getImagemAnexada());

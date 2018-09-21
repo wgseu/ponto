@@ -917,7 +917,7 @@ class Produto extends SyncModel
      * Filter fields, upload data and keep key data
      * @param Produto $original Original instance without modifications
      */
-    public function filter($original)
+    public function filter($original, $localized = false)
     {
         global $app;
 
@@ -931,11 +931,11 @@ class Produto extends SyncModel
         $this->setDescricao(Filter::string($this->getDescricao()));
         $this->setAbreviacao(Filter::string($this->getAbreviacao()));
         $this->setDetalhes(Filter::string($this->getDetalhes()));
-        $this->setQuantidadeLimite(Filter::float($this->getQuantidadeLimite()));
-        $this->setQuantidadeMaxima(Filter::float($this->getQuantidadeMaxima()));
-        $this->setConteudo(Filter::float($this->getConteudo()));
-        $this->setPrecoVenda(Filter::money($this->getPrecoVenda()));
-        $this->setCustoProducao(Filter::money($this->getCustoProducao()));
+        $this->setQuantidadeLimite(Filter::float($this->getQuantidadeLimite(), $localized));
+        $this->setQuantidadeMaxima(Filter::float($this->getQuantidadeMaxima(), $localized));
+        $this->setConteudo(Filter::float($this->getConteudo(), $localized));
+        $this->setPrecoVenda(Filter::money($this->getPrecoVenda(), $localized));
+        $this->setCustoProducao(Filter::money($this->getCustoProducao(), $localized));
         $this->setTempoPreparo(Filter::number($this->getTempoPreparo()));
         $imagem = upload_image('raw_imagem', 'produto', null, 256, 256, true, 'crop');
         if (is_null($imagem) && trim($this->getImagem()) != '') {

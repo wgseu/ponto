@@ -309,7 +309,7 @@ class Auditoria extends SyncModel
      * Filter fields, upload data and keep key data
      * @param Auditoria $original Original instance without modifications
      */
-    public function filter($original)
+    public function filter($original, $localized = false)
     {
         $this->setID($original->getID());
         $this->setFuncionarioID(Filter::number($this->getFuncionarioID()));

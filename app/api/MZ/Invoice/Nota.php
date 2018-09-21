@@ -901,7 +901,7 @@ class Nota extends SyncModel
      * Filter fields, upload data and keep key data
      * @param Nota $original Original instance without modifications
      */
-    public function filter($original)
+    public function filter($original, $localized = false)
     {
         $this->setID($original->getID());
         $this->setSerie(Filter::number($this->getSerie()));
@@ -915,7 +915,7 @@ class Nota extends SyncModel
         $this->setMotivo(Filter::string($this->getMotivo()));
         $this->setConsultaURL(Filter::string($this->getConsultaURL()));
         $this->setQRCode(Filter::text($this->getQRCode()));
-        $this->setTributos(Filter::money($this->getTributos()));
+        $this->setTributos(Filter::money($this->getTributos(), $localized));
         $this->setDetalhes(Filter::string($this->getDetalhes()));
         $this->setDataAutorizacao(Filter::datetime($this->getDataAutorizacao()));
         $this->setDataEmissao(Filter::datetime($this->getDataEmissao()));

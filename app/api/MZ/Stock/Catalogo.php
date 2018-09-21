@@ -365,15 +365,15 @@ class Catalogo extends SyncModel
      * Filter fields, upload data and keep key data
      * @param Catalogo $original Original instance without modifications
      */
-    public function filter($original)
+    public function filter($original, $localized = false)
     {
         $this->setID($original->getID());
         $this->setProdutoID(Filter::number($this->getProdutoID()));
         $this->setFornecedorID(Filter::number($this->getFornecedorID()));
-        $this->setPrecoCompra(Filter::money($this->getPrecoCompra()));
-        $this->setPrecoVenda(Filter::money($this->getPrecoVenda()));
-        $this->setQuantidadeMinima(Filter::float($this->getQuantidadeMinima()));
-        $this->setEstoque(Filter::float($this->getEstoque()));
+        $this->setPrecoCompra(Filter::money($this->getPrecoCompra(), $localized));
+        $this->setPrecoVenda(Filter::money($this->getPrecoVenda(), $localized));
+        $this->setQuantidadeMinima(Filter::float($this->getQuantidadeMinima(), $localized));
+        $this->setEstoque(Filter::float($this->getEstoque(), $localized));
         $this->setDataConsulta(Filter::datetime($this->getDataConsulta()));
     }
 

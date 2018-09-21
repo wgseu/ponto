@@ -709,7 +709,7 @@ class Pagamento extends SyncModel
      * Filter fields, upload data and keep key data
      * @param Pagamento $original Original instance without modifications
      */
-    public function filter($original)
+    public function filter($original, $localized = false)
     {
         $this->setID($original->getID());
         $this->setCarteiraID(Filter::number($this->getCarteiraID()));
@@ -722,10 +722,10 @@ class Pagamento extends SyncModel
         $this->setChequeID(Filter::number($this->getChequeID()));
         $this->setContaID(Filter::number($this->getContaID()));
         $this->setCreditoID(Filter::number($this->getCreditoID()));
-        $this->setTotal(Filter::money($this->getTotal()));
+        $this->setTotal(Filter::money($this->getTotal(), $localized));
         $this->setParcelas(Filter::number($this->getParcelas()));
-        $this->setValorParcela(Filter::money($this->getValorParcela()));
-        $this->setTaxas(Filter::money($this->getTaxas()));
+        $this->setValorParcela(Filter::money($this->getValorParcela(), $localized));
+        $this->setTaxas(Filter::money($this->getTaxas(), $localized));
         $this->setDetalhes(Filter::string($this->getDetalhes()));
         $this->setDataCompensacao(Filter::datetime($this->getDataCompensacao()));
         $this->setDataHora(Filter::datetime($this->getDataHora()));

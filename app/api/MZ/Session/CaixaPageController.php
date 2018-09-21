@@ -77,7 +77,7 @@ class CaixaPageController extends \MZ\Core\Controller
         if (is_post()) {
             $caixa = new Caixa($_POST);
             try {
-                $caixa->filter($old_caixa);
+                $caixa->filter($old_caixa, true);
                 $caixa->insert();
                 $old_caixa->clean($caixa);
                 $msg = sprintf(
@@ -135,7 +135,7 @@ class CaixaPageController extends \MZ\Core\Controller
                     $caixa->setNumeroInicial($old_caixa->getNumeroInicial());
                     $caixa->setSerie($old_caixa->getSerie());
                 }
-                $caixa->filter($old_caixa);
+                $caixa->filter($old_caixa, true);
                 $caixa->update();
                 $old_caixa->clean($caixa);
                 $msg = sprintf(

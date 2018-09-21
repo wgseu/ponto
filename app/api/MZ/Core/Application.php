@@ -49,7 +49,7 @@ class Application
     {
         $this->path = $path;
         $this->system = new \MZ\System\Sistema();
-        $this->authentication = new \MZ\Account\Authentication();
+        $this->authentication = new \MZ\Account\Authentication($this);
         $this->database = new DB();
         $this->session = new Session();
         $this->request = Request::createFromGlobals();
@@ -178,17 +178,22 @@ class Application
             if (is_callable($ready)) {
                 $ready($this);
             } else {
-                $this->dispatch();
+                $this->dispatch()->send();
             }
         } catch (\Exception $e) {
             $this->handleException($e);
         }
     }
 
-    public function dispatch()
+    /**
+     * Dispatch request
+     * @param \Symfony\Component\HttpFoundation\Request $request http request
+     * @return \Symfony\Component\HttpFoundation\Response response object
+     */
+    public function dispatch($request)
     {
         $context = new RequestContext();
-        $context->fromRequest($this->request);
+        $context->fromRequest($request);
         $locator = new FileLocator([ $this->getPath('routes') ]);
         $router = new Router(
             new PhpFileLoader($locator),
@@ -196,9 +201,12 @@ class Application
             [ 'cache_dir' => $this->getPath('cache') ],
             $context
         );
-        $matched = $router->matchRequest($this->request);
+        $matched = $router->matchRequest($request);
+        $save_request = $this->request;
+        $this->request = $request;
         $response = $this->route($matched);
-        $response->send();
+        $this->request = $save_request;
+        return $response;
     }
 
     private function route($matched)
@@ -227,7 +235,7 @@ class Application
         if ($response instanceof \MZ\Response\JsonResponse) {
             $errors = [];
             if ($exception instanceof \MZ\Exception\ValidationException) {
-                $errors = $e->getErrors();
+                $errors = $exception->getErrors();
             }
             $response->error($exception->getMessage(), $exception->getCode(), $errors);
             $response->setStatusCode(Response::HTTP_BAD_REQUEST);

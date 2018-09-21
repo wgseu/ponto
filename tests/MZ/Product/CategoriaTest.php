@@ -131,7 +131,7 @@ class CategoriaTest extends \MZ\Framework\TestCase
         $found_categoria = Categoria::findByID($categoria->getID());
         $found_categoria->setDescricao('Nova categoria');
         $found_categoria->update();
-        $categoria->loadByID($categoria->getID());
+        $categoria->loadByID();
         $this->assertEquals($categoria, $found_categoria);
     }
 
@@ -158,11 +158,7 @@ class CategoriaTest extends \MZ\Framework\TestCase
         $categoria->insert();
         $found_categoria = Categoria::findByID($categoria->getID());
         $this->assertEquals($categoria, $found_categoria);
-        $found_categoria->loadByID($categoria->getID());
-        $this->assertEquals($categoria, $found_categoria);
         $found_categoria = Categoria::findByDescricao($categoria->getDescricao());
-        $this->assertEquals($categoria, $found_categoria);
-        $found_categoria->loadByDescricao($categoria->getDescricao());
         $this->assertEquals($categoria, $found_categoria);
         $found_categoria = Categoria::find(['search' => 'find']);
         $this->assertEquals($categoria, $found_categoria);

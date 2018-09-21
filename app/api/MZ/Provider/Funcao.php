@@ -24,13 +24,14 @@
  */
 namespace MZ\Provider;
 
-use MZ\Database\SyncModel;
-use MZ\Database\DB;
 use MZ\Util\Filter;
 use MZ\Util\Validator;
+use MZ\Database\DB;
+use MZ\Database\SyncModel;
+use MZ\Exception\ValidationException;
 
 /**
- * Função ou cargo de um funcionário
+ * Função ou atribuição de tarefas à um prestador
  */
 class Funcao extends SyncModel
 {
@@ -44,9 +45,9 @@ class Funcao extends SyncModel
      */
     private $descricao;
     /**
-     * Salário base ou mínimo que será acrescentado comissões
+     * Remuneracao pelas atividades exercidas, não está incluso comissões
      */
-    private $salario_base;
+    private $remuneracao;
 
     /**
      * Constructor for a new empty instance of Funcao
@@ -69,7 +70,7 @@ class Funcao extends SyncModel
     /**
      * Set ID value to new on param
      * @param  mixed $id new value for ID
-     * @return Funcao Self instance
+     * @return self Self instance
      */
     public function setID($id)
     {
@@ -89,7 +90,7 @@ class Funcao extends SyncModel
     /**
      * Set Descricao value to new on param
      * @param  mixed $descricao new value for Descricao
-     * @return Funcao Self instance
+     * @return self Self instance
      */
     public function setDescricao($descricao)
     {
@@ -98,22 +99,22 @@ class Funcao extends SyncModel
     }
 
     /**
-     * Salário base ou mínimo que será acrescentado comissões
-     * @return mixed Salário base of Funcao
+     * Remuneracao pelas atividades exercidas, não está incluso comissões
+     * @return mixed Remuneração of Funcao
      */
-    public function getSalarioBase()
+    public function getRemuneracao()
     {
-        return $this->salario_base;
+        return $this->remuneracao;
     }
 
     /**
-     * Set SalarioBase value to new on param
-     * @param  mixed $salario_base new value for SalarioBase
-     * @return Funcao Self instance
+     * Set Remuneracao value to new on param
+     * @param  mixed $remuneracao new value for Remuneracao
+     * @return self Self instance
      */
-    public function setSalarioBase($salario_base)
+    public function setRemuneracao($remuneracao)
     {
-        $this->salario_base = $salario_base;
+        $this->remuneracao = $remuneracao;
         return $this;
     }
 
@@ -127,18 +128,18 @@ class Funcao extends SyncModel
         $funcao = parent::toArray($recursive);
         $funcao['id'] = $this->getID();
         $funcao['descricao'] = $this->getDescricao();
-        $funcao['salariobase'] = $this->getSalarioBase();
+        $funcao['remuneracao'] = $this->getRemuneracao();
         return $funcao;
     }
 
     /**
      * Fill this instance with from array values, you can pass instance to
      * @param  mixed $funcao Associated key -> value to assign into this instance
-     * @return Funcao Self instance
+     * @return self Self instance
      */
     public function fromArray($funcao = [])
     {
-        if ($funcao instanceof Funcao) {
+        if ($funcao instanceof self) {
             $funcao = $funcao->toArray();
         } elseif (!is_array($funcao)) {
             $funcao = [];
@@ -154,10 +155,10 @@ class Funcao extends SyncModel
         } else {
             $this->setDescricao($funcao['descricao']);
         }
-        if (!isset($funcao['salariobase'])) {
-            $this->setSalarioBase(null);
+        if (!isset($funcao['remuneracao'])) {
+            $this->setRemuneracao(null);
         } else {
-            $this->setSalarioBase($funcao['salariobase']);
+            $this->setRemuneracao($funcao['remuneracao']);
         }
         return $this;
     }
@@ -174,13 +175,13 @@ class Funcao extends SyncModel
 
     /**
      * Filter fields, upload data and keep key data
-     * @param Funcao $original Original instance without modifications
+     * @param self $original Original instance without modifications
      */
     public function filter($original)
     {
         $this->setID($original->getID());
         $this->setDescricao(Filter::string($this->getDescricao()));
-        $this->setSalarioBase(Filter::money($this->getSalarioBase()));
+        $this->setRemuneracao(Filter::money($this->getRemuneracao()));
     }
 
     /**
@@ -193,7 +194,7 @@ class Funcao extends SyncModel
 
     /**
      * Validate fields updating them and throw exception when invalid data has found
-     * @return array All field of Funcao in array format
+     * @return mixed[] All field of Funcao in array format
      */
     public function validate()
     {
@@ -201,13 +202,13 @@ class Funcao extends SyncModel
         if (is_null($this->getDescricao())) {
             $errors['descricao'] = 'A descrição não pode ser vazia';
         }
-        if (is_null($this->getSalarioBase())) {
-            $errors['salariobase'] = 'O salário base não pode ser vazio';
-        } elseif ($this->getSalarioBase() < 0) {
-            $errors['salariobase'] = 'O salário base não pode ser negativo';
+        if (is_null($this->getRemuneracao())) {
+            $errors['salariobase'] = 'A remuneração base não pode ser vazia';
+        } elseif ($this->getRemuneracao() < 0) {
+            $errors['salariobase'] = 'A remuneração base não pode ser negativa';
         }
         if (!empty($errors)) {
-            throw new \MZ\Exception\ValidationException($errors);
+            throw new ValidationException($errors);
         }
         return $this->toArray();
     }
@@ -220,7 +221,7 @@ class Funcao extends SyncModel
     protected function translate($e)
     {
         if (contains(['Descricao', 'UNIQUE'], $e->getMessage())) {
-            return new \MZ\Exception\ValidationException([
+            return new ValidationException([
                 'descricao' => sprintf(
                     'A descrição "%s" já está cadastrada',
                     $this->getDescricao()
@@ -241,7 +242,8 @@ class Funcao extends SyncModel
         unset($values['id']);
         try {
             $id = DB::insertInto('Funcoes')->values($values)->execute();
-            $this->loadByID($id);
+            $this->setID($id);
+            $this->loadByID();
         } catch (\Exception $e) {
             throw $this->translate($e);
         }
@@ -265,7 +267,7 @@ class Funcao extends SyncModel
                 ->set($values)
                 ->where('id', $this->getID())
                 ->execute();
-            $this->loadByID($this->getID());
+            $this->loadByID();
         } catch (\Exception $e) {
             throw $this->translate($e);
         }

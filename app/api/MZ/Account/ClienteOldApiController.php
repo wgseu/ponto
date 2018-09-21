@@ -62,15 +62,8 @@ class ClienteOldApiController extends \MZ\Core\ApiController
         }
         $clientes = Cliente::findAll($condition, $order, $limit);
         $items = [];
-        $domask = intval(isset($_GET['formatar']) ? $_GET['formatar'] : 0) != 0;
         foreach ($clientes as $cliente) {
             $item = $cliente->publish();
-            if (!$domask) {
-                $item['fone1'] = $cliente->getFone(1);
-                $item['fone2'] = $cliente->getFone(2);
-                $item['cpf'] = $cliente->getCPF();
-            }
-            $item['imagemurl'] = $item['imagem'];
             $items[] = $item;
         }
         return $this->json()->success(['clientes' => $items]);
@@ -97,7 +90,6 @@ class ClienteOldApiController extends \MZ\Core\ApiController
             $cliente->insert();
             $old_cliente->clean($cliente);
             $item = $cliente->publish();
-            $item['imagemurl'] = $item['imagem'];
             return $this->json()->success(['cliente' => $item]);
         } catch (\Exception $e) {
             return $this->json()->error($e->getMessage());
@@ -144,7 +136,7 @@ class ClienteOldApiController extends \MZ\Core\ApiController
         }
         $this->getApplication()->getAuthentication()->login($cliente);
         $status = [];
-        $status['token'] = $this->getApplication()->getAuthentication()->getAuthorization();
+        $status['token'] = $this->getApplication()->getAuthentication()->makeToken();
         $status['versao'] = Sistema::VERSAO;
         $status['cliente'] = logged_user()->getID();
         $status['info'] = [
@@ -216,7 +208,7 @@ class ClienteOldApiController extends \MZ\Core\ApiController
             } catch (\Exception $e) {
                 return $this->json()->error($e->getMessage());
             }
-            $status['token'] = $this->getApplication()->getAuthentication()->updateAuthorization();
+            $status['token'] = $this->getApplication()->getAuthentication()->updateToken();
         } else {
             $status['permissoes'] = [];
         }

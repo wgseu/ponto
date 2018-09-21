@@ -76,7 +76,7 @@ class ComandaPageController extends \MZ\Core\Controller
         if (is_post()) {
             $comanda = new Comanda($_POST);
             try {
-                $comanda->filter($old_comanda);
+                $comanda->filter($old_comanda, true);
                 $comanda->insert();
                 $old_comanda->clean($comanda);
                 $msg = sprintf(
@@ -131,7 +131,7 @@ class ComandaPageController extends \MZ\Core\Controller
         if (is_post()) {
             $comanda = new Comanda($_POST);
             try {
-                $comanda->filter($old_comanda);
+                $comanda->filter($old_comanda, true);
                 $comanda->update();
                 $old_comanda->clean($comanda);
                 $msg = sprintf(

@@ -45,6 +45,11 @@
             "app/function/mailer.php"
         ]
     },
+    "autoload-dev": {
+        "psr-4": {
+            "MZ\\": "tests/MZ"
+        }
+    },
     "scripts": {
         "test": [
             "phpunit"

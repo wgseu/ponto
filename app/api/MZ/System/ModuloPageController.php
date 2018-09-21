@@ -75,7 +75,7 @@ class ModuloPageController extends \MZ\Core\Controller
             $modulo = new Modulo($_POST);
             try {
                 DB::beginTransaction();
-                $modulo->filter($old_modulo);
+                $modulo->filter($old_modulo, true);
                 $modulo->update();
                 $old_modulo->clean($modulo);
                 DB::commit();

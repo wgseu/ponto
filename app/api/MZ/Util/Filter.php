@@ -32,7 +32,7 @@ class Filter
     /**
      * Filter string and remove all non digits
      * @param  string $value text containing digits
-     * @return string        only digits number from string
+     * @return string only digits number from string
      */
     public static function digits($value)
     {
@@ -46,7 +46,7 @@ class Filter
     /**
      * Filter string number into int type or null
      * @param  string $value representative number
-     * @return int       int value filtered or null
+     * @return int int value filtered or null
      */
     public static function number($value)
     {
@@ -58,12 +58,16 @@ class Filter
     }
 
     /**
-     * Filter currency values to float or null
+     * Filter string float repesentation to float or null
      * @param  string $value Country specific formated value
-     * @return float         raw value
+     * @param boolean $localized Informs if value is localized
+     * @return float raw value
      */
-    public static function money($value)
+    public static function float($value, $localized = true)
     {
+        if (!$localized) {
+            return floatval($value);
+        }
         $sep = '.';
         $dec = ',';
         $value = preg_replace('/[^0-9'.$dec.'\-]/', '', $value);
@@ -74,19 +78,20 @@ class Filter
     }
 
     /**
-     * Filter string float repesentation to float or null
+     * Filter currency values to float or null
      * @param  string $value Country specific formated value
-     * @return float         raw value
+     * @param boolean $localized Informs if value is localized
+     * @return float raw value
      */
-    public static function float($value)
+    public static function money($value, $localized = true)
     {
-        return self::money($value);
+        return self::float($value, $localized);
     }
 
     /**
      * Filter string striping tags and removing spaces
      * @param  string $value unsafe string
-     * @return string        trimmed and stripped string
+     * @return string trimmed and stripped string
      */
     public static function string($value)
     {
@@ -100,7 +105,7 @@ class Filter
     /**
      * Filter raw or special text
      * @param  string $value unknow text
-     * @return string        processed text
+     * @return string processed text
      */
     public static function text($value)
     {
@@ -113,7 +118,7 @@ class Filter
     /**
      * Filter name and beautiful camel case letters
      * @param  string $nome name with tags and wrong case letters
-     * @return string       beautiful name
+     * @return string beautiful name
      */
     public static function name($nome)
     {
@@ -152,7 +157,7 @@ class Filter
      * Unmask string from mask format
      * @param  string $str  text to unmask
      * @param  string $mask mask to apply
-     * @return string       new text unmasked or null if empty
+     * @return string new text unmasked or null if empty
      */
     public static function unmask($str, $mask)
     {
@@ -264,7 +269,7 @@ class Filter
      * Parse a date or datetime string for current country
      * @param  string $value humman datetime value
      * @param  string $time default time value
-     * @return string        database datetime format
+     * @return string database datetime format
      */
     public static function parseTime($value, $time)
     {
@@ -295,7 +300,7 @@ class Filter
      * Parse a datetime string for current country
      * @param  string $value humman datetime value
      * @param  string $time default time value
-     * @return string        database datetime format
+     * @return string database datetime format
      */
     public static function datetime($value, $time = null)
     {
@@ -341,7 +346,7 @@ class Filter
      * Escape single and double quotes
      * @param  mixed $value Text to be escaped or array
      * @param  string $key Key to access array
-     * @return string        escaped text
+     * @return string escaped text
      */
     public static function input($value, $key = null)
     {
@@ -354,7 +359,7 @@ class Filter
     /**
      * Filter array values and removes blank values entry
      * @param  array $array array to be filtered
-     * @return array        array filtered
+     * @return array array filtered
      */
     public static function query($array)
     {

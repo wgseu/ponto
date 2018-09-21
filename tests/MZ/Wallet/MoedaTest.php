@@ -176,8 +176,6 @@ class MoedaTest extends \MZ\Framework\TestCase
         $this->assertEquals($moeda, $found_moeda);
         $found_moeda = Moeda::findByID($moeda->getID());
         $this->assertEquals($moeda, $found_moeda);
-        $found_moeda->loadByID($moeda->getID());
-        $this->assertEquals($moeda, $found_moeda);
 
         $moeda_sec = new Moeda();
         $moeda_sec->setNome('Moeda find second');

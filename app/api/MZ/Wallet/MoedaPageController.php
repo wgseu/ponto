@@ -72,7 +72,7 @@ class MoedaPageController extends \MZ\Core\Controller
         if (is_post()) {
             $moeda = new Moeda($_POST);
             try {
-                $moeda->filter($old_moeda);
+                $moeda->filter($old_moeda, true);
                 $moeda->save();
                 $old_moeda->clean($moeda);
                 $msg = sprintf(
@@ -127,7 +127,7 @@ class MoedaPageController extends \MZ\Core\Controller
         if (is_post()) {
             $moeda = new Moeda($_POST);
             try {
-                $moeda->filter($old_moeda);
+                $moeda->filter($old_moeda, true);
                 $moeda->save();
                 $old_moeda->clean($moeda);
                 $msg = sprintf(

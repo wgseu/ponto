@@ -411,7 +411,8 @@ class Movimentacao extends SyncModel
         unset($values['id']);
         try {
             $id = DB::insertInto('Movimentacoes')->values($values)->execute();
-            $this->loadByID($id);
+            $this->setID($id);
+            $this->loadByID();
         } catch (\Exception $e) {
             throw $this->translate($e);
         }
@@ -435,7 +436,7 @@ class Movimentacao extends SyncModel
                 ->set($values)
                 ->where('id', $this->getID())
                 ->execute();
-            $this->loadByID($this->getID());
+            $this->loadByID();
         } catch (\Exception $e) {
             throw $this->translate($e);
         }

@@ -26,12 +26,27 @@ namespace MZ\Provider;
 
 class FuncaoTest extends \MZ\Framework\TestCase
 {
+    /**
+     * @return Funcao
+     */
+    public static function create($permissions)
+    {
+        $last = Funcao::find([], ['id' => -1]);
+        $id = intval($last->getID()) + 1;
+        $funcao = new Funcao();
+        $funcao->setDescricao("Provider permission group #{$id}");
+        $funcao->setRemuneracao(12.3);
+        $funcao->insert();
+        \MZ\System\AcessoTest::create($funcao, $permissions);
+        return $funcao;
+    }
+
     public function testFromArray()
     {
         $old_funcao = new Funcao([
             'id' => 123,
             'descricao' => 'Função',
-            'salariobase' => 12.3,
+            'remuneracao' => 12.3,
         ]);
         $funcao = new Funcao();
         $funcao->fromArray($old_funcao);
@@ -45,12 +60,12 @@ class FuncaoTest extends \MZ\Framework\TestCase
         $old_funcao = new Funcao([
             'id' => 1234,
             'descricao' => 'Função filter',
-            'salariobase' => 12.3,
+            'remuneracao' => 12.3,
         ]);
         $funcao = new Funcao([
             'id' => 321,
             'descricao' => ' Função <script>filter</script> ',
-            'salariobase' => '12,3',
+            'remuneracao' => '12,3',
         ]);
         $funcao->filter($old_funcao);
         $this->assertEquals($old_funcao, $funcao);
@@ -63,7 +78,7 @@ class FuncaoTest extends \MZ\Framework\TestCase
         $allowed = [
             'id',
             'descricao',
-            'salariobase',
+            'remuneracao',
         ];
         $this->assertEquals($allowed, array_keys($values));
     }
@@ -78,13 +93,13 @@ class FuncaoTest extends \MZ\Framework\TestCase
             $this->assertEquals(
                 [
                     'descricao',
-                    'salariobase',
+                    'remuneracao',
                 ],
                 array_keys($e->getErrors())
             );
         }
         $funcao->setDescricao('Função to insert');
-        $funcao->setSalarioBase(12.3);
+        $funcao->setRemuneracao(12.3);
         $funcao->insert();
     }
 
@@ -92,10 +107,10 @@ class FuncaoTest extends \MZ\Framework\TestCase
     {
         $funcao = new Funcao();
         $funcao->setDescricao('Função to update');
-        $funcao->setSalarioBase(12.3);
+        $funcao->setRemuneracao(12.3);
         $funcao->insert();
         $funcao->setDescricao('Função updated');
-        $funcao->setSalarioBase(21.4);
+        $funcao->setRemuneracao(21.4);
         $funcao->update();
         $found_funcao = Funcao::findByID($funcao->getID());
         $this->assertEquals($funcao, $found_funcao);
@@ -108,7 +123,7 @@ class FuncaoTest extends \MZ\Framework\TestCase
     {
         $funcao = new Funcao();
         $funcao->setDescricao('Função to delete');
-        $funcao->setSalarioBase(12.3);
+        $funcao->setRemuneracao(12.3);
         $funcao->insert();
         $funcao->delete();
         $funcao->clean(new Funcao());
@@ -123,22 +138,18 @@ class FuncaoTest extends \MZ\Framework\TestCase
     {
         $funcao = new Funcao();
         $funcao->setDescricao('Função find');
-        $funcao->setSalarioBase(12.3);
+        $funcao->setRemuneracao(12.3);
         $funcao->insert();
         $found_funcao = Funcao::find(['id' => $funcao->getID()]);
         $this->assertEquals($funcao, $found_funcao);
         $found_funcao = Funcao::findByID($funcao->getID());
         $this->assertEquals($funcao, $found_funcao);
-        $found_funcao->loadByID($funcao->getID());
-        $this->assertEquals($funcao, $found_funcao);
         $found_funcao = Funcao::findByDescricao($funcao->getDescricao());
-        $this->assertEquals($funcao, $found_funcao);
-        $found_funcao->loadByDescricao($funcao->getDescricao());
         $this->assertEquals($funcao, $found_funcao);
 
         $funcao_sec = new Funcao();
         $funcao_sec->setDescricao('Função find second');
-        $funcao_sec->setSalarioBase(12.3);
+        $funcao_sec->setRemuneracao(12.3);
         $funcao_sec->insert();
 
         $funcoes = Funcao::findAll(['search' => 'Função find'], [], 2, 0);

@@ -96,25 +96,28 @@ $[field.each(comment)]
      * $[Field.comment]
 $[field.end]
 $[field.if(array)]
-     * @param  integer $index index to get $[Field.norm]
+     * @param integer $number number to get $[Field.norm]
 $[field.end]
-     * @return mixed $[Field.name] of $[Table.norm]
+$[field.if(integer|bigint)]
+     * @return int $[field.name] of $[Table.name]
+$[field.else.if(float|double)]
+     * @return float $[field.name] of $[Table.name]
+$[field.else]
+     * @return string $[field.name] of $[Table.name]
+$[field.end]
      */
 $[field.end]
-    public function get$[Field.norm]($[field.if(array)]$index$[field.end])
+    public function get$[Field.norm]($[field.if(array)]$number$[field.end])
     {
 $[field.if(array)]
-        if ($index < 1 || $index > $[field.array.count]) {
+        if ($number < 1 || $number > $[field.array.count]) {
             throw new \Exception(
-                vsprintf(
-                    'Índice %d inválido, aceito somente de %d até %d',
-                    [intval($index), 1, $[field.array.count]]
-                ),
+                _t('invalid_field_index', intval($number), 1, $[field.array.count]),
                 500
             );
         }
 $[field.end]
-        return $this->$[field.unix]$[field.if(array)][$index]$[field.end];
+        return $this->$[field.unix]$[field.if(array)][$number]$[field.end];
     }
 $[field.if(boolean)]
 
@@ -135,25 +138,28 @@ $[field.end]
     /**
      * Set $[Field.norm] value to new on param
 $[field.if(array)]
-     * @param  integer $index index for set $[Field.norm]
+     * @param integer $number number to set $[field.name]
 $[field.end]
-     * @param  mixed $$[field.unix] new value for $[Field.norm]
+$[field.if(integer|bigint)]
+     * @param int $$[field.unix] Set $[field.name] for $[Table.name]
+$[field.else.if(float|double)]
+     * @param float $$[field.unix] Set $[field.name] for $[Table.name]
+$[field.else]
+     * @param string $$[field.unix] Set $[field.name] for $[Table.name]
+$[field.end]
      * @return self Self instance
      */
-    public function set$[Field.norm]($[field.if(array)]$index, $[field.end]$$[field.unix])
+    public function set$[Field.norm]($[field.if(array)]$number, $[field.end]$$[field.unix])
     {
 $[field.if(array)]
-        if ($index < 1 || $index > $[field.array.count]) {
+        if ($number < 1 || $number > $[field.array.count]) {
             throw new \Exception(
-                vsprintf(
-                    'Índice %d inválido, aceito somente de %d até %d',
-                    [intval($index), 1, $[field.array.count]]
-                ),
+                _t('invalid_field_index', intval($number), 1, $[field.array.count]),
                 500
             );
         }
 $[field.end]
-        $this->$[field.unix]$[field.if(array)][$index]$[field.end] = $$[field.unix];
+        $this->$[field.unix]$[field.if(array)][$number]$[field.end] = $$[field.unix];
         return $this;
     }
 $[field.end]
@@ -161,7 +167,7 @@ $[field.end]
 
     /**
      * Convert this instance to array associated key -> value
-     * @param  boolean $recursive Allow rescursive conversion of fields
+     * @param boolean $recursive Allow rescursive conversion of fields
      * @return array All field and values into array format
      */
     public function toArray($recursive = false)
@@ -179,7 +185,7 @@ $[field.end]
 
     /**
      * Fill this instance with from array values, you can pass instance to
-     * @param  mixed $$[table.unix] Associated key -> value to assign into this instance
+     * @param mixed $$[table.unix] Associated key -> value to assign into this instance
      * @return self Self instance
      */
     public function fromArray($$[table.unix] = [])
@@ -263,13 +269,10 @@ $[field.end]
     /**
      * Filter fields, upload data and keep key data
      * @param self $original Original instance without modifications
+     * @param boolean $localized Informs if fields are localized
      */
-    public function filter($original)
+    public function filter($original, $localized = false)
     {
-$[table.exists(blob)]
-        global $app;
-
-$[table.end]
 $[field.each(all)]
 $[field.if(primary)]
         $this->set$[Field.norm]($original->get$[Field.norm]($[field.if(array)]$[field.array.number]$[field.end]));
@@ -280,9 +283,9 @@ $[field.else.if(time)]
 $[field.else.if(datetime)]
         $this->set$[Field.norm]($[field.if(array)]$[field.array.number], $[field.end]Filter::datetime($this->get$[Field.norm]($[field.if(array)]$[field.array.number]$[field.end])));
 $[field.else.if(currency)]
-        $this->set$[Field.norm]($[field.if(array)]$[field.array.number], $[field.end]Filter::money($this->get$[Field.norm]($[field.if(array)]$[field.array.number]$[field.end])));
+        $this->set$[Field.norm]($[field.if(array)]$[field.array.number], $[field.end]Filter::money($this->get$[Field.norm]($[field.if(array)]$[field.array.number]$[field.end]), $localized));
 $[field.else.if(float|double)]
-        $this->set$[Field.norm]($[field.if(array)]$[field.array.number], $[field.end]Filter::float($this->get$[Field.norm]($[field.if(array)]$[field.array.number]$[field.end])));
+        $this->set$[Field.norm]($[field.if(array)]$[field.array.number], $[field.end]Filter::float($this->get$[Field.norm]($[field.if(array)]$[field.array.number]$[field.end]), $localized));
 $[field.else.if(masked)]
         $this->set$[Field.norm]($[field.if(array)]$[field.array.number], $[field.end]Filter::unmask($this->get$[Field.norm]($[field.if(array)]$[field.array.number]$[field.end]), _p('Mascara', '$[Field.norm]')));
 $[field.else.if(integer|bigint)]
@@ -293,7 +296,7 @@ $[field.else.if(blob)]
             $this->set$[Field.norm]($[field.if(array)]$[field.array.number], $[field.end]true);
         } else {
             $this->set$[Field.norm]($[field.if(array)]$[field.array.number], $[field.end]$$[field.unix]);
-            $$[field.unix]_path = $app->getPath('public') . $this->make$[Field.norm]();
+            $$[field.unix]_path = $this->getApplication()->getPath('public') . $this->make$[Field.norm]();
             if (!is_null($$[field.unix])) {
                 $this->set$[Field.norm](file_get_contents($$[field.unix]_path));
                 @unlink($$[field.unix]_path);
@@ -316,7 +319,7 @@ $[field.end]
 
     /**
      * Clean instance resources like images and docs
-     * @param  self $dependency Don't clean when dependency use same resources
+     * @param self $dependency Don't clean when dependency use same resources
      */
     public function clean($dependency)
     {
@@ -334,7 +337,8 @@ $[field.end]
 
     /**
      * Validate fields updating them and throw exception when invalid data has found
-     * @return mixed[] All field of $[Table.norm] in array format
+     * @return array All field of $[Table.norm] in array format
+     * @throws \MZ\Exception\ValidationException for invalid input data
      */
     public function validate()
     {
@@ -343,48 +347,48 @@ $[field.each(all)]
 $[field.if(primary)]
 $[field.else.contains(fone)]
         if (!Validator::checkPhone($this->get$[Field.norm]($[field.if(array)]$[field.array.number]$[field.end])$[field.if(null)], true$[field.end])) {
-            $errors['$[field]'] = '$[FIELD.gender] $[Field.name] é inválid$[field.gender]';
+            $errors['$[field]'] = _t('$[table.unix].$[field.unix]_invalid');
         }
 $[field.else.match(cpf)]
         if (!Validator::checkCPF($this->get$[Field.norm]($[field.if(array)]$[field.array.number]$[field.end])$[field.if(null)], true$[field.end])) {
-            $errors['$[field]'] = sprintf('$[FIELD.gender] %s é inválid$[field.gender]', _p('Titulo', '$[Field.name]'));
+            $errors['$[field]'] = _t('$[field.unix]_invalid', _p('Titulo', '$[Field.name]'));
         }
 $[field.else.match(cep)]
         if (!Validator::checkCEP($this->get$[Field.norm]($[field.if(array)]$[field.array.number]$[field.end])$[field.if(null)], true$[field.end])) {
-            $errors['$[field]'] = sprintf('$[FIELD.gender] %s é inválid$[field.gender]', _p('Titulo', '$[Field.name]'));
+            $errors['$[field]'] = _t('$[field.unix]_invalid', _p('Titulo', '$[Field.name]'));
         }
 $[field.else.match(cnpj)]
         if (!Validator::checkCNPJ($this->get$[Field.norm]($[field.if(array)]$[field.array.number]$[field.end])$[field.if(null)], true$[field.end])) {
-            $errors['$[field]'] = sprintf('$[FIELD.gender] %s é inválid$[field.gender]', _p('Titulo', '$[Field.name]'));
+            $errors['$[field]'] = _t('$[field.unix]_invalid', _p('Titulo', '$[Field.name]'));
         }
 $[field.else.match(usuario|login)]
         if (!Validator::checkUsername($this->get$[Field.norm]($[field.if(array)]$[field.array.number]$[field.end])$[field.if(null)], true$[field.end])) {
-            $errors['$[field]'] = '$[FIELD.gender] $[field.name] é inválid$[field.gender]';
+            $errors['$[field]'] = _t('$[field.unix]_invalid');
         }
 $[field.else.match(email)]
         if (!Validator::checkEmail($this->get$[Field.norm]($[field.if(array)]$[field.array.number]$[field.end])$[field.if(null)], true$[field.end])) {
-            $errors['$[field]'] = '$[FIELD.gender] $[field.name] é inválid$[field.gender]';
+            $errors['$[field]'] = _t('$[field.unix]_invalid');
         }
 $[field.else.match(ip)]
         if (!Validator::checkIP($this->get$[Field.norm]($[field.if(array)]$[field.array.number]$[field.end])$[field.if(null)], true$[field.end])) {
-            $errors['$[field]'] = '$[FIELD.gender] $[Field.name] é inválid$[field.gender]';
+            $errors['$[field]'] = _t('$[field.unix]_invalid');
         }
 $[field.else.match(senha|password)]
         if (!Validator::checkPassword($this->get$[Field.norm]($[field.if(array)]$[field.array.number]$[field.end]), $this->exists())) {
-            $errors['$[field]'] = '$[FIELD.gender] $[field.name] informad$[field.gender] não é segur$[field.gender]';
+            $errors['$[field]'] = _t('$[field.unix]_insecure');
         }
 $[field.else.if(enum)]
         if (!Validator::checkInSet($this->get$[Field.norm]($[field.if(array)]$[field.array.number]$[field.end]), self::get$[Field.norm]Options())) {
-            $errors['$[field]'] = '$[FIELD.gender] $[field.name] é inválid$[field.gender]';
+            $errors['$[field]'] = _t('$[table.unix].$[field.unix]_invalid');
         }
 $[field.else.if(boolean)]
         if (!Validator::checkBoolean($this->get$[Field.norm]($[field.if(array)]$[field.array.number]$[field.end]))) {
-            $errors['$[field]'] = '$[FIELD.gender] $[field.name] é inválid$[field.gender]';
+            $errors['$[field]'] = _t('$[table.unix].$[field.unix]_invalid');
         }
 $[field.else.if(null)]
 $[field.else]
         if (is_null($this->get$[Field.norm]($[field.if(array)]$[field.array.number]$[field.end]))) {
-            $errors['$[field]'] = '$[FIELD.gender] $[field.name] não pode ser vazi$[field.gender]';
+            $errors['$[field]'] = _t('$[table.unix].$[field.unix]_cannot_empty');
         }
 $[field.end]
 $[field.end]
@@ -396,7 +400,7 @@ $[field.end]
 
     /**
      * Translate SQL exception into application exception
-     * @param  \Exception $e exception to translate into a readable error
+     * @param \Exception $e exception to translate into a readable error
      * @return \MZ\Exception\ValidationException new exception translated
      */
     protected function translate($e)
@@ -405,8 +409,8 @@ $[table.each(unique)]
         if (contains([$[unique.each(all)]'$[Field]', $[unique.end]'UNIQUE'], $e->getMessage())) {
             return new ValidationException([
 $[unique.each(all)]
-                '$[field]' => sprintf(
-                    '$[FIELD.gender] $[field.name] "%s" já está cadastrad$[field.gender]',
+                '$[field]' => _t(
+                    '$[table.unix].$[field.unix]_used',
                     $this->get$[Field.norm]($[field.if(array)]$[field.array.number]$[field.end])
                 ),
 $[unique.end]
@@ -423,6 +427,7 @@ $[table.end]
     /**
      * Insert a new $[Table.name] into the database and fill instance from database
      * @return self Self instance
+     * @throws \MZ\Exception\ValidationException for invalid input data
      */
     public function insert()
     {
@@ -431,7 +436,8 @@ $[table.end]
         unset($values['$[primary]']);
         try {
             $$[primary.unix] = DB::insertInto('$[Table]')->values($values)->execute();
-            $this->loadBy$[Primary.norm]($$[primary.unix]);
+            $this->set$[Primary.norm]($$[primary.unix]);
+            $this->loadBy$[Primary.norm]();
         } catch (\Exception $e) {
             throw $this->translate($e);
         }
@@ -440,14 +446,17 @@ $[table.end]
 
     /**
      * Update $[Table.name] with instance values into database for $[Primary.name]
-     * @param  array $only Save these fields only, when empty save all fields except id
+     * @param array $only Save these fields only, when empty save all fields except id
      * @return int rows affected
+     * @throws \MZ\Exception\ValidationException for invalid input data
      */
     public function update($only = [])
     {
         $values = $this->validate();
         if (!$this->exists()) {
-            throw new \Exception('O identificador d$[table.gender] $[table.name] não foi informado');
+            throw new ValidationException(
+                ['id' => _t('$[table.unix].id_cannot_empty')]
+            );
         }
         $values = DB::filterValues($values, $only, false);
 $[field.each(all)]
@@ -466,7 +475,7 @@ $[field.end]
                 ->set($values)
                 ->where(['$[primary]' => $this->get$[Primary.norm]()])
                 ->execute();
-            $this->loadBy$[Primary.norm]($this->get$[Primary.norm]());
+            $this->loadBy$[Primary.norm]();
         } catch (\Exception $e) {
             throw $this->translate($e);
         }
@@ -476,11 +485,14 @@ $[field.end]
     /**
      * Delete this instance from database using $[Primary.name]
      * @return integer Number of rows deleted (Max 1)
+     * @throws \MZ\Exception\ValidationException for invalid id
      */
     public function delete()
     {
         if (!$this->exists()) {
-            throw new \Exception('O identificador d$[table.gender] $[table.name] não foi informado');
+            throw new ValidationException(
+                ['id' => _t('$[table.unix].id_cannot_empty')]
+            );
         }
         $result = DB::deleteFrom('$[Table]')
             ->where('$[primary]', $this->get$[Primary.norm]())
@@ -490,8 +502,8 @@ $[field.end]
 
     /**
      * Load one register for it self with a condition
-     * @param  array $condition Condition for searching the row
-     * @param  array $order associative field name -> [-1, 1]
+     * @param array $condition Condition for searching the row
+     * @param array $order associative field name -> [-1, 1]
      * @return self Self instance filled or empty
      */
     public function load($condition, $order = [])
@@ -548,17 +560,20 @@ $[field.if(comment)]
 $[field.each(comment)]
      * $[Field.comment]
 $[field.end]
+$[field.if(array)]
+     * @param integer $number get $[Reference.norm] from number
+$[field.end]
      * @return \$[Reference.package]\$[Reference.norm] The object fetched from database
      */
 $[field.end]
-    public function find$[Field.norm]($[field.if(array)]$index$[field.end])
+    public function find$[Field.norm]($[field.if(array)]$number$[field.end])
     {
 $[field.if(null)]
-        if (is_null($this->get$[Field.norm]($[field.if(array)]$index$[field.end]))) {
+        if (is_null($this->get$[Field.norm]($[field.if(array)]$number$[field.end]))) {
             return new \$[Reference.package]\$[Reference.norm]();
         }
 $[field.end]
-        return \$[Reference.package]\$[Reference.norm]::findBy$[Reference.pk.norm]($this->get$[Field.norm]($[field.if(array)]$index$[field.end]));
+        return \$[Reference.package]\$[Reference.norm]::findBy$[Reference.pk.norm]($this->get$[Field.norm]($[field.if(array)]$number$[field.end]));
     }
 $[field.end]
 $[field.end]
@@ -568,14 +583,14 @@ $[field.else.if(enum)]
 
     /**
      * Gets textual and translated $[Field.norm] for $[Table.norm]
-     * @param  int $index choose option from index
-     * @return mixed A associative key -> translated representative text or text for index
+     * @param int $index choose option from index
+     * @return string[]|string A associative key -> translated representative text or text for index
      */
     public static function get$[Field.norm]Options($index = null)
     {
         $options = [
 $[field.each(option)]
-            self::$[FIELD.unix]_$[FIELD.option.norm] => '$[Field.option.name]',
+            self::$[FIELD.unix]_$[FIELD.option.norm] => _t('$[table.unix].$[field.unix]_$[field.option.unix]'),
 $[field.end]
         ];
         if (!is_null($index)) {
@@ -599,7 +614,7 @@ $[field.end]
 
     /**
      * Filter order array
-     * @param  mixed $order order string or array to parse and filter allowed
+     * @param mixed $order order string or array to parse and filter allowed
      * @return array allowed associative order
      */
     private static function filterOrder($order)
@@ -610,7 +625,7 @@ $[field.end]
 
     /**
      * Filter condition array with allowed fields
-     * @param  array $condition condition to filter rows
+     * @param array $condition condition to filter rows
      * @return array allowed condition
      */
     private static function filterCondition($condition)
@@ -630,8 +645,8 @@ $[descriptor.end]
 
     /**
      * Fetch data from database with a condition
-     * @param  array $condition condition to filter rows
-     * @param  array $order order rows
+     * @param array $condition condition to filter rows
+     * @param array $order order rows
      * @return SelectQuery query object with condition statement
      */
     private static function query($condition = [], $order = [])
@@ -663,8 +678,8 @@ $[descriptor.end]
 
     /**
      * Search one register with a condition
-     * @param  array $condition Condition for searching the row
-     * @param  array $order order rows
+     * @param array $condition Condition for searching the row
+     * @param array $order order rows
      * @return self A filled $[Table.name] or empty instance
      */
     public static function find($condition, $order = [])
@@ -673,6 +688,22 @@ $[descriptor.end]
         $row = $query->fetch() ?: [];
         return new self($row);
     }
+
+    /**
+     * Search one register with a condition
+     * @param array $condition Condition for searching the row
+     * @param array $order order rows
+     * @return self A filled $[Table.name] or empty instance
+     * @throws \Exception when register has not found
+     */
+    public static function findOrFail($condition, $order = [])
+    {
+        $result = self::find($condition, $order);
+        if (!$result->exists()) {
+            throw new \Exception(_t('$[table.unix].not_found'), 404);
+        }
+        return $result;
+    }
 $[table.each(unique)]
 
     /**
@@ -680,11 +711,11 @@ $[table.each(unique)]
 
 $[unique.each(all)]
 $[field.if(integer|bigint)]
-     * @param  int $$[field.unix] $[field.name] to find $[Table.name]
+     * @param int $$[field.unix] $[field.name] to find $[Table.name]
 $[field.else.if(float|double)]
-     * @param  float $$[field.unix] $[field.name] to find $[Table.name]
+     * @param float $$[field.unix] $[field.name] to find $[Table.name]
 $[field.else]
-     * @param  string $$[field.unix] $[field.name] to find $[Table.name]
+     * @param string $$[field.unix] $[field.name] to find $[Table.name]
 $[field.end]
 $[unique.end]
      * @return self A filled instance or empty when not found
@@ -701,10 +732,10 @@ $[table.end]
 
     /**
      * Find all $[Table.name]
-     * @param  array  $condition Condition to get all $[Table.name]
-     * @param  array  $order     Order $[Table.name]
-     * @param  int    $limit     Limit data into row count
-     * @param  int    $offset    Start offset to get rows
+     * @param array  $condition Condition to get all $[Table.name]
+     * @param array  $order     Order $[Table.name]
+     * @param int    $limit     Limit data into row count
+     * @param int    $offset    Start offset to get rows
      * @return self[]             List of all rows instanced as $[Table.norm]
      */
     public static function findAll($condition = [], $order = [], $limit = null, $offset = null)
@@ -726,7 +757,7 @@ $[table.end]
 
     /**
      * Count all rows from database with matched condition critery
-     * @param  array $condition condition to filter rows
+     * @param array $condition condition to filter rows
      * @return integer Quantity of rows
      */
     public static function count($condition = [])

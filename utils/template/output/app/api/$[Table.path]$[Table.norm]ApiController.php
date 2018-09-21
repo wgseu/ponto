@@ -60,11 +60,11 @@ class $[Table.norm]ApiController extends \MZ\Core\ApiController
     public function add()
     {
         $this->needPermission(Permissao::NOME_$[TABLE.style]);
+        $localized = $this->getRequest()->query->getBoolean('localized', false);
         $$[table.unix] = new $[Table.norm]($this->getJsonParams());
-        $$[table.unix]->filter(new $[Table.norm]());
+        $$[table.unix]->filter(new $[Table.norm](), $localized);
         $$[table.unix]->insert();
-        $message = _t('$[table.unix].registered', $$[table.unix]->get$[Table.desc.norm]());
-        return $this->getResponse()->success(['item' => $$[table.unix]->publish()], $message);
+        return $this->getResponse()->success(['item' => $$[table.unix]->publish()]);
     }
 
     /**
@@ -75,12 +75,12 @@ class $[Table.norm]ApiController extends \MZ\Core\ApiController
     {
         $this->needPermission(Permissao::NOME_$[TABLE.style]);
         $old_$[table.unix] = $[Table.norm]::findOrFail(['$[primary]' => $id]);
+        $localized = $this->getRequest()->query->getBoolean('localized', false);
         $$[table.unix] = new $[Table.norm]($this->getJsonParams());
-        $$[table.unix]->filter($old_$[table.unix]);
+        $$[table.unix]->filter($old_$[table.unix], $localized);
         $$[table.unix]->update();
         $old_$[table.unix]->clean($$[table.unix]);
-        $message = _t('$[table.unix].updated', $$[table.unix]->get$[Table.desc.norm]());
-        return $this->getResponse()->success(['item' => $$[table.unix]->publish()], $message);
+        return $this->getResponse()->success(['item' => $$[table.unix]->publish()]);
     }
 
     /**
@@ -93,8 +93,7 @@ class $[Table.norm]ApiController extends \MZ\Core\ApiController
         $$[table.unix] = $[Table.norm]::findOrFail(['$[primary]' => $id]);
         $$[table.unix]->delete();
         $$[table.unix]->clean(new $[Table.norm]());
-        $message = _t('$[table.unix].deleted', $$[table.unix]->get$[Table.desc.norm]());
-        return $this->getResponse()->success([], $message);
+        return $this->getResponse()->success([]);
     }
 
     /**

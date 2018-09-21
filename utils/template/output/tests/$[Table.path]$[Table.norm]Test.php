@@ -29,109 +29,23 @@ $[table.end]
 $[field.each(all)]
 $[field.if(null|primary)]
 $[field.else.if(reference)]
-use $[Reference.package]\$[Reference.norm];
+use $[Reference.package]\$[Reference.norm]Test;
 $[field.end]
 $[field.end]
-use \MZ\Database\DB;
+use MZ\Database\DB;
+use MZ\System\Permissao;
+use MZ\Account\AuthenticationTest;
 
 class $[Table.norm]Test extends \MZ\Framework\TestCase
 {
-    public function testFromArray()
+    public static function build($[descriptor.if(string)]$$[descriptor.unix] = null$[descriptor.end])
     {
-        $old_$[table.unix] = new $[Table.norm]([
-$[field.each(all)]
-            '$[field]' => $[field.if(integer|bigint)]123$[field.else.if(float|currency)]12.3$[field.else.if(boolean)]'Y'$[field.else.if(datetime)]'2016-12-25 12:15:00'$[field.else.if(blob)]"\x5\x0\x3"$[field.else.if(image)]'image.png'$[field.else]'$[Table.name]'$[field.end],
-$[field.end]
-        ]);
-        $$[table.unix] = new $[Table.norm]();
-        $$[table.unix]->fromArray($old_$[table.unix]);
-        $this->assertEquals($$[table.unix], $old_$[table.unix]);
-        $$[table.unix]->fromArray(null);
-        $this->assertEquals($$[table.unix], new $[Table.norm]());
-    }
-
-    public function testFilter()
-    {
-        $old_$[table.unix] = new $[Table.norm]([
-$[field.each(all)]
-            '$[field]' => $[field.if(integer|bigint)]1234$[field.else.if(float|currency)]12.3$[field.else.if(boolean)]'Y'$[field.else.if(datetime)]'2016-12-23 12:15:00'$[field.else.if(blob)]"\x5\x0\x3"$[field.else.if(image)]'image.png'$[field.else]'$[Table.name] filter'$[field.end],
-$[field.end]
-        ]);
-        $$[table.unix] = new $[Table.norm]([
-$[field.each(all)]
-            '$[field]' => $[field.if(primary)]321$[field.else.if(integer|bigint)]'1.234'$[field.else.if(float|currency)]'12,3'$[field.else.if(boolean)]'Y'$[field.else.if(datetime)]'23/12/2016 12:15'$[field.else.if(blob)]"\x5\x0\x3"$[field.else.if(image)]'image.png'$[field.else]' $[Table.name] <script>filter</script> '$[field.end],
-$[field.end]
-        ]);
-        $$[table.unix]->filter($old_$[table.unix]);
-        $this->assertEquals($old_$[table.unix], $$[table.unix]);
-    }
-
-    public function testPublish()
-    {
-        $$[table.unix] = new $[Table.norm]();
-        $values = $$[table.unix]->publish();
-        $allowed = [
-$[field.each(all)]
-$[field.match(ip|senha|password|secreto|salt|deletado)]
-$[field.else]
-            '$[field]',
-$[field.end]
-$[field.end]
-        ];
-        $this->assertEquals($allowed, array_keys($values));
-    }
-
-    public function testInsert()
-    {
+        $last = $[Table.norm]::find([], ['id' => -1]);
+        $id = $last->getID() + 1;
 $[field.each(all)]
 $[field.if(null|primary)]
 $[field.else.if(reference)]
-        // TODO: início copiar
-        $$[reference.unix] = new $[Reference.norm]();
-        $$[reference.unix]->insert();
-        // TODO: fim copiar
-$[field.end]
-$[field.end]
-        $$[table.unix] = new $[Table.norm]();
-        try {
-            $$[table.unix]->insert();
-            $this->fail('Não deveria ter cadastrado $[table.gender] $[table.name]');
-        } catch (\MZ\Exception\ValidationException $e) {
-            $this->assertEquals(
-                [
-$[field.each(all)]
-$[field.if(null|primary)]
-$[field.else.if(info)]
-$[field.else]
-                    '$[field]',
-$[field.end]
-$[field.end]
-                ],
-                array_keys($e->getErrors())
-            );
-        }
-$[field.each(all)]
-$[field.if(null|primary)]
-$[field.else.if(reference)]
-        $$[table.unix]->set$[Field.norm]($[field.if(array)]$[field.array.number], $[field.end]$$[reference.unix]->get$[Reference.pk.norm]());
-$[field.else.if(info)]
-        $$[table.unix]->set$[Field.norm]($[field.if(array)]$[field.array.number], $[field.end]$[Field.info]);
-$[field.else]
-        $$[table.unix]->set$[Field.norm]($[field.if(array)]$[field.array.number], $[field.end]$[field.if(integer|bigint)]123$[field.else.if(float|currency)]12.3$[field.else.if(boolean)]'Y'$[field.else.if(datetime)]'2016-12-25 12:15:00'$[field.else.if(blob)]"\x5\x0\x3"$[field.else.if(image)]'image.png'$[field.else]'$[Table.name] to insert'$[field.end]);
-$[field.end]
-$[field.end]
-        $$[table.unix]->insert();
-    }
-
-    public function testUpdate()
-    {
-$[field.each(all)]
-$[field.if(null|primary)]
-$[field.else.if(reference)]
-        // TODO: início copiar
-        $$[reference.unix] = new $[Reference.norm]();
-        $$[reference.unix]->insert();
-        // TODO: fim copiar
+        $$[reference.unix] = new $[Reference.norm]Test::create();
 $[field.end]
 $[field.end]
         $$[table.unix] = new $[Table.norm]();
@@ -141,108 +55,82 @@ $[field.else.if(reference)]
         $$[table.unix]->set$[Field.norm]($[field.if(array)]$[field.array.number], $[field.end]$$[reference.unix]->get$[Reference.pk.norm]());
 $[field.else.if(info)]
         $$[table.unix]->set$[Field.norm]($[field.if(array)]$[field.array.number], $[field.end]$[Field.info]);
+$[field.else.if(enum)]
+        $$[table.unix]->set$[Field.norm]($[field.if(array)]$[field.array.number], $[field.end]$[Table.norm]::$[field.each(option)]$[field.if(first)]$[FIELD.unix]_$[FIELD.option.norm]$[field.end]$[field.end]);
+$[field.else.if(descriptor)]
+$[descriptor.if(string)]
+        $$[table.unix]->set$[Field.norm]($[field.if(array)]$[field.array.number], $[field.end]$$[field.unix] ?: "$[Table.name] #{$id}");
+$[descriptor.else]
+        $$[table.unix]->set$[Field.norm]($[field.if(array)]$[field.array.number], $[field.end]$id);
+$[descriptor.end]
 $[field.else]
-        $$[table.unix]->set$[Field.norm]($[field.if(array)]$[field.array.number], $[field.end]$[field.if(integer|bigint)]123$[field.else.if(float|currency)]12.3$[field.else.if(boolean)]'N'$[field.else.if(datetime)]'2016-12-26 12:15:00'$[field.else.if(blob)]"\x5\x0\x3"$[field.else.if(image)]'image.png'$[field.else]'$[Table.name] to update'$[field.end]);
+        $$[table.unix]->set$[Field.norm]($[field.if(array)]$[field.array.number], $[field.end]$[field.if(integer|bigint)]123$[field.else.if(float|currency)]12.3$[field.else.if(boolean)]'Y'$[field.else.if(datetime)]'2016-12-25 12:15:00'$[field.else.if(blob)]"\x5\x0\x3"$[field.else.if(image)]'image.png'$[field.else]'$[Field.name] d$[table.gender] $[table.name]'$[field.end]);
 $[field.end]
 $[field.end]
-        $$[table.unix]->insert();
-$[field.each(all)]
-$[field.if(primary)]
-$[field.else.if(reference)]
-$[field.else.if(info)]
-$[field.else]
-        $$[table.unix]->set$[Field.norm]($[field.if(array)]$[field.array.number], $[field.end]$[field.if(integer|bigint)]456$[field.else.if(float|currency)]21.4$[field.else.if(boolean)]'N'$[field.else.if(datetime)]'2016-12-25 14:15:00'$[field.else.if(blob)]"\x4\x0\x5"$[field.else.if(image)]'picture.png'$[field.else]'$[Table.name] updated'$[field.end]);
-$[field.end]
-$[field.end]
-        $$[table.unix]->update();
-        $found_$[table.unix] = $[Table.norm]::findByID($$[table.unix]->getID());
-        $this->assertEquals($$[table.unix], $found_$[table.unix]);
-        $$[table.unix]->set$[Primary.norm]('');
-        $this->expectException('\Exception');
-        $$[table.unix]->update();
+        return $$[table.unix];
     }
 
-    public function testDelete()
+    public static function create($[descriptor.if(string)]$$[descriptor.unix] = null$[descriptor.end])
     {
-$[field.each(all)]
-$[field.if(null|primary)]
-$[field.else.if(reference)]
-        // TODO: início copiar
-        $$[reference.unix] = new $[Reference.norm]();
-        $$[reference.unix]->insert();
-        // TODO: fim copiar
-$[field.end]
-$[field.end]
-        $$[table.unix] = new $[Table.norm]();
-$[field.each(all)]
-$[field.if(null|primary)]
-$[field.else.if(reference)]
-        $$[table.unix]->set$[Field.norm]($[field.if(array)]$[field.array.number], $[field.end]$$[reference.unix]->get$[Reference.pk.norm]());
-$[field.else.if(info)]
-        $$[table.unix]->set$[Field.norm]($[field.if(array)]$[field.array.number], $[field.end]$[Field.info]);
-$[field.else]
-        $$[table.unix]->set$[Field.norm]($[field.if(array)]$[field.array.number], $[field.end]$[field.if(integer|bigint)]123$[field.else.if(float|currency)]12.3$[field.else.if(boolean)]'Y'$[field.else.if(datetime)]'2016-12-20 12:15:00'$[field.else.if(blob)]"\x5\x0\x3"$[field.else.if(image)]'image.png'$[field.else]'$[Table.name] to delete'$[field.end]);
-$[field.end]
-$[field.end]
+        $$[table.unix] = self::create($[descriptor.if(string)]$$[descriptor.unix]$[descriptor.end]);
         $$[table.unix]->insert();
-        $$[table.unix]->delete();
-        $$[table.unix]->clean(new $[Table.norm]());
-        $found_$[table.unix] = $[Table.norm]::findBy$[Primary.norm]($$[table.unix]->get$[Primary.norm]());
-        $this->assertEquals(new $[Table.norm](), $found_$[table.unix]);
-        $$[table.unix]->set$[Primary.norm]('');
-        $this->expectException('\Exception');
-        $$[table.unix]->delete();
+        return $$[table.unix];
     }
 
     public function testFind()
     {
-$[field.each(all)]
-$[field.if(null|primary)]
-$[field.else.if(reference)]
-        // TODO: início copiar
-        $$[reference.unix] = new $[Reference.norm]();
-        $$[reference.unix]->insert();
-        // TODO: fim copiar
-$[field.end]
-$[field.end]
-        $$[table.unix] = new $[Table.norm]();
-$[field.each(all)]
-$[field.if(null|primary)]
-$[field.else.if(reference)]
-        $$[table.unix]->set$[Field.norm]($[field.if(array)]$[field.array.number], $[field.end]$$[reference.unix]->get$[Reference.pk.norm]());
-$[field.else.if(info)]
-        $$[table.unix]->set$[Field.norm]($[field.if(array)]$[field.array.number], $[field.end]$[Field.info]);
-$[field.else]
-        $$[table.unix]->set$[Field.norm]($[field.if(array)]$[field.array.number], $[field.end]$[field.if(integer|bigint)]123$[field.else.if(float|currency)]12.3$[field.else.if(boolean)]'Y'$[field.else.if(datetime)]'2016-12-25 12:15:00'$[field.else.if(blob)]"\x5\x0\x3"$[field.else.if(image)]'image.png'$[field.else]'$[Table.name] find'$[field.end]);
-$[field.end]
-$[field.end]
-        $$[table.unix]->insert();
-        $found_$[table.unix] = $[Table.norm]::find(['$[primary]' => $$[table.unix]->get$[Primary.norm]()]);
-        $this->assertEquals($$[table.unix], $found_$[table.unix]);
-$[table.each(unique)]
-        $found_$[table.unix] = $[Table.norm]::findBy$[unique.each(all)]$[Field.norm]$[unique.end]($[unique.each(all)]$[field.if(first)]$[field.else], $[field.end]$$[table.unix]->get$[Field.norm]($[field.if(array)]$[field.array.number]$[field.end])$[unique.end]);
-        $this->assertEquals($$[table.unix], $found_$[table.unix]);
-        $found_$[table.unix]->loadBy$[unique.each(all)]$[Field.norm]$[unique.end]($[unique.each(all)]$[field.if(first)]$[field.else], $[field.end]$$[table.unix]->get$[Field.norm]($[field.if(array)]$[field.array.number]$[field.end])$[unique.end]);
-        $this->assertEquals($$[table.unix], $found_$[table.unix]);
-$[table.end]
+        $$[table.unix] = self::create();
+        AuthenticationTest::authProvider([Permissao::NOME_$[TABLE.style]]);
+        $expected = [
+            'status' => 'ok',
+            'items' => [
+                $$[table.unix]->publish(),
+            ],
+        ];
+        $result = $this->get('/api/$[table.unix.plural]', ['search' => $$[table.unix]->get$[Descriptor.norm]()]);
+        $this->assertEquals($expected, \array_intersect_key($result, \array_keys($expected)));
+    }
 
-        $$[table.unix]_sec = new $[Table.norm]();
-$[field.each(all)]
-$[field.if(null|primary)]
-$[field.else.if(reference)]
-        $$[table.unix]_sec->set$[Field.norm]($[field.if(array)]$[field.array.number], $[field.end]$$[reference.unix]->get$[Reference.pk.norm]());
-$[field.else.if(info)]
-        $$[table.unix]_sec->set$[Field.norm]($[field.if(array)]$[field.array.number], $[field.end]$[Field.info]);
-$[field.else]
-        $$[table.unix]_sec->set$[Field.norm]($[field.if(array)]$[field.array.number], $[field.end]$[field.if(integer|bigint)]123$[field.else.if(float|currency)]12.3$[field.else.if(boolean)]'Y'$[field.else.if(datetime)]'2016-12-25 12:15:00'$[field.else.if(blob)]"\x5\x0\x3"$[field.else.if(image)]'image.png'$[field.else]'$[Table.name] find second'$[field.end]);
-$[field.end]
-$[field.end]
-        $$[table.unix]_sec->insert();
+    public function testAdd()
+    {
+        $$[table.unix] = self::build();
+        AuthenticationTest::authProvider([Permissao::NOME_$[TABLE.style]]);
+        $expected = [
+            'status' => 'ok',
+            'item' => [
+                $$[table.unix]->publish(),
+            ]
+        ];
+        $result = $this->post('/api/$[table.unix.plural]', $$[table.unix]->toArray());
+        $expected['item']['id'] = $result['item']['id'];
+        $this->assertEquals($expected, \array_intersect_key($result, \array_keys($expected)));
+    }
 
-        $$[table.unix.plural] = $[Table.norm]::findAll(['search' => '$[Table.name] find'], [], 2, 0);
-        $this->assertEquals([$$[table.unix], $$[table.unix]_sec], $$[table.unix.plural]);
+    public function testUpdate()
+    {
+        $$[table.unix] = self::create();
+        AuthenticationTest::authProvider([Permissao::NOME_$[TABLE.style]]);
+        $id = $$[table.unix]->get$[Primary.norm]();
+        $result = $this->put('/api/$[table.unix.plural]/' . $id, $$[table.unix]->toArray());
+        $$[table.unix]->loadBy$[Primary.norm]();
+        $expected = [
+            'status' => 'ok',
+            'item' => [
+                $$[table.unix]->publish(),
+            ]
+        ];
+        $this->assertEquals($expected, \array_intersect_key($result, \array_keys($expected)));
+    }
 
-        $count = $[Table.norm]::count(['search' => '$[Table.name] find']);
-        $this->assertEquals(2, $count);
+    public function testDelete()
+    {
+        $$[table.unix] = self::create();
+        AuthenticationTest::authProvider([Permissao::NOME_$[TABLE.style]]);
+        $id = $$[table.unix]->get$[Primary.norm]();
+        $result = $this->delete('/api/$[table.unix.plural]/' . $id);
+        $$[table.unix]->loadBy$[Primary.norm]();
+        $expected = [ 'status' => 'ok', ];
+        $this->assertEquals($expected, \array_intersect_key($result, \array_keys($expected)));
+        $this->assertFalse($$[table.unix]->exists());
     }
 }

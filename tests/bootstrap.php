@@ -29,13 +29,15 @@ use MZ\Database\DB;
 global $app;
 $app = require_once __DIR__.'/../bootstrap/app.php';
 
-
-$app->run(null, function ($app) {
-    $script = dirname(__DIR__) . '/database/model/sqlite.sql';
-    DB::getPdo()->exec(file_get_contents($script));
-    $script = dirname(__DIR__) . '/database/model/sqlite_insert.sql';
-    DB::getPdo()->exec(file_get_contents($script));
-});
+$app->run(
+    function ($app) {},
+    function ($app) {
+        $script = dirname(__DIR__) . '/database/model/sqlite.sql';
+        DB::getPdo()->exec(file_get_contents($script));
+        $script = dirname(__DIR__) . '/database/model/sqlite_insert.sql';
+        DB::getPdo()->exec(file_get_contents($script));
+    }
+);
 
 function getExpectedBuffer($name, $content)
 {

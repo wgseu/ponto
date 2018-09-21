@@ -189,7 +189,7 @@ class PedidoOldApiController extends \MZ\Core\ApiController
         need_manager(true);
         try {
             $pedido = new Pedido($_GET);
-            $pedido->loadByID($pedido->getID());
+            $pedido->loadByID();
             if (!$pedido->exists()) {
                 throw new \Exception('O pedido informado não existe');
             }

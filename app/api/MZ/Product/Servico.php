@@ -24,10 +24,12 @@
  */
 namespace MZ\Product;
 
-use MZ\Database\SyncModel;
-use MZ\Database\DB;
+use MZ\Util\Mask;
 use MZ\Util\Filter;
 use MZ\Util\Validator;
+use MZ\Database\DB;
+use MZ\Database\SyncModel;
+use MZ\Exception\ValidationException;
 
 /**
  * Taxas, eventos e serviço cobrado nos pedidos
@@ -76,6 +78,11 @@ class Servico extends SyncModel
      */
     private $data_fim;
     /**
+     * Tempo de participação máxima que não será obrigatório adicionar o
+     * serviço ao pedido
+     */
+    private $tempo_limite;
+    /**
      * Valor do serviço
      */
     private $valor;
@@ -83,6 +90,10 @@ class Servico extends SyncModel
      * Informa se a taxa ou serviço é individual para cada pessoa
      */
     private $individual;
+    /**
+     * Banner do evento
+     */
+    private $imagem_url;
     /**
      * Informa se o serviço está ativo
      */
@@ -99,7 +110,7 @@ class Servico extends SyncModel
 
     /**
      * Identificador do serviço
-     * @return mixed ID of Servico
+     * @return int id of Serviço
      */
     public function getID()
     {
@@ -108,8 +119,8 @@ class Servico extends SyncModel
 
     /**
      * Set ID value to new on param
-     * @param  mixed $id new value for ID
-     * @return Servico Self instance
+     * @param int $id Set id for Serviço
+     * @return self Self instance
      */
     public function setID($id)
     {
@@ -119,7 +130,7 @@ class Servico extends SyncModel
 
     /**
      * Nome do serviço, Ex.: Comissão, Entrega, Couvert
-     * @return mixed Nome of Servico
+     * @return string nome of Serviço
      */
     public function getNome()
     {
@@ -128,8 +139,8 @@ class Servico extends SyncModel
 
     /**
      * Set Nome value to new on param
-     * @param  mixed $nome new value for Nome
-     * @return Servico Self instance
+     * @param string $nome Set nome for Serviço
+     * @return self Self instance
      */
     public function setNome($nome)
     {
@@ -139,7 +150,7 @@ class Servico extends SyncModel
 
     /**
      * Descrição do serviço, Ex.: Show de fulano
-     * @return mixed Descrição of Servico
+     * @return string descrição of Serviço
      */
     public function getDescricao()
     {
@@ -148,8 +159,8 @@ class Servico extends SyncModel
 
     /**
      * Set Descricao value to new on param
-     * @param  mixed $descricao new value for Descricao
-     * @return Servico Self instance
+     * @param string $descricao Set descrição for Serviço
+     * @return self Self instance
      */
     public function setDescricao($descricao)
     {
@@ -159,7 +170,7 @@ class Servico extends SyncModel
 
     /**
      * Detalhes do serviço, Ex.: Com participação especial de fulano
-     * @return mixed Detalhes of Servico
+     * @return string detalhes of Serviço
      */
     public function getDetalhes()
     {
@@ -168,8 +179,8 @@ class Servico extends SyncModel
 
     /**
      * Set Detalhes value to new on param
-     * @param  mixed $detalhes new value for Detalhes
-     * @return Servico Self instance
+     * @param string $detalhes Set detalhes for Serviço
+     * @return self Self instance
      */
     public function setDetalhes($detalhes)
     {
@@ -179,7 +190,7 @@ class Servico extends SyncModel
 
     /**
      * Tipo de serviço, Evento: Eventos como show no estabelecimento
-     * @return mixed Tipo of Servico
+     * @return string tipo of Serviço
      */
     public function getTipo()
     {
@@ -188,8 +199,8 @@ class Servico extends SyncModel
 
     /**
      * Set Tipo value to new on param
-     * @param  mixed $tipo new value for Tipo
-     * @return Servico Self instance
+     * @param string $tipo Set tipo for Serviço
+     * @return self Self instance
      */
     public function setTipo($tipo)
     {
@@ -199,7 +210,7 @@ class Servico extends SyncModel
 
     /**
      * Informa se a taxa é obrigatória
-     * @return mixed Obrigatório of Servico
+     * @return string obrigatório of Serviço
      */
     public function getObrigatorio()
     {
@@ -217,8 +228,8 @@ class Servico extends SyncModel
 
     /**
      * Set Obrigatorio value to new on param
-     * @param  mixed $obrigatorio new value for Obrigatorio
-     * @return Servico Self instance
+     * @param string $obrigatorio Set obrigatório for Serviço
+     * @return self Self instance
      */
     public function setObrigatorio($obrigatorio)
     {
@@ -228,7 +239,7 @@ class Servico extends SyncModel
 
     /**
      * Data de início do evento
-     * @return mixed Data de início of Servico
+     * @return string data de início of Serviço
      */
     public function getDataInicio()
     {
@@ -237,8 +248,8 @@ class Servico extends SyncModel
 
     /**
      * Set DataInicio value to new on param
-     * @param  mixed $data_inicio new value for DataInicio
-     * @return Servico Self instance
+     * @param string $data_inicio Set data de início for Serviço
+     * @return self Self instance
      */
     public function setDataInicio($data_inicio)
     {
@@ -248,7 +259,7 @@ class Servico extends SyncModel
 
     /**
      * Data final do evento
-     * @return mixed Data final of Servico
+     * @return string data final of Serviço
      */
     public function getDataFim()
     {
@@ -257,8 +268,8 @@ class Servico extends SyncModel
 
     /**
      * Set DataFim value to new on param
-     * @param  mixed $data_fim new value for DataFim
-     * @return Servico Self instance
+     * @param string $data_fim Set data final for Serviço
+     * @return self Self instance
      */
     public function setDataFim($data_fim)
     {
@@ -267,8 +278,29 @@ class Servico extends SyncModel
     }
 
     /**
+     * Tempo de participação máxima que não será obrigatório adicionar o
+     * serviço ao pedido
+     * @return int tempo limite of Serviço
+     */
+    public function getTempoLimite()
+    {
+        return $this->tempo_limite;
+    }
+
+    /**
+     * Set TempoLimite value to new on param
+     * @param int $tempo_limite Set tempo limite for Serviço
+     * @return self Self instance
+     */
+    public function setTempoLimite($tempo_limite)
+    {
+        $this->tempo_limite = $tempo_limite;
+        return $this;
+    }
+
+    /**
      * Valor do serviço
-     * @return mixed Valor of Servico
+     * @return string valor of Serviço
      */
     public function getValor()
     {
@@ -277,8 +309,8 @@ class Servico extends SyncModel
 
     /**
      * Set Valor value to new on param
-     * @param  mixed $valor new value for Valor
-     * @return Servico Self instance
+     * @param string $valor Set valor for Serviço
+     * @return self Self instance
      */
     public function setValor($valor)
     {
@@ -288,7 +320,7 @@ class Servico extends SyncModel
 
     /**
      * Informa se a taxa ou serviço é individual para cada pessoa
-     * @return mixed Individual of Servico
+     * @return string individual of Serviço
      */
     public function getIndividual()
     {
@@ -306,8 +338,8 @@ class Servico extends SyncModel
 
     /**
      * Set Individual value to new on param
-     * @param  mixed $individual new value for Individual
-     * @return Servico Self instance
+     * @param string $individual Set individual for Serviço
+     * @return self Self instance
      */
     public function setIndividual($individual)
     {
@@ -316,8 +348,28 @@ class Servico extends SyncModel
     }
 
     /**
+     * Banner do evento
+     * @return string imagem of Serviço
+     */
+    public function getImagemURL()
+    {
+        return $this->imagem_url;
+    }
+
+    /**
+     * Set ImagemURL value to new on param
+     * @param string $imagem_url Set imagem for Serviço
+     * @return self Self instance
+     */
+    public function setImagemURL($imagem_url)
+    {
+        $this->imagem_url = $imagem_url;
+        return $this;
+    }
+
+    /**
      * Informa se o serviço está ativo
-     * @return mixed Ativo of Servico
+     * @return string ativo of Serviço
      */
     public function getAtivo()
     {
@@ -335,8 +387,8 @@ class Servico extends SyncModel
 
     /**
      * Set Ativo value to new on param
-     * @param  mixed $ativo new value for Ativo
-     * @return Servico Self instance
+     * @param string $ativo Set ativo for Serviço
+     * @return self Self instance
      */
     public function setAtivo($ativo)
     {
@@ -346,7 +398,7 @@ class Servico extends SyncModel
 
     /**
      * Convert this instance to array associated key -> value
-     * @param  boolean $recursive Allow rescursive conversion of fields
+     * @param boolean $recursive Allow rescursive conversion of fields
      * @return array All field and values into array format
      */
     public function toArray($recursive = false)
@@ -360,20 +412,22 @@ class Servico extends SyncModel
         $servico['obrigatorio'] = $this->getObrigatorio();
         $servico['datainicio'] = $this->getDataInicio();
         $servico['datafim'] = $this->getDataFim();
+        $servico['tempolimite'] = $this->getTempoLimite();
         $servico['valor'] = $this->getValor();
         $servico['individual'] = $this->getIndividual();
+        $servico['imagemurl'] = $this->getImagemURL();
         $servico['ativo'] = $this->getAtivo();
         return $servico;
     }
 
     /**
      * Fill this instance with from array values, you can pass instance to
-     * @param  mixed $servico Associated key -> value to assign into this instance
-     * @return Servico Self instance
+     * @param mixed $servico Associated key -> value to assign into this instance
+     * @return self Self instance
      */
     public function fromArray($servico = [])
     {
-        if ($servico instanceof Servico) {
+        if ($servico instanceof self) {
             $servico = $servico->toArray();
         } elseif (!is_array($servico)) {
             $servico = [];
@@ -419,6 +473,11 @@ class Servico extends SyncModel
         } else {
             $this->setDataFim($servico['datafim']);
         }
+        if (!array_key_exists('tempolimite', $servico)) {
+            $this->setTempoLimite(null);
+        } else {
+            $this->setTempoLimite($servico['tempolimite']);
+        }
         if (!isset($servico['valor'])) {
             $this->setValor(null);
         } else {
@@ -429,6 +488,11 @@ class Servico extends SyncModel
         } else {
             $this->setIndividual($servico['individual']);
         }
+        if (!array_key_exists('imagemurl', $servico)) {
+            $this->setImagemURL(null);
+        } else {
+            $this->setImagemURL($servico['imagemurl']);
+        }
         if (!isset($servico['ativo'])) {
             $this->setAtivo('N');
         } else {
@@ -438,20 +502,37 @@ class Servico extends SyncModel
     }
 
     /**
+     * Get relative imagem path or default imagem
+     * @param boolean $default If true return default image, otherwise check field
+     * @param string  $default_name Default image name
+     * @return string relative web path for serviço imagem
+     */
+    public function makeImagemURL($default = false, $default_name = 'servico.png')
+    {
+        $imagem_url = $this->getImagemURL();
+        if ($default) {
+            $imagem_url = null;
+        }
+        return get_image_url($imagem_url, 'servico', $default_name);
+    }
+
+    /**
      * Convert this instance into array associated key -> value with only public fields
      * @return array All public field and values into array format
      */
     public function publish()
     {
         $servico = parent::publish();
+        $servico['imagemurl'] = $this->makeImagemURL(false, null);
         return $servico;
     }
 
     /**
      * Filter fields, upload data and keep key data
-     * @param Servico $original Original instance without modifications
+     * @param self $original Original instance without modifications
+     * @param boolean $localized Informs if fields are localized
      */
-    public function filter($original)
+    public function filter($original, $localized = false)
     {
         $this->setID($original->getID());
         $this->setNome(Filter::string($this->getNome()));
@@ -459,91 +540,93 @@ class Servico extends SyncModel
         $this->setDetalhes(Filter::string($this->getDetalhes()));
         $this->setDataInicio(Filter::datetime($this->getDataInicio()));
         $this->setDataFim(Filter::datetime($this->getDataFim()));
-        $this->setValor(Filter::money($this->getValor()));
+        $this->setTempoLimite(Filter::number($this->getTempoLimite()));
+        $this->setValor(Filter::money($this->getValor(), $localized));
+        $imagem_url = upload_image('raw_imagemurl', 'servico');
+        if (is_null($imagem_url) && trim($this->getImagemURL()) != '') {
+            $this->setImagemURL($original->getImagemURL());
+        } else {
+            $this->setImagemURL($imagem_url);
+        }
     }
 
     /**
      * Clean instance resources like images and docs
-     * @param  Servico $dependency Don't clean when dependency use same resources
+     * @param self $dependency Don't clean when dependency use same resources
      */
     public function clean($dependency)
     {
+        if (!is_null($this->getImagemURL()) && $dependency->getImagemURL() != $this->getImagemURL()) {
+            @unlink(get_image_path($this->getImagemURL(), 'servico'));
+        }
+        $this->setImagemURL($dependency->getImagemURL());
     }
 
     /**
      * Validate fields updating them and throw exception when invalid data has found
-     * @return array All field of Servico in array format
+     * @return mixed[] All field of Servico in array format
+     * @throws \MZ\Exception\ValidationException for invalid input data
      */
     public function validate()
     {
         $errors = [];
         if (is_null($this->getNome())) {
-            $errors['nome'] = 'O nome não pode ser vazio';
+            $errors['nome'] = _t('servico.nome_cannot_empty');
         }
         if (is_null($this->getDescricao())) {
-            $errors['descricao'] = 'A descrição não pode ser vazia';
+            $errors['descricao'] = _t('servico.descricao_cannot_empty');
         }
         if (!Validator::checkInSet($this->getTipo(), self::getTipoOptions())) {
-            $errors['tipo'] = 'O tipo é inválido ou vazio';
+            $errors['tipo'] = _t('servico.tipo_invalid');
         }
         if (!Validator::checkBoolean($this->getObrigatorio())) {
-            $errors['obrigatorio'] = 'O obrigatório é inválido ou vazio';
+            $errors['obrigatorio'] = _t('servico.obrigatorio_invalid');
         }
         if (is_null($this->getValor())) {
-            $errors['valor'] = 'O valor não pode ser vazio';
+            $errors['valor'] = _t('servico.valor_cannot_empty');
         } elseif ($this->getValor() < 0) {
-            $errors['valor'] = 'O valor não pode ser negativo';
+            $errors['valor'] = _t('servico.valor_cannot_negative');
         } elseif (is_equal($this->getValor(), 0)) {
-            $errors['valor'] = 'O valor não pode ser nulo';
+            $errors['valor'] = _t('servico.valor_cannot_zero');
         }
         if (!Validator::checkBoolean($this->getIndividual())) {
-            $errors['individual'] = 'O individual é inválido ou vazio';
+            $errors['individual'] = _t('servico.individual_invalid');
         }
         if (!Validator::checkBoolean($this->getAtivo())) {
-            $errors['ativo'] = 'O ativo é inválido ou vazio';
+            $errors['ativo'] = _t('servico.ativo_invalid');
         }
         if ($this->getTipo() == self::TIPO_EVENTO) {
             if (is_null($this->getDataInicio())) {
-                $errors['datainicio'] = 'A data de ínicio do evento é inválida';
+                $errors['datainicio'] = _t('servico.datainicio_invalid');
             }
             if (is_null($this->getDataFim())) {
-                $errors['datafim'] = 'A data final do evento é inválida';
+                $errors['datafim'] = _t('servico.datafim_invalid');
             }
         } else {
             if (!is_null($this->getDataInicio())) {
-                $errors['datainicio'] = 'A data de ínicio não deveria ser informada';
+                $errors['datainicio'] = _t('servico.datainicio_must_empty');
             }
             if (!is_null($this->getDataFim())) {
-                $errors['datafim'] = 'A data final não deveria ser informada';
+                $errors['datafim'] = _t('servico.datafim_must_empty');
             }
         }
         if (!empty($errors)) {
-            throw new \MZ\Exception\ValidationException($errors);
+            throw new ValidationException($errors);
         }
-        $this->checkAccess();
         return $this->toArray();
     }
 
     private function checkAccess()
     {
         if ($this->getID() >= self::DESCONTO_ID && $this->getID() <= self::ENTREGA_ID) {
-            throw new \Exception('Esse serviço é interno do sistema e não pode ser alterado');
+            throw new \Exception(_t('servico.internal_readonly'));
         }
     }
 
     /**
-     * Translate SQL exception into application exception
-     * @param  \Exception $e exception to translate into a readable error
-     * @return \MZ\Exception\ValidationException new exception translated
-     */
-    protected function translate($e)
-    {
-        return parent::translate($e);
-    }
-
-    /**
      * Insert a new Serviço into the database and fill instance from database
-     * @return Servico Self instance
+     * @return self Self instance
+     * @throws \MZ\Exception\ValidationException for invalid input data
      */
     public function insert()
     {
@@ -552,7 +635,8 @@ class Servico extends SyncModel
         unset($values['id']);
         try {
             $id = DB::insertInto('Servicos')->values($values)->execute();
-            $this->loadByID($id);
+            $this->setID($id);
+            $this->loadByID();
         } catch (\Exception $e) {
             throw $this->translate($e);
         }
@@ -561,36 +645,42 @@ class Servico extends SyncModel
 
     /**
      * Update Serviço with instance values into database for ID
-     * @param  array $only Save these fields only, when empty save all fields except id
-     * @return Servico Self instance
+     * @param array $only Save these fields only, when empty save all fields except id
+     * @return int rows affected
+     * @throws \MZ\Exception\ValidationException for invalid input data
      */
     public function update($only = [])
     {
         $values = $this->validate();
         if (!$this->exists()) {
-            throw new \Exception('O identificador do serviço não foi informado');
+            throw new ValidationException(
+                ['id' => _t('servico.id_cannot_empty')]
+            );
         }
         $values = DB::filterValues($values, $only, false);
         try {
-            DB::update('Servicos')
+            $affected = DB::update('Servicos')
                 ->set($values)
-                ->where('id', $this->getID())
+                ->where(['id' => $this->getID()])
                 ->execute();
-            $this->loadByID($this->getID());
+            $this->loadByID();
         } catch (\Exception $e) {
             throw $this->translate($e);
         }
-        return $this;
+        return $affected;
     }
 
     /**
      * Delete this instance from database using ID
      * @return integer Number of rows deleted (Max 1)
+     * @throws \MZ\Exception\ValidationException for invalid id
      */
     public function delete()
     {
         if (!$this->exists()) {
-            throw new \Exception('O identificador do serviço não foi informado');
+            throw new ValidationException(
+                ['id' => _t('servico.id_cannot_empty')]
+            );
         }
         $this->checkAccess();
         $result = DB::deleteFrom('Servicos')
@@ -601,9 +691,9 @@ class Servico extends SyncModel
 
     /**
      * Load one register for it self with a condition
-     * @param  array $condition Condition for searching the row
-     * @param  array $order associative field name -> [-1, 1]
-     * @return Servico Self instance filled or empty
+     * @param array $condition Condition for searching the row
+     * @param array $order associative field name -> [-1, 1]
+     * @return self Self instance filled or empty
      */
     public function load($condition, $order = [])
     {
@@ -614,14 +704,14 @@ class Servico extends SyncModel
 
     /**
      * Gets textual and translated Tipo for Servico
-     * @param  int $index choose option from index
-     * @return mixed A associative key -> translated representative text or text for index
+     * @param int $index choose option from index
+     * @return string[]|string A associative key -> translated representative text or text for index
      */
     public static function getTipoOptions($index = null)
     {
         $options = [
-            self::TIPO_EVENTO => 'Evento',
-            self::TIPO_TAXA => 'Taxa',
+            self::TIPO_EVENTO => _t('servico.tipo_evento'),
+            self::TIPO_TAXA => _t('servico.tipo_taxa'),
         ];
         if (!is_null($index)) {
             return $options[$index];
@@ -635,14 +725,14 @@ class Servico extends SyncModel
      */
     private static function getAllowedKeys()
     {
-        $servico = new Servico();
+        $servico = new self();
         $allowed = Filter::concatKeys('s.', $servico->toArray());
         return $allowed;
     }
 
     /**
      * Filter order array
-     * @param  mixed $order order string or array to parse and filter allowed
+     * @param mixed $order order string or array to parse and filter allowed
      * @return array allowed associative order
      */
     private static function filterOrder($order)
@@ -653,7 +743,7 @@ class Servico extends SyncModel
 
     /**
      * Filter condition array with allowed fields
-     * @param  array $condition condition to filter rows
+     * @param array $condition condition to filter rows
      * @return array allowed condition
      */
     private static function filterCondition($condition)
@@ -671,8 +761,8 @@ class Servico extends SyncModel
 
     /**
      * Fetch data from database with a condition
-     * @param  array $condition condition to filter rows
-     * @param  array $order order rows
+     * @param array $condition condition to filter rows
+     * @param array $order order rows
      * @return SelectQuery query object with condition statement
      */
     private static function query($condition = [], $order = [])
@@ -686,24 +776,40 @@ class Servico extends SyncModel
 
     /**
      * Search one register with a condition
-     * @param  array $condition Condition for searching the row
-     * @param  array $order order rows
-     * @return Servico A filled Serviço or empty instance
+     * @param array $condition Condition for searching the row
+     * @param array $order order rows
+     * @return self A filled Serviço or empty instance
      */
     public static function find($condition, $order = [])
     {
         $query = self::query($condition, $order)->limit(1);
         $row = $query->fetch() ?: [];
-        return new Servico($row);
+        return new self($row);
+    }
+
+    /**
+     * Search one register with a condition
+     * @param array $condition Condition for searching the row
+     * @param array $order order rows
+     * @return self A filled Serviço or empty instance
+     * @throws \Exception when register has not found
+     */
+    public static function findOrFail($condition, $order = [])
+    {
+        $result = self::find($condition, $order);
+        if (!$result->exists()) {
+            throw new \Exception(_t('servico.not_found'), 404);
+        }
+        return $result;
     }
 
     /**
      * Find all Serviço
-     * @param  array  $condition Condition to get all Serviço
-     * @param  array  $order     Order Serviço
-     * @param  int    $limit     Limit data into row count
-     * @param  int    $offset    Start offset to get rows
-     * @return array             List of all rows instanced as Servico
+     * @param array  $condition Condition to get all Serviço
+     * @param array  $order     Order Serviço
+     * @param int    $limit     Limit data into row count
+     * @param int    $offset    Start offset to get rows
+     * @return self[]             List of all rows instanced as Servico
      */
     public static function findAll($condition = [], $order = [], $limit = null, $offset = null)
     {
@@ -717,14 +823,14 @@ class Servico extends SyncModel
         $rows = $query->fetchAll();
         $result = [];
         foreach ($rows as $row) {
-            $result[] = new Servico($row);
+            $result[] = new self($row);
         }
         return $result;
     }
 
     /**
      * Count all rows from database with matched condition critery
-     * @param  array $condition condition to filter rows
+     * @param array $condition condition to filter rows
      * @return integer Quantity of rows
      */
     public static function count($condition = [])

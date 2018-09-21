@@ -62,7 +62,6 @@ class FornecedorOldApiController extends \MZ\Core\ApiController
                 $item['cnpj'] = $cliente_item['cpf'];
             }
             $item['email'] = $cliente->getEmail();
-            $item['imagemurl'] = $cliente_item['imagem'];
             $items[] = $item;
         }
         return $this->json()->success(['items' => $items]);

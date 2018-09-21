@@ -81,7 +81,7 @@ class CreditoPageController extends \MZ\Core\Controller
             try {
                 $old_credito->setFuncionarioID(logged_provider()->getID());
                 $old_credito->setClienteID($credito->getClienteID());
-                $credito->filter($old_credito);
+                $credito->filter($old_credito, true);
                 $credito->insert();
                 $old_credito->clean($credito);
                 $msg = sprintf(
@@ -132,7 +132,7 @@ class CreditoPageController extends \MZ\Core\Controller
         if (is_post()) {
             $credito = new Credito($_POST);
             try {
-                $credito->filter($old_credito);
+                $credito->filter($old_credito, true);
                 $credito->update();
                 $old_credito->clean($credito);
                 $msg = sprintf(

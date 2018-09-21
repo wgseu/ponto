@@ -85,7 +85,7 @@ class CategoriaPageController extends \MZ\Core\Controller
         if (is_post()) {
             $categoria = new Categoria($_POST);
             try {
-                $categoria->filter($old_categoria);
+                $categoria->filter($old_categoria, true);
                 $categoria->insert();
                 $old_categoria->clean($categoria);
                 $msg = sprintf(
@@ -139,7 +139,7 @@ class CategoriaPageController extends \MZ\Core\Controller
         if (is_post()) {
             $categoria = new Categoria($_POST);
             try {
-                $categoria->filter($old_categoria);
+                $categoria->filter($old_categoria, true);
                 $categoria->update();
                 $old_categoria->clean($categoria);
                 $msg = sprintf(

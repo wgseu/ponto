@@ -24,10 +24,12 @@
  */
 namespace MZ\Account;
 
-use MZ\Database\SyncModel;
-use MZ\Database\DB;
+use MZ\Util\Mask;
 use MZ\Util\Filter;
 use MZ\Util\Validator;
+use MZ\Database\DB;
+use MZ\Database\SyncModel;
+use MZ\Exception\ValidationException;
 
 /**
  * Classificação se contas, permite atribuir um grupo de contas
@@ -48,6 +50,10 @@ class Classificacao extends SyncModel
      * Descrição da classificação
      */
     private $descricao;
+    /**
+     * Ícone da categoria da conta
+     */
+    private $icone_url;
 
     /**
      * Constructor for a new empty instance of Classificacao
@@ -70,7 +76,7 @@ class Classificacao extends SyncModel
     /**
      * Set ID value to new on param
      * @param  mixed $id new value for ID
-     * @return Classificacao Self instance
+     * @return self Self instance
      */
     public function setID($id)
     {
@@ -91,7 +97,7 @@ class Classificacao extends SyncModel
     /**
      * Set ClassificacaoID value to new on param
      * @param  mixed $classificacao_id new value for ClassificacaoID
-     * @return Classificacao Self instance
+     * @return self Self instance
      */
     public function setClassificacaoID($classificacao_id)
     {
@@ -111,11 +117,31 @@ class Classificacao extends SyncModel
     /**
      * Set Descricao value to new on param
      * @param  mixed $descricao new value for Descricao
-     * @return Classificacao Self instance
+     * @return self Self instance
      */
     public function setDescricao($descricao)
     {
         $this->descricao = $descricao;
+        return $this;
+    }
+
+    /**
+     * Ícone da categoria da conta
+     * @return mixed Ícone of Classificacao
+     */
+    public function getIconeURL()
+    {
+        return $this->icone_url;
+    }
+
+    /**
+     * Set IconeURL value to new on param
+     * @param  mixed $icone_url new value for IconeURL
+     * @return self Self instance
+     */
+    public function setIconeURL($icone_url)
+    {
+        $this->icone_url = $icone_url;
         return $this;
     }
 
@@ -130,17 +156,18 @@ class Classificacao extends SyncModel
         $classificacao['id'] = $this->getID();
         $classificacao['classificacaoid'] = $this->getClassificacaoID();
         $classificacao['descricao'] = $this->getDescricao();
+        $classificacao['iconeurl'] = $this->getIconeURL();
         return $classificacao;
     }
 
     /**
      * Fill this instance with from array values, you can pass instance to
      * @param  mixed $classificacao Associated key -> value to assign into this instance
-     * @return Classificacao Self instance
+     * @return self Self instance
      */
     public function fromArray($classificacao = [])
     {
-        if ($classificacao instanceof Classificacao) {
+        if ($classificacao instanceof self) {
             $classificacao = $classificacao->toArray();
         } elseif (!is_array($classificacao)) {
             $classificacao = [];
@@ -161,7 +188,27 @@ class Classificacao extends SyncModel
         } else {
             $this->setDescricao($classificacao['descricao']);
         }
+        if (!array_key_exists('iconeurl', $classificacao)) {
+            $this->setIconeURL(null);
+        } else {
+            $this->setIconeURL($classificacao['iconeurl']);
+        }
         return $this;
+    }
+
+    /**
+     * Get relative ícone path or default ícone
+     * @param boolean $default If true return default image, otherwise check field
+     * @param string  $default_name Default image name
+     * @return string relative web path for classificação ícone
+     */
+    public function makeIconeURL($default = false, $default_name = 'classificacao.png')
+    {
+        $icone_url = $this->getIconeURL();
+        if ($default) {
+            $icone_url = null;
+        }
+        return get_image_url($icone_url, 'classificacao', $default_name);
     }
 
     /**
@@ -171,31 +218,42 @@ class Classificacao extends SyncModel
     public function publish()
     {
         $classificacao = parent::publish();
+        $classificacao['iconeurl'] = $this->makeIconeURL(false, null);
         return $classificacao;
     }
 
     /**
      * Filter fields, upload data and keep key data
-     * @param Classificacao $original Original instance without modifications
+     * @param self $original Original instance without modifications
      */
     public function filter($original)
     {
         $this->setID($original->getID());
         $this->setClassificacaoID(Filter::number($this->getClassificacaoID()));
         $this->setDescricao(Filter::string($this->getDescricao()));
+        $icone_url = upload_image('raw_iconeurl', 'classificacao');
+        if (is_null($icone_url) && trim($this->getIconeURL()) != '') {
+            $this->setIconeURL($original->getIconeURL());
+        } else {
+            $this->setIconeURL($icone_url);
+        }
     }
 
     /**
      * Clean instance resources like images and docs
-     * @param  Classificacao $dependency Don't clean when dependency use same resources
+     * @param  self $dependency Don't clean when dependency use same resources
      */
     public function clean($dependency)
     {
+        if (!is_null($this->getIconeURL()) && $dependency->getIconeURL() != $this->getIconeURL()) {
+            @unlink(get_image_path($this->getIconeURL(), 'classificacao'));
+        }
+        $this->setIconeURL($dependency->getIconeURL());
     }
 
     /**
      * Validate fields updating them and throw exception when invalid data has found
-     * @return array All field of Classificacao in array format
+     * @return mixed[] All field of Classificacao in array format
      */
     public function validate()
     {
@@ -208,7 +266,7 @@ class Classificacao extends SyncModel
             $errors['descricao'] = 'Essa classificação superior não pode ser atribuída';
         }
         if (!empty($errors)) {
-            throw new \MZ\Exception\ValidationException($errors);
+            throw new ValidationException($errors);
         }
         return $this->toArray();
     }
@@ -221,7 +279,7 @@ class Classificacao extends SyncModel
     protected function translate($e)
     {
         if (contains(['Descricao', 'UNIQUE'], $e->getMessage())) {
-            return new \MZ\Exception\ValidationException([
+            return new ValidationException([
                 'descricao' => sprintf(
                     'A descrição "%s" já está cadastrada',
                     $this->getDescricao()
@@ -233,7 +291,7 @@ class Classificacao extends SyncModel
 
     /**
      * Insert a new Classificação into the database and fill instance from database
-     * @return Classificacao Self instance
+     * @return self Self instance
      */
     public function insert()
     {
@@ -242,7 +300,8 @@ class Classificacao extends SyncModel
         unset($values['id']);
         try {
             $id = DB::insertInto('Classificacoes')->values($values)->execute();
-            $this->loadByID($id);
+            $this->setID($id);
+            $this->loadByID();
         } catch (\Exception $e) {
             throw $this->translate($e);
         }
@@ -252,7 +311,7 @@ class Classificacao extends SyncModel
     /**
      * Update Classificação with instance values into database for ID
      * @param  array $only Save these fields only, when empty save all fields except id
-     * @return Classificacao Self instance
+     * @return int rows affected
      */
     public function update($only = [])
     {
@@ -262,15 +321,15 @@ class Classificacao extends SyncModel
         }
         $values = DB::filterValues($values, $only, false);
         try {
-            DB::update('Classificacoes')
+            $affected = DB::update('Classificacoes')
                 ->set($values)
-                ->where('id', $this->getID())
+                ->where(['id' => $this->getID()])
                 ->execute();
-            $this->loadByID($this->getID());
+            $this->loadByID();
         } catch (\Exception $e) {
             throw $this->translate($e);
         }
-        return $this;
+        return $affected;
     }
 
     /**
@@ -292,7 +351,7 @@ class Classificacao extends SyncModel
      * Load one register for it self with a condition
      * @param  array $condition Condition for searching the row
      * @param  array $order associative field name -> [-1, 1]
-     * @return Classificacao Self instance filled or empty
+     * @return self Self instance filled or empty
      */
     public function load($condition, $order = [])
     {
@@ -303,13 +362,12 @@ class Classificacao extends SyncModel
 
     /**
      * Load into this object from database using, Descricao
-     * @param  string $descricao descrição to find Classificação
-     * @return Classificacao Self filled instance or empty when not found
+     * @return self Self filled instance or empty when not found
      */
-    public function loadByDescricao($descricao)
+    public function loadByDescricao()
     {
         return $this->load([
-            'descricao' => strval($descricao),
+            'descricao' => strval($this->getDescricao()),
         ]);
     }
 
@@ -332,7 +390,7 @@ class Classificacao extends SyncModel
      */
     private static function getAllowedKeys()
     {
-        $classificacao = new Classificacao();
+        $classificacao = new self();
         $allowed = Filter::concatKeys('c.', $classificacao->toArray());
         return $allowed;
     }
@@ -386,24 +444,25 @@ class Classificacao extends SyncModel
      * Search one register with a condition
      * @param  array $condition Condition for searching the row
      * @param  array $order order rows
-     * @return Classificacao A filled Classificação or empty instance
+     * @return self A filled Classificação or empty instance
      */
     public static function find($condition, $order = [])
     {
         $query = self::query($condition, $order)->limit(1);
         $row = $query->fetch() ?: [];
-        return new Classificacao($row);
+        return new self($row);
     }
 
     /**
      * Find this object on database using, Descricao
      * @param  string $descricao descrição to find Classificação
-     * @return Classificacao A filled instance or empty when not found
+     * @return self A filled instance or empty when not found
      */
     public static function findByDescricao($descricao)
     {
         $result = new self();
-        return $result->loadByDescricao($descricao);
+        $result->setDescricao($descricao);
+        return $result->loadByDescricao();
     }
 
     /**
@@ -412,7 +471,7 @@ class Classificacao extends SyncModel
      * @param  array  $order     Order Classificação
      * @param  int    $limit     Limit data into row count
      * @param  int    $offset    Start offset to get rows
-     * @return array             List of all rows instanced as Classificacao
+     * @return self[]             List of all rows instanced as Classificacao
      */
     public static function findAll($condition = [], $order = [], $limit = null, $offset = null)
     {
@@ -426,7 +485,7 @@ class Classificacao extends SyncModel
         $rows = $query->fetchAll();
         $result = [];
         foreach ($rows as $row) {
-            $result[] = new Classificacao($row);
+            $result[] = new self($row);
         }
         return $result;
     }

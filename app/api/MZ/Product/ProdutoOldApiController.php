@@ -83,18 +83,15 @@ class ProdutoOldApiController extends \MZ\Core\ApiController
             'conteudo',
             'divisivel',
             'dataatualizacao',
-            // extras
-            'estrelas',
-            'estoque',
             'imagemurl',
+            'avaliacao',
+            // extras
+            'estoque',
             'categoria',
             'unidade',
         ];
         $items = [];
         foreach ($produtos as $item) {
-            // TODO implementar estrelas de mais vendido
-            $item['estrelas'] = 3;
-            $item['imagemurl'] = get_image_url($item['imagem'], 'produto', null);
             $items[] = array_intersect_key($item, array_flip($campos));
         }
         return $this->json()->success(['produtos' => $items]);

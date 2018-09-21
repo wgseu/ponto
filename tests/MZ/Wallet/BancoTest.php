@@ -139,15 +139,9 @@ class BancoTest extends \MZ\Framework\TestCase
         $this->assertEquals($banco, $found_banco);
         $found_banco = Banco::findByID($banco->getID());
         $this->assertEquals($banco, $found_banco);
-        $found_banco->loadByID($banco->getID());
-        $this->assertEquals($banco, $found_banco);
         $found_banco = Banco::findByRazaoSocial($banco->getRazaoSocial());
         $this->assertEquals($banco, $found_banco);
-        $found_banco->loadByRazaoSocial($banco->getRazaoSocial());
-        $this->assertEquals($banco, $found_banco);
         $found_banco = Banco::findByNumero($banco->getNumero());
-        $this->assertEquals($banco, $found_banco);
-        $found_banco->loadByNumero($banco->getNumero());
         $this->assertEquals($banco, $found_banco);
 
         $banco_sec = new Banco();

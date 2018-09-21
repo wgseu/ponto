@@ -33,13 +33,29 @@ class Authentication
     private $permissions;
 
     /**
-     * Constructor for a new empty instance of Authentication
+     * @var \MZ\Core\Application
      */
-    public function __construct()
+    private $application;
+
+    /**
+     * Constructor for a new empty instance of Authentication
+     * @param \MZ\Core\Application $application Main application
+     */
+    public function __construct($application)
     {
+        $this->application = $application;
         $this->user = new Cliente();
         $this->employee = new \MZ\Provider\Prestador();
         $this->permissions = [];
+    }
+
+    /**
+     * Get the application object
+     * @return Application application object
+     */
+    public function getApplication()
+    {
+        return $this->application;
     }
 
     /**
@@ -74,7 +90,7 @@ class Authentication
      */
     public function initialize()
     {
-        $this->getUser()->setID(\Session::Get('cliente_id'));
+        $this->getUser()->setID($this->getApplication()->getSession()->get('cliente_id'));
         return $this;
     }
 
@@ -83,7 +99,7 @@ class Authentication
      */
     public function load()
     {
-        $this->getUser()->loadByID($this->getUser()->getID());
+        $this->getUser()->loadByID();
         if (!$this->getUser()->exists()) {
             $this->findAuthorization();
             if ($this->getUser()->exists()) {
@@ -105,12 +121,12 @@ class Authentication
     public function login($cliente)
     {
         $this->user = $cliente;
-        \Session::Set('cliente_id', $this->getUser()->getID());
+        $this->getApplication()->getSession()->set('cliente_id', $this->getUser()->getID());
         $this->refresh();
         return $this;
     }
 
-    public function getAuthorization()
+    public function makeToken()
     {
         $data = [
             'iat' => time(),
@@ -123,14 +139,14 @@ class Authentication
 
     public function logout()
     {
-        \Session::Get('cliente_id', true);
+        $this->getApplication()->getSession()->remove('cliente_id');
         $this->getUser()->fromArray([]);
         $this->getEmployee()->fromArray([]);
         $this->permissions = [];
         return $this;
     }
 
-    public function updateAuthorization()
+    public function updateToken()
     {
         $token = $this->getBearerToken();
         if ($token) {
@@ -142,7 +158,7 @@ class Authentication
                     throw new \Exception('Refresh the token before expires', 301);
                 }
             } catch (\Exception $e) {
-                $token = $this->getAuthorization();
+                $token = $this->makeToken();
             }
         }
         return $token;
@@ -155,7 +171,8 @@ class Authentication
             $key = getenv('JWT_KEY');
             try {
                 $decoded = JWT::decode($token, $key, ['HS256']);
-                $this->getUser()->loadByID($decoded->id);
+                $this->getUser()->setID($decoded->id);
+                $this->getUser()->loadByID();
             } catch (\Exception $e) {
                 $this->getUser()->fromArray([]);
             }

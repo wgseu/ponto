@@ -74,7 +74,7 @@ class FornecedorPageController extends \MZ\Core\Controller
         if (is_post()) {
             $fornecedor = new Fornecedor($_POST);
             try {
-                $fornecedor->filter($old_fornecedor);
+                $fornecedor->filter($old_fornecedor, true);
                 $fornecedor->insert();
                 $old_fornecedor->clean($fornecedor);
                 $msg = sprintf(
@@ -128,7 +128,7 @@ class FornecedorPageController extends \MZ\Core\Controller
         if (is_post()) {
             $fornecedor = new Fornecedor($_POST);
             try {
-                $fornecedor->filter($old_fornecedor);
+                $fornecedor->filter($old_fornecedor, true);
                 $fornecedor->update();
                 $old_fornecedor->clean($fornecedor);
                 $msg = sprintf(

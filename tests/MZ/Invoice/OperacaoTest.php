@@ -134,11 +134,7 @@ class OperacaoTest extends \MZ\Framework\TestCase
         $this->assertEquals($operacao, $found_operacao);
         $found_operacao = Operacao::findByID($operacao->getID());
         $this->assertEquals($operacao, $found_operacao);
-        $found_operacao->loadByID($operacao->getID());
-        $this->assertEquals($operacao, $found_operacao);
         $found_operacao = Operacao::findByCodigo($operacao->getCodigo());
-        $this->assertEquals($operacao, $found_operacao);
-        $found_operacao->loadByCodigo($operacao->getCodigo());
         $this->assertEquals($operacao, $found_operacao);
 
         $operacao_sec = new Operacao();

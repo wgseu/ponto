@@ -28,6 +28,7 @@ use MZ\Database\SyncModel;
 use MZ\Database\DB;
 use MZ\Util\Filter;
 use MZ\Util\Validator;
+use MZ\Exception\ValidationException;
 use MZ\Sale\Pedido;
 use MZ\Sale\Juncao;
 
@@ -41,6 +42,14 @@ class Mesa extends SyncModel
      * Número da mesa
      */
     private $id;
+    /**
+     * Setor em que a mesa está localizada
+     */
+    private $setor_id;
+    /**
+     * Número da mesa
+     */
+    private $numero;
     /**
      * Nome da mesa
      */
@@ -71,11 +80,51 @@ class Mesa extends SyncModel
     /**
      * Set ID value to new on param
      * @param  mixed $id new value for ID
-     * @return Mesa Self instance
+     * @return self Self instance
      */
     public function setID($id)
     {
         $this->id = $id;
+        return $this;
+    }
+
+    /**
+     * Setor em que a mesa está localizada
+     * @return mixed Setor of Mesa
+     */
+    public function getSetorID()
+    {
+        return $this->setor_id;
+    }
+
+    /**
+     * Set SetorID value to new on param
+     * @param  mixed $setor_id new value for SetorID
+     * @return self Self instance
+     */
+    public function setSetorID($setor_id)
+    {
+        $this->setor_id = $setor_id;
+        return $this;
+    }
+
+    /**
+     * Número da mesa
+     * @return mixed Número of Mesa
+     */
+    public function getNumero()
+    {
+        return $this->numero;
+    }
+
+    /**
+     * Set Numero value to new on param
+     * @param  mixed $numero new value for Numero
+     * @return self Self instance
+     */
+    public function setNumero($numero)
+    {
+        $this->numero = $numero;
         return $this;
     }
 
@@ -91,7 +140,7 @@ class Mesa extends SyncModel
     /**
      * Set Nome value to new on param
      * @param  mixed $nome new value for Nome
-     * @return Mesa Self instance
+     * @return self Self instance
      */
     public function setNome($nome)
     {
@@ -120,7 +169,7 @@ class Mesa extends SyncModel
     /**
      * Set Ativa value to new on param
      * @param  mixed $ativa new value for Ativa
-     * @return Mesa Self instance
+     * @return self Self instance
      */
     public function setAtiva($ativa)
     {
@@ -137,6 +186,8 @@ class Mesa extends SyncModel
     {
         $mesa = parent::toArray($recursive);
         $mesa['id'] = $this->getID();
+        $mesa['setorid'] = $this->getSetorID();
+        $mesa['numero'] = $this->getNumero();
         $mesa['nome'] = $this->getNome();
         $mesa['ativa'] = $this->getAtiva();
         return $mesa;
@@ -145,11 +196,11 @@ class Mesa extends SyncModel
     /**
      * Fill this instance with from array values, you can pass instance to
      * @param  mixed $mesa Associated key -> value to assign into this instance
-     * @return Mesa Self instance
+     * @return self Self instance
      */
     public function fromArray($mesa = [])
     {
-        if ($mesa instanceof Mesa) {
+        if ($mesa instanceof self) {
             $mesa = $mesa->toArray();
         } elseif (!is_array($mesa)) {
             $mesa = [];
@@ -159,6 +210,16 @@ class Mesa extends SyncModel
             $this->setID(null);
         } else {
             $this->setID($mesa['id']);
+        }
+        if (!array_key_exists('setorid', $mesa)) {
+            $this->setSetorID(null);
+        } else {
+            $this->setSetorID($mesa['setorid']);
+        }
+        if (!isset($mesa['numero'])) {
+            $this->setNumero(null);
+        } else {
+            $this->setNumero($mesa['numero']);
         }
         if (!isset($mesa['nome'])) {
             $this->setNome(null);
@@ -185,17 +246,19 @@ class Mesa extends SyncModel
 
     /**
      * Filter fields, upload data and keep key data
-     * @param Mesa $original Original instance without modifications
+     * @param self $original Original instance without modifications
      */
     public function filter($original)
     {
-        $this->setID(Filter::number($this->getID()));
+        $this->setID($original->getID());
+        $this->setSetorID(Filter::number($this->getSetorID()));
+        $this->setNumero(Filter::number($this->getNumero()));
         $this->setNome(Filter::string($this->getNome()));
     }
 
     /**
      * Clean instance resources like images and docs
-     * @param  Mesa $dependency Don't clean when dependency use same resources
+     * @param  self $dependency Don't clean when dependency use same resources
      */
     public function clean($dependency)
     {
@@ -203,11 +266,14 @@ class Mesa extends SyncModel
 
     /**
      * Validate fields updating them and throw exception when invalid data has found
-     * @return array All field of Mesa in array format
+     * @return mixed[] All field of Mesa in array format
      */
     public function validate()
     {
         $errors = [];
+        if (is_null($this->getNumero())) {
+            $errors['numero'] = 'O número não pode ser vazio';
+        }
         if (is_null($this->getNome())) {
             $errors['nome'] = 'O nome não pode ser vazio';
         }
@@ -222,7 +288,7 @@ class Mesa extends SyncModel
             }
         }
         if (!empty($errors)) {
-            throw new \MZ\Exception\ValidationException($errors);
+            throw new ValidationException($errors);
         }
         return $this->toArray();
     }
@@ -234,19 +300,19 @@ class Mesa extends SyncModel
      */
     protected function translate($e)
     {
-        if (stripos($e->getMessage(), 'PRIMARY') !== false) {
-            return new \MZ\Exception\ValidationException([
-                'id' => sprintf(
-                    'O número "%s" já está cadastrado',
-                    $this->getID()
-                ),
-            ]);
-        }
         if (contains(['Nome', 'UNIQUE'], $e->getMessage())) {
-            return new \MZ\Exception\ValidationException([
+            return new ValidationException([
                 'nome' => sprintf(
                     'O nome "%s" já está cadastrado',
                     $this->getNome()
+                ),
+            ]);
+        }
+        if (contains(['Numero', 'UNIQUE'], $e->getMessage())) {
+            return new ValidationException([
+                'numero' => sprintf(
+                    'O número "%s" já está cadastrado',
+                    $this->getNumero()
                 ),
             ]);
         }
@@ -255,14 +321,17 @@ class Mesa extends SyncModel
 
     /**
      * Insert a new Mesa into the database and fill instance from database
-     * @return Mesa Self instance
+     * @return self Self instance
      */
     public function insert()
     {
+        $this->setID(null);
         $values = $this->validate();
+        unset($values['id']);
         try {
             $id = DB::insertInto('Mesas')->values($values)->execute();
-            $this->loadByID($id);
+            $this->setID($id);
+            $this->loadByID();
         } catch (\Exception $e) {
             throw $this->translate($e);
         }
@@ -271,7 +340,8 @@ class Mesa extends SyncModel
 
     /**
      * Update Mesa with instance values into database for Número
-     * @return Mesa Self instance
+     * @param  array $only Save these fields only, when empty save all fields except id
+     * @return int rows affected
      */
     public function update($only = [])
     {
@@ -281,15 +351,15 @@ class Mesa extends SyncModel
         }
         $values = DB::filterValues($values, $only, false);
         try {
-            DB::update('Mesas')
+            $affected = DB::update('Mesas')
                 ->set($values)
-                ->where('id', $this->getID())
+                ->where(['id' => $this->getID()])
                 ->execute();
-            $this->loadByID($this->getID());
+            $this->loadByID();
         } catch (\Exception $e) {
             throw $this->translate($e);
         }
-        return $this;
+        return $affected;
     }
 
     /**
@@ -311,7 +381,7 @@ class Mesa extends SyncModel
      * Load one register for it self with a condition
      * @param  array $condition Condition for searching the row
      * @param  array $order associative field name -> [-1, 1]
-     * @return Mesa Self instance filled or empty
+     * @return self Self instance filled or empty
      */
     public function load($condition, $order = [])
     {
@@ -322,26 +392,46 @@ class Mesa extends SyncModel
 
     /**
      * Load into this object from database using, Nome
-     * @param  string $nome nome to find Mesa
-     * @return Mesa Self filled instance or empty when not found
+     * @return self Self filled instance or empty when not found
      */
-    public function loadByNome($nome)
+    public function loadByNome()
     {
         return $this->load([
-            'nome' => strval($nome),
+            'nome' => strval($this->getNome()),
         ]);
     }
 
     /**
-     * Load next available id from database into this object id field
-     * @return Mesa Self id filled instance with next id
+     * Load into this object from database using, Numero
+     * @return self Self filled instance or empty when not found
      */
-    public function loadNextID()
+    public function loadByNumero()
     {
-        $query = self::query()
-            ->select(null)
-            ->select('MAX(id) as id');
-        return $this->setID($query->fetchColumn() + 1);
+        return $this->load([
+            'numero' => intval($this->getNumero()),
+        ]);
+    }
+
+    /**
+     * Load next available number from database into this object numero field
+     * @return Mesa Self id filled instance with next numero
+     */
+    public function loadNextNumero()
+    {
+        $last = self::find([], ['numero' => -1]);
+        return $this->setNumero($last->getNumero() + 1);
+    }
+
+    /**
+     * Setor em que a mesa está localizada
+     * @return \MZ\Environment\Setor The object fetched from database
+     */
+    public function findSetorID()
+    {
+        if (is_null($this->getSetorID())) {
+            return new \MZ\Environment\Setor();
+        }
+        return \MZ\Environment\Setor::findByID($this->getSetorID());
     }
 
     /**
@@ -350,7 +440,7 @@ class Mesa extends SyncModel
      */
     private static function getAllowedKeys()
     {
-        $mesa = new Mesa();
+        $mesa = new self();
         $allowed = Filter::concatKeys('m.', $mesa->toArray());
         return $allowed;
     }
@@ -416,12 +506,12 @@ class Mesa extends SyncModel
                 ->groupBy('m.id');
             if (isset($order['funcionario'])) {
                 $funcionario_id = intval($order['funcionario']);
-                $query = $query->orderBy('IF(p.funcionarioid = ?, 1, 0) DESC', $funcionario_id);
+                $query = $query->orderBy('IF(p.prestadorid = ?, 1, 0) DESC', $funcionario_id);
             }
         }
         $condition = self::filterCondition($condition);
         $query = DB::buildOrderBy($query, self::filterOrder($order));
-        $query = $query->orderBy('m.id ASC');
+        $query = $query->orderBy('m.numero ASC');
         return DB::buildCondition($query, $condition);
     }
 
@@ -429,24 +519,37 @@ class Mesa extends SyncModel
      * Search one register with a condition
      * @param  array $condition Condition for searching the row
      * @param  array $order order rows
-     * @return Mesa A filled Mesa or empty instance
+     * @return self A filled Mesa or empty instance
      */
     public static function find($condition, $order = [])
     {
         $query = self::query($condition, $order)->limit(1);
         $row = $query->fetch() ?: [];
-        return new Mesa($row);
+        return new self($row);
     }
 
     /**
      * Find this object on database using, Nome
      * @param  string $nome nome to find Mesa
-     * @return Mesa A filled instance or empty when not found
+     * @return self A filled instance or empty when not found
      */
     public static function findByNome($nome)
     {
         $result = new self();
-        return $result->loadByNome($nome);
+        $result->setNome($nome);
+        return $result->loadByNome();
+    }
+
+    /**
+     * Find this object on database using, Numero
+     * @param  int $numero número to find Mesa
+     * @return self A filled instance or empty when not found
+     */
+    public static function findByNumero($numero)
+    {
+        $result = new self();
+        $result->setNumero($numero);
+        return $result->loadByNumero();
     }
 
     /**
@@ -455,7 +558,7 @@ class Mesa extends SyncModel
      * @param  array  $order     Order Mesa
      * @param  int    $limit     Limit data into row count
      * @param  int    $offset    Start offset to get rows
-     * @return array             List of all rows instanced as Mesa
+     * @return self[]             List of all rows instanced as Mesa
      */
     public static function findAll($condition = [], $order = [], $limit = null, $offset = null)
     {
@@ -469,7 +572,7 @@ class Mesa extends SyncModel
         $rows = $query->fetchAll();
         $result = [];
         foreach ($rows as $row) {
-            $result[] = new Mesa($row);
+            $result[] = new self($row);
         }
         return $result;
     }

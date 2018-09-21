@@ -72,7 +72,7 @@ class SetorPageController extends \MZ\Core\Controller
         if (is_post()) {
             $setor = new Setor($_POST);
             try {
-                $setor->filter($old_setor);
+                $setor->filter($old_setor, true);
                 $setor->insert();
                 $old_setor->clean($setor);
                 $msg = sprintf(
@@ -124,7 +124,7 @@ class SetorPageController extends \MZ\Core\Controller
             $setor = new Setor($_POST);
             try {
                 $setor->setID($old_setor->getID());
-                $setor->filter($old_setor);
+                $setor->filter($old_setor, true);
                 $setor->update();
                 $old_setor->clean($setor);
                 $msg = sprintf(

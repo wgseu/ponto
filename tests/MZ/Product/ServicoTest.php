@@ -24,202 +24,87 @@
  */
 namespace MZ\Product;
 
-use \MZ\Database\DB;
+use MZ\Database\DB;
+use MZ\System\Permissao;
+use MZ\Account\AuthenticationTest;
 
 class ServicoTest extends \MZ\Framework\TestCase
 {
-    public function testFromArray()
+    public static function build($descricao = null)
     {
-        $old_servico = new Servico([
-            'id' => 123,
-            'nome' => 'Serviço',
-            'descricao' => 'Serviço',
-            'detalhes' => 'Serviço',
-            'tipo' => Servico::TIPO_EVENTO,
-            'obrigatorio' => 'Y',
-            'datainicio' => '2016-12-25 12:15:00',
-            'datafim' => '2016-12-25 12:15:00',
-            'valor' => 12.3,
-            'individual' => 'Y',
-            'ativo' => 'Y',
-        ]);
+        $last = Servico::find([], ['id' => -1]);
+        $id = $last->getID() + 1;
         $servico = new Servico();
-        $servico->fromArray($old_servico);
-        $this->assertEquals($servico, $old_servico);
-        $servico->fromArray(null);
-        $this->assertEquals($servico, new Servico());
-    }
-
-    public function testFilter()
-    {
-        $old_servico = new Servico([
-            'id' => 1234,
-            'nome' => 'Serviço filter',
-            'descricao' => 'Serviço filter',
-            'detalhes' => 'Serviço filter',
-            'tipo' => Servico::TIPO_TAXA,
-            'obrigatorio' => 'Y',
-            'datainicio' => '2016-12-23 12:15:00',
-            'datafim' => '2016-12-23 12:15:00',
-            'valor' => 12.3,
-            'individual' => 'Y',
-            'ativo' => 'Y',
-        ]);
-        $servico = new Servico([
-            'id' => 321,
-            'nome' => ' Serviço <script>filter</script> ',
-            'descricao' => ' Serviço <script>filter</script> ',
-            'detalhes' => ' Serviço <script>filter</script> ',
-            'tipo' => Servico::TIPO_TAXA,
-            'obrigatorio' => 'Y',
-            'datainicio' => '23/12/2016 12:15',
-            'datafim' => '23/12/2016 12:15',
-            'valor' => '12,3',
-            'individual' => 'Y',
-            'ativo' => 'Y',
-        ]);
-        $servico->filter($old_servico);
-        $this->assertEquals($old_servico, $servico);
-    }
-
-    public function testPublish()
-    {
-        $servico = new Servico();
-        $values = $servico->publish();
-        $allowed = [
-            'id',
-            'nome',
-            'descricao',
-            'detalhes',
-            'tipo',
-            'obrigatorio',
-            'datainicio',
-            'datafim',
-            'valor',
-            'individual',
-            'ativo',
-        ];
-        $this->assertEquals($allowed, array_keys($values));
-    }
-
-    public function testInsert()
-    {
-        $servico = new Servico();
-        $servico->setObrigatorio(null);
-        $servico->setIndividual(null);
-        $servico->setAtivo(null);
-        try {
-            $servico->insert();
-            $this->fail('Não deveria ter cadastrado o serviço');
-        } catch (\MZ\Exception\ValidationException $e) {
-            $this->assertEquals(
-                [
-                    'nome',
-                    'descricao',
-                    'tipo',
-                    'obrigatorio',
-                    'valor',
-                    'individual',
-                    'ativo',
-                ],
-                array_keys($e->getErrors())
-            );
-        }
-        $servico->setNome('Serviço to insert');
-        $servico->setDescricao('Serviço to insert');
-        $servico->setTipo(Servico::TIPO_EVENTO);
-        $servico->setObrigatorio('Y');
-        $servico->setValor(12.3);
-        $servico->setIndividual('Y');
-        $servico->setAtivo('Y');
-        $servico->setDataInicio(DB::now());
-        $servico->setDataFim(DB::now('+1 day'));
-        $servico->insert();
-    }
-
-    public function testUpdate()
-    {
-        $servico = new Servico();
-        $servico->setNome('Serviço to update');
-        $servico->setDescricao('Serviço to update');
+        $servico->setNome($descricao ?: "Serviço #{$id}");
+        $servico->setDescricao($descricao ?: "Descrição do serviço #{$id}");
         $servico->setTipo(Servico::TIPO_TAXA);
         $servico->setObrigatorio('N');
         $servico->setValor(12.3);
-        $servico->setIndividual('N');
-        $servico->setAtivo('N');
-        $servico->insert();
-        $servico->setNome('Serviço updated');
-        $servico->setDescricao('Serviço updated');
-        $servico->setDetalhes('Serviço updated');
-        $servico->setTipo(Servico::TIPO_EVENTO);
-        $servico->setObrigatorio('N');
-        $servico->setDataInicio('2016-12-25 14:15:00');
-        $servico->setDataFim('2016-12-25 14:15:00');
-        $servico->setValor(21.4);
-        $servico->setIndividual('N');
-        $servico->setAtivo('N');
-        $servico->update();
-        $found_servico = Servico::findByID($servico->getID());
-        $this->assertEquals($servico, $found_servico);
-        $servico->setID('');
-        $this->expectException('\Exception');
-        $servico->update();
-    }
-
-    public function testDelete()
-    {
-        $servico = new Servico();
-        $servico->setNome('Serviço to delete');
-        $servico->setDescricao('Serviço to delete');
-        $servico->setTipo(Servico::TIPO_TAXA);
-        $servico->setObrigatorio('Y');
-        $servico->setValor(12.3);
         $servico->setIndividual('Y');
         $servico->setAtivo('Y');
+        return $servico;
+    }
+
+    public static function create($descricao = null)
+    {
+        $servico = self::build($descricao);
         $servico->insert();
-        $servico->delete();
-        $servico->clean(new Servico());
-        $found_servico = Servico::findByID($servico->getID());
-        $this->assertEquals(new Servico(), $found_servico);
-        $servico->setID('');
-        $this->expectException('\Exception');
-        $servico->delete();
+        return $servico;
     }
 
     public function testFind()
     {
-        $servico = new Servico();
-        $servico->setNome('Serviço find');
-        $servico->setDescricao('Serviço find');
-        $servico->setTipo(Servico::TIPO_EVENTO);
-        $servico->setDataInicio(DB::now());
-        $servico->setDataFim(DB::now('+1 day'));
-        $servico->setObrigatorio('Y');
-        $servico->setValor(12.3);
-        $servico->setIndividual('Y');
-        $servico->setAtivo('Y');
-        $servico->insert();
-        $found_servico = Servico::find(['id' => $servico->getID()]);
-        $this->assertEquals($servico, $found_servico);
-        $found_servico = Servico::findByID($servico->getID());
-        $this->assertEquals($servico, $found_servico);
-        $found_servico->loadByID($servico->getID());
-        $this->assertEquals($servico, $found_servico);
+        $servico = self::create('Serviço find');
+        $servico_sec = self::create('Serviço find second');
+        AuthenticationTest::authProvider([Permissao::NOME_CADASTROSERVICOS]);
+        $expected = [
+            'status' => 'ok',
+            'items' => [
+                $servico->publish(),
+                $servico_sec->publish()
+            ],
+            'pages' => 1
+        ];
+        $result = $this->get('/api/servicos', ['search' => $servico->getNome()]);
+        $this->assertEquals($expected, $result);
+    }
 
-        $servico_sec = new Servico();
-        $servico_sec->setNome('Serviço find second');
-        $servico_sec->setDescricao('Serviço find second');
-        $servico_sec->setTipo(Servico::TIPO_TAXA);
-        $servico_sec->setObrigatorio('Y');
-        $servico_sec->setValor(12.3);
-        $servico_sec->setIndividual('Y');
-        $servico_sec->setAtivo('Y');
-        $servico_sec->insert();
+    public function testAdd()
+    {
+        $servico = self::build();
+        AuthenticationTest::authProvider([Permissao::NOME_CADASTROSERVICOS]);
+        $expected = [
+            'status' => 'ok',
+            'item' => $servico->publish(),
+        ];
+        $result = $this->post('/api/servicos', $servico->toArray());
+        $expected['item']['id'] = $result['item']['id'];
+        $this->assertEquals($expected, \array_intersect_key($result, $expected));
+    }
 
-        $servicos = Servico::findAll(['search' => 'Serviço find'], [], 2, 0);
-        $this->assertEquals([$servico, $servico_sec], $servicos);
+    public function testUpdate()
+    {
+        $servico = self::create();
+        AuthenticationTest::authProvider([Permissao::NOME_CADASTROSERVICOS]);
+        $id = $servico->getID();
+        $result = $this->put('/api/servicos/' . $id, $servico->toArray());
+        $servico->loadByID();
+        $expected = [
+            'status' => 'ok',
+            'item' => $servico->publish(),
+        ];
+        $this->assertEquals($expected, \array_intersect_key($result, $expected));
+    }
 
-        $count = Servico::count(['search' => 'Serviço find']);
-        $this->assertEquals(2, $count);
+    public function testDelete()
+    {
+        $servico = self::create();
+        AuthenticationTest::authProvider([Permissao::NOME_CADASTROSERVICOS]);
+        $id = $servico->getID();
+        $result = $this->delete('/api/servicos/' . $id);
+        $servico->loadByID();
+        $expected = [ 'status' => 'ok', ];
+        $this->assertEquals($expected, \array_intersect_key($result, $expected));
+        $this->assertFalse($servico->exists());
     }
 }

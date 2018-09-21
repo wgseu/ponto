@@ -80,7 +80,7 @@ class FormaPagtoPageController extends \MZ\Core\Controller
         if (is_post()) {
             $forma_pagto = new FormaPagto($_POST);
             try {
-                $forma_pagto->filter($old_forma_pagto);
+                $forma_pagto->filter($old_forma_pagto, true);
                 $forma_pagto->insert();
                 $old_forma_pagto->clean($forma_pagto);
                 $msg = sprintf(
@@ -134,7 +134,7 @@ class FormaPagtoPageController extends \MZ\Core\Controller
         if (is_post()) {
             $forma_pagto = new FormaPagto($_POST);
             try {
-                $forma_pagto->filter($old_forma_pagto);
+                $forma_pagto->filter($old_forma_pagto, true);
                 $forma_pagto->update();
                 $old_forma_pagto->clean($forma_pagto);
                 $msg = sprintf(

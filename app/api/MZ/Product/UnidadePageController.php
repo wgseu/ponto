@@ -72,7 +72,7 @@ class UnidadePageController extends \MZ\Core\Controller
         if (is_post()) {
             $unidade = new Unidade($_POST);
             try {
-                $unidade->filter($old_unidade);
+                $unidade->filter($old_unidade, true);
                 $unidade->insert();
                 $old_unidade->clean($unidade);
                 $msg = sprintf(
@@ -123,7 +123,7 @@ class UnidadePageController extends \MZ\Core\Controller
         if (is_post()) {
             $unidade = new Unidade($_POST);
             try {
-                $unidade->filter($old_unidade);
+                $unidade->filter($old_unidade, true);
                 $unidade->update();
                 $old_unidade->clean($unidade);
                 $msg = sprintf(

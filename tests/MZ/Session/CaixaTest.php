@@ -25,7 +25,7 @@
 namespace MZ\Session;
 
 use MZ\Account\Cliente;
-use \MZ\Database\DB;
+use MZ\Database\DB;
 
 class CaixaTest extends \MZ\Framework\TestCase
 {
@@ -107,11 +107,7 @@ class CaixaTest extends \MZ\Framework\TestCase
 
         $found_caixa = Caixa::findByID($caixa->getID());
         $this->assertEquals($caixa, $found_caixa);
-        $found_caixa->loadByID($caixa->getID());
-        $this->assertEquals($caixa, $found_caixa);
         $found_caixa = Caixa::findByDescricao('Caixa 4');
-        $this->assertEquals($caixa, $found_caixa);
-        $found_caixa->loadByDescricao('Caixa 4');
         $this->assertEquals($caixa, $found_caixa);
 
         $caixa_sec = new Caixa();

@@ -77,7 +77,7 @@ class MesaPageController extends \MZ\Core\Controller
         if (is_post()) {
             $mesa = new Mesa($_POST);
             try {
-                $mesa->filter($old_mesa);
+                $mesa->filter($old_mesa, true);
                 $mesa->insert();
                 $old_mesa->clean($mesa);
                 $msg = sprintf(
@@ -106,8 +106,8 @@ class MesaPageController extends \MZ\Core\Controller
         } elseif (is_output('json')) {
             return $this->json()->error('Nenhum dado foi enviado');
         } else {
-            $mesa->loadNextID();
-            $mesa->setNome('Mesa ' . $mesa->getID());
+            $mesa->loadNextNumero();
+            $mesa->setNome('Mesa ' . $mesa->getNumero());
             $mesa->setAtiva('Y');
         }
         return $this->view('gerenciar_mesa_cadastrar', get_defined_vars());
@@ -132,7 +132,7 @@ class MesaPageController extends \MZ\Core\Controller
         if (is_post()) {
             $mesa = new Mesa($_POST);
             try {
-                $mesa->filter($old_mesa);
+                $mesa->filter($old_mesa, true);
                 $mesa->update();
                 $old_mesa->clean($mesa);
                 $msg = sprintf(

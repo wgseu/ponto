@@ -492,7 +492,8 @@ class Cartao extends SyncModel
         unset($values['id']);
         try {
             $id = DB::insertInto('Cartoes')->values($values)->execute();
-            $this->loadByID($id);
+            $this->setID($id);
+            $this->loadByID();
         } catch (\Exception $e) {
             throw $this->translate($e);
         }
@@ -516,7 +517,7 @@ class Cartao extends SyncModel
                 ->set($values)
                 ->where('id', $this->getID())
                 ->execute();
-            $this->loadByID($this->getID());
+            $this->loadByID();
         } catch (\Exception $e) {
             throw $this->translate($e);
         }

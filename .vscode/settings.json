@@ -1,4 +1,6 @@
 {
     "better-phpunit.phpunitBinary": "${workspaceFolder}/vendor/bin/phpunit",
-    "phpcs.executablePath": "vendor/bin/phpcs"
+    "better-phpunit.commandSuffix": "--no-coverage",
+    "phpcs.executablePath": "vendor/bin/phpcs",
+    "phpcs.enable": false
 }

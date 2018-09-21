@@ -76,7 +76,7 @@ class CidadePageController extends \MZ\Core\Controller
         if (is_post()) {
             $cidade = new Cidade($_POST);
             try {
-                $cidade->filter($old_cidade);
+                $cidade->filter($old_cidade, true);
                 $cidade->save();
                 $old_cidade->clean($cidade);
                 $msg = sprintf(
@@ -140,7 +140,7 @@ class CidadePageController extends \MZ\Core\Controller
         if (is_post()) {
             $cidade = new Cidade($_POST);
             try {
-                $cidade->filter($old_cidade);
+                $cidade->filter($old_cidade, true);
                 $cidade->save();
                 $old_cidade->clean($cidade);
                 $msg = sprintf(

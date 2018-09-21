@@ -328,7 +328,7 @@ class Empresa extends SyncModel
                 ->set($values)
                 ->where(['id' => $this->getID()])
                 ->execute();
-            $this->loadByID($this->getID());
+            $this->loadByID();
         } catch (\Exception $e) {
             throw $this->translate($e);
         }
@@ -365,7 +365,8 @@ class Empresa extends SyncModel
 
     public function loadAll()
     {
-        $this->loadByID('1');
+        $this->setID('1');
+        $this->loadByID();
         $values = parse_ini_string(base64_decode($this->getOpcoes()), true, INI_SCANNER_RAW);
         settype($values, 'array');
         $this->getOptions()->addValues($values);

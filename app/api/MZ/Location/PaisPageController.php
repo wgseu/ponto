@@ -74,7 +74,7 @@ class PaisPageController extends \MZ\Core\Controller
         if (is_post()) {
             $pais = new Pais($_POST);
             try {
-                $pais->filter($old_pais);
+                $pais->filter($old_pais, true);
                 $pais->save();
                 $old_pais->clean($pais);
                 $msg = sprintf(
@@ -127,7 +127,7 @@ class PaisPageController extends \MZ\Core\Controller
         if (is_post()) {
             $pais = new Pais($_POST);
             try {
-                $pais->filter($old_pais);
+                $pais->filter($old_pais, true);
                 $pais->save();
                 $old_pais->clean($pais);
                 $msg = sprintf(

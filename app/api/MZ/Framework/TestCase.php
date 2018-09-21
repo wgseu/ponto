@@ -24,9 +24,130 @@
  */
 namespace MZ\Framework;
 
+use Symfony\Component\HttpFoundation\Request;
+
 /**
  * Frontend testing helper
  */
 class TestCase extends \PHPUnit\Framework\TestCase
 {
+    /**
+     * Global Application
+     * @return \MZ\Core\Application
+     */
+    public function getApplication()
+    {
+        return self::getApp();
+    }
+
+    /**
+     * Global Application
+     * @return \MZ\Core\Application
+     */
+    public static function getApp()
+    {
+        global $app;
+        return $app;
+    }
+
+    /**
+     * Execute http GET request and return json decoded as array
+     * @param string $url url to fetch data
+     * @param mixed[] $query url query params
+     * @return mixed[] response data
+     */
+    public function get($url, $query = [])
+    {
+        $request = Request::create($url, 'GET', $query);
+        $result = \json_decode($this->getApplication()->dispatch($request)->getContent(), true);
+        return $result;
+    }
+
+    /**
+     * Execute http POST request and return json decoded as array
+     * @param string $url url to post data
+     * @param mixed[] $data data to submit
+     * @param boolean $form send as form url encoded
+     * @return mixed[] response data
+     */
+    public function post($url, $data, $form = false)
+    {
+        $content = $form ? null : \json_encode($data);
+        $server = $form ? [] : ['Content-Type' => 'application/json'];
+        $parameters = $form ? $data : [];
+        $request = Request::create(
+            $url,
+            'POST',
+            $parameters,
+            [],
+            [],
+            $server,
+            $content
+        );
+        $result = \json_decode($this->getApplication()->dispatch($request)->getContent(), true);
+        return $result;
+    }
+
+    /**
+     * Execute http PUT request and return json decoded as array
+     * @param string $url url to post data
+     * @param mixed[] $data data to submit
+     * @param boolean $form send as form url encoded
+     * @return mixed[] response data
+     */
+    public function put($url, $data = [], $form = false)
+    {
+        $content = $form ? null : \json_encode($data);
+        $server = $form ? [] : ['Content-Type' => 'application/json'];
+        $parameters = $form ? $data : [];
+        $request = Request::create(
+            $url,
+            'PUT',
+            $parameters,
+            [],
+            [],
+            $server,
+            $content
+        );
+        $result = \json_decode($this->getApplication()->dispatch($request)->getContent(), true);
+        return $result;
+    }
+
+    /**
+     * Execute http PATCH request and return json decoded as array
+     * @param string $url url to post data
+     * @param mixed[] $data data to submit
+     * @param boolean $form send as form url encoded
+     * @return mixed[] response data
+     */
+    public function patch($url, $data = [], $form = false)
+    {
+        $content = $form ? null : \json_encode($data);
+        $server = $form ? [] : ['Content-Type' => 'application/json'];
+        $parameters = $form ? $data : [];
+        $request = Request::create(
+            $url,
+            'PATCH',
+            $parameters,
+            [],
+            [],
+            $server,
+            $content
+        );
+        $result = \json_decode($this->getApplication()->dispatch($request)->getContent(), true);
+        return $result;
+    }
+
+    /**
+     * Execute http DELETE request and return json decoded as array
+     * @param string $url url to post data
+     * @param mixed[] $query url query params
+     * @return mixed[] response data
+     */
+    public function delete($url, $query = [])
+    {
+        $request = Request::create($url, 'DELETE', $query);
+        $result = \json_decode($this->getApplication()->dispatch($request)->getContent(), true);
+        return $result;
+    }
 }

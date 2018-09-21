@@ -124,11 +124,7 @@ class SetorTest extends \MZ\Framework\TestCase
         $this->assertEquals($setor, $found_setor);
         $found_setor = Setor::findByID($setor->getID());
         $this->assertEquals($setor, $found_setor);
-        $found_setor->loadByID($setor->getID());
-        $this->assertEquals($setor, $found_setor);
         $found_setor = Setor::findByNome($setor->getNome());
-        $this->assertEquals($setor, $found_setor);
-        $found_setor->loadByNome($setor->getNome());
         $this->assertEquals($setor, $found_setor);
 
         $setor_sec = new Setor();

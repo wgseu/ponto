@@ -41,8 +41,6 @@ class CategoriaOldApiController extends \MZ\Core\ApiController
         $items = [];
         foreach ($categorias as $categoria) {
             $item = $categoria->publish();
-            $item['imagemurl'] = is_null($categoria->getImagem()) ? null: $item['imagem'];
-            unset($item['imagem']);
             if ($todas) {
                 $item['disponivel'] = $categoria->isAvailable();
             }

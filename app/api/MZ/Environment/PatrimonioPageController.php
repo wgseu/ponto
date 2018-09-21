@@ -77,7 +77,7 @@ class PatrimonioPageController extends \MZ\Core\Controller
         if (is_post()) {
             $patrimonio = new Patrimonio($_POST);
             try {
-                $patrimonio->filter($old_patrimonio);
+                $patrimonio->filter($old_patrimonio, true);
                 $patrimonio->insert();
                 $old_patrimonio->clean($patrimonio);
                 $msg = sprintf(
@@ -135,7 +135,7 @@ class PatrimonioPageController extends \MZ\Core\Controller
         if (is_post()) {
             $patrimonio = new Patrimonio($_POST);
             try {
-                $patrimonio->filter($old_patrimonio);
+                $patrimonio->filter($old_patrimonio, true);
                 $patrimonio->update();
                 $old_patrimonio->clean($patrimonio);
                 $msg = sprintf(

@@ -78,7 +78,7 @@ class BairroPageController extends \MZ\Core\Controller
         if (is_post()) {
             $bairro = new Bairro($_POST);
             try {
-                $bairro->filter($old_bairro);
+                $bairro->filter($old_bairro, true);
                 $bairro->save();
                 $old_bairro->clean($bairro);
                 $msg = sprintf(
@@ -146,7 +146,7 @@ class BairroPageController extends \MZ\Core\Controller
         if (is_post()) {
             $bairro = new Bairro($_POST);
             try {
-                $bairro->filter($old_bairro);
+                $bairro->filter($old_bairro, true);
                 $bairro->save();
                 $old_bairro->clean($bairro);
                 $msg = sprintf(

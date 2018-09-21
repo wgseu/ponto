@@ -69,7 +69,7 @@ class BancoPageController extends \MZ\Core\Controller
         if (is_post()) {
             $banco = new Banco($_POST);
             try {
-                $banco->filter($old_banco);
+                $banco->filter($old_banco, true);
                 $banco->insert();
                 $msg = sprintf(
                     'Banco "%s" cadastrado com sucesso!',
@@ -119,7 +119,7 @@ class BancoPageController extends \MZ\Core\Controller
         if (is_post()) {
             $banco = new Banco($_POST);
             try {
-                $banco->filter($old_banco);
+                $banco->filter($old_banco, true);
                 $banco->update();
                 $msg = sprintf(
                     'Banco "%s" atualizado com sucesso!',

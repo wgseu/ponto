@@ -76,7 +76,7 @@ class LocalizacaoPageController extends \MZ\Core\Controller
                     throw new \Exception('Você não tem permissão para atribuir um endereço a essa empresa!');
                 }
                 $old_localizacao->setClienteID($localizacao->getClienteID());
-                $localizacao->filter($old_localizacao);
+                $localizacao->filter($old_localizacao, true);
                 $estado_id = isset($_POST['estadoid']) ? $_POST['estadoid'] : null;
                 $estado = \MZ\Location\Estado::findByID($estado_id);
                 if (!$estado->exists()) {
@@ -132,7 +132,7 @@ class LocalizacaoPageController extends \MZ\Core\Controller
             $localizacao = new Localizacao($_POST);
             try {
                 DB::beginTransaction();
-                $localizacao->filter($old_localizacao);
+                $localizacao->filter($old_localizacao, true);
                 $estado_id = isset($_POST['estadoid']) ? $_POST['estadoid'] : null;
                 $estado = Estado::findByID($estado_id);
                 if (!$estado->exists()) {

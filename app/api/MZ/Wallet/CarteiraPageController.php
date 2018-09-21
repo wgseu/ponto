@@ -75,7 +75,7 @@ class CarteiraPageController extends \MZ\Core\Controller
         if (is_post()) {
             $carteira = new Carteira($_POST);
             try {
-                $carteira->filter($old_carteira);
+                $carteira->filter($old_carteira, true);
                 $carteira->insert();
                 $old_carteira->clean($carteira);
                 $msg = sprintf(
@@ -129,7 +129,7 @@ class CarteiraPageController extends \MZ\Core\Controller
         if (is_post()) {
             $carteira = new Carteira($_POST);
             try {
-                $carteira->filter($old_carteira);
+                $carteira->filter($old_carteira, true);
                 $carteira->update();
                 $old_carteira->clean($carteira);
                 $msg = sprintf(

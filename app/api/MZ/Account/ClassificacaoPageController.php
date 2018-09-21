@@ -82,7 +82,7 @@ class ClassificacaoPageController extends \MZ\Core\Controller
         if (is_post()) {
             $classificacao = new Classificacao($_POST);
             try {
-                $classificacao->filter($old_classificacao);
+                $classificacao->filter($old_classificacao, true);
                 $classificacao->insert();
                 $old_classificacao->clean($classificacao);
                 $msg = sprintf(
@@ -137,7 +137,7 @@ class ClassificacaoPageController extends \MZ\Core\Controller
             $classificacao = new Classificacao($_POST);
             try {
                 $classificacao->setID($old_classificacao->getID());
-                $classificacao->filter($old_classificacao);
+                $classificacao->filter($old_classificacao, true);
                 $classificacao->update();
                 $old_classificacao->clean($classificacao);
                 $msg = sprintf(

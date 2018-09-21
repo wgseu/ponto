@@ -65,7 +65,6 @@ class PrestadorOldApiController extends \MZ\Core\ApiController
             $item['cpf'] = $cliente_item['cpf'];
             $item['email'] = $cliente->getEmail();
             $item['funcao'] = $funcao->getDescricao();
-            $item['imagemurl'] = $cliente_item['imagem'];
             $items[] = array_intersect_key($item, array_flip($campos));
         }
         return $this->json()->success(['items' => $items]);

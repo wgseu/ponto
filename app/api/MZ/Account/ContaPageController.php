@@ -85,7 +85,7 @@ class ContaPageController extends \MZ\Core\Controller
             try {
                 $old_conta->setFuncionarioID(logged_provider()->getID());
                 $despesa = isset($_POST['tipo']) ? $_POST['tipo'] < 0 : false;
-                $conta->filter($old_conta, $despesa);
+                $conta->filter($old_conta, $despesa, true);
                 $conta->insert();
                 $old_conta->clean($conta);
                 $msg = sprintf(
@@ -139,7 +139,7 @@ class ContaPageController extends \MZ\Core\Controller
             $conta = new Conta($_POST);
             try {
                 $despesa = isset($_POST['tipo']) ? $_POST['tipo'] < 0 : false;
-                $conta->filter($old_conta, $despesa);
+                $conta->filter($old_conta, $despesa, true);
                 $conta->update();
                 $old_conta->clean($conta);
                 $msg = sprintf(

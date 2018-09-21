@@ -131,11 +131,7 @@ class ComandaTest extends \MZ\Framework\TestCase
         $this->assertEquals($comanda, $found_comanda);
         $found_comanda = Comanda::findByID($comanda->getID());
         $this->assertEquals($comanda, $found_comanda);
-        $found_comanda->loadByID($comanda->getID());
-        $this->assertEquals($comanda, $found_comanda);
         $found_comanda = Comanda::findByNome($comanda->getNome());
-        $this->assertEquals($comanda, $found_comanda);
-        $found_comanda->loadByNome($comanda->getNome());
         $this->assertEquals($comanda, $found_comanda);
 
         $comanda_sec = new Comanda();

@@ -31,6 +31,7 @@ use MZ\Util\Validator;
 use MZ\Util\Mask;
 use MZ\Provider\Prestador;
 use MZ\Sale\Pedido;
+use MZ\Exception\ValidationException;
 
 /**
  * Informações de cliente físico ou jurídico. Clientes, empresas,
@@ -69,7 +70,7 @@ class Cliente extends SyncModel
      */
     private $login;
     /**
-     * Senha embaralhada do cliente ou funcionário
+     * Senha embaralhada do cliente
      */
     private $senha;
     /**
@@ -173,8 +174,8 @@ class Cliente extends SyncModel
 
     /**
      * Set ID value to new on param
-     * @param  mixed $id new value for ID
-     * @return Cliente Self instance
+     * @param mixed $id new value for ID
+     * @return self Self instance
      */
     public function setID($id)
     {
@@ -193,8 +194,8 @@ class Cliente extends SyncModel
 
     /**
      * Set Tipo value to new on param
-     * @param  mixed $tipo new value for Tipo
-     * @return Cliente Self instance
+     * @param mixed $tipo new value for Tipo
+     * @return self Self instance
      */
     public function setTipo($tipo)
     {
@@ -213,7 +214,7 @@ class Cliente extends SyncModel
 
     /**
      * Set EmpresaID value to new on param
-     * @param  mixed $empresa_id new value for EmpresaID
+     * @param mixed $empresa_id new value for EmpresaID
      * @return self Self instance
      */
     public function setEmpresaID($empresa_id)
@@ -233,8 +234,8 @@ class Cliente extends SyncModel
 
     /**
      * Set Login value to new on param
-     * @param  mixed $login new value for Login
-     * @return Cliente Self instance
+     * @param mixed $login new value for Login
+     * @return self Self instance
      */
     public function setLogin($login)
     {
@@ -243,7 +244,7 @@ class Cliente extends SyncModel
     }
 
     /**
-     * Senha embaralhada do cliente ou funcionário
+     * Senha embaralhada do cliente
      * @return mixed Senha of Cliente
      */
     public function getSenha()
@@ -253,8 +254,8 @@ class Cliente extends SyncModel
 
     /**
      * Set Senha value to new on param
-     * @param  mixed $senha new value for Senha
-     * @return Cliente Self instance
+     * @param mixed $senha new value for Senha
+     * @return self Self instance
      */
     public function setSenha($senha)
     {
@@ -273,8 +274,8 @@ class Cliente extends SyncModel
 
     /**
      * Set Nome value to new on param
-     * @param  mixed $nome new value for Nome
-     * @return Cliente Self instance
+     * @param mixed $nome new value for Nome
+     * @return self Self instance
      */
     public function setNome($nome)
     {
@@ -293,8 +294,8 @@ class Cliente extends SyncModel
 
     /**
      * Set Sobrenome value to new on param
-     * @param  mixed $sobrenome new value for Sobrenome
-     * @return Cliente Self instance
+     * @param mixed $sobrenome new value for Sobrenome
+     * @return self Self instance
      */
     public function setSobrenome($sobrenome)
     {
@@ -313,8 +314,8 @@ class Cliente extends SyncModel
 
     /**
      * Set Genero value to new on param
-     * @param  mixed $genero new value for Genero
-     * @return Cliente Self instance
+     * @param mixed $genero new value for Genero
+     * @return self Self instance
      */
     public function setGenero($genero)
     {
@@ -334,8 +335,8 @@ class Cliente extends SyncModel
 
     /**
      * Set CPF value to new on param
-     * @param  mixed $cpf new value for CPF
-     * @return Cliente Self instance
+     * @param mixed $cpf new value for CPF
+     * @return self Self instance
      */
     public function setCPF($cpf)
     {
@@ -354,8 +355,8 @@ class Cliente extends SyncModel
 
     /**
      * Set RG value to new on param
-     * @param  mixed $rg new value for RG
-     * @return Cliente Self instance
+     * @param mixed $rg new value for RG
+     * @return self Self instance
      */
     public function setRG($rg)
     {
@@ -374,8 +375,8 @@ class Cliente extends SyncModel
 
     /**
      * Set IM value to new on param
-     * @param  mixed $im new value for IM
-     * @return Cliente Self instance
+     * @param mixed $im new value for IM
+     * @return self Self instance
      */
     public function setIM($im)
     {
@@ -394,8 +395,8 @@ class Cliente extends SyncModel
 
     /**
      * Set Email value to new on param
-     * @param  mixed $email new value for Email
-     * @return Cliente Self instance
+     * @param mixed $email new value for Email
+     * @return self Self instance
      */
     public function setEmail($email)
     {
@@ -414,8 +415,8 @@ class Cliente extends SyncModel
 
     /**
      * Set DataAniversario value to new on param
-     * @param  mixed $data_aniversario new value for DataAniversario
-     * @return Cliente Self instance
+     * @param mixed $data_aniversario new value for DataAniversario
+     * @return self Self instance
      */
     public function setDataAniversario($data_aniversario)
     {
@@ -434,8 +435,8 @@ class Cliente extends SyncModel
 
     /**
      * Set Slogan value to new on param
-     * @param  mixed $slogan new value for Slogan
-     * @return Cliente Self instance
+     * @param mixed $slogan new value for Slogan
+     * @return self Self instance
      */
     public function setSlogan($slogan)
     {
@@ -454,8 +455,8 @@ class Cliente extends SyncModel
 
     /**
      * Set Secreto value to new on param
-     * @param  mixed $secreto new value for Secreto
-     * @return Cliente Self instance
+     * @param mixed $secreto new value for Secreto
+     * @return self Self instance
      */
     public function setSecreto($secreto)
     {
@@ -474,8 +475,8 @@ class Cliente extends SyncModel
 
     /**
      * Set LimiteCompra value to new on param
-     * @param  mixed $limite_compra new value for LimiteCompra
-     * @return Cliente Self instance
+     * @param mixed $limite_compra new value for LimiteCompra
+     * @return self Self instance
      */
     public function setLimiteCompra($limite_compra)
     {
@@ -494,8 +495,8 @@ class Cliente extends SyncModel
 
     /**
      * Set FacebookURL value to new on param
-     * @param  mixed $facebook_url new value for FacebookURL
-     * @return Cliente Self instance
+     * @param mixed $facebook_url new value for FacebookURL
+     * @return self Self instance
      */
     public function setFacebookURL($facebook_url)
     {
@@ -514,8 +515,8 @@ class Cliente extends SyncModel
 
     /**
      * Set TwitterURL value to new on param
-     * @param  mixed $twitter_url new value for TwitterURL
-     * @return Cliente Self instance
+     * @param mixed $twitter_url new value for TwitterURL
+     * @return self Self instance
      */
     public function setTwitterURL($twitter_url)
     {
@@ -534,8 +535,8 @@ class Cliente extends SyncModel
 
     /**
      * Set LinkedInURL value to new on param
-     * @param  mixed $linked_in_url new value for LinkedInURL
-     * @return Cliente Self instance
+     * @param mixed $linked_in_url new value for LinkedInURL
+     * @return self Self instance
      */
     public function setLinkedInURL($linked_in_url)
     {
@@ -554,7 +555,7 @@ class Cliente extends SyncModel
 
     /**
      * Set ImagemURL value to new on param
-     * @param  mixed $imagem_url new value for ImagemURL
+     * @param mixed $imagem_url new value for ImagemURL
      * @return self Self instance
      */
     public function setImagemURL($imagem_url)
@@ -575,7 +576,7 @@ class Cliente extends SyncModel
 
     /**
      * Set Linguagem value to new on param
-     * @param  mixed $linguagem new value for Linguagem
+     * @param mixed $linguagem new value for Linguagem
      * @return self Self instance
      */
     public function setLinguagem($linguagem)
@@ -595,8 +596,8 @@ class Cliente extends SyncModel
 
     /**
      * Set DataAtualizacao value to new on param
-     * @param  mixed $data_atualizacao new value for DataAtualizacao
-     * @return Cliente Self instance
+     * @param mixed $data_atualizacao new value for DataAtualizacao
+     * @return self Self instance
      */
     public function setDataAtualizacao($data_atualizacao)
     {
@@ -615,8 +616,8 @@ class Cliente extends SyncModel
 
     /**
      * Set DataCadastro value to new on param
-     * @param  mixed $data_cadastro new value for DataCadastro
-     * @return Cliente Self instance
+     * @param mixed $data_cadastro new value for DataCadastro
+     * @return self Self instance
      */
     public function setDataCadastro($data_cadastro)
     {
@@ -642,7 +643,7 @@ class Cliente extends SyncModel
      */
     public function setTelefone($telefone)
     {
-        if (!($telefone instanceof Telefone) && !is_null($telefone)) {
+        if (!($telefone instanceof Telefone)) {
             $telefone = new Telefone(is_array($telefone) ? $telefone : ['numero' => $telefone]);
         }
         $this->telefone = $telefone;
@@ -651,7 +652,7 @@ class Cliente extends SyncModel
 
     /**
      * Convert this instance to array associated key -> value
-     * @param  boolean $recursive Allow rescursive conversion of fields
+     * @param boolean $recursive Allow rescursive conversion of fields
      * @return array All field and values into array format
      */
     public function toArray($recursive = false)
@@ -685,12 +686,12 @@ class Cliente extends SyncModel
 
     /**
      * Fill this instance with from array values, you can pass instance to
-     * @param  mixed $cliente Associated key -> value to assign into this instance
-     * @return Cliente Self instance
+     * @param mixed $cliente Associated key -> value to assign into this instance
+     * @return self Self instance
      */
     public function fromArray($cliente = [])
     {
-        if ($cliente instanceof Cliente) {
+        if ($cliente instanceof self) {
             $cliente = $cliente->toArray();
         } elseif (!is_array($cliente)) {
             $cliente = [];
@@ -915,12 +916,10 @@ class Cliente extends SyncModel
 
     /**
      * Filter fields, upload data and keep key data
-     * @param Cliente $original Original instance without modifications
+     * @param self $original Original instance without modifications
      */
     public function filter($original)
     {
-        global $app;
-
         $this->setID($original->getID());
         $this->setSecreto($original->getSecreto());
         $this->setLimiteCompra(Filter::float($original->getLimiteCompra()));
@@ -972,6 +971,7 @@ class Cliente extends SyncModel
     /**
      * Validate fields updating them and throw exception when invalid data has found
      * @return mixed[] All field of Cliente in array format
+     * @throws \MZ\Exception\ValidationException When password does't match
      */
     public function validate()
     {
@@ -1017,7 +1017,7 @@ class Cliente extends SyncModel
             $errors['email'] = 'O e-mail é inválido';
         }
         if (is_null($this->getCPF()) &&
-            is_null($this->getTelefone()) &&
+            is_null($this->getTelefone()->getNumero()) &&
             is_null($this->getLogin()) &&
             is_null($this->getEmail())
         ) {
@@ -1036,7 +1036,7 @@ class Cliente extends SyncModel
         $this->setDataCadastro(DB::now());
         $this->setDataAtualizacao(DB::now());
         if (!empty($errors)) {
-            throw new \MZ\Exception\ValidationException($errors);
+            throw new ValidationException($errors);
         }
         $values = $this->toArray();
         if (is_null($this->getSenha())) {
@@ -1062,13 +1062,13 @@ class Cliente extends SyncModel
 
     /**
      * Translate SQL exception into application exception
-     * @param  \Exception $e exception to translate into a readable error
+     * @param \Exception $e exception to translate into a readable error
      * @return \MZ\Exception\ValidationException new exception translated
      */
     protected function translate($e)
     {
         if (contains(['Email', 'UNIQUE'], $e->getMessage())) {
-            return new \MZ\Exception\ValidationException([
+            return new ValidationException([
                 'email' => sprintf(
                     'O e-mail "%s" já está cadastrado',
                     $this->getEmail()
@@ -1076,7 +1076,7 @@ class Cliente extends SyncModel
             ]);
         }
         if (contains(['CPF', 'UNIQUE'], $e->getMessage())) {
-            return new \MZ\Exception\ValidationException([
+            return new ValidationException([
                 'cpf' => sprintf(
                     'O cpf "%s" já está cadastrado',
                     $this->getCPF()
@@ -1084,7 +1084,7 @@ class Cliente extends SyncModel
             ]);
         }
         if (contains(['Login', 'UNIQUE'], $e->getMessage())) {
-            return new \MZ\Exception\ValidationException([
+            return new ValidationException([
                 'login' => sprintf(
                     'O login "%s" já está cadastrado',
                     $this->getLogin()
@@ -1092,7 +1092,7 @@ class Cliente extends SyncModel
             ]);
         }
         if (contains(['Secreto', 'UNIQUE'], $e->getMessage())) {
-            return new \MZ\Exception\ValidationException([
+            return new ValidationException([
                 'secreto' => 'Não foi possível gerar o código de recuperação',
             ]);
         }
@@ -1102,6 +1102,7 @@ class Cliente extends SyncModel
     /**
      * Insert a new Cliente into the database and fill instance from database
      * @return self Self instance
+     * @throws \MZ\Exception\ValidationException When password does't match
      */
     public function insert()
     {
@@ -1111,12 +1112,13 @@ class Cliente extends SyncModel
         try {
             DB::beginTransaction();
             $id = DB::insertInto('Clientes')->values($values)->execute();
-            $this->loadByID($id);
-            if (!is_null($this->getTelefone())) {
+            if (!is_null($this->getTelefone()->getNumero())) {
                 $this->getTelefone()->setPrincipal('Y');
-                $this->getTelefone()->setClienteID($this->getID());
+                $this->getTelefone()->setClienteID($id);
                 $this->getTelefone()->insert();
             }
+            $this->setID($id);
+            $this->loadByID();
             DB::commit();
         } catch (\Exception $e) {
             DB::rollBack();
@@ -1127,8 +1129,9 @@ class Cliente extends SyncModel
 
     /**
      * Update Cliente with instance values into database for ID
-     * @param  array $only Save these fields only, when empty save all fields except id
-     * @return Cliente Self instance
+     * @param array $only Save these fields only, when empty save all fields except id
+     * @return int rows affected
+     * @throws \MZ\Exception\ValidationException When password does't match
      */
     public function update($only = [])
     {
@@ -1137,17 +1140,17 @@ class Cliente extends SyncModel
             throw new \Exception('O identificador do cliente não foi informado');
         }
         $values = DB::filterValues($values, $only, false);
-        unset($values['data_cadastro']);
+        unset($values['datacadastro']);
         try {
-            DB::update('Clientes')
+            $affected = DB::update('Clientes')
                 ->set($values)
-                ->where('id', $this->getID())
+                ->where(['id' => $this->getID()])
                 ->execute();
-            $this->loadByID($this->getID());
+            $this->loadByID();
         } catch (\Exception $e) {
             throw $this->translate($e);
         }
-        return $this;
+        return $affected;
     }
 
     /**
@@ -1167,15 +1170,17 @@ class Cliente extends SyncModel
 
     /**
      * Load one register for it self with a condition
-     * @param  array $condition Condition for searching the row
-     * @param  array $order associative field name -> [-1, 1]
-     * @return Cliente Self instance filled or empty
+     * @param array $condition Condition for searching the row
+     * @param array $order associative field name -> [-1, 1]
+     * @return self Self instance filled or empty
      */
     public function load($condition, $order = [])
     {
         $query = self::query($condition, $order)->limit(1);
         $row = $query->fetch() ?: [];
-        return $this->fromArray($row);
+        $this->fromArray($row);
+        $this->loadTelefone();
+        return $this;
     }
 
     /**
@@ -1192,50 +1197,55 @@ class Cliente extends SyncModel
 
     /**
      * Load into this object from database using, Email
-     * @param  string $email e-mail to find Cliente
-     * @return Cliente Self filled instance or empty when not found
+     * @return self Self filled instance or empty when not found
      */
-    public function loadByEmail($email)
+    public function loadByEmail()
     {
         return $this->load([
-            'email' => strval($email),
+            'email' => strval($this->getEmail()),
         ]);
     }
 
     /**
      * Load into this object from database using, CPF
-     * @param  string $cpf cpf to find Cliente
-     * @return Cliente Self filled instance or empty when not found
+     * @return self Self filled instance or empty when not found
      */
-    public function loadByCPF($cpf)
+    public function loadByCPF()
     {
         return $this->load([
-            'cpf' => strval($cpf),
+            'cpf' => strval($this->getCPF()),
         ]);
     }
 
     /**
      * Load into this object from database using, Login
-     * @param  string $login login to find Cliente
-     * @return Cliente Self filled instance or empty when not found
+     * @return self Self filled instance or empty when not found
      */
-    public function loadByLogin($login)
+    public function loadByLogin()
     {
         return $this->load([
-            'login' => strval($login),
+            'login' => strval($this->getLogin()),
         ]);
     }
 
     /**
      * Load into this object from database using, Secreto
-     * @param  string $secreto código de recuperação to find Cliente
-     * @return Cliente Self filled instance or empty when not found
+     * @return self Self filled instance or empty when not found
      */
-    public function loadBySecreto($secreto)
+    public function loadBySecreto()
     {
         return $this->load([
-            'secreto' => strval($secreto),
+            'secreto' => strval($this->getSecreto()),
         ]);
+    }
+
+    /**
+     * Load main phone from database
+     * @return self Self instance
+     */
+    public function loadTelefone()
+    {
+        return $this->setTelefone(Telefone::find(['clienteid' => $this->getID(), 'principal' => 'Y']));
     }
 
     /**
@@ -1252,7 +1262,7 @@ class Cliente extends SyncModel
 
     /**
      * Gets textual and translated Tipo for Cliente
-     * @param  int $index choose option from index
+     * @param int $index choose option from index
      * @return mixed A associative key -> translated representative text or text for index
      */
     public static function getTipoOptions($index = null)
@@ -1269,7 +1279,7 @@ class Cliente extends SyncModel
 
     /**
      * Gets textual and translated Genero for Cliente
-     * @param  int $index choose option from index
+     * @param int $index choose option from index
      * @return mixed A associative key -> translated representative text or text for index
      */
     public static function getGeneroOptions($index = null)
@@ -1290,11 +1300,16 @@ class Cliente extends SyncModel
      */
     private static function getAllowedKeys()
     {
-        $cliente = new Cliente();
+        $cliente = new self();
         $allowed = Filter::concatKeys('c.', $cliente->toArray());
         return $allowed;
     }
 
+    /**
+     * Build search for phone number
+     * @param string $fone masked phone number
+     * @return string string like for search
+     */
     public static function buildFoneSearch($fone)
     {
         $fone = Filter::digits($fone);
@@ -1311,7 +1326,7 @@ class Cliente extends SyncModel
 
     /**
      * Filter order array
-     * @param  mixed $order order string or array to parse and filter allowed
+     * @param mixed $order order string or array to parse and filter allowed
      * @return array allowed associative order
      */
     private static function filterOrder($order)
@@ -1322,7 +1337,7 @@ class Cliente extends SyncModel
 
     /**
      * Filter condition array with allowed fields
-     * @param  array $condition condition to filter rows
+     * @param array $condition condition to filter rows
      * @return array allowed condition
      */
     private static function filterCondition($condition)
@@ -1332,7 +1347,7 @@ class Cliente extends SyncModel
             $fone = $condition['fone'];
             $fone = self::buildFoneSearch($fone);
             $field = '(t.numero LIKE ?)';
-            $condition[$field] = [$fone, $fone];
+            $condition[$field] = $fone;
             $allowed[$field] = true;
             unset($condition['fone']);
         }
@@ -1359,8 +1374,8 @@ class Cliente extends SyncModel
 
     /**
      * Fetch data from database with a condition
-     * @param  array $condition condition to filter rows
-     * @param  array $order order rows
+     * @param array $condition condition to filter rows
+     * @param array $order order rows
      * @return SelectQuery query object with condition statement
      */
     private static function query($condition = [], $order = [])
@@ -1428,15 +1443,15 @@ class Cliente extends SyncModel
 
     /**
      * Search one register with a condition
-     * @param  array $condition Condition for searching the row
-     * @param  array $order order rows
-     * @return Cliente A filled Cliente or empty instance
+     * @param array $condition Condition for searching the row
+     * @param array $order order rows
+     * @return self A filled Cliente or empty instance
      */
     public static function find($condition, $order = [])
     {
         $query = self::query($condition, $order)->limit(1);
         $row = $query->fetch() ?: [];
-        return new Cliente($row);
+        return new self($row);
     }
 
     /**
@@ -1452,46 +1467,50 @@ class Cliente extends SyncModel
 
     /**
      * Find this object on database using, Email
-     * @param  string $email e-mail to find Cliente
-     * @return Cliente A filled instance or empty when not found
+     * @param string $email e-mail to find Cliente
+     * @return self A filled instance or empty when not found
      */
     public static function findByEmail($email)
     {
         $result = new self();
-        return $result->loadByEmail($email);
+        $result->setEmail($email);
+        return $result->loadByEmail();
     }
 
     /**
      * Find this object on database using, CPF
-     * @param  string $cpf cpf to find Cliente
-     * @return Cliente A filled instance or empty when not found
+     * @param string $cpf cpf to find Cliente
+     * @return self A filled instance or empty when not found
      */
     public static function findByCPF($cpf)
     {
         $result = new self();
-        return $result->loadByCPF($cpf);
+        $result->setCPF($cpf);
+        return $result->loadByCPF();
     }
 
     /**
      * Find this object on database using, Login
-     * @param  string $login login to find Cliente
-     * @return Cliente A filled instance or empty when not found
+     * @param string $login login to find Cliente
+     * @return self A filled instance or empty when not found
      */
     public static function findByLogin($login)
     {
         $result = new self();
-        return $result->loadByLogin($login);
+        $result->setLogin($login);
+        return $result->loadByLogin();
     }
 
     /**
      * Find this object on database using, Secreto
-     * @param  string $secreto código de recuperação to find Cliente
-     * @return Cliente A filled instance or empty when not found
+     * @param string $secreto código de recuperação to find Cliente
+     * @return self A filled instance or empty when not found
      */
     public static function findBySecreto($secreto)
     {
         $result = new self();
-        return $result->loadBySecreto($secreto);
+        $result->setSecreto($secreto);
+        return $result->loadBySecreto();
     }
 
     /**
@@ -1527,11 +1546,11 @@ class Cliente extends SyncModel
 
     /**
      * Find all Cliente
-     * @param  array  $condition Condition to get all Cliente
-     * @param  array  $order     Order Cliente
-     * @param  int    $limit     Limit data into row count
-     * @param  int    $offset    Start offset to get rows
-     * @return array             List of all rows instanced as Cliente
+     * @param array   $condition Condition to get all Cliente
+     * @param array   $order     Order Cliente
+     * @param int     $limit     Limit data into row count
+     * @param int     $offset    Start offset to get rows
+     * @return self[] List of all rows instanced as Cliente
      */
     public static function findAll($condition = [], $order = [], $limit = null, $offset = null)
     {
@@ -1545,7 +1564,7 @@ class Cliente extends SyncModel
         $rows = $query->fetchAll();
         $result = [];
         foreach ($rows as $row) {
-            $result[] = new Cliente($row);
+            $result[] = new self($row);
         }
         return $result;
     }
@@ -1572,7 +1591,7 @@ class Cliente extends SyncModel
 
     /**
      * Count all rows from database with matched condition critery
-     * @param  array $condition condition to filter rows
+     * @param array $condition condition to filter rows
      * @return integer Quantity of rows
      */
     public static function count($condition = [])

@@ -109,7 +109,7 @@ class CartaoPageController extends \MZ\Core\Controller
         if (is_post()) {
             $cartao = new Cartao($_POST);
             try {
-                $cartao->filter($old_cartao);
+                $cartao->filter($old_cartao, true);
                 $cartao->insert();
                 $old_cartao->clean($cartao);
                 $msg = sprintf(
@@ -164,7 +164,7 @@ class CartaoPageController extends \MZ\Core\Controller
         if (is_post()) {
             $cartao = new Cartao($_POST);
             try {
-                $cartao->filter($old_cartao);
+                $cartao->filter($old_cartao, true);
                 $cartao->update();
                 $old_cartao->clean($cartao);
                 $msg = sprintf(

@@ -25,7 +25,7 @@
 namespace MZ\System;
 
 use MZ\System\Servidor;
-use \MZ\Database\DB;
+use MZ\Database\DB;
 
 class SistemaTest extends \MZ\Framework\TestCase
 {
@@ -92,9 +92,7 @@ class SistemaTest extends \MZ\Framework\TestCase
     public function testUpdate()
     {
         $servidor = Servidor::find([]);
-
-        $sistema = new Sistema();
-        $sistema->loadByID('1');
+        $sistema = Sistema::findByID('1');
         $sistema->setServidorID($servidor->getID());
         $sistema->update();
         $found_sistema = Sistema::findByID($sistema->getID());
@@ -106,8 +104,7 @@ class SistemaTest extends \MZ\Framework\TestCase
 
     public function testFind()
     {
-        $sistema = new Sistema();
-        $sistema->loadByID('1');
+        $sistema = Sistema::findByID('1');
         $found_sistema = Sistema::find(['id' => $sistema->getID()]);
         $this->assertEquals($sistema, $found_sistema);
         $count = Sistema::count();

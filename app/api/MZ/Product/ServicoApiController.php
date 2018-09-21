@@ -58,11 +58,11 @@ class ServicoApiController extends \MZ\Core\ApiController
     public function add()
     {
         $this->needPermission(Permissao::NOME_CADASTROSERVICOS);
+        $localized = $this->getRequest()->query->getBoolean('localized', false);
         $servico = new Servico($this->getJsonParams());
-        $servico->filter(new Servico());
+        $servico->filter(new Servico(), $localized);
         $servico->insert();
-        $message = _t('servico.registered', $servico->getDescricao());
-        return $this->getResponse()->success(['item' => $servico->publish()], $message);
+        return $this->getResponse()->success(['item' => $servico->publish()]);
     }
 
     /**
@@ -73,12 +73,12 @@ class ServicoApiController extends \MZ\Core\ApiController
     {
         $this->needPermission(Permissao::NOME_CADASTROSERVICOS);
         $old_servico = Servico::findOrFail(['id' => $id]);
+        $localized = $this->getRequest()->query->getBoolean('localized', false);
         $servico = new Servico($this->getJsonParams());
-        $servico->filter($old_servico);
+        $servico->filter($old_servico, $localized);
         $servico->update();
         $old_servico->clean($servico);
-        $message = _t('servico.updated', $servico->getDescricao());
-        return $this->getResponse()->success(['item' => $servico->publish()], $message);
+        return $this->getResponse()->success(['item' => $servico->publish()]);
     }
 
     /**
@@ -91,8 +91,7 @@ class ServicoApiController extends \MZ\Core\ApiController
         $servico = Servico::findOrFail(['id' => $id]);
         $servico->delete();
         $servico->clean(new Servico());
-        $message = _t('servico.deleted', $servico->getDescricao());
-        return $this->getResponse()->success([], $message);
+        return $this->getResponse()->success([]);
     }
 
     /**

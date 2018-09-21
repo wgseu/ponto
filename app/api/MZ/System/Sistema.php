@@ -617,7 +617,7 @@ class Sistema extends Model
                 ->set($values)
                 ->where('id', $this->getID())
                 ->execute();
-            $this->loadByID($this->getID());
+            $this->loadByID();
         } catch (\Exception $e) {
             throw $this->translate($e);
         }
@@ -655,7 +655,8 @@ class Sistema extends Model
      */
     public function loadAll()
     {
-        $this->loadByID('1');
+        $this->setID('1');
+        $this->loadByID();
         $this->getBusiness()->loadAll();
         $this->company  = $this->getBusiness()->findEmpresaID();
         $this->localization = Localizacao::find(['clienteid' => $this->getCompany()->getID()]);

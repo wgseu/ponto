@@ -134,11 +134,7 @@ class UnidadeTest extends \MZ\Framework\TestCase
         $this->assertEquals($unidade, $found_unidade);
         $found_unidade = Unidade::findByID($unidade->getID());
         $this->assertEquals($unidade, $found_unidade);
-        $found_unidade->loadByID($unidade->getID());
-        $this->assertEquals($unidade, $found_unidade);
         $found_unidade = Unidade::findBySigla($unidade->getSigla());
-        $this->assertEquals($unidade, $found_unidade);
-        $found_unidade->loadBySigla($unidade->getSigla());
         $this->assertEquals($unidade, $found_unidade);
 
         $unidade_sec = new Unidade();

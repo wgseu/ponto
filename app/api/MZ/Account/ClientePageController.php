@@ -62,7 +62,7 @@ class ClientePageController extends \MZ\Core\Controller
                 }
                 $senha = isset($_POST['confirmarsenha']) ? $_POST['confirmarsenha'] : '';
                 $cliente->passwordMatch($senha);
-                $cliente->filter($old_cliente);
+                $cliente->filter($old_cliente, true);
                 $cliente->insert();
                 $old_cliente->clean($cliente);
                 if (is_output('json')) {
@@ -152,7 +152,7 @@ class ClientePageController extends \MZ\Core\Controller
                 $senha = isset($_POST['confirmarsenha']) ? $_POST['confirmarsenha'] : '';
                 $cliente->passwordMatch($senha);
         
-                $cliente->filter($old_cliente);
+                $cliente->filter($old_cliente, true);
                 $cliente->update();
                 $old_cliente->clean($cliente);
                 $msg = 'Conta atualizada com sucesso!';
@@ -253,7 +253,7 @@ class ClientePageController extends \MZ\Core\Controller
                         'Você deve alterar a empresa do sistema em vez de cadastrar uma nova'
                     );
                 }
-                $cliente->filter($old_cliente);
+                $cliente->filter($old_cliente, true);
                 $cliente->insert();
                 $old_cliente->clean($cliente);
                 if (isset($_GET['sistema']) && intval($_GET['sistema']) == 1) {
@@ -354,7 +354,7 @@ class ClientePageController extends \MZ\Core\Controller
                 }
                 $senha = isset($_POST['confirmarsenha']) ? $_POST['confirmarsenha'] : '';
                 $cliente->passwordMatch($senha);
-                $cliente->filter($old_cliente);
+                $cliente->filter($old_cliente, true);
                 $cliente->update();
                 $old_cliente->clean($cliente);
                 $msg = sprintf(

@@ -22,43 +22,20 @@
  *
  * @author Equipe GrandChef <desenvolvimento@mzsw.com.br>
  */
-namespace MZ\Provider;
+namespace MZ\Account;
 
-class PrestadorTest extends \MZ\Framework\TestCase
+use MZ\Database\DB;
+
+class AuthenticationTest extends \MZ\Framework\TestCase
 {
     /**
-     * @return Prestador
+     * @return \MZ\Provider\Prestador
      */
-    public static function create($funcao)
+    public static function authProvider($permissions)
     {
-        $cliente = \MZ\Account\ClienteTest::create();
-        $last = Prestador::find([], ['id' => -1]);
-        $prestador = new Prestador();
-        $prestador->loadNextCodigo();
-        $prestador->setFuncaoID($funcao->getID());
-        $prestador->setClienteID($cliente->getID());
-        $prestador->setVinculo(Prestador::VINCULO_FUNCIONARIO);
-        $prestador->setAtivo('Y');
-        $prestador->insert();
+        $funcao = \MZ\Provider\FuncaoTest::create($permissions);
+        $prestador = \MZ\Provider\PrestadorTest::create($funcao);
+        self::getApp()->getAuthentication()->login($prestador->findClienteID());
         return $prestador;
-    }
-
-    public function testPublish()
-    {
-        $funcionario = new Prestador();
-        $values = $funcionario->publish();
-        $allowed = [
-            'id',
-            'funcaoid',
-            'clienteid',
-            'codigobarras',
-            'porcentagem',
-            'linguagemid',
-            'pontuacao',
-            'ativo',
-            'datasaida',
-            'datacadastro',
-        ];
-        $this->assertEquals($allowed, array_keys($values));
     }
 }

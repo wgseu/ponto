@@ -45,8 +45,25 @@ abstract class Model
     abstract public function getID();
 
     /**
+     * Set the primary key for this entry
+     * @param int $id database id
+     * @return self key of register
+     */
+    abstract public function setID($id);
+
+    /**
+     * Get the application object
+     * @return \MZ\Core\Application application object
+     */
+    public function getApplication()
+    {
+        global $app;
+        return $app;
+    }
+
+    /**
      * Convert this instance to array associated key -> value
-     * @param  boolean $recursive Allow rescursive conversion of fields
+     * @param boolean $recursive Allow rescursive conversion of fields
      * @return array All field and values into array format
      */
     public function toArray($recursive = false)
@@ -56,7 +73,7 @@ abstract class Model
 
     /**
      * Fill this instance with from array values, you can pass instance to
-     * @param  mixed $model Associated key -> value to assign into this instance
+     * @param mixed $model Associated key -> value to assign into this instance
      * @return Model Self instance
      */
     public function fromArray($model = [])
@@ -84,7 +101,7 @@ abstract class Model
 
     /**
      * Translate SQL exception into application exception
-     * @param  \Exception $e exception to translate into a readable error
+     * @param \Exception $e exception to translate into a readable error
      * @return \Exception new exception translated
      */
     protected function translate($e)
@@ -110,7 +127,7 @@ abstract class Model
 
     /**
      * Clean instance resources like images and docs
-     * @param  mixed $dependency Don't clean when dependency use same resources
+     * @param mixed $dependency Don't clean when dependency use same resources
      * @return mixed Self instance
      */
     abstract public function clean($dependency);
@@ -123,8 +140,8 @@ abstract class Model
 
     /**
      * Load one register for it self with a condition
-     * @param  array $condition Condition for searching the row
-     * @param  array $order associative field name -> [-1, 1]
+     * @param array $condition Condition for searching the row
+     * @param array $order associative field name -> [-1, 1]
      * @return Setor Self instance filled or empty
      */
     abstract public function load($condition, $order = []);
@@ -137,7 +154,7 @@ abstract class Model
 
     /**
      * Update registry with instance values into database for ID
-     * @param  array $only Save these fields only, when empty save all fields except id
+     * @param array $only Save these fields only, when empty save all fields except id
      * @return mixed Self instance
      */
     abstract public function update($only = []);
@@ -150,37 +167,37 @@ abstract class Model
 
     /**
      * Save a new or a existing instance into the database and fill instance from database
-     * @param  array $only Save these fields only, when empty save all fields except id
+     * @param array $only Save these fields only, when empty save all fields except id
      * @return Model Self instance
      */
-    public function save($only = [], $except = false)
+    public function save($only = [])
     {
         if ($this->exists()) {
-            return $this->update($only, $except);
+            return $this->update($only);
         }
         return $this->insert();
     }
 
     /**
      * Load into this object from database using id
-     * @param  int $id id to find this object on database
-     * @return Model Self filled instance or empty when not found
+     * @return self Self filled instance or empty when not found
      */
-    public function loadByID($id)
+    public function loadByID()
     {
         return $this->load([
-            'id' => intval($id),
+            'id' => intval($this->getID()),
         ]);
     }
 
     /**
      * Find this object on database using, ID
-     * @param  int $id id to find object on database
-     * @return Model A filled instance or empty when not found
+     * @param int $id id to find object on database
+     * @return self A filled instance or empty when not found
      */
     public static function findByID($id)
     {
         $result = new static();
-        return $result->loadByID($id);
+        $result->setID($id);
+        return $result->loadByID();
     }
 }

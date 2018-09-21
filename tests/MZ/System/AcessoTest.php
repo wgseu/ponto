@@ -26,6 +26,23 @@ namespace MZ\System;
 
 class AcessoTest extends \MZ\Framework\TestCase
 {
+    /**
+     * @return Acesso[]
+     */
+    public static function create($funcao, $permissions)
+    {
+        $result = [];
+        foreach ($permissions as $permissao_nome) {
+            $permissao = Permissao::findByNome($permissao_nome);
+            $acesso = new Acesso();
+            $acesso->setPermissaoID($permissao->getID());
+            $acesso->setFuncaoID($funcao->getID());
+            $acesso->insert();
+            $result[] = $acesso;
+        }
+        return $result;
+    }
+
     public function testPublish()
     {
         $acesso = new Acesso();

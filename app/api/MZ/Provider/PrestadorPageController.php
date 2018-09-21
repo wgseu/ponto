@@ -98,7 +98,7 @@ class PrestadorPageController extends \MZ\Core\Controller
         if (is_post()) {
             $prestador = new Prestador($_POST);
             try {
-                $prestador->filter($old_funcionario);
+                $prestador->filter($old_funcionario, true);
                 $prestador->insert();
                 $old_funcionario->clean($prestador);
                 $cliente = $prestador->findClienteID();
@@ -175,7 +175,7 @@ class PrestadorPageController extends \MZ\Core\Controller
         if (is_post()) {
             $prestador = new Prestador($_POST);
             try {
-                $prestador->filter($old_funcionario);
+                $prestador->filter($old_funcionario, true);
                 $prestador->update();
                 $old_funcionario->clean($prestador);
                 $msg = sprintf(

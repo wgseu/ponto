@@ -77,7 +77,7 @@ class IntegracaoPageController extends \MZ\Core\Controller
         if (is_post()) {
             $integracao = new Integracao($_POST);
             try {
-                $integracao->filter($old_integracao);
+                $integracao->filter($old_integracao, true);
                 $integracao->save(array_keys($_POST));
                 $old_integracao->clean($integracao);
                 $msg = sprintf(

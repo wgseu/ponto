@@ -75,7 +75,7 @@ class FuncaoPageController extends \MZ\Core\Controller
         if (is_post()) {
             $funcao = new Funcao($_POST);
             try {
-                $funcao->filter($old_funcao);
+                $funcao->filter($old_funcao, true);
                 $funcao->insert();
                 $old_funcao->clean($funcao);
                 $msg = sprintf(
@@ -128,7 +128,7 @@ class FuncaoPageController extends \MZ\Core\Controller
         if (is_post()) {
             $funcao = new Funcao($_POST);
             try {
-                $funcao->filter($old_funcao);
+                $funcao->filter($old_funcao, true);
                 $funcao->update();
                 $old_funcao->clean($funcao);
                 $msg = sprintf(

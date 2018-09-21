@@ -116,7 +116,7 @@ class ProdutoPageController extends \MZ\Core\Controller
         if (is_post()) {
             $produto = new Produto($_POST);
             try {
-                $produto->filter($old_produto);
+                $produto->filter($old_produto, true);
                 $produto->insert();
                 $old_produto->clean($produto);
                 $produto->load(['id' => $produto->getID(), 'promocao' => 'N']);
@@ -180,7 +180,7 @@ class ProdutoPageController extends \MZ\Core\Controller
         if (is_post()) {
             $produto = new Produto($_POST);
             try {
-                $produto->filter($old_produto);
+                $produto->filter($old_produto, true);
                 $produto->update();
                 $old_produto->clean($produto);
                 $produto->load(['id' => $produto->getID(), 'promocao' => 'N']);

@@ -163,8 +163,6 @@ class HorarioTest extends \MZ\Framework\TestCase
         $this->assertEquals($horario, $found_horario);
         $found_horario = Horario::findByID($horario->getID());
         $this->assertEquals($horario, $found_horario);
-        $found_horario->loadByID($horario->getID());
-        $this->assertEquals($horario, $found_horario);
 
         $horario_sec = new Horario();
         $horario_sec->setModo('Funcionamento');

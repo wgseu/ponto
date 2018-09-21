@@ -129,11 +129,7 @@ class OrigemTest extends \MZ\Framework\TestCase
         $this->assertEquals($origem, $found_origem);
         $found_origem = Origem::findByID($origem->getID());
         $this->assertEquals($origem, $found_origem);
-        $found_origem->loadByID($origem->getID());
-        $this->assertEquals($origem, $found_origem);
         $found_origem = Origem::findByCodigo($origem->getCodigo());
-        $this->assertEquals($origem, $found_origem);
-        $found_origem->loadByCodigo($origem->getCodigo());
         $this->assertEquals($origem, $found_origem);
 
         $origem_sec = new Origem();

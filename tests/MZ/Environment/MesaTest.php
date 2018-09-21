@@ -30,6 +30,8 @@ class MesaTest extends \MZ\Framework\TestCase
     {
         $old_mesa = new Mesa([
             'id' => 123,
+            'setorid' => 123,
+            'numero' => 123,
             'nome' => 'Mesa',
             'ativa' => 'Y',
         ]);
@@ -44,11 +46,15 @@ class MesaTest extends \MZ\Framework\TestCase
     {
         $old_mesa = new Mesa([
             'id' => 1234,
+            'setorid' => 1234,
+            'numero' => 1234,
             'nome' => 'Mesa filter',
             'ativa' => 'Y',
         ]);
         $mesa = new Mesa([
             'id' => 1234,
+            'setorid' => '1.234',
+            'numero' => '1.234',
             'nome' => ' Mesa <script>filter</script> ',
             'ativa' => 'Y',
         ]);
@@ -62,6 +68,8 @@ class MesaTest extends \MZ\Framework\TestCase
         $values = $mesa->publish();
         $allowed = [
             'id',
+            'setorid',
+            'numero',
             'nome',
             'ativa',
         ];
@@ -78,13 +86,14 @@ class MesaTest extends \MZ\Framework\TestCase
         } catch (\MZ\Exception\ValidationException $e) {
             $this->assertEquals(
                 [
+                    'numero',
                     'nome',
                     'ativa',
                 ],
                 array_keys($e->getErrors())
             );
         }
-        $mesa->loadNextID();
+        $mesa->loadNextNumero();
         $mesa->setNome('Mesa to insert ' . $mesa->getID());
         $mesa->setAtiva('Y');
         $mesa->insert();
@@ -93,6 +102,7 @@ class MesaTest extends \MZ\Framework\TestCase
     public function testUpdate()
     {
         $mesa = new Mesa();
+        $mesa->loadNextNumero();
         $mesa->setNome('Mesa to update');
         $mesa->setAtiva('N');
         $mesa->insert();
@@ -109,6 +119,7 @@ class MesaTest extends \MZ\Framework\TestCase
     public function testDelete()
     {
         $mesa = new Mesa();
+        $mesa->loadNextNumero();
         $mesa->setNome('Mesa to delete');
         $mesa->setAtiva('Y');
         $mesa->insert();
@@ -124,6 +135,7 @@ class MesaTest extends \MZ\Framework\TestCase
     public function testFind()
     {
         $mesa = new Mesa();
+        $mesa->loadNextNumero();
         $mesa->setNome('Mesa find');
         $mesa->setAtiva('Y');
         $mesa->insert();
@@ -131,14 +143,13 @@ class MesaTest extends \MZ\Framework\TestCase
         $this->assertEquals($mesa, $found_mesa);
         $found_mesa = Mesa::findByID($mesa->getID());
         $this->assertEquals($mesa, $found_mesa);
-        $found_mesa->loadByID($mesa->getID());
+        $found_mesa = Mesa::findByNumero($mesa->getNumero());
         $this->assertEquals($mesa, $found_mesa);
         $found_mesa = Mesa::findByNome($mesa->getNome());
         $this->assertEquals($mesa, $found_mesa);
-        $found_mesa->loadByNome($mesa->getNome());
-        $this->assertEquals($mesa, $found_mesa);
 
         $mesa_sec = new Mesa();
+        $mesa_sec->loadNextNumero();
         $mesa_sec->setNome('Mesa find second');
         $mesa_sec->setAtiva('Y');
         $mesa_sec->insert();

@@ -129,11 +129,7 @@ class RegimeTest extends \MZ\Framework\TestCase
         $this->assertEquals($regime, $found_regime);
         $found_regime = Regime::findByID($regime->getID());
         $this->assertEquals($regime, $found_regime);
-        $found_regime->loadByID($regime->getID());
-        $this->assertEquals($regime, $found_regime);
         $found_regime = Regime::findByCodigo($regime->getCodigo());
-        $this->assertEquals($regime, $found_regime);
-        $found_regime->loadByCodigo($regime->getCodigo());
         $this->assertEquals($regime, $found_regime);
 
         $regime_sec = new Regime();

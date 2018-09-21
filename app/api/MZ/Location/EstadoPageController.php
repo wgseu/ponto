@@ -74,7 +74,7 @@ class EstadoPageController extends \MZ\Core\Controller
         if (is_post()) {
             $estado = new Estado($_POST);
             try {
-                $estado->filter($old_estado);
+                $estado->filter($old_estado, true);
                 $estado->save();
                 $old_estado->clean($estado);
                 $msg = sprintf(
@@ -126,7 +126,7 @@ class EstadoPageController extends \MZ\Core\Controller
         if (is_post()) {
             $estado = new Estado($_POST);
             try {
-                $estado->filter($old_estado);
+                $estado->filter($old_estado, true);
                 $estado->save();
                 $old_estado->clean($estado);
                 $msg = sprintf(

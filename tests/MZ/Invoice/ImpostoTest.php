@@ -159,11 +159,7 @@ class ImpostoTest extends \MZ\Framework\TestCase
         $this->assertEquals($imposto, $found_imposto);
         $found_imposto = Imposto::findByID($imposto->getID());
         $this->assertEquals($imposto, $found_imposto);
-        $found_imposto->loadByID($imposto->getID());
-        $this->assertEquals($imposto, $found_imposto);
         $found_imposto = Imposto::findByGrupoSimplesSubstituicaoCodigo($imposto->getGrupo(), $imposto->getSimples(), $imposto->getSubstituicao(), $imposto->getCodigo());
-        $this->assertEquals($imposto, $found_imposto);
-        $found_imposto->loadByGrupoSimplesSubstituicaoCodigo($imposto->getGrupo(), $imposto->getSimples(), $imposto->getSubstituicao(), $imposto->getCodigo());
         $this->assertEquals($imposto, $found_imposto);
 
         $imposto_sec = new Imposto();

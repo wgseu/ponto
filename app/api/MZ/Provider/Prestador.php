@@ -30,54 +30,76 @@ use MZ\Util\Filter;
 use MZ\Util\Validator;
 use MZ\Account\Cliente;
 use MZ\System\Permissao;
+use MZ\Exception\ValidationException;
 
 /**
- * Funcionário que trabalha na empresa e possui uma determinada função
+ * Prestador de serviço que realiza alguma tarefa na empresa
  */
 class Prestador extends SyncModel
 {
 
     /**
-     * Código do funcionário
+     * Vínculo empregatício com a empresa, funcionário e autônomo são pessoas
+     * físicas, prestador é pessoa jurídica
+     */
+    const VINCULO_FUNCIONARIO = 'Funcionario';
+    const VINCULO_PRESTADOR = 'Prestador';
+    const VINCULO_AUTONOMO = 'Autonomo';
+
+    /**
+     * Identificador do prestador
      */
     private $id;
     /**
-     * Função do funcionário na empresa
+     * Código do prestador
+     */
+    private $codigo;
+    /**
+     * Função do prestada na empresa
      */
     private $funcao_id;
     /**
-     * Cliente que representa esse funcionário, único no cadastro de
-     * funcionários
+     * Cliente que representa esse prestador, único no cadastro de prestadores
      */
     private $cliente_id;
     /**
-     * Código de barras utilizado pelo funcionário para autorizar uma operação
-     * no sistema
+     * Informa a empresa que gerencia os colaboradores, nulo para a empresa do
+     * próprio estabelecimento
+     */
+    private $prestador_id;
+    /**
+     * Vínculo empregatício com a empresa, funcionário e autônomo são pessoas
+     * físicas, prestador é pessoa jurídica
+     */
+    private $vinculo;
+    /**
+     * Código de barras utilizado pelo prestador para autorizar uma operação no
+     * sistema
      */
     private $codigo_barras;
     /**
-     * Porcentagem cobrada pelo funcionário ao cliente, Ex.: Comissão de 10%
+     * Porcentagem cobrada pelo funcionário ou autônomo ao cliente, Ex.:
+     * Comissão de 10%
      */
     private $porcentagem;
-    /**
-     * Código da linguagem utilizada pelo funcionário para visualizar o
-     * programa e o site
-     */
-    private $linguagem_id;
     /**
      * Define a distribuição da porcentagem pela parcela de pontos
      */
     private $pontuacao;
     /**
-     * Informa se o funcionário está ativo na empresa
+     * Informa se o prestador está ativo na empresa
      */
     private $ativo;
     /**
-     * Data de saída do funcionário, informado apenas quando ativo for não
+     * Remuneracao pelas atividades exercidas, não está incluso comissões
      */
-    private $data_saida;
+    private $remuneracao;
     /**
-     * Data em que o funcionário foi cadastrado no sistema
+     * Data de término de contrato, informado apenas quando ativo for não
+     */
+    private $data_termino;
+    /**
+     * Data em que o prestador de serviços foi cadastrado no sistema
      */
     private $data_cadastro;
 
@@ -91,8 +113,8 @@ class Prestador extends SyncModel
     }
 
     /**
-     * Código do funcionário
-     * @return mixed Código of Prestador
+     * Identificador do prestador
+     * @return mixed ID of Prestador
      */
     public function getID()
     {
@@ -102,7 +124,7 @@ class Prestador extends SyncModel
     /**
      * Set ID value to new on param
      * @param  mixed $id new value for ID
-     * @return Prestador Self instance
+     * @return self Self instance
      */
     public function setID($id)
     {
@@ -111,7 +133,27 @@ class Prestador extends SyncModel
     }
 
     /**
-     * Função do funcionário na empresa
+     * Código do prestador
+     * @return mixed Código of Prestador
+     */
+    public function getCodigo()
+    {
+        return $this->codigo;
+    }
+
+    /**
+     * Set Codigo value to new on param
+     * @param  mixed $codigo new value for Codigo
+     * @return self Self instance
+     */
+    public function setCodigo($codigo)
+    {
+        $this->codigo = $codigo;
+        return $this;
+    }
+
+    /**
+     * Função do prestada na empresa
      * @return mixed Função of Prestador
      */
     public function getFuncaoID()
@@ -122,7 +164,7 @@ class Prestador extends SyncModel
     /**
      * Set FuncaoID value to new on param
      * @param  mixed $funcao_id new value for FuncaoID
-     * @return Prestador Self instance
+     * @return self Self instance
      */
     public function setFuncaoID($funcao_id)
     {
@@ -131,8 +173,7 @@ class Prestador extends SyncModel
     }
 
     /**
-     * Cliente que representa esse funcionário, único no cadastro de
-     * funcionários
+     * Cliente que representa esse prestador, único no cadastro de prestadores
      * @return mixed Cliente of Prestador
      */
     public function getClienteID()
@@ -143,7 +184,7 @@ class Prestador extends SyncModel
     /**
      * Set ClienteID value to new on param
      * @param  mixed $cliente_id new value for ClienteID
-     * @return Prestador Self instance
+     * @return self Self instance
      */
     public function setClienteID($cliente_id)
     {
@@ -152,8 +193,50 @@ class Prestador extends SyncModel
     }
 
     /**
-     * Código de barras utilizado pelo funcionário para autorizar uma operação
-     * no sistema
+     * Informa a empresa que gerencia os colaboradores, nulo para a empresa do
+     * próprio estabelecimento
+     * @return mixed Prestador of Prestador
+     */
+    public function getPrestadorID()
+    {
+        return $this->prestador_id;
+    }
+
+    /**
+     * Set PrestadorID value to new on param
+     * @param  mixed $prestador_id new value for PrestadorID
+     * @return self Self instance
+     */
+    public function setPrestadorID($prestador_id)
+    {
+        $this->prestador_id = $prestador_id;
+        return $this;
+    }
+
+    /**
+     * Vínculo empregatício com a empresa, funcionário e autônomo são pessoas
+     * físicas, prestador é pessoa jurídica
+     * @return mixed Vínculo of Prestador
+     */
+    public function getVinculo()
+    {
+        return $this->vinculo;
+    }
+
+    /**
+     * Set Vinculo value to new on param
+     * @param  mixed $vinculo new value for Vinculo
+     * @return self Self instance
+     */
+    public function setVinculo($vinculo)
+    {
+        $this->vinculo = $vinculo;
+        return $this;
+    }
+
+    /**
+     * Código de barras utilizado pelo prestador para autorizar uma operação no
+     * sistema
      * @return mixed Código de barras of Prestador
      */
     public function getCodigoBarras()
@@ -164,7 +247,7 @@ class Prestador extends SyncModel
     /**
      * Set CodigoBarras value to new on param
      * @param  mixed $codigo_barras new value for CodigoBarras
-     * @return Prestador Self instance
+     * @return self Self instance
      */
     public function setCodigoBarras($codigo_barras)
     {
@@ -173,7 +256,8 @@ class Prestador extends SyncModel
     }
 
     /**
-     * Porcentagem cobrada pelo funcionário ao cliente, Ex.: Comissão de 10%
+     * Porcentagem cobrada pelo funcionário ou autônomo ao cliente, Ex.:
+     * Comissão de 10%
      * @return mixed Comissão of Prestador
      */
     public function getPorcentagem()
@@ -184,32 +268,11 @@ class Prestador extends SyncModel
     /**
      * Set Porcentagem value to new on param
      * @param  mixed $porcentagem new value for Porcentagem
-     * @return Prestador Self instance
+     * @return self Self instance
      */
     public function setPorcentagem($porcentagem)
     {
         $this->porcentagem = $porcentagem;
-        return $this;
-    }
-
-    /**
-     * Código da linguagem utilizada pelo funcionário para visualizar o
-     * programa e o site
-     * @return mixed Linguagem of Prestador
-     */
-    public function getLinguagemID()
-    {
-        return $this->linguagem_id;
-    }
-
-    /**
-     * Set LinguagemID value to new on param
-     * @param  mixed $linguagem_id new value for LinguagemID
-     * @return Prestador Self instance
-     */
-    public function setLinguagemID($linguagem_id)
-    {
-        $this->linguagem_id = $linguagem_id;
         return $this;
     }
 
@@ -225,7 +288,7 @@ class Prestador extends SyncModel
     /**
      * Set Pontuacao value to new on param
      * @param  mixed $pontuacao new value for Pontuacao
-     * @return Prestador Self instance
+     * @return self Self instance
      */
     public function setPontuacao($pontuacao)
     {
@@ -234,7 +297,7 @@ class Prestador extends SyncModel
     }
 
     /**
-     * Informa se o funcionário está ativo na empresa
+     * Informa se o prestador está ativo na empresa
      * @return mixed Ativo of Prestador
      */
     public function getAtivo()
@@ -243,7 +306,7 @@ class Prestador extends SyncModel
     }
 
     /**
-     * Informa se o funcionário está ativo na empresa
+     * Informa se o prestador está ativo na empresa
      * @return boolean Check if o of Ativo is selected or checked
      */
     public function isAtivo()
@@ -254,7 +317,7 @@ class Prestador extends SyncModel
     /**
      * Set Ativo value to new on param
      * @param  mixed $ativo new value for Ativo
-     * @return Prestador Self instance
+     * @return self Self instance
      */
     public function setAtivo($ativo)
     {
@@ -263,27 +326,47 @@ class Prestador extends SyncModel
     }
 
     /**
-     * Data de saída do funcionário, informado apenas quando ativo for não
-     * @return mixed Data de saída of Prestador
+     * Remuneracao pelas atividades exercidas, não está incluso comissões
+     * @return mixed Remuneração of Prestador
      */
-    public function getDataSaida()
+    public function getRemuneracao()
     {
-        return $this->data_saida;
+        return $this->remuneracao;
     }
 
     /**
-     * Set DataSaida value to new on param
-     * @param  mixed $data_saida new value for DataSaida
-     * @return Prestador Self instance
+     * Set Remuneracao value to new on param
+     * @param  mixed $remuneracao new value for Remuneracao
+     * @return self Self instance
      */
-    public function setDataSaida($data_saida)
+    public function setRemuneracao($remuneracao)
     {
-        $this->data_saida = $data_saida;
+        $this->remuneracao = $remuneracao;
         return $this;
     }
 
     /**
-     * Data em que o funcionário foi cadastrado no sistema
+     * Data de término de contrato, informado apenas quando ativo for não
+     * @return mixed Data de término de contrato of Prestador
+     */
+    public function getDataTermino()
+    {
+        return $this->data_termino;
+    }
+
+    /**
+     * Set DataTermino value to new on param
+     * @param  mixed $data_termino new value for DataTermino
+     * @return self Self instance
+     */
+    public function setDataTermino($data_termino)
+    {
+        $this->data_termino = $data_termino;
+        return $this;
+    }
+
+    /**
+     * Data em que o prestador de serviços foi cadastrado no sistema
      * @return mixed Data de cadastro of Prestador
      */
     public function getDataCadastro()
@@ -294,7 +377,7 @@ class Prestador extends SyncModel
     /**
      * Set DataCadastro value to new on param
      * @param  mixed $data_cadastro new value for DataCadastro
-     * @return Prestador Self instance
+     * @return self Self instance
      */
     public function setDataCadastro($data_cadastro)
     {
@@ -311,14 +394,17 @@ class Prestador extends SyncModel
     {
         $prestador = parent::toArray($recursive);
         $prestador['id'] = $this->getID();
+        $prestador['codigo'] = $this->getCodigo();
         $prestador['funcaoid'] = $this->getFuncaoID();
         $prestador['clienteid'] = $this->getClienteID();
+        $prestador['prestadorid'] = $this->getPrestadorID();
+        $prestador['vinculo'] = $this->getVinculo();
         $prestador['codigobarras'] = $this->getCodigoBarras();
         $prestador['porcentagem'] = $this->getPorcentagem();
-        $prestador['linguagemid'] = $this->getLinguagemID();
         $prestador['pontuacao'] = $this->getPontuacao();
         $prestador['ativo'] = $this->getAtivo();
-        $prestador['datasaida'] = $this->getDataSaida();
+        $prestador['remuneracao'] = $this->getRemuneracao();
+        $prestador['datatermino'] = $this->getDataTermino();
         $prestador['datacadastro'] = $this->getDataCadastro();
         return $prestador;
     }
@@ -326,11 +412,11 @@ class Prestador extends SyncModel
     /**
      * Fill this instance with from array values, you can pass instance to
      * @param  mixed $prestador Associated key -> value to assign into this instance
-     * @return Prestador Self instance
+     * @return self Self instance
      */
     public function fromArray($prestador = [])
     {
-        if ($prestador instanceof Prestador) {
+        if ($prestador instanceof self) {
             $prestador = $prestador->toArray();
         } elseif (!is_array($prestador)) {
             $prestador = [];
@@ -340,6 +426,11 @@ class Prestador extends SyncModel
             $this->setID(null);
         } else {
             $this->setID($prestador['id']);
+        }
+        if (!isset($prestador['codigo'])) {
+            $this->setCodigo(null);
+        } else {
+            $this->setCodigo($prestador['codigo']);
         }
         if (!isset($prestador['funcaoid'])) {
             $this->setFuncaoID(null);
@@ -351,6 +442,16 @@ class Prestador extends SyncModel
         } else {
             $this->setClienteID($prestador['clienteid']);
         }
+        if (!array_key_exists('prestadorid', $prestador)) {
+            $this->setPrestadorID(null);
+        } else {
+            $this->setPrestadorID($prestador['prestadorid']);
+        }
+        if (!isset($prestador['vinculo'])) {
+            $this->setVinculo(null);
+        } else {
+            $this->setVinculo($prestador['vinculo']);
+        }
         if (!array_key_exists('codigobarras', $prestador)) {
             $this->setCodigoBarras(null);
         } else {
@@ -360,11 +461,6 @@ class Prestador extends SyncModel
             $this->setPorcentagem(0);
         } else {
             $this->setPorcentagem($prestador['porcentagem']);
-        }
-        if (!isset($prestador['linguagemid'])) {
-            $this->setLinguagemID(1046);
-        } else {
-            $this->setLinguagemID($prestador['linguagemid']);
         }
         if (!isset($prestador['pontuacao'])) {
             $this->setPontuacao(0);
@@ -376,10 +472,15 @@ class Prestador extends SyncModel
         } else {
             $this->setAtivo($prestador['ativo']);
         }
-        if (!array_key_exists('datasaida', $prestador)) {
-            $this->setDataSaida(null);
+        if (!isset($prestador['remuneracao'])) {
+            $this->setRemuneracao(0);
         } else {
-            $this->setDataSaida($prestador['datasaida']);
+            $this->setRemuneracao($prestador['remuneracao']);
+        }
+        if (!array_key_exists('datatermino', $prestador)) {
+            $this->setDataTermino(null);
+        } else {
+            $this->setDataTermino($prestador['datatermino']);
         }
         if (!isset($prestador['datacadastro'])) {
             $this->setDataCadastro(DB::now());
@@ -414,14 +515,16 @@ class Prestador extends SyncModel
      */
     public function filter($original)
     {
-        $this->setID(Filter::number($this->getID()));
+        $this->setID($original->getID());
+        $this->setCodigo(Filter::number($this->getCodigo()));
         $this->setFuncaoID(Filter::number($this->getFuncaoID()));
         $this->setClienteID(Filter::number($this->getClienteID()));
+        $this->setPrestadorID(Filter::number($this->getPrestadorID()));
         $this->setCodigoBarras(Filter::string($this->getCodigoBarras()));
         $this->setPorcentagem(Filter::float($this->getPorcentagem()));
-        $this->setLinguagemID(Filter::number($this->getLinguagemID()));
         $this->setPontuacao(Filter::number($this->getPontuacao()));
-        $this->setDataSaida($original->getDataSaida());
+        $this->setRemuneracao(Filter::money($this->getRemuneracao()));
+        $this->setDataTermino(Filter::datetime($this->getDataTermino()));
         if (is_owner($original) || is_self($original)) {
             $this->setClienteID($original->getClienteID());
             $this->setFuncaoID($original->getFuncaoID());
@@ -449,6 +552,9 @@ class Prestador extends SyncModel
     public function validate()
     {
         $errors = [];
+        if (is_null($this->getCodigo())) {
+            $errors['codigo'] = 'O código não pode ser vazio';
+        }
         if (is_null($this->getFuncaoID())) {
             $errors['funcaoid'] = 'A função não pode ser vazia';
         }
@@ -464,13 +570,13 @@ class Prestador extends SyncModel
                 $errors['clienteid'] = 'O cliente precisa possuir uma senha';
             }
         }
+        if (!Validator::checkInSet($this->getVinculo(), self::getVinculoOptions())) {
+            $errors['vinculo'] = 'O vínculo é inválido';
+        }
         if (is_null($this->getPorcentagem())) {
             $errors['porcentagem'] = 'A comissão não pode ser vazia';
         } elseif ($this->getPorcentagem() < 0) {
             $errors['porcentagem'] = 'A comissão não pode ser negativa';
-        }
-        if (is_null($this->getLinguagemID())) {
-            $errors['linguagemid'] = 'A linguagem não pode ser vazia';
         }
         if (is_null($this->getPontuacao())) {
             $errors['pontuacao'] = 'A pontuação não pode ser vazia';
@@ -479,6 +585,9 @@ class Prestador extends SyncModel
         }
         if (!Validator::checkBoolean($this->getAtivo())) {
             $errors['ativo'] = 'A informação se está ativo(a) não foi informada ou é inválida';
+        }
+        if (is_null($this->getRemuneracao())) {
+            $errors['remuneracao'] = 'A remuneração não pode ser vazia';
         }
         $this->setDataCadastro(DB::now());
         if (!empty($errors)) {
@@ -494,16 +603,8 @@ class Prestador extends SyncModel
      */
     protected function translate($e)
     {
-        if (stripos($e->getMessage(), 'PRIMARY') !== false) {
-            return new \MZ\Exception\ValidationException([
-                'id' => sprintf(
-                    'O código "%s" já está cadastrado',
-                    $this->getID()
-                ),
-            ]);
-        }
-        if (stripos($e->getMessage(), 'UK_ClienteID') !== false) {
-            return new \MZ\Exception\ValidationException([
+        if (contains(['ClienteID', 'UNIQUE'], $e->getMessage())) {
+            return new ValidationException([
                 'clienteid' => sprintf(
                     'O cliente "%s" já está cadastrado',
                     $this->getClienteID()
@@ -511,10 +612,18 @@ class Prestador extends SyncModel
             ]);
         }
         if (contains(['CodigoBarras', 'UNIQUE'], $e->getMessage())) {
-            return new \MZ\Exception\ValidationException([
+            return new ValidationException([
                 'codigobarras' => sprintf(
                     'O código de barras "%s" já está cadastrado',
                     $this->getCodigoBarras()
+                ),
+            ]);
+        }
+        if (contains(['Codigo', 'UNIQUE'], $e->getMessage())) {
+            return new ValidationException([
+                'codigo' => sprintf(
+                    'O código "%s" já está cadastrado',
+                    $this->getCodigo()
                 ),
             ]);
         }
@@ -530,7 +639,8 @@ class Prestador extends SyncModel
         $values = $this->validate();
         try {
             $id = DB::insertInto('Prestadores')->values($values)->execute();
-            $this->loadByID($id);
+            $this->setID($id);
+            $this->loadByID();
         } catch (\Exception $e) {
             throw $this->translate($e);
         }
@@ -538,27 +648,28 @@ class Prestador extends SyncModel
     }
 
     /**
-     * Update Funcionário with instance values into database for Código
-     * @return Prestador Self instance
+     * Update Prestador with instance values into database for ID
+     * @param  array $only Save these fields only, when empty save all fields except id
+     * @return int rows affected
      */
     public function update($only = [])
     {
         $values = $this->validate();
         if (!$this->exists()) {
-            throw new \Exception('O identificador do funcionário não foi informado');
+            throw new \Exception('O identificador do prestador não foi informado');
         }
         $values = DB::filterValues($values, $only, false);
         unset($values['datacadastro']);
         try {
-            DB::update('Prestadores')
+            $affected = DB::update('Prestadores')
                 ->set($values)
                 ->where('id', $this->getID())
                 ->execute();
-            $this->loadByID($this->getID());
+            $this->loadByID();
         } catch (\Exception $e) {
             throw $this->translate($e);
         }
-        return $this;
+        return $affected;
     }
 
     /**
@@ -597,7 +708,6 @@ class Prestador extends SyncModel
      */
     public function has($permission)
     {
-        global $app;
         if (!$this->exists()) {
             return false;
         }
@@ -605,7 +715,7 @@ class Prestador extends SyncModel
             return true;
         }
         settype($permission, 'array');
-        $permissoes = $app->getAuthentication()->getPermissions();
+        $permissoes = $this->getApplication()->getAuthentication()->getPermissions();
         if ($this->getID() != logged_provider()->getID()) {
             $permissoes = Acesso::getPermissoes($this->getFuncaoID());
         }
@@ -663,6 +773,27 @@ class Prestador extends SyncModel
     }
 
     /**
+     * Load into this object from database using, Codigo
+     * @return self Self filled instance or empty when not found
+     */
+    public function loadByCodigo()
+    {
+        return $this->load([
+            'codigo' => intval($this->getCodigo()),
+        ]);
+    }
+
+    /**
+     * Load next available code from database into this object codigo field
+     * @return self Self id filled instance with next code
+     */
+    public function loadNextCodigo()
+    {
+        $last = self::find([], ['codigo' => -1]);
+        return $this->setCodigo($last->getCodigo() + 1);
+    }
+
+    /**
      * Função do funcionário na empresa
      * @return \MZ\Provider\Funcao The object fetched from database
      */
@@ -679,6 +810,37 @@ class Prestador extends SyncModel
     public function findClienteID()
     {
         return \MZ\Account\Cliente::findByID($this->getClienteID());
+    }
+
+    /**
+     * Informa a empresa que gerencia os colaboradores, nulo para a empresa do
+     * próprio estabelecimento
+     * @return \MZ\Provider\Prestador The object fetched from database
+     */
+    public function findPrestadorID()
+    {
+        if (is_null($this->getPrestadorID())) {
+            return new \MZ\Provider\Prestador();
+        }
+        return \MZ\Provider\Prestador::findByID($this->getPrestadorID());
+    }
+
+    /**
+     * Gets textual and translated Vinculo for Prestador
+     * @param  int $index choose option from index
+     * @return mixed A associative key -> translated representative text or text for index
+     */
+    public static function getVinculoOptions($index = null)
+    {
+        $options = [
+            self::VINCULO_FUNCIONARIO => 'Funcionário',
+            self::VINCULO_PRESTADOR => 'Prestador',
+            self::VINCULO_AUTONOMO => 'Autônomo',
+        ];
+        if (!is_null($index)) {
+            return $options[$index];
+        }
+        return $options;
     }
 
     /**
@@ -724,7 +886,8 @@ class Prestador extends SyncModel
     private static function query($condition = [], $order = [])
     {
         $query = DB::from('Prestadores p')
-            ->leftJoin('Clientes c ON c.id = p.clienteid');
+            ->leftJoin('Clientes c ON c.id = p.clienteid')
+            ->leftJoin('Telefones t ON t.clienteid = c.id AND t.principal = ?', 'Y');
         if (isset($condition['search'])) {
             $search = trim($condition['search']);
             if (Validator::checkEmail($search)) {
@@ -733,8 +896,8 @@ class Prestador extends SyncModel
                 $query = $query->where('c.cpf', Filter::digits($search));
             } elseif (check_fone($search, true)) {
                 $fone = Cliente::buildFoneSearch($search);
-                $query = $query->where('(c.fone1 LIKE ? OR c.fone2 LIKE ?)', $fone, $fone);
-                $query = $query->orderBy('IF(c.fone1 LIKE ?, 0, 1)', $fone);
+                $query = $query->where('(t.numero LIKE ?)', $fone, $fone);
+                $query = $query->orderBy('IF(t.numero LIKE ?, 0, 1)', $fone);
             } elseif (Validator::checkDigits($search)) {
                 $query = $query->where('p.id', intval($search));
             } else {
@@ -792,12 +955,24 @@ class Prestador extends SyncModel
     }
 
     /**
+     * Find this object on database using, Codigo
+     * @param  int $codigo código to find Prestador
+     * @return self A filled instance or empty when not found
+     */
+    public static function findByCodigo($codigo)
+    {
+        $result = new self();
+        $result->setCodigo($codigo);
+        return $result->loadByCodigo();
+    }
+
+    /**
      * Find all Funcionário
      * @param  array  $condition Condition to get all Funcionário
      * @param  array  $order     Order Funcionário
      * @param  int    $limit     Limit data into row count
      * @param  int    $offset    Start offset to get rows
-     * @return array             List of all rows instanced as Prestador
+     * @return self[]             List of all rows instanced as Prestador
      */
     public static function findAll($condition = [], $order = [], $limit = null, $offset = null)
     {

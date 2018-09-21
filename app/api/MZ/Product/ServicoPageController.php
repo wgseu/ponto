@@ -74,7 +74,7 @@ class ServicoPageController extends \MZ\Core\Controller
         if (is_post()) {
             $servico = new Servico($_POST);
             try {
-                $servico->filter($old_servico);
+                $servico->filter($old_servico, true);
                 $servico->insert();
                 $old_servico->clean($servico);
                 $msg = sprintf(
@@ -127,7 +127,7 @@ class ServicoPageController extends \MZ\Core\Controller
         if (is_post()) {
             $servico = new Servico($_POST);
             try {
-                $servico->filter($old_servico);
+                $servico->filter($old_servico, true);
                 $servico->update();
                 $old_servico->clean($servico);
                 $msg = sprintf(

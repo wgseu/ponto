@@ -30,6 +30,23 @@ use MZ\Provider\Prestador;
 
 class ClienteTest extends \MZ\Framework\TestCase
 {
+    /**
+     * @return Cliente
+     */
+    public static function create()
+    {
+        $last = Cliente::find([], ['id' => -1]);
+        $id = $last->getID() + 1;
+        $cliente = new Cliente();
+        $cliente->setNomeCompleto('Aleatorio da Silva');
+        $cliente->setEmail("testaleatorio{$id}@email.com");
+        $cliente->setLogin("login_{$id}");
+        $cliente->setGenero(Cliente::GENERO_MASCULINO);
+        $cliente->setSenha('1234');
+        $cliente->insert();
+        return $cliente;
+    }
+
     public function testFromArray()
     {
         $old_cliente = new Cliente([
@@ -237,7 +254,7 @@ class ClienteTest extends \MZ\Framework\TestCase
         }
         $cliente->setID($id);
         $cliente->delete();
-        $cliente->loadByID($cliente->getID());
+        $cliente->loadByID();
         $this->assertFalse($cliente->exists());
     }
 
@@ -279,11 +296,13 @@ class ClienteTest extends \MZ\Framework\TestCase
         $cliente->setGenero(Cliente::GENERO_MASCULINO);
         $cliente->setSenha('1234');
         $cliente->setTelefone('44967442288');
+        $cliente->getTelefone()->setPaisID($this->getApplication()->getSystem()->getCountry()->getID());
         $cliente->insert();
         $first_cliente = new Cliente($cliente);
         $cliente->setEmail('beltrano@email.com');
         $cliente->setLogin('beltrano');
         $cliente->setTelefone('44988552211');
+        $cliente->getTelefone()->setPaisID($this->getApplication()->getSystem()->getCountry()->getID());
         $cliente->setCPF('95672167624');
         $cliente->setSenha('1234');
         $cliente->setSecreto('635sd89d5f4a68d7sd6s5a4');
@@ -341,11 +360,11 @@ class ClienteTest extends \MZ\Framework\TestCase
         // findBySecreto
         $found_cliente = Cliente::findBySecreto($cliente->getSecreto());
         $this->assertEquals($cliente, $found_cliente);
-        // findAcionistaID
-        $found_cliente = $cliente->findAcionistaID();
+        // findEmpresaID
+        $found_cliente = $cliente->findEmpresaID();
         $this->assertEquals($first_cliente, $found_cliente);
-        // findAcionistaID
-        $found_cliente = $first_cliente->findAcionistaID();
+        // findEmpresaID
+        $found_cliente = $first_cliente->findEmpresaID();
         $empty_cliente->setDataCadastro($found_cliente->getDataCadastro());
         $empty_cliente->setDataAtualizacao($found_cliente->getDataAtualizacao());
         $this->assertEquals($empty_cliente, $found_cliente);
@@ -354,7 +373,7 @@ class ClienteTest extends \MZ\Framework\TestCase
         $this->assertEquals($cliente, $found_cliente);
         $found_cliente = Cliente::find(['search' => $cliente->getCPF()]);
         $this->assertEquals($cliente, $found_cliente);
-        $found_cliente = Cliente::find(['search' => $cliente->getFone(1)]);
+        $found_cliente = Cliente::find(['search' => $cliente->getTelefone()->getNumero()]);
         $this->assertEquals($cliente, $found_cliente);
         // findAll
         $clientes = Cliente::findAll(['search' => $cliente->getNomeCompleto()], ['id' => -1], 2, 0);

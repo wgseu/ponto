@@ -281,7 +281,8 @@ class Servidor extends Model
         unset($values['id']);
         try {
             $id = DB::insertInto('Servidores')->values($values)->execute();
-            $this->loadByID($id);
+            $this->setID($id);
+            $this->loadByID();
         } catch (\Exception $e) {
             throw $this->translate($e);
         }
@@ -305,7 +306,7 @@ class Servidor extends Model
                 ->set($values)
                 ->where(['id' => $this->getID()])
                 ->execute();
-            $this->loadByID($this->getID());
+            $this->loadByID();
         } catch (\Exception $e) {
             throw $this->translate($e);
         }

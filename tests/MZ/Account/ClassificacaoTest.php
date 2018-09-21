@@ -123,11 +123,7 @@ class ClassificacaoTest extends \MZ\Framework\TestCase
         $this->assertEquals($classificacao, $found_classificacao);
         $found_classificacao = Classificacao::findByID($classificacao->getID());
         $this->assertEquals($classificacao, $found_classificacao);
-        $found_classificacao->loadByID($classificacao->getID());
-        $this->assertEquals($classificacao, $found_classificacao);
         $found_classificacao = Classificacao::findByDescricao($classificacao->getDescricao());
-        $this->assertEquals($classificacao, $found_classificacao);
-        $found_classificacao->loadByDescricao($classificacao->getDescricao());
         $this->assertEquals($classificacao, $found_classificacao);
 
         $classificacao_sec = new Classificacao();

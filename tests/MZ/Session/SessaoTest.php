@@ -154,8 +154,6 @@ class SessaoTest extends \MZ\Framework\TestCase
         $sessao->update();
         $found_sessao = Sessao::findByID($sessao->getID());
         $this->assertEquals($sessao, $found_sessao);
-        $found_sessao->loadByID($sessao->getID());
-        $this->assertEquals($sessao, $found_sessao);
 
         $sessao_sec = new Sessao();
         $sessao_sec->setDataInicio('2016-11-25 12:15:00');

@@ -26,34 +26,34 @@ namespace MZ\Account;
 
 use MZ\System\Permissao;
 use MZ\Util\Filter;
+use MZ\Core\PageController;
 
 /**
  * Allow application to serve system resources
  */
-class ClassificacaoPageController extends \MZ\Core\Controller
+class ClassificacaoPageController extends PageController
 {
     public function find()
     {
-        need_permission(Permissao::NOME_CADASTROCONTAS, is_output('json'));
+        $this->needPermission([Permissao::NOME_CADASTROCONTAS]);
 
-        $limite = isset($_GET['limite']) ? intval($_GET['limite']) : 10;
-        if ($limite > 100 || $limite < 1) {
-            $limite = 10;
-        }
-        $condition = Filter::query($_GET);
+        $limite = max(1, min(100, $this->getRequest()->query->getInt('limite', 10)));
+        $condition = Filter::query($this->getRequest()->query->all());
         unset($condition['ordem']);
         if (isset($condition['classificacaoid']) && intval($condition['classificacaoid']) < 0) {
             unset($condition['classificacaoid']);
-        } elseif (array_key_exists('classificacaoid', $_GET)) {
+        } elseif ($this->getRequest()->query->has('classificacaoid')) {
             $condition['classificacaoid'] = isset($condition['classificacaoid']) ? $condition['classificacaoid'] : null;
         }
         $classificacao = new Classificacao($condition);
-        $order = Filter::order(isset($_GET['ordem']) ? $_GET['ordem'] : '');
+        $order = Filter::order($this->getRequest()->query->get('ordem', ''));
         $count = Classificacao::count($condition);
-        list($pagesize, $offset, $pagination) = pagestring($count, $limite);
-        $classificacoes = Classificacao::findAll($condition, $order, $pagesize, $offset);
+        $page = max(1, $this->getRequest()->query->getInt('pagina', 1));
+        $pager = new \Pager($count, $limite, $page, 'pagina');
+        $pagination = $pager->genBasic();
+        $classificacoes = Classificacao::findAll($condition, $order, $limite, $pager->offset);
 
-        if (is_output('json')) {
+        if ($this->isJson()) {
             $items = [];
             foreach ($classificacoes as $_classificacao) {
                 $items[] = $_classificacao->publish();
@@ -71,8 +71,8 @@ class ClassificacaoPageController extends \MZ\Core\Controller
 
     public function add()
     {
-        need_permission(Permissao::NOME_CADASTROCONTAS, is_output('json'));
-        $id = isset($_GET['id']) ? $_GET['id'] : null;
+        $this->needPermission([Permissao::NOME_CADASTROCONTAS]);
+        $id = $this->getRequest()->query->getInt('id', null);
         $classificacao = Classificacao::findByID($id);
         $classificacao->setID(null);
 
@@ -80,7 +80,7 @@ class ClassificacaoPageController extends \MZ\Core\Controller
         $errors = [];
         $old_classificacao = $classificacao;
         if (is_post()) {
-            $classificacao = new Classificacao($_POST);
+            $classificacao = new Classificacao($this->getData());
             try {
                 $classificacao->filter($old_classificacao, true);
                 $classificacao->insert();
@@ -89,7 +89,7 @@ class ClassificacaoPageController extends \MZ\Core\Controller
                     'Classificação "%s" cadastrada com sucesso!',
                     $classificacao->getDescricao()
                 );
-                if (is_output('json')) {
+                if ($this->isJson()) {
                     return $this->json()->success(['item' => $classificacao->publish()], $msg);
                 }
                 \Thunder::success($msg, true);
@@ -99,7 +99,7 @@ class ClassificacaoPageController extends \MZ\Core\Controller
                 if ($e instanceof \MZ\Exception\ValidationException) {
                     $errors = $e->getErrors();
                 }
-                if (is_output('json')) {
+                if ($this->isJson()) {
                     return $this->json()->error($e->getMessage(), null, $errors);
                 }
                 \Thunder::error($e->getMessage());
@@ -108,7 +108,7 @@ class ClassificacaoPageController extends \MZ\Core\Controller
                     break;
                 }
             }
-        } elseif (is_output('json')) {
+        } elseif ($this->isJson()) {
             return $this->json()->error('Nenhum dado foi enviado');
         } else {
             $classificacao = new Classificacao();
@@ -119,12 +119,12 @@ class ClassificacaoPageController extends \MZ\Core\Controller
 
     public function update()
     {
-        need_permission(Permissao::NOME_CADASTROCONTAS, is_output('json'));
-        $id = isset($_GET['id']) ? $_GET['id'] : null;
+        $this->needPermission([Permissao::NOME_CADASTROCONTAS]);
+        $id = $this->getRequest()->query->getInt('id', null);
         $classificacao = Classificacao::findByID($id);
         if (!$classificacao->exists()) {
             $msg = 'A classificação não foi informada ou não existe!';
-            if (is_output('json')) {
+            if ($this->isJson()) {
                 return $this->json()->error($msg);
             }
             \Thunder::warning($msg);
@@ -134,7 +134,7 @@ class ClassificacaoPageController extends \MZ\Core\Controller
         $errors = [];
         $old_classificacao = $classificacao;
         if (is_post()) {
-            $classificacao = new Classificacao($_POST);
+            $classificacao = new Classificacao($this->getData());
             try {
                 $classificacao->setID($old_classificacao->getID());
                 $classificacao->filter($old_classificacao, true);
@@ -144,7 +144,7 @@ class ClassificacaoPageController extends \MZ\Core\Controller
                     'Classificação "%s" atualizada com sucesso!',
                     $classificacao->getDescricao()
                 );
-                if (is_output('json')) {
+                if ($this->isJson()) {
                     return $this->json()->success(['item' => $classificacao->publish()], $msg);
                 }
                 \Thunder::success($msg, true);
@@ -154,7 +154,7 @@ class ClassificacaoPageController extends \MZ\Core\Controller
                 if ($e instanceof \MZ\Exception\ValidationException) {
                     $errors = $e->getErrors();
                 }
-                if (is_output('json')) {
+                if ($this->isJson()) {
                     return $this->json()->error($e->getMessage(), null, $errors);
                 }
                 \Thunder::error($e->getMessage());
@@ -163,7 +163,7 @@ class ClassificacaoPageController extends \MZ\Core\Controller
                     break;
                 }
             }
-        } elseif (is_output('json')) {
+        } elseif ($this->isJson()) {
             return $this->json()->error('Nenhum dado foi enviado');
         }
         $_classificacoes = Classificacao::findAll(['classificacaoid' => null]);
@@ -172,12 +172,12 @@ class ClassificacaoPageController extends \MZ\Core\Controller
 
     public function delete()
     {
-        need_permission(Permissao::NOME_CADASTROCONTAS, is_output('json'));
-        $id = isset($_GET['id']) ? $_GET['id'] : null;
+        $this->needPermission([Permissao::NOME_CADASTROCONTAS]);
+        $id = $this->getRequest()->query->getInt('id', null);
         $classificacao = Classificacao::findByID($id);
         if (!$classificacao->exists()) {
             $msg = 'A classificação não foi informada ou não existe!';
-            if (is_output('json')) {
+            if ($this->isJson()) {
                 return $this->json()->error($msg);
             }
             \Thunder::warning($msg);
@@ -187,7 +187,7 @@ class ClassificacaoPageController extends \MZ\Core\Controller
             $classificacao->delete();
             $classificacao->clean(new Classificacao());
             $msg = sprintf('Classificação "%s" excluída com sucesso!', $classificacao->getDescricao());
-            if (is_output('json')) {
+            if ($this->isJson()) {
                 return $this->json()->success([], $msg);
             }
             \Thunder::success($msg, true);
@@ -196,7 +196,7 @@ class ClassificacaoPageController extends \MZ\Core\Controller
                 'Não foi possível excluir a classificação "%s"!',
                 $classificacao->getDescricao()
             );
-            if (is_output('json')) {
+            if ($this->isJson()) {
                 return $this->json()->error($msg);
             }
             \Thunder::error($msg);

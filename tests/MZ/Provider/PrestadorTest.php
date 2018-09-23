@@ -24,39 +24,63 @@
  */
 namespace MZ\Provider;
 
+use MZ\Provider\FuncaoTest;
+use MZ\Account\ClienteTest;
+use MZ\System\Permissao;
+
 class PrestadorTest extends \MZ\Framework\TestCase
 {
     /**
+     * Build a valid prestador
+     * @param Funcao $funcao provider function
      * @return Prestador
      */
-    public static function create($funcao)
+    public static function build($funcao = null)
     {
-        $cliente = \MZ\Account\ClienteTest::create();
-        $last = Prestador::find([], ['id' => -1]);
+        $funcao = $funcao ?: FuncaoTest::create(Permissao::getAll());
+        $cliente = ClienteTest::create();
         $prestador = new Prestador();
         $prestador->loadNextCodigo();
         $prestador->setFuncaoID($funcao->getID());
         $prestador->setClienteID($cliente->getID());
         $prestador->setVinculo(Prestador::VINCULO_FUNCIONARIO);
         $prestador->setAtivo('Y');
+        return $prestador;
+    }
+
+    /**
+     * Create a prestador on database
+     * @param Funcao $funcao provider function
+     * @return Prestador
+     */
+    public static function create($funcao = null)
+    {
+        $prestador = self::build($funcao);
         $prestador->insert();
         return $prestador;
     }
 
+    /**
+     * Create a prestador on database
+     * @return Prestador
+     */
     public function testPublish()
     {
         $funcionario = new Prestador();
         $values = $funcionario->publish();
         $allowed = [
             'id',
+            'codigo',
             'funcaoid',
             'clienteid',
+            'prestadorid',
+            'vinculo',
             'codigobarras',
             'porcentagem',
-            'linguagemid',
             'pontuacao',
             'ativo',
-            'datasaida',
+            'remuneracao',
+            'datatermino',
             'datacadastro',
         ];
         $this->assertEquals($allowed, array_keys($values));

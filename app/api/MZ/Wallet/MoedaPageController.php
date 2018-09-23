@@ -26,29 +26,29 @@ namespace MZ\Wallet;
 
 use MZ\System\Permissao;
 use MZ\Util\Filter;
+use MZ\Core\PageController;
 
 /**
  * Allow application to serve system resources
  */
-class MoedaPageController extends \MZ\Core\Controller
+class MoedaPageController extends PageController
 {
     public function find()
     {
-        need_permission(Permissao::NOME_CADASTROMOEDAS, is_output('json'));
+        $this->needPermission([Permissao::NOME_CADASTROMOEDAS]);
 
-        $limite = isset($_GET['limite']) ? intval($_GET['limite']) : 10;
-        if ($limite > 100 || $limite < 1) {
-            $limite = 10;
-        }
-        $condition = Filter::query($_GET);
+        $limite = max(1, min(100, $this->getRequest()->query->getInt('limite', 10)));
+        $condition = Filter::query($this->getRequest()->query->all());
         unset($condition['ordem']);
         $moeda = new Moeda($condition);
-        $order = Filter::order(isset($_GET['ordem'])?$_GET['ordem']:'');
+        $order = Filter::order($this->getRequest()->query->get('ordem', ''));
         $count = Moeda::count($condition);
-        list($pagesize, $offset, $pagination) = pagestring($count, $limite);
-        $moedas = Moeda::findAll($condition, $order, $pagesize, $offset);
+        $page = max(1, $this->getRequest()->query->getInt('pagina', 1));
+        $pager = new \Pager($count, $limite, $page, 'pagina');
+        $pagination = $pager->genBasic();
+        $moedas = Moeda::findAll($condition, $order, $limite, $pager->offset);
 
-        if (is_output('json')) {
+        if ($this->isJson()) {
             $items = [];
             foreach ($moedas as $_moeda) {
                 $items[] = $_moeda->publish();
@@ -61,8 +61,8 @@ class MoedaPageController extends \MZ\Core\Controller
 
     public function add()
     {
-        need_permission(Permissao::NOME_CADASTROMOEDAS, is_output('json'));
-        $id = isset($_GET['id']) ? $_GET['id'] : null;
+        $this->needPermission([Permissao::NOME_CADASTROMOEDAS]);
+        $id = $this->getRequest()->query->getInt('id', null);
         $moeda = Moeda::findByID($id);
         $moeda->setID(null);
 
@@ -70,7 +70,7 @@ class MoedaPageController extends \MZ\Core\Controller
         $errors = [];
         $old_moeda = $moeda;
         if (is_post()) {
-            $moeda = new Moeda($_POST);
+            $moeda = new Moeda($this->getData());
             try {
                 $moeda->filter($old_moeda, true);
                 $moeda->save();
@@ -79,7 +79,7 @@ class MoedaPageController extends \MZ\Core\Controller
                     'Moeda "%s" atualizada com sucesso!',
                     $moeda->getNome()
                 );
-                if (is_output('json')) {
+                if ($this->isJson()) {
                     return $this->json()->success(['item' => $moeda->publish()], $msg);
                 }
                 \Thunder::success($msg, true);
@@ -89,7 +89,7 @@ class MoedaPageController extends \MZ\Core\Controller
                 if ($e instanceof \MZ\Exception\ValidationException) {
                     $errors = $e->getErrors();
                 }
-                if (is_output('json')) {
+                if ($this->isJson()) {
                     return $this->json()->error($e->getMessage(), null, $errors);
                 }
                 \Thunder::error($e->getMessage());
@@ -98,7 +98,7 @@ class MoedaPageController extends \MZ\Core\Controller
                     break;
                 }
             }
-        } elseif (is_output('json')) {
+        } elseif ($this->isJson()) {
             return $this->json()->error('Nenhum dado foi enviado');
         } elseif (is_null($moeda->getNome())) {
             $moeda->setDivisao(100);
@@ -110,12 +110,12 @@ class MoedaPageController extends \MZ\Core\Controller
 
     public function update()
     {
-        need_permission(Permissao::NOME_CADASTROMOEDAS, is_output('json'));
-        $id = isset($_GET['id']) ? $_GET['id'] : null;
+        $this->needPermission([Permissao::NOME_CADASTROMOEDAS]);
+        $id = $this->getRequest()->query->getInt('id', null);
         $moeda = Moeda::findByID($id);
         if (!$moeda->exists()) {
             $msg = 'A moeda não foi informada ou não existe';
-            if (is_output('json')) {
+            if ($this->isJson()) {
                 return $this->json()->error($msg);
             }
             \Thunder::warning($msg);
@@ -125,7 +125,7 @@ class MoedaPageController extends \MZ\Core\Controller
         $errors = [];
         $old_moeda = $moeda;
         if (is_post()) {
-            $moeda = new Moeda($_POST);
+            $moeda = new Moeda($this->getData());
             try {
                 $moeda->filter($old_moeda, true);
                 $moeda->save();
@@ -134,7 +134,7 @@ class MoedaPageController extends \MZ\Core\Controller
                     'Moeda "%s" atualizada com sucesso!',
                     $moeda->getNome()
                 );
-                if (is_output('json')) {
+                if ($this->isJson()) {
                     return $this->json()->success(['item' => $moeda->publish()], $msg);
                 }
                 \Thunder::success($msg, true);
@@ -144,7 +144,7 @@ class MoedaPageController extends \MZ\Core\Controller
                 if ($e instanceof \MZ\Exception\ValidationException) {
                     $errors = $e->getErrors();
                 }
-                if (is_output('json')) {
+                if ($this->isJson()) {
                     return $this->json()->error($e->getMessage(), null, $errors);
                 }
                 \Thunder::error($e->getMessage());
@@ -153,7 +153,7 @@ class MoedaPageController extends \MZ\Core\Controller
                     break;
                 }
             }
-        } elseif (is_output('json')) {
+        } elseif ($this->isJson()) {
             return $this->json()->error('Nenhum dado foi enviado');
         }
         return $this->view('gerenciar_moeda_editar', get_defined_vars());
@@ -161,12 +161,12 @@ class MoedaPageController extends \MZ\Core\Controller
 
     public function delete()
     {
-        need_permission(Permissao::NOME_CADASTROMOEDAS, is_output('json'));
-        $id = isset($_GET['id']) ? $_GET['id'] : null;
+        $this->needPermission([Permissao::NOME_CADASTROMOEDAS]);
+        $id = $this->getRequest()->query->getInt('id', null);
         $moeda = Moeda::findByID($id);
         if (!$moeda->exists()) {
             $msg = 'A moeda não foi informada ou não existe';
-            if (is_output('json')) {
+            if ($this->isJson()) {
                 return $this->json()->error($msg);
             }
             \Thunder::warning($msg);
@@ -176,7 +176,7 @@ class MoedaPageController extends \MZ\Core\Controller
             $moeda->delete();
             $moeda->clean(new Moeda());
             $msg = sprintf('Moeda "%s" excluída com sucesso!', $moeda->getNome());
-            if (is_output('json')) {
+            if ($this->isJson()) {
                 return $this->json()->success([], $msg);
             }
             \Thunder::success($msg, true);
@@ -185,7 +185,7 @@ class MoedaPageController extends \MZ\Core\Controller
                 'Não foi possível excluir a moeda "%s"',
                 $moeda->getNome()
             );
-            if (is_output('json')) {
+            if ($this->isJson()) {
                 return $this->json()->error($msg);
             }
             \Thunder::error($msg);

@@ -38,6 +38,13 @@ use MZ\Account\AuthenticationTest;
 
 class $[Table.norm]Test extends \MZ\Framework\TestCase
 {
+    /**
+     * Build a valid $[table.name]
+$[descriptor.if(string)]
+     * @param string $$[descriptor.unix] $[Table.name] $[descriptor.name]
+$[descriptor.end]
+     * @return $[Table.norm]
+     */
     public static function build($[descriptor.if(string)]$$[descriptor.unix] = null$[descriptor.end])
     {
         $last = $[Table.norm]::find([], ['id' => -1]);
@@ -45,12 +52,12 @@ class $[Table.norm]Test extends \MZ\Framework\TestCase
 $[field.each(all)]
 $[field.if(null|primary)]
 $[field.else.if(reference)]
-        $$[reference.unix] = new $[Reference.norm]Test::create();
+        $$[reference.unix] = $[Reference.norm]Test::create();
 $[field.end]
 $[field.end]
         $$[table.unix] = new $[Table.norm]();
 $[field.each(all)]
-$[field.if(null|primary)]
+$[field.if(null|primary|info)]
 $[field.else.if(reference)]
         $$[table.unix]->set$[Field.norm]($[field.if(array)]$[field.array.number], $[field.end]$$[reference.unix]->get$[Reference.pk.norm]());
 $[field.else.if(info)]
@@ -59,10 +66,17 @@ $[field.else.if(enum)]
         $$[table.unix]->set$[Field.norm]($[field.if(array)]$[field.array.number], $[field.end]$[Table.norm]::$[field.each(option)]$[field.if(first)]$[FIELD.unix]_$[FIELD.option.norm]$[field.end]$[field.end]);
 $[field.else.if(descriptor)]
 $[descriptor.if(string)]
-        $$[table.unix]->set$[Field.norm]($[field.if(array)]$[field.array.number], $[field.end]$$[field.unix] ?: "$[Table.name] #{$id}");
+        $$[table.unix]->set$[Field.norm]($[field.if(array)]$[field.array.number], $[field.end]$$[field.unix] ?: "$[Table.name] {$id}");
 $[descriptor.else]
         $$[table.unix]->set$[Field.norm]($[field.if(array)]$[field.array.number], $[field.end]$id);
 $[descriptor.end]
+$[field.else.if(unique)]
+$[field.if(string)]
+        $$[table.unix]->set$[Field.norm]($[field.if(array)]$[field.array.number], $[field.end]$$[field.unix] ?: "$[Table.name] {$id}");
+$[field.else]
+        $$[table.unix]->set$[Field.norm]($[field.if(array)]$[field.array.number], $[field.end]$id);
+$[field.end]
+$[field.else.match(.*atualizacao|.*cadastro|.*criacao|.*lancamento|.*envio)]
 $[field.else]
         $$[table.unix]->set$[Field.norm]($[field.if(array)]$[field.array.number], $[field.end]$[field.if(integer|bigint)]123$[field.else.if(float|currency)]12.3$[field.else.if(boolean)]'Y'$[field.else.if(datetime)]'2016-12-25 12:15:00'$[field.else.if(blob)]"\x5\x0\x3"$[field.else.if(image)]'image.png'$[field.else]'$[Field.name] d$[table.gender] $[table.name]'$[field.end]);
 $[field.end]
@@ -70,9 +84,16 @@ $[field.end]
         return $$[table.unix];
     }
 
+    /**
+     * Create a $[table.name] on database
+$[descriptor.if(string)]
+     * @param string $$[descriptor.unix] $[Table.name] $[descriptor.name]
+$[descriptor.end]
+     * @return $[Table.norm]
+     */
     public static function create($[descriptor.if(string)]$$[descriptor.unix] = null$[descriptor.end])
     {
-        $$[table.unix] = self::create($[descriptor.if(string)]$$[descriptor.unix]$[descriptor.end]);
+        $$[table.unix] = self::build($[descriptor.if(string)]$$[descriptor.unix]$[descriptor.end]);
         $$[table.unix]->insert();
         return $$[table.unix];
     }
@@ -80,7 +101,7 @@ $[field.end]
     public function testFind()
     {
         $$[table.unix] = self::create();
-        AuthenticationTest::authProvider([Permissao::NOME_$[TABLE.style]]);
+        AuthenticationTest::authProvider([Permissao::NOME_SISTEMA, Permissao::NOME_$[TABLE.style]]);
         $expected = [
             'status' => 'ok',
             'items' => [
@@ -94,7 +115,7 @@ $[field.end]
     public function testAdd()
     {
         $$[table.unix] = self::build();
-        AuthenticationTest::authProvider([Permissao::NOME_$[TABLE.style]]);
+        AuthenticationTest::authProvider([Permissao::NOME_SISTEMA, Permissao::NOME_$[TABLE.style]]);
         $expected = [
             'status' => 'ok',
             'item' => [
@@ -102,14 +123,14 @@ $[field.end]
             ]
         ];
         $result = $this->post('/api/$[table.unix.plural]', $$[table.unix]->toArray());
-        $expected['item']['id'] = $result['item']['id'];
+        $expected['item']['id'] = $result['item']['id'] ?? null;
         $this->assertEquals($expected, \array_intersect_key($result, \array_keys($expected)));
     }
 
     public function testUpdate()
     {
         $$[table.unix] = self::create();
-        AuthenticationTest::authProvider([Permissao::NOME_$[TABLE.style]]);
+        AuthenticationTest::authProvider([Permissao::NOME_SISTEMA, Permissao::NOME_$[TABLE.style]]);
         $id = $$[table.unix]->get$[Primary.norm]();
         $result = $this->put('/api/$[table.unix.plural]/' . $id, $$[table.unix]->toArray());
         $$[table.unix]->loadBy$[Primary.norm]();
@@ -125,7 +146,7 @@ $[field.end]
     public function testDelete()
     {
         $$[table.unix] = self::create();
-        AuthenticationTest::authProvider([Permissao::NOME_$[TABLE.style]]);
+        AuthenticationTest::authProvider([Permissao::NOME_SISTEMA, Permissao::NOME_$[TABLE.style]]);
         $id = $$[table.unix]->get$[Primary.norm]();
         $result = $this->delete('/api/$[table.unix.plural]/' . $id);
         $$[table.unix]->loadBy$[Primary.norm]();

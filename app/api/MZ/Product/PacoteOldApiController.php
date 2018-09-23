@@ -31,16 +31,16 @@ class PacoteOldApiController extends \MZ\Core\ApiController
 {
     public function find()
     {
-        $grupo_id = isset($_GET['grupo']) ? intval($_GET['grupo']) : null;
+        $grupo_id = $this->getRequest()->query->getInt('grupo', null);
         if (is_null($grupo_id)) {
             return $this->json()->error('Grupo não informado');
         }
-        $limite = isset($_GET['limite']) ? intval($_GET['limite']): null;
+        $limite = $this->getRequest()->query->getInt('limite', null);
         if (!is_null($limite) && $limite < 1) {
             $limite = null;
         }
-        $busca = isset($_GET['busca']) ? strval($_GET['busca']) : null;
-        $associacoes = isset($_POST['pacote']) ? $_POST['pacote']: [];
+        $busca = $this->getRequest()->query->get('busca');
+        $associacoes = $this->getRequest()->request->get('pacote');
         $condition = [
             'grupoid' => $grupo_id,
             'visivel' => 'Y',

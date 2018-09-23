@@ -27,29 +27,29 @@ namespace MZ\Environment;
 use MZ\System\Permissao;
 use MZ\Database\DB;
 use MZ\Util\Filter;
+use MZ\Core\PageController;
 
 /**
  * Allow application to serve system resources
  */
-class PatrimonioPageController extends \MZ\Core\Controller
+class PatrimonioPageController extends PageController
 {
     public function find()
     {
-        need_permission(Permissao::NOME_CADASTROPATRIMONIO, is_output('json'));
+        $this->needPermission([Permissao::NOME_CADASTROPATRIMONIO]);
 
-        $limite = isset($_GET['limite']) ? intval($_GET['limite']) : 10;
-        if ($limite > 100 || $limite < 1) {
-            $limite = 10;
-        }
-        $condition = Filter::query($_GET);
+        $limite = max(1, min(100, $this->getRequest()->query->getInt('limite', 10)));
+        $condition = Filter::query($this->getRequest()->query->all());
         unset($condition['ordem']);
         $patrimonio = new Patrimonio($condition);
-        $order = Filter::order(isset($_GET['ordem']) ? $_GET['ordem'] : '');
+        $order = Filter::order($this->getRequest()->query->get('ordem', ''));
         $count = Patrimonio::count($condition);
-        list($pagesize, $offset, $pagination) = pagestring($count, $limite);
-        $patrimonios = Patrimonio::findAll($condition, $order, $pagesize, $offset);
+        $page = max(1, $this->getRequest()->query->getInt('pagina', 1));
+        $pager = new \Pager($count, $limite, $page, 'pagina');
+        $pagination = $pager->genBasic();
+        $patrimonios = Patrimonio::findAll($condition, $order, $limite, $pager->offset);
 
-        if (is_output('json')) {
+        if ($this->isJson()) {
             $items = [];
             foreach ($patrimonios as $_patrimonio) {
                 $items[] = $_patrimonio->publish();
@@ -65,8 +65,8 @@ class PatrimonioPageController extends \MZ\Core\Controller
 
     public function add()
     {
-        need_permission(Permissao::NOME_CADASTROPATRIMONIO, is_output('json'));
-        $id = isset($_GET['id']) ? $_GET['id'] : null;
+        $this->needPermission([Permissao::NOME_CADASTROPATRIMONIO]);
+        $id = $this->getRequest()->query->getInt('id', null);
         $patrimonio = Patrimonio::findByID($id);
         $patrimonio->setID(null);
         $patrimonio->setImagemAnexada(null);
@@ -75,7 +75,7 @@ class PatrimonioPageController extends \MZ\Core\Controller
         $errors = [];
         $old_patrimonio = $patrimonio;
         if (is_post()) {
-            $patrimonio = new Patrimonio($_POST);
+            $patrimonio = new Patrimonio($this->getData());
             try {
                 $patrimonio->filter($old_patrimonio, true);
                 $patrimonio->insert();
@@ -84,7 +84,7 @@ class PatrimonioPageController extends \MZ\Core\Controller
                     'Patrimônio "%s" cadastrado com sucesso!',
                     $patrimonio->getDescricao()
                 );
-                if (is_output('json')) {
+                if ($this->isJson()) {
                     return $this->json()->success(['item' => $patrimonio->publish()], $msg);
                 }
                 \Thunder::success($msg, true);
@@ -94,7 +94,7 @@ class PatrimonioPageController extends \MZ\Core\Controller
                 if ($e instanceof \MZ\Exception\ValidationException) {
                     $errors = $e->getErrors();
                 }
-                if (is_output('json')) {
+                if ($this->isJson()) {
                     return $this->json()->error($e->getMessage(), null, $errors);
                 }
                 \Thunder::error($e->getMessage());
@@ -103,7 +103,7 @@ class PatrimonioPageController extends \MZ\Core\Controller
                     break;
                 }
             }
-        } elseif (is_output('json')) {
+        } elseif ($this->isJson()) {
             return $this->json()->error('Nenhum dado foi enviado');
         } elseif (is_null($patrimonio->getDescricao())) {
             $patrimonio->setCusto(0.0);
@@ -118,12 +118,12 @@ class PatrimonioPageController extends \MZ\Core\Controller
 
     public function update()
     {
-        need_permission(Permissao::NOME_CADASTROPATRIMONIO, is_output('json'));
-        $id = isset($_GET['id']) ? $_GET['id'] : null;
+        $this->needPermission([Permissao::NOME_CADASTROPATRIMONIO]);
+        $id = $this->getRequest()->query->getInt('id', null);
         $patrimonio = Patrimonio::findByID($id);
         if (!$patrimonio->exists()) {
             $msg = 'O patrimônio não foi informado ou não existe';
-            if (is_output('json')) {
+            if ($this->isJson()) {
                 return $this->json()->error($msg);
             }
             \Thunder::warning($msg);
@@ -133,7 +133,7 @@ class PatrimonioPageController extends \MZ\Core\Controller
         $errors = [];
         $old_patrimonio = $patrimonio;
         if (is_post()) {
-            $patrimonio = new Patrimonio($_POST);
+            $patrimonio = new Patrimonio($this->getData());
             try {
                 $patrimonio->filter($old_patrimonio, true);
                 $patrimonio->update();
@@ -142,7 +142,7 @@ class PatrimonioPageController extends \MZ\Core\Controller
                     'Patrimônio "%s" atualizado com sucesso!',
                     $patrimonio->getDescricao()
                 );
-                if (is_output('json')) {
+                if ($this->isJson()) {
                     return $this->json()->success(['item' => $patrimonio->publish()], $msg);
                 }
                 \Thunder::success($msg, true);
@@ -152,7 +152,7 @@ class PatrimonioPageController extends \MZ\Core\Controller
                 if ($e instanceof \MZ\Exception\ValidationException) {
                     $errors = $e->getErrors();
                 }
-                if (is_output('json')) {
+                if ($this->isJson()) {
                     return $this->json()->error($e->getMessage(), null, $errors);
                 }
                 \Thunder::error($e->getMessage());
@@ -161,7 +161,7 @@ class PatrimonioPageController extends \MZ\Core\Controller
                     break;
                 }
             }
-        } elseif (is_output('json')) {
+        } elseif ($this->isJson()) {
             return $this->json()->error('Nenhum dado foi enviado');
         }
         return $this->view('gerenciar_patrimonio_editar', get_defined_vars());
@@ -169,12 +169,12 @@ class PatrimonioPageController extends \MZ\Core\Controller
 
     public function delete()
     {
-        need_permission(Permissao::NOME_CADASTROPATRIMONIO, is_output('json'));
-        $id = isset($_GET['id']) ? $_GET['id'] : null;
+        $this->needPermission([Permissao::NOME_CADASTROPATRIMONIO]);
+        $id = $this->getRequest()->query->getInt('id', null);
         $patrimonio = Patrimonio::findByID($id);
         if (!$patrimonio->exists()) {
             $msg = 'O patrimônio não foi informado ou não existe';
-            if (is_output('json')) {
+            if ($this->isJson()) {
                 return $this->json()->error($msg);
             }
             \Thunder::warning($msg);
@@ -184,7 +184,7 @@ class PatrimonioPageController extends \MZ\Core\Controller
             $patrimonio->delete();
             $patrimonio->clean(new Patrimonio());
             $msg = sprintf('Patrimônio "%s" excluído com sucesso!', $patrimonio->getDescricao());
-            if (is_output('json')) {
+            if ($this->isJson()) {
                 return $this->json()->success([], $msg);
             }
             \Thunder::success($msg, true);
@@ -193,7 +193,7 @@ class PatrimonioPageController extends \MZ\Core\Controller
                 'Não foi possível excluir o patrimônio "%s"',
                 $patrimonio->getDescricao()
             );
-            if (is_output('json')) {
+            if ($this->isJson()) {
                 return $this->json()->error($msg);
             }
             \Thunder::error($msg);

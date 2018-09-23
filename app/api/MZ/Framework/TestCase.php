@@ -32,25 +32,6 @@ use Symfony\Component\HttpFoundation\Request;
 class TestCase extends \PHPUnit\Framework\TestCase
 {
     /**
-     * Global Application
-     * @return \MZ\Core\Application
-     */
-    public function getApplication()
-    {
-        return self::getApp();
-    }
-
-    /**
-     * Global Application
-     * @return \MZ\Core\Application
-     */
-    public static function getApp()
-    {
-        global $app;
-        return $app;
-    }
-
-    /**
      * Execute http GET request and return json decoded as array
      * @param string $url url to fetch data
      * @param mixed[] $query url query params
@@ -59,7 +40,7 @@ class TestCase extends \PHPUnit\Framework\TestCase
     public function get($url, $query = [])
     {
         $request = Request::create($url, 'GET', $query);
-        $result = \json_decode($this->getApplication()->dispatch($request)->getContent(), true);
+        $result = \json_decode(app()->dispatch($request)->getContent(), true);
         return $result;
     }
 
@@ -84,7 +65,7 @@ class TestCase extends \PHPUnit\Framework\TestCase
             $server,
             $content
         );
-        $result = \json_decode($this->getApplication()->dispatch($request)->getContent(), true);
+        $result = \json_decode(app()->dispatch($request)->getContent(), true);
         return $result;
     }
 
@@ -109,7 +90,7 @@ class TestCase extends \PHPUnit\Framework\TestCase
             $server,
             $content
         );
-        $result = \json_decode($this->getApplication()->dispatch($request)->getContent(), true);
+        $result = \json_decode(app()->dispatch($request)->getContent(), true);
         return $result;
     }
 
@@ -134,7 +115,7 @@ class TestCase extends \PHPUnit\Framework\TestCase
             $server,
             $content
         );
-        $result = \json_decode($this->getApplication()->dispatch($request)->getContent(), true);
+        $result = \json_decode(app()->dispatch($request)->getContent(), true);
         return $result;
     }
 
@@ -147,7 +128,7 @@ class TestCase extends \PHPUnit\Framework\TestCase
     public function delete($url, $query = [])
     {
         $request = Request::create($url, 'DELETE', $query);
-        $result = \json_decode($this->getApplication()->dispatch($request)->getContent(), true);
+        $result = \json_decode(app()->dispatch($request)->getContent(), true);
         return $result;
     }
 }

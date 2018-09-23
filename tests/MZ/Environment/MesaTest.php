@@ -58,7 +58,7 @@ class MesaTest extends \MZ\Framework\TestCase
             'nome' => ' Mesa <script>filter</script> ',
             'ativa' => 'Y',
         ]);
-        $mesa->filter($old_mesa);
+        $mesa->filter($old_mesa, true);
         $this->assertEquals($old_mesa, $mesa);
     }
 

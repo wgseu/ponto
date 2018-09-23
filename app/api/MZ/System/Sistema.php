@@ -133,11 +133,6 @@ class Sistema extends Model
      * @var \MZ\Core\Settings
      */
     private $settings;
-    /**
-     * Website URL
-     * @var string
-     */
-    private $url;
 
     /* end system fields */
 
@@ -556,26 +551,10 @@ class Sistema extends Model
         return $this->settings;
     }
 
-    /**
-     * Get the current URL for this application system
-     * @return string URL with protocol for this system
-     */
-    public function getURL()
-    {
-        return $this->url;
-    }
-
     public function initialize($app_path)
     {
         $this->business = new Empresa();
         $this->getSettings()->load($app_path  . '/config');
-        $host = isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : null;
-        if (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] != 'off') {
-            $protocol = 'https';
-        } else {
-            $protocol = 'http';
-        }
-        $this->url = "{$protocol}://{$host}";
     }
 
     /**

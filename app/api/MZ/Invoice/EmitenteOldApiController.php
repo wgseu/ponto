@@ -33,7 +33,7 @@ class EmitenteOldApiController extends \MZ\Core\ApiController
 {
     public function certificate()
     {
-        need_permission(Permissao::NOME_ALTERARCONFIGURACOES, true);
+        $this->needPermission([Permissao::NOME_ALTERARCONFIGURACOES]);
         
         if (!is_post()) {
             return $this->json()->error('Nenhum dado foi enviado');
@@ -44,22 +44,22 @@ class EmitenteOldApiController extends \MZ\Core\ApiController
             if (is_null($cert_file)) {
                 throw new \Exception('O certificado não foi enviado', 404);
             }
-            $cert_path = $this->getApplication()->getPath('public') . get_document_url($cert_file, 'cert');
+            $cert_path = app()->getPath('public') . get_document_url($cert_file, 'cert');
             $cert_store = file_get_contents($cert_path);
             unlink($cert_path);
             if ($cert_store === false) {
                 throw new \Exception('Não foi possível ler o arquivo', 1);
             }
-            if (!openssl_pkcs12_read($cert_store, $cert_info, $_POST['senha'])) {
+            if (!openssl_pkcs12_read($cert_store, $cert_info, $this->getRequest()->request->get('senha'))) {
                 throw new \Exception('Senha incorreta', 1);
             }
             $certinfo = openssl_x509_parse($cert_info['cert']);
             file_put_contents(
-                $this->getApplication()->getPath('public') . get_document_url('public.pem', 'cert'),
+                app()->getPath('public') . get_document_url('public.pem', 'cert'),
                 $cert_info['cert']
             );
             file_put_contents(
-                $this->getApplication()->getPath('public') . get_document_url('private.pem', 'cert'),
+                app()->getPath('public') . get_document_url('private.pem', 'cert'),
                 $cert_info['pkey']
             );
             return $this->json()->success(['chave' => [

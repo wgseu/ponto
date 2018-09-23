@@ -31,7 +31,7 @@ class CategoriaOldApiController extends \MZ\Core\ApiController
 {
     public function find()
     {
-        $todas = isset($_GET['todas']) && $_GET['todas'] == 'Y';
+        $todas = $this->getRequest()->query->get('todas') == 'Y';
         if ($todas) {
             $condition = [];
         } else {

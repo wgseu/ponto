@@ -64,8 +64,7 @@ abstract class Model
 
     public function loadTemplate($name)
     {
-        global $app;
-        $path = $app->getPath('template');
+        $path = app()->getPath('template');
         $content = file_get_contents($path . '/coupon/' . $name . '.cpt');
         $template = json_decode($content, true);
         $this->setTemplate($template['template']);
@@ -93,10 +92,9 @@ abstract class Model
      */
     protected function isAvailable($resource)
     {
-        global $app;
 
         if ($resource == 'company.cellphone') {
-            return $app->getSystem()->getCompany()->getTelefone() !== null;
+            return app()->getSystem()->getCompany()->getTelefone() !== null;
         }
         return false;
     }
@@ -109,40 +107,39 @@ abstract class Model
 
     protected function resolve($entry)
     {
-        global $app;
 
         if ($entry == 'date.time') {
             return Mask::datetime($this->datetime);
         }
         if ($entry == 'company.name') {
-            return $app->getSystem()->getCompany()->getNome();
+            return app()->getSystem()->getCompany()->getNome();
         }
         if ($entry == 'company.address.street') {
-            return $app->getSystem()->getLocalization()->getLogradouro();
+            return app()->getSystem()->getLocalization()->getLogradouro();
         }
         if ($entry == 'company.address.number') {
-            return $app->getSystem()->getLocalization()->getNumero();
+            return app()->getSystem()->getLocalization()->getNumero();
         }
         if ($entry == 'company.address.district') {
-            return $app->getSystem()->getDistrict()->getNome();
+            return app()->getSystem()->getDistrict()->getNome();
         }
         if ($entry == 'company.phone') {
-            if (is_null($app->getSystem()->getCompany()->getTelefone())) {
+            if (is_null(app()->getSystem()->getCompany()->getTelefone())) {
                 return null;
             }
-            return Mask::phone($app->getSystem()->getCompany()->getTelefone()->getNumero());
+            return Mask::phone(app()->getSystem()->getCompany()->getTelefone()->getNumero());
         }
         if ($entry == 'company.cellphone') {
-            return Mask::phone($app->getSystem()->getCompany()->getTelefone()->getNumero());
+            return Mask::phone(app()->getSystem()->getCompany()->getTelefone()->getNumero());
         }
         if ($entry == 'company.address.city') {
-            return $app->getSystem()->getCity()->getNome();
+            return app()->getSystem()->getCity()->getNome();
         }
         if ($entry == 'company.address.state.code') {
-            return $app->getSystem()->getState()->getUF();
+            return app()->getSystem()->getState()->getUF();
         }
         if ($entry == 'money.symbol') {
-            return $app->getSystem()->getCurrency()->getSimbolo();
+            return app()->getSystem()->getCurrency()->getSimbolo();
         }
         return $entry;
     }

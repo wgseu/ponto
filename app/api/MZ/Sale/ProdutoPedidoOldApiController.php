@@ -34,16 +34,16 @@ class ProdutoPedidoOldApiController extends \MZ\Core\ApiController
 {
     public function export()
     {
-        need_permission(Permissao::NOME_RELATORIOVENDAS, true);
+        $this->needPermission([Permissao::NOME_RELATORIOVENDAS]);
         set_time_limit(0);
 
         try {
-            $formato = isset($_GET['formato']) ? $_GET['formato'] : null;
-            $condition = Filter::query($_GET);
-            if (array_key_exists('!produtoid', $_GET)) {
+            $formato = $this->getRequest()->query->get('formato');
+            $condition = Filter::query($this->getRequest()->query->all());
+            if ($this->getRequest()->query->has('!produtoid')) {
                 $condition['!produtoid'] = isset($condition['!produtoid']) ? $condition['!produtoid'] : null;
             }
-            if (array_key_exists('!servicoid', $_GET)) {
+            if ($this->getRequest()->query->has('!servicoid')) {
                 $condition['!servicoid'] = isset($condition['!servicoid']) ? $condition['!servicoid'] : null;
             }
             $condition['detalhado'] = true;
@@ -55,16 +55,16 @@ class ProdutoPedidoOldApiController extends \MZ\Core\ApiController
                 'Atendente',
                 'Código',
                 'Descrição',
-                'Preço ('. $this->getApplication()->getSystem()->getCurrency()->getSimbolo() . ')',
+                'Preço ('. app()->getSystem()->getCurrency()->getSimbolo() . ')',
                 'Quantidade',
-                'Comissão ('. $this->getApplication()->getSystem()->getCurrency()->getSimbolo() . ')',
-                'Subtotal ('. $this->getApplication()->getSystem()->getCurrency()->getSimbolo() . ')',
-                'Total ('. $this->getApplication()->getSystem()->getCurrency()->getSimbolo() . ')',
-                'Preço de venda ('. $this->getApplication()->getSystem()->getCurrency()->getSimbolo() . ')',
-                'Custo ('. $this->getApplication()->getSystem()->getCurrency()->getSimbolo() . ')',
-                'Lucro ('. $this->getApplication()->getSystem()->getCurrency()->getSimbolo() . ')',
-                'Custo total ('. $this->getApplication()->getSystem()->getCurrency()->getSimbolo() . ')',
-                'Lucro total ('. $this->getApplication()->getSystem()->getCurrency()->getSimbolo() . ')',
+                'Comissão ('. app()->getSystem()->getCurrency()->getSimbolo() . ')',
+                'Subtotal ('. app()->getSystem()->getCurrency()->getSimbolo() . ')',
+                'Total ('. app()->getSystem()->getCurrency()->getSimbolo() . ')',
+                'Preço de venda ('. app()->getSystem()->getCurrency()->getSimbolo() . ')',
+                'Custo ('. app()->getSystem()->getCurrency()->getSimbolo() . ')',
+                'Lucro ('. app()->getSystem()->getCurrency()->getSimbolo() . ')',
+                'Custo total ('. app()->getSystem()->getCurrency()->getSimbolo() . ')',
+                'Lucro total ('. app()->getSystem()->getCurrency()->getSimbolo() . ')',
                 'Observações',
                 'Data do pedido'
             ];

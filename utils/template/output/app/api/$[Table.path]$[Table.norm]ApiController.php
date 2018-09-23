@@ -39,7 +39,7 @@ class $[Table.norm]ApiController extends \MZ\Core\ApiController
      */
     public function find()
     {
-        $this->needPermission(Permissao::NOME_$[TABLE.style]);
+        $this->needPermission([Permissao::NOME_$[TABLE.style]]);
         $limit = max(1, min(100, $this->getRequest()->query->getInt('limit', 10)));
         $page = max(1, $this->getRequest()->query->getInt('page', 1));
         $condition = Filter::query($this->getRequest()->query->all());
@@ -59,9 +59,9 @@ class $[Table.norm]ApiController extends \MZ\Core\ApiController
      */
     public function add()
     {
-        $this->needPermission(Permissao::NOME_$[TABLE.style]);
+        $this->needPermission([Permissao::NOME_$[TABLE.style]]);
         $localized = $this->getRequest()->query->getBoolean('localized', false);
-        $$[table.unix] = new $[Table.norm]($this->getJsonParams());
+        $$[table.unix] = new $[Table.norm]($this->getData());
         $$[table.unix]->filter(new $[Table.norm](), $localized);
         $$[table.unix]->insert();
         return $this->getResponse()->success(['item' => $$[table.unix]->publish()]);
@@ -73,10 +73,10 @@ class $[Table.norm]ApiController extends \MZ\Core\ApiController
      */
     public function update($id)
     {
-        $this->needPermission(Permissao::NOME_$[TABLE.style]);
+        $this->needPermission([Permissao::NOME_$[TABLE.style]]);
         $old_$[table.unix] = $[Table.norm]::findOrFail(['$[primary]' => $id]);
         $localized = $this->getRequest()->query->getBoolean('localized', false);
-        $$[table.unix] = new $[Table.norm]($this->getJsonParams());
+        $$[table.unix] = new $[Table.norm]($this->getData());
         $$[table.unix]->filter($old_$[table.unix], $localized);
         $$[table.unix]->update();
         $old_$[table.unix]->clean($$[table.unix]);
@@ -89,7 +89,7 @@ class $[Table.norm]ApiController extends \MZ\Core\ApiController
      */
     public function delete($id)
     {
-        $this->needPermission(Permissao::NOME_$[TABLE.style]);
+        $this->needPermission([Permissao::NOME_$[TABLE.style]]);
         $$[table.unix] = $[Table.norm]::findOrFail(['$[primary]' => $id]);
         $$[table.unix]->delete();
         $$[table.unix]->clean(new $[Table.norm]());

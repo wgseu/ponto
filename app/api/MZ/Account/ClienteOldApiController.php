@@ -40,25 +40,21 @@ class ClienteOldApiController extends \MZ\Core\ApiController
 {
     public function find()
     {
-        need_manager(true);
+        app()->needManager();
 
-        $limit = intval(isset($_GET['limite'])?$_GET['limite']:5);
-        $primeiro = isset($_GET['primeiro']) ? $_GET['primeiro']: false;
-        $busca = isset($_GET['busca']) ? $_GET['busca'] : null;
+        $limit = max(1, min(20, $this->getRequest()->query->getInt('limite', 5)));
+        $primeiro = $this->getRequest()->query->getBoolean('primeiro');
+        $busca = $this->getRequest()->query->get('busca');
         if ($primeiro || check_fone($busca, true)) {
             $limit = 1;
-        } elseif ($limit < 1) {
-            $limit = 5;
-        } elseif ($limit > 20) {
-            $limit = 20;
         }
-        $order = Filter::order(isset($_GET['ordem']) ? $_GET['ordem']: '');
-        $condition = Filter::query($_GET);
+        $order = Filter::order($this->getRequest()->query->get('ordem', ''));
+        $condition = Filter::query($this->getRequest()->query->all());
         unset($condition['limite']);
         unset($condition['primeiro']);
         unset($condition['ordem']);
-        if (isset($_GET['busca'])) {
-            $condition['search'] = $_GET['busca'];
+        if ($this->getRequest()->query->get('busca')) {
+            $condition['search'] = $this->getRequest()->query->get('busca');
         }
         $clientes = Cliente::findAll($condition, $order, $limit);
         $items = [];
@@ -71,20 +67,19 @@ class ClienteOldApiController extends \MZ\Core\ApiController
 
     public function register()
     {
-        if (!is_login()) {
+        if (!app()->getAuthentication()->isLogin()) {
             return $this->json()->error('Usuário não autenticado!');
         }
-        $values = isset($_POST['cliente']) ? $_POST['cliente'] : [];
         $old_cliente = new Cliente();
         try {
-            if (!logged_provider()->has(Permissao::NOME_PEDIDOMESA) &&
-                !logged_provider()->has(Permissao::NOME_PEDIDOCOMANDA) &&
-                !logged_provider()->has(Permissao::NOME_PAGAMENTO) &&
-                !logged_provider()->has(Permissao::NOME_CADASTROCLIENTES)
+            if (!app()->auth->has([Permissao::NOME_PEDIDOMESA]) &&
+                !app()->auth->has([Permissao::NOME_PEDIDOCOMANDA]) &&
+                !app()->auth->has([Permissao::NOME_PAGAMENTO]) &&
+                !app()->auth->has([Permissao::NOME_CADASTROCLIENTES])
             ) {
                 throw new \Exception('Você não tem permissão para cadastrar clientes');
             }
-            $cliente = new Cliente($values);
+            $cliente = new Cliente($this->getRequest()->request->get('cliente'));
             $cliente->setSenha(Generator::token().'a123Z');
             $cliente->filter($old_cliente);
             $cliente->insert();
@@ -98,11 +93,11 @@ class ClienteOldApiController extends \MZ\Core\ApiController
 
     public function login()
     {
-        $usuario = isset($_POST['usuario']) ? strval($_POST['usuario']) : null;
-        $senha = isset($_POST['senha']) ? strval($_POST['senha']) : null;
-        $lembrar = isset($_POST['lembrar']) ? strval($_POST['lembrar']) : null;
-        $metodo = isset($_POST['metodo']) ? strval($_POST['metodo']) : null;
-        $token = isset($_POST['token']) ? strval($_POST['token']) : null;
+        $usuario = $this->getRequest()->request->get('usuario');
+        $senha = $this->getRequest()->request->get('senha');
+        $lembrar = $this->getRequest()->request->get('lembrar');
+        $metodo = $this->getRequest()->request->get('metodo');
+        $token = $this->getRequest()->request->get('token');
         $cliente = Cliente::findByLoginSenha($usuario, $senha);
         if (!$cliente->exists()) {
             return $this->json()->error('Usuário ou senha incorretos!');
@@ -110,12 +105,12 @@ class ClienteOldApiController extends \MZ\Core\ApiController
         $prestador = Prestador::findByClienteID($cliente->getID());
         $dispositivo = new Dispositivo();
         if ($prestador->exists()) {
-            if (!$prestador->has(Permissao::NOME_SISTEMA)) {
+            if (!$prestador->has([Permissao::NOME_SISTEMA])) {
                 return $this->json()->error('Você não tem permissão para acessar o sistema!');
             }
             try {
-                $device = isset($_POST['device']) ? $_POST['device'] : null;
-                $serial = isset($_POST['serial']) ? $_POST['serial'] : null;
+                $device = $this->getRequest()->request->get('device');
+                $serial = $this->getRequest()->request->get('serial');
                 $dispositivo->setNome($device);
                 $dispositivo->setSerial($serial);
                 $dispositivo->register();
@@ -131,45 +126,45 @@ class ClienteOldApiController extends \MZ\Core\ApiController
                 return $this->json()->error($e->getMessage());
             }
         }
-        if (is_login()) {
-            $this->getApplication()->getAuthentication()->logout();
+        if (app()->getAuthentication()->isLogin()) {
+            app()->getAuthentication()->logout();
         }
-        $this->getApplication()->getAuthentication()->login($cliente);
+        app()->getAuthentication()->login($cliente);
         $status = [];
-        $status['token'] = $this->getApplication()->getAuthentication()->makeToken();
+        $status['token'] = app()->getAuthentication()->makeToken();
         $status['versao'] = Sistema::VERSAO;
-        $status['cliente'] = logged_user()->getID();
+        $status['cliente'] = app()->auth->user->getID();
         $status['info'] = [
             'usuario' => [
-                'nome' => logged_user()->getNome(),
-                'email' => logged_user()->getEmail(),
-                'login' => logged_user()->getLogin(),
-                'imagemurl' => get_image_url(logged_user()->getImagem(), 'cliente', null)
+                'nome' => app()->auth->user->getNome(),
+                'email' => app()->auth->user->getEmail(),
+                'login' => app()->auth->user->getLogin(),
+                'imagemurl' => get_image_url(app()->auth->user->getImagem(), 'cliente', null)
             ]
         ];
-        $status['funcionario'] = intval(logged_provider()->getID());
+        $status['funcionario'] = intval(app()->auth->provider->getID());
         $status['validacao'] = strval($dispositivo->getValidacao());
         $status['autologout'] = is_boolean_config('Sistema', 'Tablet.Logout');
-        if (is_manager()) {
+        if (app()->auth->isManager()) {
             $status['acesso'] = 'funcionario';
-        } elseif (is_login()) {
+        } elseif (app()->getAuthentication()->isLogin()) {
             $status['acesso'] = 'cliente';
         } else {
             $status['acesso'] = 'visitante';
         }
-        $status['permissoes'] = $this->getApplication()->getAuthentication()->getPermissions();
+        $status['permissoes'] = app()->getAuthentication()->getPermissions();
         return $this->json()->success($status, 'Login efetuado com sucesso!');
     }
 
     public function logout()
     {
-        $this->getApplication()->getAuthentication()->logout();
+        app()->getAuthentication()->logout();
         return $this->json()->success([], 'Logout efetuado com sucesso!');
     }
 
     public function status()
     {
-        $company = $this->getApplication()->getSystem()->getCompany();
+        $company = app()->getSystem()->getCompany();
         $status = [];
         $status['info'] = [
             'empresa' => [
@@ -180,35 +175,35 @@ class ClienteOldApiController extends \MZ\Core\ApiController
         $status['versao'] = Sistema::VERSAO;
         $status['validacao'] = '';
         $status['autologout'] = is_boolean_config('Sistema', 'Tablet.Logout');
-        if (is_manager()) {
+        if (app()->auth->isManager()) {
             $status['acesso'] = 'funcionario';
-        } elseif (is_login()) {
+        } elseif (app()->getAuthentication()->isLogin()) {
             $status['acesso'] = 'cliente';
         } else {
             $status['acesso'] = 'visitante';
         }
-        if (is_login()) {
-            $status['cliente'] = logged_user()->getID();
+        if (app()->getAuthentication()->isLogin()) {
+            $status['cliente'] = app()->auth->user->getID();
             $status['info']['usuario'] = [
-                'nome' => logged_user()->getNome(),
-                'email' => logged_user()->getEmail(),
-                'login' => logged_user()->getLogin(),
-                'imagemurl' => get_image_url(logged_user()->getImagem(), 'cliente', null)
+                'nome' => app()->auth->user->getNome(),
+                'email' => app()->auth->user->getEmail(),
+                'login' => app()->auth->user->getLogin(),
+                'imagemurl' => get_image_url(app()->auth->user->getImagem(), 'cliente', null)
             ];
-            $status['funcionario'] = intval(logged_provider()->getID());
+            $status['funcionario'] = intval(app()->auth->provider->getID());
             try {
-                $status['permissoes'] = $this->getApplication()->getAuthentication()->getPermissions();
+                $status['permissoes'] = app()->getAuthentication()->getPermissions();
                 $dispositivo = new Dispositivo();
-                if (is_manager()) {
-                    $dispositivo->setNome(isset($_GET['device']) ? $_GET['device'] : null);
-                    $dispositivo->setSerial(isset($_GET['serial']) ? $_GET['serial'] : null);
+                if (app()->auth->isManager()) {
+                    $dispositivo->setNome($this->getRequest()->query->get('device'));
+                    $dispositivo->setSerial($this->getRequest()->query->get('serial'));
                     $dispositivo->register();
                 }
                 $status['validacao'] = $dispositivo->getValidacao();
             } catch (\Exception $e) {
                 return $this->json()->error($e->getMessage());
             }
-            $status['token'] = $this->getApplication()->getAuthentication()->updateToken();
+            $status['token'] = app()->getAuthentication()->updateToken();
         } else {
             $status['permissoes'] = [];
         }
@@ -217,16 +212,16 @@ class ClienteOldApiController extends \MZ\Core\ApiController
 
     public function export()
     {
-        need_manager(is_output('json'));
-        need_permission(Permissao::NOME_RELATORIOCLIENTES, is_output('json'));
+        app()->needManager();
+        $this->needPermission([Permissao::NOME_RELATORIOCLIENTES]);
         set_time_limit(0);
         try {
-            $formato = isset($_GET['formato']) ? $_GET['formato'] : null;
-            $condition = Filter::query($_GET);
+            $formato = $this->getRequest()->query->get('formato');
+            $condition = Filter::query($this->getRequest()->query->all());
             unset($condition['ordem']);
             unset($condition['formato']);
             $cliente = new Cliente($condition);
-            $order = Filter::order(isset($_GET['ordem']) ? $_GET['ordem'] : '');
+            $order = Filter::order($this->getRequest()->query->get('ordem', ''));
             $clientes = Cliente::findAll($condition, $order);
             // Coluna dos dados
             $columns = [

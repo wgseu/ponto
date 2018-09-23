@@ -70,7 +70,7 @@ class SistemaTest extends \MZ\Framework\TestCase
             'fusohorario' => ' Sistema <script>filter</script> ',
             'versaodb' => ' Sistema <script>filter</script> ',
         ]);
-        $sistema->filter($old_sistema);
+        $sistema->filter($old_sistema, true);
         $this->assertEquals($old_sistema, $sistema);
     }
 

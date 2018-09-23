@@ -42,12 +42,9 @@ class Custom extends Engine
     public function render($tFile)
     {
         ob_start();
-        // TODO: remove retrocompatibility
-        // Begin retrocompatibility
         foreach ($this->getProperties() as $k => $v) {
             ${$k} = $v;
         }
-        // End retrocompatibility
         include $this->__template($tFile);
         return ob_get_clean();
     }

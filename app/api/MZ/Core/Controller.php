@@ -35,24 +35,11 @@ use MZ\Exception\AuthorizationException;
  */
 abstract class Controller
 {
-    private $application;
-
     /**
      * Constructor for a new instance of Controller
-     * @param Application $application Main application
      */
-    public function __construct($application)
+    public function __construct()
     {
-        $this->application = $application;
-    }
-
-    /**
-     * Get the application object
-     * @return Application application object
-     */
-    public function getApplication()
-    {
-        return $this->application;
     }
 
     /**
@@ -61,7 +48,7 @@ abstract class Controller
      */
     public function getRequest()
     {
-        return $this->getApplication()->getRequest();
+        return app()->getRequest();
     }
 
     /**
@@ -71,16 +58,19 @@ abstract class Controller
     public function getResponse()
     {
         return new \MZ\Response\HtmlResponse(
-            $this->getApplication()->getSystem()->getSettings()
+            app()->getSystem()->getSettings()
         );
     }
 
+    /**
+     * Require permissions for logged provider
+     * @param array $permissions permission need
+     * @return self Application
+     * @throws \MZ\Exception\AuthorizationException
+     */
     public function needPermission($permission)
     {
-        if (!$this->getApplication()->getAuthentication()->getEmployee()->has($permission)) {
-            settype($permission, 'array');
-            throw new AuthorizationException(_t('need.permission'), Response::HTTP_UNAUTHORIZED, $permission);
-        }
+        return app()->needPermission($permission);
     }
 
     /**
@@ -106,6 +96,24 @@ abstract class Controller
     public function redirect($path)
     {
         return new RedirectResponse($path);
+    }
+
+    /**
+     * Return true if request has output as json
+     * @return bool true for json output, false otherwise
+     */
+    public function isJson()
+    {
+        return $this->getRequest()->query->get('saida') == 'json';
+    }
+
+    /**
+     * Get current request array
+     * @return array request data
+     */
+    public function getData()
+    {
+        return $this->getRequest()->request->all();
     }
 
     /**

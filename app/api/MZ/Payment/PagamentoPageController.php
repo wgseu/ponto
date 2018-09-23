@@ -26,6 +26,7 @@ namespace MZ\Payment;
 
 use MZ\System\Permissao;
 use MZ\Util\Filter;
+use MZ\Core\PageController;
 use MZ\Wallet\Carteira;
 use MZ\Account\Cliente;
 use MZ\Sale\Pedido;
@@ -37,12 +38,12 @@ use MZ\Database\DB;
 /**
  * Allow application to serve system resources
  */
-class PagamentoPageController extends \MZ\Core\Controller
+class PagamentoPageController extends PageController
 {
     public function dashboard()
     {
-        need_manager(is_output('json'));
-        need_owner();
+        app()->needManager();
+        app()->needOwner();
         
         $data_inicio = strtotime('first day of last month 0:00');
         $data_fim = strtotime('-1 sec tomorrow');
@@ -114,21 +115,20 @@ class PagamentoPageController extends \MZ\Core\Controller
 
     public function find()
     {
-        need_permission(Permissao::NOME_PAGAMENTO, is_output('json'));
+        $this->needPermission([Permissao::NOME_PAGAMENTO]);
 
-        $limite = isset($_GET['limite']) ? intval($_GET['limite']) : 10;
-        if ($limite > 100 || $limite < 1) {
-            $limite = 10;
-        }
-        $condition = Filter::query($_GET);
+        $limite = max(1, min(100, $this->getRequest()->query->getInt('limite', 10)));
+        $condition = Filter::query($this->getRequest()->query->all());
         unset($condition['ordem']);
         $pagamento = new Pagamento($condition);
-        $order = Filter::order(isset($_GET['ordem']) ? $_GET['ordem'] : '');
+        $order = Filter::order($this->getRequest()->query->get('ordem', ''));
         $count = Pagamento::count($condition);
-        list($pagesize, $offset, $pagination) = pagestring($count, $limite);
-        $pagamentos = Pagamento::findAll($condition, $order, $pagesize, $offset);
+        $page = max(1, $this->getRequest()->query->getInt('pagina', 1));
+        $pager = new \Pager($count, $limite, $page, 'pagina');
+        $pagination = $pager->genBasic();
+        $pagamentos = Pagamento::findAll($condition, $order, $limite, $pager->offset);
 
-        if (is_output('json')) {
+        if ($this->isJson()) {
             $items = [];
             foreach ($pagamentos as $_pagamento) {
                 $items[] = $_pagamento->publish();

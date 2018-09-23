@@ -269,19 +269,18 @@ class Caixa extends SyncModel
      */
     public function validate()
     {
-        global $app;
 
         $errors = [];
         if (is_null($this->getDescricao())) {
             $errors['descricao'] = 'A descrição não pode ser vazia';
         }
         $old_caixa = self::findByID($this->getID());
-        if (!$app->getSystem()->isFiscalVisible()) {
+        if (!app()->getSystem()->isFiscalVisible()) {
             $this->setSerie($old_caixa->exists() ? $old_caixa->getSerie() : 1);
         } elseif (!Validator::checkDigits($this->getSerie())) {
             $errors['serie'] = 'A série não pode ser vazia';
         }
-        if (!$app->getSystem()->isFiscalVisible()) {
+        if (!app()->getSystem()->isFiscalVisible()) {
             $this->setNumeroInicial($old_caixa->exists() ? $old_caixa->getNumeroInicial() : 1);
         } elseif (!Validator::checkDigits($this->getNumeroInicial())) {
             $errors['numeroinicial'] = 'O número inicial não pode ser vazio';

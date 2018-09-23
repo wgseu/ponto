@@ -194,46 +194,20 @@ function human_range($inicio, $fim, $sep = '/')
  */
 function auto_version($file)
 {
-    global $app;
-
-    if (strpos($file, '/') != 0 || !file_exists($app->getPath('public') . $file)) {
+    if (strpos($file, '/') != 0 || !file_exists(app()->getPath('public') . $file)) {
         return $file;
     }
-    return $file . '?' . filemtime($app->getPath('public') . $file);
-}
-
-function get_redirect_page($default = null)
-{
-    $redirect_page = \Session::Get('redirect', true);
-    if ($redirect_page) {
-        return $redirect_page;
-    }
-    if ($default) {
-        return $default;
-    }
-    return '/';
-}
-
-function set_redirect_page($url = null)
-{
-    if (is_null($url)) {
-        $url = $_SERVER['REQUEST_URI'];
-    }
-    \Session::Set('redirect', $url);
+    return $file . '?' . filemtime(app()->getPath('public') . $file);
 }
 
 function template($tFile)
 {
-    global $app;
-
-    return $app->getResponse('html')->output($tFile);
+    return app()->getResponse('html')->output($tFile);
 }
 
 function render($tFile, $vs = [], $hook = true)
 {
-    global $app;
-
-    $render = new \MZ\Template\Custom($app->getSystem()->getSettings());
+    $render = new \MZ\Template\Custom(app()->getSystem()->getSettings());
     foreach ($vs as $_k => $_v) {
         $render->{$_k} = $_v;
     }
@@ -246,110 +220,21 @@ function render($tFile, $vs = [], $hook = true)
 
 function render_hook($c)
 {
-    global $app;
-
-    $c = preg_replace('#href="/#i', 'href="'.$app->makeURL('/'), $c);
-    $c = preg_replace('#src="/#i', 'src="'.$app->makeURL('/'), $c);
-    $c = preg_replace('#action="/#i', 'action="'.$app->makeURL('/'), $c);
+    $url = app()->makeURL('/');
+    $c = preg_replace('#href="/#i', 'href="'.$url, $c);
+    $c = preg_replace('#src="/#i', 'src="'.$url, $c);
+    $c = preg_replace('#action="/#i', 'action="'.$url, $c);
     return $c;
 }
 
-function logged_user()
+/**
+ * Get the application object
+ * @return \MZ\Core\Application application object
+ */
+function app()
 {
     global $app;
-    return $app->getAuthentication()->getUser();
-}
-
-function logged_provider()
-{
-    global $app;
-    return $app->getAuthentication()->getEmployee();
-}
-
-function need_login($json = false)
-{
-    if (is_login()) {
-        if (is_post()) {
-            \Session::Get('redirect', true);
-        }
-        return \Session::Get('cliente_id');
-    }
-    $msg = 'Necessário autenticação, faça login para continuar';
-    if (!$json) {
-        if (is_get()) {
-            \Session::Set('redirect', $_SERVER['REQUEST_URI']);
-        } else {
-            \Session::Set('redirect', $_SERVER['HTTP_REFERER']);
-        }
-        \Thunder::warning($msg);
-    }
-    throw new RedirectException($msg, 401, '/conta/entrar');
-}
-
-function need_manager($json = false)
-{
-    need_login($json);
-    if (is_manager()) {
-        return \Session::Get('cliente_id');
-    }
-    $msg = 'Somente funcionários poderão acessar as páginas de gerenciamento';
-    if (!$json) {
-        \Thunder::warning($msg);
-    }
-    throw new RedirectException($msg, 403, '/');
-}
-
-function need_owner($json = false)
-{
-    need_manager($json);
-    if (is_owner()) {
-        return \Session::Get('cliente_id');
-    }
-    $msg = 'Somente administradores poderão acessar essas páginas';
-    if (!$json) {
-        \Thunder::warning($msg);
-    }
-    throw new RedirectException($msg, 403, '/gerenciar/');
-}
-
-function need_permission($array, $json = false)
-{
-    need_manager($json);
-    if (logged_provider()->has($array)) {
-        return \Session::Get('cliente_id');
-    }
-    $msg = 'Você não possui permissão para acessar essa função';
-    if (!$json) {
-        \Thunder::warning($msg);
-    }
-    throw new RedirectException($msg, 403, '/gerenciar/');
-}
-
-function is_login()
-{
-    $cliente_id = \Session::Get('cliente_id');
-    return is_numeric($cliente_id) && logged_user()->exists();
-}
-
-function is_manager($prestador = null)
-{
-    if (!is_null($prestador)) {
-        return $prestador->exists();
-    }
-    return is_login() && !is_null(logged_provider()->getID());
-}
-
-function is_owner($prestador = null)
-{
-    if (!is_null($prestador)) {
-        return is_manager($prestador) && $prestador->getID() == 1;
-    }
-    return is_manager() && logged_provider()->getID() == 1;
-}
-
-function is_self($prestador)
-{
-    return is_manager() && $prestador->exists() && $prestador->getID() == logged_provider()->getID();
+    return $app;
 }
 
 function _t($key)
@@ -357,26 +242,9 @@ function _t($key)
     return $key;
 }
 
-function is_get()
-{
-    return !is_post();
-}
-
 function is_post()
 {
     return strtoupper($_SERVER['REQUEST_METHOD']) == 'POST';
-}
-
-function is_output($format)
-{
-    switch ($format) {
-        case 'json':
-            return isset($_GET['saida']) && $_GET['saida'] == 'json';
-        case 'xml':
-            return isset($_GET['saida']) && $_GET['saida'] == 'xml';
-        default:
-            return false;
-    }
 }
 
 function get_languages_info()
@@ -423,7 +291,7 @@ function set_timezone_for($uf, $pais = 'Brasil')
 
 function current_language_id()
 {
-    $lang_id = logged_provider()->getLinguagemID();
+    $lang_id = app()->auth->provider->getLinguagemID();
     if (is_null($lang_id)) {
         $lang_id = 1046;
     }
@@ -432,19 +300,15 @@ function current_language_id()
 
 function get_string_config($section, $key, $default = null)
 {
-    global $app;
-
-    return $app->getSystem()->getBusiness()->getOptions()->getValue($section, $key, $default);
+    return app()->getSystem()->getBusiness()->getOptions()->getValue($section, $key, $default);
 }
 
 function set_string_config($section, $key, $value)
 {
-    global $app;
-
     if (is_null($value)) {
-        $app->getSystem()->getBusiness()->getOptions()->deleteEntry($section, $key);
+        app()->getSystem()->getBusiness()->getOptions()->deleteEntry($section, $key);
     } else {
-        $app->getSystem()->getBusiness()->getOptions()->setValue($section, $key, $value);
+        app()->getSystem()->getBusiness()->getOptions()->setValue($section, $key, $value);
     }
 }
 
@@ -480,8 +344,6 @@ function config_values_exists($array, $section, $key)
 
 function _p($section, $key)
 {
-    global $app;
-
     $entries = [
         'Titulo.CNPJ' => 'CNPJ',
         'Mascara.CNPJ' => '99.999.999/9999-99',
@@ -625,7 +487,7 @@ function _p($section, $key)
         'Cupom.Restante' => 'Restante',
         'Cupom.TotalJuros' => 'Total(J)'
     ];
-    $country_entries = $app->getSystem()->getEntries();
+    $country_entries = app()->getSystem()->getEntries();
     if (is_array($country_entries) &&
         array_key_exists($section, $country_entries) &&
         array_key_exists($key, $country_entries[$section])
@@ -738,13 +600,11 @@ function upload_file($inputname, $dir, $name, $def_ext, $allow_ext, $force_ext =
 
 function upload_image($inputname, $type, $name = null, $width = null, $height = null, $png = false, $mode = null)
 {
-    global $app;
-
     $force_ext = null;
     if ($png) {
         $force_ext = '.png';
     }
-    $dir = $app->getPath('image') . '/' . $type . '/';
+    $dir = app()->getPath('image') . '/' . $type . '/';
     $name = upload_file($inputname, $dir, $name, '.jpg', 'gif|bmp|png|jpg|jpeg', $force_ext);
     if (is_null($name)) {
         return null;
@@ -764,9 +624,7 @@ function upload_image($inputname, $type, $name = null, $width = null, $height = 
 
 function upload_document($inputname, $type, $name = null)
 {
-    global $app;
-
-    $dir = $app->getPath('docs') . '/' . $type . '/';
+    $dir = app()->getPath('docs') . '/' . $type . '/';
     return upload_file(
         $inputname,
         $dir,
@@ -871,12 +729,10 @@ function get_image_url($name, $namespace, $default = null)
 
 function get_image_path($name, $namespace)
 {
-    global $app;
-
     if (is_null($name)) {
         return null;
     }
-    return $app->getPath('public') . get_image_url($name, $namespace);
+    return app()->getPath('public') . get_image_url($name, $namespace);
 }
 
 function get_document_url($name, $namespace, $default = null)
@@ -886,12 +742,10 @@ function get_document_url($name, $namespace, $default = null)
 
 function get_document_path($name, $namespace)
 {
-    global $app;
-
     if (is_null($name)) {
         return null;
     }
-    return $app->getPath('public') . get_document_url($name, $namespace);
+    return app()->getPath('public') . get_document_url($name, $namespace);
 }
 
 function is_local_path($name)
@@ -965,12 +819,6 @@ function get_forma_pagto($type)
         default:
             return 'Dinheiro';
     }
-}
-
-function pagestring($count, $pagesize, $field = 'pagina')
-{
-    $p = new \Pager($count, $pagesize, null, $field);
-    return [$pagesize, $p->offset, $p->genBasic(), $p->genPages(), $p->pageCount];
 }
 
 function to_ini($array)

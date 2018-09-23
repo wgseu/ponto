@@ -52,7 +52,7 @@ class RegimeTest extends \MZ\Framework\TestCase
             'codigo' => '1.234',
             'descricao' => ' Regime <script>filter</script> ',
         ]);
-        $regime->filter($old_regime);
+        $regime->filter($old_regime, true);
         $this->assertEquals($old_regime, $regime);
     }
 

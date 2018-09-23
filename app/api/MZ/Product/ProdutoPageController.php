@@ -29,11 +29,12 @@ use MZ\System\Permissao;
 use MZ\Stock\Estoque;
 use MZ\Environment\Setor;
 use MZ\Util\Filter;
+use MZ\Core\PageController;
 
 /**
  * Allow application to serve system resources
  */
-class ProdutoPageController extends \MZ\Core\Controller
+class ProdutoPageController extends PageController
 {
     public function display()
     {
@@ -65,22 +66,21 @@ class ProdutoPageController extends \MZ\Core\Controller
 
     public function find()
     {
-        need_permission(Permissao::NOME_CADASTROPRODUTOS, is_output('json'));
+        $this->needPermission([Permissao::NOME_CADASTROPRODUTOS]);
 
-        $limite = isset($_GET['limite']) ? intval($_GET['limite']) : 10;
-        if ($limite > 100 || $limite < 1) {
-            $limite = 10;
-        }
-        $condition = Filter::query($_GET);
+        $limite = max(1, min(100, $this->getRequest()->query->getInt('limite', 10)));
+        $condition = Filter::query($this->getRequest()->query->all());
         unset($condition['ordem']);
         $condition['promocao'] = 'N';
         $produto = new Produto($condition);
-        $order = Filter::order(isset($_GET['ordem']) ? $_GET['ordem'] : '');
+        $order = Filter::order($this->getRequest()->query->get('ordem', ''));
         $count = Produto::count($condition);
-        list($pagesize, $offset, $pagination) = pagestring($count, $limite);
-        $produtos = Produto::findAll($condition, $order, $pagesize, $offset);
+        $page = max(1, $this->getRequest()->query->getInt('pagina', 1));
+        $pager = new \Pager($count, $limite, $page, 'pagina');
+        $pagination = $pager->genBasic();
+        $produtos = Produto::findAll($condition, $order, $limite, $pager->offset);
 
-        if (is_output('json')) {
+        if ($this->isJson()) {
             $items = [];
             foreach ($produtos as $_produto) {
                 $items[] = $_produto->publish();
@@ -104,8 +104,8 @@ class ProdutoPageController extends \MZ\Core\Controller
 
     public function add()
     {
-        need_permission(Permissao::NOME_CADASTROPRODUTOS, is_output('json'));
-        $id = isset($_GET['id']) ? $_GET['id'] : null;
+        $this->needPermission([Permissao::NOME_CADASTROPRODUTOS]);
+        $id = $this->getRequest()->query->getInt('id', null);
         $produto = Produto::find(['id' => $id, 'promocao' => 'N']);
         $produto->setID(null);
         $produto->setImagem(null);
@@ -114,7 +114,7 @@ class ProdutoPageController extends \MZ\Core\Controller
         $errors = [];
         $old_produto = $produto;
         if (is_post()) {
-            $produto = new Produto($_POST);
+            $produto = new Produto($this->getData());
             try {
                 $produto->filter($old_produto, true);
                 $produto->insert();
@@ -124,7 +124,7 @@ class ProdutoPageController extends \MZ\Core\Controller
                     'Produto "%s" cadastrado com sucesso!',
                     $produto->getDescricao()
                 );
-                if (is_output('json')) {
+                if ($this->isJson()) {
                     return $this->json()->success(['item' => $produto->publish()], $msg);
                 }
                 \Thunder::success($msg, true);
@@ -134,7 +134,7 @@ class ProdutoPageController extends \MZ\Core\Controller
                 if ($e instanceof \MZ\Exception\ValidationException) {
                     $errors = $e->getErrors();
                 }
-                if (is_output('json')) {
+                if ($this->isJson()) {
                     return $this->json()->error($e->getMessage(), null, $errors);
                 }
                 \Thunder::error($e->getMessage());
@@ -143,7 +143,7 @@ class ProdutoPageController extends \MZ\Core\Controller
                     break;
                 }
             }
-        } elseif (is_output('json')) {
+        } elseif ($this->isJson()) {
             return $this->json()->error('Nenhum dado foi enviado');
         } elseif (!is_numeric($id)) {
             $unidade = Unidade::findBySigla(Unidade::SIGLA_UNITARIA);
@@ -163,12 +163,12 @@ class ProdutoPageController extends \MZ\Core\Controller
 
     public function update()
     {
-        need_permission(Permissao::NOME_CADASTROPRODUTOS, is_output('json'));
-        $id = isset($_GET['id']) ? $_GET['id'] : null;
+        $this->needPermission([Permissao::NOME_CADASTROPRODUTOS]);
+        $id = $this->getRequest()->query->getInt('id', null);
         $produto = Produto::find(['id' => $id, 'promocao' => 'N']);
         if (!$produto->exists()) {
             $msg = 'O produto não foi informado ou não existe';
-            if (is_output('json')) {
+            if ($this->isJson()) {
                 return $this->json()->error($msg);
             }
             \Thunder::warning($msg);
@@ -178,7 +178,7 @@ class ProdutoPageController extends \MZ\Core\Controller
         $errors = [];
         $old_produto = $produto;
         if (is_post()) {
-            $produto = new Produto($_POST);
+            $produto = new Produto($this->getData());
             try {
                 $produto->filter($old_produto, true);
                 $produto->update();
@@ -188,7 +188,7 @@ class ProdutoPageController extends \MZ\Core\Controller
                     'Produto "%s" atualizado com sucesso!',
                     $produto->getDescricao()
                 );
-                if (is_output('json')) {
+                if ($this->isJson()) {
                     return $this->json()->success(['item' => $produto->publish()], $msg);
                 }
                 \Thunder::success($msg, true);
@@ -198,7 +198,7 @@ class ProdutoPageController extends \MZ\Core\Controller
                 if ($e instanceof \MZ\Exception\ValidationException) {
                     $errors = $e->getErrors();
                 }
-                if (is_output('json')) {
+                if ($this->isJson()) {
                     return $this->json()->error($e->getMessage(), null, $errors);
                 }
                 \Thunder::error($e->getMessage());
@@ -207,7 +207,7 @@ class ProdutoPageController extends \MZ\Core\Controller
                     break;
                 }
             }
-        } elseif (is_output('json')) {
+        } elseif ($this->isJson()) {
             return $this->json()->error('Nenhum dado foi enviado');
         }
         $_categorias = Categoria::findAll();
@@ -218,12 +218,12 @@ class ProdutoPageController extends \MZ\Core\Controller
 
     public function delete()
     {
-        need_permission(Permissao::NOME_CADASTROPRODUTOS, is_output('json'));
-        $id = isset($_GET['id']) ? $_GET['id'] : null;
+        $this->needPermission([Permissao::NOME_CADASTROPRODUTOS]);
+        $id = $this->getRequest()->query->getInt('id', null);
         $produto = Produto::findByID($id);
         if (!$produto->exists()) {
             $msg = 'O produto não foi informado ou não existe!';
-            if (is_output('json')) {
+            if ($this->isJson()) {
                 return $this->json()->error($msg);
             }
             \Thunder::warning($msg);
@@ -233,7 +233,7 @@ class ProdutoPageController extends \MZ\Core\Controller
             $produto->delete();
             $produto->clean(new Produto());
             $msg = sprintf('Produto "%s" excluído com sucesso!', $produto->getDescricao());
-            if (is_output('json')) {
+            if ($this->isJson()) {
                 return $this->json()->success([], $msg);
             }
             \Thunder::success($msg, true);
@@ -242,7 +242,7 @@ class ProdutoPageController extends \MZ\Core\Controller
                 'Não foi possível excluir o produto "%s"',
                 $produto->getDescricao()
             );
-            if (is_output('json')) {
+            if ($this->isJson()) {
                 return $this->json()->error($msg);
             }
             \Thunder::error($msg);
@@ -252,12 +252,12 @@ class ProdutoPageController extends \MZ\Core\Controller
 
     public function costs()
     {
-        need_permission(Permissao::NOME_CADASTROPRODUTOS, is_output('json'));
-        $id = isset($_GET['id']) ? $_GET['id'] : null;
+        $this->needPermission([Permissao::NOME_CADASTROPRODUTOS]);
+        $id = $this->getRequest()->query->getInt('id', null);
         $produto = Produto::findByID($id);
         if (!$produto->exists()) {
             $msg = 'O produto não foi informado ou não existe';
-            if (is_output('json')) {
+            if ($this->isJson()) {
                 return $this->json()->error($msg);
             }
             \Thunder::warning($msg);
@@ -265,7 +265,7 @@ class ProdutoPageController extends \MZ\Core\Controller
         }
         if ($produto->getTipo() != Produto::TIPO_COMPOSICAO) {
             $msg = sprintf('O produto "%s" não é uma composição', $produto->getDescricao());
-            if (is_output('json')) {
+            if ($this->isJson()) {
                 return $this->json()->error($msg);
             }
             \Thunder::warning($msg);
@@ -326,10 +326,10 @@ class ProdutoPageController extends \MZ\Core\Controller
         $integracao = Integracao::findByAcessoURL(\MZ\Integrator\IFood::NAME);
         $association = new \MZ\Association\Product($integracao);
 
-        if (isset($_GET['action'])) {
-            if (is_post() && $_GET['action'] == 'upload') {
-                if (!isset($_GET['token']) || $_GET['token'] != INTGR_TOKEN) {
-                    need_permission(Permissao::NOME_CADASTROPRODUTOS, true);
+        if ($this->getRequest()->query->has('action')) {
+            if (is_post() && $this->getRequest()->query->get('action') == 'upload') {
+                if ($this->getRequest()->query->get('token') != INTGR_TOKEN) {
+                    $this->needPermission([Permissao::NOME_CADASTROPRODUTOS]);
                 }
                 try {
                     if (!isset($_FILES['raw_arquivo']) || $_FILES['raw_arquivo']['error'] === UPLOAD_ERR_NO_FILE) {
@@ -395,24 +395,24 @@ class ProdutoPageController extends \MZ\Core\Controller
                 } catch (\Exception $e) {
                     return $this->json()->error($e->getMessage());
                 }
-            } elseif (is_post() && $_GET['action'] == 'update') {
-                need_permission(Permissao::NOME_CADASTROPRODUTOS, true);
+            } elseif (is_post() && $this->getRequest()->query->get('action') == 'update') {
+                $this->needPermission([Permissao::NOME_CADASTROPRODUTOS]);
                 try {
-                    $codigo = isset($_POST['codigo'])?$_POST['codigo']:null;
+                    $codigo = $this->getRequest()->request->get('codigo');
                     $association->update(
                         $codigo,
-                        isset($_POST['id'])?$_POST['id']:null
+                        $this->getRequest()->request->get('id')
                     );
                     $produtos = $association->getProdutos();
                     return $this->json()->success(['produto' => $produtos[$codigo]]);
                 } catch (\Exception $e) {
                     return $this->json()->error($e->getMessage());
                 }
-            } elseif (is_post() && $_GET['action'] == 'delete') {
-                need_permission(Permissao::NOME_CADASTROPRODUTOS, true);
+            } elseif (is_post() && $this->getRequest()->query->get('action') == 'delete') {
+                $this->needPermission([Permissao::NOME_CADASTROPRODUTOS]);
                 try {
-                    $codigo = isset($_POST['codigo'])?$_POST['codigo']:null;
-                    $subcodigo = isset($_POST['subcodigo'])?$_POST['subcodigo']:null;
+                    $codigo = $this->getRequest()->request->get('codigo');
+                    $subcodigo = $this->getRequest()->request->get('subcodigo');
                     $association->delete($codigo, $subcodigo);
                     if (isset($subcodigo)) {
                         $msg = 'Item do pacote excluído com sucesso!';
@@ -423,30 +423,30 @@ class ProdutoPageController extends \MZ\Core\Controller
                 } catch (\Exception $e) {
                     return $this->json()->error($e->getMessage());
                 }
-            } elseif (is_post() && $_GET['action'] == 'mount') {
-                need_permission(Permissao::NOME_CADASTROPRODUTOS, true);
+            } elseif (is_post() && $this->getRequest()->query->get('action') == 'mount') {
+                $this->needPermission([Permissao::NOME_CADASTROPRODUTOS]);
                 try {
-                    $codigo = isset($_POST['codigo'])?$_POST['codigo']:null;
-                    $subcodigo = isset($_POST['subcodigo'])?$_POST['subcodigo']:null;
-                    $id = isset($_POST['id'])?$_POST['id']:null;
+                    $codigo = $this->getRequest()->request->get('codigo');
+                    $subcodigo = $this->getRequest()->request->get('subcodigo');
+                    $id = $this->getRequest()->request->get('id');
                     $association->mount($codigo, $subcodigo, $id);
                     $produtos = $association->getProdutos();
                     return $this->json()->success(['pacote' => $produtos[$codigo]['itens'][$subcodigo]]);
                 } catch (\Exception $e) {
                     return $this->json()->error($e->getMessage());
                 }
-            } elseif ($_GET['action'] == 'package') {
-                need_permission(Permissao::NOME_CADASTROPRODUTOS, true);
+            } elseif ($this->getRequest()->query->get('action') == 'package') {
+                $this->needPermission([Permissao::NOME_CADASTROPRODUTOS]);
                 try {
-                    $codigo = isset($_GET['codigo']) ? $_GET['codigo'] : null;
+                    $codigo = $this->getRequest()->query->get('codigo');
                     $package = $association->findPackage($codigo);
                     return $this->json()->success($package);
                 } catch (\Exception $e) {
                     return $this->json()->error($e->getMessage());
                 }
-            } elseif ($_GET['action'] == 'download') {
-                if (!isset($_GET['token']) || $_GET['token'] != INTGR_TOKEN) {
-                    need_permission(Permissao::NOME_CADASTROPRODUTOS, true);
+            } elseif ($this->getRequest()->query->get('action') == 'download') {
+                if ($this->getRequest()->query->get('token') != INTGR_TOKEN) {
+                    $this->needPermission([Permissao::NOME_CADASTROPRODUTOS]);
                 }
                 $codigos = \MZ\Integrator\IFood::CARDS;
                 $card = new \MZ\Association\Card($integracao, $codigos);
@@ -489,7 +489,7 @@ class ProdutoPageController extends \MZ\Core\Controller
                 exit;
             }
         }
-        need_permission(Permissao::NOME_CADASTROPRODUTOS, is_output('json'));
+        $this->needPermission([Permissao::NOME_CADASTROPRODUTOS]);
 
         $produtos = $association->findAll();
 
@@ -501,25 +501,25 @@ class ProdutoPageController extends \MZ\Core\Controller
         $integracao = Integracao::findByAcessoURL(\MZ\Integrator\Kromax::NAME);
         $association = new \MZ\Association\Product($integracao);
 
-        if (isset($_GET['action'])) {
-            if (is_post() && $_GET['action'] == 'update') {
-                need_permission(Permissao::NOME_CADASTROPRODUTOS, true);
+        if ($this->getRequest()->query->has('action')) {
+            if (is_post() && $this->getRequest()->query->get('action') == 'update') {
+                $this->needPermission([Permissao::NOME_CADASTROPRODUTOS]);
                 try {
-                    $codigo = isset($_POST['codigo'])?$_POST['codigo']:null;
+                    $codigo = $this->getRequest()->request->get('codigo');
                     $association->update(
                         $codigo,
-                        isset($_POST['id'])?$_POST['id']:null
+                        $this->getRequest()->request->get('id')
                     );
                     $produtos = $association->getProdutos();
                     return $this->json()->success(['produto' => $produtos[$codigo]]);
                 } catch (\Exception $e) {
                     return $this->json()->error($e->getMessage());
                 }
-            } elseif (is_post() && $_GET['action'] == 'delete') {
-                need_permission(Permissao::NOME_CADASTROPRODUTOS, true);
+            } elseif (is_post() && $this->getRequest()->query->get('action') == 'delete') {
+                $this->needPermission([Permissao::NOME_CADASTROPRODUTOS]);
                 try {
-                    $codigo = isset($_POST['codigo'])?$_POST['codigo']:null;
-                    $subcodigo = isset($_POST['subcodigo'])?$_POST['subcodigo']:null;
+                    $codigo = $this->getRequest()->request->get('codigo');
+                    $subcodigo = $this->getRequest()->request->get('subcodigo');
                     $association->delete($codigo, $subcodigo);
                     if (isset($subcodigo)) {
                         $msg = 'Item do pacote excluído com sucesso!';
@@ -530,22 +530,22 @@ class ProdutoPageController extends \MZ\Core\Controller
                 } catch (\Exception $e) {
                     return $this->json()->error($e->getMessage());
                 }
-            } elseif (is_post() && $_GET['action'] == 'mount') {
-                need_permission(Permissao::NOME_CADASTROPRODUTOS, true);
+            } elseif (is_post() && $this->getRequest()->query->get('action') == 'mount') {
+                $this->needPermission([Permissao::NOME_CADASTROPRODUTOS]);
                 try {
-                    $codigo = isset($_POST['codigo'])?$_POST['codigo']:null;
-                    $subcodigo = isset($_POST['subcodigo'])?$_POST['subcodigo']:null;
-                    $id = isset($_POST['id'])?$_POST['id']:null;
+                    $codigo = $this->getRequest()->request->get('codigo');
+                    $subcodigo = $this->getRequest()->request->get('subcodigo');
+                    $id = $this->getRequest()->request->get('id');
                     $association->mount($codigo, $subcodigo, $id);
                     $produtos = $association->getProdutos();
                     return $this->json()->success(['pacote' => $produtos[$codigo]['itens'][$subcodigo]]);
                 } catch (\Exception $e) {
                     return $this->json()->error($e->getMessage());
                 }
-            } elseif ($_GET['action'] == 'package') {
-                need_permission(Permissao::NOME_CADASTROPRODUTOS, true);
+            } elseif ($this->getRequest()->query->get('action') == 'package') {
+                $this->needPermission([Permissao::NOME_CADASTROPRODUTOS]);
                 try {
-                    $codigo = isset($_GET['codigo']) ? $_GET['codigo'] : null;
+                    $codigo = $this->getRequest()->query->get('codigo');
                     $package = $association->findPackage($codigo);
                     return $this->json()->success($package);
                 } catch (\Exception $e) {
@@ -553,7 +553,7 @@ class ProdutoPageController extends \MZ\Core\Controller
                 }
             }
         }
-        need_permission(Permissao::NOME_CADASTROPRODUTOS, is_output('json'));
+        $this->needPermission([Permissao::NOME_CADASTROPRODUTOS]);
 
         $produtos = $association->findAll();
 

@@ -74,8 +74,7 @@ class Validator
         $mask = _p('Mascara', 'Telefone');
         $phone = Filter::unmask($phone, $mask);
         $mask_len = strlen(Filter::digits($mask));
-        global $app;
-        if ($app->getSystem()->getCountry()->getSigla() != 'BRA') {
+        if (app()->getSystem()->getCountry()->getSigla() != 'BRA') {
             return strlen($phone) == $mask_len;
         }
         // Somente Brasil (Nono dígito)
@@ -100,8 +99,7 @@ class Validator
         if (strlen($cpf) != $mask_len) {
             return false;
         }
-        global $app;
-        if ($app->getSystem()->getCountry()->getSigla() != 'BRA') {
+        if (app()->getSystem()->getCountry()->getSigla() != 'BRA') {
             return true;
         }
         // Somente Brasil
@@ -141,8 +139,7 @@ class Validator
         if (strlen($cnpj) != $mask_len) {
             return false;
         }
-        global $app;
-        if ($app->getSystem()->getCountry()->getSigla() != 'BRA') {
+        if (app()->getSystem()->getCountry()->getSigla() != 'BRA') {
             return true;
         }
         // Somente Brasil

@@ -26,28 +26,28 @@ namespace MZ\Location;
 
 use MZ\System\Permissao;
 use MZ\Util\Filter;
+use MZ\Core\PageController;
 
 /**
  * Allow application to serve system resources
  */
-class BairroPageController extends \MZ\Core\Controller
+class BairroPageController extends PageController
 {
     public function find()
     {
-        need_permission(Permissao::NOME_CADASTROBAIRROS, is_output('json'));
+        $this->needPermission([Permissao::NOME_CADASTROBAIRROS]);
 
-        $limite = isset($_GET['limite'])?intval($_GET['limite']):10;
-        if ($limite > 100 || $limite < 1) {
-            $limite = 10;
-        }
-        $condition = Filter::query($_GET);
+        $limite = max(1, min(100, $this->getRequest()->query->getInt('limite', 10)));
+        $condition = Filter::query($this->getRequest()->query->all());
         unset($condition['ordem']);
-        $order = Filter::order(isset($_GET['ordem'])?$_GET['ordem']:'');
+        $order = Filter::order($this->getRequest()->query->get('ordem', ''));
         $count = Bairro::count($condition);
-        list($pagesize, $offset, $pagination) = pagestring($count, $limite);
-        $bairros = Bairro::findAll($condition, $order, $pagesize, $offset);
+        $page = max(1, $this->getRequest()->query->getInt('pagina', 1));
+        $pager = new \Pager($count, $limite, $page, 'pagina');
+        $pagination = $pager->genBasic();
+        $bairros = Bairro::findAll($condition, $order, $limite, $pager->offset);
 
-        if (is_output('json')) {
+        if ($this->isJson()) {
             $items = [];
             foreach ($bairros as $bairro) {
                 $items[] = $bairro->publish();
@@ -55,9 +55,9 @@ class BairroPageController extends \MZ\Core\Controller
             return $this->json()->success(['items' => $items]);
         }
 
-        $pais = \MZ\Location\Pais::findByID(isset($_GET['paisid']) ? $_GET['paisid'] : null);
-        $estado = \MZ\Location\Estado::findByID(isset($_GET['estadoid']) ? $_GET['estadoid'] : null);
-        $cidade = \MZ\Location\Cidade::findByID(isset($_GET['cidadeid']) ? $_GET['cidadeid'] : null);
+        $pais = \MZ\Location\Pais::findByID($this->getRequest()->query->get('paisid'));
+        $estado = \MZ\Location\Estado::findByID($this->getRequest()->query->get('estadoid'));
+        $cidade = \MZ\Location\Cidade::findByID($this->getRequest()->query->get('cidadeid'));
 
         $_paises = \MZ\Location\Pais::findAll();
         $_estados = \MZ\Location\Estado::findAll(['paisid' => $pais->getID()]);
@@ -67,8 +67,8 @@ class BairroPageController extends \MZ\Core\Controller
 
     public function add()
     {
-        need_permission(Permissao::NOME_CADASTROBAIRROS, is_output('json'));
-        $id = isset($_GET['id']) ? $_GET['id'] : null;
+        $this->needPermission([Permissao::NOME_CADASTROBAIRROS]);
+        $id = $this->getRequest()->query->getInt('id', null);
         $bairro = Bairro::findByID($id);
         $bairro->setID(null);
 
@@ -76,7 +76,7 @@ class BairroPageController extends \MZ\Core\Controller
         $errors = [];
         $old_bairro = $bairro;
         if (is_post()) {
-            $bairro = new Bairro($_POST);
+            $bairro = new Bairro($this->getData());
             try {
                 $bairro->filter($old_bairro, true);
                 $bairro->save();
@@ -85,7 +85,7 @@ class BairroPageController extends \MZ\Core\Controller
                     'Bairro "%s" cadastrado com sucesso!',
                     $bairro->getNome()
                 );
-                if (is_output('json')) {
+                if ($this->isJson()) {
                     return $this->json()->success(['item' => $bairro->publish()], $msg);
                 }
                 \Thunder::success($msg, true);
@@ -95,7 +95,7 @@ class BairroPageController extends \MZ\Core\Controller
                 if ($e instanceof \MZ\Exception\ValidationException) {
                     $errors = $e->getErrors();
                 }
-                if (is_output('json')) {
+                if ($this->isJson()) {
                     return $this->json()->error($e->getMessage(), null, $errors);
                 }
                 \Thunder::error($e->getMessage());
@@ -104,13 +104,13 @@ class BairroPageController extends \MZ\Core\Controller
                     break;
                 }
             }
-        } elseif (is_output('json')) {
+        } elseif ($this->isJson()) {
             return $this->json()->error('Nenhum dado foi enviado');
         } elseif (is_null($bairro->getNome())) {
             $bairro->setDisponivel('Y');
         }
         if (is_null($bairro->getCidadeID())) {
-            $bairro->setCidadeID($this->getApplication()->getSystem()->getCity()->getID());
+            $bairro->setCidadeID(app()->getSystem()->getCity()->getID());
         }
         $cidade = $bairro->findCidadeID();
         $estado = $cidade->findEstadoID();
@@ -129,12 +129,12 @@ class BairroPageController extends \MZ\Core\Controller
 
     public function update()
     {
-        need_permission(Permissao::NOME_CADASTROBAIRROS, is_output('json'));
-        $id = isset($_GET['id']) ? $_GET['id'] : null;
+        $this->needPermission([Permissao::NOME_CADASTROBAIRROS]);
+        $id = $this->getRequest()->query->getInt('id', null);
         $bairro = Bairro::findByID($id);
         if (!$bairro->exists()) {
             $msg = 'Não existe Bairro com o ID informado!';
-            if (is_output('json')) {
+            if ($this->isJson()) {
                 return $this->json()->error($msg);
             }
             \Thunder::warning($msg);
@@ -144,7 +144,7 @@ class BairroPageController extends \MZ\Core\Controller
         $errors = [];
         $old_bairro = $bairro;
         if (is_post()) {
-            $bairro = new Bairro($_POST);
+            $bairro = new Bairro($this->getData());
             try {
                 $bairro->filter($old_bairro, true);
                 $bairro->save();
@@ -153,7 +153,7 @@ class BairroPageController extends \MZ\Core\Controller
                     'Bairro "%s" atualizado com sucesso!',
                     $bairro->getNome()
                 );
-                if (is_output('json')) {
+                if ($this->isJson()) {
                     return $this->json()->success(['item' => $bairro->publish()], $msg);
                 }
                 \Thunder::success($msg, true);
@@ -163,7 +163,7 @@ class BairroPageController extends \MZ\Core\Controller
                 if ($e instanceof \MZ\Exception\ValidationException) {
                     $errors = $e->getErrors();
                 }
-                if (is_output('json')) {
+                if ($this->isJson()) {
                     return $this->json()->error($e->getMessage(), null, $errors);
                 }
                 \Thunder::error($e->getMessage());
@@ -172,7 +172,7 @@ class BairroPageController extends \MZ\Core\Controller
                     break;
                 }
             }
-        } elseif (is_output('json')) {
+        } elseif ($this->isJson()) {
             return $this->json()->error('Nenhum dado foi enviado');
         }
         $cidade = $bairro->findCidadeID();
@@ -191,12 +191,12 @@ class BairroPageController extends \MZ\Core\Controller
 
     public function delete()
     {
-        need_permission(Permissao::NOME_CADASTROBAIRROS, is_output('json'));
-        $id = isset($_GET['id']) ? $_GET['id'] : null;
+        $this->needPermission([Permissao::NOME_CADASTROBAIRROS]);
+        $id = $this->getRequest()->query->getInt('id', null);
         $bairro = Bairro::findByID($id);
         if (!$bairro->exists()) {
             $msg = 'Não existe Bairro com o ID informado!';
-            if (is_output('json')) {
+            if ($this->isJson()) {
                 return $this->json()->error($msg);
             }
             \Thunder::warning($msg);
@@ -206,7 +206,7 @@ class BairroPageController extends \MZ\Core\Controller
             $bairro->delete();
             $bairro->clean(new Bairro());
             $msg = sprintf('Bairro "%s" excluído com sucesso!', $bairro->getNome());
-            if (is_output('json')) {
+            if ($this->isJson()) {
                 return $this->json()->success([], $msg);
             }
             \Thunder::success($msg, true);
@@ -215,7 +215,7 @@ class BairroPageController extends \MZ\Core\Controller
                 'Não foi possível excluir o Bairro "%s"!',
                 $bairro->getNome()
             );
-            if (is_output('json')) {
+            if ($this->isJson()) {
                 return $this->json()->error($msg);
             }
             \Thunder::error($msg);

@@ -26,6 +26,23 @@ namespace MZ\Product;
 
 class UnidadeTest extends \MZ\Framework\TestCase
 {
+    public static function build($nome = null, $sigla = null)
+    {
+        $last = Unidade::find([], ['id' => -1]);
+        $id = $last->getID() + 1;
+        $unidade = new Unidade();
+        $unidade->setNome($nome ?: "Unidade #{$id}");
+        $unidade->setSigla($sigla ?: "S{$id}");
+        return $unidade;
+    }
+
+    public static function create($nome = null)
+    {
+        $unidade = self::build($nome);
+        $unidade->insert();
+        return $unidade;
+    }
+
     public function testFromArray()
     {
         $old_unidade = new Unidade([
@@ -55,7 +72,7 @@ class UnidadeTest extends \MZ\Framework\TestCase
             'descricao' => ' Unidade <script>filter</script> ',
             'sigla' => ' Unidade <script>filter</script> ',
         ]);
-        $unidade->filter($old_unidade);
+        $unidade->filter($old_unidade, true);
         $this->assertEquals($old_unidade, $unidade);
     }
 

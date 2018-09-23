@@ -847,7 +847,6 @@ class Pedido extends SyncModel
      */
     public function validate()
     {
-        global $app;
 
         $errors = [];
         if (is_null($this->getSessaoID())) {
@@ -880,7 +879,7 @@ class Pedido extends SyncModel
         if (!Validator::checkBoolean($this->getCancelado())) {
             $errors['cancelado'] = 'A informação de cancelamento não foi informado';
         }
-        if (!$this->exists() && trim($app->getSystem()->getLicenseKey()) == '') {
+        if (!$this->exists() && trim(app()->getSystem()->getLicenseKey()) == '') {
             $count = self::count();
             if ($count >= 20) {
                 $errors['id'] = 'Quantidade de pedidos excedido, adquira uma licença para continuar';
@@ -895,22 +894,22 @@ class Pedido extends SyncModel
     public function checkAccess($operador)
     {
         if ($this->getTipo() == self::TIPO_MESA) {
-            if (!$operador->has(Permissao::NOME_PEDIDOMESA)) {
+            if (!$operador->has([Permissao::NOME_PEDIDOMESA])) {
                 throw new \Exception('Você não tem permissão para acessar mesas');
             }
         } elseif ($this->getTipo() == self::TIPO_COMANDA) {
-            if (!$operador->has(Permissao::NOME_PEDIDOCOMANDA)) {
+            if (!$operador->has([Permissao::NOME_PEDIDOCOMANDA])) {
                 throw new \Exception('Você não tem permissão para acessar comandas');
             }
         } elseif ($this->getTipo() == self::TIPO_ENTREGA) {
-            if (!$operador->has(Permissao::NOME_ENTREGAPEDIDOS)) {
+            if (!$operador->has([Permissao::NOME_ENTREGAPEDIDOS])) {
                 throw new \Exception('Você não tem permissão para criar pedidos para entrega');
-            } elseif (!$operador->has(Permissao::NOME_ENTREGAADICIONAR) && $this->exists()) {
+            } elseif (!$operador->has([Permissao::NOME_ENTREGAADICIONAR]) && $this->exists()) {
                 throw new \Exception('Você não tem permissão para adicionar produtos no pedido para entrega');
             }
         } else {
             // AVULSA
-            if (!$operador->has(Permissao::NOME_PAGAMENTO)) {
+            if (!$operador->has([Permissao::NOME_PAGAMENTO])) {
                 throw new \Exception('Você não tem permissão para criar pedidos para balcão');
             }
         }
@@ -935,7 +934,7 @@ class Pedido extends SyncModel
         if ($this->getFuncionarioID() == $operador->getID()) {
             return $this;
         }
-        if ($this->getTipo() == self::TIPO_MESA && !$operador->has(Permissao::NOME_MESAS)) {
+        if ($this->getTipo() == self::TIPO_MESA && !$operador->has([Permissao::NOME_MESAS])) {
             $cliente = $this->findFuncionarioID()->findClienteID();
             $msg = sprintf(
                 'Apenas o(a) funcionário(a) "%s" poderá realizar pedidos para essa mesa.',
@@ -943,7 +942,7 @@ class Pedido extends SyncModel
             );
             throw new \Exception($msg);
         }
-        if ($this->getTipo() == self::TIPO_COMANDA && !$operador->has(Permissao::NOME_COMANDAS)) {
+        if ($this->getTipo() == self::TIPO_COMANDA && !$operador->has([Permissao::NOME_COMANDAS])) {
             $cliente = $this->findFuncionarioID()->findClienteID();
             $msg = sprintf(
                 'Apenas o(a) funcionário(a) "%s" poderá realizar pedidos para essa comanda.',

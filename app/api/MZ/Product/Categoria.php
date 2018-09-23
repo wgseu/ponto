@@ -24,10 +24,12 @@
  */
 namespace MZ\Product;
 
-use MZ\Database\SyncModel;
-use MZ\Database\DB;
+use MZ\Util\Mask;
 use MZ\Util\Filter;
 use MZ\Util\Validator;
+use MZ\Database\DB;
+use MZ\Database\SyncModel;
+use MZ\Exception\ValidationException;
 
 /**
  * Informa qual a categoria dos produtos e permite a rápida localização dos
@@ -56,11 +58,19 @@ class Categoria extends SyncModel
     /**
      * Imagem representativa da categoria
      */
-    private $imagem;
+    private $imagem_url;
+    /**
+     * Informa a ordem de exibição das categorias nas vendas
+     */
+    private $ordem;
     /**
      * Data de atualização das informações da categoria
      */
     private $data_atualizacao;
+    /**
+     * Data em que a categoria foi arquivada e não será mais usada
+     */
+    private $data_arquivado;
 
     /**
      * Constructor for a new empty instance of Categoria
@@ -73,7 +83,7 @@ class Categoria extends SyncModel
 
     /**
      * Identificador da categoria
-     * @return mixed ID of Categoria
+     * @return int id of Categoria
      */
     public function getID()
     {
@@ -82,8 +92,8 @@ class Categoria extends SyncModel
 
     /**
      * Set ID value to new on param
-     * @param  mixed $id new value for ID
-     * @return Categoria Self instance
+     * @param int $id Set id for Categoria
+     * @return self Self instance
      */
     public function setID($id)
     {
@@ -94,7 +104,7 @@ class Categoria extends SyncModel
     /**
      * Informa a categoria pai da categoria atual, a categoria atual é uma
      * subcategoria
-     * @return mixed Categoria superior of Categoria
+     * @return int categoria superior of Categoria
      */
     public function getCategoriaID()
     {
@@ -103,8 +113,8 @@ class Categoria extends SyncModel
 
     /**
      * Set CategoriaID value to new on param
-     * @param  mixed $categoria_id new value for CategoriaID
-     * @return Categoria Self instance
+     * @param int $categoria_id Set categoria superior for Categoria
+     * @return self Self instance
      */
     public function setCategoriaID($categoria_id)
     {
@@ -114,7 +124,7 @@ class Categoria extends SyncModel
 
     /**
      * Descrição da categoria. Ex.: Refrigerantes, Salgados
-     * @return mixed Descrição of Categoria
+     * @return string descrição of Categoria
      */
     public function getDescricao()
     {
@@ -123,8 +133,8 @@ class Categoria extends SyncModel
 
     /**
      * Set Descricao value to new on param
-     * @param  mixed $descricao new value for Descricao
-     * @return Categoria Self instance
+     * @param string $descricao Set descrição for Categoria
+     * @return self Self instance
      */
     public function setDescricao($descricao)
     {
@@ -134,7 +144,7 @@ class Categoria extends SyncModel
 
     /**
      * Informa se a categoria é destinada para produtos ou serviços
-     * @return mixed Serviço of Categoria
+     * @return string serviço of Categoria
      */
     public function getServico()
     {
@@ -152,8 +162,8 @@ class Categoria extends SyncModel
 
     /**
      * Set Servico value to new on param
-     * @param  mixed $servico new value for Servico
-     * @return Categoria Self instance
+     * @param string $servico Set serviço for Categoria
+     * @return self Self instance
      */
     public function setServico($servico)
     {
@@ -163,27 +173,47 @@ class Categoria extends SyncModel
 
     /**
      * Imagem representativa da categoria
-     * @return mixed Imagem of Categoria
+     * @return string imagem of Categoria
      */
-    public function getImagem()
+    public function getImagemURL()
     {
-        return $this->imagem;
+        return $this->imagem_url;
     }
 
     /**
-     * Set Imagem value to new on param
-     * @param  mixed $imagem new value for Imagem
-     * @return Categoria Self instance
+     * Set ImagemURL value to new on param
+     * @param string $imagem_url Set imagem for Categoria
+     * @return self Self instance
      */
-    public function setImagem($imagem)
+    public function setImagemURL($imagem_url)
     {
-        $this->imagem = $imagem;
+        $this->imagem_url = $imagem_url;
+        return $this;
+    }
+
+    /**
+     * Informa a ordem de exibição das categorias nas vendas
+     * @return int ordem of Categoria
+     */
+    public function getOrdem()
+    {
+        return $this->ordem;
+    }
+
+    /**
+     * Set Ordem value to new on param
+     * @param int $ordem Set ordem for Categoria
+     * @return self Self instance
+     */
+    public function setOrdem($ordem)
+    {
+        $this->ordem = $ordem;
         return $this;
     }
 
     /**
      * Data de atualização das informações da categoria
-     * @return mixed Data de atualização of Categoria
+     * @return string data de atualização of Categoria
      */
     public function getDataAtualizacao()
     {
@@ -192,8 +222,8 @@ class Categoria extends SyncModel
 
     /**
      * Set DataAtualizacao value to new on param
-     * @param  mixed $data_atualizacao new value for DataAtualizacao
-     * @return Categoria Self instance
+     * @param string $data_atualizacao Set data de atualização for Categoria
+     * @return self Self instance
      */
     public function setDataAtualizacao($data_atualizacao)
     {
@@ -202,8 +232,28 @@ class Categoria extends SyncModel
     }
 
     /**
+     * Data em que a categoria foi arquivada e não será mais usada
+     * @return string data de arquivação of Categoria
+     */
+    public function getDataArquivado()
+    {
+        return $this->data_arquivado;
+    }
+
+    /**
+     * Set DataArquivado value to new on param
+     * @param string $data_arquivado Set data de arquivação for Categoria
+     * @return self Self instance
+     */
+    public function setDataArquivado($data_arquivado)
+    {
+        $this->data_arquivado = $data_arquivado;
+        return $this;
+    }
+
+    /**
      * Convert this instance to array associated key -> value
-     * @param  boolean $recursive Allow rescursive conversion of fields
+     * @param boolean $recursive Allow rescursive conversion of fields
      * @return array All field and values into array format
      */
     public function toArray($recursive = false)
@@ -213,19 +263,21 @@ class Categoria extends SyncModel
         $categoria['categoriaid'] = $this->getCategoriaID();
         $categoria['descricao'] = $this->getDescricao();
         $categoria['servico'] = $this->getServico();
-        $categoria['imagem'] = $this->getImagem();
+        $categoria['imagemurl'] = $this->getImagemURL();
+        $categoria['ordem'] = $this->getOrdem();
         $categoria['dataatualizacao'] = $this->getDataAtualizacao();
+        $categoria['dataarquivado'] = $this->getDataArquivado();
         return $categoria;
     }
 
     /**
      * Fill this instance with from array values, you can pass instance to
-     * @param  mixed $categoria Associated key -> value to assign into this instance
-     * @return Categoria Self instance
+     * @param mixed $categoria Associated key -> value to assign into this instance
+     * @return self Self instance
      */
     public function fromArray($categoria = [])
     {
-        if ($categoria instanceof Categoria) {
+        if ($categoria instanceof self) {
             $categoria = $categoria->toArray();
         } elseif (!is_array($categoria)) {
             $categoria = [];
@@ -251,15 +303,25 @@ class Categoria extends SyncModel
         } else {
             $this->setServico($categoria['servico']);
         }
-        if (!array_key_exists('imagem', $categoria)) {
-            $this->setImagem(null);
+        if (!array_key_exists('imagemurl', $categoria)) {
+            $this->setImagemURL(null);
         } else {
-            $this->setImagem($categoria['imagem']);
+            $this->setImagemURL($categoria['imagemurl']);
+        }
+        if (!isset($categoria['ordem'])) {
+            $this->setOrdem(0);
+        } else {
+            $this->setOrdem($categoria['ordem']);
         }
         if (!isset($categoria['dataatualizacao'])) {
             $this->setDataAtualizacao(null);
         } else {
             $this->setDataAtualizacao($categoria['dataatualizacao']);
+        }
+        if (!array_key_exists('dataarquivado', $categoria)) {
+            $this->setDataArquivado(null);
+        } else {
+            $this->setDataArquivado($categoria['dataarquivado']);
         }
         return $this;
     }
@@ -267,16 +329,16 @@ class Categoria extends SyncModel
     /**
      * Get relative imagem path or default imagem
      * @param boolean $default If true return default image, otherwise check field
-     * @param string $default_name Default image name
+     * @param string  $default_name Default image name
      * @return string relative web path for categoria imagem
      */
-    public function makeImagem($default = false, $default_name = 'categoria.png')
+    public function makeImagemURL($default = false, $default_name = 'categoria.png')
     {
-        $imagem = $this->getImagem();
+        $imagem_url = $this->getImagemURL();
         if ($default) {
-            $imagem = null;
+            $imagem_url = null;
         }
-        return get_image_url($imagem, 'categoria', $default_name);
+        return get_image_url($imagem_url, 'categoria', $default_name);
     }
 
     /**
@@ -286,7 +348,7 @@ class Categoria extends SyncModel
     public function publish()
     {
         $categoria = parent::publish();
-        $categoria['imagem'] = $this->makeImagem(false, null);
+        $categoria['imagemurl'] = $this->makeImagemURL(false, null);
         return $categoria;
     }
 
@@ -297,82 +359,83 @@ class Categoria extends SyncModel
 
     /**
      * Filter fields, upload data and keep key data
-     * @param Categoria $original Original instance without modifications
+     * @param self $original Original instance without modifications
+     * @param boolean $localized Informs if fields are localized
+     * @return self Self instance
      */
     public function filter($original, $localized = false)
     {
-        global $app;
-
         $this->setID($original->getID());
         $this->setCategoriaID(Filter::number($this->getCategoriaID()));
         $this->setDescricao(Filter::string($this->getDescricao()));
-        $imagem = upload_image('raw_imagem', 'categoria', null, 256, 256, true);
-        if (is_null($imagem) && trim($this->getImagem()) != '') {
-            $this->setImagem(true);
+        $imagem_url = upload_image('raw_imagemurl', 'categoria', null, 256, 256, true);
+        if (is_null($imagem_url) && trim($this->getImagemURL()) != '') {
+            $this->setImagemURL($original->getImagemURL());
         } else {
-            $this->setImagem($imagem);
-            $image_path = $app->getPath('public') . $this->makeImagem();
-            if (!is_null($imagem)) {
-                $this->setImagem(file_get_contents($image_path));
-                @unlink($image_path);
-            }
+            $this->setImagemURL($imagem_url);
         }
+        $this->setOrdem(Filter::number($this->getOrdem()));
+        $this->setDataArquivado(Filter::datetime($this->getDataArquivado()));
+        return $this;
     }
 
     /**
      * Clean instance resources like images and docs
-     * @param  Categoria $dependency Don't clean when dependency use same resources
+     * @param self $dependency Don't clean when dependency use same resources
      */
     public function clean($dependency)
     {
-        $this->setImagem($dependency->getImagem());
+        if (!is_null($this->getImagemURL()) && $dependency->getImagemURL() != $this->getImagemURL()) {
+            @unlink(get_image_path($this->getImagemURL(), 'categoria'));
+        }
+        $this->setImagemURL($dependency->getImagemURL());
     }
 
     /**
      * Validate fields updating them and throw exception when invalid data has found
      * @return array All field of Categoria in array format
+     * @throws \MZ\Exception\ValidationException for invalid input data
      */
     public function validate()
     {
         $errors = [];
         if (!is_null($this->getCategoriaID())) {
-            $_categoria = $this->findCategoriaID();
-            if (!$_categoria->exists()) {
-                $errors['categoriaid'] = 'A categoria informada não existe';
-            } elseif (!is_null($_categoria->getCategoriaID())) {
-                $errors['categoriaid'] = 'A categoria informada já é uma subcategoria';
-            } elseif ($_categoria->getID() == $this->getID()) {
-                $errors['categoriaid'] = 'A categoria superior não pode ser a própria categoria';
+            $categoriapai = $this->findCategoriaID();
+            if (!$categoriapai->exists()) {
+                $errors['categoriaid'] = _t('categoria.categoriapai_not_found');
+            } elseif (!is_null($categoriapai->getCategoriaID())) {
+                $errors['categoriaid'] = _t('categoria.categoriapai_already');
+            } elseif ($categoriapai->getID() == $this->getID()) {
+                $errors['categoriaid'] = _t('categoria.categoriapai_same');
             }
         }
         if (is_null($this->getDescricao())) {
-            $errors['descricao'] = 'A descrição não pode ser vazia';
+            $errors['descricao'] = _t('categoria.descricao_cannot_empty');
         }
         if (!Validator::checkBoolean($this->getServico())) {
-            $errors['servico'] = 'O serviço é inválido ou está vazio';
+            $errors['servico'] = _t('categoria.servico_invalid');
+        }
+        if (is_null($this->getOrdem())) {
+            $errors['ordem'] = _t('categoria.ordem_cannot_empty');
         }
         $this->setDataAtualizacao(DB::now());
         if (!empty($errors)) {
-            throw new \MZ\Exception\ValidationException($errors);
+            throw new ValidationException($errors);
         }
-        $values = $this->toArray();
-        if ($this->getImagem() === true) {
-            unset($values['imagem']);
-        }
-        return $values;
+        return $this->toArray();
     }
 
     /**
      * Translate SQL exception into application exception
-     * @param  \Exception $e exception to translate into a readable error
+     * @param \Exception $e exception to translate into a readable error
      * @return \MZ\Exception\ValidationException new exception translated
      */
     protected function translate($e)
     {
         if (contains(['Descricao', 'UNIQUE'], $e->getMessage())) {
-            return new \MZ\Exception\ValidationException([
-                'descricao' => sprintf(
-                    'A descrição "%s" já está cadastrada',
+            return new ValidationException([
+                'descricao' => _t(
+                    'categoria.descricao_used',
                     $this->getDescricao()
                 ),
             ]);
@@ -382,7 +445,8 @@ class Categoria extends SyncModel
 
     /**
      * Insert a new Categoria into the database and fill instance from database
-     * @return Categoria Self instance
+     * @return self Self instance
+     * @throws \MZ\Exception\ValidationException for invalid input data
      */
     public function insert()
     {
@@ -401,36 +465,42 @@ class Categoria extends SyncModel
 
     /**
      * Update Categoria with instance values into database for ID
-     * @param  array $only Save these fields only, when empty save all fields except id
-     * @return Categoria Self instance
+     * @param array $only Save these fields only, when empty save all fields except id
+     * @return int rows affected
+     * @throws \MZ\Exception\ValidationException for invalid input data
      */
     public function update($only = [])
     {
         $values = $this->validate();
         if (!$this->exists()) {
-            throw new \Exception('O identificador da categoria não foi informado');
+            throw new ValidationException(
+                ['id' => _t('categoria.id_cannot_empty')]
+            );
         }
         $values = DB::filterValues($values, $only, false);
         try {
-            DB::update('Categorias')
+            $affected = DB::update('Categorias')
                 ->set($values)
-                ->where('id', $this->getID())
+                ->where(['id' => $this->getID()])
                 ->execute();
             $this->loadByID();
         } catch (\Exception $e) {
             throw $this->translate($e);
         }
-        return $this;
+        return $affected;
     }
 
     /**
      * Delete this instance from database using ID
      * @return integer Number of rows deleted (Max 1)
+     * @throws \MZ\Exception\ValidationException for invalid id
      */
     public function delete()
     {
         if (!$this->exists()) {
-            throw new \Exception('O identificador da categoria não foi informado');
+            throw new ValidationException(
+                ['id' => _t('categoria.id_cannot_empty')]
+            );
         }
         $result = DB::deleteFrom('Categorias')
             ->where('id', $this->getID())
@@ -440,9 +510,9 @@ class Categoria extends SyncModel
 
     /**
      * Load one register for it self with a condition
-     * @param  array $condition Condition for searching the row
-     * @param  array $order associative field name -> [-1, 1]
-     * @return Categoria Self instance filled or empty
+     * @param array $condition Condition for searching the row
+     * @param array $order associative field name -> [-1, 1]
+     * @return self Self instance filled or empty
      */
     public function load($condition, $order = [])
     {
@@ -453,28 +523,13 @@ class Categoria extends SyncModel
 
     /**
      * Load into this object from database using, Descricao
-     * @param  string $descricao descrição to find Categoria
-     * @return Categoria Self filled instance or empty when not found
+     * @return self Self filled instance or empty when not found
      */
-    public function loadByDescricao($descricao)
+    public function loadByDescricao()
     {
         return $this->load([
-            'descricao' => strval($descricao),
+            'descricao' => strval($this->getDescricao()),
         ]);
-    }
-
-    /**
-     * Load imagem into this object from database using
-     * @return Categoria Self instance
-     */
-    public function loadImagem()
-    {
-        $imagem = DB::from('Categorias c')
-            ->select(null)
-            ->select('c.imagem')
-            ->where('c.id', $this->getID())
-            ->fetchColumn();
-        return $this->setImagem($imagem);
     }
 
     /**
@@ -496,14 +551,14 @@ class Categoria extends SyncModel
      */
     private static function getAllowedKeys()
     {
-        $categoria = new Categoria();
+        $categoria = new self();
         $allowed = Filter::concatKeys('c.', $categoria->toArray());
         return $allowed;
     }
 
     /**
      * Filter order array
-     * @param  mixed $order order string or array to parse and filter allowed
+     * @param mixed $order order string or array to parse and filter allowed
      * @return array allowed associative order
      */
     private static function filterOrder($order)
@@ -520,7 +575,7 @@ class Categoria extends SyncModel
 
     /**
      * Filter condition array with allowed fields
-     * @param  array $condition condition to filter rows
+     * @param array $condition condition to filter rows
      * @return array allowed condition
      */
     private static function filterCondition($condition)
@@ -538,24 +593,13 @@ class Categoria extends SyncModel
 
     /**
      * Fetch data from database with a condition
-     * @param  array $condition condition to filter rows
-     * @param  array $order order rows
+     * @param array $condition condition to filter rows
+     * @param array $order order rows
      * @return SelectQuery query object with condition statement
      */
     private static function query($condition = [], $order = [])
     {
-        $query = DB::from('Categorias c')
-            ->select(null)
-            ->select('c.id')
-            ->select('c.categoriaid')
-            ->select('c.descricao')
-            ->select('c.servico')
-            ->select(
-                '(CASE WHEN c.imagem IS NULL THEN NULL ELSE '.
-                DB::concat(['c.id', '".png"']).
-                ' END) as imagem'
-            )
-            ->select('c.dataatualizacao');
+        $query = DB::from('Categorias c');
         $order = Filter::order($order);
         if (isset($condition['disponivel']) || isset($order['vendas'])) {
             $query = $query->leftJoin('Produtos p ON p.categoriaid = c.id AND p.visivel = "Y"');
@@ -580,35 +624,51 @@ class Categoria extends SyncModel
 
     /**
      * Search one register with a condition
-     * @param  array $condition Condition for searching the row
-     * @param  array $order order rows
-     * @return Categoria A filled Categoria or empty instance
+     * @param array $condition Condition for searching the row
+     * @param array $order order rows
+     * @return self A filled Categoria or empty instance
      */
     public static function find($condition, $order = [])
     {
-        $query = self::query($condition, $order)->limit(1);
-        $row = $query->fetch() ?: [];
-        return new Categoria($row);
+        $result = new self();
+        return $result->load($condition, $order);
+    }
+
+    /**
+     * Search one register with a condition
+     * @param array $condition Condition for searching the row
+     * @param array $order order rows
+     * @return self A filled Categoria or empty instance
+     * @throws \Exception when register has not found
+     */
+    public static function findOrFail($condition, $order = [])
+    {
+        $result = self::find($condition, $order);
+        if (!$result->exists()) {
+            throw new \Exception(_t('categoria.not_found'), 404);
+        }
+        return $result;
     }
 
     /**
      * Find this object on database using, Descricao
-     * @param  string $descricao descrição to find Categoria
-     * @return Categoria A filled instance or empty when not found
+     * @param string $descricao descrição to find Categoria
+     * @return self A filled instance or empty when not found
      */
     public static function findByDescricao($descricao)
     {
         $result = new self();
-        return $result->loadByDescricao($descricao);
+        $result->setDescricao($descricao);
+        return $result->loadByDescricao();
     }
 
     /**
      * Find all Categoria
-     * @param  array  $condition Condition to get all Categoria
-     * @param  array  $order     Order Categoria
-     * @param  int    $limit     Limit data into row count
-     * @param  int    $offset    Start offset to get rows
-     * @return array             List of all rows instanced as Categoria
+     * @param array  $condition Condition to get all Categoria
+     * @param array  $order     Order Categoria
+     * @param int    $limit     Limit data into row count
+     * @param int    $offset    Start offset to get rows
+     * @return self[]             List of all rows instanced as Categoria
      */
     public static function findAll($condition = [], $order = [], $limit = null, $offset = null)
     {
@@ -622,14 +682,14 @@ class Categoria extends SyncModel
         $rows = $query->fetchAll();
         $result = [];
         foreach ($rows as $row) {
-            $result[] = new Categoria($row);
+            $result[] = new self($row);
         }
         return $result;
     }
 
     /**
      * Count all rows from database with matched condition critery
-     * @param  array $condition condition to filter rows
+     * @param array $condition condition to filter rows
      * @return integer Quantity of rows
      */
     public static function count($condition = [])

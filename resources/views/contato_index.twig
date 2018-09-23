@@ -4,7 +4,7 @@
     $('#' + '{{ $focusctrl }}').focus();
   });
 </script>
-{% if !is_login() || is_null(logged_user()->getEmail()) %}
+{% if !$auth->isLogin() || is_null($user->getEmail()) %}
   {% $col = array(
     'col-md-6',
     'col-md-6',
@@ -28,9 +28,9 @@
         <form name="contato" id="contato-form" method="post" action="/contato/">
           <div class="row">
             <div class="{{ $col[0] }}">
-              {% if !is_login() || is_null(logged_user()->getEmail()) %}
+              {% if !$auth->isLogin() || is_null($user->getEmail()) %}
                 <div class="form-group">
-                  <input type="text" class="form-control" placeholder="Seu nome *" id="nome" name="nome" value="{{ $this->post('nome') ?: logged_user()->getNomeCompleto() }}">
+                  <input type="text" class="form-control" placeholder="Seu nome *" id="nome" name="nome" value="{{ $this->post('nome') ?: $user->getNomeCompleto() }}">
                 </div>
                 <div class="form-group">
                   <input type="email" class="form-control" placeholder="Seu E-mail *" id="email" name="email" value="{{ $this->post('email') }}">

@@ -346,6 +346,14 @@ class Telefone extends SyncModel
         if (!Validator::checkBoolean($this->getPrincipal())) {
             $errors['principal'] = 'O principal é inválido';
         }
+        if ($this->isPrincipal() &&
+            self::count([
+                'numero' => $this->getNumero(),
+                'principal' => 'Y',
+            ]) > 0
+        ) {
+            $errors['numero'] = _t('telefone.numero_used');
+        }
         if (!empty($errors)) {
             throw new ValidationException($errors);
         }
@@ -506,9 +514,8 @@ class Telefone extends SyncModel
      */
     public static function find($condition, $order = [])
     {
-        $query = self::query($condition, $order)->limit(1);
-        $row = $query->fetch() ?: [];
-        return new self($row);
+        $result = new self();
+        return $result->load($condition, $order);
     }
 
     /**

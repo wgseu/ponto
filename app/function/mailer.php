@@ -13,9 +13,8 @@ function mail_custom($emails = [], $subject, $message, $reply = null, $attachmen
 
 function mail_recuperar($cliente)
 {
-    global $app;
 
-    $company = $app->getSystem()->getCompany();
+    $company = app()->getSystem()->getCompany();
     $vars = [
         'cliente_secreto' => $cliente->getSecreto(),
         'cliente_nome' => $cliente->getNome(),
@@ -35,9 +34,8 @@ function mail_recuperar($cliente)
 
 function mail_confirmacao($cliente)
 {
-    global $app;
 
-    $company = $app->getSystem()->getCompany();
+    $company = app()->getSystem()->getCompany();
     $vars = [
         'cliente_secreto' => $cliente->getSecreto(),
         'cliente_nome' => $cliente->getNome(),
@@ -57,9 +55,8 @@ function mail_confirmacao($cliente)
 
 function mail_contato($email, $nome, $assunto, $mensagem)
 {
-    global $app;
 
-    $company = $app->getSystem()->getCompany();
+    $company = app()->getSystem()->getCompany();
     $user = get_string_config('Email', 'Usuario');
     $from = get_string_config('Email', 'From', $user);
     $to = $company->getNome().' <'.$from.'>';
@@ -81,9 +78,8 @@ function mail_contato($email, $nome, $assunto, $mensagem)
 
 function mail_nota($email, $nome, $modo, $filters, $files = [])
 {
-    global $app;
 
-    $company = $app->getSystem()->getCompany();
+    $company = app()->getSystem()->getCompany();
     $pass = get_string_config('Email', 'Senha', '');
     if ($pass == '') {
         throw new \Exception('O serviço de E-mail não foi configurado', 500);

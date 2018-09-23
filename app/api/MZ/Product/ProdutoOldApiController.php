@@ -37,35 +37,32 @@ class ProdutoOldApiController extends \MZ\Core\ApiController
 {
     public function find()
     {
-        $limit = isset($_GET['limite']) ? intval($_GET['limite']) : 5;
-        if ($limit < 1 || $limit > 10) {
-            $limit = 5;
-        }
-        $primeiro = isset($_GET['primeiro']) ? $_GET['primeiro'] : null;
+        $limit = max(1, min(10, $this->getRequest()->query->getInt('limit', 5)));
+        $primeiro = $this->getRequest()->query->getBoolean('primeiro');
         if ($primeiro) {
             $limit = 1;
         }
         $condition = [
             'promocao' => 'Y'
         ];
-        if (isset($_GET['todos']) && $_GET['todos'] == 'Y') {
+        if ($this->getRequest()->query->get('todos') == 'Y') {
             $limit = null;
         }
-        if (isset($_GET['categoria']) && is_numeric($_GET['categoria'])) {
+        if ($this->getRequest()->query->getInt('categoria')) {
             $limit = null;
-            $condition['categoria'] = intval($_GET['categoria']);
+            $condition['categoria'] = $this->getRequest()->query->getInt('categoria');
         }
-        if (isset($_GET['busca'])) {
-            $condition['search'] = $_GET['busca'];
+        if ($this->getRequest()->query->get('busca')) {
+            $condition['search'] = $this->getRequest()->query->get('busca');
         }
-        $estoque = isset($_GET['estoque']) ? intval($_GET['estoque']) : 0;
+        $estoque = $this->getRequest()->query->getInt('estoque');
         // estoque == -1 mostra todos os produtos para funcionários
         // estoque ==  0 mostra todos os produtos disponíveis
         // estoque ==  1 mostra apenas produtos de estoque para funcionários
         $negativo = is_boolean_config('Estoque', 'Estoque.Negativo');
-        if ($estoque > 0 && is_manager()) {
+        if ($estoque > 0 && app()->auth->isManager()) {
             $condition['tipo'] = Produto::TIPO_PRODUTO;
-        } elseif ($estoque == 0 || !is_manager()) {
+        } elseif ($estoque == 0 || !app()->auth->isManager()) {
             if (!$negativo) {
                 $condition['disponivel'] = 'Y';
             }
@@ -99,21 +96,21 @@ class ProdutoOldApiController extends \MZ\Core\ApiController
 
     public function export()
     {
-        need_permission(Permissao::NOME_CADASTROPRODUTOS, isset($_GET['saida']) && is_output('json'));
+        $this->needPermission([Permissao::NOME_CADASTROPRODUTOS]);
 
         set_time_limit(0);
 
         try {
-            $formato = isset($_GET['formato']) ? $_GET['formato'] : null;
-            $condition = Filter::query($_GET);
+            $formato = $this->getRequest()->query->get('formato');
+            $condition = Filter::query($this->getRequest()->query->all());
             $condition['promocao'] = 'N';
-            $order = Filter::order(isset($_GET['ordem']) ? $_GET['ordem'] : '');
+            $order = Filter::order($this->getRequest()->query->get('ordem', ''));
             $produtos = Produto::findAll($condition, $order);
             // Coluna dos dados
             $columns = [
                 'Código',
                 'Descrição',
-                'Preço de Venda ('. $this->getApplication()->getSystem()->getCurrency()->getSimbolo() . ')',
+                'Preço de Venda ('. app()->getSystem()->getCurrency()->getSimbolo() . ')',
                 'Categoria',
                 'Tipo',
                 'Unidades',

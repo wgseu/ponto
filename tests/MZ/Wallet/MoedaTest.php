@@ -73,7 +73,7 @@ class MoedaTest extends \MZ\Framework\TestCase
             'dataatualizacao' => '2016-12-25 12:15:00',
             'ativa' => 'Y',
         ]);
-        $moeda->filter($old_moeda);
+        $moeda->filter($old_moeda, true);
         $this->assertEquals($old_moeda, $moeda);
     }
 

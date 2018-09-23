@@ -692,7 +692,9 @@ class Cliente extends SyncModel
     public function fromArray($cliente = [])
     {
         if ($cliente instanceof self) {
+            $telefone = $cliente->getTelefone();
             $cliente = $cliente->toArray();
+            $cliente['telefone'] = $telefone;
         } elseif (!is_array($cliente)) {
             $cliente = [];
         }
@@ -980,13 +982,13 @@ class Cliente extends SyncModel
         if (!Validator::checkInSet($this->getTipo(), self::getTipoOptions())) {
             $errors['tipo'] = 'O tipo não foi informado ou é inválido';
         }
-        if (is_manager($prestador) && $this->getTipo() != self::TIPO_FISICA) {
+        if ($prestador->exists() && $this->getTipo() != self::TIPO_FISICA) {
             $errors['tipo'] = 'O funcionário deve ser uma pessoa física';
         }
         if (!Validator::checkUsername($this->getLogin(), true)) {
             $errors['login'] = 'O login é inválido';
         }
-        if (is_manager($prestador) && is_null($this->getLogin())) {
+        if ($prestador->exists() && is_null($this->getLogin())) {
             $errors['login'] = 'Login obrigatório para o tipo de conta';
         }
         if (!Validator::checkPassword($this->getSenha(), $this->exists())) {
@@ -1449,9 +1451,8 @@ class Cliente extends SyncModel
      */
     public static function find($condition, $order = [])
     {
-        $query = self::query($condition, $order)->limit(1);
-        $row = $query->fetch() ?: [];
-        return new self($row);
+        $result = new self();
+        return $result->load($condition, $order);
     }
 
     /**

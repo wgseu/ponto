@@ -35,17 +35,17 @@ class MesaOldApiController extends \MZ\Core\ApiController
 {
     public function find()
     {
-        if (!is_login()) {
+        if (!app()->getAuthentication()->isLogin()) {
             return $this->json()->error('Usuário não autenticado!');
         }
-        if (!logged_provider()->has(Permissao::NOME_PEDIDOMESA)) {
+        if (!app()->auth->has([Permissao::NOME_PEDIDOMESA])) {
             return $this->json()->error('Você não tem permissão para acessar mesas');
         }
         $order = [
-            'funcionario' => logged_provider()->getID()
+            'funcionario' => app()->auth->provider->getID()
         ];
         /* verifica se deve ordenar pelo número da mesa */
-        if (isset($_GET['ordenar']) && $_GET['ordenar'] == 'mesa') {
+        if ($this->getRequest()->query->get('ordenar') == 'mesa') {
             unset($order['funcionario']);
         }
         $condition = [

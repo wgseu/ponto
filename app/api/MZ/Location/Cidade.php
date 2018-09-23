@@ -320,9 +320,8 @@ class Cidade extends SyncModel
         if ($cidade->exists()) {
             return $cidade;
         }
-        if (!logged_provider()->has(Permissao::NOME_CADASTROCIDADES)) {
-            throw new \Exception('A cidade não está cadastrada e você não tem permissão para cadastrar uma');
-        }
+        $msg = 'A cidade não está cadastrada e você não tem permissão para cadastrar uma';
+        app()->needPermission([Permissao::NOME_CADASTROCIDADES], $msg);
         $cidade->setEstadoID($estado_id);
         $cidade->setNome($nome);
         $cidade->filter(new Cidade());

@@ -27,29 +27,29 @@ namespace MZ\Account;
 use MZ\System\Permissao;
 use MZ\Database\DB;
 use MZ\Util\Filter;
+use MZ\Core\PageController;
 
 /**
  * Allow application to serve system resources
  */
-class ContaPageController extends \MZ\Core\Controller
+class ContaPageController extends PageController
 {
     public function find()
     {
-        need_permission(Permissao::NOME_CADASTROCONTAS, is_output('json'));
+        $this->needPermission([Permissao::NOME_CADASTROCONTAS]);
 
-        $limite = isset($_GET['limite']) ? intval($_GET['limite']) : 10;
-        if ($limite > 100 || $limite < 1) {
-            $limite = 10;
-        }
-        $condition = Filter::query($_GET);
+        $limite = max(1, min(100, $this->getRequest()->query->getInt('limite', 10)));
+        $condition = Filter::query($this->getRequest()->query->all());
         unset($condition['ordem']);
         $conta = new Conta($condition);
-        $order = Filter::order(isset($_GET['ordem']) ? $_GET['ordem'] : '');
+        $order = Filter::order($this->getRequest()->query->get('ordem', ''));
         $count = Conta::count($condition);
-        list($pagesize, $offset, $pagination) = pagestring($count, $limite);
-        $contas = Conta::findAll($condition, $order, $pagesize, $offset);
+        $page = max(1, $this->getRequest()->query->getInt('pagina', 1));
+        $pager = new \Pager($count, $limite, $page, 'pagina');
+        $pagination = $pager->genBasic();
+        $contas = Conta::findAll($condition, $order, $limite, $pager->offset);
 
-        if (is_output('json')) {
+        if ($this->isJson()) {
             $items = [];
             foreach ($contas as $_conta) {
                 $items[] = $_conta->publish();
@@ -69,8 +69,8 @@ class ContaPageController extends \MZ\Core\Controller
 
     public function add()
     {
-        need_permission(Permissao::NOME_CADASTROCONTAS, is_output('json'));
-        $id = isset($_GET['id']) ? $_GET['id'] : null;
+        $this->needPermission([Permissao::NOME_CADASTROCONTAS]);
+        $id = $this->getRequest()->query->getInt('id', null);
         $conta = Conta::findByID($id);
         $conta->setID(null);
         $conta->setVencimento(DB::now());
@@ -81,10 +81,10 @@ class ContaPageController extends \MZ\Core\Controller
         $errors = [];
         $old_conta = $conta;
         if (is_post()) {
-            $conta = new Conta($_POST);
+            $conta = new Conta($this->getData());
             try {
-                $old_conta->setFuncionarioID(logged_provider()->getID());
-                $despesa = isset($_POST['tipo']) ? $_POST['tipo'] < 0 : false;
+                $old_conta->setFuncionarioID(app()->auth->provider->getID());
+                $despesa = $this->getRequest()->request->getInt('tipo') < 0;
                 $conta->filter($old_conta, $despesa, true);
                 $conta->insert();
                 $old_conta->clean($conta);
@@ -92,7 +92,7 @@ class ContaPageController extends \MZ\Core\Controller
                     'Conta "%s" cadastrada com sucesso!',
                     $conta->getDescricao()
                 );
-                if (is_output('json')) {
+                if ($this->isJson()) {
                     return $this->json()->success(['item' => $conta->publish()], $msg);
                 }
                 \Thunder::success($msg, true);
@@ -102,7 +102,7 @@ class ContaPageController extends \MZ\Core\Controller
                 if ($e instanceof \MZ\Exception\ValidationException) {
                     $errors = $e->getErrors();
                 }
-                if (is_output('json')) {
+                if ($this->isJson()) {
                     return $this->json()->error($e->getMessage(), null, $errors);
                 }
                 \Thunder::error($e->getMessage());
@@ -111,7 +111,7 @@ class ContaPageController extends \MZ\Core\Controller
                     break;
                 }
             }
-        } elseif (is_output('json')) {
+        } elseif ($this->isJson()) {
             return $this->json()->error('Nenhum dado foi enviado');
         }
         $classificacao_id_obj = $conta->findClassificacaoID();
@@ -121,12 +121,12 @@ class ContaPageController extends \MZ\Core\Controller
 
     public function update()
     {
-        need_permission(Permissao::NOME_CADASTROCONTAS, is_output('json'));
-        $id = isset($_GET['id']) ? $_GET['id'] : null;
+        $this->needPermission([Permissao::NOME_CADASTROCONTAS]);
+        $id = $this->getRequest()->query->getInt('id', null);
         $conta = Conta::findByID($id);
         if (!$conta->exists()) {
             $msg = 'A conta não foi informada ou não existe';
-            if (is_output('json')) {
+            if ($this->isJson()) {
                 return $this->json()->error($msg);
             }
             \Thunder::warning($msg);
@@ -136,9 +136,9 @@ class ContaPageController extends \MZ\Core\Controller
         $errors = [];
         $old_conta = $conta;
         if (is_post()) {
-            $conta = new Conta($_POST);
+            $conta = new Conta($this->getData());
             try {
-                $despesa = isset($_POST['tipo']) ? $_POST['tipo'] < 0 : false;
+                $despesa = $this->getRequest()->request->getInt('tipo') < 0;
                 $conta->filter($old_conta, $despesa, true);
                 $conta->update();
                 $old_conta->clean($conta);
@@ -146,7 +146,7 @@ class ContaPageController extends \MZ\Core\Controller
                     'Conta "%s" atualizada com sucesso!',
                     $conta->getDescricao()
                 );
-                if (is_output('json')) {
+                if ($this->isJson()) {
                     return $this->json()->success(['item' => $conta->publish()], $msg);
                 }
                 \Thunder::success($msg, true);
@@ -156,7 +156,7 @@ class ContaPageController extends \MZ\Core\Controller
                 if ($e instanceof \MZ\Exception\ValidationException) {
                     $errors = $e->getErrors();
                 }
-                if (is_output('json')) {
+                if ($this->isJson()) {
                     return $this->json()->error($e->getMessage(), null, $errors);
                 }
                 \Thunder::error($e->getMessage());
@@ -165,7 +165,7 @@ class ContaPageController extends \MZ\Core\Controller
                     break;
                 }
             }
-        } elseif (is_output('json')) {
+        } elseif ($this->isJson()) {
             return $this->json()->error('Nenhum dado foi enviado');
         }
 
@@ -176,12 +176,12 @@ class ContaPageController extends \MZ\Core\Controller
 
     public function delete()
     {
-        need_permission(Permissao::NOME_CADASTROCONTAS, is_output('json'));
-        $id = isset($_GET['id']) ? $_GET['id'] : null;
+        $this->needPermission([Permissao::NOME_CADASTROCONTAS]);
+        $id = $this->getRequest()->query->getInt('id', null);
         $conta = Conta::findByID($id);
         if (!$conta->exists()) {
             $msg = 'A conta não foi informada ou não existe';
-            if (is_output('json')) {
+            if ($this->isJson()) {
                 return $this->json()->error($msg);
             }
             \Thunder::warning($msg);
@@ -191,7 +191,7 @@ class ContaPageController extends \MZ\Core\Controller
             $conta->delete();
             $conta->clean(new Conta());
             $msg = sprintf('Conta "%s" excluída com sucesso!', $conta->getDescricao());
-            if (is_output('json')) {
+            if ($this->isJson()) {
                 return $this->json()->success([], $msg);
             }
             \Thunder::success($msg, true);
@@ -200,7 +200,7 @@ class ContaPageController extends \MZ\Core\Controller
                 'Não foi possível excluir a conta "%s"!',
                 $conta->getDescricao()
             );
-            if (is_output('json')) {
+            if ($this->isJson()) {
                 return $this->json()->error($msg);
             }
             \Thunder::error($msg);

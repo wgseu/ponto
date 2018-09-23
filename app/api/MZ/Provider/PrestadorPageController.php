@@ -28,34 +28,32 @@ use MZ\System\Permissao;
 use MZ\Database\DB;
 use MZ\Account\Cliente;
 use MZ\Util\Filter;
+use MZ\Core\PageController;
 
 /**
  * Allow application to serve system resources
  */
-class PrestadorPageController extends \MZ\Core\Controller
+class PrestadorPageController extends PageController
 {
     public function find()
     {
-        need_manager(is_output('json'));
+        app()->needManager();
 
-        need_manager();
-
-        $limite = isset($_GET['limite']) ? intval($_GET['limite']) : 10;
-        if ($limite > 100 || $limite < 1) {
-            $limite = 10;
-        }
-        $condition = Filter::query($_GET);
+        $limite = max(1, min(100, $this->getRequest()->query->getInt('limite', 10)));
+        $condition = Filter::query($this->getRequest()->query->all());
         unset($condition['ordem']);
-        if (!logged_provider()->has(Permissao::NOME_CADASTROFUNCIONARIOS)) {
-            $condition['id'] = logged_provider()->getID();
+        if (!app()->auth->has([Permissao::NOME_CADASTROFUNCIONARIOS])) {
+            $condition['id'] = app()->auth->provider->getID();
         }
         $prestador = new Prestador($condition);
-        $order = Filter::order(isset($_GET['ordem']) ? $_GET['ordem'] : '');
+        $order = Filter::order($this->getRequest()->query->get('ordem', ''));
         $count = Prestador::count($condition);
-        list($pagesize, $offset, $pagination) = pagestring($count, $limite);
-        $prestadores = Prestador::findAll($condition, $order, $pagesize, $offset);
+        $page = max(1, $this->getRequest()->query->getInt('pagina', 1));
+        $pager = new \Pager($count, $limite, $page, 'pagina');
+        $pagination = $pager->genBasic();
+        $prestadores = Prestador::findAll($condition, $order, $limite, $pager->offset);
 
-        if (is_output('json')) {
+        if ($this->isJson()) {
             $items = [];
             foreach ($prestadores as $_funcionario) {
                 $items[] = $_funcionario->publish();
@@ -64,7 +62,7 @@ class PrestadorPageController extends \MZ\Core\Controller
         }
 
         $funcao = $prestador->findFuncaoID();
-        $estado = isset($_GET['estado']) ? $_GET['estado'] : null;
+        $estado = $this->getRequest()->query->get('estado');
         if ($estado == 'ativo') {
             $estado = 'Y';
         } elseif ($estado == 'inativo') {
@@ -87,8 +85,8 @@ class PrestadorPageController extends \MZ\Core\Controller
 
     public function add()
     {
-        need_permission(Permissao::NOME_CADASTROFUNCIONARIOS, is_output('json'));
-        $id = isset($_GET['id']) ? $_GET['id'] : null;
+        $this->needPermission([Permissao::NOME_CADASTROFUNCIONARIOS]);
+        $id = $this->getRequest()->query->getInt('id', null);
         $prestador = Prestador::findByID($id);
         $prestador->setID(null);
 
@@ -96,7 +94,7 @@ class PrestadorPageController extends \MZ\Core\Controller
         $errors = [];
         $old_funcionario = $prestador;
         if (is_post()) {
-            $prestador = new Prestador($_POST);
+            $prestador = new Prestador($this->getData());
             try {
                 $prestador->filter($old_funcionario, true);
                 $prestador->insert();
@@ -106,7 +104,7 @@ class PrestadorPageController extends \MZ\Core\Controller
                     'Funcionário "%s" cadastrado com sucesso!',
                     $cliente->getAssinatura()
                 );
-                if (is_output('json')) {
+                if ($this->isJson()) {
                     return $this->json()->success(['item' => $cliente->publish()], $msg);
                 }
                 \Thunder::success($msg, true);
@@ -116,7 +114,7 @@ class PrestadorPageController extends \MZ\Core\Controller
                 if ($e instanceof \MZ\Exception\ValidationException) {
                     $errors = $e->getErrors();
                 }
-                if (is_output('json')) {
+                if ($this->isJson()) {
                     return $this->json()->error($e->getMessage(), null, $errors);
                 }
                 \Thunder::error($e->getMessage());
@@ -125,7 +123,7 @@ class PrestadorPageController extends \MZ\Core\Controller
                     break;
                 }
             }
-        } elseif (is_output('json')) {
+        } elseif ($this->isJson()) {
             return $this->json()->error('Nenhum dado foi enviado');
         } elseif (is_null($prestador->getClienteID())) {
             $prestador->setAtivo('Y');
@@ -138,31 +136,29 @@ class PrestadorPageController extends \MZ\Core\Controller
 
     public function update()
     {
-        need_manager(is_output('json'));
-
-        need_manager();
-        $id = isset($_GET['id']) ? $_GET['id'] : null;
+        app()->needManager();
+        $id = $this->getRequest()->query->getInt('id', null);
         $prestador = Prestador::findByID($id);
         if (!$prestador->exists()) {
             $msg = 'O funcionário não foi informado ou não existe';
-            if (is_output('json')) {
+            if ($this->isJson()) {
                 return $this->json()->error($msg);
             }
             \Thunder::warning($msg);
             return $this->redirect('/gerenciar/funcionario/');
         }
         if ((
-                !logged_provider()->has(Permissao::NOME_CADASTROFUNCIONARIOS) &&
-                !is_self($prestador)
+                !app()->auth->has([Permissao::NOME_CADASTROFUNCIONARIOS]) &&
+                !app()->auth->isSelf($prestador)
             ) ||
             (
-                $prestador->has(Permissao::NOME_CADASTROFUNCIONARIOS) &&
-                !is_self($prestador) &&
-                !is_owner()
+                $prestador->has([Permissao::NOME_CADASTROFUNCIONARIOS]) &&
+                !app()->auth->isSelf($prestador) &&
+                !app()->auth->isOwner()
             )
         ) {
             $msg = 'Você não tem permissão para alterar as informações desse(a) funcionário(a)';
-            if (is_output('json')) {
+            if ($this->isJson()) {
                 return $this->json()->error($msg);
             }
             \Thunder::warning($msg);
@@ -173,7 +169,7 @@ class PrestadorPageController extends \MZ\Core\Controller
         $errors = [];
         $old_funcionario = $prestador;
         if (is_post()) {
-            $prestador = new Prestador($_POST);
+            $prestador = new Prestador($this->getData());
             try {
                 $prestador->filter($old_funcionario, true);
                 $prestador->update();
@@ -182,7 +178,7 @@ class PrestadorPageController extends \MZ\Core\Controller
                     'Funcionário(a) "%s" atualizado(a) com sucesso!',
                     $cliente_func->getAssinatura()
                 );
-                if (is_output('json')) {
+                if ($this->isJson()) {
                     return $this->json()->success(['item' => $cliente_func->publish()], $msg);
                 }
                 \Thunder::success($msg, true);
@@ -192,7 +188,7 @@ class PrestadorPageController extends \MZ\Core\Controller
                 if ($e instanceof \MZ\Exception\ValidationException) {
                     $errors = $e->getErrors();
                 }
-                if (is_output('json')) {
+                if ($this->isJson()) {
                     return $this->json()->error($e->getMessage(), null, $errors);
                 }
                 \Thunder::error($e->getMessage());
@@ -201,7 +197,7 @@ class PrestadorPageController extends \MZ\Core\Controller
                     break;
                 }
             }
-        } elseif (is_output('json')) {
+        } elseif ($this->isJson()) {
             return $this->json()->error('Nenhum dado foi enviado');
         }
         $_funcoes = Funcao::findAll();
@@ -211,12 +207,12 @@ class PrestadorPageController extends \MZ\Core\Controller
 
     public function delete()
     {
-        need_permission(Permissao::NOME_CADASTROFUNCIONARIOS, is_output('json'));
-        $id = isset($_GET['id']) ? $_GET['id'] : null;
+        $this->needPermission([Permissao::NOME_CADASTROFUNCIONARIOS]);
+        $id = $this->getRequest()->query->getInt('id', null);
         $prestador = Prestador::findByID($id);
         if (!$prestador->exists()) {
             $msg = 'O funcionário não foi informado ou não existe';
-            if (is_output('json')) {
+            if ($this->isJson()) {
                 return $this->json()->error($msg);
             }
             \Thunder::warning($msg);
@@ -227,7 +223,7 @@ class PrestadorPageController extends \MZ\Core\Controller
             $prestador->delete();
             $prestador->clean(new Prestador());
             $msg = sprintf('Funcionário "%s" excluído com sucesso!', $cliente->getAssinatura());
-            if (is_output('json')) {
+            if ($this->isJson()) {
                 return $this->json()->success([], $msg);
             }
             \Thunder::success($msg, true);
@@ -236,7 +232,7 @@ class PrestadorPageController extends \MZ\Core\Controller
                 'Não foi possível excluir o funcionário "%s"',
                 $cliente->getAssinatura()
             );
-            if (is_output('json')) {
+            if ($this->isJson()) {
                 return $this->json()->error($msg);
             }
             \Thunder::error($msg);

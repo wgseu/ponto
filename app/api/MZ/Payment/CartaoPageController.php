@@ -28,17 +28,18 @@ use MZ\System\Permissao;
 use MZ\Wallet\Carteira;
 use MZ\System\Integracao;
 use MZ\Util\Filter;
+use MZ\Core\PageController;
 use MZ\Integrator\IFood;
 use MZ\Integrator\Kromax;
 
 /**
  * Allow application to serve system resources
  */
-class CartaoPageController extends \MZ\Core\Controller
+class CartaoPageController extends PageController
 {
     public function associate($name)
     {
-        need_permission(Permissao::NOME_CADASTROCARTOES, is_output('json'));
+        $this->needPermission([Permissao::NOME_CADASTROCARTOES]);
         // TODO permitir cadastrar novo cartão na página de associação
         if ($name == 'ifood') {
             $codigos = IFood::CARDS;
@@ -48,11 +49,11 @@ class CartaoPageController extends \MZ\Core\Controller
         $integracao = Integracao::findByAcessoURL($name);
         $association = new \MZ\Association\Card($integracao, $codigos);
 
-        if (isset($_GET['action']) && is_post() && $_GET['action'] == 'update') {
-            need_permission(Permissao::NOME_CADASTROCARTOES, true);
+        if (is_post() && $this->getRequest()->query->get('action') == 'update') {
+            $this->needPermission([Permissao::NOME_CADASTROCARTOES]);
             try {
-                $codigo = isset($_POST['codigo'])?$_POST['codigo']:null;
-                $id = array_key_exists('id', $_POST)?$_POST['id']:null;
+                $codigo = $this->getRequest()->request->get('codigo');
+                $id = $this->getRequest()->request->get('id');
                 $cartao = $association->update($codigo, $id);
                 return $this->json()->success(['cartao' => $cartao->toArray()]);
             } catch (\Exception $e) {
@@ -66,21 +67,20 @@ class CartaoPageController extends \MZ\Core\Controller
 
     public function find()
     {
-        need_permission(Permissao::NOME_CADASTROCARTOES, is_output('json'));
+        $this->needPermission([Permissao::NOME_CADASTROCARTOES]);
 
-        $limite = isset($_GET['limite']) ? intval($_GET['limite']) : 10;
-        if ($limite > 100 || $limite < 1) {
-            $limite = 10;
-        }
-        $condition = Filter::query($_GET);
+        $limite = max(1, min(100, $this->getRequest()->query->getInt('limite', 10)));
+        $condition = Filter::query($this->getRequest()->query->all());
         unset($condition['ordem']);
         $cartao = new Cartao($condition);
-        $order = Filter::order(isset($_GET['ordem']) ? $_GET['ordem'] : '');
+        $order = Filter::order($this->getRequest()->query->get('ordem', ''));
         $count = Cartao::count($condition);
-        list($pagesize, $offset, $pagination) = pagestring($count, $limite);
-        $cartoes = Cartao::findAll($condition, $order, $pagesize, $offset);
+        $page = max(1, $this->getRequest()->query->getInt('pagina', 1));
+        $pager = new \Pager($count, $limite, $page, 'pagina');
+        $pagination = $pager->genBasic();
+        $cartoes = Cartao::findAll($condition, $order, $limite, $pager->offset);
 
-        if (is_output('json')) {
+        if ($this->isJson()) {
             $items = [];
             foreach ($cartoes as $_cartao) {
                 $items[] = $_cartao->publish();
@@ -98,8 +98,8 @@ class CartaoPageController extends \MZ\Core\Controller
 
     public function add()
     {
-        need_permission(Permissao::NOME_CADASTROCARTOES, is_output('json'));
-        $id = isset($_GET['id']) ? $_GET['id'] : null;
+        $this->needPermission([Permissao::NOME_CADASTROCARTOES]);
+        $id = $this->getRequest()->query->getInt('id', null);
         $cartao = Cartao::findByID($id);
         $cartao->setID(null);
 
@@ -107,7 +107,7 @@ class CartaoPageController extends \MZ\Core\Controller
         $errors = [];
         $old_cartao = $cartao;
         if (is_post()) {
-            $cartao = new Cartao($_POST);
+            $cartao = new Cartao($this->getData());
             try {
                 $cartao->filter($old_cartao, true);
                 $cartao->insert();
@@ -116,7 +116,7 @@ class CartaoPageController extends \MZ\Core\Controller
                     'Cartão "%s" cadastrado com sucesso!',
                     $cartao->getDescricao()
                 );
-                if (is_output('json')) {
+                if ($this->isJson()) {
                     return $this->json()->success(['item' => $cartao->publish()], $msg);
                 }
                 \Thunder::success($msg, true);
@@ -126,7 +126,7 @@ class CartaoPageController extends \MZ\Core\Controller
                 if ($e instanceof \MZ\Exception\ValidationException) {
                     $errors = $e->getErrors();
                 }
-                if (is_output('json')) {
+                if ($this->isJson()) {
                     return $this->json()->error($e->getMessage(), null, $errors);
                 }
                 \Thunder::error($e->getMessage());
@@ -135,7 +135,7 @@ class CartaoPageController extends \MZ\Core\Controller
                     break;
                 }
             }
-        } elseif (is_output('json')) {
+        } elseif ($this->isJson()) {
             return $this->json()->error('Nenhum dado foi enviado');
         } elseif (is_null($cartao->getDescricao())) {
             $cartao->setAtivo('Y');
@@ -147,12 +147,12 @@ class CartaoPageController extends \MZ\Core\Controller
 
     public function update()
     {
-        need_permission(Permissao::NOME_CADASTROCARTOES, is_output('json'));
-        $id = isset($_GET['id']) ? $_GET['id'] : null;
+        $this->needPermission([Permissao::NOME_CADASTROCARTOES]);
+        $id = $this->getRequest()->query->getInt('id', null);
         $cartao = Cartao::findByID($id);
         if (!$cartao->exists()) {
             $msg = 'O cartão informado não existe!';
-            if (is_output('json')) {
+            if ($this->isJson()) {
                 return $this->json()->error($msg);
             }
             \Thunder::warning($msg);
@@ -162,7 +162,7 @@ class CartaoPageController extends \MZ\Core\Controller
         $errors = [];
         $old_cartao = $cartao;
         if (is_post()) {
-            $cartao = new Cartao($_POST);
+            $cartao = new Cartao($this->getData());
             try {
                 $cartao->filter($old_cartao, true);
                 $cartao->update();
@@ -171,7 +171,7 @@ class CartaoPageController extends \MZ\Core\Controller
                     'Cartão "%s" atualizado com sucesso!',
                     $cartao->getDescricao()
                 );
-                if (is_output('json')) {
+                if ($this->isJson()) {
                     return $this->json()->success(['item' => $cartao->publish()], $msg);
                 }
                 \Thunder::success($msg, true);
@@ -181,7 +181,7 @@ class CartaoPageController extends \MZ\Core\Controller
                 if ($e instanceof \MZ\Exception\ValidationException) {
                     $errors = $e->getErrors();
                 }
-                if (is_output('json')) {
+                if ($this->isJson()) {
                     return $this->json()->error($e->getMessage(), null, $errors);
                 }
                 \Thunder::error($e->getMessage());
@@ -190,7 +190,7 @@ class CartaoPageController extends \MZ\Core\Controller
                     break;
                 }
             }
-        } elseif (is_output('json')) {
+        } elseif ($this->isJson()) {
             return $this->json()->error('Nenhum dado foi enviado');
         }
         $_carteiras = Carteira::findAll();
@@ -200,12 +200,12 @@ class CartaoPageController extends \MZ\Core\Controller
 
     public function delete()
     {
-        need_permission(Permissao::NOME_CADASTROCARTOES, is_output('json'));
-        $id = isset($_GET['id']) ? $_GET['id'] : null;
+        $this->needPermission([Permissao::NOME_CADASTROCARTOES]);
+        $id = $this->getRequest()->query->getInt('id', null);
         $cartao = Cartao::findByID($id);
         if (!$cartao->exists()) {
             $msg = 'O cartão não foi informado ou não existe!';
-            if (is_output('json')) {
+            if ($this->isJson()) {
                 return $this->json()->error($msg);
             }
             \Thunder::warning($msg);
@@ -215,7 +215,7 @@ class CartaoPageController extends \MZ\Core\Controller
             $cartao->delete();
             $cartao->clean(new Cartao());
             $msg = sprintf('Cartão "%s" excluído com sucesso!', $cartao->getDescricao());
-            if (is_output('json')) {
+            if ($this->isJson()) {
                 return $this->json()->success([], $msg);
             }
             \Thunder::success($msg, true);
@@ -224,7 +224,7 @@ class CartaoPageController extends \MZ\Core\Controller
                 'Não foi possível excluir o cartão "%s"!',
                 $cartao->getDescricao()
             );
-            if (is_output('json')) {
+            if ($this->isJson()) {
                 return $this->json()->error($msg);
             }
             \Thunder::error($msg);

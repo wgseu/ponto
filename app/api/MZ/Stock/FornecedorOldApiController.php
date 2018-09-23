@@ -31,25 +31,21 @@ class FornecedorOldApiController extends \MZ\Core\ApiController
 {
     public function find()
     {
-        need_manager(true);
+        app()->needManager();
 
-        $limite = isset($_GET['limite']) ? intval($_GET['limite']) : 5;
-        $primeiro = isset($_GET['primeiro']) ? $_GET['primeiro'] : null;
-        $search = isset($_GET['busca']) ? $_GET['busca'] : null;
+        $limite = max(1, min(20, $this->getRequest()->query->getInt('limite', 5)));
+        $primeiro = $this->getRequest()->query->get('primeiro');
+        $search = $this->getRequest()->query->get('busca');
         if ($primeiro || check_fone($search, true)) {
             $limite = 1;
-        } elseif ($limite < 1) {
-            $limite = 5;
-        } elseif ($limite > 20) {
-            $limite = 20;
         }
         $condition = [];
-        if (isset($_GET['busca'])) {
+        if ($search) {
             $condition['search'] = $search;
         }
         $fornecedores = Fornecedor::findAll($condition, [], $limite);
         $items = [];
-        $domask = isset($_GET['format']) ? intval($_GET['format']) != 0: false;
+        $domask = $this->getRequest()->query->getBoolean('format');
         foreach ($fornecedores as $fornecedor) {
             $cliente = $fornecedor->findEmpresaID();
             $cliente_item = $cliente->publish();

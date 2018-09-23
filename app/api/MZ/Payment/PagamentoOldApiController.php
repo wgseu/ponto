@@ -36,14 +36,14 @@ class PagamentoOldApiController extends \MZ\Core\ApiController
 {
     public function billing()
     {
-        if (!is_login()) {
+        if (!app()->getAuthentication()->isLogin()) {
             return $this->json()->error('Usuário não autenticado!');
         }
-        if (!logged_provider()->has(Permissao::NOME_RELATORIOCAIXA)) {
+        if (!app()->auth->has([Permissao::NOME_RELATORIOCAIXA])) {
             return $this->json()->error('Você não tem permissão para acessar o faturamento da empresa');
         }
         $response = [];
-        $mes = isset($_GET['mes']) ? abs(intval($_GET['mes'])): 0;
+        $mes = abs($this->getRequest()->query->getInt('mes'));
         $meses = [];
         for ($i = $mes; $i < $mes + 4; $i++) {
             $data = DB::date("first day of -$i month");
@@ -61,10 +61,10 @@ class PagamentoOldApiController extends \MZ\Core\ApiController
 
     public function statement()
     {
-        if (!is_login()) {
+        if (!app()->getAuthentication()->isLogin()) {
             return $this->json()->error('Usuário não autenticado!');
         }
-        if (!logged_provider()->has(Permissao::NOME_RELATORIOCAIXA)) {
+        if (!app()->auth->has([Permissao::NOME_RELATORIOCAIXA])) {
             return $this->json()->error('Você não tem permissão para acessar o resumo de valores');
         }
         $sessao = Sessao::findLastAberta();
@@ -110,7 +110,7 @@ class PagamentoOldApiController extends \MZ\Core\ApiController
             ],
             ['forma_tipo' => true]
         );
-        $mes = abs(intval(isset($_GET['mes']) ? $_GET['mes'] : null));
+        $mes = abs(intval($this->getRequest()->query->get('mes')));
         $meses = [];
         for ($i = $mes; $i < $mes + 4; $i++) {
             $data = DB::date("first day of -$i month");
@@ -128,14 +128,14 @@ class PagamentoOldApiController extends \MZ\Core\ApiController
 
     public function actions()
     {
-        need_owner(true);
-        $action = isset($_GET['action']) ? $_GET['action'] : null;
+        app()->needOwner();
+        $action = $this->getRequest()->query->get('action');
         if ($action == 'faturamento') {
-            $start = strtotime(isset($_GET['start']) ? $_GET['start'] : null);
+            $start = strtotime($this->getRequest()->query->get('start'));
             if ($start === false) {
                 $start = time();
             }
-            $end = strtotime(isset($_GET['end']) ? $_GET['end'] : null);
+            $end = strtotime($this->getRequest()->query->get('end'));
             if ($end === false) {
                 $end = time();
             }
@@ -156,7 +156,7 @@ class PagamentoOldApiController extends \MZ\Core\ApiController
             }
             return $this->json()->success(['faturamento' => $data]);
         } elseif ($action == 'meta') {
-            $intervalo = strtolower(isset($_GET['intervalo']) ? $_GET['intervalo'] : null);
+            $intervalo = strtolower($this->getRequest()->query->get('intervalo'));
             switch ($intervalo) {
                 case 'anual':
                     $atual_de = DB::date('first day of jan');

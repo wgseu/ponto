@@ -24,6 +24,7 @@
  */
 namespace MZ\Provider;
 
+use MZ\Util\Mask;
 use MZ\Util\Filter;
 use MZ\Util\Validator;
 use MZ\Database\DB;
@@ -60,7 +61,7 @@ class Funcao extends SyncModel
 
     /**
      * Identificador da função
-     * @return mixed ID of Funcao
+     * @return int id of Função
      */
     public function getID()
     {
@@ -69,7 +70,7 @@ class Funcao extends SyncModel
 
     /**
      * Set ID value to new on param
-     * @param  mixed $id new value for ID
+     * @param int $id Set id for Função
      * @return self Self instance
      */
     public function setID($id)
@@ -80,7 +81,7 @@ class Funcao extends SyncModel
 
     /**
      * Descreve o nome da função
-     * @return mixed Descrição of Funcao
+     * @return string descrição of Função
      */
     public function getDescricao()
     {
@@ -89,7 +90,7 @@ class Funcao extends SyncModel
 
     /**
      * Set Descricao value to new on param
-     * @param  mixed $descricao new value for Descricao
+     * @param string $descricao Set descrição for Função
      * @return self Self instance
      */
     public function setDescricao($descricao)
@@ -100,7 +101,7 @@ class Funcao extends SyncModel
 
     /**
      * Remuneracao pelas atividades exercidas, não está incluso comissões
-     * @return mixed Remuneração of Funcao
+     * @return string remuneração of Função
      */
     public function getRemuneracao()
     {
@@ -109,7 +110,7 @@ class Funcao extends SyncModel
 
     /**
      * Set Remuneracao value to new on param
-     * @param  mixed $remuneracao new value for Remuneracao
+     * @param string $remuneracao Set remuneração for Função
      * @return self Self instance
      */
     public function setRemuneracao($remuneracao)
@@ -120,7 +121,7 @@ class Funcao extends SyncModel
 
     /**
      * Convert this instance to array associated key -> value
-     * @param  boolean $recursive Allow rescursive conversion of fields
+     * @param boolean $recursive Allow rescursive conversion of fields
      * @return array All field and values into array format
      */
     public function toArray($recursive = false)
@@ -134,7 +135,7 @@ class Funcao extends SyncModel
 
     /**
      * Fill this instance with from array values, you can pass instance to
-     * @param  mixed $funcao Associated key -> value to assign into this instance
+     * @param mixed $funcao Associated key -> value to assign into this instance
      * @return self Self instance
      */
     public function fromArray($funcao = [])
@@ -176,17 +177,20 @@ class Funcao extends SyncModel
     /**
      * Filter fields, upload data and keep key data
      * @param self $original Original instance without modifications
+     * @param boolean $localized Informs if fields are localized
+     * @return self Self instance
      */
     public function filter($original, $localized = false)
     {
         $this->setID($original->getID());
         $this->setDescricao(Filter::string($this->getDescricao()));
         $this->setRemuneracao(Filter::money($this->getRemuneracao(), $localized));
+        return $this;
     }
 
     /**
      * Clean instance resources like images and docs
-     * @param  Funcao $dependency Don't clean when dependency use same resources
+     * @param self $dependency Don't clean when dependency use same resources
      */
     public function clean($dependency)
     {
@@ -194,18 +198,19 @@ class Funcao extends SyncModel
 
     /**
      * Validate fields updating them and throw exception when invalid data has found
-     * @return mixed[] All field of Funcao in array format
+     * @return array All field of Funcao in array format
+     * @throws \MZ\Exception\ValidationException for invalid input data
      */
     public function validate()
     {
         $errors = [];
         if (is_null($this->getDescricao())) {
-            $errors['descricao'] = 'A descrição não pode ser vazia';
+            $errors['descricao'] = _t('funcao.descricao_cannot_empty');
         }
         if (is_null($this->getRemuneracao())) {
-            $errors['salariobase'] = 'A remuneração base não pode ser vazia';
+            $errors['remuneracao'] = _t('funcao.remuneracao_cannot_empty');
         } elseif ($this->getRemuneracao() < 0) {
-            $errors['salariobase'] = 'A remuneração base não pode ser negativa';
+            $errors['remuneracao'] = _t('funcao.remuneracao_cannot_negative');
         }
         if (!empty($errors)) {
             throw new ValidationException($errors);
@@ -215,15 +220,15 @@ class Funcao extends SyncModel
 
     /**
      * Translate SQL exception into application exception
-     * @param  \Exception $e exception to translate into a readable error
+     * @param \Exception $e exception to translate into a readable error
      * @return \MZ\Exception\ValidationException new exception translated
      */
     protected function translate($e)
     {
         if (contains(['Descricao', 'UNIQUE'], $e->getMessage())) {
             return new ValidationException([
-                'descricao' => sprintf(
-                    'A descrição "%s" já está cadastrada',
+                'descricao' => _t(
+                    'funcao.descricao_used',
                     $this->getDescricao()
                 ),
             ]);
@@ -233,7 +238,8 @@ class Funcao extends SyncModel
 
     /**
      * Insert a new Função into the database and fill instance from database
-     * @return Funcao Self instance
+     * @return self Self instance
+     * @throws \MZ\Exception\ValidationException for invalid input data
      */
     public function insert()
     {
@@ -252,36 +258,42 @@ class Funcao extends SyncModel
 
     /**
      * Update Função with instance values into database for ID
-     * @param  array $only Save these fields only, when empty save all fields except id
-     * @return Funcao Self instance
+     * @param array $only Save these fields only, when empty save all fields except id
+     * @return int rows affected
+     * @throws \MZ\Exception\ValidationException for invalid input data
      */
     public function update($only = [])
     {
         $values = $this->validate();
         if (!$this->exists()) {
-            throw new \Exception('O identificador da função não foi informado');
+            throw new ValidationException(
+                ['id' => _t('funcao.id_cannot_empty')]
+            );
         }
         $values = DB::filterValues($values, $only, false);
         try {
-            DB::update('Funcoes')
+            $affected = DB::update('Funcoes')
                 ->set($values)
-                ->where('id', $this->getID())
+                ->where(['id' => $this->getID()])
                 ->execute();
             $this->loadByID();
         } catch (\Exception $e) {
             throw $this->translate($e);
         }
-        return $this;
+        return $affected;
     }
 
     /**
      * Delete this instance from database using ID
      * @return integer Number of rows deleted (Max 1)
+     * @throws \MZ\Exception\ValidationException for invalid id
      */
     public function delete()
     {
         if (!$this->exists()) {
-            throw new \Exception('O identificador da função não foi informado');
+            throw new ValidationException(
+                ['id' => _t('funcao.id_cannot_empty')]
+            );
         }
         $result = DB::deleteFrom('Funcoes')
             ->where('id', $this->getID())
@@ -291,9 +303,9 @@ class Funcao extends SyncModel
 
     /**
      * Load one register for it self with a condition
-     * @param  array $condition Condition for searching the row
-     * @param  array $order associative field name -> [-1, 1]
-     * @return Funcao Self instance filled or empty
+     * @param array $condition Condition for searching the row
+     * @param array $order associative field name -> [-1, 1]
+     * @return self Self instance filled or empty
      */
     public function load($condition, $order = [])
     {
@@ -304,13 +316,12 @@ class Funcao extends SyncModel
 
     /**
      * Load into this object from database using, Descricao
-     * @param  string $descricao descrição to find Função
-     * @return Funcao Self filled instance or empty when not found
+     * @return self Self filled instance or empty when not found
      */
-    public function loadByDescricao($descricao)
+    public function loadByDescricao()
     {
         return $this->load([
-            'descricao' => strval($descricao),
+            'descricao' => strval($this->getDescricao()),
         ]);
     }
 
@@ -320,14 +331,14 @@ class Funcao extends SyncModel
      */
     private static function getAllowedKeys()
     {
-        $funcao = new Funcao();
+        $funcao = new self();
         $allowed = Filter::concatKeys('f.', $funcao->toArray());
         return $allowed;
     }
 
     /**
      * Filter order array
-     * @param  mixed $order order string or array to parse and filter allowed
+     * @param mixed $order order string or array to parse and filter allowed
      * @return array allowed associative order
      */
     private static function filterOrder($order)
@@ -338,7 +349,7 @@ class Funcao extends SyncModel
 
     /**
      * Filter condition array with allowed fields
-     * @param  array $condition condition to filter rows
+     * @param array $condition condition to filter rows
      * @return array allowed condition
      */
     private static function filterCondition($condition)
@@ -356,8 +367,8 @@ class Funcao extends SyncModel
 
     /**
      * Fetch data from database with a condition
-     * @param  array $condition condition to filter rows
-     * @param  array $order order rows
+     * @param array $condition condition to filter rows
+     * @param array $order order rows
      * @return SelectQuery query object with condition statement
      */
     private static function query($condition = [], $order = [])
@@ -372,35 +383,51 @@ class Funcao extends SyncModel
 
     /**
      * Search one register with a condition
-     * @param  array $condition Condition for searching the row
-     * @param  array $order order rows
-     * @return Funcao A filled Função or empty instance
+     * @param array $condition Condition for searching the row
+     * @param array $order order rows
+     * @return self A filled Função or empty instance
      */
     public static function find($condition, $order = [])
     {
-        $query = self::query($condition, $order)->limit(1);
-        $row = $query->fetch() ?: [];
-        return new Funcao($row);
+        $result = new self();
+        return $result->load($condition, $order);
+    }
+
+    /**
+     * Search one register with a condition
+     * @param array $condition Condition for searching the row
+     * @param array $order order rows
+     * @return self A filled Função or empty instance
+     * @throws \Exception when register has not found
+     */
+    public static function findOrFail($condition, $order = [])
+    {
+        $result = self::find($condition, $order);
+        if (!$result->exists()) {
+            throw new \Exception(_t('funcao.not_found'), 404);
+        }
+        return $result;
     }
 
     /**
      * Find this object on database using, Descricao
-     * @param  string $descricao descrição to find Função
-     * @return Funcao A filled instance or empty when not found
+     * @param string $descricao descrição to find Função
+     * @return self A filled instance or empty when not found
      */
     public static function findByDescricao($descricao)
     {
         $result = new self();
-        return $result->loadByDescricao($descricao);
+        $result->setDescricao($descricao);
+        return $result->loadByDescricao();
     }
 
     /**
      * Find all Função
-     * @param  array  $condition Condition to get all Função
-     * @param  array  $order     Order Função
-     * @param  int    $limit     Limit data into row count
-     * @param  int    $offset    Start offset to get rows
-     * @return array             List of all rows instanced as Funcao
+     * @param array  $condition Condition to get all Função
+     * @param array  $order     Order Função
+     * @param int    $limit     Limit data into row count
+     * @param int    $offset    Start offset to get rows
+     * @return self[] List of all rows instanced as Funcao
      */
     public static function findAll($condition = [], $order = [], $limit = null, $offset = null)
     {
@@ -414,14 +441,14 @@ class Funcao extends SyncModel
         $rows = $query->fetchAll();
         $result = [];
         foreach ($rows as $row) {
-            $result[] = new Funcao($row);
+            $result[] = new self($row);
         }
         return $result;
     }
 
     /**
      * Count all rows from database with matched condition critery
-     * @param  array $condition condition to filter rows
+     * @param array $condition condition to filter rows
      * @return integer Quantity of rows
      */
     public static function count($condition = [])

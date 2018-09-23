@@ -26,22 +26,21 @@ namespace MZ\System;
 
 use MZ\System\Permissao;
 use MZ\Util\Filter;
+use MZ\Core\PageController;
 
 /**
  * Allow application to serve system resources
  */
-class AcessoPageController extends \MZ\Core\Controller
+class AcessoPageController extends PageController
 {
     public function manage()
     {
-        need_manager(is_output('json'));
-
-        need_owner(is_output('json'));
-        $funcao_id = isset($_GET['funcao']) ? $_GET['funcao'] : null;
-        $funcao_id = isset($_POST['funcao']) ? $_POST['funcao'] : $funcao_id;
+        app()->neeOwner();
+        $funcao_id = $this->getRequest()->query->get('funcao');
+        $funcao_id = $this->getRequest()->request->get('funcao', $funcao_id);
         $funcao = Funcao::findByID($funcao_id);
         if (!$funcao->exists()) {
-            if (is_output('json')) {
+            if ($this->isJson()) {
                 return $this->json()->error('A função não foi informada ou não existe');
             }
             return $this->redirect('/gerenciar/funcao/');
@@ -49,12 +48,12 @@ class AcessoPageController extends \MZ\Core\Controller
         $errors = [];
         if (is_post()) {
             try {
-                $permissao_id = isset($_POST['permissao']) ? $_POST['permissao'] : null;
+                $permissao_id = $this->getRequest()->request->get('permissao');
                 $permissao = Permissao::findByID($permissao_id);
                 if (!$permissao->exists()) {
                     throw new \Exception('A permissão não foi informada ou não existe', 404);
                 }
-                if (isset($_POST['marcado']) && $_POST['marcado'] == 'Y') {
+                if ($this->getRequest()->request->get('marcado') == 'Y') {
                     $acesso = new Acesso();
                     $acesso->setFuncaoID($funcao->getID());
                     $acesso->setPermissaoID($permissao->getID());
@@ -66,7 +65,7 @@ class AcessoPageController extends \MZ\Core\Controller
                     ]);
                     $acesso->delete();
                 }
-                if (is_output('json')) {
+                if ($this->isJson()) {
                     return $this->json()->success();
                 }
                 return $this->redirect('/gerenciar/acesso/?funcao=' . $funcao->getID());
@@ -74,7 +73,7 @@ class AcessoPageController extends \MZ\Core\Controller
                 if ($e instanceof \MZ\Exception\ValidationException) {
                     $errors = $e->getErrors();
                 }
-                if (is_output('json')) {
+                if ($this->isJson()) {
                     return $this->json()->error($e->getMessage(), null, $errors);
                 }
                 \Thunder::error($e->getMessage());
@@ -84,12 +83,12 @@ class AcessoPageController extends \MZ\Core\Controller
                 }
             }
         }
-        $condition = Filter::query($_GET);
+        $condition = Filter::query($this->getRequest()->query->all());
         unset($condition['ordem']);
-        $order = Filter::order(isset($_GET['ordem'])?$_GET['ordem']:'');
+        $order = Filter::order($this->getRequest()->query->get('ordem', ''));
         $permissoes = Permissao::findAll($condition, $order);
 
-        if (is_output('json')) {
+        if ($this->isJson()) {
             $items = [];
             foreach ($permissoes as $permissao) {
                 $item = $permissao->publish();

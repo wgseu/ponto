@@ -37,17 +37,14 @@ class NotaOldApiController extends \MZ\Core\ApiController
 {
     public function display()
     {
-        need_permission(
-            [
-                Permissao::NOME_PAGAMENTO, ['||'],
-                Permissao::NOME_SELECIONARCAIXA, ['||'],
-                Permissao::NOME_RELATORIOPEDIDOS
-            ],
-            true
-        );
+        $this->needPermission([
+            Permissao::NOME_PAGAMENTO, ['||'],
+            Permissao::NOME_SELECIONARCAIXA, ['||'],
+            Permissao::NOME_RELATORIOPEDIDOS
+        ]);
 
         try {
-            $pedido_id = isset($_GET['pedidoid']) ? $_GET['pedidoid'] : null;
+            $pedido_id = $this->getRequest()->query->get('pedidoid');
             $pedido = Pedido::findByID($pedido_id);
             if (!$pedido->exists()) {
                 throw new \Exception('O pedido não foi informado ou não existe', 404);
@@ -73,18 +70,15 @@ class NotaOldApiController extends \MZ\Core\ApiController
 
     public function download()
     {
-        need_permission(
-            [
-                Permissao::NOME_RELATORIOFLUXO,
-                Permissao::NOME_EXCLUIRPEDIDO,
-            ],
-            true
-        );
+        $this->needPermission([
+            Permissao::NOME_RELATORIOFLUXO,
+            Permissao::NOME_EXCLUIRPEDIDO,
+        ]);
 
         set_time_limit(0);
 
         try {
-            $condition = Filter::query($_GET);
+            $condition = Filter::query($this->getRequest()->query->all());
             $notas = Nota::findAll($condition);
             if (count($notas) == 0) {
                 throw new \Exception('Nenhuma nota no resultado da busca', 404);
@@ -122,15 +116,12 @@ class NotaOldApiController extends \MZ\Core\ApiController
 
     public function send()
     {
-        need_permission(
-            Permissao::NOME_PAGAMENTO,
-            true
-        );
+        $this->needPermission([Permissao::NOME_PAGAMENTO]);
 
         set_time_limit(0);
 
         try {
-            $condition = Filter::query($_GET);
+            $condition = Filter::query($this->getRequest()->query->all());
             $notas = Nota::findAll($condition);
             $nota = new Nota($condition);
 
@@ -207,13 +198,10 @@ class NotaOldApiController extends \MZ\Core\ApiController
                     return $this->json()->success();
                 }
             }
-            need_permission(
-                [
-                    Permissao::NOME_RELATORIOFLUXO,
-                    Permissao::NOME_EXCLUIRPEDIDO,
-                ],
-                is_output('json')
-            );
+            $this->needPermission([
+                Permissao::NOME_RELATORIOFLUXO,
+                Permissao::NOME_EXCLUIRPEDIDO,
+            ]);
             $sufixo_str = '';
             if (count($sufixo) > 1) {
                 $sufixo_str = ' e ' . array_pop($sufixo);
@@ -239,11 +227,11 @@ class NotaOldApiController extends \MZ\Core\ApiController
 
     public function process()
     {
-        need_permission(Permissao::NOME_ALTERARCONFIGURACOES, true);
+        $this->needPermission([Permissao::NOME_ALTERARCONFIGURACOES]);
 
         set_time_limit(0);
         $nfe_api = new \NFeAPI();
-        $nfe_api->setOffline(isset($_POST['offline_start']) ? $_POST['offline_start'] : null);
+        $nfe_api->setOffline($this->getRequest()->request->get('offline_start'));
         try {
             $nfe_api->init();
             $result = $nfe_api->processa();
@@ -259,22 +247,22 @@ class NotaOldApiController extends \MZ\Core\ApiController
 
     public function add()
     {
-        need_manager(is_output('json'));
-        need_permission([Permissao::NOME_PAGAMENTO, ['||'], Permissao::NOME_SELECIONARCAIXA], true);
+        app()->needManager();
+        $this->needPermission([Permissao::NOME_PAGAMENTO, ['||'], Permissao::NOME_SELECIONARCAIXA]);
 
         if (!is_post()) {
             return $this->json()->error('Nenhum dado foi enviado');
         }
 
         try {
-            $caixa = Caixa::findByID(isset($_POST['caixaid']) ? $_POST['caixaid'] : null);
+            $caixa = Caixa::findByID($this->getRequest()->request->get('caixaid'));
             if (!$caixa->exists()) {
                 throw new \Exception('O caixa informado não existe', 404);
             }
             if (!$caixa->isAtivo()) {
                 throw new \Exception(sprintf('O caixa "%s" não está ativo', $caixa->getDescricao()), 500);
             }
-            $pedido = Pedido::findByID(isset($_POST['pedidoid']) ? $_POST['pedidoid'] : null);
+            $pedido = Pedido::findByID($this->getRequest()->request->get('pedidoid'));
             if (!$pedido->exists()) {
                 throw new \Exception('O pedido informado não existe', 404);
             }

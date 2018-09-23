@@ -33,18 +33,18 @@ class BairroOldApiController extends \MZ\Core\ApiController
 {
     public function find()
     {
-        $estado_id = isset($_GET['estadoid']) ? $_GET['estadoid'] : null;
+        $estado_id = $this->getRequest()->query->get('estadoid');
         $estado = Estado::findByID($estado_id);
         if (!$estado->exists()) {
             return $this->json()->error('O estado não foi informado ou não existe!');
         }
-        $cidade_nome = isset($_GET['cidade']) ? trim($_GET['cidade']) : null;
+        $cidade_nome = $this->getRequest()->query->get('cidade');
         $cidade = Cidade::findByEstadoIDNome($estado_id, $cidade_nome);
         if (!$cidade->exists()) {
             return $this->json()->error('A cidade informada não existe!');
         }
-        $order = Filter::order(isset($_GET['ordem']) ? $_GET['ordem']: '');
-        $condition = Filter::query($_GET);
+        $order = Filter::order($this->getRequest()->query->get('ordem', ''));
+        $condition = Filter::query($this->getRequest()->query->all());
         $condition['cidadeid'] = $cidade->getID();
         unset($condition['ordem']);
         $bairros = Bairro::findAll($condition, $order, 10);

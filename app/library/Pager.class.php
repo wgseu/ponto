@@ -22,10 +22,6 @@ class Pager
         $this->pageString = $string;
         $this->pageSize = abs($size);
         $this->rowCount = abs($count);
-
-        if (is_null($pageNumber)) {
-            $pageNumber = isset($_GET[$this->pageString]) ? $_GET[$this->pageString] : null;
-        }
         $this->pageCount = ceil($this->rowCount/$this->pageSize);
         $this->pageCount = ($this->pageCount<=0)?1:$this->pageCount;
         $this->pageNo = abs(intval($pageNumber));

@@ -61,7 +61,7 @@ class ImpostoTest extends \MZ\Framework\TestCase
             'codigo' => '1.234',
             'descricao' => ' Imposto <script>filter</script> ',
         ]);
-        $imposto->filter($old_imposto);
+        $imposto->filter($old_imposto, true);
         $this->assertEquals($old_imposto, $imposto);
     }
 

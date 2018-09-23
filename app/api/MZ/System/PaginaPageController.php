@@ -25,11 +25,12 @@
 namespace MZ\System;
 
 use MZ\Util\Filter;
+use MZ\Core\PageController;
 
 /**
  * Allow application to serve system resources
  */
-class PaginaPageController extends \MZ\Core\Controller
+class PaginaPageController extends PageController
 {
     public function index()
     {
@@ -39,8 +40,8 @@ class PaginaPageController extends \MZ\Core\Controller
     public function contact()
     {
         $focusctrl = 'nome';
-        if (is_login()) {
-            if (is_null(logged_user()->getEmail())) {
+        if (app()->getAuthentication()->isLogin()) {
+            if (is_null(app()->auth->user->getEmail())) {
                 $focusctrl = 'email';
             } else {
                 $focusctrl = 'assunto';
@@ -48,14 +49,14 @@ class PaginaPageController extends \MZ\Core\Controller
         }
         $erro = [];
         if (is_post()) {
-            $email = isset($_POST['email']) ? strip_tags(trim($_POST['email'])) : null;
-            $nome = isset($_POST['nome']) ? strip_tags(trim($_POST['nome'])) : null;
-            if (is_login()) {
-                $email = $email ?: logged_user()->getEmail();
-                $nome = $nome ?: logged_user()->getNome();
+            $email = trim(strip_tags($this->getRequest()->request->get('email')));
+            $nome = trim(strip_tags($this->getRequest()->request->get('nome')));
+            if (app()->getAuthentication()->isLogin()) {
+                $email = $email ?: app()->auth->user->getEmail();
+                $nome = $nome ?: app()->auth->user->getNome();
             }
-            $assunto = isset($_POST['assunto']) ? strip_tags(trim($_POST['assunto'])) : null;
-            $mensagem = isset($_POST['mensagem']) ? strip_tags(trim($_POST['mensagem'])) : null;
+            $assunto = trim(strip_tags($this->getRequest()->request->get('assunto')));
+            $mensagem = trim(strip_tags($this->getRequest()->request->get('mensagem')));
             if ($nome == '') {
                 $erros['nome'] = 'O nome não pode ser vazio';
             }

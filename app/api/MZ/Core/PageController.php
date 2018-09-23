@@ -22,43 +22,11 @@
  *
  * @author Equipe GrandChef <desenvolvimento@mzsw.com.br>
  */
-namespace MZ\Location;
-
-use MZ\Util\Filter;
+namespace MZ\Core;
 
 /**
- * Allow application to serve system resources
+ * Allow application to serve html page
  */
-class CidadeOldApiController extends \MZ\Core\ApiController
+abstract class PageController extends Controller
 {
-    public function find()
-    {
-        $limit = max(1, min(100, $this->getRequest()->query->getInt('limit', 10)));
-        $order = Filter::order($this->getRequest()->query->get('ordem', ''));
-        $condition = Filter::query($this->getRequest()->query->all());
-        unset($condition['ordem']);
-        $cidades = Cidade::findAll($condition, $order, $limite);
-
-        $items = [];
-        foreach ($cidades as $cidade) {
-            $items[] = $cidade->publish();
-        }
-        return $this->json()->success(['items' => $items]);
-    }
-
-    /**
-     * Get URL patterns associated with callback for use into router
-     * @return array List of routes
-     */
-    public static function getRoutes()
-    {
-        return [
-            [
-                'name' => 'app_cidade_find',
-                'path' => '/app/cidade/',
-                'method' => 'GET',
-                'controller' => 'find',
-            ]
-        ];
-    }
 }

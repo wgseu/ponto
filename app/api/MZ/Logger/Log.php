@@ -141,8 +141,7 @@ class Log
             return $this;
         }
         if (!isset($log['directory'])) {
-            global $app;
-            $this->setDirectory($app->getPath('logs'));
+                $this->setDirectory(app()->getPath('logs'));
         } else {
             $this->setDirectory($log['directory']);
         }

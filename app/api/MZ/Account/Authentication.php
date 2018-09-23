@@ -25,37 +25,36 @@
 namespace MZ\Account;
 
 use Firebase\JWT\JWT;
+use MZ\System\Permissao;
 
 class Authentication
 {
-    private $user;
-    private $employee;
+    /**
+     * Authenticated user
+     * @var Cliente
+     */
+    public $user;
+
+    /**
+     * Authenticated provider
+     * @var \MZ\Provider\Prestador
+     */
+    public $provider;
+
+    /**
+     * Provider allowed permissions
+     * @var array
+     */
     private $permissions;
 
     /**
-     * @var \MZ\Core\Application
-     */
-    private $application;
-
-    /**
      * Constructor for a new empty instance of Authentication
-     * @param \MZ\Core\Application $application Main application
      */
-    public function __construct($application)
+    public function __construct()
     {
-        $this->application = $application;
         $this->user = new Cliente();
-        $this->employee = new \MZ\Provider\Prestador();
+        $this->provider = new \MZ\Provider\Prestador();
         $this->permissions = [];
-    }
-
-    /**
-     * Get the application object
-     * @return Application application object
-     */
-    public function getApplication()
-    {
-        return $this->application;
     }
 
     /**
@@ -73,7 +72,7 @@ class Authentication
      */
     public function getEmployee()
     {
-        return $this->employee;
+        return $this->provider;
     }
 
     /**
@@ -90,7 +89,7 @@ class Authentication
      */
     public function initialize()
     {
-        $this->getUser()->setID($this->getApplication()->getSession()->get('cliente_id'));
+        $this->getUser()->setID(app()->getSession()->get('cliente_id'));
         return $this;
     }
 
@@ -115,15 +114,76 @@ class Authentication
     {
         $this->getEmployee()->loadByClienteID($this->getUser()->getID());
         $this->permissions = \MZ\System\Acesso::getPermissoes($this->getEmployee()->getFuncaoID());
+        if (!$this->has([Permissao::NOME_SISTEMA])) {
+            $this->getEmployee()->fromArray([]);
+            $this->permissions = [];
+        }
         return $this;
     }
 
     public function login($cliente)
     {
         $this->user = $cliente;
-        $this->getApplication()->getSession()->set('cliente_id', $this->getUser()->getID());
+        app()->getSession()->set('cliente_id', $this->getUser()->getID());
         $this->refresh();
         return $this;
+    }
+
+    public function logout()
+    {
+        app()->getSession()->remove('cliente_id');
+        $this->getUser()->fromArray([]);
+        $this->getEmployee()->fromArray([]);
+        $this->permissions = [];
+        return $this;
+    }
+
+    /**
+     * Check if has a user logged
+     * @return boolean true if has a user logged, false otherwise
+     */
+    public function isLogin()
+    {
+        return $this->getUser()->exists();
+    }
+
+    /**
+     * Check if logged user is a provider
+     * @return boolean true if logged user is a provider, false otherwise
+     */
+    public function isManager()
+    {
+        return $this->getEmployee()->exists();
+    }
+
+    /**
+     * Check if logged provider is owner of company
+     * @return boolean true if logged provider is owner of company, false otherwise
+     */
+    public function isOwner()
+    {
+        return $this->isManager() && $this->getEmployee()->isOwner($this->getPermissions());
+    }
+
+    /**
+     * Check if logged provider have permissions informed
+     * @param array $permissions permission need
+     * @return boolean True if have all permissions informed
+     * @throws \MZ\Exception\AuthorizationException
+     */
+    public function has($permissions)
+    {
+        return $this->isManager() && $this->getEmployee()->has($permissions, $this->getPermissions());
+    }
+
+    /**
+     * Check if logged provider is the same as provider informed
+     * @param \MZ\Provider\Prestador $prestador service provider
+     * @return boolean true if provider is the same as logged provider
+     */
+    public function isSelf($prestador)
+    {
+        return $this->isManager() && $prestador->getID() == $this->getEmployee()->getID();
     }
 
     public function makeToken()
@@ -135,15 +195,6 @@ class Authentication
         ];
         $key = getenv('JWT_KEY');
         return JWT::encode($data, $key);
-    }
-
-    public function logout()
-    {
-        $this->getApplication()->getSession()->remove('cliente_id');
-        $this->getUser()->fromArray([]);
-        $this->getEmployee()->fromArray([]);
-        $this->permissions = [];
-        return $this;
     }
 
     public function updateToken()
@@ -188,11 +239,11 @@ class Authentication
     private function getAuthorizationHeader()
     {
         $headers = null;
-        if (isset($_SERVER['Authorization'])) {
-            $headers = trim($_SERVER["Authorization"]);
-        } elseif (isset($_SERVER['HTTP_AUTHORIZATION'])) {
-            //Nginx or fast CGI
-            $headers = trim($_SERVER["HTTP_AUTHORIZATION"]);
+        if (app()->getRequest()->server->get('Authorization')) {
+            $headers = trim(app()->getRequest()->server->get('Authorization'));
+        } elseif (app()->getRequest()->server->get('HTTP_AUTHORIZATION')) {
+            // Nginx or fast CGI
+            $headers = trim(app()->getRequest()->server->get('HTTP_AUTHORIZATION'));
         } elseif (function_exists('apache_request_headers')) {
             $requestHeaders = apache_request_headers();
             // Server-side fix for bug in old Android versions

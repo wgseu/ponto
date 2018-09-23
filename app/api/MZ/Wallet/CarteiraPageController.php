@@ -26,29 +26,29 @@ namespace MZ\Wallet;
 
 use MZ\System\Permissao;
 use MZ\Util\Filter;
+use MZ\Core\PageController;
 
 /**
  * Allow application to serve system resources
  */
-class CarteiraPageController extends \MZ\Core\Controller
+class CarteiraPageController extends PageController
 {
     public function find()
     {
-        need_permission(Permissao::NOME_CADASTROCARTEIRAS, is_output('json'));
+        $this->needPermission([Permissao::NOME_CADASTROCARTEIRAS]);
 
-        $limite = isset($_GET['limite']) ? intval($_GET['limite']) : 10;
-        if ($limite > 100 || $limite < 1) {
-            $limite = 10;
-        }
-        $condition = Filter::query($_GET);
+        $limite = max(1, min(100, $this->getRequest()->query->getInt('limite', 10)));
+        $condition = Filter::query($this->getRequest()->query->all());
         unset($condition['ordem']);
         $carteira = new Carteira($condition);
-        $order = Filter::order(isset($_GET['ordem']) ? $_GET['ordem'] : '');
+        $order = Filter::order($this->getRequest()->query->get('ordem', ''));
         $count = Carteira::count($condition);
-        list($pagesize, $offset, $pagination) = pagestring($count, $limite);
-        $carteiras = Carteira::findAll($condition, $order, $pagesize, $offset);
+        $page = max(1, $this->getRequest()->query->getInt('pagina', 1));
+        $pager = new \Pager($count, $limite, $page, 'pagina');
+        $pagination = $pager->genBasic();
+        $carteiras = Carteira::findAll($condition, $order, $limite, $pager->offset);
 
-        if (is_output('json')) {
+        if ($this->isJson()) {
             $items = [];
             foreach ($carteiras as $_carteira) {
                 $items[] = $_carteira->publish();
@@ -63,8 +63,8 @@ class CarteiraPageController extends \MZ\Core\Controller
 
     public function add()
     {
-        need_permission(Permissao::NOME_CADASTROCARTEIRAS, is_output('json'));
-        $id = isset($_GET['id']) ? $_GET['id'] : null;
+        $this->needPermission([Permissao::NOME_CADASTROCARTEIRAS]);
+        $id = $this->getRequest()->query->getInt('id', null);
         $carteira = Carteira::findByID($id);
         $carteira->setID(null);
 
@@ -73,7 +73,7 @@ class CarteiraPageController extends \MZ\Core\Controller
         $carteira = new Carteira();
         $old_carteira = $carteira;
         if (is_post()) {
-            $carteira = new Carteira($_POST);
+            $carteira = new Carteira($this->getData());
             try {
                 $carteira->filter($old_carteira, true);
                 $carteira->insert();
@@ -82,7 +82,7 @@ class CarteiraPageController extends \MZ\Core\Controller
                     'Carteira "%s" cadastrada com sucesso!',
                     $carteira->getDescricao()
                 );
-                if (is_output('json')) {
+                if ($this->isJson()) {
                     return $this->json()->success(['item' => $carteira->publish()], $msg);
                 }
                 \Thunder::success($msg, true);
@@ -92,7 +92,7 @@ class CarteiraPageController extends \MZ\Core\Controller
                 if ($e instanceof \MZ\Exception\ValidationException) {
                     $errors = $e->getErrors();
                 }
-                if (is_output('json')) {
+                if ($this->isJson()) {
                     return $this->json()->error($e->getMessage(), null, $errors);
                 }
                 \Thunder::error($e->getMessage());
@@ -101,7 +101,7 @@ class CarteiraPageController extends \MZ\Core\Controller
                     break;
                 }
             }
-        } elseif (is_output('json')) {
+        } elseif ($this->isJson()) {
             return $this->json()->error('Nenhum dado foi enviado');
         } else {
             $carteira->setAtiva('Y');
@@ -112,12 +112,12 @@ class CarteiraPageController extends \MZ\Core\Controller
 
     public function update()
     {
-        need_permission(Permissao::NOME_CADASTROCARTEIRAS, is_output('json'));
-        $id = isset($_GET['id']) ? $_GET['id'] : null;
+        $this->needPermission([Permissao::NOME_CADASTROCARTEIRAS]);
+        $id = $this->getRequest()->query->getInt('id', null);
         $carteira = Carteira::findByID($id);
         if (!$carteira->exists()) {
             $msg = 'A carteira informada não existe!';
-            if (is_output('json')) {
+            if ($this->isJson()) {
                 return $this->json()->error($msg);
             }
             \Thunder::warning($msg);
@@ -127,7 +127,7 @@ class CarteiraPageController extends \MZ\Core\Controller
         $errors = [];
         $old_carteira = $carteira;
         if (is_post()) {
-            $carteira = new Carteira($_POST);
+            $carteira = new Carteira($this->getData());
             try {
                 $carteira->filter($old_carteira, true);
                 $carteira->update();
@@ -136,7 +136,7 @@ class CarteiraPageController extends \MZ\Core\Controller
                     'Carteira "%s" atualizada com sucesso!',
                     $carteira->getDescricao()
                 );
-                if (is_output('json')) {
+                if ($this->isJson()) {
                     return $this->json()->success(['item' => $carteira->publish()], $msg);
                 }
                 \Thunder::success($msg, true);
@@ -146,7 +146,7 @@ class CarteiraPageController extends \MZ\Core\Controller
                 if ($e instanceof \MZ\Exception\ValidationException) {
                     $errors = $e->getErrors();
                 }
-                if (is_output('json')) {
+                if ($this->isJson()) {
                     return $this->json()->error($e->getMessage(), null, $errors);
                 }
                 \Thunder::error($e->getMessage());
@@ -155,7 +155,7 @@ class CarteiraPageController extends \MZ\Core\Controller
                     break;
                 }
             }
-        } elseif (is_output('json')) {
+        } elseif ($this->isJson()) {
             return $this->json()->error('Nenhum dado foi enviado');
         }
         $_banco = $carteira->findBancoID();
@@ -164,12 +164,12 @@ class CarteiraPageController extends \MZ\Core\Controller
 
     public function delete()
     {
-        need_permission(Permissao::NOME_CADASTROCARTEIRAS, is_output('json'));
-        $id = isset($_GET['id']) ? $_GET['id'] : null;
+        $this->needPermission([Permissao::NOME_CADASTROCARTEIRAS]);
+        $id = $this->getRequest()->query->getInt('id', null);
         $carteira = Carteira::findByID($id);
         if (!$carteira->exists()) {
             $msg = 'A carteira não foi informada ou não existe!';
-            if (is_output('json')) {
+            if ($this->isJson()) {
                 return $this->json()->error($msg);
             }
             \Thunder::warning($msg);
@@ -179,7 +179,7 @@ class CarteiraPageController extends \MZ\Core\Controller
             $carteira->delete();
             $carteira->clean(new Carteira());
             $msg = sprintf('Carteira "%s" excluída com sucesso!', $carteira->getDescricao());
-            if (is_output('json')) {
+            if ($this->isJson()) {
                 return $this->json()->success([], $msg);
             }
             \Thunder::success($msg, true);
@@ -188,7 +188,7 @@ class CarteiraPageController extends \MZ\Core\Controller
                 'Não foi possível excluir a carteira "%s"!',
                 $carteira->getDescricao()
             );
-            if (is_output('json')) {
+            if ($this->isJson()) {
                 return $this->json()->error($msg);
             }
             \Thunder::error($msg);

@@ -128,9 +128,8 @@ class NFeUtil extends \NFe\Common\Util
      */
     public static function fixEncoding($text)
     {
-        global $app;
 
-        $estado = $app->getSystem()->getState();
+        $estado = app()->getSystem()->getState();
         if ($estado->getUF() == 'MT') {
             return \NFeUtil::removeAccent($text);
         }
@@ -139,12 +138,11 @@ class NFeUtil extends \NFe\Common\Util
 
     public static function fixBarCode($code)
     {
-        global $app;
 
         if ($code !== null) {
             return $code;
         }
-        $estado = $app->getSystem()->getState();
+        $estado = app()->getSystem()->getState();
         switch ($estado->getUF()) {
             case 'AM':
             case 'CE':

@@ -27,34 +27,34 @@ namespace MZ\Product;
 use MZ\System\Permissao;
 use MZ\Database\DB;
 use MZ\Util\Filter;
+use MZ\Core\PageController;
 
 /**
  * Allow application to serve system resources
  */
-class CategoriaPageController extends \MZ\Core\Controller
+class CategoriaPageController extends PageController
 {
     public function find()
     {
-        need_permission(Permissao::NOME_CADASTROPRODUTOS, is_output('json'));
+        $this->needPermission([Permissao::NOME_CADASTROPRODUTOS]);
 
-        $limite = isset($_GET['limite']) ? intval($_GET['limite']) : 10;
-        if ($limite > 100 || $limite < 1) {
-            $limite = 10;
-        }
-        $condition = Filter::query($_GET);
+        $limite = max(1, min(100, $this->getRequest()->query->getInt('limite', 10)));
+        $condition = Filter::query($this->getRequest()->query->all());
         unset($condition['ordem']);
         if (isset($condition['categoriaid']) && intval($condition['categoriaid']) < 0) {
             unset($condition['categoriaid']);
-        } elseif (array_key_exists('categoriaid', $_GET)) {
+        } elseif ($this->getRequest()->query->has('categoriaid')) {
             $condition['categoriaid'] = isset($condition['categoriaid']) ? $condition['categoriaid'] : null;
         }
         $categoria = new Categoria($condition);
-        $order = Filter::order(isset($_GET['ordem']) ? $_GET['ordem'] : '');
+        $order = Filter::order($this->getRequest()->query->get('ordem', ''));
         $count = Categoria::count($condition);
-        list($pagesize, $offset, $pagination) = pagestring($count, $limite);
-        $categorias = Categoria::findAll($condition, $order, $pagesize, $offset);
+        $page = max(1, $this->getRequest()->query->getInt('pagina', 1));
+        $pager = new \Pager($count, $limite, $page, 'pagina');
+        $pagination = $pager->genBasic();
+        $categorias = Categoria::findAll($condition, $order, $limite, $pager->offset);
 
-        if (is_output('json')) {
+        if ($this->isJson()) {
             $items = [];
             foreach ($categorias as $_categoria) {
                 $items[] = $_categoria->publish();
@@ -73,8 +73,8 @@ class CategoriaPageController extends \MZ\Core\Controller
 
     public function add()
     {
-        need_permission(Permissao::NOME_CADASTROPRODUTOS, is_output('json'));
-        $id = isset($_GET['id']) ? $_GET['id'] : null;
+        $this->needPermission([Permissao::NOME_CADASTROPRODUTOS]);
+        $id = $this->getRequest()->query->getInt('id', null);
         $categoria = Categoria::findByID($id);
         $categoria->setID(null);
         $categoria->setImagem(null);
@@ -83,7 +83,7 @@ class CategoriaPageController extends \MZ\Core\Controller
         $errors = [];
         $old_categoria = $categoria;
         if (is_post()) {
-            $categoria = new Categoria($_POST);
+            $categoria = new Categoria($this->getData());
             try {
                 $categoria->filter($old_categoria, true);
                 $categoria->insert();
@@ -92,7 +92,7 @@ class CategoriaPageController extends \MZ\Core\Controller
                     'Categoria "%s" cadastrada com sucesso!',
                     $categoria->getDescricao()
                 );
-                if (is_output('json')) {
+                if ($this->isJson()) {
                     return $this->json()->success(['item' => $categoria->publish()], $msg);
                 }
                 \Thunder::success($msg, true);
@@ -102,7 +102,7 @@ class CategoriaPageController extends \MZ\Core\Controller
                 if ($e instanceof \MZ\Exception\ValidationException) {
                     $errors = $e->getErrors();
                 }
-                if (is_output('json')) {
+                if ($this->isJson()) {
                     return $this->json()->error($e->getMessage(), null, $errors);
                 }
                 \Thunder::error($e->getMessage());
@@ -111,7 +111,7 @@ class CategoriaPageController extends \MZ\Core\Controller
                     break;
                 }
             }
-        } elseif (is_output('json')) {
+        } elseif ($this->isJson()) {
             return $this->json()->error('Nenhum dado foi enviado');
         } elseif (is_null($categoria->getDescricao())) {
             $categoria->setServico('Y');
@@ -122,12 +122,12 @@ class CategoriaPageController extends \MZ\Core\Controller
 
     public function update()
     {
-        need_permission(Permissao::NOME_CADASTROPRODUTOS, is_output('json'));
-        $id = isset($_GET['id']) ? $_GET['id'] : null;
+        $this->needPermission([Permissao::NOME_CADASTROPRODUTOS]);
+        $id = $this->getRequest()->query->getInt('id', null);
         $categoria = Categoria::findByID($id);
         if (!$categoria->exists()) {
             $msg = 'A categoria informada não existe!';
-            if (is_output('json')) {
+            if ($this->isJson()) {
                 return $this->json()->error($msg);
             }
             \Thunder::warning($msg);
@@ -137,7 +137,7 @@ class CategoriaPageController extends \MZ\Core\Controller
         $errors = [];
         $old_categoria = $categoria;
         if (is_post()) {
-            $categoria = new Categoria($_POST);
+            $categoria = new Categoria($this->getData());
             try {
                 $categoria->filter($old_categoria, true);
                 $categoria->update();
@@ -146,7 +146,7 @@ class CategoriaPageController extends \MZ\Core\Controller
                     'Categoria "%s" atualizada com sucesso!',
                     $categoria->getDescricao()
                 );
-                if (is_output('json')) {
+                if ($this->isJson()) {
                     return $this->json()->success(['item' => $categoria->publish()], $msg);
                 }
                 \Thunder::success($msg, true);
@@ -156,7 +156,7 @@ class CategoriaPageController extends \MZ\Core\Controller
                 if ($e instanceof \MZ\Exception\ValidationException) {
                     $errors = $e->getErrors();
                 }
-                if (is_output('json')) {
+                if ($this->isJson()) {
                     return $this->json()->error($e->getMessage(), null, $errors);
                 }
                 \Thunder::error($e->getMessage());
@@ -172,12 +172,12 @@ class CategoriaPageController extends \MZ\Core\Controller
 
     public function delete()
     {
-        need_permission(Permissao::NOME_CADASTROPRODUTOS, is_output('json'));
-        $id = isset($_GET['id']) ? $_GET['id'] : null;
+        $this->needPermission([Permissao::NOME_CADASTROPRODUTOS]);
+        $id = $this->getRequest()->query->getInt('id', null);
         $categoria = Categoria::findByID($id);
         if (!$categoria->exists()) {
             $msg = 'A categoria não foi informada ou não existe!';
-            if (is_output('json')) {
+            if ($this->isJson()) {
                 return $this->json()->error($msg);
             }
             \Thunder::warning($msg);
@@ -187,7 +187,7 @@ class CategoriaPageController extends \MZ\Core\Controller
             $categoria->delete();
             $categoria->clean(new Categoria());
             $msg = sprintf('Categoria "%s" excluída com sucesso!', $categoria->getDescricao());
-            if (is_output('json')) {
+            if ($this->isJson()) {
                 return $this->json()->success([], $msg);
             }
             \Thunder::success($msg, true);
@@ -196,7 +196,7 @@ class CategoriaPageController extends \MZ\Core\Controller
                 'Não foi possível excluir a categoria "%s"!',
                 $categoria->getDescricao()
             );
-            if (is_output('json')) {
+            if ($this->isJson()) {
                 return $this->json()->error($msg);
             }
             \Thunder::error($msg);

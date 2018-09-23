@@ -26,28 +26,28 @@ namespace MZ\Location;
 
 use MZ\System\Permissao;
 use MZ\Util\Filter;
+use MZ\Core\PageController;
 
 /**
  * Allow application to serve system resources
  */
-class CidadePageController extends \MZ\Core\Controller
+class CidadePageController extends PageController
 {
     public function find()
     {
-        need_permission(Permissao::NOME_CADASTROCIDADES, is_output('json'));
+        $this->needPermission([Permissao::NOME_CADASTROCIDADES]);
 
-        $limite = isset($_GET['limite'])?intval($_GET['limite']):10;
-        if ($limite > 100 || $limite < 1) {
-            $limite = 10;
-        }
-        $condition = Filter::query($_GET);
+        $limite = max(1, min(100, $this->getRequest()->query->getInt('limite', 10)));
+        $condition = Filter::query($this->getRequest()->query->all());
         unset($condition['ordem']);
-        $order = Filter::order(isset($_GET['ordem'])?$_GET['ordem']:'');
+        $order = Filter::order($this->getRequest()->query->get('ordem', ''));
         $count = Cidade::count($condition);
-        list($pagesize, $offset, $pagination) = pagestring($count, $limite);
-        $cidades = Cidade::findAll($condition, $order, $pagesize, $offset);
+        $page = max(1, $this->getRequest()->query->getInt('pagina', 1));
+        $pager = new \Pager($count, $limite, $page, 'pagina');
+        $pagination = $pager->genBasic();
+        $cidades = Cidade::findAll($condition, $order, $limite, $pager->offset);
 
-        if (is_output('json')) {
+        if ($this->isJson()) {
             $items = [];
             foreach ($cidades as $cidade) {
                 $items[] = $cidade->publish();
@@ -55,8 +55,8 @@ class CidadePageController extends \MZ\Core\Controller
             return $this->json()->success(['items' => $items]);
         }
 
-        $pais = \MZ\Location\Pais::findByID(isset($_GET['paisid']) ? $_GET['paisid'] : null);
-        $estado = \MZ\Location\Estado::findByID(isset($_GET['estadoid']) ? $_GET['estadoid'] : null);
+        $pais = \MZ\Location\Pais::findByID($this->getRequest()->query->get('paisid'));
+        $estado = \MZ\Location\Estado::findByID($this->getRequest()->query->get('estadoid'));
         $_paises = \MZ\Location\Pais::findAll();
         $_estados = \MZ\Location\Estado::findAll(['paisid' => $pais->getID()]);
 
@@ -65,8 +65,8 @@ class CidadePageController extends \MZ\Core\Controller
 
     public function add()
     {
-        need_permission(Permissao::NOME_CADASTROCIDADES, is_output('json'));
-        $id = isset($_GET['id']) ? $_GET['id'] : null;
+        $this->needPermission([Permissao::NOME_CADASTROCIDADES]);
+        $id = $this->getRequest()->query->getInt('id', null);
         $cidade = Cidade::findByID($id);
         $cidade->setID(null);
 
@@ -74,7 +74,7 @@ class CidadePageController extends \MZ\Core\Controller
         $errors = [];
         $old_cidade = $cidade;
         if (is_post()) {
-            $cidade = new Cidade($_POST);
+            $cidade = new Cidade($this->getData());
             try {
                 $cidade->filter($old_cidade, true);
                 $cidade->save();
@@ -83,7 +83,7 @@ class CidadePageController extends \MZ\Core\Controller
                     'Cidade "%s" atualizada com sucesso!',
                     $cidade->getNome()
                 );
-                if (is_output('json')) {
+                if ($this->isJson()) {
                     return $this->json()->success(['item' => $cidade->publish()], $msg);
                 }
                 \Thunder::success($msg, true);
@@ -93,7 +93,7 @@ class CidadePageController extends \MZ\Core\Controller
                 if ($e instanceof \MZ\Exception\ValidationException) {
                     $errors = $e->getErrors();
                 }
-                if (is_output('json')) {
+                if ($this->isJson()) {
                     return $this->json()->error($e->getMessage(), null, $errors);
                 }
                 \Thunder::error($e->getMessage());
@@ -102,11 +102,11 @@ class CidadePageController extends \MZ\Core\Controller
                     break;
                 }
             }
-        } elseif (is_output('json')) {
+        } elseif ($this->isJson()) {
             return $this->json()->error('Nenhum dado foi enviado');
         }
         if (is_null($cidade->getEstadoID())) {
-            $cidade->setEstadoID($this->getApplication()->getSystem()->getState()->getID());
+            $cidade->setEstadoID(app()->getSystem()->getState()->getID());
         }
         $_estado = $cidade->findEstadoID();
         $_paises = \MZ\Location\Pais::findAll();
@@ -123,12 +123,12 @@ class CidadePageController extends \MZ\Core\Controller
 
     public function update()
     {
-        need_permission(Permissao::NOME_CADASTROCIDADES, is_output('json'));
-        $id = isset($_GET['id']) ? $_GET['id'] : null;
+        $this->needPermission([Permissao::NOME_CADASTROCIDADES]);
+        $id = $this->getRequest()->query->getInt('id', null);
         $cidade = Cidade::findByID($id);
         if (!$cidade->exists()) {
             $msg = 'A cidade não foi informada ou não existe!';
-            if (is_output('json')) {
+            if ($this->isJson()) {
                 return $this->json()->error($msg);
             }
             \Thunder::warning($msg);
@@ -138,7 +138,7 @@ class CidadePageController extends \MZ\Core\Controller
         $errors = [];
         $old_cidade = $cidade;
         if (is_post()) {
-            $cidade = new Cidade($_POST);
+            $cidade = new Cidade($this->getData());
             try {
                 $cidade->filter($old_cidade, true);
                 $cidade->save();
@@ -147,7 +147,7 @@ class CidadePageController extends \MZ\Core\Controller
                     'Cidade "%s" atualizada com sucesso!',
                     $cidade->getNome()
                 );
-                if (is_output('json')) {
+                if ($this->isJson()) {
                     return $this->json()->success(['item' => $cidade->publish()], $msg);
                 }
                 \Thunder::success($msg, true);
@@ -157,7 +157,7 @@ class CidadePageController extends \MZ\Core\Controller
                 if ($e instanceof \MZ\Exception\ValidationException) {
                     $errors = $e->getErrors();
                 }
-                if (is_output('json')) {
+                if ($this->isJson()) {
                     return $this->json()->error($e->getMessage(), null, $errors);
                 }
                 \Thunder::error($e->getMessage());
@@ -166,7 +166,7 @@ class CidadePageController extends \MZ\Core\Controller
                     break;
                 }
             }
-        } elseif (is_output('json')) {
+        } elseif ($this->isJson()) {
             return $this->json()->error('Nenhum dado foi enviado');
         }
 
@@ -185,12 +185,12 @@ class CidadePageController extends \MZ\Core\Controller
 
     public function delete()
     {
-        need_permission(Permissao::NOME_CADASTROCIDADES, is_output('json'));
-        $id = isset($_GET['id']) ? $_GET['id'] : null;
+        $this->needPermission([Permissao::NOME_CADASTROCIDADES]);
+        $id = $this->getRequest()->query->getInt('id', null);
         $cidade = Cidade::findByID($id);
         if (!$cidade->exists()) {
             $msg = 'A cidade não foi informada ou não existe!';
-            if (is_output('json')) {
+            if ($this->isJson()) {
                 return $this->json()->error($msg);
             }
             \Thunder::warning($msg);
@@ -200,7 +200,7 @@ class CidadePageController extends \MZ\Core\Controller
             $cidade->delete();
             $cidade->clean(new Cidade());
             $msg = sprintf('Cidade "%s" excluída com sucesso!', $cidade->getNome());
-            if (is_output('json')) {
+            if ($this->isJson()) {
                 return $this->json()->success([], $msg);
             }
             \Thunder::success($msg, true);
@@ -209,7 +209,7 @@ class CidadePageController extends \MZ\Core\Controller
                 'Não foi possível excluir a cidade "%s"!',
                 $cidade->getNome()
             );
-            if (is_output('json')) {
+            if ($this->isJson()) {
                 return $this->json()->error($msg);
             }
             \Thunder::error($msg);

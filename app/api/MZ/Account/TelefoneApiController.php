@@ -37,7 +37,7 @@ class TelefoneApiController extends \MZ\Core\ApiController
      */
     public function find()
     {
-        $this->needPermission(Permissao::NOME_CADASTROCLIENTES);
+        $this->needPermission([Permissao::NOME_CADASTROCLIENTES]);
         $limit = max(1, min(100, $this->getRequest()->query->getInt('limit', 10)));
         $page = max(1, $this->getRequest()->query->getInt('page', 1));
         $condition = Filter::query($this->getRequest()->query->all());
@@ -57,8 +57,8 @@ class TelefoneApiController extends \MZ\Core\ApiController
      */
     public function add()
     {
-        $this->needPermission(Permissao::NOME_CADASTROCLIENTES);
-        $telefone = new Telefone($this->getJsonParams());
+        $this->needPermission([Permissao::NOME_CADASTROCLIENTES]);
+        $telefone = new Telefone($this->getData());
         $telefone->filter(new Telefone());
         $telefone->insert();
         $message = _t('telefone.registered', $telefone->getNumero());
@@ -71,9 +71,9 @@ class TelefoneApiController extends \MZ\Core\ApiController
      */
     public function update($id)
     {
-        $this->needPermission(Permissao::NOME_CADASTROCLIENTES);
+        $this->needPermission([Permissao::NOME_CADASTROCLIENTES]);
         $old_telefone = Telefone::findOrFail(['id' => $id]);
-        $telefone = new Telefone($this->getJsonParams());
+        $telefone = new Telefone($this->getData());
         $telefone->filter($old_telefone);
         $telefone->update();
         $old_telefone->clean($telefone);
@@ -87,7 +87,7 @@ class TelefoneApiController extends \MZ\Core\ApiController
      */
     public function delete($id)
     {
-        $this->needPermission(Permissao::NOME_CADASTROCLIENTES);
+        $this->needPermission([Permissao::NOME_CADASTROCLIENTES]);
         $telefone = Telefone::findOrFail(['id' => $id]);
         $telefone->delete();
         $telefone->clean(new Telefone());

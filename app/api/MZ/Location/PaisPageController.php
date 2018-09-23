@@ -27,29 +27,29 @@ namespace MZ\Location;
 use MZ\System\Permissao;
 use MZ\Wallet\Moeda;
 use MZ\Util\Filter;
+use MZ\Core\PageController;
 
 /**
  * Allow application to serve system resources
  */
-class PaisPageController extends \MZ\Core\Controller
+class PaisPageController extends PageController
 {
     public function find()
     {
-        need_permission(Permissao::NOME_CADASTROPAISES, is_output('json'));
+        $this->needPermission([Permissao::NOME_CADASTROPAISES]);
 
-        $limite = isset($_GET['limite']) ? intval($_GET['limite']) : 10;
-        if ($limite > 100 || $limite < 1) {
-            $limite = 10;
-        }
-        $condition = Filter::query($_GET);
+        $limite = max(1, min(100, $this->getRequest()->query->getInt('limite', 10)));
+        $condition = Filter::query($this->getRequest()->query->all());
         unset($condition['ordem']);
         $pais = new Pais($condition);
-        $order = Filter::order(isset($_GET['ordem'])?$_GET['ordem']:'');
+        $order = Filter::order($this->getRequest()->query->get('ordem', ''));
         $count = Pais::count($condition);
-        list($pagesize, $offset, $pagination) = pagestring($count, $limite);
-        $paises = Pais::findAll($condition, $order, $pagesize, $offset);
+        $page = max(1, $this->getRequest()->query->getInt('pagina', 1));
+        $pager = new \Pager($count, $limite, $page, 'pagina');
+        $pagination = $pager->genBasic();
+        $paises = Pais::findAll($condition, $order, $limite, $pager->offset);
 
-        if (is_output('json')) {
+        if ($this->isJson()) {
             $items = [];
             foreach ($paises as $_pais) {
                 $items[] = $_pais->publish();
@@ -63,8 +63,8 @@ class PaisPageController extends \MZ\Core\Controller
 
     public function add()
     {
-        need_permission(Permissao::NOME_CADASTROPAISES, is_output('json'));
-        $id = isset($_GET['id']) ? $_GET['id'] : null;
+        $this->needPermission([Permissao::NOME_CADASTROPAISES]);
+        $id = $this->getRequest()->query->getInt('id', null);
         $pais = Pais::findByID($id);
         $pais->setID(null);
 
@@ -72,7 +72,7 @@ class PaisPageController extends \MZ\Core\Controller
         $errors = [];
         $old_pais = $pais;
         if (is_post()) {
-            $pais = new Pais($_POST);
+            $pais = new Pais($this->getData());
             try {
                 $pais->filter($old_pais, true);
                 $pais->save();
@@ -81,7 +81,7 @@ class PaisPageController extends \MZ\Core\Controller
                     'País "%s" atualizado com sucesso!',
                     $pais->getNome()
                 );
-                if (is_output('json')) {
+                if ($this->isJson()) {
                     return $this->json()->success(['item' => $pais->publish()], $msg);
                 }
                 \Thunder::success($msg, true);
@@ -91,7 +91,7 @@ class PaisPageController extends \MZ\Core\Controller
                 if ($e instanceof \MZ\Exception\ValidationException) {
                     $errors = $e->getErrors();
                 }
-                if (is_output('json')) {
+                if ($this->isJson()) {
                     return $this->json()->error($e->getMessage(), null, $errors);
                 }
                 \Thunder::error($e->getMessage());
@@ -100,7 +100,7 @@ class PaisPageController extends \MZ\Core\Controller
                     break;
                 }
             }
-        } elseif (is_output('json')) {
+        } elseif ($this->isJson()) {
             return $this->json()->error('Nenhum dado foi enviado');
         }
         $moedas = Moeda::findAll();
@@ -110,12 +110,12 @@ class PaisPageController extends \MZ\Core\Controller
 
     public function update()
     {
-        need_permission(Permissao::NOME_CADASTROPAISES, is_output('json'));
-        $id = isset($_GET['id']) ? $_GET['id'] : null;
+        $this->needPermission([Permissao::NOME_CADASTROPAISES]);
+        $id = $this->getRequest()->query->getInt('id', null);
         $pais = Pais::findByID($id);
         if (!$pais->exists()) {
             $msg = 'O país não foi informado ou não existe';
-            if (is_output('json')) {
+            if ($this->isJson()) {
                 return $this->json()->error($msg);
             }
             \Thunder::warning($msg);
@@ -125,7 +125,7 @@ class PaisPageController extends \MZ\Core\Controller
         $errors = [];
         $old_pais = $pais;
         if (is_post()) {
-            $pais = new Pais($_POST);
+            $pais = new Pais($this->getData());
             try {
                 $pais->filter($old_pais, true);
                 $pais->save();
@@ -134,7 +134,7 @@ class PaisPageController extends \MZ\Core\Controller
                     'País "%s" atualizado com sucesso!',
                     $pais->getNome()
                 );
-                if (is_output('json')) {
+                if ($this->isJson()) {
                     return $this->json()->success(['item' => $pais->publish()], $msg);
                 }
                 \Thunder::success($msg, true);
@@ -144,7 +144,7 @@ class PaisPageController extends \MZ\Core\Controller
                 if ($e instanceof \MZ\Exception\ValidationException) {
                     $errors = $e->getErrors();
                 }
-                if (is_output('json')) {
+                if ($this->isJson()) {
                     return $this->json()->error($e->getMessage(), null, $errors);
                 }
                 \Thunder::error($e->getMessage());
@@ -153,7 +153,7 @@ class PaisPageController extends \MZ\Core\Controller
                     break;
                 }
             }
-        } elseif (is_output('json')) {
+        } elseif ($this->isJson()) {
             return $this->json()->error('Nenhum dado foi enviado');
         }
         $moedas = Moeda::findAll();
@@ -163,12 +163,12 @@ class PaisPageController extends \MZ\Core\Controller
 
     public function delete()
     {
-        need_permission(Permissao::NOME_CADASTROPAISES, is_output('json'));
-        $id = isset($_GET['id']) ? $_GET['id'] : null;
+        $this->needPermission([Permissao::NOME_CADASTROPAISES]);
+        $id = $this->getRequest()->query->getInt('id', null);
         $pais = Pais::findByID($id);
         if (!$pais->exists()) {
             $msg = 'O país não foi informado ou não existe';
-            if (is_output('json')) {
+            if ($this->isJson()) {
                 return $this->json()->error($msg);
             }
             \Thunder::warning($msg);
@@ -179,7 +179,7 @@ class PaisPageController extends \MZ\Core\Controller
             $pais->clean(new Pais());
             $msg = sprintf('País "%s" excluído com sucesso!', $pais->getNome());
             $msg = 'País "' . $pais->getNome() . '" excluído com sucesso!';
-            if (is_output('json')) {
+            if ($this->isJson()) {
                 return $this->json()->success([], $msg);
             }
             \Thunder::success($msg, true);
@@ -188,7 +188,7 @@ class PaisPageController extends \MZ\Core\Controller
                 'Não foi possível excluir o país "%s"',
                 $pais->getNome()
             );
-            if (is_output('json')) {
+            if ($this->isJson()) {
                 return $this->json()->error($msg);
             }
             \Thunder::error($msg);

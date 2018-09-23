@@ -26,29 +26,29 @@ namespace MZ\Environment;
 
 use MZ\System\Permissao;
 use MZ\Util\Filter;
+use MZ\Core\PageController;
 
 /**
  * Allow application to serve system resources
  */
-class MesaPageController extends \MZ\Core\Controller
+class MesaPageController extends PageController
 {
     public function find()
     {
-        need_permission(Permissao::NOME_CADASTROMESAS, is_output('json'));
+        $this->needPermission([Permissao::NOME_CADASTROMESAS]);
 
-        $limite = isset($_GET['limite']) ? intval($_GET['limite']) : 10;
-        if ($limite > 100 || $limite < 1) {
-            $limite = 10;
-        }
-        $condition = Filter::query($_GET);
+        $limite = max(1, min(100, $this->getRequest()->query->getInt('limite', 10)));
+        $condition = Filter::query($this->getRequest()->query->all());
         unset($condition['ordem']);
         $mesa = new Mesa($condition);
-        $order = Filter::order(isset($_GET['ordem']) ? $_GET['ordem'] : '');
+        $order = Filter::order($this->getRequest()->query->get('ordem', ''));
         $count = Mesa::count($condition);
-        list($pagesize, $offset, $pagination) = pagestring($count, $limite);
-        $mesas = Mesa::findAll($condition, $order, $pagesize, $offset);
+        $page = max(1, $this->getRequest()->query->getInt('pagina', 1));
+        $pager = new \Pager($count, $limite, $page, 'pagina');
+        $pagination = $pager->genBasic();
+        $mesas = Mesa::findAll($condition, $order, $limite, $pager->offset);
 
-        if (is_output('json')) {
+        if ($this->isJson()) {
             $items = [];
             foreach ($mesas as $_mesa) {
                 $items[] = $_mesa->publish();
@@ -66,8 +66,8 @@ class MesaPageController extends \MZ\Core\Controller
 
     public function add()
     {
-        need_permission(Permissao::NOME_CADASTROMESAS, is_output('json'));
-        $id = isset($_GET['id']) ? $_GET['id'] : null;
+        $this->needPermission([Permissao::NOME_CADASTROMESAS]);
+        $id = $this->getRequest()->query->getInt('id', null);
         $mesa = Mesa::findByID($id);
         $mesa->setID(null);
 
@@ -75,7 +75,7 @@ class MesaPageController extends \MZ\Core\Controller
         $errors = [];
         $old_mesa = $mesa;
         if (is_post()) {
-            $mesa = new Mesa($_POST);
+            $mesa = new Mesa($this->getData());
             try {
                 $mesa->filter($old_mesa, true);
                 $mesa->insert();
@@ -84,7 +84,7 @@ class MesaPageController extends \MZ\Core\Controller
                     'Mesa "%s" cadastrada com sucesso!',
                     $mesa->getNome()
                 );
-                if (is_output('json')) {
+                if ($this->isJson()) {
                     return $this->json()->success(['item' => $mesa->publish()], $msg);
                 }
                 \Thunder::success($msg, true);
@@ -94,7 +94,7 @@ class MesaPageController extends \MZ\Core\Controller
                 if ($e instanceof \MZ\Exception\ValidationException) {
                     $errors = $e->getErrors();
                 }
-                if (is_output('json')) {
+                if ($this->isJson()) {
                     return $this->json()->error($e->getMessage(), null, $errors);
                 }
                 \Thunder::error($e->getMessage());
@@ -103,7 +103,7 @@ class MesaPageController extends \MZ\Core\Controller
                     break;
                 }
             }
-        } elseif (is_output('json')) {
+        } elseif ($this->isJson()) {
             return $this->json()->error('Nenhum dado foi enviado');
         } else {
             $mesa->loadNextNumero();
@@ -115,12 +115,12 @@ class MesaPageController extends \MZ\Core\Controller
 
     public function update()
     {
-        need_permission(Permissao::NOME_CADASTROMESAS, is_output('json'));
-        $id = isset($_GET['id']) ? $_GET['id'] : null;
+        $this->needPermission([Permissao::NOME_CADASTROMESAS]);
+        $id = $this->getRequest()->query->getInt('id', null);
         $mesa = Mesa::findByID($id);
         if (!$mesa->exists()) {
             $msg = 'A mesa não foi informada ou não existe';
-            if (is_output('json')) {
+            if ($this->isJson()) {
                 return $this->json()->error($msg);
             }
             \Thunder::warning($msg);
@@ -130,7 +130,7 @@ class MesaPageController extends \MZ\Core\Controller
         $errors = [];
         $old_mesa = $mesa;
         if (is_post()) {
-            $mesa = new Mesa($_POST);
+            $mesa = new Mesa($this->getData());
             try {
                 $mesa->filter($old_mesa, true);
                 $mesa->update();
@@ -139,7 +139,7 @@ class MesaPageController extends \MZ\Core\Controller
                     'Mesa "%s" atualizada com sucesso!',
                     $mesa->getNome()
                 );
-                if (is_output('json')) {
+                if ($this->isJson()) {
                     return $this->json()->success(['item' => $mesa->publish()], $msg);
                 }
                 \Thunder::success($msg, true);
@@ -149,7 +149,7 @@ class MesaPageController extends \MZ\Core\Controller
                 if ($e instanceof \MZ\Exception\ValidationException) {
                     $errors = $e->getErrors();
                 }
-                if (is_output('json')) {
+                if ($this->isJson()) {
                     return $this->json()->error($e->getMessage(), null, $errors);
                 }
                 \Thunder::error($e->getMessage());
@@ -158,7 +158,7 @@ class MesaPageController extends \MZ\Core\Controller
                     break;
                 }
             }
-        } elseif (is_output('json')) {
+        } elseif ($this->isJson()) {
             return $this->json()->error('Nenhum dado foi enviado');
         }
         return $this->view('gerenciar_mesa_editar', get_defined_vars());
@@ -166,12 +166,12 @@ class MesaPageController extends \MZ\Core\Controller
 
     public function delete()
     {
-        need_permission(Permissao::NOME_CADASTROMESAS, is_output('json'));
-        $id = isset($_GET['id']) ? $_GET['id'] : null;
+        $this->needPermission([Permissao::NOME_CADASTROMESAS]);
+        $id = $this->getRequest()->query->getInt('id', null);
         $mesa = Mesa::findByID($id);
         if (!$mesa->exists()) {
             $msg = 'A mesa não foi informada ou não existe';
-            if (is_output('json')) {
+            if ($this->isJson()) {
                 return $this->json()->error($msg);
             }
             \Thunder::warning($msg);
@@ -181,7 +181,7 @@ class MesaPageController extends \MZ\Core\Controller
             $mesa->delete();
             $mesa->clean(new Mesa());
             $msg = sprintf('Mesa "%s" excluída com sucesso!', $mesa->getNome());
-            if (is_output('json')) {
+            if ($this->isJson()) {
                 return $this->json()->success([], $msg);
             }
             \Thunder::success($msg, true);
@@ -190,7 +190,7 @@ class MesaPageController extends \MZ\Core\Controller
                 'Não foi possível excluir a mesa "%s"',
                 $mesa->getNome()
             );
-            if (is_output('json')) {
+            if ($this->isJson()) {
                 return $this->json()->error($msg);
             }
             \Thunder::error($msg);

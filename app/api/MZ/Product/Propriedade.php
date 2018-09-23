@@ -304,7 +304,7 @@ class Propriedade extends SyncModel
             $this->setImagem(true);
         } else {
             $this->setImagem($imagem);
-            $image_path = $app->getPath('public') . $this->makeImagem();
+            $image_path = app()->getPath('public') . $this->makeImagem();
             if (!is_null($imagem)) {
                 $this->setImagem(file_get_contents($image_path));
                 @unlink($image_path);

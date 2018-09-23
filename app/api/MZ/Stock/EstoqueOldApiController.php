@@ -34,25 +34,19 @@ class EstoqueOldApiController extends \MZ\Core\ApiController
 {
     public function add()
     {
-        if (!is_login()) {
+        if (!app()->getAuthentication()->isLogin()) {
             return $this->json()->error('Usuário não autenticado!');
         }
-        $values = isset($_POST['estoque']) ? $_POST['estoque'] : [];
         try {
-            if (!logged_provider()->has(Permissao::NOME_ESTOQUE)) {
+            if (!app()->auth->has([Permissao::NOME_ESTOQUE])) {
                 throw new \Exception('Você não tem permissão para inserir no estoque');
             }
             $setor = Setor::findDefault();
-            $estoque = new Estoque($values);
-            // TODO: corrigir filter para API
-            $old_estoque = new Estoque($estoque);
+            $estoque = new Estoque($this->getRequest()->request->get('estoque'));
             $estoque->filter(new Estoque());
-            $estoque->setQuantidade(floatval($old_estoque->getQuantidade()));
-            $estoque->setPrecoCompra(floatval($old_estoque->getPrecoCompra()));
-            // end api fix
             $estoque->setTipoMovimento(Estoque::TIPO_MOVIMENTO_ENTRADA);
             $estoque->setSetorID($setor->getID());
-            $estoque->setFuncionarioID(logged_provider()->getID());
+            $estoque->setFuncionarioID(app()->auth->provider->getID());
             $estoque->setCancelado('N');
             $estoque->insert();
             return $this->json()->success(['estoque' => $estoque->publish()]);

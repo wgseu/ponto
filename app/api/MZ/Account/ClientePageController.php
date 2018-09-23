@@ -29,18 +29,19 @@ use MZ\System\Permissao;
 use MZ\Provider\Prestador;
 use MZ\Location\Localizacao;
 use MZ\Util\Filter;
+use MZ\Core\PageController;
 use MZ\Util\Mask;
 
 /**
  * Allow application to serve system resources
  */
-class ClientePageController extends \MZ\Core\Controller
+class ClientePageController extends PageController
 {
     public function register()
     {
-        if (is_login()) {
+        if (app()->getAuthentication()->isLogin()) {
             $msg = 'Você já está cadastrado e autenticado!';
-            if (is_output('json')) {
+            if ($this->isJson()) {
                 return $this->json()->error($msg);
             }
             \Thunder::information($msg, true);
@@ -52,30 +53,30 @@ class ClientePageController extends \MZ\Core\Controller
         $old_cliente = $cliente;
         $aceitar = null;
         if (is_post()) {
-            $cliente = new Cliente($_POST);
-            $aceitar = isset($_POST['aceitar']) ? $_POST['aceitar'] : null;
+            $cliente = new Cliente($this->getData());
+            $aceitar = $this->getRequest()->request->get('aceitar');
             try {
                 if ($aceitar != 'true') {
                     throw new \MZ\Exception\ValidationException(
                         ['aceitar' => 'Os termos não foram aceitos']
                     );
                 }
-                $senha = isset($_POST['confirmarsenha']) ? $_POST['confirmarsenha'] : '';
+                $senha = $this->getRequest()->request->get('confirmarsenha', '');
                 $cliente->passwordMatch($senha);
                 $cliente->filter($old_cliente, true);
                 $cliente->insert();
                 $old_cliente->clean($cliente);
-                if (is_output('json')) {
+                if ($this->isJson()) {
                     return $this->json()->success(['item' => $cliente->publish()]);
                 }
-                $this->getApplication()->getAuthentication()->login($cliente);
-                return $this->redirect(get_redirect_page());
+                app()->getAuthentication()->login($cliente);
+                return $this->loginSuccessfull();
             } catch (\Exception $e) {
                 $cliente->clean($old_cliente);
                 if ($e instanceof \MZ\Exception\ValidationException) {
                     $errors = $e->getErrors();
                 }
-                if (is_output('json')) {
+                if ($this->isJson()) {
                     return $this->json()->error($e->getMessage(), null, $errors);
                 }
                 \Thunder::error($e->getMessage());
@@ -87,10 +88,10 @@ class ClientePageController extends \MZ\Core\Controller
                     $focusctrl = $focusctrl . '-' . strtolower(Cliente::GENERO_MASCULINO);
                 }
             }
-        } elseif (is_output('json')) {
+        } elseif ($this->isJson()) {
             return $this->json()->error('Nenhum dado foi enviado');
         }
-        $response = $this->getApplication()->getResponse();
+        $response = app()->getResponse();
         $response->setTitle('Registrar');
         $response->getEngine()->cliente = $cliente;
         $response->getEngine()->aceitar = $aceitar;
@@ -100,37 +101,44 @@ class ClientePageController extends \MZ\Core\Controller
 
     public function logout()
     {
-        $this->getApplication()->getAuthentication()->logout();
+        app()->getAuthentication()->logout();
         return $this->redirect('/conta/entrar');
+    }
+
+    private function loginSuccessfull()
+    {
+        $url = app()->getSession()->get('redirect', '/');
+        $url = $this->getRequest()->request->get('redirect', $url);
+        app()->getSession()->remove('redirect');
+        return $this->redirect($url);
     }
 
     public function login()
     {
-        if (is_login()) {
-            $url = (is_post() && isset($_POST['redirect'])) ? strval($_POST['redirect']) : null;
+        if (app()->getAuthentication()->isLogin()) {
+            $url = $this->getRequest()->request->get('redirect');
             return $this->redirect($url);
         }
         if (is_post()) {
-            $usuario = isset($_POST['usuario']) ? strval($_POST['usuario']) : null;
-            $senha = isset($_POST['senha']) ? strval($_POST['senha']) : null;
+            $usuario = $this->getRequest()->request->get('usuario');
+            $senha = $this->getRequest()->request->get('senha');
             $cliente = Cliente::findByLoginSenha($usuario, $senha);
             if ($cliente->exists()) {
-                $this->getApplication()->getAuthentication()->login($cliente);
-                $url = isset($_POST['redirect']) ? strval($_POST['redirect']) : get_redirect_page();
-                return $this->redirect($url);
+                app()->getAuthentication()->login($cliente);
+                return $this->loginSuccessfull();
             }
             $msg = 'Usuário ou senha incorretos!';
             \Thunder::error($msg);
         }
-        $response = $this->getApplication()->getResponse();
+        $response = app()->getResponse();
         $response->setTitle('Entrar');
         return $response->output('conta_entrar');
     }
 
     public function edit()
     {
-        need_login(is_output('json'));
-        $cliente = logged_user();
+        app()->needLogin();
+        $cliente = app()->auth->user;
         
         $tab = 'dados';
         $gerenciando = false;
@@ -141,7 +149,7 @@ class ClientePageController extends \MZ\Core\Controller
         $errors = [];
         $old_cliente = $cliente;
         if (is_post()) {
-            $cliente = new Cliente($_POST);
+            $cliente = new Cliente($this->getData());
             try {
                 // não deixa o usuário alterar os dados abaixo
                 $cliente->setEmail($old_cliente->getEmail());
@@ -149,14 +157,14 @@ class ClientePageController extends \MZ\Core\Controller
                 $cliente->setAcionistaID($old_cliente->getAcionistaID());
                 $cliente->setSlogan($old_cliente->getSlogan());
         
-                $senha = isset($_POST['confirmarsenha']) ? $_POST['confirmarsenha'] : '';
+                $senha = $this->getRequest()->request->get('confirmarsenha', '');
                 $cliente->passwordMatch($senha);
         
                 $cliente->filter($old_cliente, true);
                 $cliente->update();
                 $old_cliente->clean($cliente);
                 $msg = 'Conta atualizada com sucesso!';
-                if (is_output('json')) {
+                if ($this->isJson()) {
                     return $this->json()->success(['item' => $cliente->publish()], $msg);
                 }
                 \Thunder::success($msg, true);
@@ -166,7 +174,7 @@ class ClientePageController extends \MZ\Core\Controller
                 if ($e instanceof \MZ\Exception\ValidationException) {
                     $errors = $e->getErrors();
                 }
-                if (is_output('json')) {
+                if ($this->isJson()) {
                     return $this->json()->error($e->getMessage(), null, $errors);
                 }
                 \Thunder::error($e->getMessage());
@@ -178,10 +186,10 @@ class ClientePageController extends \MZ\Core\Controller
                     $focusctrl = $focusctrl . '-' . strtolower($cliente->getGenero());
                 }
             }
-        } elseif (is_output('json')) {
+        } elseif ($this->isJson()) {
             return $this->json()->error('Nenhum dado foi enviado');
         }
-        $response = $this->getApplication()->getResponse();
+        $response = app()->getResponse();
         $response->setTitle('Editar Conta');
         $response->getEngine()->old_cliente = $old_cliente;
         $response->getEngine()->cliente = $cliente;
@@ -195,13 +203,10 @@ class ClientePageController extends \MZ\Core\Controller
 
     public function find()
     {
-        need_permission(Permissao::NOME_CADASTROCLIENTES, is_output('json'));
+        $this->needPermission([Permissao::NOME_CADASTROCLIENTES]);
 
-        $limite = isset($_GET['limite']) ? intval($_GET['limite']) : 10;
-        if ($limite > 100 || $limite < 1) {
-            $limite = 10;
-        }
-        $condition = Filter::query($_GET);
+        $limite = max(1, min(100, $this->getRequest()->query->getInt('limite', 10)));
+        $condition = Filter::query($this->getRequest()->query->all());
         unset($condition['ordem']);
         $genero = isset($condition['genero']) ? $condition['genero'] : null;
         if ($genero == 'Empresa') {
@@ -209,12 +214,14 @@ class ClientePageController extends \MZ\Core\Controller
             unset($condition['genero']);
         }
         $cliente = new Cliente($condition);
-        $order = Filter::order(isset($_GET['ordem']) ? $_GET['ordem'] : '');
+        $order = Filter::order($this->getRequest()->query->get('ordem', ''));
         $count = Cliente::count($condition);
-        list($pagesize, $offset, $pagination) = pagestring($count, $limite);
-        $clientes = Cliente::findAll($condition, $order, $pagesize, $offset);
+        $page = max(1, $this->getRequest()->query->getInt('pagina', 1));
+        $pager = new \Pager($count, $limite, $page, 'pagina');
+        $pagination = $pager->genBasic();
+        $clientes = Cliente::findAll($condition, $order, $limite, $pager->offset);
 
-        if (is_output('json')) {
+        if ($this->isJson()) {
             $items = [];
             foreach ($clientes as $_cliente) {
                 $items[] = $_cliente->publish();
@@ -230,24 +237,22 @@ class ClientePageController extends \MZ\Core\Controller
 
     public function add()
     {
-        need_permission(Permissao::NOME_CADASTROCLIENTES, is_output('json'));
+        $this->needPermission([Permissao::NOME_CADASTROCLIENTES]);
         $focusctrl = 'tipo';
         $errors = [];
         $cliente = new Cliente();
         $old_cliente = $cliente;
         if (is_post()) {
-            $cliente = new Cliente($_POST);
+            $cliente = new Cliente($this->getData());
             try {
                 DB::beginTransaction();
-                if (isset($_GET['sistema']) &&
-                    intval($_GET['sistema']) == 1 &&
+                if ($this->getRequest()->query->getInt('sistema') == 1 &&
                     $cliente->getTipo() != Cliente::TIPO_JURIDICA
                 ) {
                     throw new \MZ\Exception\ValidationException(['tipo' => 'O tipo da empresa deve ser jurídica']);
                 }
-                if (isset($_GET['sistema']) &&
-                    intval($_GET['sistema']) == 1 &&
-                    !is_null($this->getApplication()->getSystem()->getBusiness()->getEmpresaID())
+                if ($this->getRequest()->query->getInt('sistema') == 1 &&
+                    !is_null(app()->getSystem()->getBusiness()->getEmpresaID())
                 ) {
                     throw new \Exception(
                         'Você deve alterar a empresa do sistema em vez de cadastrar uma nova'
@@ -256,16 +261,16 @@ class ClientePageController extends \MZ\Core\Controller
                 $cliente->filter($old_cliente, true);
                 $cliente->insert();
                 $old_cliente->clean($cliente);
-                if (isset($_GET['sistema']) && intval($_GET['sistema']) == 1) {
-                    $this->getApplication()->getSystem()->getBusiness()->setEmpresaID($cliente->getID());
-                    $this->getApplication()->getSystem()->getBusiness()->update();
+                if ($this->getRequest()->query->getInt('sistema') == 1) {
+                    app()->getSystem()->getBusiness()->setEmpresaID($cliente->getID());
+                    app()->getSystem()->getBusiness()->update();
                 }
                 DB::commit();
                 $msg = sprintf(
                     'Cliente "%s" cadastrado com sucesso!',
                     $cliente->getNomeCompleto()
                 );
-                if (is_output('json')) {
+                if ($this->isJson()) {
                     return $this->json()->success(['item' => $cliente->publish()], $msg);
                 }
                 \Thunder::success($msg, true);
@@ -276,7 +281,7 @@ class ClientePageController extends \MZ\Core\Controller
                 if ($e instanceof \MZ\Exception\ValidationException) {
                     $errors = $e->getErrors();
                 }
-                if (is_output('json')) {
+                if ($this->isJson()) {
                     return $this->json()->error($e->getMessage(), null, $errors);
                 }
                 \Thunder::error($e->getMessage());
@@ -288,7 +293,7 @@ class ClientePageController extends \MZ\Core\Controller
                     $focusctrl = $focusctrl . '-' . strtolower(Cliente::GENERO_MASCULINO);
                 }
             }
-        } elseif (is_output('json')) {
+        } elseif ($this->isJson()) {
             return $this->json()->error('Nenhum dado foi enviado');
         }
         return $this->view('gerenciar_cliente_cadastrar', get_defined_vars());
@@ -296,27 +301,25 @@ class ClientePageController extends \MZ\Core\Controller
 
     public function update()
     {
-        need_manager(is_output('json'));
-
-        need_manager(is_output('json'));
-        $id = isset($_GET['id']) ? $_GET['id'] : null;
+        app()->needManager();
+        $id = $this->getRequest()->query->getInt('id', null);
         $cliente = Cliente::findByID($id);
         if (!$cliente->exists()) {
             $msg = 'O cliente não foi informado ou não existe!';
-            if (is_output('json')) {
+            if ($this->isJson()) {
                 return $this->json()->error($msg);
             }
             \Thunder::warning($msg);
             return $this->redirect('/gerenciar/cliente/');
         }
-        if ($cliente->getID() != logged_user()->getID()) {
-            need_permission(Permissao::NOME_CADASTROCLIENTES, is_output('json'));
+        if ($cliente->getID() != app()->auth->user->getID()) {
+            $this->needPermission([Permissao::NOME_CADASTROCLIENTES]);
         }
-        if ($cliente->getID() == $this->getApplication()->getSystem()->getCompany()->getID() &&
-            !logged_provider()->has(Permissao::NOME_ALTERARCONFIGURACOES)
+        if ($cliente->getID() == app()->getSystem()->getCompany()->getID() &&
+            !app()->auth->has([Permissao::NOME_ALTERARCONFIGURACOES])
         ) {
             $msg = 'Você não tem permissão para alterar essa empresa!';
-            if (is_output('json')) {
+            if ($this->isJson()) {
                 return $this->json()->error($msg);
             }
             \Thunder::warning($msg);
@@ -325,17 +328,17 @@ class ClientePageController extends \MZ\Core\Controller
         $prestador = Prestador::findByClienteID($cliente->getID());
         if ($prestador->exists() &&
             (
-                (!logged_provider()->has(Permissao::NOME_CADASTROFUNCIONARIOS) &&
-                    logged_provider()->getID() != $prestador->getID()
+                (!app()->auth->has([Permissao::NOME_CADASTROFUNCIONARIOS]) &&
+                    app()->auth->provider->getID() != $prestador->getID()
                 ) ||
-                ($prestador->has(Permissao::NOME_CADASTROFUNCIONARIOS) &&
-                    logged_provider()->getID() != $prestador->getID() &&
-                    !is_owner()
+                ($prestador->has([Permissao::NOME_CADASTROFUNCIONARIOS]) &&
+                    app()->auth->provider->getID() != $prestador->getID() &&
+                    !app()->auth->isOwner()
                 )
             )
         ) {
             $msg = 'Você não tem permissão para alterar as informações desse cliente!';
-            if (is_output('json')) {
+            if ($this->isJson()) {
                 return $this->json()->error($msg);
             }
             \Thunder::warning($msg);
@@ -345,14 +348,14 @@ class ClientePageController extends \MZ\Core\Controller
         $errors = [];
         $old_cliente = $cliente;
         if (is_post()) {
-            $cliente = new Cliente($_POST);
+            $cliente = new Cliente($this->getData());
             try {
-                if ($cliente->getID() == $this->getApplication()->getSystem()->getCompany()->getID() &&
+                if ($cliente->getID() == app()->getSystem()->getCompany()->getID() &&
                     $cliente->getTipo() != Cliente::TIPO_JURIDICA
                 ) {
                     throw new \MZ\Exception\ValidationException(['tipo' => 'O tipo da empresa deve ser jurídica']);
                 }
-                $senha = isset($_POST['confirmarsenha']) ? $_POST['confirmarsenha'] : '';
+                $senha = $this->getRequest()->request->get('confirmarsenha', '');
                 $cliente->passwordMatch($senha);
                 $cliente->filter($old_cliente, true);
                 $cliente->update();
@@ -361,7 +364,7 @@ class ClientePageController extends \MZ\Core\Controller
                     'Cliente "%s" atualizado com sucesso!',
                     $cliente->getNomeCompleto()
                 );
-                if (is_output('json')) {
+                if ($this->isJson()) {
                     return $this->json()->success(['item' => $cliente->publish()], $msg);
                 }
                 \Thunder::success($msg, true);
@@ -371,7 +374,7 @@ class ClientePageController extends \MZ\Core\Controller
                 if ($e instanceof \MZ\Exception\ValidationException) {
                     $errors = $e->getErrors();
                 }
-                if (is_output('json')) {
+                if ($this->isJson()) {
                     return $this->json()->error($e->getMessage(), null, $errors);
                 }
                 \Thunder::error($e->getMessage());
@@ -383,7 +386,7 @@ class ClientePageController extends \MZ\Core\Controller
                     $focusctrl = $focusctrl . '-' . strtolower($cliente->getGenero());
                 }
             }
-        } elseif (is_output('json')) {
+        } elseif ($this->isJson()) {
             return $this->json()->error('Nenhum dado foi enviado');
         }
         return $this->view('gerenciar_cliente_editar', get_defined_vars());
@@ -391,20 +394,20 @@ class ClientePageController extends \MZ\Core\Controller
 
     public function delete()
     {
-        need_permission(Permissao::NOME_CADASTROCLIENTES, is_output('json'));
-        $id = isset($_GET['id']) ? $_GET['id'] : null;
+        $this->needPermission([Permissao::NOME_CADASTROCLIENTES]);
+        $id = $this->getRequest()->query->getInt('id', null);
         $cliente = Cliente::findByID($id);
         if (!$cliente->exists()) {
             $msg = 'O cliente não foi informado ou não existe!';
-            if (is_output('json')) {
+            if ($this->isJson()) {
                 return $this->json()->error($msg);
             }
             \Thunder::warning($msg);
             return $this->redirect('/gerenciar/cliente/');
         }
-        if ($cliente->getID() == $this->getApplication()->getSystem()->getCompany()->getID()) {
+        if ($cliente->getID() == app()->getSystem()->getCompany()->getID()) {
             $msg = 'Essa empresa não pode ser excluída';
-            if (is_output('json')) {
+            if ($this->isJson()) {
                 return $this->json()->error($msg);
             }
             \Thunder::warning($msg);
@@ -414,18 +417,18 @@ class ClientePageController extends \MZ\Core\Controller
         if ($prestador->exists() &&
             (
                 (
-                    !logged_provider()->has(Permissao::NOME_CADASTROFUNCIONARIOS) &&
-                    logged_provider()->getID() != $prestador->getID()
+                    !app()->auth->has([Permissao::NOME_CADASTROFUNCIONARIOS]) &&
+                    app()->auth->provider->getID() != $prestador->getID()
                 ) ||
                 (
-                    $prestador->has(Permissao::NOME_CADASTROFUNCIONARIOS) &&
-                    logged_provider()->getID() != $prestador->getID() &&
-                    !is_owner()
+                    $prestador->has([Permissao::NOME_CADASTROFUNCIONARIOS]) &&
+                    app()->auth->provider->getID() != $prestador->getID() &&
+                    !app()->auth->isOwner()
                 )
             )
         ) {
             $msg = 'Você não tem permissão para excluir esse cliente';
-            if (is_output('json')) {
+            if ($this->isJson()) {
                 return $this->json()->error($msg);
             }
             \Thunder::warning($msg);
@@ -435,7 +438,7 @@ class ClientePageController extends \MZ\Core\Controller
             $cliente->delete();
             $cliente->clean(new Cliente());
             $msg = sprintf('Cliente "%s" excluído com sucesso!', $cliente->getNomeCompleto());
-            if (is_output('json')) {
+            if ($this->isJson()) {
                 return $this->json()->success([], $msg);
             }
             \Thunder::success($msg, true);
@@ -444,7 +447,7 @@ class ClientePageController extends \MZ\Core\Controller
                 'Não foi possível excluir o cliente "%s"',
                 $cliente->getNome()
             );
-            if (is_output('json')) {
+            if ($this->isJson()) {
                 return $this->json()->error($msg);
             }
             \Thunder::error($msg);

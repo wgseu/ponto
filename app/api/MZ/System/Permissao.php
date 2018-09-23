@@ -534,6 +534,15 @@ class Permissao extends SyncModel
         return $result->loadByNome($nome);
     }
 
+    public static function getAll()
+    {
+        $reflector = new \ReflectionClass(__CLASS__);
+        $permissoes = \array_filter($reflector->getConstants(), function ($name) {
+            return \preg_match('/^NOME_/', $name);
+        }, ARRAY_FILTER_USE_KEY);
+        return \array_values($permissoes);
+    }
+
     /**
      * Find all Permissão
      * @param  array  $condition Condition to get all Permissão

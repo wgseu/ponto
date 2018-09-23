@@ -24,10 +24,12 @@
  */
 namespace MZ\Session;
 
-use MZ\Database\SyncModel;
-use MZ\Database\DB;
+use MZ\Util\Mask;
 use MZ\Util\Filter;
 use MZ\Util\Validator;
+use MZ\Database\DB;
+use MZ\Database\SyncModel;
+use MZ\Exception\ValidationException;
 
 /**
  * Movimentação do caixa, permite abrir diversos caixas na conta de
@@ -56,19 +58,19 @@ class Movimentacao extends SyncModel
     /**
      * Funcionário que abriu o caixa
      */
-    private $funcionario_abertura_id;
-    /**
-     * Data de abertura do caixa
-     */
-    private $data_abertura;
+    private $iniciador_id;
     /**
      * Funcionário que fechou o caixa
      */
-    private $funcionario_fechamento_id;
+    private $fechador_id;
     /**
      * Data de fechamento do caixa
      */
     private $data_fechamento;
+    /**
+     * Data de abertura do caixa
+     */
+    private $data_abertura;
 
     /**
      * Constructor for a new empty instance of Movimentacao
@@ -81,7 +83,7 @@ class Movimentacao extends SyncModel
 
     /**
      * Código da movimentação do caixa
-     * @return mixed ID of Movimentacao
+     * @return int id of Movimentação
      */
     public function getID()
     {
@@ -90,8 +92,8 @@ class Movimentacao extends SyncModel
 
     /**
      * Set ID value to new on param
-     * @param  mixed $id new value for ID
-     * @return Movimentacao Self instance
+     * @param int $id Set id for Movimentação
+     * @return self Self instance
      */
     public function setID($id)
     {
@@ -102,7 +104,7 @@ class Movimentacao extends SyncModel
     /**
      * Sessão do dia, permite abrir vários caixas no mesmo dia com o mesmo
      * código da sessão
-     * @return mixed Sessão of Movimentacao
+     * @return int sessão of Movimentação
      */
     public function getSessaoID()
     {
@@ -111,8 +113,8 @@ class Movimentacao extends SyncModel
 
     /**
      * Set SessaoID value to new on param
-     * @param  mixed $sessao_id new value for SessaoID
-     * @return Movimentacao Self instance
+     * @param int $sessao_id Set sessão for Movimentação
+     * @return self Self instance
      */
     public function setSessaoID($sessao_id)
     {
@@ -122,7 +124,7 @@ class Movimentacao extends SyncModel
 
     /**
      * Caixa a qual pertence essa movimentação
-     * @return mixed Caixa of Movimentacao
+     * @return int caixa of Movimentação
      */
     public function getCaixaID()
     {
@@ -131,8 +133,8 @@ class Movimentacao extends SyncModel
 
     /**
      * Set CaixaID value to new on param
-     * @param  mixed $caixa_id new value for CaixaID
-     * @return Movimentacao Self instance
+     * @param int $caixa_id Set caixa for Movimentação
+     * @return self Self instance
      */
     public function setCaixaID($caixa_id)
     {
@@ -142,7 +144,7 @@ class Movimentacao extends SyncModel
 
     /**
      * Informa se o caixa está aberto
-     * @return mixed Aberta of Movimentacao
+     * @return string aberta of Movimentação
      */
     public function getAberta()
     {
@@ -160,8 +162,8 @@ class Movimentacao extends SyncModel
 
     /**
      * Set Aberta value to new on param
-     * @param  mixed $aberta new value for Aberta
-     * @return Movimentacao Self instance
+     * @param string $aberta Set aberta for Movimentação
+     * @return self Self instance
      */
     public function setAberta($aberta)
     {
@@ -171,67 +173,47 @@ class Movimentacao extends SyncModel
 
     /**
      * Funcionário que abriu o caixa
-     * @return mixed Funcionário inicializador of Movimentacao
+     * @return int funcionário inicializador of Movimentação
      */
-    public function getFuncionarioAberturaID()
+    public function getIniciadorID()
     {
-        return $this->funcionario_abertura_id;
+        return $this->iniciador_id;
     }
 
     /**
-     * Set FuncionarioAberturaID value to new on param
-     * @param  mixed $funcionario_abertura_id new value for FuncionarioAberturaID
-     * @return Movimentacao Self instance
+     * Set IniciadorID value to new on param
+     * @param int $iniciador_id Set funcionário inicializador for Movimentação
+     * @return self Self instance
      */
-    public function setFuncionarioAberturaID($funcionario_abertura_id)
+    public function setIniciadorID($iniciador_id)
     {
-        $this->funcionario_abertura_id = $funcionario_abertura_id;
-        return $this;
-    }
-
-    /**
-     * Data de abertura do caixa
-     * @return mixed Data de abertura of Movimentacao
-     */
-    public function getDataAbertura()
-    {
-        return $this->data_abertura;
-    }
-
-    /**
-     * Set DataAbertura value to new on param
-     * @param  mixed $data_abertura new value for DataAbertura
-     * @return Movimentacao Self instance
-     */
-    public function setDataAbertura($data_abertura)
-    {
-        $this->data_abertura = $data_abertura;
+        $this->iniciador_id = $iniciador_id;
         return $this;
     }
 
     /**
      * Funcionário que fechou o caixa
-     * @return mixed Funcionário fechador of Movimentacao
+     * @return int funcionário fechador of Movimentação
      */
-    public function getFuncionarioFechamentoID()
+    public function getFechadorID()
     {
-        return $this->funcionario_fechamento_id;
+        return $this->fechador_id;
     }
 
     /**
-     * Set FuncionarioFechamentoID value to new on param
-     * @param  mixed $funcionario_fechamento_id new value for FuncionarioFechamentoID
-     * @return Movimentacao Self instance
+     * Set FechadorID value to new on param
+     * @param int $fechador_id Set funcionário fechador for Movimentação
+     * @return self Self instance
      */
-    public function setFuncionarioFechamentoID($funcionario_fechamento_id)
+    public function setFechadorID($fechador_id)
     {
-        $this->funcionario_fechamento_id = $funcionario_fechamento_id;
+        $this->fechador_id = $fechador_id;
         return $this;
     }
 
     /**
      * Data de fechamento do caixa
-     * @return mixed Data de fechamento of Movimentacao
+     * @return string data de fechamento of Movimentação
      */
     public function getDataFechamento()
     {
@@ -240,8 +222,8 @@ class Movimentacao extends SyncModel
 
     /**
      * Set DataFechamento value to new on param
-     * @param  mixed $data_fechamento new value for DataFechamento
-     * @return Movimentacao Self instance
+     * @param string $data_fechamento Set data de fechamento for Movimentação
+     * @return self Self instance
      */
     public function setDataFechamento($data_fechamento)
     {
@@ -250,8 +232,28 @@ class Movimentacao extends SyncModel
     }
 
     /**
+     * Data de abertura do caixa
+     * @return string data de abertura of Movimentação
+     */
+    public function getDataAbertura()
+    {
+        return $this->data_abertura;
+    }
+
+    /**
+     * Set DataAbertura value to new on param
+     * @param string $data_abertura Set data de abertura for Movimentação
+     * @return self Self instance
+     */
+    public function setDataAbertura($data_abertura)
+    {
+        $this->data_abertura = $data_abertura;
+        return $this;
+    }
+
+    /**
      * Convert this instance to array associated key -> value
-     * @param  boolean $recursive Allow rescursive conversion of fields
+     * @param boolean $recursive Allow rescursive conversion of fields
      * @return array All field and values into array format
      */
     public function toArray($recursive = false)
@@ -261,21 +263,21 @@ class Movimentacao extends SyncModel
         $movimentacao['sessaoid'] = $this->getSessaoID();
         $movimentacao['caixaid'] = $this->getCaixaID();
         $movimentacao['aberta'] = $this->getAberta();
-        $movimentacao['funcionarioaberturaid'] = $this->getFuncionarioAberturaID();
-        $movimentacao['dataabertura'] = $this->getDataAbertura();
-        $movimentacao['funcionariofechamentoid'] = $this->getFuncionarioFechamentoID();
+        $movimentacao['iniciadorid'] = $this->getIniciadorID();
+        $movimentacao['fechadorid'] = $this->getFechadorID();
         $movimentacao['datafechamento'] = $this->getDataFechamento();
+        $movimentacao['dataabertura'] = $this->getDataAbertura();
         return $movimentacao;
     }
 
     /**
      * Fill this instance with from array values, you can pass instance to
-     * @param  mixed $movimentacao Associated key -> value to assign into this instance
-     * @return Movimentacao Self instance
+     * @param mixed $movimentacao Associated key -> value to assign into this instance
+     * @return self Self instance
      */
     public function fromArray($movimentacao = [])
     {
-        if ($movimentacao instanceof Movimentacao) {
+        if ($movimentacao instanceof self) {
             $movimentacao = $movimentacao->toArray();
         } elseif (!is_array($movimentacao)) {
             $movimentacao = [];
@@ -301,25 +303,25 @@ class Movimentacao extends SyncModel
         } else {
             $this->setAberta($movimentacao['aberta']);
         }
-        if (!isset($movimentacao['funcionarioaberturaid'])) {
-            $this->setFuncionarioAberturaID(null);
+        if (!isset($movimentacao['iniciadorid'])) {
+            $this->setIniciadorID(null);
         } else {
-            $this->setFuncionarioAberturaID($movimentacao['funcionarioaberturaid']);
+            $this->setIniciadorID($movimentacao['iniciadorid']);
         }
-        if (!isset($movimentacao['dataabertura'])) {
-            $this->setDataAbertura(DB::now());
+        if (!array_key_exists('fechadorid', $movimentacao)) {
+            $this->setFechadorID(null);
         } else {
-            $this->setDataAbertura($movimentacao['dataabertura']);
-        }
-        if (!array_key_exists('funcionariofechamentoid', $movimentacao)) {
-            $this->setFuncionarioFechamentoID(null);
-        } else {
-            $this->setFuncionarioFechamentoID($movimentacao['funcionariofechamentoid']);
+            $this->setFechadorID($movimentacao['fechadorid']);
         }
         if (!array_key_exists('datafechamento', $movimentacao)) {
             $this->setDataFechamento(null);
         } else {
             $this->setDataFechamento($movimentacao['datafechamento']);
+        }
+        if (!isset($movimentacao['dataabertura'])) {
+            $this->setDataAbertura(DB::now());
+        } else {
+            $this->setDataAbertura($movimentacao['dataabertura']);
         }
         return $this;
     }
@@ -336,22 +338,25 @@ class Movimentacao extends SyncModel
 
     /**
      * Filter fields, upload data and keep key data
-     * @param Movimentacao $original Original instance without modifications
+     * @param self $original Original instance without modifications
+     * @param boolean $localized Informs if fields are localized
+     * @return self Self instance
      */
     public function filter($original, $localized = false)
     {
         $this->setID($original->getID());
         $this->setSessaoID(Filter::number($this->getSessaoID()));
         $this->setCaixaID(Filter::number($this->getCaixaID()));
-        $this->setFuncionarioAberturaID(Filter::number($this->getFuncionarioAberturaID()));
-        $this->setDataAbertura(Filter::datetime($this->getDataAbertura()));
-        $this->setFuncionarioFechamentoID(Filter::number($this->getFuncionarioFechamentoID()));
+        $this->setIniciadorID(Filter::number($this->getIniciadorID()));
+        $this->setFechadorID(Filter::number($this->getFechadorID()));
         $this->setDataFechamento(Filter::datetime($this->getDataFechamento()));
+        $this->setDataAbertura(Filter::datetime($this->getDataAbertura()));
+        return $this;
     }
 
     /**
      * Clean instance resources like images and docs
-     * @param  Movimentacao $dependency Don't clean when dependency use same resources
+     * @param self $dependency Don't clean when dependency use same resources
      */
     public function clean($dependency)
     {
@@ -360,49 +365,41 @@ class Movimentacao extends SyncModel
     /**
      * Validate fields updating them and throw exception when invalid data has found
      * @return array All field of Movimentacao in array format
+     * @throws \MZ\Exception\ValidationException for invalid input data
      */
     public function validate()
     {
         $errors = [];
         if (is_null($this->getSessaoID())) {
-            $errors['sessaoid'] = 'A sessão não foi informada';
+            $errors['sessaoid'] = _t('movimentacao.sessao_id_cannot_empty');
         }
         $caixa = $this->findCaixaID();
         if (is_null($this->getCaixaID())) {
-            $errors['caixaid'] = 'O caixa não foi informado';
+            $errors['caixaid'] = _t('movimentacao.caixa_id_cannot_empty');
         } elseif (!$caixa->isAtivo()) {
-            $errors['caixaid'] = sprintf('O caixa "%s" não está ativo', $caixa->getDescricao());
+            $errors['caixaid'] = _t('movimentacao.caixa_inactive', $caixa->getDescricao());
         }
         if (!Validator::checkBoolean($this->getAberta())) {
-            $errors['aberta'] = 'A abertura não foi informada ou é inválida';
+            $errors['aberta'] = _t('movimentacao.aberta_invalid');
         } elseif (!$this->exists() && !$this->isAberta()) {
-            $errors['aberta'] = 'O caixa não pode ser aberto com status fechado';
+            $errors['aberta'] = _t('movimentacao.aberta_create_closed');
         }
-        if (is_null($this->getFuncionarioAberturaID())) {
-            $errors['funcionarioaberturaid'] = 'O(A) funcionário(a) inicializador(a) não pode ser vazio(a)';
+        if (is_null($this->getIniciadorID())) {
+            $errors['iniciadorid'] = _t('movimentacao.iniciador_id_cannot_empty');
         }
         if (is_null($this->getDataAbertura())) {
-            $errors['dataabertura'] = 'A data de abertura não pode ser vazia';
+            $errors['dataabertura'] = _t('movimentacao.data_abertura_cannot_empty');
         }
         if (!empty($errors)) {
-            throw new \MZ\Exception\ValidationException($errors);
+            throw new ValidationException($errors);
         }
         return $this->toArray();
     }
 
     /**
-     * Translate SQL exception into application exception
-     * @param  \Exception $e exception to translate into a readable error
-     * @return \MZ\Exception\ValidationException new exception translated
-     */
-    protected function translate($e)
-    {
-        return parent::translate($e);
-    }
-
-    /**
      * Insert a new Movimentação into the database and fill instance from database
-     * @return Movimentacao Self instance
+     * @return self Self instance
+     * @throws \MZ\Exception\ValidationException for invalid input data
      */
     public function insert()
     {
@@ -421,36 +418,42 @@ class Movimentacao extends SyncModel
 
     /**
      * Update Movimentação with instance values into database for ID
-     * @param  array $only Save these fields only, when empty save all fields except id
-     * @return Movimentacao Self instance
+     * @param array $only Save these fields only, when empty save all fields except id
+     * @return int rows affected
+     * @throws \MZ\Exception\ValidationException for invalid input data
      */
     public function update($only = [])
     {
         $values = $this->validate();
         if (!$this->exists()) {
-            throw new \Exception('O identificador da movimentação não foi informado');
+            throw new ValidationException(
+                ['id' => _t('movimentacao.id_cannot_empty')]
+            );
         }
         $values = DB::filterValues($values, $only, false);
         try {
-            DB::update('Movimentacoes')
+            $affected = DB::update('Movimentacoes')
                 ->set($values)
-                ->where('id', $this->getID())
+                ->where(['id' => $this->getID()])
                 ->execute();
             $this->loadByID();
         } catch (\Exception $e) {
             throw $this->translate($e);
         }
-        return $this;
+        return $affected;
     }
 
     /**
      * Delete this instance from database using ID
      * @return integer Number of rows deleted (Max 1)
+     * @throws \MZ\Exception\ValidationException for invalid id
      */
     public function delete()
     {
         if (!$this->exists()) {
-            throw new \Exception('O identificador da movimentação não foi informado');
+            throw new ValidationException(
+                ['id' => _t('movimentacao.id_cannot_empty')]
+            );
         }
         $result = DB::deleteFrom('Movimentacoes')
             ->where('id', $this->getID())
@@ -460,9 +463,9 @@ class Movimentacao extends SyncModel
 
     /**
      * Load one register for it self with a condition
-     * @param  array $condition Condition for searching the row
-     * @param  array $order associative field name -> [-1, 1]
-     * @return Movimentacao Self instance filled or empty
+     * @param array $condition Condition for searching the row
+     * @param array $order associative field name -> [-1, 1]
+     * @return self Self instance filled or empty
      */
     public function load($condition, $order = [])
     {
@@ -473,15 +476,14 @@ class Movimentacao extends SyncModel
 
     /**
      * Find open cash register preferred to employee informed
-     * @param  int $funcionario_id preferred to employee
-     * @return Movimentacao A filled instance or empty when not found
+     * @return self A filled instance or empty when not found
      */
-    public function loadByAberta($funcionario_id = null)
+    public function loadByAberta()
     {
         return $this->load(
             ['aberta' => 'Y'],
             [
-                'inicializador' => [-1 => $funcionario_id],
+                'inicializador' => [-1 => $this->getIniciadorID()],
                 'dataabertura' => -1
             ]
         );
@@ -510,21 +512,21 @@ class Movimentacao extends SyncModel
      * Funcionário que abriu o caixa
      * @return \MZ\Provider\Prestador The object fetched from database
      */
-    public function findFuncionarioAberturaID()
+    public function findIniciadorID()
     {
-        return \MZ\Provider\Prestador::findByID($this->getFuncionarioAberturaID());
+        return \MZ\Provider\Prestador::findByID($this->getIniciadorID());
     }
 
     /**
      * Funcionário que fechou o caixa
      * @return \MZ\Provider\Prestador The object fetched from database
      */
-    public function findFuncionarioFechamentoID()
+    public function findFechadorID()
     {
-        if (is_null($this->getFuncionarioFechamentoID())) {
+        if (is_null($this->getFechadorID())) {
             return new \MZ\Provider\Prestador();
         }
-        return \MZ\Provider\Prestador::findByID($this->getFuncionarioFechamentoID());
+        return \MZ\Provider\Prestador::findByID($this->getFechadorID());
     }
 
     /**
@@ -533,14 +535,14 @@ class Movimentacao extends SyncModel
      */
     private static function getAllowedKeys()
     {
-        $movimentacao = new Movimentacao();
+        $movimentacao = new self();
         $allowed = Filter::concatKeys('m.', $movimentacao->toArray());
         return $allowed;
     }
 
     /**
      * Filter order array
-     * @param  mixed $order order string or array to parse and filter allowed
+     * @param mixed $order order string or array to parse and filter allowed
      * @return array allowed associative order
      */
     private static function filterOrder($order)
@@ -548,7 +550,7 @@ class Movimentacao extends SyncModel
         $allowed = self::getAllowedKeys();
         $order = Filter::order($order);
         if (isset($order['inicializador'])) {
-            $field = '(m.funcionarioaberturaid = ?)';
+            $field = '(m.iniciadorid = ?)';
             $order = replace_key($order, 'inicializador', $field);
             $allowed[$field] = true;
         }
@@ -557,7 +559,7 @@ class Movimentacao extends SyncModel
 
     /**
      * Filter condition array with allowed fields
-     * @param  array $condition condition to filter rows
+     * @param array $condition condition to filter rows
      * @return array allowed condition
      */
     private static function filterCondition($condition)
@@ -580,8 +582,8 @@ class Movimentacao extends SyncModel
 
     /**
      * Fetch data from database with a condition
-     * @param  array $condition condition to filter rows
-     * @param  array $order order rows
+     * @param array $condition condition to filter rows
+     * @param array $order order rows
      * @return SelectQuery query object with condition statement
      */
     private static function query($condition = [], $order = [])
@@ -595,15 +597,30 @@ class Movimentacao extends SyncModel
 
     /**
      * Search one register with a condition
-     * @param  array $condition Condition for searching the row
-     * @param  array $order order rows
-     * @return Movimentacao A filled Movimentação or empty instance
+     * @param array $condition Condition for searching the row
+     * @param array $order order rows
+     * @return self A filled Movimentação or empty instance
      */
     public static function find($condition, $order = [])
     {
-        $query = self::query($condition, $order)->limit(1);
-        $row = $query->fetch() ?: [];
-        return new Movimentacao($row);
+        $result = new self();
+        return $result->load($condition, $order);
+    }
+
+    /**
+     * Search one register with a condition
+     * @param array $condition Condition for searching the row
+     * @param array $order order rows
+     * @return self A filled Movimentação or empty instance
+     * @throws \Exception when register has not found
+     */
+    public static function findOrFail($condition, $order = [])
+    {
+        $result = self::find($condition, $order);
+        if (!$result->exists()) {
+            throw new \Exception(_t('movimentacao.not_found'), 404);
+        }
+        return $result;
     }
 
     /**
@@ -614,7 +631,8 @@ class Movimentacao extends SyncModel
     public static function findByAberta($funcionario_id = null)
     {
         $result = new self();
-        return $result->loadByAberta($funcionario_id);
+        $result->setIniciadorID($funcionario_id);
+        return $result->loadByAberta();
     }
 
     /**
@@ -633,11 +651,11 @@ class Movimentacao extends SyncModel
 
     /**
      * Find all Movimentação
-     * @param  array  $condition Condition to get all Movimentação
-     * @param  array  $order     Order Movimentação
-     * @param  int    $limit     Limit data into row count
-     * @param  int    $offset    Start offset to get rows
-     * @return array             List of all rows instanced as Movimentacao
+     * @param array  $condition Condition to get all Movimentação
+     * @param array  $order     Order Movimentação
+     * @param int    $limit     Limit data into row count
+     * @param int    $offset    Start offset to get rows
+     * @return self[] List of all rows instanced as Movimentacao
      */
     public static function findAll($condition = [], $order = [], $limit = null, $offset = null)
     {
@@ -651,14 +669,14 @@ class Movimentacao extends SyncModel
         $rows = $query->fetchAll();
         $result = [];
         foreach ($rows as $row) {
-            $result[] = new Movimentacao($row);
+            $result[] = new self($row);
         }
         return $result;
     }
 
     /**
      * Count all rows from database with matched condition critery
-     * @param  array $condition condition to filter rows
+     * @param array $condition condition to filter rows
      * @return integer Quantity of rows
      */
     public static function count($condition = [])

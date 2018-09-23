@@ -56,7 +56,7 @@ class ServicoTest extends \MZ\Framework\TestCase
     {
         $servico = self::create('Serviço find');
         $servico_sec = self::create('Serviço find second');
-        AuthenticationTest::authProvider([Permissao::NOME_CADASTROSERVICOS]);
+        AuthenticationTest::authProvider([Permissao::NOME_SISTEMA, Permissao::NOME_CADASTROSERVICOS]);
         $expected = [
             'status' => 'ok',
             'items' => [
@@ -72,20 +72,20 @@ class ServicoTest extends \MZ\Framework\TestCase
     public function testAdd()
     {
         $servico = self::build();
-        AuthenticationTest::authProvider([Permissao::NOME_CADASTROSERVICOS]);
+        AuthenticationTest::authProvider([Permissao::NOME_SISTEMA, Permissao::NOME_CADASTROSERVICOS]);
         $expected = [
             'status' => 'ok',
             'item' => $servico->publish(),
         ];
         $result = $this->post('/api/servicos', $servico->toArray());
-        $expected['item']['id'] = $result['item']['id'];
-        $this->assertEquals($expected, \array_intersect_key($result, $expected));
+        $expected['item']['id'] = $result['item']['id'] ?? null;
+        $this->assertEquals($expected, $result);
     }
 
     public function testUpdate()
     {
         $servico = self::create();
-        AuthenticationTest::authProvider([Permissao::NOME_CADASTROSERVICOS]);
+        AuthenticationTest::authProvider([Permissao::NOME_SISTEMA, Permissao::NOME_CADASTROSERVICOS]);
         $id = $servico->getID();
         $result = $this->put('/api/servicos/' . $id, $servico->toArray());
         $servico->loadByID();
@@ -99,7 +99,7 @@ class ServicoTest extends \MZ\Framework\TestCase
     public function testDelete()
     {
         $servico = self::create();
-        AuthenticationTest::authProvider([Permissao::NOME_CADASTROSERVICOS]);
+        AuthenticationTest::authProvider([Permissao::NOME_SISTEMA, Permissao::NOME_CADASTROSERVICOS]);
         $id = $servico->getID();
         $result = $this->delete('/api/servicos/' . $id);
         $servico->loadByID();

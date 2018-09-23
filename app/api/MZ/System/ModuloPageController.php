@@ -26,29 +26,29 @@ namespace MZ\System;
 
 use MZ\Database\DB;
 use MZ\Util\Filter;
+use MZ\Core\PageController;
 
 /**
  * Allow application to serve system resources
  */
-class ModuloPageController extends \MZ\Core\Controller
+class ModuloPageController extends PageController
 {
     public function find()
     {
-        need_permission(Permissao::NOME_ALTERARCONFIGURACOES, is_output('json'));
+        $this->needPermission([Permissao::NOME_ALTERARCONFIGURACOES]);
 
-        $limite = isset($_GET['limite']) ? intval($_GET['limite']) : 10;
-        if ($limite > 100 || $limite < 1) {
-            $limite = 10;
-        }
-        $condition = Filter::query($_GET);
+        $limite = max(1, min(100, $this->getRequest()->query->getInt('limite', 10)));
+        $condition = Filter::query($this->getRequest()->query->all());
         unset($condition['ordem']);
         $modulo = new Modulo($condition);
-        $order = Filter::order(isset($_GET['ordem']) ? $_GET['ordem'] : '');
+        $order = Filter::order($this->getRequest()->query->get('ordem', ''));
         $count = Modulo::count($condition);
-        list($pagesize, $offset, $pagination) = pagestring($count, $limite);
-        $modulos = Modulo::findAll($condition, $order, $pagesize, $offset);
+        $page = max(1, $this->getRequest()->query->getInt('pagina', 1));
+        $pager = new \Pager($count, $limite, $page, 'pagina');
+        $pagination = $pager->genBasic();
+        $modulos = Modulo::findAll($condition, $order, $limite, $pager->offset);
 
-        if (is_output('json')) {
+        if ($this->isJson()) {
             $items = [];
             foreach ($modulos as $_modulo) {
                 $items[] = $_modulo->publish();
@@ -61,8 +61,8 @@ class ModuloPageController extends \MZ\Core\Controller
 
     public function update()
     {
-        need_permission(Permissao::NOME_ALTERARCONFIGURACOES, true);
-        $id = isset($_GET['id']) ? $_GET['id'] : null;
+        $this->needPermission([Permissao::NOME_ALTERARCONFIGURACOES]);
+        $id = $this->getRequest()->query->getInt('id', null);
         $modulo = Modulo::findByID($id);
         if (!$modulo->exists()) {
             $msg = 'O módulo não foi informado ou não existe';
@@ -72,7 +72,7 @@ class ModuloPageController extends \MZ\Core\Controller
         $errors = [];
         $old_modulo = $modulo;
         if (is_post()) {
-            $modulo = new Modulo($_POST);
+            $modulo = new Modulo($this->getData());
             try {
                 DB::beginTransaction();
                 $modulo->filter($old_modulo, true);

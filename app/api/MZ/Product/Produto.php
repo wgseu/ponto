@@ -24,11 +24,13 @@
  */
 namespace MZ\Product;
 
-use MZ\Database\SyncModel;
-use MZ\Database\DB;
+use MZ\Util\Mask;
 use MZ\Util\Date;
 use MZ\Util\Filter;
 use MZ\Util\Validator;
+use MZ\Database\DB;
+use MZ\Database\SyncModel;
+use MZ\Exception\ValidationException;
 use MZ\Stock\Estoque;
 
 /**
@@ -51,6 +53,10 @@ class Produto extends SyncModel
      * Código do produto
      */
     private $id;
+    /**
+     * Código do produto, deve ser único entre todos os produtos
+     */
+    private $codigo;
     /**
      * Código de barras do produto, deve ser único entre todos os produtos
      */
@@ -147,13 +153,25 @@ class Produto extends SyncModel
      */
     private $visivel;
     /**
+     * Informa se o produto é de uso interno e não está disponível para venda
+     */
+    private $interno;
+    /**
+     * Média das avaliações do último período
+     */
+    private $avaliacao;
+    /**
      * Imagem do produto
      */
-    private $imagem;
+    private $imagem_url;
     /**
      * Data de atualização das informações do produto
      */
     private $data_atualizacao;
+    /**
+     * Data em que o produto foi arquivado e não será mais usado
+     */
+    private $data_arquivado;
 
     /**
      * Constructor for a new empty instance of Produto
@@ -166,7 +184,7 @@ class Produto extends SyncModel
 
     /**
      * Código do produto
-     * @return mixed ID of Produto
+     * @return int id of Produto
      */
     public function getID()
     {
@@ -175,8 +193,8 @@ class Produto extends SyncModel
 
     /**
      * Set ID value to new on param
-     * @param  mixed $id new value for ID
-     * @return Produto Self instance
+     * @param int $id Set id for Produto
+     * @return self Self instance
      */
     public function setID($id)
     {
@@ -185,8 +203,28 @@ class Produto extends SyncModel
     }
 
     /**
+     * Código do produto, deve ser único entre todos os produtos
+     * @return int código of Produto
+     */
+    public function getCodigo()
+    {
+        return $this->codigo;
+    }
+
+    /**
+     * Set Codigo value to new on param
+     * @param int $codigo Set código for Produto
+     * @return self Self instance
+     */
+    public function setCodigo($codigo)
+    {
+        $this->codigo = $codigo;
+        return $this;
+    }
+
+    /**
      * Código de barras do produto, deve ser único entre todos os produtos
-     * @return mixed Código de barras of Produto
+     * @return string código de barras of Produto
      */
     public function getCodigoBarras()
     {
@@ -195,8 +233,8 @@ class Produto extends SyncModel
 
     /**
      * Set CodigoBarras value to new on param
-     * @param  mixed $codigo_barras new value for CodigoBarras
-     * @return Produto Self instance
+     * @param string $codigo_barras Set código de barras for Produto
+     * @return self Self instance
      */
     public function setCodigoBarras($codigo_barras)
     {
@@ -206,7 +244,7 @@ class Produto extends SyncModel
 
     /**
      * Categoria do produto, permite a rápida localização ao utilizar tablets
-     * @return mixed Categoria of Produto
+     * @return int categoria of Produto
      */
     public function getCategoriaID()
     {
@@ -215,8 +253,8 @@ class Produto extends SyncModel
 
     /**
      * Set CategoriaID value to new on param
-     * @param  mixed $categoria_id new value for CategoriaID
-     * @return Produto Self instance
+     * @param int $categoria_id Set categoria for Produto
+     * @return self Self instance
      */
     public function setCategoriaID($categoria_id)
     {
@@ -226,7 +264,7 @@ class Produto extends SyncModel
 
     /**
      * Informa a unidade do produtos, Ex.: Grama, Litro.
-     * @return mixed Unidade of Produto
+     * @return int unidade of Produto
      */
     public function getUnidadeID()
     {
@@ -235,8 +273,8 @@ class Produto extends SyncModel
 
     /**
      * Set UnidadeID value to new on param
-     * @param  mixed $unidade_id new value for UnidadeID
-     * @return Produto Self instance
+     * @param int $unidade_id Set unidade for Produto
+     * @return self Self instance
      */
     public function setUnidadeID($unidade_id)
     {
@@ -246,7 +284,7 @@ class Produto extends SyncModel
 
     /**
      * Informa de qual setor o produto será retirado após a venda
-     * @return mixed Setor de estoque of Produto
+     * @return int setor de estoque of Produto
      */
     public function getSetorEstoqueID()
     {
@@ -255,8 +293,8 @@ class Produto extends SyncModel
 
     /**
      * Set SetorEstoqueID value to new on param
-     * @param  mixed $setor_estoque_id new value for SetorEstoqueID
-     * @return Produto Self instance
+     * @param int $setor_estoque_id Set setor de estoque for Produto
+     * @return self Self instance
      */
     public function setSetorEstoqueID($setor_estoque_id)
     {
@@ -267,7 +305,7 @@ class Produto extends SyncModel
     /**
      * Informa em qual setor de preparo será enviado o ticket de preparo ou
      * autorização, se nenhum for informado nada será impresso
-     * @return mixed Setor de preparo of Produto
+     * @return int setor de preparo of Produto
      */
     public function getSetorPreparoID()
     {
@@ -276,8 +314,8 @@ class Produto extends SyncModel
 
     /**
      * Set SetorPreparoID value to new on param
-     * @param  mixed $setor_preparo_id new value for SetorPreparoID
-     * @return Produto Self instance
+     * @param int $setor_preparo_id Set setor de preparo for Produto
+     * @return self Self instance
      */
     public function setSetorPreparoID($setor_preparo_id)
     {
@@ -287,7 +325,7 @@ class Produto extends SyncModel
 
     /**
      * Informações de tributação do produto
-     * @return mixed Tributação of Produto
+     * @return int tributação of Produto
      */
     public function getTributacaoID()
     {
@@ -296,8 +334,8 @@ class Produto extends SyncModel
 
     /**
      * Set TributacaoID value to new on param
-     * @param  mixed $tributacao_id new value for TributacaoID
-     * @return Produto Self instance
+     * @param int $tributacao_id Set tributação for Produto
+     * @return self Self instance
      */
     public function setTributacaoID($tributacao_id)
     {
@@ -307,7 +345,7 @@ class Produto extends SyncModel
 
     /**
      * Descrição do produto, Ex.: Refri. Coca Cola 2L.
-     * @return mixed Descrição of Produto
+     * @return string descrição of Produto
      */
     public function getDescricao()
     {
@@ -316,8 +354,8 @@ class Produto extends SyncModel
 
     /**
      * Set Descricao value to new on param
-     * @param  mixed $descricao new value for Descricao
-     * @return Produto Self instance
+     * @param string $descricao Set descrição for Produto
+     * @return self Self instance
      */
     public function setDescricao($descricao)
     {
@@ -327,7 +365,7 @@ class Produto extends SyncModel
 
     /**
      * Nome abreviado do produto, Ex.: Cebola, Tomate, Queijo
-     * @return mixed Abreviação of Produto
+     * @return string abreviação of Produto
      */
     public function getAbreviacao()
     {
@@ -336,8 +374,8 @@ class Produto extends SyncModel
 
     /**
      * Set Abreviacao value to new on param
-     * @param  mixed $abreviacao new value for Abreviacao
-     * @return Produto Self instance
+     * @param string $abreviacao Set abreviação for Produto
+     * @return self Self instance
      */
     public function setAbreviacao($abreviacao)
     {
@@ -347,7 +385,7 @@ class Produto extends SyncModel
 
     /**
      * Informa detalhes do produto, Ex: Com Cebola, Pimenta, Orégano
-     * @return mixed Detalhes of Produto
+     * @return string detalhes of Produto
      */
     public function getDetalhes()
     {
@@ -356,8 +394,8 @@ class Produto extends SyncModel
 
     /**
      * Set Detalhes value to new on param
-     * @param  mixed $detalhes new value for Detalhes
-     * @return Produto Self instance
+     * @param string $detalhes Set detalhes for Produto
+     * @return self Self instance
      */
     public function setDetalhes($detalhes)
     {
@@ -368,7 +406,7 @@ class Produto extends SyncModel
     /**
      * Informa a quantidade limite para que o sistema avise que o produto já
      * está acabando
-     * @return mixed Quantidade limite of Produto
+     * @return float quantidade limite of Produto
      */
     public function getQuantidadeLimite()
     {
@@ -377,8 +415,8 @@ class Produto extends SyncModel
 
     /**
      * Set QuantidadeLimite value to new on param
-     * @param  mixed $quantidade_limite new value for QuantidadeLimite
-     * @return Produto Self instance
+     * @param float $quantidade_limite Set quantidade limite for Produto
+     * @return self Self instance
      */
     public function setQuantidadeLimite($quantidade_limite)
     {
@@ -389,7 +427,7 @@ class Produto extends SyncModel
     /**
      * Informa a quantidade máxima do produto no estoque, não proibe, apenas
      * avisa
-     * @return mixed Quantidade máxima of Produto
+     * @return float quantidade máxima of Produto
      */
     public function getQuantidadeMaxima()
     {
@@ -398,8 +436,8 @@ class Produto extends SyncModel
 
     /**
      * Set QuantidadeMaxima value to new on param
-     * @param  mixed $quantidade_maxima new value for QuantidadeMaxima
-     * @return Produto Self instance
+     * @param float $quantidade_maxima Set quantidade máxima for Produto
+     * @return self Self instance
      */
     public function setQuantidadeMaxima($quantidade_maxima)
     {
@@ -410,7 +448,7 @@ class Produto extends SyncModel
     /**
      * Informa o conteúdo do produto, Ex.: 2000 para 2L de conteúdo, 200 para
      * 200g de peso ou 1 para 1 unidade
-     * @return mixed Conteúdo of Produto
+     * @return float conteúdo of Produto
      */
     public function getConteudo()
     {
@@ -419,8 +457,8 @@ class Produto extends SyncModel
 
     /**
      * Set Conteudo value to new on param
-     * @param  mixed $conteudo new value for Conteudo
-     * @return Produto Self instance
+     * @param float $conteudo Set conteúdo for Produto
+     * @return self Self instance
      */
     public function setConteudo($conteudo)
     {
@@ -430,7 +468,7 @@ class Produto extends SyncModel
 
     /**
      * Preço de venda ou preço de venda base para pacotes
-     * @return mixed Preço de venda of Produto
+     * @return string preço de venda of Produto
      */
     public function getPrecoVenda()
     {
@@ -439,8 +477,8 @@ class Produto extends SyncModel
 
     /**
      * Set PrecoVenda value to new on param
-     * @param  mixed $preco_venda new value for PrecoVenda
-     * @return Produto Self instance
+     * @param string $preco_venda Set preço de venda for Produto
+     * @return self Self instance
      */
     public function setPrecoVenda($preco_venda)
     {
@@ -451,7 +489,7 @@ class Produto extends SyncModel
     /**
      * Informa qual o valor para o custo de produção do produto, utilizado
      * quando não há formação de composição do produto
-     * @return mixed Custo de produção of Produto
+     * @return string custo de produção of Produto
      */
     public function getCustoProducao()
     {
@@ -460,8 +498,8 @@ class Produto extends SyncModel
 
     /**
      * Set CustoProducao value to new on param
-     * @param  mixed $custo_producao new value for CustoProducao
-     * @return Produto Self instance
+     * @param string $custo_producao Set custo de produção for Produto
+     * @return self Self instance
      */
     public function setCustoProducao($custo_producao)
     {
@@ -474,7 +512,7 @@ class Produto extends SyncModel
      * estoque, Composição: Produto que não possui estoque diretamente, pois é
      * composto de outros produtos ou composições, Pacote: Permite a composição
      * no momento da venda, não possui estoque diretamente
-     * @return mixed Tipo of Produto
+     * @return string tipo of Produto
      */
     public function getTipo()
     {
@@ -483,8 +521,8 @@ class Produto extends SyncModel
 
     /**
      * Set Tipo value to new on param
-     * @param  mixed $tipo new value for Tipo
-     * @return Produto Self instance
+     * @param string $tipo Set tipo for Produto
+     * @return self Self instance
      */
     public function setTipo($tipo)
     {
@@ -495,7 +533,7 @@ class Produto extends SyncModel
     /**
      * Informa se deve ser cobrado a taxa de serviço dos garçons sobre este
      * produto
-     * @return mixed Cobrança de serviço of Produto
+     * @return string cobrança de serviço of Produto
      */
     public function getCobrarServico()
     {
@@ -514,8 +552,8 @@ class Produto extends SyncModel
 
     /**
      * Set CobrarServico value to new on param
-     * @param  mixed $cobrar_servico new value for CobrarServico
-     * @return Produto Self instance
+     * @param string $cobrar_servico Set cobrança de serviço for Produto
+     * @return self Self instance
      */
     public function setCobrarServico($cobrar_servico)
     {
@@ -525,7 +563,7 @@ class Produto extends SyncModel
 
     /**
      * Informa se o produto pode ser vendido fracionado
-     * @return mixed Divisível of Produto
+     * @return string divisível of Produto
      */
     public function getDivisivel()
     {
@@ -543,8 +581,8 @@ class Produto extends SyncModel
 
     /**
      * Set Divisivel value to new on param
-     * @param  mixed $divisivel new value for Divisivel
-     * @return Produto Self instance
+     * @param string $divisivel Set divisível for Produto
+     * @return self Self instance
      */
     public function setDivisivel($divisivel)
     {
@@ -555,7 +593,7 @@ class Produto extends SyncModel
     /**
      * Informa se o peso do produto deve ser obtido de uma balança,
      * obrigatoriamente o produto deve ser divisível
-     * @return mixed Pesável of Produto
+     * @return string pesável of Produto
      */
     public function getPesavel()
     {
@@ -574,8 +612,8 @@ class Produto extends SyncModel
 
     /**
      * Set Pesavel value to new on param
-     * @param  mixed $pesavel new value for Pesavel
-     * @return Produto Self instance
+     * @param string $pesavel Set pesável for Produto
+     * @return self Self instance
      */
     public function setPesavel($pesavel)
     {
@@ -585,7 +623,7 @@ class Produto extends SyncModel
 
     /**
      * Informa se o produto vence em pouco tempo
-     * @return mixed Perecível of Produto
+     * @return string perecível of Produto
      */
     public function getPerecivel()
     {
@@ -603,8 +641,8 @@ class Produto extends SyncModel
 
     /**
      * Set Perecivel value to new on param
-     * @param  mixed $perecivel new value for Perecivel
-     * @return Produto Self instance
+     * @param string $perecivel Set perecível for Produto
+     * @return self Self instance
      */
     public function setPerecivel($perecivel)
     {
@@ -615,7 +653,7 @@ class Produto extends SyncModel
     /**
      * Tempo de preparo em minutos para preparar uma composição, 0 para não
      * informado
-     * @return mixed Tempo de preparo of Produto
+     * @return int tempo de preparo of Produto
      */
     public function getTempoPreparo()
     {
@@ -624,8 +662,8 @@ class Produto extends SyncModel
 
     /**
      * Set TempoPreparo value to new on param
-     * @param  mixed $tempo_preparo new value for TempoPreparo
-     * @return Produto Self instance
+     * @param int $tempo_preparo Set tempo de preparo for Produto
+     * @return self Self instance
      */
     public function setTempoPreparo($tempo_preparo)
     {
@@ -635,7 +673,7 @@ class Produto extends SyncModel
 
     /**
      * Informa se o produto estará disponível para venda
-     * @return mixed Visível of Produto
+     * @return string visível of Produto
      */
     public function getVisivel()
     {
@@ -653,8 +691,8 @@ class Produto extends SyncModel
 
     /**
      * Set Visivel value to new on param
-     * @param  mixed $visivel new value for Visivel
-     * @return Produto Self instance
+     * @param string $visivel Set visível for Produto
+     * @return self Self instance
      */
     public function setVisivel($visivel)
     {
@@ -663,28 +701,77 @@ class Produto extends SyncModel
     }
 
     /**
-     * Imagem do produto
-     * @return mixed Imagem of Produto
+     * Informa se o produto é de uso interno e não está disponível para venda
+     * @return string interno of Produto
      */
-    public function getImagem()
+    public function getInterno()
     {
-        return $this->imagem;
+        return $this->interno;
     }
 
     /**
-     * Set Imagem value to new on param
-     * @param  mixed $imagem new value for Imagem
-     * @return Produto Self instance
+     * Informa se o produto é de uso interno e não está disponível para venda
+     * @return boolean Check if o of Interno is selected or checked
      */
-    public function setImagem($imagem)
+    public function isInterno()
     {
-        $this->imagem = $imagem;
+        return $this->interno == 'Y';
+    }
+
+    /**
+     * Set Interno value to new on param
+     * @param string $interno Set interno for Produto
+     * @return self Self instance
+     */
+    public function setInterno($interno)
+    {
+        $this->interno = $interno;
+        return $this;
+    }
+
+    /**
+     * Média das avaliações do último período
+     * @return float avaliação of Produto
+     */
+    public function getAvaliacao()
+    {
+        return $this->avaliacao;
+    }
+
+    /**
+     * Set Avaliacao value to new on param
+     * @param float $avaliacao Set avaliação for Produto
+     * @return self Self instance
+     */
+    public function setAvaliacao($avaliacao)
+    {
+        $this->avaliacao = $avaliacao;
+        return $this;
+    }
+
+    /**
+     * Imagem do produto
+     * @return string imagem of Produto
+     */
+    public function getImagemURL()
+    {
+        return $this->imagem_url;
+    }
+
+    /**
+     * Set ImagemURL value to new on param
+     * @param string $imagem_url Set imagem for Produto
+     * @return self Self instance
+     */
+    public function setImagemURL($imagem_url)
+    {
+        $this->imagem_url = $imagem_url;
         return $this;
     }
 
     /**
      * Data de atualização das informações do produto
-     * @return mixed Data de atualização of Produto
+     * @return string data de atualização of Produto
      */
     public function getDataAtualizacao()
     {
@@ -693,8 +780,8 @@ class Produto extends SyncModel
 
     /**
      * Set DataAtualizacao value to new on param
-     * @param  mixed $data_atualizacao new value for DataAtualizacao
-     * @return Produto Self instance
+     * @param string $data_atualizacao Set data de atualização for Produto
+     * @return self Self instance
      */
     public function setDataAtualizacao($data_atualizacao)
     {
@@ -703,14 +790,35 @@ class Produto extends SyncModel
     }
 
     /**
+     * Data em que o produto foi arquivado e não será mais usado
+     * @return string data de arquivação of Produto
+     */
+    public function getDataArquivado()
+    {
+        return $this->data_arquivado;
+    }
+
+    /**
+     * Set DataArquivado value to new on param
+     * @param string $data_arquivado Set data de arquivação for Produto
+     * @return self Self instance
+     */
+    public function setDataArquivado($data_arquivado)
+    {
+        $this->data_arquivado = $data_arquivado;
+        return $this;
+    }
+
+    /**
      * Convert this instance to array associated key -> value
-     * @param  boolean $recursive Allow rescursive conversion of fields
+     * @param boolean $recursive Allow rescursive conversion of fields
      * @return array All field and values into array format
      */
     public function toArray($recursive = false)
     {
         $produto = parent::toArray($recursive);
         $produto['id'] = $this->getID();
+        $produto['codigo'] = $this->getCodigo();
         $produto['codigobarras'] = $this->getCodigoBarras();
         $produto['categoriaid'] = $this->getCategoriaID();
         $produto['unidadeid'] = $this->getUnidadeID();
@@ -732,19 +840,22 @@ class Produto extends SyncModel
         $produto['perecivel'] = $this->getPerecivel();
         $produto['tempopreparo'] = $this->getTempoPreparo();
         $produto['visivel'] = $this->getVisivel();
-        $produto['imagem'] = $this->getImagem();
+        $produto['interno'] = $this->getInterno();
+        $produto['avaliacao'] = $this->getAvaliacao();
+        $produto['imagemurl'] = $this->getImagemURL();
         $produto['dataatualizacao'] = $this->getDataAtualizacao();
+        $produto['dataarquivado'] = $this->getDataArquivado();
         return $produto;
     }
 
     /**
      * Fill this instance with from array values, you can pass instance to
-     * @param  mixed $produto Associated key -> value to assign into this instance
-     * @return Produto Self instance
+     * @param mixed $produto Associated key -> value to assign into this instance
+     * @return self Self instance
      */
     public function fromArray($produto = [])
     {
-        if ($produto instanceof Produto) {
+        if ($produto instanceof self) {
             $produto = $produto->toArray();
         } elseif (!is_array($produto)) {
             $produto = [];
@@ -754,6 +865,11 @@ class Produto extends SyncModel
             $this->setID(null);
         } else {
             $this->setID($produto['id']);
+        }
+        if (!isset($produto['codigo'])) {
+            $this->setCodigo(null);
+        } else {
+            $this->setCodigo($produto['codigo']);
         }
         if (!array_key_exists('codigobarras', $produto)) {
             $this->setCodigoBarras(null);
@@ -801,22 +917,22 @@ class Produto extends SyncModel
             $this->setDetalhes($produto['detalhes']);
         }
         if (!isset($produto['quantidadelimite'])) {
-            $this->setQuantidadeLimite(0);
+            $this->setQuantidadeLimite(null);
         } else {
             $this->setQuantidadeLimite($produto['quantidadelimite']);
         }
         if (!isset($produto['quantidademaxima'])) {
-            $this->setQuantidadeMaxima(0);
+            $this->setQuantidadeMaxima(null);
         } else {
             $this->setQuantidadeMaxima($produto['quantidademaxima']);
         }
         if (!isset($produto['conteudo'])) {
-            $this->setConteudo(1);
+            $this->setConteudo(null);
         } else {
             $this->setConteudo($produto['conteudo']);
         }
         if (!isset($produto['precovenda'])) {
-            $this->setPrecoVenda(0);
+            $this->setPrecoVenda(null);
         } else {
             $this->setPrecoVenda($produto['precovenda']);
         }
@@ -860,15 +976,30 @@ class Produto extends SyncModel
         } else {
             $this->setVisivel($produto['visivel']);
         }
-        if (!array_key_exists('imagem', $produto)) {
-            $this->setImagem(null);
+        if (!isset($produto['interno'])) {
+            $this->setInterno('N');
         } else {
-            $this->setImagem($produto['imagem']);
+            $this->setInterno($produto['interno']);
+        }
+        if (!array_key_exists('avaliacao', $produto)) {
+            $this->setAvaliacao(null);
+        } else {
+            $this->setAvaliacao($produto['avaliacao']);
+        }
+        if (!array_key_exists('imagemurl', $produto)) {
+            $this->setImagemURL(null);
+        } else {
+            $this->setImagemURL($produto['imagemurl']);
         }
         if (!isset($produto['dataatualizacao'])) {
             $this->setDataAtualizacao(DB::now());
         } else {
             $this->setDataAtualizacao($produto['dataatualizacao']);
+        }
+        if (!array_key_exists('dataarquivado', $produto)) {
+            $this->setDataArquivado(null);
+        } else {
+            $this->setDataArquivado($produto['dataarquivado']);
         }
         return $this;
     }
@@ -885,16 +1016,16 @@ class Produto extends SyncModel
     /**
      * Get relative imagem path or default imagem
      * @param boolean $default If true return default image, otherwise check field
-     * @param string $default_name Default image name
+     * @param string  $default_name Default image name
      * @return string relative web path for produto imagem
      */
-    public function makeImagem($default = false, $default_name = 'produto.png')
+    public function makeImagemURL($default = false, $default_name = 'produto.png')
     {
-        $imagem = $this->getImagem();
+        $imagem_url = $this->getImagemURL();
         if ($default) {
-            $imagem = null;
+            $imagem_url = null;
         }
-        return get_image_url($imagem, 'produto', $default_name);
+        return get_image_url($imagem_url, 'produto', $default_name);
     }
 
     public function getEstoque($setor_id = null)
@@ -909,20 +1040,21 @@ class Produto extends SyncModel
     public function publish()
     {
         $produto = parent::publish();
-        $produto['imagem'] = $this->makeImagem(false, null);
+        $produto['imagemurl'] = $this->makeImagemURL(false, null);
         return $produto;
     }
 
     /**
      * Filter fields, upload data and keep key data
-     * @param Produto $original Original instance without modifications
+     * @param self $original Original instance without modifications
+     * @param boolean $localized Informs if fields are localized
+     * @return self Self instance
      */
     public function filter($original, $localized = false)
     {
-        global $app;
-
-        $this->setID(Filter::number($this->getID()));
+        $this->setID($original->getID());
         $this->setTributacaoID($original->getTributacaoID());
+        $this->setCodigo(Filter::number($this->getCodigo()));
         $this->setCodigoBarras(Filter::string($this->getCodigoBarras()));
         $this->setCategoriaID(Filter::number($this->getCategoriaID()));
         $this->setUnidadeID(Filter::number($this->getUnidadeID()));
@@ -937,131 +1069,143 @@ class Produto extends SyncModel
         $this->setPrecoVenda(Filter::money($this->getPrecoVenda(), $localized));
         $this->setCustoProducao(Filter::money($this->getCustoProducao(), $localized));
         $this->setTempoPreparo(Filter::number($this->getTempoPreparo()));
-        $imagem = upload_image('raw_imagem', 'produto', null, 256, 256, true, 'crop');
-        if (is_null($imagem) && trim($this->getImagem()) != '') {
-            $this->setImagem(true);
+        $this->setAvaliacao(Filter::float($this->getAvaliacao(), $localized));
+        $imagem_url = upload_image('raw_imagemurl', 'produto', null, 256, 256, true, 'crop');
+        if (is_null($imagem_url) && trim($this->getImagemURL()) != '') {
+            $this->setImagemURL($original->getImagemURL());
         } else {
-            $this->setImagem($imagem);
-            $image_path = $app->getPath('public') . $this->makeImagem();
-            if (!is_null($imagem)) {
-                $this->setImagem(file_get_contents($image_path));
-                @unlink($image_path);
-            }
+            $this->setImagemURL($imagem_url);
         }
+        $this->setDataArquivado(Filter::datetime($this->getDataArquivado()));
+        return $this;
     }
 
     /**
      * Clean instance resources like images and docs
-     * @param  Produto $dependency Don't clean when dependency use same resources
+     * @param self $dependency Don't clean when dependency use same resources
      */
     public function clean($dependency)
     {
-        $this->setImagem($dependency->getImagem());
+        if (!is_null($this->getImagemURL()) && $dependency->getImagemURL() != $this->getImagemURL()) {
+            @unlink(get_image_path($this->getImagemURL(), 'produto'));
+        }
+        $this->setImagemURL($dependency->getImagemURL());
     }
 
     /**
      * Validate fields updating them and throw exception when invalid data has found
      * @return array All field of Produto in array format
+     * @throws \MZ\Exception\ValidationException for invalid input data
      */
     public function validate()
     {
         $errors = [];
+        if (is_null($this->getCodigo())) {
+            $errors['codigo'] = _t('produto.codigo_cannot_empty');
+        }
         if (is_null($this->getCategoriaID())) {
-            $errors['categoriaid'] = 'A categoria não pode ser vazia';
+            $errors['categoriaid'] = _t('produto.categoria_id_cannot_empty');
         }
         if (is_null($this->getUnidadeID())) {
-            $errors['unidadeid'] = 'A unidade não pode ser vazia';
+            $errors['unidadeid'] = _t('produto.unidade_id_cannot_empty');
         }
         if (is_null($this->getDescricao())) {
-            $errors['descricao'] = 'A descrição não pode ser vazia';
+            $errors['descricao'] = _t('produto.descricao_cannot_empty');
         }
         if (is_null($this->getQuantidadeLimite())) {
-            $errors['quantidadelimite'] = 'A quantidade limite não pode ser vazia';
+            $errors['quantidadelimite'] = _t('produto.quantidade_limite_cannot_empty');
         } elseif ($this->getQuantidadeLimite() < 0) {
-            $errors['quantidadelimite'] = 'A quantidade limite não pode ser negativa';
+            $errors['quantidadelimite'] = _t('produto.quantidade_limite_cannot_negative');
         }
         if (is_null($this->getQuantidadeMaxima())) {
-            $errors['quantidademaxima'] = 'A quantidade máxima não pode ser vazia';
+            $errors['quantidademaxima'] = _t('produto.quantidade_maxima_cannot_empty');
         } elseif ($this->getQuantidadeMaxima() < 0) {
-            $errors['quantidademaxima'] = 'A quantidade máxima não pode ser negativa';
+            $errors['quantidademaxima'] = _t('produto.quantidade_maxima_cannot_negative');
         }
         if (is_null($this->getConteudo())) {
-            $errors['conteudo'] = 'O conteúdo não pode ser vazio';
+            $errors['conteudo'] = _t('produto.conteudo_cannot_empty');
         } else {
             $unidade = $this->findUnidadeID();
             if (is_equal($this->getConteudo(), 0, 0.0001)) {
-                $errors['conteudo'] = 'O conteúdo não pode ser nulo';
+                $errors['conteudo'] = _t('produto.conteudo_cannot_zero');
             } elseif ($this->getConteudo() != 1 && strtoupper($unidade->getSigla()) == Unidade::SIGLA_UNITARIA) {
-                $errors['conteudo'] = 'O conteúdo deve ser unitário com valor 1';
+                $errors['conteudo'] = _t('produto.conteudo_must_unitary');
             }
         }
         if (is_null($this->getPrecoVenda())) {
-            $errors['precovenda'] = 'O preço de venda não pode ser vazio';
+            $errors['precovenda'] = _t('produto.preco_venda_cannot_empty');
         } elseif ($this->getPrecoVenda() < 0) {
-            $errors['precovenda'] = 'O preço de venda não pode ser negativo';
+            $errors['precovenda'] = _t('produto.preco_venda_cannot_negative');
         }
         if ($this->getCustoProducao() < 0) {
-            $errors['custoproducao'] = 'O custo de produção não pode ser negativo';
+            $errors['custoproducao'] = _t('produto.custo_producao_cannot_negative');
         }
         if (!Validator::checkInSet($this->getTipo(), self::getTipoOptions())) {
-            $errors['tipo'] = 'O tipo é inválido';
+            $errors['tipo'] = _t('produto.tipo_invalid');
         }
         if ($this->getTipo() == self::TIPO_PACOTE &&
             Pacote::count(['produtoid' => $this->getID()]) > 0
         ) {
-            $errors['tipo'] = 'O produto não pode ser um pacote pois já faz parte de um';
+            $errors['tipo'] = _t('produto.tipo_already_packaged');
         }
         if (!Validator::checkBoolean($this->getCobrarServico())) {
-            $errors['cobrarservico'] = 'A cobrança de serviço é inválida';
+            $errors['cobrarservico'] = _t('produto.cobrar_servico_invalid');
         }
         if (!Validator::checkBoolean($this->getDivisivel())) {
-            $errors['divisivel'] = 'O divisível é inválido';
+            $errors['divisivel'] = _t('produto.divisivel_invalid');
         }
         if (!Validator::checkBoolean($this->getPesavel())) {
-            $errors['pesavel'] = 'O pesável é inválido';
+            $errors['pesavel'] = _t('produto.pesavel_invalid');
         }
         if (!Validator::checkBoolean($this->getPerecivel())) {
-            $errors['perecivel'] = 'O perecível é inválido';
+            $errors['perecivel'] = _t('produto.perecivel_invalid');
         }
         if (is_null($this->getTempoPreparo())) {
-            $errors['tempopreparo'] = 'O tempo de preparo não pode ser vazio';
+            $errors['tempopreparo'] = _t('produto.tempo_preparo_cannot_empty');
         } elseif ($this->getTempoPreparo() < 0) {
-            $errors['tempopreparo'] = 'O tempo de preparo não pode ser negativo';
+            $errors['tempopreparo'] = _t('produto.tempo_preparo_cannot_negative');
         }
         if (!Validator::checkBoolean($this->getVisivel())) {
-            $errors['visivel'] = 'O visível é inválido';
+            $errors['visivel'] = _t('produto.visivel_invalid');
+        }
+        if (!Validator::checkBoolean($this->getInterno())) {
+            $errors['interno'] = _t('produto.interno_invalid');
         }
         $this->setDataAtualizacao(DB::now());
         if (!empty($errors)) {
-            throw new \MZ\Exception\ValidationException($errors);
+            throw new ValidationException($errors);
         }
-        $values = $this->toArray();
-        if ($this->getImagem() === true) {
-            unset($values['imagem']);
-        }
-        return $values;
+        return $this->toArray();
     }
 
     /**
      * Translate SQL exception into application exception
-     * @param  \Exception $e exception to translate into a readable error
+     * @param \Exception $e exception to translate into a readable error
      * @return \MZ\Exception\ValidationException new exception translated
      */
     protected function translate($e)
     {
         if (contains(['Descricao', 'UNIQUE'], $e->getMessage())) {
-            return new \MZ\Exception\ValidationException([
-                'descricao' => sprintf(
-                    'A descrição "%s" já está cadastrada',
+            return new ValidationException([
+                'descricao' => _t(
+                    'produto.descricao_used',
                     $this->getDescricao()
                 ),
             ]);
         }
-        if (contains(['CodBarras', 'UNIQUE'], $e->getMessage())) {
-            return new \MZ\Exception\ValidationException([
-                'codigobarras' => sprintf(
-                    'O código de barras "%s" já está cadastrado',
+        if (contains(['CodigoBarras', 'UNIQUE'], $e->getMessage())) {
+            return new ValidationException([
+                'codigobarras' => _t(
+                    'produto.codigo_barras_used',
                     $this->getCodigoBarras()
+                ),
+            ]);
+        }
+        if (contains(['Codigo', 'UNIQUE'], $e->getMessage())) {
+            return new ValidationException([
+                'codigo' => _t(
+                    'produto.codigo_used',
+                    $this->getCodigo()
                 ),
             ]);
         }
@@ -1070,11 +1214,14 @@ class Produto extends SyncModel
 
     /**
      * Insert a new Produto into the database and fill instance from database
-     * @return Produto Self instance
+     * @return self Self instance
+     * @throws \MZ\Exception\ValidationException for invalid input data
      */
     public function insert()
     {
+        $this->setID(null);
         $values = $this->validate();
+        unset($values['id']);
         try {
             $id = DB::insertInto('Produtos')->values($values)->execute();
             $this->setID($id);
@@ -1087,36 +1234,42 @@ class Produto extends SyncModel
 
     /**
      * Update Produto with instance values into database for ID
-     * @param  array $only Save these fields only, when empty save all fields except id
-     * @return Produto Self instance
+     * @param array $only Save these fields only, when empty save all fields except id
+     * @return int rows affected
+     * @throws \MZ\Exception\ValidationException for invalid input data
      */
     public function update($only = [])
     {
         $values = $this->validate();
         if (!$this->exists()) {
-            throw new \Exception('O identificador do produto não foi informado');
+            throw new ValidationException(
+                ['id' => _t('produto.id_cannot_empty')]
+            );
         }
         $values = DB::filterValues($values, $only, false);
         try {
-            DB::update('Produtos')
+            $affected = DB::update('Produtos')
                 ->set($values)
-                ->where('id', $this->getID())
+                ->where(['id' => $this->getID()])
                 ->execute();
             $this->loadByID();
         } catch (\Exception $e) {
             throw $this->translate($e);
         }
-        return $this;
+        return $affected;
     }
 
     /**
      * Delete this instance from database using ID
      * @return integer Number of rows deleted (Max 1)
+     * @throws \MZ\Exception\ValidationException for invalid id
      */
     public function delete()
     {
         if (!$this->exists()) {
-            throw new \Exception('O identificador do produto não foi informado');
+            throw new ValidationException(
+                ['id' => _t('produto.id_cannot_empty')]
+            );
         }
         $result = DB::deleteFrom('Produtos')
             ->where('id', $this->getID())
@@ -1126,9 +1279,9 @@ class Produto extends SyncModel
 
     /**
      * Load one register for it self with a condition
-     * @param  array $condition Condition for searching the row
-     * @param  array $order associative field name -> [-1, 1]
-     * @return Produto Self instance filled or empty
+     * @param array $condition Condition for searching the row
+     * @param array $order associative field name -> [-1, 1]
+     * @return self Self instance filled or empty
      */
     public function load($condition, $order = [])
     {
@@ -1139,40 +1292,35 @@ class Produto extends SyncModel
 
     /**
      * Load into this object from database using, Descricao
-     * @param  string $descricao descrição to find Produto
-     * @return Produto Self filled instance or empty when not found
+     * @return self Self filled instance or empty when not found
      */
-    public function loadByDescricao($descricao)
+    public function loadByDescricao()
     {
         return $this->load([
-            'descricao' => strval($descricao),
+            'descricao' => strval($this->getDescricao()),
         ]);
     }
 
     /**
      * Load into this object from database using, CodigoBarras
-     * @param  string $codigo_barras código de barras to find Produto
-     * @return Produto Self filled instance or empty when not found
+     * @return self Self filled instance or empty when not found
      */
-    public function loadByCodigoBarras($codigo_barras)
+    public function loadByCodigoBarras()
     {
         return $this->load([
-            'codigobarras' => strval($codigo_barras),
+            'codigobarras' => strval($this->getCodigoBarras()),
         ]);
     }
 
     /**
-     * Load image data from blob field on database
-     * @return Produto Self instance with imagem field filled
+     * Load into this object from database using, Codigo
+     * @return self Self filled instance or empty when not found
      */
-    public function loadImagem()
+    public function loadByCodigo()
     {
-        $imagem = DB::from('Produtos p')
-            ->select(null)
-            ->select('p.imagem')
-            ->where('p.id', $this->getID())
-            ->fetchColumn();
-        return $this->setImagem($imagem);
+        return $this->load([
+            'codigo' => intval($this->getCodigo()),
+        ]);
     }
 
     /**
@@ -1232,15 +1380,15 @@ class Produto extends SyncModel
 
     /**
      * Gets textual and translated Tipo for Produto
-     * @param  int $index choose option from index
-     * @return mixed A associative key -> translated representative text or text for index
+     * @param int $index choose option from index
+     * @return string[]|string A associative key -> translated representative text or text for index
      */
     public static function getTipoOptions($index = null)
     {
         $options = [
-            self::TIPO_PRODUTO => 'Produto',
-            self::TIPO_COMPOSICAO => 'Composição',
-            self::TIPO_PACOTE => 'Pacote',
+            self::TIPO_PRODUTO => _t('produto.tipo_produto'),
+            self::TIPO_COMPOSICAO => _t('produto.tipo_composicao'),
+            self::TIPO_PACOTE => _t('produto.tipo_pacote'),
         ];
         if (!is_null($index)) {
             return $options[$index];
@@ -1254,14 +1402,14 @@ class Produto extends SyncModel
      */
     private static function getAllowedKeys()
     {
-        $produto = new Produto();
+        $produto = new self();
         $allowed = Filter::concatKeys('p.', $produto->toArray());
         return $allowed;
     }
 
     /**
      * Filter order array
-     * @param  mixed $order order string or array to parse and filter allowed
+     * @param mixed $order order string or array to parse and filter allowed
      * @return array allowed associative order
      */
     private static function filterOrder($order)
@@ -1272,7 +1420,7 @@ class Produto extends SyncModel
 
     /**
      * Filter condition array with allowed fields
-     * @param  array $condition condition to filter rows
+     * @param array $condition condition to filter rows
      * @return array allowed condition
      */
     private static function filterCondition($condition)
@@ -1297,8 +1445,8 @@ class Produto extends SyncModel
 
     /**
      * Fetch data from database with a condition
-     * @param  array $condition condition to filter rows
-     * @param  array $order order rows
+     * @param array $condition condition to filter rows
+     * @param array $order order rows
      * @return SelectQuery query object with condition statement
      */
     private static function query($condition = [], $order = [])
@@ -1311,6 +1459,7 @@ class Produto extends SyncModel
         $query = DB::from('Produtos p')
             ->select(null)
             ->select('p.id')
+            ->select('p.codigo')
             ->select('p.codigobarras')
             ->select('p.categoriaid')
             ->select('p.unidadeid')
@@ -1335,16 +1484,19 @@ class Produto extends SyncModel
             ->select('p.perecivel')
             ->select('p.tempopreparo')
             ->select('p.visivel')
-            ->select(
-                '(CASE WHEN p.imagem IS NULL THEN NULL ELSE '.
-                DB::concat(['p.id', '".png"']).
-                ' END) as imagem'
-            )
+            ->select('p.interno')
+            ->select('p.avaliacao')
+            ->select('p.imagemurl')
             ->select('p.dataatualizacao')
+            ->select('p.dataarquivado')
             ->leftJoin(
                 'Promocoes r ON r.produtoid = p.id AND ' .
-                '? BETWEEN r.inicio AND r.fim',
-                $week_offset
+                '? BETWEEN r.inicio AND r.fim AND ' .
+                'r.agendamento = ? AND ' .
+                'r.evento = ?',
+                $week_offset,
+                'N',
+                'N'
             )
             ->leftJoin('Categorias c ON c.id = p.categoriaid');
         if ($estoque) {
@@ -1375,7 +1527,7 @@ class Produto extends SyncModel
             $search = trim($condition['search']);
             if (Validator::checkDigits($search)) {
                 $query = $query->where(
-                    '(p.id = ? OR p.codigobarras = ?)',
+                    '(p.codigo = ? OR p.codigobarras = ?)',
                     intval($search),
                     Filter::digits($search)
                 );
@@ -1414,46 +1566,75 @@ class Produto extends SyncModel
 
     /**
      * Search one register with a condition
-     * @param  array $condition Condition for searching the row
-     * @param  array $order order rows
-     * @return Produto A filled Produto or empty instance
+     * @param array $condition Condition for searching the row
+     * @param array $order order rows
+     * @return self A filled Produto or empty instance
      */
     public static function find($condition, $order = [])
     {
-        $query = self::query($condition, $order)->limit(1);
-        $row = $query->fetch() ?: [];
-        return new Produto($row);
+        $result = new self();
+        return $result->load($condition, $order);
+    }
+
+    /**
+     * Search one register with a condition
+     * @param array $condition Condition for searching the row
+     * @param array $order order rows
+     * @return self A filled Produto or empty instance
+     * @throws \Exception when register has not found
+     */
+    public static function findOrFail($condition, $order = [])
+    {
+        $result = self::find($condition, $order);
+        if (!$result->exists()) {
+            throw new \Exception(_t('produto.not_found'), 404);
+        }
+        return $result;
     }
 
     /**
      * Find this object on database using, Descricao
-     * @param  string $descricao descrição to find Produto
-     * @return Produto A filled instance or empty when not found
+     * @param string $descricao descrição to find Produto
+     * @return self A filled instance or empty when not found
      */
     public static function findByDescricao($descricao)
     {
         $result = new self();
-        return $result->loadByDescricao($descricao);
+        $result->setDescricao($descricao);
+        return $result->loadByDescricao();
     }
 
     /**
      * Find this object on database using, CodigoBarras
-     * @param  string $codigo_barras código de barras to find Produto
-     * @return Produto A filled instance or empty when not found
+     * @param string $codigo_barras código de barras to find Produto
+     * @return self A filled instance or empty when not found
      */
     public static function findByCodigoBarras($codigo_barras)
     {
         $result = new self();
-        return $result->loadByCodigoBarras($codigo_barras);
+        $result->setCodigoBarras($codigo_barras);
+        return $result->loadByCodigoBarras();
+    }
+
+    /**
+     * Find this object on database using, Codigo
+     * @param int $codigo código to find Produto
+     * @return self A filled instance or empty when not found
+     */
+    public static function findByCodigo($codigo)
+    {
+        $result = new self();
+        $result->setCodigo($codigo);
+        return $result->loadByCodigo();
     }
 
     /**
      * Find all Produto
-     * @param  array  $condition Condition to get all Produto
-     * @param  array  $order     Order Produto
-     * @param  int    $limit     Limit data into row count
-     * @param  int    $offset    Start offset to get rows
-     * @return array             List of all rows instanced as Produto
+     * @param array  $condition Condition to get all Produto
+     * @param array  $order     Order Produto
+     * @param int    $limit     Limit data into row count
+     * @param int    $offset    Start offset to get rows
+     * @return self[]             List of all rows instanced as Produto
      */
     public static function findAll($condition = [], $order = [], $limit = null, $offset = null)
     {
@@ -1467,18 +1648,18 @@ class Produto extends SyncModel
         $rows = $query->fetchAll();
         $result = [];
         foreach ($rows as $row) {
-            $result[] = new Produto($row);
+            $result[] = new self($row);
         }
         return $result;
     }
 
     /**
      * Find all Produto
-     * @param  array  $condition Condition to get all Produto
-     * @param  array  $order     Order Produto
-     * @param  int    $limit     Limit data into row count
-     * @param  int    $offset    Start offset to get rows
-     * @return array             List of all rows
+     * @param array  $condition Condition to get all Produto
+     * @param array  $order     Order Produto
+     * @param int    $limit     Limit data into row count
+     * @param int    $offset    Start offset to get rows
+     * @return array List of all rows as array
      */
     public static function rawFindAll($condition = [], $order = [], $limit = null, $offset = null)
     {
@@ -1494,7 +1675,7 @@ class Produto extends SyncModel
 
     /**
      * Count all rows from database with matched condition critery
-     * @param  array $condition condition to filter rows
+     * @param array $condition condition to filter rows
      * @return integer Quantity of rows
      */
     public static function count($condition = [])

@@ -26,29 +26,29 @@ namespace MZ\Session;
 
 use MZ\System\Permissao;
 use MZ\Util\Filter;
+use MZ\Core\PageController;
 
 /**
  * Allow application to serve system resources
  */
-class MovimentacaoPageController extends \MZ\Core\Controller
+class MovimentacaoPageController extends PageController
 {
     public function find()
     {
-        need_permission(Permissao::NOME_ABRIRCAIXA, is_output('json'));
+        $this->needPermission([Permissao::NOME_ABRIRCAIXA]);
 
-        $limite = isset($_GET['limite']) ? intval($_GET['limite']) : 10;
-        if ($limite > 100 || $limite < 1) {
-            $limite = 10;
-        }
-        $condition = Filter::query($_GET);
+        $limite = max(1, min(100, $this->getRequest()->query->getInt('limite', 10)));
+        $condition = Filter::query($this->getRequest()->query->all());
         unset($condition['ordem']);
         $movimentacao = new Movimentacao($condition);
-        $order = Filter::order(isset($_GET['ordem']) ? $_GET['ordem'] : '');
+        $order = Filter::order($this->getRequest()->query->get('ordem', ''));
         $count = Movimentacao::count($condition);
-        list($pagesize, $offset, $pagination) = pagestring($count, $limite);
-        $movimentacoes = Movimentacao::findAll($condition, $order, $pagesize, $offset);
+        $page = max(1, $this->getRequest()->query->getInt('pagina', 1));
+        $pager = new \Pager($count, $limite, $page, 'pagina');
+        $pagination = $pager->genBasic();
+        $movimentacoes = Movimentacao::findAll($condition, $order, $limite, $pager->offset);
 
-        if (is_output('json')) {
+        if ($this->isJson()) {
             $items = [];
             foreach ($movimentacoes as $_movimentacao) {
                 $items[] = $_movimentacao->publish();

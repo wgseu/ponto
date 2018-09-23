@@ -26,6 +26,7 @@ namespace MZ\Session;
 
 use MZ\Account\Cliente;
 use MZ\Database\DB;
+use MZ\Provider\PrestadorTest;
 
 class CaixaTest extends \MZ\Framework\TestCase
 {
@@ -55,7 +56,7 @@ class CaixaTest extends \MZ\Framework\TestCase
             'serie' => 'a1t2',
             'numeroinicial' => 'b5a3',
         ]);
-        $caixa->filter($old_caixa);
+        $caixa->filter($old_caixa, true);
         $this->assertEquals($old_caixa, $caixa);
     }
 
@@ -123,17 +124,15 @@ class CaixaTest extends \MZ\Framework\TestCase
 
     public function testSerie()
     {
-        global $app;
-
-        $old_value = $app->getSystem()->getBusiness()->getOptions()->getValue('Sistema', 'Fiscal.Mostrar');
-        $app->getSystem()->getBusiness()->getOptions()->setValue('Sistema', 'Fiscal.Mostrar', true);
+        $old_value = app()->getSystem()->getBusiness()->getOptions()->getValue('Sistema', 'Fiscal.Mostrar');
+        app()->getSystem()->getBusiness()->getOptions()->setValue('Sistema', 'Fiscal.Mostrar', true);
         $caixa = new Caixa();
         $caixa->setDescricao('Caixa 6');
         $caixa->setSerie(4);
         $caixa->setNumeroInicial(100);
         $caixa->setAtivo('Y');
         $caixa->insert();
-        $app->getSystem()->getBusiness()->getOptions()->setValue('Sistema', 'Fiscal.Mostrar', $old_value);
+        app()->getSystem()->getBusiness()->getOptions()->setValue('Sistema', 'Fiscal.Mostrar', $old_value);
 
         $found_caixa = Caixa::findBySerie(4);
         $this->assertEquals($caixa, $found_caixa);
@@ -169,10 +168,8 @@ class CaixaTest extends \MZ\Framework\TestCase
 
     public function testValidate()
     {
-        global $app;
-        
-        $old_value = $app->getSystem()->getBusiness()->getOptions()->getValue('Sistema', 'Fiscal.Mostrar');
-        $app->getSystem()->getBusiness()->getOptions()->setValue('Sistema', 'Fiscal.Mostrar', true);
+        $old_value = app()->getSystem()->getBusiness()->getOptions()->getValue('Sistema', 'Fiscal.Mostrar');
+        app()->getSystem()->getBusiness()->getOptions()->setValue('Sistema', 'Fiscal.Mostrar', true);
         $this->expectException('\MZ\Exception\ValidationException');
         try {
             $caixa = new Caixa();
@@ -185,7 +182,7 @@ class CaixaTest extends \MZ\Framework\TestCase
             );
             throw $e;
         } finally {
-            $app->getSystem()->getBusiness()->getOptions()->setValue('Sistema', 'Fiscal.Mostrar', $old_value);
+            app()->getSystem()->getBusiness()->getOptions()->setValue('Sistema', 'Fiscal.Mostrar', $old_value);
         }
     }
 
@@ -200,25 +197,13 @@ class CaixaTest extends \MZ\Framework\TestCase
         $sessao->setAberta('Y');
         $sessao->insert();
 
-        $cliente = new Cliente();
-        $cliente->setNomeCompleto('Fulano da Silva');
-        $cliente->setGenero(Cliente::GENERO_MASCULINO);
-        $cliente->setEmail('fulano@email.com');
-        $cliente->setLogin('fulano');
-        $cliente->setSenha('1234');
-        $cliente->insert();
-
-        $funcao = \MZ\Provider\Funcao::find([], ['id' => 1]);
-
-        $funcionario = new \MZ\Provider\Prestador();
-        $funcionario->setFuncaoID($funcao->getID());
-        $funcionario->setClienteID($cliente->getID());
-        $funcionario->insert();
+        $funcao = \MZ\Provider\FuncaoTest::create([]);
+        $funcionario = \MZ\Provider\PrestadorTest::create($funcao);
 
         $movimentacao = new Movimentacao();
         $movimentacao->setSessaoID($sessao->getID());
         $movimentacao->setCaixaID($caixa->getID());
-        $movimentacao->setFuncionarioAberturaID($funcionario->getID());
+        $movimentacao->setIniciadorID($funcionario->getID());
         $movimentacao->setAberta('Y');
         $movimentacao->insert();
 
@@ -233,7 +218,7 @@ class CaixaTest extends \MZ\Framework\TestCase
         } finally {
             try {
                 $movimentacao->setDataFechamento(DB::now());
-                $movimentacao->setFuncionarioFechamentoID($funcionario->getID());
+                $movimentacao->setFechadorID($funcionario->getID());
                 $movimentacao->update();
         
                 $sessao->setAberta('N');

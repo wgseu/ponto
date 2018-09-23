@@ -26,6 +26,24 @@ namespace MZ\Product;
 
 class CategoriaTest extends \MZ\Framework\TestCase
 {
+    public static function build($descricao = null)
+    {
+        $last = Categoria::find([], ['id' => -1]);
+        $id = $last->getID() + 1;
+        $categoria = new Categoria();
+        $categoria->setDescricao($descricao ?: "Categoria #{$id}");
+        $categoria->setServico('Y');
+        $categoria->setOrdem(0);
+        return $categoria;
+    }
+
+    public static function create($descricao = null)
+    {
+        $categoria = self::build($descricao);
+        $categoria->insert();
+        return $categoria;
+    }
+
     public function testFromArray()
     {
         $old_categoria = new Categoria([
@@ -53,7 +71,6 @@ class CategoriaTest extends \MZ\Framework\TestCase
             'categoriaid' => 1234,
             'descricao' => 'Categoria filter',
             'servico' => 'Y',
-            'imagem' => "\x5\x0\x3",
             'dataatualizacao' => '2016-12-23 12:15:00',
         ]);
         $categoria = new Categoria([
@@ -61,11 +78,9 @@ class CategoriaTest extends \MZ\Framework\TestCase
             'categoriaid' => '1.234',
             'descricao' => ' Categoria <script>filter</script> ',
             'servico' => 'Y',
-            'imagem' => "\x5\x0\x3",
             'dataatualizacao' => '2016-12-23 12:15:00',
         ]);
-        $categoria->filter($old_categoria);
-        $old_categoria->setImagem(true);
+        $categoria->filter($old_categoria, true);
         $this->assertEquals($old_categoria, $categoria);
     }
 
@@ -78,8 +93,10 @@ class CategoriaTest extends \MZ\Framework\TestCase
             'categoriaid',
             'descricao',
             'servico',
-            'imagem',
+            'imagemurl',
+            'ordem',
             'dataatualizacao',
+            'dataarquivado',
         ];
         $this->assertEquals($allowed, array_keys($values));
     }
@@ -162,17 +179,9 @@ class CategoriaTest extends \MZ\Framework\TestCase
         $this->assertEquals($categoria, $found_categoria);
         $found_categoria = Categoria::find(['search' => 'find']);
         $this->assertEquals($categoria, $found_categoria);
-        $unidade = new Unidade();
-        $unidade->setNome('Nome da unidade');
-        $unidade->setSigla('UND');
-        $unidade->insert();
-        $produto = new Produto();
-        $produto->setDescricao('Produto da categoria');
+        $produto = ProdutoTest::create();
         $produto->setCategoriaID($categoria->getID());
-        $produto->setUnidadeID($unidade->getID());
-        $produto->setTipo(Produto::TIPO_PRODUTO);
-        $produto->setVisivel('Y');
-        $produto->insert();
+        $produto->update();
         $found_categoria = Categoria::find(['id' => $categoria->getID(), 'disponivel' => 'Y']);
         $this->assertEquals($categoria, $found_categoria);
         $found_categoria = Categoria::find(['id' => $categoria->getID(), 'disponivel' => 'N']);

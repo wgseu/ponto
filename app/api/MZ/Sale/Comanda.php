@@ -24,10 +24,12 @@
  */
 namespace MZ\Sale;
 
-use MZ\Database\SyncModel;
-use MZ\Database\DB;
+use MZ\Util\Mask;
 use MZ\Util\Filter;
 use MZ\Util\Validator;
+use MZ\Database\DB;
+use MZ\Database\SyncModel;
+use MZ\Exception\ValidationException;
 
 /**
  * Comanda individual, permite lançar pedidos em cartões de consumo
@@ -39,6 +41,10 @@ class Comanda extends SyncModel
      * Número da comanda
      */
     private $id;
+    /**
+     * Número da comanda
+     */
+    private $numero;
     /**
      * Nome da comanda
      */
@@ -59,7 +65,7 @@ class Comanda extends SyncModel
 
     /**
      * Número da comanda
-     * @return mixed Número of Comanda
+     * @return int número of Comanda
      */
     public function getID()
     {
@@ -68,8 +74,8 @@ class Comanda extends SyncModel
 
     /**
      * Set ID value to new on param
-     * @param  mixed $id new value for ID
-     * @return Comanda Self instance
+     * @param int $id Set número for Comanda
+     * @return self Self instance
      */
     public function setID($id)
     {
@@ -78,8 +84,28 @@ class Comanda extends SyncModel
     }
 
     /**
+     * Número da comanda
+     * @return int número of Comanda
+     */
+    public function getNumero()
+    {
+        return $this->numero;
+    }
+
+    /**
+     * Set Numero value to new on param
+     * @param int $numero Set número for Comanda
+     * @return self Self instance
+     */
+    public function setNumero($numero)
+    {
+        $this->numero = $numero;
+        return $this;
+    }
+
+    /**
      * Nome da comanda
-     * @return mixed Nome of Comanda
+     * @return string nome of Comanda
      */
     public function getNome()
     {
@@ -88,8 +114,8 @@ class Comanda extends SyncModel
 
     /**
      * Set Nome value to new on param
-     * @param  mixed $nome new value for Nome
-     * @return Comanda Self instance
+     * @param string $nome Set nome for Comanda
+     * @return self Self instance
      */
     public function setNome($nome)
     {
@@ -99,7 +125,7 @@ class Comanda extends SyncModel
 
     /**
      * Informa se a comanda está diponível para ser usada nas vendas
-     * @return mixed Ativa of Comanda
+     * @return string ativa of Comanda
      */
     public function getAtiva()
     {
@@ -117,8 +143,8 @@ class Comanda extends SyncModel
 
     /**
      * Set Ativa value to new on param
-     * @param  mixed $ativa new value for Ativa
-     * @return Comanda Self instance
+     * @param string $ativa Set ativa for Comanda
+     * @return self Self instance
      */
     public function setAtiva($ativa)
     {
@@ -128,13 +154,14 @@ class Comanda extends SyncModel
 
     /**
      * Convert this instance to array associated key -> value
-     * @param  boolean $recursive Allow rescursive conversion of fields
+     * @param boolean $recursive Allow rescursive conversion of fields
      * @return array All field and values into array format
      */
     public function toArray($recursive = false)
     {
         $comanda = parent::toArray($recursive);
         $comanda['id'] = $this->getID();
+        $comanda['numero'] = $this->getNumero();
         $comanda['nome'] = $this->getNome();
         $comanda['ativa'] = $this->getAtiva();
         return $comanda;
@@ -142,12 +169,12 @@ class Comanda extends SyncModel
 
     /**
      * Fill this instance with from array values, you can pass instance to
-     * @param  mixed $comanda Associated key -> value to assign into this instance
-     * @return Comanda Self instance
+     * @param mixed $comanda Associated key -> value to assign into this instance
+     * @return self Self instance
      */
     public function fromArray($comanda = [])
     {
-        if ($comanda instanceof Comanda) {
+        if ($comanda instanceof self) {
             $comanda = $comanda->toArray();
         } elseif (!is_array($comanda)) {
             $comanda = [];
@@ -157,6 +184,11 @@ class Comanda extends SyncModel
             $this->setID(null);
         } else {
             $this->setID($comanda['id']);
+        }
+        if (!isset($comanda['numero'])) {
+            $this->setNumero(null);
+        } else {
+            $this->setNumero($comanda['numero']);
         }
         if (!isset($comanda['nome'])) {
             $this->setNome(null);
@@ -183,17 +215,21 @@ class Comanda extends SyncModel
 
     /**
      * Filter fields, upload data and keep key data
-     * @param Comanda $original Original instance without modifications
+     * @param self $original Original instance without modifications
+     * @param boolean $localized Informs if fields are localized
+     * @return self Self instance
      */
     public function filter($original, $localized = false)
     {
-        $this->setID(Filter::number($this->getID()));
+        $this->setID($original->getID());
+        $this->setNumero(Filter::number($this->getNumero()));
         $this->setNome(Filter::string($this->getNome()));
+        return $this;
     }
 
     /**
      * Clean instance resources like images and docs
-     * @param  Comanda $dependency Don't clean when dependency use same resources
+     * @param self $dependency Don't clean when dependency use same resources
      */
     public function clean($dependency)
     {
@@ -202,49 +238,53 @@ class Comanda extends SyncModel
     /**
      * Validate fields updating them and throw exception when invalid data has found
      * @return array All field of Comanda in array format
+     * @throws \MZ\Exception\ValidationException for invalid input data
      */
     public function validate()
     {
         $errors = [];
-        if (is_null($this->getNome())) {
-            $errors['nome'] = 'O nome não pode ser vazio';
+        if (is_null($this->getNumero())) {
+            $errors['numero'] = _t('comanda.numero_cannot_empty');
         }
-        if (is_null($this->getAtiva())) {
-            $errors['ativa'] = 'A disponibilidade da comanda não foi informada';
+        if (is_null($this->getNome())) {
+            $errors['nome'] = _t('comanda.nome_cannot_empty');
+        }
+        if (!Validator::checkBoolean($this->getAtiva())) {
+            $errors['ativa'] = _t('comanda.ativa_invalid');
         }
         $old_comanda = self::findByID($this->getID());
         if ($old_comanda->exists() && $old_comanda->isAtiva() && !$this->isAtiva()) {
             $pedido = Pedido::findByComandaID($old_comanda->getID());
             if ($pedido->exists()) {
-                $errors['ativa'] = 'A comanda não pode ser desativada porque possui um pedido em aberto';
+                $errors['ativa'] = _t('comanda.ativa_open');
             }
         }
         if (!empty($errors)) {
-            throw new \MZ\Exception\ValidationException($errors);
+            throw new ValidationException($errors);
         }
         return $this->toArray();
     }
 
     /**
      * Translate SQL exception into application exception
-     * @param  \Exception $e exception to translate into a readable error
+     * @param \Exception $e exception to translate into a readable error
      * @return \MZ\Exception\ValidationException new exception translated
      */
     protected function translate($e)
     {
-        if (stripos($e->getMessage(), 'PRIMARY') !== false) {
-            return new \MZ\Exception\ValidationException([
-                'id' => vsprintf(
-                    'O Número "%s" já está cadastrado',
-                    [$this->getID()]
+        if (contains(['Nome', 'UNIQUE'], $e->getMessage())) {
+            return new ValidationException([
+                'nome' => _t(
+                    'comanda.nome_used',
+                    $this->getNome()
                 ),
             ]);
         }
-        if (contains(['Nome', 'UNIQUE'], $e->getMessage())) {
-            return new \MZ\Exception\ValidationException([
-                'nome' => vsprintf(
-                    'O Nome "%s" já está cadastrado',
-                    [$this->getNome()]
+        if (contains(['Numero', 'UNIQUE'], $e->getMessage())) {
+            return new ValidationException([
+                'numero' => _t(
+                    'comanda.numero_used',
+                    $this->getNumero()
                 ),
             ]);
         }
@@ -253,11 +293,14 @@ class Comanda extends SyncModel
 
     /**
      * Insert a new Comanda into the database and fill instance from database
-     * @return Comanda Self instance
+     * @return self Self instance
+     * @throws \MZ\Exception\ValidationException for invalid input data
      */
     public function insert()
     {
+        $this->setID(null);
         $values = $this->validate();
+        unset($values['id']);
         try {
             $id = DB::insertInto('Comandas')->values($values)->execute();
             $this->setID($id);
@@ -270,35 +313,42 @@ class Comanda extends SyncModel
 
     /**
      * Update Comanda with instance values into database for Número
-     * @return Comanda Self instance
+     * @param array $only Save these fields only, when empty save all fields except id
+     * @return int rows affected
+     * @throws \MZ\Exception\ValidationException for invalid input data
      */
     public function update($only = [])
     {
         $values = $this->validate();
         if (!$this->exists()) {
-            throw new \Exception('O identificador da comanda não foi informado');
+            throw new ValidationException(
+                ['id' => _t('comanda.id_cannot_empty')]
+            );
         }
         $values = DB::filterValues($values, $only, false);
         try {
-            DB::update('Comandas')
+            $affected = DB::update('Comandas')
                 ->set($values)
-                ->where('id', $this->getID())
+                ->where(['id' => $this->getID()])
                 ->execute();
             $this->loadByID();
         } catch (\Exception $e) {
             throw $this->translate($e);
         }
-        return $this;
+        return $affected;
     }
 
     /**
      * Delete this instance from database using Número
      * @return integer Number of rows deleted (Max 1)
+     * @throws \MZ\Exception\ValidationException for invalid id
      */
     public function delete()
     {
         if (!$this->exists()) {
-            throw new \Exception('O identificador da comanda não foi informado');
+            throw new ValidationException(
+                ['id' => _t('comanda.id_cannot_empty')]
+            );
         }
         $result = DB::deleteFrom('Comandas')
             ->where('id', $this->getID())
@@ -308,9 +358,9 @@ class Comanda extends SyncModel
 
     /**
      * Load one register for it self with a condition
-     * @param  array $condition Condition for searching the row
-     * @param  array $order associative field name -> [-1, 1]
-     * @return Comanda Self instance filled or empty
+     * @param array $condition Condition for searching the row
+     * @param array $order associative field name -> [-1, 1]
+     * @return self Self instance filled or empty
      */
     public function load($condition, $order = [])
     {
@@ -321,25 +371,34 @@ class Comanda extends SyncModel
 
     /**
      * Load into this object from database using, Nome
-     * @param  string $nome nome to find Comanda
-     * @return Comanda Self filled instance or empty when not found
+     * @return self Self filled instance or empty when not found
      */
-    public function loadByNome($nome)
+    public function loadByNome()
     {
         return $this->load([
-            'nome' => strval($nome),
+            'nome' => strval($this->getNome()),
         ]);
     }
 
     /**
-     * Find this object on database using, Nome
-     * @param  string $nome nome to find Comanda
-     * @return Comanda A filled instance or empty when not found
+     * Load into this object from database using, Numero
+     * @return self Self filled instance or empty when not found
      */
-    public static function findByNome($nome)
+    public function loadByNumero()
     {
-        $result = new self();
-        return $result->loadByNome($nome);
+        return $this->load([
+            'numero' => intval($this->getNumero()),
+        ]);
+    }
+
+    /**
+     * Load next available number from database into this object numero field
+     * @return self Self id filled instance with next numero
+     */
+    public function loadNextNumero()
+    {
+        $last = self::find([], ['numero' => -1]);
+        return $this->setNumero($last->getNumero() + 1);
     }
 
     /**
@@ -348,14 +407,14 @@ class Comanda extends SyncModel
      */
     private static function getAllowedKeys()
     {
-        $comanda = new Comanda();
+        $comanda = new self();
         $allowed = Filter::concatKeys('c.', $comanda->toArray());
         return $allowed;
     }
 
     /**
      * Filter order array
-     * @param  mixed $order order string or array to parse and filter allowed
+     * @param mixed $order order string or array to parse and filter allowed
      * @return array allowed associative order
      */
     private static function filterOrder($order)
@@ -366,7 +425,7 @@ class Comanda extends SyncModel
 
     /**
      * Filter condition array with allowed fields
-     * @param  array $condition condition to filter rows
+     * @param array $condition condition to filter rows
      * @return array allowed condition
      */
     private static function filterCondition($condition)
@@ -387,7 +446,8 @@ class Comanda extends SyncModel
 
     /**
      * Fetch data from database with a condition
-     * @param  array $condition condition to filter rows
+     * @param array $condition condition to filter rows
+     * @param array $order order rows
      * @return SelectQuery query object with condition statement
      */
     private static function query($condition = [], $order = [])
@@ -410,8 +470,8 @@ class Comanda extends SyncModel
                 ->leftJoin('Mesas m ON m.id = p.mesaid')
                 ->leftJoin('Clientes l ON l.id = p.clienteid');
             if (isset($order['funcionario'])) {
-                $funcionario_id = intval($order['funcionario']);
-                $query = $query->orderBy('IF(p.funcionarioid = ?, 1, 0) DESC', $funcionario_id);
+                $prestador_id = intval($order['funcionario']);
+                $query = $query->orderBy('IF(p.prestadorid = ?, 1, 0) DESC', $prestador_id);
             }
             if (array_key_exists('mesas', $condition)) {
                 $query = $query->where('NOT p.mesaid', $condition['mesas']);
@@ -426,37 +486,63 @@ class Comanda extends SyncModel
 
     /**
      * Search one register with a condition
-     * @param  array $condition Condition for searching the row
-     * @return Comanda A filled Comanda or empty instance
+     * @param array $condition Condition for searching the row
+     * @param array $order order rows
+     * @return self A filled Comanda or empty instance
      */
-    public static function find($condition)
+    public static function find($condition, $order = [])
     {
-        $query = self::query($condition)->limit(1);
-        $row = $query->fetch();
-        if ($row === false) {
-            $row = [];
+        $result = new self();
+        return $result->load($condition, $order);
+    }
+
+    /**
+     * Search one register with a condition
+     * @param array $condition Condition for searching the row
+     * @param array $order order rows
+     * @return self A filled Comanda or empty instance
+     * @throws \Exception when register has not found
+     */
+    public static function findOrFail($condition, $order = [])
+    {
+        $result = self::find($condition, $order);
+        if (!$result->exists()) {
+            throw new \Exception(_t('comanda.not_found'), 404);
         }
-        return new Comanda($row);
+        return $result;
     }
 
     /**
-     * Get next available Comanda id
-     * @return int available Comanda id
+     * Find this object on database using, Nome
+     * @param string $nome nome to find Comanda
+     * @return self A filled instance or empty when not found
      */
-    public static function getNextID()
+    public static function findByNome($nome)
     {
-        $query = self::query()
-            ->select(null)
-            ->select('MAX(id) as id');
-        return $query->fetch('id') + 1;
+        $result = new self();
+        $result->setNome($nome);
+        return $result->loadByNome();
     }
 
     /**
-     * Fetch all rows from database with matched condition critery
-     * @param  array $condition condition to filter rows
-     * @param  integer $limit number of rows to get, null for all
-     * @param  integer $offset start index to get rows, null for begining
-     * @return array All rows instanced and filled
+     * Find this object on database using, Numero
+     * @param int $numero número to find Comanda
+     * @return self A filled instance or empty when not found
+     */
+    public static function findByNumero($numero)
+    {
+        $result = new self();
+        $result->setNumero($numero);
+        return $result->loadByNumero();
+    }
+
+    /**
+     * Find all Comanda
+     * @param array  $condition Condition to get all Comanda
+     * @param array  $order     Order Comanda
+     * @param int    $limit     Limit data into row count
+     * @param int    $offset    Start offset to get rows
+     * @return self[] List of all rows instanced as Comanda
      */
     public static function findAll($condition = [], $order = [], $limit = null, $offset = null)
     {
@@ -470,17 +556,18 @@ class Comanda extends SyncModel
         $rows = $query->fetchAll();
         $result = [];
         foreach ($rows as $row) {
-            $result[] = new Comanda($row);
+            $result[] = new self($row);
         }
         return $result;
     }
 
     /**
-     * Fetch all rows from database with matched condition critery
-     * @param  array $condition condition to filter rows
-     * @param  integer $limit number of rows to get, null for all
-     * @param  integer $offset start index to get rows, null for begining
-     * @return array All rows
+     * Find all Comanda
+     * @param array  $condition Condition to get all Comanda
+     * @param array  $order     Order Comanda
+     * @param int    $limit     Limit data into row count
+     * @param int    $offset    Start offset to get rows
+     * @return array List of all rows instanced as array
      */
     public static function rawFindAll($condition = [], $order = [], $limit = null, $offset = null)
     {
@@ -496,7 +583,7 @@ class Comanda extends SyncModel
 
     /**
      * Count all rows from database with matched condition critery
-     * @param  array $condition condition to filter rows
+     * @param array $condition condition to filter rows
      * @return integer Quantity of rows
      */
     public static function count($condition = [])

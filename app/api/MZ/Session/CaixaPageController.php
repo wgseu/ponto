@@ -26,29 +26,29 @@ namespace MZ\Session;
 
 use MZ\System\Permissao;
 use MZ\Util\Filter;
+use MZ\Core\PageController;
 
 /**
  * Allow application to serve system resources
  */
-class CaixaPageController extends \MZ\Core\Controller
+class CaixaPageController extends PageController
 {
     public function find()
     {
-        need_permission(Permissao::NOME_CADASTROCAIXAS, is_output('json'));
+        $this->needPermission([Permissao::NOME_CADASTROCAIXAS]);
 
-        $limite = isset($_GET['limite']) ? intval($_GET['limite']) : 10;
-        if ($limite > 100 || $limite < 1) {
-            $limite = 10;
-        }
-        $condition = Filter::query($_GET);
+        $limite = max(1, min(100, $this->getRequest()->query->getInt('limite', 10)));
+        $condition = Filter::query($this->getRequest()->query->all());
         unset($condition['ordem']);
         $caixa = new Caixa($condition);
-        $order = Filter::order(isset($_GET['ordem']) ? $_GET['ordem'] : '');
+        $order = Filter::order($this->getRequest()->query->get('ordem', ''));
         $count = Caixa::count($condition);
-        list($pagesize, $offset, $pagination) = pagestring($count, $limite);
-        $caixas = Caixa::findAll($condition, $order, $pagesize, $offset);
+        $page = max(1, $this->getRequest()->query->getInt('pagina', 1));
+        $pager = new \Pager($count, $limite, $page, 'pagina');
+        $pagination = $pager->genBasic();
+        $caixas = Caixa::findAll($condition, $order, $limite, $pager->offset);
 
-        if (is_output('json')) {
+        if ($this->isJson()) {
             $items = [];
             foreach ($caixas as $_caixa) {
                 $items[] = $_caixa->publish();
@@ -66,8 +66,8 @@ class CaixaPageController extends \MZ\Core\Controller
 
     public function add()
     {
-        need_permission(Permissao::NOME_CADASTROCAIXAS, is_output('json'));
-        $id = isset($_GET['id']) ? $_GET['id'] : null;
+        $this->needPermission([Permissao::NOME_CADASTROCAIXAS]);
+        $id = $this->getRequest()->query->getInt('id', null);
         $caixa = Caixa::findByID($id);
         $caixa->setID(null);
 
@@ -75,7 +75,7 @@ class CaixaPageController extends \MZ\Core\Controller
         $errors = [];
         $old_caixa = $caixa;
         if (is_post()) {
-            $caixa = new Caixa($_POST);
+            $caixa = new Caixa($this->getData());
             try {
                 $caixa->filter($old_caixa, true);
                 $caixa->insert();
@@ -84,7 +84,7 @@ class CaixaPageController extends \MZ\Core\Controller
                     'Caixa "%s" cadastrado com sucesso!',
                     $caixa->getDescricao()
                 );
-                if (is_output('json')) {
+                if ($this->isJson()) {
                     return $this->json()->success(['item' => $caixa->publish()], $msg);
                 }
                 \Thunder::success($msg, true);
@@ -94,7 +94,7 @@ class CaixaPageController extends \MZ\Core\Controller
                 if ($e instanceof \MZ\Exception\ValidationException) {
                     $errors = $e->getErrors();
                 }
-                if (is_output('json')) {
+                if ($this->isJson()) {
                     return $this->json()->error($e->getMessage(), null, $errors);
                 }
                 \Thunder::error($e->getMessage());
@@ -103,7 +103,7 @@ class CaixaPageController extends \MZ\Core\Controller
                     break;
                 }
             }
-        } elseif (is_output('json')) {
+        } elseif ($this->isJson()) {
             return $this->json()->error('Nenhum dado foi enviado');
         } else {
             $caixa->setAtivo('Y');
@@ -113,12 +113,12 @@ class CaixaPageController extends \MZ\Core\Controller
 
     public function update()
     {
-        need_permission(Permissao::NOME_CADASTROCAIXAS, is_output('json'));
-        $id = isset($_GET['id']) ? $_GET['id'] : null;
+        $this->needPermission([Permissao::NOME_CADASTROCAIXAS]);
+        $id = $this->getRequest()->query->getInt('id', null);
         $caixa = Caixa::findByID($id);
         if (!$caixa->exists()) {
             $msg = 'O caixa informado não existe!';
-            if (is_output('json')) {
+            if ($this->isJson()) {
                 return $this->json()->error($msg);
             }
             \Thunder::warning($msg);
@@ -128,10 +128,10 @@ class CaixaPageController extends \MZ\Core\Controller
         $errors = [];
         $old_caixa = $caixa;
         if (is_post()) {
-            $caixa = new Caixa($_POST);
+            $caixa = new Caixa($this->getData());
             try {
                 $caixa->setID($old_caixa->getID());
-                if (!$this->getApplication()->getSystem()->isFiscalVisible()) {
+                if (!app()->getSystem()->isFiscalVisible()) {
                     $caixa->setNumeroInicial($old_caixa->getNumeroInicial());
                     $caixa->setSerie($old_caixa->getSerie());
                 }
@@ -142,7 +142,7 @@ class CaixaPageController extends \MZ\Core\Controller
                     'Caixa "%s" atualizado com sucesso!',
                     $caixa->getDescricao()
                 );
-                if (is_output('json')) {
+                if ($this->isJson()) {
                     return $this->json()->success(['item' => $caixa->publish()], $msg);
                 }
                 \Thunder::success($msg, true);
@@ -152,7 +152,7 @@ class CaixaPageController extends \MZ\Core\Controller
                 if ($e instanceof \MZ\Exception\ValidationException) {
                     $errors = $e->getErrors();
                 }
-                if (is_output('json')) {
+                if ($this->isJson()) {
                     return $this->json()->error($e->getMessage(), null, $errors);
                 }
                 \Thunder::error($e->getMessage());
@@ -161,7 +161,7 @@ class CaixaPageController extends \MZ\Core\Controller
                     break;
                 }
             }
-        } elseif (is_output('json')) {
+        } elseif ($this->isJson()) {
             return $this->json()->error('Nenhum dado foi enviado');
         }
         return $this->view('gerenciar_caixa_editar', get_defined_vars());
@@ -169,12 +169,12 @@ class CaixaPageController extends \MZ\Core\Controller
 
     public function delete()
     {
-        need_permission(Permissao::NOME_CADASTROCAIXAS, is_output('json'));
-        $id = isset($_GET['id']) ? $_GET['id'] : null;
+        $this->needPermission([Permissao::NOME_CADASTROCAIXAS]);
+        $id = $this->getRequest()->query->getInt('id', null);
         $caixa = Caixa::findByID($id);
         if (!$caixa->exists()) {
             $msg = 'O caixa não foi informado ou não existe!';
-            if (is_output('json')) {
+            if ($this->isJson()) {
                 return $this->json()->error($msg);
             }
             \Thunder::warning($msg);
@@ -184,7 +184,7 @@ class CaixaPageController extends \MZ\Core\Controller
             $caixa->delete();
             $caixa->clean(new Caixa());
             $msg = sprintf('Caixa "%s" excluído com sucesso!', $caixa->getDescricao());
-            if (is_output('json')) {
+            if ($this->isJson()) {
                 return $this->json()->success([], $msg);
             }
             \Thunder::success($msg, true);
@@ -193,7 +193,7 @@ class CaixaPageController extends \MZ\Core\Controller
                 'Não foi possível excluir o caixa "%s"!',
                 $caixa->getDescricao()
             );
-            if (is_output('json')) {
+            if ($this->isJson()) {
                 return $this->json()->error($msg);
             }
             \Thunder::error($msg);

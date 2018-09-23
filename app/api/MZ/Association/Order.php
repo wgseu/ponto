@@ -124,7 +124,6 @@ class Order extends Pedido
 
     public function loadDOM($dom)
     {
-        global $app;
 
         $dados = $this->integracao->read();
         $cartoes = isset($dados['cartoes'])?$dados['cartoes']:[];
@@ -250,7 +249,7 @@ class Order extends Pedido
                             throw new RedirectException(
                                 sprintf('Forma de pagamento "%s" não reconhecida', $cod_tipo_cond_pagto),
                                 500,
-                                $app->makeURL('/gerenciar/cartao/' . $this->integracao->getAcessoURL())
+                                app()->makeURL('/gerenciar/cartao/' . $this->integracao->getAcessoURL())
                             );
                     }
                     $forma_pagto = FormaPagto::find(['tipo' => $tipo_pagto, 'ativa' => 'Y']);
@@ -280,14 +279,14 @@ class Order extends Pedido
                             throw new RedirectException(
                                 sprintf('O cartão de código "%s" não é suportado nessa versão', $cod_tipo_pagto),
                                 500,
-                                $app->makeURL('/gerenciar/cartao/' . $this->integracao->getAcessoURL())
+                                app()->makeURL('/gerenciar/cartao/' . $this->integracao->getAcessoURL())
                             );
                         }
                         if (!isset($cartoes[$cod_tipo_pagto])) {
                             throw new RedirectException(
                                 sprintf('O cartão "%s" não foi associado', $this->card_names[$cod_tipo_pagto]['name']),
                                 500,
-                                $app->makeURL('/gerenciar/cartao/' . $this->integracao->getAcessoURL())
+                                app()->makeURL('/gerenciar/cartao/' . $this->integracao->getAcessoURL())
                             );
                         }
                         $pagamento->setCartaoID($cartoes[$cod_tipo_pagto]);
@@ -299,7 +298,7 @@ class Order extends Pedido
                                     $this->card_names[$cod_tipo_pagto]['name']
                                 ),
                                 500,
-                                $app->makeURL('/gerenciar/cartao/' . $this->integracao->getAcessoURL())
+                                app()->makeURL('/gerenciar/cartao/' . $this->integracao->getAcessoURL())
                             );
                         }
                         $pagamento->setParcelas(1);
@@ -392,7 +391,7 @@ class Order extends Pedido
                     throw new RedirectException(
                         sprintf('O produto "%s" não foi associado corretamente', $descricao),
                         404,
-                        $app->makeURL('/gerenciar/produto/' . $this->integracao->getAcessoURL())
+                        app()->makeURL('/gerenciar/produto/' . $this->integracao->getAcessoURL())
                     );
                 }
                 if ($produto->getTipo() == Produto::TIPO_PACOTE) {
@@ -423,7 +422,7 @@ class Order extends Pedido
                                 $produto_pai->getDescricao()
                             ),
                             404,
-                            $app->makeURL('/gerenciar/produto/' . $this->integracao->getAcessoURL())
+                            app()->makeURL('/gerenciar/produto/' . $this->integracao->getAcessoURL())
                         );
                     }
                     $produto = $composicao->findProdutoID();
@@ -444,7 +443,7 @@ class Order extends Pedido
                                 $produto_pai->getDescricao()
                             ),
                             404,
-                            $app->makeURL('/gerenciar/produto/' . $this->integracao->getAcessoURL())
+                            app()->makeURL('/gerenciar/produto/' . $this->integracao->getAcessoURL())
                         );
                     }
                     $produto_pedido->setProdutoID($pacote->getProdutoID());
@@ -456,7 +455,7 @@ class Order extends Pedido
                             $descricao
                         ),
                         404,
-                        $app->makeURL('/gerenciar/produto/' . $this->integracao->getAcessoURL())
+                        app()->makeURL('/gerenciar/produto/' . $this->integracao->getAcessoURL())
                     );
                 }
                 if (!is_null($produto_pedido->getProdutoID())) {
@@ -483,7 +482,7 @@ class Order extends Pedido
                 throw new RedirectException(
                     'O produto principal do pacote não foi encontrado',
                     404,
-                    $app->makeURL('/gerenciar/produto/' . $this->integracao->getAcessoURL())
+                    app()->makeURL('/gerenciar/produto/' . $this->integracao->getAcessoURL())
                 );
             }
         }
@@ -702,15 +701,7 @@ class Order extends Pedido
             $produto_pedido->setCancelado('N');
             $produto_pedido->setVisualizado('N');
             $this->checkSaldo($produto_pedido->getTotal());
-            // TODO: corrigir filter para API
-            $old_produto_pedido = new ProdutoPedido($produto_pedido);
             $produto_pedido->filter(new ProdutoPedido()); // limpa o ID
-            $produto_pedido->setPreco(floatval($old_produto_pedido->getPreco()));
-            $produto_pedido->setQuantidade(floatval($old_produto_pedido->getQuantidade()));
-            $produto_pedido->setPorcentagem(floatval($old_produto_pedido->getPorcentagem()));
-            $produto_pedido->setPrecoVenda(floatval($old_produto_pedido->getPrecoVenda()));
-            $produto_pedido->setPrecoCompra(floatval($old_produto_pedido->getPrecoCompra()));
-            // end api fix
             $produto_pedido->register($item_info['formacoes']);
             if ($produto->exists() && $produto->getTipo() == Produto::TIPO_PACOTE) {
                 $pacote_pedido = $produto_pedido;

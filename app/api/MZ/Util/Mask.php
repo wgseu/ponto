@@ -79,14 +79,13 @@ class Mask
      */
     public static function money($value, $format = false)
     {
-        global $app;
 
         $value = round($value, 2);
         $sep = '.';
         $dec = ',';
         $number =  number_format($value, 2, $dec, $sep);
         if ($format) {
-            $currency = $app->getSystem()->getCurrency();
+            $currency = app()->getSystem()->getCurrency();
             return sprintf($currency->getFormato(), $number);
         }
         return $number;

@@ -58,7 +58,7 @@ class BancoTest extends \MZ\Framework\TestCase
             'agenciamascara' => ' Banco <script>filter</script> ',
             'contamascara' => ' Banco <script>filter</script> ',
         ]);
-        $banco->filter($old_banco);
+        $banco->filter($old_banco, true);
         $this->assertEquals($old_banco, $banco);
     }
 

@@ -26,6 +26,32 @@ namespace MZ\Environment;
 
 class SetorTest extends \MZ\Framework\TestCase
 {
+    /**
+     * Build a valid setor
+     * @param string $nome Setor nome
+     * @return Setor
+     */
+    public static function build($nome = null)
+    {
+        $last = Setor::find([], ['id' => -1]);
+        $id = $last->getID() + 1;
+        $setor = new Setor();
+        $setor->setNome($nome ?: "Setor {$id}");
+        return $setor;
+    }
+
+    /**
+     * Create a setor on database
+     * @param string $nome Setor nome
+     * @return Setor
+     */
+    public static function create($nome = null)
+    {
+        $setor = self::build($nome);
+        $setor->insert();
+        return $setor;
+    }
+
     public function testFromArray()
     {
         $old_setor = new Setor([
@@ -52,7 +78,7 @@ class SetorTest extends \MZ\Framework\TestCase
             'nome' => ' Setor <script>filter</script> ',
             'descricao' => ' Setor <script>filter</script> ',
         ]);
-        $setor->filter($old_setor);
+        $setor->filter($old_setor, true);
         $this->assertEquals($old_setor, $setor);
     }
 
@@ -62,6 +88,7 @@ class SetorTest extends \MZ\Framework\TestCase
         $values = $setor->publish();
         $allowed = [
             'id',
+            'setorid',
             'nome',
             'descricao',
         ];

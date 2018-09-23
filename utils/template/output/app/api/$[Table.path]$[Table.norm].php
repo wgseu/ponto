@@ -297,7 +297,7 @@ $[field.else.if(blob)]
             $this->set$[Field.norm]($[field.if(array)]$[field.array.number], $[field.end]true);
         } else {
             $this->set$[Field.norm]($[field.if(array)]$[field.array.number], $[field.end]$$[field.unix]);
-            $$[field.unix]_path = $this->getApplication()->getPath('public') . $this->make$[Field.norm]();
+            $$[field.unix]_path = app()->getPath('public') . $this->make$[Field.norm]();
             if (!is_null($$[field.unix])) {
                 $this->set$[Field.norm](file_get_contents($$[field.unix]_path));
                 @unlink($$[field.unix]_path);
@@ -387,6 +387,8 @@ $[field.else.if(boolean)]
         if (!Validator::checkBoolean($this->get$[Field.norm]($[field.if(array)]$[field.array.number]$[field.end]))) {
             $errors['$[field]'] = _t('$[table.unix].$[field.unix]_invalid');
         }
+$[field.else.match(.*atualizacao|.*cadastro|.*criacao|.*lancamento|.*envio)]
+        $this->set$[Field.norm]($[field.if(array)]$[field.array.number], $[field.end]DB::now());
 $[field.else.if(null)]
 $[field.else]
         if (is_null($this->get$[Field.norm]($[field.if(array)]$[field.array.number]$[field.end]))) {
@@ -686,9 +688,8 @@ $[descriptor.end]
      */
     public static function find($condition, $order = [])
     {
-        $query = self::query($condition, $order)->limit(1);
-        $row = $query->fetch() ?: [];
-        return new self($row);
+        $result = new self();
+        return $result->load($condition, $order);
     }
 
     /**
@@ -738,7 +739,7 @@ $[table.end]
      * @param array  $order     Order $[Table.name]
      * @param int    $limit     Limit data into row count
      * @param int    $offset    Start offset to get rows
-     * @return self[]             List of all rows instanced as $[Table.norm]
+     * @return self[] List of all rows instanced as $[Table.norm]
      */
     public static function findAll($condition = [], $order = [], $limit = null, $offset = null)
     {

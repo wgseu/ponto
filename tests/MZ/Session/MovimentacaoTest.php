@@ -35,10 +35,10 @@ class MovimentacaoTest extends \MZ\Framework\TestCase
             'sessaoid',
             'caixaid',
             'aberta',
-            'funcionarioaberturaid',
-            'dataabertura',
-            'funcionariofechamentoid',
+            'iniciadorid',
+            'fechadorid',
             'datafechamento',
+            'dataabertura',
         ];
         $this->assertEquals($allowed, array_keys($values));
     }

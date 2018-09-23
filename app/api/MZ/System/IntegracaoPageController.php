@@ -25,29 +25,29 @@
 namespace MZ\System;
 
 use MZ\Util\Filter;
+use MZ\Core\PageController;
 
 /**
  * Allow application to serve system resources
  */
-class IntegracaoPageController extends \MZ\Core\Controller
+class IntegracaoPageController extends PageController
 {
     public function find()
     {
-        need_permission(Permissao::NOME_ALTERARCONFIGURACOES, is_output('json'));
+        $this->needPermission([Permissao::NOME_ALTERARCONFIGURACOES]);
 
-        $limite = isset($_GET['limite']) ? intval($_GET['limite']) : 10;
-        if ($limite > 100 || $limite < 1) {
-            $limite = 10;
-        }
-        $condition = Filter::query($_GET);
+        $limite = max(1, min(100, $this->getRequest()->query->getInt('limite', 10)));
+        $condition = Filter::query($this->getRequest()->query->all());
         unset($condition['ordem']);
         $integracao = new Integracao($condition);
-        $order = Filter::order(isset($_GET['ordem']) ? $_GET['ordem'] : '');
+        $order = Filter::order($this->getRequest()->query->get('ordem', ''));
         $count = Integracao::count($condition);
-        list($pagesize, $offset, $pagination) = pagestring($count, $limite);
-        $integracoes = Integracao::findAll($condition, $order, $pagesize, $offset);
+        $page = max(1, $this->getRequest()->query->getInt('pagina', 1));
+        $pager = new \Pager($count, $limite, $page, 'pagina');
+        $pagination = $pager->genBasic();
+        $integracoes = Integracao::findAll($condition, $order, $limite, $pager->offset);
 
-        if (is_output('json')) {
+        if ($this->isJson()) {
             $items = [];
             foreach ($integracoes as $integracao) {
                 $items[] = $integracao->publish();
@@ -60,12 +60,12 @@ class IntegracaoPageController extends \MZ\Core\Controller
 
     public function update()
     {
-        need_permission(Permissao::NOME_ALTERARCONFIGURACOES, is_output('json'));
-        $id = isset($_GET['id']) ? $_GET['id'] : null;
+        $this->needPermission([Permissao::NOME_ALTERARCONFIGURACOES]);
+        $id = $this->getRequest()->query->getInt('id', null);
         $integracao = Integracao::findByID($id);
         if (!$integracao->exists()) {
             $msg = 'A integração não foi informada ou não existe';
-            if (is_output('json')) {
+            if ($this->isJson()) {
                 return $this->json()->error($msg);
             }
             \Thunder::warning($msg);
@@ -75,16 +75,16 @@ class IntegracaoPageController extends \MZ\Core\Controller
         $errors = [];
         $old_integracao = $integracao;
         if (is_post()) {
-            $integracao = new Integracao($_POST);
+            $integracao = new Integracao($this->getData());
             try {
                 $integracao->filter($old_integracao, true);
-                $integracao->save(array_keys($_POST));
+                $integracao->save(array_keys($this->getData()));
                 $old_integracao->clean($integracao);
                 $msg = sprintf(
                     'Integração "%s" atualizada com sucesso!',
                     $integracao->getNome()
                 );
-                if (is_output('json')) {
+                if ($this->isJson()) {
                     return $this->json()->success(['item' => $integracao->publish()], $msg);
                 }
                 \Thunder::success($msg, true);
@@ -94,7 +94,7 @@ class IntegracaoPageController extends \MZ\Core\Controller
                 if ($e instanceof \MZ\Exception\ValidationException) {
                     $errors = $e->getErrors();
                 }
-                if (is_output('json')) {
+                if ($this->isJson()) {
                     return $this->json()->error($e->getMessage(), null, $errors);
                 }
                 \Thunder::error($e->getMessage());
@@ -103,7 +103,7 @@ class IntegracaoPageController extends \MZ\Core\Controller
                     break;
                 }
             }
-        } elseif (is_output('json')) {
+        } elseif ($this->isJson()) {
             return $this->json()->error('Nenhum dado foi enviado');
         }
         return $this->view('gerenciar_integracao_editar', get_defined_vars());

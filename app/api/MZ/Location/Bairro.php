@@ -344,9 +344,8 @@ class Bairro extends SyncModel
         if ($bairro->exists()) {
             return $bairro;
         }
-        if (!logged_provider()->has(Permissao::NOME_CADASTROBAIRROS)) {
-            throw new \Exception('O bairro não está cadastrada e você não tem permissão para cadastrar um');
-        }
+        $msg = 'O bairro não está cadastrada e você não tem permissão para cadastrar um';
+        app()->needPermission([Permissao::NOME_CADASTROBAIRROS], $msg);
         $bairro->setCidadeID($cidade_id);
         $bairro->setNome($nome);
         $bairro->setValorEntrega(0.0);

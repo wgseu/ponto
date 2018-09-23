@@ -44,19 +44,19 @@
               <a href="/contato/">Contato</a>
             </li>
             <li>
-              {% if is_manager() %}
+              {% if $auth->isManager() %}
                 <a href="/gerenciar/">Gerenciar</a>
-              {% elseif is_login() %}
+              {% elseif $auth->isLogin() %}
                 <a href="/conta/editar">Minha Conta</a>
               {% endif %}
             </li>
-            {% if !is_login() %}
+            {% if !$auth->isLogin() %}
               <li>
                 <a href="/conta/cadastrar">Cadastrar</a>
               </li>
             {% endif %}
             <li>
-              {% if !is_login() %}
+              {% if !$auth->isLogin() %}
                 <a href="/conta/entrar">Entrar</a>
               {% else %}
                 <a href="/conta/sair">Sair</a>

@@ -34,7 +34,6 @@ class Mailer
         if ('UTF-8'!=$options['encoding']) {
             $message = mb_convert_encoding($message, $options['encoding'], 'UTF-8');
         }
-        global $app;
         /* get from ini */
         $security = ['', 'ssl', 'tls'];
         $host = get_string_config('Email', 'Servidor');
@@ -43,7 +42,7 @@ class Mailer
         $user = get_string_config('Email', 'Usuario');
         $pass = get_string_config('Email', 'Senha');
         $from = get_string_config('Email', 'From', $user);
-        $site = $app->getSystem()->getCompany()->getNome();
+        $site = app()->getSystem()->getCompany()->getNome();
 
         $subject = self::EscapeHead($subject, $options['subjectenc']);
         $site = self::EscapeHead($site, $options['subjectenc']);

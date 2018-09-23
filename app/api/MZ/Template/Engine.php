@@ -89,6 +89,15 @@ abstract class Engine
         if (!isset($this->properties['currency'])) {
             $this->currency = $this->app->getSystem()->getCurrency();
         }
+        if (!isset($this->properties['auth'])) {
+            $this->auth = $this->app->getAuthentication();
+        }
+        if (!isset($this->properties['user'])) {
+            $this->user = $this->app->getAuthentication()->getUser();
+        }
+        if (!isset($this->properties['provider'])) {
+            $this->provider = $this->app->getAuthentication()->getEmployee();
+        }
     }
 
     /**

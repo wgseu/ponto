@@ -31,18 +31,18 @@ class ComposicaoOldApiController extends \MZ\Core\ApiController
 {
     public function find()
     {
-        $produto_id = isset($_GET['produto']) ? $_GET['produto'] : null;
+        $produto_id = $this->getRequest()->query->get('produto');
         $produto = Produto::findByID($produto_id);
         if (!$produto->exists()) {
             return $this->json()->error('O produto não foi informado ou não existe');
         }
-        $limite = isset($_GET['limite']) ? intval($_GET['limite']) : null;
+        $limite = $this->getRequest()->query->getInt('limite', null);
         if (!is_null($limite) && $limite < 1) {
             $limite = null;
         }
-        $selecionaveis = isset($_GET['selecionaveis']) ? $_GET['selecionaveis'] : false;
-        $adicionais = isset($_GET['adicionais']) ? $_GET['adicionais'] : false;
-        $sem_opcionais = isset($_GET['sem_opcionais']) ? $_GET['sem_opcionais'] : false;
+        $selecionaveis = $this->getRequest()->query->getBoolean('selecionaveis');
+        $adicionais = $this->getRequest()->query->getBoolean('adicionais');
+        $sem_opcionais = $this->getRequest()->query->getBoolean('sem_opcionais');
         $tipo = [
             Composicao::TIPO_COMPOSICAO => true,
             Composicao::TIPO_ADICIONAL => true,
@@ -59,7 +59,7 @@ class ComposicaoOldApiController extends \MZ\Core\ApiController
         }
         $tipo = array_keys($tipo);
         $condition = [];
-        $condition['search'] = isset($_GET['busca']) ? $_GET['busca'] : null;
+        $condition['search'] = $this->getRequest()->query->get('busca');
         $condition['tipo'] = $tipo;
         $condition['composicaoid'] = $produto->getID();
         $condition['ativa'] = 'Y';

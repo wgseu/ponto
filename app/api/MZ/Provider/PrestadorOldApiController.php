@@ -33,17 +33,13 @@ class PrestadorOldApiController extends \MZ\Core\ApiController
 {
     public function find()
     {
-        need_manager(true);
-        $limit = isset($_GET['limite']) ? intval($_GET['limite']) : 5;
-        $search = isset($_GET['search']) ? $_GET['search']: null;
+        app()->needManager();
+        $limit = max(1, min(20, $this->getRequest()->query->getInt('limite', 5)));
+        $search = $this->getRequest()->query->get('search');
         if (check_fone($search, true)) {
             $limit = 1;
-        } elseif ($limit < 1) {
-            $limit = 5;
-        } elseif ($limit > 20) {
-            $limit = 20;
         }
-        $condition = Filter::query($_GET);
+        $condition = Filter::query($this->getRequest()->query->all());
         $prestadores = Prestador::findAll($condition, [], $limit);
         $campos = [
             'id',

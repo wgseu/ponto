@@ -34,7 +34,7 @@ class FuncaoTest extends \MZ\Framework\TestCase
         $last = Funcao::find([], ['id' => -1]);
         $id = intval($last->getID()) + 1;
         $funcao = new Funcao();
-        $funcao->setDescricao("Provider permission group #{$id}");
+        $funcao->setDescricao("Função {$id}");
         $funcao->setRemuneracao(12.3);
         $funcao->insert();
         \MZ\System\AcessoTest::create($funcao, $permissions);
@@ -67,7 +67,7 @@ class FuncaoTest extends \MZ\Framework\TestCase
             'descricao' => ' Função <script>filter</script> ',
             'remuneracao' => '12,3',
         ]);
-        $funcao->filter($old_funcao);
+        $funcao->filter($old_funcao, true);
         $this->assertEquals($old_funcao, $funcao);
     }
 

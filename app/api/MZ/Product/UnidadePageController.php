@@ -26,29 +26,29 @@ namespace MZ\Product;
 
 use MZ\System\Permissao;
 use MZ\Util\Filter;
+use MZ\Core\PageController;
 
 /**
  * Allow application to serve system resources
  */
-class UnidadePageController extends \MZ\Core\Controller
+class UnidadePageController extends PageController
 {
     public function find()
     {
-        need_permission(Permissao::NOME_CADASTROPRODUTOS, is_output('json'));
+        $this->needPermission([Permissao::NOME_CADASTROPRODUTOS]);
 
-        $limite = isset($_GET['limite']) ? intval($_GET['limite']) : 10;
-        if ($limite > 100 || $limite < 1) {
-            $limite = 10;
-        }
-        $condition = Filter::query($_GET);
+        $limite = max(1, min(100, $this->getRequest()->query->getInt('limite', 10)));
+        $condition = Filter::query($this->getRequest()->query->all());
         unset($condition['ordem']);
         $unidade = new Unidade($condition);
-        $order = Filter::order(isset($_GET['ordem']) ? $_GET['ordem'] : '');
+        $order = Filter::order($this->getRequest()->query->get('ordem', ''));
         $count = Unidade::count($condition);
-        list($pagesize, $offset, $pagination) = pagestring($count, $limite);
-        $unidades = Unidade::findAll($condition, $order, $pagesize, $offset);
+        $page = max(1, $this->getRequest()->query->getInt('pagina', 1));
+        $pager = new \Pager($count, $limite, $page, 'pagina');
+        $pagination = $pager->genBasic();
+        $unidades = Unidade::findAll($condition, $order, $limite, $pager->offset);
 
-        if (is_output('json')) {
+        if ($this->isJson()) {
             $items = [];
             foreach ($unidades as $_unidade) {
                 $items[] = $_unidade->publish();
@@ -61,8 +61,8 @@ class UnidadePageController extends \MZ\Core\Controller
 
     public function add()
     {
-        need_permission(Permissao::NOME_CADASTROPRODUTOS, is_output('json'));
-        $id = isset($_GET['id']) ? $_GET['id'] : null;
+        $this->needPermission([Permissao::NOME_CADASTROPRODUTOS]);
+        $id = $this->getRequest()->query->getInt('id', null);
         $unidade = Unidade::findByID($id);
         $unidade->setID(null);
 
@@ -70,7 +70,7 @@ class UnidadePageController extends \MZ\Core\Controller
         $errors = [];
         $old_unidade = $unidade;
         if (is_post()) {
-            $unidade = new Unidade($_POST);
+            $unidade = new Unidade($this->getData());
             try {
                 $unidade->filter($old_unidade, true);
                 $unidade->insert();
@@ -79,7 +79,7 @@ class UnidadePageController extends \MZ\Core\Controller
                     'Unidade "%s" cadastrada com sucesso!',
                     $unidade->getNome()
                 );
-                if (is_output('json')) {
+                if ($this->isJson()) {
                     return $this->json()->success(['item' => $unidade->publish()], $msg);
                 }
                 \Thunder::success($msg, true);
@@ -89,7 +89,7 @@ class UnidadePageController extends \MZ\Core\Controller
                 if ($e instanceof \MZ\Exception\ValidationException) {
                     $errors = $e->getErrors();
                 }
-                if (is_output('json')) {
+                if ($this->isJson()) {
                     return $this->json()->error($e->getMessage(), null, $errors);
                 }
                 \Thunder::error($e->getMessage());
@@ -98,7 +98,7 @@ class UnidadePageController extends \MZ\Core\Controller
                     break;
                 }
             }
-        } elseif (is_output('json')) {
+        } elseif ($this->isJson()) {
             return $this->json()->error('Nenhum dado foi enviado');
         }
         return $this->view('gerenciar_unidade_cadastrar', get_defined_vars());
@@ -106,12 +106,12 @@ class UnidadePageController extends \MZ\Core\Controller
 
     public function update()
     {
-        need_permission(Permissao::NOME_CADASTROPRODUTOS, is_output('json'));
-        $id = isset($_GET['id']) ? $_GET['id'] : null;
+        $this->needPermission([Permissao::NOME_CADASTROPRODUTOS]);
+        $id = $this->getRequest()->query->getInt('id', null);
         $unidade = Unidade::findByID($id);
         if (!$unidade->exists()) {
             $msg = 'A unidade não foi informada ou não existe';
-            if (is_output('json')) {
+            if ($this->isJson()) {
                 return $this->json()->error($msg);
             }
             \Thunder::warning($msg);
@@ -121,7 +121,7 @@ class UnidadePageController extends \MZ\Core\Controller
         $errors = [];
         $old_unidade = $unidade;
         if (is_post()) {
-            $unidade = new Unidade($_POST);
+            $unidade = new Unidade($this->getData());
             try {
                 $unidade->filter($old_unidade, true);
                 $unidade->update();
@@ -130,7 +130,7 @@ class UnidadePageController extends \MZ\Core\Controller
                     'Unidade "%s" atualizada com sucesso!',
                     $unidade->getNome()
                 );
-                if (is_output('json')) {
+                if ($this->isJson()) {
                     return $this->json()->success(['item' => $unidade->publish()], $msg);
                 }
                 \Thunder::success($msg, true);
@@ -140,7 +140,7 @@ class UnidadePageController extends \MZ\Core\Controller
                 if ($e instanceof \MZ\Exception\ValidationException) {
                     $errors = $e->getErrors();
                 }
-                if (is_output('json')) {
+                if ($this->isJson()) {
                     return $this->json()->error($e->getMessage(), null, $errors);
                 }
                 \Thunder::error($e->getMessage());
@@ -149,7 +149,7 @@ class UnidadePageController extends \MZ\Core\Controller
                     break;
                 }
             }
-        } elseif (is_output('json')) {
+        } elseif ($this->isJson()) {
             return $this->json()->error('Nenhum dado foi enviado');
         }
         return $this->view('gerenciar_unidade_editar', get_defined_vars());
@@ -157,12 +157,12 @@ class UnidadePageController extends \MZ\Core\Controller
 
     public function delete()
     {
-        need_permission(Permissao::NOME_CADASTROPRODUTOS, is_output('json'));
-        $id = isset($_GET['id']) ? $_GET['id'] : null;
+        $this->needPermission([Permissao::NOME_CADASTROPRODUTOS]);
+        $id = $this->getRequest()->query->getInt('id', null);
         $unidade = Unidade::findByID($id);
         if (!$unidade->exists()) {
             $msg = 'A unidade não foi informada ou não existe';
-            if (is_output('json')) {
+            if ($this->isJson()) {
                 return $this->json()->error($msg);
             }
             \Thunder::warning($msg);
@@ -172,7 +172,7 @@ class UnidadePageController extends \MZ\Core\Controller
             $unidade->delete();
             $unidade->clean(new Unidade());
             $msg = sprintf('Unidade "%s" excluída com sucesso!', $unidade->getNome());
-            if (is_output('json')) {
+            if ($this->isJson()) {
                 return $this->json()->success([], $msg);
             }
             \Thunder::success($msg, true);
@@ -181,7 +181,7 @@ class UnidadePageController extends \MZ\Core\Controller
                 'Não foi possível excluir a unidade "%s"',
                 $unidade->getNome()
             );
-            if (is_output('json')) {
+            if ($this->isJson()) {
                 return $this->json()->error($msg);
             }
             \Thunder::error($msg);

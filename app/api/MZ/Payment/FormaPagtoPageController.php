@@ -27,29 +27,29 @@ namespace MZ\Payment;
 use MZ\System\Permissao;
 use MZ\Wallet\Carteira;
 use MZ\Util\Filter;
+use MZ\Core\PageController;
 
 /**
  * Allow application to serve system resources
  */
-class FormaPagtoPageController extends \MZ\Core\Controller
+class FormaPagtoPageController extends PageController
 {
     public function find()
     {
-        need_permission(Permissao::NOME_CADASTROFORMASPAGTO, is_output('json'));
+        $this->needPermission([Permissao::NOME_CADASTROFORMASPAGTO]);
 
-        $limite = isset($_GET['limite']) ? intval($_GET['limite']) : 10;
-        if ($limite > 100 || $limite < 1) {
-            $limite = 10;
-        }
-        $condition = Filter::query($_GET);
+        $limite = max(1, min(100, $this->getRequest()->query->getInt('limite', 10)));
+        $condition = Filter::query($this->getRequest()->query->all());
         unset($condition['ordem']);
         $forma_pagto = new FormaPagto($condition);
-        $order = Filter::order(isset($_GET['ordem']) ? $_GET['ordem'] : '');
+        $order = Filter::order($this->getRequest()->query->get('ordem', ''));
         $count = FormaPagto::count($condition);
-        list($pagesize, $offset, $pagination) = pagestring($count, $limite);
-        $formas_de_pagamento = FormaPagto::findAll($condition, $order, $pagesize, $offset);
+        $page = max(1, $this->getRequest()->query->getInt('pagina', 1));
+        $pager = new \Pager($count, $limite, $page, 'pagina');
+        $pagination = $pager->genBasic();
+        $formas_de_pagamento = FormaPagto::findAll($condition, $order, $limite, $pager->offset);
 
-        if (is_output('json')) {
+        if ($this->isJson()) {
             $items = [];
             foreach ($formas_de_pagamento as $_forma_pagto) {
                 $items[] = $_forma_pagto->publish();
@@ -69,8 +69,8 @@ class FormaPagtoPageController extends \MZ\Core\Controller
 
     public function add()
     {
-        need_permission(Permissao::NOME_CADASTROFORMASPAGTO, is_output('json'));
-        $id = isset($_GET['id']) ? $_GET['id'] : null;
+        $this->needPermission([Permissao::NOME_CADASTROFORMASPAGTO]);
+        $id = $this->getRequest()->query->getInt('id', null);
         $forma_pagto = FormaPagto::findByID($id);
         $forma_pagto->setID(null);
 
@@ -78,7 +78,7 @@ class FormaPagtoPageController extends \MZ\Core\Controller
         $errors = [];
         $old_forma_pagto = $forma_pagto;
         if (is_post()) {
-            $forma_pagto = new FormaPagto($_POST);
+            $forma_pagto = new FormaPagto($this->getData());
             try {
                 $forma_pagto->filter($old_forma_pagto, true);
                 $forma_pagto->insert();
@@ -87,7 +87,7 @@ class FormaPagtoPageController extends \MZ\Core\Controller
                     'Forma de pagamento "%s" cadastrada com sucesso!',
                     $forma_pagto->getDescricao()
                 );
-                if (is_output('json')) {
+                if ($this->isJson()) {
                     return $this->json()->success(['item' => $forma_pagto->publish()], $msg);
                 }
                 \Thunder::success($msg, true);
@@ -97,7 +97,7 @@ class FormaPagtoPageController extends \MZ\Core\Controller
                 if ($e instanceof \MZ\Exception\ValidationException) {
                     $errors = $e->getErrors();
                 }
-                if (is_output('json')) {
+                if ($this->isJson()) {
                     return $this->json()->error($e->getMessage(), null, $errors);
                 }
                 \Thunder::error($e->getMessage());
@@ -106,7 +106,7 @@ class FormaPagtoPageController extends \MZ\Core\Controller
                     break;
                 }
             }
-        } elseif (is_output('json')) {
+        } elseif ($this->isJson()) {
             return $this->json()->error('Nenhum dado foi enviado');
         } else {
             $forma_pagto->setAtiva('Y');
@@ -117,12 +117,12 @@ class FormaPagtoPageController extends \MZ\Core\Controller
 
     public function update()
     {
-        need_permission(Permissao::NOME_CADASTROFORMASPAGTO, is_output('json'));
-        $id = isset($_GET['id']) ? $_GET['id'] : null;
+        $this->needPermission([Permissao::NOME_CADASTROFORMASPAGTO]);
+        $id = $this->getRequest()->query->getInt('id', null);
         $forma_pagto = FormaPagto::findByID($id);
         if (!$forma_pagto->exists()) {
             $msg = 'A forma de pagamento não foi informada ou não existe';
-            if (is_output('json')) {
+            if ($this->isJson()) {
                 return $this->json()->error($msg);
             }
             \Thunder::warning($msg);
@@ -132,7 +132,7 @@ class FormaPagtoPageController extends \MZ\Core\Controller
         $errors = [];
         $old_forma_pagto = $forma_pagto;
         if (is_post()) {
-            $forma_pagto = new FormaPagto($_POST);
+            $forma_pagto = new FormaPagto($this->getData());
             try {
                 $forma_pagto->filter($old_forma_pagto, true);
                 $forma_pagto->update();
@@ -141,7 +141,7 @@ class FormaPagtoPageController extends \MZ\Core\Controller
                     'Forma de pagamento "%s" atualizada com sucesso!',
                     $forma_pagto->getDescricao()
                 );
-                if (is_output('json')) {
+                if ($this->isJson()) {
                     return $this->json()->success(['item' => $forma_pagto->publish()], $msg);
                 }
                 \Thunder::success($msg, true);
@@ -151,7 +151,7 @@ class FormaPagtoPageController extends \MZ\Core\Controller
                 if ($e instanceof \MZ\Exception\ValidationException) {
                     $errors = $e->getErrors();
                 }
-                if (is_output('json')) {
+                if ($this->isJson()) {
                     return $this->json()->error($e->getMessage(), null, $errors);
                 }
                 \Thunder::error($e->getMessage());
@@ -160,7 +160,7 @@ class FormaPagtoPageController extends \MZ\Core\Controller
                     break;
                 }
             }
-        } elseif (is_output('json')) {
+        } elseif ($this->isJson()) {
             return $this->json()->error('Nenhum dado foi enviado');
         }
         $_carteiras = Carteira::findAll();
@@ -169,12 +169,12 @@ class FormaPagtoPageController extends \MZ\Core\Controller
 
     public function delete()
     {
-        need_permission(Permissao::NOME_CADASTROFORMASPAGTO, is_output('json'));
-        $id = isset($_GET['id']) ? $_GET['id'] : null;
+        $this->needPermission([Permissao::NOME_CADASTROFORMASPAGTO]);
+        $id = $this->getRequest()->query->getInt('id', null);
         $forma_pagto = FormaPagto::findByID($id);
         if (!$forma_pagto->exists()) {
             $msg = 'A forma de pagamento não foi informada ou não existe';
-            if (is_output('json')) {
+            if ($this->isJson()) {
                 return $this->json()->error($msg);
             }
             \Thunder::warning($msg);
@@ -184,7 +184,7 @@ class FormaPagtoPageController extends \MZ\Core\Controller
             $forma_pagto->delete();
             $forma_pagto->clean(new FormaPagto());
             $msg = sprintf('Forma de pagamento "%s" excluída com sucesso!', $forma_pagto->getDescricao());
-            if (is_output('json')) {
+            if ($this->isJson()) {
                 return $this->json()->success([], $msg);
             }
             \Thunder::success($msg, true);
@@ -193,7 +193,7 @@ class FormaPagtoPageController extends \MZ\Core\Controller
                 'Não foi possível excluir a forma de pagamento "%s"',
                 $forma_pagto->getDescricao()
             );
-            if (is_output('json')) {
+            if ($this->isJson()) {
                 return $this->json()->error($msg);
             }
             \Thunder::error($msg);

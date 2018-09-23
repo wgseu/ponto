@@ -44,27 +44,27 @@ class PedidoOldApiController extends \MZ\Core\ApiController
 {
     public function find()
     {
-        if (!is_login()) {
+        if (!app()->getAuthentication()->isLogin()) {
             return $this->json()->error('Usuário não autenticado!');
         }
         try {
             $pedido = new Pedido();
             $tipo = Pedido::TIPO_MESA;
-            if (isset($_GET['comanda'])) {
+            if ($this->getRequest()->query->get('comanda')) {
                 $tipo = Pedido::TIPO_COMANDA;
             }
-            $pedido->setID(isset($_GET['id']) ? $_GET['id'] : null);
+            $pedido->setID($this->getRequest()->query->get('id'));
             $pedido->setTipo($tipo);
-            $pedido->setMesaID(isset($_GET['mesa']) ? $_GET['mesa'] : null);
-            $pedido->setComandaID(isset($_GET['comanda']) ? $_GET['comanda'] : null);
+            $pedido->setMesaID($this->getRequest()->query->get('mesa'));
+            $pedido->setComandaID($this->getRequest()->query->get('comanda'));
             if ($pedido->exists()) {
                 $pedido->loadByID();
-                $pedido->checkAccess(logged_provider());
+                $pedido->checkAccess(app()->auth->provider);
             } else {
-                $pedido->checkAccess(logged_provider());
+                $pedido->checkAccess(app()->auth->provider);
                 $pedido->loadByLocal();
             }
-            $agrupar = isset($_GET['agrupar']) ? boolval($_GET['agrupar']) : true;
+            $agrupar = $this->getRequest()->query->getBoolean('agrupar', true);
             $group = ['p.id'];
             if ($agrupar) {
                 $group = [
@@ -160,11 +160,11 @@ class PedidoOldApiController extends \MZ\Core\ApiController
 
     public function add()
     {
-        need_login(true);
+        app()->needLogin();
         $order = new Order();
-        $order->setEmployee(logged_provider());
+        $order->setEmployee(app()->auth->provider);
         try {
-            $order->loadData($_POST);
+            $order->loadData($this->getRequest()->request->all());
             $order->search();
             $order->process();
         } catch (\Exception $e) {
@@ -183,26 +183,26 @@ class PedidoOldApiController extends \MZ\Core\ApiController
      */
     public function newCoupon()
     {
-        if (!is_login()) {
+        if (!app()->getAuthentication()->isLogin()) {
             return $this->json()->error('Usuário não autenticado!');
         }
-        need_manager(true);
+        app()->needManager();
         try {
-            $pedido = new Pedido($_GET);
+            $pedido = new Pedido($this->getRequest()->query->all());
             $pedido->loadByID();
             if (!$pedido->exists()) {
                 throw new \Exception('O pedido informado não existe');
             }
-            $pedido->checkAccess(logged_provider());
+            $pedido->checkAccess(app()->auth->provider);
             if ($pedido->getEstado() != Pedido::ESTADO_FECHADO) {
-                $pedido->setFechadorID(logged_provider()->getID());
+                $pedido->setFechadorID(app()->auth->provider->getID());
                 $pedido->setDataImpressao(DB::now());
                 $pedido->setEstado(Pedido::ESTADO_FECHADO);
                 $pedido->update();
             }
             $dispositivo = new Dispositivo();
-            $dispositivo->setNome(isset($_GET['device']) ? $_GET['device'] : null);
-            $dispositivo->setSerial(isset($_GET['serial']) ? $_GET['serial'] : null);
+            $dispositivo->setNome($this->getRequest()->query->get('device'));
+            $dispositivo->setSerial($this->getRequest()->query->get('serial'));
             $dispositivo->loadBySerial($dispositivo->getSerial());
             if (!$dispositivo->exists()) {
                 throw new \Exception('O dispositivo informado não existe ou não foi validado');

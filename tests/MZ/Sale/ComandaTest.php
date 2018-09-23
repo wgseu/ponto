@@ -26,10 +26,29 @@ namespace MZ\Sale;
 
 class ComandaTest extends \MZ\Framework\TestCase
 {
+    public static function build($nome = null)
+    {
+        $last = Comanda::find([], ['id' => -1]);
+        $id = $last->getID() + 1;
+        $comanda = new Comanda();
+        $comanda->setNumero($id);
+        $comanda->setNome($nome ?: "Comanda {$id}");
+        $comanda->setAtiva('Y');
+        return $comanda;
+    }
+
+    public static function create($nome = null)
+    {
+        $comanda = self::build($nome);
+        $comanda->insert();
+        return $comanda;
+    }
+
     public function testFromArray()
     {
         $old_comanda = new Comanda([
             'id' => 123,
+            'numero' => 123,
             'nome' => 'Comanda',
             'ativa' => 'Y',
         ]);
@@ -44,15 +63,17 @@ class ComandaTest extends \MZ\Framework\TestCase
     {
         $old_comanda = new Comanda([
             'id' => 1234,
+            'numero' => 1230,
             'nome' => 'Comanda filter',
             'ativa' => 'Y',
         ]);
         $comanda = new Comanda([
             'id' => 1234,
+            'numero' => '1.230',
             'nome' => ' Comanda <script>filter</script> ',
             'ativa' => 'Y',
         ]);
-        $comanda->filter($old_comanda);
+        $comanda->filter($old_comanda, true);
         $this->assertEquals($old_comanda, $comanda);
     }
 
@@ -62,6 +83,7 @@ class ComandaTest extends \MZ\Framework\TestCase
         $values = $comanda->publish();
         $allowed = [
             'id',
+            'numero',
             'nome',
             'ativa',
         ];
@@ -78,24 +100,18 @@ class ComandaTest extends \MZ\Framework\TestCase
         } catch (\MZ\Exception\ValidationException $e) {
             $this->assertEquals(
                 [
+                    'numero',
                     'nome',
                     'ativa',
                 ],
                 array_keys($e->getErrors())
             );
         }
-        $comanda->setID(Comanda::getNextID());
-        $comanda->setNome('Comanda to insert ' . $comanda->getID());
-        $comanda->setAtiva('Y');
-        $comanda->insert();
     }
 
     public function testUpdate()
     {
-        $comanda = new Comanda();
-        $comanda->setNome('Comanda to update');
-        $comanda->setAtiva('N');
-        $comanda->insert();
+        $comanda = self::create('Comanda to update');
         $comanda->setNome('Comanda updated');
         $comanda->setAtiva('N');
         $comanda->update();
@@ -108,10 +124,7 @@ class ComandaTest extends \MZ\Framework\TestCase
 
     public function testDelete()
     {
-        $comanda = new Comanda();
-        $comanda->setNome('Comanda to delete');
-        $comanda->setAtiva('Y');
-        $comanda->insert();
+        $comanda = self::create('Comanda to delete');
         $comanda->delete();
         $comanda->clean(new Comanda());
         $found_comanda = Comanda::findByID($comanda->getID());
@@ -123,21 +136,15 @@ class ComandaTest extends \MZ\Framework\TestCase
 
     public function testFind()
     {
-        $comanda = new Comanda();
-        $comanda->setNome('Comanda find');
-        $comanda->setAtiva('Y');
-        $comanda->insert();
+        $comanda = self::create('Comanda find');
         $found_comanda = Comanda::find(['id' => $comanda->getID()]);
         $this->assertEquals($comanda, $found_comanda);
-        $found_comanda = Comanda::findByID($comanda->getID());
+        $found_comanda = Comanda::findByNumero($comanda->getNumero());
         $this->assertEquals($comanda, $found_comanda);
         $found_comanda = Comanda::findByNome($comanda->getNome());
         $this->assertEquals($comanda, $found_comanda);
 
-        $comanda_sec = new Comanda();
-        $comanda_sec->setNome('Comanda find second');
-        $comanda_sec->setAtiva('Y');
-        $comanda_sec->insert();
+        $comanda_sec = self::create('Comanda find second');
 
         $comandas = Comanda::findAll(['search' => 'Comanda find'], [], 2, 0);
         $this->assertEquals([$comanda, $comanda_sec], $comandas);

@@ -39,10 +39,10 @@ abstract class ApiController extends Controller
     }
 
     /**
-     * Get current request as json
-     * @return array json request content as array
+     * Get current json request data
+     * @return array json request data
      */
-    public function getJsonParams()
+    public function getData()
     {
         $content = $this->getRequest()->getContent();
         return json_decode($content, true) ?: [];

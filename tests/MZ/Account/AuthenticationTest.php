@@ -25,6 +25,7 @@
 namespace MZ\Account;
 
 use MZ\Database\DB;
+use MZ\System\Permissao;
 
 class AuthenticationTest extends \MZ\Framework\TestCase
 {
@@ -35,7 +36,31 @@ class AuthenticationTest extends \MZ\Framework\TestCase
     {
         $funcao = \MZ\Provider\FuncaoTest::create($permissions);
         $prestador = \MZ\Provider\PrestadorTest::create($funcao);
-        self::getApp()->getAuthentication()->login($prestador->findClienteID());
+        app()->getAuthentication()->login($prestador->findClienteID());
         return $prestador;
+    }
+
+    public function testClienteLogin()
+    {
+        app()->getAuthentication()->logout();
+        $cliente = \MZ\Account\ClienteTest::create();
+        app()->getAuthentication()->login($cliente);
+        $this->assertTrue(app()->getAuthentication()->getUser()->exists());
+    }
+
+    public function testPrestadorLoginSemAcesso()
+    {
+        app()->getAuthentication()->logout();
+        self::authProvider([]);
+        $this->assertTrue(app()->getAuthentication()->getUser()->exists());
+        $this->assertFalse(app()->getAuthentication()->getEmployee()->exists());
+    }
+
+    public function testPrestadorLogin()
+    {
+        app()->getAuthentication()->logout();
+        self::authProvider([Permissao::NOME_SISTEMA]);
+        $this->assertTrue(app()->getAuthentication()->getUser()->exists());
+        $this->assertTrue(app()->getAuthentication()->getEmployee()->exists());
     }
 }

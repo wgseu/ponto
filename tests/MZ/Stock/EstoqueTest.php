@@ -24,8 +24,46 @@
  */
 namespace MZ\Stock;
 
+use MZ\Product\ProdutoTest;
+use MZ\Environment\SetorTest;
+use MZ\Provider\PrestadorTest;
+
 class EstoqueTest extends \MZ\Framework\TestCase
 {
+    /**
+     * Build a valid estoque
+     * @param \MZ\Product\Produto $produto product to insert on stock
+     * @return Estoque
+     */
+    public static function build($produto = null)
+    {
+        $last = Estoque::find([], ['id' => -1]);
+        $id = $last->getID() + 1;
+        $produto = $produto ?: ProdutoTest::create();
+        $setor = SetorTest::create();
+        $prestador = PrestadorTest::create();
+        $estoque = new Estoque();
+        $estoque->setProdutoID($produto->getID());
+        $estoque->setSetorID($setor->getID());
+        $estoque->setPrestadorID($prestador->getID());
+        $estoque->setTipoMovimento(Estoque::TIPO_MOVIMENTO_ENTRADA);
+        $estoque->setQuantidade(10);
+        $estoque->setPrecoCompra(12.3);
+        return $estoque;
+    }
+
+    /**
+     * Create a estoque on database
+     * @param \MZ\Product\Produto $produto product to insert on stock
+     * @return Estoque
+     */
+    public static function create($produto = null)
+    {
+        $estoque = self::build();
+        $estoque->insert();
+        return $estoque;
+    }
+
     public function testPublish()
     {
         $estoque = new Estoque();

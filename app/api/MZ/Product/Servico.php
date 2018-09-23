@@ -782,9 +782,8 @@ class Servico extends SyncModel
      */
     public static function find($condition, $order = [])
     {
-        $query = self::query($condition, $order)->limit(1);
-        $row = $query->fetch() ?: [];
-        return new self($row);
+        $result = new self();
+        return $result->load($condition, $order);
     }
 
     /**

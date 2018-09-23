@@ -27,21 +27,19 @@ namespace MZ\Location;
 use MZ\System\Permissao;
 use MZ\Database\DB;
 use MZ\Util\Filter;
+use MZ\Core\PageController;
 
 /**
  * Allow application to serve system resources
  */
-class LocalizacaoPageController extends \MZ\Core\Controller
+class LocalizacaoPageController extends PageController
 {
     public function find()
     {
-        need_permission(Permissao::NOME_CADASTROCLIENTES, true);
+        $this->needPermission([Permissao::NOME_CADASTROCLIENTES]);
 
-        $limite = isset($_GET['limite']) ? intval($_GET['limite']) : 10;
-        if ($limite > 100 || $limite < 1) {
-            $limite = 10;
-        }
-        $condition = Filter::query($_GET);
+        $limite = max(1, min(100, $this->getRequest()->query->getInt('limite', 10)));
+        $condition = Filter::query($this->getRequest()->query->all());
         unset($condition['ordem']);
         $localizacao = new Localizacao($condition);
         $cliente = $localizacao->findClienteID();
@@ -49,10 +47,12 @@ class LocalizacaoPageController extends \MZ\Core\Controller
             $msg = 'O cliente não foi informado ou não existe!';
             return $this->json()->error($msg);
         }
-        $order = Filter::order(isset($_GET['ordem']) ? $_GET['ordem'] : '');
+        $order = Filter::order($this->getRequest()->query->get('ordem', ''));
         $count = Localizacao::count($condition);
-        list($pagesize, $offset, $pagination) = pagestring($count, $limite);
-        $localizacoes = Localizacao::findAll($condition, $order, $pagesize, $offset);
+        $page = max(1, $this->getRequest()->query->getInt('pagina', 1));
+        $pager = new \Pager($count, $limite, $page, 'pagina');
+        $pagination = $pager->genBasic();
+        $localizacoes = Localizacao::findAll($condition, $order, $limite, $pager->offset);
 
         $items = [];
         foreach ($localizacoes as $_localizacao) {
@@ -63,30 +63,30 @@ class LocalizacaoPageController extends \MZ\Core\Controller
 
     public function add()
     {
-        need_permission(Permissao::NOME_CADASTROCLIENTES, true);
+        $this->needPermission([Permissao::NOME_CADASTROCLIENTES]);
         $localizacao = new Localizacao();
         $old_localizacao = $localizacao;
         if (is_post()) {
-            $localizacao = new Localizacao($_POST);
+            $localizacao = new Localizacao($this->getData());
             try {
                 DB::beginTransaction();
-                if ($localizacao->getClienteID() == $this->getApplication()->getSystem()->getCompany()->getID() &&
-                    !logged_provider()->has(Permissao::NOME_ALTERARCONFIGURACOES)
+                if ($localizacao->getClienteID() == app()->getSystem()->getCompany()->getID() &&
+                    !app()->auth->has([Permissao::NOME_ALTERARCONFIGURACOES])
                 ) {
                     throw new \Exception('Você não tem permissão para atribuir um endereço a essa empresa!');
                 }
                 $old_localizacao->setClienteID($localizacao->getClienteID());
                 $localizacao->filter($old_localizacao, true);
-                $estado_id = isset($_POST['estadoid']) ? $_POST['estadoid'] : null;
+                $estado_id = $this->getRequest()->request->get('estadoid');
                 $estado = \MZ\Location\Estado::findByID($estado_id);
                 if (!$estado->exists()) {
                     throw new \MZ\Exception\ValidationException(
                         ['estadoid' => 'O estado não foi informado ou não existe!']
                     );
                 }
-                $cidade_id = isset($_POST['cidade']) ? $_POST['cidade'] : null;
+                $cidade_id = $this->getRequest()->request->get('cidade');
                 $cidade = \MZ\Location\Cidade::findOrInsert($estado->getID(), $cidade_id);
-                $bairro_id = isset($_POST['bairro']) ? $_POST['bairro'] : null;
+                $bairro_id = $this->getRequest()->request->get('bairro');
                 $bairro = \MZ\Location\Bairro::findOrInsert($cidade->getID(), $bairro_id);
                 $localizacao->setBairroID($bairro->getID());
                 $localizacao->insert();
@@ -113,36 +113,36 @@ class LocalizacaoPageController extends \MZ\Core\Controller
 
     public function update()
     {
-        need_permission(Permissao::NOME_CADASTROCLIENTES, true);
+        $this->needPermission([Permissao::NOME_CADASTROCLIENTES]);
 
-        $id = isset($_GET['id']) ? $_GET['id'] : null;
+        $id = $this->getRequest()->query->getInt('id', null);
         $localizacao = Localizacao::findByID($id);
         if (!$localizacao->exists()) {
             $msg = 'A localização não foi informada ou não existe';
             return $this->json()->error($msg);
         }
-        if ($localizacao->getClienteID() == $this->getApplication()->getSystem()->getCompany()->getID() &&
-            !logged_provider()->has(Permissao::NOME_ALTERARCONFIGURACOES)
+        if ($localizacao->getClienteID() == app()->getSystem()->getCompany()->getID() &&
+            !app()->auth->has([Permissao::NOME_ALTERARCONFIGURACOES])
         ) {
             $msg = 'Você não tem permissão para alterar o endereço dessa empresa!';
             return $this->json()->error($msg);
         }
         $old_localizacao = $localizacao;
         if (is_post()) {
-            $localizacao = new Localizacao($_POST);
+            $localizacao = new Localizacao($this->getData());
             try {
                 DB::beginTransaction();
                 $localizacao->filter($old_localizacao, true);
-                $estado_id = isset($_POST['estadoid']) ? $_POST['estadoid'] : null;
+                $estado_id = $this->getRequest()->request->get('estadoid');
                 $estado = Estado::findByID($estado_id);
                 if (!$estado->exists()) {
                     throw new \MZ\Exception\ValidationException(
                         ['estadoid' => 'O estado não foi informado ou não existe!']
                     );
                 }
-                $cidade_id = isset($_POST['cidade']) ? $_POST['cidade'] : null;
+                $cidade_id = $this->getRequest()->request->get('cidade');
                 $cidade = Cidade::findOrInsert($estado->getID(), $cidade_id);
-                $bairro_id = isset($_POST['bairro']) ? $_POST['bairro'] : null;
+                $bairro_id = $this->getRequest()->request->get('bairro');
                 $bairro = Bairro::findOrInsert($cidade->getID(), $bairro_id);
                 $localizacao->setBairroID($bairro->getID());
                 $localizacao->save();
@@ -169,8 +169,8 @@ class LocalizacaoPageController extends \MZ\Core\Controller
 
     public function delete()
     {
-        need_permission(Permissao::NOME_CADASTROCLIENTES, true);
-        $id = isset($_GET['id']) ? $_GET['id'] : null;
+        $this->needPermission([Permissao::NOME_CADASTROCLIENTES]);
+        $id = $this->getRequest()->query->getInt('id', null);
         $localizacao = Localizacao::findByID($id);
         if (!$localizacao->exists()) {
             $msg = 'A localização não foi informada ou não existe';

@@ -52,7 +52,7 @@ class ClassificacaoTest extends \MZ\Framework\TestCase
             'classificacaoid' => '1.234',
             'descricao' => ' Classificação <script>filter</script> ',
         ]);
-        $classificacao->filter($old_classificacao);
+        $classificacao->filter($old_classificacao, true);
         $this->assertEquals($old_classificacao, $classificacao);
     }
 
@@ -64,6 +64,7 @@ class ClassificacaoTest extends \MZ\Framework\TestCase
             'id',
             'classificacaoid',
             'descricao',
+            'iconeurl',
         ];
         $this->assertEquals($allowed, array_keys($values));
     }

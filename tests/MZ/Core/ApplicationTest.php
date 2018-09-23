@@ -30,8 +30,7 @@ class ApplicationTest extends \MZ\Framework\TestCase
 {
     public function testGlobalApp()
     {
-        global $app;
-        $this->assertNotNull($app);
+        $this->assertNotNull(app());
     }
 
     public function testAssignedDB()

@@ -33,27 +33,27 @@ class LocalizacaoOldApiController extends \MZ\Core\ApiController
 {
     public function find()
     {
-        $estado_id = isset($_GET['estadoid']) ? $_GET['estadoid'] : null;
+        $estado_id = $this->getRequest()->query->get('estadoid');
         $estado = Estado::findByID($estado_id);
         if (!$estado->exists()) {
             return $this->json()->error('O estado não foi informado ou não existe!');
         }
-        $cidade = Cidade::findByEstadoIDNome($estado_id, isset($_GET['cidade'])?trim($_GET['cidade']):null);
+        $cidade = Cidade::findByEstadoIDNome($estado_id, $this->getRequest()->query->get('cidade'));
         if (!$cidade->exists()) {
             return $this->json()->error('A cidade informada não existe!');
         }
-        $condition = Filter::query($_GET);
+        $condition = Filter::query($this->getRequest()->query->all());
         $condition['cidadeid'] = $cidade->getID();
         // filter remove empty entry
-        if (array_key_exists('typesearch', $_GET)) {
-            $condition['typesearch'] = $_GET['typesearch'];
+        if ($this->getRequest()->query->has('typesearch')) {
+            $condition['typesearch'] = $this->getRequest()->query->get('typesearch');
         }
         $localizacoes = Localizacao::findAll($condition, [], 10);
         $campos = [
             'cep',
             'logradouro'
         ];
-        if (isset($_GET['tipo']) && $_GET['tipo'] == Localizacao::TIPO_APARTAMENTO) {
+        if ($this->getRequest()->query->get('tipo') == Localizacao::TIPO_APARTAMENTO) {
             $campos[] = 'numero';
             $campos[] = 'condominio';
         }

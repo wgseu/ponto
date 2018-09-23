@@ -31,11 +31,11 @@ class IntegracaoOldApiController extends \MZ\Core\ApiController
 {
     public function update()
     {
-        need_permission(Permissao::NOME_ALTERARCONFIGURACOES, true);
+        $this->needPermission([Permissao::NOME_ALTERARCONFIGURACOES]);
         if (!is_post()) {
             return $this->json()->error('Nenhum dado foi enviado');
         }
-        $id = isset($_POST['id'])?$_POST['id']:null;
+        $id = $this->getRequest()->request->get('id');
         $integracao = Integracao::findByID($id);
         if (!$integracao->exists()) {
             $msg = 'A integração não foi informada ou não existe';
@@ -43,9 +43,9 @@ class IntegracaoOldApiController extends \MZ\Core\ApiController
         }
         $old_integracao = $integracao;
         try {
-            $integracao = new Integracao($_POST);
+            $integracao = new Integracao($this->getRequest()->request->all());
             $integracao->filter($old_integracao);
-            $integracao->save(array_keys($_POST));
+            $integracao->save(array_keys($this->getRequest()->request->all()));
             $old_integracao->clean($integracao);
             $msg = sprintf(
                 'Integração "%s" atualizada com sucesso!',

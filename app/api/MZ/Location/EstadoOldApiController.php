@@ -31,7 +31,7 @@ class EstadoOldApiController extends \MZ\Core\ApiController
 {
     public function find()
     {
-        $pais_id = isset($_GET['paisid']) ? $_GET['paisid'] : null;
+        $pais_id = $this->getRequest()->query->get('paisid');
         $pais = Pais::findByID($pais_id);
         if (!$pais->exists()) {
             return $this->json()->error('O país não foi informado ou não existe!');

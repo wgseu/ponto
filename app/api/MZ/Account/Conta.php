@@ -772,14 +772,13 @@ class Conta extends SyncModel
      */
     public function clean($dependency)
     {
-        global $app;
 
         // exclui o documento antigo
         if (!is_null($this->getAnexoCaminho()) &&
             $dependency->getAnexoCaminho() != $this->getAnexoCaminho() &&
             !is_local_path($this->getAnexoCaminho())
         ) {
-            @unlink($app->getPath('public') . get_document_url($this->getAnexoCaminho(), 'conta'));
+            @unlink(app()->getPath('public') . get_document_url($this->getAnexoCaminho(), 'conta'));
         }
         $this->setAnexoCaminho($dependency->getAnexoCaminho());
     }

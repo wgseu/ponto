@@ -554,9 +554,8 @@ class Integracao extends SyncModel
      */
     public function read()
     {
-        global $app;
 
-        $filename = $app->getPath('public') . $this->makeDataURL();
+        $filename = app()->getPath('public') . $this->makeDataURL();
         if (!file_exists($filename)) {
             return [];
         }
@@ -569,9 +568,8 @@ class Integracao extends SyncModel
      */
     public function write($data)
     {
-        global $app;
 
-        $filename = $app->getPath('public') . $this->makeDataURL();
+        $filename = app()->getPath('public') . $this->makeDataURL();
         xmkdir(dirname($filename), 0711);
         if (file_put_contents($filename, json_encode($data)) === false) {
             throw new \Exception(

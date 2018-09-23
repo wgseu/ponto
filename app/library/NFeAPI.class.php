@@ -47,29 +47,28 @@ class NFeAPI extends \NFe\Common\Ajuste
 
     public function init()
     {
-        global $app;
 
-        $empresa = $app->getSystem()->getCompany();
-        $localizacao = $app->getSystem()->getLocalization();
-        $bairro = $app->getSystem()->getDistrict();
-        $cidade = $app->getSystem()->getCity();
-        $estado = $app->getSystem()->getState();
+        $empresa = app()->getSystem()->getCompany();
+        $localizacao = app()->getSystem()->getLocalization();
+        $bairro = app()->getSystem()->getDistrict();
+        $cidade = app()->getSystem()->getCity();
+        $estado = app()->getSystem()->getState();
 
         $this->external_emitente = Emitente::findByID('1');
         if (!$this->external_emitente->exists()) {
             throw new \Exception('As configurações fiscais do emitente não foram ajustadas', 500);
         }
-        \NFe\Logger\Log::getInstance()->setDirectory($app->getPath('logs'));
+        \NFe\Logger\Log::getInstance()->setDirectory(app()->getPath('logs'));
         $this->external_regime = $this->external_emitente->findRegimeID();
         $this->sefaz = \NFe\Core\SEFAZ::getInstance();
         $this->sefaz->setConfiguracao($this);
         $this->setBanco(new \NFeDB());
         $this->getBanco()->getIBPT()->setOffline($this->isOffline());
-        $chave_publica = $app->getPath('public') . get_document_url($this->external_emitente->getChavePublica(), 'cert');
+        $chave_publica = app()->getPath('public') . get_document_url($this->external_emitente->getChavePublica(), 'cert');
         $this->setArquivoChavePublica($chave_publica);
-        $chave_privada = $app->getPath('public') . get_document_url($this->external_emitente->getChavePrivada(), 'cert');
+        $chave_privada = app()->getPath('public') . get_document_url($this->external_emitente->getChavePrivada(), 'cert');
         $this->setArquivoChavePrivada($chave_privada);
-        $xml_base = $app->getPath('public') . get_document_url('', 'xml');
+        $xml_base = app()->getPath('public') . get_document_url('', 'xml');
         $this->setPastaXmlBase($xml_base);
         $this->setToken($this->external_emitente->getToken());
         $this->setCSC($this->external_emitente->getCSC());

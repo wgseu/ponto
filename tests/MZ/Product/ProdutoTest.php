@@ -24,14 +24,52 @@
  */
 namespace MZ\Product;
 
+use MZ\System\Permissao;
+use MZ\Account\AuthenticationTest;
+use MZ\Stock\EstoqueTest;
+
 class ProdutoTest extends \MZ\Framework\TestCase
 {
+    public static function build($descricao = null)
+    {
+        $last = Produto::find([], ['id' => -1]);
+        $id = $last->getID() + 1;
+        $categoria = CategoriaTest::create();
+        $unidade = UnidadeTest::create();
+        $produto = new Produto();
+        $produto->setCodigo($id);
+        $produto->setCategoriaID($categoria->getID());
+        $produto->setUnidadeID($unidade->getID());
+        $produto->setDescricao($descricao ?: "Produto #{$id}");
+        $produto->setQuantidadeLimite(0);
+        $produto->setQuantidadeMaxima(0);
+        $produto->setConteudo(1);
+        $produto->setPrecoVenda(0);
+        $produto->setTipo(Produto::TIPO_PRODUTO);
+        $produto->setCobrarServico('Y');
+        $produto->setDivisivel('Y');
+        $produto->setPesavel('Y');
+        $produto->setPerecivel('Y');
+        $produto->setTempoPreparo(0);
+        $produto->setVisivel('Y');
+        $produto->setInterno('N');
+        return $produto;
+    }
+
+    public static function create($descricao = null)
+    {
+        $produto = self::build($descricao);
+        $produto->insert();
+        return $produto;
+    }
+
     public function testPublish()
     {
         $produto = new Produto();
         $values = $produto->publish();
         $allowed = [
             'id',
+            'codigo',
             'codigobarras',
             'categoriaid',
             'unidadeid',
@@ -53,9 +91,28 @@ class ProdutoTest extends \MZ\Framework\TestCase
             'perecivel',
             'tempopreparo',
             'visivel',
-            'imagem',
+            'interno',
+            'avaliacao',
+            'imagemurl',
             'dataatualizacao',
+            'dataarquivado',
         ];
         $this->assertEquals($allowed, array_keys($values));
+    }
+
+    public function testAppFind()
+    {
+        $estoque = EstoqueTest::create();
+        $produto = $estoque->findProdutoID();
+        AuthenticationTest::authProvider([Permissao::NOME_SISTEMA, Permissao::NOME_CADASTROPRODUTOS]);
+        $expected = [
+            'status' => 'ok',
+            'items' => [
+                $produto->publish(),
+            ],
+        ];
+        app()->getAuthentication()->logout();
+        $result = $this->get('/app/produto/listar', ['busca' => $produto->getDescricao()]);
+        $this->assertEquals($expected, \array_intersect_key($result, \array_keys($expected)));
     }
 }

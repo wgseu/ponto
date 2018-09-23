@@ -27,29 +27,29 @@ namespace MZ\Account;
 use MZ\System\Permissao;
 use MZ\Database\DB;
 use MZ\Util\Filter;
+use MZ\Core\PageController;
 
 /**
  * Allow application to serve system resources
  */
-class CreditoPageController extends \MZ\Core\Controller
+class CreditoPageController extends PageController
 {
     public function find()
     {
-        need_permission(Permissao::NOME_CADASTRARCREDITOS, is_output('json'));
+        $this->needPermission([Permissao::NOME_CADASTRARCREDITOS]);
 
-        $limite = isset($_GET['limite']) ? intval($_GET['limite']) : 10;
-        if ($limite > 100 || $limite < 1) {
-            $limite = 10;
-        }
-        $condition = Filter::query($_GET);
+        $limite = max(1, min(100, $this->getRequest()->query->getInt('limite', 10)));
+        $condition = Filter::query($this->getRequest()->query->all());
         unset($condition['ordem']);
         $credito = new Credito($condition);
-        $order = Filter::order(isset($_GET['ordem']) ? $_GET['ordem'] : '');
+        $order = Filter::order($this->getRequest()->query->get('ordem', ''));
         $count = Credito::count($condition);
-        list($pagesize, $offset, $pagination) = pagestring($count, $limite);
-        $creditos = Credito::findAll($condition, $order, $pagesize, $offset);
+        $page = max(1, $this->getRequest()->query->getInt('pagina', 1));
+        $pager = new \Pager($count, $limite, $page, 'pagina');
+        $pagination = $pager->genBasic();
+        $creditos = Credito::findAll($condition, $order, $limite, $pager->offset);
 
-        if (is_output('json')) {
+        if ($this->isJson()) {
             $items = [];
             foreach ($creditos as $_credito) {
                 $items[] = $_credito->publish();
@@ -67,8 +67,8 @@ class CreditoPageController extends \MZ\Core\Controller
 
     public function add()
     {
-        need_permission(Permissao::NOME_CADASTRARCREDITOS, is_output('json'));
-        $id = isset($_GET['id']) ? $_GET['id'] : null;
+        $this->needPermission([Permissao::NOME_CADASTRARCREDITOS]);
+        $id = $this->getRequest()->query->getInt('id', null);
         $credito = Credito::findByID($id);
         $credito->setID(null);
         $credito->setDataCadastro(DB::now());
@@ -77,9 +77,9 @@ class CreditoPageController extends \MZ\Core\Controller
         $errors = [];
         $old_credito = $credito;
         if (is_post()) {
-            $credito = new Credito($_POST);
+            $credito = new Credito($this->getData());
             try {
-                $old_credito->setFuncionarioID(logged_provider()->getID());
+                $old_credito->setFuncionarioID(app()->auth->provider->getID());
                 $old_credito->setClienteID($credito->getClienteID());
                 $credito->filter($old_credito, true);
                 $credito->insert();
@@ -88,7 +88,7 @@ class CreditoPageController extends \MZ\Core\Controller
                     'Crédito "%s" cadastrado com sucesso!',
                     $credito->getDetalhes()
                 );
-                if (is_output('json')) {
+                if ($this->isJson()) {
                     return $this->json()->success(['item' => $credito->publish()], $msg);
                 }
                 \Thunder::success($msg, true);
@@ -98,7 +98,7 @@ class CreditoPageController extends \MZ\Core\Controller
                 if ($e instanceof \MZ\Exception\ValidationException) {
                     $errors = $e->getErrors();
                 }
-                if (is_output('json')) {
+                if ($this->isJson()) {
                     return $this->json()->error($e->getMessage(), null, $errors);
                 }
                 \Thunder::error($e->getMessage());
@@ -107,7 +107,7 @@ class CreditoPageController extends \MZ\Core\Controller
                     break;
                 }
             }
-        } elseif (is_output('json')) {
+        } elseif ($this->isJson()) {
             return $this->json()->error('Nenhum dado foi enviado');
         }
         return $this->view('gerenciar_credito_cadastrar', get_defined_vars());
@@ -115,12 +115,12 @@ class CreditoPageController extends \MZ\Core\Controller
 
     public function update()
     {
-        need_permission(Permissao::NOME_CADASTRARCREDITOS, is_output('json'));
-        $id = isset($_GET['id']) ? $_GET['id'] : null;
+        $this->needPermission([Permissao::NOME_CADASTRARCREDITOS]);
+        $id = $this->getRequest()->query->getInt('id', null);
         $credito = Credito::findByID($id);
         if (!$credito->exists()) {
             $msg = 'O crédito não foi informado ou não existe';
-            if (is_output('json')) {
+            if ($this->isJson()) {
                 return $this->json()->error($msg);
             }
             \Thunder::warning($msg);
@@ -130,7 +130,7 @@ class CreditoPageController extends \MZ\Core\Controller
         $errors = [];
         $old_credito = $credito;
         if (is_post()) {
-            $credito = new Credito($_POST);
+            $credito = new Credito($this->getData());
             try {
                 $credito->filter($old_credito, true);
                 $credito->update();
@@ -139,7 +139,7 @@ class CreditoPageController extends \MZ\Core\Controller
                     'Crédito "%s" atualizado com sucesso!',
                     $credito->getDetalhes()
                 );
-                if (is_output('json')) {
+                if ($this->isJson()) {
                     return $this->json()->success(['item' => $credito->publish()], $msg);
                 }
                 \Thunder::success($msg, true);
@@ -149,7 +149,7 @@ class CreditoPageController extends \MZ\Core\Controller
                 if ($e instanceof \MZ\Exception\ValidationException) {
                     $errors = $e->getErrors();
                 }
-                if (is_output('json')) {
+                if ($this->isJson()) {
                     return $this->json()->error($e->getMessage(), null, $errors);
                 }
                 \Thunder::error($e->getMessage());
@@ -158,7 +158,7 @@ class CreditoPageController extends \MZ\Core\Controller
                     break;
                 }
             }
-        } elseif (is_output('json')) {
+        } elseif ($this->isJson()) {
             return $this->json()->error('Nenhum dado foi enviado');
         }
         return $this->view('gerenciar_credito_editar', get_defined_vars());
@@ -166,12 +166,12 @@ class CreditoPageController extends \MZ\Core\Controller
 
     public function delete()
     {
-        need_permission(Permissao::NOME_CADASTRARCREDITOS, is_output('json'));
-        $id = isset($_GET['id']) ? $_GET['id'] : null;
+        $this->needPermission([Permissao::NOME_CADASTRARCREDITOS]);
+        $id = $this->getRequest()->query->getInt('id', null);
         $credito = Credito::findByID($id);
         if (!$credito->exists()) {
             $msg = 'O crédito não foi informado ou não existe';
-            if (is_output('json')) {
+            if ($this->isJson()) {
                 return $this->json()->error($msg);
             }
             \Thunder::warning($msg);
@@ -181,7 +181,7 @@ class CreditoPageController extends \MZ\Core\Controller
             $credito->delete();
             $credito->clean(new Credito());
             $msg = sprintf('Crédito "%s" excluído com sucesso!', $credito->getDetalhes());
-            if (is_output('json')) {
+            if ($this->isJson()) {
                 return $this->json()->success([], $msg);
             }
             \Thunder::success($msg, true);
@@ -190,7 +190,7 @@ class CreditoPageController extends \MZ\Core\Controller
                 'Não foi possível excluir o crédito "%s"',
                 $credito->getDetalhes()
             );
-            if (is_output('json')) {
+            if ($this->isJson()) {
                 return $this->json()->error($msg);
             }
             \Thunder::error($msg);
@@ -200,12 +200,12 @@ class CreditoPageController extends \MZ\Core\Controller
 
     public function cancel()
     {
-        need_permission(Permissao::NOME_CADASTRARCREDITOS, is_output('json'));
-        $id = isset($_GET['id']) ? $_GET['id'] : null;
+        $this->needPermission([Permissao::NOME_CADASTRARCREDITOS]);
+        $id = $this->getRequest()->query->getInt('id', null);
         $credito = Credito::findByID($id);
         if (!$credito->exists()) {
             $msg = 'O crédito não foi informado ou não existe';
-            if (is_output('json')) {
+            if ($this->isJson()) {
                 return $this->json()->error($msg);
             }
             \Thunder::warning($msg);
@@ -214,7 +214,7 @@ class CreditoPageController extends \MZ\Core\Controller
         try {
             $credito->cancel();
             $msg = sprintf('Crédito "%s" cancelado com sucesso!', $credito->getDetalhes());
-            if (is_output('json')) {
+            if ($this->isJson()) {
                 return $this->json()->success([], $msg);
             }
             \Thunder::success($msg, true);
@@ -223,7 +223,7 @@ class CreditoPageController extends \MZ\Core\Controller
                 'Não foi possível cancelar o crédito "%s"',
                 $credito->getDetalhes()
             );
-            if (is_output('json')) {
+            if ($this->isJson()) {
                 return $this->json()->error($msg);
             }
             \Thunder::error($msg);

@@ -37,7 +37,7 @@ class ServicoApiController extends \MZ\Core\ApiController
      */
     public function find()
     {
-        $this->needPermission(Permissao::NOME_CADASTROSERVICOS);
+        $this->needPermission([Permissao::NOME_CADASTROSERVICOS]);
         $limit = max(1, min(100, $this->getRequest()->query->getInt('limit', 10)));
         $page = max(1, $this->getRequest()->query->getInt('page', 1));
         $condition = Filter::query($this->getRequest()->query->all());
@@ -57,9 +57,9 @@ class ServicoApiController extends \MZ\Core\ApiController
      */
     public function add()
     {
-        $this->needPermission(Permissao::NOME_CADASTROSERVICOS);
+        $this->needPermission([Permissao::NOME_CADASTROSERVICOS]);
         $localized = $this->getRequest()->query->getBoolean('localized', false);
-        $servico = new Servico($this->getJsonParams());
+        $servico = new Servico($this->getData());
         $servico->filter(new Servico(), $localized);
         $servico->insert();
         return $this->getResponse()->success(['item' => $servico->publish()]);
@@ -71,10 +71,10 @@ class ServicoApiController extends \MZ\Core\ApiController
      */
     public function update($id)
     {
-        $this->needPermission(Permissao::NOME_CADASTROSERVICOS);
+        $this->needPermission([Permissao::NOME_CADASTROSERVICOS]);
         $old_servico = Servico::findOrFail(['id' => $id]);
         $localized = $this->getRequest()->query->getBoolean('localized', false);
-        $servico = new Servico($this->getJsonParams());
+        $servico = new Servico($this->getData());
         $servico->filter($old_servico, $localized);
         $servico->update();
         $old_servico->clean($servico);
@@ -87,7 +87,7 @@ class ServicoApiController extends \MZ\Core\ApiController
      */
     public function delete($id)
     {
-        $this->needPermission(Permissao::NOME_CADASTROSERVICOS);
+        $this->needPermission([Permissao::NOME_CADASTROSERVICOS]);
         $servico = Servico::findOrFail(['id' => $id]);
         $servico->delete();
         $servico->clean(new Servico());

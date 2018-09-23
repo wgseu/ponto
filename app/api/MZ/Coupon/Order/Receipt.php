@@ -274,7 +274,6 @@ class Receipt extends Model
      */
     protected function isAvailable($resource)
     {
-        global $app;
 
         if ($resource == 'order.subtotal.many') {
             return count($this->services) > 0 || is_greater($this->commission, 0);

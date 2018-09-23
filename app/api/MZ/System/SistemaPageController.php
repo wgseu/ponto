@@ -25,37 +25,38 @@
 namespace MZ\System;
 
 use MZ\Account\Cliente;
+use MZ\Core\PageController;
 
 /**
  * Allow application to serve system resources
  */
-class SistemaPageController extends \MZ\Core\Controller
+class SistemaPageController extends PageController
 {
     public function manage()
     {
-        need_manager(is_output('json'));
-        if (is_owner()) {
-            $controller = new \MZ\Payment\PagamentoPageController($this->getApplication());
+        app()->needManager();
+        if (app()->auth->isOwner()) {
+            $controller = new \MZ\Payment\PagamentoPageController(app());
             return $controller->dashboard();
-        } elseif (logged_provider()->has(Permissao::NOME_PAGAMENTO)) {
-            $controller = new \MZ\Sale\PedidoPageController($this->getApplication());
+        } elseif (app()->auth->has([Permissao::NOME_PAGAMENTO])) {
+            $controller = new \MZ\Sale\PedidoPageController(app());
             return $controller->find();
         } else {
-            $controller = new \MZ\Provider\PrestadorPageController($this->getApplication());
+            $controller = new \MZ\Provider\PrestadorPageController(app());
             return $controller->find();
         }
     }
 
     public function display()
     {
-        need_permission(Permissao::NOME_ALTERARCONFIGURACOES, is_output('json'));
+        $this->needPermission([Permissao::NOME_ALTERARCONFIGURACOES]);
 
         $tab = 'empresa';
-        $cliente = $this->getApplication()->getSystem()->getCompany();
+        $cliente = app()->getSystem()->getCompany();
         if (!$cliente->exists()) {
             $cliente->setTipo(Cliente::TIPO_JURIDICA);
         }
-        $localizacao = \MZ\Location\Localizacao::find(['clienteid' => $this->getApplication()->getSystem()->getCompany()->getID()]);
+        $localizacao = \MZ\Location\Localizacao::find(['clienteid' => app()->getSystem()->getCompany()->getID()]);
         $localizacao->setClienteID($cliente->getID());
         if (!$localizacao->exists()) {
             $localizacao->setMostrar('Y');
@@ -76,7 +77,7 @@ class SistemaPageController extends \MZ\Core\Controller
 
     public function advanced()
     {
-        need_permission(Permissao::NOME_ALTERARCONFIGURACOES, is_output('json'));
+        $this->needPermission([Permissao::NOME_ALTERARCONFIGURACOES]);
 
         $focusctrl = 'mapskey';
         $tab = 'avancado';
@@ -86,12 +87,12 @@ class SistemaPageController extends \MZ\Core\Controller
         $dropbox_token = get_string_config('Sistema', 'Dropbox.AccessKey');
         if (is_post()) {
             try {
-                $maps_api = isset($_POST['mapskey']) ? trim($_POST['mapskey']) : null;
+                $maps_api = trim($this->getRequest()->request->get('mapskey'));
                 set_string_config('Site', 'Maps.API', $maps_api);
-                $dropbox_token = isset($_POST['dropboxtoken']) ? trim($_POST['dropboxtoken']) : null;
+                $dropbox_token = trim($this->getRequest()->request->get('dropboxtoken'));
                 set_string_config('Sistema', 'Dropbox.AccessKey', $dropbox_token);
-                $this->getApplication()->getSystem()->filter($this->getApplication()->getSystem());
-                $this->getApplication()->getSystem()->update(['opcoes']);
+                app()->getSystem()->filter(app()->getSystem());
+                app()->getSystem()->update(['opcoes']);
                 \Thunder::success('Opções avançadas atualizadas com sucesso!', true);
                 return $this->redirect('/gerenciar/sistema/avancado');
             } catch (\ValidationException $e) {
@@ -111,7 +112,7 @@ class SistemaPageController extends \MZ\Core\Controller
 
     public function mail()
     {
-        need_permission(Permissao::NOME_ALTERARCONFIGURACOES, is_output('json'));
+        $this->needPermission([Permissao::NOME_ALTERARCONFIGURACOES]);
 
         $tab = 'email';
         $focusctrl = 'destinatario';
@@ -124,27 +125,27 @@ class SistemaPageController extends \MZ\Core\Controller
         $usuario = get_string_config('Email', 'Usuario');
         if (is_post()) {
             try {
-                $destinatario = isset($_POST['destinatario']) ? trim($_POST['destinatario']) : null;
+                $destinatario = trim($this->getRequest()->request->get('destinatario'));
                 set_string_config('Email', 'Remetente', $destinatario);
-                $servidor = isset($_POST['servidor']) ? trim($_POST['servidor']) : null;
+                $servidor = trim($this->getRequest()->request->get('servidor'));
                 set_string_config('Email', 'Servidor', $servidor);
-                $porta = isset($_POST['porta']) ? intval($_POST['porta']) : null;
+                $porta = trim($this->getRequest()->request->getInt('porta', null));
                 if ($porta < 0 || $porta > 65535) {
                     throw new \Exception('A porta é inválida, informe um número entre 0 e 65535');
                 }
                 set_int_config('Email', 'Porta', $porta);
-                $encriptacao = isset($_POST['encriptacao']) ? intval($_POST['encriptacao']) : null;
+                $encriptacao = trim($this->getRequest()->request->getInt('encriptacao', null));
                 set_int_config('Email', 'Criptografia', $encriptacao);
-                $usuario = isset($_POST['usuario']) ? trim($_POST['usuario']) : null;
+                $usuario = trim($this->getRequest()->request->get('usuario'));
                 set_string_config('Email', 'Usuario', $usuario);
-                $senha = isset($_POST['senha']) ? strval($_POST['senha']) : null;
+                $senha = $this->getRequest()->request->get('senha');
                 if (strlen($senha) > 0) {
                     set_string_config('Email', 'Senha', $senha);
                 }
-                $this->getApplication()->getSystem()->filter($this->getApplication()->getSystem());
-                $this->getApplication()->getSystem()->update(['opcoes']);
+                app()->getSystem()->filter(app()->getSystem());
+                app()->getSystem()->update(['opcoes']);
                 $msg = 'E-mail atualizado com sucesso!';
-                if (is_output('json')) {
+                if ($this->isJson()) {
                     return $this->json()->success([], $msg);
                 }
                 \Thunder::success($msg, true);
@@ -154,7 +155,7 @@ class SistemaPageController extends \MZ\Core\Controller
                 if ($e instanceof \MZ\Exception\ValidationException) {
                     $errors = $e->getErrors();
                 }
-                if (is_output('json')) {
+                if ($this->isJson()) {
                     return $this->json()->error($e->getMessage(), null, $errors);
                 }
                 \Thunder::error($e->getMessage());
@@ -163,7 +164,7 @@ class SistemaPageController extends \MZ\Core\Controller
                     break;
                 }
             }
-        } elseif (is_output('json')) {
+        } elseif ($this->isJson()) {
             return $this->json()->error('Nenhum dado foi enviado');
         }
 
@@ -172,7 +173,7 @@ class SistemaPageController extends \MZ\Core\Controller
 
     public function invoice()
     {
-        need_permission(Permissao::NOME_ALTERARCONFIGURACOES, is_output('json'));
+        $this->needPermission([Permissao::NOME_ALTERARCONFIGURACOES]);
 
         $focusctrl = 'fiscal_timeout';
         $tab = 'fiscal';
@@ -181,15 +182,15 @@ class SistemaPageController extends \MZ\Core\Controller
         $fiscal_timeout = get_int_config('Sistema', 'Fiscal.Timeout', 30);
         if (is_post()) {
             try {
-                $fiscal_timeout = \MZ\Util\Filter::number(isset($_POST['fiscal_timeout'])?$_POST['fiscal_timeout']:null);
+                $fiscal_timeout = \MZ\Util\Filter::number($this->getRequest()->request->get('fiscal_timeout'));
                 if (intval($fiscal_timeout) < 2) {
                     throw new \MZ\Exception\ValidationException(
                         ['fiscal_timeout' => 'O tempo limite não pode ser menor que 2 segundos']
                     );
                 }
                 set_int_config('Sistema', 'Fiscal.Timeout', $fiscal_timeout);
-                $this->getApplication()->getSystem()->filter($this->getApplication()->getSystem());
-                $this->getApplication()->getSystem()->update(['opcoes']);
+                app()->getSystem()->filter(app()->getSystem());
+                app()->getSystem()->update(['opcoes']);
                 \Thunder::success('Opções fiscais atualizadas com sucesso!', true);
                 return $this->redirect('/gerenciar/sistema/fiscal');
             } catch (\Exception $e) {
@@ -197,7 +198,7 @@ class SistemaPageController extends \MZ\Core\Controller
                 if ($e instanceof \MZ\Exception\ValidationException) {
                     $errors = $e->getErrors();
                 }
-                if (is_output('json')) {
+                if ($this->isJson()) {
                     return $this->json()->error($e->getMessage(), null, $errors);
                 }
                 \Thunder::error($e->getMessage());
@@ -206,7 +207,7 @@ class SistemaPageController extends \MZ\Core\Controller
                     break;
                 }
             }
-        } elseif (is_output('json')) {
+        } elseif ($this->isJson()) {
             return $this->json()->error('Nenhum dado foi enviado');
         }
 
@@ -215,7 +216,7 @@ class SistemaPageController extends \MZ\Core\Controller
 
     public function printing()
     {
-        need_permission(Permissao::NOME_ALTERARCONFIGURACOES, is_post() || is_output('json'));
+        $this->needPermission([Permissao::NOME_ALTERARCONFIGURACOES]);
 
         $tab = 'impressao';
         $opcoes_aparencia = [
@@ -456,20 +457,20 @@ class SistemaPageController extends \MZ\Core\Controller
 
         if (is_post()) {
             try {
-                $secao = isset($_POST['secao']) ? $_POST['secao'] : null;
-                $chave = isset($_POST['chave']) ? $_POST['chave'] : null;
+                $secao = $this->getRequest()->request->get('secao');
+                $chave = $this->getRequest()->request->get('chave');
                 if (!config_values_exists($opcoes_impressao, $secao, $chave)) {
                     throw new \Exception('A opção de impressão informada não existe', 1);
                 }
-                $marcado = isset($_POST['marcado']) ? $_POST['marcado'] : null;
+                $marcado = $this->getRequest()->request->get('marcado');
                 set_boolean_config($secao, $chave, $marcado == 'Y');
-                $this->getApplication()->getSystem()->filter($this->getApplication()->getSystem());
-                $this->getApplication()->getSystem()->update(['opcoes']);
+                app()->getSystem()->filter(app()->getSystem());
+                app()->getSystem()->update(['opcoes']);
                 return $this->json()->success();
             } catch (\Exception $e) {
                 return $this->json()->error($e->getMessage());
             }
-        } elseif (is_output('json')) {
+        } elseif ($this->isJson()) {
             return $this->json()->error('Nenhum dado foi enviado');
         }
 
@@ -478,7 +479,7 @@ class SistemaPageController extends \MZ\Core\Controller
 
     public function layout()
     {
-        need_permission(Permissao::NOME_ALTERARCONFIGURACOES, is_output('json'));
+        $this->needPermission([Permissao::NOME_ALTERARCONFIGURACOES]);
 
         $focusctrl = 'bemvindo';
         $base_url = 'header';
@@ -538,7 +539,7 @@ class SistemaPageController extends \MZ\Core\Controller
             }
             try {
                 foreach ($images_info as $key => &$value) {
-                    $old_url = isset($_POST[$value['field']]) ? trim($_POST[$value['field']]) : null;
+                    $old_url = $this->getRequest()->request->get($value['field']);
                     $value['save'] = upload_image($value['image'], $base_url);
                     if (!is_null($value['save'])) {
                         set_string_config('Site', $value['section'], $value['save']);
@@ -548,22 +549,22 @@ class SistemaPageController extends \MZ\Core\Controller
                         $value['save'] = $value['url'];
                     }
                 }
-                $text_bemvindo = isset($_POST['bemvindo']) ? trim($_POST['bemvindo']) : null;
+                $text_bemvindo = trim($this->getRequest()->request->get('bemvindo'));
                 set_string_config('Site', 'Text.BemVindo', $text_bemvindo);
-                $text_chamada = isset($_POST['chamada']) ? trim($_POST['chamada']) : null;
+                $text_chamada = trim($this->getRequest()->request->get('chamada'));
                 set_string_config('Site', 'Text.Chamada', $text_chamada);
-                $this->getApplication()->getSystem()->filter($this->getApplication()->getSystem());
-                $this->getApplication()->getSystem()->update(['opcoes']);
+                app()->getSystem()->filter(app()->getSystem());
+                app()->getSystem()->update(['opcoes']);
                 foreach ($images_info as $key => $value) {
                     // exclui a imagem antiga, pois uma nova foi informada
                     if (!is_null($value['url']) &&
                         $value['save'] != $value['url']
                     ) {
-                        unlink($this->getApplication()->getPath('public') . get_image_url($value['url'], $base_url));
+                        unlink(app()->getPath('public') . get_image_url($value['url'], $base_url));
                     }
                 }
                 $msg = 'Layout atualizado com sucesso!';
-                if (is_output('json')) {
+                if ($this->isJson()) {
                     return $this->json()->success(['item' => $sistema->publish()], $msg);
                 }
                 \Thunder::success($msg, true);
@@ -578,10 +579,10 @@ class SistemaPageController extends \MZ\Core\Controller
                     if (!is_null($value['save']) &&
                         $value['url'] != $value['save']
                     ) {
-                        unlink($this->getApplication()->getPath('public') . get_image_url($value['save'], $base_url));
+                        unlink(app()->getPath('public') . get_image_url($value['save'], $base_url));
                     }
                 }
-                if (is_output('json')) {
+                if ($this->isJson()) {
                     return $this->json()->error($e->getMessage(), null, $errors);
                 }
                 \Thunder::error($e->getMessage());
@@ -590,7 +591,7 @@ class SistemaPageController extends \MZ\Core\Controller
                     break;
                 }
             }
-        } elseif (is_output('json')) {
+        } elseif ($this->isJson()) {
             return $this->json()->error('Nenhum dado foi enviado');
         }
 
@@ -599,7 +600,7 @@ class SistemaPageController extends \MZ\Core\Controller
 
     public function options()
     {
-        need_permission(Permissao::NOME_ALTERARCONFIGURACOES, is_post() || is_output('json'));
+        $this->needPermission([Permissao::NOME_ALTERARCONFIGURACOES]);
 
         $tab = 'opcoes';
         $opcoes_comportamento = [
@@ -697,20 +698,20 @@ class SistemaPageController extends \MZ\Core\Controller
 
         if (is_post()) {
             try {
-                $secao = isset($_POST['secao']) ? $_POST['secao'] : null;
-                $chave = isset($_POST['chave']) ? $_POST['chave'] : null;
+                $secao = $this->getRequest()->request->get('secao');
+                $chave = $this->getRequest()->request->get('chave');
                 if (!config_values_exists($opcoes_comportamento, $secao, $chave)) {
                     throw new \Exception('A opção de comportamento informada não existe', 1);
                 }
-                $marcado = isset($_POST['marcado']) ? $_POST['marcado'] : null;
+                $marcado = $this->getRequest()->request->get('marcado');
                 set_boolean_config($secao, $chave, $marcado == 'Y');
-                $this->getApplication()->getSystem()->filter($this->getApplication()->getSystem());
-                $this->getApplication()->getSystem()->update(['opcoes']);
+                app()->getSystem()->filter(app()->getSystem());
+                app()->getSystem()->update(['opcoes']);
                 return $this->json()->success();
             } catch (\Exception $e) {
                 return $this->json()->error($e->getMessage());
             }
-        } elseif (is_output('json')) {
+        } elseif ($this->isJson()) {
             return $this->json()->error('Nenhum dado foi enviado');
         }
 

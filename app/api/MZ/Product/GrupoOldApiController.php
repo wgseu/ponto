@@ -31,7 +31,7 @@ class GrupoOldApiController extends \MZ\Core\ApiController
 {
     public function find()
     {
-        $produto_id = isset($_GET['produto']) ? $_GET['produto'] : null;
+        $produto_id = $this->getRequest()->query->get('produto');
         $produto = Produto::findByID($produto_id);
         if (!$produto->exists()) {
             return $this->json()->error('Produto não informado ou não existente');

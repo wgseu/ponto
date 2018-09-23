@@ -27,30 +27,30 @@ namespace MZ\Payment;
 use MZ\Wallet\Banco;
 use MZ\System\Permissao;
 use MZ\Util\Filter;
+use MZ\Core\PageController;
 
 /**
  * Allow application to serve system resources
  */
-class FolhaChequePageController extends \MZ\Core\Controller
+class FolhaChequePageController extends PageController
 {
     public function find()
     {
-        need_permission(Permissao::NOME_PAGAMENTO, is_output('json'));
+        $this->needPermission([Permissao::NOME_PAGAMENTO]);
 
-        $limite = isset($_GET['limite']) ? intval($_GET['limite']) : 10;
-        if ($limite > 100 || $limite < 1) {
-            $limite = 10;
-        }
-        $condition = Filter::query($_GET);
+        $limite = max(1, min(100, $this->getRequest()->query->getInt('limite', 10)));
+        $condition = Filter::query($this->getRequest()->query->all());
         unset($condition['ordem']);
         $folha_cheque = new FolhaCheque($condition);
         $cheque = new Cheque($condition);
-        $order = Filter::order(isset($_GET['ordem']) ? $_GET['ordem'] : '');
+        $order = Filter::order($this->getRequest()->query->get('ordem', ''));
         $count = FolhaCheque::count($condition);
-        list($pagesize, $offset, $pagination) = pagestring($count, $limite);
-        $folhas_de_cheques = FolhaCheque::findAll($condition, $order, $pagesize, $offset);
+        $page = max(1, $this->getRequest()->query->getInt('pagina', 1));
+        $pager = new \Pager($count, $limite, $page, 'pagina');
+        $pagination = $pager->genBasic();
+        $folhas_de_cheques = FolhaCheque::findAll($condition, $order, $limite, $pager->offset);
 
-        if (is_output('json')) {
+        if ($this->isJson()) {
             $items = [];
             foreach ($folhas_de_cheques as $_folha_cheque) {
                 $items[] = $_folha_cheque->publish();
@@ -69,12 +69,12 @@ class FolhaChequePageController extends \MZ\Core\Controller
 
     public function recall()
     {
-        need_permission(Permissao::NOME_PAGAMENTO, is_output('json'));
-        $id = isset($_GET['id']) ? $_GET['id'] : null;
+        $this->needPermission([Permissao::NOME_PAGAMENTO]);
+        $id = $this->getRequest()->query->getInt('id', null);
         $folha_cheque = FolhaCheque::findByID($id);
         if (!$folha_cheque->exists()) {
             $msg = 'A folha de cheque não foi informada ou não existe';
-            if (is_output('json')) {
+            if ($this->isJson()) {
                 return $this->json()->error($msg);
             }
             \Thunder::warning($msg);
@@ -83,7 +83,7 @@ class FolhaChequePageController extends \MZ\Core\Controller
         try {
             $folha_cheque->recolher();
             $msg = sprintf('Folha de cheque "%s" compensada com sucesso!', $folha_cheque->getNumero());
-            if (is_output('json')) {
+            if ($this->isJson()) {
                 return $this->json()->success([], $msg);
             }
             \Thunder::success($msg, true);
@@ -92,7 +92,7 @@ class FolhaChequePageController extends \MZ\Core\Controller
                 'Não foi possível recolher a folha de cheque "%s"',
                 $folha_cheque->getNumero()
             );
-            if (is_output('json')) {
+            if ($this->isJson()) {
                 return $this->json()->error($msg);
             }
             \Thunder::error($msg);

@@ -34,23 +34,53 @@ use Symfony\Component\Routing\Router;
 use Symfony\Component\Routing\RequestContext;
 use Symfony\Component\Routing\Loader\PhpFileLoader;
 use Symfony\Component\Routing\Exception\ResourceNotFoundException;
+use MZ\Exception\RedirectException;
+use MZ\Exception\AuthorizationException;
 
 class Application
 {
-    private $authentication;
-    private $settings;
-    private $database;
-    private $system;
+    /**
+     * Database connection
+     * @var \MZ\Database\DB
+     */
+    public $db;
+    /**
+     * System options
+     * @var \MZ\System\Sistema
+     */
+    public $system;
+    /**
+     * Authentication guard
+     * @var \MZ\Account\Authentication
+     */
+    public $auth;
+    /**
+     * Root app path
+     * @var string
+     */
     private $path;
+    /**
+     * App session
+     * @var \Symfony\Component\HttpFoundation\Session\Session
+     */
     private $session;
+    /**
+     * HTTP request
+     * @var \Symfony\Component\HttpFoundation\Request
+     */
     private $request;
+    /**
+     * Website URL
+     * @var string
+     */
+    private $url;
 
     public function __construct($path)
     {
         $this->path = $path;
         $this->system = new \MZ\System\Sistema();
-        $this->authentication = new \MZ\Account\Authentication($this);
-        $this->database = new DB();
+        $this->auth = new \MZ\Account\Authentication();
+        $this->db = new DB();
         $this->session = new Session();
         $this->request = Request::createFromGlobals();
     }
@@ -70,7 +100,7 @@ class Application
      */
     public function getAuthentication()
     {
-        return $this->authentication;
+        return $this->auth;
     }
 
     /**
@@ -79,7 +109,7 @@ class Application
      */
     public function getDatabase()
     {
-        return $this->database;
+        return $this->db;
     }
 
     /**
@@ -117,6 +147,26 @@ class Application
         );
     }
 
+    public function initUrl()
+    {
+        $host = $this->getRequest()->server->get('HTTP_HOST');
+        if ($this->getRequest()->server->get('HTTPS') != 'off') {
+            $protocol = 'https';
+        } else {
+            $protocol = 'http';
+        }
+        $this->url = "{$protocol}://{$host}";
+    }
+
+    /**
+     * Get the current URL for this application system
+     * @return string URL with protocol for this system
+     */
+    public function getURL()
+    {
+        return $this->url;
+    }
+
     /**
      * Build a URL for this site
      * @param  string $path path to append
@@ -124,7 +174,7 @@ class Application
      */
     public function makeURL($path)
     {
-        return $this->getSystem()->getURL() . $path;
+        return $this->getURL() . $path;
     }
 
     /**
@@ -141,6 +191,7 @@ class Application
      */
     private function initialize()
     {
+        $this->initUrl();
         $this->getSession()->start();
         $this->getSystem()->initialize($this->path);
         $this->getAuthentication()->initialize();
@@ -212,7 +263,7 @@ class Application
     private function route($matched)
     {
         list($class, $method) = explode('@', $matched['_controller']);
-        $service = new $class($this);
+        $service = new $class();
         try {
             $response = call_user_func_array(
                 [$service, $method],
@@ -252,12 +303,73 @@ class Application
      */
     private function handleException($exception)
     {
-        if ($exception instanceof \MZ\Exception\RedirectException) {
+        if ($exception instanceof RedirectException) {
             $response = new RedirectResponse($exception->getURL());
         } else {
             $response = $this->getResponse();
         }
         $this->translateException($exception, $response);
         $response->send();
+    }
+
+    /**
+     * Require logged user
+     * @return self Application
+     * @throws \MZ\Exception\RedirectException
+     */
+    public function needLogin()
+    {
+        if (!$this->getAuthentication()->isLogin()) {
+            throw new RedirectException(_t('need_login'), Response::HTTP_UNAUTHORIZED, '/conta/entrar');
+        }
+        return $this;
+    }
+
+    /**
+     * Require logged user as provider
+     * @return self Application
+     * @throws \MZ\Exception\RedirectException
+     */
+    public function needManager()
+    {
+        $this->needLogin();
+        if (!$this->getAuthentication()->isManager()) {
+            throw new RedirectException(_t('need_manager'), Response::HTTP_FORBIDDEN, '/conta/entrar');
+        }
+        return $this;
+    }
+
+    /**
+     * Require logged provider as owner
+     * @return self Application
+     * @throws \MZ\Exception\RedirectException
+     */
+    public function needOwner()
+    {
+        $this->needManager();
+        if (!$this->getAuthentication()->isOwner()) {
+            throw new RedirectException(_t('need_owner'), Response::HTTP_FORBIDDEN, '/gerenciar/');
+        }
+        return $this;
+    }
+
+    /**
+     * Require permissions for logged provider
+     * @param array $permissions permission need
+     * @param string $message option error message
+     * @return self Application
+     * @throws \MZ\Exception\AuthorizationException
+     */
+    public function needPermission($permissions, $message = null)
+    {
+        $this->needManager();
+        if (!$this->getAuthentication()->has($permissions)) {
+            throw new AuthorizationException(
+                $message ?: _t('$this->needPermission'),
+                Response::HTTP_FORBIDDEN,
+                $permissions
+            );
+        }
+        return $this;
     }
 }

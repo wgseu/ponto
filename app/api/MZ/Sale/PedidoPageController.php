@@ -26,24 +26,22 @@ namespace MZ\Sale;
 
 use MZ\System\Permissao;
 use MZ\Util\Filter;
+use MZ\Core\PageController;
 
 /**
  * Allow application to serve system resources
  */
-class PedidoPageController extends \MZ\Core\Controller
+class PedidoPageController extends PageController
 {
     public function find()
     {
-        need_permission(Permissao::NOME_PAGAMENTO, is_output('json'));
+        $this->needPermission([Permissao::NOME_PAGAMENTO]);
 
-        $limite = isset($_GET['limite']) ? intval($_GET['limite']) : 10;
-        if ($limite > 100 || $limite < 1) {
-            $limite = 10;
-        }
-        $condition = Filter::query($_GET);
+        $limite = max(1, min(100, $this->getRequest()->query->getInt('limite', 10)));
+        $condition = Filter::query($this->getRequest()->query->all());
         unset($condition['ordem']);
 
-        $estado = isset($_GET['estado']) ? trim($_GET['estado']) : null;
+        $estado = $this->getRequest()->query->get('estado');
         if ($estado == 'Cancelado') {
             $condition['cancelado'] = 'Y';
             unset($condition['estado']);
@@ -55,12 +53,14 @@ class PedidoPageController extends \MZ\Core\Controller
         }
 
         $pedido = new Pedido($condition);
-        $order = Filter::order(isset($_GET['ordem']) ? $_GET['ordem'] : '');
+        $order = Filter::order($this->getRequest()->query->get('ordem', ''));
         $count = Pedido::count($condition);
-        list($pagesize, $offset, $pagination) = pagestring($count, $limite);
-        $pedidos = Pedido::findAll($condition, $order, $pagesize, $offset);
+        $page = max(1, $this->getRequest()->query->getInt('pagina', 1));
+        $pager = new \Pager($count, $limite, $page, 'pagina');
+        $pagination = $pager->genBasic();
+        $pedidos = Pedido::findAll($condition, $order, $limite, $pager->offset);
 
-        if (is_output('json')) {
+        if ($this->isJson()) {
             $items = [];
             foreach ($pedidos as $_pedido) {
                 $items[] = $_pedido->publish();

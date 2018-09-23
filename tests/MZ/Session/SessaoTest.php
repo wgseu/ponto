@@ -55,7 +55,7 @@ class SessaoTest extends \MZ\Framework\TestCase
             'datatermino' => '23/12/2016 12:15',
             'aberta' => 'Y',
         ]);
-        $sessao->filter($old_sessao);
+        $sessao->filter($old_sessao, true);
         $this->assertEquals($old_sessao, $sessao);
     }
 

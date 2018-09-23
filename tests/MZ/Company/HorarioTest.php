@@ -70,7 +70,7 @@ class HorarioTest extends \MZ\Framework\TestCase
             'mensagem' => ' Horário <script>filter</script> ',
             'fechado' => 'Y',
         ]);
-        $horario->filter($old_horario);
+        $horario->filter($old_horario, true);
         $this->assertEquals($old_horario, $horario);
     }
 

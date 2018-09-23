@@ -30,6 +30,7 @@ use MZ\Util\Filter;
 use MZ\Util\Validator;
 use MZ\Account\Cliente;
 use MZ\System\Permissao;
+use MZ\System\Acesso;
 use MZ\Exception\ValidationException;
 
 /**
@@ -525,12 +526,12 @@ class Prestador extends SyncModel
         $this->setPontuacao(Filter::number($this->getPontuacao()));
         $this->setRemuneracao(Filter::money($this->getRemuneracao(), $localized));
         $this->setDataTermino(Filter::datetime($this->getDataTermino()));
-        if (is_owner($original) || is_self($original)) {
+        if ($original->isOwner() || app()->auth->isSelf($original)) {
             $this->setClienteID($original->getClienteID());
             $this->setFuncaoID($original->getFuncaoID());
             $this->setAtivo($original->getAtivo());
         }
-        if (!is_owner($original) && is_self($original)) {
+        if (!$original->isOwner() && app()->auth->isSelf($original)) {
             $this->setPorcentagem($original->getPorcentagem());
             $this->setCodigoBarras($original->getCodigoBarras());
             $this->setPontuacao($original->getPontuacao());
@@ -681,13 +682,13 @@ class Prestador extends SyncModel
         if (!$this->exists()) {
             throw new \Exception('O identificador do funcionário não foi informado');
         }
-        if ($this->has(Permissao::NOME_CADASTROFUNCIONARIOS) && !is_owner()) {
+        if ($this->has([Permissao::NOME_CADASTROFUNCIONARIOS]) && !app()->auth->isOwner()) {
             throw new \Exception('Você não tem permissão para excluir esse funcionário!');
         }
-        if (is_self($this)) {
+        if (app()->auth->isSelf($this)) {
             throw new \Exception('Você não pode excluir a si mesmo!');
         }
-        if (is_owner($this)) {
+        if ($this->isOwner()) {
             throw new \Exception('Esse funcionário não pode ser excluído!');
         }
         $result = DB::deleteFrom('Prestadores')
@@ -696,29 +697,31 @@ class Prestador extends SyncModel
         return $result;
     }
 
-    public function isOwner()
+    /**
+     * Check if this provider is the company owner
+     * @param array $permissoes provider permissions
+     * @return boolean true if provider is the company owner
+     */
+    public function isOwner($permissoes = null)
     {
-        return $this->getID() == 1;
+        return $this->has(
+            [Permissao::NOME_RESTAURACAO],
+            $permissoes
+        );
     }
 
     /**
      * Check if this employee have permission
-     * @param array|string $permission permission to check
+     * @param array $permission permission to check
+     * @param array $permissoes provider permissions
      * @return boolean true when has all permission passed or false otherwise
      */
-    public function has($permission)
+    public function has($permission, $permissoes = null)
     {
         if (!$this->exists()) {
             return false;
         }
-        if ($this->isOwner()) {
-            return true;
-        }
-        settype($permission, 'array');
-        $permissoes = $this->getApplication()->getAuthentication()->getPermissions();
-        if ($this->getID() != logged_provider()->getID()) {
-            $permissoes = Acesso::getPermissoes($this->getFuncaoID());
-        }
+        $permissoes = $permissoes ?: Acesso::getPermissoes($this->getFuncaoID());
         $allow = true;
         $operator = '&&';
         foreach ($permission as $value) {

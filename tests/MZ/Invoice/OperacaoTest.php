@@ -55,7 +55,7 @@ class OperacaoTest extends \MZ\Framework\TestCase
             'descricao' => ' Operação <script>filter</script> ',
             'detalhes' => ' Operação <script>filter</script> ',
         ]);
-        $operacao->filter($old_operacao);
+        $operacao->filter($old_operacao, true);
         $this->assertEquals($old_operacao, $operacao);
     }
 

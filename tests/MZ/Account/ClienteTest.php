@@ -70,7 +70,7 @@ class ClienteTest extends \MZ\Framework\TestCase
             'facebookurl' => 'facebook',
             'twitterurl' => 'twitter',
             'linkedinurl' => 'linkedin',
-            'imagem' => "\x5\x0\x3",
+            'imagemurl' => 'image.png',
             'dataatualizacao' => '2016-12-05 12:15:00',
             'datacadastro' => '2016-12-05 12:15:00',
         ]);
@@ -87,7 +87,7 @@ class ClienteTest extends \MZ\Framework\TestCase
     public function testTelefone()
     {
         $cliente = new Cliente();
-        $this->assertNull($cliente->getTelefone());
+        $this->assertNotNull($cliente->getTelefone());
         $cliente->setTelefone('44988888888');
         $this->assertNotNull($cliente->getTelefone());
         $this->assertEquals($cliente->getTelefone()->getNumero(), '44988888888');
@@ -183,6 +183,7 @@ class ClienteTest extends \MZ\Framework\TestCase
         $cliente->setEmail('cicrano@email.com');
         $cliente->setLogin('cicrano');
         $cliente->setTelefone('44911223399');
+        $cliente->getTelefone()->setPaisID(app()->getSystem()->getCountry()->getID());
         $cliente->setCPF('12663254410');
         $cliente->setGenero(Cliente::GENERO_MASCULINO);
         $cliente->setSenha('1234');
@@ -225,14 +226,14 @@ class ClienteTest extends \MZ\Framework\TestCase
             $cliente->insert();
             $this->fail('Não deveria ter cadastrado o cliente com o mesmo telefone');
         } catch (ValidationException $e) {
-            $this->assertEquals(['fone1'], array_keys($e->getErrors()));
+            $this->assertEquals(['numero'], array_keys($e->getErrors()));
         }
         $cliente = new Cliente();
         $cliente->setNomeCompleto('Cicrano da Silva');
         $cliente->setEmail('test2cicrano@email.com');
         $cliente->setGenero(Cliente::GENERO_MASCULINO);
         $cliente->setSenha('1234');
-        $cliente->setAcionistaID(0);
+        $cliente->setEmpresaID(0);
         $this->expectException('\PDOException');
         $cliente->insert();
     }
@@ -296,13 +297,13 @@ class ClienteTest extends \MZ\Framework\TestCase
         $cliente->setGenero(Cliente::GENERO_MASCULINO);
         $cliente->setSenha('1234');
         $cliente->setTelefone('44967442288');
-        $cliente->getTelefone()->setPaisID($this->getApplication()->getSystem()->getCountry()->getID());
+        $cliente->getTelefone()->setPaisID(app()->getSystem()->getCountry()->getID());
         $cliente->insert();
         $first_cliente = new Cliente($cliente);
         $cliente->setEmail('beltrano@email.com');
         $cliente->setLogin('beltrano');
         $cliente->setTelefone('44988552211');
-        $cliente->getTelefone()->setPaisID($this->getApplication()->getSystem()->getCountry()->getID());
+        $cliente->getTelefone()->setPaisID(app()->getSystem()->getCountry()->getID());
         $cliente->setCPF('95672167624');
         $cliente->setSenha('1234');
         $cliente->setSecreto('635sd89d5f4a68d7sd6s5a4');
@@ -377,6 +378,9 @@ class ClienteTest extends \MZ\Framework\TestCase
         $this->assertEquals($cliente, $found_cliente);
         // findAll
         $clientes = Cliente::findAll(['search' => $cliente->getNomeCompleto()], ['id' => -1], 2, 0);
+        $this->assertEquals(2, count($clientes));
+        $clientes[0]->loadTelefone();
+        $clientes[1]->loadTelefone();
         $this->assertEquals([$cliente, $first_cliente], $clientes);
         // findAll
         $compradores = Cliente::findAll([
@@ -392,6 +396,9 @@ class ClienteTest extends \MZ\Framework\TestCase
             'ate_cadastro' => $cliente->getDataCadastro(),
             'id' => [$cliente->getID(), $first_cliente->getID()]
         ]);
+        $this->assertEquals(2, count($clientes));
+        $clientes[0]->loadTelefone();
+        $clientes[1]->loadTelefone();
         $this->assertEquals([$first_cliente, $cliente], $clientes);
         // rawFindAll
         $clientes = Cliente::rawFindAll(['search' => $cliente->getNomeCompleto()], ['id' => 1], 2, 0);
@@ -489,7 +496,8 @@ class ClienteTest extends \MZ\Framework\TestCase
             'limitecompra' => '1.012,5'
         ]);
         $cliente = new Cliente($cliente_obj);
-        $cliente->filter($filter_cliente);
+        $cliente->getTelefone()->filter($filter_cliente->getTelefone(), true);
+        $cliente->filter($filter_cliente, true);
         $filter_cliente->setLimiteCompra(1012.5);
         $this->assertEquals($filter_cliente, $cliente);
         $cliente_obj->setTipo(Cliente::TIPO_JURIDICA);
@@ -498,7 +506,7 @@ class ClienteTest extends \MZ\Framework\TestCase
         $filter_cliente->setGenero(Cliente::GENERO_FEMININO);
         $filter_cliente->setLimiteCompra('1.012,5');
         $filter_cliente->setCPF('73591671000148');
-        $cliente_obj->filter($filter_cliente);
+        $cliente_obj->filter($filter_cliente, true);
         $filter_cliente->setLimiteCompra(1012.5);
         $this->assertEquals($filter_cliente, $cliente_obj);
     }

@@ -280,7 +280,6 @@ class DB
 
     public static function __callStatic($name, $arguments)
     {
-        global $app;
-        return call_user_func_array(array($app->getDatabase(), $name), $arguments);
+        return call_user_func_array(array(app()->getDatabase(), $name), $arguments);
     }
 }

@@ -26,29 +26,29 @@ namespace MZ\Sale;
 
 use MZ\System\Permissao;
 use MZ\Util\Filter;
+use MZ\Core\PageController;
 
 /**
  * Allow application to serve system resources
  */
-class ComandaPageController extends \MZ\Core\Controller
+class ComandaPageController extends PageController
 {
     public function find()
     {
-        need_permission(Permissao::NOME_CADASTROCOMANDAS, is_output('json'));
+        $this->needPermission([Permissao::NOME_CADASTROCOMANDAS]);
 
-        $limite = isset($_GET['limite']) ? intval($_GET['limite']) : 10;
-        if ($limite > 100 || $limite < 1) {
-            $limite = 10;
-        }
-        $condition = Filter::query($_GET);
+        $limite = max(1, min(100, $this->getRequest()->query->getInt('limite', 10)));
+        $condition = Filter::query($this->getRequest()->query->all());
         unset($condition['ordem']);
         $comanda = new Comanda($condition);
-        $order = Filter::order(isset($_GET['ordem']) ? $_GET['ordem'] : '');
+        $order = Filter::order($this->getRequest()->query->get('ordem', ''));
         $count = Comanda::count($condition);
-        list($pagesize, $offset, $pagination) = pagestring($count, $limite);
-        $comandas = Comanda::findAll($condition, $order, $pagesize, $offset);
+        $page = max(1, $this->getRequest()->query->getInt('pagina', 1));
+        $pager = new \Pager($count, $limite, $page, 'pagina');
+        $pagination = $pager->genBasic();
+        $comandas = Comanda::findAll($condition, $order, $limite, $pager->offset);
 
-        if (is_output('json')) {
+        if ($this->isJson()) {
             $items = [];
             foreach ($comandas as $_comanda) {
                 $items[] = $_comanda->publish();
@@ -65,8 +65,8 @@ class ComandaPageController extends \MZ\Core\Controller
 
     public function add()
     {
-        need_permission(Permissao::NOME_CADASTROCOMANDAS, is_output('json'));
-        $id = isset($_GET['id']) ? $_GET['id'] : null;
+        $this->needPermission([Permissao::NOME_CADASTROCOMANDAS]);
+        $id = $this->getRequest()->query->getInt('id', null);
         $comanda = Comanda::findByID($id);
         $comanda->setID(null);
 
@@ -74,7 +74,7 @@ class ComandaPageController extends \MZ\Core\Controller
         $errors = [];
         $old_comanda = $comanda;
         if (is_post()) {
-            $comanda = new Comanda($_POST);
+            $comanda = new Comanda($this->getData());
             try {
                 $comanda->filter($old_comanda, true);
                 $comanda->insert();
@@ -83,7 +83,7 @@ class ComandaPageController extends \MZ\Core\Controller
                     'Comanda "%s" cadastrada com sucesso!',
                     $comanda->getNome()
                 );
-                if (is_output('json')) {
+                if ($this->isJson()) {
                     return $this->json()->success(['item' => $comanda->publish()], $msg);
                 }
                 \Thunder::success($msg, true);
@@ -93,7 +93,7 @@ class ComandaPageController extends \MZ\Core\Controller
                 if ($e instanceof \MZ\Exception\ValidationException) {
                     $errors = $e->getErrors();
                 }
-                if (is_output('json')) {
+                if ($this->isJson()) {
                     return $this->json()->error($e->getMessage(), null, $errors);
                 }
                 \Thunder::error($e->getMessage());
@@ -102,7 +102,7 @@ class ComandaPageController extends \MZ\Core\Controller
                     break;
                 }
             }
-        } elseif (is_output('json')) {
+        } elseif ($this->isJson()) {
             return $this->json()->error('Nenhum dado foi enviado');
         } else {
             $comanda->setID(Comanda::getNextID());
@@ -114,12 +114,12 @@ class ComandaPageController extends \MZ\Core\Controller
 
     public function update()
     {
-        need_permission(Permissao::NOME_CADASTROCOMANDAS, is_output('json'));
-        $id = isset($_GET['id']) ? $_GET['id'] : null;
+        $this->needPermission([Permissao::NOME_CADASTROCOMANDAS]);
+        $id = $this->getRequest()->query->getInt('id', null);
         $comanda = Comanda::findByID($id);
         if (!$comanda->exists()) {
             $msg = 'A comanda não foi informada ou não existe';
-            if (is_output('json')) {
+            if ($this->isJson()) {
                 return $this->json()->error($msg);
             }
             \Thunder::warning($msg);
@@ -129,7 +129,7 @@ class ComandaPageController extends \MZ\Core\Controller
         $errors = [];
         $old_comanda = $comanda;
         if (is_post()) {
-            $comanda = new Comanda($_POST);
+            $comanda = new Comanda($this->getData());
             try {
                 $comanda->filter($old_comanda, true);
                 $comanda->update();
@@ -138,7 +138,7 @@ class ComandaPageController extends \MZ\Core\Controller
                     'Comanda "%s" atualizada com sucesso!',
                     $comanda->getNome()
                 );
-                if (is_output('json')) {
+                if ($this->isJson()) {
                     return $this->json()->success(['item' => $comanda->publish()], $msg);
                 }
                 \Thunder::success($msg, true);
@@ -148,7 +148,7 @@ class ComandaPageController extends \MZ\Core\Controller
                 if ($e instanceof \MZ\Exception\ValidationException) {
                     $errors = $e->getErrors();
                 }
-                if (is_output('json')) {
+                if ($this->isJson()) {
                     return $this->json()->error($e->getMessage(), null, $errors);
                 }
                 \Thunder::error($e->getMessage());
@@ -157,7 +157,7 @@ class ComandaPageController extends \MZ\Core\Controller
                     break;
                 }
             }
-        } elseif (is_output('json')) {
+        } elseif ($this->isJson()) {
             return $this->json()->error('Nenhum dado foi enviado');
         }
         return $this->view('gerenciar_comanda_editar', get_defined_vars());
@@ -165,12 +165,12 @@ class ComandaPageController extends \MZ\Core\Controller
 
     public function delete()
     {
-        need_permission(Permissao::NOME_CADASTROCOMANDAS, is_output('json'));
-        $id = isset($_GET['id']) ? $_GET['id'] : null;
+        $this->needPermission([Permissao::NOME_CADASTROCOMANDAS]);
+        $id = $this->getRequest()->query->getInt('id', null);
         $comanda = Comanda::findByID($id);
         if (!$comanda->exists()) {
             $msg = 'A comanda não foi informada ou não existe!';
-            if (is_output('json')) {
+            if ($this->isJson()) {
                 return $this->json()->error($msg);
             }
             \Thunder::warning($msg);
@@ -180,7 +180,7 @@ class ComandaPageController extends \MZ\Core\Controller
             $comanda->delete();
             $comanda->clean(new Comanda());
             $msg = sprintf('Comanda "%s" excluída com sucesso!', $comanda->getNome());
-            if (is_output('json')) {
+            if ($this->isJson()) {
                 return $this->json()->success([], $msg);
             }
             \Thunder::success($msg, true);
@@ -189,7 +189,7 @@ class ComandaPageController extends \MZ\Core\Controller
                 'Não foi possível excluir a comanda "%s"',
                 $comanda->getNome()
             );
-            if (is_output('json')) {
+            if ($this->isJson()) {
                 return $this->json()->error($msg);
             }
             \Thunder::error($msg);

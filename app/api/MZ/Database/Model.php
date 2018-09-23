@@ -52,16 +52,6 @@ abstract class Model
     abstract public function setID($id);
 
     /**
-     * Get the application object
-     * @return \MZ\Core\Application application object
-     */
-    public function getApplication()
-    {
-        global $app;
-        return $app;
-    }
-
-    /**
      * Convert this instance to array associated key -> value
      * @param boolean $recursive Allow rescursive conversion of fields
      * @return array All field and values into array format

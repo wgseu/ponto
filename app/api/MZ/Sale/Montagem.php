@@ -425,8 +425,9 @@ class Montagem extends ProdutoPedido
     /**
      * Filtra o pacote montado ajustando as quantidade e valores
      * @param \Closure $callback função que será chamada para atribuir o preço e quantidade no item
+     * @param boolean $localized Informs if fields are localized
      */
-    public function filter($callback = null)
+    public function filter($callback = null, $localized = false)
     {
         if ($callback === null) {
             $callback = [$this, 'updateItem'];

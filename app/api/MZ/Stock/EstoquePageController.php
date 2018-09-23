@@ -26,29 +26,29 @@ namespace MZ\Stock;
 
 use MZ\System\Permissao;
 use MZ\Util\Filter;
+use MZ\Core\PageController;
 
 /**
  * Allow application to serve system resources
  */
-class EstoquePageController extends \MZ\Core\Controller
+class EstoquePageController extends PageController
 {
     public function find()
     {
-        need_permission(Permissao::NOME_ESTOQUE, is_output('json'));
+        $this->needPermission([Permissao::NOME_ESTOQUE]);
 
-        $limite = isset($_GET['limite']) ? intval($_GET['limite']) : 10;
-        if ($limite > 100 || $limite < 1) {
-            $limite = 10;
-        }
-        $condition = Filter::query($_GET);
+        $limite = max(1, min(100, $this->getRequest()->query->getInt('limite', 10)));
+        $condition = Filter::query($this->getRequest()->query->all());
         unset($condition['ordem']);
         $estoque = new Estoque($condition);
-        $order = Filter::order(isset($_GET['ordem']) ? $_GET['ordem'] : '');
+        $order = Filter::order($this->getRequest()->query->get('ordem', ''));
         $count = Estoque::count($condition);
-        list($pagesize, $offset, $pagination) = pagestring($count, $limite);
-        $estoques = Estoque::findAll($condition, $order, $pagesize, $offset);
+        $page = max(1, $this->getRequest()->query->getInt('pagina', 1));
+        $pager = new \Pager($count, $limite, $page, 'pagina');
+        $pagination = $pager->genBasic();
+        $estoques = Estoque::findAll($condition, $order, $limite, $pager->offset);
 
-        if (is_output('json')) {
+        if ($this->isJson()) {
             $items = [];
             foreach ($estoques as $_estoque) {
                 $items[] = $_estoque->publish();
@@ -65,12 +65,12 @@ class EstoquePageController extends \MZ\Core\Controller
 
     public function cancel()
     {
-        need_permission([Permissao::NOME_ESTOQUE, Permissao::NOME_RETIRARDOESTOQUE], is_output('json'));
-        $id = isset($_GET['id']) ? $_GET['id'] : null;
+        $this->needPermission([Permissao::NOME_ESTOQUE, Permissao::NOME_RETIRARDOESTOQUE]);
+        $id = $this->getRequest()->query->getInt('id', null);
         $estoque = Estoque::findByID($id);
         if (!$estoque->exists()) {
             $msg = 'O estoque não foi informado ou não existe';
-            if (is_output('json')) {
+            if ($this->isJson()) {
                 return $this->json()->error($msg);
             }
             \Thunder::warning($msg);
@@ -84,13 +84,13 @@ class EstoquePageController extends \MZ\Core\Controller
                 $produto->getDescricao(),
                 strval($estoque->getQuantidade())
             );
-            if (is_output('json')) {
+            if ($this->isJson()) {
                 return $this->json()->success([], $msg);
             }
             \Thunder::success($msg, true);
         } catch (\Exception $e) {
             $msg = $e->getMessage();
-            if (is_output('json')) {
+            if ($this->isJson()) {
                 return $this->json()->error($msg);
             }
             \Thunder::error($msg);

@@ -26,29 +26,29 @@ namespace MZ\Environment;
 
 use MZ\System\Permissao;
 use MZ\Util\Filter;
+use MZ\Core\PageController;
 
 /**
  * Allow application to serve system resources
  */
-class SetorPageController extends \MZ\Core\Controller
+class SetorPageController extends PageController
 {
     public function find()
     {
-        need_permission(Permissao::NOME_ESTOQUE, is_output('json'));
+        $this->needPermission([Permissao::NOME_ESTOQUE]);
 
-        $limite = isset($_GET['limite']) ? intval($_GET['limite']) : 10;
-        if ($limite > 100 || $limite < 1) {
-            $limite = 10;
-        }
-        $condition = Filter::query($_GET);
+        $limite = max(1, min(100, $this->getRequest()->query->getInt('limite', 10)));
+        $condition = Filter::query($this->getRequest()->query->all());
         unset($condition['ordem']);
         $setor = new Setor($condition);
-        $order = Filter::order(isset($_GET['ordem']) ? $_GET['ordem'] : '');
+        $order = Filter::order($this->getRequest()->query->get('ordem', ''));
         $count = Setor::count($condition);
-        list($pagesize, $offset, $pagination) = pagestring($count, $limite);
-        $setores = Setor::findAll($condition, $order, $pagesize, $offset);
+        $page = max(1, $this->getRequest()->query->getInt('pagina', 1));
+        $pager = new \Pager($count, $limite, $page, 'pagina');
+        $pagination = $pager->genBasic();
+        $setores = Setor::findAll($condition, $order, $limite, $pager->offset);
 
-        if (is_output('json')) {
+        if ($this->isJson()) {
             $items = [];
             foreach ($setores as $_setor) {
                 $items[] = $_setor->publish();
@@ -61,8 +61,8 @@ class SetorPageController extends \MZ\Core\Controller
 
     public function add()
     {
-        need_permission(Permissao::NOME_ESTOQUE, is_output('json'));
-        $id = isset($_GET['id']) ? $_GET['id'] : null;
+        $this->needPermission([Permissao::NOME_ESTOQUE]);
+        $id = $this->getRequest()->query->getInt('id', null);
         $setor = Setor::findByID($id);
         $setor->setID(null);
 
@@ -70,7 +70,7 @@ class SetorPageController extends \MZ\Core\Controller
         $errors = [];
         $old_setor = $setor;
         if (is_post()) {
-            $setor = new Setor($_POST);
+            $setor = new Setor($this->getData());
             try {
                 $setor->filter($old_setor, true);
                 $setor->insert();
@@ -79,7 +79,7 @@ class SetorPageController extends \MZ\Core\Controller
                     'Setor "%s" cadastrado com sucesso!',
                     $setor->getNome()
                 );
-                if (is_output('json')) {
+                if ($this->isJson()) {
                     return $this->json()->success(['item' => $setor->publish()], $msg);
                 }
                 \Thunder::success($msg, true);
@@ -89,7 +89,7 @@ class SetorPageController extends \MZ\Core\Controller
                 if ($e instanceof \MZ\Exception\ValidationException) {
                     $errors = $e->getErrors();
                 }
-                if (is_output('json')) {
+                if ($this->isJson()) {
                     return $this->json()->error($e->getMessage(), null, $errors);
                 }
                 \Thunder::error($e->getMessage());
@@ -98,7 +98,7 @@ class SetorPageController extends \MZ\Core\Controller
                     break;
                 }
             }
-        } elseif (is_output('json')) {
+        } elseif ($this->isJson()) {
             return $this->json()->error('Nenhum dado foi enviado');
         }
         return $this->view('gerenciar_setor_cadastrar', get_defined_vars());
@@ -106,12 +106,12 @@ class SetorPageController extends \MZ\Core\Controller
 
     public function update()
     {
-        need_permission(Permissao::NOME_ESTOQUE, is_output('json'));
-        $id = isset($_GET['id']) ? $_GET['id'] : null;
+        $this->needPermission([Permissao::NOME_ESTOQUE]);
+        $id = $this->getRequest()->query->getInt('id', null);
         $setor = Setor::findByID($id);
         if (!$setor->exists()) {
             $msg = 'O setor não foi informado ou não existe';
-            if (is_output('json')) {
+            if ($this->isJson()) {
                 return $this->json()->error($msg);
             }
             \Thunder::warning($msg);
@@ -121,7 +121,7 @@ class SetorPageController extends \MZ\Core\Controller
         $errors = [];
         $old_setor = $setor;
         if (is_post()) {
-            $setor = new Setor($_POST);
+            $setor = new Setor($this->getData());
             try {
                 $setor->setID($old_setor->getID());
                 $setor->filter($old_setor, true);
@@ -131,7 +131,7 @@ class SetorPageController extends \MZ\Core\Controller
                     'Setor "%s" atualizado com sucesso!',
                     $setor->getNome()
                 );
-                if (is_output('json')) {
+                if ($this->isJson()) {
                     return $this->json()->success(['item' => $setor->publish()], $msg);
                 }
                 \Thunder::success($msg, true);
@@ -141,7 +141,7 @@ class SetorPageController extends \MZ\Core\Controller
                 if ($e instanceof \MZ\Exception\ValidationException) {
                     $errors = $e->getErrors();
                 }
-                if (is_output('json')) {
+                if ($this->isJson()) {
                     return $this->json()->error($e->getMessage(), null, $errors);
                 }
                 \Thunder::error($e->getMessage());
@@ -150,7 +150,7 @@ class SetorPageController extends \MZ\Core\Controller
                     break;
                 }
             }
-        } elseif (is_output('json')) {
+        } elseif ($this->isJson()) {
             return $this->json()->error('Nenhum dado foi enviado');
         }
         return $this->view('gerenciar_setor_editar', get_defined_vars());
@@ -158,12 +158,12 @@ class SetorPageController extends \MZ\Core\Controller
 
     public function delete()
     {
-        need_permission(Permissao::NOME_ESTOQUE, is_output('json'));
-        $id = isset($_GET['id']) ? $_GET['id'] : null;
+        $this->needPermission([Permissao::NOME_ESTOQUE]);
+        $id = $this->getRequest()->query->getInt('id', null);
         $setor = Setor::findByID($id);
         if (!$setor->exists()) {
             $msg = 'O setor não foi informado ou não existe';
-            if (is_output('json')) {
+            if ($this->isJson()) {
                 return $this->json()->error($msg);
             }
             \Thunder::warning($msg);
@@ -173,7 +173,7 @@ class SetorPageController extends \MZ\Core\Controller
             $setor->delete();
             $setor->clean(new Setor());
             $msg = sprintf('Setor "%s" excluído com sucesso!', $setor->getNome());
-            if (is_output('json')) {
+            if ($this->isJson()) {
                 return $this->json()->success([], $msg);
             }
             \Thunder::success($msg, true);
@@ -182,7 +182,7 @@ class SetorPageController extends \MZ\Core\Controller
                 'Não foi possível excluir o setor "%s"',
                 $setor->getNome()
             );
-            if (is_output('json')) {
+            if ($this->isJson()) {
                 return $this->json()->error($msg);
             }
             \Thunder::error($msg);

@@ -391,9 +391,8 @@ class Dispositivo extends SyncModel
      */
     public function validate()
     {
-        global $app;
         $errors = [];
-        if (!$app->getSystem()->exists()) {
+        if (!app()->getSystem()->exists()) {
             $errors['sistemaid'] = 'Não há dados na tabela do sistema';
         }
         if (is_null($this->getSetorID())) {
@@ -409,11 +408,11 @@ class Dispositivo extends SyncModel
             $errors['tipo'] = 'O tipo não foi informado ou é inválido';
         }
         $device_count = self::count();
-        if ($device_count > $app->getSystem()->getDispositivos()) {
+        if ($device_count > app()->getSystem()->getDispositivos()) {
             $errors['tipo'] = 'Limite de dispositivos excedido, remova os dispositivos excedentes para continuar';
         }
         if (!$this->exists() &&
-            $device_count >= $app->getSystem()->getDispositivos()
+            $device_count >= app()->getSystem()->getDispositivos()
         ) {
             $errors['tipo'] = 'Limite de dispositivos esgotado, verifique sua licença';
         }

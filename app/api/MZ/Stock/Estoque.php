@@ -24,10 +24,12 @@
  */
 namespace MZ\Stock;
 
-use MZ\Database\SyncModel;
-use MZ\Database\DB;
+use MZ\Util\Mask;
 use MZ\Util\Filter;
 use MZ\Util\Validator;
+use MZ\Database\DB;
+use MZ\Database\SyncModel;
+use MZ\Exception\ValidationException;
 use MZ\Product\Composicao;
 use MZ\Environment\Setor;
 use MZ\Product\Produto;
@@ -58,6 +60,10 @@ class Estoque extends SyncModel
      */
     private $produto_id;
     /**
+     * Informa de qual compra originou essa entrada em estoque
+     */
+    private $requisito_id;
+    /**
      * Identificador do item que gerou a saída desse produto do estoque
      */
     private $transacao_id;
@@ -75,9 +81,9 @@ class Estoque extends SyncModel
      */
     private $setor_id;
     /**
-     * Funcionário que inseriu/retirou o produto do estoque
+     * Prestador que inseriu/retirou o produto do estoque
      */
-    private $funcionario_id;
+    private $prestador_id;
     /**
      * Tipo de movimentação do estoque. Entrada: Entrada de produtos no
      * estoque, Venda: Saída de produtos através de venda, Consumo: Saída de
@@ -129,7 +135,7 @@ class Estoque extends SyncModel
 
     /**
      * Identificador da entrada no estoque
-     * @return mixed ID of Estoque
+     * @return int id of Estoque
      */
     public function getID()
     {
@@ -138,8 +144,8 @@ class Estoque extends SyncModel
 
     /**
      * Set ID value to new on param
-     * @param  mixed $id new value for ID
-     * @return Estoque Self instance
+     * @param int $id Set id for Estoque
+     * @return self Self instance
      */
     public function setID($id)
     {
@@ -149,7 +155,7 @@ class Estoque extends SyncModel
 
     /**
      * Produto que entrou no estoque
-     * @return mixed Produto of Estoque
+     * @return int produto of Estoque
      */
     public function getProdutoID()
     {
@@ -158,8 +164,8 @@ class Estoque extends SyncModel
 
     /**
      * Set ProdutoID value to new on param
-     * @param  mixed $produto_id new value for ProdutoID
-     * @return Estoque Self instance
+     * @param int $produto_id Set produto for Estoque
+     * @return self Self instance
      */
     public function setProdutoID($produto_id)
     {
@@ -168,8 +174,28 @@ class Estoque extends SyncModel
     }
 
     /**
+     * Informa de qual compra originou essa entrada em estoque
+     * @return int requisição de compra of Estoque
+     */
+    public function getRequisitoID()
+    {
+        return $this->requisito_id;
+    }
+
+    /**
+     * Set RequisitoID value to new on param
+     * @param int $requisito_id Set requisição de compra for Estoque
+     * @return self Self instance
+     */
+    public function setRequisitoID($requisito_id)
+    {
+        $this->requisito_id = $requisito_id;
+        return $this;
+    }
+
+    /**
      * Identificador do item que gerou a saída desse produto do estoque
-     * @return mixed Transação of Estoque
+     * @return int transação of Estoque
      */
     public function getTransacaoID()
     {
@@ -178,8 +204,8 @@ class Estoque extends SyncModel
 
     /**
      * Set TransacaoID value to new on param
-     * @param  mixed $transacao_id new value for TransacaoID
-     * @return Estoque Self instance
+     * @param int $transacao_id Set transação for Estoque
+     * @return self Self instance
      */
     public function setTransacaoID($transacao_id)
     {
@@ -190,7 +216,7 @@ class Estoque extends SyncModel
     /**
      * Informa de qual entrada no estoque essa saída foi retirada, permite
      * estoque FIFO
-     * @return mixed Entrada of Estoque
+     * @return int entrada of Estoque
      */
     public function getEntradaID()
     {
@@ -199,8 +225,8 @@ class Estoque extends SyncModel
 
     /**
      * Set EntradaID value to new on param
-     * @param  mixed $entrada_id new value for EntradaID
-     * @return Estoque Self instance
+     * @param int $entrada_id Set entrada for Estoque
+     * @return self Self instance
      */
     public function setEntradaID($entrada_id)
     {
@@ -210,7 +236,7 @@ class Estoque extends SyncModel
 
     /**
      * Fornecedor do produto
-     * @return mixed Fornecedor of Estoque
+     * @return int fornecedor of Estoque
      */
     public function getFornecedorID()
     {
@@ -219,8 +245,8 @@ class Estoque extends SyncModel
 
     /**
      * Set FornecedorID value to new on param
-     * @param  mixed $fornecedor_id new value for FornecedorID
-     * @return Estoque Self instance
+     * @param int $fornecedor_id Set fornecedor for Estoque
+     * @return self Self instance
      */
     public function setFornecedorID($fornecedor_id)
     {
@@ -230,7 +256,7 @@ class Estoque extends SyncModel
 
     /**
      * Setor de onde o produto foi inserido ou retirado
-     * @return mixed Setor of Estoque
+     * @return int setor of Estoque
      */
     public function getSetorID()
     {
@@ -239,8 +265,8 @@ class Estoque extends SyncModel
 
     /**
      * Set SetorID value to new on param
-     * @param  mixed $setor_id new value for SetorID
-     * @return Estoque Self instance
+     * @param int $setor_id Set setor for Estoque
+     * @return self Self instance
      */
     public function setSetorID($setor_id)
     {
@@ -249,22 +275,22 @@ class Estoque extends SyncModel
     }
 
     /**
-     * Funcionário que inseriu/retirou o produto do estoque
-     * @return mixed Funcionário of Estoque
+     * Prestador que inseriu/retirou o produto do estoque
+     * @return int prestador of Estoque
      */
-    public function getFuncionarioID()
+    public function getPrestadorID()
     {
-        return $this->funcionario_id;
+        return $this->prestador_id;
     }
 
     /**
-     * Set FuncionarioID value to new on param
-     * @param  mixed $funcionario_id new value for FuncionarioID
-     * @return Estoque Self instance
+     * Set PrestadorID value to new on param
+     * @param int $prestador_id Set prestador for Estoque
+     * @return self Self instance
      */
-    public function setFuncionarioID($funcionario_id)
+    public function setPrestadorID($prestador_id)
     {
-        $this->funcionario_id = $funcionario_id;
+        $this->prestador_id = $prestador_id;
         return $this;
     }
 
@@ -273,7 +299,7 @@ class Estoque extends SyncModel
      * estoque, Venda: Saída de produtos através de venda, Consumo: Saída de
      * produtos por consumo próprio, Transferência: Indica a transferência de
      * produtos entre setores
-     * @return mixed Tipo de movimento of Estoque
+     * @return string tipo de movimento of Estoque
      */
     public function getTipoMovimento()
     {
@@ -282,8 +308,8 @@ class Estoque extends SyncModel
 
     /**
      * Set TipoMovimento value to new on param
-     * @param  mixed $tipo_movimento new value for TipoMovimento
-     * @return Estoque Self instance
+     * @param string $tipo_movimento Set tipo de movimento for Estoque
+     * @return self Self instance
      */
     public function setTipoMovimento($tipo_movimento)
     {
@@ -293,7 +319,7 @@ class Estoque extends SyncModel
 
     /**
      * Quantidade do mesmo produto inserido no estoque
-     * @return mixed Quantidade of Estoque
+     * @return float quantidade of Estoque
      */
     public function getQuantidade()
     {
@@ -302,8 +328,8 @@ class Estoque extends SyncModel
 
     /**
      * Set Quantidade value to new on param
-     * @param  mixed $quantidade new value for Quantidade
-     * @return Estoque Self instance
+     * @param float $quantidade Set quantidade for Estoque
+     * @return self Self instance
      */
     public function setQuantidade($quantidade)
     {
@@ -313,7 +339,7 @@ class Estoque extends SyncModel
 
     /**
      * Preço de compra do produto
-     * @return mixed Preço de compra of Estoque
+     * @return string preço de compra of Estoque
      */
     public function getPrecoCompra()
     {
@@ -322,8 +348,8 @@ class Estoque extends SyncModel
 
     /**
      * Set PrecoCompra value to new on param
-     * @param  mixed $preco_compra new value for PrecoCompra
-     * @return Estoque Self instance
+     * @param string $preco_compra Set preço de compra for Estoque
+     * @return self Self instance
      */
     public function setPrecoCompra($preco_compra)
     {
@@ -333,7 +359,7 @@ class Estoque extends SyncModel
 
     /**
      * Lote de produção do produto comprado
-     * @return mixed Lote of Estoque
+     * @return string lote of Estoque
      */
     public function getLote()
     {
@@ -342,8 +368,8 @@ class Estoque extends SyncModel
 
     /**
      * Set Lote value to new on param
-     * @param  mixed $lote new value for Lote
-     * @return Estoque Self instance
+     * @param string $lote Set lote for Estoque
+     * @return self Self instance
      */
     public function setLote($lote)
     {
@@ -353,7 +379,7 @@ class Estoque extends SyncModel
 
     /**
      * Data de fabricação do produto
-     * @return mixed Data de fabricação of Estoque
+     * @return string data de fabricação of Estoque
      */
     public function getDataFabricacao()
     {
@@ -362,8 +388,8 @@ class Estoque extends SyncModel
 
     /**
      * Set DataFabricacao value to new on param
-     * @param  mixed $data_fabricacao new value for DataFabricacao
-     * @return Estoque Self instance
+     * @param string $data_fabricacao Set data de fabricação for Estoque
+     * @return self Self instance
      */
     public function setDataFabricacao($data_fabricacao)
     {
@@ -373,7 +399,7 @@ class Estoque extends SyncModel
 
     /**
      * Data de vencimento do produto
-     * @return mixed Data de vencimento of Estoque
+     * @return string data de vencimento of Estoque
      */
     public function getDataVencimento()
     {
@@ -382,8 +408,8 @@ class Estoque extends SyncModel
 
     /**
      * Set DataVencimento value to new on param
-     * @param  mixed $data_vencimento new value for DataVencimento
-     * @return Estoque Self instance
+     * @param string $data_vencimento Set data de vencimento for Estoque
+     * @return self Self instance
      */
     public function setDataVencimento($data_vencimento)
     {
@@ -393,7 +419,7 @@ class Estoque extends SyncModel
 
     /**
      * Detalhes da inserção ou retirada do estoque
-     * @return mixed Detalhes of Estoque
+     * @return string detalhes of Estoque
      */
     public function getDetalhes()
     {
@@ -402,8 +428,8 @@ class Estoque extends SyncModel
 
     /**
      * Set Detalhes value to new on param
-     * @param  mixed $detalhes new value for Detalhes
-     * @return Estoque Self instance
+     * @param string $detalhes Set detalhes for Estoque
+     * @return self Self instance
      */
     public function setDetalhes($detalhes)
     {
@@ -413,7 +439,7 @@ class Estoque extends SyncModel
 
     /**
      * Informa a entrada ou saída do estoque foi cancelada
-     * @return mixed Cancelado of Estoque
+     * @return string cancelado of Estoque
      */
     public function getCancelado()
     {
@@ -431,8 +457,8 @@ class Estoque extends SyncModel
 
     /**
      * Set Cancelado value to new on param
-     * @param  mixed $cancelado new value for Cancelado
-     * @return Estoque Self instance
+     * @param string $cancelado Set cancelado for Estoque
+     * @return self Self instance
      */
     public function setCancelado($cancelado)
     {
@@ -442,7 +468,7 @@ class Estoque extends SyncModel
 
     /**
      * Data de entrada ou saída do produto do estoque
-     * @return mixed Data de movimento of Estoque
+     * @return string data de movimento of Estoque
      */
     public function getDataMovimento()
     {
@@ -451,8 +477,8 @@ class Estoque extends SyncModel
 
     /**
      * Set DataMovimento value to new on param
-     * @param  mixed $data_movimento new value for DataMovimento
-     * @return Estoque Self instance
+     * @param string $data_movimento Set data de movimento for Estoque
+     * @return self Self instance
      */
     public function setDataMovimento($data_movimento)
     {
@@ -462,7 +488,7 @@ class Estoque extends SyncModel
 
     /**
      * Convert this instance to array associated key -> value
-     * @param  boolean $recursive Allow rescursive conversion of fields
+     * @param boolean $recursive Allow rescursive conversion of fields
      * @return array All field and values into array format
      */
     public function toArray($recursive = false)
@@ -470,11 +496,12 @@ class Estoque extends SyncModel
         $estoque = parent::toArray($recursive);
         $estoque['id'] = $this->getID();
         $estoque['produtoid'] = $this->getProdutoID();
+        $estoque['requisitoid'] = $this->getRequisitoID();
         $estoque['transacaoid'] = $this->getTransacaoID();
         $estoque['entradaid'] = $this->getEntradaID();
         $estoque['fornecedorid'] = $this->getFornecedorID();
         $estoque['setorid'] = $this->getSetorID();
-        $estoque['funcionarioid'] = $this->getFuncionarioID();
+        $estoque['prestadorid'] = $this->getPrestadorID();
         $estoque['tipomovimento'] = $this->getTipoMovimento();
         $estoque['quantidade'] = $this->getQuantidade();
         $estoque['precocompra'] = $this->getPrecoCompra();
@@ -489,12 +516,12 @@ class Estoque extends SyncModel
 
     /**
      * Fill this instance with from array values, you can pass instance to
-     * @param  mixed $estoque Associated key -> value to assign into this instance
-     * @return Estoque Self instance
+     * @param mixed $estoque Associated key -> value to assign into this instance
+     * @return self Self instance
      */
     public function fromArray($estoque = [])
     {
-        if ($estoque instanceof Estoque) {
+        if ($estoque instanceof self) {
             $estoque = $estoque->toArray();
         } elseif (!is_array($estoque)) {
             $estoque = [];
@@ -509,6 +536,11 @@ class Estoque extends SyncModel
             $this->setProdutoID(null);
         } else {
             $this->setProdutoID($estoque['produtoid']);
+        }
+        if (!array_key_exists('requisitoid', $estoque)) {
+            $this->setRequisitoID(null);
+        } else {
+            $this->setRequisitoID($estoque['requisitoid']);
         }
         if (!array_key_exists('transacaoid', $estoque)) {
             $this->setTransacaoID(null);
@@ -530,10 +562,10 @@ class Estoque extends SyncModel
         } else {
             $this->setSetorID($estoque['setorid']);
         }
-        if (!isset($estoque['funcionarioid'])) {
-            $this->setFuncionarioID(null);
+        if (!isset($estoque['prestadorid'])) {
+            $this->setPrestadorID(null);
         } else {
-            $this->setFuncionarioID($estoque['funcionarioid']);
+            $this->setPrestadorID($estoque['prestadorid']);
         }
         if (!isset($estoque['tipomovimento'])) {
             $this->setTipoMovimento(null);
@@ -571,7 +603,7 @@ class Estoque extends SyncModel
             $this->setDetalhes($estoque['detalhes']);
         }
         if (!isset($estoque['cancelado'])) {
-            $this->setCancelado(null);
+            $this->setCancelado('N');
         } else {
             $this->setCancelado($estoque['cancelado']);
         }
@@ -581,17 +613,6 @@ class Estoque extends SyncModel
             $this->setDataMovimento($estoque['datamovimento']);
         }
         return $this;
-    }
-
-    /**
-     * Get last buy price for informed product
-     * @param int $produtoid Product id to get last price
-     * @return float the last buy price
-     */
-    public static function getUltimoPrecoCompra($produtoid)
-    {
-        $estoque = self::find(['produtoid' => $produtoid, 'cancelado' => 'N'], ['id' => -1]);
-        return $estoque->getPrecoCompra() + 0.0;
     }
 
     /**
@@ -606,15 +627,18 @@ class Estoque extends SyncModel
 
     /**
      * Filter fields, upload data and keep key data
-     * @param Estoque $original Original instance without modifications
+     * @param self $original Original instance without modifications
+     * @param boolean $localized Informs if fields are localized
+     * @return self Self instance
      */
     public function filter($original, $localized = false)
     {
         $this->setID($original->getID());
         $this->setTransacaoID(Filter::number($original->getTransacaoID()));
         $this->setEntradaID(Filter::number($original->getEntradaID()));
-        $this->setFuncionarioID(Filter::number($original->getFuncionarioID()));
+        $this->setPrestadorID(Filter::number($original->getPrestadorID()));
         $this->setProdutoID(Filter::number($this->getProdutoID()));
+        $this->setRequisitoID(Filter::number($this->getRequisitoID()));
         $this->setFornecedorID(Filter::number($this->getFornecedorID()));
         $this->setSetorID(Filter::number($this->getSetorID()));
         $this->setQuantidade(Filter::float($this->getQuantidade(), $localized));
@@ -623,12 +647,12 @@ class Estoque extends SyncModel
         $this->setDataFabricacao(Filter::datetime($this->getDataFabricacao()));
         $this->setDataVencimento(Filter::datetime($this->getDataVencimento()));
         $this->setDetalhes(Filter::string($this->getDetalhes()));
-        $this->setDataMovimento(DB::now());
+        return $this;
     }
 
     /**
      * Clean instance resources like images and docs
-     * @param  Estoque $dependency Don't clean when dependency use same resources
+     * @param self $dependency Don't clean when dependency use same resources
      */
     public function clean($dependency)
     {
@@ -637,35 +661,36 @@ class Estoque extends SyncModel
     /**
      * Validate fields updating them and throw exception when invalid data has found
      * @return array All field of Estoque in array format
+     * @throws \MZ\Exception\ValidationException for invalid input data
      */
     public function validate()
     {
         $errors = [];
         $produto = $this->findProdutoID();
         if (is_null($this->getProdutoID())) {
-            $errors['produtoid'] = 'O produto não pode ser vazio';
+            $errors['produtoid'] = _t('estoque.produto_id_cannot_empty');
         } elseif ($produto->getTipo() != Produto::TIPO_PRODUTO) {
             $errors['produtoid'] = 'O produto informado não é do tipo produto';
         }
         if (is_null($this->getSetorID())) {
-            $errors['setorid'] = 'O setor não pode ser vazio';
+            $errors['setorid'] = _t('estoque.setor_id_cannot_empty');
         }
-        if (is_null($this->getFuncionarioID())) {
-            $errors['funcionarioid'] = 'O funcionário não pode ser vazio';
+        if (is_null($this->getPrestadorID())) {
+            $errors['prestadorid'] = _t('estoque.prestador_id_cannot_empty');
         }
         if (!Validator::checkInSet($this->getTipoMovimento(), self::getTipoMovimentoOptions())) {
-            $errors['tipomovimento'] = 'O tipo de movimento não foi informado ou é inválido';
+            $errors['tipomovimento'] = _t('estoque.tipo_movimento_invalid');
         }
         if (is_null($this->getQuantidade())) {
-            $errors['quantidade'] = 'A quantidade não pode ser vazia';
+            $errors['quantidade'] = _t('estoque.quantidade_cannot_empty');
         } elseif ($this->getQuantidade() <= 0 && $this->getTipoMovimento() == self::TIPO_MOVIMENTO_ENTRADA) {
             $errors['quantidade'] = 'A quantidade não pode ser nula ou negativa';
         }
         if (is_null($this->getPrecoCompra())) {
-            $errors['precocompra'] = 'O preço de compra não pode ser vazio';
+            $errors['precocompra'] = _t('estoque.preco_compra_cannot_empty');
         }
         if (!Validator::checkBoolean($this->getCancelado())) {
-            $errors['cancelado'] = 'O cancelamento não foi informado ou é inválido';
+            $errors['cancelado'] = _t('estoque.cancelado_invalid');
         } elseif ($this->exists() && $this->isCancelado()) {
             $old_estoque = self::findByID($this->getID());
             if ($old_estoque->isCancelado()) {
@@ -679,24 +704,15 @@ class Estoque extends SyncModel
         }
         $this->setDataMovimento(DB::now());
         if (!empty($errors)) {
-            throw new \MZ\Exception\ValidationException($errors);
+            throw new ValidationException($errors);
         }
         return $this->toArray();
     }
 
     /**
-     * Translate SQL exception into application exception
-     * @param  \Exception $e exception to translate into a readable error
-     * @return \MZ\Exception\ValidationException new exception translated
-     */
-    protected function translate($e)
-    {
-        return parent::translate($e);
-    }
-
-    /**
      * Insert a new Estoque into the database and fill instance from database
-     * @return Estoque Self instance
+     * @return self Self instance
+     * @throws \MZ\Exception\ValidationException for invalid input data
      */
     public function insert()
     {
@@ -715,37 +731,43 @@ class Estoque extends SyncModel
 
     /**
      * Update Estoque with instance values into database for ID
-     * @param  array $only Save these fields only, when empty save all fields except id
-     * @return Estoque Self instance
+     * @param array $only Save these fields only, when empty save all fields except id
+     * @return int rows affected
+     * @throws \MZ\Exception\ValidationException for invalid input data
      */
     public function update($only = [])
     {
         $values = $this->validate();
         if (!$this->exists()) {
-            throw new \Exception('O identificador do estoque não foi informado');
+            throw new ValidationException(
+                ['id' => _t('estoque.id_cannot_empty')]
+            );
         }
         $values = DB::filterValues($values, $only, false);
         unset($values['datamovimento']);
         try {
-            DB::update('Estoque')
+            $affected = DB::update('Estoque')
                 ->set($values)
-                ->where('id', $this->getID())
+                ->where(['id' => $this->getID()])
                 ->execute();
             $this->loadByID();
         } catch (\Exception $e) {
             throw $this->translate($e);
         }
-        return $this;
+        return $affected;
     }
 
     /**
      * Delete this instance from database using ID
      * @return integer Number of rows deleted (Max 1)
+     * @throws \MZ\Exception\ValidationException for invalid id
      */
     public function delete()
     {
         if (!$this->exists()) {
-            throw new \Exception('O identificador do estoque não foi informado');
+            throw new ValidationException(
+                ['id' => _t('estoque.id_cannot_empty')]
+            );
         }
         $result = DB::deleteFrom('Estoque')
             ->where('id', $this->getID())
@@ -849,9 +871,9 @@ class Estoque extends SyncModel
 
     /**
      * Load one register for it self with a condition
-     * @param  array $condition Condition for searching the row
-     * @param  array $order associative field name -> [-1, 1]
-     * @return Estoque Self instance filled or empty
+     * @param array $condition Condition for searching the row
+     * @param array $order associative field name -> [-1, 1]
+     * @return self Self instance filled or empty
      */
     public function load($condition, $order = [])
     {
@@ -870,15 +892,27 @@ class Estoque extends SyncModel
     }
 
     /**
+     * Informa de qual compra originou essa entrada em estoque
+     * @return \MZ\Stock\Requisito The object fetched from database
+     */
+    public function findRequisitoID()
+    {
+        if (is_null($this->getRequisitoID())) {
+            return new \MZ\Stock\Requisito();
+        }
+        return \MZ\Stock\Requisito::findByID($this->getRequisitoID());
+    }
+
+    /**
      * Identificador do item que gerou a saída desse produto do estoque
-     * @return \MZ\Sale\ProdutoPedido The object fetched from database
+     * @return \MZ\Sale\Item The object fetched from database
      */
     public function findTransacaoID()
     {
         if (is_null($this->getTransacaoID())) {
-            return new \MZ\Sale\ProdutoPedido();
+            return new \MZ\Sale\Item();
         }
-        return \MZ\Sale\ProdutoPedido::findByID($this->getTransacaoID());
+        return \MZ\Sale\Item::findByID($this->getTransacaoID());
     }
 
     /**
@@ -916,12 +950,12 @@ class Estoque extends SyncModel
     }
 
     /**
-     * Funcionário que inseriu/retirou o produto do estoque
+     * Prestador que inseriu/retirou o produto do estoque
      * @return \MZ\Provider\Prestador The object fetched from database
      */
-    public function findFuncionarioID()
+    public function findPrestadorID()
     {
-        return \MZ\Provider\Prestador::findByID($this->getFuncionarioID());
+        return \MZ\Provider\Prestador::findByID($this->getPrestadorID());
     }
 
     /**
@@ -952,16 +986,16 @@ class Estoque extends SyncModel
 
     /**
      * Gets textual and translated TipoMovimento for Estoque
-     * @param  int $index choose option from index
-     * @return mixed A associative key -> translated representative text or text for index
+     * @param int $index choose option from index
+     * @return string[]|string A associative key -> translated representative text or text for index
      */
     public static function getTipoMovimentoOptions($index = null)
     {
         $options = [
-            self::TIPO_MOVIMENTO_ENTRADA => 'Entrada',
-            self::TIPO_MOVIMENTO_VENDA => 'Venda',
-            self::TIPO_MOVIMENTO_CONSUMO => 'Consumo',
-            self::TIPO_MOVIMENTO_TRANSFERENCIA => 'Transferência',
+            self::TIPO_MOVIMENTO_ENTRADA => _t('estoque.tipo_movimento_entrada'),
+            self::TIPO_MOVIMENTO_VENDA => _t('estoque.tipo_movimento_venda'),
+            self::TIPO_MOVIMENTO_CONSUMO => _t('estoque.tipo_movimento_consumo'),
+            self::TIPO_MOVIMENTO_TRANSFERENCIA => _t('estoque.tipo_movimento_transferencia'),
         ];
         if (!is_null($index)) {
             return $options[$index];
@@ -975,14 +1009,14 @@ class Estoque extends SyncModel
      */
     private static function getAllowedKeys()
     {
-        $estoque = new Estoque();
+        $estoque = new self();
         $allowed = Filter::concatKeys('e.', $estoque->toArray());
         return $allowed;
     }
 
     /**
      * Filter order array
-     * @param  mixed $order order string or array to parse and filter allowed
+     * @param mixed $order order string or array to parse and filter allowed
      * @return array allowed associative order
      */
     private static function filterOrder($order)
@@ -1004,7 +1038,7 @@ class Estoque extends SyncModel
 
     /**
      * Filter condition array with allowed fields
-     * @param  array $condition condition to filter rows
+     * @param array $condition condition to filter rows
      * @return array allowed condition
      */
     private static function filterCondition($condition)
@@ -1015,8 +1049,8 @@ class Estoque extends SyncModel
 
     /**
      * Fetch data from database with a condition
-     * @param  array $condition condition to filter rows
-     * @param  array $order order rows
+     * @param array $condition condition to filter rows
+     * @param array $order order rows
      * @return SelectQuery query object with condition statement
      */
     private static function query($condition = [], $order = [])
@@ -1030,15 +1064,43 @@ class Estoque extends SyncModel
 
     /**
      * Search one register with a condition
-     * @param  array $condition Condition for searching the row
-     * @param  array $order order rows
-     * @return Estoque A filled Estoque or empty instance
+     * @param array $condition Condition for searching the row
+     * @param array $order order rows
+     * @return self A filled Estoque or empty instance
      */
     public static function find($condition, $order = [])
     {
-        $query = self::query($condition, $order)->limit(1);
-        $row = $query->fetch() ?: [];
-        return new Estoque($row);
+        $result = new self();
+        return $result->load($condition, $order);
+    }
+
+    /**
+     * Search one register with a condition
+     * @param array $condition Condition for searching the row
+     * @param array $order order rows
+     * @return self A filled Estoque or empty instance
+     * @throws \Exception when register has not found
+     */
+    public static function findOrFail($condition, $order = [])
+    {
+        $result = self::find($condition, $order);
+        if (!$result->exists()) {
+            throw new \Exception(_t('estoque.not_found'), 404);
+        }
+        return $result;
+    }
+
+
+
+    /**
+     * Get last buy price for informed product
+     * @param int $produtoid Product id to get last price
+     * @return float the last buy price
+     */
+    public static function getUltimoPrecoCompra($produtoid)
+    {
+        $estoque = self::find(['produtoid' => $produtoid, 'cancelado' => 'N'], ['id' => -1]);
+        return $estoque->getPrecoCompra() + 0.0;
     }
 
     /**
@@ -1079,11 +1141,11 @@ class Estoque extends SyncModel
 
     /**
      * Find all Estoque
-     * @param  array  $condition Condition to get all Estoque
-     * @param  array  $order     Order Estoque
-     * @param  int    $limit     Limit data into row count
-     * @param  int    $offset    Start offset to get rows
-     * @return array             List of all rows instanced as Estoque
+     * @param array  $condition Condition to get all Estoque
+     * @param array  $order     Order Estoque
+     * @param int    $limit     Limit data into row count
+     * @param int    $offset    Start offset to get rows
+     * @return self[] List of all rows instanced as Estoque
      */
     public static function findAll($condition = [], $order = [], $limit = null, $offset = null)
     {
@@ -1097,14 +1159,14 @@ class Estoque extends SyncModel
         $rows = $query->fetchAll();
         $result = [];
         foreach ($rows as $row) {
-            $result[] = new Estoque($row);
+            $result[] = new self($row);
         }
         return $result;
     }
 
     /**
      * Count all rows from database with matched condition critery
-     * @param  array $condition condition to filter rows
+     * @param array $condition condition to filter rows
      * @return integer Quantity of rows
      */
     public static function count($condition = [])

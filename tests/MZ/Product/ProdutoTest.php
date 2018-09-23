@@ -105,14 +105,35 @@ class ProdutoTest extends \MZ\Framework\TestCase
         $estoque = EstoqueTest::create();
         $produto = $estoque->findProdutoID();
         AuthenticationTest::authProvider([Permissao::NOME_SISTEMA, Permissao::NOME_CADASTROPRODUTOS]);
+        $campos = [
+            'id',
+            'categoriaid',
+            'descricao',
+            'detalhes',
+            'precovenda',
+            'tipo',
+            'conteudo',
+            'divisivel',
+            'dataatualizacao',
+            'imagemurl',
+            'avaliacao',
+            // extras
+            'estoque',
+            'categoria',
+            'unidade',
+        ];
+        $item = $produto->publish();
+        $item['estoque'] = $estoque->getQuantidade();
+        $item['categoria'] = $produto->findCategoriaID()->getDescricao();
+        $item['unidade'] = $produto->findUnidadeID()->getSigla();
         $expected = [
             'status' => 'ok',
-            'items' => [
-                $produto->publish(),
+            'produtos' => [
+                array_intersect_key($item, array_flip($campos)),
             ],
         ];
         app()->getAuthentication()->logout();
         $result = $this->get('/app/produto/listar', ['busca' => $produto->getDescricao()]);
-        $this->assertEquals($expected, \array_intersect_key($result, \array_keys($expected)));
+        $this->assertEquals($expected, \array_intersect_key($result, $expected));
     }
 }

@@ -109,7 +109,7 @@ $[descriptor.end]
             ],
         ];
         $result = $this->get('/api/$[table.unix.plural]', ['search' => $$[table.unix]->get$[Descriptor.norm]()]);
-        $this->assertEquals($expected, \array_intersect_key($result, \array_keys($expected)));
+        $this->assertEquals($expected, \array_intersect_key($result, $expected));
     }
 
     public function testAdd()
@@ -124,7 +124,7 @@ $[descriptor.end]
         ];
         $result = $this->post('/api/$[table.unix.plural]', $$[table.unix]->toArray());
         $expected['item']['id'] = $result['item']['id'] ?? null;
-        $this->assertEquals($expected, \array_intersect_key($result, \array_keys($expected)));
+        $this->assertEquals($expected, \array_intersect_key($result, $expected));
     }
 
     public function testUpdate()
@@ -140,7 +140,7 @@ $[descriptor.end]
                 $$[table.unix]->publish(),
             ]
         ];
-        $this->assertEquals($expected, \array_intersect_key($result, \array_keys($expected)));
+        $this->assertEquals($expected, \array_intersect_key($result, $expected));
     }
 
     public function testDelete()
@@ -151,7 +151,7 @@ $[descriptor.end]
         $result = $this->delete('/api/$[table.unix.plural]/' . $id);
         $$[table.unix]->loadBy$[Primary.norm]();
         $expected = [ 'status' => 'ok', ];
-        $this->assertEquals($expected, \array_intersect_key($result, \array_keys($expected)));
+        $this->assertEquals($expected, \array_intersect_key($result, $expected));
         $this->assertFalse($$[table.unix]->exists());
     }
 }

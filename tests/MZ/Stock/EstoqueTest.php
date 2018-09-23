@@ -71,11 +71,12 @@ class EstoqueTest extends \MZ\Framework\TestCase
         $allowed = [
             'id',
             'produtoid',
+            'requisitoid',
             'transacaoid',
             'entradaid',
             'fornecedorid',
             'setorid',
-            'funcionarioid',
+            'prestadorid',
             'tipomovimento',
             'quantidade',
             'precocompra',

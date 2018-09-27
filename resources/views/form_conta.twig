@@ -20,7 +20,7 @@
     <span id="cliente-label">
       <span>Cliente:
       </span>
-      <span class="identifier">{{ \MZ\Util\Mask::phone($_cliente->getFone(1)) }}</span>
+      <span class="identifier">{{ \MZ\Util\Mask::phone($_cliente->getTelefone()->getNumero()) }}</span>
     </span>
   </label>
   <input type="text" id="clienteid" class="form-control" value="{{ $_cliente->getNomeCompleto() }}">

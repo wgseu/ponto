@@ -694,7 +694,7 @@ class Cliente extends SyncModel
         if ($cliente instanceof self) {
             $telefone = $cliente->getTelefone();
             $cliente = $cliente->toArray();
-            $cliente['telefone'] = $telefone;
+            $cliente['fone1'] = $telefone;
         } elseif (!is_array($cliente)) {
             $cliente = [];
         }
@@ -764,10 +764,10 @@ class Cliente extends SyncModel
         } else {
             $this->setDataAniversario($cliente['dataaniversario']);
         }
-        if (!array_key_exists('telefone', $cliente)) {
+        if (!array_key_exists('fone1', $cliente)) {
             $this->setTelefone(null);
         } else {
-            $this->setTelefone($cliente['telefone']);
+            $this->setTelefone($cliente['fone1']);
         }
         if (!array_key_exists('slogan', $cliente)) {
             $this->setSlogan(null);
@@ -1144,12 +1144,20 @@ class Cliente extends SyncModel
         $values = DB::filterValues($values, $only, false);
         unset($values['datacadastro']);
         try {
+            DB::beginTransaction();
             $affected = DB::update('Clientes')
                 ->set($values)
                 ->where(['id' => $this->getID()])
                 ->execute();
+            if (!is_null($this->getTelefone()->getNumero())) {
+                $this->getTelefone()->setPrincipal('Y');
+                $this->getTelefone()->setClienteID($this->getID());
+                $this->getTelefone()->save();
+            }
             $this->loadByID();
+            DB::commit();
         } catch (\Exception $e) {
+            DB::rollBack();
             throw $this->translate($e);
         }
         return $affected;

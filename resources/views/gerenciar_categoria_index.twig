@@ -62,7 +62,7 @@
                 <tr>
                   <td class="product-cell">
                     <strong>
-                      <a href="/gerenciar/categoria/editar?id={{ $categoria->getID() }}" title="Editar categoria '{{ $categoria->getDescricao() }}'"><img src="{{ get_image_url($categoria->getImagem(), 'categoria', 'categoria.png') }}" height="48" alt="Imagem" title="Imagem"/>{{ $categoria->getDescricao() }}</a>
+                      <a href="/gerenciar/categoria/editar?id={{ $categoria->getID() }}" title="Editar categoria '{{ $categoria->getDescricao() }}'"><img src="{{ $categoria->makeImagemURL() }}" height="48" alt="Imagem" title="Imagem"/>{{ $categoria->getDescricao() }}</a>
                     </strong>
                     {% $_categoria = $categoria->findCategoriaID() %}
                     <small>

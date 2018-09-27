@@ -27,9 +27,41 @@ namespace MZ\Session;
 use MZ\Account\Cliente;
 use MZ\Database\DB;
 use MZ\Provider\PrestadorTest;
+use MZ\Wallet\CarteiraTest;
 
 class CaixaTest extends \MZ\Framework\TestCase
 {
+    /**
+     * Build a valid caixa
+     * @param string $descricao Caixa descrição
+     * @return Caixa
+     */
+    public static function build($descricao = null)
+    {
+        $last = Caixa::find([], ['id' => -1]);
+        $id = $last->getID() + 1;
+        $carteira = CarteiraTest::create();
+        $caixa = new Caixa();
+        $caixa->setCarteiraID($carteira->getID());
+        $caixa->setDescricao($descricao ?: "Caixa {$id}");
+        $caixa->setSerie(4);
+        $caixa->setNumeroInicial(100);
+        $caixa->setAtivo('Y');
+        return $caixa;
+    }
+
+    /**
+     * Create a caixa on database
+     * @param string $descricao Caixa descrição
+     * @return Caixa
+     */
+    public static function create($descricao = null)
+    {
+        $caixa = self::build($descricao);
+        $caixa->insert();
+        return $caixa;
+    }
+
     public function testFromArray()
     {
         $old_caixa = new Caixa(['descricao' => 'Caixa 1']);
@@ -66,6 +98,7 @@ class CaixaTest extends \MZ\Framework\TestCase
         $values = $caixa->publish();
         $allowed = [
             'id',
+            'carteiraid',
             'descricao',
             'serie',
             'numeroinicial',
@@ -76,9 +109,7 @@ class CaixaTest extends \MZ\Framework\TestCase
 
     public function testInsert()
     {
-        $caixa = new Caixa();
-        $caixa->setDescricao('Caixa 2');
-        $caixa->insert();
+        $caixa = self::create('Caixa 2');
         $this->expectException('\MZ\Exception\ValidationException');
         try {
             $caixa->insert();
@@ -90,9 +121,7 @@ class CaixaTest extends \MZ\Framework\TestCase
 
     public function testUpdate()
     {
-        $caixa = new Caixa();
-        $caixa->setDescricao('Caixa 3');
-        $caixa->insert();
+        $caixa = self::create('Caixa 3');
         $this->assertTrue($caixa->exists());
 
         $caixa->setDescricao('Cash register 3');
@@ -102,18 +131,14 @@ class CaixaTest extends \MZ\Framework\TestCase
 
     public function testFind()
     {
-        $caixa = new Caixa();
-        $caixa->setDescricao('Caixa 4');
-        $caixa->insert();
+        $caixa = self::create('Caixa 4');
 
         $found_caixa = Caixa::findByID($caixa->getID());
         $this->assertEquals($caixa, $found_caixa);
         $found_caixa = Caixa::findByDescricao('Caixa 4');
         $this->assertEquals($caixa, $found_caixa);
 
-        $caixa_sec = new Caixa();
-        $caixa_sec->setDescricao('Caixa 48');
-        $caixa_sec->insert();
+        $caixa_sec = self::create('Caixa 48');
 
         $caixas = Caixa::findAll(['search' => 'Caixa 4'], [], 2, 0);
         $this->assertEquals([$caixa, $caixa_sec], $caixas);
@@ -126,31 +151,26 @@ class CaixaTest extends \MZ\Framework\TestCase
     {
         $old_value = app()->getSystem()->getBusiness()->getOptions()->getValue('Sistema', 'Fiscal.Mostrar');
         app()->getSystem()->getBusiness()->getOptions()->setValue('Sistema', 'Fiscal.Mostrar', true);
-        $caixa = new Caixa();
-        $caixa->setDescricao('Caixa 6');
-        $caixa->setSerie(4);
-        $caixa->setNumeroInicial(100);
-        $caixa->setAtivo('Y');
-        $caixa->insert();
+        $caixa = self::create('Caixa 6');
         app()->getSystem()->getBusiness()->getOptions()->setValue('Sistema', 'Fiscal.Mostrar', $old_value);
 
-        $found_caixa = Caixa::findBySerie(4);
+        $found_caixa = Caixa::findBySerie($caixa->getSerie());
         $this->assertEquals($caixa, $found_caixa);
 
         $caixa->setAtivo('N');
         $caixa->update();
 
-        $found_caixa = Caixa::findBySerie(4);
+        $found_caixa = Caixa::findBySerie($caixa->getSerie());
         $this->assertEquals(new Caixa(), $found_caixa);
 
-        Caixa::resetBySerie(4);
+        Caixa::resetBySerie($caixa->getSerie());
         $found_caixa = Caixa::findByID($caixa->getID());
         $this->assertEquals($caixa, $found_caixa);
 
         $caixa->setAtivo('Y');
         $caixa->update();
-        Caixa::resetBySerie(4);
-        $found_caixa = Caixa::findBySerie(4);
+        Caixa::resetBySerie($caixa->getSerie());
+        $found_caixa = Caixa::findBySerie($caixa->getSerie());
         $new_caixa = new Caixa($caixa);
         $new_caixa->setNumeroInicial(1);
         $this->assertEquals($new_caixa, $found_caixa);
@@ -158,9 +178,7 @@ class CaixaTest extends \MZ\Framework\TestCase
 
     public function testSearch()
     {
-        $caixa = new Caixa();
-        $caixa->setDescricao('Caixa 5');
-        $caixa->insert();
+        $caixa = self::create('Caixa 5');
 
         $found_caixa = Caixa::find(['search' => 'xa 5']);
         $this->assertEquals($caixa, $found_caixa);
@@ -177,7 +195,7 @@ class CaixaTest extends \MZ\Framework\TestCase
             $caixa->insert();
         } catch (\MZ\Exception\ValidationException $e) {
             $this->assertEquals(
-                ['descricao', 'serie', 'numeroinicial', 'ativo'],
+                ['carteiraid', 'descricao', 'serie', 'numeroinicial', 'ativo'],
                 array_keys($e->getErrors())
             );
             throw $e;
@@ -188,10 +206,7 @@ class CaixaTest extends \MZ\Framework\TestCase
 
     public function testDesativarEmUso()
     {
-        $caixa = new Caixa();
-        $caixa->setDescricao('Caixa 7');
-        $caixa->setAtivo('Y');
-        $caixa->insert();
+        $caixa = self::create('Caixa 7');
 
         $sessao = new Sessao();
         $sessao->setAberta('Y');
@@ -231,9 +246,7 @@ class CaixaTest extends \MZ\Framework\TestCase
 
     public function testDelete()
     {
-        $caixa = new Caixa();
-        $caixa->setDescricao('Caixa 9');
-        $caixa->insert();
+        $caixa = self::create('Caixa 9');
         $caixa->delete();
         $caixa->clean(new Caixa());
         $found_caixa = Caixa::findByID($caixa->getID());

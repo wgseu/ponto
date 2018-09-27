@@ -81,7 +81,7 @@ class NFeAPI extends \NFe\Common\Ajuste
         $emitente->setRazaoSocial(\NFeUtil::fixEncoding($empresa->getSobrenome()));
         $emitente->setFantasia(\NFeUtil::fixEncoding($empresa->getNome()));
         $emitente->setCNPJ($empresa->getCPF());
-        $emitente->setTelefone($empresa->getFone(1));
+        $emitente->setTelefone($empresa->getTelefone()->getNumero());
         $emitente->setIE($empresa->getRG());
         $emitente->setIM($empresa->getIM());
         $emitente->setRegime($this->external_regime->getCodigo());

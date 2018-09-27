@@ -34,8 +34,8 @@ class TestCase extends \PHPUnit\Framework\TestCase
     /**
      * Execute http GET request and return json decoded as array
      * @param string $url url to fetch data
-     * @param mixed[] $query url query params
-     * @return mixed[] response data
+     * @param array $query url query params
+     * @return array response data
      */
     public function get($url, $query = [])
     {
@@ -47,9 +47,9 @@ class TestCase extends \PHPUnit\Framework\TestCase
     /**
      * Execute http POST request and return json decoded as array
      * @param string $url url to post data
-     * @param mixed[] $data data to submit
+     * @param array $data data to submit
      * @param boolean $form send as form url encoded
-     * @return mixed[] response data
+     * @return array response data
      */
     public function post($url, $data, $form = false)
     {
@@ -72,9 +72,9 @@ class TestCase extends \PHPUnit\Framework\TestCase
     /**
      * Execute http PUT request and return json decoded as array
      * @param string $url url to post data
-     * @param mixed[] $data data to submit
+     * @param array $data data to submit
      * @param boolean $form send as form url encoded
-     * @return mixed[] response data
+     * @return array response data
      */
     public function put($url, $data = [], $form = false)
     {
@@ -97,9 +97,9 @@ class TestCase extends \PHPUnit\Framework\TestCase
     /**
      * Execute http PATCH request and return json decoded as array
      * @param string $url url to post data
-     * @param mixed[] $data data to submit
+     * @param array $data data to submit
      * @param boolean $form send as form url encoded
-     * @return mixed[] response data
+     * @return array response data
      */
     public function patch($url, $data = [], $form = false)
     {
@@ -122,8 +122,8 @@ class TestCase extends \PHPUnit\Framework\TestCase
     /**
      * Execute http DELETE request and return json decoded as array
      * @param string $url url to post data
-     * @param mixed[] $query url query params
-     * @return mixed[] response data
+     * @param array $query url query params
+     * @return array response data
      */
     public function delete($url, $query = [])
     {

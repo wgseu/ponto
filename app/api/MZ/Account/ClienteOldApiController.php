@@ -139,7 +139,7 @@ class ClienteOldApiController extends \MZ\Core\ApiController
                 'nome' => app()->auth->user->getNome(),
                 'email' => app()->auth->user->getEmail(),
                 'login' => app()->auth->user->getLogin(),
-                'imagemurl' => get_image_url(app()->auth->user->getImagem(), 'cliente', null)
+                'imagemurl' => app()->auth->user->makeImagemURL(false, null)
             ]
         ];
         $status['funcionario'] = intval(app()->auth->provider->getID());
@@ -188,7 +188,7 @@ class ClienteOldApiController extends \MZ\Core\ApiController
                 'nome' => app()->auth->user->getNome(),
                 'email' => app()->auth->user->getEmail(),
                 'login' => app()->auth->user->getLogin(),
-                'imagemurl' => get_image_url(app()->auth->user->getImagem(), 'cliente', null)
+                'imagemurl' => app()->auth->user->makeImagemURL(false, null)
             ];
             $status['funcionario'] = intval(app()->auth->provider->getID());
             try {
@@ -227,7 +227,6 @@ class ClienteOldApiController extends \MZ\Core\ApiController
             $columns = [
                 'Nome/Fantasia',
                 'Telefone',
-                'Celular',
                 'E-mail',
                 'Aniversário/Fundação',
                 sprintf('%s/%s', _p('Titulo', 'CPF'), _p('Titulo', 'CNPJ')),
@@ -262,8 +261,7 @@ class ClienteOldApiController extends \MZ\Core\ApiController
         
                 $row = [];
                 $row[] = $value->getNomeCompleto();
-                $row[] = Mask::phone($value->getFone(1));
-                $row[] = Mask::phone($value->getFone(2));
+                $row[] = Mask::phone($value->getTelefone()->getNumero());
                 $row[] = $value->getEmail();
                 if (is_null($value->getDataAniversario())) {
                     $row[] = null;

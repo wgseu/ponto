@@ -64,6 +64,8 @@ class ClientePageController extends PageController
                 $senha = $this->getRequest()->request->get('confirmarsenha', '');
                 $cliente->passwordMatch($senha);
                 $cliente->filter($old_cliente, true);
+                $cliente->getTelefone()->setPaisID(app()->getSystem()->getCountry()->getID());
+                $cliente->getTelefone()->filter(new Telefone(), true);
                 $cliente->insert();
                 $old_cliente->clean($cliente);
                 if ($this->isJson()) {
@@ -154,15 +156,19 @@ class ClientePageController extends PageController
                 // não deixa o usuário alterar os dados abaixo
                 $cliente->setEmail($old_cliente->getEmail());
                 $cliente->setTipo($old_cliente->getTipo());
-                $cliente->setAcionistaID($old_cliente->getAcionistaID());
+                $cliente->setEmpresaID($old_cliente->getEmpresaID());
                 $cliente->setSlogan($old_cliente->getSlogan());
-        
+
                 $senha = $this->getRequest()->request->get('confirmarsenha', '');
                 $cliente->passwordMatch($senha);
-        
+
                 $cliente->filter($old_cliente, true);
+                $cliente->getTelefone()->setPaisID(app()->getSystem()->getCountry()->getID());
+                $cliente->getTelefone()->filter($old_cliente->getTelefone(), true);
                 $cliente->update();
+
                 $old_cliente->clean($cliente);
+                $old_cliente->getTelefone()->clean($cliente->getTelefone());
                 $msg = 'Conta atualizada com sucesso!';
                 if ($this->isJson()) {
                     return $this->json()->success(['item' => $cliente->publish()], $msg);

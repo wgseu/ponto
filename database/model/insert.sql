@@ -359,7 +359,7 @@ INSERT INTO `Mesas` (`ID`, `Numero`, `Nome`, `Ativa`) VALUES
 	(8, 8, "Mesa 8", 'Y'),
 	(9, 9, "Mesa 9", 'Y'),
 	(10, 10, "Mesa 10", 'Y');
-	
+
 INSERT INTO `Comandas` (`ID`, `Numero`, `Nome`, `Ativa`) VALUES
 	(1, 1, "Comanda 1", 'Y'),
 	(2, 2, "Comanda 2", 'Y'),
@@ -378,11 +378,12 @@ INSERT INTO `Clientes` (`ID`, `Tipo`, `Login`, `Senha`, `Nome`, `Sobrenome`, `Ge
 INSERT INTO `Prestadores` (`ID`, `Codigo`, `FuncaoID`, `ClienteID`, `Ativo`, `DataCadastro`) VALUES
 	(1, 1, 1, 1, 'Y', NOW());
 
-INSERT INTO `Caixas` (`ID`, `Descricao`, `Ativo`) VALUES
-	(1, "Caixa 1", 'Y');
-
 INSERT INTO `Carteiras` (`ID`, `Tipo`, `Descricao`, `Ativa`) VALUES
-	(1, 'Financeira', 'Cofre da empresa', 'Y');
+	(1, 'Local', "Cofre da empresa", 'Y'),
+	(2, 'Local', "Gaveta do Caixa 1", 'Y');
+
+INSERT INTO `Caixas` (`ID`, `CarteiraID`, `Descricao`, `Ativo`) VALUES
+	(1, 2, "Caixa 1", 'Y');
 
 INSERT INTO `Formas_Pagto` (`ID`, `Descricao`, `Tipo`, `CarteiraID`, `Parcelado`, `MinParcelas`, `MaxParcelas`, `ParcelasSemJuros`, `Juros`, `Ativa`) VALUES
 	(1, "Dinheiro", 'Dinheiro', 1, 'N', NULL, NULL, NULL, NULL, 'Y'),
@@ -394,17 +395,17 @@ INSERT INTO `Formas_Pagto` (`ID`, `Descricao`, `Tipo`, `CarteiraID`, `Parcelado`
 	(7, "Saldo", 'Saldo', 1, 'N', NULL, NULL, NULL, NULL, 'N');
 
 INSERT INTO `Cartoes` (`ID`, `FormaPagtoID`, `Bandeira`, `ImagemURL`, `Ativo`) VALUES
-	(1, 2, "Visa", '~visa.png', 'Y'),
-	(2, 2, "MasterCard", '~mastercard.png', 'Y'),
-	(3, 2, "Hipercard", '~hipercard.png', 'Y'),
-	(4, 2, "Elo", '~elo.png', 'Y'),
-	(5, 2, "American Express", '~american_express.png', 'N'),
-	(6, 2, "Diners Club", '~diners_club.png', 'N'),
-	(7, 3, "Maestro", '~maestro.png', 'Y'),
-	(8, 3, "Visa Electron", '~visa_electron.png', 'Y'),
-	(9, 3, "Elo", '~elo.png', 'Y'),
-	(10, 4, "Sodexo", '~sodexo.png', 'Y'),
-	(11, 4, "Ticket", '~ticket.png', 'Y');
+	(1, 2, "Visa", 'visa.png', 'Y'),
+	(2, 2, "MasterCard", 'mastercard.png', 'Y'),
+	(3, 2, "Hipercard", 'hipercard.png', 'Y'),
+	(4, 2, "Elo", 'elo.png', 'Y'),
+	(5, 2, "American Express", 'american_express.png', 'N'),
+	(6, 2, "Diners Club", 'diners_club.png', 'N'),
+	(7, 3, "Maestro", 'maestro.png', 'Y'),
+	(8, 3, "Visa Electron", 'visa_electron.png', 'Y'),
+	(9, 3, "Elo", 'elo.png', 'Y'),
+	(10, 4, "Sodexo", 'sodexo.png', 'Y'),
+	(11, 4, "Ticket", 'ticket.png', 'Y');
 
 INSERT INTO `Categorias` (`ID`, `Descricao`, `Servico`, `DataAtualizacao`) VALUES
 	(1, "Pizzas e massas", 'Y', NOW()),
@@ -635,7 +636,7 @@ INSERT INTO `Operacoes` (`ID`, `Codigo`, `Descricao`, `Detalhes`) VALUES
 	(7, 5405, 'Venda de mercadoria adquirida ou recebida de terceiros em operação com mercadoria sujeita ao regime de substituição tributária, na condição de contribuinte substituído', 'Classificam-se neste código as vendas de mercadorias adquiridas ou recebidas de terceiros em operação com mercadorias sujeitas ao regime de substituição tributária, na condição de contribuinte substituído');
 
 INSERT INTO `Integracoes` (`Nome`, `AcessoURL`, `Descricao`, `IconeURL`, `Ativo`, `DataAtualizacao`) VALUES
-	('iFood', 'ifood', 'Módulo de integração com o iFood', '~ifood.png', 'N', NOW()),
-	('Kromax', 'kromax', 'Módulo de integração com a Kromax', '~kromax.png', 'N', NOW());
+	('iFood', 'ifood', 'Módulo de integração com o iFood', 'ifood.png', 'N', NOW()),
+	('Kromax', 'kromax', 'Módulo de integração com a Kromax', 'kromax.png', 'N', NOW());
 
 SET SQL_MODE=@OLD_SQL_MODE;

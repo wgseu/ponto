@@ -1,4 +1,7 @@
 <?php
+
+use PHPMailer\PHPMailer\PHPMailer;
+
 /**
  * @author: shwdai@gmail.com
  */

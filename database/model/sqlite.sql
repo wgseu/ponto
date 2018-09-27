@@ -2,7 +2,7 @@
 -- Author:        Mazin
 -- Caption:       GrandChef Model
 -- Project:       GrandChef
--- Changed:       2018-09-13 20:20
+-- Changed:       2018-09-27 10:42
 -- Created:       2012-09-05 23:08
 PRAGMA foreign_keys = OFF;
 
@@ -142,16 +142,6 @@ CREATE TABLE "Clientes"(
 );
 CREATE INDEX "Clientes.Nome_INDEX" ON "Clientes" ("Nome");
 CREATE INDEX "Clientes.FK_Clientes_Clientes_AcionistaID_idx" ON "Clientes" ("EmpresaID");
-CREATE TABLE "Caixas"(
---   Caixas de movimentação financeira[N:Caixa|Caixas][G:o][L:CadastroCaixas][K:MZ\Session|MZ\Session\][H:SyncModel]
-  "ID" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,-- Identificador do caixa[G:o]
-  "Descricao" VARCHAR(50) NOT NULL,-- Descrição do caixa[N:Descrição][G:a][S]
-  "Serie" INTEGER NOT NULL DEFAULT 1,-- Série do caixa[N:Série][G:a]
-  "NumeroInicial" INTEGER NOT NULL DEFAULT 1,-- Número inicial na geração da nota, será usado quando maior que o último número utilizado[N:Número inicial][G:o]
-  "Ativo" TEXT NOT NULL CHECK("Ativo" IN('Y', 'N')) DEFAULT 'Y',-- Informa se o caixa está ativo[N:Ativo][G:o]
-  CONSTRAINT "Descricao_UNIQUE"
-    UNIQUE("Descricao")
-);
 CREATE TABLE "Moedas"(
 --   Moedas financeiras de um país[N:Moeda|Moedas][G:a][L:CadastroMoedas][K:MZ\Wallet|MZ\Wallet\][H:SyncModel]
   "ID" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,-- Identificador da moeda[G:o]
@@ -235,9 +225,10 @@ CREATE TABLE "Categorias"(
   "ID" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,-- Identificador da categoria[G:o]
   "CategoriaID" INTEGER DEFAULT NULL,-- Informa a categoria pai da categoria atual, a categoria atual é uma subcategoria[N:Categoria superior][G:a][S:S]
   "Descricao" VARCHAR(45) NOT NULL,-- Descrição da categoria. Ex.: Refrigerantes, Salgados[N:Descrição][G:a][S]
+  "Detalhes" VARCHAR(200) DEFAULT NULL,-- Informa os detalhes gerais dos produtos dessa categoria[G:o][N:Detalhes]
   "Servico" TEXT NOT NULL CHECK("Servico" IN('Y', 'N')),-- Informa se a categoria é destinada para produtos ou serviços[N:Serviço][G:o]
   "ImagemURL" VARCHAR(100) DEFAULT NULL,-- Imagem representativa da categoria[N:Imagem][G:a][I:256x256|categoria|categoria.png]
-  "Ordem" INTEGER NOT NULL DEFAULT 0,-- Informa a ordem de exibição das categorias nas vendas[G:a][N:Ordem]
+  "Ordem" INTEGER NOT NULL DEFAULT 0,-- Informa a ordem de exibição das categorias nas vendas[G:a][N:Ordem][F:0]
   "DataAtualizacao" DATETIME NOT NULL,-- Data de atualização das informações da categoria[N:Data de atualização][G:a]
   "DataArquivado" DATETIME DEFAULT NULL,-- Data em que a categoria foi arquivada e não será mais usada[G:a][N:Data de arquivação]
   CONSTRAINT "Descricao_UNIQUE"
@@ -337,41 +328,6 @@ CREATE TABLE "Viagens"(
     ON UPDATE RESTRICT
 );
 CREATE INDEX "Viagens.FK_Entregas_Prestadores_ResponsavelID_idx" ON "Viagens" ("ResponsavelID");
-CREATE TABLE "Movimentacoes"(
---   Movimentação do caixa, permite abrir diversos caixas na conta de operadores[N:Movimentação|Movimentações][G:a][L:AbrirCaixa][K:MZ\Session|MZ\Session\][H:SyncModel]
-  "ID" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,-- Código da movimentação do caixa[G:o]
-  "SessaoID" INTEGER NOT NULL,-- Sessão do dia, permite abrir vários caixas no mesmo dia com o mesmo código da sessão[N:Sessão][G:a][S:S]
-  "CaixaID" INTEGER NOT NULL,-- Caixa a qual pertence essa movimentação[N:Caixa][G:o][S]
-  "Aberta" TEXT NOT NULL CHECK("Aberta" IN('Y', 'N')) DEFAULT 'Y',-- Informa se o caixa está aberto[N:Aberta][G:a]
-  "IniciadorID" INTEGER NOT NULL,-- Funcionário que abriu o caixa[N:Funcionário inicializador][G:a][S:S]
-  "FechadorID" INTEGER DEFAULT NULL,-- Funcionário que fechou o caixa[N:Funcionário fechador][G:o][S:S]
-  "DataFechamento" DATETIME DEFAULT NULL,-- Data de fechamento do caixa[N:Data de fechamento][G:a]
-  "DataAbertura" DATETIME NOT NULL,-- Data de abertura do caixa[N:Data de abertura][G:a]
-  CONSTRAINT "FK_Movimentacoes_Sessoes_SessaoID"
-    FOREIGN KEY("SessaoID")
-    REFERENCES "Sessoes"("ID")
-    ON DELETE RESTRICT
-    ON UPDATE RESTRICT,
-  CONSTRAINT "FK_Movimentacoes_Caixas_CaixaID"
-    FOREIGN KEY("CaixaID")
-    REFERENCES "Caixas"("ID")
-    ON DELETE RESTRICT
-    ON UPDATE RESTRICT,
-  CONSTRAINT "FK_Movimentacoes_Prestadores_IniciadorID"
-    FOREIGN KEY("IniciadorID")
-    REFERENCES "Prestadores"("ID")
-    ON DELETE RESTRICT
-    ON UPDATE RESTRICT,
-  CONSTRAINT "FK_Movimentacoes_Prestadores_FechadorID"
-    FOREIGN KEY("FechadorID")
-    REFERENCES "Prestadores"("ID")
-    ON DELETE RESTRICT
-    ON UPDATE RESTRICT
-);
-CREATE INDEX "Movimentacoes.FK_Movimentacoes_Sessoes_SessaoID_idx" ON "Movimentacoes" ("SessaoID");
-CREATE INDEX "Movimentacoes.FK_Movimentacoes_Caixas_CaixaID_idx" ON "Movimentacoes" ("CaixaID");
-CREATE INDEX "Movimentacoes.FK_Movimentacoes_Prestadores_IniciadorID_idx" ON "Movimentacoes" ("IniciadorID");
-CREATE INDEX "Movimentacoes.FK_Movimentacoes_Prestadores_FechadorID_idx" ON "Movimentacoes" ("FechadorID");
 CREATE TABLE "Bancos"(
 --   Bancos disponíveis no país[N:Banco|Bancos][G:o][L:CadastroBancos][K:MZ\Wallet|MZ\Wallet\][H:SyncModel]
   "ID" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,-- Identificador do banco[G:o]
@@ -480,34 +436,6 @@ CREATE TABLE "Empresas"(
 CREATE INDEX "Empresas.FK_Sistema_Clientes_EmpresaID_idx" ON "Empresas" ("EmpresaID");
 CREATE INDEX "Empresas.FK_Sistema_Clientes_ParceiroID_idx" ON "Empresas" ("ParceiroID");
 CREATE INDEX "Empresas.FK_Sistema_Paises_PaisID_idx" ON "Empresas" ("PaisID");
-CREATE TABLE "Dispositivos"(
---   Computadores e tablets com opções de acesso[N:Dispositivo|Dispositivos][G:o][L:CadastroComputadores][K:MZ\Device|MZ\Device\][H:SyncModel]
-  "ID" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,-- Identificador do dispositivo[G:o]
-  "SetorID" INTEGER NOT NULL,-- Setor em que o dispositivo está instalado/será usado[N:Setor][G:o]
-  "CaixaID" INTEGER DEFAULT NULL,-- Finalidade do dispositivo, caixa ou terminal, o caixa é único entre os dispositivos[N:Caixa][G:o]
-  "Nome" VARCHAR(100) NOT NULL,-- Nome do computador ou tablet em rede, único entre os dispositivos[N:Nome][G:o][S]
-  "Tipo" TEXT NOT NULL CHECK("Tipo" IN('Computador', 'Tablet')) DEFAULT 'Computador',-- Tipo de dispositivo[N:Tipo][G:o][S:S]
-  "Descricao" VARCHAR(45) DEFAULT NULL,-- Descrição do dispositivo[N:Descrição][G:a]
-  "Opcoes" TEXT DEFAULT NULL,-- Opções do dispositivo, Ex.: Balança, identificador de chamadas e outros[N:Opções][G:a]
-  "Serial" VARCHAR(45) NOT NULL,-- Serial do tablet para validação, único entre os dispositivos[N:Serial][G:o]
-  "Validacao" VARCHAR(40) DEFAULT NULL,-- Validação do dispositivo[N:Validação][G:a]
-  CONSTRAINT "CaixaID_UNIQUE"
-    UNIQUE("CaixaID"),
-  CONSTRAINT "Serial_UNIQUE"
-    UNIQUE("Serial"),
-  CONSTRAINT "FK_Dispositivos_Setores_SetorID"
-    FOREIGN KEY("SetorID")
-    REFERENCES "Setores"("ID")
-    ON DELETE RESTRICT
-    ON UPDATE RESTRICT,
-  CONSTRAINT "FK_Dispositivos_Caixas_CaixaID"
-    FOREIGN KEY("CaixaID")
-    REFERENCES "Caixas"("ID")
-    ON DELETE RESTRICT
-    ON UPDATE RESTRICT
-);
-CREATE INDEX "Dispositivos.FK_Dispositivos_Setores_SetorID_idx" ON "Dispositivos" ("SetorID");
-CREATE INDEX "Dispositivos.FK_Dispositivos_Caixas_CaixaID_idx" ON "Dispositivos" ("CaixaID");
 CREATE TABLE "Fornecedores"(
 --   Fornecedores de produtos[N:Fornecedor|Fornecedores][G:o][L:CadastroFornecedores][K:MZ\Stock|MZ\Stock\][H:SyncModel]
   "ID" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,-- Identificador do fornecedor[G:o]
@@ -630,17 +558,17 @@ CREATE TABLE "Produtos"(
   "Descricao" VARCHAR(75) NOT NULL,-- Descrição do produto, Ex.: Refri. Coca Cola 2L.[N:Descrição][G:a][S]
   "Abreviacao" VARCHAR(100) DEFAULT NULL,-- Nome abreviado do produto, Ex.: Cebola, Tomate, Queijo[N:Abreviação][G:a]
   "Detalhes" VARCHAR(255) DEFAULT NULL,-- Informa detalhes do produto, Ex: Com Cebola, Pimenta, Orégano[N:Detalhes][G:o]
-  "QuantidadeLimite" DOUBLE NOT NULL,-- Informa a quantidade limite para que o sistema avise que o produto já está acabando[N:Quantidade limite][G:a]
-  "QuantidadeMaxima" DOUBLE NOT NULL DEFAULT 0,-- Informa a quantidade máxima do produto no estoque, não proibe, apenas avisa[N:Quantidade máxima][G:a]
-  "Conteudo" DOUBLE NOT NULL DEFAULT 1,-- Informa o conteúdo do produto, Ex.: 2000 para 2L de conteúdo, 200 para 200g de peso ou 1 para 1 unidade[N:Conteúdo][G:o]
-  "PrecoVenda" DECIMAL NOT NULL,-- Preço de venda ou preço de venda base para pacotes[N:Preço de venda][G:o]
+  "QuantidadeLimite" DOUBLE NOT NULL,-- Informa a quantidade limite para que o sistema avise que o produto já está acabando[N:Quantidade limite][G:a][F:0]
+  "QuantidadeMaxima" DOUBLE NOT NULL DEFAULT 0,-- Informa a quantidade máxima do produto no estoque, não proibe, apenas avisa[N:Quantidade máxima][G:a][F:0]
+  "Conteudo" DOUBLE NOT NULL DEFAULT 1,-- Informa o conteúdo do produto, Ex.: 2000 para 2L de conteúdo, 200 para 200g de peso ou 1 para 1 unidade[N:Conteúdo][G:o][F:1]
+  "PrecoVenda" DECIMAL NOT NULL,-- Preço de venda ou preço de venda base para pacotes[N:Preço de venda][G:o][F:0]
   "CustoProducao" DECIMAL DEFAULT NULL,-- Informa qual o valor para o custo de produção do produto, utilizado quando não há formação de composição do produto[N:Custo de produção][G:o]
   "Tipo" TEXT NOT NULL CHECK("Tipo" IN('Produto', 'Composicao', 'Pacote')) DEFAULT 'Produto',-- Informa qual é o tipo de produto. Produto: Produto normal que possui estoque, Composição: Produto que não possui estoque diretamente, pois é composto de outros produtos ou composições, Pacote: Permite a composição no momento da venda, não possui estoque diretamente[N:Tipo][G:o][E:Produto|Composição|Pacote]
   "CobrarServico" TEXT NOT NULL CHECK("CobrarServico" IN('Y', 'N')) DEFAULT 'Y',-- Informa se deve ser cobrado a taxa de serviço dos garçons sobre este produto[N:Cobrança de serviço][G:a]
   "Divisivel" TEXT NOT NULL CHECK("Divisivel" IN('Y', 'N')) DEFAULT 'N',-- Informa se o produto pode ser vendido fracionado[N:Divisível][G:o]
   "Pesavel" TEXT NOT NULL CHECK("Pesavel" IN('Y', 'N')) DEFAULT 'N',-- Informa se o peso do produto deve ser obtido de uma balança, obrigatoriamente o produto deve ser divisível[N:Pesável][G:o]
   "Perecivel" TEXT NOT NULL CHECK("Perecivel" IN('Y', 'N')) DEFAULT 'N',-- Informa se o produto vence em pouco tempo[N:Perecível][G:o]
-  "TempoPreparo" INTEGER NOT NULL DEFAULT 0,-- Tempo de preparo em minutos para preparar uma composição, 0 para não informado[N:Tempo de preparo][G:o]
+  "TempoPreparo" INTEGER NOT NULL DEFAULT 0,-- Tempo de preparo em minutos para preparar uma composição, 0 para não informado[N:Tempo de preparo][G:o][F:0]
   "Visivel" TEXT NOT NULL CHECK("Visivel" IN('Y', 'N')) DEFAULT 'Y',-- Informa se o produto estará disponível para venda[N:Visível][G:o]
   "Interno" TEXT NOT NULL CHECK("Interno" IN('Y', 'N')) DEFAULT 'N',-- Informa se o produto é de uso interno e não está disponível para venda[N:Interno][G:o]
   "Avaliacao" DOUBLE DEFAULT NULL,-- Média das avaliações do último período[G:a][N:Avaliação]
@@ -717,36 +645,6 @@ CREATE TABLE "Telefones"(
 );
 CREATE INDEX "Telefones.FK_Telefones_Clientes_ClienteID_idx" ON "Telefones" ("ClienteID");
 CREATE INDEX "Telefones.IDX_Numero" ON "Telefones" ("Numero");
-CREATE TABLE "Impressoras"(
---   Impressora para impressão de serviços e contas[N:Impressora|Impressoras][G:a][L:CadastroImpressoras][K:MZ\Device|MZ\Device\][H:SyncModel]
-  "ID" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,-- Identificador da impressora[G:o]
-  "SetorID" INTEGER NOT NULL,-- Setor de impressão[N:Setor de impressão][G:o]
-  "DispositivoID" INTEGER DEFAULT NULL,-- Dispositivo que contém a impressora[N:Dispositivo][G:o]
-  "Nome" VARCHAR(100) NOT NULL,-- Nome da impressora instalada no windows[N:Nome][G:o]
-  "Driver" VARCHAR(45) DEFAULT NULL,-- Informa qual conjunto de comandos deve ser utilizado[N:Driver][G:o]
-  "Descricao" VARCHAR(45) NOT NULL DEFAULT '',-- Descrição da impressora[N:Descrição][G:a][S]
-  "Modo" TEXT NOT NULL CHECK("Modo" IN('Terminal', 'Caixa', 'Servico', 'Estoque')) DEFAULT 'Terminal',-- Modo de impressão[N:Modo][G:o][E:Terminal|Caixa|Serviço|Estoque]
-  "Opcoes" INTEGER NOT NULL DEFAULT 1,-- Opções da impressora, Ex.: Cortar papel, Acionar gaveta e outros[N:Opções][G:a]
-  "Colunas" INTEGER NOT NULL DEFAULT 48,-- Quantidade de colunas do cupom[N:Quantidade de colunas][G:a]
-  "Avanco" INTEGER NOT NULL DEFAULT 6,-- Quantidade de linhas para avanço do papel[N:Avanço de papel][G:o]
-  "Comandos" TEXT DEFAULT NULL,-- Comandos para impressão, quando o driver é customizado[N:Comandos][G:o]
-  CONSTRAINT "UK_Impresoras_Setor_Dispositivo_Modo"
-    UNIQUE("SetorID","DispositivoID","Modo"),
-  CONSTRAINT "UK_Impressoras_Dispositivo_Descricao"
-    UNIQUE("DispositivoID","Descricao"),
-  CONSTRAINT "FK_Impressoras_Dispositivos_DispositivoID"
-    FOREIGN KEY("DispositivoID")
-    REFERENCES "Dispositivos"("ID")
-    ON DELETE RESTRICT
-    ON UPDATE RESTRICT,
-  CONSTRAINT "FK_Impressoras_Setores_SetorID"
-    FOREIGN KEY("SetorID")
-    REFERENCES "Setores"("ID")
-    ON DELETE RESTRICT
-    ON UPDATE RESTRICT
-);
-CREATE INDEX "Impressoras.FK_Impressoras_Dispositivos_DispositivoID_idx" ON "Impressoras" ("DispositivoID");
-CREATE INDEX "Impressoras.FK_Impressoras_Setores_SetorID_idx" ON "Impressoras" ("SetorID");
 CREATE TABLE "Cheques"(
 --   Folha de cheque lançado como pagamento[N:Cheque|Cheques][G:o][L:Pagamento][K:MZ\Payment|MZ\Payment\][H:SyncModel]
   "ID" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,-- Identificador da folha de cheque[G:o]
@@ -754,14 +652,9 @@ CREATE TABLE "Cheques"(
   "BancoID" INTEGER NOT NULL,-- Banco do cheque[N:Banco][G:o][S]
   "Agencia" VARCHAR(45) NOT NULL,-- Número da agência[N:Agência][G:a]
   "Conta" VARCHAR(45) NOT NULL,-- Número da conta do banco descrito no cheque[N:Conta][G:a]
-  "Compensacao" VARCHAR(10) NOT NULL,-- Número de compensação do cheque[N:Compensação][G:a]
   "Numero" VARCHAR(20) NOT NULL,-- Número da folha do cheque[N:Número][G:o][S]
   "Valor" DECIMAL NOT NULL,-- Valor na folha do cheque[N:Valor][G:o]
   "Vencimento" DATETIME NOT NULL,-- Data de vencimento do cheque[N:Vencimento][G:o]
-  "C1" INTEGER NOT NULL,-- C1 do cheque[N:C1][G:o]
-  "C2" INTEGER NOT NULL,-- C2 do cheque[N:C2][G:o]
-  "C3" INTEGER NOT NULL,-- C3 do cheque[N:C3][G:o]
-  "Serie" VARCHAR(10) DEFAULT NULL,-- Número de série do cheque[N:Série][G:a]
   "Cancelado" TEXT NOT NULL CHECK("Cancelado" IN('Y', 'N')) DEFAULT 'N',-- Informa se o cheque e todas as suas folhas estão cancelados[N:Cancelado][G:o]
   "Recolhido" TEXT NOT NULL CHECK("Recolhido" IN('Y', 'N')) DEFAULT 'N',-- Informa se o cheque foi recolhido no banco[N:Recolhido][G:o]
   "Recolhimento" DATETIME DEFAULT NULL,-- Data de recolhimento do cheque[N:Data de recolhimento][G:a]
@@ -858,12 +751,11 @@ CREATE TABLE "Carteiras"(
   "ID" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,-- Código local da carteira[G:o]
   "Tipo" TEXT NOT NULL CHECK("Tipo" IN('Bancaria', 'Financeira', 'Credito', 'Local')),-- Tipo de carteira, 'Bancaria' para conta bancária, 'Financeira' para carteira financeira da empresa ou de sites de pagamentos, 'Credito' para cartão de crédito e 'Local' para caixas e cofres locais[N:Tipo][G:o][S:S][E:Bancária|Financeira|Crédito|Local]
   "CarteiraID" INTEGER DEFAULT NULL,-- Informa a carteira superior, exemplo: Banco e cartões como subcarteira[G:a][N:Carteira superior]
-  "CaixaID" INTEGER DEFAULT NULL,-- Informa se esta carteira é um caixa da empresa de tipo local
   "BancoID" INTEGER DEFAULT NULL,-- Código local do banco quando a carteira for bancária[N:Banco][G:o][S:S]
   "Descricao" VARCHAR(100) NOT NULL,-- Descrição da carteira, nome dado a carteira cadastrada[N:Descrição][G:a][S]
   "Conta" VARCHAR(100) DEFAULT NULL,-- Número da conta bancária ou usuário da conta de acesso da carteira[N:Conta][G:a]
   "Agencia" VARCHAR(200) DEFAULT NULL,-- Número da agência da conta bancária ou site da carteira financeira[N:Agência][G:a]
-  "Transacao" DECIMAL NOT NULL DEFAULT 0,-- Valor cobrado pela operadora de pagamento para cada transação[N:Transação][G:a]
+  "Transacao" DECIMAL NOT NULL DEFAULT 0,-- Valor cobrado pela operadora de pagamento para cada transação[N:Transação][G:a][F:0]
   "Limite" DECIMAL DEFAULT NULL,-- Limite de crédito[G:o][N:Limite de crédito]
   "Token" VARCHAR(250) DEFAULT NULL,-- Token para integração de pagamentos[G:o][N:Token]
   "Ambiente" TEXT CHECK("Ambiente" IN('Teste', 'Producao')) DEFAULT NULL,-- Ambiente de execução da API usando o token[G:o][N:Ambiente]
@@ -879,16 +771,10 @@ CREATE TABLE "Carteiras"(
     FOREIGN KEY("CarteiraID")
     REFERENCES "Carteiras"("ID")
     ON DELETE RESTRICT
-    ON UPDATE RESTRICT,
-  CONSTRAINT "FK_Carteiras_Caixas_CaixaID"
-    FOREIGN KEY("CaixaID")
-    REFERENCES "Caixas"("ID")
-    ON DELETE RESTRICT
     ON UPDATE RESTRICT
 );
 CREATE INDEX "Carteiras.FK_Carteiras_Bancos_BancoID_idx" ON "Carteiras" ("BancoID");
 CREATE INDEX "Carteiras.FK_Carteiras_Carteiras_CarteiraID_idx" ON "Carteiras" ("CarteiraID");
-CREATE INDEX "Carteiras.FK_Carteiras_Caixas_CaixaID_idx" ON "Carteiras" ("CaixaID");
 CREATE TABLE "Listas"(
 --   Lista de compras de produtos[N:Lista de compra|Listas de compras][G:a][L:ListaCompras][K:MZ\Stock|MZ\Stock\][H:SyncModel]
   "ID" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,-- Identificador da lista de compras[G:o]
@@ -1408,8 +1294,8 @@ CREATE INDEX "Pagamentos.FK_Pagamentos_Cheques_ChequeID_idx" ON "Pagamentos" ("C
 CREATE INDEX "Pagamentos.FK_Pagamentos_Pagamentos_PagamentoID_idx" ON "Pagamentos" ("PagamentoID");
 CREATE INDEX "Pagamentos.FK_Pagamentos_Moedas_MoedaID_idx" ON "Pagamentos" ("MoedaID");
 CREATE INDEX "Pagamentos.FK_Pagamentos_Pagamentos_AgrupamentoID_idx" ON "Pagamentos" ("AgrupamentoID");
-CREATE INDEX "Pagamentos.IDX_DataCompensacao" ON "Pagamentos" ("DataCompensacao");
-CREATE INDEX "Pagamentos.IDX_DataLancamento" ON "Pagamentos" ("DataLancamento");
+CREATE INDEX "Pagamentos.IDX_DataCompensacao" ON "Pagamentos" ("DataCompensacao" DESC);
+CREATE INDEX "Pagamentos.IDX_DataLancamento" ON "Pagamentos" ("DataLancamento" DESC);
 CREATE TABLE "Estoque"(
 --   Estoque de produtos por setor[N:Estoque|Estoques][G:o][L:Estoque][K:MZ\Stock|MZ\Stock\][H:SyncModel]
   "ID" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,-- Identificador da entrada no estoque[G:o]
@@ -1473,6 +1359,53 @@ CREATE INDEX "Estoque.FK_Estoque_Setores_SetorID_idx" ON "Estoque" ("SetorID");
 CREATE INDEX "Estoque.FK_Estoque_Estoque_EntradaID_idx" ON "Estoque" ("EntradaID");
 CREATE INDEX "Estoque.FK_Estoque_Requisitos_RequisitoID_idx" ON "Estoque" ("RequisitoID");
 CREATE INDEX "Estoque.IDX_DataMovimento" ON "Estoque" ("DataMovimento");
+CREATE TABLE "Impressoras"(
+--   Impressora para impressão de serviços e contas[N:Impressora|Impressoras][G:a][L:CadastroImpressoras][K:MZ\Device|MZ\Device\][H:SyncModel]
+  "ID" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,-- Identificador da impressora[G:o]
+  "SetorID" INTEGER NOT NULL,-- Setor de impressão[N:Setor de impressão][G:o]
+  "DispositivoID" INTEGER DEFAULT NULL,-- Dispositivo que contém a impressora[N:Dispositivo][G:o]
+  "Nome" VARCHAR(100) NOT NULL,-- Nome da impressora instalada no windows[N:Nome][G:o]
+  "Driver" VARCHAR(45) DEFAULT NULL,-- Informa qual conjunto de comandos deve ser utilizado[N:Driver][G:o]
+  "Descricao" VARCHAR(45) NOT NULL DEFAULT '',-- Descrição da impressora[N:Descrição][G:a][S]
+  "Modo" TEXT NOT NULL CHECK("Modo" IN('Terminal', 'Caixa', 'Servico', 'Estoque')) DEFAULT 'Terminal',-- Modo de impressão[N:Modo][G:o][E:Terminal|Caixa|Serviço|Estoque]
+  "Opcoes" INTEGER NOT NULL DEFAULT 1,-- Opções da impressora, Ex.: Cortar papel, Acionar gaveta e outros[N:Opções][G:a]
+  "Colunas" INTEGER NOT NULL DEFAULT 48,-- Quantidade de colunas do cupom[N:Quantidade de colunas][G:a]
+  "Avanco" INTEGER NOT NULL DEFAULT 6,-- Quantidade de linhas para avanço do papel[N:Avanço de papel][G:o]
+  "Comandos" TEXT DEFAULT NULL,-- Comandos para impressão, quando o driver é customizado[N:Comandos][G:o]
+  CONSTRAINT "UK_Impresoras_Setor_Dispositivo_Modo"
+    UNIQUE("SetorID","DispositivoID","Modo"),
+  CONSTRAINT "UK_Impressoras_Dispositivo_Descricao"
+    UNIQUE("DispositivoID","Descricao"),
+  CONSTRAINT "FK_Impressoras_Dispositivos_DispositivoID"
+    FOREIGN KEY("DispositivoID")
+    REFERENCES "Dispositivos"("ID")
+    ON DELETE RESTRICT
+    ON UPDATE RESTRICT,
+  CONSTRAINT "FK_Impressoras_Setores_SetorID"
+    FOREIGN KEY("SetorID")
+    REFERENCES "Setores"("ID")
+    ON DELETE RESTRICT
+    ON UPDATE RESTRICT
+);
+CREATE INDEX "Impressoras.FK_Impressoras_Dispositivos_DispositivoID_idx" ON "Impressoras" ("DispositivoID");
+CREATE INDEX "Impressoras.FK_Impressoras_Setores_SetorID_idx" ON "Impressoras" ("SetorID");
+CREATE TABLE "Caixas"(
+--   Caixas de movimentação financeira[N:Caixa|Caixas][G:o][L:CadastroCaixas][K:MZ\Session|MZ\Session\][H:SyncModel]
+  "ID" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,-- Identificador do caixa[G:o]
+  "CarteiraID" INTEGER NOT NULL,-- Informa a carteira que representa esse caixa[G:a][N:Carteira]
+  "Descricao" VARCHAR(50) NOT NULL,-- Descrição do caixa[N:Descrição][G:a][S]
+  "Serie" INTEGER NOT NULL DEFAULT 1,-- Série do caixa[N:Série][G:a]
+  "NumeroInicial" INTEGER NOT NULL DEFAULT 1,-- Número inicial na geração da nota, será usado quando maior que o último número utilizado[N:Número inicial][G:o]
+  "Ativo" TEXT NOT NULL CHECK("Ativo" IN('Y', 'N')) DEFAULT 'Y',-- Informa se o caixa está ativo[N:Ativo][G:o]
+  CONSTRAINT "Descricao_UNIQUE"
+    UNIQUE("Descricao"),
+  CONSTRAINT "FK_Caixas_Carteiras_CarteiraID"
+    FOREIGN KEY("CarteiraID")
+    REFERENCES "Carteiras"("ID")
+    ON DELETE RESTRICT
+    ON UPDATE RESTRICT
+);
+CREATE INDEX "Caixas.FK_Caixas_Carteiras_CarteiraID_idx" ON "Caixas" ("CarteiraID");
 CREATE TABLE "Cartoes"(
 --   Cartões utilizados na forma de pagamento em cartão[N:Cartão|Cartões][G:o][L:CadastroCartoes][K:MZ\Payment|MZ\Payment\][H:SyncModel]
   "ID" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,-- Identificador do cartão[G:o]
@@ -1721,6 +1654,42 @@ CREATE INDEX "Pedidos.FK_Pedidos_Localizacoes_LocalizacaoID_idx" ON "Pedidos" ("
 CREATE INDEX "Pedidos.FK_Pedidos_Comandas_ComandaID_idx" ON "Pedidos" ("ComandaID");
 CREATE INDEX "Pedidos.FK_Pedidos_Prestadores_FechadorID_idx" ON "Pedidos" ("FechadorID");
 CREATE INDEX "Pedidos.FK_Pedidos_Viagens_EntregaID_idx" ON "Pedidos" ("EntregaID");
+CREATE INDEX "Pedidos.IDX_DataCriacao" ON "Pedidos" ("DataCriacao" DESC);
+CREATE TABLE "Movimentacoes"(
+--   Movimentação do caixa, permite abrir diversos caixas na conta de operadores[N:Movimentação|Movimentações][G:a][L:AbrirCaixa][K:MZ\Session|MZ\Session\][H:SyncModel]
+  "ID" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,-- Código da movimentação do caixa[G:o]
+  "SessaoID" INTEGER NOT NULL,-- Sessão do dia, permite abrir vários caixas no mesmo dia com o mesmo código da sessão[N:Sessão][G:a][S:S]
+  "CaixaID" INTEGER NOT NULL,-- Caixa a qual pertence essa movimentação[N:Caixa][G:o][S]
+  "Aberta" TEXT NOT NULL CHECK("Aberta" IN('Y', 'N')) DEFAULT 'Y',-- Informa se o caixa está aberto[N:Aberta][G:a]
+  "IniciadorID" INTEGER NOT NULL,-- Funcionário que abriu o caixa[N:Funcionário inicializador][G:a][S:S]
+  "FechadorID" INTEGER DEFAULT NULL,-- Funcionário que fechou o caixa[N:Funcionário fechador][G:o][S:S]
+  "DataFechamento" DATETIME DEFAULT NULL,-- Data de fechamento do caixa[N:Data de fechamento][G:a]
+  "DataAbertura" DATETIME NOT NULL,-- Data de abertura do caixa[N:Data de abertura][G:a]
+  CONSTRAINT "FK_Movimentacoes_Sessoes_SessaoID"
+    FOREIGN KEY("SessaoID")
+    REFERENCES "Sessoes"("ID")
+    ON DELETE RESTRICT
+    ON UPDATE RESTRICT,
+  CONSTRAINT "FK_Movimentacoes_Caixas_CaixaID"
+    FOREIGN KEY("CaixaID")
+    REFERENCES "Caixas"("ID")
+    ON DELETE RESTRICT
+    ON UPDATE RESTRICT,
+  CONSTRAINT "FK_Movimentacoes_Prestadores_IniciadorID"
+    FOREIGN KEY("IniciadorID")
+    REFERENCES "Prestadores"("ID")
+    ON DELETE RESTRICT
+    ON UPDATE RESTRICT,
+  CONSTRAINT "FK_Movimentacoes_Prestadores_FechadorID"
+    FOREIGN KEY("FechadorID")
+    REFERENCES "Prestadores"("ID")
+    ON DELETE RESTRICT
+    ON UPDATE RESTRICT
+);
+CREATE INDEX "Movimentacoes.FK_Movimentacoes_Sessoes_SessaoID_idx" ON "Movimentacoes" ("SessaoID");
+CREATE INDEX "Movimentacoes.FK_Movimentacoes_Caixas_CaixaID_idx" ON "Movimentacoes" ("CaixaID");
+CREATE INDEX "Movimentacoes.FK_Movimentacoes_Prestadores_IniciadorID_idx" ON "Movimentacoes" ("IniciadorID");
+CREATE INDEX "Movimentacoes.FK_Movimentacoes_Prestadores_FechadorID_idx" ON "Movimentacoes" ("FechadorID");
 CREATE TABLE "Eventos"(
 --   Eventos de envio das notas[N:Evento|Eventos][G:o][L:RelatorioAuditoria][K:MZ\Invoice|MZ\Invoice\][H:SyncModel]
   "ID" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,-- Identificador do evento[G:o]
@@ -1922,7 +1891,7 @@ CREATE TABLE "Itens"(
 CREATE INDEX "Itens.FK_Itens_Pedidos_PedidoID_idx" ON "Itens" ("PedidoID");
 CREATE INDEX "Itens.FK_Itens_Produtos_ProdutoID_idx" ON "Itens" ("ProdutoID");
 CREATE INDEX "Itens.FK_Itens_Prestadores_PrestadorID_idx" ON "Itens" ("PrestadorID");
-CREATE INDEX "Itens.IDX_Itens_DataHora" ON "Itens" ("DataHora");
+CREATE INDEX "Itens.IDX_DataHora" ON "Itens" ("DataHora" DESC);
 CREATE INDEX "Itens.FK_Itens_Itens_ItemID_idx" ON "Itens" ("ItemID");
 CREATE INDEX "Itens.FK_Itens_Servicos_ServicoID_idx" ON "Itens" ("ServicoID");
 CREATE INDEX "Itens.FK_Itens_Pagamentos_PagamentoID_idx" ON "Itens" ("PagamentoID");
@@ -1998,8 +1967,36 @@ CREATE INDEX "Contas.FK_Contas_Classificacoes_ClassificacaoID_idx" ON "Contas" (
 CREATE INDEX "Contas.FK_Contas_Contas_ContaID_idx" ON "Contas" ("ContaID");
 CREATE INDEX "Contas.FK_Contas_Carteiras_CarteiraID_idx" ON "Contas" ("CarteiraID");
 CREATE INDEX "Contas.FK_Contas_Contas_AgrupamentoID_idx" ON "Contas" ("AgrupamentoID");
-CREATE INDEX "Contas.IDX_Vencimento" ON "Contas" ("Vencimento");
-CREATE INDEX "Contas.IDX_DataEmissao" ON "Contas" ("DataEmissao");
+CREATE INDEX "Contas.IDX_Vencimento" ON "Contas" ("Vencimento" DESC);
+CREATE INDEX "Contas.IDX_DataEmissao" ON "Contas" ("DataEmissao" DESC);
+CREATE TABLE "Dispositivos"(
+--   Computadores e tablets com opções de acesso[N:Dispositivo|Dispositivos][G:o][L:CadastroComputadores][K:MZ\Device|MZ\Device\][H:SyncModel]
+  "ID" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,-- Identificador do dispositivo[G:o]
+  "SetorID" INTEGER NOT NULL,-- Setor em que o dispositivo está instalado/será usado[N:Setor][G:o]
+  "CaixaID" INTEGER DEFAULT NULL,-- Finalidade do dispositivo, caixa ou terminal, o caixa é único entre os dispositivos[N:Caixa][G:o]
+  "Nome" VARCHAR(100) NOT NULL,-- Nome do computador ou tablet em rede, único entre os dispositivos[N:Nome][G:o][S]
+  "Tipo" TEXT NOT NULL CHECK("Tipo" IN('Computador', 'Tablet')) DEFAULT 'Computador',-- Tipo de dispositivo[N:Tipo][G:o][S:S]
+  "Descricao" VARCHAR(45) DEFAULT NULL,-- Descrição do dispositivo[N:Descrição][G:a]
+  "Opcoes" TEXT DEFAULT NULL,-- Opções do dispositivo, Ex.: Balança, identificador de chamadas e outros[N:Opções][G:a]
+  "Serial" VARCHAR(45) NOT NULL,-- Serial do tablet para validação, único entre os dispositivos[N:Serial][G:o]
+  "Validacao" VARCHAR(40) DEFAULT NULL,-- Validação do dispositivo[N:Validação][G:a]
+  CONSTRAINT "CaixaID_UNIQUE"
+    UNIQUE("CaixaID"),
+  CONSTRAINT "Serial_UNIQUE"
+    UNIQUE("Serial"),
+  CONSTRAINT "FK_Dispositivos_Setores_SetorID"
+    FOREIGN KEY("SetorID")
+    REFERENCES "Setores"("ID")
+    ON DELETE RESTRICT
+    ON UPDATE RESTRICT,
+  CONSTRAINT "FK_Dispositivos_Caixas_CaixaID"
+    FOREIGN KEY("CaixaID")
+    REFERENCES "Caixas"("ID")
+    ON DELETE RESTRICT
+    ON UPDATE RESTRICT
+);
+CREATE INDEX "Dispositivos.FK_Dispositivos_Setores_SetorID_idx" ON "Dispositivos" ("SetorID");
+CREATE INDEX "Dispositivos.FK_Dispositivos_Caixas_CaixaID_idx" ON "Dispositivos" ("CaixaID");
 CREATE TABLE "Avaliacoes"(
 --   Avaliação de atendimento e outros serviços do estabelecimento[N:Avaliação|Avaliações][G:a][L:Pagamento][K:MZ\Rating|MZ\Rating\][H:SyncModel]
   "ID" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,-- Identificador da avaliação[G:o]

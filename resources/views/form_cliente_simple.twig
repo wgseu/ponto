@@ -21,7 +21,7 @@
 </div>
 <div class="form-group col-md-3 col-sm-6 col-xs-6">
   <label>Telefone:</label>
-  <input type="text" value="{{ \MZ\Util\Mask::phone($cliente->getFone(1)) }}" id="fone1" name="fone1" class="form-control" mask="{{ _p('Mascara', 'Telefone') }}" placeholder="Telefone ou celular">
+  <input type="text" value="{{ \MZ\Util\Mask::phone($cliente->getTelefone()->getNumero()) }}" id="fone1" name="fone1" class="form-control" mask="{{ _p('Mascara', 'Telefone') }}" placeholder="Telefone ou celular">
 </div>
 <div class="form-group col-md-6 col-sm-6 col-xs-12">
   <label>E-mail:</label>

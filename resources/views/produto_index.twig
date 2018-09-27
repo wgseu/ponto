@@ -42,7 +42,7 @@
         <div class="col-md-3 col-sm-4 col-xs-6 ofertas">
           <div class="item" data-produto="{{ $produto->getID() }}" data-detalhes="{{ $produto->getDetalhes() }}">
             <div class="imagem border-color">
-              <img src="{{ get_image_url($produto->getImagem(), 'produto', 'produto.png') }}" title="{{ $produto->getDescricao() }}" height="128">
+              <img src="{{ $produto->makeImagemURL() }}" title="{{ $produto->getDescricao() }}" height="128">
             </div>
             <div class="anuncio">
               <div class="limite">

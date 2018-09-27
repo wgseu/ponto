@@ -361,16 +361,6 @@ class Telefone extends SyncModel
     }
 
     /**
-     * Translate SQL exception into application exception
-     * @param  \Exception $e exception to translate into a readable error
-     * @return \MZ\Exception\ValidationException new exception translated
-     */
-    protected function translate($e)
-    {
-        return parent::translate($e);
-    }
-
-    /**
      * Insert a new Telefone into the database and fill instance from database
      * @return self Self instance
      */

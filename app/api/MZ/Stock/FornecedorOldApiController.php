@@ -51,7 +51,7 @@ class FornecedorOldApiController extends \MZ\Core\ApiController
             $cliente_item = $cliente->publish();
             $item = $fornecedor->publish();
             $item['nome'] = $cliente->getNome();
-            $item['fone1'] = $cliente->getFone(1);
+            $item['fone1'] = $cliente->getTelefone()->getNumero();
             $item['cnpj'] = $cliente->getCPF();
             if ($domask) {
                 $item['fone1'] = $cliente_item['fone1'];

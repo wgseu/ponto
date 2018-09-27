@@ -68,13 +68,12 @@
               {% for $cliente in $clientes %}
                 <tr>
                   <td>
-                    <a href="/gerenciar/cliente/editar?id={{ $cliente->getID() }}" title="Editar cliente '{{ $cliente->getNomeCompleto() }}'"><img src="{{ get_image_url($cliente->getImagem(), 'cliente', $cliente->getTipo() == \MZ\Account\Cliente::TIPO_JURIDICA?'empresa.png':'cliente.png') }}" class="{{ $cliente->getTipo() == \MZ\Account\Cliente::TIPO_FISICA?'rounded':'' }}" height="48" alt="Foto" title="Foto"/>
+                    <a href="/gerenciar/cliente/editar?id={{ $cliente->getID() }}" title="Editar cliente '{{ $cliente->getNomeCompleto() }}'"><img src="{{ $cliente->makeImagemURL(false, $cliente->getTipo() == \MZ\Account\Cliente::TIPO_JURIDICA?'empresa.png':'cliente.png') }}" class="{{ $cliente->getTipo() == \MZ\Account\Cliente::TIPO_FISICA?'rounded':'' }}" height="48" alt="Foto" title="Foto"/>
                       <strong>{{ $cliente->getNomeCompleto() }}</strong>
                     </a>
                   </td>
                   <td class="text-center">
-                    <strong>{{ \MZ\Util\Mask::phone($cliente->getFone(1)) }}</strong>
-                    <small title="Celular">{{ \MZ\Util\Mask::phone($cliente->getFone(2)) }}</small>
+                    <strong>{{ \MZ\Util\Mask::phone($cliente->getTelefone()->getNumero()) }}</strong>
                   </td>
                   <td class="text-center">
                     <strong>{{ $cliente->getLogin() }}</strong>

@@ -46,7 +46,7 @@
             <div class="col-md-6 col-sm-6 col-xs-12 top-row">
               <div class="assoc-item {{ $produto['status'] }}">
                 <div class="assoc-img">
-                  <img src="{{ get_image_url($associado->getImagem(), 'produto', 'produto.png') }}" height="48" alt="Imagem"/>
+                  <img src="{{ $associado->makeImagemURL() }}" height="48" alt="Imagem"/>
                 </div>
                 <div class="assoc-info">
                   <input type="hidden" id="produto_{{ $produto['codigo'] }}_ref" name="produto[{{ $produto['codigo'] }}]" data-descricao="{{ $associado->getDescricao() }}" data-codigo="{{ $produto['codigo'] }}" data-id="{{ $associado->getID() }}" data-item-count="{{ count($produto['itens']) }}" value="{{ $associado->getID() }}">

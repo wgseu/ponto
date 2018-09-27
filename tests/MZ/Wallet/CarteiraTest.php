@@ -26,6 +26,35 @@ namespace MZ\Wallet;
 
 class CarteiraTest extends \MZ\Framework\TestCase
 {
+    /**
+     * Build a valid carteira
+     * @param string $descricao Carteira descrição
+     * @return Carteira
+     */
+    public static function build($descricao = null)
+    {
+        $last = Carteira::find([], ['id' => -1]);
+        $id = $last->getID() + 1;
+        $carteira = new Carteira();
+        $carteira->setTipo(Carteira::TIPO_LOCAL);
+        $carteira->setDescricao($descricao ?: "Carteira {$id}");
+        $carteira->setTransacao(10);
+        $carteira->setAtiva('Y');
+        return $carteira;
+    }
+
+    /**
+     * Create a carteira on database
+     * @param string $descricao Carteira descrição
+     * @return Carteira
+     */
+    public static function create($descricao = null)
+    {
+        $carteira = self::build($descricao);
+        $carteira->insert();
+        return $carteira;
+    }
+
     public function testPublish()
     {
         $carteira = new Carteira();
@@ -33,10 +62,17 @@ class CarteiraTest extends \MZ\Framework\TestCase
         $allowed = [
             'id',
             'tipo',
+            'carteiraid',
             'bancoid',
             'descricao',
             'conta',
             'agencia',
+            'transacao',
+            'limite',
+            'token',
+            'ambiente',
+            'logourl',
+            'cor',
             'ativa',
         ];
         $this->assertEquals($allowed, array_keys($values));

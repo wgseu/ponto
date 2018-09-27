@@ -82,7 +82,7 @@
                 <tr class="{{ !$prestador->isAtivo() ? 'active': '' }}">
                   {% $_cliente = $prestador->findClienteID() %}
                   <td>
-                    <a href="/gerenciar/cliente/editar?id={{ $_cliente->getID() }}" title="Editar cliente '{{ $_cliente->getNomeCompleto() }}'"><img src="{{ get_image_url($_cliente->getImagem(), 'cliente', 'cliente.png') }}" class="{{ $_cliente->getTipo() == \MZ\Account\Cliente::TIPO_FISICA?'rounded':'' }}" height="48" alt="Foto" title="Foto"/>
+                    <a href="/gerenciar/cliente/editar?id={{ $_cliente->getID() }}" title="Editar cliente '{{ $_cliente->getNomeCompleto() }}'"><img src="{{ $_cliente->makeImagem() }}" class="{{ $_cliente->getTipo() == \MZ\Account\Cliente::TIPO_FISICA?'rounded':'' }}" height="48" alt="Foto" title="Foto"/>
                       <strong>{{ $_cliente->getNomeCompleto() }}</strong>
                     </a>
                   </td>

@@ -63,7 +63,7 @@ class ClienteTest extends \MZ\Framework\TestCase
             'im' => '123654',
             'email' => 'cliente@email.com',
             'dataaniversario' => '2010-12-05',
-            'telefone' => '4499885544',
+            'fone1' => '4499885544',
             'slogan' => 'O Cliente',
             'secreto' => 'ABC8987EFA',
             'limitecompra' => 12.5,
@@ -484,7 +484,7 @@ class ClienteTest extends \MZ\Framework\TestCase
             'cpf' => '331.196.564-70',
             'email' => 'cliente@email.com',
             'dataaniversario' => '05/12/2010',
-            'telefone' => '(44) 9988-5544',
+            'fone1' => '(44) 9988-5544',
         ]);
         $filter_cliente = new Cliente([
             'id' => null,
@@ -492,7 +492,7 @@ class ClienteTest extends \MZ\Framework\TestCase
             'cpf' => '33119656470',
             'email' => 'cliente@email.com',
             'dataaniversario' => '2010-12-05',
-            'telefone' => '4499885544',
+            'fone1' => '4499885544',
             'limitecompra' => '1.012,5'
         ]);
         $cliente = new Cliente($cliente_obj);

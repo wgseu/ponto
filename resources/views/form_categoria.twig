@@ -2,10 +2,10 @@
   <label for="set_imagem">Imagem:</label>
   <div id="imagem_container" class="image-view third-effect" style="height: 256px;">
     <label for="image_header" class="lbltitle">
-      <img src="{{ get_image_url($categoria->getImagem(), 'categoria', 'categoria.png') }}" no-picture="{{ get_image_url(null, 'categoria', 'categoria.png') }}" height="256" alt="Imagem" title="Imagem"/>
+      <img src="{{ $categoria->makeImagemURL() }}" no-picture="{{ $categoria->makeImagemURL(true) }}" height="256" alt="Imagem" title="Imagem"/>
     </label>
     <input class="upload" type="file" id="raw_imagem" name="raw_imagem" accept="image/x-png, image/jpeg"/>
-    <input type="hidden" name="imagem" value="{{ $categoria->getImagem() }}"/>
+    <input type="hidden" name="imagem" value="{{ $categoria->getImagemURL() }}"/>
     <div class="mask">
       <a href="#" class="img-open" id="set_imagem" title="Selecionar imagem do computador">Abrir</a>
       <a href="#" class="img-remove" title="Remover imagem">Remover</a>

@@ -24,10 +24,12 @@
  */
 namespace MZ\Wallet;
 
-use MZ\Database\SyncModel;
-use MZ\Database\DB;
+use MZ\Util\Mask;
 use MZ\Util\Filter;
 use MZ\Util\Validator;
+use MZ\Database\DB;
+use MZ\Database\SyncModel;
+use MZ\Exception\ValidationException;
 
 /**
  * Informa uma conta bancária ou uma carteira financeira
@@ -36,21 +38,35 @@ class Carteira extends SyncModel
 {
 
     /**
-     * Tipo de carteira, 'Bancaria' para conta bancária e 'Financeira' para
-     * carteira financeira da empresa ou de sites de pagamentos
+     * Tipo de carteira, 'Bancaria' para conta bancária, 'Financeira' para
+     * carteira financeira da empresa ou de sites de pagamentos, 'Credito' para
+     * cartão de crédito e 'Local' para caixas e cofres locais
      */
     const TIPO_BANCARIA = 'Bancaria';
     const TIPO_FINANCEIRA = 'Financeira';
+    const TIPO_CREDITO = 'Credito';
+    const TIPO_LOCAL = 'Local';
+
+    /**
+     * Ambiente de execução da API usando o token
+     */
+    const AMBIENTE_TESTE = 'Teste';
+    const AMBIENTE_PRODUCAO = 'Producao';
 
     /**
      * Código local da carteira
      */
     private $id;
     /**
-     * Tipo de carteira, 'Bancaria' para conta bancária e 'Financeira' para
-     * carteira financeira da empresa ou de sites de pagamentos
+     * Tipo de carteira, 'Bancaria' para conta bancária, 'Financeira' para
+     * carteira financeira da empresa ou de sites de pagamentos, 'Credito' para
+     * cartão de crédito e 'Local' para caixas e cofres locais
      */
     private $tipo;
+    /**
+     * Informa a carteira superior, exemplo: Banco e cartões como subcarteira
+     */
+    private $carteira_id;
     /**
      * Código local do banco quando a carteira for bancária
      */
@@ -68,6 +84,30 @@ class Carteira extends SyncModel
      */
     private $agencia;
     /**
+     * Valor cobrado pela operadora de pagamento para cada transação
+     */
+    private $transacao;
+    /**
+     * Limite de crédito
+     */
+    private $limite;
+    /**
+     * Token para integração de pagamentos
+     */
+    private $token;
+    /**
+     * Ambiente de execução da API usando o token
+     */
+    private $ambiente;
+    /**
+     * Logo do gateway de pagamento
+     */
+    private $logo_url;
+    /**
+     * Cor predominante da marca da instituição
+     */
+    private $cor;
+    /**
      * Informa se a carteira ou conta bancária está ativa
      */
     private $ativa;
@@ -83,7 +123,7 @@ class Carteira extends SyncModel
 
     /**
      * Código local da carteira
-     * @return mixed ID of Carteira
+     * @return int id of Carteira
      */
     public function getID()
     {
@@ -92,8 +132,8 @@ class Carteira extends SyncModel
 
     /**
      * Set ID value to new on param
-     * @param  mixed $id new value for ID
-     * @return Carteira Self instance
+     * @param int $id Set id for Carteira
+     * @return self Self instance
      */
     public function setID($id)
     {
@@ -102,9 +142,10 @@ class Carteira extends SyncModel
     }
 
     /**
-     * Tipo de carteira, 'Bancaria' para conta bancária e 'Financeira' para
-     * carteira financeira da empresa ou de sites de pagamentos
-     * @return mixed Tipo of Carteira
+     * Tipo de carteira, 'Bancaria' para conta bancária, 'Financeira' para
+     * carteira financeira da empresa ou de sites de pagamentos, 'Credito' para
+     * cartão de crédito e 'Local' para caixas e cofres locais
+     * @return string tipo of Carteira
      */
     public function getTipo()
     {
@@ -113,8 +154,8 @@ class Carteira extends SyncModel
 
     /**
      * Set Tipo value to new on param
-     * @param  mixed $tipo new value for Tipo
-     * @return Carteira Self instance
+     * @param string $tipo Set tipo for Carteira
+     * @return self Self instance
      */
     public function setTipo($tipo)
     {
@@ -123,8 +164,28 @@ class Carteira extends SyncModel
     }
 
     /**
+     * Informa a carteira superior, exemplo: Banco e cartões como subcarteira
+     * @return int carteira superior of Carteira
+     */
+    public function getCarteiraID()
+    {
+        return $this->carteira_id;
+    }
+
+    /**
+     * Set CarteiraID value to new on param
+     * @param int $carteira_id Set carteira superior for Carteira
+     * @return self Self instance
+     */
+    public function setCarteiraID($carteira_id)
+    {
+        $this->carteira_id = $carteira_id;
+        return $this;
+    }
+
+    /**
      * Código local do banco quando a carteira for bancária
-     * @return mixed Banco of Carteira
+     * @return int banco of Carteira
      */
     public function getBancoID()
     {
@@ -133,8 +194,8 @@ class Carteira extends SyncModel
 
     /**
      * Set BancoID value to new on param
-     * @param  mixed $banco_id new value for BancoID
-     * @return Carteira Self instance
+     * @param int $banco_id Set banco for Carteira
+     * @return self Self instance
      */
     public function setBancoID($banco_id)
     {
@@ -144,7 +205,7 @@ class Carteira extends SyncModel
 
     /**
      * Descrição da carteira, nome dado a carteira cadastrada
-     * @return mixed Descrição of Carteira
+     * @return string descrição of Carteira
      */
     public function getDescricao()
     {
@@ -153,8 +214,8 @@ class Carteira extends SyncModel
 
     /**
      * Set Descricao value to new on param
-     * @param  mixed $descricao new value for Descricao
-     * @return Carteira Self instance
+     * @param string $descricao Set descrição for Carteira
+     * @return self Self instance
      */
     public function setDescricao($descricao)
     {
@@ -164,7 +225,7 @@ class Carteira extends SyncModel
 
     /**
      * Número da conta bancária ou usuário da conta de acesso da carteira
-     * @return mixed Conta of Carteira
+     * @return string conta of Carteira
      */
     public function getConta()
     {
@@ -173,8 +234,8 @@ class Carteira extends SyncModel
 
     /**
      * Set Conta value to new on param
-     * @param  mixed $conta new value for Conta
-     * @return Carteira Self instance
+     * @param string $conta Set conta for Carteira
+     * @return self Self instance
      */
     public function setConta($conta)
     {
@@ -184,7 +245,7 @@ class Carteira extends SyncModel
 
     /**
      * Número da agência da conta bancária ou site da carteira financeira
-     * @return mixed Agência of Carteira
+     * @return string agência of Carteira
      */
     public function getAgencia()
     {
@@ -193,8 +254,8 @@ class Carteira extends SyncModel
 
     /**
      * Set Agencia value to new on param
-     * @param  mixed $agencia new value for Agencia
-     * @return Carteira Self instance
+     * @param string $agencia Set agência for Carteira
+     * @return self Self instance
      */
     public function setAgencia($agencia)
     {
@@ -203,8 +264,128 @@ class Carteira extends SyncModel
     }
 
     /**
+     * Valor cobrado pela operadora de pagamento para cada transação
+     * @return string transação of Carteira
+     */
+    public function getTransacao()
+    {
+        return $this->transacao;
+    }
+
+    /**
+     * Set Transacao value to new on param
+     * @param string $transacao Set transação for Carteira
+     * @return self Self instance
+     */
+    public function setTransacao($transacao)
+    {
+        $this->transacao = $transacao;
+        return $this;
+    }
+
+    /**
+     * Limite de crédito
+     * @return string limite de crédito of Carteira
+     */
+    public function getLimite()
+    {
+        return $this->limite;
+    }
+
+    /**
+     * Set Limite value to new on param
+     * @param string $limite Set limite de crédito for Carteira
+     * @return self Self instance
+     */
+    public function setLimite($limite)
+    {
+        $this->limite = $limite;
+        return $this;
+    }
+
+    /**
+     * Token para integração de pagamentos
+     * @return string token of Carteira
+     */
+    public function getToken()
+    {
+        return $this->token;
+    }
+
+    /**
+     * Set Token value to new on param
+     * @param string $token Set token for Carteira
+     * @return self Self instance
+     */
+    public function setToken($token)
+    {
+        $this->token = $token;
+        return $this;
+    }
+
+    /**
+     * Ambiente de execução da API usando o token
+     * @return string ambiente of Carteira
+     */
+    public function getAmbiente()
+    {
+        return $this->ambiente;
+    }
+
+    /**
+     * Set Ambiente value to new on param
+     * @param string $ambiente Set ambiente for Carteira
+     * @return self Self instance
+     */
+    public function setAmbiente($ambiente)
+    {
+        $this->ambiente = $ambiente;
+        return $this;
+    }
+
+    /**
+     * Logo do gateway de pagamento
+     * @return string logo of Carteira
+     */
+    public function getLogoURL()
+    {
+        return $this->logo_url;
+    }
+
+    /**
+     * Set LogoURL value to new on param
+     * @param string $logo_url Set logo for Carteira
+     * @return self Self instance
+     */
+    public function setLogoURL($logo_url)
+    {
+        $this->logo_url = $logo_url;
+        return $this;
+    }
+
+    /**
+     * Cor predominante da marca da instituição
+     * @return string cor of Carteira
+     */
+    public function getCor()
+    {
+        return $this->cor;
+    }
+
+    /**
+     * Set Cor value to new on param
+     * @param string $cor Set cor for Carteira
+     * @return self Self instance
+     */
+    public function setCor($cor)
+    {
+        $this->cor = $cor;
+        return $this;
+    }
+
+    /**
      * Informa se a carteira ou conta bancária está ativa
-     * @return mixed Ativa of Carteira
+     * @return string ativa of Carteira
      */
     public function getAtiva()
     {
@@ -222,8 +403,8 @@ class Carteira extends SyncModel
 
     /**
      * Set Ativa value to new on param
-     * @param  mixed $ativa new value for Ativa
-     * @return Carteira Self instance
+     * @param string $ativa Set ativa for Carteira
+     * @return self Self instance
      */
     public function setAtiva($ativa)
     {
@@ -233,7 +414,7 @@ class Carteira extends SyncModel
 
     /**
      * Convert this instance to array associated key -> value
-     * @param  boolean $recursive Allow rescursive conversion of fields
+     * @param boolean $recursive Allow rescursive conversion of fields
      * @return array All field and values into array format
      */
     public function toArray($recursive = false)
@@ -241,22 +422,29 @@ class Carteira extends SyncModel
         $carteira = parent::toArray($recursive);
         $carteira['id'] = $this->getID();
         $carteira['tipo'] = $this->getTipo();
+        $carteira['carteiraid'] = $this->getCarteiraID();
         $carteira['bancoid'] = $this->getBancoID();
         $carteira['descricao'] = $this->getDescricao();
         $carteira['conta'] = $this->getConta();
         $carteira['agencia'] = $this->getAgencia();
+        $carteira['transacao'] = $this->getTransacao();
+        $carteira['limite'] = $this->getLimite();
+        $carteira['token'] = $this->getToken();
+        $carteira['ambiente'] = $this->getAmbiente();
+        $carteira['logourl'] = $this->getLogoURL();
+        $carteira['cor'] = $this->getCor();
         $carteira['ativa'] = $this->getAtiva();
         return $carteira;
     }
 
     /**
      * Fill this instance with from array values, you can pass instance to
-     * @param  mixed $carteira Associated key -> value to assign into this instance
-     * @return Carteira Self instance
+     * @param mixed $carteira Associated key -> value to assign into this instance
+     * @return self Self instance
      */
     public function fromArray($carteira = [])
     {
-        if ($carteira instanceof Carteira) {
+        if ($carteira instanceof self) {
             $carteira = $carteira->toArray();
         } elseif (!is_array($carteira)) {
             $carteira = [];
@@ -271,6 +459,11 @@ class Carteira extends SyncModel
             $this->setTipo(null);
         } else {
             $this->setTipo($carteira['tipo']);
+        }
+        if (!array_key_exists('carteiraid', $carteira)) {
+            $this->setCarteiraID(null);
+        } else {
+            $this->setCarteiraID($carteira['carteiraid']);
         }
         if (!array_key_exists('bancoid', $carteira)) {
             $this->setBancoID(null);
@@ -292,6 +485,36 @@ class Carteira extends SyncModel
         } else {
             $this->setAgencia($carteira['agencia']);
         }
+        if (!isset($carteira['transacao'])) {
+            $this->setTransacao(0);
+        } else {
+            $this->setTransacao($carteira['transacao']);
+        }
+        if (!array_key_exists('limite', $carteira)) {
+            $this->setLimite(null);
+        } else {
+            $this->setLimite($carteira['limite']);
+        }
+        if (!array_key_exists('token', $carteira)) {
+            $this->setToken(null);
+        } else {
+            $this->setToken($carteira['token']);
+        }
+        if (!array_key_exists('ambiente', $carteira)) {
+            $this->setAmbiente(null);
+        } else {
+            $this->setAmbiente($carteira['ambiente']);
+        }
+        if (!array_key_exists('logourl', $carteira)) {
+            $this->setLogoURL(null);
+        } else {
+            $this->setLogoURL($carteira['logourl']);
+        }
+        if (!array_key_exists('cor', $carteira)) {
+            $this->setCor(null);
+        } else {
+            $this->setCor($carteira['cor']);
+        }
         if (!isset($carteira['ativa'])) {
             $this->setAtiva('N');
         } else {
@@ -301,50 +524,80 @@ class Carteira extends SyncModel
     }
 
     /**
+     * Get relative logo path or default logo
+     * @param boolean $default If true return default image, otherwise check field
+     * @param string  $default_name Default image name
+     * @return string relative web path for carteira logo
+     */
+    public function makeLogoURL($default = false, $default_name = 'carteira.png')
+    {
+        $logo_url = $this->getLogoURL();
+        if ($default) {
+            $logo_url = null;
+        }
+        return get_image_url($logo_url, 'carteira', $default_name);
+    }
+
+    /**
      * Convert this instance into array associated key -> value with only public fields
      * @return array All public field and values into array format
      */
     public function publish()
     {
         $carteira = parent::publish();
+        $carteira['logourl'] = $this->makeLogoURL(false, null);
         return $carteira;
     }
 
     /**
      * Filter fields, upload data and keep key data
-     * @param Carteira $original Original instance without modifications
+     * @param self $original Original instance without modifications
+     * @param boolean $localized Informs if fields are localized
+     * @return self Self instance
      */
     public function filter($original, $localized = false)
     {
         $this->setID($original->getID());
+        $this->setCarteiraID(Filter::number($this->getCarteiraID()));
         $this->setBancoID(Filter::number($this->getBancoID()));
         $this->setDescricao(Filter::string($this->getDescricao()));
         $this->setConta(Filter::string($this->getConta()));
         $this->setAgencia(Filter::string($this->getAgencia()));
+        $this->setTransacao(Filter::money($this->getTransacao(), $localized));
+        $this->setLimite(Filter::money($this->getLimite(), $localized));
+        $this->setToken(Filter::text($this->getToken()));
+        $logo_url = upload_image('raw_logourl', 'carteira');
+        if (is_null($logo_url) && trim($this->getLogoURL()) != '') {
+            $this->setLogoURL($original->getLogoURL());
+        } else {
+            $this->setLogoURL($logo_url);
+        }
+        $this->setCor(Filter::string($this->getCor()));
+        return $this;
     }
 
     /**
      * Clean instance resources like images and docs
-     * @param  Carteira $dependency Don't clean when dependency use same resources
+     * @param self $dependency Don't clean when dependency use same resources
      */
     public function clean($dependency)
     {
+        if (!is_null($this->getLogoURL()) && $dependency->getLogoURL() != $this->getLogoURL()) {
+            @unlink(get_image_path($this->getLogoURL(), 'carteira'));
+        }
+        $this->setLogoURL($dependency->getLogoURL());
     }
 
     /**
      * Validate fields updating them and throw exception when invalid data has found
      * @return array All field of Carteira in array format
+     * @throws \MZ\Exception\ValidationException for invalid input data
      */
     public function validate()
     {
         $errors = [];
-        if (is_null($this->getTipo())) {
-            $errors['tipo'] = 'O Tipo não pode ser vazio';
-        }
-        if (!is_null($this->getTipo()) &&
-            !array_key_exists($this->getTipo(), self::getTipoOptions())
-        ) {
-            $errors['tipo'] = 'O Tipo é invalido';
+        if (!Validator::checkInSet($this->getTipo(), self::getTipoOptions())) {
+            $errors['tipo'] = _t('carteira.tipo_invalid');
         }
         if ($this->getTipo() == self::TIPO_BANCARIA && is_null($this->getBancoID())) {
             $errors['bancoid'] = 'O banco não foi informado';
@@ -353,7 +606,7 @@ class Carteira extends SyncModel
             $errors['bancoid'] = 'O banco não pode ser informado';
         }
         if (is_null($this->getDescricao())) {
-            $errors['descricao'] = 'A Descrição não pode ser vazia';
+            $errors['descricao'] = _t('carteira.descricao_cannot_empty');
         }
         if ($this->getTipo() == self::TIPO_BANCARIA && is_null($this->getAgencia())) {
             $errors['agencia'] = 'A agência não pode ser vazia';
@@ -361,28 +614,25 @@ class Carteira extends SyncModel
         if ($this->getTipo() == self::TIPO_BANCARIA && is_null($this->getConta())) {
             $errors['conta'] = 'A conta não pode ser vazia';
         }
-        if (is_null($this->getAtiva())) {
-            $errors['ativa'] = 'A Ativação não pode ser vazia';
+        if (is_null($this->getTransacao())) {
+            $errors['transacao'] = _t('carteira.transacao_cannot_empty');
+        }
+        if (!Validator::checkInSet($this->getAmbiente(), self::getAmbienteOptions(), true)) {
+            $errors['ambiente'] = _t('carteira.ambiente_invalid');
+        }
+        if (!Validator::checkBoolean($this->getAtiva())) {
+            $errors['ativa'] = _t('carteira.ativa_invalid');
         }
         if (!empty($errors)) {
-            throw new \MZ\Exception\ValidationException($errors);
+            throw new ValidationException($errors);
         }
         return $this->toArray();
     }
 
     /**
-     * Translate SQL exception into application exception
-     * @param  \Exception $e exception to translate into a readable error
-     * @return \MZ\Exception\ValidationException new exception translated
-     */
-    protected function translate($e)
-    {
-        return parent::translate($e);
-    }
-
-    /**
      * Insert a new Carteira into the database and fill instance from database
-     * @return Carteira Self instance
+     * @return self Self instance
+     * @throws \MZ\Exception\ValidationException for invalid input data
      */
     public function insert()
     {
@@ -401,36 +651,42 @@ class Carteira extends SyncModel
 
     /**
      * Update Carteira with instance values into database for ID
-     * @param  array $only Save these fields only, when empty save all fields except id
-     * @return Carteira Self instance
+     * @param array $only Save these fields only, when empty save all fields except id
+     * @return int rows affected
+     * @throws \MZ\Exception\ValidationException for invalid input data
      */
     public function update($only = [])
     {
         $values = $this->validate();
         if (!$this->exists()) {
-            throw new \Exception('O identificador da carteira não foi informado');
+            throw new ValidationException(
+                ['id' => _t('carteira.id_cannot_empty')]
+            );
         }
         $values = DB::filterValues($values, $only, false);
         try {
-            DB::update('Carteiras')
+            $affected = DB::update('Carteiras')
                 ->set($values)
-                ->where('id', $this->getID())
+                ->where(['id' => $this->getID()])
                 ->execute();
             $this->loadByID();
         } catch (\Exception $e) {
             throw $this->translate($e);
         }
-        return $this;
+        return $affected;
     }
 
     /**
      * Delete this instance from database using ID
      * @return integer Number of rows deleted (Max 1)
+     * @throws \MZ\Exception\ValidationException for invalid id
      */
     public function delete()
     {
         if (!$this->exists()) {
-            throw new \Exception('O identificador da carteira não foi informado');
+            throw new ValidationException(
+                ['id' => _t('carteira.id_cannot_empty')]
+            );
         }
         $result = DB::deleteFrom('Carteiras')
             ->where('id', $this->getID())
@@ -440,15 +696,27 @@ class Carteira extends SyncModel
 
     /**
      * Load one register for it self with a condition
-     * @param  array $condition Condition for searching the row
-     * @param  array $order associative field name -> [-1, 1]
-     * @return Carteira Self instance filled or empty
+     * @param array $condition Condition for searching the row
+     * @param array $order associative field name -> [-1, 1]
+     * @return self Self instance filled or empty
      */
     public function load($condition, $order = [])
     {
         $query = self::query($condition, $order)->limit(1);
         $row = $query->fetch() ?: [];
         return $this->fromArray($row);
+    }
+
+    /**
+     * Informa a carteira superior, exemplo: Banco e cartões como subcarteira
+     * @return \MZ\Wallet\Carteira The object fetched from database
+     */
+    public function findCarteiraID()
+    {
+        if (is_null($this->getCarteiraID())) {
+            return new \MZ\Wallet\Carteira();
+        }
+        return \MZ\Wallet\Carteira::findByID($this->getCarteiraID());
     }
 
     /**
@@ -465,14 +733,33 @@ class Carteira extends SyncModel
 
     /**
      * Gets textual and translated Tipo for Carteira
-     * @param  int $index choose option from index
-     * @return mixed A associative key -> translated representative text or text for index
+     * @param int $index choose option from index
+     * @return string[]|string A associative key -> translated representative text or text for index
      */
     public static function getTipoOptions($index = null)
     {
         $options = [
-            self::TIPO_BANCARIA => 'Bancária',
-            self::TIPO_FINANCEIRA => 'Financeira',
+            self::TIPO_BANCARIA => _t('carteira.tipo_bancaria'),
+            self::TIPO_FINANCEIRA => _t('carteira.tipo_financeira'),
+            self::TIPO_CREDITO => _t('carteira.tipo_credito'),
+            self::TIPO_LOCAL => _t('carteira.tipo_local'),
+        ];
+        if (!is_null($index)) {
+            return $options[$index];
+        }
+        return $options;
+    }
+
+    /**
+     * Gets textual and translated Ambiente for Carteira
+     * @param int $index choose option from index
+     * @return string[]|string A associative key -> translated representative text or text for index
+     */
+    public static function getAmbienteOptions($index = null)
+    {
+        $options = [
+            self::AMBIENTE_TESTE => _t('carteira.ambiente_teste'),
+            self::AMBIENTE_PRODUCAO => _t('carteira.ambiente_producao'),
         ];
         if (!is_null($index)) {
             return $options[$index];
@@ -486,14 +773,14 @@ class Carteira extends SyncModel
      */
     private static function getAllowedKeys()
     {
-        $carteira = new Carteira();
+        $carteira = new self();
         $allowed = Filter::concatKeys('c.', $carteira->toArray());
         return $allowed;
     }
 
     /**
      * Filter order array
-     * @param  mixed $order order string or array to parse and filter allowed
+     * @param mixed $order order string or array to parse and filter allowed
      * @return array allowed associative order
      */
     private static function filterOrder($order)
@@ -504,7 +791,7 @@ class Carteira extends SyncModel
 
     /**
      * Filter condition array with allowed fields
-     * @param  array $condition condition to filter rows
+     * @param array $condition condition to filter rows
      * @return array allowed condition
      */
     private static function filterCondition($condition)
@@ -522,8 +809,8 @@ class Carteira extends SyncModel
 
     /**
      * Fetch data from database with a condition
-     * @param  array $condition condition to filter rows
-     * @param  array $order order rows
+     * @param array $condition condition to filter rows
+     * @param array $order order rows
      * @return SelectQuery query object with condition statement
      */
     private static function query($condition = [], $order = [])
@@ -538,23 +825,39 @@ class Carteira extends SyncModel
 
     /**
      * Search one register with a condition
-     * @param  array $condition Condition for searching the row
-     * @param  array $order order rows
-     * @return Carteira A filled Carteira or empty instance
+     * @param array $condition Condition for searching the row
+     * @param array $order order rows
+     * @return self A filled Carteira or empty instance
      */
     public static function find($condition, $order = [])
     {
-        $query = self::query($condition, $order)->limit(1);
-        $row = $query->fetch() ?: [];
-        return new Carteira($row);
+        $result = new self();
+        return $result->load($condition, $order);
     }
 
     /**
-     * Fetch all rows from database with matched condition critery
-     * @param  array $condition condition to filter rows
-     * @param  integer $limit number of rows to get, null for all
-     * @param  integer $offset start index to get rows, null for begining
-     * @return array All rows instanced and filled
+     * Search one register with a condition
+     * @param array $condition Condition for searching the row
+     * @param array $order order rows
+     * @return self A filled Carteira or empty instance
+     * @throws \Exception when register has not found
+     */
+    public static function findOrFail($condition, $order = [])
+    {
+        $result = self::find($condition, $order);
+        if (!$result->exists()) {
+            throw new \Exception(_t('carteira.not_found'), 404);
+        }
+        return $result;
+    }
+
+    /**
+     * Find all Carteira
+     * @param array  $condition Condition to get all Carteira
+     * @param array  $order     Order Carteira
+     * @param int    $limit     Limit data into row count
+     * @param int    $offset    Start offset to get rows
+     * @return self[] List of all rows instanced as Carteira
      */
     public static function findAll($condition = [], $order = [], $limit = null, $offset = null)
     {
@@ -568,14 +871,14 @@ class Carteira extends SyncModel
         $rows = $query->fetchAll();
         $result = [];
         foreach ($rows as $row) {
-            $result[] = new Carteira($row);
+            $result[] = new self($row);
         }
         return $result;
     }
 
     /**
      * Count all rows from database with matched condition critery
-     * @param  array $condition condition to filter rows
+     * @param array $condition condition to filter rows
      * @return integer Quantity of rows
      */
     public static function count($condition = [])

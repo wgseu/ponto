@@ -81,7 +81,7 @@
               {% for $produto in $produtos %}
                 <tr class="{{ !$produto->isVisivel() ? 'active': '' }}">
                   <td class="product-cell">
-                    <a href="/gerenciar/produto/editar?id={{ $produto->getID() }}" title="Editar produto '{{ $produto->getDescricao() }}'"><img src="{{ get_image_url($produto->getImagem(), 'produto', 'produto.png') }}" height="48" alt="Imagem" title="Imagem"/></a>
+                    <a href="/gerenciar/produto/editar?id={{ $produto->getID() }}" title="Editar produto '{{ $produto->getDescricao() }}'"><img src="{{ $produto->makeImagemURL() }}" height="48" alt="Imagem" title="Imagem"/></a>
                     <strong>{{ $produto->getDescricao() }}</strong>
                     <small>{{ $produto->getAbreviacao() }}</small>
                   </td>

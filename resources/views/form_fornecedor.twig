@@ -2,7 +2,7 @@
 <input type="hidden" id="empresaid_ref" name="empresaid" data-nome="{{ $_empresa->getNome() }}" value="{{ $fornecedor->getEmpresaID() }}">
 <div class="form-group col-lg-6 col-md-6 col-sm-6 col-xs-12">
   <label for="empresaid">Empresa:
-    <span class="identifier">{{ \MZ\Util\Mask::phone($_empresa->getFone(1)) }}
+    <span class="identifier">{{ \MZ\Util\Mask::phone($_empresa->getTelefone()->getNumero()) }}
     </span>
   </label>
   <input type="text" id="empresaid" class="form-control" value="{{ $_empresa->getNome() }}">

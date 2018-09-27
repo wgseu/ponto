@@ -173,7 +173,7 @@ class NFeDB extends \NFe\Database\Estatico
                 $destinatario->setCNPJ($_cliente->getCPF());
             }
             $destinatario->setEmail($_cliente->getEmail());
-            $destinatario->setTelefone($_cliente->getFone(1));
+            $destinatario->setTelefone($_cliente->getTelefone()->getNumero());
             $endereco = null;
             if ($_localizacao_entrega->exists()) {
                 $endereco = new \NFe\Entity\Endereco();

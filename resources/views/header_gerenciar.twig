@@ -27,7 +27,7 @@
           <div class="left_col scroll-view">
             <div class="navbar nav_title" style="border: 0;">
               <a href="/" class="site_title">
-                <img src="{{ get_image_url($app->getSystem()->getCompany()->getImagem(), 'cliente', 'empresa.png') }}" width="128px"></img>
+                <img src="{{ $app->getSystem()->getCompany()->makeImagemURL(false, 'empresa.png') }}" width="128px"></img>
               </a>
             </div>
             <div class="clearfix"></div>
@@ -46,7 +46,7 @@
                       <span class="fa"></span>
                     </a>
                   </li>
-                  {% if logged_employee()->has([\MZ\System\Permissao::NOME_PAGAMENTO]) || logged_employee()->has([\MZ\System\Permissao::NOME_ABRIRCAIXA]) %}
+                  {% if $provider->has([\MZ\System\Permissao::NOME_PAGAMENTO]) || $provider->has([\MZ\System\Permissao::NOME_ABRIRCAIXA]) %}
                     <li>
                       <a>
                         <i class="fa fa-area-chart"></i>
@@ -56,7 +56,7 @@
                         <span class="fa fa-chevron-down"></span>
                       </a>
                       <ul class="nav child_menu" style="display: none">
-                        {% if logged_employee()->has([\MZ\System\Permissao::NOME_PAGAMENTO]) %}
+                        {% if $provider->has([\MZ\System\Permissao::NOME_PAGAMENTO]) %}
                           <li>
                             <a href="/gerenciar/pedido/">
                               <i class="fa fa-check"></i>
@@ -67,7 +67,7 @@
                             </a>
                           </li>
                         {% endif %}
-                        {% if logged_employee()->has([\MZ\System\Permissao::NOME_PAGAMENTO]) %}
+                        {% if $provider->has([\MZ\System\Permissao::NOME_PAGAMENTO]) %}
                           <li>
                             <a href="/gerenciar/produto_pedido/">
                               <i class="fa fa-bars"></i>
@@ -78,7 +78,7 @@
                             </a>
                           </li>
                         {% endif %}
-                        {% if logged_employee()->has([\MZ\System\Permissao::NOME_PAGAMENTO]) %}
+                        {% if $provider->has([\MZ\System\Permissao::NOME_PAGAMENTO]) %}
                           <li>
                             <a href="/gerenciar/pagamento/">
                               <i class="fa fa-money"></i>
@@ -89,7 +89,7 @@
                             </a>
                           </li>
                         {% endif %}
-                        {% if logged_employee()->has([\MZ\System\Permissao::NOME_ABRIRCAIXA]) %}
+                        {% if $provider->has([\MZ\System\Permissao::NOME_ABRIRCAIXA]) %}
                           <li>
                             <a href="/gerenciar/movimentacao/">
                               <i class="fa fa-suitcase"></i>
@@ -103,7 +103,7 @@
                       </ul>
                     </li>
                   {% endif %}
-                  {% if logged_employee()->has([\MZ\System\Permissao::NOME_CADASTROCAIXAS]) || logged_employee()->has([\MZ\System\Permissao::NOME_CADASTROBANCOS]) || logged_employee()->has([\MZ\System\Permissao::NOME_CADASTROCARTEIRAS]) || logged_employee()->has([\MZ\System\Permissao::NOME_CADASTROFORMASPAGTO]) || logged_employee()->has([\MZ\System\Permissao::NOME_CADASTROCARTOES]) || logged_employee()->has([\MZ\System\Permissao::NOME_CADASTROCONTAS]) || logged_employee()->has([\MZ\System\Permissao::NOME_CADASTRARCREDITOS]) || logged_employee()->has([\MZ\System\Permissao::NOME_PAGAMENTO]) %}
+                  {% if $provider->has([\MZ\System\Permissao::NOME_CADASTROCAIXAS]) || $provider->has([\MZ\System\Permissao::NOME_CADASTROBANCOS]) || $provider->has([\MZ\System\Permissao::NOME_CADASTROCARTEIRAS]) || $provider->has([\MZ\System\Permissao::NOME_CADASTROFORMASPAGTO]) || $provider->has([\MZ\System\Permissao::NOME_CADASTROCARTOES]) || $provider->has([\MZ\System\Permissao::NOME_CADASTROCONTAS]) || $provider->has([\MZ\System\Permissao::NOME_CADASTRARCREDITOS]) || $provider->has([\MZ\System\Permissao::NOME_PAGAMENTO]) %}
                     <li>
                       <a>
                         <i class="fa fa-money"></i>
@@ -113,7 +113,7 @@
                         <span class="fa fa-chevron-down"></span>
                       </a>
                       <ul class="nav child_menu" style="display: none">
-                        {% if logged_employee()->has([\MZ\System\Permissao::NOME_CADASTROCAIXAS]) %}
+                        {% if $provider->has([\MZ\System\Permissao::NOME_CADASTROCAIXAS]) %}
                           <li>
                             <a href="/gerenciar/caixa/">
                               <i class="fa fa-shopping-cart"></i>
@@ -124,7 +124,7 @@
                             </a>
                           </li>
                         {% endif %}
-                        {% if logged_employee()->has([\MZ\System\Permissao::NOME_CADASTROBANCOS]) %}
+                        {% if $provider->has([\MZ\System\Permissao::NOME_CADASTROBANCOS]) %}
                           <li>
                             <a href="/gerenciar/banco/">
                               <i class="fa fa-bank"></i>
@@ -135,7 +135,7 @@
                             </a>
                           </li>
                         {% endif %}
-                        {% if logged_employee()->has([\MZ\System\Permissao::NOME_CADASTROCARTEIRAS]) %}
+                        {% if $provider->has([\MZ\System\Permissao::NOME_CADASTROCARTEIRAS]) %}
                           <li>
                             <a href="/gerenciar/carteira/">
                               <i class="fa fa-money"></i>
@@ -146,7 +146,7 @@
                             </a>
                           </li>
                         {% endif %}
-                        {% if logged_employee()->has([\MZ\System\Permissao::NOME_CADASTROFORMASPAGTO]) %}
+                        {% if $provider->has([\MZ\System\Permissao::NOME_CADASTROFORMASPAGTO]) %}
                           <li>
                             <a href="/gerenciar/forma_pagto/">
                               <i class="fa fa-ticket"></i>
@@ -157,7 +157,7 @@
                             </a>
                           </li>
                         {% endif %}
-                        {% if logged_employee()->has([\MZ\System\Permissao::NOME_CADASTROCARTOES]) %}
+                        {% if $provider->has([\MZ\System\Permissao::NOME_CADASTROCARTOES]) %}
                           <li>
                             <a href="/gerenciar/cartao/">
                               <i class="fa fa-credit-card"></i>
@@ -168,7 +168,7 @@
                             </a>
                           </li>
                         {% endif %}
-                        {% if logged_employee()->has([\MZ\System\Permissao::NOME_CADASTROCONTAS]) %}
+                        {% if $provider->has([\MZ\System\Permissao::NOME_CADASTROCONTAS]) %}
                           <li>
                             <a href="/gerenciar/conta/">
                               <i class="fa fa-shield"></i>
@@ -179,7 +179,7 @@
                             </a>
                           </li>
                         {% endif %}
-                        {% if logged_employee()->has([\MZ\System\Permissao::NOME_CADASTRARCREDITOS]) %}
+                        {% if $provider->has([\MZ\System\Permissao::NOME_CADASTRARCREDITOS]) %}
                           <li>
                             <a href="/gerenciar/credito/">
                               <i class="fa fa-gift"></i>
@@ -190,7 +190,7 @@
                             </a>
                           </li>
                         {% endif %}
-                        {% if logged_employee()->has([\MZ\System\Permissao::NOME_PAGAMENTO]) %}
+                        {% if $provider->has([\MZ\System\Permissao::NOME_PAGAMENTO]) %}
                           <li>
                             <a href="/gerenciar/folha_cheque/">
                               <i class="fa fa-keyboard-o"></i>
@@ -204,7 +204,7 @@
                       </ul>
                     </li>
                   {% endif %}
-                  {% if logged_employee()->has([\MZ\System\Permissao::NOME_CADASTROPRODUTOS]) || logged_employee()->has([\MZ\System\Permissao::NOME_CADASTROSERVICOS]) || logged_employee()->has([\MZ\System\Permissao::NOME_ESTOQUE]) %}
+                  {% if $provider->has([\MZ\System\Permissao::NOME_CADASTROPRODUTOS]) || $provider->has([\MZ\System\Permissao::NOME_CADASTROSERVICOS]) || $provider->has([\MZ\System\Permissao::NOME_ESTOQUE]) %}
                     <li>
                       <a>
                         <i class="fa fa-cube"></i>
@@ -214,7 +214,7 @@
                         <span class="fa fa-chevron-down"></span>
                       </a>
                       <ul class="nav child_menu" style="display: none">
-                        {% if logged_employee()->has([\MZ\System\Permissao::NOME_CADASTROPRODUTOS]) %}
+                        {% if $provider->has([\MZ\System\Permissao::NOME_CADASTROPRODUTOS]) %}
                           <li>
                             <a href="/gerenciar/produto/">
                               <i class="fa fa-cube"></i>
@@ -225,7 +225,7 @@
                             </a>
                           </li>
                         {% endif %}
-                        {% if logged_employee()->has([\MZ\System\Permissao::NOME_CADASTROSERVICOS]) %}
+                        {% if $provider->has([\MZ\System\Permissao::NOME_CADASTROSERVICOS]) %}
                           <li>
                             <a href="/gerenciar/servico/">
                               <i class="fa fa-coffee"></i>
@@ -236,7 +236,7 @@
                             </a>
                           </li>
                         {% endif %}
-                        {% if logged_employee()->has([\MZ\System\Permissao::NOME_CADASTROPRODUTOS]) %}
+                        {% if $provider->has([\MZ\System\Permissao::NOME_CADASTROPRODUTOS]) %}
                           <li>
                             <a href="/gerenciar/categoria/">
                               <i class="fa fa-list"></i>
@@ -247,7 +247,7 @@
                             </a>
                           </li>
                         {% endif %}
-                        {% if logged_employee()->has([\MZ\System\Permissao::NOME_ESTOQUE]) %}
+                        {% if $provider->has([\MZ\System\Permissao::NOME_ESTOQUE]) %}
                           <li>
                             <a href="/gerenciar/estoque/">
                               <i class="fa fa-cubes"></i>
@@ -270,7 +270,7 @@
                       <span class="fa fa-chevron-down"></span>
                     </a>
                     <ul class="nav child_menu" style="display: none">
-                      {% if logged_employee()->has([\MZ\System\Permissao::NOME_CADASTROCLIENTES]) %}
+                      {% if $provider->has([\MZ\System\Permissao::NOME_CADASTROCLIENTES]) %}
                         <li>
                           <a href="/gerenciar/cliente/">
                             <i class="fa fa-user"></i>
@@ -281,7 +281,7 @@
                           </a>
                         </li>
                       {% endif %}
-                      {% if logged_employee()->has([\MZ\System\Permissao::NOME_CADASTROFORNECEDORES]) %}
+                      {% if $provider->has([\MZ\System\Permissao::NOME_CADASTROFORNECEDORES]) %}
                         <li>
                           <a href="/gerenciar/fornecedor/">
                             <i class="fa fa-building"></i>
@@ -314,7 +314,7 @@
                       {% endif %}
                     </ul>
                   </li>
-                  {% if logged_employee()->has([\MZ\System\Permissao::NOME_CADASTROPAISES]) || logged_employee()->has([\MZ\System\Permissao::NOME_CADASTROESTADOS]) || logged_employee()->has([\MZ\System\Permissao::NOME_CADASTROCIDADES]) || logged_employee()->has([\MZ\System\Permissao::NOME_CADASTROBAIRROS]) %}
+                  {% if $provider->has([\MZ\System\Permissao::NOME_CADASTROPAISES]) || $provider->has([\MZ\System\Permissao::NOME_CADASTROESTADOS]) || $provider->has([\MZ\System\Permissao::NOME_CADASTROCIDADES]) || $provider->has([\MZ\System\Permissao::NOME_CADASTROBAIRROS]) %}
                     <li>
                       <a>
                         <i class="fa fa-flag"></i>
@@ -324,7 +324,7 @@
                         <span class="fa fa-chevron-down"></span>
                       </a>
                       <ul class="nav child_menu" style="display: none">
-                        {% if logged_employee()->has([\MZ\System\Permissao::NOME_CADASTROPAISES]) %}
+                        {% if $provider->has([\MZ\System\Permissao::NOME_CADASTROPAISES]) %}
                           <li>
                             <a href="/gerenciar/pais/">
                               <i class="fa fa-globe"></i>
@@ -335,7 +335,7 @@
                             </a>
                           </li>
                         {% endif %}
-                        {% if logged_employee()->has([\MZ\System\Permissao::NOME_CADASTROESTADOS]) %}
+                        {% if $provider->has([\MZ\System\Permissao::NOME_CADASTROESTADOS]) %}
                           <li>
                             <a href="/gerenciar/estado/">
                               <i class="fa fa-flag"></i>
@@ -346,7 +346,7 @@
                             </a>
                           </li>
                         {% endif %}
-                        {% if logged_employee()->has([\MZ\System\Permissao::NOME_CADASTROCIDADES]) %}
+                        {% if $provider->has([\MZ\System\Permissao::NOME_CADASTROCIDADES]) %}
                           <li>
                             <a href="/gerenciar/cidade/">
                               <i class="fa fa-university"></i>
@@ -357,7 +357,7 @@
                             </a>
                           </li>
                         {% endif %}
-                        {% if logged_employee()->has([\MZ\System\Permissao::NOME_CADASTROBAIRROS]) %}
+                        {% if $provider->has([\MZ\System\Permissao::NOME_CADASTROBAIRROS]) %}
                           <li>
                             <a href="/gerenciar/bairro/">
                               <i class="fa fa-tag"></i>
@@ -371,7 +371,7 @@
                       </ul>
                     </li>
                   {% endif %}
-                  {% if logged_employee()->has([\MZ\System\Permissao::NOME_CADASTROMESAS]) || logged_employee()->has([\MZ\System\Permissao::NOME_CADASTROCOMANDAS]) || logged_employee()->has([\MZ\System\Permissao::NOME_ESTOQUE]) || logged_employee()->has([\MZ\System\Permissao::NOME_CADASTROCONTAS]) || logged_employee()->has([\MZ\System\Permissao::NOME_CADASTROPATRIMONIO]) %}
+                  {% if $provider->has([\MZ\System\Permissao::NOME_CADASTROMESAS]) || $provider->has([\MZ\System\Permissao::NOME_CADASTROCOMANDAS]) || $provider->has([\MZ\System\Permissao::NOME_ESTOQUE]) || $provider->has([\MZ\System\Permissao::NOME_CADASTROCONTAS]) || $provider->has([\MZ\System\Permissao::NOME_CADASTROPATRIMONIO]) %}
                     <li>
                       <a>
                         <i class="fa fa-sitemap"></i>
@@ -381,7 +381,7 @@
                         <span class="fa fa-chevron-down"></span>
                       </a>
                       <ul class="nav child_menu" style="display: none">
-                        {% if logged_employee()->has([\MZ\System\Permissao::NOME_CADASTROMESAS]) %}
+                        {% if $provider->has([\MZ\System\Permissao::NOME_CADASTROMESAS]) %}
                           <li>
                             <a href="/gerenciar/mesa/">
                               <i class="fa fa-table"></i>
@@ -392,7 +392,7 @@
                             </a>
                           </li>
                         {% endif %}
-                        {% if logged_employee()->has([\MZ\System\Permissao::NOME_CADASTROCOMANDAS]) %}
+                        {% if $provider->has([\MZ\System\Permissao::NOME_CADASTROCOMANDAS]) %}
                           <li>
                             <a href="/gerenciar/comanda/">
                               <i class="fa fa-credit-card"></i>
@@ -403,7 +403,7 @@
                             </a>
                           </li>
                         {% endif %}
-                        {% if logged_employee()->has([\MZ\System\Permissao::NOME_ESTOQUE]) %}
+                        {% if $provider->has([\MZ\System\Permissao::NOME_ESTOQUE]) %}
                           <li>
                             <a href="/gerenciar/setor/">
                               <i class="fa fa-sitemap"></i>
@@ -414,7 +414,7 @@
                             </a>
                           </li>
                         {% endif %}
-                        {% if logged_employee()->has([\MZ\System\Permissao::NOME_CADASTROCONTAS]) %}
+                        {% if $provider->has([\MZ\System\Permissao::NOME_CADASTROCONTAS]) %}
                           <li>
                             <a href="/gerenciar/classificacao/">
                               <i class="fa fa-folder"></i>
@@ -425,7 +425,7 @@
                             </a>
                           </li>
                         {% endif %}
-                        {% if logged_employee()->has([\MZ\System\Permissao::NOME_CADASTROPATRIMONIO]) %}
+                        {% if $provider->has([\MZ\System\Permissao::NOME_CADASTROPATRIMONIO]) %}
                           <li>
                             <a href="/gerenciar/patrimonio/">
                               <i class="fa fa-camera"></i>
@@ -439,7 +439,7 @@
                       </ul>
                     </li>
                   {% endif %}
-                  {% if logged_employee()->has([\MZ\System\Permissao::NOME_CADASTROMOEDAS]) || logged_employee()->has([\MZ\System\Permissao::NOME_CADASTROPRODUTOS]) %}
+                  {% if $provider->has([\MZ\System\Permissao::NOME_CADASTROMOEDAS]) || $provider->has([\MZ\System\Permissao::NOME_CADASTROPRODUTOS]) %}
                     <li>
                       <a>
                         <i class="fa fa-filter"></i>
@@ -449,7 +449,7 @@
                         <span class="fa fa-chevron-down"></span>
                       </a>
                       <ul class="nav child_menu" style="display: none">
-                        {% if logged_employee()->has([\MZ\System\Permissao::NOME_CADASTROMOEDAS]) %}
+                        {% if $provider->has([\MZ\System\Permissao::NOME_CADASTROMOEDAS]) %}
                           <li>
                             <a href="/gerenciar/moeda/">
                               <i class="fa fa-dollar"></i>
@@ -460,7 +460,7 @@
                             </a>
                           </li>
                         {% endif %}
-                        {% if logged_employee()->has([\MZ\System\Permissao::NOME_CADASTROPRODUTOS]) %}
+                        {% if $provider->has([\MZ\System\Permissao::NOME_CADASTROPRODUTOS]) %}
                           <li>
                             <a href="/gerenciar/unidade/">
                               <i class="fa fa-filter"></i>
@@ -474,7 +474,7 @@
                       </ul>
                     </li>
                   {% endif %}
-                  {% if logged_employee()->has([\MZ\System\Permissao::NOME_ALTERARCONFIGURACOES]) || logged_employee()->has([\MZ\System\Permissao::NOME_RELATORIOAUDITORIA]) || logged_employee()->has([\MZ\System\Permissao::NOME_ALTERARPAGINAS]) %}
+                  {% if $provider->has([\MZ\System\Permissao::NOME_ALTERARCONFIGURACOES]) || $provider->has([\MZ\System\Permissao::NOME_RELATORIOAUDITORIA]) || $provider->has([\MZ\System\Permissao::NOME_ALTERARPAGINAS]) %}
                     <li>
                       <a>
                         <i class="fa fa-cog"></i>
@@ -484,7 +484,7 @@
                         <span class="fa fa-chevron-down"></span>
                       </a>
                       <ul class="nav child_menu" style="display: none">
-                        {% if logged_employee()->has([\MZ\System\Permissao::NOME_ALTERARCONFIGURACOES]) %}
+                        {% if $provider->has([\MZ\System\Permissao::NOME_ALTERARCONFIGURACOES]) %}
                           <li>
                             <a href="/gerenciar/integracao/">
                               <i class="fa fa-exchange"></i>
@@ -495,7 +495,7 @@
                             </a>
                           </li>
                         {% endif %}
-                        {% if logged_employee()->has([\MZ\System\Permissao::NOME_ALTERARCONFIGURACOES]) %}
+                        {% if $provider->has([\MZ\System\Permissao::NOME_ALTERARCONFIGURACOES]) %}
                           <li>
                             <a href="/gerenciar/sistema/">
                               <i class="fa fa-wrench"></i>
@@ -506,18 +506,7 @@
                             </a>
                           </li>
                         {% endif %}
-                        {% if logged_employee()->has([\MZ\System\Permissao::NOME_ALTERARPAGINAS]) %}
-                          <li>
-                            <a href="/gerenciar/pagina/">
-                              <i class="fa fa-file-image-o"></i>
-                              <span class="nav-text">
-                                Páginas
-                              </span>
-                              <span class="fa"></span>
-                            </a>
-                          </li>
-                        {% endif %}
-                        {% if logged_employee()->has([\MZ\System\Permissao::NOME_RELATORIOAUDITORIA]) %}
+                        {% if $provider->has([\MZ\System\Permissao::NOME_RELATORIOAUDITORIA]) %}
                           <li>
                             <a href="/gerenciar/auditoria/">
                               <i class="fa fa-key"></i>
@@ -528,7 +517,7 @@
                             </a>
                           </li>
                         {% endif %}
-                        {% if logged_employee()->has([\MZ\System\Permissao::NOME_ALTERARCONFIGURACOES]) %}
+                        {% if $provider->has([\MZ\System\Permissao::NOME_ALTERARCONFIGURACOES]) %}
                           <li>
                             <a href="/gerenciar/modulo/">
                               <i class="fa fa-check-square"></i>
@@ -550,12 +539,12 @@
 
             <!-- /menu footer buttons -->
             <div class="sidebar-footer hidden-small">
-              {% if logged_employee()->has([\MZ\System\Permissao::NOME_ALTERARCONFIGURACOES]) %}
+              {% if $provider->has([\MZ\System\Permissao::NOME_ALTERARCONFIGURACOES]) %}
                 <a href="/gerenciar/sistema/" data-toggle="tooltip" data-placement="top" title="Configurações">
                   <span class="glyphicon glyphicon-cog" aria-hidden="true"></span>
                 </a>
               {% else %}
-                <a href="/gerenciar/funcionario/editar?id={{ logged_employee()->getID() }}" data-toggle="tooltip" data-placement="top" title="Configurações">
+                <a href="/gerenciar/funcionario/editar?id={{ $provider->getID() }}" data-toggle="tooltip" data-placement="top" title="Configurações">
                   <span class="glyphicon glyphicon-cog" aria-hidden="true"></span>
                 </a>
               {% endif %}
@@ -587,14 +576,14 @@
               <ul class="nav navbar-nav navbar-right">
                 <li class="">
                   <a href="javascript:;" class="user-profile dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
-                    <img src="{{ get_image_url($user->getImagem(), 'cliente', 'cliente.png') }}" alt="">{{ $user->getNome() }}
+                    <img src="{{ $user->makeImagemURL() }}" alt="">{{ $user->getNome() }}
                     <span class=" fa fa-angle-down"></span>
                   </a>
                   <ul class="dropdown-menu dropdown-usermenu animated fadeInDown pull-right">
                     <li>
                       <a href="/conta/editar">Perfil</a>
                     </li>
-                    {% if logged_employee()->has([\MZ\System\Permissao::NOME_ALTERARCONFIGURACOES]) %}
+                    {% if $provider->has([\MZ\System\Permissao::NOME_ALTERARCONFIGURACOES]) %}
                       <li>
                         <a href="/gerenciar/sistema/">
                           <span>Configurações</span></a>

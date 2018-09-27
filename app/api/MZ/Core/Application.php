@@ -229,7 +229,7 @@ class Application
             if (is_callable($ready)) {
                 $ready($this);
             } else {
-                $this->dispatch()->send();
+                $this->dispatch($this->getRequest())->send();
             }
         } catch (\Exception $e) {
             $this->handleException($e);

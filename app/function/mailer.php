@@ -21,7 +21,7 @@ function mail_recuperar($cliente)
         'automatico' => true,
         'from_name' => $company->getNome(),
         'sitename' => $company->getNome(),
-        'sitelogo' => get_image_url($company->getImagem(), 'cliente', 'empresa.png'),
+        'sitelogo' => $company->makeImagemURL(false, 'empresa.png'),
     ];
     $message = render('email_recuperar', $vars);
     /* begin test */
@@ -42,7 +42,7 @@ function mail_confirmacao($cliente)
         'automatico' => true,
         'from_name' => $company->getNome(),
         'sitename' => $company->getNome(),
-        'sitelogo' => get_image_url($company->getImagem(), 'cliente', 'empresa.png'),
+        'sitelogo' => $company->makeImagemURL(false, 'empresa.png'),
     ];
     $message = render('email_confirmacao', $vars);
     /* begin test */
@@ -65,7 +65,7 @@ function mail_contato($email, $nome, $assunto, $mensagem)
         'automatico' => false,
         'from_name' => $nome.' - '.$email,
         'sitename' => $company->getNome(),
-        'sitelogo' => get_image_url($company->getImagem(), 'cliente', 'empresa.png'),
+        'sitelogo' => $company->makeImagemURL(),
     ];
     $message = render('email_contato', $vars);
     /* begin test */
@@ -99,7 +99,7 @@ function mail_nota($email, $nome, $modo, $filters, $files = [])
         'filters' => $filters,
         'from_name' => $empresa_nome.' - '.$from,
         'sitename' => $empresa_nome,
-        'sitelogo' => get_image_url($company->getImagem(), 'cliente', 'empresa.png'),
+        'sitelogo' => $company->makeImagemURL(false, 'empresa.png'),
     ];
     if ($modo == 'contador') {
         $message = render('email_nota_contador', $vars);

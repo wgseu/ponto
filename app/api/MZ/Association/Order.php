@@ -588,8 +588,8 @@ class Order extends Pedido
                     $this->customer->fromArray($cliente->toArray());
                 }
             }
-            if (!$this->customer->exists() && Validator::checkPhone($this->customer->getFone(1))) {
-                $cliente = Cliente::findByFone($this->customer->getFone(1));
+            if (!$this->customer->exists() && Validator::checkPhone($this->customer->getTelefone()->getNumero())) {
+                $cliente = Cliente::findByFone($this->customer->getTelefone()->getNumero());
                 if ($cliente->exists()) {
                     $this->customer->fromArray($cliente->toArray());
                 }

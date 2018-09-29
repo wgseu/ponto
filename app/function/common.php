@@ -200,11 +200,6 @@ function auto_version($file)
     return $file . '?' . filemtime(app()->getPath('public') . $file);
 }
 
-function template($tFile)
-{
-    return app()->getResponse('html')->output($tFile);
-}
-
 function render($tFile, $vs = [], $hook = true)
 {
     $render = new \MZ\Template\Custom(app()->getSystem()->getSettings());
@@ -239,7 +234,27 @@ function app()
 
 function _t($key)
 {
-    return $key;
+    $messages = [];
+    $msg_path = app()->getPath('lang') . '/' . app()->system->country->getLinguagemID() . '/messages.php';
+    if (\file_exists($msg_path)) {
+        $messages = require($msg_path);
+    }
+    if (!isset($messages[$key])) {
+        $fallback = 'pt-BR';
+        $msg_path = app()->getPath('lang') . '/' . $fallback . '/messages.php';
+        $messages = require($msg_path);
+    }
+    if (!isset($messages[$key])) {
+        return $key;
+    }
+    $text = $messages[$key];
+    $args = \func_get_args();
+    \array_shift($args);
+    $argc = \count($args);
+    if ($argc == 0) {
+        return $text;
+    }
+    return \vsprintf($text, $args);
 }
 
 function is_post()

@@ -69,7 +69,7 @@ class ComposicaoOldApiController extends \MZ\Core\ApiController
             $produto = $composicao->findProdutoID();
             $unidade = $produto->findUnidadeID();
             $item = $composicao->publish();
-            $item['imagemurl'] = $produto->makeImagem(false, null);
+            $item['imagemurl'] = $produto->makeImagemURL(false, null);
             $item['produtodescricao'] = $produto->getDescricao();
             $item['produtoabreviacao'] = $produto->getAbreviacao();
             $item['produtoconteudo'] = $produto->getConteudo();

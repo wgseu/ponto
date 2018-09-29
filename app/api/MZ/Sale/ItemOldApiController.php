@@ -30,7 +30,7 @@ use MZ\Util\Filter;
 /**
  * Allow application to serve system resources
  */
-class ProdutoPedidoOldApiController extends \MZ\Core\ApiController
+class ItemOldApiController extends \MZ\Core\ApiController
 {
     public function export()
     {
@@ -47,7 +47,7 @@ class ProdutoPedidoOldApiController extends \MZ\Core\ApiController
                 $condition['!servicoid'] = isset($condition['!servicoid']) ? $condition['!servicoid'] : null;
             }
             $condition['detalhado'] = true;
-            $itens_do_pedido = ProdutoPedido::findAll($condition, [], null, null, [], ['p.id']);
+            $itens_do_pedido = Item::findAll($condition, [], null, null, [], ['p.id']);
             // Coluna dos dados
             $columns = [
                 'Pedido',

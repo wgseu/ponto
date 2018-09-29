@@ -24,11 +24,11 @@
  */
 namespace MZ\Sale;
 
-class ProdutoPedidoTest extends \MZ\Framework\TestCase
+class ItemTest extends \MZ\Framework\TestCase
 {
     public function testPublish()
     {
-        $produto_pedido = new ProdutoPedido();
+        $produto_pedido = new Item();
         $values = $produto_pedido->publish();
         $allowed = [
             'id',
@@ -36,7 +36,7 @@ class ProdutoPedidoTest extends \MZ\Framework\TestCase
             'funcionarioid',
             'produtoid',
             'servicoid',
-            'produtopedidoid',
+            'itemid',
             'descricao',
             'preco',
             'quantidade',

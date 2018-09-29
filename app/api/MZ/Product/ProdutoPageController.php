@@ -57,11 +57,7 @@ class ProdutoPageController extends PageController
             $produtos = [];
             $categoria_atual = new Categoria();
         }
-        $response = $this->getResponse();
-        $response->getEngine()->categorias = $categorias;
-        $response->getEngine()->produtos = $produtos;
-        $response->getEngine()->categoria_atual = $categoria_atual;
-        return $response->output('produto_index');
+        return $this->view('produto_index', get_defined_vars());
     }
 
     public function find()

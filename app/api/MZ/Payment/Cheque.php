@@ -30,59 +30,63 @@ use MZ\Util\Filter;
 use MZ\Util\Validator;
 
 /**
- * Cheques lançados como pagamentos
+ * Cheque de um pagamento
  */
 class Cheque extends SyncModel
 {
 
     /**
-     * Identificador do cheque
+     * Identificador da folha de cheque
      */
     private $id;
     /**
-     * Banco do cheque
+     * Cheque a qual pertence esssa folha
      */
-    private $banco_id;
+    private $cheque_id;
     /**
-     * Número da agência
+     * Número de compensação do cheque
      */
-    private $agencia;
+    private $compensacao;
     /**
-     * Número da conta do banco descrito no cheque
+     * Número da folha do cheque
      */
-    private $conta;
+    private $numero;
     /**
-     * Cliente que emitiu o cheque
+     * Valor na folha do cheque
      */
-    private $cliente_id;
+    private $valor;
     /**
-     * Quantidade de parcelas/folhas de cheque
+     * Data de vencimento do cheque
      */
-    private $parcelas;
+    private $vencimento;
     /**
-     * Total pago em cheque
+     * C1 do cheque
      */
-    private $total;
+    private $c = [];
     /**
-     * Informa se o cheque e todas as suas folhas estão cancelados
+     * Número de série do cheque
      */
-    private $cancelado;
+    private $serie;
     /**
-     * Data de cadastro do cheque
+     * Informa se o cheque foi recolhido no banco
      */
-    private $data_cadastro;
+    private $recolhido;
+    /**
+     * Data de recolhimento do cheque
+     */
+    private $recolhimento;
 
     /**
      * Constructor for a new empty instance of Cheque
-     * @param array $cheque All field and values to fill the instance
+     * @param array $folha_cheque All field and values to fill the instance
      */
-    public function __construct($cheque = [])
+    public function __construct($folha_cheque = [])
     {
-        parent::__construct($cheque);
+        parent::__construct($folha_cheque);
     }
 
     /**
-     * Identificador do cheque
+     * Identificador da folha de cheque
      * @return mixed ID of Cheque
      */
     public function getID()
@@ -102,171 +106,211 @@ class Cheque extends SyncModel
     }
 
     /**
-     * Banco do cheque
-     * @return mixed Banco of Cheque
+     * Cheque a qual pertence esssa folha
+     * @return mixed Cheque of Cheque
      */
-    public function getBancoID()
+    public function getChequeID()
     {
-        return $this->banco_id;
+        return $this->cheque_id;
     }
 
     /**
-     * Set BancoID value to new on param
-     * @param  mixed $banco_id new value for BancoID
+     * Set ChequeID value to new on param
+     * @param  mixed $cheque_id new value for ChequeID
      * @return Cheque Self instance
      */
-    public function setBancoID($banco_id)
+    public function setChequeID($cheque_id)
     {
-        $this->banco_id = $banco_id;
+        $this->cheque_id = $cheque_id;
         return $this;
     }
 
     /**
-     * Número da agência
-     * @return mixed Agência of Cheque
+     * Número de compensação do cheque
+     * @return mixed Compensação of Cheque
      */
-    public function getAgencia()
+    public function getCompensacao()
     {
-        return $this->agencia;
+        return $this->compensacao;
     }
 
     /**
-     * Set Agencia value to new on param
-     * @param  mixed $agencia new value for Agencia
+     * Set Compensacao value to new on param
+     * @param  mixed $compensacao new value for Compensacao
      * @return Cheque Self instance
      */
-    public function setAgencia($agencia)
+    public function setCompensacao($compensacao)
     {
-        $this->agencia = $agencia;
+        $this->compensacao = $compensacao;
         return $this;
     }
 
     /**
-     * Número da conta do banco descrito no cheque
-     * @return mixed Conta of Cheque
+     * Número da folha do cheque
+     * @return mixed Número of Cheque
      */
-    public function getConta()
+    public function getNumero()
     {
-        return $this->conta;
+        return $this->numero;
     }
 
     /**
-     * Set Conta value to new on param
-     * @param  mixed $conta new value for Conta
+     * Set Numero value to new on param
+     * @param  mixed $numero new value for Numero
      * @return Cheque Self instance
      */
-    public function setConta($conta)
+    public function setNumero($numero)
     {
-        $this->conta = $conta;
+        $this->numero = $numero;
         return $this;
     }
 
     /**
-     * Cliente que emitiu o cheque
-     * @return mixed Cliente of Cheque
+     * Valor na folha do cheque
+     * @return mixed Valor of Cheque
      */
-    public function getClienteID()
+    public function getValor()
     {
-        return $this->cliente_id;
+        return $this->valor;
     }
 
     /**
-     * Set ClienteID value to new on param
-     * @param  mixed $cliente_id new value for ClienteID
+     * Set Valor value to new on param
+     * @param  mixed $valor new value for Valor
      * @return Cheque Self instance
      */
-    public function setClienteID($cliente_id)
+    public function setValor($valor)
     {
-        $this->cliente_id = $cliente_id;
+        $this->valor = $valor;
         return $this;
     }
 
     /**
-     * Quantidade de parcelas/folhas de cheque
-     * @return mixed Parcelas of Cheque
+     * Data de vencimento do cheque
+     * @return mixed Vencimento of Cheque
      */
-    public function getParcelas()
+    public function getVencimento()
     {
-        return $this->parcelas;
+        return $this->vencimento;
     }
 
     /**
-     * Set Parcelas value to new on param
-     * @param  mixed $parcelas new value for Parcelas
+     * Set Vencimento value to new on param
+     * @param  mixed $vencimento new value for Vencimento
      * @return Cheque Self instance
      */
-    public function setParcelas($parcelas)
+    public function setVencimento($vencimento)
     {
-        $this->parcelas = $parcelas;
+        $this->vencimento = $vencimento;
         return $this;
     }
 
     /**
-     * Total pago em cheque
-     * @return mixed Total of Cheque
+     * C1 do cheque
+     * @param  integer $index index to get C
+     * @return mixed C1 of Cheque
      */
-    public function getTotal()
+    public function getC($index)
     {
-        return $this->total;
+        if ($index < 1 || $index > 3) {
+            throw new \Exception(
+                vsprintf(
+                    'Índice %d inválido, aceito somente de %d até %d',
+                    [intval($index), 1, 3]
+                ),
+                500
+            );
+        }
+        return $this->c[$index];
     }
 
     /**
-     * Set Total value to new on param
-     * @param  mixed $total new value for Total
+     * Set C value to new on param
+     * @param  integer $index index for set C
+     * @param  mixed $c new value for C
      * @return Cheque Self instance
      */
-    public function setTotal($total)
+    public function setC($index, $c)
     {
-        $this->total = $total;
+        if ($index < 1 || $index > 3) {
+            throw new \Exception(
+                vsprintf(
+                    'Índice %d inválido, aceito somente de %d até %d',
+                    [intval($index), 1, 3]
+                ),
+                500
+            );
+        }
+        $this->c[$index] = $c;
         return $this;
     }
 
     /**
-     * Informa se o cheque e todas as suas folhas estão cancelados
-     * @return mixed Cancelado of Cheque
+     * Número de série do cheque
+     * @return mixed Série of Cheque
      */
-    public function getCancelado()
+    public function getSerie()
     {
-        return $this->cancelado;
+        return $this->serie;
     }
 
     /**
-     * Informa se o cheque e todas as suas folhas estão cancelados
-     * @return boolean Check if o of Cancelado is selected or checked
-     */
-    public function isCancelado()
-    {
-        return $this->cancelado == 'Y';
-    }
-
-    /**
-     * Set Cancelado value to new on param
-     * @param  mixed $cancelado new value for Cancelado
+     * Set Serie value to new on param
+     * @param  mixed $serie new value for Serie
      * @return Cheque Self instance
      */
-    public function setCancelado($cancelado)
+    public function setSerie($serie)
     {
-        $this->cancelado = $cancelado;
+        $this->serie = $serie;
         return $this;
     }
 
     /**
-     * Data de cadastro do cheque
-     * @return mixed Data de cadastro of Cheque
+     * Informa se o cheque foi recolhido no banco
+     * @return mixed Recolhido of Cheque
      */
-    public function getDataCadastro()
+    public function getRecolhido()
     {
-        return $this->data_cadastro;
+        return $this->recolhido;
     }
 
     /**
-     * Set DataCadastro value to new on param
-     * @param  mixed $data_cadastro new value for DataCadastro
+     * Informa se o cheque foi recolhido no banco
+     * @return boolean Check if o of Recolhido is selected or checked
+     */
+    public function isRecolhido()
+    {
+        return $this->recolhido == 'Y';
+    }
+
+    /**
+     * Set Recolhido value to new on param
+     * @param  mixed $recolhido new value for Recolhido
      * @return Cheque Self instance
      */
-    public function setDataCadastro($data_cadastro)
+    public function setRecolhido($recolhido)
     {
-        $this->data_cadastro = $data_cadastro;
+        $this->recolhido = $recolhido;
+        return $this;
+    }
+
+    /**
+     * Data de recolhimento do cheque
+     * @return mixed Data de recolhimento of Cheque
+     */
+    public function getRecolhimento()
+    {
+        return $this->recolhimento;
+    }
+
+    /**
+     * Set Recolhimento value to new on param
+     * @param  mixed $recolhimento new value for Recolhimento
+     * @return Cheque Self instance
+     */
+    public function setRecolhimento($recolhimento)
+    {
+        $this->recolhimento = $recolhimento;
         return $this;
     }
 
@@ -277,76 +321,94 @@ class Cheque extends SyncModel
      */
     public function toArray($recursive = false)
     {
-        $cheque = parent::toArray($recursive);
-        $cheque['id'] = $this->getID();
-        $cheque['bancoid'] = $this->getBancoID();
-        $cheque['agencia'] = $this->getAgencia();
-        $cheque['conta'] = $this->getConta();
-        $cheque['clienteid'] = $this->getClienteID();
-        $cheque['parcelas'] = $this->getParcelas();
-        $cheque['total'] = $this->getTotal();
-        $cheque['cancelado'] = $this->getCancelado();
-        $cheque['datacadastro'] = $this->getDataCadastro();
-        return $cheque;
+        $folha_cheque = parent::toArray($recursive);
+        $folha_cheque['id'] = $this->getID();
+        $folha_cheque['chequeid'] = $this->getChequeID();
+        $folha_cheque['compensacao'] = $this->getCompensacao();
+        $folha_cheque['numero'] = $this->getNumero();
+        $folha_cheque['valor'] = $this->getValor();
+        $folha_cheque['vencimento'] = $this->getVencimento();
+        $folha_cheque['c1'] = $this->getC(1);
+        $folha_cheque['c2'] = $this->getC(2);
+        $folha_cheque['c3'] = $this->getC(3);
+        $folha_cheque['serie'] = $this->getSerie();
+        $folha_cheque['recolhido'] = $this->getRecolhido();
+        $folha_cheque['recolhimento'] = $this->getRecolhimento();
+        return $folha_cheque;
     }
 
     /**
      * Fill this instance with from array values, you can pass instance to
-     * @param  mixed $cheque Associated key -> value to assign into this instance
+     * @param  mixed $folha_cheque Associated key -> value to assign into this instance
      * @return Cheque Self instance
      */
-    public function fromArray($cheque = [])
+    public function fromArray($folha_cheque = [])
     {
-        if ($cheque instanceof Cheque) {
-            $cheque = $cheque->toArray();
-        } elseif (!is_array($cheque)) {
-            $cheque = [];
+        if ($folha_cheque instanceof Cheque) {
+            $folha_cheque = $folha_cheque->toArray();
+        } elseif (!is_array($folha_cheque)) {
+            $folha_cheque = [];
         }
-        parent::fromArray($cheque);
-        if (!isset($cheque['id'])) {
+        parent::fromArray($folha_cheque);
+        if (!isset($folha_cheque['id'])) {
             $this->setID(null);
         } else {
-            $this->setID($cheque['id']);
+            $this->setID($folha_cheque['id']);
         }
-        if (!isset($cheque['bancoid'])) {
-            $this->setBancoID(null);
+        if (!isset($folha_cheque['chequeid'])) {
+            $this->setChequeID(null);
         } else {
-            $this->setBancoID($cheque['bancoid']);
+            $this->setChequeID($folha_cheque['chequeid']);
         }
-        if (!isset($cheque['agencia'])) {
-            $this->setAgencia(null);
+        if (!isset($folha_cheque['compensacao'])) {
+            $this->setCompensacao(null);
         } else {
-            $this->setAgencia($cheque['agencia']);
+            $this->setCompensacao($folha_cheque['compensacao']);
         }
-        if (!isset($cheque['conta'])) {
-            $this->setConta(null);
+        if (!isset($folha_cheque['numero'])) {
+            $this->setNumero(null);
         } else {
-            $this->setConta($cheque['conta']);
+            $this->setNumero($folha_cheque['numero']);
         }
-        if (!isset($cheque['clienteid'])) {
-            $this->setClienteID(null);
+        if (!isset($folha_cheque['valor'])) {
+            $this->setValor(null);
         } else {
-            $this->setClienteID($cheque['clienteid']);
+            $this->setValor($folha_cheque['valor']);
         }
-        if (!isset($cheque['parcelas'])) {
-            $this->setParcelas(null);
+        if (!isset($folha_cheque['vencimento'])) {
+            $this->setVencimento(null);
         } else {
-            $this->setParcelas($cheque['parcelas']);
+            $this->setVencimento($folha_cheque['vencimento']);
         }
-        if (!isset($cheque['total'])) {
-            $this->setTotal(null);
+        if (!isset($folha_cheque['c1'])) {
+            $this->setC(1, null);
         } else {
-            $this->setTotal($cheque['total']);
+            $this->setC(1, $folha_cheque['c1']);
         }
-        if (!isset($cheque['cancelado'])) {
-            $this->setCancelado(null);
+        if (!isset($folha_cheque['c2'])) {
+            $this->setC(2, null);
         } else {
-            $this->setCancelado($cheque['cancelado']);
+            $this->setC(2, $folha_cheque['c2']);
         }
-        if (!isset($cheque['datacadastro'])) {
-            $this->setDataCadastro(null);
+        if (!isset($folha_cheque['c3'])) {
+            $this->setC(3, null);
         } else {
-            $this->setDataCadastro($cheque['datacadastro']);
+            $this->setC(3, $folha_cheque['c3']);
+        }
+        if (!array_key_exists('serie', $folha_cheque)) {
+            $this->setSerie(null);
+        } else {
+            $this->setSerie($folha_cheque['serie']);
+        }
+        if (!isset($folha_cheque['recolhido'])) {
+            $this->setRecolhido('N');
+        } else {
+            $this->setRecolhido($folha_cheque['recolhido']);
+        }
+        if (!array_key_exists('recolhimento', $folha_cheque)) {
+            $this->setRecolhimento(null);
+        } else {
+            $this->setRecolhimento($folha_cheque['recolhimento']);
         }
         return $this;
     }
@@ -357,8 +419,8 @@ class Cheque extends SyncModel
      */
     public function publish()
     {
-        $cheque = parent::publish();
-        return $cheque;
+        $folha_cheque = parent::publish();
+        return $folha_cheque;
     }
 
     /**
@@ -368,13 +430,16 @@ class Cheque extends SyncModel
     public function filter($original, $localized = false)
     {
         $this->setID($original->getID());
-        $this->setBancoID(Filter::number($this->getBancoID()));
-        $this->setAgencia(Filter::string($this->getAgencia()));
-        $this->setConta(Filter::string($this->getConta()));
-        $this->setClienteID(Filter::number($this->getClienteID()));
-        $this->setParcelas(Filter::number($this->getParcelas()));
-        $this->setTotal(Filter::money($this->getTotal(), $localized));
-        $this->setDataCadastro(Filter::datetime($this->getDataCadastro()));
+        $this->setChequeID(Filter::number($this->getChequeID()));
+        $this->setCompensacao(Filter::string($this->getCompensacao()));
+        $this->setNumero(Filter::string($this->getNumero()));
+        $this->setValor(Filter::money($this->getValor(), $localized));
+        $this->setVencimento(Filter::datetime($this->getVencimento()));
+        $this->setC(1, Filter::number($this->getC(1)));
+        $this->setC(2, Filter::number($this->getC(2)));
+        $this->setC(3, Filter::number($this->getC(3)));
+        $this->setSerie(Filter::string($this->getSerie()));
+        $this->setRecolhimento(Filter::datetime($this->getRecolhimento()));
     }
 
     /**
@@ -392,32 +457,35 @@ class Cheque extends SyncModel
     public function validate()
     {
         $errors = [];
-        if (is_null($this->getBancoID())) {
-            $errors['bancoid'] = 'O banco não pode ser vazio';
+        $old_folha = self::findByID($this->getID());
+        if (is_null($this->getChequeID())) {
+            $errors['chequeid'] = 'O cheque não pode ser vazio';
         }
-        if (is_null($this->getAgencia())) {
-            $errors['agencia'] = 'A agência não pode ser vazia';
+        if (is_null($this->getCompensacao())) {
+            $errors['compensacao'] = 'A compensação não pode ser vazia';
         }
-        if (is_null($this->getConta())) {
-            $errors['conta'] = 'A conta não pode ser vazia';
+        if (is_null($this->getNumero())) {
+            $errors['numero'] = 'O número não pode ser vazio';
         }
-        if (is_null($this->getClienteID())) {
-            $errors['clienteid'] = 'O cliente não pode ser vazio';
+        if (is_null($this->getValor())) {
+            $errors['valor'] = 'O valor não pode ser vazio';
         }
-        if (is_null($this->getParcelas())) {
-            $errors['parcelas'] = 'A parcelas não pode ser vazia';
+        if (is_null($this->getVencimento())) {
+            $errors['vencimento'] = 'O vencimento não pode ser vazio';
         }
-        if (is_null($this->getTotal())) {
-            $errors['total'] = 'O total não pode ser vazio';
+        if (is_null($this->getC(1))) {
+            $errors['c1'] = 'O C1 não pode ser vazio';
         }
-        if (is_null($this->getCancelado())) {
-            $errors['cancelado'] = 'O cancelado não pode ser vazio';
+        if (is_null($this->getC(2))) {
+            $errors['c2'] = 'O C2 não pode ser vazio';
         }
-        if (!Validator::checkBoolean($this->getCancelado(), true)) {
-            $errors['cancelado'] = 'O cancelado é inválido';
+        if (is_null($this->getC(3))) {
+            $errors['c3'] = 'O C3 não pode ser vazio';
         }
-        if (is_null($this->getDataCadastro())) {
-            $errors['datacadastro'] = 'A data de cadastro não pode ser vazia';
+        if (!Validator::checkBoolean($this->getRecolhido())) {
+            $errors['recolhido'] = 'A informação de recolhimento é inválida';
+        } elseif ($this->isRecolhido() && $old_folha->exists() && $old_folha->isRecolhido()) {
+            $errors['recolhido'] = 'Essa folha de cheque já foi recolhida';
         }
         if (!empty($errors)) {
             throw new \MZ\Exception\ValidationException($errors);
@@ -432,11 +500,23 @@ class Cheque extends SyncModel
      */
     protected function translate($e)
     {
+        if (stripos($e->getMessage(), 'UK_Cheques_ChequeID_Numero') !== false) {
+            return new \MZ\Exception\ValidationException([
+                'chequeid' => sprintf(
+                    'O cheque "%s" já está cadastrado',
+                    $this->getChequeID()
+                ),
+                'numero' => sprintf(
+                    'O número "%s" já está cadastrado',
+                    $this->getNumero()
+                ),
+            ]);
+        }
         return parent::translate($e);
     }
 
     /**
-     * Insert a new Cheque into the database and fill instance from database
+     * Insert a new Folha de cheque into the database and fill instance from database
      * @return Cheque Self instance
      */
     public function insert()
@@ -455,15 +535,14 @@ class Cheque extends SyncModel
     }
 
     /**
-     * Update Cheque with instance values into database for ID
-     * @param  array $only Save these fields only, when empty save all fields except id
+     * Update Folha de cheque with instance values into database for ID
      * @return Cheque Self instance
      */
     public function update($only = [])
     {
         $values = $this->validate();
         if (!$this->exists()) {
-            throw new \Exception('O identificador do cheque não foi informado');
+            throw new \Exception('O identificador da folha de cheque não foi informado');
         }
         $values = DB::filterValues($values, $only, false);
         try {
@@ -478,6 +557,13 @@ class Cheque extends SyncModel
         return $this;
     }
 
+    public function recolher()
+    {
+        $this->setRecolhido('Y');
+        $this->setRecolhimento(DB::now());
+        return $this->update();
+    }
+
     /**
      * Delete this instance from database using ID
      * @return integer Number of rows deleted (Max 1)
@@ -485,7 +571,7 @@ class Cheque extends SyncModel
     public function delete()
     {
         if (!$this->exists()) {
-            throw new \Exception('O identificador do cheque não foi informado');
+            throw new \Exception('O identificador da folha de cheque não foi informado');
         }
         $result = DB::deleteFrom('Cheques')
             ->where('id', $this->getID())
@@ -507,21 +593,26 @@ class Cheque extends SyncModel
     }
 
     /**
-     * Banco do cheque
-     * @return \MZ\Wallet\Banco The object fetched from database
+     * Load into this object from database using, ChequeID, Numero
+     * @param  int $cheque_id cheque to find Folha de cheque
+     * @param  string $numero número to find Folha de cheque
+     * @return Cheque Self filled instance or empty when not found
      */
-    public function findBancoID()
+    public function loadByChequeIDNumero($cheque_id, $numero)
     {
-        return \MZ\Wallet\Banco::findByID($this->getBancoID());
+        return $this->load([
+            'chequeid' => intval($cheque_id),
+            'numero' => strval($numero),
+        ]);
     }
 
     /**
-     * Cliente que emitiu o cheque
-     * @return \MZ\Account\Cliente The object fetched from database
+     * Cheque a qual pertence esssa folha
+     * @return \MZ\Payment\Cheque The object fetched from database
      */
-    public function findClienteID()
+    public function findChequeID()
     {
-        return \MZ\Account\Cliente::findByID($this->getClienteID());
+        return \MZ\Payment\Cheque::findByID($this->getChequeID());
     }
 
     /**
@@ -530,8 +621,8 @@ class Cheque extends SyncModel
      */
     private static function getAllowedKeys()
     {
-        $cheque = new Cheque();
-        $allowed = Filter::concatKeys('c.', $cheque->toArray());
+        $folha_cheque = new Cheque();
+        $allowed = Filter::concatKeys('f.', $folha_cheque->toArray());
         return $allowed;
     }
 
@@ -543,7 +634,7 @@ class Cheque extends SyncModel
     private static function filterOrder($order)
     {
         $allowed = self::getAllowedKeys();
-        return Filter::orderBy($order, $allowed, 'c.');
+        return Filter::orderBy($order, $allowed, ['f.', 'c.']);
     }
 
     /**
@@ -554,7 +645,14 @@ class Cheque extends SyncModel
     private static function filterCondition($condition)
     {
         $allowed = self::getAllowedKeys();
-        return Filter::keys($condition, $allowed, 'c.');
+        if (isset($condition['search'])) {
+            $search = $condition['search'];
+            $field = 'f.numero LIKE ?';
+            $condition[$field] = '%'.$search.'%';
+            $allowed[$field] = true;
+            unset($condition['search']);
+        }
+        return Filter::keys($condition, $allowed, ['f.', 'c.']);
     }
 
     /**
@@ -565,10 +663,12 @@ class Cheque extends SyncModel
      */
     private static function query($condition = [], $order = [])
     {
-        $query = DB::from('Cheques c');
+        $query = DB::from('Cheques f')
+            ->leftJoin('Cheques c ON c.id = f.chequeid');
         $condition = self::filterCondition($condition);
         $query = DB::buildOrderBy($query, self::filterOrder($order));
-        $query = $query->orderBy('c.id ASC');
+        $query = $query->orderBy('f.numero ASC');
+        $query = $query->orderBy('f.id ASC');
         return DB::buildCondition($query, $condition);
     }
 
@@ -576,7 +676,7 @@ class Cheque extends SyncModel
      * Search one register with a condition
      * @param  array $condition Condition for searching the row
      * @param  array $order order rows
-     * @return Cheque A filled Cheque or empty instance
+     * @return Cheque A filled Folha de cheque or empty instance
      */
     public static function find($condition, $order = [])
     {
@@ -586,9 +686,21 @@ class Cheque extends SyncModel
     }
 
     /**
-     * Find all Cheque
-     * @param  array  $condition Condition to get all Cheque
-     * @param  array  $order     Order Cheque
+     * Find this object on database using, ChequeID, Numero
+     * @param  int $cheque_id cheque to find Folha de cheque
+     * @param  string $numero número to find Folha de cheque
+     * @return Cheque A filled instance or empty when not found
+     */
+    public static function findByChequeIDNumero($cheque_id, $numero)
+    {
+        $result = new self();
+        return $result->loadByChequeIDNumero($cheque_id, $numero);
+    }
+
+    /**
+     * Find all Folha de cheque
+     * @param  array  $condition Condition to get all Folha de cheque
+     * @param  array  $order     Order Folha de cheque
      * @param  int    $limit     Limit data into row count
      * @param  int    $offset    Start offset to get rows
      * @return array             List of all rows instanced as Cheque

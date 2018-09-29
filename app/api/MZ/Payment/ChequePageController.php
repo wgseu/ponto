@@ -32,7 +32,7 @@ use MZ\Core\PageController;
 /**
  * Allow application to serve system resources
  */
-class FolhaChequePageController extends PageController
+class ChequePageController extends PageController
 {
     public function find()
     {
@@ -41,14 +41,14 @@ class FolhaChequePageController extends PageController
         $limite = max(1, min(100, $this->getRequest()->query->getInt('limite', 10)));
         $condition = Filter::query($this->getRequest()->query->all());
         unset($condition['ordem']);
-        $folha_cheque = new FolhaCheque($condition);
+        $folha_cheque = new Cheque($condition);
         $cheque = new Cheque($condition);
         $order = Filter::order($this->getRequest()->query->get('ordem', ''));
-        $count = FolhaCheque::count($condition);
+        $count = Cheque::count($condition);
         $page = max(1, $this->getRequest()->query->getInt('pagina', 1));
         $pager = new \Pager($count, $limite, $page, 'pagina');
         $pagination = $pager->genBasic();
-        $folhas_de_cheques = FolhaCheque::findAll($condition, $order, $limite, $pager->offset);
+        $folhas_de_cheques = Cheque::findAll($condition, $order, $limite, $pager->offset);
 
         if ($this->isJson()) {
             $items = [];
@@ -71,7 +71,7 @@ class FolhaChequePageController extends PageController
     {
         $this->needPermission([Permissao::NOME_PAGAMENTO]);
         $id = $this->getRequest()->query->getInt('id', null);
-        $folha_cheque = FolhaCheque::findByID($id);
+        $folha_cheque = Cheque::findByID($id);
         if (!$folha_cheque->exists()) {
             $msg = 'A folha de cheque não foi informada ou não existe';
             if ($this->isJson()) {

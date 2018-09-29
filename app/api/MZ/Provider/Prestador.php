@@ -704,10 +704,8 @@ class Prestador extends SyncModel
      */
     public function isOwner($permissoes = null)
     {
-        return $this->has(
-            [Permissao::NOME_RESTAURACAO],
-            $permissoes
-        );
+        $cliente = app()->auth->user->getID() == $this->getClienteID() ? app()->auth->user : $this->findClienteID();
+        return $cliente->getEmpresaID() == app()->system->company->getID() || app()->system->company->getID() == null;
     }
 
     /**

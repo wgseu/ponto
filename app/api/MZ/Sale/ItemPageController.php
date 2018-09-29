@@ -33,7 +33,7 @@ use MZ\Core\PageController;
 /**
  * Allow application to serve system resources
  */
-class ProdutoPedidoPageController extends PageController
+class ItemPageController extends PageController
 {
     public function find()
     {
@@ -70,13 +70,13 @@ class ProdutoPedidoPageController extends PageController
                 unset($condition['tipo']);
             }
         }
-        $produto_pedido = new ProdutoPedido($condition);
+        $produto_pedido = new Item($condition);
         $order = Filter::order($this->getRequest()->query->get('ordem', ''));
-        $count = ProdutoPedido::count($condition);
+        $count = Item::count($condition);
         $page = max(1, $this->getRequest()->query->getInt('pagina', 1));
         $pager = new \Pager($count, $limite, $page, 'pagina');
         $pagination = $pager->genBasic();
-        $itens_do_pedido = ProdutoPedido::findAll($condition, $order, $limite, $pager->offset);
+        $itens_do_pedido = Item::findAll($condition, $order, $limite, $pager->offset);
 
         if ($this->isJson()) {
             $items = [];
@@ -89,7 +89,7 @@ class ProdutoPedidoPageController extends PageController
         $_modulo_names = Pedido::getTipoOptions();
 
         $_estado_names = ['Valido' => 'Válido'] +
-            ProdutoPedido::getEstadoOptions() +
+            Item::getEstadoOptions() +
             ['Cancelado' => 'Cancelado'];
 
         $_tipo_names = ['Produtos' => 'Todos os produtos'] +

@@ -26,6 +26,7 @@ namespace MZ\Account;
 
 use MZ\Database\DB;
 use MZ\System\Permissao;
+use MZ\System\Sistema;
 
 class AuthenticationTest extends \MZ\Framework\TestCase
 {
@@ -62,5 +63,27 @@ class AuthenticationTest extends \MZ\Framework\TestCase
         self::authProvider([Permissao::NOME_SISTEMA]);
         $this->assertTrue(app()->getAuthentication()->getUser()->exists());
         $this->assertTrue(app()->getAuthentication()->getEmployee()->exists());
+    }
+
+    public function testAppStatus()
+    {
+        app()->getAuthentication()->logout();
+        $expected = [
+            'status' => 'ok',
+            'info' => [
+                'empresa' => [
+                    'nome' => null,
+                    'imagemurl' => null
+                ],
+            ],
+            'versao' => Sistema::VERSAO,
+            'validacao' => null,
+            'autologout' => false,
+            'acesso' => 'visitante',
+            'permissoes' => []
+        ];
+        app()->getAuthentication()->logout();
+        $result = $this->get('/app/conta/status');
+        $this->assertEquals($expected, \array_intersect_key($result, $expected));
     }
 }

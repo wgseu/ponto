@@ -35,7 +35,6 @@ class CreditoTest extends \MZ\Framework\TestCase
             'clienteid',
             'valor',
             'detalhes',
-            'funcionarioid',
             'cancelado',
             'datacadastro',
         ];

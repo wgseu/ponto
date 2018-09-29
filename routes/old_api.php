@@ -17,7 +17,7 @@ $collection = new RouteCollection();
 \MZ\Location\CidadeOldApiController::addRoutes($collection);
 \MZ\Location\BairroOldApiController::addRoutes($collection);
 \MZ\Location\LocalizacaoOldApiController::addRoutes($collection);
-\MZ\Sale\ProdutoPedidoOldApiController::addRoutes($collection);
+\MZ\Sale\ItemOldApiController::addRoutes($collection);
 \MZ\Payment\PagamentoOldApiController::addRoutes($collection);
 \MZ\Stock\FornecedorOldApiController::addRoutes($collection);
 \MZ\Stock\EstoqueOldApiController::addRoutes($collection);

@@ -290,17 +290,17 @@ class Transferencia extends SyncModel
      * Item que foi transferido
      * @return mixed Item transferido of Transferencia
      */
-    public function getProdutoPedidoID()
+    public function getItemID()
     {
         return $this->produto_pedido_id;
     }
 
     /**
-     * Set ProdutoPedidoID value to new on param
-     * @param  mixed $produto_pedido_id new value for ProdutoPedidoID
+     * Set ItemID value to new on param
+     * @param  mixed $produto_pedido_id new value for ItemID
      * @return Transferencia Self instance
      */
-    public function setProdutoPedidoID($produto_pedido_id)
+    public function setItemID($produto_pedido_id)
     {
         $this->produto_pedido_id = $produto_pedido_id;
         return $this;
@@ -363,7 +363,7 @@ class Transferencia extends SyncModel
         $transferencia['destinomesaid'] = $this->getDestinoMesaID();
         $transferencia['comandaid'] = $this->getComandaID();
         $transferencia['destinocomandaid'] = $this->getDestinoComandaID();
-        $transferencia['produtopedidoid'] = $this->getProdutoPedidoID();
+        $transferencia['itemid'] = $this->getItemID();
         $transferencia['funcionarioid'] = $this->getFuncionarioID();
         $transferencia['datahora'] = $this->getDataHora();
         return $transferencia;
@@ -427,10 +427,10 @@ class Transferencia extends SyncModel
         } else {
             $this->setDestinoComandaID($transferencia['destinocomandaid']);
         }
-        if (!array_key_exists('produtopedidoid', $transferencia)) {
-            $this->setProdutoPedidoID(null);
+        if (!array_key_exists('itemid', $transferencia)) {
+            $this->setItemID(null);
         } else {
-            $this->setProdutoPedidoID($transferencia['produtopedidoid']);
+            $this->setItemID($transferencia['itemid']);
         }
         if (!isset($transferencia['funcionarioid'])) {
             $this->setFuncionarioID(null);
@@ -468,7 +468,7 @@ class Transferencia extends SyncModel
         $this->setDestinoMesaID(Filter::number($this->getDestinoMesaID()));
         $this->setComandaID(Filter::number($this->getComandaID()));
         $this->setDestinoComandaID(Filter::number($this->getDestinoComandaID()));
-        $this->setProdutoPedidoID(Filter::number($this->getProdutoPedidoID()));
+        $this->setItemID(Filter::number($this->getItemID()));
         $this->setFuncionarioID(Filter::number($this->getFuncionarioID()));
         $this->setDataHora(Filter::datetime($this->getDataHora()));
     }
@@ -667,14 +667,14 @@ class Transferencia extends SyncModel
 
     /**
      * Item que foi transferido
-     * @return \MZ\Sale\ProdutoPedido The object fetched from database
+     * @return \MZ\Sale\Item The object fetched from database
      */
-    public function findProdutoPedidoID()
+    public function findItemID()
     {
-        if (is_null($this->getProdutoPedidoID())) {
-            return new \MZ\Sale\ProdutoPedido();
+        if (is_null($this->getItemID())) {
+            return new \MZ\Sale\Item();
         }
-        return \MZ\Sale\ProdutoPedido::findByID($this->getProdutoPedidoID());
+        return \MZ\Sale\Item::findByID($this->getItemID());
     }
 
     /**

@@ -34,7 +34,7 @@ class PaginaPageController extends PageController
 {
     public function index()
     {
-        return $this->getResponse()->output('index');
+        return $this->view('index', get_defined_vars());
     }
 
     public function contact()
@@ -89,9 +89,8 @@ class PaginaPageController extends PageController
             }
             \Thunder::error($erro[$focusctrl]);
         }
-        $response = $this->getResponse();
-        $response->setTitle('Contato');
-        return $response->output('contato_index');
+        $pagetitle = 'Contato';
+        return $this->view('contato_index', get_defined_vars());
     }
 
     /**

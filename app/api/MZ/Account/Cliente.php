@@ -24,11 +24,11 @@
  */
 namespace MZ\Account;
 
-use MZ\Database\SyncModel;
-use MZ\Database\DB;
+use MZ\Util\Mask;
 use MZ\Util\Filter;
 use MZ\Util\Validator;
-use MZ\Util\Mask;
+use MZ\Database\DB;
+use MZ\Database\SyncModel;
 use MZ\Provider\Prestador;
 use MZ\Sale\Pedido;
 use MZ\Exception\ValidationException;
@@ -52,6 +52,13 @@ class Cliente extends SyncModel
      */
     const GENERO_MASCULINO = 'Masculino';
     const GENERO_FEMININO = 'Feminino';
+
+    /**
+     * Informa o estado da conta do cliente
+     */
+    const STATUS_ATIVO = 'Ativo';
+    const STATUS_INATIVO = 'Inativo';
+    const STATUS_BLOQUEADO = 'Bloqueado';
 
     /**
      * Identificador do cliente
@@ -111,9 +118,17 @@ class Cliente extends SyncModel
      */
     private $slogan;
     /**
+     * Informa o estado da conta do cliente
+     */
+    private $status;
+    /**
      * Código secreto para recuperar a conta do cliente
      */
     private $secreto;
+    /**
+     * Se informado, significa que a senha é segura
+     */
+    private $salt;
     /**
      * Limite de compra utilizando a forma de pagamento Conta
      */
@@ -165,7 +180,7 @@ class Cliente extends SyncModel
 
     /**
      * Identificador do cliente
-     * @return mixed ID of Cliente
+     * @return int id of Cliente
      */
     public function getID()
     {
@@ -174,7 +189,7 @@ class Cliente extends SyncModel
 
     /**
      * Set ID value to new on param
-     * @param mixed $id new value for ID
+     * @param int $id Set id for Cliente
      * @return self Self instance
      */
     public function setID($id)
@@ -185,7 +200,7 @@ class Cliente extends SyncModel
 
     /**
      * Informa o tipo de pessoa, que pode ser física ou jurídica
-     * @return mixed Tipo of Cliente
+     * @return string tipo of Cliente
      */
     public function getTipo()
     {
@@ -194,7 +209,7 @@ class Cliente extends SyncModel
 
     /**
      * Set Tipo value to new on param
-     * @param mixed $tipo new value for Tipo
+     * @param string $tipo Set tipo for Cliente
      * @return self Self instance
      */
     public function setTipo($tipo)
@@ -205,7 +220,7 @@ class Cliente extends SyncModel
 
     /**
      * Informa se esse cliente faz parte da empresa informada
-     * @return mixed Empresa of Cliente
+     * @return int empresa of Cliente
      */
     public function getEmpresaID()
     {
@@ -214,7 +229,7 @@ class Cliente extends SyncModel
 
     /**
      * Set EmpresaID value to new on param
-     * @param mixed $empresa_id new value for EmpresaID
+     * @param int $empresa_id Set empresa for Cliente
      * @return self Self instance
      */
     public function setEmpresaID($empresa_id)
@@ -225,7 +240,7 @@ class Cliente extends SyncModel
 
     /**
      * Nome de usuário utilizado para entrar no sistema, aplicativo ou site
-     * @return mixed Login of Cliente
+     * @return string login of Cliente
      */
     public function getLogin()
     {
@@ -234,7 +249,7 @@ class Cliente extends SyncModel
 
     /**
      * Set Login value to new on param
-     * @param mixed $login new value for Login
+     * @param string $login Set login for Cliente
      * @return self Self instance
      */
     public function setLogin($login)
@@ -245,7 +260,7 @@ class Cliente extends SyncModel
 
     /**
      * Senha embaralhada do cliente
-     * @return mixed Senha of Cliente
+     * @return string senha of Cliente
      */
     public function getSenha()
     {
@@ -254,7 +269,7 @@ class Cliente extends SyncModel
 
     /**
      * Set Senha value to new on param
-     * @param mixed $senha new value for Senha
+     * @param string $senha Set senha for Cliente
      * @return self Self instance
      */
     public function setSenha($senha)
@@ -265,7 +280,7 @@ class Cliente extends SyncModel
 
     /**
      * Primeiro nome da pessoa física ou nome fantasia da empresa
-     * @return mixed Nome of Cliente
+     * @return string nome of Cliente
      */
     public function getNome()
     {
@@ -274,7 +289,7 @@ class Cliente extends SyncModel
 
     /**
      * Set Nome value to new on param
-     * @param mixed $nome new value for Nome
+     * @param string $nome Set nome for Cliente
      * @return self Self instance
      */
     public function setNome($nome)
@@ -285,7 +300,7 @@ class Cliente extends SyncModel
 
     /**
      * Restante do nome da pessoa física ou Razão social da empresa
-     * @return mixed Sobrenome of Cliente
+     * @return string sobrenome of Cliente
      */
     public function getSobrenome()
     {
@@ -294,7 +309,7 @@ class Cliente extends SyncModel
 
     /**
      * Set Sobrenome value to new on param
-     * @param mixed $sobrenome new value for Sobrenome
+     * @param string $sobrenome Set sobrenome for Cliente
      * @return self Self instance
      */
     public function setSobrenome($sobrenome)
@@ -305,7 +320,7 @@ class Cliente extends SyncModel
 
     /**
      * Informa o gênero do cliente do tipo pessoa física
-     * @return mixed Gênero of Cliente
+     * @return string gênero of Cliente
      */
     public function getGenero()
     {
@@ -314,7 +329,7 @@ class Cliente extends SyncModel
 
     /**
      * Set Genero value to new on param
-     * @param mixed $genero new value for Genero
+     * @param string $genero Set gênero for Cliente
      * @return self Self instance
      */
     public function setGenero($genero)
@@ -326,7 +341,7 @@ class Cliente extends SyncModel
     /**
      * Cadastro de Pessoa Física(CPF) ou Cadastro Nacional de Pessoa
      * Jurídica(CNPJ)
-     * @return mixed CPF of Cliente
+     * @return string cpf of Cliente
      */
     public function getCPF()
     {
@@ -335,7 +350,7 @@ class Cliente extends SyncModel
 
     /**
      * Set CPF value to new on param
-     * @param mixed $cpf new value for CPF
+     * @param string $cpf Set cpf for Cliente
      * @return self Self instance
      */
     public function setCPF($cpf)
@@ -346,7 +361,7 @@ class Cliente extends SyncModel
 
     /**
      * Registro Geral(RG) ou Inscrição Estadual (IE)
-     * @return mixed Registro Geral of Cliente
+     * @return string registro geral of Cliente
      */
     public function getRG()
     {
@@ -355,7 +370,7 @@ class Cliente extends SyncModel
 
     /**
      * Set RG value to new on param
-     * @param mixed $rg new value for RG
+     * @param string $rg Set registro geral for Cliente
      * @return self Self instance
      */
     public function setRG($rg)
@@ -366,7 +381,7 @@ class Cliente extends SyncModel
 
     /**
      * Inscrição municipal da empresa
-     * @return mixed Inscrição municipal of Cliente
+     * @return string inscrição municipal of Cliente
      */
     public function getIM()
     {
@@ -375,7 +390,7 @@ class Cliente extends SyncModel
 
     /**
      * Set IM value to new on param
-     * @param mixed $im new value for IM
+     * @param string $im Set inscrição municipal for Cliente
      * @return self Self instance
      */
     public function setIM($im)
@@ -386,7 +401,7 @@ class Cliente extends SyncModel
 
     /**
      * E-mail do cliente ou da empresa
-     * @return mixed E-mail of Cliente
+     * @return string e-mail of Cliente
      */
     public function getEmail()
     {
@@ -395,7 +410,7 @@ class Cliente extends SyncModel
 
     /**
      * Set Email value to new on param
-     * @param mixed $email new value for Email
+     * @param string $email Set e-mail for Cliente
      * @return self Self instance
      */
     public function setEmail($email)
@@ -406,7 +421,7 @@ class Cliente extends SyncModel
 
     /**
      * Data de aniversário sem o ano ou data de fundação
-     * @return mixed Data de aniversário of Cliente
+     * @return string data de aniversário of Cliente
      */
     public function getDataAniversario()
     {
@@ -415,7 +430,7 @@ class Cliente extends SyncModel
 
     /**
      * Set DataAniversario value to new on param
-     * @param mixed $data_aniversario new value for DataAniversario
+     * @param string $data_aniversario Set data de aniversário for Cliente
      * @return self Self instance
      */
     public function setDataAniversario($data_aniversario)
@@ -426,7 +441,7 @@ class Cliente extends SyncModel
 
     /**
      * Slogan ou detalhes do cliente
-     * @return mixed Observação of Cliente
+     * @return string observação of Cliente
      */
     public function getSlogan()
     {
@@ -435,7 +450,7 @@ class Cliente extends SyncModel
 
     /**
      * Set Slogan value to new on param
-     * @param mixed $slogan new value for Slogan
+     * @param string $slogan Set observação for Cliente
      * @return self Self instance
      */
     public function setSlogan($slogan)
@@ -445,8 +460,28 @@ class Cliente extends SyncModel
     }
 
     /**
+     * Informa o estado da conta do cliente
+     * @return string status of Cliente
+     */
+    public function getStatus()
+    {
+        return $this->status;
+    }
+
+    /**
+     * Set Status value to new on param
+     * @param string $status Set status for Cliente
+     * @return self Self instance
+     */
+    public function setStatus($status)
+    {
+        $this->status = $status;
+        return $this;
+    }
+
+    /**
      * Código secreto para recuperar a conta do cliente
-     * @return mixed Código de recuperação of Cliente
+     * @return string código de recuperação of Cliente
      */
     public function getSecreto()
     {
@@ -455,7 +490,7 @@ class Cliente extends SyncModel
 
     /**
      * Set Secreto value to new on param
-     * @param mixed $secreto new value for Secreto
+     * @param string $secreto Set código de recuperação for Cliente
      * @return self Self instance
      */
     public function setSecreto($secreto)
@@ -465,8 +500,28 @@ class Cliente extends SyncModel
     }
 
     /**
+     * Se informado, significa que a senha é segura
+     * @return string código de segurança of Cliente
+     */
+    public function getSalt()
+    {
+        return $this->salt;
+    }
+
+    /**
+     * Set Salt value to new on param
+     * @param string $salt Set código de segurança for Cliente
+     * @return self Self instance
+     */
+    public function setSalt($salt)
+    {
+        $this->salt = $salt;
+        return $this;
+    }
+
+    /**
      * Limite de compra utilizando a forma de pagamento Conta
-     * @return mixed Limite de compra of Cliente
+     * @return string limite de compra of Cliente
      */
     public function getLimiteCompra()
     {
@@ -475,7 +530,7 @@ class Cliente extends SyncModel
 
     /**
      * Set LimiteCompra value to new on param
-     * @param mixed $limite_compra new value for LimiteCompra
+     * @param string $limite_compra Set limite de compra for Cliente
      * @return self Self instance
      */
     public function setLimiteCompra($limite_compra)
@@ -486,7 +541,7 @@ class Cliente extends SyncModel
 
     /**
      * URL para acessar a página do Facebook do cliente
-     * @return mixed Facebook of Cliente
+     * @return string facebook of Cliente
      */
     public function getFacebookURL()
     {
@@ -495,7 +550,7 @@ class Cliente extends SyncModel
 
     /**
      * Set FacebookURL value to new on param
-     * @param mixed $facebook_url new value for FacebookURL
+     * @param string $facebook_url Set facebook for Cliente
      * @return self Self instance
      */
     public function setFacebookURL($facebook_url)
@@ -506,7 +561,7 @@ class Cliente extends SyncModel
 
     /**
      * URL para acessar a página do Twitter do cliente
-     * @return mixed Twitter of Cliente
+     * @return string twitter of Cliente
      */
     public function getTwitterURL()
     {
@@ -515,7 +570,7 @@ class Cliente extends SyncModel
 
     /**
      * Set TwitterURL value to new on param
-     * @param mixed $twitter_url new value for TwitterURL
+     * @param string $twitter_url Set twitter for Cliente
      * @return self Self instance
      */
     public function setTwitterURL($twitter_url)
@@ -526,7 +581,7 @@ class Cliente extends SyncModel
 
     /**
      * URL para acessar a página do LinkedIn do cliente
-     * @return mixed LinkedIn of Cliente
+     * @return string linkedin of Cliente
      */
     public function getLinkedInURL()
     {
@@ -535,7 +590,7 @@ class Cliente extends SyncModel
 
     /**
      * Set LinkedInURL value to new on param
-     * @param mixed $linked_in_url new value for LinkedInURL
+     * @param string $linked_in_url Set linkedin for Cliente
      * @return self Self instance
      */
     public function setLinkedInURL($linked_in_url)
@@ -546,7 +601,7 @@ class Cliente extends SyncModel
 
     /**
      * Foto do cliente ou logo da empresa
-     * @return mixed Foto of Cliente
+     * @return string foto of Cliente
      */
     public function getImagemURL()
     {
@@ -555,7 +610,7 @@ class Cliente extends SyncModel
 
     /**
      * Set ImagemURL value to new on param
-     * @param mixed $imagem_url new value for ImagemURL
+     * @param string $imagem_url Set foto for Cliente
      * @return self Self instance
      */
     public function setImagemURL($imagem_url)
@@ -567,7 +622,7 @@ class Cliente extends SyncModel
     /**
      * Código da linguagem utilizada pelo cliente para visualizar o aplicativo
      * e o site, Ex: pt-BR
-     * @return mixed Linguagem of Cliente
+     * @return string linguagem of Cliente
      */
     public function getLinguagem()
     {
@@ -576,7 +631,7 @@ class Cliente extends SyncModel
 
     /**
      * Set Linguagem value to new on param
-     * @param mixed $linguagem new value for Linguagem
+     * @param string $linguagem Set linguagem for Cliente
      * @return self Self instance
      */
     public function setLinguagem($linguagem)
@@ -587,7 +642,7 @@ class Cliente extends SyncModel
 
     /**
      * Data de atualização das informações do cliente
-     * @return mixed Data de atualização of Cliente
+     * @return string data de atualização of Cliente
      */
     public function getDataAtualizacao()
     {
@@ -596,7 +651,7 @@ class Cliente extends SyncModel
 
     /**
      * Set DataAtualizacao value to new on param
-     * @param mixed $data_atualizacao new value for DataAtualizacao
+     * @param string $data_atualizacao Set data de atualização for Cliente
      * @return self Self instance
      */
     public function setDataAtualizacao($data_atualizacao)
@@ -607,7 +662,7 @@ class Cliente extends SyncModel
 
     /**
      * Data de cadastro do cliente
-     * @return mixed Data de cadastro of Cliente
+     * @return string data de cadastro of Cliente
      */
     public function getDataCadastro()
     {
@@ -616,7 +671,7 @@ class Cliente extends SyncModel
 
     /**
      * Set DataCadastro value to new on param
-     * @param mixed $data_cadastro new value for DataCadastro
+     * @param string $data_cadastro Set data de cadastro for Cliente
      * @return self Self instance
      */
     public function setDataCadastro($data_cadastro)
@@ -672,7 +727,9 @@ class Cliente extends SyncModel
         $cliente['email'] = $this->getEmail();
         $cliente['dataaniversario'] = $this->getDataAniversario();
         $cliente['slogan'] = $this->getSlogan();
+        $cliente['status'] = $this->getStatus();
         $cliente['secreto'] = $this->getSecreto();
+        $cliente['salt'] = $this->getSalt();
         $cliente['limitecompra'] = $this->getLimiteCompra();
         $cliente['facebookurl'] = $this->getFacebookURL();
         $cliente['twitterurl'] = $this->getTwitterURL();
@@ -774,10 +831,20 @@ class Cliente extends SyncModel
         } else {
             $this->setSlogan($cliente['slogan']);
         }
+        if (!isset($cliente['status'])) {
+            $this->setStatus(self::STATUS_INATIVO);
+        } else {
+            $this->setStatus($cliente['status']);
+        }
         if (!array_key_exists('secreto', $cliente)) {
             $this->setSecreto(null);
         } else {
             $this->setSecreto($cliente['secreto']);
+        }
+        if (!array_key_exists('salt', $cliente)) {
+            $this->setSalt(null);
+        } else {
+            $this->setSalt($cliente['salt']);
         }
         if (!array_key_exists('limitecompra', $cliente)) {
             $this->setLimiteCompra(null);
@@ -912,6 +979,7 @@ class Cliente extends SyncModel
             $cliente['fone1'] = null;
         }
         unset($cliente['secreto']);
+        unset($cliente['salt']);
         $cliente['imagemurl'] = $this->makeImagemURL(false, null);
         return $cliente;
     }
@@ -919,11 +987,14 @@ class Cliente extends SyncModel
     /**
      * Filter fields, upload data and keep key data
      * @param self $original Original instance without modifications
+     * @param boolean $localized Informs if fields are localized
+     * @return self Self instance
      */
     public function filter($original, $localized = false)
     {
         $this->setID($original->getID());
         $this->setSecreto($original->getSecreto());
+        $this->setSalt($original->getSalt());
         $this->setLimiteCompra(Filter::float($original->getLimiteCompra(), $localized));
         $this->setEmpresaID(Filter::number($this->getEmpresaID()));
         $this->setLogin(Filter::string($this->getLogin()));
@@ -956,6 +1027,7 @@ class Cliente extends SyncModel
         } else {
             $this->setImagemURL($imagem_url);
         }
+        return $this;
     }
 
     /**
@@ -972,51 +1044,51 @@ class Cliente extends SyncModel
 
     /**
      * Validate fields updating them and throw exception when invalid data has found
-     * @return mixed[] All field of Cliente in array format
-     * @throws \MZ\Exception\ValidationException When password does't match
+     * @return array All field of Cliente in array format
+     * @throws \MZ\Exception\ValidationException for invalid input data
      */
     public function validate()
     {
         $errors = [];
         $prestador = Prestador::findByClienteID($this->getID());
         if (!Validator::checkInSet($this->getTipo(), self::getTipoOptions())) {
-            $errors['tipo'] = 'O tipo não foi informado ou é inválido';
+            $errors['tipo'] = _t('cliente.tipo_invalid');
         }
         if ($prestador->exists() && $this->getTipo() != self::TIPO_FISICA) {
-            $errors['tipo'] = 'O funcionário deve ser uma pessoa física';
+            $errors['tipo'] = _t('cliente.employee_humman');
         }
         if (!Validator::checkUsername($this->getLogin(), true)) {
-            $errors['login'] = 'O login é inválido';
+            $errors['login'] = _t('login_invalid');
         }
         if ($prestador->exists() && is_null($this->getLogin())) {
-            $errors['login'] = 'Login obrigatório para o tipo de conta';
+            $errors['login'] = _t('employee_need_login');
         }
         if (!Validator::checkPassword($this->getSenha(), $this->exists())) {
-            $errors['senha'] = 'A senha deve possuir no mínimo 4 caracteres';
+            $errors['senha'] = _t('senha_insecure');
         }
         if (!is_null($this->getSenha())) {
             $this->gerarSenha();
         }
         if (is_null($this->getNome())) {
-            $errors['nome'] = 'O nome não pode ser vazio';
+            $errors['nome'] = _t('cliente.nome_cannot_empty');
         }
         if (strlen($this->getNome()) < 2) {
-            $errors['nome'] = 'Nome inválido';
+            $errors['nome'] = _t('cliente.nome_invalid');
         }
         if (!Validator::checkInSet($this->getGenero(), self::getGeneroOptions())) {
-            $errors['genero'] = 'O gênero é inválido';
+            $errors['genero'] = _t('cliente.genero_invalid');
         }
         if ($this->getTipo() == self::TIPO_FISICA) {
             if (!Validator::checkCPF($this->getCPF(), true)) {
-                $errors['cpf'] = sprintf('O %s é inválido', _p('Titulo', 'CPF'));
+                $errors['cpf'] = _t('cpf_invalid', _p('Titulo', 'CPF'));
             }
         } else {
             if (!Validator::checkCNPJ($this->getCPF(), true)) {
-                $errors['cpf'] = sprintf('O %s é inválido', _p('Titulo', 'CNPJ'));
+                $errors['cpf'] = _t('cpf_invalid', _p('Titulo', 'CNPJ'));
             }
         }
         if (!Validator::checkEmail($this->getEmail(), true)) {
-            $errors['email'] = 'O e-mail é inválido';
+            $errors['email'] = _t('email_invalid');
         }
         if (is_null($this->getCPF()) &&
             is_null($this->getTelefone()->getNumero()) &&
@@ -1027,13 +1099,13 @@ class Cliente extends SyncModel
             if ($this->getTipo() == self::TIPO_JURIDICA) {
                 $cpf_title = _p('Titulo', 'CNPJ');
             }
-            $errors['email'] = sprintf(
-                'Nenhum dado chave foi informado, informe um Telefone, Usuário, E-mail ou %s',
-                $cpf_title
-            );
+            $errors['email'] = _t('cliente.none_key', $cpf_title);
+        }
+        if (!Validator::checkInSet($this->getStatus(), self::getStatusOptions())) {
+            $errors['status'] = _t('cliente.status_invalid');
         }
         if (!is_null($this->getLimiteCompra()) && $this->getLimiteCompra() < 0) {
-            $errors['limitecompra'] = 'O limite de compra não pode ser negativo';
+            $errors['limitecompra'] = _t('cliente.limitecompra_negative');
         }
         $this->setDataCadastro(DB::now());
         $this->setDataAtualizacao(DB::now());
@@ -1071,31 +1143,38 @@ class Cliente extends SyncModel
     {
         if (contains(['Email', 'UNIQUE'], $e->getMessage())) {
             return new ValidationException([
-                'email' => sprintf(
-                    'O e-mail "%s" já está cadastrado',
+                'email' => _t(
+                    'cliente.email_used',
                     $this->getEmail()
                 ),
             ]);
         }
         if (contains(['CPF', 'UNIQUE'], $e->getMessage())) {
+            $cpf_title = _p('Titulo', 'CPF');
+            if ($this->getTipo() == self::TIPO_JURIDICA) {
+                $cpf_title = _p('Titulo', 'CNPJ');
+            }
             return new ValidationException([
-                'cpf' => sprintf(
-                    'O cpf "%s" já está cadastrado',
-                    $this->getCPF()
+                'cpf' => _t(
+                    'cliente.cpf_used',
+                    $cpf_title
                 ),
             ]);
         }
         if (contains(['Login', 'UNIQUE'], $e->getMessage())) {
             return new ValidationException([
-                'login' => sprintf(
-                    'O login "%s" já está cadastrado',
+                'login' => _t(
+                    'cliente.login_used',
                     $this->getLogin()
                 ),
             ]);
         }
         if (contains(['Secreto', 'UNIQUE'], $e->getMessage())) {
             return new ValidationException([
-                'secreto' => 'Não foi possível gerar o código de recuperação',
+                'secreto' => _t(
+                    'cliente.recover_code',
+                    $this->getSecreto()
+                ),
             ]);
         }
         return parent::translate($e);
@@ -1104,7 +1183,7 @@ class Cliente extends SyncModel
     /**
      * Insert a new Cliente into the database and fill instance from database
      * @return self Self instance
-     * @throws \MZ\Exception\ValidationException When password does't match
+     * @throws \MZ\Exception\ValidationException for invalid input data
      */
     public function insert()
     {
@@ -1133,13 +1212,15 @@ class Cliente extends SyncModel
      * Update Cliente with instance values into database for ID
      * @param array $only Save these fields only, when empty save all fields except id
      * @return int rows affected
-     * @throws \MZ\Exception\ValidationException When password does't match
+     * @throws \MZ\Exception\ValidationException for invalid input data
      */
     public function update($only = [])
     {
         $values = $this->validate();
         if (!$this->exists()) {
-            throw new \Exception('O identificador do cliente não foi informado');
+            throw new ValidationException(
+                ['id' => _t('cliente.id_cannot_empty')]
+            );
         }
         $values = DB::filterValues($values, $only, false);
         unset($values['datacadastro']);
@@ -1166,11 +1247,14 @@ class Cliente extends SyncModel
     /**
      * Delete this instance from database using ID
      * @return integer Number of rows deleted (Max 1)
+     * @throws \MZ\Exception\ValidationException for invalid id
      */
     public function delete()
     {
         if (!$this->exists()) {
-            throw new \Exception('O identificador do cliente não foi informado');
+            throw new ValidationException(
+                ['id' => _t('cliente.id_cannot_empty')]
+            );
         }
         $result = DB::deleteFrom('Clientes')
             ->where('id', $this->getID())
@@ -1273,13 +1357,13 @@ class Cliente extends SyncModel
     /**
      * Gets textual and translated Tipo for Cliente
      * @param int $index choose option from index
-     * @return mixed A associative key -> translated representative text or text for index
+     * @return string[]|string A associative key -> translated representative text or text for index
      */
     public static function getTipoOptions($index = null)
     {
         $options = [
-            self::TIPO_FISICA => 'Física',
-            self::TIPO_JURIDICA => 'Jurídica',
+            self::TIPO_FISICA => _t('cliente.tipo_fisica'),
+            self::TIPO_JURIDICA => _t('cliente.tipo_juridica'),
         ];
         if (!is_null($index)) {
             return $options[$index];
@@ -1290,13 +1374,31 @@ class Cliente extends SyncModel
     /**
      * Gets textual and translated Genero for Cliente
      * @param int $index choose option from index
-     * @return mixed A associative key -> translated representative text or text for index
+     * @return string[]|string A associative key -> translated representative text or text for index
      */
     public static function getGeneroOptions($index = null)
     {
         $options = [
-            self::GENERO_MASCULINO => 'Masculino',
-            self::GENERO_FEMININO => 'Feminino',
+            self::GENERO_MASCULINO => _t('cliente.genero_masculino'),
+            self::GENERO_FEMININO => _t('cliente.genero_feminino'),
+        ];
+        if (!is_null($index)) {
+            return $options[$index];
+        }
+        return $options;
+    }
+
+    /**
+     * Gets textual and translated Status for Cliente
+     * @param int $index choose option from index
+     * @return string[]|string A associative key -> translated representative text or text for index
+     */
+    public static function getStatusOptions($index = null)
+    {
+        $options = [
+            self::STATUS_ATIVO => _t('cliente.status_ativo'),
+            self::STATUS_INATIVO => _t('cliente.status_inativo'),
+            self::STATUS_BLOQUEADO => _t('cliente.status_bloqueado'),
         ];
         if (!is_null($index)) {
             return $options[$index];
@@ -1464,9 +1566,25 @@ class Cliente extends SyncModel
     }
 
     /**
+     * Search one register with a condition
+     * @param array $condition Condition for searching the row
+     * @param array $order order rows
+     * @return self A filled Cliente or empty instance
+     * @throws \Exception when register has not found
+     */
+    public static function findOrFail($condition, $order = [])
+    {
+        $result = self::find($condition, $order);
+        if (!$result->exists()) {
+            throw new \Exception(_t('cliente.not_found'), 404);
+        }
+        return $result;
+    }
+
+    /**
      * Find this object on database using, Fone
-     * @param  string $fone telefone to find Cliente
-     * @return Cliente A filled instance or empty when not found
+     * @param string $fone telefone to find Cliente
+     * @return self A filled instance or empty when not found
      */
     public static function findByFone($fone)
     {
@@ -1555,10 +1673,10 @@ class Cliente extends SyncModel
 
     /**
      * Find all Cliente
-     * @param array   $condition Condition to get all Cliente
-     * @param array   $order     Order Cliente
-     * @param int     $limit     Limit data into row count
-     * @param int     $offset    Start offset to get rows
+     * @param array  $condition Condition to get all Cliente
+     * @param array  $order     Order Cliente
+     * @param int    $limit     Limit data into row count
+     * @param int    $offset    Start offset to get rows
      * @return self[] List of all rows instanced as Cliente
      */
     public static function findAll($condition = [], $order = [], $limit = null, $offset = null)

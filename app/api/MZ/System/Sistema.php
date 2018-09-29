@@ -79,49 +79,49 @@ class Sistema extends Model
      * Business information
      * @var Empresa
      */
-    private $business;
+    public $business;
     
     /**
      * Enterprise that manages this system
      * @var \MZ\Account\Cliente
      */
-    private $company;
+    public $company;
 
     /**
      * Company address
      * @var \MZ\Location\Localizacao
      */
-    private $localization;
+    public $localization;
 
     /**
      * Company district location
      * @var \MZ\Location\Bairro
      */
-    private $district;
+    public $district;
 
     /**
      * Company city location
      * @var \MZ\Location\Cidade
      */
-    private $city;
+    public $city;
 
     /**
      * Company state location
      * @var \MZ\Location\Estado
      */
-    private $state;
+    public $state;
 
     /**
      * Company country location
      * @var \MZ\Location\Pais
      */
-    private $country;
+    public $country;
 
     /**
      * Country main currency
      * @var \MZ\Wallet\Moeda
      */
-    private $currency;
+    public $currency;
 
     /**
      * Country region options

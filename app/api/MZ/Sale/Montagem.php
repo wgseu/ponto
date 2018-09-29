@@ -34,7 +34,7 @@ use MZ\Product\Composicao;
 /**
  * Montagem de pacote, informa a formação de um pacote
  */
-class Montagem extends ProdutoPedido
+class Montagem extends Item
 {
     /**
      * Grupos formados
@@ -121,7 +121,7 @@ class Montagem extends ProdutoPedido
      */
     public function fromArray($montagem = [])
     {
-        if ($montagem instanceof ProdutoPedido) {
+        if ($montagem instanceof Item) {
             $montagem = $montagem->toArray();
         } elseif (!is_array($montagem)) {
             $montagem = [];
@@ -224,7 +224,7 @@ class Montagem extends ProdutoPedido
 
     /**
      * Adiciona um item e suas formações à montagem do pacote
-     * @param ProdutoPedido $item item do pacote
+     * @param Item $item item do pacote
      * @param array $formacoes lista de formações do item
      * @return Montagem Self instance
      */
@@ -274,7 +274,7 @@ class Montagem extends ProdutoPedido
                 throw new \Exception('Propriedade não deve conter composições');
             }
             // ignora o pacote principal quando não tem propriedades
-            if (count($formacoes) == 0 && !is_null($item->getProdutoPedidoID())) {
+            if (count($formacoes) == 0 && !is_null($item->getItemID())) {
                 $produto = $item->findProdutoID();
                 throw new \Exception(
                     sprintf(
@@ -564,8 +564,8 @@ class Montagem extends ProdutoPedido
             }
         });
         $errors = [];
-        if (!is_null($this->getProdutoPedidoID())) {
-            $errors['produtopedidoid'] = 'O pacote principal não pode fazer parte de outro';
+        if (!is_null($this->getItemID())) {
+            $errors['itemid'] = 'O pacote principal não pode fazer parte de outro';
         }
         if (!empty($errors)) {
             throw new \MZ\Exception\ValidationException($errors);

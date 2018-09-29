@@ -169,7 +169,7 @@ class ClienteOldApiController extends \MZ\Core\ApiController
         $status['info'] = [
             'empresa' => [
                 'nome' => $company->getNome(),
-                'imagemurl' => $company->makeImagem(false, null)
+                'imagemurl' => $company->makeImagemURL(false, null)
             ]
         ];
         $status['versao'] = Sistema::VERSAO;

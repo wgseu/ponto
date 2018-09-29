@@ -104,17 +104,17 @@ class Formacao extends SyncModel
      * Informa qual foi o produto vendido para essa formação
      * @return mixed Item do pedido of Formacao
      */
-    public function getProdutoPedidoID()
+    public function getItemID()
     {
         return $this->produto_pedido_id;
     }
 
     /**
-     * Set ProdutoPedidoID value to new on param
-     * @param  mixed $produto_pedido_id new value for ProdutoPedidoID
+     * Set ItemID value to new on param
+     * @param  mixed $produto_pedido_id new value for ItemID
      * @return Formacao Self instance
      */
-    public function setProdutoPedidoID($produto_pedido_id)
+    public function setItemID($produto_pedido_id)
     {
         $this->produto_pedido_id = $produto_pedido_id;
         return $this;
@@ -211,7 +211,7 @@ class Formacao extends SyncModel
     {
         $formacao = parent::toArray($recursive);
         $formacao['id'] = $this->getID();
-        $formacao['produtopedidoid'] = $this->getProdutoPedidoID();
+        $formacao['itemid'] = $this->getItemID();
         $formacao['tipo'] = $this->getTipo();
         $formacao['pacoteid'] = $this->getPacoteID();
         $formacao['composicaoid'] = $this->getComposicaoID();
@@ -237,10 +237,10 @@ class Formacao extends SyncModel
         } else {
             $this->setID($formacao['id']);
         }
-        if (!isset($formacao['produtopedidoid'])) {
-            $this->setProdutoPedidoID(null);
+        if (!isset($formacao['itemid'])) {
+            $this->setItemID(null);
         } else {
-            $this->setProdutoPedidoID($formacao['produtopedidoid']);
+            $this->setItemID($formacao['itemid']);
         }
         if (!isset($formacao['tipo'])) {
             $this->setTipo(null);
@@ -282,7 +282,7 @@ class Formacao extends SyncModel
     public function filter($original, $localized = false)
     {
         $this->setID($original->getID());
-        $this->setProdutoPedidoID(Filter::number($this->getProdutoPedidoID()));
+        $this->setItemID(Filter::number($this->getItemID()));
         $this->setPacoteID(Filter::number($this->getPacoteID()));
         $this->setComposicaoID(Filter::number($this->getComposicaoID()));
         $this->setQuantidade(Filter::float($this->getQuantidade(), $localized));
@@ -303,8 +303,8 @@ class Formacao extends SyncModel
     public function validate()
     {
         $errors = [];
-        if (is_null($this->getProdutoPedidoID())) {
-            $errors['produtopedidoid'] = 'O item do pedido não pode ser vazio';
+        if (is_null($this->getItemID())) {
+            $errors['itemid'] = 'O item do pedido não pode ser vazio';
         }
         if (!Validator::checkInSet($this->getTipo(), self::getTipoOptions())) {
             $errors['tipo'] = 'O tipo não foi informado ou é inválido';
@@ -325,11 +325,11 @@ class Formacao extends SyncModel
      */
     protected function translate($e)
     {
-        if (stripos($e->getMessage(), 'UK_Formacoes_ProdutoPedidoID_PacoteID') !== false) {
+        if (stripos($e->getMessage(), 'UK_Formacoes_ItemID_PacoteID') !== false) {
             return new \MZ\Exception\ValidationException([
-                'produtopedidoid' => sprintf(
+                'itemid' => sprintf(
                     'O item do pedido "%s" já está cadastrado',
-                    $this->getProdutoPedidoID()
+                    $this->getItemID()
                 ),
                 'pacoteid' => sprintf(
                     'O pacote "%s" já está cadastrado',
@@ -412,26 +412,26 @@ class Formacao extends SyncModel
     }
 
     /**
-     * Load into this object from database using, ProdutoPedidoID, PacoteID
+     * Load into this object from database using, ItemID, PacoteID
      * @param  int $produto_pedido_id item do pedido to find Formação
      * @param  int $pacote_id pacote to find Formação
      * @return Formacao Self filled instance or empty when not found
      */
-    public function loadByProdutoPedidoIDPacoteID($produto_pedido_id, $pacote_id)
+    public function loadByItemIDPacoteID($produto_pedido_id, $pacote_id)
     {
         return $this->load([
-            'produtopedidoid' => intval($produto_pedido_id),
+            'itemid' => intval($produto_pedido_id),
             'pacoteid' => intval($pacote_id),
         ]);
     }
 
     /**
      * Informa qual foi o produto vendido para essa formação
-     * @return \MZ\Sale\ProdutoPedido The object fetched from database
+     * @return \MZ\Sale\Item The object fetched from database
      */
-    public function findProdutoPedidoID()
+    public function findItemID()
     {
-        return \MZ\Sale\ProdutoPedido::findByID($this->getProdutoPedidoID());
+        return \MZ\Sale\Item::findByID($this->getItemID());
     }
 
     /**
@@ -537,15 +537,15 @@ class Formacao extends SyncModel
     }
 
     /**
-     * Find this object on database using, ProdutoPedidoID, PacoteID
+     * Find this object on database using, ItemID, PacoteID
      * @param  int $produto_pedido_id item do pedido to find Formação
      * @param  int $pacote_id pacote to find Formação
      * @return Formacao A filled instance or empty when not found
      */
-    public static function findByProdutoPedidoIDPacoteID($produto_pedido_id, $pacote_id)
+    public static function findByItemIDPacoteID($produto_pedido_id, $pacote_id)
     {
         $result = new self();
-        return $result->loadByProdutoPedidoIDPacoteID($produto_pedido_id, $pacote_id);
+        return $result->loadByItemIDPacoteID($produto_pedido_id, $pacote_id);
     }
 
     /**

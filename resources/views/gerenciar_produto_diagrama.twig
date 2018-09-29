@@ -14,7 +14,7 @@
           name: '{{ single_quotes($_produto->getAbreviado()) }}',
           title: '{{ quantify($_composicao->getQuantidade(), $_unidade->getSigla(), $_produto->getConteudo()) }} = {{ $this->currency($_composicao->getValor() * $_composicao->getQuantidade()) }}'
         },
-        image: '{{ $_produto->makeImagem() }}'
+        image: '{{ $_produto->makeImagemURL() }}'
       },
     {% endfor %}
   ];

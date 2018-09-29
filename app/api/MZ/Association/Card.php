@@ -31,21 +31,29 @@ class Card
 {
     /**
      * Integration
+     * @var \MZ\System\Integracao
      */
     private $integracao;
     /**
      * Dados
+     * @var array
      */
     private $dados;
     /**
      * Cartões
+     * @var array
      */
     private $cartoes;
     /**
      * Códigos
+     * @var array
      */
     private $codigos;
 
+    /**
+     * @param \MZ\System\Integracao $integracao
+     * @param array $codigos
+     */
     public function __construct($integracao, $codigos)
     {
         $this->integracao = $integracao;

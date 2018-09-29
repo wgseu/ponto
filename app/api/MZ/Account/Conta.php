@@ -24,17 +24,55 @@
  */
 namespace MZ\Account;
 
-use MZ\Database\SyncModel;
-use MZ\Database\DB;
+use MZ\Util\Mask;
 use MZ\Util\Filter;
 use MZ\Util\Validator;
+use MZ\Database\DB;
+use MZ\Database\SyncModel;
+use MZ\Exception\ValidationException;
 
 /**
  * Contas a pagar e ou receber
  */
 class Conta extends SyncModel
 {
-    const MOVIMENTACAO_ID = 1;
+
+    /**
+     * Tipo de conta se receita ou despesa
+     */
+    const TIPO_RECEITA = 'Receita';
+    const TIPO_DESPESA = 'Despesa';
+
+    /**
+     * Fonte dos valores, comissão e remuneração se pagar antes do vencimento,
+     * o valor será proporcional
+     */
+    const FONTE_FIXA = 'Fixa';
+    const FONTE_VARIAVEL = 'Variavel';
+    const FONTE_COMISSAO = 'Comissao';
+    const FONTE_REMUNERACAO = 'Remuneracao';
+
+    /**
+     * Modo de cobrança se diário ou mensal, a quantidade é definida em
+     * frequencia
+     */
+    const MODO_DIARIO = 'Diario';
+    const MODO_MENSAL = 'Mensal';
+
+    /**
+     * Fórmula de juros que será cobrado em caso de atraso
+     */
+    const FORMULA_SIMPLES = 'Simples';
+    const FORMULA_COMPOSTO = 'Composto';
+
+    /**
+     * Informa o estado da conta, desativa quando agrupa
+     */
+    const ESTADO_ANALISE = 'Analise';
+    const ESTADO_ATIVA = 'Ativa';
+    const ESTADO_PAGA = 'Paga';
+    const ESTADO_CANCELADA = 'Cancelada';
+    const ESTADO_DESATIVADA = 'Desativada';
 
     /**
      * Código da conta
@@ -49,9 +87,20 @@ class Conta extends SyncModel
      */
     private $funcionario_id;
     /**
-     * Subclassificação da conta
+     * Informa a conta principal
      */
-    private $sub_classificacao_id;
+    private $conta_id;
+    /**
+     * Informa se esta conta foi agrupada e não precisa ser mais paga
+     * individualmente, uma conta agrupada é tratada internamente como
+     * desativada
+     */
+    private $agrupamento_id;
+    /**
+     * Informa a carteira que essa conta será paga automaticamente ou para
+     * informar as contas a pagar dessa carteira
+     */
+    private $carteira_id;
     /**
      * Cliente a qual a conta pertence
      */
@@ -61,6 +110,10 @@ class Conta extends SyncModel
      */
     private $pedido_id;
     /**
+     * Tipo de conta se receita ou despesa
+     */
+    private $tipo;
+    /**
      * Descrição da conta
      */
     private $descricao;
@@ -69,30 +122,53 @@ class Conta extends SyncModel
      */
     private $valor;
     /**
+     * Fonte dos valores, comissão e remuneração se pagar antes do vencimento,
+     * o valor será proporcional
+     */
+    private $fonte;
+    /**
+     * Informa qual o número da parcela para esta conta
+     */
+    private $numero_parcela;
+    /**
+     * Quantidade de parcelas que essa conta terá, zero para conta recorrente e
+     * será alterado para 1 quando criar a próxima conta
+     */
+    private $parcelas;
+    /**
+     * Frequência da recorrência em dias ou mês, depende do modo de cobrança
+     */
+    private $frequencia;
+    /**
+     * Modo de cobrança se diário ou mensal, a quantidade é definida em
+     * frequencia
+     */
+    private $modo;
+    /**
+     * Informa se o pagamento será automático após o vencimento, só ocorrerá se
+     * tiver saldo na carteira, usado para débito automático
+     */
+    private $automatico;
+    /**
      * Acréscimo de valores ao total
      */
     private $acrescimo;
     /**
-     * Multa em valor em caso atraso
+     * Valor da multa em caso de atraso
      */
     private $multa;
     /**
-     * Juros em caso de atraso, valor de 0 a 1, 1 = 100%
+     * Juros diário em caso de atraso, valor de 0 a 1, 1 = 100%
      */
     private $juros;
     /**
-     * Calcula o acréscimo automaticamente no pagamento quando a conta está
-     * atrasada
+     * Fórmula de juros que será cobrado em caso de atraso
      */
-    private $auto_acrescimo;
+    private $formula;
     /**
      * Data de vencimento da conta
      */
     private $vencimento;
-    /**
-     * Data de emissão da conta
-     */
-    private $data_emissao;
     /**
      * Número do documento que gerou a conta
      */
@@ -100,19 +176,19 @@ class Conta extends SyncModel
     /**
      * Caminho do anexo da conta
      */
-    private $anexo_caminho;
+    private $anexo_url;
     /**
-     * Informa se a conta foi cancelada
+     * Informa o estado da conta, desativa quando agrupa
      */
-    private $cancelada;
+    private $estado;
     /**
-     * Data de pagamento que será atribuida ao pagar a conta
+     * Data do último cálculo de acréscimo por atraso de pagamento
      */
-    private $data_pagamento;
+    private $data_calculo;
     /**
-     * Data de cadastro da conta
+     * Data de emissão da conta
      */
-    private $data_cadastro;
+    private $data_emissao;
 
     /**
      * Constructor for a new empty instance of Conta
@@ -125,7 +201,7 @@ class Conta extends SyncModel
 
     /**
      * Código da conta
-     * @return mixed ID of Conta
+     * @return int id of Conta
      */
     public function getID()
     {
@@ -134,8 +210,8 @@ class Conta extends SyncModel
 
     /**
      * Set ID value to new on param
-     * @param  mixed $id new value for ID
-     * @return Conta Self instance
+     * @param int $id Set id for Conta
+     * @return self Self instance
      */
     public function setID($id)
     {
@@ -145,7 +221,7 @@ class Conta extends SyncModel
 
     /**
      * Classificação da conta
-     * @return mixed Classificação of Conta
+     * @return int classificação of Conta
      */
     public function getClassificacaoID()
     {
@@ -154,8 +230,8 @@ class Conta extends SyncModel
 
     /**
      * Set ClassificacaoID value to new on param
-     * @param  mixed $classificacao_id new value for ClassificacaoID
-     * @return Conta Self instance
+     * @param int $classificacao_id Set classificação for Conta
+     * @return self Self instance
      */
     public function setClassificacaoID($classificacao_id)
     {
@@ -165,7 +241,7 @@ class Conta extends SyncModel
 
     /**
      * Funcionário que lançou a conta
-     * @return mixed Funcionário of Conta
+     * @return int funcionário of Conta
      */
     public function getFuncionarioID()
     {
@@ -174,8 +250,8 @@ class Conta extends SyncModel
 
     /**
      * Set FuncionarioID value to new on param
-     * @param  mixed $funcionario_id new value for FuncionarioID
-     * @return Conta Self instance
+     * @param int $funcionario_id Set funcionário for Conta
+     * @return self Self instance
      */
     public function setFuncionarioID($funcionario_id)
     {
@@ -184,28 +260,71 @@ class Conta extends SyncModel
     }
 
     /**
-     * Subclassificação da conta
-     * @return mixed Subclassificação of Conta
+     * Informa a conta principal
+     * @return int conta principal of Conta
      */
-    public function getSubClassificacaoID()
+    public function getContaID()
     {
-        return $this->sub_classificacao_id;
+        return $this->conta_id;
     }
 
     /**
-     * Set SubClassificacaoID value to new on param
-     * @param  mixed $sub_classificacao_id new value for SubClassificacaoID
-     * @return Conta Self instance
+     * Set ContaID value to new on param
+     * @param int $conta_id Set conta principal for Conta
+     * @return self Self instance
      */
-    public function setSubClassificacaoID($sub_classificacao_id)
+    public function setContaID($conta_id)
     {
-        $this->sub_classificacao_id = $sub_classificacao_id;
+        $this->conta_id = $conta_id;
+        return $this;
+    }
+
+    /**
+     * Informa se esta conta foi agrupada e não precisa ser mais paga
+     * individualmente, uma conta agrupada é tratada internamente como
+     * desativada
+     * @return int agrupamento of Conta
+     */
+    public function getAgrupamentoID()
+    {
+        return $this->agrupamento_id;
+    }
+
+    /**
+     * Set AgrupamentoID value to new on param
+     * @param int $agrupamento_id Set agrupamento for Conta
+     * @return self Self instance
+     */
+    public function setAgrupamentoID($agrupamento_id)
+    {
+        $this->agrupamento_id = $agrupamento_id;
+        return $this;
+    }
+
+    /**
+     * Informa a carteira que essa conta será paga automaticamente ou para
+     * informar as contas a pagar dessa carteira
+     * @return int carteira of Conta
+     */
+    public function getCarteiraID()
+    {
+        return $this->carteira_id;
+    }
+
+    /**
+     * Set CarteiraID value to new on param
+     * @param int $carteira_id Set carteira for Conta
+     * @return self Self instance
+     */
+    public function setCarteiraID($carteira_id)
+    {
+        $this->carteira_id = $carteira_id;
         return $this;
     }
 
     /**
      * Cliente a qual a conta pertence
-     * @return mixed Cliente of Conta
+     * @return int cliente of Conta
      */
     public function getClienteID()
     {
@@ -214,8 +333,8 @@ class Conta extends SyncModel
 
     /**
      * Set ClienteID value to new on param
-     * @param  mixed $cliente_id new value for ClienteID
-     * @return Conta Self instance
+     * @param int $cliente_id Set cliente for Conta
+     * @return self Self instance
      */
     public function setClienteID($cliente_id)
     {
@@ -225,7 +344,7 @@ class Conta extends SyncModel
 
     /**
      * Pedido da qual essa conta foi gerada
-     * @return mixed Pedido of Conta
+     * @return int pedido of Conta
      */
     public function getPedidoID()
     {
@@ -234,8 +353,8 @@ class Conta extends SyncModel
 
     /**
      * Set PedidoID value to new on param
-     * @param  mixed $pedido_id new value for PedidoID
-     * @return Conta Self instance
+     * @param int $pedido_id Set pedido for Conta
+     * @return self Self instance
      */
     public function setPedidoID($pedido_id)
     {
@@ -244,8 +363,28 @@ class Conta extends SyncModel
     }
 
     /**
+     * Tipo de conta se receita ou despesa
+     * @return string tipo of Conta
+     */
+    public function getTipo()
+    {
+        return $this->tipo;
+    }
+
+    /**
+     * Set Tipo value to new on param
+     * @param string $tipo Set tipo for Conta
+     * @return self Self instance
+     */
+    public function setTipo($tipo)
+    {
+        $this->tipo = $tipo;
+        return $this;
+    }
+
+    /**
      * Descrição da conta
-     * @return mixed Descrição of Conta
+     * @return string descrição of Conta
      */
     public function getDescricao()
     {
@@ -254,8 +393,8 @@ class Conta extends SyncModel
 
     /**
      * Set Descricao value to new on param
-     * @param  mixed $descricao new value for Descricao
-     * @return Conta Self instance
+     * @param string $descricao Set descrição for Conta
+     * @return self Self instance
      */
     public function setDescricao($descricao)
     {
@@ -265,7 +404,7 @@ class Conta extends SyncModel
 
     /**
      * Valor da conta
-     * @return mixed Valor of Conta
+     * @return string valor of Conta
      */
     public function getValor()
     {
@@ -274,8 +413,8 @@ class Conta extends SyncModel
 
     /**
      * Set Valor value to new on param
-     * @param  mixed $valor new value for Valor
-     * @return Conta Self instance
+     * @param string $valor Set valor for Conta
+     * @return self Self instance
      */
     public function setValor($valor)
     {
@@ -284,8 +423,142 @@ class Conta extends SyncModel
     }
 
     /**
+     * Fonte dos valores, comissão e remuneração se pagar antes do vencimento,
+     * o valor será proporcional
+     * @return string fonte dos valores of Conta
+     */
+    public function getFonte()
+    {
+        return $this->fonte;
+    }
+
+    /**
+     * Set Fonte value to new on param
+     * @param string $fonte Set fonte dos valores for Conta
+     * @return self Self instance
+     */
+    public function setFonte($fonte)
+    {
+        $this->fonte = $fonte;
+        return $this;
+    }
+
+    /**
+     * Informa qual o número da parcela para esta conta
+     * @return int número da parcela of Conta
+     */
+    public function getNumeroParcela()
+    {
+        return $this->numero_parcela;
+    }
+
+    /**
+     * Set NumeroParcela value to new on param
+     * @param int $numero_parcela Set número da parcela for Conta
+     * @return self Self instance
+     */
+    public function setNumeroParcela($numero_parcela)
+    {
+        $this->numero_parcela = $numero_parcela;
+        return $this;
+    }
+
+    /**
+     * Quantidade de parcelas que essa conta terá, zero para conta recorrente e
+     * será alterado para 1 quando criar a próxima conta
+     * @return int parcelas of Conta
+     */
+    public function getParcelas()
+    {
+        return $this->parcelas;
+    }
+
+    /**
+     * Set Parcelas value to new on param
+     * @param int $parcelas Set parcelas for Conta
+     * @return self Self instance
+     */
+    public function setParcelas($parcelas)
+    {
+        $this->parcelas = $parcelas;
+        return $this;
+    }
+
+    /**
+     * Frequência da recorrência em dias ou mês, depende do modo de cobrança
+     * @return int frequencia of Conta
+     */
+    public function getFrequencia()
+    {
+        return $this->frequencia;
+    }
+
+    /**
+     * Set Frequencia value to new on param
+     * @param int $frequencia Set frequencia for Conta
+     * @return self Self instance
+     */
+    public function setFrequencia($frequencia)
+    {
+        $this->frequencia = $frequencia;
+        return $this;
+    }
+
+    /**
+     * Modo de cobrança se diário ou mensal, a quantidade é definida em
+     * frequencia
+     * @return string modo of Conta
+     */
+    public function getModo()
+    {
+        return $this->modo;
+    }
+
+    /**
+     * Set Modo value to new on param
+     * @param string $modo Set modo for Conta
+     * @return self Self instance
+     */
+    public function setModo($modo)
+    {
+        $this->modo = $modo;
+        return $this;
+    }
+
+    /**
+     * Informa se o pagamento será automático após o vencimento, só ocorrerá se
+     * tiver saldo na carteira, usado para débito automático
+     * @return string automático of Conta
+     */
+    public function getAutomatico()
+    {
+        return $this->automatico;
+    }
+
+    /**
+     * Informa se o pagamento será automático após o vencimento, só ocorrerá se
+     * tiver saldo na carteira, usado para débito automático
+     * @return boolean Check if o of Automatico is selected or checked
+     */
+    public function isAutomatico()
+    {
+        return $this->automatico == 'Y';
+    }
+
+    /**
+     * Set Automatico value to new on param
+     * @param string $automatico Set automático for Conta
+     * @return self Self instance
+     */
+    public function setAutomatico($automatico)
+    {
+        $this->automatico = $automatico;
+        return $this;
+    }
+
+    /**
      * Acréscimo de valores ao total
-     * @return mixed Acréscimo of Conta
+     * @return string acréscimo of Conta
      */
     public function getAcrescimo()
     {
@@ -294,8 +567,8 @@ class Conta extends SyncModel
 
     /**
      * Set Acrescimo value to new on param
-     * @param  mixed $acrescimo new value for Acrescimo
-     * @return Conta Self instance
+     * @param string $acrescimo Set acréscimo for Conta
+     * @return self Self instance
      */
     public function setAcrescimo($acrescimo)
     {
@@ -304,8 +577,8 @@ class Conta extends SyncModel
     }
 
     /**
-     * Multa em valor em caso atraso
-     * @return mixed Multa of Conta
+     * Valor da multa em caso de atraso
+     * @return string multa por atraso of Conta
      */
     public function getMulta()
     {
@@ -314,8 +587,8 @@ class Conta extends SyncModel
 
     /**
      * Set Multa value to new on param
-     * @param  mixed $multa new value for Multa
-     * @return Conta Self instance
+     * @param string $multa Set multa por atraso for Conta
+     * @return self Self instance
      */
     public function setMulta($multa)
     {
@@ -324,8 +597,8 @@ class Conta extends SyncModel
     }
 
     /**
-     * Juros em caso de atraso, valor de 0 a 1, 1 = 100%
-     * @return mixed Juros of Conta
+     * Juros diário em caso de atraso, valor de 0 a 1, 1 = 100%
+     * @return float juros of Conta
      */
     public function getJuros()
     {
@@ -334,8 +607,8 @@ class Conta extends SyncModel
 
     /**
      * Set Juros value to new on param
-     * @param  mixed $juros new value for Juros
-     * @return Conta Self instance
+     * @param float $juros Set juros for Conta
+     * @return self Self instance
      */
     public function setJuros($juros)
     {
@@ -344,39 +617,28 @@ class Conta extends SyncModel
     }
 
     /**
-     * Calcula o acréscimo automaticamente no pagamento quando a conta está
-     * atrasada
-     * @return mixed Acréscimo automático of Conta
+     * Fórmula de juros que será cobrado em caso de atraso
+     * @return string tipo de juros of Conta
      */
-    public function getAutoAcrescimo()
+    public function getFormula()
     {
-        return $this->auto_acrescimo;
+        return $this->formula;
     }
 
     /**
-     * Calcula o acréscimo automaticamente no pagamento quando a conta está
-     * atrasada
-     * @return boolean Check if o of AutoAcrescimo is selected or checked
+     * Set Formula value to new on param
+     * @param string $formula Set tipo de juros for Conta
+     * @return self Self instance
      */
-    public function isAutoAcrescimo()
+    public function setFormula($formula)
     {
-        return $this->auto_acrescimo == 'Y';
-    }
-
-    /**
-     * Set AutoAcrescimo value to new on param
-     * @param  mixed $auto_acrescimo new value for AutoAcrescimo
-     * @return Conta Self instance
-     */
-    public function setAutoAcrescimo($auto_acrescimo)
-    {
-        $this->auto_acrescimo = $auto_acrescimo;
+        $this->formula = $formula;
         return $this;
     }
 
     /**
      * Data de vencimento da conta
-     * @return mixed Data de vencimento of Conta
+     * @return string data de vencimento of Conta
      */
     public function getVencimento()
     {
@@ -385,8 +647,8 @@ class Conta extends SyncModel
 
     /**
      * Set Vencimento value to new on param
-     * @param  mixed $vencimento new value for Vencimento
-     * @return Conta Self instance
+     * @param string $vencimento Set data de vencimento for Conta
+     * @return self Self instance
      */
     public function setVencimento($vencimento)
     {
@@ -395,28 +657,8 @@ class Conta extends SyncModel
     }
 
     /**
-     * Data de emissão da conta
-     * @return mixed Data de emissão of Conta
-     */
-    public function getDataEmissao()
-    {
-        return $this->data_emissao;
-    }
-
-    /**
-     * Set DataEmissao value to new on param
-     * @param  mixed $data_emissao new value for DataEmissao
-     * @return Conta Self instance
-     */
-    public function setDataEmissao($data_emissao)
-    {
-        $this->data_emissao = $data_emissao;
-        return $this;
-    }
-
-    /**
      * Número do documento que gerou a conta
-     * @return mixed Número do documento of Conta
+     * @return string número do documento of Conta
      */
     public function getNumeroDoc()
     {
@@ -425,8 +667,8 @@ class Conta extends SyncModel
 
     /**
      * Set NumeroDoc value to new on param
-     * @param  mixed $numero_doc new value for NumeroDoc
-     * @return Conta Self instance
+     * @param string $numero_doc Set número do documento for Conta
+     * @return self Self instance
      */
     public function setNumeroDoc($numero_doc)
     {
@@ -436,96 +678,87 @@ class Conta extends SyncModel
 
     /**
      * Caminho do anexo da conta
-     * @return mixed Anexo of Conta
+     * @return string anexo of Conta
      */
-    public function getAnexoCaminho()
+    public function getAnexoURL()
     {
-        return $this->anexo_caminho;
+        return $this->anexo_url;
     }
 
     /**
-     * Set AnexoCaminho value to new on param
-     * @param  mixed $anexo_caminho new value for AnexoCaminho
-     * @return Conta Self instance
+     * Set AnexoURL value to new on param
+     * @param string $anexo_url Set anexo for Conta
+     * @return self Self instance
      */
-    public function setAnexoCaminho($anexo_caminho)
+    public function setAnexoURL($anexo_url)
     {
-        $this->anexo_caminho = $anexo_caminho;
+        $this->anexo_url = $anexo_url;
         return $this;
     }
 
     /**
-     * Informa se a conta foi cancelada
-     * @return mixed Cancelada of Conta
+     * Informa o estado da conta, desativa quando agrupa
+     * @return string estado of Conta
      */
-    public function getCancelada()
+    public function getEstado()
     {
-        return $this->cancelada;
+        return $this->estado;
     }
 
     /**
-     * Informa se a conta foi cancelada
-     * @return boolean Check if a of Cancelada is selected or checked
+     * Set Estado value to new on param
+     * @param string $estado Set estado for Conta
+     * @return self Self instance
      */
-    public function isCancelada()
+    public function setEstado($estado)
     {
-        return $this->cancelada == 'Y';
-    }
-
-    /**
-     * Set Cancelada value to new on param
-     * @param  mixed $cancelada new value for Cancelada
-     * @return Conta Self instance
-     */
-    public function setCancelada($cancelada)
-    {
-        $this->cancelada = $cancelada;
+        $this->estado = $estado;
         return $this;
     }
 
     /**
-     * Data de pagamento que será atribuida ao pagar a conta
-     * @return mixed Data de pagamento of Conta
+     * Data do último cálculo de acréscimo por atraso de pagamento
+     * @return string data de cálculo of Conta
      */
-    public function getDataPagamento()
+    public function getDataCalculo()
     {
-        return $this->data_pagamento;
+        return $this->data_calculo;
     }
 
     /**
-     * Set DataPagamento value to new on param
-     * @param  mixed $data_pagamento new value for DataPagamento
-     * @return Conta Self instance
+     * Set DataCalculo value to new on param
+     * @param string $data_calculo Set data de cálculo for Conta
+     * @return self Self instance
      */
-    public function setDataPagamento($data_pagamento)
+    public function setDataCalculo($data_calculo)
     {
-        $this->data_pagamento = $data_pagamento;
+        $this->data_calculo = $data_calculo;
         return $this;
     }
 
     /**
-     * Data de cadastro da conta
-     * @return mixed Data de cadastro of Conta
+     * Data de emissão da conta
+     * @return string data de emissão of Conta
      */
-    public function getDataCadastro()
+    public function getDataEmissao()
     {
-        return $this->data_cadastro;
+        return $this->data_emissao;
     }
 
     /**
-     * Set DataCadastro value to new on param
-     * @param  mixed $data_cadastro new value for DataCadastro
-     * @return Conta Self instance
+     * Set DataEmissao value to new on param
+     * @param string $data_emissao Set data de emissão for Conta
+     * @return self Self instance
      */
-    public function setDataCadastro($data_cadastro)
+    public function setDataEmissao($data_emissao)
     {
-        $this->data_cadastro = $data_cadastro;
+        $this->data_emissao = $data_emissao;
         return $this;
     }
 
     /**
      * Convert this instance to array associated key -> value
-     * @param  boolean $recursive Allow rescursive conversion of fields
+     * @param boolean $recursive Allow rescursive conversion of fields
      * @return array All field and values into array format
      */
     public function toArray($recursive = false)
@@ -534,33 +767,41 @@ class Conta extends SyncModel
         $conta['id'] = $this->getID();
         $conta['classificacaoid'] = $this->getClassificacaoID();
         $conta['funcionarioid'] = $this->getFuncionarioID();
-        $conta['subclassificacaoid'] = $this->getSubClassificacaoID();
+        $conta['contaid'] = $this->getContaID();
+        $conta['agrupamentoid'] = $this->getAgrupamentoID();
+        $conta['carteiraid'] = $this->getCarteiraID();
         $conta['clienteid'] = $this->getClienteID();
         $conta['pedidoid'] = $this->getPedidoID();
+        $conta['tipo'] = $this->getTipo();
         $conta['descricao'] = $this->getDescricao();
         $conta['valor'] = $this->getValor();
+        $conta['fonte'] = $this->getFonte();
+        $conta['numeroparcela'] = $this->getNumeroParcela();
+        $conta['parcelas'] = $this->getParcelas();
+        $conta['frequencia'] = $this->getFrequencia();
+        $conta['modo'] = $this->getModo();
+        $conta['automatico'] = $this->getAutomatico();
         $conta['acrescimo'] = $this->getAcrescimo();
         $conta['multa'] = $this->getMulta();
         $conta['juros'] = $this->getJuros();
-        $conta['autoacrescimo'] = $this->getAutoAcrescimo();
+        $conta['formula'] = $this->getFormula();
         $conta['vencimento'] = $this->getVencimento();
-        $conta['dataemissao'] = $this->getDataEmissao();
         $conta['numerodoc'] = $this->getNumeroDoc();
-        $conta['anexocaminho'] = $this->getAnexoCaminho();
-        $conta['cancelada'] = $this->getCancelada();
-        $conta['datapagamento'] = $this->getDataPagamento();
-        $conta['datacadastro'] = $this->getDataCadastro();
+        $conta['anexourl'] = $this->getAnexoURL();
+        $conta['estado'] = $this->getEstado();
+        $conta['datacalculo'] = $this->getDataCalculo();
+        $conta['dataemissao'] = $this->getDataEmissao();
         return $conta;
     }
 
     /**
      * Fill this instance with from array values, you can pass instance to
-     * @param  mixed $conta Associated key -> value to assign into this instance
-     * @return Conta Self instance
+     * @param mixed $conta Associated key -> value to assign into this instance
+     * @return self Self instance
      */
     public function fromArray($conta = [])
     {
-        if ($conta instanceof Conta) {
+        if ($conta instanceof self) {
             $conta = $conta->toArray();
         } elseif (!is_array($conta)) {
             $conta = [];
@@ -581,10 +822,20 @@ class Conta extends SyncModel
         } else {
             $this->setFuncionarioID($conta['funcionarioid']);
         }
-        if (!array_key_exists('subclassificacaoid', $conta)) {
-            $this->setSubClassificacaoID(null);
+        if (!array_key_exists('contaid', $conta)) {
+            $this->setContaID(null);
         } else {
-            $this->setSubClassificacaoID($conta['subclassificacaoid']);
+            $this->setContaID($conta['contaid']);
+        }
+        if (!array_key_exists('agrupamentoid', $conta)) {
+            $this->setAgrupamentoID(null);
+        } else {
+            $this->setAgrupamentoID($conta['agrupamentoid']);
+        }
+        if (!array_key_exists('carteiraid', $conta)) {
+            $this->setCarteiraID(null);
+        } else {
+            $this->setCarteiraID($conta['carteiraid']);
         }
         if (!array_key_exists('clienteid', $conta)) {
             $this->setClienteID(null);
@@ -596,6 +847,11 @@ class Conta extends SyncModel
         } else {
             $this->setPedidoID($conta['pedidoid']);
         }
+        if (!isset($conta['tipo'])) {
+            $this->setTipo(null);
+        } else {
+            $this->setTipo($conta['tipo']);
+        }
         if (!isset($conta['descricao'])) {
             $this->setDescricao(null);
         } else {
@@ -606,70 +862,107 @@ class Conta extends SyncModel
         } else {
             $this->setValor($conta['valor']);
         }
+        if (!isset($conta['fonte'])) {
+            $this->setFonte(self::FONTE_FIXA);
+        } else {
+            $this->setFonte($conta['fonte']);
+        }
+        if (!isset($conta['numeroparcela'])) {
+            $this->setNumeroParcela(1);
+        } else {
+            $this->setNumeroParcela($conta['numeroparcela']);
+        }
+        if (!isset($conta['parcelas'])) {
+            $this->setParcelas(1);
+        } else {
+            $this->setParcelas($conta['parcelas']);
+        }
+        if (!isset($conta['frequencia'])) {
+            $this->setFrequencia(1);
+        } else {
+            $this->setFrequencia($conta['frequencia']);
+        }
+        if (!isset($conta['modo'])) {
+            $this->setModo(self::MODO_MENSAL);
+        } else {
+            $this->setModo($conta['modo']);
+        }
+        if (!isset($conta['automatico'])) {
+            $this->setAutomatico('N');
+        } else {
+            $this->setAutomatico($conta['automatico']);
+        }
         if (!isset($conta['acrescimo'])) {
-            $this->setAcrescimo(null);
+            $this->setAcrescimo(0);
         } else {
             $this->setAcrescimo($conta['acrescimo']);
         }
         if (!isset($conta['multa'])) {
-            $this->setMulta(null);
+            $this->setMulta(0);
         } else {
             $this->setMulta($conta['multa']);
         }
         if (!isset($conta['juros'])) {
-            $this->setJuros(null);
+            $this->setJuros(0);
         } else {
             $this->setJuros($conta['juros']);
         }
-        if (!isset($conta['autoacrescimo'])) {
-            $this->setAutoAcrescimo('N');
+        if (!isset($conta['formula'])) {
+            $this->setFormula(self::FORMULA_COMPOSTO);
         } else {
-            $this->setAutoAcrescimo($conta['autoacrescimo']);
+            $this->setFormula($conta['formula']);
         }
-        if (!array_key_exists('vencimento', $conta)) {
+        if (!isset($conta['vencimento'])) {
             $this->setVencimento(null);
         } else {
             $this->setVencimento($conta['vencimento']);
-        }
-        if (!array_key_exists('dataemissao', $conta)) {
-            $this->setDataEmissao(null);
-        } else {
-            $this->setDataEmissao($conta['dataemissao']);
         }
         if (!array_key_exists('numerodoc', $conta)) {
             $this->setNumeroDoc(null);
         } else {
             $this->setNumeroDoc($conta['numerodoc']);
         }
-        if (!array_key_exists('anexocaminho', $conta)) {
-            $this->setAnexoCaminho(null);
+        if (!array_key_exists('anexourl', $conta)) {
+            $this->setAnexoURL(null);
         } else {
-            $this->setAnexoCaminho($conta['anexocaminho']);
+            $this->setAnexoURL($conta['anexourl']);
         }
-        if (!isset($conta['cancelada'])) {
-            $this->setCancelada('N');
+        if (!isset($conta['estado'])) {
+            $this->setEstado(self::ESTADO_ATIVA);
         } else {
-            $this->setCancelada($conta['cancelada']);
+            $this->setEstado($conta['estado']);
         }
-        if (!array_key_exists('datapagamento', $conta)) {
-            $this->setDataPagamento(null);
+        if (!array_key_exists('datacalculo', $conta)) {
+            $this->setDataCalculo(DB::now());
         } else {
-            $this->setDataPagamento($conta['datapagamento']);
+            $this->setDataCalculo($conta['datacalculo']);
         }
-        if (!isset($conta['datacadastro'])) {
-            $this->setDataCadastro(DB::now());
+        if (!isset($conta['dataemissao'])) {
+            $this->setDataEmissao(DB::now());
         } else {
-            $this->setDataCadastro($conta['datacadastro']);
+            $this->setDataEmissao($conta['dataemissao']);
         }
         return $this;
     }
 
+    /**
+     * Get relative anexo path or default anexo
+     * @param boolean $default If true return default image, otherwise check field
+     * @param string  $default_name Default image name
+     * @return string relative web path for conta anexo
+     */
+    public function makeAnexoURL($default = false, $default_name = 'conta.png')
+    {
+        $anexo_url = $this->getAnexoURL();
+        if ($default) {
+            $anexo_url = null;
+        }
+        return get_document_url($anexo_url, 'conta', $default_name);
+    }
+
     public function getAcrescimoAtual()
     {
-        $datapagto = strtotime($this->getDataPagamento());
-        if ($datapagto === false) {
-            $datapagto = time();
-        }
+        $datapagto = time();
         $vencimento = strtotime("tomorrow", strtotime($this->getVencimento())) - 1;
         $is_vencida = !is_null($this->getVencimento()) && $vencimento < $datapagto;
         if (!$is_vencida) {
@@ -713,10 +1006,7 @@ class Conta extends SyncModel
 
     public function getTotal()
     {
-        if (!$this->isAutoAcrescimo()) {
-            return $this->getValor() + $this->getAcrescimo();
-        }
-        return $this->getValor() + $this->getAcrescimoAtual();
+        return $this->getValor() + $this->getAcrescimo();
     }
 
     /**
@@ -726,108 +1016,144 @@ class Conta extends SyncModel
     public function publish()
     {
         $conta = parent::publish();
+        $conta['anexourl'] = $this->makeAnexoURL(false, null);
         return $conta;
     }
 
     /**
      * Filter fields, upload data and keep key data
-     * @param Conta $original Original instance without modifications
+     * @param self $original Original instance without modifications
+     * @param boolean $localized Informs if fields are localized
+     * @return self Self instance
      */
-    public function filter($original, $despesa = false)
+    public function filter($original, $localized = false)
     {
-        // não deixa alterar esses dados
         $this->setID($original->getID());
-        $this->setFuncionarioID($original->getFuncionarioID());
-        $this->setPedidoID($original->getPedidoID());
-        $this->setCancelada($original->getCancelada());
+        $this->setFuncionarioID(Filter::number($original->getFuncionarioID()));
+        $this->setPedidoID(Filter::number($original->getPedidoID()));
+        $this->setEstado($original->getEstado());
         $this->setClassificacaoID(Filter::number($this->getClassificacaoID()));
-        $this->setSubClassificacaoID(Filter::number($this->getSubClassificacaoID()));
+        $this->setContaID(Filter::number($this->getContaID()));
+        $this->setAgrupamentoID(Filter::number($this->getAgrupamentoID()));
+        $this->setCarteiraID(Filter::number($this->getCarteiraID()));
         $this->setClienteID(Filter::number($this->getClienteID()));
         $this->setDescricao(Filter::string($this->getDescricao()));
-        $this->setValor(abs(Filter::money($this->getValor(), $localized)));
-        $this->setAcrescimo(abs(Filter::money($this->getAcrescimo(), $localized)));
-        $this->setMulta(abs(Filter::money($this->getMulta(), $localized)));
-        if ($despesa) {
+        $this->setValor(Filter::money($this->getValor(), $localized));
+        $this->setAcrescimo(Filter::money($this->getAcrescimo(), $localized));
+        $this->setMulta(Filter::money($this->getMulta(), $localized));
+        if ($this->getValor() > 0 && $this->getTipo() == self::TIPO_DESPESA) {
             $this->setValor(-$this->getValor());
+        }
+        if ($this->getAcrescimo() > 0 && $this->getTipo() == self::TIPO_DESPESA) {
             $this->setAcrescimo(-$this->getAcrescimo());
+        }
+        if ($this->getMulta() > 0 && $this->getTipo() == self::TIPO_DESPESA) {
             $this->setMulta(-$this->getMulta());
         }
-        $this->setJuros(Filter::float($this->getJuros(), $localized) / 100.0);
-        $this->setVencimento(Filter::date($this->getVencimento()));
-        $this->setDataEmissao(Filter::date($this->getDataEmissao()));
+
+        $this->setNumeroParcela(Filter::number($this->getNumeroParcela()));
+        $this->setParcelas(Filter::number($this->getParcelas()));
+        $this->setFrequencia(Filter::number($this->getFrequencia()));
+        $this->setJuros(Filter::float($this->getJuros(), $localized) / 100);
+        $this->setVencimento(Filter::datetime($this->getVencimento()));
         $this->setNumeroDoc(Filter::string($this->getNumeroDoc()));
-        $this->setAnexoCaminho(Filter::string($this->getAnexoCaminho()));
-        $this->setDataPagamento(Filter::date($this->getDataPagamento()));
-        $anexocaminho = upload_document('raw_anexocaminho', 'conta');
-        if (is_null($anexocaminho) && trim($this->getAnexoCaminho()) != '') {
-            $this->setAnexoCaminho($original->getAnexoCaminho());
+        $anexo_url = upload_document('raw_anexourl', 'conta');
+        if (is_null($anexo_url) && trim($this->getAnexoURL()) != '') {
+            $this->setAnexoURL($original->getAnexoURL());
         } else {
-            $this->setAnexoCaminho($anexocaminho);
+            $this->setAnexoURL($anexo_url);
         }
+        $this->setDataCalculo(Filter::datetime($this->getDataCalculo()));
+        $this->setDataEmissao(Filter::datetime($this->getDataEmissao()));
+        return $this;
     }
 
     /**
      * Clean instance resources like images and docs
-     * @param  Conta $dependency Don't clean when dependency use same resources
+     * @param self $dependency Don't clean when dependency use same resources
      */
     public function clean($dependency)
     {
-
-        // exclui o documento antigo
-        if (!is_null($this->getAnexoCaminho()) &&
-            $dependency->getAnexoCaminho() != $this->getAnexoCaminho() &&
-            !is_local_path($this->getAnexoCaminho())
-        ) {
-            @unlink(app()->getPath('public') . get_document_url($this->getAnexoCaminho(), 'conta'));
+        if (!is_null($this->getAnexoURL()) && $dependency->getAnexoURL() != $this->getAnexoURL()) {
+            @unlink(get_document_path($this->getAnexoURL(), 'conta'));
         }
-        $this->setAnexoCaminho($dependency->getAnexoCaminho());
+        $this->setAnexoURL($dependency->getAnexoURL());
     }
 
     /**
      * Validate fields updating them and throw exception when invalid data has found
      * @return array All field of Conta in array format
+     * @throws \MZ\Exception\ValidationException for invalid input data
      */
     public function validate()
     {
         $errors = [];
         if (is_null($this->getClassificacaoID())) {
-            $errors['classificacaoid'] = 'A classificação não pode ser vazia';
+            $errors['classificacaoid'] = _t('conta.classificacao_id_cannot_empty');
         }
         if (is_null($this->getFuncionarioID())) {
-            $errors['funcionarioid'] = 'O funcionário não pode ser vazio';
+            $errors['funcionarioid'] = _t('conta.funcionario_id_cannot_empty');
+        }
+        if (!Validator::checkInSet($this->getTipo(), self::getTipoOptions())) {
+            $errors['tipo'] = _t('conta.tipo_invalid');
         }
         if (is_null($this->getDescricao())) {
-            $errors['descricao'] = 'A descrição não pode ser vazia';
+            $errors['descricao'] = _t('conta.descricao_cannot_empty');
         }
         if (is_null($this->getValor())) {
-            $errors['valor'] = 'O valor não pode ser vazio';
+            $errors['valor'] = _t('conta.valor_cannot_empty');
         } elseif (is_equal($this->getValor(), 0)) {
-            $errors['valor'] = 'O valor não pode ser nulo';
+            $errors['valor'] = _t('conta.valor_cannot_zero');
+        } elseif ($this->getValor() < 0 && $this->getTipo() == self::TIPO_RECEITA) {
+            $errors['valor'] = _t('conta.receita_negativa');
+        } elseif ($this->getValor() > 0 && $this->getTipo() == self::TIPO_DESPESA) {
+            $errors['valor'] = _t('conta.despesa_positiva');
+        }
+        if (!Validator::checkInSet($this->getFonte(), self::getFonteOptions())) {
+            $errors['fonte'] = _t('conta.fonte_invalid');
+        }
+        if (is_null($this->getNumeroParcela())) {
+            $errors['numeroparcela'] = _t('conta.numero_parcela_cannot_empty');
+        }
+        if (is_null($this->getParcelas())) {
+            $errors['parcelas'] = _t('conta.parcelas_cannot_empty');
+        }
+        if (is_null($this->getFrequencia())) {
+            $errors['frequencia'] = _t('conta.frequencia_cannot_empty');
+        }
+        if (!Validator::checkInSet($this->getModo(), self::getModoOptions())) {
+            $errors['modo'] = _t('conta.modo_invalid');
+        }
+        if (!Validator::checkBoolean($this->getAutomatico())) {
+            $errors['automatico'] = _t('conta.automatico_invalid');
         }
         if (is_null($this->getAcrescimo())) {
-            $errors['acrescimo'] = 'O acréscimo não pode ser vazio';
-        } elseif ($this->getValor() > 0 && $this->getAcrescimo() < 0) {
-            $errors['acrescimo'] = 'O acréscimo não pode ser negativo';
-        } elseif ($this->getValor() <= 0 && $this->getAcrescimo() > 0) {
-            $errors['acrescimo'] = 'O acréscimo não pode ser positivo';
+            $errors['acrescimo'] = _t('conta.acrescimo_cannot_empty');
+        } elseif ($this->getTipo() == self::TIPO_RECEITA && $this->getAcrescimo() < 0) {
+            $errors['acrescimo'] = _t('conta.acrescimo_cannot_negative');
+        } elseif ($this->getTipo() == self::TIPO_DESPESA && $this->getAcrescimo() > 0) {
+            $errors['acrescimo'] = _t('conta.acrescimo_cannot_positive');
         }
         if (is_null($this->getMulta())) {
-            $errors['multa'] = 'A multa não pode ser vazia';
-        } elseif ($this->getValor() > 0 && $this->getMulta() < 0) {
-            $errors['multa'] = 'A multa não pode ser negativa';
-        } elseif ($this->getValor() <= 0 && $this->getMulta() > 0) {
-            $errors['multa'] = 'A multa não pode ser positiva';
+            $errors['multa'] = _t('conta.multa_cannot_empty');
+        } elseif ($this->getTipo() == self::TIPO_RECEITA && $this->getMulta() < 0) {
+            $errors['multa'] = _t('conta.multa_cannot_negative');
+        } elseif ($this->getTipo() == self::TIPO_DESPESA && $this->getMulta() > 0) {
+            $errors['multa'] = _t('conta.multa_cannot_positive');
         }
         if (is_null($this->getJuros())) {
-            $errors['juros'] = 'O juros não pode ser vazio';
+            $errors['juros'] = _t('conta.juros_cannot_empty');
         } elseif ($this->getJuros() < 0) {
-            $errors['juros'] = 'O juros não pode ser negativo';
+            $errors['juros'] = _t('conta.juros_cannot_negative');
         }
-        if (!Validator::checkBoolean($this->getAutoAcrescimo())) {
-            $errors['autoacrescimo'] = 'O acréscimo automático não foi informado ou é inválido';
+        if (!Validator::checkInSet($this->getFormula(), self::getFormulaOptions())) {
+            $errors['formula'] = _t('conta.formula_invalid');
         }
-        if (!Validator::checkBoolean($this->getCancelada())) {
-            $errors['cancelada'] = 'A informação de cancelamento não foi informada ou é inválida';
+        if (is_null($this->getVencimento())) {
+            $errors['vencimento'] = _t('conta.vencimento_cannot_empty');
+        }
+        if (!Validator::checkInSet($this->getEstado(), self::getEstadoOptions())) {
+            $errors['estado'] = _t('conta.estado_invalid');
         }
         $receitas = 0;
         if ($this->exists()) {
@@ -835,10 +1161,10 @@ class Conta extends SyncModel
             if (is_equal($info['receitas'], 0) && is_equal($info['despesas'], 0)) {
                 $errors['id'] = 'A conta informada já foi consolidada e não pode ser alterada';
             }
-            if ($this->getValor() > 0 && is_greater($info['recebido'], $this->getValor())) {
+            if ($this->getTipo() == self::TIPO_RECEITA && is_greater($info['recebido'], $this->getValor())) {
                 $errors['valor'] = 'O total recebido é maior que o valor da conta';
             }
-            if ($this->getValor() <= 0 && is_greater(-$info['pago'], -$this->getValor())) {
+            if ($this->getTipo() == self::TIPO_DESPESA && is_greater(-$info['pago'], -$this->getValor())) {
                 $errors['valor'] = 'O total pago é maior que o valor da conta';
             }
             $_conta = self::findByID($this->getID());
@@ -865,29 +1191,19 @@ class Conta extends SyncModel
                 }
             }
         }
-        if (is_null($this->getVencimento())) {
-            $errors['vencimento'] = 'A data de vencimento não foi informada corretamente';
+        if (is_null($this->getDataEmissao())) {
+            $errors['dataemissao'] = _t('conta.data_emissao_cannot_empty');
         }
-        $this->setDataCadastro(DB::now());
         if (!empty($errors)) {
-            throw new \MZ\Exception\ValidationException($errors);
+            throw new ValidationException($errors);
         }
         return $this->toArray();
     }
 
     /**
-     * Translate SQL exception into application exception
-     * @param  \Exception $e exception to translate into a readable error
-     * @return \MZ\Exception\ValidationException new exception translated
-     */
-    protected function translate($e)
-    {
-        return parent::translate($e);
-    }
-
-    /**
      * Insert a new Conta into the database and fill instance from database
-     * @return Conta Self instance
+     * @return self Self instance
+     * @throws \MZ\Exception\ValidationException for invalid input data
      */
     public function insert()
     {
@@ -906,43 +1222,42 @@ class Conta extends SyncModel
 
     /**
      * Update Conta with instance values into database for ID
-     * @param  array $only Save these fields only, when empty save all fields except id
-     * @return Conta Self instance
+     * @param array $only Save these fields only, when empty save all fields except id
+     * @return int rows affected
+     * @throws \MZ\Exception\ValidationException for invalid input data
      */
     public function update($only = [])
     {
         $values = $this->validate();
         if (!$this->exists()) {
-            throw new \Exception('O identificador da conta não foi informado');
-        }
-        if ($this->getID() == self::MOVIMENTACAO_ID) {
-            throw new \Exception('A conta informada é utilizada internamente pelo sistema e não pode ser alterada');
+            throw new ValidationException(
+                ['id' => _t('conta.id_cannot_empty')]
+            );
         }
         $values = DB::filterValues($values, $only, false);
-        unset($values['datacadastro']);
         try {
-            DB::update('Contas')
+            $affected = DB::update('Contas')
                 ->set($values)
-                ->where('id', $this->getID())
+                ->where(['id' => $this->getID()])
                 ->execute();
             $this->loadByID();
         } catch (\Exception $e) {
             throw $this->translate($e);
         }
-        return $this;
+        return $affected;
     }
 
     /**
      * Delete this instance from database using ID
      * @return integer Number of rows deleted (Max 1)
+     * @throws \MZ\Exception\ValidationException for invalid id
      */
     public function delete()
     {
         if (!$this->exists()) {
-            throw new \Exception('O identificador da conta não foi informado');
-        }
-        if ($this->getID() == self::MOVIMENTACAO_ID) {
-            throw new \Exception('A conta informada é utilizada internamente pelo sistema e não pode ser excluída');
+            throw new ValidationException(
+                ['id' => _t('conta.id_cannot_empty')]
+            );
         }
         $result = DB::deleteFrom('Contas')
             ->where('id', $this->getID())
@@ -952,9 +1267,9 @@ class Conta extends SyncModel
 
     /**
      * Load one register for it self with a condition
-     * @param  array $condition Condition for searching the row
-     * @param  array $order associative field name -> [-1, 1]
-     * @return Conta Self instance filled or empty
+     * @param array $condition Condition for searching the row
+     * @param array $order associative field name -> [-1, 1]
+     * @return self Self instance filled or empty
      */
     public function load($condition, $order = [])
     {
@@ -982,15 +1297,42 @@ class Conta extends SyncModel
     }
 
     /**
-     * Subclassificação da conta
-     * @return \MZ\Account\Classificacao The object fetched from database
+     * Informa a conta principal
+     * @return \MZ\Account\Conta The object fetched from database
      */
-    public function findSubClassificacaoID()
+    public function findContaID()
     {
-        if (is_null($this->getSubClassificacaoID())) {
-            return new \MZ\Account\Classificacao();
+        if (is_null($this->getContaID())) {
+            return new \MZ\Account\Conta();
         }
-        return \MZ\Account\Classificacao::findByID($this->getSubClassificacaoID());
+        return \MZ\Account\Conta::findByID($this->getContaID());
+    }
+
+    /**
+     * Informa se esta conta foi agrupada e não precisa ser mais paga
+     * individualmente, uma conta agrupada é tratada internamente como
+     * desativada
+     * @return \MZ\Account\Conta The object fetched from database
+     */
+    public function findAgrupamentoID()
+    {
+        if (is_null($this->getAgrupamentoID())) {
+            return new \MZ\Account\Conta();
+        }
+        return \MZ\Account\Conta::findByID($this->getAgrupamentoID());
+    }
+
+    /**
+     * Informa a carteira que essa conta será paga automaticamente ou para
+     * informar as contas a pagar dessa carteira
+     * @return \MZ\Wallet\Carteira The object fetched from database
+     */
+    public function findCarteiraID()
+    {
+        if (is_null($this->getCarteiraID())) {
+            return new \MZ\Wallet\Carteira();
+        }
+        return \MZ\Wallet\Carteira::findByID($this->getCarteiraID());
     }
 
     /**
@@ -1018,19 +1360,109 @@ class Conta extends SyncModel
     }
 
     /**
+     * Gets textual and translated Tipo for Conta
+     * @param int $index choose option from index
+     * @return string[]|string A associative key -> translated representative text or text for index
+     */
+    public static function getTipoOptions($index = null)
+    {
+        $options = [
+            self::TIPO_RECEITA => _t('conta.tipo_receita'),
+            self::TIPO_DESPESA => _t('conta.tipo_despesa'),
+        ];
+        if (!is_null($index)) {
+            return $options[$index];
+        }
+        return $options;
+    }
+
+    /**
+     * Gets textual and translated Fonte for Conta
+     * @param int $index choose option from index
+     * @return string[]|string A associative key -> translated representative text or text for index
+     */
+    public static function getFonteOptions($index = null)
+    {
+        $options = [
+            self::FONTE_FIXA => _t('conta.fonte_fixa'),
+            self::FONTE_VARIAVEL => _t('conta.fonte_variavel'),
+            self::FONTE_COMISSAO => _t('conta.fonte_comissao'),
+            self::FONTE_REMUNERACAO => _t('conta.fonte_remuneracao'),
+        ];
+        if (!is_null($index)) {
+            return $options[$index];
+        }
+        return $options;
+    }
+
+    /**
+     * Gets textual and translated Modo for Conta
+     * @param int $index choose option from index
+     * @return string[]|string A associative key -> translated representative text or text for index
+     */
+    public static function getModoOptions($index = null)
+    {
+        $options = [
+            self::MODO_DIARIO => _t('conta.modo_diario'),
+            self::MODO_MENSAL => _t('conta.modo_mensal'),
+        ];
+        if (!is_null($index)) {
+            return $options[$index];
+        }
+        return $options;
+    }
+
+    /**
+     * Gets textual and translated Formula for Conta
+     * @param int $index choose option from index
+     * @return string[]|string A associative key -> translated representative text or text for index
+     */
+    public static function getFormulaOptions($index = null)
+    {
+        $options = [
+            self::FORMULA_SIMPLES => _t('conta.formula_simples'),
+            self::FORMULA_COMPOSTO => _t('conta.formula_composto'),
+        ];
+        if (!is_null($index)) {
+            return $options[$index];
+        }
+        return $options;
+    }
+
+    /**
+     * Gets textual and translated Estado for Conta
+     * @param int $index choose option from index
+     * @return string[]|string A associative key -> translated representative text or text for index
+     */
+    public static function getEstadoOptions($index = null)
+    {
+        $options = [
+            self::ESTADO_ANALISE => _t('conta.estado_analise'),
+            self::ESTADO_ATIVA => _t('conta.estado_ativa'),
+            self::ESTADO_PAGA => _t('conta.estado_paga'),
+            self::ESTADO_CANCELADA => _t('conta.estado_cancelada'),
+            self::ESTADO_DESATIVADA => _t('conta.estado_desativada'),
+        ];
+        if (!is_null($index)) {
+            return $options[$index];
+        }
+        return $options;
+    }
+
+    /**
      * Get allowed keys array
      * @return array allowed keys array
      */
     private static function getAllowedKeys()
     {
-        $conta = new Conta();
+        $conta = new self();
         $allowed = Filter::concatKeys('c.', $conta->toArray());
         return $allowed;
     }
 
     /**
      * Filter order array
-     * @param  mixed $order order string or array to parse and filter allowed
+     * @param mixed $order order string or array to parse and filter allowed
      * @return array allowed associative order
      */
     private static function filterOrder($order)
@@ -1041,7 +1473,7 @@ class Conta extends SyncModel
 
     /**
      * Filter condition array with allowed fields
-     * @param  array $condition condition to filter rows
+     * @param array $condition condition to filter rows
      * @return array allowed condition
      */
     private static function filterCondition($condition)
@@ -1049,8 +1481,8 @@ class Conta extends SyncModel
         $allowed = self::getAllowedKeys();
         if (isset($condition['search'])) {
             $search = trim($condition['search']);
-            if (substr($search, 0, 1) == '#') {
-                $condition['numerodoc'] = substr($search, 1);
+            if (is_numeric($search)) {
+                $condition['numerodoc'] = $search;
             } elseif ($search != '') {
                 $field = 'c.descricao LIKE ?';
                 $condition[$field] = '%'.$search.'%';
@@ -1060,7 +1492,7 @@ class Conta extends SyncModel
         }
         if (isset($condition['classificacao'])) {
             $classificacao = intval($condition['classificacao']);
-            $field = '(c.classificacaoid = ? OR c.subclassificacaoid = ?)';
+            $field = '(c.classificacaoid = ? OR s.classificacaoid = ?)';
             $condition[$field] = [$classificacao, $classificacao];
             $allowed[$field] = true;
             unset($condition['classificacao']);
@@ -1070,8 +1502,8 @@ class Conta extends SyncModel
 
     /**
      * Fetch data from database with a condition
-     * @param  array $condition condition to filter rows
-     * @param  array $order order rows
+     * @param array $condition condition to filter rows
+     * @param array $order order rows
      * @return SelectQuery query object with condition statement
      */
     private static function query($condition = [], $order = [])
@@ -1085,15 +1517,30 @@ class Conta extends SyncModel
 
     /**
      * Search one register with a condition
-     * @param  array $condition Condition for searching the row
-     * @param  array $order order rows
-     * @return Conta A filled Conta or empty instance
+     * @param array $condition Condition for searching the row
+     * @param array $order order rows
+     * @return self A filled Conta or empty instance
      */
     public static function find($condition, $order = [])
     {
-        $query = self::query($condition, $order)->limit(1);
-        $row = $query->fetch() ?: [];
-        return new Conta($row);
+        $result = new self();
+        return $result->load($condition, $order);
+    }
+
+    /**
+     * Search one register with a condition
+     * @param array $condition Condition for searching the row
+     * @param array $order order rows
+     * @return self A filled Conta or empty instance
+     * @throws \Exception when register has not found
+     */
+    public static function findOrFail($condition, $order = [])
+    {
+        $result = self::find($condition, $order);
+        if (!$result->exists()) {
+            throw new \Exception(_t('conta.not_found'), 404);
+        }
+        return $result;
     }
 
     public static function getTotalAbertas(
@@ -1121,7 +1568,7 @@ class Conta extends SyncModel
         $data = [];
         $descricao = trim($descricao);
         if (is_numeric($descricao)) {
-            $sql .= 'AND c.id = :codigo ';
+            $sql .= 'AND c.numerodoc = :codigo ';
             $data[':codigo'] = intval($descricao);
         } elseif ($descricao != '') {
             $sql .= 'AND c.descricao LIKE :descricao ';
@@ -1172,11 +1619,11 @@ class Conta extends SyncModel
 
     /**
      * Find all Conta
-     * @param  array  $condition Condition to get all Conta
-     * @param  array  $order     Order Conta
-     * @param  int    $limit     Limit data into row count
-     * @param  int    $offset    Start offset to get rows
-     * @return array             List of all rows instanced as Conta
+     * @param array  $condition Condition to get all Conta
+     * @param array  $order     Order Conta
+     * @param int    $limit     Limit data into row count
+     * @param int    $offset    Start offset to get rows
+     * @return self[] List of all rows instanced as Conta
      */
     public static function findAll($condition = [], $order = [], $limit = null, $offset = null)
     {
@@ -1190,14 +1637,14 @@ class Conta extends SyncModel
         $rows = $query->fetchAll();
         $result = [];
         foreach ($rows as $row) {
-            $result[] = new Conta($row);
+            $result[] = new self($row);
         }
         return $result;
     }
 
     /**
      * Count all rows from database with matched condition critery
-     * @param  array $condition condition to filter rows
+     * @param array $condition condition to filter rows
      * @return integer Quantity of rows
      */
     public static function count($condition = [])

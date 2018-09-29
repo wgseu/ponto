@@ -32,7 +32,7 @@ use MZ\Account\Cliente;
 use MZ\Sale\Pedido;
 use MZ\Session\Sessao;
 use MZ\Account\Conta;
-use MZ\Sale\ProdutoPedido;
+use MZ\Sale\Item;
 use MZ\Database\DB;
 
 /**
@@ -105,7 +105,7 @@ class PagamentoPageController extends PageController
         if ($sessao->exists()) {
             $condition['sessaoid'] = $sessao->getID();
         }
-        $categorias = ProdutoPedido::rawFindAll(
+        $categorias = Item::rawFindAll(
             $condition,
             [],
             6

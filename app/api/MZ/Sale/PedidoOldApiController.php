@@ -74,7 +74,7 @@ class PedidoOldApiController extends \MZ\Core\ApiController
                     'p.detalhes'
                 ];
             }
-            $itens = ProdutoPedido::rawFindAll(
+            $itens = Item::rawFindAll(
                 [
                     'detalhado' => true,
                     'pedidoid' => $pedido->getID(),
@@ -88,7 +88,7 @@ class PedidoOldApiController extends \MZ\Core\ApiController
             );
             $campos = [
                 'id',
-                'produtopedidoid',
+                'itemid',
                 'tipo',
                 'mesaid',
                 'comandaid',
@@ -221,7 +221,7 @@ class PedidoOldApiController extends \MZ\Core\ApiController
             $printer->setColumns($impressora->getColunas());
             $receipt = new Receipt($printer);
             $receipt->setOrder($pedido);
-            $receipt->setItems(ProdutoPedido::findAll(
+            $receipt->setItems(Item::findAll(
                 [
                     'pedidoid' => $pedido->getID(),
                     'cancelado' => 'N'

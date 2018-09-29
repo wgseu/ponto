@@ -41,7 +41,7 @@ use MZ\Payment\Pagamento;
 use MZ\Payment\Cartao;
 use MZ\Account\Cliente;
 use MZ\Sale\Pedido;
-use MZ\Sale\ProdutoPedido;
+use MZ\Sale\Item;
 use MZ\Sale\Formacao;
 use MZ\Sale\Montagem;
 use MZ\Product\Servico;
@@ -216,7 +216,7 @@ class Order extends Pedido
             foreach ($pagamento_list as $pagamento_node) {
                 $cod_tipo_cond_pagto = Document::childValue($pagamento_node, 'codTipoCondPagto');
                 if ($cod_tipo_cond_pagto == 'D') {
-                    $produto_pedido = new ProdutoPedido();
+                    $produto_pedido = new Item();
                     $produto_pedido->setServicoID(Servico::DESCONTO_ID);
                     $produto_pedido->setQuantidade(1);
                     $produto_pedido->setPreco(-floatval(Document::childValue($pagamento_node, 'valor')));
@@ -349,7 +349,7 @@ class Order extends Pedido
         }
         $desconto = floatval(Document::childValue($body_pedido, 'vlrDesconto'));
         if ($desconto > 0) {
-            $produto_pedido = new ProdutoPedido();
+            $produto_pedido = new Item();
             $produto_pedido->setServicoID(Servico::DESCONTO_ID);
             $produto_pedido->setQuantidade(1);
             $produto_pedido->setPreco(-$desconto);
@@ -359,7 +359,7 @@ class Order extends Pedido
         }
         $taxa_entrega = floatval(Document::childValue($body_pedido, 'vlrTaxa'));
         if ($taxa_entrega > 0) {
-            $produto_pedido = new ProdutoPedido();
+            $produto_pedido = new Item();
             $produto_pedido->setServicoID(Servico::ENTREGA_ID);
             $produto_pedido->setQuantidade(1);
             $produto_pedido->setPreco($taxa_entrega);
@@ -377,7 +377,7 @@ class Order extends Pedido
             $codigo_pai = Document::childValue($item, 'codPai', false);
             $descricao = Document::childValue($item, 'descricaoCardapio');
             $codigo_pdv = Document::childValue($item, 'codProdutoPdv', false);
-            $produto_pedido = new ProdutoPedido();
+            $produto_pedido = new Item();
             $produto_pedido->setID($i);
             $produto_pedido->setQuantidade(floatval(Document::childValue($item, 'quantidade')));
             $produto_pedido->setPreco(floatval(Document::childValue($item, 'vlrUnitLiq')));
@@ -461,7 +461,7 @@ class Order extends Pedido
                 if (!is_null($produto_pedido->getProdutoID())) {
                     // aqui o produto pai é um pacote e o item é um produto
                     $pacotes[$parent_index][] = $i;
-                    $produto_pedido->setProdutoPedidoID($produto_pedido_pai->getID());
+                    $produto_pedido->setItemID($produto_pedido_pai->getID());
                     $this->products[$i] = [
                         'item' => $produto_pedido,
                         'formacoes' => []
@@ -549,14 +549,14 @@ class Order extends Pedido
         $this->products = [];
         $parent_products = [];
         foreach ($_pedidos as $_produto_pedido) {
-            $produto_pedido = new ProdutoPedido($_produto_pedido);
-            if (!is_null($produto_pedido->getProdutoPedidoID())) {
-                if (isset($parent_products[$produto_pedido->getProdutoPedidoID()])) {
-                    $parent_index = $parent_products[$produto_pedido->getProdutoPedidoID()];
+            $produto_pedido = new Item($_produto_pedido);
+            if (!is_null($produto_pedido->getItemID())) {
+                if (isset($parent_products[$produto_pedido->getItemID()])) {
+                    $parent_index = $parent_products[$produto_pedido->getItemID()];
                 } elseif (is_null($parent_index)) {
                     throw new \Exception('A ordem dos pedidos enviados é inválida', 500);
                 }
-                $produto_pedido->setProdutoPedidoID($parent_index);
+                $produto_pedido->setItemID($parent_index);
             } else {
                 if ($produto_pedido->exists()) {
                     $parent_products[$produto_pedido->getID()] = $i;
@@ -665,7 +665,7 @@ class Order extends Pedido
         $added = 0;
         $pacotes = [];
         $comissao_balcao = is_boolean_config('Vendas', 'Balcao.Comissao');
-        $pacote_pedido = new ProdutoPedido();
+        $pacote_pedido = new Item();
         foreach ($this->products as $index => $item_info) {
             $produto_pedido = $item_info['item'];
             $produto_pedido->setPedidoID($this->getID());
@@ -682,13 +682,13 @@ class Order extends Pedido
                 ) {
                     $produto_pedido->setPorcentagem($this->employee->getPorcentagem());
                 }
-                if (!is_null($produto_pedido->getProdutoPedidoID())) {
-                    $produto_pedido->setProdutoPedidoID($pacote_pedido->getID());
+                if (!is_null($produto_pedido->getItemID())) {
+                    $produto_pedido->setItemID($pacote_pedido->getID());
                     $pacotes[$pacote_pedido->getID()]['itens'][] = $item_info;
                 } elseif ($produto->getTipo() != Produto::TIPO_PACOTE) {
                     $produto_pedido->setPreco($produto->getPrecoVenda());
                     $produto_pedido->setPrecoVenda($produto->getPrecoVenda());
-                    $pacote_pedido = new ProdutoPedido();
+                    $pacote_pedido = new Item();
                 }
                 if (!is_null($produto->getCustoProducao())) {
                     $produto_pedido->setPrecoCompra($produto->getCustoProducao());
@@ -697,11 +697,11 @@ class Order extends Pedido
             if (is_null($produto_pedido->getPorcentagem())) {
                 $produto_pedido->setPorcentagem(0);
             }
-            $produto_pedido->setEstado(ProdutoPedido::ESTADO_ADICIONADO);
+            $produto_pedido->setEstado(Item::ESTADO_ADICIONADO);
             $produto_pedido->setCancelado('N');
             $produto_pedido->setVisualizado('N');
             $this->checkSaldo($produto_pedido->getTotal());
-            $produto_pedido->filter(new ProdutoPedido()); // limpa o ID
+            $produto_pedido->filter(new Item()); // limpa o ID
             $produto_pedido->register($item_info['formacoes']);
             if ($produto->exists() && $produto->getTipo() == Produto::TIPO_PACOTE) {
                 $pacote_pedido = $produto_pedido;

@@ -22,7 +22,7 @@
  *
  * @author Equipe GrandChef <desenvolvimento@mzsw.com.br>
  */
-namespace MZ\Sale;
+namespace MZ\Promotion;
 
 use MZ\Database\SyncModel;
 use MZ\Database\DB;

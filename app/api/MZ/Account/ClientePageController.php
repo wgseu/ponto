@@ -93,12 +93,8 @@ class ClientePageController extends PageController
         } elseif ($this->isJson()) {
             return $this->json()->error('Nenhum dado foi enviado');
         }
-        $response = app()->getResponse();
-        $response->setTitle('Registrar');
-        $response->getEngine()->cliente = $cliente;
-        $response->getEngine()->aceitar = $aceitar;
-        $response->getEngine()->focusctrl = $focusctrl;
-        return $response->output('conta_cadastrar');
+        $pagetitle = 'Registrar';
+        return $this->view('conta_cadastrar', get_defined_vars());
     }
 
     public function logout()
@@ -132,9 +128,8 @@ class ClientePageController extends PageController
             $msg = 'Usuário ou senha incorretos!';
             \Thunder::error($msg);
         }
-        $response = app()->getResponse();
-        $response->setTitle('Entrar');
-        return $response->output('conta_entrar');
+        $pagetitle = 'Entrar';
+        return $this->view('conta_entrar', get_defined_vars());
     }
 
     public function edit()
@@ -195,16 +190,8 @@ class ClientePageController extends PageController
         } elseif ($this->isJson()) {
             return $this->json()->error('Nenhum dado foi enviado');
         }
-        $response = app()->getResponse();
-        $response->setTitle('Editar Conta');
-        $response->getEngine()->old_cliente = $old_cliente;
-        $response->getEngine()->cliente = $cliente;
-        $response->getEngine()->aceitar = $aceitar;
-        $response->getEngine()->focusctrl = $focusctrl;
-        $response->getEngine()->cadastrar_cliente = $cadastrar_cliente;
-        $response->getEngine()->gerenciando = $gerenciando;
-        $response->getEngine()->tab = $tab;
-        return $response->output('conta_editar');
+        $pagetitle = 'Editar Conta';
+        return $this->view('conta_editar', get_defined_vars());
     }
 
     public function find()

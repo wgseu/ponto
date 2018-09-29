@@ -111,6 +111,7 @@ class ClienteTest extends \MZ\Framework\TestCase
             'email',
             'dataaniversario',
             'slogan',
+            'status',
             'limitecompra',
             'facebookurl',
             'twitterurl',

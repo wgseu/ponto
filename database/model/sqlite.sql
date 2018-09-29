@@ -2,7 +2,7 @@
 -- Author:        Mazin
 -- Caption:       GrandChef Model
 -- Project:       GrandChef
--- Changed:       2018-09-27 10:42
+-- Changed:       2018-09-29 12:04
 -- Created:       2012-09-05 23:08
 PRAGMA foreign_keys = OFF;
 
@@ -107,7 +107,7 @@ CREATE TABLE "Clientes"(
   "Tipo" TEXT NOT NULL CHECK("Tipo" IN('Fisica', 'Juridica')) DEFAULT 'Fisica',-- Informa o tipo de pessoa, que pode ser física ou jurídica[N:Tipo][G:o][E:Física|Jurídica][S:S]
   "EmpresaID" INTEGER DEFAULT NULL,-- Informa se esse cliente faz parte da empresa informada[N:Empresa][G:o][S:S]
   "Login" VARCHAR(50),-- Nome de usuário utilizado para entrar no sistema, aplicativo ou site[N:Login][G:o]
-  "Senha" VARCHAR(40) DEFAULT NULL,-- Senha embaralhada do cliente[N:Senha][G:a][P]
+  "Senha" VARCHAR(255) DEFAULT NULL,-- Senha embaralhada do cliente[N:Senha][G:a][P]
   "Nome" VARCHAR(100) NOT NULL,-- Primeiro nome da pessoa física ou nome fantasia da empresa[N:Nome][G:o][S]
   "Sobrenome" VARCHAR(100) DEFAULT NULL,-- Restante do nome da pessoa física ou Razão social da empresa[N:Sobrenome][G:o]
   "Genero" TEXT CHECK("Genero" IN('Masculino', 'Feminino')) DEFAULT 'Masculino',-- Informa o gênero do cliente do tipo pessoa física[N:Gênero][G:o][S:S][R]
@@ -117,7 +117,9 @@ CREATE TABLE "Clientes"(
   "Email" VARCHAR(100) DEFAULT NULL,-- E-mail do cliente ou da empresa[N:E-mail][G:o]
   "DataAniversario" DATE DEFAULT NULL,-- Data de aniversário sem o ano ou data de fundação[N:Data de aniversário][G:a]
   "Slogan" VARCHAR(100) DEFAULT NULL,-- Slogan ou detalhes do cliente[N:Observação][G:a]
+  "Status" TEXT NOT NULL CHECK("Status" IN('Ativo', 'Inativo', 'Bloqueado')) DEFAULT 'Ativo',-- Informa o estado da conta do cliente[G:o][N:Status]
   "Secreto" VARCHAR(40) DEFAULT NULL,-- Código secreto para recuperar a conta do cliente[N:Código de recuperação][G:o][D]
+  "Salt" VARCHAR(100) DEFAULT NULL,-- Se informado, significa que a senha é segura[G:o][N:Código de segurança][D]
   "LimiteCompra" DECIMAL DEFAULT NULL,-- Limite de compra utilizando a forma de pagamento Conta[N:Limite de compra][G:o]
   "FacebookURL" VARCHAR(200) DEFAULT NULL,-- URL para acessar a página do Facebook do cliente[N:Facebook][G:o]
   "TwitterURL" VARCHAR(200) DEFAULT NULL,-- URL para acessar a página do Twitter do cliente[N:Twitter][G:o]
@@ -456,7 +458,7 @@ CREATE TABLE "Creditos"(
   "ID" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,-- Identificador do crédito[G:o]
   "ClienteID" INTEGER NOT NULL,-- Cliente a qual o crédito pertence[N:Cliente][G:o][S:S]
   "Valor" DECIMAL NOT NULL,-- Valor do crédito[N:Valor][G:o]
-  "Detalhes" VARCHAR(255),-- Detalhes do crédito, justificativa do crédito[N:Detalhes][G:o][S]
+  "Detalhes" VARCHAR(255) NOT NULL,-- Detalhes do crédito, justificativa do crédito[N:Detalhes][G:o][S]
   "Cancelado" TEXT NOT NULL CHECK("Cancelado" IN('Y', 'N')) DEFAULT 'N',-- Informa se o crédito foi cancelado[N:Cancelado][G:o]
   "DataCadastro" DATETIME NOT NULL,-- Data de cadastro do crédito[N:Data de cadastro][G:a]
   CONSTRAINT "FK_Creditos_Clientes_ClienteID"
@@ -1458,7 +1460,7 @@ CREATE TABLE "Formacoes"(
   "PacoteID" INTEGER DEFAULT NULL,-- Informa qual pacote foi selecionado no momento da venda[N:Pacote][G:o][S]
   "ComposicaoID" INTEGER DEFAULT NULL,-- Informa qual composição foi retirada ou adicionada no momento da venda[N:Composição][G:a]
   "Quantidade" DOUBLE NOT NULL DEFAULT 1,-- Quantidade de itens selecionados[N:Quantidade][G:a]
-  CONSTRAINT "UK_Formacoes_ProdutoPedidoID_PacoteID"
+  CONSTRAINT "UK_Formacoes_ItemID_PacoteID"
     UNIQUE("ItemID","PacoteID"),
   CONSTRAINT "FK_Formacoes_Itens_ItemID"
     FOREIGN KEY("ItemID")

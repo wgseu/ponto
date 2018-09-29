@@ -27,7 +27,7 @@ use MZ\Product\Servico;
 use MZ\Account\Cliente;
 use MZ\Payment\FormaPagto;
 use MZ\Payment\Pagamento;
-use MZ\Sale\ProdutoPedido;
+use MZ\Sale\Item;
 use MZ\Sale\Pedido;
 use MZ\Invoice\Evento;
 use MZ\Invoice\Nota;
@@ -96,7 +96,7 @@ class NFeDB extends \NFe\Database\Estatico
             ['id' => 1]
         );
         /* Itens do pedido */
-        $_itens = ProdutoPedido::findAll(
+        $_itens = Item::findAll(
             [
                 'pedidoid' => $_pedido->getID(),
                 'cancelado' => 'N'

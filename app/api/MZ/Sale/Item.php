@@ -36,7 +36,7 @@ use MZ\Exception\ValidationException;
  * Produtos, taxas e serviços do pedido, a alteração do estado permite o
  * controle de produção
  */
-class ProdutoPedido extends SyncModel
+class Item extends SyncModel
 {
 
     /**
@@ -135,7 +135,7 @@ class ProdutoPedido extends SyncModel
     private $data_hora;
 
     /**
-     * Constructor for a new empty instance of ProdutoPedido
+     * Constructor for a new empty instance of Item
      * @param array $produto_pedido All field and values to fill the instance
      */
     public function __construct($produto_pedido = [])
@@ -145,7 +145,7 @@ class ProdutoPedido extends SyncModel
 
     /**
      * Identificador do item do pedido
-     * @return mixed ID of ProdutoPedido
+     * @return mixed ID of Item
      */
     public function getID()
     {
@@ -155,7 +155,7 @@ class ProdutoPedido extends SyncModel
     /**
      * Set ID value to new on param
      * @param  mixed $id new value for ID
-     * @return ProdutoPedido Self instance
+     * @return Item Self instance
      */
     public function setID($id)
     {
@@ -165,7 +165,7 @@ class ProdutoPedido extends SyncModel
 
     /**
      * Pedido a qual pertence esse item
-     * @return mixed Pedido of ProdutoPedido
+     * @return mixed Pedido of Item
      */
     public function getPedidoID()
     {
@@ -175,7 +175,7 @@ class ProdutoPedido extends SyncModel
     /**
      * Set PedidoID value to new on param
      * @param  mixed $pedido_id new value for PedidoID
-     * @return ProdutoPedido Self instance
+     * @return Item Self instance
      */
     public function setPedidoID($pedido_id)
     {
@@ -185,7 +185,7 @@ class ProdutoPedido extends SyncModel
 
     /**
      * Funcionário que lançou esse item no pedido
-     * @return mixed Funcionário of ProdutoPedido
+     * @return mixed Funcionário of Item
      */
     public function getFuncionarioID()
     {
@@ -195,7 +195,7 @@ class ProdutoPedido extends SyncModel
     /**
      * Set FuncionarioID value to new on param
      * @param  mixed $funcionario_id new value for FuncionarioID
-     * @return ProdutoPedido Self instance
+     * @return Item Self instance
      */
     public function setFuncionarioID($funcionario_id)
     {
@@ -205,7 +205,7 @@ class ProdutoPedido extends SyncModel
 
     /**
      * Produto vendido
-     * @return mixed Produto of ProdutoPedido
+     * @return mixed Produto of Item
      */
     public function getProdutoID()
     {
@@ -215,7 +215,7 @@ class ProdutoPedido extends SyncModel
     /**
      * Set ProdutoID value to new on param
      * @param  mixed $produto_id new value for ProdutoID
-     * @return ProdutoPedido Self instance
+     * @return Item Self instance
      */
     public function setProdutoID($produto_id)
     {
@@ -225,7 +225,7 @@ class ProdutoPedido extends SyncModel
 
     /**
      * Serviço cobrado ou taxa
-     * @return mixed Serviço of ProdutoPedido
+     * @return mixed Serviço of Item
      */
     public function getServicoID()
     {
@@ -235,7 +235,7 @@ class ProdutoPedido extends SyncModel
     /**
      * Set ServicoID value to new on param
      * @param  mixed $servico_id new value for ServicoID
-     * @return ProdutoPedido Self instance
+     * @return Item Self instance
      */
     public function setServicoID($servico_id)
     {
@@ -245,19 +245,19 @@ class ProdutoPedido extends SyncModel
 
     /**
      * Pacote em que esse item faz parte
-     * @return mixed Pacote of ProdutoPedido
+     * @return mixed Pacote of Item
      */
-    public function getProdutoPedidoID()
+    public function getItemID()
     {
         return $this->produto_pedido_id;
     }
 
     /**
-     * Set ProdutoPedidoID value to new on param
-     * @param  mixed $produto_pedido_id new value for ProdutoPedidoID
-     * @return ProdutoPedido Self instance
+     * Set ItemID value to new on param
+     * @param  mixed $produto_pedido_id new value for ItemID
+     * @return Item Self instance
      */
-    public function setProdutoPedidoID($produto_pedido_id)
+    public function setItemID($produto_pedido_id)
     {
         $this->produto_pedido_id = $produto_pedido_id;
         return $this;
@@ -265,7 +265,7 @@ class ProdutoPedido extends SyncModel
 
     /**
      * Sobrescreve a descrição do produto na exibição
-     * @return mixed Descrição of ProdutoPedido
+     * @return mixed Descrição of Item
      */
     public function getDescricao()
     {
@@ -275,7 +275,7 @@ class ProdutoPedido extends SyncModel
     /**
      * Set Descricao value to new on param
      * @param  mixed $descricao new value for Descricao
-     * @return ProdutoPedido Self instance
+     * @return Item Self instance
      */
     public function setDescricao($descricao)
     {
@@ -285,7 +285,7 @@ class ProdutoPedido extends SyncModel
 
     /**
      * Preço do produto já com desconto
-     * @return mixed Preço of ProdutoPedido
+     * @return mixed Preço of Item
      */
     public function getPreco()
     {
@@ -295,7 +295,7 @@ class ProdutoPedido extends SyncModel
     /**
      * Set Preco value to new on param
      * @param  mixed $preco new value for Preco
-     * @return ProdutoPedido Self instance
+     * @return Item Self instance
      */
     public function setPreco($preco)
     {
@@ -305,7 +305,7 @@ class ProdutoPedido extends SyncModel
 
     /**
      * Quantidade de itens vendidos
-     * @return mixed Quantidade of ProdutoPedido
+     * @return mixed Quantidade of Item
      */
     public function getQuantidade()
     {
@@ -315,7 +315,7 @@ class ProdutoPedido extends SyncModel
     /**
      * Set Quantidade value to new on param
      * @param  mixed $quantidade new value for Quantidade
-     * @return ProdutoPedido Self instance
+     * @return Item Self instance
      */
     public function setQuantidade($quantidade)
     {
@@ -325,7 +325,7 @@ class ProdutoPedido extends SyncModel
 
     /**
      * Porcentagem cobrada sobre essa venda, escala de 0 a 100
-     * @return mixed Porcentagem of ProdutoPedido
+     * @return mixed Porcentagem of Item
      */
     public function getPorcentagem()
     {
@@ -335,7 +335,7 @@ class ProdutoPedido extends SyncModel
     /**
      * Set Porcentagem value to new on param
      * @param  mixed $porcentagem new value for Porcentagem
-     * @return ProdutoPedido Self instance
+     * @return Item Self instance
      */
     public function setPorcentagem($porcentagem)
     {
@@ -345,7 +345,7 @@ class ProdutoPedido extends SyncModel
 
     /**
      * Preço de normal do produto no momento da venda
-     * @return mixed Preço de venda of ProdutoPedido
+     * @return mixed Preço de venda of Item
      */
     public function getPrecoVenda()
     {
@@ -355,7 +355,7 @@ class ProdutoPedido extends SyncModel
     /**
      * Set PrecoVenda value to new on param
      * @param  mixed $preco_venda new value for PrecoVenda
-     * @return ProdutoPedido Self instance
+     * @return Item Self instance
      */
     public function setPrecoVenda($preco_venda)
     {
@@ -365,7 +365,7 @@ class ProdutoPedido extends SyncModel
 
     /**
      * Preço de compra do produto calculado automaticamente na hora da venda
-     * @return mixed Preço de compra of ProdutoPedido
+     * @return mixed Preço de compra of Item
      */
     public function getPrecoCompra()
     {
@@ -375,7 +375,7 @@ class ProdutoPedido extends SyncModel
     /**
      * Set PrecoCompra value to new on param
      * @param  mixed $preco_compra new value for PrecoCompra
-     * @return ProdutoPedido Self instance
+     * @return Item Self instance
      */
     public function setPrecoCompra($preco_compra)
     {
@@ -385,7 +385,7 @@ class ProdutoPedido extends SyncModel
 
     /**
      * Observações do item pedido, Ex.: bem gelado, mal passado
-     * @return mixed Observações of ProdutoPedido
+     * @return mixed Observações of Item
      */
     public function getDetalhes()
     {
@@ -395,7 +395,7 @@ class ProdutoPedido extends SyncModel
     /**
      * Set Detalhes value to new on param
      * @param  mixed $detalhes new value for Detalhes
-     * @return ProdutoPedido Self instance
+     * @return Item Self instance
      */
     public function setDetalhes($detalhes)
     {
@@ -405,7 +405,7 @@ class ProdutoPedido extends SyncModel
 
     /**
      * Estado de preparo e envio do produto
-     * @return mixed Estado of ProdutoPedido
+     * @return mixed Estado of Item
      */
     public function getEstado()
     {
@@ -415,7 +415,7 @@ class ProdutoPedido extends SyncModel
     /**
      * Set Estado value to new on param
      * @param  mixed $estado new value for Estado
-     * @return ProdutoPedido Self instance
+     * @return Item Self instance
      */
     public function setEstado($estado)
     {
@@ -425,7 +425,7 @@ class ProdutoPedido extends SyncModel
 
     /**
      * Informa se o item foi visualizado por alguém
-     * @return mixed Visualizado of ProdutoPedido
+     * @return mixed Visualizado of Item
      */
     public function getVisualizado()
     {
@@ -444,7 +444,7 @@ class ProdutoPedido extends SyncModel
     /**
      * Set Visualizado value to new on param
      * @param  mixed $visualizado new value for Visualizado
-     * @return ProdutoPedido Self instance
+     * @return Item Self instance
      */
     public function setVisualizado($visualizado)
     {
@@ -454,7 +454,7 @@ class ProdutoPedido extends SyncModel
 
     /**
      * Data de visualização do item
-     * @return mixed Data de visualização of ProdutoPedido
+     * @return mixed Data de visualização of Item
      */
     public function getDataVisualizacao()
     {
@@ -464,7 +464,7 @@ class ProdutoPedido extends SyncModel
     /**
      * Set DataVisualizacao value to new on param
      * @param  mixed $data_visualizacao new value for DataVisualizacao
-     * @return ProdutoPedido Self instance
+     * @return Item Self instance
      */
     public function setDataVisualizacao($data_visualizacao)
     {
@@ -474,7 +474,7 @@ class ProdutoPedido extends SyncModel
 
     /**
      * Data de atualização do estado do item
-     * @return mixed Data de atualização of ProdutoPedido
+     * @return mixed Data de atualização of Item
      */
     public function getDataAtualizacao()
     {
@@ -484,7 +484,7 @@ class ProdutoPedido extends SyncModel
     /**
      * Set DataAtualizacao value to new on param
      * @param  mixed $data_atualizacao new value for DataAtualizacao
-     * @return ProdutoPedido Self instance
+     * @return Item Self instance
      */
     public function setDataAtualizacao($data_atualizacao)
     {
@@ -494,7 +494,7 @@ class ProdutoPedido extends SyncModel
 
     /**
      * Informa se o item foi cancelado
-     * @return mixed Cancelado of ProdutoPedido
+     * @return mixed Cancelado of Item
      */
     public function getCancelado()
     {
@@ -513,7 +513,7 @@ class ProdutoPedido extends SyncModel
     /**
      * Set Cancelado value to new on param
      * @param  mixed $cancelado new value for Cancelado
-     * @return ProdutoPedido Self instance
+     * @return Item Self instance
      */
     public function setCancelado($cancelado)
     {
@@ -523,7 +523,7 @@ class ProdutoPedido extends SyncModel
 
     /**
      * Informa o motivo do item ser cancelado
-     * @return mixed Motivo of ProdutoPedido
+     * @return mixed Motivo of Item
      */
     public function getMotivo()
     {
@@ -533,7 +533,7 @@ class ProdutoPedido extends SyncModel
     /**
      * Set Motivo value to new on param
      * @param  mixed $motivo new value for Motivo
-     * @return ProdutoPedido Self instance
+     * @return Item Self instance
      */
     public function setMotivo($motivo)
     {
@@ -543,7 +543,7 @@ class ProdutoPedido extends SyncModel
 
     /**
      * Informa se o item foi cancelado por conta de desperdício
-     * @return mixed Desperdiçado of ProdutoPedido
+     * @return mixed Desperdiçado of Item
      */
     public function getDesperdicado()
     {
@@ -562,7 +562,7 @@ class ProdutoPedido extends SyncModel
     /**
      * Set Desperdicado value to new on param
      * @param  mixed $desperdicado new value for Desperdicado
-     * @return ProdutoPedido Self instance
+     * @return Item Self instance
      */
     public function setDesperdicado($desperdicado)
     {
@@ -572,7 +572,7 @@ class ProdutoPedido extends SyncModel
 
     /**
      * Data e hora da realização do pedido do item
-     * @return mixed Data e hora of ProdutoPedido
+     * @return mixed Data e hora of Item
      */
     public function getDataHora()
     {
@@ -582,7 +582,7 @@ class ProdutoPedido extends SyncModel
     /**
      * Set DataHora value to new on param
      * @param  mixed $data_hora new value for DataHora
-     * @return ProdutoPedido Self instance
+     * @return Item Self instance
      */
     public function setDataHora($data_hora)
     {
@@ -603,7 +603,7 @@ class ProdutoPedido extends SyncModel
         $produto_pedido['funcionarioid'] = $this->getFuncionarioID();
         $produto_pedido['produtoid'] = $this->getProdutoID();
         $produto_pedido['servicoid'] = $this->getServicoID();
-        $produto_pedido['produtopedidoid'] = $this->getProdutoPedidoID();
+        $produto_pedido['itemid'] = $this->getItemID();
         $produto_pedido['descricao'] = $this->getDescricao();
         $produto_pedido['preco'] = $this->getPreco();
         $produto_pedido['quantidade'] = $this->getQuantidade();
@@ -625,11 +625,11 @@ class ProdutoPedido extends SyncModel
     /**
      * Fill this instance with from array values, you can pass instance to
      * @param  mixed $produto_pedido Associated key -> value to assign into this instance
-     * @return ProdutoPedido Self instance
+     * @return Item Self instance
      */
     public function fromArray($produto_pedido = [])
     {
-        if ($produto_pedido instanceof ProdutoPedido) {
+        if ($produto_pedido instanceof Item) {
             $produto_pedido = $produto_pedido->toArray();
         } elseif (!is_array($produto_pedido)) {
             $produto_pedido = [];
@@ -660,10 +660,10 @@ class ProdutoPedido extends SyncModel
         } else {
             $this->setServicoID($produto_pedido['servicoid']);
         }
-        if (!array_key_exists('produtopedidoid', $produto_pedido)) {
-            $this->setProdutoPedidoID(null);
+        if (!array_key_exists('itemid', $produto_pedido)) {
+            $this->setItemID(null);
         } else {
-            $this->setProdutoPedidoID($produto_pedido['produtopedidoid']);
+            $this->setItemID($produto_pedido['itemid']);
         }
         if (!array_key_exists('descricao', $produto_pedido)) {
             $this->setDescricao(null);
@@ -840,8 +840,8 @@ class ProdutoPedido extends SyncModel
 
     /**
      * Adiciona observação na frente dos detalhes
-     * @param ProdutoPedido $obs Texto da observação
-     * @return ProdutoPedido Self instance
+     * @param Item $obs Texto da observação
+     * @return Item Self instance
      */
     public function addObservacao($obs)
     {
@@ -855,7 +855,7 @@ class ProdutoPedido extends SyncModel
 
     /**
      * Filter fields, upload data and keep key data
-     * @param ProdutoPedido $original Original instance without modifications
+     * @param Item $original Original instance without modifications
      */
     public function filter($original, $localized = false)
     {
@@ -864,7 +864,7 @@ class ProdutoPedido extends SyncModel
         $this->setFuncionarioID(Filter::number($this->getFuncionarioID()));
         $this->setProdutoID(Filter::number($this->getProdutoID()));
         $this->setServicoID(Filter::number($this->getServicoID()));
-        $this->setProdutoPedidoID(Filter::number($this->getProdutoPedidoID()));
+        $this->setItemID(Filter::number($this->getItemID()));
         $this->setDescricao(Filter::string($this->getDescricao()));
         $this->setPreco(Filter::money($this->getPreco(), $localized));
         $this->setQuantidade(Filter::float($this->getQuantidade(), $localized));
@@ -880,7 +880,7 @@ class ProdutoPedido extends SyncModel
 
     /**
      * Clean instance resources like images and docs
-     * @param  ProdutoPedido $dependency Don't clean when dependency use same resources
+     * @param  Item $dependency Don't clean when dependency use same resources
      */
     public function clean($dependency)
     {
@@ -888,7 +888,7 @@ class ProdutoPedido extends SyncModel
 
     /**
      * Validate fields updating them and throw exception when invalid data has found
-     * @return array All field of ProdutoPedido in array format
+     * @return array All field of Item in array format
      */
     public function validate()
     {
@@ -948,7 +948,7 @@ class ProdutoPedido extends SyncModel
 
     /**
      * Insert a new Item do pedido into the database and fill instance from database
-     * @return ProdutoPedido Self instance
+     * @return Item Self instance
      */
     public function insert()
     {
@@ -967,7 +967,7 @@ class ProdutoPedido extends SyncModel
 
     /**
      * Update Item do pedido with instance values into database for ID
-     * @return ProdutoPedido Self instance
+     * @return Item Self instance
      */
     public function update($only = [])
     {
@@ -1007,7 +1007,7 @@ class ProdutoPedido extends SyncModel
     public function register($formacoes)
     {
         try {
-            if (is_null($this->getProdutoPedidoID())) {
+            if (is_null($this->getItemID())) {
                 // aplica o desconto dos opcionais e acrescenta o valor dos adicionais
                 // apenas nas composições fora de pacotes
                 foreach ($formacoes as $formacao) {
@@ -1032,7 +1032,7 @@ class ProdutoPedido extends SyncModel
             }
             $composicoes = [];
             foreach ($formacoes as $formacao) {
-                $formacao->setProdutoPedidoID($this->getID());
+                $formacao->setItemID($this->getID());
                 $formacao->filter(new Formacao());
                 $formacao->insert();
                 if ($formacao->getTipo() == Formacao::TIPO_COMPOSICAO) {
@@ -1055,7 +1055,7 @@ class ProdutoPedido extends SyncModel
      * Load one register for it self with a condition
      * @param  array $condition Condition for searching the row
      * @param  array $order associative field name -> [-1, 1]
-     * @return ProdutoPedido Self instance filled or empty
+     * @return Item Self instance filled or empty
      */
     public function load($condition, $order = [])
     {
@@ -1108,18 +1108,18 @@ class ProdutoPedido extends SyncModel
 
     /**
      * Pacote em que esse item faz parte
-     * @return \MZ\Sale\ProdutoPedido The object fetched from database
+     * @return \MZ\Sale\Item The object fetched from database
      */
-    public function findProdutoPedidoID()
+    public function findItemID()
     {
-        if (is_null($this->getProdutoPedidoID())) {
-            return new \MZ\Sale\ProdutoPedido();
+        if (is_null($this->getItemID())) {
+            return new \MZ\Sale\Item();
         }
-        return \MZ\Sale\ProdutoPedido::findByID($this->getProdutoPedidoID());
+        return \MZ\Sale\Item::findByID($this->getItemID());
     }
 
     /**
-     * Gets textual and translated Estado for ProdutoPedido
+     * Gets textual and translated Estado for Item
      * @param  int $index choose option from index
      * @return mixed A associative key -> translated representative text or text for index
      */
@@ -1145,7 +1145,7 @@ class ProdutoPedido extends SyncModel
      */
     private static function getAllowedKeys()
     {
-        $produto_pedido = new ProdutoPedido();
+        $produto_pedido = new Item();
         $allowed = Filter::concatKeys('p.', $produto_pedido->toArray());
         return $allowed;
     }
@@ -1254,7 +1254,7 @@ class ProdutoPedido extends SyncModel
                 ->select('p.funcionarioid')
                 ->select('p.produtoid')
                 ->select('p.servicoid')
-                ->select('p.produtopedidoid')
+                ->select('p.itemid')
                 ->select('p.descricao')
                 ->select('p.preco')
                 ->select('SUM(p.quantidade) as quantidade')
@@ -1322,13 +1322,13 @@ class ProdutoPedido extends SyncModel
      * @param  array $order associative field name -> [-1, 1]
      * @param  array $select select fields, empty to all fields
      * @param  array $group group rows
-     * @return ProdutoPedido A filled Item do pedido or empty instance
+     * @return Item A filled Item do pedido or empty instance
      */
     public static function find($condition, $order = [], $select = [], $group = [])
     {
         $query = self::query($condition, $order, $select, $group)->limit(1);
         $row = $query->fetch() ?: [];
-        return new ProdutoPedido($row);
+        return new Item($row);
     }
 
     /**
@@ -1339,7 +1339,7 @@ class ProdutoPedido extends SyncModel
      * @param  int    $offset    Start offset to get rows
      * @param  array  $select select fields, empty to all fields
      * @param  array  $group group rows
-     * @return array  List of all rows instanced as ProdutoPedido
+     * @return array  List of all rows instanced as Item
      */
     public static function findAll(
         $condition = [],
@@ -1359,7 +1359,7 @@ class ProdutoPedido extends SyncModel
         $rows = $query->fetchAll();
         $result = [];
         foreach ($rows as $row) {
-            $result[] = new ProdutoPedido($row);
+            $result[] = new Item($row);
         }
         return $result;
     }

@@ -32,7 +32,6 @@ use Symfony\Component\HttpFoundation\Response;
 class HtmlResponse extends Response
 {
     private $engine;
-    private $title;
 
     /**
      * Constructor for a new instance of Response
@@ -42,15 +41,6 @@ class HtmlResponse extends Response
     {
         parent::__construct();
         $this->engine = new \MZ\Template\Custom($settings);
-    }
-
-    /**
-     * Title of the HTML page
-     * @param string $title new title for the page
-     */
-    public function setTitle($title)
-    {
-        $this->title = $title;
     }
 
     /**
@@ -96,7 +86,7 @@ class HtmlResponse extends Response
                 $this->headers->set('Content-Type', 'text/html; charset=UTF-8');
                 break;
         }
-        $this->engine->pagetitle = $this->title;
+        $this->engine->pagetitle = isset($this->engine->getProperties()['pagetitle']) ? $this->engine->pagetitle : null;
         $content = $this->engine->render($template . '.twig');
         $this->setContent($content);
         return $this;

@@ -40,7 +40,7 @@ class TransferenciaTest extends \MZ\Framework\TestCase
             'destinomesaid',
             'comandaid',
             'destinocomandaid',
-            'produtopedidoid',
+            'itemid',
             'funcionarioid',
             'datahora',
         ];

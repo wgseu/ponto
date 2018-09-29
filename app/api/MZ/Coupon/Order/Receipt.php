@@ -46,14 +46,14 @@ class Receipt extends Model
 
     /**
      * Products of order
-     * @var \MZ\Sale\ProdutoPedido[]
+     * @var \MZ\Sale\Item[]
      */
     private $products;
     private $product_index;
 
     /**
      * Services of order
-     * @var \MZ\Sale\ProdutoPedido[]
+     * @var \MZ\Sale\Item[]
      */
     private $services;
     private $service_index;
@@ -100,7 +100,7 @@ class Receipt extends Model
 
     /**
      * Informs all products, services and discounts of order
-     * @param \MZ\Sale\ProdutoPedido[] $items all products, services and discounts
+     * @param \MZ\Sale\Item[] $items all products, services and discounts
      */
     public function setItems($items)
     {
@@ -131,7 +131,7 @@ class Receipt extends Model
 
     /**
      * Get current product item
-     * @return \MZ\Sale\ProdutoPedido current product item
+     * @return \MZ\Sale\Item current product item
      */
     protected function getProduct()
     {
@@ -170,7 +170,7 @@ class Receipt extends Model
 
     /**
      * Get current service item
-     * @return \MZ\Sale\ProdutoPedido current service item
+     * @return \MZ\Sale\Item current service item
      */
     protected function getService()
     {

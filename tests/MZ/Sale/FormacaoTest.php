@@ -32,7 +32,7 @@ class FormacaoTest extends \MZ\Framework\TestCase
         $values = $formacao->publish();
         $allowed = [
             'id',
-            'produtopedidoid',
+            'itemid',
             'tipo',
             'pacoteid',
             'composicaoid',

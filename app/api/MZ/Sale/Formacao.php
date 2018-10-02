@@ -24,10 +24,12 @@
  */
 namespace MZ\Sale;
 
-use MZ\Database\SyncModel;
-use MZ\Database\DB;
+use MZ\Util\Mask;
 use MZ\Util\Filter;
 use MZ\Util\Validator;
+use MZ\Database\DB;
+use MZ\Database\SyncModel;
+use MZ\Exception\ValidationException;
 
 /**
  * Informa qual foi a formação que gerou esse produto, assim como quais
@@ -51,7 +53,7 @@ class Formacao extends SyncModel
     /**
      * Informa qual foi o produto vendido para essa formação
      */
-    private $produto_pedido_id;
+    private $item_id;
     /**
      * Informa qual tipo de formação foi escolhida, Pacote: O produto ou
      * propriedade faz parte de um pacote, Composição: O produto é uma
@@ -82,7 +84,7 @@ class Formacao extends SyncModel
 
     /**
      * Identificador da formação
-     * @return mixed ID of Formacao
+     * @return int id of Formação
      */
     public function getID()
     {
@@ -91,8 +93,8 @@ class Formacao extends SyncModel
 
     /**
      * Set ID value to new on param
-     * @param  mixed $id new value for ID
-     * @return Formacao Self instance
+     * @param int $id Set id for Formação
+     * @return self Self instance
      */
     public function setID($id)
     {
@@ -102,21 +104,21 @@ class Formacao extends SyncModel
 
     /**
      * Informa qual foi o produto vendido para essa formação
-     * @return mixed Item do pedido of Formacao
+     * @return int item do pedido of Formação
      */
     public function getItemID()
     {
-        return $this->produto_pedido_id;
+        return $this->item_id;
     }
 
     /**
      * Set ItemID value to new on param
-     * @param  mixed $produto_pedido_id new value for ItemID
-     * @return Formacao Self instance
+     * @param int $item_id Set item do pedido for Formação
+     * @return self Self instance
      */
-    public function setItemID($produto_pedido_id)
+    public function setItemID($item_id)
     {
-        $this->produto_pedido_id = $produto_pedido_id;
+        $this->item_id = $item_id;
         return $this;
     }
 
@@ -124,7 +126,7 @@ class Formacao extends SyncModel
      * Informa qual tipo de formação foi escolhida, Pacote: O produto ou
      * propriedade faz parte de um pacote, Composição: O produto é uma
      * composição e esse item foi retirado ou adicionado na venda
-     * @return mixed Tipo of Formacao
+     * @return string tipo of Formação
      */
     public function getTipo()
     {
@@ -133,8 +135,8 @@ class Formacao extends SyncModel
 
     /**
      * Set Tipo value to new on param
-     * @param  mixed $tipo new value for Tipo
-     * @return Formacao Self instance
+     * @param string $tipo Set tipo for Formação
+     * @return self Self instance
      */
     public function setTipo($tipo)
     {
@@ -144,7 +146,7 @@ class Formacao extends SyncModel
 
     /**
      * Informa qual pacote foi selecionado no momento da venda
-     * @return mixed Pacote of Formacao
+     * @return int pacote of Formação
      */
     public function getPacoteID()
     {
@@ -153,8 +155,8 @@ class Formacao extends SyncModel
 
     /**
      * Set PacoteID value to new on param
-     * @param  mixed $pacote_id new value for PacoteID
-     * @return Formacao Self instance
+     * @param int $pacote_id Set pacote for Formação
+     * @return self Self instance
      */
     public function setPacoteID($pacote_id)
     {
@@ -164,7 +166,7 @@ class Formacao extends SyncModel
 
     /**
      * Informa qual composição foi retirada ou adicionada no momento da venda
-     * @return mixed Composição of Formacao
+     * @return int composição of Formação
      */
     public function getComposicaoID()
     {
@@ -173,8 +175,8 @@ class Formacao extends SyncModel
 
     /**
      * Set ComposicaoID value to new on param
-     * @param  mixed $composicao_id new value for ComposicaoID
-     * @return Formacao Self instance
+     * @param int $composicao_id Set composição for Formação
+     * @return self Self instance
      */
     public function setComposicaoID($composicao_id)
     {
@@ -184,7 +186,7 @@ class Formacao extends SyncModel
 
     /**
      * Quantidade de itens selecionados
-     * @return mixed Quantidade of Formacao
+     * @return float quantidade of Formação
      */
     public function getQuantidade()
     {
@@ -193,8 +195,8 @@ class Formacao extends SyncModel
 
     /**
      * Set Quantidade value to new on param
-     * @param  mixed $quantidade new value for Quantidade
-     * @return Formacao Self instance
+     * @param float $quantidade Set quantidade for Formação
+     * @return self Self instance
      */
     public function setQuantidade($quantidade)
     {
@@ -204,7 +206,7 @@ class Formacao extends SyncModel
 
     /**
      * Convert this instance to array associated key -> value
-     * @param  boolean $recursive Allow rescursive conversion of fields
+     * @param boolean $recursive Allow rescursive conversion of fields
      * @return array All field and values into array format
      */
     public function toArray($recursive = false)
@@ -221,12 +223,12 @@ class Formacao extends SyncModel
 
     /**
      * Fill this instance with from array values, you can pass instance to
-     * @param  mixed $formacao Associated key -> value to assign into this instance
-     * @return Formacao Self instance
+     * @param mixed $formacao Associated key -> value to assign into this instance
+     * @return self Self instance
      */
     public function fromArray($formacao = [])
     {
-        if ($formacao instanceof Formacao) {
+        if ($formacao instanceof self) {
             $formacao = $formacao->toArray();
         } elseif (!is_array($formacao)) {
             $formacao = [];
@@ -277,7 +279,9 @@ class Formacao extends SyncModel
 
     /**
      * Filter fields, upload data and keep key data
-     * @param Formacao $original Original instance without modifications
+     * @param self $original Original instance without modifications
+     * @param boolean $localized Informs if fields are localized
+     * @return self Self instance
      */
     public function filter($original, $localized = false)
     {
@@ -286,11 +290,12 @@ class Formacao extends SyncModel
         $this->setPacoteID(Filter::number($this->getPacoteID()));
         $this->setComposicaoID(Filter::number($this->getComposicaoID()));
         $this->setQuantidade(Filter::float($this->getQuantidade(), $localized));
+        return $this;
     }
 
     /**
      * Clean instance resources like images and docs
-     * @param  Formacao $dependency Don't clean when dependency use same resources
+     * @param self $dependency Don't clean when dependency use same resources
      */
     public function clean($dependency)
     {
@@ -299,40 +304,41 @@ class Formacao extends SyncModel
     /**
      * Validate fields updating them and throw exception when invalid data has found
      * @return array All field of Formacao in array format
+     * @throws \MZ\Exception\ValidationException for invalid input data
      */
     public function validate()
     {
         $errors = [];
         if (is_null($this->getItemID())) {
-            $errors['itemid'] = 'O item do pedido não pode ser vazio';
+            $errors['itemid'] = _t('formacao.item_id_cannot_empty');
         }
         if (!Validator::checkInSet($this->getTipo(), self::getTipoOptions())) {
-            $errors['tipo'] = 'O tipo não foi informado ou é inválido';
+            $errors['tipo'] = _t('formacao.tipo_invalid');
         }
         if (is_null($this->getQuantidade())) {
-            $errors['quantidade'] = 'A quantidade não pode ser vazia';
+            $errors['quantidade'] = _t('formacao.quantidade_cannot_empty');
         }
         if (!empty($errors)) {
-            throw new \MZ\Exception\ValidationException($errors);
+            throw new ValidationException($errors);
         }
         return $this->toArray();
     }
 
     /**
      * Translate SQL exception into application exception
-     * @param  \Exception $e exception to translate into a readable error
+     * @param \Exception $e exception to translate into a readable error
      * @return \MZ\Exception\ValidationException new exception translated
      */
     protected function translate($e)
     {
-        if (stripos($e->getMessage(), 'UK_Formacoes_ItemID_PacoteID') !== false) {
-            return new \MZ\Exception\ValidationException([
-                'itemid' => sprintf(
-                    'O item do pedido "%s" já está cadastrado',
+        if (contains(['ItemID', 'PacoteID', 'UNIQUE'], $e->getMessage())) {
+            return new ValidationException([
+                'itemid' => _t(
+                    'formacao.item_id_used',
                     $this->getItemID()
                 ),
-                'pacoteid' => sprintf(
-                    'O pacote "%s" já está cadastrado',
+                'pacoteid' => _t(
+                    'formacao.pacote_id_used',
                     $this->getPacoteID()
                 ),
             ]);
@@ -342,7 +348,8 @@ class Formacao extends SyncModel
 
     /**
      * Insert a new Formação into the database and fill instance from database
-     * @return Formacao Self instance
+     * @return self Self instance
+     * @throws \MZ\Exception\ValidationException for invalid input data
      */
     public function insert()
     {
@@ -361,36 +368,42 @@ class Formacao extends SyncModel
 
     /**
      * Update Formação with instance values into database for ID
-     * @param  array $only Save these fields only, when empty save all fields except id
-     * @return Formacao Self instance
+     * @param array $only Save these fields only, when empty save all fields except id
+     * @return int rows affected
+     * @throws \MZ\Exception\ValidationException for invalid input data
      */
     public function update($only = [])
     {
         $values = $this->validate();
         if (!$this->exists()) {
-            throw new \Exception('O identificador da formação não foi informado');
+            throw new ValidationException(
+                ['id' => _t('formacao.id_cannot_empty')]
+            );
         }
         $values = DB::filterValues($values, $only, false);
         try {
-            DB::update('Formacoes')
+            $affected = DB::update('Formacoes')
                 ->set($values)
-                ->where('id', $this->getID())
+                ->where(['id' => $this->getID()])
                 ->execute();
             $this->loadByID();
         } catch (\Exception $e) {
             throw $this->translate($e);
         }
-        return $this;
+        return $affected;
     }
 
     /**
      * Delete this instance from database using ID
      * @return integer Number of rows deleted (Max 1)
+     * @throws \MZ\Exception\ValidationException for invalid id
      */
     public function delete()
     {
         if (!$this->exists()) {
-            throw new \Exception('O identificador da formação não foi informado');
+            throw new ValidationException(
+                ['id' => _t('formacao.id_cannot_empty')]
+            );
         }
         $result = DB::deleteFrom('Formacoes')
             ->where('id', $this->getID())
@@ -400,9 +413,9 @@ class Formacao extends SyncModel
 
     /**
      * Load one register for it self with a condition
-     * @param  array $condition Condition for searching the row
-     * @param  array $order associative field name -> [-1, 1]
-     * @return Formacao Self instance filled or empty
+     * @param array $condition Condition for searching the row
+     * @param array $order associative field name -> [-1, 1]
+     * @return self Self instance filled or empty
      */
     public function load($condition, $order = [])
     {
@@ -413,15 +426,13 @@ class Formacao extends SyncModel
 
     /**
      * Load into this object from database using, ItemID, PacoteID
-     * @param  int $produto_pedido_id item do pedido to find Formação
-     * @param  int $pacote_id pacote to find Formação
-     * @return Formacao Self filled instance or empty when not found
+     * @return self Self filled instance or empty when not found
      */
-    public function loadByItemIDPacoteID($produto_pedido_id, $pacote_id)
+    public function loadByItemIDPacoteID()
     {
         return $this->load([
-            'itemid' => intval($produto_pedido_id),
-            'pacoteid' => intval($pacote_id),
+            'itemid' => intval($this->getItemID()),
+            'pacoteid' => intval($this->getPacoteID()),
         ]);
     }
 
@@ -460,14 +471,14 @@ class Formacao extends SyncModel
 
     /**
      * Gets textual and translated Tipo for Formacao
-     * @param  int $index choose option from index
-     * @return mixed A associative key -> translated representative text or text for index
+     * @param int $index choose option from index
+     * @return string[] A associative key -> translated representative text or text for index
      */
     public static function getTipoOptions($index = null)
     {
         $options = [
-            self::TIPO_PACOTE => 'Pacote',
-            self::TIPO_COMPOSICAO => 'Composicao',
+            self::TIPO_PACOTE => _t('formacao.tipo_pacote'),
+            self::TIPO_COMPOSICAO => _t('formacao.tipo_composicao'),
         ];
         if (!is_null($index)) {
             return $options[$index];
@@ -481,14 +492,14 @@ class Formacao extends SyncModel
      */
     private static function getAllowedKeys()
     {
-        $formacao = new Formacao();
+        $formacao = new self();
         $allowed = Filter::concatKeys('f.', $formacao->toArray());
         return $allowed;
     }
 
     /**
      * Filter order array
-     * @param  mixed $order order string or array to parse and filter allowed
+     * @param mixed $order order string or array to parse and filter allowed
      * @return array allowed associative order
      */
     private static function filterOrder($order)
@@ -499,7 +510,7 @@ class Formacao extends SyncModel
 
     /**
      * Filter condition array with allowed fields
-     * @param  array $condition condition to filter rows
+     * @param array $condition condition to filter rows
      * @return array allowed condition
      */
     private static function filterCondition($condition)
@@ -510,8 +521,8 @@ class Formacao extends SyncModel
 
     /**
      * Fetch data from database with a condition
-     * @param  array $condition condition to filter rows
-     * @param  array $order order rows
+     * @param array $condition condition to filter rows
+     * @param array $order order rows
      * @return SelectQuery query object with condition statement
      */
     private static function query($condition = [], $order = [])
@@ -525,36 +536,53 @@ class Formacao extends SyncModel
 
     /**
      * Search one register with a condition
-     * @param  array $condition Condition for searching the row
-     * @param  array $order order rows
-     * @return Formacao A filled Formação or empty instance
+     * @param array $condition Condition for searching the row
+     * @param array $order order rows
+     * @return self A filled Formação or empty instance
      */
     public static function find($condition, $order = [])
     {
-        $query = self::query($condition, $order)->limit(1);
-        $row = $query->fetch() ?: [];
-        return new Formacao($row);
+        $result = new self();
+        return $result->load($condition, $order);
+    }
+
+    /**
+     * Search one register with a condition
+     * @param array $condition Condition for searching the row
+     * @param array $order order rows
+     * @return self A filled Formação or empty instance
+     * @throws \Exception when register has not found
+     */
+    public static function findOrFail($condition, $order = [])
+    {
+        $result = self::find($condition, $order);
+        if (!$result->exists()) {
+            throw new \Exception(_t('formacao.not_found'), 404);
+        }
+        return $result;
     }
 
     /**
      * Find this object on database using, ItemID, PacoteID
-     * @param  int $produto_pedido_id item do pedido to find Formação
-     * @param  int $pacote_id pacote to find Formação
-     * @return Formacao A filled instance or empty when not found
+     * @param int $item_id item do pedido to find Formação
+     * @param int $pacote_id pacote to find Formação
+     * @return self A filled instance or empty when not found
      */
-    public static function findByItemIDPacoteID($produto_pedido_id, $pacote_id)
+    public static function findByItemIDPacoteID($item_id, $pacote_id)
     {
         $result = new self();
-        return $result->loadByItemIDPacoteID($produto_pedido_id, $pacote_id);
+        $result->setItemID($item_id);
+        $result->setPacoteID($pacote_id);
+        return $result->loadByItemIDPacoteID();
     }
 
     /**
      * Find all Formação
-     * @param  array  $condition Condition to get all Formação
-     * @param  array  $order     Order Formação
-     * @param  int    $limit     Limit data into row count
-     * @param  int    $offset    Start offset to get rows
-     * @return array             List of all rows instanced as Formacao
+     * @param array  $condition Condition to get all Formação
+     * @param array  $order     Order Formação
+     * @param int    $limit     Limit data into row count
+     * @param int    $offset    Start offset to get rows
+     * @return self[] List of all rows instanced as Formacao
      */
     public static function findAll($condition = [], $order = [], $limit = null, $offset = null)
     {
@@ -568,14 +596,14 @@ class Formacao extends SyncModel
         $rows = $query->fetchAll();
         $result = [];
         foreach ($rows as $row) {
-            $result[] = new Formacao($row);
+            $result[] = new self($row);
         }
         return $result;
     }
 
     /**
      * Count all rows from database with matched condition critery
-     * @param  array $condition condition to filter rows
+     * @param array $condition condition to filter rows
      * @return integer Quantity of rows
      */
     public static function count($condition = [])

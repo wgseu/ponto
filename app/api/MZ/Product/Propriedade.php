@@ -24,10 +24,12 @@
  */
 namespace MZ\Product;
 
-use MZ\Database\SyncModel;
-use MZ\Database\DB;
+use MZ\Util\Mask;
 use MZ\Util\Filter;
 use MZ\Util\Validator;
+use MZ\Database\DB;
+use MZ\Database\SyncModel;
+use MZ\Exception\ValidationException;
 
 /**
  * Informa tamanhos de pizzas e opções de peso do produto
@@ -55,7 +57,7 @@ class Propriedade extends SyncModel
     /**
      * Imagem que representa a propriedade
      */
-    private $imagem;
+    private $imagem_url;
     /**
      * Data de atualização dos dados ou da imagem da propriedade
      */
@@ -72,7 +74,7 @@ class Propriedade extends SyncModel
 
     /**
      * Identificador da propriedade
-     * @return mixed ID of Propriedade
+     * @return int id of Propriedade
      */
     public function getID()
     {
@@ -81,8 +83,8 @@ class Propriedade extends SyncModel
 
     /**
      * Set ID value to new on param
-     * @param  mixed $id new value for ID
-     * @return Propriedade Self instance
+     * @param int $id Set id for Propriedade
+     * @return self Self instance
      */
     public function setID($id)
     {
@@ -92,7 +94,7 @@ class Propriedade extends SyncModel
 
     /**
      * Grupo que possui essa propriedade como item de um pacote
-     * @return mixed Grupo of Propriedade
+     * @return int grupo of Propriedade
      */
     public function getGrupoID()
     {
@@ -101,8 +103,8 @@ class Propriedade extends SyncModel
 
     /**
      * Set GrupoID value to new on param
-     * @param  mixed $grupo_id new value for GrupoID
-     * @return Propriedade Self instance
+     * @param int $grupo_id Set grupo for Propriedade
+     * @return self Self instance
      */
     public function setGrupoID($grupo_id)
     {
@@ -112,7 +114,7 @@ class Propriedade extends SyncModel
 
     /**
      * Nome da propriedade, Ex.: Grande, Pequena
-     * @return mixed Nome of Propriedade
+     * @return string nome of Propriedade
      */
     public function getNome()
     {
@@ -121,8 +123,8 @@ class Propriedade extends SyncModel
 
     /**
      * Set Nome value to new on param
-     * @param  mixed $nome new value for Nome
-     * @return Propriedade Self instance
+     * @param string $nome Set nome for Propriedade
+     * @return self Self instance
      */
     public function setNome($nome)
     {
@@ -133,7 +135,7 @@ class Propriedade extends SyncModel
     /**
      * Abreviação do nome da propriedade, Ex.: G para Grande, P para Pequena,
      * essa abreviação fará parte do nome do produto
-     * @return mixed Abreviação of Propriedade
+     * @return string abreviação of Propriedade
      */
     public function getAbreviacao()
     {
@@ -142,8 +144,8 @@ class Propriedade extends SyncModel
 
     /**
      * Set Abreviacao value to new on param
-     * @param  mixed $abreviacao new value for Abreviacao
-     * @return Propriedade Self instance
+     * @param string $abreviacao Set abreviação for Propriedade
+     * @return self Self instance
      */
     public function setAbreviacao($abreviacao)
     {
@@ -153,27 +155,27 @@ class Propriedade extends SyncModel
 
     /**
      * Imagem que representa a propriedade
-     * @return mixed Imagem of Propriedade
+     * @return string imagem of Propriedade
      */
-    public function getImagem()
+    public function getImagemURL()
     {
-        return $this->imagem;
+        return $this->imagem_url;
     }
 
     /**
-     * Set Imagem value to new on param
-     * @param  mixed $imagem new value for Imagem
-     * @return Propriedade Self instance
+     * Set ImagemURL value to new on param
+     * @param string $imagem_url Set imagem for Propriedade
+     * @return self Self instance
      */
-    public function setImagem($imagem)
+    public function setImagemURL($imagem_url)
     {
-        $this->imagem = $imagem;
+        $this->imagem_url = $imagem_url;
         return $this;
     }
 
     /**
      * Data de atualização dos dados ou da imagem da propriedade
-     * @return mixed Data de atualização of Propriedade
+     * @return string data de atualização of Propriedade
      */
     public function getDataAtualizacao()
     {
@@ -182,8 +184,8 @@ class Propriedade extends SyncModel
 
     /**
      * Set DataAtualizacao value to new on param
-     * @param  mixed $data_atualizacao new value for DataAtualizacao
-     * @return Propriedade Self instance
+     * @param string $data_atualizacao Set data de atualização for Propriedade
+     * @return self Self instance
      */
     public function setDataAtualizacao($data_atualizacao)
     {
@@ -193,7 +195,7 @@ class Propriedade extends SyncModel
 
     /**
      * Convert this instance to array associated key -> value
-     * @param  boolean $recursive Allow rescursive conversion of fields
+     * @param boolean $recursive Allow rescursive conversion of fields
      * @return array All field and values into array format
      */
     public function toArray($recursive = false)
@@ -203,19 +205,19 @@ class Propriedade extends SyncModel
         $propriedade['grupoid'] = $this->getGrupoID();
         $propriedade['nome'] = $this->getNome();
         $propriedade['abreviacao'] = $this->getAbreviacao();
-        $propriedade['imagem'] = $this->getImagem();
+        $propriedade['imagemurl'] = $this->getImagemURL();
         $propriedade['dataatualizacao'] = $this->getDataAtualizacao();
         return $propriedade;
     }
 
     /**
      * Fill this instance with from array values, you can pass instance to
-     * @param  mixed $propriedade Associated key -> value to assign into this instance
-     * @return Propriedade Self instance
+     * @param mixed $propriedade Associated key -> value to assign into this instance
+     * @return self Self instance
      */
     public function fromArray($propriedade = [])
     {
-        if ($propriedade instanceof Propriedade) {
+        if ($propriedade instanceof self) {
             $propriedade = $propriedade->toArray();
         } elseif (!is_array($propriedade)) {
             $propriedade = [];
@@ -241,10 +243,10 @@ class Propriedade extends SyncModel
         } else {
             $this->setAbreviacao($propriedade['abreviacao']);
         }
-        if (!array_key_exists('imagem', $propriedade)) {
-            $this->setImagem(null);
+        if (!array_key_exists('imagemurl', $propriedade)) {
+            $this->setImagemURL(null);
         } else {
-            $this->setImagem($propriedade['imagem']);
+            $this->setImagemURL($propriedade['imagemurl']);
         }
         if (!isset($propriedade['dataatualizacao'])) {
             $this->setDataAtualizacao(DB::now());
@@ -266,16 +268,16 @@ class Propriedade extends SyncModel
     /**
      * Get relative imagem path or default imagem
      * @param boolean $default If true return default image, otherwise check field
-     * @param string $default_name Default image name
+     * @param string  $default_name Default image name
      * @return string relative web path for propriedade imagem
      */
-    public function makeImagem($default = false, $default_name = 'propriedade.png')
+    public function makeImagemURL($default = false, $default_name = 'propriedade.png')
     {
-        $imagem = $this->getImagem();
+        $imagem_url = $this->getImagemURL();
         if ($default) {
-            $imagem = null;
+            $imagem_url = null;
         }
-        return get_image_url($imagem, 'propriedade', $default_name);
+        return get_image_url($imagem_url, 'propriedade', $default_name);
     }
 
     /**
@@ -285,13 +287,15 @@ class Propriedade extends SyncModel
     public function publish()
     {
         $propriedade = parent::publish();
-        $propriedade['imagem'] = $this->makeImagem(false, null);
+        $propriedade['imagemurl'] = $this->makeImagemURL(false, null);
         return $propriedade;
     }
 
     /**
      * Filter fields, upload data and keep key data
-     * @param Propriedade $original Original instance without modifications
+     * @param self $original Original instance without modifications
+     * @param boolean $localized Informs if fields are localized
+     * @return self Self instance
      */
     public function filter($original, $localized = false)
     {
@@ -299,68 +303,63 @@ class Propriedade extends SyncModel
         $this->setGrupoID(Filter::number($this->getGrupoID()));
         $this->setNome(Filter::string($this->getNome()));
         $this->setAbreviacao(Filter::string($this->getAbreviacao()));
-        $imagem = upload_image('raw_imagem', 'propriedade', null, 256, 256, true, 'crop');
-        if (is_null($imagem) && trim($this->getImagem()) != '') {
-            $this->setImagem(true);
+        $imagem_url = upload_image('raw_imagemurl', 'propriedade', null, 256, 256, false, 'crop');
+        if (is_null($imagem_url) && trim($this->getImagemURL()) != '') {
+            $this->setImagemURL($original->getImagemURL());
         } else {
-            $this->setImagem($imagem);
-            $image_path = app()->getPath('public') . $this->makeImagem();
-            if (!is_null($imagem)) {
-                $this->setImagem(file_get_contents($image_path));
-                @unlink($image_path);
-            }
+            $this->setImagemURL($imagem_url);
         }
-        $this->setDataAtualizacao(DB::now());
+        return $this;
     }
 
     /**
      * Clean instance resources like images and docs
-     * @param  Propriedade $dependency Don't clean when dependency use same resources
+     * @param self $dependency Don't clean when dependency use same resources
      */
     public function clean($dependency)
     {
-        $this->setImagem($dependency->getImagem());
+        if (!is_null($this->getImagemURL()) && $dependency->getImagemURL() != $this->getImagemURL()) {
+            @unlink(get_image_path($this->getImagemURL(), 'propriedade'));
+        }
+        $this->setImagemURL($dependency->getImagemURL());
     }
 
     /**
      * Validate fields updating them and throw exception when invalid data has found
      * @return array All field of Propriedade in array format
+     * @throws \MZ\Exception\ValidationException for invalid input data
      */
     public function validate()
     {
         $errors = [];
         if (is_null($this->getGrupoID())) {
-            $errors['grupoid'] = 'O grupo não pode ser vazio';
+            $errors['grupoid'] = _t('propriedade.grupo_id_cannot_empty');
         }
         if (is_null($this->getNome())) {
-            $errors['nome'] = 'O nome não pode ser vazio';
+            $errors['nome'] = _t('propriedade.nome_cannot_empty');
         }
         $this->setDataAtualizacao(DB::now());
         if (!empty($errors)) {
-            throw new \MZ\Exception\ValidationException($errors);
+            throw new ValidationException($errors);
         }
-        $values = $this->toArray();
-        if ($this->getImagem() === true) {
-            unset($values['imagem']);
-        }
-        return $values;
+        return $this->toArray();
     }
 
     /**
      * Translate SQL exception into application exception
-     * @param  \Exception $e exception to translate into a readable error
+     * @param \Exception $e exception to translate into a readable error
      * @return \MZ\Exception\ValidationException new exception translated
      */
     protected function translate($e)
     {
         if (contains(['GrupoID', 'Nome', 'UNIQUE'], $e->getMessage())) {
-            return new \MZ\Exception\ValidationException([
-                'grupoid' => sprintf(
-                    'O grupo "%s" já está cadastrado',
+            return new ValidationException([
+                'grupoid' => _t(
+                    'propriedade.grupo_id_used',
                     $this->getGrupoID()
                 ),
-                'nome' => sprintf(
-                    'O nome "%s" já está cadastrado',
+                'nome' => _t(
+                    'propriedade.nome_used',
                     $this->getNome()
                 ),
             ]);
@@ -370,7 +369,8 @@ class Propriedade extends SyncModel
 
     /**
      * Insert a new Propriedade into the database and fill instance from database
-     * @return Propriedade Self instance
+     * @return self Self instance
+     * @throws \MZ\Exception\ValidationException for invalid input data
      */
     public function insert()
     {
@@ -389,36 +389,42 @@ class Propriedade extends SyncModel
 
     /**
      * Update Propriedade with instance values into database for ID
-     * @param  array $only Save these fields only, when empty save all fields except id
-     * @return Propriedade Self instance
+     * @param array $only Save these fields only, when empty save all fields except id
+     * @return int rows affected
+     * @throws \MZ\Exception\ValidationException for invalid input data
      */
     public function update($only = [])
     {
         $values = $this->validate();
         if (!$this->exists()) {
-            throw new \Exception('O identificador da propriedade não foi informado');
+            throw new ValidationException(
+                ['id' => _t('propriedade.id_cannot_empty')]
+            );
         }
         $values = DB::filterValues($values, $only, false);
         try {
-            DB::update('Propriedades')
+            $affected = DB::update('Propriedades')
                 ->set($values)
-                ->where('id', $this->getID())
+                ->where(['id' => $this->getID()])
                 ->execute();
             $this->loadByID();
         } catch (\Exception $e) {
             throw $this->translate($e);
         }
-        return $this;
+        return $affected;
     }
 
     /**
      * Delete this instance from database using ID
      * @return integer Number of rows deleted (Max 1)
+     * @throws \MZ\Exception\ValidationException for invalid id
      */
     public function delete()
     {
         if (!$this->exists()) {
-            throw new \Exception('O identificador da propriedade não foi informado');
+            throw new ValidationException(
+                ['id' => _t('propriedade.id_cannot_empty')]
+            );
         }
         $result = DB::deleteFrom('Propriedades')
             ->where('id', $this->getID())
@@ -428,9 +434,9 @@ class Propriedade extends SyncModel
 
     /**
      * Load one register for it self with a condition
-     * @param  array $condition Condition for searching the row
-     * @param  array $order associative field name -> [-1, 1]
-     * @return Propriedade Self instance filled or empty
+     * @param array $condition Condition for searching the row
+     * @param array $order associative field name -> [-1, 1]
+     * @return self Self instance filled or empty
      */
     public function load($condition, $order = [])
     {
@@ -441,30 +447,14 @@ class Propriedade extends SyncModel
 
     /**
      * Load into this object from database using, GrupoID, Nome
-     * @param  int $grupo_id grupo to find Propriedade
-     * @param  string $nome nome to find Propriedade
-     * @return Propriedade Self filled instance or empty when not found
+     * @return self Self filled instance or empty when not found
      */
-    public function loadByGrupoIDNome($grupo_id, $nome)
+    public function loadByGrupoIDNome()
     {
         return $this->load([
-            'grupoid' => intval($grupo_id),
-            'nome' => strval($nome),
+            'grupoid' => intval($this->getGrupoID()),
+            'nome' => strval($this->getNome()),
         ]);
-    }
-
-    /**
-     * Load image data from blob field on database
-     * @return Produto Self instance with imagem field filled
-     */
-    public function loadImagem()
-    {
-        $data = DB::from('Propriedades p')
-            ->select(null)
-            ->select('p.imagem')
-            ->where('p.id', $this->getID());
-        $this->setImagem($data);
-        return $this;
     }
 
     /**
@@ -482,14 +472,14 @@ class Propriedade extends SyncModel
      */
     private static function getAllowedKeys()
     {
-        $propriedade = new Propriedade();
+        $propriedade = new self();
         $allowed = Filter::concatKeys('p.', $propriedade->toArray());
         return $allowed;
     }
 
     /**
      * Filter order array
-     * @param  mixed $order order string or array to parse and filter allowed
+     * @param mixed $order order string or array to parse and filter allowed
      * @return array allowed associative order
      */
     private static function filterOrder($order)
@@ -500,7 +490,7 @@ class Propriedade extends SyncModel
 
     /**
      * Filter condition array with allowed fields
-     * @param  array $condition condition to filter rows
+     * @param array $condition condition to filter rows
      * @return array allowed condition
      */
     private static function filterCondition($condition)
@@ -518,8 +508,8 @@ class Propriedade extends SyncModel
 
     /**
      * Fetch data from database with a condition
-     * @param  array $condition condition to filter rows
-     * @param  array $order order rows
+     * @param array $condition condition to filter rows
+     * @param array $order order rows
      * @return SelectQuery query object with condition statement
      */
     private static function query($condition = [], $order = [])
@@ -544,36 +534,53 @@ class Propriedade extends SyncModel
 
     /**
      * Search one register with a condition
-     * @param  array $condition Condition for searching the row
-     * @param  array $order order rows
-     * @return Propriedade A filled Propriedade or empty instance
+     * @param array $condition Condition for searching the row
+     * @param array $order order rows
+     * @return self A filled Propriedade or empty instance
      */
     public static function find($condition, $order = [])
     {
-        $query = self::query($condition, $order)->limit(1);
-        $row = $query->fetch() ?: [];
-        return new Propriedade($row);
+        $result = new self();
+        return $result->load($condition, $order);
+    }
+
+    /**
+     * Search one register with a condition
+     * @param array $condition Condition for searching the row
+     * @param array $order order rows
+     * @return self A filled Propriedade or empty instance
+     * @throws \Exception when register has not found
+     */
+    public static function findOrFail($condition, $order = [])
+    {
+        $result = self::find($condition, $order);
+        if (!$result->exists()) {
+            throw new \Exception(_t('propriedade.not_found'), 404);
+        }
+        return $result;
     }
 
     /**
      * Find this object on database using, GrupoID, Nome
-     * @param  int $grupo_id grupo to find Propriedade
-     * @param  string $nome nome to find Propriedade
-     * @return Propriedade A filled instance or empty when not found
+     * @param int $grupo_id grupo to find Propriedade
+     * @param string $nome nome to find Propriedade
+     * @return self A filled instance or empty when not found
      */
     public static function findByGrupoIDNome($grupo_id, $nome)
     {
         $result = new self();
-        return $result->loadByGrupoIDNome($grupo_id, $nome);
+        $result->setGrupoID($grupo_id);
+        $result->setNome($nome);
+        return $result->loadByGrupoIDNome();
     }
 
     /**
      * Find all Propriedade
-     * @param  array  $condition Condition to get all Propriedade
-     * @param  array  $order     Order Propriedade
-     * @param  int    $limit     Limit data into row count
-     * @param  int    $offset    Start offset to get rows
-     * @return array             List of all rows instanced as Propriedade
+     * @param array  $condition Condition to get all Propriedade
+     * @param array  $order     Order Propriedade
+     * @param int    $limit     Limit data into row count
+     * @param int    $offset    Start offset to get rows
+     * @return self[] List of all rows instanced as Propriedade
      */
     public static function findAll($condition = [], $order = [], $limit = null, $offset = null)
     {
@@ -587,14 +594,14 @@ class Propriedade extends SyncModel
         $rows = $query->fetchAll();
         $result = [];
         foreach ($rows as $row) {
-            $result[] = new Propriedade($row);
+            $result[] = new self($row);
         }
         return $result;
     }
 
     /**
      * Count all rows from database with matched condition critery
-     * @param  array $condition condition to filter rows
+     * @param array $condition condition to filter rows
      * @return integer Quantity of rows
      */
     public static function count($condition = [])

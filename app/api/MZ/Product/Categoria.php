@@ -52,6 +52,10 @@ class Categoria extends SyncModel
      */
     private $descricao;
     /**
+     * Informa os detalhes gerais dos produtos dessa categoria
+     */
+    private $detalhes;
+    /**
      * Informa se a categoria é destinada para produtos ou serviços
      */
     private $servico;
@@ -139,6 +143,26 @@ class Categoria extends SyncModel
     public function setDescricao($descricao)
     {
         $this->descricao = $descricao;
+        return $this;
+    }
+
+    /**
+     * Informa os detalhes gerais dos produtos dessa categoria
+     * @return string detalhes of Categoria
+     */
+    public function getDetalhes()
+    {
+        return $this->detalhes;
+    }
+
+    /**
+     * Set Detalhes value to new on param
+     * @param string $detalhes Set detalhes for Categoria
+     * @return self Self instance
+     */
+    public function setDetalhes($detalhes)
+    {
+        $this->detalhes = $detalhes;
         return $this;
     }
 
@@ -262,6 +286,7 @@ class Categoria extends SyncModel
         $categoria['id'] = $this->getID();
         $categoria['categoriaid'] = $this->getCategoriaID();
         $categoria['descricao'] = $this->getDescricao();
+        $categoria['detalhes'] = $this->getDetalhes();
         $categoria['servico'] = $this->getServico();
         $categoria['imagemurl'] = $this->getImagemURL();
         $categoria['ordem'] = $this->getOrdem();
@@ -297,6 +322,11 @@ class Categoria extends SyncModel
             $this->setDescricao(null);
         } else {
             $this->setDescricao($categoria['descricao']);
+        }
+        if (!array_key_exists('detalhes', $categoria)) {
+            $this->setDetalhes(null);
+        } else {
+            $this->setDetalhes($categoria['detalhes']);
         }
         if (!isset($categoria['servico'])) {
             $this->setServico('N');
@@ -368,7 +398,8 @@ class Categoria extends SyncModel
         $this->setID($original->getID());
         $this->setCategoriaID(Filter::number($this->getCategoriaID()));
         $this->setDescricao(Filter::string($this->getDescricao()));
-        $imagem_url = upload_image('raw_imagemurl', 'categoria', null, 256, 256, true);
+        $this->setDetalhes(Filter::string($this->getDetalhes()));
+        $imagem_url = upload_image('raw_imagemurl', 'categoria', null, 256, 256);
         if (is_null($imagem_url) && trim($this->getImagemURL()) != '') {
             $this->setImagemURL($original->getImagemURL());
         } else {
@@ -668,7 +699,7 @@ class Categoria extends SyncModel
      * @param array  $order     Order Categoria
      * @param int    $limit     Limit data into row count
      * @param int    $offset    Start offset to get rows
-     * @return self[]             List of all rows instanced as Categoria
+     * @return self[] List of all rows instanced as Categoria
      */
     public static function findAll($condition = [], $order = [], $limit = null, $offset = null)
     {

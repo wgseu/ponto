@@ -917,22 +917,22 @@ class Produto extends SyncModel
             $this->setDetalhes($produto['detalhes']);
         }
         if (!isset($produto['quantidadelimite'])) {
-            $this->setQuantidadeLimite(null);
+            $this->setQuantidadeLimite(0);
         } else {
             $this->setQuantidadeLimite($produto['quantidadelimite']);
         }
         if (!isset($produto['quantidademaxima'])) {
-            $this->setQuantidadeMaxima(null);
+            $this->setQuantidadeMaxima(0);
         } else {
             $this->setQuantidadeMaxima($produto['quantidademaxima']);
         }
         if (!isset($produto['conteudo'])) {
-            $this->setConteudo(null);
+            $this->setConteudo(1);
         } else {
             $this->setConteudo($produto['conteudo']);
         }
         if (!isset($produto['precovenda'])) {
-            $this->setPrecoVenda(null);
+            $this->setPrecoVenda(0);
         } else {
             $this->setPrecoVenda($produto['precovenda']);
         }
@@ -1053,7 +1053,7 @@ class Produto extends SyncModel
     public function filter($original, $localized = false)
     {
         $this->setID($original->getID());
-        $this->setTributacaoID($original->getTributacaoID());
+        $this->setTributacaoID(Filter::number($original->getTributacaoID()));
         $this->setCodigo(Filter::number($this->getCodigo()));
         $this->setCodigoBarras(Filter::string($this->getCodigoBarras()));
         $this->setCategoriaID(Filter::number($this->getCategoriaID()));
@@ -1070,13 +1070,13 @@ class Produto extends SyncModel
         $this->setCustoProducao(Filter::money($this->getCustoProducao(), $localized));
         $this->setTempoPreparo(Filter::number($this->getTempoPreparo()));
         $this->setAvaliacao(Filter::float($this->getAvaliacao(), $localized));
-        $imagem_url = upload_image('raw_imagemurl', 'produto', null, 256, 256, true, 'crop');
+        $imagem_url = upload_image('raw_imagemurl', 'produto', null, 256, 256, false, 'crop');
         if (is_null($imagem_url) && trim($this->getImagemURL()) != '') {
             $this->setImagemURL($original->getImagemURL());
         } else {
             $this->setImagemURL($imagem_url);
         }
-        $this->setDataArquivado(Filter::datetime($this->getDataArquivado()));
+        $this->setDataArquivado(null);
         return $this;
     }
 
@@ -1381,7 +1381,7 @@ class Produto extends SyncModel
     /**
      * Gets textual and translated Tipo for Produto
      * @param int $index choose option from index
-     * @return string[]|string A associative key -> translated representative text or text for index
+     * @return string[] A associative key -> translated representative text or text for index
      */
     public static function getTipoOptions($index = null)
     {
@@ -1634,7 +1634,7 @@ class Produto extends SyncModel
      * @param array  $order     Order Produto
      * @param int    $limit     Limit data into row count
      * @param int    $offset    Start offset to get rows
-     * @return self[]             List of all rows instanced as Produto
+     * @return self[] List of all rows instanced as Produto
      */
     public static function findAll($condition = [], $order = [], $limit = null, $offset = null)
     {

@@ -24,17 +24,19 @@
  */
 namespace MZ\Product;
 
-use MZ\Database\SyncModel;
-use MZ\Database\DB;
-use MZ\Util\Date;
+use MZ\Util\Mask;
 use MZ\Util\Filter;
 use MZ\Util\Validator;
+use MZ\Database\DB;
+use MZ\Database\SyncModel;
+use MZ\Exception\ValidationException;
 
 /**
  * Contém todos as opções para a formação do produto final
  */
 class Pacote extends SyncModel
 {
+
     /**
      * Identificador do pacote
      */
@@ -83,6 +85,10 @@ class Pacote extends SyncModel
      * Indica se o pacote estará disponível para venda
      */
     private $visivel;
+    /**
+     * Data em que o pacote foi arquivado e não será mais usado
+     */
+    private $data_arquivado;
 
     /**
      * Constructor for a new empty instance of Pacote
@@ -95,7 +101,7 @@ class Pacote extends SyncModel
 
     /**
      * Identificador do pacote
-     * @return mixed ID of Pacote
+     * @return int id of Pacote
      */
     public function getID()
     {
@@ -104,8 +110,8 @@ class Pacote extends SyncModel
 
     /**
      * Set ID value to new on param
-     * @param  mixed $id new value for ID
-     * @return Pacote Self instance
+     * @param int $id Set id for Pacote
+     * @return self Self instance
      */
     public function setID($id)
     {
@@ -115,7 +121,7 @@ class Pacote extends SyncModel
 
     /**
      * Pacote a qual pertence as informações de formação do produto final
-     * @return mixed Pacote of Pacote
+     * @return int pacote of Pacote
      */
     public function getPacoteID()
     {
@@ -124,8 +130,8 @@ class Pacote extends SyncModel
 
     /**
      * Set PacoteID value to new on param
-     * @param  mixed $pacote_id new value for PacoteID
-     * @return Pacote Self instance
+     * @param int $pacote_id Set pacote for Pacote
+     * @return self Self instance
      */
     public function setPacoteID($pacote_id)
     {
@@ -135,7 +141,7 @@ class Pacote extends SyncModel
 
     /**
      * Grupo de formação, Ex.: Tamanho, Sabores e Complementos.
-     * @return mixed Grupo of Pacote
+     * @return int grupo of Pacote
      */
     public function getGrupoID()
     {
@@ -144,8 +150,8 @@ class Pacote extends SyncModel
 
     /**
      * Set GrupoID value to new on param
-     * @param  mixed $grupo_id new value for GrupoID
-     * @return Pacote Self instance
+     * @param int $grupo_id Set grupo for Pacote
+     * @return self Self instance
      */
     public function setGrupoID($grupo_id)
     {
@@ -155,7 +161,7 @@ class Pacote extends SyncModel
 
     /**
      * Produto selecionável do grupo. Não pode conter propriedade.
-     * @return mixed Produto of Pacote
+     * @return int produto of Pacote
      */
     public function getProdutoID()
     {
@@ -164,8 +170,8 @@ class Pacote extends SyncModel
 
     /**
      * Set ProdutoID value to new on param
-     * @param  mixed $produto_id new value for ProdutoID
-     * @return Pacote Self instance
+     * @param int $produto_id Set produto for Pacote
+     * @return self Self instance
      */
     public function setProdutoID($produto_id)
     {
@@ -175,7 +181,7 @@ class Pacote extends SyncModel
 
     /**
      * Propriedade selecionável do grupo. Não pode conter produto.
-     * @return mixed Propriedade of Pacote
+     * @return int propriedade of Pacote
      */
     public function getPropriedadeID()
     {
@@ -184,8 +190,8 @@ class Pacote extends SyncModel
 
     /**
      * Set PropriedadeID value to new on param
-     * @param  mixed $propriedade_id new value for PropriedadeID
-     * @return Pacote Self instance
+     * @param int $propriedade_id Set propriedade for Pacote
+     * @return self Self instance
      */
     public function setPropriedadeID($propriedade_id)
     {
@@ -197,7 +203,7 @@ class Pacote extends SyncModel
      * Informa a propriedade pai de um complemento, permite atribuir preços
      * diferentes dependendo da propriedade, Ex.: Tamanho -> Sabor, onde
      * Tamanho é pai de Sabor
-     * @return mixed Associação of Pacote
+     * @return int associação of Pacote
      */
     public function getAssociacaoID()
     {
@@ -206,8 +212,8 @@ class Pacote extends SyncModel
 
     /**
      * Set AssociacaoID value to new on param
-     * @param  mixed $associacao_id new value for AssociacaoID
-     * @return Pacote Self instance
+     * @param int $associacao_id Set associação for Pacote
+     * @return self Self instance
      */
     public function setAssociacaoID($associacao_id)
     {
@@ -218,7 +224,7 @@ class Pacote extends SyncModel
     /**
      * Permite definir uma quantidade mínima obrigatória para a venda desse
      * item
-     * @return mixed Quantidade mínima of Pacote
+     * @return int quantidade mínima of Pacote
      */
     public function getQuantidadeMinima()
     {
@@ -227,8 +233,8 @@ class Pacote extends SyncModel
 
     /**
      * Set QuantidadeMinima value to new on param
-     * @param  mixed $quantidade_minima new value for QuantidadeMinima
-     * @return Pacote Self instance
+     * @param int $quantidade_minima Set quantidade mínima for Pacote
+     * @return self Self instance
      */
     public function setQuantidadeMinima($quantidade_minima)
     {
@@ -238,7 +244,7 @@ class Pacote extends SyncModel
 
     /**
      * Define a quantidade máxima que pode ser vendido esse item repetidamente
-     * @return mixed Quantidade máxima of Pacote
+     * @return int quantidade máxima of Pacote
      */
     public function getQuantidadeMaxima()
     {
@@ -247,8 +253,8 @@ class Pacote extends SyncModel
 
     /**
      * Set QuantidadeMaxima value to new on param
-     * @param  mixed $quantidade_maxima new value for QuantidadeMaxima
-     * @return Pacote Self instance
+     * @param int $quantidade_maxima Set quantidade máxima for Pacote
+     * @return self Self instance
      */
     public function setQuantidadeMaxima($quantidade_maxima)
     {
@@ -258,7 +264,7 @@ class Pacote extends SyncModel
 
     /**
      * Valor acrescentado ao produto quando o item é selecionado
-     * @return mixed Valor of Pacote
+     * @return string valor of Pacote
      */
     public function getValor()
     {
@@ -267,8 +273,8 @@ class Pacote extends SyncModel
 
     /**
      * Set Valor value to new on param
-     * @param  mixed $valor new value for Valor
-     * @return Pacote Self instance
+     * @param string $valor Set valor for Pacote
+     * @return self Self instance
      */
     public function setValor($valor)
     {
@@ -279,7 +285,7 @@ class Pacote extends SyncModel
     /**
      * Informa se o complemento está selecionado por padrão, recomendado apenas
      * para produtos
-     * @return mixed Selecionado of Pacote
+     * @return string selecionado of Pacote
      */
     public function getSelecionado()
     {
@@ -298,8 +304,8 @@ class Pacote extends SyncModel
 
     /**
      * Set Selecionado value to new on param
-     * @param  mixed $selecionado new value for Selecionado
-     * @return Pacote Self instance
+     * @param string $selecionado Set selecionado for Pacote
+     * @return self Self instance
      */
     public function setSelecionado($selecionado)
     {
@@ -309,7 +315,7 @@ class Pacote extends SyncModel
 
     /**
      * Indica se o pacote estará disponível para venda
-     * @return mixed Visível of Pacote
+     * @return string visível of Pacote
      */
     public function getVisivel()
     {
@@ -327,8 +333,8 @@ class Pacote extends SyncModel
 
     /**
      * Set Visivel value to new on param
-     * @param  mixed $visivel new value for Visivel
-     * @return Pacote Self instance
+     * @param string $visivel Set visível for Pacote
+     * @return self Self instance
      */
     public function setVisivel($visivel)
     {
@@ -337,8 +343,28 @@ class Pacote extends SyncModel
     }
 
     /**
+     * Data em que o pacote foi arquivado e não será mais usado
+     * @return string data de arquivação of Pacote
+     */
+    public function getDataArquivado()
+    {
+        return $this->data_arquivado;
+    }
+
+    /**
+     * Set DataArquivado value to new on param
+     * @param string $data_arquivado Set data de arquivação for Pacote
+     * @return self Self instance
+     */
+    public function setDataArquivado($data_arquivado)
+    {
+        $this->data_arquivado = $data_arquivado;
+        return $this;
+    }
+
+    /**
      * Convert this instance to array associated key -> value
-     * @param  boolean $recursive Allow rescursive conversion of fields
+     * @param boolean $recursive Allow rescursive conversion of fields
      * @return array All field and values into array format
      */
     public function toArray($recursive = false)
@@ -355,17 +381,18 @@ class Pacote extends SyncModel
         $pacote['valor'] = $this->getValor();
         $pacote['selecionado'] = $this->getSelecionado();
         $pacote['visivel'] = $this->getVisivel();
+        $pacote['dataarquivado'] = $this->getDataArquivado();
         return $pacote;
     }
 
     /**
      * Fill this instance with from array values, you can pass instance to
-     * @param  mixed $pacote Associated key -> value to assign into this instance
-     * @return Pacote Self instance
+     * @param mixed $pacote Associated key -> value to assign into this instance
+     * @return self Self instance
      */
     public function fromArray($pacote = [])
     {
-        if ($pacote instanceof Pacote) {
+        if ($pacote instanceof self) {
             $pacote = $pacote->toArray();
         } elseif (!is_array($pacote)) {
             $pacote = [];
@@ -426,6 +453,11 @@ class Pacote extends SyncModel
         } else {
             $this->setVisivel($pacote['visivel']);
         }
+        if (!array_key_exists('dataarquivado', $pacote)) {
+            $this->setDataArquivado(null);
+        } else {
+            $this->setDataArquivado($pacote['dataarquivado']);
+        }
         return $this;
     }
 
@@ -441,7 +473,9 @@ class Pacote extends SyncModel
 
     /**
      * Filter fields, upload data and keep key data
-     * @param Pacote $original Original instance without modifications
+     * @param self $original Original instance without modifications
+     * @param boolean $localized Informs if fields are localized
+     * @return self Self instance
      */
     public function filter($original, $localized = false)
     {
@@ -454,11 +488,13 @@ class Pacote extends SyncModel
         $this->setQuantidadeMinima(Filter::number($this->getQuantidadeMinima()));
         $this->setQuantidadeMaxima(Filter::number($this->getQuantidadeMaxima()));
         $this->setValor(Filter::money($this->getValor(), $localized));
+        $this->setDataArquivado(null);
+        return $this;
     }
 
     /**
      * Clean instance resources like images and docs
-     * @param  Pacote $dependency Don't clean when dependency use same resources
+     * @param self $dependency Don't clean when dependency use same resources
      */
     public function clean($dependency)
     {
@@ -467,50 +503,42 @@ class Pacote extends SyncModel
     /**
      * Validate fields updating them and throw exception when invalid data has found
      * @return array All field of Pacote in array format
+     * @throws \MZ\Exception\ValidationException for invalid input data
      */
     public function validate()
     {
         $errors = [];
         if (is_null($this->getPacoteID())) {
-            $errors['pacoteid'] = 'O Pacote não pode ser vazio';
+            $errors['pacoteid'] = _t('pacote.pacote_id_cannot_empty');
         }
         if (is_null($this->getGrupoID())) {
-            $errors['grupoid'] = 'O Grupo não pode ser vazio';
+            $errors['grupoid'] = _t('pacote.grupo_id_cannot_empty');
         }
         if (is_null($this->getQuantidadeMinima())) {
-            $this->setQuantidadeMinima(0);
+            $errors['quantidademinima'] = _t('pacote.quantidade_minima_cannot_empty');
         }
         if (is_null($this->getQuantidadeMaxima())) {
-            $this->setQuantidadeMaxima(1);
+            $errors['quantidademaxima'] = _t('pacote.quantidade_maxima_cannot_empty');
         }
         if (is_null($this->getValor())) {
-            $errors['valor'] = 'O Valor não pode ser vazio';
+            $errors['valor'] = _t('pacote.valor_cannot_empty');
         }
         if (!Validator::checkBoolean($this->getSelecionado())) {
-            $errors['selecionado'] = 'A seleção não foi informada ou é inválida';
+            $errors['selecionado'] = _t('pacote.selecionado_invalid');
         }
         if (!Validator::checkBoolean($this->getVisivel())) {
-            $errors['visivel'] = 'A visíbilidade não foi informada ou é inválida';
+            $errors['visivel'] = _t('pacote.visivel_invalid');
         }
         if (!empty($errors)) {
-            throw new \MZ\Exception\ValidationException($errors);
+            throw new ValidationException($errors);
         }
         return $this->toArray();
     }
 
     /**
-     * Translate SQL exception into application exception
-     * @param  \Exception $e exception to translate into a readable error
-     * @return \MZ\Exception\ValidationException new exception translated
-     */
-    protected function translate($e)
-    {
-        return parent::translate($e);
-    }
-
-    /**
      * Insert a new Pacote into the database and fill instance from database
-     * @return Pacote Self instance
+     * @return self Self instance
+     * @throws \MZ\Exception\ValidationException for invalid input data
      */
     public function insert()
     {
@@ -529,36 +557,42 @@ class Pacote extends SyncModel
 
     /**
      * Update Pacote with instance values into database for ID
-     * @param  array $only Save these fields only, when empty save all fields except id
-     * @return Pacote Self instance
+     * @param array $only Save these fields only, when empty save all fields except id
+     * @return int rows affected
+     * @throws \MZ\Exception\ValidationException for invalid input data
      */
     public function update($only = [])
     {
         $values = $this->validate();
         if (!$this->exists()) {
-            throw new \Exception('O identificador do pacote não foi informado');
+            throw new ValidationException(
+                ['id' => _t('pacote.id_cannot_empty')]
+            );
         }
         $values = DB::filterValues($values, $only, false);
         try {
-            DB::update('Pacotes')
+            $affected = DB::update('Pacotes')
                 ->set($values)
-                ->where('id', $this->getID())
+                ->where(['id' => $this->getID()])
                 ->execute();
             $this->loadByID();
         } catch (\Exception $e) {
             throw $this->translate($e);
         }
-        return $this;
+        return $affected;
     }
 
     /**
      * Delete this instance from database using ID
      * @return integer Number of rows deleted (Max 1)
+     * @throws \MZ\Exception\ValidationException for invalid id
      */
     public function delete()
     {
         if (!$this->exists()) {
-            throw new \Exception('O identificador do pacote não foi informado');
+            throw new ValidationException(
+                ['id' => _t('pacote.id_cannot_empty')]
+            );
         }
         $result = DB::deleteFrom('Pacotes')
             ->where('id', $this->getID())
@@ -568,9 +602,9 @@ class Pacote extends SyncModel
 
     /**
      * Load one register for it self with a condition
-     * @param  array $condition Condition for searching the row
-     * @param  array $order associative field name -> [-1, 1]
-     * @return Pacote Self instance filled or empty
+     * @param array $condition Condition for searching the row
+     * @param array $order associative field name -> [-1, 1]
+     * @return self Self instance filled or empty
      */
     public function load($condition, $order = [])
     {
@@ -641,14 +675,14 @@ class Pacote extends SyncModel
      */
     private static function getAllowedKeys()
     {
-        $pacote = new Pacote();
+        $pacote = new self();
         $allowed = Filter::concatKeys('p.', $pacote->toArray());
         return $allowed;
     }
 
     /**
      * Filter order array
-     * @param  mixed $order order string or array to parse and filter allowed
+     * @param mixed $order order string or array to parse and filter allowed
      * @return array allowed associative order
      */
     private static function filterOrder($order)
@@ -659,7 +693,7 @@ class Pacote extends SyncModel
 
     /**
      * Filter condition array with allowed fields
-     * @param  array $condition condition to filter rows
+     * @param array $condition condition to filter rows
      * @return array allowed condition
      */
     private static function filterCondition($condition)
@@ -670,8 +704,8 @@ class Pacote extends SyncModel
 
     /**
      * Fetch data from database with a condition
-     * @param  array $condition condition to filter rows
-     * @param  array $order order rows
+     * @param array $condition condition to filter rows
+     * @param array $order order rows
      * @return SelectQuery query object with condition statement
      */
     private static function query($condition = [], $order = [])
@@ -737,19 +771,6 @@ class Pacote extends SyncModel
      * Search one register with a condition
      * @param  array $condition Condition for searching the row
      * @param  array $order order rows
-     * @return Pacote A filled Pacote or empty instance
-     */
-    public static function find($condition, $order = [])
-    {
-        $query = self::query($condition, $order)->limit(1);
-        $row = $query->fetch() ?: [];
-        return new Pacote($row);
-    }
-
-    /**
-     * Search one register with a condition
-     * @param  array $condition Condition for searching the row
-     * @param  array $order order rows
      * @return array Array with fields or empty when not found
      */
     public static function rawFind($condition, $order = [])
@@ -759,11 +780,40 @@ class Pacote extends SyncModel
     }
 
     /**
-     * Fetch all rows from database with matched condition critery
-     * @param  array $condition condition to filter rows
-     * @param  integer $limit number of rows to get, null for all
-     * @param  integer $offset start index to get rows, null for begining
-     * @return array All rows instanced and filled
+     * Search one register with a condition
+     * @param array $condition Condition for searching the row
+     * @param array $order order rows
+     * @return self A filled Pacote or empty instance
+     */
+    public static function find($condition, $order = [])
+    {
+        $result = new self();
+        return $result->load($condition, $order);
+    }
+
+    /**
+     * Search one register with a condition
+     * @param array $condition Condition for searching the row
+     * @param array $order order rows
+     * @return self A filled Pacote or empty instance
+     * @throws \Exception when register has not found
+     */
+    public static function findOrFail($condition, $order = [])
+    {
+        $result = self::find($condition, $order);
+        if (!$result->exists()) {
+            throw new \Exception(_t('pacote.not_found'), 404);
+        }
+        return $result;
+    }
+
+    /**
+     * Find all Pacote
+     * @param array  $condition Condition to get all Pacote
+     * @param array  $order     Order Pacote
+     * @param int    $limit     Limit data into row count
+     * @param int    $offset    Start offset to get rows
+     * @return self[] List of all rows instanced as Pacote
      */
     public static function findAll($condition = [], $order = [], $limit = null, $offset = null)
     {
@@ -777,7 +827,7 @@ class Pacote extends SyncModel
         $rows = $query->fetchAll();
         $result = [];
         foreach ($rows as $row) {
-            $result[] = new Pacote($row);
+            $result[] = new self($row);
         }
         return $result;
     }
@@ -803,7 +853,7 @@ class Pacote extends SyncModel
 
     /**
      * Count all rows from database with matched condition critery
-     * @param  array $condition condition to filter rows
+     * @param array $condition condition to filter rows
      * @return integer Quantity of rows
      */
     public static function count($condition = [])

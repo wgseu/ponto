@@ -24,10 +24,12 @@
  */
 namespace MZ\Sale;
 
-use MZ\Database\SyncModel;
-use MZ\Database\DB;
+use MZ\Util\Mask;
 use MZ\Util\Filter;
 use MZ\Util\Validator;
+use MZ\Database\DB;
+use MZ\Database\SyncModel;
+use MZ\Exception\ValidationException;
 
 /**
  * Informa a transferência de uma mesa / comanda para outra, ou de um
@@ -87,11 +89,11 @@ class Transferencia extends SyncModel
     /**
      * Item que foi transferido
      */
-    private $produto_pedido_id;
+    private $item_id;
     /**
-     * Funcionário que transferiu esse pedido/produto
+     * Prestador que transferiu esse pedido/produto
      */
-    private $funcionario_id;
+    private $prestador_id;
     /**
      * Data e hora da transferência
      */
@@ -108,7 +110,7 @@ class Transferencia extends SyncModel
 
     /**
      * Identificador da transferência
-     * @return mixed ID of Transferencia
+     * @return int id of Transferência
      */
     public function getID()
     {
@@ -117,8 +119,8 @@ class Transferencia extends SyncModel
 
     /**
      * Set ID value to new on param
-     * @param  mixed $id new value for ID
-     * @return Transferencia Self instance
+     * @param int $id Set id for Transferência
+     * @return self Self instance
      */
     public function setID($id)
     {
@@ -128,7 +130,7 @@ class Transferencia extends SyncModel
 
     /**
      * Identificador do pedido de origem
-     * @return mixed Pedido de origem of Transferencia
+     * @return int pedido de origem of Transferência
      */
     public function getPedidoID()
     {
@@ -137,8 +139,8 @@ class Transferencia extends SyncModel
 
     /**
      * Set PedidoID value to new on param
-     * @param  mixed $pedido_id new value for PedidoID
-     * @return Transferencia Self instance
+     * @param int $pedido_id Set pedido de origem for Transferência
+     * @return self Self instance
      */
     public function setPedidoID($pedido_id)
     {
@@ -148,7 +150,7 @@ class Transferencia extends SyncModel
 
     /**
      * Identificador do pedido de destino
-     * @return mixed Pedido de destino of Transferencia
+     * @return int pedido de destino of Transferência
      */
     public function getDestinoPedidoID()
     {
@@ -157,8 +159,8 @@ class Transferencia extends SyncModel
 
     /**
      * Set DestinoPedidoID value to new on param
-     * @param  mixed $destino_pedido_id new value for DestinoPedidoID
-     * @return Transferencia Self instance
+     * @param int $destino_pedido_id Set pedido de destino for Transferência
+     * @return self Self instance
      */
     public function setDestinoPedidoID($destino_pedido_id)
     {
@@ -168,7 +170,7 @@ class Transferencia extends SyncModel
 
     /**
      * Tipo de transferência, se de mesa/comanda ou de produto
-     * @return mixed Tipo of Transferencia
+     * @return string tipo of Transferência
      */
     public function getTipo()
     {
@@ -177,8 +179,8 @@ class Transferencia extends SyncModel
 
     /**
      * Set Tipo value to new on param
-     * @param  mixed $tipo new value for Tipo
-     * @return Transferencia Self instance
+     * @param string $tipo Set tipo for Transferência
+     * @return self Self instance
      */
     public function setTipo($tipo)
     {
@@ -188,7 +190,7 @@ class Transferencia extends SyncModel
 
     /**
      * Módulo de venda, se mesa ou comanda
-     * @return mixed Módulo of Transferencia
+     * @return string módulo of Transferência
      */
     public function getModulo()
     {
@@ -197,8 +199,8 @@ class Transferencia extends SyncModel
 
     /**
      * Set Modulo value to new on param
-     * @param  mixed $modulo new value for Modulo
-     * @return Transferencia Self instance
+     * @param string $modulo Set módulo for Transferência
+     * @return self Self instance
      */
     public function setModulo($modulo)
     {
@@ -208,7 +210,7 @@ class Transferencia extends SyncModel
 
     /**
      * Identificador da mesa de origem
-     * @return mixed Mesa de origem of Transferencia
+     * @return int mesa de origem of Transferência
      */
     public function getMesaID()
     {
@@ -217,8 +219,8 @@ class Transferencia extends SyncModel
 
     /**
      * Set MesaID value to new on param
-     * @param  mixed $mesa_id new value for MesaID
-     * @return Transferencia Self instance
+     * @param int $mesa_id Set mesa de origem for Transferência
+     * @return self Self instance
      */
     public function setMesaID($mesa_id)
     {
@@ -228,7 +230,7 @@ class Transferencia extends SyncModel
 
     /**
      * Mesa de destino da transferência
-     * @return mixed Mesa de destino of Transferencia
+     * @return int mesa de destino of Transferência
      */
     public function getDestinoMesaID()
     {
@@ -237,8 +239,8 @@ class Transferencia extends SyncModel
 
     /**
      * Set DestinoMesaID value to new on param
-     * @param  mixed $destino_mesa_id new value for DestinoMesaID
-     * @return Transferencia Self instance
+     * @param int $destino_mesa_id Set mesa de destino for Transferência
+     * @return self Self instance
      */
     public function setDestinoMesaID($destino_mesa_id)
     {
@@ -248,7 +250,7 @@ class Transferencia extends SyncModel
 
     /**
      * Comanda de origem da transferência
-     * @return mixed Comanda de origem of Transferencia
+     * @return int comanda de origem of Transferência
      */
     public function getComandaID()
     {
@@ -257,8 +259,8 @@ class Transferencia extends SyncModel
 
     /**
      * Set ComandaID value to new on param
-     * @param  mixed $comanda_id new value for ComandaID
-     * @return Transferencia Self instance
+     * @param int $comanda_id Set comanda de origem for Transferência
+     * @return self Self instance
      */
     public function setComandaID($comanda_id)
     {
@@ -268,7 +270,7 @@ class Transferencia extends SyncModel
 
     /**
      * Comanda de destino
-     * @return mixed Comanda de destino of Transferencia
+     * @return int comanda de destino of Transferência
      */
     public function getDestinoComandaID()
     {
@@ -277,8 +279,8 @@ class Transferencia extends SyncModel
 
     /**
      * Set DestinoComandaID value to new on param
-     * @param  mixed $destino_comanda_id new value for DestinoComandaID
-     * @return Transferencia Self instance
+     * @param int $destino_comanda_id Set comanda de destino for Transferência
+     * @return self Self instance
      */
     public function setDestinoComandaID($destino_comanda_id)
     {
@@ -288,47 +290,47 @@ class Transferencia extends SyncModel
 
     /**
      * Item que foi transferido
-     * @return mixed Item transferido of Transferencia
+     * @return int item transferido of Transferência
      */
     public function getItemID()
     {
-        return $this->produto_pedido_id;
+        return $this->item_id;
     }
 
     /**
      * Set ItemID value to new on param
-     * @param  mixed $produto_pedido_id new value for ItemID
-     * @return Transferencia Self instance
+     * @param int $item_id Set item transferido for Transferência
+     * @return self Self instance
      */
-    public function setItemID($produto_pedido_id)
+    public function setItemID($item_id)
     {
-        $this->produto_pedido_id = $produto_pedido_id;
+        $this->item_id = $item_id;
         return $this;
     }
 
     /**
-     * Funcionário que transferiu esse pedido/produto
-     * @return mixed Funcionário of Transferencia
+     * Prestador que transferiu esse pedido/produto
+     * @return int prestador of Transferência
      */
-    public function getFuncionarioID()
+    public function getPrestadorID()
     {
-        return $this->funcionario_id;
+        return $this->prestador_id;
     }
 
     /**
-     * Set FuncionarioID value to new on param
-     * @param  mixed $funcionario_id new value for FuncionarioID
-     * @return Transferencia Self instance
+     * Set PrestadorID value to new on param
+     * @param int $prestador_id Set prestador for Transferência
+     * @return self Self instance
      */
-    public function setFuncionarioID($funcionario_id)
+    public function setPrestadorID($prestador_id)
     {
-        $this->funcionario_id = $funcionario_id;
+        $this->prestador_id = $prestador_id;
         return $this;
     }
 
     /**
      * Data e hora da transferência
-     * @return mixed Data e hora of Transferencia
+     * @return string data e hora of Transferência
      */
     public function getDataHora()
     {
@@ -337,8 +339,8 @@ class Transferencia extends SyncModel
 
     /**
      * Set DataHora value to new on param
-     * @param  mixed $data_hora new value for DataHora
-     * @return Transferencia Self instance
+     * @param string $data_hora Set data e hora for Transferência
+     * @return self Self instance
      */
     public function setDataHora($data_hora)
     {
@@ -348,7 +350,7 @@ class Transferencia extends SyncModel
 
     /**
      * Convert this instance to array associated key -> value
-     * @param  boolean $recursive Allow rescursive conversion of fields
+     * @param boolean $recursive Allow rescursive conversion of fields
      * @return array All field and values into array format
      */
     public function toArray($recursive = false)
@@ -364,19 +366,19 @@ class Transferencia extends SyncModel
         $transferencia['comandaid'] = $this->getComandaID();
         $transferencia['destinocomandaid'] = $this->getDestinoComandaID();
         $transferencia['itemid'] = $this->getItemID();
-        $transferencia['funcionarioid'] = $this->getFuncionarioID();
+        $transferencia['prestadorid'] = $this->getPrestadorID();
         $transferencia['datahora'] = $this->getDataHora();
         return $transferencia;
     }
 
     /**
      * Fill this instance with from array values, you can pass instance to
-     * @param  mixed $transferencia Associated key -> value to assign into this instance
-     * @return Transferencia Self instance
+     * @param mixed $transferencia Associated key -> value to assign into this instance
+     * @return self Self instance
      */
     public function fromArray($transferencia = [])
     {
-        if ($transferencia instanceof Transferencia) {
+        if ($transferencia instanceof self) {
             $transferencia = $transferencia->toArray();
         } elseif (!is_array($transferencia)) {
             $transferencia = [];
@@ -432,10 +434,10 @@ class Transferencia extends SyncModel
         } else {
             $this->setItemID($transferencia['itemid']);
         }
-        if (!isset($transferencia['funcionarioid'])) {
-            $this->setFuncionarioID(null);
+        if (!isset($transferencia['prestadorid'])) {
+            $this->setPrestadorID(null);
         } else {
-            $this->setFuncionarioID($transferencia['funcionarioid']);
+            $this->setPrestadorID($transferencia['prestadorid']);
         }
         if (!isset($transferencia['datahora'])) {
             $this->setDataHora(null);
@@ -457,7 +459,9 @@ class Transferencia extends SyncModel
 
     /**
      * Filter fields, upload data and keep key data
-     * @param Transferencia $original Original instance without modifications
+     * @param self $original Original instance without modifications
+     * @param boolean $localized Informs if fields are localized
+     * @return self Self instance
      */
     public function filter($original, $localized = false)
     {
@@ -469,13 +473,14 @@ class Transferencia extends SyncModel
         $this->setComandaID(Filter::number($this->getComandaID()));
         $this->setDestinoComandaID(Filter::number($this->getDestinoComandaID()));
         $this->setItemID(Filter::number($this->getItemID()));
-        $this->setFuncionarioID(Filter::number($this->getFuncionarioID()));
+        $this->setPrestadorID(Filter::number($this->getPrestadorID()));
         $this->setDataHora(Filter::datetime($this->getDataHora()));
+        return $this;
     }
 
     /**
      * Clean instance resources like images and docs
-     * @param  Transferencia $dependency Don't clean when dependency use same resources
+     * @param self $dependency Don't clean when dependency use same resources
      */
     public function clean($dependency)
     {
@@ -484,53 +489,39 @@ class Transferencia extends SyncModel
     /**
      * Validate fields updating them and throw exception when invalid data has found
      * @return array All field of Transferencia in array format
+     * @throws \MZ\Exception\ValidationException for invalid input data
      */
     public function validate()
     {
         $errors = [];
         if (is_null($this->getPedidoID())) {
-            $errors['pedidoid'] = 'O pedido de origem não pode ser vazio';
+            $errors['pedidoid'] = _t('transferencia.pedido_id_cannot_empty');
         }
         if (is_null($this->getDestinoPedidoID())) {
-            $errors['destinopedidoid'] = 'O pedido de destino não pode ser vazio';
+            $errors['destinopedidoid'] = _t('transferencia.destino_pedido_id_cannot_empty');
         }
-        if (is_null($this->getTipo())) {
-            $errors['tipo'] = 'O tipo não pode ser vazio';
+        if (!Validator::checkInSet($this->getTipo(), self::getTipoOptions())) {
+            $errors['tipo'] = _t('transferencia.tipo_invalid');
         }
-        if (!Validator::checkInSet($this->getTipo(), self::getTipoOptions(), true)) {
-            $errors['tipo'] = 'O tipo é inválido';
+        if (!Validator::checkInSet($this->getModulo(), self::getModuloOptions())) {
+            $errors['modulo'] = _t('transferencia.modulo_invalid');
         }
-        if (is_null($this->getModulo())) {
-            $errors['modulo'] = 'O módulo não pode ser vazio';
-        }
-        if (!Validator::checkInSet($this->getModulo(), self::getModuloOptions(), true)) {
-            $errors['modulo'] = 'O módulo é inválido';
-        }
-        if (is_null($this->getFuncionarioID())) {
-            $errors['funcionarioid'] = 'O funcionário não pode ser vazio';
+        if (is_null($this->getPrestadorID())) {
+            $errors['prestadorid'] = _t('transferencia.prestador_id_cannot_empty');
         }
         if (is_null($this->getDataHora())) {
-            $errors['datahora'] = 'A data e hora não pode ser vazia';
+            $errors['datahora'] = _t('transferencia.data_hora_cannot_empty');
         }
         if (!empty($errors)) {
-            throw new \MZ\Exception\ValidationException($errors);
+            throw new ValidationException($errors);
         }
         return $this->toArray();
     }
 
     /**
-     * Translate SQL exception into application exception
-     * @param  \Exception $e exception to translate into a readable error
-     * @return \MZ\Exception\ValidationException new exception translated
-     */
-    protected function translate($e)
-    {
-        return parent::translate($e);
-    }
-
-    /**
      * Insert a new Transferência into the database and fill instance from database
-     * @return Transferencia Self instance
+     * @return self Self instance
+     * @throws \MZ\Exception\ValidationException for invalid input data
      */
     public function insert()
     {
@@ -549,36 +540,42 @@ class Transferencia extends SyncModel
 
     /**
      * Update Transferência with instance values into database for ID
-     * @param  array $only Save these fields only, when empty save all fields except id
-     * @return Transferencia Self instance
+     * @param array $only Save these fields only, when empty save all fields except id
+     * @return int rows affected
+     * @throws \MZ\Exception\ValidationException for invalid input data
      */
     public function update($only = [])
     {
         $values = $this->validate();
         if (!$this->exists()) {
-            throw new \Exception('O identificador da transferência não foi informado');
+            throw new ValidationException(
+                ['id' => _t('transferencia.id_cannot_empty')]
+            );
         }
         $values = DB::filterValues($values, $only, false);
         try {
-            DB::update('Transferencias')
+            $affected = DB::update('Transferencias')
                 ->set($values)
-                ->where('id', $this->getID())
+                ->where(['id' => $this->getID()])
                 ->execute();
             $this->loadByID();
         } catch (\Exception $e) {
             throw $this->translate($e);
         }
-        return $this;
+        return $affected;
     }
 
     /**
      * Delete this instance from database using ID
      * @return integer Number of rows deleted (Max 1)
+     * @throws \MZ\Exception\ValidationException for invalid id
      */
     public function delete()
     {
         if (!$this->exists()) {
-            throw new \Exception('O identificador da transferência não foi informado');
+            throw new ValidationException(
+                ['id' => _t('transferencia.id_cannot_empty')]
+            );
         }
         $result = DB::deleteFrom('Transferencias')
             ->where('id', $this->getID())
@@ -588,9 +585,9 @@ class Transferencia extends SyncModel
 
     /**
      * Load one register for it self with a condition
-     * @param  array $condition Condition for searching the row
-     * @param  array $order associative field name -> [-1, 1]
-     * @return Transferencia Self instance filled or empty
+     * @param array $condition Condition for searching the row
+     * @param array $order associative field name -> [-1, 1]
+     * @return self Self instance filled or empty
      */
     public function load($condition, $order = [])
     {
@@ -678,24 +675,24 @@ class Transferencia extends SyncModel
     }
 
     /**
-     * Funcionário que transferiu esse pedido/produto
+     * Prestador que transferiu esse pedido/produto
      * @return \MZ\Provider\Prestador The object fetched from database
      */
-    public function findFuncionarioID()
+    public function findPrestadorID()
     {
-        return \MZ\Provider\Prestador::findByID($this->getFuncionarioID());
+        return \MZ\Provider\Prestador::findByID($this->getPrestadorID());
     }
 
     /**
      * Gets textual and translated Tipo for Transferencia
-     * @param  int $index choose option from index
-     * @return mixed A associative key -> translated representative text or text for index
+     * @param int $index choose option from index
+     * @return string[] A associative key -> translated representative text or text for index
      */
     public static function getTipoOptions($index = null)
     {
         $options = [
-            self::TIPO_PEDIDO => 'Pedido',
-            self::TIPO_PRODUTO => 'Produto',
+            self::TIPO_PEDIDO => _t('transferencia.tipo_pedido'),
+            self::TIPO_PRODUTO => _t('transferencia.tipo_produto'),
         ];
         if (!is_null($index)) {
             return $options[$index];
@@ -705,14 +702,14 @@ class Transferencia extends SyncModel
 
     /**
      * Gets textual and translated Modulo for Transferencia
-     * @param  int $index choose option from index
-     * @return mixed A associative key -> translated representative text or text for index
+     * @param int $index choose option from index
+     * @return string[] A associative key -> translated representative text or text for index
      */
     public static function getModuloOptions($index = null)
     {
         $options = [
-            self::MODULO_MESA => 'Mesa',
-            self::MODULO_COMANDA => 'Comanda',
+            self::MODULO_MESA => _t('transferencia.modulo_mesa'),
+            self::MODULO_COMANDA => _t('transferencia.modulo_comanda'),
         ];
         if (!is_null($index)) {
             return $options[$index];
@@ -726,14 +723,14 @@ class Transferencia extends SyncModel
      */
     private static function getAllowedKeys()
     {
-        $transferencia = new Transferencia();
+        $transferencia = new self();
         $allowed = Filter::concatKeys('t.', $transferencia->toArray());
         return $allowed;
     }
 
     /**
      * Filter order array
-     * @param  mixed $order order string or array to parse and filter allowed
+     * @param mixed $order order string or array to parse and filter allowed
      * @return array allowed associative order
      */
     private static function filterOrder($order)
@@ -744,7 +741,7 @@ class Transferencia extends SyncModel
 
     /**
      * Filter condition array with allowed fields
-     * @param  array $condition condition to filter rows
+     * @param array $condition condition to filter rows
      * @return array allowed condition
      */
     private static function filterCondition($condition)
@@ -755,8 +752,8 @@ class Transferencia extends SyncModel
 
     /**
      * Fetch data from database with a condition
-     * @param  array $condition condition to filter rows
-     * @param  array $order order rows
+     * @param array $condition condition to filter rows
+     * @param array $order order rows
      * @return SelectQuery query object with condition statement
      */
     private static function query($condition = [], $order = [])
@@ -770,24 +767,39 @@ class Transferencia extends SyncModel
 
     /**
      * Search one register with a condition
-     * @param  array $condition Condition for searching the row
-     * @param  array $order order rows
-     * @return Transferencia A filled Transferência or empty instance
+     * @param array $condition Condition for searching the row
+     * @param array $order order rows
+     * @return self A filled Transferência or empty instance
      */
     public static function find($condition, $order = [])
     {
-        $query = self::query($condition, $order)->limit(1);
-        $row = $query->fetch() ?: [];
-        return new Transferencia($row);
+        $result = new self();
+        return $result->load($condition, $order);
+    }
+
+    /**
+     * Search one register with a condition
+     * @param array $condition Condition for searching the row
+     * @param array $order order rows
+     * @return self A filled Transferência or empty instance
+     * @throws \Exception when register has not found
+     */
+    public static function findOrFail($condition, $order = [])
+    {
+        $result = self::find($condition, $order);
+        if (!$result->exists()) {
+            throw new \Exception(_t('transferencia.not_found'), 404);
+        }
+        return $result;
     }
 
     /**
      * Find all Transferência
-     * @param  array  $condition Condition to get all Transferência
-     * @param  array  $order     Order Transferência
-     * @param  int    $limit     Limit data into row count
-     * @param  int    $offset    Start offset to get rows
-     * @return array             List of all rows instanced as Transferencia
+     * @param array  $condition Condition to get all Transferência
+     * @param array  $order     Order Transferência
+     * @param int    $limit     Limit data into row count
+     * @param int    $offset    Start offset to get rows
+     * @return self[] List of all rows instanced as Transferencia
      */
     public static function findAll($condition = [], $order = [], $limit = null, $offset = null)
     {
@@ -801,14 +813,14 @@ class Transferencia extends SyncModel
         $rows = $query->fetchAll();
         $result = [];
         foreach ($rows as $row) {
-            $result[] = new Transferencia($row);
+            $result[] = new self($row);
         }
         return $result;
     }
 
     /**
      * Count all rows from database with matched condition critery
-     * @param  array $condition condition to filter rows
+     * @param array $condition condition to filter rows
      * @return integer Quantity of rows
      */
     public static function count($condition = [])

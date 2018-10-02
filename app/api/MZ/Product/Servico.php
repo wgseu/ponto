@@ -531,6 +531,7 @@ class Servico extends SyncModel
      * Filter fields, upload data and keep key data
      * @param self $original Original instance without modifications
      * @param boolean $localized Informs if fields are localized
+     * @return self Self instance
      */
     public function filter($original, $localized = false)
     {
@@ -548,6 +549,7 @@ class Servico extends SyncModel
         } else {
             $this->setImagemURL($imagem_url);
         }
+        return $this;
     }
 
     /**
@@ -564,7 +566,7 @@ class Servico extends SyncModel
 
     /**
      * Validate fields updating them and throw exception when invalid data has found
-     * @return mixed[] All field of Servico in array format
+     * @return array All field of Servico in array format
      * @throws \MZ\Exception\ValidationException for invalid input data
      */
     public function validate()
@@ -705,7 +707,7 @@ class Servico extends SyncModel
     /**
      * Gets textual and translated Tipo for Servico
      * @param int $index choose option from index
-     * @return string[]|string A associative key -> translated representative text or text for index
+     * @return string[] A associative key -> translated representative text or text for index
      */
     public static function getTipoOptions($index = null)
     {
@@ -808,7 +810,7 @@ class Servico extends SyncModel
      * @param array  $order     Order Serviço
      * @param int    $limit     Limit data into row count
      * @param int    $offset    Start offset to get rows
-     * @return self[]             List of all rows instanced as Servico
+     * @return self[] List of all rows instanced as Servico
      */
     public static function findAll($condition = [], $order = [], $limit = null, $offset = null)
     {

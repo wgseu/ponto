@@ -24,10 +24,12 @@
  */
 namespace MZ\Product;
 
-use MZ\Database\SyncModel;
-use MZ\Database\DB;
+use MZ\Util\Mask;
 use MZ\Util\Filter;
 use MZ\Util\Validator;
+use MZ\Database\DB;
+use MZ\Database\SyncModel;
+use MZ\Exception\ValidationException;
 
 /**
  * Unidades de medidas aplicadas aos produtos
@@ -64,7 +66,7 @@ class Unidade extends SyncModel
 
     /**
      * Identificador da unidade
-     * @return mixed ID of Unidade
+     * @return int id of Unidade
      */
     public function getID()
     {
@@ -73,8 +75,8 @@ class Unidade extends SyncModel
 
     /**
      * Set ID value to new on param
-     * @param  mixed $id new value for ID
-     * @return Unidade Self instance
+     * @param int $id Set id for Unidade
+     * @return self Self instance
      */
     public function setID($id)
     {
@@ -84,7 +86,7 @@ class Unidade extends SyncModel
 
     /**
      * Nome da unidade de medida, Ex.: Grama, Quilo
-     * @return mixed Nome of Unidade
+     * @return string nome of Unidade
      */
     public function getNome()
     {
@@ -93,8 +95,8 @@ class Unidade extends SyncModel
 
     /**
      * Set Nome value to new on param
-     * @param  mixed $nome new value for Nome
-     * @return Unidade Self instance
+     * @param string $nome Set nome for Unidade
+     * @return self Self instance
      */
     public function setNome($nome)
     {
@@ -104,7 +106,7 @@ class Unidade extends SyncModel
 
     /**
      * Detalhes sobre a unidade de medida
-     * @return mixed Descrição of Unidade
+     * @return string descrição of Unidade
      */
     public function getDescricao()
     {
@@ -113,8 +115,8 @@ class Unidade extends SyncModel
 
     /**
      * Set Descricao value to new on param
-     * @param  mixed $descricao new value for Descricao
-     * @return Unidade Self instance
+     * @param string $descricao Set descrição for Unidade
+     * @return self Self instance
      */
     public function setDescricao($descricao)
     {
@@ -124,7 +126,7 @@ class Unidade extends SyncModel
 
     /**
      * Sigla da unidade de medida, Ex.: UN, L, g
-     * @return mixed Sigla of Unidade
+     * @return string sigla of Unidade
      */
     public function getSigla()
     {
@@ -133,8 +135,8 @@ class Unidade extends SyncModel
 
     /**
      * Set Sigla value to new on param
-     * @param  mixed $sigla new value for Sigla
-     * @return Unidade Self instance
+     * @param string $sigla Set sigla for Unidade
+     * @return self Self instance
      */
     public function setSigla($sigla)
     {
@@ -144,7 +146,7 @@ class Unidade extends SyncModel
 
     /**
      * Convert this instance to array associated key -> value
-     * @param  boolean $recursive Allow rescursive conversion of fields
+     * @param boolean $recursive Allow rescursive conversion of fields
      * @return array All field and values into array format
      */
     public function toArray($recursive = false)
@@ -159,12 +161,12 @@ class Unidade extends SyncModel
 
     /**
      * Fill this instance with from array values, you can pass instance to
-     * @param  mixed $unidade Associated key -> value to assign into this instance
-     * @return Unidade Self instance
+     * @param mixed $unidade Associated key -> value to assign into this instance
+     * @return self Self instance
      */
     public function fromArray($unidade = [])
     {
-        if ($unidade instanceof Unidade) {
+        if ($unidade instanceof self) {
             $unidade = $unidade->toArray();
         } elseif (!is_array($unidade)) {
             $unidade = [];
@@ -261,7 +263,9 @@ class Unidade extends SyncModel
 
     /**
      * Filter fields, upload data and keep key data
-     * @param Unidade $original Original instance without modifications
+     * @param self $original Original instance without modifications
+     * @param boolean $localized Informs if fields are localized
+     * @return self Self instance
      */
     public function filter($original, $localized = false)
     {
@@ -269,11 +273,12 @@ class Unidade extends SyncModel
         $this->setNome(Filter::string($this->getNome()));
         $this->setDescricao(Filter::string($this->getDescricao()));
         $this->setSigla(Filter::string($this->getSigla()));
+        return $this;
     }
 
     /**
      * Clean instance resources like images and docs
-     * @param  Unidade $dependency Don't clean when dependency use same resources
+     * @param self $dependency Don't clean when dependency use same resources
      */
     public function clean($dependency)
     {
@@ -282,33 +287,34 @@ class Unidade extends SyncModel
     /**
      * Validate fields updating them and throw exception when invalid data has found
      * @return array All field of Unidade in array format
+     * @throws \MZ\Exception\ValidationException for invalid input data
      */
     public function validate()
     {
         $errors = [];
         if (is_null($this->getNome())) {
-            $errors['nome'] = 'O nome não pode ser vazio';
+            $errors['nome'] = _t('unidade.nome_cannot_empty');
         }
         if (is_null($this->getSigla())) {
-            $errors['sigla'] = 'A sigla não pode ser vazia';
+            $errors['sigla'] = _t('unidade.sigla_cannot_empty');
         }
         if (!empty($errors)) {
-            throw new \MZ\Exception\ValidationException($errors);
+            throw new ValidationException($errors);
         }
         return $this->toArray();
     }
 
     /**
      * Translate SQL exception into application exception
-     * @param  \Exception $e exception to translate into a readable error
+     * @param \Exception $e exception to translate into a readable error
      * @return \MZ\Exception\ValidationException new exception translated
      */
     protected function translate($e)
     {
         if (contains(['Sigla', 'UNIQUE'], $e->getMessage())) {
-            return new \MZ\Exception\ValidationException([
-                'sigla' => sprintf(
-                    'A sigla "%s" já está cadastrada',
+            return new ValidationException([
+                'sigla' => _t(
+                    'unidade.sigla_used',
                     $this->getSigla()
                 ),
             ]);
@@ -318,7 +324,8 @@ class Unidade extends SyncModel
 
     /**
      * Insert a new Unidade into the database and fill instance from database
-     * @return Unidade Self instance
+     * @return self Self instance
+     * @throws \MZ\Exception\ValidationException for invalid input data
      */
     public function insert()
     {
@@ -337,36 +344,42 @@ class Unidade extends SyncModel
 
     /**
      * Update Unidade with instance values into database for ID
-     * @param  array $only Save these fields only, when empty save all fields except id
-     * @return Unidade Self instance
+     * @param array $only Save these fields only, when empty save all fields except id
+     * @return int rows affected
+     * @throws \MZ\Exception\ValidationException for invalid input data
      */
     public function update($only = [])
     {
         $values = $this->validate();
         if (!$this->exists()) {
-            throw new \Exception('O identificador da unidade não foi informado');
+            throw new ValidationException(
+                ['id' => _t('unidade.id_cannot_empty')]
+            );
         }
         $values = DB::filterValues($values, $only, false);
         try {
-            DB::update('Unidades')
+            $affected = DB::update('Unidades')
                 ->set($values)
-                ->where('id', $this->getID())
+                ->where(['id' => $this->getID()])
                 ->execute();
             $this->loadByID();
         } catch (\Exception $e) {
             throw $this->translate($e);
         }
-        return $this;
+        return $affected;
     }
 
     /**
      * Delete this instance from database using ID
      * @return integer Number of rows deleted (Max 1)
+     * @throws \MZ\Exception\ValidationException for invalid id
      */
     public function delete()
     {
         if (!$this->exists()) {
-            throw new \Exception('O identificador da unidade não foi informado');
+            throw new ValidationException(
+                ['id' => _t('unidade.id_cannot_empty')]
+            );
         }
         $result = DB::deleteFrom('Unidades')
             ->where('id', $this->getID())
@@ -376,9 +389,9 @@ class Unidade extends SyncModel
 
     /**
      * Load one register for it self with a condition
-     * @param  array $condition Condition for searching the row
-     * @param  array $order associative field name -> [-1, 1]
-     * @return Unidade Self instance filled or empty
+     * @param array $condition Condition for searching the row
+     * @param array $order associative field name -> [-1, 1]
+     * @return self Self instance filled or empty
      */
     public function load($condition, $order = [])
     {
@@ -389,13 +402,12 @@ class Unidade extends SyncModel
 
     /**
      * Load into this object from database using, Sigla
-     * @param  string $sigla sigla to find Unidade
-     * @return Unidade Self filled instance or empty when not found
+     * @return self Self filled instance or empty when not found
      */
-    public function loadBySigla($sigla)
+    public function loadBySigla()
     {
         return $this->load([
-            'sigla' => strval($sigla),
+            'sigla' => strval($this->getSigla()),
         ]);
     }
 
@@ -405,14 +417,14 @@ class Unidade extends SyncModel
      */
     private static function getAllowedKeys()
     {
-        $unidade = new Unidade();
+        $unidade = new self();
         $allowed = Filter::concatKeys('u.', $unidade->toArray());
         return $allowed;
     }
 
     /**
      * Filter order array
-     * @param  mixed $order order string or array to parse and filter allowed
+     * @param mixed $order order string or array to parse and filter allowed
      * @return array allowed associative order
      */
     private static function filterOrder($order)
@@ -423,7 +435,7 @@ class Unidade extends SyncModel
 
     /**
      * Filter condition array with allowed fields
-     * @param  array $condition condition to filter rows
+     * @param array $condition condition to filter rows
      * @return array allowed condition
      */
     private static function filterCondition($condition)
@@ -441,8 +453,8 @@ class Unidade extends SyncModel
 
     /**
      * Fetch data from database with a condition
-     * @param  array $condition condition to filter rows
-     * @param  array $order order rows
+     * @param array $condition condition to filter rows
+     * @param array $order order rows
      * @return SelectQuery query object with condition statement
      */
     private static function query($condition = [], $order = [])
@@ -457,35 +469,51 @@ class Unidade extends SyncModel
 
     /**
      * Search one register with a condition
-     * @param  array $condition Condition for searching the row
-     * @param  array $order order rows
-     * @return Unidade A filled Unidade or empty instance
+     * @param array $condition Condition for searching the row
+     * @param array $order order rows
+     * @return self A filled Unidade or empty instance
      */
     public static function find($condition, $order = [])
     {
-        $query = self::query($condition, $order)->limit(1);
-        $row = $query->fetch() ?: [];
-        return new Unidade($row);
+        $result = new self();
+        return $result->load($condition, $order);
+    }
+
+    /**
+     * Search one register with a condition
+     * @param array $condition Condition for searching the row
+     * @param array $order order rows
+     * @return self A filled Unidade or empty instance
+     * @throws \Exception when register has not found
+     */
+    public static function findOrFail($condition, $order = [])
+    {
+        $result = self::find($condition, $order);
+        if (!$result->exists()) {
+            throw new \Exception(_t('unidade.not_found'), 404);
+        }
+        return $result;
     }
 
     /**
      * Find this object on database using, Sigla
-     * @param  string $sigla sigla to find Unidade
-     * @return Unidade A filled instance or empty when not found
+     * @param string $sigla sigla to find Unidade
+     * @return self A filled instance or empty when not found
      */
     public static function findBySigla($sigla)
     {
         $result = new self();
-        return $result->loadBySigla($sigla);
+        $result->setSigla($sigla);
+        return $result->loadBySigla();
     }
 
     /**
      * Find all Unidade
-     * @param  array  $condition Condition to get all Unidade
-     * @param  array  $order     Order Unidade
-     * @param  int    $limit     Limit data into row count
-     * @param  int    $offset    Start offset to get rows
-     * @return array             List of all rows instanced as Unidade
+     * @param array  $condition Condition to get all Unidade
+     * @param array  $order     Order Unidade
+     * @param int    $limit     Limit data into row count
+     * @param int    $offset    Start offset to get rows
+     * @return self[] List of all rows instanced as Unidade
      */
     public static function findAll($condition = [], $order = [], $limit = null, $offset = null)
     {
@@ -499,14 +527,14 @@ class Unidade extends SyncModel
         $rows = $query->fetchAll();
         $result = [];
         foreach ($rows as $row) {
-            $result[] = new Unidade($row);
+            $result[] = new self($row);
         }
         return $result;
     }
 
     /**
      * Count all rows from database with matched condition critery
-     * @param  array $condition condition to filter rows
+     * @param array $condition condition to filter rows
      * @return integer Quantity of rows
      */
     public static function count($condition = [])

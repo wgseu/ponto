@@ -24,10 +24,12 @@
  */
 namespace MZ\Product;
 
-use MZ\Database\SyncModel;
-use MZ\Database\DB;
+use MZ\Util\Mask;
 use MZ\Util\Filter;
 use MZ\Util\Validator;
+use MZ\Database\DB;
+use MZ\Database\SyncModel;
+use MZ\Exception\ValidationException;
 
 /**
  * Informa todos os valores nutricionais da tabela nutricional
@@ -72,7 +74,7 @@ class ValorNutricional extends SyncModel
 
     /**
      * Identificador do valor nutricional
-     * @return mixed ID of ValorNutricional
+     * @return int id of Valor nutricional
      */
     public function getID()
     {
@@ -81,8 +83,8 @@ class ValorNutricional extends SyncModel
 
     /**
      * Set ID value to new on param
-     * @param  mixed $id new value for ID
-     * @return ValorNutricional Self instance
+     * @param int $id Set id for Valor nutricional
+     * @return self Self instance
      */
     public function setID($id)
     {
@@ -92,7 +94,7 @@ class ValorNutricional extends SyncModel
 
     /**
      * Informe a que tabela nutricional este valor pertence
-     * @return mixed Informação of ValorNutricional
+     * @return int informação of Valor nutricional
      */
     public function getInformacaoID()
     {
@@ -101,8 +103,8 @@ class ValorNutricional extends SyncModel
 
     /**
      * Set InformacaoID value to new on param
-     * @param  mixed $informacao_id new value for InformacaoID
-     * @return ValorNutricional Self instance
+     * @param int $informacao_id Set informação for Valor nutricional
+     * @return self Self instance
      */
     public function setInformacaoID($informacao_id)
     {
@@ -113,7 +115,7 @@ class ValorNutricional extends SyncModel
     /**
      * Unidade de medida do valor nutricional, geralmente grama, exceto para
      * valor energético
-     * @return mixed Unidade of ValorNutricional
+     * @return int unidade of Valor nutricional
      */
     public function getUnidadeID()
     {
@@ -122,8 +124,8 @@ class ValorNutricional extends SyncModel
 
     /**
      * Set UnidadeID value to new on param
-     * @param  mixed $unidade_id new value for UnidadeID
-     * @return ValorNutricional Self instance
+     * @param int $unidade_id Set unidade for Valor nutricional
+     * @return self Self instance
      */
     public function setUnidadeID($unidade_id)
     {
@@ -133,7 +135,7 @@ class ValorNutricional extends SyncModel
 
     /**
      * Nome do valor nutricional
-     * @return mixed Nome of ValorNutricional
+     * @return string nome of Valor nutricional
      */
     public function getNome()
     {
@@ -142,8 +144,8 @@ class ValorNutricional extends SyncModel
 
     /**
      * Set Nome value to new on param
-     * @param  mixed $nome new value for Nome
-     * @return ValorNutricional Self instance
+     * @param string $nome Set nome for Valor nutricional
+     * @return self Self instance
      */
     public function setNome($nome)
     {
@@ -153,7 +155,7 @@ class ValorNutricional extends SyncModel
 
     /**
      * Quantidade do valor nutricional com base na porção
-     * @return mixed Quantidade of ValorNutricional
+     * @return float quantidade of Valor nutricional
      */
     public function getQuantidade()
     {
@@ -162,8 +164,8 @@ class ValorNutricional extends SyncModel
 
     /**
      * Set Quantidade value to new on param
-     * @param  mixed $quantidade new value for Quantidade
-     * @return ValorNutricional Self instance
+     * @param float $quantidade Set quantidade for Valor nutricional
+     * @return self Self instance
      */
     public function setQuantidade($quantidade)
     {
@@ -173,7 +175,7 @@ class ValorNutricional extends SyncModel
 
     /**
      * Valor diário em %
-     * @return mixed Valor diário of ValorNutricional
+     * @return float valor diário of Valor nutricional
      */
     public function getValorDiario()
     {
@@ -182,8 +184,8 @@ class ValorNutricional extends SyncModel
 
     /**
      * Set ValorDiario value to new on param
-     * @param  mixed $valor_diario new value for ValorDiario
-     * @return ValorNutricional Self instance
+     * @param float $valor_diario Set valor diário for Valor nutricional
+     * @return self Self instance
      */
     public function setValorDiario($valor_diario)
     {
@@ -193,7 +195,7 @@ class ValorNutricional extends SyncModel
 
     /**
      * Convert this instance to array associated key -> value
-     * @param  boolean $recursive Allow rescursive conversion of fields
+     * @param boolean $recursive Allow rescursive conversion of fields
      * @return array All field and values into array format
      */
     public function toArray($recursive = false)
@@ -210,12 +212,12 @@ class ValorNutricional extends SyncModel
 
     /**
      * Fill this instance with from array values, you can pass instance to
-     * @param  mixed $valor_nutricional Associated key -> value to assign into this instance
-     * @return ValorNutricional Self instance
+     * @param mixed $valor_nutricional Associated key -> value to assign into this instance
+     * @return self Self instance
      */
     public function fromArray($valor_nutricional = [])
     {
-        if ($valor_nutricional instanceof ValorNutricional) {
+        if ($valor_nutricional instanceof self) {
             $valor_nutricional = $valor_nutricional->toArray();
         } elseif (!is_array($valor_nutricional)) {
             $valor_nutricional = [];
@@ -266,7 +268,9 @@ class ValorNutricional extends SyncModel
 
     /**
      * Filter fields, upload data and keep key data
-     * @param ValorNutricional $original Original instance without modifications
+     * @param self $original Original instance without modifications
+     * @param boolean $localized Informs if fields are localized
+     * @return self Self instance
      */
     public function filter($original, $localized = false)
     {
@@ -276,11 +280,12 @@ class ValorNutricional extends SyncModel
         $this->setNome(Filter::string($this->getNome()));
         $this->setQuantidade(Filter::float($this->getQuantidade(), $localized));
         $this->setValorDiario(Filter::float($this->getValorDiario(), $localized));
+        return $this;
     }
 
     /**
      * Clean instance resources like images and docs
-     * @param  ValorNutricional $dependency Don't clean when dependency use same resources
+     * @param self $dependency Don't clean when dependency use same resources
      */
     public function clean($dependency)
     {
@@ -289,43 +294,44 @@ class ValorNutricional extends SyncModel
     /**
      * Validate fields updating them and throw exception when invalid data has found
      * @return array All field of ValorNutricional in array format
+     * @throws \MZ\Exception\ValidationException for invalid input data
      */
     public function validate()
     {
         $errors = [];
         if (is_null($this->getInformacaoID())) {
-            $errors['informacaoid'] = 'A informação não pode ser vazia';
+            $errors['informacaoid'] = _t('valor_nutricional.informacao_id_cannot_empty');
         }
         if (is_null($this->getUnidadeID())) {
-            $errors['unidadeid'] = 'A unidade não pode ser vazia';
+            $errors['unidadeid'] = _t('valor_nutricional.unidade_id_cannot_empty');
         }
         if (is_null($this->getNome())) {
-            $errors['nome'] = 'O nome não pode ser vazio';
+            $errors['nome'] = _t('valor_nutricional.nome_cannot_empty');
         }
         if (is_null($this->getQuantidade())) {
-            $errors['quantidade'] = 'A quantidade não pode ser vazia';
+            $errors['quantidade'] = _t('valor_nutricional.quantidade_cannot_empty');
         }
         if (!empty($errors)) {
-            throw new \MZ\Exception\ValidationException($errors);
+            throw new ValidationException($errors);
         }
         return $this->toArray();
     }
 
     /**
      * Translate SQL exception into application exception
-     * @param  \Exception $e exception to translate into a readable error
+     * @param \Exception $e exception to translate into a readable error
      * @return \MZ\Exception\ValidationException new exception translated
      */
     protected function translate($e)
     {
-        if (stripos($e->getMessage(), 'UK_Informacao_Nome') !== false) {
-            return new \MZ\Exception\ValidationException([
-                'informacaoid' => sprintf(
-                    'A informação "%s" já está cadastrada',
+        if (contains(['InformacaoID', 'Nome', 'UNIQUE'], $e->getMessage())) {
+            return new ValidationException([
+                'informacaoid' => _t(
+                    'valor_nutricional.informacao_id_used',
                     $this->getInformacaoID()
                 ),
-                'nome' => sprintf(
-                    'O nome "%s" já está cadastrado',
+                'nome' => _t(
+                    'valor_nutricional.nome_used',
                     $this->getNome()
                 ),
             ]);
@@ -335,7 +341,8 @@ class ValorNutricional extends SyncModel
 
     /**
      * Insert a new Valor nutricional into the database and fill instance from database
-     * @return ValorNutricional Self instance
+     * @return self Self instance
+     * @throws \MZ\Exception\ValidationException for invalid input data
      */
     public function insert()
     {
@@ -354,35 +361,42 @@ class ValorNutricional extends SyncModel
 
     /**
      * Update Valor nutricional with instance values into database for ID
-     * @return ValorNutricional Self instance
+     * @param array $only Save these fields only, when empty save all fields except id
+     * @return int rows affected
+     * @throws \MZ\Exception\ValidationException for invalid input data
      */
     public function update($only = [])
     {
         $values = $this->validate();
         if (!$this->exists()) {
-            throw new \Exception('O identificador do valor nutricional não foi informado');
+            throw new ValidationException(
+                ['id' => _t('valor_nutricional.id_cannot_empty')]
+            );
         }
         $values = DB::filterValues($values, $only, false);
         try {
-            DB::update('Valores_Nutricionais')
+            $affected = DB::update('Valores_Nutricionais')
                 ->set($values)
-                ->where('id', $this->getID())
+                ->where(['id' => $this->getID()])
                 ->execute();
             $this->loadByID();
         } catch (\Exception $e) {
             throw $this->translate($e);
         }
-        return $this;
+        return $affected;
     }
 
     /**
      * Delete this instance from database using ID
      * @return integer Number of rows deleted (Max 1)
+     * @throws \MZ\Exception\ValidationException for invalid id
      */
     public function delete()
     {
         if (!$this->exists()) {
-            throw new \Exception('O identificador do valor nutricional não foi informado');
+            throw new ValidationException(
+                ['id' => _t('valor_nutricional.id_cannot_empty')]
+            );
         }
         $result = DB::deleteFrom('Valores_Nutricionais')
             ->where('id', $this->getID())
@@ -392,9 +406,9 @@ class ValorNutricional extends SyncModel
 
     /**
      * Load one register for it self with a condition
-     * @param  array $condition Condition for searching the row
-     * @param  array $order associative field name -> [-1, 1]
-     * @return ValorNutricional Self instance filled or empty
+     * @param array $condition Condition for searching the row
+     * @param array $order associative field name -> [-1, 1]
+     * @return self Self instance filled or empty
      */
     public function load($condition, $order = [])
     {
@@ -405,15 +419,13 @@ class ValorNutricional extends SyncModel
 
     /**
      * Load into this object from database using, InformacaoID, Nome
-     * @param  int $informacao_id informação to find Valor nutricional
-     * @param  string $nome nome to find Valor nutricional
-     * @return ValorNutricional Self filled instance or empty when not found
+     * @return self Self filled instance or empty when not found
      */
-    public function loadByInformacaoIDNome($informacao_id, $nome)
+    public function loadByInformacaoIDNome()
     {
         return $this->load([
-            'informacaoid' => intval($informacao_id),
-            'nome' => strval($nome),
+            'informacaoid' => intval($this->getInformacaoID()),
+            'nome' => strval($this->getNome()),
         ]);
     }
 
@@ -442,14 +454,14 @@ class ValorNutricional extends SyncModel
      */
     private static function getAllowedKeys()
     {
-        $valor_nutricional = new ValorNutricional();
+        $valor_nutricional = new self();
         $allowed = Filter::concatKeys('v.', $valor_nutricional->toArray());
         return $allowed;
     }
 
     /**
      * Filter order array
-     * @param  mixed $order order string or array to parse and filter allowed
+     * @param mixed $order order string or array to parse and filter allowed
      * @return array allowed associative order
      */
     private static function filterOrder($order)
@@ -460,7 +472,7 @@ class ValorNutricional extends SyncModel
 
     /**
      * Filter condition array with allowed fields
-     * @param  array $condition condition to filter rows
+     * @param array $condition condition to filter rows
      * @return array allowed condition
      */
     private static function filterCondition($condition)
@@ -478,8 +490,8 @@ class ValorNutricional extends SyncModel
 
     /**
      * Fetch data from database with a condition
-     * @param  array $condition condition to filter rows
-     * @param  array $order order rows
+     * @param array $condition condition to filter rows
+     * @param array $order order rows
      * @return SelectQuery query object with condition statement
      */
     private static function query($condition = [], $order = [])
@@ -494,36 +506,53 @@ class ValorNutricional extends SyncModel
 
     /**
      * Search one register with a condition
-     * @param  array $condition Condition for searching the row
-     * @param  array $order order rows
-     * @return ValorNutricional A filled Valor nutricional or empty instance
+     * @param array $condition Condition for searching the row
+     * @param array $order order rows
+     * @return self A filled Valor nutricional or empty instance
      */
     public static function find($condition, $order = [])
     {
-        $query = self::query($condition, $order)->limit(1);
-        $row = $query->fetch() ?: [];
-        return new ValorNutricional($row);
+        $result = new self();
+        return $result->load($condition, $order);
+    }
+
+    /**
+     * Search one register with a condition
+     * @param array $condition Condition for searching the row
+     * @param array $order order rows
+     * @return self A filled Valor nutricional or empty instance
+     * @throws \Exception when register has not found
+     */
+    public static function findOrFail($condition, $order = [])
+    {
+        $result = self::find($condition, $order);
+        if (!$result->exists()) {
+            throw new \Exception(_t('valor_nutricional.not_found'), 404);
+        }
+        return $result;
     }
 
     /**
      * Find this object on database using, InformacaoID, Nome
-     * @param  int $informacao_id informação to find Valor nutricional
-     * @param  string $nome nome to find Valor nutricional
-     * @return ValorNutricional A filled instance or empty when not found
+     * @param int $informacao_id informação to find Valor nutricional
+     * @param string $nome nome to find Valor nutricional
+     * @return self A filled instance or empty when not found
      */
     public static function findByInformacaoIDNome($informacao_id, $nome)
     {
         $result = new self();
-        return $result->loadByInformacaoIDNome($informacao_id, $nome);
+        $result->setInformacaoID($informacao_id);
+        $result->setNome($nome);
+        return $result->loadByInformacaoIDNome();
     }
 
     /**
      * Find all Valor nutricional
-     * @param  array  $condition Condition to get all Valor nutricional
-     * @param  array  $order     Order Valor nutricional
-     * @param  int    $limit     Limit data into row count
-     * @param  int    $offset    Start offset to get rows
-     * @return array             List of all rows instanced as ValorNutricional
+     * @param array  $condition Condition to get all Valor nutricional
+     * @param array  $order     Order Valor nutricional
+     * @param int    $limit     Limit data into row count
+     * @param int    $offset    Start offset to get rows
+     * @return self[] List of all rows instanced as ValorNutricional
      */
     public static function findAll($condition = [], $order = [], $limit = null, $offset = null)
     {
@@ -537,14 +566,14 @@ class ValorNutricional extends SyncModel
         $rows = $query->fetchAll();
         $result = [];
         foreach ($rows as $row) {
-            $result[] = new ValorNutricional($row);
+            $result[] = new self($row);
         }
         return $result;
     }
 
     /**
      * Count all rows from database with matched condition critery
-     * @param  array $condition condition to filter rows
+     * @param array $condition condition to filter rows
      * @return integer Quantity of rows
      */
     public static function count($condition = [])

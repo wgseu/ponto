@@ -24,10 +24,12 @@
  */
 namespace MZ\Product;
 
-use MZ\Database\SyncModel;
-use MZ\Database\DB;
+use MZ\Util\Mask;
 use MZ\Util\Filter;
 use MZ\Util\Validator;
+use MZ\Database\DB;
+use MZ\Database\SyncModel;
+use MZ\Exception\ValidationException;
 
 /**
  * Informa as propriedades da composição de um produto composto
@@ -72,6 +74,11 @@ class Composicao extends SyncModel
      */
     private $valor;
     /**
+     * Define a quantidade máxima que essa composição pode ser vendida
+     * repetidamente
+     */
+    private $quantidade_maxima;
+    /**
      * Indica se a composição está sendo usada atualmente na composição do
      * produto
      */
@@ -88,7 +95,7 @@ class Composicao extends SyncModel
 
     /**
      * Identificador da composição
-     * @return mixed ID of Composicao
+     * @return int id of Composição
      */
     public function getID()
     {
@@ -97,8 +104,8 @@ class Composicao extends SyncModel
 
     /**
      * Set ID value to new on param
-     * @param  mixed $id new value for ID
-     * @return Composicao Self instance
+     * @param int $id Set id for Composição
+     * @return self Self instance
      */
     public function setID($id)
     {
@@ -109,7 +116,7 @@ class Composicao extends SyncModel
     /**
      * Informa a qual produto pertence essa composição, deve sempre ser um
      * produto do tipo Composição
-     * @return mixed Composição of Composicao
+     * @return int composição of Composição
      */
     public function getComposicaoID()
     {
@@ -118,8 +125,8 @@ class Composicao extends SyncModel
 
     /**
      * Set ComposicaoID value to new on param
-     * @param  mixed $composicao_id new value for ComposicaoID
-     * @return Composicao Self instance
+     * @param int $composicao_id Set composição for Composição
+     * @return self Self instance
      */
     public function setComposicaoID($composicao_id)
     {
@@ -130,7 +137,7 @@ class Composicao extends SyncModel
     /**
      * Produto ou composição que faz parte dessa composição, Obs: Não pode ser
      * um pacote
-     * @return mixed Produto da composição of Composicao
+     * @return int produto da composição of Composição
      */
     public function getProdutoID()
     {
@@ -139,8 +146,8 @@ class Composicao extends SyncModel
 
     /**
      * Set ProdutoID value to new on param
-     * @param  mixed $produto_id new value for ProdutoID
-     * @return Composicao Self instance
+     * @param int $produto_id Set produto da composição for Composição
+     * @return self Self instance
      */
     public function setProdutoID($produto_id)
     {
@@ -151,7 +158,7 @@ class Composicao extends SyncModel
     /**
      * Tipo de composição, 'Composicao' sempre retira do estoque, 'Opcional'
      * permite desmarcar na venda, 'Adicional' permite adicionar na venda
-     * @return mixed Tipo of Composicao
+     * @return string tipo of Composição
      */
     public function getTipo()
     {
@@ -160,8 +167,8 @@ class Composicao extends SyncModel
 
     /**
      * Set Tipo value to new on param
-     * @param  mixed $tipo new value for Tipo
-     * @return Composicao Self instance
+     * @param string $tipo Set tipo for Composição
+     * @return self Self instance
      */
     public function setTipo($tipo)
     {
@@ -171,7 +178,7 @@ class Composicao extends SyncModel
 
     /**
      * Quantidade que será consumida desse produto para cada composição formada
-     * @return mixed Quantidade of Composicao
+     * @return float quantidade of Composição
      */
     public function getQuantidade()
     {
@@ -180,8 +187,8 @@ class Composicao extends SyncModel
 
     /**
      * Set Quantidade value to new on param
-     * @param  mixed $quantidade new value for Quantidade
-     * @return Composicao Self instance
+     * @param float $quantidade Set quantidade for Composição
+     * @return self Self instance
      */
     public function setQuantidade($quantidade)
     {
@@ -192,7 +199,7 @@ class Composicao extends SyncModel
     /**
      * Desconto que será realizado ao retirar esse produto da composição no
      * momento da venda
-     * @return mixed Valor of Composicao
+     * @return string valor of Composição
      */
     public function getValor()
     {
@@ -201,8 +208,8 @@ class Composicao extends SyncModel
 
     /**
      * Set Valor value to new on param
-     * @param  mixed $valor new value for Valor
-     * @return Composicao Self instance
+     * @param string $valor Set valor for Composição
+     * @return self Self instance
      */
     public function setValor($valor)
     {
@@ -211,9 +218,30 @@ class Composicao extends SyncModel
     }
 
     /**
+     * Define a quantidade máxima que essa composição pode ser vendida
+     * repetidamente
+     * @return int quantidade máxima of Composição
+     */
+    public function getQuantidadeMaxima()
+    {
+        return $this->quantidade_maxima;
+    }
+
+    /**
+     * Set QuantidadeMaxima value to new on param
+     * @param int $quantidade_maxima Set quantidade máxima for Composição
+     * @return self Self instance
+     */
+    public function setQuantidadeMaxima($quantidade_maxima)
+    {
+        $this->quantidade_maxima = $quantidade_maxima;
+        return $this;
+    }
+
+    /**
      * Indica se a composição está sendo usada atualmente na composição do
      * produto
-     * @return mixed Ativa of Composicao
+     * @return string ativa of Composição
      */
     public function getAtiva()
     {
@@ -232,8 +260,8 @@ class Composicao extends SyncModel
 
     /**
      * Set Ativa value to new on param
-     * @param  mixed $ativa new value for Ativa
-     * @return Composicao Self instance
+     * @param string $ativa Set ativa for Composição
+     * @return self Self instance
      */
     public function setAtiva($ativa)
     {
@@ -243,7 +271,7 @@ class Composicao extends SyncModel
 
     /**
      * Convert this instance to array associated key -> value
-     * @param  boolean $recursive Allow rescursive conversion of fields
+     * @param boolean $recursive Allow rescursive conversion of fields
      * @return array All field and values into array format
      */
     public function toArray($recursive = false)
@@ -255,18 +283,19 @@ class Composicao extends SyncModel
         $composicao['tipo'] = $this->getTipo();
         $composicao['quantidade'] = $this->getQuantidade();
         $composicao['valor'] = $this->getValor();
+        $composicao['quantidademaxima'] = $this->getQuantidadeMaxima();
         $composicao['ativa'] = $this->getAtiva();
         return $composicao;
     }
 
     /**
      * Fill this instance with from array values, you can pass instance to
-     * @param  mixed $composicao Associated key -> value to assign into this instance
-     * @return Composicao Self instance
+     * @param mixed $composicao Associated key -> value to assign into this instance
+     * @return self Self instance
      */
     public function fromArray($composicao = [])
     {
-        if ($composicao instanceof Composicao) {
+        if ($composicao instanceof self) {
             $composicao = $composicao->toArray();
         } elseif (!is_array($composicao)) {
             $composicao = [];
@@ -302,6 +331,11 @@ class Composicao extends SyncModel
         } else {
             $this->setValor($composicao['valor']);
         }
+        if (!isset($composicao['quantidademaxima'])) {
+            $this->setQuantidadeMaxima(1);
+        } else {
+            $this->setQuantidadeMaxima($composicao['quantidademaxima']);
+        }
         if (!isset($composicao['ativa'])) {
             $this->setAtiva('N');
         } else {
@@ -322,7 +356,9 @@ class Composicao extends SyncModel
 
     /**
      * Filter fields, upload data and keep key data
-     * @param Composicao $original Original instance without modifications
+     * @param self $original Original instance without modifications
+     * @param boolean $localized Informs if fields are localized
+     * @return self Self instance
      */
     public function filter($original, $localized = false)
     {
@@ -331,11 +367,13 @@ class Composicao extends SyncModel
         $this->setProdutoID(Filter::number($this->getProdutoID()));
         $this->setQuantidade(Filter::float($this->getQuantidade(), $localized));
         $this->setValor(Filter::money($this->getValor(), $localized));
+        $this->setQuantidadeMaxima(Filter::number($this->getQuantidadeMaxima()));
+        return $this;
     }
 
     /**
      * Clean instance resources like images and docs
-     * @param  Composicao $dependency Don't clean when dependency use same resources
+     * @param self $dependency Don't clean when dependency use same resources
      */
     public function clean($dependency)
     {
@@ -344,59 +382,57 @@ class Composicao extends SyncModel
     /**
      * Validate fields updating them and throw exception when invalid data has found
      * @return array All field of Composicao in array format
+     * @throws \MZ\Exception\ValidationException for invalid input data
      */
     public function validate()
     {
         $errors = [];
         if (is_null($this->getComposicaoID())) {
-            $errors['composicaoid'] = 'A composição não pode ser vazia';
+            $errors['composicaoid'] = _t('composicao.composicao_id_cannot_empty');
         }
         if (is_null($this->getProdutoID())) {
-            $errors['produtoid'] = 'O produto da composição não pode ser vazio';
+            $errors['produtoid'] = _t('composicao.produto_id_cannot_empty');
         }
-        if (is_null($this->getTipo())) {
-            $errors['tipo'] = 'O tipo não pode ser vazio';
-        }
-        if (!Validator::checkInSet($this->getTipo(), self::getTipoOptions(), true)) {
-            $errors['tipo'] = 'O tipo é inválido';
+        if (!Validator::checkInSet($this->getTipo(), self::getTipoOptions())) {
+            $errors['tipo'] = _t('composicao.tipo_invalid');
         }
         if (is_null($this->getQuantidade())) {
-            $errors['quantidade'] = 'A quantidade não pode ser vazia';
+            $errors['quantidade'] = _t('composicao.quantidade_cannot_empty');
         }
         if (is_null($this->getValor())) {
-            $errors['valor'] = 'O valor não pode ser vazio';
+            $errors['valor'] = _t('composicao.valor_cannot_empty');
         }
-        if (is_null($this->getAtiva())) {
-            $errors['ativa'] = 'A ativa não pode ser vazia';
+        if (is_null($this->getQuantidadeMaxima())) {
+            $errors['quantidademaxima'] = _t('composicao.quantidade_maxima_cannot_empty');
         }
-        if (!Validator::checkBoolean($this->getAtiva(), true)) {
-            $errors['ativa'] = 'A ativa é inválida';
+        if (!Validator::checkBoolean($this->getAtiva())) {
+            $errors['ativa'] = _t('composicao.ativa_invalid');
         }
         if (!empty($errors)) {
-            throw new \MZ\Exception\ValidationException($errors);
+            throw new ValidationException($errors);
         }
         return $this->toArray();
     }
 
     /**
      * Translate SQL exception into application exception
-     * @param  \Exception $e exception to translate into a readable error
+     * @param \Exception $e exception to translate into a readable error
      * @return \MZ\Exception\ValidationException new exception translated
      */
     protected function translate($e)
     {
-        if (stripos($e->getMessage(), 'UK_Composicoes_ComposicaoID_ProdutoID_Tipo') !== false) {
-            return new \MZ\Exception\ValidationException([
-                'composicaoid' => sprintf(
-                    'A composição "%s" já está cadastrada',
+        if (contains(['ComposicaoID', 'ProdutoID', 'Tipo', 'UNIQUE'], $e->getMessage())) {
+            return new ValidationException([
+                'composicaoid' => _t(
+                    'composicao.composicao_id_used',
                     $this->getComposicaoID()
                 ),
-                'produtoid' => sprintf(
-                    'O produto da composição "%s" já está cadastrado',
+                'produtoid' => _t(
+                    'composicao.produto_id_used',
                     $this->getProdutoID()
                 ),
-                'tipo' => sprintf(
-                    'O tipo "%s" já está cadastrado',
+                'tipo' => _t(
+                    'composicao.tipo_used',
                     $this->getTipo()
                 ),
             ]);
@@ -406,7 +442,8 @@ class Composicao extends SyncModel
 
     /**
      * Insert a new Composição into the database and fill instance from database
-     * @return Composicao Self instance
+     * @return self Self instance
+     * @throws \MZ\Exception\ValidationException for invalid input data
      */
     public function insert()
     {
@@ -425,36 +462,42 @@ class Composicao extends SyncModel
 
     /**
      * Update Composição with instance values into database for ID
-     * @param  array $only Save these fields only, when empty save all fields except id
-     * @return Composicao Self instance
+     * @param array $only Save these fields only, when empty save all fields except id
+     * @return int rows affected
+     * @throws \MZ\Exception\ValidationException for invalid input data
      */
     public function update($only = [])
     {
         $values = $this->validate();
         if (!$this->exists()) {
-            throw new \Exception('O identificador da composição não foi informado');
+            throw new ValidationException(
+                ['id' => _t('composicao.id_cannot_empty')]
+            );
         }
         $values = DB::filterValues($values, $only, false);
         try {
-            DB::update('Composicoes')
+            $affected = DB::update('Composicoes')
                 ->set($values)
-                ->where('id', $this->getID())
+                ->where(['id' => $this->getID()])
                 ->execute();
             $this->loadByID();
         } catch (\Exception $e) {
             throw $this->translate($e);
         }
-        return $this;
+        return $affected;
     }
 
     /**
      * Delete this instance from database using ID
      * @return integer Number of rows deleted (Max 1)
+     * @throws \MZ\Exception\ValidationException for invalid id
      */
     public function delete()
     {
         if (!$this->exists()) {
-            throw new \Exception('O identificador da composição não foi informado');
+            throw new ValidationException(
+                ['id' => _t('composicao.id_cannot_empty')]
+            );
         }
         $result = DB::deleteFrom('Composicoes')
             ->where('id', $this->getID())
@@ -464,9 +507,9 @@ class Composicao extends SyncModel
 
     /**
      * Load one register for it self with a condition
-     * @param  array $condition Condition for searching the row
-     * @param  array $order associative field name -> [-1, 1]
-     * @return Composicao Self instance filled or empty
+     * @param array $condition Condition for searching the row
+     * @param array $order associative field name -> [-1, 1]
+     * @return self Self instance filled or empty
      */
     public function load($condition, $order = [])
     {
@@ -477,17 +520,14 @@ class Composicao extends SyncModel
 
     /**
      * Load into this object from database using, ComposicaoID, ProdutoID, Tipo
-     * @param  int $composicao_id composição to find Composição
-     * @param  int $produto_id produto da composição to find Composição
-     * @param  string $tipo tipo to find Composição
-     * @return Composicao Self filled instance or empty when not found
+     * @return self Self filled instance or empty when not found
      */
-    public function loadByComposicaoIDProdutoIDTipo($composicao_id, $produto_id, $tipo)
+    public function loadByComposicaoIDProdutoIDTipo()
     {
         return $this->load([
-            'composicaoid' => intval($composicao_id),
-            'produtoid' => intval($produto_id),
-            'tipo' => strval($tipo),
+            'composicaoid' => intval($this->getComposicaoID()),
+            'produtoid' => intval($this->getProdutoID()),
+            'tipo' => strval($this->getTipo()),
         ]);
     }
 
@@ -513,15 +553,15 @@ class Composicao extends SyncModel
 
     /**
      * Gets textual and translated Tipo for Composicao
-     * @param  int $index choose option from index
-     * @return mixed A associative key -> translated representative text or text for index
+     * @param int $index choose option from index
+     * @return string[] A associative key -> translated representative text or text for index
      */
     public static function getTipoOptions($index = null)
     {
         $options = [
-            self::TIPO_COMPOSICAO => 'Composição',
-            self::TIPO_OPCIONAL => 'Opcional',
-            self::TIPO_ADICIONAL => 'Adicional',
+            self::TIPO_COMPOSICAO => _t('composicao.tipo_composicao'),
+            self::TIPO_OPCIONAL => _t('composicao.tipo_opcional'),
+            self::TIPO_ADICIONAL => _t('composicao.tipo_adicional'),
         ];
         if (!is_null($index)) {
             return $options[$index];
@@ -535,14 +575,14 @@ class Composicao extends SyncModel
      */
     private static function getAllowedKeys()
     {
-        $composicao = new Composicao();
+        $composicao = new self();
         $allowed = Filter::concatKeys('c.', $composicao->toArray());
         return $allowed;
     }
 
     /**
      * Filter order array
-     * @param  mixed $order order string or array to parse and filter allowed
+     * @param mixed $order order string or array to parse and filter allowed
      * @return array allowed associative order
      */
     private static function filterOrder($order)
@@ -553,7 +593,7 @@ class Composicao extends SyncModel
 
     /**
      * Filter condition array with allowed fields
-     * @param  array $condition condition to filter rows
+     * @param array $condition condition to filter rows
      * @return array allowed condition
      */
     private static function filterCondition($condition)
@@ -564,8 +604,8 @@ class Composicao extends SyncModel
 
     /**
      * Fetch data from database with a condition
-     * @param  array $condition condition to filter rows
-     * @param  array $order order rows
+     * @param array $condition condition to filter rows
+     * @param array $order order rows
      * @return SelectQuery query object with condition statement
      */
     private static function query($condition = [], $order = [])
@@ -586,37 +626,55 @@ class Composicao extends SyncModel
 
     /**
      * Search one register with a condition
-     * @param  array $condition Condition for searching the row
-     * @param  array $order order rows
-     * @return Composicao A filled Composição or empty instance
+     * @param array $condition Condition for searching the row
+     * @param array $order order rows
+     * @return self A filled Composição or empty instance
      */
     public static function find($condition, $order = [])
     {
-        $query = self::query($condition, $order)->limit(1);
-        $row = $query->fetch() ?: [];
-        return new Composicao($row);
+        $result = new self();
+        return $result->load($condition, $order);
+    }
+
+    /**
+     * Search one register with a condition
+     * @param array $condition Condition for searching the row
+     * @param array $order order rows
+     * @return self A filled Composição or empty instance
+     * @throws \Exception when register has not found
+     */
+    public static function findOrFail($condition, $order = [])
+    {
+        $result = self::find($condition, $order);
+        if (!$result->exists()) {
+            throw new \Exception(_t('composicao.not_found'), 404);
+        }
+        return $result;
     }
 
     /**
      * Find this object on database using, ComposicaoID, ProdutoID, Tipo
-     * @param  int $composicao_id composição to find Composição
-     * @param  int $produto_id produto da composição to find Composição
-     * @param  string $tipo tipo to find Composição
-     * @return Composicao A filled instance or empty when not found
+     * @param int $composicao_id composição to find Composição
+     * @param int $produto_id produto da composição to find Composição
+     * @param string $tipo tipo to find Composição
+     * @return self A filled instance or empty when not found
      */
     public static function findByComposicaoIDProdutoIDTipo($composicao_id, $produto_id, $tipo)
     {
         $result = new self();
-        return $result->loadByComposicaoIDProdutoIDTipo($composicao_id, $produto_id, $tipo);
+        $result->setComposicaoID($composicao_id);
+        $result->setProdutoID($produto_id);
+        $result->setTipo($tipo);
+        return $result->loadByComposicaoIDProdutoIDTipo();
     }
 
     /**
      * Find all Composição
-     * @param  array  $condition Condition to get all Composição
-     * @param  array  $order     Order Composição
-     * @param  int    $limit     Limit data into row count
-     * @param  int    $offset    Start offset to get rows
-     * @return array             List of all rows instanced as Composicao
+     * @param array  $condition Condition to get all Composição
+     * @param array  $order     Order Composição
+     * @param int    $limit     Limit data into row count
+     * @param int    $offset    Start offset to get rows
+     * @return self[] List of all rows instanced as Composicao
      */
     public static function findAll($condition = [], $order = [], $limit = null, $offset = null)
     {
@@ -630,14 +688,14 @@ class Composicao extends SyncModel
         $rows = $query->fetchAll();
         $result = [];
         foreach ($rows as $row) {
-            $result[] = new Composicao($row);
+            $result[] = new self($row);
         }
         return $result;
     }
 
     /**
      * Count all rows from database with matched condition critery
-     * @param  array $condition condition to filter rows
+     * @param array $condition condition to filter rows
      * @return integer Quantity of rows
      */
     public static function count($condition = [])

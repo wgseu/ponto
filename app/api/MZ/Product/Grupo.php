@@ -24,10 +24,12 @@
  */
 namespace MZ\Product;
 
-use MZ\Database\SyncModel;
-use MZ\Database\DB;
+use MZ\Util\Mask;
 use MZ\Util\Filter;
 use MZ\Util\Validator;
+use MZ\Database\DB;
+use MZ\Database\SyncModel;
+use MZ\Exception\ValidationException;
 
 /**
  * Grupos de pacotes, permite criar grupos como Tamanho, Sabores para
@@ -62,7 +64,12 @@ class Grupo extends SyncModel
      */
     private $produto_id;
     /**
-     * Descrição do grupo da formação, Exemplo: Tamanho, Sabores
+     * Nome resumido do grupo da formação, Exemplo: Tamanho, Sabores
+     */
+    private $nome;
+    /**
+     * Descrição do grupo da formação, Exemplo: Escolha o tamanho, Escolha os
+     * sabores
      */
     private $descricao;
     /**
@@ -89,6 +96,14 @@ class Grupo extends SyncModel
      * Soma todos os preços dos produtos selecionados
      */
     private $funcao;
+    /**
+     * Informa a ordem de exibição dos grupos
+     */
+    private $ordem;
+    /**
+     * Data em que o grupo foi arquivado e não será mais usado
+     */
+    private $data_arquivado;
 
     /**
      * Constructor for a new empty instance of Grupo
@@ -101,7 +116,7 @@ class Grupo extends SyncModel
 
     /**
      * Identificador do grupo
-     * @return mixed ID of Grupo
+     * @return int id of Grupo
      */
     public function getID()
     {
@@ -110,8 +125,8 @@ class Grupo extends SyncModel
 
     /**
      * Set ID value to new on param
-     * @param  mixed $id new value for ID
-     * @return Grupo Self instance
+     * @param int $id Set id for Grupo
+     * @return self Self instance
      */
     public function setID($id)
     {
@@ -121,7 +136,7 @@ class Grupo extends SyncModel
 
     /**
      * Informa o pacote base da formação
-     * @return mixed Pacote of Grupo
+     * @return int pacote of Grupo
      */
     public function getProdutoID()
     {
@@ -130,8 +145,8 @@ class Grupo extends SyncModel
 
     /**
      * Set ProdutoID value to new on param
-     * @param  mixed $produto_id new value for ProdutoID
-     * @return Grupo Self instance
+     * @param int $produto_id Set pacote for Grupo
+     * @return self Self instance
      */
     public function setProdutoID($produto_id)
     {
@@ -140,8 +155,29 @@ class Grupo extends SyncModel
     }
 
     /**
-     * Descrição do grupo da formação, Exemplo: Tamanho, Sabores
-     * @return mixed Descrição of Grupo
+     * Nome resumido do grupo da formação, Exemplo: Tamanho, Sabores
+     * @return string nome of Grupo
+     */
+    public function getNome()
+    {
+        return $this->nome;
+    }
+
+    /**
+     * Set Nome value to new on param
+     * @param string $nome Set nome for Grupo
+     * @return self Self instance
+     */
+    public function setNome($nome)
+    {
+        $this->nome = $nome;
+        return $this;
+    }
+
+    /**
+     * Descrição do grupo da formação, Exemplo: Escolha o tamanho, Escolha os
+     * sabores
+     * @return string descrição of Grupo
      */
     public function getDescricao()
     {
@@ -150,8 +186,8 @@ class Grupo extends SyncModel
 
     /**
      * Set Descricao value to new on param
-     * @param  mixed $descricao new value for Descricao
-     * @return Grupo Self instance
+     * @param string $descricao Set descrição for Grupo
+     * @return self Self instance
      */
     public function setDescricao($descricao)
     {
@@ -161,7 +197,7 @@ class Grupo extends SyncModel
 
     /**
      * Informa se é possível selecionar mais de um produto ou opção do produto
-     * @return mixed Múltiplo of Grupo
+     * @return string múltiplo of Grupo
      */
     public function getMultiplo()
     {
@@ -179,8 +215,8 @@ class Grupo extends SyncModel
 
     /**
      * Set Multiplo value to new on param
-     * @param  mixed $multiplo new value for Multiplo
-     * @return Grupo Self instance
+     * @param string $multiplo Set múltiplo for Grupo
+     * @return self Self instance
      */
     public function setMultiplo($multiplo)
     {
@@ -190,7 +226,7 @@ class Grupo extends SyncModel
 
     /**
      * Informa se a formação final será apenas uma unidade ou vários itens
-     * @return mixed Tipo of Grupo
+     * @return string tipo of Grupo
      */
     public function getTipo()
     {
@@ -199,8 +235,8 @@ class Grupo extends SyncModel
 
     /**
      * Set Tipo value to new on param
-     * @param  mixed $tipo new value for Tipo
-     * @return Grupo Self instance
+     * @param string $tipo Set tipo for Grupo
+     * @return self Self instance
      */
     public function setTipo($tipo)
     {
@@ -211,7 +247,7 @@ class Grupo extends SyncModel
     /**
      * Permite definir uma quantidade mínima obrigatória para continuar com a
      * venda
-     * @return mixed Quantidade mínima of Grupo
+     * @return int quantidade mínima of Grupo
      */
     public function getQuantidadeMinima()
     {
@@ -220,8 +256,8 @@ class Grupo extends SyncModel
 
     /**
      * Set QuantidadeMinima value to new on param
-     * @param  mixed $quantidade_minima new value for QuantidadeMinima
-     * @return Grupo Self instance
+     * @param int $quantidade_minima Set quantidade mínima for Grupo
+     * @return self Self instance
      */
     public function setQuantidadeMinima($quantidade_minima)
     {
@@ -231,7 +267,7 @@ class Grupo extends SyncModel
 
     /**
      * Define a quantidade máxima de itens que podem ser escolhidos
-     * @return mixed Quantidade máxima of Grupo
+     * @return int quantidade máxima of Grupo
      */
     public function getQuantidadeMaxima()
     {
@@ -240,8 +276,8 @@ class Grupo extends SyncModel
 
     /**
      * Set QuantidadeMaxima value to new on param
-     * @param  mixed $quantidade_maxima new value for QuantidadeMaxima
-     * @return Grupo Self instance
+     * @param int $quantidade_maxima Set quantidade máxima for Grupo
+     * @return self Self instance
      */
     public function setQuantidadeMaxima($quantidade_maxima)
     {
@@ -254,7 +290,7 @@ class Grupo extends SyncModel
      * preço, Média:  define o preço do produto como a média dos itens
      * selecionados, Máximo: Obtém o preço do item mais caro do grupo, Soma:
      * Soma todos os preços dos produtos selecionados
-     * @return mixed Função de preço of Grupo
+     * @return string função de preço of Grupo
      */
     public function getFuncao()
     {
@@ -263,8 +299,8 @@ class Grupo extends SyncModel
 
     /**
      * Set Funcao value to new on param
-     * @param  mixed $funcao new value for Funcao
-     * @return Grupo Self instance
+     * @param string $funcao Set função de preço for Grupo
+     * @return self Self instance
      */
     public function setFuncao($funcao)
     {
@@ -273,8 +309,48 @@ class Grupo extends SyncModel
     }
 
     /**
+     * Informa a ordem de exibição dos grupos
+     * @return int ordem of Grupo
+     */
+    public function getOrdem()
+    {
+        return $this->ordem;
+    }
+
+    /**
+     * Set Ordem value to new on param
+     * @param int $ordem Set ordem for Grupo
+     * @return self Self instance
+     */
+    public function setOrdem($ordem)
+    {
+        $this->ordem = $ordem;
+        return $this;
+    }
+
+    /**
+     * Data em que o grupo foi arquivado e não será mais usado
+     * @return string data de arquivação of Grupo
+     */
+    public function getDataArquivado()
+    {
+        return $this->data_arquivado;
+    }
+
+    /**
+     * Set DataArquivado value to new on param
+     * @param string $data_arquivado Set data de arquivação for Grupo
+     * @return self Self instance
+     */
+    public function setDataArquivado($data_arquivado)
+    {
+        $this->data_arquivado = $data_arquivado;
+        return $this;
+    }
+
+    /**
      * Convert this instance to array associated key -> value
-     * @param  boolean $recursive Allow rescursive conversion of fields
+     * @param boolean $recursive Allow rescursive conversion of fields
      * @return array All field and values into array format
      */
     public function toArray($recursive = false)
@@ -282,23 +358,26 @@ class Grupo extends SyncModel
         $grupo = parent::toArray($recursive);
         $grupo['id'] = $this->getID();
         $grupo['produtoid'] = $this->getProdutoID();
+        $grupo['nome'] = $this->getNome();
         $grupo['descricao'] = $this->getDescricao();
         $grupo['multiplo'] = $this->getMultiplo();
         $grupo['tipo'] = $this->getTipo();
         $grupo['quantidademinima'] = $this->getQuantidadeMinima();
         $grupo['quantidademaxima'] = $this->getQuantidadeMaxima();
         $grupo['funcao'] = $this->getFuncao();
+        $grupo['ordem'] = $this->getOrdem();
+        $grupo['dataarquivado'] = $this->getDataArquivado();
         return $grupo;
     }
 
     /**
      * Fill this instance with from array values, you can pass instance to
-     * @param  mixed $grupo Associated key -> value to assign into this instance
-     * @return Grupo Self instance
+     * @param mixed $grupo Associated key -> value to assign into this instance
+     * @return self Self instance
      */
     public function fromArray($grupo = [])
     {
-        if ($grupo instanceof Grupo) {
+        if ($grupo instanceof self) {
             $grupo = $grupo->toArray();
         } elseif (!is_array($grupo)) {
             $grupo = [];
@@ -313,6 +392,11 @@ class Grupo extends SyncModel
             $this->setProdutoID(null);
         } else {
             $this->setProdutoID($grupo['produtoid']);
+        }
+        if (!isset($grupo['nome'])) {
+            $this->setNome(null);
+        } else {
+            $this->setNome($grupo['nome']);
         }
         if (!isset($grupo['descricao'])) {
             $this->setDescricao(null);
@@ -344,6 +428,16 @@ class Grupo extends SyncModel
         } else {
             $this->setFuncao($grupo['funcao']);
         }
+        if (!isset($grupo['ordem'])) {
+            $this->setOrdem(null);
+        } else {
+            $this->setOrdem($grupo['ordem']);
+        }
+        if (!array_key_exists('dataarquivado', $grupo)) {
+            $this->setDataArquivado(null);
+        } else {
+            $this->setDataArquivado($grupo['dataarquivado']);
+        }
         return $this;
     }
 
@@ -359,20 +453,26 @@ class Grupo extends SyncModel
 
     /**
      * Filter fields, upload data and keep key data
-     * @param Grupo $original Original instance without modifications
+     * @param self $original Original instance without modifications
+     * @param boolean $localized Informs if fields are localized
+     * @return self Self instance
      */
     public function filter($original, $localized = false)
     {
         $this->setID($original->getID());
         $this->setProdutoID(Filter::number($this->getProdutoID()));
+        $this->setNome(Filter::string($this->getNome()));
         $this->setDescricao(Filter::string($this->getDescricao()));
         $this->setQuantidadeMinima(Filter::number($this->getQuantidadeMinima()));
         $this->setQuantidadeMaxima(Filter::number($this->getQuantidadeMaxima()));
+        $this->setOrdem(Filter::number($this->getOrdem()));
+        $this->setDataArquivado(null);
+        return $this;
     }
 
     /**
      * Clean instance resources like images and docs
-     * @param  Grupo $dependency Don't clean when dependency use same resources
+     * @param self $dependency Don't clean when dependency use same resources
      */
     public function clean($dependency)
     {
@@ -381,53 +481,72 @@ class Grupo extends SyncModel
     /**
      * Validate fields updating them and throw exception when invalid data has found
      * @return array All field of Grupo in array format
+     * @throws \MZ\Exception\ValidationException for invalid input data
      */
     public function validate()
     {
         $errors = [];
         if (is_null($this->getProdutoID())) {
-            $errors['produtoid'] = 'O pacote não pode ser vazio';
+            $errors['produtoid'] = _t('grupo.produto_id_cannot_empty');
+        }
+        if (is_null($this->getNome())) {
+            $errors['nome'] = _t('grupo.nome_cannot_empty');
         }
         if (is_null($this->getDescricao())) {
-            $errors['descricao'] = 'A descrição não pode ser vazia';
+            $errors['descricao'] = _t('grupo.descricao_cannot_empty');
         }
         if (!Validator::checkBoolean($this->getMultiplo())) {
-            $errors['multiplo'] = 'A informação de múltiplo não foi informada ou é inválida';
+            $errors['multiplo'] = _t('grupo.multiplo_invalid');
         }
         if (!Validator::checkInSet($this->getTipo(), self::getTipoOptions())) {
-            $errors['tipo'] = 'O tipo não foi informado ou é inválido';
+            $errors['tipo'] = _t('grupo.tipo_invalid');
         }
         if (is_null($this->getQuantidadeMinima())) {
-            $errors['quantidademinima'] = 'A quantidade mínima não pode ser vazia';
+            $errors['quantidademinima'] = _t('grupo.quantidade_minima_cannot_empty');
         }
         if (is_null($this->getQuantidadeMaxima())) {
-            $errors['quantidademaxima'] = 'A quantidade máxima não pode ser vazia';
+            $errors['quantidademaxima'] = _t('grupo.quantidade_maxima_cannot_empty');
         }
         if (!Validator::checkInSet($this->getFuncao(), self::getFuncaoOptions())) {
-            $errors['funcao'] = 'A função de preço não foi informada ou é inválida';
+            $errors['funcao'] = _t('grupo.funcao_invalid');
+        }
+        if (is_null($this->getOrdem())) {
+            $errors['ordem'] = _t('grupo.ordem_cannot_empty');
         }
         if (!empty($errors)) {
-            throw new \MZ\Exception\ValidationException($errors);
+            throw new ValidationException($errors);
         }
         return $this->toArray();
     }
 
     /**
      * Translate SQL exception into application exception
-     * @param  \Exception $e exception to translate into a readable error
+     * @param \Exception $e exception to translate into a readable error
      * @return \MZ\Exception\ValidationException new exception translated
      */
     protected function translate($e)
     {
-        if (stripos($e->getMessage(), 'UK_Grupos_Produto_Descricao') !== false) {
-            return new \MZ\Exception\ValidationException([
-                'produtoid' => sprintf(
-                    'O pacote "%s" já está cadastrado',
+        if (contains(['ProdutoID', 'Descricao', 'UNIQUE'], $e->getMessage())) {
+            return new ValidationException([
+                'produtoid' => _t(
+                    'grupo.produto_id_used',
                     $this->getProdutoID()
                 ),
-                'descricao' => sprintf(
-                    'A descrição "%s" já está cadastrada',
+                'descricao' => _t(
+                    'grupo.descricao_used',
                     $this->getDescricao()
+                ),
+            ]);
+        }
+        if (contains(['ProdutoID', 'Nome', 'UNIQUE'], $e->getMessage())) {
+            return new ValidationException([
+                'produtoid' => _t(
+                    'grupo.produto_id_used',
+                    $this->getProdutoID()
+                ),
+                'nome' => _t(
+                    'grupo.nome_used',
+                    $this->getNome()
                 ),
             ]);
         }
@@ -436,7 +555,8 @@ class Grupo extends SyncModel
 
     /**
      * Insert a new Grupo into the database and fill instance from database
-     * @return Grupo Self instance
+     * @return self Self instance
+     * @throws \MZ\Exception\ValidationException for invalid input data
      */
     public function insert()
     {
@@ -455,36 +575,42 @@ class Grupo extends SyncModel
 
     /**
      * Update Grupo with instance values into database for ID
-     * @param  array $only Save these fields only, when empty save all fields except id
-     * @return Grupo Self instance
+     * @param array $only Save these fields only, when empty save all fields except id
+     * @return int rows affected
+     * @throws \MZ\Exception\ValidationException for invalid input data
      */
     public function update($only = [])
     {
         $values = $this->validate();
         if (!$this->exists()) {
-            throw new \Exception('O identificador do grupo não foi informado');
+            throw new ValidationException(
+                ['id' => _t('grupo.id_cannot_empty')]
+            );
         }
         $values = DB::filterValues($values, $only, false);
         try {
-            DB::update('Grupos')
+            $affected = DB::update('Grupos')
                 ->set($values)
-                ->where('id', $this->getID())
+                ->where(['id' => $this->getID()])
                 ->execute();
             $this->loadByID();
         } catch (\Exception $e) {
             throw $this->translate($e);
         }
-        return $this;
+        return $affected;
     }
 
     /**
      * Delete this instance from database using ID
      * @return integer Number of rows deleted (Max 1)
+     * @throws \MZ\Exception\ValidationException for invalid id
      */
     public function delete()
     {
         if (!$this->exists()) {
-            throw new \Exception('O identificador do grupo não foi informado');
+            throw new ValidationException(
+                ['id' => _t('grupo.id_cannot_empty')]
+            );
         }
         $result = DB::deleteFrom('Grupos')
             ->where('id', $this->getID())
@@ -494,9 +620,9 @@ class Grupo extends SyncModel
 
     /**
      * Load one register for it self with a condition
-     * @param  array $condition Condition for searching the row
-     * @param  array $order associative field name -> [-1, 1]
-     * @return Grupo Self instance filled or empty
+     * @param array $condition Condition for searching the row
+     * @param array $order associative field name -> [-1, 1]
+     * @return self Self instance filled or empty
      */
     public function load($condition, $order = [])
     {
@@ -507,15 +633,25 @@ class Grupo extends SyncModel
 
     /**
      * Load into this object from database using, ProdutoID, Descricao
-     * @param  int $produto_id pacote to find Grupo
-     * @param  string $descricao descrição to find Grupo
-     * @return Grupo Self filled instance or empty when not found
+     * @return self Self filled instance or empty when not found
      */
-    public function loadByProdutoIDDescricao($produto_id, $descricao)
+    public function loadByProdutoIDDescricao()
     {
         return $this->load([
-            'produtoid' => intval($produto_id),
-            'descricao' => strval($descricao),
+            'produtoid' => intval($this->getProdutoID()),
+            'descricao' => strval($this->getDescricao()),
+        ]);
+    }
+
+    /**
+     * Load into this object from database using, ProdutoID, Nome
+     * @return self Self filled instance or empty when not found
+     */
+    public function loadByProdutoIDNome()
+    {
+        return $this->load([
+            'produtoid' => intval($this->getProdutoID()),
+            'nome' => strval($this->getNome()),
         ]);
     }
 
@@ -530,14 +666,14 @@ class Grupo extends SyncModel
 
     /**
      * Gets textual and translated Tipo for Grupo
-     * @param  int $index choose option from index
-     * @return mixed A associative key -> translated representative text or text for index
+     * @param int $index choose option from index
+     * @return string[] A associative key -> translated representative text or text for index
      */
     public static function getTipoOptions($index = null)
     {
         $options = [
-            self::TIPO_INTEIRO => 'Inteiro',
-            self::TIPO_FRACIONADO => 'Fracionado',
+            self::TIPO_INTEIRO => _t('grupo.tipo_inteiro'),
+            self::TIPO_FRACIONADO => _t('grupo.tipo_fracionado'),
         ];
         if (!is_null($index)) {
             return $options[$index];
@@ -547,16 +683,16 @@ class Grupo extends SyncModel
 
     /**
      * Gets textual and translated Funcao for Grupo
-     * @param  int $index choose option from index
-     * @return mixed A associative key -> translated representative text or text for index
+     * @param int $index choose option from index
+     * @return string[] A associative key -> translated representative text or text for index
      */
     public static function getFuncaoOptions($index = null)
     {
         $options = [
-            self::FUNCAO_MINIMO => 'Mínimo',
-            self::FUNCAO_MEDIA => 'Média',
-            self::FUNCAO_MAXIMO => 'Máximo',
-            self::FUNCAO_SOMA => 'Soma',
+            self::FUNCAO_MINIMO => _t('grupo.funcao_minimo'),
+            self::FUNCAO_MEDIA => _t('grupo.funcao_media'),
+            self::FUNCAO_MAXIMO => _t('grupo.funcao_maximo'),
+            self::FUNCAO_SOMA => _t('grupo.funcao_soma'),
         ];
         if (!is_null($index)) {
             return $options[$index];
@@ -570,14 +706,14 @@ class Grupo extends SyncModel
      */
     private static function getAllowedKeys()
     {
-        $grupo = new Grupo();
+        $grupo = new self();
         $allowed = Filter::concatKeys('g.', $grupo->toArray());
         return $allowed;
     }
 
     /**
      * Filter order array
-     * @param  mixed $order order string or array to parse and filter allowed
+     * @param mixed $order order string or array to parse and filter allowed
      * @return array allowed associative order
      */
     private static function filterOrder($order)
@@ -588,7 +724,7 @@ class Grupo extends SyncModel
 
     /**
      * Filter condition array with allowed fields
-     * @param  array $condition condition to filter rows
+     * @param array $condition condition to filter rows
      * @return array allowed condition
      */
     private static function filterCondition($condition)
@@ -606,8 +742,8 @@ class Grupo extends SyncModel
 
     /**
      * Fetch data from database with a condition
-     * @param  array $condition condition to filter rows
-     * @param  array $order order rows
+     * @param array $condition condition to filter rows
+     * @param array $order order rows
      * @return SelectQuery query object with condition statement
      */
     private static function query($condition = [], $order = [])
@@ -641,36 +777,67 @@ class Grupo extends SyncModel
 
     /**
      * Search one register with a condition
-     * @param  array $condition Condition for searching the row
-     * @param  array $order order rows
-     * @return Grupo A filled Grupo or empty instance
+     * @param array $condition Condition for searching the row
+     * @param array $order order rows
+     * @return self A filled Grupo or empty instance
      */
     public static function find($condition, $order = [])
     {
-        $query = self::query($condition, $order)->limit(1);
-        $row = $query->fetch() ?: [];
-        return new Grupo($row);
+        $result = new self();
+        return $result->load($condition, $order);
+    }
+
+    /**
+     * Search one register with a condition
+     * @param array $condition Condition for searching the row
+     * @param array $order order rows
+     * @return self A filled Grupo or empty instance
+     * @throws \Exception when register has not found
+     */
+    public static function findOrFail($condition, $order = [])
+    {
+        $result = self::find($condition, $order);
+        if (!$result->exists()) {
+            throw new \Exception(_t('grupo.not_found'), 404);
+        }
+        return $result;
     }
 
     /**
      * Find this object on database using, ProdutoID, Descricao
-     * @param  int $produto_id pacote to find Grupo
-     * @param  string $descricao descrição to find Grupo
-     * @return Grupo A filled instance or empty when not found
+     * @param int $produto_id pacote to find Grupo
+     * @param string $descricao descrição to find Grupo
+     * @return self A filled instance or empty when not found
      */
     public static function findByProdutoIDDescricao($produto_id, $descricao)
     {
         $result = new self();
-        return $result->loadByProdutoIDDescricao($produto_id, $descricao);
+        $result->setProdutoID($produto_id);
+        $result->setDescricao($descricao);
+        return $result->loadByProdutoIDDescricao();
+    }
+
+    /**
+     * Find this object on database using, ProdutoID, Nome
+     * @param int $produto_id pacote to find Grupo
+     * @param string $nome nome to find Grupo
+     * @return self A filled instance or empty when not found
+     */
+    public static function findByProdutoIDNome($produto_id, $nome)
+    {
+        $result = new self();
+        $result->setProdutoID($produto_id);
+        $result->setNome($nome);
+        return $result->loadByProdutoIDNome();
     }
 
     /**
      * Find all Grupo
-     * @param  array  $condition Condition to get all Grupo
-     * @param  array  $order     Order Grupo
-     * @param  int    $limit     Limit data into row count
-     * @param  int    $offset    Start offset to get rows
-     * @return array             List of all rows instanced as Grupo
+     * @param array  $condition Condition to get all Grupo
+     * @param array  $order     Order Grupo
+     * @param int    $limit     Limit data into row count
+     * @param int    $offset    Start offset to get rows
+     * @return self[] List of all rows instanced as Grupo
      */
     public static function findAll($condition = [], $order = [], $limit = null, $offset = null)
     {
@@ -684,7 +851,7 @@ class Grupo extends SyncModel
         $rows = $query->fetchAll();
         $result = [];
         foreach ($rows as $row) {
-            $result[] = new Grupo($row);
+            $result[] = new self($row);
         }
         return $result;
     }
@@ -711,7 +878,7 @@ class Grupo extends SyncModel
 
     /**
      * Count all rows from database with matched condition critery
-     * @param  array $condition condition to filter rows
+     * @param array $condition condition to filter rows
      * @return integer Quantity of rows
      */
     public static function count($condition = [])

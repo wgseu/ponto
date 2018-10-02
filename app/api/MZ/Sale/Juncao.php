@@ -24,10 +24,12 @@
  */
 namespace MZ\Sale;
 
-use MZ\Database\SyncModel;
-use MZ\Database\DB;
+use MZ\Util\Mask;
 use MZ\Util\Filter;
 use MZ\Util\Validator;
+use MZ\Database\DB;
+use MZ\Database\SyncModel;
+use MZ\Exception\ValidationException;
 
 /**
  * Junções de mesas, informa quais mesas estão juntas ao pedido
@@ -76,7 +78,7 @@ class Juncao extends SyncModel
 
     /**
      * Identificador da junção
-     * @return mixed ID of Juncao
+     * @return int id of Junção
      */
     public function getID()
     {
@@ -85,8 +87,8 @@ class Juncao extends SyncModel
 
     /**
      * Set ID value to new on param
-     * @param  mixed $id new value for ID
-     * @return Juncao Self instance
+     * @param int $id Set id for Junção
+     * @return self Self instance
      */
     public function setID($id)
     {
@@ -96,7 +98,7 @@ class Juncao extends SyncModel
 
     /**
      * Mesa que está junta ao pedido
-     * @return mixed Mesa of Juncao
+     * @return int mesa of Junção
      */
     public function getMesaID()
     {
@@ -105,8 +107,8 @@ class Juncao extends SyncModel
 
     /**
      * Set MesaID value to new on param
-     * @param  mixed $mesa_id new value for MesaID
-     * @return Juncao Self instance
+     * @param int $mesa_id Set mesa for Junção
+     * @return self Self instance
      */
     public function setMesaID($mesa_id)
     {
@@ -116,7 +118,7 @@ class Juncao extends SyncModel
 
     /**
      * Pedido a qual a mesa está junta, o pedido deve ser de uma mesa
-     * @return mixed Pedido of Juncao
+     * @return int pedido of Junção
      */
     public function getPedidoID()
     {
@@ -125,8 +127,8 @@ class Juncao extends SyncModel
 
     /**
      * Set PedidoID value to new on param
-     * @param  mixed $pedido_id new value for PedidoID
-     * @return Juncao Self instance
+     * @param int $pedido_id Set pedido for Junção
+     * @return self Self instance
      */
     public function setPedidoID($pedido_id)
     {
@@ -137,7 +139,7 @@ class Juncao extends SyncModel
     /**
      * Estado a junção da mesa. Associado: a mesa está junta ao pedido,
      * Liberado: A mesa está livre, Cancelado: A mesa está liberada
-     * @return mixed Estado of Juncao
+     * @return string estado of Junção
      */
     public function getEstado()
     {
@@ -146,8 +148,8 @@ class Juncao extends SyncModel
 
     /**
      * Set Estado value to new on param
-     * @param  mixed $estado new value for Estado
-     * @return Juncao Self instance
+     * @param string $estado Set estado for Junção
+     * @return self Self instance
      */
     public function setEstado($estado)
     {
@@ -157,7 +159,7 @@ class Juncao extends SyncModel
 
     /**
      * Data e hora da junção das mesas
-     * @return mixed Data do movimento of Juncao
+     * @return string data do movimento of Junção
      */
     public function getDataMovimento()
     {
@@ -166,8 +168,8 @@ class Juncao extends SyncModel
 
     /**
      * Set DataMovimento value to new on param
-     * @param  mixed $data_movimento new value for DataMovimento
-     * @return Juncao Self instance
+     * @param string $data_movimento Set data do movimento for Junção
+     * @return self Self instance
      */
     public function setDataMovimento($data_movimento)
     {
@@ -177,7 +179,7 @@ class Juncao extends SyncModel
 
     /**
      * Convert this instance to array associated key -> value
-     * @param  boolean $recursive Allow rescursive conversion of fields
+     * @param boolean $recursive Allow rescursive conversion of fields
      * @return array All field and values into array format
      */
     public function toArray($recursive = false)
@@ -193,12 +195,12 @@ class Juncao extends SyncModel
 
     /**
      * Fill this instance with from array values, you can pass instance to
-     * @param  mixed $juncao Associated key -> value to assign into this instance
-     * @return Juncao Self instance
+     * @param mixed $juncao Associated key -> value to assign into this instance
+     * @return self Self instance
      */
     public function fromArray($juncao = [])
     {
-        if ($juncao instanceof Juncao) {
+        if ($juncao instanceof self) {
             $juncao = $juncao->toArray();
         } elseif (!is_array($juncao)) {
             $juncao = [];
@@ -244,7 +246,9 @@ class Juncao extends SyncModel
 
     /**
      * Filter fields, upload data and keep key data
-     * @param Juncao $original Original instance without modifications
+     * @param self $original Original instance without modifications
+     * @param boolean $localized Informs if fields are localized
+     * @return self Self instance
      */
     public function filter($original, $localized = false)
     {
@@ -252,11 +256,12 @@ class Juncao extends SyncModel
         $this->setMesaID(Filter::number($this->getMesaID()));
         $this->setPedidoID(Filter::number($this->getPedidoID()));
         $this->setDataMovimento(Filter::datetime($this->getDataMovimento()));
+        return $this;
     }
 
     /**
      * Clean instance resources like images and docs
-     * @param  Juncao $dependency Don't clean when dependency use same resources
+     * @param self $dependency Don't clean when dependency use same resources
      */
     public function clean($dependency)
     {
@@ -265,44 +270,33 @@ class Juncao extends SyncModel
     /**
      * Validate fields updating them and throw exception when invalid data has found
      * @return array All field of Juncao in array format
+     * @throws \MZ\Exception\ValidationException for invalid input data
      */
     public function validate()
     {
         $errors = [];
         if (is_null($this->getMesaID())) {
-            $errors['mesaid'] = 'A mesa não pode ser vazia';
+            $errors['mesaid'] = _t('juncao.mesa_id_cannot_empty');
         }
         if (is_null($this->getPedidoID())) {
-            $errors['pedidoid'] = 'O pedido não pode ser vazio';
+            $errors['pedidoid'] = _t('juncao.pedido_id_cannot_empty');
         }
-        if (is_null($this->getEstado())) {
-            $errors['estado'] = 'O estado não pode ser vazio';
-        }
-        if (!Validator::checkInSet($this->getEstado(), self::getEstadoOptions(), true)) {
-            $errors['estado'] = 'O estado é inválido';
+        if (!Validator::checkInSet($this->getEstado(), self::getEstadoOptions())) {
+            $errors['estado'] = _t('juncao.estado_invalid');
         }
         if (is_null($this->getDataMovimento())) {
-            $errors['datamovimento'] = 'A data do movimento não pode ser vazia';
+            $errors['datamovimento'] = _t('juncao.data_movimento_cannot_empty');
         }
         if (!empty($errors)) {
-            throw new \MZ\Exception\ValidationException($errors);
+            throw new ValidationException($errors);
         }
         return $this->toArray();
     }
 
     /**
-     * Translate SQL exception into application exception
-     * @param  \Exception $e exception to translate into a readable error
-     * @return \MZ\Exception\ValidationException new exception translated
-     */
-    protected function translate($e)
-    {
-        return parent::translate($e);
-    }
-
-    /**
      * Insert a new Junção into the database and fill instance from database
-     * @return Juncao Self instance
+     * @return self Self instance
+     * @throws \MZ\Exception\ValidationException for invalid input data
      */
     public function insert()
     {
@@ -321,36 +315,42 @@ class Juncao extends SyncModel
 
     /**
      * Update Junção with instance values into database for ID
-     * @param  array $only Save these fields only, when empty save all fields except id
-     * @return Juncao Self instance
+     * @param array $only Save these fields only, when empty save all fields except id
+     * @return int rows affected
+     * @throws \MZ\Exception\ValidationException for invalid input data
      */
     public function update($only = [])
     {
         $values = $this->validate();
         if (!$this->exists()) {
-            throw new \Exception('O identificador da junção não foi informado');
+            throw new ValidationException(
+                ['id' => _t('juncao.id_cannot_empty')]
+            );
         }
         $values = DB::filterValues($values, $only, false);
         try {
-            DB::update('Juncoes')
+            $affected = DB::update('Juncoes')
                 ->set($values)
-                ->where('id', $this->getID())
+                ->where(['id' => $this->getID()])
                 ->execute();
             $this->loadByID();
         } catch (\Exception $e) {
             throw $this->translate($e);
         }
-        return $this;
+        return $affected;
     }
 
     /**
      * Delete this instance from database using ID
      * @return integer Number of rows deleted (Max 1)
+     * @throws \MZ\Exception\ValidationException for invalid id
      */
     public function delete()
     {
         if (!$this->exists()) {
-            throw new \Exception('O identificador da junção não foi informado');
+            throw new ValidationException(
+                ['id' => _t('juncao.id_cannot_empty')]
+            );
         }
         $result = DB::deleteFrom('Juncoes')
             ->where('id', $this->getID())
@@ -360,9 +360,9 @@ class Juncao extends SyncModel
 
     /**
      * Load one register for it self with a condition
-     * @param  array $condition Condition for searching the row
-     * @param  array $order associative field name -> [-1, 1]
-     * @return Juncao Self instance filled or empty
+     * @param array $condition Condition for searching the row
+     * @param array $order associative field name -> [-1, 1]
+     * @return self Self instance filled or empty
      */
     public function load($condition, $order = [])
     {
@@ -391,15 +391,15 @@ class Juncao extends SyncModel
 
     /**
      * Gets textual and translated Estado for Juncao
-     * @param  int $index choose option from index
-     * @return mixed A associative key -> translated representative text or text for index
+     * @param int $index choose option from index
+     * @return string[] A associative key -> translated representative text or text for index
      */
     public static function getEstadoOptions($index = null)
     {
         $options = [
-            self::ESTADO_ASSOCIADO => 'Associado',
-            self::ESTADO_LIBERADO => 'Liberado',
-            self::ESTADO_CANCELADO => 'Cancelado',
+            self::ESTADO_ASSOCIADO => _t('juncao.estado_associado'),
+            self::ESTADO_LIBERADO => _t('juncao.estado_liberado'),
+            self::ESTADO_CANCELADO => _t('juncao.estado_cancelado'),
         ];
         if (!is_null($index)) {
             return $options[$index];
@@ -413,14 +413,14 @@ class Juncao extends SyncModel
      */
     private static function getAllowedKeys()
     {
-        $juncao = new Juncao();
+        $juncao = new self();
         $allowed = Filter::concatKeys('j.', $juncao->toArray());
         return $allowed;
     }
 
     /**
      * Filter order array
-     * @param  mixed $order order string or array to parse and filter allowed
+     * @param mixed $order order string or array to parse and filter allowed
      * @return array allowed associative order
      */
     private static function filterOrder($order)
@@ -431,7 +431,7 @@ class Juncao extends SyncModel
 
     /**
      * Filter condition array with allowed fields
-     * @param  array $condition condition to filter rows
+     * @param array $condition condition to filter rows
      * @return array allowed condition
      */
     private static function filterCondition($condition)
@@ -442,8 +442,8 @@ class Juncao extends SyncModel
 
     /**
      * Fetch data from database with a condition
-     * @param  array $condition condition to filter rows
-     * @param  array $order order rows
+     * @param array $condition condition to filter rows
+     * @param array $order order rows
      * @return SelectQuery query object with condition statement
      */
     private static function query($condition = [], $order = [])
@@ -457,24 +457,39 @@ class Juncao extends SyncModel
 
     /**
      * Search one register with a condition
-     * @param  array $condition Condition for searching the row
-     * @param  array $order order rows
-     * @return Juncao A filled Junção or empty instance
+     * @param array $condition Condition for searching the row
+     * @param array $order order rows
+     * @return self A filled Junção or empty instance
      */
     public static function find($condition, $order = [])
     {
-        $query = self::query($condition, $order)->limit(1);
-        $row = $query->fetch() ?: [];
-        return new Juncao($row);
+        $result = new self();
+        return $result->load($condition, $order);
+    }
+
+    /**
+     * Search one register with a condition
+     * @param array $condition Condition for searching the row
+     * @param array $order order rows
+     * @return self A filled Junção or empty instance
+     * @throws \Exception when register has not found
+     */
+    public static function findOrFail($condition, $order = [])
+    {
+        $result = self::find($condition, $order);
+        if (!$result->exists()) {
+            throw new \Exception(_t('juncao.not_found'), 404);
+        }
+        return $result;
     }
 
     /**
      * Find all Junção
-     * @param  array  $condition Condition to get all Junção
-     * @param  array  $order     Order Junção
-     * @param  int    $limit     Limit data into row count
-     * @param  int    $offset    Start offset to get rows
-     * @return array             List of all rows instanced as Juncao
+     * @param array  $condition Condition to get all Junção
+     * @param array  $order     Order Junção
+     * @param int    $limit     Limit data into row count
+     * @param int    $offset    Start offset to get rows
+     * @return self[] List of all rows instanced as Juncao
      */
     public static function findAll($condition = [], $order = [], $limit = null, $offset = null)
     {
@@ -488,14 +503,14 @@ class Juncao extends SyncModel
         $rows = $query->fetchAll();
         $result = [];
         foreach ($rows as $row) {
-            $result[] = new Juncao($row);
+            $result[] = new self($row);
         }
         return $result;
     }
 
     /**
      * Count all rows from database with matched condition critery
-     * @param  array $condition condition to filter rows
+     * @param array $condition condition to filter rows
      * @return integer Quantity of rows
      */
     public static function count($condition = [])

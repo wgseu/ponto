@@ -24,10 +24,12 @@
  */
 namespace MZ\Product;
 
-use MZ\Database\SyncModel;
-use MZ\Database\DB;
+use MZ\Util\Mask;
 use MZ\Util\Filter;
 use MZ\Util\Validator;
+use MZ\Database\DB;
+use MZ\Database\SyncModel;
+use MZ\Exception\ValidationException;
 
 /**
  * Permite cadastrar informações da tabela nutricional
@@ -72,7 +74,7 @@ class Informacao extends SyncModel
 
     /**
      * Identificador da informação nutricional
-     * @return mixed ID of Informacao
+     * @return int id of Informação nutricional
      */
     public function getID()
     {
@@ -81,8 +83,8 @@ class Informacao extends SyncModel
 
     /**
      * Set ID value to new on param
-     * @param  mixed $id new value for ID
-     * @return Informacao Self instance
+     * @param int $id Set id for Informação nutricional
+     * @return self Self instance
      */
     public function setID($id)
     {
@@ -92,7 +94,7 @@ class Informacao extends SyncModel
 
     /**
      * Produto a que essa tabela de informações nutricionais pertence
-     * @return mixed Produto of Informacao
+     * @return int produto of Informação nutricional
      */
     public function getProdutoID()
     {
@@ -101,8 +103,8 @@ class Informacao extends SyncModel
 
     /**
      * Set ProdutoID value to new on param
-     * @param  mixed $produto_id new value for ProdutoID
-     * @return Informacao Self instance
+     * @param int $produto_id Set produto for Informação nutricional
+     * @return self Self instance
      */
     public function setProdutoID($produto_id)
     {
@@ -112,7 +114,7 @@ class Informacao extends SyncModel
 
     /**
      * Unidade de medida da porção
-     * @return mixed Unidade of Informacao
+     * @return int unidade of Informação nutricional
      */
     public function getUnidadeID()
     {
@@ -121,8 +123,8 @@ class Informacao extends SyncModel
 
     /**
      * Set UnidadeID value to new on param
-     * @param  mixed $unidade_id new value for UnidadeID
-     * @return Informacao Self instance
+     * @param int $unidade_id Set unidade for Informação nutricional
+     * @return self Self instance
      */
     public function setUnidadeID($unidade_id)
     {
@@ -132,7 +134,7 @@ class Informacao extends SyncModel
 
     /**
      * Quantidade da porção para base nos valores nutricionais
-     * @return mixed Porção of Informacao
+     * @return float porção of Informação nutricional
      */
     public function getPorcao()
     {
@@ -141,8 +143,8 @@ class Informacao extends SyncModel
 
     /**
      * Set Porcao value to new on param
-     * @param  mixed $porcao new value for Porcao
-     * @return Informacao Self instance
+     * @param float $porcao Set porção for Informação nutricional
+     * @return self Self instance
      */
     public function setPorcao($porcao)
     {
@@ -153,7 +155,7 @@ class Informacao extends SyncModel
     /**
      * Informa a quantidade de referência da dieta geralmente 2000kcal ou
      * 8400kJ
-     * @return mixed Dieta of Informacao
+     * @return float dieta of Informação nutricional
      */
     public function getDieta()
     {
@@ -162,8 +164,8 @@ class Informacao extends SyncModel
 
     /**
      * Set Dieta value to new on param
-     * @param  mixed $dieta new value for Dieta
-     * @return Informacao Self instance
+     * @param float $dieta Set dieta for Informação nutricional
+     * @return self Self instance
      */
     public function setDieta($dieta)
     {
@@ -173,7 +175,7 @@ class Informacao extends SyncModel
 
     /**
      * Informa todos os ingredientes que compõe o produto
-     * @return mixed Ingredientes of Informacao
+     * @return string ingredientes of Informação nutricional
      */
     public function getIngredientes()
     {
@@ -182,8 +184,8 @@ class Informacao extends SyncModel
 
     /**
      * Set Ingredientes value to new on param
-     * @param  mixed $ingredientes new value for Ingredientes
-     * @return Informacao Self instance
+     * @param string $ingredientes Set ingredientes for Informação nutricional
+     * @return self Self instance
      */
     public function setIngredientes($ingredientes)
     {
@@ -193,7 +195,7 @@ class Informacao extends SyncModel
 
     /**
      * Convert this instance to array associated key -> value
-     * @param  boolean $recursive Allow rescursive conversion of fields
+     * @param boolean $recursive Allow rescursive conversion of fields
      * @return array All field and values into array format
      */
     public function toArray($recursive = false)
@@ -210,12 +212,12 @@ class Informacao extends SyncModel
 
     /**
      * Fill this instance with from array values, you can pass instance to
-     * @param  mixed $informacao Associated key -> value to assign into this instance
-     * @return Informacao Self instance
+     * @param mixed $informacao Associated key -> value to assign into this instance
+     * @return self Self instance
      */
     public function fromArray($informacao = [])
     {
-        if ($informacao instanceof Informacao) {
+        if ($informacao instanceof self) {
             $informacao = $informacao->toArray();
         } elseif (!is_array($informacao)) {
             $informacao = [];
@@ -266,7 +268,9 @@ class Informacao extends SyncModel
 
     /**
      * Filter fields, upload data and keep key data
-     * @param Informacao $original Original instance without modifications
+     * @param self $original Original instance without modifications
+     * @param boolean $localized Informs if fields are localized
+     * @return self Self instance
      */
     public function filter($original, $localized = false)
     {
@@ -276,11 +280,12 @@ class Informacao extends SyncModel
         $this->setPorcao(Filter::float($this->getPorcao(), $localized));
         $this->setDieta(Filter::float($this->getDieta(), $localized));
         $this->setIngredientes(Filter::text($this->getIngredientes()));
+        return $this;
     }
 
     /**
      * Clean instance resources like images and docs
-     * @param  Informacao $dependency Don't clean when dependency use same resources
+     * @param self $dependency Don't clean when dependency use same resources
      */
     public function clean($dependency)
     {
@@ -289,39 +294,40 @@ class Informacao extends SyncModel
     /**
      * Validate fields updating them and throw exception when invalid data has found
      * @return array All field of Informacao in array format
+     * @throws \MZ\Exception\ValidationException for invalid input data
      */
     public function validate()
     {
         $errors = [];
         if (is_null($this->getProdutoID())) {
-            $errors['produtoid'] = 'O produto não pode ser vazio';
+            $errors['produtoid'] = _t('informacao.produto_id_cannot_empty');
         }
         if (is_null($this->getUnidadeID())) {
-            $errors['unidadeid'] = 'A unidade não pode ser vazia';
+            $errors['unidadeid'] = _t('informacao.unidade_id_cannot_empty');
         }
         if (is_null($this->getPorcao())) {
-            $errors['porcao'] = 'A porção não pode ser vazia';
+            $errors['porcao'] = _t('informacao.porcao_cannot_empty');
         }
         if (is_null($this->getDieta())) {
-            $errors['dieta'] = 'A dieta não pode ser vazia';
+            $errors['dieta'] = _t('informacao.dieta_cannot_empty');
         }
         if (!empty($errors)) {
-            throw new \MZ\Exception\ValidationException($errors);
+            throw new ValidationException($errors);
         }
         return $this->toArray();
     }
 
     /**
      * Translate SQL exception into application exception
-     * @param  \Exception $e exception to translate into a readable error
+     * @param \Exception $e exception to translate into a readable error
      * @return \MZ\Exception\ValidationException new exception translated
      */
     protected function translate($e)
     {
         if (contains(['ProdutoID', 'UNIQUE'], $e->getMessage())) {
-            return new \MZ\Exception\ValidationException([
-                'produtoid' => sprintf(
-                    'O produto "%s" já está cadastrado',
+            return new ValidationException([
+                'produtoid' => _t(
+                    'informacao.produto_id_used',
                     $this->getProdutoID()
                 ),
             ]);
@@ -331,7 +337,8 @@ class Informacao extends SyncModel
 
     /**
      * Insert a new Informação nutricional into the database and fill instance from database
-     * @return Informacao Self instance
+     * @return self Self instance
+     * @throws \MZ\Exception\ValidationException for invalid input data
      */
     public function insert()
     {
@@ -350,35 +357,42 @@ class Informacao extends SyncModel
 
     /**
      * Update Informação nutricional with instance values into database for ID
-     * @return Informacao Self instance
+     * @param array $only Save these fields only, when empty save all fields except id
+     * @return int rows affected
+     * @throws \MZ\Exception\ValidationException for invalid input data
      */
     public function update($only = [])
     {
         $values = $this->validate();
         if (!$this->exists()) {
-            throw new \Exception('O identificador da informação nutricional não foi informado');
+            throw new ValidationException(
+                ['id' => _t('informacao.id_cannot_empty')]
+            );
         }
         $values = DB::filterValues($values, $only, false);
         try {
-            DB::update('Informacoes')
+            $affected = DB::update('Informacoes')
                 ->set($values)
-                ->where('id', $this->getID())
+                ->where(['id' => $this->getID()])
                 ->execute();
             $this->loadByID();
         } catch (\Exception $e) {
             throw $this->translate($e);
         }
-        return $this;
+        return $affected;
     }
 
     /**
      * Delete this instance from database using ID
      * @return integer Number of rows deleted (Max 1)
+     * @throws \MZ\Exception\ValidationException for invalid id
      */
     public function delete()
     {
         if (!$this->exists()) {
-            throw new \Exception('O identificador da informação nutricional não foi informado');
+            throw new ValidationException(
+                ['id' => _t('informacao.id_cannot_empty')]
+            );
         }
         $result = DB::deleteFrom('Informacoes')
             ->where('id', $this->getID())
@@ -388,9 +402,9 @@ class Informacao extends SyncModel
 
     /**
      * Load one register for it self with a condition
-     * @param  array $condition Condition for searching the row
-     * @param  array $order associative field name -> [-1, 1]
-     * @return Informacao Self instance filled or empty
+     * @param array $condition Condition for searching the row
+     * @param array $order associative field name -> [-1, 1]
+     * @return self Self instance filled or empty
      */
     public function load($condition, $order = [])
     {
@@ -401,13 +415,12 @@ class Informacao extends SyncModel
 
     /**
      * Load into this object from database using, ProdutoID
-     * @param  int $produto_id produto to find Informação nutricional
-     * @return Informacao Self filled instance or empty when not found
+     * @return self Self filled instance or empty when not found
      */
-    public function loadByProdutoID($produto_id)
+    public function loadByProdutoID()
     {
         return $this->load([
-            'produtoid' => intval($produto_id),
+            'produtoid' => intval($this->getProdutoID()),
         ]);
     }
 
@@ -435,14 +448,14 @@ class Informacao extends SyncModel
      */
     private static function getAllowedKeys()
     {
-        $informacao = new Informacao();
+        $informacao = new self();
         $allowed = Filter::concatKeys('i.', $informacao->toArray());
         return $allowed;
     }
 
     /**
      * Filter order array
-     * @param  mixed $order order string or array to parse and filter allowed
+     * @param mixed $order order string or array to parse and filter allowed
      * @return array allowed associative order
      */
     private static function filterOrder($order)
@@ -453,7 +466,7 @@ class Informacao extends SyncModel
 
     /**
      * Filter condition array with allowed fields
-     * @param  array $condition condition to filter rows
+     * @param array $condition condition to filter rows
      * @return array allowed condition
      */
     private static function filterCondition($condition)
@@ -464,8 +477,8 @@ class Informacao extends SyncModel
 
     /**
      * Fetch data from database with a condition
-     * @param  array $condition condition to filter rows
-     * @param  array $order order rows
+     * @param array $condition condition to filter rows
+     * @param array $order order rows
      * @return SelectQuery query object with condition statement
      */
     private static function query($condition = [], $order = [])
@@ -479,35 +492,51 @@ class Informacao extends SyncModel
 
     /**
      * Search one register with a condition
-     * @param  array $condition Condition for searching the row
-     * @param  array $order order rows
-     * @return Informacao A filled Informação nutricional or empty instance
+     * @param array $condition Condition for searching the row
+     * @param array $order order rows
+     * @return self A filled Informação nutricional or empty instance
      */
     public static function find($condition, $order = [])
     {
-        $query = self::query($condition, $order)->limit(1);
-        $row = $query->fetch() ?: [];
-        return new Informacao($row);
+        $result = new self();
+        return $result->load($condition, $order);
+    }
+
+    /**
+     * Search one register with a condition
+     * @param array $condition Condition for searching the row
+     * @param array $order order rows
+     * @return self A filled Informação nutricional or empty instance
+     * @throws \Exception when register has not found
+     */
+    public static function findOrFail($condition, $order = [])
+    {
+        $result = self::find($condition, $order);
+        if (!$result->exists()) {
+            throw new \Exception(_t('informacao.not_found'), 404);
+        }
+        return $result;
     }
 
     /**
      * Find this object on database using, ProdutoID
-     * @param  int $produto_id produto to find Informação nutricional
-     * @return Informacao A filled instance or empty when not found
+     * @param int $produto_id produto to find Informação nutricional
+     * @return self A filled instance or empty when not found
      */
     public static function findByProdutoID($produto_id)
     {
         $result = new self();
-        return $result->loadByProdutoID($produto_id);
+        $result->setProdutoID($produto_id);
+        return $result->loadByProdutoID();
     }
 
     /**
      * Find all Informação nutricional
-     * @param  array  $condition Condition to get all Informação nutricional
-     * @param  array  $order     Order Informação nutricional
-     * @param  int    $limit     Limit data into row count
-     * @param  int    $offset    Start offset to get rows
-     * @return array             List of all rows instanced as Informacao
+     * @param array  $condition Condition to get all Informação nutricional
+     * @param array  $order     Order Informação nutricional
+     * @param int    $limit     Limit data into row count
+     * @param int    $offset    Start offset to get rows
+     * @return self[] List of all rows instanced as Informacao
      */
     public static function findAll($condition = [], $order = [], $limit = null, $offset = null)
     {
@@ -521,14 +550,14 @@ class Informacao extends SyncModel
         $rows = $query->fetchAll();
         $result = [];
         foreach ($rows as $row) {
-            $result[] = new Informacao($row);
+            $result[] = new self($row);
         }
         return $result;
     }
 
     /**
      * Count all rows from database with matched condition critery
-     * @param  array $condition condition to filter rows
+     * @param array $condition condition to filter rows
      * @return integer Quantity of rows
      */
     public static function count($condition = [])

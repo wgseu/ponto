@@ -24,12 +24,12 @@
  */
 namespace MZ\Sale;
 
-use MZ\Database\SyncModel;
-use MZ\Database\DB;
+use MZ\Util\Mask;
 use MZ\Util\Filter;
 use MZ\Util\Validator;
-use MZ\System\Permissao;
-use MZ\Payment\Pagamento;
+use MZ\Database\DB;
+use MZ\Database\SyncModel;
+use MZ\Exception\ValidationException;
 
 /**
  * Informações do pedido de venda
@@ -70,22 +70,13 @@ class Pedido extends SyncModel
      */
     private $comanda_id;
     /**
-     * Movimentação do caixa quando o pedido é pago total ou parcial, somente
-     * um caixa pode receber os pagamentos de um pedido
-     */
-    private $movimentacao_id;
-    /**
      * Identificador da sessão de vendas
      */
     private $sessao_id;
     /**
-     * Funcionário que criou esse pedido
+     * Prestador que criou esse pedido
      */
-    private $funcionario_id;
-    /**
-     * Entregador que fez a entrega do pedido
-     */
-    private $entregador_id;
+    private $prestador_id;
     /**
      * Identificador do cliente do pedido
      */
@@ -95,6 +86,10 @@ class Pedido extends SyncModel
      * pedido será para viagem
      */
     private $localizacao_id;
+    /**
+     * Informa em qual entrega esse pedido foi despachado
+     */
+    private $entrega_id;
     /**
      * Tipo de venda
      */
@@ -131,21 +126,21 @@ class Pedido extends SyncModel
      */
     private $motivo;
     /**
-     * Data de criação do pedido
+     * Data e hora que o entregador concluiu a entrega desse pedido
      */
-    private $data_criacao;
+    private $data_entrega;
     /**
      * Data de agendamento do pedido
      */
     private $data_agendamento;
     /**
-     * Data e hora que o entregador saiu para entregar o pedido
-     */
-    private $data_entrega;
-    /**
      * Data de finalização do pedido
      */
     private $data_conclusao;
+    /**
+     * Data de criação do pedido
+     */
+    private $data_criacao;
 
     /**
      * Constructor for a new empty instance of Pedido
@@ -158,7 +153,7 @@ class Pedido extends SyncModel
 
     /**
      * Código do pedido
-     * @return mixed Código of Pedido
+     * @return int código of Pedido
      */
     public function getID()
     {
@@ -167,8 +162,8 @@ class Pedido extends SyncModel
 
     /**
      * Set ID value to new on param
-     * @param  mixed $id new value for ID
-     * @return Pedido Self instance
+     * @param int $id Set código for Pedido
+     * @return self Self instance
      */
     public function setID($id)
     {
@@ -178,7 +173,7 @@ class Pedido extends SyncModel
 
     /**
      * Identificador da mesa, único quando o pedido não está fechado
-     * @return mixed Mesa of Pedido
+     * @return int mesa of Pedido
      */
     public function getMesaID()
     {
@@ -187,8 +182,8 @@ class Pedido extends SyncModel
 
     /**
      * Set MesaID value to new on param
-     * @param  mixed $mesa_id new value for MesaID
-     * @return Pedido Self instance
+     * @param int $mesa_id Set mesa for Pedido
+     * @return self Self instance
      */
     public function setMesaID($mesa_id)
     {
@@ -198,7 +193,7 @@ class Pedido extends SyncModel
 
     /**
      * Identificador da comanda, único quando o pedido não está fechado
-     * @return mixed Comanda of Pedido
+     * @return int comanda of Pedido
      */
     public function getComandaID()
     {
@@ -207,8 +202,8 @@ class Pedido extends SyncModel
 
     /**
      * Set ComandaID value to new on param
-     * @param  mixed $comanda_id new value for ComandaID
-     * @return Pedido Self instance
+     * @param int $comanda_id Set comanda for Pedido
+     * @return self Self instance
      */
     public function setComandaID($comanda_id)
     {
@@ -217,29 +212,8 @@ class Pedido extends SyncModel
     }
 
     /**
-     * Movimentação do caixa quando o pedido é pago total ou parcial, somente
-     * um caixa pode receber os pagamentos de um pedido
-     * @return mixed Movimentação of Pedido
-     */
-    public function getMovimentacaoID()
-    {
-        return $this->movimentacao_id;
-    }
-
-    /**
-     * Set MovimentacaoID value to new on param
-     * @param  mixed $movimentacao_id new value for MovimentacaoID
-     * @return Pedido Self instance
-     */
-    public function setMovimentacaoID($movimentacao_id)
-    {
-        $this->movimentacao_id = $movimentacao_id;
-        return $this;
-    }
-
-    /**
      * Identificador da sessão de vendas
-     * @return mixed Sessão of Pedido
+     * @return int sessão of Pedido
      */
     public function getSessaoID()
     {
@@ -248,8 +222,8 @@ class Pedido extends SyncModel
 
     /**
      * Set SessaoID value to new on param
-     * @param  mixed $sessao_id new value for SessaoID
-     * @return Pedido Self instance
+     * @param int $sessao_id Set sessão for Pedido
+     * @return self Self instance
      */
     public function setSessaoID($sessao_id)
     {
@@ -258,48 +232,28 @@ class Pedido extends SyncModel
     }
 
     /**
-     * Funcionário que criou esse pedido
-     * @return mixed Funcionário of Pedido
+     * Prestador que criou esse pedido
+     * @return int prestador of Pedido
      */
-    public function getFuncionarioID()
+    public function getPrestadorID()
     {
-        return $this->funcionario_id;
+        return $this->prestador_id;
     }
 
     /**
-     * Set FuncionarioID value to new on param
-     * @param  mixed $funcionario_id new value for FuncionarioID
-     * @return Pedido Self instance
+     * Set PrestadorID value to new on param
+     * @param int $prestador_id Set prestador for Pedido
+     * @return self Self instance
      */
-    public function setFuncionarioID($funcionario_id)
+    public function setPrestadorID($prestador_id)
     {
-        $this->funcionario_id = $funcionario_id;
-        return $this;
-    }
-
-    /**
-     * Entregador que fez a entrega do pedido
-     * @return mixed Entregador of Pedido
-     */
-    public function getEntregadorID()
-    {
-        return $this->entregador_id;
-    }
-
-    /**
-     * Set EntregadorID value to new on param
-     * @param  mixed $entregador_id new value for EntregadorID
-     * @return Pedido Self instance
-     */
-    public function setEntregadorID($entregador_id)
-    {
-        $this->entregador_id = $entregador_id;
+        $this->prestador_id = $prestador_id;
         return $this;
     }
 
     /**
      * Identificador do cliente do pedido
-     * @return mixed Cliente of Pedido
+     * @return int cliente of Pedido
      */
     public function getClienteID()
     {
@@ -308,8 +262,8 @@ class Pedido extends SyncModel
 
     /**
      * Set ClienteID value to new on param
-     * @param  mixed $cliente_id new value for ClienteID
-     * @return Pedido Self instance
+     * @param int $cliente_id Set cliente for Pedido
+     * @return self Self instance
      */
     public function setClienteID($cliente_id)
     {
@@ -320,7 +274,7 @@ class Pedido extends SyncModel
     /**
      * Endereço de entrega do pedido, se não informado na venda entrega, o
      * pedido será para viagem
-     * @return mixed Localização of Pedido
+     * @return int localização of Pedido
      */
     public function getLocalizacaoID()
     {
@@ -329,8 +283,8 @@ class Pedido extends SyncModel
 
     /**
      * Set LocalizacaoID value to new on param
-     * @param  mixed $localizacao_id new value for LocalizacaoID
-     * @return Pedido Self instance
+     * @param int $localizacao_id Set localização for Pedido
+     * @return self Self instance
      */
     public function setLocalizacaoID($localizacao_id)
     {
@@ -339,8 +293,28 @@ class Pedido extends SyncModel
     }
 
     /**
+     * Informa em qual entrega esse pedido foi despachado
+     * @return int entrega of Pedido
+     */
+    public function getEntregaID()
+    {
+        return $this->entrega_id;
+    }
+
+    /**
+     * Set EntregaID value to new on param
+     * @param int $entrega_id Set entrega for Pedido
+     * @return self Self instance
+     */
+    public function setEntregaID($entrega_id)
+    {
+        $this->entrega_id = $entrega_id;
+        return $this;
+    }
+
+    /**
      * Tipo de venda
-     * @return mixed Tipo of Pedido
+     * @return string tipo of Pedido
      */
     public function getTipo()
     {
@@ -349,8 +323,8 @@ class Pedido extends SyncModel
 
     /**
      * Set Tipo value to new on param
-     * @param  mixed $tipo new value for Tipo
-     * @return Pedido Self instance
+     * @param string $tipo Set tipo for Pedido
+     * @return self Self instance
      */
     public function setTipo($tipo)
     {
@@ -363,7 +337,7 @@ class Pedido extends SyncModel
      * agendamento. Ativo: O pedido deve ser processado. Fechado: O cliente
      * pediu a conta e está pronto para pagar. Entrega: O pedido saiu para
      * entrega. Finalizado: O pedido foi pago e concluído
-     * @return mixed Estado of Pedido
+     * @return string estado of Pedido
      */
     public function getEstado()
     {
@@ -372,8 +346,8 @@ class Pedido extends SyncModel
 
     /**
      * Set Estado value to new on param
-     * @param  mixed $estado new value for Estado
-     * @return Pedido Self instance
+     * @param string $estado Set estado for Pedido
+     * @return self Self instance
      */
     public function setEstado($estado)
     {
@@ -383,7 +357,7 @@ class Pedido extends SyncModel
 
     /**
      * Informa quantas pessoas estão na mesa
-     * @return mixed Pessoas of Pedido
+     * @return int pessoas of Pedido
      */
     public function getPessoas()
     {
@@ -392,8 +366,8 @@ class Pedido extends SyncModel
 
     /**
      * Set Pessoas value to new on param
-     * @param  mixed $pessoas new value for Pessoas
-     * @return Pedido Self instance
+     * @param int $pessoas Set pessoas for Pedido
+     * @return self Self instance
      */
     public function setPessoas($pessoas)
     {
@@ -403,7 +377,7 @@ class Pedido extends SyncModel
 
     /**
      * Detalhes da reserva ou do pedido
-     * @return mixed Descrição of Pedido
+     * @return string descrição of Pedido
      */
     public function getDescricao()
     {
@@ -412,8 +386,8 @@ class Pedido extends SyncModel
 
     /**
      * Set Descricao value to new on param
-     * @param  mixed $descricao new value for Descricao
-     * @return Pedido Self instance
+     * @param string $descricao Set descrição for Pedido
+     * @return self Self instance
      */
     public function setDescricao($descricao)
     {
@@ -423,7 +397,7 @@ class Pedido extends SyncModel
 
     /**
      * Informa quem fechou o pedido e imprimiu a conta
-     * @return mixed Fechador do pedido of Pedido
+     * @return int fechador do pedido of Pedido
      */
     public function getFechadorID()
     {
@@ -432,8 +406,8 @@ class Pedido extends SyncModel
 
     /**
      * Set FechadorID value to new on param
-     * @param  mixed $fechador_id new value for FechadorID
-     * @return Pedido Self instance
+     * @param int $fechador_id Set fechador do pedido for Pedido
+     * @return self Self instance
      */
     public function setFechadorID($fechador_id)
     {
@@ -443,7 +417,7 @@ class Pedido extends SyncModel
 
     /**
      * Data de impressão da conta do cliente
-     * @return mixed Data de impressão of Pedido
+     * @return string data de impressão of Pedido
      */
     public function getDataImpressao()
     {
@@ -452,8 +426,8 @@ class Pedido extends SyncModel
 
     /**
      * Set DataImpressao value to new on param
-     * @param  mixed $data_impressao new value for DataImpressao
-     * @return Pedido Self instance
+     * @param string $data_impressao Set data de impressão for Pedido
+     * @return self Self instance
      */
     public function setDataImpressao($data_impressao)
     {
@@ -463,7 +437,7 @@ class Pedido extends SyncModel
 
     /**
      * Informa se o pedido foi cancelado
-     * @return mixed Cancelado of Pedido
+     * @return string cancelado of Pedido
      */
     public function getCancelado()
     {
@@ -481,8 +455,8 @@ class Pedido extends SyncModel
 
     /**
      * Set Cancelado value to new on param
-     * @param  mixed $cancelado new value for Cancelado
-     * @return Pedido Self instance
+     * @param string $cancelado Set cancelado for Pedido
+     * @return self Self instance
      */
     public function setCancelado($cancelado)
     {
@@ -492,7 +466,7 @@ class Pedido extends SyncModel
 
     /**
      * Informa o motivo do cancelamento
-     * @return mixed Motivo of Pedido
+     * @return string motivo of Pedido
      */
     public function getMotivo()
     {
@@ -501,8 +475,8 @@ class Pedido extends SyncModel
 
     /**
      * Set Motivo value to new on param
-     * @param  mixed $motivo new value for Motivo
-     * @return Pedido Self instance
+     * @param string $motivo Set motivo for Pedido
+     * @return self Self instance
      */
     public function setMotivo($motivo)
     {
@@ -511,48 +485,8 @@ class Pedido extends SyncModel
     }
 
     /**
-     * Data de criação do pedido
-     * @return mixed Data de criação of Pedido
-     */
-    public function getDataCriacao()
-    {
-        return $this->data_criacao;
-    }
-
-    /**
-     * Set DataCriacao value to new on param
-     * @param  mixed $data_criacao new value for DataCriacao
-     * @return Pedido Self instance
-     */
-    public function setDataCriacao($data_criacao)
-    {
-        $this->data_criacao = $data_criacao;
-        return $this;
-    }
-
-    /**
-     * Data de agendamento do pedido
-     * @return mixed Data de agendamento of Pedido
-     */
-    public function getDataAgendamento()
-    {
-        return $this->data_agendamento;
-    }
-
-    /**
-     * Set DataAgendamento value to new on param
-     * @param  mixed $data_agendamento new value for DataAgendamento
-     * @return Pedido Self instance
-     */
-    public function setDataAgendamento($data_agendamento)
-    {
-        $this->data_agendamento = $data_agendamento;
-        return $this;
-    }
-
-    /**
-     * Data e hora que o entregador saiu para entregar o pedido
-     * @return mixed Data de entrega of Pedido
+     * Data e hora que o entregador concluiu a entrega desse pedido
+     * @return string data de entrega of Pedido
      */
     public function getDataEntrega()
     {
@@ -561,8 +495,8 @@ class Pedido extends SyncModel
 
     /**
      * Set DataEntrega value to new on param
-     * @param  mixed $data_entrega new value for DataEntrega
-     * @return Pedido Self instance
+     * @param string $data_entrega Set data de entrega for Pedido
+     * @return self Self instance
      */
     public function setDataEntrega($data_entrega)
     {
@@ -571,8 +505,28 @@ class Pedido extends SyncModel
     }
 
     /**
+     * Data de agendamento do pedido
+     * @return string data de agendamento of Pedido
+     */
+    public function getDataAgendamento()
+    {
+        return $this->data_agendamento;
+    }
+
+    /**
+     * Set DataAgendamento value to new on param
+     * @param string $data_agendamento Set data de agendamento for Pedido
+     * @return self Self instance
+     */
+    public function setDataAgendamento($data_agendamento)
+    {
+        $this->data_agendamento = $data_agendamento;
+        return $this;
+    }
+
+    /**
      * Data de finalização do pedido
-     * @return mixed Data de conclusão of Pedido
+     * @return string data de conclusão of Pedido
      */
     public function getDataConclusao()
     {
@@ -581,8 +535,8 @@ class Pedido extends SyncModel
 
     /**
      * Set DataConclusao value to new on param
-     * @param  mixed $data_conclusao new value for DataConclusao
-     * @return Pedido Self instance
+     * @param string $data_conclusao Set data de conclusão for Pedido
+     * @return self Self instance
      */
     public function setDataConclusao($data_conclusao)
     {
@@ -591,8 +545,28 @@ class Pedido extends SyncModel
     }
 
     /**
+     * Data de criação do pedido
+     * @return string data de criação of Pedido
+     */
+    public function getDataCriacao()
+    {
+        return $this->data_criacao;
+    }
+
+    /**
+     * Set DataCriacao value to new on param
+     * @param string $data_criacao Set data de criação for Pedido
+     * @return self Self instance
+     */
+    public function setDataCriacao($data_criacao)
+    {
+        $this->data_criacao = $data_criacao;
+        return $this;
+    }
+
+    /**
      * Convert this instance to array associated key -> value
-     * @param  boolean $recursive Allow rescursive conversion of fields
+     * @param boolean $recursive Allow rescursive conversion of fields
      * @return array All field and values into array format
      */
     public function toArray($recursive = false)
@@ -601,12 +575,11 @@ class Pedido extends SyncModel
         $pedido['id'] = $this->getID();
         $pedido['mesaid'] = $this->getMesaID();
         $pedido['comandaid'] = $this->getComandaID();
-        $pedido['movimentacaoid'] = $this->getMovimentacaoID();
         $pedido['sessaoid'] = $this->getSessaoID();
-        $pedido['funcionarioid'] = $this->getFuncionarioID();
-        $pedido['entregadorid'] = $this->getEntregadorID();
+        $pedido['prestadorid'] = $this->getPrestadorID();
         $pedido['clienteid'] = $this->getClienteID();
         $pedido['localizacaoid'] = $this->getLocalizacaoID();
+        $pedido['entregaid'] = $this->getEntregaID();
         $pedido['tipo'] = $this->getTipo();
         $pedido['estado'] = $this->getEstado();
         $pedido['pessoas'] = $this->getPessoas();
@@ -615,21 +588,21 @@ class Pedido extends SyncModel
         $pedido['dataimpressao'] = $this->getDataImpressao();
         $pedido['cancelado'] = $this->getCancelado();
         $pedido['motivo'] = $this->getMotivo();
-        $pedido['datacriacao'] = $this->getDataCriacao();
-        $pedido['dataagendamento'] = $this->getDataAgendamento();
         $pedido['dataentrega'] = $this->getDataEntrega();
+        $pedido['dataagendamento'] = $this->getDataAgendamento();
         $pedido['dataconclusao'] = $this->getDataConclusao();
+        $pedido['datacriacao'] = $this->getDataCriacao();
         return $pedido;
     }
 
     /**
      * Fill this instance with from array values, you can pass instance to
-     * @param  mixed $pedido Associated key -> value to assign into this instance
-     * @return Pedido Self instance
+     * @param mixed $pedido Associated key -> value to assign into this instance
+     * @return self Self instance
      */
     public function fromArray($pedido = [])
     {
-        if ($pedido instanceof Pedido) {
+        if ($pedido instanceof self) {
             $pedido = $pedido->toArray();
         } elseif (!is_array($pedido)) {
             $pedido = [];
@@ -650,25 +623,15 @@ class Pedido extends SyncModel
         } else {
             $this->setComandaID($pedido['comandaid']);
         }
-        if (!array_key_exists('movimentacaoid', $pedido)) {
-            $this->setMovimentacaoID(null);
-        } else {
-            $this->setMovimentacaoID($pedido['movimentacaoid']);
-        }
-        if (!isset($pedido['sessaoid'])) {
+        if (!array_key_exists('sessaoid', $pedido)) {
             $this->setSessaoID(null);
         } else {
             $this->setSessaoID($pedido['sessaoid']);
         }
-        if (!isset($pedido['funcionarioid'])) {
-            $this->setFuncionarioID(null);
+        if (!array_key_exists('prestadorid', $pedido)) {
+            $this->setPrestadorID(null);
         } else {
-            $this->setFuncionarioID($pedido['funcionarioid']);
-        }
-        if (!array_key_exists('entregadorid', $pedido)) {
-            $this->setEntregadorID(null);
-        } else {
-            $this->setEntregadorID($pedido['entregadorid']);
+            $this->setPrestadorID($pedido['prestadorid']);
         }
         if (!array_key_exists('clienteid', $pedido)) {
             $this->setClienteID(null);
@@ -679,6 +642,11 @@ class Pedido extends SyncModel
             $this->setLocalizacaoID(null);
         } else {
             $this->setLocalizacaoID($pedido['localizacaoid']);
+        }
+        if (!array_key_exists('entregaid', $pedido)) {
+            $this->setEntregaID(null);
+        } else {
+            $this->setEntregaID($pedido['entregaid']);
         }
         if (!isset($pedido['tipo'])) {
             $this->setTipo(null);
@@ -711,7 +679,7 @@ class Pedido extends SyncModel
             $this->setDataImpressao($pedido['dataimpressao']);
         }
         if (!isset($pedido['cancelado'])) {
-            $this->setCancelado(null);
+            $this->setCancelado('N');
         } else {
             $this->setCancelado($pedido['cancelado']);
         }
@@ -720,25 +688,25 @@ class Pedido extends SyncModel
         } else {
             $this->setMotivo($pedido['motivo']);
         }
-        if (!isset($pedido['datacriacao'])) {
-            $this->setDataCriacao(DB::now());
+        if (!array_key_exists('dataentrega', $pedido)) {
+            $this->setDataEntrega(null);
         } else {
-            $this->setDataCriacao($pedido['datacriacao']);
+            $this->setDataEntrega($pedido['dataentrega']);
         }
         if (!array_key_exists('dataagendamento', $pedido)) {
             $this->setDataAgendamento(null);
         } else {
             $this->setDataAgendamento($pedido['dataagendamento']);
         }
-        if (!array_key_exists('dataentrega', $pedido)) {
-            $this->setDataEntrega(null);
-        } else {
-            $this->setDataEntrega($pedido['dataentrega']);
-        }
         if (!array_key_exists('dataconclusao', $pedido)) {
             $this->setDataConclusao(null);
         } else {
             $this->setDataConclusao($pedido['dataconclusao']);
+        }
+        if (!isset($pedido['datacriacao'])) {
+            $this->setDataCriacao(DB::now());
+        } else {
+            $this->setDataCriacao($pedido['datacriacao']);
         }
         return $this;
     }
@@ -809,33 +777,35 @@ class Pedido extends SyncModel
 
     /**
      * Filter fields, upload data and keep key data
-     * @param Pedido $original Original instance without modifications
+     * @param self $original Original instance without modifications
+     * @param boolean $localized Informs if fields are localized
+     * @return self Self instance
      */
     public function filter($original, $localized = false)
     {
         $this->setID($original->getID());
         $this->setMesaID(Filter::number($this->getMesaID()));
         $this->setComandaID(Filter::number($this->getComandaID()));
-        $this->setMovimentacaoID(Filter::number($this->getMovimentacaoID()));
         $this->setSessaoID(Filter::number($this->getSessaoID()));
-        $this->setFuncionarioID(Filter::number($this->getFuncionarioID()));
-        $this->setEntregadorID(Filter::number($this->getEntregadorID()));
+        $this->setPrestadorID(Filter::number($this->getPrestadorID()));
         $this->setClienteID(Filter::number($this->getClienteID()));
         $this->setLocalizacaoID(Filter::number($this->getLocalizacaoID()));
+        $this->setEntregaID(Filter::number($this->getEntregaID()));
         $this->setPessoas(Filter::number($this->getPessoas()));
         $this->setDescricao(Filter::string($this->getDescricao()));
         $this->setFechadorID(Filter::number($this->getFechadorID()));
         $this->setDataImpressao(Filter::datetime($this->getDataImpressao()));
         $this->setMotivo(Filter::string($this->getMotivo()));
-        $this->setDataAgendamento(Filter::datetime($this->getDataAgendamento()));
         $this->setDataEntrega(Filter::datetime($this->getDataEntrega()));
+        $this->setDataAgendamento(Filter::datetime($this->getDataAgendamento()));
         $this->setDataConclusao(Filter::datetime($this->getDataConclusao()));
         $this->setDataCriacao(Filter::datetime($this->getDataCriacao()));
+        return $this;
     }
 
     /**
      * Clean instance resources like images and docs
-     * @param  Pedido $dependency Don't clean when dependency use same resources
+     * @param self $dependency Don't clean when dependency use same resources
      */
     public function clean($dependency)
     {
@@ -844,19 +814,16 @@ class Pedido extends SyncModel
     /**
      * Validate fields updating them and throw exception when invalid data has found
      * @return array All field of Pedido in array format
+     * @throws \MZ\Exception\ValidationException for invalid input data
      */
     public function validate()
     {
-
         $errors = [];
-        if (is_null($this->getSessaoID())) {
-            $errors['sessaoid'] = 'A sessão não pode ser vazia';
-        }
-        if (is_null($this->getFuncionarioID())) {
-            $errors['funcionarioid'] = 'O funcionário não pode ser vazio';
+        if (is_null($this->getFuncionarioID()) && is_null($this->getClienteID())) {
+            $errors['funcionarioid'] = 'O usuário não foi informado';
         }
         if (!Validator::checkInSet($this->getTipo(), self::getTipoOptions())) {
-            $errors['tipo'] = 'O tipo não foi informado ou é inválido';
+            $errors['tipo'] = _t('pedido.tipo_invalid');
         }
         if (is_null($this->getMesaID()) && $this->getTipo() == self::TIPO_MESA) {
             $errors['mesaid'] = 'A mesa não foi informada';
@@ -871,13 +838,13 @@ class Pedido extends SyncModel
             $errors['comandaid'] = 'Esse tipo de venda não aceita informar comanda';
         }
         if (!Validator::checkInSet($this->getEstado(), self::getEstadoOptions())) {
-            $errors['estado'] = 'O estado não foi informado ou é inválido';
+            $errors['estado'] = _t('pedido.estado_invalid');
         }
         if (is_null($this->getPessoas())) {
-            $errors['pessoas'] = 'A quantidade de pessoas não foi informada';
+            $errors['pessoas'] = _t('pedido.pessoas_cannot_empty');
         }
         if (!Validator::checkBoolean($this->getCancelado())) {
-            $errors['cancelado'] = 'A informação de cancelamento não foi informado';
+            $errors['cancelado'] = _t('pedido.cancelado_invalid');
         }
         if (!$this->exists() && trim(app()->getSystem()->getLicenseKey()) == '') {
             $count = self::count();
@@ -885,8 +852,9 @@ class Pedido extends SyncModel
                 $errors['id'] = 'Quantidade de pedidos excedido, adquira uma licença para continuar';
             }
         }
+        $this->setDataCriacao(DB::now());
         if (!empty($errors)) {
-            throw new \MZ\Exception\ValidationException($errors);
+            throw new ValidationException($errors);
         }
         return $this->toArray();
     }
@@ -931,11 +899,11 @@ class Pedido extends SyncModel
         if (!in_array($this->getTipo(), [self::TIPO_MESA, self::TIPO_COMANDA])) {
             return $this;
         }
-        if ($this->getFuncionarioID() == $operador->getID()) {
+        if ($this->getPrestadorID() == $operador->getID()) {
             return $this;
         }
         if ($this->getTipo() == self::TIPO_MESA && !$operador->has([Permissao::NOME_MESAS])) {
-            $cliente = $this->findFuncionarioID()->findClienteID();
+            $cliente = $this->findPrestadorID()->findClienteID();
             $msg = sprintf(
                 'Apenas o(a) funcionário(a) "%s" poderá realizar pedidos para essa mesa.',
                 $cliente->getAssinatura()
@@ -943,7 +911,7 @@ class Pedido extends SyncModel
             throw new \Exception($msg);
         }
         if ($this->getTipo() == self::TIPO_COMANDA && !$operador->has([Permissao::NOME_COMANDAS])) {
-            $cliente = $this->findFuncionarioID()->findClienteID();
+            $cliente = $this->findPrestadorID()->findClienteID();
             $msg = sprintf(
                 'Apenas o(a) funcionário(a) "%s" poderá realizar pedidos para essa comanda.',
                 $cliente->getAssinatura()
@@ -972,26 +940,9 @@ class Pedido extends SyncModel
     }
 
     /**
-     * Translate SQL exception into application exception
-     * @param  \Exception $e exception to translate into a readable error
-     * @return \MZ\Exception\ValidationException new exception translated
-     */
-    protected function translate($e)
-    {
-        if (stripos($e->getMessage(), 'PRIMARY') !== false) {
-            return new \MZ\Exception\ValidationException([
-                'id' => sprintf(
-                    'O código "%s" já está cadastrado',
-                    $this->getID()
-                ),
-            ]);
-        }
-        return parent::translate($e);
-    }
-
-    /**
      * Insert a new Pedido into the database and fill instance from database
-     * @return Pedido Self instance
+     * @return self Self instance
+     * @throws \MZ\Exception\ValidationException for invalid input data
      */
     public function insert()
     {
@@ -1010,36 +961,43 @@ class Pedido extends SyncModel
 
     /**
      * Update Pedido with instance values into database for Código
-     * @return Pedido Self instance
+     * @param array $only Save these fields only, when empty save all fields except id
+     * @return int rows affected
+     * @throws \MZ\Exception\ValidationException for invalid input data
      */
     public function update($only = [])
     {
         $values = $this->validate();
         if (!$this->exists()) {
-            throw new \Exception('O identificador do pedido não foi informado');
+            throw new ValidationException(
+                ['id' => _t('pedido.id_cannot_empty')]
+            );
         }
         $values = DB::filterValues($values, $only, false);
         unset($values['datacriacao']);
         try {
-            DB::update('Pedidos')
+            $affected = DB::update('Pedidos')
                 ->set($values)
-                ->where('id', $this->getID())
+                ->where(['id' => $this->getID()])
                 ->execute();
             $this->loadByID();
         } catch (\Exception $e) {
             throw $this->translate($e);
         }
-        return $this;
+        return $affected;
     }
 
     /**
      * Delete this instance from database using Código
      * @return integer Number of rows deleted (Max 1)
+     * @throws \MZ\Exception\ValidationException for invalid id
      */
     public function delete()
     {
         if (!$this->exists()) {
-            throw new \Exception('O identificador do pedido não foi informado');
+            throw new ValidationException(
+                ['id' => _t('pedido.id_cannot_empty')]
+            );
         }
         $result = DB::deleteFrom('Pedidos')
             ->where('id', $this->getID())
@@ -1049,9 +1007,9 @@ class Pedido extends SyncModel
 
     /**
      * Load one register for it self with a condition
-     * @param  array $condition Condition for searching the row
-     * @param  array $order associative field name -> [-1, 1]
-     * @return Pedido Self instance filled or empty when not found
+     * @param array $condition Condition for searching the row
+     * @param array $order associative field name -> [-1, 1]
+     * @return self Self instance filled or empty
      */
     public function load($condition, $order = [])
     {
@@ -1063,7 +1021,7 @@ class Pedido extends SyncModel
     /**
      * Load order by open table id
      * @param  int $mesa_id id to find open table
-     * @return Pedido Self instance filled or empty when not found
+     * @return self Self instance filled or empty when not found
      */
     public function loadByMesaID($mesa_id)
     {
@@ -1078,7 +1036,7 @@ class Pedido extends SyncModel
     /**
      * Load order by open card id
      * @param  int $comanda_id id to find open card
-     * @return Pedido Self instance filled or empty when not found
+     * @return self Self instance filled or empty when not found
      */
     public function loadByComandaID($comanda_id)
     {
@@ -1092,7 +1050,7 @@ class Pedido extends SyncModel
 
     /**
      * Load open order by type into this object
-     * @return Pedido The object fetched from database or empty when not found
+     * @return self The object fetched from database or empty when not found
      */
     public function loadByLocal()
     {
@@ -1108,7 +1066,7 @@ class Pedido extends SyncModel
 
     /**
      * Load open order by customer and date
-     * @return Pedido The object fetched from database or empty when not found
+     * @return self The object fetched from database or empty when not found
      */
     public function loadAproximado()
     {
@@ -1145,46 +1103,27 @@ class Pedido extends SyncModel
     }
 
     /**
-     * Movimentação do caixa quando o pedido é pago total ou parcial, somente
-     * um caixa pode receber os pagamentos de um pedido
-     * @return \MZ\Session\Movimentacao The object fetched from database
-     */
-    public function findMovimentacaoID()
-    {
-        if (is_null($this->getMovimentacaoID())) {
-            return new \MZ\Session\Movimentacao();
-        }
-        return \MZ\Session\Movimentacao::findByID($this->getMovimentacaoID());
-    }
-
-    /**
      * Identificador da sessão de vendas
      * @return \MZ\Session\Sessao The object fetched from database
      */
     public function findSessaoID()
     {
+        if (is_null($this->getSessaoID())) {
+            return new \MZ\Session\Sessao();
+        }
         return \MZ\Session\Sessao::findByID($this->getSessaoID());
     }
 
     /**
-     * Funcionário que criou esse pedido
+     * Prestador que criou esse pedido
      * @return \MZ\Provider\Prestador The object fetched from database
      */
-    public function findFuncionarioID()
+    public function findPrestadorID()
     {
-        return \MZ\Provider\Prestador::findByID($this->getFuncionarioID());
-    }
-
-    /**
-     * Entregador que fez a entrega do pedido
-     * @return \MZ\Provider\Prestador The object fetched from database
-     */
-    public function findEntregadorID()
-    {
-        if (is_null($this->getEntregadorID())) {
+        if (is_null($this->getPrestadorID())) {
             return new \MZ\Provider\Prestador();
         }
-        return \MZ\Provider\Prestador::findByID($this->getEntregadorID());
+        return \MZ\Provider\Prestador::findByID($this->getPrestadorID());
     }
 
     /**
@@ -1210,6 +1149,18 @@ class Pedido extends SyncModel
             return new \MZ\Location\Localizacao();
         }
         return \MZ\Location\Localizacao::findByID($this->getLocalizacaoID());
+    }
+
+    /**
+     * Informa em qual entrega esse pedido foi despachado
+     * @return \MZ\Location\Viagem The object fetched from database
+     */
+    public function findEntregaID()
+    {
+        if (is_null($this->getEntregaID())) {
+            return new \MZ\Location\Viagem();
+        }
+        return \MZ\Location\Viagem::findByID($this->getEntregaID());
     }
 
     /**
@@ -1241,11 +1192,11 @@ class Pedido extends SyncModel
         } else {
             $query = DB::from('Pedidos p')
                 ->select(null)
-                ->select('SUM(IF(NOT ISNULL(r.produtoid), r.preco * r.quantidade, 0)) as produtos')
-                ->select('SUM(IF(NOT ISNULL(r.produtoid), ROUND(r.preco * r.quantidade * r.porcentagem / 100, 2), 0)) as comissao')
-                ->select('SUM(IF(NOT ISNULL(r.servicoid) AND r.preco >= 0, r.preco * r.quantidade, 0)) as servicos')
-                ->select('SUM(IF(NOT ISNULL(r.servicoid) AND r.preco < 0, r.preco * r.quantidade, 0)) as descontos')
-                ->leftJoin('Produtos_Pedidos r ON r.pedidoid = p.id AND r.cancelado = ?', $this->getCancelado());
+                ->select('SUM(IF(NOT ISNULL(i.produtoid), i.subtotal, 0)) as produtos')
+                ->select('SUM(IF(NOT ISNULL(i.produtoid), i.comissao, 0)) as comissao')
+                ->select('SUM(IF(NOT ISNULL(i.servicoid) AND i.preco >= 0, i.subtotal, 0)) as servicos')
+                ->select('SUM(IF(NOT ISNULL(i.servicoid) AND i.preco < 0, i.subtotal, 0)) as descontos')
+                ->leftJoin('Itens i ON i.pedidoid = p.id AND i.cancelado = ?', $this->getCancelado());
             if ($this->exists()) {
                 $query = $query->where('p.id', $this->getID());
             } else {
@@ -1263,15 +1214,6 @@ class Pedido extends SyncModel
     }
 
     /**
-     * Retorna o total vendido do pedido com informações detalhadas ou resumida
-     * @param  bool $resumido informa se deve retornar apenas o total do pedido
-     * @return mixed array com os totais detalhados ou apenas o total se for resumido
-     */
-    public function findTotalLocal($resumido = false)
-    {
-    }
-
-    /**
      * Obtem o total pago para esse pedido
      */
     public function findPagamentoTotal()
@@ -1286,16 +1228,16 @@ class Pedido extends SyncModel
 
     /**
      * Gets textual and translated Tipo for Pedido
-     * @param  int $index choose option from index
-     * @return mixed A associative key -> translated representative text or text for index
+     * @param int $index choose option from index
+     * @return string[] A associative key -> translated representative text or text for index
      */
     public static function getTipoOptions($index = null)
     {
         $options = [
-            self::TIPO_MESA => 'Mesa',
-            self::TIPO_COMANDA => 'Comanda',
-            self::TIPO_AVULSO => 'Balcão',
-            self::TIPO_ENTREGA => 'Entrega',
+            self::TIPO_MESA => _t('pedido.tipo_mesa'),
+            self::TIPO_COMANDA => _t('pedido.tipo_comanda'),
+            self::TIPO_AVULSO => _t('pedido.tipo_avulso'),
+            self::TIPO_ENTREGA => _t('pedido.tipo_entrega'),
         ];
         if (!is_null($index)) {
             return $options[$index];
@@ -1305,17 +1247,17 @@ class Pedido extends SyncModel
 
     /**
      * Gets textual and translated Estado for Pedido
-     * @param  int $index choose option from index
-     * @return mixed A associative key -> translated representative text or text for index
+     * @param int $index choose option from index
+     * @return string[] A associative key -> translated representative text or text for index
      */
     public static function getEstadoOptions($index = null)
     {
         $options = [
-            self::ESTADO_FINALIZADO => 'Finalizado',
-            self::ESTADO_ATIVO => 'Ativo',
-            self::ESTADO_AGENDADO => 'Agendado',
-            self::ESTADO_ENTREGA => 'Entrega',
-            self::ESTADO_FECHADO => 'Fechado',
+            self::ESTADO_FINALIZADO => _t('pedido.estado_finalizado'),
+            self::ESTADO_ATIVO => _t('pedido.estado_ativo'),
+            self::ESTADO_AGENDADO => _t('pedido.estado_agendado'),
+            self::ESTADO_ENTREGA => _t('pedido.estado_entrega'),
+            self::ESTADO_FECHADO => _t('pedido.estado_fechado'),
         ];
         if (!is_null($index)) {
             return $options[$index];
@@ -1329,14 +1271,14 @@ class Pedido extends SyncModel
      */
     private static function getAllowedKeys()
     {
-        $pedido = new Pedido();
+        $pedido = new self();
         $allowed = Filter::concatKeys('p.', $pedido->toArray());
         return $allowed;
     }
 
     /**
      * Filter order array
-     * @param  mixed $order order string or array to parse and filter allowed
+     * @param mixed $order order string or array to parse and filter allowed
      * @return array allowed associative order
      */
     private static function filterOrder($order)
@@ -1347,7 +1289,7 @@ class Pedido extends SyncModel
 
     /**
      * Filter condition array with allowed fields
-     * @param  array $condition condition to filter rows
+     * @param array $condition condition to filter rows
      * @return array allowed condition
      */
     private static function filterCondition($condition)
@@ -1387,8 +1329,8 @@ class Pedido extends SyncModel
 
     /**
      * Fetch data from database with a condition
-     * @param  array $condition condition to filter rows
-     * @param  array $order order rows
+     * @param array $condition condition to filter rows
+     * @param array $order order rows
      * @return SelectQuery query object with condition statement
      */
     private static function query($condition = [], $order = [])
@@ -1402,15 +1344,30 @@ class Pedido extends SyncModel
 
     /**
      * Search one register with a condition
-     * @param  array $condition Condition for searching the row
-     * @param  array $order order rows
-     * @return Pedido A filled Pedido or empty instance
+     * @param array $condition Condition for searching the row
+     * @param array $order order rows
+     * @return self A filled Pedido or empty instance
      */
     public static function find($condition, $order = [])
     {
-        $query = self::query($condition, $order)->limit(1);
-        $row = $query->fetch() ?: [];
-        return new Pedido($row);
+        $result = new self();
+        return $result->load($condition, $order);
+    }
+
+    /**
+     * Search one register with a condition
+     * @param array $condition Condition for searching the row
+     * @param array $order order rows
+     * @return self A filled Pedido or empty instance
+     * @throws \Exception when register has not found
+     */
+    public static function findOrFail($condition, $order = [])
+    {
+        $result = self::find($condition, $order);
+        if (!$result->exists()) {
+            throw new \Exception(_t('pedido.not_found'), 404);
+        }
+        return $result;
     }
 
     /**
@@ -1492,13 +1449,13 @@ class Pedido extends SyncModel
     {
         $query = DB::from('Pedidos p')
             ->select(null)
-            ->select('ROUND(SUM(r.preco * r.quantidade), 4) as subtotal')
-            ->select('ROUND(SUM(r.preco * r.quantidade * (r.porcentagem / 100 + 1)), 4) as total')
-            ->select('ROUND(SUM(IF(p.tipo = "Mesa", r.preco * r.quantidade * (r.porcentagem / 100 + 1), 0)), 4) as mesa')
-            ->select('ROUND(SUM(IF(p.tipo = "Comanda", r.preco * r.quantidade * (r.porcentagem / 100 + 1), 0)), 4) as comanda')
-            ->select('ROUND(SUM(IF(p.tipo = "Avulso", r.preco * r.quantidade * (r.porcentagem / 100 + 1), 0)), 4) as avulso')
-            ->select('ROUND(SUM(IF(p.tipo = "Entrega", r.preco * r.quantidade * (r.porcentagem / 100 + 1), 0)), 4) as entrega')
-            ->leftJoin('Produtos_Pedidos r ON r.pedidoid = p.id AND r.cancelado = ?', 'N')
+            ->select('SUM(i.subtotal) as subtotal')
+            ->select('SUM(i.total) as total')
+            ->select('SUM(IF(p.tipo = "Mesa", i.total, 0)) as mesa')
+            ->select('SUM(IF(p.tipo = "Comanda", i.total, 0)) as comanda')
+            ->select('SUM(IF(p.tipo = "Avulso", i.total, 0)) as avulso')
+            ->select('SUM(IF(p.tipo = "Entrega", i.total, 0)) as entrega')
+            ->leftJoin('Itens i ON i.pedidoid = p.id AND i.cancelado = ?', 'N')
             ->where(['p.cancelado' => 'N']);
         if (!is_null($sessao_id)) {
             $query = $query->where(['p.sessaoid' => $sessao_id]);
@@ -1524,11 +1481,11 @@ class Pedido extends SyncModel
 
     /**
      * Find all Pedido
-     * @param  array  $condition Condition to get all Pedido
-     * @param  array  $order     Order Pedido
-     * @param  int    $limit     Limit data into row count
-     * @param  int    $offset    Start offset to get rows
-     * @return array             List of all rows instanced as Pedido
+     * @param array  $condition Condition to get all Pedido
+     * @param array  $order     Order Pedido
+     * @param int    $limit     Limit data into row count
+     * @param int    $offset    Start offset to get rows
+     * @return self[] List of all rows instanced as Pedido
      */
     public static function findAll($condition = [], $order = [], $limit = null, $offset = null)
     {
@@ -1542,14 +1499,14 @@ class Pedido extends SyncModel
         $rows = $query->fetchAll();
         $result = [];
         foreach ($rows as $row) {
-            $result[] = new Pedido($row);
+            $result[] = new self($row);
         }
         return $result;
     }
 
     /**
      * Count all rows from database with matched condition critery
-     * @param  array $condition condition to filter rows
+     * @param array $condition condition to filter rows
      * @return integer Quantity of rows
      */
     public static function count($condition = [])

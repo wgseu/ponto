@@ -24,13 +24,14 @@
  */
 namespace MZ\Sale;
 
-use MZ\Database\SyncModel;
-use MZ\Database\DB;
+use MZ\Util\Mask;
 use MZ\Util\Filter;
 use MZ\Util\Validator;
+use MZ\Database\DB;
+use MZ\Database\SyncModel;
+use MZ\Exception\ValidationException;
 use MZ\Stock\Estoque;
 use MZ\Product\Composicao;
-use MZ\Exception\ValidationException;
 
 /**
  * Produtos, taxas e serviços do pedido, a alteração do estado permite o
@@ -58,9 +59,9 @@ class Item extends SyncModel
      */
     private $pedido_id;
     /**
-     * Funcionário que lançou esse item no pedido
+     * Prestador que lançou esse item no pedido
      */
-    private $funcionario_id;
+    private $prestador_id;
     /**
      * Produto vendido
      */
@@ -72,7 +73,11 @@ class Item extends SyncModel
     /**
      * Pacote em que esse item faz parte
      */
-    private $produto_pedido_id;
+    private $item_id;
+    /**
+     * Informa se esse item foi pago e qual foi o lançamento
+     */
+    private $pagamento_id;
     /**
      * Sobrescreve a descrição do produto na exibição
      */
@@ -86,9 +91,17 @@ class Item extends SyncModel
      */
     private $quantidade;
     /**
-     * Porcentagem cobrada sobre essa venda, escala de 0 a 100
+     * Subtotal do item sem comissão
      */
-    private $porcentagem;
+    private $subtotal;
+    /**
+     * Valor total de comissão cobrada nesse item da venda
+     */
+    private $comissao;
+    /**
+     * Total a pagar do item com a comissão
+     */
+    private $total;
     /**
      * Preço de normal do produto no momento da venda
      */
@@ -106,18 +119,6 @@ class Item extends SyncModel
      */
     private $estado;
     /**
-     * Informa se o item foi visualizado por alguém
-     */
-    private $visualizado;
-    /**
-     * Data de visualização do item
-     */
-    private $data_visualizacao;
-    /**
-     * Data de atualização do estado do item
-     */
-    private $data_atualizacao;
-    /**
      * Informa se o item foi cancelado
      */
     private $cancelado;
@@ -130,22 +131,34 @@ class Item extends SyncModel
      */
     private $desperdicado;
     /**
+     * Informa se os produtos foram retirados do estoque para produção
+     */
+    private $reservado;
+    /**
+     * Data de visualização do item
+     */
+    private $data_visualizacao;
+    /**
+     * Data de atualização do estado do item
+     */
+    private $data_atualizacao;
+    /**
      * Data e hora da realização do pedido do item
      */
     private $data_hora;
 
     /**
      * Constructor for a new empty instance of Item
-     * @param array $produto_pedido All field and values to fill the instance
+     * @param array $item All field and values to fill the instance
      */
-    public function __construct($produto_pedido = [])
+    public function __construct($item = [])
     {
-        parent::__construct($produto_pedido);
+        parent::__construct($item);
     }
 
     /**
      * Identificador do item do pedido
-     * @return mixed ID of Item
+     * @return int id of Item do pedido
      */
     public function getID()
     {
@@ -154,8 +167,8 @@ class Item extends SyncModel
 
     /**
      * Set ID value to new on param
-     * @param  mixed $id new value for ID
-     * @return Item Self instance
+     * @param int $id Set id for Item do pedido
+     * @return self Self instance
      */
     public function setID($id)
     {
@@ -165,7 +178,7 @@ class Item extends SyncModel
 
     /**
      * Pedido a qual pertence esse item
-     * @return mixed Pedido of Item
+     * @return int pedido of Item do pedido
      */
     public function getPedidoID()
     {
@@ -174,8 +187,8 @@ class Item extends SyncModel
 
     /**
      * Set PedidoID value to new on param
-     * @param  mixed $pedido_id new value for PedidoID
-     * @return Item Self instance
+     * @param int $pedido_id Set pedido for Item do pedido
+     * @return self Self instance
      */
     public function setPedidoID($pedido_id)
     {
@@ -184,28 +197,28 @@ class Item extends SyncModel
     }
 
     /**
-     * Funcionário que lançou esse item no pedido
-     * @return mixed Funcionário of Item
+     * Prestador que lançou esse item no pedido
+     * @return int prestador of Item do pedido
      */
-    public function getFuncionarioID()
+    public function getPrestadorID()
     {
-        return $this->funcionario_id;
+        return $this->prestador_id;
     }
 
     /**
-     * Set FuncionarioID value to new on param
-     * @param  mixed $funcionario_id new value for FuncionarioID
-     * @return Item Self instance
+     * Set PrestadorID value to new on param
+     * @param int $prestador_id Set prestador for Item do pedido
+     * @return self Self instance
      */
-    public function setFuncionarioID($funcionario_id)
+    public function setPrestadorID($prestador_id)
     {
-        $this->funcionario_id = $funcionario_id;
+        $this->prestador_id = $prestador_id;
         return $this;
     }
 
     /**
      * Produto vendido
-     * @return mixed Produto of Item
+     * @return int produto of Item do pedido
      */
     public function getProdutoID()
     {
@@ -214,8 +227,8 @@ class Item extends SyncModel
 
     /**
      * Set ProdutoID value to new on param
-     * @param  mixed $produto_id new value for ProdutoID
-     * @return Item Self instance
+     * @param int $produto_id Set produto for Item do pedido
+     * @return self Self instance
      */
     public function setProdutoID($produto_id)
     {
@@ -225,7 +238,7 @@ class Item extends SyncModel
 
     /**
      * Serviço cobrado ou taxa
-     * @return mixed Serviço of Item
+     * @return int serviço of Item do pedido
      */
     public function getServicoID()
     {
@@ -234,8 +247,8 @@ class Item extends SyncModel
 
     /**
      * Set ServicoID value to new on param
-     * @param  mixed $servico_id new value for ServicoID
-     * @return Item Self instance
+     * @param int $servico_id Set serviço for Item do pedido
+     * @return self Self instance
      */
     public function setServicoID($servico_id)
     {
@@ -245,27 +258,47 @@ class Item extends SyncModel
 
     /**
      * Pacote em que esse item faz parte
-     * @return mixed Pacote of Item
+     * @return int pacote of Item do pedido
      */
     public function getItemID()
     {
-        return $this->produto_pedido_id;
+        return $this->item_id;
     }
 
     /**
      * Set ItemID value to new on param
-     * @param  mixed $produto_pedido_id new value for ItemID
-     * @return Item Self instance
+     * @param int $item_id Set pacote for Item do pedido
+     * @return self Self instance
      */
-    public function setItemID($produto_pedido_id)
+    public function setItemID($item_id)
     {
-        $this->produto_pedido_id = $produto_pedido_id;
+        $this->item_id = $item_id;
+        return $this;
+    }
+
+    /**
+     * Informa se esse item foi pago e qual foi o lançamento
+     * @return int pagamento of Item do pedido
+     */
+    public function getPagamentoID()
+    {
+        return $this->pagamento_id;
+    }
+
+    /**
+     * Set PagamentoID value to new on param
+     * @param int $pagamento_id Set pagamento for Item do pedido
+     * @return self Self instance
+     */
+    public function setPagamentoID($pagamento_id)
+    {
+        $this->pagamento_id = $pagamento_id;
         return $this;
     }
 
     /**
      * Sobrescreve a descrição do produto na exibição
-     * @return mixed Descrição of Item
+     * @return string descrição of Item do pedido
      */
     public function getDescricao()
     {
@@ -274,8 +307,8 @@ class Item extends SyncModel
 
     /**
      * Set Descricao value to new on param
-     * @param  mixed $descricao new value for Descricao
-     * @return Item Self instance
+     * @param string $descricao Set descrição for Item do pedido
+     * @return self Self instance
      */
     public function setDescricao($descricao)
     {
@@ -285,7 +318,7 @@ class Item extends SyncModel
 
     /**
      * Preço do produto já com desconto
-     * @return mixed Preço of Item
+     * @return string preço of Item do pedido
      */
     public function getPreco()
     {
@@ -294,8 +327,8 @@ class Item extends SyncModel
 
     /**
      * Set Preco value to new on param
-     * @param  mixed $preco new value for Preco
-     * @return Item Self instance
+     * @param string $preco Set preço for Item do pedido
+     * @return self Self instance
      */
     public function setPreco($preco)
     {
@@ -305,7 +338,7 @@ class Item extends SyncModel
 
     /**
      * Quantidade de itens vendidos
-     * @return mixed Quantidade of Item
+     * @return float quantidade of Item do pedido
      */
     public function getQuantidade()
     {
@@ -314,8 +347,8 @@ class Item extends SyncModel
 
     /**
      * Set Quantidade value to new on param
-     * @param  mixed $quantidade new value for Quantidade
-     * @return Item Self instance
+     * @param float $quantidade Set quantidade for Item do pedido
+     * @return self Self instance
      */
     public function setQuantidade($quantidade)
     {
@@ -324,28 +357,68 @@ class Item extends SyncModel
     }
 
     /**
-     * Porcentagem cobrada sobre essa venda, escala de 0 a 100
-     * @return mixed Porcentagem of Item
+     * Subtotal do item sem comissão
+     * @return string subtotal of Item do pedido
      */
-    public function getPorcentagem()
+    public function getSubtotal()
     {
-        return $this->porcentagem;
+        return $this->subtotal;
     }
 
     /**
-     * Set Porcentagem value to new on param
-     * @param  mixed $porcentagem new value for Porcentagem
-     * @return Item Self instance
+     * Set Subtotal value to new on param
+     * @param string $subtotal Set subtotal for Item do pedido
+     * @return self Self instance
      */
-    public function setPorcentagem($porcentagem)
+    public function setSubtotal($subtotal)
     {
-        $this->porcentagem = $porcentagem;
+        $this->subtotal = $subtotal;
+        return $this;
+    }
+
+    /**
+     * Valor total de comissão cobrada nesse item da venda
+     * @return string porcentagem of Item do pedido
+     */
+    public function getComissao()
+    {
+        return $this->comissao;
+    }
+
+    /**
+     * Set Comissao value to new on param
+     * @param string $comissao Set porcentagem for Item do pedido
+     * @return self Self instance
+     */
+    public function setComissao($comissao)
+    {
+        $this->comissao = $comissao;
+        return $this;
+    }
+
+    /**
+     * Total a pagar do item com a comissão
+     * @return string total of Item do pedido
+     */
+    public function getTotal()
+    {
+        return $this->total;
+    }
+
+    /**
+     * Set Total value to new on param
+     * @param string $total Set total for Item do pedido
+     * @return self Self instance
+     */
+    public function setTotal($total)
+    {
+        $this->total = $total;
         return $this;
     }
 
     /**
      * Preço de normal do produto no momento da venda
-     * @return mixed Preço de venda of Item
+     * @return string preço de venda of Item do pedido
      */
     public function getPrecoVenda()
     {
@@ -354,8 +427,8 @@ class Item extends SyncModel
 
     /**
      * Set PrecoVenda value to new on param
-     * @param  mixed $preco_venda new value for PrecoVenda
-     * @return Item Self instance
+     * @param string $preco_venda Set preço de venda for Item do pedido
+     * @return self Self instance
      */
     public function setPrecoVenda($preco_venda)
     {
@@ -365,7 +438,7 @@ class Item extends SyncModel
 
     /**
      * Preço de compra do produto calculado automaticamente na hora da venda
-     * @return mixed Preço de compra of Item
+     * @return string preço de compra of Item do pedido
      */
     public function getPrecoCompra()
     {
@@ -374,8 +447,8 @@ class Item extends SyncModel
 
     /**
      * Set PrecoCompra value to new on param
-     * @param  mixed $preco_compra new value for PrecoCompra
-     * @return Item Self instance
+     * @param string $preco_compra Set preço de compra for Item do pedido
+     * @return self Self instance
      */
     public function setPrecoCompra($preco_compra)
     {
@@ -385,7 +458,7 @@ class Item extends SyncModel
 
     /**
      * Observações do item pedido, Ex.: bem gelado, mal passado
-     * @return mixed Observações of Item
+     * @return string observações of Item do pedido
      */
     public function getDetalhes()
     {
@@ -394,8 +467,8 @@ class Item extends SyncModel
 
     /**
      * Set Detalhes value to new on param
-     * @param  mixed $detalhes new value for Detalhes
-     * @return Item Self instance
+     * @param string $detalhes Set observações for Item do pedido
+     * @return self Self instance
      */
     public function setDetalhes($detalhes)
     {
@@ -405,7 +478,7 @@ class Item extends SyncModel
 
     /**
      * Estado de preparo e envio do produto
-     * @return mixed Estado of Item
+     * @return string estado of Item do pedido
      */
     public function getEstado()
     {
@@ -414,8 +487,8 @@ class Item extends SyncModel
 
     /**
      * Set Estado value to new on param
-     * @param  mixed $estado new value for Estado
-     * @return Item Self instance
+     * @param string $estado Set estado for Item do pedido
+     * @return self Self instance
      */
     public function setEstado($estado)
     {
@@ -424,77 +497,8 @@ class Item extends SyncModel
     }
 
     /**
-     * Informa se o item foi visualizado por alguém
-     * @return mixed Visualizado of Item
-     */
-    public function getVisualizado()
-    {
-        return $this->visualizado;
-    }
-
-    /**
-     * Informa se o item foi visualizado por alguém
-     * @return boolean Check if o of Visualizado is selected or checked
-     */
-    public function isVisualizado()
-    {
-        return $this->visualizado == 'Y';
-    }
-
-    /**
-     * Set Visualizado value to new on param
-     * @param  mixed $visualizado new value for Visualizado
-     * @return Item Self instance
-     */
-    public function setVisualizado($visualizado)
-    {
-        $this->visualizado = $visualizado;
-        return $this;
-    }
-
-    /**
-     * Data de visualização do item
-     * @return mixed Data de visualização of Item
-     */
-    public function getDataVisualizacao()
-    {
-        return $this->data_visualizacao;
-    }
-
-    /**
-     * Set DataVisualizacao value to new on param
-     * @param  mixed $data_visualizacao new value for DataVisualizacao
-     * @return Item Self instance
-     */
-    public function setDataVisualizacao($data_visualizacao)
-    {
-        $this->data_visualizacao = $data_visualizacao;
-        return $this;
-    }
-
-    /**
-     * Data de atualização do estado do item
-     * @return mixed Data de atualização of Item
-     */
-    public function getDataAtualizacao()
-    {
-        return $this->data_atualizacao;
-    }
-
-    /**
-     * Set DataAtualizacao value to new on param
-     * @param  mixed $data_atualizacao new value for DataAtualizacao
-     * @return Item Self instance
-     */
-    public function setDataAtualizacao($data_atualizacao)
-    {
-        $this->data_atualizacao = $data_atualizacao;
-        return $this;
-    }
-
-    /**
      * Informa se o item foi cancelado
-     * @return mixed Cancelado of Item
+     * @return string cancelado of Item do pedido
      */
     public function getCancelado()
     {
@@ -512,8 +516,8 @@ class Item extends SyncModel
 
     /**
      * Set Cancelado value to new on param
-     * @param  mixed $cancelado new value for Cancelado
-     * @return Item Self instance
+     * @param string $cancelado Set cancelado for Item do pedido
+     * @return self Self instance
      */
     public function setCancelado($cancelado)
     {
@@ -523,7 +527,7 @@ class Item extends SyncModel
 
     /**
      * Informa o motivo do item ser cancelado
-     * @return mixed Motivo of Item
+     * @return string motivo of Item do pedido
      */
     public function getMotivo()
     {
@@ -532,8 +536,8 @@ class Item extends SyncModel
 
     /**
      * Set Motivo value to new on param
-     * @param  mixed $motivo new value for Motivo
-     * @return Item Self instance
+     * @param string $motivo Set motivo for Item do pedido
+     * @return self Self instance
      */
     public function setMotivo($motivo)
     {
@@ -543,7 +547,7 @@ class Item extends SyncModel
 
     /**
      * Informa se o item foi cancelado por conta de desperdício
-     * @return mixed Desperdiçado of Item
+     * @return string desperdiçado of Item do pedido
      */
     public function getDesperdicado()
     {
@@ -561,8 +565,8 @@ class Item extends SyncModel
 
     /**
      * Set Desperdicado value to new on param
-     * @param  mixed $desperdicado new value for Desperdicado
-     * @return Item Self instance
+     * @param string $desperdicado Set desperdiçado for Item do pedido
+     * @return self Self instance
      */
     public function setDesperdicado($desperdicado)
     {
@@ -571,8 +575,77 @@ class Item extends SyncModel
     }
 
     /**
+     * Informa se os produtos foram retirados do estoque para produção
+     * @return string reservado of Item do pedido
+     */
+    public function getReservado()
+    {
+        return $this->reservado;
+    }
+
+    /**
+     * Informa se os produtos foram retirados do estoque para produção
+     * @return boolean Check if o of Reservado is selected or checked
+     */
+    public function isReservado()
+    {
+        return $this->reservado == 'Y';
+    }
+
+    /**
+     * Set Reservado value to new on param
+     * @param string $reservado Set reservado for Item do pedido
+     * @return self Self instance
+     */
+    public function setReservado($reservado)
+    {
+        $this->reservado = $reservado;
+        return $this;
+    }
+
+    /**
+     * Data de visualização do item
+     * @return string data de visualização of Item do pedido
+     */
+    public function getDataVisualizacao()
+    {
+        return $this->data_visualizacao;
+    }
+
+    /**
+     * Set DataVisualizacao value to new on param
+     * @param string $data_visualizacao Set data de visualização for Item do pedido
+     * @return self Self instance
+     */
+    public function setDataVisualizacao($data_visualizacao)
+    {
+        $this->data_visualizacao = $data_visualizacao;
+        return $this;
+    }
+
+    /**
+     * Data de atualização do estado do item
+     * @return string data de atualização of Item do pedido
+     */
+    public function getDataAtualizacao()
+    {
+        return $this->data_atualizacao;
+    }
+
+    /**
+     * Set DataAtualizacao value to new on param
+     * @param string $data_atualizacao Set data de atualização for Item do pedido
+     * @return self Self instance
+     */
+    public function setDataAtualizacao($data_atualizacao)
+    {
+        $this->data_atualizacao = $data_atualizacao;
+        return $this;
+    }
+
+    /**
      * Data e hora da realização do pedido do item
-     * @return mixed Data e hora of Item
+     * @return string data e hora of Item do pedido
      */
     public function getDataHora()
     {
@@ -581,8 +654,8 @@ class Item extends SyncModel
 
     /**
      * Set DataHora value to new on param
-     * @param  mixed $data_hora new value for DataHora
-     * @return Item Self instance
+     * @param string $data_hora Set data e hora for Item do pedido
+     * @return self Self instance
      */
     public function setDataHora($data_hora)
     {
@@ -592,153 +665,171 @@ class Item extends SyncModel
 
     /**
      * Convert this instance to array associated key -> value
-     * @param  boolean $recursive Allow rescursive conversion of fields
+     * @param boolean $recursive Allow rescursive conversion of fields
      * @return array All field and values into array format
      */
     public function toArray($recursive = false)
     {
-        $produto_pedido = parent::toArray($recursive);
-        $produto_pedido['id'] = $this->getID();
-        $produto_pedido['pedidoid'] = $this->getPedidoID();
-        $produto_pedido['funcionarioid'] = $this->getFuncionarioID();
-        $produto_pedido['produtoid'] = $this->getProdutoID();
-        $produto_pedido['servicoid'] = $this->getServicoID();
-        $produto_pedido['itemid'] = $this->getItemID();
-        $produto_pedido['descricao'] = $this->getDescricao();
-        $produto_pedido['preco'] = $this->getPreco();
-        $produto_pedido['quantidade'] = $this->getQuantidade();
-        $produto_pedido['porcentagem'] = $this->getPorcentagem();
-        $produto_pedido['precovenda'] = $this->getPrecoVenda();
-        $produto_pedido['precocompra'] = $this->getPrecoCompra();
-        $produto_pedido['detalhes'] = $this->getDetalhes();
-        $produto_pedido['estado'] = $this->getEstado();
-        $produto_pedido['visualizado'] = $this->getVisualizado();
-        $produto_pedido['datavisualizacao'] = $this->getDataVisualizacao();
-        $produto_pedido['dataatualizacao'] = $this->getDataAtualizacao();
-        $produto_pedido['cancelado'] = $this->getCancelado();
-        $produto_pedido['motivo'] = $this->getMotivo();
-        $produto_pedido['desperdicado'] = $this->getDesperdicado();
-        $produto_pedido['datahora'] = $this->getDataHora();
-        return $produto_pedido;
+        $item = parent::toArray($recursive);
+        $item['id'] = $this->getID();
+        $item['pedidoid'] = $this->getPedidoID();
+        $item['prestadorid'] = $this->getPrestadorID();
+        $item['produtoid'] = $this->getProdutoID();
+        $item['servicoid'] = $this->getServicoID();
+        $item['itemid'] = $this->getItemID();
+        $item['pagamentoid'] = $this->getPagamentoID();
+        $item['descricao'] = $this->getDescricao();
+        $item['preco'] = $this->getPreco();
+        $item['quantidade'] = $this->getQuantidade();
+        $item['subtotal'] = $this->getSubtotal();
+        $item['comissao'] = $this->getComissao();
+        $item['total'] = $this->getTotal();
+        $item['precovenda'] = $this->getPrecoVenda();
+        $item['precocompra'] = $this->getPrecoCompra();
+        $item['detalhes'] = $this->getDetalhes();
+        $item['estado'] = $this->getEstado();
+        $item['cancelado'] = $this->getCancelado();
+        $item['motivo'] = $this->getMotivo();
+        $item['desperdicado'] = $this->getDesperdicado();
+        $item['reservado'] = $this->getReservado();
+        $item['datavisualizacao'] = $this->getDataVisualizacao();
+        $item['dataatualizacao'] = $this->getDataAtualizacao();
+        $item['datahora'] = $this->getDataHora();
+        return $item;
     }
 
     /**
      * Fill this instance with from array values, you can pass instance to
-     * @param  mixed $produto_pedido Associated key -> value to assign into this instance
-     * @return Item Self instance
+     * @param mixed $item Associated key -> value to assign into this instance
+     * @return self Self instance
      */
-    public function fromArray($produto_pedido = [])
+    public function fromArray($item = [])
     {
-        if ($produto_pedido instanceof Item) {
-            $produto_pedido = $produto_pedido->toArray();
-        } elseif (!is_array($produto_pedido)) {
-            $produto_pedido = [];
+        if ($item instanceof self) {
+            $item = $item->toArray();
+        } elseif (!is_array($item)) {
+            $item = [];
         }
-        parent::fromArray($produto_pedido);
-        if (!isset($produto_pedido['id'])) {
+        parent::fromArray($item);
+        if (!isset($item['id'])) {
             $this->setID(null);
         } else {
-            $this->setID($produto_pedido['id']);
+            $this->setID($item['id']);
         }
-        if (!isset($produto_pedido['pedidoid'])) {
+        if (!isset($item['pedidoid'])) {
             $this->setPedidoID(null);
         } else {
-            $this->setPedidoID($produto_pedido['pedidoid']);
+            $this->setPedidoID($item['pedidoid']);
         }
-        if (!isset($produto_pedido['funcionarioid'])) {
-            $this->setFuncionarioID(null);
+        if (!isset($item['prestadorid'])) {
+            $this->setPrestadorID(null);
         } else {
-            $this->setFuncionarioID($produto_pedido['funcionarioid']);
+            $this->setPrestadorID($item['prestadorid']);
         }
-        if (!array_key_exists('produtoid', $produto_pedido)) {
+        if (!array_key_exists('produtoid', $item)) {
             $this->setProdutoID(null);
         } else {
-            $this->setProdutoID($produto_pedido['produtoid']);
+            $this->setProdutoID($item['produtoid']);
         }
-        if (!array_key_exists('servicoid', $produto_pedido)) {
+        if (!array_key_exists('servicoid', $item)) {
             $this->setServicoID(null);
         } else {
-            $this->setServicoID($produto_pedido['servicoid']);
+            $this->setServicoID($item['servicoid']);
         }
-        if (!array_key_exists('itemid', $produto_pedido)) {
+        if (!array_key_exists('itemid', $item)) {
             $this->setItemID(null);
         } else {
-            $this->setItemID($produto_pedido['itemid']);
+            $this->setItemID($item['itemid']);
         }
-        if (!array_key_exists('descricao', $produto_pedido)) {
+        if (!array_key_exists('pagamentoid', $item)) {
+            $this->setPagamentoID(null);
+        } else {
+            $this->setPagamentoID($item['pagamentoid']);
+        }
+        if (!array_key_exists('descricao', $item)) {
             $this->setDescricao(null);
         } else {
-            $this->setDescricao($produto_pedido['descricao']);
+            $this->setDescricao($item['descricao']);
         }
-        if (!isset($produto_pedido['preco'])) {
+        if (!isset($item['preco'])) {
             $this->setPreco(null);
         } else {
-            $this->setPreco($produto_pedido['preco']);
+            $this->setPreco($item['preco']);
         }
-        if (!isset($produto_pedido['quantidade'])) {
+        if (!isset($item['quantidade'])) {
             $this->setQuantidade(null);
         } else {
-            $this->setQuantidade($produto_pedido['quantidade']);
+            $this->setQuantidade($item['quantidade']);
         }
-        if (!isset($produto_pedido['porcentagem'])) {
-            $this->setPorcentagem(0);
+        if (!isset($item['subtotal'])) {
+            $this->setSubtotal(null);
         } else {
-            $this->setPorcentagem($produto_pedido['porcentagem']);
+            $this->setSubtotal($item['subtotal']);
         }
-        if (!isset($produto_pedido['precovenda'])) {
+        if (!isset($item['comissao'])) {
+            $this->setComissao(0);
+        } else {
+            $this->setComissao($item['comissao']);
+        }
+        if (!isset($item['total'])) {
+            $this->setTotal(null);
+        } else {
+            $this->setTotal($item['total']);
+        }
+        if (!isset($item['precovenda'])) {
             $this->setPrecoVenda(null);
         } else {
-            $this->setPrecoVenda($produto_pedido['precovenda']);
+            $this->setPrecoVenda($item['precovenda']);
         }
-        if (!isset($produto_pedido['precocompra'])) {
+        if (!isset($item['precocompra'])) {
             $this->setPrecoCompra(0);
         } else {
-            $this->setPrecoCompra($produto_pedido['precocompra']);
+            $this->setPrecoCompra($item['precocompra']);
         }
-        if (!array_key_exists('detalhes', $produto_pedido)) {
+        if (!array_key_exists('detalhes', $item)) {
             $this->setDetalhes(null);
         } else {
-            $this->setDetalhes($produto_pedido['detalhes']);
+            $this->setDetalhes($item['detalhes']);
         }
-        if (!isset($produto_pedido['estado'])) {
-            $this->setEstado(self::ESTADO_ADICIONADO);
+        if (!isset($item['estado'])) {
+            $this->setEstado(null);
         } else {
-            $this->setEstado($produto_pedido['estado']);
+            $this->setEstado($item['estado']);
         }
-        if (!isset($produto_pedido['visualizado'])) {
-            $this->setVisualizado('N');
-        } else {
-            $this->setVisualizado($produto_pedido['visualizado']);
-        }
-        if (!array_key_exists('datavisualizacao', $produto_pedido)) {
-            $this->setDataVisualizacao(null);
-        } else {
-            $this->setDataVisualizacao($produto_pedido['datavisualizacao']);
-        }
-        if (!array_key_exists('dataatualizacao', $produto_pedido)) {
-            $this->setDataAtualizacao(DB::now());
-        } else {
-            $this->setDataAtualizacao($produto_pedido['dataatualizacao']);
-        }
-        if (!isset($produto_pedido['cancelado'])) {
+        if (!isset($item['cancelado'])) {
             $this->setCancelado('N');
         } else {
-            $this->setCancelado($produto_pedido['cancelado']);
+            $this->setCancelado($item['cancelado']);
         }
-        if (!array_key_exists('motivo', $produto_pedido)) {
+        if (!array_key_exists('motivo', $item)) {
             $this->setMotivo(null);
         } else {
-            $this->setMotivo($produto_pedido['motivo']);
+            $this->setMotivo($item['motivo']);
         }
-        if (!isset($produto_pedido['desperdicado'])) {
+        if (!isset($item['desperdicado'])) {
             $this->setDesperdicado('N');
         } else {
-            $this->setDesperdicado($produto_pedido['desperdicado']);
+            $this->setDesperdicado($item['desperdicado']);
         }
-        if (!isset($produto_pedido['datahora'])) {
+        if (!isset($item['reservado'])) {
+            $this->setReservado('N');
+        } else {
+            $this->setReservado($item['reservado']);
+        }
+        if (!array_key_exists('datavisualizacao', $item)) {
+            $this->setDataVisualizacao(null);
+        } else {
+            $this->setDataVisualizacao($item['datavisualizacao']);
+        }
+        if (!array_key_exists('dataatualizacao', $item)) {
+            $this->setDataAtualizacao(DB::now());
+        } else {
+            $this->setDataAtualizacao($item['dataatualizacao']);
+        }
+        if (!isset($item['datahora'])) {
             $this->setDataHora(DB::now());
         } else {
-            $this->setDataHora($produto_pedido['datahora']);
+            $this->setDataHora($item['datahora']);
         }
         return $this;
     }
@@ -749,18 +840,13 @@ class Item extends SyncModel
      */
     public function publish()
     {
-        $produto_pedido = parent::publish();
-        return $produto_pedido;
+        $item = parent::publish();
+        return $item;
     }
 
     public function getSubvenda()
     {
         return $this->getPrecoVenda() * $this->getQuantidade();
-    }
-
-    public function getSubtotal()
-    {
-        return $this->getPreco() * $this->getQuantidade();
     }
 
     /**
@@ -779,16 +865,6 @@ class Item extends SyncModel
     public function getDescontos()
     {
         return $this->getSubvenda() - $this->getSubtotal();
-    }
-
-    public function getComissao()
-    {
-        return $this->getSubtotal() * $this->getPorcentagem() / 100.0;
-    }
-
-    public function getTotal()
-    {
-        return $this->getSubtotal() + $this->getComissao();
     }
 
     public function getCusto()
@@ -855,32 +931,36 @@ class Item extends SyncModel
 
     /**
      * Filter fields, upload data and keep key data
-     * @param Item $original Original instance without modifications
+     * @param self $original Original instance without modifications
+     * @param boolean $localized Informs if fields are localized
+     * @return self Self instance
      */
     public function filter($original, $localized = false)
     {
         $this->setID($original->getID());
         $this->setPedidoID(Filter::number($this->getPedidoID()));
-        $this->setFuncionarioID(Filter::number($this->getFuncionarioID()));
+        $this->setPrestadorID(Filter::number($this->getPrestadorID()));
         $this->setProdutoID(Filter::number($this->getProdutoID()));
         $this->setServicoID(Filter::number($this->getServicoID()));
         $this->setItemID(Filter::number($this->getItemID()));
+        $this->setPagamentoID(Filter::number($this->getPagamentoID()));
         $this->setDescricao(Filter::string($this->getDescricao()));
         $this->setPreco(Filter::money($this->getPreco(), $localized));
         $this->setQuantidade(Filter::float($this->getQuantidade(), $localized));
-        $this->setPorcentagem(Filter::float($this->getPorcentagem(), $localized));
+        $this->setSubtotal(Filter::money($this->getSubtotal(), $localized));
+        $this->setComissao(Filter::money($this->getComissao(), $localized));
+        $this->setTotal(Filter::money($this->getTotal(), $localized));
         $this->setPrecoVenda(Filter::money($this->getPrecoVenda(), $localized));
         $this->setPrecoCompra(Filter::money($this->getPrecoCompra(), $localized));
         $this->setDetalhes(Filter::string($this->getDetalhes()));
-        $this->setDataVisualizacao(Filter::datetime($this->getDataVisualizacao()));
-        $this->setDataAtualizacao(DB::now());
         $this->setMotivo(Filter::string($this->getMotivo()));
-        $this->setDataHora(DB::now());
+        $this->setDataVisualizacao(Filter::datetime($this->getDataVisualizacao()));
+        return $this;
     }
 
     /**
      * Clean instance resources like images and docs
-     * @param  Item $dependency Don't clean when dependency use same resources
+     * @param self $dependency Don't clean when dependency use same resources
      */
     public function clean($dependency)
     {
@@ -889,44 +969,51 @@ class Item extends SyncModel
     /**
      * Validate fields updating them and throw exception when invalid data has found
      * @return array All field of Item in array format
+     * @throws \MZ\Exception\ValidationException for invalid input data
      */
     public function validate()
     {
         $errors = [];
         if (is_null($this->getPedidoID())) {
-            $errors['pedidoid'] = 'O pedido não pode ser vazio';
+            $errors['pedidoid'] = _t('item.pedido_id_cannot_empty');
         }
-        if (is_null($this->getFuncionarioID())) {
-            $errors['funcionarioid'] = 'O funcionário não pode ser vazio';
+        if (is_null($this->getPrestadorID())) {
+            $errors['prestadorid'] = _t('item.prestador_id_cannot_empty');
         }
         if (is_null($this->getPreco())) {
-            $errors['preco'] = 'O preço não pode ser vazio';
+            $errors['preco'] = _t('item.preco_cannot_empty');
         }
         if (is_null($this->getQuantidade())) {
-            $errors['quantidade'] = 'A quantidade não pode ser vazia';
+            $errors['quantidade'] = _t('item.quantidade_cannot_empty');
         } elseif ($this->getQuantidade() > 10000) {
             $errors['quantidade'] = 'Quantidade muito elevada, faça multiplos lançamentos menores';
         }
-        if (is_null($this->getPorcentagem())) {
-            $errors['porcentagem'] = 'A porcentagem não pode ser vazia';
+        if (is_null($this->getSubtotal())) {
+            $errors['subtotal'] = _t('item.subtotal_cannot_empty');
+        }
+        if (is_null($this->getComissao())) {
+            $errors['comissao'] = _t('item.comissao_cannot_empty');
+        }
+        if (is_null($this->getTotal())) {
+            $errors['total'] = _t('item.total_cannot_empty');
         }
         if (is_null($this->getPrecoVenda())) {
-            $errors['precovenda'] = 'O preço de venda não pode ser vazio';
+            $errors['precovenda'] = _t('item.preco_venda_cannot_empty');
         }
         if (is_null($this->getPrecoCompra())) {
-            $errors['precocompra'] = 'O preço de compra não pode ser vazio';
+            $errors['precocompra'] = _t('item.preco_compra_cannot_empty');
         }
         if (!Validator::checkInSet($this->getEstado(), self::getEstadoOptions())) {
-            $errors['estado'] = 'O estado do item não foi informado ou é inválido';
-        }
-        if (!Validator::checkBoolean($this->getVisualizado())) {
-            $errors['visualizado'] = 'A informação de visualização não foi informada ou é inválida';
+            $errors['estado'] = _t('item.estado_invalid');
         }
         if (!Validator::checkBoolean($this->getCancelado())) {
-            $errors['cancelado'] = 'O cancelamento não foi informado ou é inválido';
+            $errors['cancelado'] = _t('item.cancelado_invalid');
         }
-        if (!Validator::checkBoolean($this->getDesperdicado(), true)) {
-            $errors['desperdicado'] = 'O desperdício não foi informado ou é inválido';
+        if (!Validator::checkBoolean($this->getDesperdicado())) {
+            $errors['desperdicado'] = _t('item.desperdicado_invalid');
+        }
+        if (!Validator::checkBoolean($this->getReservado())) {
+            $errors['reservado'] = _t('item.reservado_invalid');
         }
         $this->setDataAtualizacao(DB::now());
         $this->setDataHora(DB::now());
@@ -937,18 +1024,9 @@ class Item extends SyncModel
     }
 
     /**
-     * Translate SQL exception into application exception
-     * @param  \Exception $e exception to translate into a readable error
-     * @return ValidationException new exception translated
-     */
-    protected function translate($e)
-    {
-        return parent::translate($e);
-    }
-
-    /**
      * Insert a new Item do pedido into the database and fill instance from database
-     * @return Item Self instance
+     * @return self Self instance
+     * @throws \MZ\Exception\ValidationException for invalid input data
      */
     public function insert()
     {
@@ -956,7 +1034,7 @@ class Item extends SyncModel
         $values = $this->validate();
         unset($values['id']);
         try {
-            $id = DB::insertInto('Produtos_Pedidos')->values($values)->execute();
+            $id = DB::insertInto('Itens')->values($values)->execute();
             $this->setID($id);
             $this->loadByID();
         } catch (\Exception $e) {
@@ -967,38 +1045,45 @@ class Item extends SyncModel
 
     /**
      * Update Item do pedido with instance values into database for ID
-     * @return Item Self instance
+     * @param array $only Save these fields only, when empty save all fields except id
+     * @return int rows affected
+     * @throws \MZ\Exception\ValidationException for invalid input data
      */
     public function update($only = [])
     {
         $values = $this->validate();
         if (!$this->exists()) {
-            throw new \Exception('O identificador do item do pedido não foi informado');
+            throw new ValidationException(
+                ['id' => _t('item.id_cannot_empty')]
+            );
         }
         $values = DB::filterValues($values, $only, false);
         unset($values['datahora']);
         try {
-            DB::update('Produtos_Pedidos')
+            $affected = DB::update('Itens')
                 ->set($values)
-                ->where('id', $this->getID())
+                ->where(['id' => $this->getID()])
                 ->execute();
             $this->loadByID();
         } catch (\Exception $e) {
             throw $this->translate($e);
         }
-        return $this;
+        return $affected;
     }
 
     /**
      * Delete this instance from database using ID
      * @return integer Number of rows deleted (Max 1)
+     * @throws \MZ\Exception\ValidationException for invalid id
      */
     public function delete()
     {
         if (!$this->exists()) {
-            throw new \Exception('O identificador do item do pedido não foi informado');
+            throw new ValidationException(
+                ['id' => _t('item.id_cannot_empty')]
+            );
         }
-        $result = DB::deleteFrom('Produtos_Pedidos')
+        $result = DB::deleteFrom('Itens')
             ->where('id', $this->getID())
             ->execute();
         return $result;
@@ -1053,9 +1138,9 @@ class Item extends SyncModel
 
     /**
      * Load one register for it self with a condition
-     * @param  array $condition Condition for searching the row
-     * @param  array $order associative field name -> [-1, 1]
-     * @return Item Self instance filled or empty
+     * @param array $condition Condition for searching the row
+     * @param array $order associative field name -> [-1, 1]
+     * @return self Self instance filled or empty
      */
     public function load($condition, $order = [])
     {
@@ -1074,12 +1159,12 @@ class Item extends SyncModel
     }
 
     /**
-     * Funcionário que lançou esse item no pedido
+     * Prestador que lançou esse item no pedido
      * @return \MZ\Provider\Prestador The object fetched from database
      */
-    public function findFuncionarioID()
+    public function findPrestadorID()
     {
-        return \MZ\Provider\Prestador::findByID($this->getFuncionarioID());
+        return \MZ\Provider\Prestador::findByID($this->getPrestadorID());
     }
 
     /**
@@ -1119,19 +1204,31 @@ class Item extends SyncModel
     }
 
     /**
+     * Informa se esse item foi pago e qual foi o lançamento
+     * @return \MZ\Payment\Pagamento The object fetched from database
+     */
+    public function findPagamentoID()
+    {
+        if (is_null($this->getPagamentoID())) {
+            return new \MZ\Payment\Pagamento();
+        }
+        return \MZ\Payment\Pagamento::findByID($this->getPagamentoID());
+    }
+
+    /**
      * Gets textual and translated Estado for Item
-     * @param  int $index choose option from index
-     * @return mixed A associative key -> translated representative text or text for index
+     * @param int $index choose option from index
+     * @return string[] A associative key -> translated representative text or text for index
      */
     public static function getEstadoOptions($index = null)
     {
         $options = [
-            self::ESTADO_ADICIONADO => 'Adicionado',
-            self::ESTADO_ENVIADO => 'Enviado',
-            self::ESTADO_PROCESSADO => 'Processado',
-            self::ESTADO_PRONTO => 'Pronto',
-            self::ESTADO_DISPONIVEL => 'Disponível',
-            self::ESTADO_ENTREGUE => 'Entregue',
+            self::ESTADO_ADICIONADO => _t('item.estado_adicionado'),
+            self::ESTADO_ENVIADO => _t('item.estado_enviado'),
+            self::ESTADO_PROCESSADO => _t('item.estado_processado'),
+            self::ESTADO_PRONTO => _t('item.estado_pronto'),
+            self::ESTADO_DISPONIVEL => _t('item.estado_disponivel'),
+            self::ESTADO_ENTREGUE => _t('item.estado_entregue'),
         ];
         if (!is_null($index)) {
             return $options[$index];
@@ -1145,57 +1242,57 @@ class Item extends SyncModel
      */
     private static function getAllowedKeys()
     {
-        $produto_pedido = new Item();
-        $allowed = Filter::concatKeys('p.', $produto_pedido->toArray());
+        $item = new self();
+        $allowed = Filter::concatKeys('i.', $item->toArray());
         return $allowed;
     }
 
     /**
      * Filter order array
-     * @param  mixed $order order string or array to parse and filter allowed
+     * @param mixed $order order string or array to parse and filter allowed
      * @return array allowed associative order
      */
     private static function filterOrder($order)
     {
         $allowed = self::getAllowedKeys();
-        return Filter::orderBy($order, $allowed, 'p.');
+        return Filter::orderBy($order, $allowed, 'i.');
     }
 
     /**
      * Filter condition array with allowed fields
-     * @param  array $condition condition to filter rows
+     * @param array $condition condition to filter rows
      * @return array allowed condition
      */
     private static function filterCondition($condition)
     {
         $allowed = self::getAllowedKeys();
         if (array_key_exists('!produtoid', $condition)) {
-            $field = 'NOT p.produtoid';
+            $field = 'NOT i.produtoid';
             $condition[$field] = $condition['!produtoid'];
             $allowed[$field] = true;
         }
         if (array_key_exists('!servicoid', $condition)) {
-            $field = 'NOT p.servicoid';
+            $field = 'NOT i.servicoid';
             $condition[$field] = $condition['!servicoid'];
             $allowed[$field] = true;
         }
         if (isset($condition['apartir_preco'])) {
-            $field = 'p.preco >= ?';
+            $field = 'i.preco >= ?';
             $condition[$field] = $condition['apartir_preco'];
             $allowed[$field] = true;
         }
         if (isset($condition['ate_preco'])) {
-            $field = 'p.preco < ?';
+            $field = 'i.preco < ?';
             $condition[$field] = $condition['ate_preco'];
             $allowed[$field] = true;
         }
         if (isset($condition['apartir_datahora'])) {
-            $field = 'p.datahora >= ?';
+            $field = 'i.datahora >= ?';
             $condition[$field] = Filter::datetime($condition['apartir_datahora'], '00:00:00');
             $allowed[$field] = true;
         }
         if (isset($condition['ate_datahora'])) {
-            $field = 'p.datahora <= ?';
+            $field = 'i.datahora <= ?';
             $condition[$field] = Filter::datetime($condition['ate_datahora'], '23:59:59');
             $allowed[$field] = true;
         }
@@ -1204,7 +1301,7 @@ class Item extends SyncModel
             if (Validator::checkDigits($search)) {
                 $condition['pedidoid'] = Filter::number($search);
             } else {
-                $field = 'p.detalhes LIKE ?';
+                $field = 'i.detalhes LIKE ?';
                 $condition[$field] = '%'.$search.'%';
                 $allowed[$field] = true;
             }
@@ -1221,7 +1318,7 @@ class Item extends SyncModel
             $field = 'd.tipo';
             $condition[$field] = $condition['produto'];
         }
-        $prefix = ['p.', 'e.', 'd.', 's.'];
+        $prefix = ['i.', 'e.', 'd.', 's.'];
         $allowed['d.tipo'] = true;
         $allowed['s.tipo'] = true;
         $allowed['e.tipo'] = true;
@@ -1232,47 +1329,50 @@ class Item extends SyncModel
 
     /**
      * Fetch data from database with a condition
-     * @param  array $condition condition to filter rows
-     * @param  array $order order rows
+     * @param array $condition condition to filter rows
+     * @param array $order order rows
      * @param  array $select select fields, empty to all fields
      * @param  array $group group rows
      * @return SelectQuery query object with condition statement
      */
     private static function query($condition = [], $order = [], $select = [], $group = [])
     {
-        $query = DB::from('Produtos_Pedidos p')
-            ->leftJoin('Pedidos e ON e.id = p.pedidoid')
-            ->leftJoin('Produtos d ON d.id = p.produtoid')
-            ->leftJoin('Servicos s ON s.id = p.servicoid');
+        $query = DB::from('Itens i')
+            ->leftJoin('Pedidos e ON e.id = i.pedidoid')
+            ->leftJoin('Produtos d ON d.id = i.produtoid')
+            ->leftJoin('Servicos s ON s.id = i.servicoid');
 
         $detalhado = isset($condition['detalhado']);
         $categorizado = isset($condition['categorizado']);
         if ($detalhado) {
             $query = $query->select(null)
-                ->select('IF(COUNT(p.id) = 1, p.id, 0) as id')
-                ->select('p.pedidoid')
-                ->select('p.funcionarioid')
-                ->select('p.produtoid')
-                ->select('p.servicoid')
-                ->select('p.itemid')
-                ->select('p.descricao')
-                ->select('p.preco')
-                ->select('SUM(p.quantidade) as quantidade')
-                ->select('p.porcentagem')
-                ->select('p.precovenda')
-                ->select('p.precocompra')
-                ->select('p.detalhes')
-                ->select('p.estado')
-                ->select('p.visualizado')
-                ->select('p.datavisualizacao')
-                ->select('p.dataatualizacao')
-                ->select('p.cancelado')
-                ->select('p.motivo')
-                ->select('p.desperdicado')
-                ->select('p.datahora')
+                ->select('IF(COUNT(i.id) = 1, i.id, 0) as id')
+                ->select('i.pedidoid')
+                ->select('i.prestadorid')
+                ->select('i.produtoid')
+                ->select('i.servicoid')
+                ->select('i.itemid')
+                ->select('i.pagamentoid')
+                ->select('i.descricao')
+                ->select('i.preco')
+                ->select('SUM(i.quantidade) as quantidade')
+                ->select('i.subtotal')
+                ->select('i.comissao')
+                ->select('i.total')
+                ->select('i.precovenda')
+                ->select('i.precocompra')
+                ->select('i.detalhes')
+                ->select('i.estado')
+                ->select('i.cancelado')
+                ->select('i.motivo')
+                ->select('i.desperdicado')
+                ->select('i.reservado')
+                ->select('i.datavisualizacao')
+                ->select('i.dataatualizacao')
+                ->select('i.datahora')
 
-                ->select('l.login as funcionariologin')
-                ->select('COALESCE(s.descricao, p.descricao, d.descricao) as produtodescricao')
+                ->select('l.login as prestadorlogin')
+                ->select('COALESCE(s.descricao, i.descricao, d.descricao) as produtodescricao')
                 ->select('COALESCE(s.nome, d.abreviacao) as produtoabreviacao')
                 ->select('d.dataatualizacao as produtodataatualizacao')
                 ->select('e.tipo as pedidotipo')
@@ -1281,23 +1381,19 @@ class Item extends SyncModel
                 ->select('u.sigla as unidadesigla')
                 ->select('e.mesaid')
                 ->select('e.comandaid')
-                ->select(
-                    '(CASE WHEN d.imagem IS NULL THEN NULL ELSE '.
-                    DB::concat(['d.id', '".png"']).
-                    ' END) as imagemurl'
-                )
+                ->select('d.imagemurl')
                 ->select('m.nome as mesanome')
                 ->select('c.nome as comandanome')
 
                 ->leftJoin('Unidades u ON u.id = d.unidadeid')
-                ->leftJoin('Funcionarios f ON f.id = p.funcionarioid')
-                ->leftJoin('Clientes l ON l.id = f.clienteid')
+                ->leftJoin('Prestadores r ON r.id = i.prestadorid')
+                ->leftJoin('Clientes l ON l.id = r.clienteid')
                 ->leftJoin('Mesas m ON m.id = e.mesaid')
                 ->leftJoin('Comandas c ON c.id = e.comandaid');
         }
         if ($categorizado) {
             $query = $query->select(null)
-                ->select('SUM(p.preco * p.quantidade) as total')
+                ->select('SUM(i.subtotal) as total')
                 ->select('COALESCE(t.descricao, ?) as descricao', 'Taxas e Serviços')
                 ->leftJoin('Categorias t ON t.id = d.categoriaid')
                 ->groupBy('d.categoriaid')
@@ -1305,8 +1401,8 @@ class Item extends SyncModel
         }
         $condition = self::filterCondition($condition);
         $query = DB::buildOrderBy($query, self::filterOrder($order));
-        $query = $query->orderBy('p.datahora DESC');
-        $query = $query->orderBy('p.id DESC');
+        $query = $query->orderBy('i.datahora DESC');
+        $query = $query->orderBy('i.id DESC');
         foreach ($select as $value) {
             $query = $query->select($value);
         }
@@ -1318,28 +1414,41 @@ class Item extends SyncModel
 
     /**
      * Search one register with a condition
-     * @param  array $condition Condition for searching the row
-     * @param  array $order associative field name -> [-1, 1]
-     * @param  array $select select fields, empty to all fields
-     * @param  array $group group rows
-     * @return Item A filled Item do pedido or empty instance
+     * @param array $condition Condition for searching the row
+     * @param array $order order rows
+     * @return self A filled Item do pedido or empty instance
      */
-    public static function find($condition, $order = [], $select = [], $group = [])
+    public static function find($condition, $order = [])
     {
-        $query = self::query($condition, $order, $select, $group)->limit(1);
-        $row = $query->fetch() ?: [];
-        return new Item($row);
+        $result = new self();
+        return $result->load($condition, $order);
+    }
+
+    /**
+     * Search one register with a condition
+     * @param array $condition Condition for searching the row
+     * @param array $order order rows
+     * @return self A filled Item do pedido or empty instance
+     * @throws \Exception when register has not found
+     */
+    public static function findOrFail($condition, $order = [])
+    {
+        $result = self::find($condition, $order);
+        if (!$result->exists()) {
+            throw new \Exception(_t('item.not_found'), 404);
+        }
+        return $result;
     }
 
     /**
      * Find all Item do pedido
-     * @param  array  $condition Condition to get all Item do pedido
-     * @param  array  $order     Order Item do pedido
-     * @param  int    $limit     Limit data into row count
-     * @param  int    $offset    Start offset to get rows
-     * @param  array  $select select fields, empty to all fields
-     * @param  array  $group group rows
-     * @return array  List of all rows instanced as Item
+     * @param array  $condition Condition to get all Item do pedido
+     * @param array  $order     Order Item do pedido
+     * @param int    $limit     Limit data into row count
+     * @param int    $offset    Start offset to get rows
+     * @param array  $select select fields, empty to all fields
+     * @param array  $group group rows
+     * @return self[] List of all rows instanced as Item
      */
     public static function findAll(
         $condition = [],
@@ -1359,7 +1468,7 @@ class Item extends SyncModel
         $rows = $query->fetchAll();
         $result = [];
         foreach ($rows as $row) {
-            $result[] = new Item($row);
+            $result[] = new self($row);
         }
         return $result;
     }
@@ -1394,7 +1503,7 @@ class Item extends SyncModel
 
     /**
      * Count all rows from database with matched condition critery
-     * @param  array $condition condition to filter rows
+     * @param array $condition condition to filter rows
      * @return integer Quantity of rows
      */
     public static function count($condition = [])

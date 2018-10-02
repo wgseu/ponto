@@ -24,10 +24,12 @@
  */
 namespace MZ\Payment;
 
-use MZ\Database\SyncModel;
-use MZ\Database\DB;
+use MZ\Util\Mask;
 use MZ\Util\Filter;
 use MZ\Util\Validator;
+use MZ\Database\DB;
+use MZ\Database\SyncModel;
+use MZ\Exception\ValidationException;
 use MZ\Account\Conta;
 
 /**
@@ -35,6 +37,17 @@ use MZ\Account\Conta;
  */
 class Pagamento extends SyncModel
 {
+
+    /**
+     * Informa qual o andamento do processo de pagamento
+     */
+    const ESTADO_ABERTO = 'Aberto';
+    const ESTADO_AGUARDANDO = 'Aguardando';
+    const ESTADO_ANALISE = 'Analise';
+    const ESTADO_PAGO = 'Pago';
+    const ESTADO_DISPUTA = 'Disputa';
+    const ESTADO_DEVOLVIDO = 'Devolvido';
+    const ESTADO_CANCELADO = 'Cancelado';
 
     /**
      * Identificador do pagamento
@@ -45,6 +58,21 @@ class Pagamento extends SyncModel
      */
     private $carteira_id;
     /**
+     * Informa em qual moeda está o valor informado
+     */
+    private $moeda_id;
+    /**
+     * Informa o pagamento principal ou primeira parcela, o valor lançado é
+     * zero para os pagamentos filhos, restante de antecipação e taxas são
+     * filhos do valor antecipado
+     */
+    private $pagamento_id;
+    /**
+     * Permite antecipar recebimentos de cartões, um pagamento agrupado é
+     * internamente tratado como desativado
+     */
+    private $agrupamento_id;
+    /**
      * Movimentação do caixa quando for pagamento de pedido ou quando a conta
      * for paga do caixa
      */
@@ -54,7 +82,7 @@ class Pagamento extends SyncModel
      */
     private $funcionario_id;
     /**
-     * Forma da pagamento do pedido ou conta
+     * Forma da pagamento do pedido
      */
     private $forma_pagto_id;
     /**
@@ -64,7 +92,7 @@ class Pagamento extends SyncModel
     /**
      * Conta que foi paga/recebida
      */
-    private $pagto_conta_id;
+    private $conta_id;
     /**
      * Cartão em que foi pago, para forma de pagamento em cartão
      */
@@ -76,48 +104,47 @@ class Pagamento extends SyncModel
     /**
      * Conta que foi utilizada como pagamento do pedido
      */
-    private $conta_id;
+    private $crediario_id;
     /**
      * Crédito que foi utilizado para pagar o pedido
      */
     private $credito_id;
     /**
-     * Total do pagamento, não inclui juros, negativo para trocos e pagamento
-     * de contas
+     * Valor pago ou recebido na moeda informada no momento do recebimento
      */
-    private $total;
+    private $valor;
     /**
-     * Quantidade de parcelas quando pagamento parcelado
+     * Informa qual o número da parcela para este pagamento
+     */
+    private $numero_parcela;
+    /**
+     * Quantidade de parcelas desse pagamento
      */
     private $parcelas;
     /**
-     * Valor da parcela em caso de parcelamento
+     * Valor lançado para pagamento do pedido ou conta na moeda local do país
      */
-    private $valor_parcela;
+    private $lancado;
     /**
-     * Total de taxas cobrada por financeiras e outros (Não negativo)
+     * Código do pagamento, usado em transações online
      */
-    private $taxas;
+    private $codigo;
     /**
      * Detalhes do pagamento
      */
     private $detalhes;
     /**
-     * Informa se o pagamento foi cancelado
+     * Informa qual o andamento do processo de pagamento
      */
-    private $cancelado;
-    /**
-     * Informa se o pagamento está efetivado(Sim) ou apenas foi lançado(Não)
-     */
-    private $ativo;
+    private $estado;
     /**
      * Data de compensação do pagamento
      */
     private $data_compensacao;
     /**
-     * Data de hora do lançamento do pagamento
+     * Data e hora do lançamento do pagamento
      */
-    private $data_hora;
+    private $data_lancamento;
 
     /**
      * Constructor for a new empty instance of Pagamento
@@ -130,7 +157,7 @@ class Pagamento extends SyncModel
 
     /**
      * Identificador do pagamento
-     * @return mixed ID of Pagamento
+     * @return int id of Pagamento
      */
     public function getID()
     {
@@ -139,8 +166,8 @@ class Pagamento extends SyncModel
 
     /**
      * Set ID value to new on param
-     * @param  mixed $id new value for ID
-     * @return Pagamento Self instance
+     * @param int $id Set id for Pagamento
+     * @return self Self instance
      */
     public function setID($id)
     {
@@ -150,7 +177,7 @@ class Pagamento extends SyncModel
 
     /**
      * Carteira de destino do valor
-     * @return mixed Carteira of Pagamento
+     * @return int carteira of Pagamento
      */
     public function getCarteiraID()
     {
@@ -159,8 +186,8 @@ class Pagamento extends SyncModel
 
     /**
      * Set CarteiraID value to new on param
-     * @param  mixed $carteira_id new value for CarteiraID
-     * @return Pagamento Self instance
+     * @param int $carteira_id Set carteira for Pagamento
+     * @return self Self instance
      */
     public function setCarteiraID($carteira_id)
     {
@@ -169,9 +196,72 @@ class Pagamento extends SyncModel
     }
 
     /**
+     * Informa em qual moeda está o valor informado
+     * @return int moeda of Pagamento
+     */
+    public function getMoedaID()
+    {
+        return $this->moeda_id;
+    }
+
+    /**
+     * Set MoedaID value to new on param
+     * @param int $moeda_id Set moeda for Pagamento
+     * @return self Self instance
+     */
+    public function setMoedaID($moeda_id)
+    {
+        $this->moeda_id = $moeda_id;
+        return $this;
+    }
+
+    /**
+     * Informa o pagamento principal ou primeira parcela, o valor lançado é
+     * zero para os pagamentos filhos, restante de antecipação e taxas são
+     * filhos do valor antecipado
+     * @return int pagamento of Pagamento
+     */
+    public function getPagamentoID()
+    {
+        return $this->pagamento_id;
+    }
+
+    /**
+     * Set PagamentoID value to new on param
+     * @param int $pagamento_id Set pagamento for Pagamento
+     * @return self Self instance
+     */
+    public function setPagamentoID($pagamento_id)
+    {
+        $this->pagamento_id = $pagamento_id;
+        return $this;
+    }
+
+    /**
+     * Permite antecipar recebimentos de cartões, um pagamento agrupado é
+     * internamente tratado como desativado
+     * @return int agrupamento of Pagamento
+     */
+    public function getAgrupamentoID()
+    {
+        return $this->agrupamento_id;
+    }
+
+    /**
+     * Set AgrupamentoID value to new on param
+     * @param int $agrupamento_id Set agrupamento for Pagamento
+     * @return self Self instance
+     */
+    public function setAgrupamentoID($agrupamento_id)
+    {
+        $this->agrupamento_id = $agrupamento_id;
+        return $this;
+    }
+
+    /**
      * Movimentação do caixa quando for pagamento de pedido ou quando a conta
      * for paga do caixa
-     * @return mixed Movimentação of Pagamento
+     * @return int movimentação of Pagamento
      */
     public function getMovimentacaoID()
     {
@@ -180,8 +270,8 @@ class Pagamento extends SyncModel
 
     /**
      * Set MovimentacaoID value to new on param
-     * @param  mixed $movimentacao_id new value for MovimentacaoID
-     * @return Pagamento Self instance
+     * @param int $movimentacao_id Set movimentação for Pagamento
+     * @return self Self instance
      */
     public function setMovimentacaoID($movimentacao_id)
     {
@@ -191,7 +281,7 @@ class Pagamento extends SyncModel
 
     /**
      * Funcionário que lançou o pagamento no sistema
-     * @return mixed Funcionário of Pagamento
+     * @return int funcionário of Pagamento
      */
     public function getFuncionarioID()
     {
@@ -200,8 +290,8 @@ class Pagamento extends SyncModel
 
     /**
      * Set FuncionarioID value to new on param
-     * @param  mixed $funcionario_id new value for FuncionarioID
-     * @return Pagamento Self instance
+     * @param int $funcionario_id Set funcionário for Pagamento
+     * @return self Self instance
      */
     public function setFuncionarioID($funcionario_id)
     {
@@ -210,8 +300,8 @@ class Pagamento extends SyncModel
     }
 
     /**
-     * Forma da pagamento do pedido ou conta
-     * @return mixed Forma de pagamento of Pagamento
+     * Forma da pagamento do pedido
+     * @return int forma de pagamento of Pagamento
      */
     public function getFormaPagtoID()
     {
@@ -220,8 +310,8 @@ class Pagamento extends SyncModel
 
     /**
      * Set FormaPagtoID value to new on param
-     * @param  mixed $forma_pagto_id new value for FormaPagtoID
-     * @return Pagamento Self instance
+     * @param int $forma_pagto_id Set forma de pagamento for Pagamento
+     * @return self Self instance
      */
     public function setFormaPagtoID($forma_pagto_id)
     {
@@ -231,7 +321,7 @@ class Pagamento extends SyncModel
 
     /**
      * Pedido que foi pago
-     * @return mixed Pedido of Pagamento
+     * @return int pedido of Pagamento
      */
     public function getPedidoID()
     {
@@ -240,8 +330,8 @@ class Pagamento extends SyncModel
 
     /**
      * Set PedidoID value to new on param
-     * @param  mixed $pedido_id new value for PedidoID
-     * @return Pagamento Self instance
+     * @param int $pedido_id Set pedido for Pagamento
+     * @return self Self instance
      */
     public function setPedidoID($pedido_id)
     {
@@ -251,27 +341,27 @@ class Pagamento extends SyncModel
 
     /**
      * Conta que foi paga/recebida
-     * @return mixed Conta of Pagamento
+     * @return int conta of Pagamento
      */
-    public function getPagtoContaID()
+    public function getContaID()
     {
-        return $this->pagto_conta_id;
+        return $this->conta_id;
     }
 
     /**
-     * Set PagtoContaID value to new on param
-     * @param  mixed $pagto_conta_id new value for PagtoContaID
-     * @return Pagamento Self instance
+     * Set ContaID value to new on param
+     * @param int $conta_id Set conta for Pagamento
+     * @return self Self instance
      */
-    public function setPagtoContaID($pagto_conta_id)
+    public function setContaID($conta_id)
     {
-        $this->pagto_conta_id = $pagto_conta_id;
+        $this->conta_id = $conta_id;
         return $this;
     }
 
     /**
      * Cartão em que foi pago, para forma de pagamento em cartão
-     * @return mixed Cartão of Pagamento
+     * @return int cartão of Pagamento
      */
     public function getCartaoID()
     {
@@ -280,8 +370,8 @@ class Pagamento extends SyncModel
 
     /**
      * Set CartaoID value to new on param
-     * @param  mixed $cartao_id new value for CartaoID
-     * @return Pagamento Self instance
+     * @param int $cartao_id Set cartão for Pagamento
+     * @return self Self instance
      */
     public function setCartaoID($cartao_id)
     {
@@ -291,7 +381,7 @@ class Pagamento extends SyncModel
 
     /**
      * Cheque em que foi pago
-     * @return mixed Cheque of Pagamento
+     * @return int cheque of Pagamento
      */
     public function getChequeID()
     {
@@ -300,8 +390,8 @@ class Pagamento extends SyncModel
 
     /**
      * Set ChequeID value to new on param
-     * @param  mixed $cheque_id new value for ChequeID
-     * @return Pagamento Self instance
+     * @param int $cheque_id Set cheque for Pagamento
+     * @return self Self instance
      */
     public function setChequeID($cheque_id)
     {
@@ -311,27 +401,27 @@ class Pagamento extends SyncModel
 
     /**
      * Conta que foi utilizada como pagamento do pedido
-     * @return mixed Conta pedido of Pagamento
+     * @return int conta pedido of Pagamento
      */
-    public function getContaID()
+    public function getCrediarioID()
     {
-        return $this->conta_id;
+        return $this->crediario_id;
     }
 
     /**
-     * Set ContaID value to new on param
-     * @param  mixed $conta_id new value for ContaID
-     * @return Pagamento Self instance
+     * Set CrediarioID value to new on param
+     * @param int $crediario_id Set conta pedido for Pagamento
+     * @return self Self instance
      */
-    public function setContaID($conta_id)
+    public function setCrediarioID($crediario_id)
     {
-        $this->conta_id = $conta_id;
+        $this->crediario_id = $crediario_id;
         return $this;
     }
 
     /**
      * Crédito que foi utilizado para pagar o pedido
-     * @return mixed Crédito of Pagamento
+     * @return int crédito of Pagamento
      */
     public function getCreditoID()
     {
@@ -340,8 +430,8 @@ class Pagamento extends SyncModel
 
     /**
      * Set CreditoID value to new on param
-     * @param  mixed $credito_id new value for CreditoID
-     * @return Pagamento Self instance
+     * @param int $credito_id Set crédito for Pagamento
+     * @return self Self instance
      */
     public function setCreditoID($credito_id)
     {
@@ -350,29 +440,48 @@ class Pagamento extends SyncModel
     }
 
     /**
-     * Total do pagamento, não inclui juros, negativo para trocos e pagamento
-     * de contas
-     * @return mixed Total of Pagamento
+     * Valor pago ou recebido na moeda informada no momento do recebimento
+     * @return string valor of Pagamento
      */
-    public function getTotal()
+    public function getValor()
     {
-        return $this->total;
+        return $this->valor;
     }
 
     /**
-     * Set Total value to new on param
-     * @param  mixed $total new value for Total
-     * @return Pagamento Self instance
+     * Set Valor value to new on param
+     * @param string $valor Set valor for Pagamento
+     * @return self Self instance
      */
-    public function setTotal($total)
+    public function setValor($valor)
     {
-        $this->total = $total;
+        $this->valor = $valor;
         return $this;
     }
 
     /**
-     * Quantidade de parcelas quando pagamento parcelado
-     * @return mixed Parcelas of Pagamento
+     * Informa qual o número da parcela para este pagamento
+     * @return int número da parcela of Pagamento
+     */
+    public function getNumeroParcela()
+    {
+        return $this->numero_parcela;
+    }
+
+    /**
+     * Set NumeroParcela value to new on param
+     * @param int $numero_parcela Set número da parcela for Pagamento
+     * @return self Self instance
+     */
+    public function setNumeroParcela($numero_parcela)
+    {
+        $this->numero_parcela = $numero_parcela;
+        return $this;
+    }
+
+    /**
+     * Quantidade de parcelas desse pagamento
+     * @return int parcelas of Pagamento
      */
     public function getParcelas()
     {
@@ -381,8 +490,8 @@ class Pagamento extends SyncModel
 
     /**
      * Set Parcelas value to new on param
-     * @param  mixed $parcelas new value for Parcelas
-     * @return Pagamento Self instance
+     * @param int $parcelas Set parcelas for Pagamento
+     * @return self Self instance
      */
     public function setParcelas($parcelas)
     {
@@ -391,48 +500,48 @@ class Pagamento extends SyncModel
     }
 
     /**
-     * Valor da parcela em caso de parcelamento
-     * @return mixed Valor da parcela of Pagamento
+     * Valor lançado para pagamento do pedido ou conta na moeda local do país
+     * @return string lancado of Pagamento
      */
-    public function getValorParcela()
+    public function getLancado()
     {
-        return $this->valor_parcela;
+        return $this->lancado;
     }
 
     /**
-     * Set ValorParcela value to new on param
-     * @param  mixed $valor_parcela new value for ValorParcela
-     * @return Pagamento Self instance
+     * Set Lancado value to new on param
+     * @param string $lancado Set lancado for Pagamento
+     * @return self Self instance
      */
-    public function setValorParcela($valor_parcela)
+    public function setLancado($lancado)
     {
-        $this->valor_parcela = $valor_parcela;
+        $this->lancado = $lancado;
         return $this;
     }
 
     /**
-     * Total de taxas cobrada por financeiras e outros (Não negativo)
-     * @return mixed Taxas of Pagamento
+     * Código do pagamento, usado em transações online
+     * @return string código of Pagamento
      */
-    public function getTaxas()
+    public function getCodigo()
     {
-        return $this->taxas;
+        return $this->codigo;
     }
 
     /**
-     * Set Taxas value to new on param
-     * @param  mixed $taxas new value for Taxas
-     * @return Pagamento Self instance
+     * Set Codigo value to new on param
+     * @param string $codigo Set código for Pagamento
+     * @return self Self instance
      */
-    public function setTaxas($taxas)
+    public function setCodigo($codigo)
     {
-        $this->taxas = $taxas;
+        $this->codigo = $codigo;
         return $this;
     }
 
     /**
      * Detalhes do pagamento
-     * @return mixed Detalhes of Pagamento
+     * @return string detalhes of Pagamento
      */
     public function getDetalhes()
     {
@@ -441,8 +550,8 @@ class Pagamento extends SyncModel
 
     /**
      * Set Detalhes value to new on param
-     * @param  mixed $detalhes new value for Detalhes
-     * @return Pagamento Self instance
+     * @param string $detalhes Set detalhes for Pagamento
+     * @return self Self instance
      */
     public function setDetalhes($detalhes)
     {
@@ -451,66 +560,28 @@ class Pagamento extends SyncModel
     }
 
     /**
-     * Informa se o pagamento foi cancelado
-     * @return mixed Cancelado of Pagamento
+     * Informa qual o andamento do processo de pagamento
+     * @return string estado of Pagamento
      */
-    public function getCancelado()
+    public function getEstado()
     {
-        return $this->cancelado;
+        return $this->estado;
     }
 
     /**
-     * Informa se o pagamento foi cancelado
-     * @return boolean Check if o of Cancelado is selected or checked
+     * Set Estado value to new on param
+     * @param string $estado Set estado for Pagamento
+     * @return self Self instance
      */
-    public function isCancelado()
+    public function setEstado($estado)
     {
-        return $this->cancelado == 'Y';
-    }
-
-    /**
-     * Set Cancelado value to new on param
-     * @param  mixed $cancelado new value for Cancelado
-     * @return Pagamento Self instance
-     */
-    public function setCancelado($cancelado)
-    {
-        $this->cancelado = $cancelado;
-        return $this;
-    }
-
-    /**
-     * Informa se o pagamento está efetivado(Sim) ou apenas foi lançado(Não)
-     * @return mixed Ativo of Pagamento
-     */
-    public function getAtivo()
-    {
-        return $this->ativo;
-    }
-
-    /**
-     * Informa se o pagamento está efetivado(Sim) ou apenas foi lançado(Não)
-     * @return boolean Check if o of Ativo is selected or checked
-     */
-    public function isAtivo()
-    {
-        return $this->ativo == 'Y';
-    }
-
-    /**
-     * Set Ativo value to new on param
-     * @param  mixed $ativo new value for Ativo
-     * @return Pagamento Self instance
-     */
-    public function setAtivo($ativo)
-    {
-        $this->ativo = $ativo;
+        $this->estado = $estado;
         return $this;
     }
 
     /**
      * Data de compensação do pagamento
-     * @return mixed Data de compensação of Pagamento
+     * @return string data de compensação of Pagamento
      */
     public function getDataCompensacao()
     {
@@ -519,8 +590,8 @@ class Pagamento extends SyncModel
 
     /**
      * Set DataCompensacao value to new on param
-     * @param  mixed $data_compensacao new value for DataCompensacao
-     * @return Pagamento Self instance
+     * @param string $data_compensacao Set data de compensação for Pagamento
+     * @return self Self instance
      */
     public function setDataCompensacao($data_compensacao)
     {
@@ -529,28 +600,28 @@ class Pagamento extends SyncModel
     }
 
     /**
-     * Data de hora do lançamento do pagamento
-     * @return mixed Data de hora of Pagamento
+     * Data e hora do lançamento do pagamento
+     * @return string data de lançamento of Pagamento
      */
-    public function getDataHora()
+    public function getDataLancamento()
     {
-        return $this->data_hora;
+        return $this->data_lancamento;
     }
 
     /**
-     * Set DataHora value to new on param
-     * @param  mixed $data_hora new value for DataHora
-     * @return Pagamento Self instance
+     * Set DataLancamento value to new on param
+     * @param string $data_lancamento Set data de lançamento for Pagamento
+     * @return self Self instance
      */
-    public function setDataHora($data_hora)
+    public function setDataLancamento($data_lancamento)
     {
-        $this->data_hora = $data_hora;
+        $this->data_lancamento = $data_lancamento;
         return $this;
     }
 
     /**
      * Convert this instance to array associated key -> value
-     * @param  boolean $recursive Allow rescursive conversion of fields
+     * @param boolean $recursive Allow rescursive conversion of fields
      * @return array All field and values into array format
      */
     public function toArray($recursive = false)
@@ -558,35 +629,38 @@ class Pagamento extends SyncModel
         $pagamento = parent::toArray($recursive);
         $pagamento['id'] = $this->getID();
         $pagamento['carteiraid'] = $this->getCarteiraID();
+        $pagamento['moedaid'] = $this->getMoedaID();
+        $pagamento['pagamentoid'] = $this->getPagamentoID();
+        $pagamento['agrupamentoid'] = $this->getAgrupamentoID();
         $pagamento['movimentacaoid'] = $this->getMovimentacaoID();
         $pagamento['funcionarioid'] = $this->getFuncionarioID();
         $pagamento['formapagtoid'] = $this->getFormaPagtoID();
         $pagamento['pedidoid'] = $this->getPedidoID();
-        $pagamento['pagtocontaid'] = $this->getPagtoContaID();
+        $pagamento['contaid'] = $this->getContaID();
         $pagamento['cartaoid'] = $this->getCartaoID();
         $pagamento['chequeid'] = $this->getChequeID();
-        $pagamento['contaid'] = $this->getContaID();
+        $pagamento['crediarioid'] = $this->getCrediarioID();
         $pagamento['creditoid'] = $this->getCreditoID();
-        $pagamento['total'] = $this->getTotal();
+        $pagamento['valor'] = $this->getValor();
+        $pagamento['numeroparcela'] = $this->getNumeroParcela();
         $pagamento['parcelas'] = $this->getParcelas();
-        $pagamento['valorparcela'] = $this->getValorParcela();
-        $pagamento['taxas'] = $this->getTaxas();
+        $pagamento['lancado'] = $this->getLancado();
+        $pagamento['codigo'] = $this->getCodigo();
         $pagamento['detalhes'] = $this->getDetalhes();
-        $pagamento['cancelado'] = $this->getCancelado();
-        $pagamento['ativo'] = $this->getAtivo();
+        $pagamento['estado'] = $this->getEstado();
         $pagamento['datacompensacao'] = $this->getDataCompensacao();
-        $pagamento['datahora'] = $this->getDataHora();
+        $pagamento['datalancamento'] = $this->getDataLancamento();
         return $pagamento;
     }
 
     /**
      * Fill this instance with from array values, you can pass instance to
-     * @param  mixed $pagamento Associated key -> value to assign into this instance
-     * @return Pagamento Self instance
+     * @param mixed $pagamento Associated key -> value to assign into this instance
+     * @return self Self instance
      */
     public function fromArray($pagamento = [])
     {
-        if ($pagamento instanceof Pagamento) {
+        if ($pagamento instanceof self) {
             $pagamento = $pagamento->toArray();
         } elseif (!is_array($pagamento)) {
             $pagamento = [];
@@ -602,17 +676,32 @@ class Pagamento extends SyncModel
         } else {
             $this->setCarteiraID($pagamento['carteiraid']);
         }
+        if (!isset($pagamento['moedaid'])) {
+            $this->setMoedaID(null);
+        } else {
+            $this->setMoedaID($pagamento['moedaid']);
+        }
+        if (!array_key_exists('pagamentoid', $pagamento)) {
+            $this->setPagamentoID(null);
+        } else {
+            $this->setPagamentoID($pagamento['pagamentoid']);
+        }
+        if (!array_key_exists('agrupamentoid', $pagamento)) {
+            $this->setAgrupamentoID(null);
+        } else {
+            $this->setAgrupamentoID($pagamento['agrupamentoid']);
+        }
         if (!array_key_exists('movimentacaoid', $pagamento)) {
             $this->setMovimentacaoID(null);
         } else {
             $this->setMovimentacaoID($pagamento['movimentacaoid']);
         }
-        if (!isset($pagamento['funcionarioid'])) {
+        if (!array_key_exists('funcionarioid', $pagamento)) {
             $this->setFuncionarioID(null);
         } else {
             $this->setFuncionarioID($pagamento['funcionarioid']);
         }
-        if (!isset($pagamento['formapagtoid'])) {
+        if (!array_key_exists('formapagtoid', $pagamento)) {
             $this->setFormaPagtoID(null);
         } else {
             $this->setFormaPagtoID($pagamento['formapagtoid']);
@@ -622,10 +711,10 @@ class Pagamento extends SyncModel
         } else {
             $this->setPedidoID($pagamento['pedidoid']);
         }
-        if (!array_key_exists('pagtocontaid', $pagamento)) {
-            $this->setPagtoContaID(null);
+        if (!array_key_exists('contaid', $pagamento)) {
+            $this->setContaID(null);
         } else {
-            $this->setPagtoContaID($pagamento['pagtocontaid']);
+            $this->setContaID($pagamento['contaid']);
         }
         if (!array_key_exists('cartaoid', $pagamento)) {
             $this->setCartaoID(null);
@@ -637,60 +726,60 @@ class Pagamento extends SyncModel
         } else {
             $this->setChequeID($pagamento['chequeid']);
         }
-        if (!array_key_exists('contaid', $pagamento)) {
-            $this->setContaID(null);
+        if (!array_key_exists('crediarioid', $pagamento)) {
+            $this->setCrediarioID(null);
         } else {
-            $this->setContaID($pagamento['contaid']);
+            $this->setCrediarioID($pagamento['crediarioid']);
         }
         if (!array_key_exists('creditoid', $pagamento)) {
             $this->setCreditoID(null);
         } else {
             $this->setCreditoID($pagamento['creditoid']);
         }
-        if (!isset($pagamento['total'])) {
-            $this->setTotal(null);
+        if (!isset($pagamento['valor'])) {
+            $this->setValor(null);
         } else {
-            $this->setTotal($pagamento['total']);
+            $this->setValor($pagamento['valor']);
+        }
+        if (!isset($pagamento['numeroparcela'])) {
+            $this->setNumeroParcela(null);
+        } else {
+            $this->setNumeroParcela($pagamento['numeroparcela']);
         }
         if (!isset($pagamento['parcelas'])) {
             $this->setParcelas(0);
         } else {
             $this->setParcelas($pagamento['parcelas']);
         }
-        if (!isset($pagamento['valorparcela'])) {
-            $this->setValorParcela(0.0);
+        if (!isset($pagamento['lancado'])) {
+            $this->setLancado(null);
         } else {
-            $this->setValorParcela($pagamento['valorparcela']);
+            $this->setLancado($pagamento['lancado']);
         }
-        if (!isset($pagamento['taxas'])) {
-            $this->setTaxas(0.0);
+        if (!array_key_exists('codigo', $pagamento)) {
+            $this->setCodigo(null);
         } else {
-            $this->setTaxas($pagamento['taxas']);
+            $this->setCodigo($pagamento['codigo']);
         }
         if (!array_key_exists('detalhes', $pagamento)) {
             $this->setDetalhes(null);
         } else {
             $this->setDetalhes($pagamento['detalhes']);
         }
-        if (!isset($pagamento['cancelado'])) {
-            $this->setCancelado('N');
+        if (!isset($pagamento['estado'])) {
+            $this->setEstado(self::ESTADO_ABERTO);
         } else {
-            $this->setCancelado($pagamento['cancelado']);
-        }
-        if (!isset($pagamento['ativo'])) {
-            $this->setAtivo('N');
-        } else {
-            $this->setAtivo($pagamento['ativo']);
+            $this->setEstado($pagamento['estado']);
         }
         if (!isset($pagamento['datacompensacao'])) {
             $this->setDataCompensacao(DB::now());
         } else {
             $this->setDataCompensacao($pagamento['datacompensacao']);
         }
-        if (!isset($pagamento['datahora'])) {
-            $this->setDataHora(DB::now());
+        if (!isset($pagamento['datalancamento'])) {
+            $this->setDataLancamento(DB::now());
         } else {
-            $this->setDataHora($pagamento['datahora']);
+            $this->setDataLancamento($pagamento['datalancamento']);
         }
         return $this;
     }
@@ -707,33 +796,40 @@ class Pagamento extends SyncModel
 
     /**
      * Filter fields, upload data and keep key data
-     * @param Pagamento $original Original instance without modifications
+     * @param self $original Original instance without modifications
+     * @param boolean $localized Informs if fields are localized
+     * @return self Self instance
      */
     public function filter($original, $localized = false)
     {
         $this->setID($original->getID());
         $this->setCarteiraID(Filter::number($this->getCarteiraID()));
+        $this->setMoedaID(Filter::number($this->getMoedaID()));
+        $this->setPagamentoID(Filter::number($this->getPagamentoID()));
+        $this->setAgrupamentoID(Filter::number($this->getAgrupamentoID()));
         $this->setMovimentacaoID(Filter::number($this->getMovimentacaoID()));
         $this->setFuncionarioID(Filter::number($this->getFuncionarioID()));
         $this->setFormaPagtoID(Filter::number($this->getFormaPagtoID()));
         $this->setPedidoID(Filter::number($this->getPedidoID()));
-        $this->setPagtoContaID(Filter::number($this->getPagtoContaID()));
+        $this->setContaID(Filter::number($this->getContaID()));
         $this->setCartaoID(Filter::number($this->getCartaoID()));
         $this->setChequeID(Filter::number($this->getChequeID()));
-        $this->setContaID(Filter::number($this->getContaID()));
+        $this->setCrediarioID(Filter::number($this->getCrediarioID()));
         $this->setCreditoID(Filter::number($this->getCreditoID()));
-        $this->setTotal(Filter::money($this->getTotal(), $localized));
+        $this->setValor(Filter::money($this->getValor(), $localized));
+        $this->setNumeroParcela(Filter::number($this->getNumeroParcela()));
         $this->setParcelas(Filter::number($this->getParcelas()));
-        $this->setValorParcela(Filter::money($this->getValorParcela(), $localized));
-        $this->setTaxas(Filter::money($this->getTaxas(), $localized));
+        $this->setLancado(Filter::money($this->getLancado(), $localized));
+        $this->setCodigo(Filter::string($this->getCodigo()));
         $this->setDetalhes(Filter::string($this->getDetalhes()));
         $this->setDataCompensacao(Filter::datetime($this->getDataCompensacao()));
-        $this->setDataHora(Filter::datetime($this->getDataHora()));
+        $this->setDataLancamento(Filter::datetime($this->getDataLancamento()));
+        return $this;
     }
 
     /**
      * Clean instance resources like images and docs
-     * @param  Pagamento $dependency Don't clean when dependency use same resources
+     * @param self $dependency Don't clean when dependency use same resources
      */
     public function clean($dependency)
     {
@@ -742,68 +838,46 @@ class Pagamento extends SyncModel
     /**
      * Validate fields updating them and throw exception when invalid data has found
      * @return array All field of Pagamento in array format
+     * @throws \MZ\Exception\ValidationException for invalid input data
      */
     public function validate()
     {
         $errors = [];
         if (is_null($this->getCarteiraID())) {
-            $errors['carteiraid'] = 'A carteira não pode ser vazia';
+            $errors['carteiraid'] = _t('pagamento.carteira_id_cannot_empty');
         }
-        if (is_null($this->getFuncionarioID())) {
-            $errors['funcionarioid'] = 'O funcionário não pode ser vazio';
+        if (is_null($this->getMoedaID())) {
+            $errors['moedaid'] = _t('pagamento.moeda_id_cannot_empty');
         }
-        if (is_null($this->getFormaPagtoID())) {
-            $errors['formapagtoid'] = 'A forma de pagamento não pode ser vazia';
+        if (is_null($this->getValor())) {
+            $errors['valor'] = _t('pagamento.valor_cannot_empty');
         }
-        if (is_null($this->getTotal())) {
-            $errors['total'] = 'O total não pode ser vazio';
+        if (is_null($this->getNumeroParcela())) {
+            $errors['numeroparcela'] = _t('pagamento.numero_parcela_cannot_empty');
         }
         if (is_null($this->getParcelas())) {
-            $errors['parcelas'] = 'A parcelas não pode ser vazia';
+            $errors['parcelas'] = _t('pagamento.parcelas_cannot_empty');
         }
-        if (is_null($this->getValorParcela())) {
-            $errors['valorparcela'] = 'O valor da parcela não pode ser vazio';
+        if (is_null($this->getLancado())) {
+            $errors['lancado'] = _t('pagamento.lancado_cannot_empty');
         }
-        if (is_null($this->getTaxas())) {
-            $errors['taxas'] = 'A taxas não pode ser vazia';
-        }
-        if (is_null($this->getCancelado())) {
-            $errors['cancelado'] = 'O cancelado não pode ser vazio';
-        }
-        if (!Validator::checkBoolean($this->getCancelado(), true)) {
-            $errors['cancelado'] = 'O cancelado é inválido';
-        }
-        if (is_null($this->getAtivo())) {
-            $errors['ativo'] = 'O ativo não pode ser vazio';
-        }
-        if (!Validator::checkBoolean($this->getAtivo(), true)) {
-            $errors['ativo'] = 'O ativo é inválido';
+        if (!Validator::checkInSet($this->getEstado(), self::getEstadoOptions())) {
+            $errors['estado'] = _t('pagamento.estado_invalid');
         }
         if (is_null($this->getDataCompensacao())) {
-            $errors['datacompensacao'] = 'A data de compensação não pode ser vazia';
+            $errors['datacompensacao'] = _t('pagamento.data_compensacao_cannot_empty');
         }
-        if (is_null($this->getDataHora())) {
-            $errors['datahora'] = 'A data de hora não pode ser vazia';
-        }
+        $this->setDataLancamento(DB::now());
         if (!empty($errors)) {
-            throw new \MZ\Exception\ValidationException($errors);
+            throw new ValidationException($errors);
         }
         return $this->toArray();
     }
 
     /**
-     * Translate SQL exception into application exception
-     * @param  \Exception $e exception to translate into a readable error
-     * @return \MZ\Exception\ValidationException new exception translated
-     */
-    protected function translate($e)
-    {
-        return parent::translate($e);
-    }
-
-    /**
      * Insert a new Pagamento into the database and fill instance from database
-     * @return Pagamento Self instance
+     * @return self Self instance
+     * @throws \MZ\Exception\ValidationException for invalid input data
      */
     public function insert()
     {
@@ -822,36 +896,43 @@ class Pagamento extends SyncModel
 
     /**
      * Update Pagamento with instance values into database for ID
-     * @param  array $only Save these fields only, when empty save all fields except id
-     * @return Pagamento Self instance
+     * @param array $only Save these fields only, when empty save all fields except id
+     * @return int rows affected
+     * @throws \MZ\Exception\ValidationException for invalid input data
      */
     public function update($only = [])
     {
         $values = $this->validate();
         if (!$this->exists()) {
-            throw new \Exception('O identificador do pagamento não foi informado');
+            throw new ValidationException(
+                ['id' => _t('pagamento.id_cannot_empty')]
+            );
         }
         $values = DB::filterValues($values, $only, false);
+        unset($values['datalancamento']);
         try {
-            DB::update('Pagamentos')
+            $affected = DB::update('Pagamentos')
                 ->set($values)
-                ->where('id', $this->getID())
+                ->where(['id' => $this->getID()])
                 ->execute();
             $this->loadByID();
         } catch (\Exception $e) {
             throw $this->translate($e);
         }
-        return $this;
+        return $affected;
     }
 
     /**
      * Delete this instance from database using ID
      * @return integer Number of rows deleted (Max 1)
+     * @throws \MZ\Exception\ValidationException for invalid id
      */
     public function delete()
     {
         if (!$this->exists()) {
-            throw new \Exception('O identificador do pagamento não foi informado');
+            throw new ValidationException(
+                ['id' => _t('pagamento.id_cannot_empty')]
+            );
         }
         $result = DB::deleteFrom('Pagamentos')
             ->where('id', $this->getID())
@@ -861,9 +942,9 @@ class Pagamento extends SyncModel
 
     /**
      * Load one register for it self with a condition
-     * @param  array $condition Condition for searching the row
-     * @param  array $order associative field name -> [-1, 1]
-     * @return Pagamento Self instance filled or empty
+     * @param array $condition Condition for searching the row
+     * @param array $order associative field name -> [-1, 1]
+     * @return self Self instance filled or empty
      */
     public function load($condition, $order = [])
     {
@@ -879,6 +960,42 @@ class Pagamento extends SyncModel
     public function findCarteiraID()
     {
         return \MZ\Wallet\Carteira::findByID($this->getCarteiraID());
+    }
+
+    /**
+     * Informa em qual moeda está o valor informado
+     * @return \MZ\Wallet\Moeda The object fetched from database
+     */
+    public function findMoedaID()
+    {
+        return \MZ\Wallet\Moeda::findByID($this->getMoedaID());
+    }
+
+    /**
+     * Informa o pagamento principal ou primeira parcela, o valor lançado é
+     * zero para os pagamentos filhos, restante de antecipação e taxas são
+     * filhos do valor antecipado
+     * @return \MZ\Payment\Pagamento The object fetched from database
+     */
+    public function findPagamentoID()
+    {
+        if (is_null($this->getPagamentoID())) {
+            return new \MZ\Payment\Pagamento();
+        }
+        return \MZ\Payment\Pagamento::findByID($this->getPagamentoID());
+    }
+
+    /**
+     * Permite antecipar recebimentos de cartões, um pagamento agrupado é
+     * internamente tratado como desativado
+     * @return \MZ\Payment\Pagamento The object fetched from database
+     */
+    public function findAgrupamentoID()
+    {
+        if (is_null($this->getAgrupamentoID())) {
+            return new \MZ\Payment\Pagamento();
+        }
+        return \MZ\Payment\Pagamento::findByID($this->getAgrupamentoID());
     }
 
     /**
@@ -900,15 +1017,21 @@ class Pagamento extends SyncModel
      */
     public function findFuncionarioID()
     {
+        if (is_null($this->getFuncionarioID())) {
+            return new \MZ\Provider\Prestador();
+        }
         return \MZ\Provider\Prestador::findByID($this->getFuncionarioID());
     }
 
     /**
-     * Forma da pagamento do pedido ou conta
+     * Forma da pagamento do pedido
      * @return \MZ\Payment\FormaPagto The object fetched from database
      */
     public function findFormaPagtoID()
     {
+        if (is_null($this->getFormaPagtoID())) {
+            return new \MZ\Payment\FormaPagto();
+        }
         return \MZ\Payment\FormaPagto::findByID($this->getFormaPagtoID());
     }
 
@@ -928,12 +1051,12 @@ class Pagamento extends SyncModel
      * Conta que foi paga/recebida
      * @return \MZ\Account\Conta The object fetched from database
      */
-    public function findPagtoContaID()
+    public function findContaID()
     {
-        if (is_null($this->getPagtoContaID())) {
+        if (is_null($this->getContaID())) {
             return new \MZ\Account\Conta();
         }
-        return \MZ\Account\Conta::findByID($this->getPagtoContaID());
+        return \MZ\Account\Conta::findByID($this->getContaID());
     }
 
     /**
@@ -964,12 +1087,12 @@ class Pagamento extends SyncModel
      * Conta que foi utilizada como pagamento do pedido
      * @return \MZ\Account\Conta The object fetched from database
      */
-    public function findContaID()
+    public function findCrediarioID()
     {
-        if (is_null($this->getContaID())) {
+        if (is_null($this->getCrediarioID())) {
             return new \MZ\Account\Conta();
         }
-        return \MZ\Account\Conta::findByID($this->getContaID());
+        return \MZ\Account\Conta::findByID($this->getCrediarioID());
     }
 
     /**
@@ -985,19 +1108,41 @@ class Pagamento extends SyncModel
     }
 
     /**
+     * Gets textual and translated Estado for Pagamento
+     * @param int $index choose option from index
+     * @return string[] A associative key -> translated representative text or text for index
+     */
+    public static function getEstadoOptions($index = null)
+    {
+        $options = [
+            self::ESTADO_ABERTO => _t('pagamento.estado_aberto'),
+            self::ESTADO_AGUARDANDO => _t('pagamento.estado_aguardando'),
+            self::ESTADO_ANALISE => _t('pagamento.estado_analise'),
+            self::ESTADO_PAGO => _t('pagamento.estado_pago'),
+            self::ESTADO_DISPUTA => _t('pagamento.estado_disputa'),
+            self::ESTADO_DEVOLVIDO => _t('pagamento.estado_devolvido'),
+            self::ESTADO_CANCELADO => _t('pagamento.estado_cancelado'),
+        ];
+        if (!is_null($index)) {
+            return $options[$index];
+        }
+        return $options;
+    }
+
+    /**
      * Get allowed keys array
      * @return array allowed keys array
      */
     private static function getAllowedKeys()
     {
-        $pagamento = new Pagamento();
+        $pagamento = new self();
         $allowed = Filter::concatKeys('p.', $pagamento->toArray());
         return $allowed;
     }
 
     /**
      * Filter order array
-     * @param  mixed $order order string or array to parse and filter allowed
+     * @param mixed $order order string or array to parse and filter allowed
      * @return array allowed associative order
      */
     private static function filterOrder($order)
@@ -1008,7 +1153,7 @@ class Pagamento extends SyncModel
 
     /**
      * Filter condition array with allowed fields
-     * @param  array $condition condition to filter rows
+     * @param array $condition condition to filter rows
      * @return array allowed condition
      */
     private static function filterCondition($condition)
@@ -1068,8 +1213,8 @@ class Pagamento extends SyncModel
 
     /**
      * Fetch data from database with a condition
-     * @param  array $condition condition to filter rows
-     * @param  array $order order rows
+     * @param array $condition condition to filter rows
+     * @param array $order order rows
      * @return SelectQuery query object with condition statement
      */
     private static function query($condition = [], $order = [])
@@ -1109,15 +1254,30 @@ class Pagamento extends SyncModel
 
     /**
      * Search one register with a condition
-     * @param  array $condition Condition for searching the row
-     * @param  array $order order rows
-     * @return Pagamento A filled Pagamento or empty instance
+     * @param array $condition Condition for searching the row
+     * @param array $order order rows
+     * @return self A filled Pagamento or empty instance
      */
     public static function find($condition, $order = [])
     {
-        $query = self::query($condition, $order)->limit(1);
-        $row = $query->fetch() ?: [];
-        return new Pagamento($row);
+        $result = new self();
+        return $result->load($condition, $order);
+    }
+
+    /**
+     * Search one register with a condition
+     * @param array $condition Condition for searching the row
+     * @param array $order order rows
+     * @return self A filled Pagamento or empty instance
+     * @throws \Exception when register has not found
+     */
+    public static function findOrFail($condition, $order = [])
+    {
+        $result = self::find($condition, $order);
+        if (!$result->exists()) {
+            throw new \Exception(_t('pagamento.not_found'), 404);
+        }
+        return $result;
     }
 
     /**
@@ -1173,11 +1333,11 @@ class Pagamento extends SyncModel
 
     /**
      * Find all Pagamento
-     * @param  array  $condition Condition to get all Pagamento
-     * @param  array  $order     Order Pagamento
-     * @param  int    $limit     Limit data into row count
-     * @param  int    $offset    Start offset to get rows
-     * @return array             List of all rows instanced as Pagamento
+     * @param array  $condition Condition to get all Pagamento
+     * @param array  $order     Order Pagamento
+     * @param int    $limit     Limit data into row count
+     * @param int    $offset    Start offset to get rows
+     * @return self[] List of all rows instanced as Pagamento
      */
     public static function findAll($condition = [], $order = [], $limit = null, $offset = null)
     {
@@ -1191,14 +1351,14 @@ class Pagamento extends SyncModel
         $rows = $query->fetchAll();
         $result = [];
         foreach ($rows as $row) {
-            $result[] = new Pagamento($row);
+            $result[] = new self($row);
         }
         return $result;
     }
 
     /**
      * Count all rows from database with matched condition critery
-     * @param  array $condition condition to filter rows
+     * @param array $condition condition to filter rows
      * @return integer Quantity of rows
      */
     public static function count($condition = [])

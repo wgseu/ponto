@@ -32,13 +32,16 @@ class ChequeTest extends \MZ\Framework\TestCase
         $values = $cheque->publish();
         $allowed = [
             'id',
+            'clienteid',
             'bancoid',
             'agencia',
             'conta',
-            'clienteid',
-            'parcelas',
-            'total',
+            'numero',
+            'valor',
+            'vencimento',
             'cancelado',
+            'recolhido',
+            'recolhimento',
             'datacadastro',
         ];
         $this->assertEquals($allowed, array_keys($values));

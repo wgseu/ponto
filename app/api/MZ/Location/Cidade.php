@@ -24,12 +24,13 @@
  */
 namespace MZ\Location;
 
-use MZ\Database\SyncModel;
-use MZ\Database\DB;
+use MZ\Util\Mask;
 use MZ\Util\Filter;
 use MZ\Util\Validator;
-use MZ\System\Permissao;
+use MZ\Database\DB;
+use MZ\Database\SyncModel;
 use MZ\Exception\ValidationException;
+use MZ\System\Permissao;
 
 /**
  * Cidade de um estado, contém bairros
@@ -65,7 +66,7 @@ class Cidade extends SyncModel
 
     /**
      * Código que identifica a cidade
-     * @return mixed ID of Cidade
+     * @return int id of Cidade
      */
     public function getID()
     {
@@ -74,8 +75,8 @@ class Cidade extends SyncModel
 
     /**
      * Set ID value to new on param
-     * @param  mixed $id new value for ID
-     * @return Cidade Self instance
+     * @param int $id Set id for Cidade
+     * @return self Self instance
      */
     public function setID($id)
     {
@@ -85,7 +86,7 @@ class Cidade extends SyncModel
 
     /**
      * Informa a qual estado a cidade pertence
-     * @return mixed Estado of Cidade
+     * @return int estado of Cidade
      */
     public function getEstadoID()
     {
@@ -94,8 +95,8 @@ class Cidade extends SyncModel
 
     /**
      * Set EstadoID value to new on param
-     * @param  mixed $estado_id new value for EstadoID
-     * @return Cidade Self instance
+     * @param int $estado_id Set estado for Cidade
+     * @return self Self instance
      */
     public function setEstadoID($estado_id)
     {
@@ -105,7 +106,7 @@ class Cidade extends SyncModel
 
     /**
      * Nome da cidade, é único para cada estado
-     * @return mixed Nome of Cidade
+     * @return string nome of Cidade
      */
     public function getNome()
     {
@@ -114,8 +115,8 @@ class Cidade extends SyncModel
 
     /**
      * Set Nome value to new on param
-     * @param  mixed $nome new value for Nome
-     * @return Cidade Self instance
+     * @param string $nome Set nome for Cidade
+     * @return self Self instance
      */
     public function setNome($nome)
     {
@@ -125,7 +126,7 @@ class Cidade extends SyncModel
 
     /**
      * Código dos correios para identificação da cidade
-     * @return mixed CEP of Cidade
+     * @return string cep of Cidade
      */
     public function getCEP()
     {
@@ -134,8 +135,8 @@ class Cidade extends SyncModel
 
     /**
      * Set CEP value to new on param
-     * @param  mixed $cep new value for CEP
-     * @return Cidade Self instance
+     * @param string $cep Set cep for Cidade
+     * @return self Self instance
      */
     public function setCEP($cep)
     {
@@ -145,7 +146,7 @@ class Cidade extends SyncModel
 
     /**
      * Convert this instance to array associated key -> value
-     * @param  boolean $recursive Allow rescursive conversion of fields
+     * @param boolean $recursive Allow rescursive conversion of fields
      * @return array All field and values into array format
      */
     public function toArray($recursive = false)
@@ -160,12 +161,12 @@ class Cidade extends SyncModel
 
     /**
      * Fill this instance with from array values, you can pass instance to
-     * @param  mixed $cidade Associated key -> value to assign into this instance
-     * @return Cidade Self instance
+     * @param mixed $cidade Associated key -> value to assign into this instance
+     * @return self Self instance
      */
     public function fromArray($cidade = [])
     {
-        if ($cidade instanceof Cidade) {
+        if ($cidade instanceof self) {
             $cidade = $cidade->toArray();
         } elseif (!is_array($cidade)) {
             $cidade = [];
@@ -201,13 +202,15 @@ class Cidade extends SyncModel
     public function publish()
     {
         $cidade = parent::publish();
-        $cidade['cep'] = \MZ\Util\Mask::mask($cidade['cep'], _p('Mascara', 'CEP'));
+        $cidade['cep'] = Mask::cep($cidade['cep']);
         return $cidade;
     }
 
     /**
      * Filter fields, upload data and keep key data
-     * @param Cidade $original Original instance without modifications
+     * @param self $original Original instance without modifications
+     * @param boolean $localized Informs if fields are localized
+     * @return self Self instance
      */
     public function filter($original, $localized = false)
     {
@@ -215,11 +218,12 @@ class Cidade extends SyncModel
         $this->setEstadoID(Filter::number($this->getEstadoID()));
         $this->setNome(Filter::string($this->getNome()));
         $this->setCEP(Filter::unmask($this->getCEP(), _p('Mascara', 'CEP')));
+        return $this;
     }
 
     /**
      * Clean instance resources like images and docs
-     * @param  Cidade $dependency Don't clean when dependency use same resources
+     * @param self $dependency Don't clean when dependency use same resources
      */
     public function clean($dependency)
     {
@@ -228,18 +232,19 @@ class Cidade extends SyncModel
     /**
      * Validate fields updating them and throw exception when invalid data has found
      * @return array All field of Cidade in array format
+     * @throws \MZ\Exception\ValidationException for invalid input data
      */
     public function validate()
     {
         $errors = [];
         if (is_null($this->getEstadoID())) {
-            $errors['estadoid'] = 'O estado não pode ser vazio';
+            $errors['estadoid'] = _t('cidade.estado_id_cannot_empty');
         }
         if (is_null($this->getNome())) {
-            $errors['nome'] = 'O nome não pode ser vazio';
+            $errors['nome'] = _t('cidade.nome_cannot_empty');
         }
         if (!Validator::checkCEP($this->getCEP(), true)) {
-            $errors['cep'] = sprintf('O %s é inválido', _p('Titulo', 'CEP'));
+            $errors['cep'] = _t('cep_invalid', _p('Titulo', 'CEP'));
         }
         if (!empty($errors)) {
             throw new ValidationException($errors);
@@ -249,31 +254,29 @@ class Cidade extends SyncModel
 
     /**
      * Translate SQL exception into application exception
-     * @param  \Exception $e exception to translate into a readable error
-     * @return ValidationException new exception translated
+     * @param \Exception $e exception to translate into a readable error
+     * @return \MZ\Exception\ValidationException new exception translated
      */
     protected function translate($e)
     {
         if (contains(['EstadoID', 'Nome', 'UNIQUE'], $e->getMessage())) {
             return new ValidationException([
-                'estadoid' => vsprintf(
-                    'O estado "%s" já está cadastrado',
-                    [$this->getEstadoID()]
+                'estadoid' => _t(
+                    'cidade.estado_id_used',
+                    $this->getEstadoID()
                 ),
-                'nome' => vsprintf(
-                    'O nome "%s" já está cadastrado',
-                    [$this->getNome()]
+                'nome' => _t(
+                    'cidade.nome_used',
+                    $this->getNome()
                 ),
             ]);
         }
         if (contains(['CEP', 'UNIQUE'], $e->getMessage())) {
             return new ValidationException([
-                'cep' => vsprintf(
-                    'O %s "%s" já está cadastrado',
-                    [
-                        _p('Titulo', 'CEP'),
-                        \MZ\Util\Mask::mask($cidade['cep'], _p('Mascara', 'CEP'))
-                    ]
+                'cep' => _t(
+                    'cidade.cep_used',
+                    _p('Titulo', 'CEP'),
+                    $this->getCEP()
                 ),
             ]);
         }
@@ -281,28 +284,210 @@ class Cidade extends SyncModel
     }
 
     /**
-     * Find this object on database using, EstadoID, Nome
-     * @param  int $estado_id estado to find Cidade
-     * @param  string $nome nome to find Cidade
-     * @return Cidade A filled instance or empty when not found
+     * Insert a new Cidade into the database and fill instance from database
+     * @return self Self instance
+     * @throws \MZ\Exception\ValidationException for invalid input data
      */
-    public static function findByEstadoIDNome($estado_id, $nome)
+    public function insert()
     {
-        $result = new self();
-        $result->setEstadoID($estado_id);
-        $result->setNome($nome);
-        return $result->loadByEstadoIDNome();
+        $this->setID(null);
+        $values = $this->validate();
+        unset($values['id']);
+        try {
+            $id = DB::insertInto('Cidades')->values($values)->execute();
+            $this->setID($id);
+            $this->loadByID();
+        } catch (\Exception $e) {
+            throw $this->translate($e);
+        }
+        return $this;
     }
 
     /**
-     * Find this object on database using, CEP
-     * @param  string $cep cep to find Cidade
-     * @return Cidade A filled instance or empty when not found
+     * Update Cidade with instance values into database for ID
+     * @param array $only Save these fields only, when empty save all fields except id
+     * @return int rows affected
+     * @throws \MZ\Exception\ValidationException for invalid input data
      */
-    public static function findByCEP($cep)
+    public function update($only = [])
+    {
+        $values = $this->validate();
+        if (!$this->exists()) {
+            throw new ValidationException(
+                ['id' => _t('cidade.id_cannot_empty')]
+            );
+        }
+        $values = DB::filterValues($values, $only, false);
+        try {
+            $affected = DB::update('Cidades')
+                ->set($values)
+                ->where(['id' => $this->getID()])
+                ->execute();
+            $this->loadByID();
+        } catch (\Exception $e) {
+            throw $this->translate($e);
+        }
+        return $affected;
+    }
+
+    /**
+     * Delete this instance from database using ID
+     * @return integer Number of rows deleted (Max 1)
+     * @throws \MZ\Exception\ValidationException for invalid id
+     */
+    public function delete()
+    {
+        if (!$this->exists()) {
+            throw new ValidationException(
+                ['id' => _t('cidade.id_cannot_empty')]
+            );
+        }
+        $result = DB::deleteFrom('Cidades')
+            ->where('id', $this->getID())
+            ->execute();
+        return $result;
+    }
+
+    /**
+     * Load one register for it self with a condition
+     * @param array $condition Condition for searching the row
+     * @param array $order associative field name -> [-1, 1]
+     * @return self Self instance filled or empty
+     */
+    public function load($condition, $order = [])
+    {
+        $query = self::query($condition, $order)->limit(1);
+        $row = $query->fetch() ?: [];
+        return $this->fromArray($row);
+    }
+
+    /**
+     * Load into this object from database using, ID
+     * @return self Self filled instance or empty when not found
+     */
+    public function loadByID()
+    {
+        return $this->load([
+            'id' => intval($this->getID()),
+        ]);
+    }
+
+    /**
+     * Load into this object from database using, EstadoID, Nome
+     * @return self Self filled instance or empty when not found
+     */
+    public function loadByEstadoIDNome()
+    {
+        return $this->load([
+            'estadoid' => intval($this->getEstadoID()),
+            'nome' => strval($this->getNome()),
+        ]);
+    }
+
+    /**
+     * Load into this object from database using, CEP
+     * @return self Self filled instance or empty when not found
+     */
+    public function loadByCEP()
+    {
+        return $this->load([
+            'cep' => strval($this->getCEP()),
+        ]);
+    }
+
+    /**
+     * Informa a qual estado a cidade pertence
+     * @return \MZ\Location\Estado The object fetched from database
+     */
+    public function findEstadoID()
+    {
+        return \MZ\Location\Estado::findByID($this->getEstadoID());
+    }
+
+    /**
+     * Get allowed keys array
+     * @return array allowed keys array
+     */
+    private static function getAllowedKeys()
+    {
+        $cidade = new self();
+        $allowed = Filter::concatKeys('c.', $cidade->toArray());
+        $allowed['e.paisid'] = true;
+        return $allowed;
+    }
+
+    /**
+     * Filter order array
+     * @param mixed $order order string or array to parse and filter allowed
+     * @return array allowed associative order
+     */
+    private static function filterOrder($order)
+    {
+        $allowed = self::getAllowedKeys();
+        return Filter::orderBy($order, $allowed, ['c.', 'e.']);
+    }
+
+    /**
+     * Filter condition array with allowed fields
+     * @param array $condition condition to filter rows
+     * @return array allowed condition
+     */
+    private static function filterCondition($condition)
+    {
+        $allowed = self::getAllowedKeys();
+        if (isset($condition['search'])) {
+            $search = trim($condition['search']);
+            $field = 'c.nome LIKE ?';
+            $condition[$field] = '%'.$search.'%';
+            $allowed[$field] = true;
+            unset($condition['search']);
+        }
+        return Filter::keys($condition, $allowed, ['c.', 'e.']);
+    }
+
+    /**
+     * Fetch data from database with a condition
+     * @param array $condition condition to filter rows
+     * @param array $order order rows
+     * @return SelectQuery query object with condition statement
+     */
+    private static function query($condition = [], $order = [])
+    {
+        $query = DB::from('Cidades c');
+        $query = $query->leftJoin('Estados e ON e.id = c.estadoid');
+        $condition = self::filterCondition($condition);
+        $query = DB::buildOrderBy($query, self::filterOrder($order));
+        $query = $query->orderBy('c.nome ASC');
+        $query = $query->orderBy('c.id ASC');
+        return DB::buildCondition($query, $condition);
+    }
+
+    /**
+     * Search one register with a condition
+     * @param array $condition Condition for searching the row
+     * @param array $order order rows
+     * @return self A filled Cidade or empty instance
+     */
+    public static function find($condition, $order = [])
     {
         $result = new self();
-        return $result->loadByCEP($cep);
+        return $result->load($condition, $order);
+    }
+
+    /**
+     * Search one register with a condition
+     * @param array $condition Condition for searching the row
+     * @param array $order order rows
+     * @return self A filled Cidade or empty instance
+     * @throws \Exception when register has not found
+     */
+    public static function findOrFail($condition, $order = [])
+    {
+        $result = self::find($condition, $order);
+        if (!$result->exists()) {
+            throw new \Exception(_t('cidade.not_found'), 404);
+        }
+        return $result;
     }
 
     /**
@@ -339,85 +524,38 @@ class Cidade extends SyncModel
     }
 
     /**
-     * Get allowed keys array
-     * @return array allowed keys array
+     * Find this object on database using, EstadoID, Nome
+     * @param int $estado_id estado to find Cidade
+     * @param string $nome nome to find Cidade
+     * @return self A filled instance or empty when not found
      */
-    private static function getAllowedKeys()
+    public static function findByEstadoIDNome($estado_id, $nome)
     {
-        $cidade = new Cidade();
-        $allowed = Filter::concatKeys('c.', $cidade->toArray());
-        $allowed['e.paisid'] = true;
-        return $allowed;
+        $result = new self();
+        $result->setEstadoID($estado_id);
+        $result->setNome($nome);
+        return $result->loadByEstadoIDNome();
     }
 
     /**
-     * Filter order array
-     * @param  mixed $order order string or array to parse and filter allowed
-     * @return array allowed associative order
+     * Find this object on database using, CEP
+     * @param string $cep cep to find Cidade
+     * @return self A filled instance or empty when not found
      */
-    private static function filterOrder($order)
+    public static function findByCEP($cep)
     {
-        $allowed = self::getAllowedKeys();
-        return Filter::orderBy($order, $allowed, ['c.', 'e.']);
+        $result = new self();
+        $result->setCEP($cep);
+        return $result->loadByCEP();
     }
 
     /**
-     * Filter condition array with allowed fields
-     * @param  array $condition condition to filter rows
-     * @return array allowed condition
-     */
-    private static function filterCondition($condition)
-    {
-        $allowed = self::getAllowedKeys();
-        if (isset($condition['search'])) {
-            $search = trim($condition['search']);
-            $field = 'c.nome LIKE ?';
-            $condition[$field] = '%'.$search.'%';
-            $allowed[$field] = true;
-            unset($condition['search']);
-        }
-        return Filter::keys($condition, $allowed, ['c.', 'e.']);
-    }
-
-    /**
-     * Fetch data from database with a condition
-     * @param  array $condition condition to filter rows
-     * @param  array $order order rows
-     * @return SelectQuery query object with condition statement
-     */
-    private static function query($condition = [], $order = [])
-    {
-        $query = DB::from('Cidades c');
-        $query = $query->leftJoin('Estados e ON e.id = c.estadoid');
-        $condition = self::filterCondition($condition);
-        $query = DB::buildOrderBy($query, self::filterOrder($order));
-        $query = $query->orderBy('c.nome ASC');
-        $query = $query->orderBy('c.id ASC');
-        return DB::buildCondition($query, $condition);
-    }
-
-    /**
-     * Search one register with a condition
-     * @param  array $condition Condition for searching the row
-     * @param  array $order order rows
-     * @return Cidade A filled Cidade or empty instance
-     */
-    public static function find($condition, $order = [])
-    {
-        $query = self::query($condition, $order)->limit(1);
-        $row = $query->fetch();
-        if ($row === false) {
-            $row = [];
-        }
-        return new Cidade($row);
-    }
-
-    /**
-     * Fetch all rows from database with matched condition critery
-     * @param  array $condition condition to filter rows
-     * @param  integer $limit number of rows to get, null for all
-     * @param  integer $offset start index to get rows, null for begining
-     * @return array All rows instanced and filled
+     * Find all Cidade
+     * @param array  $condition Condition to get all Cidade
+     * @param array  $order     Order Cidade
+     * @param int    $limit     Limit data into row count
+     * @param int    $offset    Start offset to get rows
+     * @return self[] List of all rows instanced as Cidade
      */
     public static function findAll($condition = [], $order = [], $limit = null, $offset = null)
     {
@@ -431,123 +569,19 @@ class Cidade extends SyncModel
         $rows = $query->fetchAll();
         $result = [];
         foreach ($rows as $row) {
-            $result[] = new Cidade($row);
+            $result[] = new self($row);
         }
         return $result;
-    }
-
-    /**
-     * Insert a new Cidade into the database and fill instance from database
-     * @return Cidade Self instance
-     */
-    public function insert()
-    {
-        $this->setID(null);
-        $values = $this->validate();
-        unset($values['id']);
-        try {
-            $id = DB::insertInto('Cidades')->values($values)->execute();
-            $this->setID($id);
-            $this->loadByID();
-        } catch (\Exception $e) {
-            throw $this->translate($e);
-        }
-        return $this;
-    }
-
-    /**
-     * Update Cidade with instance values into database for ID
-     * @param  array $only Save these fields only, when empty save all fields except id
-     * @return Cidade Self instance
-     */
-    public function update($only = [])
-    {
-        $values = $this->validate();
-        if (!$this->exists()) {
-            throw new \Exception('O identificador da cidade não foi informado');
-        }
-        $values = DB::filterValues($values, $only, false);
-        try {
-            DB::update('Cidades')
-                ->set($values)
-                ->where('id', $this->getID())
-                ->execute();
-            $this->loadByID();
-        } catch (\Exception $e) {
-            throw $this->translate($e);
-        }
-        return $this;
-    }
-
-    /**
-     * Delete this instance from database using ID
-     * @return integer Number of rows deleted (Max 1)
-     */
-    public function delete()
-    {
-        if (!$this->exists()) {
-            throw new \Exception('O identificador da cidade não foi informado');
-        }
-        $result = DB::deleteFrom('Cidades')
-            ->where('id', $this->getID())
-            ->execute();
-        return $result;
-    }
-
-    /**
-     * Load one register for it self with a condition
-     * @param  array $condition Condition for searching the row
-     * @param  array $order associative field name -> [-1, 1]
-     * @return Cidade Self instance filled or empty
-     */
-    public function load($condition, $order = [])
-    {
-        $query = self::query($condition, $order)->limit(1);
-        $row = $query->fetch() ?: [];
-        return $this->fromArray($row);
-    }
-
-    /**
-     * Load into this object from database using, EstadoID, Nome
-     * @return Cidade Self filled instance or empty when not found
-     */
-    public function loadByEstadoIDNome()
-    {
-        return $this->load([
-            'estadoid' => intval($this->getEstadoID()),
-            'nome' => strval($this->getNome()),
-        ]);
-    }
-
-    /**
-     * Load into this object from database using, CEP
-     * @param  string $cep cep to find Cidade
-     * @return Cidade Self filled instance or empty when not found
-     */
-    public function loadByCEP($cep)
-    {
-        return $this->load([
-            'cep' => strval($cep),
-        ]);
     }
 
     /**
      * Count all rows from database with matched condition critery
-     * @param  array $condition condition to filter rows
+     * @param array $condition condition to filter rows
      * @return integer Quantity of rows
      */
     public static function count($condition = [])
     {
         $query = self::query($condition);
         return $query->count();
-    }
-
-    /**
-     * Informa a qual estado a cidade pertence
-     * @return \MZ\Location\Estado The object fetched from database
-     */
-    public function findEstadoID()
-    {
-        return \MZ\Location\Estado::findByID($this->getEstadoID());
     }
 }

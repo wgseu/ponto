@@ -24,10 +24,12 @@
  */
 namespace MZ\Device;
 
-use MZ\Database\SyncModel;
-use MZ\Database\DB;
+use MZ\Util\Mask;
 use MZ\Util\Filter;
 use MZ\Util\Validator;
+use MZ\Database\DB;
+use MZ\Database\SyncModel;
+use MZ\Exception\ValidationException;
 
 /**
  * Impressora para impressão de serviços e contas
@@ -99,7 +101,7 @@ class Impressora extends SyncModel
 
     /**
      * Identificador da impressora
-     * @return mixed ID of Impressora
+     * @return int id of Impressora
      */
     public function getID()
     {
@@ -108,8 +110,8 @@ class Impressora extends SyncModel
 
     /**
      * Set ID value to new on param
-     * @param  mixed $id new value for ID
-     * @return Impressora Self instance
+     * @param int $id Set id for Impressora
+     * @return self Self instance
      */
     public function setID($id)
     {
@@ -119,7 +121,7 @@ class Impressora extends SyncModel
 
     /**
      * Setor de impressão
-     * @return mixed Setor de impressão of Impressora
+     * @return int setor de impressão of Impressora
      */
     public function getSetorID()
     {
@@ -128,8 +130,8 @@ class Impressora extends SyncModel
 
     /**
      * Set SetorID value to new on param
-     * @param  mixed $setor_id new value for SetorID
-     * @return Impressora Self instance
+     * @param int $setor_id Set setor de impressão for Impressora
+     * @return self Self instance
      */
     public function setSetorID($setor_id)
     {
@@ -139,7 +141,7 @@ class Impressora extends SyncModel
 
     /**
      * Dispositivo que contém a impressora
-     * @return mixed Dispositivo of Impressora
+     * @return int dispositivo of Impressora
      */
     public function getDispositivoID()
     {
@@ -148,8 +150,8 @@ class Impressora extends SyncModel
 
     /**
      * Set DispositivoID value to new on param
-     * @param  mixed $dispositivo_id new value for DispositivoID
-     * @return Impressora Self instance
+     * @param int $dispositivo_id Set dispositivo for Impressora
+     * @return self Self instance
      */
     public function setDispositivoID($dispositivo_id)
     {
@@ -159,7 +161,7 @@ class Impressora extends SyncModel
 
     /**
      * Nome da impressora instalada no windows
-     * @return mixed Nome of Impressora
+     * @return string nome of Impressora
      */
     public function getNome()
     {
@@ -168,8 +170,8 @@ class Impressora extends SyncModel
 
     /**
      * Set Nome value to new on param
-     * @param  mixed $nome new value for Nome
-     * @return Impressora Self instance
+     * @param string $nome Set nome for Impressora
+     * @return self Self instance
      */
     public function setNome($nome)
     {
@@ -179,7 +181,7 @@ class Impressora extends SyncModel
 
     /**
      * Informa qual conjunto de comandos deve ser utilizado
-     * @return mixed Driver of Impressora
+     * @return string driver of Impressora
      */
     public function getDriver()
     {
@@ -188,8 +190,8 @@ class Impressora extends SyncModel
 
     /**
      * Set Driver value to new on param
-     * @param  mixed $driver new value for Driver
-     * @return Impressora Self instance
+     * @param string $driver Set driver for Impressora
+     * @return self Self instance
      */
     public function setDriver($driver)
     {
@@ -199,7 +201,7 @@ class Impressora extends SyncModel
 
     /**
      * Descrição da impressora
-     * @return mixed Descrição of Impressora
+     * @return string descrição of Impressora
      */
     public function getDescricao()
     {
@@ -208,8 +210,8 @@ class Impressora extends SyncModel
 
     /**
      * Set Descricao value to new on param
-     * @param  mixed $descricao new value for Descricao
-     * @return Impressora Self instance
+     * @param string $descricao Set descrição for Impressora
+     * @return self Self instance
      */
     public function setDescricao($descricao)
     {
@@ -219,7 +221,7 @@ class Impressora extends SyncModel
 
     /**
      * Modo de impressão
-     * @return mixed Modo of Impressora
+     * @return string modo of Impressora
      */
     public function getModo()
     {
@@ -228,8 +230,8 @@ class Impressora extends SyncModel
 
     /**
      * Set Modo value to new on param
-     * @param  mixed $modo new value for Modo
-     * @return Impressora Self instance
+     * @param string $modo Set modo for Impressora
+     * @return self Self instance
      */
     public function setModo($modo)
     {
@@ -239,7 +241,7 @@ class Impressora extends SyncModel
 
     /**
      * Opções da impressora, Ex.: Cortar papel, Acionar gaveta e outros
-     * @return mixed Opções of Impressora
+     * @return int opções of Impressora
      */
     public function getOpcoes()
     {
@@ -248,8 +250,8 @@ class Impressora extends SyncModel
 
     /**
      * Set Opcoes value to new on param
-     * @param  mixed $opcoes new value for Opcoes
-     * @return Impressora Self instance
+     * @param int $opcoes Set opções for Impressora
+     * @return self Self instance
      */
     public function setOpcoes($opcoes)
     {
@@ -259,7 +261,7 @@ class Impressora extends SyncModel
 
     /**
      * Quantidade de colunas do cupom
-     * @return mixed Quantidade de colunas of Impressora
+     * @return int quantidade de colunas of Impressora
      */
     public function getColunas()
     {
@@ -268,8 +270,8 @@ class Impressora extends SyncModel
 
     /**
      * Set Colunas value to new on param
-     * @param  mixed $colunas new value for Colunas
-     * @return Impressora Self instance
+     * @param int $colunas Set quantidade de colunas for Impressora
+     * @return self Self instance
      */
     public function setColunas($colunas)
     {
@@ -279,7 +281,7 @@ class Impressora extends SyncModel
 
     /**
      * Quantidade de linhas para avanço do papel
-     * @return mixed Avanço de papel of Impressora
+     * @return int avanço de papel of Impressora
      */
     public function getAvanco()
     {
@@ -288,8 +290,8 @@ class Impressora extends SyncModel
 
     /**
      * Set Avanco value to new on param
-     * @param  mixed $avanco new value for Avanco
-     * @return Impressora Self instance
+     * @param int $avanco Set avanço de papel for Impressora
+     * @return self Self instance
      */
     public function setAvanco($avanco)
     {
@@ -299,7 +301,7 @@ class Impressora extends SyncModel
 
     /**
      * Comandos para impressão, quando o driver é customizado
-     * @return mixed Comandos of Impressora
+     * @return string comandos of Impressora
      */
     public function getComandos()
     {
@@ -308,8 +310,8 @@ class Impressora extends SyncModel
 
     /**
      * Set Comandos value to new on param
-     * @param  mixed $comandos new value for Comandos
-     * @return Impressora Self instance
+     * @param string $comandos Set comandos for Impressora
+     * @return self Self instance
      */
     public function setComandos($comandos)
     {
@@ -319,7 +321,7 @@ class Impressora extends SyncModel
 
     /**
      * Convert this instance to array associated key -> value
-     * @param  boolean $recursive Allow rescursive conversion of fields
+     * @param boolean $recursive Allow rescursive conversion of fields
      * @return array All field and values into array format
      */
     public function toArray($recursive = false)
@@ -341,12 +343,12 @@ class Impressora extends SyncModel
 
     /**
      * Fill this instance with from array values, you can pass instance to
-     * @param  mixed $impressora Associated key -> value to assign into this instance
-     * @return Impressora Self instance
+     * @param mixed $impressora Associated key -> value to assign into this instance
+     * @return self Self instance
      */
     public function fromArray($impressora = [])
     {
-        if ($impressora instanceof Impressora) {
+        if ($impressora instanceof self) {
             $impressora = $impressora->toArray();
         } elseif (!is_array($impressora)) {
             $impressora = [];
@@ -445,7 +447,9 @@ class Impressora extends SyncModel
 
     /**
      * Filter fields, upload data and keep key data
-     * @param Impressora $original Original instance without modifications
+     * @param self $original Original instance without modifications
+     * @param boolean $localized Informs if fields are localized
+     * @return self Self instance
      */
     public function filter($original, $localized = false)
     {
@@ -459,11 +463,12 @@ class Impressora extends SyncModel
         $this->setColunas(Filter::number($this->getColunas()));
         $this->setAvanco(Filter::number($this->getAvanco()));
         $this->setComandos(Filter::text($this->getComandos()));
+        return $this;
     }
 
     /**
      * Clean instance resources like images and docs
-     * @param  Impressora $dependency Don't clean when dependency use same resources
+     * @param self $dependency Don't clean when dependency use same resources
      */
     public function clean($dependency)
     {
@@ -472,71 +477,69 @@ class Impressora extends SyncModel
     /**
      * Validate fields updating them and throw exception when invalid data has found
      * @return array All field of Impressora in array format
+     * @throws \MZ\Exception\ValidationException for invalid input data
      */
     public function validate()
     {
         $errors = [];
         if (is_null($this->getSetorID())) {
-            $errors['setorid'] = 'O setor de impressão não pode ser vazio';
+            $errors['setorid'] = _t('impressora.setor_id_cannot_empty');
         }
         if (is_null($this->getNome())) {
-            $errors['nome'] = 'O nome não pode ser vazio';
+            $errors['nome'] = _t('impressora.nome_cannot_empty');
         }
         if (is_null($this->getDescricao())) {
-            $errors['descricao'] = 'A descrição não pode ser vazia';
+            $errors['descricao'] = _t('impressora.descricao_cannot_empty');
         }
-        if (is_null($this->getModo())) {
-            $errors['modo'] = 'O modo não pode ser vazio';
-        }
-        if (!Validator::checkInSet($this->getModo(), self::getModoOptions(), true)) {
-            $errors['modo'] = 'O modo é inválido';
+        if (!Validator::checkInSet($this->getModo(), self::getModoOptions())) {
+            $errors['modo'] = _t('impressora.modo_invalid');
         }
         if (is_null($this->getOpcoes())) {
-            $errors['opcoes'] = 'A opções não pode ser vazia';
+            $errors['opcoes'] = _t('impressora.opcoes_cannot_empty');
         }
         if (is_null($this->getColunas())) {
-            $errors['colunas'] = 'A quantidade de colunas não pode ser vazia';
+            $errors['colunas'] = _t('impressora.colunas_cannot_empty');
         }
         if (is_null($this->getAvanco())) {
-            $errors['avanco'] = 'O avanço de papel não pode ser vazio';
+            $errors['avanco'] = _t('impressora.avanco_cannot_empty');
         }
         if (!empty($errors)) {
-            throw new \MZ\Exception\ValidationException($errors);
+            throw new ValidationException($errors);
         }
         return $this->toArray();
     }
 
     /**
      * Translate SQL exception into application exception
-     * @param  \Exception $e exception to translate into a readable error
+     * @param \Exception $e exception to translate into a readable error
      * @return \MZ\Exception\ValidationException new exception translated
      */
     protected function translate($e)
     {
-        if (stripos($e->getMessage(), 'UK_Impresoras_Setor_Dispositivo_Modo') !== false) {
-            return new \MZ\Exception\ValidationException([
-                'setorid' => sprintf(
-                    'O setor de impressão "%s" já está cadastrado',
+        if (contains(['SetorID', 'DispositivoID', 'Modo', 'UNIQUE'], $e->getMessage())) {
+            return new ValidationException([
+                'setorid' => _t(
+                    'impressora.setor_id_used',
                     $this->getSetorID()
                 ),
-                'dispositivoid' => sprintf(
-                    'O dispositivo "%s" já está cadastrado',
+                'dispositivoid' => _t(
+                    'impressora.dispositivo_id_used',
                     $this->getDispositivoID()
                 ),
-                'modo' => sprintf(
-                    'O modo "%s" já está cadastrado',
+                'modo' => _t(
+                    'impressora.modo_used',
                     $this->getModo()
                 ),
             ]);
         }
-        if (stripos($e->getMessage(), 'UK_Impressoras_Dispositivo_Descricao') !== false) {
-            return new \MZ\Exception\ValidationException([
-                'dispositivoid' => sprintf(
-                    'O dispositivo "%s" já está cadastrado',
+        if (contains(['DispositivoID', 'Descricao', 'UNIQUE'], $e->getMessage())) {
+            return new ValidationException([
+                'dispositivoid' => _t(
+                    'impressora.dispositivo_id_used',
                     $this->getDispositivoID()
                 ),
-                'descricao' => sprintf(
-                    'A descrição "%s" já está cadastrada',
+                'descricao' => _t(
+                    'impressora.descricao_used',
                     $this->getDescricao()
                 ),
             ]);
@@ -546,7 +549,8 @@ class Impressora extends SyncModel
 
     /**
      * Insert a new Impressora into the database and fill instance from database
-     * @return Impressora Self instance
+     * @return self Self instance
+     * @throws \MZ\Exception\ValidationException for invalid input data
      */
     public function insert()
     {
@@ -565,36 +569,42 @@ class Impressora extends SyncModel
 
     /**
      * Update Impressora with instance values into database for ID
-     * @param  array $only Save these fields only, when empty save all fields except id
-     * @return Impressora Self instance
+     * @param array $only Save these fields only, when empty save all fields except id
+     * @return int rows affected
+     * @throws \MZ\Exception\ValidationException for invalid input data
      */
     public function update($only = [])
     {
         $values = $this->validate();
         if (!$this->exists()) {
-            throw new \Exception('O identificador da impressora não foi informado');
+            throw new ValidationException(
+                ['id' => _t('impressora.id_cannot_empty')]
+            );
         }
         $values = DB::filterValues($values, $only, false);
         try {
-            DB::update('Impressoras')
+            $affected = DB::update('Impressoras')
                 ->set($values)
-                ->where('id', $this->getID())
+                ->where(['id' => $this->getID()])
                 ->execute();
             $this->loadByID();
         } catch (\Exception $e) {
             throw $this->translate($e);
         }
-        return $this;
+        return $affected;
     }
 
     /**
      * Delete this instance from database using ID
      * @return integer Number of rows deleted (Max 1)
+     * @throws \MZ\Exception\ValidationException for invalid id
      */
     public function delete()
     {
         if (!$this->exists()) {
-            throw new \Exception('O identificador da impressora não foi informado');
+            throw new ValidationException(
+                ['id' => _t('impressora.id_cannot_empty')]
+            );
         }
         $result = DB::deleteFrom('Impressoras')
             ->where('id', $this->getID())
@@ -604,9 +614,9 @@ class Impressora extends SyncModel
 
     /**
      * Load one register for it self with a condition
-     * @param  array $condition Condition for searching the row
-     * @param  array $order associative field name -> [-1, 1]
-     * @return Impressora Self instance filled or empty
+     * @param array $condition Condition for searching the row
+     * @param array $order associative field name -> [-1, 1]
+     * @return self Self instance filled or empty
      */
     public function load($condition, $order = [])
     {
@@ -617,31 +627,26 @@ class Impressora extends SyncModel
 
     /**
      * Load into this object from database using, SetorID, DispositivoID, Modo
-     * @param  int $setor_id setor de impressão to find Impressora
-     * @param  int $dispositivo_id dispositivo to find Impressora
-     * @param  string $modo modo to find Impressora
-     * @return Impressora Self filled instance or empty when not found
+     * @return self Self filled instance or empty when not found
      */
-    public function loadBySetorIDDispositivoIDModo($setor_id, $dispositivo_id, $modo)
+    public function loadBySetorIDDispositivoIDModo()
     {
         return $this->load([
-            'setorid' => intval($setor_id),
-            'dispositivoid' => intval($dispositivo_id),
-            'modo' => strval($modo),
+            'setorid' => intval($this->getSetorID()),
+            'dispositivoid' => intval($this->getDispositivoID()),
+            'modo' => strval($this->getModo()),
         ]);
     }
 
     /**
      * Load into this object from database using, DispositivoID, Descricao
-     * @param  int $dispositivo_id dispositivo to find Impressora
-     * @param  string $descricao descrição to find Impressora
-     * @return Impressora Self filled instance or empty when not found
+     * @return self Self filled instance or empty when not found
      */
-    public function loadByDispositivoIDDescricao($dispositivo_id, $descricao)
+    public function loadByDispositivoIDDescricao()
     {
         return $this->load([
-            'dispositivoid' => intval($dispositivo_id),
-            'descricao' => strval($descricao),
+            'dispositivoid' => intval($this->getDispositivoID()),
+            'descricao' => strval($this->getDescricao()),
         ]);
     }
 
@@ -668,16 +673,16 @@ class Impressora extends SyncModel
 
     /**
      * Gets textual and translated Modo for Impressora
-     * @param  int $index choose option from index
-     * @return mixed A associative key -> translated representative text or text for index
+     * @param int $index choose option from index
+     * @return string[] A associative key -> translated representative text or text for index
      */
     public static function getModoOptions($index = null)
     {
         $options = [
-            self::MODO_TERMINAL => 'Terminal',
-            self::MODO_CAIXA => 'Caixa',
-            self::MODO_SERVICO => 'Serviço',
-            self::MODO_ESTOQUE => 'Estoque',
+            self::MODO_TERMINAL => _t('impressora.modo_terminal'),
+            self::MODO_CAIXA => _t('impressora.modo_caixa'),
+            self::MODO_SERVICO => _t('impressora.modo_servico'),
+            self::MODO_ESTOQUE => _t('impressora.modo_estoque'),
         ];
         if (!is_null($index)) {
             return $options[$index];
@@ -691,14 +696,14 @@ class Impressora extends SyncModel
      */
     private static function getAllowedKeys()
     {
-        $impressora = new Impressora();
+        $impressora = new self();
         $allowed = Filter::concatKeys('i.', $impressora->toArray());
         return $allowed;
     }
 
     /**
      * Filter order array
-     * @param  mixed $order order string or array to parse and filter allowed
+     * @param mixed $order order string or array to parse and filter allowed
      * @return array allowed associative order
      */
     private static function filterOrder($order)
@@ -709,7 +714,7 @@ class Impressora extends SyncModel
 
     /**
      * Filter condition array with allowed fields
-     * @param  array $condition condition to filter rows
+     * @param array $condition condition to filter rows
      * @return array allowed condition
      */
     private static function filterCondition($condition)
@@ -727,8 +732,8 @@ class Impressora extends SyncModel
 
     /**
      * Fetch data from database with a condition
-     * @param  array $condition condition to filter rows
-     * @param  array $order order rows
+     * @param array $condition condition to filter rows
+     * @param array $order order rows
      * @return SelectQuery query object with condition statement
      */
     private static function query($condition = [], $order = [])
@@ -743,49 +748,69 @@ class Impressora extends SyncModel
 
     /**
      * Search one register with a condition
-     * @param  array $condition Condition for searching the row
-     * @param  array $order order rows
-     * @return Impressora A filled Impressora or empty instance
+     * @param array $condition Condition for searching the row
+     * @param array $order order rows
+     * @return self A filled Impressora or empty instance
      */
     public static function find($condition, $order = [])
     {
-        $query = self::query($condition, $order)->limit(1);
-        $row = $query->fetch() ?: [];
-        return new Impressora($row);
+        $result = new self();
+        return $result->load($condition, $order);
+    }
+
+    /**
+     * Search one register with a condition
+     * @param array $condition Condition for searching the row
+     * @param array $order order rows
+     * @return self A filled Impressora or empty instance
+     * @throws \Exception when register has not found
+     */
+    public static function findOrFail($condition, $order = [])
+    {
+        $result = self::find($condition, $order);
+        if (!$result->exists()) {
+            throw new \Exception(_t('impressora.not_found'), 404);
+        }
+        return $result;
     }
 
     /**
      * Find this object on database using, SetorID, DispositivoID, Modo
-     * @param  int $setor_id setor de impressão to find Impressora
-     * @param  int $dispositivo_id dispositivo to find Impressora
-     * @param  string $modo modo to find Impressora
-     * @return Impressora A filled instance or empty when not found
+     * @param int $setor_id setor de impressão to find Impressora
+     * @param int $dispositivo_id dispositivo to find Impressora
+     * @param string $modo modo to find Impressora
+     * @return self A filled instance or empty when not found
      */
     public static function findBySetorIDDispositivoIDModo($setor_id, $dispositivo_id, $modo)
     {
         $result = new self();
-        return $result->loadBySetorIDDispositivoIDModo($setor_id, $dispositivo_id, $modo);
+        $result->setSetorID($setor_id);
+        $result->setDispositivoID($dispositivo_id);
+        $result->setModo($modo);
+        return $result->loadBySetorIDDispositivoIDModo();
     }
 
     /**
      * Find this object on database using, DispositivoID, Descricao
-     * @param  int $dispositivo_id dispositivo to find Impressora
-     * @param  string $descricao descrição to find Impressora
-     * @return Impressora A filled instance or empty when not found
+     * @param int $dispositivo_id dispositivo to find Impressora
+     * @param string $descricao descrição to find Impressora
+     * @return self A filled instance or empty when not found
      */
     public static function findByDispositivoIDDescricao($dispositivo_id, $descricao)
     {
         $result = new self();
-        return $result->loadByDispositivoIDDescricao($dispositivo_id, $descricao);
+        $result->setDispositivoID($dispositivo_id);
+        $result->setDescricao($descricao);
+        return $result->loadByDispositivoIDDescricao();
     }
 
     /**
      * Find all Impressora
-     * @param  array  $condition Condition to get all Impressora
-     * @param  array  $order     Order Impressora
-     * @param  int    $limit     Limit data into row count
-     * @param  int    $offset    Start offset to get rows
-     * @return array             List of all rows instanced as Impressora
+     * @param array  $condition Condition to get all Impressora
+     * @param array  $order     Order Impressora
+     * @param int    $limit     Limit data into row count
+     * @param int    $offset    Start offset to get rows
+     * @return self[] List of all rows instanced as Impressora
      */
     public static function findAll($condition = [], $order = [], $limit = null, $offset = null)
     {
@@ -799,14 +824,14 @@ class Impressora extends SyncModel
         $rows = $query->fetchAll();
         $result = [];
         foreach ($rows as $row) {
-            $result[] = new Impressora($row);
+            $result[] = new self($row);
         }
         return $result;
     }
 
     /**
      * Count all rows from database with matched condition critery
-     * @param  array $condition condition to filter rows
+     * @param array $condition condition to filter rows
      * @return integer Quantity of rows
      */
     public static function count($condition = [])

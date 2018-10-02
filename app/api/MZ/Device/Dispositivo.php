@@ -24,11 +24,13 @@
  */
 namespace MZ\Device;
 
-use MZ\Database\SyncModel;
-use MZ\Database\DB;
+use MZ\Util\Mask;
 use MZ\Util\Filter;
 use MZ\Util\Validator;
 use MZ\Logger\Log;
+use MZ\Database\DB;
+use MZ\Database\SyncModel;
+use MZ\Exception\ValidationException;
 
 /**
  * Computadores e tablets com opções de acesso
@@ -76,7 +78,7 @@ class Dispositivo extends SyncModel
      */
     private $serial;
     /**
-     * Validação do tablet
+     * Validação do dispositivo
      */
     private $validacao;
 
@@ -91,7 +93,7 @@ class Dispositivo extends SyncModel
 
     /**
      * Identificador do dispositivo
-     * @return mixed ID of Dispositivo
+     * @return int id of Dispositivo
      */
     public function getID()
     {
@@ -100,8 +102,8 @@ class Dispositivo extends SyncModel
 
     /**
      * Set ID value to new on param
-     * @param  mixed $id new value for ID
-     * @return Dispositivo Self instance
+     * @param int $id Set id for Dispositivo
+     * @return self Self instance
      */
     public function setID($id)
     {
@@ -111,7 +113,7 @@ class Dispositivo extends SyncModel
 
     /**
      * Setor em que o dispositivo está instalado/será usado
-     * @return mixed Setor of Dispositivo
+     * @return int setor of Dispositivo
      */
     public function getSetorID()
     {
@@ -120,8 +122,8 @@ class Dispositivo extends SyncModel
 
     /**
      * Set SetorID value to new on param
-     * @param  mixed $setor_id new value for SetorID
-     * @return Dispositivo Self instance
+     * @param int $setor_id Set setor for Dispositivo
+     * @return self Self instance
      */
     public function setSetorID($setor_id)
     {
@@ -132,7 +134,7 @@ class Dispositivo extends SyncModel
     /**
      * Finalidade do dispositivo, caixa ou terminal, o caixa é único entre os
      * dispositivos
-     * @return mixed Caixa of Dispositivo
+     * @return int caixa of Dispositivo
      */
     public function getCaixaID()
     {
@@ -141,8 +143,8 @@ class Dispositivo extends SyncModel
 
     /**
      * Set CaixaID value to new on param
-     * @param  mixed $caixa_id new value for CaixaID
-     * @return Dispositivo Self instance
+     * @param int $caixa_id Set caixa for Dispositivo
+     * @return self Self instance
      */
     public function setCaixaID($caixa_id)
     {
@@ -152,7 +154,7 @@ class Dispositivo extends SyncModel
 
     /**
      * Nome do computador ou tablet em rede, único entre os dispositivos
-     * @return mixed Nome of Dispositivo
+     * @return string nome of Dispositivo
      */
     public function getNome()
     {
@@ -161,8 +163,8 @@ class Dispositivo extends SyncModel
 
     /**
      * Set Nome value to new on param
-     * @param  mixed $nome new value for Nome
-     * @return Dispositivo Self instance
+     * @param string $nome Set nome for Dispositivo
+     * @return self Self instance
      */
     public function setNome($nome)
     {
@@ -172,7 +174,7 @@ class Dispositivo extends SyncModel
 
     /**
      * Tipo de dispositivo
-     * @return mixed Tipo of Dispositivo
+     * @return string tipo of Dispositivo
      */
     public function getTipo()
     {
@@ -181,8 +183,8 @@ class Dispositivo extends SyncModel
 
     /**
      * Set Tipo value to new on param
-     * @param  mixed $tipo new value for Tipo
-     * @return Dispositivo Self instance
+     * @param string $tipo Set tipo for Dispositivo
+     * @return self Self instance
      */
     public function setTipo($tipo)
     {
@@ -192,7 +194,7 @@ class Dispositivo extends SyncModel
 
     /**
      * Descrição do dispositivo
-     * @return mixed Descrição of Dispositivo
+     * @return string descrição of Dispositivo
      */
     public function getDescricao()
     {
@@ -201,8 +203,8 @@ class Dispositivo extends SyncModel
 
     /**
      * Set Descricao value to new on param
-     * @param  mixed $descricao new value for Descricao
-     * @return Dispositivo Self instance
+     * @param string $descricao Set descrição for Dispositivo
+     * @return self Self instance
      */
     public function setDescricao($descricao)
     {
@@ -212,7 +214,7 @@ class Dispositivo extends SyncModel
 
     /**
      * Opções do dispositivo, Ex.: Balança, identificador de chamadas e outros
-     * @return mixed Opções of Dispositivo
+     * @return string opções of Dispositivo
      */
     public function getOpcoes()
     {
@@ -221,8 +223,8 @@ class Dispositivo extends SyncModel
 
     /**
      * Set Opcoes value to new on param
-     * @param  mixed $opcoes new value for Opcoes
-     * @return Dispositivo Self instance
+     * @param string $opcoes Set opções for Dispositivo
+     * @return self Self instance
      */
     public function setOpcoes($opcoes)
     {
@@ -232,7 +234,7 @@ class Dispositivo extends SyncModel
 
     /**
      * Serial do tablet para validação, único entre os dispositivos
-     * @return mixed Serial of Dispositivo
+     * @return string serial of Dispositivo
      */
     public function getSerial()
     {
@@ -241,8 +243,8 @@ class Dispositivo extends SyncModel
 
     /**
      * Set Serial value to new on param
-     * @param  mixed $serial new value for Serial
-     * @return Dispositivo Self instance
+     * @param string $serial Set serial for Dispositivo
+     * @return self Self instance
      */
     public function setSerial($serial)
     {
@@ -251,8 +253,8 @@ class Dispositivo extends SyncModel
     }
 
     /**
-     * Validação do tablet
-     * @return mixed Validação of Dispositivo
+     * Validação do dispositivo
+     * @return string validação of Dispositivo
      */
     public function getValidacao()
     {
@@ -261,8 +263,8 @@ class Dispositivo extends SyncModel
 
     /**
      * Set Validacao value to new on param
-     * @param  mixed $validacao new value for Validacao
-     * @return Dispositivo Self instance
+     * @param string $validacao Set validação for Dispositivo
+     * @return self Self instance
      */
     public function setValidacao($validacao)
     {
@@ -272,7 +274,7 @@ class Dispositivo extends SyncModel
 
     /**
      * Convert this instance to array associated key -> value
-     * @param  boolean $recursive Allow rescursive conversion of fields
+     * @param boolean $recursive Allow rescursive conversion of fields
      * @return array All field and values into array format
      */
     public function toArray($recursive = false)
@@ -292,12 +294,12 @@ class Dispositivo extends SyncModel
 
     /**
      * Fill this instance with from array values, you can pass instance to
-     * @param  mixed $dispositivo Associated key -> value to assign into this instance
-     * @return Dispositivo Self instance
+     * @param mixed $dispositivo Associated key -> value to assign into this instance
+     * @return self Self instance
      */
     public function fromArray($dispositivo = [])
     {
-        if ($dispositivo instanceof Dispositivo) {
+        if ($dispositivo instanceof self) {
             $dispositivo = $dispositivo->toArray();
         } elseif (!is_array($dispositivo)) {
             $dispositivo = [];
@@ -333,12 +335,12 @@ class Dispositivo extends SyncModel
         } else {
             $this->setDescricao($dispositivo['descricao']);
         }
-        if (!isset($dispositivo['opcoes'])) {
-            $this->setOpcoes(0);
+        if (!array_key_exists('opcoes', $dispositivo)) {
+            $this->setOpcoes(null);
         } else {
             $this->setOpcoes($dispositivo['opcoes']);
         }
-        if (!array_key_exists('serial', $dispositivo)) {
+        if (!isset($dispositivo['serial'])) {
             $this->setSerial(null);
         } else {
             $this->setSerial($dispositivo['serial']);
@@ -363,7 +365,9 @@ class Dispositivo extends SyncModel
 
     /**
      * Filter fields, upload data and keep key data
-     * @param Dispositivo $original Original instance without modifications
+     * @param self $original Original instance without modifications
+     * @param boolean $localized Informs if fields are localized
+     * @return self Self instance
      */
     public function filter($original, $localized = false)
     {
@@ -372,14 +376,15 @@ class Dispositivo extends SyncModel
         $this->setCaixaID(Filter::number($this->getCaixaID()));
         $this->setNome(Filter::string($this->getNome()));
         $this->setDescricao(Filter::string($this->getDescricao()));
-        $this->setOpcoes(Filter::number($this->getOpcoes()));
+        $this->setOpcoes(Filter::text($this->getOpcoes()));
         $this->setSerial(Filter::string($this->getSerial()));
         $this->setValidacao(Filter::string($this->getValidacao()));
+        return $this;
     }
 
     /**
      * Clean instance resources like images and docs
-     * @param  Dispositivo $dependency Don't clean when dependency use same resources
+     * @param self $dependency Don't clean when dependency use same resources
      */
     public function clean($dependency)
     {
@@ -388,6 +393,7 @@ class Dispositivo extends SyncModel
     /**
      * Validate fields updating them and throw exception when invalid data has found
      * @return array All field of Dispositivo in array format
+     * @throws \MZ\Exception\ValidationException for invalid input data
      */
     public function validate()
     {
@@ -396,16 +402,16 @@ class Dispositivo extends SyncModel
             $errors['sistemaid'] = 'Não há dados na tabela do sistema';
         }
         if (is_null($this->getSetorID())) {
-            $errors['setorid'] = 'O setor não pode ser vazio';
+            $errors['setorid'] = _t('dispositivo.setor_id_cannot_empty');
         }
         if (is_null($this->getNome())) {
-            $errors['nome'] = 'O nome do dispositivo não foi informado';
-        }
-        if (is_null($this->getSerial())) {
-            $errors['serial'] = 'O identificador do dispositivo não foi informado';
+            $errors['nome'] = _t('dispositivo.nome_cannot_empty');
         }
         if (!Validator::checkInSet($this->getTipo(), self::getTipoOptions())) {
-            $errors['tipo'] = 'O tipo não foi informado ou é inválido';
+            $errors['tipo'] = _t('dispositivo.tipo_invalid');
+        }
+        if (is_null($this->getSerial())) {
+            $errors['serial'] = _t('dispositivo.serial_cannot_empty');
         }
         $device_count = self::count();
         if ($device_count > app()->getSystem()->getDispositivos()) {
@@ -416,42 +422,31 @@ class Dispositivo extends SyncModel
         ) {
             $errors['tipo'] = 'Limite de dispositivos esgotado, verifique sua licença';
         }
-        if (is_null($this->getOpcoes())) {
-            $errors['opcoes'] = 'A opções não pode ser vazia';
-        }
         if (!empty($errors)) {
-            throw new \MZ\Exception\ValidationException($errors);
+            throw new ValidationException($errors);
         }
         return $this->toArray();
     }
 
     /**
      * Translate SQL exception into application exception
-     * @param  \Exception $e exception to translate into a readable error
+     * @param \Exception $e exception to translate into a readable error
      * @return \MZ\Exception\ValidationException new exception translated
      */
     protected function translate($e)
     {
-        if (contains(['Nome', 'UNIQUE'], $e->getMessage())) {
-            return new \MZ\Exception\ValidationException([
-                'nome' => sprintf(
-                    'O nome "%s" já está cadastrado',
-                    $this->getNome()
-                ),
-            ]);
-        }
         if (contains(['CaixaID', 'UNIQUE'], $e->getMessage())) {
-            return new \MZ\Exception\ValidationException([
-                'caixaid' => sprintf(
-                    'O caixa "%s" já está cadastrado',
+            return new ValidationException([
+                'caixaid' => _t(
+                    'dispositivo.caixa_id_used',
                     $this->getCaixaID()
                 ),
             ]);
         }
         if (contains(['Serial', 'UNIQUE'], $e->getMessage())) {
-            return new \MZ\Exception\ValidationException([
-                'serial' => sprintf(
-                    'O serial "%s" já está cadastrado',
+            return new ValidationException([
+                'serial' => _t(
+                    'dispositivo.serial_used',
                     $this->getSerial()
                 ),
             ]);
@@ -461,7 +456,8 @@ class Dispositivo extends SyncModel
 
     /**
      * Insert a new Dispositivo into the database and fill instance from database
-     * @return Dispositivo Self instance
+     * @return self Self instance
+     * @throws \MZ\Exception\ValidationException for invalid input data
      */
     public function insert()
     {
@@ -480,36 +476,42 @@ class Dispositivo extends SyncModel
 
     /**
      * Update Dispositivo with instance values into database for ID
-     * @param  array $only Save these fields only, when empty save all fields except id
-     * @return Dispositivo Self instance
+     * @param array $only Save these fields only, when empty save all fields except id
+     * @return int rows affected
+     * @throws \MZ\Exception\ValidationException for invalid input data
      */
     public function update($only = [])
     {
         $values = $this->validate();
         if (!$this->exists()) {
-            throw new \Exception('O identificador do dispositivo não foi informado');
+            throw new ValidationException(
+                ['id' => _t('dispositivo.id_cannot_empty')]
+            );
         }
         $values = DB::filterValues($values, $only, false);
         try {
-            DB::update('Dispositivos')
+            $affected = DB::update('Dispositivos')
                 ->set($values)
-                ->where('id', $this->getID())
+                ->where(['id' => $this->getID()])
                 ->execute();
             $this->loadByID();
         } catch (\Exception $e) {
             throw $this->translate($e);
         }
-        return $this;
+        return $affected;
     }
 
     /**
      * Delete this instance from database using ID
      * @return integer Number of rows deleted (Max 1)
+     * @throws \MZ\Exception\ValidationException for invalid id
      */
     public function delete()
     {
         if (!$this->exists()) {
-            throw new \Exception('O identificador do dispositivo não foi informado');
+            throw new ValidationException(
+                ['id' => _t('dispositivo.id_cannot_empty')]
+            );
         }
         $result = DB::deleteFrom('Dispositivos')
             ->where('id', $this->getID())
@@ -523,11 +525,7 @@ class Dispositivo extends SyncModel
         $this->setSetorID($setor->getID());
         $this->setTipo(self::TIPO_TABLET);
         $this->setDescricao('Tablet ' . $this->getNome());
-        $this->setOpcoes(0);
-        $dispositivo = self::findByNome($this->getNome());
-        if (!$dispositivo->exists()) {
-            $dispositivo = self::findBySerial($this->getSerial());
-        }
+        $dispositivo = self::findBySerial($this->getSerial());
         // permite a atualização das informações para o novo dispositivo
         $this->setID($dispositivo->getID());
         $this->validate();
@@ -546,9 +544,9 @@ class Dispositivo extends SyncModel
 
     /**
      * Load one register for it self with a condition
-     * @param  array $condition Condition for searching the row
-     * @param  array $order associative field name -> [-1, 1]
-     * @return Dispositivo Self instance filled or empty
+     * @param array $condition Condition for searching the row
+     * @param array $order associative field name -> [-1, 1]
+     * @return self Self instance filled or empty
      */
     public function load($condition, $order = [])
     {
@@ -558,38 +556,24 @@ class Dispositivo extends SyncModel
     }
 
     /**
-     * Load into this object from database using, Nome
-     * @param  string $nome nome to find Dispositivo
-     * @return Dispositivo Self filled instance or empty when not found
-     */
-    public function loadByNome($nome)
-    {
-        return $this->load([
-            'nome' => strval($nome),
-        ]);
-    }
-
-    /**
      * Load into this object from database using, CaixaID
-     * @param  int $caixa_id caixa to find Dispositivo
-     * @return Dispositivo Self filled instance or empty when not found
+     * @return self Self filled instance or empty when not found
      */
-    public function loadByCaixaID($caixa_id)
+    public function loadByCaixaID()
     {
         return $this->load([
-            'caixaid' => intval($caixa_id),
+            'caixaid' => intval($this->getCaixaID()),
         ]);
     }
 
     /**
      * Load into this object from database using, Serial
-     * @param  string $serial serial to find Dispositivo
-     * @return Dispositivo Self filled instance or empty when not found
+     * @return self Self filled instance or empty when not found
      */
-    public function loadBySerial($serial)
+    public function loadBySerial()
     {
         return $this->load([
-            'serial' => strval($serial),
+            'serial' => strval($this->getSerial()),
         ]);
     }
 
@@ -617,14 +601,14 @@ class Dispositivo extends SyncModel
 
     /**
      * Gets textual and translated Tipo for Dispositivo
-     * @param  int $index choose option from index
-     * @return mixed A associative key -> translated representative text or text for index
+     * @param int $index choose option from index
+     * @return string[] A associative key -> translated representative text or text for index
      */
     public static function getTipoOptions($index = null)
     {
         $options = [
-            self::TIPO_COMPUTADOR => 'Computador',
-            self::TIPO_TABLET => 'Tablet',
+            self::TIPO_COMPUTADOR => _t('dispositivo.tipo_computador'),
+            self::TIPO_TABLET => _t('dispositivo.tipo_tablet'),
         ];
         if (!is_null($index)) {
             return $options[$index];
@@ -638,14 +622,14 @@ class Dispositivo extends SyncModel
      */
     private static function getAllowedKeys()
     {
-        $dispositivo = new Dispositivo();
+        $dispositivo = new self();
         $allowed = Filter::concatKeys('d.', $dispositivo->toArray());
         return $allowed;
     }
 
     /**
      * Filter order array
-     * @param  mixed $order order string or array to parse and filter allowed
+     * @param mixed $order order string or array to parse and filter allowed
      * @return array allowed associative order
      */
     private static function filterOrder($order)
@@ -656,7 +640,7 @@ class Dispositivo extends SyncModel
 
     /**
      * Filter condition array with allowed fields
-     * @param  array $condition condition to filter rows
+     * @param array $condition condition to filter rows
      * @return array allowed condition
      */
     private static function filterCondition($condition)
@@ -674,8 +658,8 @@ class Dispositivo extends SyncModel
 
     /**
      * Fetch data from database with a condition
-     * @param  array $condition condition to filter rows
-     * @param  array $order order rows
+     * @param array $condition condition to filter rows
+     * @param array $order order rows
      * @return SelectQuery query object with condition statement
      */
     private static function query($condition = [], $order = [])
@@ -690,57 +674,63 @@ class Dispositivo extends SyncModel
 
     /**
      * Search one register with a condition
-     * @param  array $condition Condition for searching the row
-     * @param  array $order order rows
-     * @return Dispositivo A filled Dispositivo or empty instance
+     * @param array $condition Condition for searching the row
+     * @param array $order order rows
+     * @return self A filled Dispositivo or empty instance
      */
     public static function find($condition, $order = [])
     {
-        $query = self::query($condition, $order)->limit(1);
-        $row = $query->fetch() ?: [];
-        return new Dispositivo($row);
+        $result = new self();
+        return $result->load($condition, $order);
     }
 
     /**
-     * Find this object on database using, Nome
-     * @param  string $nome nome to find Dispositivo
-     * @return Dispositivo A filled instance or empty when not found
+     * Search one register with a condition
+     * @param array $condition Condition for searching the row
+     * @param array $order order rows
+     * @return self A filled Dispositivo or empty instance
+     * @throws \Exception when register has not found
      */
-    public static function findByNome($nome)
+    public static function findOrFail($condition, $order = [])
     {
-        $result = new self();
-        return $result->loadByNome($nome);
+        $result = self::find($condition, $order);
+        if (!$result->exists()) {
+            throw new \Exception(_t('dispositivo.not_found'), 404);
+        }
+        return $result;
     }
 
     /**
      * Find this object on database using, CaixaID
-     * @param  int $caixa_id caixa to find Dispositivo
-     * @return Dispositivo A filled instance or empty when not found
+     * @param int $caixa_id caixa to find Dispositivo
+     * @return self A filled instance or empty when not found
      */
     public static function findByCaixaID($caixa_id)
     {
         $result = new self();
-        return $result->loadByCaixaID($caixa_id);
+        $result->setCaixaID($caixa_id);
+        return $result->loadByCaixaID();
     }
 
     /**
      * Find this object on database using, Serial
-     * @param  string $serial serial to find Dispositivo
-     * @return Dispositivo A filled instance or empty when not found
+     * @param string $serial serial to find Dispositivo
+     * @return self A filled instance or empty when not found
      */
     public static function findBySerial($serial)
     {
         $result = new self();
-        return $result->loadBySerial($serial);
+        $result->setSerial($serial);
+        return $result->loadBySerial();
     }
 
     /**
      * Find all Dispositivo
-     * @param  array  $condition Condition to get all Dispositivo
-     * @param  array  $order     Order Dispositivo
-     * @param  int    $limit     Limit data into row count
-     * @param  int    $offset    Start offset to get rows
-     * @return array             List of all rows instanced as Dispositivo
+     * @param array  $condition Condition to get all Dispositivo
+     * @param array  $order     Order Dispositivo
+     * @param int    $limit     Limit data into row count
+     * @param int    $offset    Start offset to get rows
+     * @return self[] List of all rows instanced as Dispositivo
      */
     public static function findAll($condition = [], $order = [], $limit = null, $offset = null)
     {
@@ -754,14 +744,14 @@ class Dispositivo extends SyncModel
         $rows = $query->fetchAll();
         $result = [];
         foreach ($rows as $row) {
-            $result[] = new Dispositivo($row);
+            $result[] = new self($row);
         }
         return $result;
     }
 
     /**
      * Count all rows from database with matched condition critery
-     * @param  array $condition condition to filter rows
+     * @param array $condition condition to filter rows
      * @return integer Quantity of rows
      */
     public static function count($condition = [])

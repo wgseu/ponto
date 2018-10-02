@@ -24,10 +24,12 @@
  */
 namespace MZ\Location;
 
-use MZ\Database\SyncModel;
-use MZ\Database\DB;
+use MZ\Util\Mask;
 use MZ\Util\Filter;
 use MZ\Util\Validator;
+use MZ\Database\DB;
+use MZ\Database\SyncModel;
+use MZ\Exception\ValidationException;
 
 /**
  * Informações de um páis com sua moeda e língua nativa
@@ -64,6 +66,10 @@ class Pais extends SyncModel
      */
     private $linguagem_id;
     /**
+     * Prefixo de telefone para ligações internacionais
+     */
+    private $prefixo;
+    /**
      * Frases, nomes de campos e máscaras específicas do país
      */
     private $entradas;
@@ -83,7 +89,7 @@ class Pais extends SyncModel
 
     /**
      * Identificador do país
-     * @return mixed ID of Pais
+     * @return int id of País
      */
     public function getID()
     {
@@ -92,8 +98,8 @@ class Pais extends SyncModel
 
     /**
      * Set ID value to new on param
-     * @param  mixed $id new value for ID
-     * @return Pais Self instance
+     * @param int $id Set id for País
+     * @return self Self instance
      */
     public function setID($id)
     {
@@ -103,7 +109,7 @@ class Pais extends SyncModel
 
     /**
      * Nome do país
-     * @return mixed Nome of Pais
+     * @return string nome of País
      */
     public function getNome()
     {
@@ -112,8 +118,8 @@ class Pais extends SyncModel
 
     /**
      * Set Nome value to new on param
-     * @param  mixed $nome new value for Nome
-     * @return Pais Self instance
+     * @param string $nome Set nome for País
+     * @return self Self instance
      */
     public function setNome($nome)
     {
@@ -123,7 +129,7 @@ class Pais extends SyncModel
 
     /**
      * Abreviação do nome do país
-     * @return mixed Sigla of Pais
+     * @return string sigla of País
      */
     public function getSigla()
     {
@@ -132,8 +138,8 @@ class Pais extends SyncModel
 
     /**
      * Set Sigla value to new on param
-     * @param  mixed $sigla new value for Sigla
-     * @return Pais Self instance
+     * @param string $sigla Set sigla for País
+     * @return self Self instance
      */
     public function setSigla($sigla)
     {
@@ -143,7 +149,7 @@ class Pais extends SyncModel
 
     /**
      * Código do país com 2 letras
-     * @return mixed Código of Pais
+     * @return string código of País
      */
     public function getCodigo()
     {
@@ -152,8 +158,8 @@ class Pais extends SyncModel
 
     /**
      * Set Codigo value to new on param
-     * @param  mixed $codigo new value for Codigo
-     * @return Pais Self instance
+     * @param string $codigo Set código for País
+     * @return self Self instance
      */
     public function setCodigo($codigo)
     {
@@ -163,7 +169,7 @@ class Pais extends SyncModel
 
     /**
      * Informa a moeda principal do país
-     * @return mixed Moeda of Pais
+     * @return int moeda of País
      */
     public function getMoedaID()
     {
@@ -172,8 +178,8 @@ class Pais extends SyncModel
 
     /**
      * Set MoedaID value to new on param
-     * @param  mixed $moeda_id new value for MoedaID
-     * @return Pais Self instance
+     * @param int $moeda_id Set moeda for País
+     * @return self Self instance
      */
     public function setMoedaID($moeda_id)
     {
@@ -183,7 +189,7 @@ class Pais extends SyncModel
 
     /**
      * Index da imagem da bandeira do país
-     * @return mixed Bandeira of Pais
+     * @return int bandeira of País
      */
     public function getBandeiraIndex()
     {
@@ -192,8 +198,8 @@ class Pais extends SyncModel
 
     /**
      * Set BandeiraIndex value to new on param
-     * @param  mixed $bandeira_index new value for BandeiraIndex
-     * @return Pais Self instance
+     * @param int $bandeira_index Set bandeira for País
+     * @return self Self instance
      */
     public function setBandeiraIndex($bandeira_index)
     {
@@ -203,7 +209,7 @@ class Pais extends SyncModel
 
     /**
      * Linguagem nativa do país
-     * @return mixed Linguagem ID of Pais
+     * @return int linguagem id of País
      */
     public function getLinguagemID()
     {
@@ -212,8 +218,8 @@ class Pais extends SyncModel
 
     /**
      * Set LinguagemID value to new on param
-     * @param  mixed $linguagem_id new value for LinguagemID
-     * @return Pais Self instance
+     * @param int $linguagem_id Set linguagem id for País
+     * @return self Self instance
      */
     public function setLinguagemID($linguagem_id)
     {
@@ -222,8 +228,28 @@ class Pais extends SyncModel
     }
 
     /**
+     * Prefixo de telefone para ligações internacionais
+     * @return string prefixo of País
+     */
+    public function getPrefixo()
+    {
+        return $this->prefixo;
+    }
+
+    /**
+     * Set Prefixo value to new on param
+     * @param string $prefixo Set prefixo for País
+     * @return self Self instance
+     */
+    public function setPrefixo($prefixo)
+    {
+        $this->prefixo = $prefixo;
+        return $this;
+    }
+
+    /**
      * Frases, nomes de campos e máscaras específicas do país
-     * @return mixed Entrada of Pais
+     * @return string entrada of País
      */
     public function getEntradas()
     {
@@ -232,8 +258,8 @@ class Pais extends SyncModel
 
     /**
      * Set Entradas value to new on param
-     * @param  mixed $entradas new value for Entradas
-     * @return Pais Self instance
+     * @param string $entradas Set entrada for País
+     * @return self Self instance
      */
     public function setEntradas($entradas)
     {
@@ -243,7 +269,7 @@ class Pais extends SyncModel
 
     /**
      * Informa se o país tem apenas um estado federativo
-     * @return mixed Unitário of Pais
+     * @return string unitário of País
      */
     public function getUnitario()
     {
@@ -261,8 +287,8 @@ class Pais extends SyncModel
 
     /**
      * Set Unitario value to new on param
-     * @param  mixed $unitario new value for Unitario
-     * @return Pais Self instance
+     * @param string $unitario Set unitário for País
+     * @return self Self instance
      */
     public function setUnitario($unitario)
     {
@@ -272,7 +298,7 @@ class Pais extends SyncModel
 
     /**
      * Convert this instance to array associated key -> value
-     * @param  boolean $recursive Allow rescursive conversion of fields
+     * @param boolean $recursive Allow rescursive conversion of fields
      * @return array All field and values into array format
      */
     public function toArray($recursive = false)
@@ -285,6 +311,7 @@ class Pais extends SyncModel
         $pais['moedaid'] = $this->getMoedaID();
         $pais['bandeiraindex'] = $this->getBandeiraIndex();
         $pais['linguagemid'] = $this->getLinguagemID();
+        $pais['prefixo'] = $this->getPrefixo();
         $pais['entradas'] = $this->getEntradas();
         $pais['unitario'] = $this->getUnitario();
         return $pais;
@@ -292,12 +319,12 @@ class Pais extends SyncModel
 
     /**
      * Fill this instance with from array values, you can pass instance to
-     * @param  mixed $pais Associated key -> value to assign into this instance
-     * @return Pais Self instance
+     * @param mixed $pais Associated key -> value to assign into this instance
+     * @return self Self instance
      */
     public function fromArray($pais = [])
     {
-        if ($pais instanceof Pais) {
+        if ($pais instanceof self) {
             $pais = $pais->toArray();
         } elseif (!is_array($pais)) {
             $pais = [];
@@ -338,6 +365,11 @@ class Pais extends SyncModel
         } else {
             $this->setLinguagemID($pais['linguagemid']);
         }
+        if (!array_key_exists('prefixo', $pais)) {
+            $this->setPrefixo(null);
+        } else {
+            $this->setPrefixo($pais['prefixo']);
+        }
         if (!array_key_exists('entradas', $pais)) {
             $this->setEntradas(null);
         } else {
@@ -363,7 +395,9 @@ class Pais extends SyncModel
 
     /**
      * Filter fields, upload data and keep key data
-     * @param Pais $original Original instance without modifications
+     * @param self $original Original instance without modifications
+     * @param boolean $localized Informs if fields are localized
+     * @return self Self instance
      */
     public function filter($original, $localized = false)
     {
@@ -374,12 +408,14 @@ class Pais extends SyncModel
         $this->setMoedaID(Filter::number($this->getMoedaID()));
         $this->setBandeiraIndex(Filter::number($this->getBandeiraIndex()));
         $this->setLinguagemID(Filter::number($this->getLinguagemID()));
+        $this->setPrefixo(Filter::string($this->getPrefixo()));
         $this->setEntradas(Filter::text($this->getEntradas()));
+        return $this;
     }
 
     /**
      * Clean instance resources like images and docs
-     * @param  Pais $dependency Don't clean when dependency use same resources
+     * @param self $dependency Don't clean when dependency use same resources
      */
     public function clean($dependency)
     {
@@ -388,68 +424,69 @@ class Pais extends SyncModel
     /**
      * Validate fields updating them and throw exception when invalid data has found
      * @return array All field of Pais in array format
+     * @throws \MZ\Exception\ValidationException for invalid input data
      */
     public function validate()
     {
         $errors = [];
         if (is_null($this->getNome())) {
-            $errors['nome'] = 'O nome não pode ser vazio';
+            $errors['nome'] = _t('pais.nome_cannot_empty');
         }
         if (is_null($this->getSigla())) {
-            $errors['sigla'] = 'A sigla não pode ser vazia';
+            $errors['sigla'] = _t('pais.sigla_cannot_empty');
         }
         if (is_null($this->getCodigo())) {
-            $errors['codigo'] = 'O código não pode ser vazio';
+            $errors['codigo'] = _t('pais.codigo_cannot_empty');
         }
         if (is_null($this->getMoedaID())) {
-            $errors['moedaid'] = 'A moeda não pode ser vazia';
+            $errors['moedaid'] = _t('pais.moeda_id_cannot_empty');
         }
         if (is_null($this->getBandeiraIndex())) {
-            $errors['bandeiraindex'] = 'A bandeira não pode ser vazia';
+            $errors['bandeiraindex'] = _t('pais.bandeira_index_cannot_empty');
         }
         if ($this->getBandeiraIndex() < 0 || $this->getBandeiraIndex() > 237) {
             $errors['bandeiraindex'] = 'A bandeira informada é inválida';
         }
         if (is_null($this->getLinguagemID())) {
-            $errors['linguagemid'] = 'O id da linguagem não pode ser vazio';
+            $errors['linguagemid'] = _t('pais.linguagem_id_cannot_empty');
         }
-        if (is_null($this->getUnitario())) {
-            $this->setUnitario('N');
+        if (!Validator::checkBoolean($this->getUnitario())) {
+            $errors['unitario'] = _t('pais.unitario_invalid');
         }
         if (!empty($errors)) {
-            throw new \MZ\Exception\ValidationException($errors);
+            throw new ValidationException($errors);
         }
         return $this->toArray();
     }
 
     /**
      * Translate SQL exception into application exception
-     * @param  \Exception $e exception to translate into a readable error
+     * @param \Exception $e exception to translate into a readable error
      * @return \MZ\Exception\ValidationException new exception translated
      */
     protected function translate($e)
     {
         if (contains(['Nome', 'UNIQUE'], $e->getMessage())) {
-            return new \MZ\Exception\ValidationException([
-                'nome' => vsprintf(
-                    'O Nome "%s" já está cadastrado',
-                    [$this->getNome()]
+            return new ValidationException([
+                'nome' => _t(
+                    'pais.nome_used',
+                    $this->getNome()
                 ),
             ]);
         }
         if (contains(['Sigla', 'UNIQUE'], $e->getMessage())) {
-            return new \MZ\Exception\ValidationException([
-                'sigla' => vsprintf(
-                    'A Sigla "%s" já está cadastrada',
-                    [$this->getSigla()]
+            return new ValidationException([
+                'sigla' => _t(
+                    'pais.sigla_used',
+                    $this->getSigla()
                 ),
             ]);
         }
         if (contains(['Codigo', 'UNIQUE'], $e->getMessage())) {
-            return new \MZ\Exception\ValidationException([
-                'codigo' => vsprintf(
-                    'O Código "%s" já está cadastrado',
-                    [$this->getCodigo()]
+            return new ValidationException([
+                'codigo' => _t(
+                    'pais.codigo_used',
+                    $this->getCodigo()
                 ),
             ]);
         }
@@ -458,7 +495,8 @@ class Pais extends SyncModel
 
     /**
      * Insert a new País into the database and fill instance from database
-     * @return Pais Self instance
+     * @return self Self instance
+     * @throws \MZ\Exception\ValidationException for invalid input data
      */
     public function insert()
     {
@@ -477,36 +515,42 @@ class Pais extends SyncModel
 
     /**
      * Update País with instance values into database for ID
-     * @param  array $only Save these fields only, when empty save all fields except id
-     * @return Pais Self instance
+     * @param array $only Save these fields only, when empty save all fields except id
+     * @return int rows affected
+     * @throws \MZ\Exception\ValidationException for invalid input data
      */
     public function update($only = [])
     {
         $values = $this->validate();
         if (!$this->exists()) {
-            throw new \Exception('O identificador do país não foi informado');
+            throw new ValidationException(
+                ['id' => _t('pais.id_cannot_empty')]
+            );
         }
         $values = DB::filterValues($values, $only, false);
         try {
-            DB::update('Paises')
+            $affected = DB::update('Paises')
                 ->set($values)
-                ->where('id', $this->getID())
+                ->where(['id' => $this->getID()])
                 ->execute();
             $this->loadByID();
         } catch (\Exception $e) {
             throw $this->translate($e);
         }
-        return $this;
+        return $affected;
     }
 
     /**
      * Delete this instance from database using ID
      * @return integer Number of rows deleted (Max 1)
+     * @throws \MZ\Exception\ValidationException for invalid id
      */
     public function delete()
     {
         if (!$this->exists()) {
-            throw new \Exception('O identificador do país não foi informado');
+            throw new ValidationException(
+                ['id' => _t('pais.id_cannot_empty')]
+            );
         }
         $result = DB::deleteFrom('Paises')
             ->where('id', $this->getID())
@@ -516,9 +560,9 @@ class Pais extends SyncModel
 
     /**
      * Load one register for it self with a condition
-     * @param  array $condition Condition for searching the row
-     * @param  array $order associative field name -> [-1, 1]
-     * @return Pais Self instance filled or empty
+     * @param array $condition Condition for searching the row
+     * @param array $order associative field name -> [-1, 1]
+     * @return self Self instance filled or empty
      */
     public function load($condition, $order = [])
     {
@@ -529,31 +573,29 @@ class Pais extends SyncModel
 
     /**
      * Load into this object from database using, Nome
-     * @param  string $nome nome to find País
-     * @return Pais Self filled instance or empty when not found
+     * @return self Self filled instance or empty when not found
      */
-    public function loadByNome($nome)
+    public function loadByNome()
     {
         return $this->load([
-            'nome' => strval($nome),
+            'nome' => strval($this->getNome()),
         ]);
     }
 
     /**
      * Load into this object from database using, Sigla
-     * @param  string $sigla sigla to find País
-     * @return Pais Self filled instance or empty when not found
+     * @return self Self filled instance or empty when not found
      */
-    public function loadBySigla($sigla)
+    public function loadBySigla()
     {
         return $this->load([
-            'sigla' => strval($sigla),
+            'sigla' => strval($this->getSigla()),
         ]);
     }
 
     /**
-     * Load into this object from database using código
-     * @return Pais Self filled instance or empty when not found
+     * Load into this object from database using, Codigo
+     * @return self Self filled instance or empty when not found
      */
     public function loadByCodigo()
     {
@@ -589,14 +631,14 @@ class Pais extends SyncModel
      */
     private static function getAllowedKeys()
     {
-        $pais = new Pais();
+        $pais = new self();
         $allowed = Filter::concatKeys('p.', $pais->toArray());
         return $allowed;
     }
 
     /**
      * Filter order array
-     * @param  mixed $order order string or array to parse and filter allowed
+     * @param mixed $order order string or array to parse and filter allowed
      * @return array allowed associative order
      */
     private static function filterOrder($order)
@@ -607,7 +649,7 @@ class Pais extends SyncModel
 
     /**
      * Filter condition array with allowed fields
-     * @param  array $condition condition to filter rows
+     * @param array $condition condition to filter rows
      * @return array allowed condition
      */
     private static function filterCondition($condition)
@@ -625,8 +667,8 @@ class Pais extends SyncModel
 
     /**
      * Fetch data from database with a condition
-     * @param  array $condition condition to filter rows
-     * @param  array $order order rows
+     * @param array $condition condition to filter rows
+     * @param array $order order rows
      * @return SelectQuery query object with condition statement
      */
     private static function query($condition = [], $order = [])
@@ -641,43 +683,60 @@ class Pais extends SyncModel
 
     /**
      * Search one register with a condition
-     * @param  array $condition Condition for searching the row
-     * @param  array $order order rows
-     * @return Pais A filled País or empty instance
+     * @param array $condition Condition for searching the row
+     * @param array $order order rows
+     * @return self A filled País or empty instance
      */
     public static function find($condition, $order = [])
     {
-        $query = self::query($condition, $order)->limit(1);
-        $row = $query->fetch() ?: [];
-        return new Pais($row);
+        $result = new self();
+        return $result->load($condition, $order);
+    }
+
+    /**
+     * Search one register with a condition
+     * @param array $condition Condition for searching the row
+     * @param array $order order rows
+     * @return self A filled País or empty instance
+     * @throws \Exception when register has not found
+     */
+    public static function findOrFail($condition, $order = [])
+    {
+        $result = self::find($condition, $order);
+        if (!$result->exists()) {
+            throw new \Exception(_t('pais.not_found'), 404);
+        }
+        return $result;
     }
 
     /**
      * Find this object on database using, Nome
-     * @param  string $nome nome to find País
-     * @return Pais A filled instance or empty when not found
+     * @param string $nome nome to find País
+     * @return self A filled instance or empty when not found
      */
     public static function findByNome($nome)
     {
         $result = new self();
-        return $result->loadByNome($nome);
+        $result->setNome($nome);
+        return $result->loadByNome();
     }
 
     /**
      * Find this object on database using, Sigla
-     * @param  string $sigla sigla to find País
-     * @return Pais A filled instance or empty when not found
+     * @param string $sigla sigla to find País
+     * @return self A filled instance or empty when not found
      */
     public static function findBySigla($sigla)
     {
         $result = new self();
-        return $result->loadBySigla($sigla);
+        $result->setSigla($sigla);
+        return $result->loadBySigla();
     }
 
     /**
      * Find this object on database using, Codigo
-     * @param  string $codigo código to find País
-     * @return Pais A filled instance or empty when not found
+     * @param string $codigo código to find País
+     * @return self A filled instance or empty when not found
      */
     public static function findByCodigo($codigo)
     {
@@ -687,11 +746,12 @@ class Pais extends SyncModel
     }
 
     /**
-     * Fetch all rows from database with matched condition critery
-     * @param  array $condition condition to filter rows
-     * @param  integer $limit number of rows to get, null for all
-     * @param  integer $offset start index to get rows, null for begining
-     * @return array All rows instanced and filled
+     * Find all País
+     * @param array  $condition Condition to get all País
+     * @param array  $order     Order País
+     * @param int    $limit     Limit data into row count
+     * @param int    $offset    Start offset to get rows
+     * @return self[] List of all rows instanced as Pais
      */
     public static function findAll($condition = [], $order = [], $limit = null, $offset = null)
     {
@@ -705,14 +765,14 @@ class Pais extends SyncModel
         $rows = $query->fetchAll();
         $result = [];
         foreach ($rows as $row) {
-            $result[] = new Pais($row);
+            $result[] = new self($row);
         }
         return $result;
     }
 
     /**
      * Count all rows from database with matched condition critery
-     * @param  array $condition condition to filter rows
+     * @param array $condition condition to filter rows
      * @return integer Quantity of rows
      */
     public static function count($condition = [])

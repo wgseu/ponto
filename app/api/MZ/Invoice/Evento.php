@@ -24,10 +24,12 @@
  */
 namespace MZ\Invoice;
 
-use MZ\Database\SyncModel;
-use MZ\Database\DB;
+use MZ\Util\Mask;
 use MZ\Util\Filter;
 use MZ\Util\Validator;
+use MZ\Database\DB;
+use MZ\Database\SyncModel;
+use MZ\Exception\ValidationException;
 
 /**
  * Eventos de envio das notas
@@ -86,7 +88,7 @@ class Evento extends SyncModel
 
     /**
      * Identificador do evento
-     * @return mixed ID of Evento
+     * @return int id of Evento
      */
     public function getID()
     {
@@ -95,8 +97,8 @@ class Evento extends SyncModel
 
     /**
      * Set ID value to new on param
-     * @param  mixed $id new value for ID
-     * @return Evento Self instance
+     * @param int $id Set id for Evento
+     * @return self Self instance
      */
     public function setID($id)
     {
@@ -106,7 +108,7 @@ class Evento extends SyncModel
 
     /**
      * Nota a qual o evento foi criado
-     * @return mixed Nota of Evento
+     * @return int nota of Evento
      */
     public function getNotaID()
     {
@@ -115,8 +117,8 @@ class Evento extends SyncModel
 
     /**
      * Set NotaID value to new on param
-     * @param  mixed $nota_id new value for NotaID
-     * @return Evento Self instance
+     * @param int $nota_id Set nota for Evento
+     * @return self Self instance
      */
     public function setNotaID($nota_id)
     {
@@ -126,7 +128,7 @@ class Evento extends SyncModel
 
     /**
      * Estado do evento
-     * @return mixed Estado of Evento
+     * @return string estado of Evento
      */
     public function getEstado()
     {
@@ -135,8 +137,8 @@ class Evento extends SyncModel
 
     /**
      * Set Estado value to new on param
-     * @param  mixed $estado new value for Estado
-     * @return Evento Self instance
+     * @param string $estado Set estado for Evento
+     * @return self Self instance
      */
     public function setEstado($estado)
     {
@@ -146,7 +148,7 @@ class Evento extends SyncModel
 
     /**
      * Mensagem do evento, descreve que aconteceu
-     * @return mixed Mensagem of Evento
+     * @return string mensagem of Evento
      */
     public function getMensagem()
     {
@@ -155,8 +157,8 @@ class Evento extends SyncModel
 
     /**
      * Set Mensagem value to new on param
-     * @param  mixed $mensagem new value for Mensagem
-     * @return Evento Self instance
+     * @param string $mensagem Set mensagem for Evento
+     * @return self Self instance
      */
     public function setMensagem($mensagem)
     {
@@ -166,7 +168,7 @@ class Evento extends SyncModel
 
     /**
      * Código de status do evento, geralmente código de erro de uma exceção
-     * @return mixed Código of Evento
+     * @return string código of Evento
      */
     public function getCodigo()
     {
@@ -175,8 +177,8 @@ class Evento extends SyncModel
 
     /**
      * Set Codigo value to new on param
-     * @param  mixed $codigo new value for Codigo
-     * @return Evento Self instance
+     * @param string $codigo Set código for Evento
+     * @return self Self instance
      */
     public function setCodigo($codigo)
     {
@@ -186,7 +188,7 @@ class Evento extends SyncModel
 
     /**
      * Data de criação do evento
-     * @return mixed Data de criação of Evento
+     * @return string data de criação of Evento
      */
     public function getDataCriacao()
     {
@@ -195,8 +197,8 @@ class Evento extends SyncModel
 
     /**
      * Set DataCriacao value to new on param
-     * @param  mixed $data_criacao new value for DataCriacao
-     * @return Evento Self instance
+     * @param string $data_criacao Set data de criação for Evento
+     * @return self Self instance
      */
     public function setDataCriacao($data_criacao)
     {
@@ -206,7 +208,7 @@ class Evento extends SyncModel
 
     /**
      * Convert this instance to array associated key -> value
-     * @param  boolean $recursive Allow rescursive conversion of fields
+     * @param boolean $recursive Allow rescursive conversion of fields
      * @return array All field and values into array format
      */
     public function toArray($recursive = false)
@@ -223,12 +225,12 @@ class Evento extends SyncModel
 
     /**
      * Fill this instance with from array values, you can pass instance to
-     * @param  mixed $evento Associated key -> value to assign into this instance
-     * @return Evento Self instance
+     * @param mixed $evento Associated key -> value to assign into this instance
+     * @return self Self instance
      */
     public function fromArray($evento = [])
     {
-        if ($evento instanceof Evento) {
+        if ($evento instanceof self) {
             $evento = $evento->toArray();
         } elseif (!is_array($evento)) {
             $evento = [];
@@ -279,7 +281,9 @@ class Evento extends SyncModel
 
     /**
      * Filter fields, upload data and keep key data
-     * @param Evento $original Original instance without modifications
+     * @param self $original Original instance without modifications
+     * @param boolean $localized Informs if fields are localized
+     * @return self Self instance
      */
     public function filter($original, $localized = false)
     {
@@ -288,11 +292,12 @@ class Evento extends SyncModel
         $this->setMensagem(Filter::text($this->getMensagem()));
         $this->setCodigo(Filter::string($this->getCodigo()));
         $this->setDataCriacao(Filter::datetime($this->getDataCriacao()));
+        return $this;
     }
 
     /**
      * Clean instance resources like images and docs
-     * @param  Evento $dependency Don't clean when dependency use same resources
+     * @param self $dependency Don't clean when dependency use same resources
      */
     public function clean($dependency)
     {
@@ -301,47 +306,34 @@ class Evento extends SyncModel
     /**
      * Validate fields updating them and throw exception when invalid data has found
      * @return array All field of Evento in array format
+     * @throws \MZ\Exception\ValidationException for invalid input data
      */
     public function validate()
     {
         $errors = [];
         if (is_null($this->getNotaID())) {
-            $errors['notaid'] = 'A nota não pode ser vazia';
+            $errors['notaid'] = _t('evento.nota_id_cannot_empty');
         }
-        if (is_null($this->getEstado())) {
-            $errors['estado'] = 'O estado não pode ser vazio';
-        }
-        if (!Validator::checkInSet($this->getEstado(), self::getEstadoOptions(), true)) {
-            $errors['estado'] = 'O estado é inválido';
+        if (!Validator::checkInSet($this->getEstado(), self::getEstadoOptions())) {
+            $errors['estado'] = _t('evento.estado_invalid');
         }
         if (is_null($this->getMensagem())) {
-            $errors['mensagem'] = 'A mensagem não pode ser vazia';
+            $errors['mensagem'] = _t('evento.mensagem_cannot_empty');
         }
         if (is_null($this->getCodigo())) {
-            $errors['codigo'] = 'O código não pode ser vazio';
+            $errors['codigo'] = _t('evento.codigo_cannot_empty');
         }
-        if (is_null($this->getDataCriacao())) {
-            $errors['datacriacao'] = 'A data de criação não pode ser vazia';
-        }
+        $this->setDataCriacao(DB::now());
         if (!empty($errors)) {
-            throw new \MZ\Exception\ValidationException($errors);
+            throw new ValidationException($errors);
         }
         return $this->toArray();
     }
 
     /**
-     * Translate SQL exception into application exception
-     * @param  \Exception $e exception to translate into a readable error
-     * @return \MZ\Exception\ValidationException new exception translated
-     */
-    protected function translate($e)
-    {
-        return parent::translate($e);
-    }
-
-    /**
      * Insert a new Evento into the database and fill instance from database
-     * @return Evento Self instance
+     * @return self Self instance
+     * @throws \MZ\Exception\ValidationException for invalid input data
      */
     public function insert()
     {
@@ -360,36 +352,43 @@ class Evento extends SyncModel
 
     /**
      * Update Evento with instance values into database for ID
-     * @param  array $only Save these fields only, when empty save all fields except id
-     * @return Evento Self instance
+     * @param array $only Save these fields only, when empty save all fields except id
+     * @return int rows affected
+     * @throws \MZ\Exception\ValidationException for invalid input data
      */
     public function update($only = [])
     {
         $values = $this->validate();
         if (!$this->exists()) {
-            throw new \Exception('O identificador do evento não foi informado');
+            throw new ValidationException(
+                ['id' => _t('evento.id_cannot_empty')]
+            );
         }
         $values = DB::filterValues($values, $only, false);
+        unset($values['datacriacao']);
         try {
-            DB::update('Eventos')
+            $affected = DB::update('Eventos')
                 ->set($values)
-                ->where('id', $this->getID())
+                ->where(['id' => $this->getID()])
                 ->execute();
             $this->loadByID();
         } catch (\Exception $e) {
             throw $this->translate($e);
         }
-        return $this;
+        return $affected;
     }
 
     /**
      * Delete this instance from database using ID
      * @return integer Number of rows deleted (Max 1)
+     * @throws \MZ\Exception\ValidationException for invalid id
      */
     public function delete()
     {
         if (!$this->exists()) {
-            throw new \Exception('O identificador do evento não foi informado');
+            throw new ValidationException(
+                ['id' => _t('evento.id_cannot_empty')]
+            );
         }
         $result = DB::deleteFrom('Eventos')
             ->where('id', $this->getID())
@@ -399,9 +398,9 @@ class Evento extends SyncModel
 
     /**
      * Load one register for it self with a condition
-     * @param  array $condition Condition for searching the row
-     * @param  array $order associative field name -> [-1, 1]
-     * @return Evento Self instance filled or empty
+     * @param array $condition Condition for searching the row
+     * @param array $order associative field name -> [-1, 1]
+     * @return self Self instance filled or empty
      */
     public function load($condition, $order = [])
     {
@@ -434,23 +433,23 @@ class Evento extends SyncModel
 
     /**
      * Gets textual and translated Estado for Evento
-     * @param  int $index choose option from index
-     * @return mixed A associative key -> translated representative text or text for index
+     * @param int $index choose option from index
+     * @return string[] A associative key -> translated representative text or text for index
      */
     public static function getEstadoOptions($index = null)
     {
         $options = [
-            self::ESTADO_ABERTO => 'Aberto',
-            self::ESTADO_ASSINADO => 'Assinado',
-            self::ESTADO_VALIDADO => 'Pendente',
-            self::ESTADO_PENDENTE => 'Em processamento',
-            self::ESTADO_PROCESSAMENTO => 'Denegado',
-            self::ESTADO_DENEGADO => 'Cancelado',
-            self::ESTADO_CANCELADO => 'Rejeitado',
-            self::ESTADO_REJEITADO => 'Contingência',
-            self::ESTADO_CONTINGENCIA => 'Inutilizado',
-            self::ESTADO_INUTILIZADO => 'Autorizado',
-            self::ESTADO_AUTORIZADO => 'Autorizado',
+            self::ESTADO_ABERTO => _t('evento.estado_aberto'),
+            self::ESTADO_ASSINADO => _t('evento.estado_assinado'),
+            self::ESTADO_VALIDADO => _t('evento.estado_validado'),
+            self::ESTADO_PENDENTE => _t('evento.estado_pendente'),
+            self::ESTADO_PROCESSAMENTO => _t('evento.estado_processamento'),
+            self::ESTADO_DENEGADO => _t('evento.estado_denegado'),
+            self::ESTADO_CANCELADO => _t('evento.estado_cancelado'),
+            self::ESTADO_REJEITADO => _t('evento.estado_rejeitado'),
+            self::ESTADO_CONTINGENCIA => _t('evento.estado_contingencia'),
+            self::ESTADO_INUTILIZADO => _t('evento.estado_inutilizado'),
+            self::ESTADO_AUTORIZADO => _t('evento.estado_autorizado'),
         ];
         if (!is_null($index)) {
             return $options[$index];
@@ -464,14 +463,14 @@ class Evento extends SyncModel
      */
     private static function getAllowedKeys()
     {
-        $evento = new Evento();
+        $evento = new self();
         $allowed = Filter::concatKeys('e.', $evento->toArray());
         return $allowed;
     }
 
     /**
      * Filter order array
-     * @param  mixed $order order string or array to parse and filter allowed
+     * @param mixed $order order string or array to parse and filter allowed
      * @return array allowed associative order
      */
     private static function filterOrder($order)
@@ -482,7 +481,7 @@ class Evento extends SyncModel
 
     /**
      * Filter condition array with allowed fields
-     * @param  array $condition condition to filter rows
+     * @param array $condition condition to filter rows
      * @return array allowed condition
      */
     private static function filterCondition($condition)
@@ -493,8 +492,8 @@ class Evento extends SyncModel
 
     /**
      * Fetch data from database with a condition
-     * @param  array $condition condition to filter rows
-     * @param  array $order order rows
+     * @param array $condition condition to filter rows
+     * @param array $order order rows
      * @return SelectQuery query object with condition statement
      */
     private static function query($condition = [], $order = [])
@@ -508,24 +507,39 @@ class Evento extends SyncModel
 
     /**
      * Search one register with a condition
-     * @param  array $condition Condition for searching the row
-     * @param  array $order order rows
-     * @return Evento A filled Evento or empty instance
+     * @param array $condition Condition for searching the row
+     * @param array $order order rows
+     * @return self A filled Evento or empty instance
      */
     public static function find($condition, $order = [])
     {
-        $query = self::query($condition, $order)->limit(1);
-        $row = $query->fetch() ?: [];
-        return new Evento($row);
+        $result = new self();
+        return $result->load($condition, $order);
+    }
+
+    /**
+     * Search one register with a condition
+     * @param array $condition Condition for searching the row
+     * @param array $order order rows
+     * @return self A filled Evento or empty instance
+     * @throws \Exception when register has not found
+     */
+    public static function findOrFail($condition, $order = [])
+    {
+        $result = self::find($condition, $order);
+        if (!$result->exists()) {
+            throw new \Exception(_t('evento.not_found'), 404);
+        }
+        return $result;
     }
 
     /**
      * Find all Evento
-     * @param  array  $condition Condition to get all Evento
-     * @param  array  $order     Order Evento
-     * @param  int    $limit     Limit data into row count
-     * @param  int    $offset    Start offset to get rows
-     * @return array             List of all rows instanced as Evento
+     * @param array  $condition Condition to get all Evento
+     * @param array  $order     Order Evento
+     * @param int    $limit     Limit data into row count
+     * @param int    $offset    Start offset to get rows
+     * @return self[] List of all rows instanced as Evento
      */
     public static function findAll($condition = [], $order = [], $limit = null, $offset = null)
     {
@@ -539,14 +553,14 @@ class Evento extends SyncModel
         $rows = $query->fetchAll();
         $result = [];
         foreach ($rows as $row) {
-            $result[] = new Evento($row);
+            $result[] = new self($row);
         }
         return $result;
     }
 
     /**
      * Count all rows from database with matched condition critery
-     * @param  array $condition condition to filter rows
+     * @param array $condition condition to filter rows
      * @return integer Quantity of rows
      */
     public static function count($condition = [])

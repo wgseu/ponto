@@ -24,10 +24,12 @@
  */
 namespace MZ\Invoice;
 
-use MZ\Database\SyncModel;
-use MZ\Database\DB;
+use MZ\Util\Mask;
 use MZ\Util\Filter;
 use MZ\Util\Validator;
+use MZ\Database\DB;
+use MZ\Database\SyncModel;
+use MZ\Exception\ValidationException;
 
 /**
  * Dados do emitente das notas fiscais
@@ -93,7 +95,7 @@ class Emitente extends SyncModel
 
     /**
      * Identificador do emitente, sempre 1
-     * @return mixed ID of Emitente
+     * @return string id of Emitente
      */
     public function getID()
     {
@@ -102,8 +104,8 @@ class Emitente extends SyncModel
 
     /**
      * Set ID value to new on param
-     * @param  mixed $id new value for ID
-     * @return Emitente Self instance
+     * @param string $id Set id for Emitente
+     * @return self Self instance
      */
     public function setID($id)
     {
@@ -113,7 +115,7 @@ class Emitente extends SyncModel
 
     /**
      * Contador responsável pela contabilidade da empresa
-     * @return mixed Contador of Emitente
+     * @return int contador of Emitente
      */
     public function getContadorID()
     {
@@ -122,8 +124,8 @@ class Emitente extends SyncModel
 
     /**
      * Set ContadorID value to new on param
-     * @param  mixed $contador_id new value for ContadorID
-     * @return Emitente Self instance
+     * @param int $contador_id Set contador for Emitente
+     * @return self Self instance
      */
     public function setContadorID($contador_id)
     {
@@ -133,7 +135,7 @@ class Emitente extends SyncModel
 
     /**
      * Regime tributário da empresa
-     * @return mixed Regime tributário of Emitente
+     * @return int regime tributário of Emitente
      */
     public function getRegimeID()
     {
@@ -142,8 +144,8 @@ class Emitente extends SyncModel
 
     /**
      * Set RegimeID value to new on param
-     * @param  mixed $regime_id new value for RegimeID
-     * @return Emitente Self instance
+     * @param int $regime_id Set regime tributário for Emitente
+     * @return self Self instance
      */
     public function setRegimeID($regime_id)
     {
@@ -153,7 +155,7 @@ class Emitente extends SyncModel
 
     /**
      * Ambiente de emissão das notas
-     * @return mixed Ambiente of Emitente
+     * @return string ambiente of Emitente
      */
     public function getAmbiente()
     {
@@ -162,8 +164,8 @@ class Emitente extends SyncModel
 
     /**
      * Set Ambiente value to new on param
-     * @param  mixed $ambiente new value for Ambiente
-     * @return Emitente Self instance
+     * @param string $ambiente Set ambiente for Emitente
+     * @return self Self instance
      */
     public function setAmbiente($ambiente)
     {
@@ -173,7 +175,7 @@ class Emitente extends SyncModel
 
     /**
      * Código de segurança do contribuinte
-     * @return mixed CSC of Emitente
+     * @return string csc of Emitente
      */
     public function getCSC()
     {
@@ -182,8 +184,8 @@ class Emitente extends SyncModel
 
     /**
      * Set CSC value to new on param
-     * @param  mixed $csc new value for CSC
-     * @return Emitente Self instance
+     * @param string $csc Set csc for Emitente
+     * @return self Self instance
      */
     public function setCSC($csc)
     {
@@ -193,7 +195,7 @@ class Emitente extends SyncModel
 
     /**
      * Token do código de segurança do contribuinte
-     * @return mixed Token of Emitente
+     * @return string token of Emitente
      */
     public function getToken()
     {
@@ -202,8 +204,8 @@ class Emitente extends SyncModel
 
     /**
      * Set Token value to new on param
-     * @param  mixed $token new value for Token
-     * @return Emitente Self instance
+     * @param string $token Set token for Emitente
+     * @return self Self instance
      */
     public function setToken($token)
     {
@@ -213,7 +215,7 @@ class Emitente extends SyncModel
 
     /**
      * Token da API do IBPT
-     * @return mixed Token IBPT of Emitente
+     * @return string token ibpt of Emitente
      */
     public function getIBPT()
     {
@@ -222,8 +224,8 @@ class Emitente extends SyncModel
 
     /**
      * Set IBPT value to new on param
-     * @param  mixed $ibpt new value for IBPT
-     * @return Emitente Self instance
+     * @param string $ibpt Set token ibpt for Emitente
+     * @return self Self instance
      */
     public function setIBPT($ibpt)
     {
@@ -233,7 +235,7 @@ class Emitente extends SyncModel
 
     /**
      * Nome do arquivo da chave privada
-     * @return mixed Chave privada of Emitente
+     * @return string chave privada of Emitente
      */
     public function getChavePrivada()
     {
@@ -242,8 +244,8 @@ class Emitente extends SyncModel
 
     /**
      * Set ChavePrivada value to new on param
-     * @param  mixed $chave_privada new value for ChavePrivada
-     * @return Emitente Self instance
+     * @param string $chave_privada Set chave privada for Emitente
+     * @return self Self instance
      */
     public function setChavePrivada($chave_privada)
     {
@@ -253,7 +255,7 @@ class Emitente extends SyncModel
 
     /**
      * Nome do arquivo da chave pública
-     * @return mixed Chave pública of Emitente
+     * @return string chave pública of Emitente
      */
     public function getChavePublica()
     {
@@ -262,8 +264,8 @@ class Emitente extends SyncModel
 
     /**
      * Set ChavePublica value to new on param
-     * @param  mixed $chave_publica new value for ChavePublica
-     * @return Emitente Self instance
+     * @param string $chave_publica Set chave pública for Emitente
+     * @return self Self instance
      */
     public function setChavePublica($chave_publica)
     {
@@ -273,7 +275,7 @@ class Emitente extends SyncModel
 
     /**
      * Data de expiração do certificado
-     * @return mixed Data de expiração of Emitente
+     * @return string data de expiração of Emitente
      */
     public function getDataExpiracao()
     {
@@ -282,8 +284,8 @@ class Emitente extends SyncModel
 
     /**
      * Set DataExpiracao value to new on param
-     * @param  mixed $data_expiracao new value for DataExpiracao
-     * @return Emitente Self instance
+     * @param string $data_expiracao Set data de expiração for Emitente
+     * @return self Self instance
      */
     public function setDataExpiracao($data_expiracao)
     {
@@ -293,7 +295,7 @@ class Emitente extends SyncModel
 
     /**
      * Convert this instance to array associated key -> value
-     * @param  boolean $recursive Allow rescursive conversion of fields
+     * @param boolean $recursive Allow rescursive conversion of fields
      * @return array All field and values into array format
      */
     public function toArray($recursive = false)
@@ -314,12 +316,12 @@ class Emitente extends SyncModel
 
     /**
      * Fill this instance with from array values, you can pass instance to
-     * @param  mixed $emitente Associated key -> value to assign into this instance
-     * @return Emitente Self instance
+     * @param mixed $emitente Associated key -> value to assign into this instance
+     * @return self Self instance
      */
     public function fromArray($emitente = [])
     {
-        if ($emitente instanceof Emitente) {
+        if ($emitente instanceof self) {
             $emitente = $emitente->toArray();
         } elseif (!is_array($emitente)) {
             $emitente = [];
@@ -390,7 +392,9 @@ class Emitente extends SyncModel
 
     /**
      * Filter fields, upload data and keep key data
-     * @param Emitente $original Original instance without modifications
+     * @param self $original Original instance without modifications
+     * @param boolean $localized Informs if fields are localized
+     * @return self Self instance
      */
     public function filter($original, $localized = false)
     {
@@ -403,11 +407,12 @@ class Emitente extends SyncModel
         $this->setChavePrivada(Filter::string($this->getChavePrivada()));
         $this->setChavePublica(Filter::string($this->getChavePublica()));
         $this->setDataExpiracao(Filter::datetime($this->getDataExpiracao()));
+        return $this;
     }
 
     /**
      * Clean instance resources like images and docs
-     * @param  Emitente $dependency Don't clean when dependency use same resources
+     * @param self $dependency Don't clean when dependency use same resources
      */
     public function clean($dependency)
     {
@@ -416,53 +421,42 @@ class Emitente extends SyncModel
     /**
      * Validate fields updating them and throw exception when invalid data has found
      * @return array All field of Emitente in array format
+     * @throws \MZ\Exception\ValidationException for invalid input data
      */
     public function validate()
     {
         $errors = [];
         if (is_null($this->getRegimeID())) {
-            $errors['regimeid'] = 'O regime tributário não pode ser vazio';
+            $errors['regimeid'] = _t('emitente.regime_id_cannot_empty');
         }
-        if (is_null($this->getAmbiente())) {
-            $errors['ambiente'] = 'O ambiente não pode ser vazio';
-        }
-        if (!Validator::checkInSet($this->getAmbiente(), self::getAmbienteOptions(), true)) {
-            $errors['ambiente'] = 'O ambiente é inválido';
+        if (!Validator::checkInSet($this->getAmbiente(), self::getAmbienteOptions())) {
+            $errors['ambiente'] = _t('emitente.ambiente_invalid');
         }
         if (is_null($this->getCSC())) {
-            $errors['csc'] = 'O csc não pode ser vazio';
+            $errors['csc'] = _t('emitente.csc_cannot_empty');
         }
         if (is_null($this->getToken())) {
-            $errors['token'] = 'O token não pode ser vazio';
+            $errors['token'] = _t('emitente.token_cannot_empty');
         }
         if (is_null($this->getChavePrivada())) {
-            $errors['chaveprivada'] = 'A chave privada não pode ser vazia';
+            $errors['chaveprivada'] = _t('emitente.chave_privada_cannot_empty');
         }
         if (is_null($this->getChavePublica())) {
-            $errors['chavepublica'] = 'A chave pública não pode ser vazia';
+            $errors['chavepublica'] = _t('emitente.chave_publica_cannot_empty');
         }
         if (is_null($this->getDataExpiracao())) {
-            $errors['dataexpiracao'] = 'A data de expiração não pode ser vazia';
+            $errors['dataexpiracao'] = _t('emitente.data_expiracao_cannot_empty');
         }
         if (!empty($errors)) {
-            throw new \MZ\Exception\ValidationException($errors);
+            throw new ValidationException($errors);
         }
         return $this->toArray();
     }
 
     /**
-     * Translate SQL exception into application exception
-     * @param  \Exception $e exception to translate into a readable error
-     * @return \MZ\Exception\ValidationException new exception translated
-     */
-    protected function translate($e)
-    {
-        return parent::translate($e);
-    }
-
-    /**
      * Insert a new Emitente into the database and fill instance from database
-     * @return Emitente Self instance
+     * @return self Self instance
+     * @throws \MZ\Exception\ValidationException for invalid input data
      */
     public function insert()
     {
@@ -481,36 +475,42 @@ class Emitente extends SyncModel
 
     /**
      * Update Emitente with instance values into database for ID
-     * @param  array $only Save these fields only, when empty save all fields except id
-     * @return Emitente Self instance
+     * @param array $only Save these fields only, when empty save all fields except id
+     * @return int rows affected
+     * @throws \MZ\Exception\ValidationException for invalid input data
      */
     public function update($only = [])
     {
         $values = $this->validate();
         if (!$this->exists()) {
-            throw new \Exception('O identificador do emitente não foi informado');
+            throw new ValidationException(
+                ['id' => _t('emitente.id_cannot_empty')]
+            );
         }
         $values = DB::filterValues($values, $only, false);
         try {
-            DB::update('Emitentes')
+            $affected = DB::update('Emitentes')
                 ->set($values)
-                ->where('id', $this->getID())
+                ->where(['id' => $this->getID()])
                 ->execute();
             $this->loadByID();
         } catch (\Exception $e) {
             throw $this->translate($e);
         }
-        return $this;
+        return $affected;
     }
 
     /**
      * Delete this instance from database using ID
      * @return integer Number of rows deleted (Max 1)
+     * @throws \MZ\Exception\ValidationException for invalid id
      */
     public function delete()
     {
         if (!$this->exists()) {
-            throw new \Exception('O identificador do emitente não foi informado');
+            throw new ValidationException(
+                ['id' => _t('emitente.id_cannot_empty')]
+            );
         }
         $result = DB::deleteFrom('Emitentes')
             ->where('id', $this->getID())
@@ -520,9 +520,9 @@ class Emitente extends SyncModel
 
     /**
      * Load one register for it self with a condition
-     * @param  array $condition Condition for searching the row
-     * @param  array $order associative field name -> [-1, 1]
-     * @return Emitente Self instance filled or empty
+     * @param array $condition Condition for searching the row
+     * @param array $order associative field name -> [-1, 1]
+     * @return self Self instance filled or empty
      */
     public function load($condition, $order = [])
     {
@@ -554,14 +554,14 @@ class Emitente extends SyncModel
 
     /**
      * Gets textual and translated Ambiente for Emitente
-     * @param  int $index choose option from index
-     * @return mixed A associative key -> translated representative text or text for index
+     * @param int $index choose option from index
+     * @return string[] A associative key -> translated representative text or text for index
      */
     public static function getAmbienteOptions($index = null)
     {
         $options = [
-            self::AMBIENTE_HOMOLOGACAO => 'Homologação',
-            self::AMBIENTE_PRODUCAO => 'Produção',
+            self::AMBIENTE_HOMOLOGACAO => _t('emitente.ambiente_homologacao'),
+            self::AMBIENTE_PRODUCAO => _t('emitente.ambiente_producao'),
         ];
         if (!is_null($index)) {
             return $options[$index];
@@ -575,14 +575,14 @@ class Emitente extends SyncModel
      */
     private static function getAllowedKeys()
     {
-        $emitente = new Emitente();
+        $emitente = new self();
         $allowed = Filter::concatKeys('e.', $emitente->toArray());
         return $allowed;
     }
 
     /**
      * Filter order array
-     * @param  mixed $order order string or array to parse and filter allowed
+     * @param mixed $order order string or array to parse and filter allowed
      * @return array allowed associative order
      */
     private static function filterOrder($order)
@@ -593,7 +593,7 @@ class Emitente extends SyncModel
 
     /**
      * Filter condition array with allowed fields
-     * @param  array $condition condition to filter rows
+     * @param array $condition condition to filter rows
      * @return array allowed condition
      */
     private static function filterCondition($condition)
@@ -604,8 +604,8 @@ class Emitente extends SyncModel
 
     /**
      * Fetch data from database with a condition
-     * @param  array $condition condition to filter rows
-     * @param  array $order order rows
+     * @param array $condition condition to filter rows
+     * @param array $order order rows
      * @return SelectQuery query object with condition statement
      */
     private static function query($condition = [], $order = [])
@@ -619,24 +619,39 @@ class Emitente extends SyncModel
 
     /**
      * Search one register with a condition
-     * @param  array $condition Condition for searching the row
-     * @param  array $order order rows
-     * @return Emitente A filled Emitente or empty instance
+     * @param array $condition Condition for searching the row
+     * @param array $order order rows
+     * @return self A filled Emitente or empty instance
      */
     public static function find($condition, $order = [])
     {
-        $query = self::query($condition, $order)->limit(1);
-        $row = $query->fetch() ?: [];
-        return new Emitente($row);
+        $result = new self();
+        return $result->load($condition, $order);
+    }
+
+    /**
+     * Search one register with a condition
+     * @param array $condition Condition for searching the row
+     * @param array $order order rows
+     * @return self A filled Emitente or empty instance
+     * @throws \Exception when register has not found
+     */
+    public static function findOrFail($condition, $order = [])
+    {
+        $result = self::find($condition, $order);
+        if (!$result->exists()) {
+            throw new \Exception(_t('emitente.not_found'), 404);
+        }
+        return $result;
     }
 
     /**
      * Find all Emitente
-     * @param  array  $condition Condition to get all Emitente
-     * @param  array  $order     Order Emitente
-     * @param  int    $limit     Limit data into row count
-     * @param  int    $offset    Start offset to get rows
-     * @return array             List of all rows instanced as Emitente
+     * @param array  $condition Condition to get all Emitente
+     * @param array  $order     Order Emitente
+     * @param int    $limit     Limit data into row count
+     * @param int    $offset    Start offset to get rows
+     * @return self[] List of all rows instanced as Emitente
      */
     public static function findAll($condition = [], $order = [], $limit = null, $offset = null)
     {
@@ -650,14 +665,14 @@ class Emitente extends SyncModel
         $rows = $query->fetchAll();
         $result = [];
         foreach ($rows as $row) {
-            $result[] = new Emitente($row);
+            $result[] = new self($row);
         }
         return $result;
     }
 
     /**
      * Count all rows from database with matched condition critery
-     * @param  array $condition condition to filter rows
+     * @param array $condition condition to filter rows
      * @return integer Quantity of rows
      */
     public static function count($condition = [])

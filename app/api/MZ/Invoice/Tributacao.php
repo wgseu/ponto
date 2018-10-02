@@ -24,10 +24,12 @@
  */
 namespace MZ\Invoice;
 
-use MZ\Database\SyncModel;
-use MZ\Database\DB;
+use MZ\Util\Mask;
 use MZ\Util\Filter;
 use MZ\Util\Validator;
+use MZ\Database\DB;
+use MZ\Database\SyncModel;
+use MZ\Exception\ValidationException;
 
 /**
  * Informação tributária dos produtos
@@ -71,7 +73,7 @@ class Tributacao extends SyncModel
 
     /**
      * Identificador da tributação
-     * @return mixed ID of Tributacao
+     * @return int id of Tributação
      */
     public function getID()
     {
@@ -80,8 +82,8 @@ class Tributacao extends SyncModel
 
     /**
      * Set ID value to new on param
-     * @param  mixed $id new value for ID
-     * @return Tributacao Self instance
+     * @param int $id Set id for Tributação
+     * @return self Self instance
      */
     public function setID($id)
     {
@@ -91,7 +93,7 @@ class Tributacao extends SyncModel
 
     /**
      * Código NCM (Nomenclatura Comum do Mercosul) do produto
-     * @return mixed NCM of Tributacao
+     * @return string ncm of Tributação
      */
     public function getNCM()
     {
@@ -100,8 +102,8 @@ class Tributacao extends SyncModel
 
     /**
      * Set NCM value to new on param
-     * @param  mixed $ncm new value for NCM
-     * @return Tributacao Self instance
+     * @param string $ncm Set ncm for Tributação
+     * @return self Self instance
      */
     public function setNCM($ncm)
     {
@@ -111,7 +113,7 @@ class Tributacao extends SyncModel
 
     /**
      * Código CEST do produto (Opcional)
-     * @return mixed CEST of Tributacao
+     * @return string cest of Tributação
      */
     public function getCEST()
     {
@@ -120,8 +122,8 @@ class Tributacao extends SyncModel
 
     /**
      * Set CEST value to new on param
-     * @param  mixed $cest new value for CEST
-     * @return Tributacao Self instance
+     * @param string $cest Set cest for Tributação
+     * @return self Self instance
      */
     public function setCEST($cest)
     {
@@ -131,7 +133,7 @@ class Tributacao extends SyncModel
 
     /**
      * Origem do produto
-     * @return mixed Origem of Tributacao
+     * @return int origem of Tributação
      */
     public function getOrigemID()
     {
@@ -140,8 +142,8 @@ class Tributacao extends SyncModel
 
     /**
      * Set OrigemID value to new on param
-     * @param  mixed $origem_id new value for OrigemID
-     * @return Tributacao Self instance
+     * @param int $origem_id Set origem for Tributação
+     * @return self Self instance
      */
     public function setOrigemID($origem_id)
     {
@@ -151,7 +153,7 @@ class Tributacao extends SyncModel
 
     /**
      * CFOP do produto
-     * @return mixed CFOP of Tributacao
+     * @return int cfop of Tributação
      */
     public function getOperacaoID()
     {
@@ -160,8 +162,8 @@ class Tributacao extends SyncModel
 
     /**
      * Set OperacaoID value to new on param
-     * @param  mixed $operacao_id new value for OperacaoID
-     * @return Tributacao Self instance
+     * @param int $operacao_id Set cfop for Tributação
+     * @return self Self instance
      */
     public function setOperacaoID($operacao_id)
     {
@@ -171,7 +173,7 @@ class Tributacao extends SyncModel
 
     /**
      * Imposto do produto
-     * @return mixed Imposto of Tributacao
+     * @return int imposto of Tributação
      */
     public function getImpostoID()
     {
@@ -180,8 +182,8 @@ class Tributacao extends SyncModel
 
     /**
      * Set ImpostoID value to new on param
-     * @param  mixed $imposto_id new value for ImpostoID
-     * @return Tributacao Self instance
+     * @param int $imposto_id Set imposto for Tributação
+     * @return self Self instance
      */
     public function setImpostoID($imposto_id)
     {
@@ -191,7 +193,7 @@ class Tributacao extends SyncModel
 
     /**
      * Convert this instance to array associated key -> value
-     * @param  boolean $recursive Allow rescursive conversion of fields
+     * @param boolean $recursive Allow rescursive conversion of fields
      * @return array All field and values into array format
      */
     public function toArray($recursive = false)
@@ -208,12 +210,12 @@ class Tributacao extends SyncModel
 
     /**
      * Fill this instance with from array values, you can pass instance to
-     * @param  mixed $tributacao Associated key -> value to assign into this instance
-     * @return Tributacao Self instance
+     * @param mixed $tributacao Associated key -> value to assign into this instance
+     * @return self Self instance
      */
     public function fromArray($tributacao = [])
     {
-        if ($tributacao instanceof Tributacao) {
+        if ($tributacao instanceof self) {
             $tributacao = $tributacao->toArray();
         } elseif (!is_array($tributacao)) {
             $tributacao = [];
@@ -264,7 +266,9 @@ class Tributacao extends SyncModel
 
     /**
      * Filter fields, upload data and keep key data
-     * @param Tributacao $original Original instance without modifications
+     * @param self $original Original instance without modifications
+     * @param boolean $localized Informs if fields are localized
+     * @return self Self instance
      */
     public function filter($original, $localized = false)
     {
@@ -274,11 +278,12 @@ class Tributacao extends SyncModel
         $this->setOrigemID(Filter::number($this->getOrigemID()));
         $this->setOperacaoID(Filter::number($this->getOperacaoID()));
         $this->setImpostoID(Filter::number($this->getImpostoID()));
+        return $this;
     }
 
     /**
      * Clean instance resources like images and docs
-     * @param  Tributacao $dependency Don't clean when dependency use same resources
+     * @param self $dependency Don't clean when dependency use same resources
      */
     public function clean($dependency)
     {
@@ -287,41 +292,33 @@ class Tributacao extends SyncModel
     /**
      * Validate fields updating them and throw exception when invalid data has found
      * @return array All field of Tributacao in array format
+     * @throws \MZ\Exception\ValidationException for invalid input data
      */
     public function validate()
     {
         $errors = [];
         if (is_null($this->getNCM())) {
-            $errors['ncm'] = 'O NCM não pode ser vazio';
+            $errors['ncm'] = _t('tributacao.ncm_cannot_empty');
         }
         if (is_null($this->getOrigemID())) {
-            $errors['origemid'] = 'A origem não pode ser vazia';
+            $errors['origemid'] = _t('tributacao.origem_id_cannot_empty');
         }
         if (is_null($this->getOperacaoID())) {
-            $errors['operacaoid'] = 'O CFOP não pode ser vazio';
+            $errors['operacaoid'] = _t('tributacao.operacao_id_cannot_empty');
         }
         if (is_null($this->getImpostoID())) {
-            $errors['impostoid'] = 'O imposto não pode ser vazio';
+            $errors['impostoid'] = _t('tributacao.imposto_id_cannot_empty');
         }
         if (!empty($errors)) {
-            throw new \MZ\Exception\ValidationException($errors);
+            throw new ValidationException($errors);
         }
         return $this->toArray();
     }
 
     /**
-     * Translate SQL exception into application exception
-     * @param  \Exception $e exception to translate into a readable error
-     * @return \MZ\Exception\ValidationException new exception translated
-     */
-    protected function translate($e)
-    {
-        return parent::translate($e);
-    }
-
-    /**
      * Insert a new Tributação into the database and fill instance from database
-     * @return Tributacao Self instance
+     * @return self Self instance
+     * @throws \MZ\Exception\ValidationException for invalid input data
      */
     public function insert()
     {
@@ -340,36 +337,42 @@ class Tributacao extends SyncModel
 
     /**
      * Update Tributação with instance values into database for ID
-     * @param  array $only Save these fields only, when empty save all fields except id
-     * @return Tributacao Self instance
+     * @param array $only Save these fields only, when empty save all fields except id
+     * @return int rows affected
+     * @throws \MZ\Exception\ValidationException for invalid input data
      */
     public function update($only = [])
     {
         $values = $this->validate();
         if (!$this->exists()) {
-            throw new \Exception('O identificador da tributação não foi informado');
+            throw new ValidationException(
+                ['id' => _t('tributacao.id_cannot_empty')]
+            );
         }
         $values = DB::filterValues($values, $only, false);
         try {
-            DB::update('Tributacoes')
+            $affected = DB::update('Tributacoes')
                 ->set($values)
-                ->where('id', $this->getID())
+                ->where(['id' => $this->getID()])
                 ->execute();
             $this->loadByID();
         } catch (\Exception $e) {
             throw $this->translate($e);
         }
-        return $this;
+        return $affected;
     }
 
     /**
      * Delete this instance from database using ID
      * @return integer Number of rows deleted (Max 1)
+     * @throws \MZ\Exception\ValidationException for invalid id
      */
     public function delete()
     {
         if (!$this->exists()) {
-            throw new \Exception('O identificador da tributação não foi informado');
+            throw new ValidationException(
+                ['id' => _t('tributacao.id_cannot_empty')]
+            );
         }
         $result = DB::deleteFrom('Tributacoes')
             ->where('id', $this->getID())
@@ -379,9 +382,9 @@ class Tributacao extends SyncModel
 
     /**
      * Load one register for it self with a condition
-     * @param  array $condition Condition for searching the row
-     * @param  array $order associative field name -> [-1, 1]
-     * @return Tributacao Self instance filled or empty
+     * @param array $condition Condition for searching the row
+     * @param array $order associative field name -> [-1, 1]
+     * @return self Self instance filled or empty
      */
     public function load($condition, $order = [])
     {
@@ -423,14 +426,14 @@ class Tributacao extends SyncModel
      */
     private static function getAllowedKeys()
     {
-        $tributacao = new Tributacao();
+        $tributacao = new self();
         $allowed = Filter::concatKeys('t.', $tributacao->toArray());
         return $allowed;
     }
 
     /**
      * Filter order array
-     * @param  mixed $order order string or array to parse and filter allowed
+     * @param mixed $order order string or array to parse and filter allowed
      * @return array allowed associative order
      */
     private static function filterOrder($order)
@@ -441,7 +444,7 @@ class Tributacao extends SyncModel
 
     /**
      * Filter condition array with allowed fields
-     * @param  array $condition condition to filter rows
+     * @param array $condition condition to filter rows
      * @return array allowed condition
      */
     private static function filterCondition($condition)
@@ -459,8 +462,8 @@ class Tributacao extends SyncModel
 
     /**
      * Fetch data from database with a condition
-     * @param  array $condition condition to filter rows
-     * @param  array $order order rows
+     * @param array $condition condition to filter rows
+     * @param array $order order rows
      * @return SelectQuery query object with condition statement
      */
     private static function query($condition = [], $order = [])
@@ -475,24 +478,39 @@ class Tributacao extends SyncModel
 
     /**
      * Search one register with a condition
-     * @param  array $condition Condition for searching the row
-     * @param  array $order order rows
-     * @return Tributacao A filled Tributação or empty instance
+     * @param array $condition Condition for searching the row
+     * @param array $order order rows
+     * @return self A filled Tributação or empty instance
      */
     public static function find($condition, $order = [])
     {
-        $query = self::query($condition, $order)->limit(1);
-        $row = $query->fetch() ?: [];
-        return new Tributacao($row);
+        $result = new self();
+        return $result->load($condition, $order);
+    }
+
+    /**
+     * Search one register with a condition
+     * @param array $condition Condition for searching the row
+     * @param array $order order rows
+     * @return self A filled Tributação or empty instance
+     * @throws \Exception when register has not found
+     */
+    public static function findOrFail($condition, $order = [])
+    {
+        $result = self::find($condition, $order);
+        if (!$result->exists()) {
+            throw new \Exception(_t('tributacao.not_found'), 404);
+        }
+        return $result;
     }
 
     /**
      * Find all Tributação
-     * @param  array  $condition Condition to get all Tributação
-     * @param  array  $order     Order Tributação
-     * @param  int    $limit     Limit data into row count
-     * @param  int    $offset    Start offset to get rows
-     * @return array             List of all rows instanced as Tributacao
+     * @param array  $condition Condition to get all Tributação
+     * @param array  $order     Order Tributação
+     * @param int    $limit     Limit data into row count
+     * @param int    $offset    Start offset to get rows
+     * @return self[] List of all rows instanced as Tributacao
      */
     public static function findAll($condition = [], $order = [], $limit = null, $offset = null)
     {
@@ -506,14 +524,14 @@ class Tributacao extends SyncModel
         $rows = $query->fetchAll();
         $result = [];
         foreach ($rows as $row) {
-            $result[] = new Tributacao($row);
+            $result[] = new self($row);
         }
         return $result;
     }
 
     /**
      * Count all rows from database with matched condition critery
-     * @param  array $condition condition to filter rows
+     * @param array $condition condition to filter rows
      * @return integer Quantity of rows
      */
     public static function count($condition = [])

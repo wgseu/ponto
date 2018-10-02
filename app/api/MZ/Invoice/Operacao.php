@@ -24,10 +24,12 @@
  */
 namespace MZ\Invoice;
 
-use MZ\Database\SyncModel;
-use MZ\Database\DB;
+use MZ\Util\Mask;
 use MZ\Util\Filter;
 use MZ\Util\Validator;
+use MZ\Database\DB;
+use MZ\Database\SyncModel;
+use MZ\Exception\ValidationException;
 
 /**
  * Código Fiscal de Operações e Prestações (CFOP)
@@ -63,7 +65,7 @@ class Operacao extends SyncModel
 
     /**
      * Identificador da operação
-     * @return mixed ID of Operacao
+     * @return int id of Operação
      */
     public function getID()
     {
@@ -72,8 +74,8 @@ class Operacao extends SyncModel
 
     /**
      * Set ID value to new on param
-     * @param  mixed $id new value for ID
-     * @return Operacao Self instance
+     * @param int $id Set id for Operação
+     * @return self Self instance
      */
     public function setID($id)
     {
@@ -83,7 +85,7 @@ class Operacao extends SyncModel
 
     /**
      * Código CFOP sem pontuação
-     * @return mixed Código of Operacao
+     * @return int código of Operação
      */
     public function getCodigo()
     {
@@ -92,8 +94,8 @@ class Operacao extends SyncModel
 
     /**
      * Set Codigo value to new on param
-     * @param  mixed $codigo new value for Codigo
-     * @return Operacao Self instance
+     * @param int $codigo Set código for Operação
+     * @return self Self instance
      */
     public function setCodigo($codigo)
     {
@@ -103,7 +105,7 @@ class Operacao extends SyncModel
 
     /**
      * Descrição da operação
-     * @return mixed Descrição of Operacao
+     * @return string descrição of Operação
      */
     public function getDescricao()
     {
@@ -112,8 +114,8 @@ class Operacao extends SyncModel
 
     /**
      * Set Descricao value to new on param
-     * @param  mixed $descricao new value for Descricao
-     * @return Operacao Self instance
+     * @param string $descricao Set descrição for Operação
+     * @return self Self instance
      */
     public function setDescricao($descricao)
     {
@@ -123,7 +125,7 @@ class Operacao extends SyncModel
 
     /**
      * Detalhes da operação (Opcional)
-     * @return mixed Detalhes of Operacao
+     * @return string detalhes of Operação
      */
     public function getDetalhes()
     {
@@ -132,8 +134,8 @@ class Operacao extends SyncModel
 
     /**
      * Set Detalhes value to new on param
-     * @param  mixed $detalhes new value for Detalhes
-     * @return Operacao Self instance
+     * @param string $detalhes Set detalhes for Operação
+     * @return self Self instance
      */
     public function setDetalhes($detalhes)
     {
@@ -143,7 +145,7 @@ class Operacao extends SyncModel
 
     /**
      * Convert this instance to array associated key -> value
-     * @param  boolean $recursive Allow rescursive conversion of fields
+     * @param boolean $recursive Allow rescursive conversion of fields
      * @return array All field and values into array format
      */
     public function toArray($recursive = false)
@@ -158,12 +160,12 @@ class Operacao extends SyncModel
 
     /**
      * Fill this instance with from array values, you can pass instance to
-     * @param  mixed $operacao Associated key -> value to assign into this instance
-     * @return Operacao Self instance
+     * @param mixed $operacao Associated key -> value to assign into this instance
+     * @return self Self instance
      */
     public function fromArray($operacao = [])
     {
-        if ($operacao instanceof Operacao) {
+        if ($operacao instanceof self) {
             $operacao = $operacao->toArray();
         } elseif (!is_array($operacao)) {
             $operacao = [];
@@ -204,7 +206,9 @@ class Operacao extends SyncModel
 
     /**
      * Filter fields, upload data and keep key data
-     * @param Operacao $original Original instance without modifications
+     * @param self $original Original instance without modifications
+     * @param boolean $localized Informs if fields are localized
+     * @return self Self instance
      */
     public function filter($original, $localized = false)
     {
@@ -212,11 +216,12 @@ class Operacao extends SyncModel
         $this->setCodigo(Filter::number($this->getCodigo()));
         $this->setDescricao(Filter::string($this->getDescricao()));
         $this->setDetalhes(Filter::string($this->getDetalhes()));
+        return $this;
     }
 
     /**
      * Clean instance resources like images and docs
-     * @param  Operacao $dependency Don't clean when dependency use same resources
+     * @param self $dependency Don't clean when dependency use same resources
      */
     public function clean($dependency)
     {
@@ -225,33 +230,34 @@ class Operacao extends SyncModel
     /**
      * Validate fields updating them and throw exception when invalid data has found
      * @return array All field of Operacao in array format
+     * @throws \MZ\Exception\ValidationException for invalid input data
      */
     public function validate()
     {
         $errors = [];
         if (is_null($this->getCodigo())) {
-            $errors['codigo'] = 'O código não pode ser vazio';
+            $errors['codigo'] = _t('operacao.codigo_cannot_empty');
         }
         if (is_null($this->getDescricao())) {
-            $errors['descricao'] = 'A descrição não pode ser vazia';
+            $errors['descricao'] = _t('operacao.descricao_cannot_empty');
         }
         if (!empty($errors)) {
-            throw new \MZ\Exception\ValidationException($errors);
+            throw new ValidationException($errors);
         }
         return $this->toArray();
     }
 
     /**
      * Translate SQL exception into application exception
-     * @param  \Exception $e exception to translate into a readable error
+     * @param \Exception $e exception to translate into a readable error
      * @return \MZ\Exception\ValidationException new exception translated
      */
     protected function translate($e)
     {
         if (contains(['Codigo', 'UNIQUE'], $e->getMessage())) {
-            return new \MZ\Exception\ValidationException([
-                'codigo' => sprintf(
-                    'O código "%s" já está cadastrado',
+            return new ValidationException([
+                'codigo' => _t(
+                    'operacao.codigo_used',
                     $this->getCodigo()
                 ),
             ]);
@@ -261,7 +267,8 @@ class Operacao extends SyncModel
 
     /**
      * Insert a new Operação into the database and fill instance from database
-     * @return Operacao Self instance
+     * @return self Self instance
+     * @throws \MZ\Exception\ValidationException for invalid input data
      */
     public function insert()
     {
@@ -280,36 +287,42 @@ class Operacao extends SyncModel
 
     /**
      * Update Operação with instance values into database for ID
-     * @param  array $only Save these fields only, when empty save all fields except id
-     * @return Operacao Self instance
+     * @param array $only Save these fields only, when empty save all fields except id
+     * @return int rows affected
+     * @throws \MZ\Exception\ValidationException for invalid input data
      */
     public function update($only = [])
     {
         $values = $this->validate();
         if (!$this->exists()) {
-            throw new \Exception('O identificador da operação não foi informado');
+            throw new ValidationException(
+                ['id' => _t('operacao.id_cannot_empty')]
+            );
         }
         $values = DB::filterValues($values, $only, false);
         try {
-            DB::update('Operacoes')
+            $affected = DB::update('Operacoes')
                 ->set($values)
-                ->where('id', $this->getID())
+                ->where(['id' => $this->getID()])
                 ->execute();
             $this->loadByID();
         } catch (\Exception $e) {
             throw $this->translate($e);
         }
-        return $this;
+        return $affected;
     }
 
     /**
      * Delete this instance from database using ID
      * @return integer Number of rows deleted (Max 1)
+     * @throws \MZ\Exception\ValidationException for invalid id
      */
     public function delete()
     {
         if (!$this->exists()) {
-            throw new \Exception('O identificador da operação não foi informado');
+            throw new ValidationException(
+                ['id' => _t('operacao.id_cannot_empty')]
+            );
         }
         $result = DB::deleteFrom('Operacoes')
             ->where('id', $this->getID())
@@ -319,9 +332,9 @@ class Operacao extends SyncModel
 
     /**
      * Load one register for it self with a condition
-     * @param  array $condition Condition for searching the row
-     * @param  array $order associative field name -> [-1, 1]
-     * @return Operacao Self instance filled or empty
+     * @param array $condition Condition for searching the row
+     * @param array $order associative field name -> [-1, 1]
+     * @return self Self instance filled or empty
      */
     public function load($condition, $order = [])
     {
@@ -332,13 +345,12 @@ class Operacao extends SyncModel
 
     /**
      * Load into this object from database using, Codigo
-     * @param  int $codigo código to find Operação
-     * @return Operacao Self filled instance or empty when not found
+     * @return self Self filled instance or empty when not found
      */
-    public function loadByCodigo($codigo)
+    public function loadByCodigo()
     {
         return $this->load([
-            'codigo' => intval($codigo),
+            'codigo' => intval($this->getCodigo()),
         ]);
     }
 
@@ -348,14 +360,14 @@ class Operacao extends SyncModel
      */
     private static function getAllowedKeys()
     {
-        $operacao = new Operacao();
+        $operacao = new self();
         $allowed = Filter::concatKeys('o.', $operacao->toArray());
         return $allowed;
     }
 
     /**
      * Filter order array
-     * @param  mixed $order order string or array to parse and filter allowed
+     * @param mixed $order order string or array to parse and filter allowed
      * @return array allowed associative order
      */
     private static function filterOrder($order)
@@ -366,7 +378,7 @@ class Operacao extends SyncModel
 
     /**
      * Filter condition array with allowed fields
-     * @param  array $condition condition to filter rows
+     * @param array $condition condition to filter rows
      * @return array allowed condition
      */
     private static function filterCondition($condition)
@@ -384,8 +396,8 @@ class Operacao extends SyncModel
 
     /**
      * Fetch data from database with a condition
-     * @param  array $condition condition to filter rows
-     * @param  array $order order rows
+     * @param array $condition condition to filter rows
+     * @param array $order order rows
      * @return SelectQuery query object with condition statement
      */
     private static function query($condition = [], $order = [])
@@ -400,35 +412,51 @@ class Operacao extends SyncModel
 
     /**
      * Search one register with a condition
-     * @param  array $condition Condition for searching the row
-     * @param  array $order order rows
-     * @return Operacao A filled Operação or empty instance
+     * @param array $condition Condition for searching the row
+     * @param array $order order rows
+     * @return self A filled Operação or empty instance
      */
     public static function find($condition, $order = [])
     {
-        $query = self::query($condition, $order)->limit(1);
-        $row = $query->fetch() ?: [];
-        return new Operacao($row);
+        $result = new self();
+        return $result->load($condition, $order);
+    }
+
+    /**
+     * Search one register with a condition
+     * @param array $condition Condition for searching the row
+     * @param array $order order rows
+     * @return self A filled Operação or empty instance
+     * @throws \Exception when register has not found
+     */
+    public static function findOrFail($condition, $order = [])
+    {
+        $result = self::find($condition, $order);
+        if (!$result->exists()) {
+            throw new \Exception(_t('operacao.not_found'), 404);
+        }
+        return $result;
     }
 
     /**
      * Find this object on database using, Codigo
-     * @param  int $codigo código to find Operação
-     * @return Operacao A filled instance or empty when not found
+     * @param int $codigo código to find Operação
+     * @return self A filled instance or empty when not found
      */
     public static function findByCodigo($codigo)
     {
         $result = new self();
-        return $result->loadByCodigo($codigo);
+        $result->setCodigo($codigo);
+        return $result->loadByCodigo();
     }
 
     /**
      * Find all Operação
-     * @param  array  $condition Condition to get all Operação
-     * @param  array  $order     Order Operação
-     * @param  int    $limit     Limit data into row count
-     * @param  int    $offset    Start offset to get rows
-     * @return array             List of all rows instanced as Operacao
+     * @param array  $condition Condition to get all Operação
+     * @param array  $order     Order Operação
+     * @param int    $limit     Limit data into row count
+     * @param int    $offset    Start offset to get rows
+     * @return self[] List of all rows instanced as Operacao
      */
     public static function findAll($condition = [], $order = [], $limit = null, $offset = null)
     {
@@ -442,14 +470,14 @@ class Operacao extends SyncModel
         $rows = $query->fetchAll();
         $result = [];
         foreach ($rows as $row) {
-            $result[] = new Operacao($row);
+            $result[] = new self($row);
         }
         return $result;
     }
 
     /**
      * Count all rows from database with matched condition critery
-     * @param  array $condition condition to filter rows
+     * @param array $condition condition to filter rows
      * @return integer Quantity of rows
      */
     public static function count($condition = [])

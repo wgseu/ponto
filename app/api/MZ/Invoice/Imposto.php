@@ -24,10 +24,12 @@
  */
 namespace MZ\Invoice;
 
-use MZ\Database\SyncModel;
-use MZ\Database\DB;
+use MZ\Util\Mask;
 use MZ\Util\Filter;
 use MZ\Util\Validator;
+use MZ\Database\DB;
+use MZ\Database\SyncModel;
+use MZ\Exception\ValidationException;
 
 /**
  * Impostos disponíveis para informar no produto
@@ -80,7 +82,7 @@ class Imposto extends SyncModel
 
     /**
      * Identificador do imposto
-     * @return mixed ID of Imposto
+     * @return int id of Imposto
      */
     public function getID()
     {
@@ -89,8 +91,8 @@ class Imposto extends SyncModel
 
     /**
      * Set ID value to new on param
-     * @param  mixed $id new value for ID
-     * @return Imposto Self instance
+     * @param int $id Set id for Imposto
+     * @return self Self instance
      */
     public function setID($id)
     {
@@ -100,7 +102,7 @@ class Imposto extends SyncModel
 
     /**
      * Grupo do imposto
-     * @return mixed Grupo of Imposto
+     * @return string grupo of Imposto
      */
     public function getGrupo()
     {
@@ -109,8 +111,8 @@ class Imposto extends SyncModel
 
     /**
      * Set Grupo value to new on param
-     * @param  mixed $grupo new value for Grupo
-     * @return Imposto Self instance
+     * @param string $grupo Set grupo for Imposto
+     * @return self Self instance
      */
     public function setGrupo($grupo)
     {
@@ -120,7 +122,7 @@ class Imposto extends SyncModel
 
     /**
      * Informa se o imposto é do simples nacional
-     * @return mixed Simples nacional of Imposto
+     * @return string simples nacional of Imposto
      */
     public function getSimples()
     {
@@ -138,8 +140,8 @@ class Imposto extends SyncModel
 
     /**
      * Set Simples value to new on param
-     * @param  mixed $simples new value for Simples
-     * @return Imposto Self instance
+     * @param string $simples Set simples nacional for Imposto
+     * @return self Self instance
      */
     public function setSimples($simples)
     {
@@ -149,7 +151,7 @@ class Imposto extends SyncModel
 
     /**
      * Informa se o imposto é por substituição tributária
-     * @return mixed Substituição tributária of Imposto
+     * @return string substituição tributária of Imposto
      */
     public function getSubstituicao()
     {
@@ -167,8 +169,8 @@ class Imposto extends SyncModel
 
     /**
      * Set Substituicao value to new on param
-     * @param  mixed $substituicao new value for Substituicao
-     * @return Imposto Self instance
+     * @param string $substituicao Set substituição tributária for Imposto
+     * @return self Self instance
      */
     public function setSubstituicao($substituicao)
     {
@@ -178,7 +180,7 @@ class Imposto extends SyncModel
 
     /**
      * Informa o código do imposto
-     * @return mixed Código of Imposto
+     * @return int código of Imposto
      */
     public function getCodigo()
     {
@@ -187,8 +189,8 @@ class Imposto extends SyncModel
 
     /**
      * Set Codigo value to new on param
-     * @param  mixed $codigo new value for Codigo
-     * @return Imposto Self instance
+     * @param int $codigo Set código for Imposto
+     * @return self Self instance
      */
     public function setCodigo($codigo)
     {
@@ -198,7 +200,7 @@ class Imposto extends SyncModel
 
     /**
      * Descrição do imposto
-     * @return mixed Descrição of Imposto
+     * @return string descrição of Imposto
      */
     public function getDescricao()
     {
@@ -207,8 +209,8 @@ class Imposto extends SyncModel
 
     /**
      * Set Descricao value to new on param
-     * @param  mixed $descricao new value for Descricao
-     * @return Imposto Self instance
+     * @param string $descricao Set descrição for Imposto
+     * @return self Self instance
      */
     public function setDescricao($descricao)
     {
@@ -218,7 +220,7 @@ class Imposto extends SyncModel
 
     /**
      * Convert this instance to array associated key -> value
-     * @param  boolean $recursive Allow rescursive conversion of fields
+     * @param boolean $recursive Allow rescursive conversion of fields
      * @return array All field and values into array format
      */
     public function toArray($recursive = false)
@@ -235,12 +237,12 @@ class Imposto extends SyncModel
 
     /**
      * Fill this instance with from array values, you can pass instance to
-     * @param  mixed $imposto Associated key -> value to assign into this instance
-     * @return Imposto Self instance
+     * @param mixed $imposto Associated key -> value to assign into this instance
+     * @return self Self instance
      */
     public function fromArray($imposto = [])
     {
-        if ($imposto instanceof Imposto) {
+        if ($imposto instanceof self) {
             $imposto = $imposto->toArray();
         } elseif (!is_array($imposto)) {
             $imposto = [];
@@ -257,12 +259,12 @@ class Imposto extends SyncModel
             $this->setGrupo($imposto['grupo']);
         }
         if (!isset($imposto['simples'])) {
-            $this->setSimples(null);
+            $this->setSimples('N');
         } else {
             $this->setSimples($imposto['simples']);
         }
         if (!isset($imposto['substituicao'])) {
-            $this->setSubstituicao(null);
+            $this->setSubstituicao('N');
         } else {
             $this->setSubstituicao($imposto['substituicao']);
         }
@@ -291,18 +293,21 @@ class Imposto extends SyncModel
 
     /**
      * Filter fields, upload data and keep key data
-     * @param Imposto $original Original instance without modifications
+     * @param self $original Original instance without modifications
+     * @param boolean $localized Informs if fields are localized
+     * @return self Self instance
      */
     public function filter($original, $localized = false)
     {
         $this->setID($original->getID());
         $this->setCodigo(Filter::number($this->getCodigo()));
         $this->setDescricao(Filter::string($this->getDescricao()));
+        return $this;
     }
 
     /**
      * Clean instance resources like images and docs
-     * @param  Imposto $dependency Don't clean when dependency use same resources
+     * @param self $dependency Don't clean when dependency use same resources
      */
     public function clean($dependency)
     {
@@ -311,63 +316,55 @@ class Imposto extends SyncModel
     /**
      * Validate fields updating them and throw exception when invalid data has found
      * @return array All field of Imposto in array format
+     * @throws \MZ\Exception\ValidationException for invalid input data
      */
     public function validate()
     {
         $errors = [];
-        if (is_null($this->getGrupo())) {
-            $errors['grupo'] = 'O grupo não pode ser vazio';
+        if (!Validator::checkInSet($this->getGrupo(), self::getGrupoOptions())) {
+            $errors['grupo'] = _t('imposto.grupo_invalid');
         }
-        if (!Validator::checkInSet($this->getGrupo(), self::getGrupoOptions(), true)) {
-            $errors['grupo'] = 'O grupo é inválido';
+        if (!Validator::checkBoolean($this->getSimples())) {
+            $errors['simples'] = _t('imposto.simples_invalid');
         }
-        if (is_null($this->getSimples())) {
-            $errors['simples'] = 'O simples nacional não pode ser vazio';
-        }
-        if (!Validator::checkBoolean($this->getSimples(), true)) {
-            $errors['simples'] = 'O simples nacional é inválido';
-        }
-        if (is_null($this->getSubstituicao())) {
-            $errors['substituicao'] = 'A substituição tributária não pode ser vazia';
-        }
-        if (!Validator::checkBoolean($this->getSubstituicao(), true)) {
-            $errors['substituicao'] = 'A substituição tributária é inválida';
+        if (!Validator::checkBoolean($this->getSubstituicao())) {
+            $errors['substituicao'] = _t('imposto.substituicao_invalid');
         }
         if (is_null($this->getCodigo())) {
-            $errors['codigo'] = 'O código não pode ser vazio';
+            $errors['codigo'] = _t('imposto.codigo_cannot_empty');
         }
         if (is_null($this->getDescricao())) {
-            $errors['descricao'] = 'A descrição não pode ser vazia';
+            $errors['descricao'] = _t('imposto.descricao_cannot_empty');
         }
         if (!empty($errors)) {
-            throw new \MZ\Exception\ValidationException($errors);
+            throw new ValidationException($errors);
         }
         return $this->toArray();
     }
 
     /**
      * Translate SQL exception into application exception
-     * @param  \Exception $e exception to translate into a readable error
+     * @param \Exception $e exception to translate into a readable error
      * @return \MZ\Exception\ValidationException new exception translated
      */
     protected function translate($e)
     {
-        if (stripos($e->getMessage(), 'UK_Imposto') !== false) {
-            return new \MZ\Exception\ValidationException([
-                'grupo' => sprintf(
-                    'O grupo "%s" já está cadastrado',
+        if (contains(['Grupo', 'Simples', 'Substituicao', 'Codigo', 'UNIQUE'], $e->getMessage())) {
+            return new ValidationException([
+                'grupo' => _t(
+                    'imposto.grupo_used',
                     $this->getGrupo()
                 ),
-                'simples' => sprintf(
-                    'O simples nacional "%s" já está cadastrado',
+                'simples' => _t(
+                    'imposto.simples_used',
                     $this->getSimples()
                 ),
-                'substituicao' => sprintf(
-                    'A substituição tributária "%s" já está cadastrada',
+                'substituicao' => _t(
+                    'imposto.substituicao_used',
                     $this->getSubstituicao()
                 ),
-                'codigo' => sprintf(
-                    'O código "%s" já está cadastrado',
+                'codigo' => _t(
+                    'imposto.codigo_used',
                     $this->getCodigo()
                 ),
             ]);
@@ -377,7 +374,8 @@ class Imposto extends SyncModel
 
     /**
      * Insert a new Imposto into the database and fill instance from database
-     * @return Imposto Self instance
+     * @return self Self instance
+     * @throws \MZ\Exception\ValidationException for invalid input data
      */
     public function insert()
     {
@@ -396,36 +394,42 @@ class Imposto extends SyncModel
 
     /**
      * Update Imposto with instance values into database for ID
-     * @param  array $only Save these fields only, when empty save all fields except id
-     * @return Imposto Self instance
+     * @param array $only Save these fields only, when empty save all fields except id
+     * @return int rows affected
+     * @throws \MZ\Exception\ValidationException for invalid input data
      */
     public function update($only = [])
     {
         $values = $this->validate();
         if (!$this->exists()) {
-            throw new \Exception('O identificador do imposto não foi informado');
+            throw new ValidationException(
+                ['id' => _t('imposto.id_cannot_empty')]
+            );
         }
         $values = DB::filterValues($values, $only, false);
         try {
-            DB::update('Impostos')
+            $affected = DB::update('Impostos')
                 ->set($values)
-                ->where('id', $this->getID())
+                ->where(['id' => $this->getID()])
                 ->execute();
             $this->loadByID();
         } catch (\Exception $e) {
             throw $this->translate($e);
         }
-        return $this;
+        return $affected;
     }
 
     /**
      * Delete this instance from database using ID
      * @return integer Number of rows deleted (Max 1)
+     * @throws \MZ\Exception\ValidationException for invalid id
      */
     public function delete()
     {
         if (!$this->exists()) {
-            throw new \Exception('O identificador do imposto não foi informado');
+            throw new ValidationException(
+                ['id' => _t('imposto.id_cannot_empty')]
+            );
         }
         $result = DB::deleteFrom('Impostos')
             ->where('id', $this->getID())
@@ -435,9 +439,9 @@ class Imposto extends SyncModel
 
     /**
      * Load one register for it self with a condition
-     * @param  array $condition Condition for searching the row
-     * @param  array $order associative field name -> [-1, 1]
-     * @return Imposto Self instance filled or empty
+     * @param array $condition Condition for searching the row
+     * @param array $order associative field name -> [-1, 1]
+     * @return self Self instance filled or empty
      */
     public function load($condition, $order = [])
     {
@@ -448,35 +452,31 @@ class Imposto extends SyncModel
 
     /**
      * Load into this object from database using, Grupo, Simples, Substituicao, Codigo
-     * @param  string $grupo grupo to find Imposto
-     * @param  string $simples simples nacional to find Imposto
-     * @param  string $substituicao substituição tributária to find Imposto
-     * @param  int $codigo código to find Imposto
-     * @return Imposto Self filled instance or empty when not found
+     * @return self Self filled instance or empty when not found
      */
-    public function loadByGrupoSimplesSubstituicaoCodigo($grupo, $simples, $substituicao, $codigo)
+    public function loadByGrupoSimplesSubstituicaoCodigo()
     {
         return $this->load([
-            'grupo' => strval($grupo),
-            'simples' => strval($simples),
-            'substituicao' => strval($substituicao),
-            'codigo' => intval($codigo),
+            'grupo' => strval($this->getGrupo()),
+            'simples' => strval($this->getSimples()),
+            'substituicao' => strval($this->getSubstituicao()),
+            'codigo' => intval($this->getCodigo()),
         ]);
     }
 
     /**
      * Gets textual and translated Grupo for Imposto
-     * @param  int $index choose option from index
-     * @return mixed A associative key -> translated representative text or text for index
+     * @param int $index choose option from index
+     * @return string[] A associative key -> translated representative text or text for index
      */
     public static function getGrupoOptions($index = null)
     {
         $options = [
-            self::GRUPO_ICMS => 'ICMS',
-            self::GRUPO_PIS => 'PIS',
-            self::GRUPO_COFINS => 'COFINS',
-            self::GRUPO_IPI => 'IPI',
-            self::GRUPO_II => 'II',
+            self::GRUPO_ICMS => _t('imposto.grupo_icms'),
+            self::GRUPO_PIS => _t('imposto.grupo_pis'),
+            self::GRUPO_COFINS => _t('imposto.grupo_cofins'),
+            self::GRUPO_IPI => _t('imposto.grupo_ipi'),
+            self::GRUPO_II => _t('imposto.grupo_ii'),
         ];
         if (!is_null($index)) {
             return $options[$index];
@@ -490,14 +490,14 @@ class Imposto extends SyncModel
      */
     private static function getAllowedKeys()
     {
-        $imposto = new Imposto();
+        $imposto = new self();
         $allowed = Filter::concatKeys('i.', $imposto->toArray());
         return $allowed;
     }
 
     /**
      * Filter order array
-     * @param  mixed $order order string or array to parse and filter allowed
+     * @param mixed $order order string or array to parse and filter allowed
      * @return array allowed associative order
      */
     private static function filterOrder($order)
@@ -508,7 +508,7 @@ class Imposto extends SyncModel
 
     /**
      * Filter condition array with allowed fields
-     * @param  array $condition condition to filter rows
+     * @param array $condition condition to filter rows
      * @return array allowed condition
      */
     private static function filterCondition($condition)
@@ -526,8 +526,8 @@ class Imposto extends SyncModel
 
     /**
      * Fetch data from database with a condition
-     * @param  array $condition condition to filter rows
-     * @param  array $order order rows
+     * @param array $condition condition to filter rows
+     * @param array $order order rows
      * @return SelectQuery query object with condition statement
      */
     private static function query($condition = [], $order = [])
@@ -542,38 +542,57 @@ class Imposto extends SyncModel
 
     /**
      * Search one register with a condition
-     * @param  array $condition Condition for searching the row
-     * @param  array $order order rows
-     * @return Imposto A filled Imposto or empty instance
+     * @param array $condition Condition for searching the row
+     * @param array $order order rows
+     * @return self A filled Imposto or empty instance
      */
     public static function find($condition, $order = [])
     {
-        $query = self::query($condition, $order)->limit(1);
-        $row = $query->fetch() ?: [];
-        return new Imposto($row);
+        $result = new self();
+        return $result->load($condition, $order);
+    }
+
+    /**
+     * Search one register with a condition
+     * @param array $condition Condition for searching the row
+     * @param array $order order rows
+     * @return self A filled Imposto or empty instance
+     * @throws \Exception when register has not found
+     */
+    public static function findOrFail($condition, $order = [])
+    {
+        $result = self::find($condition, $order);
+        if (!$result->exists()) {
+            throw new \Exception(_t('imposto.not_found'), 404);
+        }
+        return $result;
     }
 
     /**
      * Find this object on database using, Grupo, Simples, Substituicao, Codigo
-     * @param  string $grupo grupo to find Imposto
-     * @param  string $simples simples nacional to find Imposto
-     * @param  string $substituicao substituição tributária to find Imposto
-     * @param  int $codigo código to find Imposto
-     * @return Imposto A filled instance or empty when not found
+     * @param string $grupo grupo to find Imposto
+     * @param string $simples simples nacional to find Imposto
+     * @param string $substituicao substituição tributária to find Imposto
+     * @param int $codigo código to find Imposto
+     * @return self A filled instance or empty when not found
      */
     public static function findByGrupoSimplesSubstituicaoCodigo($grupo, $simples, $substituicao, $codigo)
     {
         $result = new self();
-        return $result->loadByGrupoSimplesSubstituicaoCodigo($grupo, $simples, $substituicao, $codigo);
+        $result->setGrupo($grupo);
+        $result->setSimples($simples);
+        $result->setSubstituicao($substituicao);
+        $result->setCodigo($codigo);
+        return $result->loadByGrupoSimplesSubstituicaoCodigo();
     }
 
     /**
      * Find all Imposto
-     * @param  array  $condition Condition to get all Imposto
-     * @param  array  $order     Order Imposto
-     * @param  int    $limit     Limit data into row count
-     * @param  int    $offset    Start offset to get rows
-     * @return array             List of all rows instanced as Imposto
+     * @param array  $condition Condition to get all Imposto
+     * @param array  $order     Order Imposto
+     * @param int    $limit     Limit data into row count
+     * @param int    $offset    Start offset to get rows
+     * @return self[] List of all rows instanced as Imposto
      */
     public static function findAll($condition = [], $order = [], $limit = null, $offset = null)
     {
@@ -587,14 +606,14 @@ class Imposto extends SyncModel
         $rows = $query->fetchAll();
         $result = [];
         foreach ($rows as $row) {
-            $result[] = new Imposto($row);
+            $result[] = new self($row);
         }
         return $result;
     }
 
     /**
      * Count all rows from database with matched condition critery
-     * @param  array $condition condition to filter rows
+     * @param array $condition condition to filter rows
      * @return integer Quantity of rows
      */
     public static function count($condition = [])

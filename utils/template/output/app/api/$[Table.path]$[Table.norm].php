@@ -588,7 +588,7 @@ $[field.else.if(enum)]
     /**
      * Gets textual and translated $[Field.norm] for $[Table.norm]
      * @param int $index choose option from index
-     * @return string[]|string A associative key -> translated representative text or text for index
+     * @return string[] A associative key -> translated representative text or text for index
      */
     public static function get$[Field.norm]Options($index = null)
     {

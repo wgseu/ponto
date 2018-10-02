@@ -24,10 +24,12 @@
  */
 namespace MZ\Location;
 
-use MZ\Database\SyncModel;
-use MZ\Database\DB;
+use MZ\Util\Mask;
 use MZ\Util\Filter;
 use MZ\Util\Validator;
+use MZ\Database\DB;
+use MZ\Database\SyncModel;
+use MZ\Exception\ValidationException;
 
 /**
  * Endereços de ruas e avenidas com informação de CEP
@@ -67,7 +69,7 @@ class Endereco extends SyncModel
 
     /**
      * Identificador do endereço
-     * @return mixed ID of Endereco
+     * @return int id of Endereço
      */
     public function getID()
     {
@@ -76,8 +78,8 @@ class Endereco extends SyncModel
 
     /**
      * Set ID value to new on param
-     * @param  mixed $id new value for ID
-     * @return Endereco Self instance
+     * @param int $id Set id for Endereço
+     * @return self Self instance
      */
     public function setID($id)
     {
@@ -87,7 +89,7 @@ class Endereco extends SyncModel
 
     /**
      * Cidade a qual o endereço pertence
-     * @return mixed Cidade of Endereco
+     * @return int cidade of Endereço
      */
     public function getCidadeID()
     {
@@ -96,8 +98,8 @@ class Endereco extends SyncModel
 
     /**
      * Set CidadeID value to new on param
-     * @param  mixed $cidade_id new value for CidadeID
-     * @return Endereco Self instance
+     * @param int $cidade_id Set cidade for Endereço
+     * @return self Self instance
      */
     public function setCidadeID($cidade_id)
     {
@@ -107,7 +109,7 @@ class Endereco extends SyncModel
 
     /**
      * Bairro a qual o endereço está localizado
-     * @return mixed Bairro of Endereco
+     * @return int bairro of Endereço
      */
     public function getBairroID()
     {
@@ -116,8 +118,8 @@ class Endereco extends SyncModel
 
     /**
      * Set BairroID value to new on param
-     * @param  mixed $bairro_id new value for BairroID
-     * @return Endereco Self instance
+     * @param int $bairro_id Set bairro for Endereço
+     * @return self Self instance
      */
     public function setBairroID($bairro_id)
     {
@@ -127,7 +129,7 @@ class Endereco extends SyncModel
 
     /**
      * Nome da rua ou avenida
-     * @return mixed Logradouro of Endereco
+     * @return string logradouro of Endereço
      */
     public function getLogradouro()
     {
@@ -136,8 +138,8 @@ class Endereco extends SyncModel
 
     /**
      * Set Logradouro value to new on param
-     * @param  mixed $logradouro new value for Logradouro
-     * @return Endereco Self instance
+     * @param string $logradouro Set logradouro for Endereço
+     * @return self Self instance
      */
     public function setLogradouro($logradouro)
     {
@@ -147,7 +149,7 @@ class Endereco extends SyncModel
 
     /**
      * Código dos correios para identificar a rua ou avenida
-     * @return mixed CEP of Endereco
+     * @return string cep of Endereço
      */
     public function getCEP()
     {
@@ -156,8 +158,8 @@ class Endereco extends SyncModel
 
     /**
      * Set CEP value to new on param
-     * @param  mixed $cep new value for CEP
-     * @return Endereco Self instance
+     * @param string $cep Set cep for Endereço
+     * @return self Self instance
      */
     public function setCEP($cep)
     {
@@ -167,7 +169,7 @@ class Endereco extends SyncModel
 
     /**
      * Convert this instance to array associated key -> value
-     * @param  boolean $recursive Allow rescursive conversion of fields
+     * @param boolean $recursive Allow rescursive conversion of fields
      * @return array All field and values into array format
      */
     public function toArray($recursive = false)
@@ -183,12 +185,12 @@ class Endereco extends SyncModel
 
     /**
      * Fill this instance with from array values, you can pass instance to
-     * @param  mixed $endereco Associated key -> value to assign into this instance
-     * @return Endereco Self instance
+     * @param mixed $endereco Associated key -> value to assign into this instance
+     * @return self Self instance
      */
     public function fromArray($endereco = [])
     {
-        if ($endereco instanceof Endereco) {
+        if ($endereco instanceof self) {
             $endereco = $endereco->toArray();
         } elseif (!is_array($endereco)) {
             $endereco = [];
@@ -229,13 +231,15 @@ class Endereco extends SyncModel
     public function publish()
     {
         $endereco = parent::publish();
-        $endereco['cep'] = \MZ\Util\Mask::cep($endereco['cep']);
+        $endereco['cep'] = Mask::cep($endereco['cep']);
         return $endereco;
     }
 
     /**
      * Filter fields, upload data and keep key data
-     * @param Endereco $original Original instance without modifications
+     * @param self $original Original instance without modifications
+     * @param boolean $localized Informs if fields are localized
+     * @return self Self instance
      */
     public function filter($original, $localized = false)
     {
@@ -244,11 +248,12 @@ class Endereco extends SyncModel
         $this->setBairroID(Filter::number($this->getBairroID()));
         $this->setLogradouro(Filter::string($this->getLogradouro()));
         $this->setCEP(Filter::unmask($this->getCEP(), _p('Mascara', 'CEP')));
+        return $this;
     }
 
     /**
      * Clean instance resources like images and docs
-     * @param  Endereco $dependency Don't clean when dependency use same resources
+     * @param self $dependency Don't clean when dependency use same resources
      */
     public function clean($dependency)
     {
@@ -257,54 +262,53 @@ class Endereco extends SyncModel
     /**
      * Validate fields updating them and throw exception when invalid data has found
      * @return array All field of Endereco in array format
+     * @throws \MZ\Exception\ValidationException for invalid input data
      */
     public function validate()
     {
         $errors = [];
         if (is_null($this->getCidadeID())) {
-            $errors['cidadeid'] = 'A cidade não pode ser vazia';
+            $errors['cidadeid'] = _t('endereco.cidade_id_cannot_empty');
         }
         if (is_null($this->getBairroID())) {
-            $errors['bairroid'] = 'O bairro não pode ser vazio';
+            $errors['bairroid'] = _t('endereco.bairro_id_cannot_empty');
         }
         if (is_null($this->getLogradouro())) {
-            $errors['logradouro'] = 'O logradouro não pode ser vazio';
-        }
-        if (is_null($this->getCEP())) {
-            $errors['cep'] = 'O cep não pode ser vazio';
+            $errors['logradouro'] = _t('endereco.logradouro_cannot_empty');
         }
         if (!Validator::checkCEP($this->getCEP())) {
-            $errors['cep'] = sprintf('O %s é inválido', _p('Titulo', 'CEP'));
+            $errors['cep'] = _t('cep_invalid', _p('Titulo', 'CEP'));
         }
         if (!empty($errors)) {
-            throw new \MZ\Exception\ValidationException($errors);
+            throw new ValidationException($errors);
         }
         return $this->toArray();
     }
 
     /**
      * Translate SQL exception into application exception
-     * @param  \Exception $e exception to translate into a readable error
+     * @param \Exception $e exception to translate into a readable error
      * @return \MZ\Exception\ValidationException new exception translated
      */
     protected function translate($e)
     {
         if (contains(['CEP', 'UNIQUE'], $e->getMessage())) {
-            return new \MZ\Exception\ValidationException([
-                'cep' => sprintf(
-                    'O cep "%s" já está cadastrado',
+            return new ValidationException([
+                'cep' => _t(
+                    'endereco.cep_used',
+                    _p('Titulo', 'CEP'),
                     $this->getCEP()
                 ),
             ]);
         }
         if (contains(['BairroID', 'Logradouro', 'UNIQUE'], $e->getMessage())) {
-            return new \MZ\Exception\ValidationException([
-                'bairroid' => sprintf(
-                    'O bairro "%s" já está cadastrado',
+            return new ValidationException([
+                'bairroid' => _t(
+                    'endereco.bairro_id_used',
                     $this->getBairroID()
                 ),
-                'logradouro' => sprintf(
-                    'O logradouro "%s" já está cadastrado',
+                'logradouro' => _t(
+                    'endereco.logradouro_used',
                     $this->getLogradouro()
                 ),
             ]);
@@ -314,7 +318,8 @@ class Endereco extends SyncModel
 
     /**
      * Insert a new Endereço into the database and fill instance from database
-     * @return Endereco Self instance
+     * @return self Self instance
+     * @throws \MZ\Exception\ValidationException for invalid input data
      */
     public function insert()
     {
@@ -333,36 +338,42 @@ class Endereco extends SyncModel
 
     /**
      * Update Endereço with instance values into database for ID
-     * @param  array $only Save these fields only, when empty save all fields except id
-     * @return Endereco Self instance
+     * @param array $only Save these fields only, when empty save all fields except id
+     * @return int rows affected
+     * @throws \MZ\Exception\ValidationException for invalid input data
      */
     public function update($only = [])
     {
         $values = $this->validate();
         if (!$this->exists()) {
-            throw new \Exception('O identificador do endereço não foi informado');
+            throw new ValidationException(
+                ['id' => _t('endereco.id_cannot_empty')]
+            );
         }
         $values = DB::filterValues($values, $only, false);
         try {
-            DB::update('Enderecos')
+            $affected = DB::update('Enderecos')
                 ->set($values)
-                ->where('id', $this->getID())
+                ->where(['id' => $this->getID()])
                 ->execute();
             $this->loadByID();
         } catch (\Exception $e) {
             throw $this->translate($e);
         }
-        return $this;
+        return $affected;
     }
 
     /**
      * Delete this instance from database using ID
      * @return integer Number of rows deleted (Max 1)
+     * @throws \MZ\Exception\ValidationException for invalid id
      */
     public function delete()
     {
         if (!$this->exists()) {
-            throw new \Exception('O identificador do endereço não foi informado');
+            throw new ValidationException(
+                ['id' => _t('endereco.id_cannot_empty')]
+            );
         }
         $result = DB::deleteFrom('Enderecos')
             ->where('id', $this->getID())
@@ -372,9 +383,9 @@ class Endereco extends SyncModel
 
     /**
      * Load one register for it self with a condition
-     * @param  array $condition Condition for searching the row
-     * @param  array $order associative field name -> [-1, 1]
-     * @return Endereco Self instance filled or empty
+     * @param array $condition Condition for searching the row
+     * @param array $order associative field name -> [-1, 1]
+     * @return self Self instance filled or empty
      */
     public function load($condition, $order = [])
     {
@@ -385,27 +396,24 @@ class Endereco extends SyncModel
 
     /**
      * Load into this object from database using, CEP
-     * @param  string $cep cep to find Endereço
-     * @return Endereco Self filled instance or empty when not found
+     * @return self Self filled instance or empty when not found
      */
-    public function loadByCEP($cep)
+    public function loadByCEP()
     {
         return $this->load([
-            'cep' => strval($cep),
+            'cep' => strval($this->getCEP()),
         ]);
     }
 
     /**
      * Load into this object from database using, BairroID, Logradouro
-     * @param  int $bairro_id bairro to find Endereço
-     * @param  string $logradouro logradouro to find Endereço
-     * @return Endereco Self filled instance or empty when not found
+     * @return self Self filled instance or empty when not found
      */
-    public function loadByBairroIDLogradouro($bairro_id, $logradouro)
+    public function loadByBairroIDLogradouro()
     {
         return $this->load([
-            'bairroid' => intval($bairro_id),
-            'logradouro' => strval($logradouro),
+            'bairroid' => intval($this->getBairroID()),
+            'logradouro' => strval($this->getLogradouro()),
         ]);
     }
 
@@ -433,14 +441,14 @@ class Endereco extends SyncModel
      */
     private static function getAllowedKeys()
     {
-        $endereco = new Endereco();
+        $endereco = new self();
         $allowed = Filter::concatKeys('e.', $endereco->toArray());
         return $allowed;
     }
 
     /**
      * Filter order array
-     * @param  mixed $order order string or array to parse and filter allowed
+     * @param mixed $order order string or array to parse and filter allowed
      * @return array allowed associative order
      */
     private static function filterOrder($order)
@@ -451,7 +459,7 @@ class Endereco extends SyncModel
 
     /**
      * Filter condition array with allowed fields
-     * @param  array $condition condition to filter rows
+     * @param array $condition condition to filter rows
      * @return array allowed condition
      */
     private static function filterCondition($condition)
@@ -469,8 +477,8 @@ class Endereco extends SyncModel
 
     /**
      * Fetch data from database with a condition
-     * @param  array $condition condition to filter rows
-     * @param  array $order order rows
+     * @param array $condition condition to filter rows
+     * @param array $order order rows
      * @return SelectQuery query object with condition statement
      */
     private static function query($condition = [], $order = [])
@@ -485,47 +493,65 @@ class Endereco extends SyncModel
 
     /**
      * Search one register with a condition
-     * @param  array $condition Condition for searching the row
-     * @param  array $order order rows
-     * @return Endereco A filled Endereço or empty instance
+     * @param array $condition Condition for searching the row
+     * @param array $order order rows
+     * @return self A filled Endereço or empty instance
      */
     public static function find($condition, $order = [])
     {
-        $query = self::query($condition, $order)->limit(1);
-        $row = $query->fetch() ?: [];
-        return new Endereco($row);
+        $result = new self();
+        return $result->load($condition, $order);
+    }
+
+    /**
+     * Search one register with a condition
+     * @param array $condition Condition for searching the row
+     * @param array $order order rows
+     * @return self A filled Endereço or empty instance
+     * @throws \Exception when register has not found
+     */
+    public static function findOrFail($condition, $order = [])
+    {
+        $result = self::find($condition, $order);
+        if (!$result->exists()) {
+            throw new \Exception(_t('endereco.not_found'), 404);
+        }
+        return $result;
     }
 
     /**
      * Find this object on database using, CEP
-     * @param  string $cep cep to find Endereço
-     * @return Endereco A filled instance or empty when not found
+     * @param string $cep cep to find Endereço
+     * @return self A filled instance or empty when not found
      */
     public static function findByCEP($cep)
     {
         $result = new self();
-        return $result->loadByCEP($cep);
+        $result->setCEP($cep);
+        return $result->loadByCEP();
     }
 
     /**
      * Find this object on database using, BairroID, Logradouro
-     * @param  int $bairro_id bairro to find Endereço
-     * @param  string $logradouro logradouro to find Endereço
-     * @return Endereco A filled instance or empty when not found
+     * @param int $bairro_id bairro to find Endereço
+     * @param string $logradouro logradouro to find Endereço
+     * @return self A filled instance or empty when not found
      */
     public static function findByBairroIDLogradouro($bairro_id, $logradouro)
     {
         $result = new self();
-        return $result->loadByBairroIDLogradouro($bairro_id, $logradouro);
+        $result->setBairroID($bairro_id);
+        $result->setLogradouro($logradouro);
+        return $result->loadByBairroIDLogradouro();
     }
 
     /**
      * Find all Endereço
-     * @param  array  $condition Condition to get all Endereço
-     * @param  array  $order     Order Endereço
-     * @param  int    $limit     Limit data into row count
-     * @param  int    $offset    Start offset to get rows
-     * @return array             List of all rows instanced as Endereco
+     * @param array  $condition Condition to get all Endereço
+     * @param array  $order     Order Endereço
+     * @param int    $limit     Limit data into row count
+     * @param int    $offset    Start offset to get rows
+     * @return self[] List of all rows instanced as Endereco
      */
     public static function findAll($condition = [], $order = [], $limit = null, $offset = null)
     {
@@ -539,14 +565,14 @@ class Endereco extends SyncModel
         $rows = $query->fetchAll();
         $result = [];
         foreach ($rows as $row) {
-            $result[] = new Endereco($row);
+            $result[] = new self($row);
         }
         return $result;
     }
 
     /**
      * Count all rows from database with matched condition critery
-     * @param  array $condition condition to filter rows
+     * @param array $condition condition to filter rows
      * @return integer Quantity of rows
      */
     public static function count($condition = [])

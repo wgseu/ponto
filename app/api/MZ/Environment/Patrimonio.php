@@ -24,10 +24,12 @@
  */
 namespace MZ\Environment;
 
-use MZ\Database\SyncModel;
-use MZ\Database\DB;
+use MZ\Util\Mask;
 use MZ\Util\Filter;
 use MZ\Util\Validator;
+use MZ\Database\DB;
+use MZ\Database\SyncModel;
+use MZ\Exception\ValidationException;
 
 /**
  * Informa detalhadamente um bem da empresa
@@ -114,7 +116,7 @@ class Patrimonio extends SyncModel
 
     /**
      * Identificador do bem
-     * @return mixed ID of Patrimonio
+     * @return int id of Patrimônio
      */
     public function getID()
     {
@@ -123,8 +125,8 @@ class Patrimonio extends SyncModel
 
     /**
      * Set ID value to new on param
-     * @param  mixed $id new value for ID
-     * @return Patrimonio Self instance
+     * @param int $id Set id for Patrimônio
+     * @return self Self instance
      */
     public function setID($id)
     {
@@ -134,7 +136,7 @@ class Patrimonio extends SyncModel
 
     /**
      * Empresa a que esse bem pertence
-     * @return mixed Empresa of Patrimonio
+     * @return int empresa of Patrimônio
      */
     public function getEmpresaID()
     {
@@ -143,8 +145,8 @@ class Patrimonio extends SyncModel
 
     /**
      * Set EmpresaID value to new on param
-     * @param  mixed $empresa_id new value for EmpresaID
-     * @return Patrimonio Self instance
+     * @param int $empresa_id Set empresa for Patrimônio
+     * @return self Self instance
      */
     public function setEmpresaID($empresa_id)
     {
@@ -154,7 +156,7 @@ class Patrimonio extends SyncModel
 
     /**
      * Fornecedor do bem
-     * @return mixed Fornecedor of Patrimonio
+     * @return int fornecedor of Patrimônio
      */
     public function getFornecedorID()
     {
@@ -163,8 +165,8 @@ class Patrimonio extends SyncModel
 
     /**
      * Set FornecedorID value to new on param
-     * @param  mixed $fornecedor_id new value for FornecedorID
-     * @return Patrimonio Self instance
+     * @param int $fornecedor_id Set fornecedor for Patrimônio
+     * @return self Self instance
      */
     public function setFornecedorID($fornecedor_id)
     {
@@ -174,7 +176,7 @@ class Patrimonio extends SyncModel
 
     /**
      * Número que identifica o bem
-     * @return mixed Número of Patrimonio
+     * @return string número of Patrimônio
      */
     public function getNumero()
     {
@@ -183,8 +185,8 @@ class Patrimonio extends SyncModel
 
     /**
      * Set Numero value to new on param
-     * @param  mixed $numero new value for Numero
-     * @return Patrimonio Self instance
+     * @param string $numero Set número for Patrimônio
+     * @return self Self instance
      */
     public function setNumero($numero)
     {
@@ -194,7 +196,7 @@ class Patrimonio extends SyncModel
 
     /**
      * Descrição ou nome do bem
-     * @return mixed Descrição of Patrimonio
+     * @return string descrição of Patrimônio
      */
     public function getDescricao()
     {
@@ -203,8 +205,8 @@ class Patrimonio extends SyncModel
 
     /**
      * Set Descricao value to new on param
-     * @param  mixed $descricao new value for Descricao
-     * @return Patrimonio Self instance
+     * @param string $descricao Set descrição for Patrimônio
+     * @return self Self instance
      */
     public function setDescricao($descricao)
     {
@@ -214,7 +216,7 @@ class Patrimonio extends SyncModel
 
     /**
      * Quantidade do bem com as mesmas características
-     * @return mixed Quantidade of Patrimonio
+     * @return float quantidade of Patrimônio
      */
     public function getQuantidade()
     {
@@ -223,8 +225,8 @@ class Patrimonio extends SyncModel
 
     /**
      * Set Quantidade value to new on param
-     * @param  mixed $quantidade new value for Quantidade
-     * @return Patrimonio Self instance
+     * @param float $quantidade Set quantidade for Patrimônio
+     * @return self Self instance
      */
     public function setQuantidade($quantidade)
     {
@@ -234,7 +236,7 @@ class Patrimonio extends SyncModel
 
     /**
      * Altura do bem em metros
-     * @return mixed Altura of Patrimonio
+     * @return float altura of Patrimônio
      */
     public function getAltura()
     {
@@ -243,8 +245,8 @@ class Patrimonio extends SyncModel
 
     /**
      * Set Altura value to new on param
-     * @param  mixed $altura new value for Altura
-     * @return Patrimonio Self instance
+     * @param float $altura Set altura for Patrimônio
+     * @return self Self instance
      */
     public function setAltura($altura)
     {
@@ -254,7 +256,7 @@ class Patrimonio extends SyncModel
 
     /**
      * Largura do bem em metros
-     * @return mixed Largura of Patrimonio
+     * @return float largura of Patrimônio
      */
     public function getLargura()
     {
@@ -263,8 +265,8 @@ class Patrimonio extends SyncModel
 
     /**
      * Set Largura value to new on param
-     * @param  mixed $largura new value for Largura
-     * @return Patrimonio Self instance
+     * @param float $largura Set largura for Patrimônio
+     * @return self Self instance
      */
     public function setLargura($largura)
     {
@@ -274,7 +276,7 @@ class Patrimonio extends SyncModel
 
     /**
      * Comprimento do bem em metros
-     * @return mixed Comprimento of Patrimonio
+     * @return float comprimento of Patrimônio
      */
     public function getComprimento()
     {
@@ -283,8 +285,8 @@ class Patrimonio extends SyncModel
 
     /**
      * Set Comprimento value to new on param
-     * @param  mixed $comprimento new value for Comprimento
-     * @return Patrimonio Self instance
+     * @param float $comprimento Set comprimento for Patrimônio
+     * @return self Self instance
      */
     public function setComprimento($comprimento)
     {
@@ -294,7 +296,7 @@ class Patrimonio extends SyncModel
 
     /**
      * Estado de conservação do bem
-     * @return mixed Estado of Patrimonio
+     * @return string estado of Patrimônio
      */
     public function getEstado()
     {
@@ -303,8 +305,8 @@ class Patrimonio extends SyncModel
 
     /**
      * Set Estado value to new on param
-     * @param  mixed $estado new value for Estado
-     * @return Patrimonio Self instance
+     * @param string $estado Set estado for Patrimônio
+     * @return self Self instance
      */
     public function setEstado($estado)
     {
@@ -314,7 +316,7 @@ class Patrimonio extends SyncModel
 
     /**
      * Valor de custo do bem
-     * @return mixed Custo of Patrimonio
+     * @return string custo of Patrimônio
      */
     public function getCusto()
     {
@@ -323,8 +325,8 @@ class Patrimonio extends SyncModel
 
     /**
      * Set Custo value to new on param
-     * @param  mixed $custo new value for Custo
-     * @return Patrimonio Self instance
+     * @param string $custo Set custo for Patrimônio
+     * @return self Self instance
      */
     public function setCusto($custo)
     {
@@ -334,7 +336,7 @@ class Patrimonio extends SyncModel
 
     /**
      * Valor que o bem vale atualmente
-     * @return mixed Valor of Patrimonio
+     * @return string valor of Patrimônio
      */
     public function getValor()
     {
@@ -343,8 +345,8 @@ class Patrimonio extends SyncModel
 
     /**
      * Set Valor value to new on param
-     * @param  mixed $valor new value for Valor
-     * @return Patrimonio Self instance
+     * @param string $valor Set valor for Patrimônio
+     * @return self Self instance
      */
     public function setValor($valor)
     {
@@ -354,7 +356,7 @@ class Patrimonio extends SyncModel
 
     /**
      * Informa se o bem está ativo e em uso
-     * @return mixed Ativo of Patrimonio
+     * @return string ativo of Patrimônio
      */
     public function getAtivo()
     {
@@ -372,8 +374,8 @@ class Patrimonio extends SyncModel
 
     /**
      * Set Ativo value to new on param
-     * @param  mixed $ativo new value for Ativo
-     * @return Patrimonio Self instance
+     * @param string $ativo Set ativo for Patrimônio
+     * @return self Self instance
      */
     public function setAtivo($ativo)
     {
@@ -383,7 +385,7 @@ class Patrimonio extends SyncModel
 
     /**
      * Caminho relativo da foto do bem
-     * @return mixed Foto do bem of Patrimonio
+     * @return string foto do bem of Patrimônio
      */
     public function getImagemAnexada()
     {
@@ -392,8 +394,8 @@ class Patrimonio extends SyncModel
 
     /**
      * Set ImagemAnexada value to new on param
-     * @param  mixed $imagem_anexada new value for ImagemAnexada
-     * @return Patrimonio Self instance
+     * @param string $imagem_anexada Set foto do bem for Patrimônio
+     * @return self Self instance
      */
     public function setImagemAnexada($imagem_anexada)
     {
@@ -403,7 +405,7 @@ class Patrimonio extends SyncModel
 
     /**
      * Data de atualização das informações do bem
-     * @return mixed Data de atualização of Patrimonio
+     * @return string data de atualização of Patrimônio
      */
     public function getDataAtualizacao()
     {
@@ -412,8 +414,8 @@ class Patrimonio extends SyncModel
 
     /**
      * Set DataAtualizacao value to new on param
-     * @param  mixed $data_atualizacao new value for DataAtualizacao
-     * @return Patrimonio Self instance
+     * @param string $data_atualizacao Set data de atualização for Patrimônio
+     * @return self Self instance
      */
     public function setDataAtualizacao($data_atualizacao)
     {
@@ -423,7 +425,7 @@ class Patrimonio extends SyncModel
 
     /**
      * Convert this instance to array associated key -> value
-     * @param  boolean $recursive Allow rescursive conversion of fields
+     * @param boolean $recursive Allow rescursive conversion of fields
      * @return array All field and values into array format
      */
     public function toArray($recursive = false)
@@ -449,12 +451,12 @@ class Patrimonio extends SyncModel
 
     /**
      * Fill this instance with from array values, you can pass instance to
-     * @param  mixed $patrimonio Associated key -> value to assign into this instance
-     * @return Patrimonio Self instance
+     * @param mixed $patrimonio Associated key -> value to assign into this instance
+     * @return self Self instance
      */
     public function fromArray($patrimonio = [])
     {
-        if ($patrimonio instanceof Patrimonio) {
+        if ($patrimonio instanceof self) {
             $patrimonio = $patrimonio->toArray();
         } elseif (!is_array($patrimonio)) {
             $patrimonio = [];
@@ -541,15 +543,16 @@ class Patrimonio extends SyncModel
     /**
      * Get relative foto do bem path or default foto do bem
      * @param boolean $default If true return default image, otherwise check field
+     * @param string  $default_name Default image name
      * @return string relative web path for patrimônio foto do bem
      */
-    public function makeImagemAnexada($default = false)
+    public function makeImagemAnexada($default = false, $default_name = 'patrimonio.png')
     {
         $imagem_anexada = $this->getImagemAnexada();
         if ($default) {
             $imagem_anexada = null;
         }
-        return get_image_url($imagem_anexada, 'patrimonio', 'patrimonio.png');
+        return get_image_url($imagem_anexada, 'patrimonio', $default_name);
     }
 
     /**
@@ -559,13 +562,15 @@ class Patrimonio extends SyncModel
     public function publish()
     {
         $patrimonio = parent::publish();
-        $patrimonio['imagemanexada'] = $this->makeImagemAnexada();
+        $patrimonio['imagemanexada'] = $this->makeImagemAnexada(false, null);
         return $patrimonio;
     }
 
     /**
      * Filter fields, upload data and keep key data
-     * @param Patrimonio $original Original instance without modifications
+     * @param self $original Original instance without modifications
+     * @param boolean $localized Informs if fields are localized
+     * @return self Self instance
      */
     public function filter($original, $localized = false)
     {
@@ -587,11 +592,12 @@ class Patrimonio extends SyncModel
             $this->setImagemAnexada($imagem_anexada);
         }
         $this->setDataAtualizacao(DB::now());
+        return $this;
     }
 
     /**
      * Clean instance resources like images and docs
-     * @param  Patrimonio $dependency Don't clean when dependency use same resources
+     * @param self $dependency Don't clean when dependency use same resources
      */
     public function clean($dependency)
     {
@@ -604,77 +610,78 @@ class Patrimonio extends SyncModel
     /**
      * Validate fields updating them and throw exception when invalid data has found
      * @return array All field of Patrimonio in array format
+     * @throws \MZ\Exception\ValidationException for invalid input data
      */
     public function validate()
     {
         $errors = [];
         if (is_null($this->getEmpresaID())) {
-            $errors['empresaid'] = 'A empresa não pode ser vazia';
+            $errors['empresaid'] = _t('patrimonio.empresa_id_cannot_empty');
         }
         if (is_null($this->getNumero())) {
-            $errors['numero'] = 'O número não pode ser vazio';
+            $errors['numero'] = _t('patrimonio.numero_cannot_empty');
         }
         if (is_null($this->getDescricao())) {
-            $errors['descricao'] = 'A descrição não pode ser vazia';
+            $errors['descricao'] = _t('patrimonio.descricao_cannot_empty');
         }
         if (is_null($this->getQuantidade())) {
-            $errors['quantidade'] = 'A quantidade não pode ser vazia';
+            $errors['quantidade'] = _t('patrimonio.quantidade_cannot_empty');
         } elseif ($this->getQuantidade() < 1) {
             $errors['quantidade'] = 'A quantidade não pode ser nula ou negativa';
         }
         if (is_null($this->getAltura())) {
-            $errors['altura'] = 'A altura não pode ser vazia';
+            $errors['altura'] = _t('patrimonio.altura_cannot_empty');
         } elseif ($this->getAltura() < 0) {
             $errors['altura'] = 'A altura não pode ser nula ou negativa';
         }
         if (is_null($this->getLargura())) {
-            $errors['largura'] = 'A largura não pode ser vazia';
+            $errors['largura'] = _t('patrimonio.largura_cannot_empty');
         } elseif ($this->getLargura() < 0) {
             $errors['largura'] = 'A largura não pode ser nula ou negativa';
         }
         if (is_null($this->getComprimento())) {
-            $errors['comprimento'] = 'O comprimento não pode ser vazio';
+            $errors['comprimento'] = _t('patrimonio.comprimento_cannot_empty');
         } elseif ($this->getComprimento() < 0) {
             $errors['comprimento'] = 'O comprimento não pode ser nulo ou negativo';
         }
         if (!Validator::checkInSet($this->getEstado(), self::getEstadoOptions())) {
-            $errors['estado'] = 'O estado é inválido';
+            $errors['estado'] = _t('patrimonio.estado_invalid');
         }
         if (is_null($this->getCusto())) {
-            $errors['custo'] = 'O custo não pode ser vazio';
+            $errors['custo'] = _t('patrimonio.custo_cannot_empty');
         } elseif ($this->getCusto() < 0) {
             $errors['custo'] = 'O custo não pode ser nulo ou negativo';
         }
         if (is_null($this->getValor())) {
-            $errors['valor'] = 'O valor não pode ser vazio';
+            $errors['valor'] = _t('patrimonio.valor_cannot_empty');
         } elseif ($this->getValor() < 0) {
             $errors['valor'] = 'O valor não pode ser negativo';
         }
         if (!Validator::checkBoolean($this->getAtivo())) {
-            $errors['ativo'] = 'O ativo é inválido';
+            $errors['ativo'] = _t('patrimonio.ativo_invalid');
         }
         $this->setDataAtualizacao(DB::now());
         if (!empty($errors)) {
-            throw new \MZ\Exception\ValidationException($errors);
+            throw new ValidationException($errors);
         }
         return $this->toArray();
     }
 
     /**
      * Translate SQL exception into application exception
-     * @param  \Exception $e exception to translate into a readable error
+     * @param \Exception $e exception to translate into a readable error
      * @return \MZ\Exception\ValidationException new exception translated
      */
     protected function translate($e)
     {
         if (contains(['Numero', 'Estado', 'UNIQUE'], $e->getMessage())) {
-            return new \MZ\Exception\ValidationException([
-                'numero' => sprintf(
-                    'O número "%s" já está cadastrado',
+            return new ValidationException([
+                'numero' => _t(
+                    'patrimonio.numero_used',
                     $this->getNumero()
                 ),
-                'estado' => sprintf(
-                    'O estado "%s" já está cadastrado',
+                'estado' => _t(
+                    'patrimonio.estado_used',
                     $this->getEstado()
                 ),
             ]);
@@ -684,7 +691,8 @@ class Patrimonio extends SyncModel
 
     /**
      * Insert a new Patrimônio into the database and fill instance from database
-     * @return Patrimonio Self instance
+     * @return self Self instance
+     * @throws \MZ\Exception\ValidationException for invalid input data
      */
     public function insert()
     {
@@ -703,36 +711,42 @@ class Patrimonio extends SyncModel
 
     /**
      * Update Patrimônio with instance values into database for ID
-     * @param  array $only Save these fields only, when empty save all fields except id
-     * @return Patrimonio Self instance
+     * @param array $only Save these fields only, when empty save all fields except id
+     * @return int rows affected
+     * @throws \MZ\Exception\ValidationException for invalid input data
      */
     public function update($only = [])
     {
         $values = $this->validate();
         if (!$this->exists()) {
-            throw new \Exception('O identificador do patrimônio não foi informado');
+            throw new ValidationException(
+                ['id' => _t('patrimonio.id_cannot_empty')]
+            );
         }
         $values = DB::filterValues($values, $only, false);
         try {
-            DB::update('Patrimonios')
+            $affected = DB::update('Patrimonios')
                 ->set($values)
-                ->where('id', $this->getID())
+                ->where(['id' => $this->getID()])
                 ->execute();
             $this->loadByID();
         } catch (\Exception $e) {
             throw $this->translate($e);
         }
-        return $this;
+        return $affected;
     }
 
     /**
      * Delete this instance from database using ID
      * @return integer Number of rows deleted (Max 1)
+     * @throws \MZ\Exception\ValidationException for invalid id
      */
     public function delete()
     {
         if (!$this->exists()) {
-            throw new \Exception('O identificador do patrimônio não foi informado');
+            throw new ValidationException(
+                ['id' => _t('patrimonio.id_cannot_empty')]
+            );
         }
         $result = DB::deleteFrom('Patrimonios')
             ->where('id', $this->getID())
@@ -742,9 +756,9 @@ class Patrimonio extends SyncModel
 
     /**
      * Load one register for it self with a condition
-     * @param  array $condition Condition for searching the row
-     * @param  array $order associative field name -> [-1, 1]
-     * @return Patrimonio Self instance filled or empty
+     * @param array $condition Condition for searching the row
+     * @param array $order associative field name -> [-1, 1]
+     * @return self Self instance filled or empty
      */
     public function load($condition, $order = [])
     {
@@ -755,15 +769,13 @@ class Patrimonio extends SyncModel
 
     /**
      * Load into this object from database using, Numero, Estado
-     * @param  string $numero número to find Patrimônio
-     * @param  string $estado estado to find Patrimônio
-     * @return Patrimonio Self filled instance or empty when not found
+     * @return self Self filled instance or empty when not found
      */
-    public function loadByNumeroEstado($numero, $estado)
+    public function loadByNumeroEstado()
     {
         return $this->load([
-            'numero' => strval($numero),
-            'estado' => strval($estado),
+            'numero' => strval($this->getNumero()),
+            'estado' => strval($this->getEstado()),
         ]);
     }
 
@@ -790,15 +802,15 @@ class Patrimonio extends SyncModel
 
     /**
      * Gets textual and translated Estado for Patrimonio
-     * @param  int $index choose option from index
-     * @return mixed A associative key -> translated representative text or text for index
+     * @param int $index choose option from index
+     * @return string[] A associative key -> translated representative text or text for index
      */
     public static function getEstadoOptions($index = null)
     {
         $options = [
-            self::ESTADO_NOVO => 'Novo',
-            self::ESTADO_CONSERVADO => 'Conservado',
-            self::ESTADO_RUIM => 'Ruim',
+            self::ESTADO_NOVO => _t('patrimonio.estado_novo'),
+            self::ESTADO_CONSERVADO => _t('patrimonio.estado_conservado'),
+            self::ESTADO_RUIM => _t('patrimonio.estado_ruim'),
         ];
         if (!is_null($index)) {
             return $options[$index];
@@ -812,14 +824,14 @@ class Patrimonio extends SyncModel
      */
     private static function getAllowedKeys()
     {
-        $patrimonio = new Patrimonio();
+        $patrimonio = new self();
         $allowed = Filter::concatKeys('p.', $patrimonio->toArray());
         return $allowed;
     }
 
     /**
      * Filter order array
-     * @param  mixed $order order string or array to parse and filter allowed
+     * @param mixed $order order string or array to parse and filter allowed
      * @return array allowed associative order
      */
     private static function filterOrder($order)
@@ -830,7 +842,7 @@ class Patrimonio extends SyncModel
 
     /**
      * Filter condition array with allowed fields
-     * @param  array $condition condition to filter rows
+     * @param array $condition condition to filter rows
      * @return array allowed condition
      */
     private static function filterCondition($condition)
@@ -848,8 +860,8 @@ class Patrimonio extends SyncModel
 
     /**
      * Fetch data from database with a condition
-     * @param  array $condition condition to filter rows
-     * @param  array $order order rows
+     * @param array $condition condition to filter rows
+     * @param array $order order rows
      * @return SelectQuery query object with condition statement
      */
     private static function query($condition = [], $order = [])
@@ -864,36 +876,53 @@ class Patrimonio extends SyncModel
 
     /**
      * Search one register with a condition
-     * @param  array $condition Condition for searching the row
-     * @param  array $order order rows
-     * @return Patrimonio A filled Patrimônio or empty instance
+     * @param array $condition Condition for searching the row
+     * @param array $order order rows
+     * @return self A filled Patrimônio or empty instance
      */
     public static function find($condition, $order = [])
     {
-        $query = self::query($condition, $order)->limit(1);
-        $row = $query->fetch() ?: [];
-        return new Patrimonio($row);
+        $result = new self();
+        return $result->load($condition, $order);
+    }
+
+    /**
+     * Search one register with a condition
+     * @param array $condition Condition for searching the row
+     * @param array $order order rows
+     * @return self A filled Patrimônio or empty instance
+     * @throws \Exception when register has not found
+     */
+    public static function findOrFail($condition, $order = [])
+    {
+        $result = self::find($condition, $order);
+        if (!$result->exists()) {
+            throw new \Exception(_t('patrimonio.not_found'), 404);
+        }
+        return $result;
     }
 
     /**
      * Find this object on database using, Numero, Estado
-     * @param  string $numero número to find Patrimônio
-     * @param  string $estado estado to find Patrimônio
-     * @return Patrimonio A filled instance or empty when not found
+     * @param string $numero número to find Patrimônio
+     * @param string $estado estado to find Patrimônio
+     * @return self A filled instance or empty when not found
      */
     public static function findByNumeroEstado($numero, $estado)
     {
         $result = new self();
-        return $result->loadByNumeroEstado($numero, $estado);
+        $result->setNumero($numero);
+        $result->setEstado($estado);
+        return $result->loadByNumeroEstado();
     }
 
     /**
      * Find all Patrimônio
-     * @param  array  $condition Condition to get all Patrimônio
-     * @param  array  $order     Order Patrimônio
-     * @param  int    $limit     Limit data into row count
-     * @param  int    $offset    Start offset to get rows
-     * @return array             List of all rows instanced as Patrimonio
+     * @param array  $condition Condition to get all Patrimônio
+     * @param array  $order     Order Patrimônio
+     * @param int    $limit     Limit data into row count
+     * @param int    $offset    Start offset to get rows
+     * @return self[] List of all rows instanced as Patrimonio
      */
     public static function findAll($condition = [], $order = [], $limit = null, $offset = null)
     {
@@ -907,14 +936,14 @@ class Patrimonio extends SyncModel
         $rows = $query->fetchAll();
         $result = [];
         foreach ($rows as $row) {
-            $result[] = new Patrimonio($row);
+            $result[] = new self($row);
         }
         return $result;
     }
 
     /**
      * Count all rows from database with matched condition critery
-     * @param  array $condition condition to filter rows
+     * @param array $condition condition to filter rows
      * @return integer Quantity of rows
      */
     public static function count($condition = [])

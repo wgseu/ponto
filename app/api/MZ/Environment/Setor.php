@@ -65,7 +65,7 @@ class Setor extends SyncModel
 
     /**
      * Identificador do setor
-     * @return mixed ID of Setor
+     * @return int id of Setor
      */
     public function getID()
     {
@@ -74,7 +74,7 @@ class Setor extends SyncModel
 
     /**
      * Set ID value to new on param
-     * @param  mixed $id new value for ID
+     * @param int $id Set id for Setor
      * @return self Self instance
      */
     public function setID($id)
@@ -85,7 +85,7 @@ class Setor extends SyncModel
 
     /**
      * Informa o setor que abrange esse subsetor
-     * @return mixed Setor superior of Setor
+     * @return int setor superior of Setor
      */
     public function getSetorID()
     {
@@ -94,7 +94,7 @@ class Setor extends SyncModel
 
     /**
      * Set SetorID value to new on param
-     * @param  mixed $setor_id new value for SetorID
+     * @param int $setor_id Set setor superior for Setor
      * @return self Self instance
      */
     public function setSetorID($setor_id)
@@ -105,7 +105,7 @@ class Setor extends SyncModel
 
     /**
      * Nome do setor, único em todo o sistema
-     * @return mixed Nome of Setor
+     * @return string nome of Setor
      */
     public function getNome()
     {
@@ -114,7 +114,7 @@ class Setor extends SyncModel
 
     /**
      * Set Nome value to new on param
-     * @param  mixed $nome new value for Nome
+     * @param string $nome Set nome for Setor
      * @return self Self instance
      */
     public function setNome($nome)
@@ -125,7 +125,7 @@ class Setor extends SyncModel
 
     /**
      * Descreve a utilização do setor
-     * @return mixed Descrição of Setor
+     * @return string descrição of Setor
      */
     public function getDescricao()
     {
@@ -134,7 +134,7 @@ class Setor extends SyncModel
 
     /**
      * Set Descricao value to new on param
-     * @param  mixed $descricao new value for Descricao
+     * @param string $descricao Set descrição for Setor
      * @return self Self instance
      */
     public function setDescricao($descricao)
@@ -145,7 +145,7 @@ class Setor extends SyncModel
 
     /**
      * Convert this instance to array associated key -> value
-     * @param  boolean $recursive Allow rescursive conversion of fields
+     * @param boolean $recursive Allow rescursive conversion of fields
      * @return array All field and values into array format
      */
     public function toArray($recursive = false)
@@ -160,7 +160,7 @@ class Setor extends SyncModel
 
     /**
      * Fill this instance with from array values, you can pass instance to
-     * @param  mixed $setor Associated key -> value to assign into this instance
+     * @param mixed $setor Associated key -> value to assign into this instance
      * @return self Self instance
      */
     public function fromArray($setor = [])
@@ -207,6 +207,8 @@ class Setor extends SyncModel
     /**
      * Filter fields, upload data and keep key data
      * @param self $original Original instance without modifications
+     * @param boolean $localized Informs if fields are localized
+     * @return self Self instance
      */
     public function filter($original, $localized = false)
     {
@@ -214,11 +216,12 @@ class Setor extends SyncModel
         $this->setSetorID(Filter::number($this->getSetorID()));
         $this->setNome(Filter::string($this->getNome()));
         $this->setDescricao(Filter::string($this->getDescricao()));
+        return $this;
     }
 
     /**
      * Clean instance resources like images and docs
-     * @param  self $dependency Don't clean when dependency use same resources
+     * @param self $dependency Don't clean when dependency use same resources
      */
     public function clean($dependency)
     {
@@ -226,13 +229,14 @@ class Setor extends SyncModel
 
     /**
      * Validate fields updating them and throw exception when invalid data has found
-     * @return mixed[] All field of Setor in array format
+     * @return array All field of Setor in array format
+     * @throws \MZ\Exception\ValidationException for invalid input data
      */
     public function validate()
     {
         $errors = [];
         if (is_null($this->getNome())) {
-            $errors['nome'] = 'O nome não pode ser vazio';
+            $errors['nome'] = _t('setor.nome_cannot_empty');
         }
         if (!empty($errors)) {
             throw new ValidationException($errors);
@@ -242,15 +246,15 @@ class Setor extends SyncModel
 
     /**
      * Translate SQL exception into application exception
-     * @param  \Exception $e exception to translate into a readable error
+     * @param \Exception $e exception to translate into a readable error
      * @return \MZ\Exception\ValidationException new exception translated
      */
     protected function translate($e)
     {
         if (contains(['Nome', 'UNIQUE'], $e->getMessage())) {
             return new ValidationException([
-                'nome' => sprintf(
-                    'O nome "%s" já está cadastrado',
+                'nome' => _t(
+                    'setor.nome_used',
                     $this->getNome()
                 ),
             ]);
@@ -261,6 +265,7 @@ class Setor extends SyncModel
     /**
      * Insert a new Setor into the database and fill instance from database
      * @return self Self instance
+     * @throws \MZ\Exception\ValidationException for invalid input data
      */
     public function insert()
     {
@@ -279,14 +284,17 @@ class Setor extends SyncModel
 
     /**
      * Update Setor with instance values into database for ID
-     * @param  array $only Save these fields only, when empty save all fields except id
+     * @param array $only Save these fields only, when empty save all fields except id
      * @return int rows affected
+     * @throws \MZ\Exception\ValidationException for invalid input data
      */
     public function update($only = [])
     {
         $values = $this->validate();
         if (!$this->exists()) {
-            throw new \Exception('O identificador do setor não foi informado');
+            throw new ValidationException(
+                ['id' => _t('setor.id_cannot_empty')]
+            );
         }
         $values = DB::filterValues($values, $only, false);
         try {
@@ -304,11 +312,14 @@ class Setor extends SyncModel
     /**
      * Delete this instance from database using ID
      * @return integer Number of rows deleted (Max 1)
+     * @throws \MZ\Exception\ValidationException for invalid id
      */
     public function delete()
     {
         if (!$this->exists()) {
-            throw new \Exception('O identificador do setor não foi informado');
+            throw new ValidationException(
+                ['id' => _t('setor.id_cannot_empty')]
+            );
         }
         $result = DB::deleteFrom('Setores')
             ->where('id', $this->getID())
@@ -318,8 +329,8 @@ class Setor extends SyncModel
 
     /**
      * Load one register for it self with a condition
-     * @param  array $condition Condition for searching the row
-     * @param  array $order associative field name -> [-1, 1]
+     * @param array $condition Condition for searching the row
+     * @param array $order associative field name -> [-1, 1]
      * @return self Self instance filled or empty
      */
     public function load($condition, $order = [])
@@ -365,7 +376,7 @@ class Setor extends SyncModel
 
     /**
      * Filter order array
-     * @param  mixed $order order string or array to parse and filter allowed
+     * @param mixed $order order string or array to parse and filter allowed
      * @return array allowed associative order
      */
     private static function filterOrder($order)
@@ -376,7 +387,7 @@ class Setor extends SyncModel
 
     /**
      * Filter condition array with allowed fields
-     * @param  array $condition condition to filter rows
+     * @param array $condition condition to filter rows
      * @return array allowed condition
      */
     private static function filterCondition($condition)
@@ -384,8 +395,8 @@ class Setor extends SyncModel
         $allowed = self::getAllowedKeys();
         if (isset($condition['search'])) {
             $search = $condition['search'];
-            $field = '(s.nome LIKE ? OR s.descricao LIKE ?)';
-            $condition[$field] = ['%'.$search.'%', '%'.$search.'%'];
+            $field = 's.nome LIKE ?';
+            $condition[$field] = '%'.$search.'%';
             $allowed[$field] = true;
             unset($condition['search']);
         }
@@ -394,8 +405,8 @@ class Setor extends SyncModel
 
     /**
      * Fetch data from database with a condition
-     * @param  array $condition condition to filter rows
-     * @param  array $order order rows
+     * @param array $condition condition to filter rows
+     * @param array $order order rows
      * @return SelectQuery query object with condition statement
      */
     private static function query($condition = [], $order = [])
@@ -410,8 +421,8 @@ class Setor extends SyncModel
 
     /**
      * Search one register with a condition
-     * @param  array $condition Condition for searching the row
-     * @param  array $order order rows
+     * @param array $condition Condition for searching the row
+     * @param array $order order rows
      * @return self A filled Setor or empty instance
      */
     public static function find($condition, $order = [])
@@ -421,8 +432,24 @@ class Setor extends SyncModel
     }
 
     /**
+     * Search one register with a condition
+     * @param array $condition Condition for searching the row
+     * @param array $order order rows
+     * @return self A filled Setor or empty instance
+     * @throws \Exception when register has not found
+     */
+    public static function findOrFail($condition, $order = [])
+    {
+        $result = self::find($condition, $order);
+        if (!$result->exists()) {
+            throw new \Exception(_t('setor.not_found'), 404);
+        }
+        return $result;
+    }
+
+    /**
      * Find this object on database using, Nome
-     * @param  string $nome nome to find Setor
+     * @param string $nome nome to find Setor
      * @return self A filled instance or empty when not found
      */
     public static function findByNome($nome)
@@ -448,11 +475,11 @@ class Setor extends SyncModel
 
     /**
      * Find all Setor
-     * @param  array  $condition Condition to get all Setor
-     * @param  array  $order     Order Setor
-     * @param  int    $limit     Limit data into row count
-     * @param  int    $offset    Start offset to get rows
-     * @return self[]             List of all rows instanced as Setor
+     * @param array  $condition Condition to get all Setor
+     * @param array  $order     Order Setor
+     * @param int    $limit     Limit data into row count
+     * @param int    $offset    Start offset to get rows
+     * @return self[] List of all rows instanced as Setor
      */
     public static function findAll($condition = [], $order = [], $limit = null, $offset = null)
     {
@@ -473,7 +500,7 @@ class Setor extends SyncModel
 
     /**
      * Count all rows from database with matched condition critery
-     * @param  array $condition condition to filter rows
+     * @param array $condition condition to filter rows
      * @return integer Quantity of rows
      */
     public static function count($condition = [])

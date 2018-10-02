@@ -102,7 +102,7 @@ class Horario extends SyncModel
 
     /**
      * Identificador do horário
-     * @return mixed ID of Horario
+     * @return int id of Horário
      */
     public function getID()
     {
@@ -111,7 +111,7 @@ class Horario extends SyncModel
 
     /**
      * Set ID value to new on param
-     * @param  mixed $id new value for ID
+     * @param int $id Set id for Horário
      * @return self Self instance
      */
     public function setID($id)
@@ -124,7 +124,7 @@ class Horario extends SyncModel
      * Modo de trabalho disponível nesse horário, Funcionamento: horário em que
      * o estabelecimento estará aberto, Operação: quando aceitar novos pedidos
      * locais, Entrega: quando aceita ainda pedidos para entrega
-     * @return mixed Modo of Horario
+     * @return string modo of Horário
      */
     public function getModo()
     {
@@ -133,7 +133,7 @@ class Horario extends SyncModel
 
     /**
      * Set Modo value to new on param
-     * @param  mixed $modo new value for Modo
+     * @param string $modo Set modo for Horário
      * @return self Self instance
      */
     public function setModo($modo)
@@ -145,7 +145,7 @@ class Horario extends SyncModel
     /**
      * Permite informar o horário de acesso ao sistema para realizar essa
      * função
-     * @return mixed Função of Horario
+     * @return int função of Horário
      */
     public function getFuncaoID()
     {
@@ -154,7 +154,7 @@ class Horario extends SyncModel
 
     /**
      * Set FuncaoID value to new on param
-     * @param  mixed $funcao_id new value for FuncaoID
+     * @param int $funcao_id Set função for Horário
      * @return self Self instance
      */
     public function setFuncaoID($funcao_id)
@@ -165,7 +165,7 @@ class Horario extends SyncModel
 
     /**
      * Permite informar o horário de prestação de serviço para esse prestador
-     * @return mixed Prestador of Horario
+     * @return int prestador of Horário
      */
     public function getPrestadorID()
     {
@@ -174,7 +174,7 @@ class Horario extends SyncModel
 
     /**
      * Set PrestadorID value to new on param
-     * @param  mixed $prestador_id new value for PrestadorID
+     * @param int $prestador_id Set prestador for Horário
      * @return self Self instance
      */
     public function setPrestadorID($prestador_id)
@@ -185,7 +185,7 @@ class Horario extends SyncModel
 
     /**
      * Permite informar o horário de atendimento para cada integração
-     * @return mixed Integração of Horario
+     * @return int integração of Horário
      */
     public function getIntegracaoID()
     {
@@ -194,7 +194,7 @@ class Horario extends SyncModel
 
     /**
      * Set IntegracaoID value to new on param
-     * @param  mixed $integracao_id new value for IntegracaoID
+     * @param int $integracao_id Set integração for Horário
      * @return self Self instance
      */
     public function setIntegracaoID($integracao_id)
@@ -206,7 +206,7 @@ class Horario extends SyncModel
     /**
      * Início do horário de funcionamento em minutos contando a partir de
      * domingo até sábado
-     * @return mixed Início of Horario
+     * @return int início of Horário
      */
     public function getInicio()
     {
@@ -215,7 +215,7 @@ class Horario extends SyncModel
 
     /**
      * Set Inicio value to new on param
-     * @param  mixed $inicio new value for Inicio
+     * @param int $inicio Set início for Horário
      * @return self Self instance
      */
     public function setInicio($inicio)
@@ -227,7 +227,7 @@ class Horario extends SyncModel
     /**
      * Horário final de funcionamento do estabelecimento contando em minutos a
      * partir de domingo
-     * @return mixed Fim of Horario
+     * @return int fim of Horário
      */
     public function getFim()
     {
@@ -236,7 +236,7 @@ class Horario extends SyncModel
 
     /**
      * Set Fim value to new on param
-     * @param  mixed $fim new value for Fim
+     * @param int $fim Set fim for Horário
      * @return self Self instance
      */
     public function setFim($fim)
@@ -248,7 +248,7 @@ class Horario extends SyncModel
     /**
      * Mensagem que será mostrada quando o estabelecimento estiver fechado por
      * algum motivo
-     * @return mixed Mensagem of Horario
+     * @return string mensagem of Horário
      */
     public function getMensagem()
     {
@@ -257,7 +257,7 @@ class Horario extends SyncModel
 
     /**
      * Set Mensagem value to new on param
-     * @param  mixed $mensagem new value for Mensagem
+     * @param string $mensagem Set mensagem for Horário
      * @return self Self instance
      */
     public function setMensagem($mensagem)
@@ -270,7 +270,7 @@ class Horario extends SyncModel
      * Informa se o estabelecimento estará fechado nesse horário programado, o
      * início e fim será tempo no formato unix, quando verdadeiro tem
      * prioridade sobre todos os horários
-     * @return mixed Fechado of Horario
+     * @return string fechado of Horário
      */
     public function getFechado()
     {
@@ -290,7 +290,7 @@ class Horario extends SyncModel
 
     /**
      * Set Fechado value to new on param
-     * @param  mixed $fechado new value for Fechado
+     * @param string $fechado Set fechado for Horário
      * @return self Self instance
      */
     public function setFechado($fechado)
@@ -301,7 +301,7 @@ class Horario extends SyncModel
 
     /**
      * Convert this instance to array associated key -> value
-     * @param  boolean $recursive Allow rescursive conversion of fields
+     * @param boolean $recursive Allow rescursive conversion of fields
      * @return array All field and values into array format
      */
     public function toArray($recursive = false)
@@ -321,7 +321,7 @@ class Horario extends SyncModel
 
     /**
      * Fill this instance with from array values, you can pass instance to
-     * @param  mixed $horario Associated key -> value to assign into this instance
+     * @param mixed $horario Associated key -> value to assign into this instance
      * @return self Self instance
      */
     public function fromArray($horario = [])
@@ -393,6 +393,8 @@ class Horario extends SyncModel
     /**
      * Filter fields, upload data and keep key data
      * @param self $original Original instance without modifications
+     * @param boolean $localized Informs if fields are localized
+     * @return self Self instance
      */
     public function filter($original, $localized = false)
     {
@@ -403,11 +405,12 @@ class Horario extends SyncModel
         $this->setInicio(Filter::number($this->getInicio()));
         $this->setFim(Filter::number($this->getFim()));
         $this->setMensagem(Filter::string($this->getMensagem()));
+        return $this;
     }
 
     /**
      * Clean instance resources like images and docs
-     * @param  self $dependency Don't clean when dependency use same resources
+     * @param self $dependency Don't clean when dependency use same resources
      */
     public function clean($dependency)
     {
@@ -415,22 +418,23 @@ class Horario extends SyncModel
 
     /**
      * Validate fields updating them and throw exception when invalid data has found
-     * @return mixed[] All field of Horario in array format
+     * @return array All field of Horario in array format
+     * @throws \MZ\Exception\ValidationException for invalid input data
      */
     public function validate()
     {
         $errors = [];
         if (!Validator::checkInSet($this->getModo(), self::getModoOptions())) {
-            $errors['modo'] = 'O modo é inválido';
+            $errors['modo'] = _t('horario.modo_invalid');
         }
         if (is_null($this->getInicio())) {
-            $errors['inicio'] = 'O início não pode ser vazio';
+            $errors['inicio'] = _t('horario.inicio_cannot_empty');
         }
         if (is_null($this->getFim())) {
-            $errors['fim'] = 'O fim não pode ser vazio';
+            $errors['fim'] = _t('horario.fim_cannot_empty');
         }
         if (!Validator::checkBoolean($this->getFechado())) {
-            $errors['fechado'] = 'O fechado é inválido';
+            $errors['fechado'] = _t('horario.fechado_invalid');
         }
         if (!empty($errors)) {
             throw new ValidationException($errors);
@@ -441,6 +445,7 @@ class Horario extends SyncModel
     /**
      * Insert a new Horário into the database and fill instance from database
      * @return self Self instance
+     * @throws \MZ\Exception\ValidationException for invalid input data
      */
     public function insert()
     {
@@ -459,14 +464,17 @@ class Horario extends SyncModel
 
     /**
      * Update Horário with instance values into database for ID
-     * @param  array $only Save these fields only, when empty save all fields except id
+     * @param array $only Save these fields only, when empty save all fields except id
      * @return int rows affected
+     * @throws \MZ\Exception\ValidationException for invalid input data
      */
     public function update($only = [])
     {
         $values = $this->validate();
         if (!$this->exists()) {
-            throw new \Exception('O identificador do horário não foi informado');
+            throw new ValidationException(
+                ['id' => _t('horario.id_cannot_empty')]
+            );
         }
         $values = DB::filterValues($values, $only, false);
         try {
@@ -484,11 +492,14 @@ class Horario extends SyncModel
     /**
      * Delete this instance from database using ID
      * @return integer Number of rows deleted (Max 1)
+     * @throws \MZ\Exception\ValidationException for invalid id
      */
     public function delete()
     {
         if (!$this->exists()) {
-            throw new \Exception('O identificador do horário não foi informado');
+            throw new ValidationException(
+                ['id' => _t('horario.id_cannot_empty')]
+            );
         }
         $result = DB::deleteFrom('Horarios')
             ->where('id', $this->getID())
@@ -498,8 +509,8 @@ class Horario extends SyncModel
 
     /**
      * Load one register for it self with a condition
-     * @param  array $condition Condition for searching the row
-     * @param  array $order associative field name -> [-1, 1]
+     * @param array $condition Condition for searching the row
+     * @param array $order associative field name -> [-1, 1]
      * @return self Self instance filled or empty
      */
     public function load($condition, $order = [])
@@ -548,15 +559,15 @@ class Horario extends SyncModel
 
     /**
      * Gets textual and translated Modo for Horario
-     * @param  int $index choose option from index
-     * @return mixed A associative key -> translated representative text or text for index
+     * @param int $index choose option from index
+     * @return string[]|string A associative key -> translated representative text or text for index
      */
     public static function getModoOptions($index = null)
     {
         $options = [
-            self::MODO_FUNCIONAMENTO => 'Funcionamento',
-            self::MODO_OPERACAO => 'Operacao',
-            self::MODO_ENTREGA => 'Entrega',
+            self::MODO_FUNCIONAMENTO => _t('horario.modo_funcionamento'),
+            self::MODO_OPERACAO => _t('horario.modo_operacao'),
+            self::MODO_ENTREGA => _t('horario.modo_entrega'),
         ];
         if (!is_null($index)) {
             return $options[$index];
@@ -577,7 +588,7 @@ class Horario extends SyncModel
 
     /**
      * Filter order array
-     * @param  mixed $order order string or array to parse and filter allowed
+     * @param mixed $order order string or array to parse and filter allowed
      * @return array allowed associative order
      */
     private static function filterOrder($order)
@@ -588,7 +599,7 @@ class Horario extends SyncModel
 
     /**
      * Filter condition array with allowed fields
-     * @param  array $condition condition to filter rows
+     * @param array $condition condition to filter rows
      * @return array allowed condition
      */
     private static function filterCondition($condition)
@@ -606,8 +617,8 @@ class Horario extends SyncModel
 
     /**
      * Fetch data from database with a condition
-     * @param  array $condition condition to filter rows
-     * @param  array $order order rows
+     * @param array $condition condition to filter rows
+     * @param array $order order rows
      * @return SelectQuery query object with condition statement
      */
     private static function query($condition = [], $order = [])
@@ -621,8 +632,8 @@ class Horario extends SyncModel
 
     /**
      * Search one register with a condition
-     * @param  array $condition Condition for searching the row
-     * @param  array $order order rows
+     * @param array $condition Condition for searching the row
+     * @param array $order order rows
      * @return self A filled Horário or empty instance
      */
     public static function find($condition, $order = [])
@@ -632,12 +643,28 @@ class Horario extends SyncModel
     }
 
     /**
+     * Search one register with a condition
+     * @param array $condition Condition for searching the row
+     * @param array $order order rows
+     * @return self A filled Horário or empty instance
+     * @throws \Exception when register has not found
+     */
+    public static function findOrFail($condition, $order = [])
+    {
+        $result = self::find($condition, $order);
+        if (!$result->exists()) {
+            throw new \Exception(_t('horario.not_found'), 404);
+        }
+        return $result;
+    }
+
+    /**
      * Find all Horário
-     * @param  array  $condition Condition to get all Horário
-     * @param  array  $order     Order Horário
-     * @param  int    $limit     Limit data into row count
-     * @param  int    $offset    Start offset to get rows
-     * @return self[]             List of all rows instanced as Horario
+     * @param array  $condition Condition to get all Horário
+     * @param array  $order     Order Horário
+     * @param int    $limit     Limit data into row count
+     * @param int    $offset    Start offset to get rows
+     * @return self[] List of all rows instanced as Horario
      */
     public static function findAll($condition = [], $order = [], $limit = null, $offset = null)
     {
@@ -658,7 +685,7 @@ class Horario extends SyncModel
 
     /**
      * Count all rows from database with matched condition critery
-     * @param  array $condition condition to filter rows
+     * @param array $condition condition to filter rows
      * @return integer Quantity of rows
      */
     public static function count($condition = [])

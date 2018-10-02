@@ -24,10 +24,12 @@
  */
 namespace MZ\Payment;
 
-use MZ\Database\SyncModel;
-use MZ\Database\DB;
+use MZ\Util\Mask;
 use MZ\Util\Filter;
 use MZ\Util\Validator;
+use MZ\Database\DB;
+use MZ\Database\SyncModel;
+use MZ\Exception\ValidationException;
 
 /**
  * Formas de pagamento disponíveis para pedido e contas
@@ -39,11 +41,12 @@ class FormaPagto extends SyncModel
      * Tipo de pagamento
      */
     const TIPO_DINHEIRO = 'Dinheiro';
-    const TIPO_CARTAO = 'Cartao';
-    const TIPO_CHEQUE = 'Cheque';
-    const TIPO_CONTA = 'Conta';
     const TIPO_CREDITO = 'Credito';
-    const TIPO_TRANSFERENCIA = 'Transferencia';
+    const TIPO_DEBITO = 'Debito';
+    const TIPO_VALE = 'Vale';
+    const TIPO_CHEQUE = 'Cheque';
+    const TIPO_CREDIARIO = 'Crediario';
+    const TIPO_SALDO = 'Saldo';
 
     /**
      * Identificador da forma de pagamento
@@ -54,13 +57,14 @@ class FormaPagto extends SyncModel
      */
     private $tipo;
     /**
+     * Informa se essa forma de pagamento estará disponível apenas nessa
+     * integração
+     */
+    private $integracao_id;
+    /**
      * Carteira que será usada para entrada de valores no caixa
      */
     private $carteira_id;
-    /**
-     * Carteira de saída de valores do caixa
-     */
-    private $carteira_pagto_id;
     /**
      * Descrição da forma de pagamento
      */
@@ -101,7 +105,7 @@ class FormaPagto extends SyncModel
 
     /**
      * Identificador da forma de pagamento
-     * @return mixed ID of FormaPagto
+     * @return int id of Forma de pagamento
      */
     public function getID()
     {
@@ -110,8 +114,8 @@ class FormaPagto extends SyncModel
 
     /**
      * Set ID value to new on param
-     * @param  mixed $id new value for ID
-     * @return FormaPagto Self instance
+     * @param int $id Set id for Forma de pagamento
+     * @return self Self instance
      */
     public function setID($id)
     {
@@ -121,7 +125,7 @@ class FormaPagto extends SyncModel
 
     /**
      * Tipo de pagamento
-     * @return mixed Tipo of FormaPagto
+     * @return string tipo of Forma de pagamento
      */
     public function getTipo()
     {
@@ -130,8 +134,8 @@ class FormaPagto extends SyncModel
 
     /**
      * Set Tipo value to new on param
-     * @param  mixed $tipo new value for Tipo
-     * @return FormaPagto Self instance
+     * @param string $tipo Set tipo for Forma de pagamento
+     * @return self Self instance
      */
     public function setTipo($tipo)
     {
@@ -140,8 +144,29 @@ class FormaPagto extends SyncModel
     }
 
     /**
+     * Informa se essa forma de pagamento estará disponível apenas nessa
+     * integração
+     * @return int integração of Forma de pagamento
+     */
+    public function getIntegracaoID()
+    {
+        return $this->integracao_id;
+    }
+
+    /**
+     * Set IntegracaoID value to new on param
+     * @param int $integracao_id Set integração for Forma de pagamento
+     * @return self Self instance
+     */
+    public function setIntegracaoID($integracao_id)
+    {
+        $this->integracao_id = $integracao_id;
+        return $this;
+    }
+
+    /**
      * Carteira que será usada para entrada de valores no caixa
-     * @return mixed Carteira de entrada of FormaPagto
+     * @return int carteira de entrada of Forma de pagamento
      */
     public function getCarteiraID()
     {
@@ -150,8 +175,8 @@ class FormaPagto extends SyncModel
 
     /**
      * Set CarteiraID value to new on param
-     * @param  mixed $carteira_id new value for CarteiraID
-     * @return FormaPagto Self instance
+     * @param int $carteira_id Set carteira de entrada for Forma de pagamento
+     * @return self Self instance
      */
     public function setCarteiraID($carteira_id)
     {
@@ -160,28 +185,8 @@ class FormaPagto extends SyncModel
     }
 
     /**
-     * Carteira de saída de valores do caixa
-     * @return mixed Carteira de saída of FormaPagto
-     */
-    public function getCarteiraPagtoID()
-    {
-        return $this->carteira_pagto_id;
-    }
-
-    /**
-     * Set CarteiraPagtoID value to new on param
-     * @param  mixed $carteira_pagto_id new value for CarteiraPagtoID
-     * @return FormaPagto Self instance
-     */
-    public function setCarteiraPagtoID($carteira_pagto_id)
-    {
-        $this->carteira_pagto_id = $carteira_pagto_id;
-        return $this;
-    }
-
-    /**
      * Descrição da forma de pagamento
-     * @return mixed Descrição of FormaPagto
+     * @return string descrição of Forma de pagamento
      */
     public function getDescricao()
     {
@@ -190,8 +195,8 @@ class FormaPagto extends SyncModel
 
     /**
      * Set Descricao value to new on param
-     * @param  mixed $descricao new value for Descricao
-     * @return FormaPagto Self instance
+     * @param string $descricao Set descrição for Forma de pagamento
+     * @return self Self instance
      */
     public function setDescricao($descricao)
     {
@@ -201,7 +206,7 @@ class FormaPagto extends SyncModel
 
     /**
      * Informa se a forma de pagamento permite parcelamento
-     * @return mixed Parcelado of FormaPagto
+     * @return string parcelado of Forma de pagamento
      */
     public function getParcelado()
     {
@@ -219,8 +224,8 @@ class FormaPagto extends SyncModel
 
     /**
      * Set Parcelado value to new on param
-     * @param  mixed $parcelado new value for Parcelado
-     * @return FormaPagto Self instance
+     * @param string $parcelado Set parcelado for Forma de pagamento
+     * @return self Self instance
      */
     public function setParcelado($parcelado)
     {
@@ -230,7 +235,7 @@ class FormaPagto extends SyncModel
 
     /**
      * Quantidade mínima de parcelas
-     * @return mixed Minimo de parcelas of FormaPagto
+     * @return int minimo de parcelas of Forma de pagamento
      */
     public function getMinParcelas()
     {
@@ -239,8 +244,8 @@ class FormaPagto extends SyncModel
 
     /**
      * Set MinParcelas value to new on param
-     * @param  mixed $min_parcelas new value for MinParcelas
-     * @return FormaPagto Self instance
+     * @param int $min_parcelas Set minimo de parcelas for Forma de pagamento
+     * @return self Self instance
      */
     public function setMinParcelas($min_parcelas)
     {
@@ -250,7 +255,7 @@ class FormaPagto extends SyncModel
 
     /**
      * Quantidade máxima de parcelas
-     * @return mixed Máximo de parcelas of FormaPagto
+     * @return int máximo de parcelas of Forma de pagamento
      */
     public function getMaxParcelas()
     {
@@ -259,8 +264,8 @@ class FormaPagto extends SyncModel
 
     /**
      * Set MaxParcelas value to new on param
-     * @param  mixed $max_parcelas new value for MaxParcelas
-     * @return FormaPagto Self instance
+     * @param int $max_parcelas Set máximo de parcelas for Forma de pagamento
+     * @return self Self instance
      */
     public function setMaxParcelas($max_parcelas)
     {
@@ -270,7 +275,7 @@ class FormaPagto extends SyncModel
 
     /**
      * Quantidade de parcelas em que não será cobrado juros
-     * @return mixed Parcelas sem juros of FormaPagto
+     * @return int parcelas sem juros of Forma de pagamento
      */
     public function getParcelasSemJuros()
     {
@@ -279,8 +284,8 @@ class FormaPagto extends SyncModel
 
     /**
      * Set ParcelasSemJuros value to new on param
-     * @param  mixed $parcelas_sem_juros new value for ParcelasSemJuros
-     * @return FormaPagto Self instance
+     * @param int $parcelas_sem_juros Set parcelas sem juros for Forma de pagamento
+     * @return self Self instance
      */
     public function setParcelasSemJuros($parcelas_sem_juros)
     {
@@ -290,7 +295,7 @@ class FormaPagto extends SyncModel
 
     /**
      * Juros cobrado ao cliente no parcelamento
-     * @return mixed Juros of FormaPagto
+     * @return float juros of Forma de pagamento
      */
     public function getJuros()
     {
@@ -299,8 +304,8 @@ class FormaPagto extends SyncModel
 
     /**
      * Set Juros value to new on param
-     * @param  mixed $juros new value for Juros
-     * @return FormaPagto Self instance
+     * @param float $juros Set juros for Forma de pagamento
+     * @return self Self instance
      */
     public function setJuros($juros)
     {
@@ -310,7 +315,7 @@ class FormaPagto extends SyncModel
 
     /**
      * Informa se a forma de pagamento está ativa
-     * @return mixed Ativa of FormaPagto
+     * @return string ativa of Forma de pagamento
      */
     public function getAtiva()
     {
@@ -328,8 +333,8 @@ class FormaPagto extends SyncModel
 
     /**
      * Set Ativa value to new on param
-     * @param  mixed $ativa new value for Ativa
-     * @return FormaPagto Self instance
+     * @param string $ativa Set ativa for Forma de pagamento
+     * @return self Self instance
      */
     public function setAtiva($ativa)
     {
@@ -339,7 +344,7 @@ class FormaPagto extends SyncModel
 
     /**
      * Convert this instance to array associated key -> value
-     * @param  boolean $recursive Allow rescursive conversion of fields
+     * @param boolean $recursive Allow rescursive conversion of fields
      * @return array All field and values into array format
      */
     public function toArray($recursive = false)
@@ -347,8 +352,8 @@ class FormaPagto extends SyncModel
         $forma_pagto = parent::toArray($recursive);
         $forma_pagto['id'] = $this->getID();
         $forma_pagto['tipo'] = $this->getTipo();
+        $forma_pagto['integracaoid'] = $this->getIntegracaoID();
         $forma_pagto['carteiraid'] = $this->getCarteiraID();
-        $forma_pagto['carteirapagtoid'] = $this->getCarteiraPagtoID();
         $forma_pagto['descricao'] = $this->getDescricao();
         $forma_pagto['parcelado'] = $this->getParcelado();
         $forma_pagto['minparcelas'] = $this->getMinParcelas();
@@ -361,12 +366,12 @@ class FormaPagto extends SyncModel
 
     /**
      * Fill this instance with from array values, you can pass instance to
-     * @param  mixed $forma_pagto Associated key -> value to assign into this instance
-     * @return FormaPagto Self instance
+     * @param mixed $forma_pagto Associated key -> value to assign into this instance
+     * @return self Self instance
      */
     public function fromArray($forma_pagto = [])
     {
-        if ($forma_pagto instanceof FormaPagto) {
+        if ($forma_pagto instanceof self) {
             $forma_pagto = $forma_pagto->toArray();
         } elseif (!is_array($forma_pagto)) {
             $forma_pagto = [];
@@ -382,15 +387,15 @@ class FormaPagto extends SyncModel
         } else {
             $this->setTipo($forma_pagto['tipo']);
         }
+        if (!array_key_exists('integracaoid', $forma_pagto)) {
+            $this->setIntegracaoID(null);
+        } else {
+            $this->setIntegracaoID($forma_pagto['integracaoid']);
+        }
         if (!isset($forma_pagto['carteiraid'])) {
             $this->setCarteiraID(null);
         } else {
             $this->setCarteiraID($forma_pagto['carteiraid']);
-        }
-        if (!isset($forma_pagto['carteirapagtoid'])) {
-            $this->setCarteiraPagtoID(null);
-        } else {
-            $this->setCarteiraPagtoID($forma_pagto['carteirapagtoid']);
         }
         if (!isset($forma_pagto['descricao'])) {
             $this->setDescricao(null);
@@ -398,7 +403,7 @@ class FormaPagto extends SyncModel
             $this->setDescricao($forma_pagto['descricao']);
         }
         if (!isset($forma_pagto['parcelado'])) {
-            $this->setParcelado(null);
+            $this->setParcelado('N');
         } else {
             $this->setParcelado($forma_pagto['parcelado']);
         }
@@ -442,23 +447,31 @@ class FormaPagto extends SyncModel
 
     /**
      * Filter fields, upload data and keep key data
-     * @param FormaPagto $original Original instance without modifications
+     * @param self $original Original instance without modifications
+     * @param boolean $localized Informs if fields are localized
+     * @return self Self instance
      */
     public function filter($original, $localized = false)
     {
         $this->setID($original->getID());
+        $this->setIntegracaoID(Filter::number($this->getIntegracaoID()));
         $this->setCarteiraID(Filter::number($this->getCarteiraID()));
-        $this->setCarteiraPagtoID(Filter::number($this->getCarteiraPagtoID()));
         $this->setDescricao(Filter::string($this->getDescricao()));
         $this->setMinParcelas(Filter::number($this->getMinParcelas()));
         $this->setMaxParcelas(Filter::number($this->getMaxParcelas()));
         $this->setParcelasSemJuros(Filter::number($this->getParcelasSemJuros()));
         $this->setJuros(Filter::float($this->getJuros(), $localized));
+        if ($this->getTipo() == self::TIPO_CARTAO) {
+            $this->setParcelado('Y');
+        } else {
+            $this->setParcelado('N');
+        }
+        return $this;
     }
 
     /**
      * Clean instance resources like images and docs
-     * @param  FormaPagto $dependency Don't clean when dependency use same resources
+     * @param self $dependency Don't clean when dependency use same resources
      */
     public function clean($dependency)
     {
@@ -467,29 +480,22 @@ class FormaPagto extends SyncModel
     /**
      * Validate fields updating them and throw exception when invalid data has found
      * @return array All field of FormaPagto in array format
+     * @throws \MZ\Exception\ValidationException for invalid input data
      */
     public function validate()
     {
         $errors = [];
         if (!Validator::checkInSet($this->getTipo(), self::getTipoOptions())) {
-            $errors['tipo'] = 'O tipo não foi informado ou é inválido';
+            $errors['tipo'] = _t('forma_pagto.tipo_invalid');
         }
         if (is_null($this->getCarteiraID())) {
-            $errors['carteiraid'] = 'A carteira de entrada não pode ser vazia';
-        }
-        if (is_null($this->getCarteiraPagtoID())) {
-            $errors['carteirapagtoid'] = 'A carteira de saída não pode ser vazia';
+            $errors['carteiraid'] = _t('forma_pagto.carteira_id_cannot_empty');
         }
         if (is_null($this->getDescricao())) {
-            $errors['descricao'] = 'A descrição não pode ser vazia';
-        }
-        if (in_array($this->getTipo(), [self::TIPO_CARTAO, self::TIPO_CHEQUE])) {
-            $this->setParcelado('Y');
-        } else {
-            $this->setParcelado('N');
+            $errors['descricao'] = _t('forma_pagto.descricao_cannot_empty');
         }
         if (!Validator::checkBoolean($this->getParcelado())) {
-            $errors['parcelado'] = 'O parcelamento não foi informado ou é inválido';
+            $errors['parcelado'] = _t('forma_pagto.parcelado_invalid');
         }
         if (!is_null($this->getMinParcelas()) && $this->getMinParcelas() < 0) {
             $errors['minparcelas'] = 'O mínimo de parcelas não pode ser negativo';
@@ -516,25 +522,25 @@ class FormaPagto extends SyncModel
             $errors['juros'] = 'O juros não pode ser negativo';
         }
         if (!Validator::checkBoolean($this->getAtiva())) {
-            $errors['ativa'] = 'A ativação não foi informada ou é inválida';
+            $errors['ativa'] = _t('forma_pagto.ativa_invalid');
         }
         if (!empty($errors)) {
-            throw new \MZ\Exception\ValidationException($errors);
+            throw new ValidationException($errors);
         }
         return $this->toArray();
     }
 
     /**
      * Translate SQL exception into application exception
-     * @param  \Exception $e exception to translate into a readable error
+     * @param \Exception $e exception to translate into a readable error
      * @return \MZ\Exception\ValidationException new exception translated
      */
     protected function translate($e)
     {
         if (contains(['Descricao', 'UNIQUE'], $e->getMessage())) {
-            return new \MZ\Exception\ValidationException([
-                'descricao' => sprintf(
-                    'A descrição "%s" já está cadastrada',
+            return new ValidationException([
+                'descricao' => _t(
+                    'forma_pagto.descricao_used',
                     $this->getDescricao()
                 ),
             ]);
@@ -544,7 +550,8 @@ class FormaPagto extends SyncModel
 
     /**
      * Insert a new Forma de pagamento into the database and fill instance from database
-     * @return FormaPagto Self instance
+     * @return self Self instance
+     * @throws \MZ\Exception\ValidationException for invalid input data
      */
     public function insert()
     {
@@ -563,35 +570,42 @@ class FormaPagto extends SyncModel
 
     /**
      * Update Forma de pagamento with instance values into database for ID
-     * @return FormaPagto Self instance
+     * @param array $only Save these fields only, when empty save all fields except id
+     * @return int rows affected
+     * @throws \MZ\Exception\ValidationException for invalid input data
      */
     public function update($only = [])
     {
         $values = $this->validate();
         if (!$this->exists()) {
-            throw new \Exception('O identificador da forma de pagamento não foi informado');
+            throw new ValidationException(
+                ['id' => _t('forma_pagto.id_cannot_empty')]
+            );
         }
         $values = DB::filterValues($values, $only, false);
         try {
-            DB::update('Formas_Pagto')
+            $affected = DB::update('Formas_Pagto')
                 ->set($values)
-                ->where('id', $this->getID())
+                ->where(['id' => $this->getID()])
                 ->execute();
             $this->loadByID();
         } catch (\Exception $e) {
             throw $this->translate($e);
         }
-        return $this;
+        return $affected;
     }
 
     /**
      * Delete this instance from database using ID
      * @return integer Number of rows deleted (Max 1)
+     * @throws \MZ\Exception\ValidationException for invalid id
      */
     public function delete()
     {
         if (!$this->exists()) {
-            throw new \Exception('O identificador da forma de pagamento não foi informado');
+            throw new ValidationException(
+                ['id' => _t('forma_pagto.id_cannot_empty')]
+            );
         }
         $result = DB::deleteFrom('Formas_Pagto')
             ->where('id', $this->getID())
@@ -601,9 +615,9 @@ class FormaPagto extends SyncModel
 
     /**
      * Load one register for it self with a condition
-     * @param  array $condition Condition for searching the row
-     * @param  array $order associative field name -> [-1, 1]
-     * @return FormaPagto Self instance filled or empty
+     * @param array $condition Condition for searching the row
+     * @param array $order associative field name -> [-1, 1]
+     * @return self Self instance filled or empty
      */
     public function load($condition, $order = [])
     {
@@ -614,14 +628,26 @@ class FormaPagto extends SyncModel
 
     /**
      * Load into this object from database using, Descricao
-     * @param  string $descricao descrição to find Forma de pagamento
-     * @return FormaPagto Self filled instance or empty when not found
+     * @return self Self filled instance or empty when not found
      */
-    public function loadByDescricao($descricao)
+    public function loadByDescricao()
     {
         return $this->load([
-            'descricao' => strval($descricao),
+            'descricao' => strval($this->getDescricao()),
         ]);
+    }
+
+    /**
+     * Informa se essa forma de pagamento estará disponível apenas nessa
+     * integração
+     * @return \MZ\System\Integracao The object fetched from database
+     */
+    public function findIntegracaoID()
+    {
+        if (is_null($this->getIntegracaoID())) {
+            return new \MZ\System\Integracao();
+        }
+        return \MZ\System\Integracao::findByID($this->getIntegracaoID());
     }
 
     /**
@@ -634,28 +660,20 @@ class FormaPagto extends SyncModel
     }
 
     /**
-     * Carteira de saída de valores do caixa
-     * @return \MZ\Wallet\Carteira The object fetched from database
-     */
-    public function findCarteiraPagtoID()
-    {
-        return \MZ\Wallet\Carteira::findByID($this->getCarteiraPagtoID());
-    }
-
-    /**
      * Gets textual and translated Tipo for FormaPagto
-     * @param  int $index choose option from index
-     * @return mixed A associative key -> translated representative text or text for index
+     * @param int $index choose option from index
+     * @return string[] A associative key -> translated representative text or text for index
      */
     public static function getTipoOptions($index = null)
     {
         $options = [
-            self::TIPO_DINHEIRO => 'Dinheiro',
-            self::TIPO_CARTAO => 'Cartão',
-            self::TIPO_CHEQUE => 'Cheque',
-            self::TIPO_CONTA => 'Conta',
-            self::TIPO_CREDITO => 'Crédito',
-            self::TIPO_TRANSFERENCIA => 'Transferência',
+            self::TIPO_DINHEIRO => _t('forma_pagto.tipo_dinheiro'),
+            self::TIPO_CREDITO => _t('forma_pagto.tipo_credito'),
+            self::TIPO_DEBITO => _t('forma_pagto.tipo_debito'),
+            self::TIPO_VALE => _t('forma_pagto.tipo_vale'),
+            self::TIPO_CHEQUE => _t('forma_pagto.tipo_cheque'),
+            self::TIPO_CREDIARIO => _t('forma_pagto.tipo_crediario'),
+            self::TIPO_SALDO => _t('forma_pagto.tipo_saldo'),
         ];
         if (!is_null($index)) {
             return $options[$index];
@@ -669,14 +687,14 @@ class FormaPagto extends SyncModel
      */
     private static function getAllowedKeys()
     {
-        $forma_pagto = new FormaPagto();
+        $forma_pagto = new self();
         $allowed = Filter::concatKeys('f.', $forma_pagto->toArray());
         return $allowed;
     }
 
     /**
      * Filter order array
-     * @param  mixed $order order string or array to parse and filter allowed
+     * @param mixed $order order string or array to parse and filter allowed
      * @return array allowed associative order
      */
     private static function filterOrder($order)
@@ -687,7 +705,7 @@ class FormaPagto extends SyncModel
 
     /**
      * Filter condition array with allowed fields
-     * @param  array $condition condition to filter rows
+     * @param array $condition condition to filter rows
      * @return array allowed condition
      */
     private static function filterCondition($condition)
@@ -705,8 +723,8 @@ class FormaPagto extends SyncModel
 
     /**
      * Fetch data from database with a condition
-     * @param  array $condition condition to filter rows
-     * @param  array $order order rows
+     * @param array $condition condition to filter rows
+     * @param array $order order rows
      * @return SelectQuery query object with condition statement
      */
     private static function query($condition = [], $order = [])
@@ -721,35 +739,51 @@ class FormaPagto extends SyncModel
 
     /**
      * Search one register with a condition
-     * @param  array $condition Condition for searching the row
-     * @param  array $order order rows
-     * @return FormaPagto A filled Forma de pagamento or empty instance
+     * @param array $condition Condition for searching the row
+     * @param array $order order rows
+     * @return self A filled Forma de pagamento or empty instance
      */
     public static function find($condition, $order = [])
     {
-        $query = self::query($condition, $order)->limit(1);
-        $row = $query->fetch() ?: [];
-        return new FormaPagto($row);
+        $result = new self();
+        return $result->load($condition, $order);
+    }
+
+    /**
+     * Search one register with a condition
+     * @param array $condition Condition for searching the row
+     * @param array $order order rows
+     * @return self A filled Forma de pagamento or empty instance
+     * @throws \Exception when register has not found
+     */
+    public static function findOrFail($condition, $order = [])
+    {
+        $result = self::find($condition, $order);
+        if (!$result->exists()) {
+            throw new \Exception(_t('forma_pagto.not_found'), 404);
+        }
+        return $result;
     }
 
     /**
      * Find this object on database using, Descricao
-     * @param  string $descricao descrição to find Forma de pagamento
-     * @return FormaPagto A filled instance or empty when not found
+     * @param string $descricao descrição to find Forma de pagamento
+     * @return self A filled instance or empty when not found
      */
     public static function findByDescricao($descricao)
     {
         $result = new self();
-        return $result->loadByDescricao($descricao);
+        $result->setDescricao($descricao);
+        return $result->loadByDescricao();
     }
 
     /**
      * Find all Forma de pagamento
-     * @param  array  $condition Condition to get all Forma de pagamento
-     * @param  array  $order     Order Forma de pagamento
-     * @param  int    $limit     Limit data into row count
-     * @param  int    $offset    Start offset to get rows
-     * @return array             List of all rows instanced as FormaPagto
+     * @param array  $condition Condition to get all Forma de pagamento
+     * @param array  $order     Order Forma de pagamento
+     * @param int    $limit     Limit data into row count
+     * @param int    $offset    Start offset to get rows
+     * @return self[] List of all rows instanced as FormaPagto
      */
     public static function findAll($condition = [], $order = [], $limit = null, $offset = null)
     {
@@ -763,14 +797,14 @@ class FormaPagto extends SyncModel
         $rows = $query->fetchAll();
         $result = [];
         foreach ($rows as $row) {
-            $result[] = new FormaPagto($row);
+            $result[] = new self($row);
         }
         return $result;
     }
 
     /**
      * Count all rows from database with matched condition critery
-     * @param  array $condition condition to filter rows
+     * @param array $condition condition to filter rows
      * @return integer Quantity of rows
      */
     public static function count($condition = [])

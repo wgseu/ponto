@@ -24,10 +24,12 @@
  */
 namespace MZ\Invoice;
 
-use MZ\Database\SyncModel;
-use MZ\Database\DB;
+use MZ\Util\Mask;
 use MZ\Util\Filter;
 use MZ\Util\Validator;
+use MZ\Database\DB;
+use MZ\Database\SyncModel;
+use MZ\Exception\ValidationException;
 use MZ\Session\Caixa;
 
 /**
@@ -88,6 +90,10 @@ class Nota extends SyncModel
      * Estado da nota
      */
     private $estado;
+    /**
+     * Último evento da nota
+     */
+    private $ultimo_evento_id;
     /**
      * Série da nota
      */
@@ -178,7 +184,7 @@ class Nota extends SyncModel
 
     /**
      * Identificador da nota
-     * @return mixed ID of Nota
+     * @return int id of Nota
      */
     public function getID()
     {
@@ -187,8 +193,8 @@ class Nota extends SyncModel
 
     /**
      * Set ID value to new on param
-     * @param  mixed $id new value for ID
-     * @return Nota Self instance
+     * @param int $id Set id for Nota
+     * @return self Self instance
      */
     public function setID($id)
     {
@@ -198,7 +204,7 @@ class Nota extends SyncModel
 
     /**
      * Tipo de registro se nota ou inutilização
-     * @return mixed Tipo of Nota
+     * @return string tipo of Nota
      */
     public function getTipo()
     {
@@ -207,8 +213,8 @@ class Nota extends SyncModel
 
     /**
      * Set Tipo value to new on param
-     * @param  mixed $tipo new value for Tipo
-     * @return Nota Self instance
+     * @param string $tipo Set tipo for Nota
+     * @return self Self instance
      */
     public function setTipo($tipo)
     {
@@ -218,7 +224,7 @@ class Nota extends SyncModel
 
     /**
      * Ambiente em que a nota foi gerada
-     * @return mixed Ambiente of Nota
+     * @return string ambiente of Nota
      */
     public function getAmbiente()
     {
@@ -227,8 +233,8 @@ class Nota extends SyncModel
 
     /**
      * Set Ambiente value to new on param
-     * @param  mixed $ambiente new value for Ambiente
-     * @return Nota Self instance
+     * @param string $ambiente Set ambiente for Nota
+     * @return self Self instance
      */
     public function setAmbiente($ambiente)
     {
@@ -238,7 +244,7 @@ class Nota extends SyncModel
 
     /**
      * Ação que deve ser tomada sobre a nota fiscal
-     * @return mixed Ação of Nota
+     * @return string ação of Nota
      */
     public function getAcao()
     {
@@ -247,8 +253,8 @@ class Nota extends SyncModel
 
     /**
      * Set Acao value to new on param
-     * @param  mixed $acao new value for Acao
-     * @return Nota Self instance
+     * @param string $acao Set ação for Nota
+     * @return self Self instance
      */
     public function setAcao($acao)
     {
@@ -258,7 +264,7 @@ class Nota extends SyncModel
 
     /**
      * Estado da nota
-     * @return mixed Estado of Nota
+     * @return string estado of Nota
      */
     public function getEstado()
     {
@@ -267,8 +273,8 @@ class Nota extends SyncModel
 
     /**
      * Set Estado value to new on param
-     * @param  mixed $estado new value for Estado
-     * @return Nota Self instance
+     * @param string $estado Set estado for Nota
+     * @return self Self instance
      */
     public function setEstado($estado)
     {
@@ -277,8 +283,28 @@ class Nota extends SyncModel
     }
 
     /**
+     * Último evento da nota
+     * @return int último evento of Nota
+     */
+    public function getUltimoEventoID()
+    {
+        return $this->ultimo_evento_id;
+    }
+
+    /**
+     * Set UltimoEventoID value to new on param
+     * @param int $ultimo_evento_id Set último evento for Nota
+     * @return self Self instance
+     */
+    public function setUltimoEventoID($ultimo_evento_id)
+    {
+        $this->ultimo_evento_id = $ultimo_evento_id;
+        return $this;
+    }
+
+    /**
      * Série da nota
-     * @return mixed Série of Nota
+     * @return int série of Nota
      */
     public function getSerie()
     {
@@ -287,8 +313,8 @@ class Nota extends SyncModel
 
     /**
      * Set Serie value to new on param
-     * @param  mixed $serie new value for Serie
-     * @return Nota Self instance
+     * @param int $serie Set série for Nota
+     * @return self Self instance
      */
     public function setSerie($serie)
     {
@@ -298,7 +324,7 @@ class Nota extends SyncModel
 
     /**
      * Número inicial da nota
-     * @return mixed Número of Nota
+     * @return int número of Nota
      */
     public function getNumeroInicial()
     {
@@ -307,8 +333,8 @@ class Nota extends SyncModel
 
     /**
      * Set NumeroInicial value to new on param
-     * @param  mixed $numero_inicial new value for NumeroInicial
-     * @return Nota Self instance
+     * @param int $numero_inicial Set número for Nota
+     * @return self Self instance
      */
     public function setNumeroInicial($numero_inicial)
     {
@@ -319,7 +345,7 @@ class Nota extends SyncModel
     /**
      * Número final da nota, igual ao número inicial quando for a nota de um
      * pedido
-     * @return mixed Número inicial of Nota
+     * @return int número final of Nota
      */
     public function getNumeroFinal()
     {
@@ -328,8 +354,8 @@ class Nota extends SyncModel
 
     /**
      * Set NumeroFinal value to new on param
-     * @param  mixed $numero_final new value for NumeroFinal
-     * @return Nota Self instance
+     * @param int $numero_final Set número final for Nota
+     * @return self Self instance
      */
     public function setNumeroFinal($numero_final)
     {
@@ -340,7 +366,7 @@ class Nota extends SyncModel
     /**
      * Permite iniciar o número da nota quando alcançar 999.999.999, deve ser
      * incrementado sempre que alcançar
-     * @return mixed Sequencia of Nota
+     * @return int sequência of Nota
      */
     public function getSequencia()
     {
@@ -349,8 +375,8 @@ class Nota extends SyncModel
 
     /**
      * Set Sequencia value to new on param
-     * @param  mixed $sequencia new value for Sequencia
-     * @return Nota Self instance
+     * @param int $sequencia Set sequência for Nota
+     * @return self Self instance
      */
     public function setSequencia($sequencia)
     {
@@ -360,7 +386,7 @@ class Nota extends SyncModel
 
     /**
      * Chave da nota fiscal
-     * @return mixed Chave of Nota
+     * @return string chave of Nota
      */
     public function getChave()
     {
@@ -369,8 +395,8 @@ class Nota extends SyncModel
 
     /**
      * Set Chave value to new on param
-     * @param  mixed $chave new value for Chave
-     * @return Nota Self instance
+     * @param string $chave Set chave for Nota
+     * @return self Self instance
      */
     public function setChave($chave)
     {
@@ -380,7 +406,7 @@ class Nota extends SyncModel
 
     /**
      * Recibo de envio para consulta posterior
-     * @return mixed Recibo of Nota
+     * @return string recibo of Nota
      */
     public function getRecibo()
     {
@@ -389,8 +415,8 @@ class Nota extends SyncModel
 
     /**
      * Set Recibo value to new on param
-     * @param  mixed $recibo new value for Recibo
-     * @return Nota Self instance
+     * @param string $recibo Set recibo for Nota
+     * @return self Self instance
      */
     public function setRecibo($recibo)
     {
@@ -400,7 +426,7 @@ class Nota extends SyncModel
 
     /**
      * Protocolo de autorização da nota fiscal
-     * @return mixed Protocolo of Nota
+     * @return string protocolo of Nota
      */
     public function getProtocolo()
     {
@@ -409,8 +435,8 @@ class Nota extends SyncModel
 
     /**
      * Set Protocolo value to new on param
-     * @param  mixed $protocolo new value for Protocolo
-     * @return Nota Self instance
+     * @param string $protocolo Set protocolo for Nota
+     * @return self Self instance
      */
     public function setProtocolo($protocolo)
     {
@@ -420,7 +446,7 @@ class Nota extends SyncModel
 
     /**
      * Pedido da nota
-     * @return mixed Pedido of Nota
+     * @return int pedido of Nota
      */
     public function getPedidoID()
     {
@@ -429,8 +455,8 @@ class Nota extends SyncModel
 
     /**
      * Set PedidoID value to new on param
-     * @param  mixed $pedido_id new value for PedidoID
-     * @return Nota Self instance
+     * @param int $pedido_id Set pedido for Nota
+     * @return self Self instance
      */
     public function setPedidoID($pedido_id)
     {
@@ -440,7 +466,7 @@ class Nota extends SyncModel
 
     /**
      * Motivo do cancelamento, contingência ou inutilização
-     * @return mixed Motivo of Nota
+     * @return string motivo of Nota
      */
     public function getMotivo()
     {
@@ -449,8 +475,8 @@ class Nota extends SyncModel
 
     /**
      * Set Motivo value to new on param
-     * @param  mixed $motivo new value for Motivo
-     * @return Nota Self instance
+     * @param string $motivo Set motivo for Nota
+     * @return self Self instance
      */
     public function setMotivo($motivo)
     {
@@ -460,7 +486,7 @@ class Nota extends SyncModel
 
     /**
      * Informa se a nota está em contingência
-     * @return mixed Contingência of Nota
+     * @return string contingência of Nota
      */
     public function getContingencia()
     {
@@ -478,8 +504,8 @@ class Nota extends SyncModel
 
     /**
      * Set Contingencia value to new on param
-     * @param  mixed $contingencia new value for Contingencia
-     * @return Nota Self instance
+     * @param string $contingencia Set contingência for Nota
+     * @return self Self instance
      */
     public function setContingencia($contingencia)
     {
@@ -489,7 +515,7 @@ class Nota extends SyncModel
 
     /**
      * URL de consulta da nota fiscal
-     * @return mixed URL de consulta of Nota
+     * @return string url de consulta of Nota
      */
     public function getConsultaURL()
     {
@@ -498,8 +524,8 @@ class Nota extends SyncModel
 
     /**
      * Set ConsultaURL value to new on param
-     * @param  mixed $consulta_url new value for ConsultaURL
-     * @return Nota Self instance
+     * @param string $consulta_url Set url de consulta for Nota
+     * @return self Self instance
      */
     public function setConsultaURL($consulta_url)
     {
@@ -509,7 +535,7 @@ class Nota extends SyncModel
 
     /**
      * Dados do QRCode da nota
-     * @return mixed QRCode of Nota
+     * @return string qrcode of Nota
      */
     public function getQRCode()
     {
@@ -518,8 +544,8 @@ class Nota extends SyncModel
 
     /**
      * Set QRCode value to new on param
-     * @param  mixed $qrcode new value for QRCode
-     * @return Nota Self instance
+     * @param string $qrcode Set qrcode for Nota
+     * @return self Self instance
      */
     public function setQRCode($qrcode)
     {
@@ -529,7 +555,7 @@ class Nota extends SyncModel
 
     /**
      * Tributos totais da nota
-     * @return mixed Tributos of Nota
+     * @return string tributos of Nota
      */
     public function getTributos()
     {
@@ -538,8 +564,8 @@ class Nota extends SyncModel
 
     /**
      * Set Tributos value to new on param
-     * @param  mixed $tributos new value for Tributos
-     * @return Nota Self instance
+     * @param string $tributos Set tributos for Nota
+     * @return self Self instance
      */
     public function setTributos($tributos)
     {
@@ -549,7 +575,7 @@ class Nota extends SyncModel
 
     /**
      * Informações de interesse do contribuinte
-     * @return mixed Informações de interesse do contribuinte of Nota
+     * @return string informações de interesse do contribuinte of Nota
      */
     public function getDetalhes()
     {
@@ -558,8 +584,8 @@ class Nota extends SyncModel
 
     /**
      * Set Detalhes value to new on param
-     * @param  mixed $detalhes new value for Detalhes
-     * @return Nota Self instance
+     * @param string $detalhes Set informações de interesse do contribuinte for Nota
+     * @return self Self instance
      */
     public function setDetalhes($detalhes)
     {
@@ -569,7 +595,7 @@ class Nota extends SyncModel
 
     /**
      * Informa se os erros já foram corrigidos para retomada do processamento
-     * @return mixed Corrigido of Nota
+     * @return string corrigido of Nota
      */
     public function getCorrigido()
     {
@@ -587,8 +613,8 @@ class Nota extends SyncModel
 
     /**
      * Set Corrigido value to new on param
-     * @param  mixed $corrigido new value for Corrigido
-     * @return Nota Self instance
+     * @param string $corrigido Set corrigido for Nota
+     * @return self Self instance
      */
     public function setCorrigido($corrigido)
     {
@@ -598,7 +624,7 @@ class Nota extends SyncModel
 
     /**
      * Informa se todos os processamentos da nota já foram realizados
-     * @return mixed Concluído of Nota
+     * @return string concluído of Nota
      */
     public function getConcluido()
     {
@@ -616,8 +642,8 @@ class Nota extends SyncModel
 
     /**
      * Set Concluido value to new on param
-     * @param  mixed $concluido new value for Concluido
-     * @return Nota Self instance
+     * @param string $concluido Set concluído for Nota
+     * @return self Self instance
      */
     public function setConcluido($concluido)
     {
@@ -627,7 +653,7 @@ class Nota extends SyncModel
 
     /**
      * Data de autorização da nota fiscal
-     * @return mixed Data de autorização of Nota
+     * @return string data de autorização of Nota
      */
     public function getDataAutorizacao()
     {
@@ -636,8 +662,8 @@ class Nota extends SyncModel
 
     /**
      * Set DataAutorizacao value to new on param
-     * @param  mixed $data_autorizacao new value for DataAutorizacao
-     * @return Nota Self instance
+     * @param string $data_autorizacao Set data de autorização for Nota
+     * @return self Self instance
      */
     public function setDataAutorizacao($data_autorizacao)
     {
@@ -647,7 +673,7 @@ class Nota extends SyncModel
 
     /**
      * Data de emissão da nota
-     * @return mixed Data de emissão of Nota
+     * @return string data de emissão of Nota
      */
     public function getDataEmissao()
     {
@@ -656,8 +682,8 @@ class Nota extends SyncModel
 
     /**
      * Set DataEmissao value to new on param
-     * @param  mixed $data_emissao new value for DataEmissao
-     * @return Nota Self instance
+     * @param string $data_emissao Set data de emissão for Nota
+     * @return self Self instance
      */
     public function setDataEmissao($data_emissao)
     {
@@ -667,7 +693,7 @@ class Nota extends SyncModel
 
     /**
      * Data de lançamento da nota no sistema
-     * @return mixed Data de lançamento of Nota
+     * @return string data de lançamento of Nota
      */
     public function getDataLancamento()
     {
@@ -676,8 +702,8 @@ class Nota extends SyncModel
 
     /**
      * Set DataLancamento value to new on param
-     * @param  mixed $data_lancamento new value for DataLancamento
-     * @return Nota Self instance
+     * @param string $data_lancamento Set data de lançamento for Nota
+     * @return self Self instance
      */
     public function setDataLancamento($data_lancamento)
     {
@@ -687,7 +713,7 @@ class Nota extends SyncModel
 
     /**
      * Convert this instance to array associated key -> value
-     * @param  boolean $recursive Allow rescursive conversion of fields
+     * @param boolean $recursive Allow rescursive conversion of fields
      * @return array All field and values into array format
      */
     public function toArray($recursive = false)
@@ -698,6 +724,7 @@ class Nota extends SyncModel
         $nota['ambiente'] = $this->getAmbiente();
         $nota['acao'] = $this->getAcao();
         $nota['estado'] = $this->getEstado();
+        $nota['ultimoeventoid'] = $this->getUltimoEventoID();
         $nota['serie'] = $this->getSerie();
         $nota['numeroinicial'] = $this->getNumeroInicial();
         $nota['numerofinal'] = $this->getNumeroFinal();
@@ -722,12 +749,12 @@ class Nota extends SyncModel
 
     /**
      * Fill this instance with from array values, you can pass instance to
-     * @param  mixed $nota Associated key -> value to assign into this instance
-     * @return Nota Self instance
+     * @param mixed $nota Associated key -> value to assign into this instance
+     * @return self Self instance
      */
     public function fromArray($nota = [])
     {
-        if ($nota instanceof Nota) {
+        if ($nota instanceof self) {
             $nota = $nota->toArray();
         } elseif (!is_array($nota)) {
             $nota = [];
@@ -757,6 +784,11 @@ class Nota extends SyncModel
             $this->setEstado(null);
         } else {
             $this->setEstado($nota['estado']);
+        }
+        if (!array_key_exists('ultimoeventoid', $nota)) {
+            $this->setUltimoEventoID(null);
+        } else {
+            $this->setUltimoEventoID($nota['ultimoeventoid']);
         }
         if (!isset($nota['serie'])) {
             $this->setSerie(null);
@@ -899,11 +931,14 @@ class Nota extends SyncModel
 
     /**
      * Filter fields, upload data and keep key data
-     * @param Nota $original Original instance without modifications
+     * @param self $original Original instance without modifications
+     * @param boolean $localized Informs if fields are localized
+     * @return self Self instance
      */
     public function filter($original, $localized = false)
     {
         $this->setID($original->getID());
+        $this->setUltimoEventoID(Filter::number($this->getUltimoEventoID()));
         $this->setSerie(Filter::number($this->getSerie()));
         $this->setNumeroInicial(Filter::number($this->getNumeroInicial()));
         $this->setNumeroFinal(Filter::number($this->getNumeroFinal()));
@@ -920,11 +955,12 @@ class Nota extends SyncModel
         $this->setDataAutorizacao(Filter::datetime($this->getDataAutorizacao()));
         $this->setDataEmissao(Filter::datetime($this->getDataEmissao()));
         $this->setDataLancamento(Filter::datetime($this->getDataLancamento()));
+        return $this;
     }
 
     /**
      * Clean instance resources like images and docs
-     * @param  Nota $dependency Don't clean when dependency use same resources
+     * @param self $dependency Don't clean when dependency use same resources
      */
     public function clean($dependency)
     {
@@ -933,71 +969,60 @@ class Nota extends SyncModel
     /**
      * Validate fields updating them and throw exception when invalid data has found
      * @return array All field of Nota in array format
+     * @throws \MZ\Exception\ValidationException for invalid input data
      */
     public function validate()
     {
         $errors = [];
         if (!Validator::checkInSet($this->getTipo(), self::getTipoOptions())) {
-            $errors['tipo'] = 'O tipo não foi informado ou é inválido';
+            $errors['tipo'] = _t('nota.tipo_invalid');
         }
         if (!Validator::checkInSet($this->getAmbiente(), self::getAmbienteOptions())) {
-            $errors['ambiente'] = 'O ambiente não foi informado ou é inválido';
+            $errors['ambiente'] = _t('nota.ambiente_invalid');
         }
         if (!Validator::checkInSet($this->getAcao(), self::getAcaoOptions())) {
-            $errors['acao'] = 'A ação não foi informada ou é inválida';
+            $errors['acao'] = _t('nota.acao_invalid');
         }
         if (!Validator::checkInSet($this->getEstado(), self::getEstadoOptions())) {
-            $errors['estado'] = 'O estado não foi informado ou é inválido';
+            $errors['estado'] = _t('nota.estado_invalid');
         }
         if (is_null($this->getSerie())) {
-            $errors['serie'] = 'A série não pode ser vazia';
+            $errors['serie'] = _t('nota.serie_cannot_empty');
         }
         if (is_null($this->getNumeroInicial())) {
-            $errors['numeroinicial'] = 'O número não pode ser vazio';
+            $errors['numeroinicial'] = _t('nota.numero_inicial_cannot_empty');
         }
         if (is_null($this->getNumeroFinal())) {
-            $errors['numerofinal'] = 'O número final não pode ser vazio';
+            $errors['numerofinal'] = _t('nota.numero_final_cannot_empty');
         }
         if (is_null($this->getSequencia())) {
-            $errors['sequencia'] = 'A sequencia não pode ser vazia';
+            $errors['sequencia'] = _t('nota.sequencia_cannot_empty');
         }
         if (!Validator::checkBoolean($this->getContingencia())) {
-            $errors['contingencia'] = 'A contingência não foi informada ou é inválida';
+            $errors['contingencia'] = _t('nota.contingencia_invalid');
         }
         if (!Validator::checkBoolean($this->getCorrigido())) {
-            $errors['corrigido'] = 'A correção não foi informada ou é inválida';
-        }
-        if (is_null($this->getConcluido())) {
-            $errors['concluido'] = 'O concluído não pode ser vazio';
+            $errors['corrigido'] = _t('nota.corrigido_invalid');
         }
         if (!Validator::checkBoolean($this->getConcluido())) {
-            $errors['concluido'] = 'A conclusão não foi informada ou é inválida';
+            $errors['concluido'] = _t('nota.concluido_invalid');
         }
         if (is_null($this->getDataEmissao())) {
-            $errors['dataemissao'] = 'A data de emissão não pode ser vazia';
+            $errors['dataemissao'] = _t('nota.data_emissao_cannot_empty');
         }
         if (is_null($this->getDataLancamento())) {
             $errors['datalancamento'] = 'A data de lançamento não pode ser vazia';
         }
         if (!empty($errors)) {
-            throw new \MZ\Exception\ValidationException($errors);
+            throw new ValidationException($errors);
         }
         return $this->toArray();
     }
 
     /**
-     * Translate SQL exception into application exception
-     * @param  \Exception $e exception to translate into a readable error
-     * @return \MZ\Exception\ValidationException new exception translated
-     */
-    protected function translate($e)
-    {
-        return parent::translate($e);
-    }
-
-    /**
      * Insert a new Nota into the database and fill instance from database
-     * @return Nota Self instance
+     * @return self Self instance
+     * @throws \MZ\Exception\ValidationException for invalid input data
      */
     public function insert()
     {
@@ -1016,36 +1041,42 @@ class Nota extends SyncModel
 
     /**
      * Update Nota with instance values into database for ID
-     * @param  array $only Save these fields only, when empty save all fields except id
-     * @return Nota Self instance
+     * @param array $only Save these fields only, when empty save all fields except id
+     * @return int rows affected
+     * @throws \MZ\Exception\ValidationException for invalid input data
      */
     public function update($only = [])
     {
         $values = $this->validate();
         if (!$this->exists()) {
-            throw new \Exception('O identificador da nota não foi informado');
+            throw new ValidationException(
+                ['id' => _t('nota.id_cannot_empty')]
+            );
         }
         $values = DB::filterValues($values, $only, false);
         try {
-            DB::update('Notas')
+            $affected = DB::update('Notas')
                 ->set($values)
-                ->where('id', $this->getID())
+                ->where(['id' => $this->getID()])
                 ->execute();
             $this->loadByID();
         } catch (\Exception $e) {
             throw $this->translate($e);
         }
-        return $this;
+        return $affected;
     }
 
     /**
      * Delete this instance from database using ID
      * @return integer Number of rows deleted (Max 1)
+     * @throws \MZ\Exception\ValidationException for invalid id
      */
     public function delete()
     {
         if (!$this->exists()) {
-            throw new \Exception('O identificador da nota não foi informado');
+            throw new ValidationException(
+                ['id' => _t('nota.id_cannot_empty')]
+            );
         }
         $result = DB::deleteFrom('Notas')
             ->where('id', $this->getID())
@@ -1053,6 +1084,10 @@ class Nota extends SyncModel
         return $result;
     }
 
+    /**
+     * Cria a próxima nota para o caixa informado
+     * @return self
+     */
     public function criarProxima()
     {
         // procura o último número da nota e a última sequencia de repetições
@@ -1109,15 +1144,27 @@ class Nota extends SyncModel
 
     /**
      * Load one register for it self with a condition
-     * @param  array $condition Condition for searching the row
-     * @param  array $order associative field name -> [-1, 1]
-     * @return Nota Self instance filled or empty
+     * @param array $condition Condition for searching the row
+     * @param array $order associative field name -> [-1, 1]
+     * @return self Self instance filled or empty
      */
     public function load($condition, $order = [])
     {
         $query = self::query($condition, $order)->limit(1);
         $row = $query->fetch() ?: [];
         return $this->fromArray($row);
+    }
+
+    /**
+     * Último evento da nota
+     * @return \MZ\Invoice\Evento The object fetched from database
+     */
+    public function findUltimoEventoID()
+    {
+        if (is_null($this->getUltimoEventoID())) {
+            return new \MZ\Invoice\Evento();
+        }
+        return \MZ\Invoice\Evento::findByID($this->getUltimoEventoID());
     }
 
     /**
@@ -1134,14 +1181,14 @@ class Nota extends SyncModel
 
     /**
      * Gets textual and translated Tipo for Nota
-     * @param  int $index choose option from index
-     * @return mixed A associative key -> translated representative text or text for index
+     * @param int $index choose option from index
+     * @return string[] A associative key -> translated representative text or text for index
      */
     public static function getTipoOptions($index = null)
     {
         $options = [
-            self::TIPO_NOTA => 'Nota',
-            self::TIPO_INUTILIZACAO => 'Inutilização',
+            self::TIPO_NOTA => _t('nota.tipo_nota'),
+            self::TIPO_INUTILIZACAO => _t('nota.tipo_inutilizacao'),
         ];
         if (!is_null($index)) {
             return $options[$index];
@@ -1151,14 +1198,14 @@ class Nota extends SyncModel
 
     /**
      * Gets textual and translated Ambiente for Nota
-     * @param  int $index choose option from index
-     * @return mixed A associative key -> translated representative text or text for index
+     * @param int $index choose option from index
+     * @return string[] A associative key -> translated representative text or text for index
      */
     public static function getAmbienteOptions($index = null)
     {
         $options = [
-            self::AMBIENTE_HOMOLOGACAO => 'Homologação',
-            self::AMBIENTE_PRODUCAO => 'Produção',
+            self::AMBIENTE_HOMOLOGACAO => _t('nota.ambiente_homologacao'),
+            self::AMBIENTE_PRODUCAO => _t('nota.ambiente_producao'),
         ];
         if (!is_null($index)) {
             return $options[$index];
@@ -1168,15 +1215,15 @@ class Nota extends SyncModel
 
     /**
      * Gets textual and translated Acao for Nota
-     * @param  int $index choose option from index
-     * @return mixed A associative key -> translated representative text or text for index
+     * @param int $index choose option from index
+     * @return string[] A associative key -> translated representative text or text for index
      */
     public static function getAcaoOptions($index = null)
     {
         $options = [
-            self::ACAO_AUTORIZAR => 'Autorizar',
-            self::ACAO_CANCELAR => 'Cancelar',
-            self::ACAO_INUTILIZAR => 'Inutilizar',
+            self::ACAO_AUTORIZAR => _t('nota.acao_autorizar'),
+            self::ACAO_CANCELAR => _t('nota.acao_cancelar'),
+            self::ACAO_INUTILIZAR => _t('nota.acao_inutilizar'),
         ];
         if (!is_null($index)) {
             return $options[$index];
@@ -1186,21 +1233,21 @@ class Nota extends SyncModel
 
     /**
      * Gets textual and translated Estado for Nota
-     * @param  int $index choose option from index
-     * @return mixed A associative key -> translated representative text or text for index
+     * @param int $index choose option from index
+     * @return string[] A associative key -> translated representative text or text for index
      */
     public static function getEstadoOptions($index = null)
     {
         $options = [
-            self::ESTADO_ABERTO => 'Aberto',
-            self::ESTADO_ASSINADO => 'Assinado',
-            self::ESTADO_PENDENTE => 'Pendente',
-            self::ESTADO_PROCESSAMENTO => 'Em processamento',
-            self::ESTADO_DENEGADO => 'Denegado',
-            self::ESTADO_REJEITADO => 'Rejeitado',
-            self::ESTADO_CANCELADO => 'Cancelado',
-            self::ESTADO_INUTILIZADO => 'Inutilizado',
-            self::ESTADO_AUTORIZADO => 'Autorizado',
+            self::ESTADO_ABERTO => _t('nota.estado_aberto'),
+            self::ESTADO_ASSINADO => _t('nota.estado_assinado'),
+            self::ESTADO_PENDENTE => _t('nota.estado_pendente'),
+            self::ESTADO_PROCESSAMENTO => _t('nota.estado_processamento'),
+            self::ESTADO_DENEGADO => _t('nota.estado_denegado'),
+            self::ESTADO_REJEITADO => _t('nota.estado_rejeitado'),
+            self::ESTADO_CANCELADO => _t('nota.estado_cancelado'),
+            self::ESTADO_INUTILIZADO => _t('nota.estado_inutilizado'),
+            self::ESTADO_AUTORIZADO => _t('nota.estado_autorizado'),
         ];
         if (!is_null($index)) {
             return $options[$index];
@@ -1214,14 +1261,14 @@ class Nota extends SyncModel
      */
     private static function getAllowedKeys()
     {
-        $nota = new Nota();
+        $nota = new self();
         $allowed = Filter::concatKeys('n.', $nota->toArray());
         return $allowed;
     }
 
     /**
      * Filter order array
-     * @param  mixed $order order string or array to parse and filter allowed
+     * @param mixed $order order string or array to parse and filter allowed
      * @return array allowed associative order
      */
     private static function filterOrder($order)
@@ -1232,7 +1279,7 @@ class Nota extends SyncModel
 
     /**
      * Filter condition array with allowed fields
-     * @param  array $condition condition to filter rows
+     * @param array $condition condition to filter rows
      * @return array allowed condition
      */
     private static function filterCondition($condition)
@@ -1316,8 +1363,8 @@ class Nota extends SyncModel
 
     /**
      * Fetch data from database with a condition
-     * @param  array $condition condition to filter rows
-     * @param  array $order order rows
+     * @param array $condition condition to filter rows
+     * @param array $order order rows
      * @return SelectQuery query object with condition statement
      */
     private static function query($condition = [], $order = [])
@@ -1331,15 +1378,30 @@ class Nota extends SyncModel
 
     /**
      * Search one register with a condition
-     * @param  array $condition Condition for searching the row
-     * @param  array $order order rows
-     * @return Nota A filled Nota or empty instance
+     * @param array $condition Condition for searching the row
+     * @param array $order order rows
+     * @return self A filled Nota or empty instance
      */
     public static function find($condition, $order = [])
     {
-        $query = self::query($condition, $order)->limit(1);
-        $row = $query->fetch() ?: [];
-        return new Nota($row);
+        $result = new self();
+        return $result->load($condition, $order);
+    }
+
+    /**
+     * Search one register with a condition
+     * @param array $condition Condition for searching the row
+     * @param array $order order rows
+     * @return self A filled Nota or empty instance
+     * @throws \Exception when register has not found
+     */
+    public static function findOrFail($condition, $order = [])
+    {
+        $result = self::find($condition, $order);
+        if (!$result->exists()) {
+            throw new \Exception(_t('nota.not_found'), 404);
+        }
+        return $result;
     }
 
     /**
@@ -1418,11 +1480,11 @@ class Nota extends SyncModel
 
     /**
      * Find all Nota
-     * @param  array  $condition Condition to get all Nota
-     * @param  array  $order     Order Nota
-     * @param  int    $limit     Limit data into row count
-     * @param  int    $offset    Start offset to get rows
-     * @return array             List of all rows instanced as Nota
+     * @param array  $condition Condition to get all Nota
+     * @param array  $order     Order Nota
+     * @param int    $limit     Limit data into row count
+     * @param int    $offset    Start offset to get rows
+     * @return self[] List of all rows instanced as Nota
      */
     public static function findAll($condition = [], $order = [], $limit = null, $offset = null)
     {
@@ -1436,7 +1498,7 @@ class Nota extends SyncModel
         $rows = $query->fetchAll();
         $result = [];
         foreach ($rows as $row) {
-            $result[] = new Nota($row);
+            $result[] = new self($row);
         }
         return $result;
     }
@@ -1497,7 +1559,7 @@ class Nota extends SyncModel
 
     /**
      * Count all rows from database with matched condition critery
-     * @param  array $condition condition to filter rows
+     * @param array $condition condition to filter rows
      * @return integer Quantity of rows
      */
     public static function count($condition = [])

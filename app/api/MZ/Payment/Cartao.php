@@ -24,10 +24,12 @@
  */
 namespace MZ\Payment;
 
-use MZ\Database\SyncModel;
-use MZ\Database\DB;
+use MZ\Util\Mask;
 use MZ\Util\Filter;
 use MZ\Util\Validator;
+use MZ\Database\DB;
+use MZ\Database\SyncModel;
+use MZ\Exception\ValidationException;
 
 /**
  * Cartões utilizados na forma de pagamento em cartão
@@ -40,29 +42,17 @@ class Cartao extends SyncModel
      */
     private $id;
     /**
+     * Forma de pagamento associada à esse cartão ou vale
+     */
+    private $forma_pagto_id;
+    /**
      * Carteira de entrada de valores no caixa
      */
     private $carteira_id;
     /**
-     * Carteira de saída de pagamentos no caixa
+     * Nome da bandeira do cartão
      */
-    private $carteira_pagto_id;
-    /**
-     * Descrição do cartão
-     */
-    private $descricao;
-    /**
-     * Índice da imagem do cartão
-     */
-    private $image_index;
-    /**
-     * Valor da mensalidade cobrada pela operadora do cartão
-     */
-    private $mensalidade;
-    /**
-     * Valor cobrado pela operadora para cada transação com o cartão
-     */
-    private $transacao;
+    private $bandeira;
     /**
      * Taxa em porcentagem cobrado sobre o total do pagamento, valores de 0 a
      * 100
@@ -72,6 +62,14 @@ class Cartao extends SyncModel
      * Quantidade de dias para repasse do valor
      */
     private $dias_repasse;
+    /**
+     * Taxa em porcentagem para antecipação de recebimento de parcelas
+     */
+    private $taxa_antecipacao;
+    /**
+     * Imagem do cartão
+     */
+    private $imagem_url;
     /**
      * Informa se o cartão está ativo
      */
@@ -88,7 +86,7 @@ class Cartao extends SyncModel
 
     /**
      * Identificador do cartão
-     * @return mixed ID of Cartao
+     * @return int id of Cartão
      */
     public function getID()
     {
@@ -97,8 +95,8 @@ class Cartao extends SyncModel
 
     /**
      * Set ID value to new on param
-     * @param  mixed $id new value for ID
-     * @return Cartao Self instance
+     * @param int $id Set id for Cartão
+     * @return self Self instance
      */
     public function setID($id)
     {
@@ -107,8 +105,28 @@ class Cartao extends SyncModel
     }
 
     /**
+     * Forma de pagamento associada à esse cartão ou vale
+     * @return int forma de pagamento of Cartão
+     */
+    public function getFormaPagtoID()
+    {
+        return $this->forma_pagto_id;
+    }
+
+    /**
+     * Set FormaPagtoID value to new on param
+     * @param int $forma_pagto_id Set forma de pagamento for Cartão
+     * @return self Self instance
+     */
+    public function setFormaPagtoID($forma_pagto_id)
+    {
+        $this->forma_pagto_id = $forma_pagto_id;
+        return $this;
+    }
+
+    /**
      * Carteira de entrada de valores no caixa
-     * @return mixed Carteira de entrada of Cartao
+     * @return int carteira de entrada of Cartão
      */
     public function getCarteiraID()
     {
@@ -117,8 +135,8 @@ class Cartao extends SyncModel
 
     /**
      * Set CarteiraID value to new on param
-     * @param  mixed $carteira_id new value for CarteiraID
-     * @return Cartao Self instance
+     * @param int $carteira_id Set carteira de entrada for Cartão
+     * @return self Self instance
      */
     public function setCarteiraID($carteira_id)
     {
@@ -127,109 +145,29 @@ class Cartao extends SyncModel
     }
 
     /**
-     * Carteira de saída de pagamentos no caixa
-     * @return mixed Carteira de saída of Cartao
+     * Nome da bandeira do cartão
+     * @return string bandeira of Cartão
      */
-    public function getCarteiraPagtoID()
+    public function getBandeira()
     {
-        return $this->carteira_pagto_id;
+        return $this->bandeira;
     }
 
     /**
-     * Set CarteiraPagtoID value to new on param
-     * @param  mixed $carteira_pagto_id new value for CarteiraPagtoID
-     * @return Cartao Self instance
+     * Set Bandeira value to new on param
+     * @param string $bandeira Set bandeira for Cartão
+     * @return self Self instance
      */
-    public function setCarteiraPagtoID($carteira_pagto_id)
+    public function setBandeira($bandeira)
     {
-        $this->carteira_pagto_id = $carteira_pagto_id;
-        return $this;
-    }
-
-    /**
-     * Descrição do cartão
-     * @return mixed Descrição of Cartao
-     */
-    public function getDescricao()
-    {
-        return $this->descricao;
-    }
-
-    /**
-     * Set Descricao value to new on param
-     * @param  mixed $descricao new value for Descricao
-     * @return Cartao Self instance
-     */
-    public function setDescricao($descricao)
-    {
-        $this->descricao = $descricao;
-        return $this;
-    }
-
-    /**
-     * Índice da imagem do cartão
-     * @return mixed Índice da imagem of Cartao
-     */
-    public function getImageIndex()
-    {
-        return $this->image_index;
-    }
-
-    /**
-     * Set ImageIndex value to new on param
-     * @param  mixed $image_index new value for ImageIndex
-     * @return Cartao Self instance
-     */
-    public function setImageIndex($image_index)
-    {
-        $this->image_index = $image_index;
-        return $this;
-    }
-
-    /**
-     * Valor da mensalidade cobrada pela operadora do cartão
-     * @return mixed Mensalidade of Cartao
-     */
-    public function getMensalidade()
-    {
-        return $this->mensalidade;
-    }
-
-    /**
-     * Set Mensalidade value to new on param
-     * @param  mixed $mensalidade new value for Mensalidade
-     * @return Cartao Self instance
-     */
-    public function setMensalidade($mensalidade)
-    {
-        $this->mensalidade = $mensalidade;
-        return $this;
-    }
-
-    /**
-     * Valor cobrado pela operadora para cada transação com o cartão
-     * @return mixed Transação of Cartao
-     */
-    public function getTransacao()
-    {
-        return $this->transacao;
-    }
-
-    /**
-     * Set Transacao value to new on param
-     * @param  mixed $transacao new value for Transacao
-     * @return Cartao Self instance
-     */
-    public function setTransacao($transacao)
-    {
-        $this->transacao = $transacao;
+        $this->bandeira = $bandeira;
         return $this;
     }
 
     /**
      * Taxa em porcentagem cobrado sobre o total do pagamento, valores de 0 a
      * 100
-     * @return mixed Taxa of Cartao
+     * @return float taxa of Cartão
      */
     public function getTaxa()
     {
@@ -238,8 +176,8 @@ class Cartao extends SyncModel
 
     /**
      * Set Taxa value to new on param
-     * @param  mixed $taxa new value for Taxa
-     * @return Cartao Self instance
+     * @param float $taxa Set taxa for Cartão
+     * @return self Self instance
      */
     public function setTaxa($taxa)
     {
@@ -249,7 +187,7 @@ class Cartao extends SyncModel
 
     /**
      * Quantidade de dias para repasse do valor
-     * @return mixed Dias para repasse of Cartao
+     * @return int dias para repasse of Cartão
      */
     public function getDiasRepasse()
     {
@@ -258,8 +196,8 @@ class Cartao extends SyncModel
 
     /**
      * Set DiasRepasse value to new on param
-     * @param  mixed $dias_repasse new value for DiasRepasse
-     * @return Cartao Self instance
+     * @param int $dias_repasse Set dias para repasse for Cartão
+     * @return self Self instance
      */
     public function setDiasRepasse($dias_repasse)
     {
@@ -268,8 +206,48 @@ class Cartao extends SyncModel
     }
 
     /**
+     * Taxa em porcentagem para antecipação de recebimento de parcelas
+     * @return float taxa de antecipação of Cartão
+     */
+    public function getTaxaAntecipacao()
+    {
+        return $this->taxa_antecipacao;
+    }
+
+    /**
+     * Set TaxaAntecipacao value to new on param
+     * @param float $taxa_antecipacao Set taxa de antecipação for Cartão
+     * @return self Self instance
+     */
+    public function setTaxaAntecipacao($taxa_antecipacao)
+    {
+        $this->taxa_antecipacao = $taxa_antecipacao;
+        return $this;
+    }
+
+    /**
+     * Imagem do cartão
+     * @return string imagem of Cartão
+     */
+    public function getImagemURL()
+    {
+        return $this->imagem_url;
+    }
+
+    /**
+     * Set ImagemURL value to new on param
+     * @param string $imagem_url Set imagem for Cartão
+     * @return self Self instance
+     */
+    public function setImagemURL($imagem_url)
+    {
+        $this->imagem_url = $imagem_url;
+        return $this;
+    }
+
+    /**
      * Informa se o cartão está ativo
-     * @return mixed Ativo of Cartao
+     * @return string ativo of Cartão
      */
     public function getAtivo()
     {
@@ -287,8 +265,8 @@ class Cartao extends SyncModel
 
     /**
      * Set Ativo value to new on param
-     * @param  mixed $ativo new value for Ativo
-     * @return Cartao Self instance
+     * @param string $ativo Set ativo for Cartão
+     * @return self Self instance
      */
     public function setAtivo($ativo)
     {
@@ -298,33 +276,32 @@ class Cartao extends SyncModel
 
     /**
      * Convert this instance to array associated key -> value
-     * @param  boolean $recursive Allow rescursive conversion of fields
+     * @param boolean $recursive Allow rescursive conversion of fields
      * @return array All field and values into array format
      */
     public function toArray($recursive = false)
     {
         $cartao = parent::toArray($recursive);
         $cartao['id'] = $this->getID();
+        $cartao['formapagtoid'] = $this->getFormaPagtoID();
         $cartao['carteiraid'] = $this->getCarteiraID();
-        $cartao['carteirapagtoid'] = $this->getCarteiraPagtoID();
-        $cartao['descricao'] = $this->getDescricao();
-        $cartao['imageindex'] = $this->getImageIndex();
-        $cartao['mensalidade'] = $this->getMensalidade();
-        $cartao['transacao'] = $this->getTransacao();
+        $cartao['bandeira'] = $this->getBandeira();
         $cartao['taxa'] = $this->getTaxa();
         $cartao['diasrepasse'] = $this->getDiasRepasse();
+        $cartao['taxaantecipacao'] = $this->getTaxaAntecipacao();
+        $cartao['imagemurl'] = $this->getImagemURL();
         $cartao['ativo'] = $this->getAtivo();
         return $cartao;
     }
 
     /**
      * Fill this instance with from array values, you can pass instance to
-     * @param  mixed $cartao Associated key -> value to assign into this instance
-     * @return Cartao Self instance
+     * @param mixed $cartao Associated key -> value to assign into this instance
+     * @return self Self instance
      */
     public function fromArray($cartao = [])
     {
-        if ($cartao instanceof Cartao) {
+        if ($cartao instanceof self) {
             $cartao = $cartao->toArray();
         } elseif (!is_array($cartao)) {
             $cartao = [];
@@ -335,35 +312,20 @@ class Cartao extends SyncModel
         } else {
             $this->setID($cartao['id']);
         }
+        if (!isset($cartao['formapagtoid'])) {
+            $this->setFormaPagtoID(null);
+        } else {
+            $this->setFormaPagtoID($cartao['formapagtoid']);
+        }
         if (!array_key_exists('carteiraid', $cartao)) {
             $this->setCarteiraID(null);
         } else {
             $this->setCarteiraID($cartao['carteiraid']);
         }
-        if (!array_key_exists('carteirapagtoid', $cartao)) {
-            $this->setCarteiraPagtoID(null);
+        if (!isset($cartao['bandeira'])) {
+            $this->setBandeira(null);
         } else {
-            $this->setCarteiraPagtoID($cartao['carteirapagtoid']);
-        }
-        if (!isset($cartao['descricao'])) {
-            $this->setDescricao(null);
-        } else {
-            $this->setDescricao($cartao['descricao']);
-        }
-        if (!array_key_exists('imageindex', $cartao)) {
-            $this->setImageIndex(null);
-        } else {
-            $this->setImageIndex($cartao['imageindex']);
-        }
-        if (!isset($cartao['mensalidade'])) {
-            $this->setMensalidade(0);
-        } else {
-            $this->setMensalidade($cartao['mensalidade']);
-        }
-        if (!isset($cartao['transacao'])) {
-            $this->setTransacao(0);
-        } else {
-            $this->setTransacao($cartao['transacao']);
+            $this->setBandeira($cartao['bandeira']);
         }
         if (!isset($cartao['taxa'])) {
             $this->setTaxa(0);
@@ -375,6 +337,16 @@ class Cartao extends SyncModel
         } else {
             $this->setDiasRepasse($cartao['diasrepasse']);
         }
+        if (!isset($cartao['taxaantecipacao'])) {
+            $this->setTaxaAntecipacao(0);
+        } else {
+            $this->setTaxaAntecipacao($cartao['taxaantecipacao']);
+        }
+        if (!array_key_exists('imagemurl', $cartao)) {
+            $this->setImagemURL(null);
+        } else {
+            $this->setImagemURL($cartao['imagemurl']);
+        }
         if (!isset($cartao['ativo'])) {
             $this->setAtivo('N');
         } else {
@@ -384,97 +356,121 @@ class Cartao extends SyncModel
     }
 
     /**
+     * Get relative imagem path or default imagem
+     * @param boolean $default If true return default image, otherwise check field
+     * @param string  $default_name Default image name
+     * @return string relative web path for cartão imagem
+     */
+    public function makeImagemURL($default = false, $default_name = 'cartao.png')
+    {
+        $imagem_url = $this->getImagemURL();
+        if ($default) {
+            $imagem_url = null;
+        }
+        return get_image_url($imagem_url, 'cartao', $default_name);
+    }
+
+    /**
      * Convert this instance into array associated key -> value with only public fields
      * @return array All public field and values into array format
      */
     public function publish()
     {
         $cartao = parent::publish();
+        $cartao['imagemurl'] = $this->makeImagemURL(false, null);
         return $cartao;
     }
 
     /**
      * Filter fields, upload data and keep key data
-     * @param Cartao $original Original instance without modifications
+     * @param self $original Original instance without modifications
+     * @param boolean $localized Informs if fields are localized
+     * @return self Self instance
      */
     public function filter($original, $localized = false)
     {
         $this->setID($original->getID());
+        $this->setFormaPagtoID(Filter::number($this->getFormaPagtoID()));
         $this->setCarteiraID(Filter::number($this->getCarteiraID()));
-        $this->setCarteiraPagtoID(Filter::number($this->getCarteiraPagtoID()));
-        $this->setDescricao(Filter::string($this->getDescricao()));
-        $this->setImageIndex(Filter::number($this->getImageIndex()));
-        $this->setMensalidade(Filter::money($this->getMensalidade(), $localized));
-        $this->setTransacao(Filter::money($this->getTransacao(), $localized));
+        $this->setBandeira(Filter::string($this->getBandeira()));
         $this->setTaxa(Filter::float($this->getTaxa(), $localized));
         $this->setDiasRepasse(Filter::number($this->getDiasRepasse()));
+        $this->setTaxaAntecipacao(Filter::float($this->getTaxaAntecipacao(), $localized));
+        $imagem_url = upload_image('raw_imagemurl', 'cartao');
+        if (is_null($imagem_url) && trim($this->getImagemURL()) != '') {
+            $this->setImagemURL($original->getImagemURL());
+        } else {
+            $this->setImagemURL($imagem_url);
+        }
+        return $this;
     }
 
     /**
      * Clean instance resources like images and docs
-     * @param  Cartao $dependency Don't clean when dependency use same resources
+     * @param self $dependency Don't clean when dependency use same resources
      */
     public function clean($dependency)
     {
+        if (!is_null($this->getImagemURL()) && $dependency->getImagemURL() != $this->getImagemURL()) {
+            @unlink(get_image_path($this->getImagemURL(), 'cartao'));
+        }
+        $this->setImagemURL($dependency->getImagemURL());
     }
 
     /**
      * Validate fields updating them and throw exception when invalid data has found
      * @return array All field of Cartao in array format
+     * @throws \MZ\Exception\ValidationException for invalid input data
      */
     public function validate()
     {
         $errors = [];
-        if (is_null($this->getDescricao())) {
-            $errors['descricao'] = 'A descrição não pode ser vazia';
+        if (is_null($this->getFormaPagtoID())) {
+            $errors['formapagtoid'] = _t('cartao.forma_pagto_id_cannot_empty');
         }
-        if ($this->getImageIndex() < 0 || $this->getImageIndex() > count(self::getImages())) {
-            $errors['imageindex'] = 'O índice da imagem não é válido';
-        }
-        if (is_null($this->getMensalidade())) {
-            $errors['mensalidade'] = 'A mensalidade não pode ser vazia';
-        } elseif ($this->getMensalidade() < 0) {
-            $errors['mensalidade'] = 'A mensalidade não pode ser negativa';
-        }
-        if (is_null($this->getTransacao())) {
-            $errors['transacao'] = 'A transação não pode ser vazia';
-        } elseif ($this->getTransacao() < 0) {
-            $errors['transacao'] = 'O valor da transação não pode ser negativo';
+        if (is_null($this->getBandeira())) {
+            $errors['bandeira'] = _t('cartao.bandeira_cannot_empty');
         }
         if (is_null($this->getTaxa())) {
-            $errors['taxa'] = 'A taxa não pode ser vazia';
+            $errors['taxa'] = _t('cartao.taxa_cannot_empty');
         } elseif ($this->getTaxa() < 0) {
             $errors['taxa'] = 'A taxa não pode ser negativa';
         }
         if (is_null($this->getDiasRepasse())) {
-            $errors['diasrepasse'] = 'O dias para repasse não pode ser vazio';
+            $errors['diasrepasse'] = _t('cartao.dias_repasse_cannot_empty');
         } elseif ($this->getDiasRepasse() < 0) {
             $errors['diasrepasse'] = 'Os dias para repasse não pode ser negativo';
         }
-        if (is_null($this->getAtivo())) {
-            $errors['ativo'] = 'O ativo não pode ser vazio';
+        if (is_null($this->getTaxaAntecipacao())) {
+            $errors['taxaantecipacao'] = _t('cartao.taxa_antecipacao_cannot_empty');
+        } elseif ($this->getTaxa() < 0) {
+            $errors['taxaantecipacao'] = _t('cartao.taxa_antecipacao_cannot_negative');
         }
-        if (!Validator::checkBoolean($this->getAtivo(), true)) {
-            $errors['ativo'] = 'O ativo é inválido';
+        if (!Validator::checkBoolean($this->getAtivo())) {
+            $errors['ativo'] = _t('cartao.ativo_invalid');
         }
         if (!empty($errors)) {
-            throw new \MZ\Exception\ValidationException($errors);
+            throw new ValidationException($errors);
         }
         return $this->toArray();
     }
 
     /**
      * Translate SQL exception into application exception
-     * @param  \Exception $e exception to translate into a readable error
+     * @param \Exception $e exception to translate into a readable error
      * @return \MZ\Exception\ValidationException new exception translated
      */
     protected function translate($e)
     {
-        if (contains(['Descricao', 'UNIQUE'], $e->getMessage())) {
-            return new \MZ\Exception\ValidationException([
-                'descricao' => sprintf(
-                    'A descrição "%s" já está cadastrada',
-                    $this->getDescricao()
+        if (contains(['FormaPagtoID', 'Bandeira', 'UNIQUE'], $e->getMessage())) {
+            return new ValidationException([
+                'formapagtoid' => _t(
+                    'cartao.forma_pagto_id_used',
+                    $this->getFormaPagtoID()
+                ),
+                'bandeira' => _t(
+                    'cartao.bandeira_used',
+                    $this->getBandeira()
                 ),
             ]);
         }
@@ -483,7 +479,8 @@ class Cartao extends SyncModel
 
     /**
      * Insert a new Cartão into the database and fill instance from database
-     * @return Cartao Self instance
+     * @return self Self instance
+     * @throws \MZ\Exception\ValidationException for invalid input data
      */
     public function insert()
     {
@@ -502,36 +499,42 @@ class Cartao extends SyncModel
 
     /**
      * Update Cartão with instance values into database for ID
-     * @param  array $only Save these fields only, when empty save all fields except id
-     * @return Cartao Self instance
+     * @param array $only Save these fields only, when empty save all fields except id
+     * @return int rows affected
+     * @throws \MZ\Exception\ValidationException for invalid input data
      */
     public function update($only = [])
     {
         $values = $this->validate();
         if (!$this->exists()) {
-            throw new \Exception('O identificador do cartão não foi informado');
+            throw new ValidationException(
+                ['id' => _t('cartao.id_cannot_empty')]
+            );
         }
         $values = DB::filterValues($values, $only, false);
         try {
-            DB::update('Cartoes')
+            $affected = DB::update('Cartoes')
                 ->set($values)
-                ->where('id', $this->getID())
+                ->where(['id' => $this->getID()])
                 ->execute();
             $this->loadByID();
         } catch (\Exception $e) {
             throw $this->translate($e);
         }
-        return $this;
+        return $affected;
     }
 
     /**
      * Delete this instance from database using ID
      * @return integer Number of rows deleted (Max 1)
+     * @throws \MZ\Exception\ValidationException for invalid id
      */
     public function delete()
     {
         if (!$this->exists()) {
-            throw new \Exception('O identificador do cartão não foi informado');
+            throw new ValidationException(
+                ['id' => _t('cartao.id_cannot_empty')]
+            );
         }
         $result = DB::deleteFrom('Cartoes')
             ->where('id', $this->getID())
@@ -541,9 +544,9 @@ class Cartao extends SyncModel
 
     /**
      * Load one register for it self with a condition
-     * @param  array $condition Condition for searching the row
-     * @param  array $order associative field name -> [-1, 1]
-     * @return Cartao Self instance filled or empty
+     * @param array $condition Condition for searching the row
+     * @param array $order associative field name -> [-1, 1]
+     * @return self Self instance filled or empty
      */
     public function load($condition, $order = [])
     {
@@ -553,15 +556,24 @@ class Cartao extends SyncModel
     }
 
     /**
-     * Load into this object from database using, Descricao
-     * @param  string $descricao descrição to find Cartão
-     * @return Cartao Self filled instance or empty when not found
+     * Load into this object from database using, FormaPagtoID, Bandeira
+     * @return self Self filled instance or empty when not found
      */
-    public function loadByDescricao($descricao)
+    public function loadByFormaPagtoIDBandeira()
     {
         return $this->load([
-            'descricao' => strval($descricao),
+            'formapagtoid' => intval($this->getFormaPagtoID()),
+            'bandeira' => strval($this->getBandeira()),
         ]);
+    }
+
+    /**
+     * Forma de pagamento associada à esse cartão ou vale
+     * @return \MZ\Payment\FormaPagto The object fetched from database
+     */
+    public function findFormaPagtoID()
+    {
+        return \MZ\Payment\FormaPagto::findByID($this->getFormaPagtoID());
     }
 
     /**
@@ -577,31 +589,19 @@ class Cartao extends SyncModel
     }
 
     /**
-     * Carteira de saída de pagamentos no caixa
-     * @return \MZ\Wallet\Carteira The object fetched from database
-     */
-    public function findCarteiraPagtoID()
-    {
-        if (is_null($this->getCarteiraPagtoID())) {
-            return new \MZ\Wallet\Carteira();
-        }
-        return \MZ\Wallet\Carteira::findByID($this->getCarteiraPagtoID());
-    }
-
-    /**
      * Get allowed keys array
      * @return array allowed keys array
      */
     private static function getAllowedKeys()
     {
-        $cartao = new Cartao();
+        $cartao = new self();
         $allowed = Filter::concatKeys('c.', $cartao->toArray());
         return $allowed;
     }
 
     /**
      * Filter order array
-     * @param  mixed $order order string or array to parse and filter allowed
+     * @param mixed $order order string or array to parse and filter allowed
      * @return array allowed associative order
      */
     private static function filterOrder($order)
@@ -612,7 +612,7 @@ class Cartao extends SyncModel
 
     /**
      * Filter condition array with allowed fields
-     * @param  array $condition condition to filter rows
+     * @param array $condition condition to filter rows
      * @return array allowed condition
      */
     private static function filterCondition($condition)
@@ -620,7 +620,7 @@ class Cartao extends SyncModel
         $allowed = self::getAllowedKeys();
         if (isset($condition['search'])) {
             $search = $condition['search'];
-            $field = 'c.descricao LIKE ?';
+            $field = 'c.bandeira LIKE ?';
             $condition[$field] = '%'.$search.'%';
             $allowed[$field] = true;
             unset($condition['search']);
@@ -630,8 +630,8 @@ class Cartao extends SyncModel
 
     /**
      * Fetch data from database with a condition
-     * @param  array $condition condition to filter rows
-     * @param  array $order order rows
+     * @param array $condition condition to filter rows
+     * @param array $order order rows
      * @return SelectQuery query object with condition statement
      */
     private static function query($condition = [], $order = [])
@@ -640,59 +640,60 @@ class Cartao extends SyncModel
         $condition = self::filterCondition($condition);
         $query = DB::buildOrderBy($query, self::filterOrder($order));
         $query = $query->orderBy('c.ativo ASC');
-        $query = $query->orderBy('c.descricao ASC');
+        $query = $query->orderBy('c.bandeira ASC');
         $query = $query->orderBy('c.id ASC');
         return DB::buildCondition($query, $condition);
     }
 
     /**
      * Search one register with a condition
-     * @param  array $condition Condition for searching the row
-     * @param  array $order order rows
-     * @return Cartao A filled Cartão or empty instance
+     * @param array $condition Condition for searching the row
+     * @param array $order order rows
+     * @return self A filled Cartão or empty instance
      */
     public static function find($condition, $order = [])
     {
-        $query = self::query($condition, $order)->limit(1);
-        $row = $query->fetch() ?: [];
-        return new Cartao($row);
-    }
-
-    public static function getImages()
-    {
-        return [
-            1 => ['id' => 1, 'name' => 'Credishop'],
-            2 => ['id' => 2, 'name' => 'Hipercard'],
-            3 => ['id' => 3, 'name' => 'Visa'],
-            4 => ['id' => 4, 'name' => 'MasterCard'],
-            5 => ['id' => 5, 'name' => 'American Express'],
-            6 => ['id' => 6, 'name' => 'Diners Club'],
-            7 => ['id' => 7, 'name' => 'Elo'],
-            8 => ['id' => 8, 'name' => 'Sodexo'],
-            9 => ['id' => 9, 'name' => 'Maestro'],
-            10 => ['id' => 10, 'name' => 'Ticket'],
-            11 => ['id' => 11, 'name' => 'Visa Electron'],
-        ];
+        $result = new self();
+        return $result->load($condition, $order);
     }
 
     /**
-     * Find this object on database using, Descricao
-     * @param  string $descricao descrição to find Cartão
-     * @return Cartao A filled instance or empty when not found
+     * Search one register with a condition
+     * @param array $condition Condition for searching the row
+     * @param array $order order rows
+     * @return self A filled Cartão or empty instance
+     * @throws \Exception when register has not found
      */
-    public static function findByDescricao($descricao)
+    public static function findOrFail($condition, $order = [])
+    {
+        $result = self::find($condition, $order);
+        if (!$result->exists()) {
+            throw new \Exception(_t('cartao.not_found'), 404);
+        }
+        return $result;
+    }
+
+    /**
+     * Find this object on database using, FormaPagtoID, Bandeira
+     * @param int $forma_pagto_id forma de pagamento to find Cartão
+     * @param string $bandeira bandeira to find Cartão
+     * @return self A filled instance or empty when not found
+     */
+    public static function findByFormaPagtoIDBandeira($forma_pagto_id, $bandeira)
     {
         $result = new self();
-        return $result->loadByDescricao($descricao);
+        $result->setFormaPagtoID($forma_pagto_id);
+        $result->setBandeira($bandeira);
+        return $result->loadByFormaPagtoIDBandeira();
     }
 
     /**
      * Find all Cartão
-     * @param  array  $condition Condition to get all Cartão
-     * @param  array  $order     Order Cartão
-     * @param  int    $limit     Limit data into row count
-     * @param  int    $offset    Start offset to get rows
-     * @return array             List of all rows instanced as Cartao
+     * @param array  $condition Condition to get all Cartão
+     * @param array  $order     Order Cartão
+     * @param int    $limit     Limit data into row count
+     * @param int    $offset    Start offset to get rows
+     * @return self[] List of all rows instanced as Cartao
      */
     public static function findAll($condition = [], $order = [], $limit = null, $offset = null)
     {
@@ -706,14 +707,14 @@ class Cartao extends SyncModel
         $rows = $query->fetchAll();
         $result = [];
         foreach ($rows as $row) {
-            $result[] = new Cartao($row);
+            $result[] = new self($row);
         }
         return $result;
     }
 
     /**
      * Count all rows from database with matched condition critery
-     * @param  array $condition condition to filter rows
+     * @param array $condition condition to filter rows
      * @return integer Quantity of rows
      */
     public static function count($condition = [])

@@ -24,10 +24,11 @@
  */
 namespace MZ\Location;
 
-use MZ\Database\SyncModel;
-use MZ\Database\DB;
+use MZ\Util\Mask;
 use MZ\Util\Filter;
 use MZ\Util\Validator;
+use MZ\Database\DB;
+use MZ\Database\SyncModel;
 use MZ\System\Permissao;
 use MZ\Exception\ValidationException;
 
@@ -57,6 +58,15 @@ class Bairro extends SyncModel
      * Informa se o bairro está disponível para entrega de pedidos
      */
     private $disponivel;
+    /**
+     * Informa se o bairro está mapeado por zonas e se é obrigatório selecionar
+     * uma zona
+     */
+    private $mapeado;
+    /**
+     * Tempo médio de entrega para esse bairro
+     */
+    private $tempo_entrega;
 
     /**
      * Constructor for a new empty instance of Bairro
@@ -69,7 +79,7 @@ class Bairro extends SyncModel
 
     /**
      * Identificador do bairro
-     * @return mixed ID of Bairro
+     * @return int id of Bairro
      */
     public function getID()
     {
@@ -78,8 +88,8 @@ class Bairro extends SyncModel
 
     /**
      * Set ID value to new on param
-     * @param  mixed $id new value for ID
-     * @return Bairro Self instance
+     * @param int $id Set id for Bairro
+     * @return self Self instance
      */
     public function setID($id)
     {
@@ -89,7 +99,7 @@ class Bairro extends SyncModel
 
     /**
      * Cidade a qual o bairro pertence
-     * @return mixed Cidade of Bairro
+     * @return int cidade of Bairro
      */
     public function getCidadeID()
     {
@@ -98,8 +108,8 @@ class Bairro extends SyncModel
 
     /**
      * Set CidadeID value to new on param
-     * @param  mixed $cidade_id new value for CidadeID
-     * @return Bairro Self instance
+     * @param int $cidade_id Set cidade for Bairro
+     * @return self Self instance
      */
     public function setCidadeID($cidade_id)
     {
@@ -109,7 +119,7 @@ class Bairro extends SyncModel
 
     /**
      * Nome do bairro
-     * @return mixed Nome of Bairro
+     * @return string nome of Bairro
      */
     public function getNome()
     {
@@ -118,8 +128,8 @@ class Bairro extends SyncModel
 
     /**
      * Set Nome value to new on param
-     * @param  mixed $nome new value for Nome
-     * @return Bairro Self instance
+     * @param string $nome Set nome for Bairro
+     * @return self Self instance
      */
     public function setNome($nome)
     {
@@ -129,7 +139,7 @@ class Bairro extends SyncModel
 
     /**
      * Valor cobrado para entregar um pedido nesse bairro
-     * @return mixed Valor da entrega of Bairro
+     * @return string valor da entrega of Bairro
      */
     public function getValorEntrega()
     {
@@ -138,8 +148,8 @@ class Bairro extends SyncModel
 
     /**
      * Set ValorEntrega value to new on param
-     * @param  mixed $valor_entrega new value for ValorEntrega
-     * @return Bairro Self instance
+     * @param string $valor_entrega Set valor da entrega for Bairro
+     * @return self Self instance
      */
     public function setValorEntrega($valor_entrega)
     {
@@ -149,7 +159,7 @@ class Bairro extends SyncModel
 
     /**
      * Informa se o bairro está disponível para entrega de pedidos
-     * @return mixed Disponível of Bairro
+     * @return string disponível of Bairro
      */
     public function getDisponivel()
     {
@@ -167,8 +177,8 @@ class Bairro extends SyncModel
 
     /**
      * Set Disponivel value to new on param
-     * @param  mixed $disponivel new value for Disponivel
-     * @return Bairro Self instance
+     * @param string $disponivel Set disponível for Bairro
+     * @return self Self instance
      */
     public function setDisponivel($disponivel)
     {
@@ -177,8 +187,59 @@ class Bairro extends SyncModel
     }
 
     /**
+     * Informa se o bairro está mapeado por zonas e se é obrigatório selecionar
+     * uma zona
+     * @return string mapeado of Bairro
+     */
+    public function getMapeado()
+    {
+        return $this->mapeado;
+    }
+
+    /**
+     * Informa se o bairro está mapeado por zonas e se é obrigatório selecionar
+     * uma zona
+     * @return boolean Check if o of Mapeado is selected or checked
+     */
+    public function isMapeado()
+    {
+        return $this->mapeado == 'Y';
+    }
+
+    /**
+     * Set Mapeado value to new on param
+     * @param string $mapeado Set mapeado for Bairro
+     * @return self Self instance
+     */
+    public function setMapeado($mapeado)
+    {
+        $this->mapeado = $mapeado;
+        return $this;
+    }
+
+    /**
+     * Tempo médio de entrega para esse bairro
+     * @return int tempo de entrega of Bairro
+     */
+    public function getTempoEntrega()
+    {
+        return $this->tempo_entrega;
+    }
+
+    /**
+     * Set TempoEntrega value to new on param
+     * @param int $tempo_entrega Set tempo de entrega for Bairro
+     * @return self Self instance
+     */
+    public function setTempoEntrega($tempo_entrega)
+    {
+        $this->tempo_entrega = $tempo_entrega;
+        return $this;
+    }
+
+    /**
      * Convert this instance to array associated key -> value
-     * @param  boolean $recursive Allow rescursive conversion of fields
+     * @param boolean $recursive Allow rescursive conversion of fields
      * @return array All field and values into array format
      */
     public function toArray($recursive = false)
@@ -189,17 +250,19 @@ class Bairro extends SyncModel
         $bairro['nome'] = $this->getNome();
         $bairro['valorentrega'] = $this->getValorEntrega();
         $bairro['disponivel'] = $this->getDisponivel();
+        $bairro['mapeado'] = $this->getMapeado();
+        $bairro['tempoentrega'] = $this->getTempoEntrega();
         return $bairro;
     }
 
     /**
      * Fill this instance with from array values, you can pass instance to
-     * @param  mixed $bairro Associated key -> value to assign into this instance
-     * @return Bairro Self instance
+     * @param mixed $bairro Associated key -> value to assign into this instance
+     * @return self Self instance
      */
     public function fromArray($bairro = [])
     {
-        if ($bairro instanceof Bairro) {
+        if ($bairro instanceof self) {
             $bairro = $bairro->toArray();
         } elseif (!is_array($bairro)) {
             $bairro = [];
@@ -230,6 +293,16 @@ class Bairro extends SyncModel
         } else {
             $this->setDisponivel($bairro['disponivel']);
         }
+        if (!isset($bairro['mapeado'])) {
+            $this->setMapeado('N');
+        } else {
+            $this->setMapeado($bairro['mapeado']);
+        }
+        if (!array_key_exists('tempoentrega', $bairro)) {
+            $this->setTempoEntrega(null);
+        } else {
+            $this->setTempoEntrega($bairro['tempoentrega']);
+        }
         return $this;
     }
 
@@ -245,7 +318,9 @@ class Bairro extends SyncModel
 
     /**
      * Filter fields, upload data and keep key data
-     * @param Bairro $original Original instance without modifications
+     * @param self $original Original instance without modifications
+     * @param boolean $localized Informs if fields are localized
+     * @return self Self instance
      */
     public function filter($original, $localized = false)
     {
@@ -253,11 +328,13 @@ class Bairro extends SyncModel
         $this->setCidadeID(Filter::number($this->getCidadeID()));
         $this->setNome(Filter::string($this->getNome()));
         $this->setValorEntrega(Filter::money($this->getValorEntrega(), $localized));
+        $this->setTempoEntrega(Filter::number($this->getTempoEntrega()));
+        return $this;
     }
 
     /**
      * Clean instance resources like images and docs
-     * @param  Bairro $dependency Don't clean when dependency use same resources
+     * @param self $dependency Don't clean when dependency use same resources
      */
     public function clean($dependency)
     {
@@ -266,26 +343,27 @@ class Bairro extends SyncModel
     /**
      * Validate fields updating them and throw exception when invalid data has found
      * @return array All field of Bairro in array format
+     * @throws \MZ\Exception\ValidationException for invalid input data
      */
     public function validate()
     {
         $errors = [];
         if (is_null($this->getCidadeID())) {
-            $errors['cidadeid'] = 'A cidade não pode ser vazia';
+            $errors['cidadeid'] = _t('bairro.cidade_id_cannot_empty');
         }
         if (is_null($this->getNome())) {
-            $errors['nome'] = 'O nome não pode ser vazio';
+            $errors['nome'] = _t('bairro.nome_cannot_empty');
         }
         if (is_null($this->getValorEntrega())) {
-            $errors['valorentrega'] = 'O Valor da entrega não pode ser vazio';
+            $errors['valorentrega'] = _t('bairro.valor_entrega_cannot_empty');
         } elseif ($this->getValorEntrega() < 0) {
             $errors['valorentrega'] = 'O valor da entrega não pode ser negativo';
         }
-        if (is_null($this->getDisponivel())) {
-            $this->setDisponivel('N');
+        if (!Validator::checkBoolean($this->getDisponivel())) {
+            $errors['disponivel'] = _t('bairro.disponivel_invalid');
         }
-        if (!array_key_exists($this->getDisponivel(), DB::getBooleanOptions())) {
-            $errors['disponivel'] = 'A disponibilidade de entrega é inválida';
+        if (!Validator::checkBoolean($this->getMapeado())) {
+            $errors['mapeado'] = _t('bairro.mapeado_invalid');
         }
         if (!empty($errors)) {
             throw new ValidationException($errors);
@@ -295,20 +373,20 @@ class Bairro extends SyncModel
 
     /**
      * Translate SQL exception into application exception
-     * @param  \Exception $e exception to translate into a readable error
-     * @return ValidationException new exception translated
+     * @param \Exception $e exception to translate into a readable error
+     * @return \MZ\Exception\ValidationException new exception translated
      */
     protected function translate($e)
     {
         if (contains(['CidadeID', 'Nome', 'UNIQUE'], $e->getMessage())) {
             return new ValidationException([
-                'cidadeid' => vsprintf(
-                    'A cidade "%s" já está cadastrada',
-                    [$this->getCidadeID()]
+                'cidadeid' => _t(
+                    'bairro.cidade_id_used',
+                    $this->getCidadeID()
                 ),
-                'nome' => vsprintf(
-                    'O nome "%s" já está cadastrado',
-                    [$this->getNome()]
+                'nome' => _t(
+                    'bairro.nome_used',
+                    $this->getNome()
                 ),
             ]);
         }
@@ -316,51 +394,102 @@ class Bairro extends SyncModel
     }
 
     /**
-     * Find this object on database using, CidadeID, Nome
-     * @param  int $cidade_id cidade to find Bairro
-     * @param  string $nome nome to find Bairro
-     * @return Bairro A filled instance or empty when not found
+     * Insert a new Bairro into the database and fill instance from database
+     * @return self Self instance
+     * @throws \MZ\Exception\ValidationException for invalid input data
      */
-    public static function findByCidadeIDNome($cidade_id, $nome)
+    public function insert()
     {
-        $result = new self();
-        $result->setCidadeID($cidade_id);
-        $result->setNome($nome);
-        return $result->loadByCidadeIDNome();
+        $this->setID(null);
+        $values = $this->validate();
+        unset($values['id']);
+        try {
+            $id = DB::insertInto('Bairros')->values($values)->execute();
+            $this->setID($id);
+            $this->loadByID();
+        } catch (\Exception $e) {
+            throw $this->translate($e);
+        }
+        return $this;
     }
 
     /**
-     * Find district with that name or register a new one
-     * @param  int $cidade_id cidade to find Bairro
-     * @param  string $nome nome to find Bairro
-     * @return Bairro A filled instance
+     * Update Bairro with instance values into database for ID
+     * @param array $only Save these fields only, when empty save all fields except id
+     * @return int rows affected
+     * @throws \MZ\Exception\ValidationException for invalid input data
      */
-    public static function findOrInsert($cidade_id, $nome)
+    public function update($only = [])
     {
-        $bairro = self::findByCidadeIDNome(
-            $cidade_id,
-            Filter::string($nome)
-        );
-        if ($bairro->exists()) {
-            return $bairro;
+        $values = $this->validate();
+        if (!$this->exists()) {
+            throw new ValidationException(
+                ['id' => _t('bairro.id_cannot_empty')]
+            );
         }
-        $msg = 'O bairro não está cadastrada e você não tem permissão para cadastrar um';
-        app()->needPermission([Permissao::NOME_CADASTROBAIRROS], $msg);
-        $bairro->setCidadeID($cidade_id);
-        $bairro->setNome($nome);
-        $bairro->setValorEntrega(0.0);
-        $bairro->filter(new Bairro());
+        $values = DB::filterValues($values, $only, false);
         try {
-            $bairro->insert();
-        } catch (ValidationException $e) {
-            $errors = $e->getErrors();
-            if (isset($errors['nome'])) {
-                $errors['bairro'] = $errors['nome'];
-                unset($errors['nome']);
-            }
-            throw new ValidationException($errors);
+            $affected = DB::update('Bairros')
+                ->set($values)
+                ->where(['id' => $this->getID()])
+                ->execute();
+            $this->loadByID();
+        } catch (\Exception $e) {
+            throw $this->translate($e);
         }
-        return $bairro;
+        return $affected;
+    }
+
+    /**
+     * Delete this instance from database using ID
+     * @return integer Number of rows deleted (Max 1)
+     * @throws \MZ\Exception\ValidationException for invalid id
+     */
+    public function delete()
+    {
+        if (!$this->exists()) {
+            throw new ValidationException(
+                ['id' => _t('bairro.id_cannot_empty')]
+            );
+        }
+        $result = DB::deleteFrom('Bairros')
+            ->where('id', $this->getID())
+            ->execute();
+        return $result;
+    }
+
+    /**
+     * Load one register for it self with a condition
+     * @param array $condition Condition for searching the row
+     * @param array $order associative field name -> [-1, 1]
+     * @return self Self instance filled or empty
+     */
+    public function load($condition, $order = [])
+    {
+        $query = self::query($condition, $order)->limit(1);
+        $row = $query->fetch() ?: [];
+        return $this->fromArray($row);
+    }
+
+    /**
+     * Load into this object from database using, CidadeID, Nome
+     * @return self Self filled instance or empty when not found
+     */
+    public function loadByCidadeIDNome()
+    {
+        return $this->load([
+            'cidadeid' => intval($this->getCidadeID()),
+            'nome' => strval($this->getNome()),
+        ]);
+    }
+
+    /**
+     * Cidade a qual o bairro pertence
+     * @return \MZ\Location\Cidade The object fetched from database
+     */
+    public function findCidadeID()
+    {
+        return \MZ\Location\Cidade::findByID($this->getCidadeID());
     }
 
     /**
@@ -369,7 +498,7 @@ class Bairro extends SyncModel
      */
     private static function getAllowedKeys()
     {
-        $bairro = new Bairro();
+        $bairro = new self();
         $allowed = Filter::concatKeys('b.', $bairro->toArray());
         $allowed['e.paisid'] = true;
         $allowed['c.estadoid'] = true;
@@ -378,7 +507,7 @@ class Bairro extends SyncModel
 
     /**
      * Filter order array
-     * @param  mixed $order order string or array to parse and filter allowed
+     * @param mixed $order order string or array to parse and filter allowed
      * @return array allowed associative order
      */
     private static function filterOrder($order)
@@ -389,7 +518,7 @@ class Bairro extends SyncModel
 
     /**
      * Filter condition array with allowed fields
-     * @param  array $condition condition to filter rows
+     * @param array $condition condition to filter rows
      * @return array allowed condition
      */
     private static function filterCondition($condition)
@@ -400,8 +529,8 @@ class Bairro extends SyncModel
 
     /**
      * Fetch data from database with a condition
-     * @param  array $condition condition to filter rows
-     * @param  array $order order rows
+     * @param array $condition condition to filter rows
+     * @param array $order order rows
      * @return SelectQuery query object with condition statement
      */
     private static function query($condition = [], $order = [])
@@ -422,26 +551,99 @@ class Bairro extends SyncModel
 
     /**
      * Search one register with a condition
-     * @param  array $condition Condition for searching the row
-     * @param  array $order order rows
-     * @return Bairro A filled Bairro or empty instance
+     * @param array $condition Condition for searching the row
+     * @param array $order order rows
+     * @return self A filled Bairro or empty instance
      */
     public static function find($condition, $order = [])
     {
-        $query = self::query($condition, $order)->limit(1);
-        $row = $query->fetch();
-        if ($row === false) {
-            $row = [];
-        }
-        return new Bairro($row);
+        $result = new self();
+        return $result->load($condition, $order);
     }
 
     /**
-     * Fetch all rows from database with matched condition critery
-     * @param  array $condition condition to filter rows
-     * @param  integer $limit number of rows to get, null for all
-     * @param  integer $offset start index to get rows, null for begining
-     * @return array All rows instanced and filled
+     * Search one register with a condition
+     * @param array $condition Condition for searching the row
+     * @param array $order order rows
+     * @return self A filled Bairro or empty instance
+     * @throws \Exception when register has not found
+     */
+    public static function findOrFail($condition, $order = [])
+    {
+        $result = self::find($condition, $order);
+        if (!$result->exists()) {
+            throw new \Exception(_t('bairro.not_found'), 404);
+        }
+        return $result;
+    }
+
+    /**
+     * Find district with that name or register a new one
+     * @param  int $cidade_id cidade to find Bairro
+     * @param  string $nome nome to find Bairro
+     * @return Bairro A filled instance
+     */
+    public static function findOrInsert($cidade_id, $nome)
+    {
+        $bairro = self::findByCidadeIDNome(
+            $cidade_id,
+            Filter::string($nome)
+        );
+        if ($bairro->exists()) {
+            return $bairro;
+        }
+        $msg = 'O bairro não está cadastrado e você não tem permissão para cadastrar um';
+        app()->needPermission([Permissao::NOME_CADASTROBAIRROS], $msg);
+        $bairro->setCidadeID($cidade_id);
+        $bairro->setNome($nome);
+        $bairro->setValorEntrega(0.0);
+        $bairro->filter(new Bairro());
+        try {
+            $bairro->insert();
+        } catch (ValidationException $e) {
+            $errors = $e->getErrors();
+            if (isset($errors['nome'])) {
+                $errors['bairro'] = $errors['nome'];
+                unset($errors['nome']);
+            }
+            throw new ValidationException($errors);
+        }
+        return $bairro;
+    }
+
+    /**
+     * Find this object on database using, ID
+     * @param int $id id to find Bairro
+     * @return self A filled instance or empty when not found
+     */
+    public static function findByID($id)
+    {
+        $result = new self();
+        $result->setID($id);
+        return $result->loadByID();
+    }
+
+    /**
+     * Find this object on database using, CidadeID, Nome
+     * @param int $cidade_id cidade to find Bairro
+     * @param string $nome nome to find Bairro
+     * @return self A filled instance or empty when not found
+     */
+    public static function findByCidadeIDNome($cidade_id, $nome)
+    {
+        $result = new self();
+        $result->setCidadeID($cidade_id);
+        $result->setNome($nome);
+        return $result->loadByCidadeIDNome();
+    }
+
+    /**
+     * Find all Bairro
+     * @param array  $condition Condition to get all Bairro
+     * @param array  $order     Order Bairro
+     * @param int    $limit     Limit data into row count
+     * @param int    $offset    Start offset to get rows
+     * @return self[] List of all rows instanced as Bairro
      */
     public static function findAll($condition = [], $order = [], $limit = null, $offset = null)
     {
@@ -455,111 +657,19 @@ class Bairro extends SyncModel
         $rows = $query->fetchAll();
         $result = [];
         foreach ($rows as $row) {
-            $result[] = new Bairro($row);
+            $result[] = new self($row);
         }
         return $result;
-    }
-
-    /**
-     * Insert a new Bairro into the database and fill instance from database
-     * @return Bairro Self instance
-     */
-    public function insert()
-    {
-        $this->setID(null);
-        $values = $this->validate();
-        unset($values['id']);
-        try {
-            $id = DB::insertInto('Bairros')->values($values)->execute();
-            $this->setID($id);
-            $this->loadByID();
-        } catch (\Exception $e) {
-            throw $this->translate($e);
-        }
-        return $this;
-    }
-
-    /**
-     * Update Bairro with instance values into database for ID
-     * @param  array $only Save these fields only, when empty save all fields except id
-     * @return Bairro Self instance
-     */
-    public function update($only = [])
-    {
-        $values = $this->validate();
-        if (!$this->exists()) {
-            throw new \Exception('O identificador do bairro não foi informado');
-        }
-        $values = DB::filterValues($values, $only, false);
-        try {
-            DB::update('Bairros')
-                ->set($values)
-                ->where('id', $this->getID())
-                ->execute();
-            $this->loadByID();
-        } catch (\Exception $e) {
-            throw $this->translate($e);
-        }
-        return $this;
-    }
-
-    /**
-     * Delete this instance from database using ID
-     * @return integer Number of rows deleted (Max 1)
-     */
-    public function delete()
-    {
-        if (!$this->exists()) {
-            throw new \Exception('O identificador do bairro não foi informado');
-        }
-        $result = DB::deleteFrom('Bairros')
-            ->where('id', $this->getID())
-            ->execute();
-        return $result;
-    }
-
-    /**
-     * Load one register for it self with a condition
-     * @param  array $condition Condition for searching the row
-     * @param  array $order associative field name -> [-1, 1]
-     * @return Bairro Self instance filled or empty
-     */
-    public function load($condition, $order = [])
-    {
-        $query = self::query($condition, $order)->limit(1);
-        $row = $query->fetch() ?: [];
-        return $this->fromArray($row);
-    }
-
-    /**
-     * Load into this object from database using, CidadeID, Nome
-     * @return Bairro Self filled instance or empty when not found
-     */
-    public function loadByCidadeIDNome()
-    {
-        return $this->load([
-            'cidadeid' => intval($this->getCidadeID()),
-            'nome' => strval($this->getNome()),
-        ]);
     }
 
     /**
      * Count all rows from database with matched condition critery
-     * @param  array $condition condition to filter rows
+     * @param array $condition condition to filter rows
      * @return integer Quantity of rows
      */
     public static function count($condition = [])
     {
         $query = self::query($condition);
         return $query->count();
-    }
-
-    /**
-     * Cidade a qual o bairro pertence
-     * @return \MZ\Location\Cidade The object fetched from database
-     */
-    public function findCidadeID()
-    {
-        return \MZ\Location\Cidade::findByID($this->getCidadeID());
     }
 }

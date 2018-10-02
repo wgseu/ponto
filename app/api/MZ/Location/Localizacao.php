@@ -24,10 +24,12 @@
  */
 namespace MZ\Location;
 
-use MZ\Database\SyncModel;
-use MZ\Database\DB;
+use MZ\Util\Mask;
 use MZ\Util\Filter;
 use MZ\Util\Validator;
+use MZ\Database\DB;
+use MZ\Database\SyncModel;
+use MZ\Exception\ValidationException;
 
 /**
  * Endereço detalhado de um cliente
@@ -53,6 +55,10 @@ class Localizacao extends SyncModel
      * Bairro do endereço
      */
     private $bairro_id;
+    /**
+     * Informa a zona do bairro
+     */
+    private $zona_id;
     /**
      * Código dos correios para identificar um logradouro
      */
@@ -117,7 +123,7 @@ class Localizacao extends SyncModel
 
     /**
      * Identificador do endereço
-     * @return mixed ID of Localizacao
+     * @return int id of Localização
      */
     public function getID()
     {
@@ -126,8 +132,8 @@ class Localizacao extends SyncModel
 
     /**
      * Set ID value to new on param
-     * @param  mixed $id new value for ID
-     * @return Localizacao Self instance
+     * @param int $id Set id for Localização
+     * @return self Self instance
      */
     public function setID($id)
     {
@@ -137,7 +143,7 @@ class Localizacao extends SyncModel
 
     /**
      * Cliente a qual esse endereço pertence
-     * @return mixed Cliente of Localizacao
+     * @return int cliente of Localização
      */
     public function getClienteID()
     {
@@ -146,8 +152,8 @@ class Localizacao extends SyncModel
 
     /**
      * Set ClienteID value to new on param
-     * @param  mixed $cliente_id new value for ClienteID
-     * @return Localizacao Self instance
+     * @param int $cliente_id Set cliente for Localização
+     * @return self Self instance
      */
     public function setClienteID($cliente_id)
     {
@@ -157,7 +163,7 @@ class Localizacao extends SyncModel
 
     /**
      * Bairro do endereço
-     * @return mixed Bairro of Localizacao
+     * @return int bairro of Localização
      */
     public function getBairroID()
     {
@@ -166,8 +172,8 @@ class Localizacao extends SyncModel
 
     /**
      * Set BairroID value to new on param
-     * @param  mixed $bairro_id new value for BairroID
-     * @return Localizacao Self instance
+     * @param int $bairro_id Set bairro for Localização
+     * @return self Self instance
      */
     public function setBairroID($bairro_id)
     {
@@ -176,8 +182,28 @@ class Localizacao extends SyncModel
     }
 
     /**
+     * Informa a zona do bairro
+     * @return int zonaid of Localização
+     */
+    public function getZonaID()
+    {
+        return $this->zona_id;
+    }
+
+    /**
+     * Set ZonaID value to new on param
+     * @param int $zona_id Set zonaid for Localização
+     * @return self Self instance
+     */
+    public function setZonaID($zona_id)
+    {
+        $this->zona_id = $zona_id;
+        return $this;
+    }
+
+    /**
      * Código dos correios para identificar um logradouro
-     * @return mixed CEP of Localizacao
+     * @return string cep of Localização
      */
     public function getCEP()
     {
@@ -186,8 +212,8 @@ class Localizacao extends SyncModel
 
     /**
      * Set CEP value to new on param
-     * @param  mixed $cep new value for CEP
-     * @return Localizacao Self instance
+     * @param string $cep Set cep for Localização
+     * @return self Self instance
      */
     public function setCEP($cep)
     {
@@ -197,7 +223,7 @@ class Localizacao extends SyncModel
 
     /**
      * Nome da rua ou avenida
-     * @return mixed Logradouro of Localizacao
+     * @return string logradouro of Localização
      */
     public function getLogradouro()
     {
@@ -206,8 +232,8 @@ class Localizacao extends SyncModel
 
     /**
      * Set Logradouro value to new on param
-     * @param  mixed $logradouro new value for Logradouro
-     * @return Localizacao Self instance
+     * @param string $logradouro Set logradouro for Localização
+     * @return self Self instance
      */
     public function setLogradouro($logradouro)
     {
@@ -217,7 +243,7 @@ class Localizacao extends SyncModel
 
     /**
      * Número da casa ou do condomínio
-     * @return mixed Número of Localizacao
+     * @return string número of Localização
      */
     public function getNumero()
     {
@@ -226,8 +252,8 @@ class Localizacao extends SyncModel
 
     /**
      * Set Numero value to new on param
-     * @param  mixed $numero new value for Numero
-     * @return Localizacao Self instance
+     * @param string $numero Set número for Localização
+     * @return self Self instance
      */
     public function setNumero($numero)
     {
@@ -237,7 +263,7 @@ class Localizacao extends SyncModel
 
     /**
      * Tipo de endereço Casa ou Apartamento
-     * @return mixed Tipo of Localizacao
+     * @return string tipo of Localização
      */
     public function getTipo()
     {
@@ -246,8 +272,8 @@ class Localizacao extends SyncModel
 
     /**
      * Set Tipo value to new on param
-     * @param  mixed $tipo new value for Tipo
-     * @return Localizacao Self instance
+     * @param string $tipo Set tipo for Localização
+     * @return self Self instance
      */
     public function setTipo($tipo)
     {
@@ -257,7 +283,7 @@ class Localizacao extends SyncModel
 
     /**
      * Complemento do endereço, Ex.: Loteamento Sul
-     * @return mixed Complemento of Localizacao
+     * @return string complemento of Localização
      */
     public function getComplemento()
     {
@@ -266,8 +292,8 @@ class Localizacao extends SyncModel
 
     /**
      * Set Complemento value to new on param
-     * @param  mixed $complemento new value for Complemento
-     * @return Localizacao Self instance
+     * @param string $complemento Set complemento for Localização
+     * @return self Self instance
      */
     public function setComplemento($complemento)
     {
@@ -277,7 +303,7 @@ class Localizacao extends SyncModel
 
     /**
      * Nome do condomínio
-     * @return mixed Condomínio of Localizacao
+     * @return string condomínio of Localização
      */
     public function getCondominio()
     {
@@ -286,8 +312,8 @@ class Localizacao extends SyncModel
 
     /**
      * Set Condominio value to new on param
-     * @param  mixed $condominio new value for Condominio
-     * @return Localizacao Self instance
+     * @param string $condominio Set condomínio for Localização
+     * @return self Self instance
      */
     public function setCondominio($condominio)
     {
@@ -297,7 +323,7 @@ class Localizacao extends SyncModel
 
     /**
      * Número do bloco quando for apartamento
-     * @return mixed Bloco of Localizacao
+     * @return string bloco of Localização
      */
     public function getBloco()
     {
@@ -306,8 +332,8 @@ class Localizacao extends SyncModel
 
     /**
      * Set Bloco value to new on param
-     * @param  mixed $bloco new value for Bloco
-     * @return Localizacao Self instance
+     * @param string $bloco Set bloco for Localização
+     * @return self Self instance
      */
     public function setBloco($bloco)
     {
@@ -317,7 +343,7 @@ class Localizacao extends SyncModel
 
     /**
      * Número do apartamento
-     * @return mixed Apartamento of Localizacao
+     * @return string apartamento of Localização
      */
     public function getApartamento()
     {
@@ -326,8 +352,8 @@ class Localizacao extends SyncModel
 
     /**
      * Set Apartamento value to new on param
-     * @param  mixed $apartamento new value for Apartamento
-     * @return Localizacao Self instance
+     * @param string $apartamento Set apartamento for Localização
+     * @return self Self instance
      */
     public function setApartamento($apartamento)
     {
@@ -337,7 +363,7 @@ class Localizacao extends SyncModel
 
     /**
      * Ponto de referência para chegar ao local
-     * @return mixed Referência of Localizacao
+     * @return string referência of Localização
      */
     public function getReferencia()
     {
@@ -346,8 +372,8 @@ class Localizacao extends SyncModel
 
     /**
      * Set Referencia value to new on param
-     * @param  mixed $referencia new value for Referencia
-     * @return Localizacao Self instance
+     * @param string $referencia Set referência for Localização
+     * @return self Self instance
      */
     public function setReferencia($referencia)
     {
@@ -357,7 +383,7 @@ class Localizacao extends SyncModel
 
     /**
      * Ponto latitudinal para localização em um mapa
-     * @return mixed Latitude of Localizacao
+     * @return float latitude of Localização
      */
     public function getLatitude()
     {
@@ -366,8 +392,8 @@ class Localizacao extends SyncModel
 
     /**
      * Set Latitude value to new on param
-     * @param  mixed $latitude new value for Latitude
-     * @return Localizacao Self instance
+     * @param float $latitude Set latitude for Localização
+     * @return self Self instance
      */
     public function setLatitude($latitude)
     {
@@ -377,7 +403,7 @@ class Localizacao extends SyncModel
 
     /**
      * Ponto longitudinal para localização em um mapa
-     * @return mixed Longitude of Localizacao
+     * @return float longitude of Localização
      */
     public function getLongitude()
     {
@@ -386,8 +412,8 @@ class Localizacao extends SyncModel
 
     /**
      * Set Longitude value to new on param
-     * @param  mixed $longitude new value for Longitude
-     * @return Localizacao Self instance
+     * @param float $longitude Set longitude for Localização
+     * @return self Self instance
      */
     public function setLongitude($longitude)
     {
@@ -397,7 +423,7 @@ class Localizacao extends SyncModel
 
     /**
      * Ex.: Minha Casa, Casa da Amiga
-     * @return mixed Apelido of Localizacao
+     * @return string apelido of Localização
      */
     public function getApelido()
     {
@@ -406,8 +432,8 @@ class Localizacao extends SyncModel
 
     /**
      * Set Apelido value to new on param
-     * @param  mixed $apelido new value for Apelido
-     * @return Localizacao Self instance
+     * @param string $apelido Set apelido for Localização
+     * @return self Self instance
      */
     public function setApelido($apelido)
     {
@@ -417,7 +443,7 @@ class Localizacao extends SyncModel
 
     /**
      * Permite esconder ou exibir um endereço do cliente
-     * @return mixed Mostrar of Localizacao
+     * @return string mostrar of Localização
      */
     public function getMostrar()
     {
@@ -435,8 +461,8 @@ class Localizacao extends SyncModel
 
     /**
      * Set Mostrar value to new on param
-     * @param  mixed $mostrar new value for Mostrar
-     * @return Localizacao Self instance
+     * @param string $mostrar Set mostrar for Localização
+     * @return self Self instance
      */
     public function setMostrar($mostrar)
     {
@@ -446,7 +472,7 @@ class Localizacao extends SyncModel
 
     /**
      * Convert this instance to array associated key -> value
-     * @param  boolean $recursive Allow rescursive conversion of fields
+     * @param boolean $recursive Allow rescursive conversion of fields
      * @return array All field and values into array format
      */
     public function toArray($recursive = false)
@@ -455,6 +481,7 @@ class Localizacao extends SyncModel
         $localizacao['id'] = $this->getID();
         $localizacao['clienteid'] = $this->getClienteID();
         $localizacao['bairroid'] = $this->getBairroID();
+        $localizacao['zonaid'] = $this->getZonaID();
         $localizacao['cep'] = $this->getCEP();
         $localizacao['logradouro'] = $this->getLogradouro();
         $localizacao['numero'] = $this->getNumero();
@@ -473,12 +500,12 @@ class Localizacao extends SyncModel
 
     /**
      * Fill this instance with from array values, you can pass instance to
-     * @param  mixed $localizacao Associated key -> value to assign into this instance
-     * @return Localizacao Self instance
+     * @param mixed $localizacao Associated key -> value to assign into this instance
+     * @return self Self instance
      */
     public function fromArray($localizacao = [])
     {
-        if ($localizacao instanceof Localizacao) {
+        if ($localizacao instanceof self) {
             $localizacao = $localizacao->toArray();
         } elseif (!is_array($localizacao)) {
             $localizacao = [];
@@ -498,6 +525,11 @@ class Localizacao extends SyncModel
             $this->setBairroID(null);
         } else {
             $this->setBairroID($localizacao['bairroid']);
+        }
+        if (!array_key_exists('zonaid', $localizacao)) {
+            $this->setZonaID(null);
+        } else {
+            $this->setZonaID($localizacao['zonaid']);
         }
         if (!array_key_exists('cep', $localizacao)) {
             $this->setCEP(null);
@@ -605,19 +637,22 @@ class Localizacao extends SyncModel
     public function publish()
     {
         $localizacao = parent::publish();
-        $localizacao['cep'] = \MZ\Util\Mask::cep($localizacao['cep']);
+        $localizacao['cep'] = Mask::cep($localizacao['cep']);
         return $localizacao;
     }
 
     /**
      * Filter fields, upload data and keep key data
-     * @param Localizacao $original Original instance without modifications
+     * @param self $original Original instance without modifications
+     * @param boolean $localized Informs if fields are localized
+     * @return self Self instance
      */
     public function filter($original, $localized = false)
     {
         $this->setID($original->getID());
         $this->setClienteID(Filter::number($original->getClienteID()));
         $this->setBairroID(Filter::number($this->getBairroID()));
+        $this->setZonaID(Filter::number($this->getZonaID()));
         $this->setCEP(Filter::unmask($this->getCEP(), _p('Mascara', 'CEP')));
         $this->setLogradouro(Filter::string($this->getLogradouro()));
         $this->setNumero(Filter::string($this->getNumero()));
@@ -629,11 +664,12 @@ class Localizacao extends SyncModel
         $this->setLatitude(Filter::float($this->getLatitude(), $localized));
         $this->setLongitude(Filter::float($this->getLongitude(), $localized));
         $this->setApelido(Filter::string($this->getApelido()));
+        return $this;
     }
 
     /**
      * Clean instance resources like images and docs
-     * @param  Localizacao $dependency Don't clean when dependency use same resources
+     * @param self $dependency Don't clean when dependency use same resources
      */
     public function clean($dependency)
     {
@@ -642,63 +678,54 @@ class Localizacao extends SyncModel
     /**
      * Validate fields updating them and throw exception when invalid data has found
      * @return array All field of Localizacao in array format
+     * @throws \MZ\Exception\ValidationException for invalid input data
      */
     public function validate()
     {
         $errors = [];
         if (is_null($this->getClienteID())) {
-            $errors['clienteid'] = 'O cliente não pode ser vazio';
+            $errors['clienteid'] = _t('localizacao.cliente_id_cannot_empty');
         }
         if (is_null($this->getBairroID())) {
-            $errors['bairroid'] = 'O bairro não pode ser vazio';
+            $errors['bairroid'] = _t('localizacao.bairro_id_cannot_empty');
         }
         if (!Validator::checkCEP($this->getCEP(), true)) {
-            $errors['cep'] = sprintf('O %s é inválido', _p('Titulo', 'CEP'));
+            $errors['cep'] = _t('cep_invalid', _p('Titulo', 'CEP'));
         }
         if (is_null($this->getLogradouro())) {
-            $errors['logradouro'] = 'O logradouro não pode ser vazio';
+            $errors['logradouro'] = _t('localizacao.logradouro_cannot_empty');
         }
         if (is_null($this->getNumero())) {
-            $errors['numero'] = 'O número não pode ser vazio';
+            $errors['numero'] = _t('localizacao.numero_cannot_empty');
         }
-        if (is_null($this->getTipo())) {
-            $this->setTipo(self::TIPO_CASA);
+        if (!Validator::checkInSet($this->getTipo(), self::getTipoOptions())) {
+            $errors['tipo'] = _t('localizacao.tipo_invalid');
         }
-        if (!is_null($this->getTipo()) &&
-            !array_key_exists($this->getTipo(), self::getTipoOptions())
-        ) {
-            $errors['tipo'] = 'O tipo é inválido';
-        }
-        if (is_null($this->getMostrar())) {
-            $this->setMostrar('N');
-        }
-        if (!is_null($this->getMostrar()) &&
-            !array_key_exists($this->getMostrar(), DB::getBooleanOptions())
-        ) {
-            $errors['mostrar'] = 'A exibição do endereço é inválida';
+        if (!Validator::checkBoolean($this->getMostrar())) {
+            $errors['mostrar'] = _t('localizacao.mostrar_invalid');
         }
         if (!empty($errors)) {
-            throw new \MZ\Exception\ValidationException($errors);
+            throw new ValidationException($errors);
         }
         return $this->toArray();
     }
 
     /**
      * Translate SQL exception into application exception
-     * @param  \Exception $e exception to translate into a readable error
+     * @param \Exception $e exception to translate into a readable error
      * @return \MZ\Exception\ValidationException new exception translated
      */
     protected function translate($e)
     {
-        if (stripos($e->getMessage(), 'UK_Localizacoes_ClienteID_Apelido') !== false) {
-            return new \MZ\Exception\ValidationException([
-                'clienteid' => vsprintf(
-                    'O cliente "%s" já está cadastrado',
-                    [$this->getClienteID()]
+        if (contains(['ClienteID', 'Apelido', 'UNIQUE'], $e->getMessage())) {
+            return new ValidationException([
+                'clienteid' => _t(
+                    'localizacao.cliente_id_used',
+                    $this->getClienteID()
                 ),
-                'apelido' => vsprintf(
-                    'O apelido "%s" já está cadastrado',
-                    [$this->getApelido()]
+                'apelido' => _t(
+                    'localizacao.apelido_used',
+                    $this->getApelido()
                 ),
             ]);
         }
@@ -707,7 +734,8 @@ class Localizacao extends SyncModel
 
     /**
      * Insert a new Localização into the database and fill instance from database
-     * @return Localizacao Self instance
+     * @return self Self instance
+     * @throws \MZ\Exception\ValidationException for invalid input data
      */
     public function insert()
     {
@@ -726,36 +754,42 @@ class Localizacao extends SyncModel
 
     /**
      * Update Localização with instance values into database for ID
-     * @param  array $only Save these fields only, when empty save all fields except id
-     * @return Localizacao Self instance
+     * @param array $only Save these fields only, when empty save all fields except id
+     * @return int rows affected
+     * @throws \MZ\Exception\ValidationException for invalid input data
      */
     public function update($only = [])
     {
         $values = $this->validate();
         if (!$this->exists()) {
-            throw new \Exception('O identificador da localização não foi informado');
+            throw new ValidationException(
+                ['id' => _t('localizacao.id_cannot_empty')]
+            );
         }
         $values = DB::filterValues($values, $only, false);
         try {
-            DB::update('Localizacoes')
+            $affected = DB::update('Localizacoes')
                 ->set($values)
-                ->where('id', $this->getID())
+                ->where(['id' => $this->getID()])
                 ->execute();
             $this->loadByID();
         } catch (\Exception $e) {
             throw $this->translate($e);
         }
-        return $this;
+        return $affected;
     }
 
     /**
      * Delete this instance from database using ID
      * @return integer Number of rows deleted (Max 1)
+     * @throws \MZ\Exception\ValidationException for invalid id
      */
     public function delete()
     {
         if (!$this->exists()) {
-            throw new \Exception('O identificador da localização não foi informado');
+            throw new ValidationException(
+                ['id' => _t('localizacao.id_cannot_empty')]
+            );
         }
         $result = DB::deleteFrom('Localizacoes')
             ->where('id', $this->getID())
@@ -765,9 +799,9 @@ class Localizacao extends SyncModel
 
     /**
      * Load one register for it self with a condition
-     * @param  array $condition Condition for searching the row
-     * @param  array $order associative field name -> [-1, 1]
-     * @return Localizacao Self instance filled or empty
+     * @param array $condition Condition for searching the row
+     * @param array $order associative field name -> [-1, 1]
+     * @return self Self instance filled or empty
      */
     public function load($condition, $order = [])
     {
@@ -778,27 +812,13 @@ class Localizacao extends SyncModel
 
     /**
      * Load into this object from database using, ClienteID, Apelido
-     * @param  int $cliente_id cliente to find Localização
-     * @param  string $apelido apelido to find Localização
-     * @return Localizacao Self filled instance or empty when not found
+     * @return self Self filled instance or empty when not found
      */
-    public function loadByClienteIDApelido($cliente_id, $apelido)
+    public function loadByClienteIDApelido()
     {
         return $this->load([
-            'clienteid' => intval($cliente_id),
-            'apelido' => strval($apelido),
-        ]);
-    }
-
-    /**
-     * Search from database customer localization from CEP
-     * @return Localizacao Self filled instance or empty when not found
-     */
-    public function loadByCEP()
-    {
-        return $this->load([
-            'cep' => strval($this->getCEP()),
-            'clienteid' => $this->getClienteID(),
+            'clienteid' => intval($this->getClienteID()),
+            'apelido' => strval($this->getApelido()),
         ]);
     }
 
@@ -819,11 +839,11 @@ class Localizacao extends SyncModel
 
     /**
      * Cliente a qual esse endereço pertence
-     * @return \ZCliente The object fetched from database
+     * @return \MZ\Account\Cliente The object fetched from database
      */
     public function findClienteID()
     {
-        return \Cliente::findByID($this->getClienteID());
+        return \MZ\Account\Cliente::findByID($this->getClienteID());
     }
 
     /**
@@ -836,15 +856,27 @@ class Localizacao extends SyncModel
     }
 
     /**
+     * Informa a zona do bairro
+     * @return \MZ\Location\Zona The object fetched from database
+     */
+    public function findZonaID()
+    {
+        if (is_null($this->getZonaID())) {
+            return new \MZ\Location\Zona();
+        }
+        return \MZ\Location\Zona::findByID($this->getZonaID());
+    }
+
+    /**
      * Gets textual and translated Tipo for Localizacao
-     * @param  int $index choose option from index
-     * @return mixed A associative key -> translated representative text or text for index
+     * @param int $index choose option from index
+     * @return string[] A associative key -> translated representative text or text for index
      */
     public static function getTipoOptions($index = null)
     {
         $options = [
-            self::TIPO_CASA => 'Casa',
-            self::TIPO_APARTAMENTO => 'Apartamento',
+            self::TIPO_CASA => _t('localizacao.tipo_casa'),
+            self::TIPO_APARTAMENTO => _t('localizacao.tipo_apartamento'),
         ];
         if (!is_null($index)) {
             return $options[$index];
@@ -858,7 +890,7 @@ class Localizacao extends SyncModel
      */
     private static function getAllowedKeys()
     {
-        $localizacao = new Localizacao();
+        $localizacao = new self();
         $allowed = Filter::concatKeys('l.', $localizacao->toArray());
         $allowed['b.cidadeid'] = true;
         return $allowed;
@@ -866,7 +898,7 @@ class Localizacao extends SyncModel
 
     /**
      * Filter order array
-     * @param  mixed $order order string or array to parse and filter allowed
+     * @param mixed $order order string or array to parse and filter allowed
      * @return array allowed associative order
      */
     private static function filterOrder($order)
@@ -883,7 +915,7 @@ class Localizacao extends SyncModel
 
     /**
      * Filter condition array with allowed fields
-     * @param  array $condition condition to filter rows
+     * @param array $condition condition to filter rows
      * @return array allowed condition
      */
     private static function filterCondition($condition)
@@ -906,8 +938,8 @@ class Localizacao extends SyncModel
 
     /**
      * Fetch data from database with a condition
-     * @param  array $condition condition to filter rows
-     * @param  array $order order rows
+     * @param array $condition condition to filter rows
+     * @param array $order order rows
      * @return SelectQuery query object with condition statement
      */
     private static function query($condition = [], $order = [])
@@ -933,26 +965,53 @@ class Localizacao extends SyncModel
 
     /**
      * Search one register with a condition
-     * @param  array $condition Condition for searching the row
-     * @param  array $order order rows
-     * @return Localizacao A filled Localização or empty instance
+     * @param array $condition Condition for searching the row
+     * @param array $order order rows
+     * @return self A filled Localização or empty instance
      */
     public static function find($condition, $order = [])
     {
-        $query = self::query($condition, $order)->limit(1);
-        $row = $query->fetch();
-        if ($row === false) {
-            $row = [];
-        }
-        return new Localizacao($row);
+        $result = new self();
+        return $result->load($condition, $order);
     }
 
     /**
-     * Fetch all rows from database with matched condition critery
-     * @param  array $condition condition to filter rows
-     * @param  integer $limit number of rows to get, null for all
-     * @param  integer $offset start index to get rows, null for begining
-     * @return array All rows instanced and filled
+     * Search one register with a condition
+     * @param array $condition Condition for searching the row
+     * @param array $order order rows
+     * @return self A filled Localização or empty instance
+     * @throws \Exception when register has not found
+     */
+    public static function findOrFail($condition, $order = [])
+    {
+        $result = self::find($condition, $order);
+        if (!$result->exists()) {
+            throw new \Exception(_t('localizacao.not_found'), 404);
+        }
+        return $result;
+    }
+
+    /**
+     * Find this object on database using, ClienteID, Apelido
+     * @param int $cliente_id cliente to find Localização
+     * @param string $apelido apelido to find Localização
+     * @return self A filled instance or empty when not found
+     */
+    public static function findByClienteIDApelido($cliente_id, $apelido)
+    {
+        $result = new self();
+        $result->setClienteID($cliente_id);
+        $result->setApelido($apelido);
+        return $result->loadByClienteIDApelido();
+    }
+
+    /**
+     * Find all Localização
+     * @param array  $condition Condition to get all Localização
+     * @param array  $order     Order Localização
+     * @param int    $limit     Limit data into row count
+     * @param int    $offset    Start offset to get rows
+     * @return self[] List of all rows instanced as Localizacao
      */
     public static function findAll($condition = [], $order = [], $limit = null, $offset = null)
     {
@@ -966,26 +1025,14 @@ class Localizacao extends SyncModel
         $rows = $query->fetchAll();
         $result = [];
         foreach ($rows as $row) {
-            $result[] = new Localizacao($row);
+            $result[] = new self($row);
         }
         return $result;
     }
 
     /**
-     * Find this object on database using, ClienteID, Apelido
-     * @param  int $cliente_id cliente to find Localização
-     * @param  string $apelido apelido to find Localização
-     * @return Localizacao A filled instance or empty when not found
-     */
-    public static function findByClienteIDApelido($cliente_id, $apelido)
-    {
-        $result = new self();
-        return $result->loadByClienteIDApelido($cliente_id, $apelido);
-    }
-
-    /**
      * Count all rows from database with matched condition critery
-     * @param  array $condition condition to filter rows
+     * @param array $condition condition to filter rows
      * @return integer Quantity of rows
      */
     public static function count($condition = [])

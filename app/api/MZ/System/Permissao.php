@@ -24,10 +24,12 @@
  */
 namespace MZ\System;
 
-use MZ\Database\SyncModel;
-use MZ\Database\DB;
+use MZ\Util\Mask;
 use MZ\Util\Filter;
 use MZ\Util\Validator;
+use MZ\Database\DB;
+use MZ\Database\SyncModel;
+use MZ\Exception\ValidationException;
 
 /**
  * Informa a listagem de todas as funções do sistema
@@ -143,6 +145,10 @@ class Permissao extends SyncModel
      */
     private $funcionalidade_id;
     /**
+     * Módulo em que essa permissão faz parte
+     */
+    private $modulo_id;
+    /**
      * Nome da permissão, único no sistema
      */
     private $nome;
@@ -162,7 +168,7 @@ class Permissao extends SyncModel
 
     /**
      * Identificador da permissão
-     * @return mixed ID of Permissao
+     * @return int id of Permissão
      */
     public function getID()
     {
@@ -171,8 +177,8 @@ class Permissao extends SyncModel
 
     /**
      * Set ID value to new on param
-     * @param  mixed $id new value for ID
-     * @return Permissao Self instance
+     * @param int $id Set id for Permissão
+     * @return self Self instance
      */
     public function setID($id)
     {
@@ -182,7 +188,7 @@ class Permissao extends SyncModel
 
     /**
      * Categoriza um grupo de permissões
-     * @return mixed Funcionalidade of Permissao
+     * @return int funcionalidade of Permissão
      */
     public function getFuncionalidadeID()
     {
@@ -191,8 +197,8 @@ class Permissao extends SyncModel
 
     /**
      * Set FuncionalidadeID value to new on param
-     * @param  mixed $funcionalidade_id new value for FuncionalidadeID
-     * @return Permissao Self instance
+     * @param int $funcionalidade_id Set funcionalidade for Permissão
+     * @return self Self instance
      */
     public function setFuncionalidadeID($funcionalidade_id)
     {
@@ -201,8 +207,28 @@ class Permissao extends SyncModel
     }
 
     /**
+     * Módulo em que essa permissão faz parte
+     * @return int módulo of Permissão
+     */
+    public function getModuloID()
+    {
+        return $this->modulo_id;
+    }
+
+    /**
+     * Set ModuloID value to new on param
+     * @param int $modulo_id Set módulo for Permissão
+     * @return self Self instance
+     */
+    public function setModuloID($modulo_id)
+    {
+        $this->modulo_id = $modulo_id;
+        return $this;
+    }
+
+    /**
      * Nome da permissão, único no sistema
-     * @return mixed Nome of Permissao
+     * @return string nome of Permissão
      */
     public function getNome()
     {
@@ -211,8 +237,8 @@ class Permissao extends SyncModel
 
     /**
      * Set Nome value to new on param
-     * @param  mixed $nome new value for Nome
-     * @return Permissao Self instance
+     * @param string $nome Set nome for Permissão
+     * @return self Self instance
      */
     public function setNome($nome)
     {
@@ -222,7 +248,7 @@ class Permissao extends SyncModel
 
     /**
      * Descreve a permissão
-     * @return mixed Descrição of Permissao
+     * @return string descrição of Permissão
      */
     public function getDescricao()
     {
@@ -231,8 +257,8 @@ class Permissao extends SyncModel
 
     /**
      * Set Descricao value to new on param
-     * @param  mixed $descricao new value for Descricao
-     * @return Permissao Self instance
+     * @param string $descricao Set descrição for Permissão
+     * @return self Self instance
      */
     public function setDescricao($descricao)
     {
@@ -242,7 +268,7 @@ class Permissao extends SyncModel
 
     /**
      * Convert this instance to array associated key -> value
-     * @param  boolean $recursive Allow rescursive conversion of fields
+     * @param boolean $recursive Allow rescursive conversion of fields
      * @return array All field and values into array format
      */
     public function toArray($recursive = false)
@@ -250,6 +276,7 @@ class Permissao extends SyncModel
         $permissao = parent::toArray($recursive);
         $permissao['id'] = $this->getID();
         $permissao['funcionalidadeid'] = $this->getFuncionalidadeID();
+        $permissao['moduloid'] = $this->getModuloID();
         $permissao['nome'] = $this->getNome();
         $permissao['descricao'] = $this->getDescricao();
         return $permissao;
@@ -257,12 +284,12 @@ class Permissao extends SyncModel
 
     /**
      * Fill this instance with from array values, you can pass instance to
-     * @param  mixed $permissao Associated key -> value to assign into this instance
-     * @return Permissao Self instance
+     * @param mixed $permissao Associated key -> value to assign into this instance
+     * @return self Self instance
      */
     public function fromArray($permissao = [])
     {
-        if ($permissao instanceof Permissao) {
+        if ($permissao instanceof self) {
             $permissao = $permissao->toArray();
         } elseif (!is_array($permissao)) {
             $permissao = [];
@@ -277,6 +304,11 @@ class Permissao extends SyncModel
             $this->setFuncionalidadeID(null);
         } else {
             $this->setFuncionalidadeID($permissao['funcionalidadeid']);
+        }
+        if (!array_key_exists('moduloid', $permissao)) {
+            $this->setModuloID(null);
+        } else {
+            $this->setModuloID($permissao['moduloid']);
         }
         if (!isset($permissao['nome'])) {
             $this->setNome(null);
@@ -303,19 +335,23 @@ class Permissao extends SyncModel
 
     /**
      * Filter fields, upload data and keep key data
-     * @param Permissao $original Original instance without modifications
+     * @param self $original Original instance without modifications
+     * @param boolean $localized Informs if fields are localized
+     * @return self Self instance
      */
     public function filter($original, $localized = false)
     {
         $this->setID($original->getID());
         $this->setFuncionalidadeID(Filter::number($this->getFuncionalidadeID()));
+        $this->setModuloID(Filter::number($this->getModuloID()));
         $this->setNome(Filter::string($this->getNome()));
         $this->setDescricao(Filter::string($this->getDescricao()));
+        return $this;
     }
 
     /**
      * Clean instance resources like images and docs
-     * @param  Permissao $dependency Don't clean when dependency use same resources
+     * @param self $dependency Don't clean when dependency use same resources
      */
     public function clean($dependency)
     {
@@ -324,36 +360,37 @@ class Permissao extends SyncModel
     /**
      * Validate fields updating them and throw exception when invalid data has found
      * @return array All field of Permissao in array format
+     * @throws \MZ\Exception\ValidationException for invalid input data
      */
     public function validate()
     {
         $errors = [];
         if (is_null($this->getFuncionalidadeID())) {
-            $errors['funcionalidadeid'] = 'A funcionalidade não pode ser vazia';
+            $errors['funcionalidadeid'] = _t('permissao.funcionalidade_id_cannot_empty');
         }
         if (is_null($this->getNome())) {
-            $errors['nome'] = 'A nome não pode ser vazia';
+            $errors['nome'] = _t('permissao.nome_cannot_empty');
         }
         if (is_null($this->getDescricao())) {
-            $errors['descricao'] = 'A descrição não pode ser vazia';
+            $errors['descricao'] = _t('permissao.descricao_cannot_empty');
         }
         if (!empty($errors)) {
-            throw new \MZ\Exception\ValidationException($errors);
+            throw new ValidationException($errors);
         }
         return $this->toArray();
     }
 
     /**
      * Translate SQL exception into application exception
-     * @param  \Exception $e exception to translate into a readable error
+     * @param \Exception $e exception to translate into a readable error
      * @return \MZ\Exception\ValidationException new exception translated
      */
     protected function translate($e)
     {
         if (contains(['Nome', 'UNIQUE'], $e->getMessage())) {
-            return new \MZ\Exception\ValidationException([
-                'nome' => sprintf(
-                    'A nome "%s" já está cadastrada',
+            return new ValidationException([
+                'nome' => _t(
+                    'permissao.nome_used',
                     $this->getNome()
                 ),
             ]);
@@ -363,7 +400,8 @@ class Permissao extends SyncModel
 
     /**
      * Insert a new Permissão into the database and fill instance from database
-     * @return Permissao Self instance
+     * @return self Self instance
+     * @throws \MZ\Exception\ValidationException for invalid input data
      */
     public function insert()
     {
@@ -382,36 +420,42 @@ class Permissao extends SyncModel
 
     /**
      * Update Permissão with instance values into database for ID
-     * @param  array $only Save these fields only, when empty save all fields except id
-     * @return Permissao Self instance
+     * @param array $only Save these fields only, when empty save all fields except id
+     * @return int rows affected
+     * @throws \MZ\Exception\ValidationException for invalid input data
      */
     public function update($only = [])
     {
         $values = $this->validate();
         if (!$this->exists()) {
-            throw new \Exception('O identificador da permissão não foi informado');
+            throw new ValidationException(
+                ['id' => _t('permissao.id_cannot_empty')]
+            );
         }
         $values = DB::filterValues($values, $only, false);
         try {
-            DB::update('Permissoes')
+            $affected = DB::update('Permissoes')
                 ->set($values)
-                ->where('id', $this->getID())
+                ->where(['id' => $this->getID()])
                 ->execute();
             $this->loadByID();
         } catch (\Exception $e) {
             throw $this->translate($e);
         }
-        return $this;
+        return $affected;
     }
 
     /**
      * Delete this instance from database using ID
      * @return integer Number of rows deleted (Max 1)
+     * @throws \MZ\Exception\ValidationException for invalid id
      */
     public function delete()
     {
         if (!$this->exists()) {
-            throw new \Exception('O identificador da permissão não foi informado');
+            throw new ValidationException(
+                ['id' => _t('permissao.id_cannot_empty')]
+            );
         }
         $result = DB::deleteFrom('Permissoes')
             ->where('id', $this->getID())
@@ -421,9 +465,9 @@ class Permissao extends SyncModel
 
     /**
      * Load one register for it self with a condition
-     * @param  array $condition Condition for searching the row
-     * @param  array $order associative field name -> [-1, 1]
-     * @return Permissao Self instance filled or empty
+     * @param array $condition Condition for searching the row
+     * @param array $order associative field name -> [-1, 1]
+     * @return self Self instance filled or empty
      */
     public function load($condition, $order = [])
     {
@@ -434,13 +478,12 @@ class Permissao extends SyncModel
 
     /**
      * Load into this object from database using, Nome
-     * @param  string $nome nome to find Permissão
-     * @return Permissao Self filled instance or empty when not found
+     * @return self Self filled instance or empty when not found
      */
-    public function loadByNome($nome)
+    public function loadByNome()
     {
         return $this->load([
-            'nome' => strval($nome),
+            'nome' => strval($this->getNome()),
         ]);
     }
 
@@ -454,19 +497,31 @@ class Permissao extends SyncModel
     }
 
     /**
+     * Módulo em que essa permissão faz parte
+     * @return \MZ\System\Modulo The object fetched from database
+     */
+    public function findModuloID()
+    {
+        if (is_null($this->getModuloID())) {
+            return new \MZ\System\Modulo();
+        }
+        return \MZ\System\Modulo::findByID($this->getModuloID());
+    }
+
+    /**
      * Get allowed keys array
      * @return array allowed keys array
      */
     private static function getAllowedKeys()
     {
-        $permissao = new Permissao();
+        $permissao = new self();
         $allowed = Filter::concatKeys('p.', $permissao->toArray());
         return $allowed;
     }
 
     /**
      * Filter order array
-     * @param  mixed $order order string or array to parse and filter allowed
+     * @param mixed $order order string or array to parse and filter allowed
      * @return array allowed associative order
      */
     private static function filterOrder($order)
@@ -477,7 +532,7 @@ class Permissao extends SyncModel
 
     /**
      * Filter condition array with allowed fields
-     * @param  array $condition condition to filter rows
+     * @param array $condition condition to filter rows
      * @return array allowed condition
      */
     private static function filterCondition($condition)
@@ -495,8 +550,8 @@ class Permissao extends SyncModel
 
     /**
      * Fetch data from database with a condition
-     * @param  array $condition condition to filter rows
-     * @param  array $order order rows
+     * @param array $condition condition to filter rows
+     * @param array $order order rows
      * @return SelectQuery query object with condition statement
      */
     private static function query($condition = [], $order = [])
@@ -512,26 +567,42 @@ class Permissao extends SyncModel
 
     /**
      * Search one register with a condition
-     * @param  array $condition Condition for searching the row
-     * @param  array $order order rows
-     * @return Permissao A filled Permissão or empty instance
+     * @param array $condition Condition for searching the row
+     * @param array $order order rows
+     * @return self A filled Permissão or empty instance
      */
     public static function find($condition, $order = [])
     {
-        $query = self::query($condition, $order)->limit(1);
-        $row = $query->fetch() ?: [];
-        return new Permissao($row);
+        $result = new self();
+        return $result->load($condition, $order);
+    }
+
+    /**
+     * Search one register with a condition
+     * @param array $condition Condition for searching the row
+     * @param array $order order rows
+     * @return self A filled Permissão or empty instance
+     * @throws \Exception when register has not found
+     */
+    public static function findOrFail($condition, $order = [])
+    {
+        $result = self::find($condition, $order);
+        if (!$result->exists()) {
+            throw new \Exception(_t('permissao.not_found'), 404);
+        }
+        return $result;
     }
 
     /**
      * Find this object on database using, Nome
-     * @param  string $nome nome to find Permissão
-     * @return Permissao A filled instance or empty when not found
+     * @param string $nome nome to find Permissão
+     * @return self A filled instance or empty when not found
      */
     public static function findByNome($nome)
     {
         $result = new self();
-        return $result->loadByNome($nome);
+        $result->setNome($nome);
+        return $result->loadByNome();
     }
 
     public static function getAll()
@@ -545,11 +616,11 @@ class Permissao extends SyncModel
 
     /**
      * Find all Permissão
-     * @param  array  $condition Condition to get all Permissão
-     * @param  array  $order     Order Permissão
-     * @param  int    $limit     Limit data into row count
-     * @param  int    $offset    Start offset to get rows
-     * @return array             List of all rows instanced as Permissao
+     * @param array  $condition Condition to get all Permissão
+     * @param array  $order     Order Permissão
+     * @param int    $limit     Limit data into row count
+     * @param int    $offset    Start offset to get rows
+     * @return self[] List of all rows instanced as Permissao
      */
     public static function findAll($condition = [], $order = [], $limit = null, $offset = null)
     {
@@ -563,14 +634,14 @@ class Permissao extends SyncModel
         $rows = $query->fetchAll();
         $result = [];
         foreach ($rows as $row) {
-            $result[] = new Permissao($row);
+            $result[] = new self($row);
         }
         return $result;
     }
 
     /**
      * Count all rows from database with matched condition critery
-     * @param  array $condition condition to filter rows
+     * @param array $condition condition to filter rows
      * @return integer Quantity of rows
      */
     public static function count($condition = [])

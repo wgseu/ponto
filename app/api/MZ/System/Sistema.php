@@ -24,10 +24,12 @@
  */
 namespace MZ\System;
 
-use MZ\Database\Model;
-use MZ\Database\DB;
+use MZ\Util\Mask;
 use MZ\Util\Filter;
 use MZ\Util\Validator;
+use MZ\Database\DB;
+use MZ\Database\SyncModel;
+use MZ\Exception\ValidationException;
 use MZ\Location\Localizacao;
 
 /**
@@ -150,7 +152,7 @@ class Sistema extends Model
 
     /**
      * Identificador único do sistema, valor 1
-     * @return mixed ID of Sistema
+     * @return string id of Sistema
      */
     public function getID()
     {
@@ -159,7 +161,7 @@ class Sistema extends Model
 
     /**
      * Set ID value to new on param
-     * @param  mixed $id new value for ID
+     * @param string $id Set id for Sistema
      * @return self Self instance
      */
     public function setID($id)
@@ -170,7 +172,7 @@ class Sistema extends Model
 
     /**
      * Servidor do sistema
-     * @return mixed Servidor of Sistema
+     * @return int servidor of Sistema
      */
     public function getServidorID()
     {
@@ -179,7 +181,7 @@ class Sistema extends Model
 
     /**
      * Set ServidorID value to new on param
-     * @param  mixed $servidor_id new value for ServidorID
+     * @param int $servidor_id Set servidor for Sistema
      * @return self Self instance
      */
     public function setServidorID($servidor_id)
@@ -190,7 +192,7 @@ class Sistema extends Model
 
     /**
      * Chave da Licença, permite licença do tipo vitalícia
-     * @return mixed Chave de licença of Sistema
+     * @return string chave de licença of Sistema
      */
     public function getLicenca()
     {
@@ -199,7 +201,7 @@ class Sistema extends Model
 
     /**
      * Set Licenca value to new on param
-     * @param  mixed $licenca new value for Licenca
+     * @param string $licenca Set chave de licença for Sistema
      * @return self Self instance
      */
     public function setLicenca($licenca)
@@ -210,7 +212,7 @@ class Sistema extends Model
 
     /**
      * Quantidade de tablets e computadores permitido para uso
-     * @return mixed Quantidade de dispositivos of Sistema
+     * @return int quantidade de dispositivos of Sistema
      */
     public function getDispositivos()
     {
@@ -219,7 +221,7 @@ class Sistema extends Model
 
     /**
      * Set Dispositivos value to new on param
-     * @param  mixed $dispositivos new value for Dispositivos
+     * @param int $dispositivos Set quantidade de dispositivos for Sistema
      * @return self Self instance
      */
     public function setDispositivos($dispositivos)
@@ -231,7 +233,7 @@ class Sistema extends Model
     /**
      * Código único da empresa, permite baixar novas licenças automaticamente e
      * autorizar sincronização do servidor
-     * @return mixed Identificador da empresa of Sistema
+     * @return string identificador da empresa of Sistema
      */
     public function getGUID()
     {
@@ -240,7 +242,7 @@ class Sistema extends Model
 
     /**
      * Set GUID value to new on param
-     * @param  mixed $guid new value for GUID
+     * @param string $guid Set identificador da empresa for Sistema
      * @return self Self instance
      */
     public function setGUID($guid)
@@ -252,7 +254,7 @@ class Sistema extends Model
     /**
      * Informa qual foi a data da última realização de backup do banco de dados
      * do sistema
-     * @return mixed Data do último backup of Sistema
+     * @return string data do último backup of Sistema
      */
     public function getUltimoBackup()
     {
@@ -261,7 +263,7 @@ class Sistema extends Model
 
     /**
      * Set UltimoBackup value to new on param
-     * @param  mixed $ultimo_backup new value for UltimoBackup
+     * @param string $ultimo_backup Set data do último backup for Sistema
      * @return self Self instance
      */
     public function setUltimoBackup($ultimo_backup)
@@ -272,7 +274,7 @@ class Sistema extends Model
 
     /**
      * Informa qual o fuso horário
-     * @return mixed FusoHorario of Sistema
+     * @return string fusohorario of Sistema
      */
     public function getFusoHorario()
     {
@@ -281,7 +283,7 @@ class Sistema extends Model
 
     /**
      * Set FusoHorario value to new on param
-     * @param  mixed $fuso_horario new value for FusoHorario
+     * @param string $fuso_horario Set fusohorario for Sistema
      * @return self Self instance
      */
     public function setFusoHorario($fuso_horario)
@@ -292,7 +294,7 @@ class Sistema extends Model
 
     /**
      * Informa qual a versão do banco de dados
-     * @return mixed Versão do banco de dados of Sistema
+     * @return string versão do banco de dados of Sistema
      */
     public function getVersaoDB()
     {
@@ -301,7 +303,7 @@ class Sistema extends Model
 
     /**
      * Set VersaoDB value to new on param
-     * @param  mixed $versao_db new value for VersaoDB
+     * @param string $versao_db Set versão do banco de dados for Sistema
      * @return self Self instance
      */
     public function setVersaoDB($versao_db)
@@ -312,7 +314,7 @@ class Sistema extends Model
 
     /**
      * Convert this instance to array associated key -> value
-     * @param  boolean $recursive Allow rescursive conversion of fields
+     * @param boolean $recursive Allow rescursive conversion of fields
      * @return array All field and values into array format
      */
     public function toArray($recursive = false)
@@ -331,7 +333,7 @@ class Sistema extends Model
 
     /**
      * Fill this instance with from array values, you can pass instance to
-     * @param  mixed $sistema Associated key -> value to assign into this instance
+     * @param mixed $sistema Associated key -> value to assign into this instance
      * @return self Self instance
      */
     public function fromArray($sistema = [])
@@ -417,7 +419,9 @@ class Sistema extends Model
 
     /**
      * Filter fields, upload data and keep key data
-     * @param Sistema $original Original instance without modifications
+     * @param self $original Original instance without modifications
+     * @param boolean $localized Informs if fields are localized
+     * @return self Self instance
      */
     public function filter($original, $localized = false)
     {
@@ -429,11 +433,12 @@ class Sistema extends Model
         $this->setUltimoBackup(Filter::datetime($this->getUltimoBackup()));
         $this->setFusoHorario(Filter::string($this->getFusoHorario()));
         $this->setVersaoDB(Filter::string($this->getVersaoDB()));
+        return $this;
     }
 
     /**
      * Clean instance resources like images and docs
-     * @param Sistema $dependency Don't clean when dependency use same resources
+     * @param self $dependency Don't clean when dependency use same resources
      */
     public function clean($dependency)
     {
@@ -441,7 +446,8 @@ class Sistema extends Model
 
     /**
      * Validate fields updating them and throw exception when invalid data has found
-     * @return mixed[] All field of Sistema in array format
+     * @return array All field of Sistema in array format
+     * @throws \MZ\Exception\ValidationException for invalid input data
      */
     public function validate()
     {
@@ -450,13 +456,13 @@ class Sistema extends Model
             $errors['id'] = 'O id do sistema não foi informado';
         }
         if (is_null($this->getServidorID())) {
-            $errors['servidorid'] = 'O servidor não pode ser vazio';
+            $errors['servidorid'] = _t('sistema.servidor_id_cannot_empty');
         }
         if (is_null($this->getVersaoDB())) {
-            $errors['versaodb'] = 'A versão do banco de dados não pode ser vazia';
+            $errors['versaodb'] = _t('sistema.versao_db_cannot_empty');
         }
         if (!empty($errors)) {
-            throw new \MZ\Exception\ValidationException($errors);
+            throw new ValidationException($errors);
         }
         return $this->toArray();
     }
@@ -558,18 +564,9 @@ class Sistema extends Model
     }
 
     /**
-     * Translate SQL exception into application exception
-     * @param  \Exception $e exception to translate into a readable error
-     * @return \MZ\Exception\ValidationException new exception translated
-     */
-    protected function translate($e)
-    {
-        return parent::translate($e);
-    }
-
-    /**
      * Insert a new Sistema into the database and fill instance from database
-     * @return Sistema Self instance
+     * @return self Self instance
+     * @throws \MZ\Exception\ValidationException for invalid input data
      */
     public function insert()
     {
@@ -581,31 +578,34 @@ class Sistema extends Model
 
     /**
      * Update Sistema with instance values into database for ID
-     * @param  array $only Save these fields only, when empty save all fields except id
-     * @return Sistema Self instance
+     * @param array $only Save these fields only, when empty save all fields except id
+     * @return int rows affected
+     * @throws \MZ\Exception\ValidationException for invalid input data
      */
     public function update($only = [])
     {
         $values = $this->validate();
         if (!$this->exists()) {
-            throw new \Exception('O identificador do sistema não foi informado');
+            throw new ValidationException(
+                ['id' => _t('sistema.id_cannot_empty')]
+            );
         }
         $values = DB::filterValues($values, $only, false);
         try {
-            DB::update('Sistema')
+            $affected = DB::update('Sistema')
                 ->set($values)
-                ->where('id', $this->getID())
+                ->where(['id' => $this->getID()])
                 ->execute();
             $this->loadByID();
         } catch (\Exception $e) {
             throw $this->translate($e);
         }
-        return $this;
+        return $affected;
     }
 
     /**
      * Delete this instance from database using ID
-     * @return integer Number of rows deleted (Max 1)
+     * @throws \Exception for invalid id
      */
     public function delete()
     {
@@ -617,9 +617,9 @@ class Sistema extends Model
 
     /**
      * Load one register for it self with a condition
-     * @param  array $condition Condition for searching the row
-     * @param  array $order associative field name -> [-1, 1]
-     * @return Sistema Self instance filled or empty
+     * @param array $condition Condition for searching the row
+     * @param array $order associative field name -> [-1, 1]
+     * @return self Self instance filled or empty
      */
     public function load($condition, $order = [])
     {
@@ -653,11 +653,11 @@ class Sistema extends Model
 
     /**
      * Servidor do sistema
-     * @return Servidor The object fetched from database
+     * @return \MZ\System\Servidor The object fetched from database
      */
     public function findServidorID()
     {
-        return Servidor::findByID($this->getServidorID());
+        return \MZ\System\Servidor::findByID($this->getServidorID());
     }
 
     /**
@@ -666,14 +666,14 @@ class Sistema extends Model
      */
     private static function getAllowedKeys()
     {
-        $sistema = new Sistema();
+        $sistema = new self();
         $allowed = Filter::concatKeys('s.', $sistema->toArray());
         return $allowed;
     }
 
     /**
      * Filter order array
-     * @param  mixed $order order string or array to parse and filter allowed
+     * @param mixed $order order string or array to parse and filter allowed
      * @return array allowed associative order
      */
     private static function filterOrder($order)
@@ -684,7 +684,7 @@ class Sistema extends Model
 
     /**
      * Filter condition array with allowed fields
-     * @param  array $condition condition to filter rows
+     * @param array $condition condition to filter rows
      * @return array allowed condition
      */
     private static function filterCondition($condition)
@@ -695,8 +695,8 @@ class Sistema extends Model
 
     /**
      * Fetch data from database with a condition
-     * @param  array $condition condition to filter rows
-     * @param  array $order order rows
+     * @param array $condition condition to filter rows
+     * @param array $order order rows
      * @return SelectQuery query object with condition statement
      */
     private static function query($condition = [], $order = [])
@@ -709,24 +709,39 @@ class Sistema extends Model
 
     /**
      * Search one register with a condition
-     * @param  array $condition Condition for searching the row
-     * @param  array $order order rows
-     * @return Sistema A filled Sistema or empty instance
+     * @param array $condition Condition for searching the row
+     * @param array $order order rows
+     * @return self A filled Sistema or empty instance
      */
     public static function find($condition, $order = [])
     {
-        $query = self::query($condition, $order)->limit(1);
-        $row = $query->fetch() ?: [];
-        return new Sistema($row);
+        $result = new self();
+        return $result->load($condition, $order);
+    }
+
+    /**
+     * Search one register with a condition
+     * @param array $condition Condition for searching the row
+     * @param array $order order rows
+     * @return self A filled Sistema or empty instance
+     * @throws \Exception when register has not found
+     */
+    public static function findOrFail($condition, $order = [])
+    {
+        $result = self::find($condition, $order);
+        if (!$result->exists()) {
+            throw new \Exception(_t('sistema.not_found'), 404);
+        }
+        return $result;
     }
 
     /**
      * Find all Sistema
-     * @param  array  $condition Condition to get all Sistema
-     * @param  array  $order     Order Sistema
-     * @param  int    $limit     Limit data into row count
-     * @param  int    $offset    Start offset to get rows
-     * @return array             List of all rows instanced as Sistema
+     * @param array  $condition Condition to get all Sistema
+     * @param array  $order     Order Sistema
+     * @param int    $limit     Limit data into row count
+     * @param int    $offset    Start offset to get rows
+     * @return self[] List of all rows instanced as Sistema
      */
     public static function findAll($condition = [], $order = [], $limit = null, $offset = null)
     {
@@ -740,14 +755,14 @@ class Sistema extends Model
         $rows = $query->fetchAll();
         $result = [];
         foreach ($rows as $row) {
-            $result[] = new Sistema($row);
+            $result[] = new self($row);
         }
         return $result;
     }
 
     /**
      * Count all rows from database with matched condition critery
-     * @param  array $condition condition to filter rows
+     * @param array $condition condition to filter rows
      * @return integer Quantity of rows
      */
     public static function count($condition = [])

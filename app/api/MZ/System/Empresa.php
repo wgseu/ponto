@@ -82,7 +82,7 @@ class Empresa extends SyncModel
 
     /**
      * Identificador único da empresa, valor 1
-     * @return mixed ID of Empresa
+     * @return string id of Empresa
      */
     public function getID()
     {
@@ -91,7 +91,7 @@ class Empresa extends SyncModel
 
     /**
      * Set ID value to new on param
-     * @param  mixed $id new value for ID
+     * @param string $id Set id for Empresa
      * @return self Self instance
      */
     public function setID($id)
@@ -102,7 +102,7 @@ class Empresa extends SyncModel
 
     /**
      * País em que a empresa está situada
-     * @return mixed País of Empresa
+     * @return int país of Empresa
      */
     public function getPaisID()
     {
@@ -111,7 +111,7 @@ class Empresa extends SyncModel
 
     /**
      * Set PaisID value to new on param
-     * @param  mixed $pais_id new value for PaisID
+     * @param int $pais_id Set país for Empresa
      * @return self Self instance
      */
     public function setPaisID($pais_id)
@@ -123,7 +123,7 @@ class Empresa extends SyncModel
     /**
      * Informa a empresa do cadastro de clientes, a empresa deve ser um cliente
      * do tipo pessoa jurídica
-     * @return mixed Empresa of Empresa
+     * @return int empresa of Empresa
      */
     public function getEmpresaID()
     {
@@ -132,7 +132,7 @@ class Empresa extends SyncModel
 
     /**
      * Set EmpresaID value to new on param
-     * @param  mixed $empresa_id new value for EmpresaID
+     * @param int $empresa_id Set empresa for Empresa
      * @return self Self instance
      */
     public function setEmpresaID($empresa_id)
@@ -144,7 +144,7 @@ class Empresa extends SyncModel
     /**
      * Informa quem realiza o suporte do sistema, deve ser um cliente do tipo
      * empresa que possua um acionista como representante
-     * @return mixed Parceiro of Empresa
+     * @return int parceiro of Empresa
      */
     public function getParceiroID()
     {
@@ -153,7 +153,7 @@ class Empresa extends SyncModel
 
     /**
      * Set ParceiroID value to new on param
-     * @param  mixed $parceiro_id new value for ParceiroID
+     * @param int $parceiro_id Set parceiro for Empresa
      * @return self Self instance
      */
     public function setParceiroID($parceiro_id)
@@ -164,7 +164,7 @@ class Empresa extends SyncModel
 
     /**
      * Opções gerais do sistema como opções de impressão e comportamento
-     * @return mixed Opções do sistema of Empresa
+     * @return string opções do sistema of Empresa
      */
     public function getOpcoes()
     {
@@ -173,7 +173,7 @@ class Empresa extends SyncModel
 
     /**
      * Set Opcoes value to new on param
-     * @param  mixed $opcoes new value for Opcoes
+     * @param string $opcoes Set opções do sistema for Empresa
      * @return self Self instance
      */
     public function setOpcoes($opcoes)
@@ -184,7 +184,7 @@ class Empresa extends SyncModel
 
     /**
      * Convert this instance to array associated key -> value
-     * @param  boolean $recursive Allow rescursive conversion of fields
+     * @param boolean $recursive Allow rescursive conversion of fields
      * @return array All field and values into array format
      */
     public function toArray($recursive = false)
@@ -200,7 +200,7 @@ class Empresa extends SyncModel
 
     /**
      * Fill this instance with from array values, you can pass instance to
-     * @param  mixed $empresa Associated key -> value to assign into this instance
+     * @param mixed $empresa Associated key -> value to assign into this instance
      * @return self Self instance
      */
     public function fromArray($empresa = [])
@@ -262,6 +262,8 @@ class Empresa extends SyncModel
     /**
      * Filter fields, upload data and keep key data
      * @param self $original Original instance without modifications
+     * @param boolean $localized Informs if fields are localized
+     * @return self Self instance
      */
     public function filter($original, $localized = false)
     {
@@ -273,11 +275,12 @@ class Empresa extends SyncModel
         $opcoes = to_ini($this->getOptions()->getValues());
         $opcoes = base64_encode($opcoes);
         $this->setOpcoes($opcoes);
+        return $this;
     }
 
     /**
      * Clean instance resources like images and docs
-     * @param  self $dependency Don't clean when dependency use same resources
+     * @param self $dependency Don't clean when dependency use same resources
      */
     public function clean($dependency)
     {
@@ -285,7 +288,8 @@ class Empresa extends SyncModel
 
     /**
      * Validate fields updating them and throw exception when invalid data has found
-     * @return mixed[] All field of Empresa in array format
+     * @return array All field of Empresa in array format
+     * @throws \MZ\Exception\ValidationException for invalid input data
      */
     public function validate()
     {
@@ -313,14 +317,17 @@ class Empresa extends SyncModel
 
     /**
      * Update Empresa with instance values into database for ID
-     * @param  array $only Save these fields only, when empty save all fields except id
+     * @param array $only Save these fields only, when empty save all fields except id
      * @return int rows affected
+     * @throws \MZ\Exception\ValidationException for invalid input data
      */
     public function update($only = [])
     {
         $values = $this->validate();
         if (!$this->exists()) {
-            throw new \Exception('O identificador da empresa não foi informado');
+            throw new ValidationException(
+                ['id' => _t('empresa.id_cannot_empty')]
+            );
         }
         $values = DB::filterValues($values, $only, false);
         try {
@@ -336,24 +343,9 @@ class Empresa extends SyncModel
     }
 
     /**
-     * Delete this instance from database using ID
-     * @return integer Number of rows deleted (Max 1)
-     */
-    public function delete()
-    {
-        if (!$this->exists()) {
-            throw new \Exception('O identificador da empresa não foi informado');
-        }
-        $result = DB::deleteFrom('Empresas')
-            ->where('id', $this->getID())
-            ->execute();
-        return $result;
-    }
-
-    /**
      * Load one register for it self with a condition
-     * @param  array $condition Condition for searching the row
-     * @param  array $order associative field name -> [-1, 1]
+     * @param array $condition Condition for searching the row
+     * @param array $order associative field name -> [-1, 1]
      * @return self Self instance filled or empty
      */
     public function load($condition, $order = [])
@@ -423,7 +415,7 @@ class Empresa extends SyncModel
 
     /**
      * Filter order array
-     * @param  mixed $order order string or array to parse and filter allowed
+     * @param mixed $order order string or array to parse and filter allowed
      * @return array allowed associative order
      */
     private static function filterOrder($order)
@@ -434,7 +426,7 @@ class Empresa extends SyncModel
 
     /**
      * Filter condition array with allowed fields
-     * @param  array $condition condition to filter rows
+     * @param array $condition condition to filter rows
      * @return array allowed condition
      */
     private static function filterCondition($condition)
@@ -445,8 +437,8 @@ class Empresa extends SyncModel
 
     /**
      * Fetch data from database with a condition
-     * @param  array $condition condition to filter rows
-     * @param  array $order order rows
+     * @param array $condition condition to filter rows
+     * @param array $order order rows
      * @return SelectQuery query object with condition statement
      */
     private static function query($condition = [], $order = [])
@@ -460,8 +452,8 @@ class Empresa extends SyncModel
 
     /**
      * Search one register with a condition
-     * @param  array $condition Condition for searching the row
-     * @param  array $order order rows
+     * @param array $condition Condition for searching the row
+     * @param array $order order rows
      * @return self A filled Empresa or empty instance
      */
     public static function find($condition, $order = [])
@@ -471,24 +463,28 @@ class Empresa extends SyncModel
     }
 
     /**
-     * Find this object on database using, ID
-     * @param  string $id id to find Empresa
-     * @return self A filled instance or empty when not found
+     * Search one register with a condition
+     * @param array $condition Condition for searching the row
+     * @param array $order order rows
+     * @return self A filled Empresa or empty instance
+     * @throws \Exception when register has not found
      */
-    public static function findByID($id)
+    public static function findOrFail($condition, $order = [])
     {
-        $result = new self();
-        $result->setID($id);
-        return $result->loadByID();
+        $result = self::find($condition, $order);
+        if (!$result->exists()) {
+            throw new \Exception(_t('empresa.not_found'), 404);
+        }
+        return $result;
     }
 
     /**
      * Find all Empresa
-     * @param  array  $condition Condition to get all Empresa
-     * @param  array  $order     Order Empresa
-     * @param  int    $limit     Limit data into row count
-     * @param  int    $offset    Start offset to get rows
-     * @return self[]             List of all rows instanced as Empresa
+     * @param array  $condition Condition to get all Empresa
+     * @param array  $order     Order Empresa
+     * @param int    $limit     Limit data into row count
+     * @param int    $offset    Start offset to get rows
+     * @return self[] List of all rows instanced as Empresa
      */
     public static function findAll($condition = [], $order = [], $limit = null, $offset = null)
     {
@@ -509,7 +505,7 @@ class Empresa extends SyncModel
 
     /**
      * Count all rows from database with matched condition critery
-     * @param  array $condition condition to filter rows
+     * @param array $condition condition to filter rows
      * @return integer Quantity of rows
      */
     public static function count($condition = [])

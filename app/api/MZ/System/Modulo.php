@@ -24,10 +24,12 @@
  */
 namespace MZ\System;
 
-use MZ\Database\SyncModel;
-use MZ\Database\DB;
+use MZ\Util\Mask;
 use MZ\Util\Filter;
 use MZ\Util\Validator;
+use MZ\Database\DB;
+use MZ\Database\SyncModel;
+use MZ\Exception\ValidationException;
 
 /**
  * Módulos do sistema que podem ser desativados/ativados
@@ -68,7 +70,7 @@ class Modulo extends SyncModel
 
     /**
      * Identificador do módulo
-     * @return mixed ID of Modulo
+     * @return int id of Módulo
      */
     public function getID()
     {
@@ -77,8 +79,8 @@ class Modulo extends SyncModel
 
     /**
      * Set ID value to new on param
-     * @param  mixed $id new value for ID
-     * @return Modulo Self instance
+     * @param int $id Set id for Módulo
+     * @return self Self instance
      */
     public function setID($id)
     {
@@ -88,7 +90,7 @@ class Modulo extends SyncModel
 
     /**
      * Nome do módulo, unico em todo o sistema
-     * @return mixed Nome of Modulo
+     * @return string nome of Módulo
      */
     public function getNome()
     {
@@ -97,8 +99,8 @@ class Modulo extends SyncModel
 
     /**
      * Set Nome value to new on param
-     * @param  mixed $nome new value for Nome
-     * @return Modulo Self instance
+     * @param string $nome Set nome for Módulo
+     * @return self Self instance
      */
     public function setNome($nome)
     {
@@ -109,7 +111,7 @@ class Modulo extends SyncModel
     /**
      * Descrição do módulo, informa detalhes sobre a funcionalidade do módulo
      * no sistema
-     * @return mixed Descrição of Modulo
+     * @return string descrição of Módulo
      */
     public function getDescricao()
     {
@@ -118,8 +120,8 @@ class Modulo extends SyncModel
 
     /**
      * Set Descricao value to new on param
-     * @param  mixed $descricao new value for Descricao
-     * @return Modulo Self instance
+     * @param string $descricao Set descrição for Módulo
+     * @return self Self instance
      */
     public function setDescricao($descricao)
     {
@@ -129,7 +131,7 @@ class Modulo extends SyncModel
 
     /**
      * Índice da imagem que representa o módulo, tamanho 64x64
-     * @return mixed Imagem of Modulo
+     * @return int imagem of Módulo
      */
     public function getImageIndex()
     {
@@ -138,8 +140,8 @@ class Modulo extends SyncModel
 
     /**
      * Set ImageIndex value to new on param
-     * @param  mixed $image_index new value for ImageIndex
-     * @return Modulo Self instance
+     * @param int $image_index Set imagem for Módulo
+     * @return self Self instance
      */
     public function setImageIndex($image_index)
     {
@@ -149,7 +151,7 @@ class Modulo extends SyncModel
 
     /**
      * Informa se o módulo do sistema está habilitado
-     * @return mixed Habilitado of Modulo
+     * @return string habilitado of Módulo
      */
     public function getHabilitado()
     {
@@ -167,8 +169,8 @@ class Modulo extends SyncModel
 
     /**
      * Set Habilitado value to new on param
-     * @param  mixed $habilitado new value for Habilitado
-     * @return Modulo Self instance
+     * @param string $habilitado Set habilitado for Módulo
+     * @return self Self instance
      */
     public function setHabilitado($habilitado)
     {
@@ -178,7 +180,7 @@ class Modulo extends SyncModel
 
     /**
      * Convert this instance to array associated key -> value
-     * @param  boolean $recursive Allow rescursive conversion of fields
+     * @param boolean $recursive Allow rescursive conversion of fields
      * @return array All field and values into array format
      */
     public function toArray($recursive = false)
@@ -194,12 +196,12 @@ class Modulo extends SyncModel
 
     /**
      * Fill this instance with from array values, you can pass instance to
-     * @param  mixed $modulo Associated key -> value to assign into this instance
-     * @return Modulo Self instance
+     * @param mixed $modulo Associated key -> value to assign into this instance
+     * @return self Self instance
      */
     public function fromArray($modulo = [])
     {
-        if ($modulo instanceof Modulo) {
+        if ($modulo instanceof self) {
             $modulo = $modulo->toArray();
         } elseif (!is_array($modulo)) {
             $modulo = [];
@@ -245,19 +247,22 @@ class Modulo extends SyncModel
 
     /**
      * Filter fields, upload data and keep key data
-     * @param Modulo $original Original instance without modifications
+     * @param self $original Original instance without modifications
+     * @param boolean $localized Informs if fields are localized
+     * @return self Self instance
      */
     public function filter($original, $localized = false)
     {
         $this->setID($original->getID());
-        $this->setNome($original->getNome());
-        $this->setDescricao($original->getDescricao());
-        $this->setImageIndex($original->getImageIndex());
+        $this->setNome(Filter::string($original->getNome()));
+        $this->setDescricao(Filter::string($original->getDescricao()));
+        $this->setImageIndex(Filter::number($original->getImageIndex()));
+        return $this;
     }
 
     /**
      * Clean instance resources like images and docs
-     * @param  Modulo $dependency Don't clean when dependency use same resources
+     * @param self $dependency Don't clean when dependency use same resources
      */
     public function clean($dependency)
     {
@@ -266,39 +271,40 @@ class Modulo extends SyncModel
     /**
      * Validate fields updating them and throw exception when invalid data has found
      * @return array All field of Modulo in array format
+     * @throws \MZ\Exception\ValidationException for invalid input data
      */
     public function validate()
     {
         $errors = [];
         if (is_null($this->getNome())) {
-            $errors['nome'] = 'O nome não pode ser vazio';
+            $errors['nome'] = _t('modulo.nome_cannot_empty');
         }
         if (is_null($this->getDescricao())) {
-            $errors['descricao'] = 'A descrição não pode ser vazia';
+            $errors['descricao'] = _t('modulo.descricao_cannot_empty');
         }
         if (is_null($this->getImageIndex())) {
-            $errors['imageindex'] = 'A imagem não pode ser vazia';
+            $errors['imageindex'] = _t('modulo.image_index_cannot_empty');
         }
         if (!Validator::checkBoolean($this->getHabilitado())) {
-            $errors['habilitado'] = 'A informação de habilitado é inválida';
+            $errors['habilitado'] = _t('modulo.habilitado_invalid');
         }
         if (!empty($errors)) {
-            throw new \MZ\Exception\ValidationException($errors);
+            throw new ValidationException($errors);
         }
         return $this->toArray();
     }
 
     /**
      * Translate SQL exception into application exception
-     * @param  \Exception $e exception to translate into a readable error
+     * @param \Exception $e exception to translate into a readable error
      * @return \MZ\Exception\ValidationException new exception translated
      */
     protected function translate($e)
     {
         if (contains(['Nome', 'UNIQUE'], $e->getMessage())) {
-            return new \MZ\Exception\ValidationException([
-                'nome' => sprintf(
-                    'O nome "%s" já está cadastrado',
+            return new ValidationException([
+                'nome' => _t(
+                    'modulo.nome_used',
                     $this->getNome()
                 ),
             ]);
@@ -308,7 +314,8 @@ class Modulo extends SyncModel
 
     /**
      * Insert a new Módulo into the database and fill instance from database
-     * @return Modulo Self instance
+     * @return self Self instance
+     * @throws \MZ\Exception\ValidationException for invalid input data
      */
     public function insert()
     {
@@ -327,36 +334,42 @@ class Modulo extends SyncModel
 
     /**
      * Update Módulo with instance values into database for ID
-     * @param  array $only Save these fields only, when empty save all fields except id
-     * @return Modulo Self instance
+     * @param array $only Save these fields only, when empty save all fields except id
+     * @return int rows affected
+     * @throws \MZ\Exception\ValidationException for invalid input data
      */
     public function update($only = [])
     {
         $values = $this->validate();
         if (!$this->exists()) {
-            throw new \Exception('O identificador do módulo não foi informado');
+            throw new ValidationException(
+                ['id' => _t('modulo.id_cannot_empty')]
+            );
         }
         $values = DB::filterValues($values, $only, false);
         try {
-            DB::update('Modulos')
+            $affected = DB::update('Modulos')
                 ->set($values)
-                ->where('id', $this->getID())
+                ->where(['id' => $this->getID()])
                 ->execute();
             $this->loadByID();
         } catch (\Exception $e) {
             throw $this->translate($e);
         }
-        return $this;
+        return $affected;
     }
 
     /**
      * Delete this instance from database using ID
      * @return integer Number of rows deleted (Max 1)
+     * @throws \MZ\Exception\ValidationException for invalid id
      */
     public function delete()
     {
         if (!$this->exists()) {
-            throw new \Exception('O identificador do módulo não foi informado');
+            throw new ValidationException(
+                ['id' => _t('modulo.id_cannot_empty')]
+            );
         }
         $result = DB::deleteFrom('Modulos')
             ->where('id', $this->getID())
@@ -366,9 +379,9 @@ class Modulo extends SyncModel
 
     /**
      * Load one register for it self with a condition
-     * @param  array $condition Condition for searching the row
-     * @param  array $order associative field name -> [-1, 1]
-     * @return Modulo Self instance filled or empty
+     * @param array $condition Condition for searching the row
+     * @param array $order associative field name -> [-1, 1]
+     * @return self Self instance filled or empty
      */
     public function load($condition, $order = [])
     {
@@ -379,13 +392,12 @@ class Modulo extends SyncModel
 
     /**
      * Load into this object from database using, Nome
-     * @param  string $nome nome to find Módulo
-     * @return Modulo Self filled instance or empty when not found
+     * @return self Self filled instance or empty when not found
      */
-    public function loadByNome($nome)
+    public function loadByNome()
     {
         return $this->load([
-            'nome' => strval($nome),
+            'nome' => strval($this->getNome()),
         ]);
     }
 
@@ -395,14 +407,14 @@ class Modulo extends SyncModel
      */
     private static function getAllowedKeys()
     {
-        $modulo = new Modulo();
+        $modulo = new self();
         $allowed = Filter::concatKeys('m.', $modulo->toArray());
         return $allowed;
     }
 
     /**
      * Filter order array
-     * @param  mixed $order order string or array to parse and filter allowed
+     * @param mixed $order order string or array to parse and filter allowed
      * @return array allowed associative order
      */
     private static function filterOrder($order)
@@ -413,7 +425,7 @@ class Modulo extends SyncModel
 
     /**
      * Filter condition array with allowed fields
-     * @param  array $condition condition to filter rows
+     * @param array $condition condition to filter rows
      * @return array allowed condition
      */
     private static function filterCondition($condition)
@@ -421,8 +433,8 @@ class Modulo extends SyncModel
         $allowed = self::getAllowedKeys();
         if (isset($condition['search'])) {
             $search = $condition['search'];
-            $field = '(m.nome LIKE ? OR m.descricao LIKE ?)';
-            $condition[$field] = ['%'.$search.'%', '%'.$search.'%'];
+            $field = 'm.nome LIKE ?';
+            $condition[$field] = '%'.$search.'%';
             $allowed[$field] = true;
             unset($condition['search']);
         }
@@ -431,8 +443,8 @@ class Modulo extends SyncModel
 
     /**
      * Fetch data from database with a condition
-     * @param  array $condition condition to filter rows
-     * @param  array $order order rows
+     * @param array $condition condition to filter rows
+     * @param array $order order rows
      * @return SelectQuery query object with condition statement
      */
     private static function query($condition = [], $order = [])
@@ -447,35 +459,51 @@ class Modulo extends SyncModel
 
     /**
      * Search one register with a condition
-     * @param  array $condition Condition for searching the row
-     * @param  array $order order rows
-     * @return Modulo A filled Módulo or empty instance
+     * @param array $condition Condition for searching the row
+     * @param array $order order rows
+     * @return self A filled Módulo or empty instance
      */
     public static function find($condition, $order = [])
     {
-        $query = self::query($condition, $order)->limit(1);
-        $row = $query->fetch() ?: [];
-        return new Modulo($row);
+        $result = new self();
+        return $result->load($condition, $order);
+    }
+
+    /**
+     * Search one register with a condition
+     * @param array $condition Condition for searching the row
+     * @param array $order order rows
+     * @return self A filled Módulo or empty instance
+     * @throws \Exception when register has not found
+     */
+    public static function findOrFail($condition, $order = [])
+    {
+        $result = self::find($condition, $order);
+        if (!$result->exists()) {
+            throw new \Exception(_t('modulo.not_found'), 404);
+        }
+        return $result;
     }
 
     /**
      * Find this object on database using, Nome
-     * @param  string $nome nome to find Módulo
-     * @return Modulo A filled instance or empty when not found
+     * @param string $nome nome to find Módulo
+     * @return self A filled instance or empty when not found
      */
     public static function findByNome($nome)
     {
         $result = new self();
-        return $result->loadByNome($nome);
+        $result->setNome($nome);
+        return $result->loadByNome();
     }
 
     /**
      * Find all Módulo
-     * @param  array  $condition Condition to get all Módulo
-     * @param  array  $order     Order Módulo
-     * @param  int    $limit     Limit data into row count
-     * @param  int    $offset    Start offset to get rows
-     * @return array             List of all rows instanced as Modulo
+     * @param array  $condition Condition to get all Módulo
+     * @param array  $order     Order Módulo
+     * @param int    $limit     Limit data into row count
+     * @param int    $offset    Start offset to get rows
+     * @return self[] List of all rows instanced as Modulo
      */
     public static function findAll($condition = [], $order = [], $limit = null, $offset = null)
     {
@@ -489,14 +517,14 @@ class Modulo extends SyncModel
         $rows = $query->fetchAll();
         $result = [];
         foreach ($rows as $row) {
-            $result[] = new Modulo($row);
+            $result[] = new self($row);
         }
         return $result;
     }
 
     /**
      * Count all rows from database with matched condition critery
-     * @param  array $condition condition to filter rows
+     * @param array $condition condition to filter rows
      * @return integer Quantity of rows
      */
     public static function count($condition = [])

@@ -24,10 +24,12 @@
  */
 namespace MZ\System;
 
-use MZ\Database\SyncModel;
-use MZ\Database\DB;
+use MZ\Util\Mask;
 use MZ\Util\Filter;
 use MZ\Util\Validator;
+use MZ\Database\DB;
+use MZ\Database\SyncModel;
+use MZ\Exception\ValidationException;
 
 /**
  * Grupo de funcionalidades do sistema
@@ -59,7 +61,7 @@ class Funcionalidade extends SyncModel
 
     /**
      * Identificador da funcionalidade
-     * @return mixed ID of Funcionalidade
+     * @return int id of Funcionalidade
      */
     public function getID()
     {
@@ -68,8 +70,8 @@ class Funcionalidade extends SyncModel
 
     /**
      * Set ID value to new on param
-     * @param  mixed $id new value for ID
-     * @return Funcionalidade Self instance
+     * @param int $id Set id for Funcionalidade
+     * @return self Self instance
      */
     public function setID($id)
     {
@@ -79,7 +81,7 @@ class Funcionalidade extends SyncModel
 
     /**
      * Nome da funcionalidade, único em todo o sistema
-     * @return mixed Nome of Funcionalidade
+     * @return string nome of Funcionalidade
      */
     public function getNome()
     {
@@ -88,8 +90,8 @@ class Funcionalidade extends SyncModel
 
     /**
      * Set Nome value to new on param
-     * @param  mixed $nome new value for Nome
-     * @return Funcionalidade Self instance
+     * @param string $nome Set nome for Funcionalidade
+     * @return self Self instance
      */
     public function setNome($nome)
     {
@@ -99,7 +101,7 @@ class Funcionalidade extends SyncModel
 
     /**
      * Descrição da funcionalidade
-     * @return mixed Descrição of Funcionalidade
+     * @return string descrição of Funcionalidade
      */
     public function getDescricao()
     {
@@ -108,8 +110,8 @@ class Funcionalidade extends SyncModel
 
     /**
      * Set Descricao value to new on param
-     * @param  mixed $descricao new value for Descricao
-     * @return Funcionalidade Self instance
+     * @param string $descricao Set descrição for Funcionalidade
+     * @return self Self instance
      */
     public function setDescricao($descricao)
     {
@@ -119,7 +121,7 @@ class Funcionalidade extends SyncModel
 
     /**
      * Convert this instance to array associated key -> value
-     * @param  boolean $recursive Allow rescursive conversion of fields
+     * @param boolean $recursive Allow rescursive conversion of fields
      * @return array All field and values into array format
      */
     public function toArray($recursive = false)
@@ -133,12 +135,12 @@ class Funcionalidade extends SyncModel
 
     /**
      * Fill this instance with from array values, you can pass instance to
-     * @param  mixed $funcionalidade Associated key -> value to assign into this instance
-     * @return Funcionalidade Self instance
+     * @param mixed $funcionalidade Associated key -> value to assign into this instance
+     * @return self Self instance
      */
     public function fromArray($funcionalidade = [])
     {
-        if ($funcionalidade instanceof Funcionalidade) {
+        if ($funcionalidade instanceof self) {
             $funcionalidade = $funcionalidade->toArray();
         } elseif (!is_array($funcionalidade)) {
             $funcionalidade = [];
@@ -174,18 +176,21 @@ class Funcionalidade extends SyncModel
 
     /**
      * Filter fields, upload data and keep key data
-     * @param Funcionalidade $original Original instance without modifications
+     * @param self $original Original instance without modifications
+     * @param boolean $localized Informs if fields are localized
+     * @return self Self instance
      */
     public function filter($original, $localized = false)
     {
         $this->setID($original->getID());
         $this->setNome(Filter::string($this->getNome()));
         $this->setDescricao(Filter::string($this->getDescricao()));
+        return $this;
     }
 
     /**
      * Clean instance resources like images and docs
-     * @param  Funcionalidade $dependency Don't clean when dependency use same resources
+     * @param self $dependency Don't clean when dependency use same resources
      */
     public function clean($dependency)
     {
@@ -194,33 +199,34 @@ class Funcionalidade extends SyncModel
     /**
      * Validate fields updating them and throw exception when invalid data has found
      * @return array All field of Funcionalidade in array format
+     * @throws \MZ\Exception\ValidationException for invalid input data
      */
     public function validate()
     {
         $errors = [];
         if (is_null($this->getNome())) {
-            $errors['nome'] = 'O nome não pode ser vazio';
+            $errors['nome'] = _t('funcionalidade.nome_cannot_empty');
         }
         if (is_null($this->getDescricao())) {
-            $errors['descricao'] = 'A descrição não pode ser vazia';
+            $errors['descricao'] = _t('funcionalidade.descricao_cannot_empty');
         }
         if (!empty($errors)) {
-            throw new \MZ\Exception\ValidationException($errors);
+            throw new ValidationException($errors);
         }
         return $this->toArray();
     }
 
     /**
      * Translate SQL exception into application exception
-     * @param  \Exception $e exception to translate into a readable error
+     * @param \Exception $e exception to translate into a readable error
      * @return \MZ\Exception\ValidationException new exception translated
      */
     protected function translate($e)
     {
         if (contains(['Nome', 'UNIQUE'], $e->getMessage())) {
-            return new \MZ\Exception\ValidationException([
-                'nome' => sprintf(
-                    'O nome "%s" já está cadastrado',
+            return new ValidationException([
+                'nome' => _t(
+                    'funcionalidade.nome_used',
                     $this->getNome()
                 ),
             ]);
@@ -230,7 +236,8 @@ class Funcionalidade extends SyncModel
 
     /**
      * Insert a new Funcionalidade into the database and fill instance from database
-     * @return Funcionalidade Self instance
+     * @return self Self instance
+     * @throws \MZ\Exception\ValidationException for invalid input data
      */
     public function insert()
     {
@@ -249,36 +256,42 @@ class Funcionalidade extends SyncModel
 
     /**
      * Update Funcionalidade with instance values into database for ID
-     * @param  array $only Save these fields only, when empty save all fields except id
-     * @return Funcionalidade Self instance
+     * @param array $only Save these fields only, when empty save all fields except id
+     * @return int rows affected
+     * @throws \MZ\Exception\ValidationException for invalid input data
      */
     public function update($only = [])
     {
         $values = $this->validate();
         if (!$this->exists()) {
-            throw new \Exception('O identificador da funcionalidade não foi informado');
+            throw new ValidationException(
+                ['id' => _t('funcionalidade.id_cannot_empty')]
+            );
         }
         $values = DB::filterValues($values, $only, false);
         try {
-            DB::update('Funcionalidades')
+            $affected = DB::update('Funcionalidades')
                 ->set($values)
-                ->where('id', $this->getID())
+                ->where(['id' => $this->getID()])
                 ->execute();
             $this->loadByID();
         } catch (\Exception $e) {
             throw $this->translate($e);
         }
-        return $this;
+        return $affected;
     }
 
     /**
      * Delete this instance from database using ID
      * @return integer Number of rows deleted (Max 1)
+     * @throws \MZ\Exception\ValidationException for invalid id
      */
     public function delete()
     {
         if (!$this->exists()) {
-            throw new \Exception('O identificador da funcionalidade não foi informado');
+            throw new ValidationException(
+                ['id' => _t('funcionalidade.id_cannot_empty')]
+            );
         }
         $result = DB::deleteFrom('Funcionalidades')
             ->where('id', $this->getID())
@@ -288,9 +301,9 @@ class Funcionalidade extends SyncModel
 
     /**
      * Load one register for it self with a condition
-     * @param  array $condition Condition for searching the row
-     * @param  array $order associative field name -> [-1, 1]
-     * @return Funcionalidade Self instance filled or empty
+     * @param array $condition Condition for searching the row
+     * @param array $order associative field name -> [-1, 1]
+     * @return self Self instance filled or empty
      */
     public function load($condition, $order = [])
     {
@@ -301,13 +314,12 @@ class Funcionalidade extends SyncModel
 
     /**
      * Load into this object from database using, Nome
-     * @param  string $nome nome to find Funcionalidade
-     * @return Funcionalidade Self filled instance or empty when not found
+     * @return self Self filled instance or empty when not found
      */
-    public function loadByNome($nome)
+    public function loadByNome()
     {
         return $this->load([
-            'nome' => strval($nome),
+            'nome' => strval($this->getNome()),
         ]);
     }
 
@@ -317,14 +329,14 @@ class Funcionalidade extends SyncModel
      */
     private static function getAllowedKeys()
     {
-        $funcionalidade = new Funcionalidade();
+        $funcionalidade = new self();
         $allowed = Filter::concatKeys('f.', $funcionalidade->toArray());
         return $allowed;
     }
 
     /**
      * Filter order array
-     * @param  mixed $order order string or array to parse and filter allowed
+     * @param mixed $order order string or array to parse and filter allowed
      * @return array allowed associative order
      */
     private static function filterOrder($order)
@@ -335,7 +347,7 @@ class Funcionalidade extends SyncModel
 
     /**
      * Filter condition array with allowed fields
-     * @param  array $condition condition to filter rows
+     * @param array $condition condition to filter rows
      * @return array allowed condition
      */
     private static function filterCondition($condition)
@@ -353,8 +365,8 @@ class Funcionalidade extends SyncModel
 
     /**
      * Fetch data from database with a condition
-     * @param  array $condition condition to filter rows
-     * @param  array $order order rows
+     * @param array $condition condition to filter rows
+     * @param array $order order rows
      * @return SelectQuery query object with condition statement
      */
     private static function query($condition = [], $order = [])
@@ -369,35 +381,51 @@ class Funcionalidade extends SyncModel
 
     /**
      * Search one register with a condition
-     * @param  array $condition Condition for searching the row
-     * @param  array $order order rows
-     * @return Funcionalidade A filled Funcionalidade or empty instance
+     * @param array $condition Condition for searching the row
+     * @param array $order order rows
+     * @return self A filled Funcionalidade or empty instance
      */
     public static function find($condition, $order = [])
     {
-        $query = self::query($condition, $order)->limit(1);
-        $row = $query->fetch() ?: [];
-        return new Funcionalidade($row);
+        $result = new self();
+        return $result->load($condition, $order);
+    }
+
+    /**
+     * Search one register with a condition
+     * @param array $condition Condition for searching the row
+     * @param array $order order rows
+     * @return self A filled Funcionalidade or empty instance
+     * @throws \Exception when register has not found
+     */
+    public static function findOrFail($condition, $order = [])
+    {
+        $result = self::find($condition, $order);
+        if (!$result->exists()) {
+            throw new \Exception(_t('funcionalidade.not_found'), 404);
+        }
+        return $result;
     }
 
     /**
      * Find this object on database using, Nome
-     * @param  string $nome nome to find Funcionalidade
-     * @return Funcionalidade A filled instance or empty when not found
+     * @param string $nome nome to find Funcionalidade
+     * @return self A filled instance or empty when not found
      */
     public static function findByNome($nome)
     {
         $result = new self();
-        return $result->loadByNome($nome);
+        $result->setNome($nome);
+        return $result->loadByNome();
     }
 
     /**
      * Find all Funcionalidade
-     * @param  array  $condition Condition to get all Funcionalidade
-     * @param  array  $order     Order Funcionalidade
-     * @param  int    $limit     Limit data into row count
-     * @param  int    $offset    Start offset to get rows
-     * @return array             List of all rows instanced as Funcionalidade
+     * @param array  $condition Condition to get all Funcionalidade
+     * @param array  $order     Order Funcionalidade
+     * @param int    $limit     Limit data into row count
+     * @param int    $offset    Start offset to get rows
+     * @return self[] List of all rows instanced as Funcionalidade
      */
     public static function findAll($condition = [], $order = [], $limit = null, $offset = null)
     {
@@ -411,14 +439,14 @@ class Funcionalidade extends SyncModel
         $rows = $query->fetchAll();
         $result = [];
         foreach ($rows as $row) {
-            $result[] = new Funcionalidade($row);
+            $result[] = new self($row);
         }
         return $result;
     }
 
     /**
      * Count all rows from database with matched condition critery
-     * @param  array $condition condition to filter rows
+     * @param array $condition condition to filter rows
      * @return integer Quantity of rows
      */
     public static function count($condition = [])

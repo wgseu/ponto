@@ -24,10 +24,12 @@
  */
 namespace MZ\System;
 
-use MZ\Database\SyncModel;
-use MZ\Database\DB;
+use MZ\Util\Mask;
 use MZ\Util\Filter;
 use MZ\Util\Validator;
+use MZ\Database\DB;
+use MZ\Database\SyncModel;
+use MZ\Exception\ValidationException;
 
 /**
  * Permite acesso à uma determinada funcionalidade da lista de permissões
@@ -59,7 +61,7 @@ class Acesso extends SyncModel
 
     /**
      * Identificador do acesso
-     * @return mixed ID of Acesso
+     * @return int id of Acesso
      */
     public function getID()
     {
@@ -68,8 +70,8 @@ class Acesso extends SyncModel
 
     /**
      * Set ID value to new on param
-     * @param  mixed $id new value for ID
-     * @return Acesso Self instance
+     * @param int $id Set id for Acesso
+     * @return self Self instance
      */
     public function setID($id)
     {
@@ -79,7 +81,7 @@ class Acesso extends SyncModel
 
     /**
      * Função a que a permissão se aplica
-     * @return mixed Função of Acesso
+     * @return int função of Acesso
      */
     public function getFuncaoID()
     {
@@ -88,8 +90,8 @@ class Acesso extends SyncModel
 
     /**
      * Set FuncaoID value to new on param
-     * @param  mixed $funcao_id new value for FuncaoID
-     * @return Acesso Self instance
+     * @param int $funcao_id Set função for Acesso
+     * @return self Self instance
      */
     public function setFuncaoID($funcao_id)
     {
@@ -99,7 +101,7 @@ class Acesso extends SyncModel
 
     /**
      * Permissão liberada para a função
-     * @return mixed Permissão of Acesso
+     * @return int permissão of Acesso
      */
     public function getPermissaoID()
     {
@@ -108,8 +110,8 @@ class Acesso extends SyncModel
 
     /**
      * Set PermissaoID value to new on param
-     * @param  mixed $permissao_id new value for PermissaoID
-     * @return Acesso Self instance
+     * @param int $permissao_id Set permissão for Acesso
+     * @return self Self instance
      */
     public function setPermissaoID($permissao_id)
     {
@@ -119,7 +121,7 @@ class Acesso extends SyncModel
 
     /**
      * Convert this instance to array associated key -> value
-     * @param  boolean $recursive Allow rescursive conversion of fields
+     * @param boolean $recursive Allow rescursive conversion of fields
      * @return array All field and values into array format
      */
     public function toArray($recursive = false)
@@ -133,12 +135,12 @@ class Acesso extends SyncModel
 
     /**
      * Fill this instance with from array values, you can pass instance to
-     * @param  mixed $acesso Associated key -> value to assign into this instance
-     * @return Acesso Self instance
+     * @param mixed $acesso Associated key -> value to assign into this instance
+     * @return self Self instance
      */
     public function fromArray($acesso = [])
     {
-        if ($acesso instanceof Acesso) {
+        if ($acesso instanceof self) {
             $acesso = $acesso->toArray();
         } elseif (!is_array($acesso)) {
             $acesso = [];
@@ -174,18 +176,21 @@ class Acesso extends SyncModel
 
     /**
      * Filter fields, upload data and keep key data
-     * @param Acesso $original Original instance without modifications
+     * @param self $original Original instance without modifications
+     * @param boolean $localized Informs if fields are localized
+     * @return self Self instance
      */
     public function filter($original, $localized = false)
     {
         $this->setID($original->getID());
         $this->setFuncaoID(Filter::number($this->getFuncaoID()));
         $this->setPermissaoID(Filter::number($this->getPermissaoID()));
+        return $this;
     }
 
     /**
      * Clean instance resources like images and docs
-     * @param  Acesso $dependency Don't clean when dependency use same resources
+     * @param self $dependency Don't clean when dependency use same resources
      */
     public function clean($dependency)
     {
@@ -194,37 +199,38 @@ class Acesso extends SyncModel
     /**
      * Validate fields updating them and throw exception when invalid data has found
      * @return array All field of Acesso in array format
+     * @throws \MZ\Exception\ValidationException for invalid input data
      */
     public function validate()
     {
         $errors = [];
         if (is_null($this->getFuncaoID())) {
-            $errors['funcaoid'] = 'A função não pode ser vazia';
+            $errors['funcaoid'] = _t('acesso.funcao_id_cannot_empty');
         }
         if (is_null($this->getPermissaoID())) {
-            $errors['permissaoid'] = 'A permissão não pode ser vazia';
+            $errors['permissaoid'] = _t('acesso.permissao_id_cannot_empty');
         }
         if (!empty($errors)) {
-            throw new \MZ\Exception\ValidationException($errors);
+            throw new ValidationException($errors);
         }
         return $this->toArray();
     }
 
     /**
      * Translate SQL exception into application exception
-     * @param  \Exception $e exception to translate into a readable error
+     * @param \Exception $e exception to translate into a readable error
      * @return \MZ\Exception\ValidationException new exception translated
      */
     protected function translate($e)
     {
-        if (stripos($e->getMessage(), 'UK_Acessos_FuncaoID_PermissaoID') !== false) {
-            return new \MZ\Exception\ValidationException([
-                'funcaoid' => sprintf(
-                    'A função "%s" já está cadastrada',
+        if (contains(['FuncaoID', 'PermissaoID', 'UNIQUE'], $e->getMessage())) {
+            return new ValidationException([
+                'funcaoid' => _t(
+                    'acesso.funcao_id_used',
                     $this->getFuncaoID()
                 ),
-                'permissaoid' => sprintf(
-                    'A permissão "%s" já está cadastrada',
+                'permissaoid' => _t(
+                    'acesso.permissao_id_used',
                     $this->getPermissaoID()
                 ),
             ]);
@@ -234,7 +240,8 @@ class Acesso extends SyncModel
 
     /**
      * Insert a new Acesso into the database and fill instance from database
-     * @return Acesso Self instance
+     * @return self Self instance
+     * @throws \MZ\Exception\ValidationException for invalid input data
      */
     public function insert()
     {
@@ -253,36 +260,42 @@ class Acesso extends SyncModel
 
     /**
      * Update Acesso with instance values into database for ID
-     * @param  array $only Save these fields only, when empty save all fields except id
-     * @return Acesso Self instance
+     * @param array $only Save these fields only, when empty save all fields except id
+     * @return int rows affected
+     * @throws \MZ\Exception\ValidationException for invalid input data
      */
     public function update($only = [])
     {
         $values = $this->validate();
         if (!$this->exists()) {
-            throw new \Exception('O identificador do acesso não foi informado');
+            throw new ValidationException(
+                ['id' => _t('acesso.id_cannot_empty')]
+            );
         }
         $values = DB::filterValues($values, $only, false);
         try {
-            DB::update('Acessos')
+            $affected = DB::update('Acessos')
                 ->set($values)
-                ->where('id', $this->getID())
+                ->where(['id' => $this->getID()])
                 ->execute();
             $this->loadByID();
         } catch (\Exception $e) {
             throw $this->translate($e);
         }
-        return $this;
+        return $affected;
     }
 
     /**
      * Delete this instance from database using ID
      * @return integer Number of rows deleted (Max 1)
+     * @throws \MZ\Exception\ValidationException for invalid id
      */
     public function delete()
     {
         if (!$this->exists()) {
-            throw new \Exception('O identificador do acesso não foi informado');
+            throw new ValidationException(
+                ['id' => _t('acesso.id_cannot_empty')]
+            );
         }
         $result = DB::deleteFrom('Acessos')
             ->where('id', $this->getID())
@@ -292,9 +305,9 @@ class Acesso extends SyncModel
 
     /**
      * Load one register for it self with a condition
-     * @param  array $condition Condition for searching the row
-     * @param  array $order associative field name -> [-1, 1]
-     * @return Acesso Self instance filled or empty
+     * @param array $condition Condition for searching the row
+     * @param array $order associative field name -> [-1, 1]
+     * @return self Self instance filled or empty
      */
     public function load($condition, $order = [])
     {
@@ -305,15 +318,13 @@ class Acesso extends SyncModel
 
     /**
      * Load into this object from database using, FuncaoID, PermissaoID
-     * @param  int $funcao_id função to find Acesso
-     * @param  int $permissao_id permissão to find Acesso
-     * @return Acesso Self filled instance or empty when not found
+     * @return self Self filled instance or empty when not found
      */
-    public function loadByFuncaoIDPermissaoID($funcao_id, $permissao_id)
+    public function loadByFuncaoIDPermissaoID()
     {
         return $this->load([
-            'funcaoid' => intval($funcao_id),
-            'permissaoid' => intval($permissao_id),
+            'funcaoid' => intval($this->getFuncaoID()),
+            'permissaoid' => intval($this->getPermissaoID()),
         ]);
     }
 
@@ -341,14 +352,14 @@ class Acesso extends SyncModel
      */
     private static function getAllowedKeys()
     {
-        $acesso = new Acesso();
+        $acesso = new self();
         $allowed = Filter::concatKeys('a.', $acesso->toArray());
         return $allowed;
     }
 
     /**
      * Filter order array
-     * @param  mixed $order order string or array to parse and filter allowed
+     * @param mixed $order order string or array to parse and filter allowed
      * @return array allowed associative order
      */
     private static function filterOrder($order)
@@ -359,7 +370,7 @@ class Acesso extends SyncModel
 
     /**
      * Filter condition array with allowed fields
-     * @param  array $condition condition to filter rows
+     * @param array $condition condition to filter rows
      * @return array allowed condition
      */
     private static function filterCondition($condition)
@@ -370,8 +381,8 @@ class Acesso extends SyncModel
 
     /**
      * Fetch data from database with a condition
-     * @param  array $condition condition to filter rows
-     * @param  array $order order rows
+     * @param array $condition condition to filter rows
+     * @param array $order order rows
      * @return SelectQuery query object with condition statement
      */
     private static function query($condition = [], $order = [])
@@ -385,27 +396,44 @@ class Acesso extends SyncModel
 
     /**
      * Search one register with a condition
-     * @param  array $condition Condition for searching the row
-     * @param  array $order order rows
-     * @return Acesso A filled Acesso or empty instance
+     * @param array $condition Condition for searching the row
+     * @param array $order order rows
+     * @return self A filled Acesso or empty instance
      */
     public static function find($condition, $order = [])
     {
-        $query = self::query($condition, $order)->limit(1);
-        $row = $query->fetch() ?: [];
-        return new Acesso($row);
+        $result = new self();
+        return $result->load($condition, $order);
+    }
+
+    /**
+     * Search one register with a condition
+     * @param array $condition Condition for searching the row
+     * @param array $order order rows
+     * @return self A filled Acesso or empty instance
+     * @throws \Exception when register has not found
+     */
+    public static function findOrFail($condition, $order = [])
+    {
+        $result = self::find($condition, $order);
+        if (!$result->exists()) {
+            throw new \Exception(_t('acesso.not_found'), 404);
+        }
+        return $result;
     }
 
     /**
      * Find this object on database using, FuncaoID, PermissaoID
-     * @param  int $funcao_id função to find Acesso
-     * @param  int $permissao_id permissão to find Acesso
-     * @return Acesso A filled instance or empty when not found
+     * @param int $funcao_id função to find Acesso
+     * @param int $permissao_id permissão to find Acesso
+     * @return self A filled instance or empty when not found
      */
     public static function findByFuncaoIDPermissaoID($funcao_id, $permissao_id)
     {
         $result = new self();
-        return $result->loadByFuncaoIDPermissaoID($funcao_id, $permissao_id);
+        $result->setFuncaoID($funcao_id);
+        $result->setPermissaoID($permissao_id);
+        return $result->loadByFuncaoIDPermissaoID();
     }
 
     public static function getPermissoes($funcao_id)
@@ -424,11 +452,11 @@ class Acesso extends SyncModel
 
     /**
      * Find all Acesso
-     * @param  array  $condition Condition to get all Acesso
-     * @param  array  $order     Order Acesso
-     * @param  int    $limit     Limit data into row count
-     * @param  int    $offset    Start offset to get rows
-     * @return array             List of all rows instanced as Acesso
+     * @param array  $condition Condition to get all Acesso
+     * @param array  $order     Order Acesso
+     * @param int    $limit     Limit data into row count
+     * @param int    $offset    Start offset to get rows
+     * @return self[] List of all rows instanced as Acesso
      */
     public static function findAll($condition = [], $order = [], $limit = null, $offset = null)
     {
@@ -442,14 +470,14 @@ class Acesso extends SyncModel
         $rows = $query->fetchAll();
         $result = [];
         foreach ($rows as $row) {
-            $result[] = new Acesso($row);
+            $result[] = new self($row);
         }
         return $result;
     }
 
     /**
      * Count all rows from database with matched condition critery
-     * @param  array $condition condition to filter rows
+     * @param array $condition condition to filter rows
      * @return integer Quantity of rows
      */
     public static function count($condition = [])

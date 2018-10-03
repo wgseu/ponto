@@ -24,10 +24,12 @@
  */
 namespace MZ\System;
 
-use MZ\Database\SyncModel;
-use MZ\Database\DB;
+use MZ\Util\Mask;
 use MZ\Util\Filter;
 use MZ\Util\Validator;
+use MZ\Database\DB;
+use MZ\Database\SyncModel;
+use MZ\Exception\ValidationException;
 
 /**
  * Registra todas as atividades importantes do sistema
@@ -40,6 +42,7 @@ class Auditoria extends SyncModel
      */
     const TIPO_FINANCEIRO = 'Financeiro';
     const TIPO_ADMINISTRATIVO = 'Administrativo';
+    const TIPO_OPERACIONAL = 'Operacional';
 
     /**
      * Prioridade de acesso do recurso
@@ -53,11 +56,16 @@ class Auditoria extends SyncModel
      */
     private $id;
     /**
-     * Funcionário que exerceu a atividade
+     * Informa a permissão concedida ou utilizada que permitiu a realização da
+     * operação
      */
-    private $funcionario_id;
+    private $permissao_id;
     /**
-     * Funcionário que autorizou o acesso ao recurso descrito
+     * Prestador que exerceu a atividade
+     */
+    private $prestador_id;
+    /**
+     * Prestador que autorizou o acesso ao recurso descrito
      */
     private $autorizador_id;
     /**
@@ -72,6 +80,11 @@ class Auditoria extends SyncModel
      * Descrição da atividade exercida
      */
     private $descricao;
+    /**
+     * Código de autorização necessário para permitir realizar a função
+     * descrita
+     */
+    private $autorizacao;
     /**
      * Data e hora do ocorrido
      */
@@ -88,7 +101,7 @@ class Auditoria extends SyncModel
 
     /**
      * Identificador da auditoria
-     * @return mixed ID of Auditoria
+     * @return int id of Auditoria
      */
     public function getID()
     {
@@ -97,8 +110,8 @@ class Auditoria extends SyncModel
 
     /**
      * Set ID value to new on param
-     * @param  mixed $id new value for ID
-     * @return Auditoria Self instance
+     * @param int $id Set id for Auditoria
+     * @return self Self instance
      */
     public function setID($id)
     {
@@ -107,28 +120,49 @@ class Auditoria extends SyncModel
     }
 
     /**
-     * Funcionário que exerceu a atividade
-     * @return mixed Funcionário of Auditoria
+     * Informa a permissão concedida ou utilizada que permitiu a realização da
+     * operação
+     * @return int permissão of Auditoria
      */
-    public function getFuncionarioID()
+    public function getPermissaoID()
     {
-        return $this->funcionario_id;
+        return $this->permissao_id;
     }
 
     /**
-     * Set FuncionarioID value to new on param
-     * @param  mixed $funcionario_id new value for FuncionarioID
-     * @return Auditoria Self instance
+     * Set PermissaoID value to new on param
+     * @param int $permissao_id Set permissão for Auditoria
+     * @return self Self instance
      */
-    public function setFuncionarioID($funcionario_id)
+    public function setPermissaoID($permissao_id)
     {
-        $this->funcionario_id = $funcionario_id;
+        $this->permissao_id = $permissao_id;
         return $this;
     }
 
     /**
-     * Funcionário que autorizou o acesso ao recurso descrito
-     * @return mixed Autorizador of Auditoria
+     * Prestador que exerceu a atividade
+     * @return int prestador of Auditoria
+     */
+    public function getPrestadorID()
+    {
+        return $this->prestador_id;
+    }
+
+    /**
+     * Set PrestadorID value to new on param
+     * @param int $prestador_id Set prestador for Auditoria
+     * @return self Self instance
+     */
+    public function setPrestadorID($prestador_id)
+    {
+        $this->prestador_id = $prestador_id;
+        return $this;
+    }
+
+    /**
+     * Prestador que autorizou o acesso ao recurso descrito
+     * @return int autorizador of Auditoria
      */
     public function getAutorizadorID()
     {
@@ -137,8 +171,8 @@ class Auditoria extends SyncModel
 
     /**
      * Set AutorizadorID value to new on param
-     * @param  mixed $autorizador_id new value for AutorizadorID
-     * @return Auditoria Self instance
+     * @param int $autorizador_id Set autorizador for Auditoria
+     * @return self Self instance
      */
     public function setAutorizadorID($autorizador_id)
     {
@@ -148,7 +182,7 @@ class Auditoria extends SyncModel
 
     /**
      * Tipo de atividade exercida
-     * @return mixed Tipo of Auditoria
+     * @return string tipo of Auditoria
      */
     public function getTipo()
     {
@@ -157,8 +191,8 @@ class Auditoria extends SyncModel
 
     /**
      * Set Tipo value to new on param
-     * @param  mixed $tipo new value for Tipo
-     * @return Auditoria Self instance
+     * @param string $tipo Set tipo for Auditoria
+     * @return self Self instance
      */
     public function setTipo($tipo)
     {
@@ -168,7 +202,7 @@ class Auditoria extends SyncModel
 
     /**
      * Prioridade de acesso do recurso
-     * @return mixed Prioridade of Auditoria
+     * @return string prioridade of Auditoria
      */
     public function getPrioridade()
     {
@@ -177,8 +211,8 @@ class Auditoria extends SyncModel
 
     /**
      * Set Prioridade value to new on param
-     * @param  mixed $prioridade new value for Prioridade
-     * @return Auditoria Self instance
+     * @param string $prioridade Set prioridade for Auditoria
+     * @return self Self instance
      */
     public function setPrioridade($prioridade)
     {
@@ -188,7 +222,7 @@ class Auditoria extends SyncModel
 
     /**
      * Descrição da atividade exercida
-     * @return mixed Descrição of Auditoria
+     * @return string descrição of Auditoria
      */
     public function getDescricao()
     {
@@ -197,8 +231,8 @@ class Auditoria extends SyncModel
 
     /**
      * Set Descricao value to new on param
-     * @param  mixed $descricao new value for Descricao
-     * @return Auditoria Self instance
+     * @param string $descricao Set descrição for Auditoria
+     * @return self Self instance
      */
     public function setDescricao($descricao)
     {
@@ -207,8 +241,29 @@ class Auditoria extends SyncModel
     }
 
     /**
+     * Código de autorização necessário para permitir realizar a função
+     * descrita
+     * @return string autorização of Auditoria
+     */
+    public function getAutorizacao()
+    {
+        return $this->autorizacao;
+    }
+
+    /**
+     * Set Autorizacao value to new on param
+     * @param string $autorizacao Set autorização for Auditoria
+     * @return self Self instance
+     */
+    public function setAutorizacao($autorizacao)
+    {
+        $this->autorizacao = $autorizacao;
+        return $this;
+    }
+
+    /**
      * Data e hora do ocorrido
-     * @return mixed Data e hora of Auditoria
+     * @return string data e hora of Auditoria
      */
     public function getDataHora()
     {
@@ -217,8 +272,8 @@ class Auditoria extends SyncModel
 
     /**
      * Set DataHora value to new on param
-     * @param  mixed $data_hora new value for DataHora
-     * @return Auditoria Self instance
+     * @param string $data_hora Set data e hora for Auditoria
+     * @return self Self instance
      */
     public function setDataHora($data_hora)
     {
@@ -228,30 +283,32 @@ class Auditoria extends SyncModel
 
     /**
      * Convert this instance to array associated key -> value
-     * @param  boolean $recursive Allow rescursive conversion of fields
+     * @param boolean $recursive Allow rescursive conversion of fields
      * @return array All field and values into array format
      */
     public function toArray($recursive = false)
     {
         $auditoria = parent::toArray($recursive);
         $auditoria['id'] = $this->getID();
-        $auditoria['funcionarioid'] = $this->getFuncionarioID();
+        $auditoria['permissaoid'] = $this->getPermissaoID();
+        $auditoria['prestadorid'] = $this->getPrestadorID();
         $auditoria['autorizadorid'] = $this->getAutorizadorID();
         $auditoria['tipo'] = $this->getTipo();
         $auditoria['prioridade'] = $this->getPrioridade();
         $auditoria['descricao'] = $this->getDescricao();
+        $auditoria['autorizacao'] = $this->getAutorizacao();
         $auditoria['datahora'] = $this->getDataHora();
         return $auditoria;
     }
 
     /**
      * Fill this instance with from array values, you can pass instance to
-     * @param  mixed $auditoria Associated key -> value to assign into this instance
-     * @return Auditoria Self instance
+     * @param mixed $auditoria Associated key -> value to assign into this instance
+     * @return self Self instance
      */
     public function fromArray($auditoria = [])
     {
-        if ($auditoria instanceof Auditoria) {
+        if ($auditoria instanceof self) {
             $auditoria = $auditoria->toArray();
         } elseif (!is_array($auditoria)) {
             $auditoria = [];
@@ -262,10 +319,15 @@ class Auditoria extends SyncModel
         } else {
             $this->setID($auditoria['id']);
         }
-        if (!isset($auditoria['funcionarioid'])) {
-            $this->setFuncionarioID(null);
+        if (!array_key_exists('permissaoid', $auditoria)) {
+            $this->setPermissaoID(null);
         } else {
-            $this->setFuncionarioID($auditoria['funcionarioid']);
+            $this->setPermissaoID($auditoria['permissaoid']);
+        }
+        if (!isset($auditoria['prestadorid'])) {
+            $this->setPrestadorID(null);
+        } else {
+            $this->setPrestadorID($auditoria['prestadorid']);
         }
         if (!isset($auditoria['autorizadorid'])) {
             $this->setAutorizadorID(null);
@@ -287,8 +349,13 @@ class Auditoria extends SyncModel
         } else {
             $this->setDescricao($auditoria['descricao']);
         }
+        if (!array_key_exists('autorizacao', $auditoria)) {
+            $this->setAutorizacao(null);
+        } else {
+            $this->setAutorizacao($auditoria['autorizacao']);
+        }
         if (!isset($auditoria['datahora'])) {
-            $this->setDataHora(null);
+            $this->setDataHora(DB::now());
         } else {
             $this->setDataHora($auditoria['datahora']);
         }
@@ -307,20 +374,24 @@ class Auditoria extends SyncModel
 
     /**
      * Filter fields, upload data and keep key data
-     * @param Auditoria $original Original instance without modifications
+     * @param self $original Original instance without modifications
+     * @param boolean $localized Informs if fields are localized
+     * @return self Self instance
      */
     public function filter($original, $localized = false)
     {
         $this->setID($original->getID());
-        $this->setFuncionarioID(Filter::number($this->getFuncionarioID()));
+        $this->setPermissaoID(Filter::number($this->getPermissaoID()));
+        $this->setPrestadorID(Filter::number($this->getPrestadorID()));
         $this->setAutorizadorID(Filter::number($this->getAutorizadorID()));
         $this->setDescricao(Filter::string($this->getDescricao()));
-        $this->setDataHora(Filter::datetime($this->getDataHora()));
+        $this->setAutorizacao(Filter::text($this->getAutorizacao()));
+        return $this;
     }
 
     /**
      * Clean instance resources like images and docs
-     * @param  Auditoria $dependency Don't clean when dependency use same resources
+     * @param self $dependency Don't clean when dependency use same resources
      */
     public function clean($dependency)
     {
@@ -329,53 +400,37 @@ class Auditoria extends SyncModel
     /**
      * Validate fields updating them and throw exception when invalid data has found
      * @return array All field of Auditoria in array format
+     * @throws \MZ\Exception\ValidationException for invalid input data
      */
     public function validate()
     {
         $errors = [];
-        if (is_null($this->getFuncionarioID())) {
-            $errors['funcionarioid'] = 'O funcionário não pode ser vazio';
+        if (is_null($this->getPrestadorID())) {
+            $errors['prestadorid'] = _t('auditoria.prestador_id_cannot_empty');
         }
         if (is_null($this->getAutorizadorID())) {
-            $errors['autorizadorid'] = 'O autorizador não pode ser vazio';
+            $errors['autorizadorid'] = _t('auditoria.autorizador_id_cannot_empty');
         }
-        if (is_null($this->getTipo())) {
-            $errors['tipo'] = 'O tipo não pode ser vazio';
+        if (!Validator::checkInSet($this->getTipo(), self::getTipoOptions())) {
+            $errors['tipo'] = _t('auditoria.tipo_invalid');
         }
-        if (!Validator::checkInSet($this->getTipo(), self::getTipoOptions(), true)) {
-            $errors['tipo'] = 'O tipo é inválido';
-        }
-        if (is_null($this->getPrioridade())) {
-            $errors['prioridade'] = 'A prioridade não pode ser vazia';
-        }
-        if (!Validator::checkInSet($this->getPrioridade(), self::getPrioridadeOptions(), true)) {
-            $errors['prioridade'] = 'A prioridade é inválida';
+        if (!Validator::checkInSet($this->getPrioridade(), self::getPrioridadeOptions())) {
+            $errors['prioridade'] = _t('auditoria.prioridade_invalid');
         }
         if (is_null($this->getDescricao())) {
-            $errors['descricao'] = 'A descrição não pode ser vazia';
+            $errors['descricao'] = _t('auditoria.descricao_cannot_empty');
         }
-        if (is_null($this->getDataHora())) {
-            $errors['datahora'] = 'A data e hora não pode ser vazia';
-        }
+        $this->setDataHora(DB::now());
         if (!empty($errors)) {
-            throw new \MZ\Exception\ValidationException($errors);
+            throw new ValidationException($errors);
         }
         return $this->toArray();
     }
 
     /**
-     * Translate SQL exception into application exception
-     * @param  \Exception $e exception to translate into a readable error
-     * @return \MZ\Exception\ValidationException new exception translated
-     */
-    protected function translate($e)
-    {
-        return parent::translate($e);
-    }
-
-    /**
      * Insert a new Auditoria into the database and fill instance from database
-     * @return Auditoria Self instance
+     * @return self Self instance
+     * @throws \MZ\Exception\ValidationException for invalid input data
      */
     public function insert()
     {
@@ -394,36 +449,43 @@ class Auditoria extends SyncModel
 
     /**
      * Update Auditoria with instance values into database for ID
-     * @param  array $only Save these fields only, when empty save all fields except id
-     * @return Auditoria Self instance
+     * @param array $only Save these fields only, when empty save all fields except id
+     * @return int rows affected
+     * @throws \MZ\Exception\ValidationException for invalid input data
      */
     public function update($only = [])
     {
         $values = $this->validate();
         if (!$this->exists()) {
-            throw new \Exception('O identificador da auditoria não foi informado');
+            throw new ValidationException(
+                ['id' => _t('auditoria.id_cannot_empty')]
+            );
         }
         $values = DB::filterValues($values, $only, false);
+        unset($values['datahora']);
         try {
-            DB::update('Auditoria')
+            $affected = DB::update('Auditoria')
                 ->set($values)
-                ->where('id', $this->getID())
+                ->where(['id' => $this->getID()])
                 ->execute();
             $this->loadByID();
         } catch (\Exception $e) {
             throw $this->translate($e);
         }
-        return $this;
+        return $affected;
     }
 
     /**
      * Delete this instance from database using ID
      * @return integer Number of rows deleted (Max 1)
+     * @throws \MZ\Exception\ValidationException for invalid id
      */
     public function delete()
     {
         if (!$this->exists()) {
-            throw new \Exception('O identificador da auditoria não foi informado');
+            throw new ValidationException(
+                ['id' => _t('auditoria.id_cannot_empty')]
+            );
         }
         $result = DB::deleteFrom('Auditoria')
             ->where('id', $this->getID())
@@ -433,9 +495,9 @@ class Auditoria extends SyncModel
 
     /**
      * Load one register for it self with a condition
-     * @param  array $condition Condition for searching the row
-     * @param  array $order associative field name -> [-1, 1]
-     * @return Auditoria Self instance filled or empty
+     * @param array $condition Condition for searching the row
+     * @param array $order associative field name -> [-1, 1]
+     * @return self Self instance filled or empty
      */
     public function load($condition, $order = [])
     {
@@ -445,16 +507,29 @@ class Auditoria extends SyncModel
     }
 
     /**
-     * Funcionário que exerceu a atividade
-     * @return \MZ\Provider\Prestador The object fetched from database
+     * Informa a permissão concedida ou utilizada que permitiu a realização da
+     * operação
+     * @return \MZ\System\Permissao The object fetched from database
      */
-    public function findFuncionarioID()
+    public function findPermissaoID()
     {
-        return \MZ\Provider\Prestador::findByID($this->getFuncionarioID());
+        if (is_null($this->getPermissaoID())) {
+            return new \MZ\System\Permissao();
+        }
+        return \MZ\System\Permissao::findByID($this->getPermissaoID());
     }
 
     /**
-     * Funcionário que autorizou o acesso ao recurso descrito
+     * Prestador que exerceu a atividade
+     * @return \MZ\Provider\Prestador The object fetched from database
+     */
+    public function findPrestadorID()
+    {
+        return \MZ\Provider\Prestador::findByID($this->getPrestadorID());
+    }
+
+    /**
+     * Prestador que autorizou o acesso ao recurso descrito
      * @return \MZ\Provider\Prestador The object fetched from database
      */
     public function findAutorizadorID()
@@ -464,14 +539,15 @@ class Auditoria extends SyncModel
 
     /**
      * Gets textual and translated Tipo for Auditoria
-     * @param  int $index choose option from index
-     * @return mixed A associative key -> translated representative text or text for index
+     * @param int $index choose option from index
+     * @return string[] A associative key -> translated representative text or text for index
      */
     public static function getTipoOptions($index = null)
     {
         $options = [
-            self::TIPO_FINANCEIRO => 'Financeiro',
-            self::TIPO_ADMINISTRATIVO => 'Administrativo',
+            self::TIPO_FINANCEIRO => _t('auditoria.tipo_financeiro'),
+            self::TIPO_ADMINISTRATIVO => _t('auditoria.tipo_administrativo'),
+            self::TIPO_OPERACIONAL => _t('auditoria.tipo_operacional'),
         ];
         if (!is_null($index)) {
             return $options[$index];
@@ -481,15 +557,15 @@ class Auditoria extends SyncModel
 
     /**
      * Gets textual and translated Prioridade for Auditoria
-     * @param  int $index choose option from index
-     * @return mixed A associative key -> translated representative text or text for index
+     * @param int $index choose option from index
+     * @return string[] A associative key -> translated representative text or text for index
      */
     public static function getPrioridadeOptions($index = null)
     {
         $options = [
-            self::PRIORIDADE_BAIXA => 'Baixa',
-            self::PRIORIDADE_MEDIA => 'Média',
-            self::PRIORIDADE_ALTA => 'Alta',
+            self::PRIORIDADE_BAIXA => _t('auditoria.prioridade_baixa'),
+            self::PRIORIDADE_MEDIA => _t('auditoria.prioridade_media'),
+            self::PRIORIDADE_ALTA => _t('auditoria.prioridade_alta'),
         ];
         if (!is_null($index)) {
             return $options[$index];
@@ -503,14 +579,14 @@ class Auditoria extends SyncModel
      */
     private static function getAllowedKeys()
     {
-        $auditoria = new Auditoria();
+        $auditoria = new self();
         $allowed = Filter::concatKeys('a.', $auditoria->toArray());
         return $allowed;
     }
 
     /**
      * Filter order array
-     * @param  mixed $order order string or array to parse and filter allowed
+     * @param mixed $order order string or array to parse and filter allowed
      * @return array allowed associative order
      */
     private static function filterOrder($order)
@@ -521,7 +597,7 @@ class Auditoria extends SyncModel
 
     /**
      * Filter condition array with allowed fields
-     * @param  array $condition condition to filter rows
+     * @param array $condition condition to filter rows
      * @return array allowed condition
      */
     private static function filterCondition($condition)
@@ -539,8 +615,8 @@ class Auditoria extends SyncModel
 
     /**
      * Fetch data from database with a condition
-     * @param  array $condition condition to filter rows
-     * @param  array $order order rows
+     * @param array $condition condition to filter rows
+     * @param array $order order rows
      * @return SelectQuery query object with condition statement
      */
     private static function query($condition = [], $order = [])
@@ -555,24 +631,39 @@ class Auditoria extends SyncModel
 
     /**
      * Search one register with a condition
-     * @param  array $condition Condition for searching the row
-     * @param  array $order order rows
-     * @return Auditoria A filled Auditoria or empty instance
+     * @param array $condition Condition for searching the row
+     * @param array $order order rows
+     * @return self A filled Auditoria or empty instance
      */
     public static function find($condition, $order = [])
     {
-        $query = self::query($condition, $order)->limit(1);
-        $row = $query->fetch() ?: [];
-        return new Auditoria($row);
+        $result = new self();
+        return $result->load($condition, $order);
+    }
+
+    /**
+     * Search one register with a condition
+     * @param array $condition Condition for searching the row
+     * @param array $order order rows
+     * @return self A filled Auditoria or empty instance
+     * @throws \Exception when register has not found
+     */
+    public static function findOrFail($condition, $order = [])
+    {
+        $result = self::find($condition, $order);
+        if (!$result->exists()) {
+            throw new \Exception(_t('auditoria.not_found'), 404);
+        }
+        return $result;
     }
 
     /**
      * Find all Auditoria
-     * @param  array  $condition Condition to get all Auditoria
-     * @param  array  $order     Order Auditoria
-     * @param  int    $limit     Limit data into row count
-     * @param  int    $offset    Start offset to get rows
-     * @return array             List of all rows instanced as Auditoria
+     * @param array  $condition Condition to get all Auditoria
+     * @param array  $order     Order Auditoria
+     * @param int    $limit     Limit data into row count
+     * @param int    $offset    Start offset to get rows
+     * @return self[] List of all rows instanced as Auditoria
      */
     public static function findAll($condition = [], $order = [], $limit = null, $offset = null)
     {
@@ -586,14 +677,14 @@ class Auditoria extends SyncModel
         $rows = $query->fetchAll();
         $result = [];
         foreach ($rows as $row) {
-            $result[] = new Auditoria($row);
+            $result[] = new self($row);
         }
         return $result;
     }
 
     /**
      * Count all rows from database with matched condition critery
-     * @param  array $condition condition to filter rows
+     * @param array $condition condition to filter rows
      * @return integer Quantity of rows
      */
     public static function count($condition = [])

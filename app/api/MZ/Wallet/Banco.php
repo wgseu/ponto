@@ -24,10 +24,12 @@
  */
 namespace MZ\Wallet;
 
-use MZ\Database\SyncModel;
-use MZ\Database\DB;
+use MZ\Util\Mask;
 use MZ\Util\Filter;
 use MZ\Util\Validator;
+use MZ\Database\DB;
+use MZ\Database\SyncModel;
+use MZ\Exception\ValidationException;
 
 /**
  * Bancos disponíveis no país
@@ -67,7 +69,7 @@ class Banco extends SyncModel
 
     /**
      * Identificador do banco
-     * @return mixed ID of Banco
+     * @return int id of Banco
      */
     public function getID()
     {
@@ -76,8 +78,8 @@ class Banco extends SyncModel
 
     /**
      * Set ID value to new on param
-     * @param  mixed $id new value for ID
-     * @return Banco Self instance
+     * @param int $id Set id for Banco
+     * @return self Self instance
      */
     public function setID($id)
     {
@@ -87,7 +89,7 @@ class Banco extends SyncModel
 
     /**
      * Número do banco
-     * @return mixed Número of Banco
+     * @return string número of Banco
      */
     public function getNumero()
     {
@@ -96,8 +98,8 @@ class Banco extends SyncModel
 
     /**
      * Set Numero value to new on param
-     * @param  mixed $numero new value for Numero
-     * @return Banco Self instance
+     * @param string $numero Set número for Banco
+     * @return self Self instance
      */
     public function setNumero($numero)
     {
@@ -107,7 +109,7 @@ class Banco extends SyncModel
 
     /**
      * Razão social do banco
-     * @return mixed Razão social of Banco
+     * @return string razão social of Banco
      */
     public function getRazaoSocial()
     {
@@ -116,8 +118,8 @@ class Banco extends SyncModel
 
     /**
      * Set RazaoSocial value to new on param
-     * @param  mixed $razao_social new value for RazaoSocial
-     * @return Banco Self instance
+     * @param string $razao_social Set razão social for Banco
+     * @return self Self instance
      */
     public function setRazaoSocial($razao_social)
     {
@@ -127,7 +129,7 @@ class Banco extends SyncModel
 
     /**
      * Mascara para formatação do número da agência
-     * @return mixed Máscara da agência of Banco
+     * @return string máscara da agência of Banco
      */
     public function getAgenciaMascara()
     {
@@ -136,8 +138,8 @@ class Banco extends SyncModel
 
     /**
      * Set AgenciaMascara value to new on param
-     * @param  mixed $agencia_mascara new value for AgenciaMascara
-     * @return Banco Self instance
+     * @param string $agencia_mascara Set máscara da agência for Banco
+     * @return self Self instance
      */
     public function setAgenciaMascara($agencia_mascara)
     {
@@ -147,7 +149,7 @@ class Banco extends SyncModel
 
     /**
      * Máscara para formatação do número da conta
-     * @return mixed Máscara da conta of Banco
+     * @return string máscara da conta of Banco
      */
     public function getContaMascara()
     {
@@ -156,8 +158,8 @@ class Banco extends SyncModel
 
     /**
      * Set ContaMascara value to new on param
-     * @param  mixed $conta_mascara new value for ContaMascara
-     * @return Banco Self instance
+     * @param string $conta_mascara Set máscara da conta for Banco
+     * @return self Self instance
      */
     public function setContaMascara($conta_mascara)
     {
@@ -167,7 +169,7 @@ class Banco extends SyncModel
 
     /**
      * Convert this instance to array associated key -> value
-     * @param  boolean $recursive Allow rescursive conversion of fields
+     * @param boolean $recursive Allow rescursive conversion of fields
      * @return array All field and values into array format
      */
     public function toArray($recursive = false)
@@ -183,12 +185,12 @@ class Banco extends SyncModel
 
     /**
      * Fill this instance with from array values, you can pass instance to
-     * @param  mixed $banco Associated key -> value to assign into this instance
-     * @return Banco Self instance
+     * @param mixed $banco Associated key -> value to assign into this instance
+     * @return self Self instance
      */
     public function fromArray($banco = [])
     {
-        if ($banco instanceof Banco) {
+        if ($banco instanceof self) {
             $banco = $banco->toArray();
         } elseif (!is_array($banco)) {
             $banco = [];
@@ -234,7 +236,9 @@ class Banco extends SyncModel
 
     /**
      * Filter fields, upload data and keep key data
-     * @param Banco $original Original instance without modifications
+     * @param self $original Original instance without modifications
+     * @param boolean $localized Informs if fields are localized
+     * @return self Self instance
      */
     public function filter($original, $localized = false)
     {
@@ -243,11 +247,12 @@ class Banco extends SyncModel
         $this->setRazaoSocial(Filter::string($this->getRazaoSocial()));
         $this->setAgenciaMascara(Filter::string($this->getAgenciaMascara()));
         $this->setContaMascara(Filter::string($this->getContaMascara()));
+        return $this;
     }
 
     /**
      * Clean instance resources like images and docs
-     * @param  Banco $dependency Don't clean when dependency use same resources
+     * @param self $dependency Don't clean when dependency use same resources
      */
     public function clean($dependency)
     {
@@ -256,42 +261,43 @@ class Banco extends SyncModel
     /**
      * Validate fields updating them and throw exception when invalid data has found
      * @return array All field of Banco in array format
+     * @throws \MZ\Exception\ValidationException for invalid input data
      */
     public function validate()
     {
         $errors = [];
         if (is_null($this->getNumero())) {
-            $errors['numero'] = 'O Número não pode ser vazio';
+            $errors['numero'] = _t('banco.numero_cannot_empty');
         }
         if (is_null($this->getRazaoSocial())) {
-            $errors['razaosocial'] = 'A Razão social não pode ser vazia';
+            $errors['razaosocial'] = _t('banco.razao_social_cannot_empty');
         }
         if (!empty($errors)) {
-            throw new \MZ\Exception\ValidationException($errors);
+            throw new ValidationException($errors);
         }
         return $this->toArray();
     }
 
     /**
      * Translate SQL exception into application exception
-     * @param  \Exception $e exception to translate into a readable error
+     * @param \Exception $e exception to translate into a readable error
      * @return \MZ\Exception\ValidationException new exception translated
      */
     protected function translate($e)
     {
         if (contains(['RazaoSocial', 'UNIQUE'], $e->getMessage())) {
-            return new \MZ\Exception\ValidationException([
-                'razaosocial' => vsprintf(
-                    'A Razão social "%s" já está cadastrada',
-                    [$this->getRazaoSocial()]
+            return new ValidationException([
+                'razaosocial' => _t(
+                    'banco.razao_social_used',
+                    $this->getRazaoSocial()
                 ),
             ]);
         }
         if (contains(['Numero', 'UNIQUE'], $e->getMessage())) {
-            return new \MZ\Exception\ValidationException([
-                'numero' => vsprintf(
-                    'O Número "%s" já está cadastrado',
-                    [$this->getNumero()]
+            return new ValidationException([
+                'numero' => _t(
+                    'banco.numero_used',
+                    $this->getNumero()
                 ),
             ]);
         }
@@ -300,7 +306,8 @@ class Banco extends SyncModel
 
     /**
      * Insert a new Banco into the database and fill instance from database
-     * @return Banco Self instance
+     * @return self Self instance
+     * @throws \MZ\Exception\ValidationException for invalid input data
      */
     public function insert()
     {
@@ -319,36 +326,42 @@ class Banco extends SyncModel
 
     /**
      * Update Banco with instance values into database for ID
-     * @param  array $only Save these fields only, when empty save all fields except id
-     * @return Banco Self instance
+     * @param array $only Save these fields only, when empty save all fields except id
+     * @return int rows affected
+     * @throws \MZ\Exception\ValidationException for invalid input data
      */
     public function update($only = [])
     {
         $values = $this->validate();
         if (!$this->exists()) {
-            throw new \Exception('O identificador do banco não foi informado');
+            throw new ValidationException(
+                ['id' => _t('banco.id_cannot_empty')]
+            );
         }
         $values = DB::filterValues($values, $only, false);
         try {
-            DB::update('Bancos')
+            $affected = DB::update('Bancos')
                 ->set($values)
-                ->where('id', $this->getID())
+                ->where(['id' => $this->getID()])
                 ->execute();
             $this->loadByID();
         } catch (\Exception $e) {
             throw $this->translate($e);
         }
-        return $this;
+        return $affected;
     }
 
     /**
      * Delete this instance from database using ID
      * @return integer Number of rows deleted (Max 1)
+     * @throws \MZ\Exception\ValidationException for invalid id
      */
     public function delete()
     {
         if (!$this->exists()) {
-            throw new \Exception('O identificador do banco não foi informado');
+            throw new ValidationException(
+                ['id' => _t('banco.id_cannot_empty')]
+            );
         }
         $result = DB::deleteFrom('Bancos')
             ->where('id', $this->getID())
@@ -358,9 +371,9 @@ class Banco extends SyncModel
 
     /**
      * Load one register for it self with a condition
-     * @param  array $condition Condition for searching the row
-     * @param  array $order associative field name -> [-1, 1]
-     * @return Banco Self instance filled or empty
+     * @param array $condition Condition for searching the row
+     * @param array $order associative field name -> [-1, 1]
+     * @return self Self instance filled or empty
      */
     public function load($condition, $order = [])
     {
@@ -371,25 +384,23 @@ class Banco extends SyncModel
 
     /**
      * Load into this object from database using, RazaoSocial
-     * @param  string $razao_social razão social to find Banco
-     * @return Banco Self filled instance or empty when not found
+     * @return self Self filled instance or empty when not found
      */
-    public function loadByRazaoSocial($razao_social)
+    public function loadByRazaoSocial()
     {
         return $this->load([
-            'razaosocial' => strval($razao_social),
+            'razaosocial' => strval($this->getRazaoSocial()),
         ]);
     }
 
     /**
      * Load into this object from database using, Numero
-     * @param  string $numero número to find Banco
-     * @return Banco Self filled instance or empty when not found
+     * @return self Self filled instance or empty when not found
      */
-    public function loadByNumero($numero)
+    public function loadByNumero()
     {
         return $this->load([
-            'numero' => strval($numero),
+            'numero' => strval($this->getNumero()),
         ]);
     }
 
@@ -399,14 +410,14 @@ class Banco extends SyncModel
      */
     private static function getAllowedKeys()
     {
-        $banco = new Banco();
+        $banco = new self();
         $allowed = Filter::concatKeys('b.', $banco->toArray());
         return $allowed;
     }
 
     /**
      * Filter order array
-     * @param  mixed $order order string or array to parse and filter allowed
+     * @param mixed $order order string or array to parse and filter allowed
      * @return array allowed associative order
      */
     private static function filterOrder($order)
@@ -417,7 +428,7 @@ class Banco extends SyncModel
 
     /**
      * Filter condition array with allowed fields
-     * @param  array $condition condition to filter rows
+     * @param array $condition condition to filter rows
      * @return array allowed condition
      */
     private static function filterCondition($condition)
@@ -428,8 +439,8 @@ class Banco extends SyncModel
 
     /**
      * Fetch data from database with a condition
-     * @param  array $condition condition to filter rows
-     * @param  array $order order rows
+     * @param array $condition condition to filter rows
+     * @param array $order order rows
      * @return SelectQuery query object with condition statement
      */
     private static function query($condition = [], $order = [])
@@ -452,25 +463,63 @@ class Banco extends SyncModel
 
     /**
      * Search one register with a condition
-     * @param  array $condition Condition for searching the row
-     * @return Banco A filled Banco or empty instance
+     * @param array $condition Condition for searching the row
+     * @param array $order order rows
+     * @return self A filled Banco or empty instance
      */
-    public static function find($condition)
+    public static function find($condition, $order = [])
     {
-        $query = self::query($condition)->limit(1);
-        $row = $query->fetch();
-        if ($row === false) {
-            $row = [];
-        }
-        return new Banco($row);
+        $result = new self();
+        return $result->load($condition, $order);
     }
 
     /**
-     * Fetch all rows from database with matched condition critery
-     * @param  array $condition condition to filter rows
-     * @param  integer $limit number of rows to get, null for all
-     * @param  integer $offset start index to get rows, null for begining
-     * @return array All rows instanced and filled
+     * Search one register with a condition
+     * @param array $condition Condition for searching the row
+     * @param array $order order rows
+     * @return self A filled Banco or empty instance
+     * @throws \Exception when register has not found
+     */
+    public static function findOrFail($condition, $order = [])
+    {
+        $result = self::find($condition, $order);
+        if (!$result->exists()) {
+            throw new \Exception(_t('banco.not_found'), 404);
+        }
+        return $result;
+    }
+
+    /**
+     * Find this object on database using, RazaoSocial
+     * @param string $razao_social razão social to find Banco
+     * @return self A filled instance or empty when not found
+     */
+    public static function findByRazaoSocial($razao_social)
+    {
+        $result = new self();
+        $result->setRazaoSocial($razao_social);
+        return $result->loadByRazaoSocial();
+    }
+
+    /**
+     * Find this object on database using, Numero
+     * @param string $numero número to find Banco
+     * @return self A filled instance or empty when not found
+     */
+    public static function findByNumero($numero)
+    {
+        $result = new self();
+        $result->setNumero($numero);
+        return $result->loadByNumero();
+    }
+
+    /**
+     * Find all Banco
+     * @param array  $condition Condition to get all Banco
+     * @param array  $order     Order Banco
+     * @param int    $limit     Limit data into row count
+     * @param int    $offset    Start offset to get rows
+     * @return self[] List of all rows instanced as Banco
      */
     public static function findAll($condition = [], $order = [], $limit = null, $offset = null)
     {
@@ -484,36 +533,14 @@ class Banco extends SyncModel
         $rows = $query->fetchAll();
         $result = [];
         foreach ($rows as $row) {
-            $result[] = new Banco($row);
+            $result[] = new self($row);
         }
         return $result;
     }
 
     /**
-     * Find this object on database using, RazaoSocial
-     * @param  string $razao_social razão social to find Banco
-     * @return Banco A filled instance or empty when not found
-     */
-    public static function findByRazaoSocial($razao_social)
-    {
-        $result = new self();
-        return $result->loadByRazaoSocial($razao_social);
-    }
-
-    /**
-     * Find this object on database using, Numero
-     * @param  string $numero número to find Banco
-     * @return Banco A filled instance or empty when not found
-     */
-    public static function findByNumero($numero)
-    {
-        $result = new self();
-        return $result->loadByNumero($numero);
-    }
-
-    /**
      * Count all rows from database with matched condition critery
-     * @param  array $condition condition to filter rows
+     * @param array $condition condition to filter rows
      * @return integer Quantity of rows
      */
     public static function count($condition = [])

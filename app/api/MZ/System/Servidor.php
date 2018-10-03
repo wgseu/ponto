@@ -67,7 +67,7 @@ class Servidor extends Model
 
     /**
      * Identificador do servidor no banco de dados
-     * @return mixed ID of Servidor
+     * @return int id of Servidor
      */
     public function getID()
     {
@@ -76,7 +76,7 @@ class Servidor extends Model
 
     /**
      * Set ID value to new on param
-     * @param  mixed $id new value for ID
+     * @param int $id Set id for Servidor
      * @return self Self instance
      */
     public function setID($id)
@@ -88,7 +88,7 @@ class Servidor extends Model
     /**
      * Identificador único do servidor, usando para identificação na
      * sincronização
-     * @return mixed Identificador único of Servidor
+     * @return string identificador único of Servidor
      */
     public function getGUID()
     {
@@ -97,7 +97,7 @@ class Servidor extends Model
 
     /**
      * Set GUID value to new on param
-     * @param  mixed $guid new value for GUID
+     * @param string $guid Set identificador único for Servidor
      * @return self Self instance
      */
     public function setGUID($guid)
@@ -109,7 +109,7 @@ class Servidor extends Model
     /**
      * Informa até onde foi sincronzado os dados desse servidor, sempre nulo no
      * proprio servidor
-     * @return mixed Sincronizado até of Servidor
+     * @return int sincronizado até of Servidor
      */
     public function getSincronizadoAte()
     {
@@ -118,7 +118,7 @@ class Servidor extends Model
 
     /**
      * Set SincronizadoAte value to new on param
-     * @param  mixed $sincronizado_ate new value for SincronizadoAte
+     * @param int $sincronizado_ate Set sincronizado até for Servidor
      * @return self Self instance
      */
     public function setSincronizadoAte($sincronizado_ate)
@@ -129,7 +129,7 @@ class Servidor extends Model
 
     /**
      * Data da última sincronização com esse servidor
-     * @return mixed Data da última sincronização of Servidor
+     * @return string data da última sincronização of Servidor
      */
     public function getUltimaSincronizacao()
     {
@@ -138,7 +138,7 @@ class Servidor extends Model
 
     /**
      * Set UltimaSincronizacao value to new on param
-     * @param  mixed $ultima_sincronizacao new value for UltimaSincronizacao
+     * @param string $ultima_sincronizacao Set data da última sincronização for Servidor
      * @return self Self instance
      */
     public function setUltimaSincronizacao($ultima_sincronizacao)
@@ -149,7 +149,7 @@ class Servidor extends Model
 
     /**
      * Convert this instance to array associated key -> value
-     * @param  boolean $recursive Allow rescursive conversion of fields
+     * @param boolean $recursive Allow rescursive conversion of fields
      * @return array All field and values into array format
      */
     public function toArray($recursive = false)
@@ -164,7 +164,7 @@ class Servidor extends Model
 
     /**
      * Fill this instance with from array values, you can pass instance to
-     * @param  mixed $servidor Associated key -> value to assign into this instance
+     * @param mixed $servidor Associated key -> value to assign into this instance
      * @return self Self instance
      */
     public function fromArray($servidor = [])
@@ -211,6 +211,8 @@ class Servidor extends Model
     /**
      * Filter fields, upload data and keep key data
      * @param self $original Original instance without modifications
+     * @param boolean $localized Informs if fields are localized
+     * @return self Self instance
      */
     public function filter($original, $localized = false)
     {
@@ -218,11 +220,12 @@ class Servidor extends Model
         $this->setGUID(Filter::string($this->getGUID()));
         $this->setSincronizadoAte(Filter::number($this->getSincronizadoAte()));
         $this->setUltimaSincronizacao(Filter::datetime($this->getUltimaSincronizacao()));
+        return $this;
     }
 
     /**
      * Clean instance resources like images and docs
-     * @param  self $dependency Don't clean when dependency use same resources
+     * @param self $dependency Don't clean when dependency use same resources
      */
     public function clean($dependency)
     {
@@ -230,13 +233,14 @@ class Servidor extends Model
 
     /**
      * Validate fields updating them and throw exception when invalid data has found
-     * @return mixed[] All field of Servidor in array format
+     * @return array All field of Servidor in array format
+     * @throws \MZ\Exception\ValidationException for invalid input data
      */
     public function validate()
     {
         $errors = [];
         if (is_null($this->getGUID())) {
-            $errors['guid'] = 'O identificador único não pode ser vazio';
+            $errors['guid'] = _t('servidor.guid_cannot_empty');
         }
         if (!empty($errors)) {
             throw new ValidationException($errors);
@@ -246,23 +250,15 @@ class Servidor extends Model
 
     /**
      * Translate SQL exception into application exception
-     * @param  \Exception $e exception to translate into a readable error
+     * @param \Exception $e exception to translate into a readable error
      * @return \MZ\Exception\ValidationException new exception translated
      */
     protected function translate($e)
     {
-        if (contains(['ID', 'UNIQUE'], $e->getMessage())) {
-            return new ValidationException([
-                'id' => sprintf(
-                    'O id "%s" já está cadastrado',
-                    $this->getID()
-                ),
-            ]);
-        }
         if (contains(['GUID', 'UNIQUE'], $e->getMessage())) {
             return new ValidationException([
-                'guid' => sprintf(
-                    'O identificador único "%s" já está cadastrado',
+                'guid' => _t(
+                    'servidor.guid_used',
                     $this->getGUID()
                 ),
             ]);
@@ -273,6 +269,7 @@ class Servidor extends Model
     /**
      * Insert a new Servidor into the database and fill instance from database
      * @return self Self instance
+     * @throws \MZ\Exception\ValidationException for invalid input data
      */
     public function insert()
     {
@@ -291,14 +288,17 @@ class Servidor extends Model
 
     /**
      * Update Servidor with instance values into database for ID
-     * @param  array $only Save these fields only, when empty save all fields except id
+     * @param array $only Save these fields only, when empty save all fields except id
      * @return int rows affected
+     * @throws \MZ\Exception\ValidationException for invalid input data
      */
     public function update($only = [])
     {
         $values = $this->validate();
         if (!$this->exists()) {
-            throw new \Exception('O identificador do servidor não foi informado');
+            throw new ValidationException(
+                ['id' => _t('servidor.id_cannot_empty')]
+            );
         }
         $values = DB::filterValues($values, $only, false);
         try {
@@ -316,11 +316,14 @@ class Servidor extends Model
     /**
      * Delete this instance from database using ID
      * @return integer Number of rows deleted (Max 1)
+     * @throws \MZ\Exception\ValidationException for invalid id
      */
     public function delete()
     {
         if (!$this->exists()) {
-            throw new \Exception('O identificador do servidor não foi informado');
+            throw new ValidationException(
+                ['id' => _t('servidor.id_cannot_empty')]
+            );
         }
         $result = DB::deleteFrom('Servidores')
             ->where('id', $this->getID())
@@ -330,8 +333,8 @@ class Servidor extends Model
 
     /**
      * Load one register for it self with a condition
-     * @param  array $condition Condition for searching the row
-     * @param  array $order associative field name -> [-1, 1]
+     * @param array $condition Condition for searching the row
+     * @param array $order associative field name -> [-1, 1]
      * @return self Self instance filled or empty
      */
     public function load($condition, $order = [])
@@ -365,7 +368,7 @@ class Servidor extends Model
 
     /**
      * Filter order array
-     * @param  mixed $order order string or array to parse and filter allowed
+     * @param mixed $order order string or array to parse and filter allowed
      * @return array allowed associative order
      */
     private static function filterOrder($order)
@@ -376,7 +379,7 @@ class Servidor extends Model
 
     /**
      * Filter condition array with allowed fields
-     * @param  array $condition condition to filter rows
+     * @param array $condition condition to filter rows
      * @return array allowed condition
      */
     private static function filterCondition($condition)
@@ -394,8 +397,8 @@ class Servidor extends Model
 
     /**
      * Fetch data from database with a condition
-     * @param  array $condition condition to filter rows
-     * @param  array $order order rows
+     * @param array $condition condition to filter rows
+     * @param array $order order rows
      * @return SelectQuery query object with condition statement
      */
     private static function query($condition = [], $order = [])
@@ -410,8 +413,8 @@ class Servidor extends Model
 
     /**
      * Search one register with a condition
-     * @param  array $condition Condition for searching the row
-     * @param  array $order order rows
+     * @param array $condition Condition for searching the row
+     * @param array $order order rows
      * @return self A filled Servidor or empty instance
      */
     public static function find($condition, $order = [])
@@ -421,8 +424,24 @@ class Servidor extends Model
     }
 
     /**
+     * Search one register with a condition
+     * @param array $condition Condition for searching the row
+     * @param array $order order rows
+     * @return self A filled Servidor or empty instance
+     * @throws \Exception when register has not found
+     */
+    public static function findOrFail($condition, $order = [])
+    {
+        $result = self::find($condition, $order);
+        if (!$result->exists()) {
+            throw new \Exception(_t('servidor.not_found'), 404);
+        }
+        return $result;
+    }
+
+    /**
      * Find this object on database using, GUID
-     * @param  string $guid identificador único to find Servidor
+     * @param string $guid identificador único to find Servidor
      * @return self A filled instance or empty when not found
      */
     public static function findByGUID($guid)
@@ -434,11 +453,11 @@ class Servidor extends Model
 
     /**
      * Find all Servidor
-     * @param  array  $condition Condition to get all Servidor
-     * @param  array  $order     Order Servidor
-     * @param  int    $limit     Limit data into row count
-     * @param  int    $offset    Start offset to get rows
-     * @return self[]             List of all rows instanced as Servidor
+     * @param array  $condition Condition to get all Servidor
+     * @param array  $order     Order Servidor
+     * @param int    $limit     Limit data into row count
+     * @param int    $offset    Start offset to get rows
+     * @return self[] List of all rows instanced as Servidor
      */
     public static function findAll($condition = [], $order = [], $limit = null, $offset = null)
     {
@@ -459,7 +478,7 @@ class Servidor extends Model
 
     /**
      * Count all rows from database with matched condition critery
-     * @param  array $condition condition to filter rows
+     * @param array $condition condition to filter rows
      * @return integer Quantity of rows
      */
     public static function count($condition = [])

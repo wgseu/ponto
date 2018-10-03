@@ -24,10 +24,12 @@
  */
 namespace MZ\System;
 
-use MZ\Database\SyncModel;
-use MZ\Database\DB;
+use MZ\Util\Mask;
 use MZ\Util\Filter;
 use MZ\Util\Validator;
+use MZ\Database\DB;
+use MZ\Database\SyncModel;
+use MZ\Exception\ValidationException;
 use MZ\Integrator\IFood;
 use MZ\Integrator\Kromax;
 
@@ -85,7 +87,7 @@ class Integracao extends SyncModel
 
     /**
      * Identificador da integração
-     * @return mixed ID of Integracao
+     * @return int id of Integração
      */
     public function getID()
     {
@@ -94,8 +96,8 @@ class Integracao extends SyncModel
 
     /**
      * Set ID value to new on param
-     * @param  mixed $id new value for ID
-     * @return Integracao Self instance
+     * @param int $id Set id for Integração
+     * @return self Self instance
      */
     public function setID($id)
     {
@@ -105,7 +107,7 @@ class Integracao extends SyncModel
 
     /**
      * Nome do módulo de integração
-     * @return mixed Nome of Integracao
+     * @return string nome of Integração
      */
     public function getNome()
     {
@@ -114,8 +116,8 @@ class Integracao extends SyncModel
 
     /**
      * Set Nome value to new on param
-     * @param  mixed $nome new value for Nome
-     * @return Integracao Self instance
+     * @param string $nome Set nome for Integração
+     * @return self Self instance
      */
     public function setNome($nome)
     {
@@ -125,7 +127,7 @@ class Integracao extends SyncModel
 
     /**
      * Nome da URL de acesso
-     * @return mixed URL of Integracao
+     * @return string url of Integração
      */
     public function getAcessoURL()
     {
@@ -134,8 +136,8 @@ class Integracao extends SyncModel
 
     /**
      * Set AcessoURL value to new on param
-     * @param  mixed $acesso_url new value for AcessoURL
-     * @return Integracao Self instance
+     * @param string $acesso_url Set url for Integração
+     * @return self Self instance
      */
     public function setAcessoURL($acesso_url)
     {
@@ -145,7 +147,7 @@ class Integracao extends SyncModel
 
     /**
      * Descrição do módulo integrador
-     * @return mixed Descrição of Integracao
+     * @return string descrição of Integração
      */
     public function getDescricao()
     {
@@ -154,8 +156,8 @@ class Integracao extends SyncModel
 
     /**
      * Set Descricao value to new on param
-     * @param  mixed $descricao new value for Descricao
-     * @return Integracao Self instance
+     * @param string $descricao Set descrição for Integração
+     * @return self Self instance
      */
     public function setDescricao($descricao)
     {
@@ -165,7 +167,7 @@ class Integracao extends SyncModel
 
     /**
      * Nome do ícone do módulo integrador
-     * @return mixed Ícone of Integracao
+     * @return string ícone of Integração
      */
     public function getIconeURL()
     {
@@ -174,8 +176,8 @@ class Integracao extends SyncModel
 
     /**
      * Set IconeURL value to new on param
-     * @param  mixed $icone_url new value for IconeURL
-     * @return Integracao Self instance
+     * @param string $icone_url Set ícone for Integração
+     * @return self Self instance
      */
     public function setIconeURL($icone_url)
     {
@@ -185,7 +187,7 @@ class Integracao extends SyncModel
 
     /**
      * Informa de o módulo de integração está habilitado
-     * @return mixed Habilitado of Integracao
+     * @return string habilitado of Integração
      */
     public function getAtivo()
     {
@@ -203,8 +205,8 @@ class Integracao extends SyncModel
 
     /**
      * Set Ativo value to new on param
-     * @param  mixed $ativo new value for Ativo
-     * @return Integracao Self instance
+     * @param string $ativo Set habilitado for Integração
+     * @return self Self instance
      */
     public function setAtivo($ativo)
     {
@@ -214,7 +216,7 @@ class Integracao extends SyncModel
 
     /**
      * Token de acesso à API de sincronização
-     * @return mixed Token of Integracao
+     * @return string token of Integração
      */
     public function getToken()
     {
@@ -223,8 +225,8 @@ class Integracao extends SyncModel
 
     /**
      * Set Token value to new on param
-     * @param  mixed $token new value for Token
-     * @return Integracao Self instance
+     * @param string $token Set token for Integração
+     * @return self Self instance
      */
     public function setToken($token)
     {
@@ -234,7 +236,7 @@ class Integracao extends SyncModel
 
     /**
      * Chave secreta para acesso à API
-     * @return mixed Chave secreta of Integracao
+     * @return string chave secreta of Integração
      */
     public function getSecret()
     {
@@ -243,8 +245,8 @@ class Integracao extends SyncModel
 
     /**
      * Set Secret value to new on param
-     * @param  mixed $secret new value for Secret
-     * @return Integracao Self instance
+     * @param string $secret Set chave secreta for Integração
+     * @return self Self instance
      */
     public function setSecret($secret)
     {
@@ -254,7 +256,7 @@ class Integracao extends SyncModel
 
     /**
      * Data de atualização dos dados do módulo de integração
-     * @return mixed Data de atualização of Integracao
+     * @return string data de atualização of Integração
      */
     public function getDataAtualizacao()
     {
@@ -263,8 +265,8 @@ class Integracao extends SyncModel
 
     /**
      * Set DataAtualizacao value to new on param
-     * @param  mixed $data_atualizacao new value for DataAtualizacao
-     * @return Integracao Self instance
+     * @param string $data_atualizacao Set data de atualização for Integração
+     * @return self Self instance
      */
     public function setDataAtualizacao($data_atualizacao)
     {
@@ -274,7 +276,7 @@ class Integracao extends SyncModel
 
     /**
      * Convert this instance to array associated key -> value
-     * @param  boolean $recursive Allow rescursive conversion of fields
+     * @param boolean $recursive Allow rescursive conversion of fields
      * @return array All field and values into array format
      */
     public function toArray($recursive = false)
@@ -294,12 +296,12 @@ class Integracao extends SyncModel
 
     /**
      * Fill this instance with from array values, you can pass instance to
-     * @param  mixed $integracao Associated key -> value to assign into this instance
-     * @return Integracao Self instance
+     * @param mixed $integracao Associated key -> value to assign into this instance
+     * @return self Self instance
      */
     public function fromArray($integracao = [])
     {
-        if ($integracao instanceof Integracao) {
+        if ($integracao instanceof self) {
             $integracao = $integracao->toArray();
         } elseif (!is_array($integracao)) {
             $integracao = [];
@@ -356,15 +358,16 @@ class Integracao extends SyncModel
     /**
      * Get relative ícone path or default ícone
      * @param boolean $default If true return default image, otherwise check field
+     * @param string  $default_name Default image name
      * @return string relative web path for integração ícone
      */
-    public function makeIconeURL($default = false)
+    public function makeIconeURL($default = false, $default_name = 'integracao.png')
     {
         $icone_url = $this->getIconeURL();
         if ($default) {
             $icone_url = null;
         }
-        return get_image_url($icone_url, 'integracao', 'integracao.png');
+        return get_image_url($icone_url, 'integracao', $default_name);
     }
 
     /**
@@ -407,34 +410,37 @@ class Integracao extends SyncModel
     public function publish()
     {
         $integracao = parent::publish();
-        $integracao['iconeurl'] = $this->makeIconeURL();
+        $integracao['iconeurl'] = $this->makeIconeURL(false, null);
         return $integracao;
     }
 
     /**
      * Filter fields, upload data and keep key data
-     * @param Integracao $original Original instance without modifications
+     * @param self $original Original instance without modifications
+     * @param boolean $localized Informs if fields are localized
+     * @return self Self instance
      */
     public function filter($original, $localized = false)
     {
         $this->setID($original->getID());
-        $this->setNome($original->getNome());
-        $this->setAcessoURL($original->getAcessoURL());
-        $this->setDescricao($original->getDescricao());
+        $this->setNome(Filter::string($original->getNome()));
+        $this->setAcessoURL(Filter::string($original->getAcessoURL()));
+        $this->setDescricao(Filter::string($original->getDescricao()));
         $this->setIconeURL($original->getIconeURL());
         $this->setToken(Filter::string($this->getToken()));
         $this->setSecret(Filter::string($this->getSecret()));
         $this->setDataAtualizacao(DB::now());
+        return $this;
     }
 
     /**
      * Clean instance resources like images and docs
-     * @param  Integracao $dependency Don't clean when dependency use same resources
+     * @param self $dependency Don't clean when dependency use same resources
      */
     public function clean($dependency)
     {
         if (!is_null($this->getIconeURL()) && $dependency->getIconeURL() != $this->getIconeURL()) {
-            unlink(get_image_path($this->getIconeURL(), 'integracao'));
+            @unlink(get_image_path($this->getIconeURL(), 'integracao'));
         }
         $this->setIconeURL($dependency->getIconeURL());
     }
@@ -442,48 +448,47 @@ class Integracao extends SyncModel
     /**
      * Validate fields updating them and throw exception when invalid data has found
      * @return array All field of Integracao in array format
+     * @throws \MZ\Exception\ValidationException for invalid input data
      */
     public function validate()
     {
         $errors = [];
         if (is_null($this->getNome())) {
-            $errors['nome'] = 'O Nome não pode ser vazio';
+            $errors['nome'] = _t('integracao.nome_cannot_empty');
         }
         if (is_null($this->getAcessoURL())) {
-            $errors['acessourl'] = 'A URL não pode ser vazia';
+            $errors['acessourl'] = _t('integracao.acesso_url_cannot_empty');
         }
-        if (is_null($this->getAtivo())) {
-            $errors['ativo'] = 'O Habilitado não pode ser vazio';
+        if (!Validator::checkBoolean($this->getAtivo())) {
+            $errors['ativo'] = _t('integracao.ativo_invalid');
         }
-        if (is_null($this->getDataAtualizacao())) {
-            $errors['dataatualizacao'] = 'A Data de atualização não pode ser vazia';
-        }
+        $this->setDataAtualizacao(DB::now());
         if (!empty($errors)) {
-            throw new \MZ\Exception\ValidationException($errors);
+            throw new ValidationException($errors);
         }
         return $this->toArray();
     }
 
     /**
      * Translate SQL exception into application exception
-     * @param  \Exception $e exception to translate into a readable error
+     * @param \Exception $e exception to translate into a readable error
      * @return \MZ\Exception\ValidationException new exception translated
      */
     protected function translate($e)
     {
         if (contains(['Nome', 'UNIQUE'], $e->getMessage())) {
-            return new \MZ\Exception\ValidationException([
-                'nome' => vsprintf(
-                    'O Nome "%s" já está cadastrado',
-                    [$this->getNome()]
+            return new ValidationException([
+                'nome' => _t(
+                    'integracao.nome_used',
+                    $this->getNome()
                 ),
             ]);
         }
         if (contains(['AcessoURL', 'UNIQUE'], $e->getMessage())) {
-            return new \MZ\Exception\ValidationException([
-                'acessourl' => vsprintf(
-                    'A URL "%s" já está cadastrada',
-                    [$this->getAcessoURL()]
+            return new ValidationException([
+                'acessourl' => _t(
+                    'integracao.acesso_url_used',
+                    $this->getAcessoURL()
                 ),
             ]);
         }
@@ -492,7 +497,8 @@ class Integracao extends SyncModel
 
     /**
      * Insert a new Integração into the database and fill instance from database
-     * @return Integracao Self instance
+     * @return self Self instance
+     * @throws \MZ\Exception\ValidationException for invalid input data
      */
     public function insert()
     {
@@ -511,36 +517,42 @@ class Integracao extends SyncModel
 
     /**
      * Update Integração with instance values into database for ID
-     * @param  array $only Save these fields only, when empty save all fields except id
-     * @return Integracao Self instance
+     * @param array $only Save these fields only, when empty save all fields except id
+     * @return int rows affected
+     * @throws \MZ\Exception\ValidationException for invalid input data
      */
     public function update($only = [])
     {
         $values = $this->validate();
         if (!$this->exists()) {
-            throw new \Exception('O identificador da integração não foi informado');
+            throw new ValidationException(
+                ['id' => _t('integracao.id_cannot_empty')]
+            );
         }
         $values = DB::filterValues($values, $only, false);
         try {
-            DB::update('Integracoes')
+            $affected = DB::update('Integracoes')
                 ->set($values)
-                ->where('id', $this->getID())
+                ->where(['id' => $this->getID()])
                 ->execute();
             $this->loadByID();
         } catch (\Exception $e) {
             throw $this->translate($e);
         }
-        return $this;
+        return $affected;
     }
 
     /**
      * Delete this instance from database using ID
      * @return integer Number of rows deleted (Max 1)
+     * @throws \MZ\Exception\ValidationException for invalid id
      */
     public function delete()
     {
         if (!$this->exists()) {
-            throw new \Exception('O identificador da integração não foi informado');
+            throw new ValidationException(
+                ['id' => _t('integracao.id_cannot_empty')]
+            );
         }
         $result = DB::deleteFrom('Integracoes')
             ->where('id', $this->getID())
@@ -585,9 +597,9 @@ class Integracao extends SyncModel
 
     /**
      * Load one register for it self with a condition
-     * @param  array $condition Condition for searching the row
-     * @param  array $order associative field name -> [-1, 1]
-     * @return Integracao Self instance filled or empty
+     * @param array $condition Condition for searching the row
+     * @param array $order associative field name -> [-1, 1]
+     * @return self Self instance filled or empty
      */
     public function load($condition, $order = [])
     {
@@ -598,25 +610,23 @@ class Integracao extends SyncModel
 
     /**
      * Load into this object from database using, Nome
-     * @param  string $nome nome to find Integração
-     * @return Integracao Self filled instance or empty when not found
+     * @return self Self filled instance or empty when not found
      */
-    public function loadByNome($nome)
+    public function loadByNome()
     {
         return $this->load([
-            'nome' => strval($nome),
+            'nome' => strval($this->getNome()),
         ]);
     }
 
     /**
      * Load into this object from database using, AcessoURL
-     * @param  string $acesso_url url to find Integração
-     * @return Integracao Self filled instance or empty when not found
+     * @return self Self filled instance or empty when not found
      */
-    public function loadByAcessoURL($acesso_url)
+    public function loadByAcessoURL()
     {
         return $this->load([
-            'acessourl' => strval($acesso_url),
+            'acessourl' => strval($this->getAcessoURL()),
         ]);
     }
 
@@ -626,14 +636,14 @@ class Integracao extends SyncModel
      */
     private static function getAllowedKeys()
     {
-        $integracao = new Integracao();
+        $integracao = new self();
         $allowed = Filter::concatKeys('i.', $integracao->toArray());
         return $allowed;
     }
 
     /**
      * Filter order array
-     * @param  mixed $order order string or array to parse and filter allowed
+     * @param mixed $order order string or array to parse and filter allowed
      * @return array allowed associative order
      */
     private static function filterOrder($order)
@@ -644,7 +654,7 @@ class Integracao extends SyncModel
 
     /**
      * Filter condition array with allowed fields
-     * @param  array $condition condition to filter rows
+     * @param array $condition condition to filter rows
      * @return array allowed condition
      */
     private static function filterCondition($condition)
@@ -662,8 +672,8 @@ class Integracao extends SyncModel
 
     /**
      * Fetch data from database with a condition
-     * @param  array $condition condition to filter rows
-     * @param  array $order order rows
+     * @param array $condition condition to filter rows
+     * @param array $order order rows
      * @return SelectQuery query object with condition statement
      */
     private static function query($condition = [], $order = [])
@@ -678,45 +688,63 @@ class Integracao extends SyncModel
 
     /**
      * Search one register with a condition
-     * @param  array $condition Condition for searching the row
-     * @param  array $order order rows
-     * @return Integracao A filled Integração or empty instance
+     * @param array $condition Condition for searching the row
+     * @param array $order order rows
+     * @return self A filled Integração or empty instance
      */
     public static function find($condition, $order = [])
     {
-        $query = self::query($condition, $order)->limit(1);
-        $row = $query->fetch() ?: [];
-        return new Integracao($row);
+        $result = new self();
+        return $result->load($condition, $order);
+    }
+
+    /**
+     * Search one register with a condition
+     * @param array $condition Condition for searching the row
+     * @param array $order order rows
+     * @return self A filled Integração or empty instance
+     * @throws \Exception when register has not found
+     */
+    public static function findOrFail($condition, $order = [])
+    {
+        $result = self::find($condition, $order);
+        if (!$result->exists()) {
+            throw new \Exception(_t('integracao.not_found'), 404);
+        }
+        return $result;
     }
 
     /**
      * Find this object on database using, Nome
-     * @param  string $nome nome to find Integração
-     * @return Integracao A filled instance or empty when not found
+     * @param string $nome nome to find Integração
+     * @return self A filled instance or empty when not found
      */
     public static function findByNome($nome)
     {
         $result = new self();
-        return $result->loadByNome($nome);
+        $result->setNome($nome);
+        return $result->loadByNome();
     }
 
     /**
      * Find this object on database using, AcessoURL
-     * @param  string $acesso_url url to find Integração
-     * @return Integracao A filled instance or empty when not found
+     * @param string $acesso_url url to find Integração
+     * @return self A filled instance or empty when not found
      */
     public static function findByAcessoURL($acesso_url)
     {
         $result = new self();
-        return $result->loadByAcessoURL($acesso_url);
+        $result->setAcessoURL($acesso_url);
+        return $result->loadByAcessoURL();
     }
 
     /**
-     * Fetch all rows from database with matched condition critery
-     * @param  array $condition condition to filter rows
-     * @param  integer $limit number of rows to get, null for all
-     * @param  integer $offset start index to get rows, null for begining
-     * @return array All rows instanced and filled
+     * Find all Integração
+     * @param array  $condition Condition to get all Integração
+     * @param array  $order     Order Integração
+     * @param int    $limit     Limit data into row count
+     * @param int    $offset    Start offset to get rows
+     * @return self[] List of all rows instanced as Integracao
      */
     public static function findAll($condition = [], $order = [], $limit = null, $offset = null)
     {
@@ -730,14 +758,14 @@ class Integracao extends SyncModel
         $rows = $query->fetchAll();
         $result = [];
         foreach ($rows as $row) {
-            $result[] = new Integracao($row);
+            $result[] = new self($row);
         }
         return $result;
     }
 
     /**
      * Count all rows from database with matched condition critery
-     * @param  array $condition condition to filter rows
+     * @param array $condition condition to filter rows
      * @return integer Quantity of rows
      */
     public static function count($condition = [])

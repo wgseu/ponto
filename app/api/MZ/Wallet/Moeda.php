@@ -91,7 +91,7 @@ class Moeda extends SyncModel
 
     /**
      * Identificador da moeda
-     * @return mixed ID of Moeda
+     * @return int id of Moeda
      */
     public function getID()
     {
@@ -100,7 +100,7 @@ class Moeda extends SyncModel
 
     /**
      * Set ID value to new on param
-     * @param  mixed $id new value for ID
+     * @param int $id Set id for Moeda
      * @return self Self instance
      */
     public function setID($id)
@@ -111,7 +111,7 @@ class Moeda extends SyncModel
 
     /**
      * Nome da moeda
-     * @return mixed Nome of Moeda
+     * @return string nome of Moeda
      */
     public function getNome()
     {
@@ -120,7 +120,7 @@ class Moeda extends SyncModel
 
     /**
      * Set Nome value to new on param
-     * @param  mixed $nome new value for Nome
+     * @param string $nome Set nome for Moeda
      * @return self Self instance
      */
     public function setNome($nome)
@@ -131,7 +131,7 @@ class Moeda extends SyncModel
 
     /**
      * Símbolo da moeda, Ex.: R$, $
-     * @return mixed Símbolo of Moeda
+     * @return string símbolo of Moeda
      */
     public function getSimbolo()
     {
@@ -140,7 +140,7 @@ class Moeda extends SyncModel
 
     /**
      * Set Simbolo value to new on param
-     * @param  mixed $simbolo new value for Simbolo
+     * @param string $simbolo Set símbolo for Moeda
      * @return self Self instance
      */
     public function setSimbolo($simbolo)
@@ -151,7 +151,7 @@ class Moeda extends SyncModel
 
     /**
      * Código internacional da moeda, Ex.: USD, BRL
-     * @return mixed Código of Moeda
+     * @return string código of Moeda
      */
     public function getCodigo()
     {
@@ -160,7 +160,7 @@ class Moeda extends SyncModel
 
     /**
      * Set Codigo value to new on param
-     * @param  mixed $codigo new value for Codigo
+     * @param string $codigo Set código for Moeda
      * @return self Self instance
      */
     public function setCodigo($codigo)
@@ -172,7 +172,7 @@ class Moeda extends SyncModel
     /**
      * Informa o número fracionário para determinar a quantidade de casas
      * decimais, Ex: 100 para 0,00. 10 para 0,0
-     * @return mixed Divisão of Moeda
+     * @return int divisão of Moeda
      */
     public function getDivisao()
     {
@@ -181,7 +181,7 @@ class Moeda extends SyncModel
 
     /**
      * Set Divisao value to new on param
-     * @param  mixed $divisao new value for Divisao
+     * @param int $divisao Set divisão for Moeda
      * @return self Self instance
      */
     public function setDivisao($divisao)
@@ -192,7 +192,7 @@ class Moeda extends SyncModel
 
     /**
      * Informa o nome da fração, Ex.: Centavo
-     * @return mixed Nome da fração of Moeda
+     * @return string nome da fração of Moeda
      */
     public function getFracao()
     {
@@ -201,7 +201,7 @@ class Moeda extends SyncModel
 
     /**
      * Set Fracao value to new on param
-     * @param  mixed $fracao new value for Fracao
+     * @param string $fracao Set nome da fração for Moeda
      * @return self Self instance
      */
     public function setFracao($fracao)
@@ -212,7 +212,7 @@ class Moeda extends SyncModel
 
     /**
      * Formado de exibição do valor, Ex: $ %s, para $ 3,00
-     * @return mixed Formato of Moeda
+     * @return string formato of Moeda
      */
     public function getFormato()
     {
@@ -221,7 +221,7 @@ class Moeda extends SyncModel
 
     /**
      * Set Formato value to new on param
-     * @param  mixed $formato new value for Formato
+     * @param string $formato Set formato for Moeda
      * @return self Self instance
      */
     public function setFormato($formato)
@@ -232,7 +232,7 @@ class Moeda extends SyncModel
 
     /**
      * Multiplicador para conversão para a moeda principal
-     * @return mixed Conversão of Moeda
+     * @return float conversão of Moeda
      */
     public function getConversao()
     {
@@ -241,7 +241,7 @@ class Moeda extends SyncModel
 
     /**
      * Set Conversao value to new on param
-     * @param  mixed $conversao new value for Conversao
+     * @param float $conversao Set conversão for Moeda
      * @return self Self instance
      */
     public function setConversao($conversao)
@@ -252,7 +252,7 @@ class Moeda extends SyncModel
 
     /**
      * Data da última atualização do fator de conversão
-     * @return mixed Data de atualização of Moeda
+     * @return string data de atualização of Moeda
      */
     public function getDataAtualizacao()
     {
@@ -261,7 +261,7 @@ class Moeda extends SyncModel
 
     /**
      * Set DataAtualizacao value to new on param
-     * @param  mixed $data_atualizacao new value for DataAtualizacao
+     * @param string $data_atualizacao Set data de atualização for Moeda
      * @return self Self instance
      */
     public function setDataAtualizacao($data_atualizacao)
@@ -273,7 +273,7 @@ class Moeda extends SyncModel
     /**
      * Informa se a moeda é recebida pela empresa, a moeda do país mesmo
      * desativada sempre é aceita
-     * @return mixed Ativa of Moeda
+     * @return string ativa of Moeda
      */
     public function getAtiva()
     {
@@ -292,7 +292,7 @@ class Moeda extends SyncModel
 
     /**
      * Set Ativa value to new on param
-     * @param  mixed $ativa new value for Ativa
+     * @param string $ativa Set ativa for Moeda
      * @return self Self instance
      */
     public function setAtiva($ativa)
@@ -303,7 +303,7 @@ class Moeda extends SyncModel
 
     /**
      * Convert this instance to array associated key -> value
-     * @param  boolean $recursive Allow rescursive conversion of fields
+     * @param boolean $recursive Allow rescursive conversion of fields
      * @return array All field and values into array format
      */
     public function toArray($recursive = false)
@@ -324,7 +324,7 @@ class Moeda extends SyncModel
 
     /**
      * Fill this instance with from array values, you can pass instance to
-     * @param  mixed $moeda Associated key -> value to assign into this instance
+     * @param mixed $moeda Associated key -> value to assign into this instance
      * @return self Self instance
      */
     public function fromArray($moeda = [])
@@ -401,6 +401,8 @@ class Moeda extends SyncModel
     /**
      * Filter fields, upload data and keep key data
      * @param self $original Original instance without modifications
+     * @param boolean $localized Informs if fields are localized
+     * @return self Self instance
      */
     public function filter($original, $localized = false)
     {
@@ -413,11 +415,12 @@ class Moeda extends SyncModel
         $this->setFormato(Filter::string($this->getFormato()));
         $this->setConversao(Filter::float($this->getConversao(), $localized));
         $this->setDataAtualizacao(Filter::datetime($this->getDataAtualizacao()));
+        return $this;
     }
 
     /**
      * Clean instance resources like images and docs
-     * @param  self $dependency Don't clean when dependency use same resources
+     * @param self $dependency Don't clean when dependency use same resources
      */
     public function clean($dependency)
     {
@@ -425,28 +428,29 @@ class Moeda extends SyncModel
 
     /**
      * Validate fields updating them and throw exception when invalid data has found
-     * @return self[] All field of Moeda in array format
+     * @return array All field of Moeda in array format
+     * @throws \MZ\Exception\ValidationException for invalid input data
      */
     public function validate()
     {
         $errors = [];
         if (is_null($this->getNome())) {
-            $errors['nome'] = 'O nome não pode ser vazio';
+            $errors['nome'] = _t('moeda.nome_cannot_empty');
         }
         if (is_null($this->getSimbolo())) {
-            $errors['simbolo'] = 'O símbolo não pode ser vazio';
+            $errors['simbolo'] = _t('moeda.simbolo_cannot_empty');
         }
         if (is_null($this->getCodigo())) {
-            $errors['codigo'] = 'O código não pode ser vazio';
+            $errors['codigo'] = _t('moeda.codigo_cannot_empty');
         }
         if (is_null($this->getDivisao())) {
-            $errors['divisao'] = 'A divisão não pode ser vazia';
+            $errors['divisao'] = _t('moeda.divisao_cannot_empty');
         }
         if (is_null($this->getFormato())) {
-            $errors['formato'] = 'O formato não pode ser vazio';
+            $errors['formato'] = _t('moeda.formato_cannot_empty');
         }
         if (!Validator::checkBoolean($this->getAtiva())) {
-            $errors['ativa'] = 'A ativa é inválida';
+            $errors['ativa'] = _t('moeda.ativa_invalid');
         }
         if (!empty($errors)) {
             throw new ValidationException($errors);
@@ -455,26 +459,9 @@ class Moeda extends SyncModel
     }
 
     /**
-     * Translate SQL exception into application exception
-     * @param  \Exception $e exception to translate into a readable error
-     * @return \MZ\Exception\ValidationException new exception translated
-     */
-    protected function translate($e)
-    {
-        if (contains(['ID', 'UNIQUE'], $e->getMessage())) {
-            return new ValidationException([
-                'id' => sprintf(
-                    'O id "%s" já está cadastrado',
-                    $this->getID()
-                ),
-            ]);
-        }
-        return parent::translate($e);
-    }
-
-    /**
      * Insert a new Moeda into the database and fill instance from database
      * @return self Self instance
+     * @throws \MZ\Exception\ValidationException for invalid input data
      */
     public function insert()
     {
@@ -493,14 +480,17 @@ class Moeda extends SyncModel
 
     /**
      * Update Moeda with instance values into database for ID
-     * @param  array $only Save these fields only, when empty save all fields except id
+     * @param array $only Save these fields only, when empty save all fields except id
      * @return int rows affected
+     * @throws \MZ\Exception\ValidationException for invalid input data
      */
     public function update($only = [])
     {
         $values = $this->validate();
         if (!$this->exists()) {
-            throw new \Exception('O identificador da moeda não foi informado');
+            throw new ValidationException(
+                ['id' => _t('moeda.id_cannot_empty')]
+            );
         }
         $values = DB::filterValues($values, $only, false);
         try {
@@ -518,11 +508,14 @@ class Moeda extends SyncModel
     /**
      * Delete this instance from database using ID
      * @return integer Number of rows deleted (Max 1)
+     * @throws \MZ\Exception\ValidationException for invalid id
      */
     public function delete()
     {
         if (!$this->exists()) {
-            throw new \Exception('O identificador da moeda não foi informado');
+            throw new ValidationException(
+                ['id' => _t('moeda.id_cannot_empty')]
+            );
         }
         $result = DB::deleteFrom('Moedas')
             ->where('id', $this->getID())
@@ -532,8 +525,8 @@ class Moeda extends SyncModel
 
     /**
      * Load one register for it self with a condition
-     * @param  array $condition Condition for searching the row
-     * @param  array $order associative field name -> [-1, 1]
+     * @param array $condition Condition for searching the row
+     * @param array $order associative field name -> [-1, 1]
      * @return self Self instance filled or empty
      */
     public function load($condition, $order = [])
@@ -556,7 +549,7 @@ class Moeda extends SyncModel
 
     /**
      * Filter order array
-     * @param  mixed $order order string or array to parse and filter allowed
+     * @param mixed $order order string or array to parse and filter allowed
      * @return array allowed associative order
      */
     private static function filterOrder($order)
@@ -567,7 +560,7 @@ class Moeda extends SyncModel
 
     /**
      * Filter condition array with allowed fields
-     * @param  array $condition condition to filter rows
+     * @param array $condition condition to filter rows
      * @return array allowed condition
      */
     private static function filterCondition($condition)
@@ -585,8 +578,8 @@ class Moeda extends SyncModel
 
     /**
      * Fetch data from database with a condition
-     * @param  array $condition condition to filter rows
-     * @param  array $order order rows
+     * @param array $condition condition to filter rows
+     * @param array $order order rows
      * @return SelectQuery query object with condition statement
      */
     private static function query($condition = [], $order = [])
@@ -601,8 +594,8 @@ class Moeda extends SyncModel
 
     /**
      * Search one register with a condition
-     * @param  array $condition Condition for searching the row
-     * @param  array $order order rows
+     * @param array $condition Condition for searching the row
+     * @param array $order order rows
      * @return self A filled Moeda or empty instance
      */
     public static function find($condition, $order = [])
@@ -612,12 +605,28 @@ class Moeda extends SyncModel
     }
 
     /**
+     * Search one register with a condition
+     * @param array $condition Condition for searching the row
+     * @param array $order order rows
+     * @return self A filled Moeda or empty instance
+     * @throws \Exception when register has not found
+     */
+    public static function findOrFail($condition, $order = [])
+    {
+        $result = self::find($condition, $order);
+        if (!$result->exists()) {
+            throw new \Exception(_t('moeda.not_found'), 404);
+        }
+        return $result;
+    }
+
+    /**
      * Find all Moeda
-     * @param  array  $condition Condition to get all Moeda
-     * @param  array  $order     Order Moeda
-     * @param  int    $limit     Limit data into row count
-     * @param  int    $offset    Start offset to get rows
-     * @return self[]             List of all rows instanced as Moeda
+     * @param array  $condition Condition to get all Moeda
+     * @param array  $order     Order Moeda
+     * @param int    $limit     Limit data into row count
+     * @param int    $offset    Start offset to get rows
+     * @return self[] List of all rows instanced as Moeda
      */
     public static function findAll($condition = [], $order = [], $limit = null, $offset = null)
     {
@@ -638,7 +647,7 @@ class Moeda extends SyncModel
 
     /**
      * Count all rows from database with matched condition critery
-     * @param  array $condition condition to filter rows
+     * @param array $condition condition to filter rows
      * @return integer Quantity of rows
      */
     public static function count($condition = [])

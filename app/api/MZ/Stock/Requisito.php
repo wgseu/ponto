@@ -24,10 +24,12 @@
  */
 namespace MZ\Stock;
 
-use MZ\Database\SyncModel;
-use MZ\Database\DB;
+use MZ\Util\Mask;
 use MZ\Util\Filter;
 use MZ\Util\Validator;
+use MZ\Database\DB;
+use MZ\Database\SyncModel;
+use MZ\Exception\ValidationException;
 
 /**
  * Informa os produtos da lista de compras
@@ -92,7 +94,7 @@ class Requisito extends SyncModel
 
     /**
      * Identificador do produto da lista
-     * @return mixed ID of Requisito
+     * @return int id of Produtos da lista
      */
     public function getID()
     {
@@ -101,8 +103,8 @@ class Requisito extends SyncModel
 
     /**
      * Set ID value to new on param
-     * @param  mixed $id new value for ID
-     * @return Requisito Self instance
+     * @param int $id Set id for Produtos da lista
+     * @return self Self instance
      */
     public function setID($id)
     {
@@ -112,7 +114,7 @@ class Requisito extends SyncModel
 
     /**
      * Lista de compra desse produto
-     * @return mixed Lista de compra of Requisito
+     * @return int lista de compra of Produtos da lista
      */
     public function getListaID()
     {
@@ -121,8 +123,8 @@ class Requisito extends SyncModel
 
     /**
      * Set ListaID value to new on param
-     * @param  mixed $lista_id new value for ListaID
-     * @return Requisito Self instance
+     * @param int $lista_id Set lista de compra for Produtos da lista
+     * @return self Self instance
      */
     public function setListaID($lista_id)
     {
@@ -132,7 +134,7 @@ class Requisito extends SyncModel
 
     /**
      * Produto que deve ser comprado
-     * @return mixed Produto of Requisito
+     * @return int produto of Produtos da lista
      */
     public function getProdutoID()
     {
@@ -141,8 +143,8 @@ class Requisito extends SyncModel
 
     /**
      * Set ProdutoID value to new on param
-     * @param  mixed $produto_id new value for ProdutoID
-     * @return Requisito Self instance
+     * @param int $produto_id Set produto for Produtos da lista
+     * @return self Self instance
      */
     public function setProdutoID($produto_id)
     {
@@ -152,7 +154,7 @@ class Requisito extends SyncModel
 
     /**
      * Informa em qual fornecedor foi realizado a compra desse produto
-     * @return mixed Compra of Requisito
+     * @return int compra of Produtos da lista
      */
     public function getCompraID()
     {
@@ -161,8 +163,8 @@ class Requisito extends SyncModel
 
     /**
      * Set CompraID value to new on param
-     * @param  mixed $compra_id new value for CompraID
-     * @return Requisito Self instance
+     * @param int $compra_id Set compra for Produtos da lista
+     * @return self Self instance
      */
     public function setCompraID($compra_id)
     {
@@ -173,7 +175,7 @@ class Requisito extends SyncModel
     /**
      * Fornecedor em que deve ser consultado ou realizado as compras dos
      * produtos, pode ser alterado no momento da compra
-     * @return mixed Fornecedor of Requisito
+     * @return int fornecedor of Produtos da lista
      */
     public function getFornecedorID()
     {
@@ -182,8 +184,8 @@ class Requisito extends SyncModel
 
     /**
      * Set FornecedorID value to new on param
-     * @param  mixed $fornecedor_id new value for FornecedorID
-     * @return Requisito Self instance
+     * @param int $fornecedor_id Set fornecedor for Produtos da lista
+     * @return self Self instance
      */
     public function setFornecedorID($fornecedor_id)
     {
@@ -193,7 +195,7 @@ class Requisito extends SyncModel
 
     /**
      * Quantidade de produtos que deve ser comprado
-     * @return mixed Quantidade of Requisito
+     * @return float quantidade of Produtos da lista
      */
     public function getQuantidade()
     {
@@ -202,8 +204,8 @@ class Requisito extends SyncModel
 
     /**
      * Set Quantidade value to new on param
-     * @param  mixed $quantidade new value for Quantidade
-     * @return Requisito Self instance
+     * @param float $quantidade Set quantidade for Produtos da lista
+     * @return self Self instance
      */
     public function setQuantidade($quantidade)
     {
@@ -213,7 +215,7 @@ class Requisito extends SyncModel
 
     /**
      * Informa quantos produtos já foram comprados
-     * @return mixed Comprado of Requisito
+     * @return float comprado of Produtos da lista
      */
     public function getComprado()
     {
@@ -222,8 +224,8 @@ class Requisito extends SyncModel
 
     /**
      * Set Comprado value to new on param
-     * @param  mixed $comprado new value for Comprado
-     * @return Requisito Self instance
+     * @param float $comprado Set comprado for Produtos da lista
+     * @return self Self instance
      */
     public function setComprado($comprado)
     {
@@ -233,7 +235,7 @@ class Requisito extends SyncModel
 
     /**
      * Preço máximo que deve ser pago na compra desse produto
-     * @return mixed Preço máximo of Requisito
+     * @return string preço máximo of Produtos da lista
      */
     public function getPrecoMaximo()
     {
@@ -242,8 +244,8 @@ class Requisito extends SyncModel
 
     /**
      * Set PrecoMaximo value to new on param
-     * @param  mixed $preco_maximo new value for PrecoMaximo
-     * @return Requisito Self instance
+     * @param string $preco_maximo Set preço máximo for Produtos da lista
+     * @return self Self instance
      */
     public function setPrecoMaximo($preco_maximo)
     {
@@ -253,7 +255,7 @@ class Requisito extends SyncModel
 
     /**
      * Preço em que o produto foi comprado da última vez ou o novo preço
-     * @return mixed Preço of Requisito
+     * @return string preço of Produtos da lista
      */
     public function getPreco()
     {
@@ -262,8 +264,8 @@ class Requisito extends SyncModel
 
     /**
      * Set Preco value to new on param
-     * @param  mixed $preco new value for Preco
-     * @return Requisito Self instance
+     * @param string $preco Set preço for Produtos da lista
+     * @return self Self instance
      */
     public function setPreco($preco)
     {
@@ -273,7 +275,7 @@ class Requisito extends SyncModel
 
     /**
      * Detalhes na compra desse produto
-     * @return mixed Observações of Requisito
+     * @return string observações of Produtos da lista
      */
     public function getObservacoes()
     {
@@ -282,8 +284,8 @@ class Requisito extends SyncModel
 
     /**
      * Set Observacoes value to new on param
-     * @param  mixed $observacoes new value for Observacoes
-     * @return Requisito Self instance
+     * @param string $observacoes Set observações for Produtos da lista
+     * @return self Self instance
      */
     public function setObservacoes($observacoes)
     {
@@ -293,7 +295,7 @@ class Requisito extends SyncModel
 
     /**
      * Informa o momento do recolhimento da mercadoria na pratileira
-     * @return mixed Data de recolhimento of Requisito
+     * @return string data de recolhimento of Produtos da lista
      */
     public function getDataRecolhimento()
     {
@@ -302,8 +304,8 @@ class Requisito extends SyncModel
 
     /**
      * Set DataRecolhimento value to new on param
-     * @param  mixed $data_recolhimento new value for DataRecolhimento
-     * @return Requisito Self instance
+     * @param string $data_recolhimento Set data de recolhimento for Produtos da lista
+     * @return self Self instance
      */
     public function setDataRecolhimento($data_recolhimento)
     {
@@ -313,7 +315,7 @@ class Requisito extends SyncModel
 
     /**
      * Convert this instance to array associated key -> value
-     * @param  boolean $recursive Allow rescursive conversion of fields
+     * @param boolean $recursive Allow rescursive conversion of fields
      * @return array All field and values into array format
      */
     public function toArray($recursive = false)
@@ -335,12 +337,12 @@ class Requisito extends SyncModel
 
     /**
      * Fill this instance with from array values, you can pass instance to
-     * @param  mixed $requisito Associated key -> value to assign into this instance
-     * @return Requisito Self instance
+     * @param mixed $requisito Associated key -> value to assign into this instance
+     * @return self Self instance
      */
     public function fromArray($requisito = [])
     {
-        if ($requisito instanceof Requisito) {
+        if ($requisito instanceof self) {
             $requisito = $requisito->toArray();
         } elseif (!is_array($requisito)) {
             $requisito = [];
@@ -416,7 +418,9 @@ class Requisito extends SyncModel
 
     /**
      * Filter fields, upload data and keep key data
-     * @param Requisito $original Original instance without modifications
+     * @param self $original Original instance without modifications
+     * @param boolean $localized Informs if fields are localized
+     * @return self Self instance
      */
     public function filter($original, $localized = false)
     {
@@ -431,11 +435,12 @@ class Requisito extends SyncModel
         $this->setPreco(Filter::money($this->getPreco(), $localized));
         $this->setObservacoes(Filter::string($this->getObservacoes()));
         $this->setDataRecolhimento(Filter::datetime($this->getDataRecolhimento()));
+        return $this;
     }
 
     /**
      * Clean instance resources like images and docs
-     * @param  Requisito $dependency Don't clean when dependency use same resources
+     * @param self $dependency Don't clean when dependency use same resources
      */
     public function clean($dependency)
     {
@@ -444,47 +449,39 @@ class Requisito extends SyncModel
     /**
      * Validate fields updating them and throw exception when invalid data has found
      * @return array All field of Requisito in array format
+     * @throws \MZ\Exception\ValidationException for invalid input data
      */
     public function validate()
     {
         $errors = [];
         if (is_null($this->getListaID())) {
-            $errors['listaid'] = 'A lista de compra não pode ser vazia';
+            $errors['listaid'] = _t('requisito.lista_id_cannot_empty');
         }
         if (is_null($this->getProdutoID())) {
-            $errors['produtoid'] = 'O produto não pode ser vazio';
+            $errors['produtoid'] = _t('requisito.produto_id_cannot_empty');
         }
         if (is_null($this->getQuantidade())) {
-            $errors['quantidade'] = 'A quantidade não pode ser vazia';
+            $errors['quantidade'] = _t('requisito.quantidade_cannot_empty');
         }
         if (is_null($this->getComprado())) {
-            $errors['comprado'] = 'O comprado não pode ser vazio';
+            $errors['comprado'] = _t('requisito.comprado_cannot_empty');
         }
         if (is_null($this->getPrecoMaximo())) {
-            $errors['precomaximo'] = 'O preço máximo não pode ser vazio';
+            $errors['precomaximo'] = _t('requisito.preco_maximo_cannot_empty');
         }
         if (is_null($this->getPreco())) {
-            $errors['preco'] = 'O preço não pode ser vazio';
+            $errors['preco'] = _t('requisito.preco_cannot_empty');
         }
         if (!empty($errors)) {
-            throw new \MZ\Exception\ValidationException($errors);
+            throw new ValidationException($errors);
         }
         return $this->toArray();
     }
 
     /**
-     * Translate SQL exception into application exception
-     * @param  \Exception $e exception to translate into a readable error
-     * @return \MZ\Exception\ValidationException new exception translated
-     */
-    protected function translate($e)
-    {
-        return parent::translate($e);
-    }
-
-    /**
      * Insert a new Produtos da lista into the database and fill instance from database
-     * @return Requisito Self instance
+     * @return self Self instance
+     * @throws \MZ\Exception\ValidationException for invalid input data
      */
     public function insert()
     {
@@ -503,35 +500,42 @@ class Requisito extends SyncModel
 
     /**
      * Update Produtos da lista with instance values into database for ID
-     * @return Requisito Self instance
+     * @param array $only Save these fields only, when empty save all fields except id
+     * @return int rows affected
+     * @throws \MZ\Exception\ValidationException for invalid input data
      */
     public function update($only = [])
     {
         $values = $this->validate();
         if (!$this->exists()) {
-            throw new \Exception('O identificador do produtos da lista não foi informado');
+            throw new ValidationException(
+                ['id' => _t('requisito.id_cannot_empty')]
+            );
         }
         $values = DB::filterValues($values, $only, false);
         try {
-            DB::update('Requisitos')
+            $affected = DB::update('Requisitos')
                 ->set($values)
-                ->where('id', $this->getID())
+                ->where(['id' => $this->getID()])
                 ->execute();
             $this->loadByID();
         } catch (\Exception $e) {
             throw $this->translate($e);
         }
-        return $this;
+        return $affected;
     }
 
     /**
      * Delete this instance from database using ID
      * @return integer Number of rows deleted (Max 1)
+     * @throws \MZ\Exception\ValidationException for invalid id
      */
     public function delete()
     {
         if (!$this->exists()) {
-            throw new \Exception('O identificador do produtos da lista não foi informado');
+            throw new ValidationException(
+                ['id' => _t('requisito.id_cannot_empty')]
+            );
         }
         $result = DB::deleteFrom('Requisitos')
             ->where('id', $this->getID())
@@ -541,9 +545,9 @@ class Requisito extends SyncModel
 
     /**
      * Load one register for it self with a condition
-     * @param  array $condition Condition for searching the row
-     * @param  array $order associative field name -> [-1, 1]
-     * @return Requisito Self instance filled or empty
+     * @param array $condition Condition for searching the row
+     * @param array $order associative field name -> [-1, 1]
+     * @return self Self instance filled or empty
      */
     public function load($condition, $order = [])
     {
@@ -601,14 +605,14 @@ class Requisito extends SyncModel
      */
     private static function getAllowedKeys()
     {
-        $requisito = new Requisito();
+        $requisito = new self();
         $allowed = Filter::concatKeys('r.', $requisito->toArray());
         return $allowed;
     }
 
     /**
      * Filter order array
-     * @param  mixed $order order string or array to parse and filter allowed
+     * @param mixed $order order string or array to parse and filter allowed
      * @return array allowed associative order
      */
     private static function filterOrder($order)
@@ -619,7 +623,7 @@ class Requisito extends SyncModel
 
     /**
      * Filter condition array with allowed fields
-     * @param  array $condition condition to filter rows
+     * @param array $condition condition to filter rows
      * @return array allowed condition
      */
     private static function filterCondition($condition)
@@ -630,8 +634,8 @@ class Requisito extends SyncModel
 
     /**
      * Fetch data from database with a condition
-     * @param  array $condition condition to filter rows
-     * @param  array $order order rows
+     * @param array $condition condition to filter rows
+     * @param array $order order rows
      * @return SelectQuery query object with condition statement
      */
     private static function query($condition = [], $order = [])
@@ -645,24 +649,39 @@ class Requisito extends SyncModel
 
     /**
      * Search one register with a condition
-     * @param  array $condition Condition for searching the row
-     * @param  array $order order rows
-     * @return Requisito A filled Produtos da lista or empty instance
+     * @param array $condition Condition for searching the row
+     * @param array $order order rows
+     * @return self A filled Produtos da lista or empty instance
      */
     public static function find($condition, $order = [])
     {
-        $query = self::query($condition, $order)->limit(1);
-        $row = $query->fetch() ?: [];
-        return new Requisito($row);
+        $result = new self();
+        return $result->load($condition, $order);
+    }
+
+    /**
+     * Search one register with a condition
+     * @param array $condition Condition for searching the row
+     * @param array $order order rows
+     * @return self A filled Produtos da lista or empty instance
+     * @throws \Exception when register has not found
+     */
+    public static function findOrFail($condition, $order = [])
+    {
+        $result = self::find($condition, $order);
+        if (!$result->exists()) {
+            throw new \Exception(_t('requisito.not_found'), 404);
+        }
+        return $result;
     }
 
     /**
      * Find all Produtos da lista
-     * @param  array  $condition Condition to get all Produtos da lista
-     * @param  array  $order     Order Produtos da lista
-     * @param  int    $limit     Limit data into row count
-     * @param  int    $offset    Start offset to get rows
-     * @return array             List of all rows instanced as Requisito
+     * @param array  $condition Condition to get all Produtos da lista
+     * @param array  $order     Order Produtos da lista
+     * @param int    $limit     Limit data into row count
+     * @param int    $offset    Start offset to get rows
+     * @return self[] List of all rows instanced as Requisito
      */
     public static function findAll($condition = [], $order = [], $limit = null, $offset = null)
     {
@@ -676,14 +695,14 @@ class Requisito extends SyncModel
         $rows = $query->fetchAll();
         $result = [];
         foreach ($rows as $row) {
-            $result[] = new Requisito($row);
+            $result[] = new self($row);
         }
         return $result;
     }
 
     /**
      * Count all rows from database with matched condition critery
-     * @param  array $condition condition to filter rows
+     * @param array $condition condition to filter rows
      * @return integer Quantity of rows
      */
     public static function count($condition = [])

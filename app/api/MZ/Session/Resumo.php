@@ -24,10 +24,12 @@
  */
 namespace MZ\Session;
 
-use MZ\Database\SyncModel;
-use MZ\Database\DB;
+use MZ\Util\Mask;
 use MZ\Util\Filter;
 use MZ\Util\Validator;
+use MZ\Database\DB;
+use MZ\Database\SyncModel;
+use MZ\Exception\ValidationException;
 
 /**
  * Resumo de fechamento de caixa, informa o valor contado no fechamento do
@@ -78,7 +80,7 @@ class Resumo extends SyncModel
 
     /**
      * Identificador do resumo
-     * @return mixed ID of Resumo
+     * @return int id of Resumo
      */
     public function getID()
     {
@@ -87,8 +89,8 @@ class Resumo extends SyncModel
 
     /**
      * Set ID value to new on param
-     * @param  mixed $id new value for ID
-     * @return Resumo Self instance
+     * @param int $id Set id for Resumo
+     * @return self Self instance
      */
     public function setID($id)
     {
@@ -98,7 +100,7 @@ class Resumo extends SyncModel
 
     /**
      * Movimentação do caixa referente ao resumo
-     * @return mixed Movimentação of Resumo
+     * @return int movimentação of Resumo
      */
     public function getMovimentacaoID()
     {
@@ -107,8 +109,8 @@ class Resumo extends SyncModel
 
     /**
      * Set MovimentacaoID value to new on param
-     * @param  mixed $movimentacao_id new value for MovimentacaoID
-     * @return Resumo Self instance
+     * @param int $movimentacao_id Set movimentação for Resumo
+     * @return self Self instance
      */
     public function setMovimentacaoID($movimentacao_id)
     {
@@ -118,7 +120,7 @@ class Resumo extends SyncModel
 
     /**
      * Tipo de pagamento do resumo
-     * @return mixed Tipo of Resumo
+     * @return string tipo of Resumo
      */
     public function getTipo()
     {
@@ -127,8 +129,8 @@ class Resumo extends SyncModel
 
     /**
      * Set Tipo value to new on param
-     * @param  mixed $tipo new value for Tipo
-     * @return Resumo Self instance
+     * @param string $tipo Set tipo for Resumo
+     * @return self Self instance
      */
     public function setTipo($tipo)
     {
@@ -138,7 +140,7 @@ class Resumo extends SyncModel
 
     /**
      * Cartão da forma de pagamento
-     * @return mixed Cartão of Resumo
+     * @return int cartão of Resumo
      */
     public function getCartaoID()
     {
@@ -147,8 +149,8 @@ class Resumo extends SyncModel
 
     /**
      * Set CartaoID value to new on param
-     * @param  mixed $cartao_id new value for CartaoID
-     * @return Resumo Self instance
+     * @param int $cartao_id Set cartão for Resumo
+     * @return self Self instance
      */
     public function setCartaoID($cartao_id)
     {
@@ -158,7 +160,7 @@ class Resumo extends SyncModel
 
     /**
      * Valor que foi contado ao fechar o caixa
-     * @return mixed Valor of Resumo
+     * @return string valor of Resumo
      */
     public function getValor()
     {
@@ -167,8 +169,8 @@ class Resumo extends SyncModel
 
     /**
      * Set Valor value to new on param
-     * @param  mixed $valor new value for Valor
-     * @return Resumo Self instance
+     * @param string $valor Set valor for Resumo
+     * @return self Self instance
      */
     public function setValor($valor)
     {
@@ -178,7 +180,7 @@ class Resumo extends SyncModel
 
     /**
      * Convert this instance to array associated key -> value
-     * @param  boolean $recursive Allow rescursive conversion of fields
+     * @param boolean $recursive Allow rescursive conversion of fields
      * @return array All field and values into array format
      */
     public function toArray($recursive = false)
@@ -194,12 +196,12 @@ class Resumo extends SyncModel
 
     /**
      * Fill this instance with from array values, you can pass instance to
-     * @param  mixed $resumo Associated key -> value to assign into this instance
-     * @return Resumo Self instance
+     * @param mixed $resumo Associated key -> value to assign into this instance
+     * @return self Self instance
      */
     public function fromArray($resumo = [])
     {
-        if ($resumo instanceof Resumo) {
+        if ($resumo instanceof self) {
             $resumo = $resumo->toArray();
         } elseif (!is_array($resumo)) {
             $resumo = [];
@@ -245,7 +247,9 @@ class Resumo extends SyncModel
 
     /**
      * Filter fields, upload data and keep key data
-     * @param Resumo $original Original instance without modifications
+     * @param self $original Original instance without modifications
+     * @param boolean $localized Informs if fields are localized
+     * @return self Self instance
      */
     public function filter($original, $localized = false)
     {
@@ -253,11 +257,12 @@ class Resumo extends SyncModel
         $this->setMovimentacaoID(Filter::number($this->getMovimentacaoID()));
         $this->setCartaoID(Filter::number($this->getCartaoID()));
         $this->setValor(Filter::money($this->getValor(), $localized));
+        return $this;
     }
 
     /**
      * Clean instance resources like images and docs
-     * @param  Resumo $dependency Don't clean when dependency use same resources
+     * @param self $dependency Don't clean when dependency use same resources
      */
     public function clean($dependency)
     {
@@ -266,47 +271,45 @@ class Resumo extends SyncModel
     /**
      * Validate fields updating them and throw exception when invalid data has found
      * @return array All field of Resumo in array format
+     * @throws \MZ\Exception\ValidationException for invalid input data
      */
     public function validate()
     {
         $errors = [];
         if (is_null($this->getMovimentacaoID())) {
-            $errors['movimentacaoid'] = 'A movimentação não pode ser vazia';
+            $errors['movimentacaoid'] = _t('resumo.movimentacao_id_cannot_empty');
         }
-        if (is_null($this->getTipo())) {
-            $errors['tipo'] = 'O tipo não pode ser vazio';
-        }
-        if (!Validator::checkInSet($this->getTipo(), self::getTipoOptions(), true)) {
-            $errors['tipo'] = 'O tipo é inválido';
+        if (!Validator::checkInSet($this->getTipo(), self::getTipoOptions())) {
+            $errors['tipo'] = _t('resumo.tipo_invalid');
         }
         if (is_null($this->getValor())) {
-            $errors['valor'] = 'O valor não pode ser vazio';
+            $errors['valor'] = _t('resumo.valor_cannot_empty');
         }
         if (!empty($errors)) {
-            throw new \MZ\Exception\ValidationException($errors);
+            throw new ValidationException($errors);
         }
         return $this->toArray();
     }
 
     /**
      * Translate SQL exception into application exception
-     * @param  \Exception $e exception to translate into a readable error
+     * @param \Exception $e exception to translate into a readable error
      * @return \MZ\Exception\ValidationException new exception translated
      */
     protected function translate($e)
     {
-        if (stripos($e->getMessage(), 'UK_Resumos_MovimentacaoID_Tipo_CartaoID') !== false) {
-            return new \MZ\Exception\ValidationException([
-                'movimentacaoid' => sprintf(
-                    'A movimentação "%s" já está cadastrada',
+        if (contains(['MovimentacaoID', 'Tipo', 'CartaoID', 'UNIQUE'], $e->getMessage())) {
+            return new ValidationException([
+                'movimentacaoid' => _t(
+                    'resumo.movimentacao_id_used',
                     $this->getMovimentacaoID()
                 ),
-                'tipo' => sprintf(
-                    'O tipo "%s" já está cadastrado',
+                'tipo' => _t(
+                    'resumo.tipo_used',
                     $this->getTipo()
                 ),
-                'cartaoid' => sprintf(
-                    'O cartão "%s" já está cadastrado',
+                'cartaoid' => _t(
+                    'resumo.cartao_id_used',
                     $this->getCartaoID()
                 ),
             ]);
@@ -316,7 +319,8 @@ class Resumo extends SyncModel
 
     /**
      * Insert a new Resumo into the database and fill instance from database
-     * @return Resumo Self instance
+     * @return self Self instance
+     * @throws \MZ\Exception\ValidationException for invalid input data
      */
     public function insert()
     {
@@ -335,36 +339,42 @@ class Resumo extends SyncModel
 
     /**
      * Update Resumo with instance values into database for ID
-     * @param  array $only Save these fields only, when empty save all fields except id
-     * @return Resumo Self instance
+     * @param array $only Save these fields only, when empty save all fields except id
+     * @return int rows affected
+     * @throws \MZ\Exception\ValidationException for invalid input data
      */
     public function update($only = [])
     {
         $values = $this->validate();
         if (!$this->exists()) {
-            throw new \Exception('O identificador do resumo não foi informado');
+            throw new ValidationException(
+                ['id' => _t('resumo.id_cannot_empty')]
+            );
         }
         $values = DB::filterValues($values, $only, false);
         try {
-            DB::update('Resumos')
+            $affected = DB::update('Resumos')
                 ->set($values)
-                ->where('id', $this->getID())
+                ->where(['id' => $this->getID()])
                 ->execute();
             $this->loadByID();
         } catch (\Exception $e) {
             throw $this->translate($e);
         }
-        return $this;
+        return $affected;
     }
 
     /**
      * Delete this instance from database using ID
      * @return integer Number of rows deleted (Max 1)
+     * @throws \MZ\Exception\ValidationException for invalid id
      */
     public function delete()
     {
         if (!$this->exists()) {
-            throw new \Exception('O identificador do resumo não foi informado');
+            throw new ValidationException(
+                ['id' => _t('resumo.id_cannot_empty')]
+            );
         }
         $result = DB::deleteFrom('Resumos')
             ->where('id', $this->getID())
@@ -374,9 +384,9 @@ class Resumo extends SyncModel
 
     /**
      * Load one register for it self with a condition
-     * @param  array $condition Condition for searching the row
-     * @param  array $order associative field name -> [-1, 1]
-     * @return Resumo Self instance filled or empty
+     * @param array $condition Condition for searching the row
+     * @param array $order associative field name -> [-1, 1]
+     * @return self Self instance filled or empty
      */
     public function load($condition, $order = [])
     {
@@ -387,17 +397,14 @@ class Resumo extends SyncModel
 
     /**
      * Load into this object from database using, MovimentacaoID, Tipo, CartaoID
-     * @param  int $movimentacao_id movimentação to find Resumo
-     * @param  string $tipo tipo to find Resumo
-     * @param  int $cartao_id cartão to find Resumo
-     * @return Resumo Self filled instance or empty when not found
+     * @return self Self filled instance or empty when not found
      */
-    public function loadByMovimentacaoIDTipoCartaoID($movimentacao_id, $tipo, $cartao_id)
+    public function loadByMovimentacaoIDTipoCartaoID()
     {
         return $this->load([
-            'movimentacaoid' => intval($movimentacao_id),
-            'tipo' => strval($tipo),
-            'cartaoid' => intval($cartao_id),
+            'movimentacaoid' => intval($this->getMovimentacaoID()),
+            'tipo' => strval($this->getTipo()),
+            'cartaoid' => intval($this->getCartaoID()),
         ]);
     }
 
@@ -424,18 +431,18 @@ class Resumo extends SyncModel
 
     /**
      * Gets textual and translated Tipo for Resumo
-     * @param  int $index choose option from index
-     * @return mixed A associative key -> translated representative text or text for index
+     * @param int $index choose option from index
+     * @return string[] A associative key -> translated representative text or text for index
      */
     public static function getTipoOptions($index = null)
     {
         $options = [
-            self::TIPO_DINHEIRO => 'Dinheiro',
-            self::TIPO_CARTAO => 'Cartão',
-            self::TIPO_CHEQUE => 'Cheque',
-            self::TIPO_CONTA => 'Conta',
-            self::TIPO_CREDITO => 'Crédito',
-            self::TIPO_TRANSFERENCIA => 'Transferência',
+            self::TIPO_DINHEIRO => _t('resumo.tipo_dinheiro'),
+            self::TIPO_CARTAO => _t('resumo.tipo_cartao'),
+            self::TIPO_CHEQUE => _t('resumo.tipo_cheque'),
+            self::TIPO_CONTA => _t('resumo.tipo_conta'),
+            self::TIPO_CREDITO => _t('resumo.tipo_credito'),
+            self::TIPO_TRANSFERENCIA => _t('resumo.tipo_transferencia'),
         ];
         if (!is_null($index)) {
             return $options[$index];
@@ -449,14 +456,14 @@ class Resumo extends SyncModel
      */
     private static function getAllowedKeys()
     {
-        $resumo = new Resumo();
+        $resumo = new self();
         $allowed = Filter::concatKeys('r.', $resumo->toArray());
         return $allowed;
     }
 
     /**
      * Filter order array
-     * @param  mixed $order order string or array to parse and filter allowed
+     * @param mixed $order order string or array to parse and filter allowed
      * @return array allowed associative order
      */
     private static function filterOrder($order)
@@ -467,7 +474,7 @@ class Resumo extends SyncModel
 
     /**
      * Filter condition array with allowed fields
-     * @param  array $condition condition to filter rows
+     * @param array $condition condition to filter rows
      * @return array allowed condition
      */
     private static function filterCondition($condition)
@@ -478,8 +485,8 @@ class Resumo extends SyncModel
 
     /**
      * Fetch data from database with a condition
-     * @param  array $condition condition to filter rows
-     * @param  array $order order rows
+     * @param array $condition condition to filter rows
+     * @param array $order order rows
      * @return SelectQuery query object with condition statement
      */
     private static function query($condition = [], $order = [])
@@ -493,37 +500,55 @@ class Resumo extends SyncModel
 
     /**
      * Search one register with a condition
-     * @param  array $condition Condition for searching the row
-     * @param  array $order order rows
-     * @return Resumo A filled Resumo or empty instance
+     * @param array $condition Condition for searching the row
+     * @param array $order order rows
+     * @return self A filled Resumo or empty instance
      */
     public static function find($condition, $order = [])
     {
-        $query = self::query($condition, $order)->limit(1);
-        $row = $query->fetch() ?: [];
-        return new Resumo($row);
+        $result = new self();
+        return $result->load($condition, $order);
+    }
+
+    /**
+     * Search one register with a condition
+     * @param array $condition Condition for searching the row
+     * @param array $order order rows
+     * @return self A filled Resumo or empty instance
+     * @throws \Exception when register has not found
+     */
+    public static function findOrFail($condition, $order = [])
+    {
+        $result = self::find($condition, $order);
+        if (!$result->exists()) {
+            throw new \Exception(_t('resumo.not_found'), 404);
+        }
+        return $result;
     }
 
     /**
      * Find this object on database using, MovimentacaoID, Tipo, CartaoID
-     * @param  int $movimentacao_id movimentação to find Resumo
-     * @param  string $tipo tipo to find Resumo
-     * @param  int $cartao_id cartão to find Resumo
-     * @return Resumo A filled instance or empty when not found
+     * @param int $movimentacao_id movimentação to find Resumo
+     * @param string $tipo tipo to find Resumo
+     * @param int $cartao_id cartão to find Resumo
+     * @return self A filled instance or empty when not found
      */
     public static function findByMovimentacaoIDTipoCartaoID($movimentacao_id, $tipo, $cartao_id)
     {
         $result = new self();
-        return $result->loadByMovimentacaoIDTipoCartaoID($movimentacao_id, $tipo, $cartao_id);
+        $result->setMovimentacaoID($movimentacao_id);
+        $result->setTipo($tipo);
+        $result->setCartaoID($cartao_id);
+        return $result->loadByMovimentacaoIDTipoCartaoID();
     }
 
     /**
      * Find all Resumo
-     * @param  array  $condition Condition to get all Resumo
-     * @param  array  $order     Order Resumo
-     * @param  int    $limit     Limit data into row count
-     * @param  int    $offset    Start offset to get rows
-     * @return array             List of all rows instanced as Resumo
+     * @param array  $condition Condition to get all Resumo
+     * @param array  $order     Order Resumo
+     * @param int    $limit     Limit data into row count
+     * @param int    $offset    Start offset to get rows
+     * @return self[] List of all rows instanced as Resumo
      */
     public static function findAll($condition = [], $order = [], $limit = null, $offset = null)
     {
@@ -537,14 +562,14 @@ class Resumo extends SyncModel
         $rows = $query->fetchAll();
         $result = [];
         foreach ($rows as $row) {
-            $result[] = new Resumo($row);
+            $result[] = new self($row);
         }
         return $result;
     }
 
     /**
      * Count all rows from database with matched condition critery
-     * @param  array $condition condition to filter rows
+     * @param array $condition condition to filter rows
      * @return integer Quantity of rows
      */
     public static function count($condition = [])

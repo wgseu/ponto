@@ -24,10 +24,12 @@
  */
 namespace MZ\Stock;
 
-use MZ\Database\SyncModel;
-use MZ\Database\DB;
+use MZ\Util\Mask;
 use MZ\Util\Filter;
 use MZ\Util\Validator;
+use MZ\Database\DB;
+use MZ\Database\SyncModel;
+use MZ\Exception\ValidationException;
 
 /**
  * Informa a lista de produtos disponíveis nos fornecedores
@@ -68,9 +70,17 @@ class Catalogo extends SyncModel
      */
     private $limitado;
     /**
+     * Informa o conteúdo do produto como é comprado, Ex.: 5UN no mesmo pacote
+     */
+    private $conteudo;
+    /**
      * Última data de consulta do preço do produto
      */
     private $data_consulta;
+    /**
+     * Data em que o produto deixou de ser vendido pelo fornecedor
+     */
+    private $data_abandono;
 
     /**
      * Constructor for a new empty instance of Catalogo
@@ -83,7 +93,7 @@ class Catalogo extends SyncModel
 
     /**
      * Identificador do catálogo
-     * @return mixed ID of Catalogo
+     * @return int id of Catálogo de produtos
      */
     public function getID()
     {
@@ -92,8 +102,8 @@ class Catalogo extends SyncModel
 
     /**
      * Set ID value to new on param
-     * @param  mixed $id new value for ID
-     * @return Catalogo Self instance
+     * @param int $id Set id for Catálogo de produtos
+     * @return self Self instance
      */
     public function setID($id)
     {
@@ -103,7 +113,7 @@ class Catalogo extends SyncModel
 
     /**
      * Produto consultado
-     * @return mixed Produto of Catalogo
+     * @return int produto of Catálogo de produtos
      */
     public function getProdutoID()
     {
@@ -112,8 +122,8 @@ class Catalogo extends SyncModel
 
     /**
      * Set ProdutoID value to new on param
-     * @param  mixed $produto_id new value for ProdutoID
-     * @return Catalogo Self instance
+     * @param int $produto_id Set produto for Catálogo de produtos
+     * @return self Self instance
      */
     public function setProdutoID($produto_id)
     {
@@ -123,7 +133,7 @@ class Catalogo extends SyncModel
 
     /**
      * Fornecedor que possui o produto à venda
-     * @return mixed Fornecedor of Catalogo
+     * @return int fornecedor of Catálogo de produtos
      */
     public function getFornecedorID()
     {
@@ -132,8 +142,8 @@ class Catalogo extends SyncModel
 
     /**
      * Set FornecedorID value to new on param
-     * @param  mixed $fornecedor_id new value for FornecedorID
-     * @return Catalogo Self instance
+     * @param int $fornecedor_id Set fornecedor for Catálogo de produtos
+     * @return self Self instance
      */
     public function setFornecedorID($fornecedor_id)
     {
@@ -143,7 +153,7 @@ class Catalogo extends SyncModel
 
     /**
      * Preço a qual o produto foi comprado da última vez
-     * @return mixed Preço de compra of Catalogo
+     * @return string preço de compra of Catálogo de produtos
      */
     public function getPrecoCompra()
     {
@@ -152,8 +162,8 @@ class Catalogo extends SyncModel
 
     /**
      * Set PrecoCompra value to new on param
-     * @param  mixed $preco_compra new value for PrecoCompra
-     * @return Catalogo Self instance
+     * @param string $preco_compra Set preço de compra for Catálogo de produtos
+     * @return self Self instance
      */
     public function setPrecoCompra($preco_compra)
     {
@@ -163,7 +173,7 @@ class Catalogo extends SyncModel
 
     /**
      * Preço de venda do produto pelo fornecedor na última consulta
-     * @return mixed Preço de venda of Catalogo
+     * @return string preço de venda of Catálogo de produtos
      */
     public function getPrecoVenda()
     {
@@ -172,8 +182,8 @@ class Catalogo extends SyncModel
 
     /**
      * Set PrecoVenda value to new on param
-     * @param  mixed $preco_venda new value for PrecoVenda
-     * @return Catalogo Self instance
+     * @param string $preco_venda Set preço de venda for Catálogo de produtos
+     * @return self Self instance
      */
     public function setPrecoVenda($preco_venda)
     {
@@ -183,7 +193,7 @@ class Catalogo extends SyncModel
 
     /**
      * Quantidade mínima que o fornecedor vende
-     * @return mixed Quantidade mínima of Catalogo
+     * @return float quantidade mínima of Catálogo de produtos
      */
     public function getQuantidadeMinima()
     {
@@ -192,8 +202,8 @@ class Catalogo extends SyncModel
 
     /**
      * Set QuantidadeMinima value to new on param
-     * @param  mixed $quantidade_minima new value for QuantidadeMinima
-     * @return Catalogo Self instance
+     * @param float $quantidade_minima Set quantidade mínima for Catálogo de produtos
+     * @return self Self instance
      */
     public function setQuantidadeMinima($quantidade_minima)
     {
@@ -203,7 +213,7 @@ class Catalogo extends SyncModel
 
     /**
      * Quantidade em estoque do produto no fornecedor
-     * @return mixed Estoque of Catalogo
+     * @return float estoque of Catálogo de produtos
      */
     public function getEstoque()
     {
@@ -212,8 +222,8 @@ class Catalogo extends SyncModel
 
     /**
      * Set Estoque value to new on param
-     * @param  mixed $estoque new value for Estoque
-     * @return Catalogo Self instance
+     * @param float $estoque Set estoque for Catálogo de produtos
+     * @return self Self instance
      */
     public function setEstoque($estoque)
     {
@@ -223,7 +233,7 @@ class Catalogo extends SyncModel
 
     /**
      * Informa se a quantidade de estoque é limitada
-     * @return mixed Limitado of Catalogo
+     * @return string limitado of Catálogo de produtos
      */
     public function getLimitado()
     {
@@ -241,8 +251,8 @@ class Catalogo extends SyncModel
 
     /**
      * Set Limitado value to new on param
-     * @param  mixed $limitado new value for Limitado
-     * @return Catalogo Self instance
+     * @param string $limitado Set limitado for Catálogo de produtos
+     * @return self Self instance
      */
     public function setLimitado($limitado)
     {
@@ -251,8 +261,28 @@ class Catalogo extends SyncModel
     }
 
     /**
+     * Informa o conteúdo do produto como é comprado, Ex.: 5UN no mesmo pacote
+     * @return float conteúdo of Catálogo de produtos
+     */
+    public function getConteudo()
+    {
+        return $this->conteudo;
+    }
+
+    /**
+     * Set Conteudo value to new on param
+     * @param float $conteudo Set conteúdo for Catálogo de produtos
+     * @return self Self instance
+     */
+    public function setConteudo($conteudo)
+    {
+        $this->conteudo = $conteudo;
+        return $this;
+    }
+
+    /**
      * Última data de consulta do preço do produto
-     * @return mixed Data de consulta of Catalogo
+     * @return string data de consulta of Catálogo de produtos
      */
     public function getDataConsulta()
     {
@@ -261,8 +291,8 @@ class Catalogo extends SyncModel
 
     /**
      * Set DataConsulta value to new on param
-     * @param  mixed $data_consulta new value for DataConsulta
-     * @return Catalogo Self instance
+     * @param string $data_consulta Set data de consulta for Catálogo de produtos
+     * @return self Self instance
      */
     public function setDataConsulta($data_consulta)
     {
@@ -271,8 +301,28 @@ class Catalogo extends SyncModel
     }
 
     /**
+     * Data em que o produto deixou de ser vendido pelo fornecedor
+     * @return string data de abandono of Catálogo de produtos
+     */
+    public function getDataAbandono()
+    {
+        return $this->data_abandono;
+    }
+
+    /**
+     * Set DataAbandono value to new on param
+     * @param string $data_abandono Set data de abandono for Catálogo de produtos
+     * @return self Self instance
+     */
+    public function setDataAbandono($data_abandono)
+    {
+        $this->data_abandono = $data_abandono;
+        return $this;
+    }
+
+    /**
      * Convert this instance to array associated key -> value
-     * @param  boolean $recursive Allow rescursive conversion of fields
+     * @param boolean $recursive Allow rescursive conversion of fields
      * @return array All field and values into array format
      */
     public function toArray($recursive = false)
@@ -286,18 +336,20 @@ class Catalogo extends SyncModel
         $catalogo['quantidademinima'] = $this->getQuantidadeMinima();
         $catalogo['estoque'] = $this->getEstoque();
         $catalogo['limitado'] = $this->getLimitado();
+        $catalogo['conteudo'] = $this->getConteudo();
         $catalogo['dataconsulta'] = $this->getDataConsulta();
+        $catalogo['dataabandono'] = $this->getDataAbandono();
         return $catalogo;
     }
 
     /**
      * Fill this instance with from array values, you can pass instance to
-     * @param  mixed $catalogo Associated key -> value to assign into this instance
-     * @return Catalogo Self instance
+     * @param mixed $catalogo Associated key -> value to assign into this instance
+     * @return self Self instance
      */
     public function fromArray($catalogo = [])
     {
-        if ($catalogo instanceof Catalogo) {
+        if ($catalogo instanceof self) {
             $catalogo = $catalogo->toArray();
         } elseif (!is_array($catalogo)) {
             $catalogo = [];
@@ -339,14 +391,24 @@ class Catalogo extends SyncModel
             $this->setEstoque($catalogo['estoque']);
         }
         if (!isset($catalogo['limitado'])) {
-            $this->setLimitado(null);
+            $this->setLimitado('N');
         } else {
             $this->setLimitado($catalogo['limitado']);
+        }
+        if (!isset($catalogo['conteudo'])) {
+            $this->setConteudo(null);
+        } else {
+            $this->setConteudo($catalogo['conteudo']);
         }
         if (!array_key_exists('dataconsulta', $catalogo)) {
             $this->setDataConsulta(null);
         } else {
             $this->setDataConsulta($catalogo['dataconsulta']);
+        }
+        if (!array_key_exists('dataabandono', $catalogo)) {
+            $this->setDataAbandono(null);
+        } else {
+            $this->setDataAbandono($catalogo['dataabandono']);
         }
         return $this;
     }
@@ -363,7 +425,9 @@ class Catalogo extends SyncModel
 
     /**
      * Filter fields, upload data and keep key data
-     * @param Catalogo $original Original instance without modifications
+     * @param self $original Original instance without modifications
+     * @param boolean $localized Informs if fields are localized
+     * @return self Self instance
      */
     public function filter($original, $localized = false)
     {
@@ -374,12 +438,15 @@ class Catalogo extends SyncModel
         $this->setPrecoVenda(Filter::money($this->getPrecoVenda(), $localized));
         $this->setQuantidadeMinima(Filter::float($this->getQuantidadeMinima(), $localized));
         $this->setEstoque(Filter::float($this->getEstoque(), $localized));
+        $this->setConteudo(Filter::float($this->getConteudo(), $localized));
         $this->setDataConsulta(Filter::datetime($this->getDataConsulta()));
+        $this->setDataAbandono(Filter::datetime($this->getDataAbandono()));
+        return $this;
     }
 
     /**
      * Clean instance resources like images and docs
-     * @param  Catalogo $dependency Don't clean when dependency use same resources
+     * @param self $dependency Don't clean when dependency use same resources
      */
     public function clean($dependency)
     {
@@ -388,53 +455,63 @@ class Catalogo extends SyncModel
     /**
      * Validate fields updating them and throw exception when invalid data has found
      * @return array All field of Catalogo in array format
+     * @throws \MZ\Exception\ValidationException for invalid input data
      */
     public function validate()
     {
         $errors = [];
         if (is_null($this->getProdutoID())) {
-            $errors['produtoid'] = 'O produto não pode ser vazio';
+            $errors['produtoid'] = _t('catalogo.produto_id_cannot_empty');
         }
         if (is_null($this->getFornecedorID())) {
-            $errors['fornecedorid'] = 'O fornecedor não pode ser vazio';
+            $errors['fornecedorid'] = _t('catalogo.fornecedor_id_cannot_empty');
         }
         if (is_null($this->getPrecoCompra())) {
-            $errors['precocompra'] = 'O preço de compra não pode ser vazio';
+            $errors['precocompra'] = _t('catalogo.preco_compra_cannot_empty');
         }
         if (is_null($this->getPrecoVenda())) {
-            $errors['precovenda'] = 'O preço de venda não pode ser vazio';
+            $errors['precovenda'] = _t('catalogo.preco_venda_cannot_empty');
         }
         if (is_null($this->getQuantidadeMinima())) {
-            $errors['quantidademinima'] = 'A quantidade mínima não pode ser vazia';
+            $errors['quantidademinima'] = _t('catalogo.quantidade_minima_cannot_empty');
         }
         if (is_null($this->getEstoque())) {
-            $errors['estoque'] = 'O estoque não pode ser vazio';
+            $errors['estoque'] = _t('catalogo.estoque_cannot_empty');
         }
-        if (is_null($this->getLimitado())) {
-            $errors['limitado'] = 'O limitado não pode ser vazio';
+        if (!Validator::checkBoolean($this->getLimitado())) {
+            $errors['limitado'] = _t('catalogo.limitado_invalid');
         }
-        if (!Validator::checkBoolean($this->getLimitado(), true)) {
-            $errors['limitado'] = 'O limitado é inválido';
+        if (is_null($this->getConteudo())) {
+            $errors['conteudo'] = _t('catalogo.conteudo_cannot_empty');
         }
         if (!empty($errors)) {
-            throw new \MZ\Exception\ValidationException($errors);
+            throw new ValidationException($errors);
         }
         return $this->toArray();
     }
 
     /**
      * Translate SQL exception into application exception
-     * @param  \Exception $e exception to translate into a readable error
+     * @param \Exception $e exception to translate into a readable error
      * @return \MZ\Exception\ValidationException new exception translated
      */
     protected function translate($e)
     {
+        if (contains(['FornecedorID', 'UNIQUE'], $e->getMessage())) {
+            return new ValidationException([
+                'fornecedorid' => _t(
+                    'catalogo.fornecedor_id_used',
+                    $this->getFornecedorID()
+                ),
+            ]);
+        }
         return parent::translate($e);
     }
 
     /**
      * Insert a new Catálogo de produtos into the database and fill instance from database
-     * @return Catalogo Self instance
+     * @return self Self instance
+     * @throws \MZ\Exception\ValidationException for invalid input data
      */
     public function insert()
     {
@@ -453,35 +530,42 @@ class Catalogo extends SyncModel
 
     /**
      * Update Catálogo de produtos with instance values into database for ID
-     * @return Catalogo Self instance
+     * @param array $only Save these fields only, when empty save all fields except id
+     * @return int rows affected
+     * @throws \MZ\Exception\ValidationException for invalid input data
      */
     public function update($only = [])
     {
         $values = $this->validate();
         if (!$this->exists()) {
-            throw new \Exception('O identificador do catálogo de produtos não foi informado');
+            throw new ValidationException(
+                ['id' => _t('catalogo.id_cannot_empty')]
+            );
         }
         $values = DB::filterValues($values, $only, false);
         try {
-            DB::update('Catalogos')
+            $affected = DB::update('Catalogos')
                 ->set($values)
-                ->where('id', $this->getID())
+                ->where(['id' => $this->getID()])
                 ->execute();
             $this->loadByID();
         } catch (\Exception $e) {
             throw $this->translate($e);
         }
-        return $this;
+        return $affected;
     }
 
     /**
      * Delete this instance from database using ID
      * @return integer Number of rows deleted (Max 1)
+     * @throws \MZ\Exception\ValidationException for invalid id
      */
     public function delete()
     {
         if (!$this->exists()) {
-            throw new \Exception('O identificador do catálogo de produtos não foi informado');
+            throw new ValidationException(
+                ['id' => _t('catalogo.id_cannot_empty')]
+            );
         }
         $result = DB::deleteFrom('Catalogos')
             ->where('id', $this->getID())
@@ -491,15 +575,26 @@ class Catalogo extends SyncModel
 
     /**
      * Load one register for it self with a condition
-     * @param  array $condition Condition for searching the row
-     * @param  array $order associative field name -> [-1, 1]
-     * @return Catalogo Self instance filled or empty
+     * @param array $condition Condition for searching the row
+     * @param array $order associative field name -> [-1, 1]
+     * @return self Self instance filled or empty
      */
     public function load($condition, $order = [])
     {
         $query = self::query($condition, $order)->limit(1);
         $row = $query->fetch() ?: [];
         return $this->fromArray($row);
+    }
+
+    /**
+     * Load into this object from database using, FornecedorID
+     * @return self Self filled instance or empty when not found
+     */
+    public function loadByFornecedorID()
+    {
+        return $this->load([
+            'fornecedorid' => intval($this->getFornecedorID()),
+        ]);
     }
 
     /**
@@ -526,14 +621,14 @@ class Catalogo extends SyncModel
      */
     private static function getAllowedKeys()
     {
-        $catalogo = new Catalogo();
+        $catalogo = new self();
         $allowed = Filter::concatKeys('c.', $catalogo->toArray());
         return $allowed;
     }
 
     /**
      * Filter order array
-     * @param  mixed $order order string or array to parse and filter allowed
+     * @param mixed $order order string or array to parse and filter allowed
      * @return array allowed associative order
      */
     private static function filterOrder($order)
@@ -544,7 +639,7 @@ class Catalogo extends SyncModel
 
     /**
      * Filter condition array with allowed fields
-     * @param  array $condition condition to filter rows
+     * @param array $condition condition to filter rows
      * @return array allowed condition
      */
     private static function filterCondition($condition)
@@ -555,8 +650,8 @@ class Catalogo extends SyncModel
 
     /**
      * Fetch data from database with a condition
-     * @param  array $condition condition to filter rows
-     * @param  array $order order rows
+     * @param array $condition condition to filter rows
+     * @param array $order order rows
      * @return SelectQuery query object with condition statement
      */
     private static function query($condition = [], $order = [])
@@ -570,24 +665,51 @@ class Catalogo extends SyncModel
 
     /**
      * Search one register with a condition
-     * @param  array $condition Condition for searching the row
-     * @param  array $order order rows
-     * @return Catalogo A filled Catálogo de produtos or empty instance
+     * @param array $condition Condition for searching the row
+     * @param array $order order rows
+     * @return self A filled Catálogo de produtos or empty instance
      */
     public static function find($condition, $order = [])
     {
-        $query = self::query($condition, $order)->limit(1);
-        $row = $query->fetch() ?: [];
-        return new Catalogo($row);
+        $result = new self();
+        return $result->load($condition, $order);
+    }
+
+    /**
+     * Search one register with a condition
+     * @param array $condition Condition for searching the row
+     * @param array $order order rows
+     * @return self A filled Catálogo de produtos or empty instance
+     * @throws \Exception when register has not found
+     */
+    public static function findOrFail($condition, $order = [])
+    {
+        $result = self::find($condition, $order);
+        if (!$result->exists()) {
+            throw new \Exception(_t('catalogo.not_found'), 404);
+        }
+        return $result;
+    }
+
+    /**
+     * Find this object on database using, FornecedorID
+     * @param int $fornecedor_id fornecedor to find Catálogo de produtos
+     * @return self A filled instance or empty when not found
+     */
+    public static function findByFornecedorID($fornecedor_id)
+    {
+        $result = new self();
+        $result->setFornecedorID($fornecedor_id);
+        return $result->loadByFornecedorID();
     }
 
     /**
      * Find all Catálogo de produtos
-     * @param  array  $condition Condition to get all Catálogo de produtos
-     * @param  array  $order     Order Catálogo de produtos
-     * @param  int    $limit     Limit data into row count
-     * @param  int    $offset    Start offset to get rows
-     * @return array             List of all rows instanced as Catalogo
+     * @param array  $condition Condition to get all Catálogo de produtos
+     * @param array  $order     Order Catálogo de produtos
+     * @param int    $limit     Limit data into row count
+     * @param int    $offset    Start offset to get rows
+     * @return self[] List of all rows instanced as Catalogo
      */
     public static function findAll($condition = [], $order = [], $limit = null, $offset = null)
     {
@@ -601,14 +723,14 @@ class Catalogo extends SyncModel
         $rows = $query->fetchAll();
         $result = [];
         foreach ($rows as $row) {
-            $result[] = new Catalogo($row);
+            $result[] = new self($row);
         }
         return $result;
     }
 
     /**
      * Count all rows from database with matched condition critery
-     * @param  array $condition condition to filter rows
+     * @param array $condition condition to filter rows
      * @return integer Quantity of rows
      */
     public static function count($condition = [])

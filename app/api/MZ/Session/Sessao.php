@@ -24,10 +24,12 @@
  */
 namespace MZ\Session;
 
-use MZ\Database\SyncModel;
-use MZ\Database\DB;
+use MZ\Util\Mask;
 use MZ\Util\Filter;
 use MZ\Util\Validator;
+use MZ\Database\DB;
+use MZ\Database\SyncModel;
+use MZ\Exception\ValidationException;
 
 /**
  * Sessão de trabalho do dia, permite que vários caixas sejam abertos
@@ -35,8 +37,6 @@ use MZ\Util\Validator;
  */
 class Sessao extends SyncModel
 {
-    const DESCONTO_ID = 1;
-    const ENTREGA_ID = 2;
 
     /**
      * Código da sessão
@@ -66,7 +66,7 @@ class Sessao extends SyncModel
 
     /**
      * Código da sessão
-     * @return mixed ID of Sessao
+     * @return int id of Sessão
      */
     public function getID()
     {
@@ -75,8 +75,8 @@ class Sessao extends SyncModel
 
     /**
      * Set ID value to new on param
-     * @param  mixed $id new value for ID
-     * @return Sessao Self instance
+     * @param int $id Set id for Sessão
+     * @return self Self instance
      */
     public function setID($id)
     {
@@ -86,7 +86,7 @@ class Sessao extends SyncModel
 
     /**
      * Data de início da sessão
-     * @return mixed Data de início of Sessao
+     * @return string data de início of Sessão
      */
     public function getDataInicio()
     {
@@ -95,8 +95,8 @@ class Sessao extends SyncModel
 
     /**
      * Set DataInicio value to new on param
-     * @param  mixed $data_inicio new value for DataInicio
-     * @return Sessao Self instance
+     * @param string $data_inicio Set data de início for Sessão
+     * @return self Self instance
      */
     public function setDataInicio($data_inicio)
     {
@@ -106,7 +106,7 @@ class Sessao extends SyncModel
 
     /**
      * Data de fechamento da sessão
-     * @return mixed Data de termíno of Sessao
+     * @return string data de termíno of Sessão
      */
     public function getDataTermino()
     {
@@ -115,8 +115,8 @@ class Sessao extends SyncModel
 
     /**
      * Set DataTermino value to new on param
-     * @param  mixed $data_termino new value for DataTermino
-     * @return Sessao Self instance
+     * @param string $data_termino Set data de termíno for Sessão
+     * @return self Self instance
      */
     public function setDataTermino($data_termino)
     {
@@ -126,7 +126,7 @@ class Sessao extends SyncModel
 
     /**
      * Informa se a sessão está aberta
-     * @return mixed Aberta of Sessao
+     * @return string aberta of Sessão
      */
     public function getAberta()
     {
@@ -144,8 +144,8 @@ class Sessao extends SyncModel
 
     /**
      * Set Aberta value to new on param
-     * @param  mixed $aberta new value for Aberta
-     * @return Sessao Self instance
+     * @param string $aberta Set aberta for Sessão
+     * @return self Self instance
      */
     public function setAberta($aberta)
     {
@@ -155,7 +155,7 @@ class Sessao extends SyncModel
 
     /**
      * Convert this instance to array associated key -> value
-     * @param  boolean $recursive Allow rescursive conversion of fields
+     * @param boolean $recursive Allow rescursive conversion of fields
      * @return array All field and values into array format
      */
     public function toArray($recursive = false)
@@ -170,12 +170,12 @@ class Sessao extends SyncModel
 
     /**
      * Fill this instance with from array values, you can pass instance to
-     * @param  mixed $sessao Associated key -> value to assign into this instance
-     * @return Sessao Self instance
+     * @param mixed $sessao Associated key -> value to assign into this instance
+     * @return self Self instance
      */
     public function fromArray($sessao = [])
     {
-        if ($sessao instanceof Sessao) {
+        if ($sessao instanceof self) {
             $sessao = $sessao->toArray();
         } elseif (!is_array($sessao)) {
             $sessao = [];
@@ -216,18 +216,21 @@ class Sessao extends SyncModel
 
     /**
      * Filter fields, upload data and keep key data
-     * @param Sessao $original Original instance without modifications
+     * @param self $original Original instance without modifications
+     * @param boolean $localized Informs if fields are localized
+     * @return self Self instance
      */
     public function filter($original, $localized = false)
     {
         $this->setID($original->getID());
         $this->setDataInicio(Filter::datetime($this->getDataInicio()));
         $this->setDataTermino(Filter::datetime($this->getDataTermino()));
+        return $this;
     }
 
     /**
      * Clean instance resources like images and docs
-     * @param  Sessao $dependency Don't clean when dependency use same resources
+     * @param self $dependency Don't clean when dependency use same resources
      */
     public function clean($dependency)
     {
@@ -236,15 +239,16 @@ class Sessao extends SyncModel
     /**
      * Validate fields updating them and throw exception when invalid data has found
      * @return array All field of Sessao in array format
+     * @throws \MZ\Exception\ValidationException for invalid input data
      */
     public function validate()
     {
         $errors = [];
         if (is_null($this->getDataInicio())) {
-            $errors['datainicio'] = 'A data de início não pode ser vazia';
+            $errors['datainicio'] = _t('sessao.data_inicio_cannot_empty');
         }
         if (!Validator::checkBoolean($this->getAberta())) {
-            $errors['aberta'] = 'A abertura não foi informada ou é inválida';
+            $errors['aberta'] = _t('sessao.aberta_invalid');
         } elseif (!$this->exists() && !$this->isAberta()) {
             $errors['aberta'] = 'A sessão não pode iniciar fechada';
         }
@@ -253,24 +257,15 @@ class Sessao extends SyncModel
             $errors['aberta'] = 'Já existe uma sessão aberta';
         }
         if (!empty($errors)) {
-            throw new \MZ\Exception\ValidationException($errors);
+            throw new ValidationException($errors);
         }
         return $this->toArray();
     }
 
     /**
-     * Translate SQL exception into application exception
-     * @param  \Exception $e exception to translate into a readable error
-     * @return \MZ\Exception\ValidationException new exception translated
-     */
-    protected function translate($e)
-    {
-        return parent::translate($e);
-    }
-
-    /**
      * Insert a new Sessão into the database and fill instance from database
-     * @return Sessao Self instance
+     * @return self Self instance
+     * @throws \MZ\Exception\ValidationException for invalid input data
      */
     public function insert()
     {
@@ -289,36 +284,42 @@ class Sessao extends SyncModel
 
     /**
      * Update Sessão with instance values into database for ID
-     * @param  array $only Save these fields only, when empty save all fields except id
-     * @return Sessao Self instance
+     * @param array $only Save these fields only, when empty save all fields except id
+     * @return int rows affected
+     * @throws \MZ\Exception\ValidationException for invalid input data
      */
     public function update($only = [])
     {
         $values = $this->validate();
         if (!$this->exists()) {
-            throw new \Exception('O identificador da sessão não foi informado');
+            throw new ValidationException(
+                ['id' => _t('sessao.id_cannot_empty')]
+            );
         }
         $values = DB::filterValues($values, $only, false);
         try {
-            DB::update('Sessoes')
+            $affected = DB::update('Sessoes')
                 ->set($values)
-                ->where('id', $this->getID())
+                ->where(['id' => $this->getID()])
                 ->execute();
             $this->loadByID();
         } catch (\Exception $e) {
             throw $this->translate($e);
         }
-        return $this;
+        return $affected;
     }
 
     /**
      * Delete this instance from database using ID
      * @return integer Number of rows deleted (Max 1)
+     * @throws \MZ\Exception\ValidationException for invalid id
      */
     public function delete()
     {
         if (!$this->exists()) {
-            throw new \Exception('O identificador da sessão não foi informado');
+            throw new ValidationException(
+                ['id' => _t('sessao.id_cannot_empty')]
+            );
         }
         $result = DB::deleteFrom('Sessoes')
             ->where('id', $this->getID())
@@ -328,9 +329,9 @@ class Sessao extends SyncModel
 
     /**
      * Load one register for it self with a condition
-     * @param  array $condition Condition for searching the row
-     * @param  array $order associative field name -> [-1, 1]
-     * @return Sessao Self instance filled or empty
+     * @param array $condition Condition for searching the row
+     * @param array $order associative field name -> [-1, 1]
+     * @return self Self instance filled or empty
      */
     public function load($condition, $order = [])
     {
@@ -345,14 +346,14 @@ class Sessao extends SyncModel
      */
     private static function getAllowedKeys()
     {
-        $sessao = new Sessao();
+        $sessao = new self();
         $allowed = Filter::concatKeys('s.', $sessao->toArray());
         return $allowed;
     }
 
     /**
      * Filter order array
-     * @param  mixed $order order string or array to parse and filter allowed
+     * @param mixed $order order string or array to parse and filter allowed
      * @return array allowed associative order
      */
     private static function filterOrder($order)
@@ -363,7 +364,7 @@ class Sessao extends SyncModel
 
     /**
      * Filter condition array with allowed fields
-     * @param  array $condition condition to filter rows
+     * @param array $condition condition to filter rows
      * @return array allowed condition
      */
     private static function filterCondition($condition)
@@ -374,8 +375,8 @@ class Sessao extends SyncModel
 
     /**
      * Fetch data from database with a condition
-     * @param  array $condition condition to filter rows
-     * @param  array $order order rows
+     * @param array $condition condition to filter rows
+     * @param array $order order rows
      * @return SelectQuery query object with condition statement
      */
     private static function query($condition = [], $order = [])
@@ -389,15 +390,30 @@ class Sessao extends SyncModel
 
     /**
      * Search one register with a condition
-     * @param  array $condition Condition for searching the row
-     * @param  array $order order rows
-     * @return Sessao A filled Sessão or empty instance
+     * @param array $condition Condition for searching the row
+     * @param array $order order rows
+     * @return self A filled Sessão or empty instance
      */
     public static function find($condition, $order = [])
     {
-        $query = self::query($condition, $order)->limit(1);
-        $row = $query->fetch() ?: [];
-        return new Sessao($row);
+        $result = new self();
+        return $result->load($condition, $order);
+    }
+
+    /**
+     * Search one register with a condition
+     * @param array $condition Condition for searching the row
+     * @param array $order order rows
+     * @return self A filled Sessão or empty instance
+     * @throws \Exception when register has not found
+     */
+    public static function findOrFail($condition, $order = [])
+    {
+        $result = self::find($condition, $order);
+        if (!$result->exists()) {
+            throw new \Exception(_t('sessao.not_found'), 404);
+        }
+        return $result;
     }
 
     /**
@@ -432,11 +448,11 @@ class Sessao extends SyncModel
 
     /**
      * Find all Sessão
-     * @param  array  $condition Condition to get all Sessão
-     * @param  array  $order     Order Sessão
-     * @param  int    $limit     Limit data into row count
-     * @param  int    $offset    Start offset to get rows
-     * @return array             List of all rows instanced as Sessao
+     * @param array  $condition Condition to get all Sessão
+     * @param array  $order     Order Sessão
+     * @param int    $limit     Limit data into row count
+     * @param int    $offset    Start offset to get rows
+     * @return self[] List of all rows instanced as Sessao
      */
     public static function findAll($condition = [], $order = [], $limit = null, $offset = null)
     {
@@ -450,14 +466,14 @@ class Sessao extends SyncModel
         $rows = $query->fetchAll();
         $result = [];
         foreach ($rows as $row) {
-            $result[] = new Sessao($row);
+            $result[] = new self($row);
         }
         return $result;
     }
 
     /**
      * Count all rows from database with matched condition critery
-     * @param  array $condition condition to filter rows
+     * @param array $condition condition to filter rows
      * @return integer Quantity of rows
      */
     public static function count($condition = [])

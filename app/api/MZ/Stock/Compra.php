@@ -24,10 +24,12 @@
  */
 namespace MZ\Stock;
 
-use MZ\Database\SyncModel;
-use MZ\Database\DB;
+use MZ\Util\Mask;
 use MZ\Util\Filter;
 use MZ\Util\Validator;
+use MZ\Database\DB;
+use MZ\Database\SyncModel;
+use MZ\Exception\ValidationException;
 
 /**
  * Compras realizadas em uma lista num determinado fornecedor
@@ -71,7 +73,7 @@ class Compra extends SyncModel
 
     /**
      * Identificador da compra
-     * @return mixed ID of Compra
+     * @return int id of Compra
      */
     public function getID()
     {
@@ -80,8 +82,8 @@ class Compra extends SyncModel
 
     /**
      * Set ID value to new on param
-     * @param  mixed $id new value for ID
-     * @return Compra Self instance
+     * @param int $id Set id for Compra
+     * @return self Self instance
      */
     public function setID($id)
     {
@@ -91,7 +93,7 @@ class Compra extends SyncModel
 
     /**
      * Informa o número fiscal da compra
-     * @return mixed Número da compra of Compra
+     * @return string número da compra of Compra
      */
     public function getNumero()
     {
@@ -100,8 +102,8 @@ class Compra extends SyncModel
 
     /**
      * Set Numero value to new on param
-     * @param  mixed $numero new value for Numero
-     * @return Compra Self instance
+     * @param string $numero Set número da compra for Compra
+     * @return self Self instance
      */
     public function setNumero($numero)
     {
@@ -111,7 +113,7 @@ class Compra extends SyncModel
 
     /**
      * Informa o funcionário que comprou os produtos da lista
-     * @return mixed Comprador of Compra
+     * @return int comprador of Compra
      */
     public function getCompradorID()
     {
@@ -120,8 +122,8 @@ class Compra extends SyncModel
 
     /**
      * Set CompradorID value to new on param
-     * @param  mixed $comprador_id new value for CompradorID
-     * @return Compra Self instance
+     * @param int $comprador_id Set comprador for Compra
+     * @return self Self instance
      */
     public function setCompradorID($comprador_id)
     {
@@ -131,7 +133,7 @@ class Compra extends SyncModel
 
     /**
      * Fornecedor em que os produtos foram compras
-     * @return mixed Fornecedor of Compra
+     * @return int fornecedor of Compra
      */
     public function getFornecedorID()
     {
@@ -140,8 +142,8 @@ class Compra extends SyncModel
 
     /**
      * Set FornecedorID value to new on param
-     * @param  mixed $fornecedor_id new value for FornecedorID
-     * @return Compra Self instance
+     * @param int $fornecedor_id Set fornecedor for Compra
+     * @return self Self instance
      */
     public function setFornecedorID($fornecedor_id)
     {
@@ -151,7 +153,7 @@ class Compra extends SyncModel
 
     /**
      * Informa o nome do documento no servidor do sistema
-     * @return mixed Documento of Compra
+     * @return string documento of Compra
      */
     public function getDocumentoURL()
     {
@@ -160,8 +162,8 @@ class Compra extends SyncModel
 
     /**
      * Set DocumentoURL value to new on param
-     * @param  mixed $documento_url new value for DocumentoURL
-     * @return Compra Self instance
+     * @param string $documento_url Set documento for Compra
+     * @return self Self instance
      */
     public function setDocumentoURL($documento_url)
     {
@@ -171,7 +173,7 @@ class Compra extends SyncModel
 
     /**
      * Informa da data de finalização da compra
-     * @return mixed Data da compra of Compra
+     * @return string data da compra of Compra
      */
     public function getDataCompra()
     {
@@ -180,8 +182,8 @@ class Compra extends SyncModel
 
     /**
      * Set DataCompra value to new on param
-     * @param  mixed $data_compra new value for DataCompra
-     * @return Compra Self instance
+     * @param string $data_compra Set data da compra for Compra
+     * @return self Self instance
      */
     public function setDataCompra($data_compra)
     {
@@ -191,7 +193,7 @@ class Compra extends SyncModel
 
     /**
      * Convert this instance to array associated key -> value
-     * @param  boolean $recursive Allow rescursive conversion of fields
+     * @param boolean $recursive Allow rescursive conversion of fields
      * @return array All field and values into array format
      */
     public function toArray($recursive = false)
@@ -208,12 +210,12 @@ class Compra extends SyncModel
 
     /**
      * Fill this instance with from array values, you can pass instance to
-     * @param  mixed $compra Associated key -> value to assign into this instance
-     * @return Compra Self instance
+     * @param mixed $compra Associated key -> value to assign into this instance
+     * @return self Self instance
      */
     public function fromArray($compra = [])
     {
-        if ($compra instanceof Compra) {
+        if ($compra instanceof self) {
             $compra = $compra->toArray();
         } elseif (!is_array($compra)) {
             $compra = [];
@@ -253,18 +255,36 @@ class Compra extends SyncModel
     }
 
     /**
+     * Get relative documento path or default documento
+     * @param boolean $default If true return default image, otherwise check field
+     * @param string  $default_name Default image name
+     * @return string relative web path for compra documento
+     */
+    public function makeDocumentoURL($default = false, $default_name = 'compra.png')
+    {
+        $documento_url = $this->getDocumentoURL();
+        if ($default) {
+            $documento_url = null;
+        }
+        return get_image_url($documento_url, 'compra', $default_name);
+    }
+
+    /**
      * Convert this instance into array associated key -> value with only public fields
      * @return array All public field and values into array format
      */
     public function publish()
     {
         $compra = parent::publish();
+        $compra['documentourl'] = $this->makeDocumentoURL(false, null);
         return $compra;
     }
 
     /**
      * Filter fields, upload data and keep key data
-     * @param Compra $original Original instance without modifications
+     * @param self $original Original instance without modifications
+     * @param boolean $localized Informs if fields are localized
+     * @return self Self instance
      */
     public function filter($original, $localized = false)
     {
@@ -272,51 +292,62 @@ class Compra extends SyncModel
         $this->setNumero(Filter::string($this->getNumero()));
         $this->setCompradorID(Filter::number($this->getCompradorID()));
         $this->setFornecedorID(Filter::number($this->getFornecedorID()));
-        $this->setDocumentoURL(Filter::string($this->getDocumentoURL()));
+        $documento_url = upload_document('raw_documentourl', 'compra');
+        if (is_null($documento_url) && trim($this->getDocumentoURL()) != '') {
+            $this->setDocumentoURL($original->getDocumentoURL());
+        } else {
+            $this->setDocumentoURL($documento_url);
+        }
         $this->setDataCompra(Filter::datetime($this->getDataCompra()));
+        return $this;
     }
 
     /**
      * Clean instance resources like images and docs
-     * @param  Compra $dependency Don't clean when dependency use same resources
+     * @param self $dependency Don't clean when dependency use same resources
      */
     public function clean($dependency)
     {
+        if (!is_null($this->getDocumentoURL()) && $dependency->getDocumentoURL() != $this->getDocumentoURL()) {
+            @unlink(get_document_path($this->getDocumentoURL(), 'compra'));
+        }
+        $this->setDocumentoURL($dependency->getDocumentoURL());
     }
 
     /**
      * Validate fields updating them and throw exception when invalid data has found
      * @return array All field of Compra in array format
+     * @throws \MZ\Exception\ValidationException for invalid input data
      */
     public function validate()
     {
         $errors = [];
         if (is_null($this->getCompradorID())) {
-            $errors['compradorid'] = 'O comprador não pode ser vazio';
+            $errors['compradorid'] = _t('compra.comprador_id_cannot_empty');
         }
         if (is_null($this->getFornecedorID())) {
-            $errors['fornecedorid'] = 'O fornecedor não pode ser vazio';
+            $errors['fornecedorid'] = _t('compra.fornecedor_id_cannot_empty');
         }
         if (is_null($this->getDataCompra())) {
-            $errors['datacompra'] = 'A data da compra não pode ser vazia';
+            $errors['datacompra'] = _t('compra.data_compra_cannot_empty');
         }
         if (!empty($errors)) {
-            throw new \MZ\Exception\ValidationException($errors);
+            throw new ValidationException($errors);
         }
         return $this->toArray();
     }
 
     /**
      * Translate SQL exception into application exception
-     * @param  \Exception $e exception to translate into a readable error
+     * @param \Exception $e exception to translate into a readable error
      * @return \MZ\Exception\ValidationException new exception translated
      */
     protected function translate($e)
     {
         if (contains(['Numero', 'UNIQUE'], $e->getMessage())) {
-            return new \MZ\Exception\ValidationException([
-                'numero' => sprintf(
-                    'O número da compra "%s" já está cadastrado',
+            return new ValidationException([
+                'numero' => _t(
+                    'compra.numero_used',
                     $this->getNumero()
                 ),
             ]);
@@ -326,7 +357,8 @@ class Compra extends SyncModel
 
     /**
      * Insert a new Compra into the database and fill instance from database
-     * @return Compra Self instance
+     * @return self Self instance
+     * @throws \MZ\Exception\ValidationException for invalid input data
      */
     public function insert()
     {
@@ -345,36 +377,42 @@ class Compra extends SyncModel
 
     /**
      * Update Compra with instance values into database for ID
-     * @param  array $only Save these fields only, when empty save all fields except id
-     * @return Compra Self instance
+     * @param array $only Save these fields only, when empty save all fields except id
+     * @return int rows affected
+     * @throws \MZ\Exception\ValidationException for invalid input data
      */
     public function update($only = [])
     {
         $values = $this->validate();
         if (!$this->exists()) {
-            throw new \Exception('O identificador da compra não foi informado');
+            throw new ValidationException(
+                ['id' => _t('compra.id_cannot_empty')]
+            );
         }
         $values = DB::filterValues($values, $only, false);
         try {
-            DB::update('Compras')
+            $affected = DB::update('Compras')
                 ->set($values)
-                ->where('id', $this->getID())
+                ->where(['id' => $this->getID()])
                 ->execute();
             $this->loadByID();
         } catch (\Exception $e) {
             throw $this->translate($e);
         }
-        return $this;
+        return $affected;
     }
 
     /**
      * Delete this instance from database using ID
      * @return integer Number of rows deleted (Max 1)
+     * @throws \MZ\Exception\ValidationException for invalid id
      */
     public function delete()
     {
         if (!$this->exists()) {
-            throw new \Exception('O identificador da compra não foi informado');
+            throw new ValidationException(
+                ['id' => _t('compra.id_cannot_empty')]
+            );
         }
         $result = DB::deleteFrom('Compras')
             ->where('id', $this->getID())
@@ -384,9 +422,9 @@ class Compra extends SyncModel
 
     /**
      * Load one register for it self with a condition
-     * @param  array $condition Condition for searching the row
-     * @param  array $order associative field name -> [-1, 1]
-     * @return Compra Self instance filled or empty
+     * @param array $condition Condition for searching the row
+     * @param array $order associative field name -> [-1, 1]
+     * @return self Self instance filled or empty
      */
     public function load($condition, $order = [])
     {
@@ -397,13 +435,12 @@ class Compra extends SyncModel
 
     /**
      * Load into this object from database using, Numero
-     * @param  string $numero número da compra to find Compra
-     * @return Compra Self filled instance or empty when not found
+     * @return self Self filled instance or empty when not found
      */
-    public function loadByNumero($numero)
+    public function loadByNumero()
     {
         return $this->load([
-            'numero' => strval($numero),
+            'numero' => strval($this->getNumero()),
         ]);
     }
 
@@ -431,14 +468,14 @@ class Compra extends SyncModel
      */
     private static function getAllowedKeys()
     {
-        $compra = new Compra();
+        $compra = new self();
         $allowed = Filter::concatKeys('c.', $compra->toArray());
         return $allowed;
     }
 
     /**
      * Filter order array
-     * @param  mixed $order order string or array to parse and filter allowed
+     * @param mixed $order order string or array to parse and filter allowed
      * @return array allowed associative order
      */
     private static function filterOrder($order)
@@ -449,7 +486,7 @@ class Compra extends SyncModel
 
     /**
      * Filter condition array with allowed fields
-     * @param  array $condition condition to filter rows
+     * @param array $condition condition to filter rows
      * @return array allowed condition
      */
     private static function filterCondition($condition)
@@ -460,8 +497,8 @@ class Compra extends SyncModel
 
     /**
      * Fetch data from database with a condition
-     * @param  array $condition condition to filter rows
-     * @param  array $order order rows
+     * @param array $condition condition to filter rows
+     * @param array $order order rows
      * @return SelectQuery query object with condition statement
      */
     private static function query($condition = [], $order = [])
@@ -475,35 +512,51 @@ class Compra extends SyncModel
 
     /**
      * Search one register with a condition
-     * @param  array $condition Condition for searching the row
-     * @param  array $order order rows
-     * @return Compra A filled Compra or empty instance
+     * @param array $condition Condition for searching the row
+     * @param array $order order rows
+     * @return self A filled Compra or empty instance
      */
     public static function find($condition, $order = [])
     {
-        $query = self::query($condition, $order)->limit(1);
-        $row = $query->fetch() ?: [];
-        return new Compra($row);
+        $result = new self();
+        return $result->load($condition, $order);
+    }
+
+    /**
+     * Search one register with a condition
+     * @param array $condition Condition for searching the row
+     * @param array $order order rows
+     * @return self A filled Compra or empty instance
+     * @throws \Exception when register has not found
+     */
+    public static function findOrFail($condition, $order = [])
+    {
+        $result = self::find($condition, $order);
+        if (!$result->exists()) {
+            throw new \Exception(_t('compra.not_found'), 404);
+        }
+        return $result;
     }
 
     /**
      * Find this object on database using, Numero
-     * @param  string $numero número da compra to find Compra
-     * @return Compra A filled instance or empty when not found
+     * @param string $numero número da compra to find Compra
+     * @return self A filled instance or empty when not found
      */
     public static function findByNumero($numero)
     {
         $result = new self();
-        return $result->loadByNumero($numero);
+        $result->setNumero($numero);
+        return $result->loadByNumero();
     }
 
     /**
      * Find all Compra
-     * @param  array  $condition Condition to get all Compra
-     * @param  array  $order     Order Compra
-     * @param  int    $limit     Limit data into row count
-     * @param  int    $offset    Start offset to get rows
-     * @return array             List of all rows instanced as Compra
+     * @param array  $condition Condition to get all Compra
+     * @param array  $order     Order Compra
+     * @param int    $limit     Limit data into row count
+     * @param int    $offset    Start offset to get rows
+     * @return self[] List of all rows instanced as Compra
      */
     public static function findAll($condition = [], $order = [], $limit = null, $offset = null)
     {
@@ -517,14 +570,14 @@ class Compra extends SyncModel
         $rows = $query->fetchAll();
         $result = [];
         foreach ($rows as $row) {
-            $result[] = new Compra($row);
+            $result[] = new self($row);
         }
         return $result;
     }
 
     /**
      * Count all rows from database with matched condition critery
-     * @param  array $condition condition to filter rows
+     * @param array $condition condition to filter rows
      * @return integer Quantity of rows
      */
     public static function count($condition = [])

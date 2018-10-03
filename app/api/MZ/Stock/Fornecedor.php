@@ -24,11 +24,12 @@
  */
 namespace MZ\Stock;
 
-use MZ\Database\SyncModel;
-use MZ\Database\DB;
+use MZ\Util\Mask;
 use MZ\Util\Filter;
 use MZ\Util\Validator;
-use MZ\Account\Cliente;
+use MZ\Database\DB;
+use MZ\Database\SyncModel;
+use MZ\Exception\ValidationException;
 
 /**
  * Fornecedores de produtos
@@ -64,7 +65,7 @@ class Fornecedor extends SyncModel
 
     /**
      * Identificador do fornecedor
-     * @return mixed ID of Fornecedor
+     * @return int id of Fornecedor
      */
     public function getID()
     {
@@ -73,8 +74,8 @@ class Fornecedor extends SyncModel
 
     /**
      * Set ID value to new on param
-     * @param  mixed $id new value for ID
-     * @return Fornecedor Self instance
+     * @param int $id Set id for Fornecedor
+     * @return self Self instance
      */
     public function setID($id)
     {
@@ -84,7 +85,7 @@ class Fornecedor extends SyncModel
 
     /**
      * Empresa do fornecedor
-     * @return mixed Empresa of Fornecedor
+     * @return int empresa of Fornecedor
      */
     public function getEmpresaID()
     {
@@ -93,8 +94,8 @@ class Fornecedor extends SyncModel
 
     /**
      * Set EmpresaID value to new on param
-     * @param  mixed $empresa_id new value for EmpresaID
-     * @return Fornecedor Self instance
+     * @param int $empresa_id Set empresa for Fornecedor
+     * @return self Self instance
      */
     public function setEmpresaID($empresa_id)
     {
@@ -104,7 +105,7 @@ class Fornecedor extends SyncModel
 
     /**
      * Prazo em dias para pagamento do fornecedor
-     * @return mixed Prazo de pagamento of Fornecedor
+     * @return int prazo de pagamento of Fornecedor
      */
     public function getPrazoPagamento()
     {
@@ -113,8 +114,8 @@ class Fornecedor extends SyncModel
 
     /**
      * Set PrazoPagamento value to new on param
-     * @param  mixed $prazo_pagamento new value for PrazoPagamento
-     * @return Fornecedor Self instance
+     * @param int $prazo_pagamento Set prazo de pagamento for Fornecedor
+     * @return self Self instance
      */
     public function setPrazoPagamento($prazo_pagamento)
     {
@@ -124,7 +125,7 @@ class Fornecedor extends SyncModel
 
     /**
      * Data de cadastro do fornecedor
-     * @return mixed Data de cadastro of Fornecedor
+     * @return string data de cadastro of Fornecedor
      */
     public function getDataCadastro()
     {
@@ -133,8 +134,8 @@ class Fornecedor extends SyncModel
 
     /**
      * Set DataCadastro value to new on param
-     * @param  mixed $data_cadastro new value for DataCadastro
-     * @return Fornecedor Self instance
+     * @param string $data_cadastro Set data de cadastro for Fornecedor
+     * @return self Self instance
      */
     public function setDataCadastro($data_cadastro)
     {
@@ -144,7 +145,7 @@ class Fornecedor extends SyncModel
 
     /**
      * Convert this instance to array associated key -> value
-     * @param  boolean $recursive Allow rescursive conversion of fields
+     * @param boolean $recursive Allow rescursive conversion of fields
      * @return array All field and values into array format
      */
     public function toArray($recursive = false)
@@ -159,12 +160,12 @@ class Fornecedor extends SyncModel
 
     /**
      * Fill this instance with from array values, you can pass instance to
-     * @param  mixed $fornecedor Associated key -> value to assign into this instance
-     * @return Fornecedor Self instance
+     * @param mixed $fornecedor Associated key -> value to assign into this instance
+     * @return self Self instance
      */
     public function fromArray($fornecedor = [])
     {
-        if ($fornecedor instanceof Fornecedor) {
+        if ($fornecedor instanceof self) {
             $fornecedor = $fornecedor->toArray();
         } elseif (!is_array($fornecedor)) {
             $fornecedor = [];
@@ -205,19 +206,22 @@ class Fornecedor extends SyncModel
 
     /**
      * Filter fields, upload data and keep key data
-     * @param Fornecedor $original Original instance without modifications
+     * @param self $original Original instance without modifications
+     * @param boolean $localized Informs if fields are localized
+     * @return self Self instance
      */
     public function filter($original, $localized = false)
     {
         $this->setID($original->getID());
-        $this->setDataCadastro($original->getDataCadastro());
         $this->setEmpresaID(Filter::number($this->getEmpresaID()));
         $this->setPrazoPagamento(Filter::number($this->getPrazoPagamento()));
+        $this->setDataCadastro(Filter::datetime($this->getDataCadastro()));
+        return $this;
     }
 
     /**
      * Clean instance resources like images and docs
-     * @param  Fornecedor $dependency Don't clean when dependency use same resources
+     * @param self $dependency Don't clean when dependency use same resources
      */
     public function clean($dependency)
     {
@@ -226,15 +230,16 @@ class Fornecedor extends SyncModel
     /**
      * Validate fields updating them and throw exception when invalid data has found
      * @return array All field of Fornecedor in array format
+     * @throws \MZ\Exception\ValidationException for invalid input data
      */
     public function validate()
     {
         $errors = [];
         if (is_null($this->getEmpresaID())) {
-            $errors['empresaid'] = 'A empresa não pode ser vazia';
+            $errors['empresaid'] = _t('fornecedor.empresa_id_cannot_empty');
         }
         if (is_null($this->getPrazoPagamento())) {
-            $errors['prazopagamento'] = 'O prazo de pagamento não pode ser vazio';
+            $errors['prazopagamento'] = _t('fornecedor.prazo_pagamento_cannot_empty');
         }
         $cliente = $this->findEmpresaID();
         if ($cliente->getTipo() != Cliente::TIPO_JURIDICA) {
@@ -242,22 +247,22 @@ class Fornecedor extends SyncModel
         }
         $this->setDataCadastro(DB::now());
         if (!empty($errors)) {
-            throw new \MZ\Exception\ValidationException($errors);
+            throw new ValidationException($errors);
         }
         return $this->toArray();
     }
 
     /**
      * Translate SQL exception into application exception
-     * @param  \Exception $e exception to translate into a readable error
+     * @param \Exception $e exception to translate into a readable error
      * @return \MZ\Exception\ValidationException new exception translated
      */
     protected function translate($e)
     {
         if (contains(['EmpresaID', 'UNIQUE'], $e->getMessage())) {
-            return new \MZ\Exception\ValidationException([
-                'empresaid' => sprintf(
-                    'A empresa "%s" já está cadastrada',
+            return new ValidationException([
+                'empresaid' => _t(
+                    'fornecedor.empresa_id_used',
                     $this->getEmpresaID()
                 ),
             ]);
@@ -267,7 +272,8 @@ class Fornecedor extends SyncModel
 
     /**
      * Insert a new Fornecedor into the database and fill instance from database
-     * @return Fornecedor Self instance
+     * @return self Self instance
+     * @throws \MZ\Exception\ValidationException for invalid input data
      */
     public function insert()
     {
@@ -286,37 +292,43 @@ class Fornecedor extends SyncModel
 
     /**
      * Update Fornecedor with instance values into database for ID
-     * @param  array $only Save these fields only, when empty save all fields except id
-     * @return Fornecedor Self instance
+     * @param array $only Save these fields only, when empty save all fields except id
+     * @return int rows affected
+     * @throws \MZ\Exception\ValidationException for invalid input data
      */
     public function update($only = [])
     {
         $values = $this->validate();
         if (!$this->exists()) {
-            throw new \Exception('O identificador do fornecedor não foi informado');
+            throw new ValidationException(
+                ['id' => _t('fornecedor.id_cannot_empty')]
+            );
         }
         $values = DB::filterValues($values, $only, false);
         unset($values['datacadastro']);
         try {
-            DB::update('Fornecedores')
+            $affected = DB::update('Fornecedores')
                 ->set($values)
-                ->where('id', $this->getID())
+                ->where(['id' => $this->getID()])
                 ->execute();
             $this->loadByID();
         } catch (\Exception $e) {
             throw $this->translate($e);
         }
-        return $this;
+        return $affected;
     }
 
     /**
      * Delete this instance from database using ID
      * @return integer Number of rows deleted (Max 1)
+     * @throws \MZ\Exception\ValidationException for invalid id
      */
     public function delete()
     {
         if (!$this->exists()) {
-            throw new \Exception('O identificador do fornecedor não foi informado');
+            throw new ValidationException(
+                ['id' => _t('fornecedor.id_cannot_empty')]
+            );
         }
         $result = DB::deleteFrom('Fornecedores')
             ->where('id', $this->getID())
@@ -326,9 +338,9 @@ class Fornecedor extends SyncModel
 
     /**
      * Load one register for it self with a condition
-     * @param  array $condition Condition for searching the row
-     * @param  array $order associative field name -> [-1, 1]
-     * @return Fornecedor Self instance filled or empty
+     * @param array $condition Condition for searching the row
+     * @param array $order associative field name -> [-1, 1]
+     * @return self Self instance filled or empty
      */
     public function load($condition, $order = [])
     {
@@ -339,13 +351,12 @@ class Fornecedor extends SyncModel
 
     /**
      * Load into this object from database using, EmpresaID
-     * @param  int $empresa_id empresa to find Fornecedor
-     * @return Fornecedor Self filled instance or empty when not found
+     * @return self Self filled instance or empty when not found
      */
-    public function loadByEmpresaID($empresa_id)
+    public function loadByEmpresaID()
     {
         return $this->load([
-            'empresaid' => intval($empresa_id),
+            'empresaid' => intval($this->getEmpresaID()),
         ]);
     }
 
@@ -364,14 +375,14 @@ class Fornecedor extends SyncModel
      */
     private static function getAllowedKeys()
     {
-        $fornecedor = new Fornecedor();
+        $fornecedor = new self();
         $allowed = Filter::concatKeys('f.', $fornecedor->toArray());
         return $allowed;
     }
 
     /**
      * Filter order array
-     * @param  mixed $order order string or array to parse and filter allowed
+     * @param mixed $order order string or array to parse and filter allowed
      * @return array allowed associative order
      */
     private static function filterOrder($order)
@@ -382,7 +393,7 @@ class Fornecedor extends SyncModel
 
     /**
      * Filter condition array with allowed fields
-     * @param  array $condition condition to filter rows
+     * @param array $condition condition to filter rows
      * @return array allowed condition
      */
     private static function filterCondition($condition)
@@ -393,14 +404,15 @@ class Fornecedor extends SyncModel
 
     /**
      * Fetch data from database with a condition
-     * @param  array $condition condition to filter rows
-     * @param  array $order order rows
+     * @param array $condition condition to filter rows
+     * @param array $order order rows
      * @return SelectQuery query object with condition statement
      */
     private static function query($condition = [], $order = [])
     {
         $query = DB::from('Fornecedores f')
-            ->leftJoin('Clientes c ON c.id = f.empresaid');
+            ->leftJoin('Clientes c ON c.id = f.empresaid')
+            ->leftJoin('Telefones t ON t.clienteid = c.id AND t.principal = ?', 'Y');
         if (isset($condition['search'])) {
             $search = trim($condition['search']);
             if (Validator::checkEmail($search)) {
@@ -409,7 +421,7 @@ class Fornecedor extends SyncModel
                 $query = $query->where('c.cpf', Filter::digits($search));
             } elseif (Validator::checkPhone($search)) {
                 $fone = Cliente::buildFoneSearch($search);
-                $query = $query->orderBy('IF(c.fone1 LIKE ?, 0, 1)', $fone);
+                $query = $query->orderBy('IF(t.numero LIKE ?, 0, 1)', $fone);
             } else {
                 $query = DB::buildSearch(
                     $search,
@@ -428,35 +440,51 @@ class Fornecedor extends SyncModel
 
     /**
      * Search one register with a condition
-     * @param  array $condition Condition for searching the row
-     * @param  array $order order rows
-     * @return Fornecedor A filled Fornecedor or empty instance
+     * @param array $condition Condition for searching the row
+     * @param array $order order rows
+     * @return self A filled Fornecedor or empty instance
      */
     public static function find($condition, $order = [])
     {
-        $query = self::query($condition, $order)->limit(1);
-        $row = $query->fetch() ?: [];
-        return new Fornecedor($row);
+        $result = new self();
+        return $result->load($condition, $order);
+    }
+
+    /**
+     * Search one register with a condition
+     * @param array $condition Condition for searching the row
+     * @param array $order order rows
+     * @return self A filled Fornecedor or empty instance
+     * @throws \Exception when register has not found
+     */
+    public static function findOrFail($condition, $order = [])
+    {
+        $result = self::find($condition, $order);
+        if (!$result->exists()) {
+            throw new \Exception(_t('fornecedor.not_found'), 404);
+        }
+        return $result;
     }
 
     /**
      * Find this object on database using, EmpresaID
-     * @param  int $empresa_id empresa to find Fornecedor
-     * @return Fornecedor A filled instance or empty when not found
+     * @param int $empresa_id empresa to find Fornecedor
+     * @return self A filled instance or empty when not found
      */
     public static function findByEmpresaID($empresa_id)
     {
         $result = new self();
-        return $result->loadByEmpresaID($empresa_id);
+        $result->setEmpresaID($empresa_id);
+        return $result->loadByEmpresaID();
     }
 
     /**
      * Find all Fornecedor
-     * @param  array  $condition Condition to get all Fornecedor
-     * @param  array  $order     Order Fornecedor
-     * @param  int    $limit     Limit data into row count
-     * @param  int    $offset    Start offset to get rows
-     * @return array             List of all rows instanced as Fornecedor
+     * @param array  $condition Condition to get all Fornecedor
+     * @param array  $order     Order Fornecedor
+     * @param int    $limit     Limit data into row count
+     * @param int    $offset    Start offset to get rows
+     * @return self[] List of all rows instanced as Fornecedor
      */
     public static function findAll($condition = [], $order = [], $limit = null, $offset = null)
     {
@@ -470,14 +498,14 @@ class Fornecedor extends SyncModel
         $rows = $query->fetchAll();
         $result = [];
         foreach ($rows as $row) {
-            $result[] = new Fornecedor($row);
+            $result[] = new self($row);
         }
         return $result;
     }
 
     /**
      * Count all rows from database with matched condition critery
-     * @param  array $condition condition to filter rows
+     * @param array $condition condition to filter rows
      * @return integer Quantity of rows
      */
     public static function count($condition = [])

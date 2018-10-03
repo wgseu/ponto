@@ -24,10 +24,12 @@
  */
 namespace MZ\Stock;
 
-use MZ\Database\SyncModel;
-use MZ\Database\DB;
+use MZ\Util\Mask;
 use MZ\Util\Filter;
 use MZ\Util\Validator;
+use MZ\Database\DB;
+use MZ\Database\SyncModel;
+use MZ\Exception\ValidationException;
 
 /**
  * Lista de compras de produtos
@@ -63,6 +65,10 @@ class Lista extends SyncModel
      */
     private $encarregado_id;
     /**
+     * Informações da viagem para realizar as compras
+     */
+    private $viagem_id;
+    /**
      * Data e hora para o encarregado ir fazer as compras
      */
     private $data_viagem;
@@ -82,7 +88,7 @@ class Lista extends SyncModel
 
     /**
      * Identificador da lista de compras
-     * @return mixed ID of Lista
+     * @return int id of Lista de compra
      */
     public function getID()
     {
@@ -91,8 +97,8 @@ class Lista extends SyncModel
 
     /**
      * Set ID value to new on param
-     * @param  mixed $id new value for ID
-     * @return Lista Self instance
+     * @param int $id Set id for Lista de compra
+     * @return self Self instance
      */
     public function setID($id)
     {
@@ -102,7 +108,7 @@ class Lista extends SyncModel
 
     /**
      * Nome da lista, pode ser uma data
-     * @return mixed Descrição of Lista
+     * @return string descrição of Lista de compra
      */
     public function getDescricao()
     {
@@ -111,8 +117,8 @@ class Lista extends SyncModel
 
     /**
      * Set Descricao value to new on param
-     * @param  mixed $descricao new value for Descricao
-     * @return Lista Self instance
+     * @param string $descricao Set descrição for Lista de compra
+     * @return self Self instance
      */
     public function setDescricao($descricao)
     {
@@ -124,7 +130,7 @@ class Lista extends SyncModel
      * Estado da lista de compra. Análise: Ainda estão sendo adicionado
      * produtos na lista, Fechada: Está pronto para compra, Comprada: Todos os
      * itens foram comprados
-     * @return mixed Estado of Lista
+     * @return string estado of Lista de compra
      */
     public function getEstado()
     {
@@ -133,8 +139,8 @@ class Lista extends SyncModel
 
     /**
      * Set Estado value to new on param
-     * @param  mixed $estado new value for Estado
-     * @return Lista Self instance
+     * @param string $estado Set estado for Lista de compra
+     * @return self Self instance
      */
     public function setEstado($estado)
     {
@@ -144,7 +150,7 @@ class Lista extends SyncModel
 
     /**
      * Informa o funcionário encarregado de fazer as compras
-     * @return mixed Encarregado of Lista
+     * @return int encarregado of Lista de compra
      */
     public function getEncarregadoID()
     {
@@ -153,8 +159,8 @@ class Lista extends SyncModel
 
     /**
      * Set EncarregadoID value to new on param
-     * @param  mixed $encarregado_id new value for EncarregadoID
-     * @return Lista Self instance
+     * @param int $encarregado_id Set encarregado for Lista de compra
+     * @return self Self instance
      */
     public function setEncarregadoID($encarregado_id)
     {
@@ -163,8 +169,28 @@ class Lista extends SyncModel
     }
 
     /**
+     * Informações da viagem para realizar as compras
+     * @return int viagem of Lista de compra
+     */
+    public function getViagemID()
+    {
+        return $this->viagem_id;
+    }
+
+    /**
+     * Set ViagemID value to new on param
+     * @param int $viagem_id Set viagem for Lista de compra
+     * @return self Self instance
+     */
+    public function setViagemID($viagem_id)
+    {
+        $this->viagem_id = $viagem_id;
+        return $this;
+    }
+
+    /**
      * Data e hora para o encarregado ir fazer as compras
-     * @return mixed Data de viagem of Lista
+     * @return string data de viagem of Lista de compra
      */
     public function getDataViagem()
     {
@@ -173,8 +199,8 @@ class Lista extends SyncModel
 
     /**
      * Set DataViagem value to new on param
-     * @param  mixed $data_viagem new value for DataViagem
-     * @return Lista Self instance
+     * @param string $data_viagem Set data de viagem for Lista de compra
+     * @return self Self instance
      */
     public function setDataViagem($data_viagem)
     {
@@ -184,7 +210,7 @@ class Lista extends SyncModel
 
     /**
      * Data de cadastro da lista
-     * @return mixed Data de cadastro of Lista
+     * @return string data de cadastro of Lista de compra
      */
     public function getDataCadastro()
     {
@@ -193,8 +219,8 @@ class Lista extends SyncModel
 
     /**
      * Set DataCadastro value to new on param
-     * @param  mixed $data_cadastro new value for DataCadastro
-     * @return Lista Self instance
+     * @param string $data_cadastro Set data de cadastro for Lista de compra
+     * @return self Self instance
      */
     public function setDataCadastro($data_cadastro)
     {
@@ -204,7 +230,7 @@ class Lista extends SyncModel
 
     /**
      * Convert this instance to array associated key -> value
-     * @param  boolean $recursive Allow rescursive conversion of fields
+     * @param boolean $recursive Allow rescursive conversion of fields
      * @return array All field and values into array format
      */
     public function toArray($recursive = false)
@@ -214,6 +240,7 @@ class Lista extends SyncModel
         $lista['descricao'] = $this->getDescricao();
         $lista['estado'] = $this->getEstado();
         $lista['encarregadoid'] = $this->getEncarregadoID();
+        $lista['viagemid'] = $this->getViagemID();
         $lista['dataviagem'] = $this->getDataViagem();
         $lista['datacadastro'] = $this->getDataCadastro();
         return $lista;
@@ -221,12 +248,12 @@ class Lista extends SyncModel
 
     /**
      * Fill this instance with from array values, you can pass instance to
-     * @param  mixed $lista Associated key -> value to assign into this instance
-     * @return Lista Self instance
+     * @param mixed $lista Associated key -> value to assign into this instance
+     * @return self Self instance
      */
     public function fromArray($lista = [])
     {
-        if ($lista instanceof Lista) {
+        if ($lista instanceof self) {
             $lista = $lista->toArray();
         } elseif (!is_array($lista)) {
             $lista = [];
@@ -251,6 +278,11 @@ class Lista extends SyncModel
             $this->setEncarregadoID(null);
         } else {
             $this->setEncarregadoID($lista['encarregadoid']);
+        }
+        if (!array_key_exists('viagemid', $lista)) {
+            $this->setViagemID(null);
+        } else {
+            $this->setViagemID($lista['viagemid']);
         }
         if (!isset($lista['dataviagem'])) {
             $this->setDataViagem(null);
@@ -277,20 +309,24 @@ class Lista extends SyncModel
 
     /**
      * Filter fields, upload data and keep key data
-     * @param Lista $original Original instance without modifications
+     * @param self $original Original instance without modifications
+     * @param boolean $localized Informs if fields are localized
+     * @return self Self instance
      */
     public function filter($original, $localized = false)
     {
         $this->setID($original->getID());
         $this->setDescricao(Filter::string($this->getDescricao()));
         $this->setEncarregadoID(Filter::number($this->getEncarregadoID()));
+        $this->setViagemID(Filter::number($this->getViagemID()));
         $this->setDataViagem(Filter::datetime($this->getDataViagem()));
         $this->setDataCadastro(Filter::datetime($this->getDataCadastro()));
+        return $this;
     }
 
     /**
      * Clean instance resources like images and docs
-     * @param  Lista $dependency Don't clean when dependency use same resources
+     * @param self $dependency Don't clean when dependency use same resources
      */
     public function clean($dependency)
     {
@@ -299,47 +335,34 @@ class Lista extends SyncModel
     /**
      * Validate fields updating them and throw exception when invalid data has found
      * @return array All field of Lista in array format
+     * @throws \MZ\Exception\ValidationException for invalid input data
      */
     public function validate()
     {
         $errors = [];
         if (is_null($this->getDescricao())) {
-            $errors['descricao'] = 'A descrição não pode ser vazia';
+            $errors['descricao'] = _t('lista.descricao_cannot_empty');
         }
-        if (is_null($this->getEstado())) {
-            $errors['estado'] = 'O estado não pode ser vazio';
-        }
-        if (!Validator::checkInSet($this->getEstado(), self::getEstadoOptions(), true)) {
-            $errors['estado'] = 'O estado é inválido';
+        if (!Validator::checkInSet($this->getEstado(), self::getEstadoOptions())) {
+            $errors['estado'] = _t('lista.estado_invalid');
         }
         if (is_null($this->getEncarregadoID())) {
-            $errors['encarregadoid'] = 'O encarregado não pode ser vazio';
+            $errors['encarregadoid'] = _t('lista.encarregado_id_cannot_empty');
         }
         if (is_null($this->getDataViagem())) {
-            $errors['dataviagem'] = 'A data de viagem não pode ser vazia';
+            $errors['dataviagem'] = _t('lista.data_viagem_cannot_empty');
         }
-        if (is_null($this->getDataCadastro())) {
-            $errors['datacadastro'] = 'A data de cadastro não pode ser vazia';
-        }
+        $this->setDataCadastro(DB::now());
         if (!empty($errors)) {
-            throw new \MZ\Exception\ValidationException($errors);
+            throw new ValidationException($errors);
         }
         return $this->toArray();
     }
 
     /**
-     * Translate SQL exception into application exception
-     * @param  \Exception $e exception to translate into a readable error
-     * @return \MZ\Exception\ValidationException new exception translated
-     */
-    protected function translate($e)
-    {
-        return parent::translate($e);
-    }
-
-    /**
      * Insert a new Lista de compra into the database and fill instance from database
-     * @return Lista Self instance
+     * @return self Self instance
+     * @throws \MZ\Exception\ValidationException for invalid input data
      */
     public function insert()
     {
@@ -358,35 +381,43 @@ class Lista extends SyncModel
 
     /**
      * Update Lista de compra with instance values into database for ID
-     * @return Lista Self instance
+     * @param array $only Save these fields only, when empty save all fields except id
+     * @return int rows affected
+     * @throws \MZ\Exception\ValidationException for invalid input data
      */
     public function update($only = [])
     {
         $values = $this->validate();
         if (!$this->exists()) {
-            throw new \Exception('O identificador da lista de compra não foi informado');
+            throw new ValidationException(
+                ['id' => _t('lista.id_cannot_empty')]
+            );
         }
         $values = DB::filterValues($values, $only, false);
+        unset($values['datacadastro']);
         try {
-            DB::update('Listas')
+            $affected = DB::update('Listas')
                 ->set($values)
-                ->where('id', $this->getID())
+                ->where(['id' => $this->getID()])
                 ->execute();
             $this->loadByID();
         } catch (\Exception $e) {
             throw $this->translate($e);
         }
-        return $this;
+        return $affected;
     }
 
     /**
      * Delete this instance from database using ID
      * @return integer Number of rows deleted (Max 1)
+     * @throws \MZ\Exception\ValidationException for invalid id
      */
     public function delete()
     {
         if (!$this->exists()) {
-            throw new \Exception('O identificador da lista de compra não foi informado');
+            throw new ValidationException(
+                ['id' => _t('lista.id_cannot_empty')]
+            );
         }
         $result = DB::deleteFrom('Listas')
             ->where('id', $this->getID())
@@ -396,9 +427,9 @@ class Lista extends SyncModel
 
     /**
      * Load one register for it self with a condition
-     * @param  array $condition Condition for searching the row
-     * @param  array $order associative field name -> [-1, 1]
-     * @return Lista Self instance filled or empty
+     * @param array $condition Condition for searching the row
+     * @param array $order associative field name -> [-1, 1]
+     * @return self Self instance filled or empty
      */
     public function load($condition, $order = [])
     {
@@ -417,16 +448,28 @@ class Lista extends SyncModel
     }
 
     /**
+     * Informações da viagem para realizar as compras
+     * @return \MZ\Location\Viagem The object fetched from database
+     */
+    public function findViagemID()
+    {
+        if (is_null($this->getViagemID())) {
+            return new \MZ\Location\Viagem();
+        }
+        return \MZ\Location\Viagem::findByID($this->getViagemID());
+    }
+
+    /**
      * Gets textual and translated Estado for Lista
-     * @param  int $index choose option from index
-     * @return mixed A associative key -> translated representative text or text for index
+     * @param int $index choose option from index
+     * @return string[] A associative key -> translated representative text or text for index
      */
     public static function getEstadoOptions($index = null)
     {
         $options = [
-            self::ESTADO_ANALISE => 'Análise',
-            self::ESTADO_FECHADA => 'Fechada',
-            self::ESTADO_COMPRADA => 'Comprada',
+            self::ESTADO_ANALISE => _t('lista.estado_analise'),
+            self::ESTADO_FECHADA => _t('lista.estado_fechada'),
+            self::ESTADO_COMPRADA => _t('lista.estado_comprada'),
         ];
         if (!is_null($index)) {
             return $options[$index];
@@ -440,14 +483,14 @@ class Lista extends SyncModel
      */
     private static function getAllowedKeys()
     {
-        $lista = new Lista();
+        $lista = new self();
         $allowed = Filter::concatKeys('l.', $lista->toArray());
         return $allowed;
     }
 
     /**
      * Filter order array
-     * @param  mixed $order order string or array to parse and filter allowed
+     * @param mixed $order order string or array to parse and filter allowed
      * @return array allowed associative order
      */
     private static function filterOrder($order)
@@ -458,7 +501,7 @@ class Lista extends SyncModel
 
     /**
      * Filter condition array with allowed fields
-     * @param  array $condition condition to filter rows
+     * @param array $condition condition to filter rows
      * @return array allowed condition
      */
     private static function filterCondition($condition)
@@ -476,8 +519,8 @@ class Lista extends SyncModel
 
     /**
      * Fetch data from database with a condition
-     * @param  array $condition condition to filter rows
-     * @param  array $order order rows
+     * @param array $condition condition to filter rows
+     * @param array $order order rows
      * @return SelectQuery query object with condition statement
      */
     private static function query($condition = [], $order = [])
@@ -492,24 +535,39 @@ class Lista extends SyncModel
 
     /**
      * Search one register with a condition
-     * @param  array $condition Condition for searching the row
-     * @param  array $order order rows
-     * @return Lista A filled Lista de compra or empty instance
+     * @param array $condition Condition for searching the row
+     * @param array $order order rows
+     * @return self A filled Lista de compra or empty instance
      */
     public static function find($condition, $order = [])
     {
-        $query = self::query($condition, $order)->limit(1);
-        $row = $query->fetch() ?: [];
-        return new Lista($row);
+        $result = new self();
+        return $result->load($condition, $order);
+    }
+
+    /**
+     * Search one register with a condition
+     * @param array $condition Condition for searching the row
+     * @param array $order order rows
+     * @return self A filled Lista de compra or empty instance
+     * @throws \Exception when register has not found
+     */
+    public static function findOrFail($condition, $order = [])
+    {
+        $result = self::find($condition, $order);
+        if (!$result->exists()) {
+            throw new \Exception(_t('lista.not_found'), 404);
+        }
+        return $result;
     }
 
     /**
      * Find all Lista de compra
-     * @param  array  $condition Condition to get all Lista de compra
-     * @param  array  $order     Order Lista de compra
-     * @param  int    $limit     Limit data into row count
-     * @param  int    $offset    Start offset to get rows
-     * @return array             List of all rows instanced as Lista
+     * @param array  $condition Condition to get all Lista de compra
+     * @param array  $order     Order Lista de compra
+     * @param int    $limit     Limit data into row count
+     * @param int    $offset    Start offset to get rows
+     * @return self[] List of all rows instanced as Lista
      */
     public static function findAll($condition = [], $order = [], $limit = null, $offset = null)
     {
@@ -523,14 +581,14 @@ class Lista extends SyncModel
         $rows = $query->fetchAll();
         $result = [];
         foreach ($rows as $row) {
-            $result[] = new Lista($row);
+            $result[] = new self($row);
         }
         return $result;
     }
 
     /**
      * Count all rows from database with matched condition critery
-     * @param  array $condition condition to filter rows
+     * @param array $condition condition to filter rows
      * @return integer Quantity of rows
      */
     public static function count($condition = [])

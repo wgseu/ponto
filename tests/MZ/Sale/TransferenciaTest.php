@@ -26,24 +26,4 @@ namespace MZ\Sale;
 
 class TransferenciaTest extends \MZ\Framework\TestCase
 {
-    public function testPublish()
-    {
-        $transferencia = new Transferencia();
-        $values = $transferencia->publish();
-        $allowed = [
-            'id',
-            'pedidoid',
-            'destinopedidoid',
-            'tipo',
-            'modulo',
-            'mesaid',
-            'destinomesaid',
-            'comandaid',
-            'destinocomandaid',
-            'itemid',
-            'funcionarioid',
-            'datahora',
-        ];
-        $this->assertEquals($allowed, array_keys($values));
-    }
 }

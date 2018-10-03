@@ -90,8 +90,6 @@ class ImpostoTest extends \MZ\Framework\TestCase
             $this->assertEquals(
                 [
                     'grupo',
-                    'simples',
-                    'substituicao',
                     'codigo',
                     'descricao',
                 ],

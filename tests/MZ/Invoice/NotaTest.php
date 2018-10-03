@@ -26,36 +26,4 @@ namespace MZ\Invoice;
 
 class NotaTest extends \MZ\Framework\TestCase
 {
-    public function testPublish()
-    {
-        $nota = new Nota();
-        $values = $nota->publish();
-        $allowed = [
-            'id',
-            'tipo',
-            'ambiente',
-            'acao',
-            'estado',
-            'serie',
-            'numeroinicial',
-            'numerofinal',
-            'sequencia',
-            'chave',
-            'recibo',
-            'protocolo',
-            'pedidoid',
-            'motivo',
-            'contingencia',
-            'consultaurl',
-            'qrcode',
-            'tributos',
-            'detalhes',
-            'corrigido',
-            'concluido',
-            'dataautorizacao',
-            'dataemissao',
-            'datalancamento',
-        ];
-        $this->assertEquals($allowed, array_keys($values));
-    }
 }

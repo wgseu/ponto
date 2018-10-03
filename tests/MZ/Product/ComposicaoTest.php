@@ -26,19 +26,4 @@ namespace MZ\Product;
 
 class ComposicaoTest extends \MZ\Framework\TestCase
 {
-    public function testPublish()
-    {
-        $composicao = new Composicao();
-        $values = $composicao->publish();
-        $allowed = [
-            'id',
-            'composicaoid',
-            'produtoid',
-            'tipo',
-            'quantidade',
-            'valor',
-            'ativa',
-        ];
-        $this->assertEquals($allowed, array_keys($values));
-    }
 }

@@ -26,32 +26,4 @@ namespace MZ\Payment;
 
 class PagamentoTest extends \MZ\Framework\TestCase
 {
-    public function testPublish()
-    {
-        $pagamento = new Pagamento();
-        $values = $pagamento->publish();
-        $allowed = [
-            'id',
-            'carteiraid',
-            'movimentacaoid',
-            'funcionarioid',
-            'formapagtoid',
-            'pedidoid',
-            'pagtocontaid',
-            'cartaoid',
-            'chequeid',
-            'contaid',
-            'creditoid',
-            'total',
-            'parcelas',
-            'valorparcela',
-            'taxas',
-            'detalhes',
-            'cancelado',
-            'ativo',
-            'datacompensacao',
-            'datahora',
-        ];
-        $this->assertEquals($allowed, array_keys($values));
-    }
 }

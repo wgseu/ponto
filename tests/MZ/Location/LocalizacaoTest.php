@@ -26,28 +26,4 @@ namespace MZ\Location;
 
 class LocalizacaoTest extends \MZ\Framework\TestCase
 {
-    public function testPublish()
-    {
-        $localizacao = new Localizacao();
-        $values = $localizacao->publish();
-        $allowed = [
-            'id',
-            'clienteid',
-            'bairroid',
-            'cep',
-            'logradouro',
-            'numero',
-            'tipo',
-            'complemento',
-            'condominio',
-            'bloco',
-            'apartamento',
-            'referencia',
-            'latitude',
-            'longitude',
-            'apelido',
-            'mostrar',
-        ];
-        $this->assertEquals($allowed, array_keys($values));
-    }
 }

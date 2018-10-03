@@ -1282,10 +1282,10 @@ class Cliente extends SyncModel
      * @param  string $fone telefone to find Cliente
      * @return Cliente Self filled instance or empty when not found
      */
-    public function loadByFone($fone)
+    public function loadByFone()
     {
         return $this->load([
-            'fone' => strval($fone),
+            'fone' => strval($this->getTelefone()->getNumero()),
         ]);
     }
 
@@ -1589,7 +1589,8 @@ class Cliente extends SyncModel
     public static function findByFone($fone)
     {
         $result = new self();
-        return $result->loadByFone($fone);
+        $result->getTelefone()->setNumero($fone);
+        return $result->loadByFone();
     }
 
     /**

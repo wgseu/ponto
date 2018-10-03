@@ -26,20 +26,4 @@ namespace MZ\Product;
 
 class GrupoTest extends \MZ\Framework\TestCase
 {
-    public function testPublish()
-    {
-        $grupo = new Grupo();
-        $values = $grupo->publish();
-        $allowed = [
-            'id',
-            'produtoid',
-            'descricao',
-            'multiplo',
-            'tipo',
-            'quantidademinima',
-            'quantidademaxima',
-            'funcao',
-        ];
-        $this->assertEquals($allowed, array_keys($values));
-    }
 }

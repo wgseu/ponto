@@ -203,7 +203,7 @@ class PedidoOldApiController extends \MZ\Core\ApiController
             $dispositivo = new Dispositivo();
             $dispositivo->setNome($this->getRequest()->query->get('device'));
             $dispositivo->setSerial($this->getRequest()->query->get('serial'));
-            $dispositivo->loadBySerial($dispositivo->getSerial());
+            $dispositivo->loadBySerial();
             if (!$dispositivo->exists()) {
                 throw new \Exception('O dispositivo informado não existe ou não foi validado');
             }

@@ -26,21 +26,4 @@ namespace MZ\Stock;
 
 class CatalogoTest extends \MZ\Framework\TestCase
 {
-    public function testPublish()
-    {
-        $catalogo = new Catalogo();
-        $values = $catalogo->publish();
-        $allowed = [
-            'id',
-            'produtoid',
-            'fornecedorid',
-            'precocompra',
-            'precovenda',
-            'quantidademinima',
-            'estoque',
-            'limitado',
-            'dataconsulta',
-        ];
-        $this->assertEquals($allowed, array_keys($values));
-    }
 }

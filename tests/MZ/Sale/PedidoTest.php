@@ -26,33 +26,4 @@ namespace MZ\Sale;
 
 class PedidoTest extends \MZ\Framework\TestCase
 {
-    public function testPublish()
-    {
-        $pedido = new Pedido();
-        $values = $pedido->publish();
-        $allowed = [
-            'id',
-            'mesaid',
-            'comandaid',
-            'movimentacaoid',
-            'sessaoid',
-            'funcionarioid',
-            'entregadorid',
-            'clienteid',
-            'localizacaoid',
-            'tipo',
-            'estado',
-            'pessoas',
-            'descricao',
-            'fechadorid',
-            'dataimpressao',
-            'cancelado',
-            'motivo',
-            'datacriacao',
-            'dataagendamento',
-            'dataentrega',
-            'dataconclusao',
-        ];
-        $this->assertEquals($allowed, array_keys($values));
-    }
 }

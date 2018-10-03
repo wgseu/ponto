@@ -26,33 +26,4 @@ namespace MZ\Sale;
 
 class ItemTest extends \MZ\Framework\TestCase
 {
-    public function testPublish()
-    {
-        $produto_pedido = new Item();
-        $values = $produto_pedido->publish();
-        $allowed = [
-            'id',
-            'pedidoid',
-            'funcionarioid',
-            'produtoid',
-            'servicoid',
-            'itemid',
-            'descricao',
-            'preco',
-            'quantidade',
-            'porcentagem',
-            'precovenda',
-            'precocompra',
-            'detalhes',
-            'estado',
-            'visualizado',
-            'datavisualizacao',
-            'dataatualizacao',
-            'cancelado',
-            'motivo',
-            'desperdicado',
-            'datahora',
-        ];
-        $this->assertEquals($allowed, array_keys($values));
-    }
 }

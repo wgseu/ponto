@@ -28,7 +28,7 @@ use MZ\Util\Mask;
 use MZ\Util\Filter;
 use MZ\Util\Validator;
 use MZ\Database\DB;
-use MZ\Database\SyncModel;
+use MZ\Database\Model;
 use MZ\Exception\ValidationException;
 use MZ\Location\Localizacao;
 

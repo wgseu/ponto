@@ -26,18 +26,4 @@ namespace MZ\Promotion;
 
 class PromocaoTest extends \MZ\Framework\TestCase
 {
-    public function testPublish()
-    {
-        $promocao = new Promocao();
-        $values = $promocao->publish();
-        $allowed = [
-            'id',
-            'produtoid',
-            'inicio',
-            'fim',
-            'valor',
-            'proibir',
-        ];
-        $this->assertEquals($allowed, array_keys($values));
-    }
 }

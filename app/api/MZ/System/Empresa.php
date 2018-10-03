@@ -343,6 +343,19 @@ class Empresa extends SyncModel
     }
 
     /**
+     * Delete this instance from database using ID
+     * @return integer Number of rows deleted (Max 1)
+     * @throws \MZ\Exception\ValidationException for invalid id
+     */
+    public function delete()
+    {
+        throw new \Exception(
+            'Não é possível excluir as informações da empresa',
+            500
+        );
+    }
+
+    /**
      * Load one register for it self with a condition
      * @param array $condition Condition for searching the row
      * @param array $order associative field name -> [-1, 1]

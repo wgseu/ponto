@@ -26,23 +26,4 @@ namespace MZ\Payment;
 
 class FormaPagtoTest extends \MZ\Framework\TestCase
 {
-    public function testPublish()
-    {
-        $forma_pagto = new FormaPagto();
-        $values = $forma_pagto->publish();
-        $allowed = [
-            'id',
-            'tipo',
-            'carteiraid',
-            'carteirapagtoid',
-            'descricao',
-            'parcelado',
-            'minparcelas',
-            'maxparcelas',
-            'parcelassemjuros',
-            'juros',
-            'ativa',
-        ];
-        $this->assertEquals($allowed, array_keys($values));
-    }
 }

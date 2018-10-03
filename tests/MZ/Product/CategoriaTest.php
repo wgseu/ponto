@@ -84,23 +84,6 @@ class CategoriaTest extends \MZ\Framework\TestCase
         $this->assertEquals($old_categoria, $categoria);
     }
 
-    public function testPublish()
-    {
-        $categoria = new Categoria();
-        $values = $categoria->publish();
-        $allowed = [
-            'id',
-            'categoriaid',
-            'descricao',
-            'servico',
-            'imagemurl',
-            'ordem',
-            'dataatualizacao',
-            'dataarquivado',
-        ];
-        $this->assertEquals($allowed, array_keys($values));
-    }
-
     public function testInsert()
     {
         $categoria = new Categoria();

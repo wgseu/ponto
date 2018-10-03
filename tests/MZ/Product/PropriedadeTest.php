@@ -26,18 +26,4 @@ namespace MZ\Product;
 
 class PropriedadeTest extends \MZ\Framework\TestCase
 {
-    public function testPublish()
-    {
-        $propriedade = new Propriedade();
-        $values = $propriedade->publish();
-        $allowed = [
-            'id',
-            'grupoid',
-            'nome',
-            'abreviacao',
-            'imagem',
-            'dataatualizacao',
-        ];
-        $this->assertEquals($allowed, array_keys($values));
-    }
 }

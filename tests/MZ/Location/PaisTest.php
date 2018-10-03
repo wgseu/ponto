@@ -26,21 +26,4 @@ namespace MZ\Location;
 
 class PaisTest extends \MZ\Framework\TestCase
 {
-    public function testPublish()
-    {
-        $pais = new Pais();
-        $values = $pais->publish();
-        $allowed = [
-            'id',
-            'nome',
-            'sigla',
-            'codigo',
-            'moedaid',
-            'bandeiraindex',
-            'linguagemid',
-            'entradas',
-            'unitario',
-        ];
-        $this->assertEquals($allowed, array_keys($values));
-    }
 }

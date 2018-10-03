@@ -26,16 +26,4 @@ namespace MZ\System;
 
 class PermissaoTest extends \MZ\Framework\TestCase
 {
-    public function testPublish()
-    {
-        $permissao = new Permissao();
-        $values = $permissao->publish();
-        $allowed = [
-            'id',
-            'funcionalidadeid',
-            'nome',
-            'descricao',
-        ];
-        $this->assertEquals($allowed, array_keys($values));
-    }
 }

@@ -1023,10 +1023,10 @@ class Pedido extends SyncModel
      * @param  int $mesa_id id to find open table
      * @return self Self instance filled or empty when not found
      */
-    public function loadByMesaID($mesa_id)
+    public function loadByMesaID()
     {
         return $this->load([
-            'mesaid' => intval($mesa_id),
+            'mesaid' => intval($this->getMesaID()),
             'cancelado' => 'N',
             'tipo' => self::TIPO_MESA,
             '!estado' => self::ESTADO_FINALIZADO
@@ -1038,10 +1038,10 @@ class Pedido extends SyncModel
      * @param  int $comanda_id id to find open card
      * @return self Self instance filled or empty when not found
      */
-    public function loadByComandaID($comanda_id)
+    public function loadByComandaID()
     {
         return $this->load([
-            'comandaid' => intval($comanda_id),
+            'comandaid' => intval($this->getComandaID()),
             'cancelado' => 'N',
             'tipo' => self::TIPO_COMANDA,
             '!estado' => self::ESTADO_FINALIZADO
@@ -1055,9 +1055,9 @@ class Pedido extends SyncModel
     public function loadByLocal()
     {
         if ($this->getTipo() == self::TIPO_MESA) {
-            $this->loadByMesaID($this->getMesaID());
+            $this->loadByMesaID();
         } elseif ($this->getTipo() == self::TIPO_COMANDA) {
-            $this->loadByComandaID($this->getComandaID());
+            $this->loadByComandaID();
         } else {
             $this->fromArray([]);
         }
@@ -1378,7 +1378,8 @@ class Pedido extends SyncModel
     public static function findByMesaID($mesa_id)
     {
         $result = new self();
-        return $result->loadByMesaID($mesa_id);
+        $result->setMesaID($mesa_id);
+        return $result->loadByMesaID();
     }
 
     /**
@@ -1389,7 +1390,8 @@ class Pedido extends SyncModel
     public static function findByComandaID($comanda_id)
     {
         $result = new self();
-        return $result->loadByComandaID($comanda_id);
+        $result->setComandaID($comanda_id);
+        return $result->loadByComandaID();
     }
 
     public static function getTicketMedio($sessao_id, $data_inicio = null, $data_fim = null)

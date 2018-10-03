@@ -26,17 +26,4 @@ namespace MZ\Location;
 
 class BairroTest extends \MZ\Framework\TestCase
 {
-    public function testPublish()
-    {
-        $bairro = new Bairro();
-        $values = $bairro->publish();
-        $allowed = [
-            'id',
-            'cidadeid',
-            'nome',
-            'valorentrega',
-            'disponivel',
-        ];
-        $this->assertEquals($allowed, array_keys($values));
-    }
 }

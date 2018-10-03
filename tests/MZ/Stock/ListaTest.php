@@ -26,18 +26,4 @@ namespace MZ\Stock;
 
 class ListaTest extends \MZ\Framework\TestCase
 {
-    public function testPublish()
-    {
-        $lista = new Lista();
-        $values = $lista->publish();
-        $allowed = [
-            'id',
-            'descricao',
-            'estado',
-            'encarregadoid',
-            'dataviagem',
-            'datacadastro',
-        ];
-        $this->assertEquals($allowed, array_keys($values));
-    }
 }

@@ -26,22 +26,4 @@ namespace MZ\Payment;
 
 class CartaoTest extends \MZ\Framework\TestCase
 {
-    public function testPublish()
-    {
-        $cartao = new Cartao();
-        $values = $cartao->publish();
-        $allowed = [
-            'id',
-            'carteiraid',
-            'carteirapagtoid',
-            'descricao',
-            'imageindex',
-            'mensalidade',
-            'transacao',
-            'taxa',
-            'diasrepasse',
-            'ativo',
-        ];
-        $this->assertEquals($allowed, array_keys($values));
-    }
 }

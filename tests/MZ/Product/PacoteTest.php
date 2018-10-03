@@ -26,23 +26,4 @@ namespace MZ\Product;
 
 class PacoteTest extends \MZ\Framework\TestCase
 {
-    public function testPublish()
-    {
-        $pacote = new Pacote();
-        $values = $pacote->publish();
-        $allowed = [
-            'id',
-            'pacoteid',
-            'grupoid',
-            'produtoid',
-            'propriedadeid',
-            'associacaoid',
-            'quantidademinima',
-            'quantidademaxima',
-            'valor',
-            'selecionado',
-            'visivel',
-        ];
-        $this->assertEquals($allowed, array_keys($values));
-    }
 }

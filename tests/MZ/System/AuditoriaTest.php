@@ -26,19 +26,4 @@ namespace MZ\System;
 
 class AuditoriaTest extends \MZ\Framework\TestCase
 {
-    public function testPublish()
-    {
-        $auditoria = new Auditoria();
-        $values = $auditoria->publish();
-        $allowed = [
-            'id',
-            'funcionarioid',
-            'autorizadorid',
-            'tipo',
-            'prioridade',
-            'descricao',
-            'datahora',
-        ];
-        $this->assertEquals($allowed, array_keys($values));
-    }
 }

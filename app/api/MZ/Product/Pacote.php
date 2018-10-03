@@ -25,6 +25,7 @@
 namespace MZ\Product;
 
 use MZ\Util\Mask;
+use MZ\Util\Date;
 use MZ\Util\Filter;
 use MZ\Util\Validator;
 use MZ\Database\DB;
@@ -743,11 +744,7 @@ class Pacote extends SyncModel
             ->select('d.tipo as produtotipo')
             ->select('d.conteudo as produtoconteudo')
             ->select('u.sigla as unidadesigla')
-            ->select(
-                '(CASE WHEN d.imagem IS NULL AND r.imagem IS NULL THEN NULL ELSE '.
-                DB::concat(['COALESCE(r.id, d.id)', '".png"']).
-                ' END) as imagemurl'
-            )
+            ->select('d.imagemurl')
             ->select('COALESCE(r.dataatualizacao, d.dataatualizacao) as dataatualizacao');
         if (isset($condition['search'])) {
             $busca = $condition['search'];

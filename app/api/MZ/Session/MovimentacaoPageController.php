@@ -70,7 +70,7 @@ class MovimentacaoPageController extends PageController
         foreach ($caixas as $caixa) {
             $_caixa_names[$caixa->getID()] = $caixa->getDescricao();
         }
-        $_funcionario = $movimentacao->findFuncionarioAberturaID();
+        $_funcionario = $movimentacao->findIniciadorID();
         return $this->view('gerenciar_movimentacao_index', get_defined_vars());
     }
 

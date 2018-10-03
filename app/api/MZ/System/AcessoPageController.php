@@ -25,6 +25,7 @@
 namespace MZ\System;
 
 use MZ\System\Permissao;
+use MZ\Provider\Funcao;
 use MZ\Util\Filter;
 use MZ\Core\PageController;
 
@@ -35,7 +36,7 @@ class AcessoPageController extends PageController
 {
     public function manage()
     {
-        app()->neeOwner();
+        app()->needOwner();
         $funcao_id = $this->getRequest()->query->get('funcao');
         $funcao_id = $this->getRequest()->request->get('funcao', $funcao_id);
         $funcao = Funcao::findByID($funcao_id);

@@ -79,10 +79,6 @@
                     <strong>
                       <a href="/gerenciar/carteira/editar?id={{ $_carteira->getID() }}" title="Editar carteira de entrada '{{ $_carteira->getDescricao() }}'">{{ $_carteira->getDescricao() }}</a>
                     </strong>
-                    {% $_carteira = $forma_pagto->findCarteiraPagtoID() %}
-                    <small>
-                      <a href="/gerenciar/carteira/editar?id={{ $_carteira->getID() }}" title="Editar carteira de saída '{{ $_carteira->getDescricao() }}'">{{ $_carteira->getDescricao() }}</a>
-                    </small>
                   </td>
                   <td>
                     {% if $forma_pagto->isParcelado() %}

@@ -105,7 +105,7 @@ class ItemPageController extends PageController
             'Entrega' => 48,
         ];
 
-        $_funcionario = $produto_pedido->findFuncionarioID();
+        $_funcionario = $produto_pedido->findPrestadorID();
         $_produto = $produto_pedido->findProdutoID();
 
         return $this->view('gerenciar_produto_pedido_index', get_defined_vars());

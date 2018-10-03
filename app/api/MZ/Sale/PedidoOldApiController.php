@@ -65,13 +65,13 @@ class PedidoOldApiController extends \MZ\Core\ApiController
                 $pedido->loadByLocal();
             }
             $agrupar = $this->getRequest()->query->getBoolean('agrupar', true);
-            $group = ['p.id'];
+            $group = ['i.id'];
             if ($agrupar) {
                 $group = [
-                    'p.servicoid',
-                    'p.produtoid',
-                    'p.preco',
-                    'p.detalhes'
+                    'i.servicoid',
+                    'i.produtoid',
+                    'i.preco',
+                    'i.detalhes'
                 ];
             }
             $itens = Item::rawFindAll(

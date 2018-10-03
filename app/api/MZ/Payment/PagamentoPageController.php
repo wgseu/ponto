@@ -161,7 +161,7 @@ class PagamentoPageController extends PageController
         $cartoes = Cartao::findAll();
         $_cartao_names = [];
         foreach ($cartoes as $cartao) {
-            $_cartao_names[$cartao->getID()] = $cartao->getDescricao();
+            $_cartao_names[$cartao->getID()] = $cartao->getBandeira();
         }
         $carteiras = Carteira::findAll();
         $_carteira_names = [];

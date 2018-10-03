@@ -514,18 +514,7 @@ class Propriedade extends SyncModel
      */
     private static function query($condition = [], $order = [])
     {
-        $query = DB::from('Propriedades p')
-            ->select(null)
-            ->select('p.id')
-            ->select('p.grupoid')
-            ->select('p.nome')
-            ->select('p.abreviacao')
-            ->select(
-                '(CASE WHEN p.imagem IS NULL THEN NULL ELSE '.
-                DB::concat(['p.id', '".png"']).
-                ' END) as imagem'
-            )
-            ->select('p.dataatualizacao');
+        $query = DB::from('Propriedades p');
         $condition = self::filterCondition($condition);
         $query = DB::buildOrderBy($query, self::filterOrder($order));
         $query = $query->orderBy('p.id ASC');

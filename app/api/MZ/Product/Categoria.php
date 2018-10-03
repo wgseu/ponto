@@ -597,7 +597,7 @@ class Categoria extends SyncModel
         $allowed = self::getAllowedKeys();
         $order = Filter::order($order);
         if (isset($order['vendas'])) {
-            $field = 'SUM(r.quantidade)';
+            $field = 'SUM(i.quantidade)';
             $order = replace_key($order, 'vendas', $field);
             $allowed[$field] = true;
         }
@@ -642,7 +642,7 @@ class Categoria extends SyncModel
         }
         if (isset($order['vendas'])) {
             $query = $query->leftJoin(
-                'Produtos_Pedidos r ON r.produtoid = p.id AND r.datahora > ?',
+                'Itens i ON i.produtoid = p.id AND i.datahora > ?',
                 DB::now('-1 month')
             );
         }

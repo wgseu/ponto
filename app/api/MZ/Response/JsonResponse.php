@@ -31,7 +31,10 @@ use Symfony\Component\HttpFoundation\JsonResponse as SymfonyJsonResponse;
  */
 class JsonResponse extends SymfonyJsonResponse
 {
-    public function error($message, $code = null, $errors = [])
+    /**
+     * @return self
+     */
+    public function error($message, $code = null, $errors = [], $extra = [])
     {
         $response = [
             'status' => 'error',
@@ -43,10 +46,13 @@ class JsonResponse extends SymfonyJsonResponse
         if (!empty($errors)) {
             $response['errors'] = $errors;
         }
-        $this->setData($response);
+        $this->setData(array_merge($response, $extra));
         return $this;
     }
 
+    /**
+     * @return self
+     */
     public function warning($message, $content = [], $code = null)
     {
         $response = [
@@ -60,6 +66,9 @@ class JsonResponse extends SymfonyJsonResponse
         return $this;
     }
 
+    /**
+     * @return self
+     */
     public function success($content = [], $message = null)
     {
         $response = [

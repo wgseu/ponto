@@ -77,7 +77,7 @@ class PedidoPageController extends PageController
             'Avulso' => 32,
             'Entrega' => 48,
         ];
-        $_funcionario = $pedido->findFuncionarioID();
+        $_funcionario = $pedido->findPrestadorID();
         $_cliente = $pedido->findClienteID();
         return $this->view('gerenciar_pedido_index', get_defined_vars());
     }

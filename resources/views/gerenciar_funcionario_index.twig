@@ -72,7 +72,6 @@
               <tr>
                 <th>Nome</th>
                 <th>Função</th>
-                <th>Linguagem</th>
                 <th class="text-center">Data de cadastro</th>
                 <th width="10%" style="text-align: center;">Ações</th>
               </tr>
@@ -90,10 +89,9 @@
                   <td>
                     <a href="/gerenciar/funcao/editar?id={{ $_funcao->getID() }}" title="Editar função '{{ $_funcao->getDescricao() }}'">{{ $_funcao->getDescricao() }}</a>
                   </td>
-                  <td>{{ $prestador->getLinguagemName() }}</td>
                   <td class="text-center">
                     <strong title="Data de cadastro">{{ $this->datetime($prestador->getDataCadastro()) }}</strong>
-                    <small title="Data de saída">{{ $this->datetime($prestador->getDataSaida()) }}</small>
+                    <small title="Data de saída">{{ $this->datetime($prestador->getDataTermino()) }}</small>
                   </td>
                   <td class="text-center">
                     <ul class="nav panel_toolbox">

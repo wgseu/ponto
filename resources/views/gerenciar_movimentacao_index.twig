@@ -74,7 +74,7 @@
                   <td class="text-center">
                     <a href="/gerenciar/caixa/editar?id={{ $_caixa->getID() }}" title="Editar caixa '{{ $_caixa->getDescricao() }}'">{{ $_caixa->getDescricao() }}</a>
                   </td>
-                  {% $_funcionario = $movimentacao->findFuncionarioAberturaID() %}
+                  {% $_funcionario = $movimentacao->findIniciadorID() %}
                   {% $_cliente = $_funcionario->findClienteID() %}
                   <td class="text-center">
                     <strong>
@@ -82,7 +82,7 @@
                     </strong>
                     <small>{{ $this->datetime($movimentacao->getDataAbertura()) }}</small>
                   </td>
-                  {% $_funcionario = $movimentacao->findFuncionarioFechamentoID() %}
+                  {% $_funcionario = $movimentacao->findFechadorID() %}
                   {% $_cliente = $_funcionario->findClienteID() %}
                   <td class="text-center">
                     <strong>

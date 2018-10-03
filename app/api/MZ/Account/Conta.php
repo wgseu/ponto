@@ -1597,12 +1597,12 @@ class Conta extends SyncModel
                              '  SUM(IF(valor > 0, valor + acrescimo, 0)) as receitas, SUM(pago) as pago, '.
                              '  SUM(recebido) as recebido, MAX(datapagto) as datapagto '.
                              'FROM ('.
-                                'SELECT c.id, c.valor, c.acrescimo, MAX(pg.datahora) as datapagto, '.
-                                '  COALESCE(IF(c.valor <= 0, SUM(pg.total), 0), 0) as pago, '.
-                                '  COALESCE(IF(c.valor > 0, SUM(pg.total), 0), 0) as recebido '.
+                                'SELECT c.id, c.valor, c.acrescimo, MAX(pg.datalancamento) as datapagto, '.
+                                '  COALESCE(IF(c.valor <= 0, SUM(pg.lancado), 0), 0) as pago, '.
+                                '  COALESCE(IF(c.valor > 0, SUM(pg.lancado), 0), 0) as recebido '.
                                 'FROM Contas c '.
-                                'LEFT JOIN Pagamentos pg ON pg.pagtocontaid = c.id AND pg.cancelado = "N" AND pg.ativo = "Y" '.
-                                'WHERE c.id <> 1 AND c.cancelada = "N" '.$sql.
+                                'LEFT JOIN Pagamentos pg ON pg.contaid = c.id AND pg.estado = "Pago" '.
+                                'WHERE c.estado = "Ativa" '.$sql.
                                 'GROUP BY c.id '.
                                 'HAVING (ABS(valor + acrescimo) - ABS(pago + recebido)) >= 0.005) a');
         $stmt->execute($data);

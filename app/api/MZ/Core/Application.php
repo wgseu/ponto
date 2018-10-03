@@ -270,8 +270,7 @@ class Application
                 array_slice($matched, 2) // skip: _route, _controller
             );
         } catch (\Exception $e) {
-            $response = $service->getResponse();
-            $this->translateException($e, $response);
+            $response = $this->translateException($e, $service->getResponse());
         }
         return $response;
     }
@@ -279,36 +278,40 @@ class Application
     /**
      * Handle exceptions and show output to user
      * @param  \Exception $exception exception throwed
-     * @param \Symfony\Component\HttpFoundation\Response $response response object for exception
+     * @return \Symfony\Component\HttpFoundation\Response response object for exception
      */
     private function translateException($exception, $response)
     {
         if ($response instanceof \MZ\Response\JsonResponse) {
             $errors = [];
+            $extra = [];
             if ($exception instanceof \MZ\Exception\ValidationException) {
                 $errors = $exception->getErrors();
+            } elseif ($exception instanceof RedirectException) {
+                $extra = ['redirect' => $exception->getURL()];
             }
-            $response->error($exception->getMessage(), $exception->getCode(), $errors);
+            $response->error($exception->getMessage(), $exception->getCode(), $errors, $extra);
             $response->setStatusCode(Response::HTTP_BAD_REQUEST);
+        } elseif ($exception instanceof RedirectException) {
+            \Thunder::warning($exception->getMessage());
+            if (!$this->getAuthentication()->isLogin() && $this->getRequest()->isMethod('GET')) {
+                $this->getSession()->set('redirect', $this->getRequest()->getRequestUri());
+            }
+            $response = new RedirectResponse($exception->getURL());
         } elseif ($exception instanceof ResourceNotFoundException) {
             $response->setStatusCode(Response::HTTP_NOT_FOUND);
             $response->output('erro_404');
         }
+        return $response;
     }
 
     /**
      * Handle exceptions and show output to user
      * @param  \Exception $exception exception throwed
-     * @param \Symfony\Component\HttpFoundation\Response $response response object for exception
      */
     private function handleException($exception)
     {
-        if ($exception instanceof RedirectException) {
-            $response = new RedirectResponse($exception->getURL());
-        } else {
-            $response = $this->getResponse();
-        }
-        $this->translateException($exception, $response);
+        $response = $this->translateException($exception, $this->getResponse());
         $response->send();
     }
 

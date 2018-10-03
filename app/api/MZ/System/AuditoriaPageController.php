@@ -63,7 +63,7 @@ class AuditoriaPageController extends PageController
             $_funcionario_names[$prestador->getID()] = $_cliente->getLogin();
         }
 
-        $_funcionario = $auditoria->findFuncionarioID();
+        $_funcionario = $auditoria->findPrestadorID();
         $_tipo_names = Auditoria::getTipoOptions();
         $_prioridade_names = Auditoria::getPrioridadeOptions();
         $_prioridade_classe = [

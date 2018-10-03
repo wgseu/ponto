@@ -92,7 +92,6 @@ class CartaoPageController extends PageController
             'Y' => 'Ativos',
             'N' => 'Inativos',
         ];
-        $_imagens = [0 => ['id' => 0, 'name' => 'Sem imagem']] + Cartao::getImages();
         return $this->view('gerenciar_cartao_index', get_defined_vars());
     }
 

@@ -47,7 +47,7 @@
             <thead>
               <tr>
                 <th>Descrição</th>
-                <th>Salário base</th>
+                <th>Remuneração</th>
                 <th width="10%" style="text-align: center;">Ações</th>
               </tr>
             </thead>
@@ -57,7 +57,7 @@
                   <td>
                     <a href="/gerenciar/acesso/?funcao={{ $funcao->getID() }}">{{ $funcao->getDescricao() }}</a>
                   </td>
-                  <td>{{ $this->currency($funcao->getSalarioBase()) }}</td>
+                  <td>{{ $this->currency($funcao->getRemuneracao()) }}</td>
                   <td class="text-center">
                     <ul class="nav panel_toolbox">
                       <li>

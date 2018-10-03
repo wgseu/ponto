@@ -45,7 +45,7 @@
             </thead>
             <tbody>
               {% for $permissao in $permissoes %}
-                {% $_acesso = \MZ\Employee\Acesso::findByFuncaoIDPermissaoID($funcao->getID(), $permissao->getID()) %}
+                {% $_acesso = \MZ\System\Acesso::findByFuncaoIDPermissaoID($funcao->getID(), $permissao->getID()) %}
                 <tr class="{{ !$_acesso->exists() ? 'active': '' }}">
                   <td>
                     <div class="">

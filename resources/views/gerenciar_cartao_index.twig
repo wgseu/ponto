@@ -54,8 +54,6 @@
               <tr>
                 <th>Descrição</th>
                 <th>Carteiras</th>
-                <th>Mensalidade</th>
-                <th>Transação</th>
                 <th>Taxa</th>
                 <th>Repasse</th>
                 <th width="10%" style="text-align: center;">Ações</th>
@@ -65,9 +63,9 @@
               {% for $cartao in $cartoes %}
                 <tr class="{{ !$cartao->isAtivo() ? 'active': '' }}">
                   <td>
-                    <a href="/gerenciar/cartao/editar?id={{ $cartao->getID() }}" title="Editar cartão '{{ $cartao->getDescricao() }}'">
-                      <div title="{{ $_imagens[intval($cartao->getImageIndex())]['name'] }}" class="cell-icon cartao-icons" style="background-position: -{{ $_imagens[intval($cartao->getImageIndex())]['id'] * 50 }}px 0px;"></div>
-                      <strong>{{ $cartao->getDescricao() }}</strong>
+                    <a href="/gerenciar/cartao/editar?id={{ $cartao->getID() }}" title="Editar cartão '{{ $cartao->getBandeira() }}'">
+                      <img src="{{ $cartao->makeImagemURL() }}" width="42px" />
+                      <strong>{{ $cartao->getBandeira() }}</strong>
                     </a>
                   </td>
                   <td>
@@ -75,25 +73,19 @@
                     <strong>
                       <a href="/gerenciar/carteira/editar?id={{ $_carteira->getID() }}" title="Editar carteira '{{ $_carteira->getDescricao() }}'">{{ $_carteira->getDescricao() }}</a>
                     </strong>
-                    {% $_carteira = $cartao->findCarteiraPagtoID() %}
-                    <small>
-                      <a href="/gerenciar/carteira/editar?id={{ $_carteira->getID() }}" title="Editar carteira '{{ $_carteira->getDescricao() }}'">{{ $_carteira->getDescricao() }}</a>
-                    </small>
                   </td>
-                  <td>{{ $this->currency($cartao->getMensalidade()) }}</td>
-                  <td>{{ $this->currency($cartao->getTransacao()) }}</td>
                   <td>{{ $cartao->getTaxa() }}%</td>
                   <td>{{ $cartao->getDiasRepasse() }}
                     dias</td>
                   <td class="text-center">
                     <ul class="nav panel_toolbox">
                       <li>
-                        <a href="/gerenciar/cartao/editar?id={{ $cartao->getID() }}" title="Editar cartão '{{ $cartao->getDescricao() }}'">
+                        <a href="/gerenciar/cartao/editar?id={{ $cartao->getID() }}" title="Editar cartão '{{ $cartao->getBandeira() }}'">
                           <i class="fa fa-edit"></i>
                         </a>
                       </li>
                       <li>
-                        <a href="/gerenciar/cartao/excluir?id={{ $cartao->getID() }}" title="Excluir cartão '{{ $cartao->getDescricao() }}'" class="ajaxlink" ask="Deseja excluir o cartão '{{ $cartao->getDescricao() }}'?">
+                        <a href="/gerenciar/cartao/excluir?id={{ $cartao->getID() }}" title="Excluir cartão '{{ $cartao->getBandeira() }}'" class="ajaxlink" ask="Deseja excluir o cartão '{{ $cartao->getBandeira() }}'?">
                           <i class="fa fa-close"></i>
                         </a>
                       </li>

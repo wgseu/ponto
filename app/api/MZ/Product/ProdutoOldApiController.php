@@ -89,7 +89,9 @@ class ProdutoOldApiController extends \MZ\Core\ApiController
         ];
         $items = [];
         foreach ($produtos as $item) {
-            $items[] = array_intersect_key($item, array_flip($campos));
+            $produto = array_intersect_key($item, array_flip($campos));
+            $produto['imagemurl'] = get_image_url($produto['imagemurl'], 'produto', null);
+            $items[] = $produto;
         }
         return $this->json()->success(['produtos' => $items]);
     }

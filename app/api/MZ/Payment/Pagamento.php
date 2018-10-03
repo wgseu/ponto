@@ -1172,12 +1172,12 @@ class Pagamento extends SyncModel
             }
         }
         if (isset($condition['apartir_datahora'])) {
-            $field = 'p.datahora >= ?';
+            $field = 'p.datalancamento >= ?';
             $condition[$field] = Filter::datetime($condition['apartir_datahora'], '00:00:00');
             $allowed[$field] = true;
         }
         if (isset($condition['ate_datahora'])) {
-            $field = 'p.datahora <= ?';
+            $field = 'p.datalancamento <= ?';
             $condition[$field] = Filter::datetime($condition['ate_datahora'], '23:59:59');
             $allowed[$field] = true;
         }
@@ -1187,24 +1187,22 @@ class Pagamento extends SyncModel
             $allowed[$field] = true;
         }
         if (array_key_exists('!pagtocontaid', $condition)) {
-            $field = 'NOT p.pagtocontaid';
+            $field = 'NOT p.contaid';
             $condition[$field] = $condition['!pagtocontaid'];
             $allowed[$field] = true;
         }
         if (isset($condition['apartir_total'])) {
-            $field = 'p.total >= ?';
+            $field = 'p.valor >= ?';
             $condition[$field] = $condition['apartir_total'];
             $allowed[$field] = true;
         }
         if (isset($condition['ate_total'])) {
-            $field = 'p.total <= ?';
+            $field = 'p.valor <= ?';
             $condition[$field] = $condition['ate_total'];
             $allowed[$field] = true;
         }
         if (isset($condition['receitas'])) {
-            $field = '(NOT p.pedidoid IS NULL OR '.
-                '(p.total >= 0 AND NOT p.pagtocontaid IS NULL AND p.pagtocontaid <> ?))';
-            $condition[$field] = Conta::MOVIMENTACAO_ID;
+            $field = '(NOT p.pedidoid IS NULL OR (p.valor >= 0 AND NOT p.contaid IS NULL))';
             $allowed[$field] = true;
         }
         $allowed['m.sessaoid'] = true;
@@ -1231,18 +1229,17 @@ class Pagamento extends SyncModel
 
     private static function queryTotal($condition, $group = [])
     {
-        $condition['cancelado'] = 'N';
-        $condition['ativo'] = 'Y';
-        $query = self::query($condition, ['datahora' => 1])
+        $condition['estado'] = self::ESTADO_PAGO;
+        $query = self::query($condition, ['datalancamento' => 1])
             ->select(null)
-            ->select('ROUND(SUM(p.total), 4) as total');
+            ->select('SUM(p.valor) as total');
         if (isset($condition['mesaid'])) {
             $query = $query->leftJoin('Pedidos e ON e.id = p.pedidoid')
                 ->where('e.mesaid', $condition['mesaid']);
         }
         if (isset($group['dia'])) {
-            $query = $query->select(DB::strftime('%Y-%m-%d', 'p.datahora').' as data')
-                ->groupBy(DB::strftime('%Y-%m-%d', 'p.datahora'));
+            $query = $query->select(DB::strftime('%Y-%m-%d', 'p.datalancamento').' as data')
+                ->groupBy(DB::strftime('%Y-%m-%d', 'p.datalancamento'));
         } elseif (isset($group['forma_tipo'])) {
             $query = $query->leftJoin('Formas_Pagto f ON f.id = p.formapagtoid')
                 ->select('LOWER(f.tipo) as tipo')

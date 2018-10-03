@@ -30,6 +30,7 @@ use MZ\Util\Validator;
 use MZ\Database\DB;
 use MZ\Database\SyncModel;
 use MZ\Exception\ValidationException;
+use MZ\System\Permissao;
 
 /**
  * Informações do pedido de venda

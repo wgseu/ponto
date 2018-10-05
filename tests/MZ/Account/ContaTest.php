@@ -26,39 +26,4 @@ namespace MZ\Account;
 
 class ContaTest extends \MZ\Framework\TestCase
 {
-    public function testPublish()
-    {
-        $conta = new Conta();
-        $values = $conta->publish();
-        $allowed = [
-            'id',
-            'classificacaoid',
-            'funcionarioid',
-            'contaid',
-            'agrupamentoid',
-            'carteiraid',
-            'clienteid',
-            'pedidoid',
-            'tipo',
-            'descricao',
-            'valor',
-            'fonte',
-            'numeroparcela',
-            'parcelas',
-            'frequencia',
-            'modo',
-            'automatico',
-            'acrescimo',
-            'multa',
-            'juros',
-            'formula',
-            'vencimento',
-            'numerodoc',
-            'anexourl',
-            'estado',
-            'datacalculo',
-            'dataemissao',
-        ];
-        $this->assertEquals($allowed, array_keys($values));
-    }
 }

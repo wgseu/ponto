@@ -70,10 +70,6 @@ class FormaPagto extends SyncModel
      */
     private $descricao;
     /**
-     * Informa se a forma de pagamento permite parcelamento
-     */
-    private $parcelado;
-    /**
      * Quantidade mínima de parcelas
      */
     private $min_parcelas;
@@ -205,35 +201,6 @@ class FormaPagto extends SyncModel
     }
 
     /**
-     * Informa se a forma de pagamento permite parcelamento
-     * @return string parcelado of Forma de pagamento
-     */
-    public function getParcelado()
-    {
-        return $this->parcelado;
-    }
-
-    /**
-     * Informa se a forma de pagamento permite parcelamento
-     * @return boolean Check if o of Parcelado is selected or checked
-     */
-    public function isParcelado()
-    {
-        return $this->parcelado == 'Y';
-    }
-
-    /**
-     * Set Parcelado value to new on param
-     * @param string $parcelado Set parcelado for Forma de pagamento
-     * @return self Self instance
-     */
-    public function setParcelado($parcelado)
-    {
-        $this->parcelado = $parcelado;
-        return $this;
-    }
-
-    /**
      * Quantidade mínima de parcelas
      * @return int minimo de parcelas of Forma de pagamento
      */
@@ -355,7 +322,6 @@ class FormaPagto extends SyncModel
         $forma_pagto['integracaoid'] = $this->getIntegracaoID();
         $forma_pagto['carteiraid'] = $this->getCarteiraID();
         $forma_pagto['descricao'] = $this->getDescricao();
-        $forma_pagto['parcelado'] = $this->getParcelado();
         $forma_pagto['minparcelas'] = $this->getMinParcelas();
         $forma_pagto['maxparcelas'] = $this->getMaxParcelas();
         $forma_pagto['parcelassemjuros'] = $this->getParcelasSemJuros();
@@ -401,11 +367,6 @@ class FormaPagto extends SyncModel
             $this->setDescricao(null);
         } else {
             $this->setDescricao($forma_pagto['descricao']);
-        }
-        if (!isset($forma_pagto['parcelado'])) {
-            $this->setParcelado('N');
-        } else {
-            $this->setParcelado($forma_pagto['parcelado']);
         }
         if (!array_key_exists('minparcelas', $forma_pagto)) {
             $this->setMinParcelas(null);
@@ -461,11 +422,6 @@ class FormaPagto extends SyncModel
         $this->setMaxParcelas(Filter::number($this->getMaxParcelas()));
         $this->setParcelasSemJuros(Filter::number($this->getParcelasSemJuros()));
         $this->setJuros(Filter::float($this->getJuros(), $localized));
-        if ($this->getTipo() == self::TIPO_CARTAO) {
-            $this->setParcelado('Y');
-        } else {
-            $this->setParcelado('N');
-        }
         return $this;
     }
 
@@ -493,9 +449,6 @@ class FormaPagto extends SyncModel
         }
         if (is_null($this->getDescricao())) {
             $errors['descricao'] = _t('forma_pagto.descricao_cannot_empty');
-        }
-        if (!Validator::checkBoolean($this->getParcelado())) {
-            $errors['parcelado'] = _t('forma_pagto.parcelado_invalid');
         }
         if (!is_null($this->getMinParcelas()) && $this->getMinParcelas() < 0) {
             $errors['minparcelas'] = 'O mínimo de parcelas não pode ser negativo';

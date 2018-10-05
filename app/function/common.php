@@ -235,7 +235,7 @@ function app()
 function _t($key)
 {
     $messages = [];
-    $msg_path = app()->getPath('lang') . '/' . app()->system->country->getLinguagemID() . '/messages.php';
+    $msg_path = app()->getPath('lang') . '/' . app()->system->country->getIdioma() . '/messages.php';
     if (\file_exists($msg_path)) {
         $messages = require($msg_path);
     }
@@ -302,15 +302,6 @@ function set_timezone_for($uf, $pais = 'Brasil')
             break;
     }
     date_default_timezone_set($timezone);
-}
-
-function current_language_id()
-{
-    $lang_id = app()->auth->provider->getLinguagemID();
-    if (is_null($lang_id)) {
-        $lang_id = 1046;
-    }
-    return $lang_id;
 }
 
 function get_string_config($section, $key, $default = null)

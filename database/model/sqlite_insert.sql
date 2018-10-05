@@ -14,11 +14,11 @@ INSERT INTO `Moedas` (`ID`, `Nome`, `Simbolo`, `Codigo`, `Divisao`, `Fracao`, `F
 	(3, "Euro", "€", "EUR", 100, "Cent", "€ %s", 'N'),
 	(4, "Metical", "MT", "MZN", 100, "Centavo", "%s MT", 'N');
 
-INSERT INTO `Paises` (`ID`, `Nome`, `Sigla`, `Codigo`, `MoedaID`, `BandeiraIndex`, `LinguagemID`, `Entradas`, `Unitario`) VALUES
-	(1, "Brasil", "BRA", "BR", 1, 28, 1046, NULL, 'N'),
-	(2, "United States of America", "USA", "US", 2, 220, 1033, 'W1RpdHVsb10NCkNFUD1aSVANCkNQRj1TU04NCg0KW01hc2NhcmFdDQpDRVA9OTk5OTkNCkNQRj05OTktOTktOTk5OQ0KVGVsZWZvbmU9KDk5OSkgOTk5LTk5OTkNCg0KW0F1ZGl0b3JpYV0NCg0K', 'N'),
-	(3, "España", "ESP", "ES", 3, 66, 1034, 'W1RpdHVsb10NCkNOUEo9UlVUDQpDUEY9TlVJUA0KQ0VQPUNPUA0KDQpbTWFzY2FyYV0NCkNQRj05Ljk5OS45OTkuOTk5DQpDRVA9OTk5OTkNCkNOUEo9OTkuOTk5Ljk5OS05DQpUZWxlZm9uZT05OTkgOTk5IDk5OQ0KDQo=', 'Y'),
-	(4, "Moçambique", "MOZ", "MZ", 4, 151, 1046, 'W1RpdHVsb10NCkNOUEo9TlVJVA0KQ0VQPUNPUA0KDQpbTWFzY2FyYV0NCkNOUEo9OS45OTk5OTk5LTkNCkNFUD05OTk5DQpUZWxlZm9uZT05OTk5LTk5OTk5DQoNCg==', 'Y');
+INSERT INTO `Paises` (`ID`, `Nome`, `Sigla`, `Codigo`, `MoedaID`, `Idioma`, `Entradas`, `Unitario`) VALUES
+	(1, "Brasil", "BRA", "BR", 1, 'pt-BR', NULL, 'N'),
+	(2, "United States of America", "USA", "US", 2, 'en-US', 'W1RpdHVsb10NCkNFUD1aSVANCkNQRj1TU04NCg0KW01hc2NhcmFdDQpDRVA9OTk5OTkNCkNQRj05OTktOTktOTk5OQ0KVGVsZWZvbmU9KDk5OSkgOTk5LTk5OTkNCg0KW0F1ZGl0b3JpYV0NCg0K', 'N'),
+	(3, "España", "ESP", "ES", 3, 'es-ES', 'W1RpdHVsb10NCkNOUEo9UlVUDQpDUEY9TlVJUA0KQ0VQPUNPUA0KDQpbTWFzY2FyYV0NCkNQRj05Ljk5OS45OTkuOTk5DQpDRVA9OTk5OTkNCkNOUEo9OTkuOTk5Ljk5OS05DQpUZWxlZm9uZT05OTkgOTk5IDk5OQ0KDQo=', 'Y'),
+	(4, "Moçambique", "MOZ", "MZ", 4, 'pt-BR', 'W1RpdHVsb10NCkNOUEo9TlVJVA0KQ0VQPUNPUA0KDQpbTWFzY2FyYV0NCkNOUEo9OS45OTk5OTk5LTkNCkNFUD05OTk5DQpUZWxlZm9uZT05OTk5LTk5OTk5DQoNCg==', 'Y');
 
 INSERT INTO `Empresas` (`ID`, `PaisID`) VALUES
 	('1', 1);
@@ -61,14 +61,14 @@ INSERT INTO `Funcoes` (`ID`, `Descricao`, `Remuneracao`) VALUES
 	(6, "Entregador(a)", 880),
 	(7, "Estoquista", 880);
 
-INSERT INTO `Modulos` (`ID`, `Nome`, `Descricao`, `ImageIndex`, `Habilitado`) VALUES
-	(1, "Mesas", "Permite realizar vendas para mesas", 4, 'Y'),
-	(2, "Venda rápida", "Permite realizar vendas rápidas com código de barras", 5, 'Y'),
-	(3, "Cartão de consumo", "Permite realizar vendas com cartão de consumo", 6, 'Y'),
-	(4, "Delivery", "Permite realizar vendas para entrega", 7, 'Y'),
-	(5, "Estoque", "Permite controlar estoque com cadastro de fornecedores", 8, 'Y'),
-	(6, "Controle de contas", "Permite cadastrar contas a pagar e a receber", 9, 'Y'),
-	(7, "Comanda eletrônica", "Permite realizar pedidos pelo celular ou tablet", 10, 'Y');
+INSERT INTO `Modulos` (`ID`, `Nome`, `Descricao`, `Habilitado`) VALUES
+	(1, "Mesas", "Permite realizar vendas para mesas", 'Y'),
+	(2, "Venda rápida", "Permite realizar vendas rápidas com código de barras", 'Y'),
+	(3, "Cartão de consumo", "Permite realizar vendas com cartão de consumo", 'Y'),
+	(4, "Delivery", "Permite realizar vendas para entrega", 'Y'),
+	(5, "Estoque", "Permite controlar estoque com cadastro de fornecedores", 'Y'),
+	(6, "Controle de contas", "Permite cadastrar contas a pagar e a receber", 'Y'),
+	(7, "Comanda eletrônica", "Permite realizar pedidos pelo celular ou tablet", 'Y');
 
 INSERT INTO `Funcionalidades` (`ID`, `Nome`, `Descricao`) VALUES
 	(1, "Operacional", "Controla operações nas telas do sistema"),
@@ -385,14 +385,14 @@ INSERT INTO `Carteiras` (`ID`, `Tipo`, `Descricao`, `Ativa`) VALUES
 INSERT INTO `Caixas` (`ID`, `CarteiraID`, `Descricao`, `Ativo`) VALUES
 	(1, 2, "Caixa 1", 'Y');
 
-INSERT INTO `Formas_Pagto` (`ID`, `Descricao`, `Tipo`, `CarteiraID`, `Parcelado`, `MinParcelas`, `MaxParcelas`, `ParcelasSemJuros`, `Juros`, `Ativa`) VALUES
-	(1, "Dinheiro", 'Dinheiro', 1, 'N', NULL, NULL, NULL, NULL, 'Y'),
-	(2, "Crédito", 'Credito', 1, 'Y', 1, 1, 1, 2.5, 'Y'),
-	(3, "Débito", 'Debito', 1, 'Y', 1, 1, 1, 2.5, 'Y'),
-	(4, "Vale", 'Vale', 1, 'N', NULL, NULL, NULL, NULL, 'N'),
-	(5, "Cheque", 'Cheque', 1, 'N', NULL, NULL, NULL, NULL, 'N'),
-	(6, "Conta", 'Crediario', 1, 'N', NULL, NULL, NULL, NULL, 'N'),
-	(7, "Saldo", 'Saldo', 1, 'N', NULL, NULL, NULL, NULL, 'N');
+INSERT INTO `Formas_Pagto` (`ID`, `Descricao`, `Tipo`, `CarteiraID`, `MinParcelas`, `MaxParcelas`, `ParcelasSemJuros`, `Juros`, `Ativa`) VALUES
+	(1, "Dinheiro", 'Dinheiro', 1, NULL, NULL, NULL, NULL, 'Y'),
+	(2, "Crédito", 'Credito', 1, 1, 1, 1, 2.5, 'Y'),
+	(3, "Débito", 'Debito', 1, 1, 1, 1, 2.5, 'Y'),
+	(4, "Vale", 'Vale', 1, NULL, NULL, NULL, NULL, 'N'),
+	(5, "Cheque", 'Cheque', 1, NULL, NULL, NULL, NULL, 'N'),
+	(6, "Conta", 'Crediario', 1, NULL, NULL, NULL, NULL, 'N'),
+	(7, "Saldo", 'Saldo', 1, NULL, NULL, NULL, NULL, 'N');
 
 INSERT INTO `Cartoes` (`ID`, `FormaPagtoID`, `Bandeira`, `ImagemURL`, `Ativo`) VALUES
 	(1, 2, "Visa", 'visa.png', 'Y'),

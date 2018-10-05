@@ -77,7 +77,7 @@ class ItemOldApiController extends \MZ\Core\ApiController
 
                 $tz = date_default_timezone_get();
                 date_default_timezone_set('UTC');
-                $datahora = strtotime($value->getDataHora());
+                $datahora = strtotime($value->getDataLancamento());
                 date_default_timezone_set($tz);
 
                 $cliente = $value->findFuncionarioID()->findClienteID();

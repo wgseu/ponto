@@ -26,17 +26,4 @@ namespace MZ\System;
 
 class ModuloTest extends \MZ\Framework\TestCase
 {
-    public function testPublish()
-    {
-        $modulo = new Modulo();
-        $values = $modulo->publish();
-        $allowed = [
-            'id',
-            'nome',
-            'descricao',
-            'imageindex',
-            'habilitado',
-        ];
-        $this->assertEquals($allowed, array_keys($values));
-    }
 }

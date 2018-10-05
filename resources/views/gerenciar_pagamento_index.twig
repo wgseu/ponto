@@ -158,8 +158,8 @@
                 </td>
                 <td class="text-center">{{ $pagamento->getDetalhes() }}</td>
                 <td class="text-center">
-                  <strong title="Data do pagamento">{{ $this->datetime($pagamento->getDataHora()) }}</strong>
-                  {% if $pagamento->getDataHora() != $pagamento->getDataCompensacao() %}
+                  <strong title="Data do pagamento">{{ $this->datetime($pagamento->getDataLancamento()) }}</strong>
+                  {% if $pagamento->getDataLancamento() != $pagamento->getDataCompensacao() %}
                     <small title="Data de compensação">{{ $this->datetime($pagamento->getDataCompensacao()) }}</small>
                   {% endif %}
                 </td>

@@ -122,6 +122,10 @@ class Conta extends SyncModel
      */
     private $valor;
     /**
+     * Valor pago ou recebido da conta
+     */
+    private $consolidado;
+    /**
      * Fonte dos valores, comissão e remuneração se pagar antes do vencimento,
      * o valor será proporcional
      */
@@ -419,6 +423,26 @@ class Conta extends SyncModel
     public function setValor($valor)
     {
         $this->valor = $valor;
+        return $this;
+    }
+
+    /**
+     * Valor pago ou recebido da conta
+     * @return string valor pago ou recebido of Conta
+     */
+    public function getConsolidado()
+    {
+        return $this->consolidado;
+    }
+
+    /**
+     * Set Consolidado value to new on param
+     * @param string $consolidado Set valor pago ou recebido for Conta
+     * @return self Self instance
+     */
+    public function setConsolidado($consolidado)
+    {
+        $this->consolidado = $consolidado;
         return $this;
     }
 
@@ -775,6 +799,7 @@ class Conta extends SyncModel
         $conta['tipo'] = $this->getTipo();
         $conta['descricao'] = $this->getDescricao();
         $conta['valor'] = $this->getValor();
+        $conta['consolidado'] = $this->getConsolidado();
         $conta['fonte'] = $this->getFonte();
         $conta['numeroparcela'] = $this->getNumeroParcela();
         $conta['parcelas'] = $this->getParcelas();
@@ -861,6 +886,11 @@ class Conta extends SyncModel
             $this->setValor(null);
         } else {
             $this->setValor($conta['valor']);
+        }
+        if (!isset($conta['consolidado'])) {
+            $this->setConsolidado(0);
+        } else {
+            $this->setConsolidado($conta['consolidado']);
         }
         if (!isset($conta['fonte'])) {
             $this->setFonte(self::FONTE_FIXA);
@@ -1039,6 +1069,7 @@ class Conta extends SyncModel
         $this->setClienteID(Filter::number($this->getClienteID()));
         $this->setDescricao(Filter::string($this->getDescricao()));
         $this->setValor(Filter::money($this->getValor(), $localized));
+        $this->setConsolidado(Filter::money($original->getConsolidado(), $localized));
         $this->setAcrescimo(Filter::money($this->getAcrescimo(), $localized));
         $this->setMulta(Filter::money($this->getMulta(), $localized));
         if ($this->getValor() > 0 && $this->getTipo() == self::TIPO_DESPESA) {
@@ -1108,6 +1139,9 @@ class Conta extends SyncModel
             $errors['valor'] = _t('conta.receita_negativa');
         } elseif ($this->getValor() > 0 && $this->getTipo() == self::TIPO_DESPESA) {
             $errors['valor'] = _t('conta.despesa_positiva');
+        }
+        if (is_null($this->getConsolidado())) {
+            $errors['consolidado'] = _t('conta.consolidado_cannot_empty');
         }
         if (!Validator::checkInSet($this->getFonte(), self::getFonteOptions())) {
             $errors['fonte'] = _t('conta.fonte_invalid');
@@ -1362,7 +1396,7 @@ class Conta extends SyncModel
     /**
      * Gets textual and translated Tipo for Conta
      * @param int $index choose option from index
-     * @return string[]|string A associative key -> translated representative text or text for index
+     * @return string[] A associative key -> translated representative text or text for index
      */
     public static function getTipoOptions($index = null)
     {
@@ -1379,7 +1413,7 @@ class Conta extends SyncModel
     /**
      * Gets textual and translated Fonte for Conta
      * @param int $index choose option from index
-     * @return string[]|string A associative key -> translated representative text or text for index
+     * @return string[] A associative key -> translated representative text or text for index
      */
     public static function getFonteOptions($index = null)
     {
@@ -1398,7 +1432,7 @@ class Conta extends SyncModel
     /**
      * Gets textual and translated Modo for Conta
      * @param int $index choose option from index
-     * @return string[]|string A associative key -> translated representative text or text for index
+     * @return string[] A associative key -> translated representative text or text for index
      */
     public static function getModoOptions($index = null)
     {
@@ -1415,7 +1449,7 @@ class Conta extends SyncModel
     /**
      * Gets textual and translated Formula for Conta
      * @param int $index choose option from index
-     * @return string[]|string A associative key -> translated representative text or text for index
+     * @return string[] A associative key -> translated representative text or text for index
      */
     public static function getFormulaOptions($index = null)
     {
@@ -1432,7 +1466,7 @@ class Conta extends SyncModel
     /**
      * Gets textual and translated Estado for Conta
      * @param int $index choose option from index
-     * @return string[]|string A associative key -> translated representative text or text for index
+     * @return string[] A associative key -> translated representative text or text for index
      */
     public static function getEstadoOptions($index = null)
     {

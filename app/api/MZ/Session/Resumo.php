@@ -42,11 +42,12 @@ class Resumo extends SyncModel
      * Tipo de pagamento do resumo
      */
     const TIPO_DINHEIRO = 'Dinheiro';
-    const TIPO_CARTAO = 'Cartao';
-    const TIPO_CHEQUE = 'Cheque';
-    const TIPO_CONTA = 'Conta';
     const TIPO_CREDITO = 'Credito';
-    const TIPO_TRANSFERENCIA = 'Transferencia';
+    const TIPO_DEBITO = 'Debito';
+    const TIPO_VALE = 'Vale';
+    const TIPO_CHEQUE = 'Cheque';
+    const TIPO_CREDIARIO = 'Crediario';
+    const TIPO_SALDO = 'Saldo';
 
     /**
      * Identificador do resumo
@@ -438,11 +439,12 @@ class Resumo extends SyncModel
     {
         $options = [
             self::TIPO_DINHEIRO => _t('resumo.tipo_dinheiro'),
-            self::TIPO_CARTAO => _t('resumo.tipo_cartao'),
-            self::TIPO_CHEQUE => _t('resumo.tipo_cheque'),
-            self::TIPO_CONTA => _t('resumo.tipo_conta'),
             self::TIPO_CREDITO => _t('resumo.tipo_credito'),
-            self::TIPO_TRANSFERENCIA => _t('resumo.tipo_transferencia'),
+            self::TIPO_DEBITO => _t('resumo.tipo_debito'),
+            self::TIPO_VALE => _t('resumo.tipo_vale'),
+            self::TIPO_CHEQUE => _t('resumo.tipo_cheque'),
+            self::TIPO_CREDIARIO => _t('resumo.tipo_crediario'),
+            self::TIPO_SALDO => _t('resumo.tipo_saldo'),
         ];
         if (!is_null($index)) {
             return $options[$index];

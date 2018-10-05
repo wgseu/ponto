@@ -58,13 +58,9 @@ class Pais extends SyncModel
      */
     private $moeda_id;
     /**
-     * Index da imagem da bandeira do país
+     * Idioma nativo do país
      */
-    private $bandeira_index;
-    /**
-     * Linguagem nativa do país
-     */
-    private $linguagem_id;
+    private $idioma;
     /**
      * Prefixo de telefone para ligações internacionais
      */
@@ -188,42 +184,22 @@ class Pais extends SyncModel
     }
 
     /**
-     * Index da imagem da bandeira do país
-     * @return int bandeira of País
+     * Idioma nativo do país
+     * @return string código do idioma of País
      */
-    public function getBandeiraIndex()
+    public function getIdioma()
     {
-        return $this->bandeira_index;
+        return $this->idioma;
     }
 
     /**
-     * Set BandeiraIndex value to new on param
-     * @param int $bandeira_index Set bandeira for País
+     * Set Idioma value to new on param
+     * @param string $idioma Set código do idioma for País
      * @return self Self instance
      */
-    public function setBandeiraIndex($bandeira_index)
+    public function setIdioma($idioma)
     {
-        $this->bandeira_index = $bandeira_index;
-        return $this;
-    }
-
-    /**
-     * Linguagem nativa do país
-     * @return int linguagem id of País
-     */
-    public function getLinguagemID()
-    {
-        return $this->linguagem_id;
-    }
-
-    /**
-     * Set LinguagemID value to new on param
-     * @param int $linguagem_id Set linguagem id for País
-     * @return self Self instance
-     */
-    public function setLinguagemID($linguagem_id)
-    {
-        $this->linguagem_id = $linguagem_id;
+        $this->idioma = $idioma;
         return $this;
     }
 
@@ -309,8 +285,7 @@ class Pais extends SyncModel
         $pais['sigla'] = $this->getSigla();
         $pais['codigo'] = $this->getCodigo();
         $pais['moedaid'] = $this->getMoedaID();
-        $pais['bandeiraindex'] = $this->getBandeiraIndex();
-        $pais['linguagemid'] = $this->getLinguagemID();
+        $pais['idioma'] = $this->getIdioma();
         $pais['prefixo'] = $this->getPrefixo();
         $pais['entradas'] = $this->getEntradas();
         $pais['unitario'] = $this->getUnitario();
@@ -355,15 +330,10 @@ class Pais extends SyncModel
         } else {
             $this->setMoedaID($pais['moedaid']);
         }
-        if (!isset($pais['bandeiraindex'])) {
-            $this->setBandeiraIndex(null);
+        if (!isset($pais['idioma'])) {
+            $this->setIdioma(null);
         } else {
-            $this->setBandeiraIndex($pais['bandeiraindex']);
-        }
-        if (!isset($pais['linguagemid'])) {
-            $this->setLinguagemID(null);
-        } else {
-            $this->setLinguagemID($pais['linguagemid']);
+            $this->setIdioma($pais['idioma']);
         }
         if (!array_key_exists('prefixo', $pais)) {
             $this->setPrefixo(null);
@@ -406,8 +376,7 @@ class Pais extends SyncModel
         $this->setSigla(Filter::string($this->getSigla()));
         $this->setCodigo(Filter::string($this->getCodigo()));
         $this->setMoedaID(Filter::number($this->getMoedaID()));
-        $this->setBandeiraIndex(Filter::number($this->getBandeiraIndex()));
-        $this->setLinguagemID(Filter::number($this->getLinguagemID()));
+        $this->setIdioma(Filter::string($this->getIdioma()));
         $this->setPrefixo(Filter::string($this->getPrefixo()));
         $this->setEntradas(Filter::text($this->getEntradas()));
         return $this;
@@ -441,14 +410,8 @@ class Pais extends SyncModel
         if (is_null($this->getMoedaID())) {
             $errors['moedaid'] = _t('pais.moeda_id_cannot_empty');
         }
-        if (is_null($this->getBandeiraIndex())) {
-            $errors['bandeiraindex'] = _t('pais.bandeira_index_cannot_empty');
-        }
-        if ($this->getBandeiraIndex() < 0 || $this->getBandeiraIndex() > 237) {
-            $errors['bandeiraindex'] = 'A bandeira informada é inválida';
-        }
-        if (is_null($this->getLinguagemID())) {
-            $errors['linguagemid'] = _t('pais.linguagem_id_cannot_empty');
+        if (is_null($this->getIdioma())) {
+            $errors['idioma'] = _t('pais.idioma_cannot_empty');
         }
         if (!Validator::checkBoolean($this->getUnitario())) {
             $errors['unitario'] = _t('pais.unitario_invalid');
@@ -611,18 +574,6 @@ class Pais extends SyncModel
     public function findMoedaID()
     {
         return \MZ\Wallet\Moeda::findByID($this->getMoedaID());
-    }
-
-    /**
-     * Flag image index list
-     */
-    public static function getImageIndexOptions()
-    {
-        $images = [];
-        for ($i = 0; $i < 238; $i++) {
-            $images[] = ['index' => $i];
-        }
-        return $images;
     }
 
     /**

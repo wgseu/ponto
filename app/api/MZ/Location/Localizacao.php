@@ -42,6 +42,7 @@ class Localizacao extends SyncModel
      */
     const TIPO_CASA = 'Casa';
     const TIPO_APARTAMENTO = 'Apartamento';
+    const TIPO_CONDOMINIO = 'Condominio';
 
     /**
      * Identificador do endereço
@@ -877,6 +878,7 @@ class Localizacao extends SyncModel
         $options = [
             self::TIPO_CASA => _t('localizacao.tipo_casa'),
             self::TIPO_APARTAMENTO => _t('localizacao.tipo_apartamento'),
+            self::TIPO_CONDOMINIO => _t('localizacao.tipo_condominio'),
         ];
         if (!is_null($index)) {
             return $options[$index];

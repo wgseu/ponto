@@ -107,7 +107,7 @@ class PedidoOldApiController extends \MZ\Core\ApiController
                 'descricao',
                 'imagemurl',
                 'produtodataatualizacao',
-                'datahora',
+                'datalancamento',
             ];
             $items = [];
             $servicos = [];

@@ -1,20 +1,24 @@
-SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0;
-SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0;
 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='TRADITIONAL,ALLOW_INVALID_DATES';
 
 USE `GrandChef`;
 
-INSERT INTO `Moedas` (`ID`, `Nome`, `Simbolo`, `Codigo`, `Divisao`, `Fracao`, `Formato`) VALUES
-	(1, "Real", "R$", "BRL", 100, "Centavo", "R$ %s"),
-	(2, "Dollar", "$", "USD", 100, "Cent", "$ %s"),
-	(3, "Euro", "€", "EUR", 100, "Cent", "€ %s"),
-	(4, "Metical", "MT", "MZN", 100, "Centavo", "%s MT");
+INSERT INTO `Servidores` (`ID`, `GUID`) VALUES
+	(1, UUID());
 
-INSERT INTO `Paises` (`ID`, `Nome`, `Sigla`, `Codigo`, `MoedaID`, `BandeiraIndex`, `LinguagemID`, `Entradas`, `Unitario`) VALUES
-	(1, "Brasil", "BRA", "BR", 1, 28, 1046, NULL, 'N'),
-	(2, "United States of America", "USA", "US", 2, 220, 1033, 'W1RpdHVsb10NCkNFUD1aSVANCkNQRj1TU04NCg0KW01hc2NhcmFdDQpDRVA9OTk5OTkNCkNQRj05OTktOTktOTk5OQ0KVGVsZWZvbmU9KDk5OSkgOTk5LTk5OTkNCg0KW0F1ZGl0b3JpYV0NCg0K', 'N'),
-	(3, "España", "ESP", "ES", 3, 66, 1034, 'W1RpdHVsb10NCkNOUEo9UlVUDQpDUEY9TlVJUA0KQ0VQPUNPUA0KDQpbTWFzY2FyYV0NCkNQRj05Ljk5OS45OTkuOTk5DQpDRVA9OTk5OTkNCkNOUEo9OTkuOTk5Ljk5OS05DQpUZWxlZm9uZT05OTkgOTk5IDk5OQ0KDQo=', 'Y'),
-	(4, "Moçambique", "MOZ", "MZ", 4, 151, 1046, 'W1RpdHVsb10NCkNOUEo9TlVJVA0KQ0VQPUNPUA0KDQpbTWFzY2FyYV0NCkNOUEo9OS45OTk5OTk5LTkNCkNFUD05OTk5DQpUZWxlZm9uZT05OTk5LTk5OTk5DQoNCg==', 'Y');
+INSERT INTO `Sistema` (`ID`, `ServidorID`, `VersaoDB`, `UltimoBackup`, `Dispositivos`) VALUES
+	('1', 1, "2.0.0.0", NOW(), 1);
+
+INSERT INTO `Moedas` (`ID`, `Nome`, `Simbolo`, `Codigo`, `Divisao`, `Fracao`, `Formato`, `Ativa`) VALUES
+	(1, "Real", "R$", "BRL", 100, "Centavo", "R$ %s", 'Y'),
+	(2, "Dollar", "$", "USD", 100, "Cent", "$ %s", 'N'),
+	(3, "Euro", "€", "EUR", 100, "Cent", "€ %s", 'N'),
+	(4, "Metical", "MT", "MZN", 100, "Centavo", "%s MT", 'N');
+
+INSERT INTO `Paises` (`ID`, `Nome`, `Sigla`, `Codigo`, `MoedaID`, `Idioma`, `Entradas`, `Unitario`) VALUES
+	(1, "Brasil", "BRA", "BR", 1, 'pt-BR', NULL, 'N'),
+	(2, "United States of America", "USA", "US", 2, 'en-US', 'W1RpdHVsb10NCkNFUD1aSVANCkNQRj1TU04NCg0KW01hc2NhcmFdDQpDRVA9OTk5OTkNCkNQRj05OTktOTktOTk5OQ0KVGVsZWZvbmU9KDk5OSkgOTk5LTk5OTkNCg0KW0F1ZGl0b3JpYV0NCg0K', 'N'),
+	(3, "España", "ESP", "ES", 3, 'es-ES', 'W1RpdHVsb10NCkNOUEo9UlVUDQpDUEY9TlVJUA0KQ0VQPUNPUA0KDQpbTWFzY2FyYV0NCkNQRj05Ljk5OS45OTkuOTk5DQpDRVA9OTk5OTkNCkNOUEo9OTkuOTk5Ljk5OS05DQpUZWxlZm9uZT05OTkgOTk5IDk5OQ0KDQo=', 'Y'),
+	(4, "Moçambique", "MOZ", "MZ", 4, 'pt-BR', 'W1RpdHVsb10NCkNOUEo9TlVJVA0KQ0VQPUNPUA0KDQpbTWFzY2FyYV0NCkNOUEo9OS45OTk5OTk5LTkNCkNFUD05OTk5DQpUZWxlZm9uZT05OTk5LTk5OTk5DQoNCg==', 'Y');
 
 INSERT INTO `Estados` (`ID`, `PaisID`, `Nome`, `UF`) VALUES
 	(1, 2, "Alaska", "AK"),
@@ -69,7 +73,7 @@ INSERT INTO `Estados` (`ID`, `PaisID`, `Nome`, `UF`) VALUES
 	(50, 2, "Wyoming", "WY"),
 	(51, 2, "District of Columbia", "DC");
 
-INSERT INTO `Funcoes` (`ID`, `Descricao`, `SalarioBase`) VALUES
+INSERT INTO `Funcoes` (`ID`, `Descricao`, `Remuneracao`) VALUES
 	(1, "Administrator", 1400),
 	(2, "Waiter", 880),
 	(3, "Checkout Operator", 1200),
@@ -78,14 +82,14 @@ INSERT INTO `Funcoes` (`ID`, `Descricao`, `SalarioBase`) VALUES
 	(6, "Deliveryman", 880),
 	(7, "Stockist", 880);
 
-INSERT INTO `Modulos` (`ID`, `Nome`, `Descricao`, `ImageIndex`, `Habilitado`) VALUES
-	(1, "Tables", "Lets make sales tables", 4, 'Y'),
-	(2, "Point of Sale", "It allows you to perform quick sales with barcode", 5, 'Y'),
-	(3, "Consumption Card", "Lets make sales with consumer card", 6, 'Y'),
-	(4, "Delivery", "Lets make sales for delivery", 7, 'Y'),
-	(5, "Stock", "It allows you to control stock with supplier registration", 8, 'Y'),
-	(6, "Account control", "It allows registering accounts payable and receivable", 9, 'Y'),
-	(7, "Eletronic command", "Lets you make orders from phone or tablet", 10, 'Y');
+INSERT INTO `Modulos` (`ID`, `Nome`, `Descricao`, `Habilitado`) VALUES
+	(1, "Tables", "Lets make sales tables", 'Y'),
+	(2, "Point of Sale", "It allows you to perform quick sales with barcode", 'Y'),
+	(3, "Consumption Card", "Lets make sales with consumer card", 'Y'),
+	(4, "Delivery", "Lets make sales for delivery", 'Y'),
+	(5, "Stock", "It allows you to control stock with supplier registration", 'Y'),
+	(6, "Account control", "It allows registering accounts payable and receivable", 'Y'),
+	(7, "Eletronic command", "Lets you make orders from phone or tablet", 'Y');
 
 INSERT INTO `Funcionalidades` (`ID`, `Nome`, `Descricao`) VALUES
 	(1, "Operational", "Controls operations in system screens"),
@@ -359,55 +363,66 @@ INSERT INTO `Acessos` (`FuncaoID`, `PermissaoID`) VALUES
 	(7, 81),
 	(7, 96);
 
-INSERT INTO `Mesas` (`ID`, `Nome`, `Ativa`) VALUES
-	(1, "Table 1", 'Y'),
-	(2, "Table 2", 'Y'),
-	(3, "Table 3", 'Y'),
-	(4, "Table 4", 'Y'),
-	(5, "Table 5", 'Y'),
-	(6, "Table 6", 'Y'),
-	(7, "Table 7", 'Y'),
-	(8, "Table 8", 'Y'),
-	(9, "Table 9", 'Y'),
-	(10, "Table 10", 'Y');
+INSERT INTO `Setores` (`ID`, `Nome`, `Descricao`) VALUES
+	(1, "Sales", "Sales sector"),
+	(2, "Kitchen", "Kitchen sector"),
+	(3, "Barbecue", "Barbecue sector"),
+	(4, "Drinks", "Drinks sector");
 
-INSERT INTO `Comandas` (`ID`, `Nome`, `Ativa`) VALUES
-	(1, "Card 1", 'Y'),
-	(2, "Card 2", 'Y'),
-	(3, "Card 3", 'Y'),
-	(4, "Card 4", 'Y'),
-	(5, "Card 5", 'Y'),
-	(6, "Card 6", 'Y'),
-	(7, "Card 7", 'Y'),
-	(8, "Card 8", 'Y'),
-	(9, "Card 9", 'Y'),
-	(10, "Card 10", 'Y');
+INSERT INTO `Mesas` (`ID`, `Numero`, `Nome`, `Ativa`) VALUES
+	(1, 1, "Table 1", 'Y'),
+	(2, 2, "Table 2", 'Y'),
+	(3, 3, "Table 3", 'Y'),
+	(4, 4, "Table 4", 'Y'),
+	(5, 5, "Table 5", 'Y'),
+	(6, 6, "Table 6", 'Y'),
+	(7, 7, "Table 7", 'Y'),
+	(8, 8, "Table 8", 'Y'),
+	(9, 9, "Table 9", 'Y'),
+	(10, 10, "Table 10", 'Y');
 
-INSERT INTO `Clientes` (`ID`, `Tipo`, `Login`, `Senha`, `Nome`, `Sobrenome`, `Genero`, `Fone1`, `DataAtualizacao`, `DataCadastro`) VALUES
-	(1, 'Fisica', "Admin", "e14268a48adfacfdaed1d420573f69df7ce4b829", "System", "administrator", 'Masculino', "0000000001", NOW(), NOW());
+INSERT INTO `Comandas` (`ID`, `Numero`, `Nome`, `Ativa`) VALUES
+	(1, 1, "Card 1", 'Y'),
+	(2, 2, "Card 2", 'Y'),
+	(3, 3, "Card 3", 'Y'),
+	(4, 4, "Card 4", 'Y'),
+	(5, 5, "Card 5", 'Y'),
+	(6, 6, "Card 6", 'Y'),
+	(7, 7, "Card 7", 'Y'),
+	(8, 8, "Card 8", 'Y'),
+	(9, 9, "Card 9", 'Y'),
+	(10, 10, "Card 10", 'Y');
 
-INSERT INTO `Funcionarios` (`ID`, `FuncaoID`, `ClienteID`, `Ativo`, `DataCadastro`) VALUES
-	(1, 1, 1, 'Y', NOW());
+INSERT INTO `Clientes` (`ID`, `Tipo`, `Login`, `Senha`, `Nome`, `Sobrenome`, `Genero`, `DataAtualizacao`, `DataCadastro`) VALUES
+	(1, 'Fisica', "Admin", "e14268a48adfacfdaed1d420573f69df7ce4b829", "System", "administrator", 'Masculino', NOW(), NOW());
 
-INSERT INTO `Caixas` (`ID`, `Descricao`, `Ativo`) VALUES
-	(1, "Cash register 1", 'Y');
+INSERT INTO `Prestadores` (`ID`, `Codigo`, `FuncaoID`, `ClienteID`, `Ativo`, `DataCadastro`) VALUES
+	(1, 1, 1, 1, 'Y', NOW());
 
 INSERT INTO `Carteiras` (`ID`, `Tipo`, `Descricao`, `Ativa`) VALUES
-	(1, 'Financeira', "Company local account", 'Y');
+	(1, 'Local', "Company local account", 'Y'),
+	(1, 'Local', "Cash drawer 1", 'Y');
 
-INSERT INTO `Formas_Pagto` (`ID`, `Descricao`, `Tipo`, `CarteiraID`, `CarteiraPagtoID`, `Parcelado`, `MinParcelas`, `MaxParcelas`, `ParcelasSemJuros`, `Juros`, `Ativa`) VALUES
-	(1, "Money", 'Dinheiro', 1, 1, 'N', NULL, NULL, NULL, NULL, 'Y'),
-	(2, "Card", 'Cartao', 1, 1, 'Y', 1, 1, 1, 2.5, 'Y'),
-	(3, "Cheque", 'Cheque', 1, 1, 'Y', 1, 6, 3, 2.5, 'N'),
-	(4, "Account", 'Conta', 1, 1, 'N', NULL, NULL, NULL, NULL, 'Y'),
-	(5, "Credit", 'Credito', 1, 1, 'N', NULL, NULL, NULL, NULL, 'Y');
+INSERT INTO `Caixas` (`ID`, `CarteiraID`, `Descricao`, `Ativo`) VALUES
+	(1, 2, "Cash register 1", 'Y');
 
-INSERT INTO `Cartoes` (`ID`, `Descricao`, `ImageIndex`, `Ativo`) VALUES
-	(1, "Visa", 3, 'Y'),
-	(2, "MasterCard", 4, 'Y'),
-	(3, "American Express", 5, 'N'),
-	(4, "Diners Club", 6, 'N'),
-	(5, "Maestro", 9, 'N');
+INSERT INTO `Formas_Pagto` (`ID`, `Descricao`, `Tipo`, `CarteiraID`, `MinParcelas`, `MaxParcelas`, `ParcelasSemJuros`, `Juros`, `Ativa`) VALUES
+	(1, "Money", 'Dinheiro', 1, NULL, NULL, NULL, NULL, 'Y'),
+	(2, "Credit", 'Credito', 1, 1, 1, 1, 2.5, 'Y'),
+	(3, "Debit", 'Debito', 1, 1, 1, 1, 2.5, 'Y'),
+	(4, "Vale", 'Vale', 1, NULL, NULL, NULL, NULL, 'N'),
+	(5, "Cheque", 'Cheque', 1, NULL, NULL, NULL, NULL, 'N'),
+	(6, "Account", 'Crediario', 1, NULL, NULL, NULL, NULL, 'N'),
+	(7, "Balance", 'Saldo', 1, NULL, NULL, NULL, NULL, 'N');
+
+INSERT INTO `Cartoes` (`ID`, `FormaPagtoID`, `Bandeira`, `ImagemURL`, `Ativo`) VALUES
+	(1, 2, "Visa", 'visa.png', 'Y'),
+	(2, 2, "MasterCard", 'mastercard.png', 'Y'),
+	(3, 2, "Hipercard", 'hipercard.png', 'Y'),
+	(4, 2, "American Express", 'american_express.png', 'N'),
+	(5, 2, "Diners Club", 'diners_club.png', 'N'),
+	(6, 3, "Maestro", 'maestro.png', 'Y'),
+	(7, 3, "Visa Electron", 'visa_electron.png', 'Y');
 
 INSERT INTO `Categorias` (`ID`, `Descricao`, `Servico`, `DataAtualizacao`) VALUES
 	(1, "Pizzas and pasta", 'Y', NOW()),
@@ -423,12 +438,6 @@ INSERT INTO `Categorias` (`ID`, `Descricao`, `Servico`, `DataAtualizacao`) VALUE
 	(11, "Portions", 'Y', NOW()),
 	(12, "Tropical drinks", 'N', NOW());
 
-INSERT INTO `Setores` (`ID`, `Nome`, `Descricao`) VALUES
-	(1, "Sales", "Sales sector"),
-	(2, "Kitchen", "Kitchen sector"),
-	(3, "Barbecue", "Barbecue sector"),
-	(4, "Drinks", "Drinks sector");
-
 INSERT INTO `Unidades` (`Nome`, `Descricao`, `Sigla`) VALUES
 	("Unity", "Unit", "UN"),
 	("Litro", "Liquid unit", "L"),
@@ -439,9 +448,6 @@ INSERT INTO `Unidades` (`Nome`, `Descricao`, `Sigla`) VALUES
 INSERT INTO `Classificacoes` (`ID`, `Descricao`) VALUES
 	(1, "Cash register movements"),
 	(2, "Bill payment");
-
-INSERT INTO `Contas` (`ID`, `ClassificacaoID`, `FuncionarioID`, `Descricao`, `Valor`, `Cancelada`, `DataCadastro`) VALUES
-	(1, 1, 1, "Cash register movements", 0, 'N', NOW());
 
 INSERT INTO `Servicos` (`ID`, `Nome`, `Descricao`, `Tipo`, `Obrigatorio`, `Valor`, `Individual`, `Ativo`) VALUES
 	(1, "Discount", "It allows to realize discounts in order", 'Taxa', 'N', 0, 'N', 'Y'),
@@ -458,13 +464,6 @@ INSERT INTO `Bancos` (`Numero`, `RazaoSocial`, `AgenciaMascara`, `ContaMascara`)
 	("8", "Capital One Financial Corp.", NULL, NULL),
 	("9", "HSBC North American Holdings Inc.", NULL, NULL),
 	("10", "TD Bank U.S. Holding Co.", NULL, NULL);
-
-INSERT INTO `Integracoes` (`Nome`, `AcessoURL`, `Descricao`, `IconeURL`, `Ativo`, `DataAtualizacao`) VALUES
-	('iFood', 'ifood', 'Integration module for iFood', 'ifood.png', 'N', NOW()),
-	('Kromax', 'kromax', 'Integration module for Kromax', 'kromax.png', 'N', NOW());
-
-INSERT INTO `Sistema` (`ID`, `PaisID`, `VersaoDB`, `UltimoBackup`, `Computadores`) VALUES
-	(1, 2, "1.9.3.5", NOW(), 1);
 
 SET SQL_MODE=@OLD_SQL_MODE;
 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;

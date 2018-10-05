@@ -51,10 +51,6 @@ class Modulo extends SyncModel
      */
     private $descricao;
     /**
-     * Índice da imagem que representa o módulo, tamanho 64x64
-     */
-    private $image_index;
-    /**
      * Informa se o módulo do sistema está habilitado
      */
     private $habilitado;
@@ -130,26 +126,6 @@ class Modulo extends SyncModel
     }
 
     /**
-     * Índice da imagem que representa o módulo, tamanho 64x64
-     * @return int imagem of Módulo
-     */
-    public function getImageIndex()
-    {
-        return $this->image_index;
-    }
-
-    /**
-     * Set ImageIndex value to new on param
-     * @param int $image_index Set imagem for Módulo
-     * @return self Self instance
-     */
-    public function setImageIndex($image_index)
-    {
-        $this->image_index = $image_index;
-        return $this;
-    }
-
-    /**
      * Informa se o módulo do sistema está habilitado
      * @return string habilitado of Módulo
      */
@@ -189,7 +165,6 @@ class Modulo extends SyncModel
         $modulo['id'] = $this->getID();
         $modulo['nome'] = $this->getNome();
         $modulo['descricao'] = $this->getDescricao();
-        $modulo['imageindex'] = $this->getImageIndex();
         $modulo['habilitado'] = $this->getHabilitado();
         return $modulo;
     }
@@ -222,11 +197,6 @@ class Modulo extends SyncModel
         } else {
             $this->setDescricao($modulo['descricao']);
         }
-        if (!isset($modulo['imageindex'])) {
-            $this->setImageIndex(null);
-        } else {
-            $this->setImageIndex($modulo['imageindex']);
-        }
         if (!isset($modulo['habilitado'])) {
             $this->setHabilitado('N');
         } else {
@@ -256,7 +226,6 @@ class Modulo extends SyncModel
         $this->setID($original->getID());
         $this->setNome(Filter::string($original->getNome()));
         $this->setDescricao(Filter::string($original->getDescricao()));
-        $this->setImageIndex(Filter::number($original->getImageIndex()));
         return $this;
     }
 
@@ -281,9 +250,6 @@ class Modulo extends SyncModel
         }
         if (is_null($this->getDescricao())) {
             $errors['descricao'] = _t('modulo.descricao_cannot_empty');
-        }
-        if (is_null($this->getImageIndex())) {
-            $errors['imageindex'] = _t('modulo.image_index_cannot_empty');
         }
         if (!Validator::checkBoolean($this->getHabilitado())) {
             $errors['habilitado'] = _t('modulo.habilitado_invalid');

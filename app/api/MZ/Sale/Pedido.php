@@ -103,6 +103,30 @@ class Pedido extends SyncModel
      */
     private $estado;
     /**
+     * Valor total dos serviços desse pedido
+     */
+    private $servicos;
+    /**
+     * Valor total dos produtos do pedido sem a comissão
+     */
+    private $produtos;
+    /**
+     * Valor total da comissão desse pedido
+     */
+    private $comissao;
+    /**
+     * Total de descontos realizado nesse pedido
+     */
+    private $descontos;
+    /**
+     * Valor já pago do pedido
+     */
+    private $pago;
+    /**
+     * Valor lançado para pagar, mas não foi pago ainda
+     */
+    private $lancado;
+    /**
      * Informa quantas pessoas estão na mesa
      */
     private $pessoas;
@@ -357,6 +381,126 @@ class Pedido extends SyncModel
     }
 
     /**
+     * Valor total dos serviços desse pedido
+     * @return string total dos serviços of Pedido
+     */
+    public function getServicos()
+    {
+        return $this->servicos;
+    }
+
+    /**
+     * Set Servicos value to new on param
+     * @param string $servicos Set total dos serviços for Pedido
+     * @return self Self instance
+     */
+    public function setServicos($servicos)
+    {
+        $this->servicos = $servicos;
+        return $this;
+    }
+
+    /**
+     * Valor total dos produtos do pedido sem a comissão
+     * @return string total dos produtos of Pedido
+     */
+    public function getProdutos()
+    {
+        return $this->produtos;
+    }
+
+    /**
+     * Set Produtos value to new on param
+     * @param string $produtos Set total dos produtos for Pedido
+     * @return self Self instance
+     */
+    public function setProdutos($produtos)
+    {
+        $this->produtos = $produtos;
+        return $this;
+    }
+
+    /**
+     * Valor total da comissão desse pedido
+     * @return string total da comissão of Pedido
+     */
+    public function getComissao()
+    {
+        return $this->comissao;
+    }
+
+    /**
+     * Set Comissao value to new on param
+     * @param string $comissao Set total da comissão for Pedido
+     * @return self Self instance
+     */
+    public function setComissao($comissao)
+    {
+        $this->comissao = $comissao;
+        return $this;
+    }
+
+    /**
+     * Total de descontos realizado nesse pedido
+     * @return string descontos of Pedido
+     */
+    public function getDescontos()
+    {
+        return $this->descontos;
+    }
+
+    /**
+     * Set Descontos value to new on param
+     * @param string $descontos Set descontos for Pedido
+     * @return self Self instance
+     */
+    public function setDescontos($descontos)
+    {
+        $this->descontos = $descontos;
+        return $this;
+    }
+
+    /**
+     * Valor já pago do pedido
+     * @return string total pago of Pedido
+     */
+    public function getPago()
+    {
+        return $this->pago;
+    }
+
+    /**
+     * Set Pago value to new on param
+     * @param string $pago Set total pago for Pedido
+     * @return self Self instance
+     */
+    public function setPago($pago)
+    {
+        $this->pago = $pago;
+        return $this;
+    }
+
+    /**
+     * Valor lançado para pagar, mas não foi pago ainda
+     * @return string total lançado of Pedido
+     */
+    public function getLancado()
+    {
+        return $this->lancado;
+    }
+
+    /**
+     * Set Lancado value to new on param
+     * @param string $lancado Set total lançado for Pedido
+     * @return self Self instance
+     */
+    public function setLancado($lancado)
+    {
+        $this->lancado = $lancado;
+        return $this;
+    }
+
+    /**
      * Informa quantas pessoas estão na mesa
      * @return int pessoas of Pedido
      */
@@ -583,6 +727,12 @@ class Pedido extends SyncModel
         $pedido['entregaid'] = $this->getEntregaID();
         $pedido['tipo'] = $this->getTipo();
         $pedido['estado'] = $this->getEstado();
+        $pedido['servicos'] = $this->getServicos();
+        $pedido['produtos'] = $this->getProdutos();
+        $pedido['comissao'] = $this->getComissao();
+        $pedido['descontos'] = $this->getDescontos();
+        $pedido['pago'] = $this->getPago();
+        $pedido['lancado'] = $this->getLancado();
         $pedido['pessoas'] = $this->getPessoas();
         $pedido['descricao'] = $this->getDescricao();
         $pedido['fechadorid'] = $this->getFechadorID();
@@ -658,6 +808,36 @@ class Pedido extends SyncModel
             $this->setEstado(null);
         } else {
             $this->setEstado($pedido['estado']);
+        }
+        if (!isset($pedido['servicos'])) {
+            $this->setServicos(0);
+        } else {
+            $this->setServicos($pedido['servicos']);
+        }
+        if (!isset($pedido['produtos'])) {
+            $this->setProdutos(0);
+        } else {
+            $this->setProdutos($pedido['produtos']);
+        }
+        if (!isset($pedido['comissao'])) {
+            $this->setComissao(0);
+        } else {
+            $this->setComissao($pedido['comissao']);
+        }
+        if (!isset($pedido['descontos'])) {
+            $this->setDescontos(0);
+        } else {
+            $this->setDescontos($pedido['descontos']);
+        }
+        if (!isset($pedido['pago'])) {
+            $this->setPago(0);
+        } else {
+            $this->setPago($pedido['pago']);
+        }
+        if (!isset($pedido['lancado'])) {
+            $this->setLancado(0);
+        } else {
+            $this->setLancado($pedido['lancado']);
         }
         if (!isset($pedido['pessoas'])) {
             $this->setPessoas(null);
@@ -792,6 +972,12 @@ class Pedido extends SyncModel
         $this->setClienteID(Filter::number($this->getClienteID()));
         $this->setLocalizacaoID(Filter::number($this->getLocalizacaoID()));
         $this->setEntregaID(Filter::number($this->getEntregaID()));
+        $this->setServicos(Filter::money($original->getServicos(), $localized));
+        $this->setProdutos(Filter::money($original->getProdutos(), $localized));
+        $this->setComissao(Filter::money($original->getComissao(), $localized));
+        $this->setDescontos(Filter::money($original->getDescontos(), $localized));
+        $this->setPago(Filter::money($original->getPago(), $localized));
+        $this->setLancado(Filter::money($original->getLancado(), $localized));
         $this->setPessoas(Filter::number($this->getPessoas()));
         $this->setDescricao(Filter::string($this->getDescricao()));
         $this->setFechadorID(Filter::number($this->getFechadorID()));
@@ -840,6 +1026,24 @@ class Pedido extends SyncModel
         }
         if (!Validator::checkInSet($this->getEstado(), self::getEstadoOptions())) {
             $errors['estado'] = _t('pedido.estado_invalid');
+        }
+        if (is_null($this->getServicos())) {
+            $errors['servicos'] = _t('pedido.servicos_cannot_empty');
+        }
+        if (is_null($this->getProdutos())) {
+            $errors['produtos'] = _t('pedido.produtos_cannot_empty');
+        }
+        if (is_null($this->getComissao())) {
+            $errors['comissao'] = _t('pedido.comissao_cannot_empty');
+        }
+        if (is_null($this->getDescontos())) {
+            $errors['descontos'] = _t('pedido.descontos_cannot_empty');
+        }
+        if (is_null($this->getPago())) {
+            $errors['pago'] = _t('pedido.pago_cannot_empty');
+        }
+        if (is_null($this->getLancado())) {
+            $errors['lancado'] = _t('pedido.lancado_cannot_empty');
         }
         if (is_null($this->getPessoas())) {
             $errors['pessoas'] = _t('pedido.pessoas_cannot_empty');

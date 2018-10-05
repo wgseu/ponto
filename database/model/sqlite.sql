@@ -2,7 +2,7 @@
 -- Author:        Mazin
 -- Caption:       GrandChef Model
 -- Project:       GrandChef
--- Changed:       2018-09-29 12:04
+-- Changed:       2018-10-05 16:47
 -- Created:       2012-09-05 23:08
 PRAGMA foreign_keys = OFF;
 
@@ -37,7 +37,7 @@ CREATE TABLE "Metricas"(
   "ID" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,-- Identificador da métrica[G:o]
   "Nome" VARCHAR(100) NOT NULL,-- Nome da métrica[G:o][N:Nome]
   "Descricao" VARCHAR(200) DEFAULT NULL,-- Descreve o que deve ser avaliado pelo cliente[G:a][N:Descrição]
-  "Tipo" TEXT NOT NULL CHECK("Tipo" IN('Entrega', 'Atendimento', 'Producao', 'Apresentacao')),-- Tipo de métrica que pode ser velocidade de entrega, quantidade no atendimento, sabor da comida e apresentação do prato[G:o][N:Tipo de métrica]
+  "Tipo" TEXT NOT NULL CHECK("Tipo" IN('Entrega', 'Atendimento', 'Producao', 'Apresentacao')),-- Tipo de métrica que pode ser velocidade de entrega, quantidade no atendimento, sabor da comida e apresentação do prato[G:o][N:Tipo de métrica][E:Entrega|Atendimento|Produção|Apresentação]
   "Quantidade" INTEGER NOT NULL,-- Quantidade das últimas avaliações para reavaliação da métrica[G:o][N:Quantidade][F:100]
   "Avaliacao" DOUBLE DEFAULT NULL,-- Média das avaliações para o período informado[G:a][N:Avaliação]
   "DataProcessamento" DATETIME DEFAULT NULL,-- Data do último processamento da avaliação[G:a][N:Data de processamento]
@@ -173,7 +173,7 @@ CREATE TABLE "Prestadores"(
   "FuncaoID" INTEGER NOT NULL,-- Função do prestada na empresa[N:Função][G:a][S:S]
   "ClienteID" INTEGER NOT NULL,-- Cliente que representa esse prestador, único no cadastro de prestadores[N:Cliente][G:o][S]
   "PrestadorID" INTEGER DEFAULT NULL,-- Informa a empresa que gerencia os colaboradores, nulo para a empresa do próprio estabelecimento[G:o][N:Prestador]
-  "Vinculo" TEXT NOT NULL CHECK("Vinculo" IN('Funcionario', 'Prestador', 'Autonomo')) DEFAULT 'Funcionario',-- Vínculo empregatício com a empresa, funcionário e autônomo são pessoas físicas, prestador é pessoa jurídica[G:o][N:Vínculo]
+  "Vinculo" TEXT NOT NULL CHECK("Vinculo" IN('Funcionario', 'Prestador', 'Autonomo')) DEFAULT 'Funcionario',-- Vínculo empregatício com a empresa, funcionário e autônomo são pessoas físicas, prestador é pessoa jurídica[G:o][N:Vínculo][E:Funcionário|Prestador|Autônomo]
   "CodigoBarras" VARCHAR(13) DEFAULT NULL,-- Código de barras utilizado pelo prestador para autorizar uma operação no sistema[N:Código de barras][G:o]
   "Porcentagem" DOUBLE NOT NULL DEFAULT 0,-- Porcentagem cobrada pelo funcionário ou autônomo ao cliente, Ex.: Comissão de 10% [N:Comissão][G:a]
   "Pontuacao" INTEGER NOT NULL DEFAULT 0,-- Define a distribuição da porcentagem pela parcela de pontos[N:Pontuação][G:a]
@@ -181,7 +181,7 @@ CREATE TABLE "Prestadores"(
   "Remuneracao" DECIMAL NOT NULL DEFAULT 0,-- Remuneracao pelas atividades exercidas, não está incluso comissões[N:Remuneração][G:a]
   "DataTermino" DATETIME DEFAULT NULL,-- Data de término de contrato, informado apenas quando ativo for não[N:Data de término de contrato][G:a][D]
   "DataCadastro" DATETIME NOT NULL,-- Data em que o prestador de serviços foi cadastrado no sistema[N:Data de cadastro][G:a][D]
-  CONSTRAINT "FK_Prestadores_Clientes_ClienteID_uk"
+  CONSTRAINT "ClienteID_UNIQUE"
     UNIQUE("ClienteID"),
   CONSTRAINT "CodigoBarras_UNIQUE"
     UNIQUE("CodigoBarras"),
@@ -212,7 +212,7 @@ CREATE TABLE "Mapeamentos"(
   "Tabela" VARCHAR(45) NOT NULL,-- Tabela em que o registro foi mapeado[G:a][N:Tabela]
   "De" INTEGER NOT NULL,-- ID de origem que será usado para identificar o ID local[G:o][N:ID de origem]
   "Para" INTEGER NOT NULL,-- ID local que será utilizado para realizar operações no banco[G:o][N:ID local]
-  CONSTRAINT "UK_Servidor_Tabela_De"
+  CONSTRAINT "ServidorID_Tabela_De_UNIQUE"
     UNIQUE("ServidorID","Tabela","De" DESC),
   CONSTRAINT "FK_Mapeamentos_Servidores_ServidorID"
     FOREIGN KEY("ServidorID")
@@ -249,8 +249,7 @@ CREATE TABLE "Paises"(
   "Sigla" VARCHAR(10) NOT NULL,-- Abreviação do nome do país[N:Sigla][G:a]
   "Codigo" VARCHAR(10) NOT NULL,-- Código do país com 2 letras[G:o][N:Código]
   "MoedaID" INTEGER NOT NULL,-- Informa a moeda principal do país[N:Moeda][G:a]
-  "BandeiraIndex" INTEGER NOT NULL,-- Index da imagem da bandeira do país[N:Bandeira][G:a]
-  "LinguagemID" INTEGER NOT NULL DEFAULT 0,-- Linguagem nativa do país[N:Linguagem ID][G:a]
+  "Idioma" VARCHAR(10) NOT NULL,-- Idioma nativo do país[N:Código do idioma][G:o]
   "Prefixo" VARCHAR(45) DEFAULT NULL,-- Prefixo de telefone para ligações internacionais[G:o][N:Prefixo]
   "Entradas" TEXT DEFAULT NULL,-- Frases, nomes de campos e máscaras específicas do país[N:Entrada][G:a]
   "Unitario" TEXT NOT NULL CHECK("Unitario" IN('Y', 'N')) DEFAULT 'N',-- Informa se o país tem apenas um estado federativo[N:Unitário][G:o][F:'N']
@@ -307,7 +306,6 @@ CREATE TABLE "Modulos"(
   "ID" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,-- Identificador do módulo[G:o]
   "Nome" VARCHAR(50) NOT NULL,-- Nome do módulo, unico em todo o sistema[N:Nome][G:o][S]
   "Descricao" VARCHAR(200) NOT NULL,-- Descrição do módulo, informa detalhes sobre a funcionalidade do módulo no sistema[N:Descrição][G:a]
-  "ImageIndex" INTEGER NOT NULL,-- Índice da imagem que representa o módulo, tamanho 64x64[N:Imagem][G:a]
   "Habilitado" TEXT NOT NULL CHECK("Habilitado" IN('Y', 'N')) DEFAULT 'Y',-- Informa se o módulo do sistema está habilitado[N:Habilitado][G:o]
   CONSTRAINT "Nome_UNIQUE"
     UNIQUE("Nome")
@@ -384,7 +382,7 @@ CREATE TABLE "Impostos"(
   "Substituicao" TEXT NOT NULL CHECK("Substituicao" IN('Y', 'N')),-- Informa se o imposto é por substituição tributária[G:a][N:Substituição tributária]
   "Codigo" INTEGER NOT NULL,-- Informa o código do imposto[G:o][N:Código]
   "Descricao" VARCHAR(255) NOT NULL,-- Descrição do imposto[G:a][N:Descrição]
-  CONSTRAINT "UK_Imposto"
+  CONSTRAINT "Grupo_Simples_Substituicao_Codigo_UNIQUE"
     UNIQUE("Grupo","Simples","Substituicao","Codigo")
 );
 CREATE TABLE "Emitentes"(
@@ -520,7 +518,7 @@ CREATE INDEX "Tributacoes.FK_Tributacoes_Impostos_ImpostoID_idx" ON "Tributacoes
 CREATE TABLE "Horarios"(
 --   Informa o horário de funcionamento do estabelecimento[N:Horário|Horários][G:o][L:AlterarHorario][K:MZ\Company|MZ\Company\][H:SyncModel]
   "ID" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,-- Identificador do horário[G:o]
-  "Modo" TEXT NOT NULL CHECK("Modo" IN('Funcionamento', 'Operacao', 'Entrega')) DEFAULT 'Funcionamento',-- Modo de trabalho disponível nesse horário, Funcionamento: horário em que o estabelecimento estará aberto, Operação: quando aceitar novos pedidos locais, Entrega: quando aceita ainda pedidos para entrega[G:o][N:Modo][F:'Funcionamento']
+  "Modo" TEXT NOT NULL CHECK("Modo" IN('Funcionamento', 'Operacao', 'Entrega')) DEFAULT 'Funcionamento',-- Modo de trabalho disponível nesse horário, Funcionamento: horário em que o estabelecimento estará aberto, Operação: quando aceitar novos pedidos locais, Entrega: quando aceita ainda pedidos para entrega[G:o][N:Modo][F:'Funcionamento'][E:Funcionamento|Operação|Entrega]
   "FuncaoID" INTEGER,-- Permite informar o horário de acesso ao sistema para realizar essa função[G:a][N:Função]
   "PrestadorID" INTEGER,-- Permite informar o horário de prestação de serviço para esse prestador[G:o][N:Prestador]
   "IntegracaoID" INTEGER DEFAULT NULL,-- Permite informar o horário de atendimento para cada integração[G:a][N:Integração]
@@ -681,7 +679,7 @@ CREATE TABLE "Observacoes"(
   "ProdutoID" INTEGER NOT NULL,-- Informa o produto que pode conter essa observação[G:o][N:Produto]
   "Grupo" INTEGER NOT NULL DEFAULT 0,-- Informa o grupo de observações obrigatórias, se maior que zero, é obrigatório escolher pelo menos uma opção[F:0][G:o][N:Grupo]
   "Descricao" VARCHAR(100) NOT NULL,-- Descrição da observação do produto[G:a][N:Descrição]
-  CONSTRAINT "UK_Produto_Descricao"
+  CONSTRAINT "ProdutoID_Descricao_UNIQUE"
     UNIQUE("ProdutoID","Descricao"),
   CONSTRAINT "FK_Observacoes_Produtos_ProdutoID"
     FOREIGN KEY("ProdutoID")
@@ -713,7 +711,7 @@ CREATE TABLE "Registros"(
   "ServidorID" INTEGER NOT NULL,-- Informa o servidor de onde originou esse registro, não enviar esses registros para o próprio servidor[G:o][N:Servidor]
   "Tabela" VARCHAR(45) NOT NULL,-- Tabela em que ocorreu o evento no registro[G:a][N:Tabela]
   "Linha" INTEGER NOT NULL,-- ID do registro que ocorreu o evento[G:a][N:Linha]
-  "Evento" TEXT NOT NULL CHECK("Evento" IN('Inserido', 'Atualizado', 'Deletado')),-- Tipo de evento que foi registrado[G:o][N:Evento]
+  "Evento" TEXT NOT NULL CHECK("Evento" IN('Inserido', 'Atualizado', 'Deletado')),-- Tipo de evento que foi registrado[G:o][N:Evento][E:Inserido|Atualizado|Deletado]
   "Momento" INTEGER NOT NULL,-- Tempo no formato UNIX que ocorreu esse evento[G:o][N:Momento]
   CONSTRAINT "FK_Registros_Servidores_ServidorID"
     FOREIGN KEY("ServidorID")
@@ -733,7 +731,7 @@ CREATE TABLE "Composicoes"(
   "Valor" DECIMAL NOT NULL DEFAULT 0,-- Desconto que será realizado ao retirar esse produto da composição no  momento da venda[N:Valor][G:o]
   "QuantidadeMaxima" INTEGER NOT NULL DEFAULT 1,-- Define a quantidade máxima que essa composição pode ser vendida repetidamente[N:Quantidade máxima][G:a][F:1]
   "Ativa" TEXT NOT NULL CHECK("Ativa" IN('Y', 'N')) DEFAULT 'Y',-- Indica se a composição está sendo usada atualmente na composição do produto[N:Ativa][G:a]
-  CONSTRAINT "UK_Composicoes_ComposicaoID_ProdutoID_Tipo"
+  CONSTRAINT "ComposicaoID_ProdutoID_Tipo_UNIQUE"
     UNIQUE("ComposicaoID","ProdutoID","Tipo"),
   CONSTRAINT "FK_Composicoes_Produtos_ComposicaoID"
     FOREIGN KEY("ComposicaoID")
@@ -760,7 +758,7 @@ CREATE TABLE "Carteiras"(
   "Transacao" DECIMAL NOT NULL DEFAULT 0,-- Valor cobrado pela operadora de pagamento para cada transação[N:Transação][G:a][F:0]
   "Limite" DECIMAL DEFAULT NULL,-- Limite de crédito[G:o][N:Limite de crédito]
   "Token" VARCHAR(250) DEFAULT NULL,-- Token para integração de pagamentos[G:o][N:Token]
-  "Ambiente" TEXT CHECK("Ambiente" IN('Teste', 'Producao')) DEFAULT NULL,-- Ambiente de execução da API usando o token[G:o][N:Ambiente]
+  "Ambiente" TEXT CHECK("Ambiente" IN('Teste', 'Producao')) DEFAULT NULL,-- Ambiente de execução da API usando o token[G:o][N:Ambiente][E:Teste|Produção]
   "LogoURL" VARCHAR(100) DEFAULT NULL,-- Logo do gateway de pagamento[N:Logo][G:o][I:256x256|carteira|carteira.png]
   "Cor" VARCHAR(20) DEFAULT NULL,-- Cor predominante da marca da instituição[G:a][N:Cor]
   "Ativa" TEXT NOT NULL CHECK("Ativa" IN('Y', 'N')) DEFAULT 'Y',-- Informa se a carteira ou conta bancária está ativa[N:Ativa][G:a]
@@ -859,7 +857,7 @@ CREATE TABLE "Acessos"(
   "ID" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,-- Identificador do acesso[G:o]
   "FuncaoID" INTEGER NOT NULL,-- Função a que a permissão se aplica[N:Função][G:a][S:S]
   "PermissaoID" INTEGER NOT NULL,-- Permissão liberada para a função[N:Permissão][G:a][S]
-  CONSTRAINT "UK_Acessos_FuncaoID_PermissaoID"
+  CONSTRAINT "FuncaoID_PermissaoID_UNIQUE"
     UNIQUE("FuncaoID","PermissaoID"),
   CONSTRAINT "FK_Acessos_Funcoes_FuncaoID"
     FOREIGN KEY("FuncaoID")
@@ -881,7 +879,6 @@ CREATE TABLE "Formas_Pagto"(
   "IntegracaoID" INTEGER DEFAULT NULL,-- Informa se essa forma de pagamento estará disponível apenas nessa integração[G:a][N:Integração]
   "CarteiraID" INTEGER NOT NULL,-- Carteira que será usada para entrada de valores no caixa[N:Carteira de entrada][G:a]
   "Descricao" VARCHAR(50) NOT NULL,-- Descrição da forma de pagamento[N:Descrição][G:a][S]
-  "Parcelado" TEXT NOT NULL CHECK("Parcelado" IN('Y', 'N')),-- Informa se a forma de pagamento permite parcelamento[N:Parcelado][G:o]
   "MinParcelas" INTEGER DEFAULT NULL,-- Quantidade mínima de parcelas[N:Minimo de parcelas][G:a]
   "MaxParcelas" INTEGER DEFAULT NULL,-- Quantidade máxima de parcelas[N:Máximo de parcelas][G:o]
   "ParcelasSemJuros" INTEGER DEFAULT NULL,-- Quantidade de parcelas em que não será cobrado juros[N:Parcelas sem juros][G:a]
@@ -915,8 +912,8 @@ CREATE TABLE "Catalogos"(
   "Conteudo" DOUBLE NOT NULL DEFAULT 1,-- Informa o conteúdo do produto como é comprado, Ex.: 5UN no mesmo pacote[N:Conteúdo][G:o]
   "DataConsulta" DATETIME DEFAULT NULL,-- Última data de consulta do preço do produto[N:Data de consulta][G:a]
   "DataAbandono" DATETIME DEFAULT NULL,-- Data em que o produto deixou de ser vendido pelo fornecedor[G:a][N:Data de abandono]
-  CONSTRAINT "UK_Fornecedor_CodigoBarras"
-    UNIQUE("FornecedorID"),
+  CONSTRAINT "FornecedorID_ProdutoID_UNIQUE"
+    UNIQUE("ProdutoID","FornecedorID"),
   CONSTRAINT "FK_Catalogos_Produtos_ProdutoID"
     FOREIGN KEY("ProdutoID")
     REFERENCES "Produtos"("ID")
@@ -974,9 +971,9 @@ CREATE TABLE "Grupos"(
   "Funcao" TEXT NOT NULL CHECK("Funcao" IN('Minimo', 'Media', 'Maximo', 'Soma')) DEFAULT 'Soma',-- Informa qual será a fórmula de cálculo do preço, Mínimo: obtém o menor preço, Média:  define o preço do produto como a média dos itens selecionados, Máximo: Obtém o preço do item mais caro do grupo, Soma: Soma todos os preços dos produtos selecionados[N:Função de preço][G:a][E:Mínimo|Média|Máximo|Soma]
   "Ordem" INTEGER NOT NULL DEFAULT 0,-- Informa a ordem de exibição dos grupos[G:a][N:Ordem]
   "DataArquivado" DATETIME DEFAULT NULL,-- Data em que o grupo foi arquivado e não será mais usado[G:a][N:Data de arquivação]
-  CONSTRAINT "UK_Grupos_Produto_Descricao"
+  CONSTRAINT "ProdutoID_Descricao_UNIQUE"
     UNIQUE("ProdutoID","Descricao"),
-  CONSTRAINT "UK_Grupos_Produto_Nome"
+  CONSTRAINT "ProdutoID_Nome_UNIQUE"
     UNIQUE("ProdutoID","Nome"),
   CONSTRAINT "FK_Grupos_Produtos_ProdutoID"
     FOREIGN KEY("ProdutoID")
@@ -989,10 +986,10 @@ CREATE TABLE "Resumos"(
 --   Resumo de fechamento de caixa, informa o valor contado no fechamento do caixa para cada forma de pagamento[N:Resumo|Resumos][G:o][L:ConferirCaixa][K:MZ\Session|MZ\Session\][H:SyncModel]
   "ID" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,-- Identificador do resumo[G:o]
   "MovimentacaoID" INTEGER NOT NULL,-- Movimentação do caixa referente ao resumo[N:Movimentação][G:a][S]
-  "Tipo" TEXT NOT NULL CHECK("Tipo" IN('Dinheiro', 'Cartao', 'Cheque', 'Conta', 'Credito', 'Transferencia')),-- Tipo de pagamento do resumo[N:Tipo][G:o][E:Dinheiro|Cartão|Cheque|Conta|Crédito|Transferência][S:S]
+  "Tipo" TEXT NOT NULL CHECK("Tipo" IN('Dinheiro', 'Credito', 'Debito', 'Vale', 'Cheque', 'Crediario', 'Saldo')),-- Tipo de pagamento do resumo[N:Tipo][G:o][E:Dinheiro|Cartão de credito|Cartão de débito|Vale|Cheque|Crediário|Saldo][S:S]
   "CartaoID" INTEGER DEFAULT NULL,-- Cartão da forma de pagamento[N:Cartão][G:o]
   "Valor" DECIMAL NOT NULL,-- Valor que foi contado ao fechar o caixa[N:Valor][G:o]
-  CONSTRAINT "UK_Resumos_MovimentacaoID_Tipo_CartaoID"
+  CONSTRAINT "MovimentacaoID_Tipo_CartaoID_UNIQUE"
     UNIQUE("MovimentacaoID","Tipo","CartaoID"),
   CONSTRAINT "FK_Resumos_Movimentacoes_MovimentacaoID"
     FOREIGN KEY("MovimentacaoID")
@@ -1144,15 +1141,15 @@ CREATE TABLE "Cupons"(
   "ClienteID" INTEGER DEFAULT NULL,-- Informa o cliente que possui e pode usar esse cupom[G:o][N:Cliente]
   "Codigo" VARCHAR(20) NOT NULL,-- Código para uso do cupom[G:o][N:Código]
   "Quantidade" INTEGER NOT NULL,-- Quantidade de cupons disponíveis ou usados[G:a][N:Quantidade]
-  "TipoDesconto" TEXT NOT NULL CHECK("TipoDesconto" IN('Valor', 'Porcentagem')),-- Informa se o desconto será por valor ou porcentagem[G:o][N:Tipo de desconto]
+  "TipoDesconto" TEXT NOT NULL CHECK("TipoDesconto" IN('Valor', 'Porcentagem')),-- Informa se o desconto será por valor ou porcentagem[G:o][N:Tipo de desconto][E:Valor|Porcentagem]
   "Valor" DECIMAL NOT NULL,-- Valor do desconto que será aplicado no pedido[G:o][N:Valor do desconto]
   "Porcentagem" DOUBLE NOT NULL,-- Porcentagem de desconto do pedido[G:a][N:Porcentagem]
   "IncluirServicos" TEXT NOT NULL CHECK("IncluirServicos" IN('Y', 'N')),-- Informa se o cupom também se aplica nos serviços[G:o][N:Contemplar serviços]
   "LimitarPedidos" TEXT NOT NULL CHECK("LimitarPedidos" IN('Y', 'N')) DEFAULT 'N',-- Informa se deve limitar o cupom pela quantidade de pedidos válidos do cliente[G:o][N:Limitar por pedidos]
-  "FuncaoPedidos" TEXT NOT NULL CHECK("FuncaoPedidos" IN('Menor', 'Igual', 'Maior')) DEFAULT 'Maior',-- Informa a regra para decidir se a quantidade de pedidos permite usar esse cupom[G:a][N:Função de limite por pedidos]
+  "FuncaoPedidos" TEXT NOT NULL CHECK("FuncaoPedidos" IN('Menor', 'Igual', 'Maior')) DEFAULT 'Maior',-- Informa a regra para decidir se a quantidade de pedidos permite usar esse cupom[G:a][N:Função de limite por pedidos][E:Menor|Igual|Maior]
   "PedidosLimite" INTEGER NOT NULL DEFAULT 0,-- Quantidade de pedidos válidos que permite usar esse cupom[G:a][N:Limite de pedidos]
   "LimitarValor" TEXT NOT NULL CHECK("LimitarValor" IN('Y', 'N')) DEFAULT 'N',-- Informa se deve limitar o uso do cupom pelo valor do pedido[G:o][N:Limitar pelo valor]
-  "FuncaoValor" TEXT NOT NULL CHECK("FuncaoValor" IN('Menor', 'Igual', 'Maior')) DEFAULT 'Maior',-- Informa a regra para decidir se o valor do pedido permite usar esse cupom[G:a][N:Função de limite por valor]
+  "FuncaoValor" TEXT NOT NULL CHECK("FuncaoValor" IN('Menor', 'Igual', 'Maior')) DEFAULT 'Maior',-- Informa a regra para decidir se o valor do pedido permite usar esse cupom[G:a][N:Função de limite por valor][E:Menor|Igual|Maior]
   "ValorLimite" DECIMAL NOT NULL DEFAULT 0,-- Valor do pedido com os serviços que permite usar esse cupom[G:a][N:Limite de valor]
   "Validade" DATETIME NOT NULL,-- Validade do cupom[G:a][N:Validade]
   "DataRegistro" DATETIME NOT NULL,-- Data de registro do cupom ou do uso[G:a][N:Data de registro]
@@ -1214,7 +1211,7 @@ CREATE TABLE "Pagamentos"(
   "Lancado" DECIMAL NOT NULL,-- Valor lançado para pagamento do pedido ou conta na moeda local do país[N:Lancado][G:o]
   "Codigo" VARCHAR(100) DEFAULT NULL,-- Código do pagamento, usado em transações online[G:o][N:Código]
   "Detalhes" VARCHAR(200) DEFAULT NULL,-- Detalhes do pagamento[N:Detalhes][G:o]
-  "Estado" TEXT NOT NULL CHECK("Estado" IN('Aberto', 'Aguardando', 'Analise', 'Pago', 'Disputa', 'Devolvido', 'Cancelado')) DEFAULT 'Aberto',-- Informa qual o andamento do processo de pagamento[N:Estado][G:o][F:self::ESTADO_ABERTO]
+  "Estado" TEXT NOT NULL CHECK("Estado" IN('Aberto', 'Aguardando', 'Analise', 'Pago', 'Disputa', 'Devolvido', 'Cancelado')) DEFAULT 'Aberto',-- Informa qual o andamento do processo de pagamento[N:Estado][G:o][F:self::ESTADO_ABERTO][E:Aberto|Aguardando pagamento|Pago|Em disputa|Devolvido|Cancelado]
   "DataCompensacao" DATETIME NOT NULL,-- Data de compensação do pagamento[N:Data de compensação][G:a]
   "DataLancamento" DATETIME NOT NULL,-- Data e hora do lançamento do pagamento[N:Data de lançamento][G:a]
   CONSTRAINT "FK_Pagamentos_Prestadores_FuncionarioID"
@@ -1374,9 +1371,9 @@ CREATE TABLE "Impressoras"(
   "Colunas" INTEGER NOT NULL DEFAULT 48,-- Quantidade de colunas do cupom[N:Quantidade de colunas][G:a]
   "Avanco" INTEGER NOT NULL DEFAULT 6,-- Quantidade de linhas para avanço do papel[N:Avanço de papel][G:o]
   "Comandos" TEXT DEFAULT NULL,-- Comandos para impressão, quando o driver é customizado[N:Comandos][G:o]
-  CONSTRAINT "UK_Impresoras_Setor_Dispositivo_Modo"
+  CONSTRAINT "SetorID_DispositivoID_Modo_UNIQUE"
     UNIQUE("SetorID","DispositivoID","Modo"),
-  CONSTRAINT "UK_Impressoras_Dispositivo_Descricao"
+  CONSTRAINT "DispositivoID_Descricao_UNIQUE"
     UNIQUE("DispositivoID","Descricao"),
   CONSTRAINT "FK_Impressoras_Dispositivos_DispositivoID"
     FOREIGN KEY("DispositivoID")
@@ -1419,7 +1416,7 @@ CREATE TABLE "Cartoes"(
   "TaxaAntecipacao" DOUBLE NOT NULL DEFAULT 0,-- Taxa em porcentagem para antecipação de recebimento de parcelas[N:Taxa de antecipação][G:a]
   "ImagemURL" VARCHAR(100) DEFAULT NULL,-- Imagem do cartão[N:Imagem][G:a][I:256x256|cartao|cartao.png]
   "Ativo" TEXT NOT NULL CHECK("Ativo" IN('Y', 'N')) DEFAULT 'Y',-- Informa se o cartão está ativo[N:Ativo][G:o]
-  CONSTRAINT "UK_FormaPagto_Bandeira"
+  CONSTRAINT "FormaPagtoID_Bandeira_UNIQUE"
     UNIQUE("FormaPagtoID","Bandeira"),
   CONSTRAINT "FK_Cartoes_Carteiras_CarteiraID"
     FOREIGN KEY("CarteiraID")
@@ -1456,11 +1453,11 @@ CREATE TABLE "Formacoes"(
 --   Informa qual foi a formação que gerou esse produto, assim como quais item foram retirados/adicionados da composição[N:Formação|Formações][G:a][L:Pagamento][K:MZ\Sale|MZ\Sale\][H:SyncModel]
   "ID" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,-- Identificador da formação[G:o]
   "ItemID" INTEGER NOT NULL,-- Informa qual foi o produto vendido para essa formação[N:Item do pedido][G:o][S:S]
-  "Tipo" TEXT NOT NULL CHECK("Tipo" IN('Pacote', 'Composicao')) DEFAULT 'Pacote',-- Informa qual tipo de formação foi escolhida, Pacote: O produto ou propriedade faz parte de um pacote, Composição: O produto é uma composição e esse item foi retirado ou adicionado na venda[N:Tipo][G:o]
+  "Tipo" TEXT NOT NULL CHECK("Tipo" IN('Pacote', 'Composicao')) DEFAULT 'Pacote',-- Informa qual tipo de formação foi escolhida, Pacote: O produto ou propriedade faz parte de um pacote, Composição: O produto é uma composição e esse item foi retirado ou adicionado na venda[N:Tipo][G:o][E:Pacote|Composição]
   "PacoteID" INTEGER DEFAULT NULL,-- Informa qual pacote foi selecionado no momento da venda[N:Pacote][G:o][S]
   "ComposicaoID" INTEGER DEFAULT NULL,-- Informa qual composição foi retirada ou adicionada no momento da venda[N:Composição][G:a]
   "Quantidade" DOUBLE NOT NULL DEFAULT 1,-- Quantidade de itens selecionados[N:Quantidade][G:a]
-  CONSTRAINT "UK_Formacoes_ItemID_PacoteID"
+  CONSTRAINT "ItemID_PacoteID_UNIQUE"
     UNIQUE("ItemID","PacoteID"),
   CONSTRAINT "FK_Formacoes_Itens_ItemID"
     FOREIGN KEY("ItemID")
@@ -1530,7 +1527,7 @@ CREATE TABLE "Valores_Nutricionais"(
   "Nome" VARCHAR(100) NOT NULL,-- Nome do valor nutricional[N:Nome][G:o][S]
   "Quantidade" DOUBLE NOT NULL,-- Quantidade do valor nutricional com base na porção[N:Quantidade][G:a]
   "ValorDiario" DOUBLE DEFAULT NULL,-- Valor diário em %[N:Valor diário][G:o]
-  CONSTRAINT "UK_Informacao_Nome"
+  CONSTRAINT "InformacaoID_Nome_UNIQUE"
     UNIQUE("InformacaoID","Nome"),
   CONSTRAINT "FK_Valores_Nutricionais_Informacoes_InformacaoID"
     FOREIGN KEY("InformacaoID")
@@ -1553,7 +1550,7 @@ CREATE TABLE "Localizacoes"(
   "CEP" VARCHAR(8) DEFAULT NULL,-- Código dos correios para identificar um logradouro[M:99999-999][N:CEP][G:o]
   "Logradouro" VARCHAR(100) NOT NULL,-- Nome da rua ou avenida[N:Logradouro][G:o][S]
   "Numero" VARCHAR(20) NOT NULL,-- Número da casa ou do condomínio[N:Número][G:o]
-  "Tipo" TEXT NOT NULL CHECK("Tipo" IN('Casa', 'Apartamento')) DEFAULT 'Casa',-- Tipo de endereço Casa ou Apartamento[N:Tipo][G:o][F:self::TIPO_CASA]
+  "Tipo" TEXT NOT NULL CHECK("Tipo" IN('Casa', 'Apartamento', 'Condominio')) DEFAULT 'Casa',-- Tipo de endereço Casa ou Apartamento[N:Tipo][G:o][F:self::TIPO_CASA][E:Casa|Apartamento|Condomínio]
   "Complemento" VARCHAR(100) DEFAULT NULL,-- Complemento do endereço, Ex.: Loteamento Sul[N:Complemento][G:o]
   "Condominio" VARCHAR(100) DEFAULT NULL,-- Nome do condomínio[N:Condomínio][G:o]
   "Bloco" VARCHAR(20) DEFAULT NULL,-- Número do bloco quando for apartamento[N:Bloco][G:o]
@@ -1596,6 +1593,12 @@ CREATE TABLE "Pedidos"(
   "EntregaID" INTEGER,-- Informa em qual entrega esse pedido foi despachado[G:a][N:Entrega]
   "Tipo" TEXT NOT NULL CHECK("Tipo" IN('Mesa', 'Comanda', 'Avulso', 'Entrega')) DEFAULT 'Mesa',-- Tipo de venda[N:Tipo][G:o][E:Mesa|Comanda|Balcão|Entrega][S:S]
   "Estado" TEXT NOT NULL CHECK("Estado" IN('Finalizado', 'Ativo', 'Agendado', 'Entrega', 'Fechado')) DEFAULT 'Ativo',-- Estado do pedido, Agendado: O pedido deve ser processado na data de agendamento. Ativo: O pedido deve ser processado. Fechado: O cliente pediu a conta e está pronto para pagar. Entrega: O pedido saiu para entrega. Finalizado: O pedido foi pago e concluído[N:Estado][G:o]
+  "Servicos" DECIMAL NOT NULL DEFAULT 0,-- Valor total dos serviços desse pedido[G:o][N:Total dos serviços][F:0]
+  "Produtos" DECIMAL NOT NULL DEFAULT 0,-- Valor total dos produtos do pedido sem a comissão[G:o][N:Total dos produtos][F:0]
+  "Comissao" DECIMAL NOT NULL DEFAULT 0,-- Valor total da comissão desse pedido[G:o][N:Total da comissão][F:0]
+  "Descontos" DECIMAL NOT NULL DEFAULT 0,-- Total de descontos realizado nesse pedido[G:o][N:Descontos][F:0]
+  "Pago" DECIMAL NOT NULL DEFAULT 0,-- Valor já pago do pedido[G:o][N:Total pago][F:0]
+  "Lancado" DECIMAL NOT NULL DEFAULT 0,-- Valor lançado para pagar, mas não foi pago ainda[G:o][N:Total lançado][F:0]
   "Pessoas" INTEGER NOT NULL DEFAULT 1,-- Informa quantas pessoas estão na mesa[N:Pessoas][G:a]
   "Descricao" VARCHAR(255) DEFAULT NULL,-- Detalhes da reserva ou do pedido[N:Descrição][G:a]
   "FechadorID" INTEGER DEFAULT NULL,-- Informa quem fechou o pedido e imprimiu a conta[N:Fechador do pedido][G:o][S:S]
@@ -1696,7 +1699,7 @@ CREATE TABLE "Eventos"(
 --   Eventos de envio das notas[N:Evento|Eventos][G:o][L:RelatorioAuditoria][K:MZ\Invoice|MZ\Invoice\][H:SyncModel]
   "ID" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,-- Identificador do evento[G:o]
   "NotaID" INTEGER NOT NULL,-- Nota a qual o evento foi criado[G:a][N:Nota][S:S]
-  "Estado" TEXT NOT NULL CHECK("Estado" IN('Aberto', 'Assinado', 'Validado', 'Pendente', 'Processamento', 'Denegado', 'Cancelado', 'Rejeitado', 'Contingencia', 'Inutilizado', 'Autorizado')),-- Estado do evento[G:o][N:Estado][E:Aberto|Assinado|Pendente|Em processamento|Denegado|Cancelado|Rejeitado|Contingência|Inutilizado|Autorizado]
+  "Estado" TEXT NOT NULL CHECK("Estado" IN('Aberto', 'Assinado', 'Validado', 'Pendente', 'Processamento', 'Denegado', 'Cancelado', 'Rejeitado', 'Contingencia', 'Inutilizado', 'Autorizado')),-- Estado do evento[G:o][N:Estado][E:Aberto|Assinado|Validado|Pendente|Em processamento|Denegado|Cancelado|Rejeitado|Contingência|Inutilizado|Autorizado]
   "Mensagem" TEXT NOT NULL,-- Mensagem do evento, descreve que aconteceu[G:a][N:Mensagem]
   "Codigo" VARCHAR(20) NOT NULL,-- Código de status do evento, geralmente código de erro de uma exceção[G:o][N:Código]
   "DataCriacao" DATETIME NOT NULL,-- Data de criação do evento[G:a][N:Data de criação]
@@ -1716,7 +1719,7 @@ CREATE TABLE "Zonas"(
   "Disponivel" TEXT NOT NULL CHECK("Disponivel" IN('Y', 'N')) DEFAULT 'Y',-- Informa se a zona está disponível para entrega de pedidos[N:Disponível][G:o]
   "Area" TEXT,
   "TempoEntrega" INTEGER DEFAULT NULL,-- Tempo médio de entrega para essa zona, sobrescreve o tempo de entrega para o bairro[N:Tempo de entrega][G:o]
-  CONSTRAINT "UK_Bairro_Nome"
+  CONSTRAINT "BairroID_Nome_UNIQUE"
     UNIQUE("BairroID","Nome"),
   CONSTRAINT "FK_Zonas_Bairros_BairroID"
     FOREIGN KEY("BairroID")
@@ -1858,7 +1861,7 @@ CREATE TABLE "Itens"(
   "Reservado" TEXT NOT NULL CHECK("Reservado" IN('Y', 'N')) DEFAULT 'Y',-- Informa se os produtos foram retirados do estoque para produção[G:o][N:Reservado]
   "DataVisualizacao" DATETIME DEFAULT NULL,-- Data de visualização do item[N:Data de visualização][G:a]
   "DataAtualizacao" DATETIME DEFAULT NULL,-- Data de atualização do estado do item[N:Data de atualização][G:a]
-  "DataHora" DATETIME NOT NULL,-- Data e hora da realização do pedido do item[N:Data e hora][G:a][D]
+  "DataLancamento" DATETIME NOT NULL,-- Data e hora da realização do pedido do item[N:Data de lançamento][G:a][D]
   CONSTRAINT "FK_Itens_Pedidos_PedidoID"
     FOREIGN KEY("PedidoID")
     REFERENCES "Pedidos"("ID")
@@ -1893,7 +1896,7 @@ CREATE TABLE "Itens"(
 CREATE INDEX "Itens.FK_Itens_Pedidos_PedidoID_idx" ON "Itens" ("PedidoID");
 CREATE INDEX "Itens.FK_Itens_Produtos_ProdutoID_idx" ON "Itens" ("ProdutoID");
 CREATE INDEX "Itens.FK_Itens_Prestadores_PrestadorID_idx" ON "Itens" ("PrestadorID");
-CREATE INDEX "Itens.IDX_DataHora" ON "Itens" ("DataHora" DESC);
+CREATE INDEX "Itens.DataLancamento_INDEX" ON "Itens" ("DataLancamento" DESC);
 CREATE INDEX "Itens.FK_Itens_Itens_ItemID_idx" ON "Itens" ("ItemID");
 CREATE INDEX "Itens.FK_Itens_Servicos_ServicoID_idx" ON "Itens" ("ServicoID");
 CREATE INDEX "Itens.FK_Itens_Pagamentos_PagamentoID_idx" ON "Itens" ("PagamentoID");
@@ -1907,23 +1910,24 @@ CREATE TABLE "Contas"(
   "CarteiraID" INTEGER DEFAULT NULL,-- Informa a carteira que essa conta será paga automaticamente ou para informar as contas a pagar dessa carteira[G:a][N:Carteira]
   "ClienteID" INTEGER DEFAULT NULL,-- Cliente a qual a conta pertence[N:Cliente][G:o][S:S]
   "PedidoID" INTEGER DEFAULT NULL,-- Pedido da qual essa conta foi gerada[N:Pedido][G:o][S:S]
-  "Tipo" TEXT NOT NULL CHECK("Tipo" IN('Receita', 'Despesa')) DEFAULT 'Despesa',-- Tipo de conta se receita ou despesa[G:o][N:Tipo]
+  "Tipo" TEXT NOT NULL CHECK("Tipo" IN('Receita', 'Despesa')) DEFAULT 'Despesa',-- Tipo de conta se receita ou despesa[G:o][N:Tipo][E:Receita|Despesa]
   "Descricao" VARCHAR(200) NOT NULL,-- Descrição da conta[N:Descrição][G:a][S]
   "Valor" DECIMAL NOT NULL,-- Valor da conta[N:Valor][G:o]
-  "Fonte" TEXT NOT NULL CHECK("Fonte" IN('Fixa', 'Variavel', 'Comissao', 'Remuneracao')) DEFAULT 'Fixa',-- Fonte dos valores, comissão e remuneração se pagar antes do vencimento, o valor será proporcional[G:a][N:Fonte dos valores]
+  "Consolidado" DECIMAL NOT NULL DEFAULT 0,-- Valor pago ou recebido da conta[G:a][N:Valor pago ou recebido]
+  "Fonte" TEXT NOT NULL CHECK("Fonte" IN('Fixa', 'Variavel', 'Comissao', 'Remuneracao')) DEFAULT 'Fixa',-- Fonte dos valores, comissão e remuneração se pagar antes do vencimento, o valor será proporcional[G:a][N:Fonte dos valores][E:Fixa|Variável|Comissão|Remuneração]
   "NumeroParcela" INTEGER NOT NULL DEFAULT 1,-- Informa qual o número da parcela para esta conta[G:o][N:Número da parcela]
   "Parcelas" INTEGER NOT NULL DEFAULT 1,-- Quantidade de parcelas que essa conta terá, zero para conta recorrente e será alterado para 1 quando criar a próxima conta[G:a][N:Parcelas]
   "Frequencia" INTEGER NOT NULL DEFAULT 0,-- Frequência da recorrência em dias ou mês, depende do modo de cobrança[G:a][N:Frequencia]
-  "Modo" TEXT NOT NULL CHECK("Modo" IN('Diario', 'Mensal')) DEFAULT 'Mensal',-- Modo de cobrança se diário ou mensal, a quantidade é definida em frequencia[G:o][N:Modo]
+  "Modo" TEXT NOT NULL CHECK("Modo" IN('Diario', 'Mensal')) DEFAULT 'Mensal',-- Modo de cobrança se diário ou mensal, a quantidade é definida em frequencia[G:o][N:Modo][E:Diário|Mensal]
   "Automatico" TEXT NOT NULL CHECK("Automatico" IN('Y', 'N')) DEFAULT 'N',-- Informa se o pagamento será automático após o vencimento, só ocorrerá se tiver saldo na carteira, usado para débito automático[G:o][N:Automático]
   "Acrescimo" DECIMAL NOT NULL DEFAULT 0,-- Acréscimo de valores ao total[N:Acréscimo][G:o]
   "Multa" DECIMAL NOT NULL DEFAULT 0,-- Valor da multa em caso de atraso[N:Multa por atraso][G:a]
   "Juros" DOUBLE NOT NULL DEFAULT 0,-- Juros diário em caso de atraso, valor de 0 a 1, 1 = 100%[N:Juros][G:o]
-  "Formula" TEXT NOT NULL CHECK("Formula" IN('Simples', 'Composto')) DEFAULT 'Composto',-- Fórmula de juros que será cobrado em caso de atraso[G:o][N:Tipo de juros]
+  "Formula" TEXT NOT NULL CHECK("Formula" IN('Simples', 'Composto')) DEFAULT 'Composto',-- Fórmula de juros que será cobrado em caso de atraso[G:o][N:Tipo de juros][E:Simples|Composto]
   "Vencimento" DATETIME NOT NULL,-- Data de vencimento da conta[N:Data de vencimento][G:a]
   "NumeroDoc" VARCHAR(64) DEFAULT NULL,-- Número do documento que gerou a conta[N:Número do documento][G:o]
   "AnexoURL" VARCHAR(200) DEFAULT NULL,-- Caminho do anexo da conta[N:Anexo][G:o][I:512x256|conta|conta.png]
-  "Estado" TEXT NOT NULL CHECK("Estado" IN('Analise', 'Ativa', 'Paga', 'Cancelada', 'Desativada')) DEFAULT 'Ativa',-- Informa o estado da conta, desativa quando agrupa[N:Estado][G:o]
+  "Estado" TEXT NOT NULL CHECK("Estado" IN('Analise', 'Ativa', 'Paga', 'Cancelada', 'Desativada')) DEFAULT 'Ativa',-- Informa o estado da conta, desativa quando agrupa[N:Estado][G:o][E:Análise|Ativa|Paga|Cancelada|Desativada]
   "DataCalculo" DATETIME DEFAULT NULL,-- Data do último cálculo de acréscimo por atraso de pagamento[N:Data de cálculo][G:a]
   "DataEmissao" DATETIME NOT NULL,-- Data de emissão da conta[N:Data de emissão][G:a]
   CONSTRAINT "FK_Contas_Clientes_ClienteID"

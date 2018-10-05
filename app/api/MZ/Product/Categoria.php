@@ -642,7 +642,7 @@ class Categoria extends SyncModel
         }
         if (isset($order['vendas'])) {
             $query = $query->leftJoin(
-                'Itens i ON i.produtoid = p.id AND i.datahora > ?',
+                'Itens i ON i.produtoid = p.id AND i.datalancamento > ?',
                 DB::now('-1 month')
             );
         }

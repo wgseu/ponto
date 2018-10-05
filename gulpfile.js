@@ -126,6 +126,19 @@ gulp.task('fix-script', function () {
       ''
     ],
   });
+  replace.sync({
+    files: 'database/model/sqlite.sql',
+    from: [
+      /ATTACH "GrandChef.sdb" AS "GrandChef";\r?\nBEGIN;\r?\n/igm,
+      /"GrandChef"."/igm,
+      /COMMIT;/igm
+    ],
+    to: [
+      '',
+      '"',
+      '\nPRAGMA foreign_keys = ON;'
+    ],
+  });
 })
 
 gulp.task('fix-sql', function () {

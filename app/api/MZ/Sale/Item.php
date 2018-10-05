@@ -145,7 +145,7 @@ class Item extends SyncModel
     /**
      * Data e hora da realização do pedido do item
      */
-    private $data_hora;
+    private $data_lancamento;
 
     /**
      * Constructor for a new empty instance of Item
@@ -645,21 +645,21 @@ class Item extends SyncModel
 
     /**
      * Data e hora da realização do pedido do item
-     * @return string data e hora of Item do pedido
+     * @return string data de lançamento of Item do pedido
      */
-    public function getDataHora()
+    public function getDataLancamento()
     {
-        return $this->data_hora;
+        return $this->data_lancamento;
     }
 
     /**
-     * Set DataHora value to new on param
-     * @param string $data_hora Set data e hora for Item do pedido
+     * Set DataLancamento value to new on param
+     * @param string $data_lancamento Set data de lançamento for Item do pedido
      * @return self Self instance
      */
-    public function setDataHora($data_hora)
+    public function setDataLancamento($data_lancamento)
     {
-        $this->data_hora = $data_hora;
+        $this->data_lancamento = $data_lancamento;
         return $this;
     }
 
@@ -694,7 +694,7 @@ class Item extends SyncModel
         $item['reservado'] = $this->getReservado();
         $item['datavisualizacao'] = $this->getDataVisualizacao();
         $item['dataatualizacao'] = $this->getDataAtualizacao();
-        $item['datahora'] = $this->getDataHora();
+        $item['datalancamento'] = $this->getDataLancamento();
         return $item;
     }
 
@@ -826,10 +826,10 @@ class Item extends SyncModel
         } else {
             $this->setDataAtualizacao($item['dataatualizacao']);
         }
-        if (!isset($item['datahora'])) {
-            $this->setDataHora(DB::now());
+        if (!isset($item['datalancamento'])) {
+            $this->setDataLancamento(DB::now());
         } else {
-            $this->setDataHora($item['datahora']);
+            $this->setDataLancamento($item['datalancamento']);
         }
         return $this;
     }
@@ -1016,7 +1016,7 @@ class Item extends SyncModel
             $errors['reservado'] = _t('item.reservado_invalid');
         }
         $this->setDataAtualizacao(DB::now());
-        $this->setDataHora(DB::now());
+        $this->setDataLancamento(DB::now());
         if (!empty($errors)) {
             throw new ValidationException($errors);
         }
@@ -1058,7 +1058,7 @@ class Item extends SyncModel
             );
         }
         $values = DB::filterValues($values, $only, false);
-        unset($values['datahora']);
+        unset($values['datalancamento']);
         try {
             $affected = DB::update('Itens')
                 ->set($values)
@@ -1287,12 +1287,12 @@ class Item extends SyncModel
             $allowed[$field] = true;
         }
         if (isset($condition['apartir_datahora'])) {
-            $field = 'i.datahora >= ?';
+            $field = 'i.datalancamento >= ?';
             $condition[$field] = Filter::datetime($condition['apartir_datahora'], '00:00:00');
             $allowed[$field] = true;
         }
         if (isset($condition['ate_datahora'])) {
-            $field = 'i.datahora <= ?';
+            $field = 'i.datalancamento <= ?';
             $condition[$field] = Filter::datetime($condition['ate_datahora'], '23:59:59');
             $allowed[$field] = true;
         }
@@ -1369,7 +1369,7 @@ class Item extends SyncModel
                 ->select('i.reservado')
                 ->select('i.datavisualizacao')
                 ->select('i.dataatualizacao')
-                ->select('i.datahora')
+                ->select('i.datalancamento')
 
                 ->select('l.login as prestadorlogin')
                 ->select('COALESCE(s.descricao, i.descricao, d.descricao) as produtodescricao')
@@ -1401,7 +1401,7 @@ class Item extends SyncModel
         }
         $condition = self::filterCondition($condition);
         $query = DB::buildOrderBy($query, self::filterOrder($order));
-        $query = $query->orderBy('i.datahora DESC');
+        $query = $query->orderBy('i.datalancamento DESC');
         $query = $query->orderBy('i.id DESC');
         foreach ($select as $value) {
             $query = $query->select($value);

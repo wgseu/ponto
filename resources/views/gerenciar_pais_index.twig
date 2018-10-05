@@ -72,8 +72,8 @@
                   <td>
                     <a href="/gerenciar/moeda/editar?id={{ $_moeda->getID() }}" title="Editar moeda '{{ $_moeda->getNome() }}'">{{ $_moeda->getNome() }}</a>
                   </td>
-                  <td>{{ $pais->getLinguagemID() }}</td>
-                  <td>{{ $pais->getUnitario() == 'Y'?'Sim':'Não' }}</td>
+                  <td>{{ $pais->getIdioma() }}</td>
+                  <td>{{ $pais->isUnitario() ? 'Sim' : 'Não' }}</td>
                   <td class="text-center">
                     <ul class="nav panel_toolbox">
                       <li>

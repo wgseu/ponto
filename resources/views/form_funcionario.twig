@@ -25,14 +25,6 @@
   <input type="text" id="porcentagem" name="porcentagem" class="numeric form-control text-right" data-a-sign=" %" data-p-sign="s" data-a-sep="." data-a-dec="," data-a-pad="false" value="{{ $prestador->getPorcentagem() }}">
 </div>
 <div class="form-group col-lg-3 col-md-4 col-sm-6 col-xs-12">
-  <label for="linguagemid">Linguagem:</label>
-  <select class="form-control" id="linguagemid" name="linguagemid">
-    {% for $value, $text in $linguagens %}
-      <option value="{{ $value }}" {{ $prestador->getLinguagemID() == $value ? 'selected': '' }}>{{ $text }}</option>
-    {% endfor %}
-  </select>
-</div>
-<div class="form-group col-lg-3 col-md-4 col-sm-6 col-xs-12">
   <label for="pontuacao">Pontuação:</label>
   <input type="text" id="pontuacao" name="pontuacao" class="numeric form-control text-right" data-a-sep="" data-m-dec="0" value="{{ $prestador->getPontuacao() }}">
 </div>

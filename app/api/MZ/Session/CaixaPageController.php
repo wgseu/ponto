@@ -27,6 +27,7 @@ namespace MZ\Session;
 use MZ\System\Permissao;
 use MZ\Util\Filter;
 use MZ\Core\PageController;
+use MZ\Wallet\Carteira;
 
 /**
  * Allow application to serve system resources
@@ -108,6 +109,7 @@ class CaixaPageController extends PageController
         } else {
             $caixa->setAtivo('Y');
         }
+        $_carteiras = Carteira::findAll();
         return $this->view('gerenciar_caixa_cadastrar', get_defined_vars());
     }
 
@@ -164,6 +166,7 @@ class CaixaPageController extends PageController
         } elseif ($this->isJson()) {
             return $this->json()->error('Nenhum dado foi enviado');
         }
+        $_carteiras = Carteira::findAll();
         return $this->view('gerenciar_caixa_editar', get_defined_vars());
     }
 

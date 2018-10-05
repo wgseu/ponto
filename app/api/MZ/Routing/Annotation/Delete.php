@@ -22,41 +22,12 @@
  *
  * @author Equipe GrandChef <desenvolvimento@mzsw.com.br>
  */
-namespace MZ\Device;
+namespace MZ\Routing\Annotation;
 
-use MZ\Environment\SetorTest;
-
-class DispositivoTest extends \MZ\Framework\TestCase
+/**
+ * DELETE method annotation
+ * @Annotation
+ */
+class Delete extends Route
 {
-    /**
-     * Build a valid dispositivo
-     * @param string $nome Dispositivo nome
-     * @return Dispositivo
-     */
-    public static function build($nome = null)
-    {
-        $last = Dispositivo::find([], ['id' => -1]);
-        $id = $last->getID() + 1;
-        $setor = SetorTest::create();
-        $dispositivo = new Dispositivo();
-        $dispositivo->setSetorID($setor->getID());
-        $dispositivo->setNome($nome ?: "Tablet {$id}");
-        $dispositivo->setDescricao($nome ?: "Tablet {$id}");
-        $dispositivo->setTipo(Dispositivo::TIPO_TABLET);
-        $dispositivo->setSerial("{$id}8sdd7qw549{$id}");
-        return $dispositivo;
-    }
-
-    /**
-     * Create a dispositivo on database
-     * @param string $nome Dispositivo nome
-     * @return Dispositivo
-     */
-    public static function create($nome = null)
-    {
-        $dispositivo = self::build($nome);
-        $dispositivo->insert();
-        $dispositivo->authorize();
-        return $dispositivo;
-    }
 }

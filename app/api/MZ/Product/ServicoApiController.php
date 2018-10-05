@@ -34,6 +34,7 @@ class ServicoApiController extends \MZ\Core\ApiController
 {
     /**
      * Find all Serviços
+     * @Get("/api/servicos", name="api_servico_find")
      */
     public function find()
     {
@@ -54,6 +55,7 @@ class ServicoApiController extends \MZ\Core\ApiController
 
     /**
      * Create a new Serviço
+     * @Post("/api/servicos", name="api_servico_add")
      */
     public function add()
     {
@@ -67,6 +69,8 @@ class ServicoApiController extends \MZ\Core\ApiController
 
     /**
      * Update an existing Serviço
+     * @Put("/api/servicos/{id}", name="api_servico_update", params={ "id": "\d+" })
+     * 
      * @param int $id Serviço id to update
      */
     public function update($id)
@@ -83,6 +87,8 @@ class ServicoApiController extends \MZ\Core\ApiController
 
     /**
      * Delete existing Serviço
+     * @Delete("/api/servicos/{id}", name="api_servico_delete", params={ "id": "\d+" })
+     * 
      * @param int $id Serviço id to delete
      */
     public function delete($id)
@@ -92,41 +98,5 @@ class ServicoApiController extends \MZ\Core\ApiController
         $servico->delete();
         $servico->clean(new Servico());
         return $this->getResponse()->success([]);
-    }
-
-    /**
-     * Get URL patterns associated with callback for use into router
-     * @return array List of routes
-     */
-    public static function getRoutes()
-    {
-        return [
-            [
-                'name' => 'api_servico_find',
-                'path' => '/api/servicos',
-                'method' => 'GET',
-                'controller' => 'find',
-            ],
-            [
-                'name' => 'api_servico_add',
-                'path' => '/api/servicos',
-                'method' => 'POST',
-                'controller' => 'add',
-            ],
-            [
-                'name' => 'api_servico_update',
-                'path' => '/api/servicos/{id}',
-                'method' => 'PUT',
-                'requirements' => ['id' => '\d+'],
-                'controller' => 'update',
-            ],
-            [
-                'name' => 'api_servico_delete',
-                'path' => '/api/servicos/{id}',
-                'method' => 'DELETE',
-                'requirements' => ['id' => '\d+'],
-                'controller' => 'delete',
-            ],
-        ];
     }
 }

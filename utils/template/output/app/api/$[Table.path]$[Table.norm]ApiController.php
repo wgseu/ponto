@@ -36,6 +36,7 @@ class $[Table.norm]ApiController extends \MZ\Core\ApiController
 {
     /**
      * Find all $[Table.name.plural]
+     * @Get("/api/$[table.unix.plural]", name="api_$[table.unix]_find")
      */
     public function find()
     {
@@ -56,6 +57,7 @@ class $[Table.norm]ApiController extends \MZ\Core\ApiController
 
     /**
      * Create a new $[Table.name]
+     * @Post("/api/$[table.unix.plural]", name="api_$[table.unix]_add")
      */
     public function add()
     {
@@ -69,6 +71,8 @@ class $[Table.norm]ApiController extends \MZ\Core\ApiController
 
     /**
      * Update an existing $[Table.name]
+     * @Put("/api/$[table.unix.plural]/{id}", name="api_$[table.unix]_update", params={ "id": "\d+" })
+     * 
      * @param int $id $[Table.name] id to update
      */
     public function update($id)
@@ -85,6 +89,8 @@ class $[Table.norm]ApiController extends \MZ\Core\ApiController
 
     /**
      * Delete existing $[Table.name]
+     * @Delete("/api/$[table.unix.plural]/{id}", name="api_$[table.unix]_delete", params={ "id": "\d+" })
+     * 
      * @param int $id $[Table.name] id to delete
      */
     public function delete($id)
@@ -94,41 +100,5 @@ class $[Table.norm]ApiController extends \MZ\Core\ApiController
         $$[table.unix]->delete();
         $$[table.unix]->clean(new $[Table.norm]());
         return $this->getResponse()->success([]);
-    }
-
-    /**
-     * Get URL patterns associated with callback for use into router
-     * @return array List of routes
-     */
-    public static function getRoutes()
-    {
-        return [
-            [
-                'name' => 'api_$[table.unix]_find',
-                'path' => '/api/$[table.unix.plural]',
-                'method' => 'GET',
-                'controller' => 'find',
-            ],
-            [
-                'name' => 'api_$[table.unix]_add',
-                'path' => '/api/$[table.unix.plural]',
-                'method' => 'POST',
-                'controller' => 'add',
-            ],
-            [
-                'name' => 'api_$[table.unix]_update',
-                'path' => '/api/$[table.unix.plural]/{id}',
-                'method' => 'PUT',
-                'requirements' => ['id' => '\d+'],
-                'controller' => 'update',
-            ],
-            [
-                'name' => 'api_$[table.unix]_delete',
-                'path' => '/api/$[table.unix.plural]/{id}',
-                'method' => 'DELETE',
-                'requirements' => ['id' => '\d+'],
-                'controller' => 'delete',
-            ],
-        ];
     }
 }

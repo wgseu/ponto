@@ -67,7 +67,6 @@ class AuthenticationTest extends \MZ\Framework\TestCase
 
     public function testAppStatus()
     {
-        app()->getAuthentication()->logout();
         $expected = [
             'status' => 'ok',
             'info' => [
@@ -84,6 +83,43 @@ class AuthenticationTest extends \MZ\Framework\TestCase
         ];
         app()->getAuthentication()->logout();
         $result = $this->get('/app/conta/status');
+        $this->assertEquals($expected, \array_intersect_key($result, $expected));
+    }
+
+    public function testAppEntrar()
+    {
+        app()->getAuthentication()->logout();
+        $dispositivo = \MZ\Device\DispositivoTest::create();
+        $prestador = \MZ\Provider\PrestadorTest::create();
+        $cliente = $prestador->findClienteID();
+        $permissoes = \MZ\System\Acesso::getPermissoes($prestador->getFuncaoID());
+        $senha = 'zA491aZ';
+        $cliente->setSenha($senha);
+        $cliente->update();
+        $data = [
+            'usuario' => $cliente->getLogin(),
+            'senha' => $senha,
+            'device' => $dispositivo->getNome(),
+            'serial' => $dispositivo->getSerial(),
+        ];
+        $result = $this->post('/app/conta/entrar', $data, true);
+        $expected = [
+            'status' => 'ok',
+            'info' => [
+                'usuario' => [
+                    'nome' => $cliente->getNome(),
+                    'email' => $cliente->getEmail(),
+                    'login' => $cliente->getLogin(),
+                    'imagemurl' => $cliente->makeImagemURL(false, null),
+                ],
+            ],
+            'funcionario' => intval($prestador->getID()),
+            'versao' => Sistema::VERSAO,
+            'cliente' => $cliente->getID(),
+            'autologout' => false,
+            'acesso' => 'funcionario',
+            'permissoes' => $permissoes,
+        ];
         $this->assertEquals($expected, \array_intersect_key($result, $expected));
     }
 }

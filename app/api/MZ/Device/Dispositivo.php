@@ -37,6 +37,7 @@ use MZ\Exception\ValidationException;
  */
 class Dispositivo extends SyncModel
 {
+    const CONCAT_TOKEN = '@uF4K2g:[C^3g6R';
 
     /**
      * Tipo de dispositivo
@@ -364,6 +365,20 @@ class Dispositivo extends SyncModel
     }
 
     /**
+     * Check if this device is validated
+     * @return boolean true if validated, false otherwise
+     */
+    public function checkValidacao()
+    {
+        return $this->getValidacao() == $this->makeValidacao();
+    }
+
+    public function makeValidacao()
+    {
+        return \sha1(self::CONCAT_TOKEN . $this->getSerial());
+    }
+
+    /**
      * Filter fields, upload data and keep key data
      * @param self $original Original instance without modifications
      * @param boolean $localized Informs if fields are localized
@@ -540,6 +555,16 @@ class Dispositivo extends SyncModel
         $exists = $this->exists();
         $this->save();
         return $this;
+    }
+
+    /**
+     * Authorize this device to access this app
+     * @return self self instance
+     */
+    public function authorize()
+    {
+        $this->setValidacao($this->makeValidacao());
+        return $this->update();
     }
 
     /**

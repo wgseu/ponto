@@ -34,6 +34,7 @@ class TelefoneApiController extends \MZ\Core\ApiController
 {
     /**
      * Find all Telefones
+     * @Get("/api/telefones", name="api_telefone_find")
      */
     public function find()
     {
@@ -54,35 +55,40 @@ class TelefoneApiController extends \MZ\Core\ApiController
 
     /**
      * Create a new Telefone
+     * @Post("/api/telefones", name="api_telefone_add")
      */
     public function add()
     {
         $this->needPermission([Permissao::NOME_CADASTROCLIENTES]);
+        $localized = $this->getRequest()->query->getBoolean('localized', false);
         $telefone = new Telefone($this->getData());
-        $telefone->filter(new Telefone());
+        $telefone->filter(new Telefone(), $localized);
         $telefone->insert();
-        $message = _t('telefone.registered', $telefone->getNumero());
-        return $this->getResponse()->success(['item' => $telefone->publish()], $message);
+        return $this->getResponse()->success(['item' => $telefone->publish()]);
     }
 
     /**
      * Update an existing Telefone
+     * @Put("/api/telefones/{id}", name="api_telefone_update", params={ "id": "\d+" })
+     * 
      * @param int $id Telefone id to update
      */
     public function update($id)
     {
         $this->needPermission([Permissao::NOME_CADASTROCLIENTES]);
         $old_telefone = Telefone::findOrFail(['id' => $id]);
+        $localized = $this->getRequest()->query->getBoolean('localized', false);
         $telefone = new Telefone($this->getData());
-        $telefone->filter($old_telefone);
+        $telefone->filter($old_telefone, $localized);
         $telefone->update();
         $old_telefone->clean($telefone);
-        $message = _t('telefone.updated', $telefone->getNumero());
-        return $this->getResponse()->success(['item' => $telefone->publish()], $message);
+        return $this->getResponse()->success(['item' => $telefone->publish()]);
     }
 
     /**
      * Delete existing Telefone
+     * @Delete("/api/telefones/{id}", name="api_telefone_delete", params={ "id": "\d+" })
+     * 
      * @param int $id Telefone id to delete
      */
     public function delete($id)
@@ -91,43 +97,6 @@ class TelefoneApiController extends \MZ\Core\ApiController
         $telefone = Telefone::findOrFail(['id' => $id]);
         $telefone->delete();
         $telefone->clean(new Telefone());
-        $message = _t('telefone.deleted', $telefone->getNumero());
-        return $this->getResponse()->success([], $message);
-    }
-
-    /**
-     * Get URL patterns associated with callback for use into router
-     * @return array List of routes
-     */
-    public static function getRoutes()
-    {
-        return [
-            [
-                'name' => 'api_telefone_find',
-                'path' => '/api/telefones',
-                'method' => 'GET',
-                'controller' => 'find',
-            ],
-            [
-                'name' => 'api_telefone_add',
-                'path' => '/api/telefones',
-                'method' => 'POST',
-                'controller' => 'add',
-            ],
-            [
-                'name' => 'api_telefone_update',
-                'path' => '/api/telefones/{id}',
-                'method' => 'PUT',
-                'requirements' => ['id' => '\d+'],
-                'controller' => 'update',
-            ],
-            [
-                'name' => 'api_telefone_delete',
-                'path' => '/api/telefones/{id}',
-                'method' => 'DELETE',
-                'requirements' => ['id' => '\d+'],
-                'controller' => 'delete',
-            ],
-        ];
+        return $this->getResponse()->success([]);
     }
 }

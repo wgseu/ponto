@@ -27,6 +27,7 @@ namespace MZ\Product;
 use MZ\System\Permissao;
 use MZ\Account\AuthenticationTest;
 use MZ\Stock\EstoqueTest;
+use MZ\Stock\Estoque;
 
 class ProdutoTest extends \MZ\Framework\TestCase
 {
@@ -134,6 +135,9 @@ class ProdutoTest extends \MZ\Framework\TestCase
         ];
         app()->getAuthentication()->logout();
         $result = $this->get('/app/produto/listar', ['categoria' => $produto->getCategoriaID()]);
+        // undo product available
+        $estoque->delete();
+        // end undo product available
         $this->assertEquals($expected, \array_intersect_key($result, $expected));
     }
 
@@ -171,6 +175,9 @@ class ProdutoTest extends \MZ\Framework\TestCase
         ];
         app()->getAuthentication()->logout();
         $result = $this->get('/app/produto/procurar', ['busca' => $produto->getDescricao()]);
+        // undo product available
+        $estoque->delete();
+        // end undo product available
         $this->assertEquals($expected, \array_intersect_key($result, $expected));
     }
 }

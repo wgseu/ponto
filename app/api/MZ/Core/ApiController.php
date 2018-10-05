@@ -24,6 +24,8 @@
  */
 namespace MZ\Core;
 
+use Doctrine\Common\Annotations\SimpleAnnotationReader;
+
 /**
  * Allow application to serve system resources as API
  */
@@ -46,5 +48,40 @@ abstract class ApiController extends Controller
     {
         $content = $this->getRequest()->getContent();
         return json_decode($content, true) ?: [];
+    }
+
+    /**
+     * Get URL patterns associated with callback for use into router
+     * @return array List of routes
+     */
+    public static function getRoutes()
+    {
+        $routes = [];
+        $class_exists = \class_exists('MZ\Routing\Annotation\Get') &&
+            \class_exists('MZ\Routing\Annotation\Put') &&
+            \class_exists('MZ\Routing\Annotation\Post') &&
+            \class_exists('MZ\Routing\Annotation\Delete');
+        $methods = get_class_methods(static::class);
+        $annotationReader = new SimpleAnnotationReader();
+        $annotationReader->addNamespace('MZ\Routing\Annotation');
+        foreach ($methods as $method_name) {
+            $reflectionMethod = new \ReflectionMethod(static::class, $method_name);
+            $methodAnnotations = $annotationReader->getMethodAnnotations($reflectionMethod);
+            foreach ($methodAnnotations as $annotation) {
+                if ($annotation instanceof \MZ\Routing\Annotation\Route) {
+                    $classname = get_class($annotation);
+                    $pos = strrpos($classname, '\\');
+                    $http_method = strtoupper(substr($classname, $pos + 1));
+                    $routes[] = [
+                        'name' => $annotation->name,
+                        'path' => $annotation->value,
+                        'method' => $http_method,
+                        'requirements' => $annotation->params,
+                        'controller' => $method_name,
+                    ];
+                }
+            }
+        }
+        return $routes;
     }
 }

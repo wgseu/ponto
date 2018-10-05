@@ -95,9 +95,6 @@ class ClienteOldApiController extends \MZ\Core\ApiController
     {
         $usuario = $this->getRequest()->request->get('usuario');
         $senha = $this->getRequest()->request->get('senha');
-        $lembrar = $this->getRequest()->request->get('lembrar');
-        $metodo = $this->getRequest()->request->get('metodo');
-        $token = $this->getRequest()->request->get('token');
         $cliente = Cliente::findByLoginSenha($usuario, $senha);
         if (!$cliente->exists()) {
             return $this->json()->error('Usuário ou senha incorretos!');
@@ -114,7 +111,7 @@ class ClienteOldApiController extends \MZ\Core\ApiController
                 $dispositivo->setNome($device);
                 $dispositivo->setSerial($serial);
                 $dispositivo->register();
-                if (is_null($dispositivo->getValidacao())) {
+                if (!$dispositivo->checkValidacao()) {
                     throw new \Exception(
                         'Este dispositivo ainda não foi validado, ' .
                         'acesse o menu "Configurações" -> "Computadores e Tablets", ' .

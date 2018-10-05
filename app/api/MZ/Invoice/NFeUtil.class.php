@@ -22,10 +22,9 @@
  *
  * @author Equipe GrandChef <desenvolvimento@mzsw.com.br>
  */
+namespace MZ\Invoice;
 
 use MZ\Payment\FormaPagto;
-use MZ\Invoice\Nota;
-use MZ\Invoice\Imposto;
 
 class NFeUtil extends \NFe\Common\Util
 {
@@ -128,17 +127,15 @@ class NFeUtil extends \NFe\Common\Util
      */
     public static function fixEncoding($text)
     {
-
         $estado = app()->getSystem()->getState();
         if ($estado->getUF() == 'MT') {
-            return \NFeUtil::removeAccent($text);
+            return self::removeAccent($text);
         }
         return $text;
     }
 
     public static function fixBarCode($code)
     {
-
         if ($code !== null) {
             return $code;
         }
@@ -158,12 +155,11 @@ class NFeUtil extends \NFe\Common\Util
         return $code;
     }
 
-
     public static function removeAccent($str)
     {
         return iconv('UTF-8', 'ASCII//TRANSLIT', str_replace(['ª', 'º'], ['', ''], self::StripAccents($str)));
     }
-    
+
     public static function stripAccents($str)
     {
         return strtr(

@@ -61,7 +61,7 @@ class Log
      */
     public function __construct($log = [])
     {
-        $this->logger = new \Monolog\Logger('NFeAPI');
+        $this->logger = new \Monolog\Logger('GrandChef');
         $this->fromArray($log);
     }
 

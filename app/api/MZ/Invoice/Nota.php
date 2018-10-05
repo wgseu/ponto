@@ -904,7 +904,7 @@ class Nota extends SyncModel
 
     public function getCaminhoXml()
     {
-        $xmlfile = \NFeDB::getCaminhoXmlAtual($this);
+        $xmlfile = \MZ\Invoice\NFeDB::getCaminhoXmlAtual($this);
         if (is_array($xmlfile)) {
             $files = $xmlfile;
         } else {

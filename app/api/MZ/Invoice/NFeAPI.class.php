@@ -22,28 +22,15 @@
  *
  * @author Equipe GrandChef <desenvolvimento@mzsw.com.br>
  */
+namespace MZ\Invoice;
 
-use MZ\Invoice\Evento;
-use MZ\Invoice\Nota;
-use MZ\Invoice\Emitente;
 use MZ\Database\DB;
 
 class NFeAPI extends \NFe\Common\Ajuste
 {
-
     private $sefaz;
     private $external_emitente;
     private $external_regime;
-
-    public function getExternalEmitente()
-    {
-        return $this->external_emitente;
-    }
-
-    public function getExternalRegime()
-    {
-        return $this->external_regime;
-    }
 
     public function init()
     {
@@ -62,7 +49,7 @@ class NFeAPI extends \NFe\Common\Ajuste
         $this->external_regime = $this->external_emitente->findRegimeID();
         $this->sefaz = \NFe\Core\SEFAZ::getInstance();
         $this->sefaz->setConfiguracao($this);
-        $this->setBanco(new \NFeDB());
+        $this->setBanco(new NFeDB());
         $this->getBanco()->getIBPT()->setOffline($this->isOffline());
         $chave_publica = app()->getPath('public') . get_document_url($this->external_emitente->getChavePublica(), 'cert');
         $this->setArquivoChavePublica($chave_publica);
@@ -78,8 +65,8 @@ class NFeAPI extends \NFe\Common\Ajuste
 
         /* Emitente */
         $emitente = new \NFe\Entity\Emitente();
-        $emitente->setRazaoSocial(\NFeUtil::fixEncoding($empresa->getSobrenome()));
-        $emitente->setFantasia(\NFeUtil::fixEncoding($empresa->getNome()));
+        $emitente->setRazaoSocial(NFeUtil::fixEncoding($empresa->getSobrenome()));
+        $emitente->setFantasia(NFeUtil::fixEncoding($empresa->getNome()));
         $emitente->setCNPJ($empresa->getCPF());
         $emitente->setTelefone($empresa->getTelefone()->getNumero());
         $emitente->setIE($empresa->getRG());
@@ -89,18 +76,28 @@ class NFeAPI extends \NFe\Common\Ajuste
         $endereco = new \NFe\Entity\Endereco();
         $endereco->setCEP($localizacao->getCEP());
         $endereco->getMunicipio()
-                 ->setNome(\NFeUtil::fixEncoding($cidade->getNome()))
+                 ->setNome(NFeUtil::fixEncoding($cidade->getNome()))
                  ->getEstado()
-                 ->setNome(\NFeUtil::fixEncoding($estado->getNome()))
+                 ->setNome(NFeUtil::fixEncoding($estado->getNome()))
                  ->setUF($estado->getUF());
-        $endereco->setBairro(\NFeUtil::fixEncoding($bairro->getNome()));
-        $endereco->setLogradouro(\NFeUtil::fixEncoding($localizacao->getLogradouro()));
+        $endereco->setBairro(NFeUtil::fixEncoding($bairro->getNome()));
+        $endereco->setLogradouro(NFeUtil::fixEncoding($localizacao->getLogradouro()));
         $endereco->setNumero($localizacao->getNumero());
 
         $emitente->setEndereco($endereco);
         $this->setEmitente($emitente);
 
         return $this;
+    }
+
+    public function getExternalEmitente()
+    {
+        return $this->external_emitente;
+    }
+
+    public function getExternalRegime()
+    {
+        return $this->external_regime;
     }
 
     private function deleteXmlAnteriores($nota)

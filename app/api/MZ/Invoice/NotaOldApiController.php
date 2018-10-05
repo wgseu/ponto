@@ -56,9 +56,9 @@ class NotaOldApiController extends \MZ\Core\ApiController
             if (!$_nota->isAutorizada()) {
                 throw new \Exception('A nota desse pedido ainda não foi autorizada', 500);
             }
-            $nfe_api = new \NFeAPI();
+            $nfe_api = new NFeAPI();
             $nfe_api->init();
-            $xmlfile = \NFeDB::getCaminhoXmlAtual($_nota);
+            $xmlfile = \MZ\Invoice\NFeDB::getCaminhoXmlAtual($_nota);
             $nota = new \NFe\Core\NFCe();
             $nota->load($xmlfile);
             return $this->json()->success(['nota' => $nota->toArray(true)]);
@@ -83,7 +83,7 @@ class NotaOldApiController extends \MZ\Core\ApiController
             if (count($notas) == 0) {
                 throw new \Exception('Nenhuma nota no resultado da busca', 404);
             }
-            $nfe_api = new \NFeAPI();
+            $nfe_api = new NFeAPI();
             $nfe_api->init();
             if (count($notas) == 1) {
                 $_nota = current($notas);
@@ -146,7 +146,7 @@ class NotaOldApiController extends \MZ\Core\ApiController
                 throw new \Exception('Apenas uma nota por vez pode ser enviada para um consumidor', 500);
             }
             $_nota = current($notas);
-            $nfe_api = new \NFeAPI();
+            $nfe_api = new NFeAPI();
             $nfe_api->init();
             $destinatario = $nfe_api->getExternalEmitente()->findContadorID();
             if ($modo == 'consumidor') {
@@ -230,7 +230,7 @@ class NotaOldApiController extends \MZ\Core\ApiController
         $this->needPermission([Permissao::NOME_ALTERARCONFIGURACOES]);
 
         set_time_limit(0);
-        $nfe_api = new \NFeAPI();
+        $nfe_api = new NFeAPI();
         $nfe_api->setOffline($this->getRequest()->request->get('offline_start'));
         try {
             $nfe_api->init();

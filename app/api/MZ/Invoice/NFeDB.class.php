@@ -22,6 +22,7 @@
  *
  * @author Equipe GrandChef <desenvolvimento@mzsw.com.br>
  */
+namespace MZ\Invoice;
 
 use MZ\Product\Servico;
 use MZ\Account\Cliente;
@@ -29,8 +30,6 @@ use MZ\Payment\FormaPagto;
 use MZ\Payment\Pagamento;
 use MZ\Sale\Item;
 use MZ\Sale\Pedido;
-use MZ\Invoice\Evento;
-use MZ\Invoice\Nota;
 use MZ\Database\DB;
 
 class NFeDB extends \NFe\Database\Estatico
@@ -39,7 +38,7 @@ class NFeDB extends \NFe\Database\Estatico
 
     public static function getCaminhoXmlAtual($_nota)
     {
-        $ambiente = \NFeUtil::toAmbiente($_nota->getAmbiente());
+        $ambiente = NFeUtil::toAmbiente($_nota->getAmbiente());
         $config = \NFe\Core\SEFAZ::getInstance()->getConfiguracao();
         switch ($_nota->getEstado()) {
             case Nota::ESTADO_ASSINADO:
@@ -122,7 +121,7 @@ class NFeDB extends \NFe\Database\Estatico
             $nota->setEmissao(\NFe\Core\Nota::EMISSAO_CONTINGENCIA);
             $nota->setDataEmissao($_nota->getDataLancamento());
             $nota->setDataContingencia($_nota->getDataLancamento());
-            $nota->setJustificativa(\NFeUtil::fixEncoding($_nota->getMotivo()));
+            $nota->setJustificativa(NFeUtil::fixEncoding($_nota->getMotivo()));
         } else {
             $nota->setEmissao(\NFe\Core\Nota::EMISSAO_NORMAL);
             $nota->setDataEmissao(DB::now());
@@ -134,31 +133,31 @@ class NFeDB extends \NFe\Database\Estatico
         }
         $_atendente_funcionario = $_pedido->findFuncionarioID();
         $_atendente = $_atendente_funcionario->findClienteID();
-        $nota->addObservacao('Operador', \NFeUtil::fixEncoding($_atendente->getAssinatura()));
+        $nota->addObservacao('Operador', NFeUtil::fixEncoding($_atendente->getAssinatura()));
         switch ($_pedido->getTipo()) {
             case Pedido::TIPO_MESA:
                 $_mesa = $_pedido->findMesaID();
-                $nota->addObservacao('Local', \NFeUtil::fixEncoding($_mesa->getNome()));
+                $nota->addObservacao('Local', NFeUtil::fixEncoding($_mesa->getNome()));
                 break;
             case Pedido::TIPO_COMANDA:
                 $_comanda = $_pedido->findComandaID();
-                $nota->addObservacao('Local', \NFeUtil::fixEncoding($_comanda->getNome()));
+                $nota->addObservacao('Local', NFeUtil::fixEncoding($_comanda->getNome()));
                 break;
             case Pedido::TIPO_AVULSO:
-                $nota->addObservacao('Local', \NFeUtil::fixEncoding('Venda Balcão'));
+                $nota->addObservacao('Local', NFeUtil::fixEncoding('Venda Balcão'));
                 break;
             case Pedido::TIPO_ENTREGA:
                 if ($_pedido->isDelivery()) {
                     $_entregador_funcionario = $_pedido->findEntregadorID();
                     $_entregador = $_entregador_funcionario->findClienteID();
-                    $nota->addObservacao('Local', \NFeUtil::fixEncoding('Pedido para Entrega'));
-                    $nota->addObservacao('Entregador', \NFeUtil::fixEncoding($_entregador->getAssinatura()));
+                    $nota->addObservacao('Local', NFeUtil::fixEncoding('Pedido para Entrega'));
+                    $nota->addObservacao('Entregador', NFeUtil::fixEncoding($_entregador->getAssinatura()));
                 } else {
-                    $nota->addObservacao('Local', \NFeUtil::fixEncoding('Pedido para Viagem'));
+                    $nota->addObservacao('Local', NFeUtil::fixEncoding('Pedido para Viagem'));
                 }
                 break;
         }
-        $nota->setAmbiente(\NFeUtil::toAmbiente($_nota->getAmbiente()));
+        $nota->setAmbiente(NFeUtil::toAmbiente($_nota->getAmbiente()));
         $_nota->setDataEmissao(DB::now($nota->getDataEmissao()));
         $_nota->update();
         /* Destinatário */
@@ -166,10 +165,10 @@ class NFeDB extends \NFe\Database\Estatico
         if ($_cliente->exists() && (!is_null($_cliente->getCPF()) || $_pedido->isDelivery())) {
             $destinatario = new \NFe\Entity\Destinatario();
             if ($_cliente->getTipo() == Cliente::TIPO_FISICA) {
-                $destinatario->setNome(\NFeUtil::fixEncoding($_cliente->getNomeCompleto()));
+                $destinatario->setNome(NFeUtil::fixEncoding($_cliente->getNomeCompleto()));
                 $destinatario->setCPF($_cliente->getCPF());
             } else {
-                $destinatario->setRazaoSocial(\NFeUtil::fixEncoding($_cliente->getSobrenome()));
+                $destinatario->setRazaoSocial(NFeUtil::fixEncoding($_cliente->getSobrenome()));
                 $destinatario->setCNPJ($_cliente->getCPF());
             }
             $destinatario->setEmail($_cliente->getEmail());
@@ -179,14 +178,14 @@ class NFeDB extends \NFe\Database\Estatico
                 $endereco = new \NFe\Entity\Endereco();
                 $endereco->setCEP($_localizacao_entrega->getCEP());
                 $endereco->getMunicipio()
-                         ->setNome(\NFeUtil::fixEncoding($_cidade_entrega->getNome()))
+                         ->setNome(NFeUtil::fixEncoding($_cidade_entrega->getNome()))
                          ->getEstado()
-                         ->setNome(\NFeUtil::fixEncoding($_estado_entrega->getNome()))
+                         ->setNome(NFeUtil::fixEncoding($_estado_entrega->getNome()))
                          ->setUF($_estado_entrega->getUF());
-                $endereco->setBairro(\NFeUtil::fixEncoding($_bairro_entrega->getNome()));
-                $endereco->setLogradouro(\NFeUtil::fixEncoding($_localizacao_entrega->getLogradouro()));
+                $endereco->setBairro(NFeUtil::fixEncoding($_bairro_entrega->getNome()));
+                $endereco->setLogradouro(NFeUtil::fixEncoding($_localizacao_entrega->getLogradouro()));
                 $endereco->setNumero($_localizacao_entrega->getNumero());
-                $endereco->setComplemento(\NFeUtil::fixEncoding($_localizacao_entrega->getComplemento()));
+                $endereco->setComplemento(NFeUtil::fixEncoding($_localizacao_entrega->getComplemento()));
             }
             $destinatario->setEndereco($endereco);
         }
@@ -194,7 +193,7 @@ class NFeDB extends \NFe\Database\Estatico
         /* Transporte */
         if ($_pedido->isDelivery()) {
             $transportador = new \NFe\Entity\Transporte\Transportador();
-            $transportador->setRazaoSocial(\NFeUtil::fixEncoding($nota->getEmitente()->getRazaoSocial()));
+            $transportador->setRazaoSocial(NFeUtil::fixEncoding($nota->getEmitente()->getRazaoSocial()));
             $transportador->setCNPJ($nota->getEmitente()->getCNPJ());
             $transportador->setIE($nota->getEmitente()->getIE());
             $transportador->setEndereco($nota->getEmitente()->getEndereco());
@@ -237,9 +236,9 @@ class NFeDB extends \NFe\Database\Estatico
             $produto = new \NFe\Entity\Produto();
             $produto->setPedido($_pedido->getID());
             $produto->setCodigo($_produto->getID());
-            $produto->setCodigoBarras(\NFeUtil::fixBarCode($_produto->getCodigoBarras()));
+            $produto->setCodigoBarras(NFeUtil::fixBarCode($_produto->getCodigoBarras()));
             $produto->setCodigoTributario($produto->getCodigoBarras());
-            $produto->setDescricao(\NFeUtil::fixEncoding($_produto->getDescricao()));
+            $produto->setDescricao(NFeUtil::fixEncoding($_produto->getDescricao()));
             $produto->setUnidade($_unidade->processaSigla($_item->getQuantidade(), $_produto->getConteudo()));
             $produto->setPreco($_item->getSubvenda());
             $produto->setDespesas($_item->getComissao());
@@ -255,7 +254,7 @@ class NFeDB extends \NFe\Database\Estatico
             $produto->setCEST($_tributacao->getCEST());
             $produto->setCFOP($_operacao->getCodigo());
             /* Impostos */
-            $imposto = \NFeUtil::toImposto($_imposto);
+            $imposto = NFeUtil::toImposto($_imposto);
             if ($imposto instanceof \NFe\Entity\Imposto\ICMS\Base) {
                 $imposto->setOrigem($_origem->getCodigo());
             }
@@ -315,12 +314,12 @@ class NFeDB extends \NFe\Database\Estatico
                 continue;
             }
             $pagamento = new \NFe\Entity\Pagamento();
-            $pagamento->setForma(\NFeUtil::toFormaPagamento($_forma->getTipo()));
+            $pagamento->setForma(NFeUtil::toFormaPagamento($_forma->getTipo()));
             $pagamento->setValor($_pagamento->getTotal());
             // $pagamento->setCredenciadora('60889128000422');
             if ($_forma->getTipo() == FormaPagto::TIPO_CARTAO) {
                 $_cartao = $_pagamento->findCartaoID();
-                $pagamento->setBandeira(\NFeUtil::toBandeira($_cartao->getDescricao()));
+                $pagamento->setBandeira(NFeUtil::toBandeira($_cartao->getDescricao()));
             }
             // $pagamento->setAutorizacao('110011');
             $saldo -= floatval($pagamento->getValor(true));
@@ -334,7 +333,7 @@ class NFeDB extends \NFe\Database\Estatico
         }
         if (count($pagamentos) == 0) {
             $pagamento = new \NFe\Entity\Pagamento();
-            $pagamento->setForma(\NFeUtil::toFormaPagamento(FormaPagto::TIPO_DINHEIRO));
+            $pagamento->setForma(NFeUtil::toFormaPagamento(FormaPagto::TIPO_DINHEIRO));
             $pagamento->setValor(0);
             $pagamentos[] = $pagamento;
         }
@@ -475,14 +474,14 @@ class NFeDB extends \NFe\Database\Estatico
                             $tarefa->setAcao(\NFe\Task\Tarefa::ACAO_CONSULTAR);
                         } else {
                             $tarefa->setAcao(\NFe\Task\Tarefa::ACAO_CANCELAR);
-                            $nota->setJustificativa(\NFeUtil::fixEncoding($_nota->getMotivo()));
+                            $nota->setJustificativa(NFeUtil::fixEncoding($_nota->getMotivo()));
                         }
                         $tarefa->setNota($nota);
                         $tarefa->setDocumento($dom);
                         $tarefas[] = $tarefa;
                         break;
                     case Nota::ACAO_INUTILIZAR:
-                        $ambiente = \NFeUtil::toAmbiente($_nota->getAmbiente());
+                        $ambiente = NFeUtil::toAmbiente($_nota->getAmbiente());
                         $inutilizacao = new \NFe\Task\Inutilizacao();
                         $inutilizacao->setUF($estado->getUF());
                         $inutilizacao->setCNPJ($emitente->getCNPJ());
@@ -492,7 +491,7 @@ class NFeDB extends \NFe\Database\Estatico
                         $inutilizacao->setSerie($_nota->getSerie());
                         $inutilizacao->setInicio($_nota->getNumeroInicial());
                         $inutilizacao->setFinal($_nota->getNumeroFinal());
-                        $inutilizacao->setJustificativa(\NFeUtil::fixEncoding($_nota->getMotivo()));
+                        $inutilizacao->setJustificativa(NFeUtil::fixEncoding($_nota->getMotivo()));
 
                         $tarefa->setAcao(\NFe\Task\Tarefa::ACAO_INUTILIZAR);
                         $tarefa->setAgente($inutilizacao);

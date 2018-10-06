@@ -71,7 +71,7 @@ class PaisPageController extends PageController
         $focusctrl = 'nome';
         $errors = [];
         $old_pais = $pais;
-        if (is_post()) {
+        if ($this->getRequest()->isMethod('POST')) {
             $pais = new Pais($this->getData());
             try {
                 $pais->filter($old_pais, true);
@@ -124,7 +124,7 @@ class PaisPageController extends PageController
         $focusctrl = 'nome';
         $errors = [];
         $old_pais = $pais;
-        if (is_post()) {
+        if ($this->getRequest()->isMethod('POST')) {
             $pais = new Pais($this->getData());
             try {
                 $pais->filter($old_pais, true);

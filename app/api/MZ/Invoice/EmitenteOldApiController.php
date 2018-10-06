@@ -35,7 +35,7 @@ class EmitenteOldApiController extends \MZ\Core\ApiController
     {
         $this->needPermission([Permissao::NOME_ALTERARCONFIGURACOES]);
         
-        if (!is_post()) {
+        if (!$this->getRequest()->isMethod('POST')) {
             return $this->json()->error('Nenhum dado foi enviado');
         }
         

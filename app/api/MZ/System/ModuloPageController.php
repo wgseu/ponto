@@ -71,7 +71,7 @@ class ModuloPageController extends PageController
         $focusctrl = 'nome';
         $errors = [];
         $old_modulo = $modulo;
-        if (is_post()) {
+        if ($this->getRequest()->isMethod('POST')) {
             $modulo = new Modulo($this->getData());
             try {
                 DB::beginTransaction();

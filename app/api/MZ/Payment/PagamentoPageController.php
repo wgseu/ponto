@@ -49,7 +49,7 @@ class PagamentoPageController extends PageController
         $data_fim = strtotime('-1 sec tomorrow');
         $faturamentos = Pagamento::rawFindAllTotal(
             [
-                'apartir_datahora' => DB::date('first day of last month'),
+                'apartir_datalancamento' => DB::date('first day of last month'),
                 '!pedidoid' => null
             ],
             ['dia' => true]
@@ -72,22 +72,22 @@ class PagamentoPageController extends PageController
         $vendas = Pedido::fetchTotal($sessao->getID());
         $faturamento = [];
         $faturamento['atual'] = Pagamento::getFaturamento(
-            ['apartir_datahora' => DB::date('first day of this month')]
+            ['apartir_datalancamento' => DB::date('first day of this month')]
         );
         $faturamento['anterior'] = Pagamento::getFaturamento([
-            'apartir_datahora' => DB::date('first day of last month'),
-            'ate_datahora' => DB::now('-1 month')
+            'apartir_datalancamento' => DB::date('first day of last month'),
+            'ate_datalancamento' => DB::now('-1 month')
         ]);
         $faturamento['base'] = Pagamento::getFaturamento([
-            'apartir_datahora' => DB::date('first day of last month'),
-            'ate_datahora' => DB::now('-1 sec today first day of this month')
+            'apartir_datalancamento' => DB::date('first day of last month'),
+            'ate_datalancamento' => DB::now('-1 sec today first day of this month')
         ]);
         $clientes = [];
         $clientes['total'] = Cliente::count();
         $clientes['hoje'] = Cliente::count(['apartir_cadastro' => DB::date()]);
         $despesas = [];
         $despesas['pagas'] = Pagamento::getDespesas(
-            ['apartir_datahora' => DB::date('first day of this month')]
+            ['apartir_datalancamento' => DB::date('first day of this month')]
         );
         $conta_info = Conta::getTotalAbertas(null, null, -1, null, date('Y-m-d', $data_fim));
         $despesas['apagar'] = $conta_info['despesas'] - $conta_info['pago'];

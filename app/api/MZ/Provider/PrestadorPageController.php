@@ -93,7 +93,7 @@ class PrestadorPageController extends PageController
         $focusctrl = 'funcaoid';
         $errors = [];
         $old_funcionario = $prestador;
-        if (is_post()) {
+        if ($this->getRequest()->isMethod('POST')) {
             $prestador = new Prestador($this->getData());
             try {
                 $prestador->filter($old_funcionario, true);
@@ -130,7 +130,6 @@ class PrestadorPageController extends PageController
         }
         $cliente_id_obj = $prestador->findClienteID();
         $_funcoes = Funcao::findAll();
-        $linguagens = get_languages_info();
         return $this->view('gerenciar_funcionario_cadastrar', get_defined_vars());
     }
 
@@ -168,7 +167,7 @@ class PrestadorPageController extends PageController
         $focusctrl = 'clienteid';
         $errors = [];
         $old_funcionario = $prestador;
-        if (is_post()) {
+        if ($this->getRequest()->isMethod('POST')) {
             $prestador = new Prestador($this->getData());
             try {
                 $prestador->filter($old_funcionario, true);
@@ -201,7 +200,6 @@ class PrestadorPageController extends PageController
             return $this->json()->error('Nenhum dado foi enviado');
         }
         $_funcoes = Funcao::findAll();
-        $linguagens = get_languages_info();
         return $this->view('gerenciar_funcionario_editar', get_defined_vars());
     }
 

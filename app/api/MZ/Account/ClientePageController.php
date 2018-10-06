@@ -52,7 +52,7 @@ class ClientePageController extends PageController
         $focusctrl = 'nome';
         $old_cliente = $cliente;
         $aceitar = null;
-        if (is_post()) {
+        if ($this->getRequest()->isMethod('POST')) {
             $cliente = new Cliente($this->getData());
             $aceitar = $this->getRequest()->request->get('aceitar');
             try {
@@ -117,7 +117,7 @@ class ClientePageController extends PageController
             $url = $this->getRequest()->request->get('redirect');
             return $this->redirect($url);
         }
-        if (is_post()) {
+        if ($this->getRequest()->isMethod('POST')) {
             $usuario = $this->getRequest()->request->get('usuario');
             $senha = $this->getRequest()->request->get('senha');
             $cliente = Cliente::findByLoginSenha($usuario, $senha);
@@ -145,7 +145,7 @@ class ClientePageController extends PageController
         $focusctrl = 'nome';
         $errors = [];
         $old_cliente = $cliente;
-        if (is_post()) {
+        if ($this->getRequest()->isMethod('POST')) {
             $cliente = new Cliente($this->getData());
             try {
                 // não deixa o usuário alterar os dados abaixo
@@ -235,7 +235,7 @@ class ClientePageController extends PageController
         $errors = [];
         $cliente = new Cliente();
         $old_cliente = $cliente;
-        if (is_post()) {
+        if ($this->getRequest()->isMethod('POST')) {
             $cliente = new Cliente($this->getData());
             try {
                 DB::beginTransaction();
@@ -340,7 +340,7 @@ class ClientePageController extends PageController
         $focusctrl = 'nome';
         $errors = [];
         $old_cliente = $cliente;
-        if (is_post()) {
+        if ($this->getRequest()->isMethod('POST')) {
             $cliente = new Cliente($this->getData());
             try {
                 if ($cliente->getID() == app()->getSystem()->getCompany()->getID() &&

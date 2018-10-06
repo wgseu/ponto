@@ -25,6 +25,7 @@
 namespace MZ\Invoice;
 
 use MZ\Util\Filter;
+use MZ\Util\Validator;
 use MZ\Sale\Pedido;
 use MZ\Session\Caixa;
 use MZ\System\Permissao;
@@ -160,7 +161,7 @@ class NotaOldApiController extends \MZ\Core\ApiController
                     throw new \Exception('O consumidor não foi informado no pedido', 500);
                 }
             }
-            if (!check_email($destinatario->getEmail())) {
+            if (!Validator::checkEmail($destinatario->getEmail())) {
                 if ($modo == 'contador') {
                     throw new \Exception('O E-mail do contador não foi informado no cadastro', 500);
                 } else {
@@ -250,7 +251,7 @@ class NotaOldApiController extends \MZ\Core\ApiController
         app()->needManager();
         $this->needPermission([Permissao::NOME_PAGAMENTO, ['||'], Permissao::NOME_SELECIONARCAIXA]);
 
-        if (!is_post()) {
+        if (!$this->getRequest()->isMethod('POST')) {
             return $this->json()->error('Nenhum dado foi enviado');
         }
 

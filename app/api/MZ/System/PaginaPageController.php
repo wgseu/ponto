@@ -25,6 +25,7 @@
 namespace MZ\System;
 
 use MZ\Util\Filter;
+use MZ\Util\Validator;
 use MZ\Core\PageController;
 
 /**
@@ -48,7 +49,7 @@ class PaginaPageController extends PageController
             }
         }
         $erro = [];
-        if (is_post()) {
+        if ($this->getRequest()->isMethod('POST')) {
             $email = trim(strip_tags($this->getRequest()->request->get('email')));
             $nome = trim(strip_tags($this->getRequest()->request->get('nome')));
             if (app()->getAuthentication()->isLogin()) {
@@ -60,7 +61,7 @@ class PaginaPageController extends PageController
             if ($nome == '') {
                 $erros['nome'] = 'O nome não pode ser vazio';
             }
-            if (!check_email($email)) {
+            if (!Validator::checkEmail($email)) {
                 $erros['email'] = 'O E-mail é inválido';
             }
             if ($assunto == '') {

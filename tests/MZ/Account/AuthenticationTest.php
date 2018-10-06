@@ -103,6 +103,7 @@ class AuthenticationTest extends \MZ\Framework\TestCase
             'serial' => $dispositivo->getSerial(),
         ];
         $result = $this->post('/app/conta/entrar', $data, true);
+        $dispositivo->delete();
         $expected = [
             'status' => 'ok',
             'info' => [

@@ -75,7 +75,7 @@ class BairroPageController extends PageController
         $focusctrl = 'nome';
         $errors = [];
         $old_bairro = $bairro;
-        if (is_post()) {
+        if ($this->getRequest()->isMethod('POST')) {
             $bairro = new Bairro($this->getData());
             try {
                 $bairro->filter($old_bairro, true);
@@ -143,7 +143,7 @@ class BairroPageController extends PageController
         $focusctrl = 'nome';
         $errors = [];
         $old_bairro = $bairro;
-        if (is_post()) {
+        if ($this->getRequest()->isMethod('POST')) {
             $bairro = new Bairro($this->getData());
             try {
                 $bairro->filter($old_bairro, true);

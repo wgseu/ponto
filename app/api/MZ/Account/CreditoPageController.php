@@ -76,7 +76,7 @@ class CreditoPageController extends PageController
         $focusctrl = 'detalhes';
         $errors = [];
         $old_credito = $credito;
-        if (is_post()) {
+        if ($this->getRequest()->isMethod('POST')) {
             $credito = new Credito($this->getData());
             try {
                 $old_credito->setFuncionarioID(app()->auth->provider->getID());
@@ -129,7 +129,7 @@ class CreditoPageController extends PageController
         $focusctrl = 'detalhes';
         $errors = [];
         $old_credito = $credito;
-        if (is_post()) {
+        if ($this->getRequest()->isMethod('POST')) {
             $credito = new Credito($this->getData());
             try {
                 $credito->filter($old_credito, true);

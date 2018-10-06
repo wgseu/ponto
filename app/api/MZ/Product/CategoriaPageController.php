@@ -82,7 +82,7 @@ class CategoriaPageController extends PageController
         $focusctrl = 'descricao';
         $errors = [];
         $old_categoria = $categoria;
-        if (is_post()) {
+        if ($this->getRequest()->isMethod('POST')) {
             $categoria = new Categoria($this->getData());
             try {
                 $categoria->filter($old_categoria, true);
@@ -136,7 +136,7 @@ class CategoriaPageController extends PageController
         $focusctrl = 'descricao';
         $errors = [];
         $old_categoria = $categoria;
-        if (is_post()) {
+        if ($this->getRequest()->isMethod('POST')) {
             $categoria = new Categoria($this->getData());
             try {
                 $categoria->filter($old_categoria, true);

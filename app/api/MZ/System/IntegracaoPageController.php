@@ -74,7 +74,7 @@ class IntegracaoPageController extends PageController
         $focusctrl = 'nome';
         $errors = [];
         $old_integracao = $integracao;
-        if (is_post()) {
+        if ($this->getRequest()->isMethod('POST')) {
             $integracao = new Integracao($this->getData());
             try {
                 $integracao->filter($old_integracao, true);

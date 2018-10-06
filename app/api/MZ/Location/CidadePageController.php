@@ -73,7 +73,7 @@ class CidadePageController extends PageController
         $focusctrl = 'nome';
         $errors = [];
         $old_cidade = $cidade;
-        if (is_post()) {
+        if ($this->getRequest()->isMethod('POST')) {
             $cidade = new Cidade($this->getData());
             try {
                 $cidade->filter($old_cidade, true);
@@ -137,7 +137,7 @@ class CidadePageController extends PageController
         $focusctrl = 'nome';
         $errors = [];
         $old_cidade = $cidade;
-        if (is_post()) {
+        if ($this->getRequest()->isMethod('POST')) {
             $cidade = new Cidade($this->getData());
             try {
                 $cidade->filter($old_cidade, true);

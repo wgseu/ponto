@@ -49,7 +49,7 @@ class CartaoPageController extends PageController
         $integracao = Integracao::findByAcessoURL($name);
         $association = new \MZ\Association\Card($integracao, $codigos);
 
-        if (is_post() && $this->getRequest()->query->get('action') == 'update') {
+        if ($this->getRequest()->isMethod('POST') && $this->getRequest()->query->get('action') == 'update') {
             $this->needPermission([Permissao::NOME_CADASTROCARTOES]);
             try {
                 $codigo = $this->getRequest()->request->get('codigo');
@@ -105,7 +105,7 @@ class CartaoPageController extends PageController
         $focusctrl = 'descricao';
         $errors = [];
         $old_cartao = $cartao;
-        if (is_post()) {
+        if ($this->getRequest()->isMethod('POST')) {
             $cartao = new Cartao($this->getData());
             try {
                 $cartao->filter($old_cartao, true);
@@ -160,7 +160,7 @@ class CartaoPageController extends PageController
         $focusctrl = 'descricao';
         $errors = [];
         $old_cartao = $cartao;
-        if (is_post()) {
+        if ($this->getRequest()->isMethod('POST')) {
             $cartao = new Cartao($this->getData());
             try {
                 $cartao->filter($old_cartao, true);

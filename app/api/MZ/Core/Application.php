@@ -122,6 +122,16 @@ class Application
     }
 
     /**
+     * Get session management
+     * @param \Symfony\Component\HttpFoundation\Session\Session $session session management
+     */
+    public function setSession($session)
+    {
+        $this->session = $session;
+        return $this;
+    }
+
+    /**
      * Get current request
      * @return \Symfony\Component\HttpFoundation\Request http request
      */

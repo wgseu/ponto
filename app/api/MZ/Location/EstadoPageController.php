@@ -71,7 +71,7 @@ class EstadoPageController extends PageController
         $focusctrl = 'nome';
         $errors = [];
         $old_estado = $estado;
-        if (is_post()) {
+        if ($this->getRequest()->isMethod('POST')) {
             $estado = new Estado($this->getData());
             try {
                 $estado->filter($old_estado, true);
@@ -123,7 +123,7 @@ class EstadoPageController extends PageController
         $focusctrl = 'nome';
         $errors = [];
         $old_estado = $estado;
-        if (is_post()) {
+        if ($this->getRequest()->isMethod('POST')) {
             $estado = new Estado($this->getData());
             try {
                 $estado->filter($old_estado, true);

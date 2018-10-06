@@ -77,7 +77,7 @@ class FormaPagtoPageController extends PageController
         $focusctrl = 'descricao';
         $errors = [];
         $old_forma_pagto = $forma_pagto;
-        if (is_post()) {
+        if ($this->getRequest()->isMethod('POST')) {
             $forma_pagto = new FormaPagto($this->getData());
             try {
                 $forma_pagto->filter($old_forma_pagto, true);
@@ -131,7 +131,7 @@ class FormaPagtoPageController extends PageController
         $focusctrl = 'descricao';
         $errors = [];
         $old_forma_pagto = $forma_pagto;
-        if (is_post()) {
+        if ($this->getRequest()->isMethod('POST')) {
             $forma_pagto = new FormaPagto($this->getData());
             try {
                 $forma_pagto->filter($old_forma_pagto, true);

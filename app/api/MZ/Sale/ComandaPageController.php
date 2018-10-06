@@ -73,7 +73,7 @@ class ComandaPageController extends PageController
         $focusctrl = 'nome';
         $errors = [];
         $old_comanda = $comanda;
-        if (is_post()) {
+        if ($this->getRequest()->isMethod('POST')) {
             $comanda = new Comanda($this->getData());
             try {
                 $comanda->filter($old_comanda, true);
@@ -128,7 +128,7 @@ class ComandaPageController extends PageController
         $focusctrl = 'nome';
         $errors = [];
         $old_comanda = $comanda;
-        if (is_post()) {
+        if ($this->getRequest()->isMethod('POST')) {
             $comanda = new Comanda($this->getData());
             try {
                 $comanda->filter($old_comanda, true);

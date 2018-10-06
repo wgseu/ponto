@@ -69,7 +69,7 @@ class SetorPageController extends PageController
         $focusctrl = 'nome';
         $errors = [];
         $old_setor = $setor;
-        if (is_post()) {
+        if ($this->getRequest()->isMethod('POST')) {
             $setor = new Setor($this->getData());
             try {
                 $setor->filter($old_setor, true);
@@ -120,7 +120,7 @@ class SetorPageController extends PageController
         $focusctrl = 'nome';
         $errors = [];
         $old_setor = $setor;
-        if (is_post()) {
+        if ($this->getRequest()->isMethod('POST')) {
             $setor = new Setor($this->getData());
             try {
                 $setor->setID($old_setor->getID());

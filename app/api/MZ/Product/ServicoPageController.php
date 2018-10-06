@@ -71,7 +71,7 @@ class ServicoPageController extends PageController
         $focusctrl = 'nome';
         $errors = [];
         $old_servico = $servico;
-        if (is_post()) {
+        if ($this->getRequest()->isMethod('POST')) {
             $servico = new Servico($this->getData());
             try {
                 $servico->filter($old_servico, true);
@@ -124,7 +124,7 @@ class ServicoPageController extends PageController
         $focusctrl = 'descricao';
         $errors = [];
         $old_servico = $servico;
-        if (is_post()) {
+        if ($this->getRequest()->isMethod('POST')) {
             $servico = new Servico($this->getData());
             try {
                 $servico->filter($old_servico, true);

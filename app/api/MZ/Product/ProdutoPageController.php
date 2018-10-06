@@ -109,7 +109,7 @@ class ProdutoPageController extends PageController
         $focusctrl = 'codigobarras';
         $errors = [];
         $old_produto = $produto;
-        if (is_post()) {
+        if ($this->getRequest()->isMethod('POST')) {
             $produto = new Produto($this->getData());
             try {
                 $produto->filter($old_produto, true);
@@ -173,7 +173,7 @@ class ProdutoPageController extends PageController
         $focusctrl = 'descricao';
         $errors = [];
         $old_produto = $produto;
-        if (is_post()) {
+        if ($this->getRequest()->isMethod('POST')) {
             $produto = new Produto($this->getData());
             try {
                 $produto->filter($old_produto, true);
@@ -323,7 +323,7 @@ class ProdutoPageController extends PageController
         $association = new \MZ\Association\Product($integracao);
 
         if ($this->getRequest()->query->has('action')) {
-            if (is_post() && $this->getRequest()->query->get('action') == 'upload') {
+            if ($this->getRequest()->isMethod('POST') && $this->getRequest()->query->get('action') == 'upload') {
                 if ($this->getRequest()->query->get('token') != INTGR_TOKEN) {
                     $this->needPermission([Permissao::NOME_CADASTROPRODUTOS]);
                 }
@@ -391,7 +391,7 @@ class ProdutoPageController extends PageController
                 } catch (\Exception $e) {
                     return $this->json()->error($e->getMessage());
                 }
-            } elseif (is_post() && $this->getRequest()->query->get('action') == 'update') {
+            } elseif ($this->getRequest()->isMethod('POST') && $this->getRequest()->query->get('action') == 'update') {
                 $this->needPermission([Permissao::NOME_CADASTROPRODUTOS]);
                 try {
                     $codigo = $this->getRequest()->request->get('codigo');
@@ -404,7 +404,7 @@ class ProdutoPageController extends PageController
                 } catch (\Exception $e) {
                     return $this->json()->error($e->getMessage());
                 }
-            } elseif (is_post() && $this->getRequest()->query->get('action') == 'delete') {
+            } elseif ($this->getRequest()->isMethod('POST') && $this->getRequest()->query->get('action') == 'delete') {
                 $this->needPermission([Permissao::NOME_CADASTROPRODUTOS]);
                 try {
                     $codigo = $this->getRequest()->request->get('codigo');
@@ -419,7 +419,7 @@ class ProdutoPageController extends PageController
                 } catch (\Exception $e) {
                     return $this->json()->error($e->getMessage());
                 }
-            } elseif (is_post() && $this->getRequest()->query->get('action') == 'mount') {
+            } elseif ($this->getRequest()->isMethod('POST') && $this->getRequest()->query->get('action') == 'mount') {
                 $this->needPermission([Permissao::NOME_CADASTROPRODUTOS]);
                 try {
                     $codigo = $this->getRequest()->request->get('codigo');
@@ -498,7 +498,7 @@ class ProdutoPageController extends PageController
         $association = new \MZ\Association\Product($integracao);
 
         if ($this->getRequest()->query->has('action')) {
-            if (is_post() && $this->getRequest()->query->get('action') == 'update') {
+            if ($this->getRequest()->isMethod('POST') && $this->getRequest()->query->get('action') == 'update') {
                 $this->needPermission([Permissao::NOME_CADASTROPRODUTOS]);
                 try {
                     $codigo = $this->getRequest()->request->get('codigo');
@@ -511,7 +511,7 @@ class ProdutoPageController extends PageController
                 } catch (\Exception $e) {
                     return $this->json()->error($e->getMessage());
                 }
-            } elseif (is_post() && $this->getRequest()->query->get('action') == 'delete') {
+            } elseif ($this->getRequest()->isMethod('POST') && $this->getRequest()->query->get('action') == 'delete') {
                 $this->needPermission([Permissao::NOME_CADASTROPRODUTOS]);
                 try {
                     $codigo = $this->getRequest()->request->get('codigo');
@@ -526,7 +526,7 @@ class ProdutoPageController extends PageController
                 } catch (\Exception $e) {
                     return $this->json()->error($e->getMessage());
                 }
-            } elseif (is_post() && $this->getRequest()->query->get('action') == 'mount') {
+            } elseif ($this->getRequest()->isMethod('POST') && $this->getRequest()->query->get('action') == 'mount') {
                 $this->needPermission([Permissao::NOME_CADASTROPRODUTOS]);
                 try {
                     $codigo = $this->getRequest()->request->get('codigo');

@@ -72,7 +72,7 @@ class CarteiraPageController extends PageController
         $errors = [];
         $carteira = new Carteira();
         $old_carteira = $carteira;
-        if (is_post()) {
+        if ($this->getRequest()->isMethod('POST')) {
             $carteira = new Carteira($this->getData());
             try {
                 $carteira->filter($old_carteira, true);
@@ -126,7 +126,7 @@ class CarteiraPageController extends PageController
         $focusctrl = 'descricao';
         $errors = [];
         $old_carteira = $carteira;
-        if (is_post()) {
+        if ($this->getRequest()->isMethod('POST')) {
             $carteira = new Carteira($this->getData());
             try {
                 $carteira->filter($old_carteira, true);

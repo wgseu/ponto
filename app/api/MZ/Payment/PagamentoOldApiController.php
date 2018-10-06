@@ -50,8 +50,8 @@ class PagamentoOldApiController extends \MZ\Core\ApiController
             $meses[] = [
                 'mes' => human_date($data, true),
                 'total' => Pagamento::getFaturamento([
-                    'apartir_datahora' => $data,
-                    'ate_datahora' => DB::now("last day of -$i month 23:59:59")
+                    'apartir_datalancamento' => $data,
+                    'ate_datalancamento' => DB::now("last day of -$i month 23:59:59")
                 ])
             ];
         }
@@ -72,22 +72,22 @@ class PagamentoOldApiController extends \MZ\Core\ApiController
         $response = [];
         $response['vendas'] = Pedido::fetchTotal($sessao->getID(), $data_inicio);
         $response['receitas'] = Pagamento::getReceitas(
-            ['sessaoid' => $sessao->getID(), 'apartir_datahora' => $data_inicio]
+            ['sessaoid' => $sessao->getID(), 'apartir_datalancamento' => $data_inicio]
         );
         $response['despesas'] = Pagamento::getDespesas(
-            ['sessaoid' => $sessao->getID(), 'apartir_datahora' => $data_inicio]
+            ['sessaoid' => $sessao->getID(), 'apartir_datalancamento' => $data_inicio]
         );
         $response['faturamento']['atual'] = Pagamento::getFaturamento(
-            ['apartir_datahora' => DB::date('first day of this month')]
+            ['apartir_datalancamento' => DB::date('first day of this month')]
         );
         $response['faturamento']['base'] = Pagamento::getFaturamento([
-            'apartir_datahora' => DB::date('first day of last month'),
-            'ate_datahora' => DB::now('-1 month')
+            'apartir_datalancamento' => DB::date('first day of last month'),
+            'ate_datalancamento' => DB::now('-1 month')
         ]);
         $response['faturamento']['estimado'] = round(($response['faturamento']['atual'] / date('j')) * date('t'), 4);
         $response['faturamento']['anterior'] = Pagamento::getFaturamento([
-            'apartir_datahora' => DB::date('first day of last month'),
-            'ate_datahora' => DB::now('-1 sec today first day of this month')
+            'apartir_datalancamento' => DB::date('first day of last month'),
+            'ate_datalancamento' => DB::now('-1 sec today first day of this month')
         ]);
         $response['faturamento']['restante'] = $response['faturamento']['anterior'] - $response['faturamento']['atual'];
         if ($response['faturamento']['anterior'] < 0.01) {
@@ -105,7 +105,7 @@ class PagamentoOldApiController extends \MZ\Core\ApiController
         }
         $response['faturamento']['pagamentos'] = Pagamento::rawFindAllTotal(
             [
-                'apartir_datahora' => DB::date('first day of this month'),
+                'apartir_datalancamento' => DB::date('first day of this month'),
                 '!pedidoid' => null
             ],
             ['forma_tipo' => true]
@@ -117,8 +117,8 @@ class PagamentoOldApiController extends \MZ\Core\ApiController
             $meses[] = [
                 'mes' => human_date($data, true),
                 'total' => Pagamento::getFaturamento([
-                    'apartir_datahora' => $data,
-                    'ate_datahora' => DB::now("last day of -$i month 23:59:59")
+                    'apartir_datalancamento' => $data,
+                    'ate_datalancamento' => DB::now("last day of -$i month 23:59:59")
                 ])
             ];
         }
@@ -144,8 +144,8 @@ class PagamentoOldApiController extends \MZ\Core\ApiController
             }
             $faturamentos = Pagamento::rawFindAllTotal(
                 [
-                    'apartir_datahora' => DB::date($start),
-                    'ate_datahora' => DB::now(strtotime('-1 sec tomorrow', $end)),
+                    'apartir_datalancamento' => DB::date($start),
+                    'ate_datalancamento' => DB::now(strtotime('-1 sec tomorrow', $end)),
                     '!pedidoid' => null
                 ],
                 ['dia' => true]
@@ -183,8 +183,8 @@ class PagamentoOldApiController extends \MZ\Core\ApiController
                     $base_ate = DB::now('-1 sec today first day of this month');
                     break;
             }
-            $atual = Pagamento::getFaturamento(['apartir_datahora' => $atual_de, 'ate_datahora' => $atual_ate]);
-            $base  = Pagamento::getFaturamento(['apartir_datahora' => $base_de, 'ate_datahora' => $base_ate]);
+            $atual = Pagamento::getFaturamento(['apartir_datalancamento' => $atual_de, 'ate_datalancamento' => $atual_ate]);
+            $base  = Pagamento::getFaturamento(['apartir_datalancamento' => $base_de, 'ate_datalancamento' => $base_ate]);
             return $this->json()->success([
                 'atual' => $atual,
                 'base' => $base,

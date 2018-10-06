@@ -74,7 +74,7 @@ class PatrimonioPageController extends PageController
         $focusctrl = 'descricao';
         $errors = [];
         $old_patrimonio = $patrimonio;
-        if (is_post()) {
+        if ($this->getRequest()->isMethod('POST')) {
             $patrimonio = new Patrimonio($this->getData());
             try {
                 $patrimonio->filter($old_patrimonio, true);
@@ -132,7 +132,7 @@ class PatrimonioPageController extends PageController
         $focusctrl = 'descricao';
         $errors = [];
         $old_patrimonio = $patrimonio;
-        if (is_post()) {
+        if ($this->getRequest()->isMethod('POST')) {
             $patrimonio = new Patrimonio($this->getData());
             try {
                 $patrimonio->filter($old_patrimonio, true);

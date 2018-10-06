@@ -47,7 +47,7 @@ class AcessoPageController extends PageController
             return $this->redirect('/gerenciar/funcao/');
         }
         $errors = [];
-        if (is_post()) {
+        if ($this->getRequest()->isMethod('POST')) {
             try {
                 $permissao_id = $this->getRequest()->request->get('permissao');
                 $permissao = Permissao::findByID($permissao_id);

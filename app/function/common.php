@@ -25,16 +25,6 @@
 
 use MZ\Exception\RedirectException;
 
-function numberval($str)
-{
-    return preg_replace('/[^0-9-]/', '', $str);
-}
-
-function is_number($value)
-{
-    return \MZ\Util\Filter::digits($value) == $value;
-}
-
 function is_equal($value, $compare, $delta = 0.005)
 {
     return $compare < ($value + $delta) && ($value - $delta) < $compare;
@@ -50,65 +40,11 @@ function is_less($value, $compare, $delta = 0.005)
     return ($value + $delta) < $compare;
 }
 
-// Função que valida o CPF
-function check_cpf($cpf)
-{
-    return \MZ\Util\Validator::checkCPF($cpf);
-}
-
-// Função que valida o CNPJ
-function check_cnpj($cnpj)
-{
-    return \MZ\Util\Validator::checkCNPJ($cnpj);
-}
-
-// Função que valida o Email
-function check_email($email)
-{
-    return \MZ\Util\Validator::checkEmail($email);
-}
-
-// Função que valida o nome de usuário
-function check_usuario($usuario)
-{
-    return \MZ\Util\Validator::checkUsername($usuario);
-}
-
 // Função que valida o telefone
 function check_fone($fone, $ignore_ddd = false)
 {
     $foned = \MZ\Util\Filter::digits($fone);
     return \MZ\Util\Validator::checkPhone($fone) || ($ignore_ddd && (strlen($foned) == 8 || strlen($foned) == 9));
-}
-
-// Função que valida o CEP
-function check_cep($cep)
-{
-    return \MZ\Util\Validator::checkCEP($cep);
-}
-
-function human_size($size)
-{
-    if ($size < 1000) {
-        return $size . ($size == 1)? ' byte': ' bytes';
-    } elseif ($size < 1024 * 1000) {
-        return number_format($size/1024, 1) . ' kB';
-    } elseif ($size < 1024 * 1024 * 1000) {
-        return number_format($size/(1024 * 1024), 1) . ' MB';
-    } else {
-        return number_format($size/(1024 * 1024 * 1024), 1) . ' GB';
-    }
-}
-
-function human_filesize($filename)
-{
-    return human_size(filesize($filename));
-}
-
-function moneyval($k)
-{
-    $k = preg_replace('/[^0-9,\-]/', '', $k);
-    return floatval(str_replace(',', '.', $k));
 }
 
 function quantify($quantity, $unity = 'UN', $content = 1)
@@ -187,19 +123,6 @@ function human_range($inicio, $fim, $sep = '/')
     }
 }
 
-/**
- *  Obtem da data de um arquivo no formato inteiro para ser usado como versão de um arquivo .css ou .js
- *
- *  @param $file O caminho do arquivo.  deve ser um caminho absoluto ou seja iniciando com uma barra.
- */
-function auto_version($file)
-{
-    if (strpos($file, '/') != 0 || !file_exists(app()->getPath('public') . $file)) {
-        return $file;
-    }
-    return $file . '?' . filemtime(app()->getPath('public') . $file);
-}
-
 function render($tFile, $vs = [], $hook = true)
 {
     $render = new \MZ\Template\Custom(app()->getSystem()->getSettings());
@@ -255,53 +178,6 @@ function _t($key)
         return $text;
     }
     return \vsprintf($text, $args);
-}
-
-function is_post()
-{
-    return strtoupper($_SERVER['REQUEST_METHOD']) == 'POST';
-}
-
-function get_languages_info()
-{
-    return [
-        '1046' => 'Português(Brasil)',
-        '1033' => 'English(United States)',
-        '1034' => 'Espanõl',
-    ];
-}
-
-function set_timezone_for($uf, $pais = 'Brasil')
-{
-    $timezones = [
-        'BR' => [
-            'AC' => 'America/Rio_branco',   'AL' => 'America/Maceio',
-            'AP' => 'America/Belem',        'AM' => 'America/Manaus',
-            'BA' => 'America/Bahia',        'CE' => 'America/Fortaleza',
-            'DF' => 'America/Sao_Paulo',    'ES' => 'America/Sao_Paulo',
-            'GO' => 'America/Sao_Paulo',    'MA' => 'America/Fortaleza',
-            'MT' => 'America/Cuiaba',       'MS' => 'America/Campo_Grande',
-            'MG' => 'America/Sao_Paulo',    'PR' => 'America/Sao_Paulo',
-            'PB' => 'America/Fortaleza',    'PA' => 'America/Belem',
-            'PE' => 'America/Recife',       'PI' => 'America/Fortaleza',
-            'RJ' => 'America/Sao_Paulo',    'RN' => 'America/Fortaleza',
-            'RS' => 'America/Sao_Paulo',    'RO' => 'America/Porto_Velho',
-            'RR' => 'America/Boa_Vista',    'SC' => 'America/Sao_Paulo',
-            'SE' => 'America/Maceio',       'SP' => 'America/Sao_Paulo',
-            'TO' => 'America/Araguaia'
-        ]
-    ];
-    $timezone = date_default_timezone_get();
-    switch ($pais) {
-        case 'BR':
-        case 'BRA':
-        case 'Brasil':
-            if (isset($timezones['BR'][$uf])) {
-                $timezone = $timezones['BR'][$uf];
-            }
-            break;
-    }
-    date_default_timezone_set($timezone);
 }
 
 function get_string_config($section, $key, $default = null)
@@ -535,11 +411,6 @@ function get_tempo($seg)
     $min = $m % 60;
     $h = (int)($m / 60);
     return sprintf('%02d:%02dh', $h, $min);
-}
-
-function to_utf8($str)
-{
-    return iconv('WINDOWS-1252', 'UTF-8', $str);
 }
 
 function xchmod($path, $access = 0644)
@@ -843,45 +714,6 @@ function to_ini($array)
     return implode("\r\n", $res);
 }
 
-function mask($str, $mask)
-{
-    if (empty($str)) {
-        return null;
-    }
-    $len = strlen($mask);
-    $res = '';
-    $j = 0;
-    $opt = false;
-    for ($i=0; $i < $len; $i++) {
-        if ($mask[$i] == '9' || $mask[$i] == '0') {
-            $res .= $str[$j++];
-        } elseif ($mask[$i] == '?') {
-            $opt = true;
-        } else {
-            $res .= $mask[$i];
-        }
-    }
-    return $res;
-}
-
-function unmask($str, $mask)
-{
-    $len = strlen($mask);
-    $res = '';
-    $j = 0;
-    $opt = false;
-    for ($i=0; $i < $len; $i++) {
-        if ($mask[$i] == '9' || $mask[$i] == '0') {
-            $res .= $str[$j++];
-        } elseif ($mask[$i] == '?') {
-            $opt = true;
-        } elseif ($mask[$i] == $str[$j]) {
-            $j++;
-        }
-    }
-    return $res;
-}
-
 function hexcolor($index, $css = false, $escape = false)
 {
     $colors = [
@@ -902,11 +734,6 @@ function hexcolor($index, $css = false, $escape = false)
 function single_quotes($string)
 {
     return str_replace('\'', '\\\'', $string);
-}
-
-function is_empty($var)
-{
-    return empty($var);
 }
 
 function replace_key($array, $key1, $key2)

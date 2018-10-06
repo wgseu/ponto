@@ -79,7 +79,7 @@ class ClassificacaoPageController extends PageController
         $focusctrl = 'descricao';
         $errors = [];
         $old_classificacao = $classificacao;
-        if (is_post()) {
+        if ($this->getRequest()->isMethod('POST')) {
             $classificacao = new Classificacao($this->getData());
             try {
                 $classificacao->filter($old_classificacao, true);
@@ -133,7 +133,7 @@ class ClassificacaoPageController extends PageController
         $focusctrl = 'descricao';
         $errors = [];
         $old_classificacao = $classificacao;
-        if (is_post()) {
+        if ($this->getRequest()->isMethod('POST')) {
             $classificacao = new Classificacao($this->getData());
             try {
                 $classificacao->setID($old_classificacao->getID());

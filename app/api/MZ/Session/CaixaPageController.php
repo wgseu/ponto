@@ -75,7 +75,7 @@ class CaixaPageController extends PageController
         $focusctrl = 'descricao';
         $errors = [];
         $old_caixa = $caixa;
-        if (is_post()) {
+        if ($this->getRequest()->isMethod('POST')) {
             $caixa = new Caixa($this->getData());
             try {
                 $caixa->filter($old_caixa, true);
@@ -129,7 +129,7 @@ class CaixaPageController extends PageController
         $focusctrl = 'descricao';
         $errors = [];
         $old_caixa = $caixa;
-        if (is_post()) {
+        if ($this->getRequest()->isMethod('POST')) {
             $caixa = new Caixa($this->getData());
             try {
                 $caixa->setID($old_caixa->getID());

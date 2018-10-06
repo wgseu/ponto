@@ -72,7 +72,7 @@ class FuncaoPageController extends PageController
         $focusctrl = 'descricao';
         $errors = [];
         $old_funcao = $funcao;
-        if (is_post()) {
+        if ($this->getRequest()->isMethod('POST')) {
             $funcao = new Funcao($this->getData());
             try {
                 $funcao->filter($old_funcao, true);
@@ -125,7 +125,7 @@ class FuncaoPageController extends PageController
         $focusctrl = 'descricao';
         $errors = [];
         $old_funcao = $funcao;
-        if (is_post()) {
+        if ($this->getRequest()->isMethod('POST')) {
             $funcao = new Funcao($this->getData());
             try {
                 $funcao->filter($old_funcao, true);

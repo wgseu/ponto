@@ -66,7 +66,7 @@ class LocalizacaoPageController extends PageController
         $this->needPermission([Permissao::NOME_CADASTROCLIENTES]);
         $localizacao = new Localizacao();
         $old_localizacao = $localizacao;
-        if (is_post()) {
+        if ($this->getRequest()->isMethod('POST')) {
             $localizacao = new Localizacao($this->getData());
             try {
                 DB::beginTransaction();
@@ -128,7 +128,7 @@ class LocalizacaoPageController extends PageController
             return $this->json()->error($msg);
         }
         $old_localizacao = $localizacao;
-        if (is_post()) {
+        if ($this->getRequest()->isMethod('POST')) {
             $localizacao = new Localizacao($this->getData());
             try {
                 DB::beginTransaction();

@@ -69,7 +69,7 @@ class UnidadePageController extends PageController
         $focusctrl = 'nome';
         $errors = [];
         $old_unidade = $unidade;
-        if (is_post()) {
+        if ($this->getRequest()->isMethod('POST')) {
             $unidade = new Unidade($this->getData());
             try {
                 $unidade->filter($old_unidade, true);
@@ -120,7 +120,7 @@ class UnidadePageController extends PageController
         $focusctrl = 'nome';
         $errors = [];
         $old_unidade = $unidade;
-        if (is_post()) {
+        if ($this->getRequest()->isMethod('POST')) {
             $unidade = new Unidade($this->getData());
             try {
                 $unidade->filter($old_unidade, true);

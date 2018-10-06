@@ -1286,14 +1286,14 @@ class Item extends SyncModel
             $condition[$field] = $condition['ate_preco'];
             $allowed[$field] = true;
         }
-        if (isset($condition['apartir_datahora'])) {
+        if (isset($condition['apartir_datalancamento'])) {
             $field = 'i.datalancamento >= ?';
-            $condition[$field] = Filter::datetime($condition['apartir_datahora'], '00:00:00');
+            $condition[$field] = Filter::datetime($condition['apartir_datalancamento'], '00:00:00');
             $allowed[$field] = true;
         }
-        if (isset($condition['ate_datahora'])) {
+        if (isset($condition['ate_datalancamento'])) {
             $field = 'i.datalancamento <= ?';
-            $condition[$field] = Filter::datetime($condition['ate_datahora'], '23:59:59');
+            $condition[$field] = Filter::datetime($condition['ate_datalancamento'], '23:59:59');
             $allowed[$field] = true;
         }
         if (isset($condition['search'])) {

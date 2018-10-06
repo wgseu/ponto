@@ -85,7 +85,7 @@ class SistemaPageController extends PageController
         $erro = [];
         $maps_api = get_string_config('Site', 'Maps.API');
         $dropbox_token = get_string_config('Sistema', 'Dropbox.AccessKey');
-        if (is_post()) {
+        if ($this->getRequest()->isMethod('POST')) {
             try {
                 $maps_api = trim($this->getRequest()->request->get('mapskey'));
                 set_string_config('Site', 'Maps.API', $maps_api);
@@ -123,7 +123,7 @@ class SistemaPageController extends PageController
         $porta = get_int_config('Email', 'Porta', 587);
         $encriptacao = get_int_config('Email', 'Criptografia', 2);
         $usuario = get_string_config('Email', 'Usuario');
-        if (is_post()) {
+        if ($this->getRequest()->isMethod('POST')) {
             try {
                 $destinatario = trim($this->getRequest()->request->get('destinatario'));
                 set_string_config('Email', 'Remetente', $destinatario);
@@ -180,7 +180,7 @@ class SistemaPageController extends PageController
 
         $erros = [];
         $fiscal_timeout = get_int_config('Sistema', 'Fiscal.Timeout', 30);
-        if (is_post()) {
+        if ($this->getRequest()->isMethod('POST')) {
             try {
                 $fiscal_timeout = \MZ\Util\Filter::number($this->getRequest()->request->get('fiscal_timeout'));
                 if (intval($fiscal_timeout) < 2) {
@@ -455,7 +455,7 @@ class SistemaPageController extends PageController
         ];
         $opcoes_impressao = array_merge($opcoes_aparencia, $opcoes_guias, $opcoes_comportamento);
 
-        if (is_post()) {
+        if ($this->getRequest()->isMethod('POST')) {
             try {
                 $secao = $this->getRequest()->request->get('secao');
                 $chave = $this->getRequest()->request->get('chave');
@@ -533,7 +533,7 @@ class SistemaPageController extends PageController
         }
         $text_bemvindo = get_string_config('Site', 'Text.BemVindo', 'Bem-vindo ao nosso restaurante!');
         $text_chamada = get_string_config('Site', 'Text.Chamada', 'Conheça nosso cardápio!');
-        if (is_post()) {
+        if ($this->getRequest()->isMethod('POST')) {
             foreach ($images_info as $key => &$value) {
                 $value['save'] = $value['url'];
             }
@@ -696,7 +696,7 @@ class SistemaPageController extends PageController
         ];
         #    ['section' => 'Sistema', 'key' => 'Logout.Timeout', 'default' => 3, 'title' => 'Minutos de inatividade'],
 
-        if (is_post()) {
+        if ($this->getRequest()->isMethod('POST')) {
             try {
                 $secao = $this->getRequest()->request->get('secao');
                 $chave = $this->getRequest()->request->get('chave');

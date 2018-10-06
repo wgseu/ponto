@@ -1,8 +1,7 @@
 <?php
+
 function mail_custom($emails = [], $subject, $message, $reply = null, $attachment = [])
 {
-    settype($emails, 'array');
-
     $options = [
         'contentType' => 'text/html',
         'encoding' => 'UTF-8',
@@ -11,9 +10,11 @@ function mail_custom($emails = [], $subject, $message, $reply = null, $attachmen
     return Mailer::SmtpMail($to, $subject, $message, $options, $emails, $reply, $attachment);
 }
 
+/**
+ * @param \MZ\Account\Cliente $cliente
+ */
 function mail_recuperar($cliente)
 {
-
     $company = app()->getSystem()->getCompany();
     $vars = [
         'cliente_secreto' => $cliente->getSecreto(),
@@ -29,12 +30,14 @@ function mail_recuperar($cliente)
     //exit;
     /* end test */
     $subject = "Recuperar conta";
-    return mail_custom($cliente->getEmail(), $subject, $message);
+    return mail_custom([$cliente->getEmail()], $subject, $message);
 }
 
+/**
+ * @param \MZ\Account\Cliente $cliente
+ */
 function mail_confirmacao($cliente)
 {
-
     $company = app()->getSystem()->getCompany();
     $vars = [
         'cliente_secreto' => $cliente->getSecreto(),
@@ -50,12 +53,11 @@ function mail_confirmacao($cliente)
     //exit;
     /* end test */
     $subject = "Confirmação de cadastro";
-    return mail_custom($cliente->getEmail(), $subject, $message);
+    return mail_custom([$cliente->getEmail()], $subject, $message);
 }
 
 function mail_contato($email, $nome, $assunto, $mensagem)
 {
-
     $company = app()->getSystem()->getCompany();
     $user = get_string_config('Email', 'Usuario');
     $from = get_string_config('Email', 'From', $user);
@@ -73,12 +75,11 @@ function mail_contato($email, $nome, $assunto, $mensagem)
     //exit;
     /* end test */
     $reply = "{$nome} <{$email}>";
-    return mail_custom($to, $assunto, $message, $reply);
+    return mail_custom([$to], $assunto, $message, $reply);
 }
 
 function mail_nota($email, $nome, $modo, $filters, $files = [])
 {
-
     $company = app()->getSystem()->getCompany();
     $pass = get_string_config('Email', 'Senha', '');
     if ($pass == '') {
@@ -111,7 +112,7 @@ function mail_nota($email, $nome, $modo, $filters, $files = [])
     // exit;
     /* end test */
     $reply = "{$empresa_nome} <{$from}>";
-    if (!mail_custom($to, $assunto, $message, $reply, $files)) {
+    if (!mail_custom([$to], $assunto, $message, $reply, $files)) {
         throw new \Exception('Não foi possível enviar o E-mail', 500);
     }
 }

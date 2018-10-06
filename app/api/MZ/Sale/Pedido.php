@@ -115,9 +115,17 @@ class Pedido extends SyncModel
      */
     private $comissao;
     /**
+     * Subtotal do pedido sem os descontos
+     */
+    private $subtotal;
+    /**
      * Total de descontos realizado nesse pedido
      */
     private $descontos;
+    /**
+     * Total do pedido já com descontos
+     */
+    private $total;
     /**
      * Valor já pago do pedido
      */
@@ -441,6 +449,26 @@ class Pedido extends SyncModel
     }
 
     /**
+     * Subtotal do pedido sem os descontos
+     * @return string subtotal of Pedido
+     */
+    public function getSubtotal()
+    {
+        return $this->subtotal;
+    }
+
+    /**
+     * Set Subtotal value to new on param
+     * @param string $subtotal Set subtotal for Pedido
+     * @return self Self instance
+     */
+    public function setSubtotal($subtotal)
+    {
+        $this->subtotal = $subtotal;
+        return $this;
+    }
+
+    /**
      * Total de descontos realizado nesse pedido
      * @return string descontos of Pedido
      */
@@ -457,6 +485,26 @@ class Pedido extends SyncModel
     public function setDescontos($descontos)
     {
         $this->descontos = $descontos;
+        return $this;
+    }
+
+    /**
+     * Total do pedido já com descontos
+     * @return string total of Pedido
+     */
+    public function getTotal()
+    {
+        return $this->total;
+    }
+
+    /**
+     * Set Total value to new on param
+     * @param string $total Set total for Pedido
+     * @return self Self instance
+     */
+    public function setTotal($total)
+    {
+        $this->total = $total;
         return $this;
     }
 
@@ -730,7 +778,9 @@ class Pedido extends SyncModel
         $pedido['servicos'] = $this->getServicos();
         $pedido['produtos'] = $this->getProdutos();
         $pedido['comissao'] = $this->getComissao();
+        $pedido['subtotal'] = $this->getSubtotal();
         $pedido['descontos'] = $this->getDescontos();
+        $pedido['total'] = $this->getTotal();
         $pedido['pago'] = $this->getPago();
         $pedido['lancado'] = $this->getLancado();
         $pedido['pessoas'] = $this->getPessoas();
@@ -824,10 +874,20 @@ class Pedido extends SyncModel
         } else {
             $this->setComissao($pedido['comissao']);
         }
+        if (!isset($pedido['subtotal'])) {
+            $this->setSubtotal(0);
+        } else {
+            $this->setSubtotal($pedido['subtotal']);
+        }
         if (!isset($pedido['descontos'])) {
             $this->setDescontos(0);
         } else {
             $this->setDescontos($pedido['descontos']);
+        }
+        if (!isset($pedido['total'])) {
+            $this->setTotal(0);
+        } else {
+            $this->setTotal($pedido['total']);
         }
         if (!isset($pedido['pago'])) {
             $this->setPago(0);
@@ -975,7 +1035,9 @@ class Pedido extends SyncModel
         $this->setServicos(Filter::money($original->getServicos(), $localized));
         $this->setProdutos(Filter::money($original->getProdutos(), $localized));
         $this->setComissao(Filter::money($original->getComissao(), $localized));
+        $this->setSubtotal(Filter::money($original->getSubtotal(), $localized));
         $this->setDescontos(Filter::money($original->getDescontos(), $localized));
+        $this->setTotal(Filter::money($original->getTotal(), $localized));
         $this->setPago(Filter::money($original->getPago(), $localized));
         $this->setLancado(Filter::money($original->getLancado(), $localized));
         $this->setPessoas(Filter::number($this->getPessoas()));
@@ -1036,8 +1098,14 @@ class Pedido extends SyncModel
         if (is_null($this->getComissao())) {
             $errors['comissao'] = _t('pedido.comissao_cannot_empty');
         }
+        if (is_null($this->getSubtotal())) {
+            $errors['subtotal'] = _t('pedido.subtotal_cannot_empty');
+        }
         if (is_null($this->getDescontos())) {
             $errors['descontos'] = _t('pedido.descontos_cannot_empty');
+        }
+        if (is_null($this->getTotal())) {
+            $errors['total'] = _t('pedido.total_cannot_empty');
         }
         if (is_null($this->getPago())) {
             $errors['pago'] = _t('pedido.pago_cannot_empty');
@@ -1389,19 +1457,22 @@ class Pedido extends SyncModel
     {
         if (!$this->exists() && is_null($this->getMesaID())) {
             $row = [
+                'servicos' => 0,
                 'produtos' => 0,
                 'comissao' => 0,
-                'servicos' => 0,
-                'descontos' => 0
+                'subtotal' => 0,
+                'descontos' => 0,
+                'total' => 0,
             ];
         } else {
             $query = DB::from('Pedidos p')
                 ->select(null)
-                ->select('SUM(IF(NOT ISNULL(i.produtoid), i.subtotal, 0)) as produtos')
-                ->select('SUM(IF(NOT ISNULL(i.produtoid), i.comissao, 0)) as comissao')
-                ->select('SUM(IF(NOT ISNULL(i.servicoid) AND i.preco >= 0, i.subtotal, 0)) as servicos')
-                ->select('SUM(IF(NOT ISNULL(i.servicoid) AND i.preco < 0, i.subtotal, 0)) as descontos')
-                ->leftJoin('Itens i ON i.pedidoid = p.id AND i.cancelado = ?', $this->getCancelado());
+                ->select('p.servicos')
+                ->select('p.produtos')
+                ->select('p.comissao')
+                ->select('p.subtotal')
+                ->select('p.descontos')
+                ->select('p.total');
             if ($this->exists()) {
                 $query = $query->where('p.id', $this->getID());
             } else {
@@ -1410,8 +1481,6 @@ class Pedido extends SyncModel
             }
             $row = $query->fetch();
         }
-        $row['subtotal'] = $row['servicos'] + $row['produtos'] + $row['comissao'];
-        $row['total'] = $row['descontos'] + $row['subtotal'];
         if ($resumido) {
             return $row['total'];
         }
@@ -1656,13 +1725,12 @@ class Pedido extends SyncModel
     {
         $query = DB::from('Pedidos p')
             ->select(null)
-            ->select('SUM(i.subtotal) as subtotal')
-            ->select('SUM(i.total) as total')
-            ->select('SUM(IF(p.tipo = "Mesa", i.total, 0)) as mesa')
-            ->select('SUM(IF(p.tipo = "Comanda", i.total, 0)) as comanda')
-            ->select('SUM(IF(p.tipo = "Avulso", i.total, 0)) as avulso')
-            ->select('SUM(IF(p.tipo = "Entrega", i.total, 0)) as entrega')
-            ->leftJoin('Itens i ON i.pedidoid = p.id AND i.cancelado = ?', 'N')
+            ->select('SUM(p.subtotal) as subtotal')
+            ->select('SUM(p.total) as total')
+            ->select('SUM(IF(p.tipo = "Mesa", p.total, 0)) as mesa')
+            ->select('SUM(IF(p.tipo = "Comanda", p.total, 0)) as comanda')
+            ->select('SUM(IF(p.tipo = "Avulso", p.total, 0)) as avulso')
+            ->select('SUM(IF(p.tipo = "Entrega", p.total, 0)) as entrega')
             ->where(['p.cancelado' => 'N']);
         if (!is_null($sessao_id)) {
             $query = $query->where(['p.sessaoid' => $sessao_id]);
@@ -1676,7 +1744,7 @@ class Pedido extends SyncModel
         $row = $query->fetch();
         return [
             'total' => $row['total'] + 0,
-            'subtotal' => $row['total'] + 0,
+            'subtotal' => $row['subtotal'] + 0,
             'tipo' => [
                 'mesa' => $row['mesa'] + 0,
                 'comanda' => $row['comanda'] + 0,

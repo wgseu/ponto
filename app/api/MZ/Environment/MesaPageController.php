@@ -74,7 +74,7 @@ class MesaPageController extends PageController
         $focusctrl = 'nome';
         $errors = [];
         $old_mesa = $mesa;
-        if (is_post()) {
+        if ($this->getRequest()->isMethod('POST')) {
             $mesa = new Mesa($this->getData());
             try {
                 $mesa->filter($old_mesa, true);
@@ -129,7 +129,7 @@ class MesaPageController extends PageController
         $focusctrl = 'nome';
         $errors = [];
         $old_mesa = $mesa;
-        if (is_post()) {
+        if ($this->getRequest()->isMethod('POST')) {
             $mesa = new Mesa($this->getData());
             try {
                 $mesa->filter($old_mesa, true);

@@ -71,7 +71,7 @@ class FornecedorPageController extends PageController
         $focusctrl = 'empresaid';
         $errors = [];
         $old_fornecedor = $fornecedor;
-        if (is_post()) {
+        if ($this->getRequest()->isMethod('POST')) {
             $fornecedor = new Fornecedor($this->getData());
             try {
                 $fornecedor->filter($old_fornecedor, true);
@@ -125,7 +125,7 @@ class FornecedorPageController extends PageController
         $focusctrl = 'empresaid';
         $errors = [];
         $old_fornecedor = $fornecedor;
-        if (is_post()) {
+        if ($this->getRequest()->isMethod('POST')) {
             $fornecedor = new Fornecedor($this->getData());
             try {
                 $fornecedor->filter($old_fornecedor, true);

@@ -80,7 +80,7 @@ class ContaPageController extends PageController
         $focusctrl = 'descricao';
         $errors = [];
         $old_conta = $conta;
-        if (is_post()) {
+        if ($this->getRequest()->isMethod('POST')) {
             $conta = new Conta($this->getData());
             try {
                 $old_conta->setFuncionarioID(app()->auth->provider->getID());
@@ -135,7 +135,7 @@ class ContaPageController extends PageController
         $focusctrl = 'descricao';
         $errors = [];
         $old_conta = $conta;
-        if (is_post()) {
+        if ($this->getRequest()->isMethod('POST')) {
             $conta = new Conta($this->getData());
             try {
                 $despesa = $this->getRequest()->request->getInt('tipo') < 0;

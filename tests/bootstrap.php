@@ -22,13 +22,15 @@
  *
  * @author Equipe GrandChef <desenvolvimento@mzsw.com.br>
  */
-
 require __DIR__.'/../bootstrap/autoload.php';
+
 use MZ\Database\DB;
+use Symfony\Component\HttpFoundation\Session\Session;
+use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
 
 global $app;
 $app = require_once __DIR__.'/../bootstrap/app.php';
-
+$app->setSession(new Session(new MockArraySessionStorage()));
 $app->run(
     function ($app) {},
     function ($app) {

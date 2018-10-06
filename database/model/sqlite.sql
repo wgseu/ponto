@@ -2,7 +2,7 @@
 -- Author:        Mazin
 -- Caption:       GrandChef Model
 -- Project:       GrandChef
--- Changed:       2018-10-05 16:47
+-- Changed:       2018-10-05 21:08
 -- Created:       2012-09-05 23:08
 PRAGMA foreign_keys = OFF;
 
@@ -1596,7 +1596,9 @@ CREATE TABLE "Pedidos"(
   "Servicos" DECIMAL NOT NULL DEFAULT 0,-- Valor total dos serviços desse pedido[G:o][N:Total dos serviços][F:0]
   "Produtos" DECIMAL NOT NULL DEFAULT 0,-- Valor total dos produtos do pedido sem a comissão[G:o][N:Total dos produtos][F:0]
   "Comissao" DECIMAL NOT NULL DEFAULT 0,-- Valor total da comissão desse pedido[G:o][N:Total da comissão][F:0]
+  "Subtotal" DECIMAL NOT NULL DEFAULT 0,-- Subtotal do pedido sem os descontos[G:o][N:Subtotal][F:0]
   "Descontos" DECIMAL NOT NULL DEFAULT 0,-- Total de descontos realizado nesse pedido[G:o][N:Descontos][F:0]
+  "Total" DECIMAL NOT NULL DEFAULT 0,-- Total do pedido já com descontos[G:o][N:Total][F:0]
   "Pago" DECIMAL NOT NULL DEFAULT 0,-- Valor já pago do pedido[G:o][N:Total pago][F:0]
   "Lancado" DECIMAL NOT NULL DEFAULT 0,-- Valor lançado para pagar, mas não foi pago ainda[G:o][N:Total lançado][F:0]
   "Pessoas" INTEGER NOT NULL DEFAULT 1,-- Informa quantas pessoas estão na mesa[N:Pessoas][G:a]

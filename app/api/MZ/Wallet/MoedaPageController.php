@@ -69,7 +69,7 @@ class MoedaPageController extends PageController
         $focusctrl = 'nome';
         $errors = [];
         $old_moeda = $moeda;
-        if (is_post()) {
+        if ($this->getRequest()->isMethod('POST')) {
             $moeda = new Moeda($this->getData());
             try {
                 $moeda->filter($old_moeda, true);
@@ -124,7 +124,7 @@ class MoedaPageController extends PageController
         $focusctrl = 'nome';
         $errors = [];
         $old_moeda = $moeda;
-        if (is_post()) {
+        if ($this->getRequest()->isMethod('POST')) {
             $moeda = new Moeda($this->getData());
             try {
                 $moeda->filter($old_moeda, true);

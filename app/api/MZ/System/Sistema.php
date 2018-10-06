@@ -417,6 +417,39 @@ class Sistema extends Model
         return $this->isFiscal() || is_boolean_config('Sistema', 'Fiscal.Mostrar', false);
     }
 
+    private function detectTimezone($uf, $pais)
+    {
+        $timezones = [
+            'BR' => [
+                'AC' => 'America/Rio_branco',   'AL' => 'America/Maceio',
+                'AP' => 'America/Belem',        'AM' => 'America/Manaus',
+                'BA' => 'America/Bahia',        'CE' => 'America/Fortaleza',
+                'DF' => 'America/Sao_Paulo',    'ES' => 'America/Sao_Paulo',
+                'GO' => 'America/Sao_Paulo',    'MA' => 'America/Fortaleza',
+                'MT' => 'America/Cuiaba',       'MS' => 'America/Campo_Grande',
+                'MG' => 'America/Sao_Paulo',    'PR' => 'America/Sao_Paulo',
+                'PB' => 'America/Fortaleza',    'PA' => 'America/Belem',
+                'PE' => 'America/Recife',       'PI' => 'America/Fortaleza',
+                'RJ' => 'America/Sao_Paulo',    'RN' => 'America/Fortaleza',
+                'RS' => 'America/Sao_Paulo',    'RO' => 'America/Porto_Velho',
+                'RR' => 'America/Boa_Vista',    'SC' => 'America/Sao_Paulo',
+                'SE' => 'America/Maceio',       'SP' => 'America/Sao_Paulo',
+                'TO' => 'America/Araguaia'
+            ]
+        ];
+        $timezone = date_default_timezone_get();
+        switch ($pais) {
+            case 'BR':
+            case 'BRA':
+            case 'Brasil':
+                if (isset($timezones['BR'][$uf])) {
+                    $timezone = $timezones['BR'][$uf];
+                }
+                break;
+        }
+        return $timezone;
+    }
+
     /**
      * Filter fields, upload data and keep key data
      * @param self $original Original instance without modifications
@@ -645,7 +678,11 @@ class Sistema extends Model
         $this->country = $this->getBusiness()->findPaisID();
         $this->currency = $this->getCountry()->findMoedaID();
 
-        set_timezone_for($this->getState()->getUF(), $this->getCountry()->getSigla());
+        $timezone = $this->getFusoHorario() ?: $this->detectTimezone(
+            $this->getState()->getUF(),
+            $this->getCountry()->getSigla() ?: 'Brasil'
+        );
+        date_default_timezone_set($timezone);
         $this->entries = parse_ini_string(base64_decode($this->getCountry()->getEntradas()), true, INI_SCANNER_RAW);
         settype($this->entries, 'array');
         return $this;

@@ -66,7 +66,7 @@ class BancoPageController extends PageController
         $errors = [];
         $banco = new Banco();
         $old_banco = $banco;
-        if (is_post()) {
+        if ($this->getRequest()->isMethod('POST')) {
             $banco = new Banco($this->getData());
             try {
                 $banco->filter($old_banco, true);
@@ -116,7 +116,7 @@ class BancoPageController extends PageController
         $focusctrl = 'razaosocial';
         $errors = [];
         $old_banco = $banco;
-        if (is_post()) {
+        if ($this->getRequest()->isMethod('POST')) {
             $banco = new Banco($this->getData());
             try {
                 $banco->filter($old_banco, true);

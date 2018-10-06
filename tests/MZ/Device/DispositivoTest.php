@@ -59,4 +59,10 @@ class DispositivoTest extends \MZ\Framework\TestCase
         $dispositivo->authorize();
         return $dispositivo;
     }
+
+    public function testInsert()
+    {
+        $dispositivo = self::create();
+        $this->assertTrue($dispositivo->exists());
+    }
 }

@@ -75,7 +75,7 @@ class ItemPageController extends PageController
         $count = Item::count($condition);
         $page = max(1, $this->getRequest()->query->getInt('pagina', 1));
         $pager = new \Pager($count, $limite, $page, 'pagina');
-        $pagination = $pager->genBasic();
+        $pagination = $pager->genPages();
         $itens_do_pedido = Item::findAll($condition, $order, $limite, $pager->offset);
 
         if ($this->isJson()) {

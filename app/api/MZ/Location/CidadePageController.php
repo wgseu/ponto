@@ -44,7 +44,7 @@ class CidadePageController extends PageController
         $count = Cidade::count($condition);
         $page = max(1, $this->getRequest()->query->getInt('pagina', 1));
         $pager = new \Pager($count, $limite, $page, 'pagina');
-        $pagination = $pager->genBasic();
+        $pagination = $pager->genPages();
         $cidades = Cidade::findAll($condition, $order, $limite, $pager->offset);
 
         if ($this->isJson()) {

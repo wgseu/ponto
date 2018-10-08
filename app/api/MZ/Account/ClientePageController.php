@@ -65,7 +65,7 @@ class ClientePageController extends PageController
                 $cliente->passwordMatch($senha);
                 $cliente->filter($old_cliente, true);
                 $cliente->getTelefone()->setPaisID(app()->getSystem()->getCountry()->getID());
-                $cliente->getTelefone()->filter(new Telefone(), true);
+                $cliente->getTelefone()->filter($old_cliente->getTelefone(), true);
                 $cliente->insert();
                 $old_cliente->clean($cliente);
                 if ($this->isJson()) {
@@ -211,7 +211,7 @@ class ClientePageController extends PageController
         $count = Cliente::count($condition);
         $page = max(1, $this->getRequest()->query->getInt('pagina', 1));
         $pager = new \Pager($count, $limite, $page, 'pagina');
-        $pagination = $pager->genBasic();
+        $pagination = $pager->genPages();
         $clientes = Cliente::findAll($condition, $order, $limite, $pager->offset);
 
         if ($this->isJson()) {
@@ -252,9 +252,16 @@ class ClientePageController extends PageController
                     );
                 }
                 $cliente->filter($old_cliente, true);
+                $cliente->getTelefone()->setPaisID(app()->getSystem()->getCountry()->getID());
+                $cliente->getTelefone()->filter($old_cliente->getTelefone(), true);
                 $cliente->insert();
                 $old_cliente->clean($cliente);
                 if ($this->getRequest()->query->getInt('sistema') == 1) {
+                    // evita de alterar a senha
+                    app()->auth->user->setSenha(null);
+                    // o primeiro a cadastrar a empresa será o dono
+                    app()->auth->user->setEmpresaID($cliente->getID());
+                    app()->auth->user->update();
                     app()->getSystem()->getBusiness()->setEmpresaID($cliente->getID());
                     app()->getSystem()->getBusiness()->update();
                 }
@@ -351,6 +358,8 @@ class ClientePageController extends PageController
                 $senha = $this->getRequest()->request->get('confirmarsenha', '');
                 $cliente->passwordMatch($senha);
                 $cliente->filter($old_cliente, true);
+                $cliente->getTelefone()->setPaisID(app()->getSystem()->getCountry()->getID());
+                $cliente->getTelefone()->filter($old_cliente->getTelefone(), true);
                 $cliente->update();
                 $old_cliente->clean($cliente);
                 $msg = sprintf(

@@ -62,24 +62,23 @@
             <thead>
               <tr>
                 <th>Descrição</th>
-                <th>Tipo</th>
-                <th>Banco</th>
-                <th>Conta</th>
-                <th>Agência</th>
+                <th>Disponível</th>
+                <th>A Receber</th>
                 <th width="10%" style="text-align: center;">Ações</th>
               </tr>
             </thead>
             <tbody>
               {% for $carteira in $carteiras %}
                 <tr class="{{ !$carteira->isAtiva() ? 'active': '' }}">
-                  <td>{{ $carteira->getDescricao() }}</td>
-                  <td>{{ $tipos[$carteira->getTipo()] }}</td>
-                  {% $_banco = $carteira->findBancoID() %}
                   <td>
-                    <a href="/gerenciar/banco/editar?id={{ $_banco->getID() }}" title="Editar banco '{{ $_banco->getRazaoSocial() }}'">{{ $_banco->getRazaoSocial() }}</a>
+                    <a href="/gerenciar/carteira/editar?id={{ $carteira->getID() }}" title="Editar carteira '{{ $carteira->getDescricao() }}'">
+                      <img src="{{ $carteira->makeLogoURL() }}" width="42px" />
+                      <strong>{{ $carteira->getDescricao() }}</strong>
+                    </a>
                   </td>
-                  <td>{{ $carteira->getConta() }}</td>
-                  <td>{{ $carteira->getAgencia() }}</td>
+                  {% $disponivel = $carteira->fetchAvailable() %}
+                  <td class="{{ $disponivel < 0 ? 'text-danger' : 'text-money' }}">{{ $this->currency($disponivel) }}</td>
+                  <td class="text-unavailable">{{ $this->currency($carteira->fetchToReceive()) }}</td>
                   <td class="text-center">
                     <ul class="nav panel_toolbox">
                       <li>
@@ -97,6 +96,14 @@
                 </tr>
               {% endfor %}
             </tbody>
+            <tfooter>
+              <tr>
+                <td><strong>Total</strong></td>
+                <td class="{{ $total_disponivel < 0 ? 'text-danger' : 'text-money' }}"><strong>{{ $this->currency($total_disponivel) }}</strong></td>
+                <td class="text-unavailable"><strong>{{ $this->currency($total_a_receber) }}</strong></td>
+                <td width="10%"></td>
+              </tr>
+            </tfooter>
           </table>
           {{ include('pagination.twig') }}
         </div>

@@ -131,7 +131,7 @@ class NFeDB extends \NFe\Database\Estatico
         } else {
             $nota->setPresenca(\NFe\Core\Nota::PRESENCA_PRESENCIAL);
         }
-        $_atendente_funcionario = $_pedido->findFuncionarioID();
+        $_atendente_funcionario = $_pedido->findPrestadorID();
         $_atendente = $_atendente_funcionario->findClienteID();
         $nota->addObservacao('Operador', NFeUtil::fixEncoding($_atendente->getAssinatura()));
         switch ($_pedido->getTipo()) {

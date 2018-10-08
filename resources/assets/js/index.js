@@ -775,16 +775,34 @@ Gerenciar.carteira.initForm = function(focus_ctrl) {
         'data-content',
         fillMask
       );
-      $('#bancoid')
-        .closest('.form-group')
-        .addClass('hidden');
       var label = $('#agencia')
         .closest('.form-group')
         .find('label');
       label.text(label.attr('data-servico'));
       $('#conta').unmask();
       $('#agencia').unmask();
-    } else {
+      $('#agencia')
+        .closest('.form-group')
+        .addClass('hidden');
+      $('#bancoid')
+        .closest('.form-group')
+        .addClass('hidden');
+      $('#limite')
+        .closest('.form-group')
+        .addClass('hidden');
+      $('#transacao')
+        .closest('.form-group')
+        .removeClass('hidden');
+      $('#conta')
+        .closest('.form-group')
+        .removeClass('hidden');
+      $('#ambiente')
+        .closest('.form-group')
+        .removeClass('hidden');
+      $('#token')
+        .closest('.form-group')
+        .removeClass('hidden');
+    } else if (tipo == 'Bancaria') {
       $('#bancoid')
         .closest('.form-group')
         .removeClass('hidden');
@@ -792,10 +810,89 @@ Gerenciar.carteira.initForm = function(focus_ctrl) {
         .closest('.form-group')
         .find('label');
       label.text(label.attr('data-agencia'));
+      $('#agencia')
+        .closest('.form-group')
+        .removeClass('hidden');
+      $('#conta')
+        .closest('.form-group')
+        .removeClass('hidden');
+      $('#token')
+        .closest('.form-group')
+        .addClass('hidden');
+      $('#transacao')
+        .closest('.form-group')
+        .addClass('hidden');
+      $('#ambiente')
+        .closest('.form-group')
+        .addClass('hidden');
+      $('#limite')
+        .closest('.form-group')
+        .addClass('hidden');
       applyMask();
+    } else if (tipo == 'Credito') {
+      $('#bancoid').val('');
+      Gerenciar.common.cleanInput(
+        '#bancoid',
+        '#bancoid_ref',
+        'data-content',
+        fillMask
+      );
+      $('#bancoid')
+        .closest('.form-group')
+        .addClass('hidden');
+      $('#agencia')
+        .closest('.form-group')
+        .addClass('hidden');
+      $('#conta')
+        .closest('.form-group')
+        .addClass('hidden');
+      $('#token')
+        .closest('.form-group')
+        .addClass('hidden');
+      $('#transacao')
+        .closest('.form-group')
+        .addClass('hidden');
+      $('#ambiente')
+        .closest('.form-group')
+        .addClass('hidden');
+      $('#limite')
+        .closest('.form-group')
+        .removeClass('hidden');
+    } else if (tipo == 'Local') {
+      $('#bancoid').val('');
+      Gerenciar.common.cleanInput(
+        '#bancoid',
+        '#bancoid_ref',
+        'data-content',
+        fillMask
+      );
+      $('#bancoid')
+        .closest('.form-group')
+        .addClass('hidden');
+      $('#agencia')
+        .closest('.form-group')
+        .addClass('hidden');
+      $('#conta')
+        .closest('.form-group')
+        .addClass('hidden');
+      $('#token')
+        .closest('.form-group')
+        .addClass('hidden');
+      $('#limite')
+        .closest('.form-group')
+        .addClass('hidden');
+      $('#transacao')
+        .closest('.form-group')
+        .addClass('hidden');
+      $('#ambiente')
+        .closest('.form-group')
+        .addClass('hidden');
     }
   }
-
+  $('#cor').colorPicker();
+  $('#transacao').autoNumeric('init');
+  $('#limite').autoNumeric('init');
+  Upload.image.initialize('#logourl_container');
   if (focus_ctrl != undefined) $('#' + focus_ctrl).focus();
   Gerenciar.banco.initField('#bancoid', fillMask);
   $('#tipo').change(function() {
@@ -823,7 +920,7 @@ Gerenciar.forma_pagto.init = function() {
 };
 Gerenciar.forma_pagto.initForm = function(focus_ctrl) {
   function tipoAlterado(tipo) {
-    if (tipo == 'Cartao' || tipo == 'Cheque') {
+    if (tipo == 'Credito') {
       $('#minparcelas')
         .closest('.form-group')
         .removeClass('hidden');
@@ -881,28 +978,11 @@ Gerenciar.cartao.init = function() {
   });
 };
 Gerenciar.cartao.initForm = function(focus_ctrl) {
-  $('#mensalidade').autoNumeric('init');
-  $('#transacao').autoNumeric('init');
   $('#taxa').autoNumeric('init');
   $('#diasrepasse').autoNumeric('init');
+  $('#taxaantecipacao').autoNumeric('init');
+  Upload.image.initialize('#imagemurl_container');
   if (focus_ctrl != undefined) $('#' + focus_ctrl).focus();
-  $('#imageindex').ddslick({
-    imageSrc: $('#imageindex').attr('data-imagesrc'),
-    width: '100%',
-    height: 260,
-    imgWidth: 50,
-    imgHeight: 31,
-    onSelected: function() {
-      $('#imageindex').css(
-        'margin-top',
-        parseInt(
-          $('#descricao')
-            .closest('.form-group')
-            .css('height')
-        ) - parseInt($('#imageindex').css('height'))
-      );
-    }
-  });
 };
 Gerenciar.cartao.initField = function(input, field) {
   Gerenciar.cartao.initFieldSelect(input, field, undefined);

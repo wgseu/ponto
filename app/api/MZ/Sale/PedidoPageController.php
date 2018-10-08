@@ -57,7 +57,7 @@ class PedidoPageController extends PageController
         $count = Pedido::count($condition);
         $page = max(1, $this->getRequest()->query->getInt('pagina', 1));
         $pager = new \Pager($count, $limite, $page, 'pagina');
-        $pagination = $pager->genBasic();
+        $pagination = $pager->genPages();
         $pedidos = Pedido::findAll($condition, $order, $limite, $pager->offset);
 
         if ($this->isJson()) {

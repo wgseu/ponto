@@ -669,7 +669,7 @@ class Order extends Pedido
         foreach ($this->products as $index => $item_info) {
             $produto_pedido = $item_info['item'];
             $produto_pedido->setPedidoID($this->getID());
-            $produto_pedido->setFuncionarioID($this->employee->getID());
+            $produto_pedido->setPrestadorID($this->employee->getID());
             $produto_pedido->setPrecoCompra(0);
             $produto = $produto_pedido->findProdutoID();
             if ($produto->exists()) {
@@ -756,7 +756,7 @@ class Order extends Pedido
                     $this->setClienteID($this->customer->getID());
                 }
                 // não existe pedido ainda, cadastra um novo
-                $this->setFuncionarioID($this->employee->getID());
+                $this->setPrestadorID($this->employee->getID());
                 $this->filter(new Pedido());
                 $this->insert();
                 $new_order = true;

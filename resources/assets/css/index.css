@@ -843,3 +843,5 @@ label .identifier {
 .integrator > img {
   margin-right: 10px;
 }
+.text-money { color: #0dc30d; }
+.text-unavailable { color: #2477f9; }

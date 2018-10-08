@@ -45,7 +45,7 @@ class ServicoPageController extends PageController
         $count = Servico::count($condition);
         $page = max(1, $this->getRequest()->query->getInt('pagina', 1));
         $pager = new \Pager($count, $limite, $page, 'pagina');
-        $pagination = $pager->genBasic();
+        $pagination = $pager->genPages();
         $servicos = Servico::findAll($condition, $order, $limite, $pager->offset);
 
         if ($this->isJson()) {

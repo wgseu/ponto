@@ -45,8 +45,10 @@ class CarteiraPageController extends PageController
         $count = Carteira::count($condition);
         $page = max(1, $this->getRequest()->query->getInt('pagina', 1));
         $pager = new \Pager($count, $limite, $page, 'pagina');
-        $pagination = $pager->genBasic();
+        $pagination = $pager->genPages();
         $carteiras = Carteira::findAll($condition, $order, $limite, $pager->offset);
+        $total_disponivel = Carteira::sumAvailable($condition);
+        $total_a_receber = Carteira::sumToReceive($condition);
 
         if ($this->isJson()) {
             $items = [];
@@ -106,7 +108,10 @@ class CarteiraPageController extends PageController
         } else {
             $carteira->setAtiva('Y');
         }
-        $_banco = $carteira->findBancoID();
+        $banco_id_obj = $carteira->findBancoID();
+        $tipo_options = Carteira::getTipoOptions();
+        $ambiente_options = Carteira::getAmbienteOptions();
+        $_carteiras = Carteira::findAll(['carteiraid' => null]);
         return $this->view('gerenciar_carteira_cadastrar', get_defined_vars());
     }
 
@@ -158,7 +163,10 @@ class CarteiraPageController extends PageController
         } elseif ($this->isJson()) {
             return $this->json()->error('Nenhum dado foi enviado');
         }
-        $_banco = $carteira->findBancoID();
+        $banco_id_obj = $carteira->findBancoID();
+        $tipo_options = Carteira::getTipoOptions();
+        $ambiente_options = Carteira::getAmbienteOptions();
+        $_carteiras = Carteira::findAll(['carteiraid' => null]);
         return $this->view('gerenciar_carteira_editar', get_defined_vars());
     }
 

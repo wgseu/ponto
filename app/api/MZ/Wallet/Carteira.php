@@ -30,6 +30,7 @@ use MZ\Util\Validator;
 use MZ\Database\DB;
 use MZ\Database\SyncModel;
 use MZ\Exception\ValidationException;
+use MZ\Payment\Pagamento;
 
 /**
  * Informa uma conta bancária ou uma carteira financeira
@@ -523,6 +524,26 @@ class Carteira extends SyncModel
         return $this;
     }
 
+    public function fetchAvailable()
+    {
+        return (float)Pagamento::sum(['valor'], [
+            'estado' => Pagamento::ESTADO_PAGO,
+            'ate_datacompensacao' => DB::now(),
+            'carteiraid' => $this->getID(),
+            'agrupamentoid' => null,
+        ]);
+    }
+
+    public function fetchToReceive()
+    {
+        return (float)Pagamento::sum(['valor'], [
+            'estado' => Pagamento::ESTADO_PAGO,
+            'apartir_datacompensacao' => DB::now(),
+            'carteiraid' => $this->getID(),
+            'agrupamentoid' => null,
+        ]);
+    }
+
     /**
      * Get relative logo path or default logo
      * @param boolean $default If true return default image, otherwise check field
@@ -566,7 +587,8 @@ class Carteira extends SyncModel
         $this->setTransacao(Filter::money($this->getTransacao(), $localized));
         $this->setLimite(Filter::money($this->getLimite(), $localized));
         $this->setToken(Filter::text($this->getToken()));
-        $logo_url = upload_image('raw_logourl', 'carteira');
+        $this->setAmbiente(Filter::string($this->getAmbiente()));
+        $logo_url = upload_image('raw_logourl', 'carteira', null, 400, 240); // 5:3
         if (is_null($logo_url) && trim($this->getLogoURL()) != '') {
             $this->setLogoURL($original->getLogoURL());
         } else {
@@ -596,6 +618,16 @@ class Carteira extends SyncModel
     public function validate()
     {
         $errors = [];
+        if (!is_null($this->getCarteiraID())) {
+            $carteirapai = $this->findCarteiraID();
+            if (!$carteirapai->exists()) {
+                $errors['carteiraid'] = _t('carteira.carteirapai_not_found');
+            } elseif (!is_null($carteirapai->getCarteiraID())) {
+                $errors['carteiraid'] = _t('carteira.carteirapai_already');
+            } elseif ($carteirapai->getID() == $this->getID()) {
+                $errors['carteiraid'] = _t('carteira.carteirapai_same');
+            }
+        }
         if (!Validator::checkInSet($this->getTipo(), self::getTipoOptions())) {
             $errors['tipo'] = _t('carteira.tipo_invalid');
         }
@@ -794,7 +826,7 @@ class Carteira extends SyncModel
      * @param array $condition condition to filter rows
      * @return array allowed condition
      */
-    private static function filterCondition($condition)
+    protected static function filterCondition($condition)
     {
         $allowed = self::getAllowedKeys();
         if (isset($condition['search'])) {
@@ -813,7 +845,7 @@ class Carteira extends SyncModel
      * @param array $order order rows
      * @return SelectQuery query object with condition statement
      */
-    private static function query($condition = [], $order = [])
+    protected static function query($condition = [], $order = [])
     {
         $query = DB::from('Carteiras c');
         $condition = self::filterCondition($condition);
@@ -874,6 +906,44 @@ class Carteira extends SyncModel
             $result[] = new self($row);
         }
         return $result;
+    }
+
+    /**
+     * Sum all values available from Carteira
+     * @param array  $condition Condition to select wallet to sum
+     * @return float Available value
+     */
+    public static function sumAvailable($condition = [])
+    {
+        $query = self::query($condition);
+        $query = $query->leftJoin('Pagamentos p ON p.carteiraid = c.id' .
+            ' AND p.estado = ?' .
+            ' AND p.datacompensacao <= ?' .
+            ' AND p.agrupamentoid IS NULL',
+            Pagamento::ESTADO_PAGO,
+            DB::now()
+        );
+        $query = $query->select(null)->select('SUM(p.valor)')->orderBy(null);
+        return (float)$query->fetchColumn();
+    }
+
+    /**
+     * Sum all values to receive from Carteira
+     * @param array  $condition Condition to select wallet to sum
+     * @return float To receive value
+     */
+    public static function sumToReceive($condition = [])
+    {
+        $query = self::query($condition);
+        $query = $query->leftJoin('Pagamentos p ON p.carteiraid = c.id' .
+            ' AND p.estado = ?' .
+            ' AND p.datacompensacao <= ?' .
+            ' AND p.agrupamentoid IS NULL',
+            Pagamento::ESTADO_PAGO,
+            DB::now()
+        );
+        $query = $query->select(null)->select('SUM(p.valor)')->orderBy(null);
+        return (float)$query->fetchColumn();
     }
 
     /**

@@ -45,7 +45,7 @@ class MesaPageController extends PageController
         $count = Mesa::count($condition);
         $page = max(1, $this->getRequest()->query->getInt('pagina', 1));
         $pager = new \Pager($count, $limite, $page, 'pagina');
-        $pagination = $pager->genBasic();
+        $pagination = $pager->genPages();
         $mesas = Mesa::findAll($condition, $order, $limite, $pager->offset);
 
         if ($this->isJson()) {

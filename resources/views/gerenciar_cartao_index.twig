@@ -53,9 +53,7 @@
             <thead>
               <tr>
                 <th>Descrição</th>
-                <th>Carteiras</th>
-                <th>Taxa</th>
-                <th>Repasse</th>
+                <th>Forma de pagamento</th>
                 <th width="10%" style="text-align: center;">Ações</th>
               </tr>
             </thead>
@@ -68,15 +66,8 @@
                       <strong>{{ $cartao->getBandeira() }}</strong>
                     </a>
                   </td>
-                  <td>
-                    {% $_carteira = $cartao->findCarteiraID() %}
-                    <strong>
-                      <a href="/gerenciar/carteira/editar?id={{ $_carteira->getID() }}" title="Editar carteira '{{ $_carteira->getDescricao() }}'">{{ $_carteira->getDescricao() }}</a>
-                    </strong>
-                  </td>
-                  <td>{{ $cartao->getTaxa() }}%</td>
-                  <td>{{ $cartao->getDiasRepasse() }}
-                    dias</td>
+{% $_forma_pagto = $cartao->findFormaPagtoID() %}
+                  <td><a href="/gerenciar/forma_pagto/editar?id={{ $_forma_pagto->getID() }}" title="Editar Forma de pagamento '{{ $_forma_pagto->getDescricao() }}'">{{ $_forma_pagto->getDescricao() }}</a></td>
                   <td class="text-center">
                     <ul class="nav panel_toolbox">
                       <li>

@@ -394,7 +394,7 @@ class Modulo extends SyncModel
      * @param array $condition condition to filter rows
      * @return array allowed condition
      */
-    private static function filterCondition($condition)
+    protected static function filterCondition($condition)
     {
         $allowed = self::getAllowedKeys();
         if (isset($condition['search'])) {
@@ -413,7 +413,7 @@ class Modulo extends SyncModel
      * @param array $order order rows
      * @return SelectQuery query object with condition statement
      */
-    private static function query($condition = [], $order = [])
+    protected static function query($condition = [], $order = [])
     {
         $query = DB::from('Modulos m');
         $condition = self::filterCondition($condition);

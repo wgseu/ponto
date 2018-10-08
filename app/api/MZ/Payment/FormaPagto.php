@@ -407,6 +407,15 @@ class FormaPagto extends SyncModel
     }
 
     /**
+     * Informa se a forma de pagamento permite parcelamento
+     * @return boolean true se permite parcelamento
+     */
+    public function isParcelado()
+    {
+        return $this->getTipo() == self::TIPO_CREDITO;
+    }
+
+    /**
      * Filter fields, upload data and keep key data
      * @param self $original Original instance without modifications
      * @param boolean $localized Informs if fields are localized
@@ -661,7 +670,7 @@ class FormaPagto extends SyncModel
      * @param array $condition condition to filter rows
      * @return array allowed condition
      */
-    private static function filterCondition($condition)
+    protected static function filterCondition($condition)
     {
         $allowed = self::getAllowedKeys();
         if (isset($condition['search'])) {
@@ -680,7 +689,7 @@ class FormaPagto extends SyncModel
      * @param array $order order rows
      * @return SelectQuery query object with condition statement
      */
-    private static function query($condition = [], $order = [])
+    protected static function query($condition = [], $order = [])
     {
         $query = DB::from('Formas_Pagto f');
         $condition = self::filterCondition($condition);

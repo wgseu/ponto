@@ -59,6 +59,7 @@ class ClienteOldApiController extends \MZ\Core\ApiController
         $clientes = Cliente::findAll($condition, $order, $limit);
         $items = [];
         foreach ($clientes as $cliente) {
+            $cliente->loadTelefone();
             $item = $cliente->publish();
             $items[] = $item;
         }

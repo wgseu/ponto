@@ -51,7 +51,7 @@ class LocalizacaoPageController extends PageController
         $count = Localizacao::count($condition);
         $page = max(1, $this->getRequest()->query->getInt('pagina', 1));
         $pager = new \Pager($count, $limite, $page, 'pagina');
-        $pagination = $pager->genBasic();
+        $pagination = $pager->genPages();
         $localizacoes = Localizacao::findAll($condition, $order, $limite, $pager->offset);
 
         $items = [];

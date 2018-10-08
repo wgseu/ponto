@@ -48,7 +48,6 @@
               <tr>
                 <th>Razão social</th>
                 <th>Número</th>
-                <th>Máscara</th>
                 <th width="10%" style="text-align: center;">Ações</th>
               </tr>
             </thead>
@@ -57,10 +56,6 @@
                 <tr>
                   <td>{{ $banco->getRazaoSocial() }}</td>
                   <td>{{ $banco->getNumero() }}</td>
-                  <td>
-                    <strong title="Máscara da agência">{{ $banco->getAgenciaMascara() }}</strong>
-                    <small title="Máscara da conta">{{ $banco->getContaMascara() }}</small>
-                  </td>
                   <td class="text-center">
                     <ul class="nav panel_toolbox">
                       <li>

@@ -364,6 +364,26 @@ class Pais extends SyncModel
     }
 
     /**
+     * Get flag index base on country code
+     * @return int flag index
+     */
+    public function getBandeiraIndex()
+    {
+        switch ($this->getCodigo()) {
+            case 'BR':
+                return 28;
+            case 'US':
+                return 220;
+            case 'ES':
+                return 66;
+            case 'MZ':
+                return 151;
+            default:
+                return 0;
+        }
+    }
+
+    /**
      * Filter fields, upload data and keep key data
      * @param self $original Original instance without modifications
      * @param boolean $localized Informs if fields are localized
@@ -603,7 +623,7 @@ class Pais extends SyncModel
      * @param array $condition condition to filter rows
      * @return array allowed condition
      */
-    private static function filterCondition($condition)
+    protected static function filterCondition($condition)
     {
         $allowed = self::getAllowedKeys();
         if (isset($condition['search'])) {
@@ -622,7 +642,7 @@ class Pais extends SyncModel
      * @param array $order order rows
      * @return SelectQuery query object with condition statement
      */
-    private static function query($condition = [], $order = [])
+    protected static function query($condition = [], $order = [])
     {
         $query = DB::from('Paises p');
         $condition = self::filterCondition($condition);

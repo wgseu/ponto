@@ -33,7 +33,7 @@ class CidadeOldApiController extends \MZ\Core\ApiController
 {
     public function find()
     {
-        $limit = max(1, min(100, $this->getRequest()->query->getInt('limit', 10)));
+        $limite = max(1, min(100, $this->getRequest()->query->getInt('limite', 10)));
         $order = Filter::order($this->getRequest()->query->get('ordem', ''));
         $condition = Filter::query($this->getRequest()->query->all());
         unset($condition['ordem']);

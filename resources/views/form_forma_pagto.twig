@@ -5,27 +5,16 @@
 <div class="form-group col-lg-3 col-md-4 col-sm-6 col-xs-12">
   <label for="tipo">Tipo:</label>
   <select id="tipo" name="tipo" class="form-control">
-    <option value="Dinheiro" {{ $forma_pagto->getTipo() == 'Dinheiro'?'selected':'' }}>Dinheiro</option>
-    <option value="Cartao" {{ $forma_pagto->getTipo() == 'Cartao'?'selected':'' }}>Cartão</option>
-    <option value="Cheque" {{ $forma_pagto->getTipo() == 'Cheque'?'selected':'' }}>Cheque</option>
-    <option value="Conta" {{ $forma_pagto->getTipo() == 'Conta'?'selected':'' }}>Conta</option>
-    <option value="Credito" {{ $forma_pagto->getTipo() == 'Credito'?'selected':'' }}>Crédito</option>
-    <option value="Transferencia" {{ $forma_pagto->getTipo() == 'Transferencia'?'selected':'' }}>Transferência</option>
+{% for $value, $text in $tipo_options %}
+    <option value="{{ $value }}" {{ $forma_pagto->getTipo() == $value ? 'selected': '' }}>{{ $text }}</option>
+{% endfor %}
   </select>
 </div>
 <div class="form-group col-lg-3 col-md-4 col-sm-6 col-xs-12">
-  <label for="carteiraid">Carteira de entrada:</label>
+  <label for="carteiraid">Carteira:</label>
   <select class="form-control" id="carteiraid" name="carteiraid">
     {% for $_carteira in $_carteiras %}
       <option value="{{ $_carteira->getID() }}" {{ $forma_pagto->getCarteiraID() == $_carteira->getID()?'selected':'' }}>{{ $_carteira->getDescricao() }}</option>
-    {% endfor %}
-  </select>
-</div>
-<div class="form-group col-lg-3 col-md-4 col-sm-6 col-xs-12">
-  <label for="carteirapagtoid">Carteira de saída:</label>
-  <select class="form-control" id="carteirapagtoid" name="carteirapagtoid">
-    {% for $_carteira in $_carteiras %}
-      <option value="{{ $_carteira->getID() }}" {{ $forma_pagto->getCarteiraPagtoID() == $_carteira->getID()?'selected':'' }}>{{ $_carteira->getDescricao() }}</option>
     {% endfor %}
   </select>
 </div>
@@ -44,6 +33,15 @@
 <div class="form-group col-lg-3 col-md-4 col-sm-6 col-xs-12">
   <label for="juros">Juros:</label>
   <input type="text" id="juros" name="juros" class="numeric form-control text-right" data-a-sep="." data-a-dec="," data-a-sign=" %" data-p-sign="s" data-a-pad="false" value="{{ $forma_pagto->getJuros() }}">
+</div>
+<div class="form-group col-lg-3 col-md-4 col-sm-6 col-xs-12">
+  <label for="integracaoid">Mostrar na integração:</label>
+  <select class="form-control" id="integracaoid" name="integracaoid">
+    <option value="" {{ is_null($forma_pagto->getIntegracaoID())?'selected':'' }}>Apenas localmente</option>
+{% for $_integracao in $_integracoes %}
+    <option value="{{ $_integracao->getID() }}" {{ $forma_pagto->getIntegracaoID() == $_integracao->getID()?'selected':'' }}>{{ $_integracao->getNome() }}</option>
+{% endfor %}
+  </select>
 </div>
 <div class="checkbox col-lg-3 col-md-4 col-sm-6 col-xs-12">
   <label>

@@ -312,7 +312,7 @@ $[field.else.if(image)]
         }
 $[field.else.if(text)]
         $this->set$[Field.norm]($[field.if(array)]$[field.array.number], $[field.end]Filter::text($this->get$[Field.norm]($[field.if(array)]$[field.array.number]$[field.end])));
-$[field.else.if(string)]
+$[field.else.if(string|enum)]
         $this->set$[Field.norm]($[field.if(array)]$[field.array.number], $[field.end]Filter::string($this->get$[Field.norm]($[field.if(array)]$[field.array.number]$[field.end])));
 $[field.end]
 $[field.end]
@@ -632,7 +632,7 @@ $[field.end]
      * @param array $condition condition to filter rows
      * @return array allowed condition
      */
-    private static function filterCondition($condition)
+    protected static function filterCondition($condition)
     {
         $allowed = self::getAllowedKeys();
 $[descriptor.if(string)]
@@ -653,7 +653,7 @@ $[descriptor.end]
      * @param array $order order rows
      * @return SelectQuery query object with condition statement
      */
-    private static function query($condition = [], $order = [])
+    protected static function query($condition = [], $order = [])
     {
 $[table.exists(blob)]
         $query = DB::from('$[Table] $[table.letter]')

@@ -46,7 +46,7 @@ class CreditoPageController extends PageController
         $count = Credito::count($condition);
         $page = max(1, $this->getRequest()->query->getInt('pagina', 1));
         $pager = new \Pager($count, $limite, $page, 'pagina');
-        $pagination = $pager->genBasic();
+        $pagination = $pager->genPages();
         $creditos = Credito::findAll($condition, $order, $limite, $pager->offset);
 
         if ($this->isJson()) {
@@ -79,7 +79,6 @@ class CreditoPageController extends PageController
         if ($this->getRequest()->isMethod('POST')) {
             $credito = new Credito($this->getData());
             try {
-                $old_credito->setFuncionarioID(app()->auth->provider->getID());
                 $old_credito->setClienteID($credito->getClienteID());
                 $credito->filter($old_credito, true);
                 $credito->insert();
@@ -243,24 +242,6 @@ class CreditoPageController extends PageController
                 'path' => '/gerenciar/credito/',
                 'method' => 'GET',
                 'controller' => 'find',
-            ],
-            [
-                'name' => 'credito_add',
-                'path' => '/gerenciar/credito/cadastrar',
-                'method' => ['GET', 'POST'],
-                'controller' => 'add',
-            ],
-            [
-                'name' => 'credito_update',
-                'path' => '/gerenciar/credito/editar',
-                'method' => ['GET', 'POST'],
-                'controller' => 'update',
-            ],
-            [
-                'name' => 'credito_delete',
-                'path' => '/gerenciar/credito/excluir',
-                'method' => 'GET',
-                'controller' => 'delete',
             ],
             [
                 'name' => 'credito_cancel',

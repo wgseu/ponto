@@ -400,11 +400,10 @@ INSERT INTO `Prestadores` (`ID`, `Codigo`, `FuncaoID`, `ClienteID`, `Ativo`, `Da
 	(1, 1, 1, 1, 'Y', NOW());
 
 INSERT INTO `Carteiras` (`ID`, `Tipo`, `Descricao`, `Ativa`) VALUES
-	(1, 'Local', "Company local account", 'Y'),
 	(1, 'Local', "Cash drawer 1", 'Y');
 
 INSERT INTO `Caixas` (`ID`, `CarteiraID`, `Descricao`, `Ativo`) VALUES
-	(1, 2, "Cash register 1", 'Y');
+	(1, 1, "Cash register 1", 'Y');
 
 INSERT INTO `Formas_Pagto` (`ID`, `Descricao`, `Tipo`, `CarteiraID`, `MinParcelas`, `MaxParcelas`, `ParcelasSemJuros`, `Juros`, `Ativa`) VALUES
 	(1, "Money", 'Dinheiro', 1, NULL, NULL, NULL, NULL, 'Y'),

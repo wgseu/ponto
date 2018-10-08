@@ -191,4 +191,23 @@ abstract class Model
         $result->setID($id);
         return $result->loadByID();
     }
+
+    /**
+     * Search one register with a condition
+     * @param  array $fields fields to sum
+     * @param  array $condition Condition for searching the row
+     * @return mixed A filled Estoque or empty instance
+     */
+    public static function sum($fields, $condition)
+    {
+        $query = static::query($condition)->select(null);
+        $fields = array_flip(static::filterCondition(array_flip($fields)));
+        foreach ($fields as $field) {
+            $query = $query->select("SUM($field)");
+        }
+        if (count($fields) == 1) {
+            return $query->orderBy(null)->fetchColumn();
+        }
+        return $query->orderBy(null)->fetch();
+    }
 }

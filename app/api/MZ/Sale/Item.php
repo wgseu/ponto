@@ -1127,7 +1127,7 @@ class Item extends SyncModel
             $estoque = new Estoque();
             $estoque->setTransacaoID($this->getID());
             $estoque->setProdutoID($this->getProdutoID());
-            $estoque->setFuncionarioID($this->getFuncionarioID());
+            $estoque->setPrestadorID($this->getPrestadorID());
             $estoque->setQuantidade($this->getQuantidade());
             $estoque->retirar($composicoes);
         } catch (\Exception $e) {
@@ -1263,7 +1263,7 @@ class Item extends SyncModel
      * @param array $condition condition to filter rows
      * @return array allowed condition
      */
-    private static function filterCondition($condition)
+    protected static function filterCondition($condition)
     {
         $allowed = self::getAllowedKeys();
         if (array_key_exists('!produtoid', $condition)) {
@@ -1335,7 +1335,7 @@ class Item extends SyncModel
      * @param  array $group group rows
      * @return SelectQuery query object with condition statement
      */
-    private static function query($condition = [], $order = [], $select = [], $group = [])
+    protected static function query($condition = [], $order = [], $select = [], $group = [])
     {
         $query = DB::from('Itens i')
             ->leftJoin('Pedidos e ON e.id = i.pedidoid')

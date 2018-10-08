@@ -76,7 +76,7 @@
                 <tr class="{{ $_prioridade_classe[$auditoria->getPrioridade()] }}">
                   <td>
                     <div title="{{ $_tipo_names[$auditoria->getTipo()] }}" class="cell-icon auditoria-icons" style="background-position: -{{ $_tipo_icon[$auditoria->getTipo()] }}px 0px;"></div>{{ $auditoria->getDescricao() }}</td>
-                  {% $_funcionario = $auditoria->findFuncionarioID() %}
+                  {% $_funcionario = $auditoria->findPrestadorID() %}
                   {% $_cliente = $_funcionario->findClienteID() %}
                   <td>
                     <a href="/gerenciar/funcionario/editar?id={{ $_funcionario->getID() }}" title="Editar funcionário '{{ $_cliente->getNomeCompleto() }}'">{{ $_cliente->getNome() }}</a>

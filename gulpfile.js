@@ -75,7 +75,8 @@ const javascripts_manager = [
   'resources/assets/js/jquery.ddslick.js',
   'resources/assets/js/raphael.js',
   'resources/assets/js/Treant.js',
-  'resources/assets/js/index.js'
+  'resources/assets/js/index.js',
+  'resources/assets/js/colorPicker/jQueryColorPicker.min.js'
 ];
 
 gulp.task('css', function () {

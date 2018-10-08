@@ -1068,8 +1068,8 @@ class Pedido extends SyncModel
     public function validate()
     {
         $errors = [];
-        if (is_null($this->getFuncionarioID()) && is_null($this->getClienteID())) {
-            $errors['funcionarioid'] = 'O usuário não foi informado';
+        if (is_null($this->getPrestadorID()) && is_null($this->getClienteID())) {
+            $errors['clienteid'] = 'O usuário não foi informado';
         }
         if (!Validator::checkInSet($this->getTipo(), self::getTipoOptions())) {
             $errors['tipo'] = _t('pedido.tipo_invalid');
@@ -1566,7 +1566,7 @@ class Pedido extends SyncModel
      * @param array $condition condition to filter rows
      * @return array allowed condition
      */
-    private static function filterCondition($condition)
+    protected static function filterCondition($condition)
     {
         $allowed = self::getAllowedKeys();
 
@@ -1607,7 +1607,7 @@ class Pedido extends SyncModel
      * @param array $order order rows
      * @return SelectQuery query object with condition statement
      */
-    private static function query($condition = [], $order = [])
+    protected static function query($condition = [], $order = [])
     {
         $query = DB::from('Pedidos p');
         $condition = self::filterCondition($condition);

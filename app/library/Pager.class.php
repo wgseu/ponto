@@ -151,42 +151,4 @@ class Pager
         }
         return $pages;
     }
-
-    public function genBasic()
-    {
-        $r = $this->paginate();
-        $buffer = null;
-        $index = '‹‹ Primeira';
-        $pre = '‹ Anterior';
-        $next = 'Próxima ›';
-        $last = 'Última ››';
-        $medtem = ($this->itemCount - 1) / 2;
-        if ($this->pageCount <= 1) {
-            return '';
-        } elseif ($this->pageCount<=$this->itemCount) {
-            $range = range(1, $this->pageCount);
-        } else {
-            $min = $this->pageNo - $medtem;
-            $max = $this->pageNo + $medtem;
-            if ($min < 1) {
-                $max += ($medtem-$min);
-                $min = 1;
-            }
-            if ($max > $this->pageCount) {
-                $min -= ( $max - $this->pageCount );
-                $max = $this->pageCount;
-            }
-            $min = ($min>1) ? $min : 1;
-            $range = range($min, $max);
-        }
-        $buffer .= '<nav class="navbar-right"><ul class="pagination">';
-        foreach ($this->GenPages() as $page) {
-            if ($page['active']) {
-                $buffer .= '<li class="active"><a href="'.$page['url'].'">'.$page['title'].'</a></li>';
-            } else {
-                $buffer .= '<li><a href="'.$page['url'].'">'.$page['title'].'</a></li>';
-            }
-        }
-        return $buffer .'</ul></nav>';
-    }
 }

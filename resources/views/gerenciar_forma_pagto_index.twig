@@ -62,8 +62,7 @@
             <thead>
               <tr>
                 <th>Descrição</th>
-                <th>Carteiras</th>
-                <th>Parcelas</th>
+                <th>Carteira / Integração</th>
                 <th width="10%" style="text-align: center;">Ações</th>
               </tr>
             </thead>
@@ -79,19 +78,10 @@
                     <strong>
                       <a href="/gerenciar/carteira/editar?id={{ $_carteira->getID() }}" title="Editar carteira de entrada '{{ $_carteira->getDescricao() }}'">{{ $_carteira->getDescricao() }}</a>
                     </strong>
-                  </td>
-                  <td>
-                    {% if $forma_pagto->isParcelado() %}
-                      <strong>de
-                        {{ $forma_pagto->getMinParcelas() }}
-                        até
-                        {{ $forma_pagto->getMaxParcelas() }}</strong>
-                      <small>Após
-                        {{ $forma_pagto->getParcelasSemJuros() }}, juros de
-                        {{ $forma_pagto->getJuros() }}%</small>
-                    {% else %}
-                      Não parcelado
-                    {% endif %}
+                    {% $_integracao = $forma_pagto->findIntegracaoID() %}
+                    <small>
+                      <a href="/gerenciar/integracao/editar?id={{ $_integracao->getID() }}" title="Editar Integração '{{ $_integracao->getNome() }}'">{{ $_integracao->getNome() }}</a>
+                    </small>
                   </td>
                   <td class="text-center">
                     <ul class="nav panel_toolbox">

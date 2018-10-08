@@ -379,11 +379,10 @@ INSERT INTO `Prestadores` (`ID`, `Codigo`, `FuncaoID`, `ClienteID`, `Ativo`, `Da
 	(1, 1, 1, 1, 'Y', NOW());
 
 INSERT INTO `Carteiras` (`ID`, `Tipo`, `Descricao`, `Ativa`) VALUES
-	(1, 'Local', "Cofre da empresa", 'Y'),
-	(2, 'Local', "Gaveta do Caixa 1", 'Y');
+	(1, 'Local', "Gaveta do Caixa 1", 'Y');
 
 INSERT INTO `Caixas` (`ID`, `CarteiraID`, `Descricao`, `Ativo`) VALUES
-	(1, 2, "Caixa 1", 'Y');
+	(1, 1, "Caixa 1", 'Y');
 
 INSERT INTO `Formas_Pagto` (`ID`, `Descricao`, `Tipo`, `CarteiraID`, `MinParcelas`, `MaxParcelas`, `ParcelasSemJuros`, `Juros`, `Ativa`) VALUES
 	(1, "Dinheiro", 'Dinheiro', 1, NULL, NULL, NULL, NULL, 'Y'),

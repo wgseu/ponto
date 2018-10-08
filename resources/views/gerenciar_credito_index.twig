@@ -64,7 +64,6 @@
                 <th>Detalhes</th>
                 <th>Valor</th>
                 <th>Cliente</th>
-                <th>Funcionário(a)</th>
                 <th>Data de cadastro</th>
                 <th width="10%" style="text-align: center;">Ações</th>
               </tr>
@@ -78,19 +77,9 @@
                   <td>
                     <a href="/gerenciar/cliente/editar?id={{ $_cliente->getID() }}" title="Editar cliente '{{ $_cliente->getNomeCompleto() }}'">{{ $_cliente->getNomeCompleto() }}</a>
                   </td>
-                  {% $_funcionario = $credito->findFuncionarioID() %}
-                  {% $_cliente = $_funcionario->findClienteID() %}
-                  <td>
-                    <a href="/gerenciar/funcionario/editar?id={{ $_funcionario->getID() }}" title="Editar funcionário '{{ $_cliente->getNomeCompleto() }}'">{{ $_cliente->getNomeCompleto() }}</a>
-                  </td>
                   <td>{{ $this->datetime($credito->getDataCadastro()) }}</td>
                   <td class="text-center">
                     <ul class="nav panel_toolbox">
-                      <li>
-                        <a href="/gerenciar/credito/editar?id={{ $credito->getID() }}" title="Editar crédito '{{ $credito->getDetalhes() }}'">
-                          <i class="fa fa-edit"></i>
-                        </a>
-                      </li>
                       {% if !$credito->isCancelado() %}
                         <li>
                           <a href="/gerenciar/credito/cancelar?id={{ $credito->getID() }}" title="Cancelar crédito '{{ $credito->getDetalhes() }}'" class="ajaxlink" ask="Deseja cancelar o crédito '{{ $credito->getDetalhes() }}'?">
@@ -98,11 +87,6 @@
                           </a>
                         </li>
                       {% endif %}
-                      <li>
-                        <a href="/gerenciar/credito/excluir?id={{ $credito->getID() }}" title="Excluir crédito '{{ $credito->getDetalhes() }}'" class="ajaxlink" ask="Deseja excluir o crédito '{{ $credito->getDetalhes() }}'?">
-                          <i class="fa fa-close"></i>
-                        </a>
-                      </li>
                     </ul>
                   </td>
                 </tr>

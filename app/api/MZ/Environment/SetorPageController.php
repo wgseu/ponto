@@ -45,7 +45,7 @@ class SetorPageController extends PageController
         $count = Setor::count($condition);
         $page = max(1, $this->getRequest()->query->getInt('pagina', 1));
         $pager = new \Pager($count, $limite, $page, 'pagina');
-        $pagination = $pager->genBasic();
+        $pagination = $pager->genPages();
         $setores = Setor::findAll($condition, $order, $limite, $pager->offset);
 
         if ($this->isJson()) {

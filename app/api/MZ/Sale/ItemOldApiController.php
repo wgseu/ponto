@@ -80,7 +80,7 @@ class ItemOldApiController extends \MZ\Core\ApiController
                 $datahora = strtotime($value->getDataLancamento());
                 date_default_timezone_set($tz);
 
-                $cliente = $value->findFuncionarioID()->findClienteID();
+                $cliente = $value->findPrestadorID()->findClienteID();
                 $pedido = $value->findPedidoID();
                 $row = [];
                 $row[] = $value->getPedidoID();

@@ -176,7 +176,7 @@ class Filter
                 $j++;
             }
         }
-        if ($res == '') {
+        if (trim($res) == '') {
             return null;
         }
         return $res;

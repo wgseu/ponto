@@ -23,9 +23,9 @@ $[field.end]
 Gerenciar.$[table.unix].initForm = function (focus_ctrl) {
 $[field.each]
 $[field.if(image)]
-  Image.upload.initialize('#$[field]_container');
+  Upload.image.initialize('#$[field]_container');
 $[field.else.if(blob)]
-  Image.upload.initialize('#$[field]_container');
+  Upload.image.initialize('#$[field]_container');
 $[field.else.if(reference)]
 $[field.if(searchable)]
   Gerenciar.$[reference.unix].initField('#$[field]');

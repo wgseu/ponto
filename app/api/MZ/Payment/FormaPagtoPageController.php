@@ -28,6 +28,7 @@ use MZ\System\Permissao;
 use MZ\Wallet\Carteira;
 use MZ\Util\Filter;
 use MZ\Core\PageController;
+use MZ\System\Integracao;
 
 /**
  * Allow application to serve system resources
@@ -46,7 +47,7 @@ class FormaPagtoPageController extends PageController
         $count = FormaPagto::count($condition);
         $page = max(1, $this->getRequest()->query->getInt('pagina', 1));
         $pager = new \Pager($count, $limite, $page, 'pagina');
-        $pagination = $pager->genBasic();
+        $pagination = $pager->genPages();
         $formas_de_pagamento = FormaPagto::findAll($condition, $order, $limite, $pager->offset);
 
         if ($this->isJson()) {
@@ -112,6 +113,8 @@ class FormaPagtoPageController extends PageController
             $forma_pagto->setAtiva('Y');
         }
         $_carteiras = Carteira::findAll();
+        $_integracoes = Integracao::findAll();
+        $tipo_options = FormaPagto::getTipoOptions();
         return $this->view('gerenciar_forma_pagto_cadastrar', get_defined_vars());
     }
 
@@ -164,6 +167,8 @@ class FormaPagtoPageController extends PageController
             return $this->json()->error('Nenhum dado foi enviado');
         }
         $_carteiras = Carteira::findAll();
+        $_integracoes = Integracao::findAll();
+        $tipo_options = FormaPagto::getTipoOptions();
         return $this->view('gerenciar_forma_pagto_editar', get_defined_vars());
     }
 

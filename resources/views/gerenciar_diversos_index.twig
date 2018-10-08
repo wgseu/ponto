@@ -1,46 +1,7 @@
 {{ include('header_gerenciar.twig') }}
 <!-- top tiles -->
 <div class="row tile_count">
-  <div class="animated flipInY col-md-2 col-sm-4 col-xs-4 tile_stats_count">
-    <div class="left"></div>
-    <div class="right">
-      <span class="count_top">
-        <i class="fa fa-users"></i>
-        Total de pessoas</span>
-      <div class="count">{{ $pessoas['total'] }}</div>
-      <span class="count_bottom">
-        <i class="green">{{ $pessoas['atual'] }}
-        </i>
-        no local</span>
-    </div>
-  </div>
-  <div class="animated flipInY col-md-2 col-sm-4 col-xs-4 tile_stats_count">
-    <div class="left"></div>
-    <div class="right">
-      <span class="count_top">
-        <i class="fa fa-clock-o"></i>
-        Permanência média</span>
-      <div class="count">{{ get_tempo($permanencia) }}</div>
-      <span class="count_bottom">
-        <i class="green">{{ $this->currency($ticket_medio) }}
-        </i>
-        ticket médio</span>
-    </div>
-  </div>
-  <div class="animated flipInY col-md-2 col-sm-4 col-xs-4 tile_stats_count">
-    <div class="left"></div>
-    <div class="right">
-      <span class="count_top">
-        <i class="fa fa-money"></i>
-        Receitas</span>
-      <div class="count green">{{ $this->money($receitas) }}</div>
-      <span class="count_bottom">
-        <i class="green">{{ $this->currency($vendas['total']) }}
-        </i>
-        Vendas</span>
-    </div>
-  </div>
-  <div class="animated flipInY col-md-2 col-sm-4 col-xs-4 tile_stats_count">
+  <div class="animated flipInY col-md-2 col-sm-4 col-xs-6 tile_stats_count">
     <div class="left"></div>
     <div class="right">
       <span class="count_top" title="Faturamento mensal">
@@ -61,7 +22,20 @@
       </span>
     </div>
   </div>
-  <div class="animated flipInY col-md-2 col-sm-4 col-xs-4 tile_stats_count">
+  <div class="animated flipInY col-md-2 col-sm-4 col-xs-6 tile_stats_count">
+    <div class="left"></div>
+    <div class="right">
+      <span class="count_top">
+        <i class="fa fa-money"></i>
+        Receitas</span>
+      <div class="count green">{{ $this->money($receitas) }}</div>
+      <span class="count_bottom">
+        <i class="green">{{ $this->currency($vendas['total']) }}
+        </i>
+        Vendas</span>
+    </div>
+  </div>
+  <div class="animated flipInY col-md-2 col-sm-4 col-xs-6 tile_stats_count">
     <div class="left"></div>
     <div class="right">
       <span class="count_top" title="Despesas do mês que ainda não foram pagas">
@@ -74,7 +48,33 @@
         pago</span>
     </div>
   </div>
-  <div class="animated flipInY col-md-2 col-sm-4 col-xs-4 tile_stats_count">
+  <div class="animated flipInY col-md-2 col-sm-4 col-xs-6 tile_stats_count">
+    <div class="left"></div>
+    <div class="right">
+      <span class="count_top">
+        <i class="fa fa-users"></i>
+        Fluxo de pessoas</span>
+      <div class="count">{{ $pessoas['total'] }}</div>
+      <span class="count_bottom">
+        <i class="green">{{ $pessoas['atual'] }}
+        </i>
+        no local</span>
+    </div>
+  </div>
+  <div class="animated flipInY col-md-2 col-sm-4 col-xs-6 tile_stats_count">
+    <div class="left"></div>
+    <div class="right">
+      <span class="count_top">
+        <i class="fa fa-clock-o"></i>
+        Permanência média</span>
+      <div class="count">{{ get_tempo($permanencia) }}</div>
+      <span class="count_bottom">
+        <i class="green">{{ $this->currency($ticket_medio) }}
+        </i>
+        ticket médio</span>
+    </div>
+  </div>
+  <div class="animated flipInY col-md-2 col-sm-4 col-xs-6 tile_stats_count">
     <div class="left"></div>
     <div class="right">
       <span class="count_top">
@@ -164,11 +164,6 @@
               <i class="fa fa-chevron-up"></i>
             </a>
           </li>
-          <li>
-            <a class="close-link">
-              <i class="fa fa-close"></i>
-            </a>
-          </li>
         </ul>
         <div class="clearfix"></div>
       </div>
@@ -206,11 +201,6 @@
           <li>
             <a class="collapse-link">
               <i class="fa fa-chevron-up"></i>
-            </a>
-          </li>
-          <li>
-            <a class="close-link">
-              <i class="fa fa-close"></i>
             </a>
           </li>
         </ul>
@@ -260,16 +250,11 @@
   <div class="col-md-4 col-sm-4 col-xs-12">
     <div class="x_panel tile fixed_height_320">
       <div class="x_title">
-        <h2 id="meta-name">Meta mensal</h2>
+        <h2 id="meta-name">Expectativa mensal</h2>
         <ul class="nav navbar-right panel_toolbox">
           <li>
             <a class="collapse-link">
               <i class="fa fa-chevron-up"></i>
-            </a>
-          </li>
-          <li>
-            <a class="close-link">
-              <i class="fa fa-close"></i>
             </a>
           </li>
         </ul>
@@ -280,19 +265,19 @@
           <ul class="quick-list">
             <li>
               <i class="fa fa-line-chart"></i>
-              <a href="#" range="anual">Meta anual</a>
+              <a href="#" range="anual">Expectativa anual</a>
             </li>
             <li>
               <i class="fa fa-pie-chart"></i>
-              <a href="#" range="mensal">Meta mensal</a>
+              <a href="#" range="mensal">Expectativa mensal</a>
             </li>
             <li>
               <i class="fa fa-bar-chart"></i>
-              <a href="#" range="semanal">Meta semanal</a>
+              <a href="#" range="semanal">Expectativa semanal</a>
             </li>
             <li>
               <i class="fa fa-area-chart"></i>
-              <a href="#" range="diaria">Meta diária</a>
+              <a href="#" range="diaria">Expectativa diária</a>
             </li>
           </ul>
 

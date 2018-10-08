@@ -1026,22 +1026,11 @@ class Estoque extends SyncModel
     }
 
     /**
-     * Filter select array with allowed fields
-     * @param  array $select selectable fields
-     * @return array allowed select fields
-     */
-    private static function filterSelect($select)
-    {
-        $allowed = self::getAllowedKeys();
-        return Filter::keys($select, $allowed, 'e.');
-    }
-
-    /**
      * Filter condition array with allowed fields
      * @param array $condition condition to filter rows
      * @return array allowed condition
      */
-    private static function filterCondition($condition)
+    protected static function filterCondition($condition)
     {
         $allowed = self::getAllowedKeys();
         return Filter::keys($condition, $allowed, 'e.');
@@ -1053,7 +1042,7 @@ class Estoque extends SyncModel
      * @param array $order order rows
      * @return SelectQuery query object with condition statement
      */
-    private static function query($condition = [], $order = [])
+    protected static function query($condition = [], $order = [])
     {
         $query = DB::from('Estoque e');
         $condition = self::filterCondition($condition);
@@ -1104,24 +1093,6 @@ class Estoque extends SyncModel
     }
 
     /**
-     * Search one register with a condition
-     * @param  array $condition Condition for searching the row
-     * @param  array $order order rows
-     * @return Estoque A filled Estoque or empty instance
-     */
-    public static function sum($condition, $field)
-    {
-        $query = self::query($condition);
-        $fields = self::filterSelect([strval($field) => 1]);
-        if (empty($fields)) {
-            return null;
-        }
-        reset($fields);
-        $field = key($fields);
-        return $query->select(null)->select("SUM($field)")->fetchColumn();
-    }
-
-    /**
      * Sum quantity of product id
      * @param  int $produto_id product id to sum stock quantity
      * @param  int $setor_id product sector id to filter stock
@@ -1136,7 +1107,7 @@ class Estoque extends SyncModel
         if (!is_null($setor_id)) {
             $condition['setorid'] = $setor_id;
         }
-        return (float)self::sum($condition, 'quantidade');
+        return (float)self::sum(['quantidade'], $condition);
     }
 
     /**

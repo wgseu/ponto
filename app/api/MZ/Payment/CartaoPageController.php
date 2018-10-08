@@ -77,7 +77,7 @@ class CartaoPageController extends PageController
         $count = Cartao::count($condition);
         $page = max(1, $this->getRequest()->query->getInt('pagina', 1));
         $pager = new \Pager($count, $limite, $page, 'pagina');
-        $pagination = $pager->genBasic();
+        $pagination = $pager->genPages();
         $cartoes = Cartao::findAll($condition, $order, $limite, $pager->offset);
 
         if ($this->isJson()) {
@@ -113,7 +113,7 @@ class CartaoPageController extends PageController
                 $old_cartao->clean($cartao);
                 $msg = sprintf(
                     'Cartão "%s" cadastrado com sucesso!',
-                    $cartao->getDescricao()
+                    $cartao->getBandeira()
                 );
                 if ($this->isJson()) {
                     return $this->json()->success(['item' => $cartao->publish()], $msg);
@@ -136,11 +136,15 @@ class CartaoPageController extends PageController
             }
         } elseif ($this->isJson()) {
             return $this->json()->error('Nenhum dado foi enviado');
-        } elseif (is_null($cartao->getDescricao())) {
+        } elseif (is_null($cartao->getBandeira())) {
             $cartao->setAtivo('Y');
         }
         $_carteiras = Carteira::findAll();
-        $_imagens = Cartao::getImages();
+        $_formas_de_pagamento = FormaPagto::findAll(['tipo' => [
+            FormaPagto::TIPO_CREDITO,
+            FormaPagto::TIPO_DEBITO,
+            FormaPagto::TIPO_VALE,
+        ]]);
         return $this->view('gerenciar_cartao_cadastrar', get_defined_vars());
     }
 
@@ -168,7 +172,7 @@ class CartaoPageController extends PageController
                 $old_cartao->clean($cartao);
                 $msg = sprintf(
                     'Cartão "%s" atualizado com sucesso!',
-                    $cartao->getDescricao()
+                    $cartao->getBandeira()
                 );
                 if ($this->isJson()) {
                     return $this->json()->success(['item' => $cartao->publish()], $msg);
@@ -193,7 +197,11 @@ class CartaoPageController extends PageController
             return $this->json()->error('Nenhum dado foi enviado');
         }
         $_carteiras = Carteira::findAll();
-        $_imagens = Cartao::getImages();
+        $_formas_de_pagamento = FormaPagto::findAll(['tipo' => [
+            FormaPagto::TIPO_CREDITO,
+            FormaPagto::TIPO_DEBITO,
+            FormaPagto::TIPO_VALE,
+        ]]);
         return $this->view('gerenciar_cartao_editar', get_defined_vars());
     }
 
@@ -213,7 +221,7 @@ class CartaoPageController extends PageController
         try {
             $cartao->delete();
             $cartao->clean(new Cartao());
-            $msg = sprintf('Cartão "%s" excluído com sucesso!', $cartao->getDescricao());
+            $msg = sprintf('Cartão "%s" excluído com sucesso!', $cartao->getBandeira());
             if ($this->isJson()) {
                 return $this->json()->success([], $msg);
             }
@@ -221,7 +229,7 @@ class CartaoPageController extends PageController
         } catch (\Exception $e) {
             $msg = sprintf(
                 'Não foi possível excluir o cartão "%s"!',
-                $cartao->getDescricao()
+                $cartao->getBandeira()
             );
             if ($this->isJson()) {
                 return $this->json()->error($msg);

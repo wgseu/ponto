@@ -46,7 +46,7 @@ class EstoqueOldApiController extends \MZ\Core\ApiController
             $estoque->filter(new Estoque());
             $estoque->setTipoMovimento(Estoque::TIPO_MOVIMENTO_ENTRADA);
             $estoque->setSetorID($setor->getID());
-            $estoque->setFuncionarioID(app()->auth->provider->getID());
+            $estoque->setPrestadorID(app()->auth->provider->getID());
             $estoque->setCancelado('N');
             $estoque->insert();
             return $this->json()->success(['estoque' => $estoque->publish()]);

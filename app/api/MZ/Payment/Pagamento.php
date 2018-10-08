@@ -1156,7 +1156,7 @@ class Pagamento extends SyncModel
      * @param array $condition condition to filter rows
      * @return array allowed condition
      */
-    private static function filterCondition($condition)
+    protected static function filterCondition($condition)
     {
         $allowed = self::getAllowedKeys();
         if (isset($condition['search'])) {
@@ -1170,6 +1170,16 @@ class Pagamento extends SyncModel
                 $condition[$field] = '%'.$search.'%';
                 $allowed[$field] = true;
             }
+        }
+        if (isset($condition['apartir_datacompensacao'])) {
+            $field = 'p.datacompensacao >= ?';
+            $condition[$field] = Filter::datetime($condition['apartir_datacompensacao'], '00:00:00');
+            $allowed[$field] = true;
+        }
+        if (isset($condition['ate_datacompensacao'])) {
+            $field = 'p.datacompensacao <= ?';
+            $condition[$field] = Filter::datetime($condition['ate_datacompensacao'], '23:59:59');
+            $allowed[$field] = true;
         }
         if (isset($condition['apartir_datalancamento'])) {
             $field = 'p.datalancamento >= ?';
@@ -1186,23 +1196,23 @@ class Pagamento extends SyncModel
             $condition[$field] = $condition['!pedidoid'];
             $allowed[$field] = true;
         }
-        if (array_key_exists('!pagtocontaid', $condition)) {
+        if (array_key_exists('!contaid', $condition)) {
             $field = 'NOT p.contaid';
-            $condition[$field] = $condition['!pagtocontaid'];
+            $condition[$field] = $condition['!contaid'];
             $allowed[$field] = true;
         }
-        if (isset($condition['apartir_total'])) {
+        if (isset($condition['apartir_valor'])) {
             $field = 'p.valor >= ?';
-            $condition[$field] = $condition['apartir_total'];
+            $condition[$field] = $condition['apartir_valor'];
             $allowed[$field] = true;
         }
-        if (isset($condition['ate_total'])) {
+        if (isset($condition['ate_valor'])) {
             $field = 'p.valor <= ?';
-            $condition[$field] = $condition['ate_total'];
+            $condition[$field] = $condition['ate_valor'];
             $allowed[$field] = true;
         }
         if (isset($condition['receitas'])) {
-            $field = '(NOT p.pedidoid IS NULL OR (p.valor >= 0 AND NOT p.contaid IS NULL))';
+            $field = '(NOT p.pedidoid IS NULL OR (p.valor > 0 AND NOT p.contaid IS NULL))';
             $allowed[$field] = true;
         }
         $allowed['m.sessaoid'] = true;
@@ -1215,7 +1225,7 @@ class Pagamento extends SyncModel
      * @param array $order order rows
      * @return SelectQuery query object with condition statement
      */
-    private static function query($condition = [], $order = [])
+    protected static function query($condition = [], $order = [])
     {
         $condition = self::filterCondition($condition);
         $query = DB::from('Pagamentos p');
@@ -1297,8 +1307,8 @@ class Pagamento extends SyncModel
 
     public static function getDespesas($condition)
     {
-        $condition['ate_total'] = 0.0;
-        $condition['!pagtocontaid'] = null;
+        $condition['ate_valor'] = 0.0;
+        $condition['!contaid'] = null;
         return self::rawFindTotal($condition);
     }
 

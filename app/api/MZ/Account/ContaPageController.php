@@ -46,7 +46,7 @@ class ContaPageController extends PageController
         $count = Conta::count($condition);
         $page = max(1, $this->getRequest()->query->getInt('pagina', 1));
         $pager = new \Pager($count, $limite, $page, 'pagina');
-        $pagination = $pager->genBasic();
+        $pagination = $pager->genPages();
         $contas = Conta::findAll($condition, $order, $limite, $pager->offset);
 
         if ($this->isJson()) {

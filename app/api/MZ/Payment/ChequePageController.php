@@ -41,63 +41,61 @@ class ChequePageController extends PageController
         $limite = max(1, min(100, $this->getRequest()->query->getInt('limite', 10)));
         $condition = Filter::query($this->getRequest()->query->all());
         unset($condition['ordem']);
-        $folha_cheque = new Cheque($condition);
         $cheque = new Cheque($condition);
         $order = Filter::order($this->getRequest()->query->get('ordem', ''));
         $count = Cheque::count($condition);
         $page = max(1, $this->getRequest()->query->getInt('pagina', 1));
         $pager = new \Pager($count, $limite, $page, 'pagina');
         $pagination = $pager->genPages();
-        $folhas_de_cheques = Cheque::findAll($condition, $order, $limite, $pager->offset);
+        $cheques = Cheque::findAll($condition, $order, $limite, $pager->offset);
 
         if ($this->isJson()) {
             $items = [];
-            foreach ($folhas_de_cheques as $_folha_cheque) {
-                $items[] = $_folha_cheque->publish();
+            foreach ($cheques as $_cheque) {
+                $items[] = $_cheque->publish();
             }
             return $this->json()->success(['items' => $items]);
         }
-
         $_banco = $cheque->findBancoID();
         $_cliente = $cheque->findClienteID();
         $estados = [
             'N' => 'A compensar',
             'Y' => 'Recolhido',
         ];
-        return $this->view('gerenciar_folha_cheque_index', get_defined_vars());
+        return $this->view('gerenciar_cheque_index', get_defined_vars());
     }
 
     public function recall()
     {
         $this->needPermission([Permissao::NOME_PAGAMENTO]);
         $id = $this->getRequest()->query->getInt('id', null);
-        $folha_cheque = Cheque::findByID($id);
-        if (!$folha_cheque->exists()) {
-            $msg = 'A folha de cheque não foi informada ou não existe';
+        $cheque = Cheque::findByID($id);
+        if (!$cheque->exists()) {
+            $msg = 'O cheque não foi informado ou não existe';
             if ($this->isJson()) {
                 return $this->json()->error($msg);
             }
             \Thunder::warning($msg);
-            return $this->redirect('/gerenciar/folha_cheque/');
+            return $this->redirect('/gerenciar/cheque/');
         }
         try {
-            $folha_cheque->recolher();
-            $msg = sprintf('Folha de cheque "%s" compensada com sucesso!', $folha_cheque->getNumero());
+            $cheque->recolher();
+            $msg = sprintf('Cheque "%s" compensado com sucesso!', $cheque->getNumero());
             if ($this->isJson()) {
                 return $this->json()->success([], $msg);
             }
             \Thunder::success($msg, true);
         } catch (\Exception $e) {
             $msg = sprintf(
-                'Não foi possível recolher a folha de cheque "%s"',
-                $folha_cheque->getNumero()
+                'Não foi possível recolher o cheque "%s"',
+                $cheque->getNumero()
             );
             if ($this->isJson()) {
                 return $this->json()->error($msg);
             }
             \Thunder::error($msg);
         }
-        return $this->redirect('/gerenciar/folha_cheque/');
+        return $this->redirect('/gerenciar/cheque/');
     }
 
     /**
@@ -108,14 +106,14 @@ class ChequePageController extends PageController
     {
         return [
             [
-                'name' => 'folha_cheque_find',
-                'path' => '/gerenciar/folha_cheque/',
+                'name' => 'cheque_find',
+                'path' => '/gerenciar/cheque/',
                 'method' => 'GET',
                 'controller' => 'find',
             ],
             [
-                'name' => 'folha_cheque_recall',
-                'path' => '/gerenciar/folha_cheque/recolher',
+                'name' => 'cheque_recall',
+                'path' => '/gerenciar/cheque/recolher',
                 'method' => 'GET',
                 'controller' => 'recall',
             ],

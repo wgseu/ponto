@@ -125,7 +125,26 @@ if not stock_columns:
 service_columns = find_columns(ws, r"servico", col_first, col_row)
 if not service_columns:
 	print("Nenhuma coluna de cobrar servico encontrada!")
-
+# detect ncm columns
+ncm_columns = find_columns(ws, r"ncm", col_first, col_row)
+if not ncm_columns:
+	print("Nenhuma coluna de NCM encontrada!")
+# detect imposto columns
+imposto_columns = find_columns(ws, r"(?:imposto|ˆst$|ˆcst$)", col_first, col_row)
+if not imposto_columns:
+	print("Nenhuma coluna de imposto encontrada!")
+# detect origem columns
+origem_columns = find_columns(ws, r"origem", col_first, col_row)
+if not origem_columns:
+	print("Nenhuma coluna de origem encontrada!")
+# detect cfop columns
+cfop_columns = find_columns(ws, r"cfop", col_first, col_row)
+if not cfop_columns:
+	print("Nenhuma coluna de cfop encontrada!")
+# detect cest columns
+cest_columns = find_columns(ws, r"cest", col_first, col_row)
+if not cest_columns:
+	print("Nenhuma coluna de cest encontrada!")
 
 # save data
 filename = os.path.join(path, "MySQLBackup.utf8.sql")
@@ -194,6 +213,33 @@ with open(filename, "w") as fd:
 		fd.write("INSERT INTO Setores (Nome, Descricao) VALUES\n")
 		fd.write("	(" + sql_field(setor) + ", " + sql_field(descricao, "'") + ") ON DUPLICATE KEY UPDATE Nome = VALUES(Nome);\n")
 
+	fd.write("\n-- Tributacoes\n")
+	taxation = set()
+	for row in xrange(rfirst, rlast):
+		codigo_produto = get_cell(ws, row, code_columns)
+		if not codigo_produto:
+			continue
+		if codigo_produto in taxation:
+			continue
+		ncm = get_cell(ws, row, ncm_columns)
+		if len(str(ncm)) != 8:
+			ncm = None
+		if not ncm: 
+			continue
+		cest = get_cell(ws, row, cest_columns)
+		origem = get_cell(ws, row, origem_columns)
+		if origem == None or len(str(origem)) == 0:
+			continue
+		operacao = get_cell(ws, row, cfop_columns)
+		if not operacao:
+			continue
+		imposto = get_cell(ws, row, imposto_columns)
+		if not imposto:
+			continue
+		taxation.add(codigo_produto)
+		fd.write("INSERT INTO Tributacoes (ID, NCM, CEST, OrigemID, OperacaoID, ImpostoID) VALUES\n")
+		fd.write("	(" + sql_int(codigo_produto) + ", " + sql_field(ncm) + ", " + sql_field(cest) + ", (SELECT ID FROM Origens WHERE Codigo = " + sql_int(origem) + "), (SELECT ID FROM Operacoes WHERE Codigo = " + sql_int(operacao) + "), (SELECT ID FROM Impostos WHERE Codigo = " + sql_int(imposto) + ")) ON DUPLICATE KEY UPDATE ID = VALUES(ID);\n")
+
 	fd.write("\n-- Produtos\n")
 	for row in xrange(rfirst, rlast):
 		codigo = get_cell(ws, row, code_columns)
@@ -239,8 +285,9 @@ with open(filename, "w") as fd:
 		visivel = get_cell(ws, row, visibility_columns)
 		divisivel = get_cell(ws, row, divisibility_columns)
 		cobrar_servico = get_cell(ws, row, service_columns)
-		fd.write("INSERT INTO Produtos (ID, CodigoBarras, Descricao, PrecoVenda, Abreviacao, Detalhes, Tipo, QuantidadeLimite, Visivel, Divisivel, CobrarServico, DataAtualizacao, CategoriaID, UnidadeID, SetorPreparoID) VALUES\n")
-		fd.write("	(" + sql_int(codigo) + ", " + sql_field(codigo_barras) + ", " + sql_field(descricao) + ", " + sql_float(preco) + ", " + sql_field(abreviacao) + ", " + sql_field(detalhes) + ", " + sql_field(tipo, "'") + ", " + sql_float(limite) + ", " + sql_bool(visivel, 'Y') + ", " + sql_bool(divisivel, 'N') + ", " + sql_bool(cobrar_servico, 'Y') + ", NOW(), " +  categoria_sql + ", (SELECT ID FROM Unidades WHERE Sigla = " + sql_field(unidade) + "), (SELECT ID FROM Setores WHERE Nome = " + sql_field(setor) + ")) ON DUPLICATE KEY UPDATE DataAtualizacao = VALUES(DataAtualizacao);\n")
+		tributacao = codigo if codigo in taxation else None
+		fd.write("INSERT INTO Produtos (ID, CodigoBarras, Descricao, PrecoVenda, Abreviacao, Detalhes, Tipo, QuantidadeLimite, Visivel, Divisivel, CobrarServico, DataAtualizacao, CategoriaID, UnidadeID, SetorPreparoID, TributacaoID) VALUES\n")
+		fd.write("	(" + sql_int(codigo) + ", " + sql_field(codigo_barras) + ", " + sql_field(descricao) + ", " + sql_float(preco) + ", " + sql_field(abreviacao) + ", " + sql_field(detalhes) + ", " + sql_field(tipo, "'") + ", " + sql_float(limite) + ", " + sql_bool(visivel, 'Y') + ", " + sql_bool(divisivel, 'N') + ", " + sql_bool(cobrar_servico, 'Y') + ", NOW(), " +  categoria_sql + ", (SELECT ID FROM Unidades WHERE Sigla = " + sql_field(unidade) + "), (SELECT ID FROM Setores WHERE Nome = " + sql_field(setor) + "), (" + sql_int(tributacao) + ")) ON DUPLICATE KEY UPDATE DataAtualizacao = VALUES(DataAtualizacao);\n")
 
 	fd.close()
 	convert_encoding(filename, os.path.join(path, "MySQLBackup.sql"))

@@ -20,7 +20,7 @@
         </select>
       </div>
       {% $_cliente_fornecedor = $_fornecedor->findEmpresaID() %}
-      <input type="hidden" id="fornecedorid_ref" name="fornecedorid" data-nome="{{ $_cliente_fornecedor->getNome() }}" value="{{ $_fornecedor->getID() }}">
+      <input type="hidden" id="fornecedorid_ref" name="fornecedorid" data-content="{{ $_cliente_fornecedor->getNome() }}" value="{{ $_fornecedor->getID() }}">
       <div class="form-group col-lg-3 col-md-6 col-sm-6 col-xs-12">
         <label for="fornecedorid">Fornecedor:
           <span class="identifier">{{ \MZ\Util\Mask::phone($_cliente_fornecedor->getTelefone()->getNumero()) }}

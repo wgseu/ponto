@@ -306,6 +306,7 @@ class Credito extends SyncModel
     public function validate()
     {
         $errors = [];
+        $old_credito = self::findByID($this->getID());
         if (is_null($this->getClienteID())) {
             $errors['clienteid'] = _t('credito.cliente_id_cannot_empty');
         }
@@ -393,6 +394,16 @@ class Credito extends SyncModel
             ->where('id', $this->getID())
             ->execute();
         return $result;
+    }
+
+    /**
+     * Cancel this credit
+     * @return self Self instance filled or empty
+     */
+    public function cancel()
+    {
+        $this->setCancelado('Y');
+        return $this->update();
     }
 
     /**

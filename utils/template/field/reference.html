@@ -8,10 +8,10 @@ $[field.if(searchable)]
   <label for="$[field]">$[Field.name]:</label>
   <select class="form-control" id="$[field]" name="$[field]">
 $[field.if(null)]
-    <option value="" {{ is_null($$[table.unix]->get$[Field.norm]())?'selected':'' }}>Não informad$[field.gender]</option>
+    <option value="" {{ is_null($$[table.unix]->get$[Field.norm]()) ? 'selected' : '' }}>Não informad$[field.gender]</option>
 $[field.end]
 {% for $_$[reference.unix] in $_$[reference.unix.plural] %}
-    <option value="{{ $_$[reference.unix]->get$[Reference.pk.norm]() }}" {{ $$[table.unix]->get$[Field.norm]() == $_$[reference.unix]->get$[Reference.pk.norm]()?'selected':'' }}>{{ $_$[reference.unix]->get$[Reference.desc.norm]() }}</option>
+    <option value="{{ $_$[reference.unix]->get$[Reference.pk.norm]() }}" {{ $$[table.unix]->get$[Field.norm]() == $_$[reference.unix]->get$[Reference.pk.norm]() ? 'selected' : '' }}>{{ $_$[reference.unix]->get$[Reference.desc.norm]() }}</option>
 {% endfor %}
   </select>
 </div>$[field.end]

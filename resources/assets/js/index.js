@@ -1062,7 +1062,7 @@ Gerenciar.cliente.initField = function(input, field, tipo) {
       return response.clientes;
     },
     field,
-    'data-nome'
+    'data-content'
   );
 };
 Gerenciar.cliente.initForm = function(focus_ctrl) {
@@ -2197,16 +2197,6 @@ Gerenciar.produto_pedido.initForm = function(focus_ctrl) {
   $('#precocompra').autoNumeric('init');
   if (focus_ctrl != undefined) $('#' + focus_ctrl).focus();
 };
-Gerenciar.cheque = {};
-Gerenciar.cheque.init = function() {
-  ajaxLink();
-  $('#search').focus();
-};
-Gerenciar.cheque.initForm = function(focus_ctrl) {
-  $('#parcelas').autoNumeric('init');
-  $('#total').autoNumeric('init');
-  if (focus_ctrl != undefined) $('#' + focus_ctrl).focus();
-};
 Gerenciar.classificacao = {};
 Gerenciar.classificacao.init = function() {
   ajaxLink();
@@ -2245,10 +2235,33 @@ Gerenciar.conta.init = function() {
 };
 Gerenciar.conta.initForm = function(focus_ctrl) {
   function tipoAlterado(tipo) {
-    if (tipo == '1') {
+    if (tipo == 'Receita') {
       $('#cliente-label').text('Cliente: ');
     } else {
       $('#cliente-label').text('Fornecedor: ');
+    }
+  }
+  function modoAutomatico(marcado) {
+    if (marcado) {
+      $('#fonte')
+        .closest('.form-group')
+        .removeClass('hidden');
+      $('#frequencia')
+        .closest('.form-group')
+        .removeClass('hidden');
+      $('#modo')
+        .closest('.form-group')
+        .removeClass('hidden');
+    } else {
+      $('#fonte')
+        .closest('.form-group')
+        .addClass('hidden');
+      $('#modo')
+        .closest('.form-group')
+        .addClass('hidden');
+      $('#frequencia')
+        .closest('.form-group')
+        .addClass('hidden');
     }
   }
   $('#tipo').change(function() {
@@ -2263,19 +2276,30 @@ Gerenciar.conta.initForm = function(focus_ctrl) {
       .find(':selected')
       .val()
   );
+  $('#automatico').click(function() {
+    modoAutomatico(
+      $('#automatico')
+        .is(':checked')
+    );
+  });
+  modoAutomatico(
+    $('#automatico')
+      .is(':checked')
+  );
   $('#valor').autoNumeric('init');
   $('#acrescimo').autoNumeric('init');
   $('#multa').autoNumeric('init');
   $('#juros').autoNumeric('init');
+  $('#frequencia').autoNumeric('init');
   $.datetimepicker.setLocale('pt-BR');
   $('#vencimento').mask('99/99/9999');
   $('#vencimento').datetimepicker({
     format: 'd/m/Y',
     enterLikeTab: false
   });
-  $('#dataemissao').mask('99/99/9999');
+  $('#dataemissao').mask('99/99/9999 99:99');
   $('#dataemissao').datetimepicker({
-    format: 'd/m/Y',
+    format: 'd/m/Y H:i',
     enterLikeTab: false
   });
   $('#datapagamento').mask('99/99/9999');
@@ -2286,16 +2310,9 @@ Gerenciar.conta.initForm = function(focus_ctrl) {
   if (focus_ctrl != undefined) $('#' + focus_ctrl).focus();
   Gerenciar.cliente.initField('#clienteid', '#clienteid_ref');
   Gerenciar.classificacao.initField('#classificacaoid', function(search) {
-    return { search: search, classificacaoid: '', saida: 'json' };
+    return { search: search, saida: 'json' };
   });
-  Gerenciar.classificacao.initField('#subclassificacaoid', function(search) {
-    return {
-      search: search,
-      classificacaoid: $('#classificacaoid_ref').val(),
-      saida: 'json'
-    };
-  });
-  $('#raw_anexocaminho').change(function() {
+  $('#raw_anexourl').change(function() {
     var input = $(this),
       label = input
         .val()
@@ -2306,13 +2323,13 @@ Gerenciar.conta.initForm = function(focus_ctrl) {
       .find(':text');
     if (input.length) text.val(label);
   });
-  $('#clear_anexocaminho').click(function() {
+  $('#clear_anexourl').click(function() {
     var text = $(this)
       .parents('.input-group')
       .find(':text');
-    $('#anexocaminho').val('');
+    $('#anexourl').val('');
     text.val('');
-    var input = $('#raw_anexocaminho');
+    var input = $('#raw_anexourl');
     input.replaceWith((input = input.clone(true)));
   });
 };
@@ -2371,8 +2388,8 @@ Gerenciar.auditoria.init = function() {
 Gerenciar.auditoria.initForm = function(focus_ctrl) {
   if (focus_ctrl != undefined) $('#' + focus_ctrl).focus();
 };
-Gerenciar.folha_cheque = {};
-Gerenciar.folha_cheque.init = function() {
+Gerenciar.cheque = {};
+Gerenciar.cheque.init = function() {
   ajaxLink();
   $('#cliente').focus();
   $('#estado').change(function() {
@@ -2382,13 +2399,6 @@ Gerenciar.folha_cheque.init = function() {
   });
   Gerenciar.banco.initField('#bancoid');
   Gerenciar.cliente.initField('#clienteid', '#clienteid_ref');
-};
-Gerenciar.folha_cheque.initForm = function(focus_ctrl) {
-  $('#valor').autoNumeric('init');
-  $('#c1').autoNumeric('init');
-  $('#c2').autoNumeric('init');
-  $('#c3').autoNumeric('init');
-  if (focus_ctrl != undefined) $('#' + focus_ctrl).focus();
 };
 Gerenciar.composicao = {};
 Gerenciar.composicao.init = function() {
@@ -2452,7 +2462,7 @@ Gerenciar.fornecedor.initField = function(input, field) {
     },
     undefined,
     field,
-    'data-nome'
+    'data-content'
   );
 };
 Gerenciar.fornecedor.initForm = function(focus_ctrl) {

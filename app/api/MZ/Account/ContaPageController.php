@@ -28,6 +28,7 @@ use MZ\System\Permissao;
 use MZ\Database\DB;
 use MZ\Util\Filter;
 use MZ\Core\PageController;
+use MZ\Wallet\Carteira;
 
 /**
  * Allow application to serve system resources
@@ -75,7 +76,6 @@ class ContaPageController extends PageController
         $conta->setID(null);
         $conta->setVencimento(DB::now());
         $conta->setDataEmissao(DB::now());
-        $conta->setDataPagamento(null);
 
         $focusctrl = 'descricao';
         $errors = [];
@@ -84,8 +84,7 @@ class ContaPageController extends PageController
             $conta = new Conta($this->getData());
             try {
                 $old_conta->setFuncionarioID(app()->auth->provider->getID());
-                $despesa = $this->getRequest()->request->getInt('tipo') < 0;
-                $conta->filter($old_conta, $despesa, true);
+                $conta->filter($old_conta, true);
                 $conta->insert();
                 $old_conta->clean($conta);
                 $msg = sprintf(
@@ -114,8 +113,18 @@ class ContaPageController extends PageController
         } elseif ($this->isJson()) {
             return $this->json()->error('Nenhum dado foi enviado');
         }
+        $tipo_options = Conta::getTipoOptions();
+        $fonte_options = Conta::getFonteOptions();
+        $modo_options = Conta::getModoOptions();
+        $formula_options = Conta::getFormulaOptions();
         $classificacao_id_obj = $conta->findClassificacaoID();
-        $sub_classificacao_id_obj = $conta->findSubClassificacaoID();
+        $cliente_id_obj = $conta->findClienteID();
+        $_carteiras = Carteira::findAll([
+            'tipo' => [
+                Carteira::TIPO_CREDITO,
+                Carteira::TIPO_BANCARIA,
+            ]
+        ]);
         return $this->view('gerenciar_conta_cadastrar', get_defined_vars());
     }
 
@@ -138,8 +147,7 @@ class ContaPageController extends PageController
         if ($this->getRequest()->isMethod('POST')) {
             $conta = new Conta($this->getData());
             try {
-                $despesa = $this->getRequest()->request->getInt('tipo') < 0;
-                $conta->filter($old_conta, $despesa, true);
+                $conta->filter($old_conta, true);
                 $conta->update();
                 $old_conta->clean($conta);
                 $msg = sprintf(
@@ -168,9 +176,18 @@ class ContaPageController extends PageController
         } elseif ($this->isJson()) {
             return $this->json()->error('Nenhum dado foi enviado');
         }
-
+        $tipo_options = Conta::getTipoOptions();
+        $fonte_options = Conta::getFonteOptions();
+        $modo_options = Conta::getModoOptions();
+        $formula_options = Conta::getFormulaOptions();
         $classificacao_id_obj = $conta->findClassificacaoID();
-        $sub_classificacao_id_obj = $conta->findSubClassificacaoID();
+        $cliente_id_obj = $conta->findClienteID();
+        $_carteiras = Carteira::findAll([
+            'tipo' => [
+                Carteira::TIPO_CREDITO,
+                Carteira::TIPO_BANCARIA,
+            ]
+        ]);
         return $this->view('gerenciar_conta_editar', get_defined_vars());
     }
 

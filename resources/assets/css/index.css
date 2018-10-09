@@ -845,3 +845,4 @@ label .identifier {
 }
 .text-money { color: #0dc30d; }
 .text-unavailable { color: #2477f9; }
+.buttons-margin { margin-top: 25px; }

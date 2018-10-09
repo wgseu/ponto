@@ -1040,6 +1040,15 @@ class Conta extends SyncModel
     }
 
     /**
+     * Informa se a conta está cancelada
+     * @return boolean true se cancelada
+     */
+    public function isCancelada()
+    {
+        return $this->getEstado() == self::ESTADO_CANCELADA;
+    }
+
+    /**
      * Convert this instance into array associated key -> value with only public fields
      * @return array All public field and values into array format
      */
@@ -1119,6 +1128,7 @@ class Conta extends SyncModel
     public function validate()
     {
         $errors = [];
+        $old_conta = self::findByID($this->getID());
         if (is_null($this->getClassificacaoID())) {
             $errors['classificacaoid'] = _t('conta.classificacao_id_cannot_empty');
         }
@@ -1191,18 +1201,30 @@ class Conta extends SyncModel
         }
         $receitas = 0;
         if ($this->exists()) {
-            $info = self::getTotalAbertas($this->getID());
-            if (is_equal($info['receitas'], 0) && is_equal($info['despesas'], 0)) {
+            if ($old_conta->getEstado() == self::ESTADO_PAGA && $this->getEstado() != self::ESTADO_CANCELADA) {
                 $errors['id'] = 'A conta informada já foi consolidada e não pode ser alterada';
             }
-            if ($this->getTipo() == self::TIPO_RECEITA && is_greater($info['recebido'], $this->getValor())) {
-                $errors['valor'] = 'O total recebido é maior que o valor da conta';
+            if ($old_conta->getEstado() == self::ESTADO_CANCELADA) {
+                $errors['id'] = 'A conta informada já foi cancelada e não pode ser alterada';
             }
-            if ($this->getTipo() == self::TIPO_DESPESA && is_greater(-$info['pago'], -$this->getValor())) {
-                $errors['valor'] = 'O total pago é maior que o valor da conta';
+            if ((
+                    $this->getEstado() == self::ESTADO_PAGA &&
+                    !is_equal($this->getConsolidado(), $this->getValor())
+                ) ||
+                (
+                    $old_conta->getEstado() == self::ESTADO_PAGA &&
+                    !is_equal($old_conta->getConsolidado(), $this->getValor())
+                )
+            ) {
+                $errors['id'] = 'O total da conta não pode ser alterado';
             }
-            $_conta = self::findByID($this->getID());
-            $receitas = $_conta->getTotal();
+            $receitas = $old_conta->getTotal();
+        }
+        if ($this->getTipo() == self::TIPO_RECEITA && is_greater($this->getConsolidado(), $this->getValor())) {
+            $errors['valor'] = 'O total recebido é maior que o valor da conta';
+        }
+        if ($this->getTipo() == self::TIPO_DESPESA && is_greater(-$this->getConsolidado(), -$this->getValor())) {
+            $errors['valor'] = 'O total pago é maior que o valor da conta';
         }
         if (!is_null($this->getClienteID()) && $this->getValor() > 0) {
             $cliente = $this->findClienteID();

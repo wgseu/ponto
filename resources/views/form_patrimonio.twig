@@ -13,7 +13,7 @@
   </div>
 </div>
 {% $_empresa = $patrimonio->findEmpresaID() %}
-<input type="hidden" id="empresaid_ref" name="empresaid" data-nome="{{ $_empresa->getNome() }}" value="{{ $patrimonio->getEmpresaID() }}">
+<input type="hidden" id="empresaid_ref" name="empresaid" data-content="{{ $_empresa->getNome() }}" value="{{ $patrimonio->getEmpresaID() }}">
 <div class="form-group col-lg-3 col-md-6 col-sm-6 col-xs-12">
   <label for="empresaid">Empresa:
     <span class="identifier">{{ \MZ\Util\Mask::phone($_empresa->getTelefone()->getNumero()) }}
@@ -23,7 +23,7 @@
 </div>
 {% $_fornecedor = $patrimonio->findFornecedorID() %}
 {% $_fornecedor = $_fornecedor->findEmpresaID() %}
-<input type="hidden" id="fornecedorid_ref" name="fornecedorid" data-nome="{{ $_fornecedor->getNome() }}" value="{{ $patrimonio->getFornecedorID() }}">
+<input type="hidden" id="fornecedorid_ref" name="fornecedorid" data-content="{{ $_fornecedor->getNome() }}" value="{{ $patrimonio->getFornecedorID() }}">
 <div class="form-group col-lg-3 col-md-6 col-sm-6 col-xs-12">
   <label for="fornecedorid">Fornecedor:
     <span class="identifier">{{ \MZ\Util\Mask::phone($_fornecedor->getTelefone()->getNumero()) }}

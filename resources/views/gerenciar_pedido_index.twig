@@ -46,7 +46,7 @@
         </label>
         <input type="text" id="funcionarioid" class="form-control" value="{{ $_cliente_func->getNomeCompleto() }}">
       </div>
-      <input type="hidden" id="clienteid_ref" name="clienteid" data-nome="{{ $_cliente->getNomeCompleto() }}" value="{{ $_cliente->getID() }}">
+      <input type="hidden" id="clienteid_ref" name="clienteid" data-content="{{ $_cliente->getNomeCompleto() }}" value="{{ $_cliente->getID() }}">
       <div class="form-group col-lg-3 col-md-3 col-sm-3 col-xs-6">
         <label for="clienteid">Cliente:
           <span class="identifier">{{ \MZ\Util\Mask::phone($_cliente->getTelefone()->getNumero()) }}

@@ -328,6 +328,7 @@ with open(filename, "w") as fd:
 	# 'AP 201'
 	poa = re.compile(r_ini + r_apart + r_end, re.I)
 
+	enderecos = {}
 	for row, fone1 in ids.iteritems():
 		bairro = get_cell(ws, row, neighborhood_columns)
 		bairro = filter_name(bairro)
@@ -355,7 +356,12 @@ with open(filename, "w") as fd:
 			tipo = 'Apartamento'
 		else:
 			tipo = 'Casa'
-		apelido = 'Minha Casa'
+		# permite cadastrar vários endereços
+		enderecos[fone1] = enderecos.get(fone1, 0) + 1
+		if enderecos[fone1] == 1:
+			apelido = 'Minha Casa'
+		else:
+			apelido = 'Meu endereço ' + str(enderecos[fone1])
 
 		if not numero:
 			m = pnabe.search(logradouro)

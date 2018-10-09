@@ -1,7 +1,7 @@
 {{ include('header_gerenciar.twig') }}
 <script type="text/javascript">
   $(function () {
-    Gerenciar.folha_cheque.init();
+    Gerenciar.cheque.init();
   });
 </script>
 <div class="row">
@@ -9,7 +9,7 @@
     <div class="col-lg-4 col-md-6 col-sm-6 col-xs-6">
       <h3>Cheques</h3>
     </div>
-    <form method="get" action="/gerenciar/folha_cheque/" id="search-form">
+    <form method="get" action="/gerenciar/cheque/" id="search-form">
       <div class="form-group col-lg-2 col-md-6 col-sm-6 col-xs-6">
         <label for="estado">Estado:</label>
         <select class="form-control" id="estado" name="estado">
@@ -27,7 +27,7 @@
         </label>
         <input type="text" id="bancoid" class="form-control" value="{{ $_banco->getRazaoSocial() }}">
       </div>
-      <input type="hidden" id="clienteid_ref" name="clienteid" data-nome="{{ $_cliente->getNomeCompleto() }}" value="{{ $_cliente->getID() }}">
+      <input type="hidden" id="clienteid_ref" name="clienteid" data-content="{{ $_cliente->getNomeCompleto() }}" value="{{ $_cliente->getID() }}">
       <div class="form-group col-lg-3 col-md-6 col-sm-6 col-xs-12">
         <label for="clienteid">Cliente:
           <span class="identifier">{{ \MZ\Util\Mask::phone($_cliente->getTelefone()->getNumero()) }}
@@ -63,21 +63,16 @@
                 <th>Agência</th>
                 <th>Conta</th>
                 <th>Valor</th>
-                <th>Compensação</th>
                 <th>Número</th>
                 <th>Vencimento</th>
-                <th>C1</th>
-                <th>C2</th>
-                <th>C3</th>
-                <th>Série</th>
                 <th>Recolhido</th>
                 <th width="10%" style="text-align: center;">Ações</th>
               </tr>
             </thead>
             <tbody>
-              {% for $folha_cheque in $folhas_de_cheques %}
-                {% $_cheque = $folha_cheque->findChequeID() %}
-                <tr class="{{ $_cheque->isCancelado() ? 'active': ($folha_cheque->isRecolhido() ? 'success': '') }}">
+              {% for $cheque in $cheques %}
+                {% $_cheque = $cheque->findChequeID() %}
+                <tr class="{{ $_cheque->isCancelado() ? 'active': ($cheque->isRecolhido() ? 'success': '') }}">
                   {% $_banco = $_cheque->findBancoID() %}
                   {% $_cliente = $_cheque->findClienteID() %}
                   <td>{{ $_cliente->getNomeCompleto() }}</td>
@@ -86,22 +81,17 @@
                   </td>
                   <td>{{ $_cheque->getAgencia() }}</td>
                   <td>{{ $_cheque->getConta() }}</td>
-                  <td>{{ $this->currency($folha_cheque->getValor()) }}</td>
-                  <td>{{ $folha_cheque->getCompensacao() }}</td>
-                  <td>{{ $folha_cheque->getNumero() }}</td>
-                  <td>{{ $this->datetime($folha_cheque->getVencimento()) }}</td>
-                  <td>{{ $folha_cheque->getC(1) }}</td>
-                  <td>{{ $folha_cheque->getC(2) }}</td>
-                  <td>{{ $folha_cheque->getC(3) }}</td>
-                  <td>{{ $folha_cheque->getSerie() }}</td>
+                  <td>{{ $this->currency($cheque->getValor()) }}</td>
+                  <td>{{ $cheque->getNumero() }}</td>
+                  <td>{{ $this->datetime($cheque->getVencimento()) }}</td>
                   <td>
-                    <strong>{{ $folha_cheque->getRecolhido() == 'Y'?'Sim':'Não' }}</strong>
-                    <small>{{ $this->datetime($folha_cheque->getRecolhimento()) }}</small>
+                    <strong>{{ $cheque->getRecolhido() == 'Y'?'Sim':'Não' }}</strong>
+                    <small>{{ $this->datetime($cheque->getRecolhimento()) }}</small>
                   </td>
                   <td class="text-center">
                     <ul class="nav panel_toolbox">
                       <li>
-                        <a href="/gerenciar/folha_cheque/recolher?id={{ $folha_cheque->getID() }}" title="Recolher folha de cheque '{{ $folha_cheque->getNumero() }}' do cliente {{ $_cliente->getNomeCompleto() }}" class="ajaxlink" ask="Deseja recolher a folha de cheque '{{ $folha_cheque->getNumero() }}' do cliente {{ $_cliente->getNomeCompleto() }}?">
+                        <a href="/gerenciar/cheque/recolher?id={{ $cheque->getID() }}" title="Recolher folha de cheque '{{ $cheque->getNumero() }}' do cliente {{ $_cliente->getNomeCompleto() }}" class="ajaxlink" ask="Deseja recolher a folha de cheque '{{ $cheque->getNumero() }}' do cliente {{ $_cliente->getNomeCompleto() }}?">
                           <i class="fa fa-university"></i>
                         </a>
                       </li>

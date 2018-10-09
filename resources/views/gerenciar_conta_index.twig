@@ -10,7 +10,7 @@
       <h3>Contas</h3>
     </div>
     <form method="get" action="/gerenciar/conta/" id="search-form">
-      <input type="hidden" id="clienteid_ref" name="clienteid" data-nome="{{ $_cliente->getNomeCompleto() }}" value="{{ $_cliente->getID() }}">
+      <input type="hidden" id="clienteid_ref" name="clienteid" data-content="{{ $_cliente->getNomeCompleto() }}" value="{{ $_cliente->getID() }}">
       <div class="form-group col-lg-3 col-md-6 col-sm-6 col-xs-12">
         <label for="clienteid">Cliente:
           <span class="identifier">{{ \MZ\Util\Mask::phone($_cliente->getTelefone()->getNumero()) }}
@@ -63,14 +63,9 @@
               <tr>
                 <th>Descrição</th>
                 <th>Total</th>
-                <th>Cliente</th>
-                <th>Classificação</th>
-                <th>Funcionário</th>
-                <th>Acréscimo</th>
-                <th class="text-center">Multa</th>
-                <th>Data de vencimento</th>
-                <th>Número do documento</th>
-                <th class="text-center">Data de cadastro</th>
+                <th>Pago</th>
+                <th class="text-center">Cliente</th>
+                <th class="text-center">Data de vencimento</th>
                 <th width="10%" style="text-align: center;">Ações</th>
               </tr>
             </thead>
@@ -78,7 +73,13 @@
               {% for $conta in $contas %}
                 <tr class="{{ $conta->isCancelada() ? 'danger': '' }}">
                   <td>
-                    <div title="{{ $conta->getValor() > 0 ? 'Receita': 'Despesa' }}" class="cell-icon conta-icons" style="background-position: -{{ $conta->getValor() > 0?0:16 }}px 0px;"></div>
+                    {% if !is_null($conta->getAnexoURL()) %}
+                      <a href="{{ $conta->makeAnexoURL() }}" target="_blank">
+                    {% endif %}
+                        <div title="{{ $conta->getValor() > 0 ? 'Receita': 'Despesa' }} {{ $conta->getNumeroDoc() }}" class="cell-icon conta-icons" style="background-position: -{{ $conta->getValor() > 0 ? 0 : 16 }}px 0px;"></div>
+                    {% if !is_null($conta->getAnexoURL()) %}
+                      </a>
+                    {% endif %}
                     <a href="/gerenciar/conta/editar?id={{ $conta->getID() }}" title="Editar conta '{{ $conta->getDescricao() }}'">{{ $conta->getDescricao() }}</a>
                   </td>
                   <td>
@@ -88,51 +89,12 @@
                       <small title="Valor inicial da conta">{{ $this->currency($conta->getValor()) }}</small>
                     {% endif %}
                   </td>
+                  <td>{{ $this->currency($conta->getConsolidado()) }}</td>
                   {% $_cliente = $conta->findClienteID() %}
-                  <td>
+                  <td class="text-center">
                     <a href="/gerenciar/cliente/editar?id={{ $_cliente->getID() }}" title="Editar cliente '{{ $_cliente->getNomeCompleto() }}'">{{ $_cliente->getNomeCompleto() }}</a>
                   </td>
-                  {% $_classificacao = $conta->findClassificacaoID() %}
-                  <td>
-                    <strong>
-                      <a href="/gerenciar/classificacao/editar?id={{ $_classificacao->getID() }}" title="Editar classificação '{{ $_classificacao->getDescricao() }}'">{{ $_classificacao->getDescricao() }}</a>
-                    </strong>
-                    {% $_classificacao = $conta->findSubClassificacaoID() %}
-                    <small>
-                      <a href="/gerenciar/classificacao/editar?id={{ $_classificacao->getID() }}" title="Editar classificação '{{ $_classificacao->getDescricao() }}'">{{ $_classificacao->getDescricao() }}</a>
-                    </small>
-                  </td>
-                  {% $_funcionario = $conta->findFuncionarioID() %}
-                  {% $_cliente_fun = $_funcionario->findClienteID() %}
-                  <td>
-                    <a href="/gerenciar/funcionario/editar?id={{ $_funcionario->getID() }}" title="Editar funcionário '{{ $_cliente_fun->getNomeCompleto() }}'">{{ $_cliente_fun->getNomeCompleto() }}</a>
-                  </td>
-                  <td>
-                    {% if $conta->isAutoAcrescimo() %}
-                      <div title="Acréscimo automático" class="cell-icon conta-icons" style="background-position: -48px 0px;"></div>
-                    {% endif %}
-                    {{ $this->currency($conta->getAcrescimo()) }}
-                  </td>
-                  <td class="text-center">
-                    <strong title="Multa">{{ $this->currency($conta->getMulta()) }}</strong>
-                    <small title="Juros">{{ $conta->getJuros() * 100 }}%</small>
-                  </td>
-                  <td>{{ $this->date($conta->getVencimento()) }}</td>
-                  <td>
-                    {% if !is_null($conta->getAnexoCaminho()) %}
-                      {% if !is_local_path($conta->getAnexoCaminho()) %}
-                        <a href="{{ get_document_url($conta->getAnexoCaminho(), 'conta') }}" target="_blank">
-                        {% endif %}
-                        <div title="Anexo" class="cell-icon conta-icons" style="background-position: -32px 0px;"></div>
-                        {% if !is_local_path($conta->getAnexoCaminho()) %}{% endif %}
-                      </a>
-                    {% endif %}
-                    {{ $conta->getNumeroDoc() }}
-                  </td>
-                  <td class="text-center">
-                    <strong title="Data de cadastro">{{ $this->date($conta->getDataCadastro()) }}</strong>
-                    <small title="Data de emissão">{{ $this->date($conta->getDataEmissao()) }}</small>
-                  </td>
+                  <td class="text-center">{{ $this->date($conta->getVencimento()) }}</td>
                   <td class="text-center">
                     <ul class="nav panel_toolbox">
                       <li>

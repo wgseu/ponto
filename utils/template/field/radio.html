@@ -3,7 +3,7 @@
   <div id="$[field]">
 $[field.each(option)]
     <label class="radio-inline" for="$[field]-$[field.option.unix]">
-      <input type="radio" id="$[field]-$[field.option.unix]" name="$[field]" value="$[field.option]" {{ $$[table.unix]->get$[Field.norm]() == '$[field.option]'?'checked':'' }}>$[Field.option.name]
+      <input type="radio" id="$[field]-$[field.option.unix]" name="$[field]" value="$[field.option]" {{ $$[table.unix]->get$[Field.norm]() == '$[field.option]' ? 'checked' : '' }}>$[Field.option.name]
     </label>
 $[field.end]
   </div>

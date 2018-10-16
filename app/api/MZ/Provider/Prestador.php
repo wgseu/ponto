@@ -706,10 +706,9 @@ class Prestador extends SyncModel
 
     /**
      * Check if this provider is the company owner
-     * @param array $permissoes provider permissions
      * @return boolean true if provider is the company owner
      */
-    public function isOwner($permissoes = null)
+    public function isOwner()
     {
         $cliente = app()->auth->user->getID() == $this->getClienteID() ? app()->auth->user : $this->findClienteID();
         return $cliente->getEmpresaID() == app()->system->company->getID() || app()->system->company->getID() == null;

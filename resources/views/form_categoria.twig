@@ -1,4 +1,4 @@
-<div class="form-group col-lg-3 col-md-4 col-sm-6 col-xs-12">
+<div class="form-group col-lg-4 col-md-6 col-sm-6 col-xs-12">
   <label for="set_imagem">Imagem:</label>
   <div id="imagem_container" class="image-view third-effect" style="height: 256px;">
     <label for="image_header" class="lbltitle">
@@ -12,10 +12,10 @@
     </div>
   </div>
 </div>
-<div class="form-group col-lg-3 col-md-4 col-sm-6 col-xs-12">
+<div class="form-group col-lg-3 col-md-6 col-sm-6 col-xs-12">
   <label for="categoriaid">Categoria superior:</label>
   <select class="form-control" id="categoriaid" name="categoriaid">
-    <option value="" {{ is_null($categoria->getCategoriaID())?'selected':'' }}>Não informada</option>
+    <option value="" {{ is_null($categoria->getCategoriaID()) ? 'selected' : '' }}>Não informada</option>
     {% for $_categoria in $_categorias %}
       {% if $categoria->getID() == $_categoria->getID() %}{% continue %}
       {% endif %}
@@ -23,11 +23,15 @@
     {% endfor %}
   </select>
 </div>
-<div class="form-group col-lg-3 col-md-4 col-sm-6 col-xs-12">
+<div class="form-group col-lg-5 col-md-6 col-sm-6 col-xs-12">
   <label for="descricao">Descrição:</label>
   <input type="text" id="descricao" name="descricao" class="form-control" value="{{ $categoria->getDescricao() }}">
 </div>
-<div class="checkbox col-lg-3 col-md-4 col-sm-6 col-xs-12">
+<div class="form-group col-lg-5 col-md-6 col-sm-6 col-xs-12">
+  <label for="detalhes">Detalhes:</label>
+  <input type="text" id="detalhes" name="detalhes" class="form-control" value="{{ $categoria->getDetalhes() }}">
+</div>
+<div class="checkbox col-lg-3 col-md-6 col-sm-6 col-xs-12">
   <label>
     <input type="checkbox" id="servico" name="servico" value="Y" {{ $categoria->getServico() == 'Y'?'checked':'' }}>
     Serviço

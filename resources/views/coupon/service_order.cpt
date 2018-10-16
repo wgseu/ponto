@@ -1,0 +1,41 @@
+{
+  "template": [
+    { "align": "center", "items": [
+        "Relatório para ", "printing.sector"
+    ]},
+    { "items": [
+        "Local: ", "order.local", { "align": "right", "items": [ "Atendente: ", "order.last_attendant" ] }
+    ]},
+    { "whitespace": "-" },
+    [ { "required": "service.product.code", "items": "Código " }, "Descrição", { "align": "right", "items": " Qtd" } ],
+    { "whitespace": "-" },
+    { "list": "order.products", "style": "bold", "width": "2x", "items": [
+        { "required": "service.product.code", "format": "%06d ", "items": "order.product.code" },
+        "order.product.description",
+        " ",
+        { "align": "right", "items": [
+            { "format": " % 4s", "items": "order.product.quantity" }
+        ]}
+    ]},
+    { "whitespace": "-" },
+    { "style": "bold", "items": [
+        "date.time", { "align": "right", "items": [ "Pedido: ", { "format": "%06d", "items": "order.id" } ] }
+    ]},
+    { "required": "service.balance", "style": "bold", "width": "2x", "items": [
+        "Saldo: ",
+        { "align": "right", "whitespace": ".", "items": [
+            "money.symbol",
+            " ",
+            { "format": "% 5s", "items": "order.payments.balance" }
+        ]}
+    ]},
+    { "required": "service.ticket", "items": [
+        "Ordem: ",
+        { "format": "%04d", "items": "ticket.number" },
+        { "align": "right", "items": [
+            "Validação: ", "ticket.token"
+        ]}
+    ]},
+    { "whitespace": "=" }
+  ]
+}

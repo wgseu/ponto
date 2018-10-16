@@ -37,7 +37,7 @@ use MZ\Exception\ValidationException;
  */
 class Dispositivo extends SyncModel
 {
-    const CONCAT_TOKEN = '@uF4K2g:[C^3g6R';
+    const CONCAT_TOKEN = 'a*9Jh654';
 
     /**
      * Tipo de dispositivo
@@ -430,12 +430,12 @@ class Dispositivo extends SyncModel
         }
         $device_count = self::count();
         if ($device_count > app()->getSystem()->getDispositivos()) {
-            $errors['tipo'] = 'Limite de dispositivos excedido, remova os dispositivos excedentes para continuar';
+            $errors['limite'] = 'Limite de dispositivos excedido, remova os dispositivos excedentes para continuar';
         }
         if (!$this->exists() &&
             $device_count >= app()->getSystem()->getDispositivos()
         ) {
-            $errors['tipo'] = 'Limite de dispositivos esgotado, verifique sua licença';
+            $errors['limite'] = 'Limite de dispositivos esgotado, verifique sua licença';
         }
         if (!empty($errors)) {
             throw new ValidationException($errors);
@@ -534,7 +534,10 @@ class Dispositivo extends SyncModel
         return $result;
     }
 
-    public function register()
+    /**
+     * @param \MZ\Provider\Prestador $prestador
+     */
+    public function register($prestador)
     {
         $setor = \MZ\Environment\Setor::findDefault();
         $this->setSetorID($setor->getID());
@@ -543,16 +546,37 @@ class Dispositivo extends SyncModel
         $dispositivo = self::findBySerial($this->getSerial());
         // permite a atualização das informações para o novo dispositivo
         $this->setID($dispositivo->getID());
-        $this->validate();
+        try {
+            $this->validate();
+        } catch (ValidationException $e) {
+            $errors = $e->getErrors();
+            if ($prestador->isOwner() && count($errors) == 1 && isset($errors['limite'])) {
+                // tenta reusar dispositivos que não foram validados
+                $dispositivo = self::find(['validacao' => null]);
+                if (!$dispositivo->exists()) {
+                    // tenta reusar dispositivos cadastrados a muito tempo
+                    $dispositivo = self::find([], ['id' => 1]);
+                }
+                $this->setID($dispositivo->getID());
+            } else {
+                throw $e;
+            }
+        }
         if ($this->exists() &&
             $this->getSerial() == $dispositivo->getSerial() &&
             $this->getNome() == $dispositivo->getNome() &&
             $dispositivo->getTipo() == self::TIPO_TABLET
         ) {
             $this->fromArray($dispositivo->toArray());
+            if ($prestador->isOwner() && !$this->checkValidacao()) {
+                $this->authorize();
+            }
             return $this;
         }
         $exists = $this->exists();
+        if ($prestador->isOwner() && !$this->checkValidacao()) {
+            $this->setValidacao($this->makeValidacao());
+        }
         $this->save();
         return $this;
     }

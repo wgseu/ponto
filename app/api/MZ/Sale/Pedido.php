@@ -31,6 +31,7 @@ use MZ\Database\DB;
 use MZ\Database\SyncModel;
 use MZ\Exception\ValidationException;
 use MZ\System\Permissao;
+use MZ\Payment\Pagamento;
 
 /**
  * Informações do pedido de venda
@@ -1007,6 +1008,15 @@ class Pedido extends SyncModel
     }
 
     /**
+     * Obtém o saldo de pagamento do pedido
+     * @return float saldo restante do pedido
+     */
+    public function getSaldo()
+    {
+        return max(0, $this->getPago() - $this->getTotal());
+    }
+
+    /**
      * Convert this instance into array associated key -> value with only public fields
      * @return array All public field and values into array format
      */
@@ -1119,7 +1129,7 @@ class Pedido extends SyncModel
         if (!Validator::checkBoolean($this->getCancelado())) {
             $errors['cancelado'] = _t('pedido.cancelado_invalid');
         }
-        if (!$this->exists() && trim(app()->getSystem()->getLicenseKey()) == '') {
+        if (!$this->exists() && trim(app()->getSystem()->getLicenca()) == '') {
             $count = self::count();
             if ($count >= 20) {
                 $errors['id'] = 'Quantidade de pedidos excedido, adquira uma licença para continuar';
@@ -1349,6 +1359,53 @@ class Pedido extends SyncModel
             'apartir_criacao' => DB::now(strtotime('-1 min', strtotime($this->getDataCriacao()))),
             'ate_criacao' => DB::now(strtotime('+1 min', strtotime($this->getDataCriacao())))
         ]);
+    }
+
+    public function totalize()
+    {
+        $produtos = Item::sum(['subtotal', 'comissao'], [
+            'pedidoid' => $this->getID(),
+            'servicoid' => null,
+            'cancelado' => 'N'
+        ]);
+        $servicos = Item::sum(['subtotal'], [
+            'pedidoid' => $this->getID(),
+            'produtoid' => null,
+            'cancelado' => 'N',
+            'apartir_preco' => 0,
+        ]);
+        $descontos = Item::sum(['subtotal'], [
+            'pedidoid' => $this->getID(),
+            'produtoid' => null,
+            'cancelado' => 'N',
+            'ate_preco' => 0,
+        ]);
+        $pago = Pagamento::sum(['lancado'], [
+            'pedidoid' => $this->getID(),
+            'estado' => Pagamento::ESTADO_PAGO
+        ]);
+        $lancado = Pagamento::sum(['lancado'], [
+            'pedidoid' => $this->getID(),
+            'estado' => [
+                Pagamento::ESTADO_ABERTO,
+                Pagamento::ESTADO_AGUARDANDO,
+                Pagamento::ESTADO_ANALISE
+            ]
+        ]);
+        $this->setServicos(floatval($servicos));
+        $this->setProdutos(floatval($produtos['subtotal']));
+        $this->setComissao(floatval($produtos['comissao']));
+        $this->setSubtotal(Filter::money(
+            $this->getServicos() + $this->getProdutos() + $this->getComissao(),
+            false
+        ));
+        $this->setDescontos(floatval($descontos));
+        $this->setTotal(Filter::money(
+            $this->getSubtotal() + $this->getDescontos(),
+            false
+        ));
+        $this->setPago(floatval($pago));
+        $this->setLancado(floatval($lancado));
     }
 
     /**

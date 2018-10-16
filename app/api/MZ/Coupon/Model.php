@@ -92,7 +92,6 @@ abstract class Model
      */
     protected function isAvailable($resource)
     {
-
         if ($resource == 'company.cellphone') {
             return app()->getSystem()->getCompany()->getTelefone() !== null;
         }
@@ -107,7 +106,6 @@ abstract class Model
 
     protected function resolve($entry)
     {
-
         if ($entry == 'date.time') {
             return Mask::datetime($this->datetime);
         }

@@ -25,17 +25,7 @@
 namespace MZ\Sale;
 
 use MZ\Association\Order;
-use MZ\Session\Sessao;
-use MZ\Database\DB;
-use MZ\Device\Impressora;
-use MZ\Device\Dispositivo;
 use MZ\Payment\Pagamento;
-use MZ\Logger\Log;
-
-use Thermal\Printer;
-use Thermal\Connection\Buffer;
-use Thermal\Model;
-use MZ\Coupon\Order\Receipt;
 
 /**
  * Allow application to serve system resources
@@ -176,81 +166,6 @@ class PedidoOldApiController extends \MZ\Core\ApiController
     public function coupon()
     {
         return $this->json()->error('Atualize o aplicativo para imprimir a conta');
-    }
-
-    /**
-     * TODO: move to new Api
-     */
-    public function newCoupon()
-    {
-        if (!app()->getAuthentication()->isLogin()) {
-            return $this->json()->error('Usuário não autenticado!');
-        }
-        app()->needManager();
-        try {
-            $pedido = new Pedido($this->getRequest()->query->all());
-            $pedido->loadByID();
-            if (!$pedido->exists()) {
-                throw new \Exception('O pedido informado não existe');
-            }
-            $pedido->checkAccess(app()->auth->provider);
-            if ($pedido->getEstado() != Pedido::ESTADO_FECHADO) {
-                $pedido->setFechadorID(app()->auth->provider->getID());
-                $pedido->setDataImpressao(DB::now());
-                $pedido->setEstado(Pedido::ESTADO_FECHADO);
-                $pedido->update();
-            }
-            $dispositivo = new Dispositivo();
-            $dispositivo->setNome($this->getRequest()->query->get('device'));
-            $dispositivo->setSerial($this->getRequest()->query->get('serial'));
-            $dispositivo->loadBySerial();
-            if (!$dispositivo->exists()) {
-                throw new \Exception('O dispositivo informado não existe ou não foi validado');
-            }
-            $impressora = Impressora::find([], [
-                'modo' => [-1 => Impressora::MODO_TERMINAL],
-                'dispositivoid' => [-1 => $dispositivo->getID()],
-                'setorid' => [-1 => $dispositivo->getSetorID()]
-            ]);
-            if (!$impressora->exists()) {
-                throw new \Exception('Nenhuma impressora cadastrada, cadastre uma impressora!');
-            }
-            $model = new Model($impressora->getModelo());
-            $connection = new Buffer();
-            $printer = new Printer($model, $connection);
-            $printer->setColumns($impressora->getColunas());
-            $receipt = new Receipt($printer);
-            $receipt->setOrder($pedido);
-            $receipt->setItems(Item::findAll(
-                [
-                    'pedidoid' => $pedido->getID(),
-                    'cancelado' => 'N'
-                ],
-                ['id' => 1]
-            ));
-            $receipt->setPayments(Pagamento::findAll(
-                [
-                    'pedidoid' => $pedido->getID(),
-                    'cancelado' => 'N'
-                ],
-                ['id' => 1]
-            ));
-            $receipt->printCoupon();
-            if ($impressora->getAvanco() > 0) {
-                $printer->feed($impressora->getAvanco());
-            }
-            $printer->buzzer();
-            $printer->cutter();
-            $data = $connection->getBuffer();
-            return $this->json()->success([
-                'data' => base64_encode($data),
-                'printer' => $impressora->getNome(),
-                'name' => 'Cupom de Consumo do Pedido #' . $pedido->getID()
-            ]);
-        } catch (\Exception $e) {
-            Log::error($e->getMessage());
-            return $this->json()->error($e->getMessage());
-        }
     }
 
     /**

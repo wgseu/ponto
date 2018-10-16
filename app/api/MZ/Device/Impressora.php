@@ -45,6 +45,13 @@ class Impressora extends SyncModel
     const MODO_SERVICO = 'Servico';
     const MODO_ESTOQUE = 'Estoque';
 
+    const OPCAO_SEM_ACENTOS = 0;
+    const OPCAO_CORTAR      = 1;
+    const OPCAO_GAVETA      = 2;
+    const OPCAO_MAIUSCULA   = 4;
+    const OPCAO_TICKET      = 5;
+    const OPCAO_SEM_BEEP    = 6;
+
     /**
      * Identificador da impressora
      */
@@ -443,6 +450,16 @@ class Impressora extends SyncModel
                 // Epson based
                 return 'TM-T20';
         }
+    }
+
+    /**
+     * Verifica se a impressora tem a opção informada
+     * @param int $option
+     * @return boolean true se tem a opção, false caso não tenha
+     */
+    public function hasOption($option)
+    {
+        return ($this->getOpcoes() & 1 << $option) != 0;
     }
 
     /**

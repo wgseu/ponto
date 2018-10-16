@@ -201,9 +201,14 @@ abstract class Model
     public static function sum($fields, $condition)
     {
         $query = static::query($condition)->select(null);
+        $aliases = $fields;
         $fields = array_flip(static::filterCondition(array_flip($fields)));
-        foreach ($fields as $field) {
-            $query = $query->select("SUM($field)");
+        if (count($fields) != count($aliases)) {
+            throw new \Exception('Invalid field to sum', 500);
+        }
+        foreach ($fields as $index => $field) {
+            $alias = $aliases[$index];
+            $query = $query->select("SUM($field) as $alias");
         }
         if (count($fields) == 1) {
             return $query->orderBy(null)->fetchColumn();

@@ -111,7 +111,7 @@ class ClienteOldApiController extends \MZ\Core\ApiController
                 $serial = $this->getRequest()->request->get('serial');
                 $dispositivo->setNome($device);
                 $dispositivo->setSerial($serial);
-                $dispositivo->register();
+                $dispositivo->register($prestador);
                 if (!$dispositivo->checkValidacao()) {
                     throw new \Exception(
                         'Este dispositivo ainda não foi validado, ' .
@@ -195,7 +195,7 @@ class ClienteOldApiController extends \MZ\Core\ApiController
                 if (app()->auth->isManager()) {
                     $dispositivo->setNome($this->getRequest()->query->get('device'));
                     $dispositivo->setSerial($this->getRequest()->query->get('serial'));
-                    $dispositivo->register();
+                    $dispositivo->register(app()->auth->provider);
                 }
                 $status['validacao'] = $dispositivo->getValidacao();
             } catch (\Exception $e) {

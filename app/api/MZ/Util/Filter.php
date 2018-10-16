@@ -85,7 +85,8 @@ class Filter
      */
     public static function money($value, $localized = true)
     {
-        return self::float($value, $localized);
+        $value = self::float($value, $localized);
+        return is_null($value) ? null : \round($value, \log10(app()->system->currency->getDivisao()));
     }
 
     /**

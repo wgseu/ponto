@@ -77,7 +77,6 @@ class CategoriaPageController extends PageController
         $id = $this->getRequest()->query->getInt('id', null);
         $categoria = Categoria::findByID($id);
         $categoria->setID(null);
-        $categoria->setImagem(null);
 
         $focusctrl = 'descricao';
         $errors = [];

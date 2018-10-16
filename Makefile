@@ -1,6 +1,6 @@
 # Makefile for Docker Nginx PHP Composer MySQL
 
-PATH := node_modules/.bin:$(PATH)
+PATH := C:\Program Files\Oracle\VirtualBox\:node_modules/.bin:$(PATH)
 
 include .env
 
@@ -12,6 +12,7 @@ help:
 	@echo "usage: make COMMAND"
 	@echo ""
 	@echo "Commands:"
+	@echo "  share        Share folder on same partition to docker work"
 	@echo "  term         Open docker terminal (Windows 7 Only)"
 	@echo "  start        Create and start containers"
 	@echo "  populate     Recreate and populate database"
@@ -39,13 +40,14 @@ init:
 	@mkdir -p public/static/doc/conta
 	@mkdir -p public/static/doc/cert
 	@mkdir -p public/static/img/categoria
-	@mkdir -p public/static/img/cliente
 	@mkdir -p public/static/img/patrimonio
-	@mkdir -p public/static/img/produto
 
 doc:
 	@docker-compose exec -T php ./vendor/bin/apigen generate app --destination docs/api
 	@make -s reset
+
+share:
+	vboxmanage sharedfolder add "default" --name "d/Development/Projects" --hostpath "\\\\\?\D:\Development\Projects" --automount
 
 term:
 	@utils\docker-term $(CURDIR)

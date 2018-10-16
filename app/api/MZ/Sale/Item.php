@@ -930,6 +930,17 @@ class Item extends SyncModel
     }
 
     /**
+     * Update total and subtotal based on quantity, price and commission
+     * @return Item Self instance
+     */
+    public function totalize()
+    {
+        $this->setSubtotal(Filter::money($this->getPreco() * $this->getQuantidade(), false));
+        $this->setTotal(Filter::money($this->getSubtotal() + $this->getComissao(), false));
+        return $this;
+    }
+
+    /**
      * Filter fields, upload data and keep key data
      * @param self $original Original instance without modifications
      * @param boolean $localized Informs if fields are localized
@@ -947,9 +958,7 @@ class Item extends SyncModel
         $this->setDescricao(Filter::string($this->getDescricao()));
         $this->setPreco(Filter::money($this->getPreco(), $localized));
         $this->setQuantidade(Filter::float($this->getQuantidade(), $localized));
-        $this->setSubtotal(Filter::money($this->getSubtotal(), $localized));
         $this->setComissao(Filter::money($this->getComissao(), $localized));
-        $this->setTotal(Filter::money($this->getTotal(), $localized));
         $this->setPrecoVenda(Filter::money($this->getPrecoVenda(), $localized));
         $this->setPrecoCompra(Filter::money($this->getPrecoCompra(), $localized));
         $this->setDetalhes(Filter::string($this->getDetalhes()));
@@ -1089,28 +1098,45 @@ class Item extends SyncModel
         return $result;
     }
 
+    private function checkFormation($formacoes)
+    {
+        if (is_null($this->getItemID())) {
+            // aplica o desconto dos opcionais e acrescenta o valor dos adicionais
+            // apenas nas composições fora de pacotes
+            $produto = $this->findProdutoID();
+            $preco = $produto->getPrecoVenda();
+            foreach ($formacoes as $formacao) {
+                if ($formacao->getTipo() != Formacao::TIPO_COMPOSICAO) {
+                    continue;
+                }
+                $composicao = $formacao->findComposicaoID();
+                if (!$composicao->exists()) {
+                    throw new ValidationException(['formacao' => 'A composição formada não existe']);
+                }
+                $operacao = -1;
+                if ($composicao->getTipo() == Composicao::TIPO_ADICIONAL) {
+                    $operacao = 1;
+                }
+                $preco += $operacao * $composicao->getValor();
+            }
+            if (!is_equal($this->getPreco(), $preco)) {
+                throw new \Exception(
+                    sprintf(
+                        'O preço do item "%s" deveria ser %s em vez de %s',
+                        $produto->getDescricao(),
+                        Mask::money($preco, true),
+                        Mask::money($this->getPreco(), true)
+                    ),
+                    401
+                );
+            }
+        }
+    }
+
     public function register($formacoes)
     {
         try {
-            if (is_null($this->getItemID())) {
-                // aplica o desconto dos opcionais e acrescenta o valor dos adicionais
-                // apenas nas composições fora de pacotes
-                foreach ($formacoes as $formacao) {
-                    if ($formacao->getTipo() != Formacao::TIPO_COMPOSICAO) {
-                        continue;
-                    }
-                    $composicao = $formacao->findComposicaoID();
-                    if (!$composicao->exists()) {
-                        throw new ValidationException(['formacao' => 'A composição formada não existe']);
-                    }
-                    $operacao = -1;
-                    if ($composicao->getTipo() == Composicao::TIPO_ADICIONAL) {
-                        $operacao = 1;
-                    }
-                    $this->setPrecoVenda($this->getPrecoVenda() + $operacao * $composicao->getValor());
-                    $this->setPreco($this->getPreco() + $operacao * $composicao->getValor());
-                }
-            }
+            $this->checkFormation($formacoes);
             $this->insert();
             if (is_null($this->getProdutoID())) {
                 return $this;

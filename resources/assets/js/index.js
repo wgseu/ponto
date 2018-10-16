@@ -2144,6 +2144,22 @@ Gerenciar.servico.initForm = function(focus_ctrl) {
     }
   }
 
+  function modoObrigatorio(marcado) {
+    if (marcado) {
+      $('#tempolimite')
+        .closest('.form-group')
+        .removeClass('hidden');
+    } else {
+      $('#tempolimite')
+        .closest('.form-group')
+        .addClass('hidden');
+    }
+  }
+  $('#obrigatorio').click(function() {
+    modoObrigatorio($('#obrigatorio').is(':checked'));
+  })
+  modoObrigatorio($('#obrigatorio').is(':checked'));
+  Upload.image.initialize('#imagemurl_container');
   $.datetimepicker.setLocale('pt-BR');
   $('#datainicio').mask('99/99/9999 99:99');
   $('#datainicio').datetimepicker({

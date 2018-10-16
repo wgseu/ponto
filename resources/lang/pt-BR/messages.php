@@ -253,6 +253,7 @@ return [
     'pedido.tipo_comanda' => 'Comanda',
     'pedido.tipo_avulso' => 'Balcão',
     'pedido.tipo_entrega' => 'Entrega',
+    'pedido.tipo_viagem' => 'Viagem',
     'pedido.estado_finalizado' => 'Finalizado',
     'pedido.estado_ativo' => 'Ativo',
     'pedido.estado_agendado' => 'Agendado',

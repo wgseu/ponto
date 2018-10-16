@@ -1,12 +1,26 @@
-<div class="form-group col-lg-3 col-md-4 col-sm-6 col-xs-12">
+<div class="form-group col-lg-6 col-md-6 col-sm-6 col-xs-12">
+  <label for="set_imagemurl">Imagem:</label>
+  <div id="imagemurl_container" class="image-view third-effect" style="height: 128px;">
+    <label for="image_header" class="lbltitle">
+      <img src="{{ $servico->makeImagemURL() }}" no-picture="{{ $servico->makeImagemURL(true) }}" height="128" alt="Imagem" title="Imagem"/>
+    </label>
+    <input class="upload" type="file" id="raw_imagemurl" name="raw_imagemurl" accept="image/x-png, image/jpeg"/>
+    <input type="hidden" name="imagemurl" value="{{ $servico->getImagemURL() }}" />
+    <div class="mask">
+      <a href="#" class="img-open" id="set_imagemurl" title="Selecionar imagem do computador">Abrir</a>
+      <a href="#" class="img-remove" title="Remover imagem">Remover</a>
+    </div>
+  </div>
+</div>
+<div class="form-group col-lg-6 col-md-6 col-sm-6 col-xs-12">
   <label for="nome">Nome:</label>
   <input type="text" id="nome" name="nome" class="form-control" value="{{ $servico->getNome() }}">
 </div>
-<div class="form-group col-lg-4 col-md-4 col-sm-6 col-xs-12">
+<div class="form-group col-lg-6 col-md-6 col-sm-6 col-xs-12">
   <label for="descricao">Descrição:</label>
   <input type="text" id="descricao" name="descricao" class="form-control" value="{{ $servico->getDescricao() }}">
 </div>
-<div class="form-group col-lg-5 col-md-4 col-sm-6 col-xs-12">
+<div class="form-group col-lg-6 col-md-6 col-sm-6 col-xs-12">
   <label for="detalhes">Detalhes:</label>
   <input type="text" id="detalhes" name="detalhes" class="form-control" value="{{ $servico->getDetalhes() }}">
 </div>
@@ -37,10 +51,14 @@
     </label>
   </div>
 </div>
+<div class="form-group col-lg-3 col-md-4 col-sm-6 col-xs-12">
+  <label for="tempolimite" title="Tempo máximo que o cliente pode utilizar o serviço sem obrigação de pagar">Tempo limite (min):</label>
+  <input type="text" id="tempolimite" name="tempolimite" class="numeric form-control text-right" data-a-sep="" data-m-dec="0" value="{{ $servico->getTempoLimite() }}">
+</div>
 <div class="form-group col-lg-2 col-md-2 col-sm-2 col-xs-6">
   <div class="checkbox">
     <label>
-      <input type="checkbox" id="individual" name="individual" value="Y" {{ $servico->getIndividual() == 'Y'?'checked':'' }}>
+      <input type="checkbox" id="individual" name="individual" value="Y" {{ $servico->getIndividual() == 'Y' ? 'checked' : '' }}>
       Individual
     </label>
   </div>
@@ -48,7 +66,7 @@
 <div class="form-group col-lg-2 col-md-2 col-sm-2 col-xs-6">
   <div class="checkbox">
     <label>
-      <input type="checkbox" id="ativo" name="ativo" value="Y" {{ $servico->getAtivo() == 'Y'?'checked':'' }}>
+      <input type="checkbox" id="ativo" name="ativo" value="Y" {{ $servico->getAtivo() == 'Y' ? 'checked' : '' }}>
       Ativo
     </label>
   </div>

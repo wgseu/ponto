@@ -97,6 +97,7 @@ class Order extends Pedido
     private $payments;
     /**
      * Payments
+     * @var \MZ\Provider\Prestador
      */
     private $employee;
     /**
@@ -674,34 +675,35 @@ class Order extends Pedido
             $produto = $produto_pedido->findProdutoID();
             if ($produto->exists()) {
                 // se chegou aqui é porque o item é um produto e não serviço
-                if ($produto->isCobrarServico() &&
-                    (
-                        in_array($this->getTipo(), [self::TIPO_MESA, self::TIPO_COMANDA]) ||
-                        ($comissao_balcao && $this->getTipo() == self::TIPO_AVULSO)
-                    )
-                ) {
-                    $produto_pedido->setPorcentagem($this->employee->getPorcentagem());
-                }
                 if (!is_null($produto_pedido->getItemID())) {
                     $produto_pedido->setItemID($pacote_pedido->getID());
                     $pacotes[$pacote_pedido->getID()]['itens'][] = $item_info;
                 } elseif ($produto->getTipo() != Produto::TIPO_PACOTE) {
-                    $produto_pedido->setPreco($produto->getPrecoVenda());
-                    $produto_pedido->setPrecoVenda($produto->getPrecoVenda());
                     $pacote_pedido = new Item();
                 }
                 if (!is_null($produto->getCustoProducao())) {
                     $produto_pedido->setPrecoCompra($produto->getCustoProducao());
                 }
             }
-            if (is_null($produto_pedido->getPorcentagem())) {
-                $produto_pedido->setPorcentagem(0);
-            }
             $produto_pedido->setEstado(Item::ESTADO_ADICIONADO);
             $produto_pedido->setCancelado('N');
-            $produto_pedido->setVisualizado('N');
-            $this->checkSaldo($produto_pedido->getTotal());
+            $produto_pedido->setDataVisualizacao(null);
             $produto_pedido->filter(new Item()); // limpa o ID
+            if ($produto->exists() && $produto->isCobrarServico() &&
+                (
+                    in_array($this->getTipo(), [self::TIPO_MESA, self::TIPO_COMANDA]) ||
+                    ($comissao_balcao && $this->getTipo() == self::TIPO_AVULSO)
+                )
+            ) {
+                $produto_pedido->setComissao(Filter::money(
+                    $this->employee->getPorcentagem() / 100 * $produto_pedido->getPreco(),
+                    false
+                ));
+            } else {
+                $produto_pedido->setComissao(0);
+            }
+            $produto_pedido->totalize();
+            $this->checkSaldo($produto_pedido->getTotal());
             $produto_pedido->register($item_info['formacoes']);
             if ($produto->exists() && $produto->getTipo() == Produto::TIPO_PACOTE) {
                 $pacote_pedido = $produto_pedido;
@@ -767,19 +769,24 @@ class Order extends Pedido
                 $this->setLocalizacaoID($viagem ? null : $this->localization->getID());
             }
             $added = $this->insertProducts();
+            $paid = 0;
             if (!$viagem) {
                 foreach ($this->payments as $index => $pagamento) {
                     $pagamento->setPedidoID($this->getID());
                     $pagamento->setFuncionarioID($this->employee->getID());
                     $pagamento->setMovimentacaoID($this->getMovimentacaoID());
                     $pagamento->insert();
+                    $paid++;
                 }
             }
             if ($added > 0 && !$new_order && $this->getEstado() != self::ESTADO_ATIVO) {
                 if (in_array($this->getTipo(), [self::TIPO_MESA, self::TIPO_COMANDA])) {
                     $this->setEstado(self::ESTADO_ATIVO);
-                    $this->update();
                 }
+            }
+            if ($paid > 0 || $added > 0) {
+                $this->totalize();
+                $this->update();
             }
             DB::commit();
         } catch (\Exception $e) {

@@ -162,7 +162,7 @@ class Authentication
      */
     public function isOwner()
     {
-        return $this->isManager() && $this->getEmployee()->isOwner($this->getPermissions());
+        return $this->isManager() && $this->getEmployee()->isOwner();
     }
 
     /**

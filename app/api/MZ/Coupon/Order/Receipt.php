@@ -322,8 +322,9 @@ class Receipt extends Model
         if ($entry == 'order.id') {
             return $this->order->getID();
         }
-        if ($entry == 'order.product.id') {
-            return $this->getProduct()->getProdutoID();
+        if ($entry == 'order.product.code') {
+            $product = $this->findProduct();
+            return $product->getCodigo();
         }
         if ($entry == 'order.product.description') {
             $product = $this->findProduct();

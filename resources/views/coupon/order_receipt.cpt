@@ -18,7 +18,7 @@
     [ "Código" , " Descrição", { "align": "right", "items": [ "Preço", "  Qtd", "    Total" ] } ],
     { "whitespace": "-" },
     { "list": "order.products", "items": [
-        { "format": "%06d", "items": "order.product.id" },
+        { "format": "%06d", "items": "order.product.code" },
         " ",
         "order.product.description",
         " ",

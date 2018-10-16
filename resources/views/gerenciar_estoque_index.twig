@@ -52,7 +52,7 @@
     <div class="col-md-12 col-sm-12 col-xs-12">
       <div class="x_panel">
         <div class="x_title">
-          <h2>Estoques<small></small>
+          <h2>Movimentações de Estoque<small></small>
           </h2>
           <div class="clearfix"></div>
         </div>
@@ -61,13 +61,8 @@
             <thead>
               <tr>
                 <th>Produto</th>
-                <th>Fornecedor</th>
-                <th>Movimento</th>
                 <th>Quantidade</th>
                 <th>Preço de compra</th>
-                <th>Lote</th>
-                <th>Data de fabricação</th>
-                <th>Detalhes</th>
                 <th>Data de movimento</th>
                 <th width="10%" style="text-align: center;">Ações</th>
               </tr>
@@ -82,28 +77,8 @@
                     </strong>
                     <small>{{ $_produto->getAbreviacao() }}</small>
                   </td>
-                  {% $_fornecedor = $estoque->findFornecedorID() %}
-                  {% $_empresa = $_fornecedor->findEmpresaID() %}
-                  <td class="product-cell">
-                    {% if $_fornecedor->exists() %}
-                      <strong>
-                        <a href="/gerenciar/fornecedor/editar?id={{ $_fornecedor->getID() }}" title="Editar fornecedor '{{ $_empresa->getNomeCompleto() }}'"><img src="{{ $_empresa->makeImagemURL(false, 'empresa.png') }}" height="48" alt="Foto" title="Foto"/>{{ $_empresa->getNomeCompleto() }}</a>
-                      </strong>
-                    {% endif %}
-                    {% $_setor = $estoque->findSetorID() %}
-                    <small title="Setor de entrada/saída">
-                      <a href="/gerenciar/setor/editar?id={{ $_setor->getID() }}" title="Editar setor '{{ $_setor->getNome() }}'">{{ $_setor->getNome() }}</a>
-                    </small>
-                  </td>
-                  <td>{{ $tipos[$estoque->getTipoMovimento()] }}</td>
                   <td>{{ $estoque->getQuantidade() }}</td>
                   <td>{{ $this->currency($estoque->getPrecoCompra()) }}</td>
-                  <td>{{ $estoque->getLote() }}</td>
-                  <td>
-                    <strong title="Data de fabricação">{{ $this->datetime($estoque->getDataFabricacao()) }}</strong>
-                    <small title="Data de vencimento">{{ $this->datetime($estoque->getDataVencimento()) }}</small>
-                  </td>
-                  <td>{{ $estoque->getDetalhes() }}</td>
                   <td>{{ $this->datetime($estoque->getDataMovimento()) }}</td>
                   <td class="text-center">
                     <ul class="nav panel_toolbox">

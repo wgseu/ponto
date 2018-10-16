@@ -73,6 +73,7 @@ class ComposicaoOldApiController extends \MZ\Core\ApiController
             $item['produtodescricao'] = $produto->getDescricao();
             $item['produtoabreviacao'] = $produto->getAbreviacao();
             $item['produtoconteudo'] = $produto->getConteudo();
+            $item['categoriaid'] = $produto->getCategoriaID();
             $item['unidadesigla'] = $unidade->getSigla();
             $item['produtodataatualizacao'] = $produto->getDataAtualizacao();
             $item['selecionavel'] = $composicao->getTipo() == Composicao::TIPO_COMPOSICAO ? 'N' : 'Y';

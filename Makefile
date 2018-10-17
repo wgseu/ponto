@@ -40,6 +40,8 @@ init:
 	@mkdir -p public/static/doc/conta
 	@mkdir -p public/static/doc/cert
 	@mkdir -p public/static/img/categoria
+	@mkdir -p public/static/img/cliente
+	@mkdir -p public/static/img/produto
 	@mkdir -p public/static/img/patrimonio
 
 doc:
@@ -57,9 +59,7 @@ clean: stop
 	@rm -Rf public/static/doc/conta
 	@rm -Rf public/static/doc/cert
 	@rm -Rf public/static/img/categoria
-	@rm -Rf public/static/img/cliente
 	@rm -Rf public/static/img/patrimonio/*.*
-	@rm -Rf public/static/img/produto
 	@rm -Rf docs/api
 
 purge: clean

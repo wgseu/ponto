@@ -45,7 +45,8 @@ class ProdutoOldApiController extends \MZ\Core\ApiController
         $condition = [
             'promocao' => 'Y'
         ];
-        if ($this->getRequest()->query->get('todos') == 'Y') {
+        $todos = $this->getRequest()->query->get('todos') == 'Y';
+        if ($todos) {
             $limit = null;
         }
         if ($this->getRequest()->query->getInt('categoria')) {
@@ -60,7 +61,8 @@ class ProdutoOldApiController extends \MZ\Core\ApiController
         // estoque ==  0 mostra todos os produtos disponíveis
         // estoque ==  1 mostra apenas produtos de estoque para funcionários
         $negativo = is_boolean_config('Estoque', 'Estoque.Negativo');
-        if ($estoque > 0 && app()->auth->isManager()) {
+        if ($todos) {
+        } elseif ($estoque > 0 && app()->auth->isManager()) {
             $condition['tipo'] = Produto::TIPO_PRODUTO;
         } elseif ($estoque == 0 || !app()->auth->isManager()) {
             if (!$negativo) {
@@ -82,6 +84,7 @@ class ProdutoOldApiController extends \MZ\Core\ApiController
             'dataatualizacao',
             'imagemurl',
             'avaliacao',
+            'visivel',
             // extras
             'estoque',
             'categoria',

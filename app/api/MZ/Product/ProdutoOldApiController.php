@@ -75,6 +75,7 @@ class ProdutoOldApiController extends \MZ\Core\ApiController
         $campos = [
             'id',
             'categoriaid',
+            'supercategoriaid',
             'descricao',
             'detalhes',
             'precovenda',

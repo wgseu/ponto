@@ -543,7 +543,7 @@ class Servico extends SyncModel
         $this->setDataFim(Filter::datetime($this->getDataFim()));
         $this->setTempoLimite(Filter::number($this->getTempoLimite()));
         $this->setValor(Filter::money($this->getValor(), $localized));
-        $imagem_url = upload_image('raw_imagemurl', 'servico');
+        $imagem_url = upload_image('raw_imagemurl', 'servico', null, 620, 400, true, 'crop');
         if (is_null($imagem_url) && trim($this->getImagemURL()) != '') {
             $this->setImagemURL($original->getImagemURL());
         } else {

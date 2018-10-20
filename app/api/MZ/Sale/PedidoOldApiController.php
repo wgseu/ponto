@@ -108,6 +108,7 @@ class PedidoOldApiController extends \MZ\Core\ApiController
                     $item['imagemurl'] = get_image_url($item['imagemurl'], 'produto', null);
                     $items[] = $item;
                 } elseif (is_greater($item['preco'], 0)) {
+                    $item['imagemurl'] = get_image_url($item['imagemurl'], 'servico', null);
                     $servicos[] = $item;
                 }
             }

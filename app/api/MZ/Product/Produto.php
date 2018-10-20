@@ -1472,10 +1472,7 @@ class Produto extends SyncModel
             ->select('p.quantidadelimite')
             ->select('p.quantidademaxima')
             ->select('p.conteudo')
-            ->select(
-                '(p.precovenda + (CASE WHEN ? = "Y" THEN COALESCE(r.valor, 0) ELSE 0 END)) as precovenda',
-                $promocao
-            )
+            ->select('(p.precovenda + COALESCE(r.valor, 0)) as precovenda')
             ->select('p.custoproducao')
             ->select('p.tipo')
             ->select('p.cobrarservico')
@@ -1491,9 +1488,11 @@ class Produto extends SyncModel
             ->select('p.dataarquivado')
             ->leftJoin(
                 'Promocoes r ON r.produtoid = p.id AND ' .
+                '? = "Y" AND ' .
                 '? BETWEEN r.inicio AND r.fim AND ' .
                 'r.agendamento = ? AND ' .
                 'r.evento = ?',
+                $promocao,
                 $week_offset,
                 'N',
                 'N'
@@ -1554,6 +1553,7 @@ class Produto extends SyncModel
         $condition['estoque'] = true;
         $query = self::query($condition, $order)
             ->select('c.descricao as categoria')
+            ->select('c.categoriaid as supercategoriaid')
             ->select('u.sigla as unidade')
             ->select('u.nome as unidade_nome')
             ->select('se.nome as setor_estoque')

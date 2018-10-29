@@ -1117,7 +1117,7 @@ class Item extends SyncModel
                 if ($composicao->getTipo() == Composicao::TIPO_ADICIONAL) {
                     $operacao = 1;
                 }
-                $preco += $operacao * $composicao->getValor();
+                $preco += $operacao * $composicao->getValor() * $formacao->getQuantidade();
             }
             if (!is_equal($this->getPreco(), $preco)) {
                 throw new \Exception(

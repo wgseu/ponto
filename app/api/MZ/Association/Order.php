@@ -550,7 +550,9 @@ class Order extends Pedido
         $this->products = [];
         $parent_products = [];
         foreach ($_pedidos as $_produto_pedido) {
-            $produto_pedido = new Item($_produto_pedido);
+            $_item = $_produto_pedido;
+            $_item['itemid'] = $_item['produtopedidoid'] ?? $_item['itemid'] ?? null;
+            $produto_pedido = new Item($_item);
             if (!is_null($produto_pedido->getItemID())) {
                 if (isset($parent_products[$produto_pedido->getItemID()])) {
                     $parent_index = $parent_products[$produto_pedido->getItemID()];
@@ -567,7 +569,7 @@ class Order extends Pedido
                 }
             }
             $formacoes = [];
-            $_formacoes = isset($_produto_pedido['formacoes']) ? $_produto_pedido['formacoes'] : [];
+            $_formacoes = isset($_item['formacoes']) ? $_item['formacoes'] : [];
             foreach ($_formacoes as $_formacao) {
                 $formacoes[] = new Formacao($_formacao);
             }

@@ -77,6 +77,7 @@ class ProdutoOldApiController extends \MZ\Core\ApiController
             'categoriaid',
             'supercategoriaid',
             'descricao',
+            'abreviacao',
             'detalhes',
             'precovenda',
             'tipo',

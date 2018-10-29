@@ -26,6 +26,7 @@ namespace MZ\Sale;
 
 use MZ\Association\Order;
 use MZ\Payment\Pagamento;
+use MZ\Product\Produto;
 
 /**
  * Allow application to serve system resources
@@ -79,6 +80,7 @@ class PedidoOldApiController extends \MZ\Core\ApiController
             $campos = [
                 'id',
                 'itemid',
+                'produtopedidoid',
                 'tipo',
                 'mesaid',
                 'comandaid',
@@ -103,7 +105,27 @@ class PedidoOldApiController extends \MZ\Core\ApiController
             $servicos = [];
             foreach ($itens as $_pedido) {
                 $_pedido['tipo'] = $_pedido['pedidotipo'];
+                $_pedido['produtopedidoid'] = $_pedido['itemid'];
                 $item = array_intersect_key($_pedido, array_flip($campos));
+                $formacao_pacote = null;
+                if ($item['produtotipo'] !== Produto::TIPO_PRODUTO || $item['itemid'] !== null) {
+                    $_formacoes = Formacao::findAll(['itemid' => $item['id']]);
+                    $formacoes = [];
+                    foreach ($_formacoes as $formacao) {
+                        if ($formacao->getTipo() == Formacao::TIPO_PACOTE) {
+                            $formacao_pacote = $formacao;
+                        }
+                        $formacoes[] = $formacao->publish();
+                    }
+                    $item['formacoes'] = $formacoes;
+                }
+                if ($item['itemid'] !== null && $formacao_pacote !== null) {
+                    $pacote = $formacao_pacote->findPacoteID();
+                    $grupo = $pacote->findGrupoID();
+                    $item['grupoid'] = $grupo->getID();
+                    $item['gruponome'] = $grupo->getNome();
+                    $item['grupotipo'] = $grupo->getTipo();
+                }
                 if (is_null($item['servicoid'])) {
                     $item['imagemurl'] = get_image_url($item['imagemurl'], 'produto', null);
                     $items[] = $item;

@@ -1098,11 +1098,14 @@ class Item extends SyncModel
         return $result;
     }
 
+    /**
+     * @param Formacao[] $formacoes lista de formações da composição
+     */
     private function checkFormation($formacoes)
     {
+        // apenas composições fora de pacotes
         if (is_null($this->getItemID())) {
             // aplica o desconto dos opcionais e acrescenta o valor dos adicionais
-            // apenas nas composições fora de pacotes
             $produto = $this->findProdutoID();
             $preco = $produto->getPrecoVenda();
             foreach ($formacoes as $formacao) {
@@ -1112,6 +1115,16 @@ class Item extends SyncModel
                 $composicao = $formacao->findComposicaoID();
                 if (!$composicao->exists()) {
                     throw new ValidationException(['formacao' => 'A composição formada não existe']);
+                }
+                if ($formacao->getQuantidade() > $composicao->getQuantidadeMaxima()) {
+                    $produto_composicao = $composicao->findProdutoID();
+                    throw new ValidationException([
+                        'formacao' => sprintf(
+                            'Adicional acima do permitido, escolha no máximo %d adicional de %s',
+                            $composicao->getQuantidadeMaxima(),
+                            $produto_composicao->getAbreviado()
+                        )
+                    ]);
                 }
                 $operacao = -1;
                 if ($composicao->getTipo() == Composicao::TIPO_ADICIONAL) {

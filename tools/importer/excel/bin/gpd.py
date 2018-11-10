@@ -270,6 +270,9 @@ with open(filename, "w") as fd:
 		unidade = get_cell(ws, row, unity_columns)
 		if not unidade:
 			unidade = "UN"
+		conteudo = 1
+		if unidade == 'g':
+			conteudo = 1000
 		setor = get_cell(ws, row, sector_columns)
 		if not setor and not sector_columns:
 			setor = "Cozinha"
@@ -286,8 +289,8 @@ with open(filename, "w") as fd:
 		divisivel = get_cell(ws, row, divisibility_columns)
 		cobrar_servico = get_cell(ws, row, service_columns)
 		tributacao = codigo if codigo in taxation else None
-		fd.write("INSERT INTO Produtos (ID, CodigoBarras, Descricao, PrecoVenda, Abreviacao, Detalhes, Tipo, QuantidadeLimite, Visivel, Divisivel, CobrarServico, DataAtualizacao, CategoriaID, UnidadeID, SetorPreparoID, TributacaoID) VALUES\n")
-		fd.write("	(" + sql_int(codigo) + ", " + sql_field(codigo_barras) + ", " + sql_field(descricao) + ", " + sql_float(preco) + ", " + sql_field(abreviacao) + ", " + sql_field(detalhes) + ", " + sql_field(tipo, "'") + ", " + sql_float(limite) + ", " + sql_bool(visivel, 'Y') + ", " + sql_bool(divisivel, 'N') + ", " + sql_bool(cobrar_servico, 'Y') + ", NOW(), " +  categoria_sql + ", (SELECT ID FROM Unidades WHERE Sigla = " + sql_field(unidade) + "), (SELECT ID FROM Setores WHERE Nome = " + sql_field(setor) + "), (" + sql_int(tributacao) + ")) ON DUPLICATE KEY UPDATE DataAtualizacao = VALUES(DataAtualizacao);\n")
+		fd.write("INSERT INTO Produtos (ID, CodigoBarras, Descricao, PrecoVenda, Abreviacao, Detalhes, Tipo, Conteudo, QuantidadeLimite, Visivel, Divisivel, CobrarServico, DataAtualizacao, CategoriaID, UnidadeID, SetorPreparoID, TributacaoID) VALUES\n")
+		fd.write("	(" + sql_int(codigo) + ", " + sql_field(codigo_barras) + ", " + sql_field(descricao) + ", " + sql_float(preco) + ", " + sql_field(abreviacao) + ", " + sql_field(detalhes) + ", " + sql_field(tipo, "'") + ", " + sql_float(conteudo) + ", " + sql_float(limite) + ", " + sql_bool(visivel, 'Y') + ", " + sql_bool(divisivel, 'N') + ", " + sql_bool(cobrar_servico, 'Y') + ", NOW(), " +  categoria_sql + ", (SELECT ID FROM Unidades WHERE Sigla = " + sql_field(unidade) + "), (SELECT ID FROM Setores WHERE Nome = " + sql_field(setor) + "), (" + sql_int(tributacao) + ")) ON DUPLICATE KEY UPDATE DataAtualizacao = VALUES(DataAtualizacao);\n")
 
 	fd.close()
 	convert_encoding(filename, os.path.join(path, "MySQLBackup.sql"))

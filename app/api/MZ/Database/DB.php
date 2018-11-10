@@ -54,6 +54,7 @@ class DB
         $pdo->setAttribute(PDO::ATTR_CASE, PDO::CASE_LOWER);
         $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         $this->fpdo = new FluentPDO($pdo);
+        $this->fpdo->convertTypes = true;
     }
 
     /**

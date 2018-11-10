@@ -143,7 +143,6 @@ class NFeUtil extends \NFe\Common\Util
         switch ($estado->getUF()) {
             case 'AM':
             case 'CE':
-            case 'GO':
             case 'MG':
             case 'MS':
             case 'SP':

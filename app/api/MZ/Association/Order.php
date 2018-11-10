@@ -755,20 +755,20 @@ class Order extends Pedido
                 $this->customer->filter(new Cliente());
                 $this->customer->insert();
             }
+            $viagem = !$this->getLocalizacaoID();
             if (!$this->exists()) {
                 if (!is_null($this->customer)) {
                     $this->setClienteID($this->customer->getID());
+                }
+                if (!is_null($this->localization) && !is_null($this->getClienteID())) {
+                    $this->registerAddress();
+                    $this->setLocalizacaoID($viagem ? null : $this->localization->getID());
                 }
                 // não existe pedido ainda, cadastra um novo
                 $this->setPrestadorID($this->employee->getID());
                 $this->filter(new Pedido());
                 $this->insert();
                 $new_order = true;
-            }
-            $viagem = !$this->getLocalizacaoID();
-            if (!is_null($this->localization) && !is_null($this->getClienteID())) {
-                $this->registerAddress();
-                $this->setLocalizacaoID($viagem ? null : $this->localization->getID());
             }
             $added = $this->insertProducts();
             $paid = 0;

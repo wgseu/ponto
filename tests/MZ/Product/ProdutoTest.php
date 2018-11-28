@@ -71,7 +71,6 @@ class ProdutoTest extends \MZ\Framework\TestCase
         $allowed = [
             'id',
             'codigo',
-            'codigobarras',
             'categoriaid',
             'unidadeid',
             'setorestoqueid',
@@ -108,8 +107,11 @@ class ProdutoTest extends \MZ\Framework\TestCase
         AuthenticationTest::authProvider([Permissao::NOME_SISTEMA, Permissao::NOME_CADASTROPRODUTOS]);
         $campos = [
             'id',
+            'codigo',
             'categoriaid',
+            'supercategoriaid',
             'descricao',
+            'abreviacao',
             'detalhes',
             'precovenda',
             'tipo',
@@ -118,14 +120,18 @@ class ProdutoTest extends \MZ\Framework\TestCase
             'dataatualizacao',
             'imagemurl',
             'avaliacao',
+            'pesavel',
+            'visivel',
             // extras
             'estoque',
             'categoria',
             'unidade',
         ];
+        $categoria = $produto->findCategoriaID();
         $item = $produto->publish();
         $item['estoque'] = $estoque->getQuantidade();
-        $item['categoria'] = $produto->findCategoriaID()->getDescricao();
+        $item['categoria'] = $categoria->getDescricao();
+        $item['supercategoriaid'] = $categoria->getCategoriaID();
         $item['unidade'] = $produto->findUnidadeID()->getSigla();
         $expected = [
             'status' => 'ok',
@@ -148,8 +154,11 @@ class ProdutoTest extends \MZ\Framework\TestCase
         AuthenticationTest::authProvider([Permissao::NOME_SISTEMA, Permissao::NOME_CADASTROPRODUTOS]);
         $campos = [
             'id',
+            'codigo',
             'categoriaid',
+            'supercategoriaid',
             'descricao',
+            'abreviacao',
             'detalhes',
             'precovenda',
             'tipo',
@@ -158,14 +167,18 @@ class ProdutoTest extends \MZ\Framework\TestCase
             'dataatualizacao',
             'imagemurl',
             'avaliacao',
+            'pesavel',
+            'visivel',
             // extras
             'estoque',
             'categoria',
             'unidade',
         ];
+        $categoria = $produto->findCategoriaID();
         $item = $produto->publish();
         $item['estoque'] = $estoque->getQuantidade();
-        $item['categoria'] = $produto->findCategoriaID()->getDescricao();
+        $item['categoria'] = $categoria->getDescricao();
+        $item['supercategoriaid'] = $categoria->getCategoriaID();
         $item['unidade'] = $produto->findUnidadeID()->getSigla();
         $expected = [
             'status' => 'ok',

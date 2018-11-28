@@ -27,7 +27,7 @@ namespace MZ\Response;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
- * Output JSON response
+ * Output HTML response
  */
 class HtmlResponse extends Response
 {

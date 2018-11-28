@@ -2,7 +2,7 @@
 -- Author:        Mazin
 -- Caption:       GrandChef Model
 -- Project:       GrandChef
--- Changed:       2018-10-05 21:08
+-- Changed:       2018-11-27 20:09
 -- Created:       2012-09-05 23:08
 PRAGMA foreign_keys = OFF;
 
@@ -548,8 +548,7 @@ CREATE INDEX "Horarios.FK_Horarios_Funcoes_FuncaoID_idx" ON "Horarios" ("FuncaoI
 CREATE TABLE "Produtos"(
 --   Informações sobre o produto, composição ou pacote[N:Produto|Produtos][G:o][L:CadastroProdutos][K:MZ\Product|MZ\Product\][H:SyncModel]
   "ID" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,-- Código do produto[G:o]
-  "Codigo" INTEGER NOT NULL,-- Código do produto, deve ser único entre todos os produtos[N:Código][G:o]
-  "CodigoBarras" VARCHAR(100) DEFAULT NULL,-- Código de barras do produto, deve ser único entre todos os produtos[N:Código de barras][G:o]
+  "Codigo" VARCHAR(100) NOT NULL,-- Código do produto podendo ser de barras ou aleatório, deve ser único entre todos os produtos[N:Código][G:o]
   "CategoriaID" INTEGER NOT NULL,-- Categoria do produto, permite a rápida localização ao utilizar tablets[N:Categoria][G:a][S:S]
   "UnidadeID" INTEGER NOT NULL,-- Informa a unidade do produtos, Ex.: Grama, Litro.[N:Unidade][G:a]
   "SetorEstoqueID" INTEGER DEFAULT NULL,-- Informa de qual setor o produto será retirado após a venda[N:Setor de estoque][G:o]
@@ -577,8 +576,6 @@ CREATE TABLE "Produtos"(
   "DataArquivado" DATETIME DEFAULT NULL,-- Data em que o produto foi arquivado e não será mais usado[G:a][N:Data de arquivação]
   CONSTRAINT "Descricao_UNIQUE"
     UNIQUE("Descricao"),
-  CONSTRAINT "CodBarras_UNIQUE"
-    UNIQUE("CodigoBarras"),
   CONSTRAINT "Codigo_UNIQUE"
     UNIQUE("Codigo"),
   CONSTRAINT "FK_Produtos_Categorias_CategoriaID"

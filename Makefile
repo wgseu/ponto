@@ -49,7 +49,7 @@ doc:
 	@make -s reset
 
 share:
-	vboxmanage sharedfolder add "default" --name "d/Development/Projects" --hostpath "\\\\\?\D:\Development\Projects" --automount
+	vboxmanage sharedfolder add "default" --name "d/Development/Projects/grandchef.api" --hostpath "\\\\\?\D:\Development\Projects\grandchef.api" --automount
 
 term:
 	@utils\docker-term $(CURDIR)

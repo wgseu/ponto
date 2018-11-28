@@ -235,9 +235,10 @@ class NFeDB extends \NFe\Database\Estatico
             $_imposto = $_tributacao->findImpostoID();
             $produto = new \NFe\Entity\Produto();
             $produto->setPedido($_pedido->getID());
-            $produto->setCodigo($_produto->getID());
-            $produto->setCodigoBarras(NFeUtil::fixBarCode($_produto->getCodigoBarras()));
-            $produto->setCodigoTributario($produto->getCodigoBarras());
+            $produto->setCodigo($_produto->getCodigo());
+            // TODO: verificar se o código é de barras
+            $produto->setCodigoBarras(NFeUtil::fixBarCode($_produto->getCodigo()));
+            $produto->setCodigoTributario($produto->getCodigo());
             $produto->setDescricao(NFeUtil::fixEncoding($_produto->getDescricao()));
             $produto->setUnidade($_unidade->processaSigla($_item->getQuantidade(), $_produto->getConteudo()));
             $produto->setPreco($_item->getSubvenda());

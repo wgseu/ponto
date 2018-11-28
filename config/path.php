@@ -12,4 +12,3 @@ $value['logs'] = dirname(__DIR__) . '/storage/logs';
 $value['certs'] = dirname(__DIR__) . '/storage/certs';
 $value['cache'] = dirname(__DIR__) . '/storage/app/cache';
 $value['routes'] = dirname(__DIR__) . '/routes';
-$value['pages'] = dirname(__DIR__) . '/app/pages';

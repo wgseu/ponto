@@ -151,7 +151,6 @@ class ClientePageController extends PageController
                 // não deixa o usuário alterar os dados abaixo
                 $cliente->setEmail($old_cliente->getEmail());
                 $cliente->setTipo($old_cliente->getTipo());
-                $cliente->setEmpresaID($old_cliente->getEmpresaID());
                 $cliente->setSlogan($old_cliente->getSlogan());
 
                 $senha = $this->getRequest()->request->get('confirmarsenha', '');
@@ -305,7 +304,7 @@ class ClientePageController extends PageController
         $id = $this->getRequest()->query->getInt('id', null);
         $cliente = Cliente::findByID($id);
         if (!$cliente->exists()) {
-            $msg = 'O cliente não foi informado ou não existe!';
+            $msg = _t('cliente.not_found');
             if ($this->isJson()) {
                 return $this->json()->error($msg);
             }

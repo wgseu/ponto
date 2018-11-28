@@ -133,9 +133,12 @@ abstract class Controller
     {
         $routes = static::getRoutes();
         foreach ($routes as $info) {
+            $defaults = ['_controller' => static::class . '@' . $info['controller']];
+            $_defaults = isset($info['defaults']) ? $info['defaults'] : [];
+            $defaults = \array_merge($defaults, $_defaults);
             $route = new Route(
                 $info['path'],
-                ['_controller' => static::class . '@' . $info['controller']], // default values
+                $defaults, // default values
                 isset($info['requirements']) ? $info['requirements'] : [], // requirements
                 [], // options
                 '', // host

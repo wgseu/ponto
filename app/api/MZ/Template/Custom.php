@@ -57,10 +57,7 @@ class Custom extends Engine
      */
     public function get($key, $default = null)
     {
-        if (!array_key_exists($key, $_GET)) {
-            return $default;
-        }
-        return $_GET[$key];
+        return app()->getRequest()->query->get($key, $default);
     }
 
     /**
@@ -71,10 +68,7 @@ class Custom extends Engine
      */
     public function post($key, $default = null)
     {
-        if (!array_key_exists($key, $_POST)) {
-            return $default;
-        }
-        return $_POST[$key];
+        return app()->getRequest()->request->get($key, $default);
     }
 
     /**
@@ -280,7 +274,7 @@ class Custom extends Engine
         }
         $cFile = $dir_compiled . DIRECTORY_SEPARATOR . str_replace(DIRECTORY_SEPARATOR, '_', $tFileN) . '.twig.php';
         if (false === file_exists($tFile)) {
-            throw new \Exception('Template file "'.$cFile.'" not found', 404);
+            throw new \Exception('Template file "'.$tFile.'" not found', 404);
         }
         if (false === file_exists($cFile) || @filemtime($tFile) > @filemtime($cFile)) {
             $this->__parse($tFile, $cFile);

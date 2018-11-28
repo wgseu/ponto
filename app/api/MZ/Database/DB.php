@@ -67,6 +67,15 @@ class DB
     }
 
     /**
+     * Get Fluent PDO instance
+     * @return \FluentPDO connected PDO instance
+     */
+    protected function __getFpdo()
+    {
+        return $this->fpdo;
+    }
+
+    /**
      * Return current date and time on database format
      * @return string current date and time database formatted
      */

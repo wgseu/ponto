@@ -54,13 +54,10 @@ class Produto extends SyncModel
      */
     private $id;
     /**
-     * Código do produto, deve ser único entre todos os produtos
+     * Código do produto podendo ser de barras ou aleatório, deve ser único
+     * entre todos os produtos
      */
     private $codigo;
-    /**
-     * Código de barras do produto, deve ser único entre todos os produtos
-     */
-    private $codigo_barras;
     /**
      * Categoria do produto, permite a rápida localização ao utilizar tablets
      */
@@ -203,8 +200,9 @@ class Produto extends SyncModel
     }
 
     /**
-     * Código do produto, deve ser único entre todos os produtos
-     * @return int código of Produto
+     * Código do produto podendo ser de barras ou aleatório, deve ser único
+     * entre todos os produtos
+     * @return string código of Produto
      */
     public function getCodigo()
     {
@@ -213,32 +211,12 @@ class Produto extends SyncModel
 
     /**
      * Set Codigo value to new on param
-     * @param int $codigo Set código for Produto
+     * @param string $codigo Set código for Produto
      * @return self Self instance
      */
     public function setCodigo($codigo)
     {
         $this->codigo = $codigo;
-        return $this;
-    }
-
-    /**
-     * Código de barras do produto, deve ser único entre todos os produtos
-     * @return string código de barras of Produto
-     */
-    public function getCodigoBarras()
-    {
-        return $this->codigo_barras;
-    }
-
-    /**
-     * Set CodigoBarras value to new on param
-     * @param string $codigo_barras Set código de barras for Produto
-     * @return self Self instance
-     */
-    public function setCodigoBarras($codigo_barras)
-    {
-        $this->codigo_barras = $codigo_barras;
         return $this;
     }
 
@@ -819,7 +797,6 @@ class Produto extends SyncModel
         $produto = parent::toArray($recursive);
         $produto['id'] = $this->getID();
         $produto['codigo'] = $this->getCodigo();
-        $produto['codigobarras'] = $this->getCodigoBarras();
         $produto['categoriaid'] = $this->getCategoriaID();
         $produto['unidadeid'] = $this->getUnidadeID();
         $produto['setorestoqueid'] = $this->getSetorEstoqueID();
@@ -870,11 +847,6 @@ class Produto extends SyncModel
             $this->setCodigo(null);
         } else {
             $this->setCodigo($produto['codigo']);
-        }
-        if (!array_key_exists('codigobarras', $produto)) {
-            $this->setCodigoBarras(null);
-        } else {
-            $this->setCodigoBarras($produto['codigobarras']);
         }
         if (!isset($produto['categoriaid'])) {
             $this->setCategoriaID(null);
@@ -1054,8 +1026,7 @@ class Produto extends SyncModel
     {
         $this->setID($original->getID());
         $this->setTributacaoID(Filter::number($original->getTributacaoID()));
-        $this->setCodigo(Filter::number($this->getCodigo()));
-        $this->setCodigoBarras(Filter::string($this->getCodigoBarras()));
+        $this->setCodigo(Filter::digits($this->getCodigo()));
         $this->setCategoriaID(Filter::number($this->getCategoriaID()));
         $this->setUnidadeID(Filter::number($this->getUnidadeID()));
         $this->setSetorEstoqueID(Filter::number($this->getSetorEstoqueID()));
@@ -1193,14 +1164,6 @@ class Produto extends SyncModel
                 ),
             ]);
         }
-        if (contains(['CodigoBarras', 'UNIQUE'], $e->getMessage())) {
-            return new ValidationException([
-                'codigobarras' => _t(
-                    'produto.codigo_barras_used',
-                    $this->getCodigoBarras()
-                ),
-            ]);
-        }
         if (contains(['Codigo', 'UNIQUE'], $e->getMessage())) {
             return new ValidationException([
                 'codigo' => _t(
@@ -1302,24 +1265,13 @@ class Produto extends SyncModel
     }
 
     /**
-     * Load into this object from database using, CodigoBarras
-     * @return self Self filled instance or empty when not found
-     */
-    public function loadByCodigoBarras()
-    {
-        return $this->load([
-            'codigobarras' => strval($this->getCodigoBarras()),
-        ]);
-    }
-
-    /**
      * Load into this object from database using, Codigo
      * @return self Self filled instance or empty when not found
      */
     public function loadByCodigo()
     {
         return $this->load([
-            'codigo' => intval($this->getCodigo()),
+            'codigo' => strval($this->getCodigo()),
         ]);
     }
 
@@ -1460,7 +1412,6 @@ class Produto extends SyncModel
             ->select(null)
             ->select('p.id')
             ->select('p.codigo')
-            ->select('p.codigobarras')
             ->select('p.categoriaid')
             ->select('p.unidadeid')
             ->select('p.setorestoqueid')
@@ -1526,8 +1477,7 @@ class Produto extends SyncModel
             $search = trim($condition['search']);
             if (Validator::checkDigits($search)) {
                 $query = $query->where(
-                    '(p.codigo = ? OR p.codigobarras = ?)',
-                    intval($search),
+                    '(p.codigo = ?)',
                     Filter::digits($search)
                 );
             } else {
@@ -1605,20 +1555,8 @@ class Produto extends SyncModel
     }
 
     /**
-     * Find this object on database using, CodigoBarras
-     * @param string $codigo_barras código de barras to find Produto
-     * @return self A filled instance or empty when not found
-     */
-    public static function findByCodigoBarras($codigo_barras)
-    {
-        $result = new self();
-        $result->setCodigoBarras($codigo_barras);
-        return $result->loadByCodigoBarras();
-    }
-
-    /**
      * Find this object on database using, Codigo
-     * @param int $codigo código to find Produto
+     * @param string $codigo código to find Produto
      * @return self A filled instance or empty when not found
      */
     public static function findByCodigo($codigo)

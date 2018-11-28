@@ -996,7 +996,7 @@ class Cliente extends SyncModel
         $this->setSecreto($original->getSecreto());
         $this->setSalt($original->getSalt());
         $this->setLimiteCompra(Filter::float($original->getLimiteCompra(), $localized));
-        $this->setEmpresaID(Filter::number($this->getEmpresaID()));
+        $this->setEmpresaID(Filter::number($original->getEmpresaID()));
         $this->setLogin(Filter::string($this->getLogin()));
         $this->setSenha(Filter::text($this->getSenha()));
         $this->setNome(Filter::string($this->getNome()));

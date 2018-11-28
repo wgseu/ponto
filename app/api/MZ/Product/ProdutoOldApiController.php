@@ -74,6 +74,7 @@ class ProdutoOldApiController extends \MZ\Core\ApiController
         $produtos = Produto::rawFindAll($condition, [], $limit);
         $campos = [
             'id',
+            'codigo',
             'categoriaid',
             'supercategoriaid',
             'descricao',
@@ -86,6 +87,7 @@ class ProdutoOldApiController extends \MZ\Core\ApiController
             'dataatualizacao',
             'imagemurl',
             'avaliacao',
+            'pesavel',
             'visivel',
             // extras
             'estoque',
@@ -124,7 +126,6 @@ class ProdutoOldApiController extends \MZ\Core\ApiController
                 'Estoque',
                 'Divisível',
                 'Cobrar serviço',
-                'Código de Barras',
                 'Conteúdo',
                 'Quantidade Limite',
                 'Quantidade Máxima',
@@ -151,7 +152,7 @@ class ProdutoOldApiController extends \MZ\Core\ApiController
                 $setor_preparo = $value->findSetorPreparoID();
                 $estoque = Estoque::sumByProdutoID($value->getID());
                 $row = [];
-                $row[] = $value->getID();
+                $row[] = $value->getCodigo();
                 $row[] = $value->getDescricao();
                 $row[] = $value->getPrecoVenda();
                 $row[] = $value->findCategoriaID()->getDescricao();
@@ -160,7 +161,6 @@ class ProdutoOldApiController extends \MZ\Core\ApiController
                 $row[] = $unidade->formatar($estoque, $value->getConteudo());
                 $row[] = Mask::bool($value->isDivisivel());
                 $row[] = Mask::bool($value->isCobrarServico());
-                $row[] = $value->getCodigoBarras();
                 $row[] = $value->getConteudo();
                 $row[] = $value->getQuantidadeLimite();
                 $row[] = $value->getQuantidadeMaxima();

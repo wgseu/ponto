@@ -134,6 +134,10 @@ class Cliente extends SyncModel
      */
     private $limite_compra;
     /**
+     * URL para acessar a página do Instagram do cliente
+     */
+    private $instagram_url;
+    /**
      * URL para acessar a página do Facebook do cliente
      */
     private $facebook_url;
@@ -540,6 +544,26 @@ class Cliente extends SyncModel
     }
 
     /**
+     * URL para acessar a página do Instagram do cliente
+     * @return string instagram of Cliente
+     */
+    public function getInstagramURL()
+    {
+        return $this->instagram_url;
+    }
+
+    /**
+     * Set InstagramURL value to new on param
+     * @param string $instagram_url Set instagram for Cliente
+     * @return self Self instance
+     */
+    public function setInstagramURL($instagram_url)
+    {
+        $this->instagram_url = $instagram_url;
+        return $this;
+    }
+
+    /**
      * URL para acessar a página do Facebook do cliente
      * @return string facebook of Cliente
      */
@@ -731,6 +755,7 @@ class Cliente extends SyncModel
         $cliente['secreto'] = $this->getSecreto();
         $cliente['salt'] = $this->getSalt();
         $cliente['limitecompra'] = $this->getLimiteCompra();
+        $cliente['instagramurl'] = $this->getInstagramURL();
         $cliente['facebookurl'] = $this->getFacebookURL();
         $cliente['twitterurl'] = $this->getTwitterURL();
         $cliente['linkedinurl'] = $this->getLinkedInURL();
@@ -850,6 +875,11 @@ class Cliente extends SyncModel
             $this->setLimiteCompra(null);
         } else {
             $this->setLimiteCompra($cliente['limitecompra']);
+        }
+        if (!array_key_exists('instagramurl', $cliente)) {
+            $this->setInstagramURL(null);
+        } else {
+            $this->setInstagramURL($cliente['instagramurl']);
         }
         if (!array_key_exists('facebookurl', $cliente)) {
             $this->setFacebookURL(null);
@@ -1012,6 +1042,7 @@ class Cliente extends SyncModel
         $this->setEmail(Filter::string($this->getEmail()));
         $this->setDataAniversario(Filter::date($this->getDataAniversario()));
         $this->setSlogan(Filter::string($this->getSlogan()));
+        $this->setInstagramURL(Filter::string($this->getInstagramURL()));
         $this->setFacebookURL(Filter::string($this->getFacebookURL()));
         $this->setTwitterURL(Filter::string($this->getTwitterURL()));
         $this->setLinkedInURL(Filter::string($this->getLinkedInURL()));

@@ -2,7 +2,7 @@
 -- Author:        Mazin
 -- Caption:       GrandChef Model
 -- Project:       GrandChef
--- Changed:       2018-11-27 20:09
+-- Changed:       2018-12-03 19:06
 -- Created:       2012-09-05 23:08
 PRAGMA foreign_keys = OFF;
 
@@ -121,6 +121,7 @@ CREATE TABLE "Clientes"(
   "Secreto" VARCHAR(40) DEFAULT NULL,-- Código secreto para recuperar a conta do cliente[N:Código de recuperação][G:o][D]
   "Salt" VARCHAR(100) DEFAULT NULL,-- Se informado, significa que a senha é segura[G:o][N:Código de segurança][D]
   "LimiteCompra" DECIMAL DEFAULT NULL,-- Limite de compra utilizando a forma de pagamento Conta[N:Limite de compra][G:o]
+  "InstagramURL" VARCHAR(200) DEFAULT NULL,-- URL para acessar a página do Instagram do cliente[N:Instagram][G:o]
   "FacebookURL" VARCHAR(200) DEFAULT NULL,-- URL para acessar a página do Facebook do cliente[N:Facebook][G:o]
   "TwitterURL" VARCHAR(200) DEFAULT NULL,-- URL para acessar a página do Twitter do cliente[N:Twitter][G:o]
   "LinkedInURL" VARCHAR(200) DEFAULT NULL,-- URL para acessar a página do LinkedIn do cliente[N:LinkedIn][G:o]
@@ -1581,6 +1582,7 @@ CREATE INDEX "Localizacoes.FK_Localizacoes_Zonas_ZonaID_idx" ON "Localizacoes" (
 CREATE TABLE "Pedidos"(
 --   Informações do pedido de venda[N:Pedido|Pedidos][G:o][L:Pagamento][K:MZ\Sale|MZ\Sale\][H:SyncModel]
   "ID" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,-- Código do pedido[N:Código][G:o]
+  "PedidoID" INTEGER DEFAULT NULL,-- Informa o pedido da mesa / comanda principal quando as mesas / comandas forem agrupadas[G:o][N:Pedido principal]
   "MesaID" INTEGER DEFAULT NULL,-- Identificador da mesa, único quando o pedido não está fechado[N:Mesa][G:a][S:S]
   "ComandaID" INTEGER DEFAULT NULL,-- Identificador da comanda, único quando o pedido não está fechado[N:Comanda][G:a][S:S]
   "SessaoID" INTEGER DEFAULT NULL,-- Identificador da sessão de vendas[N:Sessão][G:a][S:S]
@@ -1647,6 +1649,11 @@ CREATE TABLE "Pedidos"(
     FOREIGN KEY("EntregaID")
     REFERENCES "Viagens"("ID")
     ON DELETE RESTRICT
+    ON UPDATE RESTRICT,
+  CONSTRAINT "FK_Pedidos_Pedidos_PedidoID"
+    FOREIGN KEY("PedidoID")
+    REFERENCES "Pedidos"("ID")
+    ON DELETE RESTRICT
     ON UPDATE RESTRICT
 );
 CREATE INDEX "Pedidos.FK_Pedidos_Mesas_MesaID_idx" ON "Pedidos" ("MesaID");
@@ -1659,6 +1666,7 @@ CREATE INDEX "Pedidos.FK_Pedidos_Comandas_ComandaID_idx" ON "Pedidos" ("ComandaI
 CREATE INDEX "Pedidos.FK_Pedidos_Prestadores_FechadorID_idx" ON "Pedidos" ("FechadorID");
 CREATE INDEX "Pedidos.FK_Pedidos_Viagens_EntregaID_idx" ON "Pedidos" ("EntregaID");
 CREATE INDEX "Pedidos.IDX_DataCriacao" ON "Pedidos" ("DataCriacao" DESC);
+CREATE INDEX "Pedidos.FK_Pedidos_Pedidos_PedidoID_idx" ON "Pedidos" ("PedidoID");
 CREATE TABLE "Movimentacoes"(
 --   Movimentação do caixa, permite abrir diversos caixas na conta de operadores[N:Movimentação|Movimentações][G:a][L:AbrirCaixa][K:MZ\Session|MZ\Session\][H:SyncModel]
   "ID" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,-- Código da movimentação do caixa[G:o]

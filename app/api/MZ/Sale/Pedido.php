@@ -64,6 +64,10 @@ class Pedido extends SyncModel
      */
     private $id;
     /**
+     * Informa o pedido da comanda principal quando as comandas forem agrupadas
+     */
+    private $pedido_id;
+    /**
      * Identificador da mesa, único quando o pedido não está fechado
      */
     private $mesa_id;
@@ -202,6 +206,26 @@ class Pedido extends SyncModel
     public function setID($id)
     {
         $this->id = $id;
+        return $this;
+    }
+
+    /**
+     * Informa o pedido da comanda principal quando as comandas forem agrupadas
+     * @return int comanda principal of Pedido
+     */
+    public function getPedidoID()
+    {
+        return $this->pedido_id;
+    }
+
+    /**
+     * Set PedidoID value to new on param
+     * @param int $pedido_id Set comanda principal for Pedido
+     * @return self Self instance
+     */
+    public function setPedidoID($pedido_id)
+    {
+        $this->pedido_id = $pedido_id;
         return $this;
     }
 
@@ -767,6 +791,7 @@ class Pedido extends SyncModel
     {
         $pedido = parent::toArray($recursive);
         $pedido['id'] = $this->getID();
+        $pedido['pedidoid'] = $this->getPedidoID();
         $pedido['mesaid'] = $this->getMesaID();
         $pedido['comandaid'] = $this->getComandaID();
         $pedido['sessaoid'] = $this->getSessaoID();
@@ -814,6 +839,11 @@ class Pedido extends SyncModel
             $this->setID(null);
         } else {
             $this->setID($pedido['id']);
+        }
+        if (!array_key_exists('pedidoid', $pedido)) {
+            $this->setPedidoID(null);
+        } else {
+            $this->setPedidoID($pedido['pedidoid']);
         }
         if (!array_key_exists('mesaid', $pedido)) {
             $this->setMesaID(null);
@@ -1035,6 +1065,7 @@ class Pedido extends SyncModel
     public function filter($original, $localized = false)
     {
         $this->setID($original->getID());
+        $this->setPedidoID(Filter::number($original->getPedidoID()));
         $this->setMesaID(Filter::number($this->getMesaID()));
         $this->setComandaID(Filter::number($this->getComandaID()));
         $this->setSessaoID(Filter::number($this->getSessaoID()));
@@ -1409,6 +1440,18 @@ class Pedido extends SyncModel
     }
 
     /**
+     * Informa o pedido da comanda principal quando as comandas forem agrupadas
+     * @return \MZ\Sale\Pedido The object fetched from database
+     */
+    public function findPedidoID()
+    {
+        if (is_null($this->getPedidoID())) {
+            return new \MZ\Sale\Pedido();
+        }
+        return \MZ\Sale\Pedido::findByID($this->getPedidoID());
+    }
+
+    /**
      * Identificador da mesa, único quando o pedido não está fechado
      * @return \MZ\Environment\Mesa The object fetched from database
      */
@@ -1524,12 +1567,12 @@ class Pedido extends SyncModel
         } else {
             $query = DB::from('Pedidos p')
                 ->select(null)
-                ->select('p.servicos')
-                ->select('p.produtos')
-                ->select('p.comissao')
-                ->select('p.subtotal')
-                ->select('p.descontos')
-                ->select('p.total');
+                ->select('SUM(p.servicos) as servicos')
+                ->select('SUM(p.produtos) as produtos')
+                ->select('SUM(p.comissao) as comissao')
+                ->select('SUM(p.subtotal) as subtotal')
+                ->select('SUM(p.descontos) as descontos')
+                ->select('SUM(p.total) as total');
             if ($this->exists()) {
                 $query = $query->where('p.id', $this->getID());
             } else {

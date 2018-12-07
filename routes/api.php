@@ -8,5 +8,7 @@ $collection = new RouteCollection();
 \MZ\Product\PropriedadeApiController::addRoutes($collection);
 \MZ\Product\PacoteApiController::addRoutes($collection);
 \MZ\Product\ServicoApiController::addRoutes($collection);
+\MZ\Payment\CartaoApiController::addRoutes($collection);
+\MZ\Payment\FormaPagtoApiController::addRoutes($collection);
 
 return $collection;

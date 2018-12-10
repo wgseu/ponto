@@ -29,7 +29,7 @@ class FornecedorTest extends \MZ\Framework\TestCase
     public function testPublish()
     {
         $fornecedor = new Fornecedor();
-        $values = $fornecedor->publish();
+        $values = $fornecedor->publish(app()->auth->provider);
         $allowed = [
             'id',
             'empresaid',

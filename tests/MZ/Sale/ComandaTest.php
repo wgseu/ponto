@@ -73,14 +73,14 @@ class ComandaTest extends \MZ\Framework\TestCase
             'nome' => ' Comanda <script>filter</script> ',
             'ativa' => 'Y',
         ]);
-        $comanda->filter($old_comanda, true);
+        $comanda->filter($old_comanda, app()->auth->provider, true);
         $this->assertEquals($old_comanda, $comanda);
     }
 
     public function testPublish()
     {
         $comanda = new Comanda();
-        $values = $comanda->publish();
+        $values = $comanda->publish(app()->auth->provider);
         $allowed = [
             'id',
             'numero',

@@ -51,7 +51,7 @@ class BancoPageController extends PageController
         if ($this->isJson()) {
             $items = [];
             foreach ($bancos as $_banco) {
-                $items[] = $_banco->publish();
+                $items[] = $_banco->publish(app()->auth->provider);
             }
             return $this->json()->success(['items' => $items]);
         }
@@ -69,14 +69,14 @@ class BancoPageController extends PageController
         if ($this->getRequest()->isMethod('POST')) {
             $banco = new Banco($this->getData());
             try {
-                $banco->filter($old_banco, true);
+                $banco->filter($old_banco, app()->auth->provider, true);
                 $banco->insert();
                 $msg = sprintf(
                     'Banco "%s" cadastrado com sucesso!',
                     $banco->getRazaoSocial()
                 );
                 if ($this->isJson()) {
-                    return $this->json()->success(['item' => $banco->publish()], $msg);
+                    return $this->json()->success(['item' => $banco->publish(app()->auth->provider)], $msg);
                 }
                 \Thunder::success($msg, true);
                 return $this->redirect('/gerenciar/banco/');
@@ -119,14 +119,14 @@ class BancoPageController extends PageController
         if ($this->getRequest()->isMethod('POST')) {
             $banco = new Banco($this->getData());
             try {
-                $banco->filter($old_banco, true);
+                $banco->filter($old_banco, app()->auth->provider, true);
                 $banco->update();
                 $msg = sprintf(
                     'Banco "%s" atualizado com sucesso!',
                     $banco->getRazaoSocial()
                 );
                 if ($this->isJson()) {
-                    return $this->json()->success(['item' => $banco->publish()], $msg);
+                    return $this->json()->success(['item' => $banco->publish(app()->auth->provider)], $msg);
                 }
                 \Thunder::success($msg, true);
                 return $this->redirect('/gerenciar/banco/');

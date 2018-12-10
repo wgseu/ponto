@@ -196,21 +196,23 @@ class Estado extends SyncModel
 
     /**
      * Convert this instance into array associated key -> value with only public fields
+     * @param \MZ\Provider\Prestador $requester user that request to view this fields
      * @return array All public field and values into array format
      */
-    public function publish()
+    public function publish($requester)
     {
-        $estado = parent::publish();
+        $estado = parent::publish($requester);
         return $estado;
     }
 
     /**
      * Filter fields, upload data and keep key data
      * @param self $original Original instance without modifications
+     * @param \MZ\Provider\Prestador $updater user that want to update this object
      * @param boolean $localized Informs if fields are localized
      * @return self Self instance
      */
-    public function filter($original, $localized = false)
+    public function filter($original, $updater, $localized = false)
     {
         $this->setID($original->getID());
         $this->setPaisID(Filter::number($this->getPaisID()));
@@ -285,84 +287,6 @@ class Estado extends SyncModel
     }
 
     /**
-     * Insert a new Estado into the database and fill instance from database
-     * @return self Self instance
-     * @throws \MZ\Exception\ValidationException for invalid input data
-     */
-    public function insert()
-    {
-        $this->setID(null);
-        $values = $this->validate();
-        unset($values['id']);
-        try {
-            $id = DB::insertInto('Estados')->values($values)->execute();
-            $this->setID($id);
-            $this->loadByID();
-        } catch (\Exception $e) {
-            throw $this->translate($e);
-        }
-        return $this;
-    }
-
-    /**
-     * Update Estado with instance values into database for ID
-     * @param array $only Save these fields only, when empty save all fields except id
-     * @return int rows affected
-     * @throws \MZ\Exception\ValidationException for invalid input data
-     */
-    public function update($only = [])
-    {
-        $values = $this->validate();
-        if (!$this->exists()) {
-            throw new ValidationException(
-                ['id' => _t('estado.id_cannot_empty')]
-            );
-        }
-        $values = DB::filterValues($values, $only, false);
-        try {
-            $affected = DB::update('Estados')
-                ->set($values)
-                ->where(['id' => $this->getID()])
-                ->execute();
-            $this->loadByID();
-        } catch (\Exception $e) {
-            throw $this->translate($e);
-        }
-        return $affected;
-    }
-
-    /**
-     * Delete this instance from database using ID
-     * @return integer Number of rows deleted (Max 1)
-     * @throws \MZ\Exception\ValidationException for invalid id
-     */
-    public function delete()
-    {
-        if (!$this->exists()) {
-            throw new ValidationException(
-                ['id' => _t('estado.id_cannot_empty')]
-            );
-        }
-        $result = DB::deleteFrom('Estados')
-            ->where('id', $this->getID())
-            ->execute();
-        return $result;
-    }
-
-    /**
-     * Load one register for it self with a condition
-     * @param array $condition Condition for searching the row
-     * @param array $order associative field name -> [-1, 1]
-     * @return self Self instance filled or empty
-     */
-    public function load($condition, $order = [])
-    {
-        $query = self::query($condition, $order)->limit(1);
-        $row = $query->fetch() ?: [];
-        return $this->fromArray($row);
-    }
-
-    /**
      * Load into this object from database using, PaisID, Nome
      * @return self Self filled instance or empty when not found
      */
@@ -396,35 +320,13 @@ class Estado extends SyncModel
     }
 
     /**
-     * Get allowed keys array
-     * @return array allowed keys array
-     */
-    private static function getAllowedKeys()
-    {
-        $estado = new self();
-        $allowed = Filter::concatKeys('e.', $estado->toArray());
-        return $allowed;
-    }
-
-    /**
-     * Filter order array
-     * @param mixed $order order string or array to parse and filter allowed
-     * @return array allowed associative order
-     */
-    private static function filterOrder($order)
-    {
-        $allowed = self::getAllowedKeys();
-        return Filter::orderBy($order, $allowed, 'e.');
-    }
-
-    /**
      * Filter condition array with allowed fields
      * @param array $condition condition to filter rows
      * @return array allowed condition
      */
-    protected static function filterCondition($condition)
+    protected function filterCondition($condition)
     {
-        $allowed = self::getAllowedKeys();
+        $allowed = $this->getAllowedKeys();
         return Filter::keys($condition, $allowed, 'e.');
     }
 
@@ -434,46 +336,18 @@ class Estado extends SyncModel
      * @param array $order order rows
      * @return SelectQuery query object with condition statement
      */
-    protected static function query($condition = [], $order = [])
+    protected function query($condition = [], $order = [])
     {
         $query = DB::from('Estados e');
         if (isset($condition['search'])) {
             $search = $condition['search'];
             $query = DB::buildSearch($search, DB::concat(['e.nome', '" "', 'e.uf']), $query);
         }
-        $condition = self::filterCondition($condition);
-        $query = DB::buildOrderBy($query, self::filterOrder($order));
+        $condition = $this->filterCondition($condition);
+        $query = DB::buildOrderBy($query, $this->filterOrder($order));
         $query = $query->orderBy('e.nome ASC');
         $query = $query->orderBy('e.id ASC');
         return DB::buildCondition($query, $condition);
-    }
-
-    /**
-     * Search one register with a condition
-     * @param array $condition Condition for searching the row
-     * @param array $order order rows
-     * @return self A filled Estado or empty instance
-     */
-    public static function find($condition, $order = [])
-    {
-        $result = new self();
-        return $result->load($condition, $order);
-    }
-
-    /**
-     * Search one register with a condition
-     * @param array $condition Condition for searching the row
-     * @param array $order order rows
-     * @return self A filled Estado or empty instance
-     * @throws \Exception when register has not found
-     */
-    public static function findOrFail($condition, $order = [])
-    {
-        $result = self::find($condition, $order);
-        if (!$result->exists()) {
-            throw new \Exception(_t('estado.not_found'), 404);
-        }
-        return $result;
     }
 
     /**
@@ -502,41 +376,5 @@ class Estado extends SyncModel
         $result->setPaisID($pais_id);
         $result->setUF($uf);
         return $result->loadByPaisIDUF();
-    }
-
-    /**
-     * Find all Estado
-     * @param array  $condition Condition to get all Estado
-     * @param array  $order     Order Estado
-     * @param int    $limit     Limit data into row count
-     * @param int    $offset    Start offset to get rows
-     * @return self[] List of all rows instanced as Estado
-     */
-    public static function findAll($condition = [], $order = [], $limit = null, $offset = null)
-    {
-        $query = self::query($condition, $order);
-        if (!is_null($limit)) {
-            $query = $query->limit($limit);
-        }
-        if (!is_null($offset)) {
-            $query = $query->offset($offset);
-        }
-        $rows = $query->fetchAll();
-        $result = [];
-        foreach ($rows as $row) {
-            $result[] = new self($row);
-        }
-        return $result;
-    }
-
-    /**
-     * Count all rows from database with matched condition critery
-     * @param array $condition condition to filter rows
-     * @return integer Quantity of rows
-     */
-    public static function count($condition = [])
-    {
-        $query = self::query($condition);
-        return $query->count();
     }
 }

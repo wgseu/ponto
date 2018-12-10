@@ -58,12 +58,12 @@ class PedidoApiController extends \MZ\Core\ApiController
         } catch (\Exception $e) {
             return $this->json()->error($e->getMessage());
         }
-        return $this->json()->success(['item' => $order->publish()]);
+        return $this->json()->success(['item' => $order->publish(app()->auth->provider)]);
     }
 
     /**
      * Build receipt job for printer and mark order as closing
-     * @Put("/api/pedidos/receipt/{id}", name="api_pedido_receipt", params={ "id": "\d+" })
+     * @Patch("/api/pedidos/receipt/{id}", name="api_pedido_receipt", params={ "id": "\d+" })
      */
     public function receipt($id)
     {

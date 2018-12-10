@@ -56,7 +56,7 @@ class PrestadorPageController extends PageController
         if ($this->isJson()) {
             $items = [];
             foreach ($prestadores as $_funcionario) {
-                $items[] = $_funcionario->publish();
+                $items[] = $_funcionario->publish(app()->auth->provider);
             }
             return $this->json()->success(['items' => $items]);
         }
@@ -96,7 +96,7 @@ class PrestadorPageController extends PageController
         if ($this->getRequest()->isMethod('POST')) {
             $prestador = new Prestador($this->getData());
             try {
-                $prestador->filter($old_funcionario, true);
+                $prestador->filter($old_funcionario, app()->auth->provider, true);
                 $prestador->insert();
                 $old_funcionario->clean($prestador);
                 $cliente = $prestador->findClienteID();
@@ -105,7 +105,7 @@ class PrestadorPageController extends PageController
                     $cliente->getAssinatura()
                 );
                 if ($this->isJson()) {
-                    return $this->json()->success(['item' => $cliente->publish()], $msg);
+                    return $this->json()->success(['item' => $cliente->publish(app()->auth->provider)], $msg);
                 }
                 \Thunder::success($msg, true);
                 return $this->redirect('/gerenciar/funcionario/');
@@ -170,7 +170,7 @@ class PrestadorPageController extends PageController
         if ($this->getRequest()->isMethod('POST')) {
             $prestador = new Prestador($this->getData());
             try {
-                $prestador->filter($old_funcionario, true);
+                $prestador->filter($old_funcionario, app()->auth->provider, true);
                 $prestador->update();
                 $old_funcionario->clean($prestador);
                 $msg = sprintf(
@@ -178,7 +178,7 @@ class PrestadorPageController extends PageController
                     $cliente_func->getAssinatura()
                 );
                 if ($this->isJson()) {
-                    return $this->json()->success(['item' => $cliente_func->publish()], $msg);
+                    return $this->json()->success(['item' => $cliente_func->publish(app()->auth->provider)], $msg);
                 }
                 \Thunder::success($msg, true);
                 return $this->redirect('/gerenciar/funcionario/');

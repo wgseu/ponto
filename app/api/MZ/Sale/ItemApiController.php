@@ -75,7 +75,7 @@ class ItemApiController extends \MZ\Core\ApiController
 
     /**
      * Build printer jobs for not printed order items
-     * @Put("/api/itens/jobs/{id}", name="api_item_jobs", params={ "id": "\d+" })
+     * @Patch("/api/itens/jobs/{id}", name="api_item_jobs", params={ "id": "\d+" })
      */
     public function jobs($id)
     {
@@ -206,7 +206,7 @@ class ItemApiController extends \MZ\Core\ApiController
 
     /**
      * Uncheck order items marked as printed
-     * @Put("/api/itens/uncheck", name="api_item_uncheck")
+     * @Patch("/api/itens/uncheck", name="api_item_uncheck")
      */
     public function uncheck()
     {

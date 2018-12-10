@@ -67,7 +67,7 @@ class EstoqueTest extends \MZ\Framework\TestCase
     public function testPublish()
     {
         $estoque = new Estoque();
-        $values = $estoque->publish();
+        $values = $estoque->publish(app()->auth->provider);
         $allowed = [
             'id',
             'produtoid',

@@ -58,14 +58,14 @@ class MesaTest extends \MZ\Framework\TestCase
             'nome' => ' Mesa <script>filter</script> ',
             'ativa' => 'Y',
         ]);
-        $mesa->filter($old_mesa, true);
+        $mesa->filter($old_mesa, app()->auth->provider, true);
         $this->assertEquals($old_mesa, $mesa);
     }
 
     public function testPublish()
     {
         $mesa = new Mesa();
-        $values = $mesa->publish();
+        $values = $mesa->publish(app()->auth->provider);
         $allowed = [
             'id',
             'setorid',

@@ -48,7 +48,7 @@ class TelefoneApiController extends \MZ\Core\ApiController
         $telefones = Telefone::findAll($condition, $order, $limit, $pager->offset);
         $itens = [];
         foreach ($telefones as $telefone) {
-            $itens[] = $telefone->publish();
+            $itens[] = $telefone->publish(app()->auth->provider);
         }
         return $this->getResponse()->success(['items' => $itens, 'pages' => $pager->pageCount]);
     }
@@ -62,27 +62,27 @@ class TelefoneApiController extends \MZ\Core\ApiController
         $this->needPermission([Permissao::NOME_CADASTROCLIENTES]);
         $localized = $this->getRequest()->query->getBoolean('localized', false);
         $telefone = new Telefone($this->getData());
-        $telefone->filter(new Telefone(), $localized);
+        $telefone->filter(new Telefone(), app()->auth->provider, $localized);
         $telefone->insert();
-        return $this->getResponse()->success(['item' => $telefone->publish()]);
+        return $this->getResponse()->success(['item' => $telefone->publish(app()->auth->provider)]);
     }
 
     /**
-     * Update an existing Telefone
-     * @Put("/api/telefones/{id}", name="api_telefone_update", params={ "id": "\d+" })
+     * Modify parts of an existing Telefone
+     * @Patch("/api/telefones/{id}", name="api_telefone_update", params={ "id": "\d+" })
      * 
-     * @param int $id Telefone id to update
+     * @param int $id Telefone id
      */
-    public function update($id)
+    public function modify($id)
     {
         $this->needPermission([Permissao::NOME_CADASTROCLIENTES]);
         $old_telefone = Telefone::findOrFail(['id' => $id]);
         $localized = $this->getRequest()->query->getBoolean('localized', false);
         $telefone = new Telefone($this->getData());
-        $telefone->filter($old_telefone, $localized);
+        $telefone->filter($old_telefone, app()->auth->provider, $localized);
         $telefone->update();
         $old_telefone->clean($telefone);
-        return $this->getResponse()->success(['item' => $telefone->publish()]);
+        return $this->getResponse()->success(['item' => $telefone->publish(app()->auth->provider)]);
     }
 
     /**

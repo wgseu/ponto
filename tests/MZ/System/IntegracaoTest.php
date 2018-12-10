@@ -29,7 +29,7 @@ class IntegracaoTest extends \MZ\Framework\TestCase
     public function testPublish()
     {
         $integracao = new Integracao();
-        $values = $integracao->publish();
+        $values = $integracao->publish(app()->auth->provider);
         $allowed = [
             'id',
             'nome',

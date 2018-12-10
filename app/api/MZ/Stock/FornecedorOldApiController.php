@@ -48,8 +48,8 @@ class FornecedorOldApiController extends \MZ\Core\ApiController
         $domask = $this->getRequest()->query->getBoolean('format');
         foreach ($fornecedores as $fornecedor) {
             $cliente = $fornecedor->findEmpresaID();
-            $cliente_item = $cliente->publish();
-            $item = $fornecedor->publish();
+            $cliente_item = $cliente->publish(app()->auth->provider);
+            $item = $fornecedor->publish(app()->auth->provider);
             $item['nome'] = $cliente->getNome();
             $item['fone1'] = $cliente->getTelefone()->getNumero();
             $item['cnpj'] = $cliente->getCPF();

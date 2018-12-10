@@ -46,7 +46,7 @@ class AcessoTest extends \MZ\Framework\TestCase
     public function testPublish()
     {
         $acesso = new Acesso();
-        $values = $acesso->publish();
+        $values = $acesso->publish(app()->auth->provider);
         $allowed = [
             'id',
             'funcaoid',

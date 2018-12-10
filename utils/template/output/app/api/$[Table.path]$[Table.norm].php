@@ -239,11 +239,12 @@ $[field.end]
 
     /**
      * Convert this instance into array associated key -> value with only public fields
+     * @param \MZ\Provider\Prestador $requester user that request to view this fields
      * @return array All public field and values into array format
      */
-    public function publish()
+    public function publish($requester)
     {
-        $$[table.unix] = parent::publish();
+        $$[table.unix] = parent::publish($requester);
 $[field.each(all)]
 $[field.if(image|blob)]
         $$[table.unix]['$[field]'] = $this->make$[Field.norm]($[field.if(array)]$[field.array.number], $[field.end]false, null);
@@ -269,10 +270,11 @@ $[field.end]
     /**
      * Filter fields, upload data and keep key data
      * @param self $original Original instance without modifications
+     * @param \MZ\Provider\Prestador $updater user that want to update this object
      * @param boolean $localized Informs if fields are localized
      * @return self Self instance
      */
-    public function filter($original, $localized = false)
+    public function filter($original, $updater, $localized = false)
     {
 $[field.each(all)]
 $[field.if(primary)]
@@ -427,95 +429,6 @@ $[table.else]
         return $e;
 $[table.end]
     }
-
-    /**
-     * Insert a new $[Table.name] into the database and fill instance from database
-     * @return self Self instance
-     * @throws \MZ\Exception\ValidationException for invalid input data
-     */
-    public function insert()
-    {
-        $this->set$[Primary.norm](null);
-        $values = $this->validate();
-        unset($values['$[primary]']);
-        try {
-            $$[primary.unix] = DB::insertInto('$[Table]')->values($values)->execute();
-            $this->set$[Primary.norm]($$[primary.unix]);
-            $this->loadBy$[Primary.norm]();
-        } catch (\Exception $e) {
-            throw $this->translate($e);
-        }
-        return $this;
-    }
-
-    /**
-     * Update $[Table.name] with instance values into database for $[Primary.name]
-     * @param array $only Save these fields only, when empty save all fields except id
-     * @return int rows affected
-     * @throws \MZ\Exception\ValidationException for invalid input data
-     */
-    public function update($only = [])
-    {
-        $values = $this->validate();
-        if (!$this->exists()) {
-            throw new ValidationException(
-                ['id' => _t('$[table.unix].id_cannot_empty')]
-            );
-        }
-        $values = DB::filterValues($values, $only, false);
-$[field.each(all)]
-$[field.if(blob)]
-        if ($this->get$[Field.norm]($[field.if(array)]$[field.array.number]$[field.end]) === true) {
-            unset($values['$[field]']);
-        }
-$[field.else.if(datetime)]
-$[field.match(.*cadastro|.*criacao|.*lancamento|.*envio)]
-        unset($values['$[field]']);
-$[field.end]
-$[field.end]
-$[field.end]
-        try {
-            $affected = DB::update('$[Table]')
-                ->set($values)
-                ->where(['$[primary]' => $this->get$[Primary.norm]()])
-                ->execute();
-            $this->loadBy$[Primary.norm]();
-        } catch (\Exception $e) {
-            throw $this->translate($e);
-        }
-        return $affected;
-    }
-
-    /**
-     * Delete this instance from database using $[Primary.name]
-     * @return integer Number of rows deleted (Max 1)
-     * @throws \MZ\Exception\ValidationException for invalid id
-     */
-    public function delete()
-    {
-        if (!$this->exists()) {
-            throw new ValidationException(
-                ['id' => _t('$[table.unix].id_cannot_empty')]
-            );
-        }
-        $result = DB::deleteFrom('$[Table]')
-            ->where('$[primary]', $this->get$[Primary.norm]())
-            ->execute();
-        return $result;
-    }
-
-    /**
-     * Load one register for it self with a condition
-     * @param array $condition Condition for searching the row
-     * @param array $order associative field name -> [-1, 1]
-     * @return self Self instance filled or empty
-     */
-    public function load($condition, $order = [])
-    {
-        $query = self::query($condition, $order)->limit(1);
-        $row = $query->fetch() ?: [];
-        return $this->fromArray($row);
-    }
 $[table.each(unique)]
 
     /**
@@ -606,35 +519,13 @@ $[field.end]
 $[field.end]
 
     /**
-     * Get allowed keys array
-     * @return array allowed keys array
-     */
-    private static function getAllowedKeys()
-    {
-        $$[table.unix] = new self();
-        $allowed = Filter::concatKeys('$[table.letter].', $$[table.unix]->toArray());
-        return $allowed;
-    }
-
-    /**
-     * Filter order array
-     * @param mixed $order order string or array to parse and filter allowed
-     * @return array allowed associative order
-     */
-    private static function filterOrder($order)
-    {
-        $allowed = self::getAllowedKeys();
-        return Filter::orderBy($order, $allowed, '$[table.letter].');
-    }
-
-    /**
      * Filter condition array with allowed fields
      * @param array $condition condition to filter rows
      * @return array allowed condition
      */
-    protected static function filterCondition($condition)
+    protected function filterCondition($condition)
     {
-        $allowed = self::getAllowedKeys();
+        $allowed = $this->getAllowedKeys();
 $[descriptor.if(string)]
         if (isset($condition['search'])) {
             $search = $condition['search'];
@@ -653,7 +544,7 @@ $[descriptor.end]
      * @param array $order order rows
      * @return SelectQuery query object with condition statement
      */
-    protected static function query($condition = [], $order = [])
+    protected function query($condition = [], $order = [])
     {
 $[table.exists(blob)]
         $query = DB::from('$[Table] $[table.letter]')
@@ -671,41 +562,13 @@ $[field.end];
 $[table.else]
         $query = DB::from('$[Table] $[table.letter]');
 $[table.end]
-        $condition = self::filterCondition($condition);
-        $query = DB::buildOrderBy($query, self::filterOrder($order));
+        $condition = $this->filterCondition($condition);
+        $query = DB::buildOrderBy($query, $this->filterOrder($order));
 $[descriptor.if(string)]
         $query = $query->orderBy('$[table.letter].$[descriptor] ASC');
 $[descriptor.end]
         $query = $query->orderBy('$[table.letter].$[primary] ASC');
         return DB::buildCondition($query, $condition);
-    }
-
-    /**
-     * Search one register with a condition
-     * @param array $condition Condition for searching the row
-     * @param array $order order rows
-     * @return self A filled $[Table.name] or empty instance
-     */
-    public static function find($condition, $order = [])
-    {
-        $result = new self();
-        return $result->load($condition, $order);
-    }
-
-    /**
-     * Search one register with a condition
-     * @param array $condition Condition for searching the row
-     * @param array $order order rows
-     * @return self A filled $[Table.name] or empty instance
-     * @throws \Exception when register has not found
-     */
-    public static function findOrFail($condition, $order = [])
-    {
-        $result = self::find($condition, $order);
-        if (!$result->exists()) {
-            throw new \Exception(_t('$[table.unix].not_found'), 404);
-        }
-        return $result;
     }
 $[table.each(unique)]
 
@@ -732,40 +595,4 @@ $[unique.end]
         return $result->loadBy$[unique.each(all)]$[Field.norm]$[unique.end]();
     }
 $[table.end]
-
-    /**
-     * Find all $[Table.name]
-     * @param array  $condition Condition to get all $[Table.name]
-     * @param array  $order     Order $[Table.name]
-     * @param int    $limit     Limit data into row count
-     * @param int    $offset    Start offset to get rows
-     * @return self[] List of all rows instanced as $[Table.norm]
-     */
-    public static function findAll($condition = [], $order = [], $limit = null, $offset = null)
-    {
-        $query = self::query($condition, $order);
-        if (!is_null($limit)) {
-            $query = $query->limit($limit);
-        }
-        if (!is_null($offset)) {
-            $query = $query->offset($offset);
-        }
-        $rows = $query->fetchAll();
-        $result = [];
-        foreach ($rows as $row) {
-            $result[] = new self($row);
-        }
-        return $result;
-    }
-
-    /**
-     * Count all rows from database with matched condition critery
-     * @param array $condition condition to filter rows
-     * @return integer Quantity of rows
-     */
-    public static function count($condition = [])
-    {
-        $query = self::query($condition);
-        return $query->count();
-    }
 }

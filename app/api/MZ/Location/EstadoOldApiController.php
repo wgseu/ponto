@@ -39,7 +39,7 @@ class EstadoOldApiController extends \MZ\Core\ApiController
         $estados = Estado::findAll(['paisid' => $pais->getID()]);
         $items = [];
         foreach ($estados as $estado) {
-            $items[] = $estado->publish();
+            $items[] = $estado->publish(app()->auth->provider);
         }
         return $this->json()->success(['items' => $items]);
     }

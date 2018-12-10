@@ -748,3 +748,81 @@ function replace_key($array, $key1, $key2)
 
     return $array;
 }
+
+function startsWith($haystack, $needle)
+{
+     $length = \strlen($needle);
+     return (\substr($haystack, 0, $length) === $needle);
+}
+
+function endsWith($haystack, $needle)
+{
+    $length = \strlen($needle);
+    if ($length == 0) {
+        return true;
+    }
+
+    return (\substr($haystack, -$length) === $needle);
+}
+
+function class_basename($class)
+{
+    if (\is_object($class)) {
+        $classname = \get_class($class);
+    } else {
+        $classname = $class;
+    }
+    $i = \strrpos($classname, '\\');
+    if ($i === false) {
+        return $classname;
+    }
+    return \substr($classname, $i + 1);
+}
+
+function underscore_case($str)
+{
+    return \ltrim(\preg_replace('/[A-Z]([A-Z](?![a-z]))*/', '_$0', $str), '_');
+}
+
+function snake_case($str)
+{
+    return \strtolower(underscore_case($str));
+}
+
+function str_plural($name, $count = 0)
+{
+    if ($count === 1) {
+        return $name;
+    }
+    if (endsWith($name, 'cao')) {
+        return \substr($name, 0, -3) . 'coes';
+    }
+    if (endsWith($name, 'sao')) {
+        return \substr($name, 0, -3) . 'soes';
+    }
+    if (endsWith($name, 'ao')) {
+        return \substr($name, 0, -2) . 'aes';
+    }
+    if (endsWith($name, 'is')) {
+        return \substr($name, 0, -2) . 'ises';
+    }
+    if (endsWith($name, 'l')) {
+        return \substr($name, 0, -1) . 'is';
+    }
+    if (endsWith($name, 'm')) {
+        return \substr($name, 0, -1) . 'ns';
+    }
+    if (endsWith($name, 'r')) {
+        return \substr($name, 0, -1) . 'res';
+    }
+    return $name . 's';
+}
+
+function pluralize($haystack, $delimiter = '_')
+{
+    $names = \explode($delimiter, $haystack);
+    foreach ($names as $key => $name) {
+        $names[$key] = str_plural($name);
+    }
+    return \implode($delimiter, $names);
+}

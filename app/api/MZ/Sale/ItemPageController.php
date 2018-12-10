@@ -81,7 +81,7 @@ class ItemPageController extends PageController
         if ($this->isJson()) {
             $items = [];
             foreach ($itens_do_pedido as $_produto_pedido) {
-                $items[] = $_produto_pedido->publish();
+                $items[] = $_produto_pedido->publish(app()->auth->provider);
             }
             return $this->json()->success(['items' => $items]);
         }

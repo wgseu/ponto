@@ -58,14 +58,14 @@ class BancoTest extends \MZ\Framework\TestCase
             'agenciamascara' => ' Banco <script>filter</script> ',
             'contamascara' => ' Banco <script>filter</script> ',
         ]);
-        $banco->filter($old_banco, true);
+        $banco->filter($old_banco, app()->auth->provider, true);
         $this->assertEquals($old_banco, $banco);
     }
 
     public function testPublish()
     {
         $banco = new Banco();
-        $values = $banco->publish();
+        $values = $banco->publish(app()->auth->provider);
         $allowed = [
             'id',
             'numero',

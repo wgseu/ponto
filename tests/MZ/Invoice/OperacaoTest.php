@@ -55,14 +55,14 @@ class OperacaoTest extends \MZ\Framework\TestCase
             'descricao' => ' Operação <script>filter</script> ',
             'detalhes' => ' Operação <script>filter</script> ',
         ]);
-        $operacao->filter($old_operacao, true);
+        $operacao->filter($old_operacao, app()->auth->provider, true);
         $this->assertEquals($old_operacao, $operacao);
     }
 
     public function testPublish()
     {
         $operacao = new Operacao();
-        $values = $operacao->publish();
+        $values = $operacao->publish(app()->auth->provider);
         $allowed = [
             'id',
             'codigo',

@@ -51,7 +51,7 @@ class ServicoPageController extends PageController
         if ($this->isJson()) {
             $items = [];
             foreach ($servicos as $_servico) {
-                $items[] = $_servico->publish();
+                $items[] = $_servico->publish(app()->auth->provider);
             }
             return $this->json()->success(['items' => $items]);
         }
@@ -74,7 +74,7 @@ class ServicoPageController extends PageController
         if ($this->getRequest()->isMethod('POST')) {
             $servico = new Servico($this->getData());
             try {
-                $servico->filter($old_servico, true);
+                $servico->filter($old_servico, app()->auth->provider, true);
                 $servico->insert();
                 $old_servico->clean($servico);
                 $msg = sprintf(
@@ -82,7 +82,7 @@ class ServicoPageController extends PageController
                     $servico->getDescricao()
                 );
                 if ($this->isJson()) {
-                    return $this->json()->success(['item' => $servico->publish()], $msg);
+                    return $this->json()->success(['item' => $servico->publish(app()->auth->provider)], $msg);
                 }
                 \Thunder::success($msg, true);
                 return $this->redirect('/gerenciar/servico/');
@@ -127,7 +127,7 @@ class ServicoPageController extends PageController
         if ($this->getRequest()->isMethod('POST')) {
             $servico = new Servico($this->getData());
             try {
-                $servico->filter($old_servico, true);
+                $servico->filter($old_servico, app()->auth->provider, true);
                 $servico->update();
                 $old_servico->clean($servico);
                 $msg = sprintf(
@@ -135,7 +135,7 @@ class ServicoPageController extends PageController
                     $servico->getDescricao()
                 );
                 if ($this->isJson()) {
-                    return $this->json()->success(['item' => $servico->publish()], $msg);
+                    return $this->json()->success(['item' => $servico->publish(app()->auth->provider)], $msg);
                 }
                 \Thunder::success($msg, true);
                 return $this->redirect('/gerenciar/servico/');

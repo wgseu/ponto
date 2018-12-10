@@ -70,14 +70,14 @@ class HorarioTest extends \MZ\Framework\TestCase
             'mensagem' => ' Horário <script>filter</script> ',
             'fechado' => 'Y',
         ]);
-        $horario->filter($old_horario, true);
+        $horario->filter($old_horario, app()->auth->provider, true);
         $this->assertEquals($old_horario, $horario);
     }
 
     public function testPublish()
     {
         $horario = new Horario();
-        $values = $horario->publish();
+        $values = $horario->publish(app()->auth->provider);
         $allowed = [
             'id',
             'modo',

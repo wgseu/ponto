@@ -51,7 +51,7 @@ class AuditoriaPageController extends PageController
         if ($this->isJson()) {
             $items = [];
             foreach ($auditorias as $_auditoria) {
-                $items[] = $_auditoria->publish();
+                $items[] = $_auditoria->publish(app()->auth->provider);
             }
             return $this->json()->success(['items' => $items]);
         }

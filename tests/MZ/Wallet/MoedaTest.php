@@ -73,14 +73,14 @@ class MoedaTest extends \MZ\Framework\TestCase
             'dataatualizacao' => '2016-12-25 12:15:00',
             'ativa' => 'Y',
         ]);
-        $moeda->filter($old_moeda, true);
+        $moeda->filter($old_moeda, app()->auth->provider, true);
         $this->assertEquals($old_moeda, $moeda);
     }
 
     public function testPublish()
     {
         $moeda = new Moeda();
-        $values = $moeda->publish();
+        $values = $moeda->publish(app()->auth->provider);
         $allowed = [
             'id',
             'nome',

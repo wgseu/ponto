@@ -40,6 +40,8 @@ class Sistema extends Model
 {
     const VERSAO = '2000';
 
+    protected $table = 'Sistema';
+
     /**
      * Identificador único do sistema, valor 1
      */
@@ -389,11 +391,12 @@ class Sistema extends Model
 
     /**
      * Convert this instance into array associated key -> value with only public fields
+     * @param \MZ\Provider\Prestador $requester user that request to view this fields
      * @return array All public field and values into array format
      */
-    public function publish()
+    public function publish($requester)
     {
-        $sistema = parent::publish();
+        $sistema = parent::publish($requester);
         unset($sistema['licenca']);
         unset($sistema['guid']);
         return $sistema;
@@ -453,10 +456,11 @@ class Sistema extends Model
     /**
      * Filter fields, upload data and keep key data
      * @param self $original Original instance without modifications
+     * @param \MZ\Provider\Prestador $updater user that want to update this object
      * @param boolean $localized Informs if fields are localized
      * @return self Self instance
      */
-    public function filter($original, $localized = false)
+    public function filter($original, $updater, $localized = false)
     {
         $this->setID($original->getID());
         $this->setServidorID(Filter::number($this->getServidorID()));
@@ -610,33 +614,6 @@ class Sistema extends Model
     }
 
     /**
-     * Update Sistema with instance values into database for ID
-     * @param array $only Save these fields only, when empty save all fields except id
-     * @return int rows affected
-     * @throws \MZ\Exception\ValidationException for invalid input data
-     */
-    public function update($only = [])
-    {
-        $values = $this->validate();
-        if (!$this->exists()) {
-            throw new ValidationException(
-                ['id' => _t('sistema.id_cannot_empty')]
-            );
-        }
-        $values = DB::filterValues($values, $only, false);
-        try {
-            $affected = DB::update('Sistema')
-                ->set($values)
-                ->where(['id' => $this->getID()])
-                ->execute();
-            $this->loadByID();
-        } catch (\Exception $e) {
-            throw $this->translate($e);
-        }
-        return $affected;
-    }
-
-    /**
      * Delete this instance from database using ID
      * @throws \Exception for invalid id
      */
@@ -646,19 +623,6 @@ class Sistema extends Model
             'Não é possível excluir informações do sistema',
             500
         );
-    }
-
-    /**
-     * Load one register for it self with a condition
-     * @param array $condition Condition for searching the row
-     * @param array $order associative field name -> [-1, 1]
-     * @return self Self instance filled or empty
-     */
-    public function load($condition, $order = [])
-    {
-        $query = self::query($condition, $order)->limit(1);
-        $row = $query->fetch() ?: [];
-        return $this->fromArray($row);
     }
 
     /**
@@ -698,35 +662,13 @@ class Sistema extends Model
     }
 
     /**
-     * Get allowed keys array
-     * @return array allowed keys array
-     */
-    private static function getAllowedKeys()
-    {
-        $sistema = new self();
-        $allowed = Filter::concatKeys('s.', $sistema->toArray());
-        return $allowed;
-    }
-
-    /**
-     * Filter order array
-     * @param mixed $order order string or array to parse and filter allowed
-     * @return array allowed associative order
-     */
-    private static function filterOrder($order)
-    {
-        $allowed = self::getAllowedKeys();
-        return Filter::orderBy($order, $allowed, 's.');
-    }
-
-    /**
      * Filter condition array with allowed fields
      * @param array $condition condition to filter rows
      * @return array allowed condition
      */
-    protected static function filterCondition($condition)
+    protected function filterCondition($condition)
     {
-        $allowed = self::getAllowedKeys();
+        $allowed = $this->getAllowedKeys();
         return Filter::keys($condition, $allowed, 's.');
     }
 
@@ -736,75 +678,11 @@ class Sistema extends Model
      * @param array $order order rows
      * @return SelectQuery query object with condition statement
      */
-    protected static function query($condition = [], $order = [])
+    protected function query($condition = [], $order = [])
     {
         $query = DB::from('Sistema s');
-        $condition = self::filterCondition($condition);
-        $query = DB::buildOrderBy($query, self::filterOrder($order));
+        $condition = $this->filterCondition($condition);
+        $query = DB::buildOrderBy($query, $this->filterOrder($order));
         return DB::buildCondition($query, $condition);
-    }
-
-    /**
-     * Search one register with a condition
-     * @param array $condition Condition for searching the row
-     * @param array $order order rows
-     * @return self A filled Sistema or empty instance
-     */
-    public static function find($condition, $order = [])
-    {
-        $result = new self();
-        return $result->load($condition, $order);
-    }
-
-    /**
-     * Search one register with a condition
-     * @param array $condition Condition for searching the row
-     * @param array $order order rows
-     * @return self A filled Sistema or empty instance
-     * @throws \Exception when register has not found
-     */
-    public static function findOrFail($condition, $order = [])
-    {
-        $result = self::find($condition, $order);
-        if (!$result->exists()) {
-            throw new \Exception(_t('sistema.not_found'), 404);
-        }
-        return $result;
-    }
-
-    /**
-     * Find all Sistema
-     * @param array  $condition Condition to get all Sistema
-     * @param array  $order     Order Sistema
-     * @param int    $limit     Limit data into row count
-     * @param int    $offset    Start offset to get rows
-     * @return self[] List of all rows instanced as Sistema
-     */
-    public static function findAll($condition = [], $order = [], $limit = null, $offset = null)
-    {
-        $query = self::query($condition, $order);
-        if (!is_null($limit)) {
-            $query = $query->limit($limit);
-        }
-        if (!is_null($offset)) {
-            $query = $query->offset($offset);
-        }
-        $rows = $query->fetchAll();
-        $result = [];
-        foreach ($rows as $row) {
-            $result[] = new self($row);
-        }
-        return $result;
-    }
-
-    /**
-     * Count all rows from database with matched condition critery
-     * @param array $condition condition to filter rows
-     * @return integer Quantity of rows
-     */
-    public static function count($condition = [])
-    {
-        $query = self::query($condition);
-        return $query->count();
     }
 }

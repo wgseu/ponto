@@ -52,14 +52,14 @@ class RegimeTest extends \MZ\Framework\TestCase
             'codigo' => '1.234',
             'descricao' => ' Regime <script>filter</script> ',
         ]);
-        $regime->filter($old_regime, true);
+        $regime->filter($old_regime, app()->auth->provider, true);
         $this->assertEquals($old_regime, $regime);
     }
 
     public function testPublish()
     {
         $regime = new Regime();
-        $values = $regime->publish();
+        $values = $regime->publish(app()->auth->provider);
         $allowed = [
             'id',
             'codigo',

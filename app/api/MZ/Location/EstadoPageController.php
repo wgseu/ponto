@@ -51,7 +51,7 @@ class EstadoPageController extends PageController
         if ($this->isJson()) {
             $items = [];
             foreach ($estados as $estado) {
-                $items[] = $estado->publish();
+                $items[] = $estado->publish(app()->auth->provider);
             }
             return $this->json()->success(['items' => $items]);
         }
@@ -74,7 +74,7 @@ class EstadoPageController extends PageController
         if ($this->getRequest()->isMethod('POST')) {
             $estado = new Estado($this->getData());
             try {
-                $estado->filter($old_estado, true);
+                $estado->filter($old_estado, app()->auth->provider, true);
                 $estado->save();
                 $old_estado->clean($estado);
                 $msg = sprintf(
@@ -82,7 +82,7 @@ class EstadoPageController extends PageController
                     $estado->getNome()
                 );
                 if ($this->isJson()) {
-                    return $this->json()->success(['item' => $estado->publish()], $msg);
+                    return $this->json()->success(['item' => $estado->publish(app()->auth->provider)], $msg);
                 }
                 \Thunder::success($msg, true);
                 return $this->redirect('/gerenciar/estado/');
@@ -126,7 +126,7 @@ class EstadoPageController extends PageController
         if ($this->getRequest()->isMethod('POST')) {
             $estado = new Estado($this->getData());
             try {
-                $estado->filter($old_estado, true);
+                $estado->filter($old_estado, app()->auth->provider, true);
                 $estado->save();
                 $old_estado->clean($estado);
                 $msg = sprintf(
@@ -134,7 +134,7 @@ class EstadoPageController extends PageController
                     $estado->getNome()
                 );
                 if ($this->isJson()) {
-                    return $this->json()->success(['item' => $estado->publish()], $msg);
+                    return $this->json()->success(['item' => $estado->publish(app()->auth->provider)], $msg);
                 }
                 \Thunder::success($msg, true);
                 return $this->redirect('/gerenciar/estado/');

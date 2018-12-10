@@ -67,7 +67,7 @@ class ProdutoTest extends \MZ\Framework\TestCase
     public function testPublish()
     {
         $produto = new Produto();
-        $values = $produto->publish();
+        $values = $produto->publish(app()->auth->provider);
         $allowed = [
             'id',
             'codigo',
@@ -128,7 +128,7 @@ class ProdutoTest extends \MZ\Framework\TestCase
             'unidade',
         ];
         $categoria = $produto->findCategoriaID();
-        $item = $produto->publish();
+        $item = $produto->publish(app()->auth->provider);
         $item['estoque'] = $estoque->getQuantidade();
         $item['categoria'] = $categoria->getDescricao();
         $item['supercategoriaid'] = $categoria->getCategoriaID();
@@ -175,7 +175,7 @@ class ProdutoTest extends \MZ\Framework\TestCase
             'unidade',
         ];
         $categoria = $produto->findCategoriaID();
-        $item = $produto->publish();
+        $item = $produto->publish(app()->auth->provider);
         $item['estoque'] = $estoque->getQuantidade();
         $item['categoria'] = $categoria->getDescricao();
         $item['supercategoriaid'] = $categoria->getCategoriaID();

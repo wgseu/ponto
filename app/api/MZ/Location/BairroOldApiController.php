@@ -50,7 +50,7 @@ class BairroOldApiController extends \MZ\Core\ApiController
         $bairros = Bairro::findAll($condition, $order, 10);
         $items = [];
         foreach ($bairros as $bairro) {
-            $items[] = $bairro->publish();
+            $items[] = $bairro->publish(app()->auth->provider);
         }
         return $this->json()->success(['items' => $items]);
     }

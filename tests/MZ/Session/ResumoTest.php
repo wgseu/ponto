@@ -29,7 +29,7 @@ class ResumoTest extends \MZ\Framework\TestCase
     public function testPublish()
     {
         $resumo = new Resumo();
-        $values = $resumo->publish();
+        $values = $resumo->publish(app()->auth->provider);
         $allowed = [
             'id',
             'movimentacaoid',

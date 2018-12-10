@@ -67,14 +67,14 @@ class FuncaoTest extends \MZ\Framework\TestCase
             'descricao' => ' Função <script>filter</script> ',
             'remuneracao' => '12,3',
         ]);
-        $funcao->filter($old_funcao, true);
+        $funcao->filter($old_funcao, app()->auth->provider, true);
         $this->assertEquals($old_funcao, $funcao);
     }
 
     public function testPublish()
     {
         $funcao = new Funcao();
-        $values = $funcao->publish();
+        $values = $funcao->publish(app()->auth->provider);
         $allowed = [
             'id',
             'descricao',

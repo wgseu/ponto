@@ -43,7 +43,7 @@ class PacoteApiController extends \MZ\Core\ApiController
         $pacotes = Pacote::findAll($condition, $order);
         $itens = [];
         foreach ($pacotes as $pacote) {
-            $itens[] = $pacote->publish();
+            $itens[] = $pacote->publish(app()->auth->provider);
         }
         return $this->getResponse()->success(['items' => $itens]);
     }
@@ -57,27 +57,27 @@ class PacoteApiController extends \MZ\Core\ApiController
         $this->needPermission([Permissao::NOME_CADASTROPRODUTOS]);
         $localized = $this->getRequest()->query->getBoolean('localized', false);
         $pacote = new Pacote($this->getData());
-        $pacote->filter(new Pacote(), $localized);
+        $pacote->filter(new Pacote(), app()->auth->provider, $localized);
         $pacote->insert();
-        return $this->getResponse()->success(['item' => $pacote->publish()]);
+        return $this->getResponse()->success(['item' => $pacote->publish(app()->auth->provider)]);
     }
 
     /**
-     * Update an existing Pacote
-     * @Put("/api/pacotes/{id}", name="api_pacote_update", params={ "id": "\d+" })
+     * Modify parts of an existing Pacote
+     * @Patch("/api/pacotes/{id}", name="api_pacote_update", params={ "id": "\d+" })
      * 
-     * @param int $id Pacote id to update
+     * @param int $id Pacote id
      */
-    public function update($id)
+    public function modify($id)
     {
         $this->needPermission([Permissao::NOME_CADASTROPRODUTOS]);
         $old_pacote = Pacote::findOrFail(['id' => $id]);
         $localized = $this->getRequest()->query->getBoolean('localized', false);
         $pacote = new Pacote($this->getData());
-        $pacote->filter($old_pacote, $localized);
+        $pacote->filter($old_pacote, app()->auth->provider, $localized);
         $pacote->update();
         $old_pacote->clean($pacote);
-        return $this->getResponse()->success(['item' => $pacote->publish()]);
+        return $this->getResponse()->success(['item' => $pacote->publish(app()->auth->provider)]);
     }
 
     /**

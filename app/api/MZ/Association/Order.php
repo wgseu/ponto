@@ -626,7 +626,7 @@ class Order extends Pedido
         $find_city = new Cidade($this->city);
         $find_city->loadByEstadoIDNome();
         if (!$find_city->exists()) {
-            $this->city->filter(new Cidade());
+            $this->city->filter(new Cidade(), app()->auth->provider);
             $this->city->insert();
         } else {
             $this->city->fromArray($find_city->toArray());
@@ -643,7 +643,7 @@ class Order extends Pedido
                 }
             }
             $this->district->setDisponivel('Y');
-            $this->district->filter(new Bairro());
+            $this->district->filter(new Bairro(), app()->auth->provider);
             $this->district->insert();
         } else {
             $this->district->fromArray($find_district->toArray());
@@ -690,7 +690,7 @@ class Order extends Pedido
             $produto_pedido->setEstado(Item::ESTADO_ADICIONADO);
             $produto_pedido->setCancelado('N');
             $produto_pedido->setDataVisualizacao(null);
-            $produto_pedido->filter(new Item()); // limpa o ID
+            $produto_pedido->filter(new Item(), app()->auth->provider); // limpa o ID
             if ($produto->exists() && $produto->isCobrarServico() &&
                 (
                     in_array($this->getTipo(), [self::TIPO_MESA, self::TIPO_COMANDA]) ||
@@ -752,7 +752,7 @@ class Order extends Pedido
             if (!is_null($this->customer) && !$this->customer->exists()) {
                 // todo cliente precisa de uma senha, gera uma aleatória
                 $this->customer->setSenha(Generator::token().'a123Z');
-                $this->customer->filter(new Cliente());
+                $this->customer->filter(new Cliente(), app()->auth->provider);
                 $this->customer->insert();
             }
             $viagem = !$this->getLocalizacaoID();
@@ -766,7 +766,7 @@ class Order extends Pedido
                 }
                 // não existe pedido ainda, cadastra um novo
                 $this->setPrestadorID($this->employee->getID());
-                $this->filter(new Pedido());
+                $this->filter(new Pedido(), app()->auth->provider);
                 $this->insert();
                 $new_order = true;
             }

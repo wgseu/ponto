@@ -22,21 +22,12 @@
  *
  * @author Equipe GrandChef <desenvolvimento@mzsw.com.br>
  */
-namespace MZ\Sale;
+namespace MZ\Routing\Annotation;
 
-class JuncaoTest extends \MZ\Framework\TestCase
+/**
+ * PATCH method annotation
+ * @Annotation
+ */
+class Patch extends Route
 {
-    public function testPublish()
-    {
-        $juncao = new Juncao();
-        $values = $juncao->publish(app()->auth->provider);
-        $allowed = [
-            'id',
-            'mesaid',
-            'pedidoid',
-            'estado',
-            'datamovimento',
-        ];
-        $this->assertEquals($allowed, array_keys($values));
-    }
 }

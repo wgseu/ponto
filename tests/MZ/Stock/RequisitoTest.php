@@ -29,7 +29,7 @@ class RequisitoTest extends \MZ\Framework\TestCase
     public function testPublish()
     {
         $requisito = new Requisito();
-        $values = $requisito->publish();
+        $values = $requisito->publish(app()->auth->provider);
         $allowed = [
             'id',
             'listaid',

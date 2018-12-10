@@ -52,7 +52,7 @@ class ChequePageController extends PageController
         if ($this->isJson()) {
             $items = [];
             foreach ($cheques as $_cheque) {
-                $items[] = $_cheque->publish();
+                $items[] = $_cheque->publish(app()->auth->provider);
             }
             return $this->json()->success(['items' => $items]);
         }

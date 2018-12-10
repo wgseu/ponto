@@ -29,7 +29,7 @@ class FormacaoTest extends \MZ\Framework\TestCase
     public function testPublish()
     {
         $formacao = new Formacao();
-        $values = $formacao->publish();
+        $values = $formacao->publish(app()->auth->provider);
         $allowed = [
             'id',
             'itemid',

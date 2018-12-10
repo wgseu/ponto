@@ -48,7 +48,7 @@ class FormaPagtoApiController extends \MZ\Core\ApiController
         $formas_de_pagamento = FormaPagto::findAll($condition, $order, $limit, $pager->offset);
         $itens = [];
         foreach ($formas_de_pagamento as $forma_pagto) {
-            $itens[] = $forma_pagto->publish();
+            $itens[] = $forma_pagto->publish(app()->auth->provider);
         }
         return $this->getResponse()->success(['items' => $itens, 'pages' => $pager->pageCount]);
     }
@@ -62,27 +62,27 @@ class FormaPagtoApiController extends \MZ\Core\ApiController
         $this->needPermission([Permissao::NOME_CADASTROFORMASPAGTO]);
         $localized = $this->getRequest()->query->getBoolean('localized', false);
         $forma_pagto = new FormaPagto($this->getData());
-        $forma_pagto->filter(new FormaPagto(), $localized);
+        $forma_pagto->filter(new FormaPagto(), app()->auth->provider, $localized);
         $forma_pagto->insert();
-        return $this->getResponse()->success(['item' => $forma_pagto->publish()]);
+        return $this->getResponse()->success(['item' => $forma_pagto->publish(app()->auth->provider)]);
     }
 
     /**
-     * Update an existing Forma de pagamento
-     * @Put("/api/formas_de_pagamento/{id}", name="api_forma_pagto_update", params={ "id": "\d+" })
+     * Modify parts of an existing Forma de pagamento
+     * @Patch("/api/formas_de_pagamento/{id}", name="api_forma_pagto_update", params={ "id": "\d+" })
      * 
-     * @param int $id Forma de pagamento id to update
+     * @param int $id Forma de pagamento id
      */
-    public function update($id)
+    public function modify($id)
     {
         $this->needPermission([Permissao::NOME_CADASTROFORMASPAGTO]);
         $old_forma_pagto = FormaPagto::findOrFail(['id' => $id]);
         $localized = $this->getRequest()->query->getBoolean('localized', false);
         $forma_pagto = new FormaPagto($this->getData());
-        $forma_pagto->filter($old_forma_pagto, $localized);
+        $forma_pagto->filter($old_forma_pagto, app()->auth->provider, $localized);
         $forma_pagto->update();
         $old_forma_pagto->clean($forma_pagto);
-        return $this->getResponse()->success(['item' => $forma_pagto->publish()]);
+        return $this->getResponse()->success(['item' => $forma_pagto->publish(app()->auth->provider)]);
     }
 
     /**

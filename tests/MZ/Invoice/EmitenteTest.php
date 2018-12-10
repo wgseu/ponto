@@ -29,7 +29,7 @@ class EmitenteTest extends \MZ\Framework\TestCase
     public function testPublish()
     {
         $emitente = new Emitente();
-        $values = $emitente->publish();
+        $values = $emitente->publish(app()->auth->provider);
         $allowed = [
             'id',
             'contadorid',

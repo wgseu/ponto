@@ -29,7 +29,7 @@ class CreditoTest extends \MZ\Framework\TestCase
     public function testPublish()
     {
         $credito = new Credito();
-        $values = $credito->publish();
+        $values = $credito->publish(app()->auth->provider);
         $allowed = [
             'id',
             'clienteid',

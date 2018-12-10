@@ -29,7 +29,7 @@ class ImpressoraTest extends \MZ\Framework\TestCase
     public function testPublish()
     {
         $impressora = new Impressora();
-        $values = $impressora->publish();
+        $values = $impressora->publish(app()->auth->provider);
         $allowed = [
             'id',
             'setorid',

@@ -29,7 +29,7 @@ class MovimentacaoTest extends \MZ\Framework\TestCase
     public function testPublish()
     {
         $movimentacao = new Movimentacao();
-        $values = $movimentacao->publish();
+        $values = $movimentacao->publish(app()->auth->provider);
         $allowed = [
             'id',
             'sessaoid',

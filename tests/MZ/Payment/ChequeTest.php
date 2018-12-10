@@ -29,7 +29,7 @@ class ChequeTest extends \MZ\Framework\TestCase
     public function testPublish()
     {
         $cheque = new Cheque();
-        $values = $cheque->publish();
+        $values = $cheque->publish(app()->auth->provider);
         $allowed = [
             'id',
             'clienteid',

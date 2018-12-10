@@ -51,7 +51,7 @@ class ComandaPageController extends PageController
         if ($this->isJson()) {
             $items = [];
             foreach ($comandas as $_comanda) {
-                $items[] = $_comanda->publish();
+                $items[] = $_comanda->publish(app()->auth->provider);
             }
             return $this->json()->success(['items' => $items]);
         }
@@ -76,7 +76,7 @@ class ComandaPageController extends PageController
         if ($this->getRequest()->isMethod('POST')) {
             $comanda = new Comanda($this->getData());
             try {
-                $comanda->filter($old_comanda, true);
+                $comanda->filter($old_comanda, app()->auth->provider, true);
                 $comanda->insert();
                 $old_comanda->clean($comanda);
                 $msg = sprintf(
@@ -84,7 +84,7 @@ class ComandaPageController extends PageController
                     $comanda->getNome()
                 );
                 if ($this->isJson()) {
-                    return $this->json()->success(['item' => $comanda->publish()], $msg);
+                    return $this->json()->success(['item' => $comanda->publish(app()->auth->provider)], $msg);
                 }
                 \Thunder::success($msg, true);
                 return $this->redirect('/gerenciar/comanda/');
@@ -131,7 +131,7 @@ class ComandaPageController extends PageController
         if ($this->getRequest()->isMethod('POST')) {
             $comanda = new Comanda($this->getData());
             try {
-                $comanda->filter($old_comanda, true);
+                $comanda->filter($old_comanda, app()->auth->provider, true);
                 $comanda->update();
                 $old_comanda->clean($comanda);
                 $msg = sprintf(
@@ -139,7 +139,7 @@ class ComandaPageController extends PageController
                     $comanda->getNome()
                 );
                 if ($this->isJson()) {
-                    return $this->json()->success(['item' => $comanda->publish()], $msg);
+                    return $this->json()->success(['item' => $comanda->publish(app()->auth->provider)], $msg);
                 }
                 \Thunder::success($msg, true);
                 return $this->redirect('/gerenciar/comanda/');

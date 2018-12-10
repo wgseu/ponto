@@ -53,7 +53,7 @@ class ContaPageController extends PageController
         if ($this->isJson()) {
             $items = [];
             foreach ($contas as $_conta) {
-                $items[] = $_conta->publish();
+                $items[] = $_conta->publish(app()->auth->provider);
             }
             return $this->json()->success(['items' => $items]);
         }
@@ -84,7 +84,7 @@ class ContaPageController extends PageController
             $conta = new Conta($this->getData());
             try {
                 $old_conta->setFuncionarioID(app()->auth->provider->getID());
-                $conta->filter($old_conta, true);
+                $conta->filter($old_conta, app()->auth->provider, true);
                 $conta->insert();
                 $old_conta->clean($conta);
                 $msg = sprintf(
@@ -92,7 +92,7 @@ class ContaPageController extends PageController
                     $conta->getDescricao()
                 );
                 if ($this->isJson()) {
-                    return $this->json()->success(['item' => $conta->publish()], $msg);
+                    return $this->json()->success(['item' => $conta->publish(app()->auth->provider)], $msg);
                 }
                 \Thunder::success($msg, true);
                 return $this->redirect('/gerenciar/conta/');
@@ -147,7 +147,7 @@ class ContaPageController extends PageController
         if ($this->getRequest()->isMethod('POST')) {
             $conta = new Conta($this->getData());
             try {
-                $conta->filter($old_conta, true);
+                $conta->filter($old_conta, app()->auth->provider, true);
                 $conta->update();
                 $old_conta->clean($conta);
                 $msg = sprintf(
@@ -155,7 +155,7 @@ class ContaPageController extends PageController
                     $conta->getDescricao()
                 );
                 if ($this->isJson()) {
-                    return $this->json()->success(['item' => $conta->publish()], $msg);
+                    return $this->json()->success(['item' => $conta->publish(app()->auth->provider)], $msg);
                 }
                 \Thunder::success($msg, true);
                 return $this->redirect('/gerenciar/conta/');

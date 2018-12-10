@@ -48,7 +48,7 @@ class ServicoApiController extends \MZ\Core\ApiController
         $servicos = Servico::findAll($condition, $order, $limit, $pager->offset);
         $itens = [];
         foreach ($servicos as $servico) {
-            $itens[] = $servico->publish();
+            $itens[] = $servico->publish(app()->auth->provider);
         }
         return $this->getResponse()->success(['items' => $itens, 'pages' => $pager->pageCount]);
     }
@@ -62,27 +62,27 @@ class ServicoApiController extends \MZ\Core\ApiController
         $this->needPermission([Permissao::NOME_CADASTROSERVICOS]);
         $localized = $this->getRequest()->query->getBoolean('localized', false);
         $servico = new Servico($this->getData());
-        $servico->filter(new Servico(), $localized);
+        $servico->filter(new Servico(), app()->auth->provider, $localized);
         $servico->insert();
-        return $this->getResponse()->success(['item' => $servico->publish()]);
+        return $this->getResponse()->success(['item' => $servico->publish(app()->auth->provider)]);
     }
 
     /**
-     * Update an existing Serviço
-     * @Put("/api/servicos/{id}", name="api_servico_update", params={ "id": "\d+" })
+     * Modify parts of an existing Serviço
+     * @Patch("/api/servicos/{id}", name="api_servico_update", params={ "id": "\d+" })
      * 
-     * @param int $id Serviço id to update
+     * @param int $id Serviço id
      */
-    public function update($id)
+    public function modify($id)
     {
         $this->needPermission([Permissao::NOME_CADASTROSERVICOS]);
         $old_servico = Servico::findOrFail(['id' => $id]);
         $localized = $this->getRequest()->query->getBoolean('localized', false);
         $servico = new Servico($this->getData());
-        $servico->filter($old_servico, $localized);
+        $servico->filter($old_servico, app()->auth->provider, $localized);
         $servico->update();
         $old_servico->clean($servico);
-        return $this->getResponse()->success(['item' => $servico->publish()]);
+        return $this->getResponse()->success(['item' => $servico->publish(app()->auth->provider)]);
     }
 
     /**

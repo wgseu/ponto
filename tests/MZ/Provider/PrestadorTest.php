@@ -67,7 +67,7 @@ class PrestadorTest extends \MZ\Framework\TestCase
     public function testPublish()
     {
         $funcionario = new Prestador();
-        $values = $funcionario->publish();
+        $values = $funcionario->publish(app()->auth->provider);
         $allowed = [
             'id',
             'codigo',

@@ -62,7 +62,7 @@ class CategoriaTest extends \MZ\Framework\TestCase
             'imagemurl',
             'dataatualizacao',
         ]);
-        $item = \array_intersect_key($categoria->publish(), $keys);
+        $item = \array_intersect_key($categoria->publish(app()->auth->provider), $keys);
         if (isset($result['categorias'])) {
             $result['categorias'] = \array_map(function ($item) use ($keys) {
                 return \array_intersect_key($item, $keys);

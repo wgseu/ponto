@@ -53,7 +53,7 @@ class CarteiraPageController extends PageController
         if ($this->isJson()) {
             $items = [];
             foreach ($carteiras as $_carteira) {
-                $items[] = $_carteira->publish();
+                $items[] = $_carteira->publish(app()->auth->provider);
             }
             return $this->json()->success(['items' => $items]);
         }
@@ -77,7 +77,7 @@ class CarteiraPageController extends PageController
         if ($this->getRequest()->isMethod('POST')) {
             $carteira = new Carteira($this->getData());
             try {
-                $carteira->filter($old_carteira, true);
+                $carteira->filter($old_carteira, app()->auth->provider, true);
                 $carteira->insert();
                 $old_carteira->clean($carteira);
                 $msg = sprintf(
@@ -85,7 +85,7 @@ class CarteiraPageController extends PageController
                     $carteira->getDescricao()
                 );
                 if ($this->isJson()) {
-                    return $this->json()->success(['item' => $carteira->publish()], $msg);
+                    return $this->json()->success(['item' => $carteira->publish(app()->auth->provider)], $msg);
                 }
                 \Thunder::success($msg, true);
                 return $this->redirect('/gerenciar/carteira/');
@@ -134,7 +134,7 @@ class CarteiraPageController extends PageController
         if ($this->getRequest()->isMethod('POST')) {
             $carteira = new Carteira($this->getData());
             try {
-                $carteira->filter($old_carteira, true);
+                $carteira->filter($old_carteira, app()->auth->provider, true);
                 $carteira->update();
                 $old_carteira->clean($carteira);
                 $msg = sprintf(
@@ -142,7 +142,7 @@ class CarteiraPageController extends PageController
                     $carteira->getDescricao()
                 );
                 if ($this->isJson()) {
-                    return $this->json()->success(['item' => $carteira->publish()], $msg);
+                    return $this->json()->success(['item' => $carteira->publish(app()->auth->provider)], $msg);
                 }
                 \Thunder::success($msg, true);
                 return $this->redirect('/gerenciar/carteira/');

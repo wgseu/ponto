@@ -53,7 +53,7 @@ class FormaPagtoPageController extends PageController
         if ($this->isJson()) {
             $items = [];
             foreach ($formas_de_pagamento as $_forma_pagto) {
-                $items[] = $_forma_pagto->publish();
+                $items[] = $_forma_pagto->publish(app()->auth->provider);
             }
             return $this->json()->success(['items' => $items]);
         }
@@ -81,7 +81,7 @@ class FormaPagtoPageController extends PageController
         if ($this->getRequest()->isMethod('POST')) {
             $forma_pagto = new FormaPagto($this->getData());
             try {
-                $forma_pagto->filter($old_forma_pagto, true);
+                $forma_pagto->filter($old_forma_pagto, app()->auth->provider, true);
                 $forma_pagto->insert();
                 $old_forma_pagto->clean($forma_pagto);
                 $msg = sprintf(
@@ -89,7 +89,7 @@ class FormaPagtoPageController extends PageController
                     $forma_pagto->getDescricao()
                 );
                 if ($this->isJson()) {
-                    return $this->json()->success(['item' => $forma_pagto->publish()], $msg);
+                    return $this->json()->success(['item' => $forma_pagto->publish(app()->auth->provider)], $msg);
                 }
                 \Thunder::success($msg, true);
                 return $this->redirect('/gerenciar/forma_pagto/');
@@ -137,7 +137,7 @@ class FormaPagtoPageController extends PageController
         if ($this->getRequest()->isMethod('POST')) {
             $forma_pagto = new FormaPagto($this->getData());
             try {
-                $forma_pagto->filter($old_forma_pagto, true);
+                $forma_pagto->filter($old_forma_pagto, app()->auth->provider, true);
                 $forma_pagto->update();
                 $old_forma_pagto->clean($forma_pagto);
                 $msg = sprintf(
@@ -145,7 +145,7 @@ class FormaPagtoPageController extends PageController
                     $forma_pagto->getDescricao()
                 );
                 if ($this->isJson()) {
-                    return $this->json()->success(['item' => $forma_pagto->publish()], $msg);
+                    return $this->json()->success(['item' => $forma_pagto->publish(app()->auth->provider)], $msg);
                 }
                 \Thunder::success($msg, true);
                 return $this->redirect('/gerenciar/forma_pagto/');

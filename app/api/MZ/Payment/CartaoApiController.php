@@ -48,7 +48,7 @@ class CartaoApiController extends \MZ\Core\ApiController
         $cartoes = Cartao::findAll($condition, $order, $limit, $pager->offset);
         $itens = [];
         foreach ($cartoes as $cartao) {
-            $itens[] = $cartao->publish();
+            $itens[] = $cartao->publish(app()->auth->provider);
         }
         return $this->getResponse()->success(['items' => $itens, 'pages' => $pager->pageCount]);
     }
@@ -62,27 +62,27 @@ class CartaoApiController extends \MZ\Core\ApiController
         $this->needPermission([Permissao::NOME_CADASTROCARTOES]);
         $localized = $this->getRequest()->query->getBoolean('localized', false);
         $cartao = new Cartao($this->getData());
-        $cartao->filter(new Cartao(), $localized);
+        $cartao->filter(new Cartao(), app()->auth->provider, $localized);
         $cartao->insert();
-        return $this->getResponse()->success(['item' => $cartao->publish()]);
+        return $this->getResponse()->success(['item' => $cartao->publish(app()->auth->provider)]);
     }
 
     /**
-     * Update an existing Cartão
-     * @Put("/api/cartoes/{id}", name="api_cartao_update", params={ "id": "\d+" })
+     * Modify parts of an existing Cartão
+     * @Patch("/api/cartoes/{id}", name="api_cartao_update", params={ "id": "\d+" })
      * 
-     * @param int $id Cartão id to update
+     * @param int $id Cartão id
      */
-    public function update($id)
+    public function modify($id)
     {
         $this->needPermission([Permissao::NOME_CADASTROCARTOES]);
         $old_cartao = Cartao::findOrFail(['id' => $id]);
         $localized = $this->getRequest()->query->getBoolean('localized', false);
         $cartao = new Cartao($this->getData());
-        $cartao->filter($old_cartao, $localized);
+        $cartao->filter($old_cartao, app()->auth->provider, $localized);
         $cartao->update();
         $old_cartao->clean($cartao);
-        return $this->getResponse()->success(['item' => $cartao->publish()]);
+        return $this->getResponse()->success(['item' => $cartao->publish(app()->auth->provider)]);
     }
 
     /**

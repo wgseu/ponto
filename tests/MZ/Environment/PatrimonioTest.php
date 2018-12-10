@@ -29,7 +29,7 @@ class PatrimonioTest extends \MZ\Framework\TestCase
     public function testPublish()
     {
         $patrimonio = new Patrimonio();
-        $values = $patrimonio->publish();
+        $values = $patrimonio->publish(app()->auth->provider);
         $allowed = [
             'id',
             'empresaid',

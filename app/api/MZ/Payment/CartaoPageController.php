@@ -83,7 +83,7 @@ class CartaoPageController extends PageController
         if ($this->isJson()) {
             $items = [];
             foreach ($cartoes as $_cartao) {
-                $items[] = $_cartao->publish();
+                $items[] = $_cartao->publish(app()->auth->provider);
             }
             return $this->json()->success(['items' => $items]);
         }
@@ -108,7 +108,7 @@ class CartaoPageController extends PageController
         if ($this->getRequest()->isMethod('POST')) {
             $cartao = new Cartao($this->getData());
             try {
-                $cartao->filter($old_cartao, true);
+                $cartao->filter($old_cartao, app()->auth->provider, true);
                 $cartao->insert();
                 $old_cartao->clean($cartao);
                 $msg = sprintf(
@@ -116,7 +116,7 @@ class CartaoPageController extends PageController
                     $cartao->getBandeira()
                 );
                 if ($this->isJson()) {
-                    return $this->json()->success(['item' => $cartao->publish()], $msg);
+                    return $this->json()->success(['item' => $cartao->publish(app()->auth->provider)], $msg);
                 }
                 \Thunder::success($msg, true);
                 return $this->redirect('/gerenciar/cartao/');
@@ -167,7 +167,7 @@ class CartaoPageController extends PageController
         if ($this->getRequest()->isMethod('POST')) {
             $cartao = new Cartao($this->getData());
             try {
-                $cartao->filter($old_cartao, true);
+                $cartao->filter($old_cartao, app()->auth->provider, true);
                 $cartao->update();
                 $old_cartao->clean($cartao);
                 $msg = sprintf(
@@ -175,7 +175,7 @@ class CartaoPageController extends PageController
                     $cartao->getBandeira()
                 );
                 if ($this->isJson()) {
-                    return $this->json()->success(['item' => $cartao->publish()], $msg);
+                    return $this->json()->success(['item' => $cartao->publish(app()->auth->provider)], $msg);
                 }
                 \Thunder::success($msg, true);
                 return $this->redirect('/gerenciar/cartao/');

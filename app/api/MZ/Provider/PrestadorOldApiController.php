@@ -54,8 +54,8 @@ class PrestadorOldApiController extends \MZ\Core\ApiController
         foreach ($prestadores as $prestador) {
             $funcao = $prestador->findFuncaoID();
             $cliente = $prestador->findClienteID();
-            $cliente_item = $cliente->publish();
-            $item = $prestador->publish();
+            $cliente_item = $cliente->publish(app()->auth->provider);
+            $item = $prestador->publish(app()->auth->provider);
             $item['nome'] = $cliente->getNomeCompleto();
             $item['fone1'] = $cliente_item['fone1'];
             $item['cpf'] = $cliente_item['cpf'];

@@ -29,7 +29,7 @@ class EventoTest extends \MZ\Framework\TestCase
     public function testPublish()
     {
         $evento = new Evento();
-        $values = $evento->publish();
+        $values = $evento->publish(app()->auth->provider);
         $allowed = [
             'id',
             'notaid',

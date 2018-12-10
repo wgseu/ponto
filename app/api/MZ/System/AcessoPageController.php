@@ -92,7 +92,7 @@ class AcessoPageController extends PageController
         if ($this->isJson()) {
             $items = [];
             foreach ($permissoes as $permissao) {
-                $item = $permissao->publish();
+                $item = $permissao->publish(app()->auth->provider);
                 $acesso = Acesso::find([
                     'funcaoid' => $funcao->getID(),
                     'permissaoid' => $permissao->getID()

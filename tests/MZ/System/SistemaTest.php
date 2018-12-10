@@ -70,14 +70,14 @@ class SistemaTest extends \MZ\Framework\TestCase
             'fusohorario' => ' Sistema <script>filter</script> ',
             'versaodb' => ' Sistema <script>filter</script> ',
         ]);
-        $sistema->filter($old_sistema, true);
+        $sistema->filter($old_sistema, app()->auth->provider, true);
         $this->assertEquals($old_sistema, $sistema);
     }
 
     public function testPublish()
     {
         $sistema = new Sistema();
-        $values = $sistema->publish();
+        $values = $sistema->publish(app()->auth->provider);
         $allowed = [
             'id',
             'servidorid',

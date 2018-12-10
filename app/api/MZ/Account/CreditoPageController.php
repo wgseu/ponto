@@ -52,7 +52,7 @@ class CreditoPageController extends PageController
         if ($this->isJson()) {
             $items = [];
             foreach ($creditos as $_credito) {
-                $items[] = $_credito->publish();
+                $items[] = $_credito->publish(app()->auth->provider);
             }
             return $this->json()->success(['items' => $items]);
         }

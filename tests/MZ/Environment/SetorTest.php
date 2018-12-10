@@ -78,14 +78,14 @@ class SetorTest extends \MZ\Framework\TestCase
             'nome' => ' Setor <script>filter</script> ',
             'descricao' => ' Setor <script>filter</script> ',
         ]);
-        $setor->filter($old_setor, true);
+        $setor->filter($old_setor, app()->auth->provider, true);
         $this->assertEquals($old_setor, $setor);
     }
 
     public function testPublish()
     {
         $setor = new Setor();
-        $values = $setor->publish();
+        $values = $setor->publish(app()->auth->provider);
         $allowed = [
             'id',
             'setorid',

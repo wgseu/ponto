@@ -56,7 +56,7 @@ class ClassificacaoPageController extends PageController
         if ($this->isJson()) {
             $items = [];
             foreach ($classificacoes as $_classificacao) {
-                $items[] = $_classificacao->publish();
+                $items[] = $_classificacao->publish(app()->auth->provider);
             }
             return $this->json()->success(['items' => $items]);
         }
@@ -82,7 +82,7 @@ class ClassificacaoPageController extends PageController
         if ($this->getRequest()->isMethod('POST')) {
             $classificacao = new Classificacao($this->getData());
             try {
-                $classificacao->filter($old_classificacao, true);
+                $classificacao->filter($old_classificacao, app()->auth->provider, true);
                 $classificacao->insert();
                 $old_classificacao->clean($classificacao);
                 $msg = sprintf(
@@ -90,7 +90,7 @@ class ClassificacaoPageController extends PageController
                     $classificacao->getDescricao()
                 );
                 if ($this->isJson()) {
-                    return $this->json()->success(['item' => $classificacao->publish()], $msg);
+                    return $this->json()->success(['item' => $classificacao->publish(app()->auth->provider)], $msg);
                 }
                 \Thunder::success($msg, true);
                 return $this->redirect('/gerenciar/classificacao/');
@@ -137,7 +137,7 @@ class ClassificacaoPageController extends PageController
             $classificacao = new Classificacao($this->getData());
             try {
                 $classificacao->setID($old_classificacao->getID());
-                $classificacao->filter($old_classificacao, true);
+                $classificacao->filter($old_classificacao, app()->auth->provider, true);
                 $classificacao->update();
                 $old_classificacao->clean($classificacao);
                 $msg = sprintf(
@@ -145,7 +145,7 @@ class ClassificacaoPageController extends PageController
                     $classificacao->getDescricao()
                 );
                 if ($this->isJson()) {
-                    return $this->json()->success(['item' => $classificacao->publish()], $msg);
+                    return $this->json()->success(['item' => $classificacao->publish(app()->auth->provider)], $msg);
                 }
                 \Thunder::success($msg, true);
                 return $this->redirect('/gerenciar/classificacao/');

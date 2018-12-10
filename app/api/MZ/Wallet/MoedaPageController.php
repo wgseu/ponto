@@ -51,7 +51,7 @@ class MoedaPageController extends PageController
         if ($this->isJson()) {
             $items = [];
             foreach ($moedas as $_moeda) {
-                $items[] = $_moeda->publish();
+                $items[] = $_moeda->publish(app()->auth->provider);
             }
             return $this->json()->success(['items' => $items]);
         }
@@ -72,7 +72,7 @@ class MoedaPageController extends PageController
         if ($this->getRequest()->isMethod('POST')) {
             $moeda = new Moeda($this->getData());
             try {
-                $moeda->filter($old_moeda, true);
+                $moeda->filter($old_moeda, app()->auth->provider, true);
                 $moeda->save();
                 $old_moeda->clean($moeda);
                 $msg = sprintf(
@@ -80,7 +80,7 @@ class MoedaPageController extends PageController
                     $moeda->getNome()
                 );
                 if ($this->isJson()) {
-                    return $this->json()->success(['item' => $moeda->publish()], $msg);
+                    return $this->json()->success(['item' => $moeda->publish(app()->auth->provider)], $msg);
                 }
                 \Thunder::success($msg, true);
                 return $this->redirect('/gerenciar/moeda/');
@@ -127,7 +127,7 @@ class MoedaPageController extends PageController
         if ($this->getRequest()->isMethod('POST')) {
             $moeda = new Moeda($this->getData());
             try {
-                $moeda->filter($old_moeda, true);
+                $moeda->filter($old_moeda, app()->auth->provider, true);
                 $moeda->save();
                 $old_moeda->clean($moeda);
                 $msg = sprintf(
@@ -135,7 +135,7 @@ class MoedaPageController extends PageController
                     $moeda->getNome()
                 );
                 if ($this->isJson()) {
-                    return $this->json()->success(['item' => $moeda->publish()], $msg);
+                    return $this->json()->success(['item' => $moeda->publish(app()->auth->provider)], $msg);
                 }
                 \Thunder::success($msg, true);
                 return $this->redirect('/gerenciar/moeda/');

@@ -43,7 +43,7 @@ class PropriedadeApiController extends \MZ\Core\ApiController
         $propriedades = Propriedade::findAll($condition, $order);
         $itens = [];
         foreach ($propriedades as $propriedade) {
-            $itens[] = $propriedade->publish();
+            $itens[] = $propriedade->publish(app()->auth->provider);
         }
         return $this->getResponse()->success(['items' => $itens]);
     }
@@ -57,27 +57,27 @@ class PropriedadeApiController extends \MZ\Core\ApiController
         $this->needPermission([Permissao::NOME_CADASTROPRODUTOS]);
         $localized = $this->getRequest()->query->getBoolean('localized', false);
         $propriedade = new Propriedade($this->getData());
-        $propriedade->filter(new Propriedade(), $localized);
+        $propriedade->filter(new Propriedade(), app()->auth->provider, $localized);
         $propriedade->insert();
-        return $this->getResponse()->success(['item' => $propriedade->publish()]);
+        return $this->getResponse()->success(['item' => $propriedade->publish(app()->auth->provider)]);
     }
 
     /**
-     * Update an existing Propriedade
-     * @Put("/api/propriedades/{id}", name="api_propriedade_update", params={ "id": "\d+" })
+     * Modify parts of an existing Propriedade
+     * @Patch("/api/propriedades/{id}", name="api_propriedade_update", params={ "id": "\d+" })
      * 
-     * @param int $id Propriedade id to update
+     * @param int $id Propriedade id
      */
-    public function update($id)
+    public function modify($id)
     {
         $this->needPermission([Permissao::NOME_CADASTROPRODUTOS]);
         $old_propriedade = Propriedade::findOrFail(['id' => $id]);
         $localized = $this->getRequest()->query->getBoolean('localized', false);
         $propriedade = new Propriedade($this->getData());
-        $propriedade->filter($old_propriedade, $localized);
+        $propriedade->filter($old_propriedade, app()->auth->provider, $localized);
         $propriedade->update();
         $old_propriedade->clean($propriedade);
-        return $this->getResponse()->success(['item' => $propriedade->publish()]);
+        return $this->getResponse()->success(['item' => $propriedade->publish(app()->auth->provider)]);
     }
 
     /**

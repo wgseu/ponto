@@ -96,7 +96,7 @@ class ClienteTest extends \MZ\Framework\TestCase
     public function testPublish()
     {
         $cliente = new Cliente();
-        $values = $cliente->publish();
+        $values = $cliente->publish(app()->auth->provider);
         $allowed = [
             'id',
             'tipo',
@@ -113,6 +113,7 @@ class ClienteTest extends \MZ\Framework\TestCase
             'slogan',
             'status',
             'limitecompra',
+            'instagramurl',
             'facebookurl',
             'twitterurl',
             'linkedinurl',
@@ -124,7 +125,7 @@ class ClienteTest extends \MZ\Framework\TestCase
         ];
         $this->assertEquals($allowed, array_keys($values));
         $cliente->setTipo(Cliente::TIPO_JURIDICA);
-        $values = $cliente->publish();
+        $values = $cliente->publish(app()->auth->provider);
         $this->assertEquals($allowed, array_keys($values));
     }
 
@@ -497,8 +498,8 @@ class ClienteTest extends \MZ\Framework\TestCase
             'limitecompra' => '1.012,5'
         ]);
         $cliente = new Cliente($cliente_obj);
-        $cliente->getTelefone()->filter($filter_cliente->getTelefone(), true);
-        $cliente->filter($filter_cliente, true);
+        $cliente->getTelefone()->filter($filter_cliente->getTelefone(), app()->auth->provider, true);
+        $cliente->filter($filter_cliente, app()->auth->provider, true);
         $filter_cliente->setLimiteCompra(1012.5);
         $this->assertEquals($filter_cliente, $cliente);
         $cliente_obj->setTipo(Cliente::TIPO_JURIDICA);
@@ -507,7 +508,7 @@ class ClienteTest extends \MZ\Framework\TestCase
         $filter_cliente->setGenero(Cliente::GENERO_FEMININO);
         $filter_cliente->setLimiteCompra('1.012,5');
         $filter_cliente->setCPF('73591671000148');
-        $cliente_obj->filter($filter_cliente, true);
+        $cliente_obj->filter($filter_cliente, app()->auth->provider, true);
         $filter_cliente->setLimiteCompra(1012.5);
         $this->assertEquals($filter_cliente, $cliente_obj);
     }

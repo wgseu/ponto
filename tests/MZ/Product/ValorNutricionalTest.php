@@ -29,7 +29,7 @@ class ValorNutricionalTest extends \MZ\Framework\TestCase
     public function testPublish()
     {
         $valor_nutricional = new ValorNutricional();
-        $values = $valor_nutricional->publish();
+        $values = $valor_nutricional->publish(app()->auth->provider);
         $allowed = [
             'id',
             'informacaoid',

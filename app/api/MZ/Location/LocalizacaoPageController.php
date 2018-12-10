@@ -56,7 +56,7 @@ class LocalizacaoPageController extends PageController
 
         $items = [];
         foreach ($localizacoes as $_localizacao) {
-            $items[] = $_localizacao->publish();
+            $items[] = $_localizacao->publish(app()->auth->provider);
         }
         return $this->json()->success(['items' => $items]);
     }
@@ -76,7 +76,7 @@ class LocalizacaoPageController extends PageController
                     throw new \Exception('Você não tem permissão para atribuir um endereço a essa empresa!');
                 }
                 $old_localizacao->setClienteID($localizacao->getClienteID());
-                $localizacao->filter($old_localizacao, true);
+                $localizacao->filter($old_localizacao, app()->auth->provider, true);
                 $estado_id = $this->getRequest()->request->get('estadoid');
                 $estado = \MZ\Location\Estado::findByID($estado_id);
                 if (!$estado->exists()) {
@@ -96,7 +96,7 @@ class LocalizacaoPageController extends PageController
                     'Localização "%s" atualizada com sucesso!',
                     $localizacao->getLogradouro()
                 );
-                return $this->json()->success(['item' => $localizacao->publish()], $msg);
+                return $this->json()->success(['item' => $localizacao->publish(app()->auth->provider)], $msg);
             } catch (\Exception $e) {
                 DB::rollBack();
                 $localizacao->clean($old_localizacao);
@@ -132,7 +132,7 @@ class LocalizacaoPageController extends PageController
             $localizacao = new Localizacao($this->getData());
             try {
                 DB::beginTransaction();
-                $localizacao->filter($old_localizacao, true);
+                $localizacao->filter($old_localizacao, app()->auth->provider, true);
                 $estado_id = $this->getRequest()->request->get('estadoid');
                 $estado = Estado::findByID($estado_id);
                 if (!$estado->exists()) {
@@ -152,7 +152,7 @@ class LocalizacaoPageController extends PageController
                     'Localização "%s" atualizada com sucesso!',
                     $localizacao->getLogradouro()
                 );
-                return $this->json()->success(['item' => $localizacao->publish()], $msg);
+                return $this->json()->success(['item' => $localizacao->publish(app()->auth->provider)], $msg);
             } catch (\Exception $e) {
                 DB::rollBack();
                 $localizacao->clean($old_localizacao);

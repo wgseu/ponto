@@ -51,7 +51,7 @@ class SetorPageController extends PageController
         if ($this->isJson()) {
             $items = [];
             foreach ($setores as $_setor) {
-                $items[] = $_setor->publish();
+                $items[] = $_setor->publish(app()->auth->provider);
             }
             return $this->json()->success(['items' => $items]);
         }
@@ -72,7 +72,7 @@ class SetorPageController extends PageController
         if ($this->getRequest()->isMethod('POST')) {
             $setor = new Setor($this->getData());
             try {
-                $setor->filter($old_setor, true);
+                $setor->filter($old_setor, app()->auth->provider, true);
                 $setor->insert();
                 $old_setor->clean($setor);
                 $msg = sprintf(
@@ -80,7 +80,7 @@ class SetorPageController extends PageController
                     $setor->getNome()
                 );
                 if ($this->isJson()) {
-                    return $this->json()->success(['item' => $setor->publish()], $msg);
+                    return $this->json()->success(['item' => $setor->publish(app()->auth->provider)], $msg);
                 }
                 \Thunder::success($msg, true);
                 return $this->redirect('/gerenciar/setor/');
@@ -124,7 +124,7 @@ class SetorPageController extends PageController
             $setor = new Setor($this->getData());
             try {
                 $setor->setID($old_setor->getID());
-                $setor->filter($old_setor, true);
+                $setor->filter($old_setor, app()->auth->provider, true);
                 $setor->update();
                 $old_setor->clean($setor);
                 $msg = sprintf(
@@ -132,7 +132,7 @@ class SetorPageController extends PageController
                     $setor->getNome()
                 );
                 if ($this->isJson()) {
-                    return $this->json()->success(['item' => $setor->publish()], $msg);
+                    return $this->json()->success(['item' => $setor->publish(app()->auth->provider)], $msg);
                 }
                 \Thunder::success($msg, true);
                 return $this->redirect('/gerenciar/setor/');

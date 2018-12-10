@@ -51,7 +51,7 @@ class MesaPageController extends PageController
         if ($this->isJson()) {
             $items = [];
             foreach ($mesas as $_mesa) {
-                $items[] = $_mesa->publish();
+                $items[] = $_mesa->publish(app()->auth->provider);
             }
             return $this->json()->success(['items' => $items]);
         }
@@ -77,7 +77,7 @@ class MesaPageController extends PageController
         if ($this->getRequest()->isMethod('POST')) {
             $mesa = new Mesa($this->getData());
             try {
-                $mesa->filter($old_mesa, true);
+                $mesa->filter($old_mesa, app()->auth->provider, true);
                 $mesa->insert();
                 $old_mesa->clean($mesa);
                 $msg = sprintf(
@@ -85,7 +85,7 @@ class MesaPageController extends PageController
                     $mesa->getNome()
                 );
                 if ($this->isJson()) {
-                    return $this->json()->success(['item' => $mesa->publish()], $msg);
+                    return $this->json()->success(['item' => $mesa->publish(app()->auth->provider)], $msg);
                 }
                 \Thunder::success($msg, true);
                 return $this->redirect('/gerenciar/mesa/');
@@ -132,7 +132,7 @@ class MesaPageController extends PageController
         if ($this->getRequest()->isMethod('POST')) {
             $mesa = new Mesa($this->getData());
             try {
-                $mesa->filter($old_mesa, true);
+                $mesa->filter($old_mesa, app()->auth->provider, true);
                 $mesa->update();
                 $old_mesa->clean($mesa);
                 $msg = sprintf(
@@ -140,7 +140,7 @@ class MesaPageController extends PageController
                     $mesa->getNome()
                 );
                 if ($this->isJson()) {
-                    return $this->json()->success(['item' => $mesa->publish()], $msg);
+                    return $this->json()->success(['item' => $mesa->publish(app()->auth->provider)], $msg);
                 }
                 \Thunder::success($msg, true);
                 return $this->redirect('/gerenciar/mesa/');

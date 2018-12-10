@@ -44,14 +44,14 @@ class IntegracaoOldApiController extends \MZ\Core\ApiController
         $old_integracao = $integracao;
         try {
             $integracao = new Integracao($this->getRequest()->request->all());
-            $integracao->filter($old_integracao);
+            $integracao->filter($old_integracao, app()->auth->provider);
             $integracao->save(array_keys($this->getRequest()->request->all()));
             $old_integracao->clean($integracao);
             $msg = sprintf(
                 'Integração "%s" atualizada com sucesso!',
                 $integracao->getNome()
             );
-            return $this->json()->success(['item' => $integracao->publish()], $msg);
+            return $this->json()->success(['item' => $integracao->publish(app()->auth->provider)], $msg);
         } catch (\Exception $e) {
             $integracao->clean($old_integracao);
             $errors = [];

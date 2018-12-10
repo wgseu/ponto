@@ -29,7 +29,7 @@ class InformacaoTest extends \MZ\Framework\TestCase
     public function testPublish()
     {
         $informacao = new Informacao();
-        $values = $informacao->publish();
+        $values = $informacao->publish(app()->auth->provider);
         $allowed = [
             'id',
             'produtoid',

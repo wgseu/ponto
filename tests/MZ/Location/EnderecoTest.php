@@ -29,7 +29,7 @@ class EnderecoTest extends \MZ\Framework\TestCase
     public function testPublish()
     {
         $endereco = new Endereco();
-        $values = $endereco->publish();
+        $values = $endereco->publish(app()->auth->provider);
         $allowed = [
             'id',
             'cidadeid',

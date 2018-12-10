@@ -29,7 +29,7 @@ class EstadoTest extends \MZ\Framework\TestCase
     public function testPublish()
     {
         $estado = new Estado();
-        $values = $estado->publish();
+        $values = $estado->publish(app()->auth->provider);
         $allowed = [
             'id',
             'paisid',

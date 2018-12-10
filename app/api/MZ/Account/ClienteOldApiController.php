@@ -60,7 +60,7 @@ class ClienteOldApiController extends \MZ\Core\ApiController
         $items = [];
         foreach ($clientes as $cliente) {
             $cliente->loadTelefone();
-            $item = $cliente->publish();
+            $item = $cliente->publish(app()->auth->provider);
             $items[] = $item;
         }
         return $this->json()->success(['clientes' => $items]);
@@ -82,10 +82,10 @@ class ClienteOldApiController extends \MZ\Core\ApiController
             }
             $cliente = new Cliente($this->getRequest()->request->get('cliente'));
             $cliente->setSenha(Generator::token().'a123Z');
-            $cliente->filter($old_cliente);
+            $cliente->filter($old_cliente, app()->auth->provider);
             $cliente->insert();
             $old_cliente->clean($cliente);
-            $item = $cliente->publish();
+            $item = $cliente->publish(app()->auth->provider);
             return $this->json()->success(['cliente' => $item]);
         } catch (\Exception $e) {
             return $this->json()->error($e->getMessage());

@@ -60,7 +60,7 @@ class LocalizacaoOldApiController extends \MZ\Core\ApiController
         $items = [];
         foreach ($localizacoes as $localizacao) {
             $bairro = $localizacao->findBairroID();
-            $item = $localizacao->publish();
+            $item = $localizacao->publish(app()->auth->provider);
             $item = array_intersect_key($item, array_flip($campos));
             $item['bairro'] = $bairro->getNome();
             $items[] = $item;

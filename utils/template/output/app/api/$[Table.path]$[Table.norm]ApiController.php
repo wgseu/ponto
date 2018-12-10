@@ -29,9 +29,17 @@ $[table.end]
 use MZ\System\Permissao;
 use MZ\Util\Filter;
 
+$[table.if(comment)]
+/**
+$[table.each(comment)]
+ * $[Table.comment]
+$[table.end]
+ */
+$[table.else]
 /**
  * Allow application to serve system resources
  */
+$[table.end]
 class $[Table.norm]ApiController extends \MZ\Core\ApiController
 {
     /**
@@ -50,7 +58,7 @@ class $[Table.norm]ApiController extends \MZ\Core\ApiController
         $$[table.unix.plural] = $[Table.norm]::findAll($condition, $order, $limit, $pager->offset);
         $itens = [];
         foreach ($$[table.unix.plural] as $$[table.unix]) {
-            $itens[] = $$[table.unix]->publish();
+            $itens[] = $$[table.unix]->publish(app()->auth->provider);
         }
         return $this->getResponse()->success(['items' => $itens, 'pages' => $pager->pageCount]);
     }
@@ -64,33 +72,34 @@ class $[Table.norm]ApiController extends \MZ\Core\ApiController
         $this->needPermission([Permissao::NOME_$[TABLE.style]]);
         $localized = $this->getRequest()->query->getBoolean('localized', false);
         $$[table.unix] = new $[Table.norm]($this->getData());
-        $$[table.unix]->filter(new $[Table.norm](), $localized);
+        $$[table.unix]->filter(new $[Table.norm](), app()->auth->provider, $localized);
         $$[table.unix]->insert();
-        return $this->getResponse()->success(['item' => $$[table.unix]->publish()]);
+        return $this->getResponse()->success(['item' => $$[table.unix]->publish(app()->auth->provider)]);
     }
 
     /**
-     * Update an existing $[Table.name]
-     * @Put("/api/$[table.unix.plural]/{id}", name="api_$[table.unix]_update", params={ "id": "\d+" })
-     * 
-     * @param int $id $[Table.name] id to update
+     * Modify parts of an existing $[Table.name]
+     * @Patch("/api/$[table.unix.plural]/{id}", name="api_$[table.unix]_update", params={ "id": "\d+" })
+     *
+     * @param int $id $[Table.name] id
      */
-    public function update($id)
+    public function modify($id)
     {
         $this->needPermission([Permissao::NOME_$[TABLE.style]]);
         $old_$[table.unix] = $[Table.norm]::findOrFail(['$[primary]' => $id]);
         $localized = $this->getRequest()->query->getBoolean('localized', false);
-        $$[table.unix] = new $[Table.norm]($this->getData());
-        $$[table.unix]->filter($old_$[table.unix], $localized);
+        $data = array_merge($old_$[table.unix]->toArray(), $this->getData());
+        $$[table.unix] = new $[Table.norm]($data);
+        $$[table.unix]->filter($old_$[table.unix], app()->auth->provider, $localized);
         $$[table.unix]->update();
         $old_$[table.unix]->clean($$[table.unix]);
-        return $this->getResponse()->success(['item' => $$[table.unix]->publish()]);
+        return $this->getResponse()->success(['item' => $$[table.unix]->publish(app()->auth->provider)]);
     }
 
     /**
      * Delete existing $[Table.name]
      * @Delete("/api/$[table.unix.plural]/{id}", name="api_$[table.unix]_delete", params={ "id": "\d+" })
-     * 
+     *
      * @param int $id $[Table.name] id to delete
      */
     public function delete($id)

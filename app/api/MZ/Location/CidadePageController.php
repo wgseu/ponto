@@ -50,7 +50,7 @@ class CidadePageController extends PageController
         if ($this->isJson()) {
             $items = [];
             foreach ($cidades as $cidade) {
-                $items[] = $cidade->publish();
+                $items[] = $cidade->publish(app()->auth->provider);
             }
             return $this->json()->success(['items' => $items]);
         }
@@ -76,7 +76,7 @@ class CidadePageController extends PageController
         if ($this->getRequest()->isMethod('POST')) {
             $cidade = new Cidade($this->getData());
             try {
-                $cidade->filter($old_cidade, true);
+                $cidade->filter($old_cidade, app()->auth->provider, true);
                 $cidade->save();
                 $old_cidade->clean($cidade);
                 $msg = sprintf(
@@ -84,7 +84,7 @@ class CidadePageController extends PageController
                     $cidade->getNome()
                 );
                 if ($this->isJson()) {
-                    return $this->json()->success(['item' => $cidade->publish()], $msg);
+                    return $this->json()->success(['item' => $cidade->publish(app()->auth->provider)], $msg);
                 }
                 \Thunder::success($msg, true);
                 return $this->redirect('/gerenciar/cidade/');
@@ -140,7 +140,7 @@ class CidadePageController extends PageController
         if ($this->getRequest()->isMethod('POST')) {
             $cidade = new Cidade($this->getData());
             try {
-                $cidade->filter($old_cidade, true);
+                $cidade->filter($old_cidade, app()->auth->provider, true);
                 $cidade->save();
                 $old_cidade->clean($cidade);
                 $msg = sprintf(
@@ -148,7 +148,7 @@ class CidadePageController extends PageController
                     $cidade->getNome()
                 );
                 if ($this->isJson()) {
-                    return $this->json()->success(['item' => $cidade->publish()], $msg);
+                    return $this->json()->success(['item' => $cidade->publish(app()->auth->provider)], $msg);
                 }
                 \Thunder::success($msg, true);
                 return $this->redirect('/gerenciar/cidade/');

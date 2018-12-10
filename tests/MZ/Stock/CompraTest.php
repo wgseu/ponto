@@ -29,7 +29,7 @@ class CompraTest extends \MZ\Framework\TestCase
     public function testPublish()
     {
         $compra = new Compra();
-        $values = $compra->publish();
+        $values = $compra->publish(app()->auth->provider);
         $allowed = [
             'id',
             'numero',

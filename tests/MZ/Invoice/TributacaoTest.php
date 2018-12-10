@@ -29,7 +29,7 @@ class TributacaoTest extends \MZ\Framework\TestCase
     public function testPublish()
     {
         $tributacao = new Tributacao();
-        $values = $tributacao->publish();
+        $values = $tributacao->publish(app()->auth->provider);
         $allowed = [
             'id',
             'ncm',

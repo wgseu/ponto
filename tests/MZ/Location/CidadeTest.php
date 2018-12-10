@@ -29,7 +29,7 @@ class CidadeTest extends \MZ\Framework\TestCase
     public function testPublish()
     {
         $cidade = new Cidade();
-        $values = $cidade->publish();
+        $values = $cidade->publish(app()->auth->provider);
         $allowed = [
             'id',
             'estadoid',

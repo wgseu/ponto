@@ -51,7 +51,7 @@ class MovimentacaoPageController extends PageController
         if ($this->isJson()) {
             $items = [];
             foreach ($movimentacoes as $_movimentacao) {
-                $items[] = $_movimentacao->publish();
+                $items[] = $_movimentacao->publish(app()->auth->provider);
             }
             return $this->json()->success(['items' => $items]);
         }

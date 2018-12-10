@@ -88,14 +88,14 @@ class CaixaTest extends \MZ\Framework\TestCase
             'serie' => 'a1t2',
             'numeroinicial' => 'b5a3',
         ]);
-        $caixa->filter($old_caixa, true);
+        $caixa->filter($old_caixa, app()->auth->provider, true);
         $this->assertEquals($old_caixa, $caixa);
     }
 
     public function testPublish()
     {
         $caixa = new Caixa();
-        $values = $caixa->publish();
+        $values = $caixa->publish(app()->auth->provider);
         $allowed = [
             'id',
             'carteiraid',

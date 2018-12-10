@@ -60,8 +60,8 @@ class ServicoTest extends \MZ\Framework\TestCase
         $expected = [
             'status' => 'ok',
             'items' => [
-                $servico->publish(),
-                $servico_sec->publish()
+                $servico->publish(app()->auth->provider),
+                $servico_sec->publish(app()->auth->provider)
             ],
             'pages' => 1
         ];
@@ -75,7 +75,7 @@ class ServicoTest extends \MZ\Framework\TestCase
         AuthenticationTest::authProvider([Permissao::NOME_SISTEMA, Permissao::NOME_CADASTROSERVICOS]);
         $expected = [
             'status' => 'ok',
-            'item' => $servico->publish(),
+            'item' => $servico->publish(app()->auth->provider),
         ];
         $result = $this->post('/api/servicos', $servico->toArray());
         $expected['item']['id'] = $result['item']['id'] ?? null;
@@ -87,11 +87,11 @@ class ServicoTest extends \MZ\Framework\TestCase
         $servico = self::create();
         AuthenticationTest::authProvider([Permissao::NOME_SISTEMA, Permissao::NOME_CADASTROSERVICOS]);
         $id = $servico->getID();
-        $result = $this->put('/api/servicos/' . $id, $servico->toArray());
+        $result = $this->patch('/api/servicos/' . $id, $servico->toArray());
         $servico->loadByID();
         $expected = [
             'status' => 'ok',
-            'item' => $servico->publish(),
+            'item' => $servico->publish(app()->auth->provider),
         ];
         $this->assertEquals($expected, \array_intersect_key($result, $expected));
     }

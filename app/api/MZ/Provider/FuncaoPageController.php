@@ -52,7 +52,7 @@ class FuncaoPageController extends PageController
         if ($this->isJson()) {
             $items = [];
             foreach ($funcoes as $_funcao) {
-                $items[] = $_funcao->publish();
+                $items[] = $_funcao->publish(app()->auth->provider);
             }
             return $this->json()->success(['items' => $items]);
         }
@@ -75,7 +75,7 @@ class FuncaoPageController extends PageController
         if ($this->getRequest()->isMethod('POST')) {
             $funcao = new Funcao($this->getData());
             try {
-                $funcao->filter($old_funcao, true);
+                $funcao->filter($old_funcao, app()->auth->provider, true);
                 $funcao->insert();
                 $old_funcao->clean($funcao);
                 $msg = sprintf(
@@ -83,7 +83,7 @@ class FuncaoPageController extends PageController
                     $funcao->getDescricao()
                 );
                 if ($this->isJson()) {
-                    return $this->json()->success(['item' => $funcao->publish()], $msg);
+                    return $this->json()->success(['item' => $funcao->publish(app()->auth->provider)], $msg);
                 }
                 \Thunder::success($msg, true);
                 return $this->redirect('/gerenciar/funcao/');
@@ -128,7 +128,7 @@ class FuncaoPageController extends PageController
         if ($this->getRequest()->isMethod('POST')) {
             $funcao = new Funcao($this->getData());
             try {
-                $funcao->filter($old_funcao, true);
+                $funcao->filter($old_funcao, app()->auth->provider, true);
                 $funcao->update();
                 $old_funcao->clean($funcao);
                 $msg = sprintf(
@@ -136,7 +136,7 @@ class FuncaoPageController extends PageController
                     $funcao->getDescricao()
                 );
                 if ($this->isJson()) {
-                    return $this->json()->success(['item' => $funcao->publish()], $msg);
+                    return $this->json()->success(['item' => $funcao->publish(app()->auth->provider)], $msg);
                 }
                 \Thunder::success($msg, true);
                 return $this->redirect('/gerenciar/funcao/');

@@ -115,7 +115,7 @@ class PedidoOldApiController extends \MZ\Core\ApiController
                         if ($formacao->getTipo() == Formacao::TIPO_PACOTE) {
                             $formacao_pacote = $formacao;
                         }
-                        $formacoes[] = $formacao->publish();
+                        $formacoes[] = $formacao->publish(app()->auth->provider);
                     }
                     $item['formacoes'] = $formacoes;
                 }
@@ -143,7 +143,7 @@ class PedidoOldApiController extends \MZ\Core\ApiController
             );
             $_pagamentos = [];
             foreach ($pagamentos as $pagamento) {
-                $item = $pagamento->publish();
+                $item = $pagamento->publish(app()->auth->provider);
                 $_pagamentos[] = $item;
             }
             $response = [];
@@ -151,7 +151,7 @@ class PedidoOldApiController extends \MZ\Core\ApiController
             $response['pedidoid'] = $pedido->getID();
             if ($pedido->getClienteID()) {
                 $cliente = $pedido->findClienteID();
-                $response['cliente'] = $cliente->publish();
+                $response['cliente'] = $cliente->publish(app()->auth->provider);
             }
             $total = $pedido->findTotal();
             $response['produtos'] = $total['produtos'];

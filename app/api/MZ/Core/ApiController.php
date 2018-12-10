@@ -60,6 +60,7 @@ abstract class ApiController extends Controller
         $class_exists = \class_exists('MZ\Routing\Annotation\Get') &&
             \class_exists('MZ\Routing\Annotation\Put') &&
             \class_exists('MZ\Routing\Annotation\Post') &&
+            \class_exists('MZ\Routing\Annotation\Patch') &&
             \class_exists('MZ\Routing\Annotation\Delete');
         $methods = get_class_methods(static::class);
         $annotationReader = new SimpleAnnotationReader();

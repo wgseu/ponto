@@ -63,7 +63,7 @@ class PedidoPageController extends PageController
         if ($this->isJson()) {
             $items = [];
             foreach ($pedidos as $_pedido) {
-                $items[] = $_pedido->publish();
+                $items[] = $_pedido->publish(app()->auth->provider);
             }
             return $this->json()->success(['items' => $items]);
         }

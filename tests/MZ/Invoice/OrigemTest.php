@@ -52,14 +52,14 @@ class OrigemTest extends \MZ\Framework\TestCase
             'codigo' => '1.234',
             'descricao' => ' Origem <script>filter</script> ',
         ]);
-        $origem->filter($old_origem, true);
+        $origem->filter($old_origem, app()->auth->provider, true);
         $this->assertEquals($old_origem, $origem);
     }
 
     public function testPublish()
     {
         $origem = new Origem();
-        $values = $origem->publish();
+        $values = $origem->publish(app()->auth->provider);
         $allowed = [
             'id',
             'codigo',

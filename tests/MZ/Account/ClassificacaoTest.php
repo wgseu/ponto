@@ -52,14 +52,14 @@ class ClassificacaoTest extends \MZ\Framework\TestCase
             'classificacaoid' => '1.234',
             'descricao' => ' Classificação <script>filter</script> ',
         ]);
-        $classificacao->filter($old_classificacao, true);
+        $classificacao->filter($old_classificacao, app()->auth->provider, true);
         $this->assertEquals($old_classificacao, $classificacao);
     }
 
     public function testPublish()
     {
         $classificacao = new Classificacao();
-        $values = $classificacao->publish();
+        $values = $classificacao->publish(app()->auth->provider);
         $allowed = [
             'id',
             'classificacaoid',

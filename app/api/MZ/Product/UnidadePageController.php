@@ -51,7 +51,7 @@ class UnidadePageController extends PageController
         if ($this->isJson()) {
             $items = [];
             foreach ($unidades as $_unidade) {
-                $items[] = $_unidade->publish();
+                $items[] = $_unidade->publish(app()->auth->provider);
             }
             return $this->json()->success(['items' => $items]);
         }
@@ -72,7 +72,7 @@ class UnidadePageController extends PageController
         if ($this->getRequest()->isMethod('POST')) {
             $unidade = new Unidade($this->getData());
             try {
-                $unidade->filter($old_unidade, true);
+                $unidade->filter($old_unidade, app()->auth->provider, true);
                 $unidade->insert();
                 $old_unidade->clean($unidade);
                 $msg = sprintf(
@@ -80,7 +80,7 @@ class UnidadePageController extends PageController
                     $unidade->getNome()
                 );
                 if ($this->isJson()) {
-                    return $this->json()->success(['item' => $unidade->publish()], $msg);
+                    return $this->json()->success(['item' => $unidade->publish(app()->auth->provider)], $msg);
                 }
                 \Thunder::success($msg, true);
                 return $this->redirect('/gerenciar/unidade/');
@@ -123,7 +123,7 @@ class UnidadePageController extends PageController
         if ($this->getRequest()->isMethod('POST')) {
             $unidade = new Unidade($this->getData());
             try {
-                $unidade->filter($old_unidade, true);
+                $unidade->filter($old_unidade, app()->auth->provider, true);
                 $unidade->update();
                 $old_unidade->clean($unidade);
                 $msg = sprintf(
@@ -131,7 +131,7 @@ class UnidadePageController extends PageController
                     $unidade->getNome()
                 );
                 if ($this->isJson()) {
-                    return $this->json()->success(['item' => $unidade->publish()], $msg);
+                    return $this->json()->success(['item' => $unidade->publish(app()->auth->provider)], $msg);
                 }
                 \Thunder::success($msg, true);
                 return $this->redirect('/gerenciar/unidade/');

@@ -51,7 +51,7 @@ class EstoquePageController extends PageController
         if ($this->isJson()) {
             $items = [];
             foreach ($estoques as $_estoque) {
-                $items[] = $_estoque->publish();
+                $items[] = $_estoque->publish(app()->auth->provider);
             }
             return $this->json()->success(['items' => $items]);
         }

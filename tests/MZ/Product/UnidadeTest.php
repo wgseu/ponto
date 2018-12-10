@@ -72,14 +72,14 @@ class UnidadeTest extends \MZ\Framework\TestCase
             'descricao' => ' Unidade <script>filter</script> ',
             'sigla' => ' Unidade <script>filter</script> ',
         ]);
-        $unidade->filter($old_unidade, true);
+        $unidade->filter($old_unidade, app()->auth->provider, true);
         $this->assertEquals($old_unidade, $unidade);
     }
 
     public function testPublish()
     {
         $unidade = new Unidade();
-        $values = $unidade->publish();
+        $values = $unidade->publish(app()->auth->provider);
         $allowed = [
             'id',
             'nome',

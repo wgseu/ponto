@@ -105,7 +105,7 @@ $[descriptor.end]
         $expected = [
             'status' => 'ok',
             'items' => [
-                $$[table.unix]->publish(),
+                $$[table.unix]->publish(app()->auth->provider),
             ],
         ];
         $result = $this->get('/api/$[table.unix.plural]', ['search' => $$[table.unix]->get$[Descriptor.norm]()]);
@@ -119,7 +119,7 @@ $[descriptor.end]
         $expected = [
             'status' => 'ok',
             'item' => [
-                $$[table.unix]->publish(),
+                $$[table.unix]->publish(app()->auth->provider),
             ]
         ];
         $result = $this->post('/api/$[table.unix.plural]', $$[table.unix]->toArray());
@@ -132,12 +132,12 @@ $[descriptor.end]
         $$[table.unix] = self::create();
         AuthenticationTest::authProvider([Permissao::NOME_SISTEMA, Permissao::NOME_$[TABLE.style]]);
         $id = $$[table.unix]->get$[Primary.norm]();
-        $result = $this->put('/api/$[table.unix.plural]/' . $id, $$[table.unix]->toArray());
+        $result = $this->patch('/api/$[table.unix.plural]/' . $id, $$[table.unix]->toArray());
         $$[table.unix]->loadBy$[Primary.norm]();
         $expected = [
             'status' => 'ok',
             'item' => [
-                $$[table.unix]->publish(),
+                $$[table.unix]->publish(app()->auth->provider),
             ]
         ];
         $this->assertEquals($expected, \array_intersect_key($result, $expected));

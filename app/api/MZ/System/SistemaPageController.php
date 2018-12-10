@@ -91,7 +91,10 @@ class SistemaPageController extends PageController
                 set_string_config('Site', 'Maps.API', $maps_api);
                 $dropbox_token = trim($this->getRequest()->request->get('dropboxtoken'));
                 set_string_config('Sistema', 'Dropbox.AccessKey', $dropbox_token);
-                app()->getSystem()->getBusiness()->filter(app()->getSystem()->getBusiness());
+                app()->getSystem()->getBusiness()->filter(
+                    app()->getSystem()->getBusiness(),
+                    app()->auth->provider
+                );
                 app()->getSystem()->getBusiness()->update(['opcoes']);
                 \Thunder::success('Opções avançadas atualizadas com sucesso!', true);
                 return $this->redirect('/gerenciar/sistema/avancado');
@@ -142,7 +145,10 @@ class SistemaPageController extends PageController
                 if (strlen($senha) > 0) {
                     set_string_config('Email', 'Senha', $senha);
                 }
-                app()->getSystem()->getBusiness()->filter(app()->getSystem()->getBusiness());
+                app()->getSystem()->getBusiness()->filter(
+                    app()->getSystem()->getBusiness(),
+                    app()->auth->provider
+                );
                 app()->getSystem()->getBusiness()->update(['opcoes']);
                 $msg = 'E-mail atualizado com sucesso!';
                 if ($this->isJson()) {
@@ -189,7 +195,10 @@ class SistemaPageController extends PageController
                     );
                 }
                 set_int_config('Sistema', 'Fiscal.Timeout', $fiscal_timeout);
-                app()->getSystem()->getBusiness()->filter(app()->getSystem()->getBusiness());
+                app()->getSystem()->getBusiness()->filter(
+                    app()->getSystem()->getBusiness(),
+                    app()->auth->provider
+                );
                 app()->getSystem()->getBusiness()->update(['opcoes']);
                 \Thunder::success('Opções fiscais atualizadas com sucesso!', true);
                 return $this->redirect('/gerenciar/sistema/fiscal');
@@ -464,7 +473,10 @@ class SistemaPageController extends PageController
                 }
                 $marcado = $this->getRequest()->request->get('marcado');
                 set_boolean_config($secao, $chave, $marcado == 'Y');
-                app()->getSystem()->getBusiness()->filter(app()->getSystem()->getBusiness());
+                app()->getSystem()->getBusiness()->filter(
+                    app()->getSystem()->getBusiness(),
+                    app()->auth->provider
+                );
                 app()->getSystem()->getBusiness()->update(['opcoes']);
                 return $this->json()->success();
             } catch (\Exception $e) {
@@ -553,7 +565,10 @@ class SistemaPageController extends PageController
                 set_string_config('Site', 'Text.BemVindo', $text_bemvindo);
                 $text_chamada = trim($this->getRequest()->request->get('chamada'));
                 set_string_config('Site', 'Text.Chamada', $text_chamada);
-                app()->getSystem()->getBusiness()->filter(app()->getSystem()->getBusiness());
+                app()->getSystem()->getBusiness()->filter(
+                    app()->getSystem()->getBusiness(),
+                    app()->auth->provider
+                );
                 app()->getSystem()->getBusiness()->update(['opcoes']);
                 foreach ($images_info as $key => $value) {
                     // exclui a imagem antiga, pois uma nova foi informada
@@ -565,7 +580,7 @@ class SistemaPageController extends PageController
                 }
                 $msg = 'Layout atualizado com sucesso!';
                 if ($this->isJson()) {
-                    return $this->json()->success(['item' => $sistema->publish()], $msg);
+                    return $this->json()->success(['item' => $sistema->publish(app()->auth->provider)], $msg);
                 }
                 \Thunder::success($msg, true);
                 return $this->redirect('/gerenciar/sistema/layout');
@@ -705,7 +720,10 @@ class SistemaPageController extends PageController
                 }
                 $marcado = $this->getRequest()->request->get('marcado');
                 set_boolean_config($secao, $chave, $marcado == 'Y');
-                app()->getSystem()->getBusiness()->filter(app()->getSystem()->getBusiness());
+                app()->getSystem()->getBusiness()->filter(
+                    app()->getSystem()->getBusiness(),
+                    app()->auth->provider
+                );
                 app()->getSystem()->getBusiness()->update(['opcoes']);
                 return $this->json()->success();
             } catch (\Exception $e) {

@@ -50,7 +50,7 @@ class BairroPageController extends PageController
         if ($this->isJson()) {
             $items = [];
             foreach ($bairros as $bairro) {
-                $items[] = $bairro->publish();
+                $items[] = $bairro->publish(app()->auth->provider);
             }
             return $this->json()->success(['items' => $items]);
         }
@@ -78,7 +78,7 @@ class BairroPageController extends PageController
         if ($this->getRequest()->isMethod('POST')) {
             $bairro = new Bairro($this->getData());
             try {
-                $bairro->filter($old_bairro, true);
+                $bairro->filter($old_bairro, app()->auth->provider, true);
                 $bairro->save();
                 $old_bairro->clean($bairro);
                 $msg = sprintf(
@@ -86,7 +86,7 @@ class BairroPageController extends PageController
                     $bairro->getNome()
                 );
                 if ($this->isJson()) {
-                    return $this->json()->success(['item' => $bairro->publish()], $msg);
+                    return $this->json()->success(['item' => $bairro->publish(app()->auth->provider)], $msg);
                 }
                 \Thunder::success($msg, true);
                 return $this->redirect('/gerenciar/bairro/');
@@ -146,7 +146,7 @@ class BairroPageController extends PageController
         if ($this->getRequest()->isMethod('POST')) {
             $bairro = new Bairro($this->getData());
             try {
-                $bairro->filter($old_bairro, true);
+                $bairro->filter($old_bairro, app()->auth->provider, true);
                 $bairro->save();
                 $old_bairro->clean($bairro);
                 $msg = sprintf(
@@ -154,7 +154,7 @@ class BairroPageController extends PageController
                     $bairro->getNome()
                 );
                 if ($this->isJson()) {
-                    return $this->json()->success(['item' => $bairro->publish()], $msg);
+                    return $this->json()->success(['item' => $bairro->publish(app()->auth->provider)], $msg);
                 }
                 \Thunder::success($msg, true);
                 return $this->redirect('/gerenciar/bairro/');

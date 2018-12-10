@@ -61,14 +61,14 @@ class ImpostoTest extends \MZ\Framework\TestCase
             'codigo' => '1.234',
             'descricao' => ' Imposto <script>filter</script> ',
         ]);
-        $imposto->filter($old_imposto, true);
+        $imposto->filter($old_imposto, app()->auth->provider, true);
         $this->assertEquals($old_imposto, $imposto);
     }
 
     public function testPublish()
     {
         $imposto = new Imposto();
-        $values = $imposto->publish();
+        $values = $imposto->publish(app()->auth->provider);
         $allowed = [
             'id',
             'grupo',

@@ -52,7 +52,7 @@ class CaixaPageController extends PageController
         if ($this->isJson()) {
             $items = [];
             foreach ($caixas as $_caixa) {
-                $items[] = $_caixa->publish();
+                $items[] = $_caixa->publish(app()->auth->provider);
             }
             return $this->json()->success(['items' => $items]);
         }
@@ -78,7 +78,7 @@ class CaixaPageController extends PageController
         if ($this->getRequest()->isMethod('POST')) {
             $caixa = new Caixa($this->getData());
             try {
-                $caixa->filter($old_caixa, true);
+                $caixa->filter($old_caixa, app()->auth->provider, true);
                 $caixa->insert();
                 $old_caixa->clean($caixa);
                 $msg = sprintf(
@@ -86,7 +86,7 @@ class CaixaPageController extends PageController
                     $caixa->getDescricao()
                 );
                 if ($this->isJson()) {
-                    return $this->json()->success(['item' => $caixa->publish()], $msg);
+                    return $this->json()->success(['item' => $caixa->publish(app()->auth->provider)], $msg);
                 }
                 \Thunder::success($msg, true);
                 return $this->redirect('/gerenciar/caixa/');
@@ -137,7 +137,7 @@ class CaixaPageController extends PageController
                     $caixa->setNumeroInicial($old_caixa->getNumeroInicial());
                     $caixa->setSerie($old_caixa->getSerie());
                 }
-                $caixa->filter($old_caixa, true);
+                $caixa->filter($old_caixa, app()->auth->provider, true);
                 $caixa->update();
                 $old_caixa->clean($caixa);
                 $msg = sprintf(
@@ -145,7 +145,7 @@ class CaixaPageController extends PageController
                     $caixa->getDescricao()
                 );
                 if ($this->isJson()) {
-                    return $this->json()->success(['item' => $caixa->publish()], $msg);
+                    return $this->json()->success(['item' => $caixa->publish(app()->auth->provider)], $msg);
                 }
                 \Thunder::success($msg, true);
                 return $this->redirect('/gerenciar/caixa/');

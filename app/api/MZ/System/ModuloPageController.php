@@ -51,7 +51,7 @@ class ModuloPageController extends PageController
         if ($this->isJson()) {
             $items = [];
             foreach ($modulos as $_modulo) {
-                $items[] = $_modulo->publish();
+                $items[] = $_modulo->publish(app()->auth->provider);
             }
             return $this->json()->success(['items' => $items]);
         }
@@ -75,7 +75,7 @@ class ModuloPageController extends PageController
             $modulo = new Modulo($this->getData());
             try {
                 DB::beginTransaction();
-                $modulo->filter($old_modulo, true);
+                $modulo->filter($old_modulo, app()->auth->provider, true);
                 $modulo->update();
                 $old_modulo->clean($modulo);
                 DB::commit();
@@ -83,7 +83,7 @@ class ModuloPageController extends PageController
                     'Módulo "%s" atualizado com sucesso!',
                     $modulo->getNome()
                 );
-                return $this->json()->success(['item' => $modulo->publish()], $msg);
+                return $this->json()->success(['item' => $modulo->publish(app()->auth->provider)], $msg);
             } catch (\Exception $e) {
                 DB::Rollback();
                 $modulo->clean($old_modulo);

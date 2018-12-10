@@ -40,7 +40,7 @@ class CategoriaOldApiController extends \MZ\Core\ApiController
         $categorias = Categoria::findAll($condition, ['vendas' => -1]);
         $items = [];
         foreach ($categorias as $categoria) {
-            $item = $categoria->publish();
+            $item = $categoria->publish(app()->auth->provider);
             if ($todas) {
                 $item['disponivel'] = $categoria->isAvailable();
             }

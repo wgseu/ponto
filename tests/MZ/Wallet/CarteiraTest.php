@@ -58,7 +58,7 @@ class CarteiraTest extends \MZ\Framework\TestCase
     public function testPublish()
     {
         $carteira = new Carteira();
-        $values = $carteira->publish();
+        $values = $carteira->publish(app()->auth->provider);
         $allowed = [
             'id',
             'tipo',

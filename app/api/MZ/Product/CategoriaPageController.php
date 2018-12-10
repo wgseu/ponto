@@ -57,7 +57,7 @@ class CategoriaPageController extends PageController
         if ($this->isJson()) {
             $items = [];
             foreach ($categorias as $_categoria) {
-                $items[] = $_categoria->publish();
+                $items[] = $_categoria->publish(app()->auth->provider);
             }
             return $this->json()->success(['items' => $items]);
         }
@@ -84,7 +84,7 @@ class CategoriaPageController extends PageController
         if ($this->getRequest()->isMethod('POST')) {
             $categoria = new Categoria($this->getData());
             try {
-                $categoria->filter($old_categoria, true);
+                $categoria->filter($old_categoria, app()->auth->provider, true);
                 $categoria->insert();
                 $old_categoria->clean($categoria);
                 $msg = sprintf(
@@ -92,7 +92,7 @@ class CategoriaPageController extends PageController
                     $categoria->getDescricao()
                 );
                 if ($this->isJson()) {
-                    return $this->json()->success(['item' => $categoria->publish()], $msg);
+                    return $this->json()->success(['item' => $categoria->publish(app()->auth->provider)], $msg);
                 }
                 \Thunder::success($msg, true);
                 return $this->redirect('/gerenciar/categoria/');
@@ -138,7 +138,7 @@ class CategoriaPageController extends PageController
         if ($this->getRequest()->isMethod('POST')) {
             $categoria = new Categoria($this->getData());
             try {
-                $categoria->filter($old_categoria, true);
+                $categoria->filter($old_categoria, app()->auth->provider, true);
                 $categoria->update();
                 $old_categoria->clean($categoria);
                 $msg = sprintf(
@@ -146,7 +146,7 @@ class CategoriaPageController extends PageController
                     $categoria->getDescricao()
                 );
                 if ($this->isJson()) {
-                    return $this->json()->success(['item' => $categoria->publish()], $msg);
+                    return $this->json()->success(['item' => $categoria->publish(app()->auth->provider)], $msg);
                 }
                 \Thunder::success($msg, true);
                 return $this->redirect('/gerenciar/categoria/');

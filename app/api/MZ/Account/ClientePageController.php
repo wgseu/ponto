@@ -63,13 +63,13 @@ class ClientePageController extends PageController
                 }
                 $senha = $this->getRequest()->request->get('confirmarsenha', '');
                 $cliente->passwordMatch($senha);
-                $cliente->filter($old_cliente, true);
+                $cliente->filter($old_cliente, app()->auth->provider, true);
                 $cliente->getTelefone()->setPaisID(app()->getSystem()->getCountry()->getID());
-                $cliente->getTelefone()->filter($old_cliente->getTelefone(), true);
+                $cliente->getTelefone()->filter($old_cliente->getTelefone(), app()->auth->provider, true);
                 $cliente->insert();
                 $old_cliente->clean($cliente);
                 if ($this->isJson()) {
-                    return $this->json()->success(['item' => $cliente->publish()]);
+                    return $this->json()->success(['item' => $cliente->publish(app()->auth->provider)]);
                 }
                 app()->getAuthentication()->login($cliente);
                 return $this->loginSuccessfull();
@@ -156,16 +156,16 @@ class ClientePageController extends PageController
                 $senha = $this->getRequest()->request->get('confirmarsenha', '');
                 $cliente->passwordMatch($senha);
 
-                $cliente->filter($old_cliente, true);
+                $cliente->filter($old_cliente, app()->auth->provider, true);
                 $cliente->getTelefone()->setPaisID(app()->getSystem()->getCountry()->getID());
-                $cliente->getTelefone()->filter($old_cliente->getTelefone(), true);
+                $cliente->getTelefone()->filter($old_cliente->getTelefone(), app()->auth->provider, true);
                 $cliente->update();
 
                 $old_cliente->clean($cliente);
                 $old_cliente->getTelefone()->clean($cliente->getTelefone());
                 $msg = 'Conta atualizada com sucesso!';
                 if ($this->isJson()) {
-                    return $this->json()->success(['item' => $cliente->publish()], $msg);
+                    return $this->json()->success(['item' => $cliente->publish(app()->auth->provider)], $msg);
                 }
                 \Thunder::success($msg, true);
                 return $this->redirect('/conta/editar');
@@ -216,7 +216,7 @@ class ClientePageController extends PageController
         if ($this->isJson()) {
             $items = [];
             foreach ($clientes as $_cliente) {
-                $items[] = $_cliente->publish();
+                $items[] = $_cliente->publish(app()->auth->provider);
             }
             return $this->json()->success(['items' => $items]);
         }
@@ -250,9 +250,9 @@ class ClientePageController extends PageController
                         'Você deve alterar a empresa do sistema em vez de cadastrar uma nova'
                     );
                 }
-                $cliente->filter($old_cliente, true);
+                $cliente->filter($old_cliente, app()->auth->provider, true);
                 $cliente->getTelefone()->setPaisID(app()->getSystem()->getCountry()->getID());
-                $cliente->getTelefone()->filter($old_cliente->getTelefone(), true);
+                $cliente->getTelefone()->filter($old_cliente->getTelefone(), app()->auth->provider, true);
                 $cliente->insert();
                 $old_cliente->clean($cliente);
                 if ($this->getRequest()->query->getInt('sistema') == 1) {
@@ -270,7 +270,7 @@ class ClientePageController extends PageController
                     $cliente->getNomeCompleto()
                 );
                 if ($this->isJson()) {
-                    return $this->json()->success(['item' => $cliente->publish()], $msg);
+                    return $this->json()->success(['item' => $cliente->publish(app()->auth->provider)], $msg);
                 }
                 \Thunder::success($msg, true);
                 return $this->redirect('/gerenciar/cliente/');
@@ -356,9 +356,9 @@ class ClientePageController extends PageController
                 }
                 $senha = $this->getRequest()->request->get('confirmarsenha', '');
                 $cliente->passwordMatch($senha);
-                $cliente->filter($old_cliente, true);
+                $cliente->filter($old_cliente, app()->auth->provider, true);
                 $cliente->getTelefone()->setPaisID(app()->getSystem()->getCountry()->getID());
-                $cliente->getTelefone()->filter($old_cliente->getTelefone(), true);
+                $cliente->getTelefone()->filter($old_cliente->getTelefone(), app()->auth->provider, true);
                 $cliente->update();
                 $old_cliente->clean($cliente);
                 $msg = sprintf(
@@ -366,7 +366,7 @@ class ClientePageController extends PageController
                     $cliente->getNomeCompleto()
                 );
                 if ($this->isJson()) {
-                    return $this->json()->success(['item' => $cliente->publish()], $msg);
+                    return $this->json()->success(['item' => $cliente->publish(app()->auth->provider)], $msg);
                 }
                 \Thunder::success($msg, true);
                 return $this->redirect('/gerenciar/cliente/');

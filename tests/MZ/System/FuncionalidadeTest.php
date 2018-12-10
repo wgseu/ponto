@@ -29,7 +29,7 @@ class FuncionalidadeTest extends \MZ\Framework\TestCase
     public function testPublish()
     {
         $funcionalidade = new Funcionalidade();
-        $values = $funcionalidade->publish();
+        $values = $funcionalidade->publish(app()->auth->provider);
         $allowed = [
             'id',
             'nome',

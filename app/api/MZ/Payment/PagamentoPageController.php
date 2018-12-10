@@ -131,7 +131,7 @@ class PagamentoPageController extends PageController
         if ($this->isJson()) {
             $items = [];
             foreach ($pagamentos as $_pagamento) {
-                $items[] = $_pagamento->publish();
+                $items[] = $_pagamento->publish(app()->auth->provider);
             }
             return $this->json()->success(['items' => $items]);
         }

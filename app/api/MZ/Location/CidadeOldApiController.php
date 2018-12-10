@@ -41,7 +41,7 @@ class CidadeOldApiController extends \MZ\Core\ApiController
 
         $items = [];
         foreach ($cidades as $cidade) {
-            $items[] = $cidade->publish();
+            $items[] = $cidade->publish(app()->auth->provider);
         }
         return $this->json()->success(['items' => $items]);
     }

@@ -52,7 +52,7 @@ class FornecedorPageController extends PageController
         if ($this->isJson()) {
             $items = [];
             foreach ($fornecedores as $_fornecedor) {
-                $items[] = $_fornecedor->publish();
+                $items[] = $_fornecedor->publish(app()->auth->provider);
             }
             return $this->json()->success(['items' => $items]);
         }
@@ -74,7 +74,7 @@ class FornecedorPageController extends PageController
         if ($this->getRequest()->isMethod('POST')) {
             $fornecedor = new Fornecedor($this->getData());
             try {
-                $fornecedor->filter($old_fornecedor, true);
+                $fornecedor->filter($old_fornecedor, app()->auth->provider, true);
                 $fornecedor->insert();
                 $old_fornecedor->clean($fornecedor);
                 $msg = sprintf(
@@ -82,7 +82,7 @@ class FornecedorPageController extends PageController
                     $fornecedor->getEmpresaID()
                 );
                 if ($this->isJson()) {
-                    return $this->json()->success(['item' => $fornecedor->publish()], $msg);
+                    return $this->json()->success(['item' => $fornecedor->publish(app()->auth->provider)], $msg);
                 }
                 \Thunder::success($msg, true);
                 return $this->redirect('/gerenciar/fornecedor/');
@@ -128,7 +128,7 @@ class FornecedorPageController extends PageController
         if ($this->getRequest()->isMethod('POST')) {
             $fornecedor = new Fornecedor($this->getData());
             try {
-                $fornecedor->filter($old_fornecedor, true);
+                $fornecedor->filter($old_fornecedor, app()->auth->provider, true);
                 $fornecedor->update();
                 $old_fornecedor->clean($fornecedor);
                 $msg = sprintf(
@@ -136,7 +136,7 @@ class FornecedorPageController extends PageController
                     $fornecedor->getEmpresaID()
                 );
                 if ($this->isJson()) {
-                    return $this->json()->success(['item' => $fornecedor->publish()], $msg);
+                    return $this->json()->success(['item' => $fornecedor->publish(app()->auth->provider)], $msg);
                 }
                 \Thunder::success($msg, true);
                 return $this->redirect('/gerenciar/fornecedor/');

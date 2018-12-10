@@ -50,7 +50,7 @@ class IntegracaoPageController extends PageController
         if ($this->isJson()) {
             $items = [];
             foreach ($integracoes as $integracao) {
-                $items[] = $integracao->publish();
+                $items[] = $integracao->publish(app()->auth->provider);
             }
             return $this->json()->success(['items' => $items]);
         }
@@ -77,7 +77,7 @@ class IntegracaoPageController extends PageController
         if ($this->getRequest()->isMethod('POST')) {
             $integracao = new Integracao($this->getData());
             try {
-                $integracao->filter($old_integracao, true);
+                $integracao->filter($old_integracao, app()->auth->provider, true);
                 $integracao->save(array_keys($this->getData()));
                 $old_integracao->clean($integracao);
                 $msg = sprintf(
@@ -85,7 +85,7 @@ class IntegracaoPageController extends PageController
                     $integracao->getNome()
                 );
                 if ($this->isJson()) {
-                    return $this->json()->success(['item' => $integracao->publish()], $msg);
+                    return $this->json()->success(['item' => $integracao->publish(app()->auth->provider)], $msg);
                 }
                 \Thunder::success($msg, true);
                 return $this->redirect('/gerenciar/integracao/');

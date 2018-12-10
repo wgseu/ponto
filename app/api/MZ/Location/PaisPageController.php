@@ -52,7 +52,7 @@ class PaisPageController extends PageController
         if ($this->isJson()) {
             $items = [];
             foreach ($paises as $_pais) {
-                $items[] = $_pais->publish();
+                $items[] = $_pais->publish(app()->auth->provider);
             }
             return $this->json()->success(['items' => $items]);
         }
@@ -74,7 +74,7 @@ class PaisPageController extends PageController
         if ($this->getRequest()->isMethod('POST')) {
             $pais = new Pais($this->getData());
             try {
-                $pais->filter($old_pais, true);
+                $pais->filter($old_pais, app()->auth->provider, true);
                 $pais->save();
                 $old_pais->clean($pais);
                 $msg = sprintf(
@@ -82,7 +82,7 @@ class PaisPageController extends PageController
                     $pais->getNome()
                 );
                 if ($this->isJson()) {
-                    return $this->json()->success(['item' => $pais->publish()], $msg);
+                    return $this->json()->success(['item' => $pais->publish(app()->auth->provider)], $msg);
                 }
                 \Thunder::success($msg, true);
                 return $this->redirect('/gerenciar/pais/');
@@ -127,7 +127,7 @@ class PaisPageController extends PageController
         if ($this->getRequest()->isMethod('POST')) {
             $pais = new Pais($this->getData());
             try {
-                $pais->filter($old_pais, true);
+                $pais->filter($old_pais, app()->auth->provider, true);
                 $pais->save();
                 $old_pais->clean($pais);
                 $msg = sprintf(
@@ -135,7 +135,7 @@ class PaisPageController extends PageController
                     $pais->getNome()
                 );
                 if ($this->isJson()) {
-                    return $this->json()->success(['item' => $pais->publish()], $msg);
+                    return $this->json()->success(['item' => $pais->publish(app()->auth->provider)], $msg);
                 }
                 \Thunder::success($msg, true);
                 return $this->redirect('/gerenciar/pais/');

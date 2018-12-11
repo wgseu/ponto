@@ -25,10 +25,14 @@
 namespace MZ\Account;
 
 use MZ\System\Permissao;
+use MZ\Provider\Prestador;
+use MZ\Exception\AuthorizationException;
+use Symfony\Component\HttpFoundation\Response;
 use MZ\Util\Filter;
 
 /**
- * Allow application to serve system resources
+ * Telefones dos clientes, apenas o telefone principal deve ser único por
+ * cliente
  */
 class TelefoneApiController extends \MZ\Core\ApiController
 {
@@ -59,10 +63,22 @@ class TelefoneApiController extends \MZ\Core\ApiController
      */
     public function add()
     {
-        $this->needPermission([Permissao::NOME_CADASTROCLIENTES]);
+        app()->needLogin();
         $localized = $this->getRequest()->query->getBoolean('localized', false);
         $telefone = new Telefone($this->getData());
         $telefone->filter(new Telefone(), app()->auth->provider, $localized);
+        $other_user = $telefone->getClienteID() != app()->auth->user->getID();
+        if ($other_user && !app()->auth->has([Permissao::NOME_CADASTROCLIENTES])) {
+            $this->needPermission([Permissao::NOME_CADASTROCLIENTES]);
+        }
+        $prestador = Prestador::findByClienteID($telefone->getClienteID());
+        if ($other_user && !app()->auth->isOwner() && $prestador->exists()) {
+            throw new AuthorizationException(
+                _t('need_owner'),
+                Response::HTTP_FORBIDDEN,
+                $permissions
+            );
+        }
         $telefone->insert();
         return $this->getResponse()->success(['item' => $telefone->publish(app()->auth->provider)]);
     }
@@ -70,7 +86,7 @@ class TelefoneApiController extends \MZ\Core\ApiController
     /**
      * Modify parts of an existing Telefone
      * @Patch("/api/telefones/{id}", name="api_telefone_update", params={ "id": "\d+" })
-     * 
+     *
      * @param int $id Telefone id
      */
     public function modify($id)
@@ -78,7 +94,8 @@ class TelefoneApiController extends \MZ\Core\ApiController
         $this->needPermission([Permissao::NOME_CADASTROCLIENTES]);
         $old_telefone = Telefone::findOrFail(['id' => $id]);
         $localized = $this->getRequest()->query->getBoolean('localized', false);
-        $telefone = new Telefone($this->getData());
+        $data = array_merge($old_telefone->toArray(), $this->getData());
+        $telefone = new Telefone($data);
         $telefone->filter($old_telefone, app()->auth->provider, $localized);
         $telefone->update();
         $old_telefone->clean($telefone);
@@ -88,7 +105,7 @@ class TelefoneApiController extends \MZ\Core\ApiController
     /**
      * Delete existing Telefone
      * @Delete("/api/telefones/{id}", name="api_telefone_delete", params={ "id": "\d+" })
-     * 
+     *
      * @param int $id Telefone id to delete
      */
     public function delete($id)

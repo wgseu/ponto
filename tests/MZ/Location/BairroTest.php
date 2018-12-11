@@ -24,69 +24,70 @@
  */
 namespace MZ\Location;
 
-use MZ\Location\PaisTest;
+use MZ\Location\CidadeTest;
 
-class EstadoTest extends \MZ\Framework\TestCase
+class BairroTest extends \MZ\Framework\TestCase
 {
     /**
-     * Build a valid estado
-     * @param string $nome Estado nome
-     * @return Estado
+     * Build a valid bairro
+     * @param string $nome Bairro nome
+     * @return Bairro
      */
     public static function build($nome = null)
     {
-        $last = Estado::find([], ['id' => -1]);
+        $last = Bairro::find([], ['id' => -1]);
         $id = $last->getID() + 1;
-        $pais = PaisTest::create();
-        $estado = new Estado();
-        $estado->setPaisID($pais->getID());
-        $estado->setNome($nome ?: "Estado {$id}");
-        $estado->setUF("S{$id}");
-        return $estado;
+        $cidade = CidadeTest::create();
+        $bairro = new Bairro();
+        $bairro->setCidadeID($cidade->getID());
+        $bairro->setNome($nome ?: "Bairro {$id}");
+        $bairro->setValorEntrega(12.3);
+        $bairro->setMapeado('Y');
+        return $bairro;
     }
 
     /**
-     * Create a estado on database
-     * @param string $nome Estado nome
-     * @return Estado
+     * Create a bairro on database
+     * @param string $nome Bairro nome
+     * @return Bairro
      */
     public static function create($nome = null)
     {
-        $estado = self::build($nome);
-        $estado->insert();
-        return $estado;
+        $bairro = self::build($nome);
+        $bairro->insert();
+        return $bairro;
     }
 
     public function testFind()
     {
-        $estado = self::create();
-        $condition = ['nome' => $estado->getNome()];
-        $found_estado = Estado::find($condition);
-        $this->assertEquals($estado, $found_estado);
-        list($found_estado) = Estado::findAll($condition, [], 1);
-        $this->assertEquals($estado, $found_estado);
-        $this->assertEquals(1, Estado::count($condition));
+        $bairro = self::create();
+        $condition = ['nome' => $bairro->getNome()];
+        $found_bairro = Bairro::find($condition);
+        $this->assertEquals($bairro, $found_bairro);
+        list($found_bairro) = Bairro::findAll($condition, [], 1);
+        $this->assertEquals($bairro, $found_bairro);
+        $this->assertEquals(1, Bairro::count($condition));
     }
 
     public function testAdd()
     {
-        $estado = self::build();
-        $estado->insert();
-        $this->assertTrue($estado->exists());
+        $bairro = self::build();
+        $bairro->insert();
+        $this->assertTrue($bairro->exists());
     }
 
     public function testUpdate()
     {
-        $estado = self::create();
-        $estado->update();
-        $this->assertTrue($estado->exists());
+        $bairro = self::create();
+        $bairro->update();
+        $this->assertTrue($bairro->exists());
     }
 
     public function testDelete()
     {
-        $estado = self::create();
-        $estado->delete();
-        $estado->loadByID();
-        $this->assertFalse($estado->exists());
+        $bairro = self::create();
+        $bairro->delete();
+        $bairro->loadByID();
+        $this->assertFalse($bairro->exists());
     }
 }

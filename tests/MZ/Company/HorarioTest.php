@@ -26,155 +26,63 @@ namespace MZ\Company;
 
 class HorarioTest extends \MZ\Framework\TestCase
 {
-    public function testFromArray()
+    /**
+     * Build a valid horário
+     * @param string $mensagem Horário mensagem
+     * @return Horario
+     */
+    public static function build($mensagem = null)
     {
-        $old_horario = new Horario([
-            'id' => 123,
-            'modo' => 'Horário',
-            'funcaoid' => 123,
-            'prestadorid' => 123,
-            'integracaoid' => 123,
-            'inicio' => 123,
-            'fim' => 123,
-            'mensagem' => 'Horário',
-            'fechado' => 'Y',
-        ]);
+        $last = Horario::find([], ['id' => -1]);
+        $id = $last->getID() + 1;
         $horario = new Horario();
-        $horario->fromArray($old_horario);
-        $this->assertEquals($horario, $old_horario);
-        $horario->fromArray(null);
-        $this->assertEquals($horario, new Horario());
+        $horario->setInicio(10000 + $id);
+        $horario->setFim(20000 + $id);
+        return $horario;
     }
 
-    public function testFilter()
+    /**
+     * Create a horário on database
+     * @param string $mensagem Horário mensagem
+     * @return Horario
+     */
+    public static function create($mensagem = null)
     {
-        $old_horario = new Horario([
-            'id' => 1234,
-            'modo' => Horario::MODO_ENTREGA,
-            'funcaoid' => 1234,
-            'prestadorid' => 1234,
-            'integracaoid' => 1234,
-            'inicio' => 1234,
-            'fim' => 1234,
-            'mensagem' => 'Horário filter',
-            'fechado' => 'Y',
-        ]);
-        $horario = new Horario([
-            'id' => 321,
-            'modo' => Horario::MODO_ENTREGA,
-            'funcaoid' => '1.234',
-            'prestadorid' => '1.234',
-            'integracaoid' => '1.234',
-            'inicio' => '1.234',
-            'fim' => '1.234',
-            'mensagem' => ' Horário <script>filter</script> ',
-            'fechado' => 'Y',
-        ]);
-        $horario->filter($old_horario, app()->auth->provider, true);
-        $this->assertEquals($old_horario, $horario);
-    }
-
-    public function testPublish()
-    {
-        $horario = new Horario();
-        $values = $horario->publish(app()->auth->provider);
-        $allowed = [
-            'id',
-            'modo',
-            'funcaoid',
-            'prestadorid',
-            'integracaoid',
-            'inicio',
-            'fim',
-            'mensagem',
-            'fechado',
-        ];
-        $this->assertEquals($allowed, array_keys($values));
-    }
-
-    public function testInsert()
-    {
-        $horario = new Horario();
-        try {
-            $horario->insert();
-            $this->fail('Não deveria ter cadastrado o horário');
-        } catch (\MZ\Exception\ValidationException $e) {
-            $this->assertEquals(
-                [
-                    'inicio',
-                    'fim',
-                ],
-                array_keys($e->getErrors())
-            );
-        }
-        $horario->setModo('Funcionamento');
-        $horario->setInicio(123);
-        $horario->setFim(123);
-        $horario->setFechado('Y');
+        $horario = self::build($mensagem);
         $horario->insert();
-    }
-
-    public function testUpdate()
-    {
-        $horario = new Horario();
-        $horario->setModo('Funcionamento');
-        $horario->setInicio(123);
-        $horario->setFim(123);
-        $horario->setFechado('N');
-        $horario->insert();
-        $horario->setInicio(456);
-        $horario->setFim(456);
-        $horario->setMensagem('Horário updated');
-        $horario->setFechado('N');
-        $horario->update();
-        $found_horario = Horario::findByID($horario->getID());
-        $this->assertEquals($horario, $found_horario);
-        $horario->setID('');
-        $this->expectException('\Exception');
-        $horario->update();
-    }
-
-    public function testDelete()
-    {
-        $horario = new Horario();
-        $horario->setModo('Funcionamento');
-        $horario->setInicio(123);
-        $horario->setFim(123);
-        $horario->setFechado('Y');
-        $horario->insert();
-        $horario->delete();
-        $horario->clean(new Horario());
-        $found_horario = Horario::findByID($horario->getID());
-        $this->assertEquals(new Horario(), $found_horario);
-        $horario->setID('');
-        $this->expectException('\Exception');
-        $horario->delete();
+        return $horario;
     }
 
     public function testFind()
     {
-        $horario = new Horario();
-        $horario->setModo('Funcionamento');
-        $horario->setInicio(123654);
-        $horario->setFim(123656);
-        $horario->setFechado('Y');
+        $horario = self::create();
+        $condition = ['inicio' => $horario->getInicio()];
+        $found_horario = Horario::find($condition);
+        $this->assertEquals($horario, $found_horario);
+        list($found_horario) = Horario::findAll($condition, [], 1);
+        $this->assertEquals($horario, $found_horario);
+        $this->assertEquals(1, Horario::count($condition));
+    }
+
+    public function testAdd()
+    {
+        $horario = self::build();
         $horario->insert();
-        $found_horario = Horario::find(['id' => $horario->getID()]);
-        $this->assertEquals($horario, $found_horario);
-        $found_horario = Horario::findByID($horario->getID());
-        $this->assertEquals($horario, $found_horario);
+        $this->assertTrue($horario->exists());
+    }
 
-        $horario_sec = new Horario();
-        $horario_sec->setModo('Funcionamento');
-        $horario_sec->setInicio(123654);
-        $horario_sec->setFim(123656);
-        $horario_sec->setFechado('Y');
-        $horario_sec->insert();
+    public function testUpdate()
+    {
+        $horario = self::create();
+        $horario->update();
+        $this->assertTrue($horario->exists());
+    }
 
-        $horarios = Horario::findAll(['inicio' => 123654], [], 2, 0);
-        $this->assertEquals([$horario, $horario_sec], $horarios);
-
-        $count = Horario::count(['inicio' => 123654]);
-        $this->assertEquals(2, $count);
+    public function testDelete()
+    {
+        $horario = self::create();
+        $horario->delete();
+        $horario->loadByID();
+        $this->assertFalse($horario->exists());
     }
 }

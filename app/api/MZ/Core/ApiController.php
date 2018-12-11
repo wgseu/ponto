@@ -42,12 +42,14 @@ abstract class ApiController extends Controller
 
     /**
      * Get current json request data
+     * @param array $defaults default values
      * @return array json request data
      */
-    public function getData()
+    public function getData($defaults = [])
     {
         $content = $this->getRequest()->getContent();
-        return json_decode($content, true) ?: [];
+        $data = json_decode($content, true) ?: [];
+        return array_merge($defaults, $data);
     }
 
     /**

@@ -24,69 +24,47 @@
  */
 namespace MZ\Location;
 
-use MZ\Location\PaisTest;
+use MZ\System\Permissao;
+use MZ\Account\AuthenticationTest;
 
-class EstadoTest extends \MZ\Framework\TestCase
+class EstadoPageControllerTest extends \MZ\Framework\TestCase
 {
-    /**
-     * Build a valid estado
-     * @param string $nome Estado nome
-     * @return Estado
-     */
-    public static function build($nome = null)
-    {
-        $last = Estado::find([], ['id' => -1]);
-        $id = $last->getID() + 1;
-        $pais = PaisTest::create();
-        $estado = new Estado();
-        $estado->setPaisID($pais->getID());
-        $estado->setNome($nome ?: "Estado {$id}");
-        $estado->setUF("S{$id}");
-        return $estado;
-    }
-
-    /**
-     * Create a estado on database
-     * @param string $nome Estado nome
-     * @return Estado
-     */
-    public static function create($nome = null)
-    {
-        $estado = self::build($nome);
-        $estado->insert();
-        return $estado;
-    }
-
     public function testFind()
     {
-        $estado = self::create();
-        $condition = ['nome' => $estado->getNome()];
-        $found_estado = Estado::find($condition);
-        $this->assertEquals($estado, $found_estado);
-        list($found_estado) = Estado::findAll($condition, [], 1);
-        $this->assertEquals($estado, $found_estado);
-        $this->assertEquals(1, Estado::count($condition));
+        $estado = EstadoTest::create();
+        AuthenticationTest::authProvider([Permissao::NOME_SISTEMA, Permissao::NOME_CADASTROESTADOS]);
+        $result = $this->get('/gerenciar/estado/', ['search' => $estado->getNome()]);
+        $this->assertEquals(200, $result->getStatusCode());
     }
 
     public function testAdd()
     {
-        $estado = self::build();
-        $estado->insert();
+        $estado = EstadoTest::build();
+        AuthenticationTest::authProvider([Permissao::NOME_SISTEMA, Permissao::NOME_CADASTROESTADOS]);
+        $result = $this->post('/gerenciar/estado/cadastrar', $estado->toArray(), true);
+        $this->assertEquals(302, $result->getStatusCode());
+        $estado->load(['nome' => $estado->getNome()]);
         $this->assertTrue($estado->exists());
     }
 
     public function testUpdate()
     {
-        $estado = self::create();
-        $estado->update();
-        $this->assertTrue($estado->exists());
+        $estado = EstadoTest::create();
+        AuthenticationTest::authProvider([Permissao::NOME_SISTEMA, Permissao::NOME_CADASTROESTADOS]);
+        $id = $estado->getID();
+        $result = $this->post('/gerenciar/estado/editar?id=' . $id, $estado->toArray(), true);
+        $estado->loadByID();
+        $this->assertEquals(302, $result->getStatusCode());
     }
 
     public function testDelete()
     {
-        $estado = self::create();
-        $estado->delete();
+        $estado = EstadoTest::create();
+        AuthenticationTest::authProvider([Permissao::NOME_SISTEMA, Permissao::NOME_CADASTROESTADOS]);
+        $id = $estado->getID();
+        $result = $this->get('/gerenciar/estado/excluir?id=' . $id);
         $estado->loadByID();
+        $this->assertEquals(302, $result->getStatusCode());
         $this->assertFalse($estado->exists());
     }
 }

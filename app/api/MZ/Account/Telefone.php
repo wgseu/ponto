@@ -302,7 +302,7 @@ class Telefone extends SyncModel
     public function publish($requester)
     {
         $telefone = parent::publish($requester);
-        $telefone['numero'] = Mask::mask($telefone['numero'], _p('numero.mask'));
+        $telefone['numero'] = Mask::mask($telefone['numero'], _p('Mascara', 'Telefone'));
         return $telefone;
     }
 
@@ -316,7 +316,7 @@ class Telefone extends SyncModel
     public function filter($original, $updater, $localized = false)
     {
         $this->setID($original->getID());
-        $this->setClienteID(Filter::number($original->getClienteID()));
+        $this->setClienteID(Filter::number($this->getClienteID()));
         $this->setPaisID(Filter::number($this->getPaisID()));
         $this->setNumero(Filter::unmask($this->getNumero(), _p('Mascara', 'Telefone')));
         $this->setOperadora(Filter::string($this->getOperadora()));

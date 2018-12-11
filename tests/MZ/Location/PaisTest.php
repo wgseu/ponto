@@ -24,69 +24,71 @@
  */
 namespace MZ\Location;
 
-use MZ\Location\PaisTest;
+use MZ\Wallet\MoedaTest;
 
-class EstadoTest extends \MZ\Framework\TestCase
+class PaisTest extends \MZ\Framework\TestCase
 {
     /**
-     * Build a valid estado
-     * @param string $nome Estado nome
-     * @return Estado
+     * Build a valid país
+     * @param string $nome País nome
+     * @return Pais
      */
     public static function build($nome = null)
     {
-        $last = Estado::find([], ['id' => -1]);
+        $last = Pais::find([], ['id' => -1]);
         $id = $last->getID() + 1;
-        $pais = PaisTest::create();
-        $estado = new Estado();
-        $estado->setPaisID($pais->getID());
-        $estado->setNome($nome ?: "Estado {$id}");
-        $estado->setUF("S{$id}");
-        return $estado;
+        $moeda = MoedaTest::create();
+        $pais = new Pais();
+        $pais->setNome($nome ?: "País {$id}");
+        $pais->setSigla("P{$id}");
+        $pais->setCodigo("C{$id}");
+        $pais->setMoedaID($moeda->getID());
+        $pais->setIdioma('pt-BR');
+        return $pais;
     }
 
     /**
-     * Create a estado on database
-     * @param string $nome Estado nome
-     * @return Estado
+     * Create a país on database
+     * @param string $nome País nome
+     * @return Pais
      */
     public static function create($nome = null)
     {
-        $estado = self::build($nome);
-        $estado->insert();
-        return $estado;
+        $pais = self::build($nome);
+        $pais->insert();
+        return $pais;
     }
 
     public function testFind()
     {
-        $estado = self::create();
-        $condition = ['nome' => $estado->getNome()];
-        $found_estado = Estado::find($condition);
-        $this->assertEquals($estado, $found_estado);
-        list($found_estado) = Estado::findAll($condition, [], 1);
-        $this->assertEquals($estado, $found_estado);
-        $this->assertEquals(1, Estado::count($condition));
+        $pais = self::create();
+        $condition = ['nome' => $pais->getNome()];
+        $found_pais = Pais::find($condition);
+        $this->assertEquals($pais, $found_pais);
+        list($found_pais) = Pais::findAll($condition, [], 1);
+        $this->assertEquals($pais, $found_pais);
+        $this->assertEquals(1, Pais::count($condition));
     }
 
     public function testAdd()
     {
-        $estado = self::build();
-        $estado->insert();
-        $this->assertTrue($estado->exists());
+        $pais = self::build();
+        $pais->insert();
+        $this->assertTrue($pais->exists());
     }
 
     public function testUpdate()
     {
-        $estado = self::create();
-        $estado->update();
-        $this->assertTrue($estado->exists());
+        $pais = self::create();
+        $pais->update();
+        $this->assertTrue($pais->exists());
     }
 
     public function testDelete()
     {
-        $estado = self::create();
-        $estado->delete();
-        $estado->loadByID();
-        $this->assertFalse($estado->exists());
+        $pais = self::create();
+        $pais->delete();
+        $pais->loadByID();
+        $this->assertFalse($pais->exists());
     }
 }

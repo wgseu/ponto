@@ -24,19 +24,72 @@
  */
 namespace MZ\Location;
 
+use MZ\Location\CidadeTest;
+use MZ\Location\BairroTest;
+
 class EnderecoTest extends \MZ\Framework\TestCase
 {
-    public function testPublish()
+    /**
+     * Build a valid endereço
+     * @param string $logradouro Endereço logradouro
+     * @return Endereco
+     */
+    public static function build($logradouro = null)
     {
+        $last = Endereco::find([], ['id' => -1]);
+        $id = $last->getID() + 1;
+        $cidade = CidadeTest::create();
+        $bairro = BairroTest::create();
         $endereco = new Endereco();
-        $values = $endereco->publish(app()->auth->provider);
-        $allowed = [
-            'id',
-            'cidadeid',
-            'bairroid',
-            'logradouro',
-            'cep',
-        ];
-        $this->assertEquals($allowed, array_keys($values));
+        $endereco->setCidadeID($cidade->getID());
+        $endereco->setBairroID($bairro->getID());
+        $endereco->setLogradouro($logradouro ?: "Endereço {$id}");
+        $endereco->setCEP(\str_pad("{$id}", 8, '0'));
+        return $endereco;
+    }
+
+    /**
+     * Create a endereço on database
+     * @param string $logradouro Endereço logradouro
+     * @return Endereco
+     */
+    public static function create($logradouro = null)
+    {
+        $endereco = self::build($logradouro);
+        $endereco->insert();
+        return $endereco;
+    }
+
+    public function testFind()
+    {
+        $endereco = self::create();
+        $condition = ['logradouro' => $endereco->getLogradouro()];
+        $found_endereco = Endereco::find($condition);
+        $this->assertEquals($endereco, $found_endereco);
+        list($found_endereco) = Endereco::findAll($condition, [], 1);
+        $this->assertEquals($endereco, $found_endereco);
+        $this->assertEquals(1, Endereco::count($condition));
+    }
+
+    public function testAdd()
+    {
+        $endereco = self::build();
+        $endereco->insert();
+        $this->assertTrue($endereco->exists());
+    }
+
+    public function testUpdate()
+    {
+        $endereco = self::create();
+        $endereco->update();
+        $this->assertTrue($endereco->exists());
+    }
+
+    public function testDelete()
+    {
+        $endereco = self::create();
+        $endereco->delete();
+        $endereco->loadByID();
+        $this->assertFalse($endereco->exists());
     }
 }

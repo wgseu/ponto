@@ -77,7 +77,7 @@ class Endereco extends SyncModel
     }
 
     /**
-     * Set ID value to new on param
+     * Identificador do endereço
      * @param int $id Set id for Endereço
      * @return self Self instance
      */
@@ -97,7 +97,7 @@ class Endereco extends SyncModel
     }
 
     /**
-     * Set CidadeID value to new on param
+     * Cidade a qual o endereço pertence
      * @param int $cidade_id Set cidade for Endereço
      * @return self Self instance
      */
@@ -117,7 +117,7 @@ class Endereco extends SyncModel
     }
 
     /**
-     * Set BairroID value to new on param
+     * Bairro a qual o endereço está localizado
      * @param int $bairro_id Set bairro for Endereço
      * @return self Self instance
      */
@@ -137,7 +137,7 @@ class Endereco extends SyncModel
     }
 
     /**
-     * Set Logradouro value to new on param
+     * Nome da rua ou avenida
      * @param string $logradouro Set logradouro for Endereço
      * @return self Self instance
      */
@@ -157,7 +157,7 @@ class Endereco extends SyncModel
     }
 
     /**
-     * Set CEP value to new on param
+     * Código dos correios para identificar a rua ou avenida
      * @param string $cep Set cep for Endereço
      * @return self Self instance
      */

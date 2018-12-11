@@ -26,115 +26,62 @@ namespace MZ\Account;
 
 class ClassificacaoTest extends \MZ\Framework\TestCase
 {
-    public function testFromArray()
+    /**
+     * Build a valid classificação
+     * @param string $descricao Classificação descrição
+     * @return Classificacao
+     */
+    public static function build($descricao = null)
     {
-        $old_classificacao = new Classificacao([
-            'id' => 123,
-            'classificacaoid' => 123,
-            'descricao' => 'Classificação',
-        ]);
+        $last = Classificacao::find([], ['id' => -1]);
+        $id = $last->getID() + 1;
         $classificacao = new Classificacao();
-        $classificacao->fromArray($old_classificacao);
-        $this->assertEquals($classificacao, $old_classificacao);
-        $classificacao->fromArray(null);
-        $this->assertEquals($classificacao, new Classificacao());
+        $classificacao->setDescricao($descricao ?: "Classificação {$id}");
+        return $classificacao;
     }
 
-    public function testFilter()
+    /**
+     * Create a classificação on database
+     * @param string $descricao Classificação descrição
+     * @return Classificacao
+     */
+    public static function create($descricao = null)
     {
-        $old_classificacao = new Classificacao([
-            'id' => 1234,
-            'classificacaoid' => 1234,
-            'descricao' => 'Classificação filter',
-        ]);
-        $classificacao = new Classificacao([
-            'id' => 321,
-            'classificacaoid' => '1.234',
-            'descricao' => ' Classificação <script>filter</script> ',
-        ]);
-        $classificacao->filter($old_classificacao, app()->auth->provider, true);
-        $this->assertEquals($old_classificacao, $classificacao);
-    }
-
-    public function testPublish()
-    {
-        $classificacao = new Classificacao();
-        $values = $classificacao->publish(app()->auth->provider);
-        $allowed = [
-            'id',
-            'classificacaoid',
-            'descricao',
-            'iconeurl',
-        ];
-        $this->assertEquals($allowed, array_keys($values));
-    }
-
-    public function testInsert()
-    {
-        $classificacao = new Classificacao();
-        try {
-            $classificacao->insert();
-            $this->fail('Não deveria ter cadastrado a classificação');
-        } catch (\MZ\Exception\ValidationException $e) {
-            $this->assertEquals(
-                [
-                    'descricao',
-                ],
-                array_keys($e->getErrors())
-            );
-        }
-        $classificacao->setDescricao('Classificação to insert');
+        $classificacao = self::build($descricao);
         $classificacao->insert();
-    }
-
-    public function testUpdate()
-    {
-        $classificacao = new Classificacao();
-        $classificacao->setDescricao('Classificação to update');
-        $classificacao->insert();
-        $classificacao->setDescricao('Classificação updated');
-        $classificacao->update();
-        $found_classificacao = Classificacao::findByID($classificacao->getID());
-        $this->assertEquals($classificacao, $found_classificacao);
-        $classificacao->setID('');
-        $this->expectException('\Exception');
-        $classificacao->update();
-    }
-
-    public function testDelete()
-    {
-        $classificacao = new Classificacao();
-        $classificacao->setDescricao('Classificação to delete');
-        $classificacao->insert();
-        $classificacao->delete();
-        $classificacao->clean(new Classificacao());
-        $found_classificacao = Classificacao::findByID($classificacao->getID());
-        $this->assertEquals(new Classificacao(), $found_classificacao);
-        $classificacao->setID('');
-        $this->expectException('\Exception');
-        $classificacao->delete();
+        return $classificacao;
     }
 
     public function testFind()
     {
-        $classificacao = new Classificacao();
-        $classificacao->setDescricao('Classificação find');
+        $classificacao = self::create();
+        $condition = ['descricao' => $classificacao->getDescricao()];
+        $found_classificacao = Classificacao::find($condition);
+        $this->assertEquals($classificacao, $found_classificacao);
+        list($found_classificacao) = Classificacao::findAll($condition, [], 1);
+        $this->assertEquals($classificacao, $found_classificacao);
+        $this->assertEquals(1, Classificacao::count($condition));
+    }
+
+    public function testAdd()
+    {
+        $classificacao = self::build();
         $classificacao->insert();
-        $found_classificacao = Classificacao::find(['id' => $classificacao->getID()]);
-        $this->assertEquals($classificacao, $found_classificacao);
-        $found_classificacao = Classificacao::findByID($classificacao->getID());
-        $this->assertEquals($classificacao, $found_classificacao);
-        $found_classificacao = Classificacao::findByDescricao($classificacao->getDescricao());
-        $this->assertEquals($classificacao, $found_classificacao);
+        $this->assertTrue($classificacao->exists());
+    }
 
-        $classificacao_sec = new Classificacao();
-        $classificacao_sec->setDescricao('Classificação find second');
-        $classificacao_sec->insert();
+    public function testUpdate()
+    {
+        $classificacao = self::create();
+        $classificacao->update();
+        $this->assertTrue($classificacao->exists());
+    }
 
-        $classificacoes = Classificacao::findAll(['search' => 'Classificação find'], [], 2, 0);
-        $this->assertEquals([$classificacao, $classificacao_sec], $classificacoes);
-
-        $count = Classificacao::count(['search' => 'Classificação find']);
-        $this->assertEquals(2, $count);
+    public function testDelete()
+    {
+        $classificacao = self::create();
+        $classificacao->delete();
+        $classificacao->loadByID();
+        $this->assertFalse($classificacao->exists());
     }
 }

@@ -73,7 +73,8 @@ class PacoteApiController extends \MZ\Core\ApiController
         $this->needPermission([Permissao::NOME_CADASTROPRODUTOS]);
         $old_pacote = Pacote::findOrFail(['id' => $id]);
         $localized = $this->getRequest()->query->getBoolean('localized', false);
-        $pacote = new Pacote($this->getData());
+        $data = array_merge($old_pacote->toArray(), $this->getData());
+        $pacote = new Pacote($data);
         $pacote->filter($old_pacote, app()->auth->provider, $localized);
         $pacote->update();
         $old_pacote->clean($pacote);

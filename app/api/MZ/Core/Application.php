@@ -378,7 +378,7 @@ class Application
         $this->needManager();
         if (!$this->getAuthentication()->has($permissions)) {
             throw new AuthorizationException(
-                $message ?: _t('$this->needPermission'),
+                $message ?: _t('need_permission'),
                 Response::HTTP_FORBIDDEN,
                 $permissions
             );

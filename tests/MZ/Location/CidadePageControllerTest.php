@@ -24,68 +24,47 @@
  */
 namespace MZ\Location;
 
-use MZ\Location\EstadoTest;
+use MZ\System\Permissao;
+use MZ\Account\AuthenticationTest;
 
-class CidadeTest extends \MZ\Framework\TestCase
+class CidadePageControllerTest extends \MZ\Framework\TestCase
 {
-    /**
-     * Build a valid cidade
-     * @param string $nome Cidade nome
-     * @return Cidade
-     */
-    public static function build($nome = null)
-    {
-        $last = Cidade::find([], ['id' => -1]);
-        $id = $last->getID() + 1;
-        $estado = EstadoTest::create();
-        $cidade = new Cidade();
-        $cidade->setEstadoID($estado->getID());
-        $cidade->setNome($nome ?: "Cidade {$id}");
-        return $cidade;
-    }
-
-    /**
-     * Create a cidade on database
-     * @param string $nome Cidade nome
-     * @return Cidade
-     */
-    public static function create($nome = null)
-    {
-        $cidade = self::build($nome);
-        $cidade->insert();
-        return $cidade;
-    }
-
     public function testFind()
     {
-        $cidade = self::create();
-        $condition = ['nome' => $cidade->getNome()];
-        $found_cidade = Cidade::find($condition);
-        $this->assertEquals($cidade, $found_cidade);
-        list($found_cidade) = Cidade::findAll($condition, [], 1);
-        $this->assertEquals($cidade, $found_cidade);
-        $this->assertEquals(1, Cidade::count($condition));
+        $cidade = CidadeTest::create();
+        AuthenticationTest::authProvider([Permissao::NOME_SISTEMA, Permissao::NOME_CADASTROCIDADES]);
+        $result = $this->get('/gerenciar/cidade/', ['search' => $cidade->getNome()]);
+        $this->assertEquals(200, $result->getStatusCode());
     }
 
     public function testAdd()
     {
-        $cidade = self::build();
-        $cidade->insert();
+        $cidade = CidadeTest::build();
+        AuthenticationTest::authProvider([Permissao::NOME_SISTEMA, Permissao::NOME_CADASTROCIDADES]);
+        $result = $this->post('/gerenciar/cidade/cadastrar', $cidade->toArray(), true);
+        $this->assertEquals(302, $result->getStatusCode());
+        $cidade->load(['nome' => $cidade->getNome()]);
         $this->assertTrue($cidade->exists());
     }
 
     public function testUpdate()
     {
-        $cidade = self::create();
-        $cidade->update();
-        $this->assertTrue($cidade->exists());
+        $cidade = CidadeTest::create();
+        AuthenticationTest::authProvider([Permissao::NOME_SISTEMA, Permissao::NOME_CADASTROCIDADES]);
+        $id = $cidade->getID();
+        $result = $this->post('/gerenciar/cidade/editar?id=' . $id, $cidade->toArray(), true);
+        $cidade->loadByID();
+        $this->assertEquals(302, $result->getStatusCode());
     }
 
     public function testDelete()
     {
-        $cidade = self::create();
-        $cidade->delete();
+        $cidade = CidadeTest::create();
+        AuthenticationTest::authProvider([Permissao::NOME_SISTEMA, Permissao::NOME_CADASTROCIDADES]);
+        $id = $cidade->getID();
+        $result = $this->get('/gerenciar/cidade/excluir?id=' . $id);
         $cidade->loadByID();
+        $this->assertEquals(302, $result->getStatusCode());
         $this->assertFalse($cidade->exists());
     }
 }

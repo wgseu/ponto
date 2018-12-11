@@ -78,7 +78,8 @@ class CartaoApiController extends \MZ\Core\ApiController
         $this->needPermission([Permissao::NOME_CADASTROCARTOES]);
         $old_cartao = Cartao::findOrFail(['id' => $id]);
         $localized = $this->getRequest()->query->getBoolean('localized', false);
-        $cartao = new Cartao($this->getData());
+        $data = array_merge($old_cartao->toArray(), $this->getData());
+        $cartao = new Cartao($data);
         $cartao->filter($old_cartao, app()->auth->provider, $localized);
         $cartao->update();
         $old_cartao->clean($cartao);

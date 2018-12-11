@@ -73,7 +73,8 @@ class PropriedadeApiController extends \MZ\Core\ApiController
         $this->needPermission([Permissao::NOME_CADASTROPRODUTOS]);
         $old_propriedade = Propriedade::findOrFail(['id' => $id]);
         $localized = $this->getRequest()->query->getBoolean('localized', false);
-        $propriedade = new Propriedade($this->getData());
+        $data = array_merge($old_propriedade->toArray(), $this->getData());
+        $propriedade = new Propriedade($data);
         $propriedade->filter($old_propriedade, app()->auth->provider, $localized);
         $propriedade->update();
         $old_propriedade->clean($propriedade);

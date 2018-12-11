@@ -22,65 +22,63 @@
  *
  * @author Equipe GrandChef <desenvolvimento@mzsw.com.br>
  */
-$[table.if(package)]
-namespace $[Table.package];
-$[table.end]
+namespace MZ\Account;
 
 use MZ\System\Permissao;
 use MZ\Account\AuthenticationTest;
 
-class $[Table.norm]ApiControllerTest extends \MZ\Framework\TestCase
+class TelefoneApiControllerTest extends \MZ\Framework\TestCase
 {
     public function testFind()
     {
-        $$[table.unix] = $[Table.norm]Test::create();
-        AuthenticationTest::authProvider([Permissao::NOME_SISTEMA, Permissao::NOME_$[TABLE.style]]);
+        $telefone = TelefoneTest::create();
+        AuthenticationTest::authProvider([Permissao::NOME_SISTEMA, Permissao::NOME_CADASTROCLIENTES]);
         $expected = [
             'status' => 'ok',
             'items' => [
-                $$[table.unix]->publish(app()->auth->provider),
+                $telefone->publish(app()->auth->provider),
             ],
         ];
-        $result = $this->get('/api/$[table.unix.plural]', ['search' => $$[table.unix]->get$[Descriptor.norm]()]);
+        $result = $this->get('/api/telefones', ['search' => $telefone->getNumero()]);
         $this->assertEquals($expected, \array_intersect_key($result, $expected));
     }
 
     public function testAdd()
     {
-        $$[table.unix] = $[Table.norm]Test::build();
-        AuthenticationTest::authProvider([Permissao::NOME_SISTEMA, Permissao::NOME_$[TABLE.style]]);
+        $telefone = TelefoneTest::build();
+        AuthenticationTest::authProvider([Permissao::NOME_SISTEMA, Permissao::NOME_CADASTROCLIENTES]);
         $expected = [
             'status' => 'ok',
-            'item' => $$[table.unix]->publish(app()->auth->provider),
+            'item' => $telefone->publish(app()->auth->provider),
         ];
-        $result = $this->post('/api/$[table.unix.plural]', $$[table.unix]->toArray());
+        $result = $this->post('/api/telefones', $telefone->toArray());
         $expected['item']['id'] = $result['item']['id'] ?? null;
         $this->assertEquals($expected, \array_intersect_key($result, $expected));
     }
 
     public function testUpdate()
     {
-        $$[table.unix] = $[Table.norm]Test::create();
-        AuthenticationTest::authProvider([Permissao::NOME_SISTEMA, Permissao::NOME_$[TABLE.style]]);
-        $id = $$[table.unix]->get$[Primary.norm]();
-        $result = $this->patch('/api/$[table.unix.plural]/' . $id, $$[table.unix]->toArray());
-        $$[table.unix]->loadBy$[Primary.norm]();
+        $telefone = TelefoneTest::create();
+        AuthenticationTest::authProvider([Permissao::NOME_SISTEMA, Permissao::NOME_CADASTROCLIENTES]);
+        $id = $telefone->getID();
+        $result = $this->patch('/api/telefones/' . $id, $telefone->toArray());
+        $telefone->loadByID();
         $expected = [
             'status' => 'ok',
-            'item' => $$[table.unix]->publish(app()->auth->provider),
+            'item' => $telefone->publish(app()->auth->provider),
         ];
         $this->assertEquals($expected, \array_intersect_key($result, $expected));
     }
 
     public function testDelete()
     {
-        $$[table.unix] = $[Table.norm]Test::create();
-        AuthenticationTest::authProvider([Permissao::NOME_SISTEMA, Permissao::NOME_$[TABLE.style]]);
-        $id = $$[table.unix]->get$[Primary.norm]();
-        $result = $this->delete('/api/$[table.unix.plural]/' . $id);
-        $$[table.unix]->loadBy$[Primary.norm]();
+        $telefone = TelefoneTest::create();
+        AuthenticationTest::authProvider([Permissao::NOME_SISTEMA, Permissao::NOME_CADASTROCLIENTES]);
+        $id = $telefone->getID();
+        $result = $this->delete('/api/telefones/' . $id);
+        $telefone->loadByID();
         $expected = [ 'status' => 'ok', ];
         $this->assertEquals($expected, \array_intersect_key($result, $expected));
-        $this->assertFalse($$[table.unix]->exists());
+        $this->assertFalse($telefone->exists());
     }
 }

@@ -22,82 +22,82 @@
  *
  * @author Equipe GrandChef <desenvolvimento@mzsw.com.br>
  */
-namespace MZ\Product;
+namespace MZ\Location;
 
 use MZ\System\Permissao;
 use MZ\Util\Filter;
 
 /**
- * Allow application to serve system resources
+ * Registro de viagem de uma entrega ou compra de insumos
  */
-class ServicoApiController extends \MZ\Core\ApiController
+class ViagemApiController extends \MZ\Core\ApiController
 {
     /**
-     * Find all Serviços
-     * @Get("/api/servicos", name="api_servico_find")
+     * Find all Viagens
+     * @Get("/api/viagens", name="api_viagem_find")
      */
     public function find()
     {
-        $this->needPermission([Permissao::NOME_CADASTROSERVICOS]);
+        $this->needPermission([Permissao::NOME_PAGAMENTO]);
         $limit = max(1, min(100, $this->getRequest()->query->getInt('limit', 10)));
         $page = max(1, $this->getRequest()->query->getInt('page', 1));
         $condition = Filter::query($this->getRequest()->query->all());
         $order = $this->getRequest()->query->get('order', '');
-        $count = Servico::count($condition);
+        $count = Viagem::count($condition);
         $pager = new \Pager($count, $limit, $page);
-        $servicos = Servico::findAll($condition, $order, $limit, $pager->offset);
+        $viagens = Viagem::findAll($condition, $order, $limit, $pager->offset);
         $itens = [];
-        foreach ($servicos as $servico) {
-            $itens[] = $servico->publish(app()->auth->provider);
+        foreach ($viagens as $viagem) {
+            $itens[] = $viagem->publish(app()->auth->provider);
         }
         return $this->getResponse()->success(['items' => $itens, 'pages' => $pager->pageCount]);
     }
 
     /**
-     * Create a new Serviço
-     * @Post("/api/servicos", name="api_servico_add")
+     * Create a new Viagem
+     * @Post("/api/viagens", name="api_viagem_add")
      */
     public function add()
     {
-        $this->needPermission([Permissao::NOME_CADASTROSERVICOS]);
+        $this->needPermission([Permissao::NOME_PAGAMENTO]);
         $localized = $this->getRequest()->query->getBoolean('localized', false);
-        $servico = new Servico($this->getData());
-        $servico->filter(new Servico(), app()->auth->provider, $localized);
-        $servico->insert();
-        return $this->getResponse()->success(['item' => $servico->publish(app()->auth->provider)]);
+        $viagem = new Viagem($this->getData());
+        $viagem->filter(new Viagem(), app()->auth->provider, $localized);
+        $viagem->insert();
+        return $this->getResponse()->success(['item' => $viagem->publish(app()->auth->provider)]);
     }
 
     /**
-     * Modify parts of an existing Serviço
-     * @Patch("/api/servicos/{id}", name="api_servico_update", params={ "id": "\d+" })
-     * 
-     * @param int $id Serviço id
+     * Modify parts of an existing Viagem
+     * @Patch("/api/viagens/{id}", name="api_viagem_update", params={ "id": "\d+" })
+     *
+     * @param int $id Viagem id
      */
     public function modify($id)
     {
-        $this->needPermission([Permissao::NOME_CADASTROSERVICOS]);
-        $old_servico = Servico::findOrFail(['id' => $id]);
+        $this->needPermission([Permissao::NOME_PAGAMENTO]);
+        $old_viagem = Viagem::findOrFail(['id' => $id]);
         $localized = $this->getRequest()->query->getBoolean('localized', false);
-        $data = array_merge($old_servico->toArray(), $this->getData());
-        $servico = new Servico($data);
-        $servico->filter($old_servico, app()->auth->provider, $localized);
-        $servico->update();
-        $old_servico->clean($servico);
-        return $this->getResponse()->success(['item' => $servico->publish(app()->auth->provider)]);
+        $data = $this->getData($old_viagem->toArray());
+        $viagem = new Viagem($data);
+        $viagem->filter($old_viagem, app()->auth->provider, $localized);
+        $viagem->update();
+        $old_viagem->clean($viagem);
+        return $this->getResponse()->success(['item' => $viagem->publish(app()->auth->provider)]);
     }
 
     /**
-     * Delete existing Serviço
-     * @Delete("/api/servicos/{id}", name="api_servico_delete", params={ "id": "\d+" })
-     * 
-     * @param int $id Serviço id to delete
+     * Delete existing Viagem
+     * @Delete("/api/viagens/{id}", name="api_viagem_delete", params={ "id": "\d+" })
+     *
+     * @param int $id Viagem id to delete
      */
     public function delete($id)
     {
-        $this->needPermission([Permissao::NOME_CADASTROSERVICOS]);
-        $servico = Servico::findOrFail(['id' => $id]);
-        $servico->delete();
-        $servico->clean(new Servico());
+        $this->needPermission([Permissao::NOME_PAGAMENTO]);
+        $viagem = Viagem::findOrFail(['id' => $id]);
+        $viagem->delete();
+        $viagem->clean(new Viagem());
         return $this->getResponse()->success([]);
     }
 }

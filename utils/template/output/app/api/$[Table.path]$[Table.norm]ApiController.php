@@ -88,7 +88,7 @@ class $[Table.norm]ApiController extends \MZ\Core\ApiController
         $this->needPermission([Permissao::NOME_$[TABLE.style]]);
         $old_$[table.unix] = $[Table.norm]::findOrFail(['$[primary]' => $id]);
         $localized = $this->getRequest()->query->getBoolean('localized', false);
-        $data = array_merge($old_$[table.unix]->toArray(), $this->getData());
+        $data = $this->getData($old_$[table.unix]->toArray());
         $$[table.unix] = new $[Table.norm]($data);
         $$[table.unix]->filter($old_$[table.unix], app()->auth->provider, $localized);
         $$[table.unix]->update();

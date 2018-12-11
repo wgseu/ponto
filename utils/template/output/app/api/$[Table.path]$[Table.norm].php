@@ -136,7 +136,9 @@ $[field.end]
 $[field.end]
 
     /**
-     * Set $[Field.norm] value to new on param
+$[field.each(comment)]
+     * $[Field.comment]
+$[field.end]
 $[field.if(array)]
      * @param integer $number number to set $[field.name]
 $[field.end]

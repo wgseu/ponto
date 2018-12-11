@@ -22,82 +22,82 @@
  *
  * @author Equipe GrandChef <desenvolvimento@mzsw.com.br>
  */
-namespace MZ\Product;
+namespace MZ\Location;
 
 use MZ\System\Permissao;
 use MZ\Util\Filter;
 
 /**
- * Allow application to serve system resources
+ * Endereços de ruas e avenidas com informação de CEP
  */
-class ServicoApiController extends \MZ\Core\ApiController
+class EnderecoApiController extends \MZ\Core\ApiController
 {
     /**
-     * Find all Serviços
-     * @Get("/api/servicos", name="api_servico_find")
+     * Find all Endereços
+     * @Get("/api/enderecos", name="api_endereco_find")
      */
     public function find()
     {
-        $this->needPermission([Permissao::NOME_CADASTROSERVICOS]);
+        $this->needPermission([Permissao::NOME_CADASTROBAIRROS]);
         $limit = max(1, min(100, $this->getRequest()->query->getInt('limit', 10)));
         $page = max(1, $this->getRequest()->query->getInt('page', 1));
         $condition = Filter::query($this->getRequest()->query->all());
         $order = $this->getRequest()->query->get('order', '');
-        $count = Servico::count($condition);
+        $count = Endereco::count($condition);
         $pager = new \Pager($count, $limit, $page);
-        $servicos = Servico::findAll($condition, $order, $limit, $pager->offset);
+        $enderecos = Endereco::findAll($condition, $order, $limit, $pager->offset);
         $itens = [];
-        foreach ($servicos as $servico) {
-            $itens[] = $servico->publish(app()->auth->provider);
+        foreach ($enderecos as $endereco) {
+            $itens[] = $endereco->publish(app()->auth->provider);
         }
         return $this->getResponse()->success(['items' => $itens, 'pages' => $pager->pageCount]);
     }
 
     /**
-     * Create a new Serviço
-     * @Post("/api/servicos", name="api_servico_add")
+     * Create a new Endereço
+     * @Post("/api/enderecos", name="api_endereco_add")
      */
     public function add()
     {
-        $this->needPermission([Permissao::NOME_CADASTROSERVICOS]);
+        $this->needPermission([Permissao::NOME_CADASTROBAIRROS]);
         $localized = $this->getRequest()->query->getBoolean('localized', false);
-        $servico = new Servico($this->getData());
-        $servico->filter(new Servico(), app()->auth->provider, $localized);
-        $servico->insert();
-        return $this->getResponse()->success(['item' => $servico->publish(app()->auth->provider)]);
+        $endereco = new Endereco($this->getData());
+        $endereco->filter(new Endereco(), app()->auth->provider, $localized);
+        $endereco->insert();
+        return $this->getResponse()->success(['item' => $endereco->publish(app()->auth->provider)]);
     }
 
     /**
-     * Modify parts of an existing Serviço
-     * @Patch("/api/servicos/{id}", name="api_servico_update", params={ "id": "\d+" })
-     * 
-     * @param int $id Serviço id
+     * Modify parts of an existing Endereço
+     * @Patch("/api/enderecos/{id}", name="api_endereco_update", params={ "id": "\d+" })
+     *
+     * @param int $id Endereço id
      */
     public function modify($id)
     {
-        $this->needPermission([Permissao::NOME_CADASTROSERVICOS]);
-        $old_servico = Servico::findOrFail(['id' => $id]);
+        $this->needPermission([Permissao::NOME_CADASTROBAIRROS]);
+        $old_endereco = Endereco::findOrFail(['id' => $id]);
         $localized = $this->getRequest()->query->getBoolean('localized', false);
-        $data = array_merge($old_servico->toArray(), $this->getData());
-        $servico = new Servico($data);
-        $servico->filter($old_servico, app()->auth->provider, $localized);
-        $servico->update();
-        $old_servico->clean($servico);
-        return $this->getResponse()->success(['item' => $servico->publish(app()->auth->provider)]);
+        $data = $this->getData($old_endereco->toArray());
+        $endereco = new Endereco($data);
+        $endereco->filter($old_endereco, app()->auth->provider, $localized);
+        $endereco->update();
+        $old_endereco->clean($endereco);
+        return $this->getResponse()->success(['item' => $endereco->publish(app()->auth->provider)]);
     }
 
     /**
-     * Delete existing Serviço
-     * @Delete("/api/servicos/{id}", name="api_servico_delete", params={ "id": "\d+" })
-     * 
-     * @param int $id Serviço id to delete
+     * Delete existing Endereço
+     * @Delete("/api/enderecos/{id}", name="api_endereco_delete", params={ "id": "\d+" })
+     *
+     * @param int $id Endereço id to delete
      */
     public function delete($id)
     {
-        $this->needPermission([Permissao::NOME_CADASTROSERVICOS]);
-        $servico = Servico::findOrFail(['id' => $id]);
-        $servico->delete();
-        $servico->clean(new Servico());
+        $this->needPermission([Permissao::NOME_CADASTROBAIRROS]);
+        $endereco = Endereco::findOrFail(['id' => $id]);
+        $endereco->delete();
+        $endereco->clean(new Endereco());
         return $this->getResponse()->success([]);
     }
 }

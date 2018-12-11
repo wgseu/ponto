@@ -109,11 +109,12 @@ abstract class Controller
 
     /**
      * Get current request array
+     * @param array $defaults default values
      * @return array request data
      */
-    public function getData()
+    public function getData($defaults = [])
     {
-        return $this->getRequest()->request->all();
+        return array_merge($defaults, $this->getRequest()->request->all());
     }
 
     /**

@@ -22,82 +22,82 @@
  *
  * @author Equipe GrandChef <desenvolvimento@mzsw.com.br>
  */
-namespace MZ\Product;
+namespace MZ\Company;
 
 use MZ\System\Permissao;
 use MZ\Util\Filter;
 
 /**
- * Allow application to serve system resources
+ * Informa o horário de funcionamento do estabelecimento
  */
-class ServicoApiController extends \MZ\Core\ApiController
+class HorarioApiController extends \MZ\Core\ApiController
 {
     /**
-     * Find all Serviços
-     * @Get("/api/servicos", name="api_servico_find")
+     * Find all Horários
+     * @Get("/api/horarios", name="api_horario_find")
      */
     public function find()
     {
-        $this->needPermission([Permissao::NOME_CADASTROSERVICOS]);
+        $this->needPermission([Permissao::NOME_ALTERARHORARIO]);
         $limit = max(1, min(100, $this->getRequest()->query->getInt('limit', 10)));
         $page = max(1, $this->getRequest()->query->getInt('page', 1));
         $condition = Filter::query($this->getRequest()->query->all());
         $order = $this->getRequest()->query->get('order', '');
-        $count = Servico::count($condition);
+        $count = Horario::count($condition);
         $pager = new \Pager($count, $limit, $page);
-        $servicos = Servico::findAll($condition, $order, $limit, $pager->offset);
+        $horarios = Horario::findAll($condition, $order, $limit, $pager->offset);
         $itens = [];
-        foreach ($servicos as $servico) {
-            $itens[] = $servico->publish(app()->auth->provider);
+        foreach ($horarios as $horario) {
+            $itens[] = $horario->publish(app()->auth->provider);
         }
         return $this->getResponse()->success(['items' => $itens, 'pages' => $pager->pageCount]);
     }
 
     /**
-     * Create a new Serviço
-     * @Post("/api/servicos", name="api_servico_add")
+     * Create a new Horário
+     * @Post("/api/horarios", name="api_horario_add")
      */
     public function add()
     {
-        $this->needPermission([Permissao::NOME_CADASTROSERVICOS]);
+        $this->needPermission([Permissao::NOME_ALTERARHORARIO]);
         $localized = $this->getRequest()->query->getBoolean('localized', false);
-        $servico = new Servico($this->getData());
-        $servico->filter(new Servico(), app()->auth->provider, $localized);
-        $servico->insert();
-        return $this->getResponse()->success(['item' => $servico->publish(app()->auth->provider)]);
+        $horario = new Horario($this->getData());
+        $horario->filter(new Horario(), app()->auth->provider, $localized);
+        $horario->insert();
+        return $this->getResponse()->success(['item' => $horario->publish(app()->auth->provider)]);
     }
 
     /**
-     * Modify parts of an existing Serviço
-     * @Patch("/api/servicos/{id}", name="api_servico_update", params={ "id": "\d+" })
-     * 
-     * @param int $id Serviço id
+     * Modify parts of an existing Horário
+     * @Patch("/api/horarios/{id}", name="api_horario_update", params={ "id": "\d+" })
+     *
+     * @param int $id Horário id
      */
     public function modify($id)
     {
-        $this->needPermission([Permissao::NOME_CADASTROSERVICOS]);
-        $old_servico = Servico::findOrFail(['id' => $id]);
+        $this->needPermission([Permissao::NOME_ALTERARHORARIO]);
+        $old_horario = Horario::findOrFail(['id' => $id]);
         $localized = $this->getRequest()->query->getBoolean('localized', false);
-        $data = array_merge($old_servico->toArray(), $this->getData());
-        $servico = new Servico($data);
-        $servico->filter($old_servico, app()->auth->provider, $localized);
-        $servico->update();
-        $old_servico->clean($servico);
-        return $this->getResponse()->success(['item' => $servico->publish(app()->auth->provider)]);
+        $data = $this->getData($old_horario->toArray());
+        $horario = new Horario($data);
+        $horario->filter($old_horario, app()->auth->provider, $localized);
+        $horario->update();
+        $old_horario->clean($horario);
+        return $this->getResponse()->success(['item' => $horario->publish(app()->auth->provider)]);
     }
 
     /**
-     * Delete existing Serviço
-     * @Delete("/api/servicos/{id}", name="api_servico_delete", params={ "id": "\d+" })
-     * 
-     * @param int $id Serviço id to delete
+     * Delete existing Horário
+     * @Delete("/api/horarios/{id}", name="api_horario_delete", params={ "id": "\d+" })
+     *
+     * @param int $id Horário id to delete
      */
     public function delete($id)
     {
-        $this->needPermission([Permissao::NOME_CADASTROSERVICOS]);
-        $servico = Servico::findOrFail(['id' => $id]);
-        $servico->delete();
-        $servico->clean(new Servico());
+        $this->needPermission([Permissao::NOME_ALTERARHORARIO]);
+        $horario = Horario::findOrFail(['id' => $id]);
+        $horario->delete();
+        $horario->clean(new Horario());
         return $this->getResponse()->success([]);
     }
 }

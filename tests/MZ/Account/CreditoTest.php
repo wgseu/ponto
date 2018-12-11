@@ -24,20 +24,69 @@
  */
 namespace MZ\Account;
 
+use MZ\Account\ClienteTest;
+
 class CreditoTest extends \MZ\Framework\TestCase
 {
-    public function testPublish()
+    /**
+     * Build a valid crédito
+     * @param string $detalhes Crédito detalhes
+     * @return Credito
+     */
+    public static function build($detalhes = null)
     {
+        $last = Credito::find([], ['id' => -1]);
+        $id = $last->getID() + 1;
+        $cliente = ClienteTest::create();
         $credito = new Credito();
-        $values = $credito->publish(app()->auth->provider);
-        $allowed = [
-            'id',
-            'clienteid',
-            'valor',
-            'detalhes',
-            'cancelado',
-            'datacadastro',
-        ];
-        $this->assertEquals($allowed, array_keys($values));
+        $credito->setClienteID($cliente->getID());
+        $credito->setValor(12.3);
+        $credito->setDetalhes($detalhes ?: "Crédito {$id}");
+        return $credito;
+    }
+
+    /**
+     * Create a crédito on database
+     * @param string $detalhes Crédito detalhes
+     * @return Credito
+     */
+    public static function create($detalhes = null)
+    {
+        $credito = self::build($detalhes);
+        $credito->insert();
+        return $credito;
+    }
+
+    public function testFind()
+    {
+        $credito = self::create();
+        $condition = ['detalhes' => $credito->getDetalhes()];
+        $found_credito = Credito::find($condition);
+        $this->assertEquals($credito, $found_credito);
+        list($found_credito) = Credito::findAll($condition, [], 1);
+        $this->assertEquals($credito, $found_credito);
+        $this->assertEquals(1, Credito::count($condition));
+    }
+
+    public function testAdd()
+    {
+        $credito = self::build();
+        $credito->insert();
+        $this->assertTrue($credito->exists());
+    }
+
+    public function testUpdate()
+    {
+        $credito = self::create();
+        $credito->update();
+        $this->assertTrue($credito->exists());
+    }
+
+    public function testDelete()
+    {
+        $credito = self::create();
+        $credito->delete();
+        $credito->loadByID();
+        $this->assertFalse($credito->exists());
     }
 }

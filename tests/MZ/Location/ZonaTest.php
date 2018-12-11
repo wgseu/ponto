@@ -24,69 +24,70 @@
  */
 namespace MZ\Location;
 
-use MZ\Location\PaisTest;
+use MZ\Location\BairroTest;
 
-class EstadoTest extends \MZ\Framework\TestCase
+class ZonaTest extends \MZ\Framework\TestCase
 {
     /**
-     * Build a valid estado
-     * @param string $nome Estado nome
-     * @return Estado
+     * Build a valid zona
+     * @param string $nome Zona nome
+     * @return Zona
      */
     public static function build($nome = null)
     {
-        $last = Estado::find([], ['id' => -1]);
+        $last = Zona::find([], ['id' => -1]);
         $id = $last->getID() + 1;
-        $pais = PaisTest::create();
-        $estado = new Estado();
-        $estado->setPaisID($pais->getID());
-        $estado->setNome($nome ?: "Estado {$id}");
-        $estado->setUF("S{$id}");
-        return $estado;
+        $bairro = BairroTest::create();
+        $zona = new Zona();
+        $zona->setBairroID($bairro->getID());
+        $zona->setNome('Nome da zona');
+        $zona->setAdicionalEntrega(12.3);
+        $zona->setDisponivel('Y');
+        return $zona;
     }
 
     /**
-     * Create a estado on database
-     * @param string $nome Estado nome
-     * @return Estado
+     * Create a zona on database
+     * @param string $nome Zona nome
+     * @return Zona
      */
     public static function create($nome = null)
     {
-        $estado = self::build($nome);
-        $estado->insert();
-        return $estado;
+        $zona = self::build($nome);
+        $zona->insert();
+        return $zona;
     }
 
     public function testFind()
     {
-        $estado = self::create();
-        $condition = ['nome' => $estado->getNome()];
-        $found_estado = Estado::find($condition);
-        $this->assertEquals($estado, $found_estado);
-        list($found_estado) = Estado::findAll($condition, [], 1);
-        $this->assertEquals($estado, $found_estado);
-        $this->assertEquals(1, Estado::count($condition));
+        $zona = self::create();
+        $condition = ['nome' => $zona->getNome()];
+        $found_zona = Zona::find($condition);
+        $this->assertEquals($zona, $found_zona);
+        list($found_zona) = Zona::findAll($condition, [], 1);
+        $this->assertEquals($zona, $found_zona);
+        $this->assertEquals(1, Zona::count($condition));
     }
 
     public function testAdd()
     {
-        $estado = self::build();
-        $estado->insert();
-        $this->assertTrue($estado->exists());
+        $zona = self::build();
+        $zona->insert();
+        $this->assertTrue($zona->exists());
     }
 
     public function testUpdate()
     {
-        $estado = self::create();
-        $estado->update();
-        $this->assertTrue($estado->exists());
+        $zona = self::create();
+        $zona->update();
+        $this->assertTrue($zona->exists());
     }
 
     public function testDelete()
     {
-        $estado = self::create();
-        $estado->delete();
-        $estado->loadByID();
-        $this->assertFalse($estado->exists());
+        $zona = self::create();
+        $zona->delete();
+        $zona->loadByID();
+        $this->assertFalse($zona->exists());
     }
 }

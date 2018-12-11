@@ -110,7 +110,7 @@ class Horario extends SyncModel
     }
 
     /**
-     * Set ID value to new on param
+     * Identificador do horário
      * @param int $id Set id for Horário
      * @return self Self instance
      */
@@ -132,7 +132,9 @@ class Horario extends SyncModel
     }
 
     /**
-     * Set Modo value to new on param
+     * Modo de trabalho disponível nesse horário, Funcionamento: horário em que
+     * o estabelecimento estará aberto, Operação: quando aceitar novos pedidos
+     * locais, Entrega: quando aceita ainda pedidos para entrega
      * @param string $modo Set modo for Horário
      * @return self Self instance
      */
@@ -153,7 +155,8 @@ class Horario extends SyncModel
     }
 
     /**
-     * Set FuncaoID value to new on param
+     * Permite informar o horário de acesso ao sistema para realizar essa
+     * função
      * @param int $funcao_id Set função for Horário
      * @return self Self instance
      */
@@ -173,7 +176,7 @@ class Horario extends SyncModel
     }
 
     /**
-     * Set PrestadorID value to new on param
+     * Permite informar o horário de prestação de serviço para esse prestador
      * @param int $prestador_id Set prestador for Horário
      * @return self Self instance
      */
@@ -193,7 +196,7 @@ class Horario extends SyncModel
     }
 
     /**
-     * Set IntegracaoID value to new on param
+     * Permite informar o horário de atendimento para cada integração
      * @param int $integracao_id Set integração for Horário
      * @return self Self instance
      */
@@ -214,7 +217,8 @@ class Horario extends SyncModel
     }
 
     /**
-     * Set Inicio value to new on param
+     * Início do horário de funcionamento em minutos contando a partir de
+     * domingo até sábado
      * @param int $inicio Set início for Horário
      * @return self Self instance
      */
@@ -235,7 +239,8 @@ class Horario extends SyncModel
     }
 
     /**
-     * Set Fim value to new on param
+     * Horário final de funcionamento do estabelecimento contando em minutos a
+     * partir de domingo
      * @param int $fim Set fim for Horário
      * @return self Self instance
      */
@@ -256,7 +261,8 @@ class Horario extends SyncModel
     }
 
     /**
-     * Set Mensagem value to new on param
+     * Mensagem que será mostrada quando o estabelecimento estiver fechado por
+     * algum motivo
      * @param string $mensagem Set mensagem for Horário
      * @return self Self instance
      */
@@ -289,7 +295,9 @@ class Horario extends SyncModel
     }
 
     /**
-     * Set Fechado value to new on param
+     * Informa se o estabelecimento estará fechado nesse horário programado, o
+     * início e fim será tempo no formato unix, quando verdadeiro tem
+     * prioridade sobre todos os horários
      * @param string $fechado Set fechado for Horário
      * @return self Self instance
      */
@@ -401,6 +409,7 @@ class Horario extends SyncModel
     public function filter($original, $updater, $localized = false)
     {
         $this->setID($original->getID());
+        $this->setModo(Filter::string($this->getModo()));
         $this->setFuncaoID(Filter::number($this->getFuncaoID()));
         $this->setPrestadorID(Filter::number($this->getPrestadorID()));
         $this->setIntegracaoID(Filter::number($this->getIntegracaoID()));
@@ -484,7 +493,7 @@ class Horario extends SyncModel
     /**
      * Gets textual and translated Modo for Horario
      * @param int $index choose option from index
-     * @return string[]|string A associative key -> translated representative text or text for index
+     * @return string[] A associative key -> translated representative text or text for index
      */
     public static function getModoOptions($index = null)
     {

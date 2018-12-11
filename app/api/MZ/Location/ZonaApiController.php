@@ -22,82 +22,82 @@
  *
  * @author Equipe GrandChef <desenvolvimento@mzsw.com.br>
  */
-namespace MZ\Product;
+namespace MZ\Location;
 
 use MZ\System\Permissao;
 use MZ\Util\Filter;
 
 /**
- * Allow application to serve system resources
+ * Zonas de um bairro
  */
-class ServicoApiController extends \MZ\Core\ApiController
+class ZonaApiController extends \MZ\Core\ApiController
 {
     /**
-     * Find all Serviços
-     * @Get("/api/servicos", name="api_servico_find")
+     * Find all Zonas
+     * @Get("/api/zonas", name="api_zona_find")
      */
     public function find()
     {
-        $this->needPermission([Permissao::NOME_CADASTROSERVICOS]);
+        $this->needPermission([Permissao::NOME_CADASTROBAIRROS]);
         $limit = max(1, min(100, $this->getRequest()->query->getInt('limit', 10)));
         $page = max(1, $this->getRequest()->query->getInt('page', 1));
         $condition = Filter::query($this->getRequest()->query->all());
         $order = $this->getRequest()->query->get('order', '');
-        $count = Servico::count($condition);
+        $count = Zona::count($condition);
         $pager = new \Pager($count, $limit, $page);
-        $servicos = Servico::findAll($condition, $order, $limit, $pager->offset);
+        $zonas = Zona::findAll($condition, $order, $limit, $pager->offset);
         $itens = [];
-        foreach ($servicos as $servico) {
-            $itens[] = $servico->publish(app()->auth->provider);
+        foreach ($zonas as $zona) {
+            $itens[] = $zona->publish(app()->auth->provider);
         }
         return $this->getResponse()->success(['items' => $itens, 'pages' => $pager->pageCount]);
     }
 
     /**
-     * Create a new Serviço
-     * @Post("/api/servicos", name="api_servico_add")
+     * Create a new Zona
+     * @Post("/api/zonas", name="api_zona_add")
      */
     public function add()
     {
-        $this->needPermission([Permissao::NOME_CADASTROSERVICOS]);
+        $this->needPermission([Permissao::NOME_CADASTROBAIRROS]);
         $localized = $this->getRequest()->query->getBoolean('localized', false);
-        $servico = new Servico($this->getData());
-        $servico->filter(new Servico(), app()->auth->provider, $localized);
-        $servico->insert();
-        return $this->getResponse()->success(['item' => $servico->publish(app()->auth->provider)]);
+        $zona = new Zona($this->getData());
+        $zona->filter(new Zona(), app()->auth->provider, $localized);
+        $zona->insert();
+        return $this->getResponse()->success(['item' => $zona->publish(app()->auth->provider)]);
     }
 
     /**
-     * Modify parts of an existing Serviço
-     * @Patch("/api/servicos/{id}", name="api_servico_update", params={ "id": "\d+" })
-     * 
-     * @param int $id Serviço id
+     * Modify parts of an existing Zona
+     * @Patch("/api/zonas/{id}", name="api_zona_update", params={ "id": "\d+" })
+     *
+     * @param int $id Zona id
      */
     public function modify($id)
     {
-        $this->needPermission([Permissao::NOME_CADASTROSERVICOS]);
-        $old_servico = Servico::findOrFail(['id' => $id]);
+        $this->needPermission([Permissao::NOME_CADASTROBAIRROS]);
+        $old_zona = Zona::findOrFail(['id' => $id]);
         $localized = $this->getRequest()->query->getBoolean('localized', false);
-        $data = array_merge($old_servico->toArray(), $this->getData());
-        $servico = new Servico($data);
-        $servico->filter($old_servico, app()->auth->provider, $localized);
-        $servico->update();
-        $old_servico->clean($servico);
-        return $this->getResponse()->success(['item' => $servico->publish(app()->auth->provider)]);
+        $data = $this->getData($old_zona->toArray());
+        $zona = new Zona($data);
+        $zona->filter($old_zona, app()->auth->provider, $localized);
+        $zona->update();
+        $old_zona->clean($zona);
+        return $this->getResponse()->success(['item' => $zona->publish(app()->auth->provider)]);
     }
 
     /**
-     * Delete existing Serviço
-     * @Delete("/api/servicos/{id}", name="api_servico_delete", params={ "id": "\d+" })
-     * 
-     * @param int $id Serviço id to delete
+     * Delete existing Zona
+     * @Delete("/api/zonas/{id}", name="api_zona_delete", params={ "id": "\d+" })
+     *
+     * @param int $id Zona id to delete
      */
     public function delete($id)
     {
-        $this->needPermission([Permissao::NOME_CADASTROSERVICOS]);
-        $servico = Servico::findOrFail(['id' => $id]);
-        $servico->delete();
-        $servico->clean(new Servico());
+        $this->needPermission([Permissao::NOME_CADASTROBAIRROS]);
+        $zona = Zona::findOrFail(['id' => $id]);
+        $zona->delete();
+        $zona->clean(new Zona());
         return $this->getResponse()->success([]);
     }
 }

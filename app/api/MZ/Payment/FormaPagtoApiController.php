@@ -78,7 +78,8 @@ class FormaPagtoApiController extends \MZ\Core\ApiController
         $this->needPermission([Permissao::NOME_CADASTROFORMASPAGTO]);
         $old_forma_pagto = FormaPagto::findOrFail(['id' => $id]);
         $localized = $this->getRequest()->query->getBoolean('localized', false);
-        $forma_pagto = new FormaPagto($this->getData());
+        $data = array_merge($old_forma_pagto->toArray(), $this->getData());
+        $forma_pagto = new FormaPagto($data);
         $forma_pagto->filter($old_forma_pagto, app()->auth->provider, $localized);
         $forma_pagto->update();
         $old_forma_pagto->clean($forma_pagto);

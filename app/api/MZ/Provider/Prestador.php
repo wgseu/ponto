@@ -594,7 +594,11 @@ class Prestador extends SyncModel
         if (!empty($errors)) {
             throw new ValidationException($errors);
         }
-        return $this->toArray();
+        $values = $this->toArray();
+        if ($this->exists()) {
+            unset($values['datacadastro']);
+        }
+        return $values;
     }
 
     /**
@@ -629,34 +633,6 @@ class Prestador extends SyncModel
             ]);
         }
         return parent::translate($e);
-    }
-
-    /**
-     * Update Prestador with instance values into database for ID
-     * @param array $only Save these fields only, when empty save all fields except id
-     * @return int rows affected
-     * @throws \MZ\Exception\ValidationException for invalid input data
-     */
-    public function update($only = [])
-    {
-        $values = $this->validate();
-        if (!$this->exists()) {
-            throw new ValidationException(
-                ['id' => _t('prestador.id_cannot_empty')]
-            );
-        }
-        $values = DB::filterValues($values, $only, false);
-        unset($values['datacadastro']);
-        try {
-            $affected = DB::update('Prestadores')
-                ->set($values)
-                ->where(['id' => $this->getID()])
-                ->execute();
-            $this->loadByID();
-        } catch (\Exception $e) {
-            throw $this->translate($e);
-        }
-        return $affected;
     }
 
     /**
@@ -698,6 +674,9 @@ class Prestador extends SyncModel
     {
         if (!$this->exists()) {
             return false;
+        }
+        if ($this->isOwner()) {
+            return true;
         }
         $permissoes = $permissoes ?: Acesso::getPermissoes($this->getFuncaoID());
         $allow = true;

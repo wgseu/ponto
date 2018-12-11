@@ -24,90 +24,36 @@
  */
 namespace MZ\System;
 
-use MZ\System\Servidor;
-use MZ\Database\DB;
-
 class SistemaTest extends \MZ\Framework\TestCase
 {
-    public function testFromArray()
+    public function testFind()
     {
-        $old_sistema = new Sistema([
-            'id' => 'Sistema',
-            'servidorid' => 123,
-            'licenca' => 'Sistema',
-            'dispositivos' => 123,
-            'guid' => 'Sistema',
-            'ultimobackup' => '2016-12-25 12:15:00',
-            'fusohorario' => 'Sistema',
-            'versaodb' => 'Sistema',
-        ]);
-        $sistema = new Sistema();
-        $sistema->fromArray($old_sistema);
-        $this->assertEquals($sistema, $old_sistema);
-        $sistema->fromArray(null);
-        $this->assertEquals($sistema, new Sistema());
+        $condition = ['id' => '1'];
+        $sistema = Sistema::find($condition);
+        $this->assertTrue($sistema->exists());
+        list($found_sistema) = Sistema::findAll($condition, [], 1);
+        $this->assertEquals($sistema, $found_sistema);
+        $this->assertEquals(1, Sistema::count($condition));
     }
 
-    public function testFilter()
+    public function testAdd()
     {
-        $old_sistema = new Sistema([
-            'id' => 'Sistema filter',
-            'servidorid' => 1234,
-            'licenca' => ' Sistema <script>filter</script> ',
-            'dispositivos' => 1234,
-            'guid' => 'Sistema filter',
-            'ultimobackup' => '2016-12-23 12:15:00',
-            'fusohorario' => 'Sistema filter',
-            'versaodb' => 'Sistema filter',
-        ]);
-        $sistema = new Sistema([
-            'id' => 321,
-            'servidorid' => '1.234',
-            'licenca' => ' Sistema <script>filter</script> ',
-            'dispositivos' => '1.234',
-            'guid' => ' Sistema <script>filter</script> ',
-            'ultimobackup' => '23/12/2016 12:15',
-            'fusohorario' => ' Sistema <script>filter</script> ',
-            'versaodb' => ' Sistema <script>filter</script> ',
-        ]);
-        $sistema->filter($old_sistema, app()->auth->provider, true);
-        $this->assertEquals($old_sistema, $sistema);
-    }
-
-    public function testPublish()
-    {
-        $sistema = new Sistema();
-        $values = $sistema->publish(app()->auth->provider);
-        $allowed = [
-            'id',
-            'servidorid',
-            'dispositivos',
-            'ultimobackup',
-            'fusohorario',
-            'versaodb',
-        ];
-        $this->assertEquals($allowed, array_keys($values));
+        $sistema = Sistema::find(['id' => '1']);
+        $this->expectException('\Exception');
+        $sistema->insert();
     }
 
     public function testUpdate()
     {
-        $servidor = Servidor::find([]);
-        $sistema = Sistema::findByID('1');
-        $sistema->setServidorID($servidor->getID());
+        $sistema = Sistema::find(['id' => '1']);
         $sistema->update();
-        $found_sistema = Sistema::findByID($sistema->getID());
-        $this->assertEquals($sistema, $found_sistema);
-        $sistema->setID('');
-        $this->expectException('\Exception');
-        $sistema->update();
+        $this->assertTrue($sistema->exists());
     }
 
-    public function testFind()
+    public function testDelete()
     {
-        $sistema = Sistema::findByID('1');
-        $found_sistema = Sistema::find(['id' => $sistema->getID()]);
-        $this->assertEquals($sistema, $found_sistema);
-        $count = Sistema::count();
-        $this->assertEquals(1, $count);
+        $sistema = Sistema::find(['id' => '1']);
+        $this->expectException('\Exception');
+        $sistema->delete();
     }
 }

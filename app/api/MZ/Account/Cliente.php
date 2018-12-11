@@ -1146,6 +1146,9 @@ class Cliente extends SyncModel
             throw new ValidationException($errors);
         }
         $values = $this->toArray();
+        if ($this->exists()) {
+            unset($values['datacadastro']);
+        }
         if (is_null($this->getSenha())) {
             unset($values['senha']);
         }
@@ -1246,26 +1249,16 @@ class Cliente extends SyncModel
      */
     public function update($only = [])
     {
-        $values = $this->validate();
-        if (!$this->exists()) {
-            throw new ValidationException(
-                ['id' => _t('cliente.id_cannot_empty')]
-            );
-        }
-        $values = DB::filterValues($values, $only, false);
-        unset($values['datacadastro']);
         try {
             DB::beginTransaction();
-            $affected = DB::update('Clientes')
-                ->set($values)
-                ->where(['id' => $this->getID()])
-                ->execute();
-            if (!is_null($this->getTelefone()->getNumero())) {
-                $this->getTelefone()->setPrincipal('Y');
-                $this->getTelefone()->setClienteID($this->getID());
-                $this->getTelefone()->save();
+            $telefone = new Telefone($this->getTelefone());
+            $affected = parent::update($only);
+            if (!is_null($telefone->getNumero())) {
+                $telefone->setPrincipal('Y');
+                $telefone->setClienteID($this->getID());
+                $telefone->save();
+                $this->setTelefone($telefone);
             }
-            $this->loadByID();
             DB::commit();
         } catch (\Exception $e) {
             DB::rollBack();

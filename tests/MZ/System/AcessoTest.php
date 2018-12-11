@@ -24,34 +24,70 @@
  */
 namespace MZ\System;
 
+use MZ\Provider\FuncaoTest;
+use MZ\System\PermissaoTest;
+
 class AcessoTest extends \MZ\Framework\TestCase
 {
+    /**
+     * Build a valid acesso
+     * @param MZ\Provider\Funcao $funcao Função que irá possuir a permissão
+     * @param string $permissao_nome nome da permissão que será construída
+     * @return Acesso
+     */
+    public static function build($funcao, $permissao_nome)
+    {
+        $permissao = Permissao::findByNome($permissao_nome);
+        $acesso = new Acesso();
+        $acesso->setPermissaoID($permissao->getID());
+        $acesso->setFuncaoID($funcao->getID());
+        return $acesso;
+    }
+
     /**
      * @return Acesso[]
      */
     public static function create($funcao, $permissions)
     {
         $result = [];
-        foreach ($permissions as $permissao_nome) {
-            $permissao = Permissao::findByNome($permissao_nome);
-            $acesso = new Acesso();
-            $acesso->setPermissaoID($permissao->getID());
-            $acesso->setFuncaoID($funcao->getID());
+        foreach ($permissions as $name) {
+            $acesso = self::build($funcao, $name);
             $acesso->insert();
             $result[] = $acesso;
         }
         return $result;
     }
 
-    public function testPublish()
+    public function testFind()
     {
-        $acesso = new Acesso();
-        $values = $acesso->publish(app()->auth->provider);
-        $allowed = [
-            'id',
-            'funcaoid',
-            'permissaoid',
-        ];
-        $this->assertEquals($allowed, array_keys($values));
+        list($acesso) = self::create(FuncaoTest::create([]), [Permissao::NOME_ALTERARCONFIGURACOES]);
+        $condition = ['permissaoid' => $acesso->getPermissaoID(), 'funcaoid' => $acesso->getFuncaoID()];
+        $found_acesso = Acesso::find($condition);
+        $this->assertEquals($acesso, $found_acesso);
+        list($found_acesso) = Acesso::findAll($condition, [], 1);
+        $this->assertEquals($acesso, $found_acesso);
+        $this->assertEquals(1, Acesso::count($condition));
+    }
+
+    public function testAdd()
+    {
+        $acesso = self::build(FuncaoTest::create([]), Permissao::NOME_ALTERARCONFIGURACOES);
+        $acesso->insert();
+        $this->assertTrue($acesso->exists());
+    }
+
+    public function testUpdate()
+    {
+        list($acesso) = self::create(FuncaoTest::create([]), [Permissao::NOME_ALTERARCONFIGURACOES]);
+        $acesso->update();
+        $this->assertTrue($acesso->exists());
+    }
+
+    public function testDelete()
+    {
+        list($acesso) = self::create(FuncaoTest::create([]), [Permissao::NOME_ALTERARCONFIGURACOES]);
+        $acesso->delete();
+        $acesso->loadByID();
+        $this->assertFalse($acesso->exists());
     }
 }

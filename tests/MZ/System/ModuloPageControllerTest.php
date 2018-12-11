@@ -22,35 +22,29 @@
  *
  * @author Equipe GrandChef <desenvolvimento@mzsw.com.br>
  */
-namespace MZ\Coupon\Order;
+namespace MZ\System;
 
-use Thermal\Printer;
-use Thermal\Connection\Buffer;
-use Thermal\Model;
-use MZ\Sale\Pedido;
-use MZ\Account\ClienteTest;
+use MZ\System\Permissao;
+use MZ\Account\AuthenticationTest;
 
-class ReceiptTest extends \MZ\Framework\TestCase
+class ModuloPageControllerTest extends \MZ\Framework\TestCase
 {
-    public function testPrint()
+    public function testFind()
     {
-        ClienteTest::createCompany('Company');
-        $model = new Model('MP-4200 TH');
-        $connection = new Buffer();
-        $printer = new Printer($model, $connection);
-        $receipt = new Receipt($printer);
-        $receipt->setItems([]);
-        $receipt->setOrder(new Pedido());
-        $receipt->setPayments([]);
-        $receipt->setDateTime('2018-07-25 21:11:00');
-        $receipt->printCoupon();
-        $printer->feed(6);
-        $printer->buzzer();
-        $printer->cutter();
-        $printer->drawer(Printer::DRAWER_1);
-        $this->assertEquals(
-            getExpectedBuffer('order_receipt_print', $connection->getBuffer()),
-            $connection->getBuffer()
-        );
+        $modulo = Modulo::find([]);
+        AuthenticationTest::authProvider([Permissao::NOME_SISTEMA, Permissao::NOME_ALTERARCONFIGURACOES]);
+        $result = $this->get('/gerenciar/modulo/', ['search' => $modulo->getNome()]);
+        $this->assertEquals(200, $result->getStatusCode());
+    }
+
+    public function testUpdate()
+    {
+        $modulo = Modulo::find([]);
+        AuthenticationTest::authProvider([Permissao::NOME_SISTEMA, Permissao::NOME_ALTERARCONFIGURACOES]);
+        $id = $modulo->getID();
+        $result = $this->post('/gerenciar/modulo/editar?id=' . $id, $modulo->toArray(), true);
+        $modulo->loadByID();
+        $expected = ['status' => 'ok', 'item' => $modulo->publish(app()->auth->provider)];
+        $this->assertEquals($expected, \array_intersect_key($result, $expected));
     }
 }

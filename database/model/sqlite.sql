@@ -2,7 +2,7 @@
 -- Author:        Mazin
 -- Caption:       GrandChef Model
 -- Project:       GrandChef
--- Changed:       2018-12-03 19:06
+-- Changed:       2018-12-10 18:18
 -- Created:       2012-09-05 23:08
 PRAGMA foreign_keys = OFF;
 
@@ -156,7 +156,9 @@ CREATE TABLE "Moedas"(
   "Formato" VARCHAR(45) NOT NULL,-- Formado de exibição do valor, Ex: $ %s, para $ 3,00[N:Formato][G:o]
   "Conversao" DOUBLE DEFAULT NULL,-- Multiplicador para conversão para a moeda principal[G:a][N:Conversão]
   "DataAtualizacao" DATETIME DEFAULT NULL,-- Data da última atualização do fator de conversão[G:a][N:Data de atualização]
-  "Ativa" TEXT NOT NULL CHECK("Ativa" IN('Y', 'N')) DEFAULT 'N'-- Informa se a moeda é recebida pela empresa, a moeda do país mesmo desativada sempre é aceita[G:a][N:Ativa]
+  "Ativa" TEXT NOT NULL CHECK("Ativa" IN('Y', 'N')) DEFAULT 'N',-- Informa se a moeda é recebida pela empresa, a moeda do país mesmo desativada sempre é aceita[G:a][N:Ativa]
+  CONSTRAINT "Codigo_UNIQUE"
+    UNIQUE("Codigo")
 );
 CREATE TABLE "Servidores"(
 --   Lista de servidores que fazem sincronizações[N:Servidor|Servidores][G:o][L:AlterarConfiguracoes][K:MZ\System|MZ\System\][H:Model]
@@ -1558,7 +1560,7 @@ CREATE TABLE "Localizacoes"(
   "Longitude" DOUBLE DEFAULT NULL,-- Ponto longitudinal para localização em um mapa[N:Longitude][G:a]
   "Apelido" VARCHAR(45) DEFAULT NULL,-- Ex.: Minha Casa, Casa da Amiga[N:Apelido][G:o]
   "Mostrar" TEXT NOT NULL CHECK("Mostrar" IN('Y', 'N')) DEFAULT 'Y',-- Permite esconder ou exibir um endereço do cliente[N:Mostrar][G:o][F:'Y']
-  CONSTRAINT "UK_Localizacoes_ClienteID_Apelido"
+  CONSTRAINT "ClienteID_Apelido_UNIQUE"
     UNIQUE("ClienteID","Apelido"),
   CONSTRAINT "FK_Localizacoes_Clientes_ClienteID"
     FOREIGN KEY("ClienteID")

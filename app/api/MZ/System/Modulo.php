@@ -280,6 +280,22 @@ class Modulo extends SyncModel
         return parent::translate($e);
     }
 
+    public function insert()
+    {
+        throw new \Exception(
+            'Um módulo deve ser implementado e não pode ser inserido',
+            500
+        );
+    }
+
+    public function delete()
+    {
+        throw new \Exception(
+            'Um módulo deve ser removido da implementado e não apenas do banco de dados',
+            500
+        );
+    }
+
     /**
      * Load into this object from database using, Nome
      * @return self Self filled instance or empty when not found

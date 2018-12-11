@@ -26,133 +26,63 @@ namespace MZ\Wallet;
 
 class BancoTest extends \MZ\Framework\TestCase
 {
-    public function testFromArray()
+    /**
+     * Build a valid banco
+     * @param string $razao_social Banco razão social
+     * @return Banco
+     */
+    public static function build($razao_social = null)
     {
-        $old_banco = new Banco([
-            'id' => 123,
-            'numero' => 'Banco',
-            'razaosocial' => 'Banco',
-            'agenciamascara' => 'Banco',
-            'contamascara' => 'Banco',
-        ]);
+        $last = Banco::find([], ['id' => -1]);
+        $id = $last->getID() + 1;
         $banco = new Banco();
-        $banco->fromArray($old_banco);
-        $this->assertEquals($banco, $old_banco);
-        $banco->fromArray(null);
-        $this->assertEquals($banco, new Banco());
+        $banco->setNumero($id + 1000);
+        $banco->setRazaoSocial($razao_social ?: "Banco {$id}");
+        return $banco;
     }
 
-    public function testFilter()
+    /**
+     * Create a banco on database
+     * @param string $razao_social Banco razão social
+     * @return Banco
+     */
+    public static function create($razao_social = null)
     {
-        $old_banco = new Banco([
-            'id' => 1234,
-            'numero' => 'Banco filter',
-            'razaosocial' => 'Banco filter',
-            'agenciamascara' => 'Banco filter',
-            'contamascara' => 'Banco filter',
-        ]);
-        $banco = new Banco([
-            'id' => 321,
-            'numero' => ' Banco <script>filter</script> ',
-            'razaosocial' => ' Banco <script>filter</script> ',
-            'agenciamascara' => ' Banco <script>filter</script> ',
-            'contamascara' => ' Banco <script>filter</script> ',
-        ]);
-        $banco->filter($old_banco, app()->auth->provider, true);
-        $this->assertEquals($old_banco, $banco);
-    }
-
-    public function testPublish()
-    {
-        $banco = new Banco();
-        $values = $banco->publish(app()->auth->provider);
-        $allowed = [
-            'id',
-            'numero',
-            'razaosocial',
-            'agenciamascara',
-            'contamascara',
-        ];
-        $this->assertEquals($allowed, array_keys($values));
-    }
-
-    public function testInsert()
-    {
-        $banco = new Banco();
-        try {
-            $banco->insert();
-            $this->fail('Não deveria ter cadastrado o banco');
-        } catch (\MZ\Exception\ValidationException $e) {
-            $this->assertEquals(
-                [
-                    'numero',
-                    'razaosocial',
-                ],
-                array_keys($e->getErrors())
-            );
-        }
-        $banco->setNumero('Banco to insert');
-        $banco->setRazaoSocial('Banco to insert');
+        $banco = self::build($razao_social);
         $banco->insert();
-    }
-
-    public function testUpdate()
-    {
-        $banco = new Banco();
-        $banco->setNumero('Banco to update');
-        $banco->setRazaoSocial('Banco to update');
-        $banco->insert();
-        $banco->setNumero('Banco updated');
-        $banco->setRazaoSocial('Banco updated');
-        $banco->setAgenciaMascara('Banco updated');
-        $banco->setContaMascara('Banco updated');
-        $banco->update();
-        $found_banco = Banco::findByID($banco->getID());
-        $this->assertEquals($banco, $found_banco);
-        $banco->setID('');
-        $this->expectException('\Exception');
-        $banco->update();
-    }
-
-    public function testDelete()
-    {
-        $banco = new Banco();
-        $banco->setNumero('Banco to delete');
-        $banco->setRazaoSocial('Banco to delete');
-        $banco->insert();
-        $banco->delete();
-        $banco->clean(new Banco());
-        $found_banco = Banco::findByID($banco->getID());
-        $this->assertEquals(new Banco(), $found_banco);
-        $banco->setID('');
-        $this->expectException('\Exception');
-        $banco->delete();
+        return $banco;
     }
 
     public function testFind()
     {
-        $banco = new Banco();
-        $banco->setNumero('Banco find');
-        $banco->setRazaoSocial('Banco find');
+        $banco = self::create();
+        $condition = ['razaosocial' => $banco->getRazaoSocial()];
+        $found_banco = Banco::find($condition);
+        $this->assertEquals($banco, $found_banco);
+        list($found_banco) = Banco::findAll($condition, [], 1);
+        $this->assertEquals($banco, $found_banco);
+        $this->assertEquals(1, Banco::count($condition));
+    }
+
+    public function testAdd()
+    {
+        $banco = self::build();
         $banco->insert();
-        $found_banco = Banco::find(['id' => $banco->getID()]);
-        $this->assertEquals($banco, $found_banco);
-        $found_banco = Banco::findByID($banco->getID());
-        $this->assertEquals($banco, $found_banco);
-        $found_banco = Banco::findByRazaoSocial($banco->getRazaoSocial());
-        $this->assertEquals($banco, $found_banco);
-        $found_banco = Banco::findByNumero($banco->getNumero());
-        $this->assertEquals($banco, $found_banco);
+        $this->assertTrue($banco->exists());
+    }
 
-        $banco_sec = new Banco();
-        $banco_sec->setNumero('Banco find second');
-        $banco_sec->setRazaoSocial('Banco find second');
-        $banco_sec->insert();
+    public function testUpdate()
+    {
+        $banco = self::create();
+        $banco->update();
+        $this->assertTrue($banco->exists());
+    }
 
-        $bancos = Banco::findAll(['search' => 'Banco find'], [], 2, 0);
-        $this->assertEquals([$banco, $banco_sec], $bancos);
-
-        $count = Banco::count(['search' => 'Banco find']);
-        $this->assertEquals(2, $count);
+    public function testDelete()
+    {
+        $banco = self::create();
+        $banco->delete();
+        $banco->loadByID();
+        $this->assertFalse($banco->exists());
     }
 }

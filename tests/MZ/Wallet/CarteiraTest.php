@@ -24,6 +24,7 @@
  */
 namespace MZ\Wallet;
 
+
 class CarteiraTest extends \MZ\Framework\TestCase
 {
     /**
@@ -55,26 +56,36 @@ class CarteiraTest extends \MZ\Framework\TestCase
         return $carteira;
     }
 
-    public function testPublish()
+    public function testFind()
     {
-        $carteira = new Carteira();
-        $values = $carteira->publish(app()->auth->provider);
-        $allowed = [
-            'id',
-            'tipo',
-            'carteiraid',
-            'bancoid',
-            'descricao',
-            'conta',
-            'agencia',
-            'transacao',
-            'limite',
-            'token',
-            'ambiente',
-            'logourl',
-            'cor',
-            'ativa',
-        ];
-        $this->assertEquals($allowed, array_keys($values));
+        $carteira = self::create();
+        $condition = ['descricao' => $carteira->getDescricao()];
+        $found_carteira = Carteira::find($condition);
+        $this->assertEquals($carteira, $found_carteira);
+        list($found_carteira) = Carteira::findAll($condition, [], 1);
+        $this->assertEquals($carteira, $found_carteira);
+        $this->assertEquals(1, Carteira::count($condition));
+    }
+
+    public function testAdd()
+    {
+        $carteira = self::build();
+        $carteira->insert();
+        $this->assertTrue($carteira->exists());
+    }
+
+    public function testUpdate()
+    {
+        $carteira = self::create();
+        $carteira->update();
+        $this->assertTrue($carteira->exists());
+    }
+
+    public function testDelete()
+    {
+        $carteira = self::create();
+        $carteira->delete();
+        $carteira->loadByID();
+        $this->assertFalse($carteira->exists());
     }
 }

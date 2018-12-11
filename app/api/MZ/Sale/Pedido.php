@@ -1172,7 +1172,11 @@ class Pedido extends SyncModel
         if (!empty($errors)) {
             throw new ValidationException($errors);
         }
-        return $this->toArray();
+        $values = $this->toArray();
+        if ($this->exists()) {
+            unset($values['datacriacao']);
+        }
+        return $values;
     }
 
     public function checkAccess($operador)
@@ -1253,34 +1257,6 @@ class Pedido extends SyncModel
                 ));
             }
         }
-    }
-
-    /**
-     * Update Pedido with instance values into database for Código
-     * @param array $only Save these fields only, when empty save all fields except id
-     * @return int rows affected
-     * @throws \MZ\Exception\ValidationException for invalid input data
-     */
-    public function update($only = [])
-    {
-        $values = $this->validate();
-        if (!$this->exists()) {
-            throw new ValidationException(
-                ['id' => _t('pedido.id_cannot_empty')]
-            );
-        }
-        $values = DB::filterValues($values, $only, false);
-        unset($values['datacriacao']);
-        try {
-            $affected = DB::update('Pedidos')
-                ->set($values)
-                ->where(['id' => $this->getID()])
-                ->execute();
-            $this->loadByID();
-        } catch (\Exception $e) {
-            throw $this->translate($e);
-        }
-        return $affected;
     }
 
     /**

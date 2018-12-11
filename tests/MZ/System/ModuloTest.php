@@ -22,35 +22,39 @@
  *
  * @author Equipe GrandChef <desenvolvimento@mzsw.com.br>
  */
-namespace MZ\Coupon\Order;
+namespace MZ\System;
 
-use Thermal\Printer;
-use Thermal\Connection\Buffer;
-use Thermal\Model;
-use MZ\Sale\Pedido;
-use MZ\Account\ClienteTest;
-
-class ReceiptTest extends \MZ\Framework\TestCase
+class ModuloTest extends \MZ\Framework\TestCase
 {
-    public function testPrint()
+    public function testFind()
     {
-        ClienteTest::createCompany('Company');
-        $model = new Model('MP-4200 TH');
-        $connection = new Buffer();
-        $printer = new Printer($model, $connection);
-        $receipt = new Receipt($printer);
-        $receipt->setItems([]);
-        $receipt->setOrder(new Pedido());
-        $receipt->setPayments([]);
-        $receipt->setDateTime('2018-07-25 21:11:00');
-        $receipt->printCoupon();
-        $printer->feed(6);
-        $printer->buzzer();
-        $printer->cutter();
-        $printer->drawer(Printer::DRAWER_1);
-        $this->assertEquals(
-            getExpectedBuffer('order_receipt_print', $connection->getBuffer()),
-            $connection->getBuffer()
-        );
+        $modulo = Modulo::find([]);
+        $condition = ['nome' => $modulo->getNome()];
+        $found_modulo = Modulo::find($condition);
+        $this->assertEquals($modulo, $found_modulo);
+        list($found_modulo) = Modulo::findAll($condition, [], 1);
+        $this->assertEquals($modulo, $found_modulo);
+        $this->assertEquals(1, Modulo::count($condition));
+    }
+
+    public function testAdd()
+    {
+        $modulo = Modulo::find([]);
+        $this->expectException('\Exception');
+        $modulo->insert();
+    }
+
+    public function testUpdate()
+    {
+        $modulo = Modulo::find([]);
+        $modulo->update();
+        $this->assertTrue($modulo->exists());
+    }
+
+    public function testDelete()
+    {
+        $modulo = Modulo::find([]);
+        $this->expectException('\Exception');
+        $modulo->delete();
     }
 }

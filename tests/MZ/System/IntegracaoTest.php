@@ -26,21 +26,64 @@ namespace MZ\System;
 
 class IntegracaoTest extends \MZ\Framework\TestCase
 {
-    public function testPublish()
+    /**
+     * Build a valid integração
+     * @param string $nome Integração nome
+     * @return Integracao
+     */
+    public static function build($nome = null)
     {
+        $last = Integracao::find([], ['id' => -1]);
+        $id = $last->getID() + 1;
         $integracao = new Integracao();
-        $values = $integracao->publish(app()->auth->provider);
-        $allowed = [
-            'id',
-            'nome',
-            'acessourl',
-            'descricao',
-            'iconeurl',
-            'ativo',
-            'token',
-            'secret',
-            'dataatualizacao',
-        ];
-        $this->assertEquals($allowed, array_keys($values));
+        $integracao->setNome("Integração {$id}");
+        $integracao->setAcessoURL("url_{$id}");
+        $integracao->setAtivo('Y');
+        return $integracao;
+    }
+
+    /**
+     * Create a integração on database
+     * @param string $nome Integração nome
+     * @return Integracao
+     */
+    public static function create($nome = null)
+    {
+        $integracao = self::build($nome);
+        $integracao->insert();
+        return $integracao;
+    }
+
+    public function testFind()
+    {
+        $integracao = self::create();
+        $condition = ['nome' => $integracao->getNome()];
+        $found_integracao = Integracao::find($condition);
+        $this->assertEquals($integracao, $found_integracao);
+        list($found_integracao) = Integracao::findAll($condition, [], 1);
+        $this->assertEquals($integracao, $found_integracao);
+        $this->assertEquals(1, Integracao::count($condition));
+    }
+
+    public function testAdd()
+    {
+        $integracao = self::build();
+        $integracao->insert();
+        $this->assertTrue($integracao->exists());
+    }
+
+    public function testUpdate()
+    {
+        $integracao = self::create();
+        $integracao->update();
+        $this->assertTrue($integracao->exists());
+    }
+
+    public function testDelete()
+    {
+        $integracao = self::create();
+        $integracao->delete();
+        $integracao->loadByID();
+        $this->assertFalse($integracao->exists());
     }
 }

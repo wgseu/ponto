@@ -24,69 +24,47 @@
  */
 namespace MZ\Wallet;
 
-class MoedaTest extends \MZ\Framework\TestCase
+use MZ\System\Permissao;
+use MZ\Account\AuthenticationTest;
+
+class MoedaPageControllerTest extends \MZ\Framework\TestCase
 {
-    /**
-     * Build a valid moeda
-     * @param string $nome Moeda nome
-     * @return Moeda
-     */
-    public static function build($nome = null)
-    {
-        $last = Moeda::find([], ['id' => -1]);
-        $id = $last->getID() + 1;
-        $moeda = new Moeda();
-        $moeda->setNome($nome ?: "Moeda {$id}");
-        $moeda->setSimbolo('$');
-        $moeda->setCodigo("C{$id}");
-        $moeda->setDivisao(100);
-        $moeda->setFormato('$ %s');
-        $moeda->setAtiva('Y');
-        return $moeda;
-    }
-
-    /**
-     * Create a moeda on database
-     * @param string $nome Moeda nome
-     * @return Moeda
-     */
-    public static function create($nome = null)
-    {
-        $moeda = self::build($nome);
-        $moeda->insert();
-        return $moeda;
-    }
-
     public function testFind()
     {
-        $moeda = self::create();
-        $condition = ['nome' => $moeda->getNome()];
-        $found_moeda = Moeda::find($condition);
-        $this->assertEquals($moeda, $found_moeda);
-        list($found_moeda) = Moeda::findAll($condition, [], 1);
-        $this->assertEquals($moeda, $found_moeda);
-        $this->assertEquals(1, Moeda::count($condition));
+        $moeda = MoedaTest::create();
+        AuthenticationTest::authProvider([Permissao::NOME_SISTEMA, Permissao::NOME_CADASTROMOEDAS]);
+        $result = $this->get('/gerenciar/moeda/', ['search' => $moeda->getNome()]);
+        $this->assertEquals(200, $result->getStatusCode());
     }
 
     public function testAdd()
     {
-        $moeda = self::build();
-        $moeda->insert();
+        $moeda = MoedaTest::build();
+        AuthenticationTest::authProvider([Permissao::NOME_SISTEMA, Permissao::NOME_CADASTROMOEDAS]);
+        $result = $this->post('/gerenciar/moeda/cadastrar', $moeda->toArray(), true);
+        $this->assertEquals(302, $result->getStatusCode());
+        $moeda->load(['nome' => $moeda->getNome()]);
         $this->assertTrue($moeda->exists());
     }
 
     public function testUpdate()
     {
-        $moeda = self::create();
-        $moeda->update();
-        $this->assertTrue($moeda->exists());
+        $moeda = MoedaTest::create();
+        AuthenticationTest::authProvider([Permissao::NOME_SISTEMA, Permissao::NOME_CADASTROMOEDAS]);
+        $id = $moeda->getID();
+        $result = $this->post('/gerenciar/moeda/editar?id=' . $id, $moeda->toArray(), true);
+        $moeda->loadByID();
+        $this->assertEquals(302, $result->getStatusCode());
     }
 
     public function testDelete()
     {
-        $moeda = self::create();
-        $moeda->delete();
+        $moeda = MoedaTest::create();
+        AuthenticationTest::authProvider([Permissao::NOME_SISTEMA, Permissao::NOME_CADASTROMOEDAS]);
+        $id = $moeda->getID();
+        $result = $this->get('/gerenciar/moeda/excluir?id=' . $id);
         $moeda->loadByID();
+        $this->assertEquals(302, $result->getStatusCode());
         $this->assertFalse($moeda->exists());
     }
 }

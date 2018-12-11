@@ -31,20 +31,48 @@ use MZ\Provider\Prestador;
 class ClienteTest extends \MZ\Framework\TestCase
 {
     /**
+     * Build a valid cliente
+     * @param string $nome Cliente nome
      * @return Cliente
      */
-    public static function create()
+    public static function build($nome = null)
     {
         $last = Cliente::find([], ['id' => -1]);
         $id = $last->getID() + 1;
         $cliente = new Cliente();
-        $cliente->setNomeCompleto('Aleatorio da Silva');
+        $cliente->setNomeCompleto($nome ?: 'Aleatorio da Silva');
         $cliente->setEmail("testaleatorio{$id}@email.com");
         $cliente->setLogin("login_{$id}");
         $cliente->setGenero(Cliente::GENERO_MASCULINO);
         $cliente->setSenha('1234');
+        return $cliente;
+    }
+
+    /**
+     * Create a cliente on database
+     * @param string $nome Cliente nome
+     * @return Cliente
+     */
+    public static function create($nome = null)
+    {
+        $cliente = self::build($nome);
         $cliente->insert();
         return $cliente;
+    }
+
+    /**
+     * App company
+     * @return Cliente
+     */
+    public static function createCompany($nome = null)
+    {
+        $empresa = self::build($nome);
+        $empresa->setTipo(Cliente::TIPO_JURIDICA);
+        $empresa->insert();
+        app()->system->business->setEmpresaID($empresa->getID());
+        app()->system->business->update();
+        app()->system->company->fromArray($empresa->toArray());
+        return $empresa;
     }
 
     public function testFromArray()

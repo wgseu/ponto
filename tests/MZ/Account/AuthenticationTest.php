@@ -31,13 +31,29 @@ use MZ\System\Sistema;
 class AuthenticationTest extends \MZ\Framework\TestCase
 {
     /**
+     * Auth as employee
      * @return \MZ\Provider\Prestador
      */
     public static function authProvider($permissions)
     {
+        ClienteTest::createCompany();
         $funcao = \MZ\Provider\FuncaoTest::create($permissions);
         $prestador = \MZ\Provider\PrestadorTest::create($funcao);
         app()->getAuthentication()->login($prestador->findClienteID());
+        return $prestador;
+    }
+
+    /**
+     * Auth as owner
+     * @return \MZ\Provider\Prestador
+     */
+    public static function authOwner()
+    {
+        $prestador = self::authProvider([]);
+        $cliente = app()->auth->user;
+        $cliente->setEmpresaID(app()->system->business->getEmpresaID());
+        $cliente->update();
+        app()->getAuthentication()->login($cliente);
         return $prestador;
     }
 
@@ -71,16 +87,17 @@ class AuthenticationTest extends \MZ\Framework\TestCase
             'status' => 'ok',
             'info' => [
                 'empresa' => [
-                    'nome' => null,
+                    'nome' => 'Aleatorio',
                     'imagemurl' => null
                 ],
             ],
             'versao' => Sistema::VERSAO,
-            'validacao' => null,
+            'validacao' => '',
             'autologout' => false,
             'acesso' => 'visitante',
             'permissoes' => []
         ];
+        self::authProvider([]);
         app()->getAuthentication()->logout();
         $result = $this->get('/app/conta/status');
         $this->assertEquals($expected, \array_intersect_key($result, $expected));

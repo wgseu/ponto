@@ -35,13 +35,16 @@ class TestCase extends \PHPUnit\Framework\TestCase
      * Execute http GET request and return json decoded as array
      * @param string $url url to fetch data
      * @param array $query url query params
-     * @return array response data
+     * @return \Symfony\Component\HttpFoundation\Response|array response object or array
      */
     public function get($url, $query = [])
     {
         $request = Request::create($url, 'GET', $query);
-        $result = \json_decode(app()->dispatch($request)->getContent(), true);
-        return $result;
+        $response = app()->dispatch($request);
+        if ($response->headers->get('Content-Type') == 'application/json') {
+            return $this->fromJson($response);
+        }
+        return $response;
     }
 
     /**
@@ -49,7 +52,7 @@ class TestCase extends \PHPUnit\Framework\TestCase
      * @param string $url url to post data
      * @param array $data data to submit
      * @param boolean $form send as form url encoded
-     * @return array response data
+     * @return \Symfony\Component\HttpFoundation\Response|array response object or array
      */
     public function post($url, $data, $form = false)
     {
@@ -65,8 +68,11 @@ class TestCase extends \PHPUnit\Framework\TestCase
             $server,
             $content
         );
-        $result = \json_decode(app()->dispatch($request)->getContent(), true);
-        return $result;
+        $response = app()->dispatch($request);
+        if ($response->headers->get('Content-Type') == 'application/json') {
+            return $this->fromJson($response);
+        }
+        return $response;
     }
 
     /**
@@ -74,7 +80,7 @@ class TestCase extends \PHPUnit\Framework\TestCase
      * @param string $url url to post data
      * @param array $data data to submit
      * @param boolean $form send as form url encoded
-     * @return array response data
+     * @return \Symfony\Component\HttpFoundation\Response|array response object or array
      */
     public function put($url, $data = [], $form = false)
     {
@@ -90,8 +96,11 @@ class TestCase extends \PHPUnit\Framework\TestCase
             $server,
             $content
         );
-        $result = \json_decode(app()->dispatch($request)->getContent(), true);
-        return $result;
+        $response = app()->dispatch($request);
+        if ($response->headers->get('Content-Type') == 'application/json') {
+            return $this->fromJson($response);
+        }
+        return $response;
     }
 
     /**
@@ -99,7 +108,7 @@ class TestCase extends \PHPUnit\Framework\TestCase
      * @param string $url url to post data
      * @param array $data data to submit
      * @param boolean $form send as form url encoded
-     * @return array response data
+     * @return \Symfony\Component\HttpFoundation\Response|array response object or array
      */
     public function patch($url, $data = [], $form = false)
     {
@@ -115,20 +124,35 @@ class TestCase extends \PHPUnit\Framework\TestCase
             $server,
             $content
         );
-        $result = \json_decode(app()->dispatch($request)->getContent(), true);
-        return $result;
+        $response = app()->dispatch($request);
+        if ($response->headers->get('Content-Type') == 'application/json') {
+            return $this->fromJson($response);
+        }
+        return $response;
     }
 
     /**
      * Execute http DELETE request and return json decoded as array
      * @param string $url url to post data
      * @param array $query url query params
-     * @return array response data
+     * @return \Symfony\Component\HttpFoundation\Response|array response object or array
      */
     public function delete($url, $query = [])
     {
         $request = Request::create($url, 'DELETE', $query);
-        $result = \json_decode(app()->dispatch($request)->getContent(), true);
-        return $result;
+        $response = app()->dispatch($request);
+        if ($response->headers->get('Content-Type') == 'application/json') {
+            return $this->fromJson($response);
+        }
+        return $response;
+    }
+
+    /**
+     * @param \Symfony\Component\HttpFoundation\Response $response response object or array
+     * @return array data array
+     */
+    public function fromJson($response)
+    {
+        return \json_decode($response->getContent(), true);
     }
 }

@@ -1031,35 +1031,11 @@ class Item extends SyncModel
         if (!empty($errors)) {
             throw new ValidationException($errors);
         }
-        return $this->toArray();
-    }
-
-    /**
-     * Update Item do pedido with instance values into database for ID
-     * @param array $only Save these fields only, when empty save all fields except id
-     * @return int rows affected
-     * @throws \MZ\Exception\ValidationException for invalid input data
-     */
-    public function update($only = [])
-    {
-        $values = $this->validate();
-        if (!$this->exists()) {
-            throw new ValidationException(
-                ['id' => _t('item.id_cannot_empty')]
-            );
+        $values = $this->toArray();
+        if ($this->exists()) {
+            unset($values['datalancamento']);
         }
-        $values = DB::filterValues($values, $only, false);
-        unset($values['datalancamento']);
-        try {
-            $affected = DB::update('Itens')
-                ->set($values)
-                ->where(['id' => $this->getID()])
-                ->execute();
-            $this->loadByID();
-        } catch (\Exception $e) {
-            throw $this->translate($e);
-        }
-        return $affected;
+        return $values;
     }
 
     /**

@@ -36,6 +36,7 @@ use MZ\Exception\ValidationException;
  */
 class Auditoria extends SyncModel
 {
+    protected $table = 'Auditoria';
 
     /**
      * Tipo de atividade exercida
@@ -426,35 +427,11 @@ class Auditoria extends SyncModel
         if (!empty($errors)) {
             throw new ValidationException($errors);
         }
-        return $this->toArray();
-    }
-
-    /**
-     * Update Auditoria with instance values into database for ID
-     * @param array $only Save these fields only, when empty save all fields except id
-     * @return int rows affected
-     * @throws \MZ\Exception\ValidationException for invalid input data
-     */
-    public function update($only = [])
-    {
-        $values = $this->validate();
-        if (!$this->exists()) {
-            throw new ValidationException(
-                ['id' => _t('auditoria.id_cannot_empty')]
-            );
+        $values = $this->toArray();
+        if ($this->exists()) {
+            unset($values['datahora']);
         }
-        $values = DB::filterValues($values, $only, false);
-        unset($values['datahora']);
-        try {
-            $affected = DB::update('Auditoria')
-                ->set($values)
-                ->where(['id' => $this->getID()])
-                ->execute();
-            $this->loadByID();
-        } catch (\Exception $e) {
-            throw $this->translate($e);
-        }
-        return $affected;
+        return $values;
     }
 
     /**

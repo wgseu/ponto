@@ -22,35 +22,28 @@
  *
  * @author Equipe GrandChef <desenvolvimento@mzsw.com.br>
  */
-namespace MZ\Coupon\Order;
+namespace MZ\System;
 
-use Thermal\Printer;
-use Thermal\Connection\Buffer;
-use Thermal\Model;
-use MZ\Sale\Pedido;
-use MZ\Account\ClienteTest;
+use MZ\System\Permissao;
+use MZ\Account\AuthenticationTest;
 
-class ReceiptTest extends \MZ\Framework\TestCase
+class IntegracaoPageControllerTest extends \MZ\Framework\TestCase
 {
-    public function testPrint()
+    public function testFind()
     {
-        ClienteTest::createCompany('Company');
-        $model = new Model('MP-4200 TH');
-        $connection = new Buffer();
-        $printer = new Printer($model, $connection);
-        $receipt = new Receipt($printer);
-        $receipt->setItems([]);
-        $receipt->setOrder(new Pedido());
-        $receipt->setPayments([]);
-        $receipt->setDateTime('2018-07-25 21:11:00');
-        $receipt->printCoupon();
-        $printer->feed(6);
-        $printer->buzzer();
-        $printer->cutter();
-        $printer->drawer(Printer::DRAWER_1);
-        $this->assertEquals(
-            getExpectedBuffer('order_receipt_print', $connection->getBuffer()),
-            $connection->getBuffer()
-        );
+        $integracao = IntegracaoTest::create();
+        AuthenticationTest::authProvider([Permissao::NOME_SISTEMA, Permissao::NOME_ALTERARCONFIGURACOES]);
+        $result = $this->get('/gerenciar/integracao/', ['search' => $integracao->getNome()]);
+        $this->assertEquals(200, $result->getStatusCode());
+    }
+
+    public function testUpdate()
+    {
+        $integracao = IntegracaoTest::create();
+        AuthenticationTest::authProvider([Permissao::NOME_SISTEMA, Permissao::NOME_ALTERARCONFIGURACOES]);
+        $id = $integracao->getID();
+        $result = $this->post('/gerenciar/integracao/editar?id=' . $id, $integracao->toArray(), true);
+        $integracao->loadByID();
+        $this->assertEquals(302, $result->getStatusCode());
     }
 }

@@ -27,15 +27,29 @@ namespace MZ\Provider;
 class FuncaoTest extends \MZ\Framework\TestCase
 {
     /**
+     * Build a valid função
+     * @param string $descricao Função descrição
      * @return Funcao
      */
-    public static function create($permissions)
+    public static function build($descricao = null)
     {
         $last = Funcao::find([], ['id' => -1]);
-        $id = intval($last->getID()) + 1;
+        $id = $last->getID() + 1;
         $funcao = new Funcao();
-        $funcao->setDescricao("Função {$id}");
+        $funcao->setDescricao($descricao ?: "Função {$id}");
         $funcao->setRemuneracao(12.3);
+        return $funcao;
+    }
+
+    /**
+     * Create a função on database
+     * @param array $permissions lista de permissões da função
+     * @param string $descricao Função descrição
+     * @return Funcao
+     */
+    public static function create($permissions = [], $descricao = null)
+    {
+        $funcao = self::build($descricao);
         $funcao->insert();
         \MZ\System\AcessoTest::create($funcao, $permissions);
         return $funcao;

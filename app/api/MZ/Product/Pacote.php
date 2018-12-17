@@ -686,7 +686,7 @@ class Pacote extends SyncModel
      * @param  integer $offset start index to get rows, null for begining
      * @return array All rows data
      */
-    public static function rawFindAll($condition = [], $order = [], $limit = null, $offset = null)
+    public static function rawFindAllEx($condition = [], $order = [], $limit = null, $offset = null)
     {
         $query = self::queryEx($condition, $order);
         if (!is_null($limit)) {

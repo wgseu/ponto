@@ -31,8 +31,8 @@ class AuditoriaPageControllerTest extends \MZ\Framework\TestCase
 {
     public function testFind()
     {
-        $auditoria = AuditoriaTest::create();
         AuthenticationTest::authProvider([Permissao::NOME_SISTEMA, Permissao::NOME_RELATORIOAUDITORIA]);
+        $auditoria = AuditoriaTest::create();
         $result = $this->get('/gerenciar/auditoria/', ['search' => $auditoria->getDescricao()]);
         $this->assertEquals(200, $result->getStatusCode());
     }

@@ -714,7 +714,7 @@ class Grupo extends SyncModel
      * @param  int    $offset    Start offset to get rows
      * @return array             List of all rows instanced as Grupo
      */
-    public static function rawFindAll($condition = [], $order = [], $limit = null, $offset = null)
+    public static function rawFindAllEx($condition = [], $order = [], $limit = null, $offset = null)
     {
         $query = self::queryEx($condition, $order);
         if (!is_null($limit)) {

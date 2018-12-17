@@ -683,16 +683,18 @@ function get_forma_pagto($type)
     switch ($type) {
         case 'dinheiro':
             return 'Dinheiro';
-        case 'cartao':
-            return 'Cartão';
+        case 'credito':
+            return 'Cartão de crédito';
+        case 'debito':
+            return 'Cartão de débito';
+        case 'vale':
+            return 'Vale';
         case 'cheque':
             return 'Cheque';
-        case 'conta':
+        case 'crediario':
             return 'Conta';
-        case 'credito':
-            return 'Crédito';
-        case 'transferencia':
-            return 'Transferência';
+        case 'saldo':
+            return 'Saldo de crédito';
         default:
             return 'Dinheiro';
     }
@@ -794,8 +796,8 @@ function str_plural($name, $count = 0)
     if ($count === 1) {
         return $name;
     }
-    if (endsWith($name, 'cao')) {
-        return \substr($name, 0, -3) . 'coes';
+    if (endsWith($name, 'cao') || endsWith($name, 'tao')) {
+        return \substr($name, 0, -2) . 'oes';
     }
     if (endsWith($name, 'sao')) {
         return \substr($name, 0, -3) . 'soes';

@@ -103,11 +103,13 @@
             </thead>
             <tbody>
               {% for $pagamento in $pagamentos %}
-                <tr class="{{ $pagamento->isCancelado() ? 'danger': (!$pagamento->isAtivo() ? 'warning': '') }}">
+                <tr class="{{ $pagamento->isCancelado() ? 'danger': (!$pagamento->isPago() ? 'warning': '') }}">
                   <td>
                     {% $_forma_pagto = $pagamento->findFormaPagtoID() %}
-                    <div class="cell-icon pagamento-icons" style="background-position: -{{ $_pagamento_icon[$_forma_pagto->getTipo()] }}px 0px;"></div>
-                    {% $_conta = $pagamento->findPagtoContaID() %}
+                    {% if $_forma_pagto->exists() %}
+                      <div class="cell-icon pagamento-icons" style="background-position: -{{ $_pagamento_icon[$_forma_pagto->getTipo()] }}px 0px;"></div>
+                    {% endif %}
+                    {% $_conta = $pagamento->findContaID() %}
                     {% $_pedido = $pagamento->findPedidoID() %}
                     {% if is_null($pagamento->getPedidoID()) %}
                       <a href="/gerenciar/conta/editar?id={{ $_conta->getID() }}" title="Editar conta '{{ $_conta->getDescricao() }}'">{{ $_conta->getID() != 1?$_conta->getDescricao():$pagamento->getDetalhes() }}</a>
@@ -118,14 +120,14 @@
                     {% endif %}
                   </td>
                   <td class="text-right">
-                    <strong title="Total">{{ $this->currency($pagamento->getTotal()) }}</strong>
-                    {% if $pagamento->getTaxas() < -0.005 || $pagamento->getTaxas() > 0.005 %}
-                      <small title="Taxas">{{ $this->currency($pagamento->getTaxas()) }}</small>
-                    {% endif %}
+                    {% $_moeda = $pagamento->findMoedaID() %}
+                    <strong title="Valor">{{ $this->currency($pagamento->getValor(), $_moeda) }}</strong>
+                    <small title="Lançado">Lançado:
+                      {{ $this->currency($pagamento->getLancado()) }}</small>
                   </td>
                   <td class="text-center">
                     <strong>
-                      {% if $_forma_pagto->getTipo() != \MZ\Payment\FormaPagto::TIPO_CARTAO %}
+                      {% if !$_forma_pagto->usaCartao() %}
                         <a href="/gerenciar/forma_pagto/editar?id={{ $_forma_pagto->getID() }}" title="Editar forma de pagamento '{{ $_forma_pagto->getDescricao() }}'">{{ $_forma_pagto->getDescricao() }}</a>
                       {% else %}
                         {% $_cartao = $pagamento->findCartaoID() %}
@@ -145,10 +147,11 @@
                   </td>
                   <td class="text-center">
                     {% if $pagamento->getParcelas() > 0 %}
-                      {{ $pagamento->getParcelas() }}
-                      x
-                      {{ $this->currency($pagamento->getValorParcela()) }}</td>
-                  {% endif %}
+                      {{ $pagamento->getNumeroParcela() }}
+                      /
+                      {{ $pagamento->getParcelas()  }}
+                    {% endif %}
+                  </td>
                 </td>
                 {% $_movimentacao = $pagamento->findMovimentacaoID() %}
                 <td class="text-center">

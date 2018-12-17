@@ -24,22 +24,91 @@
  */
 namespace MZ\Session;
 
+use MZ\Session\SessaoTest;
+use MZ\Session\CaixaTest;
+use MZ\Provider\PrestadorTest;
+use MZ\Database\DB;
+
 class MovimentacaoTest extends \MZ\Framework\TestCase
 {
-    public function testPublish()
+    /**
+     * Build a valid movimentação
+     * @return Movimentacao
+     */
+    public static function build()
     {
+        $last = Movimentacao::find([], ['id' => -1]);
+        $id = $last->getID() + 1;
+        $sessao = SessaoTest::create();
+        $caixa = CaixaTest::create();
+        $prestador = PrestadorTest::create();
         $movimentacao = new Movimentacao();
-        $values = $movimentacao->publish(app()->auth->provider);
-        $allowed = [
-            'id',
-            'sessaoid',
-            'caixaid',
-            'aberta',
-            'iniciadorid',
-            'fechadorid',
-            'datafechamento',
-            'dataabertura',
-        ];
-        $this->assertEquals($allowed, array_keys($values));
+        $movimentacao->setSessaoID($sessao->getID());
+        $movimentacao->setCaixaID($caixa->getID());
+        $movimentacao->setAberta('Y');
+        $movimentacao->setIniciadorID($prestador->getID());
+        $movimentacao->setDataAbertura('2016-12-25 12:15:00');
+        return $movimentacao;
+    }
+
+    /**
+     * Create a movimentação on database
+     * @return Movimentacao
+     */
+    public static function create()
+    {
+        $movimentacao = self::build();
+        $movimentacao->insert();
+        return $movimentacao;
+    }
+
+    /**
+     * Encerra a movimentação do caixa
+     * @param Movimentacao $movimentacao
+     */
+    public static function close($movimentacao)
+    {
+        $movimentacao->setAberta('N');
+        $movimentacao->setFechadorID($movimentacao->getIniciadorID());
+        $movimentacao->setDataFechamento(DB::now());
+        $movimentacao->update();
+        SessaoTest::close($movimentacao->findSessaoID());
+    }
+
+    public function testFind()
+    {
+        $movimentacao = self::create();
+        $condition = ['caixaid' => $movimentacao->getCaixaID()];
+        $found_movimentacao = Movimentacao::find($condition);
+        $this->assertEquals($movimentacao, $found_movimentacao);
+        list($found_movimentacao) = Movimentacao::findAll($condition, [], 1);
+        $this->assertEquals($movimentacao, $found_movimentacao);
+        $this->assertEquals(1, Movimentacao::count($condition));
+        self::close($movimentacao);
+    }
+
+    public function testAdd()
+    {
+        $movimentacao = self::build();
+        $movimentacao->insert();
+        $this->assertTrue($movimentacao->exists());
+        self::close($movimentacao);
+    }
+
+    public function testUpdate()
+    {
+        $movimentacao = self::create();
+        $movimentacao->update();
+        $this->assertTrue($movimentacao->exists());
+        self::close($movimentacao);
+    }
+
+    public function testDelete()
+    {
+        $movimentacao = self::create();
+        self::close($movimentacao);
+        $movimentacao->delete();
+        $movimentacao->loadByID();
+        $this->assertFalse($movimentacao->exists());
     }
 }

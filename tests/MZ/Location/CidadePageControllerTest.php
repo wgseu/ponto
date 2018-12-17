@@ -31,16 +31,16 @@ class CidadePageControllerTest extends \MZ\Framework\TestCase
 {
     public function testFind()
     {
-        $cidade = CidadeTest::create();
         AuthenticationTest::authProvider([Permissao::NOME_SISTEMA, Permissao::NOME_CADASTROCIDADES]);
+        $cidade = CidadeTest::create();
         $result = $this->get('/gerenciar/cidade/', ['search' => $cidade->getNome()]);
         $this->assertEquals(200, $result->getStatusCode());
     }
 
     public function testAdd()
     {
-        $cidade = CidadeTest::build();
         AuthenticationTest::authProvider([Permissao::NOME_SISTEMA, Permissao::NOME_CADASTROCIDADES]);
+        $cidade = CidadeTest::build();
         $result = $this->post('/gerenciar/cidade/cadastrar', $cidade->toArray(), true);
         $this->assertEquals(302, $result->getStatusCode());
         $cidade->load(['nome' => $cidade->getNome()]);
@@ -49,8 +49,8 @@ class CidadePageControllerTest extends \MZ\Framework\TestCase
 
     public function testUpdate()
     {
-        $cidade = CidadeTest::create();
         AuthenticationTest::authProvider([Permissao::NOME_SISTEMA, Permissao::NOME_CADASTROCIDADES]);
+        $cidade = CidadeTest::create();
         $id = $cidade->getID();
         $result = $this->post('/gerenciar/cidade/editar?id=' . $id, $cidade->toArray(), true);
         $cidade->loadByID();
@@ -59,8 +59,8 @@ class CidadePageControllerTest extends \MZ\Framework\TestCase
 
     public function testDelete()
     {
-        $cidade = CidadeTest::create();
         AuthenticationTest::authProvider([Permissao::NOME_SISTEMA, Permissao::NOME_CADASTROCIDADES]);
+        $cidade = CidadeTest::create();
         $id = $cidade->getID();
         $result = $this->get('/gerenciar/cidade/excluir?id=' . $id);
         $cidade->loadByID();

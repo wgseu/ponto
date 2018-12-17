@@ -24,8 +24,48 @@
  */
 namespace MZ\Session;
 
+use MZ\Database\DB;
+
 class SessaoTest extends \MZ\Framework\TestCase
 {
+    /**
+     * Build a valid sessão
+     * @return Sessao
+     */
+    public static function build()
+    {
+        $sessao = new Sessao();
+        $sessao->setDataInicio('2016-12-25 12:15:00');
+        $sessao->setAberta('Y');
+        return $sessao;
+    }
+
+    /**
+     * Create a sessão on database
+     * @return Sessao
+     */
+    public static function create($force = false)
+    {
+        $sessao = self::build();
+        $aberta = Sessao::findByAberta();
+        if ($aberta->exists() && !$force) {
+            return $aberta;
+        }
+        $sessao->insert();
+        return $sessao;
+    }
+
+    /**
+     * Fecha a sessão
+     * @param Sessao $sessao
+     */
+    public static function close($sessao)
+    {
+        $sessao->setAberta('N');
+        $sessao->setDataTermino(DB::now());
+        $sessao->update();
+    }
+
     public function testFromArray()
     {
         $old_sessao = new Sessao([

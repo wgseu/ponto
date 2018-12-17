@@ -31,16 +31,16 @@ class IntegracaoPageControllerTest extends \MZ\Framework\TestCase
 {
     public function testFind()
     {
-        $integracao = IntegracaoTest::create();
         AuthenticationTest::authProvider([Permissao::NOME_SISTEMA, Permissao::NOME_ALTERARCONFIGURACOES]);
+        $integracao = IntegracaoTest::create();
         $result = $this->get('/gerenciar/integracao/', ['search' => $integracao->getNome()]);
         $this->assertEquals(200, $result->getStatusCode());
     }
 
     public function testUpdate()
     {
-        $integracao = IntegracaoTest::create();
         AuthenticationTest::authProvider([Permissao::NOME_SISTEMA, Permissao::NOME_ALTERARCONFIGURACOES]);
+        $integracao = IntegracaoTest::create();
         $id = $integracao->getID();
         $result = $this->post('/gerenciar/integracao/editar?id=' . $id, $integracao->toArray(), true);
         $integracao->loadByID();

@@ -100,7 +100,7 @@ class ClientePageController extends PageController
     public function logout()
     {
         app()->getAuthentication()->logout();
-        return $this->redirect('/conta/entrar');
+        return $this->redirect('/#/login');
     }
 
     private function loginSuccessfull()
@@ -109,27 +109,6 @@ class ClientePageController extends PageController
         $url = $this->getRequest()->request->get('redirect', $url);
         app()->getSession()->remove('redirect');
         return $this->redirect($url);
-    }
-
-    public function login()
-    {
-        if (app()->getAuthentication()->isLogin()) {
-            $url = $this->getRequest()->request->get('redirect');
-            return $this->redirect($url);
-        }
-        if ($this->getRequest()->isMethod('POST')) {
-            $usuario = $this->getRequest()->request->get('usuario');
-            $senha = $this->getRequest()->request->get('senha');
-            $cliente = Cliente::findByLoginSenha($usuario, $senha);
-            if ($cliente->exists()) {
-                app()->getAuthentication()->login($cliente);
-                return $this->loginSuccessfull();
-            }
-            $msg = 'Usuário ou senha incorretos!';
-            \Thunder::error($msg);
-        }
-        $pagetitle = 'Entrar';
-        return $this->view('conta_entrar', get_defined_vars());
     }
 
     public function edit()
@@ -480,12 +459,6 @@ class ClientePageController extends PageController
                 'path' => '/conta/sair',
                 'method' => 'GET',
                 'controller' => 'logout',
-            ],
-            [
-                'name' => 'cliente_login',
-                'path' => '/conta/entrar',
-                'method' => ['GET', 'POST'],
-                'controller' => 'login',
             ],
             [
                 'name' => 'cliente_find',

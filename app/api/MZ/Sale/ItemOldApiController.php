@@ -47,7 +47,7 @@ class ItemOldApiController extends \MZ\Core\ApiController
                 $condition['!servicoid'] = isset($condition['!servicoid']) ? $condition['!servicoid'] : null;
             }
             $condition['detalhado'] = true;
-            $itens_do_pedido = Item::findAll($condition, [], null, null, [], ['p.id']);
+            $itens_do_pedido = Item::findAllEx($condition, [], null, null, [], ['p.id']);
             // Coluna dos dados
             $columns = [
                 'Pedido',

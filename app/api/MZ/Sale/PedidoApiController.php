@@ -58,7 +58,7 @@ class PedidoApiController extends \MZ\Core\ApiController
         } catch (\Exception $e) {
             return $this->json()->error($e->getMessage());
         }
-        return $this->json()->success(['item' => $order->publish(app()->auth->provider)]);
+        return $this->json()->success();
     }
 
     /**

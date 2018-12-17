@@ -31,16 +31,16 @@ class BancoPageControllerTest extends \MZ\Framework\TestCase
 {
     public function testFind()
     {
-        $banco = BancoTest::create();
         AuthenticationTest::authProvider([Permissao::NOME_SISTEMA, Permissao::NOME_CADASTROBANCOS]);
+        $banco = BancoTest::create();
         $result = $this->get('/gerenciar/banco/', ['search' => $banco->getRazaoSocial()]);
         $this->assertEquals(200, $result->getStatusCode());
     }
 
     public function testAdd()
     {
-        $banco = BancoTest::build();
         AuthenticationTest::authProvider([Permissao::NOME_SISTEMA, Permissao::NOME_CADASTROBANCOS]);
+        $banco = BancoTest::build();
         $result = $this->post('/gerenciar/banco/cadastrar', $banco->toArray(), true);
         $this->assertEquals(302, $result->getStatusCode());
         $banco->load(['razaosocial' => $banco->getRazaoSocial()]);
@@ -49,8 +49,8 @@ class BancoPageControllerTest extends \MZ\Framework\TestCase
 
     public function testUpdate()
     {
-        $banco = BancoTest::create();
         AuthenticationTest::authProvider([Permissao::NOME_SISTEMA, Permissao::NOME_CADASTROBANCOS]);
+        $banco = BancoTest::create();
         $id = $banco->getID();
         $result = $this->post('/gerenciar/banco/editar?id=' . $id, $banco->toArray(), true);
         $banco->loadByID();
@@ -59,8 +59,8 @@ class BancoPageControllerTest extends \MZ\Framework\TestCase
 
     public function testDelete()
     {
-        $banco = BancoTest::create();
         AuthenticationTest::authProvider([Permissao::NOME_SISTEMA, Permissao::NOME_CADASTROBANCOS]);
+        $banco = BancoTest::create();
         $id = $banco->getID();
         $result = $this->get('/gerenciar/banco/excluir?id=' . $id);
         $banco->loadByID();

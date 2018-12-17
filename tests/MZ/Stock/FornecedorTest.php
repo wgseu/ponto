@@ -24,18 +24,73 @@
  */
 namespace MZ\Stock;
 
+use MZ\Account\ClienteTest;
+use MZ\Account\Cliente;
+
 class FornecedorTest extends \MZ\Framework\TestCase
 {
-    public function testPublish()
+    /**
+     * Build a valid fornecedor
+     * @param string $nome nome do fornecedor
+     * @return Fornecedor
+     */
+    public static function build($nome = null)
     {
+        $last = Fornecedor::find([], ['id' => -1]);
+        $id = $last->getID() + 1;
+        $cliente = ClienteTest::build();
+        $cliente->setTipo(Cliente::TIPO_JURIDICA);
+        $cliente->setNome($nome ?? "Fornecedor ${id}");
+        $cliente->setSobrenome(($nome ?? "Fornecedor ${id}") . ' LTDA');
+        $cliente->insert();
         $fornecedor = new Fornecedor();
-        $values = $fornecedor->publish(app()->auth->provider);
-        $allowed = [
-            'id',
-            'empresaid',
-            'prazopagamento',
-            'datacadastro',
-        ];
-        $this->assertEquals($allowed, array_keys($values));
+        $fornecedor->setEmpresaID($cliente->getID());
+        $fornecedor->setPrazoPagamento(30);
+        return $fornecedor;
+    }
+
+    /**
+     * Create a fornecedor on database
+     * @param string $nome nome do fornecedor
+     * @return Fornecedor
+     */
+    public static function create($nome = null)
+    {
+        $fornecedor = self::build($nome);
+        $fornecedor->insert();
+        return $fornecedor;
+    }
+
+    public function testFind()
+    {
+        $fornecedor = self::create();
+        $condition = ['empresaid' => $fornecedor->getEmpresaID()];
+        $found_fornecedor = Fornecedor::find($condition);
+        $this->assertEquals($fornecedor, $found_fornecedor);
+        list($found_fornecedor) = Fornecedor::findAll($condition, [], 1);
+        $this->assertEquals($fornecedor, $found_fornecedor);
+        $this->assertEquals(1, Fornecedor::count($condition));
+    }
+
+    public function testAdd()
+    {
+        $fornecedor = self::build();
+        $fornecedor->insert();
+        $this->assertTrue($fornecedor->exists());
+    }
+
+    public function testUpdate()
+    {
+        $fornecedor = self::create();
+        $fornecedor->update();
+        $this->assertTrue($fornecedor->exists());
+    }
+
+    public function testDelete()
+    {
+        $fornecedor = self::create();
+        $fornecedor->delete();
+        $fornecedor->loadByID();
+        $this->assertFalse($fornecedor->exists());
     }
 }

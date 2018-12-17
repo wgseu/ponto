@@ -107,21 +107,16 @@ class CaixaTest extends \MZ\Framework\TestCase
         $this->assertEquals($allowed, array_keys($values));
     }
 
-    public function testInsert()
+    public function testAdd()
     {
-        $caixa = self::create('Caixa 2');
-        $this->expectException('\MZ\Exception\ValidationException');
-        try {
-            $caixa->insert();
-        } catch (\MZ\Exception\ValidationException $e) {
-            $this->assertEquals(['descricao'], array_keys($e->getErrors()));
-            throw $e;
-        }
+        $caixa = self::build();
+        $caixa->insert();
+        $this->assertTrue($caixa->exists());
     }
 
     public function testUpdate()
     {
-        $caixa = self::create('Caixa 3');
+        $caixa = self::create('Caixa de número 3');
         $this->assertTrue($caixa->exists());
 
         $caixa->setDescricao('Cash register 3');
@@ -131,19 +126,19 @@ class CaixaTest extends \MZ\Framework\TestCase
 
     public function testFind()
     {
-        $caixa = self::create('Caixa 4');
+        $caixa = self::create('Caixa de número 4');
 
         $found_caixa = Caixa::findByID($caixa->getID());
         $this->assertEquals($caixa, $found_caixa);
-        $found_caixa = Caixa::findByDescricao('Caixa 4');
+        $found_caixa = Caixa::findByDescricao('Caixa de número 4');
         $this->assertEquals($caixa, $found_caixa);
 
-        $caixa_sec = self::create('Caixa 48');
+        $caixa_sec = self::create('Caixa de número 48');
 
-        $caixas = Caixa::findAll(['search' => 'Caixa 4'], [], 2, 0);
+        $caixas = Caixa::findAll(['search' => 'Caixa de número 4'], [], 2, 0);
         $this->assertEquals([$caixa, $caixa_sec], $caixas);
 
-        $count = Caixa::count(['search' => 'Caixa 4']);
+        $count = Caixa::count(['search' => 'Caixa de número 4']);
         $this->assertEquals(2, $count);
     }
 
@@ -151,7 +146,7 @@ class CaixaTest extends \MZ\Framework\TestCase
     {
         $old_value = app()->getSystem()->getBusiness()->getOptions()->getValue('Sistema', 'Fiscal.Mostrar');
         app()->getSystem()->getBusiness()->getOptions()->setValue('Sistema', 'Fiscal.Mostrar', true);
-        $caixa = self::create('Caixa 6');
+        $caixa = self::create('Caixa de número 6');
         app()->getSystem()->getBusiness()->getOptions()->setValue('Sistema', 'Fiscal.Mostrar', $old_value);
 
         $found_caixa = Caixa::findBySerie($caixa->getSerie());
@@ -178,9 +173,9 @@ class CaixaTest extends \MZ\Framework\TestCase
 
     public function testSearch()
     {
-        $caixa = self::create('Caixa 5');
+        $caixa = self::create('Caixa de número 5');
 
-        $found_caixa = Caixa::find(['search' => 'xa 5']);
+        $found_caixa = Caixa::find(['search' => 'xa de número 5']);
         $this->assertEquals($caixa, $found_caixa);
     }
 
@@ -206,7 +201,7 @@ class CaixaTest extends \MZ\Framework\TestCase
 
     public function testDesativarEmUso()
     {
-        $caixa = self::create('Caixa 7');
+        $caixa = self::create('Caixa de número 7');
 
         $sessao = new Sessao();
         $sessao->setAberta('Y');
@@ -232,12 +227,7 @@ class CaixaTest extends \MZ\Framework\TestCase
             throw $e;
         } finally {
             try {
-                $movimentacao->setDataFechamento(DB::now());
-                $movimentacao->setFechadorID($funcionario->getID());
-                $movimentacao->update();
-        
-                $sessao->setAberta('N');
-                $sessao->update();
+                MovimentacaoTest::close($movimentacao);
             } catch (\Exception $e) {
                 $this->fail($e->getMessage());
             }
@@ -246,7 +236,7 @@ class CaixaTest extends \MZ\Framework\TestCase
 
     public function testDelete()
     {
-        $caixa = self::create('Caixa 9');
+        $caixa = self::create('Caixa de número 9');
         $caixa->delete();
         $caixa->clean(new Caixa());
         $found_caixa = Caixa::findByID($caixa->getID());

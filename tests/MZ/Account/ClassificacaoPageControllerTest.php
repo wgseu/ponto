@@ -31,16 +31,16 @@ class ClassificacaoPageControllerTest extends \MZ\Framework\TestCase
 {
     public function testFind()
     {
-        $classificacao = ClassificacaoTest::create();
         AuthenticationTest::authProvider([Permissao::NOME_SISTEMA, Permissao::NOME_CADASTROCONTAS]);
+        $classificacao = ClassificacaoTest::create();
         $result = $this->get('/gerenciar/classificacao/', ['search' => $classificacao->getDescricao()]);
         $this->assertEquals(200, $result->getStatusCode());
     }
 
     public function testAdd()
     {
-        $classificacao = ClassificacaoTest::build();
         AuthenticationTest::authProvider([Permissao::NOME_SISTEMA, Permissao::NOME_CADASTROCONTAS]);
+        $classificacao = ClassificacaoTest::build();
         $result = $this->post('/gerenciar/classificacao/cadastrar', $classificacao->toArray(), true);
         $this->assertEquals(302, $result->getStatusCode());
         $classificacao->load(['descricao' => $classificacao->getDescricao()]);
@@ -49,8 +49,8 @@ class ClassificacaoPageControllerTest extends \MZ\Framework\TestCase
 
     public function testUpdate()
     {
-        $classificacao = ClassificacaoTest::create();
         AuthenticationTest::authProvider([Permissao::NOME_SISTEMA, Permissao::NOME_CADASTROCONTAS]);
+        $classificacao = ClassificacaoTest::create();
         $id = $classificacao->getID();
         $result = $this->post('/gerenciar/classificacao/editar?id=' . $id, $classificacao->toArray(), true);
         $classificacao->loadByID();
@@ -59,8 +59,8 @@ class ClassificacaoPageControllerTest extends \MZ\Framework\TestCase
 
     public function testDelete()
     {
-        $classificacao = ClassificacaoTest::create();
         AuthenticationTest::authProvider([Permissao::NOME_SISTEMA, Permissao::NOME_CADASTROCONTAS]);
+        $classificacao = ClassificacaoTest::create();
         $id = $classificacao->getID();
         $result = $this->get('/gerenciar/classificacao/excluir?id=' . $id);
         $classificacao->loadByID();

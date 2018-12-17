@@ -24,29 +24,77 @@
  */
 namespace MZ\Environment;
 
+use MZ\Account\ClienteTest;
+
 class PatrimonioTest extends \MZ\Framework\TestCase
 {
-    public function testPublish()
+    /**
+     * Build a valid patrimônio
+     * @param string $descricao Patrimônio descrição
+     * @return Patrimonio
+     */
+    public static function build($descricao = null)
     {
+        $last = Patrimonio::find([], ['id' => -1]);
+        $id = $last->getID() + 1;
+        $cliente = ClienteTest::create();
         $patrimonio = new Patrimonio();
-        $values = $patrimonio->publish(app()->auth->provider);
-        $allowed = [
-            'id',
-            'empresaid',
-            'fornecedorid',
-            'numero',
-            'descricao',
-            'quantidade',
-            'altura',
-            'largura',
-            'comprimento',
-            'estado',
-            'custo',
-            'valor',
-            'ativo',
-            'imagemanexada',
-            'dataatualizacao',
-        ];
-        $this->assertEquals($allowed, array_keys($values));
+        $patrimonio->setEmpresaID($cliente->getID());
+        $patrimonio->setNumero($id + 1000);
+        $patrimonio->setDescricao($descricao ?: "Patrimônio {$id}");
+        $patrimonio->setQuantidade(2);
+        $patrimonio->setAltura(3);
+        $patrimonio->setLargura(4);
+        $patrimonio->setComprimento(5.6);
+        $patrimonio->setEstado(Patrimonio::ESTADO_NOVO);
+        $patrimonio->setCusto(12.3);
+        $patrimonio->setValor(12.3);
+        $patrimonio->setAtivo('Y');
+        return $patrimonio;
+    }
+
+    /**
+     * Create a patrimônio on database
+     * @param string $descricao Patrimônio descrição
+     * @return Patrimonio
+     */
+    public static function create($descricao = null)
+    {
+        $patrimonio = self::build($descricao);
+        $patrimonio->insert();
+        return $patrimonio;
+    }
+
+    public function testFind()
+    {
+        $patrimonio = self::create();
+        $condition = ['descricao' => $patrimonio->getDescricao()];
+        $found_patrimonio = Patrimonio::find($condition);
+        $this->assertEquals($patrimonio, $found_patrimonio);
+        list($found_patrimonio) = Patrimonio::findAll($condition, [], 1);
+        $this->assertEquals($patrimonio, $found_patrimonio);
+        $this->assertEquals(1, Patrimonio::count($condition));
+    }
+
+    public function testAdd()
+    {
+        $patrimonio = self::build();
+        $patrimonio->insert();
+        $this->assertTrue($patrimonio->exists());
+    }
+
+    public function testUpdate()
+    {
+        $patrimonio = self::create();
+        $patrimonio->update();
+        $this->assertTrue($patrimonio->exists());
+    }
+
+    public function testDelete()
+    {
+        $patrimonio = self::create();
+        $patrimonio->delete();
+        $patrimonio->loadByID();
+        $this->assertFalse($patrimonio->exists());
     }
 }

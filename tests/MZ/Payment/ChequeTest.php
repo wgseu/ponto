@@ -24,26 +24,73 @@
  */
 namespace MZ\Payment;
 
+use MZ\Account\ClienteTest;
+use MZ\Wallet\BancoTest;
+
 class ChequeTest extends \MZ\Framework\TestCase
 {
-    public function testPublish()
+    /**
+     * Build a valid cheque
+     * @return Cheque
+     */
+    public static function build()
     {
+        $last = Cheque::find([], ['id' => -1]);
+        $id = $last->getID() + 1;
+        $cliente = ClienteTest::create();
+        $banco = BancoTest::create();
         $cheque = new Cheque();
-        $values = $cheque->publish(app()->auth->provider);
-        $allowed = [
-            'id',
-            'clienteid',
-            'bancoid',
-            'agencia',
-            'conta',
-            'numero',
-            'valor',
-            'vencimento',
-            'cancelado',
-            'recolhido',
-            'recolhimento',
-            'datacadastro',
-        ];
-        $this->assertEquals($allowed, array_keys($values));
+        $cheque->setClienteID($cliente->getID());
+        $cheque->setBancoID($banco->getID());
+        $cheque->setAgencia('Agência do cheque');
+        $cheque->setConta('Conta do cheque');
+        $cheque->setNumero($id);
+        $cheque->setValor(12.3);
+        $cheque->setVencimento('2016-12-25 12:15:00');
+        return $cheque;
+    }
+
+    /**
+     * Create a cheque on database
+     * @return Cheque
+     */
+    public static function create()
+    {
+        $cheque = self::build();
+        $cheque->insert();
+        return $cheque;
+    }
+
+    public function testFind()
+    {
+        $cheque = self::create();
+        $condition = ['bancoid' => $cheque->getBancoID()];
+        $found_cheque = Cheque::find($condition);
+        $this->assertEquals($cheque, $found_cheque);
+        list($found_cheque) = Cheque::findAll($condition, [], 1);
+        $this->assertEquals($cheque, $found_cheque);
+        $this->assertEquals(1, Cheque::count($condition));
+    }
+
+    public function testAdd()
+    {
+        $cheque = self::build();
+        $cheque->insert();
+        $this->assertTrue($cheque->exists());
+    }
+
+    public function testUpdate()
+    {
+        $cheque = self::create();
+        $cheque->update();
+        $this->assertTrue($cheque->exists());
+    }
+
+    public function testDelete()
+    {
+        $cheque = self::create();
+        $cheque->delete();
+        $cheque->loadByID();
+        $this->assertFalse($cheque->exists());
     }
 }

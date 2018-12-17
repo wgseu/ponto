@@ -32,8 +32,8 @@ class AcessoPageControllerTest extends \MZ\Framework\TestCase
 {
     public function testFind()
     {
-        list($acesso) = AcessoTest::create(FuncaoTest::create([]), [Permissao::NOME_ALTERARCONFIGURACOES]);
         AuthenticationTest::authOwner();
+        list($acesso) = AcessoTest::create(FuncaoTest::create([]), [Permissao::NOME_ALTERARCONFIGURACOES]);
         $result = $this->get('/gerenciar/acesso/', [
             'funcao' => $acesso->getFuncaoID(),
             'search' => $acesso->findPermissaoID()->getNome(),
@@ -43,9 +43,9 @@ class AcessoPageControllerTest extends \MZ\Framework\TestCase
 
     public function testAdd()
     {
+        AuthenticationTest::authOwner();
         $funcao = FuncaoTest::create([]);
         $permissao = Permissao::findByNome(Permissao::NOME_ALTERARCONFIGURACOES);
-        AuthenticationTest::authOwner();
         $result = $this->post('/gerenciar/acesso/', [
             'funcao' => $funcao->getID(),
             'permissao' => $permissao->getID(),
@@ -58,8 +58,8 @@ class AcessoPageControllerTest extends \MZ\Framework\TestCase
 
     public function testDelete()
     {
-        list($acesso) = AcessoTest::create(FuncaoTest::create([]), [Permissao::NOME_ALTERARCONFIGURACOES]);
         AuthenticationTest::authOwner();
+        list($acesso) = AcessoTest::create(FuncaoTest::create([]), [Permissao::NOME_ALTERARCONFIGURACOES]);
         $id = $acesso->getID();
         $result = $this->post('/gerenciar/acesso/', [
             'funcao' => $acesso->getFuncaoID(),

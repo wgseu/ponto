@@ -31,8 +31,8 @@ class TelefoneApiControllerTest extends \MZ\Framework\TestCase
 {
     public function testFind()
     {
-        $telefone = TelefoneTest::create();
         AuthenticationTest::authProvider([Permissao::NOME_SISTEMA, Permissao::NOME_CADASTROCLIENTES]);
+        $telefone = TelefoneTest::create();
         $expected = [
             'status' => 'ok',
             'items' => [
@@ -45,8 +45,8 @@ class TelefoneApiControllerTest extends \MZ\Framework\TestCase
 
     public function testAdd()
     {
-        $telefone = TelefoneTest::build();
         AuthenticationTest::authProvider([Permissao::NOME_SISTEMA, Permissao::NOME_CADASTROCLIENTES]);
+        $telefone = TelefoneTest::build();
         $expected = [
             'status' => 'ok',
             'item' => $telefone->publish(app()->auth->provider),
@@ -58,8 +58,8 @@ class TelefoneApiControllerTest extends \MZ\Framework\TestCase
 
     public function testUpdate()
     {
-        $telefone = TelefoneTest::create();
         AuthenticationTest::authProvider([Permissao::NOME_SISTEMA, Permissao::NOME_CADASTROCLIENTES]);
+        $telefone = TelefoneTest::create();
         $id = $telefone->getID();
         $result = $this->patch('/api/telefones/' . $id, $telefone->toArray());
         $telefone->loadByID();
@@ -72,8 +72,8 @@ class TelefoneApiControllerTest extends \MZ\Framework\TestCase
 
     public function testDelete()
     {
-        $telefone = TelefoneTest::create();
         AuthenticationTest::authProvider([Permissao::NOME_SISTEMA, Permissao::NOME_CADASTROCLIENTES]);
+        $telefone = TelefoneTest::create();
         $id = $telefone->getID();
         $result = $this->delete('/api/telefones/' . $id);
         $telefone->loadByID();

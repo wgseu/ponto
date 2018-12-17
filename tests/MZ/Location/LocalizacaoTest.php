@@ -44,7 +44,7 @@ class LocalizacaoTest extends \MZ\Framework\TestCase
         $localizacao->setClienteID($cliente->getID());
         $localizacao->setBairroID($bairro->getID());
         $localizacao->setLogradouro($logradouro ?: "Localização {$id}");
-        $localizacao->setNumero('Número da localização');
+        $localizacao->setNumero("{$id}");
         return $localizacao;
     }
 

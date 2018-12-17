@@ -31,16 +31,16 @@ class CreditoPageControllerTest extends \MZ\Framework\TestCase
 {
     public function testFind()
     {
-        $credito = CreditoTest::create();
         AuthenticationTest::authProvider([Permissao::NOME_SISTEMA, Permissao::NOME_CADASTRARCREDITOS]);
+        $credito = CreditoTest::create();
         $result = $this->get('/gerenciar/credito/', ['search' => $credito->getDetalhes()]);
         $this->assertEquals(200, $result->getStatusCode());
     }
 
     public function testCancel()
     {
-        $credito = CreditoTest::create();
         AuthenticationTest::authProvider([Permissao::NOME_SISTEMA, Permissao::NOME_CADASTRARCREDITOS]);
+        $credito = CreditoTest::create();
         $id = $credito->getID();
         $this->assertFalse($credito->isCancelado());
         $result = $this->get('/gerenciar/credito/cancelar?id=' . $id);

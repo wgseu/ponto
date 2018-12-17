@@ -133,12 +133,13 @@ class Custom extends Engine
 
     /**
      * Format float value to country currency format
-     * @param  string $value value to be formatted
+     * @param string $value value to be formatted
+     * @param \MZ\Wallet\Moeda $currency curency of value
      * @return string currency formatted
      */
-    public function currency($value)
+    public function currency($value, $currency = null)
     {
-        return Mask::money($value, true);
+        return Mask::money($value, true, $currency);
     }
 
     /**

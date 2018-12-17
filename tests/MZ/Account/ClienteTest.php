@@ -45,6 +45,7 @@ class ClienteTest extends \MZ\Framework\TestCase
         $cliente->setLogin("login_{$id}");
         $cliente->setGenero(Cliente::GENERO_MASCULINO);
         $cliente->setSenha('1234');
+        $cliente->setLimiteCompra(0);
         return $cliente;
     }
 

@@ -24,6 +24,10 @@
  */
 namespace MZ\Company;
 
+use MZ\Provider\FuncaoTest;
+use MZ\Provider\PrestadorTest;
+use MZ\System\IntegracaoTest;
+
 class HorarioTest extends \MZ\Framework\TestCase
 {
     /**
@@ -36,6 +40,7 @@ class HorarioTest extends \MZ\Framework\TestCase
         $last = Horario::find([], ['id' => -1]);
         $id = $last->getID() + 1;
         $horario = new Horario();
+        $horario->setMensagem($mensagem);
         $horario->setInicio(10000 + $id);
         $horario->setFim(20000 + $id);
         return $horario;
@@ -55,13 +60,23 @@ class HorarioTest extends \MZ\Framework\TestCase
 
     public function testFind()
     {
-        $horario = self::create();
-        $condition = ['inicio' => $horario->getInicio()];
+        $mensagem = 'Estamos de férias';
+        $horario = self::create($mensagem);
+        $condition = ['inicio' => $horario->getInicio(), 'search' => $mensagem];
         $found_horario = Horario::find($condition);
         $this->assertEquals($horario, $found_horario);
         list($found_horario) = Horario::findAll($condition, [], 1);
         $this->assertEquals($horario, $found_horario);
         $this->assertEquals(1, Horario::count($condition));
+    }
+
+    public function testAddInvalid()
+    {
+        $horario = new Horario();
+        $horario->setModo('Livre');
+        $horario->setFechado('S');
+        $this->expectException('\MZ\Exception\ValidationException');
+        $horario->insert();
     }
 
     public function testAdd()
@@ -84,5 +99,36 @@ class HorarioTest extends \MZ\Framework\TestCase
         $horario->delete();
         $horario->loadByID();
         $this->assertFalse($horario->exists());
+    }
+
+    public function testMethods()
+    {
+        $horario = self::build();
+        $horario->setFechado('Y');
+        $horario->fromArray($horario);
+        $horario->insert();
+        $this->assertTrue($horario->isFechado());
+        $horario->fromArray(null);
+    }
+
+    public function testFindReferenceByID()
+    {
+        $horario = self::create();
+        $this->assertFalse($horario->findFuncaoID()->exists());
+        $horario->setFuncaoID(FuncaoTest::create([])->getID());
+        $this->assertTrue($horario->findFuncaoID()->exists());
+        
+        $this->assertFalse($horario->findPrestadorID()->exists());
+        $horario->setPrestadorID(PrestadorTest::create()->getID());
+        $this->assertTrue($horario->findPrestadorID()->exists());
+        
+        $this->assertFalse($horario->findIntegracaoID()->exists());
+        $horario->setIntegracaoID(IntegracaoTest::create()->getID());
+        $this->assertTrue($horario->findIntegracaoID()->exists());
+    }
+
+    public function testModoOptions()
+    {
+        $this->assertInternalType('string', Horario::getModoOptions(Horario::MODO_OPERACAO));
     }
 }

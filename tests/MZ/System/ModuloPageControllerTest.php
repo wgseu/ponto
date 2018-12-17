@@ -31,16 +31,16 @@ class ModuloPageControllerTest extends \MZ\Framework\TestCase
 {
     public function testFind()
     {
-        $modulo = Modulo::find([]);
         AuthenticationTest::authProvider([Permissao::NOME_SISTEMA, Permissao::NOME_ALTERARCONFIGURACOES]);
+        $modulo = Modulo::find([]);
         $result = $this->get('/gerenciar/modulo/', ['search' => $modulo->getNome()]);
         $this->assertEquals(200, $result->getStatusCode());
     }
 
     public function testUpdate()
     {
-        $modulo = Modulo::find([]);
         AuthenticationTest::authProvider([Permissao::NOME_SISTEMA, Permissao::NOME_ALTERARCONFIGURACOES]);
+        $modulo = Modulo::find([]);
         $id = $modulo->getID();
         $result = $this->post('/gerenciar/modulo/editar?id=' . $id, $modulo->toArray(), true);
         $modulo->loadByID();

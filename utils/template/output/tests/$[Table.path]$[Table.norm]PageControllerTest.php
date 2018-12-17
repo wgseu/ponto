@@ -33,16 +33,16 @@ class $[Table.norm]PageControllerTest extends \MZ\Framework\TestCase
 {
     public function testFind()
     {
-        $$[table.unix] = $[Table.norm]Test::create();
         AuthenticationTest::authProvider([Permissao::NOME_SISTEMA, Permissao::NOME_$[TABLE.style]]);
+        $$[table.unix] = $[Table.norm]Test::create();
         $result = $this->get('/gerenciar/$[table.unix]/', ['search' => $$[table.unix]->get$[Descriptor.norm]()]);
         $this->assertEquals(200, $result->getStatusCode());
     }
 
     public function testAdd()
     {
-        $$[table.unix] = $[Table.norm]Test::build();
         AuthenticationTest::authProvider([Permissao::NOME_SISTEMA, Permissao::NOME_$[TABLE.style]]);
+        $$[table.unix] = $[Table.norm]Test::build();
         $result = $this->post('/gerenciar/$[table.unix]/cadastrar', $$[table.unix]->toArray(), true);
         $this->assertEquals(302, $result->getStatusCode());
         $$[table.unix]->load(['$[descriptor]' => $$[table.unix]->get$[Descriptor.norm]()]);
@@ -51,8 +51,8 @@ class $[Table.norm]PageControllerTest extends \MZ\Framework\TestCase
 
     public function testUpdate()
     {
-        $$[table.unix] = $[Table.norm]Test::create();
         AuthenticationTest::authProvider([Permissao::NOME_SISTEMA, Permissao::NOME_$[TABLE.style]]);
+        $$[table.unix] = $[Table.norm]Test::create();
         $id = $$[table.unix]->get$[Primary.norm]();
         $result = $this->post('/gerenciar/$[table.unix]/editar?id=' . $id, $$[table.unix]->toArray(), true);
         $$[table.unix]->loadBy$[Primary.norm]();
@@ -61,8 +61,8 @@ class $[Table.norm]PageControllerTest extends \MZ\Framework\TestCase
 
     public function testDelete()
     {
-        $$[table.unix] = $[Table.norm]Test::create();
         AuthenticationTest::authProvider([Permissao::NOME_SISTEMA, Permissao::NOME_$[TABLE.style]]);
+        $$[table.unix] = $[Table.norm]Test::create();
         $id = $$[table.unix]->get$[Primary.norm]();
         $result = $this->get('/gerenciar/$[table.unix]/excluir?id=' . $id);
         $$[table.unix]->loadBy$[Primary.norm]();

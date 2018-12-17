@@ -24,25 +24,73 @@
  */
 namespace MZ\Device;
 
+use MZ\Environment\SetorTest;
+
 class ImpressoraTest extends \MZ\Framework\TestCase
 {
-    public function testPublish()
+    /**
+     * Build a valid impressora
+     * @param string $descricao Impressora descrição
+     * @return Impressora
+     */
+    public static function build($descricao = null)
     {
+        $last = Impressora::find([], ['id' => -1]);
+        $id = $last->getID() + 1;
+        $setor = SetorTest::create();
         $impressora = new Impressora();
-        $values = $impressora->publish(app()->auth->provider);
-        $allowed = [
-            'id',
-            'setorid',
-            'dispositivoid',
-            'nome',
-            'driver',
-            'descricao',
-            'modo',
-            'opcoes',
-            'colunas',
-            'avanco',
-            'comandos',
-        ];
-        $this->assertEquals($allowed, array_keys($values));
+        $impressora->setSetorID($setor->getID());
+        $impressora->setNome('Nome da impressora');
+        $impressora->setDescricao($descricao ?: "Impressora {$id}");
+        $impressora->setModo(Impressora::MODO_TERMINAL);
+        $impressora->setOpcoes(123);
+        $impressora->setColunas(48);
+        $impressora->setAvanco(3);
+        return $impressora;
+    }
+
+    /**
+     * Create a impressora on database
+     * @param string $descricao Impressora descrição
+     * @return Impressora
+     */
+    public static function create($descricao = null)
+    {
+        $impressora = self::build($descricao);
+        $impressora->insert();
+        return $impressora;
+    }
+
+    public function testFind()
+    {
+        $impressora = self::create();
+        $condition = ['descricao' => $impressora->getDescricao()];
+        $found_impressora = Impressora::find($condition);
+        $this->assertEquals($impressora, $found_impressora);
+        list($found_impressora) = Impressora::findAll($condition, [], 1);
+        $this->assertEquals($impressora, $found_impressora);
+        $this->assertEquals(1, Impressora::count($condition));
+    }
+
+    public function testAdd()
+    {
+        $impressora = self::build();
+        $impressora->insert();
+        $this->assertTrue($impressora->exists());
+    }
+
+    public function testUpdate()
+    {
+        $impressora = self::create();
+        $impressora->update();
+        $this->assertTrue($impressora->exists());
+    }
+
+    public function testDelete()
+    {
+        $impressora = self::create();
+        $impressora->delete();
+        $impressora->loadByID();
+        $this->assertFalse($impressora->exists());
     }
 }

@@ -71,7 +71,7 @@ class ProdutoOldApiController extends \MZ\Core\ApiController
             $condition['permitido'] = 'Y';
             $condition['visivel'] = 'Y';
         }
-        $produtos = Produto::rawFindAll($condition, [], $limit);
+        $produtos = Produto::rawFindAllEx($condition, [], $limit);
         $campos = [
             'id',
             'codigo',

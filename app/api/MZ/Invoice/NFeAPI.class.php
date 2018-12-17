@@ -28,13 +28,21 @@ use MZ\Database\DB;
 
 class NFeAPI extends \NFe\Common\Ajuste
 {
+    /**
+     * @var \NFe\Core\SEFAZ
+     */
     private $sefaz;
+    /**
+     * @var Emitente
+     */
     private $external_emitente;
+    /**
+     * @var Regime
+     */
     private $external_regime;
 
     public function init()
     {
-
         $empresa = app()->getSystem()->getCompany();
         $localizacao = app()->getSystem()->getLocalization();
         $bairro = app()->getSystem()->getDistrict();
@@ -205,9 +213,7 @@ class NFeAPI extends \NFe\Common\Ajuste
     }
 
     /**
-     * Chamado quando a forma de emissão da nota fiscal muda para contingência,
-     * aqui deve ser decidido se o número da nota deverá ser pulado e se esse
-     * número deve ser cancelado ou inutilizado
+     * Chamado quando a forma de emissão da nota fiscal muda para contingência
      */
     public function onNotaContingencia($nota, $offline, $exception)
     {
@@ -321,7 +327,8 @@ class NFeAPI extends \NFe\Common\Ajuste
     /**
      * Chamado após tentar enviar uma nota e não ter certeza se ela foi
      * recebida ou não (problemas técnicos), deverá ser feito uma consulta pela
-     * chave para obter o estado da nota
+     * chave para obter o estado da nota,
+     * aqui deve ser cancelada a nota incerta e gerar outra em contingência
      */
     public function onNotaPendente($nota, $xml, $exception)
     {
@@ -451,7 +458,7 @@ class NFeAPI extends \NFe\Common\Ajuste
     }
     
     /**
-     * Chamado quando uma ação é executada
+     * Chamado quando uma tarefa é executada com sucesso
      */
     public function onTarefaExecutada($tarefa, $retorno)
     {

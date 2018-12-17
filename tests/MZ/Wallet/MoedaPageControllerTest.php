@@ -31,16 +31,16 @@ class MoedaPageControllerTest extends \MZ\Framework\TestCase
 {
     public function testFind()
     {
-        $moeda = MoedaTest::create();
         AuthenticationTest::authProvider([Permissao::NOME_SISTEMA, Permissao::NOME_CADASTROMOEDAS]);
+        $moeda = MoedaTest::create();
         $result = $this->get('/gerenciar/moeda/', ['search' => $moeda->getNome()]);
         $this->assertEquals(200, $result->getStatusCode());
     }
 
     public function testAdd()
     {
-        $moeda = MoedaTest::build();
         AuthenticationTest::authProvider([Permissao::NOME_SISTEMA, Permissao::NOME_CADASTROMOEDAS]);
+        $moeda = MoedaTest::build();
         $result = $this->post('/gerenciar/moeda/cadastrar', $moeda->toArray(), true);
         $this->assertEquals(302, $result->getStatusCode());
         $moeda->load(['nome' => $moeda->getNome()]);
@@ -49,8 +49,8 @@ class MoedaPageControllerTest extends \MZ\Framework\TestCase
 
     public function testUpdate()
     {
-        $moeda = MoedaTest::create();
         AuthenticationTest::authProvider([Permissao::NOME_SISTEMA, Permissao::NOME_CADASTROMOEDAS]);
+        $moeda = MoedaTest::create();
         $id = $moeda->getID();
         $result = $this->post('/gerenciar/moeda/editar?id=' . $id, $moeda->toArray(), true);
         $moeda->loadByID();
@@ -59,8 +59,8 @@ class MoedaPageControllerTest extends \MZ\Framework\TestCase
 
     public function testDelete()
     {
-        $moeda = MoedaTest::create();
         AuthenticationTest::authProvider([Permissao::NOME_SISTEMA, Permissao::NOME_CADASTROMOEDAS]);
+        $moeda = MoedaTest::create();
         $id = $moeda->getID();
         $result = $this->get('/gerenciar/moeda/excluir?id=' . $id);
         $moeda->loadByID();

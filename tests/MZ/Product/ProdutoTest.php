@@ -28,35 +28,46 @@ use MZ\System\Permissao;
 use MZ\Account\AuthenticationTest;
 use MZ\Stock\EstoqueTest;
 use MZ\Stock\Estoque;
+use MZ\Environment\SetorTest;
 
 class ProdutoTest extends \MZ\Framework\TestCase
 {
+    /**
+     * @param string $descricao descricao do produto
+     * @return Produto
+     */
     public static function build($descricao = null)
     {
         $last = Produto::find([], ['id' => -1]);
         $id = $last->getID() + 1;
         $categoria = CategoriaTest::create();
         $unidade = UnidadeTest::create();
+        $setor = SetorTest::create();
         $produto = new Produto();
         $produto->setCodigo($id);
         $produto->setCategoriaID($categoria->getID());
         $produto->setUnidadeID($unidade->getID());
+        $produto->setSetorPreparoID($setor->getID());
         $produto->setDescricao($descricao ?: "Produto #{$id}");
-        $produto->setQuantidadeLimite(0);
-        $produto->setQuantidadeMaxima(0);
+        $produto->setQuantidadeLimite(10);
+        $produto->setQuantidadeMaxima(100);
         $produto->setConteudo(1);
-        $produto->setPrecoVenda(0);
+        $produto->setPrecoVenda(3.50);
         $produto->setTipo(Produto::TIPO_PRODUTO);
         $produto->setCobrarServico('Y');
         $produto->setDivisivel('Y');
         $produto->setPesavel('Y');
         $produto->setPerecivel('Y');
-        $produto->setTempoPreparo(0);
+        $produto->setTempoPreparo(10);
         $produto->setVisivel('Y');
         $produto->setInterno('N');
         return $produto;
     }
 
+    /**
+     * @param string $descricao descricao do produto
+     * @return Produto
+     */
     public static function create($descricao = null)
     {
         $produto = self::build($descricao);
@@ -102,9 +113,9 @@ class ProdutoTest extends \MZ\Framework\TestCase
 
     public function testAppList()
     {
+        AuthenticationTest::authProvider([Permissao::NOME_SISTEMA, Permissao::NOME_CADASTROPRODUTOS]);
         $estoque = EstoqueTest::create();
         $produto = $estoque->findProdutoID();
-        AuthenticationTest::authProvider([Permissao::NOME_SISTEMA, Permissao::NOME_CADASTROPRODUTOS]);
         $campos = [
             'id',
             'codigo',
@@ -149,9 +160,9 @@ class ProdutoTest extends \MZ\Framework\TestCase
 
     public function testAppFind()
     {
+        AuthenticationTest::authProvider([Permissao::NOME_SISTEMA, Permissao::NOME_CADASTROPRODUTOS]);
         $estoque = EstoqueTest::create();
         $produto = $estoque->findProdutoID();
-        AuthenticationTest::authProvider([Permissao::NOME_SISTEMA, Permissao::NOME_CADASTROPRODUTOS]);
         $campos = [
             'id',
             'codigo',

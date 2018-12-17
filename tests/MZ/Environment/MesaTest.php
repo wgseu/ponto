@@ -26,6 +26,34 @@ namespace MZ\Environment;
 
 class MesaTest extends \MZ\Framework\TestCase
 {
+    /**
+     * Build a valid mesa
+     * @param string $nome Mesa nome
+     * @return Mesa
+     */
+    public static function build($nome = null)
+    {
+        $last = Mesa::find([], ['id' => -1]);
+        $id = $last->getID() + 1;
+        $mesa = new Mesa();
+        $mesa->setNumero($id);
+        $mesa->setNome($nome ?: "Mesa {$id}");
+        $mesa->setAtiva('Y');
+        return $mesa;
+    }
+
+    /**
+     * Create a mesa on database
+     * @param string $nome Mesa nome
+     * @return Mesa
+     */
+    public static function create($nome = null)
+    {
+        $mesa = self::build($nome);
+        $mesa->insert();
+        return $mesa;
+    }
+
     public function testFromArray()
     {
         $old_mesa = new Mesa([

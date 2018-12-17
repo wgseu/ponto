@@ -42,8 +42,7 @@ class PagamentoPageController extends PageController
 {
     public function dashboard()
     {
-        app()->needManager();
-        app()->needOwner();
+        app()->needPermission([Permissao::NOME_RELATORIOFLUXO]);
         
         $data_inicio = strtotime('first day of last month 0:00');
         $data_fim = strtotime('-1 sec tomorrow');
@@ -146,11 +145,12 @@ class PagamentoPageController extends PageController
 
         $_pagamento_icon = [
             'Dinheiro' => 0,
-            'Cartao' => 16,
+            'Credito' => 16,
+            'Debito' => 16,
+            'Vale' => 16,
             'Cheque' => 32,
-            'Conta' => 48,
-            'Credito' => 64,
-            'Transferencia' => 80,
+            'Crediario' => 48,
+            'Saldo' => 64,
         ];
 
         $formas_de_pagamento = FormaPagto::findAll();

@@ -65,7 +65,7 @@ class PedidoOldApiController extends \MZ\Core\ApiController
                     'i.detalhes'
                 ];
             }
-            $itens = Item::rawFindAll(
+            $itens = Item::rawFindAllEx(
                 [
                     'detalhado' => true,
                     'pedidoid' => $pedido->getID(),
@@ -177,7 +177,32 @@ class PedidoOldApiController extends \MZ\Core\ApiController
         $order = new Order();
         $order->setEmployee(app()->auth->provider);
         try {
-            $order->loadData($this->getRequest()->request->all());
+            $data = $this->getRequest()->request->all();
+            $data['mesaid'] = $data['mesa'] ?? null;
+            unset($data['mesa']);
+            $data['comandaid'] = $data['comanda'] ?? null;
+            unset($data['comanda']);
+            $tipo = $data['tipo'] ?? 'mesa';
+            if ($tipo == 'mesa') {
+                $data['tipo'] = Pedido::TIPO_MESA;
+            } elseif ($tipo == 'comanda') {
+                $data['tipo'] = Pedido::TIPO_COMANDA;
+            } else {
+                $data['tipo'] = null;
+            }
+            if (isset($data['cliente']) && check_fone($data['cliente'], true)) {
+                $cliente = Cliente::findByFone($data['cliente']);
+                $data['clienteid'] = $cliente->getID();
+                unset($data['cliente']);
+            }
+            $pedidos = $data['pedidos'] ?? [];
+            foreach ($pedidos as $index => $produto_pedido) {
+                $pedidos[$index]['itemid'] = $produto_pedido['produtopedidoid'] ?? null;
+                unset($pedidos[$index]['produtopedidoid']);
+            }
+            $data['itens'] = $pedidos;
+            unset($data['pedidos']);
+            $order->loadData($data);
             $order->search();
             $order->process();
         } catch (\Exception $e) {

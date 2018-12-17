@@ -36,7 +36,7 @@ class GrupoOldApiController extends \MZ\Core\ApiController
         if (!$produto->exists()) {
             return $this->json()->error('Produto não informado ou não existente');
         }
-        $grupos = Grupo::rawFindAll(['produtoid' => $produto->getID()]);
+        $grupos = Grupo::rawFindAllEx(['produtoid' => $produto->getID()]);
         return $this->json()->success(['grupos' => $grupos]);
     }
 

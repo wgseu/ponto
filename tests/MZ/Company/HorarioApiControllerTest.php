@@ -31,8 +31,8 @@ class HorarioApiControllerTest extends \MZ\Framework\TestCase
 {
     public function testFind()
     {
-        $horario = HorarioTest::create();
         AuthenticationTest::authProvider([Permissao::NOME_SISTEMA, Permissao::NOME_ALTERARHORARIO]);
+        $horario = HorarioTest::create();
         $expected = [
             'status' => 'ok',
             'items' => [
@@ -45,8 +45,8 @@ class HorarioApiControllerTest extends \MZ\Framework\TestCase
 
     public function testAdd()
     {
-        $horario = HorarioTest::build();
         AuthenticationTest::authProvider([Permissao::NOME_SISTEMA, Permissao::NOME_ALTERARHORARIO]);
+        $horario = HorarioTest::build();
         $expected = [
             'status' => 'ok',
             'item' => $horario->publish(app()->auth->provider),
@@ -58,8 +58,8 @@ class HorarioApiControllerTest extends \MZ\Framework\TestCase
 
     public function testUpdate()
     {
-        $horario = HorarioTest::create();
         AuthenticationTest::authProvider([Permissao::NOME_SISTEMA, Permissao::NOME_ALTERARHORARIO]);
+        $horario = HorarioTest::create();
         $id = $horario->getID();
         $result = $this->patch('/api/horarios/' . $id, $horario->toArray());
         $horario->loadByID();
@@ -72,8 +72,8 @@ class HorarioApiControllerTest extends \MZ\Framework\TestCase
 
     public function testDelete()
     {
-        $horario = HorarioTest::create();
         AuthenticationTest::authProvider([Permissao::NOME_SISTEMA, Permissao::NOME_ALTERARHORARIO]);
+        $horario = HorarioTest::create();
         $id = $horario->getID();
         $result = $this->delete('/api/horarios/' . $id);
         $horario->loadByID();

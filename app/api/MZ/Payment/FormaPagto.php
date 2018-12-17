@@ -418,6 +418,17 @@ class FormaPagto extends SyncModel
     }
 
     /**
+     * Informa se a forma de pagamento usa cartão
+     * @return boolean true se usa cartão
+     */
+    public function usaCartao()
+    {
+        return $this->getTipo() == self::TIPO_CREDITO ||
+            $this->getTipo() == self::TIPO_DEBITO ||
+            $this->getTipo() == self::TIPO_VALE;
+    }
+
+    /**
      * Filter fields, upload data and keep key data
      * @param self $original Original instance without modifications
      * @param \MZ\Provider\Prestador $updater user that want to update this object

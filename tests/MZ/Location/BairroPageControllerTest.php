@@ -31,16 +31,16 @@ class BairroPageControllerTest extends \MZ\Framework\TestCase
 {
     public function testFind()
     {
-        $bairro = BairroTest::create();
         AuthenticationTest::authProvider([Permissao::NOME_SISTEMA, Permissao::NOME_CADASTROBAIRROS]);
+        $bairro = BairroTest::create();
         $result = $this->get('/gerenciar/bairro/', ['search' => $bairro->getNome()]);
         $this->assertEquals(200, $result->getStatusCode());
     }
 
     public function testAdd()
     {
-        $bairro = BairroTest::build();
         AuthenticationTest::authProvider([Permissao::NOME_SISTEMA, Permissao::NOME_CADASTROBAIRROS]);
+        $bairro = BairroTest::build();
         $result = $this->post('/gerenciar/bairro/cadastrar', $bairro->toArray(), true);
         $this->assertEquals(302, $result->getStatusCode());
         $bairro->load(['nome' => $bairro->getNome()]);
@@ -49,8 +49,8 @@ class BairroPageControllerTest extends \MZ\Framework\TestCase
 
     public function testUpdate()
     {
-        $bairro = BairroTest::create();
         AuthenticationTest::authProvider([Permissao::NOME_SISTEMA, Permissao::NOME_CADASTROBAIRROS]);
+        $bairro = BairroTest::create();
         $id = $bairro->getID();
         $result = $this->post('/gerenciar/bairro/editar?id=' . $id, $bairro->toArray(), true);
         $bairro->loadByID();
@@ -59,8 +59,8 @@ class BairroPageControllerTest extends \MZ\Framework\TestCase
 
     public function testDelete()
     {
-        $bairro = BairroTest::create();
         AuthenticationTest::authProvider([Permissao::NOME_SISTEMA, Permissao::NOME_CADASTROBAIRROS]);
+        $bairro = BairroTest::create();
         $id = $bairro->getID();
         $result = $this->get('/gerenciar/bairro/excluir?id=' . $id);
         $bairro->loadByID();

@@ -333,7 +333,7 @@ class Application
     public function needLogin()
     {
         if (!$this->getAuthentication()->isLogin()) {
-            throw new RedirectException(_t('need_login'), Response::HTTP_UNAUTHORIZED, '/conta/entrar');
+            throw new RedirectException(_t('need_login'), Response::HTTP_UNAUTHORIZED, '/#/login');
         }
         return $this;
     }
@@ -347,7 +347,7 @@ class Application
     {
         $this->needLogin();
         if (!$this->getAuthentication()->isManager()) {
-            throw new RedirectException(_t('need_manager'), Response::HTTP_FORBIDDEN, '/conta/entrar');
+            throw new RedirectException(_t('need_manager'), Response::HTTP_FORBIDDEN, '/#/login');
         }
         return $this;
     }

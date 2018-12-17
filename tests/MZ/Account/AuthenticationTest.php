@@ -26,7 +26,6 @@ namespace MZ\Account;
 
 use MZ\Database\DB;
 use MZ\System\Permissao;
-use MZ\System\Sistema;
 
 class AuthenticationTest extends \MZ\Framework\TestCase
 {
@@ -79,65 +78,5 @@ class AuthenticationTest extends \MZ\Framework\TestCase
         self::authProvider([Permissao::NOME_SISTEMA]);
         $this->assertTrue(app()->getAuthentication()->getUser()->exists());
         $this->assertTrue(app()->getAuthentication()->getEmployee()->exists());
-    }
-
-    public function testAppStatus()
-    {
-        $expected = [
-            'status' => 'ok',
-            'info' => [
-                'empresa' => [
-                    'nome' => 'Aleatorio',
-                    'imagemurl' => null
-                ],
-            ],
-            'versao' => Sistema::VERSAO,
-            'validacao' => '',
-            'autologout' => false,
-            'acesso' => 'visitante',
-            'permissoes' => []
-        ];
-        self::authProvider([]);
-        app()->getAuthentication()->logout();
-        $result = $this->get('/app/conta/status');
-        $this->assertEquals($expected, \array_intersect_key($result, $expected));
-    }
-
-    public function testAppEntrar()
-    {
-        app()->getAuthentication()->logout();
-        $dispositivo = \MZ\Device\DispositivoTest::create();
-        $prestador = \MZ\Provider\PrestadorTest::create();
-        $cliente = $prestador->findClienteID();
-        $permissoes = \MZ\System\Acesso::getPermissoes($prestador->getFuncaoID());
-        $senha = 'zA491aZ';
-        $cliente->setSenha($senha);
-        $cliente->update();
-        $data = [
-            'usuario' => $cliente->getLogin(),
-            'senha' => $senha,
-            'device' => $dispositivo->getNome(),
-            'serial' => $dispositivo->getSerial(),
-        ];
-        $result = $this->post('/app/conta/entrar', $data, true);
-        $dispositivo->delete();
-        $expected = [
-            'status' => 'ok',
-            'info' => [
-                'usuario' => [
-                    'nome' => $cliente->getNome(),
-                    'email' => $cliente->getEmail(),
-                    'login' => $cliente->getLogin(),
-                    'imagemurl' => $cliente->makeImagemURL(false, null),
-                ],
-            ],
-            'funcionario' => intval($prestador->getID()),
-            'versao' => Sistema::VERSAO,
-            'cliente' => $cliente->getID(),
-            'autologout' => false,
-            'acesso' => 'funcionario',
-            'permissoes' => $permissoes,
-        ];
-        $this->assertEquals($expected, \array_intersect_key($result, $expected));
     }
 }

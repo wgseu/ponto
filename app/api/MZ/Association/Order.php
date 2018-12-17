@@ -516,25 +516,15 @@ class Order extends Pedido
         $this->city = null;
         $this->state = null;
         $this->country = null;
-        $_pedidos = isset($data['pedidos']) ? $data['pedidos'] : [];
-        $this->setTipo(self::TIPO_MESA);
-        if (isset($data['tipo'])) {
-            if ($data['tipo'] == 'comanda') {
-                $this->setTipo(self::TIPO_COMANDA);
-            } elseif ($data['tipo'] == 'mesa') {
-                $this->setTipo(self::TIPO_MESA);
-            /*} elseif ($data['tipo'] == 'avulso') {
-                $this->setTipo(self::TIPO_AVULSO);
-            } elseif ($data['tipo'] == 'entrega') {
-                $this->setTipo(self::TIPO_ENTREGA);*/
-            } else {
-                throw new \Exception('Tipo de lançamento não suportado nessa versão', 500);
-            }
+        $_pedidos = $data['itens'] ?? [];
+        $this->setTipo($data['tipo'] ?? self::TIPO_MESA);
+        if ($this->getTipo() != self::TIPO_MESA && $this->getTipo() != self::TIPO_COMANDA) {
+            throw new \Exception('Tipo de lançamento não suportado nessa versão', 500);
         }
-        $this->setMesaID(isset($data['mesa']) && $data['mesa'] ? intval($data['mesa']) : null);
-        $this->setComandaID(isset($data['comanda']) ? intval($data['comanda']) : null);
-        if (isset($data['cliente']) && check_fone($data['cliente'], true)) {
-            $this->customer = Cliente::findByFone($data['cliente']);
+        $this->setMesaID($data['mesaid'] ?? null);
+        $this->setComandaID($data['comandaid'] ?? null);
+        if (isset($data['clienteid'])) {
+            $this->customer = Cliente::findByID($data['clienteid']);
             if (!$this->customer->exists()) {
                 $this->customer = null;
             }
@@ -549,9 +539,7 @@ class Order extends Pedido
         $parent_index = null;
         $this->products = [];
         $parent_products = [];
-        foreach ($_pedidos as $_produto_pedido) {
-            $_item = $_produto_pedido;
-            $_item['itemid'] = $_item['produtopedidoid'] ?? $_item['itemid'] ?? null;
+        foreach ($_pedidos as $_item) {
             $produto_pedido = new Item($_item);
             if (!is_null($produto_pedido->getItemID())) {
                 if (isset($parent_products[$produto_pedido->getItemID()])) {
@@ -569,7 +557,7 @@ class Order extends Pedido
                 }
             }
             $formacoes = [];
-            $_formacoes = isset($_item['formacoes']) ? $_item['formacoes'] : [];
+            $_formacoes = $_item['formacoes'] ?? [];
             foreach ($_formacoes as $_formacao) {
                 $formacoes[] = new Formacao($_formacao);
             }

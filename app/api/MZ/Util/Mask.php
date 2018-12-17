@@ -73,11 +73,12 @@ class Mask
 
     /**
      * Convert float value into money format from user country
-     * @param  float  $value  money value
-     * @param  boolean $format format money adding symbol to number
+     * @param float  $value  money value
+     * @param boolean $format format money adding symbol to number
+     * @param \MZ\Wallet\Moeda $currency curency of value
      * @return string          money into readable format
      */
-    public static function money($value, $format = false)
+    public static function money($value, $format = false, $currency = null)
     {
 
         $value = round($value, 2);
@@ -85,7 +86,7 @@ class Mask
         $dec = ',';
         $number =  number_format($value, 2, $dec, $sep);
         if ($format) {
-            $currency = app()->getSystem()->getCurrency();
+            $currency = $currency ?: app()->getSystem()->getCurrency();
             return sprintf($currency->getFormato(), $number);
         }
         return $number;

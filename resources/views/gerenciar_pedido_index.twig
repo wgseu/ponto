@@ -123,11 +123,6 @@
                     <strong>
                       <a href="/gerenciar/pedido/?search=%23{{ $_sessao->getID() }}" title="Pedidos da sessão '{{ $_sessao->getID() }}'">{{ $_sessao->getID() }}</a>
                     </strong>
-                    {% $_movimentacao = $pedido->findMovimentacaoID() %}
-                    {% $_caixa = $_movimentacao->findCaixaID() %}
-                    <small>
-                      <a href="/gerenciar/caixa/editar?id={{ $_caixa->getID() }}" title="Editar caixa '{{ $_caixa->getDescricao() }}'">{{ $_caixa->getDescricao() }}</a>
-                    </small>
                   </td>
                   {% $_funcionario = $pedido->findPrestadorID() %}
                   {% $_cliente = $_funcionario->findClienteID() %}

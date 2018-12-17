@@ -31,16 +31,16 @@ class EstadoPageControllerTest extends \MZ\Framework\TestCase
 {
     public function testFind()
     {
-        $estado = EstadoTest::create();
         AuthenticationTest::authProvider([Permissao::NOME_SISTEMA, Permissao::NOME_CADASTROESTADOS]);
+        $estado = EstadoTest::create();
         $result = $this->get('/gerenciar/estado/', ['search' => $estado->getNome()]);
         $this->assertEquals(200, $result->getStatusCode());
     }
 
     public function testAdd()
     {
-        $estado = EstadoTest::build();
         AuthenticationTest::authProvider([Permissao::NOME_SISTEMA, Permissao::NOME_CADASTROESTADOS]);
+        $estado = EstadoTest::build();
         $result = $this->post('/gerenciar/estado/cadastrar', $estado->toArray(), true);
         $this->assertEquals(302, $result->getStatusCode());
         $estado->load(['nome' => $estado->getNome()]);
@@ -49,8 +49,8 @@ class EstadoPageControllerTest extends \MZ\Framework\TestCase
 
     public function testUpdate()
     {
-        $estado = EstadoTest::create();
         AuthenticationTest::authProvider([Permissao::NOME_SISTEMA, Permissao::NOME_CADASTROESTADOS]);
+        $estado = EstadoTest::create();
         $id = $estado->getID();
         $result = $this->post('/gerenciar/estado/editar?id=' . $id, $estado->toArray(), true);
         $estado->loadByID();
@@ -59,8 +59,8 @@ class EstadoPageControllerTest extends \MZ\Framework\TestCase
 
     public function testDelete()
     {
-        $estado = EstadoTest::create();
         AuthenticationTest::authProvider([Permissao::NOME_SISTEMA, Permissao::NOME_CADASTROESTADOS]);
+        $estado = EstadoTest::create();
         $id = $estado->getID();
         $result = $this->get('/gerenciar/estado/excluir?id=' . $id);
         $estado->loadByID();

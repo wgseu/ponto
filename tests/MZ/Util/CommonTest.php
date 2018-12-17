@@ -30,6 +30,7 @@ class CommonTest extends \MZ\Framework\TestCase
 {
     public function testStrPlural()
     {
+        $this->assertEquals('cartoes', str_plural('cartao'));
         $this->assertEquals('configuracoes', str_plural('configuracao'));
         $this->assertEquals('paineis', str_plural('painel'));
         $this->assertEquals('paes', str_plural('pao'));

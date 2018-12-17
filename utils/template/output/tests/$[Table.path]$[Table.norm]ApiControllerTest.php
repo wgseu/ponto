@@ -33,8 +33,8 @@ class $[Table.norm]ApiControllerTest extends \MZ\Framework\TestCase
 {
     public function testFind()
     {
-        $$[table.unix] = $[Table.norm]Test::create();
         AuthenticationTest::authProvider([Permissao::NOME_SISTEMA, Permissao::NOME_$[TABLE.style]]);
+        $$[table.unix] = $[Table.norm]Test::create();
         $expected = [
             'status' => 'ok',
             'items' => [
@@ -47,8 +47,8 @@ class $[Table.norm]ApiControllerTest extends \MZ\Framework\TestCase
 
     public function testAdd()
     {
-        $$[table.unix] = $[Table.norm]Test::build();
         AuthenticationTest::authProvider([Permissao::NOME_SISTEMA, Permissao::NOME_$[TABLE.style]]);
+        $$[table.unix] = $[Table.norm]Test::build();
         $expected = [
             'status' => 'ok',
             'item' => $$[table.unix]->publish(app()->auth->provider),
@@ -60,8 +60,8 @@ class $[Table.norm]ApiControllerTest extends \MZ\Framework\TestCase
 
     public function testUpdate()
     {
-        $$[table.unix] = $[Table.norm]Test::create();
         AuthenticationTest::authProvider([Permissao::NOME_SISTEMA, Permissao::NOME_$[TABLE.style]]);
+        $$[table.unix] = $[Table.norm]Test::create();
         $id = $$[table.unix]->get$[Primary.norm]();
         $result = $this->patch('/api/$[table.unix.plural]/' . $id, $$[table.unix]->toArray());
         $$[table.unix]->loadBy$[Primary.norm]();
@@ -74,8 +74,8 @@ class $[Table.norm]ApiControllerTest extends \MZ\Framework\TestCase
 
     public function testDelete()
     {
-        $$[table.unix] = $[Table.norm]Test::create();
         AuthenticationTest::authProvider([Permissao::NOME_SISTEMA, Permissao::NOME_$[TABLE.style]]);
+        $$[table.unix] = $[Table.norm]Test::create();
         $id = $$[table.unix]->get$[Primary.norm]();
         $result = $this->delete('/api/$[table.unix.plural]/' . $id);
         $$[table.unix]->loadBy$[Primary.norm]();

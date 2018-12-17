@@ -38,6 +38,7 @@ use MZ\Payment\Pagamento;
  */
 class Pedido extends SyncModel
 {
+    protected $table = 'Pedidos';
 
     /**
      * Tipo de venda

@@ -1366,7 +1366,7 @@ class Item extends SyncModel
      * @param array  $group group rows
      * @return self[] List of all rows instanced as Item
      */
-    public static function findAll(
+    public static function findAllEx(
         $condition = [],
         $order = [],
         $limit = null,
@@ -1400,7 +1400,7 @@ class Item extends SyncModel
      * @param  array  $group group rows
      * @return array  List of all rows
      */
-    public static function rawFindAll(
+    public static function rawFindAllEx(
         $condition = [],
         $order = [],
         $limit = null,

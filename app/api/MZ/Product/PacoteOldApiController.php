@@ -49,7 +49,7 @@ class PacoteOldApiController extends \MZ\Core\ApiController
         if (is_array($associacoes) && count($associacoes) > 0) {
             $condition['associacaoid'] = $associacoes;
         }
-        $pacotes = Pacote::rawFindAll($condition, [], $limite);
+        $pacotes = Pacote::rawFindAllEx($condition, [], $limite);
         $items = [];
         foreach ($pacotes as $item) {
             $folder = is_null($item['produtoid']) ? 'propriedade': 'produto';

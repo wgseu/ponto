@@ -54,9 +54,9 @@ class ServicoTest extends \MZ\Framework\TestCase
 
     public function testFind()
     {
+        AuthenticationTest::authProvider([Permissao::NOME_SISTEMA, Permissao::NOME_CADASTROSERVICOS]);
         $servico = self::create('Serviço find');
         $servico_sec = self::create('Serviço find second');
-        AuthenticationTest::authProvider([Permissao::NOME_SISTEMA, Permissao::NOME_CADASTROSERVICOS]);
         $expected = [
             'status' => 'ok',
             'items' => [
@@ -71,8 +71,8 @@ class ServicoTest extends \MZ\Framework\TestCase
 
     public function testAdd()
     {
-        $servico = self::build();
         AuthenticationTest::authProvider([Permissao::NOME_SISTEMA, Permissao::NOME_CADASTROSERVICOS]);
+        $servico = self::build();
         $expected = [
             'status' => 'ok',
             'item' => $servico->publish(app()->auth->provider),
@@ -84,8 +84,8 @@ class ServicoTest extends \MZ\Framework\TestCase
 
     public function testUpdate()
     {
-        $servico = self::create();
         AuthenticationTest::authProvider([Permissao::NOME_SISTEMA, Permissao::NOME_CADASTROSERVICOS]);
+        $servico = self::create();
         $id = $servico->getID();
         $result = $this->patch('/api/servicos/' . $id, $servico->toArray());
         $servico->loadByID();
@@ -98,8 +98,8 @@ class ServicoTest extends \MZ\Framework\TestCase
 
     public function testDelete()
     {
-        $servico = self::create();
         AuthenticationTest::authProvider([Permissao::NOME_SISTEMA, Permissao::NOME_CADASTROSERVICOS]);
+        $servico = self::create();
         $id = $servico->getID();
         $result = $this->delete('/api/servicos/' . $id);
         $servico->loadByID();

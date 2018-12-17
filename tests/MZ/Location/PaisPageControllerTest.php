@@ -31,16 +31,16 @@ class PaisPageControllerTest extends \MZ\Framework\TestCase
 {
     public function testFind()
     {
-        $pais = PaisTest::create();
         AuthenticationTest::authProvider([Permissao::NOME_SISTEMA, Permissao::NOME_CADASTROPAISES]);
+        $pais = PaisTest::create();
         $result = $this->get('/gerenciar/pais/', ['search' => $pais->getNome()]);
         $this->assertEquals(200, $result->getStatusCode());
     }
 
     public function testAdd()
     {
-        $pais = PaisTest::build();
         AuthenticationTest::authProvider([Permissao::NOME_SISTEMA, Permissao::NOME_CADASTROPAISES]);
+        $pais = PaisTest::build();
         $result = $this->post('/gerenciar/pais/cadastrar', $pais->toArray(), true);
         $this->assertEquals(302, $result->getStatusCode());
         $pais->load(['nome' => $pais->getNome()]);
@@ -49,8 +49,8 @@ class PaisPageControllerTest extends \MZ\Framework\TestCase
 
     public function testUpdate()
     {
-        $pais = PaisTest::create();
         AuthenticationTest::authProvider([Permissao::NOME_SISTEMA, Permissao::NOME_CADASTROPAISES]);
+        $pais = PaisTest::create();
         $id = $pais->getID();
         $result = $this->post('/gerenciar/pais/editar?id=' . $id, $pais->toArray(), true);
         $pais->loadByID();
@@ -59,8 +59,8 @@ class PaisPageControllerTest extends \MZ\Framework\TestCase
 
     public function testDelete()
     {
-        $pais = PaisTest::create();
         AuthenticationTest::authProvider([Permissao::NOME_SISTEMA, Permissao::NOME_CADASTROPAISES]);
+        $pais = PaisTest::create();
         $id = $pais->getID();
         $result = $this->get('/gerenciar/pais/excluir?id=' . $id);
         $pais->loadByID();

@@ -75,7 +75,7 @@ $[field.else]
 $[field.end]
 $[field.else.match(.*atualizacao|.*cadastro|.*criacao|.*lancamento|.*envio)]
 $[field.else]
-        $$[table.unix]->set$[Field.norm]($[field.if(array)]$[field.array.number], $[field.end]$[field.if(integer|bigint)]123$[field.else.if(float|currency)]12.3$[field.else.if(boolean)]'Y'$[field.else.if(datetime)]'2016-12-25 12:15:00'$[field.else.if(blob)]"\x5\x0\x3"$[field.else.if(image)]'image.png'$[field.else]'$[Field.name] d$[table.gender] $[table.name]'$[field.end]);
+        $$[table.unix]->set$[Field.norm]($[field.if(array)]$[field.array.number], $[field.end]$[field.if(integer|bigint)]123$[field.else.if(float|currency|double)]12.3$[field.else.if(boolean)]'Y'$[field.else.if(datetime)]'2016-12-25 12:15:00'$[field.else.if(blob)]"\x5\x0\x3"$[field.else.if(image)]'image.png'$[field.else]'$[Field.name] d$[table.gender] $[table.name]'$[field.end]);
 $[field.end]
 $[field.end]
         return $$[table.unix];

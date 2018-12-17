@@ -31,16 +31,16 @@ class CarteiraPageControllerTest extends \MZ\Framework\TestCase
 {
     public function testFind()
     {
-        $carteira = CarteiraTest::create();
         AuthenticationTest::authProvider([Permissao::NOME_SISTEMA, Permissao::NOME_CADASTROCARTEIRAS]);
+        $carteira = CarteiraTest::create();
         $result = $this->get('/gerenciar/carteira/', ['search' => $carteira->getDescricao()]);
         $this->assertEquals(200, $result->getStatusCode());
     }
 
     public function testAdd()
     {
-        $carteira = CarteiraTest::build();
         AuthenticationTest::authProvider([Permissao::NOME_SISTEMA, Permissao::NOME_CADASTROCARTEIRAS]);
+        $carteira = CarteiraTest::build();
         $result = $this->post('/gerenciar/carteira/cadastrar', $carteira->toArray(), true);
         $this->assertEquals(302, $result->getStatusCode());
         $carteira->load(['descricao' => $carteira->getDescricao()]);
@@ -49,8 +49,8 @@ class CarteiraPageControllerTest extends \MZ\Framework\TestCase
 
     public function testUpdate()
     {
-        $carteira = CarteiraTest::create();
         AuthenticationTest::authProvider([Permissao::NOME_SISTEMA, Permissao::NOME_CADASTROCARTEIRAS]);
+        $carteira = CarteiraTest::create();
         $id = $carteira->getID();
         $result = $this->post('/gerenciar/carteira/editar?id=' . $id, $carteira->toArray(), true);
         $carteira->loadByID();
@@ -59,8 +59,8 @@ class CarteiraPageControllerTest extends \MZ\Framework\TestCase
 
     public function testDelete()
     {
-        $carteira = CarteiraTest::create();
         AuthenticationTest::authProvider([Permissao::NOME_SISTEMA, Permissao::NOME_CADASTROCARTEIRAS]);
+        $carteira = CarteiraTest::create();
         $id = $carteira->getID();
         $result = $this->get('/gerenciar/carteira/excluir?id=' . $id);
         $carteira->loadByID();

@@ -785,6 +785,24 @@ class Pagamento extends SyncModel
     }
 
     /**
+     * Informa se o pagamento foi realizado com sucesso
+     * @return bool
+     */
+    public function isPago()
+    {
+        return $this->getEstado() == self::ESTADO_PAGO;
+    }
+
+    /**
+     * Informa se o pagamento está cancelado
+     * @return bool
+     */
+    public function isCancelado()
+    {
+        return $this->getEstado() == self::ESTADO_CANCELADO || $this->getEstado() == self::ESTADO_DEVOLVIDO;
+    }
+
+    /**
      * Convert this instance into array associated key -> value with only public fields
      * @param \MZ\Provider\Prestador $requester user that request to view this fields
      * @return array All public field and values into array format

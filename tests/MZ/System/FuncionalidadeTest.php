@@ -24,17 +24,29 @@
  */
 namespace MZ\System;
 
+
 class FuncionalidadeTest extends \MZ\Framework\TestCase
 {
-    public function testPublish()
+    public function testFind()
     {
-        $funcionalidade = new Funcionalidade();
-        $values = $funcionalidade->publish(app()->auth->provider);
-        $allowed = [
-            'id',
-            'nome',
-            'descricao',
-        ];
-        $this->assertEquals($allowed, array_keys($values));
+        $funcionalidade = Funcionalidade::find([], ['id' => -1]);
+        $funcionalidade = Funcionalidade::findByNome($funcionalidade->getNome());
+        $condition = ['descricao' => $funcionalidade->getDescricao()];
+        $found_funcionalidade = Funcionalidade::find($condition);
+        $this->assertEquals($funcionalidade, $found_funcionalidade);
+        list($found_funcionalidade) = Funcionalidade::findAll($condition, [], 1);
+        $this->assertEquals($funcionalidade, $found_funcionalidade);
+        $this->assertEquals(1, Funcionalidade::count($condition));
+    }
+
+    public function testOther()
+    {
+        $funcionalidade = Funcionalidade::find([], ['id' => -1]);
+        $funcionalidade_copy = new Funcionalidade();
+        $funcionalidade_copy->fromArray($funcionalidade);
+        $funcionalidade_copy->filter($funcionalidade, app()->auth->provider);
+        $funcionalidade_copy->clean($funcionalidade);
+        $this->assertEquals($funcionalidade, $funcionalidade_copy);
+        $this->assertEquals($funcionalidade->toArray(), $funcionalidade_copy->validate());
     }
 }

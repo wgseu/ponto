@@ -27,6 +27,8 @@ namespace MZ\System;
 use MZ\Product\Produto;
 use MZ\Task\Runner;
 use MZ\Logger\Log;
+use Symfony\Component\HttpFoundation\HeaderUtils;
+use Symfony\Component\HttpFoundation\Response;
 
 /**
  * Allow application to serve system resources
@@ -53,11 +55,18 @@ class SistemaOldApiController extends \MZ\Core\ApiController
             $zip->close();
 
             $filename = 'GrandChef_'.date('Y-m-d_H-i-s').'.Site.Backup.zip';
-            header('Content-Type: application/zip');
-            header('Content-Length: ' . filesize($file));
-            header("Content-Disposition: attachment; filename*=UTF-8''" . rawurlencode($filename));
-            readfile($file);
-            unlink($file);
+            $fileContent = \file_get_contents($file);
+            $fileSize = filesize($file);
+            // unlink($file);
+            $response = new Response($fileContent);
+            $disposition = HeaderUtils::makeDisposition(
+                HeaderUtils::DISPOSITION_ATTACHMENT,
+                $filename
+            );
+            $response->headers->set('Content-Disposition', $disposition);
+            $response->headers->set('Content-Type', 'application/zip');
+            $response->headers->set('Content-Length', $fileSize);
+            return $response;
         } catch (\Exception $e) {
             return $this->json()->error($e->getMessage());
         }
@@ -70,18 +79,15 @@ class SistemaOldApiController extends \MZ\Core\ApiController
         try {
             set_time_limit(0);
             $inputname = 'zipfile';
-            if (!isset($_FILES[$inputname])) {
+            if (!$this->getRequest()->files->has($inputname)) {
                 throw new \Exception('Nenhum dado foi enviado', 401);
             }
-            $file = $_FILES[$inputname];
-            if (!$file || $file['error'] === UPLOAD_ERR_NO_FILE) {
-                throw new \Exception('Nenhum arquivo foi enviado', 401);
-            }
-            if ($file['error'] !== UPLOAD_ERR_OK) {
-                throw new \MZ\Exception\UploadException($file['error']);
+            $file = $this->getRequest()->files->get($inputname);
+            if (!$file->isValid()) {
+                throw new \Exception('Nenhum arquivo foi enviado ou é inválido', 401);
             }
             $zip = new \ZipArchive();
-            $zip->open($file['tmp_name']);
+            $zip->open($file->getPathname());
 
             zip_extract_folder(
                 $zip,

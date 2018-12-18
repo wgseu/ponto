@@ -31,6 +31,17 @@ class AuthenticationTest extends \MZ\Framework\TestCase
 {
     /**
      * Auth as employee
+     * @return Cliente
+     */
+    public static function authUser()
+    {
+        $cliente = ClienteTest::create();
+        app()->getAuthentication()->login($cliente);
+        return $cliente;
+    }
+
+    /**
+     * Auth as employee
      * @return \MZ\Provider\Prestador
      */
     public static function authProvider($permissions)

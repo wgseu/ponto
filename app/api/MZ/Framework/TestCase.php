@@ -52,9 +52,10 @@ class TestCase extends \PHPUnit\Framework\TestCase
      * @param string $url url to post data
      * @param array $data data to submit
      * @param boolean $form send as form url encoded
+     * @param array $files files to submit
      * @return \Symfony\Component\HttpFoundation\Response|array response object or array
      */
-    public function post($url, $data, $form = false)
+    public function post($url, $data, $form = false, $files = [])
     {
         $content = $form ? null : \json_encode($data);
         $server = $form ? [] : ['Content-Type' => 'application/json'];
@@ -64,7 +65,7 @@ class TestCase extends \PHPUnit\Framework\TestCase
             'POST',
             $parameters,
             [],
-            [],
+            $files,
             $server,
             $content
         );

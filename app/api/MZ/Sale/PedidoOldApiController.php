@@ -176,6 +176,10 @@ class PedidoOldApiController extends \MZ\Core\ApiController
         app()->needLogin();
         $order = new Order();
         $order->setEmployee(app()->auth->provider);
+        $synchronize = $this->getRequest()->request->getBoolean('sync');
+        if ($synchronize) {
+            return $this->json()->error('Atualize o aplicativo para possibilitar a impressão dos serviços');
+        }
         try {
             $data = $this->getRequest()->request->all();
             $data['mesaid'] = $data['mesa'] ?? null;
@@ -204,11 +208,24 @@ class PedidoOldApiController extends \MZ\Core\ApiController
             unset($data['pedidos']);
             $order->loadData($data);
             $order->search();
-            $order->process();
+            $created = !$order->exists();
+            $estado = $order->getEstado();
+            $added = $order->process();
+            $changed = !$created && $estado != $order->getEstado();
+            $senha_balcao = is_boolean_config('Imprimir', 'Senha.Paineis');
+            $comanda_senha = is_boolean_config('Imprimir', 'Comanda.Senha');
+            $queue = ($senha_balcao && $order->getTipo() == Order::TIPO_AVULSO) ||
+                ($comanda_senha && $order->getTipo() == Order::TIPO_COMANDA);
+            return $this->json()->success([
+                'id' => $order->getID(),
+                'added' => $added,
+                'created' => $created,
+                'changed' => $changed,
+                'queue' => $created && $queue
+            ]);
         } catch (\Exception $e) {
             return $this->json()->error($e->getMessage());
         }
-        return $this->json()->success();
     }
 
     public function coupon()

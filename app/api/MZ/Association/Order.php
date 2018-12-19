@@ -720,10 +720,11 @@ class Order extends Pedido
     /**
      * Add items to existing order, create a new order when don't exists
      *
-     * @return boolean true if order has created or false if already exists
+     * @return int quantidade de produtos ou serviços adicionados
      */
     public function process()
     {
+        $added = 0;
         $new_order = false;
         try {
             DB::beginTransaction();
@@ -731,11 +732,6 @@ class Order extends Pedido
             if (!$this->exists()) {
                 $sessao = Sessao::findByAberta(true);
                 $this->setSessaoID($sessao->getID());
-                if ($this->needMovimentacao()) {
-                    // venda balcão e delivery precisa informar o caixa
-                    $movimentacao = Movimentacao::findByAberta($this->employee->getID());
-                    $this->setMovimentacaoID($movimentacao->getID());
-                }
             }
             if (!is_null($this->customer) && !$this->customer->exists()) {
                 // todo cliente precisa de uma senha, gera uma aleatória
@@ -763,8 +759,6 @@ class Order extends Pedido
             if (!$viagem) {
                 foreach ($this->payments as $index => $pagamento) {
                     $pagamento->setPedidoID($this->getID());
-                    $pagamento->setFuncionarioID($this->employee->getID());
-                    $pagamento->setMovimentacaoID($this->getMovimentacaoID());
                     $pagamento->insert();
                     $paid++;
                 }
@@ -783,7 +777,7 @@ class Order extends Pedido
             DB::rollBack();
             throw $e;
         }
-        return $new_order;
+        return $added;
     }
 
     /**

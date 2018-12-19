@@ -55,10 +55,12 @@ class PedidoApiController extends \MZ\Core\ApiController
             $order->loadData($this->getData());
             $order->search();
             $order->process();
+            return $this->json()->success([
+                'item' => $order->publish(app()->auth->provider)
+            ]);
         } catch (\Exception $e) {
             return $this->json()->error($e->getMessage());
         }
-        return $this->json()->success();
     }
 
     /**

@@ -584,11 +584,18 @@ class Prestador extends SyncModel
         }
         if (!Validator::checkBoolean($this->getAtivo())) {
             $errors['ativo'] = _t('prestador.ativo_invalid');
+        } elseif (!$this->exists() && !$this->isAtivo()) {
+            $errors['ativo'] = _t('prestador.new_inactive');
         }
         if (is_null($this->getRemuneracao())) {
             $errors['remuneracao'] = _t('prestador.remuneracao_cannot_empty');
         } elseif ($this->getRemuneracao() < 0) {
             $errors['remuneracao'] = 'A remuneração não pode ser negativa';
+        }
+        if ($this->isAtivo() && !is_null($this->getDataTermino())) {
+            $errors['datatermino'] = _t('prestador.data_termino_mustbe_null');
+        } elseif (!$this->isAtivo() && is_null($this->getDataTermino())) {
+            $errors['datatermino'] = _t('prestador.data_termino_cannot_empty');
         }
         $this->setDataCadastro(DB::now());
         if (!empty($errors)) {

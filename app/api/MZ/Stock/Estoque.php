@@ -673,7 +673,9 @@ class Estoque extends SyncModel
         if (is_null($this->getProdutoID())) {
             $errors['produtoid'] = _t('estoque.produto_id_cannot_empty');
         } elseif ($produto->getTipo() != Produto::TIPO_PRODUTO) {
-            $errors['produtoid'] = 'O produto informado não é do tipo produto';
+            $errors['produtoid'] = _t('estoque.is_not_product');
+        } elseif (fmod($this->getQuantidade(), 1) > 0 && !$produto->isDivisivel()) {
+            $errors['produtoid'] = _t('estoque.produto_indivisible', $produto->getDescricao());
         }
         if (is_null($this->getSetorID())) {
             $errors['setorid'] = _t('estoque.setor_id_cannot_empty');
@@ -686,8 +688,12 @@ class Estoque extends SyncModel
         }
         if (is_null($this->getQuantidade())) {
             $errors['quantidade'] = _t('estoque.quantidade_cannot_empty');
-        } elseif ($this->getQuantidade() <= 0 && $this->getTipoMovimento() == self::TIPO_MOVIMENTO_ENTRADA) {
-            $errors['quantidade'] = 'A quantidade não pode ser nula ou negativa';
+        } elseif ($this->getQuantidade() == 0) {
+            $errors['quantidade'] = _t('estoque.quantidade_zero');
+        } elseif ($this->getTipoMovimento() == self::TIPO_MOVIMENTO_ENTRADA && $this->getQuantidade() < 0) {
+            $errors['quantidade'] = _t('estoque.quantidade_negative');
+        } elseif (!is_null($this->getTransacaoID()) && $this->getQuantidade() > 0) {
+            $errors['quantidade'] = _t('estoque.sales_cannot_add');
         }
         if (is_null($this->getPrecoCompra())) {
             $errors['precocompra'] = _t('estoque.preco_compra_cannot_empty');
@@ -695,15 +701,17 @@ class Estoque extends SyncModel
         if (!Validator::checkBoolean($this->getCancelado())) {
             $errors['cancelado'] = _t('estoque.cancelado_invalid');
         } elseif ($this->exists() && $this->isCancelado()) {
-            $old_estoque = self::findByID($this->getID());
-            if ($old_estoque->isCancelado()) {
-                $errors['cancelado'] = 'Essa movimentação está cancelada e não pode ser alterada';
+            $old = self::findByID($this->getID());
+            if ($old->isCancelado()) {
+                $errors['cancelado'] = _t('estoque.already_canceled');
             } else {
                 $count = self::count(['entradaid' => $this->getID(), 'cancelado' => 'N']);
                 if ($count > 0) {
-                    $errors['cancelado'] = 'Essa entrada já foi movimentada e não pode ser cancelada';
+                    $errors['cancelado'] = _t('estoque.used_cannot_cancel');
                 }
             }
+        } elseif (!$this->exists() && $this->isCancelado()) {
+            $errors['cancelado'] = _t('estoque.new_canceled');
         }
         $this->setDataMovimento(DB::now());
         if (!empty($errors)) {
@@ -730,6 +738,7 @@ class Estoque extends SyncModel
 
     public function retirarFIFO()
     {
+        $compra = 0;
         $negativo = is_boolean_config('Estoque', 'Estoque.Negativo');
         $restante = $this->getQuantidade();
         $produto = $this->findProdutoID();
@@ -758,16 +767,23 @@ class Estoque extends SyncModel
             $this->setDataVencimento($entrada->getDataVencimento());
             $this->setCancelado('N');
             $this->insert();
+            $compra += -$this->getQuantidade() * $this->getPrecoCompra();
             $restante = $restante - $this->getQuantidade();
             if ($restante > -0.0005) {
                 break;
             }
             $this->setQuantidade($restante);
         }
+        return $compra;
     }
 
+    /**
+     * Retira do estoque a quantidade informada
+     * @param 
+     */
     public function retirar($opcionais)
     {
+        $compra = 0;
         $setor = Setor::findDefault();
         $this->setTipoMovimento(self::TIPO_MOVIMENTO_VENDA);
         $stack = new \SplStack();
@@ -805,9 +821,10 @@ class Estoque extends SyncModel
                 }
                 $this->setProdutoID($produto->getID());
                 $this->setQuantidade(-$composicao->getQuantidade());
-                $this->retirarFIFO();
+                $compra += $this->retirarFIFO();
             }
         }
+        return $compra;
     }
 
     /**

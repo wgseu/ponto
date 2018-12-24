@@ -102,7 +102,7 @@ abstract class Model
      */
     public function exists()
     {
-        return !is_null($this->getID()) && is_numeric($this->getID());
+        return is_numeric($this->getID());
     }
 
     /**

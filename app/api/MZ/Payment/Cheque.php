@@ -501,7 +501,7 @@ class Cheque extends SyncModel
     public function validate()
     {
         $errors = [];
-        $old_cheque = self::findByID($this->getID());
+        $old = self::findByID($this->getID());
         if (is_null($this->getClienteID())) {
             $errors['clienteid'] = _t('cheque.cliente_id_cannot_empty');
         }
@@ -525,10 +525,12 @@ class Cheque extends SyncModel
         }
         if (!Validator::checkBoolean($this->getCancelado())) {
             $errors['cancelado'] = _t('cheque.cancelado_invalid');
+        } elseif (!$this->exists() && $this->isCancelado()) {
+            $errors['cancelado'] = _t('cheque.new_canceled');
         }
         if (!Validator::checkBoolean($this->getRecolhido())) {
             $errors['recolhido'] = _t('cheque.recolhido_invalid');
-        } elseif ($this->isRecolhido() && $old_cheque->exists() && $old_cheque->isRecolhido()) {
+        } elseif ($this->isRecolhido() && $old->exists() && $old->isRecolhido()) {
             $errors['recolhido'] = 'Essa folha de cheque já foi recolhida';
         }
         $this->setDataCadastro(DB::now());

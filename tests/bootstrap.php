@@ -34,7 +34,7 @@ $app->setSession(new Session(new MockArraySessionStorage()));
 $app->run(
     function ($app) {},
     function ($app) {
-        DB::getFpdo()->convertTypes = false;
+        DB::getQuery()->convertTypes = false;
         $script = dirname(__DIR__) . '/database/model/sqlite.sql';
         DB::getPdo()->exec(file_get_contents($script));
         $script = dirname(__DIR__) . '/database/model/sqlite_insert.sql';

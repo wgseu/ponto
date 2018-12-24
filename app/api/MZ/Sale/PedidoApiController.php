@@ -43,24 +43,20 @@ use MZ\Coupon\Order\Receipt;
 class PedidoApiController extends \MZ\Core\ApiController
 {
     /**
-     * Create order or add items to existing order
+     * Create order, add items or payments
      * @Post("/api/pedidos", name="api_pedido_add")
      */
     public function add()
     {
         app()->needLogin();
         $order = new Order();
-        $order->setEmployee(app()->auth->provider);
-        try {
-            $order->loadData($this->getData());
-            $order->search();
-            $order->process();
-            return $this->json()->success([
-                'item' => $order->publish(app()->auth->provider)
-            ]);
-        } catch (\Exception $e) {
-            return $this->json()->error($e->getMessage());
-        }
+        $order->employee = app()->auth->provider;
+        $order->loadData($this->getData());
+        $order->search();
+        $order->process();
+        return $this->json()->success([
+            'item' => $order->publish(app()->auth->provider)
+        ]);
     }
 
     /**

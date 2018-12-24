@@ -32,7 +32,7 @@ use FluentPDO;
  */
 class DB
 {
-    private $fpdo = null;
+    private $query = null;
     private $transactionCounter = 0;
 
     public function connect($config)
@@ -53,8 +53,8 @@ class DB
         $pdo = new PDO($dsn, $config['user'], $config['pass']);
         $pdo->setAttribute(PDO::ATTR_CASE, PDO::CASE_LOWER);
         $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-        $this->fpdo = new FluentPDO($pdo);
-        $this->fpdo->convertTypes = true;
+        $this->query = new FluentPDO($pdo);
+        $this->query->convertTypes = true;
     }
 
     /**
@@ -63,16 +63,16 @@ class DB
      */
     protected function __getPdo()
     {
-        return $this->fpdo->getPdo();
+        return $this->query->getPdo();
     }
 
     /**
      * Get Fluent PDO instance
-     * @return \FluentPDO connected PDO instance
+     * @return \Envms\FluentPDO\Query connected PDO instance
      */
-    protected function __getFpdo()
+    protected function __getQuery()
     {
-        return $this->fpdo;
+        return $this->query;
     }
 
     /**
@@ -285,7 +285,7 @@ class DB
         if (method_exists($this, '__' . $name)) {
             return call_user_func_array(array($this, '__' . $name), $arguments);
         }
-        return call_user_func_array(array($this->fpdo, $name), $arguments);
+        return call_user_func_array(array($this->query, $name), $arguments);
     }
 
     public static function __callStatic($name, $arguments)

@@ -10,6 +10,7 @@ $collection = new RouteCollection();
 \MZ\Product\ServicoApiController::addRoutes($collection);
 \MZ\Payment\CartaoApiController::addRoutes($collection);
 \MZ\Payment\FormaPagtoApiController::addRoutes($collection);
+\MZ\Wallet\MoedaApiController::addRoutes($collection);
 \MZ\Location\ViagemApiController::addRoutes($collection);
 \MZ\Account\TelefoneApiController::addRoutes($collection);
 \MZ\Location\ZonaApiController::addRoutes($collection);

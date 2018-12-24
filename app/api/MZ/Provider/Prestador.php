@@ -679,20 +679,29 @@ class Prestador extends SyncModel
             return true;
         }
         $permissoes = $permissoes ?: Acesso::getPermissoes($this->getFuncaoID());
-        $allow = true;
+        $allow = false;
+        $tested = 0;
         $operator = '&&';
         foreach ($permission as $value) {
             if (is_array($value)) {
-                $operator = current($value);
+                $flag = $this->has($value, $permissoes);
+            } elseif ($value == '&&' || $value == '||') {
+                $operator = $value;
                 continue;
-            }
-            if ($operator == '||') {
-                $allow = $allow || in_array($value, $permissoes);
             } else {
-                $allow = $allow && in_array($value, $permissoes);
+                $flag = in_array($value, $permissoes);
+            }
+            $tested++;
+            if ($operator == '||') {
+                $allow = ($allow && $tested  > 1) || $flag;
+            } else {
+                $allow = ($allow || $tested == 1) && $flag;
+                if (!$allow) {
+                    break;
+                }
             }
         }
-        return ($allow && count($permission) > 0);
+        return $allow;
     }
 
     /**

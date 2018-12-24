@@ -8,11 +8,11 @@ INSERT INTO `Servidores` (`ID`, `GUID`) VALUES
 INSERT INTO `Sistema` (`ID`, `ServidorID`, `VersaoDB`, `UltimoBackup`, `Dispositivos`) VALUES
 	('1', 1, "2.0.0.0", datetime('now'), 1);
 
-INSERT INTO `Moedas` (`ID`, `Nome`, `Simbolo`, `Codigo`, `Divisao`, `Fracao`, `Formato`, `Ativa`) VALUES
-	(1, "Real", "R$", "BRL", 100, "Centavo", "R$ %s", 'Y'),
-	(2, "Dollar", "$", "USD", 100, "Cent", "$ %s", 'N'),
-	(3, "Euro", "€", "EUR", 100, "Cent", "€ %s", 'N'),
-	(4, "Metical", "MT", "MZN", 100, "Centavo", "%s MT", 'N');
+INSERT INTO `Moedas` (`ID`, `Nome`, `Simbolo`, `Codigo`, `Divisao`, `Fracao`, `Formato`, `Conversao`, `Ativa`) VALUES
+	(1, "Real", "R$", "BRL", 100, "Centavo", "R$ %s", 1, 'Y'),
+	(2, "Dollar", "$", "USD", 100, "Cent", "$ %s", NULL, 'N'),
+	(3, "Euro", "€", "EUR", 100, "Cent", "€ %s", NULL, 'N'),
+	(4, "Metical", "MT", "MZN", 100, "Centavo", "%s MT", NULL, 'N');
 
 INSERT INTO `Paises` (`ID`, `Nome`, `Sigla`, `Codigo`, `MoedaID`, `Idioma`, `Entradas`, `Unitario`) VALUES
 	(1, "Brasil", "BRA", "BR", 1, 'pt-BR', NULL, 'N'),

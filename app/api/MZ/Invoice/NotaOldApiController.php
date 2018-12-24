@@ -39,8 +39,8 @@ class NotaOldApiController extends \MZ\Core\ApiController
     public function display()
     {
         $this->needPermission([
-            Permissao::NOME_PAGAMENTO, ['||'],
-            Permissao::NOME_SELECIONARCAIXA, ['||'],
+            Permissao::NOME_PAGAMENTO, '||',
+            Permissao::NOME_SELECIONARCAIXA, '||',
             Permissao::NOME_RELATORIOPEDIDOS
         ]);
 
@@ -249,7 +249,7 @@ class NotaOldApiController extends \MZ\Core\ApiController
     public function add()
     {
         app()->needManager();
-        $this->needPermission([Permissao::NOME_PAGAMENTO, ['||'], Permissao::NOME_SELECIONARCAIXA]);
+        $this->needPermission([Permissao::NOME_PAGAMENTO, '||', Permissao::NOME_SELECIONARCAIXA]);
 
         if (!$this->getRequest()->isMethod('POST')) {
             return $this->json()->error('Nenhum dado foi enviado');

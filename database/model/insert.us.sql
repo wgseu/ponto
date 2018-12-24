@@ -8,17 +8,20 @@ INSERT INTO `Servidores` (`ID`, `GUID`) VALUES
 INSERT INTO `Sistema` (`ID`, `ServidorID`, `VersaoDB`, `UltimoBackup`, `Dispositivos`) VALUES
 	('1', 1, "2.0.0.0", NOW(), 1);
 
-INSERT INTO `Moedas` (`ID`, `Nome`, `Simbolo`, `Codigo`, `Divisao`, `Fracao`, `Formato`, `Ativa`) VALUES
-	(1, "Real", "R$", "BRL", 100, "Centavo", "R$ %s", 'Y'),
-	(2, "Dollar", "$", "USD", 100, "Cent", "$ %s", 'N'),
-	(3, "Euro", "€", "EUR", 100, "Cent", "€ %s", 'N'),
-	(4, "Metical", "MT", "MZN", 100, "Centavo", "%s MT", 'N');
+INSERT INTO `Moedas` (`ID`, `Nome`, `Simbolo`, `Codigo`, `Divisao`, `Fracao`, `Formato`, `Conversao`, `Ativa`) VALUES
+	(1, "Real", "R$", "BRL", 100, "Centavo", "R$ %s", NULL, 'N'),
+	(2, "Dollar", "$", "USD", 100, "Cent", "$ %s", 1, 'Y'),
+	(3, "Euro", "€", "EUR", 100, "Cent", "€ %s", NULL, 'N'),
+	(4, "Metical", "MT", "MZN", 100, "Centavo", "%s MT", NULL, 'N');
 
 INSERT INTO `Paises` (`ID`, `Nome`, `Sigla`, `Codigo`, `MoedaID`, `Idioma`, `Entradas`, `Unitario`) VALUES
 	(1, "Brasil", "BRA", "BR", 1, 'pt-BR', NULL, 'N'),
 	(2, "United States of America", "USA", "US", 2, 'en-US', 'W1RpdHVsb10NCkNFUD1aSVANCkNQRj1TU04NCg0KW01hc2NhcmFdDQpDRVA9OTk5OTkNCkNQRj05OTktOTktOTk5OQ0KVGVsZWZvbmU9KDk5OSkgOTk5LTk5OTkNCg0KW0F1ZGl0b3JpYV0NCg0K', 'N'),
 	(3, "España", "ESP", "ES", 3, 'es-ES', 'W1RpdHVsb10NCkNOUEo9UlVUDQpDUEY9TlVJUA0KQ0VQPUNPUA0KDQpbTWFzY2FyYV0NCkNQRj05Ljk5OS45OTkuOTk5DQpDRVA9OTk5OTkNCkNOUEo9OTkuOTk5Ljk5OS05DQpUZWxlZm9uZT05OTkgOTk5IDk5OQ0KDQo=', 'Y'),
 	(4, "Moçambique", "MOZ", "MZ", 4, 'pt-BR', 'W1RpdHVsb10NCkNOUEo9TlVJVA0KQ0VQPUNPUA0KDQpbTWFzY2FyYV0NCkNOUEo9OS45OTk5OTk5LTkNCkNFUD05OTk5DQpUZWxlZm9uZT05OTk5LTk5OTk5DQoNCg==', 'Y');
+
+INSERT INTO `Empresas` (`ID`, `PaisID`) VALUES
+	('1', 2);
 
 INSERT INTO `Estados` (`ID`, `PaisID`, `Nome`, `UF`) VALUES
 	(1, 2, "Alaska", "AK"),

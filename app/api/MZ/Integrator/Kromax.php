@@ -30,6 +30,7 @@ use MZ\Sale\Pedido;
 use MZ\System\Task;
 use MZ\Association\Order;
 use MZ\Association\Product;
+use MZ\Association\XmlIntegrator;
 
 /**
  * Kromax Service and Task
@@ -79,25 +80,27 @@ class Kromax extends Task
         $dom = $this->request();
         $this->setPending(0);
         $order = new Order();
-        $order->setIntegracao($this->getData());
-        $order->setCardNames(self::CARDS);
-        $order->setEmployee(Prestador::findByID(1));
+        $integrator = new XmlIntegrator();
+        $integrator->integracao = $this->getData();
+        $integrator->order = $order;
+        $integrator->card_names = self::CARDS;
+        $integrator->dom = $dom;
         if (!$this->checkReponse($dom, 0)) {
             // TODO atualizar tabela de produtos por outro meio mais rápido
             $product = new Product($this->getData());
             $product->populateFromXML($dom);
-
-            $order->loadDOM($dom);
+            $data = $integrator->load();
+            $order->loadData($data);
             $order->search();
             if (!$order->exists()) {
                 $order->process();
             }
-            $changes = $order->store();
+            $changes = $integrator->store();
         } else {
-            $changes = $order->changes(1);
+            $changes = $integrator->changes(1);
         }
         $updates = $this->submit($changes);
-        if ($order->apply($updates)) {
+        if ($integrator->apply($updates)) {
             $this->setPending(1);
         }
         return $this->getPending();

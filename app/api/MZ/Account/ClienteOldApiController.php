@@ -138,7 +138,7 @@ class ClienteOldApiController extends \MZ\Core\ApiController
                 'email' => app()->auth->user->getEmail(),
                 'login' => app()->auth->user->getLogin(),
                 'imagemurl' => app()->auth->user->makeImagemURL(false, null)
-            ]
+            ],
         ];
         $status['funcionario'] = intval(app()->auth->provider->getID());
         $status['validacao'] = strval($dispositivo->getValidacao());
@@ -168,7 +168,8 @@ class ClienteOldApiController extends \MZ\Core\ApiController
             'empresa' => [
                 'nome' => $company->getNome(),
                 'imagemurl' => $company->makeImagemURL(false, null)
-            ]
+            ],
+            'moeda' => app()->system->currency->publish(app()->auth->provider),
         ];
         $status['versao'] = Sistema::VERSAO;
         $status['validacao'] = '';

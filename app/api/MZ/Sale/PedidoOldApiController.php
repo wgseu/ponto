@@ -175,7 +175,7 @@ class PedidoOldApiController extends \MZ\Core\ApiController
     {
         app()->needLogin();
         $order = new Order();
-        $order->setEmployee(app()->auth->provider);
+        $order->employee = app()->auth->provider;
         $synchronize = $this->getRequest()->request->getBoolean('sync');
         if ($synchronize) {
             return $this->json()->error('Atualize o aplicativo para possibilitar a impressão dos serviços');

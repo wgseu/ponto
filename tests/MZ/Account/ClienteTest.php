@@ -46,6 +46,7 @@ class ClienteTest extends \MZ\Framework\TestCase
         $cliente->setGenero(Cliente::GENERO_MASCULINO);
         $cliente->setSenha('1234');
         $cliente->setLimiteCompra(0);
+        $cliente->setStatus(Cliente::STATUS_ATIVO);
         return $cliente;
     }
 
@@ -265,7 +266,7 @@ class ClienteTest extends \MZ\Framework\TestCase
         $cliente->setGenero(Cliente::GENERO_MASCULINO);
         $cliente->setSenha('1234');
         $cliente->setEmpresaID(0);
-        $this->expectException('\PDOException');
+        $this->expectException('\Exception');
         $cliente->insert();
     }
 

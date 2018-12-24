@@ -22,84 +22,84 @@
  *
  * @author Equipe GrandChef <desenvolvimento@mzsw.com.br>
  */
-namespace MZ\Product;
+namespace MZ\Wallet;
 
 use MZ\System\Permissao;
 use MZ\Util\Filter;
 
 /**
- * Allow application to serve system resources
+ * Moedas financeiras de um país
  */
-class ServicoApiController extends \MZ\Core\ApiController
+class MoedaApiController extends \MZ\Core\ApiController
 {
     /**
-     * Find all Serviços
-     * @Get("/api/servicos", name="api_servico_find")
+     * Find all Moedas
+     * @Get("/api/moedas", name="api_moeda_find")
      */
     public function find()
     {
         $limit = max(1, min(100, $this->getRequest()->query->getInt('limit', 10)));
         $page = max(1, $this->getRequest()->query->getInt('page', 1));
         $condition = Filter::query($this->getRequest()->query->all());
-        if (!app()->auth->has([Permissao::NOME_CADASTROSERVICOS])) {
-            $condition['ativo'] = 'Y';
+        if (!app()->auth->has([Permissao::NOME_CADASTROMOEDAS])) {
+            $condition['ativa'] = 'Y';
         }
         $order = $this->getRequest()->query->get('order', '');
-        $count = Servico::count($condition);
+        $count = Moeda::count($condition);
         $pager = new \Pager($count, $limit, $page);
-        $servicos = Servico::findAll($condition, $order, $limit, $pager->offset);
+        $moedas = Moeda::findAll($condition, $order, $limit, $pager->offset);
         $itens = [];
-        foreach ($servicos as $servico) {
-            $itens[] = $servico->publish(app()->auth->provider);
+        foreach ($moedas as $moeda) {
+            $itens[] = $moeda->publish(app()->auth->provider);
         }
         return $this->getResponse()->success(['items' => $itens, 'pages' => $pager->pageCount]);
     }
 
     /**
-     * Create a new Serviço
-     * @Post("/api/servicos", name="api_servico_add")
+     * Create a new Moeda
+     * @Post("/api/moedas", name="api_moeda_add")
      */
     public function add()
     {
-        $this->needPermission([Permissao::NOME_CADASTROSERVICOS]);
+        $this->needPermission([Permissao::NOME_CADASTROMOEDAS]);
         $localized = $this->getRequest()->query->getBoolean('localized', false);
-        $servico = new Servico($this->getData());
-        $servico->filter(new Servico(), app()->auth->provider, $localized);
-        $servico->insert();
-        return $this->getResponse()->success(['item' => $servico->publish(app()->auth->provider)]);
+        $moeda = new Moeda($this->getData());
+        $moeda->filter(new Moeda(), app()->auth->provider, $localized);
+        $moeda->insert();
+        return $this->getResponse()->success(['item' => $moeda->publish(app()->auth->provider)]);
     }
 
     /**
-     * Modify parts of an existing Serviço
-     * @Patch("/api/servicos/{id}", name="api_servico_update", params={ "id": "\d+" })
-     * 
-     * @param int $id Serviço id
+     * Modify parts of an existing Moeda
+     * @Patch("/api/moedas/{id}", name="api_moeda_update", params={ "id": "\d+" })
+     *
+     * @param int $id Moeda id
      */
     public function modify($id)
     {
-        $this->needPermission([Permissao::NOME_CADASTROSERVICOS]);
-        $old_servico = Servico::findOrFail(['id' => $id]);
+        $this->needPermission([Permissao::NOME_CADASTROMOEDAS]);
+        $old_moeda = Moeda::findOrFail(['id' => $id]);
         $localized = $this->getRequest()->query->getBoolean('localized', false);
-        $data = array_merge($old_servico->toArray(), $this->getData());
-        $servico = new Servico($data);
-        $servico->filter($old_servico, app()->auth->provider, $localized);
-        $servico->update();
-        $old_servico->clean($servico);
-        return $this->getResponse()->success(['item' => $servico->publish(app()->auth->provider)]);
+        $data = $this->getData($old_moeda->toArray());
+        $moeda = new Moeda($data);
+        $moeda->filter($old_moeda, app()->auth->provider, $localized);
+        $moeda->update();
+        $old_moeda->clean($moeda);
+        return $this->getResponse()->success(['item' => $moeda->publish(app()->auth->provider)]);
     }
 
     /**
-     * Delete existing Serviço
-     * @Delete("/api/servicos/{id}", name="api_servico_delete", params={ "id": "\d+" })
-     * 
-     * @param int $id Serviço id to delete
+     * Delete existing Moeda
+     * @Delete("/api/moedas/{id}", name="api_moeda_delete", params={ "id": "\d+" })
+     *
+     * @param int $id Moeda id to delete
      */
     public function delete($id)
     {
-        $this->needPermission([Permissao::NOME_CADASTROSERVICOS]);
-        $servico = Servico::findOrFail(['id' => $id]);
-        $servico->delete();
-        $servico->clean(new Servico());
+        $this->needPermission([Permissao::NOME_CADASTROMOEDAS]);
+        $moeda = Moeda::findOrFail(['id' => $id]);
+        $moeda->delete();
+        $moeda->clean(new Moeda());
         return $this->getResponse()->success([]);
     }
 }

@@ -2,7 +2,7 @@
 -- Author:        Mazin
 -- Caption:       GrandChef Model
 -- Project:       GrandChef
--- Changed:       2018-12-10 18:18
+-- Changed:       2018-12-22 13:07
 -- Created:       2012-09-05 23:08
 PRAGMA foreign_keys = OFF;
 
@@ -1304,7 +1304,7 @@ CREATE TABLE "Estoque"(
   "EntradaID" INTEGER DEFAULT NULL,-- Informa de qual entrada no estoque essa saída foi retirada, permite estoque FIFO[N:Entrada][G:a][S:S]
   "FornecedorID" INTEGER DEFAULT NULL,-- Fornecedor do produto[N:Fornecedor][G:o][S:S]
   "SetorID" INTEGER NOT NULL,-- Setor de onde o produto foi inserido ou retirado[N:Setor][G:o]
-  "PrestadorID" INTEGER NOT NULL,-- Prestador que inseriu/retirou o produto do estoque[N:Prestador][G:o][S:S]
+  "PrestadorID" INTEGER DEFAULT NULL,-- Prestador que inseriu/retirou o produto do estoque[N:Prestador][G:o][S:S]
   "TipoMovimento" TEXT NOT NULL CHECK("TipoMovimento" IN('Entrada', 'Venda', 'Consumo', 'Transferencia')),-- Tipo de movimentação do estoque. Entrada: Entrada de produtos no estoque, Venda: Saída de produtos através de venda, Consumo: Saída de produtos por consumo próprio, Transferência: Indica a transferência de produtos entre setores[N:Tipo de movimento][G:o][E:Entrada|Venda|Consumo|Transferência][S:S]
   "Quantidade" DOUBLE NOT NULL,-- Quantidade do mesmo produto inserido no estoque[N:Quantidade][G:a]
   "PrecoCompra" DECIMAL NOT NULL DEFAULT 0,-- Preço de compra do produto[N:Preço de compra][G:o]
@@ -1849,7 +1849,7 @@ CREATE TABLE "Itens"(
 --   Produtos, taxas e serviços do pedido, a alteração do estado permite o controle de produção[N:Item do pedido|Itens do pedido][G:o][L:Pagamento][U:Item|Itens][K:MZ\Sale|MZ\Sale\][H:SyncModel]
   "ID" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,-- Identificador do item do pedido[G:o]
   "PedidoID" INTEGER NOT NULL,-- Pedido a qual pertence esse item[N:Pedido][G:o][S:S]
-  "PrestadorID" INTEGER NOT NULL,-- Prestador que lançou esse item no pedido[N:Prestador][G:o][S:S]
+  "PrestadorID" INTEGER DEFAULT NULL,-- Prestador que lançou esse item no pedido[N:Prestador][G:o][S:S]
   "ProdutoID" INTEGER,-- Produto vendido[N:Produto][G:o][S][S:S]
   "ServicoID" INTEGER DEFAULT NULL,-- Serviço cobrado ou taxa[N:Serviço][G:o][S:S]
   "ItemID" INTEGER DEFAULT NULL,-- Pacote em que esse item faz parte[N:Pacote][G:o][S:S]

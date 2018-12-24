@@ -932,4 +932,5 @@ return [
     'avaliacao.data_avaliacao_cannot_empty' => 'A data da avaliação não pode ser vazia',
     'avaliacao.id_cannot_empty' => 'O identificador da avaliação não foi informado',
     'avaliacao.not_found' => 'Avaliação não encontrada',
+    'moeda.conversao_unit' => 'A conversão da moeda principal deve ser 1',
 ];

@@ -59,6 +59,7 @@ class ClienteOldApiControllerTest extends \MZ\Framework\TestCase
 
     public function testAppStatus()
     {
+        AuthenticationTest::authProvider([]);
         $expected = [
             'status' => 'ok',
             'info' => [
@@ -66,6 +67,7 @@ class ClienteOldApiControllerTest extends \MZ\Framework\TestCase
                     'nome' => 'Aleatorio',
                     'imagemurl' => null
                 ],
+                'moeda' => app()->system->currency->publish(app()->auth->provider),
             ],
             'versao' => Sistema::VERSAO,
             'validacao' => '',
@@ -73,8 +75,7 @@ class ClienteOldApiControllerTest extends \MZ\Framework\TestCase
             'acesso' => 'visitante',
             'permissoes' => []
         ];
-        AuthenticationTest::authProvider([]);
-        app()->getAuthentication()->logout();
+        app()->auth->logout();
         $result = $this->get('/app/conta/status');
         $this->assertEquals($expected, \array_intersect_key($result, $expected));
     }

@@ -454,6 +454,12 @@ class Moeda extends SyncModel
         if (!Validator::checkBoolean($this->getAtiva())) {
             $errors['ativa'] = _t('moeda.ativa_invalid');
         }
+        if ($this->exists() &&
+            app()->system->currency->getID() == $this->getID() &&
+            $this->getConversao() != 1
+        ) {
+            $errors['conversao'] = _t('moeda.conversao_unit');
+        }
         if (!empty($errors)) {
             throw new ValidationException($errors);
         }

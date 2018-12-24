@@ -225,8 +225,8 @@ class Sessao extends SyncModel
     public function filter($original, $updater, $localized = false)
     {
         $this->setID($original->getID());
-        $this->setDataInicio(Filter::datetime($this->getDataInicio()));
-        $this->setDataTermino(Filter::datetime($this->getDataTermino()));
+        $this->setDataInicio(Filter::datetime($original->getDataInicio()));
+        $this->setDataTermino(Filter::datetime($original->getDataTermino()));
         return $this;
     }
 
@@ -246,17 +246,33 @@ class Sessao extends SyncModel
     public function validate()
     {
         $errors = [];
+        $old = self::findByID($this->getID());
         if (is_null($this->getDataInicio())) {
             $errors['datainicio'] = _t('sessao.data_inicio_cannot_empty');
+        } elseif ($old->exists() && $old->getDataInicio() != $this->getDataInicio()) {
+            $errors['datainicio'] = _t('sessao.data_inicio_cannot_change');
         }
+        if (is_null($this->getDataTermino()) && !$this->isAberta()) {
+            $errors['datatermino'] = _t('sessao.data_termino_cannot_empty');
+        } elseif (!is_null($this->getDataTermino()) && $this->isAberta()) {
+            $errors['datatermino'] = _t('sessao.data_termino_mustbe_empty');
+        } elseif ($old->exists() && !$old->isAberta() &&
+            $old->getDataTermino() != $this->getDataTermino()
+        ) {
+            $errors['datatermino'] = _t('sessao.data_termino_cannot_change');
+        }
+        $count = Movimentacao::count(['sessaoid' => $this->getID(), 'aberta' => 'Y']);
+        $sessao = self::findByAberta();
         if (!Validator::checkBoolean($this->getAberta())) {
             $errors['aberta'] = _t('sessao.aberta_invalid');
         } elseif (!$this->exists() && !$this->isAberta()) {
-            $errors['aberta'] = 'A sessão não pode iniciar fechada';
-        }
-        $sessao = self::findByAberta();
-        if ($this->isAberta() && $sessao->exists() && $this->getID() != $sessao->getID()) {
-            $errors['aberta'] = 'Já existe uma sessão aberta';
+            $errors['aberta'] = _t('sessao.ativa_start_closed');
+        } elseif ($this->isAberta() && $sessao->exists() && $this->getID() != $sessao->getID()) {
+            $errors['aberta'] = _t('sessao.ativa_already_open');
+        } elseif (!$this->isAberta() && $count > 0) {
+            $errors['aberta'] = _tc('sessao.movimentation_open', $count, $count);
+        } elseif ($old->exists() && !$old->isAberta() && $this->isAberta()) {
+            $errors['aberta'] = _t('sessao.cannot_reopen');
         }
         if (!empty($errors)) {
             throw new ValidationException($errors);

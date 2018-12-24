@@ -976,6 +976,16 @@ class Nota extends SyncModel
     public function validate()
     {
         $errors = [];
+        $count = self::count([
+            '!id' => $this->getID(),
+            'entrenumero' => [$this->getNumeroInicial(), $this->getNumeroFinal()],
+            'sequencia' => $this->getSequencia(),
+            'serie' => $this->getSerie(),
+            'ambiente' => $this->getAmbiente(),
+        ]);
+        if ($count > 0) {
+            $errors['tipo'] = _t('nota.number_exists');
+        }
         if (!Validator::checkInSet($this->getTipo(), self::getTipoOptions())) {
             $errors['tipo'] = _t('nota.tipo_invalid');
         }
@@ -994,8 +1004,17 @@ class Nota extends SyncModel
         if (is_null($this->getNumeroInicial())) {
             $errors['numeroinicial'] = _t('nota.numero_inicial_cannot_empty');
         }
+        if ($this->getNumeroInicial() <= 0) {
+            $errors['numeroinicial'] = _t('nota.number_negative');
+        }
         if (is_null($this->getNumeroFinal())) {
             $errors['numerofinal'] = _t('nota.numero_final_cannot_empty');
+        }
+        if ($this->getNumeroFinal() > 999999999) {
+            $errors['numerofinal'] = _t('nota.number_exceeds');
+        }
+        if ($this->getNumeroInicial() > $this->getNumeroFinal()) {
+            $errors['numerofinal'] = _t('nota.number_inverted');
         }
         if (is_null($this->getSequencia())) {
             $errors['sequencia'] = _t('nota.sequencia_cannot_empty');
@@ -1258,6 +1277,17 @@ class Nota extends SyncModel
         if (isset($condition['tarefas'])) {
             $field = '(n.acao <> ? OR (n.contingencia = ? AND n.estado = ?))';
             $condition[$field] = [self::ACAO_AUTORIZAR, 'Y', self::ESTADO_PENDENTE];
+            $allowed[$field] = true;
+        }
+        if (isset($condition['entrenumero']) && count($condition['entrenumero']) == 2) {
+            $values = $condition['entrenumero'];
+            $field = '((n.numeroinicial BETWEEN ? AND ?) OR (? BETWEEN n.numeroinicial AND n.numerofinal))';
+            $condition[$field] = [$values[0], $values[1], $values[0]];
+            $allowed[$field] = true;
+        }
+        if (isset($condition['!id'])) {
+            $field = 'NOT n.id';
+            $condition[$field] = $condition['!id'];
             $allowed[$field] = true;
         }
         return Filter::keys($condition, $allowed, 'n.');

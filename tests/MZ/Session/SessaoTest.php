@@ -123,6 +123,7 @@ class SessaoTest extends \MZ\Framework\TestCase
             $this->assertEquals(
                 [
                     'datainicio',
+                    'datatermino',
                     'aberta',
                 ],
                 array_keys($e->getErrors())
@@ -148,6 +149,7 @@ class SessaoTest extends \MZ\Framework\TestCase
         }
         // fecha para não interferir nos outros testes
         $sessao->setAberta('N');
+        $sessao->setDataTermino('2016-12-25 13:15:00');
         $sessao->update();
     }
 
@@ -157,14 +159,12 @@ class SessaoTest extends \MZ\Framework\TestCase
         $sessao->setDataInicio('2016-12-26 12:15:00');
         $sessao->setAberta('Y');
         $sessao->insert();
-        $sessao->setDataInicio('2016-12-25 14:15:00');
-        $sessao->setDataTermino('2016-12-25 14:15:00');
-        $sessao->setAberta('Y');
         $sessao->update();
         $found_sessao = Sessao::findByID($sessao->getID());
         $this->assertEquals($sessao, $found_sessao);
         // fecha para não interferir nos outros testes
         $sessao->setAberta('N');
+        $sessao->setDataTermino('2016-12-25 13:15:00');
         $sessao->update();
     }
 
@@ -191,6 +191,7 @@ class SessaoTest extends \MZ\Framework\TestCase
         $sessao->insert();
         // fecha para não interferir nos outros testes
         $sessao->setAberta('N');
+        $sessao->setDataTermino('2016-12-25 13:15:00');
         $sessao->update();
         $found_sessao = Sessao::findByID($sessao->getID());
         $this->assertEquals($sessao, $found_sessao);
@@ -201,6 +202,7 @@ class SessaoTest extends \MZ\Framework\TestCase
         $sessao_sec->insert();
         // fecha para não interferir nos outros testes
         $sessao_sec->setAberta('N');
+        $sessao_sec->setDataTermino('2016-12-25 13:15:00');
         $sessao_sec->update();
 
         $sessoes = Sessao::findAll(['datainicio' => '2016-11-25 12:15:00'], [], 2, 0);

@@ -54,6 +54,8 @@ class ClienteOldApiControllerTest extends \MZ\Framework\TestCase
         ];
         $result = $this->post('/app/cliente/', ['cliente' => $cliente->toArray()], true);
         $expected['cliente']['id'] = $result['cliente']['id'] ?? null;
+        $expected['cliente']['dataatualizacao'] = $result['cliente']['dataatualizacao'] ?? null;
+        $expected['cliente']['datacadastro'] = $result['cliente']['datacadastro'] ?? null;
         $this->assertEquals($expected, \array_intersect_key($result, $expected));
     }
 

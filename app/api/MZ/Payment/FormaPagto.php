@@ -464,8 +464,12 @@ class FormaPagto extends SyncModel
     public function validate()
     {
         $errors = [];
+        $count = $this->exists() ? Pagamento::count(['formapagtoid' => $this->getID()]) : 0;
+        $old = self::findByID($this->getID());
         if (!Validator::checkInSet($this->getTipo(), self::getTipoOptions())) {
             $errors['tipo'] = _t('forma_pagto.tipo_invalid');
+        } elseif ($old->exists() && $count > 0 && $old->getTipo() != $this->getTipo()) {
+            $errors['tipo'] = _t('forma_pagto.tipo_cannot_change');
         }
         if (is_null($this->getCarteiraID())) {
             $errors['carteiraid'] = _t('forma_pagto.carteira_id_cannot_empty');

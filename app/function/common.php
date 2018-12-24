@@ -155,7 +155,7 @@ function app()
     return $app;
 }
 
-function _t($key)
+function _translate($key, $args = [], $plural = null)
 {
     $messages = [];
     $msg_path = app()->getPath('lang') . '/' . app()->system->country->getIdioma() . '/messages.php';
@@ -171,13 +171,30 @@ function _t($key)
         return $key;
     }
     $text = $messages[$key];
-    $args = \func_get_args();
-    \array_shift($args);
     $argc = \count($args);
     if ($argc == 0) {
         return $text;
     }
+    if (!is_null($plural)) {
+        $parts = explode(' | ', $text);
+        $text = $plural && count($parts) > 1 ? $parts[1] : $parts[0];
+    }
     return \vsprintf($text, $args);
+}
+
+function _t($key)
+{
+    $args = func_get_args();
+    array_shift($args);
+    return _translate($key, $args);
+}
+
+function _tc($key, $count = 1)
+{
+    $args = func_get_args();
+    array_shift($args);
+    array_shift($args);
+    return _translate($key, $args, $count != 1);
 }
 
 function get_string_config($section, $key, $default = null)

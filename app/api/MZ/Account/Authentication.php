@@ -112,7 +112,10 @@ class Authentication
 
     public function refresh()
     {
-        $this->provider = \MZ\Provider\Prestador::findByClienteID($this->getUser()->getID());
+        $this->provider = \MZ\Provider\Prestador::find([
+            'clienteid' => $this->getUser()->getID(),
+            'ativo' => 'Y',
+        ]);
         $this->permissions = \MZ\System\Acesso::getPermissoes($this->getEmployee()->getFuncaoID());
         if (!$this->has([Permissao::NOME_SISTEMA])) {
             $this->getEmployee()->fromArray([]);

@@ -2,7 +2,7 @@
 -- Author:        Mazin
 -- Caption:       GrandChef Model
 -- Project:       GrandChef
--- Changed:       2018-12-22 13:07
+-- Changed:       2018-12-26 17:35
 -- Created:       2012-09-05 23:08
 PRAGMA foreign_keys = OFF;
 
@@ -964,7 +964,6 @@ CREATE TABLE "Grupos"(
   "ProdutoID" INTEGER NOT NULL,-- Informa o pacote base da formação[N:Pacote][G:o][S:S]
   "Nome" VARCHAR(100) NOT NULL,-- Nome resumido do grupo da formação, Exemplo: Tamanho, Sabores[N:Nome][G:o][S:S]
   "Descricao" VARCHAR(100) NOT NULL,-- Descrição do grupo da formação, Exemplo: Escolha o tamanho, Escolha os sabores[N:Descrição][G:a][S]
-  "Multiplo" TEXT NOT NULL CHECK("Multiplo" IN('Y', 'N')) DEFAULT 'Y',-- Informa se é possível selecionar mais de um produto ou opção do produto[N:Múltiplo][G:o]
   "Tipo" TEXT NOT NULL CHECK("Tipo" IN('Inteiro', 'Fracionado')) DEFAULT 'Inteiro',-- Informa se a formação final será apenas uma unidade ou vários itens[N:Tipo][G:o]
   "QuantidadeMinima" INTEGER NOT NULL DEFAULT 1,-- Permite definir uma quantidade mínima obrigatória para continuar com a venda[N:Quantidade mínima][G:a]
   "QuantidadeMaxima" INTEGER NOT NULL DEFAULT 0,-- Define a quantidade máxima de itens que podem ser escolhidos[N:Quantidade máxima][G:a]

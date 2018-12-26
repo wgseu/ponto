@@ -82,10 +82,10 @@ INSERT INTO `Estoque` (`ID`, `ProdutoID`, `TransacaoID`, `EntradaID`, `Fornecedo
 	(15, 23, NULL, NULL, NULL, 1, 1, 'Entrada', 0.6, 20, NULL, NOW(), NULL, NULL, 'N', NOW()),
 	(16, 24, NULL, NULL, NULL, 1, 1, 'Entrada', 15, 6, NULL, NOW(), NULL, NULL, 'N', NOW());
 
-INSERT INTO `Grupos` (`ID`, `ProdutoID`, `Nome`, `Descricao`, `Multiplo`, `Tipo`, `QuantidadeMinima`, `QuantidadeMaxima`, `Funcao`) VALUES
-	(1, 5, 'Tamanho', 'Tamanho', 'N', 'Inteiro', 1, 1, 'Soma'),
-	(2, 5, 'Sabores', 'Sabores', 'Y', 'Fracionado', 1, 2, 'Media'),
-	(3, 5, 'Borda', 'Borda', 'N', 'Inteiro', 0, 1, 'Soma');
+INSERT INTO `Grupos` (`ID`, `ProdutoID`, `Nome`, `Descricao`, `Tipo`, `QuantidadeMinima`, `QuantidadeMaxima`, `Funcao`) VALUES
+	(1, 5, 'Tamanho', 'Tamanho', 'Inteiro', 1, 1, 'Soma'),
+	(2, 5, 'Sabores', 'Sabores', 'Fracionado', 1, 2, 'Media'),
+	(3, 5, 'Borda', 'Borda', 'Inteiro', 0, 1, 'Soma');
 
 INSERT INTO `Propriedades` (`ID`, `GrupoID`, `Nome`, `Abreviacao`, `DataAtualizacao`) VALUES
 	(1, 1, 'Pequena', 'P', NOW()),

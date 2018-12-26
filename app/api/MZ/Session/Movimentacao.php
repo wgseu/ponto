@@ -30,6 +30,8 @@ use MZ\Util\Validator;
 use MZ\Database\DB;
 use MZ\Database\SyncModel;
 use MZ\Exception\ValidationException;
+use MZ\Sale\Pedido;
+use MZ\Payment\Pagamento;
 
 /**
  * Movimentação do caixa, permite abrir diversos caixas na conta de
@@ -372,8 +374,17 @@ class Movimentacao extends SyncModel
     public function validate()
     {
         $errors = [];
+        $old = self::findByID($this->getID());
+        if ($old->exists() && !$old->isAberta()) {
+            $errors['id'] = _t('movimentacao.cannot_changed');
+        }
+        $sessao = $this->findSessaoID();
         if (is_null($this->getSessaoID())) {
             $errors['sessaoid'] = _t('movimentacao.sessao_id_cannot_empty');
+        } elseif (!$sessao->isAberta()) {
+            $errors['sessaoid'] = _t('movimentacao.sessao_closed');
+        } elseif ($old->exists() && $old->getSessaoID() != $this->getSessaoID()) {
+            $errors['sessaoid'] = _t('movimentacao.sessao_changed');
         }
         $caixa = $this->findCaixaID();
         if (is_null($this->getCaixaID())) {
@@ -381,16 +392,61 @@ class Movimentacao extends SyncModel
         } elseif (!$caixa->isAtivo()) {
             $errors['caixaid'] = _t('movimentacao.caixa_inactive', $caixa->getDescricao());
         }
+        $count = self::count(['aberta' => 'Y']);
+        $pedidos = Pedido::count([
+            'sessaoid' => $this->getSessaoID(),
+            'cancelado' => 'N',
+            '!estado' => Pedido::ESTADO_FINALIZADO
+        ]);
+        $pagamentos = Pagamento::count([
+            'movimentacaoid' => $this->getID(),
+            'estado' => [
+                Pagamento::ESTADO_ABERTO,
+                Pagamento::ESTADO_AGUARDANDO,
+                Pagamento::ESTADO_ANALISE
+            ]
+        ]);
         if (!Validator::checkBoolean($this->getAberta())) {
             $errors['aberta'] = _t('movimentacao.aberta_invalid');
         } elseif (!$this->exists() && !$this->isAberta()) {
             $errors['aberta'] = _t('movimentacao.aberta_create_closed');
+        } elseif ($old->exists() && !$old->isAberta() && $this->isAberta()) {
+            $errors['aberta'] = _t('movimentacao.aberta_reopen');
+        } elseif (!$this->isAberta() && $count < 2 && $pedidos > 0) {
+            $errors['aberta'] = _tc('movimentacao.aberta_orders', $pedidos, $pedidos);
+        } elseif (!$this->isAberta() && $count < 2 && $pagamentos > 0) {
+            $errors['aberta'] = _tc('movimentacao.aberta_payments', $pagamentos, $pagamentos);
         }
+        $movimentacao = self::find([
+            'sessaoid' => $this->getSessaoID(),
+            'caixaid' => $this->getCaixaID(),
+            'iniciadorid' => $this->getIniciadorID(),
+            'aberta' => 'Y'
+        ]);
+        $iniciador = $this->findIniciadorID();
         if (is_null($this->getIniciadorID())) {
             $errors['iniciadorid'] = _t('movimentacao.iniciador_id_cannot_empty');
+        } elseif (!$iniciador->isAtivo() && $this->isAberta()) {
+            $errors['iniciadorid'] = _t('movimentacao.iniciador_inactive');
+        } elseif ($movimentacao->exists() && !$this->exists()) {
+            $errors['iniciadorid'] = _t('movimentacao.iniciador_initiated');
+        } elseif ($old->exists() && $old->getIniciadorID() != $this->getIniciadorID()) {
+            $errors['iniciadorid'] = _t('movimentacao.iniciador_changed');
+        }
+        if (!is_null($this->getFechadorID()) && $this->isAberta()) {
+            $errors['fechadorid'] = _t('movimentacao.fechador_mustbe_empty');
+        } elseif (is_null($this->getFechadorID()) && !$this->isAberta()) {
+            $errors['fechadorid'] = _t('movimentacao.fechador_cannot_empty');
         }
         if (is_null($this->getDataAbertura())) {
             $errors['dataabertura'] = _t('movimentacao.data_abertura_cannot_empty');
+        } elseif ($old->exists() && $old->getDataAbertura() != $this->getDataAbertura()) {
+            $errors['dataabertura'] = _t('movimentacao.data_abertura_changed');
+        }
+        if (!is_null($this->getDataFechamento()) && $this->isAberta()) {
+            $errors['datafechamento'] = _t('movimentacao.data_fechamento_mustbe_empty');
+        } elseif (is_null($this->getDataFechamento()) && !$this->isAberta()) {
+            $errors['datafechamento'] = _t('movimentacao.data_fechamento_cannot_empty');
         }
         if (!empty($errors)) {
             throw new ValidationException($errors);

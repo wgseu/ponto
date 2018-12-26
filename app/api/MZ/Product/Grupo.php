@@ -73,10 +73,6 @@ class Grupo extends SyncModel
      */
     private $descricao;
     /**
-     * Informa se é possível selecionar mais de um produto ou opção do produto
-     */
-    private $multiplo;
-    /**
      * Informa se a formação final será apenas uma unidade ou vários itens
      */
     private $tipo;
@@ -192,35 +188,6 @@ class Grupo extends SyncModel
     public function setDescricao($descricao)
     {
         $this->descricao = $descricao;
-        return $this;
-    }
-
-    /**
-     * Informa se é possível selecionar mais de um produto ou opção do produto
-     * @return string múltiplo of Grupo
-     */
-    public function getMultiplo()
-    {
-        return $this->multiplo;
-    }
-
-    /**
-     * Informa se é possível selecionar mais de um produto ou opção do produto
-     * @return boolean Check if o of Multiplo is selected or checked
-     */
-    public function isMultiplo()
-    {
-        return $this->multiplo == 'Y';
-    }
-
-    /**
-     * Set Multiplo value to new on param
-     * @param string $multiplo Set múltiplo for Grupo
-     * @return self Self instance
-     */
-    public function setMultiplo($multiplo)
-    {
-        $this->multiplo = $multiplo;
         return $this;
     }
 
@@ -360,7 +327,6 @@ class Grupo extends SyncModel
         $grupo['produtoid'] = $this->getProdutoID();
         $grupo['nome'] = $this->getNome();
         $grupo['descricao'] = $this->getDescricao();
-        $grupo['multiplo'] = $this->getMultiplo();
         $grupo['tipo'] = $this->getTipo();
         $grupo['quantidademinima'] = $this->getQuantidadeMinima();
         $grupo['quantidademaxima'] = $this->getQuantidadeMaxima();
@@ -402,11 +368,6 @@ class Grupo extends SyncModel
             $this->setDescricao(null);
         } else {
             $this->setDescricao($grupo['descricao']);
-        }
-        if (!isset($grupo['multiplo'])) {
-            $this->setMultiplo('N');
-        } else {
-            $this->setMultiplo($grupo['multiplo']);
         }
         if (!isset($grupo['tipo'])) {
             $this->setTipo(null);
@@ -453,6 +414,15 @@ class Grupo extends SyncModel
     }
 
     /**
+     * Informa se é possível selecionar mais de um produto ou opção do produto
+     * @return boolean Check if o of Multiplo is selected or checked
+     */
+    public function isMultiplo()
+    {
+        return $this->getQuantidadeMaxima() == 0 || $this->getQuantidadeMaxima() > 1;
+    }
+
+    /**
      * Filter fields, upload data and keep key data
      * @param self $original Original instance without modifications
      * @param \MZ\Provider\Prestador $updater user that want to update this object
@@ -488,17 +458,17 @@ class Grupo extends SyncModel
     public function validate()
     {
         $errors = [];
+        $produto = $this->findProdutoID();
         if (is_null($this->getProdutoID())) {
             $errors['produtoid'] = _t('grupo.produto_id_cannot_empty');
+        } elseif ($produto->getTipo() != Produto::TIPO_PACOTE) {
+            $errors['produtoid'] = _t('grupo.produto_id_not_package');
         }
         if (is_null($this->getNome())) {
             $errors['nome'] = _t('grupo.nome_cannot_empty');
         }
         if (is_null($this->getDescricao())) {
             $errors['descricao'] = _t('grupo.descricao_cannot_empty');
-        }
-        if (!Validator::checkBoolean($this->getMultiplo())) {
-            $errors['multiplo'] = _t('grupo.multiplo_invalid');
         }
         if (!Validator::checkInSet($this->getTipo(), self::getTipoOptions())) {
             $errors['tipo'] = _t('grupo.tipo_invalid');

@@ -41,6 +41,10 @@ class PedidoApiControllerTest extends \MZ\Framework\TestCase
         $data = $pedido->toArray();
         $result = $this->post('/api/pedidos', $data);
         $this->assertEquals($expected, \array_intersect_key($result, $expected));
+        $pedido->setID($result['item']['id']);
+        $pedido->loadByID();
+        $pedido->setEstado(Pedido::ESTADO_FINALIZADO);
+        $pedido->update();
         MovimentacaoTest::close($movimentacao);
     }
 }

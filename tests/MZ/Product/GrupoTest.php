@@ -37,15 +37,16 @@ class GrupoTest extends \MZ\Framework\TestCase
     {
         $last = Grupo::find([], ['id' => -1]);
         $id = $last->getID() + 1;
-        $produto = ProdutoTest::create();
+        $produto = ProdutoTest::build();
+        $produto->setTipo(Produto::TIPO_PACOTE);
+        $produto->insert();
         $grupo = new Grupo();
         $grupo->setProdutoID($produto->getID());
         $grupo->setNome('Nome do grupo');
         $grupo->setDescricao($descricao ?: "Grupo {$id}");
-        $grupo->setMultiplo('Y');
         $grupo->setTipo(Grupo::TIPO_INTEIRO);
-        $grupo->setQuantidadeMinima(123);
-        $grupo->setQuantidadeMaxima(123);
+        $grupo->setQuantidadeMinima(1);
+        $grupo->setQuantidadeMaxima(3);
         $grupo->setFuncao(Grupo::FUNCAO_MINIMO);
         $grupo->setOrdem(123);
         return $grupo;

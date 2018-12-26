@@ -40,7 +40,8 @@ class PacoteTest extends \MZ\Framework\TestCase
         $produto = ProdutoTest::create();
         $grupo = GrupoTest::create();
         $pacote = new Pacote();
-        $pacote->setPacoteID($produto->getID());
+        $pacote->setPacoteID($grupo->getProdutoID());
+        $pacote->setProdutoID($produto->getID());
         $pacote->setGrupoID($grupo->getID());
         $pacote->setValor(12.3);
         return $pacote;
@@ -88,5 +89,12 @@ class PacoteTest extends \MZ\Framework\TestCase
         $pacote->delete();
         $pacote->loadByID();
         $this->assertFalse($pacote->exists());
+    }
+
+    public function testInsertBlankFields()
+    {
+        $pacote = new Pacote();
+        $this->expectException('\Exception');
+        $pacote->insert();
     }
 }

@@ -308,22 +308,36 @@ class Credito extends SyncModel
     public function validate()
     {
         $errors = [];
-        $old_credito = self::findByID($this->getID());
+        $old = self::findByID($this->getID());
+        $other_total = self::sum(['valor'], ['clienteid' => $old->getClienteID(), 'cancelado' => 'N']);
         if (is_null($this->getClienteID())) {
             $errors['clienteid'] = _t('credito.cliente_id_cannot_empty');
+        } elseif ($old->exists() &&
+            $this->getClienteID() != $old->getClienteID() &&
+            $old->getValor() > 0 &&
+            $other_total < $old->getValor()
+        ) {
+            $errors['clienteid'] = _t('credito.cliente_cannot_transfer');
         }
+        $total = self::sum(['valor'], ['clienteid' => $this->getClienteID(), 'cancelado' => 'N']);
         if (is_null($this->getValor())) {
             $errors['valor'] = _t('credito.valor_cannot_empty');
+        } elseif ($old->exists() && $old->getValor() != $this->getValor()) {
+            $errors['valor'] = _t('credito.valor_changed');
+        } elseif (!$this->isCancelado() && $this->getValor() < 0 && $total + $this->getValor() < 0) {
+            $errors['valor'] = _t('credito.valor_insufficient');
+        } elseif ($this->isCancelado() && $this->getValor() > 0 && $total < $this->getValor()) {
+            $errors['valor'] = _t('credito.valor_cancel_negative');
         }
         if (is_null($this->getDetalhes())) {
             $errors['detalhes'] = _t('credito.detalhes_cannot_empty');
         }
         if (!Validator::checkBoolean($this->getCancelado())) {
             $errors['cancelado'] = _t('credito.cancelado_invalid');
-        } elseif (!Validator::checkBoolean($this->getCancelado())) {
-            $errors['cancelado'] = 'A informação se cancelado é inválida';
-        } elseif ($this->isCancelado() && $old_credito->exists() && $old_credito->isCancelado()) {
-            $errors['cancelado'] = 'O crédito informado já está cancelado';
+        } elseif ($old->exists() && $old->isCancelado()) {
+            $errors['cancelado'] = _t('credito.cancelado_already');
+        } elseif (!$this->exists() && $this->isCancelado()) {
+            $errors['cancelado'] = _t('credito.cancelado_new');
         }
         $this->setDataCadastro(DB::now());
         if (!empty($errors)) {

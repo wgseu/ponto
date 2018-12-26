@@ -511,11 +511,63 @@ class Pacote extends SyncModel
     public function validate()
     {
         $errors = [];
-        if (is_null($this->getPacoteID())) {
-            $errors['pacoteid'] = _t('pacote.pacote_id_cannot_empty');
-        }
+        $produto = $this->findPacoteID();
+        $grupo = $this->findGrupoID();
         if (is_null($this->getGrupoID())) {
             $errors['grupoid'] = _t('pacote.grupo_id_cannot_empty');
+        } elseif ($grupo->getProdutoID() != $this->getPacoteID()) {
+            $errors['grupoid'] = _t('pacote.grupo_id_other');
+        }
+        if ($produto->getTipo() != Produto::TIPO_PACOTE) {
+            $errors['pacoteid'] = _t('pacote.pacote_id_not_package');
+        }
+        $produtos = self::count([
+            '!id' => $this->getID(),
+            'grupoid' => $this->getGrupoID(),
+            'produtoid' => $this->getProdutoID(),
+            'associacaoid' => $this->getAssociacaoID(),
+        ]);
+        $propriedades = self::count([
+            '!id' => $this->getID(),
+            'grupoid' => $this->getGrupoID(),
+            'propriedadeid' => $this->getPropriedadeID(),
+            'associacaoid' => $this->getAssociacaoID(),
+        ]);
+        $produtos_grupo = self::count([
+            '!id' => $this->getID(),
+            'grupoid' => $this->getGrupoID(),
+            'propriedadeid' => null,
+        ]);
+        $propriedades_grupo = self::count([
+            '!id' => $this->getID(),
+            'grupoid' => $this->getGrupoID(),
+            'produtoid' => null,
+        ]);
+        $produto = $this->findProdutoID();
+        if (is_null($this->getProdutoID()) && is_null($this->getPropriedadeID())) {
+            $errors['produtoid'] = _t('pacote.produto_propriedade_id_cannot_empty');
+        } elseif (!is_null($this->getProdutoID()) && !is_null($this->getPropriedadeID())) {
+            $errors['produtoid'] = _t('pacote.produto_propriedade_id_both');
+        } elseif (!is_null($this->getProdutoID()) && $produtos > 0) {
+            $errors['produtoid'] = _t('pacote.produto_id_existing');
+        } elseif (!is_null($this->getProdutoID()) && $propriedades_grupo > 0) {
+            $errors['produtoid'] = _t('pacote.produto_id_conflict');
+        } elseif ($produto->getTipo() == Produto::TIPO_PACOTE) {
+            $errors['produtoid'] = _t('pacote.produto_id_package');
+        }
+        if (!is_null($this->getPropriedadeID()) && $propriedades > 0) {
+            $errors['propriedadeid'] = _t('pacote.propriedade_id_existing');
+        } elseif (!is_null($this->getPropriedadeID()) && $produtos_grupo > 0) {
+            $errors['propriedadeid'] = _t('pacote.propriedade_id_conflict');
+        }
+        $associacao = $this->findAssociacaoID();
+        $pacote = self::find([
+            '!id' => $this->getID(),
+            'grupoid' => $this->getGrupoID(),
+        ]);
+        $other_associacao = $pacote->findAssociacaoID();
+        if ($pacote->exists() && $associacao->getGrupoID() != $other_associacao->getGrupoID()) {
+            $errors['associacaoid'] = _t('pacote.associacao_id_conflict');
         }
         if (is_null($this->getQuantidadeMinima())) {
             $errors['quantidademinima'] = _t('pacote.quantidade_minima_cannot_empty');
@@ -526,8 +578,18 @@ class Pacote extends SyncModel
         if (is_null($this->getValor())) {
             $errors['valor'] = _t('pacote.valor_cannot_empty');
         }
+        $selecionados = self::count([
+            '!id' => $this->getID(),
+            'grupoid' => $this->getGrupoID(),
+            'associacaoid' => $this->getAssociacaoID(),
+        ]);
         if (!Validator::checkBoolean($this->getSelecionado())) {
             $errors['selecionado'] = _t('pacote.selecionado_invalid');
+        } elseif ($this->isSelecionado() &&
+            $grupo->getQuantidadeMaxima() > 0 &&
+            $selecionados >= $grupo->getQuantidadeMaxima()
+        ) {
+            $errors['selecionado'] = _t('pacote.selecionado_multiple');
         }
         if (!Validator::checkBoolean($this->getVisivel())) {
             $errors['visivel'] = _t('pacote.visivel_invalid');
@@ -602,6 +664,11 @@ class Pacote extends SyncModel
     protected function filterCondition($condition)
     {
         $allowed = $this->getAllowedKeys();
+        if (isset($condition['!id'])) {
+            $field = 'NOT p.id';
+            $condition[$field] = $condition['!id'];
+            $allowed[$field] = true;
+        }
         return Filter::keys($condition, $allowed, 'p.');
     }
 

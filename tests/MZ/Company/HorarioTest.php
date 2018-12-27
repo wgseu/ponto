@@ -24,6 +24,7 @@
  */
 namespace MZ\Company;
 
+use MZ\Util\Date;
 use MZ\Provider\FuncaoTest;
 use MZ\Provider\PrestadorTest;
 use MZ\System\IntegracaoTest;
@@ -41,8 +42,8 @@ class HorarioTest extends \MZ\Framework\TestCase
         $id = $last->getID() + 1;
         $horario = new Horario();
         $horario->setMensagem($mensagem);
-        $horario->setInicio(10000 + $id);
-        $horario->setFim(20000 + $id);
+        $horario->setInicio(Date::MINUTES_PER_DAY + $id * 20);
+        $horario->setFim($horario->getInicio() + 10);
         return $horario;
     }
 
@@ -130,5 +131,76 @@ class HorarioTest extends \MZ\Framework\TestCase
     public function testModoOptions()
     {
         $this->assertInternalType('string', Horario::getModoOptions(Horario::MODO_OPERACAO));
+    }
+
+    public function testMultipleSelections()
+    {
+        $horario = self::build();
+        $horario->setFuncaoID(FuncaoTest::create([])->getID());
+        $horario->setPrestadorID(PrestadorTest::create()->getID());
+        $this->expectException('\MZ\Exception\ValidationException');
+        $horario->insert();
+    }
+
+    public function testInvalidInterval()
+    {
+        $horario = self::build();
+        $inicio = $horario->getInicio();
+        $horario->setInicio($horario->getFim());
+        $horario->setFim($inicio);
+        $this->expectException('\MZ\Exception\ValidationException');
+        $horario->insert();
+    }
+
+    public function testInvalidStart()
+    {
+        $horario = self::build();
+        $horario->setInicio(1439);
+        $this->expectException('\MZ\Exception\ValidationException');
+        $horario->insert();
+    }
+
+    public function testInvalidEnd()
+    {
+        $horario = self::build();
+        $horario->setFim(Date::MINUTES_PER_DAY * 8);
+        $this->expectException('\MZ\Exception\ValidationException');
+        $horario->insert();
+    }
+
+    public function testExistingInto()
+    {
+        $horario = self::create();
+        $horario->setInicio($horario->getInicio() - 1);
+        $horario->setFim($horario->getFim() + 1);
+        $this->expectException('\MZ\Exception\ValidationException');
+        $horario->insert();
+    }
+
+    public function testExistingBefore()
+    {
+        $horario = self::create();
+        $horario->setInicio($horario->getInicio() - 1);
+        $horario->setFim($horario->getFim() - 1);
+        $this->expectException('\MZ\Exception\ValidationException');
+        $horario->insert();
+    }
+
+    public function testExistingAfter()
+    {
+        $horario = self::create();
+        $horario->setInicio($horario->getInicio() + 1);
+        $horario->setFim($horario->getFim() + 1);
+        $this->expectException('\MZ\Exception\ValidationException');
+        $horario->insert();
+    }
+
+    public function testExistingExternal()
+    {
+        $horario = self::create();
+        $horario->setInicio($horario->getInicio() + 1);
+        $horario->setFim($horario->getFim() - 1);
+        $this->expectException('\MZ\Exception\ValidationException');
+        $horario->insert();
     }
 }

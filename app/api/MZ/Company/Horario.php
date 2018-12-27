@@ -24,6 +24,7 @@
  */
 namespace MZ\Company;
 
+use MZ\Util\Date;
 use MZ\Util\Mask;
 use MZ\Util\Filter;
 use MZ\Util\Validator;
@@ -36,7 +37,6 @@ use MZ\Exception\ValidationException;
  */
 class Horario extends SyncModel
 {
-
     /**
      * Modo de trabalho disponível nesse horário, Funcionamento: horário em que
      * o estabelecimento estará aberto, Operação: quando aceitar novos pedidos
@@ -438,11 +438,34 @@ class Horario extends SyncModel
         if (!Validator::checkInSet($this->getModo(), self::getModoOptions())) {
             $errors['modo'] = _t('horario.modo_invalid');
         }
+        $selecao = !is_null($this->getFuncaoID()) +
+            !is_null($this->getPrestadorID()) +
+            !is_null($this->getIntegracaoID());
+        if ($selecao > 1) {
+            $errors['funcaoid'] = _t('horario.multiple_selections');
+        }
+        $count = self::count([
+            '!id' => $this->getID(),
+            'modo' => $this->getModo(),
+            'funcaoid' => $this->getFuncaoID(),
+            'prestadorid' => $this->getPrestadorID(),
+            'integracaoid' => $this->getIntegracaoID(),
+            'entre' => [$this->getInicio(), $this->getFim()],
+            'fechado' => $this->getFechado(),
+        ]);
         if (is_null($this->getInicio())) {
             $errors['inicio'] = _t('horario.inicio_cannot_empty');
+        } elseif ($this->getInicio() >= $this->getFim()) {
+            $errors['inicio'] = _t('horario.invalid_interval');
+        } elseif (!$this->isFechado() && $this->getInicio() < Date::MINUTES_PER_DAY) {
+            $errors['inicio'] = _t('horario.inicio_invalid');
+        } elseif ($count > 0) {
+            $errors['inicio'] = _t('horario.inicio_existing');
         }
         if (is_null($this->getFim())) {
             $errors['fim'] = _t('horario.fim_cannot_empty');
+        } elseif (!$this->isFechado() && $this->getFim() >= Date::MINUTES_PER_DAY * 8) {
+            $errors['fim'] = _t('horario.fim_invalid');
         }
         if (!Validator::checkBoolean($this->getFechado())) {
             $errors['fechado'] = _t('horario.fechado_invalid');
@@ -522,6 +545,37 @@ class Horario extends SyncModel
             $condition[$field] = '%'.$search.'%';
             $allowed[$field] = true;
             unset($condition['search']);
+        }
+        if (isset($condition['!id'])) {
+            $field = 'NOT h.id';
+            $condition[$field] = $condition['!id'];
+            $allowed[$field] = true;
+        }
+        if (isset($condition['ate_inicio'])) {
+            $field = 'h.inicio <= ?';
+            $condition[$field] = $condition['ate_inicio'];
+            $allowed[$field] = true;
+        }
+        if (isset($condition['apartir_inicio'])) {
+            $field = 'h.inicio >= ?';
+            $condition[$field] = $condition['apartir_inicio'];
+            $allowed[$field] = true;
+        }
+        if (isset($condition['ate_fim'])) {
+            $field = 'h.fim <= ?';
+            $condition[$field] = $condition['ate_fim'];
+            $allowed[$field] = true;
+        }
+        if (isset($condition['apartir_fim'])) {
+            $field = 'h.fim >= ?';
+            $condition[$field] = $condition['apartir_fim'];
+            $allowed[$field] = true;
+        }
+        if (isset($condition['entre']) && count($condition['entre']) == 2) {
+            $values = $condition['entre'];
+            $field = '(h.inicio BETWEEN ? AND ? OR ? BETWEEN h.inicio AND h.fim)';
+            $condition[$field] = [$values[0], $values[1], $values[0]];
+            $allowed[$field] = true;
         }
         return Filter::keys($condition, $allowed, 'h.');
     }

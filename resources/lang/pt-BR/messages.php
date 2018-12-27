@@ -988,4 +988,9 @@ return [
     'grupo.produto_id_not_package' => 'O grupo deve pertencer apenas a pacotes',
     'pacote.grupo_id_other' => 'Esse grupo pertence a outro pacote',
     'pacote.produto_id_package' => 'O produto do pacote não pode ser outro pacote',
+    'horario.multiple_selections' => 'Informe apenas um grupo de horário por vez',
+    'horario.inicio_existing' => 'Já existe um horário nesse intervalo',
+    'horario.invalid_interval' => 'O horário de início não pode ser após o término',
+    'horario.inicio_invalid' => 'O horário inicial não é válido',
+    'horario.fim_invalid' => 'O horário final não é válido',
 ];

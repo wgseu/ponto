@@ -46,7 +46,6 @@ class $[Table.norm]$[table.if(inherited)] extends $[table.inherited]$[table.end]
 $[field.each(all)]
 $[field.if(primary)]
 $[field.else.if(enum)]
-
 $[field.if(comment)]
     /**
 $[field.each(comment)]
@@ -57,9 +56,9 @@ $[field.end]
 $[field.each(option)]
     const $[FIELD.unix]_$[FIELD.option.norm] = '$[field.option]';
 $[field.end]
-$[field.end]
-$[field.end]
 
+$[field.end]
+$[field.end]
 $[field.each(all)]
 $[field.if(repeated)]
 $[field.else]
@@ -68,6 +67,8 @@ $[field.if(comment)]
 $[field.each(comment)]
      * $[Field.comment]
 $[field.end]
+     * @var $[field.if(integer|bigint)]int$[field.else.if(float|double|currency)]float$[field.else]string$[field.end]$[field.if(array)][]$[field.end]
+
      */
 $[field.end]
     private $$[field.unix]$[field.if(array)] = []$[field.end];
@@ -96,11 +97,11 @@ $[field.each(comment)]
      * $[Field.comment]
 $[field.end]
 $[field.if(array)]
-     * @param integer $number number to get $[Field.norm]
+     * @param int $number number to get $[Field.norm]
 $[field.end]
 $[field.if(integer|bigint)]
      * @return int $[field.name] of $[Table.name]
-$[field.else.if(float|double)]
+$[field.else.if(float|double|currency)]
      * @return float $[field.name] of $[Table.name]
 $[field.else]
      * @return string $[field.name] of $[Table.name]
@@ -140,11 +141,11 @@ $[field.each(comment)]
      * $[Field.comment]
 $[field.end]
 $[field.if(array)]
-     * @param integer $number number to set $[field.name]
+     * @param int $number number to set $[field.name]
 $[field.end]
 $[field.if(integer|bigint)]
      * @param int $$[field.unix] Set $[field.name] for $[Table.name]
-$[field.else.if(float|double)]
+$[field.else.if(float|double|currency)]
      * @param float $$[field.unix] Set $[field.name] for $[Table.name]
 $[field.else]
      * @param string $$[field.unix] Set $[field.name] for $[Table.name]
@@ -444,7 +445,7 @@ $[table.each(unique)]
 $[unique.each(all)]
 $[field.if(integer|bigint)]
             '$[field]' => intval($this->get$[Field.norm]($[field.if(array)]$[field.array.number]$[field.end])),
-$[field.else.if(float|double)]
+$[field.else.if(float|double|currency)]
             '$[field]' => floatval($this->get$[Field.norm]($[field.if(array)]$[field.array.number]$[field.end])),
 $[field.else]
             '$[field]' => strval($this->get$[Field.norm]($[field.if(array)]$[field.array.number]$[field.end])),
@@ -480,7 +481,7 @@ $[field.each(comment)]
      * $[Field.comment]
 $[field.end]
 $[field.if(array)]
-     * @param integer $number get $[Reference.norm] from number
+     * @param int $number get $[Reference.norm] from number
 $[field.end]
      * @return \$[Reference.package]\$[Reference.norm] The object fetched from database
      */
@@ -519,6 +520,7 @@ $[field.end]
     }
 $[field.end]
 $[field.end]
+$[descriptor.if(string)]
 
     /**
      * Filter condition array with allowed fields
@@ -528,7 +530,6 @@ $[field.end]
     protected function filterCondition($condition)
     {
         $allowed = $this->getAllowedKeys();
-$[descriptor.if(string)]
         if (isset($condition['search'])) {
             $search = $condition['search'];
             $field = '$[table.letter].$[descriptor] LIKE ?';
@@ -536,9 +537,9 @@ $[descriptor.if(string)]
             $allowed[$field] = true;
             unset($condition['search']);
         }
-$[descriptor.end]
         return Filter::keys($condition, $allowed, '$[table.letter].');
     }
+$[descriptor.end]
 
     /**
      * Fetch data from database with a condition
@@ -580,7 +581,7 @@ $[table.each(unique)]
 $[unique.each(all)]
 $[field.if(integer|bigint)]
      * @param int $$[field.unix] $[field.name] to find $[Table.name]
-$[field.else.if(float|double)]
+$[field.else.if(float|double|currency)]
      * @param float $$[field.unix] $[field.name] to find $[Table.name]
 $[field.else]
      * @param string $$[field.unix] $[field.name] to find $[Table.name]

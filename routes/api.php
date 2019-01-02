@@ -16,5 +16,6 @@ $collection = new RouteCollection();
 \MZ\Location\ZonaApiController::addRoutes($collection);
 \MZ\Company\HorarioApiController::addRoutes($collection);
 \MZ\Location\EnderecoApiController::addRoutes($collection);
+\MZ\Device\DispositivoApiController::addRoutes($collection);
 
 return $collection;

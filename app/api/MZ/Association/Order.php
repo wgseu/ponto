@@ -49,47 +49,74 @@ use MZ\Product\Produto;
 use MZ\Product\Composicao;
 use MZ\Session\Sessao;
 use MZ\Session\Movimentacao;
+use MZ\Provider\Prestador;
 use MZ\Exception\RedirectException;
 
 class Order extends Pedido
 {
     /**
      * Customer
+     * @var \MZ\Account\Cliente
      */
     private $customer;
+
     /**
      * Localization
+     * @var \MZ\Location\Localizacao
      */
     private $localization;
+
     /**
      * District
+     * @var \MZ\Location\Bairro
      */
     private $district;
+
     /**
      * City
+     * @var \MZ\Location\Cidade
      */
     private $city;
+
     /**
      * State
+     * @var \MZ\Location\Estado
      */
     private $state;
+
     /**
      * Country
+     * @var \MZ\Location\Pais
      */
     private $country;
+
     /**
      * Products
+     * @var \MZ\Product\Produto[]
      */
-    private $products;
+    private $products = [];
+
     /**
      * Payments
+     * @var \MZ\Payment\Pagamento[]
      */
-    private $payments;
+    private $payments = [];
+
     /**
-     * Payments
+     * Funcionário que está fazendo o pedido
      * @var \MZ\Provider\Prestador
      */
     public $employee;
+
+    /**
+     * Constructor for a new empty instance of Pedido
+     * @param array $pedido All field and values to fill the instance
+     */
+    public function __construct($order = [])
+    {
+        parent::__construct($order);
+        $this->employee = new Prestador();
+    }
 
     public function loadOrder($data)
     {
@@ -327,7 +354,9 @@ class Order extends Pedido
         }
         try {
             DB::beginTransaction();
-            $this->validaAcesso($this->employee);
+            if ($this->employee->exists()) {
+                $this->validaAcesso($this->employee);
+            }
             if (!$this->exists()) {
                 $sessao = Sessao::findByAberta(true);
                 $this->setSessaoID($sessao->getID());
@@ -335,6 +364,7 @@ class Order extends Pedido
             $this->registerCustomer();
             $viagem = !$this->getLocalizacaoID();
             if (!$this->exists()) {
+                // não existe pedido ainda, cadastra um novo
                 if (!is_null($this->customer)) {
                     $this->setClienteID($this->customer->getID());
                 }
@@ -342,13 +372,8 @@ class Order extends Pedido
                     $this->registerAddress();
                     $this->setLocalizacaoID($viagem ? null : $this->localization->getID());
                 }
-                // não existe pedido ainda, cadastra um novo
-                if (!is_null($this->employee)) {
-                    $this->setPrestadorID($this->employee->getID());
-                } else {
-                    $this->setPrestadorID(null);
-                }
-                $this->filter(new Pedido(), app()->auth->provider);
+                $this->setPrestadorID($this->employee->getID());
+                $this->filter(new Pedido(), $this->employee);
                 $this->insert();
                 $new_order = true;
             }

@@ -173,7 +173,7 @@ class PedidoOldApiController extends \MZ\Core\ApiController
 
     public function add()
     {
-        app()->needLogin();
+        app()->needManager();
         $order = new Order();
         $order->employee = app()->auth->provider;
         $synchronize = $this->getRequest()->request->getBoolean('sync');

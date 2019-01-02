@@ -2,7 +2,7 @@
 -- Author:        Mazin
 -- Caption:       GrandChef Model
 -- Project:       GrandChef
--- Changed:       2018-12-26 17:35
+-- Changed:       2019-01-02 16:27
 -- Created:       2012-09-05 23:08
 PRAGMA foreign_keys = OFF;
 
@@ -1989,7 +1989,7 @@ CREATE TABLE "Dispositivos"(
   "SetorID" INTEGER NOT NULL,-- Setor em que o dispositivo está instalado/será usado[N:Setor][G:o]
   "CaixaID" INTEGER DEFAULT NULL,-- Finalidade do dispositivo, caixa ou terminal, o caixa é único entre os dispositivos[N:Caixa][G:o]
   "Nome" VARCHAR(100) NOT NULL,-- Nome do computador ou tablet em rede, único entre os dispositivos[N:Nome][G:o][S]
-  "Tipo" TEXT NOT NULL CHECK("Tipo" IN('Computador', 'Tablet')) DEFAULT 'Computador',-- Tipo de dispositivo[N:Tipo][G:o][S:S]
+  "Tipo" TEXT NOT NULL CHECK("Tipo" IN('Computador', 'Tablet', 'Navegador')) DEFAULT 'Computador',-- Tipo de dispositivo[N:Tipo][G:o][S:S]
   "Descricao" VARCHAR(45) DEFAULT NULL,-- Descrição do dispositivo[N:Descrição][G:a]
   "Opcoes" TEXT DEFAULT NULL,-- Opções do dispositivo, Ex.: Balança, identificador de chamadas e outros[N:Opções][G:a]
   "Serial" VARCHAR(45) NOT NULL,-- Serial do tablet para validação, único entre os dispositivos[N:Serial][G:o]

@@ -44,42 +44,52 @@ class Dispositivo extends SyncModel
      */
     const TIPO_COMPUTADOR = 'Computador';
     const TIPO_TABLET = 'Tablet';
+    const TIPO_NAVEGADOR = 'Navegador';
 
     /**
      * Identificador do dispositivo
+     * @var int
      */
     private $id;
     /**
      * Setor em que o dispositivo está instalado/será usado
+     * @var int
      */
     private $setor_id;
     /**
      * Finalidade do dispositivo, caixa ou terminal, o caixa é único entre os
      * dispositivos
+     * @var int
      */
     private $caixa_id;
     /**
      * Nome do computador ou tablet em rede, único entre os dispositivos
+     * @var string
      */
     private $nome;
     /**
      * Tipo de dispositivo
+     * @var string
      */
     private $tipo;
     /**
      * Descrição do dispositivo
+     * @var string
      */
     private $descricao;
     /**
      * Opções do dispositivo, Ex.: Balança, identificador de chamadas e outros
+     * @var string
      */
     private $opcoes;
     /**
      * Serial do tablet para validação, único entre os dispositivos
+     * @var string
      */
     private $serial;
     /**
      * Validação do dispositivo
+     * @var string
      */
     private $validacao;
 
@@ -102,7 +112,7 @@ class Dispositivo extends SyncModel
     }
 
     /**
-     * Set ID value to new on param
+     * Identificador do dispositivo
      * @param int $id Set id for Dispositivo
      * @return self Self instance
      */
@@ -122,7 +132,7 @@ class Dispositivo extends SyncModel
     }
 
     /**
-     * Set SetorID value to new on param
+     * Setor em que o dispositivo está instalado/será usado
      * @param int $setor_id Set setor for Dispositivo
      * @return self Self instance
      */
@@ -143,7 +153,8 @@ class Dispositivo extends SyncModel
     }
 
     /**
-     * Set CaixaID value to new on param
+     * Finalidade do dispositivo, caixa ou terminal, o caixa é único entre os
+     * dispositivos
      * @param int $caixa_id Set caixa for Dispositivo
      * @return self Self instance
      */
@@ -163,7 +174,7 @@ class Dispositivo extends SyncModel
     }
 
     /**
-     * Set Nome value to new on param
+     * Nome do computador ou tablet em rede, único entre os dispositivos
      * @param string $nome Set nome for Dispositivo
      * @return self Self instance
      */
@@ -183,7 +194,7 @@ class Dispositivo extends SyncModel
     }
 
     /**
-     * Set Tipo value to new on param
+     * Tipo de dispositivo
      * @param string $tipo Set tipo for Dispositivo
      * @return self Self instance
      */
@@ -203,7 +214,7 @@ class Dispositivo extends SyncModel
     }
 
     /**
-     * Set Descricao value to new on param
+     * Descrição do dispositivo
      * @param string $descricao Set descrição for Dispositivo
      * @return self Self instance
      */
@@ -223,7 +234,7 @@ class Dispositivo extends SyncModel
     }
 
     /**
-     * Set Opcoes value to new on param
+     * Opções do dispositivo, Ex.: Balança, identificador de chamadas e outros
      * @param string $opcoes Set opções for Dispositivo
      * @return self Self instance
      */
@@ -243,7 +254,7 @@ class Dispositivo extends SyncModel
     }
 
     /**
-     * Set Serial value to new on param
+     * Serial do tablet para validação, único entre os dispositivos
      * @param string $serial Set serial for Dispositivo
      * @return self Self instance
      */
@@ -263,7 +274,7 @@ class Dispositivo extends SyncModel
     }
 
     /**
-     * Set Validacao value to new on param
+     * Validação do dispositivo
      * @param string $validacao Set validação for Dispositivo
      * @return self Self instance
      */
@@ -392,6 +403,7 @@ class Dispositivo extends SyncModel
         $this->setSetorID(Filter::number($this->getSetorID()));
         $this->setCaixaID(Filter::number($this->getCaixaID()));
         $this->setNome(Filter::string($this->getNome()));
+        $this->setTipo(Filter::string($this->getTipo()));
         $this->setDescricao(Filter::string($this->getDescricao()));
         $this->setOpcoes(Filter::text($this->getOpcoes()));
         $this->setSerial(Filter::string($this->getSerial()));
@@ -582,6 +594,7 @@ class Dispositivo extends SyncModel
         $options = [
             self::TIPO_COMPUTADOR => _t('dispositivo.tipo_computador'),
             self::TIPO_TABLET => _t('dispositivo.tipo_tablet'),
+            self::TIPO_NAVEGADOR => _t('dispositivo.tipo_navegador'),
         ];
         if (!is_null($index)) {
             return $options[$index];

@@ -48,7 +48,7 @@ class PedidoApiController extends \MZ\Core\ApiController
      */
     public function add()
     {
-        app()->needLogin();
+        app()->needManager();
         $order = new Order();
         $order->employee = app()->auth->provider;
         $order->loadData($this->getData());

@@ -6,6 +6,11 @@ include .env
 
 export DEBUG_BACK
 export DEBUG_HOST
+export WEB_HOST
+export FASTCGI_HOST
+export FASTCGI_PORT
+export PROXY_HOST
+export PUBLIC_PATH
 
 # Database dumps
 DB_DUMPS_DIR=storage/db/dumps
@@ -85,6 +90,8 @@ autoload:
 	@docker run --rm -v $(shell pwd):/app composer dump-autoload --no-scripts
 
 start: init reset
+	envsubst '$$WEB_HOST' < ./etc/nginx/default.template.conf > ./etc/nginx/default.conf
+	envsubst '$$FASTCGI_HOST $$FASTCGI_PORT $$PROXY_HOST $$PUBLIC_PATH' < ./etc/nginx/location.template.conf > ./etc/nginx/location.info
 	envsubst '$$DEBUG_BACK $$DEBUG_HOST' < ./etc/php/php.template.ini > ./etc/php/php.ini
 	docker-compose up -d
 

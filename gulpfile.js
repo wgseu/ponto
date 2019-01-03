@@ -171,20 +171,6 @@ gulp.task('fix-pop', function () {
   });
 })
 
-gulp.task('fix-loc', function () {
-  replace.sync({
-    files: 'etc/nginx/grandchef.location',
-    from: [
-      /"%PUBLIC_PATH%"/igm,
-      /127.0.0.1:9456;/igm
-    ],
-    to: [
-      '/var/www/html/public',
-      'php:9000;'
-    ]
-  });
-})
-
 const syncReload = function (done) {
   browserSync.reload();
   done();

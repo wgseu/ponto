@@ -4,6 +4,9 @@ PATH := C:\Program Files\Oracle\VirtualBox\:node_modules/.bin:$(PATH)
 
 include .env
 
+export DEBUG_BACK
+export DEBUG_HOST
+
 # Database dumps
 DB_DUMPS_DIR=storage/db/dumps
 
@@ -82,8 +85,7 @@ autoload:
 	@docker run --rm -v $(shell pwd):/app composer dump-autoload --no-scripts
 
 start: init reset
-	@cp etc/nginx/default.conf.template etc/nginx/grandchef.location
-	@npm run fix-loc
+	envsubst '$$DEBUG_BACK $$DEBUG_HOST' < ./etc/php/php.template.ini > ./etc/php/php.ini
 	docker-compose up -d
 
 stop:

@@ -2,7 +2,9 @@ utils/*.sublime-workspace
 vendor/
 *.lock
 build/
-etc/nginx/grandchef.location
+etc/nginx/default.conf
+etc/nginx/location.info
+etc/php/php.ini
 storage/
 .env
 node_modules/

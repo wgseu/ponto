@@ -1200,6 +1200,21 @@ class Produto extends SyncModel
     }
 
     /**
+     * Load next available code from database into this object codigo field
+     * @return self Self codigo filled instance with next code
+     */
+    public function loadNextCodigo()
+    {
+        $last = self::find(['proximo' => $this->getCodigo(), 'promocao' => 'N']);
+        if ($last->exists()) {
+            return $this->setCodigo(strval($last->getCodigo() + 1));
+        } elseif (!\is_numeric($this->getCodigo()) || $this->getCodigo() < 1) {
+            return $this->setCodigo('1');
+        }
+        return $this;
+    }
+
+    /**
      * Categoria do produto, permite a rápida localização ao utilizar tablets
      * @return \MZ\Product\Categoria The object fetched from database
      */
@@ -1273,6 +1288,32 @@ class Produto extends SyncModel
     }
 
     /**
+     * Get allowed keys array
+     * @return array allowed keys array
+     */
+    protected function getAllowedKeys()
+    {
+        $allowed = parent::getAllowedKeys();
+        $allowed['CAST(p.codigo AS DECIMAL)'] = true;
+        return $allowed;
+    }
+
+    /**
+     * Filter order array
+     * @param mixed $order order string or array to parse and filter allowed
+     * @return array allowed associative order
+     */
+    protected function filterOrder($order)
+    {
+        $order = Filter::order($order);
+        if (isset($order['codigo'])) {
+            $field = 'CAST(p.codigo AS DECIMAL)';
+            $order = replace_key($order, 'codigo', $field);
+        }
+        return parent::filterOrder($order);
+    }
+
+    /**
      * Filter condition array with allowed fields
      * @param array $condition condition to filter rows
      * @return array allowed condition
@@ -1305,6 +1346,7 @@ class Produto extends SyncModel
      */
     protected function query($condition = [], $order = [])
     {
+        $order = Filter::order($order);
         $estoque = isset($condition['disponivel']) || isset($condition['limitado']) ||
             isset($condition['estoque']);
         $setorestoque = isset($condition['setorestoque']) ? $condition['setorestoque'] : null;
@@ -1367,6 +1409,16 @@ class Produto extends SyncModel
                 self::TIPO_PRODUTO,
                 $disponivel
             );
+        }
+        if (array_key_exists('proximo', $condition)) {
+            $query = $query->leftJoin(
+                'Produtos o ON CAST(o.codigo as DECIMAL) = CAST(p.codigo as DECIMAL) + 1'
+            );
+            $query = $query->where('o.id', null);
+            if (isset($condition['proximo'])) {
+                $query = $query->where('CAST(p.codigo as DECIMAL) >= ?', $condition['proximo'] - 1);
+            }
+            $order['codigo'] = 1;
         }
         if (isset($condition['limitado'])) {
             $limitado = $condition['limitado'];

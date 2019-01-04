@@ -38,13 +38,12 @@ class ProdutoTest extends \MZ\Framework\TestCase
      */
     public static function build($descricao = null)
     {
-        $last = Produto::find([], ['id' => -1]);
-        $id = $last->getID() + 1;
         $categoria = CategoriaTest::create();
         $unidade = UnidadeTest::create();
         $setor = SetorTest::create();
         $produto = new Produto();
-        $produto->setCodigo($id);
+        $produto->loadNextCodigo();
+        $id = $produto->getCodigo();
         $produto->setCategoriaID($categoria->getID());
         $produto->setUnidadeID($unidade->getID());
         $produto->setSetorPreparoID($setor->getID());
@@ -203,5 +202,31 @@ class ProdutoTest extends \MZ\Framework\TestCase
         $estoque->delete();
         // end undo product available
         $this->assertEquals($expected, \array_intersect_key($result, $expected));
+    }
+
+    public function testLoadNextCodigo()
+    {
+        $produto = self::build();
+        $produto->setCodigo($produto->getCodigo() + 1);
+        $produto->loadNextCodigo();
+        $produto->setDescricao("Produto #{$produto->getCodigo()}");
+        $produto->insert();
+        $old_codigo = $produto->getCodigo();
+        $produto = self::build();
+        $produto->setCodigo($old_codigo + 10);
+        $produto->setDescricao("Produto #{$produto->getCodigo()}");
+        $produto->insert();
+        $produto->loadNextCodigo();
+        $this->assertEquals($old_codigo + 11, $produto->getCodigo());
+        $produto = self::build();
+        $produto->setCodigo($old_codigo);
+        $produto->loadNextCodigo();
+        $this->assertEquals($old_codigo + 1, $produto->getCodigo());
+        $produto->setDescricao("Produto #{$produto->getCodigo()}");
+        $produto->insert();
+        $produto = self::build();
+        $produto->setCodigo($old_codigo);
+        $produto->loadNextCodigo();
+        $this->assertEquals($old_codigo + 2, $produto->getCodigo());
     }
 }

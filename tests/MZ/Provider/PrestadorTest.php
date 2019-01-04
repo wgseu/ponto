@@ -75,7 +75,6 @@ class PrestadorTest extends \MZ\Framework\TestCase
             'clienteid',
             'prestadorid',
             'vinculo',
-            'codigobarras',
             'porcentagem',
             'pontuacao',
             'ativo',

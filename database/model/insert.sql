@@ -376,7 +376,7 @@ INSERT INTO `Clientes` (`ID`, `Tipo`, `Login`, `Senha`, `Nome`, `Sobrenome`, `Ge
 	(1, 'Fisica', "Admin", "e14268a48adfacfdaed1d420573f69df7ce4b829", "Administrador", "do Sistema", 'Masculino', NOW(), NOW());
 
 INSERT INTO `Prestadores` (`ID`, `Codigo`, `FuncaoID`, `ClienteID`, `Ativo`, `DataCadastro`) VALUES
-	(1, 1, 1, 1, 'Y', NOW());
+	(1, '1', 1, 1, 'Y', NOW());
 
 INSERT INTO `Carteiras` (`ID`, `Tipo`, `Descricao`, `Ativa`) VALUES
 	(1, 'Local', "Gaveta do Caixa 1", 'Y');

@@ -100,17 +100,12 @@ class DB
     }
 
     /**
-     * Gets boolean array or boolean value for index
-     * @param  string $index Y or N, null to return array
-     * @return mixed A array or boolean value
+     * Gets boolean array
+     * @return mixed An array
      */
-    public static function getBooleanOptions($index = null)
+    public static function getBooleanOptions()
     {
-        $options = ['Y' => true, 'N' => false];
-        if (!is_null($index)) {
-            return $options[$index];
-        }
-        return $options;
+        return ['Y' => true, 'N' => false];
     }
 
     /**

@@ -2,7 +2,7 @@
 -- Author:        Mazin
 -- Caption:       GrandChef Model
 -- Project:       GrandChef
--- Changed:       2019-01-02 16:27
+-- Changed:       2019-01-04 11:35
 -- Created:       2012-09-05 23:08
 PRAGMA foreign_keys = OFF;
 
@@ -137,14 +137,14 @@ CREATE TABLE "Clientes"(
     UNIQUE("Login"),
   CONSTRAINT "Secreto_UNIQUE"
     UNIQUE("Secreto"),
-  CONSTRAINT "FK_Clientes_Clientes_AcionistaID"
+  CONSTRAINT "FK_Clientes_EmpresaID"
     FOREIGN KEY("EmpresaID")
     REFERENCES "Clientes"("ID")
     ON DELETE RESTRICT
     ON UPDATE RESTRICT
 );
-CREATE INDEX "Clientes.Nome_INDEX" ON "Clientes" ("Nome");
-CREATE INDEX "Clientes.FK_Clientes_Clientes_AcionistaID_idx" ON "Clientes" ("EmpresaID");
+CREATE INDEX "Clientes.IDX_Nome" ON "Clientes" ("Nome");
+CREATE INDEX "Clientes.FK_Clientes_EmpresaID_idx" ON "Clientes" ("EmpresaID");
 CREATE TABLE "Moedas"(
 --   Moedas financeiras de um país[N:Moeda|Moedas][G:a][L:CadastroMoedas][K:MZ\Wallet|MZ\Wallet\][H:SyncModel]
   "ID" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,-- Identificador da moeda[G:o]
@@ -172,12 +172,11 @@ CREATE TABLE "Servidores"(
 CREATE TABLE "Prestadores"(
 --   Prestador de serviço que realiza alguma tarefa na empresa[N:Prestador|Prestadores][G:o][L:CadastroPrestadores][K:MZ\Provider|MZ\Provider\][H:SyncModel]
   "ID" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,-- Identificador do prestador[G:o]
-  "Codigo" INTEGER NOT NULL,-- Código do prestador[N:Código][G:o]
+  "Codigo" VARCHAR(100) NOT NULL,-- Código do prestador, podendo ser de barras[N:Código][G:o]
   "FuncaoID" INTEGER NOT NULL,-- Função do prestada na empresa[N:Função][G:a][S:S]
   "ClienteID" INTEGER NOT NULL,-- Cliente que representa esse prestador, único no cadastro de prestadores[N:Cliente][G:o][S]
   "PrestadorID" INTEGER DEFAULT NULL,-- Informa a empresa que gerencia os colaboradores, nulo para a empresa do próprio estabelecimento[G:o][N:Prestador]
   "Vinculo" TEXT NOT NULL CHECK("Vinculo" IN('Funcionario', 'Prestador', 'Autonomo')) DEFAULT 'Funcionario',-- Vínculo empregatício com a empresa, funcionário e autônomo são pessoas físicas, prestador é pessoa jurídica[G:o][N:Vínculo][E:Funcionário|Prestador|Autônomo]
-  "CodigoBarras" VARCHAR(13) DEFAULT NULL,-- Código de barras utilizado pelo prestador para autorizar uma operação no sistema[N:Código de barras][G:o]
   "Porcentagem" DOUBLE NOT NULL DEFAULT 0,-- Porcentagem cobrada pelo funcionário ou autônomo ao cliente, Ex.: Comissão de 10% [N:Comissão][G:a]
   "Pontuacao" INTEGER NOT NULL DEFAULT 0,-- Define a distribuição da porcentagem pela parcela de pontos[N:Pontuação][G:a]
   "Ativo" TEXT NOT NULL CHECK("Ativo" IN('Y', 'N')) DEFAULT 'Y',-- Informa se o prestador está ativo na empresa[N:Ativo][G:o]
@@ -186,8 +185,6 @@ CREATE TABLE "Prestadores"(
   "DataCadastro" DATETIME NOT NULL,-- Data em que o prestador de serviços foi cadastrado no sistema[N:Data de cadastro][G:a][D]
   CONSTRAINT "ClienteID_UNIQUE"
     UNIQUE("ClienteID"),
-  CONSTRAINT "CodigoBarras_UNIQUE"
-    UNIQUE("CodigoBarras"),
   CONSTRAINT "Codigo_UNIQUE"
     UNIQUE("Codigo"),
   CONSTRAINT "FK_Prestadores_Funcoes_FuncaoID"
@@ -200,14 +197,14 @@ CREATE TABLE "Prestadores"(
     REFERENCES "Clientes"("ID")
     ON DELETE RESTRICT
     ON UPDATE RESTRICT,
-  CONSTRAINT "FK_Prestadores_Prestadores_PrestadorID"
+  CONSTRAINT "FK_Prestadores_PrestadorID"
     FOREIGN KEY("PrestadorID")
     REFERENCES "Prestadores"("ID")
     ON DELETE RESTRICT
     ON UPDATE RESTRICT
 );
 CREATE INDEX "Prestadores.FK_Prestadores_Funcoes_FuncaoID_idx" ON "Prestadores" ("FuncaoID");
-CREATE INDEX "Prestadores.FK_Prestadores_Prestadores_PrestadorID_idx" ON "Prestadores" ("PrestadorID");
+CREATE INDEX "Prestadores.FK_Prestadores_PrestadorID_idx" ON "Prestadores" ("PrestadorID");
 CREATE TABLE "Mapeamentos"(
 --   Informa qual é o id associado de outros servidores para esse servidor[N:Mapeamento|Mapeamentos][G:o][L:AlterarConfiguracoes][K:MZ\Database|MZ\Database\][H:Model]
   "ID" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,-- Identificador do mapeamento[G:o][N:Identificador]
@@ -238,13 +235,13 @@ CREATE TABLE "Categorias"(
   "DataArquivado" DATETIME DEFAULT NULL,-- Data em que a categoria foi arquivada e não será mais usada[G:a][N:Data de arquivação]
   CONSTRAINT "Descricao_UNIQUE"
     UNIQUE("Descricao"),
-  CONSTRAINT "FK_Categorias_Categorias_CategoriaID"
+  CONSTRAINT "FK_Categorias_CategoriaID"
     FOREIGN KEY("CategoriaID")
     REFERENCES "Categorias"("ID")
     ON DELETE RESTRICT
     ON UPDATE RESTRICT
 );
-CREATE INDEX "Categorias.FK_Categorias_Categorias_CategoriaID_idx" ON "Categorias" ("CategoriaID");
+CREATE INDEX "Categorias.FK_Categorias_CategoriaID_idx" ON "Categorias" ("CategoriaID");
 CREATE TABLE "Paises"(
 --   Informações de um páis com sua moeda e língua nativa[N:País|Paises][G:o][L:CadastroPaises][K:MZ\Location|MZ\Location\][H:SyncModel]
   "ID" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,-- Identificador do país[G:o]
@@ -324,13 +321,13 @@ CREATE TABLE "Viagens"(
   "DataAtualizacao" DATETIME DEFAULT NULL,-- Data de atualização da localização do responsável[G:a][N:Data de atualização]
   "DataChegada" DATETIME DEFAULT NULL,-- Data de chegada no estabelecimento[G:a][N:Data de chegada]
   "DataSaida" DATETIME NOT NULL,-- Data e hora que o responsável saiu para entregar o pedido ou fazer as compras[N:Data de saida][G:a]
-  CONSTRAINT "FK_Entregas_Prestadores_ResponsavelID"
+  CONSTRAINT "FK_Viagens_Prestadores_ResponsavelID"
     FOREIGN KEY("ResponsavelID")
     REFERENCES "Prestadores"("ID")
     ON DELETE RESTRICT
     ON UPDATE RESTRICT
 );
-CREATE INDEX "Viagens.FK_Entregas_Prestadores_ResponsavelID_idx" ON "Viagens" ("ResponsavelID");
+CREATE INDEX "Viagens.FK_Viagens_Prestadores_ResponsavelID_idx" ON "Viagens" ("ResponsavelID");
 CREATE TABLE "Bancos"(
 --   Bancos disponíveis no país[N:Banco|Bancos][G:o][L:CadastroBancos][K:MZ\Wallet|MZ\Wallet\][H:SyncModel]
   "ID" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,-- Identificador do banco[G:o]
@@ -420,25 +417,25 @@ CREATE TABLE "Empresas"(
   "EmpresaID" INTEGER DEFAULT NULL,-- Informa a empresa do cadastro de clientes, a empresa deve ser um cliente do tipo pessoa jurídica[N:Empresa][G:a][S:S]
   "ParceiroID" INTEGER DEFAULT NULL,-- Informa quem realiza o suporte do sistema, deve ser um cliente do tipo empresa que possua um acionista como representante[N:Parceiro][G:o][S:S]
   "Opcoes" TEXT DEFAULT NULL,-- Opções gerais do sistema como opções de impressão e comportamento[N:Opções do sistema][G:a]
-  CONSTRAINT "FK_Sistema_Clientes_EmpresaID0"
+  CONSTRAINT "FK_Empresas_Clientes_EmpresaID"
     FOREIGN KEY("EmpresaID")
     REFERENCES "Clientes"("ID")
     ON DELETE RESTRICT
     ON UPDATE RESTRICT,
-  CONSTRAINT "FK_Sistema_Clientes_ParceiroID0"
+  CONSTRAINT "FK_Empresas_Clientes_ParceiroID"
     FOREIGN KEY("ParceiroID")
     REFERENCES "Clientes"("ID")
     ON DELETE RESTRICT
     ON UPDATE RESTRICT,
-  CONSTRAINT "FK_Sistema_Paises_PaisID0"
+  CONSTRAINT "FK_Empresas_Paises_PaisID"
     FOREIGN KEY("PaisID")
     REFERENCES "Paises"("ID")
     ON DELETE RESTRICT
     ON UPDATE RESTRICT
 );
-CREATE INDEX "Empresas.FK_Sistema_Clientes_EmpresaID_idx" ON "Empresas" ("EmpresaID");
-CREATE INDEX "Empresas.FK_Sistema_Clientes_ParceiroID_idx" ON "Empresas" ("ParceiroID");
-CREATE INDEX "Empresas.FK_Sistema_Paises_PaisID_idx" ON "Empresas" ("PaisID");
+CREATE INDEX "Empresas.FK_Empresas_Clientes_EmpresaID_idx" ON "Empresas" ("EmpresaID");
+CREATE INDEX "Empresas.FK_Empresas_Clientes_ParceiroID_idx" ON "Empresas" ("ParceiroID");
+CREATE INDEX "Empresas.FK_Empresas_Paises_PaisID_idx" ON "Empresas" ("PaisID");
 CREATE TABLE "Fornecedores"(
 --   Fornecedores de produtos[N:Fornecedor|Fornecedores][G:o][L:CadastroFornecedores][K:MZ\Stock|MZ\Stock\][H:SyncModel]
   "ID" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,-- Identificador do fornecedor[G:o]
@@ -670,7 +667,7 @@ CREATE TABLE "Cheques"(
     ON DELETE RESTRICT
     ON UPDATE RESTRICT
 );
-CREATE INDEX "Cheques.IDX_Cheques_Vencimento_Recolhido" ON "Cheques" ("Vencimento","Recolhido");
+CREATE INDEX "Cheques.IDX_Vencimento_Recolhido" ON "Cheques" ("Vencimento","Recolhido");
 CREATE INDEX "Cheques.FK_Cheques_Clientes_ClienteID_idx" ON "Cheques" ("ClienteID");
 CREATE INDEX "Cheques.FK_Cheques_Bancos_BancoID_idx" ON "Cheques" ("BancoID");
 CREATE TABLE "Observacoes"(
@@ -767,14 +764,14 @@ CREATE TABLE "Carteiras"(
     REFERENCES "Bancos"("ID")
     ON DELETE RESTRICT
     ON UPDATE RESTRICT,
-  CONSTRAINT "FK_Carteiras_Carteiras_CarteiraID"
+  CONSTRAINT "FK_Carteiras_CarteiraID"
     FOREIGN KEY("CarteiraID")
     REFERENCES "Carteiras"("ID")
     ON DELETE RESTRICT
     ON UPDATE RESTRICT
 );
 CREATE INDEX "Carteiras.FK_Carteiras_Bancos_BancoID_idx" ON "Carteiras" ("BancoID");
-CREATE INDEX "Carteiras.FK_Carteiras_Carteiras_CarteiraID_idx" ON "Carteiras" ("CarteiraID");
+CREATE INDEX "Carteiras.FK_Carteiras_CarteiraID_idx" ON "Carteiras" ("CarteiraID");
 CREATE TABLE "Listas"(
 --   Lista de compras de produtos[N:Lista de compra|Listas de compras][G:a][L:ListaCompras][K:MZ\Stock|MZ\Stock\][H:SyncModel]
   "ID" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,-- Identificador da lista de compras[G:o]
@@ -955,7 +952,7 @@ CREATE TABLE "Auditoria"(
     ON UPDATE RESTRICT
 );
 CREATE INDEX "Auditoria.FK_Auditoria_Prestadores_PrestadorID_idx" ON "Auditoria" ("PrestadorID");
-CREATE INDEX "Auditoria.IDX_Auditoria_DataHora" ON "Auditoria" ("DataHora");
+CREATE INDEX "Auditoria.IDX_DataHora" ON "Auditoria" ("DataHora");
 CREATE INDEX "Auditoria.FK_Auditoria_Prestadores_AutorizadorID_idx" ON "Auditoria" ("AutorizadorID");
 CREATE INDEX "Auditoria.FK_Auditoria_Permissoes_PermissaoID_idx" ON "Auditoria" ("PermissaoID");
 CREATE TABLE "Grupos"(
@@ -1152,7 +1149,7 @@ CREATE TABLE "Cupons"(
   "ValorLimite" DECIMAL NOT NULL DEFAULT 0,-- Valor do pedido com os serviços que permite usar esse cupom[G:a][N:Limite de valor]
   "Validade" DATETIME NOT NULL,-- Validade do cupom[G:a][N:Validade]
   "DataRegistro" DATETIME NOT NULL,-- Data de registro do cupom ou do uso[G:a][N:Data de registro]
-  CONSTRAINT "FK_Cupons_Cupons_CupomID"
+  CONSTRAINT "FK_Cupons_CupomID"
     FOREIGN KEY("CupomID")
     REFERENCES "Cupons"("ID")
     ON DELETE RESTRICT
@@ -1168,7 +1165,7 @@ CREATE TABLE "Cupons"(
     ON DELETE RESTRICT
     ON UPDATE RESTRICT
 );
-CREATE INDEX "Cupons.FK_Cupons_Cupons_CupomID_idx" ON "Cupons" ("CupomID");
+CREATE INDEX "Cupons.FK_Cupons_CupomID_idx" ON "Cupons" ("CupomID");
 CREATE INDEX "Cupons.FK_Cupons_Pedidos_PedidoID_idx" ON "Cupons" ("PedidoID");
 CREATE INDEX "Cupons.FK_Cupons_Clientes_ClienteID_idx" ON "Cupons" ("ClienteID");
 CREATE TABLE "Propriedades"(
@@ -1233,12 +1230,12 @@ CREATE TABLE "Pagamentos"(
     REFERENCES "Cartoes"("ID")
     ON DELETE RESTRICT
     ON UPDATE RESTRICT,
-  CONSTRAINT "FK_Pagamentos_Contas_ContaID"
+  CONSTRAINT "FK_Pagamentos_Contas_CrediarioID"
     FOREIGN KEY("CrediarioID")
     REFERENCES "Contas"("ID")
     ON DELETE RESTRICT
     ON UPDATE RESTRICT,
-  CONSTRAINT "FK_Pagamentos_Contas_PagtoContaID"
+  CONSTRAINT "FK_Pagamentos_Contas_ContaID"
     FOREIGN KEY("ContaID")
     REFERENCES "Contas"("ID")
     ON DELETE RESTRICT
@@ -1263,7 +1260,7 @@ CREATE TABLE "Pagamentos"(
     REFERENCES "Cheques"("ID")
     ON DELETE RESTRICT
     ON UPDATE RESTRICT,
-  CONSTRAINT "FK_Pagamentos_Pagamentos_PagamentoID"
+  CONSTRAINT "FK_Pagamentos_PagamentoID"
     FOREIGN KEY("PagamentoID")
     REFERENCES "Pagamentos"("ID")
     ON DELETE RESTRICT
@@ -1273,7 +1270,7 @@ CREATE TABLE "Pagamentos"(
     REFERENCES "Moedas"("ID")
     ON DELETE RESTRICT
     ON UPDATE RESTRICT,
-  CONSTRAINT "FK_Pagamentos_Pagamentos_AgrupamentoID"
+  CONSTRAINT "FK_Pagamentos_AgrupamentoID"
     FOREIGN KEY("AgrupamentoID")
     REFERENCES "Pagamentos"("ID")
     ON DELETE RESTRICT
@@ -1283,15 +1280,15 @@ CREATE INDEX "Pagamentos.FK_Pagamentos_Prestadores_FuncionarioID_idx" ON "Pagame
 CREATE INDEX "Pagamentos.FK_Pagamentos_Formas_Pagto_FormaPagtoID_idx" ON "Pagamentos" ("FormaPagtoID");
 CREATE INDEX "Pagamentos.FK_Pagamentos_Pedidos_PedidoID_idx" ON "Pagamentos" ("PedidoID");
 CREATE INDEX "Pagamentos.FK_Pagamentos_Cartoes_CartaoID_idx" ON "Pagamentos" ("CartaoID");
-CREATE INDEX "Pagamentos.FK_Pagamentos_Contas_ContaID_idx" ON "Pagamentos" ("CrediarioID");
-CREATE INDEX "Pagamentos.FK_Pagamentos_Contas_PagtoContaID_idx" ON "Pagamentos" ("ContaID");
+CREATE INDEX "Pagamentos.FK_Pagamentos_Contas_CrediarioID_idx" ON "Pagamentos" ("CrediarioID");
+CREATE INDEX "Pagamentos.FK_Pagamentos_Contas_ContaID_idx" ON "Pagamentos" ("ContaID");
 CREATE INDEX "Pagamentos.FK_Pagamentos_Movimentacoes_MovimentacaoID_idx" ON "Pagamentos" ("MovimentacaoID");
 CREATE INDEX "Pagamentos.FK_Pagamentos_Creditos_CreditoID_idx" ON "Pagamentos" ("CreditoID");
 CREATE INDEX "Pagamentos.FK_Pagamentos_Carteiras_CarteiraID_idx" ON "Pagamentos" ("CarteiraID");
 CREATE INDEX "Pagamentos.FK_Pagamentos_Cheques_ChequeID_idx" ON "Pagamentos" ("ChequeID");
-CREATE INDEX "Pagamentos.FK_Pagamentos_Pagamentos_PagamentoID_idx" ON "Pagamentos" ("PagamentoID");
+CREATE INDEX "Pagamentos.FK_Pagamentos_PagamentoID_idx" ON "Pagamentos" ("PagamentoID");
 CREATE INDEX "Pagamentos.FK_Pagamentos_Moedas_MoedaID_idx" ON "Pagamentos" ("MoedaID");
-CREATE INDEX "Pagamentos.FK_Pagamentos_Pagamentos_AgrupamentoID_idx" ON "Pagamentos" ("AgrupamentoID");
+CREATE INDEX "Pagamentos.FK_Pagamentos_AgrupamentoID_idx" ON "Pagamentos" ("AgrupamentoID");
 CREATE INDEX "Pagamentos.IDX_DataCompensacao" ON "Pagamentos" ("DataCompensacao" DESC);
 CREATE INDEX "Pagamentos.IDX_DataLancamento" ON "Pagamentos" ("DataLancamento" DESC);
 CREATE TABLE "Estoque"(
@@ -1338,7 +1335,7 @@ CREATE TABLE "Estoque"(
     REFERENCES "Setores"("ID")
     ON DELETE RESTRICT
     ON UPDATE RESTRICT,
-  CONSTRAINT "FK_Estoque_Estoque_EntradaID"
+  CONSTRAINT "FK_Estoque_EntradaID"
     FOREIGN KEY("EntradaID")
     REFERENCES "Estoque"("ID")
     ON DELETE RESTRICT
@@ -1354,7 +1351,7 @@ CREATE INDEX "Estoque.FK_Estoque_Itens_TransacaoID_idx" ON "Estoque" ("Transacao
 CREATE INDEX "Estoque.FK_Estoque_Fornecedores_FornecedorID_idx" ON "Estoque" ("FornecedorID");
 CREATE INDEX "Estoque.FK_Estoque_Prestadores_PrestadorID_idx" ON "Estoque" ("PrestadorID");
 CREATE INDEX "Estoque.FK_Estoque_Setores_SetorID_idx" ON "Estoque" ("SetorID");
-CREATE INDEX "Estoque.FK_Estoque_Estoque_EntradaID_idx" ON "Estoque" ("EntradaID");
+CREATE INDEX "Estoque.FK_Estoque_EntradaID_idx" ON "Estoque" ("EntradaID");
 CREATE INDEX "Estoque.FK_Estoque_Requisitos_RequisitoID_idx" ON "Estoque" ("RequisitoID");
 CREATE INDEX "Estoque.IDX_DataMovimento" ON "Estoque" ("DataMovimento");
 CREATE TABLE "Impressoras"(
@@ -1566,7 +1563,7 @@ CREATE TABLE "Localizacoes"(
     REFERENCES "Clientes"("ID")
     ON DELETE RESTRICT
     ON UPDATE RESTRICT,
-  CONSTRAINT "FK_Localizacoes_Bairros"
+  CONSTRAINT "FK_Localizacoes_Bairros_BairroID"
     FOREIGN KEY("BairroID")
     REFERENCES "Bairros"("ID")
     ON DELETE RESTRICT
@@ -1577,8 +1574,8 @@ CREATE TABLE "Localizacoes"(
     ON DELETE RESTRICT
     ON UPDATE RESTRICT
 );
-CREATE INDEX "Localizacoes.FK_Localizacoes_Clientes_ClienteID_ID_idx" ON "Localizacoes" ("ClienteID");
-CREATE INDEX "Localizacoes.FK_Localizacoes_Bairros_idx" ON "Localizacoes" ("BairroID");
+CREATE INDEX "Localizacoes.FK_Localizacoes_Clientes_ClienteID_idx" ON "Localizacoes" ("ClienteID");
+CREATE INDEX "Localizacoes.FK_Localizacoes_Bairros_BairroID_idx" ON "Localizacoes" ("BairroID");
 CREATE INDEX "Localizacoes.FK_Localizacoes_Zonas_ZonaID_idx" ON "Localizacoes" ("ZonaID");
 CREATE TABLE "Pedidos"(
 --   Informações do pedido de venda[N:Pedido|Pedidos][G:o][L:Pagamento][K:MZ\Sale|MZ\Sale\][H:SyncModel]
@@ -1651,7 +1648,7 @@ CREATE TABLE "Pedidos"(
     REFERENCES "Viagens"("ID")
     ON DELETE RESTRICT
     ON UPDATE RESTRICT,
-  CONSTRAINT "FK_Pedidos_Pedidos_PedidoID"
+  CONSTRAINT "FK_Pedidos_PedidoID"
     FOREIGN KEY("PedidoID")
     REFERENCES "Pedidos"("ID")
     ON DELETE RESTRICT
@@ -1667,7 +1664,7 @@ CREATE INDEX "Pedidos.FK_Pedidos_Comandas_ComandaID_idx" ON "Pedidos" ("ComandaI
 CREATE INDEX "Pedidos.FK_Pedidos_Prestadores_FechadorID_idx" ON "Pedidos" ("FechadorID");
 CREATE INDEX "Pedidos.FK_Pedidos_Viagens_EntregaID_idx" ON "Pedidos" ("EntregaID");
 CREATE INDEX "Pedidos.IDX_DataCriacao" ON "Pedidos" ("DataCriacao" DESC);
-CREATE INDEX "Pedidos.FK_Pedidos_Pedidos_PedidoID_idx" ON "Pedidos" ("PedidoID");
+CREATE INDEX "Pedidos.FK_Pedidos_PedidoID_idx" ON "Pedidos" ("PedidoID");
 CREATE TABLE "Movimentacoes"(
 --   Movimentação do caixa, permite abrir diversos caixas na conta de operadores[N:Movimentação|Movimentações][G:a][L:AbrirCaixa][K:MZ\Session|MZ\Session\][H:SyncModel]
   "ID" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,-- Código da movimentação do caixa[G:o]
@@ -1765,7 +1762,7 @@ CREATE TABLE "Pacotes"(
     REFERENCES "Grupos"("ID")
     ON DELETE RESTRICT
     ON UPDATE RESTRICT,
-  CONSTRAINT "FK_Pacotes_Pacotes_AssociacaoID"
+  CONSTRAINT "FK_Pacotes_AssociacaoID"
     FOREIGN KEY("AssociacaoID")
     REFERENCES "Pacotes"("ID")
     ON DELETE RESTRICT
@@ -1779,7 +1776,7 @@ CREATE TABLE "Pacotes"(
 CREATE INDEX "Pacotes.FK_Pacotes_Produtos_PacoteID_idx" ON "Pacotes" ("PacoteID");
 CREATE INDEX "Pacotes.FK_Pacotes_Produtos_ProdutoID_idx" ON "Pacotes" ("ProdutoID");
 CREATE INDEX "Pacotes.FK_Pacotes_Grupos_GrupoID_idx" ON "Pacotes" ("GrupoID");
-CREATE INDEX "Pacotes.FK_Pacotes_Pacotes_AssociacaoID_idx" ON "Pacotes" ("AssociacaoID");
+CREATE INDEX "Pacotes.FK_Pacotes_AssociacaoID_idx" ON "Pacotes" ("AssociacaoID");
 CREATE INDEX "Pacotes.FK_Pacotes_Propriedades_PropriedadeID_idx" ON "Pacotes" ("PropriedadeID");
 CREATE TABLE "Transferencias"(
 --   Informa a transferência de uma mesa / comanda para outra, ou de um produto para outra mesa / comanda[N:Transferência|Transferências][G:a][L:TransferirProdutos][K:MZ\Sale|MZ\Sale\][H:SyncModel]
@@ -1885,7 +1882,7 @@ CREATE TABLE "Itens"(
     REFERENCES "Prestadores"("ID")
     ON DELETE RESTRICT
     ON UPDATE RESTRICT,
-  CONSTRAINT "FK_Itens_Itens_ItemID"
+  CONSTRAINT "FK_Itens_ItemID"
     FOREIGN KEY("ItemID")
     REFERENCES "Itens"("ID")
     ON DELETE RESTRICT
@@ -1904,8 +1901,8 @@ CREATE TABLE "Itens"(
 CREATE INDEX "Itens.FK_Itens_Pedidos_PedidoID_idx" ON "Itens" ("PedidoID");
 CREATE INDEX "Itens.FK_Itens_Produtos_ProdutoID_idx" ON "Itens" ("ProdutoID");
 CREATE INDEX "Itens.FK_Itens_Prestadores_PrestadorID_idx" ON "Itens" ("PrestadorID");
-CREATE INDEX "Itens.DataLancamento_INDEX" ON "Itens" ("DataLancamento" DESC);
-CREATE INDEX "Itens.FK_Itens_Itens_ItemID_idx" ON "Itens" ("ItemID");
+CREATE INDEX "Itens.IDX_DataLancamento" ON "Itens" ("DataLancamento" DESC);
+CREATE INDEX "Itens.FK_Itens_ItemID_idx" ON "Itens" ("ItemID");
 CREATE INDEX "Itens.FK_Itens_Servicos_ServicoID_idx" ON "Itens" ("ServicoID");
 CREATE INDEX "Itens.FK_Itens_Pagamentos_PagamentoID_idx" ON "Itens" ("PagamentoID");
 CREATE TABLE "Contas"(
@@ -1958,7 +1955,7 @@ CREATE TABLE "Contas"(
     REFERENCES "Classificacoes"("ID")
     ON DELETE RESTRICT
     ON UPDATE RESTRICT,
-  CONSTRAINT "FK_Contas_Contas_ContaID"
+  CONSTRAINT "FK_Contas_ContaID"
     FOREIGN KEY("ContaID")
     REFERENCES "Contas"("ID")
     ON DELETE RESTRICT
@@ -1968,7 +1965,7 @@ CREATE TABLE "Contas"(
     REFERENCES "Carteiras"("ID")
     ON DELETE RESTRICT
     ON UPDATE RESTRICT,
-  CONSTRAINT "FK_Contas_Contas_AgrupamentoID"
+  CONSTRAINT "FK_Contas_AgrupamentoID"
     FOREIGN KEY("AgrupamentoID")
     REFERENCES "Contas"("ID")
     ON DELETE RESTRICT
@@ -1978,9 +1975,9 @@ CREATE INDEX "Contas.FK_Contas_Clientes_ClienteID_idx" ON "Contas" ("ClienteID")
 CREATE INDEX "Contas.FK_Contas_Prestadores_FuncionarioID_idx" ON "Contas" ("FuncionarioID");
 CREATE INDEX "Contas.FK_Contas_Pedidos_PedidoID_idx" ON "Contas" ("PedidoID");
 CREATE INDEX "Contas.FK_Contas_Classificacoes_ClassificacaoID_idx" ON "Contas" ("ClassificacaoID");
-CREATE INDEX "Contas.FK_Contas_Contas_ContaID_idx" ON "Contas" ("ContaID");
+CREATE INDEX "Contas.FK_Contas_ContaID_idx" ON "Contas" ("ContaID");
 CREATE INDEX "Contas.FK_Contas_Carteiras_CarteiraID_idx" ON "Contas" ("CarteiraID");
-CREATE INDEX "Contas.FK_Contas_Contas_AgrupamentoID_idx" ON "Contas" ("AgrupamentoID");
+CREATE INDEX "Contas.FK_Contas_AgrupamentoID_idx" ON "Contas" ("AgrupamentoID");
 CREATE INDEX "Contas.IDX_Vencimento" ON "Contas" ("Vencimento" DESC);
 CREATE INDEX "Contas.IDX_DataEmissao" ON "Contas" ("DataEmissao" DESC);
 CREATE TABLE "Dispositivos"(
@@ -2066,7 +2063,7 @@ CREATE TABLE "Juncoes"(
 );
 CREATE INDEX "Juncoes.FK_Juncoes_Mesas_MesaID_idx" ON "Juncoes" ("MesaID");
 CREATE INDEX "Juncoes.FK_Juncoes_Pedidos_PedidoID_idx" ON "Juncoes" ("PedidoID");
-CREATE INDEX "Juncoes.MesaEstado_INDEX" ON "Juncoes" ("MesaID","Estado");
+CREATE INDEX "Juncoes.IDX_MesaID_Estado" ON "Juncoes" ("MesaID","Estado");
 CREATE TABLE "Promocoes"(
 --   Informa se há descontos nos produtos em determinados dias da semana, o preço pode subir ou descer e ser agendado para ser aplicado[N:Promoção|Promoções][G:a][L:CadastroProdutos][K:MZ\Promotion|MZ\Promotion\][H:SyncModel]
   "ID" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,-- Identificador da promoção[G:o]

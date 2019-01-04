@@ -31,6 +31,7 @@ use MZ\Util\Validator;
 use MZ\Database\DB;
 use MZ\Database\SyncModel;
 use MZ\Exception\ValidationException;
+use MZ\Product\Servico;
 
 /**
  * Informa se há descontos nos produtos em determinados dias da semana, o
@@ -38,7 +39,6 @@ use MZ\Exception\ValidationException;
  */
 class Promocao extends SyncModel
 {
-
     /**
      * Identificador da promoção
      */
@@ -716,11 +716,46 @@ class Promocao extends SyncModel
     public function validate()
     {
         $errors = [];
+        $count = self::count([
+            '!id' => $this->getID(),
+            'categoriaid' => $this->getCategoriaID(),
+            'produtoid' => $this->getProdutoID(),
+            'servicoid' => $this->getServicoID(),
+            'bairroid' => $this->getBairroID(),
+            'zonaid' => $this->getZonaID(),
+            'integracaoid' => $this->getIntegracaoID(),
+            'entre' => [$this->getInicio(), $this->getFim()],
+            'evento' => $this->getEvento(),
+        ]);
+        $selecao = !is_null($this->getCategoriaID()) +
+            !is_null($this->getProdutoID()) +
+            !is_null($this->getServicoID());
+        if (is_null($this->getServicoID()) && !is_null($this->getBairroID())) {
+            $errors['servicoid'] = _t('promocao.servico_id_empty');
+        } elseif ($this->getServicoID() == Servico::DESCONTO_ID) {
+            $errors['servicoid'] = _t('promocao.servico_id_discount');
+        } elseif ($selecao > 1) {
+            $errors['servicoid'] = _t('promocao.multiple_selections');
+        }
+        if ($selecao < 1) {
+            $errors['produtoid'] = _t('promocao.no_selection');
+        }
+        if (!is_null($this->getZonaID()) && is_null($this->getBairroID())) {
+            $errors['bairroid'] = _t('promocao.bairro_id_empty');
+        }
         if (is_null($this->getInicio())) {
             $errors['inicio'] = _t('promocao.inicio_cannot_empty');
+        } elseif ($this->getInicio() >= $this->getFim()) {
+            $errors['inicio'] = _t('promocao.invalid_interval');
+        } elseif (!$this->isEvento() && $this->getInicio() < Date::MINUTES_PER_DAY) {
+            $errors['inicio'] = _t('promocao.inicio_invalid');
+        } elseif ($count > 0) {
+            $errors['inicio'] = _t('promocao.inicio_existing');
         }
         if (is_null($this->getFim())) {
             $errors['fim'] = _t('promocao.fim_cannot_empty');
+        } elseif (!$this->isEvento() && $this->getFim() >= Date::MINUTES_PER_DAY * 8) {
+            $errors['fim'] = _t('promocao.fim_invalid');
         }
         if (is_null($this->getValor())) {
             $errors['valor'] = _t('promocao.valor_cannot_empty');
@@ -844,6 +879,11 @@ class Promocao extends SyncModel
     protected function filterCondition($condition)
     {
         $allowed = $this->getAllowedKeys();
+        if (isset($condition['!id'])) {
+            $field = 'NOT p.id';
+            $condition[$field] = $condition['!id'];
+            $allowed[$field] = true;
+        }
         if (isset($condition['ate_inicio'])) {
             $field = 'p.inicio <= ?';
             $condition[$field] = $condition['ate_inicio'];
@@ -855,6 +895,12 @@ class Promocao extends SyncModel
             $condition[$field] = $condition['apartir_fim'];
             $allowed[$field] = true;
             unset($condition['apartir_fim']);
+        }
+        if (isset($condition['entre']) && count($condition['entre']) == 2) {
+            $values = $condition['entre'];
+            $field = '(p.inicio BETWEEN ? AND ? OR ? BETWEEN p.inicio AND p.fim)';
+            $condition[$field] = [$values[0], $values[1], $values[0]];
+            $allowed[$field] = true;
         }
         return Filter::keys($condition, $allowed, 'p.');
     }

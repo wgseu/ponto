@@ -496,11 +496,24 @@ class Transferencia extends SyncModel
     public function validate()
     {
         $errors = [];
+        $pedido = $this->findPedidoID();
+        $pedido_destino = $this->findDestinoPedidoID();
+        if ($this->exists()) {
+            $errors['id'] = _t('transferencia.id_cannot_update');
+        }
         if (is_null($this->getPedidoID())) {
             $errors['pedidoid'] = _t('transferencia.pedido_id_cannot_empty');
+        } elseif ($pedido->isCancelado()) {
+            $errors['pedidoid'] = _t('transferencia.pedido_id_canceled');
+        } elseif ($pedido->getEstado() == Pedido::ESTADO_FINALIZADO) {
+            $errors['pedidoid'] = _t('transferencia.pedido_id_finished');
         }
         if (is_null($this->getDestinoPedidoID())) {
             $errors['destinopedidoid'] = _t('transferencia.destino_pedido_id_cannot_empty');
+        } elseif ($pedido_destino->isCancelado()) {
+            $errors['destinopedidoid'] = _t('transferencia.destino_pedido_id_canceled');
+        } elseif ($pedido_destino->getEstado() == Pedido::ESTADO_FINALIZADO) {
+            $errors['destinopedidoid'] = _t('transferencia.destino_pedido_id_finished');
         }
         if (!Validator::checkInSet($this->getTipo(), self::getTipoOptions())) {
             $errors['tipo'] = _t('transferencia.tipo_invalid');
@@ -508,12 +521,33 @@ class Transferencia extends SyncModel
         if (!Validator::checkInSet($this->getModulo(), self::getModuloOptions())) {
             $errors['modulo'] = _t('transferencia.modulo_invalid');
         }
+        if ($this->getModulo() == self::MODULO_MESA && is_null($this->getMesaID())) {
+            $errors['mesaid'] = _t('transferencia.mesa_id_cannot_empty');
+        } elseif ($this->getModulo() == self::MODULO_COMANDA && !is_null($this->getMesaID())) {
+            $errors['mesaid'] = _t('transferencia.mesa_id_mustbe_empty');
+        }
+        if ($this->getModulo() == self::MODULO_MESA && is_null($this->getDestinoMesaID())) {
+            $errors['destinomesaid'] = _t('transferencia.destino_mesa_id_cannot_empty');
+        } elseif ($this->getModulo() == self::MODULO_COMANDA && !is_null($this->getDestinoMesaID())) {
+            $errors['destinomesaid'] = _t('transferencia.destino_mesa_id_mustbe_empty');
+        }
+        if ($this->getModulo() == self::MODULO_COMANDA && is_null($this->getComandaID())) {
+            $errors['comandaid'] = _t('transferencia.comanda_id_cannot_empty');
+        } elseif ($this->getModulo() == self::MODULO_MESA && !is_null($this->getComandaID())) {
+            $errors['comandaid'] = _t('transferencia.comanda_id_mustbe_empty');
+        }
+        if ($this->getModulo() == self::MODULO_COMANDA && is_null($this->getDestinoComandaID())) {
+            $errors['destinocomandaid'] = _t('transferencia.destino_comanda_id_cannot_empty');
+        } elseif ($this->getModulo() == self::MODULO_MESA && !is_null($this->getDestinoComandaID())) {
+            $errors['destinocomandaid'] = _t('transferencia.destino_comanda_id_mustbe_empty');
+        }
         if (is_null($this->getPrestadorID())) {
             $errors['prestadorid'] = _t('transferencia.prestador_id_cannot_empty');
         }
-        if (is_null($this->getDataHora())) {
-            $errors['datahora'] = _t('transferencia.data_hora_cannot_empty');
+        if ($this->getTipo() == self::TIPO_PRODUTO && is_null($this->getItemID())) {
+            $errors['itemid'] = _t('transferencia.item_id_cannot_empty');
         }
+        $this->setDataHora(DB::now());
         if (!empty($errors)) {
             throw new ValidationException($errors);
         }

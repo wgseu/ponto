@@ -38,15 +38,16 @@ class TransferenciaTest extends \MZ\Framework\TestCase
         $last = Transferencia::find([], ['id' => -1]);
         $id = $last->getID() + 1;
         $pedido = PedidoTest::create();
-        $pedido = PedidoTest::create();
+        $pedido_destino = PedidoTest::create();
         $prestador = PrestadorTest::create();
         $transferencia = new Transferencia();
         $transferencia->setPedidoID($pedido->getID());
-        $transferencia->setDestinoPedidoID($pedido->getID());
+        $transferencia->setDestinoPedidoID($pedido_destino->getID());
         $transferencia->setTipo(Transferencia::TIPO_PEDIDO);
         $transferencia->setModulo(Transferencia::MODULO_MESA);
+        $transferencia->setMesaID($pedido->getMesaID());
+        $transferencia->setDestinoMesaID($pedido_destino->getMesaID());
         $transferencia->setPrestadorID($prestador->getID());
-        $transferencia->setDataHora('2016-12-25 12:15:00');
         return $transferencia;
     }
 
@@ -82,8 +83,8 @@ class TransferenciaTest extends \MZ\Framework\TestCase
     public function testUpdate()
     {
         $transferencia = self::create();
+        $this->expectException('\MZ\Exception\ValidationException');
         $transferencia->update();
-        $this->assertTrue($transferencia->exists());
     }
 
     public function testDelete()

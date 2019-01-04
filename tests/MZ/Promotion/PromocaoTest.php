@@ -24,6 +24,9 @@
  */
 namespace MZ\Promotion;
 
+use MZ\Product\ProdutoTest;
+use MZ\Product\CategoriaTest;
+use MZ\Util\Date;
 
 class PromocaoTest extends \MZ\Framework\TestCase
 {
@@ -35,15 +38,17 @@ class PromocaoTest extends \MZ\Framework\TestCase
     {
         $last = Promocao::find([], ['id' => -1]);
         $id = $last->getID() + 1;
+        $produto = ProdutoTest::create();
         $promocao = new Promocao();
-        $promocao->setInicio(123);
-        $promocao->setFim(123);
+        $promocao->setProdutoID($produto->getID());
+        $promocao->setInicio(Date::MINUTES_PER_DAY + $id * 20);
+        $promocao->setFim($promocao->getInicio() + 10);
         $promocao->setValor(12.3);
         $promocao->setPontos(123);
         $promocao->setParcial('Y');
-        $promocao->setProibir('Y');
-        $promocao->setEvento('Y');
-        $promocao->setAgendamento('Y');
+        $promocao->setProibir('N');
+        $promocao->setEvento('N');
+        $promocao->setAgendamento('N');
         return $promocao;
     }
 
@@ -89,5 +94,75 @@ class PromocaoTest extends \MZ\Framework\TestCase
         $promocao->delete();
         $promocao->loadByID();
         $this->assertFalse($promocao->exists());
+    }
+
+    public function testMultipleSelections()
+    {
+        $promocao = self::build();
+        $promocao->setCategoriaID(CategoriaTest::create([])->getID());
+        $this->expectException('\MZ\Exception\ValidationException');
+        $promocao->insert();
+    }
+
+    public function testInvalidInterval()
+    {
+        $promocao = self::build();
+        $inicio = $promocao->getInicio();
+        $promocao->setInicio($promocao->getFim());
+        $promocao->setFim($inicio);
+        $this->expectException('\MZ\Exception\ValidationException');
+        $promocao->insert();
+    }
+
+    public function testInvalidStart()
+    {
+        $promocao = self::build();
+        $promocao->setInicio(1439);
+        $this->expectException('\MZ\Exception\ValidationException');
+        $promocao->insert();
+    }
+
+    public function testInvalidEnd()
+    {
+        $promocao = self::build();
+        $promocao->setFim(Date::MINUTES_PER_DAY * 8);
+        $this->expectException('\MZ\Exception\ValidationException');
+        $promocao->insert();
+    }
+
+    public function testExistingInto()
+    {
+        $promocao = self::create();
+        $promocao->setInicio($promocao->getInicio() - 1);
+        $promocao->setFim($promocao->getFim() + 1);
+        $this->expectException('\MZ\Exception\ValidationException');
+        $promocao->insert();
+    }
+
+    public function testExistingBefore()
+    {
+        $promocao = self::create();
+        $promocao->setInicio($promocao->getInicio() - 1);
+        $promocao->setFim($promocao->getFim() - 1);
+        $this->expectException('\MZ\Exception\ValidationException');
+        $promocao->insert();
+    }
+
+    public function testExistingAfter()
+    {
+        $promocao = self::create();
+        $promocao->setInicio($promocao->getInicio() + 1);
+        $promocao->setFim($promocao->getFim() + 1);
+        $this->expectException('\MZ\Exception\ValidationException');
+        $promocao->insert();
+    }
+
+    public function testExistingExternal()
+    {
+        $promocao = self::create();
+        $promocao->setInicio($promocao->getInicio() + 1);
+        $promocao->setFim($promocao->getFim() - 1);
+        $this->expectException('\MZ\Exception\ValidationException');
+        $promocao->insert();
     }
 }

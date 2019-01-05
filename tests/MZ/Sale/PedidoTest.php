@@ -33,15 +33,18 @@ class PedidoTest extends \MZ\Framework\TestCase
      * Build a valid pedido
      * @return Pedido
      */
-    public static function build()
+    public static function build($tipo = null)
     {
-        $last = Pedido::find([], ['id' => -1]);
-        $id = $last->getID() + 1;
         $prestador = PrestadorTest::create();
-        $mesa = MesaTest::create();
         $pedido = new Pedido();
-        $pedido->setTipo(Pedido::TIPO_MESA);
-        $pedido->setMesaID($mesa->getID());
+        $pedido->setTipo($tipo ?? Pedido::TIPO_MESA);
+        if ($pedido->getTipo() == Pedido::TIPO_MESA) {
+            $mesa = MesaTest::create();
+            $pedido->setMesaID($mesa->getID());
+        } elseif ($pedido->getTipo() == Pedido::TIPO_COMANDA) {
+            $comanda = ComandaTest::create();
+            $pedido->setComandaID($comanda->getID());
+        }
         $pedido->setEstado(Pedido::ESTADO_ATIVO);
         $pedido->setPrestadorID($prestador->getID());
         $pedido->setPessoas(3);
@@ -52,9 +55,9 @@ class PedidoTest extends \MZ\Framework\TestCase
      * Create a pedido on database
      * @return Pedido
      */
-    public static function create()
+    public static function create($tipo = null)
     {
-        $pedido = self::build();
+        $pedido = self::build($tipo);
         $pedido->insert();
         return $pedido;
     }

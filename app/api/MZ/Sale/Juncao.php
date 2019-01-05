@@ -277,18 +277,32 @@ class Juncao extends SyncModel
     public function validate()
     {
         $errors = [];
+        $juncao = self::find([
+            '!id' => $this->getID(),
+            'mesaid' => $this->getMesaID(),
+            'estado' => self::ESTADO_ASSOCIADO
+        ]);
+        $pedido = $this->findPedidoID();
         if (is_null($this->getMesaID())) {
             $errors['mesaid'] = _t('juncao.mesa_id_cannot_empty');
+        } elseif ($juncao->exists()) {
+            $errors['mesaid'] = _t('juncao.mesa_id_exists');
+        } elseif ($this->getMesaID() == $pedido->getMesaID()) {
+            $errors['mesaid'] = _t('juncao.mesa_id_same');
         }
         if (is_null($this->getPedidoID())) {
             $errors['pedidoid'] = _t('juncao.pedido_id_cannot_empty');
+        } elseif (!$pedido->isAberto()) {
+            $errors['pedidoid'] = _t('juncao.pedido_id_closed');
+        } elseif ($pedido->getTipo() != Pedido::TIPO_MESA) {
+            $errors['pedidoid'] = _t('juncao.pedido_id_incompatible');
         }
         if (!Validator::checkInSet($this->getEstado(), self::getEstadoOptions())) {
             $errors['estado'] = _t('juncao.estado_invalid');
+        } elseif (!$this->exists() && $this->getEstado() != self::ESTADO_ASSOCIADO) {
+            $errors['estado'] = _t('juncao.estado_new_closed');
         }
-        if (is_null($this->getDataMovimento())) {
-            $errors['datamovimento'] = _t('juncao.data_movimento_cannot_empty');
-        }
+        $this->setDataMovimento(DB::now());
         if (!empty($errors)) {
             throw new ValidationException($errors);
         }
@@ -339,6 +353,11 @@ class Juncao extends SyncModel
     protected function filterCondition($condition)
     {
         $allowed = $this->getAllowedKeys();
+        if (isset($condition['!id'])) {
+            $field = 'NOT j.id';
+            $condition[$field] = $condition['!id'];
+            $allowed[$field] = true;
+        }
         return Filter::keys($condition, $allowed, 'j.');
     }
 

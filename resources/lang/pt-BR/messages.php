@@ -1015,4 +1015,9 @@ return [
     'promocao.servico_id_empty' => 'O serviço não foi informado na promoção por bairro',
     'promocao.servico_id_discount' => 'O serviço da promoção não pode ser desconto',
     'promocao.bairro_id_empty' => 'O bairro da zona deve ser informado',
+    'juncao.mesa_id_exists' => 'A mesa informada já está junta com outra mesa',
+    'juncao.mesa_id_same' => 'A mesa não pode juntar com ela mesma',
+    'juncao.pedido_id_closed' => 'A mesa de destino precisa estar aberta',
+    'juncao.pedido_id_incompatible' => 'O pedido de destino deve ser de uma mesa',
+    'juncao.estado_new_closed' => 'A junção deve ser cadastrada como associada',
 ];

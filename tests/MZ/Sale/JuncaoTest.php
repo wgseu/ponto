@@ -24,19 +24,110 @@
  */
 namespace MZ\Sale;
 
+use MZ\Environment\MesaTest;
+use MZ\Sale\PedidoTest;
+
 class JuncaoTest extends \MZ\Framework\TestCase
 {
-    public function testPublish()
+    /**
+     * Build a valid junção
+     * @return Juncao
+     */
+    public static function build()
     {
+        $mesa = MesaTest::create();
+        $pedido = PedidoTest::create();
         $juncao = new Juncao();
-        $values = $juncao->publish(app()->auth->provider);
-        $allowed = [
-            'id',
-            'mesaid',
-            'pedidoid',
-            'estado',
-            'datamovimento',
-        ];
-        $this->assertEquals($allowed, array_keys($values));
+        $juncao->setMesaID($mesa->getID());
+        $juncao->setPedidoID($pedido->getID());
+        $juncao->setEstado(Juncao::ESTADO_ASSOCIADO);
+        return $juncao;
+    }
+
+    /**
+     * Create a junção on database
+     * @return Juncao
+     */
+    public static function create()
+    {
+        $juncao = self::build();
+        $juncao->insert();
+        return $juncao;
+    }
+
+    public function testFind()
+    {
+        $juncao = self::create();
+        $condition = ['mesaid' => $juncao->getMesaID()];
+        $found_juncao = Juncao::find($condition);
+        $this->assertEquals($juncao, $found_juncao);
+        list($found_juncao) = Juncao::findAll($condition, [], 1);
+        $this->assertEquals($juncao, $found_juncao);
+        $this->assertEquals(1, Juncao::count($condition));
+    }
+
+    public function testAdd()
+    {
+        $juncao = self::build();
+        $juncao->insert();
+        $this->assertTrue($juncao->exists());
+    }
+
+    public function testUpdate()
+    {
+        $juncao = self::create();
+        $juncao->update();
+        $this->assertTrue($juncao->exists());
+    }
+
+    public function testDelete()
+    {
+        $juncao = self::create();
+        $juncao->delete();
+        $juncao->loadByID();
+        $this->assertFalse($juncao->exists());
+    }
+
+    public function testJuntarLiberado()
+    {
+        $juncao = self::build();
+        $juncao->setEstado(Juncao::ESTADO_LIBERADO);
+        $this->expectException('\MZ\Exception\ValidationException');
+        $juncao->insert();
+    }
+
+    public function testJuntarNovamente()
+    {
+        $juncao = self::create();
+        $this->expectException('\MZ\Exception\ValidationException');
+        $juncao->insert();
+    }
+
+    public function testJuntarMesmaMesa()
+    {
+        $juncao = self::build();
+        $pedido = $juncao->findPedidoID();
+        $juncao->setMesaID($pedido->getMesaID());
+        $this->expectException('\MZ\Exception\ValidationException');
+        $juncao->insert();
+    }
+
+    public function testJuntarPedidoFechado()
+    {
+        $juncao = self::build();
+        $pedido = $juncao->findPedidoID();
+        $pedido->setEstado(Pedido::ESTADO_FINALIZADO);
+        $pedido->update();
+        $this->expectException('\MZ\Exception\ValidationException');
+        $juncao->insert();
+    }
+
+    public function testJuntarPedidoDiferente()
+    {
+        $juncao = self::build();
+        $pedido = PedidoTest::create(Pedido::TIPO_COMANDA);
+        $juncao->setPedidoID($pedido->getID());
+        $this->expectException('\MZ\Exception\ValidationException');
+        $juncao->insert();
     }
 }

@@ -32,7 +32,9 @@ global $app;
 $app = require_once __DIR__.'/../bootstrap/app.php';
 $app->setSession(new Session(new MockArraySessionStorage()));
 $app->run(
-    function ($app) {},
+    function ($app) {
+        $app->getSystem()->setLicenca('test');
+    },
     function ($app) {
         DB::getQuery()->convertTypes = false;
         $script = dirname(__DIR__) . '/database/model/sqlite.sql';

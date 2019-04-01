@@ -1238,9 +1238,6 @@ class Produto extends SyncModel
      */
     public function findSetorEstoqueID()
     {
-        if (is_null($this->getSetorEstoqueID())) {
-            return new \MZ\Environment\Setor();
-        }
         return \MZ\Environment\Setor::findByID($this->getSetorEstoqueID());
     }
 
@@ -1251,9 +1248,6 @@ class Produto extends SyncModel
      */
     public function findSetorPreparoID()
     {
-        if (is_null($this->getSetorPreparoID())) {
-            return new \MZ\Environment\Setor();
-        }
         return \MZ\Environment\Setor::findByID($this->getSetorPreparoID());
     }
 
@@ -1263,9 +1257,6 @@ class Produto extends SyncModel
      */
     public function findTributacaoID()
     {
-        if (is_null($this->getTributacaoID())) {
-            return new \MZ\Invoice\Tributacao();
-        }
         return \MZ\Invoice\Tributacao::findByID($this->getTributacaoID());
     }
 

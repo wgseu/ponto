@@ -211,8 +211,8 @@ def get_cell(ws, row, columns):
 
 def convert_encoding(sourceFileName, targetFileName, sourceEncoding="utf-8", destEncoding="cp1252"):
 	BLOCKSIZE = 1048576 # or some other, desired size in bytes
-	with codecs.open(sourceFileName, "r", sourceEncoding) as sourceFile:
-	    with codecs.open(targetFileName, "w", destEncoding) as targetFile:
+	with codecs.open(sourceFileName, "rb", sourceEncoding) as sourceFile:
+	    with codecs.open(targetFileName, "wb", destEncoding) as targetFile:
 	        while True:
 	            contents = sourceFile.read(BLOCKSIZE)
 	            if not contents:

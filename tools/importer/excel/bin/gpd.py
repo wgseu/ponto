@@ -6,15 +6,13 @@ import os
 import re
 import sys
 import time
-import Tkinter as tk
-from tkFileDialog import askopenfilename
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))) + '/util')
 from utility import *
 
 reload(sys)
 sys.setdefaultencoding('utf8')
 
-versao = "1.9.3.5"
+versao = "1.9.6.0"
 if len(sys.argv) > 1:
 	filename = sys.argv[1]
 	if os.path.isfile(filename):
@@ -23,13 +21,8 @@ if len(sys.argv) > 1:
 		path = filename
 		filename = os.path.join(path, 'Produtos.xlsx')
 else:
-	root = tk.Tk()
-	root.withdraw()
-	filename = askopenfilename()
-	if not filename:
-		print("Nenhum arquivo selecionado!")
-		sys.exit(1)
-	path = os.path.dirname(filename)
+	print("Nenhum arquivo selecionado!")
+	sys.exit(1)
 
 wb = load_workbook(filename, keep_vba=True)
 
@@ -130,7 +123,7 @@ ncm_columns = find_columns(ws, r"ncm", col_first, col_row)
 if not ncm_columns:
 	print("Nenhuma coluna de NCM encontrada!")
 # detect imposto columns
-imposto_columns = find_columns(ws, r"(?:imposto|ˆst$|ˆcst$)", col_first, col_row)
+imposto_columns = find_columns(ws, r"^(?:.*imposto.*|st|cst|csosn)$", col_first, col_row)
 if not imposto_columns:
 	print("Nenhuma coluna de imposto encontrada!")
 # detect origem columns
@@ -197,8 +190,8 @@ with open(filename, "w") as fd:
 			continue
 		unitys.add(unidade)
 		nome = "Unidade " + unidade
-		fd.write("INSERT INTO Unidades (Nome, Sigla) VALUES\n")
-		fd.write("	(" + sql_field(nome) + ", " + sql_field(unidade, "'") + ") ON DUPLICATE KEY UPDATE Sigla = VALUES(Sigla);\n")
+		fd.write("INSERT INTO Unidades (Nome, Sigla, DataAtualizacao) VALUES\n")
+		fd.write("	(" + sql_field(nome) + ", " + sql_field(unidade, "'") + ", NOW()) ON DUPLICATE KEY UPDATE Sigla = VALUES(Sigla);\n")
 
 	fd.write("\n-- Setores\n")
 	sectors = set()
@@ -210,8 +203,8 @@ with open(filename, "w") as fd:
 			continue
 		sectors.add(setor)
 		descricao = "Setor " + setor
-		fd.write("INSERT INTO Setores (Nome, Descricao) VALUES\n")
-		fd.write("	(" + sql_field(setor) + ", " + sql_field(descricao, "'") + ") ON DUPLICATE KEY UPDATE Nome = VALUES(Nome);\n")
+		fd.write("INSERT INTO Setores (Nome, Descricao, DataAtualizacao) VALUES\n")
+		fd.write("	(" + sql_field(setor) + ", " + sql_field(descricao, "'") + ", NOW()) ON DUPLICATE KEY UPDATE Nome = VALUES(Nome);\n")
 
 	fd.write("\n-- Tributacoes\n")
 	taxation = set()
@@ -229,7 +222,7 @@ with open(filename, "w") as fd:
 		cest = get_cell(ws, row, cest_columns)
 		origem = get_cell(ws, row, origem_columns)
 		if origem == None or len(str(origem)) == 0:
-			continue
+			origem = 0
 		operacao = get_cell(ws, row, cfop_columns)
 		if not operacao:
 			continue

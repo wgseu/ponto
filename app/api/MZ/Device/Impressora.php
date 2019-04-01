@@ -606,9 +606,6 @@ class Impressora extends SyncModel
      */
     public function findDispositivoID()
     {
-        if (is_null($this->getDispositivoID())) {
-            return new \MZ\Device\Dispositivo();
-        }
         return \MZ\Device\Dispositivo::findByID($this->getDispositivoID());
     }
 

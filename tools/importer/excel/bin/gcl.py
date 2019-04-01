@@ -7,12 +7,9 @@ import datetime
 import json
 import codecs
 import roman
-import MySQLdb
-import Tkinter as tk
 from openpyxl import load_workbook
 from openpyxl.compat import range
 from openpyxl.utils import get_column_letter
-from tkFileDialog import askopenfilename
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))) + '/util')
 from utility import *
 
@@ -20,7 +17,7 @@ from utility import *
 reload(sys)
 sys.setdefaultencoding('utf-8')
 
-versao = "1.9.3.5"
+versao = "1.9.6.0"
 
 if len(sys.argv) > 1:
 	filename = sys.argv[1]
@@ -42,13 +39,8 @@ if len(sys.argv) > 1:
 	if len(sys.argv) > 4:
 		cidade_padrao = sys.argv[4]
 else:
-	root = tk.Tk()
-	root.withdraw()
-	filename = askopenfilename()
-	if not filename:
-		print("Nenhum arquivo selecionado!")
-		sys.exit(1)
-	path = os.path.dirname(filename)
+	print("Nenhum arquivo selecionado!")
+	sys.exit(1)
 
 wb = load_workbook(filename, keep_vba=True)
 

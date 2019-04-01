@@ -503,9 +503,6 @@ class Movimentacao extends SyncModel
      */
     public function findFechadorID()
     {
-        if (is_null($this->getFechadorID())) {
-            return new \MZ\Provider\Prestador();
-        }
         return \MZ\Provider\Prestador::findByID($this->getFechadorID());
     }
 

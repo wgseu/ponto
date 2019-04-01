@@ -461,9 +461,6 @@ class Emitente extends SyncModel
      */
     public function findContadorID()
     {
-        if (is_null($this->getContadorID())) {
-            return new \MZ\Account\Cliente();
-        }
         return \MZ\Account\Cliente::findByID($this->getContadorID());
     }
 

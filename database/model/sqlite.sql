@@ -2,7 +2,7 @@
 -- Author:        Mazin
 -- Caption:       GrandChef Model
 -- Project:       GrandChef
--- Changed:       2019-01-04 11:35
+-- Changed:       2019-01-05 18:58
 -- Created:       2012-09-05 23:08
 PRAGMA foreign_keys = OFF;
 
@@ -1604,7 +1604,7 @@ CREATE TABLE "Pedidos"(
   "DataImpressao" DATETIME DEFAULT NULL,-- Data de impressão da conta do cliente[N:Data de impressão][G:a]
   "Cancelado" TEXT NOT NULL CHECK("Cancelado" IN('Y', 'N')) DEFAULT 'N',-- Informa se o pedido foi cancelado[N:Cancelado][G:o]
   "Motivo" VARCHAR(200) DEFAULT NULL,-- Informa o motivo do cancelamento[G:o][N:Motivo]
-  "DataEntrega" DATETIME DEFAULT NULL,-- Data e hora que o entregador concluiu a entrega desse pedido[N:Data de entrega][G:a]
+  "DataEntrega" DATETIME DEFAULT NULL,-- Data e hora que o entregador saiu para entregar esse pedido[N:Data de entrega][G:a]
   "DataAgendamento" DATETIME DEFAULT NULL,-- Data de agendamento do pedido[N:Data de agendamento][G:a]
   "DataConclusao" DATETIME DEFAULT NULL,-- Data de finalização do pedido[N:Data de conclusão][G:a]
   "DataCriacao" DATETIME NOT NULL,-- Data de criação do pedido[N:Data de criação][G:a]

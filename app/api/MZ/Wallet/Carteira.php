@@ -669,9 +669,6 @@ class Carteira extends SyncModel
      */
     public function findCarteiraID()
     {
-        if (is_null($this->getCarteiraID())) {
-            return new \MZ\Wallet\Carteira();
-        }
         return \MZ\Wallet\Carteira::findByID($this->getCarteiraID());
     }
 
@@ -681,9 +678,6 @@ class Carteira extends SyncModel
      */
     public function findBancoID()
     {
-        if (is_null($this->getBancoID())) {
-            return new \MZ\Wallet\Banco();
-        }
         return \MZ\Wallet\Banco::findByID($this->getBancoID());
     }
 

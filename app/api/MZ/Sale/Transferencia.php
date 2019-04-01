@@ -578,9 +578,6 @@ class Transferencia extends SyncModel
      */
     public function findMesaID()
     {
-        if (is_null($this->getMesaID())) {
-            return new \MZ\Environment\Mesa();
-        }
         return \MZ\Environment\Mesa::findByID($this->getMesaID());
     }
 
@@ -590,9 +587,6 @@ class Transferencia extends SyncModel
      */
     public function findDestinoMesaID()
     {
-        if (is_null($this->getDestinoMesaID())) {
-            return new \MZ\Environment\Mesa();
-        }
         return \MZ\Environment\Mesa::findByID($this->getDestinoMesaID());
     }
 
@@ -602,9 +596,6 @@ class Transferencia extends SyncModel
      */
     public function findComandaID()
     {
-        if (is_null($this->getComandaID())) {
-            return new \MZ\Sale\Comanda();
-        }
         return \MZ\Sale\Comanda::findByID($this->getComandaID());
     }
 
@@ -614,9 +605,6 @@ class Transferencia extends SyncModel
      */
     public function findDestinoComandaID()
     {
-        if (is_null($this->getDestinoComandaID())) {
-            return new \MZ\Sale\Comanda();
-        }
         return \MZ\Sale\Comanda::findByID($this->getDestinoComandaID());
     }
 
@@ -626,9 +614,6 @@ class Transferencia extends SyncModel
      */
     public function findItemID()
     {
-        if (is_null($this->getItemID())) {
-            return new \MZ\Sale\Item();
-        }
         return \MZ\Sale\Item::findByID($this->getItemID());
     }
 

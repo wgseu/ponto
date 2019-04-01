@@ -26,6 +26,7 @@ namespace MZ\Sale;
 
 use MZ\Provider\PrestadorTest;
 use MZ\Environment\MesaTest;
+use MZ\Session\Sessao;
 
 class PedidoTest extends \MZ\Framework\TestCase
 {
@@ -38,16 +39,18 @@ class PedidoTest extends \MZ\Framework\TestCase
         $prestador = PrestadorTest::create();
         $pedido = new Pedido();
         $pedido->setTipo($tipo ?? Pedido::TIPO_MESA);
+        $pedido->setSessaoID(Sessao::findByAberta()->getID());
         if ($pedido->getTipo() == Pedido::TIPO_MESA) {
             $mesa = MesaTest::create();
             $pedido->setMesaID($mesa->getID());
+            $pedido->setPessoas(3);
         } elseif ($pedido->getTipo() == Pedido::TIPO_COMANDA) {
             $comanda = ComandaTest::create();
             $pedido->setComandaID($comanda->getID());
+            $pedido->setPessoas(1);
         }
         $pedido->setEstado(Pedido::ESTADO_ATIVO);
         $pedido->setPrestadorID($prestador->getID());
-        $pedido->setPessoas(3);
         return $pedido;
     }
 

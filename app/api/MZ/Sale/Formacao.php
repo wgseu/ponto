@@ -375,9 +375,6 @@ class Formacao extends SyncModel
      */
     public function findPacoteID()
     {
-        if (is_null($this->getPacoteID())) {
-            return new \MZ\Product\Pacote();
-        }
         return \MZ\Product\Pacote::findByID($this->getPacoteID());
     }
 
@@ -387,9 +384,6 @@ class Formacao extends SyncModel
      */
     public function findComposicaoID()
     {
-        if (is_null($this->getComposicaoID())) {
-            return new \MZ\Product\Composicao();
-        }
         return \MZ\Product\Composicao::findByID($this->getComposicaoID());
     }
 

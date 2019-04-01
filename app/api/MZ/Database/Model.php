@@ -179,7 +179,7 @@ abstract class Model
 
     /**
      * Filter fields, upload data and keep key data
-     * @param mixed $original Original instance without modifications
+     * @param self $original Original instance without modifications
      * @param \MZ\Provider\Prestador $updater user that want to update this object
      * @param boolean $localized Informs if fields are localized
      * @return self Self instance
@@ -233,7 +233,7 @@ abstract class Model
     }
 
     /**
-     * Update Informação nutricional with instance values into database for ID
+     * Update row with instance values into database for ID
      * @param array $only Save these fields only, when empty save all fields except id
      * @return int rows affected
      * @throws \MZ\Exception\ValidationException for invalid input data
@@ -280,7 +280,7 @@ abstract class Model
     /**
      * Save a new or a existing instance into the database and fill instance from database
      * @param array $only Save these fields only, when empty save all fields except id
-     * @return Model Self instance
+     * @return self Self instance
      */
     public function save($only = [])
     {
@@ -296,6 +296,9 @@ abstract class Model
      */
     public function loadByID()
     {
+        if (!$this->exists()) {
+            return $this->fromArray([]);
+        }
         return $this->load([
             'id' => intval($this->getID()),
         ]);

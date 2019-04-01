@@ -483,9 +483,6 @@ class Horario extends SyncModel
      */
     public function findFuncaoID()
     {
-        if (is_null($this->getFuncaoID())) {
-            return new \MZ\Provider\Funcao();
-        }
         return \MZ\Provider\Funcao::findByID($this->getFuncaoID());
     }
 
@@ -495,9 +492,6 @@ class Horario extends SyncModel
      */
     public function findPrestadorID()
     {
-        if (is_null($this->getPrestadorID())) {
-            return new \MZ\Provider\Prestador();
-        }
         return \MZ\Provider\Prestador::findByID($this->getPrestadorID());
     }
 
@@ -507,9 +501,6 @@ class Horario extends SyncModel
      */
     public function findIntegracaoID()
     {
-        if (is_null($this->getIntegracaoID())) {
-            return new \MZ\System\Integracao();
-        }
         return \MZ\System\Integracao::findByID($this->getIntegracaoID());
     }
 

@@ -29,12 +29,14 @@ use MZ\Account\AuthenticationTest;
 use MZ\Device\DispositivoTest;
 use MZ\Device\ImpressoraTest;
 use MZ\Device\Dispositivo;
+use MZ\Session\MovimentacaoTest;
 
 class ItemApiControllerTest extends \MZ\Framework\TestCase
 {
     public function testJobs()
     {
         AuthenticationTest::authProvider([Permissao::NOME_SISTEMA, Permissao::NOME_PEDIDOMESA]);
+        $movimentacao = MovimentacaoTest::create();
         $item = ItemTest::create();
         $dispositivo = Dispositivo::find([]);
         if (!$dispositivo->exists()) {
@@ -53,11 +55,16 @@ class ItemApiControllerTest extends \MZ\Framework\TestCase
         $item->loadByID();
         $this->assertEquals(Item::ESTADO_ENVIADO, $item->getEstado());
         $this->assertEquals($expected, \array_intersect_key($result, $expected));
+        $pedido = $item->findPedidoID();
+        $pedido->setEstado(Pedido::ESTADO_FINALIZADO);
+        $pedido->update();
+        MovimentacaoTest::close($movimentacao);
     }
 
     public function testUncheck()
     {
         AuthenticationTest::authProvider([Permissao::NOME_SISTEMA, Permissao::NOME_PEDIDOMESA]);
+        $movimentacao = MovimentacaoTest::create();
         $item = ItemTest::create();
         $dispositivo = Dispositivo::find([]);
         if (!$dispositivo->exists()) {
@@ -75,5 +82,9 @@ class ItemApiControllerTest extends \MZ\Framework\TestCase
         $this->patch('/api/itens/uncheck', $data);
         $item->loadByID();
         $this->assertEquals(Item::ESTADO_ADICIONADO, $item->getEstado());
+        $pedido = $item->findPedidoID();
+        $pedido->setEstado(Pedido::ESTADO_FINALIZADO);
+        $pedido->update();
+        MovimentacaoTest::close($movimentacao);
     }
 }

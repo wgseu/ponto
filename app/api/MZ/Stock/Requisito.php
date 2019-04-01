@@ -504,9 +504,6 @@ class Requisito extends SyncModel
      */
     public function findCompraID()
     {
-        if (is_null($this->getCompraID())) {
-            return new \MZ\Stock\Compra();
-        }
         return \MZ\Stock\Compra::findByID($this->getCompraID());
     }
 
@@ -517,9 +514,6 @@ class Requisito extends SyncModel
      */
     public function findFornecedorID()
     {
-        if (is_null($this->getFornecedorID())) {
-            return new \MZ\Stock\Fornecedor();
-        }
         return \MZ\Stock\Fornecedor::findByID($this->getFornecedorID());
     }
 

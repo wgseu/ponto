@@ -426,9 +426,6 @@ class Permissao extends SyncModel
      */
     public function findModuloID()
     {
-        if (is_null($this->getModuloID())) {
-            return new \MZ\System\Modulo();
-        }
         return \MZ\System\Modulo::findByID($this->getModuloID());
     }
 

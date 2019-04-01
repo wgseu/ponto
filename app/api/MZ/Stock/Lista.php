@@ -380,9 +380,6 @@ class Lista extends SyncModel
      */
     public function findViagemID()
     {
-        if (is_null($this->getViagemID())) {
-            return new \MZ\Location\Viagem();
-        }
         return \MZ\Location\Viagem::findByID($this->getViagemID());
     }
 

@@ -624,9 +624,6 @@ class Pacote extends SyncModel
      */
     public function findProdutoID()
     {
-        if (is_null($this->getProdutoID())) {
-            return new \MZ\Product\Produto();
-        }
         return \MZ\Product\Produto::findByID($this->getProdutoID());
     }
 
@@ -636,9 +633,6 @@ class Pacote extends SyncModel
      */
     public function findPropriedadeID()
     {
-        if (is_null($this->getPropriedadeID())) {
-            return new \MZ\Product\Propriedade();
-        }
         return \MZ\Product\Propriedade::findByID($this->getPropriedadeID());
     }
 
@@ -650,9 +644,6 @@ class Pacote extends SyncModel
      */
     public function findAssociacaoID()
     {
-        if (is_null($this->getAssociacaoID())) {
-            return new \MZ\Product\Pacote();
-        }
         return \MZ\Product\Pacote::findByID($this->getAssociacaoID());
     }
 

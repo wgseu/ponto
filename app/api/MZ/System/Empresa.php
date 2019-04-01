@@ -345,9 +345,6 @@ class Empresa extends SyncModel
      */
     public function findPaisID()
     {
-        if (is_null($this->getPaisID())) {
-            return new \MZ\Location\Pais();
-        }
         return \MZ\Location\Pais::findByID($this->getPaisID());
     }
 
@@ -358,9 +355,6 @@ class Empresa extends SyncModel
      */
     public function findEmpresaID()
     {
-        if (is_null($this->getEmpresaID())) {
-            return new \MZ\Account\Cliente();
-        }
         return \MZ\Account\Cliente::findByID($this->getEmpresaID());
     }
 
@@ -371,9 +365,6 @@ class Empresa extends SyncModel
      */
     public function findParceiroID()
     {
-        if (is_null($this->getParceiroID())) {
-            return new \MZ\Account\Cliente();
-        }
         return \MZ\Account\Cliente::findByID($this->getParceiroID());
     }
 

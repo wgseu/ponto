@@ -718,9 +718,6 @@ class Patrimonio extends SyncModel
      */
     public function findFornecedorID()
     {
-        if (is_null($this->getFornecedorID())) {
-            return new \MZ\Stock\Fornecedor();
-        }
         return \MZ\Stock\Fornecedor::findByID($this->getFornecedorID());
     }
 

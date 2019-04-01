@@ -1351,9 +1351,6 @@ class Cliente extends SyncModel
      */
     public function findEmpresaID()
     {
-        if (is_null($this->getEmpresaID())) {
-            return new self();
-        }
         return self::findByID($this->getEmpresaID());
     }
 

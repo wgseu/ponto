@@ -348,9 +348,6 @@ class Resumo extends SyncModel
      */
     public function findCartaoID()
     {
-        if (is_null($this->getCartaoID())) {
-            return new \MZ\Payment\Cartao();
-        }
         return \MZ\Payment\Cartao::findByID($this->getCartaoID());
     }
 

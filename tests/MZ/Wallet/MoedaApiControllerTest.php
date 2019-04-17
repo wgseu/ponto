@@ -49,12 +49,26 @@ class MoedaApiControllerTest extends \MZ\Framework\TestCase
         $moeda = MoedaTest::build();
         $moeda->setDivisao(strval($moeda->getDivisao()));
         $moeda->setConversao(floatval($moeda->getConversao()));
+        $moeda->setAtiva('N');
+        $this->assertFalse($moeda->isAtiva());
+        $moeda->setAtiva('Y');
+        $this->assertTrue($moeda->isAtiva());
+        $this->assertEquals($moeda->toArray(), (new Moeda($moeda))->toArray());
+        $this->assertEquals((new Moeda())->toArray(), (new Moeda(1))->toArray());
         $expected = [
             'status' => 'ok',
             'item' => $moeda->publish(app()->auth->provider),
         ];
         $result = $this->post('/api/moedas', $moeda->toArray());
         $expected['item']['id'] = $result['item']['id'] ?? null;
+        $this->assertEquals($expected, \array_intersect_key($result, $expected));
+    }
+
+    public function testAddInvalid()
+    {
+        AuthenticationTest::authProvider([Permissao::NOME_SISTEMA, Permissao::NOME_CADASTROMOEDAS]);
+        $expected = [ 'status' => 'error', ];
+        $result = $this->post('/api/moedas', ['ativa' => 'S']);
         $this->assertEquals($expected, \array_intersect_key($result, $expected));
     }
 
@@ -69,6 +83,16 @@ class MoedaApiControllerTest extends \MZ\Framework\TestCase
             'status' => 'ok',
             'item' => $moeda->publish(app()->auth->provider),
         ];
+        $this->assertEquals($expected, \array_intersect_key($result, $expected));
+    }
+
+    public function testUpdateCurrentInvalid()
+    {
+        AuthenticationTest::authProvider([Permissao::NOME_SISTEMA, Permissao::NOME_CADASTROMOEDAS]);
+        $moeda = app()->system->currency;
+        $moeda->setConversao(2);
+        $expected = [ 'status' => 'error', ];
+        $result = $this->patch('/api/moedas/' . $moeda->getID(), $moeda->toArray());
         $this->assertEquals($expected, \array_intersect_key($result, $expected));
     }
 

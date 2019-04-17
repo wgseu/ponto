@@ -6,7 +6,7 @@ if not exist %sevenzip% (
 )
 if not exist %sevenzip% goto no_7z
 
-set version="1.9.4.5"
+set version="1.9.6.0"
 if not "%~1" == "" set version="%~1"
 
 gpd.py "%CD%"

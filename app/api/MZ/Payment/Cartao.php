@@ -506,9 +506,6 @@ class Cartao extends SyncModel
      */
     public function findCarteiraID()
     {
-        if (is_null($this->getCarteiraID())) {
-            return new \MZ\Wallet\Carteira();
-        }
         return \MZ\Wallet\Carteira::findByID($this->getCarteiraID());
     }
 

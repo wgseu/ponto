@@ -786,9 +786,6 @@ class Localizacao extends SyncModel
      */
     public function findZonaID()
     {
-        if (is_null($this->getZonaID())) {
-            return new \MZ\Location\Zona();
-        }
         return \MZ\Location\Zona::findByID($this->getZonaID());
     }
 

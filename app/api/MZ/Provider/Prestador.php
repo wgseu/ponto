@@ -742,9 +742,6 @@ class Prestador extends SyncModel
      */
     public function findPrestadorID()
     {
-        if (is_null($this->getPrestadorID())) {
-            return new \MZ\Provider\Prestador();
-        }
         return \MZ\Provider\Prestador::findByID($this->getPrestadorID());
     }
 

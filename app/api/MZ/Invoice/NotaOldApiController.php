@@ -30,6 +30,7 @@ use MZ\Sale\Pedido;
 use MZ\Session\Caixa;
 use MZ\System\Permissao;
 use MZ\Logger\Log;
+use MZ\Mail\NotaFiscal as NotaFiscalMail;
 
 /**
  * Allow application to serve system resources
@@ -195,7 +196,12 @@ class NotaOldApiController extends \MZ\Core\ApiController
                 $xmlfile = $_nota->getCaminhoXml();
                 if (!is_array($xmlfile)) {
                     $xmlname = basename($xmlfile);
-                    mail_nota($destinatario->getEmail(), $destinatario->getNome(), $modo, $filters, [$xmlname => $xmlfile]);
+                    $mail = new NotaFiscalMail();
+                    $mail->destinatario = $destinatario;
+                    $mail->modo = $modo;
+                    $mail->filters = $filters;
+                    $mail->files = $xmlfile;
+                    $mail->send();
                     return $this->json()->success();
                 }
             }
@@ -214,7 +220,12 @@ class NotaOldApiController extends \MZ\Core\ApiController
             $zipfile = Nota::zip($notas);
             $zipname = 'Notas'.$sufixo_str.'.zip';
             try {
-                mail_nota($destinatario->getEmail(), $destinatario->getNome(), $modo, $filters, [$zipname => $zipfile]);
+                $mail = new NotaFiscalMail();
+                $mail->destinatario = $destinatario;
+                $mail->modo = $modo;
+                $mail->filters = $filters;
+                $mail->files = $xmlfile;
+                $mail->send();
             } catch (\Exception $e) {
                 unlink($zipfile);
                 throw $e;

@@ -494,9 +494,6 @@ class Categoria extends SyncModel
      */
     public function findCategoriaID()
     {
-        if (is_null($this->getCategoriaID())) {
-            return new \MZ\Product\Categoria();
-        }
         return \MZ\Product\Categoria::findByID($this->getCategoriaID());
     }
 

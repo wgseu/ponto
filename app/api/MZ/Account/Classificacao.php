@@ -313,9 +313,6 @@ class Classificacao extends SyncModel
      */
     public function findClassificacaoID()
     {
-        if (is_null($this->getClassificacaoID())) {
-            return new \MZ\Account\Classificacao();
-        }
         return \MZ\Account\Classificacao::findByID($this->getClassificacaoID());
     }
 

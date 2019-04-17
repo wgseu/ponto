@@ -488,11 +488,6 @@ $[field.end]
 $[field.end]
     public function find$[Field.norm]($[field.if(array)]$number$[field.end])
     {
-$[field.if(null)]
-        if (is_null($this->get$[Field.norm]($[field.if(array)]$number$[field.end]))) {
-            return new \$[Reference.package]\$[Reference.norm]();
-        }
-$[field.end]
         return \$[Reference.package]\$[Reference.norm]::findBy$[Reference.pk.norm]($this->get$[Field.norm]($[field.if(array)]$number$[field.end]));
     }
 $[field.end]

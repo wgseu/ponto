@@ -441,9 +441,6 @@ class Auditoria extends SyncModel
      */
     public function findPermissaoID()
     {
-        if (is_null($this->getPermissaoID())) {
-            return new \MZ\System\Permissao();
-        }
         return \MZ\System\Permissao::findByID($this->getPermissaoID());
     }
 

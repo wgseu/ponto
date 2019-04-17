@@ -28,6 +28,9 @@ use MZ\Util\Filter;
 use MZ\Util\Validator;
 use MZ\Core\PageController;
 
+use MZ\Mail\NotaFiscal as NotaFiscalMail;
+use MZ\Mail\Contato as ContatoMail;
+
 /**
  * Allow application to serve system resources
  */
@@ -74,9 +77,12 @@ class PaginaPageController extends PageController
                 if (!empty($erros)) {
                     throw new \MZ\Exception\ValidationException($erros);
                 }
-                if (!mail_contato($email, $nome, $assunto, $mensagem)) {
-                    throw new \Exception("Não foi possível enviar o E-mail, por favor tente novamente mais tarde");
-                }
+                $mail = new ContatoMail();
+                $mail->email = $email;
+                $mail->nome = $nome;
+                $mail->assunto = $assunto;
+                $mail->mensagem = $mensagem;
+                $mail->send();
                 $response = $this->getResponse();
                 return $response->output('contato_sucesso');
             } catch (\MZ\Exception\ValidationException $e) {
@@ -84,6 +90,7 @@ class PaginaPageController extends PageController
             } catch (\Exception $e) {
                 $erro['unknow'] = $e->getMessage();
             }
+
             foreach ($erro as $key => $value) {
                 $focusctrl = $key;
                 break;

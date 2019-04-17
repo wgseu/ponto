@@ -578,9 +578,6 @@ class Dispositivo extends SyncModel
      */
     public function findCaixaID()
     {
-        if (is_null($this->getCaixaID())) {
-            return new \MZ\Session\Caixa();
-        }
         return \MZ\Session\Caixa::findByID($this->getCaixaID());
     }
 

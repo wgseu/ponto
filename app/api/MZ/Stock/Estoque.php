@@ -842,9 +842,6 @@ class Estoque extends SyncModel
      */
     public function findRequisitoID()
     {
-        if (is_null($this->getRequisitoID())) {
-            return new \MZ\Stock\Requisito();
-        }
         return \MZ\Stock\Requisito::findByID($this->getRequisitoID());
     }
 
@@ -854,9 +851,6 @@ class Estoque extends SyncModel
      */
     public function findTransacaoID()
     {
-        if (is_null($this->getTransacaoID())) {
-            return new \MZ\Sale\Item();
-        }
         return \MZ\Sale\Item::findByID($this->getTransacaoID());
     }
 
@@ -867,9 +861,6 @@ class Estoque extends SyncModel
      */
     public function findEntradaID()
     {
-        if (is_null($this->getEntradaID())) {
-            return new \MZ\Stock\Estoque();
-        }
         return \MZ\Stock\Estoque::findByID($this->getEntradaID());
     }
 
@@ -879,9 +870,6 @@ class Estoque extends SyncModel
      */
     public function findFornecedorID()
     {
-        if (is_null($this->getFornecedorID())) {
-            return new \MZ\Stock\Fornecedor();
-        }
         return \MZ\Stock\Fornecedor::findByID($this->getFornecedorID());
     }
 

@@ -1282,9 +1282,6 @@ class Conta extends SyncModel
      */
     public function findContaID()
     {
-        if (is_null($this->getContaID())) {
-            return new \MZ\Account\Conta();
-        }
         return \MZ\Account\Conta::findByID($this->getContaID());
     }
 
@@ -1296,9 +1293,6 @@ class Conta extends SyncModel
      */
     public function findAgrupamentoID()
     {
-        if (is_null($this->getAgrupamentoID())) {
-            return new \MZ\Account\Conta();
-        }
         return \MZ\Account\Conta::findByID($this->getAgrupamentoID());
     }
 
@@ -1309,9 +1303,6 @@ class Conta extends SyncModel
      */
     public function findCarteiraID()
     {
-        if (is_null($this->getCarteiraID())) {
-            return new \MZ\Wallet\Carteira();
-        }
         return \MZ\Wallet\Carteira::findByID($this->getCarteiraID());
     }
 
@@ -1321,9 +1312,6 @@ class Conta extends SyncModel
      */
     public function findClienteID()
     {
-        if (is_null($this->getClienteID())) {
-            return new \MZ\Account\Cliente();
-        }
         return \MZ\Account\Cliente::findByID($this->getClienteID());
     }
 
@@ -1333,9 +1321,6 @@ class Conta extends SyncModel
      */
     public function findPedidoID()
     {
-        if (is_null($this->getPedidoID())) {
-            return new \MZ\Sale\Pedido();
-        }
         return \MZ\Sale\Pedido::findByID($this->getPedidoID());
     }
 

@@ -281,9 +281,6 @@ class Setor extends SyncModel
      */
     public function findSetorID()
     {
-        if (is_null($this->getSetorID())) {
-            return new \MZ\Environment\Setor();
-        }
         return \MZ\Environment\Setor::findByID($this->getSetorID());
     }
 

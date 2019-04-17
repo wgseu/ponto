@@ -546,9 +546,6 @@ class FormaPagto extends SyncModel
      */
     public function findIntegracaoID()
     {
-        if (is_null($this->getIntegracaoID())) {
-            return new \MZ\System\Integracao();
-        }
         return \MZ\System\Integracao::findByID($this->getIntegracaoID());
     }
 

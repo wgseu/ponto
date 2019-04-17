@@ -32,7 +32,14 @@ use FluentPDO;
  */
 class DB
 {
+    /**
+     * @var \FluentPDO
+     */
     private $query = null;
+
+    /**
+     * @var int
+     */
     private $transactionCounter = 0;
 
     public function connect($config)

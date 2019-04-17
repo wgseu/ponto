@@ -804,9 +804,6 @@ class Promocao extends SyncModel
      */
     public function findCategoriaID()
     {
-        if (is_null($this->getCategoriaID())) {
-            return new \MZ\Product\Categoria();
-        }
         return \MZ\Product\Categoria::findByID($this->getCategoriaID());
     }
 
@@ -817,9 +814,6 @@ class Promocao extends SyncModel
      */
     public function findProdutoID()
     {
-        if (is_null($this->getProdutoID())) {
-            return new \MZ\Product\Produto();
-        }
         return \MZ\Product\Produto::findByID($this->getProdutoID());
     }
 
@@ -829,9 +823,6 @@ class Promocao extends SyncModel
      */
     public function findServicoID()
     {
-        if (is_null($this->getServicoID())) {
-            return new \MZ\Product\Servico();
-        }
         return \MZ\Product\Servico::findByID($this->getServicoID());
     }
 
@@ -841,9 +832,6 @@ class Promocao extends SyncModel
      */
     public function findBairroID()
     {
-        if (is_null($this->getBairroID())) {
-            return new \MZ\Location\Bairro();
-        }
         return \MZ\Location\Bairro::findByID($this->getBairroID());
     }
 
@@ -853,9 +841,6 @@ class Promocao extends SyncModel
      */
     public function findZonaID()
     {
-        if (is_null($this->getZonaID())) {
-            return new \MZ\Location\Zona();
-        }
         return \MZ\Location\Zona::findByID($this->getZonaID());
     }
 
@@ -865,9 +850,6 @@ class Promocao extends SyncModel
      */
     public function findIntegracaoID()
     {
-        if (is_null($this->getIntegracaoID())) {
-            return new \MZ\System\Integracao();
-        }
         return \MZ\System\Integracao::findByID($this->getIntegracaoID());
     }
 

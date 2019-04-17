@@ -1104,9 +1104,6 @@ class Nota extends SyncModel
      */
     public function findUltimoEventoID()
     {
-        if (is_null($this->getUltimoEventoID())) {
-            return new \MZ\Invoice\Evento();
-        }
         return \MZ\Invoice\Evento::findByID($this->getUltimoEventoID());
     }
 
@@ -1116,9 +1113,6 @@ class Nota extends SyncModel
      */
     public function findPedidoID()
     {
-        if (is_null($this->getPedidoID())) {
-            return new \MZ\Sale\Pedido();
-        }
         return \MZ\Sale\Pedido::findByID($this->getPedidoID());
     }
 

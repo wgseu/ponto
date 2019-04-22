@@ -36,6 +36,34 @@ class CartaoApiController extends \MZ\Core\ApiController
      * Find all Cartões
      * @Get("/api/cartoes", name="api_cartao_find")
      */
+    public function associate($name)
+    {
+        $this->needPermission([Permissao::NOME_CADASTROCARTOES]);
+        // TODO permitir cadastrar novo cartão na página de associação
+        if ($name == 'ifood') {
+            $codigos = IFood::CARDS;
+        } else {
+            $codigos = Kromax::CARDS;
+        }
+        $integracao = Integracao::findByAcessoURL($name);
+        $association = new \MZ\Association\Card($integracao, $codigos);
+
+        if ($this->getRequest()->isMethod('POST') && $this->getRequest()->query->get('action') == 'update') {
+            $this->needPermission([Permissao::NOME_CADASTROCARTOES]);
+            try {
+                $codigo = $this->getRequest()->request->get('codigo');
+                $id = $this->getRequest()->request->get('id');
+                $cartao = $association->update($codigo, $id);
+                return $this->getResponse()->success(['cartao' => $cartao->toArray()]);
+            } catch (\Exception $e) {
+                return $this->getResponse()->error($e->getMessage());
+            }
+        }
+        $codigos = $association->findAll();
+        $_imagens = Cartao::getImages();
+        return $this->getRoutes('\MZ\Payment\CartaoPageController::addRoutes($main_collection)');
+    }
+
     public function find()
     {
         $this->needPermission([Permissao::NOME_CADASTROCARTOES]);

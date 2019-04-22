@@ -26,7 +26,6 @@ namespace MZ\Account;
 
 use MZ\System\Permissao;
 use MZ\Util\Filter;
-use MZ\Core\ApiController;
 
 /**
  * Classificação se contas, permite atribuir um grupo de contas
@@ -40,37 +39,32 @@ class ClassificacaoApiController extends \MZ\Core\ApiController
     public function find()
     {
         $this->needPermission([Permissao::NOME_CADASTROCONTAS]);
-        $limite = max(1, min(100, $this->getRequest()->query->getInt('limite', 10)));
+        $limit = max(1, min(100, $this->getRequest()->query->getInt('limit', 10)));
+        $page = max(1, $this->getRequest()->query->getInt('page', 1));
         $condition = Filter::query($this->getRequest()->query->all());
-        unset($condition['ordem']);
         if (isset($condition['classificacaoid']) && intval($condition['classificacaoid']) < 0) {
             unset($condition['classificacaoid']);
         } elseif ($this->getRequest()->query->has('classificacaoid')) {
             $condition['classificacaoid'] = isset($condition['classificacaoid']) ? $condition['classificacaoid'] : null;
         }
         $classificacao = new Classificacao($condition);
-        $order = Filter::order($this->getRequest()->query->get('ordem', ''));
+        $order = $this->getRequest()->query->get('order', '');
         $count = Classificacao::count($condition);
-        $page = max(1, $this->getRequest()->query->getInt('pagina', 1));
-        $pager = new \Pager($count, $limite, $page, 'pagina');
-        $pagination = $pager->genPages();
-        $classificacoes = Classificacao::findAll($condition, $order, $limite, $pager->offset);
-
+        $pager = new \Pager($count, $limit, $page);
+        $classificacoes = Classificacao::findAll($condition, $order, $limit, $pager->offset);
         if ($this->isJson()) {
-            $items = [];
-            foreach ($classificacoes as $_classificacao) {
-                $items[] = $_classificacao->publish(app()->auth->provider);
+            $itens = [];
+            foreach ($classificacoes as $classificacao) {
+                $itens[] = $classificacao->publish(app()->auth->provider);
             }
-            return $this->json()->success(['items' => $items]);
-
+            return $this->getResponse()->success(['items' => $itens, 'pages' => $pager->pageCount]);
         }
-
-        $classificacoes_sup = Classificacao::findAll(['classificacaoid' => null]);
-        $_classificacao_names = [];
-        foreach ($classificacoes_sup as $classificacao) {
-            $_classificacao_names[$classificacao->getID()] = $classificacao->getDescricao();
+        $classificacoes = Classificacao::findAll(['classificacaoid' => null]);
+        $classificacao = [];
+        foreach ($classificacoes as $classificacao) {
+            $classificacao[$classificacao->getID()] = $classificacao->getDescricao();
         }
-        return $this->view('gerenciar_classificacao_index', get_defined_vars());
+        return $this->getRoutes('\MZ\Account\ClassificacaoApiController');
     }
 
     /**
@@ -80,52 +74,42 @@ class ClassificacaoApiController extends \MZ\Core\ApiController
     public function add()
     {
         $this->needPermission([Permissao::NOME_CADASTROCONTAS]);
-        $id = $this->getRequest()->query->getInt('id', null);
-        $classificacao = Classificacao::findByID($id);
-        $classificacao->setID(null);
-        
-        $focusctrl = 'descricao';
-        $errors = [];
-        $old_classificacao = $classificacao;
+        $localized = $this->getRequest()->query->getBoolean('localized', false);;
         if ($this->getRequest()->isMethod('POST')) {
-            $localized = $this->getRequest()->query->getBoolean('localized', false);
             $classificacao = new Classificacao($this->getData());
             try {
-                $classificacao->filter($old_classificacao, app()->auth->provider, true);
+                $classificacao->filter(new Classificacao(), app()->auth->provider, $localized);
                 $classificacao->insert();
-                $old_classificacao->clean($classificacao);
+                $classificacao->clean($classificacao);
                 $msg = sprintf(
                     'Classificação "%s" cadastrada com sucesso!',
                     $classificacao->getDescricao()
                 );
                 if ($this->isJson()) {
-                    return $this->json()->success(['item' => $classificacao->publish(app()->auth->provider)], $msg);
+                    return $this->getResponse()->success(['item' => $classificacao->publish(app()->auth->provider)], $msg);
                 }
-                \Thunder::success($msg, true);
-                return $this->redirect('/gerenciar/classificacao/');
+                return $this->getRoutes('\MZ\Account\ClassificacaoApiController');
             } catch (\Exception $e) {
-                $classificacao->clean($old_classificacao);
+                $classificacao->clean($classificacao);
                 if ($e instanceof \MZ\Exception\ValidationException) {
                     $errors = $e->getErrors();
                 }
                 if ($this->isJson()) {
-                    return $this->json()->error($e->getMessage(), null, $errors);
+                    return $this->getResponse()->error($e->getMessage(), null, $errors);
                 }
-                \Thunder::error($e->getMessage());
                 foreach ($errors as $key => $value) {
                     $focusctrl = $key;
                     break;
                 }
             }
         } elseif ($this->isJson()) {
-            return $this->json()->error('Nenhum dado foi enviado');
+            return $this->getResponse()->error('Nenhum dado foi enviado');
         } else {
-            $classificacao = new Classificacao();
+            $classificacao = new Classificacao($this->getData());
         }
-        $_classificacoes = Classificacao::findAll(['classificacaoid' => null]);
-        return $this->view('gerenciar_classificacao_cadastrar', get_defined_vars());
+        $classificacao = Classificacao::findAll(['classificacaoid' => null]);
+        return $this->getRoutes('\MZ\Account\ClassificacaoApiController');
     }
-    
 
     /**
      * Modify parts of an existing Classificação
@@ -136,59 +120,18 @@ class ClassificacaoApiController extends \MZ\Core\ApiController
     public function modify($id)
     {
         $this->needPermission([Permissao::NOME_CADASTROCONTAS]);
-        $id = $this->getRequest()->query->getInt('id', null);
-        $classificacao = Classificacao::findOrFail(['id' => $id]);
-        if (!$classificacao->exists()) {
+        $old_classificacao = Classificacao::findOrFail(['id' => $id]);
+        if ($this->isJson()) {
             $msg = 'A classificação não foi informada ou não existe!';
-            if ($this->isJson()) {
-                return $this->json()->error($msg);
-            }
-            \Thunder::warning($msg);
-            return $this->redirect('/gerenciar/classificacao/');
+            return $this->getResponse()->error($msg)->redirect('\MZ\Account\ClassificacaoPageController::addRoutes($main_collection)');
         }
-        $focusctrl = 'descricao';
-        $errors = [];
-        $old_classificacao = $classificacao;
-        if ($this->getRequest()->isMethod('POST')) {
-            $classificacao = new Classificacao($this->getData());
-        try {
-             
-            $localized = $this->getRequest()->query->getBoolean('localized', false);
-            $data = $this->getData($classificacao->toArray());
-            $classificacao = new Classificacao($data);
-            $classificacao->setID($old_classificacao->getID());
-            $classificacao->filter($old_classificacao, app()->auth->provider, true);
-            $classificacao->update();
-            $old_classificacao->clean($classificacao);
-            $msg = sprintf(
-                'Classificação "%s" atualizada com sucesso!',
-                $classificacao->getDescricao()
-            );
-            if ($this->isJson()) {
-                return $this->json()->success(['item' => $classificacao->publish(app()->auth->provider)], $msg);
-            }
-            \Thunder::success($msg, true);
-            return $this->redirect('/gerenciar/classificacao/');
-        } catch (\Exception $e) {
-            $classificacao->clean($old_classificacao);
-            if ($e instanceof \MZ\Exception\ValidationException) {
-                $errors = $e->getErrors();
-            }
-            if ($this->isJson()) {
-                return $this->json()->error($e->getMessage(), null, $errors);
-            }
-            \Thunder::error($e->getMessage());
-            foreach ($errors as $key => $value) {
-                $focusctrl = $key;
-                break;
-            }
-
-        }
-        }elseif ($this->isJson()) {
-            return $this->json()->error('Nenhum dado foi enviado');
-        }
-        $_classificacoes = Classificacao::findAll(['classificacaoid' => null]);
-        return $this->view('gerenciar_classificacao_editar', get_defined_vars());
+        $localized = $this->getRequest()->query->getBoolean('localized', false);
+        $data = $this->getData($old_classificacao->toArray());
+        $classificacao = new Classificacao($data);
+        $classificacao->filter($old_classificacao, app()->auth->provider, $localized);
+        $classificacao->update();
+        $old_classificacao->clean($classificacao);
+        return $this->getResponse()->success(['item' => $classificacao->publish(app()->auth->provider)]);
     }
 
     /**
@@ -201,35 +144,8 @@ class ClassificacaoApiController extends \MZ\Core\ApiController
     {
         $this->needPermission([Permissao::NOME_CADASTROCONTAS]);
         $classificacao = Classificacao::findOrFail(['id' => $id]);
-        $id = $this->getRequest()->query->getInt('id', null);
-        $classificacao = Classificacao::findByID($id);
-        if (!$classificacao->exists()) {
-            $msg = 'A classificação não foi informada ou não existe!';
-            if ($this->isJson()) {
-                return $this->json()->error($msg);
-            }
-            \Thunder::warning($msg);
-            return $this->redirect('/gerenciar/classificacao/');
-        }
-        try {
-            $classificacao->delete();
-            $classificacao->clean(new Classificacao());
-            $msg = sprintf('Classificação "%s" excluída com sucesso!', $classificacao->getDescricao());
-            if ($this->isJson()) {
-                return $this->json()->success([], $msg);
-            }
-            \Thunder::success($msg, true);
-        } catch (\Exception $e) {
-            $msg = sprintf(
-                'Não foi possível excluir a classificação "%s"!',
-                $classificacao->getDescricao()
-            );
-            if ($this->isJson()) {
-                return $this->json()->error($msg);
-            }
-            \Thunder::error($msg);
-        }
-        return $this->redirect('/gerenciar/classificacao/');
+        $classificacao->delete();
+        $classificacao->clean(new Classificacao());
+        return $this->getResponse()->success([]);
     }
-    
 }

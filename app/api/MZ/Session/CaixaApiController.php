@@ -22,84 +22,82 @@
  *
  * @author Equipe GrandChef <desenvolvimento@mzsw.com.br>
  */
-namespace MZ\Account;
+namespace MZ\Session;
 
 use MZ\System\Permissao;
-use MZ\Database\DB;
 use MZ\Util\Filter;
-use MZ\Core\ApiController;
 
 /**
- * Contas a pagar e ou receber
+ * Caixas de movimentação financeira
  */
-class ContaApiController extends \MZ\Core\ApiController
+class CaixaApiController extends \MZ\Core\ApiController
 {
     /**
-     * Find all Contas
-     * @Get("/api/contas", name="api_conta_find")
+     * Find all Caixas
+     * @Get("/api/caixas", name="api_caixa_find")
      */
     public function find()
     {
-        $this->needPermission([Permissao::NOME_CADASTROCONTAS]);
+        $this->needPermission([Permissao::NOME_CADASTROCAIXAS]);
         $limit = max(1, min(100, $this->getRequest()->query->getInt('limit', 10)));
         $page = max(1, $this->getRequest()->query->getInt('page', 1));
         $condition = Filter::query($this->getRequest()->query->all());
         $order = $this->getRequest()->query->get('order', '');
-        $count = Conta::count($condition);
+        $count = Caixa::count($condition);
         $pager = new \Pager($count, $limit, $page);
-        $contas = Conta::findAll($condition, $order, $limit, $pager->offset);
+        $caixas = Caixa::findAll($condition, $order, $limit, $pager->offset);
         $itens = [];
-        foreach ($contas as $conta) {
-            $itens[] = $conta->publish(app()->auth->provider);
+        foreach ($caixas as $caixa) {
+            $itens[] = $caixa->publish(app()->auth->provider);
         }
         return $this->getResponse()->success(['items' => $itens, 'pages' => $pager->pageCount]);
     }
 
     /**
-     * Create a new Conta
-     * @Post("/api/contas", name="api_conta_add")
+     * Create a new Caixa
+     * @Post("/api/caixas", name="api_caixa_add")
      */
     public function add()
     {
-        $this->needPermission([Permissao::NOME_CADASTROCONTAS]);
+        $this->needPermission([Permissao::NOME_CADASTROCAIXAS]);
         $localized = $this->getRequest()->query->getBoolean('localized', false);
-        $conta = new Conta($this->getData());
-        $conta->filter(new Conta(), app()->auth->provider, $localized);
-        $conta->insert();
-        return $this->getResponse()->success(['item' => $conta->publish(app()->auth->provider)]);
+        $caixa = new Caixa($this->getData());
+        $caixa->filter(new Caixa(), app()->auth->provider, $localized);
+        $caixa->insert();
+        return $this->getResponse()->success(['item' => $caixa->publish(app()->auth->provider)]);
     }
 
     /**
-     * Modify parts of an existing Conta
-     * @Patch("/api/contas/{id}", name="api_conta_update", params={ "id": "\d+" })
+     * Modify parts of an existing Caixa
+     * @Patch("/api/caixas/{id}", name="api_caixa_update", params={ "id": "\d+" })
      *
-     * @param int $id Conta id
+     * @param int $id Caixa id
      */
     public function modify($id)
     {
-        $this->needPermission([Permissao::NOME_CADASTROCONTAS]);
-        $old_conta = Conta::findOrFail(['id' => $id]);
+        $this->needPermission([Permissao::NOME_CADASTROCAIXAS]);
+        $old_caixa = Caixa::findOrFail(['id' => $id]);
         $localized = $this->getRequest()->query->getBoolean('localized', false);
-        $data = $this->getData($old_conta->toArray());
-        $conta = new Conta($data);
-        $conta->filter($old_conta, app()->auth->provider, $localized);
-        $conta->update();
-        $old_conta->clean($conta);
-        return $this->getResponse()->success(['item' => $conta->publish(app()->auth->provider)]);
+        $data = $this->getData($old_caixa->toArray());
+        $caixa = new Caixa($data);
+        $caixa->filter($old_caixa, app()->auth->provider, $localized);
+        $caixa->update();
+        $old_caixa->clean($caixa);
+        return $this->getResponse()->success(['item' => $caixa->publish(app()->auth->provider)]);
     }
 
     /**
-     * Delete existing Conta
-     * @Delete("/api/contas/{id}", name="api_conta_delete", params={ "id": "\d+" })
+     * Delete existing Caixa
+     * @Delete("/api/caixas/{id}", name="api_caixa_delete", params={ "id": "\d+" })
      *
-     * @param int $id Conta id to delete
+     * @param int $id Caixa id to delete
      */
     public function delete($id)
     {
-        $this->needPermission([Permissao::NOME_CADASTROCONTAS]);
-        $conta = Conta::findOrFail(['id' => $id]);
-        $conta->delete();
-        $conta->clean(new Conta());
+        $this->needPermission([Permissao::NOME_CADASTROCAIXAS]);
+        $caixa = Caixa::findOrFail(['id' => $id]);
+        $caixa->delete();
+        $caixa->clean(new Caixa());
         return $this->getResponse()->success([]);
     }
 }

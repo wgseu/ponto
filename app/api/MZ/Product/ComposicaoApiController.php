@@ -22,84 +22,82 @@
  *
  * @author Equipe GrandChef <desenvolvimento@mzsw.com.br>
  */
-namespace MZ\Account;
+namespace MZ\Product;
 
 use MZ\System\Permissao;
-use MZ\Database\DB;
 use MZ\Util\Filter;
-use MZ\Core\ApiController;
 
 /**
- * Contas a pagar e ou receber
+ * Informa as propriedades da composição de um produto composto
  */
-class ContaApiController extends \MZ\Core\ApiController
+class ComposicaoApiController extends \MZ\Core\ApiController
 {
     /**
-     * Find all Contas
-     * @Get("/api/contas", name="api_conta_find")
+     * Find all Composições
+     * @Get("/api/composicoes", name="api_composicao_find")
      */
     public function find()
     {
-        $this->needPermission([Permissao::NOME_CADASTROCONTAS]);
+        $this->needPermission([Permissao::NOME_CADASTROPRODUTOS]);
         $limit = max(1, min(100, $this->getRequest()->query->getInt('limit', 10)));
         $page = max(1, $this->getRequest()->query->getInt('page', 1));
         $condition = Filter::query($this->getRequest()->query->all());
         $order = $this->getRequest()->query->get('order', '');
-        $count = Conta::count($condition);
+        $count = Composicao::count($condition);
         $pager = new \Pager($count, $limit, $page);
-        $contas = Conta::findAll($condition, $order, $limit, $pager->offset);
+        $composicoes = Composicao::findAll($condition, $order, $limit, $pager->offset);
         $itens = [];
-        foreach ($contas as $conta) {
-            $itens[] = $conta->publish(app()->auth->provider);
+        foreach ($composicoes as $composicao) {
+            $itens[] = $composicao->publish(app()->auth->provider);
         }
         return $this->getResponse()->success(['items' => $itens, 'pages' => $pager->pageCount]);
     }
 
     /**
-     * Create a new Conta
-     * @Post("/api/contas", name="api_conta_add")
+     * Create a new Composição
+     * @Post("/api/composicoes", name="api_composicao_add")
      */
     public function add()
     {
-        $this->needPermission([Permissao::NOME_CADASTROCONTAS]);
+        $this->needPermission([Permissao::NOME_CADASTROPRODUTOS]);
         $localized = $this->getRequest()->query->getBoolean('localized', false);
-        $conta = new Conta($this->getData());
-        $conta->filter(new Conta(), app()->auth->provider, $localized);
-        $conta->insert();
-        return $this->getResponse()->success(['item' => $conta->publish(app()->auth->provider)]);
+        $composicao = new Composicao($this->getData());
+        $composicao->filter(new Composicao(), app()->auth->provider, $localized);
+        $composicao->insert();
+        return $this->getResponse()->success(['item' => $composicao->publish(app()->auth->provider)]);
     }
 
     /**
-     * Modify parts of an existing Conta
-     * @Patch("/api/contas/{id}", name="api_conta_update", params={ "id": "\d+" })
+     * Modify parts of an existing Composição
+     * @Patch("/api/composicoes/{id}", name="api_composicao_update", params={ "id": "\d+" })
      *
-     * @param int $id Conta id
+     * @param int $id Composição id
      */
     public function modify($id)
     {
-        $this->needPermission([Permissao::NOME_CADASTROCONTAS]);
-        $old_conta = Conta::findOrFail(['id' => $id]);
+        $this->needPermission([Permissao::NOME_CADASTROPRODUTOS]);
+        $old_composicao = Composicao::findOrFail(['id' => $id]);
         $localized = $this->getRequest()->query->getBoolean('localized', false);
-        $data = $this->getData($old_conta->toArray());
-        $conta = new Conta($data);
-        $conta->filter($old_conta, app()->auth->provider, $localized);
-        $conta->update();
-        $old_conta->clean($conta);
-        return $this->getResponse()->success(['item' => $conta->publish(app()->auth->provider)]);
+        $data = $this->getData($old_composicao->toArray());
+        $composicao = new Composicao($data);
+        $composicao->filter($old_composicao, app()->auth->provider, $localized);
+        $composicao->update();
+        $old_composicao->clean($composicao);
+        return $this->getResponse()->success(['item' => $composicao->publish(app()->auth->provider)]);
     }
 
     /**
-     * Delete existing Conta
-     * @Delete("/api/contas/{id}", name="api_conta_delete", params={ "id": "\d+" })
+     * Delete existing Composição
+     * @Delete("/api/composicoes/{id}", name="api_composicao_delete", params={ "id": "\d+" })
      *
-     * @param int $id Conta id to delete
+     * @param int $id Composição id to delete
      */
     public function delete($id)
     {
-        $this->needPermission([Permissao::NOME_CADASTROCONTAS]);
-        $conta = Conta::findOrFail(['id' => $id]);
-        $conta->delete();
-        $conta->clean(new Conta());
+        $this->needPermission([Permissao::NOME_CADASTROPRODUTOS]);
+        $composicao = Composicao::findOrFail(['id' => $id]);
+        $composicao->delete();
+        $composicao->clean(new Composicao());
         return $this->getResponse()->success([]);
     }
 }

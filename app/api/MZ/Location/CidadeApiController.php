@@ -22,84 +22,82 @@
  *
  * @author Equipe GrandChef <desenvolvimento@mzsw.com.br>
  */
-namespace MZ\Account;
+namespace MZ\Location;
 
 use MZ\System\Permissao;
-use MZ\Database\DB;
 use MZ\Util\Filter;
-use MZ\Core\ApiController;
 
 /**
- * Contas a pagar e ou receber
+ * Cidade de um estado, contém bairros
  */
-class ContaApiController extends \MZ\Core\ApiController
+class CidadeApiController extends \MZ\Core\ApiController
 {
     /**
-     * Find all Contas
-     * @Get("/api/contas", name="api_conta_find")
+     * Find all Cidades
+     * @Get("/api/cidades", name="api_cidade_find")
      */
     public function find()
     {
-        $this->needPermission([Permissao::NOME_CADASTROCONTAS]);
+        $this->needPermission([Permissao::NOME_CADASTROCIDADES]);
         $limit = max(1, min(100, $this->getRequest()->query->getInt('limit', 10)));
         $page = max(1, $this->getRequest()->query->getInt('page', 1));
         $condition = Filter::query($this->getRequest()->query->all());
         $order = $this->getRequest()->query->get('order', '');
-        $count = Conta::count($condition);
+        $count = Cidade::count($condition);
         $pager = new \Pager($count, $limit, $page);
-        $contas = Conta::findAll($condition, $order, $limit, $pager->offset);
+        $cidades = Cidade::findAll($condition, $order, $limit, $pager->offset);
         $itens = [];
-        foreach ($contas as $conta) {
-            $itens[] = $conta->publish(app()->auth->provider);
+        foreach ($cidades as $cidade) {
+            $itens[] = $cidade->publish(app()->auth->provider);
         }
         return $this->getResponse()->success(['items' => $itens, 'pages' => $pager->pageCount]);
     }
 
     /**
-     * Create a new Conta
-     * @Post("/api/contas", name="api_conta_add")
+     * Create a new Cidade
+     * @Post("/api/cidades", name="api_cidade_add")
      */
     public function add()
     {
-        $this->needPermission([Permissao::NOME_CADASTROCONTAS]);
+        $this->needPermission([Permissao::NOME_CADASTROCIDADES]);
         $localized = $this->getRequest()->query->getBoolean('localized', false);
-        $conta = new Conta($this->getData());
-        $conta->filter(new Conta(), app()->auth->provider, $localized);
-        $conta->insert();
-        return $this->getResponse()->success(['item' => $conta->publish(app()->auth->provider)]);
+        $cidade = new Cidade($this->getData());
+        $cidade->filter(new Cidade(), app()->auth->provider, $localized);
+        $cidade->insert();
+        return $this->getResponse()->success(['item' => $cidade->publish(app()->auth->provider)]);
     }
 
     /**
-     * Modify parts of an existing Conta
-     * @Patch("/api/contas/{id}", name="api_conta_update", params={ "id": "\d+" })
+     * Modify parts of an existing Cidade
+     * @Patch("/api/cidades/{id}", name="api_cidade_update", params={ "id": "\d+" })
      *
-     * @param int $id Conta id
+     * @param int $id Cidade id
      */
     public function modify($id)
     {
-        $this->needPermission([Permissao::NOME_CADASTROCONTAS]);
-        $old_conta = Conta::findOrFail(['id' => $id]);
+        $this->needPermission([Permissao::NOME_CADASTROCIDADES]);
+        $old_cidade = Cidade::findOrFail(['id' => $id]);
         $localized = $this->getRequest()->query->getBoolean('localized', false);
-        $data = $this->getData($old_conta->toArray());
-        $conta = new Conta($data);
-        $conta->filter($old_conta, app()->auth->provider, $localized);
-        $conta->update();
-        $old_conta->clean($conta);
-        return $this->getResponse()->success(['item' => $conta->publish(app()->auth->provider)]);
+        $data = $this->getData($old_cidade->toArray());
+        $cidade = new Cidade($data);
+        $cidade->filter($old_cidade, app()->auth->provider, $localized);
+        $cidade->update();
+        $old_cidade->clean($cidade);
+        return $this->getResponse()->success(['item' => $cidade->publish(app()->auth->provider)]);
     }
 
     /**
-     * Delete existing Conta
-     * @Delete("/api/contas/{id}", name="api_conta_delete", params={ "id": "\d+" })
+     * Delete existing Cidade
+     * @Delete("/api/cidades/{id}", name="api_cidade_delete", params={ "id": "\d+" })
      *
-     * @param int $id Conta id to delete
+     * @param int $id Cidade id to delete
      */
     public function delete($id)
     {
-        $this->needPermission([Permissao::NOME_CADASTROCONTAS]);
-        $conta = Conta::findOrFail(['id' => $id]);
-        $conta->delete();
-        $conta->clean(new Conta());
+        $this->needPermission([Permissao::NOME_CADASTROCIDADES]);
+        $cidade = Cidade::findOrFail(['id' => $id]);
+        $cidade->delete();
+        $cidade->clean(new Cidade());
         return $this->getResponse()->success([]);
     }
 }

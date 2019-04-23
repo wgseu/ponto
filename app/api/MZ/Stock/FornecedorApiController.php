@@ -22,84 +22,82 @@
  *
  * @author Equipe GrandChef <desenvolvimento@mzsw.com.br>
  */
-namespace MZ\Account;
+namespace MZ\Stock;
 
 use MZ\System\Permissao;
-use MZ\Database\DB;
 use MZ\Util\Filter;
-use MZ\Core\ApiController;
 
 /**
- * Contas a pagar e ou receber
+ * Fornecedores de produtos
  */
-class ContaApiController extends \MZ\Core\ApiController
+class FornecedorApiController extends \MZ\Core\ApiController
 {
     /**
-     * Find all Contas
-     * @Get("/api/contas", name="api_conta_find")
+     * Find all Fornecedores
+     * @Get("/api/fornecedores", name="api_fornecedor_find")
      */
     public function find()
     {
-        $this->needPermission([Permissao::NOME_CADASTROCONTAS]);
+        $this->needPermission([Permissao::NOME_CADASTROFORNECEDORES]);
         $limit = max(1, min(100, $this->getRequest()->query->getInt('limit', 10)));
         $page = max(1, $this->getRequest()->query->getInt('page', 1));
         $condition = Filter::query($this->getRequest()->query->all());
         $order = $this->getRequest()->query->get('order', '');
-        $count = Conta::count($condition);
+        $count = Fornecedor::count($condition);
         $pager = new \Pager($count, $limit, $page);
-        $contas = Conta::findAll($condition, $order, $limit, $pager->offset);
+        $fornecedores = Fornecedor::findAll($condition, $order, $limit, $pager->offset);
         $itens = [];
-        foreach ($contas as $conta) {
-            $itens[] = $conta->publish(app()->auth->provider);
+        foreach ($fornecedores as $fornecedor) {
+            $itens[] = $fornecedor->publish(app()->auth->provider);
         }
         return $this->getResponse()->success(['items' => $itens, 'pages' => $pager->pageCount]);
     }
 
     /**
-     * Create a new Conta
-     * @Post("/api/contas", name="api_conta_add")
+     * Create a new Fornecedor
+     * @Post("/api/fornecedores", name="api_fornecedor_add")
      */
     public function add()
     {
-        $this->needPermission([Permissao::NOME_CADASTROCONTAS]);
+        $this->needPermission([Permissao::NOME_CADASTROFORNECEDORES]);
         $localized = $this->getRequest()->query->getBoolean('localized', false);
-        $conta = new Conta($this->getData());
-        $conta->filter(new Conta(), app()->auth->provider, $localized);
-        $conta->insert();
-        return $this->getResponse()->success(['item' => $conta->publish(app()->auth->provider)]);
+        $fornecedor = new Fornecedor($this->getData());
+        $fornecedor->filter(new Fornecedor(), app()->auth->provider, $localized);
+        $fornecedor->insert();
+        return $this->getResponse()->success(['item' => $fornecedor->publish(app()->auth->provider)]);
     }
 
     /**
-     * Modify parts of an existing Conta
-     * @Patch("/api/contas/{id}", name="api_conta_update", params={ "id": "\d+" })
+     * Modify parts of an existing Fornecedor
+     * @Patch("/api/fornecedores/{id}", name="api_fornecedor_update", params={ "id": "\d+" })
      *
-     * @param int $id Conta id
+     * @param int $id Fornecedor id
      */
     public function modify($id)
     {
-        $this->needPermission([Permissao::NOME_CADASTROCONTAS]);
-        $old_conta = Conta::findOrFail(['id' => $id]);
+        $this->needPermission([Permissao::NOME_CADASTROFORNECEDORES]);
+        $old_fornecedor = Fornecedor::findOrFail(['id' => $id]);
         $localized = $this->getRequest()->query->getBoolean('localized', false);
-        $data = $this->getData($old_conta->toArray());
-        $conta = new Conta($data);
-        $conta->filter($old_conta, app()->auth->provider, $localized);
-        $conta->update();
-        $old_conta->clean($conta);
-        return $this->getResponse()->success(['item' => $conta->publish(app()->auth->provider)]);
+        $data = $this->getData($old_fornecedor->toArray());
+        $fornecedor = new Fornecedor($data);
+        $fornecedor->filter($old_fornecedor, app()->auth->provider, $localized);
+        $fornecedor->update();
+        $old_fornecedor->clean($fornecedor);
+        return $this->getResponse()->success(['item' => $fornecedor->publish(app()->auth->provider)]);
     }
 
     /**
-     * Delete existing Conta
-     * @Delete("/api/contas/{id}", name="api_conta_delete", params={ "id": "\d+" })
+     * Delete existing Fornecedor
+     * @Delete("/api/fornecedores/{id}", name="api_fornecedor_delete", params={ "id": "\d+" })
      *
-     * @param int $id Conta id to delete
+     * @param int $id Fornecedor id to delete
      */
     public function delete($id)
     {
-        $this->needPermission([Permissao::NOME_CADASTROCONTAS]);
-        $conta = Conta::findOrFail(['id' => $id]);
-        $conta->delete();
-        $conta->clean(new Conta());
+        $this->needPermission([Permissao::NOME_CADASTROFORNECEDORES]);
+        $fornecedor = Fornecedor::findOrFail(['id' => $id]);
+        $fornecedor->delete();
+        $fornecedor->clean(new Fornecedor());
         return $this->getResponse()->success([]);
     }
 }

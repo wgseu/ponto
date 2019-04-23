@@ -52,19 +52,11 @@ class ClassificacaoApiController extends \MZ\Core\ApiController
         $count = Classificacao::count($condition);
         $pager = new \Pager($count, $limit, $page);
         $classificacoes = Classificacao::findAll($condition, $order, $limit, $pager->offset);
-        if ($this->isJson()) {
-            $itens = [];
-            foreach ($classificacoes as $classificacao) {
-                $itens[] = $classificacao->publish(app()->auth->provider);
-            }
-            return $this->getResponse()->success(['items' => $itens, 'pages' => $pager->pageCount]);
-        }
-        $classificacoes = Classificacao::findAll(['classificacaoid' => null]);
-        $classificacao = [];
+        $itens = [];
         foreach ($classificacoes as $classificacao) {
-            $classificacao[$classificacao->getID()] = $classificacao->getDescricao();
+            $itens[] = $classificacao->publish(app()->auth->provider);
         }
-        return $this->getRoutes('\MZ\Account\ClassificacaoApiController');
+        return $this->getResponse()->success(['items' => $itens, 'pages' => $pager->pageCount]);
     }
 
     /**
@@ -73,42 +65,13 @@ class ClassificacaoApiController extends \MZ\Core\ApiController
      */
     public function add()
     {
+
         $this->needPermission([Permissao::NOME_CADASTROCONTAS]);
-        $localized = $this->getRequest()->query->getBoolean('localized', false);;
-        if ($this->getRequest()->isMethod('POST')) {
-            $classificacao = new Classificacao($this->getData());
-            try {
-                $classificacao->filter(new Classificacao(), app()->auth->provider, $localized);
-                $classificacao->insert();
-                $classificacao->clean($classificacao);
-                $msg = sprintf(
-                    'Classificação "%s" cadastrada com sucesso!',
-                    $classificacao->getDescricao()
-                );
-                if ($this->isJson()) {
-                    return $this->getResponse()->success(['item' => $classificacao->publish(app()->auth->provider)], $msg);
-                }
-                return $this->getRoutes('\MZ\Account\ClassificacaoApiController');
-            } catch (\Exception $e) {
-                $classificacao->clean($classificacao);
-                if ($e instanceof \MZ\Exception\ValidationException) {
-                    $errors = $e->getErrors();
-                }
-                if ($this->isJson()) {
-                    return $this->getResponse()->error($e->getMessage(), null, $errors);
-                }
-                foreach ($errors as $key => $value) {
-                    $focusctrl = $key;
-                    break;
-                }
-            }
-        } elseif ($this->isJson()) {
-            return $this->getResponse()->error('Nenhum dado foi enviado');
-        } else {
-            $classificacao = new Classificacao($this->getData());
-        }
-        $classificacao = Classificacao::findAll(['classificacaoid' => null]);
-        return $this->getRoutes('\MZ\Account\ClassificacaoApiController');
+        $localized = $this->getRequest()->query->getBoolean('localized', false);
+        $classificacao = new Classificacao($this->getData());
+        $classificacao->filter(new Classificacao(), app()->auth->provider, $localized);
+        $classificacao->insert();
+        return $this->getResponse()->success(['item' => $classificacao->publish(app()->auth->provider)]);
     }
 
     /**
@@ -121,10 +84,6 @@ class ClassificacaoApiController extends \MZ\Core\ApiController
     {
         $this->needPermission([Permissao::NOME_CADASTROCONTAS]);
         $old_classificacao = Classificacao::findOrFail(['id' => $id]);
-        if ($this->isJson()) {
-            $msg = 'A classificação não foi informada ou não existe!';
-            return $this->getResponse()->error($msg)->redirect('\MZ\Account\ClassificacaoPageController::addRoutes($main_collection)');
-        }
         $localized = $this->getRequest()->query->getBoolean('localized', false);
         $data = $this->getData($old_classificacao->toArray());
         $classificacao = new Classificacao($data);

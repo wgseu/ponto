@@ -27,6 +27,7 @@ namespace MZ\Sale;
 use MZ\Sale\PedidoTest;
 use MZ\Product\ProdutoTest;
 use MZ\Provider\PrestadorTest;
+use MZ\Session\MovimentacaoTest;
 
 class ItemTest extends \MZ\Framework\TestCase
 {
@@ -34,11 +35,11 @@ class ItemTest extends \MZ\Framework\TestCase
      * Build a valid item do pedido
      * @return Item
      */
-    public static function build()
+    public static function build($pedido = null)
     {
         $last = Item::find([], ['id' => -1]);
         $id = $last->getID() + 1;
-        $pedido = PedidoTest::create();
+        $pedido = $pedido ?? PedidoTest::create();
         $prestador = PrestadorTest::create();
         $produto = ProdutoTest::create();
         $item = new Item();
@@ -62,15 +63,16 @@ class ItemTest extends \MZ\Framework\TestCase
      * Create a item do pedido on database
      * @return Item
      */
-    public static function create()
+    public static function create($pedido = null)
     {
-        $item = self::build();
+        $item = self::build($pedido);
         $item->insert();
         return $item;
     }
 
     public function testFind()
     {
+        $movimentacao = MovimentacaoTest::create();
         $item = self::create();
         $condition = ['produtoid' => $item->getProdutoID()];
         $found_item = Item::find($condition);
@@ -78,27 +80,42 @@ class ItemTest extends \MZ\Framework\TestCase
         list($found_item) = Item::findAll($condition, [], 1);
         $this->assertEquals($item, $found_item);
         $this->assertEquals(1, Item::count($condition));
+        $pedido = $item->findPedidoID();
+        PedidoTest::close($pedido);
+        MovimentacaoTest::close($movimentacao);
     }
 
     public function testAdd()
     {
+        $movimentacao = MovimentacaoTest::create();
         $item = self::build();
         $item->insert();
         $this->assertTrue($item->exists());
+        $pedido = $item->findPedidoID();
+        PedidoTest::close($pedido);
+        MovimentacaoTest::close($movimentacao);
     }
 
     public function testUpdate()
     {
+        $movimentacao = MovimentacaoTest::create();
         $item = self::create();
         $item->update();
         $this->assertTrue($item->exists());
+        $pedido = $item->findPedidoID();
+        PedidoTest::close($pedido);
+        MovimentacaoTest::close($movimentacao);
     }
 
     public function testDelete()
     {
+        $movimentacao = MovimentacaoTest::create();
         $item = self::create();
+        $pedido = $item->findPedidoID();
         $item->delete();
         $item->loadByID();
         $this->assertFalse($item->exists());
+        $pedido->delete();
+        MovimentacaoTest::close($movimentacao);
     }
 }

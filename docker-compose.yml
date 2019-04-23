@@ -14,7 +14,7 @@ services:
             - php
             - db
     php:
-        image: nanoninja/php-fpm:7.1
+        image: nanoninja/php-fpm:7.1.14
         restart: always
         volumes:
             - "./etc/php/php.ini:/usr/local/etc/php/conf.d/php.ini"

@@ -26,14 +26,18 @@ namespace MZ\Sale;
 
 use MZ\System\Permissao;
 use MZ\Account\AuthenticationTest;
+use MZ\Session\MovimentacaoTest;
 
 class PedidoPageControllerTest extends \MZ\Framework\TestCase
 {
     public function testFind()
     {
         AuthenticationTest::authProvider([Permissao::NOME_SISTEMA, Permissao::NOME_PAGAMENTO]);
+        $movimentacao = MovimentacaoTest::create();
         $pedido = PedidoTest::create();
         $result = $this->get('/gerenciar/pedido/', ['search' => $pedido->getMesaID()]);
         $this->assertEquals(200, $result->getStatusCode());
+        PedidoTest::close($pedido);
+        MovimentacaoTest::close($movimentacao);
     }
 }

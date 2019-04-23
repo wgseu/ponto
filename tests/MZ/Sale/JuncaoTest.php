@@ -26,6 +26,7 @@ namespace MZ\Sale;
 
 use MZ\Environment\MesaTest;
 use MZ\Sale\PedidoTest;
+use MZ\Session\MovimentacaoTest;
 
 class JuncaoTest extends \MZ\Framework\TestCase
 {
@@ -57,6 +58,7 @@ class JuncaoTest extends \MZ\Framework\TestCase
 
     public function testFind()
     {
+        $movimentacao = MovimentacaoTest::create();
         $juncao = self::create();
         $condition = ['mesaid' => $juncao->getMesaID()];
         $found_juncao = Juncao::find($condition);
@@ -64,70 +66,120 @@ class JuncaoTest extends \MZ\Framework\TestCase
         list($found_juncao) = Juncao::findAll($condition, [], 1);
         $this->assertEquals($juncao, $found_juncao);
         $this->assertEquals(1, Juncao::count($condition));
+        $pedido = $juncao->findPedidoID();
+        PedidoTest::close($pedido);
+        MovimentacaoTest::close($movimentacao);
     }
 
     public function testAdd()
     {
+        $movimentacao = MovimentacaoTest::create();
         $juncao = self::build();
         $juncao->insert();
         $this->assertTrue($juncao->exists());
+        $pedido = $juncao->findPedidoID();
+        PedidoTest::close($pedido);
+        MovimentacaoTest::close($movimentacao);
     }
 
     public function testUpdate()
     {
+        $movimentacao = MovimentacaoTest::create();
         $juncao = self::create();
         $juncao->update();
         $this->assertTrue($juncao->exists());
+        $pedido = $juncao->findPedidoID();
+        PedidoTest::close($pedido);
+        MovimentacaoTest::close($movimentacao);
     }
 
     public function testDelete()
     {
+        $movimentacao = MovimentacaoTest::create();
         $juncao = self::create();
+        $pedido = $juncao->findPedidoID();
         $juncao->delete();
         $juncao->loadByID();
+        $pedido->delete();
         $this->assertFalse($juncao->exists());
+        MovimentacaoTest::close($movimentacao);
     }
 
     public function testJuntarLiberado()
     {
+        $movimentacao = MovimentacaoTest::create();
         $juncao = self::build();
         $juncao->setEstado(Juncao::ESTADO_LIBERADO);
         $this->expectException('\MZ\Exception\ValidationException');
-        $juncao->insert();
+        try {
+            $juncao->insert();
+        } finally {
+            $pedido = $juncao->findPedidoID();
+            ItemTest::create($pedido);
+            PedidoTest::close($pedido);
+            MovimentacaoTest::close($movimentacao);
+        }
     }
 
     public function testJuntarNovamente()
     {
+        $movimentacao = MovimentacaoTest::create();
         $juncao = self::create();
         $this->expectException('\MZ\Exception\ValidationException');
-        $juncao->insert();
+        try {
+            $juncao->insert();
+        } finally {
+            $pedido = $juncao->findPedidoID();
+            ItemTest::create($pedido);
+            PedidoTest::close($pedido);
+            MovimentacaoTest::close($movimentacao);
+        }
     }
 
     public function testJuntarMesmaMesa()
     {
+        $movimentacao = MovimentacaoTest::create();
         $juncao = self::build();
         $pedido = $juncao->findPedidoID();
         $juncao->setMesaID($pedido->getMesaID());
         $this->expectException('\MZ\Exception\ValidationException');
-        $juncao->insert();
+        try {
+            $juncao->insert();
+        } finally {
+            ItemTest::create($pedido);
+            PedidoTest::close($pedido);
+            MovimentacaoTest::close($movimentacao);
+        }
     }
 
     public function testJuntarPedidoFechado()
     {
+        $movimentacao = MovimentacaoTest::create();
         $juncao = self::build();
         $pedido = $juncao->findPedidoID();
-        $pedido->setEstado(Pedido::ESTADO_FINALIZADO);
-        $pedido->update();
+        PedidoTest::close($pedido);
         $this->expectException('\MZ\Exception\ValidationException');
-        $juncao->insert();
+        try {
+            $juncao->insert();
+        } finally {
+            MovimentacaoTest::close($movimentacao);
+        }
     }
 
     public function testJuntarPedidoDiferente()
     {
+        $movimentacao = MovimentacaoTest::create();
         $juncao = self::build();
+        $old_pedido = $juncao->findPedidoID();
         $pedido = PedidoTest::create(Pedido::TIPO_COMANDA);
         $juncao->setPedidoID($pedido->getID());
         $this->expectException('\MZ\Exception\ValidationException');
-        $juncao->insert();
+        try {
+            $juncao->insert();
+        } finally {
+            PedidoTest::close($pedido);
+            PedidoTest::close($old_pedido);
+            MovimentacaoTest::close($movimentacao);
+        }
     }
 }

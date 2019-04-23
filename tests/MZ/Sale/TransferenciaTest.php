@@ -26,6 +26,7 @@ namespace MZ\Sale;
 
 use MZ\Sale\PedidoTest;
 use MZ\Provider\PrestadorTest;
+use MZ\Session\MovimentacaoTest;
 
 class TransferenciaTest extends \MZ\Framework\TestCase
 {
@@ -64,6 +65,7 @@ class TransferenciaTest extends \MZ\Framework\TestCase
 
     public function testFind()
     {
+        $movimentacao = MovimentacaoTest::create();
         $transferencia = self::create();
         $condition = ['pedidoid' => $transferencia->getPedidoID()];
         $found_transferencia = Transferencia::find($condition);
@@ -71,27 +73,53 @@ class TransferenciaTest extends \MZ\Framework\TestCase
         list($found_transferencia) = Transferencia::findAll($condition, [], 1);
         $this->assertEquals($transferencia, $found_transferencia);
         $this->assertEquals(1, Transferencia::count($condition));
+        $pedido = $transferencia->findPedidoID();
+        $pedido_destino = $transferencia->findDestinoPedidoID();
+        PedidoTest::close($pedido);
+        PedidoTest::close($pedido_destino);
+        MovimentacaoTest::close($movimentacao);
     }
 
     public function testAdd()
     {
+        $movimentacao = MovimentacaoTest::create();
         $transferencia = self::build();
         $transferencia->insert();
         $this->assertTrue($transferencia->exists());
+        $pedido = $transferencia->findPedidoID();
+        $pedido_destino = $transferencia->findDestinoPedidoID();
+        PedidoTest::close($pedido);
+        PedidoTest::close($pedido_destino);
+        MovimentacaoTest::close($movimentacao);
     }
 
     public function testUpdate()
     {
+        $movimentacao = MovimentacaoTest::create();
         $transferencia = self::create();
         $this->expectException('\MZ\Exception\ValidationException');
-        $transferencia->update();
+        try {
+            $transferencia->update();
+        } finally {
+            $pedido = $transferencia->findPedidoID();
+            $pedido_destino = $transferencia->findDestinoPedidoID();
+            PedidoTest::close($pedido);
+            PedidoTest::close($pedido_destino);
+            MovimentacaoTest::close($movimentacao);
+        }
     }
 
     public function testDelete()
     {
+        $movimentacao = MovimentacaoTest::create();
         $transferencia = self::create();
+        $pedido = $transferencia->findPedidoID();
+        $pedido_destino = $transferencia->findDestinoPedidoID();
         $transferencia->delete();
         $transferencia->loadByID();
         $this->assertFalse($transferencia->exists());
+        PedidoTest::close($pedido);
+        PedidoTest::close($pedido_destino);
+        MovimentacaoTest::close($movimentacao);
     }
 }

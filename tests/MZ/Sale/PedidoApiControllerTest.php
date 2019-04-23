@@ -33,8 +33,8 @@ class PedidoApiControllerTest extends \MZ\Framework\TestCase
     public function testAdd()
     {
         AuthenticationTest::authProvider([Permissao::NOME_SISTEMA, Permissao::NOME_PEDIDOMESA]);
-        $pedido = PedidoTest::build();
         $movimentacao = MovimentacaoTest::create();
+        $pedido = PedidoTest::build();
         $expected = [
             'status' => 'ok',
         ];
@@ -43,8 +43,7 @@ class PedidoApiControllerTest extends \MZ\Framework\TestCase
         $this->assertEquals($expected, \array_intersect_key($result, $expected));
         $pedido->setID($result['item']['id']);
         $pedido->loadByID();
-        $pedido->setEstado(Pedido::ESTADO_FINALIZADO);
-        $pedido->update();
+        PedidoTest::close($pedido);
         MovimentacaoTest::close($movimentacao);
     }
 }

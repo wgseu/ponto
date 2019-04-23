@@ -53,6 +53,7 @@ class PropriedadeApiControllerTest extends \MZ\Framework\TestCase
         ];
         $result = $this->post('/api/propriedades', $propriedade->toArray());
         $expected['item']['id'] = $result['item']['id'] ?? null;
+        $expected['item']['dataatualizacao'] = $result['item']['dataatualizacao'] ?? null;
         $this->assertEquals($expected, \array_intersect_key($result, $expected));
     }
 

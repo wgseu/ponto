@@ -27,6 +27,7 @@ namespace MZ\Sale;
 use MZ\Provider\PrestadorTest;
 use MZ\Environment\MesaTest;
 use MZ\Session\Sessao;
+use MZ\Session\MovimentacaoTest;
 
 class PedidoTest extends \MZ\Framework\TestCase
 {
@@ -65,8 +66,21 @@ class PedidoTest extends \MZ\Framework\TestCase
         return $pedido;
     }
 
+    /**
+     * Fecha o pedido
+     * @param Pedido $pedido
+     */
+    public static function close($pedido)
+    {
+        // adiciona um item para não dar erro
+        ItemTest::create($pedido);
+        $pedido->setEstado(Pedido::ESTADO_FINALIZADO);
+        $pedido->update();
+    }
+
     public function testFind()
     {
+        $movimentacao = MovimentacaoTest::create();
         $pedido = self::create();
         $condition = ['mesaid' => $pedido->getMesaID()];
         $found_pedido = Pedido::find($condition);
@@ -74,27 +88,37 @@ class PedidoTest extends \MZ\Framework\TestCase
         list($found_pedido) = Pedido::findAll($condition, [], 1);
         $this->assertEquals($pedido, $found_pedido);
         $this->assertEquals(1, Pedido::count($condition));
+        PedidoTest::close($pedido);
+        MovimentacaoTest::close($movimentacao);
     }
 
     public function testAdd()
     {
+        $movimentacao = MovimentacaoTest::create();
         $pedido = self::build();
         $pedido->insert();
         $this->assertTrue($pedido->exists());
+        PedidoTest::close($pedido);
+        MovimentacaoTest::close($movimentacao);
     }
 
     public function testUpdate()
     {
+        $movimentacao = MovimentacaoTest::create();
         $pedido = self::create();
         $pedido->update();
         $this->assertTrue($pedido->exists());
+        PedidoTest::close($pedido);
+        MovimentacaoTest::close($movimentacao);
     }
 
     public function testDelete()
     {
+        $movimentacao = MovimentacaoTest::create();
         $pedido = self::create();
         $pedido->delete();
         $pedido->loadByID();
         $this->assertFalse($pedido->exists());
+        MovimentacaoTest::close($movimentacao);
     }
 }

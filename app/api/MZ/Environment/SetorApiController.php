@@ -22,83 +22,83 @@
  *
  * @author Equipe GrandChef <desenvolvimento@mzsw.com.br>
  */
-namespace MZ\Location;
+namespace MZ\Environment;
 
 use MZ\System\Permissao;
 use MZ\Util\Filter;
 
 /**
- * Cidade de um estado, contém bairros
+ * Setor de impressão e de estoque
  */
-class CidadeApiController extends \MZ\Core\ApiController
+class SetorApiController extends \MZ\Core\ApiController
 {
     /**
-     * Find all Cidades
-     * @Get("/api/cidades", name="api_cidade_find")
+     * Find all Setores
+     * @Get("/api/setores", name="api_setor_find")
      */
     public function find()
     {
-        $this->needPermission([Permissao::NOME_CADASTROCIDADES]);
+        $this->needPermission([Permissao::NOME_ESTOQUE]);
         $limit = max(1, min(100, $this->getRequest()->query->getInt('limit', 10)));
         $page = max(1, $this->getRequest()->query->getInt('page', 1));
         $condition = Filter::query($this->getRequest()->query->all());
         unset($condition['ordem']);
         $order = $this->getRequest()->query->get('order', '');
-        $count = Cidade::count($condition);
+        $count = Setor::count($condition);
         $pager = new \Pager($count, $limit, $page);
-        $cidades = Cidade::findAll($condition, $order, $limit, $pager->offset);
+        $setores = Setor::findAll($condition, $order, $limit, $pager->offset);
         $itens = [];
-        foreach ($cidades as $cidade) {
-            $itens[] = $cidade->publish(app()->auth->provider);
+        foreach ($setores as $setor) {
+            $itens[] = $setor->publish(app()->auth->provider);
         }
         return $this->getResponse()->success(['items' => $itens, 'pages' => $pager->pageCount]);
     }
 
     /**
-     * Create a new Cidade
-     * @Post("/api/cidades", name="api_cidade_add")
+     * Create a new Setor
+     * @Post("/api/setores", name="api_setor_add")
      */
     public function add()
     {
-        $this->needPermission([Permissao::NOME_CADASTROCIDADES]);
+        $this->needPermission([Permissao::NOME_ESTOQUE]);
         $localized = $this->getRequest()->query->getBoolean('localized', false);
-        $cidade = new Cidade($this->getData());
-        $cidade->filter(new Cidade(), app()->auth->provider, $localized);
-        $cidade->insert();
-        return $this->getResponse()->success(['item' => $cidade->publish(app()->auth->provider)]);
+        $setor = new Setor($this->getData());
+        $setor->filter(new Setor(), app()->auth->provider, $localized);
+        $setor->insert();
+        return $this->getResponse()->success(['item' => $setor->publish(app()->auth->provider)]);
     }
 
     /**
-     * Modify parts of an existing Cidade
-     * @Patch("/api/cidades/{id}", name="api_cidade_update", params={ "id": "\d+" })
+     * Modify parts of an existing Setor
+     * @Patch("/api/setores/{id}", name="api_setor_update", params={ "id": "\d+" })
      *
-     * @param int $id Cidade id
+     * @param int $id Setor id
      */
     public function modify($id)
     {
-        $this->needPermission([Permissao::NOME_CADASTROCIDADES]);
-        $old_cidade = Cidade::findOrFail(['id' => $id]);
+        $this->needPermission([Permissao::NOME_ESTOQUE]);
+        $old_setor = Setor::findOrFail(['id' => $id]);
         $localized = $this->getRequest()->query->getBoolean('localized', false);
-        $data = $this->getData($old_cidade->toArray());
-        $cidade = new Cidade($data);
-        $cidade->filter($old_cidade, app()->auth->provider, $localized);
-        $cidade->update();
-        $old_cidade->clean($cidade);
-        return $this->getResponse()->success(['item' => $cidade->publish(app()->auth->provider)]);
+        $data = $this->getData($old_setor->toArray());
+        $setor = new Setor($data);
+        $setor->filter($old_setor, app()->auth->provider, $localized);
+        $setor->update();
+        $old_setor->clean($setor);
+        return $this->getResponse()->success(['item' => $setor->publish(app()->auth->provider)]);
     }
 
     /**
-     * Delete existing Cidade
-     * @Delete("/api/cidades/{id}", name="api_cidade_delete", params={ "id": "\d+" })
+     * Delete existing Setor
+     * @Delete("/api/setores/{id}", name="api_setor_delete", params={ "id": "\d+" })
      *
-     * @param int $id Cidade id to delete
+     * @param int $id Setor id to delete
      */
     public function delete($id)
     {
-        $this->needPermission([Permissao::NOME_CADASTROCIDADES]);
-        $cidade = Cidade::findOrFail(['id' => $id]);
-        $cidade->delete();
-        $cidade->clean(new Cidade());
+        $this->needPermission([Permissao::NOME_ESTOQUE]);
+        $setor = Setor::findOrFail(['id' => $id]);
+        $setor->delete();
+        $setor->clean(new Setor());
         return $this->getResponse()->success([]);
     }
 }

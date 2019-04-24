@@ -33,8 +33,8 @@ use MZ\Util\Filter;
 class CartaoApiController extends \MZ\Core\ApiController
 {
     /**
-     * Find all Cartões
-     * @Get("/api/cartoes", name="api_cartao_find")
+     * associate Cartões
+     * @Get("/api/cartoes/{name}", name="api_cartao_associate", params={ "name": "[a-zA-Z]" })
      */
     public function associate($name)
     {
@@ -47,29 +47,24 @@ class CartaoApiController extends \MZ\Core\ApiController
         }
         $integracao = Integracao::findByAcessoURL($name);
         $association = new \MZ\Association\Card($integracao, $codigos);
-
-        if ($this->getRequest()->isMethod('POST') && $this->getRequest()->query->get('action') == 'update') {
-            $this->needPermission([Permissao::NOME_CADASTROCARTOES]);
-            try {
-                $codigo = $this->getRequest()->request->get('codigo');
-                $id = $this->getRequest()->request->get('id');
-                $cartao = $association->update($codigo, $id);
-                return $this->getResponse()->success(['cartao' => $cartao->toArray()]);
-            } catch (\Exception $e) {
-                return $this->getResponse()->error($e->getMessage());
-            }
-        }
-        $codigos = $association->findAll();
-        $_imagens = Cartao::getImages();
-        return $this->getRoutes('\MZ\Payment\CartaoPageController::addRoutes($main_collection)');
+        $this->needPermission([Permissao::NOME_CADASTROCARTOES]);
+        $codigo = $this->getRequest()->request->get('codigo');
+        $id = $this->getRequest()->request->get('id');
+        $cartao = $association->update($codigo, $id);
+        return $this->getResponse()->success(['cartao' => $cartao->toArray()]);
     }
 
+    /**
+     * Find all Cartões
+     * @Get("/api/cartoes", name="api_cartao_find")
+     */
     public function find()
     {
         $this->needPermission([Permissao::NOME_CADASTROCARTOES]);
         $limit = max(1, min(100, $this->getRequest()->query->getInt('limit', 10)));
         $page = max(1, $this->getRequest()->query->getInt('page', 1));
         $condition = Filter::query($this->getRequest()->query->all());
+        unset($condition['ordem']);
         $order = $this->getRequest()->query->get('order', '');
         $count = Cartao::count($condition);
         $pager = new \Pager($count, $limit, $page);
@@ -106,7 +101,7 @@ class CartaoApiController extends \MZ\Core\ApiController
         $this->needPermission([Permissao::NOME_CADASTROCARTOES]);
         $old_cartao = Cartao::findOrFail(['id' => $id]);
         $localized = $this->getRequest()->query->getBoolean('localized', false);
-        $data = array_merge($old_cartao->toArray(), $this->getData());
+        $data = $this->getData($old_cartao->toArray());
         $cartao = new Cartao($data);
         $cartao->filter($old_cartao, app()->auth->provider, $localized);
         $cartao->update();

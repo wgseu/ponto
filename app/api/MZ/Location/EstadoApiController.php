@@ -28,77 +28,77 @@ use MZ\System\Permissao;
 use MZ\Util\Filter;
 
 /**
- * Cidade de um estado, contém bairros
+ * Estado federativo de um país
  */
-class CidadeApiController extends \MZ\Core\ApiController
+class EstadoApiController extends \MZ\Core\ApiController
 {
     /**
-     * Find all Cidades
-     * @Get("/api/cidades", name="api_cidade_find")
+     * Find all Estados
+     * @Get("/api/estados", name="api_estado_find")
      */
     public function find()
     {
-        $this->needPermission([Permissao::NOME_CADASTROCIDADES]);
+        $this->needPermission([Permissao::NOME_CADASTROESTADOS]);
         $limit = max(1, min(100, $this->getRequest()->query->getInt('limit', 10)));
         $page = max(1, $this->getRequest()->query->getInt('page', 1));
         $condition = Filter::query($this->getRequest()->query->all());
         unset($condition['ordem']);
         $order = $this->getRequest()->query->get('order', '');
-        $count = Cidade::count($condition);
+        $count = Estado::count($condition);
         $pager = new \Pager($count, $limit, $page);
-        $cidades = Cidade::findAll($condition, $order, $limit, $pager->offset);
+        $estados = Estado::findAll($condition, $order, $limit, $pager->offset);
         $itens = [];
-        foreach ($cidades as $cidade) {
-            $itens[] = $cidade->publish(app()->auth->provider);
+        foreach ($estados as $estado) {
+            $itens[] = $estado->publish(app()->auth->provider);
         }
         return $this->getResponse()->success(['items' => $itens, 'pages' => $pager->pageCount]);
     }
 
     /**
-     * Create a new Cidade
-     * @Post("/api/cidades", name="api_cidade_add")
+     * Create a new Estado
+     * @Post("/api/estados", name="api_estado_add")
      */
     public function add()
     {
-        $this->needPermission([Permissao::NOME_CADASTROCIDADES]);
+        $this->needPermission([Permissao::NOME_CADASTROESTADOS]);
         $localized = $this->getRequest()->query->getBoolean('localized', false);
-        $cidade = new Cidade($this->getData());
-        $cidade->filter(new Cidade(), app()->auth->provider, $localized);
-        $cidade->insert();
-        return $this->getResponse()->success(['item' => $cidade->publish(app()->auth->provider)]);
+        $estado = new Estado($this->getData());
+        $estado->filter(new Estado(), app()->auth->provider, $localized);
+        $estado->insert();
+        return $this->getResponse()->success(['item' => $estado->publish(app()->auth->provider)]);
     }
 
     /**
-     * Modify parts of an existing Cidade
-     * @Patch("/api/cidades/{id}", name="api_cidade_update", params={ "id": "\d+" })
+     * Modify parts of an existing Estado
+     * @Patch("/api/estados/{id}", name="api_estado_update", params={ "id": "\d+" })
      *
-     * @param int $id Cidade id
+     * @param int $id Estado id
      */
     public function modify($id)
     {
-        $this->needPermission([Permissao::NOME_CADASTROCIDADES]);
-        $old_cidade = Cidade::findOrFail(['id' => $id]);
+        $this->needPermission([Permissao::NOME_CADASTROESTADOS]);
+        $old_estado = Estado::findOrFail(['id' => $id]);
         $localized = $this->getRequest()->query->getBoolean('localized', false);
-        $data = $this->getData($old_cidade->toArray());
-        $cidade = new Cidade($data);
-        $cidade->filter($old_cidade, app()->auth->provider, $localized);
-        $cidade->update();
-        $old_cidade->clean($cidade);
-        return $this->getResponse()->success(['item' => $cidade->publish(app()->auth->provider)]);
+        $data = $this->getData($old_estado->toArray());
+        $estado = new Estado($data);
+        $estado->filter($old_estado, app()->auth->provider, $localized);
+        $estado->update();
+        $old_estado->clean($estado);
+        return $this->getResponse()->success(['item' => $estado->publish(app()->auth->provider)]);
     }
 
     /**
-     * Delete existing Cidade
-     * @Delete("/api/cidades/{id}", name="api_cidade_delete", params={ "id": "\d+" })
+     * Delete existing Estado
+     * @Delete("/api/estados/{id}", name="api_estado_delete", params={ "id": "\d+" })
      *
-     * @param int $id Cidade id to delete
+     * @param int $id Estado id to delete
      */
     public function delete($id)
     {
-        $this->needPermission([Permissao::NOME_CADASTROCIDADES]);
-        $cidade = Cidade::findOrFail(['id' => $id]);
-        $cidade->delete();
-        $cidade->clean(new Cidade());
+        $this->needPermission([Permissao::NOME_CADASTROESTADOS]);
+        $estado = Estado::findOrFail(['id' => $id]);
+        $estado->delete();
+        $estado->clean(new Estado());
         return $this->getResponse()->success([]);
     }
 }

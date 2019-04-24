@@ -39,65 +39,32 @@ class CreditoApiController extends \MZ\Core\ApiController
     public function find()
     {
         $this->needPermission([Permissao::NOME_CADASTRARCREDITOS]);
-
-        $limite = max(1, min(100, $this->getRequest()->query->getInt('limit', 10)));
+        $limit = max(1, min(100, $this->getRequest()->query->getInt('limit', 10)));
+        $page = max(1, $this->getRequest()->query->getInt('page', 1));
         $condition = Filter::query($this->getRequest()->query->all());
         unset($condition['ordem']);
-        $credito = new Credito($condition);
-        $order = Filter::order($this->getRequest()->query->get('ordem', ''));
+        $order = $this->getRequest()->query->get('order', '');
         $count = Credito::count($condition);
-        $page = max(1, $this->getRequest()->query->getInt('pagina', 1));
-        $pager = new \Pager($count, $limite, $page, 'pagina');
-        $pagination = $pager->genPages();
-        $creditos = Credito::findAll($condition, $order, $limite, $pager->offset);
-        
-        if ($this->isJson()) {
-            $items = [];
-            foreach ($credito as $_credito) {
-                $items[] = $_credito->publish(app()->auth->provider);
-            }
-            return $this->json()->success(['items' => $items]);
+        $pager = new \Pager($count, $limit, $page);
+        $creditos = Credito::findAll($condition, $order, $limit, $pager->offset);
+        $itens = [];
+        foreach ($creditos as $credito) {
+            $itens[] = $credito->publish(app()->auth->provider);
         }
-
-        $_cliente = $credito->findClienteID();
-        $estados = [
-            'Y' => 'Cancelados',
-            'N' => 'Válidos',
-        ];
-        return $this->view('gerenciar_credito_index', get_defined_vars());
+        return $this->getResponse()->success(['items' => $itens, 'pages' => $pager->pageCount]);
     }
 
+    /**
+     * Cancel Créditos
+     * @Get("/api/creditos", name="api_credito_cancel")
+     */
     public function cancel()
     {
         $this->needPermission([Permissao::NOME_CADASTRARCREDITOS]);
         $id = $this->getRequest()->query->getInt('id', null);
-        $credito = Credito::findByID($id);
-        if (!$credito->exists()) {
-            $msg = 'O crédito não foi informado ou não existe';
-            if ($this->isJson()) {
-                return $this->json()->error($msg);
-            }
-            \Thunder::warning($msg);
-            return $this->redirect('/gerenciar/credito/');
-        }
-        try {
-            $credito->cancel();
-            $msg = sprintf('Crédito "%s" cancelado com sucesso!', $credito->getDetalhes());
-            if ($this->isJson()) {
-                return $this->json()->success([], $msg);
-            }
-            \Thunder::success($msg, true);
-        } catch (\Exception $e) {
-            $msg = sprintf(
-                'Não foi possível cancelar o crédito "%s"',
-                $credito->getDetalhes()
-            );
-            if ($this->isJson()) {
-                return $this->json()->error($msg);
-            }
-            \Thunder::error($msg);
-        }
-        return $this->redirect('/gerenciar/credito/');
+        $credito = Credito::findOrFail($id);
+        $credito->cancel();
+        return $this->getResponse()->success([]);
     }
 
     /**

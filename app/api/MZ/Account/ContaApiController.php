@@ -44,6 +44,7 @@ class ContaApiController extends \MZ\Core\ApiController
         $limit = max(1, min(100, $this->getRequest()->query->getInt('limit', 10)));
         $page = max(1, $this->getRequest()->query->getInt('page', 1));
         $condition = Filter::query($this->getRequest()->query->all());
+        unset($condition['ordem']);
         $order = $this->getRequest()->query->get('order', '');
         $count = Conta::count($condition);
         $pager = new \Pager($count, $limit, $page);
@@ -64,6 +65,9 @@ class ContaApiController extends \MZ\Core\ApiController
         $this->needPermission([Permissao::NOME_CADASTROCONTAS]);
         $localized = $this->getRequest()->query->getBoolean('localized', false);
         $conta = new Conta($this->getData());
+        $conta->setID(null);
+        $conta->setVencimento(DB::now());
+        $conta->setDataEmissao(DB::now());
         $conta->filter(new Conta(), app()->auth->provider, $localized);
         $conta->insert();
         return $this->getResponse()->success(['item' => $conta->publish(app()->auth->provider)]);

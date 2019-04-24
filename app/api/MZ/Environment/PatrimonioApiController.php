@@ -42,6 +42,7 @@ class PatrimonioApiController extends \MZ\Core\ApiController
         $limit = max(1, min(100, $this->getRequest()->query->getInt('limit', 10)));
         $page = max(1, $this->getRequest()->query->getInt('page', 1));
         $condition = Filter::query($this->getRequest()->query->all());
+        unset($condition['ordem']);
         $order = $this->getRequest()->query->get('order', '');
         $count = Patrimonio::count($condition);
         $pager = new \Pager($count, $limit, $page);
@@ -62,6 +63,8 @@ class PatrimonioApiController extends \MZ\Core\ApiController
         $this->needPermission([Permissao::NOME_CADASTROPATRIMONIO]);
         $localized = $this->getRequest()->query->getBoolean('localized', false);
         $patrimonio = new Patrimonio($this->getData());
+        $patrimonio->setID(null);
+        $patrimonio->setImagemAnexada(null);
         $patrimonio->filter(new Patrimonio(), app()->auth->provider, $localized);
         $patrimonio->insert();
         return $this->getResponse()->success(['item' => $patrimonio->publish(app()->auth->provider)]);

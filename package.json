@@ -7,24 +7,15 @@
   "author": "MZ Software <contato@grandchef.com.br>",
   "scripts": {
     "dev": "gulp",
-    "fix-sql": "gulp fix-sql",
-    "fix-loc": "gulp fix-loc",
-    "fix-script": "gulp fix-script",
-    "fix-pop": "gulp fix-pop --name"
+    "fix-sql": "gulp fix_sql",
+    "fix-script": "gulp fix_script",
+    "fix-pop": "gulp fix_pop --name"
   },
   "devDependencies": {
-    "browser-sync": "^2.26.3",
-    "dotenv": "^6.0.0",
-    "eslint": "^4.17.0",
-    "gulp": "^3.9.1",
-    "gulp-clean-css": "^3.9.2",
-    "gulp-concat": "^2.6.1",
-    "gulp-uglify": "^3.0.0",
-    "gulp-util": "^3.0.8",
-    "replace-in-file": "^3.4.0"
-  },
-  "dependencies": {
-    "animate.css": "^3.5.2",
-    "gaugeJS": "^1.3.6"
+    "browser-sync": "^2.26.5",
+    "dotenv": "^7.0.0",
+    "eslint": "^5.16.0",
+    "gulp": "^4.0.1",
+    "replace-in-file": "^4.0.0"
   }
 }

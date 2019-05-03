@@ -42,6 +42,7 @@ class IntegracaoApiController extends \MZ\Core\ApiController
         $limit = max(1, min(100, $this->getRequest()->query->getInt('limit', 10)));
         $page = max(1, $this->getRequest()->query->getInt('page', 1));
         $condition = Filter::query($this->getRequest()->query->all());
+        unset($condition['ordem']);-
         $order = $this->getRequest()->query->get('order', '');
         $count = Integracao::count($condition);
         $pager = new \Pager($count, $limit, $page);
@@ -51,20 +52,6 @@ class IntegracaoApiController extends \MZ\Core\ApiController
             $itens[] = $integracao->publish(app()->auth->provider);
         }
         return $this->getResponse()->success(['items' => $itens, 'pages' => $pager->pageCount]);
-    }
-
-    /**
-     * Create a new Integração
-     * @Post("/api/integracoes", name="api_integracao_add")
-     */
-    public function add()
-    {
-        $this->needPermission([Permissao::NOME_ALTERARCONFIGURACOES]);
-        $localized = $this->getRequest()->query->getBoolean('localized', false);
-        $integracao = new Integracao($this->getData());
-        $integracao->filter(new Integracao(), app()->auth->provider, $localized);
-        $integracao->insert();
-        return $this->getResponse()->success(['item' => $integracao->publish(app()->auth->provider)]);
     }
 
     /**
@@ -84,20 +71,5 @@ class IntegracaoApiController extends \MZ\Core\ApiController
         $integracao->update();
         $old_integracao->clean($integracao);
         return $this->getResponse()->success(['item' => $integracao->publish(app()->auth->provider)]);
-    }
-
-    /**
-     * Delete existing Integração
-     * @Delete("/api/integracoes/{id}", name="api_integracao_delete", params={ "id": "\d+" })
-     *
-     * @param int $id Integração id to delete
-     */
-    public function delete($id)
-    {
-        $this->needPermission([Permissao::NOME_ALTERARCONFIGURACOES]);
-        $integracao = Integracao::findOrFail(['id' => $id]);
-        $integracao->delete();
-        $integracao->clean(new Integracao());
-        return $this->getResponse()->success([]);
     }
 }

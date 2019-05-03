@@ -29,6 +29,7 @@ use MZ\Util\Filter;
 use MZ\Device\Impressora;
 use MZ\Device\Dispositivo;
 use MZ\Coupon\Service\Order as ServiceOrder;
+use \MZ\Product\Produto;
 
 use Thermal\Printer;
 use Thermal\Connection\Buffer;
@@ -71,6 +72,59 @@ class ItemApiController extends \MZ\Core\ApiController
         $sector = \MZ\Environment\Setor::findByID($setor_id);
         $this->cache['sectors'][$setor_id] = $sector;
         return $sector;
+    }
+
+     /**
+     * Find order items
+     * @Get("/api/itens/find", name="api_item_find")
+     */
+    public function find()
+    {
+        $this->needPermission([Permissao::NOME_PAGAMENTO]);
+
+        $limite = max(1, min(100, $this->getRequest()->query->getInt('limite', 10)));
+        $condition = Filter::query($this->getRequest()->query->all());
+        unset($condition['ordem']);
+        if (isset($condition['estado'])) {
+            if ($condition['estado'] == 'Valido') {
+                unset($condition['estado']);
+                $condition['cancelado'] = 'N';
+            } elseif ($condition['estado'] == 'Cancelado') {
+                unset($condition['estado']);
+                $condition['cancelado'] = 'Y';
+            }
+        }
+        if (isset($condition['tipo'])) {
+            if ($condition['tipo'] == 'Produtos') {
+                unset($condition['tipo']);
+                $condition['!produtoid'] = null;
+            } elseif ($condition['tipo'] == 'Servico') {
+                unset($condition['tipo']);
+                $condition['!servicoid'] = null;
+            } elseif ($condition['tipo'] == 'Desconto') {
+                unset($condition['tipo']);
+                $condition['ate_preco'] = 0;
+                $condition['!servicoid'] = null;
+            } elseif (array_key_exists($condition['tipo'], Produto::getTipoOptions())) {
+                $condition['produto'] = $condition['tipo'];
+                unset($condition['tipo']);
+            } elseif (array_key_exists($condition['tipo'], Servico::getTipoOptions())) {
+                $condition['servico'] = $condition['tipo'];
+                unset($condition['tipo']);
+            }
+        }
+        $produto_pedido = new Item($condition);
+        $order = Filter::order($this->getRequest()->query->get('ordem', ''));
+        $count = Item::count($condition);
+        $page = max(1, $this->getRequest()->query->getInt('pagina', 1));
+        $pager = new \Pager($count, $limite, $page, 'pagina');
+        $pagination = $pager->genPages();
+        $itens_do_pedido = Item::findAll($condition, $order, $limite, $pager->offset);
+        $items = [];
+        foreach ($itens_do_pedido as $_produto_pedido) {
+            $items[] = $_produto_pedido->publish(app()->auth->provider);
+        }
+        return $this->getResponse()->success(['items' => $items, 'pages' => $pager->pageCount]);
     }
 
     /**

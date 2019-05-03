@@ -43,6 +43,12 @@ class ClienteApiController extends \MZ\Core\ApiController
         $limit = max(1, min(100, $this->getRequest()->query->getInt('limit', 10)));
         $page = max(1, $this->getRequest()->query->getInt('page', 1));
         $condition = Filter::query($this->getRequest()->query->all());
+        unset($condition['ordem']);
+        $genero = isset($condition['genero']) ? $condition['genero'] : null;
+        if ($genero == 'Empresa') {
+            $condition['tipo'] = Cliente::TIPO_JURIDICA;
+            unset($condition['genero']);
+        }
         $order = $this->getRequest()->query->get('order', '');
         $count = Cliente::count($condition);
         $pager = new \Pager($count, $limit, $page);
@@ -63,7 +69,18 @@ class ClienteApiController extends \MZ\Core\ApiController
         $this->needPermission([Permissao::NOME_CADASTROCLIENTES]);
         $localized = $this->getRequest()->query->getBoolean('localized', false);
         $cliente = new Cliente($this->getData());
+        $aceitar = null;
+        $aceitar = $this->getRequest()->request->get('aceitar');
+        if ($aceitar != 'true') {
+            throw new \MZ\Exception\ValidationException(
+                ['aceitar' => 'Os termos não foram aceitos']
+            );
+        }
+        $senha = $this->getRequest()->request->get('confirmarsenha', '');
+        $cliente->passwordMatch($senha);
         $cliente->filter(new Cliente(), app()->auth->provider, $localized);
+        $cliente->getTelefone()->setPaisID(app()->getSystem()->getCountry()->getID());
+        $cliente->getTelefone()->filter($old_cliente->getTelefone(), app()->auth->provider, true);
         $cliente->insert();
         return $this->getResponse()->success(['item' => $cliente->publish(app()->auth->provider)]);
     }
@@ -76,12 +93,19 @@ class ClienteApiController extends \MZ\Core\ApiController
      */
     public function modify($id)
     {
-        $this->needPermission([Permissao::NOME_CADASTROCLIENTES]);
+        app()->needManager();
         $old_cliente = Cliente::findOrFail(['id' => $id]);
         $localized = $this->getRequest()->query->getBoolean('localized', false);
         $data = $this->getData($old_cliente->toArray());
         $cliente = new Cliente($data);
+        $cliente->setEmail($old_cliente->getEmail());
+        $cliente->setTipo($old_cliente->getTipo());
+        $cliente->setSlogan($old_cliente->getSlogan());
+        $senha = $this->getRequest()->request->get('confirmarsenha', '');
+        $cliente->passwordMatch($senha);
         $cliente->filter($old_cliente, app()->auth->provider, $localized);
+        $cliente->getTelefone()->setPaisID(app()->getSystem()->getCountry()->getID());
+        $cliente->getTelefone()->filter($old_cliente->getTelefone(), app()->auth->provider, true);
         $cliente->update();
         $old_cliente->clean($cliente);
         return $this->getResponse()->success(['item' => $cliente->publish(app()->auth->provider)]);

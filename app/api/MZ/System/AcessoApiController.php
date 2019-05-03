@@ -28,77 +28,78 @@ use MZ\System\Permissao;
 use MZ\Util\Filter;
 
 /**
- * Registra todas as atividades importantes do sistema
+ * Permite acesso à uma determinada funcionalidade da lista de permissões
  */
-class AuditoriaApiController extends \MZ\Core\ApiController
+class AcessoApiController extends \MZ\Core\ApiController
 {
     /**
-     * Find all Auditorias
-     * @Get("/api/auditorias", name="api_auditoria_find")
+     * Find all Acessos
+     * @Get("/api/acessos", name="api_acesso_find")
      */
     public function find()
     {
-        $this->needPermission([Permissao::NOME_RELATORIOAUDITORIA]);
+        app()->needOwner();
         $limit = max(1, min(100, $this->getRequest()->query->getInt('limit', 10)));
         $page = max(1, $this->getRequest()->query->getInt('page', 1));
         $condition = Filter::query($this->getRequest()->query->all());
-        unset($condition['ordem']);
         $order = $this->getRequest()->query->get('order', '');
-        $count = Auditoria::count($condition);
+        $count = Acesso::count($condition);
         $pager = new \Pager($count, $limit, $page);
-        $auditorias = Auditoria::findAll($condition, $order, $limit, $pager->offset);
+        $acessos = Acesso::findAll($condition, $order, $limit, $pager->offset);
         $itens = [];
-        foreach ($auditorias as $auditoria) {
-            $itens[] = $auditoria->publish(app()->auth->provider);
+        foreach ($acessos as $acesso) {
+            $itens[] = $acesso->publish(app()->auth->provider);
         }
         return $this->getResponse()->success(['items' => $itens, 'pages' => $pager->pageCount]);
     }
 
     /**
-     * Create a new Auditoria
-     * @Post("/api/auditorias", name="api_auditoria_add")
+     * Create a new Acesso
+     * @Post("/api/acessos", name="api_acesso_add")
      */
     public function add()
     {
-        $this->needPermission([Permissao::NOME_RELATORIOAUDITORIA]);
+        app()->needOwner();
         $localized = $this->getRequest()->query->getBoolean('localized', false);
-        $auditoria = new Auditoria($this->getData());
-        $auditoria->filter(new Auditoria(), app()->auth->provider, $localized);
-        $auditoria->insert();
-        return $this->getResponse()->success(['item' => $auditoria->publish(app()->auth->provider)]);
+        $acesso = new Acesso($this->getData());
+        $acesso->filter(new Acesso(), app()->auth->provider, $localized);
+        $acesso->insert();
+        return $this->getResponse()->success(['item' => $acesso->publish(app()->auth->provider)]);
     }
 
     /**
-     * Modify parts of an existing Auditoria
-     * @Patch("/api/auditorias/{id}", name="api_auditoria_update", params={ "id": "\d+" })
+     * Modify parts of an existing Acesso
+     * @Patch("/api/acessos/{id}", name="api_acesso_update", params={ "id": "\d+" })
      *
-     * @param int $id Auditoria id
+     * @param int $id Acesso id
      */
     public function modify($id)
     {
-        $this->needPermission([Permissao::NOME_RELATORIOAUDITORIA]);
-        $old_auditoria = Auditoria::findOrFail(['id' => $id]);
+        app()->needOwner();
+        $old_acesso = Acesso::findOrFail(['id' => $id]);
         $localized = $this->getRequest()->query->getBoolean('localized', false);
-        $data = $this->getData($old_auditoria->toArray());
-        $auditoria = new Auditoria($data);
-        $auditoria->filter($old_auditoria, app()->auth->provider, $localized);
-        $auditoria->update();
-        $old_auditoria->clean($auditoria);
-        return $this->getResponse()->success(['item' => $auditoria->publish(app()->auth->provider)]);
+        $data = $this->getData($old_acesso->toArray());
+        $acesso = new Acesso($data);
+        $acesso->filter($old_acesso, app()->auth->provider, $localized);
+        $acesso->update();
+        $old_acesso->clean($acesso);
+        return $this->getResponse()->success(['item' => $acesso->publish(app()->auth->provider)]);
     }
 
     /**
-     * Delete existing Auditoria
-     * @Delete("/api/auditorias/{id}", name="api_auditoria_delete", params={ "id": "\d+" })
+     * Delete existing Acesso
+     * @Delete("/api/acessos/{id}", name="api_acesso_delete", params={ "id": "\d+" })
      *
-     * @param int $id Auditoria id to delete
+     * @param int $id Acesso id to delete
      */
     public function delete($id)
     {
-        $this->needPermission([Permissao::NOME_RELATORIOAUDITORIA]);
-        $auditoria = Auditoria::findOrFail(['id' => $id]);
-        $auditoria->delete();
-        $auditoria->clean(new Auditoria());
+        app()->needOwner();
+        $acesso = Acesso::findOrFail(['id' => $id]);
+        $acesso->delete();
+        $acesso->clean(new Acesso());
         return $this->getResponse()->success([]);
     }
 }
+
+

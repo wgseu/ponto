@@ -43,6 +43,43 @@ use MZ\Coupon\Order\Receipt;
 class PedidoApiController extends \MZ\Core\ApiController
 {
     /**
+    * Find all Pedidos
+    * @Get("/api/pedidos", name="api_pedido_get")
+    */
+    public function find()
+    {
+        $this->needPermission([Permissao::NOME_PAGAMENTO]);
+
+        $limite = max(1, min(100, $this->getRequest()->query->getInt('limite', 10)));
+        $condition = Filter::query($this->getRequest()->query->all());
+        unset($condition['ordem']);
+
+        $estado = $this->getRequest()->query->get('estado');
+        if ($estado == 'Cancelado') {
+            $condition['cancelado'] = 'Y';
+            unset($condition['estado']);
+        } elseif ($estado == 'Valido') {
+            $condition['cancelado'] = 'N';
+            unset($condition['estado']);
+        } elseif ($estado != '') {
+            $condition['cancelado'] = 'N';
+        }
+
+        $pedido = new Pedido($condition);
+        $order = Filter::order($this->getRequest()->query->get('ordem', ''));
+        $count = Pedido::count($condition);
+        $page = max(1, $this->getRequest()->query->getInt('pagina', 1));
+        $pager = new \Pager($count, $limite, $page, 'pagina');
+        $pagination = $pager->genPages();
+        $pedidos = Pedido::findAll($condition, $order, $limite, $pager->offset);
+        $items = [];
+        foreach ($pedidos as $_pedido) {
+            $items[] = $_pedido->publish(app()->auth->provider);
+        }
+        return $this->json()->success(['items' => $items, 'pages' => $pager->pageCount]);
+    }
+
+    /**
      * Create order, add items or payments
      * @Post("/api/pedidos", name="api_pedido_add")
      */

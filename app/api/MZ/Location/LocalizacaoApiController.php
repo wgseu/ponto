@@ -64,6 +64,13 @@ class LocalizacaoApiController extends \MZ\Core\ApiController
         $localized = $this->getRequest()->query->getBoolean('localized', false);
         $localizacao = new Localizacao($this->getData());
         $localizacao->filter(new Localizacao(), app()->auth->provider, $localized);
+        $estado_id = $this->getRequest()->request->get('estadoid');
+        $estado = \MZ\Location\Estado::findByID($estado_id);
+        $cidade_id = $this->getRequest()->request->get('cidade');
+        $cidade = \MZ\Location\Cidade::findOrInsert($estado->getID(), $cidade_id);
+        $bairro_id = $this->getRequest()->request->get('bairro');
+        $bairro = \MZ\Location\Bairro::findOrInsert($cidade->getID(), $bairro_id);
+        $localizacao->setBairroID($bairro->getID());
         $localizacao->insert();
         return $this->getResponse()->success(['item' => $localizacao->publish(app()->auth->provider)]);
     }
@@ -82,6 +89,13 @@ class LocalizacaoApiController extends \MZ\Core\ApiController
         $data = $this->getData($old_localizacao->toArray());
         $localizacao = new Localizacao($data);
         $localizacao->filter($old_localizacao, app()->auth->provider, $localized);
+        $estado_id = $this->getRequest()->request->get('estadoid');
+        $estado = \MZ\Location\Estado::findByID($estado_id);
+        $cidade_id = $this->getRequest()->request->get('cidade');
+        $cidade = \MZ\Location\Cidade::findOrInsert($estado->getID(), $cidade_id);
+        $bairro_id = $this->getRequest()->request->get('bairro');
+        $bairro = \MZ\Location\Bairro::findOrInsert($cidade->getID(), $bairro_id);
+        $localizacao->setBairroID($bairro->getID());
         $localizacao->update();
         $old_localizacao->clean($localizacao);
         if ($localizacao->getClienteID() == app()->getSystem()->getCompany()->getID() &&

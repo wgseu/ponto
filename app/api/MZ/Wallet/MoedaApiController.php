@@ -41,6 +41,7 @@ class MoedaApiController extends \MZ\Core\ApiController
         $limit = max(1, min(100, $this->getRequest()->query->getInt('limit', 10)));
         $page = max(1, $this->getRequest()->query->getInt('page', 1));
         $condition = Filter::query($this->getRequest()->query->all());
+        unset($condition['ordem']);
         if (!app()->auth->has([Permissao::NOME_CADASTROMOEDAS])) {
             $condition['ativa'] = 'Y';
         }

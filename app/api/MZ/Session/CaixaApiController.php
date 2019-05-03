@@ -42,6 +42,7 @@ class CaixaApiController extends \MZ\Core\ApiController
         $limit = max(1, min(100, $this->getRequest()->query->getInt('limit', 10)));
         $page = max(1, $this->getRequest()->query->getInt('page', 1));
         $condition = Filter::query($this->getRequest()->query->all());
+        unset($condition['ordem']);
         $order = $this->getRequest()->query->get('order', '');
         $count = Caixa::count($condition);
         $pager = new \Pager($count, $limit, $page);
@@ -80,6 +81,11 @@ class CaixaApiController extends \MZ\Core\ApiController
         $localized = $this->getRequest()->query->getBoolean('localized', false);
         $data = $this->getData($old_caixa->toArray());
         $caixa = new Caixa($data);
+        $caixa->setID($old_caixa->getID());
+        if (!app()->getSystem()->isFiscalVisible()) {
+            $caixa->setNumeroInicial($old_caixa->getNumeroInicial());
+            $caixa->setSerie($old_caixa->getSerie());
+        }
         $caixa->filter($old_caixa, app()->auth->provider, $localized);
         $caixa->update();
         $old_caixa->clean($caixa);

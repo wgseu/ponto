@@ -42,6 +42,7 @@ class EstoqueApiController extends \MZ\Core\ApiController
         $limit = max(1, min(100, $this->getRequest()->query->getInt('limit', 10)));
         $page = max(1, $this->getRequest()->query->getInt('page', 1));
         $condition = Filter::query($this->getRequest()->query->all());
+        unset($condition['ordem']);
         $order = $this->getRequest()->query->get('order', '');
         $count = Estoque::count($condition);
         $pager = new \Pager($count, $limit, $page);
@@ -98,6 +99,19 @@ class EstoqueApiController extends \MZ\Core\ApiController
         $estoque = Estoque::findOrFail(['id' => $id]);
         $estoque->delete();
         $estoque->clean(new Estoque());
+        return $this->getResponse()->success([]);
+    }
+
+    /**
+     * Cancel Estoques
+     * @Get("/api/estoques", name="api_estoque_cancel")
+     */
+    public function cancel()
+    {
+        $this->needPermission([Permissao::NOME_ESTOQUE, Permissao::NOME_RETIRARDOESTOQUE]);
+        $id = $this->getRequest()->query->getInt('id', null);
+        $estoque = Estoque::findOrFail(['id' => $id]);
+        $estoque->cancelar();
         return $this->getResponse()->success([]);
     }
 }

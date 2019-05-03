@@ -38,10 +38,13 @@ class FuncaoApiController extends \MZ\Core\ApiController
      */
     public function find()
     {
+        app()->needManager();
+        app()->needOwner();
         $this->needPermission([Permissao::NOME_ALTERARCONFIGURACOES]);
         $limit = max(1, min(100, $this->getRequest()->query->getInt('limit', 10)));
         $page = max(1, $this->getRequest()->query->getInt('page', 1));
         $condition = Filter::query($this->getRequest()->query->all());
+        unset($condition['ordem']);
         $order = $this->getRequest()->query->get('order', '');
         $count = Funcao::count($condition);
         $pager = new \Pager($count, $limit, $page);
@@ -74,6 +77,8 @@ class FuncaoApiController extends \MZ\Core\ApiController
      */
     public function modify($id)
     {
+        app()->needManager();
+        app()->needOwner();
         $this->needPermission([Permissao::NOME_ALTERARCONFIGURACOES]);
         $old_funcao = Funcao::findOrFail(['id' => $id]);
         $localized = $this->getRequest()->query->getBoolean('localized', false);
@@ -93,6 +98,8 @@ class FuncaoApiController extends \MZ\Core\ApiController
      */
     public function delete($id)
     {
+        app()->needManager();
+        app()->needOwner();
         $this->needPermission([Permissao::NOME_ALTERARCONFIGURACOES]);
         $funcao = Funcao::findOrFail(['id' => $id]);
         $funcao->delete();

@@ -42,6 +42,7 @@ class ComandaApiController extends \MZ\Core\ApiController
         $limit = max(1, min(100, $this->getRequest()->query->getInt('limit', 10)));
         $page = max(1, $this->getRequest()->query->getInt('page', 1));
         $condition = Filter::query($this->getRequest()->query->all());
+        unset($condition['ordem']);
         $order = $this->getRequest()->query->get('order', '');
         $count = Comanda::count($condition);
         $pager = new \Pager($count, $limit, $page);

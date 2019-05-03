@@ -22,83 +22,83 @@
  *
  * @author Equipe GrandChef <desenvolvimento@mzsw.com.br>
  */
-namespace MZ\System;
+namespace MZ\Payment;
 
 use MZ\System\Permissao;
 use MZ\Util\Filter;
 
 /**
- * Registra todas as atividades importantes do sistema
+ * Pagamentos de contas e pedidos
  */
-class AuditoriaApiController extends \MZ\Core\ApiController
+class PagamentoApiController extends \MZ\Core\ApiController
 {
     /**
-     * Find all Auditorias
-     * @Get("/api/auditorias", name="api_auditoria_find")
+     * Find all Pagamentos
+     * @Get("/api/pagamentos", name="api_pagamento_find")
      */
     public function find()
     {
-        $this->needPermission([Permissao::NOME_RELATORIOAUDITORIA]);
+        $this->needPermission([Permissao::NOME_PAGAMENTO]);
         $limit = max(1, min(100, $this->getRequest()->query->getInt('limit', 10)));
         $page = max(1, $this->getRequest()->query->getInt('page', 1));
         $condition = Filter::query($this->getRequest()->query->all());
         unset($condition['ordem']);
         $order = $this->getRequest()->query->get('order', '');
-        $count = Auditoria::count($condition);
+        $count = Pagamento::count($condition);
         $pager = new \Pager($count, $limit, $page);
-        $auditorias = Auditoria::findAll($condition, $order, $limit, $pager->offset);
+        $pagamentos = Pagamento::findAll($condition, $order, $limit, $pager->offset);
         $itens = [];
-        foreach ($auditorias as $auditoria) {
-            $itens[] = $auditoria->publish(app()->auth->provider);
+        foreach ($pagamentos as $pagamento) {
+            $itens[] = $pagamento->publish(app()->auth->provider);
         }
         return $this->getResponse()->success(['items' => $itens, 'pages' => $pager->pageCount]);
     }
 
     /**
-     * Create a new Auditoria
-     * @Post("/api/auditorias", name="api_auditoria_add")
+     * Create a new Pagamento
+     * @Post("/api/pagamentos", name="api_pagamento_add")
      */
     public function add()
     {
-        $this->needPermission([Permissao::NOME_RELATORIOAUDITORIA]);
+        $this->needPermission([Permissao::NOME_PAGAMENTO]);
         $localized = $this->getRequest()->query->getBoolean('localized', false);
-        $auditoria = new Auditoria($this->getData());
-        $auditoria->filter(new Auditoria(), app()->auth->provider, $localized);
-        $auditoria->insert();
-        return $this->getResponse()->success(['item' => $auditoria->publish(app()->auth->provider)]);
+        $pagamento = new Pagamento($this->getData());
+        $pagamento->filter(new Pagamento(), app()->auth->provider, $localized);
+        $pagamento->insert();
+        return $this->getResponse()->success(['item' => $pagamento->publish(app()->auth->provider)]);
     }
 
     /**
-     * Modify parts of an existing Auditoria
-     * @Patch("/api/auditorias/{id}", name="api_auditoria_update", params={ "id": "\d+" })
+     * Modify parts of an existing Pagamento
+     * @Patch("/api/pagamentos/{id}", name="api_pagamento_update", params={ "id": "\d+" })
      *
-     * @param int $id Auditoria id
+     * @param int $id Pagamento id
      */
     public function modify($id)
     {
-        $this->needPermission([Permissao::NOME_RELATORIOAUDITORIA]);
-        $old_auditoria = Auditoria::findOrFail(['id' => $id]);
+        $this->needPermission([Permissao::NOME_PAGAMENTO]);
+        $old_pagamento = Pagamento::findOrFail(['id' => $id]);
         $localized = $this->getRequest()->query->getBoolean('localized', false);
-        $data = $this->getData($old_auditoria->toArray());
-        $auditoria = new Auditoria($data);
-        $auditoria->filter($old_auditoria, app()->auth->provider, $localized);
-        $auditoria->update();
-        $old_auditoria->clean($auditoria);
-        return $this->getResponse()->success(['item' => $auditoria->publish(app()->auth->provider)]);
+        $data = $this->getData($old_pagamento->toArray());
+        $pagamento = new Pagamento($data);
+        $pagamento->filter($old_pagamento, app()->auth->provider, $localized);
+        $pagamento->update();
+        $old_pagamento->clean($pagamento);
+        return $this->getResponse()->success(['item' => $pagamento->publish(app()->auth->provider)]);
     }
 
     /**
-     * Delete existing Auditoria
-     * @Delete("/api/auditorias/{id}", name="api_auditoria_delete", params={ "id": "\d+" })
+     * Delete existing Pagamento
+     * @Delete("/api/pagamentos/{id}", name="api_pagamento_delete", params={ "id": "\d+" })
      *
-     * @param int $id Auditoria id to delete
+     * @param int $id Pagamento id to delete
      */
     public function delete($id)
     {
-        $this->needPermission([Permissao::NOME_RELATORIOAUDITORIA]);
-        $auditoria = Auditoria::findOrFail(['id' => $id]);
-        $auditoria->delete();
-        $auditoria->clean(new Auditoria());
+        $this->needPermission([Permissao::NOME_PAGAMENTO]);
+        $pagamento = Pagamento::findOrFail(['id' => $id]);
+        $pagamento->delete();
+        $pagamento->clean(new Pagamento());
         return $this->getResponse()->success([]);
     }
 }

@@ -51,6 +51,7 @@ init:
 	@mkdir -p public/static/img/cliente
 	@mkdir -p public/static/img/produto
 	@mkdir -p public/static/img/patrimonio
+	@mkdir -p public/static/img/header
 
 doc:
 	@docker-compose exec -T php ./vendor/bin/apigen generate app --destination docs/api

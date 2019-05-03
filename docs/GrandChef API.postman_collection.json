@@ -1,0 +1,5406 @@
+{
+	"info": {
+		"_postman_id": "37548471-938c-47aa-9f58-c9936a9e9f0a",
+		"name": "GrandChef API",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Old Auth",
+			"description": null,
+			"item": [
+				{
+					"name": "Logout",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{BASE_URL}}/app/conta/sair",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"app",
+								"conta",
+								"sair"
+							]
+						},
+						"description": "Sai do sistema"
+					},
+					"response": []
+				},
+				{
+					"name": "Login como Admin",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{AUTH_TOKEN}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "usuario",
+									"value": "admin",
+									"type": "text"
+								},
+								{
+									"key": "senha",
+									"value": "123456",
+									"type": "text"
+								},
+								{
+									"key": "device",
+									"value": "android_1234",
+									"type": "text"
+								},
+								{
+									"key": "serial",
+									"value": "5893d435-d2e4-49b0-bb3c-c9c3286f3165",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{BASE_URL}}/app/conta/entrar",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"app",
+								"conta",
+								"entrar"
+							]
+						},
+						"description": "Login como admin"
+					},
+					"response": []
+				},
+				{
+					"name": "Status",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "http://localhost:3003/app/conta/status?device=android_1234&serial=5893d435-d2e4-49b0-bb3c-c9c3286f3165",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3003",
+							"path": [
+								"app",
+								"conta",
+								"status"
+							],
+							"query": [
+								{
+									"key": "device",
+									"value": "android_1234"
+								},
+								{
+									"key": "serial",
+									"value": "5893d435-d2e4-49b0-bb3c-c9c3286f3165"
+								}
+							]
+						},
+						"description": "Informa o status do acesso"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Old List",
+			"description": null,
+			"item": [
+				{
+					"name": "Baixar notas",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "http://localhost:3003/gerenciar/nota/baixar?saida=json",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3003",
+							"path": [
+								"gerenciar",
+								"nota",
+								"baixar"
+							],
+							"query": [
+								{
+									"key": "saida",
+									"value": "json"
+								}
+							]
+						},
+						"description": "Baixa notas fiscais de acordo com o filtro"
+					},
+					"response": []
+				},
+				{
+					"name": "Listar pedidos da comanda",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "http://localhost:3003/app/pedido/listar?comanda=1",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3003",
+							"path": [
+								"app",
+								"pedido",
+								"listar"
+							],
+							"query": [
+								{
+									"key": "comanda",
+									"value": "1"
+								}
+							]
+						},
+						"description": "Lista os produtos da comanda informada"
+					},
+					"response": []
+				},
+				{
+					"name": "Listar Composições",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "http://localhost:3003/app/composicao/listar?produto=2&selecionaveis=1",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3003",
+							"path": [
+								"app",
+								"composicao",
+								"listar"
+							],
+							"query": [
+								{
+									"key": "produto",
+									"value": "2"
+								},
+								{
+									"key": "selecionaveis",
+									"value": "1"
+								}
+							]
+						},
+						"description": "Lista todas as composições selecionáveis do produto"
+					},
+					"response": []
+				},
+				{
+					"name": "Listar Categorias",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "http://localhost:3003/app/categoria/listar",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3003",
+							"path": [
+								"app",
+								"categoria",
+								"listar"
+							]
+						},
+						"description": "Listar categorias"
+					},
+					"response": []
+				},
+				{
+					"name": "Procurar Fornecedores",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "http://localhost:3003/app/fornecedor/",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3003",
+							"path": [
+								"app",
+								"fornecedor",
+								""
+							]
+						},
+						"description": "Procura fornecedores pelo telefone ou nome"
+					},
+					"response": []
+				},
+				{
+					"name": "Listar Mesas",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "http://localhost:3003/app/mesa/listar",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3003",
+							"path": [
+								"app",
+								"mesa",
+								"listar"
+							]
+						},
+						"description": "Lista todas as mesas ativas com seus respectivos estados"
+					},
+					"response": []
+				},
+				{
+					"name": "Procurar Clientes",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "http://localhost:3003/app/cliente/procurar",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3003",
+							"path": [
+								"app",
+								"cliente",
+								"procurar"
+							]
+						},
+						"description": "Procura clientes pelo telefone ou nome"
+					},
+					"response": []
+				},
+				{
+					"name": "Procurar Produtos",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "http://localhost:3003/app/produto/procurar",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3003",
+							"path": [
+								"app",
+								"produto",
+								"procurar"
+							]
+						},
+						"description": "Procura produtos da categoria informada"
+					},
+					"response": []
+				},
+				{
+					"name": "Listar Produtos",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "http://localhost:3003/app/produto/listar?categoria=10",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3003",
+							"path": [
+								"app",
+								"produto",
+								"listar"
+							],
+							"query": [
+								{
+									"key": "categoria",
+									"value": "10"
+								}
+							]
+						},
+						"description": "Lista todos os produtos da categoria informada"
+					},
+					"response": []
+				},
+				{
+					"name": "Listar Grupos",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "http://localhost:3003/app/grupo/listar?produto=5",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3003",
+							"path": [
+								"app",
+								"grupo",
+								"listar"
+							],
+							"query": [
+								{
+									"key": "produto",
+									"value": "5"
+								}
+							]
+						},
+						"description": "Lista todos os grupos do produto"
+					},
+					"response": []
+				},
+				{
+					"name": "Listar pedidos da mesa",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "http://localhost:3003/app/pedido/listar?mesa=3",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3003",
+							"path": [
+								"app",
+								"pedido",
+								"listar"
+							],
+							"query": [
+								{
+									"key": "mesa",
+									"value": "3"
+								}
+							]
+						},
+						"description": "Lista os produtos da mesa informada"
+					},
+					"response": []
+				},
+				{
+					"name": "Listar Pacotes",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "pacote[0]",
+									"value": "1",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "http://localhost:3003/app/pacote/listar?grupo=2&busca=ca",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3003",
+							"path": [
+								"app",
+								"pacote",
+								"listar"
+							],
+							"query": [
+								{
+									"key": "grupo",
+									"value": "2"
+								},
+								{
+									"key": "busca",
+									"value": "ca"
+								}
+							]
+						},
+						"description": "Lista todos os pacotes do grupo"
+					},
+					"response": []
+				},
+				{
+					"name": "Mostrar faturamento",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "http://localhost:3003/app/relatorio/resumo",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3003",
+							"path": [
+								"app",
+								"relatorio",
+								"resumo"
+							]
+						},
+						"description": "Mostra o faturamento dos 4 meses passados do mês informado"
+					},
+					"response": []
+				},
+				{
+					"name": "Mostrar resumo",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "http://localhost:3003/app/relatorio/faturamento",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3003",
+							"path": [
+								"app",
+								"relatorio",
+								"faturamento"
+							]
+						},
+						"description": "Mostra resumo de vendas e pagamentos"
+					},
+					"response": []
+				},
+				{
+					"name": "Listar Comandas",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "http://localhost:3003/app/comanda/listar",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3003",
+							"path": [
+								"app",
+								"comanda",
+								"listar"
+							]
+						},
+						"description": "Lista todas as comandas ativas com seus respectivos estados"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Old Sync",
+			"description": null,
+			"item": [
+				{
+					"name": "Envio de Certificado",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/x-www-form-urlencoded"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "senha",
+									"value": "123456",
+									"type": "text"
+								},
+								{
+									"key": "certificado",
+									"type": "file",
+									"src": "",
+									"value": ""
+								}
+							]
+						},
+						"url": {
+							"raw": "http://localhost:3003/gerenciar/emitente/certificado?saida=json",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3003",
+							"path": [
+								"gerenciar",
+								"emitente",
+								"certificado"
+							],
+							"query": [
+								{
+									"key": "saida",
+									"value": "json"
+								}
+							]
+						},
+						"description": "Atualiza o certificado"
+					},
+					"response": []
+				},
+				{
+					"name": "Opção de impressão",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "marcado",
+									"value": "N",
+									"type": "text"
+								},
+								{
+									"key": "secao",
+									"value": "Imprimir",
+									"type": "text"
+								},
+								{
+									"key": "chave",
+									"value": "Vendas.Cancelamentos",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "http://localhost:3003/gerenciar/sistema/impressao",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3003",
+							"path": [
+								"gerenciar",
+								"sistema",
+								"impressao"
+							]
+						},
+						"description": "Altera uma opção de impressão"
+					},
+					"response": []
+				},
+				{
+					"name": "Enviar pedido para mesa",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "tipo",
+									"value": "mesa",
+									"type": "text"
+								},
+								{
+									"key": "mesa",
+									"value": "1",
+									"type": "text"
+								},
+								{
+									"key": "pedidos[0][produtoid]",
+									"value": "1",
+									"type": "text"
+								},
+								{
+									"key": "pedidos[0][quantidade]",
+									"value": "2",
+									"type": "text"
+								},
+								{
+									"key": "pedidos[0][detalhes]",
+									"value": "detalhes",
+									"type": "text"
+								},
+								{
+									"key": "pedidos[0][preco]",
+									"value": "1",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "http://localhost:3001/app/pedido/",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3001",
+							"path": [
+								"app",
+								"pedido",
+								""
+							]
+						},
+						"description": "Envia os pedidos para uma mesa"
+					},
+					"response": []
+				},
+				{
+					"name": "Cadastrar Cliente",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "cliente[nome]",
+									"value": "Cadastro",
+									"type": "text"
+								},
+								{
+									"key": "cliente[sobrenome]",
+									"value": "de Teste",
+									"type": "text"
+								},
+								{
+									"key": "cliente[genero]",
+									"value": "Feminino",
+									"type": "text"
+								},
+								{
+									"key": "cliente[tipo]",
+									"value": "Fisica",
+									"type": "text"
+								},
+								{
+									"key": "cliente[fone1]",
+									"value": "86912332007",
+									"type": "text"
+								},
+								{
+									"key": "cliente[dataaniversario]",
+									"value": "2010-04-56",
+									"type": "text"
+								},
+								{
+									"key": "cliente[cpf]",
+									"value": null,
+									"type": "text"
+								},
+								{
+									"key": "cliente[email]",
+									"value": "fulano@gmail.com",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "http://localhost:3001/app/cliente/",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3001",
+							"path": [
+								"app",
+								"cliente",
+								""
+							]
+						},
+						"description": "Cadastra um cliente"
+					},
+					"response": []
+				},
+				{
+					"name": "Enviar notas",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "http://localhost:3001/gerenciar/nota/enviar?saida=json&modo=contador&serie=1&estado=Autorizado&emissao_inicio=2017-02-01&emissao_fim=2017-02-28",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3001",
+							"path": [
+								"gerenciar",
+								"nota",
+								"enviar"
+							],
+							"query": [
+								{
+									"key": "saida",
+									"value": "json"
+								},
+								{
+									"key": "modo",
+									"value": "contador"
+								},
+								{
+									"key": "serie",
+									"value": "1"
+								},
+								{
+									"key": "estado",
+									"value": "Autorizado"
+								},
+								{
+									"key": "emissao_inicio",
+									"value": "2017-02-01"
+								},
+								{
+									"key": "emissao_fim",
+									"value": "2017-02-28"
+								}
+							]
+						},
+						"description": "Envia as notas fiscais para o contador ou cliente"
+					},
+					"response": []
+				},
+				{
+					"name": "DANFE JSON",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "http://localhost:3001/gerenciar/nota/danfe?saida=json&pedido_id=19",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3001",
+							"path": [
+								"gerenciar",
+								"nota",
+								"danfe"
+							],
+							"query": [
+								{
+									"key": "saida",
+									"value": "json"
+								},
+								{
+									"key": "pedido_id",
+									"value": "19"
+								}
+							]
+						},
+						"description": "Processa notas fiscais"
+					},
+					"response": []
+				},
+				{
+					"name": "Cria nota",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "caixa_id",
+									"value": "1",
+									"type": "text"
+								},
+								{
+									"key": "pedido_id",
+									"value": "38761",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "http://localhost:3001/gerenciar/nota/cadastrar?saida=json",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3001",
+							"path": [
+								"gerenciar",
+								"nota",
+								"cadastrar"
+							],
+							"query": [
+								{
+									"key": "saida",
+									"value": "json"
+								}
+							]
+						},
+						"description": "Cria nota do pedido e consulta"
+					},
+					"response": []
+				},
+				{
+					"name": "Inserir Estoque",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "estoque[produtoid]",
+									"value": "1",
+									"type": "text"
+								},
+								{
+									"key": "estoque[quantidade]",
+									"value": "1",
+									"type": "text"
+								},
+								{
+									"key": "estoque[precocompra]",
+									"value": "2.50",
+									"type": "text"
+								},
+								{
+									"key": "estoque[tipomovimento]",
+									"value": "Entrada",
+									"type": "text"
+								},
+								{
+									"key": "estoque[datafabricacao]",
+									"value": "2014-04-20",
+									"type": "text"
+								},
+								{
+									"key": "estoque[datavencimento]",
+									"value": "2015-05-21",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "http://localhost:3001/app/estoque/",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3001",
+							"path": [
+								"app",
+								"estoque",
+								""
+							]
+						},
+						"description": "Inserir produto no estoque"
+					},
+					"response": []
+				},
+				{
+					"name": "Enviar pedido para comanda",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "tipo",
+									"value": "comanda",
+									"type": "text"
+								},
+								{
+									"key": "mesa",
+									"value": "1",
+									"type": "text"
+								},
+								{
+									"key": "comanda",
+									"value": "6",
+									"type": "text"
+								},
+								{
+									"key": "pedidos[0][produtoid]",
+									"value": "16",
+									"type": "text"
+								},
+								{
+									"key": "pedidos[0][quantidade]",
+									"value": "2",
+									"type": "text"
+								},
+								{
+									"key": "pedidos[0][detalhes]",
+									"value": "detalhes",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "http://localhost:3001/app/pedido/",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3001",
+							"path": [
+								"app",
+								"pedido",
+								""
+							]
+						},
+						"description": "Envia os pedidos para uma comanda"
+					},
+					"response": []
+				},
+				{
+					"name": "Abrir comanda",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "tipo",
+									"value": "comanda",
+									"type": "text"
+								},
+								{
+									"key": "mesa",
+									"value": "10",
+									"type": "text"
+								},
+								{
+									"key": "comanda",
+									"value": "7",
+									"type": "text"
+								},
+								{
+									"key": "descricao",
+									"value": "Cliente VIP",
+									"type": "text"
+								},
+								{
+									"key": "cliente",
+									"value": "88397282",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "http://localhost:3001/app/pedido/",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3001",
+							"path": [
+								"app",
+								"pedido",
+								""
+							]
+						},
+						"description": "Abre uma comanda"
+					},
+					"response": []
+				},
+				{
+					"name": "Processa Notas",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "http://localhost:3001/gerenciar/nota/processa?saida=json",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3001",
+							"path": [
+								"gerenciar",
+								"nota",
+								"processa"
+							],
+							"query": [
+								{
+									"key": "saida",
+									"value": "json"
+								}
+							]
+						},
+						"description": "Processa notas fiscais"
+					},
+					"response": []
+				},
+				{
+					"name": "Enviar pacote para mesa",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "tipo",
+									"value": "mesa",
+									"type": "text"
+								},
+								{
+									"key": "mesa",
+									"value": "6",
+									"type": "text"
+								},
+								{
+									"key": "pedidos[0][produtoid]",
+									"value": "600",
+									"type": "text"
+								},
+								{
+									"key": "pedidos[0][preco]",
+									"value": "0.01",
+									"type": "text"
+								},
+								{
+									"key": "pedidos[0][quantidade]",
+									"value": "1",
+									"type": "text"
+								},
+								{
+									"key": "pedidos[0][detalhes]",
+									"value": "sem pimenta",
+									"type": "text"
+								},
+								{
+									"key": "pedidos[0][descricao]",
+									"value": "Pizza G",
+									"type": "text"
+								},
+								{
+									"key": "pedidos[0][formacoes][0][tipo]",
+									"value": "Pacote",
+									"type": "text"
+								},
+								{
+									"key": "pedidos[0][formacoes][0][pacoteid]",
+									"value": "27",
+									"type": "text"
+								},
+								{
+									"key": "pedidos[1][produtoid]",
+									"value": "293",
+									"type": "text"
+								},
+								{
+									"key": "pedidos[1][preco]",
+									"value": "34.88",
+									"type": "text"
+								},
+								{
+									"key": "pedidos[1][quantidade]",
+									"value": "1",
+									"type": "text"
+								},
+								{
+									"key": "pedidos[1][detalhes]",
+									"value": "Sem Cebola, Sem Azeitona",
+									"type": "text"
+								},
+								{
+									"key": "pedidos[1][produtopedidoid]",
+									"value": "1",
+									"type": "text"
+								},
+								{
+									"key": "pedidos[1][formacoes][0][tipo]",
+									"value": "Pacote",
+									"type": "text"
+								},
+								{
+									"key": "pedidos[1][formacoes][0][pacoteid]",
+									"value": "106",
+									"type": "text"
+								},
+								{
+									"key": "pedidos[1][formacoes][1][tipo]",
+									"value": "Composicao",
+									"type": "text"
+								},
+								{
+									"key": "pedidos[1][formacoes][1][composicaoid]",
+									"value": "59",
+									"type": "text"
+								},
+								{
+									"key": "pedidos[1][formacoes][2][tipo]",
+									"value": "Composicao",
+									"type": "text"
+								},
+								{
+									"key": "pedidos[1][formacoes][2][composicaoid]",
+									"value": "57",
+									"type": "text"
+								},
+								{
+									"key": "pedidos[2][produtoid]",
+									"value": "25",
+									"type": "text"
+								},
+								{
+									"key": "pedidos[2][preco]",
+									"value": "0.01",
+									"type": "text"
+								},
+								{
+									"key": "pedidos[2][quantidade]",
+									"value": "1",
+									"type": "text"
+								},
+								{
+									"key": "pedidos[2][produtopedidoid]",
+									"value": "1",
+									"type": "text"
+								},
+								{
+									"key": "pedidos[2][formacoes][0][tipo]",
+									"value": "Pacote",
+									"type": "text"
+								},
+								{
+									"key": "pedidos[2][formacoes][0][pacoteid]",
+									"value": "121",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "http://localhost:3001/app/pedido/",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3001",
+							"path": [
+								"app",
+								"pedido",
+								""
+							]
+						},
+						"description": "Envia ym pacote montado para uma mesa"
+					},
+					"response": []
+				},
+				{
+					"name": "Executa tarefas",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "http://localhost:3001/gerenciar/sistema/tarefa?saida=json&token=WWHxIdzDakrea921zGveQkKccrf80mDp",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3001",
+							"path": [
+								"gerenciar",
+								"sistema",
+								"tarefa"
+							],
+							"query": [
+								{
+									"key": "saida",
+									"value": "json"
+								},
+								{
+									"key": "token",
+									"value": "WWHxIdzDakrea921zGveQkKccrf80mDp"
+								}
+							]
+						},
+						"description": "Executa tarefas do sistema"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Old System",
+			"description": "System functions",
+			"item": [
+				{
+					"name": "Restore",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "zipfile",
+									"type": "file",
+									"src": "",
+									"value": ""
+								}
+							]
+						},
+						"url": {
+							"raw": "http://localhost:3001/gerenciar/sistema/restore",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3001",
+							"path": [
+								"gerenciar",
+								"sistema",
+								"restore"
+							]
+						},
+						"description": "Restore a ZIP backup file"
+					},
+					"response": []
+				},
+				{
+					"name": "Backup",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "http://localhost:3001/gerenciar/sistema/backup",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3001",
+							"path": [
+								"gerenciar",
+								"sistema",
+								"backup"
+							]
+						},
+						"description": "Baixa um zip com os arquivos criados no site"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "MZ",
+			"description": "",
+			"item": [
+				{
+					"name": "Account",
+					"description": "",
+					"item": [
+						{
+							"name": "Classificacoes",
+							"description": "",
+							"item": [
+								{
+									"name": "Procurar Classificacoes",
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{AUTH_TOKEN}}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "GET",
+										"header": [],
+										"body": {},
+										"url": {
+											"raw": "{{BASE_URL}}/api/classificacoes",
+											"host": [
+												"{{BASE_URL}}"
+											],
+											"path": [
+												"api",
+												"classificacoes"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Adicionar Classificacoes",
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{AUTH_TOKEN}}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "POST",
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{ \"descricao\": \"Pagamento de Fornecedores\" }\n"
+										},
+										"url": {
+											"raw": "{{BASE_URL}}/api/classificacoes",
+											"host": [
+												"{{BASE_URL}}"
+											],
+											"path": [
+												"api",
+												"classificacoes"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Modificar Classificacoes",
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{AUTH_TOKEN}}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "PATCH",
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{ \"descricao\": \"Pagamento de Fornecedores\" }\n"
+										},
+										"url": {
+											"raw": "{{BASE_URL}}/api/classificacoes/{id}",
+											"host": [
+												"{{BASE_URL}}"
+											],
+											"path": [
+												"api",
+												"classificacoes",
+												"{id}"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Deletar Classificacoes",
+									"request": {
+										"method": "DELETE",
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": ""
+										},
+										"url": {
+											"raw": "{{BASE_URL}}/api/classificacoes/",
+											"host": [
+												"{{BASE_URL}}"
+											],
+											"path": [
+												"api",
+												"classificacoes",
+												""
+											]
+										}
+									},
+									"response": []
+								}
+							],
+							"_postman_isSubFolder": true
+						},
+						{
+							"name": "Cliente",
+							"description": "",
+							"item": [
+								{
+									"name": "Procurar Cliente",
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{AUTH_TOKEN}}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "GET",
+										"header": [],
+										"body": {},
+										"url": {
+											"raw": "{{BASE_URL}}/api/clientes",
+											"host": [
+												"{{BASE_URL}}"
+											],
+											"path": [
+												"api",
+												"clientes"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Adicionar Cliente",
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{ \"tipo\": \"Fisica\",\n  \"nome\": \"Teste\",\n  \"senha\": \"123456\",\n  \"genero\": \"Masculino\",\n  \"email\": \"teste@gmail.com\"\n}"
+										},
+										"url": {
+											"raw": "{{BASE_URL}}/api/clientes",
+											"host": [
+												"{{BASE_URL}}"
+											],
+											"path": [
+												"api",
+												"clientes"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Modificar Cliente",
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{AUTH_TOKEN}}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "PATCH",
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{ \"tipo\": \"Juridica\",\n  \"nome\": \"Test\",\n  \"senha\": \"12345\",\n  \"genero\": \"Feminino\",\n  \"email\": \"test@gmail.com\"\n}"
+										},
+										"url": {
+											"raw": "{{BASE_URL}}/api/clientes/{{ID_CLIENTE}}",
+											"host": [
+												"{{BASE_URL}}"
+											],
+											"path": [
+												"api",
+												"clientes",
+												"{{ID_CLIENTE}}"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Deletar Cliente",
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{AUTH_TOKEN}}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "DELETE",
+										"header": [],
+										"body": {},
+										"url": {
+											"raw": "{{BASE_URL}}/api/clientes/{{ID_CLIENTE}}",
+											"host": [
+												"{{BASE_URL}}"
+											],
+											"path": [
+												"api",
+												"clientes",
+												"{{ID_CLIENTE}}"
+											]
+										}
+									},
+									"response": []
+								}
+							],
+							"_postman_isSubFolder": true
+						},
+						{
+							"name": "Conta",
+							"description": "",
+							"item": [
+								{
+									"name": "Procurar Conta",
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{AUTH_TOKEN}}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "GET",
+										"header": [],
+										"body": {},
+										"url": {
+											"raw": "{{BASE_URL}}/api/contas",
+											"host": [
+												"{{BASE_URL}}"
+											],
+											"path": [
+												"api",
+												"contas"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Adicionar Conta",
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{AUTH_TOKEN}}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "POST",
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n  \"tipo\": \"Receita\",\n  \"descricao\": \"Conta a receber\",\n  \"classificacaoid\": \"2\",\n  \"valor\": \"150\"\n}"
+										},
+										"url": {
+											"raw": "{{BASE_URL}}/api/contas/{{ID_CLIENTE}}",
+											"host": [
+												"{{BASE_URL}}"
+											],
+											"path": [
+												"api",
+												"contas",
+												"{{ID_CLIENTE}}"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Modificar Conta",
+									"request": {
+										"method": "PATCH",
+										"header": [],
+										"body": {},
+										"url": {
+											"raw": "{{BASE_URL}}/api/contas/{id}",
+											"host": [
+												"{{BASE_URL}}"
+											],
+											"path": [
+												"api",
+												"contas",
+												"{id}"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Deletar Conta",
+									"request": {
+										"method": "DELETE",
+										"header": [],
+										"body": {},
+										"url": {
+											"raw": "{{BASE_URL}}/api/contas/{id}",
+											"host": [
+												"{{BASE_URL}}"
+											],
+											"path": [
+												"api",
+												"contas",
+												"{id}"
+											]
+										}
+									},
+									"response": []
+								}
+							],
+							"_postman_isSubFolder": true
+						},
+						{
+							"name": "Credito",
+							"description": "",
+							"item": [
+								{
+									"name": "Procurar Credito",
+									"request": {
+										"method": "GET",
+										"header": [],
+										"body": {},
+										"url": {
+											"raw": "{{BASE_URL}}/api/creditos",
+											"host": [
+												"{{BASE_URL}}"
+											],
+											"path": [
+												"api",
+												"creditos"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Cancelar Credito",
+									"request": {
+										"method": "GET",
+										"header": [],
+										"body": {},
+										"url": {
+											"raw": "{{BASE_URL}}/api/creditos",
+											"host": [
+												"{{BASE_URL}}"
+											],
+											"path": [
+												"api",
+												"creditos"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Adicionar Credito",
+									"request": {
+										"method": "POST",
+										"header": [],
+										"body": {},
+										"url": {
+											"raw": "{{BASE_URL}}/api/creditos",
+											"host": [
+												"{{BASE_URL}}"
+											],
+											"path": [
+												"api",
+												"creditos"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Modificar Credito",
+									"request": {
+										"method": "PATCH",
+										"header": [],
+										"body": {},
+										"url": {
+											"raw": "{{BASE_URL}}/api/creditos/{id}",
+											"host": [
+												"{{BASE_URL}}"
+											],
+											"path": [
+												"api",
+												"creditos",
+												"{id}"
+											]
+										}
+									},
+									"response": []
+								}
+							],
+							"_postman_isSubFolder": true
+						},
+						{
+							"name": "Telefone",
+							"description": "",
+							"item": [
+								{
+									"name": "Procurar",
+									"request": {
+										"method": "GET",
+										"header": [],
+										"body": {},
+										"url": {
+											"raw": "{{BASE_URL}}/api/telefones",
+											"host": [
+												"{{BASE_URL}}"
+											],
+											"path": [
+												"api",
+												"telefones"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Adicionar",
+									"request": {
+										"method": "POST",
+										"header": [],
+										"body": {},
+										"url": {
+											"raw": "{{BASE_URL}}/api/telefones",
+											"host": [
+												"{{BASE_URL}}"
+											],
+											"path": [
+												"api",
+												"telefones"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Modificar",
+									"request": {
+										"method": "PATCH",
+										"header": [],
+										"body": {},
+										"url": {
+											"raw": "{{BASE_URL}}/api/telefones/{id}",
+											"host": [
+												"{{BASE_URL}}"
+											],
+											"path": [
+												"api",
+												"telefones",
+												"{id}"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Deletar",
+									"request": {
+										"method": "DELETE",
+										"header": [],
+										"body": {},
+										"url": {
+											"raw": "{{BASE_URL}}/api/telefones/{id}",
+											"host": [
+												"{{BASE_URL}}"
+											],
+											"path": [
+												"api",
+												"telefones",
+												"{id}"
+											]
+										}
+									},
+									"response": []
+								}
+							],
+							"_postman_isSubFolder": true
+						}
+					],
+					"_postman_isSubFolder": true
+				},
+				{
+					"name": "Association",
+					"description": "",
+					"item": [],
+					"_postman_isSubFolder": true
+				},
+				{
+					"name": "Company",
+					"description": "",
+					"item": [
+						{
+							"name": "Horario",
+							"description": "",
+							"item": [
+								{
+									"name": "Procurar",
+									"request": {
+										"method": "GET",
+										"header": [],
+										"body": {},
+										"url": {
+											"raw": "{{BASE_URL}}/api/horarios",
+											"host": [
+												"{{BASE_URL}}"
+											],
+											"path": [
+												"api",
+												"horarios"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Adicionar",
+									"request": {
+										"method": "POST",
+										"header": [],
+										"body": {},
+										"url": {
+											"raw": "{{BASE_URL}}/api/horarios",
+											"host": [
+												"{{BASE_URL}}"
+											],
+											"path": [
+												"api",
+												"horarios"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Modificar",
+									"request": {
+										"method": "PATCH",
+										"header": [],
+										"body": {},
+										"url": {
+											"raw": "{{BASE_URL}}/api/horarios/{id}",
+											"host": [
+												"{{BASE_URL}}"
+											],
+											"path": [
+												"api",
+												"horarios",
+												"{id}"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Deletar",
+									"request": {
+										"method": "DELETE",
+										"header": [],
+										"body": {},
+										"url": {
+											"raw": "{{BASE_URL}}/api/horarios/{id}",
+											"host": [
+												"{{BASE_URL}}"
+											],
+											"path": [
+												"api",
+												"horarios",
+												"{id}"
+											]
+										}
+									},
+									"response": []
+								}
+							],
+							"_postman_isSubFolder": true
+						}
+					],
+					"_postman_isSubFolder": true
+				},
+				{
+					"name": "Core",
+					"description": "",
+					"item": [],
+					"_postman_isSubFolder": true
+				},
+				{
+					"name": "Coupon",
+					"description": "",
+					"item": [],
+					"_postman_isSubFolder": true
+				},
+				{
+					"name": "Database",
+					"description": "",
+					"item": [],
+					"_postman_isSubFolder": true
+				},
+				{
+					"name": "Device",
+					"description": "",
+					"item": [
+						{
+							"name": "Dispositivo",
+							"description": "",
+							"item": [
+								{
+									"name": "Procurar",
+									"request": {
+										"method": "GET",
+										"header": [],
+										"body": {},
+										"url": {
+											"raw": "{{BASE_URL}}/api/dispositivos",
+											"host": [
+												"{{BASE_URL}}"
+											],
+											"path": [
+												"api",
+												"dispositivos"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Adicionar",
+									"request": {
+										"method": "POST",
+										"header": [],
+										"body": {},
+										"url": {
+											"raw": "{{BASE_URL}}/api/dispositivos",
+											"host": [
+												"{{BASE_URL}}"
+											],
+											"path": [
+												"api",
+												"dispositivos"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Modificar",
+									"request": {
+										"method": "PATCH",
+										"header": [],
+										"body": {},
+										"url": {
+											"raw": "{{BASE_URL}}/api/dispositivos/{id}",
+											"host": [
+												"{{BASE_URL}}"
+											],
+											"path": [
+												"api",
+												"dispositivos",
+												"{id}"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Deletar",
+									"request": {
+										"method": "DELETE",
+										"header": [],
+										"body": {},
+										"url": {
+											"raw": "{{BASE_URL}}/api/dispositivos/{id}",
+											"host": [
+												"{{BASE_URL}}"
+											],
+											"path": [
+												"api",
+												"dispositivos",
+												"{id}"
+											]
+										}
+									},
+									"response": []
+								}
+							],
+							"_postman_isSubFolder": true
+						}
+					],
+					"_postman_isSubFolder": true
+				},
+				{
+					"name": "Environment",
+					"description": "",
+					"item": [
+						{
+							"name": "Mesa",
+							"description": "",
+							"item": [
+								{
+									"name": "Procurar",
+									"request": {
+										"method": "GET",
+										"header": [],
+										"body": {},
+										"url": {
+											"raw": "{{BASE_URL}}/api/mesas",
+											"host": [
+												"{{BASE_URL}}"
+											],
+											"path": [
+												"api",
+												"mesas"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Adicionar",
+									"request": {
+										"method": "POST",
+										"header": [],
+										"body": {},
+										"url": {
+											"raw": "{{BASE_URL}}/api/mesas",
+											"host": [
+												"{{BASE_URL}}"
+											],
+											"path": [
+												"api",
+												"mesas"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Modificar",
+									"request": {
+										"method": "PATCH",
+										"header": [],
+										"body": {},
+										"url": {
+											"raw": "{{BASE_URL}}/api/mesas/{id}",
+											"host": [
+												"{{BASE_URL}}"
+											],
+											"path": [
+												"api",
+												"mesas",
+												"{id}"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Deletar",
+									"request": {
+										"method": "DELETE",
+										"header": [],
+										"body": {},
+										"url": {
+											"raw": "{{BASE_URL}}/api/mesas/{id}",
+											"host": [
+												"{{BASE_URL}}"
+											],
+											"path": [
+												"api",
+												"mesas",
+												"{id}"
+											]
+										}
+									},
+									"response": []
+								}
+							],
+							"_postman_isSubFolder": true
+						},
+						{
+							"name": "Patrimonio",
+							"description": "",
+							"item": [
+								{
+									"name": "Procurar",
+									"request": {
+										"method": "GET",
+										"header": [],
+										"body": {},
+										"url": {
+											"raw": "{{BASE_URL}}/api/patrimonios",
+											"host": [
+												"{{BASE_URL}}"
+											],
+											"path": [
+												"api",
+												"patrimonios"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Adicionar",
+									"request": {
+										"method": "POST",
+										"header": [],
+										"body": {},
+										"url": {
+											"raw": "{{BASE_URL}}/api/patrimonios",
+											"host": [
+												"{{BASE_URL}}"
+											],
+											"path": [
+												"api",
+												"patrimonios"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Modificar",
+									"request": {
+										"method": "PATCH",
+										"header": [],
+										"body": {},
+										"url": {
+											"raw": "{{BASE_URL}}/api/patrimonios/{id}",
+											"host": [
+												"{{BASE_URL}}"
+											],
+											"path": [
+												"api",
+												"patrimonios",
+												"{id}"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Deletar",
+									"request": {
+										"method": "DELETE",
+										"header": [],
+										"body": {},
+										"url": {
+											"raw": "{{BASE_URL}}/api/patrimonios/{id}",
+											"host": [
+												"{{BASE_URL}}"
+											],
+											"path": [
+												"api",
+												"patrimonios",
+												"{id}"
+											]
+										}
+									},
+									"response": []
+								}
+							],
+							"_postman_isSubFolder": true
+						},
+						{
+							"name": "Setor",
+							"description": "",
+							"item": [
+								{
+									"name": "Procurar",
+									"request": {
+										"method": "GET",
+										"header": [],
+										"body": {},
+										"url": {
+											"raw": "{{BASE_URL}}/api/setores",
+											"host": [
+												"{{BASE_URL}}"
+											],
+											"path": [
+												"api",
+												"setores"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Adicionar",
+									"request": {
+										"method": "POST",
+										"header": [],
+										"body": {},
+										"url": {
+											"raw": "{{BASE_URL}}/api/setores",
+											"host": [
+												"{{BASE_URL}}"
+											],
+											"path": [
+												"api",
+												"setores"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Modificar",
+									"request": {
+										"method": "PATCH",
+										"header": [],
+										"body": {},
+										"url": {
+											"raw": "{{BASE_URL}}/api/setores/{id}",
+											"host": [
+												"{{BASE_URL}}"
+											],
+											"path": [
+												"api",
+												"setores",
+												"{id}"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Deletar",
+									"request": {
+										"method": "DELETE",
+										"header": [],
+										"body": {},
+										"url": {
+											"raw": "{{BASE_URL}}/api/setores/{id}",
+											"host": [
+												"{{BASE_URL}}"
+											],
+											"path": [
+												"api",
+												"setores",
+												"{id}"
+											]
+										}
+									},
+									"response": []
+								}
+							],
+							"_postman_isSubFolder": true
+						}
+					],
+					"_postman_isSubFolder": true
+				},
+				{
+					"name": "Exception",
+					"description": "",
+					"item": [],
+					"_postman_isSubFolder": true
+				},
+				{
+					"name": "Framework",
+					"description": "",
+					"item": [],
+					"_postman_isSubFolder": true
+				},
+				{
+					"name": "Integrator",
+					"description": "",
+					"item": [],
+					"_postman_isSubFolder": true
+				},
+				{
+					"name": "Invoice",
+					"description": "",
+					"item": [],
+					"_postman_isSubFolder": true
+				},
+				{
+					"name": "Location",
+					"description": "",
+					"item": [
+						{
+							"name": "Bairro",
+							"description": "",
+							"item": [
+								{
+									"name": "Procurar",
+									"request": {
+										"method": "GET",
+										"header": [],
+										"body": {},
+										"url": {
+											"raw": "{{BASE_URL}}/api/bairros",
+											"host": [
+												"{{BASE_URL}}"
+											],
+											"path": [
+												"api",
+												"bairros"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Adicionar",
+									"request": {
+										"method": "POST",
+										"header": [],
+										"body": {},
+										"url": {
+											"raw": "{{BASE_URL}}/api/bairros",
+											"host": [
+												"{{BASE_URL}}"
+											],
+											"path": [
+												"api",
+												"bairros"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Modificar",
+									"request": {
+										"method": "PATCH",
+										"header": [],
+										"body": {},
+										"url": {
+											"raw": "{{BASE_URL}}/api/bairros/{id}",
+											"host": [
+												"{{BASE_URL}}"
+											],
+											"path": [
+												"api",
+												"bairros",
+												"{id}"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Deletar",
+									"request": {
+										"method": "DELETE",
+										"header": [],
+										"body": {},
+										"url": {
+											"raw": "{{BASE_URL}}/api/bairros/{id}",
+											"host": [
+												"{{BASE_URL}}"
+											],
+											"path": [
+												"api",
+												"bairros",
+												"{id}"
+											]
+										}
+									},
+									"response": []
+								}
+							],
+							"_postman_isSubFolder": true
+						},
+						{
+							"name": "Cidade",
+							"description": "",
+							"item": [
+								{
+									"name": "Procurar",
+									"request": {
+										"method": "GET",
+										"header": [],
+										"body": {},
+										"url": {
+											"raw": "{{BASE_URL}}/api/cidades",
+											"host": [
+												"{{BASE_URL}}"
+											],
+											"path": [
+												"api",
+												"cidades"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Adicionar",
+									"request": {
+										"method": "POST",
+										"header": [],
+										"body": {},
+										"url": {
+											"raw": "{{BASE_URL}}/api/cidades",
+											"host": [
+												"{{BASE_URL}}"
+											],
+											"path": [
+												"api",
+												"cidades"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Modificar",
+									"request": {
+										"method": "PATCH",
+										"header": [],
+										"body": {},
+										"url": {
+											"raw": "{{BASE_URL}}/api/cidades/{id}",
+											"host": [
+												"{{BASE_URL}}"
+											],
+											"path": [
+												"api",
+												"cidades",
+												"{id}"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Deletar",
+									"request": {
+										"method": "DELETE",
+										"header": [],
+										"body": {},
+										"url": {
+											"raw": "{{BASE_URL}}/api/cidades/{id}",
+											"host": [
+												"{{BASE_URL}}"
+											],
+											"path": [
+												"api",
+												"cidades",
+												"{id}"
+											]
+										}
+									},
+									"response": []
+								}
+							],
+							"_postman_isSubFolder": true
+						},
+						{
+							"name": "Endereco",
+							"description": "",
+							"item": [
+								{
+									"name": "Procurar",
+									"request": {
+										"method": "GET",
+										"header": [],
+										"body": {},
+										"url": {
+											"raw": "{{BASE_URL}}/api/enderecos",
+											"host": [
+												"{{BASE_URL}}"
+											],
+											"path": [
+												"api",
+												"enderecos"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Adicionar",
+									"request": {
+										"method": "POST",
+										"header": [],
+										"body": {},
+										"url": {
+											"raw": "{{BASE_URL}}/api/enderecos",
+											"host": [
+												"{{BASE_URL}}"
+											],
+											"path": [
+												"api",
+												"enderecos"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Modificar",
+									"request": {
+										"method": "PATCH",
+										"header": [],
+										"body": {},
+										"url": {
+											"raw": "{{BASE_URL}}/api/enderecos/{id}",
+											"host": [
+												"{{BASE_URL}}"
+											],
+											"path": [
+												"api",
+												"enderecos",
+												"{id}"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Deletar",
+									"request": {
+										"method": "DELETE",
+										"header": [],
+										"body": {},
+										"url": {
+											"raw": "{{BASE_URL}}/api/enderecos/{id}",
+											"host": [
+												"{{BASE_URL}}"
+											],
+											"path": [
+												"api",
+												"enderecos",
+												"{id}"
+											]
+										}
+									},
+									"response": []
+								}
+							],
+							"_postman_isSubFolder": true
+						},
+						{
+							"name": "Estado",
+							"description": "",
+							"item": [
+								{
+									"name": "Procurar",
+									"request": {
+										"method": "GET",
+										"header": [],
+										"body": {},
+										"url": {
+											"raw": "{{BASE_URL}}/api/estados",
+											"host": [
+												"{{BASE_URL}}"
+											],
+											"path": [
+												"api",
+												"estados"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Adicionar",
+									"request": {
+										"method": "POST",
+										"header": [],
+										"body": {},
+										"url": {
+											"raw": "{{BASE_URL}}/api/estados",
+											"host": [
+												"{{BASE_URL}}"
+											],
+											"path": [
+												"api",
+												"estados"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Modificar",
+									"request": {
+										"method": "PATCH",
+										"header": [],
+										"body": {},
+										"url": {
+											"raw": "{{BASE_URL}}/api/estados/{id}",
+											"host": [
+												"{{BASE_URL}}"
+											],
+											"path": [
+												"api",
+												"estados",
+												"{id}"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Deletar",
+									"request": {
+										"method": "DELETE",
+										"header": [],
+										"body": {},
+										"url": {
+											"raw": "{{BASE_URL}}/api/estados/{id}",
+											"host": [
+												"{{BASE_URL}}"
+											],
+											"path": [
+												"api",
+												"estados",
+												"{id}"
+											]
+										}
+									},
+									"response": []
+								}
+							],
+							"_postman_isSubFolder": true
+						},
+						{
+							"name": "Localizacao",
+							"description": "",
+							"item": [
+								{
+									"name": "Procurar",
+									"request": {
+										"method": "GET",
+										"header": [],
+										"body": {},
+										"url": {
+											"raw": "{{BASE_URL}}/api/localizacoes",
+											"host": [
+												"{{BASE_URL}}"
+											],
+											"path": [
+												"api",
+												"localizacoes"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Adicionar",
+									"request": {
+										"method": "POST",
+										"header": [],
+										"body": {},
+										"url": {
+											"raw": "{{BASE_URL}}/api/localizacoes",
+											"host": [
+												"{{BASE_URL}}"
+											],
+											"path": [
+												"api",
+												"localizacoes"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Modificar",
+									"request": {
+										"method": "PATCH",
+										"header": [],
+										"body": {},
+										"url": {
+											"raw": "{{BASE_URL}}/api/localizacoes/{id}",
+											"host": [
+												"{{BASE_URL}}"
+											],
+											"path": [
+												"api",
+												"localizacoes",
+												"{id}"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Deletar",
+									"request": {
+										"method": "DELETE",
+										"header": [],
+										"body": {},
+										"url": {
+											"raw": "{{BASE_URL}}/api/localizacoes/{id}",
+											"host": [
+												"{{BASE_URL}}"
+											],
+											"path": [
+												"api",
+												"localizacoes",
+												"{id}"
+											]
+										}
+									},
+									"response": []
+								}
+							],
+							"_postman_isSubFolder": true
+						},
+						{
+							"name": "Pais",
+							"description": "",
+							"item": [
+								{
+									"name": "Procurar",
+									"request": {
+										"method": "GET",
+										"header": [],
+										"body": {},
+										"url": {
+											"raw": "{{BASE_URL}}/api/paises",
+											"host": [
+												"{{BASE_URL}}"
+											],
+											"path": [
+												"api",
+												"paises"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Adicionar",
+									"request": {
+										"method": "POST",
+										"header": [],
+										"body": {},
+										"url": {
+											"raw": "{{BASE_URL}}/api/paises",
+											"host": [
+												"{{BASE_URL}}"
+											],
+											"path": [
+												"api",
+												"paises"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Modificar",
+									"request": {
+										"method": "PATCH",
+										"header": [],
+										"body": {},
+										"url": {
+											"raw": "{{BASE_URL}}/api/paises/{id}",
+											"host": [
+												"{{BASE_URL}}"
+											],
+											"path": [
+												"api",
+												"paises",
+												"{id}"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Deletar",
+									"request": {
+										"method": "DELETE",
+										"header": [],
+										"body": {},
+										"url": {
+											"raw": "{{BASE_URL}}/api/paises/{id}",
+											"host": [
+												"{{BASE_URL}}"
+											],
+											"path": [
+												"api",
+												"paises",
+												"{id}"
+											]
+										}
+									},
+									"response": []
+								}
+							],
+							"_postman_isSubFolder": true
+						},
+						{
+							"name": "Viagem",
+							"description": "",
+							"item": [
+								{
+									"name": "Procurar",
+									"request": {
+										"method": "GET",
+										"header": [],
+										"body": {},
+										"url": {
+											"raw": "{{BASE_URL}}/api/viagens",
+											"host": [
+												"{{BASE_URL}}"
+											],
+											"path": [
+												"api",
+												"viagens"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Adicionar",
+									"request": {
+										"method": "POST",
+										"header": [],
+										"body": {},
+										"url": {
+											"raw": "{{BASE_URL}}/api/viagens",
+											"host": [
+												"{{BASE_URL}}"
+											],
+											"path": [
+												"api",
+												"viagens"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Modificar",
+									"request": {
+										"method": "PATCH",
+										"header": [],
+										"body": {},
+										"url": {
+											"raw": "{{BASE_URL}}/api/viagens/{id}",
+											"host": [
+												"{{BASE_URL}}"
+											],
+											"path": [
+												"api",
+												"viagens",
+												"{id}"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Deletar",
+									"request": {
+										"method": "DELETE",
+										"header": [],
+										"body": {},
+										"url": {
+											"raw": "{{BASE_URL}}/api/viagens/{id}",
+											"host": [
+												"{{BASE_URL}}"
+											],
+											"path": [
+												"api",
+												"viagens",
+												"{id}"
+											]
+										}
+									},
+									"response": []
+								}
+							],
+							"_postman_isSubFolder": true
+						},
+						{
+							"name": "Zona",
+							"description": "",
+							"item": [
+								{
+									"name": "Procurar",
+									"request": {
+										"method": "GET",
+										"header": [],
+										"body": {},
+										"url": {
+											"raw": "{{BASE_URL}}/api/zonas",
+											"host": [
+												"{{BASE_URL}}"
+											],
+											"path": [
+												"api",
+												"zonas"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Adicionar",
+									"request": {
+										"method": "POST",
+										"header": [],
+										"body": {},
+										"url": {
+											"raw": "{{BASE_URL}}/api/zonas",
+											"host": [
+												"{{BASE_URL}}"
+											],
+											"path": [
+												"api",
+												"zonas"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Modificar",
+									"request": {
+										"method": "PATCH",
+										"header": [],
+										"body": {},
+										"url": {
+											"raw": "{{BASE_URL}}/api/zonas/{id}",
+											"host": [
+												"{{BASE_URL}}"
+											],
+											"path": [
+												"api",
+												"zonas",
+												"{id}"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Deletar",
+									"request": {
+										"method": "DELETE",
+										"header": [],
+										"body": {},
+										"url": {
+											"raw": "{{BASE_URL}}/api/zonas/{id}",
+											"host": [
+												"{{BASE_URL}}"
+											],
+											"path": [
+												"api",
+												"zonas",
+												"{id}"
+											]
+										}
+									},
+									"response": []
+								}
+							],
+							"_postman_isSubFolder": true
+						}
+					],
+					"_postman_isSubFolder": true
+				},
+				{
+					"name": "Logger",
+					"description": "",
+					"item": [],
+					"_postman_isSubFolder": true
+				},
+				{
+					"name": "Mail",
+					"description": "",
+					"item": [],
+					"_postman_isSubFolder": true
+				},
+				{
+					"name": "Payment",
+					"description": "",
+					"item": [
+						{
+							"name": "Cartao",
+							"description": "",
+							"item": [
+								{
+									"name": "Associar",
+									"request": {
+										"method": "GET",
+										"header": [],
+										"body": {},
+										"url": {
+											"raw": "{{BASE_URL}}/api/cartoes/{name}",
+											"host": [
+												"{{BASE_URL}}"
+											],
+											"path": [
+												"api",
+												"cartoes",
+												"{name}"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Procurar",
+									"request": {
+										"method": "GET",
+										"header": [],
+										"body": {},
+										"url": {
+											"raw": "{{BASE_URL}}/api/cartoes",
+											"host": [
+												"{{BASE_URL}}"
+											],
+											"path": [
+												"api",
+												"cartoes"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Adicionar",
+									"request": {
+										"method": "POST",
+										"header": [],
+										"body": {},
+										"url": {
+											"raw": "{{BASE_URL}}/api/cartoes",
+											"host": [
+												"{{BASE_URL}}"
+											],
+											"path": [
+												"api",
+												"cartoes"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Modificar",
+									"request": {
+										"method": "PATCH",
+										"header": [],
+										"body": {},
+										"url": {
+											"raw": "{{BASE_URL}}/api/cartoes/{id}",
+											"host": [
+												"{{BASE_URL}}"
+											],
+											"path": [
+												"api",
+												"cartoes",
+												"{id}"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Deletar",
+									"request": {
+										"method": "DELETE",
+										"header": [],
+										"body": {},
+										"url": {
+											"raw": "{{BASE_URL}}/api/cartoes/{id}",
+											"host": [
+												"{{BASE_URL}}"
+											],
+											"path": [
+												"api",
+												"cartoes",
+												"{id}"
+											]
+										}
+									},
+									"response": []
+								}
+							],
+							"_postman_isSubFolder": true
+						},
+						{
+							"name": "Cheque",
+							"description": "",
+							"item": [
+								{
+									"name": "Procurar",
+									"request": {
+										"method": "GET",
+										"header": [],
+										"body": {},
+										"url": {
+											"raw": "{{BASE_URL}}/api/cheques",
+											"host": [
+												"{{BASE_URL}}"
+											],
+											"path": [
+												"api",
+												"cheques"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Adicionar",
+									"request": {
+										"method": "POST",
+										"header": [],
+										"body": {},
+										"url": {
+											"raw": "{{BASE_URL}}/api/cheques",
+											"host": [
+												"{{BASE_URL}}"
+											],
+											"path": [
+												"api",
+												"cheques"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Modificar",
+									"request": {
+										"method": "PATCH",
+										"header": [],
+										"body": {},
+										"url": {
+											"raw": "{{BASE_URL}}/api/cheques/{id}",
+											"host": [
+												"{{BASE_URL}}"
+											],
+											"path": [
+												"api",
+												"cheques",
+												"{id}"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Deletar",
+									"request": {
+										"method": "DELETE",
+										"header": [],
+										"body": {},
+										"url": {
+											"raw": "{{BASE_URL}}/api/cheques/{id}",
+											"host": [
+												"{{BASE_URL}}"
+											],
+											"path": [
+												"api",
+												"cheques",
+												"{id}"
+											]
+										}
+									},
+									"response": []
+								}
+							],
+							"_postman_isSubFolder": true
+						},
+						{
+							"name": "FormaPagamento",
+							"description": "",
+							"item": [
+								{
+									"name": "Procurar",
+									"request": {
+										"method": "GET",
+										"header": [],
+										"body": {},
+										"url": {
+											"raw": "{{BASE_URL}}/api/formas_de_pagamento",
+											"host": [
+												"{{BASE_URL}}"
+											],
+											"path": [
+												"api",
+												"formas_de_pagamento"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Adicionar",
+									"request": {
+										"method": "POST",
+										"header": [],
+										"body": {},
+										"url": {
+											"raw": "{{BASE_URL}}/api/formas_de_pagamento",
+											"host": [
+												"{{BASE_URL}}"
+											],
+											"path": [
+												"api",
+												"formas_de_pagamento"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Modificar",
+									"request": {
+										"method": "PATCH",
+										"header": [],
+										"body": {},
+										"url": {
+											"raw": "{{BASE_URL}}/api/formas_de_pagamento/{id}",
+											"host": [
+												"{{BASE_URL}}"
+											],
+											"path": [
+												"api",
+												"formas_de_pagamento",
+												"{id}"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Deletar",
+									"request": {
+										"method": "DELETE",
+										"header": [],
+										"body": {},
+										"url": {
+											"raw": "{{BASE_URL}}/api/formas_de_pagamento/{id}",
+											"host": [
+												"{{BASE_URL}}"
+											],
+											"path": [
+												"api",
+												"formas_de_pagamento",
+												"{id}"
+											]
+										}
+									},
+									"response": []
+								}
+							],
+							"_postman_isSubFolder": true
+						}
+					],
+					"_postman_isSubFolder": true
+				},
+				{
+					"name": "Product",
+					"description": "",
+					"item": [
+						{
+							"name": "Categoria",
+							"description": "",
+							"item": [
+								{
+									"name": "Procurar",
+									"request": {
+										"method": "GET",
+										"header": [],
+										"body": {},
+										"url": {
+											"raw": "{{BASE_URL}}/api/categorias",
+											"host": [
+												"{{BASE_URL}}"
+											],
+											"path": [
+												"api",
+												"categorias"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Adicionar",
+									"request": {
+										"method": "POST",
+										"header": [],
+										"body": {},
+										"url": {
+											"raw": "{{BASE_URL}}/api/categorias",
+											"host": [
+												"{{BASE_URL}}"
+											],
+											"path": [
+												"api",
+												"categorias"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Modificar",
+									"request": {
+										"method": "PATCH",
+										"header": [],
+										"body": {},
+										"url": {
+											"raw": "{{BASE_URL}}/api/categorias/{id}",
+											"host": [
+												"{{BASE_URL}}"
+											],
+											"path": [
+												"api",
+												"categorias",
+												"{id}"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Deletar",
+									"request": {
+										"method": "DELETE",
+										"header": [],
+										"body": {},
+										"url": {
+											"raw": "{{BASE_URL}}/api/categorias/{id}",
+											"host": [
+												"{{BASE_URL}}"
+											],
+											"path": [
+												"api",
+												"categorias",
+												"{id}"
+											]
+										}
+									},
+									"response": []
+								}
+							],
+							"_postman_isSubFolder": true
+						},
+						{
+							"name": "Composicao",
+							"description": "",
+							"item": [
+								{
+									"name": "Procurar",
+									"request": {
+										"method": "GET",
+										"header": [],
+										"body": {},
+										"url": {
+											"raw": "{{BASE_URL}}/api/composicoes",
+											"host": [
+												"{{BASE_URL}}"
+											],
+											"path": [
+												"api",
+												"composicoes"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Adicionar",
+									"request": {
+										"method": "POST",
+										"header": [],
+										"body": {},
+										"url": {
+											"raw": "{{BASE_URL}}/api/composicoes",
+											"host": [
+												"{{BASE_URL}}"
+											],
+											"path": [
+												"api",
+												"composicoes"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Modificar",
+									"request": {
+										"method": "PATCH",
+										"header": [],
+										"body": {},
+										"url": {
+											"raw": "{{BASE_URL}}/api/composicoes/{id}",
+											"host": [
+												"{{BASE_URL}}"
+											],
+											"path": [
+												"api",
+												"composicoes",
+												"{id}"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Deletar",
+									"request": {
+										"method": "DELETE",
+										"header": [],
+										"body": {},
+										"url": {
+											"raw": "{{BASE_URL}}/api/composicoes/{id}",
+											"host": [
+												"{{BASE_URL}}"
+											],
+											"path": [
+												"api",
+												"composicoes",
+												"{id}"
+											]
+										}
+									},
+									"response": []
+								}
+							],
+							"_postman_isSubFolder": true
+						},
+						{
+							"name": "Pacote",
+							"description": "",
+							"item": [
+								{
+									"name": "Procurar",
+									"request": {
+										"method": "GET",
+										"header": [],
+										"body": {},
+										"url": {
+											"raw": "{{BASE_URL}}/api/pacotes",
+											"host": [
+												"{{BASE_URL}}"
+											],
+											"path": [
+												"api",
+												"pacotes"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Adicionar",
+									"request": {
+										"method": "POST",
+										"header": [],
+										"body": {},
+										"url": {
+											"raw": "{{BASE_URL}}/api/pacotes",
+											"host": [
+												"{{BASE_URL}}"
+											],
+											"path": [
+												"api",
+												"pacotes"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Modificar",
+									"request": {
+										"method": "PATCH",
+										"header": [],
+										"body": {},
+										"url": {
+											"raw": "{{BASE_URL}}/api/pacotes/{id}",
+											"host": [
+												"{{BASE_URL}}"
+											],
+											"path": [
+												"api",
+												"pacotes",
+												"{id}"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Deletar",
+									"request": {
+										"method": "DELETE",
+										"header": [],
+										"body": {},
+										"url": {
+											"raw": "{{BASE_URL}}/api/pacotes/{id}",
+											"host": [
+												"{{BASE_URL}}"
+											],
+											"path": [
+												"api",
+												"pacotes",
+												"{id}"
+											]
+										}
+									},
+									"response": []
+								}
+							],
+							"_postman_isSubFolder": true
+						},
+						{
+							"name": "Produto",
+							"description": "",
+							"item": [
+								{
+									"name": "Procurar",
+									"request": {
+										"method": "GET",
+										"header": [],
+										"body": {},
+										"url": {
+											"raw": "{{BASE_URL}}/api/produtos",
+											"host": [
+												"{{BASE_URL}}"
+											],
+											"path": [
+												"api",
+												"produtos"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Adicionar",
+									"request": {
+										"method": "POST",
+										"header": [],
+										"body": {},
+										"url": {
+											"raw": "{{BASE_URL}}/api/produtos",
+											"host": [
+												"{{BASE_URL}}"
+											],
+											"path": [
+												"api",
+												"produtos"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Modificar",
+									"request": {
+										"method": "PATCH",
+										"header": [],
+										"body": {},
+										"url": {
+											"raw": "{{BASE_URL}}/api/produtos/{id}",
+											"host": [
+												"{{BASE_URL}}"
+											],
+											"path": [
+												"api",
+												"produtos",
+												"{id}"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Deletar",
+									"request": {
+										"method": "DELETE",
+										"header": [],
+										"body": {},
+										"url": {
+											"raw": "{{BASE_URL}}/api/produtos/{id}",
+											"host": [
+												"{{BASE_URL}}"
+											],
+											"path": [
+												"api",
+												"produtos",
+												"{id}"
+											]
+										}
+									},
+									"response": []
+								}
+							],
+							"_postman_isSubFolder": true
+						},
+						{
+							"name": "Propriedade",
+							"description": "",
+							"item": [
+								{
+									"name": "Procurar",
+									"request": {
+										"method": "GET",
+										"header": [],
+										"body": {},
+										"url": {
+											"raw": "{{BASE_URL}}/api/propriedades",
+											"host": [
+												"{{BASE_URL}}"
+											],
+											"path": [
+												"api",
+												"propriedades"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Adicionar",
+									"request": {
+										"method": "POST",
+										"header": [],
+										"body": {},
+										"url": {
+											"raw": "{{BASE_URL}}/api/propriedades",
+											"host": [
+												"{{BASE_URL}}"
+											],
+											"path": [
+												"api",
+												"propriedades"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Modificar",
+									"request": {
+										"method": "PATCH",
+										"header": [],
+										"body": {},
+										"url": {
+											"raw": "{{BASE_URL}}/api/propriedades/{id}",
+											"host": [
+												"{{BASE_URL}}"
+											],
+											"path": [
+												"api",
+												"propriedades",
+												"{id}"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Deletar",
+									"request": {
+										"method": "DELETE",
+										"header": [],
+										"body": {},
+										"url": {
+											"raw": "{{BASE_URL}}/api/propriedades/{id}",
+											"host": [
+												"{{BASE_URL}}"
+											],
+											"path": [
+												"api",
+												"propriedades",
+												"{id}"
+											]
+										}
+									},
+									"response": []
+								}
+							],
+							"_postman_isSubFolder": true
+						},
+						{
+							"name": "Servico",
+							"description": "",
+							"item": [
+								{
+									"name": "Procurar",
+									"request": {
+										"method": "GET",
+										"header": [],
+										"body": {},
+										"url": {
+											"raw": "{{BASE_URL}}/api/servicos",
+											"host": [
+												"{{BASE_URL}}"
+											],
+											"path": [
+												"api",
+												"servicos"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Adicionar",
+									"request": {
+										"method": "POST",
+										"header": [],
+										"body": {},
+										"url": {
+											"raw": "{{BASE_URL}}/api/servicos",
+											"host": [
+												"{{BASE_URL}}"
+											],
+											"path": [
+												"api",
+												"servicos"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Modificar",
+									"request": {
+										"method": "PATCH",
+										"header": [],
+										"body": {},
+										"url": {
+											"raw": "{{BASE_URL}}/api/servicos/{id}",
+											"host": [
+												"{{BASE_URL}}"
+											],
+											"path": [
+												"api",
+												"servicos",
+												"{id}"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Deletar",
+									"request": {
+										"method": "DELETE",
+										"header": [],
+										"body": {},
+										"url": {
+											"raw": "{{BASE_URL}}/api/servicos/{id}",
+											"host": [
+												"{{BASE_URL}}"
+											],
+											"path": [
+												"api",
+												"servicos",
+												"{id}"
+											]
+										}
+									},
+									"response": []
+								}
+							],
+							"_postman_isSubFolder": true
+						},
+						{
+							"name": "Unidade",
+							"description": "",
+							"item": [
+								{
+									"name": "Procurar",
+									"request": {
+										"method": "GET",
+										"header": [],
+										"body": {},
+										"url": {
+											"raw": "{{BASE_URL}}/api/unidades",
+											"host": [
+												"{{BASE_URL}}"
+											],
+											"path": [
+												"api",
+												"unidades"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Adicionar",
+									"request": {
+										"method": "POST",
+										"header": [],
+										"body": {},
+										"url": {
+											"raw": "{{BASE_URL}}/api/unidades",
+											"host": [
+												"{{BASE_URL}}"
+											],
+											"path": [
+												"api",
+												"unidades"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Modificar",
+									"request": {
+										"method": "PATCH",
+										"header": [],
+										"body": {},
+										"url": {
+											"raw": "{{BASE_URL}}/api/unidades/{id}",
+											"host": [
+												"{{BASE_URL}}"
+											],
+											"path": [
+												"api",
+												"unidades",
+												"{id}"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Deletar",
+									"request": {
+										"method": "DELETE",
+										"header": [],
+										"body": {},
+										"url": {
+											"raw": "{{BASE_URL}}/api/unidades/{id}",
+											"host": [
+												"{{BASE_URL}}"
+											],
+											"path": [
+												"api",
+												"unidades",
+												"{id}"
+											]
+										}
+									},
+									"response": []
+								}
+							],
+							"_postman_isSubFolder": true
+						}
+					],
+					"_postman_isSubFolder": true
+				},
+				{
+					"name": "Promotion",
+					"description": "",
+					"item": [],
+					"_postman_isSubFolder": true
+				},
+				{
+					"name": "Provider",
+					"description": "",
+					"item": [
+						{
+							"name": "Funcao",
+							"description": "",
+							"item": [
+								{
+									"name": "Procurar",
+									"request": {
+										"method": "GET",
+										"header": [],
+										"body": {},
+										"url": {
+											"raw": "{{BASE_URL}}/api/funcoes",
+											"host": [
+												"{{BASE_URL}}"
+											],
+											"path": [
+												"api",
+												"funcoes"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Adicionar",
+									"request": {
+										"method": "POST",
+										"header": [],
+										"body": {},
+										"url": {
+											"raw": "{{BASE_URL}}/api/funcoes",
+											"host": [
+												"{{BASE_URL}}"
+											],
+											"path": [
+												"api",
+												"funcoes"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Modificar",
+									"request": {
+										"method": "PATCH",
+										"header": [],
+										"body": {},
+										"url": {
+											"raw": "{{BASE_URL}}/api/funcoes/{id}",
+											"host": [
+												"{{BASE_URL}}"
+											],
+											"path": [
+												"api",
+												"funcoes",
+												"{id}"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Deletar",
+									"request": {
+										"method": "DELETE",
+										"header": [],
+										"body": {},
+										"url": {
+											"raw": "{{BASE_URL}}/api/funcoes/{id}",
+											"host": [
+												"{{BASE_URL}}"
+											],
+											"path": [
+												"api",
+												"funcoes",
+												"{id}"
+											]
+										}
+									},
+									"response": []
+								}
+							],
+							"_postman_isSubFolder": true
+						},
+						{
+							"name": "Prestador",
+							"description": "",
+							"item": [
+								{
+									"name": "Procurar",
+									"request": {
+										"method": "GET",
+										"header": [],
+										"body": {},
+										"url": {
+											"raw": "{{BASE_URL}}/api/prestadores",
+											"host": [
+												"{{BASE_URL}}"
+											],
+											"path": [
+												"api",
+												"prestadores"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Adicionar",
+									"request": {
+										"method": "POST",
+										"header": [],
+										"body": {},
+										"url": {
+											"raw": "{{BASE_URL}}/api/prestadores",
+											"host": [
+												"{{BASE_URL}}"
+											],
+											"path": [
+												"api",
+												"prestadores"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Modificar",
+									"request": {
+										"method": "PATCH",
+										"header": [],
+										"body": {},
+										"url": {
+											"raw": "{{BASE_URL}}/api/prestadores/{id}",
+											"host": [
+												"{{BASE_URL}}"
+											],
+											"path": [
+												"api",
+												"prestadores",
+												"{id}"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Deletar",
+									"request": {
+										"method": "DELETE",
+										"header": [],
+										"body": {},
+										"url": {
+											"raw": "{{BASE_URL}}/api/prestadores/{id}",
+											"host": [
+												"{{BASE_URL}}"
+											],
+											"path": [
+												"api",
+												"prestadores",
+												"{id}"
+											]
+										}
+									},
+									"response": []
+								}
+							],
+							"_postman_isSubFolder": true
+						}
+					],
+					"_postman_isSubFolder": true
+				},
+				{
+					"name": "Response",
+					"description": "",
+					"item": [],
+					"_postman_isSubFolder": true
+				},
+				{
+					"name": "Routing",
+					"description": "",
+					"item": [
+						{
+							"name": "Annotation",
+							"description": "",
+							"item": [],
+							"_postman_isSubFolder": true
+						}
+					],
+					"_postman_isSubFolder": true
+				},
+				{
+					"name": "Sale",
+					"description": "",
+					"item": [
+						{
+							"name": "Comanda",
+							"description": "",
+							"item": [
+								{
+									"name": "Procurar",
+									"request": {
+										"method": "GET",
+										"header": [],
+										"body": {},
+										"url": {
+											"raw": "{{BASE_URL}}/api/comandas",
+											"host": [
+												"{{BASE_URL}}"
+											],
+											"path": [
+												"api",
+												"comandas"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Adicionar",
+									"request": {
+										"method": "POST",
+										"header": [],
+										"body": {},
+										"url": {
+											"raw": "{{BASE_URL}}/api/comandas",
+											"host": [
+												"{{BASE_URL}}"
+											],
+											"path": [
+												"api",
+												"comandas"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Modificar",
+									"request": {
+										"method": "PATCH",
+										"header": [],
+										"body": {},
+										"url": {
+											"raw": "{{BASE_URL}}/api/comandas/{id}",
+											"host": [
+												"{{BASE_URL}}"
+											],
+											"path": [
+												"api",
+												"comandas",
+												"{id}"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Deletar",
+									"request": {
+										"method": "DELETE",
+										"header": [],
+										"body": {},
+										"url": {
+											"raw": "{{BASE_URL}}/api/comandas/{id}",
+											"host": [
+												"{{BASE_URL}}"
+											],
+											"path": [
+												"api",
+												"comandas",
+												"{id}"
+											]
+										}
+									},
+									"response": []
+								}
+							],
+							"_postman_isSubFolder": true
+						},
+						{
+							"name": "Item",
+							"description": "",
+							"item": [
+								{
+									"name": "empregos",
+									"request": {
+										"method": "PATCH",
+										"header": [],
+										"body": {},
+										"url": {
+											"raw": "{{BASE_URL}}/api/itens/jobs/{id}",
+											"host": [
+												"{{BASE_URL}}"
+											],
+											"path": [
+												"api",
+												"itens",
+												"jobs",
+												"{id}"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "desmarque",
+									"request": {
+										"method": "PATCH",
+										"header": [],
+										"body": {},
+										"url": {
+											"raw": "{{BASE_URL}}/api/itens/uncheck",
+											"host": [
+												"{{BASE_URL}}"
+											],
+											"path": [
+												"api",
+												"itens",
+												"uncheck"
+											]
+										}
+									},
+									"response": []
+								}
+							],
+							"_postman_isSubFolder": true
+						},
+						{
+							"name": "Pedido",
+							"description": "",
+							"item": [
+								{
+									"name": "Adicionar",
+									"request": {
+										"method": "POST",
+										"header": [],
+										"body": {},
+										"url": {
+											"raw": "{{BASE_URL}}/api/pedidos",
+											"host": [
+												"{{BASE_URL}}"
+											],
+											"path": [
+												"api",
+												"pedidos"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "recibo",
+									"request": {
+										"method": "PATCH",
+										"header": [],
+										"body": {},
+										"url": {
+											"raw": "/api/pedidos/receipt/{id}",
+											"path": [
+												"api",
+												"pedidos",
+												"receipt",
+												"{id}"
+											]
+										}
+									},
+									"response": []
+								}
+							],
+							"_postman_isSubFolder": true
+						}
+					],
+					"_postman_isSubFolder": true
+				},
+				{
+					"name": "Session",
+					"description": "",
+					"item": [
+						{
+							"name": "Caixa",
+							"description": "",
+							"item": [
+								{
+									"name": "Procurar",
+									"request": {
+										"method": "GET",
+										"header": [],
+										"body": {},
+										"url": {
+											"raw": "{{BASE_URL}}/api/caixas",
+											"host": [
+												"{{BASE_URL}}"
+											],
+											"path": [
+												"api",
+												"caixas"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Adicionar",
+									"request": {
+										"method": "POST",
+										"header": [],
+										"body": {},
+										"url": {
+											"raw": "{{BASE_URL}}/api/caixas",
+											"host": [
+												"{{BASE_URL}}"
+											],
+											"path": [
+												"api",
+												"caixas"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Modificar",
+									"request": {
+										"method": "PATCH",
+										"header": [],
+										"body": {},
+										"url": {
+											"raw": "{{BASE_URL}}/api/caixas/{id}",
+											"host": [
+												"{{BASE_URL}}"
+											],
+											"path": [
+												"api",
+												"caixas",
+												"{id}"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Deletar",
+									"request": {
+										"method": "DELETE",
+										"header": [],
+										"body": {},
+										"url": {
+											"raw": "{{BASE_URL}}/api/caixas/{id}",
+											"host": [
+												"{{BASE_URL}}"
+											],
+											"path": [
+												"api",
+												"caixas",
+												"{id}"
+											]
+										}
+									},
+									"response": []
+								}
+							],
+							"_postman_isSubFolder": true
+						},
+						{
+							"name": "Movimentacao",
+							"description": "",
+							"item": [
+								{
+									"name": "Procurar",
+									"request": {
+										"method": "GET",
+										"header": [],
+										"body": {},
+										"url": {
+											"raw": "{{BASE_URL}}/api/movimentacoes",
+											"host": [
+												"{{BASE_URL}}"
+											],
+											"path": [
+												"api",
+												"movimentacoes"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Adicionar",
+									"request": {
+										"method": "POST",
+										"header": [],
+										"body": {},
+										"url": {
+											"raw": "{{BASE_URL}}/api/movimentacoes",
+											"host": [
+												"{{BASE_URL}}"
+											],
+											"path": [
+												"api",
+												"movimentacoes"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Modificar",
+									"request": {
+										"method": "PATCH",
+										"header": [],
+										"body": {},
+										"url": {
+											"raw": "{{BASE_URL}}/api/movimentacoes/{id}",
+											"host": [
+												"{{BASE_URL}}"
+											],
+											"path": [
+												"api",
+												"movimentacoes",
+												"{id}"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Deletar",
+									"request": {
+										"method": "DELETE",
+										"header": [],
+										"body": {},
+										"url": {
+											"raw": "{{BASE_URL}}/api/movimentacoes/{id}",
+											"host": [
+												"{{BASE_URL}}"
+											],
+											"path": [
+												"api",
+												"movimentacoes",
+												"{id}"
+											]
+										}
+									},
+									"response": []
+								}
+							],
+							"_postman_isSubFolder": true
+						}
+					],
+					"_postman_isSubFolder": true
+				},
+				{
+					"name": "Stock",
+					"description": "",
+					"item": [
+						{
+							"name": "Estoque",
+							"description": "",
+							"item": [
+								{
+									"name": "Procurar",
+									"request": {
+										"method": "GET",
+										"header": [],
+										"body": {},
+										"url": {
+											"raw": "{{BASE_URL}}/api/estoques",
+											"host": [
+												"{{BASE_URL}}"
+											],
+											"path": [
+												"api",
+												"estoques"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Adicionar",
+									"request": {
+										"method": "POST",
+										"header": [],
+										"body": {},
+										"url": {
+											"raw": "{{BASE_URL}}/api/estoques",
+											"host": [
+												"{{BASE_URL}}"
+											],
+											"path": [
+												"api",
+												"estoques"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Modificar",
+									"request": {
+										"method": "PATCH",
+										"header": [],
+										"body": {},
+										"url": {
+											"raw": "{{BASE_URL}}/api/estoques/{id}",
+											"host": [
+												"{{BASE_URL}}"
+											],
+											"path": [
+												"api",
+												"estoques",
+												"{id}"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Deletar",
+									"request": {
+										"method": "DELETE",
+										"header": [],
+										"body": {},
+										"url": {
+											"raw": "{{BASE_URL}}/api/estoques/{id}",
+											"host": [
+												"{{BASE_URL}}"
+											],
+											"path": [
+												"api",
+												"estoques",
+												"{id}"
+											]
+										}
+									},
+									"response": []
+								}
+							],
+							"_postman_isSubFolder": true
+						},
+						{
+							"name": "Fornecedor",
+							"description": "",
+							"item": [
+								{
+									"name": "Procurar",
+									"request": {
+										"method": "GET",
+										"header": [],
+										"body": {},
+										"url": {
+											"raw": "{{BASE_URL}}/api/fornecedores",
+											"host": [
+												"{{BASE_URL}}"
+											],
+											"path": [
+												"api",
+												"fornecedores"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Adicionar",
+									"request": {
+										"method": "POST",
+										"header": [],
+										"body": {},
+										"url": {
+											"raw": "{{BASE_URL}}/api/fornecedores",
+											"host": [
+												"{{BASE_URL}}"
+											],
+											"path": [
+												"api",
+												"fornecedores"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Modificador",
+									"request": {
+										"method": "PATCH",
+										"header": [],
+										"body": {},
+										"url": {
+											"raw": "{{BASE_URL}}/api/fornecedores/{id}",
+											"host": [
+												"{{BASE_URL}}"
+											],
+											"path": [
+												"api",
+												"fornecedores",
+												"{id}"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Deletar",
+									"request": {
+										"method": "DELETE",
+										"header": [],
+										"body": {},
+										"url": {
+											"raw": "{{BASE_URL}}/api/fornecedores/{id}",
+											"host": [
+												"{{BASE_URL}}"
+											],
+											"path": [
+												"api",
+												"fornecedores",
+												"{id}"
+											]
+										}
+									},
+									"response": []
+								}
+							],
+							"_postman_isSubFolder": true
+						}
+					],
+					"_postman_isSubFolder": true
+				},
+				{
+					"name": "System",
+					"description": "",
+					"item": [
+						{
+							"name": "Auditoria",
+							"description": "",
+							"item": [
+								{
+									"name": "Procurar",
+									"request": {
+										"method": "GET",
+										"header": [],
+										"body": {},
+										"url": {
+											"raw": "{{BASE_URL}}/api/auditorias",
+											"host": [
+												"{{BASE_URL}}"
+											],
+											"path": [
+												"api",
+												"auditorias"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Adicionar",
+									"request": {
+										"method": "POST",
+										"header": [],
+										"body": {},
+										"url": {
+											"raw": "{{BASE_URL}}/api/auditorias",
+											"host": [
+												"{{BASE_URL}}"
+											],
+											"path": [
+												"api",
+												"auditorias"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Modificar",
+									"request": {
+										"method": "PATCH",
+										"header": [],
+										"body": {},
+										"url": {
+											"raw": "{{BASE_URL}}/api/auditorias/{id}",
+											"host": [
+												"{{BASE_URL}}"
+											],
+											"path": [
+												"api",
+												"auditorias",
+												"{id}"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Deletar",
+									"request": {
+										"method": "DELETE",
+										"header": [],
+										"body": {},
+										"url": {
+											"raw": "{{BASE_URL}}/api/auditorias/{id}",
+											"host": [
+												"{{BASE_URL}}"
+											],
+											"path": [
+												"api",
+												"auditorias",
+												"{id}"
+											]
+										}
+									},
+									"response": []
+								}
+							],
+							"_postman_isSubFolder": true
+						},
+						{
+							"name": "Integracao",
+							"description": "",
+							"item": [
+								{
+									"name": "Procurar",
+									"request": {
+										"method": "GET",
+										"header": [],
+										"body": {},
+										"url": {
+											"raw": "{{BASE_URL}}/api/integracoes",
+											"host": [
+												"{{BASE_URL}}"
+											],
+											"path": [
+												"api",
+												"integracoes"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Adicionar",
+									"request": {
+										"method": "POST",
+										"header": [],
+										"body": {},
+										"url": {
+											"raw": "{{BASE_URL}}/api/integracoes",
+											"host": [
+												"{{BASE_URL}}"
+											],
+											"path": [
+												"api",
+												"integracoes"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Modificar",
+									"request": {
+										"method": "PATCH",
+										"header": [],
+										"body": {},
+										"url": {
+											"raw": "{{BASE_URL}}/api/integracoes/{id}",
+											"host": [
+												"{{BASE_URL}}"
+											],
+											"path": [
+												"api",
+												"integracoes",
+												"{id}"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Deletar",
+									"request": {
+										"method": "DELETE",
+										"header": [],
+										"body": {},
+										"url": {
+											"raw": "{{BASE_URL}}/api/integracoes/{id}",
+											"host": [
+												"{{BASE_URL}}"
+											],
+											"path": [
+												"api",
+												"integracoes",
+												"{id}"
+											]
+										}
+									},
+									"response": []
+								}
+							],
+							"_postman_isSubFolder": true
+						},
+						{
+							"name": "Modulo",
+							"description": "",
+							"item": [
+								{
+									"name": "Procurar",
+									"request": {
+										"method": "GET",
+										"header": [],
+										"body": {},
+										"url": {
+											"raw": "{{BASE_URL}}/api/modulos",
+											"host": [
+												"{{BASE_URL}}"
+											],
+											"path": [
+												"api",
+												"modulos"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Adicionar",
+									"request": {
+										"method": "POST",
+										"header": [],
+										"body": {},
+										"url": {
+											"raw": "{{BASE_URL}}/api/modulos",
+											"host": [
+												"{{BASE_URL}}"
+											],
+											"path": [
+												"api",
+												"modulos"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Modificar",
+									"request": {
+										"method": "PATCH",
+										"header": [],
+										"body": {},
+										"url": {
+											"raw": "{{BASE_URL}}/api/modulos/{id}",
+											"host": [
+												"{{BASE_URL}}"
+											],
+											"path": [
+												"api",
+												"modulos",
+												"{id}"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Deletar",
+									"request": {
+										"method": "DELETE",
+										"header": [],
+										"body": {},
+										"url": {
+											"raw": "{{BASE_URL}}/api/modulos/{id}",
+											"host": [
+												"{{BASE_URL}}"
+											],
+											"path": [
+												"api",
+												"modulos",
+												"{id}"
+											]
+										}
+									},
+									"response": []
+								}
+							],
+							"_postman_isSubFolder": true
+						},
+						{
+							"name": "Sistema",
+							"description": "",
+							"item": [
+								{
+									"name": "Procurar",
+									"request": {
+										"method": "GET",
+										"header": [],
+										"body": {},
+										"url": {
+											"raw": "{{BASE_URL}}/api/sistemas",
+											"host": [
+												"{{BASE_URL}}"
+											],
+											"path": [
+												"api",
+												"sistemas"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Adicionar",
+									"request": {
+										"method": "POST",
+										"header": [],
+										"body": {},
+										"url": {
+											"raw": "{{BASE_URL}}/api/sistemas",
+											"host": [
+												"{{BASE_URL}}"
+											],
+											"path": [
+												"api",
+												"sistemas"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Modificar",
+									"request": {
+										"method": "PATCH",
+										"header": [],
+										"body": {},
+										"url": {
+											"raw": "{{BASE_URL}}/api/sistemas/{id}",
+											"host": [
+												"{{BASE_URL}}"
+											],
+											"path": [
+												"api",
+												"sistemas",
+												"{id}"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Deletar",
+									"request": {
+										"method": "DELETE",
+										"header": [],
+										"body": {},
+										"url": {
+											"raw": "{{BASE_URL}}/api/sistemas/{id}",
+											"host": [
+												"{{BASE_URL}}"
+											],
+											"path": [
+												"api",
+												"sistemas",
+												"{id}"
+											]
+										}
+									},
+									"response": []
+								}
+							],
+							"_postman_isSubFolder": true
+						}
+					],
+					"_postman_isSubFolder": true
+				},
+				{
+					"name": "Task",
+					"description": "",
+					"item": [],
+					"_postman_isSubFolder": true
+				},
+				{
+					"name": "Template",
+					"description": "",
+					"item": [],
+					"_postman_isSubFolder": true
+				},
+				{
+					"name": "Util",
+					"description": "",
+					"item": [],
+					"_postman_isSubFolder": true
+				},
+				{
+					"name": "Wallet",
+					"description": "",
+					"item": [
+						{
+							"name": "Banco",
+							"description": "",
+							"item": [
+								{
+									"name": "Procurar",
+									"request": {
+										"method": "GET",
+										"header": [],
+										"body": {},
+										"url": {
+											"raw": "{{BASE_URL}}/api/bancos",
+											"host": [
+												"{{BASE_URL}}"
+											],
+											"path": [
+												"api",
+												"bancos"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Adicionar",
+									"request": {
+										"method": "POST",
+										"header": [],
+										"body": {},
+										"url": {
+											"raw": "{{BASE_URL}}/api/bancos",
+											"host": [
+												"{{BASE_URL}}"
+											],
+											"path": [
+												"api",
+												"bancos"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Modificar",
+									"request": {
+										"method": "PATCH",
+										"header": [],
+										"body": {},
+										"url": {
+											"raw": "{{BASE_URL}}/api/bancos/{id}",
+											"host": [
+												"{{BASE_URL}}"
+											],
+											"path": [
+												"api",
+												"bancos",
+												"{id}"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Deletar",
+									"request": {
+										"method": "DELETE",
+										"header": [],
+										"body": {},
+										"url": {
+											"raw": "{{BASE_URL}}/api/bancos/{id}",
+											"host": [
+												"{{BASE_URL}}"
+											],
+											"path": [
+												"api",
+												"bancos",
+												"{id}"
+											]
+										}
+									},
+									"response": []
+								}
+							],
+							"_postman_isSubFolder": true
+						},
+						{
+							"name": "Carteira",
+							"description": "",
+							"item": [
+								{
+									"name": "Procurar",
+									"request": {
+										"method": "GET",
+										"header": [],
+										"body": {},
+										"url": {
+											"raw": "{{BASE_URL}}/api/carteiras",
+											"host": [
+												"{{BASE_URL}}"
+											],
+											"path": [
+												"api",
+												"carteiras"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Adicionar",
+									"request": {
+										"method": "POST",
+										"header": [],
+										"body": {},
+										"url": {
+											"raw": "{{BASE_URL}}/api/carteiras",
+											"host": [
+												"{{BASE_URL}}"
+											],
+											"path": [
+												"api",
+												"carteiras"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Modificar",
+									"request": {
+										"method": "PATCH",
+										"header": [],
+										"body": {},
+										"url": {
+											"raw": "{{BASE_URL}}/api/carteiras/{id}",
+											"host": [
+												"{{BASE_URL}}"
+											],
+											"path": [
+												"api",
+												"carteiras",
+												"{id}"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Deletar",
+									"request": {
+										"method": "DELETE",
+										"header": [],
+										"body": {},
+										"url": {
+											"raw": "{{BASE_URL}}/api/carteiras/{id}",
+											"host": [
+												"{{BASE_URL}}"
+											],
+											"path": [
+												"api",
+												"carteiras",
+												"{id}"
+											]
+										}
+									},
+									"response": []
+								}
+							],
+							"_postman_isSubFolder": true
+						},
+						{
+							"name": "Moeda",
+							"description": "",
+							"item": [
+								{
+									"name": "Procurar",
+									"request": {
+										"method": "GET",
+										"header": [],
+										"body": {},
+										"url": {
+											"raw": "{{BASE_URL}}/api/moedas",
+											"host": [
+												"{{BASE_URL}}"
+											],
+											"path": [
+												"api",
+												"moedas"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Adicionar",
+									"request": {
+										"method": "POST",
+										"header": [],
+										"body": {},
+										"url": {
+											"raw": "{{BASE_URL}}/api/moedas",
+											"host": [
+												"{{BASE_URL}}"
+											],
+											"path": [
+												"api",
+												"moedas"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Modificar",
+									"request": {
+										"method": "PATCH",
+										"header": [],
+										"body": {},
+										"url": {
+											"raw": "{{BASE_URL}}/api/moedas/{id}",
+											"host": [
+												"{{BASE_URL}}"
+											],
+											"path": [
+												"api",
+												"moedas",
+												"{id}"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Deletar",
+									"request": {
+										"method": "DELETE",
+										"header": [],
+										"body": {},
+										"url": {
+											"raw": "{{BASE_URL}}/api/moedas/{id}",
+											"host": [
+												"{{BASE_URL}}"
+											],
+											"path": [
+												"api",
+												"moedas",
+												"{id}"
+											]
+										}
+									},
+									"response": []
+								}
+							],
+							"_postman_isSubFolder": true
+						}
+					],
+					"_postman_isSubFolder": true
+				},
+				{
+					"name": "Credito",
+					"description": "",
+					"item": [],
+					"_postman_isSubFolder": true
+				}
+			]
+		}
+	]
+}

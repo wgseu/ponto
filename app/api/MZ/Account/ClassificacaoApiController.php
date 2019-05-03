@@ -41,13 +41,7 @@ class ClassificacaoApiController extends \MZ\Core\ApiController
         $this->needPermission([Permissao::NOME_CADASTROCONTAS]);
         $limit = max(1, min(100, $this->getRequest()->query->getInt('limit', 10)));
         $page = max(1, $this->getRequest()->query->getInt('page', 1));
-        $condition = Filter::query($this->getRequest()->query->all());
-        if (isset($condition['classificacaoid']) && intval($condition['classificacaoid']) < 0) {
-            unset($condition['classificacaoid']);
-        } elseif ($this->getRequest()->query->has('classificacaoid')) {
-            $condition['classificacaoid'] = isset($condition['classificacaoid']) ? $condition['classificacaoid'] : null;
-        }
-        $classificacao = new Classificacao($condition);
+        $condition = Filter::values($this->getRequest()->query->all());
         $order = $this->getRequest()->query->get('order', '');
         $count = Classificacao::count($condition);
         $pager = new \Pager($count, $limit, $page);

@@ -24,6 +24,8 @@
  */
 namespace MZ\Account;
 
+use MZ\Exception\ValidationException;
+
 class ClassificacaoTest extends \MZ\Framework\TestCase
 {
     /**
@@ -36,6 +38,7 @@ class ClassificacaoTest extends \MZ\Framework\TestCase
         $last = Classificacao::find([], ['id' => -1]);
         $id = $last->getID() + 1;
         $classificacao = new Classificacao();
+        // $classificacao->setClassificacaoID(1);
         $classificacao->setDescricao($descricao ?: "Classificação {$id}");
         return $classificacao;
     }
@@ -63,11 +66,120 @@ class ClassificacaoTest extends \MZ\Framework\TestCase
         $this->assertEquals(1, Classificacao::count($condition));
     }
 
+    public function testFindByDescricao()
+    {
+        $classificacao = self::create();
+        $classificacaoFind = Classificacao::findByDescricao($classificacao->getDescricao());
+        $this->assertEquals($classificacao->getDescricao(), $classificacaoFind->getDescricao());
+    }
+
     public function testAdd()
     {
         $classificacao = self::build();
         $classificacao->insert();
         $this->assertTrue($classificacao->exists());
+    }
+
+    public function testAddInvalid()
+    {
+        $classificacao = self::build();
+        $classificacao->setDescricao(null);
+
+        try {
+            $classificacao->insert();
+            $this->fail('Não pode cadastra com valores null');
+        } catch (ValidationException $e) {
+            $this->assertEquals(['descricao'], array_keys($e->getErrors()));
+        }
+        //-----------------------------------
+        //Tenta cadastra uma subclassificacao com uma classificacao que não existe
+        $classificacao = self::build();
+        $classificacao->setDescricao('Teste 1');
+        $classificacao->insert();
+
+        $subClassificacao = self::build();
+        $subClassificacao->setDescricao('SubClass');
+        //a subC estara "associada" com a Classificacao 54
+        $subClassificacao->setClassificacaoID(54);
+        try {
+            $subClassificacao->insert();
+            $this->fail('A classificacao pai não existe');
+        } catch (ValidationException $e) {
+            $this->assertEquals(['classificacaoid'], array_keys($e->getErrors()));
+        }
+        //-----------------------------------
+        $classificacao = self::build();
+        $classificacao->setDescricao('Teste vários níveis');
+        $classificacao->insert();
+
+        //criar a subClassificacao
+        $subClassificacao = self::build();
+        $subClassificacao->setDescricao('subClassificacao');
+        $subClassificacao->setClassificacaoID($classificacao->getID());
+        $subClassificacao->insert();
+
+        //criar uma $subClassificacao da $subClassificacao
+        $subSubClassificacao = self::build();
+        $subSubClassificacao->setDescricao('testinho 1');
+        $subSubClassificacao->setClassificacaoID($subClassificacao->getID());
+        try {
+            $subSubClassificacao->insert();
+            $this->fail('Não cadastrar mais de 1 nível');
+        } catch (ValidationException $e) {
+            $this->assertEquals(['classificacaoid'], array_keys($e->getErrors()));
+        }
+    }
+
+    public function testUpdateInvalid()
+    {
+        $classificacao_pai = self::build();
+        $classificacao_pai->setDescricao('Teste');
+        $classificacao_pai->insert();
+
+        //criando outra classificacao 
+        $classificacao = self::build();
+        $classificacao->setID($classificacao_pai->getID());
+        $classificacao->setClassificacaoID($classificacao_pai->getID());
+        $classificacao->setDescricao('Testinho');
+
+        try {
+            $classificacao->update();
+            $this->fail('Erro');
+        } catch (ValidationException $e) {
+            $this->assertEquals(['classificacaoid'], array_keys($e->getErrors()));
+        }
+    }
+
+    public function testTranslate()
+    {
+        $classificacao = self::build();
+        $classificacao->insert();
+
+        try {
+            $classificacao->insert();
+            $this->fail('Não cadastrar descricao duplicada');
+        } catch (ValidationException $e) {
+            $this->assertEquals(['descricao'], array_keys($e->getErrors()));
+        }
+    }
+
+    public function testMakeIconeURL()
+    {
+        $classificacao = new Classificacao();
+        $this->assertEquals('/static/img/classificacao.png', $classificacao->makeIconeURL(true));
+        $classificacao->setIconeURL('imagem.png');
+        $this->assertEquals('/static/img/classificacao/imagem.png', $classificacao->makeIconeURL());
+    }
+
+    public function testClean()
+    {
+        $old_classificacao = new Classificacao();
+        $old_classificacao->setIconeURL('classificacaoFake.png');
+
+        $classificacao = new Classificacao();
+        $classificacao->setIconeURL('classificacaoFake2.png');
+        $classificacao->clean($old_classificacao);
+        $this->assertEquals($old_classificacao, $classificacao);
     }
 
     public function testUpdate()

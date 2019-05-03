@@ -42,22 +42,17 @@ class CategoriaApiController extends \MZ\Core\ApiController
         $this->needPermission([Permissao::NOME_CADASTROPRODUTOS]);
         $limit = max(1, min(100, $this->getRequest()->query->getInt('limit', 10)));
         $page = max(1, $this->getRequest()->query->getInt('page', 1));
-        $condition = Filter::query($this->getRequest()->query->all());
+        $condition = Filter::values($this->getRequest()->query->all());
         unset($condition['ordem']);
         $order = $this->getRequest()->query->get('order', '');
         $count = Categoria::count($condition);
         $pager = new \Pager($count, $limit, $page);
         $categorias = Categoria::findAll($condition, $order, $limit, $pager->offset);
-        if (isset($condition['categoriaid']) && intval($condition['categoriaid']) < 0) {
-            unset($condition['categoriaid']);
-        } elseif ($this->getRequest()->query->has('categoriaid')) {
-            $condition['categoriaid'] = isset($condition['categoriaid']) ? $condition['categoriaid'] : null;
-            $itens = [];
-            foreach ($categorias as $categoria) {
-                $itens[] = $categoria->publish(app()->auth->provider);
-            }
-            return $this->getResponse()->success(['items' => $itens, 'pages' => $pager->pageCount]);
+        $itens = [];
+        foreach ($categorias as $categoria) {
+            $itens[] = $categoria->publish(app()->auth->provider);
         }
+        return $this->getResponse()->success(['items' => $itens, 'pages' => $pager->pageCount]);
     }
 
     /**

@@ -264,12 +264,18 @@ class Classificacao extends SyncModel
     public function validate()
     {
         $errors = [];
+        if (!is_null($this->getClassificacaoID())) {
+            $classificacaopai = $this->findClassificacaoID();
+            if (!$classificacaopai->exists()) {
+                $errors['classificacaoid'] = _t('classificacao.classificacaopai_not_found');
+            } elseif (!is_null($classificacaopai->getClassificacaoID())) {
+                $errors['classificacaoid'] = _t('classificacao.classificacaopai_already');
+            } elseif ($classificacaopai->getID() == $this->getID()) {
+                $errors['classificacaoid'] = _t('classificacao.classificacaopai_same');
+            }
+        }
         if (is_null($this->getDescricao())) {
             $errors['descricao'] = _t('classificacao.descricao_cannot_empty');
-        }
-        $superior = $this->findClassificacaoID();
-        if ($superior->exists() && !is_null($superior->getClassificacaoID())) {
-            $errors['descricao'] = 'Essa classificação superior não pode ser atribuída';
         }
         if (!empty($errors)) {
             throw new ValidationException($errors);

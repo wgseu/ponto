@@ -371,4 +371,24 @@ class Filter
             }
         );
     }
+
+    /**
+     * Filter array values and change to null blank values entry
+     * @param  array $array array to be filtered
+     * @return array array filtered
+     */
+    public static function values($array)
+    {
+        return array_map(
+            function ($value) {
+                if (is_array($value) || trim($value) !== '') {
+                    return $value;
+                } else {
+                    $value = null;
+                    return $value;
+                }
+            },
+            $array
+        );
+    }
 }

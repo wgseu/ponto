@@ -56,13 +56,14 @@ class CreditoApiController extends \MZ\Core\ApiController
 
     /**
      * Cancel Créditos
-     * @Get("/api/creditos", name="api_credito_cancel")
+     * @Patch("/api/creditos/cancel/{id}", name="api_credito_cancel", params={ "id": "\d+" })
+     * 
+     * @param int $id Crédito id to cancel
      */
-    public function cancel()
+    public function cancel($id)
     {
         $this->needPermission([Permissao::NOME_CADASTRARCREDITOS]);
-        $id = $this->getRequest()->query->getInt('id', null);
-        $credito = Credito::findOrFail($id);
+        $credito = Credito::findOrFail(['id' => $id]);
         $credito->cancel();
         return $this->getResponse()->success([]);
     }

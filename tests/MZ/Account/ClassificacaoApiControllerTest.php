@@ -27,24 +27,35 @@ namespace MZ\Account;
 use MZ\System\Permissao;
 use MZ\Account\AuthenticationTest;
 
-class ClassificacaoPageControllerTest extends \MZ\Framework\TestCase
+class ClassificacaoApiControllerTest extends \MZ\Framework\TestCase
 {
     public function testFind()
     {
         AuthenticationTest::authProvider([Permissao::NOME_SISTEMA, Permissao::NOME_CADASTROCONTAS]);
         $classificacao = ClassificacaoTest::create();
-        $result = $this->get('/gerenciar/classificacao/', ['search' => $classificacao->getDescricao()]);
-        $this->assertEquals(200, $result->getStatusCode());
+        $expected = [
+            'status' => 'ok',
+            'items' => [
+                $classificacao->publish(app()->auth->provider),
+            ],
+        ];
+        $result = $this->get('/api/classificacoes', ['search' => $classificacao->getDescricao()]);
+        $this->assertEquals($expected, \array_intersect_key($result, $expected));
     }
 
     public function testAdd()
     {
         AuthenticationTest::authProvider([Permissao::NOME_SISTEMA, Permissao::NOME_CADASTROCONTAS]);
         $classificacao = ClassificacaoTest::build();
-        $result = $this->post('/gerenciar/classificacao/cadastrar', $classificacao->toArray(), true);
-        $this->assertEquals(302, $result->getStatusCode());
-        $classificacao->load(['descricao' => $classificacao->getDescricao()]);
-        $this->assertTrue($classificacao->exists());
+        $this->assertEquals($classificacao->toArray(), (new Classificacao($classificacao))->toArray());
+        $this->assertEquals((new Classificacao())->toArray(), (new Classificacao(1))->toArray());
+        $expected = [
+            'status' => 'ok',
+            'item' => $classificacao->publish(app()->auth->provider),
+        ];
+        $result = $this->post('/api/classificacoes', $classificacao->toArray());
+        $expected['item']['id'] = $result['item']['id'] ?? null;
+        $this->assertEquals($expected, \array_intersect_key($result, $expected));
     }
 
     public function testUpdate()
@@ -52,9 +63,13 @@ class ClassificacaoPageControllerTest extends \MZ\Framework\TestCase
         AuthenticationTest::authProvider([Permissao::NOME_SISTEMA, Permissao::NOME_CADASTROCONTAS]);
         $classificacao = ClassificacaoTest::create();
         $id = $classificacao->getID();
-        $result = $this->post('/gerenciar/classificacao/editar?id=' . $id, $classificacao->toArray(), true);
+        $result = $this->patch('/api/classificacoes/' . $id, $classificacao->toArray());
         $classificacao->loadByID();
-        $this->assertEquals(302, $result->getStatusCode());
+        $expected = [
+            'status' => 'ok',
+            'item' => $classificacao->publish(app()->auth->provider),
+        ];
+        $this->assertEquals($expected, \array_intersect_key($result, $expected));
     }
 
     public function testDelete()
@@ -62,9 +77,10 @@ class ClassificacaoPageControllerTest extends \MZ\Framework\TestCase
         AuthenticationTest::authProvider([Permissao::NOME_SISTEMA, Permissao::NOME_CADASTROCONTAS]);
         $classificacao = ClassificacaoTest::create();
         $id = $classificacao->getID();
-        $result = $this->get('/gerenciar/classificacao/excluir?id=' . $id);
+        $result = $this->delete('/api/classificacoes/' . $id);
         $classificacao->loadByID();
-        $this->assertEquals(302, $result->getStatusCode());
+        $expected = [ 'status' => 'ok', ];
+        $this->assertEquals($expected, \array_intersect_key($result, $expected));
         $this->assertFalse($classificacao->exists());
     }
 }

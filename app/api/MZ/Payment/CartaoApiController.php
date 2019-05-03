@@ -34,7 +34,33 @@ class CartaoApiController extends \MZ\Core\ApiController
 {
     /**
      * associate Cartões
-     * @Get("/api/cartoes/{name}", name="api_cartao_associate", params={ "name": "[a-zA-Z]" })
+     * @Get("/api/cartoes/{name}", name="api_cartao_associations", params={ "name": "[a-zA-Z]" })
+     */
+    public function fetchAssociation($name)
+    {
+        $this->needPermission([Permissao::NOME_CADASTROCARTOES]);
+        // TODO permitir cadastrar novo cartão na página de associação
+        if ($name == 'ifood') {
+            $codigos = IFood::CARDS;
+        } else {
+            $codigos = Kromax::CARDS;
+        }
+        $integracao = Integracao::findByAcessoURL($name);
+        $association = new \MZ\Association\Card($integracao, $codigos);
+        $this->needPermission([Permissao::NOME_CADASTROCARTOES]);
+        $codigos = $association->findAll();
+        $itens = [];
+        foreach ($codigos as $index => $value) {
+            $itens[$index] = $codigos;
+            $cartao = $itens[$index]['cartao'];
+            $itens[$index]['cartao'] = $cartao->publish();
+        }
+        return $this->getResponse()->success(['itens' => $itens]);
+    }
+
+    /**
+     * associate Cartões
+     * @Patch("/api/cartoes/{name}", name="api_cartao_associate", params={ "name": "[a-zA-Z]" })
      */
     public function associate($name)
     {
@@ -51,7 +77,7 @@ class CartaoApiController extends \MZ\Core\ApiController
         $codigo = $this->getRequest()->request->get('codigo');
         $id = $this->getRequest()->request->get('id');
         $cartao = $association->update($codigo, $id);
-        return $this->getResponse()->success(['cartao' => $cartao->toArray()]);
+        return $this->getResponse()->success(['cartao' => $cartao->publish()]);
     }
 
     /**

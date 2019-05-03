@@ -25,6 +25,7 @@
 namespace MZ\Product;
 
 use MZ\Product\ProdutoTest;
+use MZ\Exception\ValidationException;
 
 class ComposicaoTest extends \MZ\Framework\TestCase
 {
@@ -70,11 +71,63 @@ class ComposicaoTest extends \MZ\Framework\TestCase
         $this->assertEquals(1, Composicao::count($condition));
     }
 
+    public function testFinds()
+    {
+        $composicao = self::create();
+
+        $composicaoFind = $composicao->findComposicaoID();
+        $this->assertEquals($composicao->getComposicaoID(), $composicaoFind->getID());
+
+        $produto = $composicao->findProdutoID();
+        $this->assertEquals($composicao->getProdutoID(), $produto->getID());
+
+        $comp = $composicao->findByComposicaoIDProdutoIDTipo($composicaoFind->getID(), $produto->getID(), $composicao->getTipo());
+        $this->assertInstanceOf(get_class($composicao), $comp);
+    }
+
     public function testAdd()
     {
         $composicao = self::build();
         $composicao->insert();
         $this->assertTrue($composicao->exists());
+    }
+
+    public function testAddInvalid()
+    {
+        $composicao = self::build();
+        $composicao->setComposicaoID(null);
+        $composicao->setProdutoID(null);
+        $composicao->setTipo(null);
+        $composicao->setQuantidade(null);
+        $composicao->setValor(null);
+        $composicao->setQuantidadeMaxima(null);
+        $composicao->setAtiva(null);
+        try {
+            $composicao->insert();
+            $this->fail('Não inserir valores nulos');
+        } catch (ValidationException $e) {
+            $this->assertEquals(['composicaoid', 'produtoid', 'tipo', 'quantidade', 'valor', 'quantidademaxima', 'ativa'], array_keys($e->getErrors()));
+        }
+    }
+
+    public function testTranslate()
+    {
+        $composicao = self::build();
+        $composicao->insert();
+        try {
+            $composicao->insert();
+            $this->fail('Não cadastrar com fk duplicada');
+        } catch (ValidationException $e) {
+            $this->assertEquals(['composicaoid', 'produtoid', 'tipo'], array_keys($e->getErrors()));
+        }
+    }
+
+    public function testOptions()
+    {
+        $composicao = self::create();
+        $options = Composicao::getTipoOptions($composicao->getTipo());
+
+        $this->assertEquals('Composição', $options);
     }
 
     public function testUpdate()

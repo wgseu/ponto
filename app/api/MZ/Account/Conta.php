@@ -1508,18 +1508,18 @@ class Conta extends SyncModel
             $sql .= 'AND c.vencimento <= :fim ';
             $data[':fim'] = date('Y-m-d 23:59:59', $data_fim);
         }
-        $stmt = $db->prepare('SELECT COUNT(id) as quantidade, SUM(IF(valor <= 0, valor + acrescimo, 0)) as despesas, '.
-                             '  SUM(IF(valor > 0, valor + acrescimo, 0)) as receitas, SUM(pago) as pago, '.
+        $stmt = $db->prepare('SELECT COUNT(id) as quantidade, SUM(CASE WHEN valor <= 0 THEN valor + acrescimo ELSE 0 END) as despesas, '.
+                             '  SUM(CASE WHEN valor > 0 THEN valor + acrescimo ELSE 0 END) as receitas, SUM(pago) as pago, '.
                              '  SUM(recebido) as recebido, MAX(datapagto) as datapagto '.
                              'FROM ('.
                                 'SELECT c.id, c.valor, c.acrescimo, MAX(pg.datalancamento) as datapagto, '.
-                                '  COALESCE(IF(c.valor <= 0, SUM(pg.lancado), 0), 0) as pago, '.
-                                '  COALESCE(IF(c.valor > 0, SUM(pg.lancado), 0), 0) as recebido '.
+                                '  COALESCE(CASE WHEN c.valor <= 0 THEN SUM(pg.lancado) ELSE 0 END, 0) as pago, '.
+                                '  COALESCE(CASE WHEN c.valor > 0 THEN SUM(pg.lancado) ELSE 0 END, 0) as recebido '.
                                 'FROM Contas c '.
                                 'LEFT JOIN Pagamentos pg ON pg.contaid = c.id AND pg.estado = "Pago" '.
                                 'WHERE c.estado = "Ativa" '.$sql.
                                 'GROUP BY c.id '.
-                                'HAVING (ABS(valor + acrescimo) - ABS(pago + recebido)) >= 0.005) a');
+                                'HAVING (ABS(c.valor + c.acrescimo) - ABS(pago + recebido)) >= 0.005) a');
         $stmt->execute($data);
         $info = $stmt->fetch();
         return [

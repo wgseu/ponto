@@ -68,7 +68,9 @@ class ContaApiController extends \MZ\Core\ApiController
         $conta->setID(null);
         $conta->setVencimento(DB::now());
         $conta->setDataEmissao(DB::now());
-        $conta->filter(new Conta(), app()->auth->provider, $localized);
+        $old_conta = new Conta();
+        $old_conta->setFuncionarioID(app()->auth->provider->getID());
+        $conta->filter($old_conta, app()->auth->provider, $localized);
         $conta->insert();
         return $this->getResponse()->success(['item' => $conta->publish(app()->auth->provider)]);
     }

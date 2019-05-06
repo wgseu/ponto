@@ -26,6 +26,7 @@ namespace MZ\Product;
 
 use MZ\System\Permissao;
 use MZ\Util\Filter;
+use MZ\System\Integracao;
 
 /**
  * Informações sobre o produto, composição ou pacote
@@ -33,71 +34,222 @@ use MZ\Util\Filter;
 class ProdutoApiController extends \MZ\Core\ApiController
 {
     /**
-     * Find all Produtos
-     * @Get("/api/produtos", name="api_produto_find")
-     */
-    public function find()
+    * Associate Produto
+    * @Get("/api/produto/associacao/{name}", name="api_produto_associate", params={ "name": "[a-zA-Z]" })
+    *
+    * @param string $name do integrador
+    */
+    public function associationProduct($name)
     {
-        $this->needPermission([Permissao::NOME_CADASTROPRODUTOS]);
-        $limit = max(1, min(100, $this->getRequest()->query->getInt('limit', 10)));
-        $page = max(1, $this->getRequest()->query->getInt('page', 1));
-        $condition = Filter::query($this->getRequest()->query->all());
-        $order = $this->getRequest()->query->get('order', '');
-        $count = Produto::count($condition);
-        $pager = new \Pager($count, $limit, $page);
-        $produtos = Produto::findAll($condition, $order, $limit, $pager->offset);
-        $itens = [];
-        foreach ($produtos as $produto) {
-            $itens[] = $produto->publish(app()->auth->provider);
+        define('INTGR_TOKEN', 'wKPZ1ABDOO9EVHJMuORwrFogsUPU7Ca5');
+
+        $association = $this->integratorName($name);
+        if ($this->getRequest()->query->has('action')) {
+            if ($this->getRequest()->isMethod('POST') && $this->getRequest()->query->get('action') == 'upload') {
+                if ($this->getRequest()->query->get('token') != INTGR_TOKEN) {
+                    $this->needPermission([Permissao::NOME_CADASTROPRODUTOS]);
+                }
+                try {
+                    if (!isset($_FILES['raw_arquivo']) || $_FILES['raw_arquivo']['error'] === UPLOAD_ERR_NO_FILE) {
+                        throw new \Exception('Nenhum arquivo foi enviado');
+                    }
+                    $file = $_FILES['raw_arquivo'];
+                    if ($file['error'] !== UPLOAD_ERR_OK) {
+                        throw new \MZ\Exception\UploadException($file['error']);
+                    }
+                    if (in_array($file['type'], ['text/xml', 'application/xml'])) {
+                        $association->populate($file['tmp_name']);
+                    } elseif (in_array($file['type'], ['text/plain'])) {
+                        // migrate from INI file
+                        $produtos = $association->getProdutos();
+                        $content = file_get_contents($file['tmp_name']);
+                        $content = preg_replace('/\/[^=\/]*\/=[^\r\n]*[\r\n]*/', '', $content);
+                        $sections = parse_ini_string($content, true, INI_SCANNER_RAW);
+                        if (isset($sections['Codigos'])) {
+                            foreach ($sections['Codigos'] as $codigo => $value) {
+                                $produto = [
+                                    'id' => $value,
+                                    'codigo' => $codigo,
+                                    'descricao' => 'Auto gerado pelo ifood.ini',
+                                    'itens' => [],
+                                ];
+                                if (isset($produtos[$codigo])) {
+                                    $produtos[$codigo] = array_merge(
+                                        $produto,
+                                        array_merge(
+                                            $produtos[$codigo],
+                                            ['id' => $value]
+                                        )
+                                    );
+                                } else {
+                                    $found = false;
+                                    foreach ($produtos as $_codigo => $_produto) {
+                                        if (isset($_produto['itens'][$codigo])) {
+                                            $found = true;
+                                            $produtos[$_codigo]['itens'][$codigo] = array_merge(
+                                                $_produto['itens'][$codigo],
+                                                array_merge(
+                                                    $_produto['itens'][$codigo],
+                                                    ['id' => $value]
+                                                )
+                                            );
+                                            break;
+                                        }
+                                    }
+                                    if (!$found) {
+                                        $produtos[$codigo] = $produto;
+                                    }
+                                }
+                            }
+                            $dados = $association->getDados();
+                            $dados = isset($dados)?$dados:[];
+                            $dados['produtos'] = $produtos;
+                            $integracao->write($dados);
+                        }
+                    } else {
+                        throw new \Exception('Formato não suportado', 401);
+                    }
+                    return $this->getResponse()->success([], 'Upload realizado com sucesso');
+                } catch (\Exception $e) {
+                    return $this->getResponse()->error($e->getMessage());
+                }
+            } elseif ($this->getRequest()->isMethod('POST') && $this->getRequest()->query->get('action') == 'mount') {
+                $this->needPermission([Permissao::NOME_CADASTROPRODUTOS]);
+                try {
+                    $codigo = $this->getRequest()->request->get('codigo');
+                    $subcodigo = $this->getRequest()->request->get('subcodigo');
+                    $id = $this->getRequest()->request->get('id');
+                    $association->mount($codigo, $subcodigo, $id);
+                    $produtos = $association->getProdutos();
+                    return $this->getResponse()->success(['pacote' => $produtos[$codigo]['itens'][$subcodigo]]);
+                } catch (\Exception $e) {
+                    return $this->getResponse()->error($e->getMessage());
+                }
+            } elseif ($this->getRequest()->isMethod('POST') && $this->getRequest()->query->get('action') == 'package') {
+                $this->needPermission([Permissao::NOME_CADASTROPRODUTOS]);
+                try {
+                    $codigo = $this->getRequest()->query->get('codigo');
+                    $package = $association->findPackage($codigo);
+                    return $this->getResponse()->success($package);
+                } catch (\Exception $e) {
+                    return $this->getResponse()->error($e->getMessage());
+                }
+            } elseif (
+                $this->getRequest()->query->get('action') == 'download'
+                && $name == 'ifood'
+                ) {
+                if ($this->getRequest()->query->get('token') != INTGR_TOKEN) {
+                    $this->needPermission([Permissao::NOME_CADASTROPRODUTOS]);
+                }
+                $codigos = \MZ\Integrator\IFood::CARDS;
+                $card = new \MZ\Association\Card($integracao, $codigos);
+                $cartoes = $card->getCartoes();
+                $produtos = $association->getProdutos();
+                $_cartoes = [];
+                $_produtos = [];
+                $_desconhecidos = [];
+                foreach ($produtos as $codigo => $produto) {
+                    if (isset($produto['id'])) {
+                        $_produtos[$codigo] = $produto['id'];
+                    } elseif (isset($produto['codigo_pdv'])) {
+                        $_produtos[$codigo] = $produto['codigo_pdv'];
+                    } else {
+                        $_desconhecidos[$codigo] = $produto['descricao'];
+                    }
+                    foreach ($produto['itens'] as $subcodigo => $subproduto) {
+                        if (isset($subproduto['id'])) {
+                            $_produtos[$codigo.'_'.$subcodigo] = $subproduto['id'];
+                        } else {
+                            $_desconhecidos[$codigo.'_'.$subcodigo] = $subproduto['descricao'];
+                        }
+                    }
+                }
+                if (empty($cartoes)) {
+                    $cartoes['/^VVREST|RSODEX|TRE|VALECA|VR_SMA|AM|DNR|ELO|MC|VIS^/'] = 'iFood';
+                }
+                foreach ($cartoes as $regex => $cartao) {
+                    $_cartoes[$regex] = $cartao;
+                }
+                $ini = [
+                    'Cartoes' => $_cartoes,
+                    'Codigos' => $_produtos,
+                    'Desconhecidos' => $_desconhecidos
+                ];
+                $filename = 'ifood.ini';
+                header('Content-Type: text/plain');
+                header("Content-Disposition: attachment; filename*=UTF-8''" . rawurlencode($filename));
+                echo to_ini($ini);
+                exit;
+            }
         }
-        return $this->getResponse()->success(['items' => $itens, 'pages' => $pager->pageCount]);
+        $this->needPermission([Permissao::NOME_CADASTROPRODUTOS]);
+        $produtos = $association->findAll();
+        return $this->getResponse()->success(['item' => $produtos]);
     }
 
     /**
-     * Create a new Produto
-     * @Post("/api/produtos", name="api_produto_add")
+     * Modify parts of an existing Produtos associados
+     * @Patch("/api/associacao/{name}", name="api_associate_update", params={ "name": "[a-zA-Z]" })
+     * 
+     * @param string $name do integrador
      */
-    public function add()
+    public function modify($name)
     {
-        $this->needPermission([Permissao::NOME_CADASTROPRODUTOS]);
-        $localized = $this->getRequest()->query->getBoolean('localized', false);
-        $produto = new Produto($this->getData());
-        $produto->filter(new Produto(), app()->auth->provider, $localized);
-        $produto->insert();
-        return $this->getResponse()->success(['item' => $produto->publish(app()->auth->provider)]);
+        if ($this->getRequest()->query->has('action')) {
+            $association = $this->integratorName($name);
+            if ($this->getRequest()->query->get('action') == 'update') {
+                $this->needPermission([Permissao::NOME_CADASTROPRODUTOS]);
+                try {
+                    $codigo = $this->getRequest()->request->get('codigo');
+                    $association->update(
+                    $codigo,
+                    $this->getRequest()->request->get('id')
+                );
+                    $produtos = $association->getProdutos();
+                    return $this->getResponse()->success(['produto' => $produtos[$codigo]]);
+                } catch (\Exception $e) {
+                    return $this->getResponse()->error($e->getMessage());
+                }
+            }
+        }
     }
 
-    /**
-     * Modify parts of an existing Produto
-     * @Patch("/api/produtos/{id}", name="api_produto_update", params={ "id": "\d+" })
-     *
-     * @param int $id Produto id
+     /**
+     * Delete Produto associado
+     * @Delete("/api/associacao/{name}", name="api_associacao_delete", params={ "name": "[a-zA-Z]" })
+     * 
+     * @param string $name do integrador
      */
-    public function modify($id)
+    public function delete($name)
     {
-        $this->needPermission([Permissao::NOME_CADASTROPRODUTOS]);
-        $old_produto = Produto::findOrFail(['id' => $id]);
-        $localized = $this->getRequest()->query->getBoolean('localized', false);
-        $data = $this->getData($old_produto->toArray());
-        $produto = new Produto($data);
-        $produto->filter($old_produto, app()->auth->provider, $localized);
-        $produto->update();
-        $old_produto->clean($produto);
-        return $this->getResponse()->success(['item' => $produto->publish(app()->auth->provider)]);
+        if ($this->getRequest()->query->has('action')) {
+            $association = $this->integratorName($name);
+            if ($this->getRequest()->isMethod('POST') && $this->getRequest()->query->get('action') == 'delete') {
+                $this->needPermission([Permissao::NOME_CADASTROPRODUTOS]);
+                try {
+                    $codigo = $this->getRequest()->request->get('codigo');
+                    $subcodigo = $this->getRequest()->request->get('subcodigo');
+                    $association->delete($codigo, $subcodigo);
+                    if (isset($subcodigo)) {
+                        $msg = 'Item do pacote excluído com sucesso!';
+                    } else {
+                        $msg = 'Produto excluído com sucesso!';
+                    }
+                    return $this->getResponse()->success([], $msg);
+                } catch (\Exception $e) {
+                    return $this->getResponse()->error($e->getMessage());
+                }
+            }
+        }
     }
 
-    /**
-     * Delete existing Produto
-     * @Delete("/api/produtos/{id}", name="api_produto_delete", params={ "id": "\d+" })
-     *
-     * @param int $id Produto id to delete
-     */
-    public function delete($id)
+    public function integratorName($name)
     {
-        $this->needPermission([Permissao::NOME_CADASTROPRODUTOS]);
-        $produto = Produto::findOrFail(['id' => $id]);
-        $produto->delete();
-        $produto->clean(new Produto());
-        return $this->getResponse()->success([]);
+        if ($name == 'ifood') {
+            $integracao = Integracao::findByAcessoURL(\MZ\Integrator\IFood::NAME);
+        } else {
+            $integracao = Integracao::findByAcessoURL(\MZ\Integrator\Kromax::NAME);
+        }
+        return $association = new \MZ\Association\Product($integracao);
     }
 }

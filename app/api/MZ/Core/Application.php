@@ -34,6 +34,7 @@ use Symfony\Component\Routing\Router;
 use Symfony\Component\Routing\RequestContext;
 use Symfony\Component\Routing\Loader\PhpFileLoader;
 use Symfony\Component\Routing\Exception\ResourceNotFoundException;
+use Symfony\Component\Routing\Exception\MethodNotAllowedException;
 use MZ\Exception\RedirectException;
 use MZ\Exception\AuthorizationException;
 
@@ -310,7 +311,8 @@ class Application
             $response = new RedirectResponse($exception->getURL());
         } elseif ($exception instanceof ResourceNotFoundException) {
             $response->setStatusCode(Response::HTTP_NOT_FOUND);
-            $response->output('erro_404');
+        } elseif ($exception instanceof MethodNotAllowedException) {
+            $response->setStatusCode(Response::HTTP_METHOD_NOT_ALLOWED);
         }
         return $response;
     }

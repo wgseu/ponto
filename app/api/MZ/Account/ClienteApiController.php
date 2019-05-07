@@ -68,17 +68,18 @@ class ClienteApiController extends \MZ\Core\ApiController
     {
         $this->needPermission([Permissao::NOME_CADASTROCLIENTES]);
         $localized = $this->getRequest()->query->getBoolean('localized', false);
-        $cliente = new Cliente($this->getData());
-        $aceitar = null;
-        $aceitar = $this->getRequest()->request->get('aceitar');
+        $data = $this->getData();
+        $cliente = new Cliente($data);
+        $old_cliente = new Cliente();
+        $aceitar = $data['aceitar'] ?? null;
         if ($aceitar != 'true') {
             throw new \MZ\Exception\ValidationException(
                 ['aceitar' => 'Os termos não foram aceitos']
             );
         }
-        $senha = $this->getRequest()->request->get('confirmarsenha', '');
+        $senha = $data['confirmarsenha'] ?? '';
         $cliente->passwordMatch($senha);
-        $cliente->filter(new Cliente(), app()->auth->provider, $localized);
+        $cliente->filter($old_cliente, app()->auth->provider, $localized);
         $cliente->getTelefone()->setPaisID(app()->getSystem()->getCountry()->getID());
         $cliente->getTelefone()->filter($old_cliente->getTelefone(), app()->auth->provider, true);
         $cliente->insert();
@@ -101,7 +102,7 @@ class ClienteApiController extends \MZ\Core\ApiController
         $cliente->setEmail($old_cliente->getEmail());
         $cliente->setTipo($old_cliente->getTipo());
         $cliente->setSlogan($old_cliente->getSlogan());
-        $senha = $this->getRequest()->request->get('confirmarsenha', '');
+        $senha = $data['confirmarsenha'] ?? '';
         $cliente->passwordMatch($senha);
         $cliente->filter($old_cliente, app()->auth->provider, $localized);
         $cliente->getTelefone()->setPaisID(app()->getSystem()->getCountry()->getID());

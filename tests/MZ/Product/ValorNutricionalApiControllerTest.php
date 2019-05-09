@@ -27,48 +27,50 @@ namespace MZ\Product;
 use MZ\System\Permissao;
 use MZ\Account\AuthenticationTest;
 
-class PropriedadeApiControllerTest extends \MZ\Framework\TestCase
+class ValorNutricionalApiControllerTest extends \MZ\Framework\TestCase
 {
     public function testFind()
     {
         AuthenticationTest::authProvider([Permissao::NOME_SISTEMA, Permissao::NOME_CADASTROPRODUTOS]);
-        $propriedade = PropriedadeTest::create();
+        $valor_nutricional = ValorNutricionalTest::create();
         $expected = [
             'status' => 'ok',
             'items' => [
-                $propriedade->publish(app()->auth->provider),
+                $valor_nutricional->publish(app()->auth->provider),
             ],
         ];
-        $result = $this->get('/api/propriedades', ['search' => $propriedade->getNome()]);
+        $result = $this->get('/api/valores_nutricionais', ['search' => $valor_nutricional->getNome()]);
         $this->assertEquals($expected, \array_intersect_key($result, $expected));
     }
 
     public function testAdd()
     {
         AuthenticationTest::authProvider([Permissao::NOME_SISTEMA, Permissao::NOME_CADASTROPRODUTOS]);
-        $propriedade = PropriedadeTest::build();
-        $this->assertEquals($propriedade->toArray(), (new Propriedade($propriedade))->toArray());
-        $this->assertEquals((new Propriedade())->toArray(), (new Propriedade(1))->toArray());
+        $valor_nutricional = ValorNutricionalTest::build();
+        $this->assertEquals($valor_nutricional->toArray(), (new ValorNutricional($valor_nutricional))->toArray());
+        $this->assertEquals((new ValorNutricional())->toArray(), (new ValorNutricional(1))->toArray());
         $expected = [
             'status' => 'ok',
-            'item' => $propriedade->publish(app()->auth->provider),
+            'item' => $valor_nutricional->publish(app()->auth->provider),
         ];
-        $result = $this->post('/api/propriedades', $propriedade->toArray());
+        $result = $this->post('/api/valores_nutricionais', $valor_nutricional->toArray());
+        $result['item']['quantidade'] = floatval($result['item']['quantidade'] ?? null);
+
         $expected['item']['id'] = $result['item']['id'] ?? null;
-        $expected['item']['dataatualizacao'] = $result['item']['dataatualizacao'] ?? null;
+        $expected['item']['valordiario'] = $result['item']['valordiario'] ?? null;
         $this->assertEquals($expected, \array_intersect_key($result, $expected));
     }
 
     public function testUpdate()
     {
         AuthenticationTest::authProvider([Permissao::NOME_SISTEMA, Permissao::NOME_CADASTROPRODUTOS]);
-        $propriedade = PropriedadeTest::create();
-        $id = $propriedade->getID();
-        $result = $this->patch('/api/propriedades/' . $id, $propriedade->toArray());
-        $propriedade->loadByID();
+        $valor_nutricional = ValorNutricionalTest::create();
+        $id = $valor_nutricional->getID();
+        $result = $this->patch('/api/valores_nutricionais/' . $id, $valor_nutricional->toArray());
+        $valor_nutricional->loadByID();
         $expected = [
             'status' => 'ok',
-            'item' => $propriedade->publish(app()->auth->provider),
+            'item' => $valor_nutricional->publish(app()->auth->provider),
         ];
         $this->assertEquals($expected, \array_intersect_key($result, $expected));
     }
@@ -76,12 +78,12 @@ class PropriedadeApiControllerTest extends \MZ\Framework\TestCase
     public function testDelete()
     {
         AuthenticationTest::authProvider([Permissao::NOME_SISTEMA, Permissao::NOME_CADASTROPRODUTOS]);
-        $propriedade = PropriedadeTest::create();
-        $id = $propriedade->getID();
-        $result = $this->delete('/api/propriedades/' . $id);
-        $propriedade->loadByID();
+        $valor_nutricional = ValorNutricionalTest::create();
+        $id = $valor_nutricional->getID();
+        $result = $this->delete('/api/valores_nutricionais/' . $id);
+        $valor_nutricional->loadByID();
         $expected = [ 'status' => 'ok', ];
         $this->assertEquals($expected, \array_intersect_key($result, $expected));
-        $this->assertFalse($propriedade->exists());
+        $this->assertFalse($valor_nutricional->exists());
     }
 }

@@ -27,6 +27,7 @@ namespace MZ\Product;
 use MZ\Database\DB;
 use MZ\System\Permissao;
 use MZ\Account\AuthenticationTest;
+use MZ\Exception\ValidationException;
 
 class ServicoTest extends \MZ\Framework\TestCase
 {
@@ -82,6 +83,85 @@ class ServicoTest extends \MZ\Framework\TestCase
         $this->assertEquals($expected, $result);
     }
 
+    public function testAddInvalid()
+    {
+        $servico = self::build();
+        $servico->setNome(null);
+        $servico->setDescricao(null);
+        $servico->setTipo(null);
+        $servico->setObrigatorio(null);
+        $servico->setValor(null);
+        $servico->setIndividual(null);
+        $servico->setAtivo(null);
+        $servico->setDataInicio(null);
+        $servico->setDataFim(null);
+        try {
+            $servico->insert();
+            $this->fail('Não cadastrar valores nulos');
+        } catch (ValidationException $e) {
+            $this->assertEquals(['nome', 'descricao', 'tipo', 'obrigatorio', 'valor', 'individual', 'ativo'], array_keys($e->getErrors()));
+        }
+        //----------------------
+        $servico = self::build();
+        $servico->setValor(-5);
+        try {
+            $servico->insert();
+            $this->fail('Valor não por ser negativo');
+        } catch (ValidationException $e) {
+            $this->assertEquals(['valor'], array_keys($e->getErrors()));
+        }
+        //----------------------
+        $servico = self::build();
+        $servico->setValor(0);
+        try {
+            $servico->insert();
+            $this->fail('Valor não por ser zero');
+        } catch (ValidationException $e) {
+            $this->assertEquals(['valor'], array_keys($e->getErrors()));
+        }
+        //----------------------
+        $servico = self::build();
+        $servico->setTipo('Evento');
+        $servico->setDataInicio(null);
+        $servico->setDataFim(null);
+        try {
+            $servico->insert();
+            $this->fail('Data invalidas');
+        } catch (ValidationException $e) {
+            $this->assertEquals(['datainicio', 'datafim'], array_keys($e->getErrors()));
+        }
+        //----------------------
+        $servico = self::build();
+        $servico->setTipo('Taxa');
+        $servico->setDataInicio(DB::now());
+        $servico->setDataFim(DB::now());
+        try {
+            $servico->insert();
+            $this->fail('Data invalidas');
+        } catch (ValidationException $e) {
+            $this->assertEquals(['datainicio', 'datafim'], array_keys($e->getErrors()));
+        }
+    }
+
+    public function testMakeImg()
+    {
+        $servico = new Servico();
+        $this->assertEquals('/static/img/servico.png', $servico->makeImagemURL(true));
+        $servico->setImagemURL('imagem.png');
+        $this->assertEquals('/static/img/servico/imagem.png', $servico->makeImagemURL());
+    }
+
+    public function testClean()
+    {
+        $old = new Servico();
+        $old->setImagemURL('testeimg.png');
+
+        $servico = new Servico();
+        $servico->setImagemURL('testeimg1.png');
+        $servico->clean($old);
+        $this->assertEquals($old, $servico);
+    }
+
     public function testUpdate()
     {
         AuthenticationTest::authProvider([Permissao::NOME_SISTEMA, Permissao::NOME_CADASTROSERVICOS]);
@@ -94,6 +174,22 @@ class ServicoTest extends \MZ\Framework\TestCase
             'item' => $servico->publish(app()->auth->provider),
         ];
         $this->assertEquals($expected, \array_intersect_key($result, $expected));
+    }
+
+    public function testCheckAccess()
+    {
+        $servico = self::build();
+        $servico->setID(1,5);
+        $this->expectException('\Exception');
+        $servico->delete();
+    }
+
+    public function testOptions()
+    {
+        $servico = self::create();
+        $options = Servico::getTipoOptions($servico->getTipo());
+
+        $this->assertEquals('Taxa', $options);
     }
 
     public function testDelete()

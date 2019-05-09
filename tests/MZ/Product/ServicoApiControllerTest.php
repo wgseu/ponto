@@ -47,6 +47,14 @@ class ServicoApiControllerTest extends \MZ\Framework\TestCase
     {
         AuthenticationTest::authProvider([Permissao::NOME_SISTEMA, Permissao::NOME_CADASTROSERVICOS]);
         $servico = ServicoTest::build();
+        $servico->setObrigatorio('Y');
+        $this->assertTrue($servico->isObrigatorio());
+        $servico->setIndividual('Y');
+        $this->assertTrue($servico->isIndividual());
+        $servico->setAtivo('Y');
+        $this->assertTrue($servico->isAtivo());
+        $this->assertEquals($servico->toArray(), (new Servico($servico))->toArray());
+        $this->assertEquals((new Servico())->toArray(), (new Servico(1))->toArray());
         $expected = [
             'status' => 'ok',
             'item' => $servico->publish(app()->auth->provider),

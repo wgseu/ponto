@@ -25,6 +25,7 @@
 namespace MZ\Product;
 
 use MZ\Product\GrupoTest;
+use MZ\Exception\ValidationException;
 
 class PropriedadeTest extends \MZ\Framework\TestCase
 {
@@ -56,6 +57,21 @@ class PropriedadeTest extends \MZ\Framework\TestCase
         return $propriedade;
     }
 
+    public function testAbreviado()
+    {
+        $propriedade = self::build();
+        $propriedade->setAbreviacao(null);
+        $propriedade->insert();
+        $desc = $propriedade->getAbreviado();
+        $this->assertEquals($propriedade->getNome(), $desc);
+        //----
+        $propriedade1 = self::build();
+        $propriedade1->setAbreviacao('P');
+        $propriedade1->insert();
+        $desc1 = $propriedade1->getAbreviado();
+        $this->assertEquals($propriedade1->getAbreviacao(), $desc1);
+    }
+
     public function testFind()
     {
         $propriedade = self::create();
@@ -67,11 +83,46 @@ class PropriedadeTest extends \MZ\Framework\TestCase
         $this->assertEquals(1, Propriedade::count($condition));
     }
 
+    public function testFinds()
+    {
+        $propriedade = self::create();
+
+        $grupo = $propriedade->findGrupoID();
+        $this->assertEquals($propriedade->getGrupoID(), $grupo->getID());
+
+        $prop = $propriedade->findByGrupoIDNome($grupo->getID(), $propriedade->getNome());
+        $this->assertInstanceOf(get_class($propriedade), $prop);
+    }
+
     public function testAdd()
     {
         $propriedade = self::build();
         $propriedade->insert();
         $this->assertTrue($propriedade->exists());
+    }
+
+    public function testAddInvalid()
+    {
+        $propriedade = self::build();
+        $propriedade->setGrupoID(null);
+        $propriedade->setNome(null);
+        try {
+            $propriedade->insert();
+            $this->fail('Não cadastrar com valores nulos');
+        } catch (ValidationException $e) {
+            $this->assertEquals(['grupoid', 'nome'], array_keys($e->getErrors()));
+        }
+    }
+
+    public function testTranslate()
+    {
+        $propriedade = self::create();
+        try {
+            $propriedade->insert();
+            $this->fail('Não cadastra fk duplicada');
+        } catch (ValidationException $e) {
+            $this->assertEquals(['grupoid', 'nome'], array_keys($e->getErrors()));
+        }
     }
 
     public function testUpdate()
@@ -80,6 +131,26 @@ class PropriedadeTest extends \MZ\Framework\TestCase
         $propriedade->update();
         $this->assertTrue($propriedade->exists());
     }
+
+    public function testMakeImg()
+    {
+        $propriedade = new Propriedade();
+        $this->assertEquals('/static/img/propriedade.png', $propriedade->makeImagemURL(true));
+        $propriedade->setImagemURL('imagem.png');
+        $this->assertEquals('/static/img/propriedade/imagem.png', $propriedade->makeImagemURL());
+    }
+
+    public function testClean()
+    {
+        $old = new Propriedade();
+        $old->setImagemURL('propriedadeinexistente.png');
+        $propriedade = new Propriedade();
+        $propriedade->setImagemURL('propriedadeinexistente1.png');
+        $propriedade->clean($old);
+        $this->assertEquals($old, $propriedade);
+    }
+
+
 
     public function testDelete()
     {

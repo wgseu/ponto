@@ -57,6 +57,10 @@ class ComposicaoApiControllerTest extends \MZ\Framework\TestCase
         ];
         $result = $this->post('/api/composicoes', $composicao->toArray());
         $expected['item']['id'] = $result['item']['id'] ?? null;
+
+        $result['item']['valor'] = floatval($result['item']['valor'] ?? null);
+        $result['item']['quantidademaxima'] = intval($result['item']['quantidademaxima'] ?? null);
+        $result['item']['quantidade'] = floatval($result['item']['quantidade'] ?? null);
         $this->assertEquals($expected, \array_intersect_key($result, $expected));
     }
 

@@ -27,48 +27,49 @@ namespace MZ\Product;
 use MZ\System\Permissao;
 use MZ\Account\AuthenticationTest;
 
-class PropriedadeApiControllerTest extends \MZ\Framework\TestCase
+class GrupoApiControllerTest extends \MZ\Framework\TestCase
 {
     public function testFind()
     {
         AuthenticationTest::authProvider([Permissao::NOME_SISTEMA, Permissao::NOME_CADASTROPRODUTOS]);
-        $propriedade = PropriedadeTest::create();
+        $grupo = GrupoTest::create();
         $expected = [
             'status' => 'ok',
             'items' => [
-                $propriedade->publish(app()->auth->provider),
+                $grupo->publish(app()->auth->provider),
             ],
         ];
-        $result = $this->get('/api/propriedades', ['search' => $propriedade->getNome()]);
+        $result = $this->get('/api/grupos', ['search' => $grupo->getDescricao()]);
         $this->assertEquals($expected, \array_intersect_key($result, $expected));
     }
 
     public function testAdd()
     {
         AuthenticationTest::authProvider([Permissao::NOME_SISTEMA, Permissao::NOME_CADASTROPRODUTOS]);
-        $propriedade = PropriedadeTest::build();
-        $this->assertEquals($propriedade->toArray(), (new Propriedade($propriedade))->toArray());
-        $this->assertEquals((new Propriedade())->toArray(), (new Propriedade(1))->toArray());
+        $grupo = GrupoTest::build();
+        $grupo->setQuantidadeMaxima(5);
+        $this->assertTrue($grupo->isMultiplo());
+        $this->assertEquals($grupo->toArray(), (new Grupo($grupo))->toArray());
+        $this->assertEquals((new Grupo())->toArray(), (new Grupo(1))->toArray());
         $expected = [
             'status' => 'ok',
-            'item' => $propriedade->publish(app()->auth->provider),
+            'item' => $grupo->publish(app()->auth->provider),
         ];
-        $result = $this->post('/api/propriedades', $propriedade->toArray());
+        $result = $this->post('/api/grupos', $grupo->toArray());
         $expected['item']['id'] = $result['item']['id'] ?? null;
-        $expected['item']['dataatualizacao'] = $result['item']['dataatualizacao'] ?? null;
         $this->assertEquals($expected, \array_intersect_key($result, $expected));
     }
 
     public function testUpdate()
     {
         AuthenticationTest::authProvider([Permissao::NOME_SISTEMA, Permissao::NOME_CADASTROPRODUTOS]);
-        $propriedade = PropriedadeTest::create();
-        $id = $propriedade->getID();
-        $result = $this->patch('/api/propriedades/' . $id, $propriedade->toArray());
-        $propriedade->loadByID();
+        $grupo = GrupoTest::create();
+        $id = $grupo->getID();
+        $result = $this->patch('/api/grupos/' . $id, $grupo->toArray());
+        $grupo->loadByID();
         $expected = [
             'status' => 'ok',
-            'item' => $propriedade->publish(app()->auth->provider),
+            'item' => $grupo->publish(app()->auth->provider),
         ];
         $this->assertEquals($expected, \array_intersect_key($result, $expected));
     }
@@ -76,12 +77,12 @@ class PropriedadeApiControllerTest extends \MZ\Framework\TestCase
     public function testDelete()
     {
         AuthenticationTest::authProvider([Permissao::NOME_SISTEMA, Permissao::NOME_CADASTROPRODUTOS]);
-        $propriedade = PropriedadeTest::create();
-        $id = $propriedade->getID();
-        $result = $this->delete('/api/propriedades/' . $id);
-        $propriedade->loadByID();
+        $grupo = GrupoTest::create();
+        $id = $grupo->getID();
+        $result = $this->delete('/api/grupos/' . $id);
+        $grupo->loadByID();
         $expected = [ 'status' => 'ok', ];
         $this->assertEquals($expected, \array_intersect_key($result, $expected));
-        $this->assertFalse($propriedade->exists());
+        $this->assertFalse($grupo->exists());
     }
 }

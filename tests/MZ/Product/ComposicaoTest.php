@@ -43,7 +43,7 @@ class ComposicaoTest extends \MZ\Framework\TestCase
         $composicao->setComposicaoID($produto->getID());
         $composicao->setProdutoID($produto->getID());
         $composicao->setTipo(Composicao::TIPO_COMPOSICAO);
-        $composicao->setQuantidade('Quantidade da composição');
+        $composicao->setQuantidade(0.0);
         $composicao->setValor(12.3);
         $composicao->setAtiva('Y');
         return $composicao;

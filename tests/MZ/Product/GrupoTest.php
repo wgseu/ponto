@@ -25,6 +25,7 @@
 namespace MZ\Product;
 
 use MZ\Product\ProdutoTest;
+use MZ\Exception\ValidationException;
 
 class GrupoTest extends \MZ\Framework\TestCase
 {
@@ -75,11 +76,94 @@ class GrupoTest extends \MZ\Framework\TestCase
         $this->assertEquals(1, Grupo::count($condition));
     }
 
+    public function testFinds()
+    {
+        $grupo = self::create();
+
+        $produtoIDDescricao = $grupo->findByProdutoIDDescricao($grupo->getProdutoID(), $grupo->getDescricao());
+        $this->assertInstanceOf(get_class($grupo), $produtoIDDescricao);
+        //----------------------------
+        $produtoIDNome = $grupo->findByProdutoIDNome($grupo->getProdutoID(), $grupo->getNome());
+        $this->assertInstanceOf(get_class($grupo), $produtoIDNome);
+    }
+
     public function testAdd()
     {
         $grupo = self::build();
         $grupo->insert();
         $this->assertTrue($grupo->exists());
+    }
+
+    public function testAddInvalid()
+    {
+        $grupo = self::build();
+        $grupo->setProdutoID(null);
+        $grupo->setNome(null);
+        $grupo->setDescricao(null);
+        $grupo->setTipo(null);
+        $grupo->setQuantidadeMinima(null);
+        $grupo->setQuantidadeMaxima(null);
+        $grupo->setFuncao(null);
+        $grupo->setOrdem(null);
+        try {
+            $grupo->insert();
+            $this->fail('Não cadastrar com valores nulos');
+        } catch (ValidationException $e) {
+            $this->assertEquals(['produtoid', 'nome', 'descricao', 'tipo', 'quantidademinima', 'quantidademaxima', 'funcao', 'ordem'], array_keys($e->getErrors()));
+        }
+
+        $grupo = self::build();
+        $produto = ProdutoTest::build();
+        $produto->setTipo(Produto::TIPO_COMPOSICAO);
+        $produto->insert();
+        $grupo->setProdutoID($produto->getID());
+        try {
+            $grupo->insert();
+            $this->fail('Produto não é um pacote');
+        } catch (ValidationException $e) {
+            $this->assertEquals(['produtoid'], array_keys($e->getErrors()));
+        }
+    }
+
+    public function testTranslate()
+    {
+        $grupo = self::build();
+        $grupo->setNome('Teste');
+        $grupo->insert();
+
+        try {
+            $grupo->insert();
+            $this->fail('Não duplicar produto id e o nome do grupo');
+        } catch (ValidationException $e) {
+            $this->assertEquals(['produtoid', 'nome'], array_keys($e->getErrors()));
+        }
+
+        $grupo = self::build();
+        $grupo->setDescricao('Teste');
+        $grupo->insert();
+
+        try {
+            $grupo->setNome('Outra coisa');
+            $grupo->insert();
+            $this->fail('Não duplicar produto id e descricao do grupo');
+        } catch (ValidationException $e) {
+            $this->assertEquals(['produtoid', 'descricao'], array_keys($e->getErrors()));
+        }
+    }
+
+    public function testGetFuncaoOptions()
+    {
+        $grupo = self::create();
+        $options = Grupo::getFuncaoOptions($grupo->getFuncao());
+        // $this->assertEquals($grupo->getFuncao(), $options);
+        $this->assertEquals('Mínimo', $options);
+    }
+
+    public function testGetTipoOptions()
+    {
+        $grupo = self::create();
+        $options = Grupo::getTipoOptions($grupo->getTipo());
+        $this->assertEquals($grupo->getTipo(), $options);
     }
 
     public function testUpdate()

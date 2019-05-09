@@ -27,6 +27,7 @@ namespace MZ\Promotion;
 use MZ\Product\ProdutoTest;
 use MZ\Product\CategoriaTest;
 use MZ\Util\Date;
+use MZ\Exception\ValidationException;
 
 class PromocaoTest extends \MZ\Framework\TestCase
 {
@@ -74,6 +75,29 @@ class PromocaoTest extends \MZ\Framework\TestCase
         $this->assertEquals(1, Promocao::count($condition));
     }
 
+    public function testFinds()
+    {
+        $promocao = self::create();
+
+        $categoria = $promocao->findCategoriaID();
+        $this->assertEquals($promocao->getCategoriaID(), $categoria->getID());
+
+        $produto = $promocao->findProdutoID();
+        $this->assertEquals($promocao->getProdutoID(), $produto->getID());
+
+        $servico = $promocao->findServicoID();
+        $this->assertEquals($promocao->getServicoID(), $servico->getID());
+
+        $bairro = $promocao->findBairroID();
+        $this->assertEquals($promocao->getBairroID(), $bairro->getID());
+
+        $zona = $promocao->findZonaID();
+        $this->assertEquals($promocao->getZonaID(), $zona->getID());
+
+        $integracao = $promocao->findIntegracaoID();
+        $this->assertEquals($promocao->getIntegracaoID(), $integracao->getID());
+    }
+
     public function testAdd()
     {
         $promocao = self::build();
@@ -81,11 +105,99 @@ class PromocaoTest extends \MZ\Framework\TestCase
         $this->assertTrue($promocao->exists());
     }
 
+    public function testAddInvalid()
+    {
+        $promocao = self::build();
+        $promocao->setInicio(null);
+        $promocao->setFim(null);
+        $promocao->setValor(null);
+        $promocao->setPontos(null);
+        $promocao->setParcial(null);
+        $promocao->setProibir(null);
+        $promocao->setEvento(null);
+        $promocao->setAgendamento(null);
+        try {
+            $promocao->insert();
+            $this->fail('Não cadastrar com valores nulos');
+        } catch (ValidationException $e) {
+            $this->assertEquals(['inicio', 'fim', 'valor', 'pontos', 'parcial', 'proibir', 'evento', 'agendamento'], array_keys($e->getErrors()));
+        }
+        //----------------
+        $promocao = self::build();
+        $promocao->setServicoID(null);
+        $promocao->setBairroID(1);
+        try {
+            $promocao->insert();
+            $this->fail('Não cadastrar com serviço nulo');
+        } catch (ValidationException $e) {
+            $this->assertEquals(['servicoid'], array_keys($e->getErrors()));
+        }
+        //----------------
+        $promocao = self::build();
+        $promocao->setServicoID(1);
+        try {
+            $promocao->insert();
+            $this->fail('O serviço da promoção não pode ser desconto');
+        } catch (ValidationException $e) {
+            $this->assertEquals(['servicoid'], array_keys($e->getErrors()));
+        }
+        //----------------
+        $promocao = self::build();
+        $promocao->setZonaID(1);
+        $promocao->setBairroID(null);
+        try {
+            $promocao->insert();
+            $this->fail('O bairro da zona deve ser informado');
+        } catch (ValidationException $e) {
+            $this->assertEquals(['bairroid'], array_keys($e->getErrors()));
+        }
+        //---------------------
+        $promocao = self::build();
+        $promocao->setCategoriaID(null);
+        $promocao->setProdutoID(null);
+        $promocao->setServicoID(null);
+        try {
+            $promocao->insert();
+            $this->fail('Nenhuma promo selecionada');
+        } catch (ValidationException $e) {
+            $this->assertEquals(['produtoid'], array_keys($e->getErrors()));
+        }
+    }
+
     public function testUpdate()
     {
         $promocao = self::create();
         $promocao->update();
         $this->assertTrue($promocao->exists());
+    }
+
+    public function testMakeBanner()
+    {
+        $promocao = new Promocao();
+        $this->assertEquals('/static/img/promocao.png', $promocao->makeBannerURL(true));
+        $promocao->setBannerURL('imagem.png');
+        $this->assertEquals('/static/img/promocao/imagem.png', $promocao->makeBannerURL());
+    }
+
+    public function testClean()
+    {
+        $old = new Promocao();
+        $old->setBannerURL('promocaofake.png');
+        $promocao = new Promocao();
+        $promocao->setBannerURL('promocaofake1.png');
+        $promocao->clean($old);
+        $this->assertEquals($old, $promocao);
+    }
+
+    public function testLoadByProdutoID()
+    {
+        $promocao = self::create();
+        $promoProduto = $promocao->loadByProdutoID();
+        $this->assertInstanceOf(get_class($promocao), $promoProduto);
+        //--------------------
+        $promocao = self::build();
+        $promocao->setProdutoID(null);
+        $promoProduto = $promocao->loadByProdutoID();
     }
 
     public function testDelete()

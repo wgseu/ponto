@@ -22,53 +22,69 @@
  *
  * @author Equipe GrandChef <desenvolvimento@mzsw.com.br>
  */
-namespace MZ\Product;
+namespace MZ\Promotion;
 
 use MZ\System\Permissao;
 use MZ\Account\AuthenticationTest;
 
-class PropriedadeApiControllerTest extends \MZ\Framework\TestCase
+class PromocaoApiControllerTest extends \MZ\Framework\TestCase
 {
     public function testFind()
     {
         AuthenticationTest::authProvider([Permissao::NOME_SISTEMA, Permissao::NOME_CADASTROPRODUTOS]);
-        $propriedade = PropriedadeTest::create();
+        $promocao = PromocaoTest::create();
         $expected = [
             'status' => 'ok',
             'items' => [
-                $propriedade->publish(app()->auth->provider),
+                $promocao->publish(app()->auth->provider),
             ],
         ];
-        $result = $this->get('/api/propriedades', ['search' => $propriedade->getNome()]);
+        $result = $this->get('/api/promocoes', ['search' => $promocao->getProdutoID()]);
+        $this->assertEquals($expected, \array_intersect_key($result, $expected));
+
+        $result = $this->get('/api/promocoes', ['ate_inicio' => $promocao->getInicio()]);
+        $this->assertEquals($expected, \array_intersect_key($result, $expected));
+
+        $result = $this->get('/api/promocoes', ['apartir_fim' => $promocao->getFim()]);
         $this->assertEquals($expected, \array_intersect_key($result, $expected));
     }
 
     public function testAdd()
     {
         AuthenticationTest::authProvider([Permissao::NOME_SISTEMA, Permissao::NOME_CADASTROPRODUTOS]);
-        $propriedade = PropriedadeTest::build();
-        $this->assertEquals($propriedade->toArray(), (new Propriedade($propriedade))->toArray());
-        $this->assertEquals((new Propriedade())->toArray(), (new Propriedade(1))->toArray());
+        $promocao = PromocaoTest::build();
+        $promocao->setParcial('Y');
+        $this->assertTrue($promocao->isParcial());
+        $promocao->setProibir('Y');
+        $this->assertTrue($promocao->isProibir());
+        $promocao->setAgendamento('Y');
+        $this->assertTrue($promocao->isAgendamento());
+        $this->assertEquals($promocao->toArray(), (new Promocao($promocao))->toArray());
+        $this->assertEquals((new Promocao())->toArray(), (new Promocao(1))->toArray());
         $expected = [
             'status' => 'ok',
-            'item' => $propriedade->publish(app()->auth->provider),
+            'item' => $promocao->publish(app()->auth->provider),
         ];
-        $result = $this->post('/api/propriedades', $propriedade->toArray());
+        $result = $this->post('/api/promocoes', $promocao->toArray());
         $expected['item']['id'] = $result['item']['id'] ?? null;
-        $expected['item']['dataatualizacao'] = $result['item']['dataatualizacao'] ?? null;
+
+        $result['item']['inicio'] = intval($result['item']['inicio'] ?? null);
+        $result['item']['fim'] = intval($result['item']['fim'] ?? null);
+        $result['item']['valor'] = intval($result['item']['valor'] ?? null);
+        $result['item']['pontos'] = intval($result['item']['pontos'] ?? null);
         $this->assertEquals($expected, \array_intersect_key($result, $expected));
     }
 
     public function testUpdate()
     {
         AuthenticationTest::authProvider([Permissao::NOME_SISTEMA, Permissao::NOME_CADASTROPRODUTOS]);
-        $propriedade = PropriedadeTest::create();
-        $id = $propriedade->getID();
-        $result = $this->patch('/api/propriedades/' . $id, $propriedade->toArray());
-        $propriedade->loadByID();
+        $promocao = PromocaoTest::create();
+        $id = $promocao->getID();
+        $result = $this->patch('/api/promocoes/' . $id, $promocao->toArray());
+        $promocao->loadByID();
         $expected = [
             'status' => 'ok',
-            'item' => $propriedade->publish(app()->auth->provider),
+            'item' => $promocao->publish(app()->auth->provider),
         ];
         $this->assertEquals($expected, \array_intersect_key($result, $expected));
     }
@@ -76,12 +92,12 @@ class PropriedadeApiControllerTest extends \MZ\Framework\TestCase
     public function testDelete()
     {
         AuthenticationTest::authProvider([Permissao::NOME_SISTEMA, Permissao::NOME_CADASTROPRODUTOS]);
-        $propriedade = PropriedadeTest::create();
-        $id = $propriedade->getID();
-        $result = $this->delete('/api/propriedades/' . $id);
-        $propriedade->loadByID();
+        $promocao = PromocaoTest::create();
+        $id = $promocao->getID();
+        $result = $this->delete('/api/promocoes/' . $id);
+        $promocao->loadByID();
         $expected = [ 'status' => 'ok', ];
         $this->assertEquals($expected, \array_intersect_key($result, $expected));
-        $this->assertFalse($propriedade->exists());
+        $this->assertFalse($promocao->exists());
     }
 }

@@ -24,20 +24,128 @@
  */
 namespace MZ\Product;
 
+use MZ\Product\InformacaoTest;
+use MZ\Product\UnidadeTest;
+use MZ\Exception\ValidationException;
+
 class ValorNutricionalTest extends \MZ\Framework\TestCase
 {
-    public function testPublish()
+    // public function testPublish()
+    // {
+    //     $valor_nutricional = new ValorNutricional();
+    //     $values = $valor_nutricional->publish(app()->auth->provider);
+    //     $allowed = [
+    //         'id',
+    //         'informacaoid',
+    //         'unidadeid',
+    //         'nome',
+    //         'quantidade',
+    //         'valordiario',
+    //     ];
+    //     $this->assertEquals($allowed, array_keys($values));
+    // }
+
+        /**
+     * Build a valid valor nutricional
+     * @param string $nome Valor nutricional nome
+     * @return ValorNutricional
+     */
+    public static function build($nome = null)
     {
+        $last = ValorNutricional::find([], ['id' => -1]);
+        $id = $last->getID() + 1;
+        $informacao = InformacaoTest::create();
+        $unidade = UnidadeTest::create();
         $valor_nutricional = new ValorNutricional();
-        $values = $valor_nutricional->publish(app()->auth->provider);
-        $allowed = [
-            'id',
-            'informacaoid',
-            'unidadeid',
-            'nome',
-            'quantidade',
-            'valordiario',
-        ];
-        $this->assertEquals($allowed, array_keys($values));
+        $valor_nutricional->setInformacaoID($informacao->getID());
+        $valor_nutricional->setUnidadeID($unidade->getID());
+        $valor_nutricional->setNome($nome ?: "Valor nutricional {$id}");
+        $valor_nutricional->setQuantidade(12.3);
+        return $valor_nutricional;
+    }
+
+    /**
+     * Create a valor nutricional on database
+     * @param string $nome Valor nutricional nome
+     * @return ValorNutricional
+     */
+    public static function create($nome = null)
+    {
+        $valor_nutricional = self::build($nome);
+        $valor_nutricional->insert();
+        return $valor_nutricional;
+    }
+
+    public function testFind()
+    {
+        $valor_nutricional = self::create();
+        $condition = ['nome' => $valor_nutricional->getNome()];
+        $found_valor_nutricional = ValorNutricional::find($condition);
+        $this->assertEquals($valor_nutricional, $found_valor_nutricional);
+        list($found_valor_nutricional) = ValorNutricional::findAll($condition, [], 1);
+        $this->assertEquals($valor_nutricional, $found_valor_nutricional);
+        $this->assertEquals(1, ValorNutricional::count($condition));
+    }
+
+    public function testAdd()
+    {
+        $valor_nutricional = self::build();
+        $valor_nutricional->insert();
+        $this->assertTrue($valor_nutricional->exists());
+    }
+
+    public function testAddInvalid()
+    {
+        $val_nutri = self::build();
+        $val_nutri->setInformacaoID(null);
+        $val_nutri->setUnidadeID(null);
+        $val_nutri->setNome(null);
+        $val_nutri->setQuantidade(null);
+        try {
+            $val_nutri->insert();
+            $this->fail('Não cadastrar com valores nulos');
+        } catch (ValidationException $e) {
+            $this->assertEquals(['informacaoid', 'unidadeid', 'nome', 'quantidade'], array_keys($e->getErrors()));
+        }
+    }
+
+    public function testTranslate()
+    {
+        $val_nutri = self::create();
+        try {
+            $val_nutri->insert();
+            $this->fail('Não cadastrar com fk duplicada');
+        } catch (ValidationException $e) {
+            $this->assertEquals(['informacaoid', 'nome'], array_keys($e->getErrors()));
+        }
+    }
+
+    public function testFinds()
+    {
+        $val_nutri = self::create();
+
+        $unidade = $val_nutri->findUnidadeID();
+        $this->assertEquals($val_nutri->getUnidadeID(), $unidade->getID());
+
+        $informacao = $val_nutri->findInformacaoID();
+        $this->assertEquals($val_nutri->getInformacaoID(), $informacao->getID());
+
+        $informacaoIDNome = $val_nutri->findByInformacaoIDNome($informacao->getID(), $val_nutri->getNome());
+        $this->assertInstanceOf(get_class($val_nutri), $informacaoIDNome);
+    }
+
+    public function testUpdate()
+    {
+        $valor_nutricional = self::create();
+        $valor_nutricional->update();
+        $this->assertTrue($valor_nutricional->exists());
+    }
+
+    public function testDelete()
+    {
+        $valor_nutricional = self::create();
+        $valor_nutricional->delete();
+        $valor_nutricional->loadByID();
+        $this->assertFalse($valor_nutricional->exists());
     }
 }

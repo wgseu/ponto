@@ -23,6 +23,7 @@
  * @author Equipe GrandChef <desenvolvimento@mzsw.com.br>
  */
 namespace MZ\Wallet;
+use MZ\Exception\ValidationException;
 
 
 class CarteiraTest extends \MZ\Framework\TestCase
@@ -67,11 +68,169 @@ class CarteiraTest extends \MZ\Framework\TestCase
         $this->assertEquals(1, Carteira::count($condition));
     }
 
+    public function testFindCarteiraID()
+    {
+        $carteiraInit = self::create();
+        $carteira = self::create();
+        $carteira->setCarteiraID($carteiraInit->getID());
+        $carteiraFind = $carteira->findCarteiraID();
+        $this->assertEquals($carteiraInit->getID(), $carteiraFind->getID());
+    }
+
+    public function testFindBancoID()
+    {
+        $banco = BancoTest::create();
+        $carteira = self::create();
+        $carteira->setBancoID($banco->getID());
+        $bancoFind = $carteira->findBancoID();
+        $this->assertEquals($bancoFind->getID(), $carteira->getBancoID());
+    }
+
     public function testAdd()
     {
         $carteira = self::build();
         $carteira->insert();
         $this->assertTrue($carteira->exists());
+    }
+
+    public function testAddInvalid()
+    {
+        // // Teste de carteira pai invalida
+        $carteira = self::build();
+        $carteira->setCarteiraID(999);
+        try {
+            $carteira->insert();
+            $this->fail('Carteira não existe');
+        } catch (ValidationException $e) {
+            $this->assertEquals(['carteiraid'], array_keys($e->getErrors()));
+        }
+        // Já existe carteiraID
+        $carteiraInit = self::build();
+        $carteiraInit->insert();
+
+        $carteira = self::build();
+        $carteira->setCarteiraID($carteiraInit->getID());
+        $carteira->insert();
+
+        $carteiraPai = self::build();
+        $carteiraPai->setCarteiraID($carteira->getID());
+        try {
+            $carteiraPai->insert();
+            $this->fail('Já existe carteiraID');
+        } catch (ValidationException $e) {
+            $this->assertEquals(['carteiraid'], array_keys($e->getErrors()));
+        }
+        // Tipo e Ambiente de carteira invalido
+        $carteira = self::build();
+        $carteira->setTipo('tipo inválido');
+        $carteira->setAmbiente('ambiente inválido');
+        try {
+            $carteira->insert();
+            $this->fail('Tipo e Ambiente de carteira inválido');
+        } catch (ValidationException $e) {
+            $this->assertEquals(['tipo', 'ambiente'], array_keys($e->getErrors()));
+        }
+        // Banco, agencia e conta não informado em cateira tipo banco
+        $carteira = self::build();
+        $carteira->setTipo(Carteira::TIPO_BANCARIA);
+        $carteira->setBancoID(null);
+        $carteira->setAgencia(null);
+        $carteira->setConta(null);
+        try {
+            $carteira->insert();
+            $this->fail('Banco, agência e conta não informado em carteira bancária');
+        } catch (ValidationException $e) {
+            $this->assertEquals(['bancoid', 'agencia', 'conta'], array_keys($e->getErrors()));
+        }
+        // Banco informado em carteira tipo financeira
+        $banco = BancoTest::build();
+        $banco->insert();
+        $carteira = self::build();
+        $carteira->setTipo(Carteira::TIPO_FINANCEIRA);
+        $carteira->setBancoID($banco->getID());
+        try {
+            $carteira->insert();
+            $this->fail('Banco informado em carteira financeira');
+        } catch (ValidationException $e) {
+            $this->assertEquals(['bancoid'], array_keys($e->getErrors()));
+        }
+    }
+
+    public function testUpdateInvalid()
+    {
+        //Teste carteiraID duplicada
+        $carteiraInit = self::build();
+        $carteiraInit->insert();
+
+        $carteira = self::build();
+        $carteira->setCarteiraID($carteiraInit->getID());
+        $carteira->setID($carteiraInit->getID());
+        try {
+            $carteira->update();
+            $this->fail('Já existe carteira com o mesmo ID');
+        } catch (ValidationException $e) {
+            $this->assertEquals(['carteiraid'], array_keys($e->getErrors()));
+        }
+        // Descrição e transação nula
+        $carteira = self::build();
+        $carteira->setDescricao(null);
+        $carteira->setTransacao(null);
+        try {
+            $carteira->update();
+            $this->fail('Descrição e transaçao não pode ser nula');
+        } catch (ValidationException $e) {
+            $this->assertEquals(['descricao', 'transacao'], array_keys($e->getErrors()));
+        }
+        // checa valor padrão de boolena no ativa
+        $carteira = self::build();
+        $carteira->setAtiva('tipo inválido');
+        try {
+            $carteira->insert();
+            $this->fail('Valor inválido');
+        } catch (ValidationException $e) {
+            $this->assertEquals(['ativa'], array_keys($e->getErrors()));
+        }
+
+    }
+
+    public function testGetTipoOptions()
+    {
+        $carteira = self::create();
+        $options = Carteira::getTipoOptions($carteira->getTipo());
+        $this->assertEquals(_t('carteira.tipo_local'), $options);
+    }
+
+    public function testGetAmbienteOptions()
+    {
+        $carteira = self::build();
+        $carteira->setAmbiente(Carteira::AMBIENTE_TESTE);
+        $options = Carteira::getAmbienteOptions($carteira->getAmbiente());
+        $this->assertEquals(Carteira::AMBIENTE_TESTE, $options);
+    }
+
+    public function testSumToReceive()
+    {
+        $pagamento = \MZ\Payment\PagamentoTest::create();
+        $pagamento->setEstado('Pago');
+        $pagamento->update();
+        $carteira = $pagamento->findCarteiraID();
+        $soma = $carteira::sumToReceive();
+        $this->assertEquals($pagamento->getValor(), $soma);
+    }
+
+    public function testIsAtivo()
+    {
+        $carteira = self::create();
+        $verificador = $carteira->isAtiva();
+        $this->assertTrue($verificador);
+    }
+
+    public function testmakeLogoURL()
+    {
+        $carteira = new Carteira();
+        $this->assertEquals('/static/img/carteira.png', $carteira->makeLogoURL(true));
+        $carteira->setLogoURL('imagem.png');
+        $this->assertEquals('/static/img/carteira/imagem.png', $carteira->makeLogoURL());
     }
 
     public function testUpdate()

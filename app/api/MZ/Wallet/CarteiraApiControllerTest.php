@@ -22,69 +22,65 @@
  *
  * @author Equipe GrandChef <desenvolvimento@mzsw.com.br>
  */
-namespace MZ\Product;
+namespace MZ\Wallet;
 
 use MZ\System\Permissao;
 use MZ\Account\AuthenticationTest;
 
-class CategoriaApiControllerTest extends \MZ\Framework\TestCase
+class CarteiraApiControllerTest extends \MZ\Framework\TestCase
 {
     public function testFind()
     {
-        AuthenticationTest::authProvider([Permissao::NOME_SISTEMA, Permissao::NOME_CADASTROPRODUTOS]);
-        $categoria = CategoriaTest::create();
+        AuthenticationTest::authProvider([Permissao::NOME_SISTEMA, Permissao::NOME_CADASTROCARTEIRAS]);
+        $carteira = CarteiraTest::create();
         $expected = [
             'status' => 'ok',
             'items' => [
-                $categoria->publish(app()->auth->provider),
+                $carteira->publish(app()->auth->provider),
             ],
         ];
-        $result = $this->get('/api/categorias', ['search' => $categoria->getDescricao()]);
+        $result = $this->get('/api/carteiras', ['search' => $carteira->getDescricao()]);
         $this->assertEquals($expected, \array_intersect_key($result, $expected));
     }
 
     public function testAdd()
     {
-        AuthenticationTest::authProvider([Permissao::NOME_SISTEMA, Permissao::NOME_CADASTROPRODUTOS]);
-        $categoria = CategoriaTest::build();
-        $categoria->setServico('Y');
-        $this->assertTrue($categoria->isServico());
-        $this->assertEquals($categoria->toArray(), (new Categoria($categoria))->toArray());
-        $this->assertEquals((new Categoria())->toArray(), (new Categoria(1))->toArray());
+        AuthenticationTest::authProvider([Permissao::NOME_SISTEMA, Permissao::NOME_CADASTROCARTEIRAS]);
+        $carteira = CarteiraTest::build();
         $expected = [
             'status' => 'ok',
-            'item' => $categoria->publish(app()->auth->provider),
+            'item' => $carteira->publish(app()->auth->provider),
         ];
-        $result = $this->post('/api/categorias', $categoria->toArray());
+        $result = $this->post('/api/carteiras', $carteira->toArray());
         $expected['item']['id'] = $result['item']['id'] ?? null;
-        $result['item']['ordem'] = intval($result['item']['ordem']);
-        $expected['item']['dataatualizacao'] = $result['item']['dataatualizacao'] ?? null;
+        $result['item']['limite'] = intval($result['item']['limite']) ?? null;
+        $result['item']['transacao'] = intval($result['item']['transacao']) ?? null;
         $this->assertEquals($expected, \array_intersect_key($result, $expected));
     }
 
     public function testUpdate()
     {
-        AuthenticationTest::authProvider([Permissao::NOME_SISTEMA, Permissao::NOME_CADASTROPRODUTOS]);
-        $categoria = CategoriaTest::create();
-        $id = $categoria->getID();
-        $result = $this->patch('/api/categorias/' . $id, $categoria->toArray());
-        $categoria->loadByID();
+        AuthenticationTest::authProvider([Permissao::NOME_SISTEMA, Permissao::NOME_CADASTROCARTEIRAS]);
+        $carteira = CarteiraTest::create();
+        $id = $carteira->getID();
+        $result = $this->patch('/api/carteiras/' . $id, $carteira->toArray());
+        $carteira->loadByID();
         $expected = [
             'status' => 'ok',
-            'item' => $categoria->publish(app()->auth->provider),
+            'item' => $carteira->publish(app()->auth->provider),
         ];
         $this->assertEquals($expected, \array_intersect_key($result, $expected));
     }
 
     public function testDelete()
     {
-        AuthenticationTest::authProvider([Permissao::NOME_SISTEMA, Permissao::NOME_CADASTROPRODUTOS]);
-        $categoria = CategoriaTest::create();
-        $id = $categoria->getID();
-        $result = $this->delete('/api/categorias/' . $id);
-        $categoria->loadByID();
+        AuthenticationTest::authProvider([Permissao::NOME_SISTEMA, Permissao::NOME_CADASTROCARTEIRAS]);
+        $carteira = CarteiraTest::create();
+        $id = $carteira->getID();
+        $result = $this->delete('/api/carteiras/' . $id);
+        $carteira->loadByID();
         $expected = [ 'status' => 'ok', ];
         $this->assertEquals($expected, \array_intersect_key($result, $expected));
-        $this->assertFalse($categoria->exists());
+        $this->assertFalse($carteira->exists());
     }
 }

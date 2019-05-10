@@ -623,7 +623,7 @@ class Prestador extends SyncModel
      */
     public function delete()
     {
-        if ($this->has([Permissao::NOME_CADASTROFUNCIONARIOS]) && !app()->auth->isOwner()) {
+        if ($this->has([Permissao::NOME_CADASTROPRESTADORES]) && !app()->auth->isOwner()) {
             throw new \Exception('Você não tem permissão para excluir esse funcionário!');
         }
         if (app()->auth->isSelf($this)) {

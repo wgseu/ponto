@@ -31,6 +31,8 @@ use MZ\Device\Impressora;
 use MZ\Device\Dispositivo;
 use MZ\Payment\Pagamento;
 use MZ\Logger\Log;
+use MZ\System\Permissao;
+use MZ\Util\Filter;
 
 use Thermal\Printer;
 use Thermal\Connection\Buffer;

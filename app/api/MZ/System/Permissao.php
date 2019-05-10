@@ -66,7 +66,7 @@ class Permissao extends SyncModel
     const NOME_CADASTROPRODUTOS = 'CadastroProdutos'; // Permitir cadastrar ou alterar um produto
     const NOME_CADASTROFORNECEDORES = 'CadastroFornecedores'; // Permitir cadastrar ou alterar um fornecedor
     const NOME_CADASTROMESAS = 'CadastroMesas'; // Permitir cadastrar ou alterar uma mesa
-    const NOME_CADASTROFUNCIONARIOS = 'CadastroFuncionarios'; // Permitir cadastrar ou alterar um funcionário
+    const NOME_CADASTROPRESTADORES = 'CadastroFuncionarios'; // Permitir cadastrar ou alterar um funcionário
     const NOME_CADASTROFORMASPAGTO = 'CadastroFormasPagto'; // Permitir cadastrar ou alterar uma forma de pagamento
     const NOME_CADASTROPROMOCOES = 'CadastroPromocoes'; // Permitir cadastrar ou alterar uma promoção
     const NOME_CADASTROCARTOES = 'CadastroCartoes'; // Permitir cadastrar ou alterar um cartão

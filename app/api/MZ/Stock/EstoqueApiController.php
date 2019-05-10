@@ -62,8 +62,14 @@ class EstoqueApiController extends \MZ\Core\ApiController
     {
         $this->needPermission([Permissao::NOME_ESTOQUE]);
         $localized = $this->getRequest()->query->getBoolean('localized', false);
-        $estoque = new Estoque($this->getData());
-        $estoque->filter(new Estoque(), app()->auth->provider, $localized);
+        $data = $this->getData();
+        $estoque = new Estoque($data);
+        $old_estoque = new Estoque();
+        $old_estoque->setPrestadorID($estoque->getPrestadorID());
+        $estoque->filter($old_estoque, app()->auth->provider, $localized);
+        $prestador_id = $data['prestadorid'] ?? null;
+        $prestador = \MZ\Provider\Prestador::findByID($prestador_id);
+        $estoque->setPrestadorID($prestador->getID());
         $estoque->insert();
         return $this->getResponse()->success(['item' => $estoque->publish(app()->auth->provider)]);
     }

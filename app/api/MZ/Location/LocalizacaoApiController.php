@@ -62,13 +62,16 @@ class LocalizacaoApiController extends \MZ\Core\ApiController
     {
         $this->needPermission([Permissao::NOME_CADASTROCLIENTES]);
         $localized = $this->getRequest()->query->getBoolean('localized', false);
-        $localizacao = new Localizacao($this->getData());
-        $localizacao->filter(new Localizacao(), app()->auth->provider, $localized);
-        $estado_id = $this->getRequest()->request->get('estadoid');
+        $data = $this->getData();
+        $localizacao = new Localizacao($data);
+        $old_localizacao = new Localizacao();
+        $old_localizacao->setClienteID($localizacao->getClienteID());
+        $localizacao->filter($old_localizacao, app()->auth->provider, $localized);
+        $estado_id = $data['estadoid'] ?? null;
         $estado = \MZ\Location\Estado::findByID($estado_id);
-        $cidade_id = $this->getRequest()->request->get('cidade');
+        $cidade_id = $data['cidade'] ?? null;
         $cidade = \MZ\Location\Cidade::findOrInsert($estado->getID(), $cidade_id);
-        $bairro_id = $this->getRequest()->request->get('bairro');
+        $bairro_id = $data['bairro'] ?? null;
         $bairro = \MZ\Location\Bairro::findOrInsert($cidade->getID(), $bairro_id);
         $localizacao->setBairroID($bairro->getID());
         $localizacao->insert();
@@ -89,20 +92,16 @@ class LocalizacaoApiController extends \MZ\Core\ApiController
         $data = $this->getData($old_localizacao->toArray());
         $localizacao = new Localizacao($data);
         $localizacao->filter($old_localizacao, app()->auth->provider, $localized);
-        $estado_id = $this->getRequest()->request->get('estadoid');
+        $estado_id = $data['estadoid'] ?? null;
         $estado = \MZ\Location\Estado::findByID($estado_id);
-        $cidade_id = $this->getRequest()->request->get('cidade');
+        $cidade_id = $data['cidade'] ?? null;
         $cidade = \MZ\Location\Cidade::findOrInsert($estado->getID(), $cidade_id);
-        $bairro_id = $this->getRequest()->request->get('bairro');
+        $bairro_id = $data['bairro'] ?? null;
         $bairro = \MZ\Location\Bairro::findOrInsert($cidade->getID(), $bairro_id);
         $localizacao->setBairroID($bairro->getID());
         $localizacao->update();
         $old_localizacao->clean($localizacao);
-        if ($localizacao->getClienteID() == app()->getSystem()->getCompany()->getID() &&
-            !app()->auth->has([Permissao::NOME_ALTERARCONFIGURACOES])
-        ) {
-            return $this->getResponse()->error();
-        }
+        return $this->getResponse()->success(['item' => $localizacao->publish(app()->auth->provider)]);
     }
 
     /**

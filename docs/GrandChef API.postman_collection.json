@@ -1486,17 +1486,17 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{ \"descricao\": \"Pagamento de Fornecedores\" }\n"
+											"raw": "{ \"descricao\": \"Pagamento de Compradores\" }\n"
 										},
 										"url": {
-											"raw": "{{BASE_URL}}/api/classificacoes/{id}",
+											"raw": "{{BASE_URL}}/api/classificacoes/{{ID_CLIENTE}}",
 											"host": [
 												"{{BASE_URL}}"
 											],
 											"path": [
 												"api",
 												"classificacoes",
-												"{id}"
+												"{{ID_CLIENTE}}"
 											]
 										}
 									},
@@ -1514,17 +1514,17 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": ""
+											"raw": "{ \"descricao\": \"Pagamento de Compradores\" }"
 										},
 										"url": {
-											"raw": "{{BASE_URL}}/api/classificacoes/",
+											"raw": "{{BASE_URL}}/api/classificacoes/{{ID_CLIENTE}}",
 											"host": [
 												"{{BASE_URL}}"
 											],
 											"path": [
 												"api",
 												"classificacoes",
-												""
+												"{{ID_CLIENTE}}"
 											]
 										}
 									},
@@ -1578,7 +1578,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{ \"tipo\": \"Fisica\",\n  \"nome\": \"Teste\",\n  \"senha\": \"123456\",\n  \"genero\": \"Masculino\",\n  \"email\": \"teste@gmail.com\"\n}"
+											"raw": "{ \n  \"tipo\": \"Juridica\",\n  \"nome\": \"Teste\",\n  \"senha\": \"123456\",\n  \"genero\": \"Masculino\",\n  \"email\": \"testee@gmail.com\",\n  \"aceitar\": \"true\",\n  \"confirmarsenha\": \"123456\"\n}"
 										},
 										"url": {
 											"raw": "{{BASE_URL}}/api/clientes",
@@ -1615,7 +1615,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{ \"tipo\": \"Juridica\",\n  \"nome\": \"Test\",\n  \"senha\": \"12345\",\n  \"genero\": \"Feminino\",\n  \"email\": \"test@gmail.com\"\n}"
+											"raw": "{ \n  \"tipo\": \"Juridica\",\n  \"nome\": \"Test\",\n  \"senha\": \"12345\",\n  \"genero\": \"Feminino\",\n  \"email\": \"test@gmail.com\",\n  \"confirmarsenha\": \"12345\"\n  \n}"
 										},
 										"url": {
 											"raw": "{{BASE_URL}}/api/clientes/{{ID_CLIENTE}}",
@@ -1669,7 +1669,7 @@
 							"description": "",
 							"item": [
 								{
-									"name": "Procurar Conta",
+									"name": "Procurar",
 									"request": {
 										"auth": {
 											"type": "bearer",
@@ -1698,7 +1698,7 @@
 									"response": []
 								},
 								{
-									"name": "Adicionar Conta",
+									"name": "Adicionar",
 									"request": {
 										"auth": {
 											"type": "bearer",
@@ -1719,7 +1719,34 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n  \"tipo\": \"Receita\",\n  \"descricao\": \"Conta a receber\",\n  \"classificacaoid\": \"2\",\n  \"valor\": \"150\"\n}"
+											"raw": "{\n  \"tipo\": \"Receita\",\n  \"descricao\": \"Conta a receber\",\n  \"classificacaoid\": \"3\",\n  \"valor\": \"150\"\n}"
+										},
+										"url": {
+											"raw": "{{BASE_URL}}/api/contas",
+											"host": [
+												"{{BASE_URL}}"
+											],
+											"path": [
+												"api",
+												"contas"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Modificar",
+									"request": {
+										"method": "PATCH",
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n  \"tipo\": \"Receita\",\n  \"descricao\": \"Conta a receber\",\n  \"classificacaoid\": \"3\",\n  \"valor\": \"15\"\n}"
 										},
 										"url": {
 											"raw": "{{BASE_URL}}/api/contas/{{ID_CLIENTE}}",
@@ -1736,40 +1763,28 @@
 									"response": []
 								},
 								{
-									"name": "Modificar Conta",
-									"request": {
-										"method": "PATCH",
-										"header": [],
-										"body": {},
-										"url": {
-											"raw": "{{BASE_URL}}/api/contas/{id}",
-											"host": [
-												"{{BASE_URL}}"
-											],
-											"path": [
-												"api",
-												"contas",
-												"{id}"
-											]
-										}
-									},
-									"response": []
-								},
-								{
-									"name": "Deletar Conta",
+									"name": "Deletar",
 									"request": {
 										"method": "DELETE",
-										"header": [],
-										"body": {},
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n  \"tipo\": \"Receita\",\n  \"descricao\": \"Conta a receber\",\n  \"classificacaoid\": \"3\",\n  \"valor\": \"15\"\n}"
+										},
 										"url": {
-											"raw": "{{BASE_URL}}/api/contas/{id}",
+											"raw": "{{BASE_URL}}/api/contas/{{ID_CLIENTE}}",
 											"host": [
 												"{{BASE_URL}}"
 											],
 											"path": [
 												"api",
 												"contas",
-												"{id}"
+												"{{ID_CLIENTE}}"
 											]
 										}
 									},
@@ -1783,8 +1798,18 @@
 							"description": "",
 							"item": [
 								{
-									"name": "Procurar Credito",
+									"name": "Procurar",
 									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{AUTH_TOKEN}}",
+													"type": "string"
+												}
+											]
+										},
 										"method": "GET",
 										"header": [],
 										"body": {},
@@ -1802,58 +1827,152 @@
 									"response": []
 								},
 								{
-									"name": "Cancelar Credito",
+									"name": "Cancelar",
 									"request": {
-										"method": "GET",
-										"header": [],
-										"body": {},
-										"url": {
-											"raw": "{{BASE_URL}}/api/creditos",
-											"host": [
-												"{{BASE_URL}}"
-											],
-											"path": [
-												"api",
-												"creditos"
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{AUTH_TOKEN}}",
+													"type": "string"
+												}
 											]
-										}
-									},
-									"response": []
-								},
-								{
-									"name": "Adicionar Credito",
-									"request": {
-										"method": "POST",
-										"header": [],
-										"body": {},
-										"url": {
-											"raw": "{{BASE_URL}}/api/creditos",
-											"host": [
-												"{{BASE_URL}}"
-											],
-											"path": [
-												"api",
-												"creditos"
-											]
-										}
-									},
-									"response": []
-								},
-								{
-									"name": "Modificar Credito",
-									"request": {
+										},
 										"method": "PATCH",
-										"header": [],
-										"body": {},
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": ""
+										},
 										"url": {
-											"raw": "{{BASE_URL}}/api/creditos/{id}",
+											"raw": "{{BASE_URL}}/api/creditos/cancel/{{CREDITO_ID}}",
 											"host": [
 												"{{BASE_URL}}"
 											],
 											"path": [
 												"api",
 												"creditos",
-												"{id}"
+												"cancel",
+												"{{CREDITO_ID}}"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Adicionar",
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{AUTH_TOKEN}}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "POST",
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{ \n\t\"valor\": \"100\",\n\t\"detalhes\": \"Credito\"\n}"
+										},
+										"url": {
+											"raw": "{{BASE_URL}}/api/creditos",
+											"host": [
+												"{{BASE_URL}}"
+											],
+											"path": [
+												"api",
+												"creditos"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Modificar",
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{AUTH_TOKEN}}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "PATCH",
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n\t\"valor\": 50,\n    \"detalhes\": \"Credito bonus\",\n    \"cancelado\": \"Y\",\n    \"clienteid\": \"1\"\n}"
+										},
+										"url": {
+											"raw": "{{BASE_URL}}/api/creditos/{{CREDITO_ID}}",
+											"host": [
+												"{{BASE_URL}}"
+											],
+											"path": [
+												"api",
+												"creditos",
+												"{{CREDITO_ID}}"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Deletar",
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{AUTH_TOKEN}}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "DELETE",
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{ \n    \"id\": 12,\n    \"clienteid\": 1\n}"
+										},
+										"url": {
+											"raw": "{{BASE_URL}}/api/creditos/{{CREDITO_ID}}",
+											"host": [
+												"{{BASE_URL}}"
+											],
+											"path": [
+												"api",
+												"creditos",
+												"{{CREDITO_ID}}"
 											]
 										}
 									},
@@ -1869,6 +1988,16 @@
 								{
 									"name": "Procurar",
 									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{AUTH_TOKEN}}",
+													"type": "string"
+												}
+											]
+										},
 										"method": "GET",
 										"header": [],
 										"body": {},
@@ -1888,9 +2017,27 @@
 								{
 									"name": "Adicionar",
 									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{AUTH_TOKEN}}",
+													"type": "string"
+												}
+											]
+										},
 										"method": "POST",
-										"header": [],
-										"body": {},
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n\t\"servico\": \"WhatsApp\",\n\t\"paisid\": \"1\",\n\t\"numero\": \"99999999\",\n\t\"clienteid\": \"1\"\n}"
+										},
 										"url": {
 											"raw": "{{BASE_URL}}/api/telefones",
 											"host": [
@@ -1907,18 +2054,36 @@
 								{
 									"name": "Modificar",
 									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{AUTH_TOKEN}}",
+													"type": "string"
+												}
+											]
+										},
 										"method": "PATCH",
-										"header": [],
-										"body": {},
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n\t\n\t\"servico\": \"Telegran\",\n\t\"paisid\": \"1\",\n\t\"numero\": \"99999999\",\n\t\"clienteid\": \"1\"\n\n}"
+										},
 										"url": {
-											"raw": "{{BASE_URL}}/api/telefones/{id}",
+											"raw": "{{BASE_URL}}/api/telefones/{{TELEFONE_ID}}",
 											"host": [
 												"{{BASE_URL}}"
 											],
 											"path": [
 												"api",
 												"telefones",
-												"{id}"
+												"{{TELEFONE_ID}}"
 											]
 										}
 									},
@@ -1927,18 +2092,36 @@
 								{
 									"name": "Deletar",
 									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{AUTH_TOKEN}}",
+													"type": "string"
+												}
+											]
+										},
 										"method": "DELETE",
-										"header": [],
-										"body": {},
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n\t\"id\": \"1\"\n}"
+										},
 										"url": {
-											"raw": "{{BASE_URL}}/api/telefones/{id}",
+											"raw": "{{BASE_URL}}/api/telefones/{{TELEFONE_ID}}",
 											"host": [
 												"{{BASE_URL}}"
 											],
 											"path": [
 												"api",
 												"telefones",
-												"{id}"
+												"{{TELEFONE_ID}}"
 											]
 										}
 									},
@@ -1967,6 +2150,16 @@
 								{
 									"name": "Procurar",
 									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{AUTH_TOKEN}}",
+													"type": "string"
+												}
+											]
+										},
 										"method": "GET",
 										"header": [],
 										"body": {},
@@ -1986,9 +2179,27 @@
 								{
 									"name": "Adicionar",
 									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{AUTH_TOKEN}}",
+													"type": "string"
+												}
+											]
+										},
 										"method": "POST",
-										"header": [],
-										"body": {},
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n\t\"modo\": \"Funcionamento\",\n\t\"inicio\": \"18:00\",\n\t\"fim\": \"21:00\",\n\t\"menssagem\": \"Estamos fechados\"\n}"
+										},
 										"url": {
 											"raw": "{{BASE_URL}}/api/horarios",
 											"host": [
@@ -2005,18 +2216,36 @@
 								{
 									"name": "Modificar",
 									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{AUTH_TOKEN}}",
+													"type": "string"
+												}
+											]
+										},
 										"method": "PATCH",
-										"header": [],
-										"body": {},
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n\t\"modo\": \"Entrega\",\n\t\"inicio\": \"17:00\",\n\t\"fim\": \"21:00\"\n}"
+										},
 										"url": {
-											"raw": "{{BASE_URL}}/api/horarios/{id}",
+											"raw": "{{BASE_URL}}/api/horarios/{{HORARIO_ID}}",
 											"host": [
 												"{{BASE_URL}}"
 											],
 											"path": [
 												"api",
 												"horarios",
-												"{id}"
+												"{{HORARIO_ID}}"
 											]
 										}
 									},
@@ -2025,18 +2254,36 @@
 								{
 									"name": "Deletar",
 									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{AUTH_TOKEN}}",
+													"type": "string"
+												}
+											]
+										},
 										"method": "DELETE",
-										"header": [],
-										"body": {},
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n\t\"id\": \"1\"\n}"
+										},
 										"url": {
-											"raw": "{{BASE_URL}}/api/horarios/{id}",
+											"raw": "{{BASE_URL}}/api/horarios/{{HORARIO_ID}}",
 											"host": [
 												"{{BASE_URL}}"
 											],
 											"path": [
 												"api",
 												"horarios",
-												"{id}"
+												"{{HORARIO_ID}}"
 											]
 										}
 									},
@@ -2077,6 +2324,16 @@
 								{
 									"name": "Procurar",
 									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{AUTH_TOKEN}}",
+													"type": "string"
+												}
+											]
+										},
 										"method": "GET",
 										"header": [],
 										"body": {},
@@ -2096,9 +2353,27 @@
 								{
 									"name": "Adicionar",
 									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{AUTH_TOKEN}}",
+													"type": "string"
+												}
+											]
+										},
 										"method": "POST",
-										"header": [],
-										"body": {},
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n\t\"nome\": \"Xiaomi\",\n\t\"descricao\": \"Tablet da cozinha\",\n\t\"setorid\": \"1\",\n\t\"tipo\": \"Tablet\",\n\t\"serial\": \"123456\"\n}"
+										},
 										"url": {
 											"raw": "{{BASE_URL}}/api/dispositivos",
 											"host": [
@@ -2115,18 +2390,36 @@
 								{
 									"name": "Modificar",
 									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{AUTH_TOKEN}}",
+													"type": "string"
+												}
+											]
+										},
 										"method": "PATCH",
-										"header": [],
-										"body": {},
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n\t\"id\": \"2\",\n\t\"nome\": \"Androide\",\n\t\"descricao\": \"Tablet da cozinha\",\n\t\"setorid\": \"1\",\n\t\"tipo\": \"Tablet\",\n\t\"serial\": \"123456\"\n}"
+										},
 										"url": {
-											"raw": "{{BASE_URL}}/api/dispositivos/{id}",
+											"raw": "{{BASE_URL}}/api/dispositivos/{{DISPOSITIVO_ID}}",
 											"host": [
 												"{{BASE_URL}}"
 											],
 											"path": [
 												"api",
 												"dispositivos",
-												"{id}"
+												"{{DISPOSITIVO_ID}}"
 											]
 										}
 									},
@@ -2135,18 +2428,36 @@
 								{
 									"name": "Deletar",
 									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{AUTH_TOKEN}}",
+													"type": "string"
+												}
+											]
+										},
 										"method": "DELETE",
-										"header": [],
-										"body": {},
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n\t\"id\": \"2\"\n}"
+										},
 										"url": {
-											"raw": "{{BASE_URL}}/api/dispositivos/{id}",
+											"raw": "{{BASE_URL}}/api/dispositivos/{{DISPOSITIVO_ID}}",
 											"host": [
 												"{{BASE_URL}}"
 											],
 											"path": [
 												"api",
 												"dispositivos",
-												"{id}"
+												"{{DISPOSITIVO_ID}}"
 											]
 										}
 									},
@@ -2169,6 +2480,16 @@
 								{
 									"name": "Procurar",
 									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{AUTH_TOKEN}}",
+													"type": "string"
+												}
+											]
+										},
 										"method": "GET",
 										"header": [],
 										"body": {},
@@ -2188,9 +2509,27 @@
 								{
 									"name": "Adicionar",
 									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{AUTH_TOKEN}}",
+													"type": "string"
+												}
+											]
+										},
 										"method": "POST",
-										"header": [],
-										"body": {},
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n\t\"numero\": \"11\",\n\t\"nome\": \"Mesa 11\",\n\t\"ativa\": \"Y\"\n}"
+										},
 										"url": {
 											"raw": "{{BASE_URL}}/api/mesas",
 											"host": [
@@ -2207,18 +2546,36 @@
 								{
 									"name": "Modificar",
 									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{AUTH_TOKEN}}",
+													"type": "string"
+												}
+											]
+										},
 										"method": "PATCH",
-										"header": [],
-										"body": {},
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n\t\"numero\": \"11\",\n\t\"nome\": \"Mesa 11\",\n\t\"ativa\": \"Y\"\n}"
+										},
 										"url": {
-											"raw": "{{BASE_URL}}/api/mesas/{id}",
+											"raw": "{{BASE_URL}}/api/mesas/{{MESA_ID}}",
 											"host": [
 												"{{BASE_URL}}"
 											],
 											"path": [
 												"api",
 												"mesas",
-												"{id}"
+												"{{MESA_ID}}"
 											]
 										}
 									},
@@ -2227,18 +2584,36 @@
 								{
 									"name": "Deletar",
 									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{AUTH_TOKEN}}",
+													"type": "string"
+												}
+											]
+										},
 										"method": "DELETE",
-										"header": [],
-										"body": {},
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n\t\"id\": \"13\"\n}"
+										},
 										"url": {
-											"raw": "{{BASE_URL}}/api/mesas/{id}",
+											"raw": "{{BASE_URL}}/api/mesas/{{MESA_ID}}",
 											"host": [
 												"{{BASE_URL}}"
 											],
 											"path": [
 												"api",
 												"mesas",
-												"{id}"
+												"{{MESA_ID}}"
 											]
 										}
 									},
@@ -2254,6 +2629,16 @@
 								{
 									"name": "Procurar",
 									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{AUTH_TOKEN}}",
+													"type": "string"
+												}
+											]
+										},
 										"method": "GET",
 										"header": [],
 										"body": {},
@@ -2274,8 +2659,16 @@
 									"name": "Adicionar",
 									"request": {
 										"method": "POST",
-										"header": [],
-										"body": {},
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n\t\"empresaid\": \"1\",\n\t\"numero\": \"1\",\n\t\"descricao\": \"Cadeira\",\n\t\"quantidade\": \"3\",\n\t\"altura\": \"1.60\",\n\t\"largura\": \"0.80\",\n\t\"estado\": \"Ruim\"\n}"
+										},
 										"url": {
 											"raw": "{{BASE_URL}}/api/patrimonios",
 											"host": [
@@ -2292,18 +2685,36 @@
 								{
 									"name": "Modificar",
 									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{AUTH_TOKEN}}",
+													"type": "string"
+												}
+											]
+										},
 										"method": "PATCH",
-										"header": [],
-										"body": {},
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n\t\"empresaid\": \"1\",\n\t\"numero\": \"1\",\n\t\"descricao\": \"Cadeira\",\n\t\"quantidade\": \"3\",\n\t\"altura\": \"1.60\",\n\t\"largura\": \"0.80\",\n\t\"estado\": \"Conservado\"\n}"
+										},
 										"url": {
-											"raw": "{{BASE_URL}}/api/patrimonios/{id}",
+											"raw": "{{BASE_URL}}/api/patrimonios/{{PATRIMONIO_ID}}",
 											"host": [
 												"{{BASE_URL}}"
 											],
 											"path": [
 												"api",
 												"patrimonios",
-												"{id}"
+												"{{PATRIMONIO_ID}}"
 											]
 										}
 									},
@@ -2312,18 +2723,36 @@
 								{
 									"name": "Deletar",
 									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{AUTH_TOKEN}}",
+													"type": "string"
+												}
+											]
+										},
 										"method": "DELETE",
-										"header": [],
-										"body": {},
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n\t\"id\": \"1\"\n}"
+										},
 										"url": {
-											"raw": "{{BASE_URL}}/api/patrimonios/{id}",
+											"raw": "{{BASE_URL}}/api/patrimonios/{{PATRIMONIO_ID}}",
 											"host": [
 												"{{BASE_URL}}"
 											],
 											"path": [
 												"api",
 												"patrimonios",
-												"{id}"
+												"{{PATRIMONIO_ID}}"
 											]
 										}
 									},
@@ -2339,6 +2768,16 @@
 								{
 									"name": "Procurar",
 									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{AUTH_TOKEN}}",
+													"type": "string"
+												}
+											]
+										},
 										"method": "GET",
 										"header": [],
 										"body": {},
@@ -2358,9 +2797,27 @@
 								{
 									"name": "Adicionar",
 									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{AUTH_TOKEN}}",
+													"type": "string"
+												}
+											]
+										},
 										"method": "POST",
-										"header": [],
-										"body": {},
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n\t\"nome\": \"Barbearia\",\n\t\"descricao\": \"Barbearia\"\n}"
+										},
 										"url": {
 											"raw": "{{BASE_URL}}/api/setores",
 											"host": [
@@ -2377,18 +2834,36 @@
 								{
 									"name": "Modificar",
 									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{AUTH_TOKEN}}",
+													"type": "string"
+												}
+											]
+										},
 										"method": "PATCH",
-										"header": [],
-										"body": {},
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n\t\"nome\": \"Barba\",\n\t\"descricao\": \"Barbearia\"\n}"
+										},
 										"url": {
-											"raw": "{{BASE_URL}}/api/setores/{id}",
+											"raw": "{{BASE_URL}}/api/setores/{{SETOR_ID}}",
 											"host": [
 												"{{BASE_URL}}"
 											],
 											"path": [
 												"api",
 												"setores",
-												"{id}"
+												"{{SETOR_ID}}"
 											]
 										}
 									},
@@ -2397,18 +2872,36 @@
 								{
 									"name": "Deletar",
 									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{AUTH_TOKEN}}",
+													"type": "string"
+												}
+											]
+										},
 										"method": "DELETE",
-										"header": [],
-										"body": {},
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": ""
+										},
 										"url": {
-											"raw": "{{BASE_URL}}/api/setores/{id}",
+											"raw": "{{BASE_URL}}/api/setores/{{SETOR_ID}}",
 											"host": [
 												"{{BASE_URL}}"
 											],
 											"path": [
 												"api",
 												"setores",
-												"{id}"
+												"{{SETOR_ID}}"
 											]
 										}
 									},
@@ -2455,6 +2948,16 @@
 								{
 									"name": "Procurar",
 									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{AUTH_TOKEN}}",
+													"type": "string"
+												}
+											]
+										},
 										"method": "GET",
 										"header": [],
 										"body": {},
@@ -2474,9 +2977,27 @@
 								{
 									"name": "Adicionar",
 									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{AUTH_TOKEN}}",
+													"type": "string"
+												}
+											]
+										},
 										"method": "POST",
-										"header": [],
-										"body": {},
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n\t\"cidadeid\": \"1\",\n\t\"nome\": \"Jardin Iguacu\",\n\t\"valorentrega\": \"5\",\n\t\"mapeado\": \"Y\"\n}"
+										},
 										"url": {
 											"raw": "{{BASE_URL}}/api/bairros",
 											"host": [
@@ -2493,18 +3014,36 @@
 								{
 									"name": "Modificar",
 									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{AUTH_TOKEN}}",
+													"type": "string"
+												}
+											]
+										},
 										"method": "PATCH",
-										"header": [],
-										"body": {},
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n\t\"nome\": \"Jadin Ouro Branco\",\n\t\"valorentrega\": \"4\"\n}"
+										},
 										"url": {
-											"raw": "{{BASE_URL}}/api/bairros/{id}",
+											"raw": "{{BASE_URL}}/api/bairros/{{BAIRRO_ID}}",
 											"host": [
 												"{{BASE_URL}}"
 											],
 											"path": [
 												"api",
 												"bairros",
-												"{id}"
+												"{{BAIRRO_ID}}"
 											]
 										}
 									},
@@ -2513,18 +3052,36 @@
 								{
 									"name": "Deletar",
 									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{AUTH_TOKEN}}",
+													"type": "string"
+												}
+											]
+										},
 										"method": "DELETE",
-										"header": [],
-										"body": {},
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": ""
+										},
 										"url": {
-											"raw": "{{BASE_URL}}/api/bairros/{id}",
+											"raw": "{{BASE_URL}}/api/bairros/{{BAIRRO_ID}}",
 											"host": [
 												"{{BASE_URL}}"
 											],
 											"path": [
 												"api",
 												"bairros",
-												"{id}"
+												"{{BAIRRO_ID}}"
 											]
 										}
 									},
@@ -2540,6 +3097,16 @@
 								{
 									"name": "Procurar",
 									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{AUTH_TOKEN}}",
+													"type": "string"
+												}
+											]
+										},
 										"method": "GET",
 										"header": [],
 										"body": {},
@@ -2559,9 +3126,27 @@
 								{
 									"name": "Adicionar",
 									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{AUTH_TOKEN}}",
+													"type": "string"
+												}
+											]
+										},
 										"method": "POST",
-										"header": [],
-										"body": {},
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n\t\"nome\": \"Maringa\",\n\t\"estadoid\": \"1\"\n}"
+										},
 										"url": {
 											"raw": "{{BASE_URL}}/api/cidades",
 											"host": [
@@ -2578,18 +3163,36 @@
 								{
 									"name": "Modificar",
 									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{AUTH_TOKEN}}",
+													"type": "string"
+												}
+											]
+										},
 										"method": "PATCH",
-										"header": [],
-										"body": {},
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n\t\"nome\": \"Paranavai\",\n\t\"estadoid\": \"2\"\n}"
+										},
 										"url": {
-											"raw": "{{BASE_URL}}/api/cidades/{id}",
+											"raw": "{{BASE_URL}}/api/cidades/{{CIDADE_ID}}",
 											"host": [
 												"{{BASE_URL}}"
 											],
 											"path": [
 												"api",
 												"cidades",
-												"{id}"
+												"{{CIDADE_ID}}"
 											]
 										}
 									},
@@ -2598,18 +3201,28 @@
 								{
 									"name": "Deletar",
 									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{AUTH_TOKEN}}",
+													"type": "string"
+												}
+											]
+										},
 										"method": "DELETE",
 										"header": [],
 										"body": {},
 										"url": {
-											"raw": "{{BASE_URL}}/api/cidades/{id}",
+											"raw": "{{BASE_URL}}/api/cidades/{{CIDADE_ID}}",
 											"host": [
 												"{{BASE_URL}}"
 											],
 											"path": [
 												"api",
 												"cidades",
-												"{id}"
+												"{{CIDADE_ID}}"
 											]
 										}
 									},
@@ -2644,9 +3257,27 @@
 								{
 									"name": "Adicionar",
 									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{AUTH_TOKEN}}",
+													"type": "string"
+												}
+											]
+										},
 										"method": "POST",
-										"header": [],
-										"body": {},
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n\t\"cidadeid\": \"1\",\n\t\"bairroid\": \"3\",\n\t\"logradouro\": \"Guerino Pomin\",\n\t\"cep\": \"87705390\"\n}"
+										},
 										"url": {
 											"raw": "{{BASE_URL}}/api/enderecos",
 											"host": [
@@ -2664,17 +3295,25 @@
 									"name": "Modificar",
 									"request": {
 										"method": "PATCH",
-										"header": [],
-										"body": {},
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n\t\"logradouro\": \"Guerino Pomin\",\n\t\"cep\": \"87705390\"\n}"
+										},
 										"url": {
-											"raw": "{{BASE_URL}}/api/enderecos/{id}",
+											"raw": "{{BASE_URL}}/api/enderecos/{{BAIRRO_ID}}",
 											"host": [
 												"{{BASE_URL}}"
 											],
 											"path": [
 												"api",
 												"enderecos",
-												"{id}"
+												"{{BAIRRO_ID}}"
 											]
 										}
 									},
@@ -2683,18 +3322,28 @@
 								{
 									"name": "Deletar",
 									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{AUTH_TOKEN}}",
+													"type": "string"
+												}
+											]
+										},
 										"method": "DELETE",
 										"header": [],
 										"body": {},
 										"url": {
-											"raw": "{{BASE_URL}}/api/enderecos/{id}",
+											"raw": "{{BASE_URL}}/api/enderecos/{{ENDERECO_ID}}",
 											"host": [
 												"{{BASE_URL}}"
 											],
 											"path": [
 												"api",
 												"enderecos",
-												"{id}"
+												"{{ENDERECO_ID}}"
 											]
 										}
 									},
@@ -2710,6 +3359,16 @@
 								{
 									"name": "Procurar",
 									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{AUTH_TOKEN}}",
+													"type": "string"
+												}
+											]
+										},
 										"method": "GET",
 										"header": [],
 										"body": {},
@@ -2729,9 +3388,27 @@
 								{
 									"name": "Adicionar",
 									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{AUTH_TOKEN}}",
+													"type": "string"
+												}
+											]
+										},
 										"method": "POST",
-										"header": [],
-										"body": {},
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n\t\"paisid\": \"1\",\n\t\"nome\": \"Parana\",\n\t\"uf\": \"PR\"\n}"
+										},
 										"url": {
 											"raw": "{{BASE_URL}}/api/estados",
 											"host": [
@@ -2748,18 +3425,36 @@
 								{
 									"name": "Modificar",
 									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{AUTH_TOKEN}}",
+													"type": "string"
+												}
+											]
+										},
 										"method": "PATCH",
-										"header": [],
-										"body": {},
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n\t\"nome\": \"Paraná\"\n}"
+										},
 										"url": {
-											"raw": "{{BASE_URL}}/api/estados/{id}",
+											"raw": "{{BASE_URL}}/api/estados/{{ESTADO_ID}}",
 											"host": [
 												"{{BASE_URL}}"
 											],
 											"path": [
 												"api",
 												"estados",
-												"{id}"
+												"{{ESTADO_ID}}"
 											]
 										}
 									},
@@ -2768,18 +3463,36 @@
 								{
 									"name": "Deletar",
 									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{AUTH_TOKEN}}",
+													"type": "string"
+												}
+											]
+										},
 										"method": "DELETE",
-										"header": [],
-										"body": {},
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n\t\"nome\": \"Paraná\"\n}"
+										},
 										"url": {
-											"raw": "{{BASE_URL}}/api/estados/{id}",
+											"raw": "{{BASE_URL}}/api/estados/{{ESTADO_ID}}",
 											"host": [
 												"{{BASE_URL}}"
 											],
 											"path": [
 												"api",
 												"estados",
-												"{id}"
+												"{{ESTADO_ID}}"
 											]
 										}
 									},
@@ -2795,6 +3508,16 @@
 								{
 									"name": "Procurar",
 									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{AUTH_TOKEN}}",
+													"type": "string"
+												}
+											]
+										},
 										"method": "GET",
 										"header": [],
 										"body": {},
@@ -2814,9 +3537,27 @@
 								{
 									"name": "Adicionar",
 									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{AUTH_TOKEN}}",
+													"type": "string"
+												}
+											]
+										},
 										"method": "POST",
-										"header": [],
-										"body": {},
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n\t\"clienteid\": \"1\",\n\t\"bairro\": \"Jardin Iguacu\",\n\t\"logradouro\": \"Guerino Pomin\",\n\t\"tipo\": \"Casa\",\n\t\"estadoid\": \"1\",\n\t\"cidade\": \"Paranavai\",\n\t\"numero\": \"415\"\n}"
+										},
 										"url": {
 											"raw": "{{BASE_URL}}/api/localizacoes",
 											"host": [
@@ -2834,17 +3575,25 @@
 									"name": "Modificar",
 									"request": {
 										"method": "PATCH",
-										"header": [],
-										"body": {},
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n\t\"clienteid\": \"1\",\n\t\"bairro\": \"Jardin\",\n\t\"logradouro\": \"Guerino Pomin\",\n\t\"tipo\": \"Casa\",\n\t\"estadoid\": \"1\",\n\t\"cidade\": \"Paranavai\",\n\t\"numero\": \"415\"\n}"
+										},
 										"url": {
-											"raw": "{{BASE_URL}}/api/localizacoes/{id}",
+											"raw": "{{BASE_URL}}/api/localizacoes/{{LOCALIZACAO_ID}}",
 											"host": [
 												"{{BASE_URL}}"
 											],
 											"path": [
 												"api",
 												"localizacoes",
-												"{id}"
+												"{{LOCALIZACAO_ID}}"
 											]
 										}
 									},
@@ -2853,18 +3602,28 @@
 								{
 									"name": "Deletar",
 									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{AUTH_TOKEN}}",
+													"type": "string"
+												}
+											]
+										},
 										"method": "DELETE",
 										"header": [],
 										"body": {},
 										"url": {
-											"raw": "{{BASE_URL}}/api/localizacoes/{id}",
+											"raw": "{{BASE_URL}}/api/localizacoes/{{LOCALIZACAO_ID}}",
 											"host": [
 												"{{BASE_URL}}"
 											],
 											"path": [
 												"api",
 												"localizacoes",
-												"{id}"
+												"{{LOCALIZACAO_ID}}"
 											]
 										}
 									},
@@ -2900,8 +3659,16 @@
 									"name": "Adicionar",
 									"request": {
 										"method": "POST",
-										"header": [],
-										"body": {},
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n\t\"nome\": \"Argentina\",\n\t\"sigla\": \"ARM\",\n\t\"codigo\": \"AR\",\n\t\"moedaid\": \"1\",\n\t\"idioma\": \"arm-ARM\",\n\t\"unitario\": \"N\"\n}"
+										},
 										"url": {
 											"raw": "{{BASE_URL}}/api/paises",
 											"host": [
@@ -2918,18 +3685,36 @@
 								{
 									"name": "Modificar",
 									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{AUTH_TOKEN}}",
+													"type": "string"
+												}
+											]
+										},
 										"method": "PATCH",
-										"header": [],
-										"body": {},
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n\t\"nome\": \"Escocia\",\n\t\"sigla\": \"ESCC\",\n\t\"codigo\": \"ESC\",\n\t\"moedaid\": \"1\",\n\t\"idioma\": \"es-ESC\",\n\t\"unitario\": \"N\"\n}"
+										},
 										"url": {
-											"raw": "{{BASE_URL}}/api/paises/{id}",
+											"raw": "{{BASE_URL}}/api/paises/{{PAIS_ID}}",
 											"host": [
 												"{{BASE_URL}}"
 											],
 											"path": [
 												"api",
 												"paises",
-												"{id}"
+												"{{PAIS_ID}}"
 											]
 										}
 									},
@@ -2938,18 +3723,36 @@
 								{
 									"name": "Deletar",
 									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{AUTH_TOKEN}}",
+													"type": "string"
+												}
+											]
+										},
 										"method": "DELETE",
-										"header": [],
-										"body": {},
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": ""
+										},
 										"url": {
-											"raw": "{{BASE_URL}}/api/paises/{id}",
+											"raw": "{{BASE_URL}}/api/paises/{{PAIS_ID}}",
 											"host": [
 												"{{BASE_URL}}"
 											],
 											"path": [
 												"api",
 												"paises",
-												"{id}"
+												"{{PAIS_ID}}"
 											]
 										}
 									},
@@ -2965,6 +3768,16 @@
 								{
 									"name": "Procurar",
 									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{AUTH_TOKEN}}",
+													"type": "string"
+												}
+											]
+										},
 										"method": "GET",
 										"header": [],
 										"body": {},
@@ -2984,9 +3797,27 @@
 								{
 									"name": "Adicionar",
 									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{AUTH_TOKEN}}",
+													"type": "string"
+												}
+											]
+										},
 										"method": "POST",
-										"header": [],
-										"body": {},
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n\t\"responsavelid\": \"1\",\n\t\"latitude\": \"25\",\n\t\"longitude\": \"80\",\n\t\"quilometragem\": \"80\",\n\t\"distancia\": \"120\",\n\t\"datachegada\": \"13/04/2010\",\n\t\"datasaida\": \"13/04/2010\"\n}"
+										},
 										"url": {
 											"raw": "{{BASE_URL}}/api/viagens",
 											"host": [
@@ -3003,18 +3834,36 @@
 								{
 									"name": "Modificar",
 									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{AUTH_TOKEN}}",
+													"type": "string"
+												}
+											]
+										},
 										"method": "PATCH",
-										"header": [],
-										"body": {},
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n\t\"responsavelid\": \"1\",\n\t\"latitude\": \"70\",\n\t\"longitude\": \"20\",\n\t\"quilometragem\": \"63\",\n\t\"distancia\": \"100\",\n\t\"datachegada\": \"14/04/2010\",\n\t\"datasaida\": \"14/04/2010\"\n}"
+										},
 										"url": {
-											"raw": "{{BASE_URL}}/api/viagens/{id}",
+											"raw": "{{BASE_URL}}/api/viagens/{{VIAGEM_ID}}",
 											"host": [
 												"{{BASE_URL}}"
 											],
 											"path": [
 												"api",
 												"viagens",
-												"{id}"
+												"{{VIAGEM_ID}}"
 											]
 										}
 									},
@@ -3023,18 +3872,28 @@
 								{
 									"name": "Deletar",
 									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{AUTH_TOKEN}}",
+													"type": "string"
+												}
+											]
+										},
 										"method": "DELETE",
 										"header": [],
 										"body": {},
 										"url": {
-											"raw": "{{BASE_URL}}/api/viagens/{id}",
+											"raw": "{{BASE_URL}}/api/viagens/{{VIAGEM_ID}}",
 											"host": [
 												"{{BASE_URL}}"
 											],
 											"path": [
 												"api",
 												"viagens",
-												"{id}"
+												"{{VIAGEM_ID}}"
 											]
 										}
 									},
@@ -3069,9 +3928,27 @@
 								{
 									"name": "Adicionar",
 									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{AUTH_TOKEN}}",
+													"type": "string"
+												}
+											]
+										},
 										"method": "POST",
-										"header": [],
-										"body": {},
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n\t\"bairroid\": \"4\",\n\t\"nome\": \"Sul\"\n}"
+										},
 										"url": {
 											"raw": "{{BASE_URL}}/api/zonas",
 											"host": [
@@ -3088,18 +3965,29 @@
 								{
 									"name": "Modificar",
 									"request": {
+										"auth": {
+											"type": "basic"
+										},
 										"method": "PATCH",
-										"header": [],
-										"body": {},
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n\t\"nome\": \"Lest\"\n}"
+										},
 										"url": {
-											"raw": "{{BASE_URL}}/api/zonas/{id}",
+											"raw": "{{BASE_URL}}/api/zonas/{{ZONA_ID}}",
 											"host": [
 												"{{BASE_URL}}"
 											],
 											"path": [
 												"api",
 												"zonas",
-												"{id}"
+												"{{ZONA_ID}}"
 											]
 										}
 									},
@@ -3108,18 +3996,36 @@
 								{
 									"name": "Deletar",
 									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{AUTH_TOKEN}}",
+													"type": "string"
+												}
+											]
+										},
 										"method": "DELETE",
-										"header": [],
-										"body": {},
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": ""
+										},
 										"url": {
-											"raw": "{{BASE_URL}}/api/zonas/{id}",
+											"raw": "{{BASE_URL}}/api/zonas/{{ZONA_ID}}",
 											"host": [
 												"{{BASE_URL}}"
 											],
 											"path": [
 												"api",
 												"zonas",
-												"{id}"
+												"{{ZONA_ID}}"
 											]
 										}
 									},
@@ -3152,28 +4058,18 @@
 							"description": "",
 							"item": [
 								{
-									"name": "Associar",
+									"name": "Buscar Associacao",
 									"request": {
-										"method": "GET",
-										"header": [],
-										"body": {},
-										"url": {
-											"raw": "{{BASE_URL}}/api/cartoes/{name}",
-											"host": [
-												"{{BASE_URL}}"
-											],
-											"path": [
-												"api",
-												"cartoes",
-												"{name}"
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{AUTH_TOKEN}}",
+													"type": "string"
+												}
 											]
-										}
-									},
-									"response": []
-								},
-								{
-									"name": "Procurar",
-									"request": {
+										},
 										"method": "GET",
 										"header": [],
 										"body": {},
@@ -3191,11 +4087,83 @@
 									"response": []
 								},
 								{
-									"name": "Adicionar",
+									"name": "Associacao",
 									"request": {
-										"method": "POST",
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{AUTH_TOKEN}}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "PATCH",
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": ""
+										},
+										"url": {
+											"raw": "{{BASE_URL}}/api/cartoes/{{CARTAO_ID}}",
+											"host": [
+												"{{BASE_URL}}"
+											],
+											"path": [
+												"api",
+												"cartoes",
+												"{{CARTAO_ID}}"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Procurar",
+									"request": {
+										"method": "GET",
 										"header": [],
 										"body": {},
+										"url": {
+											"raw": "/api/cartoes",
+											"path": [
+												"api",
+												"cartoes"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Adicionar",
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{AUTH_TOKEN}}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "POST",
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n\t\"formapagtoid\": \"1\",\n\t\"bandeira\": \"Elo\",\n\t\"taxa\": \"0\"\n}"
+										},
 										"url": {
 											"raw": "{{BASE_URL}}/api/cartoes",
 											"host": [
@@ -3212,18 +4180,36 @@
 								{
 									"name": "Modificar",
 									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{AUTH_TOKEN}}",
+													"type": "string"
+												}
+											]
+										},
 										"method": "PATCH",
-										"header": [],
-										"body": {},
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n\t\"formapagtoid\": \"1\",\n\t\"bandeira\": \"Master Card\"\n}"
+										},
 										"url": {
-											"raw": "{{BASE_URL}}/api/cartoes/{id}",
+											"raw": "{{BASE_URL}}/api/cartoes/{{CARTAO_ID}}",
 											"host": [
 												"{{BASE_URL}}"
 											],
 											"path": [
 												"api",
 												"cartoes",
-												"{id}"
+												"{{CARTAO_ID}}"
 											]
 										}
 									},
@@ -3232,18 +4218,36 @@
 								{
 									"name": "Deletar",
 									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{AUTH_TOKEN}}",
+													"type": "string"
+												}
+											]
+										},
 										"method": "DELETE",
-										"header": [],
-										"body": {},
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": ""
+										},
 										"url": {
-											"raw": "{{BASE_URL}}/api/cartoes/{id}",
+											"raw": "{{BASE_URL}}/api/cartoes/{{CARTAO_ID}}",
 											"host": [
 												"{{BASE_URL}}"
 											],
 											"path": [
 												"api",
 												"cartoes",
-												"{id}"
+												"{{CARTAO_ID}}"
 											]
 										}
 									},
@@ -3259,6 +4263,16 @@
 								{
 									"name": "Procurar",
 									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{AUTH_TOKEN}}",
+													"type": "string"
+												}
+											]
+										},
 										"method": "GET",
 										"header": [],
 										"body": {},
@@ -3278,9 +4292,27 @@
 								{
 									"name": "Adicionar",
 									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{AUTH_TOKEN}}",
+													"type": "string"
+												}
+											]
+										},
 										"method": "POST",
-										"header": [],
-										"body": {},
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n\t\"clienteid\": \"1\",\n\t\"bancoid\": \"1\",\n\t\"agencia\": \"1\",\n\t\"conta\": \"1\",\n\t\"numero\": \"400\",\n\t\"vencimento\": \"13/06/2019\"\n}"
+										},
 										"url": {
 											"raw": "{{BASE_URL}}/api/cheques",
 											"host": [
@@ -3297,18 +4329,36 @@
 								{
 									"name": "Modificar",
 									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{AUTH_TOKEN}}",
+													"type": "string"
+												}
+											]
+										},
 										"method": "PATCH",
-										"header": [],
-										"body": {},
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n\t\"clienteid\": \"1\",\n\t\"bancodi\":\"1\",\n\t\"agencia\": \"1\",\n\t\"conta\": \"1\",\n\t\"numero\": \"300\",\n\t\"vencimento\": \"14/06/2019\"\n}"
+										},
 										"url": {
-											"raw": "{{BASE_URL}}/api/cheques/{id}",
+											"raw": "{{BASE_URL}}/api/cheques/{{CHEQUE_ID}}",
 											"host": [
 												"{{BASE_URL}}"
 											],
 											"path": [
 												"api",
 												"cheques",
-												"{id}"
+												"{{CHEQUE_ID}}"
 											]
 										}
 									},
@@ -3317,18 +4367,28 @@
 								{
 									"name": "Deletar",
 									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{AUTH_TOKEN}}",
+													"type": "string"
+												}
+											]
+										},
 										"method": "DELETE",
 										"header": [],
 										"body": {},
 										"url": {
-											"raw": "{{BASE_URL}}/api/cheques/{id}",
+											"raw": "{{BASE_URL}}/api/cheques/{{CHEQUE_ID}}",
 											"host": [
 												"{{BASE_URL}}"
 											],
 											"path": [
 												"api",
 												"cheques",
-												"{id}"
+												"{{CHEQUE_ID}}"
 											]
 										}
 									},
@@ -3344,6 +4404,16 @@
 								{
 									"name": "Procurar",
 									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{AUTH_TOKEN}}",
+													"type": "string"
+												}
+											]
+										},
 										"method": "GET",
 										"header": [],
 										"body": {},
@@ -3364,8 +4434,16 @@
 									"name": "Adicionar",
 									"request": {
 										"method": "POST",
-										"header": [],
-										"body": {},
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n\t\"tipo\": \"Crediario\",\n\t\"integracaoid\": \"1\",\n\t\"carteiraid\": \"1\",\n\t\"descricao\": \"Testando Api\",\n\t\"minparcelas\": \"1\",\n\t\"maxparcelas\": \"1\",\n\t\"parcelassemjuros\": \"1\",\n\t\"juros\": \"5.0\",\n\t\"ativa\": \"Y\"\n}"
+										},
 										"url": {
 											"raw": "{{BASE_URL}}/api/formas_de_pagamento",
 											"host": [
@@ -3382,18 +4460,36 @@
 								{
 									"name": "Modificar",
 									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{AUTH_TOKEN}}",
+													"type": "string"
+												}
+											]
+										},
 										"method": "PATCH",
-										"header": [],
-										"body": {},
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n\t\"tipo\": \"Saldo\",\n\t\"integracaoid\": \"1\",\n\t\"carteiraid\": \"1\",\n\t\"descricao\": \"Testando Api\",\n\t\"minparcelas\": \"1\",\n\t\"maxparcelas\": \"1\",\n\t\"parcelassemjuros\": \"1\",\n\t\"juros\": \"5.0\",\n\t\"ativa\": \"Y\"\n}"
+										},
 										"url": {
-											"raw": "{{BASE_URL}}/api/formas_de_pagamento/{id}",
+											"raw": "{{BASE_URL}}/api/formas_de_pagamento/{{FORMAPAGTO_ID}}",
 											"host": [
 												"{{BASE_URL}}"
 											],
 											"path": [
 												"api",
 												"formas_de_pagamento",
-												"{id}"
+												"{{FORMAPAGTO_ID}}"
 											]
 										}
 									},
@@ -3402,18 +4498,28 @@
 								{
 									"name": "Deletar",
 									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{AUTH_TOKEN}}",
+													"type": "string"
+												}
+											]
+										},
 										"method": "DELETE",
 										"header": [],
 										"body": {},
 										"url": {
-											"raw": "{{BASE_URL}}/api/formas_de_pagamento/{id}",
+											"raw": "{{BASE_URL}}/api/formas_de_pagamento/{{FORMAPAGTO_ID}}",
 											"host": [
 												"{{BASE_URL}}"
 											],
 											"path": [
 												"api",
 												"formas_de_pagamento",
-												"{id}"
+												"{{FORMAPAGTO_ID}}"
 											]
 										}
 									},
@@ -3436,6 +4542,16 @@
 								{
 									"name": "Procurar",
 									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{AUTH_TOKEN}}",
+													"type": "string"
+												}
+											]
+										},
 										"method": "GET",
 										"header": [],
 										"body": {},
@@ -3455,9 +4571,27 @@
 								{
 									"name": "Adicionar",
 									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{AUTH_TOKEN}}",
+													"type": "string"
+												}
+											]
+										},
 										"method": "POST",
-										"header": [],
-										"body": {},
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n\t\"categoriaid\": \"1\",\n\t\"descricao\": \"Massa de pao\",\n\t\"detalhes\": \"Leite sem lactose\",\n\t\"servico\": \"N\",\n\t\"ordem\": \"5\",\n\t\"dataatualizacao\": \"13/04/2019\",\n\t\"dataarquivo\": \"14/04/2019\"\n}"
+										},
 										"url": {
 											"raw": "{{BASE_URL}}/api/categorias",
 											"host": [
@@ -3474,18 +4608,36 @@
 								{
 									"name": "Modificar",
 									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{AUTH_TOKEN}}",
+													"type": "string"
+												}
+											]
+										},
 										"method": "PATCH",
-										"header": [],
-										"body": {},
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n\t\"descricao\": \"Massa\"\n}"
+										},
 										"url": {
-											"raw": "{{BASE_URL}}/api/categorias/{id}",
+											"raw": "{{BASE_URL}}/api/categorias/{{CATEGORIA_ID}}",
 											"host": [
 												"{{BASE_URL}}"
 											],
 											"path": [
 												"api",
 												"categorias",
-												"{id}"
+												"{{CATEGORIA_ID}}"
 											]
 										}
 									},
@@ -3494,18 +4646,28 @@
 								{
 									"name": "Deletar",
 									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{AUTH_TOKEN}}",
+													"type": "string"
+												}
+											]
+										},
 										"method": "DELETE",
 										"header": [],
 										"body": {},
 										"url": {
-											"raw": "{{BASE_URL}}/api/categorias/{id}",
+											"raw": "{{BASE_URL}}/api/categorias/{{CATEGORIA_ID}}",
 											"host": [
 												"{{BASE_URL}}"
 											],
 											"path": [
 												"api",
 												"categorias",
-												"{id}"
+												"{{CATEGORIA_ID}}"
 											]
 										}
 									},
@@ -3521,6 +4683,16 @@
 								{
 									"name": "Procurar",
 									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{AUTH_TOKEN}}",
+													"type": "string"
+												}
+											]
+										},
 										"method": "GET",
 										"header": [],
 										"body": {},
@@ -3540,9 +4712,27 @@
 								{
 									"name": "Adicionar",
 									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{AUTH_TOKEN}}",
+													"type": "string"
+												}
+											]
+										},
 										"method": "POST",
-										"header": [],
-										"body": {},
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n\t\"composicaoid\": \"1\",\n\t\"produtoid\": \"1\",\n\t\"tipo\": \"Composicao\",\n\t\"quantidade\": \"3\",\n\t\"valor\": \"5.0\",\n\t\"quantidademaxima\": \"10\",\n\t\"ativa\": \"Y\"\n}"
+										},
 										"url": {
 											"raw": "{{BASE_URL}}/api/composicoes",
 											"host": [
@@ -3559,18 +4749,36 @@
 								{
 									"name": "Modificar",
 									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{AUTH_TOKEN}}",
+													"type": "string"
+												}
+											]
+										},
 										"method": "PATCH",
-										"header": [],
-										"body": {},
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n\t\"composicaoid\": \"1\",\n\t\"produtoid\": \"1\",\n\t\"tipo\": \"Opcional\",\n\t\"quantidade\": \"2\",\n\t\"valor\": \"10\",\n\t\"quantidademaxima\": \"15\",\n\t\"ativa\": \"Y\"\n}\n"
+										},
 										"url": {
-											"raw": "{{BASE_URL}}/api/composicoes/{id}",
+											"raw": "{{BASE_URL}}/api/composicoes/{{COMPOSICAO_ID}}",
 											"host": [
 												"{{BASE_URL}}"
 											],
 											"path": [
 												"api",
 												"composicoes",
-												"{id}"
+												"{{COMPOSICAO_ID}}"
 											]
 										}
 									},
@@ -3579,18 +4787,28 @@
 								{
 									"name": "Deletar",
 									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{AUTH_TOKEN}}",
+													"type": "string"
+												}
+											]
+										},
 										"method": "DELETE",
 										"header": [],
 										"body": {},
 										"url": {
-											"raw": "{{BASE_URL}}/api/composicoes/{id}",
+											"raw": "{{BASE_URL}}/api/composicoes/{{COMPOSICAO_ID}}",
 											"host": [
 												"{{BASE_URL}}"
 											],
 											"path": [
 												"api",
 												"composicoes",
-												"{id}"
+												"{{COMPOSICAO_ID}}"
 											]
 										}
 									},
@@ -3606,6 +4824,16 @@
 								{
 									"name": "Procurar",
 									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{AUTH_TOKEN}}",
+													"type": "string"
+												}
+											]
+										},
 										"method": "GET",
 										"header": [],
 										"body": {},
@@ -3625,9 +4853,27 @@
 								{
 									"name": "Adicionar",
 									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{AUTH_TOKEN}}",
+													"type": "string"
+												}
+											]
+										},
 										"method": "POST",
-										"header": [],
-										"body": {},
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n\t\"pacoteid\": \"5\",\n\t\"grupoid\": \"2\",\n\t\"produtoid\": \"8\",\n\t\"associacaoid\": \"3\",\n\t\"quantidademinima\": \"0\",\n\t\"quantidademaxima\": \"1\",\n\t\"valor\": 10,\n\t\"visivel\": \"Y\"\n}"
+										},
 										"url": {
 											"raw": "{{BASE_URL}}/api/pacotes",
 											"host": [
@@ -3644,18 +4890,36 @@
 								{
 									"name": "Modificar",
 									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{AUTH_TOKEN}}",
+													"type": "string"
+												}
+											]
+										},
 										"method": "PATCH",
-										"header": [],
-										"body": {},
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"id\": 18,\n    \"pacoteid\": 5,\n    \"grupoid\": 2,\n    \"produtoid\": 8,\n    \"propriedadeid\": null,\n    \"associacaoid\": 3,\n    \"quantidademinima\": 10,\n    \"quantidademaxima\": 20,\n    \"valor\": 20,\n    \"selecionado\": \"Y\",\n    \"visivel\": \"N\",\n    \"dataarquivado\": null\n}"
+										},
 										"url": {
-											"raw": "{{BASE_URL}}/api/pacotes/{id}",
+											"raw": "{{BASE_URL}}/api/pacotes/{{PACOTE_ID}}",
 											"host": [
 												"{{BASE_URL}}"
 											],
 											"path": [
 												"api",
 												"pacotes",
-												"{id}"
+												"{{PACOTE_ID}}"
 											]
 										}
 									},
@@ -3664,18 +4928,28 @@
 								{
 									"name": "Deletar",
 									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{AUTH_TOKEN}}",
+													"type": "string"
+												}
+											]
+										},
 										"method": "DELETE",
 										"header": [],
 										"body": {},
 										"url": {
-											"raw": "{{BASE_URL}}/api/pacotes/{id}",
+											"raw": "{{BASE_URL}}/api/pacotes/{{PACOTE_ID}}",
 											"host": [
 												"{{BASE_URL}}"
 											],
 											"path": [
 												"api",
 												"pacotes",
-												"{id}"
+												"{{PACOTE_ID}}"
 											]
 										}
 									},
@@ -3691,6 +4965,16 @@
 								{
 									"name": "Procurar",
 									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{AUTH_TOKEN}}",
+													"type": "string"
+												}
+											]
+										},
 										"method": "GET",
 										"header": [],
 										"body": {},
@@ -3776,6 +5060,16 @@
 								{
 									"name": "Procurar",
 									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{AUTH_TOKEN}}",
+													"type": "string"
+												}
+											]
+										},
 										"method": "GET",
 										"header": [],
 										"body": {},
@@ -3795,9 +5089,27 @@
 								{
 									"name": "Adicionar",
 									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{AUTH_TOKEN}}",
+													"type": "string"
+												}
+											]
+										},
 										"method": "POST",
-										"header": [],
-										"body": {},
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n\t\"grupoid\": \"2\",\n\t\"nome\": \"Pequeno\",\n\t\"abreviacao\": \"G\"\n}"
+										},
 										"url": {
 											"raw": "{{BASE_URL}}/api/propriedades",
 											"host": [
@@ -3814,18 +5126,36 @@
 								{
 									"name": "Modificar",
 									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{AUTH_TOKEN}}",
+													"type": "string"
+												}
+											]
+										},
 										"method": "PATCH",
-										"header": [],
-										"body": {},
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n\t\"nome\": \"Pequenino\"\n}"
+										},
 										"url": {
-											"raw": "{{BASE_URL}}/api/propriedades/{id}",
+											"raw": "{{BASE_URL}}/api/propriedades/{{PROPRIEDADE_ID}}",
 											"host": [
 												"{{BASE_URL}}"
 											],
 											"path": [
 												"api",
 												"propriedades",
-												"{id}"
+												"{{PROPRIEDADE_ID}}"
 											]
 										}
 									},
@@ -3834,18 +5164,28 @@
 								{
 									"name": "Deletar",
 									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{AUTH_TOKEN}}",
+													"type": "string"
+												}
+											]
+										},
 										"method": "DELETE",
 										"header": [],
 										"body": {},
 										"url": {
-											"raw": "{{BASE_URL}}/api/propriedades/{id}",
+											"raw": "{{BASE_URL}}/api/propriedades/{{PROPRIEDADE_ID}}",
 											"host": [
 												"{{BASE_URL}}"
 											],
 											"path": [
 												"api",
 												"propriedades",
-												"{id}"
+												"{{PROPRIEDADE_ID}}"
 											]
 										}
 									},
@@ -3861,6 +5201,16 @@
 								{
 									"name": "Procurar",
 									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{AUTH_TOKEN}}",
+													"type": "string"
+												}
+											]
+										},
 										"method": "GET",
 										"header": [],
 										"body": {},
@@ -3880,9 +5230,27 @@
 								{
 									"name": "Adicionar",
 									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{AUTH_TOKEN}}",
+													"type": "string"
+												}
+											]
+										},
 										"method": "POST",
-										"header": [],
-										"body": {},
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n\t\"nome\": \"Couver\",\n\t\"descricao\": \"Show Mazin\",\n\t\"detalhes\": \"Participacao de json\",\n\t\"tipo\": \"Evento\",\n\t\"valor\": 50,\n\t\"datainicio\": \"2019-06-13\",\n\t\"datafim\": \"2019-06-14\"\n}"
+										},
 										"url": {
 											"raw": "{{BASE_URL}}/api/servicos",
 											"host": [
@@ -3919,18 +5287,28 @@
 								{
 									"name": "Deletar",
 									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{AUTH_TOKEN}}",
+													"type": "string"
+												}
+											]
+										},
 										"method": "DELETE",
 										"header": [],
 										"body": {},
 										"url": {
-											"raw": "{{BASE_URL}}/api/servicos/{id}",
+											"raw": "{{BASE_URL}}/api/servicos/{{SERVICO_ID}}",
 											"host": [
 												"{{BASE_URL}}"
 											],
 											"path": [
 												"api",
 												"servicos",
-												"{id}"
+												"{{SERVICO_ID}}"
 											]
 										}
 									},
@@ -3946,6 +5324,16 @@
 								{
 									"name": "Procurar",
 									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{AUTH_TOKEN}}",
+													"type": "string"
+												}
+											]
+										},
 										"method": "GET",
 										"header": [],
 										"body": {},
@@ -3965,9 +5353,27 @@
 								{
 									"name": "Adicionar",
 									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{AUTH_TOKEN}}",
+													"type": "string"
+												}
+											]
+										},
 										"method": "POST",
-										"header": [],
-										"body": {},
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n\t\"nome\": \"Quilo\",\n\t\"sigla\": \"kl\"\n}"
+										},
 										"url": {
 											"raw": "{{BASE_URL}}/api/unidades",
 											"host": [
@@ -3984,18 +5390,36 @@
 								{
 									"name": "Modificar",
 									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{AUTH_TOKEN}}",
+													"type": "string"
+												}
+											]
+										},
 										"method": "PATCH",
-										"header": [],
-										"body": {},
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n\t\"nome\": \"Grama\"\n}"
+										},
 										"url": {
-											"raw": "{{BASE_URL}}/api/unidades/{id}",
+											"raw": "{{BASE_URL}}/api/unidades/{{UNIDADE_ID}}",
 											"host": [
 												"{{BASE_URL}}"
 											],
 											"path": [
 												"api",
 												"unidades",
-												"{id}"
+												"{{UNIDADE_ID}}"
 											]
 										}
 									},
@@ -4004,18 +5428,28 @@
 								{
 									"name": "Deletar",
 									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{AUTH_TOKEN}}",
+													"type": "string"
+												}
+											]
+										},
 										"method": "DELETE",
 										"header": [],
 										"body": {},
 										"url": {
-											"raw": "{{BASE_URL}}/api/unidades/{id}",
+											"raw": "{{BASE_URL}}/api/unidades/{{UNIDADE_ID}}",
 											"host": [
 												"{{BASE_URL}}"
 											],
 											"path": [
 												"api",
 												"unidades",
-												"{id}"
+												"{{UNIDADE_ID}}"
 											]
 										}
 									},
@@ -4044,6 +5478,16 @@
 								{
 									"name": "Procurar",
 									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{AUTH_TOKEN}}",
+													"type": "string"
+												}
+											]
+										},
 										"method": "GET",
 										"header": [],
 										"body": {},
@@ -4063,9 +5507,27 @@
 								{
 									"name": "Adicionar",
 									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{AUTH_TOKEN}}",
+													"type": "string"
+												}
+											]
+										},
 										"method": "POST",
-										"header": [],
-										"body": {},
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n\t\"descricao\": \"Proprietario\",\n\t\"remuneracao\": 20000\n}"
+										},
 										"url": {
 											"raw": "{{BASE_URL}}/api/funcoes",
 											"host": [
@@ -4082,18 +5544,36 @@
 								{
 									"name": "Modificar",
 									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{AUTH_TOKEN}}",
+													"type": "string"
+												}
+											]
+										},
 										"method": "PATCH",
-										"header": [],
-										"body": {},
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n\t\"descricao\": \"Aluno\"\n}"
+										},
 										"url": {
-											"raw": "{{BASE_URL}}/api/funcoes/{id}",
+											"raw": "{{BASE_URL}}/api/funcoes/{{FUNCAO_ID}}",
 											"host": [
 												"{{BASE_URL}}"
 											],
 											"path": [
 												"api",
 												"funcoes",
-												"{id}"
+												"{{FUNCAO_ID}}"
 											]
 										}
 									},
@@ -4102,18 +5582,28 @@
 								{
 									"name": "Deletar",
 									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{AUTH_TOKEN}}",
+													"type": "string"
+												}
+											]
+										},
 										"method": "DELETE",
 										"header": [],
 										"body": {},
 										"url": {
-											"raw": "{{BASE_URL}}/api/funcoes/{id}",
+											"raw": "{{BASE_URL}}/api/funcoes/{{FUNCAO_ID}}",
 											"host": [
 												"{{BASE_URL}}"
 											],
 											"path": [
 												"api",
 												"funcoes",
-												"{id}"
+												"{{FUNCAO_ID}}"
 											]
 										}
 									},
@@ -4129,6 +5619,16 @@
 								{
 									"name": "Procurar",
 									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{AUTH_TOKEN}}",
+													"type": "string"
+												}
+											]
+										},
 										"method": "GET",
 										"header": [],
 										"body": {},
@@ -4148,9 +5648,27 @@
 								{
 									"name": "Adicionar",
 									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{AUTH_TOKEN}}",
+													"type": "string"
+												}
+											]
+										},
 										"method": "POST",
-										"header": [],
-										"body": {},
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n\t\"codigo\": \"3\",\n\t\"funcaoid\": \"2\",\n\t\"clienteid\": \"3\",\n\t\"prestadorid\": \"1\",\n\t\"vinculo\": \"Funcionario\",\n    \"porcentagem\": 0,\n    \"pontuacao\": 0,\n    \"remuneracao\": 0\n}"
+										},
 										"url": {
 											"raw": "{{BASE_URL}}/api/prestadores",
 											"host": [
@@ -4167,18 +5685,36 @@
 								{
 									"name": "Modificar",
 									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{AUTH_TOKEN}}",
+													"type": "string"
+												}
+											]
+										},
 										"method": "PATCH",
-										"header": [],
-										"body": {},
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n\t\n\t\"vinculo\": \"Funcionario\"\n}"
+										},
 										"url": {
-											"raw": "{{BASE_URL}}/api/prestadores/{id}",
+											"raw": "{{BASE_URL}}/api/prestadores/{{PRESTADOR_ID}}",
 											"host": [
 												"{{BASE_URL}}"
 											],
 											"path": [
 												"api",
 												"prestadores",
-												"{id}"
+												"{{PRESTADOR_ID}}"
 											]
 										}
 									},
@@ -4187,18 +5723,36 @@
 								{
 									"name": "Deletar",
 									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{AUTH_TOKEN}}",
+													"type": "string"
+												}
+											]
+										},
 										"method": "DELETE",
-										"header": [],
-										"body": {},
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": ""
+										},
 										"url": {
-											"raw": "{{BASE_URL}}/api/prestadores/{id}",
+											"raw": "{{BASE_URL}}/api/prestadores/{{PRESTADOR_ID}}",
 											"host": [
 												"{{BASE_URL}}"
 											],
 											"path": [
 												"api",
 												"prestadores",
-												"{id}"
+												"{{PRESTADOR_ID}}"
 											]
 										}
 									},
@@ -4240,6 +5794,16 @@
 								{
 									"name": "Procurar",
 									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{AUTH_TOKEN}}",
+													"type": "string"
+												}
+											]
+										},
 										"method": "GET",
 										"header": [],
 										"body": {},
@@ -4259,9 +5823,27 @@
 								{
 									"name": "Adicionar",
 									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{AUTH_TOKEN}}",
+													"type": "string"
+												}
+											]
+										},
 										"method": "POST",
-										"header": [],
-										"body": {},
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n\t\"numero\": \"12\",\n\t\"nome\": \"Comanda10\",\n\t\"ativa\": \"Y\"\n}"
+										},
 										"url": {
 											"raw": "{{BASE_URL}}/api/comandas",
 											"host": [
@@ -4278,18 +5860,36 @@
 								{
 									"name": "Modificar",
 									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{AUTH_TOKEN}}",
+													"type": "string"
+												}
+											]
+										},
 										"method": "PATCH",
-										"header": [],
-										"body": {},
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n\t\"nome\": \"Comanda01\"\n}"
+										},
 										"url": {
-											"raw": "{{BASE_URL}}/api/comandas/{id}",
+											"raw": "{{BASE_URL}}/api/comandas/{{COMANDA_ID}}",
 											"host": [
 												"{{BASE_URL}}"
 											],
 											"path": [
 												"api",
 												"comandas",
-												"{id}"
+												"{{COMANDA_ID}}"
 											]
 										}
 									},
@@ -4298,18 +5898,36 @@
 								{
 									"name": "Deletar",
 									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{AUTH_TOKEN}}",
+													"type": "string"
+												}
+											]
+										},
 										"method": "DELETE",
-										"header": [],
-										"body": {},
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": ""
+										},
 										"url": {
-											"raw": "{{BASE_URL}}/api/comandas/{id}",
+											"raw": "{{BASE_URL}}/api/comandas/{{COMANDA_ID}}",
 											"host": [
 												"{{BASE_URL}}"
 											],
 											"path": [
 												"api",
 												"comandas",
-												"{id}"
+												"{{COMANDA_ID}}"
 											]
 										}
 									},
@@ -4325,11 +5943,29 @@
 								{
 									"name": "empregos",
 									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{AUTH_TOKEN}}",
+													"type": "string"
+												}
+											]
+										},
 										"method": "PATCH",
-										"header": [],
-										"body": {},
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n\t\n     \"pedidoid\": \"4\"\n}"
+										},
 										"url": {
-											"raw": "{{BASE_URL}}/api/itens/jobs/{id}",
+											"raw": "{{BASE_URL}}/api/itens/jobs/{{ITEM_ID}}",
 											"host": [
 												"{{BASE_URL}}"
 											],
@@ -4337,7 +5973,7 @@
 												"api",
 												"itens",
 												"jobs",
-												"{id}"
+												"{{ITEM_ID}}"
 											]
 										}
 									},
@@ -4346,6 +5982,16 @@
 								{
 									"name": "desmarque",
 									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{AUTH_TOKEN}}",
+													"type": "string"
+												}
+											]
+										},
 										"method": "PATCH",
 										"header": [],
 										"body": {},
@@ -4362,6 +6008,36 @@
 										}
 									},
 									"response": []
+								},
+								{
+									"name": "Procurar",
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{AUTH_TOKEN}}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "GET",
+										"header": [],
+										"body": {},
+										"url": {
+											"raw": "{{BASE_URL}}/api/itens/find",
+											"host": [
+												"{{BASE_URL}}"
+											],
+											"path": [
+												"api",
+												"itens",
+												"find"
+											]
+										}
+									},
+									"response": []
 								}
 							],
 							"_postman_isSubFolder": true
@@ -4373,9 +6049,27 @@
 								{
 									"name": "Adicionar",
 									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{AUTH_TOKEN}}",
+													"type": "string"
+												}
+											]
+										},
 										"method": "POST",
-										"header": [],
-										"body": {},
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n\t\"mesaid\": \"2\",\n\t\"sessaoid\": \"2\",\n\t\"prestadorid\": \"1\",\n\t\"clienteid\": \"1\",\n\t\"tipo\": \"Mesa\",\n\t\"estado\": \"Ocupada\",\n\t\"servicos\": 20,\n\t\"produtos\": \"1\",\n\t\"comissao\": 0,\n\t\"subtotal\": 25,\n\t\"descontos\": 0,\n\t\"total\": 30,\n\t\"pago\": 0,\n\t\"lancado\": 55,\n\t\"pessoas\": 1,\n\t\"fechadorid\": \"1\",\n\t\"cancelado\": \"N\"\n}"
+										},
 										"url": {
 											"raw": "{{BASE_URL}}/api/pedidos",
 											"host": [
@@ -4392,16 +6086,66 @@
 								{
 									"name": "recibo",
 									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{AUTH_TOKEN}}",
+													"type": "string"
+												}
+											]
+										},
 										"method": "PATCH",
-										"header": [],
-										"body": {},
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"mesaid\": 1,\n    \"sessaoid\": 1,\n    \"prestadorid\": 1,\n    \"clienteid\": 1,\n    \"tipo\": \"Mesa\",\n    \"estado\": \"Fechado\",\n    \"servicos\": 0,\n    \"produtos\": 0,\n    \"comissao\": 0,\n    \"subtotal\": 0,\n    \"descontos\": 0,\n    \"total\": 0,\n    \"pago\": 0,\n    \"lancado\": 0,\n    \"pessoas\": 1,\n    \"fechadorid\": 1,\n    \"cancelado\": \"N\",\n    \"datacriacao\": \"2019-05-08 17:41:55\"\n}"
+										},
 										"url": {
-											"raw": "/api/pedidos/receipt/{id}",
+											"raw": "{{BASE_URL}}/api/pedidos/receipt/{{PEDIDO_ID}}",
+											"host": [
+												"{{BASE_URL}}"
+											],
 											"path": [
 												"api",
 												"pedidos",
 												"receipt",
-												"{id}"
+												"{{PEDIDO_ID}}"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Procurar",
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{AUTH_TOKEN}}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "GET",
+										"header": [],
+										"body": {},
+										"url": {
+											"raw": "{{BASE_URL}}/api/pedidos",
+											"host": [
+												"{{BASE_URL}}"
+											],
+											"path": [
+												"api",
+												"pedidos"
 											]
 										}
 									},
@@ -4443,9 +6187,27 @@
 								{
 									"name": "Adicionar",
 									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{AUTH_TOKEN}}",
+													"type": "string"
+												}
+											]
+										},
 										"method": "POST",
-										"header": [],
-										"body": {},
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n\t\"carteiraid\": \"1\",\n\t\"descricao\": \"Caixa 6\",\n\t\"ativo\": \"Y\"\n}"
+										},
 										"url": {
 											"raw": "{{BASE_URL}}/api/caixas",
 											"host": [
@@ -4463,17 +6225,25 @@
 									"name": "Modificar",
 									"request": {
 										"method": "PATCH",
-										"header": [],
-										"body": {},
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n\t\"descricao\": \"Caixa2\"\n}"
+										},
 										"url": {
-											"raw": "{{BASE_URL}}/api/caixas/{id}",
+											"raw": "{{BASE_URL}}/api/caixas/{{CAIXA_ID}}",
 											"host": [
 												"{{BASE_URL}}"
 											],
 											"path": [
 												"api",
 												"caixas",
-												"{id}"
+												"{{CAIXA_ID}}"
 											]
 										}
 									},
@@ -4482,18 +6252,28 @@
 								{
 									"name": "Deletar",
 									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{AUTH_TOKEN}}",
+													"type": "string"
+												}
+											]
+										},
 										"method": "DELETE",
 										"header": [],
 										"body": {},
 										"url": {
-											"raw": "{{BASE_URL}}/api/caixas/{id}",
+											"raw": "{{BASE_URL}}/api/caixas/{{CAIXA_ID}}",
 											"host": [
 												"{{BASE_URL}}"
 											],
 											"path": [
 												"api",
 												"caixas",
-												"{id}"
+												"{{CAIXA_ID}}"
 											]
 										}
 									},
@@ -4509,6 +6289,16 @@
 								{
 									"name": "Procurar",
 									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{AUTH_TOKEN}}",
+													"type": "string"
+												}
+											]
+										},
 										"method": "GET",
 										"header": [],
 										"body": {},
@@ -4528,9 +6318,27 @@
 								{
 									"name": "Adicionar",
 									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{AUTH_TOKEN}}",
+													"type": "string"
+												}
+											]
+										},
 										"method": "POST",
-										"header": [],
-										"body": {},
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"sessaoid\": 1,\n    \"caixaid\": 5,\n    \"aberta\": \"Y\",\n    \"iniciadorid\": 1\n}"
+										},
 										"url": {
 											"raw": "{{BASE_URL}}/api/movimentacoes",
 											"host": [
@@ -4547,18 +6355,36 @@
 								{
 									"name": "Modificar",
 									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{AUTH_TOKEN}}",
+													"type": "string"
+												}
+											]
+										},
 										"method": "PATCH",
-										"header": [],
-										"body": {},
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n\t\"caixaid\": \"6\"\n}"
+										},
 										"url": {
-											"raw": "{{BASE_URL}}/api/movimentacoes/{id}",
+											"raw": "{{BASE_URL}}/api/movimentacoes/{{MOVIMENTACAO_ID}}",
 											"host": [
 												"{{BASE_URL}}"
 											],
 											"path": [
 												"api",
 												"movimentacoes",
-												"{id}"
+												"{{MOVIMENTACAO_ID}}"
 											]
 										}
 									},
@@ -4567,18 +6393,36 @@
 								{
 									"name": "Deletar",
 									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{AUTH_TOKEN}}",
+													"type": "string"
+												}
+											]
+										},
 										"method": "DELETE",
-										"header": [],
-										"body": {},
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": ""
+										},
 										"url": {
-											"raw": "{{BASE_URL}}/api/movimentacoes/{id}",
+											"raw": "{{BASE_URL}}/api/movimentacoes/{{MOVIMENTACAO_ID}}",
 											"host": [
 												"{{BASE_URL}}"
 											],
 											"path": [
 												"api",
 												"movimentacoes",
-												"{id}"
+												"{{MOVIMENTACAO_ID}}"
 											]
 										}
 									},
@@ -4601,6 +6445,16 @@
 								{
 									"name": "Procurar",
 									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{AUTH_TOKEN}}",
+													"type": "string"
+												}
+											]
+										},
 										"method": "GET",
 										"header": [],
 										"body": {},
@@ -4620,9 +6474,27 @@
 								{
 									"name": "Adicionar",
 									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{AUTH_TOKEN}}",
+													"type": "string"
+												}
+											]
+										},
 										"method": "POST",
-										"header": [],
-										"body": {},
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n\t\"produtoid\": \"1\",\n\t\"setorid\": \"1\",\n\t\"prestadorid\": 1,\n\t\"tipomovimento\": \"Entrada\",\n\t\"quantidade\": \"12\",\n\t\"precocompra\": \"12\",\n\t\"datafabricacao\": \"2019-05-13\",\n\t\"cancelado\": \"N\",\n\t\"datamovimento\": \"2019-05-13\"\n}"
+										},
 										"url": {
 											"raw": "{{BASE_URL}}/api/estoques",
 											"host": [
@@ -4639,18 +6511,36 @@
 								{
 									"name": "Modificar",
 									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{AUTH_TOKEN}}",
+													"type": "string"
+												}
+											]
+										},
 										"method": "PATCH",
-										"header": [],
-										"body": {},
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n\t\"tipomovimento\": \"Consumo\"\n}"
+										},
 										"url": {
-											"raw": "{{BASE_URL}}/api/estoques/{id}",
+											"raw": "{{BASE_URL}}/api/estoques/{{ESTOQUE_ID}}",
 											"host": [
 												"{{BASE_URL}}"
 											],
 											"path": [
 												"api",
 												"estoques",
-												"{id}"
+												"{{ESTOQUE_ID}}"
 											]
 										}
 									},
@@ -4659,18 +6549,28 @@
 								{
 									"name": "Deletar",
 									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{AUTH_TOKEN}}",
+													"type": "string"
+												}
+											]
+										},
 										"method": "DELETE",
 										"header": [],
 										"body": {},
 										"url": {
-											"raw": "{{BASE_URL}}/api/estoques/{id}",
+											"raw": "{{BASE_URL}}/api/estoques/{{ESTOQUE_ID}}",
 											"host": [
 												"{{BASE_URL}}"
 											],
 											"path": [
 												"api",
 												"estoques",
-												"{id}"
+												"{{ESTOQUE_ID}}"
 											]
 										}
 									},
@@ -4686,6 +6586,16 @@
 								{
 									"name": "Procurar",
 									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{AUTH_TOKEN}}",
+													"type": "string"
+												}
+											]
+										},
 										"method": "GET",
 										"header": [],
 										"body": {},
@@ -4705,9 +6615,27 @@
 								{
 									"name": "Adicionar",
 									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{AUTH_TOKEN}}",
+													"type": "string"
+												}
+											]
+										},
 										"method": "POST",
-										"header": [],
-										"body": {},
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n\t\"empresaid\": \"5\",\n\t\"prazopagamento\": \"2019-05-14\",\n\t\"datacadastro\": \"2019-04-13\"\n}"
+										},
 										"url": {
 											"raw": "{{BASE_URL}}/api/fornecedores",
 											"host": [
@@ -4724,18 +6652,36 @@
 								{
 									"name": "Modificador",
 									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{AUTH_TOKEN}}",
+													"type": "string"
+												}
+											]
+										},
 										"method": "PATCH",
-										"header": [],
-										"body": {},
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n\t\"prazopagamento\": \"2019-05-15\"\n}"
+										},
 										"url": {
-											"raw": "{{BASE_URL}}/api/fornecedores/{id}",
+											"raw": "{{BASE_URL}}/api/fornecedores/{{FORNECEDOR_ID}}",
 											"host": [
 												"{{BASE_URL}}"
 											],
 											"path": [
 												"api",
 												"fornecedores",
-												"{id}"
+												"{{FORNECEDOR_ID}}"
 											]
 										}
 									},
@@ -4744,18 +6690,28 @@
 								{
 									"name": "Deletar",
 									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{AUTH_TOKEN}}",
+													"type": "string"
+												}
+											]
+										},
 										"method": "DELETE",
 										"header": [],
 										"body": {},
 										"url": {
-											"raw": "{{BASE_URL}}/api/fornecedores/{id}",
+											"raw": "{{BASE_URL}}/api/fornecedores/{{FORNECEDOR_ID}}",
 											"host": [
 												"{{BASE_URL}}"
 											],
 											"path": [
 												"api",
 												"fornecedores",
-												"{id}"
+												"{{FORNECEDOR_ID}}"
 											]
 										}
 									},
@@ -4778,6 +6734,16 @@
 								{
 									"name": "Procurar",
 									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{AUTH_TOKEN}}",
+													"type": "string"
+												}
+											]
+										},
 										"method": "GET",
 										"header": [],
 										"body": {},
@@ -4797,9 +6763,27 @@
 								{
 									"name": "Adicionar",
 									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{AUTH_TOKEN}}",
+													"type": "string"
+												}
+											]
+										},
 										"method": "POST",
-										"header": [],
-										"body": {},
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n\t\"permissaoid\": \"1\",\n\t\"prestadorid\": \"1\",\n\t\"autorizadorid\": \"1\",\n\t\"prioridade\": \"Baixa\",\n\t\"tipo\": \"Financeiro\",\n\t\"descricao\": \"Conta da empresa\"\n}"
+										},
 										"url": {
 											"raw": "{{BASE_URL}}/api/auditorias",
 											"host": [
@@ -4816,18 +6800,36 @@
 								{
 									"name": "Modificar",
 									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{AUTH_TOKEN}}",
+													"type": "string"
+												}
+											]
+										},
 										"method": "PATCH",
-										"header": [],
-										"body": {},
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n\t\"tipo\": \"Administrativo\"\n}"
+										},
 										"url": {
-											"raw": "{{BASE_URL}}/api/auditorias/{id}",
+											"raw": "{{BASE_URL}}/api/auditorias/{{AUDITORIA_ID}}",
 											"host": [
 												"{{BASE_URL}}"
 											],
 											"path": [
 												"api",
 												"auditorias",
-												"{id}"
+												"{{AUDITORIA_ID}}"
 											]
 										}
 									},
@@ -4836,18 +6838,28 @@
 								{
 									"name": "Deletar",
 									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{AUTH_TOKEN}}",
+													"type": "string"
+												}
+											]
+										},
 										"method": "DELETE",
 										"header": [],
 										"body": {},
 										"url": {
-											"raw": "{{BASE_URL}}/api/auditorias/{id}",
+											"raw": "{{BASE_URL}}/api/auditorias/{{AUDITORIA_ID}}",
 											"host": [
 												"{{BASE_URL}}"
 											],
 											"path": [
 												"api",
 												"auditorias",
-												"{id}"
+												"{{AUDITORIA_ID}}"
 											]
 										}
 									},
@@ -4863,6 +6875,16 @@
 								{
 									"name": "Procurar",
 									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{AUTH_TOKEN}}",
+													"type": "string"
+												}
+											]
+										},
 										"method": "GET",
 										"header": [],
 										"body": {},
@@ -4882,9 +6904,27 @@
 								{
 									"name": "Adicionar",
 									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{AUTH_TOKEN}}",
+													"type": "string"
+												}
+											]
+										},
 										"method": "POST",
-										"header": [],
-										"body": {},
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n\t\"nome\": \"GrandChef\",\n\t\"acessourl\": \"grandchef\",\n\t\"descricao\": \"Modulo de integração com o GrandChef\",\n\t\"inconeurl\": \"/static/img/integracao/grandchef.png\",\n\t\"ativo\": \"N\",\n\t\"dataatualizacao\": \"2019-05-10\"\n}"
+										},
 										"url": {
 											"raw": "{{BASE_URL}}/api/integracoes",
 											"host": [
@@ -4901,18 +6941,36 @@
 								{
 									"name": "Modificar",
 									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{AUTH_TOKEN}}",
+													"type": "string"
+												}
+											]
+										},
 										"method": "PATCH",
-										"header": [],
-										"body": {},
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n\t\"nome\": \"GrandChef\",\n\t\"acessourl\": \"grandchef\",\n\t\"descricao\": \"Modulo de integração com o GrandChef\",\n\t\"iconeurl\": \"/static/img/integracao/grandchef.png\",\n\t\"ativo\": \"N\",\n\t\"dataatualizacao\": \"2019-05-10\"\n}"
+										},
 										"url": {
-											"raw": "{{BASE_URL}}/api/integracoes/{id}",
+											"raw": "{{BASE_URL}}/api/integracoes/{{INTEGRACAO_ID}}",
 											"host": [
 												"{{BASE_URL}}"
 											],
 											"path": [
 												"api",
 												"integracoes",
-												"{id}"
+												"{{INTEGRACAO_ID}}"
 											]
 										}
 									},
@@ -4921,18 +6979,28 @@
 								{
 									"name": "Deletar",
 									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{AUTH_TOKEN}}",
+													"type": "string"
+												}
+											]
+										},
 										"method": "DELETE",
 										"header": [],
 										"body": {},
 										"url": {
-											"raw": "{{BASE_URL}}/api/integracoes/{id}",
+											"raw": "{{BASE_URL}}/api/integracoes/{{INTEGRACAO_ID}}",
 											"host": [
 												"{{BASE_URL}}"
 											],
 											"path": [
 												"api",
 												"integracoes",
-												"{id}"
+												"{{INTEGRACAO_ID}}"
 											]
 										}
 									},
@@ -4948,6 +7016,16 @@
 								{
 									"name": "Procurar",
 									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{AUTH_TOKEN}}",
+													"type": "string"
+												}
+											]
+										},
 										"method": "GET",
 										"header": [],
 										"body": {},
@@ -4967,9 +7045,27 @@
 								{
 									"name": "Adicionar",
 									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{AUTH_TOKEN}}",
+													"type": "string"
+												}
+											]
+										},
 										"method": "POST",
-										"header": [],
-										"body": {},
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n\t\"nome\": \"GrandChef\",\n\t\"descricao\": \"Permitir realizar vendas para a emtrega\",\n\t\"habilitado\": \"Y\"\n}"
+										},
 										"url": {
 											"raw": "{{BASE_URL}}/api/modulos",
 											"host": [
@@ -4987,17 +7083,25 @@
 									"name": "Modificar",
 									"request": {
 										"method": "PATCH",
-										"header": [],
-										"body": {},
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": ""
+										},
 										"url": {
-											"raw": "{{BASE_URL}}/api/modulos/{id}",
+											"raw": "{{BASE_URL}}/api/modulos/{{MODULO_ID}}",
 											"host": [
 												"{{BASE_URL}}"
 											],
 											"path": [
 												"api",
 												"modulos",
-												"{id}"
+												"{{MODULO_ID}}"
 											]
 										}
 									},
@@ -5006,18 +7110,36 @@
 								{
 									"name": "Deletar",
 									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{AUTH_TOKEN}}",
+													"type": "string"
+												}
+											]
+										},
 										"method": "DELETE",
-										"header": [],
-										"body": {},
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": ""
+										},
 										"url": {
-											"raw": "{{BASE_URL}}/api/modulos/{id}",
+											"raw": "{{BASE_URL}}/api/modulos/{{MODULO_ID}}",
 											"host": [
 												"{{BASE_URL}}"
 											],
 											"path": [
 												"api",
 												"modulos",
-												"{id}"
+												"{{MODULO_ID}}"
 											]
 										}
 									},
@@ -5033,6 +7155,16 @@
 								{
 									"name": "Procurar",
 									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{AUTH_TOKEN}}",
+													"type": "string"
+												}
+											]
+										},
 										"method": "GET",
 										"header": [],
 										"body": {},
@@ -5052,9 +7184,27 @@
 								{
 									"name": "Adicionar",
 									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{AUTH_TOKEN}}",
+													"type": "string"
+												}
+											]
+										},
 										"method": "POST",
-										"header": [],
-										"body": {},
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n\t\"servidorid\": \"1\",\n\t\"licenca\": \"1\",\n\t\"dispositivos\": \"1\",\n\t\"ultimobackup\": \"2019-05-13\",\n\t\"versaodb\": \"3.0.3.0\"\n}"
+										},
 										"url": {
 											"raw": "{{BASE_URL}}/api/sistemas",
 											"host": [
@@ -5071,18 +7221,28 @@
 								{
 									"name": "Modificar",
 									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{AUTH_TOKEN}}",
+													"type": "string"
+												}
+											]
+										},
 										"method": "PATCH",
 										"header": [],
 										"body": {},
 										"url": {
-											"raw": "{{BASE_URL}}/api/sistemas/{id}",
+											"raw": "{{BASE_URL}}/api/sistemas/{{SISTEMA_ID}}",
 											"host": [
 												"{{BASE_URL}}"
 											],
 											"path": [
 												"api",
 												"sistemas",
-												"{id}"
+												"{{SISTEMA_ID}}"
 											]
 										}
 									},
@@ -5091,18 +7251,36 @@
 								{
 									"name": "Deletar",
 									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{AUTH_TOKEN}}",
+													"type": "string"
+												}
+											]
+										},
 										"method": "DELETE",
-										"header": [],
-										"body": {},
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": ""
+										},
 										"url": {
-											"raw": "{{BASE_URL}}/api/sistemas/{id}",
+											"raw": "{{BASE_URL}}/api/sistemas/{{SISTEMA_ID}}",
 											"host": [
 												"{{BASE_URL}}"
 											],
 											"path": [
 												"api",
 												"sistemas",
-												"{id}"
+												"{{SISTEMA_ID}}"
 											]
 										}
 									},
@@ -5143,6 +7321,16 @@
 								{
 									"name": "Procurar",
 									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{AUTH_TOKEN}}",
+													"type": "string"
+												}
+											]
+										},
 										"method": "GET",
 										"header": [],
 										"body": {},
@@ -5162,9 +7350,27 @@
 								{
 									"name": "Adicionar",
 									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{AUTH_TOKEN}}",
+													"type": "string"
+												}
+											]
+										},
 										"method": "POST",
-										"header": [],
-										"body": {},
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n\t\"numero\": \"6\",\n\t\"razaosocial\": \"GrandChef\"\n}"
+										},
 										"url": {
 											"raw": "{{BASE_URL}}/api/bancos",
 											"host": [
@@ -5181,18 +7387,36 @@
 								{
 									"name": "Modificar",
 									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{AUTH_TOKEN}}",
+													"type": "string"
+												}
+											]
+										},
 										"method": "PATCH",
-										"header": [],
-										"body": {},
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n\t\"numero\": \"5\"\n}"
+										},
 										"url": {
-											"raw": "{{BASE_URL}}/api/bancos/{id}",
+											"raw": "{{BASE_URL}}/api/bancos/{{BANCO_ID}}",
 											"host": [
 												"{{BASE_URL}}"
 											],
 											"path": [
 												"api",
 												"bancos",
-												"{id}"
+												"{{BANCO_ID}}"
 											]
 										}
 									},
@@ -5201,18 +7425,28 @@
 								{
 									"name": "Deletar",
 									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{AUTH_TOKEN}}",
+													"type": "string"
+												}
+											]
+										},
 										"method": "DELETE",
 										"header": [],
 										"body": {},
 										"url": {
-											"raw": "{{BASE_URL}}/api/bancos/{id}",
+											"raw": "{{BASE_URL}}/api/bancos/{{BANCO_ID}}",
 											"host": [
 												"{{BASE_URL}}"
 											],
 											"path": [
 												"api",
 												"bancos",
-												"{id}"
+												"{{BANCO_ID}}"
 											]
 										}
 									},
@@ -5228,6 +7462,16 @@
 								{
 									"name": "Procurar",
 									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{AUTH_TOKEN}}",
+													"type": "string"
+												}
+											]
+										},
 										"method": "GET",
 										"header": [],
 										"body": {},
@@ -5247,9 +7491,27 @@
 								{
 									"name": "Adicionar",
 									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{AUTH_TOKEN}}",
+													"type": "string"
+												}
+											]
+										},
 										"method": "POST",
-										"header": [],
-										"body": {},
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n\t\"tipo\": \"Local\",\n\t\"descricao\": \"Carteira da empresa\",\n\t\"ativa\": \"Y\"\n}"
+										},
 										"url": {
 											"raw": "{{BASE_URL}}/api/carteiras",
 											"host": [
@@ -5267,17 +7529,25 @@
 									"name": "Modificar",
 									"request": {
 										"method": "PATCH",
-										"header": [],
-										"body": {},
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n\t\"tipo\": \"Credito\"\n}"
+										},
 										"url": {
-											"raw": "{{BASE_URL}}/api/carteiras/{id}",
+											"raw": "{{BASE_URL}}/api/carteiras/{{CARTEIRA_ID}}",
 											"host": [
 												"{{BASE_URL}}"
 											],
 											"path": [
 												"api",
 												"carteiras",
-												"{id}"
+												"{{CARTEIRA_ID}}"
 											]
 										}
 									},
@@ -5286,18 +7556,28 @@
 								{
 									"name": "Deletar",
 									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{AUTH_TOKEN}}",
+													"type": "string"
+												}
+											]
+										},
 										"method": "DELETE",
 										"header": [],
 										"body": {},
 										"url": {
-											"raw": "{{BASE_URL}}/api/carteiras/{id}",
+											"raw": "{{BASE_URL}}/api/carteiras/{{CARTEIRA_ID}}",
 											"host": [
 												"{{BASE_URL}}"
 											],
 											"path": [
 												"api",
 												"carteiras",
-												"{id}"
+												"{{CARTEIRA_ID}}"
 											]
 										}
 									},
@@ -5313,6 +7593,16 @@
 								{
 									"name": "Procurar",
 									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{AUTH_TOKEN}}",
+													"type": "string"
+												}
+											]
+										},
 										"method": "GET",
 										"header": [],
 										"body": {},
@@ -5332,9 +7622,27 @@
 								{
 									"name": "Adicionar",
 									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{AUTH_TOKEN}}",
+													"type": "string"
+												}
+											]
+										},
 										"method": "POST",
-										"header": [],
-										"body": {},
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n\t\"nome\": \"Peso\",\n\t\"simbolo\": \"$\",\n\t\"codigo\": \"ARS\",\n\t\"divisao\": 100,\n\t\"formato\": \"%s AR\"\n}"
+										},
 										"url": {
 											"raw": "{{BASE_URL}}/api/moedas",
 											"host": [
@@ -5351,18 +7659,36 @@
 								{
 									"name": "Modificar",
 									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{AUTH_TOKEN}}",
+													"type": "string"
+												}
+											]
+										},
 										"method": "PATCH",
-										"header": [],
-										"body": {},
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n\t\"nome\": \"Libra\"\n}"
+										},
 										"url": {
-											"raw": "{{BASE_URL}}/api/moedas/{id}",
+											"raw": "{{BASE_URL}}/api/moedas/{{MOEDA_ID}}",
 											"host": [
 												"{{BASE_URL}}"
 											],
 											"path": [
 												"api",
 												"moedas",
-												"{id}"
+												"{{MOEDA_ID}}"
 											]
 										}
 									},
@@ -5371,18 +7697,28 @@
 								{
 									"name": "Deletar",
 									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{AUTH_TOKEN}}",
+													"type": "string"
+												}
+											]
+										},
 										"method": "DELETE",
 										"header": [],
 										"body": {},
 										"url": {
-											"raw": "{{BASE_URL}}/api/moedas/{id}",
+											"raw": "{{BASE_URL}}/api/moedas/{{MOEDA_ID}}",
 											"host": [
 												"{{BASE_URL}}"
 											],
 											"path": [
 												"api",
 												"moedas",
-												"{id}"
+												"{{MOEDA_ID}}"
 											]
 										}
 									},

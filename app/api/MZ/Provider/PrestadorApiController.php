@@ -43,7 +43,7 @@ class PrestadorApiController extends \MZ\Core\ApiController
         $page = max(1, $this->getRequest()->query->getInt('page', 1));
         $condition = Filter::query($this->getRequest()->query->all());
         unset($condition['ordem']);
-        if (!app()->auth->has([Permissao::NOME_CADASTROFUNCIONARIOS])) {
+        if (!app()->auth->has([Permissao::NOME_CADASTROPRESTADORES])) {
             $condition['id'] = app()->auth->provider->getID();
         }
         $order = $this->getRequest()->query->get('order', '');
@@ -65,8 +65,15 @@ class PrestadorApiController extends \MZ\Core\ApiController
     {
         $this->needPermission([Permissao::NOME_CADASTROPRESTADORES]);
         $localized = $this->getRequest()->query->getBoolean('localized', false);
-        $prestador = new Prestador($this->getData());
-        $prestador->filter(new Prestador(), app()->auth->provider, $localized);
+        $data = $this->getData();
+        $prestador = new Prestador($data);
+        $old_prestador = new Prestador();
+        $old_prestador->setClienteID($prestador->getClienteID());
+        $prestador->filter($old_prestador, app()->auth->provider, $localized);
+        $funcao_id = $data['funcaoid'] ?? null;
+        $funcao = \MZ\Provider\Funcao::findByID($funcao_id);
+        $prestador->setFuncaoID($funcao->getID());
+        $prestador->setAtivo('Y');
         $prestador->insert();
         return $this->getResponse()->success(['item' => $prestador->publish(app()->auth->provider)]);
     }

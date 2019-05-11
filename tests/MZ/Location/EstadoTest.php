@@ -25,6 +25,7 @@
 namespace MZ\Location;
 
 use MZ\Location\PaisTest;
+use MZ\Exception\ValidationException;
 
 class EstadoTest extends \MZ\Framework\TestCase
 {
@@ -68,11 +69,62 @@ class EstadoTest extends \MZ\Framework\TestCase
         $this->assertEquals(1, Estado::count($condition));
     }
 
+    public function testFinds()
+    {
+        $estado = self::create();
+
+        $pais = $estado->findPaisID();
+        $this->assertEquals($estado->getPaisID(), $pais->getID());
+
+        $estadoByPaisIDNome = $estado->findByPaisIDNome($pais->getID(), $estado->getNome());
+        $this->assertInstanceOf(get_class($estado), $estadoByPaisIDNome);
+
+        $estadoByPaisIDUF = $estado->findByPaisIDUF($pais->getID(), $estado->getUF());
+        $this->assertInstanceOf(get_class($estado), $estadoByPaisIDUF);
+    }
+
     public function testAdd()
     {
         $estado = self::build();
         $estado->insert();
         $this->assertTrue($estado->exists());
+    }
+
+    public function testAddInvalid()
+    {
+        $estado = self::build();
+        $estado->setPaisID(null);
+        $estado->setNome(null);
+        $estado->setUF(null);
+        try {
+            $estado->insert();
+            $estado->fail('Não cadastrar');
+        } catch (ValidationException $e) {
+            $this->assertEquals(['paisid', 'nome', 'uf'], array_keys($e->getErrors()));
+        }
+    }
+
+    public function testTranslate()
+    {
+        $estado = self::build();
+        $estado->setNome('Teste');
+        $estado->insert();
+        try {
+            $estado->setUF('TR');
+            $estado->insert();
+            $this->fail('fk duplicada');
+        } catch (ValidationException $e) {
+            $this->assertEquals(['paisid', 'nome'], array_keys($e->getErrors()));
+        }
+        //-----------------------
+        $estado = self::build();
+        $estado->insert();
+        try {
+            $estado->insert();
+            $this->fail('fk duplicada');
+        } catch (ValidationException $e) {
+            $this->assertEquals(['paisid', 'uf'], array_keys($e->getErrors()));
+        }
     }
 
     public function testUpdate()

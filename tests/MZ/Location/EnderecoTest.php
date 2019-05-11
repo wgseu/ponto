@@ -26,6 +26,7 @@ namespace MZ\Location;
 
 use MZ\Location\CidadeTest;
 use MZ\Location\BairroTest;
+use MZ\Exception\ValidationException;
 
 class EnderecoTest extends \MZ\Framework\TestCase
 {
@@ -71,11 +72,71 @@ class EnderecoTest extends \MZ\Framework\TestCase
         $this->assertEquals(1, Endereco::count($condition));
     }
 
+    public function testFinds()
+    {
+        $endereco = self::create();
+
+        $cidade = $endereco->findCidadeID();
+        $this->assertEquals($endereco->getCidadeID(), $cidade->getID());
+
+        $bairro = $endereco->findBairroID();
+        $this->assertEquals($endereco->getBairroID(), $bairro->getID());
+
+        $bairroByCep = $endereco->findByCEP($endereco->getCEP());
+        $this->assertInstanceOf(get_class($endereco), $bairroByCep);
+
+        $bairro2 = $endereco->findByBairroIDLogradouro($endereco->getID(), $endereco->getLogradouro());
+        $this->assertInstanceOf(get_class($endereco), $bairro2);
+    }
+
     public function testAdd()
     {
         $endereco = self::build();
         $endereco->insert();
         $this->assertTrue($endereco->exists());
+    }
+
+    public function testAddInvalid()
+    {
+        $endereco = self::build();
+        $endereco->setCidadeID(null);
+        $endereco->setBairroID(null);
+        $endereco->setLogradouro(null);
+        $endereco->setCEP('sdkfmn3902384');
+        try {
+            $endereco->insert();
+            $this->fail('Não cadastrar');
+        } catch (ValidationException $e) {
+            $this->assertEquals(['cidadeid', 'bairroid', 'logradouro', 'cep'], array_keys($e->getErrors()));
+        }
+    }
+
+    public function testTranslate()
+    {
+        $endereco = self::build();
+        $endereco->setCEP('1234567899');
+        $endereco->insert();
+        try {
+            $endereco->setBairroID(6);
+            $endereco->setLogradouro('teste');
+            $endereco->insert();
+            $this->fail('Fk duplicada');
+        } catch (ValidationException $e) {
+            $this->assertEquals(['cep'], array_keys($e->getErrors()));
+        }
+        //------------------------
+        $endereco = self::build();
+        $endereco->setBairroID(1);
+        $endereco->setLogradouro('Rua sem saida');
+        $endereco->insert();
+        try {
+            $endereco->insert();
+            $this->fail('Fk duplicada');
+        } catch (ValidationException $e) {
+            $this->assertEquals(['bairroid', 'logradouro'], array_keys($e->getErrors()));
+        }
+
+
     }
 
     public function testUpdate()

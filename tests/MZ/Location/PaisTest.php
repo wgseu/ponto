@@ -25,6 +25,7 @@
 namespace MZ\Location;
 
 use MZ\Wallet\MoedaTest;
+use MZ\Exception\ValidationException;
 
 class PaisTest extends \MZ\Framework\TestCase
 {
@@ -70,11 +71,106 @@ class PaisTest extends \MZ\Framework\TestCase
         $this->assertEquals(1, Pais::count($condition));
     }
 
+    public function testFinds()
+    {
+        $pais = self::create();
+
+        $moeda = $pais->findMoedaID();
+        $this->assertEquals($pais->getMoedaID(), $moeda->getID());
+
+        $paisByNome = $pais->findByNome($pais->getNome());
+        $this->assertInstanceOf(get_class($pais), $paisByNome);
+
+        $paisBySigla = $pais->findBySigla($pais->getSigla());
+        $this->assertInstanceOf(get_class($pais), $paisBySigla);
+
+        $paisByCod = $pais->findByCodigo($pais->getCodigo());
+        $this->assertInstanceOf(get_class($pais), $paisByCod);
+    }
+
     public function testAdd()
     {
         $pais = self::build();
         $pais->insert();
         $this->assertTrue($pais->exists());
+    }
+
+    public function testAddInvalid()
+    {
+        $pais = self::build();
+        $pais->setNome(null);
+        $pais->setSigla(null);
+        $pais->setCodigo(null);
+        $pais->setMoedaID(null);
+        $pais->setIdioma(null);
+        $pais->setUnitario(null);
+        try {
+            $pais->insert();
+            $this->fail('não cadastrar com valores nulos');
+        } catch (Validation $e) {
+            $this->assertEquals(
+                ['nome', 'sigla', 'codigo', 'moedaid', 'idioma', 'unitario'],
+                array_keys($e->getErrors())
+            );
+        }
+    }
+
+    public function testTranslate()
+    {
+        $pais = self::create();
+        try {
+            $pais->insert();
+            $this->fail('fk codigo duplicada');
+        } catch (ValidationException $e) {
+            $this->assertEquals(['codigo'], array_keys($e->getErrors()));
+        }
+
+        $pais = self::create();
+        try {
+            $pais->setCodigo('uk');
+            $pais->insert();
+            $this->fail('fk sigla duplicada');
+        } catch (ValidationException $e) {
+            $this->assertEquals(['sigla'], array_keys($e->getErrors()));
+        }
+
+        $pais = self::create();
+        try {
+            $pais->setCodigo('uk');
+            $pais->setSigla('kk');
+            $pais->insert();
+            $this->fail('fk nome duplicada');
+        } catch (ValidationException $e) {
+            $this->assertEquals(['nome'], array_keys($e->getErrors()));
+        }
+    }
+
+    public function testBandeiraIndex()
+    {
+        $pais = self::build();
+        $pais->setCodigo('MZ');
+        $cod = $pais->getBandeiraIndex();
+        $this->assertEquals(151, $cod);
+        //--------------------
+        $pais = self::build();
+        $pais->setCodigo('KK');
+        $cod = $pais->getBandeiraIndex();
+        $this->assertEquals(0, $cod);
+        //-------------------------
+        $pais = self::build();
+        $pais->setCodigo('US');
+        $cod = $pais->getBandeiraIndex();
+        $this->assertEquals(220, $cod);
+        //--------------------
+        $pais = self::build();
+        $pais->setCodigo('BR');
+        $cod = $pais->getBandeiraIndex();
+        $this->assertEquals(28, $cod);
+        //--------------------
+        $pais = self::build();
+        $pais->setCodigo('ES');
+        $cod = $pais->getBandeiraIndex();
+        $this->assertEquals(66, $cod);
     }
 
     public function testUpdate()

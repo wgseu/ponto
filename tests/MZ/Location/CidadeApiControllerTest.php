@@ -27,24 +27,35 @@ namespace MZ\Location;
 use MZ\System\Permissao;
 use MZ\Account\AuthenticationTest;
 
-class CidadePageControllerTest extends \MZ\Framework\TestCase
+class CidadeApiControllerTest extends \MZ\Framework\TestCase
 {
     public function testFind()
     {
         AuthenticationTest::authProvider([Permissao::NOME_SISTEMA, Permissao::NOME_CADASTROCIDADES]);
         $cidade = CidadeTest::create();
-        $result = $this->get('/gerenciar/cidade/', ['search' => $cidade->getNome()]);
-        $this->assertEquals(200, $result->getStatusCode());
+        $expected = [
+            'status' => 'ok',
+            'items' => [
+                $cidade->publish(app()->auth->provider),
+            ],
+        ];
+        $result = $this->get('/api/cidades', ['search' => $cidade->getNome()]);
+        $this->assertEquals($expected, \array_intersect_key($result, $expected));
     }
 
     public function testAdd()
     {
         AuthenticationTest::authProvider([Permissao::NOME_SISTEMA, Permissao::NOME_CADASTROCIDADES]);
         $cidade = CidadeTest::build();
-        $result = $this->post('/gerenciar/cidade/cadastrar', $cidade->toArray(), true);
-        $this->assertEquals(302, $result->getStatusCode());
-        $cidade->load(['nome' => $cidade->getNome()]);
-        $this->assertTrue($cidade->exists());
+        $this->assertEquals($cidade->toArray(), (new Cidade($cidade))->toArray());
+        $this->assertEquals((new Cidade())->toArray(), (new Cidade(1))->toArray());
+        $expected = [
+            'status' => 'ok',
+            'item' => $cidade->publish(app()->auth->provider),
+        ];
+        $result = $this->post('/api/cidades', $cidade->toArray());
+        $expected['item']['id'] = $result['item']['id'] ?? null;
+        $this->assertEquals($expected, \array_intersect_key($result, $expected));
     }
 
     public function testUpdate()
@@ -52,9 +63,13 @@ class CidadePageControllerTest extends \MZ\Framework\TestCase
         AuthenticationTest::authProvider([Permissao::NOME_SISTEMA, Permissao::NOME_CADASTROCIDADES]);
         $cidade = CidadeTest::create();
         $id = $cidade->getID();
-        $result = $this->post('/gerenciar/cidade/editar?id=' . $id, $cidade->toArray(), true);
+        $result = $this->patch('/api/cidades/' . $id, $cidade->toArray());
         $cidade->loadByID();
-        $this->assertEquals(302, $result->getStatusCode());
+        $expected = [
+            'status' => 'ok',
+            'item' => $cidade->publish(app()->auth->provider),
+        ];
+        $this->assertEquals($expected, \array_intersect_key($result, $expected));
     }
 
     public function testDelete()
@@ -62,9 +77,10 @@ class CidadePageControllerTest extends \MZ\Framework\TestCase
         AuthenticationTest::authProvider([Permissao::NOME_SISTEMA, Permissao::NOME_CADASTROCIDADES]);
         $cidade = CidadeTest::create();
         $id = $cidade->getID();
-        $result = $this->get('/gerenciar/cidade/excluir?id=' . $id);
+        $result = $this->delete('/api/cidades/' . $id);
         $cidade->loadByID();
-        $this->assertEquals(302, $result->getStatusCode());
+        $expected = [ 'status' => 'ok', ];
+        $this->assertEquals($expected, \array_intersect_key($result, $expected));
         $this->assertFalse($cidade->exists());
     }
 }

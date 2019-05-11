@@ -25,6 +25,9 @@
 namespace MZ\Location;
 
 use MZ\Location\EstadoTest;
+use MZ\Exception\ValidationException;
+use MZ\System\Permissao;
+use MZ\Account\AuthenticationTest;
 
 class CidadeTest extends \MZ\Framework\TestCase
 {
@@ -67,11 +70,87 @@ class CidadeTest extends \MZ\Framework\TestCase
         $this->assertEquals(1, Cidade::count($condition));
     }
 
+    public function testFinds()
+    {
+        $cidade = self::create();
+
+        $estado = $cidade->findEstadoID();
+        $this->assertEquals($cidade->getEstadoID(), $estado->getID());
+
+        $cidByEstadoIDNome = $cidade->findByEstadoIDNome($estado->getID(), $cidade->getNome());
+        $this->assertInstanceOf(get_class($cidade), $cidByEstadoIDNome);
+
+        $cidByCEP = $cidade->findByCEP($cidade->getCEP());
+        $this->assertInstanceOf(get_class($cidade), $cidByCEP);
+    }
+
+    public function testFindOrInsert()
+    {
+        $cidade = self::create();
+
+        $cidadeFound = Cidade::findOrInsert($cidade->getEstadoID(), $cidade->getNome());
+        $this->assertInstanceOf(get_class($cidade), $cidadeFound);
+
+        $cidade2 = self::build();
+        AuthenticationTest::authProvider([Permissao::NOME_SISTEMA, Permissao::NOME_CADASTROCIDADES]);
+        $cidadeFound2 = Cidade::findOrInsert($cidade2->getEstadoID(), $cidade2->getNome());
+        $this->assertInstanceOf(get_class($cidade2), $cidadeFound2);
+
+        try {
+            $cidade3 = self::build();
+            $cidade3->setNome(null);
+            AuthenticationTest::authProvider([Permissao::NOME_SISTEMA, Permissao::NOME_CADASTROCIDADES]);
+            $cidadeFound3 = Cidade::findOrInsert($cidade3->getEstadoID(), $cidade3->getNome());
+            $this->fail('Não cadastrar');
+        } catch (ValidationException $e) {
+            $this->assertEquals(['cidade'], array_keys($e->getErrors()));
+        }
+    }
+
+
     public function testAdd()
     {
         $cidade = self::build();
         $cidade->insert();
         $this->assertTrue($cidade->exists());
+    }
+
+    public function testAddInvalid()
+    {
+        $cidade = self::build();
+        $cidade->setEstadoID(null);
+        $cidade->setNome(null);
+        $cidade->setCEP('kkk65777645');
+        try {
+            $cidade->insert();
+            $this->fail('Não cadastrar com valores nulos');
+        } catch (ValidationException $e) {
+            $this->assertEquals(['estadoid', 'nome', 'cep'], array_keys($e->getErrors()));
+        }
+    }
+
+    public function testTranslate()
+    {
+        $cidade = self::build();
+        $cidade->setNome('Test');
+        $cidade->setEstadoID(15);
+        $cidade->insert();
+        try {
+            $cidade->insert();
+            $this->fail('Não cadastrar fk duplicada');
+        } catch (ValidationException $e) {
+            $this->assertEquals(['estadoid', 'nome'], array_keys($e->getErrors()));
+        }
+        //--------------------
+        $cidade = self::build();
+        $cidade->setCEP('87710000');
+        $cidade->insert();
+        try {
+            $cidade->insert();
+            $this->fail('fk duplicada');
+        } catch (ValidationException $e) {
+            $this->assertEquals(['cep'], array_keys($e->getErrors()));
+        }
     }
 
     public function testUpdate()

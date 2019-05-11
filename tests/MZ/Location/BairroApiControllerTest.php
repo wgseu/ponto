@@ -27,24 +27,42 @@ namespace MZ\Location;
 use MZ\System\Permissao;
 use MZ\Account\AuthenticationTest;
 
-class BairroPageControllerTest extends \MZ\Framework\TestCase
+class BairroApiControllerTest extends \MZ\Framework\TestCase
 {
     public function testFind()
     {
         AuthenticationTest::authProvider([Permissao::NOME_SISTEMA, Permissao::NOME_CADASTROBAIRROS]);
         $bairro = BairroTest::create();
-        $result = $this->get('/gerenciar/bairro/', ['search' => $bairro->getNome()]);
-        $this->assertEquals(200, $result->getStatusCode());
+        $expected = [
+            'status' => 'ok',
+            'items' => [
+                $bairro->publish(app()->auth->provider),
+            ],
+        ];
+        $result = $this->get('/api/bairros', ['search' => $bairro->getNome()]);
+        $this->assertEquals($expected, \array_intersect_key($result, $expected));
     }
 
     public function testAdd()
     {
         AuthenticationTest::authProvider([Permissao::NOME_SISTEMA, Permissao::NOME_CADASTROBAIRROS]);
         $bairro = BairroTest::build();
-        $result = $this->post('/gerenciar/bairro/cadastrar', $bairro->toArray(), true);
-        $this->assertEquals(302, $result->getStatusCode());
-        $bairro->load(['nome' => $bairro->getNome()]);
-        $this->assertTrue($bairro->exists());
+        $bairro->setDisponivel('Y');
+        $this->assertTrue($bairro->isDisponivel());
+
+        $bairro->setMapeado('Y');
+        $this->assertTrue($bairro->isMapeado());
+
+        $this->assertEquals($bairro->toArray(), (new Bairro($bairro))->toArray());
+        $this->assertEquals((new Bairro())->toArray(), (new Bairro(1))->toArray());
+        $expected = [
+            'status' => 'ok',
+            'item' => $bairro->publish(app()->auth->provider),
+        ];
+        $result = $this->post('/api/bairros', $bairro->toArray());
+        $expected['item']['id'] = $result['item']['id'] ?? null;
+        $result['item']['valorentrega'] = floatval($result['item']['valorentrega'] ?? null);
+        $this->assertEquals($expected, \array_intersect_key($result, $expected));
     }
 
     public function testUpdate()
@@ -52,9 +70,13 @@ class BairroPageControllerTest extends \MZ\Framework\TestCase
         AuthenticationTest::authProvider([Permissao::NOME_SISTEMA, Permissao::NOME_CADASTROBAIRROS]);
         $bairro = BairroTest::create();
         $id = $bairro->getID();
-        $result = $this->post('/gerenciar/bairro/editar?id=' . $id, $bairro->toArray(), true);
+        $result = $this->patch('/api/bairros/' . $id, $bairro->toArray());
         $bairro->loadByID();
-        $this->assertEquals(302, $result->getStatusCode());
+        $expected = [
+            'status' => 'ok',
+            'item' => $bairro->publish(app()->auth->provider),
+        ];
+        $this->assertEquals($expected, \array_intersect_key($result, $expected));
     }
 
     public function testDelete()
@@ -62,9 +84,10 @@ class BairroPageControllerTest extends \MZ\Framework\TestCase
         AuthenticationTest::authProvider([Permissao::NOME_SISTEMA, Permissao::NOME_CADASTROBAIRROS]);
         $bairro = BairroTest::create();
         $id = $bairro->getID();
-        $result = $this->get('/gerenciar/bairro/excluir?id=' . $id);
+        $result = $this->delete('/api/bairros/' . $id);
         $bairro->loadByID();
-        $this->assertEquals(302, $result->getStatusCode());
+        $expected = [ 'status' => 'ok', ];
+        $this->assertEquals($expected, \array_intersect_key($result, $expected));
         $this->assertFalse($bairro->exists());
     }
 }

@@ -27,24 +27,37 @@ namespace MZ\Location;
 use MZ\System\Permissao;
 use MZ\Account\AuthenticationTest;
 
-class PaisPageControllerTest extends \MZ\Framework\TestCase
+class PaisApiControllerTest extends \MZ\Framework\TestCase
 {
     public function testFind()
     {
         AuthenticationTest::authProvider([Permissao::NOME_SISTEMA, Permissao::NOME_CADASTROPAISES]);
         $pais = PaisTest::create();
-        $result = $this->get('/gerenciar/pais/', ['search' => $pais->getNome()]);
-        $this->assertEquals(200, $result->getStatusCode());
+        $expected = [
+            'status' => 'ok',
+            'items' => [
+                $pais->publish(app()->auth->provider),
+            ],
+        ];
+        $result = $this->get('/api/paises', ['search' => $pais->getNome()]);
+        $this->assertEquals($expected, \array_intersect_key($result, $expected));
     }
 
     public function testAdd()
     {
         AuthenticationTest::authProvider([Permissao::NOME_SISTEMA, Permissao::NOME_CADASTROPAISES]);
         $pais = PaisTest::build();
-        $result = $this->post('/gerenciar/pais/cadastrar', $pais->toArray(), true);
-        $this->assertEquals(302, $result->getStatusCode());
-        $pais->load(['nome' => $pais->getNome()]);
-        $this->assertTrue($pais->exists());
+        $pais->setUnitario('Y');
+        $this->assertTrue($pais->isUnitario());
+        $this->assertEquals($pais->toArray(), (new Pais($pais))->toArray());
+        $this->assertEquals((new Pais())->toArray(), (new Pais(1))->toArray());
+        $expected = [
+            'status' => 'ok',
+            'item' => $pais->publish(app()->auth->provider),
+        ];
+        $result = $this->post('/api/paises', $pais->toArray());
+        $expected['item']['id'] = $result['item']['id'] ?? null;
+        $this->assertEquals($expected, \array_intersect_key($result, $expected));
     }
 
     public function testUpdate()
@@ -52,9 +65,13 @@ class PaisPageControllerTest extends \MZ\Framework\TestCase
         AuthenticationTest::authProvider([Permissao::NOME_SISTEMA, Permissao::NOME_CADASTROPAISES]);
         $pais = PaisTest::create();
         $id = $pais->getID();
-        $result = $this->post('/gerenciar/pais/editar?id=' . $id, $pais->toArray(), true);
+        $result = $this->patch('/api/paises/' . $id, $pais->toArray());
         $pais->loadByID();
-        $this->assertEquals(302, $result->getStatusCode());
+        $expected = [
+            'status' => 'ok',
+            'item' => $pais->publish(app()->auth->provider),
+        ];
+        $this->assertEquals($expected, \array_intersect_key($result, $expected));
     }
 
     public function testDelete()
@@ -62,9 +79,10 @@ class PaisPageControllerTest extends \MZ\Framework\TestCase
         AuthenticationTest::authProvider([Permissao::NOME_SISTEMA, Permissao::NOME_CADASTROPAISES]);
         $pais = PaisTest::create();
         $id = $pais->getID();
-        $result = $this->get('/gerenciar/pais/excluir?id=' . $id);
+        $result = $this->delete('/api/paises/' . $id);
         $pais->loadByID();
-        $this->assertEquals(302, $result->getStatusCode());
+        $expected = [ 'status' => 'ok', ];
+        $this->assertEquals($expected, \array_intersect_key($result, $expected));
         $this->assertFalse($pais->exists());
     }
 }

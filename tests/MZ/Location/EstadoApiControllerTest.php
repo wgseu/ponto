@@ -27,24 +27,35 @@ namespace MZ\Location;
 use MZ\System\Permissao;
 use MZ\Account\AuthenticationTest;
 
-class EstadoPageControllerTest extends \MZ\Framework\TestCase
+class EstadoApiControllerTest extends \MZ\Framework\TestCase
 {
     public function testFind()
     {
         AuthenticationTest::authProvider([Permissao::NOME_SISTEMA, Permissao::NOME_CADASTROESTADOS]);
         $estado = EstadoTest::create();
-        $result = $this->get('/gerenciar/estado/', ['search' => $estado->getNome()]);
-        $this->assertEquals(200, $result->getStatusCode());
+        $expected = [
+            'status' => 'ok',
+            'items' => [
+                $estado->publish(app()->auth->provider),
+            ],
+        ];
+        $result = $this->get('/api/estados', ['search' => $estado->getNome()]);
+        $this->assertEquals($expected, \array_intersect_key($result, $expected));
     }
 
     public function testAdd()
     {
         AuthenticationTest::authProvider([Permissao::NOME_SISTEMA, Permissao::NOME_CADASTROESTADOS]);
         $estado = EstadoTest::build();
-        $result = $this->post('/gerenciar/estado/cadastrar', $estado->toArray(), true);
-        $this->assertEquals(302, $result->getStatusCode());
-        $estado->load(['nome' => $estado->getNome()]);
-        $this->assertTrue($estado->exists());
+        $this->assertEquals($estado->toArray(), (new Estado($estado))->toArray());
+        $this->assertEquals((new Estado())->toArray(), (new Estado(1))->toArray());
+        $expected = [
+            'status' => 'ok',
+            'item' => $estado->publish(app()->auth->provider),
+        ];
+        $result = $this->post('/api/estados', $estado->toArray());
+        $expected['item']['id'] = $result['item']['id'] ?? null;
+        $this->assertEquals($expected, \array_intersect_key($result, $expected));
     }
 
     public function testUpdate()
@@ -52,9 +63,13 @@ class EstadoPageControllerTest extends \MZ\Framework\TestCase
         AuthenticationTest::authProvider([Permissao::NOME_SISTEMA, Permissao::NOME_CADASTROESTADOS]);
         $estado = EstadoTest::create();
         $id = $estado->getID();
-        $result = $this->post('/gerenciar/estado/editar?id=' . $id, $estado->toArray(), true);
+        $result = $this->patch('/api/estados/' . $id, $estado->toArray());
         $estado->loadByID();
-        $this->assertEquals(302, $result->getStatusCode());
+        $expected = [
+            'status' => 'ok',
+            'item' => $estado->publish(app()->auth->provider),
+        ];
+        $this->assertEquals($expected, \array_intersect_key($result, $expected));
     }
 
     public function testDelete()
@@ -62,9 +77,10 @@ class EstadoPageControllerTest extends \MZ\Framework\TestCase
         AuthenticationTest::authProvider([Permissao::NOME_SISTEMA, Permissao::NOME_CADASTROESTADOS]);
         $estado = EstadoTest::create();
         $id = $estado->getID();
-        $result = $this->get('/gerenciar/estado/excluir?id=' . $id);
+        $result = $this->delete('/api/estados/' . $id);
         $estado->loadByID();
-        $this->assertEquals(302, $result->getStatusCode());
+        $expected = [ 'status' => 'ok', ];
+        $this->assertEquals($expected, \array_intersect_key($result, $expected));
         $this->assertFalse($estado->exists());
     }
 }

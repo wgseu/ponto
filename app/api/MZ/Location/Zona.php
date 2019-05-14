@@ -326,14 +326,6 @@ class Zona extends SyncModel
      */
     protected function translate($e)
     {
-        if (contains(['ID', 'UNIQUE'], $e->getMessage())) {
-            return new ValidationException([
-                'id' => _t(
-                    'zona.id_used',
-                    $this->getID()
-                ),
-            ]);
-        }
         if (contains(['BairroID', 'Nome', 'UNIQUE'], $e->getMessage())) {
             return new ValidationException([
                 'bairroid' => _t(

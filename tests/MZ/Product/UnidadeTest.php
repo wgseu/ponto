@@ -24,6 +24,8 @@
  */
 namespace MZ\Product;
 
+use MZ\Exception\ValidationException;
+
 class UnidadeTest extends \MZ\Framework\TestCase
 {
     public static function build($nome = null, $sigla = null)
@@ -107,6 +109,18 @@ class UnidadeTest extends \MZ\Framework\TestCase
         $unidade->setNome('Unidade to insert');
         $unidade->setSigla('Unidade to insert');
         $unidade->insert();
+    }
+
+    public function testTranslate()
+    {
+        $unidade = self::create();
+
+        try {
+            $unidade->insert();
+            $this->fail('Não cadastrar com fk repetida');
+        } catch (ValidationException $e) {
+            $this->assertEquals(['sigla'], array_keys($e->getErrors()));
+        }
     }
 
     public function testUpdate()

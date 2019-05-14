@@ -25,6 +25,7 @@
 namespace MZ\Location;
 
 use MZ\Location\BairroTest;
+use MZ\Exception\ValidationException;
 
 class ZonaTest extends \MZ\Framework\TestCase
 {
@@ -69,11 +70,49 @@ class ZonaTest extends \MZ\Framework\TestCase
         $this->assertEquals(1, Zona::count($condition));
     }
 
+    public function testFinds()
+    {
+        $zona = self::create();
+        $bairro = $zona->findBairroID();
+        $this->assertEquals($zona->getBairroID(), $bairro->getID());
+
+        $zonaByBairroIDNome = $zona->findByBairroIDNome($bairro->getID(), $zona->getNome());
+        $this->assertInstanceOf(get_class($zona), $zonaByBairroIDNome);
+    }
+
     public function testAdd()
     {
         $zona = self::build();
         $zona->insert();
         $this->assertTrue($zona->exists());
+    }
+
+    public function testAddInvalid()
+    {
+        $zona = self::build();
+        $zona->setBairroID(null);
+        $zona->setNome(null);
+        $zona->setAdicionalEntrega(null);
+        $zona->setDisponivel('E');
+        try {
+            $zona->insert();
+            $this->fail('Não cadastrar valores nulos');
+        } catch (ValidationException $e) {
+            $this->assertEquals(['bairroid', 'nome', 'adicionalentrega', 'disponivel'], array_keys($e->getErrors()));
+        }
+    }
+
+    public function testTranslate()
+    {
+        $zona = self::build();
+        $zona->setID(12);
+        $zona->insert();
+        try {
+            $zona->insert();
+            $this->fail('Fk duplicada');
+        } catch (ValidationException $e) {
+            $this->assertEquals(['bairroid', 'nome'], array_keys($e->getErrors()));
+        }
     }
 
     public function testUpdate()

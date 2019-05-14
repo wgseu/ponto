@@ -27,24 +27,35 @@ namespace MZ\Product;
 use MZ\System\Permissao;
 use MZ\Account\AuthenticationTest;
 
-class UnidadePageControllerTest extends \MZ\Framework\TestCase
+class UnidadeApiControllerTest extends \MZ\Framework\TestCase
 {
     public function testFind()
     {
         AuthenticationTest::authProvider([Permissao::NOME_SISTEMA, Permissao::NOME_CADASTROPRODUTOS]);
         $unidade = UnidadeTest::create();
-        $result = $this->get('/gerenciar/unidade/', ['search' => $unidade->getNome()]);
-        $this->assertEquals(200, $result->getStatusCode());
+        $expected = [
+            'status' => 'ok',
+            'items' => [
+                $unidade->publish(app()->auth->provider),
+            ],
+        ];
+        $result = $this->get('/api/unidades', ['search' => $unidade->getNome()]);
+        $this->assertEquals($expected, \array_intersect_key($result, $expected));
     }
 
     public function testAdd()
     {
         AuthenticationTest::authProvider([Permissao::NOME_SISTEMA, Permissao::NOME_CADASTROPRODUTOS]);
         $unidade = UnidadeTest::build();
-        $result = $this->post('/gerenciar/unidade/cadastrar', $unidade->toArray(), true);
-        $this->assertEquals(302, $result->getStatusCode());
-        $unidade->load(['nome' => $unidade->getNome()]);
-        $this->assertTrue($unidade->exists());
+        $this->assertEquals($unidade->toArray(), (new Unidade($unidade))->toArray());
+        $this->assertEquals((new Unidade())->toArray(), (new Unidade(1))->toArray());
+        $expected = [
+            'status' => 'ok',
+            'item' => $unidade->publish(app()->auth->provider),
+        ];
+        $result = $this->post('/api/unidades', $unidade->toArray());
+        $expected['item']['id'] = $result['item']['id'] ?? null;
+        $this->assertEquals($expected, \array_intersect_key($result, $expected));
     }
 
     public function testUpdate()
@@ -52,9 +63,13 @@ class UnidadePageControllerTest extends \MZ\Framework\TestCase
         AuthenticationTest::authProvider([Permissao::NOME_SISTEMA, Permissao::NOME_CADASTROPRODUTOS]);
         $unidade = UnidadeTest::create();
         $id = $unidade->getID();
-        $result = $this->post('/gerenciar/unidade/editar?id=' . $id, $unidade->toArray(), true);
+        $result = $this->patch('/api/unidades/' . $id, $unidade->toArray());
         $unidade->loadByID();
-        $this->assertEquals(302, $result->getStatusCode());
+        $expected = [
+            'status' => 'ok',
+            'item' => $unidade->publish(app()->auth->provider),
+        ];
+        $this->assertEquals($expected, \array_intersect_key($result, $expected));
     }
 
     public function testDelete()
@@ -62,9 +77,10 @@ class UnidadePageControllerTest extends \MZ\Framework\TestCase
         AuthenticationTest::authProvider([Permissao::NOME_SISTEMA, Permissao::NOME_CADASTROPRODUTOS]);
         $unidade = UnidadeTest::create();
         $id = $unidade->getID();
-        $result = $this->get('/gerenciar/unidade/excluir?id=' . $id);
+        $result = $this->delete('/api/unidades/' . $id);
         $unidade->loadByID();
-        $this->assertEquals(302, $result->getStatusCode());
+        $expected = [ 'status' => 'ok', ];
+        $this->assertEquals($expected, \array_intersect_key($result, $expected));
         $this->assertFalse($unidade->exists());
     }
 }

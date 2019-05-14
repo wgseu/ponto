@@ -25,6 +25,7 @@
 namespace MZ\Location;
 
 use MZ\Provider\PrestadorTest;
+use MZ\Exception\ValidationException;
 
 class ViagemTest extends \MZ\Framework\TestCase
 {
@@ -65,11 +66,32 @@ class ViagemTest extends \MZ\Framework\TestCase
         $this->assertEquals(1, Viagem::count($condition));
     }
 
+    public function testFinds()
+    {
+        $viagem = self::create();
+
+        $resp = $viagem->findResponsavelID();
+        $this->assertEquals($viagem->getResponsavelID(), $resp->getID());
+    }
+
     public function testAdd()
     {
         $viagem = self::build();
         $viagem->insert();
         $this->assertTrue($viagem->exists());
+    }
+
+    public function testAddInvalid()
+    {
+        $viagem = self::build();
+        $viagem->setResponsavelID(null);
+        $viagem->setDataSaida(null);
+        try {
+            $viagem->insert();
+            $viagem->fail('Não cadastrar valores nulos');
+        } catch (ValidationException $e) {
+            $this->assertEquals(['responsaveid', 'datasaida'], array_keys($e->getErrors()));
+        }
     }
 
     public function testUpdate()

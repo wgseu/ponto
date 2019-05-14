@@ -409,35 +409,6 @@ class Viagem extends SyncModel
     }
 
     /**
-     * Translate SQL exception into application exception
-     * @param \Exception $e exception to translate into a readable error
-     * @return \MZ\Exception\ValidationException new exception translated
-     */
-    protected function translate($e)
-    {
-        if (contains(['ID', 'UNIQUE'], $e->getMessage())) {
-            return new ValidationException([
-                'id' => _t(
-                    'viagem.id_used',
-                    $this->getID()
-                ),
-            ]);
-        }
-        return parent::translate($e);
-    }
-
-    /**
-     * Load into this object from database using, ID
-     * @return self Self filled instance or empty when not found
-     */
-    public function loadByID()
-    {
-        return $this->load([
-            'id' => intval($this->getID()),
-        ]);
-    }
-
-    /**
      * Responsável pela entrega ou compra
      * @return \MZ\Provider\Prestador The object fetched from database
      */
@@ -472,15 +443,4 @@ class Viagem extends SyncModel
         return DB::buildCondition($query, $condition);
     }
 
-    /**
-     * Find this object on database using, ID
-     * @param int $id id to find Viagem
-     * @return self A filled instance or empty when not found
-     */
-    public static function findByID($id)
-    {
-        $result = new self();
-        $result->setID($id);
-        return $result->loadByID();
-    }
 }

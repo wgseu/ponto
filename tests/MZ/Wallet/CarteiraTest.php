@@ -218,6 +218,16 @@ class CarteiraTest extends \MZ\Framework\TestCase
         $this->assertEquals($pagamento->getValor(), $soma);
     }
 
+    public function testFetchAvailable()
+    {
+        $pagamento = \MZ\Payment\PagamentoTest::create();
+        $pagamento->setEstado('Pago');
+        $pagamento->update();
+        $carteira = $pagamento->findCarteiraID();
+        $resul = $carteira->fetchAvailable();
+        $this->assertEquals($pagamento->getValor(), $resul);
+    }
+
     public function testIsAtivo()
     {
         $carteira = self::create();
@@ -246,5 +256,16 @@ class CarteiraTest extends \MZ\Framework\TestCase
         $carteira->delete();
         $carteira->loadByID();
         $this->assertFalse($carteira->exists());
+    }
+
+    public function testClean()
+    {
+        $old_carteira = new Carteira();
+        $old_carteira->setLogoURL('imagem.png');
+
+        $carteira = new Carteira();
+        $carteira->setLogoURL('imagem.png');
+        $carteira->clean($old_carteira);
+        $this->assertEquals($old_carteira, $carteira);
     }
 }

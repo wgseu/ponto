@@ -23,6 +23,7 @@
  * @author Equipe GrandChef <desenvolvimento@mzsw.com.br>
  */
 namespace MZ\Wallet;
+use MZ\Exception\ValidationException;
 
 class BancoTest extends \MZ\Framework\TestCase
 {
@@ -51,6 +52,64 @@ class BancoTest extends \MZ\Framework\TestCase
         $banco = self::build($razao_social);
         $banco->insert();
         return $banco;
+    }
+
+    public function testValidate()
+    {
+        //Teste número nulo
+        $banco = self::build();
+        $banco->setNumero(null); 
+        try {
+            $banco->update();
+            $this->fail('Número não pode ser nulo');
+        } catch (ValidationException $e) {
+            $this->assertEquals(['numero'], array_keys($e->getErrors()));
+        }
+        //testa razão social nula
+        $banco = self::build();
+        $banco->setRazaoSocial(null); 
+        try {
+            $banco->update();
+            $this->fail('Razão social não pode ser nulo');
+        } catch (ValidationException $e) {
+            $this->assertEquals(['razaosocial'], array_keys($e->getErrors()));
+        }
+    }
+
+    public function testTranslate()
+    {
+        //Teste razão social já existe
+        $banco = self::create();
+        $banco->setNumero(99999);
+        try {
+            $banco->insert();
+            $this->fail('Razão social deve ser unico');
+        } catch (ValidationException $e) {
+            $this->assertEquals(['razaosocial'], array_keys($e->getErrors()));
+        }
+        //Teste de número já existe
+        $banco =  self::create();
+        $banco->setRazaoSocial('GrandChef teste');
+        try {
+            $banco->insert();
+            $this->fail('Número deve ser unico');
+        } catch (ValidationException $e) {
+            $this->assertEquals(['numero'], array_keys($e->getErrors()));
+        }
+    }
+
+    public function testFindByRazaoSocial()
+    {
+        $banco = self::create();
+        $bancoFind = $banco::findByRazaoSocial($banco->getRazaoSocial());
+        $this->assertEquals($banco->getRazaoSocial(), $bancoFind->getRazaoSocial());
+    }
+
+    public function testFindByNumero()
+    {
+        $banco = self::create();
+        $bancoFind = $banco::findByNumero($banco->getNumero());
+        $this->assertEquals($banco->getRazaoSocial(), $bancoFind->getRazaoSocial());
     }
 
     public function testFind()

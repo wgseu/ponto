@@ -12,6 +12,16 @@
 				{
 					"name": "Logout",
 					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{AUTH_TOKEN}}",
+									"type": "string"
+								}
+							]
+						},
 						"method": "GET",
 						"header": [],
 						"body": {
@@ -91,6 +101,16 @@
 				{
 					"name": "Status",
 					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{AUTH_TOKEN}}",
+									"type": "string"
+								}
+							]
+						},
 						"method": "GET",
 						"header": [],
 						"body": {
@@ -98,12 +118,10 @@
 							"raw": ""
 						},
 						"url": {
-							"raw": "http://localhost:3003/app/conta/status?device=android_1234&serial=5893d435-d2e4-49b0-bb3c-c9c3286f3165",
-							"protocol": "http",
+							"raw": "{{BASE_URL}}/app/conta/status?device=android_1234&serial=5893d435-d2e4-49b0-bb3c-c9c3286f3165",
 							"host": [
-								"localhost"
+								"{{BASE_URL}}"
 							],
-							"port": "3003",
 							"path": [
 								"app",
 								"conta",
@@ -133,6 +151,16 @@
 				{
 					"name": "Baixar notas",
 					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{AUTH_TOKEN}}",
+									"type": "string"
+								}
+							]
+						},
 						"method": "GET",
 						"header": [],
 						"body": {
@@ -140,12 +168,10 @@
 							"raw": ""
 						},
 						"url": {
-							"raw": "http://localhost:3003/gerenciar/nota/baixar?saida=json",
-							"protocol": "http",
+							"raw": "{{BASE_URL}}/gerenciar/nota/baixar?saida=json",
 							"host": [
-								"localhost"
+								"{{BASE_URL}}"
 							],
-							"port": "3003",
 							"path": [
 								"gerenciar",
 								"nota",
@@ -165,6 +191,16 @@
 				{
 					"name": "Listar pedidos da comanda",
 					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{AUTH_TOKEN}}",
+									"type": "string"
+								}
+							]
+						},
 						"method": "GET",
 						"header": [],
 						"body": {
@@ -172,12 +208,10 @@
 							"raw": ""
 						},
 						"url": {
-							"raw": "http://localhost:3003/app/pedido/listar?comanda=1",
-							"protocol": "http",
+							"raw": "{{BASE_URL}}/app/pedido/listar?comanda=1",
 							"host": [
-								"localhost"
+								"{{BASE_URL}}"
 							],
-							"port": "3003",
 							"path": [
 								"app",
 								"pedido",
@@ -197,6 +231,16 @@
 				{
 					"name": "Listar Composições",
 					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{AUTH_TOKEN}}",
+									"type": "string"
+								}
+							]
+						},
 						"method": "GET",
 						"header": [],
 						"body": {
@@ -204,12 +248,10 @@
 							"raw": ""
 						},
 						"url": {
-							"raw": "http://localhost:3003/app/composicao/listar?produto=2&selecionaveis=1",
-							"protocol": "http",
+							"raw": "{{BASE_URL}}/app/composicao/listar?produto=2&selecionaveis=1",
 							"host": [
-								"localhost"
+								"{{BASE_URL}}"
 							],
-							"port": "3003",
 							"path": [
 								"app",
 								"composicao",
@@ -233,6 +275,16 @@
 				{
 					"name": "Listar Categorias",
 					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{AUTH_TOKEN}}",
+									"type": "string"
+								}
+							]
+						},
 						"method": "GET",
 						"header": [],
 						"body": {
@@ -240,12 +292,10 @@
 							"raw": ""
 						},
 						"url": {
-							"raw": "http://localhost:3003/app/categoria/listar",
-							"protocol": "http",
+							"raw": "{{BASE_URL}}/app/categoria/listar",
 							"host": [
-								"localhost"
+								"{{BASE_URL}}"
 							],
-							"port": "3003",
 							"path": [
 								"app",
 								"categoria",
@@ -259,6 +309,16 @@
 				{
 					"name": "Procurar Fornecedores",
 					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{AUTH_TOKEN}}",
+									"type": "string"
+								}
+							]
+						},
 						"method": "GET",
 						"header": [],
 						"body": {
@@ -266,12 +326,10 @@
 							"raw": ""
 						},
 						"url": {
-							"raw": "http://localhost:3003/app/fornecedor/",
-							"protocol": "http",
+							"raw": "{{BASE_URL}}/app/fornecedor/",
 							"host": [
-								"localhost"
+								"{{BASE_URL}}"
 							],
-							"port": "3003",
 							"path": [
 								"app",
 								"fornecedor",
@@ -285,6 +343,16 @@
 				{
 					"name": "Listar Mesas",
 					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{AUTH_TOKEN}}",
+									"type": "string"
+								}
+							]
+						},
 						"method": "GET",
 						"header": [],
 						"body": {
@@ -292,12 +360,10 @@
 							"raw": ""
 						},
 						"url": {
-							"raw": "http://localhost:3003/app/mesa/listar",
-							"protocol": "http",
+							"raw": "{{BASE_URL}}/app/mesa/listar",
 							"host": [
-								"localhost"
+								"{{BASE_URL}}"
 							],
-							"port": "3003",
 							"path": [
 								"app",
 								"mesa",
@@ -311,6 +377,16 @@
 				{
 					"name": "Procurar Clientes",
 					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{AUTH_TOKEN}}",
+									"type": "string"
+								}
+							]
+						},
 						"method": "GET",
 						"header": [],
 						"body": {
@@ -318,12 +394,10 @@
 							"raw": ""
 						},
 						"url": {
-							"raw": "http://localhost:3003/app/cliente/procurar",
-							"protocol": "http",
+							"raw": "{{BASE_URL}}/app/cliente/procurar",
 							"host": [
-								"localhost"
+								"{{BASE_URL}}"
 							],
-							"port": "3003",
 							"path": [
 								"app",
 								"cliente",
@@ -337,6 +411,16 @@
 				{
 					"name": "Procurar Produtos",
 					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{AUTH_TOKEN}}",
+									"type": "string"
+								}
+							]
+						},
 						"method": "GET",
 						"header": [],
 						"body": {
@@ -344,12 +428,10 @@
 							"raw": ""
 						},
 						"url": {
-							"raw": "http://localhost:3003/app/produto/procurar",
-							"protocol": "http",
+							"raw": "{{BASE_URL}}/app/produto/procurar",
 							"host": [
-								"localhost"
+								"{{BASE_URL}}"
 							],
-							"port": "3003",
 							"path": [
 								"app",
 								"produto",
@@ -363,6 +445,16 @@
 				{
 					"name": "Listar Produtos",
 					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{AUTH_TOKEN}}",
+									"type": "string"
+								}
+							]
+						},
 						"method": "GET",
 						"header": [],
 						"body": {
@@ -370,12 +462,10 @@
 							"raw": ""
 						},
 						"url": {
-							"raw": "http://localhost:3003/app/produto/listar?categoria=10",
-							"protocol": "http",
+							"raw": "{{BASE_URL}}/app/produto/listar?categoria=10",
 							"host": [
-								"localhost"
+								"{{BASE_URL}}"
 							],
-							"port": "3003",
 							"path": [
 								"app",
 								"produto",
@@ -395,6 +485,16 @@
 				{
 					"name": "Listar Grupos",
 					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{AUTH_TOKEN}}",
+									"type": "string"
+								}
+							]
+						},
 						"method": "GET",
 						"header": [],
 						"body": {
@@ -402,12 +502,10 @@
 							"raw": ""
 						},
 						"url": {
-							"raw": "http://localhost:3003/app/grupo/listar?produto=5",
-							"protocol": "http",
+							"raw": "{{BASE_URL}}/app/grupo/listar?produto=5",
 							"host": [
-								"localhost"
+								"{{BASE_URL}}"
 							],
-							"port": "3003",
 							"path": [
 								"app",
 								"grupo",
@@ -427,6 +525,16 @@
 				{
 					"name": "Listar pedidos da mesa",
 					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{AUTH_TOKEN}}",
+									"type": "string"
+								}
+							]
+						},
 						"method": "GET",
 						"header": [],
 						"body": {
@@ -434,12 +542,10 @@
 							"raw": ""
 						},
 						"url": {
-							"raw": "http://localhost:3003/app/pedido/listar?mesa=3",
-							"protocol": "http",
+							"raw": "{{BASE_URL}}/app/pedido/listar?mesa=3",
 							"host": [
-								"localhost"
+								"{{BASE_URL}}"
 							],
-							"port": "3003",
 							"path": [
 								"app",
 								"pedido",
@@ -459,6 +565,16 @@
 				{
 					"name": "Listar Pacotes",
 					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{AUTH_TOKEN}}",
+									"type": "string"
+								}
+							]
+						},
 						"method": "POST",
 						"header": [],
 						"body": {
@@ -472,12 +588,10 @@
 							]
 						},
 						"url": {
-							"raw": "http://localhost:3003/app/pacote/listar?grupo=2&busca=ca",
-							"protocol": "http",
+							"raw": "{{BASE_URL}}/app/pacote/listar?grupo=2&busca=ca",
 							"host": [
-								"localhost"
+								"{{BASE_URL}}"
 							],
-							"port": "3003",
 							"path": [
 								"app",
 								"pacote",
@@ -501,6 +615,16 @@
 				{
 					"name": "Mostrar faturamento",
 					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{AUTH_TOKEN}}",
+									"type": "string"
+								}
+							]
+						},
 						"method": "GET",
 						"header": [],
 						"body": {
@@ -508,12 +632,10 @@
 							"raw": ""
 						},
 						"url": {
-							"raw": "http://localhost:3003/app/relatorio/resumo",
-							"protocol": "http",
+							"raw": "{{BASE_URL}}/app/relatorio/resumo",
 							"host": [
-								"localhost"
+								"{{BASE_URL}}"
 							],
-							"port": "3003",
 							"path": [
 								"app",
 								"relatorio",
@@ -527,6 +649,16 @@
 				{
 					"name": "Mostrar resumo",
 					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{AUTH_TOKEN}}",
+									"type": "string"
+								}
+							]
+						},
 						"method": "GET",
 						"header": [],
 						"body": {
@@ -534,12 +666,10 @@
 							"raw": ""
 						},
 						"url": {
-							"raw": "http://localhost:3003/app/relatorio/faturamento",
-							"protocol": "http",
+							"raw": "{{BASE_URL}}/app/relatorio/faturamento",
 							"host": [
-								"localhost"
+								"{{BASE_URL}}"
 							],
-							"port": "3003",
 							"path": [
 								"app",
 								"relatorio",
@@ -553,6 +683,16 @@
 				{
 					"name": "Listar Comandas",
 					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{AUTH_TOKEN}}",
+									"type": "string"
+								}
+							]
+						},
 						"method": "GET",
 						"header": [],
 						"body": {
@@ -560,12 +700,10 @@
 							"raw": ""
 						},
 						"url": {
-							"raw": "http://localhost:3003/app/comanda/listar",
-							"protocol": "http",
+							"raw": "{{BASE_URL}}/app/comanda/listar",
 							"host": [
-								"localhost"
+								"{{BASE_URL}}"
 							],
-							"port": "3003",
 							"path": [
 								"app",
 								"comanda",
@@ -585,6 +723,16 @@
 				{
 					"name": "Envio de Certificado",
 					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{AUTH_TOKEN}}",
+									"type": "string"
+								}
+							]
+						},
 						"method": "POST",
 						"header": [
 							{
@@ -609,12 +757,10 @@
 							]
 						},
 						"url": {
-							"raw": "http://localhost:3003/gerenciar/emitente/certificado?saida=json",
-							"protocol": "http",
+							"raw": "{{BASE_URL}}/gerenciar/emitente/certificado?saida=json",
 							"host": [
-								"localhost"
+								"{{BASE_URL}}"
 							],
-							"port": "3003",
 							"path": [
 								"gerenciar",
 								"emitente",
@@ -634,6 +780,16 @@
 				{
 					"name": "Opção de impressão",
 					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{AUTH_TOKEN}}",
+									"type": "string"
+								}
+							]
+						},
 						"method": "POST",
 						"header": [],
 						"body": {
@@ -657,12 +813,10 @@
 							]
 						},
 						"url": {
-							"raw": "http://localhost:3003/gerenciar/sistema/impressao",
-							"protocol": "http",
+							"raw": "{{BASE_URL}}/gerenciar/sistema/impressao",
 							"host": [
-								"localhost"
+								"{{BASE_URL}}"
 							],
-							"port": "3003",
 							"path": [
 								"gerenciar",
 								"sistema",
@@ -676,6 +830,16 @@
 				{
 					"name": "Enviar pedido para mesa",
 					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{AUTH_TOKEN}}",
+									"type": "string"
+								}
+							]
+						},
 						"method": "POST",
 						"header": [],
 						"body": {
@@ -714,12 +878,10 @@
 							]
 						},
 						"url": {
-							"raw": "http://localhost:3001/app/pedido/",
-							"protocol": "http",
+							"raw": "{{BASE_URL}}/app/pedido/",
 							"host": [
-								"localhost"
+								"{{BASE_URL}}"
 							],
-							"port": "3001",
 							"path": [
 								"app",
 								"pedido",
@@ -733,6 +895,16 @@
 				{
 					"name": "Cadastrar Cliente",
 					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{AUTH_TOKEN}}",
+									"type": "string"
+								}
+							]
+						},
 						"method": "POST",
 						"header": [],
 						"body": {
@@ -781,12 +953,10 @@
 							]
 						},
 						"url": {
-							"raw": "http://localhost:3001/app/cliente/",
-							"protocol": "http",
+							"raw": "{{BASE_URL}}/app/cliente/",
 							"host": [
-								"localhost"
+								"{{BASE_URL}}"
 							],
-							"port": "3001",
 							"path": [
 								"app",
 								"cliente",
@@ -800,6 +970,16 @@
 				{
 					"name": "Enviar notas",
 					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{AUTH_TOKEN}}",
+									"type": "string"
+								}
+							]
+						},
 						"method": "GET",
 						"header": [],
 						"body": {
@@ -807,12 +987,10 @@
 							"raw": ""
 						},
 						"url": {
-							"raw": "http://localhost:3001/gerenciar/nota/enviar?saida=json&modo=contador&serie=1&estado=Autorizado&emissao_inicio=2017-02-01&emissao_fim=2017-02-28",
-							"protocol": "http",
+							"raw": "{{BASE_URL}}/gerenciar/nota/enviar?saida=json&modo=contador&serie=1&estado=Autorizado&emissao_inicio=2017-02-01&emissao_fim=2017-02-28",
 							"host": [
-								"localhost"
+								"{{BASE_URL}}"
 							],
-							"port": "3001",
 							"path": [
 								"gerenciar",
 								"nota",
@@ -852,6 +1030,16 @@
 				{
 					"name": "DANFE JSON",
 					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{AUTH_TOKEN}}",
+									"type": "string"
+								}
+							]
+						},
 						"method": "GET",
 						"header": [],
 						"body": {
@@ -859,12 +1047,10 @@
 							"raw": ""
 						},
 						"url": {
-							"raw": "http://localhost:3001/gerenciar/nota/danfe?saida=json&pedido_id=19",
-							"protocol": "http",
+							"raw": "{{BASE_URL}}/gerenciar/nota/danfe?saida=json&pedido_id=19",
 							"host": [
-								"localhost"
+								"{{BASE_URL}}"
 							],
-							"port": "3001",
 							"path": [
 								"gerenciar",
 								"nota",
@@ -888,6 +1074,16 @@
 				{
 					"name": "Cria nota",
 					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{AUTH_TOKEN}}",
+									"type": "string"
+								}
+							]
+						},
 						"method": "POST",
 						"header": [],
 						"body": {
@@ -906,12 +1102,10 @@
 							]
 						},
 						"url": {
-							"raw": "http://localhost:3001/gerenciar/nota/cadastrar?saida=json",
-							"protocol": "http",
+							"raw": "{{BASE_URL}}/gerenciar/nota/cadastrar?saida=json",
 							"host": [
-								"localhost"
+								"{{BASE_URL}}"
 							],
-							"port": "3001",
 							"path": [
 								"gerenciar",
 								"nota",
@@ -931,6 +1125,16 @@
 				{
 					"name": "Inserir Estoque",
 					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{AUTH_TOKEN}}",
+									"type": "string"
+								}
+							]
+						},
 						"method": "POST",
 						"header": [],
 						"body": {
@@ -969,12 +1173,10 @@
 							]
 						},
 						"url": {
-							"raw": "http://localhost:3001/app/estoque/",
-							"protocol": "http",
+							"raw": "{{BASE_URL}}/app/estoque/",
 							"host": [
-								"localhost"
+								"{{BASE_URL}}"
 							],
-							"port": "3001",
 							"path": [
 								"app",
 								"estoque",
@@ -988,6 +1190,16 @@
 				{
 					"name": "Enviar pedido para comanda",
 					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{AUTH_TOKEN}}",
+									"type": "string"
+								}
+							]
+						},
 						"method": "POST",
 						"header": [],
 						"body": {
@@ -1026,12 +1238,10 @@
 							]
 						},
 						"url": {
-							"raw": "http://localhost:3001/app/pedido/",
-							"protocol": "http",
+							"raw": "{{BASE_URL}}/app/pedido/",
 							"host": [
-								"localhost"
+								"{{BASE_URL}}"
 							],
-							"port": "3001",
 							"path": [
 								"app",
 								"pedido",
@@ -1045,6 +1255,16 @@
 				{
 					"name": "Abrir comanda",
 					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{AUTH_TOKEN}}",
+									"type": "string"
+								}
+							]
+						},
 						"method": "POST",
 						"header": [],
 						"body": {
@@ -1078,12 +1298,10 @@
 							]
 						},
 						"url": {
-							"raw": "http://localhost:3001/app/pedido/",
-							"protocol": "http",
+							"raw": "{{BASE_URL}}/app/pedido/",
 							"host": [
-								"localhost"
+								"{{BASE_URL}}"
 							],
-							"port": "3001",
 							"path": [
 								"app",
 								"pedido",
@@ -1097,6 +1315,16 @@
 				{
 					"name": "Processa Notas",
 					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{AUTH_TOKEN}}",
+									"type": "string"
+								}
+							]
+						},
 						"method": "GET",
 						"header": [],
 						"body": {
@@ -1104,12 +1332,10 @@
 							"raw": ""
 						},
 						"url": {
-							"raw": "http://localhost:3001/gerenciar/nota/processa?saida=json",
-							"protocol": "http",
+							"raw": "{{BASE_URL}}/gerenciar/nota/processa?saida=json",
 							"host": [
-								"localhost"
+								"{{BASE_URL}}"
 							],
-							"port": "3001",
 							"path": [
 								"gerenciar",
 								"nota",
@@ -1129,6 +1355,16 @@
 				{
 					"name": "Enviar pacote para mesa",
 					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{AUTH_TOKEN}}",
+									"type": "string"
+								}
+							]
+						},
 						"method": "POST",
 						"header": [],
 						"body": {
@@ -1267,12 +1503,10 @@
 							]
 						},
 						"url": {
-							"raw": "http://localhost:3001/app/pedido/",
-							"protocol": "http",
+							"raw": "{{BASE_URL}}/app/pedido/",
 							"host": [
-								"localhost"
+								"{{BASE_URL}}"
 							],
-							"port": "3001",
 							"path": [
 								"app",
 								"pedido",
@@ -1286,6 +1520,16 @@
 				{
 					"name": "Executa tarefas",
 					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{AUTH_TOKEN}}",
+									"type": "string"
+								}
+							]
+						},
 						"method": "GET",
 						"header": [],
 						"body": {
@@ -1293,12 +1537,10 @@
 							"raw": ""
 						},
 						"url": {
-							"raw": "http://localhost:3001/gerenciar/sistema/tarefa?saida=json&token=WWHxIdzDakrea921zGveQkKccrf80mDp",
-							"protocol": "http",
+							"raw": "{{BASE_URL}}/gerenciar/sistema/tarefa?saida=json&token=WWHxIdzDakrea921zGveQkKccrf80mDp",
 							"host": [
-								"localhost"
+								"{{BASE_URL}}"
 							],
-							"port": "3001",
 							"path": [
 								"gerenciar",
 								"sistema",
@@ -1328,6 +1570,16 @@
 				{
 					"name": "Restore",
 					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{AUTH_TOKEN}}",
+									"type": "string"
+								}
+							]
+						},
 						"method": "POST",
 						"header": [],
 						"body": {
@@ -1342,12 +1594,10 @@
 							]
 						},
 						"url": {
-							"raw": "http://localhost:3001/gerenciar/sistema/restore",
-							"protocol": "http",
+							"raw": "{{BASE_URL}}/gerenciar/sistema/restore",
 							"host": [
-								"localhost"
+								"{{BASE_URL}}"
 							],
-							"port": "3001",
 							"path": [
 								"gerenciar",
 								"sistema",
@@ -1361,6 +1611,16 @@
 				{
 					"name": "Backup",
 					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{AUTH_TOKEN}}",
+									"type": "string"
+								}
+							]
+						},
 						"method": "GET",
 						"header": [],
 						"body": {
@@ -1368,12 +1628,10 @@
 							"raw": ""
 						},
 						"url": {
-							"raw": "http://localhost:3001/gerenciar/sistema/backup",
-							"protocol": "http",
+							"raw": "{{BASE_URL}}/gerenciar/sistema/backup",
 							"host": [
-								"localhost"
+								"{{BASE_URL}}"
 							],
-							"port": "3001",
 							"path": [
 								"gerenciar",
 								"sistema",
@@ -1399,7 +1657,7 @@
 							"description": "",
 							"item": [
 								{
-									"name": "Procurar Classificacoes",
+									"name": "Procurar",
 									"request": {
 										"auth": {
 											"type": "bearer",
@@ -1428,7 +1686,7 @@
 									"response": []
 								},
 								{
-									"name": "Adicionar Classificacoes",
+									"name": "Adicionar",
 									"request": {
 										"auth": {
 											"type": "bearer",
@@ -1465,7 +1723,7 @@
 									"response": []
 								},
 								{
-									"name": "Modificar Classificacoes",
+									"name": "Modificar",
 									"request": {
 										"auth": {
 											"type": "bearer",
@@ -1489,21 +1747,21 @@
 											"raw": "{ \"descricao\": \"Pagamento de Compradores\" }\n"
 										},
 										"url": {
-											"raw": "{{BASE_URL}}/api/classificacoes/{{ID_CLIENTE}}",
+											"raw": "{{BASE_URL}}/api/classificacoes/{{CLASSIFICACAO_ID}}",
 											"host": [
 												"{{BASE_URL}}"
 											],
 											"path": [
 												"api",
 												"classificacoes",
-												"{{ID_CLIENTE}}"
+												"{{CLASSIFICACAO_ID}}"
 											]
 										}
 									},
 									"response": []
 								},
 								{
-									"name": "Deletar Classificacoes",
+									"name": "Deletar",
 									"request": {
 										"method": "DELETE",
 										"header": [
@@ -1517,14 +1775,14 @@
 											"raw": "{ \"descricao\": \"Pagamento de Compradores\" }"
 										},
 										"url": {
-											"raw": "{{BASE_URL}}/api/classificacoes/{{ID_CLIENTE}}",
+											"raw": "{{BASE_URL}}/api/classificacoes/{{CLASSIFICACAO_ID}}",
 											"host": [
 												"{{BASE_URL}}"
 											],
 											"path": [
 												"api",
 												"classificacoes",
-												"{{ID_CLIENTE}}"
+												"{{CLASSIFICACAO_ID}}"
 											]
 										}
 									},
@@ -1538,7 +1796,7 @@
 							"description": "",
 							"item": [
 								{
-									"name": "Procurar Cliente",
+									"name": "Procurar",
 									"request": {
 										"auth": {
 											"type": "bearer",
@@ -1567,8 +1825,18 @@
 									"response": []
 								},
 								{
-									"name": "Adicionar Cliente",
+									"name": "Adicionar",
 									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{AUTH_TOKEN}}",
+													"type": "string"
+												}
+											]
+										},
 										"method": "POST",
 										"header": [
 											{
@@ -1578,7 +1846,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{ \n  \"tipo\": \"Juridica\",\n  \"nome\": \"Teste\",\n  \"senha\": \"123456\",\n  \"genero\": \"Masculino\",\n  \"email\": \"testee@gmail.com\",\n  \"aceitar\": \"true\",\n  \"confirmarsenha\": \"123456\"\n}"
+											"raw": "{ \n  \"tipo\": \"Fisica\",\n  \"nome\": \"Teste\",\n  \"senha\": \"123456\",\n  \"genero\": \"Masculino\",\n  \"email\": \"testee@gmail.com\",\n  \"aceitar\": \"true\",\n  \"confirmarsenha\": \"123456\",\n  \"login\": \"testando\"\n}"
 										},
 										"url": {
 											"raw": "{{BASE_URL}}/api/clientes",
@@ -1594,7 +1862,7 @@
 									"response": []
 								},
 								{
-									"name": "Modificar Cliente",
+									"name": "Modificar",
 									"request": {
 										"auth": {
 											"type": "bearer",
@@ -1615,24 +1883,24 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{ \n  \"tipo\": \"Juridica\",\n  \"nome\": \"Test\",\n  \"senha\": \"12345\",\n  \"genero\": \"Feminino\",\n  \"email\": \"test@gmail.com\",\n  \"confirmarsenha\": \"12345\"\n  \n}"
+											"raw": "{ \n  \"tipo\": \"Fisica\",\n  \"nome\": \"Test\",\n  \"senha\": \"12345\",\n  \"genero\": \"Feminino\",\n  \"email\": \"test@gmail.com\",\n  \"confirmarsenha\": \"12345\",\n  \"login\": \"Testando\"\n}"
 										},
 										"url": {
-											"raw": "{{BASE_URL}}/api/clientes/{{ID_CLIENTE}}",
+											"raw": "{{BASE_URL}}/api/clientes/{{CLIENTE_ID}}",
 											"host": [
 												"{{BASE_URL}}"
 											],
 											"path": [
 												"api",
 												"clientes",
-												"{{ID_CLIENTE}}"
+												"{{CLIENTE_ID}}"
 											]
 										}
 									},
 									"response": []
 								},
 								{
-									"name": "Deletar Cliente",
+									"name": "Deletar",
 									"request": {
 										"auth": {
 											"type": "bearer",
@@ -1648,14 +1916,14 @@
 										"header": [],
 										"body": {},
 										"url": {
-											"raw": "{{BASE_URL}}/api/clientes/{{ID_CLIENTE}}",
+											"raw": "{{BASE_URL}}/api/clientes/{{CLIENTE_ID}}",
 											"host": [
 												"{{BASE_URL}}"
 											],
 											"path": [
 												"api",
 												"clientes",
-												"{{ID_CLIENTE}}"
+												"{{CLIENTE_ID}}"
 											]
 										}
 									},
@@ -1737,6 +2005,16 @@
 								{
 									"name": "Modificar",
 									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{AUTH_TOKEN}}",
+													"type": "string"
+												}
+											]
+										},
 										"method": "PATCH",
 										"header": [
 											{
@@ -1749,14 +2027,14 @@
 											"raw": "{\n  \"tipo\": \"Receita\",\n  \"descricao\": \"Conta a receber\",\n  \"classificacaoid\": \"3\",\n  \"valor\": \"15\"\n}"
 										},
 										"url": {
-											"raw": "{{BASE_URL}}/api/contas/{{ID_CLIENTE}}",
+											"raw": "{{BASE_URL}}/api/contas/{{CONTA_ID}}",
 											"host": [
 												"{{BASE_URL}}"
 											],
 											"path": [
 												"api",
 												"contas",
-												"{{ID_CLIENTE}}"
+												"{{CONTA_ID}}"
 											]
 										}
 									},
@@ -1765,6 +2043,16 @@
 								{
 									"name": "Deletar",
 									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{AUTH_TOKEN}}",
+													"type": "string"
+												}
+											]
+										},
 										"method": "DELETE",
 										"header": [
 											{
@@ -1777,14 +2065,14 @@
 											"raw": "{\n  \"tipo\": \"Receita\",\n  \"descricao\": \"Conta a receber\",\n  \"classificacaoid\": \"3\",\n  \"valor\": \"15\"\n}"
 										},
 										"url": {
-											"raw": "{{BASE_URL}}/api/contas/{{ID_CLIENTE}}",
+											"raw": "{{BASE_URL}}/api/contas/{{CONTA_ID}}",
 											"host": [
 												"{{BASE_URL}}"
 											],
 											"path": [
 												"api",
 												"contas",
-												"{{ID_CLIENTE}}"
+												"{{CONTA_ID}}"
 											]
 										}
 									},
@@ -2134,12 +2422,6 @@
 					"_postman_isSubFolder": true
 				},
 				{
-					"name": "Association",
-					"description": "",
-					"item": [],
-					"_postman_isSubFolder": true
-				},
-				{
 					"name": "Company",
 					"description": "",
 					"item": [
@@ -2293,24 +2575,6 @@
 							"_postman_isSubFolder": true
 						}
 					],
-					"_postman_isSubFolder": true
-				},
-				{
-					"name": "Core",
-					"description": "",
-					"item": [],
-					"_postman_isSubFolder": true
-				},
-				{
-					"name": "Coupon",
-					"description": "",
-					"item": [],
-					"_postman_isSubFolder": true
-				},
-				{
-					"name": "Database",
-					"description": "",
-					"item": [],
 					"_postman_isSubFolder": true
 				},
 				{
@@ -2914,33 +3178,150 @@
 					"_postman_isSubFolder": true
 				},
 				{
-					"name": "Exception",
-					"description": "",
-					"item": [],
-					"_postman_isSubFolder": true
-				},
-				{
-					"name": "Framework",
-					"description": "",
-					"item": [],
-					"_postman_isSubFolder": true
-				},
-				{
-					"name": "Integrator",
-					"description": "",
-					"item": [],
-					"_postman_isSubFolder": true
-				},
-				{
-					"name": "Invoice",
-					"description": "",
-					"item": [],
-					"_postman_isSubFolder": true
-				},
-				{
 					"name": "Location",
 					"description": "",
 					"item": [
+						{
+							"name": "Cidade",
+							"description": "",
+							"item": [
+								{
+									"name": "Procurar",
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{AUTH_TOKEN}}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "GET",
+										"header": [],
+										"body": {},
+										"url": {
+											"raw": "{{BASE_URL}}/api/cidades",
+											"host": [
+												"{{BASE_URL}}"
+											],
+											"path": [
+												"api",
+												"cidades"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Adicionar",
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{AUTH_TOKEN}}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "POST",
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n\t\"nome\": \"Maringa\",\n\t\"estadoid\": \"1\"\n}"
+										},
+										"url": {
+											"raw": "{{BASE_URL}}/api/cidades",
+											"host": [
+												"{{BASE_URL}}"
+											],
+											"path": [
+												"api",
+												"cidades"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Modificar",
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{AUTH_TOKEN}}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "PATCH",
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n\t\"nome\": \"Paranavai\",\n\t\"estadoid\": \"2\"\n}"
+										},
+										"url": {
+											"raw": "{{BASE_URL}}/api/cidades/{{CIDADE_ID}}",
+											"host": [
+												"{{BASE_URL}}"
+											],
+											"path": [
+												"api",
+												"cidades",
+												"{{CIDADE_ID}}"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Deletar",
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{AUTH_TOKEN}}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "DELETE",
+										"header": [],
+										"body": {},
+										"url": {
+											"raw": "{{BASE_URL}}/api/cidades/{{CIDADE_ID}}",
+											"host": [
+												"{{BASE_URL}}"
+											],
+											"path": [
+												"api",
+												"cidades",
+												"{{CIDADE_ID}}"
+											]
+										}
+									},
+									"response": []
+								}
+							],
+							"_postman_isSubFolder": true
+						},
 						{
 							"name": "Bairro",
 							"description": "",
@@ -3091,147 +3472,6 @@
 							"_postman_isSubFolder": true
 						},
 						{
-							"name": "Cidade",
-							"description": "",
-							"item": [
-								{
-									"name": "Procurar",
-									"request": {
-										"auth": {
-											"type": "bearer",
-											"bearer": [
-												{
-													"key": "token",
-													"value": "{{AUTH_TOKEN}}",
-													"type": "string"
-												}
-											]
-										},
-										"method": "GET",
-										"header": [],
-										"body": {},
-										"url": {
-											"raw": "{{BASE_URL}}/api/cidades",
-											"host": [
-												"{{BASE_URL}}"
-											],
-											"path": [
-												"api",
-												"cidades"
-											]
-										}
-									},
-									"response": []
-								},
-								{
-									"name": "Adicionar",
-									"request": {
-										"auth": {
-											"type": "bearer",
-											"bearer": [
-												{
-													"key": "token",
-													"value": "{{AUTH_TOKEN}}",
-													"type": "string"
-												}
-											]
-										},
-										"method": "POST",
-										"header": [
-											{
-												"key": "Content-Type",
-												"value": "application/json"
-											}
-										],
-										"body": {
-											"mode": "raw",
-											"raw": "{\n\t\"nome\": \"Maringa\",\n\t\"estadoid\": \"1\"\n}"
-										},
-										"url": {
-											"raw": "{{BASE_URL}}/api/cidades",
-											"host": [
-												"{{BASE_URL}}"
-											],
-											"path": [
-												"api",
-												"cidades"
-											]
-										}
-									},
-									"response": []
-								},
-								{
-									"name": "Modificar",
-									"request": {
-										"auth": {
-											"type": "bearer",
-											"bearer": [
-												{
-													"key": "token",
-													"value": "{{AUTH_TOKEN}}",
-													"type": "string"
-												}
-											]
-										},
-										"method": "PATCH",
-										"header": [
-											{
-												"key": "Content-Type",
-												"value": "application/json"
-											}
-										],
-										"body": {
-											"mode": "raw",
-											"raw": "{\n\t\"nome\": \"Paranavai\",\n\t\"estadoid\": \"2\"\n}"
-										},
-										"url": {
-											"raw": "{{BASE_URL}}/api/cidades/{{CIDADE_ID}}",
-											"host": [
-												"{{BASE_URL}}"
-											],
-											"path": [
-												"api",
-												"cidades",
-												"{{CIDADE_ID}}"
-											]
-										}
-									},
-									"response": []
-								},
-								{
-									"name": "Deletar",
-									"request": {
-										"auth": {
-											"type": "bearer",
-											"bearer": [
-												{
-													"key": "token",
-													"value": "{{AUTH_TOKEN}}",
-													"type": "string"
-												}
-											]
-										},
-										"method": "DELETE",
-										"header": [],
-										"body": {},
-										"url": {
-											"raw": "{{BASE_URL}}/api/cidades/{{CIDADE_ID}}",
-											"host": [
-												"{{BASE_URL}}"
-											],
-											"path": [
-												"api",
-												"cidades",
-												"{{CIDADE_ID}}"
-											]
-										}
-									},
-									"response": []
-								}
-							],
-							"_postman_isSubFolder": true
-						},
-						{
 							"name": "Endereco",
 							"description": "",
 							"item": [
@@ -3276,7 +3516,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n\t\"cidadeid\": \"1\",\n\t\"bairroid\": \"3\",\n\t\"logradouro\": \"Guerino Pomin\",\n\t\"cep\": \"87705390\"\n}"
+											"raw": "{\n\t\"cidadeid\": \"1\",\n\t\"bairroid\": \"1\",\n\t\"logradouro\": \"Guerino Pomin\",\n\t\"cep\": \"87705390\"\n}"
 										},
 										"url": {
 											"raw": "{{BASE_URL}}/api/enderecos",
@@ -3306,14 +3546,14 @@
 											"raw": "{\n\t\"logradouro\": \"Guerino Pomin\",\n\t\"cep\": \"87705390\"\n}"
 										},
 										"url": {
-											"raw": "{{BASE_URL}}/api/enderecos/{{BAIRRO_ID}}",
+											"raw": "{{BASE_URL}}/api/enderecos/{{ENDERECO_ID}}",
 											"host": [
 												"{{BASE_URL}}"
 											],
 											"path": [
 												"api",
 												"enderecos",
-												"{{BAIRRO_ID}}"
+												"{{ENDERECO_ID}}"
 											]
 										}
 									},
@@ -3407,7 +3647,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n\t\"paisid\": \"1\",\n\t\"nome\": \"Parana\",\n\t\"uf\": \"PR\"\n}"
+											"raw": "{\n\t\"paisid\": \"5\",\n\t\"nome\": \"Buenos Aires\",\n\t\"uf\": \"Bs\"\n}"
 										},
 										"url": {
 											"raw": "{{BASE_URL}}/api/estados",
@@ -3444,7 +3684,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n\t\"nome\": \"Paraná\"\n}"
+											"raw": "{\n\t\"nome\": \"Buenos Aire\"\n}"
 										},
 										"url": {
 											"raw": "{{BASE_URL}}/api/estados/{{ESTADO_ID}}",
@@ -3947,7 +4187,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n\t\"bairroid\": \"4\",\n\t\"nome\": \"Sul\"\n}"
+											"raw": "{\n\t\"bairroid\": \"1\",\n\t\"nome\": \"Sul\"\n}"
 										},
 										"url": {
 											"raw": "{{BASE_URL}}/api/zonas",
@@ -4038,18 +4278,6 @@
 					"_postman_isSubFolder": true
 				},
 				{
-					"name": "Logger",
-					"description": "",
-					"item": [],
-					"_postman_isSubFolder": true
-				},
-				{
-					"name": "Mail",
-					"description": "",
-					"item": [],
-					"_postman_isSubFolder": true
-				},
-				{
 					"name": "Payment",
 					"description": "",
 					"item": [
@@ -4127,11 +4355,24 @@
 								{
 									"name": "Procurar",
 									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{AUTH_TOKEN}}",
+													"type": "string"
+												}
+											]
+										},
 										"method": "GET",
 										"header": [],
 										"body": {},
 										"url": {
-											"raw": "/api/cartoes",
+											"raw": "{{BASE_URL}}/api/cartoes",
+											"host": [
+												"{{BASE_URL}}"
+											],
 											"path": [
 												"api",
 												"cartoes"
@@ -4963,7 +5204,7 @@
 							"description": "",
 							"item": [
 								{
-									"name": "Procurar",
+									"name": "Modificar",
 									"request": {
 										"auth": {
 											"type": "bearer",
@@ -4975,56 +5216,26 @@
 												}
 											]
 										},
-										"method": "GET",
-										"header": [],
-										"body": {},
-										"url": {
-											"raw": "{{BASE_URL}}/api/produtos",
-											"host": [
-												"{{BASE_URL}}"
-											],
-											"path": [
-												"api",
-												"produtos"
-											]
-										}
-									},
-									"response": []
-								},
-								{
-									"name": "Adicionar",
-									"request": {
-										"method": "POST",
-										"header": [],
-										"body": {},
-										"url": {
-											"raw": "{{BASE_URL}}/api/produtos",
-											"host": [
-												"{{BASE_URL}}"
-											],
-											"path": [
-												"api",
-												"produtos"
-											]
-										}
-									},
-									"response": []
-								},
-								{
-									"name": "Modificar",
-									"request": {
 										"method": "PATCH",
-										"header": [],
-										"body": {},
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n\t\n}"
+										},
 										"url": {
-											"raw": "{{BASE_URL}}/api/produtos/{id}",
+											"raw": "{{BASE_URL}}/api/produtos/{{PRODUTO_ID}}",
 											"host": [
 												"{{BASE_URL}}"
 											],
 											"path": [
 												"api",
 												"produtos",
-												"{id}"
+												"{{PRODUTO_ID}}"
 											]
 										}
 									},
@@ -5033,18 +5244,28 @@
 								{
 									"name": "Deletar",
 									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{AUTH_TOKEN}}",
+													"type": "string"
+												}
+											]
+										},
 										"method": "DELETE",
 										"header": [],
 										"body": {},
 										"url": {
-											"raw": "{{BASE_URL}}/api/produtos/{id}",
+											"raw": "{{BASE_URL}}/api/produtos/{{PRODUTO_ID}}",
 											"host": [
 												"{{BASE_URL}}"
 											],
 											"path": [
 												"api",
 												"produtos",
-												"{id}"
+												"{{PRODUTO_ID}}"
 											]
 										}
 									},
@@ -5267,18 +5488,36 @@
 								{
 									"name": "Modificar",
 									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{AUTH_TOKEN}}",
+													"type": "string"
+												}
+											]
+										},
 										"method": "PATCH",
-										"header": [],
-										"body": {},
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n\t\"descricao\": \"Show GrandChef\"\n}"
+										},
 										"url": {
-											"raw": "{{BASE_URL}}/api/servicos/{id}",
+											"raw": "{{BASE_URL}}/api/servicos/{{SERVICO_ID}}",
 											"host": [
 												"{{BASE_URL}}"
 											],
 											"path": [
 												"api",
 												"servicos",
-												"{id}"
+												"{{SERVICO_ID}}"
 											]
 										}
 									},
@@ -5459,12 +5698,6 @@
 							"_postman_isSubFolder": true
 						}
 					],
-					"_postman_isSubFolder": true
-				},
-				{
-					"name": "Promotion",
-					"description": "",
-					"item": [],
 					"_postman_isSubFolder": true
 				},
 				{
@@ -5667,7 +5900,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n\t\"codigo\": \"3\",\n\t\"funcaoid\": \"2\",\n\t\"clienteid\": \"3\",\n\t\"prestadorid\": \"1\",\n\t\"vinculo\": \"Funcionario\",\n    \"porcentagem\": 0,\n    \"pontuacao\": 0,\n    \"remuneracao\": 0\n}"
+											"raw": "{\n\t\"codigo\": \"3\",\n\t\"funcaoid\": \"2\",\n\t\"clienteid\": \"2\",\n\t\"prestadorid\": \"1\",\n\t\"vinculo\": \"Funcionario\",\n    \"porcentagem\": 0,\n    \"pontuacao\": 0,\n    \"remuneracao\": 0\n}"
 										},
 										"url": {
 											"raw": "{{BASE_URL}}/api/prestadores",
@@ -5759,25 +5992,6 @@
 									"response": []
 								}
 							],
-							"_postman_isSubFolder": true
-						}
-					],
-					"_postman_isSubFolder": true
-				},
-				{
-					"name": "Response",
-					"description": "",
-					"item": [],
-					"_postman_isSubFolder": true
-				},
-				{
-					"name": "Routing",
-					"description": "",
-					"item": [
-						{
-							"name": "Annotation",
-							"description": "",
-							"item": [],
 							"_postman_isSubFolder": true
 						}
 					],
@@ -6337,7 +6551,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"sessaoid\": 1,\n    \"caixaid\": 5,\n    \"aberta\": \"Y\",\n    \"iniciadorid\": 1\n}"
+											"raw": "{\n    \"sessaoid\": 1,\n    \"caixaid\": 2,\n    \"aberta\": \"Y\",\n    \"iniciadorid\": 1\n}"
 										},
 										"url": {
 											"raw": "{{BASE_URL}}/api/movimentacoes",
@@ -6374,7 +6588,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n\t\"caixaid\": \"6\"\n}"
+											"raw": "{\n\t\"caixaid\": \"1\"\n}"
 										},
 										"url": {
 											"raw": "{{BASE_URL}}/api/movimentacoes/{{MOVIMENTACAO_ID}}",
@@ -6849,8 +7063,16 @@
 											]
 										},
 										"method": "DELETE",
-										"header": [],
-										"body": {},
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": ""
+										},
 										"url": {
 											"raw": "{{BASE_URL}}/api/auditorias/{{AUDITORIA_ID}}",
 											"host": [
@@ -6902,43 +7124,6 @@
 									"response": []
 								},
 								{
-									"name": "Adicionar",
-									"request": {
-										"auth": {
-											"type": "bearer",
-											"bearer": [
-												{
-													"key": "token",
-													"value": "{{AUTH_TOKEN}}",
-													"type": "string"
-												}
-											]
-										},
-										"method": "POST",
-										"header": [
-											{
-												"key": "Content-Type",
-												"value": "application/json"
-											}
-										],
-										"body": {
-											"mode": "raw",
-											"raw": "{\n\t\"nome\": \"GrandChef\",\n\t\"acessourl\": \"grandchef\",\n\t\"descricao\": \"Modulo de integração com o GrandChef\",\n\t\"inconeurl\": \"/static/img/integracao/grandchef.png\",\n\t\"ativo\": \"N\",\n\t\"dataatualizacao\": \"2019-05-10\"\n}"
-										},
-										"url": {
-											"raw": "{{BASE_URL}}/api/integracoes",
-											"host": [
-												"{{BASE_URL}}"
-											],
-											"path": [
-												"api",
-												"integracoes"
-											]
-										}
-									},
-									"response": []
-								},
-								{
 									"name": "Modificar",
 									"request": {
 										"auth": {
@@ -6960,38 +7145,8 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n\t\"nome\": \"GrandChef\",\n\t\"acessourl\": \"grandchef\",\n\t\"descricao\": \"Modulo de integração com o GrandChef\",\n\t\"iconeurl\": \"/static/img/integracao/grandchef.png\",\n\t\"ativo\": \"N\",\n\t\"dataatualizacao\": \"2019-05-10\"\n}"
+											"raw": "{\n\t\"descricao\": \"GrandChef\"\n}"
 										},
-										"url": {
-											"raw": "{{BASE_URL}}/api/integracoes/{{INTEGRACAO_ID}}",
-											"host": [
-												"{{BASE_URL}}"
-											],
-											"path": [
-												"api",
-												"integracoes",
-												"{{INTEGRACAO_ID}}"
-											]
-										}
-									},
-									"response": []
-								},
-								{
-									"name": "Deletar",
-									"request": {
-										"auth": {
-											"type": "bearer",
-											"bearer": [
-												{
-													"key": "token",
-													"value": "{{AUTH_TOKEN}}",
-													"type": "string"
-												}
-											]
-										},
-										"method": "DELETE",
-										"header": [],
-										"body": {},
 										"url": {
 											"raw": "{{BASE_URL}}/api/integracoes/{{INTEGRACAO_ID}}",
 											"host": [
@@ -7290,24 +7445,6 @@
 							"_postman_isSubFolder": true
 						}
 					],
-					"_postman_isSubFolder": true
-				},
-				{
-					"name": "Task",
-					"description": "",
-					"item": [],
-					"_postman_isSubFolder": true
-				},
-				{
-					"name": "Template",
-					"description": "",
-					"item": [],
-					"_postman_isSubFolder": true
-				},
-				{
-					"name": "Util",
-					"description": "",
-					"item": [],
 					"_postman_isSubFolder": true
 				},
 				{
@@ -7728,12 +7865,6 @@
 							"_postman_isSubFolder": true
 						}
 					],
-					"_postman_isSubFolder": true
-				},
-				{
-					"name": "Credito",
-					"description": "",
-					"item": [],
 					"_postman_isSubFolder": true
 				}
 			]

@@ -25,6 +25,7 @@
 namespace MZ\Stock;
 
 use MZ\Provider\PrestadorTest;
+use MZ\Exception\ValidationException;
 
 class ListaTest extends \MZ\Framework\TestCase
 {
@@ -76,11 +77,46 @@ class ListaTest extends \MZ\Framework\TestCase
         $this->assertTrue($lista->exists());
     }
 
+    public function testAddInvalid()
+    {
+        $lista = self::build();
+        $lista->setDescricao(null);
+        $lista->setEstado(null);
+        $lista->setEncarregadoID(null);
+        $lista->setDataViagem(null);
+        try {
+            $lista->insert();
+            $this->fail('Não cadastrar valores nulos');
+        } catch (ValidationException $e) {
+            $this->assertEquals(['descricao', 'estado', 'encarregadoid', 'dataviagem'], array_keys($e->getErrors()));
+        }
+    }
+
+    public function testFinds()
+    {
+        $lista = self::create();
+
+        $encarregado = $lista->findEncarregadoID();
+        $this->assertEquals($lista->getEncarregadoID(), $encarregado->getID());
+
+        $viagem = $lista->findViagemID();
+        $this->assertEquals($lista->getViagemID(), $viagem->getID());
+    }
+
     public function testUpdate()
     {
         $lista = self::create();
         $lista->update();
         $this->assertTrue($lista->exists());
+    }
+
+    public function testGetOptions()
+    {
+        $lista = self::build();
+        $lista->setEstado("Fechada");
+        $lista->insert();
+        $options = Lista::getEstadoOptions($lista->getEstado());
+        $this->assertEquals($lista->getEstado(), $options);
     }
 
     public function testDelete()

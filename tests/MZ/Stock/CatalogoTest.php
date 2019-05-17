@@ -26,6 +26,7 @@ namespace MZ\Stock;
 
 use MZ\Product\ProdutoTest;
 use MZ\Stock\FornecedorTest;
+use MZ\Exception\ValidationException;
 
 class CatalogoTest extends \MZ\Framework\TestCase
 {
@@ -73,11 +74,56 @@ class CatalogoTest extends \MZ\Framework\TestCase
         $this->assertEquals(1, Catalogo::count($condition));
     }
 
+    public function testFinds()
+    {
+        $catalogo = self::create();
+
+        $produto = $catalogo->findProdutoID();
+        $this->assertEquals($catalogo->getProdutoID(), $produto->getID());
+
+        $fornecedor = $catalogo->findFornecedorID();
+        $this->assertEquals($catalogo->getFornecedorID(), $fornecedor->getID());
+
+        $catalogoByFornecedor = $catalogo->findByFornecedorID($fornecedor->getID());
+        $this->assertInstanceOf(get_class($catalogo), $catalogoByFornecedor);
+    }
+
     public function testAdd()
     {
         $catalogo = self::build();
         $catalogo->insert();
         $this->assertTrue($catalogo->exists());
+    }
+
+    public function testAddInvalid()
+    {
+        $catalogo = self::build();
+        $catalogo->setProdutoID(null);
+        $catalogo->setFornecedorID(null);
+        $catalogo->setPrecoCompra(null);
+        $catalogo->setPrecoVenda(null);
+        $catalogo->setQuantidadeMinima(null);
+        $catalogo->setEstoque(null);
+        $catalogo->setLimitado(null);
+        $catalogo->setConteudo(null);
+        try {
+            $catalogo->insert();
+            $this->fail('Valores nulos');
+        } catch (ValidationException $e) {
+            $this->assertEquals(['produtoid', 'fornecedorid', 'precocompra', 'precovenda', 'quantidademinima',
+            'estoque', 'limitado', 'conteudo'], array_keys($e->getErrors()));
+        }
+    }
+
+    public function testTranslate()
+    {
+        $catalogo = self::create();
+        try {
+            $catalogo->insert();
+            $this->fail('Fk duplicada');
+        } catch (ValidationException $e) {
+            $this->assertEquals(['fornecedorid'], array_keys($e->getErrors()));
+        }
     }
 
     public function testUpdate()

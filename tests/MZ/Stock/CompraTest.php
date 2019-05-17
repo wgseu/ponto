@@ -24,20 +24,130 @@
  */
 namespace MZ\Stock;
 
+use MZ\Provider\PrestadorTest;
+use MZ\Stock\FornecedorTest;
+use MZ\Exception\ValidationException;
+
 class CompraTest extends \MZ\Framework\TestCase
 {
-    public function testPublish()
+    /**
+     * Build a valid compra
+     * @return Compra
+     */
+    public static function build()
+    {
+        $last = Compra::find([], ['id' => -1]);
+        $id = $last->getID() + 1;
+        $prestador = PrestadorTest::create();
+        $fornecedor = FornecedorTest::create();
+        $compra = new Compra();
+        $compra->setCompradorID($prestador->getID());
+        $compra->setFornecedorID($fornecedor->getID());
+        $compra->setDataCompra('2016-12-25 12:15:00');
+        return $compra;
+    }
+
+    /**
+     * Create a compra on database
+     * @return Compra
+     */
+    public static function create()
+    {
+        $compra = self::build();
+        $compra->insert();
+        return $compra;
+    }
+
+    public function testFind()
+    {
+        $compra = self::create();
+        $condition = ['compradorid' => $compra->getCompradorID()];
+        $found_compra = Compra::find($condition);
+        $this->assertEquals($compra, $found_compra);
+        list($found_compra) = Compra::findAll($condition, [], 1);
+        $this->assertEquals($compra, $found_compra);
+        $this->assertEquals(1, Compra::count($condition));
+    }
+
+    public function testFinds()
+    {
+        $compra = self::create();
+
+        $comprador = $compra->findCompradorID();
+        $this->assertEquals($compra->getCompradorID(), $comprador->getID());
+
+        $fornecedor = $compra->findFornecedorID();
+        $this->assertEquals($compra->getFornecedorID(), $fornecedor->getID());
+
+        $compraByNum = $compra->findByNumero($compra->getNumero());
+        $this->assertInstanceOf(get_class($compra), $compraByNum);
+    }
+
+    public function testAdd()
+    {
+        $compra = self::build();
+        $compra->insert();
+        $this->assertTrue($compra->exists());
+    }
+
+    public function testAddInvalid()
+    {
+        $compra = self::build();
+        $compra->setCompradorID(null);
+        $compra->setFornecedorID(null);
+        $compra->setDataCompra(null);
+        try {
+            $compra->insert();
+            $this->fail('Valores nulos');
+        } catch (ValidationException $e) {
+            $this->assertEquals(['compradorid', 'fornecedorid', 'datacompra'], array_keys($e->getErrors()));
+        }
+    }
+
+    public function testTranslate()
+    {
+        $compra = self::build();
+        $compra->setNumero('2345678');
+        $compra->insert();
+        try {
+            $compra->insert();
+            $this->fail("fk duplicada");
+        } catch (ValidationException $e) {
+            $this->assertEquals(['numero'], array_keys($e->getErrors()));
+        }
+    }
+
+    public function testMakeDocURL()
     {
         $compra = new Compra();
-        $values = $compra->publish(app()->auth->provider);
-        $allowed = [
-            'id',
-            'numero',
-            'compradorid',
-            'fornecedorid',
-            'documentourl',
-            'datacompra',
-        ];
-        $this->assertEquals($allowed, array_keys($values));
+        $img = $compra->makeDocumentoURL(true);
+        $this->assertEquals('/static/img/compra.png', $img);
+        $compra->setDocumentoURL('teste.png');
+        $this->assertEquals('/static/img/compra/teste.png', $compra->makeDocumentoURL());
+    }
+
+    public function testClean()
+    {
+        $old = new Compra();
+        $old->setDocumentoURL('teste.png');
+        $compra = new Compra();
+        $compra->setDocumentoURL('teste1.png');
+        $compra->clean($old);
+        $this->assertEquals($old, $compra);
+    }
+
+    public function testUpdate()
+    {
+        $compra = self::create();
+        $compra->update();
+        $this->assertTrue($compra->exists());
+    }
+
+    public function testDelete()
+    {
+        $compra = self::create();
+        $compra->delete();
+        $compra->loadByID();
+        $this->assertFalse($compra->exists());
     }
 }

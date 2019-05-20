@@ -26,6 +26,8 @@ namespace MZ\System;
 
 use MZ\Provider\FuncaoTest;
 use MZ\System\PermissaoTest;
+use MZ\Account\AuthenticationTest;
+use MZ\Exception\ValidationException;
 
 class AcessoTest extends \MZ\Framework\TestCase
 {
@@ -74,6 +76,76 @@ class AcessoTest extends \MZ\Framework\TestCase
         $acesso = self::build(FuncaoTest::create([]), Permissao::NOME_ALTERARCONFIGURACOES);
         $acesso->insert();
         $this->assertTrue($acesso->exists());
+    }
+
+    public function testValidate()
+    {
+        // teste funcaoID nulo
+        $provider = AuthenticationTest::authOwner();
+        $funcao = $provider->findFuncaoID();
+        $acesso = self::build($funcao, Permissao::NOME_ALTERARCONFIGURACOES);
+        $acesso->setFuncaoID(null);
+        try {
+            $acesso->insert();
+            $this->fail('FuncaoID não pode ser nulo');
+        } catch (ValidationException $e) {
+            $this->assertEquals(['funcaoid'], array_keys($e->getErrors()));
+        }
+        // teste funcaoID nulo
+        $provider = AuthenticationTest::authOwner();
+        $funcao = $provider->findFuncaoID();
+        $acesso = self::build($funcao, Permissao::NOME_ALTERARCONFIGURACOES);
+        $acesso->setPermissaoID(null);
+        try {
+            $acesso->insert();
+            $this->fail('PermissaoID não pode ser nulo');
+        } catch (ValidationException $e) {
+            $this->assertEquals(['permissaoid'], array_keys($e->getErrors()));
+        }
+    }
+
+    public function testTranslate()
+    {
+        $provider = AuthenticationTest::authOwner();
+        $funcao = $provider->findFuncaoID();
+        $acessoInit = self::build($funcao, Permissao::NOME_ALTERARCONFIGURACOES);
+        $acessoInit->insert();
+        try {
+            $acessoInit->insert();
+            $this->fail('funcaoID e permissaoID devem ser únicos');
+        } catch (ValidationException $e) {
+            $this->assertEquals(['funcaoid', 'permissaoid'], array_keys($e->getErrors()));
+        }
+    }
+
+    public function testFindByFuncaoIDPermissaoID()
+    {
+        $provider = AuthenticationTest::authOwner();
+        $funcao = $provider->findFuncaoID();
+        $acesso = self::build($funcao, Permissao::NOME_ALTERARCONFIGURACOES);
+        $acesso->insert();
+        $found_acesso = $acesso::findByFuncaoIDPermissaoID($acesso->getFuncaoID(), $acesso->getPermissaoID());
+        $this->assertEquals($found_acesso, $acesso);
+    }
+
+    public function testFindFuncaoID()
+    {
+        $provider = AuthenticationTest::authOwner();
+        $funcao = $provider->findFuncaoID();
+        $acesso = self::build($funcao, Permissao::NOME_ALTERARCONFIGURACOES);
+        $acesso->insert();
+        $found_funcao = $acesso->findFuncaoID();
+        $this->assertEquals($found_funcao, $funcao);
+    }
+
+    public function testFindPermissaoID()
+    {
+        $provider = AuthenticationTest::authOwner();
+        $funcao = $provider->findFuncaoID();
+        $acesso = self::build($funcao, Permissao::NOME_ALTERARCONFIGURACOES);
+        $acesso->insert();
+        $found_permissao = $acesso->findPermissaoID();
+        $this->assertEquals($acesso->getPermissaoID(), $found_permissao->getID());
     }
 
     public function testUpdate()

@@ -23,6 +23,7 @@
  * @author Equipe GrandChef <desenvolvimento@mzsw.com.br>
  */
 namespace MZ\System;
+use MZ\Exception\ValidationException;
 
 class ModuloTest extends \MZ\Framework\TestCase
 {
@@ -37,13 +38,6 @@ class ModuloTest extends \MZ\Framework\TestCase
         $this->assertEquals(1, Modulo::count($condition));
     }
 
-    public function testAdd()
-    {
-        $modulo = Modulo::find([]);
-        $this->expectException('\Exception');
-        $modulo->insert();
-    }
-
     public function testUpdate()
     {
         $modulo = Modulo::find([]);
@@ -51,10 +45,79 @@ class ModuloTest extends \MZ\Framework\TestCase
         $this->assertTrue($modulo->exists());
     }
 
+    public function testIsHabilitado()
+    {
+        $modulo = Modulo::find([]);
+        $result = $modulo->isHabilitado();
+        $this->assertTrue($result);
+    }
+
+    public function testValidate()
+    {
+        //nome não pode ser nulo
+        $modulo = Modulo::find([]);
+        $modulo->setNome(null);
+        try {
+            $modulo->update();
+            $this->fail('nome não pode ser nulo');
+        } catch (ValidationException $e) {
+            $this->assertEquals(['nome'], array_keys($e->getErrors()));
+        }
+        //descricão não pode ser nula
+        $modulo = Modulo::find([]);
+        $modulo->setDescricao(null);
+        try {
+            $modulo->update();
+            $this->fail('descrição não pode ser nula');
+        } catch (ValidationException $e) {
+            $this->assertEquals(['descricao'], array_keys($e->getErrors()));
+        }
+        //Valor de habilitado não é válido
+        $modulo = Modulo::find([]);
+        $modulo->setHabilitado(null);
+        try {
+            $modulo->update();
+            $this->fail('descrição não pode ser nula');
+        } catch (ValidationException $e) {
+            $this->assertEquals(['habilitado'], array_keys($e->getErrors()));
+        }
+    }
+
+    public function testTranslate()
+    {
+        $moduloInit = Modulo::find([]);
+        $modulo = new Modulo();
+        $modulo->setID(2);
+        $modulo->setNome($moduloInit->getNome());
+        $modulo->setDescricao('teste descrição');
+        try {
+            $modulo->update();
+            $this->fail('Nome do modulo não pode ser o mesmo');
+        } catch (ValidationException $e) {
+            $this->assertEquals(['nome'], array_keys($e->getErrors()));
+        }
+    }
+
+    public function testInsert()
+    {
+        $modulo = new Modulo();
+        $modulo->setNome('teste nome');
+        $modulo->setDescricao('teste descrição');
+        $this->expectException('\Exception');
+        $modulo->insert();
+    }
+
     public function testDelete()
     {
         $modulo = Modulo::find([]);
         $this->expectException('\Exception');
         $modulo->delete();
+    }
+
+    public function testeFindByNome()
+    {
+        $modulo = Modulo::find([]);
+        $found_modulo = Modulo::findByNome($modulo->getNome());
+        $this->assertEquals($modulo->getNome(), $found_modulo->getNome());
     }
 }

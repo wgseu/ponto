@@ -55,20 +55,6 @@ class ModuloApiController extends \MZ\Core\ApiController
     }
 
     /**
-     * Create a new Módulo
-     * @Post("/api/modulos", name="api_modulo_add")
-     */
-    public function add()
-    {
-        $this->needPermission([Permissao::NOME_ALTERARCONFIGURACOES]);
-        $localized = $this->getRequest()->query->getBoolean('localized', false);
-        $modulo = new Modulo($this->getData());
-        $modulo->filter(new Modulo(), app()->auth->provider, $localized);
-        $modulo->insert();
-        return $this->getResponse()->success(['item' => $modulo->publish(app()->auth->provider)]);
-    }
-
-    /**
      * Modify parts of an existing Módulo
      * @Patch("/api/modulos/{id}", name="api_modulo_update", params={ "id": "\d+" })
      *
@@ -85,20 +71,5 @@ class ModuloApiController extends \MZ\Core\ApiController
         $modulo->update();
         $old_modulo->clean($modulo);
         return $this->getResponse()->success(['item' => $modulo->publish(app()->auth->provider)]);
-    }
-
-    /**
-     * Delete existing Módulo
-     * @Delete("/api/modulos/{id}", name="api_modulo_delete", params={ "id": "\d+" })
-     *
-     * @param int $id Módulo id to delete
-     */
-    public function delete($id)
-    {
-        $this->needPermission([Permissao::NOME_ALTERARCONFIGURACOES]);
-        $modulo = Modulo::findOrFail(['id' => $id]);
-        $modulo->delete();
-        $modulo->clean(new Modulo());
-        return $this->getResponse()->success([]);
     }
 }

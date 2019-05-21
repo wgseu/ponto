@@ -32,7 +32,7 @@ class ModuloApiControllerTest extends \MZ\Framework\TestCase
     public function testFind()
     {
         AuthenticationTest::authProvider([Permissao::NOME_SISTEMA, Permissao::NOME_ALTERARCONFIGURACOES]);
-        $modulo = ModuloTest::create();
+        $modulo = Modulo::find([]);
         $expected = [
             'status' => 'ok',
             'items' => [
@@ -43,23 +43,10 @@ class ModuloApiControllerTest extends \MZ\Framework\TestCase
         $this->assertEquals($expected, \array_intersect_key($result, $expected));
     }
 
-    public function testAdd()
-    {
-        AuthenticationTest::authProvider([Permissao::NOME_SISTEMA, Permissao::NOME_ALTERARCONFIGURACOES]);
-        $modulo = ModuloTest::build();
-        $expected = [
-            'status' => 'ok',
-            'item' => $modulo->publish(app()->auth->provider),
-        ];
-        $result = $this->post('/api/modulos', $modulo->toArray());
-        $expected['item']['id'] = $result['item']['id'] ?? null;
-        $this->assertEquals($expected, \array_intersect_key($result, $expected));
-    }
-
     public function testUpdate()
     {
         AuthenticationTest::authProvider([Permissao::NOME_SISTEMA, Permissao::NOME_ALTERARCONFIGURACOES]);
-        $modulo = ModuloTest::create();
+        $modulo = Modulo::find([]);
         $id = $modulo->getID();
         $result = $this->patch('/api/modulos/' . $id, $modulo->toArray());
         $modulo->loadByID();
@@ -68,17 +55,5 @@ class ModuloApiControllerTest extends \MZ\Framework\TestCase
             'item' => $modulo->publish(app()->auth->provider),
         ];
         $this->assertEquals($expected, \array_intersect_key($result, $expected));
-    }
-
-    public function testDelete()
-    {
-        AuthenticationTest::authProvider([Permissao::NOME_SISTEMA, Permissao::NOME_ALTERARCONFIGURACOES]);
-        $modulo = ModuloTest::create();
-        $id = $modulo->getID();
-        $result = $this->delete('/api/modulos/' . $id);
-        $modulo->loadByID();
-        $expected = [ 'status' => 'ok', ];
-        $this->assertEquals($expected, \array_intersect_key($result, $expected));
-        $this->assertFalse($modulo->exists());
     }
 }

@@ -25,6 +25,7 @@
 namespace MZ\Account;
 
 use MZ\Account\ClienteTest;
+use MZ\Exception\ValidationException;
 
 class CreditoTest extends \MZ\Framework\TestCase
 {
@@ -68,6 +69,14 @@ class CreditoTest extends \MZ\Framework\TestCase
         $this->assertEquals(1, Credito::count($condition));
     }
 
+    public function testFindCliente()
+    {
+        $credito = self::create();
+
+        $cliente = $credito->findClienteID();
+        $this->assertEquals($credito->getClienteID(), $cliente->getID());
+    }
+
     public function testAdd()
     {
         $credito = self::build();
@@ -75,11 +84,99 @@ class CreditoTest extends \MZ\Framework\TestCase
         $this->assertTrue($credito->exists());
     }
 
+    public function testAddInvalid()
+    {
+        $credito = new Credito();
+        $credito->setValor(null);
+        $credito->setDetalhes(null);
+        $credito->setCancelado(null);
+        try {
+            $credito->insert();
+            $this->fail('Não cadastrar com valores null');
+        } catch (ValidationException $e) {
+            $this->assertEquals(['clienteid', 'valor', 'detalhes', 'cancelado'], array_keys($e->getErrors()));
+        }
+        //---------------------------
+        $credito = self::build();
+        $credito->setCancelado('N');
+        $credito->setValor(-100);
+        try {
+            $credito->insert();
+            $this->fail('Não cadastrar');
+        } catch (ValidationException $e) {
+            $this->assertEquals(['valor'], array_keys($e->getErrors()));
+        }
+        //---------------------------
+        $credito = self::build();
+        $credito->setCancelado('Y');
+        $credito->setValor(100);
+        try {
+            $credito->insert();
+            $this->fail('Não cadastrar');
+        } catch (ValidationException $e) {
+            $this->assertEquals(['valor', 'cancelado'], array_keys($e->getErrors()));
+        }
+        //---------------------------
+        $credito = self::build();
+        $credito->setCancelado('Y');
+        try {
+            $credito->insert();
+            $this->fail('Não cadastrar');
+        } catch (ValidationException $e) {
+            $this->assertEquals(['valor', 'cancelado'], array_keys($e->getErrors()));
+        }
+    }
+
     public function testUpdate()
     {
         $credito = self::create();
         $credito->update();
         $this->assertTrue($credito->exists());
+    }
+
+    public function testUpdateInvalid()
+    {
+        $old = self::create();
+        $credito = self::build();
+        $credito->setID($old->getID());
+        $credito->setValor(55);
+        try {
+            $credito->update();
+            $this->fail('Erro');
+        } catch (ValidationException $e) {
+            $this->assertEquals(['valor'], array_keys($e->getErrors()));
+        }
+        //---------------------------
+        // $old = self::build();
+        // $old->setValor(10);
+        // $old->insert();
+        // $credito = self::build();
+        // $credito->setID(14);
+        // try {
+        //     $credito->update();
+        //     $this->fail('Não atualizar');
+        // } catch (ValidationException $e) {
+        //     $this->assertEquals(['clienteid'], array_keys($e->getErrors()));
+        // }
+        //---------------
+        // $old = self::build();
+        // $old->isCancelado('Y');
+        // $old->insert();
+        // try {
+        //     $old->setDetalhes('Teste credito já cancelado');
+        //     $old->update();
+        //     $this->fail('Não atualizar');
+        // } catch (ValidationException $e) {
+        //     $this->assertEquals(['clienteid'], array_keys($e->getErrors()));
+        // }
+    }
+
+    public function testCancel()
+    {
+        $credito = self::create();
+        $credito->cancel();
+        $this->assertTrue($credito->isCancelado());
+        $this->assertEquals('Y', $credito->getCancelado());
     }
 
     public function testDelete()

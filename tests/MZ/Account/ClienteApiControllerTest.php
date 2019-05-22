@@ -26,71 +26,51 @@ namespace MZ\Account;
 
 use MZ\System\Permissao;
 use MZ\Account\AuthenticationTest;
-use MZ\Provider\PrestadorTest;
 
-class TelefoneApiControllerTest extends \MZ\Framework\TestCase
+class ClienteApiControllerTest extends \MZ\Framework\TestCase
 {
     public function testFind()
     {
         AuthenticationTest::authProvider([Permissao::NOME_SISTEMA, Permissao::NOME_CADASTROCLIENTES]);
-        $telefone = TelefoneTest::create();
+        $cliente = ClienteTest::create();
         $expected = [
             'status' => 'ok',
             'items' => [
-                $telefone->publish(app()->auth->provider),
+                $cliente->publish(app()->auth->provider),
             ],
         ];
-        $result = $this->get('/api/telefones', ['search' => $telefone->getNumero()]);
+        $result = $this->get('/api/clientes', ['id' => $cliente->getID()]);
         $this->assertEquals($expected, \array_intersect_key($result, $expected));
     }
 
     public function testAdd()
     {
         AuthenticationTest::authProvider([Permissao::NOME_SISTEMA, Permissao::NOME_CADASTROCLIENTES]);
-        $telefone = TelefoneTest::build();
-        $this->assertEquals($telefone->toArray(), (new Telefone($telefone))->toArray());
+        $cliente = ClienteTest::build();
         $expected = [
             'status' => 'ok',
-            'item' => $telefone->publish(app()->auth->provider),
+            'item' => $cliente->publish(app()->auth->provider),
         ];
-        $result = $this->post('/api/telefones', $telefone->toArray());
+        $data = $cliente->toArray();
+        $data['confirmarsenha'] = $cliente->getSenha();
+        $data['aceitar'] = true;
+        $result = $this->post('/api/clientes', $data);
         $expected['item']['id'] = $result['item']['id'] ?? null;
-        $this->assertEquals($expected, \array_intersect_key($result, $expected));
-        //---------------------
-        AuthenticationTest::authProvider([Permissao::NOME_SISTEMA]);
-        $telefone = TelefoneTest::build();
-        $expected = [
-            'status' => 'error',
-            'msg' => 'need_permission',
-            'code' => 403
-        ];
-        $result = $this->post('/api/telefones', $telefone->toArray());
-        $this->assertEquals($expected, \array_intersect_key($result, $expected));
-        //-------
-        AuthenticationTest::authProvider([Permissao::NOME_SISTEMA, Permissao::NOME_CADASTROCLIENTES]);
-        $telefone = TelefoneTest::build();
-        $prestador = PrestadorTest::build();
-        $prestador->setClienteID($telefone->getClienteID());
-        $prestador->insert();
-        $expected = [
-            'status' => 'error',
-            'msg' => 'Undefined variable: permissions',
-            'code' => 8
-        ];
-        $result = $this->post('/api/telefones', $telefone->toArray());
         $this->assertEquals($expected, \array_intersect_key($result, $expected));
     }
 
     public function testUpdate()
     {
         AuthenticationTest::authProvider([Permissao::NOME_SISTEMA, Permissao::NOME_CADASTROCLIENTES]);
-        $telefone = TelefoneTest::create();
-        $id = $telefone->getID();
-        $result = $this->patch('/api/telefones/' . $id, $telefone->toArray());
-        $telefone->loadByID();
+        $cliente = ClienteTest::create();
+        $data = $cliente->toArray();
+        $data['confirmarsenha'] = $cliente->getSenha();
+        $id = $cliente->getID();
+        $result = $this->patch('/api/clientes/' . $id, $data);
+        $cliente->loadByID();
         $expected = [
             'status' => 'ok',
-            'item' => $telefone->publish(app()->auth->provider),
+            'item' => $cliente->publish(app()->auth->provider),
         ];
         $this->assertEquals($expected, \array_intersect_key($result, $expected));
     }
@@ -98,12 +78,12 @@ class TelefoneApiControllerTest extends \MZ\Framework\TestCase
     public function testDelete()
     {
         AuthenticationTest::authProvider([Permissao::NOME_SISTEMA, Permissao::NOME_CADASTROCLIENTES]);
-        $telefone = TelefoneTest::create();
-        $id = $telefone->getID();
-        $result = $this->delete('/api/telefones/' . $id);
-        $telefone->loadByID();
+        $cliente = ClienteTest::create();
+        $id = $cliente->getID();
+        $result = $this->delete('/api/clientes/' . $id);
+        $cliente->loadByID();
         $expected = [ 'status' => 'ok', ];
         $this->assertEquals($expected, \array_intersect_key($result, $expected));
-        $this->assertFalse($telefone->exists());
+        $this->assertFalse($cliente->exists());
     }
 }

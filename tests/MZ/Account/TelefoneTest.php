@@ -26,6 +26,7 @@ namespace MZ\Account;
 
 use MZ\Account\ClienteTest;
 use MZ\Location\PaisTest;
+use MZ\Exception\ValidationException;
 
 class TelefoneTest extends \MZ\Framework\TestCase
 {
@@ -69,6 +70,9 @@ class TelefoneTest extends \MZ\Framework\TestCase
         list($found_telefone) = Telefone::findAll($condition, [], 1);
         $this->assertEquals($telefone, $found_telefone);
         $this->assertEquals(1, Telefone::count($condition));
+        //----
+        $cliente = $telefone->findClienteID();
+        $this->assertEquals($telefone->getClienteID(), $cliente->getID());
     }
 
     public function testAdd()
@@ -76,6 +80,21 @@ class TelefoneTest extends \MZ\Framework\TestCase
         $telefone = self::build();
         $telefone->insert();
         $this->assertTrue($telefone->exists());
+    }
+
+    public function testAddInvalid()
+    {
+        $telefone = self::build();
+        $telefone->setClienteID(null);
+        $telefone->setPaisID(null);
+        $telefone->setNumero(null);
+        $telefone->setPrincipal('E');
+        try {
+            $telefone->insert();
+            $this->fail('Não cadastrar valores nulos');
+        } catch (ValidationException $e) {
+            $this->assertEquals(['clienteid', 'paisid', 'numero', 'principal'], array_keys($e->getErrors()));
+        }
     }
 
     public function testUpdate()

@@ -27,6 +27,7 @@ namespace MZ\Account;
 use MZ\Database\DB;
 use MZ\Exception\ValidationException;
 use MZ\Provider\Prestador;
+use MZ\Account\TelefoneTest;
 
 class ClienteTest extends \MZ\Framework\TestCase
 {
@@ -44,9 +45,10 @@ class ClienteTest extends \MZ\Framework\TestCase
         $cliente->setEmail("testaleatorio{$id}@email.com");
         $cliente->setLogin("login_{$id}");
         $cliente->setGenero(Cliente::GENERO_MASCULINO);
-        $cliente->setSenha('1234');
+        $cliente->setSenha('123456');
         $cliente->setLimiteCompra(0);
         $cliente->setStatus(Cliente::STATUS_ATIVO);
+        $cliente->setDataAniversario('1993-03-18');
         return $cliente;
     }
 
@@ -200,12 +202,13 @@ class ClienteTest extends \MZ\Framework\TestCase
         $cliente->setEmail('cicrano a@email.com');
         $cliente->setTelefone('11223399');
         $cliente->setLimiteCompra(null);
+        $cliente->setStatus('Teste');
         try {
             $cliente->insert();
             $this->fail('Não deveria ter cadastrado o cliente');
         } catch (ValidationException $e) {
             $this->assertEquals(
-                ['login', 'nome', 'genero', 'cpf', 'email'],
+                ['login', 'nome', 'genero', 'cpf', 'email', 'status'],
                 array_keys($e->getErrors())
             );
         }
@@ -220,6 +223,7 @@ class ClienteTest extends \MZ\Framework\TestCase
         $cliente->setGenero(Cliente::GENERO_MASCULINO);
         $cliente->setSenha('1234');
         $cliente->setSecreto('jsdo6as4168dsa46546sa54d');
+        $cliente->setStatus('Ativo');
         $cliente->insert();
         try {
             $cliente->setSenha('1234');
@@ -320,6 +324,13 @@ class ClienteTest extends \MZ\Framework\TestCase
             $this->fail('Não deveria ter atualizado o cliente sem o ID');
         } catch (\Exception $e) {
         }
+        //-------------
+
+        $cliente = self::build();
+        $cliente->setTelefone('234567890');
+        $cliente->getTelefone()->setPaisID(app()->getSystem()->getCountry()->getID());
+        $cliente->insert();
+        $cliente->update();
     }
 
     public function testFindAndLoad()
@@ -464,11 +475,20 @@ class ClienteTest extends \MZ\Framework\TestCase
     public function testClean()
     {
         $old_cliente = new Cliente();
+        $old_cliente->setImagemURL('clientenaoexiste.png');
         $cliente = new Cliente();
+        $cliente->setImagemURL('clientenaoexiste2.png');
         $cliente->setDataCadastro($old_cliente->getDataCadastro());
         $cliente->setDataAtualizacao($old_cliente->getDataAtualizacao());
         $cliente->clean($old_cliente);
         $this->assertEquals($old_cliente, $cliente);
+    }
+
+    public function testGetStatus()
+    {
+        $cliente = self::create();
+        $options = Cliente::getStatusOptions($cliente->getStatus());
+        $this->assertEquals($cliente->getStatus(), $options);
     }
 
     public function testNomeCompleto()

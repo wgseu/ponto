@@ -76,8 +76,11 @@ class CreditoApiController extends \MZ\Core\ApiController
     {
         $this->needPermission([Permissao::NOME_CADASTRARCREDITOS]);
         $localized = $this->getRequest()->query->getBoolean('localized', false);
-        $credito = new Credito($this->getData());
-        $credito->filter(new Credito(), app()->auth->provider, $localized);
+        $data = $this->getData();
+        $credito = new Credito($data);
+        $old_credito = new Credito;
+        $old_credito->setClienteID($credito->getClienteID());
+        $credito->filter($old_credito, app()->auth->provider, $localized);
         $credito->insert();
         return $this->getResponse()->success(['item' => $credito->publish(app()->auth->provider)]);
     }

@@ -6,10 +6,10 @@
     ]},
     { "items": "Senha", "align": "center" },
     { "align": "center", "style": "bold", "width": "2x", "height": "2x", "items": [
-        { "items": "order.id", "format": "%03d" }
+        { "items": "queue.number", "format": "%03d" }
     ]},
     { "items": [
-        "Local: ", "order.local", { "align": "right", "items": [ "Atendente: ", "order.last_attendant" ] }
+        "Local: ", "order.local", { "align": "right", "items": [ "Atendente: ", "order.attendant" ] }
     ]},
     { "whitespace": "=" }
   ]

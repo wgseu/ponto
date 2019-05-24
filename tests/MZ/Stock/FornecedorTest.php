@@ -26,6 +26,8 @@ namespace MZ\Stock;
 
 use MZ\Account\ClienteTest;
 use MZ\Account\Cliente;
+use MZ\Account\TelefoneTest;
+use MZ\Exception\ValidationException;
 
 class FornecedorTest extends \MZ\Framework\TestCase
 {
@@ -70,6 +72,101 @@ class FornecedorTest extends \MZ\Framework\TestCase
         list($found_fornecedor) = Fornecedor::findAll($condition, [], 1);
         $this->assertEquals($fornecedor, $found_fornecedor);
         $this->assertEquals(1, Fornecedor::count($condition));
+    }
+
+    public function testQueryEmail()
+    {
+        $fornecedor = self::create();
+        $cliente = $fornecedor->findEmpresaID();
+        $condition = ['search' => $cliente->getEmail()];
+        $found_fornecedor = Fornecedor::find($condition);
+        $this->assertEquals($fornecedor, $found_fornecedor);
+    }
+
+    public function testQueryCPF()
+    {
+        $fornecedor = self::create();
+        $cliente = $fornecedor->findEmpresaID();
+        $cliente->setCPF('52238376000132');
+        $cliente->update();
+        $condition = ['search' => $cliente->getCPF()];
+        $found_fornecedor = Fornecedor::find($condition);
+        $this->assertEquals($fornecedor, $found_fornecedor);
+    }
+
+    public function testQueryPhone()
+    {
+        $fornecedor = self::create();
+        $cliente = $fornecedor->findEmpresaID();
+        $telefone = TelefoneTest::build();
+        $telefone->setClienteID($cliente->getID());
+        $telefone->setNumero('44999719966');
+        $telefone->insert();
+        $condition = ['search' => $telefone->getNumero()];
+        $found_fornecedor = Fornecedor::find($condition);
+        $this->assertEquals($fornecedor, $found_fornecedor);
+    }
+
+    public function testValidate()
+    {
+        //testa empresaid nula
+        $fornecedor = self::build();
+        $fornecedor->setEmpresaID(null);
+        try {
+            $fornecedor->insert();
+            $this->fail('EmpresaID não pode ser nulo');
+        } catch (ValidationException $e) {
+            $this->assertEquals(['empresaid'], array_keys($e->getErrors()));
+        }
+        //teste prazo pagamento nulo
+        $fornecedor = self::build();
+        $fornecedor->setPrazoPagamento(null);
+        try {
+            $fornecedor->insert();
+            $this->fail('Prazo pagamento não pode ser nulo');
+        } catch (ValidationException $e) {
+            $this->assertEquals(['prazopagamento'], array_keys($e->getErrors()));
+        }
+        //teste de cliente juridico
+        $fornecedor = self::build();
+        $cliente = $fornecedor->findEmpresaID();
+        $cliente->setTipo(Cliente::TIPO_FISICA);
+        $cliente->update();
+        try {
+            $fornecedor->insert();
+            $this->fail('Empresa diferente de juridica');
+        } catch (ValidationException $e) {
+            $this->assertEquals(['empresaid'], array_keys($e->getErrors()));
+        }
+    }
+
+    public function testTranslate()
+    {
+        $fornecedorInit = self::create();
+        $fornecedor = self::build();
+        $fornecedor->setEmpresaID($fornecedorInit->getEmpresaID());
+        try {
+            $fornecedor->insert();
+            $this->fail('Empresa duplicado para fornecedor');
+        } catch (ValidationException $e) {
+            $this->assertEquals(['empresaid'], array_keys($e->getErrors()));
+        }
+
+    }
+
+    public function testFindEmpresaID()
+    {
+        $fornecedor = self::create();
+        $cliente = $fornecedor->findEmpresaID();
+        $this->assertEquals($fornecedor->getEmpresaID(), $cliente->getID());
+    }
+
+    public function testFindByEmpresaID()
+    {
+        $cliente = ClienteTest::create();
+        $fornecedor = Fornecedor::findByEmpresaID($cliente->getID());
+        $fornecedor->setEmpresaID($cliente->getID());
+        $this->assertEquals($fornecedor->getEmpresaID(), $cliente->getID());
     }
 
     public function testAdd()

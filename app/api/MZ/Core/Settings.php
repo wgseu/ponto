@@ -151,7 +151,7 @@ class Settings
         if (!file_exists($php_file)) {
             throw new \Exception('Configuration file "'.$php_file.'" not found', 404);
         }
-        require_once($php_file);
+        require($php_file);
         return $value;
     }
 }

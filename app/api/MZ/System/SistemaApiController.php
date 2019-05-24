@@ -55,20 +55,6 @@ class SistemaApiController extends \MZ\Core\ApiController
     }
 
     /**
-     * Create a new Sistema
-     * @Post("/api/sistemas", name="api_sistema_add")
-     */
-    public function add()
-    {
-        $this->needPermission([Permissao::NOME_ALTERARCONFIGURACOES]);
-        $localized = $this->getRequest()->query->getBoolean('localized', false);
-        $sistema = new Sistema($this->getData());
-        $sistema->filter(new Sistema(), app()->auth->provider, $localized);
-        $sistema->insert();
-        return $this->getResponse()->success(['item' => $sistema->publish(app()->auth->provider)]);
-    }
-
-    /**
      * Modify parts of an existing Sistema
      * @Patch("/api/sistemas/{id}", name="api_sistema_update", params={ "id": "\d+" })
      *
@@ -88,44 +74,34 @@ class SistemaApiController extends \MZ\Core\ApiController
     }
 
     /**
-     * Delete existing Sistema
-     * @Delete("/api/sistemas/{id}", name="api_sistema_delete", params={ "id": "\d+" })
-     *
-     * @param int $id Sistema id to delete
+     * @Post("/api/sistemas/advanced", name="api_sistema_advanced")
      */
-    public function delete($id)
-    {
-        $this->needPermission([Permissao::NOME_ALTERARCONFIGURACOES]);
-        $sistema = Sistema::findOrFail(['id' => $id]);
-        $sistema->delete();
-        $sistema->clean(new Sistema());
-        return $this->getResponse()->success([]);
-    }
-
     public function advanced()
     {
         $this->needPermission([Permissao::NOME_ALTERARCONFIGURACOES]);
         $erro = [];
         $maps_api = get_string_config('Site', 'Maps.API');
         $dropbox_token = get_string_config('Sistema', 'Dropbox.AccessKey');
-        if ($this->getRequest()->isMethod('POST')) {
-            try {
-                $maps_api = trim($this->getRequest()->request->get('mapskey'));
-                set_string_config('Site', 'Maps.API', $maps_api);
-                $dropbox_token = trim($this->getRequest()->request->get('dropboxtoken'));
-                set_string_config('Sistema', 'Dropbox.AccessKey', $dropbox_token);
-                app()->getSystem()->getBusiness()->filter(
-                    app()->getSystem()->getBusiness(),
-                    app()->auth->provider
-                );
-                app()->getSystem()->getBusiness()->update(['opcoes']);
-                return $this->getResponse()->success([]);
-            } catch (\ValidationException $e) {
-                return $this->getResponse()->error($e->getMessage());
-            }
+        $data = $this->getData();
+        try {
+            $maps_api = trim($data['mapskey']);
+            set_string_config('Site', 'Maps.API', $maps_api);
+            $dropbox_token = trim($data['dropboxtoken']);
+            set_string_config('Sistema', 'Dropbox.AccessKey', $dropbox_token);
+            app()->getSystem()->getBusiness()->filter(
+                app()->getSystem()->getBusiness(),
+                app()->auth->provider
+            );
+            app()->getSystem()->getBusiness()->update(['opcoes']);
+            return $this->getResponse()->success([]);
+        } catch (\ValidationException $e) {
+            return $this->getResponse()->error($e->getMessage());
         }
     }
 
+    /**
+     * @Post("/api/sistemas/mail", name="api_sistema_mail")
+     */
     public function mail()
     {
         $this->needPermission([Permissao::NOME_ALTERARCONFIGURACOES]);
@@ -134,48 +110,51 @@ class SistemaApiController extends \MZ\Core\ApiController
         $porta = get_int_config('Email', 'Porta', 587);
         $encriptacao = get_int_config('Email', 'Criptografia', 2);
         $usuario = get_string_config('Email', 'Usuario');
-        if ($this->getRequest()->isMethod('POST')) {
-            try {
-                $destinatario = trim($this->getRequest()->request->get('destinatario'));
-                set_string_config('Email', 'Remetente', $destinatario);
-                $servidor = trim($this->getRequest()->request->get('servidor'));
-                set_string_config('Email', 'Servidor', $servidor);
-                $porta = trim($this->getRequest()->request->getInt('porta', null));
-                if ($porta < 0 || $porta > 65535) {
-                    throw new \Exception('A porta é inválida, informe um número entre 0 e 65535');
-                }
-                set_int_config('Email', 'Porta', $porta);
-                $encriptacao = trim($this->getRequest()->request->getInt('encriptacao', null));
-                set_int_config('Email', 'Criptografia', $encriptacao);
-                $usuario = trim($this->getRequest()->request->get('usuario'));
-                set_string_config('Email', 'Usuario', $usuario);
-                $senha = $this->getRequest()->request->get('senha');
-                if (strlen($senha) > 0) {
-                    set_string_config('Email', 'Senha', $senha);
-                }
-                app()->getSystem()->getBusiness()->filter(
-                    app()->getSystem()->getBusiness(),
-                    app()->auth->provider
-                );
-                app()->getSystem()->getBusiness()->update(['opcoes']);
-                return $this->getResponse()->success([]);
-            } catch (\Exception $e) {
-                $sistema->clean($old_sistema);
-                return $this->getResponse()->error($e->getMessage());
+        $data = $this->getData();
+        try {
+            $destinatario = trim($data['destinatario']);
+            set_string_config('Email', 'Remetente', $destinatario);
+            $servidor = trim($data['servidor']);
+            set_string_config('Email', 'Servidor', $servidor);
+            $porta = trim($data['porta']);
+            if ($porta < 0 || $porta > 65535) {
+                throw new \Exception('A porta é inválida, informe um número entre 0 e 65535');
             }
+            set_int_config('Email', 'Porta', $porta);
+            $encriptacao = trim($data['encriptacao']);
+            set_int_config('Email', 'Criptografia', $encriptacao);
+            $usuario = trim($data['usuario']);
+            set_string_config('Email', 'Usuario', $usuario);
+            $senha = $data['senha'];
+            if (strlen($senha) > 0) {
+                set_string_config('Email', 'Senha', $senha);
+            }
+            app()->getSystem()->getBusiness()->filter(
+                app()->getSystem()->getBusiness(),
+                app()->auth->provider
+            );
+            app()->getSystem()->getBusiness()->update(['opcoes']);
+            return $this->getResponse()->success([]);
+        } catch (\Exception $e) {
+            $sistema->clean($old_sistema);
+            return $this->getResponse()->error($e->getMessage());
         }
     }
 
+    /**
+     * @Post("/api/sistemas/invoice", name="api_sistema_invoice")
+     */
     public function invoice()
     {
         $this->needPermission([Permissao::NOME_ALTERARCONFIGURACOES]);
         $focusctrl = 'fiscal_timeout';
         $tab = 'fiscal';
         $erros = [];
+        $data = $this->getData();
         $fiscal_timeout = get_int_config('Sistema', 'Fiscal.Timeout', 30);
         if ($this->getRequest()->isMethod('POST')) {
             try {
-                $fiscal_timeout = \MZ\Util\Filter::number($this->getRequest()->request->get('fiscal_timeout'));
+                $fiscal_timeout = \MZ\Util\Filter::number($data['fiscal_timeout']);
                 if (intval($fiscal_timeout) < 2) {
                     throw new \MZ\Exception\ValidationException(
                         ['fiscal_timeout' => 'O tempo limite não pode ser menor que 2 segundos']
@@ -187,6 +166,7 @@ class SistemaApiController extends \MZ\Core\ApiController
                     app()->auth->provider
                 );
                 app()->getSystem()->getBusiness()->update(['opcoes']);
+                return $this->getResponse()->success([]);
             } catch (\Exception $e) {
                 $sistema->clean($old_sistema);
                 return $this->getResponse()->error($e->getMessage());
@@ -194,6 +174,9 @@ class SistemaApiController extends \MZ\Core\ApiController
         }
     }
 
+    /**
+     * @Post("/api/sistemas/printing", name="api_sistema_printing")
+     */
     public function printing()
     {
         $this->needPermission([Permissao::NOME_ALTERARCONFIGURACOES]);
@@ -432,127 +415,29 @@ class SistemaApiController extends \MZ\Core\ApiController
             ],
         ];
         $opcoes_impressao = array_merge($opcoes_aparencia, $opcoes_guias, $opcoes_comportamento);
-
-        if ($this->getRequest()->isMethod('POST')) {
-            try {
-                $secao = $this->getRequest()->request->get('secao');
-                $chave = $this->getRequest()->request->get('chave');
-                if (!config_values_exists($opcoes_impressao, $secao, $chave)) {
-                    throw new \Exception('A opção de impressão informada não existe', 1);
-                }
-                $marcado = $this->getRequest()->request->get('marcado');
-                set_boolean_config($secao, $chave, $marcado == 'Y');
-                app()->getSystem()->getBusiness()->filter(
-                    app()->getSystem()->getBusiness(),
-                    app()->auth->provider
-                );
-                app()->getSystem()->getBusiness()->update(['opcoes']);
-                return $this->getResponse()->success();
-            } catch (\Exception $e) {
-                return $this->getResponse()->error($e->getMessage());
+        $data = $this->getData();
+        try {
+            $secao = $data['secao'];
+            $chave = $data['chave'];
+            if (!config_values_exists($opcoes_impressao, $secao, $chave)) {
+                throw new \Exception('A opção de impressão informada não existe', 1);
             }
+            $marcado = $this->getRequest()->request->get('marcado');
+            set_boolean_config($secao, $chave, $marcado == 'Y');
+            app()->getSystem()->getBusiness()->filter(
+                app()->getSystem()->getBusiness(),
+                app()->auth->provider
+            );
+            app()->getSystem()->getBusiness()->update(['opcoes']);
+            return $this->getResponse()->success();
+        } catch (\Exception $e) {
+            return $this->getResponse()->error($e->getMessage());
         }
-    }
+}
 
-    public function layout()
-    {
-        $this->needPermission([Permissao::NOME_ALTERARCONFIGURACOES]);
-        $images_info = [
-            'header' => [
-                'section' => 'Image.Header',
-                'field' => 'header_url',
-                'image' => 'image_header',
-            ],
-            'login' => [
-                'section' => 'Image.Login',
-                'field' => 'login_url',
-                'image' => 'image_login',
-            ],
-            'cadastrar' => [
-                'section' => 'Image.Cadastrar',
-                'field' => 'cadastrar_url',
-                'image' => 'image_cadastrar',
-            ],
-            'produtos' => [
-                'section' => 'Image.Produtos',
-                'field' => 'produtos_url',
-                'image' => 'image_produtos',
-            ],
-            'sobre' => [
-                'section' => 'Image.Sobre',
-                'field' => 'sobre_url',
-                'image' => 'image_sobre',
-            ],
-            'privacidade' => [
-                'section' => 'Image.Privacidade',
-                'field' => 'privacidade_url',
-                'image' => 'image_privacidade',
-            ],
-            'termos' => [
-                'section' => 'Image.Termos',
-                'field' => 'termos_url',
-                'image' => 'image_termos',
-            ],
-            'contato' => [
-                'section' => 'Image.Contato',
-                'field' => 'contato_url',
-                'image' => 'image_contato',
-            ],
-        ];
-        foreach ($images_info as $key => &$value) {
-            $value['url'] = get_string_config('Site', $value['section']);
-        }
-        $text_bemvindo = get_string_config('Site', 'Text.BemVindo', 'Bem-vindo ao nosso restaurante!');
-        $text_chamada = get_string_config('Site', 'Text.Chamada', 'Conheça nosso cardápio!');
-        if ($this->getRequest()->isMethod('POST')) {
-            foreach ($images_info as $key => &$value) {
-                $value['save'] = $value['url'];
-            }
-            try {
-                foreach ($images_info as $key => &$value) {
-                    $old_url = $this->getRequest()->request->get($value['field']);
-                    $value['save'] = upload_image($value['image'], $base_url);
-                    if (!is_null($value['save'])) {
-                        set_string_config('Site', $value['section'], $value['save']);
-                    } elseif ($old_url == '') {
-                        set_string_config('Site', $value['section'], null);
-                    } else {
-                        $value['save'] = $value['url'];
-                    }
-                }
-                $text_bemvindo = trim($this->getRequest()->request->get('bemvindo'));
-                set_string_config('Site', 'Text.BemVindo', $text_bemvindo);
-                $text_chamada = trim($this->getRequest()->request->get('chamada'));
-                set_string_config('Site', 'Text.Chamada', $text_chamada);
-                app()->getSystem()->getBusiness()->filter(
-                    app()->getSystem()->getBusiness(),
-                    app()->auth->provider
-                );
-                app()->getSystem()->getBusiness()->update(['opcoes']);
-                foreach ($images_info as $key => $value) {
-                    // exclui a imagem antiga, pois uma nova foi informada
-                    if (!is_null($value['url']) &&
-                        $value['save'] != $value['url']
-                    ) {
-                        unlink(app()->getPath('public') . get_image_url($value['url'], $base_url));
-                    }
-                }
-                return $this->getResponse()->success(['item' => $sistema->publish(app()->auth->provider)]);
-            } catch (\Exception $e) {
-                $sistema->clean($old_sistema);
-                foreach ($images_info as $key => $value) {
-                    // remove imagem enviada
-                    if (!is_null($value['save']) &&
-                        $value['url'] != $value['save']
-                    ) {
-                        unlink(app()->getPath('public') . get_image_url($value['save'], $base_url));
-                    }
-                    return $this->getResponse()->error($e->getMessage());
-                }
-            }
-        }
-    }
-
+    /**
+     * @Post("/api/sistemas/options", name="api_sistema_options")
+     */
     public function options()
     {
         $this->needPermission([Permissao::NOME_ALTERARCONFIGURACOES]);
@@ -649,24 +534,23 @@ class SistemaApiController extends \MZ\Core\ApiController
         ];
         #    ['section' => 'Sistema', 'key' => 'Logout.Timeout', 'default' => 3, 'title' => 'Minutos de inatividade'],
 
-        if ($this->getRequest()->isMethod('POST')) {
-            try {
-                $secao = $this->getRequest()->request->get('secao');
-                $chave = $this->getRequest()->request->get('chave');
-                if (!config_values_exists($opcoes_comportamento, $secao, $chave)) {
-                    throw new \Exception('A opção de comportamento informada não existe', 1);
-                }
-                $marcado = $this->getRequest()->request->get('marcado');
-                set_boolean_config($secao, $chave, $marcado == 'Y');
-                app()->getSystem()->getBusiness()->filter(
-                    app()->getSystem()->getBusiness(),
-                    app()->auth->provider
-                );
-                app()->getSystem()->getBusiness()->update(['opcoes']);
-                return $this->getResponse()->success();
-            } catch (\Exception $e) {
-                return $this->getResponse()->error($e->getMessage());
+        $data = $this->getData();
+        try {
+            $secao = $data['secao'];
+            $chave = $data['chave'];
+            if (!config_values_exists($opcoes_comportamento, $secao, $chave)) {
+                throw new \Exception('A opção de comportamento informada não existe', 1);
             }
+            $marcado = $data['marcado'];
+            set_boolean_config($secao, $chave, $marcado == 'Y');
+            app()->getSystem()->getBusiness()->filter(
+                app()->getSystem()->getBusiness(),
+                app()->auth->provider
+            );
+            app()->getSystem()->getBusiness()->update(['opcoes']);
+            return $this->getResponse()->success();
+        } catch (\Exception $e) {
+            return $this->getResponse()->error($e->getMessage());
         }
     }
 

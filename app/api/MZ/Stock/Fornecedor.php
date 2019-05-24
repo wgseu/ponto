@@ -327,7 +327,8 @@ class Fornecedor extends SyncModel
                 $query = $query->where('c.cpf', Filter::digits($search));
             } elseif (Validator::checkPhone($search)) {
                 $fone = Cliente::buildFoneSearch($search);
-                $query = $query->orderBy('IF(t.numero LIKE ?, 0, 1)', $fone);
+                $query = $query->where('t.numero', $search);
+                $query = $query->orderBy('t.numero ASC');
             } else {
                 $query = DB::buildSearch(
                     $search,

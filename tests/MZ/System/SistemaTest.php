@@ -23,9 +23,97 @@
  * @author Equipe GrandChef <desenvolvimento@mzsw.com.br>
  */
 namespace MZ\System;
+use MZ\Exception\ValidationException;
+use MZ\Account\AuthenticationTest;
 
 class SistemaTest extends \MZ\Framework\TestCase
 {
+    /**
+     * Build a valid sistema
+     * @param string $versao_db Sistema versão do banco de dados
+     * @return Sistema
+     */
+    public static function build($versao_db = null)
+    {
+        $last = Sistema::find([], ['id' => -1]);
+        $id = $last->getID() + 1;
+        $servidor = ServidorTest::create();
+        $sistema = new Sistema();
+        $sistema->setServidorID($servidor->getID());
+        $sistema->setVersaoDB($versao_db ?: "Sistema {$id}");
+        return $sistema;
+    }
+
+    /**
+     * Create a sistema on database
+     * @param string $versao_db Sistema versão do banco de dados
+     * @return Sistema
+     */
+    public static function create($versao_db = null)
+    {
+        $sistema = self::build($versao_db);
+        $sistema->insert();
+        return $sistema;
+    }
+
+    public function testLoadAll()
+    {
+        AuthenticationTest::authProvider([Permissao::NOME_SISTEMA, Permissao::NOME_ALTERARCONFIGURACOES]);
+        $sistema = Sistema::find([]);
+        $path =  dirname(dirname(dirname(__DIR__)));
+        $sistema->initialize($path);
+        $sistema->loadAll();
+        $this->assertTrue($sistema->exists());
+        $moeda = $sistema->getCurrency();
+        $this->assertTrue($moeda->exists());
+    }
+
+    public function testInitialize()
+    {
+        $sistema = Sistema::find([]);
+        $path =  dirname(dirname(dirname(__DIR__)));
+        $sistema->initialize($path);
+        $this->assertTrue($sistema->exists());
+    }
+
+    public function testFindServidorID()
+    {
+        $sistema = Sistema::find([]);
+        $servidor = $sistema->findServidorID();
+        $this->assertEquals($servidor->getID(), $sistema->getServidorID());
+    }
+
+    public function testValidate()
+    {
+        //teste id diferente de 1
+        $sistema = Sistema::find([]);
+        $sistema->setID('2');
+        try {
+            $sistema->update();
+            $this->fail('O id do sistema não foi informado');
+        } catch (ValidationException $e) {
+            $this->assertEquals(['id'], array_keys($e->getErrors()));
+        }
+        //testa servidor nulo
+        $sistema = Sistema::find([]);
+        $sistema->setServidorID(null);
+        try {
+            $sistema->update();
+            $this->fail('ServidorID não pode ser nulo');
+        } catch (ValidationException $e) {
+            $this->assertEquals(['servidorid'], array_keys($e->getErrors()));
+        }
+        //testa versãoDB nulo
+        $sistema = Sistema::find([]);
+        $sistema->setVersaoDB(null);
+        try {
+            $sistema->update();
+            $this->fail('VersãoDB não pode ser nulo');
+        } catch (ValidationException $e) {
+            $this->assertEquals(['versaodb'], array_keys($e->getErrors()));
+        }
+    }
+
     public function testFind()
     {
         $condition = ['id' => '1'];

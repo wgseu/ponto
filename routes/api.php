@@ -56,5 +56,6 @@ $collection = new RouteCollection();
 \MZ\Environment\PatrimonioApiController::addRoutes($collection);
 \MZ\Environment\MesaApiController::addRoutes($collection);
 \MZ\Environment\SetorApiController::addRoutes($collection);
+\MZ\Device\ImpressoraApiController::addRoutes($collection);
 
 return $collection;

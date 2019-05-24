@@ -116,8 +116,8 @@ class PedidoApiController extends \MZ\Core\ApiController
             }
             $pedido->checkAccess(app()->auth->provider);
             $dispositivo = new Dispositivo();
-            $dispositivo->setNome($data['device']);
-            $dispositivo->setSerial($data['serial']);
+            $dispositivo->setNome($data['device'] ?? null);
+            $dispositivo->setSerial($data['serial'] ?? null);
             $dispositivo->loadBySerial();
             if (!$dispositivo->exists()) {
                 throw new \Exception('O dispositivo informado não existe ou não foi validado');

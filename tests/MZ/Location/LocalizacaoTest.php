@@ -26,6 +26,7 @@ namespace MZ\Location;
 
 use MZ\Account\ClienteTest;
 use MZ\Location\BairroTest;
+use MZ\Exception\ValidationException;
 
 class LocalizacaoTest extends \MZ\Framework\TestCase
 {
@@ -71,11 +72,141 @@ class LocalizacaoTest extends \MZ\Framework\TestCase
         $this->assertEquals(1, Localizacao::count($condition));
     }
 
+    public function testFinds()
+    {
+        $loc = self::create();
+
+        $cliente = $loc->findClienteID();
+        $this->assertEquals($loc->getClienteID(), $cliente->getID());
+
+        $bairro = $loc->findBairroID();
+        $this->assertEquals($loc->getBairroID(), $bairro->getID());
+
+        $zona = $loc->findZonaID();
+        $this->assertEquals($loc->getZonaID(), $zona->getID());
+
+        $localizacao = $loc->findByClienteIDApelido($cliente->getID(), $loc->getApelido());
+        $this->assertInstanceOf(get_class($loc), $localizacao);
+    }
+
     public function testAdd()
     {
         $localizacao = self::build();
         $localizacao->insert();
         $this->assertTrue($localizacao->exists());
+    }
+
+    public function testAddInvalid()
+    {
+        $loc = self::build();
+        $loc->setClienteID(null);
+        $loc->setBairroID(null);
+        $loc->setCEP('dfgh3489938338');
+        $loc->setLogradouro(null);
+        $loc->setNumero(null);
+        $loc->setTipo(null);
+        $loc->setMostrar(null);
+        try {
+            $loc->insert();
+            $loc->fail('Não cadastrar valor nulo');
+        } catch (ValidationException $e) {
+            $this->assertEquals(
+                ['clienteid', 'bairroid', 'cep', 'logradouro', 'numero', 'tipo', 'mostrar'],
+                array_keys($e->getErrors())
+            );
+        }
+    }
+
+    public function testTranslate()
+    {
+        $loc = self::build();
+        $loc->setClienteID(1);
+        $loc->setApelido('teste');
+        $loc->insert();
+        try {
+            $loc->insert();
+            $this->fail('fk duplicada');
+        } catch (ValidationException $e) {
+            $this->assertEquals(['clienteid', 'apelido'], array_keys($e->getErrors()));
+        }
+    }
+
+    public function testIsSame()
+    {
+        $localizacao = self::build();
+        $this->assertFalse($localizacao->isSame($localizacao));
+        //---------------------
+        $loc = self::create();
+        $localizacao = self::build();
+        $localizacao->setLogradouro('Testinho');
+        $this->assertFalse($loc->isSame($localizacao));
+        //---------------------
+        $loc = self::create();
+        $localizacao = self::build();
+        $localizacao->setLogradouro($loc->getLogradouro());
+        $localizacao->setNumero('888');
+        $this->assertFalse($loc->isSame($localizacao));
+        //---------------------
+        $loc = self::build();
+        $loc->setTipo(Localizacao::TIPO_APARTAMENTO);
+        $loc->insert();
+        $localizacao = self::build();
+        $localizacao->setLogradouro($loc->getLogradouro());
+        $localizacao->setNumero($loc->getNumero());
+        $this->assertTrue($loc->isSame($localizacao));
+        //---------------------
+        $loc = self::build();
+        $loc->setTipo(Localizacao::TIPO_APARTAMENTO);
+        $loc->insert();
+        $localizacao = self::build();
+        $localizacao->setLogradouro($loc->getLogradouro());
+        $localizacao->setNumero($loc->getNumero());
+        $localizacao->setTipo($loc->getTipo());
+        $localizacao->setCondominio('Teste condominio');
+        $this->assertFalse($loc->isSame($localizacao));
+        //---------------------
+        $loc = self::build();
+        $loc->setTipo(Localizacao::TIPO_APARTAMENTO);
+        $loc->insert();
+        $localizacao = self::build();
+        $localizacao->setLogradouro($loc->getLogradouro());
+        $localizacao->setNumero($loc->getNumero());
+        $localizacao->setTipo($loc->getTipo());
+        $localizacao->setCondominio($loc->getCondominio());
+        $localizacao->setBloco('Teste');
+        $this->assertFalse($loc->isSame($localizacao));
+        //---------------------
+        $loc = self::build();
+        $loc->setTipo(Localizacao::TIPO_APARTAMENTO);
+        $loc->insert();
+        $localizacao = self::build();
+        $localizacao->setLogradouro($loc->getLogradouro());
+        $localizacao->setNumero($loc->getNumero());
+        $localizacao->setTipo($loc->getTipo());
+        $localizacao->setCondominio($loc->getCondominio());
+        $localizacao->setBloco($loc->getBloco());
+        $localizacao->setApartamento('teste');
+        $this->assertFalse($loc->isSame($localizacao));
+        //---------------------
+        $loc = self::build();
+        $loc->setTipo(Localizacao::TIPO_APARTAMENTO);
+        $loc->insert();
+        $localizacao = self::build();
+        $localizacao->setBairroID(77);
+        $localizacao->setLogradouro($loc->getLogradouro());
+        $localizacao->setNumero($loc->getNumero());
+        $localizacao->setTipo($loc->getTipo());
+        $localizacao->setCondominio($loc->getCondominio());
+        $localizacao->setBloco($loc->getBloco());
+        $localizacao->setApartamento($loc->getApartamento());
+        $this->assertTrue($loc->isSame($localizacao));
+    }
+
+    public function testGetOptions()
+    {
+        $localizacao = self::create();
+        $options = Localizacao::getTipoOptions($localizacao->getTipo());
+        $this->assertEquals($localizacao->getTipo(), $options);
     }
 
     public function testUpdate()

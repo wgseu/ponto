@@ -25,6 +25,7 @@
 namespace MZ\Environment;
 
 use MZ\Account\ClienteTest;
+use MZ\Exception\ValidationException;
 
 class PatrimonioTest extends \MZ\Framework\TestCase
 {
@@ -81,6 +82,93 @@ class PatrimonioTest extends \MZ\Framework\TestCase
         $patrimonio = self::build();
         $patrimonio->insert();
         $this->assertTrue($patrimonio->exists());
+    }
+
+    public function testAddInvalid()
+    {
+        $patrimonio = self::build();
+        $patrimonio->setEmpresaID(null);
+        $patrimonio->setNumero(null);
+        $patrimonio->setDescricao(null);
+        $patrimonio->setQuantidade(null);
+        $patrimonio->setAltura(null);
+        $patrimonio->setLargura(null);
+        $patrimonio->setComprimento(null);
+        $patrimonio->setEstado('Teste');
+        $patrimonio->setCusto(null);
+        $patrimonio->setValor(null);
+        $patrimonio->setAtivo('E');
+        try {
+            $patrimonio->insert();
+            $this->fail('Nao cadastrar');
+        } catch (ValidationException $e) {
+            $this->assertEquals(['empresaid', 'numero', 'descricao', 'quantidade', 'altura', 'largura', 'comprimento',
+             'estado', 'custo', 'valor', 'ativo'], array_keys($e->getErrors()));
+        }
+        //---------------------
+        $patrimonio = self::build();
+        $patrimonio->setQuantidade(0);
+        $patrimonio->setAltura(-1);
+        $patrimonio->setLargura(-1);
+        $patrimonio->setComprimento(-1);
+        $patrimonio->setCusto(-1);
+        $patrimonio->setValor(-1);
+        try {
+            $patrimonio->insert();
+            $this->fail('Não cadastrar valores negativos');
+        } catch (ValidationException $e) {
+            $this->assertEquals(['quantidade', 'altura', 'largura', 'comprimento', 'custo', 'valor'], array_keys($e->getErrors()));
+        }
+    }
+
+    public function testTranslate()
+    {
+        $patrimonio = self::create();
+        try {
+            $patrimonio->insert();
+            $this->fail('fk');
+        } catch (ValidationException $e) {
+            $this->assertEquals(['numero', 'estado'], array_keys($e->getErrors()));
+        }
+    }
+
+    public function testFinds()
+    {
+        $patrimonio = self::create();
+
+        $empresa = $patrimonio->findEmpresaID();
+        $this->assertEquals($patrimonio->getEmpresaID(), $empresa->getID());
+
+        $fornecedor = $patrimonio->findFornecedorID();
+        $this->assertEquals($patrimonio->getFornecedorID(), $fornecedor->getID());
+
+        $patri = $patrimonio->findByNumeroEstado($patrimonio->getNumero(), $patrimonio->getEstado());
+        $this->assertInstanceOf(get_class($patrimonio), $patri);
+    }
+
+    public function testGetOption()
+    {
+        $patrimonio = self::create();
+        $options = Patrimonio::getEstadoOptions($patrimonio->getEstado());
+        $this->assertEquals($patrimonio->getEstado(), $options);
+    }
+
+    public function testMakeImgAnexada()
+    {
+        $patrimonio = new Patrimonio();
+        $this->assertEquals('/static/img/patrimonio.png', $patrimonio->makeImagemAnexada(true));
+        $patrimonio->setImagemAnexada('imagem.png');
+        $this->assertEquals('/static/img/patrimonio/imagem.png', $patrimonio->makeImagemAnexada());
+    }
+
+    public function testClean()
+    {
+        $old = new Patrimonio();
+        $old->setImagemAnexada('teste.png');
+        $patrimonio = new Patrimonio();
+        $patrimonio->setImagemAnexada('teste1.png');
+        $patrimonio->clean($old);
+        $this->assertEquals($old, $patrimonio);
     }
 
     public function testUpdate()

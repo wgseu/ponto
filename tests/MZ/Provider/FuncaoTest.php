@@ -112,9 +112,35 @@ class FuncaoTest extends \MZ\Framework\TestCase
                 array_keys($e->getErrors())
             );
         }
+        //---------------------
         $funcao->setDescricao('Função to insert');
-        $funcao->setRemuneracao(12.3);
-        $funcao->insert();
+        $funcao->setRemuneracao(null);
+        try {
+            $funcao->insert();
+            $this->fail('Remuneração não pode ser nula');
+        } catch (\MZ\Exception\ValidationException $e) {
+            $this->assertEquals(['remuneracao'], array_keys($e->getErrors()));
+        }
+        //---------------------
+        $funcao->setRemuneracao(-100);
+        try {
+            $funcao->insert();
+            $this->fail('Remuneração não pode ser negativa');
+        } catch (\MZ\Exception\ValidationException $e) {
+            $this->assertEquals(['remuneracao'], array_keys($e->getErrors()));
+        }
+    }
+
+    public function testTranslate()
+    {
+        $funcao = self::create();
+
+        try {
+            $funcao->insert();
+            $this->fail('Não inserir fk duplicada');
+        } catch (\MZ\Exception\ValidationException $e) {
+            $this->assertEquals(['descricao'], array_keys($e->getErrors()));
+        }
     }
 
     public function testUpdate()

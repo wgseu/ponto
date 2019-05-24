@@ -27,24 +27,44 @@ namespace MZ\Environment;
 use MZ\System\Permissao;
 use MZ\Account\AuthenticationTest;
 
-class PatrimonioPageControllerTest extends \MZ\Framework\TestCase
+class PatrimonioApiControllerTest extends \MZ\Framework\TestCase
 {
     public function testFind()
     {
         AuthenticationTest::authProvider([Permissao::NOME_SISTEMA, Permissao::NOME_CADASTROPATRIMONIO]);
         $patrimonio = PatrimonioTest::create();
-        $result = $this->get('/gerenciar/patrimonio/', ['search' => $patrimonio->getDescricao()]);
-        $this->assertEquals(200, $result->getStatusCode());
+        $expected = [
+            'status' => 'ok',
+            'items' => [
+                $patrimonio->publish(app()->auth->provider),
+            ],
+        ];
+        $result = $this->get('/api/patrimonios', ['search' => $patrimonio->getDescricao()]);
+        $this->assertEquals($expected, \array_intersect_key($result, $expected));
     }
 
     public function testAdd()
     {
         AuthenticationTest::authProvider([Permissao::NOME_SISTEMA, Permissao::NOME_CADASTROPATRIMONIO]);
         $patrimonio = PatrimonioTest::build();
-        $result = $this->post('/gerenciar/patrimonio/cadastrar', $patrimonio->toArray(), true);
-        $this->assertEquals(302, $result->getStatusCode());
-        $patrimonio->load(['descricao' => $patrimonio->getDescricao()]);
-        $this->assertTrue($patrimonio->exists());
+        $patrimonio->setAtivo('Y');
+        $this->assertTrue($patrimonio->isAtivo());
+        $this->assertEquals($patrimonio->toArray(), (new Patrimonio($patrimonio))->toArray());
+        $this->assertEquals((new Patrimonio())->toArray(), (new Patrimonio(1))->toArray());
+        $expected = [
+            'status' => 'ok',
+            'item' => $patrimonio->publish(app()->auth->provider),
+        ];
+        $result = $this->post('/api/patrimonios', $patrimonio->toArray());
+        $expected['item']['id'] = $result['item']['id'] ?? null;
+        $result['item']['numero'] = intval($result['item']['numero'] ?? null);
+        $result['item']['quantidade'] = floatval($result['item']['quantidade'] ?? null);
+        $result['item']['altura'] = floatval($result['item']['altura'] ?? null);
+        $result['item']['largura'] = floatval($result['item']['largura'] ?? null);
+        $result['item']['comprimento'] = floatval($result['item']['comprimento'] ?? null);
+        $result['item']['custo'] = floatval($result['item']['custo'] ?? null);
+        $result['item']['valor'] = floatval($result['item']['valor'] ?? null);
+        $this->assertEquals($expected, \array_intersect_key($result, $expected));
     }
 
     public function testUpdate()
@@ -52,9 +72,13 @@ class PatrimonioPageControllerTest extends \MZ\Framework\TestCase
         AuthenticationTest::authProvider([Permissao::NOME_SISTEMA, Permissao::NOME_CADASTROPATRIMONIO]);
         $patrimonio = PatrimonioTest::create();
         $id = $patrimonio->getID();
-        $result = $this->post('/gerenciar/patrimonio/editar?id=' . $id, $patrimonio->toArray(), true);
+        $result = $this->patch('/api/patrimonios/' . $id, $patrimonio->toArray());
         $patrimonio->loadByID();
-        $this->assertEquals(302, $result->getStatusCode());
+        $expected = [
+            'status' => 'ok',
+            'item' => $patrimonio->publish(app()->auth->provider),
+        ];
+        $this->assertEquals($expected, \array_intersect_key($result, $expected));
     }
 
     public function testDelete()
@@ -62,9 +86,10 @@ class PatrimonioPageControllerTest extends \MZ\Framework\TestCase
         AuthenticationTest::authProvider([Permissao::NOME_SISTEMA, Permissao::NOME_CADASTROPATRIMONIO]);
         $patrimonio = PatrimonioTest::create();
         $id = $patrimonio->getID();
-        $result = $this->get('/gerenciar/patrimonio/excluir?id=' . $id);
+        $result = $this->delete('/api/patrimonios/' . $id);
         $patrimonio->loadByID();
-        $this->assertEquals(302, $result->getStatusCode());
+        $expected = [ 'status' => 'ok', ];
+        $this->assertEquals($expected, \array_intersect_key($result, $expected));
         $this->assertFalse($patrimonio->exists());
     }
 }

@@ -24,6 +24,11 @@
  */
 namespace MZ\Environment;
 
+use MZ\Exception\ValidationException;
+use MZ\Sale\PedidoTest;
+use MZ\Session\CaixaTest;
+use MZ\Session\MovimentacaoTest;
+
 class MesaTest extends \MZ\Framework\TestCase
 {
     /**
@@ -144,6 +149,26 @@ class MesaTest extends \MZ\Framework\TestCase
         $mesa->update();
     }
 
+    public function testUpdateInvalid()
+    {
+        $movimentacao = MovimentacaoTest::create();
+        $old = self::build();
+        $old->setAtiva('Y');
+        $old->insert();
+        $pedido = PedidoTest::build();
+        $pedido->setMesaID($old->getID());
+        $pedido->insert();
+
+        try {
+            $old->setAtiva('N');
+            $old->update();
+            $this->fail('Não atualizar');
+        } catch (ValidationException $e) {
+            $this->assertEquals(['ativa'], array_keys($e->getErrors()));
+        }
+        MovimentacaoTest::close($movimentacao);
+    }
+
     public function testDelete()
     {
         $mesa = new Mesa();
@@ -187,5 +212,33 @@ class MesaTest extends \MZ\Framework\TestCase
 
         $count = Mesa::count(['search' => 'Mesa find']);
         $this->assertEquals(2, $count);
+    }
+
+    public function testFindSetor()
+    {
+        $mesa = self::create();
+        $setor = $mesa->findSetorID();
+        $this->assertEquals($mesa->getSetorID(), $setor->getID());
+    }
+
+    public function testTranslate()
+    {
+        $mesa = self::create();
+        try {
+            $mesa->setNumero(12);
+            $mesa->insert();
+            $this->fail('Fk duplicada');
+        } catch (ValidationException $e) {
+            $this->assertEquals(['nome'], array_keys($e->getErrors()));
+        }
+        //---------
+        $mesa = self::create();
+        try {
+            $mesa->setNome('Teste');
+            $mesa->insert();
+            $this->fail('Fk duplicada');
+        } catch (ValidationException $e) {
+            $this->assertEquals(['numero'], array_keys($e->getErrors()));
+        }
     }
 }

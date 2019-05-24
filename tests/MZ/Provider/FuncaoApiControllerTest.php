@@ -27,44 +27,62 @@ namespace MZ\Provider;
 use MZ\System\Permissao;
 use MZ\Account\AuthenticationTest;
 
-class FuncaoPageControllerTest extends \MZ\Framework\TestCase
+class FuncaoApiControllerTest extends \MZ\Framework\TestCase
 {
     public function testFind()
     {
+        AuthenticationTest::authProvider([Permissao::NOME_SISTEMA, Permissao::NOME_ALTERARCONFIGURACOES]);
         AuthenticationTest::authOwner();
         $funcao = FuncaoTest::create();
-        $result = $this->get('/gerenciar/funcao/', ['search' => $funcao->getDescricao()]);
-        $this->assertEquals(200, $result->getStatusCode());
+        $expected = [
+            'status' => 'ok',
+            'items' => [
+                $funcao->publish(app()->auth->provider),
+            ],
+        ];
+        $result = $this->get('/api/funcoes', ['search' => $funcao->getDescricao()]);
+        $this->assertEquals($expected, \array_intersect_key($result, $expected));
     }
 
     public function testAdd()
     {
-        AuthenticationTest::authOwner();
+        AuthenticationTest::authProvider([Permissao::NOME_SISTEMA, Permissao::NOME_ALTERARCONFIGURACOES]);
         $funcao = FuncaoTest::build();
-        $result = $this->post('/gerenciar/funcao/cadastrar', $funcao->toArray(), true);
-        $this->assertEquals(302, $result->getStatusCode());
-        $funcao->load(['descricao' => $funcao->getDescricao()]);
-        $this->assertTrue($funcao->exists());
+        $expected = [
+            'status' => 'ok',
+            'item' => $funcao->publish(app()->auth->provider),
+        ];
+        $result = $this->post('/api/funcoes', $funcao->toArray());
+        $expected['item']['id'] = $result['item']['id'] ?? null;
+        $result['item']['remuneracao'] = floatval($result['item']['remuneracao'] ?? null);
+        $this->assertEquals($expected, \array_intersect_key($result, $expected));
     }
 
     public function testUpdate()
     {
+        AuthenticationTest::authProvider([Permissao::NOME_SISTEMA, Permissao::NOME_ALTERARCONFIGURACOES]);
         AuthenticationTest::authOwner();
         $funcao = FuncaoTest::create();
         $id = $funcao->getID();
-        $result = $this->post('/gerenciar/funcao/editar?id=' . $id, $funcao->toArray(), true);
+        $result = $this->patch('/api/funcoes/' . $id, $funcao->toArray());
         $funcao->loadByID();
-        $this->assertEquals(302, $result->getStatusCode());
+        $expected = [
+            'status' => 'ok',
+            'item' => $funcao->publish(app()->auth->provider),
+        ];
+        $this->assertEquals($expected, \array_intersect_key($result, $expected));
     }
 
     public function testDelete()
     {
+        AuthenticationTest::authProvider([Permissao::NOME_SISTEMA, Permissao::NOME_ALTERARCONFIGURACOES]);
         AuthenticationTest::authOwner();
         $funcao = FuncaoTest::create();
         $id = $funcao->getID();
-        $result = $this->get('/gerenciar/funcao/excluir?id=' . $id);
+        $result = $this->delete('/api/funcoes/' . $id);
         $funcao->loadByID();
-        $this->assertEquals(302, $result->getStatusCode());
+        $expected = [ 'status' => 'ok', ];
+        $this->assertEquals($expected, \array_intersect_key($result, $expected));
         $this->assertFalse($funcao->exists());
     }
 }

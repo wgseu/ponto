@@ -26,6 +26,8 @@ namespace MZ\Product;
 
 use MZ\Product\ProdutoTest;
 use MZ\Product\GrupoTest;
+use MZ\Product\PropriedadeTest;
+use MZ\Exception\ValidationException;
 
 class PacoteTest extends \MZ\Framework\TestCase
 {
@@ -69,6 +71,13 @@ class PacoteTest extends \MZ\Framework\TestCase
         $this->assertEquals(1, Pacote::count($condition));
     }
 
+    public function testFindProp()
+    {
+        $pacote = self::create();
+        $prop = $pacote->findPropriedadeID();
+        $this->assertEquals($pacote->getPropriedadeID(), $prop->getID());
+    }
+
     public function testAdd()
     {
         $pacote = self::build();
@@ -76,19 +85,69 @@ class PacoteTest extends \MZ\Framework\TestCase
         $this->assertTrue($pacote->exists());
     }
 
-    public function testUpdate()
+    public function testAddInvalid()
     {
-        $pacote = self::create();
-        $pacote->update();
-        $this->assertTrue($pacote->exists());
-    }
+        $pacote = self::build();
 
-    public function testDelete()
-    {
-        $pacote = self::create();
-        $pacote->delete();
-        $pacote->loadByID();
-        $this->assertFalse($pacote->exists());
+        $pacote->setQuantidadeMaxima(null);
+        $pacote->setQuantidadeMinima(null);
+        $pacote->setSelecionado(null);
+        $pacote->setVisivel(null);
+        try {
+            $pacote->insert();
+            $this->fail('Não cadastrar valores nulos');
+        } catch (ValidationException $e) {
+            $this->assertEquals(['quantidademinima', 'quantidademaxima', 'selecionado', 'visivel'], array_keys($e->getErrors()));
+        }
+        //--------------------------------
+        $pacote = self::build();
+        $pacote->setProdutoID(1);
+        $pacote->setPropriedadeID(2);
+        try {
+            $pacote->insert();
+            $this->fail('Não cadastrar com produto ID e propriedade ID');
+        } catch (ValidationException $e) {
+            $this->assertEquals(['produtoid'], array_keys($e->getErrors()));
+        }
+        //---------cadastrar 2 produtos (pacote.produto_id_existing)
+        $produto = ProdutoTest::build();
+        $produto->setDescricao('Queijo');
+        $produto->insert();
+        $pacote = self::build();
+        $pacote->setProdutoID($produto->getID());
+        $pacote->insert();
+        try {
+            $pacote->insert();
+            $this->fail('o produto informado já está cadastrado');
+        } catch (ValidationException $e) {
+            $this->assertEquals(['produtoid'], array_keys($e->getErrors()));
+        }
+        //---------pacote.produto_id_package
+        $produto = ProdutoTest::build();
+        $produto->setTipo(Produto::TIPO_PACOTE);
+        $produto->insert();
+        $pacote = self::build();
+        $pacote->setProdutoID($produto->getID());
+        try {
+            $pacote->insert();
+            $this->fail('O produto do pacote não pode ser outro pacote');
+        } catch (ValidationException $e) {
+            $this->assertEquals(['produtoid'], array_keys($e->getErrors()));
+        }
+        //---------pacote.propriedade_id_existing
+        $propriedade = PropriedadeTest::build();
+        $propriedade->setNome('Grande');
+        $propriedade->insert();
+        $pacote = self::build();
+        $pacote->setProdutoID(null);
+        $pacote->setPropriedadeID($propriedade->getID());
+        $pacote->insert();
+        try {
+            $pacote->insert();
+            $this->fail('Propriedade já cadastrada');
+        } catch (ValidationException $e) {
+            $this->assertEquals(['propriedadeid'], array_keys($e->getErrors()));
+        }
     }
 
     public function testInsertBlankFields()

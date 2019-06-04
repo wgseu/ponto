@@ -68,4 +68,29 @@ class FilterTest extends \MZ\Framework\TestCase
             Filter::order('')
         );
     }
+
+    public function testFloat()
+    {
+        $this->assertEquals(null, Filter::float(''));
+    }
+
+    public function testName()
+    {
+        $this->assertEquals(null, Filter::name(null));
+        $this->assertEquals('Testinho', Filter::name('tEstInho'));
+    }
+
+    public function testTime()
+    {
+        $this->assertEquals('2010-04-12', Filter::time('12-04-2010'));
+        $this->assertEquals(null, Filter::time(null));
+    }
+
+    public function testValues()
+    {
+        $this->assertEquals(null, Filter::values([null]));
+        $this->assertEquals('testinho', Filter::values(['teste' => 'testinho']));
+        // $this->assertEquals()
+    }
+
 }

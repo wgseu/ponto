@@ -383,10 +383,8 @@ class Filter
             function ($value) {
                 if (is_array($value) || trim($value) !== '') {
                     return $value;
-                } else {
-                    $value = null;
-                    return $value;
                 }
+                return $value = null;
             },
             $array
         );

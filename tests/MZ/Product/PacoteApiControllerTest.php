@@ -47,6 +47,10 @@ class PacoteApiControllerTest extends \MZ\Framework\TestCase
     {
         AuthenticationTest::authProvider([Permissao::NOME_SISTEMA, Permissao::NOME_CADASTROPRODUTOS]);
         $pacote = PacoteTest::build();
+        $pacote->setVisivel('Y');
+        $this->assertTrue($pacote->isVisivel());
+        $this->assertEquals($pacote->toArray(), (new Pacote($pacote))->toArray());
+        $this->assertEquals((new Pacote())->toArray(), (new Pacote(1))->toArray());
         $expected = [
             'status' => 'ok',
             'item' => $pacote->publish(app()->auth->provider),

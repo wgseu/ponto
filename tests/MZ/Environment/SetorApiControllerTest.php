@@ -27,24 +27,33 @@ namespace MZ\Environment;
 use MZ\System\Permissao;
 use MZ\Account\AuthenticationTest;
 
-class SetorPageControllerTest extends \MZ\Framework\TestCase
+class SetorApiControllerTest extends \MZ\Framework\TestCase
 {
     public function testFind()
     {
         AuthenticationTest::authProvider([Permissao::NOME_SISTEMA, Permissao::NOME_ESTOQUE]);
         $setor = SetorTest::create();
-        $result = $this->get('/gerenciar/setor/', ['search' => $setor->getNome()]);
-        $this->assertEquals(200, $result->getStatusCode());
+        $expected = [
+            'status' => 'ok',
+            'items' => [
+                $setor->publish(app()->auth->provider),
+            ],
+        ];
+        $result = $this->get('/api/setores', ['search' => $setor->getNome()]);
+        $this->assertEquals($expected, \array_intersect_key($result, $expected));
     }
 
     public function testAdd()
     {
         AuthenticationTest::authProvider([Permissao::NOME_SISTEMA, Permissao::NOME_ESTOQUE]);
         $setor = SetorTest::build();
-        $result = $this->post('/gerenciar/setor/cadastrar', $setor->toArray(), true);
-        $this->assertEquals(302, $result->getStatusCode());
-        $setor->load(['nome' => $setor->getNome()]);
-        $this->assertTrue($setor->exists());
+        $expected = [
+            'status' => 'ok',
+            'item' => $setor->publish(app()->auth->provider),
+        ];
+        $result = $this->post('/api/setores', $setor->toArray());
+        $expected['item']['id'] = $result['item']['id'] ?? null;
+        $this->assertEquals($expected, \array_intersect_key($result, $expected));
     }
 
     public function testUpdate()
@@ -52,9 +61,13 @@ class SetorPageControllerTest extends \MZ\Framework\TestCase
         AuthenticationTest::authProvider([Permissao::NOME_SISTEMA, Permissao::NOME_ESTOQUE]);
         $setor = SetorTest::create();
         $id = $setor->getID();
-        $result = $this->post('/gerenciar/setor/editar?id=' . $id, $setor->toArray(), true);
+        $result = $this->patch('/api/setores/' . $id, $setor->toArray());
         $setor->loadByID();
-        $this->assertEquals(302, $result->getStatusCode());
+        $expected = [
+            'status' => 'ok',
+            'item' => $setor->publish(app()->auth->provider),
+        ];
+        $this->assertEquals($expected, \array_intersect_key($result, $expected));
     }
 
     public function testDelete()
@@ -62,9 +75,10 @@ class SetorPageControllerTest extends \MZ\Framework\TestCase
         AuthenticationTest::authProvider([Permissao::NOME_SISTEMA, Permissao::NOME_ESTOQUE]);
         $setor = SetorTest::create();
         $id = $setor->getID();
-        $result = $this->get('/gerenciar/setor/excluir?id=' . $id);
+        $result = $this->delete('/api/setores/' . $id);
         $setor->loadByID();
-        $this->assertEquals(302, $result->getStatusCode());
+        $expected = [ 'status' => 'ok', ];
+        $this->assertEquals($expected, \array_intersect_key($result, $expected));
         $this->assertFalse($setor->exists());
     }
 }

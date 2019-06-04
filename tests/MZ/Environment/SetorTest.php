@@ -24,6 +24,8 @@
  */
 namespace MZ\Environment;
 
+use MZ\Exception\ValidationException;
+
 class SetorTest extends \MZ\Framework\TestCase
 {
     /**
@@ -111,6 +113,17 @@ class SetorTest extends \MZ\Framework\TestCase
         }
         $setor->setNome('Setor to insert');
         $setor->insert();
+    }
+
+    public function testTranslate()
+    {
+        $setor = self::create();
+        try {
+            $setor->insert();
+            $this->fail('Fk duplicada');
+        } catch (ValidationException $e) {
+            $this->assertEquals(['nome'], array_keys($e->getErrors()));
+        }
     }
 
     public function testUpdate()

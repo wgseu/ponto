@@ -104,7 +104,7 @@ class ChequeApiController extends \MZ\Core\ApiController
 
     /**
      * Recall Cheque
-     * @Get("/api/cheques", name="api_cheque_recall")
+     * @Get("/api/cheques/recall", name="api_cheque_recall")
      */
     public function recall()
     {

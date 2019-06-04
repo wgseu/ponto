@@ -26,7 +26,10 @@ namespace MZ\Provider;
 
 use MZ\Provider\FuncaoTest;
 use MZ\Account\ClienteTest;
+use MZ\Account\AuthenticationTest;
 use MZ\System\Permissao;
+use MZ\Exception\ValidationException;
+use MZ\Database\DB;
 
 class PrestadorTest extends \MZ\Framework\TestCase
 {
@@ -83,5 +86,191 @@ class PrestadorTest extends \MZ\Framework\TestCase
             'datacadastro',
         ];
         $this->assertEquals($allowed, array_keys($values));
+    }
+
+    public function testAddInvalid()
+    {
+        $prestador = self::build();
+        $prestador->setCodigo(null);
+        $prestador->setFuncaoID(null);
+        $prestador->setClienteID(null);
+        $prestador->setVinculo(null);
+        $prestador->setPorcentagem(null);
+        $prestador->setPontuacao(null);
+        $prestador->setAtivo(null);
+        $prestador->setRemuneracao(null);
+        try {
+            $prestador->insert();
+            $this->fail('Não cadastrar valores nulos');
+        } catch (ValidationException $e) {
+            $this->assertEquals(
+                ['codigo', 'funcaoid', 'clienteid', 'vinculo', 'porcentagem', 'pontuacao', 'ativo', 'remuneracao', 'datatermino'],
+                array_keys($e->getErrors())
+            );
+        }
+        //----------------------
+        $cliente = ClienteTest::build();
+        $cliente->setTipo("Juridica");
+        $cliente->insert();
+        $prestador = self::build();
+        $prestador->setClienteID($cliente->getID());
+        try {
+            $prestador->insert();
+            $this->fail('Não cadastrar cliente != P.Fisica');
+        } catch (ValidationException $e) {
+            $this->assertEquals(['clienteid'], array_keys($e->getErrors()));
+        }
+        //------------Cliente sem login
+        $cliente = ClienteTest::build();
+        $cliente->setID(55);
+        $cliente->setLogin('');
+        try {
+            $prestador = self::build();
+            $prestador->setClienteID($cliente->getID());
+            $prestador->insert();
+            $this->fail('cliente sem login');
+        } catch (ValidationException $e) {
+            $this->assertEquals(['clienteid'], array_keys($e->getErrors()));
+        }
+        //------------Cliente sem senha
+        $cliente = ClienteTest::build();
+        $cliente->setID(55);
+        $cliente->setSenha(null);
+        try {
+            $prestador = self::build();
+            $prestador->setClienteID($cliente->getID());
+            $prestador->insert();
+            $this->fail('cliente sem senha');
+        } catch (ValidationException $e) {
+            $this->assertEquals(['clienteid'], array_keys($e->getErrors()));
+        }
+        //----------------------
+        $prestador = self::build();
+        $prestador->setPorcentagem(-1);
+        try {
+            $prestador->insert();
+            $this->fail('Não cadastra comissão negativa');
+        } catch (ValidationException $e) {
+            $this->assertEquals(['porcentagem'], array_keys($e->getErrors()));
+        }
+        //----------------------
+        $prestador = self::build();
+        $prestador->setPontuacao(-1);
+        try {
+            $prestador->insert();
+            $this->fail('Não cadastra pontuação negativa');
+        } catch (ValidationException $e) {
+            $this->assertEquals(['pontuacao'], array_keys($e->getErrors()));
+        }
+        //----------------------
+        $prestador = self::build();
+        $prestador->setRemuneracao(-1);
+        try {
+            $prestador->insert();
+            $this->fail('Não remuneracao comissão negativa');
+        } catch (ValidationException $e) {
+            $this->assertEquals(['remuneracao'], array_keys($e->getErrors()));
+        }
+        //----------(!$this->isAtivo() && is_null($this->getDataTermino())
+        $prestador = self::build();
+        $prestador->setAtivo('N');
+        try {
+            $prestador->insert();
+            $this->fail('Não cadastrar funcionario inativo');
+        } catch (ValidationException $e) {
+            $this->assertEquals(['ativo', 'datatermino'], array_keys($e->getErrors()));
+        }
+        //----------------------
+        $prestador = self::build();
+        $prestador->setAtivo('Y');
+        $prestador->setDataTermino(DB::now());
+        try {
+            $prestador->insert();
+            $this->fail('Não remuneracao comissão negativa');
+        } catch (ValidationException $e) {
+            $this->assertEquals(['datatermino'], array_keys($e->getErrors()));
+        }
+    }
+
+    public function testTranslate()
+    {
+        $prestador = self::create();
+        try {
+            $prestador->setCodigo('12346');
+            $prestador->insert();
+            $this->fail('Não cadastrar fk duplicada');
+        } catch (ValidationException $e) {
+            $this->assertEquals(['clienteid'], array_keys($e->getErrors()));
+        }
+
+        $prestador = self::create();
+        try {
+            $prestador->insert();
+            $this->fail('Não cadastrar fk duplicada');
+        } catch (ValidationException $e) {
+            $this->assertEquals(['codigo'], array_keys($e->getErrors()));
+        }
+        //-------- return
+        // $cliente = build();
+        // $prestador = self::build();
+        // $prestador->setClienteID($cliente->getID());
+        // $prestador->insert();
+        // try {
+        //     $prestador->insert();
+        //     $this->fail('Não cadastrar fk duplicada');
+        // } catch (ValidationException $e) {
+        //     $this->assertEquals(['clienteid'], array_keys($e->getErrors()));
+        // }
+    }
+
+    public function testFinds()
+    {
+        //FAZER O TESTE FINDS
+        $prestador = self::create();
+        $funcao = $prestador->findFuncaoID();
+        $this->assertEquals($prestador->getFuncaoID(), $funcao->getID());
+
+        $prestadorFound = $prestador->findPrestadorID();
+        $this->assertEquals($prestador->getPrestadorID(), $prestadorFound->getID());
+
+        $prestByCod = $prestador->findByCodigo($prestador->getCodigo());
+        $this->assertInstanceOF(get_class($prestador), $prestByCod);
+    }
+
+    public function testGetVinculo()
+    {
+        $prestador = self::create();
+        $options = Prestador::getVinculoOptions($prestador->getVinculo());
+        $this->assertEquals('Funcionário', $options);
+    }
+
+    public function testDelete()
+    {
+        $prestador = self::create();
+        $prestador->delete();
+        $prestador->loadByID();
+        $this->assertFalse($prestador->exists());
+    }
+
+    public function testDeleteInvalid()
+    {
+        AuthenticationTest::authProvider([Permissao::NOME_SISTEMA, Permissao::NOME_CADASTROPRESTADORES]);
+        $prestador = PrestadorTest::create();
+        $this->expectException('\Exception');
+        $prestador->delete();
+    }
+
+    public function testDeleteSelf()
+    {
+        $prestador = AuthenticationTest::authSelf();
+        $this->expectException('\Exception');
+        $prestador->delete();
+    }
+
+    public function testDeleteOwner()
+    {
+        $prestador = AuthenticationTest::authOwner();
+        $this->expectException('\Exception');
+        $prestador->delete();
     }
 }

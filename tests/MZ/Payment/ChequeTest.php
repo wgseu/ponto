@@ -26,6 +26,7 @@ namespace MZ\Payment;
 
 use MZ\Account\ClienteTest;
 use MZ\Wallet\BancoTest;
+use MZ\Exception\ValidationException;
 
 class ChequeTest extends \MZ\Framework\TestCase
 {
@@ -79,18 +80,56 @@ class ChequeTest extends \MZ\Framework\TestCase
         $this->assertTrue($cheque->exists());
     }
 
-    public function testUpdate()
+    public function testAddInvalid()
     {
-        $cheque = self::create();
-        $cheque->update();
-        $this->assertTrue($cheque->exists());
+        $cheque = self::build();
+        $cheque->setClienteID(null);
+        $cheque->setBancoID(null);
+        $cheque->setAgencia(null);
+        $cheque->setConta(null);
+        $cheque->setNumero(null);
+        $cheque->setValor(null);
+        $cheque->setVencimento(null);
+        $cheque->setCancelado('T');
+        $cheque->setRecolhido('T');
+        try {
+            $cheque->insert();
+            $this->fail('Valores invalidos');
+        } catch (ValidationException $e) {
+            $this->assertEquals(['clienteid', 'bancoid', 'agencia', 'conta',
+            'numero', 'valor', 'vencimento', 'cancelado', 'recolhido'], array_keys($e->getErrors()));
+        }
+        $cheque = self::build();
+        $cheque->setCancelado('Y');
+        try {
+            $cheque->insert();
+            $this->fail('Não pode cadastrar cheque cancelado');
+        } catch (ValidationException $e) {
+            $this->assertEquals(['cancelado'], array_keys($e->getErrors()));
+        }
     }
 
-    public function testDelete()
+    public function testUpdateInvalid()
     {
         $cheque = self::create();
-        $cheque->delete();
-        $cheque->loadByID();
-        $this->assertFalse($cheque->exists());
+        $cheque->recolher();
+        $cheque->insert();
+        try {
+            $cheque->setRecolhido('Y');
+            $cheque->update();
+            $this->fail('Cheque já recolhido');
+        } catch (ValidationException $e) {
+            $this->assertEquals(['recolhido'], array_keys($e->getErrors()));
+        }
+    }
+
+    public function testFinds()
+    {
+        $cheque = self::create();
+        $cliente = $cheque->findClienteID();
+        $this->assertEquals($cheque->getClienteID(), $cliente->getID());
+
+        $banco = $cheque->findBancoID();
+        $this->assertEquals($cheque->getBancoID(), $banco->getID());
     }
 }

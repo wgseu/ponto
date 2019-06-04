@@ -821,7 +821,8 @@ class Prestador extends SyncModel
             } elseif (check_fone($search, true)) {
                 $fone = Cliente::buildFoneSearch($search);
                 $query = $query->where('(t.numero LIKE ?)', $fone, $fone);
-                $query = $query->orderBy('IF(t.numero LIKE ?, 0, 1)', $fone);
+                // $query = $query->orderBy('IF(t.numero LIKE ?, 0, 1)', $fone);
+                $query = $query->orderBy('(CASE WHEN t.numero LIKE ? THEN 0 ELSE 1 END)', $fone);
             } elseif (Validator::checkDigits($search)) {
                 $query = $query->where('p.id', intval($search));
             } else {

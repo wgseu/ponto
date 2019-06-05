@@ -24,6 +24,10 @@
  */
 namespace MZ\Sale;
 
+use MZ\Sale\PedidoTest;
+use MZ\Session\CaixaTest;
+use MZ\Session\MovimentacaoTest;
+
 class ComandaTest extends \MZ\Framework\TestCase
 {
     public static function build($nome = null)
@@ -112,6 +116,7 @@ class ComandaTest extends \MZ\Framework\TestCase
     public function testUpdate()
     {
         $comanda = self::create('Comanda to update');
+        $comanda->loadNextNumero();
         $comanda->setNome('Comanda updated');
         $comanda->setAtiva('N');
         $comanda->update();
@@ -120,6 +125,26 @@ class ComandaTest extends \MZ\Framework\TestCase
         $comanda->setID('');
         $this->expectException('\Exception');
         $comanda->update();
+    }
+
+    public function testUpdateInvalid()
+    {
+        $movimentacao = MovimentacaoTest::create();
+        $comanda = self::create('Comanda to update');
+        $pedido = PedidoTest::build();
+        $pedido->setComandaID($comanda->getID());
+        $pedido->setMesaID(null);
+        $pedido->setPessoas(1);
+        $pedido->setTipo(Pedido::TIPO_COMANDA);
+        $pedido->insert();
+        $comanda->loadNextNumero();
+        $comanda->setNome('Comanda updated');
+        $comanda->setAtiva('N');
+        try {
+            $comanda->update();
+        } catch (\MZ\Exception\ValidationException $e) {
+            $this->assertEquals(['ativa'], array_keys($e->getErrors()));
+        }
     }
 
     public function testDelete()
@@ -151,5 +176,25 @@ class ComandaTest extends \MZ\Framework\TestCase
 
         $count = Comanda::count(['search' => 'Comanda find']);
         $this->assertEquals(2, $count);
+    }
+
+    public function testTranslate()
+    {
+        $comanda = self::create();
+        try {
+            $comanda->insert();
+            $this->fail('Fk duplicada');
+        } catch (\MZ\Exception\ValidationException $e) {
+            $this->assertEquals(['numero'], array_keys($e->getErrors()));
+        }
+        //---------------
+        $comanda = self::create();
+        try {
+            $comanda->setNumero(81);
+            $comanda->insert();
+            $this->fail('Fk duplicada');
+        } catch (\MZ\Exception\ValidationException $e) {
+            $this->assertEquals(['nome'], array_keys($e->getErrors()));
+        }
     }
 }

@@ -26,25 +26,52 @@ namespace MZ\Sale;
 
 use MZ\System\Permissao;
 use MZ\Account\AuthenticationTest;
+use MZ\Sale\PedidoTest;
+use MZ\Sale\Pedido;
+use MZ\Session\MovimentacaoTest;
 
-class ComandaPageControllerTest extends \MZ\Framework\TestCase
+class ComandaApiControllerTest extends \MZ\Framework\TestCase
 {
     public function testFind()
     {
         AuthenticationTest::authProvider([Permissao::NOME_SISTEMA, Permissao::NOME_CADASTROCOMANDAS]);
+        $movimentacao = MovimentacaoTest::create();
         $comanda = ComandaTest::create();
-        $result = $this->get('/gerenciar/comanda/', ['search' => $comanda->getNome()]);
-        $this->assertEquals(200, $result->getStatusCode());
+        $pedido = PedidoTest::build();
+        $pedido->setMesaID(null);
+        $pedido->setPessoas(1);
+        $pedido->setTipo(Pedido::TIPO_COMANDA);
+        $pedido->setComandaID($comanda->getID());
+        $pedido->insert();
+        $pedidos = Pedido::findAll(['comandaid' => $comanda->getID()]);
+
+        $expected = [
+            'status' => 'ok',
+            'items' => [
+                $comanda->publish(app()->auth->provider),
+            ],
+        ];
+        $result = $this->get('/api/comandas', ['search' => $comanda->getNome()]);
+        $this->assertEquals($expected, \array_intersect_key($result, $expected));
+
+        $result = $this->get('/api/comandas', ['search' => $comanda->getID()]);
+        $this->assertEquals($expected, \array_intersect_key($result, $expected));
+
+        $result = $this->get('/api/comandas', ['pedidos' => $pedidos]);
     }
 
     public function testAdd()
     {
         AuthenticationTest::authProvider([Permissao::NOME_SISTEMA, Permissao::NOME_CADASTROCOMANDAS]);
         $comanda = ComandaTest::build();
-        $result = $this->post('/gerenciar/comanda/cadastrar', $comanda->toArray(), true);
-        $this->assertEquals(302, $result->getStatusCode());
-        $comanda->load(['nome' => $comanda->getNome()]);
-        $this->assertTrue($comanda->exists());
+        $expected = [
+            'status' => 'ok',
+            'item' => $comanda->publish(app()->auth->provider),
+        ];
+        $result = $this->post('/api/comandas', $comanda->toArray());
+        $expected['item']['id'] = $result['item']['id'] ?? null;
+        $result['item']['numero'] = intval($result['item']['numero']);
+        $this->assertEquals($expected, \array_intersect_key($result, $expected));
     }
 
     public function testUpdate()
@@ -52,9 +79,13 @@ class ComandaPageControllerTest extends \MZ\Framework\TestCase
         AuthenticationTest::authProvider([Permissao::NOME_SISTEMA, Permissao::NOME_CADASTROCOMANDAS]);
         $comanda = ComandaTest::create();
         $id = $comanda->getID();
-        $result = $this->post('/gerenciar/comanda/editar?id=' . $id, $comanda->toArray(), true);
+        $result = $this->patch('/api/comandas/' . $id, $comanda->toArray());
         $comanda->loadByID();
-        $this->assertEquals(302, $result->getStatusCode());
+        $expected = [
+            'status' => 'ok',
+            'item' => $comanda->publish(app()->auth->provider),
+        ];
+        $this->assertEquals($expected, \array_intersect_key($result, $expected));
     }
 
     public function testDelete()
@@ -62,9 +93,10 @@ class ComandaPageControllerTest extends \MZ\Framework\TestCase
         AuthenticationTest::authProvider([Permissao::NOME_SISTEMA, Permissao::NOME_CADASTROCOMANDAS]);
         $comanda = ComandaTest::create();
         $id = $comanda->getID();
-        $result = $this->get('/gerenciar/comanda/excluir?id=' . $id);
+        $result = $this->delete('/api/comandas/' . $id);
         $comanda->loadByID();
-        $this->assertEquals(302, $result->getStatusCode());
+        $expected = [ 'status' => 'ok', ];
+        $this->assertEquals($expected, \array_intersect_key($result, $expected));
         $this->assertFalse($comanda->exists());
     }
 }

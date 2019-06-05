@@ -47,6 +47,14 @@ class FormaPagtoApiControllerTest extends \MZ\Framework\TestCase
     {
         AuthenticationTest::authProvider([Permissao::NOME_SISTEMA, Permissao::NOME_CADASTROFORMASPAGTO]);
         $forma_pagto = FormaPagtoTest::build();
+        $forma_pagto->setAtiva('Y');
+        $this->assertTrue($forma_pagto->isAtiva());
+        //se o tipo for credito é parcelado
+        $forma_pagto->setTipo(FormaPagto::TIPO_CREDITO);
+        $this->assertTrue($forma_pagto->isParcelado());
+        
+        $this->assertEquals($forma_pagto->toArray(), (new FormaPagto($forma_pagto))->toArray());
+        $this->assertEquals((new FormaPagto())->toArray(), (new FormaPagto(1))->toArray());
         $expected = [
             'status' => 'ok',
             'item' => $forma_pagto->publish(app()->auth->provider),

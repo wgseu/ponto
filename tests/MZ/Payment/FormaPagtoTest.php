@@ -25,6 +25,8 @@
 namespace MZ\Payment;
 
 use MZ\Wallet\CarteiraTest;
+use MZ\Exception\ValidationException;
+use MZ\Payment\PagamentoTest;
 
 class FormaPagtoTest extends \MZ\Framework\TestCase
 {
@@ -77,18 +79,97 @@ class FormaPagtoTest extends \MZ\Framework\TestCase
         $this->assertTrue($forma_pagto->exists());
     }
 
-    public function testUpdate()
+    public function testAddInvalid()
     {
-        $forma_pagto = self::create();
-        $forma_pagto->update();
-        $this->assertTrue($forma_pagto->exists());
+        $forma_pagto = self::build();
+        $forma_pagto->setCarteiraID(null);
+        $forma_pagto->setDescricao(null);
+        $forma_pagto->setTipo('Tipo invalido');
+        $forma_pagto->setAtiva('T');
+        $forma_pagto->setMinParcelas(-1);
+        $forma_pagto->setMaxParcelas(-1);
+        $forma_pagto->setParcelasSemJuros(-1);
+        $forma_pagto->setJuros(-1);
+        try {
+            $forma_pagto->insert();
+            $this->fail('Valores invalidos');
+        } catch (ValidationException $e) {
+            $this->assertEquals(['tipo', 'carteiraid', 'descricao', 'minparcelas', 'maxparcelas', 'parcelassemjuros', 'juros', 'ativa'], array_keys($e->getErrors()));
+        }
+        //---------------------
+        $forma_pagto = self::build();
+        $forma_pagto->setMinParcelas(5);
+        $forma_pagto->setMaxParcelas(4);
+        $forma_pagto->setParcelasSemJuros(3);
+        try {
+            $forma_pagto->insert();
+            $this->fail('Não cadastrar');
+        } catch (ValidationException $e) {
+            $this->assertEquals(['maxparcelas', 'parcelassemjuros'], array_keys($e->getErrors()));
+        }
     }
 
-    public function testDelete()
+    public function testUpdateInvalid()
+    {
+        $forma_pagto = self::build();
+        $forma_pagto->setTipo(FormaPagto::TIPO_CREDITO);
+        $forma_pagto->insert();
+        $pagamento = PagamentoTest::build();
+        $pagamento->setFormaPagtoID($forma_pagto->getID());
+        $pagamento->insert();
+
+        try {
+            $forma_pagto->setTipo(FormaPagto::TIPO_DINHEIRO);
+            $forma_pagto->update();
+            $this->fail('Não pode alterar o tipo da forma de pagamento');
+        } catch (ValidationException $e) {
+            $this->assertEquals(['tipo'], array_keys($e->getErrors()));
+        }
+    }
+
+    public function testFinds()
     {
         $forma_pagto = self::create();
-        $forma_pagto->delete();
-        $forma_pagto->loadByID();
-        $this->assertFalse($forma_pagto->exists());
+
+        $integracao = $forma_pagto->findIntegracaoID();
+        $this->assertEquals($forma_pagto->getIntegracaoID(), $integracao->getID());
+
+        $carteira = $forma_pagto->findCarteiraID();
+        $this->assertEquals($forma_pagto->getCarteiraID(), $carteira->getID());
+
+        $forma_pagtoByDesc = FormaPagto::findByDescricao($forma_pagto->getDescricao());
+        $this->assertInstanceOf(get_class($forma_pagto), $forma_pagtoByDesc);
+    }
+
+    public function testGetOptions()
+    {
+        $forma_pagto = self::create();
+        $options = FormaPagto::getTipoOptions($forma_pagto->getTipo());
+        $this->assertEquals($forma_pagto->getTipo(), $options);
+    }
+
+    public function testTranslate()
+    {
+        $forma_pagto = self::create();
+        try {
+            $forma_pagto->insert();
+            $this->fail('Fk duplicada');
+
+        } catch (ValidationException $e) {
+            $this->assertEquals(['descricao'], array_keys($e->getErrors()));
+        }
+    }
+
+    public function testUsaCartao()
+    {
+        $forma_pagto = self::build();
+        $forma_pagto->setTipo(FormaPagto::TIPO_CREDITO);
+        $forma_pagto->insert();
+        $this->assertTrue($forma_pagto->usaCartao());
+
+        $forma_pagto = self::build();
+        $forma_pagto->setTipo(FormaPagto::TIPO_DEBITO);
+        $forma_pagto->insert();
+        $this->assertTrue($forma_pagto->usaCartao());
     }
 }

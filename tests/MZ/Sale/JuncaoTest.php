@@ -71,6 +71,14 @@ class JuncaoTest extends \MZ\Framework\TestCase
         MovimentacaoTest::close($movimentacao);
     }
 
+    public function testFindMesa()
+    {
+        $movimentacao = MovimentacaoTest::create();
+        $juncao = self::create();
+        $mesa = $juncao->findMesaID();
+        $this->assertEquals($juncao->getMesaID(), $mesa->getID());
+    }
+
     public function testAdd()
     {
         $movimentacao = MovimentacaoTest::create();
@@ -181,5 +189,31 @@ class JuncaoTest extends \MZ\Framework\TestCase
             PedidoTest::close($old_pedido);
             MovimentacaoTest::close($movimentacao);
         }
+    }
+
+    public function testAddInvalid()
+    {
+        $movimentacao = MovimentacaoTest::create();
+        $juncao = self::build();
+        $juncao->setMesaID(null);
+        $juncao->setPedidoID(null);
+        $juncao->setEstado('Teste');
+        try {
+            $juncao->insert();
+            $this->fail('valores invalidos');
+        } catch (\MZ\Exception\ValidationException $e) {
+            $this->assertEquals(
+                ['mesaid', 'pedidoid', 'estado'],
+                array_keys($e->getErrors())
+            );
+        }
+    }
+
+    public function testGetEstado()
+    {
+        $movimentacao = MovimentacaoTest::create();
+        $juncao = self::create();
+        $options = Juncao::getEstadoOptions($juncao->getEstado());
+        $this->assertEquals($juncao->getEstado(), $options);
     }
 }

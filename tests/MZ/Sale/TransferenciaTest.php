@@ -24,9 +24,13 @@
  */
 namespace MZ\Sale;
 
+use MZ\Sale\ItemTest;
+use MZ\Sale\Item;
 use MZ\Sale\PedidoTest;
+use MZ\Sale\Pedido;
 use MZ\Provider\PrestadorTest;
 use MZ\Session\MovimentacaoTest;
+use MZ\Exception\ValidationException;
 
 class TransferenciaTest extends \MZ\Framework\TestCase
 {
@@ -91,6 +95,113 @@ class TransferenciaTest extends \MZ\Framework\TestCase
         PedidoTest::close($pedido);
         PedidoTest::close($pedido_destino);
         MovimentacaoTest::close($movimentacao);
+    }
+
+    public function testAddInvalid()
+    {
+        $movimentacao = MovimentacaoTest::create();
+        $transferencia = self::build();
+        $transferencia->setPedidoID(null);
+        $transferencia->setDestinoPedidoID(null);
+        $transferencia->setTipo('Teste');
+        $transferencia->setModulo('Teste');
+        $transferencia->setPrestadorID(null);
+        try {
+            $transferencia->insert();
+            $this->fail('Valores nulos');
+        } catch (ValidationException $e) {
+            $this->assertEquals(
+                ['pedidoid', 'destinopedidoid', 'tipo', 'modulo', 'prestadorid'],
+                array_keys($e->getErrors())
+            );
+        }
+        //-------------Pedido cancelado
+        $transferencia = self::build();
+        $pedido = PedidoTest::create();
+        $pedido->setCancelado('Y');
+        $pedido->update();
+        $transferencia->setPedidoID($pedido->getID());
+        $transferencia->setDestinoPedidoID($pedido->getID());
+        $transferencia->setModulo(Transferencia::MODULO_MESA);
+        $transferencia->setMesaID(null);
+        $transferencia->setDestinoMesaID(null);
+        $transferencia->setComandaID(1);
+        $transferencia->setDestinoComandaID(1);
+        try {
+            $transferencia->insert();
+            $this->fail('Pedido cancelado');
+        } catch (ValidationException $e) {
+            $this->assertEquals(['pedidoid', 'destinopedidoid', 'mesaid', 'destinomesaid', 'comandaid', 'destinocomandaid'], array_keys($e->getErrors()));
+        }
+        //------------Pedido finalizado
+        $transferencia = self::build();
+        $pedido = PedidoTest::create();
+        $pedido->setCancelado('N');
+        $item = ItemTest::build();
+        $item->setPedidoID($pedido->getID());
+        $item->insert();
+        $pedido->setEstado(Pedido::ESTADO_FINALIZADO);
+        $pedido->update();
+        $transferencia->setPedidoID($pedido->getID());
+        $transferencia->setDestinoPedidoID($pedido->getID());
+        $transferencia->setModulo(Transferencia::MODULO_COMANDA);
+        $transferencia->setMesaID(2);
+        $transferencia->setDestinoMesaID(2);
+        $transferencia->setComandaID(null);
+        $transferencia->setDestinoComandaID(null);
+        try {
+            $transferencia->insert();
+            $this->fail('Pedido cancelado');
+        } catch (ValidationException $e) {
+            $this->assertEquals(['pedidoid', 'destinopedidoid', 'mesaid', 'destinomesaid', 'comandaid', 'destinocomandaid'], array_keys($e->getErrors()));
+        }
+        //-----------
+        $transferencia = self::build();
+        $transferencia->setTipo(Transferencia::TIPO_PRODUTO);
+        try {
+            $transferencia->insert();
+            $this->fail('nao cadastrar');
+        } catch (ValidationException $e) {
+            $this->assertEquals(['itemid'], array_keys($e->getErrors()));
+        }
+
+        PedidoTest::close($pedido);
+        MovimentacaoTest::close($movimentacao);
+    }
+
+    public function testFinds()
+    {
+        $movimentacao = MovimentacaoTest::create();
+        $transferencia = self::create();
+
+        $mesa = $transferencia->findMesaID();
+        $this->assertEquals($transferencia->getMesaID(), $mesa->getID());
+
+        $destinoMesa = $transferencia->findDestinoMesaID();
+        $this->assertEquals($transferencia->getDestinoMesaID(), $destinoMesa->getID());
+
+        $comanda = $transferencia->findComandaID();
+        $this->assertEquals($transferencia->getComandaID(), $comanda->getID());
+
+        $comandaDestino = $transferencia->findDestinoComandaID();
+        $this->assertEquals($transferencia->getDestinoComandaID(), $comandaDestino->getID());
+
+        $item = $transferencia->findItemID();
+        $this->assertEquals($transferencia->getItemID(), $item->getID());
+
+        $prestador = $transferencia->findPrestadorID();
+        $this->assertEquals($transferencia->getPrestadorID(), $prestador->getID());
+    }
+
+    public function testGetOptions()
+    {
+        $movimentacao = MovimentacaoTest::create();
+        $transferencia = self::create();
+        $options = Transferencia::getTipoOptions($transferencia->getTipo());
+        $this->assertEquals($transferencia->getTipo(), $options);
+
+        $options = Transferencia::getModuloOptions($transferencia->getModulo());
+        $this->assertEquals($transferencia->getModulo(), $options);
     }
 
     public function testUpdate()

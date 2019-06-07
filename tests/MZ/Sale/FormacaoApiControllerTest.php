@@ -22,65 +22,71 @@
  *
  * @author Equipe GrandChef <desenvolvimento@mzsw.com.br>
  */
-namespace MZ\Stock;
+namespace MZ\Sale;
 
 use MZ\System\Permissao;
 use MZ\Account\AuthenticationTest;
+use MZ\Session\MovimentacaoTest;
 
-class FornecedorApiControllerTest extends \MZ\Framework\TestCase
+class FormacaoApiControllerTest extends \MZ\Framework\TestCase
 {
     public function testFind()
     {
-        AuthenticationTest::authProvider([Permissao::NOME_SISTEMA, Permissao::NOME_CADASTROFORNECEDORES]);
-        $fornecedor = FornecedorTest::create();
+        AuthenticationTest::authProvider([Permissao::NOME_SISTEMA, Permissao::NOME_PAGAMENTO]);
+        $movimentacao = MovimentacaoTest::create();
+        $formacao = FormacaoTest::create();
+
         $expected = [
             'status' => 'ok',
             'items' => [
-                $fornecedor->publish(app()->auth->provider),
+                $formacao->publish(app()->auth->provider),
             ],
         ];
-        $result = $this->get('/api/fornecedores', ['empresaid' => $fornecedor->getEmpresaID()]);
+        $result = $this->get('/api/formacoes', ['search' => $formacao->getPacoteID()]);
         $this->assertEquals($expected, \array_intersect_key($result, $expected));
     }
 
     public function testAdd()
     {
-        AuthenticationTest::authProvider([Permissao::NOME_SISTEMA, Permissao::NOME_CADASTROFORNECEDORES]);
-        $fornecedor = FornecedorTest::build();
+        AuthenticationTest::authProvider([Permissao::NOME_SISTEMA, Permissao::NOME_PAGAMENTO]);
+        $movimentacao = MovimentacaoTest::create();
+        $formacao = FormacaoTest::build();
+        $this->assertEquals($formacao->toArray(), (new Formacao($formacao))->toArray());
+        $this->assertEquals((new Formacao())->toArray(), (new Formacao(1))->toArray());
         $expected = [
             'status' => 'ok',
-            'item' => $fornecedor->publish(app()->auth->provider),
+            'item' => $formacao->publish(app()->auth->provider),
         ];
-        $result = $this->post('/api/fornecedores', $fornecedor->toArray());
+        $result = $this->post('/api/formacoes', $formacao->toArray());
         $expected['item']['id'] = $result['item']['id'] ?? null;
-        $expected['item']['datacadastro'] = $result['item']['datacadastro'] ?? null;
-        $result['item']['prazopagamento'] = intval($result['item']['prazopagamento']) ?? null;
         $this->assertEquals($expected, \array_intersect_key($result, $expected));
     }
 
     public function testUpdate()
     {
-        AuthenticationTest::authProvider([Permissao::NOME_SISTEMA, Permissao::NOME_CADASTROFORNECEDORES]);
-        $fornecedor = FornecedorTest::create();
-        $id = $fornecedor->getID();
-        $result = $this->patch('/api/fornecedores/' . $id, $fornecedor->toArray());
-        $fornecedor->loadByID();
+        AuthenticationTest::authProvider([Permissao::NOME_SISTEMA, Permissao::NOME_PAGAMENTO]);
+        $movimentacao = MovimentacaoTest::create();
+        $formacao = FormacaoTest::create();
+        $id = $formacao->getID();
+        $result = $this->patch('/api/formacoes/' . $id, $formacao->toArray());
+        $formacao->loadByID();
         $expected = [
             'status' => 'ok',
-            'item' => $fornecedor->publish(app()->auth->provider),
+            'item' => $formacao->publish(app()->auth->provider),
         ];
         $this->assertEquals($expected, \array_intersect_key($result, $expected));
     }
 
     public function testDelete()
     {
-        AuthenticationTest::authProvider([Permissao::NOME_SISTEMA, Permissao::NOME_CADASTROFORNECEDORES]);
-        $fornecedor = FornecedorTest::create();
-        $id = $fornecedor->getID();
-        $result = $this->delete('/api/fornecedores/' . $id);
-        $fornecedor->loadByID();
+        AuthenticationTest::authProvider([Permissao::NOME_SISTEMA, Permissao::NOME_PAGAMENTO]);
+        $movimentacao = MovimentacaoTest::create();
+        $formacao = FormacaoTest::create();
+        $id = $formacao->getID();
+        $result = $this->delete('/api/formacoes/' . $id);
+        $formacao->loadByID();
         $expected = [ 'status' => 'ok', ];
         $this->assertEquals($expected, \array_intersect_key($result, $expected));
-        $this->assertFalse($fornecedor->exists());
+        $this->assertFalse($formacao->exists());
     }
 }

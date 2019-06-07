@@ -176,18 +176,4 @@ class FornecedorTest extends \MZ\Framework\TestCase
         $this->assertTrue($fornecedor->exists());
     }
 
-    public function testUpdate()
-    {
-        $fornecedor = self::create();
-        $fornecedor->update();
-        $this->assertTrue($fornecedor->exists());
-    }
-
-    public function testDelete()
-    {
-        $fornecedor = self::create();
-        $fornecedor->delete();
-        $fornecedor->loadByID();
-        $this->assertFalse($fornecedor->exists());
-    }
 }

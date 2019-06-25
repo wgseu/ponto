@@ -88,12 +88,12 @@ fix:
 	@docker-compose exec -T php ./vendor/bin/phpcbf --standard=PSR2 app tests/MZ
 
 update:
-		@docker run --rm \
+	@docker run --rm \
 		-u $(CURRENT_UID) \
 		-v $(shell pwd):/app \
 		-v /etc/passwd:/etc/passwd:ro \
     -v /etc/group:/etc/group:ro \
-		composer update --ignore-platform-reqs --no-scripts
+		composer update -n --ignore-platform-reqs --no-scripts
 
 autoload:
 	@docker run --rm \

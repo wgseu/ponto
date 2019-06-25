@@ -108,29 +108,6 @@ class NFeAPI extends \NFe\Common\Ajuste
         return $this->external_regime;
     }
 
-    private function deleteXmlAnteriores($nota)
-    {
-        $filename = $this->getPastaXmlRejeitado($nota->getAmbiente()) . '/' . $nota->getID() . '.xml';
-        if (file_exists($filename)) {
-            unlink($filename);
-        }
-
-        $filename = $this->getPastaXmlProcessamento($nota->getAmbiente()) . '/' . $nota->getID() . '.xml';
-        if (file_exists($filename)) {
-            unlink($filename);
-        }
-
-        $filename = $this->getPastaXmlPendente($nota->getAmbiente()) . '/' . $nota->getID() . '.xml';
-        if (file_exists($filename)) {
-            unlink($filename);
-        }
-
-        $filename = $this->getPastaXmlAssinado($nota->getAmbiente()) . '/' . $nota->getID() . '.xml';
-        if (file_exists($filename)) {
-            unlink($filename);
-        }
-    }
-
     /**
      * Processa as notas e tarefas
      */

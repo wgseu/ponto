@@ -576,16 +576,15 @@
 							]
 						},
 						"method": "POST",
-						"header": [],
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
 						"body": {
-							"mode": "formdata",
-							"formdata": [
-								{
-									"key": "pacote[0]",
-									"value": "1",
-									"type": "text"
-								}
-							]
+							"mode": "raw",
+							"raw": ""
 						},
 						"url": {
 							"raw": "{{BASE_URL}}/app/pacote/listar?grupo=2&busca=ca",
@@ -711,6 +710,73 @@
 							]
 						},
 						"description": "Lista todas as comandas ativas com seus respectivos estados"
+					},
+					"response": []
+				},
+				{
+					"name": "Procurar Pacotes",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{AUTH_TOKEN}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {},
+						"url": {
+							"raw": "{{BASE_URL}}/api/pacotes",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"api",
+								"pacotes"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Inserir Cliente",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{AUTH_TOKEN}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{BASE_URL}}/app/cliente/",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"app",
+								"cliente",
+								""
+							]
+						}
 					},
 					"response": []
 				}
@@ -1136,51 +1202,24 @@
 							]
 						},
 						"method": "POST",
-						"header": [],
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
 						"body": {
-							"mode": "formdata",
-							"formdata": [
-								{
-									"key": "estoque[produtoid]",
-									"value": "1",
-									"type": "text"
-								},
-								{
-									"key": "estoque[quantidade]",
-									"value": "1",
-									"type": "text"
-								},
-								{
-									"key": "estoque[precocompra]",
-									"value": "2.50",
-									"type": "text"
-								},
-								{
-									"key": "estoque[tipomovimento]",
-									"value": "Entrada",
-									"type": "text"
-								},
-								{
-									"key": "estoque[datafabricacao]",
-									"value": "2014-04-20",
-									"type": "text"
-								},
-								{
-									"key": "estoque[datavencimento]",
-									"value": "2015-05-21",
-									"type": "text"
-								}
-							]
+							"mode": "raw",
+							"raw": "{\n\t\"produtoid\": 1,\n\t\"requisitoid\": 1,\n\t\"transacaoid\": 1,\n\t\"entradaid\": 1,\n\t\"fornecedorid\": 1,\n\t\"setorid\": 1,\n\t\"prestadorid\": 1,\n\t\"tipomovimento\": \"Entrada\",\n\t\"quantidade\": 3,\n\t\"precocompra\": 20,\n\t\"lote\": 1,\n\t\"datafabricacao\": \"2019-07-05\",\n\t\"datavencimento\": \"2019-08-06\",\n\t\"detalhes\": \"Produto novo no mercado\"\n}"
 						},
 						"url": {
-							"raw": "{{BASE_URL}}/app/estoque/",
+							"raw": "{{BASE_URL}}/app/estoques",
 							"host": [
 								"{{BASE_URL}}"
 							],
 							"path": [
 								"app",
-								"estoque",
-								""
+								"estoques"
 							]
 						},
 						"description": "Inserir produto no estoque"
@@ -1846,7 +1885,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{ \n  \"tipo\": \"Fisica\",\n  \"nome\": \"Teste\",\n  \"senha\": \"123456\",\n  \"genero\": \"Masculino\",\n  \"email\": \"testee@gmail.com\",\n  \"aceitar\": \"true\",\n  \"confirmarsenha\": \"123456\",\n  \"login\": \"testando\"\n}"
+											"raw": "{ \n  \"tipo\": \"Fisica\",\n  \"nome\": \"Teste\",\n  \"senha\": \"123456\",\n  \"genero\": \"Masculino\",\n  \"email\": \"teste@gmail.com\",\n  \"aceitar\": \"true\",\n  \"confirmarsenha\": \"123456\",\n  \"login\": \"Teste01\",\n  \"slogan\": \"GrandChef\"\n}"
 										},
 										"url": {
 											"raw": "{{BASE_URL}}/api/clientes",
@@ -2722,6 +2761,145 @@
 												"api",
 												"dispositivos",
 												"{{DISPOSITIVO_ID}}"
+											]
+										}
+									},
+									"response": []
+								}
+							],
+							"_postman_isSubFolder": true
+						},
+						{
+							"name": "Impressora",
+							"description": "",
+							"item": [
+								{
+									"name": "Procurar",
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{AUTH_TOKEN}}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "GET",
+										"header": [],
+										"body": {},
+										"url": {
+											"raw": "{{BASE_URL}}/api/impressoras",
+											"host": [
+												"{{BASE_URL}}"
+											],
+											"path": [
+												"api",
+												"impressoras"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Adicionar",
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{AUTH_TOKEN}}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "POST",
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n\t\"setorid\": \"2\",\n\t\"dispositivoid\": \"1\",\n\t\"nome\": \"Impressora Cozinha\",\n\t\"driver\": \"Bematech\",\n\t\"descricao\": \"Impressora Cozinha\",\n\t\"modo\": \"Servico\",\n\t\"opcoes\": 1,\n\t\"colunas\": \"48\",\n\t\"avanco\": \"2\",\n\t\"device\": \"android_1234\",\n\t\"serial\": \"5893d435-d2e4-49b0-bb3c-c9c3286f3165\"\n}"
+										},
+										"url": {
+											"raw": "{{BASE_URL}}/api/impressoras",
+											"host": [
+												"{{BASE_URL}}"
+											],
+											"path": [
+												"api",
+												"impressoras"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Modificar",
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{AUTH_TOKEN}}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "PATCH",
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n\t\"nome\": \"Bematech\"\n}"
+										},
+										"url": {
+											"raw": "{{BASE_URL}}/api/impressoras/{{IMPRESSORA_ID}}",
+											"host": [
+												"{{BASE_URL}}"
+											],
+											"path": [
+												"api",
+												"impressoras",
+												"{{IMPRESSORA_ID}}"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Deletar",
+									"request": {
+										"method": "DELETE",
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": ""
+										},
+										"url": {
+											"raw": "{{BASE_URL}}/api/impressoras/{{IMPRESSORA_ID}}",
+											"host": [
+												"{{BASE_URL}}"
+											],
+											"path": [
+												"api",
+												"impressoras",
+												"{{IMPRESSORA_ID}}"
 											]
 										}
 									},
@@ -6155,7 +6333,7 @@
 							"description": "",
 							"item": [
 								{
-									"name": "empregos",
+									"name": "Empregos",
 									"request": {
 										"auth": {
 											"type": "bearer",
@@ -6194,7 +6372,7 @@
 									"response": []
 								},
 								{
-									"name": "desmarque",
+									"name": "Desmarque",
 									"request": {
 										"auth": {
 											"type": "bearer",
@@ -6282,7 +6460,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n\t\"mesaid\": \"2\",\n\t\"sessaoid\": \"2\",\n\t\"prestadorid\": \"1\",\n\t\"clienteid\": \"1\",\n\t\"tipo\": \"Mesa\",\n\t\"estado\": \"Ocupada\",\n\t\"servicos\": 20,\n\t\"produtos\": \"1\",\n\t\"comissao\": 0,\n\t\"subtotal\": 25,\n\t\"descontos\": 0,\n\t\"total\": 30,\n\t\"pago\": 0,\n\t\"lancado\": 55,\n\t\"pessoas\": 1,\n\t\"fechadorid\": \"1\",\n\t\"cancelado\": \"N\"\n}"
+											"raw": "{\n\t\"sessaoid\": \"2\",\n\t\"pedidoid\": \"1\",\n\t\"prestadorid\": \"1\",\n\t\"clienteid\": \"2\",\n\t\"comandaid\": \"1\",\n\t\"tipo\": \"Comanda\",\n\t\"estado\": \"Ocupada\",\n\t\"servicos\": 20,\n\t\"produtos\": \"1\",\n\t\"comissao\": 0,\n\t\"subtotal\": 25,\n\t\"descontos\": 0,\n\t\"total\": 30,\n\t\"pago\": 0,\n\t\"lancado\": 55,\n\t\"pessoas\": 1,\n\t\"fechadorid\": \"1\",\n\t\"cancelado\": \"N\"\n}"
 										},
 										"url": {
 											"raw": "{{BASE_URL}}/api/pedidos",
@@ -6298,7 +6476,7 @@
 									"response": []
 								},
 								{
-									"name": "recibo",
+									"name": "Recibo",
 									"request": {
 										"auth": {
 											"type": "bearer",
@@ -6319,7 +6497,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"mesaid\": 1,\n    \"sessaoid\": 1,\n    \"prestadorid\": 1,\n    \"clienteid\": 1,\n    \"tipo\": \"Mesa\",\n    \"estado\": \"Fechado\",\n    \"servicos\": 0,\n    \"produtos\": 0,\n    \"comissao\": 0,\n    \"subtotal\": 0,\n    \"descontos\": 0,\n    \"total\": 0,\n    \"pago\": 0,\n    \"lancado\": 0,\n    \"pessoas\": 1,\n    \"fechadorid\": 1,\n    \"cancelado\": \"N\",\n    \"datacriacao\": \"2019-05-08 17:41:55\"\n}"
+											"raw": "{\n    \"mesaid\": 1,\n    \"sessaoid\": 1,\n    \"prestadorid\": 1,\n    \"clienteid\": 2,\n    \"tipo\": \"Comanda\",\n    \"estado\": \"Aberto\",\n    \"servicos\": 0,\n    \"produtos\": 0,\n    \"comissao\": 0,\n    \"subtotal\": 0,\n    \"descontos\": 0,\n    \"total\": 0,\n    \"pago\": 0,\n    \"lancado\": 0,\n    \"pessoas\": 1,\n    \"fechadorid\": 1,\n    \"cancelado\": \"N\",\n    \"datacriacao\": \"2019-05-08 17:41:55\",\n\t\"device\": \"Xiaomi\",\n\t\"serial\": \"123456\"\n}"
 										},
 										"url": {
 											"raw": "{{BASE_URL}}/api/pedidos/receipt/{{PEDIDO_ID}}",
@@ -6360,6 +6538,45 @@
 											"path": [
 												"api",
 												"pedidos"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Queue",
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{AUTH_TOKEN}}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "PATCH",
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"mesaid\": 2,\n    \"empresaid\": 1,\n    \"sessaoid\": 1,\n    \"prestadorid\": 1,\n    \"clienteid\": 1,\n    \"tipo\": \"Comanda\",\n\t\"comandaid\": 1,\n    \"estado\": \"Fechado\",\n    \"pessoas\": 1,\n    \"fechadorid\": 1,\n    \"cancelado\": \"N\",\n    \"datacriacao\": \"2019-05-08 17:41:55\",\n\t\"device\": \"Androide\",\n\t\"serial\": \"123456\"\n}"
+										},
+										"url": {
+											"raw": "{{BASE_URL}}/api/pedidos/queue/{{PEDIDO_ID}}",
+											"host": [
+												"{{BASE_URL}}"
+											],
+											"path": [
+												"api",
+												"pedidos",
+												"queue",
+												"{{PEDIDO_ID}}"
 											]
 										}
 									},

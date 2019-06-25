@@ -1,15 +1,16 @@
 {
   "template": [
-    { "items": "company.name", "style": "bold", "width": "2x", "align": "center" },
+    { "items": 
+      "company.name", "style": "bold", "width": "2x", "align": "center"
+    },
     { "items": [
         "date.time", { "align": "right", "items": [ "Pedido: ", { "format": "%06d", "items": "order.id" } ] }
     ]},
     { "items": "Senha", "align": "center" },
-    { "align": "center", "style": "bold", "width": "2x", "height": "2x", "items": [
-        { "items": "queue.number", "format": "%03d" }
-    ]},
+    { "items": "queue.number", "align": "center", "format": "%03d", "style": "bold", "width": "2x", "height": "2x"},
+
     { "items": [
-        "Local: ", "order.local", { "align": "right", "items": [ "Atendente: ", "order.attendant" ] }
+        "Local: ", "order.local", { "align": "right", "items": [ "Atendente: ", { "items": "order.attendant" } ] }
     ]},
     { "whitespace": "=" }
   ]

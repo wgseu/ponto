@@ -38,6 +38,7 @@ use Thermal\Printer;
 use Thermal\Connection\Buffer;
 use Thermal\Model;
 use MZ\Coupon\Order\Receipt;
+use MZ\Coupon\Queue;
 
 /**
  * Allow application to serve system resources
@@ -171,6 +172,67 @@ class PedidoApiController extends \MZ\Core\ApiController
                 'data' => base64_encode($buffer),
                 'printer' => $impressora->getNome(),
                 'name' => 'Cupom de Consumo do Pedido #' . $pedido->getID()
+            ]);
+        } catch (\Exception $e) {
+            Log::error($e->getMessage());
+            return $this->json()->error($e->getMessage());
+        }
+    }
+
+    /**
+     * Build queue job for printer and mark order as closing
+     * @Patch("/api/pedidos/queue/{id}", name="api_pedido_queue", params={ "id": "\d+" })
+     */
+
+    public function queue($id)
+    {
+        if (!app()->getAuthentication()->isLogin()) {
+            return $this->json()->error('Usuário não autenticado!');
+        }
+        app()->needManager();
+        $data = $this->getData();
+        try {
+            $pedido = Pedido::findByID($id);
+            if (!$pedido->exists()) {
+                throw new \Exception('O pedido informado não existe');
+            }
+            $pedido->checkAccess(app()->auth->provider);
+            $dispositivo = new Dispositivo();
+            $dispositivo->setNome($data['device'] ?? null);
+            $dispositivo->setSerial($data['serial'] ?? null);
+            $dispositivo->loadBySerial();
+            if (!$dispositivo->exists()) {
+                throw new \Exception('O dispositivo informado não existe ou não foi validado');
+            }
+            $impressora = Impressora::find([], [
+                'modo' => [-1 => Impressora::MODO_TERMINAL],
+                'dispositivoid' => [-1 => $dispositivo->getID()],
+                'setorid' => [-1 => $dispositivo->getSetorID()]
+            ]);
+            if (!$impressora->exists()) {
+                throw new \Exception('Nenhuma impressora cadastrada, cadastre uma impressora!');
+            }
+            $model = new Model($impressora->getModelo());
+            $connection = new Buffer();
+            $printer = new Printer($model, $connection);
+            $printer->setColumns($impressora->getColunas());
+            $queue = new Queue($printer);
+            $queue->setOrder($pedido);
+            $queue->printCoupon();
+            if ($impressora->getAvanco() > 0) {
+                $printer->feed($impressora->getAvanco());
+            }
+            if (!$impressora->hasOption(Impressora::OPCAO_SEM_BEEP)) {
+                $printer->buzzer();
+            }
+            if ($impressora->hasOption(Impressora::OPCAO_CORTAR)) {
+                $printer->cutter();
+            }
+            $buffer = $connection->getBuffer();
+            return $this->json()->success([
+                'data' => base64_encode($buffer),
+                'printer' => $impressora->getNome(),
+                'name' => 'Senha do pedido #' . $pedido->getID()
             ]);
         } catch (\Exception $e) {
             Log::error($e->getMessage());

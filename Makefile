@@ -11,6 +11,9 @@ export FASTCGI_HOST
 export FASTCGI_PORT
 export PROXY_HOST
 export PUBLIC_PATH
+export CURRENT_UID
+
+CURRENT_UID= $(shell id -u):$(shell id -g)
 
 # Database dumps
 DB_DUMPS_DIR=storage/db/dumps
@@ -85,10 +88,18 @@ fix:
 	@docker-compose exec -T php ./vendor/bin/phpcbf --standard=PSR2 app tests/MZ
 
 update:
-	@docker run --rm -v $(shell pwd):/app composer update --ignore-platform-reqs --no-scripts
+		@docker run --rm \
+		-u $(CURRENT_UID) \
+		-v $(shell pwd):/app \
+		-v /etc/passwd:/etc/passwd:ro \
+    -v /etc/group:/etc/group:ro \
+		composer update --ignore-platform-reqs --no-scripts
 
 autoload:
-	@docker run --rm -v $(shell pwd):/app composer dump-autoload --no-scripts
+	@docker run --rm \
+	-u $(CURRENT_UID) \
+	-v $(shell pwd):/app \
+	composer dump-autoload --no-scripts
 
 start: init reset
 	envsubst '$$WEB_HOST' < ./etc/nginx/default.template.conf > ./etc/nginx/default.conf
@@ -110,15 +121,15 @@ populate:
 	@cat database/model/populate.sql >> $(DB_DUMPS_DIR)/populate.sql
 	@npm run fix-pop "$(DB_NAME)"
 	@make -s reset
-	@docker exec -i $(shell docker-compose ps -q db) mysql -u"$(DB_ROOT_USER)" -p"$(DB_ROOT_PASSWORD)" < $(DB_DUMPS_DIR)/populate.sql
+	@docker exec -i $(shell CURRENT_UID=$(CURRENT_UID) docker-compose ps -q db) mysql -u"$(DB_ROOT_USER)" -p"$(DB_ROOT_PASSWORD)" < $(DB_DUMPS_DIR)/populate.sql
 
 dump:
 	@mkdir -p $(DB_DUMPS_DIR)
-	@docker exec $(shell docker-compose ps -q db) mysqldump -B "$(DB_NAME)" -u"$(DB_ROOT_USER)" -p"$(DB_ROOT_PASSWORD)" --add-drop-database > $(DB_DUMPS_DIR)/db.sql
+	@docker exec $(shell CURRENT_UID=$(CURRENT_UID) docker-compose ps -q db) mysqldump -B "$(DB_NAME)" -u"$(DB_ROOT_USER)" -p"$(DB_ROOT_PASSWORD)" --add-drop-database > $(DB_DUMPS_DIR)/db.sql
 	@make -s reset
 
 restore:
-	@docker exec -i $(shell docker-compose ps -q db) mysql -u"$(DB_ROOT_USER)" -p"$(DB_ROOT_PASSWORD)" < $(DB_DUMPS_DIR)/db.sql
+	@docker exec -i $(shell CURRENT_UID=$(CURRENT_UID) docker-compose ps -q db) mysql -u"$(DB_ROOT_USER)" -p"$(DB_ROOT_PASSWORD)" < $(DB_DUMPS_DIR)/db.sql
 
 test:
 	@docker-compose exec -T php ./vendor/bin/phpunit --configuration ./ --no-coverage

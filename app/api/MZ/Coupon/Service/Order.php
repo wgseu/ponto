@@ -26,7 +26,7 @@ namespace MZ\Coupon\Service;
 
 use MZ\Coupon\Model;
 use MZ\Util\Mask;
-use \MZ\Sale\Pedido;
+use MZ\Sale\Pedido;
 
 /**
  * Coupon model

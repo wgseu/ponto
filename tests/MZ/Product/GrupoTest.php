@@ -74,6 +74,7 @@ class GrupoTest extends \MZ\Framework\TestCase
         list($found_grupo) = Grupo::findAll($condition, [], 1);
         $this->assertEquals($grupo, $found_grupo);
         $this->assertEquals(1, Grupo::count($condition));
+        $grupo->delete();
     }
 
     public function testFinds()
@@ -85,6 +86,7 @@ class GrupoTest extends \MZ\Framework\TestCase
         //----------------------------
         $produtoIDNome = $grupo->findByProdutoIDNome($grupo->getProdutoID(), $grupo->getNome());
         $this->assertInstanceOf(get_class($grupo), $produtoIDNome);
+        $grupo->delete();
     }
 
     public function testAdd()
@@ -92,6 +94,7 @@ class GrupoTest extends \MZ\Framework\TestCase
         $grupo = self::build();
         $grupo->insert();
         $this->assertTrue($grupo->exists());
+        $grupo->delete();
     }
 
     public function testAddInvalid()
@@ -108,6 +111,7 @@ class GrupoTest extends \MZ\Framework\TestCase
         try {
             $grupo->insert();
             $this->fail('Não cadastrar com valores nulos');
+            $grupo->delete();
         } catch (ValidationException $e) {
             $this->assertEquals(['produtoid', 'nome', 'descricao', 'tipo', 'quantidademinima', 'quantidademaxima', 'funcao', 'ordem'], array_keys($e->getErrors()));
         }
@@ -120,6 +124,7 @@ class GrupoTest extends \MZ\Framework\TestCase
         try {
             $grupo->insert();
             $this->fail('Produto não é um pacote');
+            $grupo->delete();
         } catch (ValidationException $e) {
             $this->assertEquals(['produtoid'], array_keys($e->getErrors()));
         }
@@ -157,6 +162,7 @@ class GrupoTest extends \MZ\Framework\TestCase
         $options = Grupo::getFuncaoOptions($grupo->getFuncao());
         // $this->assertEquals($grupo->getFuncao(), $options);
         $this->assertEquals('Mínimo', $options);
+        $grupo->delete();
     }
 
     public function testGetTipoOptions()
@@ -164,6 +170,7 @@ class GrupoTest extends \MZ\Framework\TestCase
         $grupo = self::create();
         $options = Grupo::getTipoOptions($grupo->getTipo());
         $this->assertEquals($grupo->getTipo(), $options);
+        $grupo->delete();
     }
 
     public function testUpdate()
@@ -171,6 +178,7 @@ class GrupoTest extends \MZ\Framework\TestCase
         $grupo = self::create();
         $grupo->update();
         $this->assertTrue($grupo->exists());
+        $grupo->delete();
     }
 
     public function testDelete()
@@ -180,4 +188,5 @@ class GrupoTest extends \MZ\Framework\TestCase
         $grupo->loadByID();
         $this->assertFalse($grupo->exists());
     }
+
 }

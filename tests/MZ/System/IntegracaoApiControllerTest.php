@@ -27,14 +27,17 @@ namespace MZ\System;
 use MZ\System\Permissao;
 use MZ\Account\AuthenticationTest;
 
-class IntegracaoPageControllerTest extends \MZ\Framework\TestCase
+class IntegracaoApiControllerTest extends \MZ\Framework\TestCase
 {
     public function testFind()
     {
         AuthenticationTest::authProvider([Permissao::NOME_SISTEMA, Permissao::NOME_ALTERARCONFIGURACOES]);
         $integracao = IntegracaoTest::create();
-        $result = $this->get('/gerenciar/integracao/', ['search' => $integracao->getNome()]);
-        $this->assertEquals(200, $result->getStatusCode());
+        $expected = [
+            'status' => 'ok',
+        ];
+        $result = $this->get('/api/integracoes', ['search' => $integracao->getNome()]);
+        $this->assertEquals($expected, \array_intersect_key($result, $expected));
     }
 
     public function testUpdate()
@@ -42,8 +45,12 @@ class IntegracaoPageControllerTest extends \MZ\Framework\TestCase
         AuthenticationTest::authProvider([Permissao::NOME_SISTEMA, Permissao::NOME_ALTERARCONFIGURACOES]);
         $integracao = IntegracaoTest::create();
         $id = $integracao->getID();
-        $result = $this->post('/gerenciar/integracao/editar?id=' . $id, $integracao->toArray(), true);
+        $result = $this->patch('/api/integracoes/' . $id, $integracao->toArray());
         $integracao->loadByID();
-        $this->assertEquals(302, $result->getStatusCode());
+        $expected = [
+            'status' => 'ok',
+            'item' => $integracao->publish(app()->auth->provider),
+        ];
+        $this->assertEquals($expected, \array_intersect_key($result, $expected));
     }
 }

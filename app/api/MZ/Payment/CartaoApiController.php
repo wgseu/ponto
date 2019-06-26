@@ -34,7 +34,7 @@ class CartaoApiController extends \MZ\Core\ApiController
 {
     /**
      * associate Cartões
-     * @Get("/api/cartoes/{name}", name="api_cartao_associations", params={ "name": "[a-zA-Z]" })
+     * @Get("/api/cartoes/association/{name}", name="api_cartao_associations", params={ "name": "[a-zA-Z]" })
      */
     public function fetchAssociation($name)
     {
@@ -60,7 +60,7 @@ class CartaoApiController extends \MZ\Core\ApiController
 
     /**
      * associate Cartões
-     * @Patch("/api/cartoes/{name}", name="api_cartao_associate", params={ "name": "[a-zA-Z]" })
+     * @Patch("/api/cartoes/associate/{name}", name="api_cartao_associate", params={ "name": "[a-zA-Z]" })
      */
     public function associate($name)
     {

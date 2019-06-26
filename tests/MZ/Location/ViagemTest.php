@@ -90,7 +90,7 @@ class ViagemTest extends \MZ\Framework\TestCase
             $viagem->insert();
             $viagem->fail('Não cadastrar valores nulos');
         } catch (ValidationException $e) {
-            $this->assertEquals(['responsaveid', 'datasaida'], array_keys($e->getErrors()));
+            $this->assertEquals(['responsavelid', 'datasaida'], array_keys($e->getErrors()));
         }
     }
 

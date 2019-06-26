@@ -25,6 +25,8 @@
 namespace MZ\Payment;
 
 use MZ\Payment\FormaPagtoTest;
+use MZ\Wallet\CarteiraTest;
+use MZ\Exception\ValidationException;
 
 class CartaoTest extends \MZ\Framework\TestCase
 {
@@ -38,7 +40,10 @@ class CartaoTest extends \MZ\Framework\TestCase
         $last = Cartao::find([], ['id' => -1]);
         $id = $last->getID() + 1;
         $forma_pagto = FormaPagtoTest::create();
+        $carteiraTeste = CarteiraTest::create();
+
         $cartao = new Cartao();
+        $cartao->setCarteiraID($carteiraTeste->getID());
         $cartao->setFormaPagtoID($forma_pagto->getID());
         $cartao->setBandeira($bandeira ?: "Bandeira {$id}");
         $cartao->setTaxa(3.50);
@@ -46,6 +51,27 @@ class CartaoTest extends \MZ\Framework\TestCase
         $cartao->setTaxaAntecipacao(6.39);
         $cartao->setAtivo('Y');
         return $cartao;
+    }
+
+    public function testTranslateFK()
+    {
+        $cartao = self::build();
+        $cartao->insert();
+
+        try {
+            $cartao->insert();
+            $this->fail('Não cadastrar com fk duplicada');
+        } catch (ValidationException $e) {
+            $this->assertEquals(['formapagtoid', 'bandeira'], array_keys($e->getErrors()));
+        }
+    }
+
+    public function testInvalidPaymentMethod()
+    {
+        $cartao = self::build();
+        $cartao->setFormaPagtoID(-1);
+        $this->expectException('\Exception');
+        $cartao->insert();
     }
 
     /**
@@ -71,11 +97,72 @@ class CartaoTest extends \MZ\Framework\TestCase
         $this->assertEquals(1, Cartao::count($condition));
     }
 
+    public function testFindCarteiraId()
+    {
+        $cartao = self::create();
+        $carteira = $cartao->findCarteiraID();
+        $this->assertEquals($cartao->getCarteiraID(), $carteira->getID());
+    }
+
+    public function testFindByFormaPagtoIDBandeira()
+    {
+        $cartao = self::create();
+        $forma_pagto = $cartao->findFormaPagtoID();
+        $formaPagtoBandeira = $cartao->findByFormaPagtoIDBandeira($forma_pagto->getID(), $cartao->getBandeira());
+        $this->assertInstanceOf(get_class($cartao), $formaPagtoBandeira);
+    }
+
     public function testAdd()
     {
         $cartao = self::build();
         $cartao->insert();
         $this->assertTrue($cartao->exists());
+    }
+
+    public function testAddInvalid()
+    {
+        $cartao = new Cartao();
+        $cartao->setFormaPagtoID(null);
+        $cartao->setBandeira(null);
+        $cartao->setTaxa(null);
+        $cartao->setDiasRepasse(null);
+        $cartao->setTaxaAntecipacao(null);
+        $cartao->setAtivo(null);
+        try {
+            $cartao->insert();
+            $this->fail('Pegando fogo no banco');
+        } catch (ValidationException $e) {
+            $this->assertEquals(['formapagtoid', 'bandeira', 'taxa', 'diasrepasse', 'taxaantecipacao', 'ativo'], array_keys($e->getErrors()));
+        }
+        //else if do validate
+        $cartao->setTaxa(-1);
+        $cartao->setDiasRepasse(-1);
+        $cartao->setTaxaAntecipacao(-1);
+        try {
+            $cartao->insert();
+            $this->fail('Não pode cadastrar');
+        } catch (ValidationException $ex) {
+            $this->assertEquals(['formapagtoid', 'bandeira', 'taxa', 'diasrepasse', 'taxaantecipacao', 'ativo'], array_keys($ex->getErrors()));
+        }
+    }
+
+    public function testMakeImagemURL()
+    {
+        $cartao = new Cartao();
+        $teste = $cartao->makeImagemURL(true);
+        $this->assertEquals('/static/img/cartao.png', $cartao->makeImagemURL(true));
+        $cartao->setImagemURL('imagem.png');
+        $this->assertEquals('/static/img/cartao/imagem.png', $cartao->makeImagemURL());
+    }
+
+    public function testClean()
+    {
+        $old_cartao = new Cartao();
+        $old_cartao->setImagemURL('cartoesnaoexistente2.png');
+        $cartao = new Cartao();
+        $cartao->setImagemURL('cartaonaoexistente.png');
+        $cartao->clean($old_cartao);
+        $this->assertEquals($old_cartao, $cartao);
     }
 
     public function testUpdate()

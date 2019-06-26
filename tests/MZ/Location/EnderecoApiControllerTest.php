@@ -41,6 +41,7 @@ class EnderecoApiControllerTest extends \MZ\Framework\TestCase
         ];
         $result = $this->get('/api/enderecos', ['search' => $endereco->getLogradouro()]);
         $this->assertEquals($expected, \array_intersect_key($result, $expected));
+        $endereco->delete();
     }
 
     public function testAdd()
@@ -70,6 +71,7 @@ class EnderecoApiControllerTest extends \MZ\Framework\TestCase
             'item' => $endereco->publish(app()->auth->provider),
         ];
         $this->assertEquals($expected, \array_intersect_key($result, $expected));
+        $endereco->delete();
     }
 
     public function testDelete()

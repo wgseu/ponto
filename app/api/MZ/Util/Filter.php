@@ -384,7 +384,7 @@ class Filter
                 if (is_array($value) || trim($value) !== '') {
                     return $value;
                 }
-                return $value = null;
+                return null;
             },
             $array
         );

@@ -27,6 +27,10 @@ namespace MZ\Sale;
 use MZ\Sale\ItemTest;
 use MZ\Session\MovimentacaoTest;
 use MZ\Exception\ValidationException;
+use MZ\Sale\PedidoTest;
+use MZ\Session\Caixa;
+use MZ\Session\Movimentacao;
+use MZ\Product\ComposicaoTest;
 
 class FormacaoTest extends \MZ\Framework\TestCase
 {
@@ -38,10 +42,14 @@ class FormacaoTest extends \MZ\Framework\TestCase
     {
         $last = Formacao::find([], ['id' => -1]);
         $id = $last->getID() + 1;
-        $item = ItemTest::create();
+        $item = ItemTest::build();
+        $composicao = ComposicaoTest::create();
+        $item->setProdutoID($composicao->getComposicaoID());
+        $item->insert();
         $formacao = new Formacao();
         $formacao->setItemID($item->getID());
-        $formacao->setTipo(Formacao::TIPO_PACOTE);
+        $formacao->setComposicaoID($composicao->getID());
+        $formacao->setTipo(Formacao::TIPO_COMPOSICAO);
         $formacao->setQuantidade(12.3);
         return $formacao;
     }
@@ -52,6 +60,7 @@ class FormacaoTest extends \MZ\Framework\TestCase
      */
     public static function create()
     {
+        $movimentacoes = Movimentacao::findAll(['aberta' => 'Y']);
         $formacao = self::build();
         $formacao->insert();
         return $formacao;
@@ -59,19 +68,27 @@ class FormacaoTest extends \MZ\Framework\TestCase
 
     public function testFind()
     {
+        $movimentacao = MovimentacaoTest::create();
         $formacao = self::create();
-        $condition = ['pacoteid' => $formacao->getPacoteID()];
+        $condition = ['composicaoid' => $formacao->getComposicaoID()];
         $found_formacao = Formacao::find($condition);
         $this->assertEquals($formacao, $found_formacao);
+
         list($found_formacao) = Formacao::findAll($condition, [], 1);
         $this->assertEquals($formacao, $found_formacao);
         $this->assertEquals(1, Formacao::count($condition));
+
+        $item = $formacao->findItemID();
+        $pedido = $item->findPedidoID();
+        PedidoTest::close($pedido);
+        MovimentacaoTest::close($movimentacao);
     }
 
     public function testAddInvalid()
     {
         $movimentacao = MovimentacaoTest::create();
         $formacao = self::build();
+        $item = $formacao->findItemID();
         $formacao->setItemID(null);
         $formacao->setTipo('Teste');
         $formacao->setQuantidade(null);
@@ -81,12 +98,16 @@ class FormacaoTest extends \MZ\Framework\TestCase
         } catch (ValidationException $e) {
             $this->assertEquals(['itemid', 'tipo', 'quantidade'], array_keys($e->getErrors()));
         }
+        $pedido = $item->findPedidoID();
+        PedidoTest::close($pedido);
+        MovimentacaoTest::close($movimentacao);
     }
 
     public function testFinds()
     {
         $movimentacao = MovimentacaoTest::create();
         $formacao = self::create();
+        
         $item = $formacao->findItemID();
         $this->assertEquals($formacao->getItemID(), $item->getID());
 
@@ -98,13 +119,18 @@ class FormacaoTest extends \MZ\Framework\TestCase
 
         $found_formacao = $formacao->findByItemIDPacoteID($item->getID(), $pacote->getID());
         $this->assertInstanceOf(get_class($formacao), $found_formacao);
+        $pedido = $item->findPedidoID();
+        PedidoTest::close($pedido);
+        MovimentacaoTest::close($movimentacao);
     }
 
     public function testGetOptions()
     {
-        $movimentacao = MovimentacaoTest::create();
-        $formacao = self::create();
-        $options = Formacao::getTipoOptions($formacao->getTipo());
-        $this->assertEquals($formacao->getTipo(), $options);
+        $formacao = new Formacao(['tipo' => Formacao::TIPO_COMPOSICAO]);
+        $options = Formacao::getTipoOptions();
+        $this->assertEquals(
+            Formacao::getTipoOptions($formacao->getTipo()),
+            $options[$formacao->getTipo()]
+        );
     }
 }

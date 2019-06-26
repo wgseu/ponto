@@ -70,6 +70,7 @@ class EnderecoTest extends \MZ\Framework\TestCase
         list($found_endereco) = Endereco::findAll($condition, [], 1);
         $this->assertEquals($endereco, $found_endereco);
         $this->assertEquals(1, Endereco::count($condition));
+        $endereco->delete();
     }
 
     public function testFinds()
@@ -87,6 +88,7 @@ class EnderecoTest extends \MZ\Framework\TestCase
 
         $bairro2 = $endereco->findByBairroIDLogradouro($endereco->getID(), $endereco->getLogradouro());
         $this->assertInstanceOf(get_class($endereco), $bairro2);
+        $endereco->delete();
     }
 
     public function testAdd()
@@ -94,6 +96,7 @@ class EnderecoTest extends \MZ\Framework\TestCase
         $endereco = self::build();
         $endereco->insert();
         $this->assertTrue($endereco->exists());
+        $endereco->delete();
     }
 
     public function testAddInvalid()
@@ -106,9 +109,19 @@ class EnderecoTest extends \MZ\Framework\TestCase
         try {
             $endereco->insert();
             $this->fail('Não cadastrar');
+            $endereco->delete();
         } catch (ValidationException $e) {
             $this->assertEquals(['cidadeid', 'bairroid', 'logradouro', 'cep'], array_keys($e->getErrors()));
         }
+    }
+
+    public function testUpdate()
+    {
+        $enderecos = Endereco::findAll();
+        $endereco = self::create();
+        $endereco->update();
+        $this->assertTrue($endereco->exists());
+        $endereco->delete();
     }
 
     public function testTranslate()
@@ -124,6 +137,11 @@ class EnderecoTest extends \MZ\Framework\TestCase
         } catch (ValidationException $e) {
             $this->assertEquals(['cep'], array_keys($e->getErrors()));
         }
+        $enderecos = Endereco::findAll();
+        for ($i=0; $i < count($enderecos); $i++) { 
+            $endereco = $enderecos[$i];
+            $endereco->delete();
+        }
         //------------------------
         $endereco = self::build();
         $endereco->setBairroID(1);
@@ -137,13 +155,6 @@ class EnderecoTest extends \MZ\Framework\TestCase
         }
 
 
-    }
-
-    public function testUpdate()
-    {
-        $endereco = self::create();
-        $endereco->update();
-        $this->assertTrue($endereco->exists());
     }
 
     public function testDelete()

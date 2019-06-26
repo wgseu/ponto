@@ -28,6 +28,7 @@ use MZ\Account\Cliente;
 use MZ\Database\DB;
 use MZ\Provider\PrestadorTest;
 use MZ\Wallet\CarteiraTest;
+use \MZ\Provider\FuncaoTest;
 
 class CaixaTest extends \MZ\Framework\TestCase
 {
@@ -169,6 +170,7 @@ class CaixaTest extends \MZ\Framework\TestCase
         $new_caixa = new Caixa($caixa);
         $new_caixa->setNumeroInicial(1);
         $this->assertEquals($new_caixa, $found_caixa);
+        $caixa->delete();
     }
 
     public function testSearch()
@@ -177,6 +179,7 @@ class CaixaTest extends \MZ\Framework\TestCase
 
         $found_caixa = Caixa::find(['search' => 'xa de número 5']);
         $this->assertEquals($caixa, $found_caixa);
+        $caixa->delete();
     }
 
     public function testValidate()
@@ -201,36 +204,26 @@ class CaixaTest extends \MZ\Framework\TestCase
 
     public function testDesativarEmUso()
     {
-        $caixa = self::create('Caixa de número 7');
-
-        $sessao = new Sessao();
-        $sessao->setAberta('Y');
-        $sessao->insert();
-
-        $funcao = \MZ\Provider\FuncaoTest::create([]);
-        $funcionario = \MZ\Provider\PrestadorTest::create($funcao);
-
-        $movimentacao = new Movimentacao();
-        $movimentacao->setSessaoID($sessao->getID());
-        $movimentacao->setCaixaID($caixa->getID());
-        $movimentacao->setIniciadorID($funcionario->getID());
-        $movimentacao->setAberta('Y');
-        $movimentacao->insert();
-
-        $this->expectException('\MZ\Exception\ValidationException');
+        $movimentacao = MovimentacaoTest::create();
+        $caixa = $movimentacao->findCaixaID();
         try {
             $caixa->setAtivo('N');
             $caixa->update();
             $this->fail('Não deveria ter desativado um caixa em uso');
         } catch (\MZ\Exception\ValidationException $e) {
             $this->assertEquals(['ativo'], array_keys($e->getErrors()));
-            throw $e;
-        } finally {
-            try {
-                MovimentacaoTest::close($movimentacao);
-            } catch (\Exception $e) {
-                $this->fail($e->getMessage());
-            }
+            MovimentacaoTest::close($movimentacao);
+        }
+    }
+
+    public function testTranslate()
+    {
+        $caixa = self::create();
+        try {
+            $caixa->insert();
+            $this->fail('fk duplicada');
+        } catch (\MZ\Exception\ValidationException $e) {
+            $this->assertEquals(['descricao'], array_keys($e->getErrors()));
         }
     }
 

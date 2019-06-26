@@ -28,6 +28,8 @@ use MZ\Session\SessaoTest;
 use MZ\Session\CaixaTest;
 use MZ\Provider\PrestadorTest;
 use MZ\Database\DB;
+use MZ\Exception\ValidationException;
+use MZ\Sale\PedidoTest;
 
 class MovimentacaoTest extends \MZ\Framework\TestCase
 {
@@ -87,28 +89,127 @@ class MovimentacaoTest extends \MZ\Framework\TestCase
         self::close($movimentacao);
     }
 
-    public function testAdd()
+    public function testAddNull()
     {
         $movimentacao = self::build();
-        $movimentacao->insert();
-        $this->assertTrue($movimentacao->exists());
+        $sessao = $movimentacao->findSessaoID();
+
+        $movimentacao->setSessaoID(null);
+        $movimentacao->setCaixaID(null);
+        $movimentacao->setAberta('T');
+        $movimentacao->setIniciadorID(null);
+        $movimentacao->setDataAbertura(null);
+        try {
+            $movimentacao->insert();
+            $this->fail('Valores nulos');
+        } catch (ValidationException $e) {
+            $this->assertEquals(
+                ['sessaoid', 'caixaid', 'aberta', 'iniciadorid', 'fechadorid', 'dataabertura', 'datafechamento'],
+                array_keys($e->getErrors())
+            );
+        }
+        SessaoTest::close($sessao);
+    }
+
+    public function testAddInvalid()
+    {
+        $movimentacao = new Movimentacao();
+
+        $sessao = SessaoTest::create();
+        SessaoTest::close($sessao);
+
+        $caixa = CaixaTest::create();
+        $caixa->setAtivo('N');
+        $caixa->update();
+
+        $prestador = PrestadorTest::create();
+        $prestador->setDataTermino(DB::now());
+        $prestador->setAtivo('N');
+        $prestador->update();
+
+        $movimentacao->setSessaoID($sessao->getID());
+        $movimentacao->setCaixaID($caixa->getID());
+        $movimentacao->setIniciadorID($prestador->getID());
+        $movimentacao->setAberta('Y');
+        $movimentacao->setDataAbertura('2016-12-25 12:15:00');
+        try {
+            $movimentacao->insert();
+            $this->fail('Não cadastrar');
+        } catch (ValidationException $e) {
+            $this->assertEquals(['sessaoid', 'caixaid', 'iniciadorid'], array_keys($e->getErrors()));
+        }
+    }
+
+    public function testReabrirCaixa()
+    {
+        $movimentacao = self::create();
+        self::close($movimentacao);
+        try {
+            $movimentacao->setAberta('Y');
+            //$old->exists() && $old->getSessaoID() != $this->getSessaoID()
+            $movimentacao->setSessaoID(4);
+            $movimentacao->update();
+        } catch (ValidationException $e) {
+            $this->assertEquals(['id', 'sessaoid', 'aberta', 'fechadorid', 'datafechamento'], array_keys($e->getErrors()));
+        }
+    }
+
+    public function testAddMovimentacaoFechada()
+    {
+        $movimentacao = self::build();
+        $movimentacao->setAberta('N');
+        $movimentacao->setFechadorID($movimentacao->getIniciadorID());
+        $movimentacao->setDataFechamento(DB::now());
+        try {
+            $movimentacao->insert();
+            $this->fail('Não criar movimentação fechada');
+        } catch (ValidationException $e) {
+            $this->assertEquals(['aberta'], array_keys($e->getErrors()));
+        }
+    }
+
+    public function testMudarFuncionario()
+    {
+        $movimentacao = self::create();
+        try {
+            $movimentacao->setIniciadorID(5);
+            $movimentacao->update();
+            $this->fail('Não pode alterar o funcionário que abriu o caixa');
+        } catch (ValidationException $e) {
+            $this->assertEquals(['iniciadorid'], array_keys($e->getErrors()));
+        }
+        $movimentacaoClose = Movimentacao::find(['id' => $movimentacao->getID()]);
+        self::close($movimentacaoClose);
+    }
+
+    public function testAlterarDtAbertura()
+    {
+        $movimentacao = self::create();
+        try {
+            $movimentacao->setDataAbertura(DB::now());
+            $movimentacao->update();
+            $this->fail('Não alterar a data de abertura do caixa');
+        } catch (ValidationException $e) {
+            $this->assertEquals(['dataabertura'], array_keys($e->getErrors()));
+        }
+        $movimentacaoClose = Movimentacao::find(['id' => $movimentacao->getID()]);
+        self::close($movimentacaoClose);
+    }
+
+    public function testFindFechador()
+    {
+        $movimentacao = self::create();
+        $fechador = $movimentacao->findFechadorID();
+        $this->assertEquals($movimentacao->getFechadorID(), $fechador->getID());
         self::close($movimentacao);
     }
 
-    public function testUpdate()
+    public function testFindByAberta()
     {
         $movimentacao = self::create();
-        $movimentacao->update();
-        $this->assertTrue($movimentacao->exists());
-        self::close($movimentacao);
-    }
+        $movimentacaoFound = Movimentacao::findByAberta($movimentacao->getIniciadorID());
 
-    public function testDelete()
-    {
-        $movimentacao = self::create();
+        $this->assertInstanceOf(get_class($movimentacao), $movimentacaoFound);
         self::close($movimentacao);
-        $movimentacao->delete();
-        $movimentacao->loadByID();
-        $this->assertFalse($movimentacao->exists());
     }
 }

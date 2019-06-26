@@ -27,6 +27,55 @@ namespace MZ\System;
 
 class FuncionalidadeTest extends \MZ\Framework\TestCase
 {
+    /**
+     * Build a valid funcionalidade
+     * @param string $descricao Funcionalidade descrição
+     * @return Funcionalidade
+     */
+    public static function build($descricao = null)
+    {
+        $last = Funcionalidade::find([], ['id' => -1]);
+        $id = $last->getID() + 1;
+        $funcionalidade = new Funcionalidade();
+        $funcionalidade->setNome("Funcionalidade {$id}");
+        $funcionalidade->setDescricao($descricao ?: "Funcionalidade {$id}");
+        return $funcionalidade;
+    }
+
+    /**
+     * Create a funcionalidade on database
+     * @param string $descricao Funcionalidade descrição
+     * @return Funcionalidade
+     */
+    public static function create($descricao = null)
+    {
+        $funcionalidade = self::build($descricao);
+        $funcionalidade->insert();
+        return $funcionalidade;
+    }
+
+    public function testAdd()
+    {
+        $funcionalidade = self::build();
+        $funcionalidade->insert();
+        $this->assertTrue($funcionalidade->exists());
+    }
+
+    public function testUpdate()
+    {
+        $funcionalidade = self::create();
+        $funcionalidade->update();
+        $this->assertTrue($funcionalidade->exists());
+    }
+
+    public function testDelete()
+    {
+        $funcionalidade = self::create();
+        $funcionalidade->delete();
+        $funcionalidade->loadByID();
+        $this->assertFalse($funcionalidade->exists());
+    }
+
     public function testFind()
     {
         $funcionalidade = Funcionalidade::find([], ['id' => -1]);

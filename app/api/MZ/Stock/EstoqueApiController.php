@@ -110,14 +110,14 @@ class EstoqueApiController extends \MZ\Core\ApiController
 
     /**
      * Cancel Estoques
-     * @Get("/api/estoques", name="api_estoque_cancel")
+     * @Get("/api/estoques/cancelar", name="api_estoque_cancel")
      */
     public function cancel()
     {
-        $this->needPermission([Permissao::NOME_ESTOQUE, Permissao::NOME_RETIRARDOESTOQUE]);
+        $this->needPermission([Permissao::NOME_ESTOQUE]);
         $id = $this->getRequest()->query->getInt('id', null);
         $estoque = Estoque::findOrFail(['id' => $id]);
         $estoque->cancelar();
-        return $this->getResponse()->success([]);
+        return $this->getResponse()->success(['item' => $estoque->publish(app()->auth->provider)]);
     }
 }

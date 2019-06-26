@@ -29,14 +29,19 @@ use MZ\Account\AuthenticationTest;
 use MZ\Sale\PedidoTest;
 use MZ\Sale\Pedido;
 use MZ\Session\MovimentacaoTest;
+use MZ\Session\Movimentacao;
 
 class ComandaApiControllerTest extends \MZ\Framework\TestCase
 {
     public function testFind()
     {
         AuthenticationTest::authProvider([Permissao::NOME_SISTEMA, Permissao::NOME_CADASTROCOMANDAS]);
+        $comandas = Comanda::findAll();
+        foreach($comandas as $comanda) {
+            $comanda->delete();
+        }
         $movimentacao = MovimentacaoTest::create();
-        $comanda = ComandaTest::create();
+        $comanda = ComandaTest::create('Comanda Teste nome');
         $pedido = PedidoTest::build();
         $pedido->setMesaID(null);
         $pedido->setPessoas(1);
@@ -58,12 +63,14 @@ class ComandaApiControllerTest extends \MZ\Framework\TestCase
         $this->assertEquals($expected, \array_intersect_key($result, $expected));
 
         $result = $this->get('/api/comandas', ['pedidos' => $pedidos]);
+        PedidoTest::close($pedido);
+        MovimentacaoTest::close($movimentacao);
     }
 
     public function testAdd()
     {
         AuthenticationTest::authProvider([Permissao::NOME_SISTEMA, Permissao::NOME_CADASTROCOMANDAS]);
-        $comanda = ComandaTest::build();
+        $comanda = ComandaTest::build('Comanda teste nome2');
         $expected = [
             'status' => 'ok',
             'item' => $comanda->publish(app()->auth->provider),
@@ -77,7 +84,7 @@ class ComandaApiControllerTest extends \MZ\Framework\TestCase
     public function testUpdate()
     {
         AuthenticationTest::authProvider([Permissao::NOME_SISTEMA, Permissao::NOME_CADASTROCOMANDAS]);
-        $comanda = ComandaTest::create();
+        $comanda = ComandaTest::create('Comanda teste nome3');
         $id = $comanda->getID();
         $result = $this->patch('/api/comandas/' . $id, $comanda->toArray());
         $comanda->loadByID();
@@ -91,7 +98,7 @@ class ComandaApiControllerTest extends \MZ\Framework\TestCase
     public function testDelete()
     {
         AuthenticationTest::authProvider([Permissao::NOME_SISTEMA, Permissao::NOME_CADASTROCOMANDAS]);
-        $comanda = ComandaTest::create();
+        $comanda = ComandaTest::create('Comanda teste nome4');
         $id = $comanda->getID();
         $result = $this->delete('/api/comandas/' . $id);
         $comanda->loadByID();

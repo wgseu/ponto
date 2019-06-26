@@ -27,6 +27,8 @@ namespace MZ\Sale;
 use MZ\System\Permissao;
 use MZ\Account\AuthenticationTest;
 use MZ\Session\MovimentacaoTest;
+use MZ\Sale\PedidoTest;
+use MZ\Session\Movimentacao;
 
 class JuncaoApiControllerTest extends \MZ\Framework\TestCase
 {
@@ -44,6 +46,9 @@ class JuncaoApiControllerTest extends \MZ\Framework\TestCase
         ];
         $result = $this->get('/api/juncoes', ['search' => $juncao->getMesaID()]);
         $this->assertEquals($expected, \array_intersect_key($result, $expected));
+        $pedido = $juncao->findPedidoID();
+        PedidoTest::close($pedido);
+        MovimentacaoTest::close($movimentacao);
     }
 
     public function testAdd()
@@ -61,6 +66,9 @@ class JuncaoApiControllerTest extends \MZ\Framework\TestCase
         $expected['item']['id'] = $result['item']['id'] ?? null;
         $expected['item']['datamovimento'] = $result['item']['datamovimento'] ?? null;
         $this->assertEquals($expected, \array_intersect_key($result, $expected));
+        $pedido = $juncao->findPedidoID();
+        PedidoTest::close($pedido);
+        MovimentacaoTest::close($movimentacao);
     }
 
     public function testUpdate()
@@ -76,6 +84,9 @@ class JuncaoApiControllerTest extends \MZ\Framework\TestCase
             'item' => $juncao->publish(app()->auth->provider),
         ];
         $this->assertEquals($expected, \array_intersect_key($result, $expected));
+        $pedido = $juncao->findPedidoID();
+        PedidoTest::close($pedido);
+        MovimentacaoTest::close($movimentacao);
     }
 
     public function testDelete()
@@ -83,11 +94,14 @@ class JuncaoApiControllerTest extends \MZ\Framework\TestCase
         AuthenticationTest::authProvider([Permissao::NOME_SISTEMA, Permissao::NOME_MUDARDEMESA]);
         $movimentacao = MovimentacaoTest::create();
         $juncao = JuncaoTest::create();
+        $pedido = $juncao->findPedidoID();
         $id = $juncao->getID();
         $result = $this->delete('/api/juncoes/' . $id);
         $juncao->loadByID();
         $expected = [ 'status' => 'ok', ];
         $this->assertEquals($expected, \array_intersect_key($result, $expected));
         $this->assertFalse($juncao->exists());
+        PedidoTest::close($pedido);
+        MovimentacaoTest::close($movimentacao);
     }
 }

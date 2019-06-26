@@ -27,6 +27,7 @@ namespace MZ\Sale;
 use MZ\Environment\MesaTest;
 use MZ\Sale\PedidoTest;
 use MZ\Session\MovimentacaoTest;
+use MZ\Session\Movimentacao;
 
 class JuncaoTest extends \MZ\Framework\TestCase
 {
@@ -77,6 +78,9 @@ class JuncaoTest extends \MZ\Framework\TestCase
         $juncao = self::create();
         $mesa = $juncao->findMesaID();
         $this->assertEquals($juncao->getMesaID(), $mesa->getID());
+        $pedido = $juncao->findPedidoID();
+        PedidoTest::close($pedido);
+        MovimentacaoTest::close($movimentacao);
     }
 
     public function testAdd()
@@ -195,6 +199,7 @@ class JuncaoTest extends \MZ\Framework\TestCase
     {
         $movimentacao = MovimentacaoTest::create();
         $juncao = self::build();
+        $pedido = $juncao->findPedidoID();
         $juncao->setMesaID(null);
         $juncao->setPedidoID(null);
         $juncao->setEstado('Teste');
@@ -207,6 +212,8 @@ class JuncaoTest extends \MZ\Framework\TestCase
                 array_keys($e->getErrors())
             );
         }
+        PedidoTest::close($pedido);
+        MovimentacaoTest::close($movimentacao);
     }
 
     public function testGetEstado()
@@ -215,5 +222,8 @@ class JuncaoTest extends \MZ\Framework\TestCase
         $juncao = self::create();
         $options = Juncao::getEstadoOptions($juncao->getEstado());
         $this->assertEquals($juncao->getEstado(), $options);
+        $pedido = $juncao->findPedidoID();
+        PedidoTest::close($pedido);
+        MovimentacaoTest::close($movimentacao);
     }
 }

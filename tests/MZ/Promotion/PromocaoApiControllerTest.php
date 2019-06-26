@@ -70,7 +70,7 @@ class PromocaoApiControllerTest extends \MZ\Framework\TestCase
 
         $result['item']['inicio'] = intval($result['item']['inicio'] ?? null);
         $result['item']['fim'] = intval($result['item']['fim'] ?? null);
-        $result['item']['valor'] = intval($result['item']['valor'] ?? null);
+        $result['item']['valor'] = floatval($result['item']['valor'] ?? null);
         $result['item']['pontos'] = intval($result['item']['pontos'] ?? null);
         $this->assertEquals($expected, \array_intersect_key($result, $expected));
     }

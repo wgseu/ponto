@@ -83,6 +83,7 @@ class PacoteTest extends \MZ\Framework\TestCase
         $pacote = self::build();
         $pacote->insert();
         $this->assertTrue($pacote->exists());
+        $pacote->delete();
     }
 
     public function testAddInvalid()
@@ -156,4 +157,5 @@ class PacoteTest extends \MZ\Framework\TestCase
         $this->expectException('\Exception');
         $pacote->insert();
     }
+
 }

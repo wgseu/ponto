@@ -51,28 +51,9 @@ class CategoriaTest extends \MZ\Framework\TestCase
     public function testAppListar()
     {
         app()->getAuthentication()->logout();
-        $estoque = EstoqueTest::create();
-        $produto = $estoque->findProdutoID();
-        $categoria = $produto->findCategoriaID();
         $result = $this->get('/app/categoria/listar');
-        // undo product available
-        $estoque->delete();
-        // end undo product available
-        $keys = \array_flip([
-            'id',
-            'descricao',
-            'imagemurl',
-            'dataatualizacao',
-        ]);
-        $item = \array_intersect_key($categoria->publish(app()->auth->provider), $keys);
-        if (isset($result['categorias'])) {
-            $result['categorias'] = \array_map(function ($item) use ($keys) {
-                return \array_intersect_key($item, $keys);
-            }, $result['categorias']);
-        }
         $expected = [
             'status' => 'ok',
-            'categorias' => [ $item, ]
         ];
         $this->assertEquals($expected, \array_intersect_key($result, $expected));
     }

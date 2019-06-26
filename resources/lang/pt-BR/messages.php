@@ -335,6 +335,7 @@ return [
     'produto.tipo_produto' => 'Produto',
     'produto.tipo_composicao' => 'Composição',
     'produto.tipo_pacote' => 'Pacote',
+    'produto.tipo_already_packaged' => 'Esse produto já faz parte de um pacote',
     'servico.id_used' => 'O id "%s" já está cadastrado em outro serviço',
     'servico.nome_cannot_empty' => 'O nome não pode ser vazio',
     'servico.descricao_cannot_empty' => 'A descrição não pode ser vazia',

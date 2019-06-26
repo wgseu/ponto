@@ -41,12 +41,15 @@ class DispositivoApiControllerTest extends \MZ\Framework\TestCase
         ];
         $result = $this->get('/api/dispositivos', ['search' => $dispositivo->getNome()]);
         $this->assertEquals($expected, \array_intersect_key($result, $expected));
+        $dispositivo->delete();
     }
 
     public function testAdd()
     {
         AuthenticationTest::authProvider([Permissao::NOME_SISTEMA, Permissao::NOME_CADASTROCOMPUTADORES]);
         $dispositivo = DispositivoTest::build();
+        $this->assertEquals($dispositivo->toArray(), (new Dispositivo($dispositivo))->toArray());
+        $this->assertEquals((new Dispositivo())->toArray(), (new Dispositivo(1))->toArray());
         $expected = [
             'status' => 'ok',
             'item' => $dispositivo->publish(app()->auth->provider),
@@ -68,6 +71,7 @@ class DispositivoApiControllerTest extends \MZ\Framework\TestCase
             'item' => $dispositivo->publish(app()->auth->provider),
         ];
         $this->assertEquals($expected, \array_intersect_key($result, $expected));
+        $dispositivo->delete();
     }
 
     public function testDelete()

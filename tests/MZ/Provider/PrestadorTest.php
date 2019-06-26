@@ -88,7 +88,7 @@ class PrestadorTest extends \MZ\Framework\TestCase
         $this->assertEquals($allowed, array_keys($values));
     }
 
-    public function testAddInvalid()
+    public function testAddNull()
     {
         $prestador = self::build();
         $prestador->setCodigo(null);
@@ -108,6 +108,10 @@ class PrestadorTest extends \MZ\Framework\TestCase
                 array_keys($e->getErrors())
             );
         }
+    }
+
+    public function testAddClienteInvalid()
+    {
         //----------------------
         $cliente = ClienteTest::build();
         $cliente->setTipo("Juridica");
@@ -144,7 +148,10 @@ class PrestadorTest extends \MZ\Framework\TestCase
         } catch (ValidationException $e) {
             $this->assertEquals(['clienteid'], array_keys($e->getErrors()));
         }
-        //----------------------
+    }
+
+    public function testAddValoresNegativos()
+    {
         $prestador = self::build();
         $prestador->setPorcentagem(-1);
         try {
@@ -171,15 +178,6 @@ class PrestadorTest extends \MZ\Framework\TestCase
         } catch (ValidationException $e) {
             $this->assertEquals(['remuneracao'], array_keys($e->getErrors()));
         }
-        //----------(!$this->isAtivo() && is_null($this->getDataTermino())
-        $prestador = self::build();
-        $prestador->setAtivo('N');
-        try {
-            $prestador->insert();
-            $this->fail('Não cadastrar funcionario inativo');
-        } catch (ValidationException $e) {
-            $this->assertEquals(['ativo', 'datatermino'], array_keys($e->getErrors()));
-        }
         //----------------------
         $prestador = self::build();
         $prestador->setAtivo('Y');
@@ -189,6 +187,19 @@ class PrestadorTest extends \MZ\Framework\TestCase
             $this->fail('Não remuneracao comissão negativa');
         } catch (ValidationException $e) {
             $this->assertEquals(['datatermino'], array_keys($e->getErrors()));
+        }
+    }
+
+    public function testAddFuncionarioInativo()
+    {
+        //----------(!$this->isAtivo() && is_null($this->getDataTermino())
+        $prestador = self::build();
+        $prestador->setAtivo('N');
+        try {
+            $prestador->insert();
+            $this->fail('Não cadastrar funcionario inativo');
+        } catch (ValidationException $e) {
+            $this->assertEquals(['ativo', 'datatermino'], array_keys($e->getErrors()));
         }
     }
 
@@ -246,6 +257,7 @@ class PrestadorTest extends \MZ\Framework\TestCase
 
     public function testDelete()
     {
+        AuthenticationTest::authOwner();
         $prestador = self::create();
         $prestador->delete();
         $prestador->loadByID();
@@ -256,13 +268,6 @@ class PrestadorTest extends \MZ\Framework\TestCase
     {
         AuthenticationTest::authProvider([Permissao::NOME_SISTEMA, Permissao::NOME_CADASTROPRESTADORES]);
         $prestador = PrestadorTest::create();
-        $this->expectException('\Exception');
-        $prestador->delete();
-    }
-
-    public function testDeleteSelf()
-    {
-        $prestador = AuthenticationTest::authSelf();
         $this->expectException('\Exception');
         $prestador->delete();
     }

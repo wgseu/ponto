@@ -30,6 +30,23 @@ use MZ\Session\MovimentacaoTest;
 
 class PedidoApiControllerTest extends \MZ\Framework\TestCase
 {
+    public function testFind()
+    {
+        AuthenticationTest::authProvider([Permissao::NOME_SISTEMA, Permissao::NOME_PAGAMENTO]);
+        $movimentacao = MovimentacaoTest::create();
+        $pedido = PedidoTest::create();
+        $expected = [
+            'status' => 'ok',
+            'items' => [
+                $pedido->publish(app()->auth->provider),
+            ],
+        ];
+        $result = $this->get('/api/pedidos', ['search' => $pedido->getID()]);
+        $this->assertEquals($expected, \array_intersect_key($result, $expected));
+        PedidoTest::close($pedido);
+        MovimentacaoTest::close($movimentacao);
+    }
+
     public function testAdd()
     {
         AuthenticationTest::authProvider([Permissao::NOME_SISTEMA, Permissao::NOME_PEDIDOMESA]);

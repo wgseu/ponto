@@ -22,26 +22,16 @@
  *
  * @author Equipe GrandChef <desenvolvimento@mzsw.com.br>
  */
-namespace MZ\Payment;
+namespace MZ\Util;
 
-use MZ\System\Permissao;
-use MZ\Account\AuthenticationTest;
-
-class PagamentoPageControllerTest extends \MZ\Framework\TestCase
+class MaskTest extends \MZ\Framework\TestCase
 {
-    public function testDashboard()
+    public function testBool()
     {
-        AuthenticationTest::authProvider([Permissao::NOME_SISTEMA, Permissao::NOME_RELATORIOFLUXO]);
-        $pagamento = PagamentoTest::create();
-        $result = $this->get('/gerenciar/diversos/');
-        $this->assertEquals(200, $result->getStatusCode());
-    }
-
-    public function testFind()
-    {
-        AuthenticationTest::authProvider([Permissao::NOME_SISTEMA, Permissao::NOME_PAGAMENTO]);
-        $pagamento = PagamentoTest::create();
-        $result = $this->get('/gerenciar/pagamento/');
-        $this->assertEquals(200, $result->getStatusCode());
+        $this->assertEquals('Sim', Mask::bool(true));
+        $this->assertEquals('Sim', Mask::bool('Y'));
+        $this->assertEquals('Sim', Mask::bool('S'));
+        $this->assertEquals('Não', Mask::bool(false));
+        $this->assertEquals('Não', Mask::bool('N'));
     }
 }

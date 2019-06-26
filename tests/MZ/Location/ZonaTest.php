@@ -61,6 +61,11 @@ class ZonaTest extends \MZ\Framework\TestCase
 
     public function testFind()
     {
+        $zonas = Zona::findAll();
+        for ($i=0; $i < count($zonas); $i++) {
+            $zona = $zonas[$i];
+            $zona->delete();
+        }
         $zona = self::create();
         $condition = ['nome' => $zona->getNome()];
         $found_zona = Zona::find($condition);
@@ -68,6 +73,7 @@ class ZonaTest extends \MZ\Framework\TestCase
         list($found_zona) = Zona::findAll($condition, [], 1);
         $this->assertEquals($zona, $found_zona);
         $this->assertEquals(1, Zona::count($condition));
+        $zona->delete();
     }
 
     public function testFinds()
@@ -78,6 +84,7 @@ class ZonaTest extends \MZ\Framework\TestCase
 
         $zonaByBairroIDNome = $zona->findByBairroIDNome($bairro->getID(), $zona->getNome());
         $this->assertInstanceOf(get_class($zona), $zonaByBairroIDNome);
+        $zona->delete();
     }
 
     public function testAdd()
@@ -85,6 +92,7 @@ class ZonaTest extends \MZ\Framework\TestCase
         $zona = self::build();
         $zona->insert();
         $this->assertTrue($zona->exists());
+        $zona->delete();
     }
 
     public function testAddInvalid()
@@ -97,9 +105,18 @@ class ZonaTest extends \MZ\Framework\TestCase
         try {
             $zona->insert();
             $this->fail('Não cadastrar valores nulos');
+            $zona->delete();
         } catch (ValidationException $e) {
             $this->assertEquals(['bairroid', 'nome', 'adicionalentrega', 'disponivel'], array_keys($e->getErrors()));
         }
+    }
+
+    public function testUpdate()
+    {
+        $zona = self::create();
+        $zona->update();
+        $this->assertTrue($zona->exists());
+        $zona->delete();
     }
 
     public function testTranslate()
@@ -113,13 +130,6 @@ class ZonaTest extends \MZ\Framework\TestCase
         } catch (ValidationException $e) {
             $this->assertEquals(['bairroid', 'nome'], array_keys($e->getErrors()));
         }
-    }
-
-    public function testUpdate()
-    {
-        $zona = self::create();
-        $zona->update();
-        $this->assertTrue($zona->exists());
     }
 
     public function testDelete()

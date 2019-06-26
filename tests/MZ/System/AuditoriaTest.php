@@ -25,6 +25,7 @@
 namespace MZ\System;
 
 use MZ\Provider\PrestadorTest;
+use MZ\Exception\ValidationException;
 
 class AuditoriaTest extends \MZ\Framework\TestCase
 {
@@ -77,6 +78,50 @@ class AuditoriaTest extends \MZ\Framework\TestCase
         $auditoria = self::build();
         $auditoria->insert();
         $this->assertTrue($auditoria->exists());
+    }
+
+    public function testAddInvalid()
+    {
+        $auditoria = self::build();
+        $auditoria->setPrestadorID(null);
+        $auditoria->setAutorizadorID(null);
+        $auditoria->setTipo('Tipo inválido');
+        $auditoria->setPrioridade('Inválido');
+        $auditoria->setDescricao(null);
+        try {
+            $auditoria->insert();
+            $this->fail('Valores inválidos');
+        } catch (ValidationException $e) {
+            $this->assertEquals(['prestadorid', 'autorizadorid', 'tipo', 'prioridade', 'descricao'], array_keys($e->getErrors()));
+        }
+    }
+
+    public function testFinds()
+    {
+        $auditoria = self::create();
+
+        $permissao = $auditoria->findPermissaoID();
+        $this->assertEquals($auditoria->getPermissaoID(), $permissao->getID());
+
+        $prestador = $auditoria->findPrestadorID();
+        $this->assertEquals($auditoria->getPrestadorID(), $prestador->getID());
+
+        $autorizador = $auditoria->findAutorizadorID();
+        $this->assertEquals($auditoria->getAutorizadorID(), $autorizador->getID());
+    }
+
+    public function testGetOptions()
+    {
+        $auditoria = new Auditoria(['tipo' => Auditoria::TIPO_ADMINISTRATIVO]);
+        $options = Auditoria::getTipoOptions();
+        $this->assertEquals(Auditoria::getTipoOptions($auditoria->getTipo()), $options[$auditoria->getTipo()]);
+    }
+
+    public function testGetPrioridade()
+    {
+        $auditoria = new Auditoria(['prioridade' => Auditoria::PRIORIDADE_MEDIA]);
+        $options = Auditoria::getPrioridadeOptions();
+        $this->assertEquals(Auditoria::getPrioridadeOptions($auditoria->getPrioridade()), $options[$auditoria->getPrioridade()]);
     }
 
     public function testUpdate()

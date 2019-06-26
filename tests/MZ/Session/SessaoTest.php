@@ -25,6 +25,8 @@
 namespace MZ\Session;
 
 use MZ\Database\DB;
+use MZ\Exception\ValidationException;
+use MZ\Session\MovimentacaoTest;
 
 class SessaoTest extends \MZ\Framework\TestCase
 {
@@ -119,7 +121,7 @@ class SessaoTest extends \MZ\Framework\TestCase
         try {
             $sessao->insert();
             $this->fail('Não deveria ter cadastrado a sessão');
-        } catch (\MZ\Exception\ValidationException $e) {
+        } catch (ValidationException $e) {
             $this->assertEquals(
                 [
                     'datainicio',
@@ -139,7 +141,7 @@ class SessaoTest extends \MZ\Framework\TestCase
             $outra_sessao->setAberta('Y');
             $outra_sessao->insert();
             $this->fail('Não deveria ter cadastrado outra sessão');
-        } catch (\MZ\Exception\ValidationException $e) {
+        } catch (ValidationException $e) {
             $this->assertEquals(
                 [
                     'aberta',
@@ -148,9 +150,7 @@ class SessaoTest extends \MZ\Framework\TestCase
             );
         }
         // fecha para não interferir nos outros testes
-        $sessao->setAberta('N');
-        $sessao->setDataTermino('2016-12-25 13:15:00');
-        $sessao->update();
+        self::close($sessao);
     }
 
     public function testUpdate()
@@ -163,9 +163,7 @@ class SessaoTest extends \MZ\Framework\TestCase
         $found_sessao = Sessao::findByID($sessao->getID());
         $this->assertEquals($sessao, $found_sessao);
         // fecha para não interferir nos outros testes
-        $sessao->setAberta('N');
-        $sessao->setDataTermino('2016-12-25 13:15:00');
-        $sessao->update();
+        self::close($sessao);
     }
 
     public function testDelete()
@@ -190,9 +188,7 @@ class SessaoTest extends \MZ\Framework\TestCase
         $sessao->setAberta('Y');
         $sessao->insert();
         // fecha para não interferir nos outros testes
-        $sessao->setAberta('N');
-        $sessao->setDataTermino('2016-12-25 13:15:00');
-        $sessao->update();
+        self::close($sessao);
         $found_sessao = Sessao::findByID($sessao->getID());
         $this->assertEquals($sessao, $found_sessao);
 
@@ -201,14 +197,95 @@ class SessaoTest extends \MZ\Framework\TestCase
         $sessao_sec->setAberta('Y');
         $sessao_sec->insert();
         // fecha para não interferir nos outros testes
-        $sessao_sec->setAberta('N');
-        $sessao_sec->setDataTermino('2016-12-25 13:15:00');
-        $sessao_sec->update();
+        self::close($sessao);
 
         $sessoes = Sessao::findAll(['datainicio' => '2016-11-25 12:15:00'], [], 2, 0);
         $this->assertEquals([$sessao, $sessao_sec], $sessoes);
 
         $count = Sessao::count(['datainicio' => '2016-11-25 12:15:00']);
         $this->assertEquals(2, $count);
+        self::close($sessao);
     }
+
+    public function testDtTerminoInvalid()
+    {
+        $sessao = self::build();
+        $sessao->setDataTermino(DB::now());
+        try {
+            $sessao->insert();
+            $this->fail('Não salvar com sessão aberta e data termino informada');
+        } catch (ValidationException $e) {
+            $this->assertEquals(['datatermino', 'aberta'], array_keys($e->getErrors()));
+        }
+    }
+
+    public function testAddSessaoAbertaInvalid()
+    {
+        $sessao = self::build();
+        $sessao->setAberta('T');
+        $sessao->setDataTermino(DB::now());
+        try {
+            $sessao->insert();
+            $this->fail('Valor para aberta invalido');
+        } catch (ValidationException $e) {
+            $this->assertEquals(['aberta'], array_keys($e->getErrors()));
+        }
+        //-------!$this->isAberta() && $count > 0
+        $movimentacao = MovimentacaoTest::create();
+
+        $sessao = $movimentacao->findSessaoID();
+        $sessao->setAberta('N');
+        $sessao->setDataTermino(DB::now());
+        try {
+            $sessao->update();
+            $this->fail('Sessão em uso em uma movimentação');
+        } catch (ValidationException $e) {
+            $this->assertEquals(['aberta'], array_keys($e->getErrors()));
+        }
+        MovimentacaoTest::close($movimentacao);
+    }
+
+    public function testReabrirSessao()
+    {
+        $sessao = self::create();
+        self::close($sessao);
+        try {
+            $sessao->setDataTermino(null);
+            $sessao->setAberta('Y');
+            $sessao->update();
+            $this->fail('Não reabrir uma sessão fechada');
+        } catch (ValidationException $e) {
+            $this->assertEquals(['datatermino', 'aberta'], array_keys($e->getErrors()));
+        }
+    }
+
+    public function testDtInicio()
+    {
+        $sessao = self::create();
+        try {
+            $sessao->setDataInicio(DB::now());
+            $sessao->update();
+            $this->fail('Não alterar a data de abertura da sessão');
+        } catch (ValidationException $e) {
+            $this->assertEquals(['datainicio'], array_keys($e->getErrors()));
+        }
+        $sessaoClose = Sessao::find(['id' => $sessao->getID()]);
+        self::close($sessaoClose);
+    }
+
+    public function testFindLastAberta()
+    {
+        $sessao = self::create();
+        $lastSessao = Sessao::findLastAberta();
+        $this->assertInstanceOf(get_class($sessao), $lastSessao);
+        self::close($sessao);
+        self::close($lastSessao);
+    }
+
+    public function testFindAbertaInvalid()
+    {
+        $this->expectException("\Exception");
+        Sessao::findByAberta(true);
+    }
+
 }

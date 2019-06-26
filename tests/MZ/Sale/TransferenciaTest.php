@@ -31,6 +31,7 @@ use MZ\Sale\Pedido;
 use MZ\Provider\PrestadorTest;
 use MZ\Session\MovimentacaoTest;
 use MZ\Exception\ValidationException;
+use MZ\Session\Movimentacao;
 
 class TransferenciaTest extends \MZ\Framework\TestCase
 {
@@ -77,6 +78,7 @@ class TransferenciaTest extends \MZ\Framework\TestCase
         list($found_transferencia) = Transferencia::findAll($condition, [], 1);
         $this->assertEquals($transferencia, $found_transferencia);
         $this->assertEquals(1, Transferencia::count($condition));
+
         $pedido = $transferencia->findPedidoID();
         $pedido_destino = $transferencia->findDestinoPedidoID();
         PedidoTest::close($pedido);
@@ -101,11 +103,16 @@ class TransferenciaTest extends \MZ\Framework\TestCase
     {
         $movimentacao = MovimentacaoTest::create();
         $transferencia = self::build();
+        $pedido_destino = $transferencia->findDestinoPedidoID();
+        $pedido = $transferencia->findPedidoID();
+        PedidoTest::close($pedido_destino);
+        PedidoTest::close($pedido);
         $transferencia->setPedidoID(null);
         $transferencia->setDestinoPedidoID(null);
         $transferencia->setTipo('Teste');
         $transferencia->setModulo('Teste');
         $transferencia->setPrestadorID(null);
+
         try {
             $transferencia->insert();
             $this->fail('Valores nulos');
@@ -115,13 +122,18 @@ class TransferenciaTest extends \MZ\Framework\TestCase
                 array_keys($e->getErrors())
             );
         }
-        //-------------Pedido cancelado
+        MovimentacaoTest::close($movimentacao);
+    }
+
+    public function testAddCancelado()
+    {
+        $movimentacao = MovimentacaoTest::create();
         $transferencia = self::build();
-        $pedido = PedidoTest::create();
+
+        $pedido = $transferencia->findPedidoID();
         $pedido->setCancelado('Y');
         $pedido->update();
         $transferencia->setPedidoID($pedido->getID());
-        $transferencia->setDestinoPedidoID($pedido->getID());
         $transferencia->setModulo(Transferencia::MODULO_MESA);
         $transferencia->setMesaID(null);
         $transferencia->setDestinoMesaID(null);
@@ -131,19 +143,19 @@ class TransferenciaTest extends \MZ\Framework\TestCase
             $transferencia->insert();
             $this->fail('Pedido cancelado');
         } catch (ValidationException $e) {
-            $this->assertEquals(['pedidoid', 'destinopedidoid', 'mesaid', 'destinomesaid', 'comandaid', 'destinocomandaid'], array_keys($e->getErrors()));
+            $this->assertEquals(['pedidoid', 'mesaid', 'destinomesaid', 'comandaid', 'destinocomandaid'], array_keys($e->getErrors()));
         }
-        //------------Pedido finalizado
+        $pedido_destino = $transferencia->findDestinoPedidoID();
+        PedidoTest::close($pedido_destino);
+        MovimentacaoTest::close($movimentacao);
+    }
+
+    public function testAddFinalido()
+    {
+        $movimentacao = MovimentacaoTest::create();
         $transferencia = self::build();
-        $pedido = PedidoTest::create();
-        $pedido->setCancelado('N');
-        $item = ItemTest::build();
-        $item->setPedidoID($pedido->getID());
-        $item->insert();
-        $pedido->setEstado(Pedido::ESTADO_FINALIZADO);
-        $pedido->update();
-        $transferencia->setPedidoID($pedido->getID());
-        $transferencia->setDestinoPedidoID($pedido->getID());
+        $pedido = $transferencia->findPedidoID();
+        PedidoTest::close($pedido);
         $transferencia->setModulo(Transferencia::MODULO_COMANDA);
         $transferencia->setMesaID(2);
         $transferencia->setDestinoMesaID(2);
@@ -153,9 +165,17 @@ class TransferenciaTest extends \MZ\Framework\TestCase
             $transferencia->insert();
             $this->fail('Pedido cancelado');
         } catch (ValidationException $e) {
-            $this->assertEquals(['pedidoid', 'destinopedidoid', 'mesaid', 'destinomesaid', 'comandaid', 'destinocomandaid'], array_keys($e->getErrors()));
+            $this->assertEquals(['pedidoid', 'mesaid', 'destinomesaid', 'comandaid', 'destinocomandaid'], array_keys($e->getErrors()));
         }
-        //-----------
+        $pedido_destino = $transferencia->findDestinoPedidoID();
+        PedidoTest::close($pedido_destino);
+        MovimentacaoTest::close($movimentacao);
+
+    }
+
+    public function testAddSemProduto()
+    {
+        $movimentacao = MovimentacaoTest::create();
         $transferencia = self::build();
         $transferencia->setTipo(Transferencia::TIPO_PRODUTO);
         try {
@@ -164,7 +184,9 @@ class TransferenciaTest extends \MZ\Framework\TestCase
         } catch (ValidationException $e) {
             $this->assertEquals(['itemid'], array_keys($e->getErrors()));
         }
-
+        $pedido_destino = $transferencia->findDestinoPedidoID();
+        $pedido = $transferencia->findPedidoID();
+        PedidoTest::close($pedido_destino);
         PedidoTest::close($pedido);
         MovimentacaoTest::close($movimentacao);
     }
@@ -191,6 +213,12 @@ class TransferenciaTest extends \MZ\Framework\TestCase
 
         $prestador = $transferencia->findPrestadorID();
         $this->assertEquals($transferencia->getPrestadorID(), $prestador->getID());
+
+        $pedido = $transferencia->findPedidoID();
+        $pedido_destino = $transferencia->findDestinoPedidoID();
+        PedidoTest::close($pedido);
+        PedidoTest::close($pedido_destino);
+        MovimentacaoTest::close($movimentacao);
     }
 
     public function testGetOptions()
@@ -202,6 +230,12 @@ class TransferenciaTest extends \MZ\Framework\TestCase
 
         $options = Transferencia::getModuloOptions($transferencia->getModulo());
         $this->assertEquals($transferencia->getModulo(), $options);
+        
+        $pedido = $transferencia->findPedidoID();
+        $pedido_destino = $transferencia->findDestinoPedidoID();
+        PedidoTest::close($pedido);
+        PedidoTest::close($pedido_destino);
+        MovimentacaoTest::close($movimentacao);
     }
 
     public function testUpdate()

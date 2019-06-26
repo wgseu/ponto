@@ -43,10 +43,44 @@ class CartaoApiControllerTest extends \MZ\Framework\TestCase
         $this->assertEquals($expected, \array_intersect_key($result, $expected));
     }
 
+    // public function testFetchAssociation()
+    // {
+    //     AuthenticationTest::authProvider([Permissao::NOME_SISTEMA, Permissao::NOME_CADASTROCARTOES]);
+    //     $cartao = CartaoTest::create();
+    //     $name = 'ifood';
+    //     $expected = [
+    //         'status' => 'ok',
+    //         'items' => [
+    //             $cartao->publish(app()->auth->provider),
+    //         ],
+    //     ];
+    //     $result = $this->get('/api/cartoes/association/', ['name' => $name]);
+    //     $this->assertEquals($expected, \array_intersect_key($result, $expected));
+    // }
+
+    // public function testAssociate()
+    // {
+    //     AuthenticationTest::authProvider([Permissao::NOME_SISTEMA, Permissao::NOME_CADASTROCARTOES]);
+    //     $cartao = CartaoTest::create();
+    //     $name = 'ifood';
+    //     $expected = [
+    //         'status' => 'ok',
+    //         'items' => [
+    //             $cartao->publish(app()->auth->provider),
+    //         ],
+    //     ];
+    //     $result = $this->patch('/api/cartoes/associate/', ['name' => $name]);
+    //     $this->assertEquals($expected, \array_intersect_key($result, $expected));
+    // }
+
     public function testAdd()
     {
         AuthenticationTest::authProvider([Permissao::NOME_SISTEMA, Permissao::NOME_CADASTROCARTOES]);
         $cartao = CartaoTest::build();
+        $cartao->setAtivo('N');
+        $this->assertFalse($cartao->isAtivo());
+        $this->assertEquals($cartao->toArray(), (new Cartao($cartao))->toArray());
+        $this->assertEquals((new Cartao())->toArray(), (new Cartao(1))->toArray());
         $expected = [
             'status' => 'ok',
             'item' => $cartao->publish(app()->auth->provider),
@@ -55,6 +89,7 @@ class CartaoApiControllerTest extends \MZ\Framework\TestCase
         $expected['item']['id'] = $result['item']['id'] ?? null;
         $this->assertEquals($expected, \array_intersect_key($result, $expected));
     }
+
 
     public function testUpdate()
     {

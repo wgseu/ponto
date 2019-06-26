@@ -27,16 +27,16 @@ namespace MZ\Sale;
 use MZ\Sale\PedidoTest;
 use MZ\Session\CaixaTest;
 use MZ\Session\MovimentacaoTest;
+use MZ\Session\Movimentacao;
 
 class ComandaTest extends \MZ\Framework\TestCase
 {
     public static function build($nome = null)
     {
-        $last = Comanda::find([], ['id' => -1]);
-        $id = $last->getID() + 1;
         $comanda = new Comanda();
-        $comanda->setNumero($id);
-        $comanda->setNome($nome ?: "Comanda {$id}");
+        $comanda->loadNextNumero();
+        $numero = $comanda->getNumero();
+        $comanda->setNome($nome ?: "Comanda {$numero}");
         $comanda->setAtiva('Y');
         return $comanda;
     }
@@ -145,6 +145,8 @@ class ComandaTest extends \MZ\Framework\TestCase
         } catch (\MZ\Exception\ValidationException $e) {
             $this->assertEquals(['ativa'], array_keys($e->getErrors()));
         }
+        PedidoTest::close($pedido);
+        MovimentacaoTest::close($movimentacao);
     }
 
     public function testDelete()

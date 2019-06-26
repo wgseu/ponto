@@ -74,6 +74,9 @@ class ImpressoraTest extends \MZ\Framework\TestCase
         list($found_impressora) = Impressora::findAll($condition, [], 1);
         $this->assertEquals($impressora, $found_impressora);
         $this->assertEquals(1, Impressora::count($condition));
+        $dispositivo = $impressora->findDispositivoID();
+        $impressora->delete();
+        $dispositivo->delete();
     }
 
     public function testFinds()
@@ -91,6 +94,10 @@ class ImpressoraTest extends \MZ\Framework\TestCase
 
         $impreByDispo = $impressora->findByDispositivoIDDescricao($dispositivo->getID(), $impressora->getDescricao());
         $this->assertInstanceOf(get_class($impressora), $impreByDispo);
+
+        $dispositivo = $impressora->findDispositivoID();
+        $impressora->delete();
+        $dispositivo->delete();
     }
 
     public function testAdd()
@@ -98,11 +105,15 @@ class ImpressoraTest extends \MZ\Framework\TestCase
         $impressora = self::build();
         $impressora->insert();
         $this->assertTrue($impressora->exists());
+        $dispositivo = $impressora->findDispositivoID();
+        $impressora->delete();
+        $dispositivo->delete();
     }
 
     public function testAddInvalid()
     {
         $impressora = self::build();
+        $dispositivo = $impressora->findDispositivoID();
         $impressora->setSetorID(null);
         $impressora->setNome(null);
         $impressora->setDescricao(null);
@@ -114,21 +125,31 @@ class ImpressoraTest extends \MZ\Framework\TestCase
             $impressora->insert();
             $this->fail('Não cadastrar valores nulos');
         } catch (ValidationException $e) {
-            $this->assertEquals(['setorid', 'nome', 'descricao', 'modo', 'opcoes', 'colunas', 'avanco'], 
-            array_keys($e->getErrors()));
+            $this->assertEquals(
+                ['setorid', 'nome', 'descricao', 'modo', 'opcoes', 'colunas', 'avanco'],
+                array_keys($e->getErrors())
+            );
         }
+        $dispositivo->delete();
     }
 
     public function testTranslate()
     {
-        $impressora = self::build();
-        $impressora->setDescricao('Teste');
-        $impressora->setSetorID(1);
-        $impressora->setDispositivoID(1);
-        $impressora->setModo(Impressora::MODO_TERMINAL);
-        $this->expectException('\Exception');
-        $impressora->insert();
-
+        $impressora = self::create();
+        try {
+            $impressora->setDescricao('Pega fogo impressora');
+            $impressora->insert();
+            $this->fail('Fk duplicada');
+        } catch (ValidationException $e) {
+            $this->assertEquals(['setorid', 'dispositivoid', 'modo'], array_keys($e->getErrors()));
+        }
+        //--------------------
+        $impressora = self::create();
+        try {
+            $impressora->insert();
+        } catch (ValidationException $e) {
+            $this->assertEquals(['dispositivoid', 'descricao'], array_keys($e->getErrors()));
+        }
     }
 
     public function testGetModoOptions()
@@ -136,6 +157,9 @@ class ImpressoraTest extends \MZ\Framework\TestCase
         $impressora = self::create();
         $options = Impressora::getModoOptions($impressora->getModo());
         $this->assertEquals($impressora->getModo(), $options);
+        $dispositivo = $impressora->findDispositivoID();
+        $impressora->delete();
+        $dispositivo->delete();
     }
 
     public function testGetModelo()
@@ -146,6 +170,10 @@ class ImpressoraTest extends \MZ\Framework\TestCase
 
         $modelo = $impressora->getModelo();
         $this->assertEquals('CMP-20', $modelo);
+
+        $dispositivo = $impressora->findDispositivoID();
+        $impressora->delete();
+        $dispositivo->delete();
         //--------
         $impressora = self::build();
         $impressora->setDriver('Dataregis');
@@ -153,6 +181,10 @@ class ImpressoraTest extends \MZ\Framework\TestCase
 
         $modelo = $impressora->getModelo();
         $this->assertEquals('VOX', $modelo);
+
+        $dispositivo = $impressora->findDispositivoID();
+        $impressora->delete();
+        $dispositivo->delete();
         //------------
         $impressora = self::build();
         $impressora->setDriver('Bematech');
@@ -160,6 +192,10 @@ class ImpressoraTest extends \MZ\Framework\TestCase
 
         $modelo = $impressora->getModelo();
         $this->assertEquals('MP-4200 TH', $modelo);
+
+        $dispositivo = $impressora->findDispositivoID();
+        $impressora->delete();
+        $dispositivo->delete();
         //---------
         $impressora = self::build();
         $impressora->setDriver('Daruma');
@@ -167,6 +203,10 @@ class ImpressoraTest extends \MZ\Framework\TestCase
 
         $modelo = $impressora->getModelo();
         $this->assertEquals('DR700', $modelo);
+
+        $dispositivo = $impressora->findDispositivoID();
+        $impressora->delete();
+        $dispositivo->delete();
         //---------
         $impressora = self::build();
         $impressora->setDriver('Diebold');
@@ -174,6 +214,10 @@ class ImpressoraTest extends \MZ\Framework\TestCase
 
         $modelo = $impressora->getModelo();
         $this->assertEquals('IM453', $modelo);
+
+        $dispositivo = $impressora->findDispositivoID();
+        $impressora->delete();
+        $dispositivo->delete();
         //---------
         $impressora = self::build();
         $impressora->setDriver('PertoPrinter');
@@ -181,6 +225,14 @@ class ImpressoraTest extends \MZ\Framework\TestCase
 
         $modelo = $impressora->getModelo();
         $this->assertEquals('PertoPrinter', $modelo);
+
+        $impressoras = Impressora::findAll();
+        for ($i=0; $i < count($impressoras); $i++) {
+            $impressora = $impressoras[$i];
+            $dispositivo = $impressora->findDispositivoID();
+            $impressora->delete();
+            $dispositivo->delete();
+        }
     }
 
     public function testUpdate()
@@ -188,6 +240,9 @@ class ImpressoraTest extends \MZ\Framework\TestCase
         $impressora = self::create();
         $impressora->update();
         $this->assertTrue($impressora->exists());
+        $dispositivo = $impressora->findDispositivoID();
+        $impressora->delete();
+        $dispositivo->delete();
     }
 
     public function testDelete()

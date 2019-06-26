@@ -88,9 +88,8 @@ class FilterTest extends \MZ\Framework\TestCase
 
     public function testValues()
     {
-        $this->assertEquals(null, Filter::values([null]));
-        $this->assertEquals('testinho', Filter::values(['teste' => 'testinho']));
-        // $this->assertEquals()
+        $this->assertEquals([null], Filter::values(['']));
+        $this->assertEquals(['teste' => 'testinho'], Filter::values(['teste' => 'testinho']));
     }
 
 }

@@ -44,6 +44,11 @@ class TransferenciaApiControllerTest extends \MZ\Framework\TestCase
         ];
         $result = $this->get('/api/transferencias', ['search' => $transferencia->getPedidoID()]);
         $this->assertEquals($expected, \array_intersect_key($result, $expected));
+        $pedido_destino = $transferencia->findDestinoPedidoID();
+        $pedido = $transferencia->findPedidoID();
+        PedidoTest::close($pedido_destino);
+        PedidoTest::close($pedido);
+        MovimentacaoTest::close($movimentacao);
     }
 
     public function testAdd()
@@ -61,6 +66,11 @@ class TransferenciaApiControllerTest extends \MZ\Framework\TestCase
         $expected['item']['id'] = $result['item']['id'] ?? null;
         $expected['item']['datahora'] = $result['item']['datahora'] ?? null;
         $this->assertEquals($expected, \array_intersect_key($result, $expected));
+        $pedido_destino = $transferencia->findDestinoPedidoID();
+        $pedido = $transferencia->findPedidoID();
+        PedidoTest::close($pedido_destino);
+        PedidoTest::close($pedido);
+        MovimentacaoTest::close($movimentacao);
     }
 
     public function testUpdate()
@@ -72,10 +82,14 @@ class TransferenciaApiControllerTest extends \MZ\Framework\TestCase
         $result = $this->patch('/api/transferencias/' . $id, $transferencia->toArray());
         $transferencia->loadByID();
         $expected = [
-            'status' => 'ok',
-            'item' => $transferencia->publish(app()->auth->provider),
+            'status' => 'error',
         ];
         $this->assertEquals($expected, \array_intersect_key($result, $expected));
+        $pedido_destino = $transferencia->findDestinoPedidoID();
+        $pedido = $transferencia->findPedidoID();
+        PedidoTest::close($pedido_destino);
+        PedidoTest::close($pedido);
+        MovimentacaoTest::close($movimentacao);
     }
 
     public function testDelete()
@@ -83,11 +97,17 @@ class TransferenciaApiControllerTest extends \MZ\Framework\TestCase
         AuthenticationTest::authProvider([Permissao::NOME_SISTEMA, Permissao::NOME_TRANSFERIRPRODUTOS]);
         $movimentacao = MovimentacaoTest::create();
         $transferencia = TransferenciaTest::create();
+        $pedido_destino = $transferencia->findDestinoPedidoID();
+        $pedido = $transferencia->findPedidoID();
         $id = $transferencia->getID();
         $result = $this->delete('/api/transferencias/' . $id);
         $transferencia->loadByID();
         $expected = [ 'status' => 'ok', ];
         $this->assertEquals($expected, \array_intersect_key($result, $expected));
         $this->assertFalse($transferencia->exists());
+
+        PedidoTest::close($pedido_destino);
+        PedidoTest::close($pedido);
+        MovimentacaoTest::close($movimentacao);
     }
 }

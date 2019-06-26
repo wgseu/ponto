@@ -24,19 +24,132 @@
  */
 namespace MZ\Session;
 
+use MZ\Session\MovimentacaoTest;
+use MZ\Exception\ValidationException;
+
 class ResumoTest extends \MZ\Framework\TestCase
 {
-    public function testPublish()
+    /**
+     * Build a valid resumo
+     * @return Resumo
+     */
+    public static function build()
     {
+        $last = Resumo::find([], ['id' => -1]);
+        $id = $last->getID() + 1;
+        $movimentacao = MovimentacaoTest::create();
         $resumo = new Resumo();
-        $values = $resumo->publish(app()->auth->provider);
-        $allowed = [
-            'id',
-            'movimentacaoid',
-            'tipo',
-            'cartaoid',
-            'valor',
-        ];
-        $this->assertEquals($allowed, array_keys($values));
+        $resumo->setMovimentacaoID($movimentacao->getID());
+        $resumo->setTipo(Resumo::TIPO_DINHEIRO);
+        $resumo->setValor(12.3);
+        return $resumo;
+    }
+
+    /**
+     * Create a resumo on database
+     * @return Resumo
+     */
+    public static function create()
+    {
+        $resumo = self::build();
+        $resumo->insert();
+        return $resumo;
+    }
+
+    public function testFind()
+    {
+        $resumo = self::create();
+        $condition = ['movimentacaoid' => $resumo->getMovimentacaoID()];
+        $found_resumo = Resumo::find($condition);
+        $this->assertEquals($resumo, $found_resumo);
+        list($found_resumo) = Resumo::findAll($condition, [], 1);
+        $this->assertEquals($resumo, $found_resumo);
+        $this->assertEquals(1, Resumo::count($condition));
+        $movimentacao = $resumo->findMovimentacaoID();
+        MovimentacaoTest::close($movimentacao);
+    }
+
+    public function testAdd()
+    {
+        $resumo = self::build();
+        $resumo->insert();
+        $this->assertTrue($resumo->exists());
+        $movimentacao = $resumo->findMovimentacaoID();
+        MovimentacaoTest::close($movimentacao);
+    }
+
+    public function testAddInvalid()
+    {
+        $resumo = self::build();
+        $movimentacao = $resumo->findMovimentacaoID();
+        $resumo->setMovimentacaoID(null);
+        $resumo->setTipo('Tipo inválido');
+        $resumo->setValor(null);
+        try {
+            $resumo->insert();
+            $this->fail('Não cadastrar com valores inválidos');
+        } catch (ValidationException $e) {
+            $this->assertEquals(['movimentacaoid', 'tipo', 'valor'], array_keys($e->getErrors()));
+        }
+        MovimentacaoTest::close($movimentacao);
+    }
+
+    public function testTranslate()
+    {
+        $resumo = self::build();
+        $resumo->setCartaoID(2);
+        $resumo->insert();
+        try {
+            $resumo->insert();
+            $this->fail('Fk duplicada');
+        } catch (ValidationException $e) {
+            $this->assertEquals(['movimentacaoid', 'tipo', 'cartaoid'], array_keys($e->getErrors()));
+        }
+        $movimentacao = $resumo->findMovimentacaoID();
+        MovimentacaoTest::close($movimentacao);
+    }
+
+    public function testFinds()
+    {
+        $resumo = self::build();
+        $resumo->setCartaoID(2);
+        $resumo->insert();
+
+        $movimentacao = $resumo->findMovimentacaoID();
+        $this->assertEquals($resumo->getMovimentacaoID(), $movimentacao->getID());
+
+        $cartao = $resumo->findCartaoID();
+        $this->assertEquals($resumo->getCartaoID(), $cartao->getID());
+
+        $resumoFound = Resumo::findByMovimentacaoIDTipoCartaoID($movimentacao->getID(), $resumo->getTipo(), $cartao->getID());
+        $this->assertInstanceOf(get_class($resumo), $resumoFound);
+        $movimentacao = $resumo->findMovimentacaoID();
+        MovimentacaoTest::close($movimentacao);
+    }
+
+    public function testGetTipo()
+    {
+        $resumo = new Resumo(['tipo' => Resumo::TIPO_VALE]);
+        $options = Resumo::getTipoOptions();
+        $this->assertEquals(Resumo::getTipoOptions($resumo->getTipo()), $options[$resumo->getTipo()]);
+    }
+
+    public function testUpdate()
+    {
+        $resumo = self::create();
+        $resumo->update();
+        $this->assertTrue($resumo->exists());
+        $movimentacao = $resumo->findMovimentacaoID();
+        MovimentacaoTest::close($movimentacao);
+    }
+
+    public function testDelete()
+    {
+        $resumo = self::create();
+        $movimentacao = $resumo->findMovimentacaoID();
+        $resumo->delete();
+        $resumo->loadByID();
+        $this->assertFalse($resumo->exists());
+        MovimentacaoTest::close($movimentacao);
     }
 }

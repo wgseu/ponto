@@ -25,8 +25,12 @@
 namespace MZ\Stock;
 
 use MZ\Product\ProdutoTest;
+use MZ\Product\Produto;
 use MZ\Environment\SetorTest;
 use MZ\Provider\PrestadorTest;
+use MZ\Exception\ValidationException;
+use MZ\Product\ComposicaoTest;
+use MZ\Product\Composicao;
 
 class EstoqueTest extends \MZ\Framework\TestCase
 {
@@ -89,4 +93,168 @@ class EstoqueTest extends \MZ\Framework\TestCase
         ];
         $this->assertEquals($allowed, array_keys($values));
     }
+
+    public function testFinds()
+    {
+        $estoque = self::create();
+
+        $requisito = $estoque->findRequisitoID();
+        $this->assertEquals($estoque->getRequisitoID(), $requisito->getID());
+
+        $transacao = $estoque->findTransacaoID();
+        $this->assertEquals($estoque->getTransacaoID(), $transacao->getID());
+
+        $entrada = $estoque->findEntradaID();
+        $this->assertEquals($estoque->getEntradaID(), $entrada->getID());
+
+        $fornecedor = $estoque->findFornecedorID();
+        $this->assertEquals($estoque->getFornecedorID(), $fornecedor->getID());
+
+        $setor = $estoque->findSetorID();
+        $this->assertEquals($estoque->getSetorID(), $setor->getID());
+
+        $prestador = $estoque->findPrestadorID();
+        $this->assertEquals($estoque->getPrestadorID(), $prestador->getID());
+
+        $est = $estoque->findAvailableEntry();
+        $this->assertInstanceOf(get_class($estoque), $est);
+    }
+
+    public function testAddInvalid()
+    {
+        $estoque = self::build();
+        $estoque->setProdutoID(null);
+        $estoque->setSetorID(null);
+        $estoque->setPrestadorID(null);
+        $estoque->setTipoMovimento('Teste');
+        $estoque->setQuantidade(null);
+        $estoque->setPrecoCompra(null);
+        $estoque->setCancelado('E');
+        try {
+            $estoque->insert();
+            $this->fail('Não cadastrar valores nulos');
+        } catch (ValidationException $e) {
+            $this->assertEquals(['produtoid', 'setorid', 'prestadorid', 'tipomovimento', 'quantidade',
+            'precocompra', 'cancelado'], array_keys($e->getErrors()));
+        }
+        //----------------------------
+        $produto = ProdutoTest::build();
+        $produto->setTipo('Composicao');
+        $produto->insert();
+        $estoque = self::build();
+        $estoque->setQuantidade(0);
+        $estoque->setProdutoID($produto->getID());
+        try {
+            $estoque->insert();
+            $this->fail('Tipo diferente de produto');
+        } catch (ValidationException $e) {
+            $this->assertEquals(['produtoid', 'quantidade'], array_keys($e->getErrors()));
+        }
+        //-----------------------------
+        $produto = ProdutoTest::build();
+        $produto->setDivisivel('N');
+        $produto->insert();
+        $estoque = self::build();
+        $estoque->setQuantidade(2.5);
+        $estoque->setProdutoID($produto->getID());
+        try {
+            $estoque->insert();
+            $this->fail('O produto não é divisivel');
+        } catch (ValidationException $e) {
+            $this->assertEquals(['produtoid'], array_keys($e->getErrors()));
+        }
+        //---------------------------
+        $estoque = self::build();
+        $estoque->setTipoMovimento(Estoque::TIPO_MOVIMENTO_ENTRADA);
+        $estoque->setQuantidade(-9);
+        try {
+            $estoque->insert();
+            $this->fail('Não dar entrada no estoque com valor negativo');
+        } catch (ValidationException $e) {
+            $this->assertEquals(['quantidade'], array_keys($e->getErrors()));
+        }
+        //---------------------------
+        $estoque = self::build();
+        $estoque->setTransacaoID(1);
+        $estoque->setQuantidade(10);
+        try {
+            $estoque->insert();
+            $this->fail('Venda não pode add produto ao estoque');
+        } catch (ValidationException $e) {
+            $this->assertEquals(['quantidade'], array_keys($e->getErrors()));
+        }
+        //-----------------
+        $estoque = self::build();
+        $estoque->setCancelado('Y');
+        try {
+            $estoque->insert();
+            $this->fail('Estoque já cancelado');
+        } catch (ValidationException $e) {
+            $this->assertEquals(['cancelado'], array_keys($e->getErrors()));
+        }
+    }
+
+    public function testUpdateInvalid()
+    {
+        $estoque = self::build();
+        $estoque->insert();
+        $estoque->setCancelado('Y');
+        $estoque->update();
+        try {
+            $estoque->update();
+            $this->fail('Estoque já cancelado');
+        } catch (ValidationException $e) {
+            $this->assertEquals(['cancelado'], array_keys($e->getErrors()));
+        }
+        //---------------
+    }
+
+    public function testGetMovimentoOptions()
+    {
+        $estoque = self::create();
+        $options = Estoque::getTipoMovimentoOptions($estoque->getTipoMovimento());
+        $this->assertEquals($estoque->getTipoMovimento(), $options);
+    }
+
+    public function testGetUltimoPrecoCompra()
+    {
+        $estoque = self::create();
+        $estoque1 = self::create();
+
+        $valor = Estoque::getUltimoPrecoCompra($estoque1->getProdutoID());
+        $this->assertEquals($estoque1->getPrecoCompra(), $valor);
+    }
+
+    public function testCancelar()
+    {
+        $estoque = self::create();
+        $estoque->cancelar();
+        $this->assertTrue($estoque->isCancelado());
+    }
+
+    public function testRetirar()
+    {
+        //------Setor de estoque onde retirar o produto
+        $setorEstoque = SetorTest::build();
+        $setorEstoque->setNome('Setor Estoque');
+        $setorEstoque->insert();
+        //-----
+
+        //-----Retirar do Estoque TIPO_PRODUTO
+        $produto = ProdutoTest::build();
+        $produto->setTipo(Produto::TIPO_PRODUTO);
+        $produto->setAbreviacao('Teste');
+        $produto->setSetorEstoqueID($setorEstoque->getID());
+        $produto->insert();
+        //--- Cadastrar mais desse produto Teste
+        $estoqueTeste = self::build();
+        $estoqueTeste->setProdutoID($produto->getID());
+        $estoqueTeste->setQuantidade(30.);
+        $estoqueTeste->setSetorID($setorEstoque->getID());
+        $estoqueTeste->insert();
+        //------------
+        $testeRet = $estoqueTeste->retirar([]);
+        $this->assertFalse($estoqueTeste->isCancelado());
+    }
+
 }

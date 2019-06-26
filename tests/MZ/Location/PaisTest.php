@@ -107,7 +107,7 @@ class PaisTest extends \MZ\Framework\TestCase
         try {
             $pais->insert();
             $this->fail('não cadastrar com valores nulos');
-        } catch (Validation $e) {
+        } catch (ValidationException $e) {
             $this->assertEquals(
                 ['nome', 'sigla', 'codigo', 'moedaid', 'idioma', 'unitario'],
                 array_keys($e->getErrors())

@@ -22,18 +22,36 @@
  *
  * @author Equipe GrandChef <desenvolvimento@mzsw.com.br>
  */
-namespace MZ\System;
+namespace MZ\Session;
 
 use MZ\System\Permissao;
-use MZ\Account\AuthenticationTest;
+use MZ\Util\Filter;
 
-class AuditoriaPageControllerTest extends \MZ\Framework\TestCase
+/**
+ * Sessão de trabalho do dia, permite que vários caixas sejam abertos
+ * utilizando uma mesma sessão
+ */
+class SessaoApiController extends \MZ\Core\ApiController
 {
-    public function testFind()
+    /**
+     * Find all Sessões
+     * @Get("/api/sessoes", name="api_sessao_find")
+     */
+    public function find()
     {
-        AuthenticationTest::authProvider([Permissao::NOME_SISTEMA, Permissao::NOME_RELATORIOAUDITORIA]);
-        $auditoria = AuditoriaTest::create();
-        $result = $this->get('/gerenciar/auditoria/', ['search' => $auditoria->getDescricao()]);
-        $this->assertEquals(200, $result->getStatusCode());
+        $this->needPermission([Permissao::NOME_ABRIRCAIXA]);
+        $limit = max(1, min(100, $this->getRequest()->query->getInt('limit', 10)));
+        $page = max(1, $this->getRequest()->query->getInt('page', 1));
+        $condition = Filter::query($this->getRequest()->query->all());
+        $order = $this->getRequest()->query->get('order', '');
+        $count = Sessao::count($condition);
+        $pager = new \Pager($count, $limit, $page);
+        $sessoes = Sessao::findAll($condition, $order, $limit, $pager->offset);
+        $itens = [];
+        foreach ($sessoes as $sessao) {
+            $itens[] = $sessao->publish(app()->auth->provider);
+        }
+        return $this->getResponse()->success(['items' => $itens, 'pages' => $pager->pageCount]);
     }
+
 }

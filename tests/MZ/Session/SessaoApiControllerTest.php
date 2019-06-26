@@ -22,31 +22,22 @@
  *
  * @author Equipe GrandChef <desenvolvimento@mzsw.com.br>
  */
-namespace MZ\System;
+namespace MZ\Session;
 
 use MZ\System\Permissao;
 use MZ\Account\AuthenticationTest;
 
-class PaginaPageControllerTest extends \MZ\Framework\TestCase
+class SessaoApiControllerTest extends \MZ\Framework\TestCase
 {
-    public function testIndex()
+    public function testFind()
     {
-        app()->getAuthentication()->logout();
-        $result = $this->get('/');
-        $this->assertEquals(200, $result->getStatusCode());
-    }
-
-    public function testContact()
-    {
-        $result = $this->get('/contato/');
-        $this->assertEquals(200, $result->getStatusCode());
-    }
-
-    public function testSendEmail()
-    {
-        AuthenticationTest::authUser();
-        $data = ['assunto' => 'Assunto', 'mensagem' => 'Mensagem'];
-        $result = $this->post('/contato/', $data, true);
-        $this->assertEquals(200, $result->getStatusCode());
+        AuthenticationTest::authProvider([Permissao::NOME_SISTEMA, Permissao::NOME_ABRIRCAIXA]);
+        $sessao = SessaoTest::create();
+        $expected = [
+            'status' => 'ok',
+        ];
+        $result = $this->get('/api/sessoes', ['search' => $sessao->getID()]);
+        $this->assertEquals($expected, \array_intersect_key($result, $expected));
+        SessaoTest::close($sessao);
     }
 }

@@ -1116,7 +1116,8 @@ class Produto extends SyncModel
         if (!Validator::checkInSet($this->getTipo(), self::getTipoOptions())) {
             $errors['tipo'] = _t('produto.tipo_invalid');
         }
-        if ($this->getTipo() == self::TIPO_PACOTE &&
+        if ($this->exists() &&
+            $this->getTipo() == self::TIPO_PACOTE &&
             Pacote::count(['produtoid' => $this->getID()]) > 0
         ) {
             $errors['tipo'] = _t('produto.tipo_already_packaged');

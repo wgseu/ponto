@@ -22,89 +22,75 @@
  *
  * @author Equipe GrandChef <desenvolvimento@mzsw.com.br>
  */
-namespace MZ\Sale;
+namespace MZ\Session;
 
 use MZ\System\Permissao;
 use MZ\Account\AuthenticationTest;
 use MZ\Session\MovimentacaoTest;
-use MZ\Sale\PedidoTest;
-use MZ\Session\Movimentacao;
 
-class FormacaoApiControllerTest extends \MZ\Framework\TestCase
+class ResumoApiControllerTest extends \MZ\Framework\TestCase
 {
     public function testFind()
     {
-        AuthenticationTest::authProvider([Permissao::NOME_SISTEMA, Permissao::NOME_PAGAMENTO]);
-        $movimentacao = MovimentacaoTest::create();
-        $formacao = FormacaoTest::create();
-
+        AuthenticationTest::authProvider([Permissao::NOME_SISTEMA, Permissao::NOME_CONFERIRCAIXA]);
+        $resumo = ResumoTest::create();
         $expected = [
             'status' => 'ok',
             'items' => [
-                $formacao->publish(app()->auth->provider),
+                $resumo->publish(app()->auth->provider),
             ],
         ];
-        $result = $this->get('/api/formacoes', ['search' => $formacao->getPacoteID()]);
+        $result = $this->get('/api/resumos', ['search' => $resumo->getMovimentacaoID()]);
         $this->assertEquals($expected, \array_intersect_key($result, $expected));
-        $item = $formacao->findItemID();
-        $pedido = $item->findPedidoID();
-        PedidoTest::close($pedido);
+        $movimentacao = $resumo->findMovimentacaoID();
         MovimentacaoTest::close($movimentacao);
     }
 
     public function testAdd()
     {
-        AuthenticationTest::authProvider([Permissao::NOME_SISTEMA, Permissao::NOME_PAGAMENTO]);
-        $movimentacao = MovimentacaoTest::create();
-        $formacao = FormacaoTest::build();
-        $this->assertEquals($formacao->toArray(), (new Formacao($formacao))->toArray());
-        $this->assertEquals((new Formacao())->toArray(), (new Formacao(1))->toArray());
+        AuthenticationTest::authProvider([Permissao::NOME_SISTEMA, Permissao::NOME_CONFERIRCAIXA]);
+        $resumo = ResumoTest::build();
+        $this->assertEquals($resumo->toArray(), (new Resumo($resumo))->toArray());
+        $this->assertEquals((new Resumo())->toArray(), (new Resumo(1))->toArray());
         $expected = [
             'status' => 'ok',
-            'item' => $formacao->publish(app()->auth->provider),
+            'item' => $resumo->publish(app()->auth->provider),
         ];
-        $result = $this->post('/api/formacoes', $formacao->toArray());
+        $result = $this->post('/api/resumos', $resumo->toArray());
         $expected['item']['id'] = $result['item']['id'] ?? null;
         $this->assertEquals($expected, \array_intersect_key($result, $expected));
-        $item = $formacao->findItemID();
-        $pedido = $item->findPedidoID();
-        PedidoTest::close($pedido);
+        $movimentacao = $resumo->findMovimentacaoID();
         MovimentacaoTest::close($movimentacao);
     }
 
     public function testUpdate()
     {
-        AuthenticationTest::authProvider([Permissao::NOME_SISTEMA, Permissao::NOME_PAGAMENTO]);
-        $movimentacao = MovimentacaoTest::create();
-        $formacao = FormacaoTest::create();
-        $id = $formacao->getID();
-        $result = $this->patch('/api/formacoes/' . $id, $formacao->toArray());
-        $formacao->loadByID();
+        AuthenticationTest::authProvider([Permissao::NOME_SISTEMA, Permissao::NOME_CONFERIRCAIXA]);
+        $resumo = ResumoTest::create();
+        $id = $resumo->getID();
+        $result = $this->patch('/api/resumos/' . $id, $resumo->toArray());
+        $resumo->loadByID();
         $expected = [
             'status' => 'ok',
-            'item' => $formacao->publish(app()->auth->provider),
+            'item' => $resumo->publish(app()->auth->provider),
         ];
         $this->assertEquals($expected, \array_intersect_key($result, $expected));
-        $item = $formacao->findItemID();
-        $pedido = $item->findPedidoID();
-        PedidoTest::close($pedido);
+        $movimentacao = $resumo->findMovimentacaoID();
         MovimentacaoTest::close($movimentacao);
     }
 
     public function testDelete()
     {
-        AuthenticationTest::authProvider([Permissao::NOME_SISTEMA, Permissao::NOME_PAGAMENTO]);
-        $movimentacao = MovimentacaoTest::create();
-        $formacao = FormacaoTest::create();
-        $item = $formacao->findItemID();
-        $pedido = $item->findPedidoID();
-        $id = $formacao->getID();
-        $result = $this->delete('/api/formacoes/' . $id);
-        $formacao->loadByID();
+        AuthenticationTest::authProvider([Permissao::NOME_SISTEMA, Permissao::NOME_CONFERIRCAIXA]);
+        $resumo = ResumoTest::create();
+        $movimentacao = $resumo->findMovimentacaoID();
+        $id = $resumo->getID();
+        $result = $this->delete('/api/resumos/' . $id);
+        $resumo->loadByID();
         $expected = [ 'status' => 'ok', ];
         $this->assertEquals($expected, \array_intersect_key($result, $expected));
-        $this->assertFalse($formacao->exists());
-        PedidoTest::close($pedido);
+        $this->assertFalse($resumo->exists());
+
         MovimentacaoTest::close($movimentacao);
     }
 }

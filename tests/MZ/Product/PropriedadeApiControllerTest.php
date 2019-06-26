@@ -33,6 +33,7 @@ class PropriedadeApiControllerTest extends \MZ\Framework\TestCase
     {
         AuthenticationTest::authProvider([Permissao::NOME_SISTEMA, Permissao::NOME_CADASTROPRODUTOS]);
         $propriedade = PropriedadeTest::create();
+
         $expected = [
             'status' => 'ok',
             'items' => [

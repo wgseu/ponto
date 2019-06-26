@@ -29,6 +29,7 @@ use MZ\Account\AuthenticationTest;
 use MZ\Sale\PedidoTest;
 use MZ\Sale\Pedido;
 use MZ\Session\MovimentacaoTest;
+use MZ\Session\Movimentacao;
 
 class MesaApiControllerTest extends \MZ\Framework\TestCase
 {
@@ -56,6 +57,8 @@ class MesaApiControllerTest extends \MZ\Framework\TestCase
 
         $result = $this->get('/api/mesas', ['pedidos' => $pedidos]);
         // $this->assertEquals($expected, \array_intersect_key($result, $expected));
+        PedidoTest::close($pedido);
+        MovimentacaoTest::close($movimentacao);
     }
 
     public function testAdd()

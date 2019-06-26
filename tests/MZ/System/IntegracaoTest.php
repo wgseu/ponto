@@ -24,6 +24,8 @@
  */
 namespace MZ\System;
 
+use MZ\Exception\ValidationException;
+
 class IntegracaoTest extends \MZ\Framework\TestCase
 {
     /**
@@ -65,11 +67,92 @@ class IntegracaoTest extends \MZ\Framework\TestCase
         $this->assertEquals(1, Integracao::count($condition));
     }
 
+    public function testFindByNome()
+    {
+        $integracao = self::create();
+
+        $integracaoFound = Integracao::findByNome($integracao->getNome());
+        $this->assertInstanceOf(get_class($integracao), $integracaoFound);
+    }
+
     public function testAdd()
     {
         $integracao = self::build();
         $integracao->insert();
         $this->assertTrue($integracao->exists());
+    }
+
+    public function testIsAtivo()
+    {
+        $integracao = self::create();
+        $this->assertFalse($integracao->isAtivo());
+        //----------
+        $integracao->setAtivo('Y');
+        $integracao->update();
+        $this->assertTrue($integracao->isAtivo());
+    }
+
+    public function testAddInvalid()
+    {
+        $integracao = self::build();
+        $integracao->setNome(null);
+        $integracao->setAcessoURL(null);
+        $integracao->setAtivo('T');
+        try {
+            $integracao->insert();
+            $this->fail('Não inserir valores nulos');
+        } catch (ValidationException $e) {
+            $this->assertEquals(['nome', 'acessourl', 'ativo'], array_keys($e->getErrors()));
+        }
+    }
+
+    public function testTranslate()
+    {
+        $integracao = self::create();
+        try {
+            $integracao->insert();
+            $this->fail('Fk duplicada');
+        } catch (ValidationException $e) {
+            $this->assertEquals(['acessourl'], array_keys($e->getErrors()));
+        }
+        //-----------
+        $integracao = self::create();
+        try {
+            $integracao->setAcessoURL('testeurl');
+            $integracao->insert();
+            $this->fail('Fk duplicada');
+        } catch (ValidationException $e) {
+            $this->assertEquals(['nome'], array_keys($e->getErrors()));
+        }
+    }
+
+    public function testMakeDataURL()
+    {
+        $integracao = new Integracao();
+        $data = $integracao->makeDataURL(true);
+        $this->assertEquals('/static/doc/.json', $data);
+        $integracao->setAcessoURL('teste');
+        $this->assertEquals('/static/doc/integracao/teste.json', $integracao->makeDataURL());
+    }
+
+    public function testMakeIconeURL()
+    {
+        $integracao = new Integracao();
+        $this->assertEquals('/static/img/integracao.png', $integracao->makeIconeURL(true));
+
+        $integracao->setIconeURL('imagem.png');
+        $this->assertEquals('/static/img/integracao/imagem.png', $integracao->makeIconeURL());
+    }
+
+    public function testClean()
+    {
+        $old = new Integracao();
+        $old->setIconeURL('teste.png');
+
+        $integracao = new Integracao();
+        $integracao->setIconeURL('teste1.png');
+        $integracao->clean($old);
+        $this->assertEquals($old, $integracao);
     }
 
     public function testUpdate()

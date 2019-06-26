@@ -94,13 +94,6 @@ class PropriedadeTest extends \MZ\Framework\TestCase
         $this->assertInstanceOf(get_class($propriedade), $prop);
     }
 
-    public function testAdd()
-    {
-        $propriedade = self::build();
-        $propriedade->insert();
-        $this->assertTrue($propriedade->exists());
-    }
-
     public function testAddInvalid()
     {
         $propriedade = self::build();
@@ -125,13 +118,6 @@ class PropriedadeTest extends \MZ\Framework\TestCase
         }
     }
 
-    public function testUpdate()
-    {
-        $propriedade = self::create();
-        $propriedade->update();
-        $this->assertTrue($propriedade->exists());
-    }
-
     public function testMakeImg()
     {
         $propriedade = new Propriedade();
@@ -148,15 +134,5 @@ class PropriedadeTest extends \MZ\Framework\TestCase
         $propriedade->setImagemURL('propriedadeinexistente1.png');
         $propriedade->clean($old);
         $this->assertEquals($old, $propriedade);
-    }
-
-
-
-    public function testDelete()
-    {
-        $propriedade = self::create();
-        $propriedade->delete();
-        $propriedade->loadByID();
-        $this->assertFalse($propriedade->exists());
     }
 }

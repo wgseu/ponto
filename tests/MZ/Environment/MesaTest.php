@@ -28,6 +28,8 @@ use MZ\Exception\ValidationException;
 use MZ\Sale\PedidoTest;
 use MZ\Session\CaixaTest;
 use MZ\Session\MovimentacaoTest;
+use MZ\Session\Movimentacao;
+use MZ\Database\DB;
 
 class MesaTest extends \MZ\Framework\TestCase
 {
@@ -166,6 +168,7 @@ class MesaTest extends \MZ\Framework\TestCase
         } catch (ValidationException $e) {
             $this->assertEquals(['ativa'], array_keys($e->getErrors()));
         }
+        PedidoTest::close($pedido);
         MovimentacaoTest::close($movimentacao);
     }
 
@@ -225,16 +228,15 @@ class MesaTest extends \MZ\Framework\TestCase
     {
         $mesa = self::create();
         try {
-            $mesa->setNumero(12);
+            $mesa->setNumero(123);
             $mesa->insert();
             $this->fail('Fk duplicada');
         } catch (ValidationException $e) {
             $this->assertEquals(['nome'], array_keys($e->getErrors()));
         }
-        //---------
+        //------
         $mesa = self::create();
         try {
-            $mesa->setNome('Teste');
             $mesa->insert();
             $this->fail('Fk duplicada');
         } catch (ValidationException $e) {

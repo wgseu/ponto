@@ -22,68 +22,67 @@
  *
  * @author Equipe GrandChef <desenvolvimento@mzsw.com.br>
  */
-namespace MZ\Product;
+namespace MZ\System;
 
 use MZ\System\Permissao;
 use MZ\Account\AuthenticationTest;
 
-class PacoteApiControllerTest extends \MZ\Framework\TestCase
+class AuditoriaApiControllerTest extends \MZ\Framework\TestCase
 {
     public function testFind()
     {
-        AuthenticationTest::authProvider([Permissao::NOME_SISTEMA, Permissao::NOME_CADASTROPRODUTOS]);
-        $pacote = PacoteTest::create();
+        AuthenticationTest::authProvider([Permissao::NOME_SISTEMA, Permissao::NOME_RELATORIOAUDITORIA]);
+        $auditoria = AuditoriaTest::create();
         $expected = [
             'status' => 'ok',
             'items' => [
-                $pacote->publish(app()->auth->provider),
+                $auditoria->publish(app()->auth->provider),
             ],
         ];
-        $result = $this->get('/api/pacotes', ['search' => $pacote->getProdutoID()]);
+        $result = $this->get('/api/auditorias', ['search' => $auditoria->getDescricao()]);
         $this->assertEquals($expected, \array_intersect_key($result, $expected));
     }
 
     public function testAdd()
     {
-        AuthenticationTest::authProvider([Permissao::NOME_SISTEMA, Permissao::NOME_CADASTROPRODUTOS]);
-        $pacote = PacoteTest::build();
-        $pacote->setVisivel('Y');
-        $this->assertTrue($pacote->isVisivel());
-        $this->assertEquals($pacote->toArray(), (new Pacote($pacote))->toArray());
-        $this->assertEquals((new Pacote())->toArray(), (new Pacote(1))->toArray());
+        AuthenticationTest::authProvider([Permissao::NOME_SISTEMA, Permissao::NOME_RELATORIOAUDITORIA]);
+        $auditoria = AuditoriaTest::build();
+
+        $this->assertEquals($auditoria->toArray(), (new Auditoria($auditoria))->toArray());
+        $this->assertEquals((new Auditoria())->toArray(), (new Auditoria(1))->toArray());
         $expected = [
             'status' => 'ok',
-            'item' => $pacote->publish(app()->auth->provider),
+            'item' => $auditoria->publish(app()->auth->provider),
         ];
-        $result = $this->post('/api/pacotes', $pacote->toArray());
+        $result = $this->post('/api/auditorias', $auditoria->toArray());
         $expected['item']['id'] = $result['item']['id'] ?? null;
+        $expected['item']['datahora'] = $result['item']['datahora'] ?? null;
         $this->assertEquals($expected, \array_intersect_key($result, $expected));
     }
 
     public function testUpdate()
     {
-        AuthenticationTest::authProvider([Permissao::NOME_SISTEMA, Permissao::NOME_CADASTROPRODUTOS]);
-        $pacote = PacoteTest::create();
-        $id = $pacote->getID();
-        $result = $this->patch('/api/pacotes/' . $id, $pacote->toArray());
-        $pacote->loadByID();
+        AuthenticationTest::authProvider([Permissao::NOME_SISTEMA, Permissao::NOME_RELATORIOAUDITORIA]);
+        $auditoria = AuditoriaTest::create();
+        $id = $auditoria->getID();
+        $result = $this->patch('/api/auditorias/' . $id, $auditoria->toArray());
+        $auditoria->loadByID();
         $expected = [
             'status' => 'ok',
-            'item' => $pacote->publish(app()->auth->provider),
+            'item' => $auditoria->publish(app()->auth->provider),
         ];
         $this->assertEquals($expected, \array_intersect_key($result, $expected));
     }
 
     public function testDelete()
     {
-        AuthenticationTest::authProvider([Permissao::NOME_SISTEMA, Permissao::NOME_CADASTROPRODUTOS]);
-        $pacote = PacoteTest::create();
-        $id = $pacote->getID();
-        $result = $this->delete('/api/pacotes/' . $id);
-        $pacote->loadByID();
+        AuthenticationTest::authProvider([Permissao::NOME_SISTEMA, Permissao::NOME_RELATORIOAUDITORIA]);
+        $auditoria = AuditoriaTest::create();
+        $id = $auditoria->getID();
+        $result = $this->delete('/api/auditorias/' . $id);
+        $auditoria->loadByID();
         $expected = [ 'status' => 'ok', ];
         $this->assertEquals($expected, \array_intersect_key($result, $expected));
-        $this->assertFalse($pacote->exists());
+        $this->assertFalse($auditoria->exists());
     }
-
 }

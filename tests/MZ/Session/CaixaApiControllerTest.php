@@ -27,24 +27,39 @@ namespace MZ\Session;
 use MZ\System\Permissao;
 use MZ\Account\AuthenticationTest;
 
-class CaixaPageControllerTest extends \MZ\Framework\TestCase
+class CaixaApiControllerTest extends \MZ\Framework\TestCase
 {
     public function testFind()
     {
         AuthenticationTest::authProvider([Permissao::NOME_SISTEMA, Permissao::NOME_CADASTROCAIXAS]);
         $caixa = CaixaTest::create();
-        $result = $this->get('/gerenciar/caixa/', ['search' => $caixa->getDescricao()]);
-        $this->assertEquals(200, $result->getStatusCode());
+        $expected = [
+            'status' => 'ok',
+            'items' => [
+                $caixa->publish(app()->auth->provider),
+            ],
+        ];
+        $result = $this->get('/api/caixas', ['search' => $caixa->getDescricao()]);
+        $this->assertEquals($expected, \array_intersect_key($result, $expected));
+        $caixa->delete();
     }
 
     public function testAdd()
     {
         AuthenticationTest::authProvider([Permissao::NOME_SISTEMA, Permissao::NOME_CADASTROCAIXAS]);
         $caixa = CaixaTest::build();
-        $result = $this->post('/gerenciar/caixa/cadastrar', $caixa->toArray(), true);
-        $this->assertEquals(302, $result->getStatusCode());
-        $caixa->load(['descricao' => $caixa->getDescricao()]);
-        $this->assertTrue($caixa->exists());
+        $expected = [
+            'status' => 'ok',
+            'item' => $caixa->publish(app()->auth->provider),
+        ];
+        $result = $this->post('/api/caixas', $caixa->toArray());
+        $expected['item']['id'] = $result['item']['id'] ?? null;
+        $serie = $result['item']['serie'] ?? null;
+        $numeroinicial = $result['item']['numeroinicial'] ?? null;
+        $expected['item']['serie'] = $serie;
+        $expected['item']['numeroinicial'] = $numeroinicial;
+
+        $this->assertEquals($expected, \array_intersect_key($result, $expected));
     }
 
     public function testUpdate()
@@ -52,9 +67,14 @@ class CaixaPageControllerTest extends \MZ\Framework\TestCase
         AuthenticationTest::authProvider([Permissao::NOME_SISTEMA, Permissao::NOME_CADASTROCAIXAS]);
         $caixa = CaixaTest::create();
         $id = $caixa->getID();
-        $result = $this->post('/gerenciar/caixa/editar?id=' . $id, $caixa->toArray(), true);
+        $result = $this->patch('/api/caixas/' . $id, $caixa->toArray());
         $caixa->loadByID();
-        $this->assertEquals(302, $result->getStatusCode());
+        $expected = [
+            'status' => 'ok',
+            'item' => $caixa->publish(app()->auth->provider),
+        ];
+        $this->assertEquals($expected, \array_intersect_key($result, $expected));
+        $caixa->delete();
     }
 
     public function testDelete()
@@ -62,9 +82,10 @@ class CaixaPageControllerTest extends \MZ\Framework\TestCase
         AuthenticationTest::authProvider([Permissao::NOME_SISTEMA, Permissao::NOME_CADASTROCAIXAS]);
         $caixa = CaixaTest::create();
         $id = $caixa->getID();
-        $result = $this->get('/gerenciar/caixa/excluir?id=' . $id);
+        $result = $this->delete('/api/caixas/' . $id);
         $caixa->loadByID();
-        $this->assertEquals(302, $result->getStatusCode());
+        $expected = [ 'status' => 'ok', ];
+        $this->assertEquals($expected, \array_intersect_key($result, $expected));
         $this->assertFalse($caixa->exists());
     }
 }

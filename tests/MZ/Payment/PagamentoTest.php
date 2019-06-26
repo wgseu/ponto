@@ -26,6 +26,8 @@ namespace MZ\Payment;
 
 use MZ\Wallet\CarteiraTest;
 use MZ\Wallet\MoedaTest;
+use MZ\Database\DB;
+use MZ\Exception\ValidationException;
 
 class PagamentoTest extends \MZ\Framework\TestCase
 {
@@ -82,18 +84,60 @@ class PagamentoTest extends \MZ\Framework\TestCase
         $this->assertTrue($pagamento->exists());
     }
 
-    public function testUpdate()
+    public function testAddInvalid()
     {
-        $pagamento = self::create();
-        $pagamento->update();
-        $this->assertTrue($pagamento->exists());
+        $pagamento = self::build();
+        $pagamento->setCarteiraID(null);
+        $pagamento->setMoedaID(null);
+        $pagamento->setValor(null);
+        $pagamento->setNumeroParcela(null);
+        $pagamento->setParcelas(null);
+        $pagamento->setLancado(null);
+        $pagamento->setEstado('Teste');
+        $pagamento->setDataCompensacao(null);
+        try {
+            $pagamento->insert();
+            $this->fail('Valores invalidos');
+        } catch (ValidationException $e) {
+            $this->assertEquals(
+                ['carteiraid', 'moedaid', 'valor', 'numeroparcela', 'parcelas', 'lancado', 'estado', 'datacompensacao'],
+                array_keys($e->getErrors())
+            );
+        }
     }
 
-    public function testDelete()
+    public function testFinds()
+    {
+        $pagamento = self::build();
+        $pagamento->setFuncionarioID(1);
+        $pagamento->setFormaPagtoID(1);
+        $pagamento->insert();
+
+        $moeda = $pagamento->findMoedaID();
+        $this->assertEquals($pagamento->getMoedaID(), $moeda->getID());
+
+        $funcionario = $pagamento->findFuncionarioID();
+        $this->assertEquals($pagamento->getFuncionarioID(), $funcionario->getID());
+
+        $formaPagto = $pagamento->findFormaPagtoID();
+        $this->assertEquals($pagamento->getFormaPagtoID(), $formaPagto->getID());
+
+    }
+
+    public function testGetEstadoOptions()
     {
         $pagamento = self::create();
-        $pagamento->delete();
-        $pagamento->loadByID();
-        $this->assertFalse($pagamento->exists());
+        $options = Pagamento::getEstadoOptions($pagamento->getEstado());
+        $this->assertEquals($pagamento->getEstado(), $options);
     }
+
+    // public function testGetReceitas()
+    // {
+    //     for ($i=0; $i < 5; $i++) {
+    //         $pagamento = self::create();
+    //     }
+
+    //     $pagamentos = Pagamento::findAll();
+    //     $receita = Pagamento::getReceitas(['apartir_datalancamento' => DB::now()]);
+    // }
 }

@@ -41,6 +41,7 @@ class ZonaApiControllerTest extends \MZ\Framework\TestCase
         ];
         $result = $this->get('/api/zonas', ['search' => $zona->getNome()]);
         $this->assertEquals($expected, \array_intersect_key($result, $expected));
+        $zona->delete();
     }
 
     public function testAdd()
@@ -73,6 +74,7 @@ class ZonaApiControllerTest extends \MZ\Framework\TestCase
             'item' => $zona->publish(app()->auth->provider),
         ];
         $this->assertEquals($expected, \array_intersect_key($result, $expected));
+        $zona->delete();
     }
 
     public function testDelete()

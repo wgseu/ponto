@@ -41,6 +41,7 @@ class ImpressoraApiControllerTest extends \MZ\Framework\TestCase
         ];
         $result = $this->get('/api/impressoras', ['search' => $impressora->getDescricao()]);
         $this->assertEquals($expected, \array_intersect_key($result, $expected));
+        $impressora->delete();
     }
 
     public function testAdd()
@@ -73,12 +74,15 @@ class ImpressoraApiControllerTest extends \MZ\Framework\TestCase
             'item' => $impressora->publish(app()->auth->provider),
         ];
         $this->assertEquals($expected, \array_intersect_key($result, $expected));
+        $impressora->delete();
     }
 
     public function testDelete()
     {
         AuthenticationTest::authProvider([Permissao::NOME_SISTEMA, Permissao::NOME_CADASTROIMPRESSORAS]);
+        $teste = Dispositivo::findAll();
         $impressora = ImpressoraTest::create();
+        $teste = Dispositivo::findAll();
         $id = $impressora->getID();
         $result = $this->delete('/api/impressoras/' . $id);
         $impressora->loadByID();

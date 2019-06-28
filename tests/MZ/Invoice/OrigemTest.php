@@ -26,6 +26,33 @@ namespace MZ\Invoice;
 
 class OrigemTest extends \MZ\Framework\TestCase
 {
+    /**
+     * Build a valid origem
+     * @param string $descricao Origem descrição
+     * @return Origem
+     */
+    public static function build($descricao = null)
+    {
+        $last = Origem::find([], ['id' => -1]);
+        $id = $last->getID() + 1;
+        $origem = new Origem();
+        $origem->setCodigo(1+$id);
+        $origem->setDescricao('Descrição da origem');
+        return $origem;
+    }
+
+    /**
+     * Create a origem on database
+     * @param string $descricao Origem descrição
+     * @return Origem
+     */
+    public static function create($descricao = null)
+    {
+        $origem = self::build($descricao);
+        $origem->insert();
+        return $origem;
+    }
+
     public function testFromArray()
     {
         $old_origem = new Origem([
@@ -86,6 +113,17 @@ class OrigemTest extends \MZ\Framework\TestCase
         $origem->setCodigo(123);
         $origem->setDescricao('Origem to insert');
         $origem->insert();
+    }
+
+    public function testTranslate()
+    {
+        $origem = self::create();
+        try {
+            $origem->insert();
+            $this->fail('fk duplicada');
+        } catch (\MZ\Exception\ValidationException $e) {
+            $this->assertEquals(['codigo'], array_keys($e->getErrors()));
+        }
     }
 
     public function testUpdate()

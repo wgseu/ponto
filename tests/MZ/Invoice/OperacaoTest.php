@@ -26,6 +26,33 @@ namespace MZ\Invoice;
 
 class OperacaoTest extends \MZ\Framework\TestCase
 {
+    /**
+     * Build a valid operação
+     * @param string $descricao Operação descrição
+     * @return Operacao
+     */
+    public static function build($descricao = null)
+    {
+        $last = Operacao::find([], ['id' => -1]);
+        $id = $last->getID() + 1;
+        $operacao = new Operacao();
+        $operacao->setCodigo(13+$id);
+        $operacao->setDescricao('Descrição da operação');
+        return $operacao;
+    }
+
+    /**
+     * Create a operação on database
+     * @param string $descricao Operação descrição
+     * @return Operacao
+     */
+    public static function create($descricao = null)
+    {
+        $operacao = self::build($descricao);
+        $operacao->insert();
+        return $operacao;
+    }
+
     public function testFromArray()
     {
         $old_operacao = new Operacao([
@@ -90,6 +117,17 @@ class OperacaoTest extends \MZ\Framework\TestCase
         $operacao->setCodigo(12345);
         $operacao->setDescricao('Operação to insert');
         $operacao->insert();
+    }
+
+    public function testTranslate()
+    {
+        $operacao = self::create();
+        try {
+            $operacao->insert();
+            $this->fail('fk duplicada');
+        } catch (\MZ\Exception\ValidationException $e) {
+            $this->assertEquals(['codigo'], array_keys($e->getErrors()));
+        }
     }
 
     public function testUpdate()

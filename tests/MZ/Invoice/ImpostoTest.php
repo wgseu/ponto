@@ -24,8 +24,40 @@
  */
 namespace MZ\Invoice;
 
+use MZ\Exception\ValidationException;
+
 class ImpostoTest extends \MZ\Framework\TestCase
 {
+    /**
+     * Build a valid imposto
+     * @param string $descricao Imposto descrição
+     * @return Imposto
+     */
+    public static function build($descricao = null)
+    {
+        $last = Imposto::find([], ['id' => -1]);
+        $id = $last->getID() + 1;
+        $imposto = new Imposto();
+        $imposto->setGrupo(Imposto::GRUPO_ICMS);
+        $imposto->setSimples('Y');
+        $imposto->setSubstituicao('Y');
+        $imposto->setCodigo(12+$id);
+        $imposto->setDescricao('Descrição do imposto');
+        return $imposto;
+    }
+
+    /**
+     * Create a imposto on database
+     * @param string $descricao Imposto descrição
+     * @return Imposto
+     */
+    public static function create($descricao = null)
+    {
+        $imposto = self::build($descricao);
+        $imposto->insert();
+        return $imposto;
+    }
+
     public function testFromArray()
     {
         $old_imposto = new Imposto([
@@ -82,7 +114,13 @@ class ImpostoTest extends \MZ\Framework\TestCase
 
     public function testInsert()
     {
-        $imposto = new Imposto();
+        $imposto = self::build();
+        $imposto->setGrupo('Invalido');
+        $imposto->setSimples('T');
+        $imposto->setSubstituicao('T');
+        $imposto->setCodigo(null);
+        $imposto->setDescricao(null);
+
         try {
             $imposto->insert();
             $this->fail('Não deveria ter cadastrado o imposto');
@@ -90,6 +128,8 @@ class ImpostoTest extends \MZ\Framework\TestCase
             $this->assertEquals(
                 [
                     'grupo',
+                    'simples',
+                    'substituicao',
                     'codigo',
                     'descricao',
                 ],
@@ -102,6 +142,32 @@ class ImpostoTest extends \MZ\Framework\TestCase
         $imposto->setCodigo(123);
         $imposto->setDescricao('Imposto to insert');
         $imposto->insert();
+
+        //isSImples
+        $this->assertTrue($imposto->isSimples());
+        //isSubstituicao
+        $this->assertTrue($imposto->isSubstituicao());
+    }
+
+    public function testTranslate()
+    {
+        $imposto = self::create();
+        try {
+            $imposto->insert();
+            $this->fail('fk duplicada');
+        } catch (ValidationException $e) {
+            $this->assertEquals(
+                ['grupo', 'simples', 'substituicao', 'codigo'],
+                array_keys($e->getErrors())
+            );
+        }
+    }
+
+    public function testGetGrupoOptions()
+    {
+        $imposto = new Imposto(['grupo' => Imposto::GRUPO_ICMS]);
+        $options = Imposto::getGrupoOptions();
+        $this->assertEquals(Imposto::getGrupoOptions($imposto->getGrupo()), $options[$imposto->getGrupo()]);
     }
 
     public function testUpdate()

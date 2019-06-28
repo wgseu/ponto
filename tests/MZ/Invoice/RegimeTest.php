@@ -24,8 +24,37 @@
  */
 namespace MZ\Invoice;
 
+use \MZ\Exception\ValidationException;
+
 class RegimeTest extends \MZ\Framework\TestCase
 {
+    /**
+     * Build a valid regime
+     * @param string $descricao Regime descrição
+     * @return Regime
+     */
+    public static function build($descricao = null)
+    {
+        $last = Regime::find([], ['id' => -1]);
+        $id = $last->getID() + 1;
+        $regime = new Regime();
+        $regime->setCodigo($id+100);
+        $regime->setDescricao('Descrição do regime');
+        return $regime;
+    }
+
+    /**
+     * Create a regime on database
+     * @param string $descricao Regime descrição
+     * @return Regime
+     */
+    public static function create($descricao = null)
+    {
+        $regime = self::build($descricao);
+        $regime->insert();
+        return $regime;
+    }
+
     public function testFromArray()
     {
         $old_regime = new Regime([
@@ -74,7 +103,7 @@ class RegimeTest extends \MZ\Framework\TestCase
         try {
             $regime->insert();
             $this->fail('Não deveria ter cadastrado o regime');
-        } catch (\MZ\Exception\ValidationException $e) {
+        } catch (ValidationException $e) {
             $this->assertEquals(
                 [
                     'codigo',
@@ -142,5 +171,16 @@ class RegimeTest extends \MZ\Framework\TestCase
 
         $count = Regime::count(['search' => 'Regime find']);
         $this->assertEquals(2, $count);
+    }
+
+    public function testTranslate()
+    {
+        $regime = self::create();
+        try {
+            $regime->insert();
+            $this->fail('Fk duplicada');
+        } catch (ValidationException $e) {
+            $this->assertEquals(['codigo'], array_keys($e->getErrors()));
+        }
     }
 }

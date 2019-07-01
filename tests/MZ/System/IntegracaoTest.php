@@ -38,7 +38,7 @@ class IntegracaoTest extends \MZ\Framework\TestCase
         $last = Integracao::find([], ['id' => -1]);
         $id = $last->getID() + 1;
         $integracao = new Integracao();
-        $integracao->setNome("Integração {$id}");
+        $integracao->setNome($nome ? :"Integração {$id}");
         $integracao->setAcessoURL("url_{$id}");
         $integracao->setAtivo('N');
         return $integracao;

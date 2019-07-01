@@ -25,6 +25,7 @@
 namespace MZ\System;
 
 use MZ\Util\Generator;
+use MZ\Exception\ValidationException;
 
 class ServidorTest extends \MZ\Framework\TestCase
 {
@@ -65,11 +66,79 @@ class ServidorTest extends \MZ\Framework\TestCase
         $this->assertEquals(1, Servidor::count($condition));
     }
 
+    public function testFindGUID()
+    {
+        $servidor = self::create();
+        $servidorFound = Servidor::findByGUID($servidor->getGUID());
+        $this->assertInstanceOf(get_class($servidor), $servidorFound);
+    }
+
     public function testAdd()
     {
         $servidor = self::build();
         $servidor->insert();
         $this->assertTrue($servidor->exists());
+    }
+
+    public function testAddInvalid()
+    {
+        $servidor = self::build();
+        $servidor->setGUID(null);
+        try {
+            $servidor->insert();
+            $this->fail('Valor invalido');
+        } catch (ValidationException $e) {
+            $this->assertEquals(['guid'], array_keys($e->getErrors()));
+        }
+    }
+
+    public function testFromArray()
+    {
+        $old= new Servidor(['guid' => Generator::guidv4()]);
+        $servidor = new Servidor();
+        $servidor->fromArray($old);
+        $this->assertEquals($servidor, $old);
+        $servidor->fromArray(null);
+        $this->assertEquals($servidor, new Servidor());
+        $servidor->clean($old);
+    }
+
+    public function testFilter()
+    {
+        $old = new Servidor([
+            'id' => 1,
+            'guid' => 54543433,
+        ]);
+        $servidor = new Servidor([
+            'id' => 1,
+            'guid' => '54543433',
+        ]);
+        $servidor->filter($old, app()->auth->provider, true);
+        $this->assertEquals($old, $servidor);
+    }
+
+    public function testPublish()
+    {
+        $servidor = new Servidor();
+        $values = $servidor->publish(app()->auth->provider);
+        $allowed = [
+            'id',
+            'guid',
+            'sincronizadoate',
+            'ultimasincronizacao'
+        ];
+        $this->assertEquals($allowed, array_keys($values));
+    }
+
+    public function testTranslate()
+    {
+        $servidor = self::create();
+        try {
+            $servidor->insert();
+            $this->fail('Fk duplicada');
+        } catch (ValidationException $e) {
+            $this->assertEquals(['guid'], array_keys($e->getErrors()));
+        }
     }
 
     public function testUpdate()

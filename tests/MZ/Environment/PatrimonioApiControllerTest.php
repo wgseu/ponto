@@ -58,9 +58,9 @@ class PatrimonioApiControllerTest extends \MZ\Framework\TestCase
         $result = $this->post('/api/patrimonios', $patrimonio->toArray());
         $expected['item']['id'] = $result['item']['id'] ?? null;
         $result['item']['numero'] = intval($result['item']['numero'] ?? null);
-        $result['item']['quantidade'] = floatval($result['item']['quantidade'] ?? null);
-        $result['item']['altura'] = floatval($result['item']['altura'] ?? null);
-        $result['item']['largura'] = floatval($result['item']['largura'] ?? null);
+        $result['item']['quantidade'] = intval($result['item']['quantidade'] ?? null);
+        $result['item']['altura'] = intval($result['item']['altura'] ?? null);
+        $result['item']['largura'] = intval($result['item']['largura'] ?? null);
         $result['item']['comprimento'] = floatval($result['item']['comprimento'] ?? null);
         $result['item']['custo'] = floatval($result['item']['custo'] ?? null);
         $result['item']['valor'] = floatval($result['item']['valor'] ?? null);

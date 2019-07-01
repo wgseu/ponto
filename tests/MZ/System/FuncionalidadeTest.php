@@ -24,6 +24,7 @@
  */
 namespace MZ\System;
 
+use MZ\Exception\ValidationException;
 
 class FuncionalidadeTest extends \MZ\Framework\TestCase
 {
@@ -97,5 +98,31 @@ class FuncionalidadeTest extends \MZ\Framework\TestCase
         $funcionalidade_copy->clean($funcionalidade);
         $this->assertEquals($funcionalidade, $funcionalidade_copy);
         $this->assertEquals($funcionalidade->toArray(), $funcionalidade_copy->validate());
+        $funcionalidade_copy->fromArray(null);
+        $this->assertEquals($funcionalidade_copy, new Funcionalidade());
+    }
+
+    public function testTranslate()
+    {
+        $funcionalidade = self::create();
+        try {
+            $funcionalidade->insert();
+            $this->fail('fk duplicada');
+        } catch (ValidationException $e) {
+            $this->assertEquals(['nome'], array_keys($e->getErrors()));
+        }
+    }
+
+    public function testAddInvalid()
+    {
+        $funcionalidade = self::build();
+        $funcionalidade->setNome(null);
+        $funcionalidade->setDescricao(null);
+        try {
+            $funcionalidade->insert();
+            $this->fail('Não cadastrar valores nulos');
+        } catch (ValidationException $e) {
+            $this->assertEquals(['nome', 'descricao'], array_keys($e->getErrors()));
+        }
     }
 }

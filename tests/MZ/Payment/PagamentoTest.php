@@ -26,6 +26,17 @@ namespace MZ\Payment;
 
 use MZ\Wallet\CarteiraTest;
 use MZ\Wallet\MoedaTest;
+use MZ\Session\MovimentacaoTest;
+use MZ\Session\CaixaTest;
+use MZ\Provider\PrestadorTest;
+use MZ\Payment\FormaPagtoTest;
+use MZ\Sale\PedidoTest;
+use MZ\Account\ContaTest;
+use MZ\Payment\CartaoTest;
+use MZ\Payment\ChequeTest;
+use MZ\Account\CreditoTest;
+use MZ\Environment\MesaTest;
+use MZ\Sale\Pedido;
 use MZ\Database\DB;
 use MZ\Exception\ValidationException;
 
@@ -106,22 +117,195 @@ class PagamentoTest extends \MZ\Framework\TestCase
         }
     }
 
-    public function testFinds()
+    public function testMoedaID()
     {
-        $pagamento = self::build();
-        $pagamento->setFuncionarioID(1);
-        $pagamento->setFormaPagtoID(1);
-        $pagamento->insert();
+        $pagamento = self::create();
+        $findMoeda = $pagamento->findMoedaID();
+        $this->assertEquals($pagamento->getMoedaID(), $findMoeda->getID());
+    }
 
-        $moeda = $pagamento->findMoedaID();
-        $this->assertEquals($pagamento->getMoedaID(), $moeda->getID());
+    public function testMoedaIDIsnull()
+    {
+        $pagamento = self::create();
+        $pagamento->setMoedaID(NULL);
+        $findMoeda = $pagamento->findMoedaID();
+        $this->assertEquals($findMoeda->getID(), NULL);
+    }
 
-        $funcionario = $pagamento->findFuncionarioID();
-        $this->assertEquals($pagamento->getFuncionarioID(), $funcionario->getID());
+    public function testPagamentoID()
+    {
+        $pagamento = self::create();
+        $pagamento->setPagamentoID(1);
+        $findPagamento = $pagamento->findPagamentoID();
+        $this->assertEquals($pagamento->getPagamentoID(), $findPagamento->getID());
+    }
 
-        $formaPagto = $pagamento->findFormaPagtoID();
-        $this->assertEquals($pagamento->getFormaPagtoID(), $formaPagto->getID());
+    public function testPagamentoIDIsnull()
+    {
+        $pagamento = self::create();
+        $findPagamento = $pagamento->findPagamentoID();
+        $this->assertEquals($findPagamento->getID(), NULL);
+    }
 
+    public function testAgrupamentoID()
+    {
+        $pagamento = self::create();
+        $pagamento->setAgrupamentoID(1);
+        $agrupamento = $pagamento->findAgrupamentoID();
+        $this->assertEquals($pagamento->getID(), $agrupamento->getID());
+    }
+
+    public function testAgrupamentoIDIsnull()
+    {
+        $pagamento = self::create();
+        $agrupamento = $pagamento->findAgrupamentoID();
+        $this->assertEquals($agrupamento->getID(), NULL);
+    }
+
+    public function testMovimentacaoID()
+    {
+        $pagamento = self::create();
+        $movimentaocao = MovimentacaoTest::create();
+        $pagamento->setMovimentacaoID($movimentaocao->getID());
+        $findMovimentaocao = $pagamento->findMovimentacaoID();
+        $this->assertEquals($movimentaocao->getID(), $findMovimentaocao->getID());
+    }
+
+    public function testMovimentacaoIDIsnull()
+    {
+        $pagamento = self::create();
+        $findMovimentaocao = $pagamento->findMovimentacaoID();
+        $this->assertEquals($findMovimentaocao->getID(), NULL);
+    }
+
+
+    public function testFindFuncionarioID()
+    {
+        $pagamento = self::create();
+        $prestador = PrestadorTest::create();
+        $pagamento->setFuncionarioID($prestador->getID());
+        $findPrestador = $pagamento->findFuncionarioID();
+        $this->assertEquals($findPrestador->getID(), $prestador->getID());
+    }
+
+    public function testFindFuncionarioIDIsnull()
+    {
+        $pagamento = self::create();
+        $findPrestador = $pagamento->findFuncionarioID();
+        $this->assertEquals($findPrestador->getID(), null);
+    }
+
+    public function testFindFormaPagtoID()
+    {
+        $pagamento = self::create();
+        $formaPagto = FormaPagtoTest::create();
+        $pagamento->setFormaPagtoID($formaPagto->getID());
+        $findFormaPagto = $pagamento->findFormaPagtoID();
+        $this->assertEquals($pagamento->getFormaPagtoID(), $findFormaPagto->getID());
+    }
+
+    public function testFindFormaPagtoIDIsnull()
+    {
+        $pagamento = self::create();
+        $findFormaPagto = $pagamento->findFormaPagtoID();
+        $this->assertEquals($findFormaPagto->getID(), NULL);
+    }
+
+    public function testPedidoID()
+    {
+        $pagamento = self::create();
+        $movimentaocao = MovimentacaoTest::create();
+        $pedido = PedidoTest::create();
+        $pagamento->setPedidoID($pedido->getID());
+        $findPedido = $pagamento->findPedidoID();
+        $this->assertEquals($pagamento->getPedidoID(), $findPedido->getID());
+    }
+
+    public function testPedidoIDIsnull()
+    {
+        $pagamento = self::create();
+        $pedido = $pagamento->findPedidoID();
+        $this->assertEquals($pedido->getID(), NULL);
+    }
+
+    public function testFindContaID()
+    {
+        $pagamento = self::create();
+        $conta = ContaTest::create();
+        $pagamento->setContaID($conta->getID());
+        $findConta = $pagamento->findContaID();
+        $this->assertEquals($conta->getID(), $findConta->getID());
+    }
+
+    public function testFindContaIDIsnull()
+    {
+        $pagamento = self::create();
+        $findConta = $pagamento->findContaID();
+        $this->assertEquals($findConta->getID(), NULL);
+    }
+
+    public function testFindCartaoID()
+    {
+        $pagamento = self::create();
+        $cartao = CartaoTest::create();
+        $pagamento->setCartaoID($cartao->getID());
+        $findCartao = $pagamento->findCartaoID();
+        $this->assertEquals($findCartao->getID(), $pagamento->getCartaoID());
+    }
+
+    public function testeFindCartaoIDIsnull()
+    {
+        $pagamento = self::create();
+        $findCartao = $pagamento->findCartaoID();
+        $this->assertEquals($findCartao->getID(), NULL);
+    }
+
+    public function testFindChequeID()
+    {
+        $pagamento = self::create();
+        $cheque = ChequeTest::create();
+        $pagamento->setChequeID($cheque->getID());
+        $findCheque = $pagamento->findChequeID();
+        $this->assertEquals($findCheque->getID(), $pagamento->getChequeID());
+    }
+
+    public function testFindChequeIDIsnull()
+    {
+        $pagamento = self::create();
+        $findCheque = $pagamento->findChequeID();
+        $this->assertEquals($findCheque->getID(), null);
+    }
+
+    public function testFindCrediarioID()
+    {
+        $pagamento = self::create();
+        $conta = ContaTest::create();
+        $pagamento->setCrediarioID($conta->getID());
+        $findConta = $pagamento->findCrediarioID();
+        $this->assertEquals($findConta->getID(), $pagamento->getCrediarioID());
+    }
+
+    public function testFindCrediarioIDIsnull()
+    {
+        $pagamento = self::create();
+        $findCrediario = $pagamento->findCrediarioID();
+        $this->assertEquals($findCrediario->getID(), null);
+    }
+
+    public function testFindCreditoID()
+    {
+        $pagamento = self::create();
+        $credito = CreditoTest::create();
+        $pagamento->setCreditoID($credito->getID());
+        $findCredito = $pagamento->findCreditoID();
+        $this->assertEquals($findCredito->getID(), $pagamento->getCreditoID());
+    }
+
+    public function testFindCreditoIDIsnull()
+    {
+        $pagamento = self::create();
+        $credito = $pagamento->findCreditoID();
+        $this->assertEquals($credito->getID(), null);
     }
 
     public function testGetEstadoOptions()
@@ -131,13 +315,174 @@ class PagamentoTest extends \MZ\Framework\TestCase
         $this->assertEquals($pagamento->getEstado(), $options);
     }
 
-    // public function testGetReceitas()
-    // {
-    //     for ($i=0; $i < 5; $i++) {
-    //         $pagamento = self::create();
-    //     }
+    public function testRawFindTotal()
+    {
+        $pagamento = self::create();
+        $movimentaocao = MovimentacaoTest::create();
+        $pedido = PedidoTest::create();
+        $pagamento->setPedidoID($pedido->getID());
+        $pagamento->setEstado(Pagamento::ESTADO_PAGO);
+        $pagamento->update();
+        $condition = ['mesaid' => 11, 'm.sessaoid' => 1];
+        $result = $pagamento::rawFindTotal($condition);
+        $this->assertEquals(0, $result);
+    }
 
-    //     $pagamentos = Pagamento::findAll();
-    //     $receita = Pagamento::getReceitas(['apartir_datalancamento' => DB::now()]);
-    // }
+    public function testRawFindTotalSearchNumber()
+    {
+        $pagamento = self::create();
+        $movimentaocao = MovimentacaoTest::create();
+        $pedido = PedidoTest::create();
+        $pagamento->setPedidoID($pedido->getID());
+        $pagamento->setEstado(Pagamento::ESTADO_PAGO);
+        $pagamento->update();
+        $condition = ['search' => 1];
+        $result = $pagamento::rawFindTotal($condition);
+        $this->assertEquals(12.3, $result);
+    }
+
+    public function testRawFindTotalDataCompensacao()
+    {
+        $pagamento = self::create();
+        $movimentaocao = MovimentacaoTest::create();
+        $pedido = PedidoTest::create();
+        $pagamento->setPedidoID($pedido->getID());
+        $pagamento->setEstado(Pagamento::ESTADO_PAGO);
+        $pagamento->update();
+        $condition = ['apartir_datacompensacao' => '2016-12-25 12:15:00'];
+        $result = $pagamento::rawFindTotal($condition);
+        $this->assertEquals(12.3, $result);
+    }
+
+    public function testRawFindTotalApartirLancamento()
+    {
+        $pagamento = self::create();
+        $movimentaocao = MovimentacaoTest::create();
+        $pedido = PedidoTest::create();
+        $pagamento->setPedidoID($pedido->getID());
+        $pagamento->setEstado(Pagamento::ESTADO_PAGO);
+        $pagamento->update();
+        $condition = ['ate_datalancamento' => DB::now()];
+        $result = $pagamento::rawFindTotal($condition);
+        $this->assertEquals(12.3, $result);
+    }
+
+    public function testRawFindTotalDataLancamento()
+    {
+        $pagamento = self::create();
+        $movimentaocao = MovimentacaoTest::create();
+        $pedido = PedidoTest::create();
+        $pagamento->setPedidoID($pedido->getID());
+        $pagamento->setEstado(Pagamento::ESTADO_PAGO);
+        $pagamento->update();
+        $condition = ['apartir_datalancamento' => DB::now()];
+        $result = $pagamento::rawFindTotal($condition);
+        $this->assertEquals(12.3, $result);
+    }
+
+    public function testRawFindTotalApartirValor()
+    {
+        $pagamento = self::create();
+        $movimentaocao = MovimentacaoTest::create();
+        $pedido = PedidoTest::create();
+        $pagamento->setPedidoID($pedido->getID());
+        $pagamento->setEstado(Pagamento::ESTADO_PAGO);
+        $pagamento->update();
+        $condition = ['apartir_valor' => 1];
+        $result = $pagamento::rawFindTotal($condition);
+        $this->assertEquals(12.3, $result);
+    }
+
+    public function testGetReceitas()
+    {
+        $pagamento = self::create();
+        $movimentaocao = MovimentacaoTest::create();
+        $pedido = PedidoTest::create();
+        $pagamento->setPedidoID($pedido->getID());
+        $pagamento->setEstado(Pagamento::ESTADO_PAGO);
+        $pagamento->update();
+        $condition = ['receitas'];
+        $result = $pagamento::getReceitas($condition);
+        $this->assertEquals($pagamento->getValor(), $result);
+    }
+
+    public function testGetDespesas()
+    {
+        $pagamento = self::create();
+        $movimentaocao = MovimentacaoTest::create();
+        $pedido = PedidoTest::create();
+        $conta = ContaTest::create();
+        $pagamento->setPedidoID($pedido->getID());
+        $pagamento->setEstado(Pagamento::ESTADO_PAGO);
+        $pagamento->setContaID($conta->getID());
+        $pagamento->update();
+        $condition = ['mesaid' => 11];
+        $result = $pagamento::getDespesas($condition);
+        $this->assertEquals(0, $result);
+    }
+
+    public function testGetFaturamento()
+    {
+        $pagamento = self::create();
+        $movimentaocao = MovimentacaoTest::create();
+        $pedido = PedidoTest::create();
+        $conta = ContaTest::create();
+        $pagamento->setPedidoID($pedido->getID());
+        $pagamento->setEstado(Pagamento::ESTADO_PAGO);
+        $pagamento->setContaID($conta->getID());
+        $pagamento->update();
+        $condition = ['mesaid' => 11];
+        $result = $pagamento::getFaturamento($condition);
+        $this->assertEquals($pagamento->getValor(), $result);
+    }
+
+    public function testRawFindAllTotal()
+    {
+        $pagamento = self::create();
+        $movimentaocao = MovimentacaoTest::create();
+        $pedido = PedidoTest::create();
+        $conta = ContaTest::create();
+        $pagamento->setPedidoID($pedido->getID());
+        $pagamento->setEstado(Pagamento::ESTADO_PAGO);
+        $pagamento->setContaID($conta->getID());
+        $pagamento->update();
+        $data = date('Y-m-d', strtotime(DB::now()));
+        $condition = ['mesaid' => 11];
+        $group = ['dia' => DB::now()];
+        $limit = 1;
+        $offset = 0;
+        $result = $pagamento::rawFindAllTotal($condition, $group, $limit, $offset);
+        $this->assertEquals(
+            [
+                [
+                'total' => $pagamento->getValor(),
+                'data' => $data
+                ]
+            ], $result);
+    }
+
+    public function testRawFindAllTotalGroup()
+    {
+        $pagamento = self::create();
+        $movimentaocao = MovimentacaoTest::create();
+        $pedido = PedidoTest::create();
+        $conta = ContaTest::create();
+        $pagamento->setPedidoID($pedido->getID());
+        $pagamento->setEstado(Pagamento::ESTADO_PAGO);
+        $pagamento->setContaID($conta->getID());
+        $pagamento->update();
+        $condition = ['mesaid' => 11];
+        $group = ['forma_tipo' => 'Dinheiro'];
+        $limit = 1;
+        $offset = 0;
+        $result = $pagamento::rawFindAllTotal($condition, $group, $limit, $offset);
+        $this->assertEquals(
+            [
+                [
+                'total' => $pagamento->getValor(),
+                'tipo' => null
+                ]
+            ], $result);
+    }
+
 }

@@ -30,6 +30,7 @@ $collection = new RouteCollection();
 \MZ\System\ModuloApiController::addRoutes($collection);
 \MZ\System\SistemaApiController::addRoutes($collection);
 \MZ\System\AcessoApiController::addRoutes($collection);
+\MZ\System\EmpresaApiController::addRoutes($collection);
 \MZ\Stock\EstoqueApiController::addRoutes($collection);
 \MZ\Stock\ListaApiController::addRoutes($collection);
 \MZ\Stock\CompraApiController::addRoutes($collection);

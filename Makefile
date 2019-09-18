@@ -1,17 +1,15 @@
 # Makefile for Docker Nginx PHP Composer MySQL
 
-PATH := C:\Program Files\Oracle\VirtualBox\:node_modules/.bin:$(PATH)
+PATH := node_modules/.bin:$(PATH)
 
 include .env
 
 export DEBUG_BACK
 export DEBUG_HOST
 export WEB_HOST
-export FASTCGI_HOST
-export FASTCGI_PORT
-export PROXY_HOST
-export PUBLIC_PATH
 export CURRENT_UID
+
+export PROXY_HOST
 
 CURRENT_UID= $(shell id -u):$(shell id -g)
 
@@ -23,10 +21,9 @@ help:
 	@echo "usage: make COMMAND"
 	@echo ""
 	@echo "Commands:"
-	@echo "  share        Share folder on same partition to docker work"
-	@echo "  term         Open docker terminal (Windows 7 Only)"
 	@echo "  start        Create and start containers"
-	@echo "  populate     Recreate and populate database"
+	@echo "  migrate      Run new migrations"
+	@echo "  downgrade    Downgrade migrations"
 	@echo "  update       Update PHP dependencies with composer"
 	@echo "  autoload     Update PHP autoload files"
 	@echo "  test         Test application"
@@ -39,7 +36,6 @@ help:
 	@echo "  clean        Stop docker and clean generated folder"
 	@echo "  purge        Clean and remove vendor folder"
 	@echo "  doc          Generate documentation of API"
-	@echo "  logs         Follow log output"
 	@echo "  stop         Stop and clear all services"
 
 init:
@@ -48,60 +44,48 @@ init:
 	@mkdir -p storage/logs
 	@mkdir -p storage/app/cache
 	@mkdir -p storage/app/compiled
-	@mkdir -p public/static/doc/conta
-	@mkdir -p public/static/doc/cert
-	@mkdir -p public/static/img/categoria
-	@mkdir -p public/static/img/cliente
-	@mkdir -p public/static/img/produto
-	@mkdir -p public/static/img/patrimonio
-	@mkdir -p public/static/img/header
+	@mkdir -p storage/framework/cache
+	@mkdir -p storage/framework/views
+	@mkdir -p storage/framework/sessions
+	@mkdir -p storage/framework/testing
 
-doc:
+doc: reset
 	@docker-compose exec -T php ./vendor/bin/apigen generate app --destination docs/api
-	@make -s reset
-
-share:
-	vboxmanage sharedfolder add "default" --name "d/Development/Projects/grandchef.api" --hostpath "\\\\\?\D:\Development\Projects\grandchef.api" --automount
 
 term:
 	@utils\docker-term $(CURDIR)
 
 clean: stop
-	@rm -Rf storage
-	@rm -Rf public/static/doc/conta
-	@rm -Rf public/static/doc/cert
-	@rm -Rf public/static/img/categoria
-	@rm -Rf public/static/img/patrimonio/*.*
-	@rm -Rf docs/api
 
 purge: clean
 	@rm -Rf node_modules
 	@rm -Rf vendor
-	@rm -Rf composer.lock
 
 check:
 	@echo "Checking the standard code..."
-	@docker-compose exec -T php ./vendor/bin/phpcs --standard=PSR2 app tests/MZ
+	@docker-compose exec -T php ./vendor/bin/phpcs --standard=PSR2 app tests
 
 fix:
 	@echo "Fixing to standard code..."
-	@docker-compose exec -T php ./vendor/bin/phpcbf --standard=PSR2 app tests/MZ
+	@docker-compose exec -T php ./vendor/bin/phpcbf --standard=PSR2 app tests
 
 update:
 	@docker run --rm \
 		-u $(CURRENT_UID) \
 		-v $(shell pwd):/app \
 		-v /etc/passwd:/etc/passwd:ro \
-    -v /etc/group:/etc/group:ro \
-		composer update -n --ignore-platform-reqs --no-scripts
+		-v /etc/group:/etc/group:ro \
+		roquie/composer-parallel update -n --ignore-platform-reqs --no-scripts -vvv
 
 autoload:
 	@docker run --rm \
-	-u $(CURRENT_UID) \
-	-v $(shell pwd):/app \
-	composer dump-autoload --no-scripts
+		-u $(CURRENT_UID) \
+		-v $(shell pwd):/app \
+		-v /etc/passwd:/etc/passwd:ro \
+		-v /etc/group:/etc/group:ro \
+		roquie/composer-parallel dump-autoload -n --no-scripts
 
-start: init reset
+start: init
 	envsubst '$$WEB_HOST' < ./etc/nginx/default.template.conf > ./etc/nginx/default.conf
 	envsubst '$$FASTCGI_HOST $$FASTCGI_PORT $$PROXY_HOST $$PUBLIC_PATH' < ./etc/nginx/location.template.conf > ./etc/nginx/location.info
 	envsubst '$$DEBUG_BACK $$DEBUG_HOST' < ./etc/php/php.template.ini > ./etc/php/php.ini
@@ -113,20 +97,15 @@ stop:
 logs:
 	@docker-compose logs -f
 
-populate:
-	@mkdir -p $(DB_DUMPS_DIR)
-	@echo "SET NAMES 'utf8' COLLATE 'utf8_unicode_ci';" > $(DB_DUMPS_DIR)/populate.sql
-	@cat database/model/script.sql >> $(DB_DUMPS_DIR)/populate.sql
-	@cat database/model/insert.sql >> $(DB_DUMPS_DIR)/populate.sql
-	@cat database/model/populate.sql >> $(DB_DUMPS_DIR)/populate.sql
-	@npm run fix-pop "$(DB_NAME)"
-	@make -s reset
-	@docker exec -i $(shell CURRENT_UID=$(CURRENT_UID) docker-compose ps -q db) mysql -u"$(DB_ROOT_USER)" -p"$(DB_ROOT_PASSWORD)" < $(DB_DUMPS_DIR)/populate.sql
+migrate:
+	@docker exec -i $(shell CURRENT_UID=$(CURRENT_UID) docker-compose ps -q php) ./artisan -n migrate
+
+downgrade:
+	@docker exec -i $(shell CURRENT_UID=$(CURRENT_UID) docker-compose ps -q php) ./artisan -n migrate:rollback
 
 dump:
 	@mkdir -p $(DB_DUMPS_DIR)
 	@docker exec $(shell CURRENT_UID=$(CURRENT_UID) docker-compose ps -q db) mysqldump -B "$(DB_NAME)" -u"$(DB_ROOT_USER)" -p"$(DB_ROOT_PASSWORD)" --add-drop-database > $(DB_DUMPS_DIR)/db.sql
-	@make -s reset
 
 restore:
 	@docker exec -i $(shell CURRENT_UID=$(CURRENT_UID) docker-compose ps -q db) mysql -u"$(DB_ROOT_USER)" -p"$(DB_ROOT_PASSWORD)" < $(DB_DUMPS_DIR)/db.sql
@@ -143,18 +122,5 @@ class:
 	@cp -f database/model/script.sql $(DB_DUMPS_DIR)/script_no_trigger.sql
 	@npm run fix-sql
 	@java -jar utils/SQLtoClass.jar -p utils/config.properties -t utils/template -o storage/app/generated
-
-reset:
-	@chmod 777 storage
-	@chmod 777 storage/logs
-	@chmod 777 storage/app/cache
-	@chmod 777 storage/app/compiled
-	@chmod 777 public/static/doc/conta
-	@chmod 777 public/static/doc/cert
-	@chmod 777 public/static/img/categoria
-	@chmod 777 public/static/img/cliente
-	@chmod 777 public/static/img/patrimonio
-	@chmod 777 public/static/img/produto
-	@chmod 777 public/static/img/header
 
 .PHONY: clean test check init

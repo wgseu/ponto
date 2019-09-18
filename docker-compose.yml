@@ -4,12 +4,9 @@ services:
         image: nginx
         volumes:
             - "./etc/nginx/default.conf:/etc/nginx/conf.d/default.conf"
-            - "./etc/nginx/location.info:/etc/nginx/conf.d/location.info"
             - "./:/var/www/html"
         ports:
             - "${WEB_PORT}:80"
-        environment:
-            - WEB_HOST=${WEB_HOST}
         command: /bin/bash -c "nginx -g 'daemon off;'"
         restart: always
         depends_on:
@@ -24,14 +21,6 @@ services:
             - "./:/var/www/html"
             - "/etc/passwd:/etc/passwd:ro"
             - "/etc/group:/etc/group:ro"
-    composer:
-        image: "composer"
-        user: ${CURRENT_UID}
-        volumes:
-            - "./:/app"
-            - "/etc/passwd:/etc/passwd:ro"
-            - "/etc/group:/etc/group:ro"
-        command: install
     myadmin:
         image: phpmyadmin/phpmyadmin
         ports:
@@ -46,16 +35,14 @@ services:
             - db
     db:
         image: mysql:5.7.27
-        command: mysqld --wait_timeout=2147483 --max_allowed_packet=50M --character-set-server=latin1 --default-storage-engine=INNODB --sql-mode="STRICT_TRANS_TABLES,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION" --max_connections=300 --innodb_use_native_aio=0
+        command: mysqld --sql-mode="STRICT_TRANS_TABLES,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION"
         restart: always
         env_file:
             - ".env"
         environment:
             - MYSQL_DATABASE=${DB_NAME}
-            - MYSQL_ROOT_PASSWORD=${DB_ROOT_PASSWORD}
             - MYSQL_USER=${DB_USER}
             - MYSQL_PASSWORD=${DB_PASSWORD}
-        ports:
-            - "${DB_EXTERNAL_PORT}:${DB_PORT}"
+            - MYSQL_ALLOW_EMPTY_PASSWORD=1
         volumes:
             - "./storage/db/mysql:/var/lib/mysql"

@@ -36,19 +36,20 @@ GrandChef usa vários projetos de código aberto para funcionar apropriadamente:
 - make
 - msys
 - Docker
+- Yarn
 
 ### Instalação
 
 Instale as dependências e inicie o servidor.
 ```sh
-git clone https://git.assembla.com/churrascaria.api.git grandchef.api
-cd grandchef.api
+git clone git@gitlab.com:grandchef/product/api.git GrandChef.Product.API
+cd GrandChef.Product.API
 cp .env.example .env
-npm install
+yarn
 make start
-make populate
 make update
-npm run dev
+make migrate
+yarn dev
 ```
 
    [PHP]: <http://www.php.net/>

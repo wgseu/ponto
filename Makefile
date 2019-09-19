@@ -24,6 +24,7 @@ help:
 	@echo "  start        Create and start containers"
 	@echo "  migrate      Run new migrations"
 	@echo "  downgrade    Downgrade migrations"
+	@echo "  seeds         Run seeds"
 	@echo "  update       Update PHP dependencies with composer"
 	@echo "  autoload     Update PHP autoload files"
 	@echo "  test         Test application"
@@ -98,10 +99,13 @@ logs:
 	@docker-compose logs -f
 
 migrate:
-	@docker exec -i $(shell CURRENT_UID=$(CURRENT_UID) docker-compose ps -q php) ./artisan -n migrate
+	@docker exec -i $(shell CURRENT_UID=$(CURRENT_UID) docker-compose ps -q php) ./artisan migrate
 
 downgrade:
-	@docker exec -i $(shell CURRENT_UID=$(CURRENT_UID) docker-compose ps -q php) ./artisan -n migrate:rollback
+	@docker exec -i $(shell CURRENT_UID=$(CURRENT_UID) docker-compose ps -q php) ./artisan migrate:rollback
+
+seeds:
+	@docker exec -i $(shell CURRENT_UID=$(CURRENT_UID) docker-compose ps -q php) ./artisan db:seed
 
 dump:
 	@mkdir -p $(DB_DUMPS_DIR)

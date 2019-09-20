@@ -34,7 +34,7 @@ use Rebing\GraphQL\Support\InputType;
 class PagamentoInput extends InputType
 {
     protected $attributes = [
-        'name' => 'Pagamento',
+        'name' => 'PagamentoInput',
         'description' => 'Pagamentos de contas e pedidos',
     ];
 
@@ -124,7 +124,7 @@ class PagamentoInput extends InputType
                 'description' => 'Detalhes do pagamento',
             ],
             'estado' => [
-                'type' => Type::nonNull(GraphQL::type('PagamentoEstadoEnum')),
+                'type' => Type::nonNull(GraphQL::type('PagamentoEstado')),
                 'description' => 'Informa qual o andamento do processo de pagamento',
             ],
             'data_pagamento' => [

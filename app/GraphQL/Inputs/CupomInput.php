@@ -34,7 +34,7 @@ use Rebing\GraphQL\Support\InputType;
 class CupomInput extends InputType
 {
     protected $attributes = [
-        'name' => 'Cupom',
+        'name' => 'CupomInput',
         'description' => 'Informa os cupons de descontos e seus usos',
     ];
 
@@ -67,7 +67,7 @@ class CupomInput extends InputType
                 'description' => 'Quantidade de cupons disponíveis ou usados',
             ],
             'tipo_desconto' => [
-                'type' => Type::nonNull(GraphQL::type('CupomTipoDescontoEnum')),
+                'type' => Type::nonNull(GraphQL::type('CupomTipoDesconto')),
                 'description' => 'Informa se o desconto será por valor ou porcentagem',
             ],
             'valor' => [
@@ -87,7 +87,7 @@ class CupomInput extends InputType
                 'description' => 'Informa se deve limitar o cupom pela quantidade de pedidos válidos do cliente',
             ],
             'funcao_pedidos' => [
-                'type' => Type::nonNull(GraphQL::type('CupomFuncaoPedidosEnum')),
+                'type' => Type::nonNull(GraphQL::type('CupomFuncaoPedidos')),
                 'description' => 'Informa a regra para decidir se a quantidade de pedidos permite usar esse cupom',
             ],
             'pedidos_limite' => [
@@ -99,7 +99,7 @@ class CupomInput extends InputType
                 'description' => 'Informa se deve limitar o uso do cupom pelo valor do pedido',
             ],
             'funcao_valor' => [
-                'type' => Type::nonNull(GraphQL::type('CupomFuncaoValorEnum')),
+                'type' => Type::nonNull(GraphQL::type('CupomFuncaoValor')),
                 'description' => 'Informa a regra para decidir se o valor do pedido permite usar esse cupom',
             ],
             'valor_limite' => [

@@ -34,7 +34,7 @@ use Rebing\GraphQL\Support\InputType;
 class CategoriaInput extends InputType
 {
     protected $attributes = [
-        'name' => 'Categoria',
+        'name' => 'CategoriaInput',
         'description' => 'Informa qual a categoria dos produtos e permite a rápida localização dos mesmos',
     ];
 

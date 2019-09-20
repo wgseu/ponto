@@ -33,7 +33,7 @@ use Rebing\GraphQL\Support\InputType;
 class CozinhaInput extends InputType
 {
     protected $attributes = [
-        'name' => 'Cozinha',
+        'name' => 'CozinhaInput',
         'description' => 'Categoria de comida servida pelo estabelecimento',
     ];
 

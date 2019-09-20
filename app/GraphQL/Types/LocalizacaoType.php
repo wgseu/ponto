@@ -72,7 +72,7 @@ class LocalizacaoType extends GraphQLType
                 'description' => 'Número da casa ou do condomínio',
             ],
             'tipo' => [
-                'type' => Type::nonNull(GraphQL::type('LocalizacaoTipoEnum')),
+                'type' => Type::nonNull(GraphQL::type('LocalizacaoTipo')),
                 'description' => 'Tipo de endereço Casa ou Apartamento',
             ],
             'complemento' => [

@@ -34,7 +34,7 @@ use Rebing\GraphQL\Support\InputType;
 class ProdutoInput extends InputType
 {
     protected $attributes = [
-        'name' => 'Produto',
+        'name' => 'ProdutoInput',
         'description' => 'Informações sobre o produto, composição ou pacote',
     ];
 
@@ -102,7 +102,7 @@ class ProdutoInput extends InputType
                 'description' => 'Informa qual o valor para o custo de produção do produto, utilizado quando não há formação de composição do produto',
             ],
             'tipo' => [
-                'type' => Type::nonNull(GraphQL::type('ProdutoTipoEnum')),
+                'type' => Type::nonNull(GraphQL::type('ProdutoTipo')),
                 'description' => 'Informa qual é o tipo de produto. Produto: Produto normal que possui estoque, Composição: Produto que não possui estoque diretamente, pois é composto de outros produtos ou composições, Pacote: Permite a composição no momento da venda, não possui estoque diretamente',
             ],
             'cobrar_servico' => [

@@ -48,7 +48,7 @@ class ImpostoType extends GraphQLType
                 'description' => 'Identificador do imposto',
             ],
             'grupo' => [
-                'type' => Type::nonNull(GraphQL::type('ImpostoGrupoEnum')),
+                'type' => Type::nonNull(GraphQL::type('ImpostoGrupo')),
                 'description' => 'Grupo do imposto',
             ],
             'simples' => [

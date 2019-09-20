@@ -34,7 +34,7 @@ use Rebing\GraphQL\Support\InputType;
 class PontuacaoInput extends InputType
 {
     protected $attributes = [
-        'name' => 'Pontuacao',
+        'name' => 'PontuacaoInput',
         'description' => 'Informa os pontos ganhos e gastos por compras de produtos promocionais',
     ];
 

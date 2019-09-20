@@ -33,7 +33,7 @@ use Rebing\GraphQL\Support\InputType;
 class SetorInput extends InputType
 {
     protected $attributes = [
-        'name' => 'Setor',
+        'name' => 'SetorInput',
         'description' => 'Setor de impressão e de estoque',
     ];
 

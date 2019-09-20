@@ -34,7 +34,7 @@ class CarteiraTipoEnum extends EnumType
 {
     protected $attributes = [
         'name' => 'CarteiraTipo',
-        'description' => 'Tipo de carteira, 'Bancaria' para conta bancária, 'Financeira' para carteira financeira da empresa ou de sites de pagamentos, 'Credito' para cartão de crédito e 'Local' para caixas e cofres locais',
+        'description' => 'Tipo de carteira, \'Bancaria\' para conta bancária, \'Financeira\' para carteira financeira da empresa ou de sites de pagamentos, \'Credito\' para cartão de crédito e \'Local\' para caixas e cofres locais',
         'values' => [
             Carteira::TIPO_BANCARIA => Carteira::TIPO_BANCARIA,
             Carteira::TIPO_FINANCEIRA => Carteira::TIPO_FINANCEIRA,

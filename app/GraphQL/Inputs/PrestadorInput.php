@@ -34,7 +34,7 @@ use Rebing\GraphQL\Support\InputType;
 class PrestadorInput extends InputType
 {
     protected $attributes = [
-        'name' => 'Prestador',
+        'name' => 'PrestadorInput',
         'description' => 'Prestador de serviço que realiza alguma tarefa na empresa',
     ];
 
@@ -68,7 +68,7 @@ class PrestadorInput extends InputType
                 'description' => 'Informa a empresa que gerencia os colaboradores, nulo para a empresa do próprio estabelecimento',
             ],
             'vinculo' => [
-                'type' => Type::nonNull(GraphQL::type('PrestadorVinculoEnum')),
+                'type' => Type::nonNull(GraphQL::type('PrestadorVinculo')),
                 'description' => 'Vínculo empregatício com a empresa, funcionário e autônomo são pessoas físicas, prestador é pessoa jurídica',
             ],
             'porcentagem' => [

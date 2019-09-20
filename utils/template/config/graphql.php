@@ -2,12 +2,6 @@
 
 declare(strict_types=1);
 
-use App\GraphQL\Enums\CardapioLocalEnum;
-use App\GraphQL\Inputs\FuncaoInput;
-use App\GraphQL\Mutations\FuncaoMutation;
-use App\GraphQL\Queries\FuncaoQuery;
-use App\GraphQL\Types\FuncaoType;
-
 return [
     // The prefix for routes
     'prefix' => 'graphql',
@@ -101,10 +95,16 @@ return [
     'schemas' => [
         'default' => [
             'query' => [
-                'funcoes' => FuncaoQuery::class,
+$[table.each]
+                '$[tAble.norm.plural]' => 'App\GraphQL\Queries\$[Table.norm]Query',
+$[table.end]
             ],
             'mutation' => [
-                'saveFuncao' => FuncaoMutation::class
+$[table.each]
+                'Create$[Table.norm]' => 'App\GraphQL\Mutations\Create$[Table.norm]Mutation',
+                'Update$[Table.norm]' => 'App\GraphQL\Mutations\Update$[Table.norm]Mutation',
+                'Delete$[Table.norm]' => 'App\GraphQL\Mutations\Delete$[Table.norm]Mutation',
+$[table.end]
             ],
             'middleware' => [],
             'method'     => ['get', 'post'],
@@ -121,8 +121,38 @@ return [
     // ]
     //
     'types' => [
-        'funcao' => FuncaoType::class,
-        'FuncaoInput' => FuncaoInput::class,
+        'StringFilter' => 'App\GraphQL\Unions\StringUnion',
+        'NumberFilter' => 'App\GraphQL\Unions\NumberUnion',
+        'DateFilter' => 'App\GraphQL\Unions\DateUnion',
+
+        'StringInput' => 'App\GraphQL\Inputs\StringInput',
+        'NumberInput' => 'App\GraphQL\Inputs\NumberInput',
+        'DateInput' => 'App\GraphQL\Inputs\DateInput',
+        'DateRangeInput' => 'App\GraphQL\Inputs\DateRangeInput',
+
+$[table.each]
+$[field.each(all)]
+$[field.if(enum)]
+        '$[Table.norm]$[Field.norm]' => 'App\GraphQL\Enums\$[Table.norm]$[Field.norm]Enum',
+$[field.end]
+$[field.end]
+$[table.end]
+
+$[table.each]
+        '$[Table.norm]Filter' => 'App\GraphQL\Filters\$[Table.norm]Filter',
+$[table.end]
+
+$[table.each]
+        '$[Table.norm]Order' => 'App\GraphQL\Ordering\$[Table.norm]Order',
+$[table.end]
+
+$[table.each]
+        '$[Table.norm]Input' => 'App\GraphQL\Inputs\$[Table.norm]Input',
+$[table.end]
+
+$[table.each]
+        '$[Table.norm]' => 'App\GraphQL\Types\$[Table.norm]Type',
+$[table.end]
     ],
 
     // The types will be loaded on demand. Default is to load all types on each request

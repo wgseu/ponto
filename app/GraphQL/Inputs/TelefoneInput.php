@@ -33,7 +33,7 @@ use Rebing\GraphQL\Support\InputType;
 class TelefoneInput extends InputType
 {
     protected $attributes = [
-        'name' => 'Telefone',
+        'name' => 'TelefoneInput',
         'description' => 'Telefones dos clientes, apenas o telefone principal deve ser único por cliente',
     ];
 

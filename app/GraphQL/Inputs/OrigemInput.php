@@ -33,7 +33,7 @@ use Rebing\GraphQL\Support\InputType;
 class OrigemInput extends InputType
 {
     protected $attributes = [
-        'name' => 'Origem',
+        'name' => 'OrigemInput',
         'description' => 'Origem da mercadoria',
     ];
 

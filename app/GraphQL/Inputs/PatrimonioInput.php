@@ -34,7 +34,7 @@ use Rebing\GraphQL\Support\InputType;
 class PatrimonioInput extends InputType
 {
     protected $attributes = [
-        'name' => 'Patrimonio',
+        'name' => 'PatrimonioInput',
         'description' => 'Informa detalhadamente um bem da empresa',
     ];
 
@@ -80,7 +80,7 @@ class PatrimonioInput extends InputType
                 'description' => 'Comprimento do bem em metros',
             ],
             'estado' => [
-                'type' => Type::nonNull(GraphQL::type('PatrimonioEstadoEnum')),
+                'type' => Type::nonNull(GraphQL::type('PatrimonioEstado')),
                 'description' => 'Estado de conservação do bem',
             ],
             'custo' => [

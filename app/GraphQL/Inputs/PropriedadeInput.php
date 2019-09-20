@@ -34,7 +34,7 @@ use Rebing\GraphQL\Support\InputType;
 class PropriedadeInput extends InputType
 {
     protected $attributes = [
-        'name' => 'Propriedade',
+        'name' => 'PropriedadeInput',
         'description' => 'Informa tamanhos de pizzas e opções de peso do produto',
     ];
 

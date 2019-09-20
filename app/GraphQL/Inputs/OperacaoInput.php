@@ -33,7 +33,7 @@ use Rebing\GraphQL\Support\InputType;
 class OperacaoInput extends InputType
 {
     protected $attributes = [
-        'name' => 'Operacao',
+        'name' => 'OperacaoInput',
         'description' => 'Código Fiscal de Operações e Prestações (CFOP)',
     ];
 

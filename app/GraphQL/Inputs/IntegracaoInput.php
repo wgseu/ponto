@@ -34,7 +34,7 @@ use Rebing\GraphQL\Support\InputType;
 class IntegracaoInput extends InputType
 {
     protected $attributes = [
-        'name' => 'Integracao',
+        'name' => 'IntegracaoInput',
         'description' => 'Informa quais integrações estão disponíveis',
     ];
 

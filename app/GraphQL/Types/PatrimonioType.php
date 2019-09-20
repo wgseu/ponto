@@ -80,7 +80,7 @@ class PatrimonioType extends GraphQLType
                 'description' => 'Comprimento do bem em metros',
             ],
             'estado' => [
-                'type' => Type::nonNull(GraphQL::type('PatrimonioEstadoEnum')),
+                'type' => Type::nonNull(GraphQL::type('PatrimonioEstado')),
                 'description' => 'Estado de conservação do bem',
             ],
             'custo' => [

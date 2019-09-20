@@ -33,7 +33,7 @@ use Rebing\GraphQL\Support\InputType;
 class BancoInput extends InputType
 {
     protected $attributes = [
-        'name' => 'Banco',
+        'name' => 'BancoInput',
         'description' => 'Bancos disponíveis no país',
     ];
 

@@ -84,11 +84,11 @@ class PedidoType extends GraphQLType
                 'description' => 'Informa se o pedido veio de uma integração e se está associado',
             ],
             'tipo' => [
-                'type' => Type::nonNull(GraphQL::type('PedidoTipoEnum')),
+                'type' => Type::nonNull(GraphQL::type('PedidoTipo')),
                 'description' => 'Tipo de venda',
             ],
             'estado' => [
-                'type' => Type::nonNull(GraphQL::type('PedidoEstadoEnum')),
+                'type' => Type::nonNull(GraphQL::type('PedidoEstado')),
                 'description' => 'Estado do pedido, Agendado: O pedido deve ser processado na data de agendamento. Aberto: O pedido deve ser processado. Entrega: O pedido saiu para entrega. Fechado: O cliente pediu a conta e está pronto para pagar. Concluído: O pedido foi pago e concluído, Cancelado: O pedido foi cancelado com os itens e pagamentos',
             ],
             'servicos' => [

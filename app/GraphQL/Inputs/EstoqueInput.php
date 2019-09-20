@@ -34,7 +34,7 @@ use Rebing\GraphQL\Support\InputType;
 class EstoqueInput extends InputType
 {
     protected $attributes = [
-        'name' => 'Estoque',
+        'name' => 'EstoqueInput',
         'description' => 'Estoque de produtos por setor',
     ];
 

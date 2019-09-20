@@ -60,7 +60,7 @@ class GrupoType extends GraphQLType
                 'description' => 'Descrição do grupo da formação, Exemplo: Escolha o tamanho, Escolha os sabores',
             ],
             'tipo' => [
-                'type' => Type::nonNull(GraphQL::type('GrupoTipoEnum')),
+                'type' => Type::nonNull(GraphQL::type('GrupoTipo')),
                 'description' => ' Informa se a formação final será apenas uma unidade ou vários itens',
             ],
             'quantidade_minima' => [
@@ -72,7 +72,7 @@ class GrupoType extends GraphQLType
                 'description' => 'Define a quantidade máxima de itens que podem ser escolhidos',
             ],
             'funcao' => [
-                'type' => Type::nonNull(GraphQL::type('GrupoFuncaoEnum')),
+                'type' => Type::nonNull(GraphQL::type('GrupoFuncao')),
                 'description' => 'Informa qual será a fórmula de cálculo do preço, Mínimo: obtém o menor preço, Média:  define o preço do produto como a média dos itens selecionados, Máximo: Obtém o preço do item mais caro do grupo, Soma: Soma todos os preços dos produtos selecionados',
             ],
             'ordem' => [

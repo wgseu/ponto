@@ -34,7 +34,7 @@ use Rebing\GraphQL\Support\InputType;
 class ContaInput extends InputType
 {
     protected $attributes = [
-        'name' => 'Conta',
+        'name' => 'ContaInput',
         'description' => 'Contas a pagar e ou receber',
     ];
 
@@ -74,7 +74,7 @@ class ContaInput extends InputType
                 'description' => 'Pedido da qual essa conta foi gerada',
             ],
             'tipo' => [
-                'type' => Type::nonNull(GraphQL::type('ContaTipoEnum')),
+                'type' => Type::nonNull(GraphQL::type('ContaTipo')),
                 'description' => 'Tipo de conta se receita ou despesa',
             ],
             'descricao' => [
@@ -91,7 +91,7 @@ class ContaInput extends InputType
                 'description' => 'Valor pago ou recebido da conta',
             ],
             'fonte' => [
-                'type' => Type::nonNull(GraphQL::type('ContaFonteEnum')),
+                'type' => Type::nonNull(GraphQL::type('ContaFonte')),
                 'description' => 'Fonte dos valores, comissão e remuneração se pagar antes do vencimento, o valor será proporcional',
             ],
             'numero_parcela' => [
@@ -107,7 +107,7 @@ class ContaInput extends InputType
                 'description' => 'Frequência da recorrência em dias ou mês, depende do modo de cobrança',
             ],
             'modo' => [
-                'type' => Type::nonNull(GraphQL::type('ContaModoEnum')),
+                'type' => Type::nonNull(GraphQL::type('ContaModo')),
                 'description' => 'Modo de cobrança se diário ou mensal, a quantidade é definida em frequencia',
             ],
             'automatico' => [
@@ -127,7 +127,7 @@ class ContaInput extends InputType
                 'description' => 'Juros diário em caso de atraso, valor de 0 a 1, 1 = 100%',
             ],
             'formula' => [
-                'type' => Type::nonNull(GraphQL::type('ContaFormulaEnum')),
+                'type' => Type::nonNull(GraphQL::type('ContaFormula')),
                 'description' => 'Fórmula de juros que será cobrado em caso de atraso',
             ],
             'vencimento' => [
@@ -145,7 +145,7 @@ class ContaInput extends InputType
                 'description' => 'Caminho do anexo da conta',
             ],
             'estado' => [
-                'type' => Type::nonNull(GraphQL::type('ContaEstadoEnum')),
+                'type' => Type::nonNull(GraphQL::type('ContaEstado')),
                 'description' => 'Informa o estado da conta',
             ],
             'data_calculo' => [

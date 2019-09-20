@@ -48,7 +48,7 @@ class HorarioType extends GraphQLType
                 'description' => 'Identificador do horário',
             ],
             'modo' => [
-                'type' => Type::nonNull(GraphQL::type('HorarioModoEnum')),
+                'type' => Type::nonNull(GraphQL::type('HorarioModo')),
                 'description' => 'Modo de trabalho disponível nesse horário, Funcionamento: horário em que o estabelecimento estará aberto, Operação: quando aceitar novos pedidos locais, Entrega: quando aceita ainda pedidos para entrega',
             ],
             'funcao_id' => [

@@ -34,7 +34,7 @@ use Rebing\GraphQL\Support\InputType;
 class PromocaoInput extends InputType
 {
     protected $attributes = [
-        'name' => 'Promocao',
+        'name' => 'PromocaoInput',
         'description' => 'Informa se há descontos nos produtos em determinados dias da semana, o preço pode subir ou descer e ser agendado para ser aplicado',
     ];
 
@@ -74,7 +74,7 @@ class PromocaoInput extends InputType
                 'description' => 'Permite alterar o preço do produto para cada integração',
             ],
             'local' => [
-                'type' => GraphQL::type('PromocaoLocalEnum'),
+                'type' => GraphQL::type('PromocaoLocal'),
                 'description' => 'Local onde o preço será aplicado',
             ],
             'inicio' => [
@@ -114,7 +114,7 @@ class PromocaoInput extends InputType
                 'description' => 'Informa se deve limitar a quantidade de vendas dessa categoria, produto ou serviço',
             ],
             'funcao_vendas' => [
-                'type' => Type::nonNull(GraphQL::type('PromocaoFuncaoVendasEnum')),
+                'type' => Type::nonNull(GraphQL::type('PromocaoFuncaoVendas')),
                 'description' => 'Informa a regra para decidir se ainda pode vender com essa promoção',
             ],
             'vendas_limite' => [
@@ -126,7 +126,7 @@ class PromocaoInput extends InputType
                 'description' => 'Informa se deve limitar a venda desse produto por cliente',
             ],
             'funcao_cliente' => [
-                'type' => Type::nonNull(GraphQL::type('PromocaoFuncaoClienteEnum')),
+                'type' => Type::nonNull(GraphQL::type('PromocaoFuncaoCliente')),
                 'description' => 'Informa a regra para decidir se o cliente consegue comprar mais nessa promoção',
             ],
             'cliente_limite' => [

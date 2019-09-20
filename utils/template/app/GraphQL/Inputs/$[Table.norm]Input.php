@@ -36,7 +36,7 @@ use Rebing\GraphQL\Support\InputType;
 class $[Table.norm]Input extends InputType
 {
     protected $attributes = [
-        'name' => '$[Table.norm]',
+        'name' => '$[Table.norm]Input',
         'description' => '$[Table.comment]',
     ];
 
@@ -66,7 +66,7 @@ $[field.else.if(blob)]
 $[field.else.if(boolean)]
                 'type' => $[field.if(null)]$[field.else]Type::nonNull($[field.end]Type::boolean()$[field.if(null)]$[field.else])$[field.end],
 $[field.else.if(enum)]
-                'type' => $[field.if(null)]$[field.else]Type::nonNull($[field.end]GraphQL::type('$[Table.norm]$[Field.norm]Enum')$[field.if(null)]$[field.else])$[field.end],
+                'type' => $[field.if(null)]$[field.else]Type::nonNull($[field.end]GraphQL::type('$[Table.norm]$[Field.norm]')$[field.if(null)]$[field.else])$[field.end],
 $[field.else]
                 'type' => $[field.if(null)]$[field.else]Type::nonNull($[field.end]Type::string()$[field.if(null)]$[field.else])$[field.end],
                 'rules' => ['max:$[field.length]'],

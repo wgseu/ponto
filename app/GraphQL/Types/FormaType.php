@@ -48,7 +48,7 @@ class FormaType extends GraphQLType
                 'description' => 'Identificador da forma de pagamento',
             ],
             'tipo' => [
-                'type' => Type::nonNull(GraphQL::type('FormaTipoEnum')),
+                'type' => Type::nonNull(GraphQL::type('FormaTipo')),
                 'description' => 'Tipo de pagamento',
             ],
             'carteira_id' => [

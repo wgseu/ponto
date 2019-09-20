@@ -34,7 +34,7 @@ use Rebing\GraphQL\Support\InputType;
 class EmitenteInput extends InputType
 {
     protected $attributes = [
-        'name' => 'Emitente',
+        'name' => 'EmitenteInput',
         'description' => 'Dados do emitente das notas fiscais',
     ];
 
@@ -54,7 +54,7 @@ class EmitenteInput extends InputType
                 'description' => 'Regime tributário da empresa',
             ],
             'ambiente' => [
-                'type' => Type::nonNull(GraphQL::type('EmitenteAmbienteEnum')),
+                'type' => Type::nonNull(GraphQL::type('EmitenteAmbiente')),
                 'description' => 'Ambiente de emissão das notas',
             ],
             'csc_teste' => [

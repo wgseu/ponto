@@ -34,7 +34,7 @@ use Rebing\GraphQL\Support\InputType;
 class LocalizacaoInput extends InputType
 {
     protected $attributes = [
-        'name' => 'Localizacao',
+        'name' => 'LocalizacaoInput',
         'description' => 'Endereço detalhado de um cliente',
     ];
 
@@ -73,7 +73,7 @@ class LocalizacaoInput extends InputType
                 'description' => 'Número da casa ou do condomínio',
             ],
             'tipo' => [
-                'type' => Type::nonNull(GraphQL::type('LocalizacaoTipoEnum')),
+                'type' => Type::nonNull(GraphQL::type('LocalizacaoTipo')),
                 'description' => 'Tipo de endereço Casa ou Apartamento',
             ],
             'complemento' => [

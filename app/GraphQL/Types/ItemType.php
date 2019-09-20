@@ -112,7 +112,7 @@ class ItemType extends GraphQLType
                 'description' => 'Observações do item pedido, Ex.: bem gelado, mal passado',
             ],
             'estado' => [
-                'type' => Type::nonNull(GraphQL::type('ItemEstadoEnum')),
+                'type' => Type::nonNull(GraphQL::type('ItemEstado')),
                 'description' => 'Estado de preparo e envio do produto',
             ],
             'cancelado' => [

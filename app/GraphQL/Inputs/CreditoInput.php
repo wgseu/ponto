@@ -34,7 +34,7 @@ use Rebing\GraphQL\Support\InputType;
 class CreditoInput extends InputType
 {
     protected $attributes = [
-        'name' => 'Credito',
+        'name' => 'CreditoInput',
         'description' => 'Créditos de clientes',
     ];
 

@@ -34,7 +34,7 @@ use Rebing\GraphQL\Support\InputType;
 class MoedaInput extends InputType
 {
     protected $attributes = [
-        'name' => 'Moeda',
+        'name' => 'MoedaInput',
         'description' => 'Moedas financeiras de um país',
     ];
 

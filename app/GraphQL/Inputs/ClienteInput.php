@@ -34,7 +34,7 @@ use Rebing\GraphQL\Support\InputType;
 class ClienteInput extends InputType
 {
     protected $attributes = [
-        'name' => 'Cliente',
+        'name' => 'ClienteInput',
         'description' => 'Informações de cliente físico ou jurídico. Clientes, empresas, funcionários, fornecedores e parceiros são cadastrados aqui',
     ];
 
@@ -46,7 +46,7 @@ class ClienteInput extends InputType
                 'description' => 'Identificador do cliente',
             ],
             'tipo' => [
-                'type' => Type::nonNull(GraphQL::type('ClienteTipoEnum')),
+                'type' => Type::nonNull(GraphQL::type('ClienteTipo')),
                 'description' => 'Informa o tipo de pessoa, que pode ser física ou jurídica',
             ],
             'empresa_id' => [
@@ -74,7 +74,7 @@ class ClienteInput extends InputType
                 'description' => 'Restante do nome da pessoa física ou Razão social da empresa',
             ],
             'genero' => [
-                'type' => GraphQL::type('ClienteGeneroEnum'),
+                'type' => GraphQL::type('ClienteGenero'),
                 'description' => 'Informa o gênero do cliente do tipo pessoa física',
             ],
             'cpf' => [
@@ -107,7 +107,7 @@ class ClienteInput extends InputType
                 'description' => 'Slogan ou detalhes do cliente',
             ],
             'status' => [
-                'type' => Type::nonNull(GraphQL::type('ClienteStatusEnum')),
+                'type' => Type::nonNull(GraphQL::type('ClienteStatus')),
                 'description' => 'Informa o estado da conta do cliente',
             ],
             'secreto' => [

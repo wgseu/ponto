@@ -34,7 +34,7 @@ use Rebing\GraphQL\Support\InputType;
 class AuditoriaInput extends InputType
 {
     protected $attributes = [
-        'name' => 'Auditoria',
+        'name' => 'AuditoriaInput',
         'description' => 'Registra todas as atividades importantes do sistema',
     ];
 
@@ -58,11 +58,11 @@ class AuditoriaInput extends InputType
                 'description' => 'Prestador que autorizou o acesso ao recurso descrito',
             ],
             'tipo' => [
-                'type' => Type::nonNull(GraphQL::type('AuditoriaTipoEnum')),
+                'type' => Type::nonNull(GraphQL::type('AuditoriaTipo')),
                 'description' => 'Tipo de atividade exercida',
             ],
             'prioridade' => [
-                'type' => Type::nonNull(GraphQL::type('AuditoriaPrioridadeEnum')),
+                'type' => Type::nonNull(GraphQL::type('AuditoriaPrioridade')),
                 'description' => 'Prioridade de acesso do recurso',
             ],
             'descricao' => [

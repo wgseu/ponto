@@ -52,7 +52,7 @@ class ListaType extends GraphQLType
                 'description' => 'Nome da lista, pode ser uma data',
             ],
             'estado' => [
-                'type' => Type::nonNull(GraphQL::type('ListaEstadoEnum')),
+                'type' => Type::nonNull(GraphQL::type('ListaEstado')),
                 'description' => 'Estado da lista de compra. Análise: Ainda estão sendo adicionado produtos na lista, Fechada: Está pronto para compra, Comprada: Todos os itens foram comprados',
             ],
             'encarregado_id' => [

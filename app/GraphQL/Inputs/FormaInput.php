@@ -34,7 +34,7 @@ use Rebing\GraphQL\Support\InputType;
 class FormaInput extends InputType
 {
     protected $attributes = [
-        'name' => 'Forma',
+        'name' => 'FormaInput',
         'description' => 'Formas de pagamento disponíveis para pedido e contas',
     ];
 
@@ -46,7 +46,7 @@ class FormaInput extends InputType
                 'description' => 'Identificador da forma de pagamento',
             ],
             'tipo' => [
-                'type' => Type::nonNull(GraphQL::type('FormaTipoEnum')),
+                'type' => Type::nonNull(GraphQL::type('FormaTipo')),
                 'description' => 'Tipo de pagamento',
             ],
             'carteira_id' => [

@@ -34,7 +34,7 @@ use Rebing\GraphQL\Support\InputType;
 class ChequeInput extends InputType
 {
     protected $attributes = [
-        'name' => 'Cheque',
+        'name' => 'ChequeInput',
         'description' => 'Folha de cheque lançado como pagamento',
     ];
 

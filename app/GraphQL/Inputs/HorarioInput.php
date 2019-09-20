@@ -34,7 +34,7 @@ use Rebing\GraphQL\Support\InputType;
 class HorarioInput extends InputType
 {
     protected $attributes = [
-        'name' => 'Horario',
+        'name' => 'HorarioInput',
         'description' => 'Informa o horário de funcionamento do estabelecimento',
     ];
 
@@ -46,7 +46,7 @@ class HorarioInput extends InputType
                 'description' => 'Identificador do horário',
             ],
             'modo' => [
-                'type' => Type::nonNull(GraphQL::type('HorarioModoEnum')),
+                'type' => Type::nonNull(GraphQL::type('HorarioModo')),
                 'description' => 'Modo de trabalho disponível nesse horário, Funcionamento: horário em que o estabelecimento estará aberto, Operação: quando aceitar novos pedidos locais, Entrega: quando aceita ainda pedidos para entrega',
             ],
             'funcao_id' => [

@@ -34,7 +34,7 @@ use Rebing\GraphQL\Support\InputType;
 class SistemaInput extends InputType
 {
     protected $attributes = [
-        'name' => 'Sistema',
+        'name' => 'SistemaInput',
         'description' => 'Classe que informa detalhes da empresa, parceiro e opções do sistema como a versão do banco de dados e a licença de uso',
     ];
 

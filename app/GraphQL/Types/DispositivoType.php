@@ -60,7 +60,7 @@ class DispositivoType extends GraphQLType
                 'description' => 'Nome do computador ou tablet em rede, único entre os dispositivos',
             ],
             'tipo' => [
-                'type' => Type::nonNull(GraphQL::type('DispositivoTipoEnum')),
+                'type' => Type::nonNull(GraphQL::type('DispositivoTipo')),
                 'description' => 'Tipo de dispositivo',
             ],
             'descricao' => [

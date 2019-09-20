@@ -33,7 +33,7 @@ use Rebing\GraphQL\Support\InputType;
 class PermissaoInput extends InputType
 {
     protected $attributes = [
-        'name' => 'Permissao',
+        'name' => 'PermissaoInput',
         'description' => 'Informa a listagem de todas as funções do sistema',
     ];
 

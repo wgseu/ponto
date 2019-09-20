@@ -33,7 +33,7 @@ use Rebing\GraphQL\Support\InputType;
 class PaisInput extends InputType
 {
     protected $attributes = [
-        'name' => 'Pais',
+        'name' => 'PaisInput',
         'description' => 'Informações de um páis com sua moeda e língua nativa',
     ];
 

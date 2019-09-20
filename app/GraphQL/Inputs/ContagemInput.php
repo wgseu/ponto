@@ -34,7 +34,7 @@ use Rebing\GraphQL\Support\InputType;
 class ContagemInput extends InputType
 {
     protected $attributes = [
-        'name' => 'Contagem',
+        'name' => 'ContagemInput',
         'description' => 'Guarda a soma do estoque de cada produto por setor',
     ];
 

@@ -33,7 +33,7 @@ use Rebing\GraphQL\Support\InputType;
 class ComandaInput extends InputType
 {
     protected $attributes = [
-        'name' => 'Comanda',
+        'name' => 'ComandaInput',
         'description' => 'Comanda individual, permite lançar pedidos em cartões de consumo',
     ];
 

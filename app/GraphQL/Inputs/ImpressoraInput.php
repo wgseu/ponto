@@ -34,7 +34,7 @@ use Rebing\GraphQL\Support\InputType;
 class ImpressoraInput extends InputType
 {
     protected $attributes = [
-        'name' => 'Impressora',
+        'name' => 'ImpressoraInput',
         'description' => 'Impressora para impressão de serviços e contas',
     ];
 
@@ -64,7 +64,7 @@ class ImpressoraInput extends InputType
                 'description' => 'Informa qual conjunto de comandos deve ser utilizado',
             ],
             'modo' => [
-                'type' => Type::nonNull(GraphQL::type('ImpressoraModoEnum')),
+                'type' => Type::nonNull(GraphQL::type('ImpressoraModo')),
                 'description' => 'Modo de impressão',
             ],
             'opcoes' => [

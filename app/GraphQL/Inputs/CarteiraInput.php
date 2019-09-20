@@ -34,7 +34,7 @@ use Rebing\GraphQL\Support\InputType;
 class CarteiraInput extends InputType
 {
     protected $attributes = [
-        'name' => 'Carteira',
+        'name' => 'CarteiraInput',
         'description' => 'Informa uma conta bancária ou uma carteira financeira',
     ];
 
@@ -46,8 +46,8 @@ class CarteiraInput extends InputType
                 'description' => 'Código local da carteira',
             ],
             'tipo' => [
-                'type' => Type::nonNull(GraphQL::type('CarteiraTipoEnum')),
-                'description' => 'Tipo de carteira, 'Bancaria' para conta bancária, 'Financeira' para carteira financeira da empresa ou de sites de pagamentos, 'Credito' para cartão de crédito e 'Local' para caixas e cofres locais',
+                'type' => Type::nonNull(GraphQL::type('CarteiraTipo')),
+                'description' => 'Tipo de carteira, \'Bancaria\' para conta bancária, \'Financeira\' para carteira financeira da empresa ou de sites de pagamentos, \'Credito\' para cartão de crédito e \'Local\' para caixas e cofres locais',
             ],
             'carteira_id' => [
                 'type' => Type::int(),
@@ -86,7 +86,7 @@ class CarteiraInput extends InputType
                 'description' => 'Token para integração de pagamentos',
             ],
             'ambiente' => [
-                'type' => GraphQL::type('CarteiraAmbienteEnum'),
+                'type' => GraphQL::type('CarteiraAmbiente'),
                 'description' => 'Ambiente de execução da API usando o token',
             ],
             'logo_url' => [

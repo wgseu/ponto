@@ -56,7 +56,7 @@ class CardapioType extends GraphQLType
                 'description' => 'Permite exibir o cardápio somente nessa integração',
             ],
             'local' => [
-                'type' => GraphQL::type('CardapioLocalEnum'),
+                'type' => GraphQL::type('CardapioLocal'),
                 'description' => 'O cardápio será exibido para vendas nesse local',
             ],
             'acrescimo' => [

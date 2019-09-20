@@ -33,7 +33,7 @@ use Rebing\GraphQL\Support\InputType;
 class BairroInput extends InputType
 {
     protected $attributes = [
-        'name' => 'Bairro',
+        'name' => 'BairroInput',
         'description' => 'Bairro de uma cidade',
     ];
 

@@ -34,7 +34,7 @@ use Rebing\GraphQL\Support\InputType;
 class CardapioInput extends InputType
 {
     protected $attributes = [
-        'name' => 'Cardapio',
+        'name' => 'CardapioInput',
         'description' => 'Cardápios para cada integração ou local de venda',
     ];
 
@@ -54,7 +54,7 @@ class CardapioInput extends InputType
                 'description' => 'Permite exibir o cardápio somente nessa integração',
             ],
             'local' => [
-                'type' => GraphQL::type('CardapioLocalEnum'),
+                'type' => GraphQL::type('CardapioLocal'),
                 'description' => 'O cardápio será exibido para vendas nesse local',
             ],
             'acrescimo' => [

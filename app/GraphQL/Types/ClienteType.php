@@ -48,7 +48,7 @@ class ClienteType extends GraphQLType
                 'description' => 'Identificador do cliente',
             ],
             'tipo' => [
-                'type' => Type::nonNull(GraphQL::type('ClienteTipoEnum')),
+                'type' => Type::nonNull(GraphQL::type('ClienteTipo')),
                 'description' => 'Informa o tipo de pessoa, que pode ser física ou jurídica',
             ],
             'empresa_id' => [
@@ -72,7 +72,7 @@ class ClienteType extends GraphQLType
                 'description' => 'Restante do nome da pessoa física ou Razão social da empresa',
             ],
             'genero' => [
-                'type' => GraphQL::type('ClienteGeneroEnum'),
+                'type' => GraphQL::type('ClienteGenero'),
                 'description' => 'Informa o gênero do cliente do tipo pessoa física',
             ],
             'cpf' => [
@@ -100,7 +100,7 @@ class ClienteType extends GraphQLType
                 'description' => 'Slogan ou detalhes do cliente',
             ],
             'status' => [
-                'type' => Type::nonNull(GraphQL::type('ClienteStatusEnum')),
+                'type' => Type::nonNull(GraphQL::type('ClienteStatus')),
                 'description' => 'Informa o estado da conta do cliente',
             ],
             'secreto' => [

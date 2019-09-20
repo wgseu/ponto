@@ -33,7 +33,7 @@ use Rebing\GraphQL\Support\InputType;
 class ClassificacaoInput extends InputType
 {
     protected $attributes = [
-        'name' => 'Classificacao',
+        'name' => 'ClassificacaoInput',
         'description' => 'Classificação se contas, permite atribuir um grupo de contas',
     ];
 

@@ -33,7 +33,7 @@ use Rebing\GraphQL\Support\InputType;
 class UnidadeInput extends InputType
 {
     protected $attributes = [
-        'name' => 'Unidade',
+        'name' => 'UnidadeInput',
         'description' => 'Unidades de medidas aplicadas aos produtos',
     ];
 

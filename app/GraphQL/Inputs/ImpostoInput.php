@@ -34,7 +34,7 @@ use Rebing\GraphQL\Support\InputType;
 class ImpostoInput extends InputType
 {
     protected $attributes = [
-        'name' => 'Imposto',
+        'name' => 'ImpostoInput',
         'description' => 'Impostos disponíveis para informar no produto',
     ];
 
@@ -46,7 +46,7 @@ class ImpostoInput extends InputType
                 'description' => 'Identificador do imposto',
             ],
             'grupo' => [
-                'type' => Type::nonNull(GraphQL::type('ImpostoGrupoEnum')),
+                'type' => Type::nonNull(GraphQL::type('ImpostoGrupo')),
                 'description' => 'Grupo do imposto',
             ],
             'simples' => [

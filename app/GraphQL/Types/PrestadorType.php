@@ -68,7 +68,7 @@ class PrestadorType extends GraphQLType
                 'description' => 'Informa a empresa que gerencia os colaboradores, nulo para a empresa do próprio estabelecimento',
             ],
             'vinculo' => [
-                'type' => Type::nonNull(GraphQL::type('PrestadorVinculoEnum')),
+                'type' => Type::nonNull(GraphQL::type('PrestadorVinculo')),
                 'description' => 'Vínculo empregatício com a empresa, funcionário e autônomo são pessoas físicas, prestador é pessoa jurídica',
             ],
             'porcentagem' => [

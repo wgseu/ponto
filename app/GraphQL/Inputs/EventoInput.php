@@ -34,7 +34,7 @@ use Rebing\GraphQL\Support\InputType;
 class EventoInput extends InputType
 {
     protected $attributes = [
-        'name' => 'Evento',
+        'name' => 'EventoInput',
         'description' => 'Eventos de envio das notas',
     ];
 
@@ -50,7 +50,7 @@ class EventoInput extends InputType
                 'description' => 'Nota a qual o evento foi criado',
             ],
             'estado' => [
-                'type' => Type::nonNull(GraphQL::type('EventoEstadoEnum')),
+                'type' => Type::nonNull(GraphQL::type('EventoEstado')),
                 'description' => 'Estado do evento',
             ],
             'mensagem' => [

@@ -34,7 +34,7 @@ use Rebing\GraphQL\Support\InputType;
 class MovimentacaoInput extends InputType
 {
     protected $attributes = [
-        'name' => 'Movimentacao',
+        'name' => 'MovimentacaoInput',
         'description' => 'Movimentação do caixa, permite abrir diversos caixas na conta de operadores',
     ];
 

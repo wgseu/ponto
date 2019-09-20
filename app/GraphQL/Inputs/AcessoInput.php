@@ -33,7 +33,7 @@ use Rebing\GraphQL\Support\InputType;
 class AcessoInput extends InputType
 {
     protected $attributes = [
-        'name' => 'Acesso',
+        'name' => 'AcessoInput',
         'description' => 'Permite acesso à uma determinada funcionalidade da lista de permissões',
     ];
 

@@ -34,7 +34,7 @@ use Rebing\GraphQL\Support\InputType;
 class PacoteInput extends InputType
 {
     protected $attributes = [
-        'name' => 'Pacote',
+        'name' => 'PacoteInput',
         'description' => 'Contém todos as opções para a formação do produto final',
     ];
 

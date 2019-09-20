@@ -52,7 +52,7 @@ class EventoType extends GraphQLType
                 'description' => 'Nota a qual o evento foi criado',
             ],
             'estado' => [
-                'type' => Type::nonNull(GraphQL::type('EventoEstadoEnum')),
+                'type' => Type::nonNull(GraphQL::type('EventoEstado')),
                 'description' => 'Estado do evento',
             ],
             'mensagem' => [

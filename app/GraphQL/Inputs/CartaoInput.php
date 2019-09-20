@@ -33,7 +33,7 @@ use Rebing\GraphQL\Support\InputType;
 class CartaoInput extends InputType
 {
     protected $attributes = [
-        'name' => 'Cartao',
+        'name' => 'CartaoInput',
         'description' => 'Cartões utilizados na forma de pagamento em cartão',
     ];
 

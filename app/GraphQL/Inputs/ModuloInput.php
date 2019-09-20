@@ -33,7 +33,7 @@ use Rebing\GraphQL\Support\InputType;
 class ModuloInput extends InputType
 {
     protected $attributes = [
-        'name' => 'Modulo',
+        'name' => 'ModuloInput',
         'description' => 'Módulos do sistema que podem ser desativados/ativados',
     ];
 

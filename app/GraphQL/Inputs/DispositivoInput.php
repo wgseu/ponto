@@ -34,7 +34,7 @@ use Rebing\GraphQL\Support\InputType;
 class DispositivoInput extends InputType
 {
     protected $attributes = [
-        'name' => 'Dispositivo',
+        'name' => 'DispositivoInput',
         'description' => 'Computadores e tablets com opções de acesso',
     ];
 
@@ -59,7 +59,7 @@ class DispositivoInput extends InputType
                 'description' => 'Nome do computador ou tablet em rede, único entre os dispositivos',
             ],
             'tipo' => [
-                'type' => Type::nonNull(GraphQL::type('DispositivoTipoEnum')),
+                'type' => Type::nonNull(GraphQL::type('DispositivoTipo')),
                 'description' => 'Tipo de dispositivo',
             ],
             'descricao' => [

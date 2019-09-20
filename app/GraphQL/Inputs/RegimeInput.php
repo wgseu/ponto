@@ -33,7 +33,7 @@ use Rebing\GraphQL\Support\InputType;
 class RegimeInput extends InputType
 {
     protected $attributes = [
-        'name' => 'Regime',
+        'name' => 'RegimeInput',
         'description' => 'Regimes tributários',
     ];
 

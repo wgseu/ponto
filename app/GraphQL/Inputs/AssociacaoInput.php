@@ -34,7 +34,7 @@ use Rebing\GraphQL\Support\InputType;
 class AssociacaoInput extends InputType
 {
     protected $attributes = [
-        'name' => 'Associacao',
+        'name' => 'AssociacaoInput',
         'description' => 'Lista de pedidos que não foram integrados ainda e devem ser associados ao sistema',
     ];
 
@@ -99,7 +99,7 @@ class AssociacaoInput extends InputType
                 'description' => 'Total que foi pago incluindo o troco',
             ],
             'status' => [
-                'type' => Type::nonNull(GraphQL::type('AssociacaoStatusEnum')),
+                'type' => Type::nonNull(GraphQL::type('AssociacaoStatus')),
                 'description' => 'Status do pedido que não foi integrado ainda',
             ],
             'motivo' => [

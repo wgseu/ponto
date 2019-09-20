@@ -33,7 +33,7 @@ use Rebing\GraphQL\Support\InputType;
 class EnderecoInput extends InputType
 {
     protected $attributes = [
-        'name' => 'Endereco',
+        'name' => 'EnderecoInput',
         'description' => 'Endereços de ruas e avenidas com informação de CEP',
     ];
 

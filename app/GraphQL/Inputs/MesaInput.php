@@ -33,7 +33,7 @@ use Rebing\GraphQL\Support\InputType;
 class MesaInput extends InputType
 {
     protected $attributes = [
-        'name' => 'Mesa',
+        'name' => 'MesaInput',
         'description' => 'Mesas para lançamento de pedidos',
     ];
 

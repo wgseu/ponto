@@ -34,7 +34,7 @@ use Rebing\GraphQL\Support\InputType;
 class ViagemInput extends InputType
 {
     protected $attributes = [
-        'name' => 'Viagem',
+        'name' => 'ViagemInput',
         'description' => 'Registro de viagem de uma entrega ou compra de insumos',
     ];
 

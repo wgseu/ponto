@@ -34,7 +34,7 @@ use Rebing\GraphQL\Support\InputType;
 class ServicoInput extends InputType
 {
     protected $attributes = [
-        'name' => 'Servico',
+        'name' => 'ServicoInput',
         'description' => 'Taxas, eventos e serviço cobrado nos pedidos',
     ];
 
@@ -61,7 +61,7 @@ class ServicoInput extends InputType
                 'description' => 'Detalhes do serviço, Ex.: Com participação especial de fulano',
             ],
             'tipo' => [
-                'type' => Type::nonNull(GraphQL::type('ServicoTipoEnum')),
+                'type' => Type::nonNull(GraphQL::type('ServicoTipo')),
                 'description' => 'Tipo de serviço, Evento: Eventos como show no estabelecimento',
             ],
             'obrigatorio' => [

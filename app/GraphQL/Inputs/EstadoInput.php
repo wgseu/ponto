@@ -33,7 +33,7 @@ use Rebing\GraphQL\Support\InputType;
 class EstadoInput extends InputType
 {
     protected $attributes = [
-        'name' => 'Estado',
+        'name' => 'EstadoInput',
         'description' => 'Estado federativo de um país',
     ];
 

@@ -64,7 +64,7 @@ class ImpressoraType extends GraphQLType
                 'description' => 'Informa qual conjunto de comandos deve ser utilizado',
             ],
             'modo' => [
-                'type' => Type::nonNull(GraphQL::type('ImpressoraModoEnum')),
+                'type' => Type::nonNull(GraphQL::type('ImpressoraModo')),
                 'description' => 'Modo de impressão',
             ],
             'opcoes' => [

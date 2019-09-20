@@ -34,7 +34,7 @@ use Rebing\GraphQL\Support\InputType;
 class ComposicaoInput extends InputType
 {
     protected $attributes = [
-        'name' => 'Composicao',
+        'name' => 'ComposicaoInput',
         'description' => 'Informa as propriedades da composição de um produto composto',
     ];
 
@@ -54,8 +54,8 @@ class ComposicaoInput extends InputType
                 'description' => 'Produto ou composição que faz parte dessa composição, Obs: Não pode ser um pacote',
             ],
             'tipo' => [
-                'type' => Type::nonNull(GraphQL::type('ComposicaoTipoEnum')),
-                'description' => 'Tipo de composição, 'Composicao' sempre retira do estoque, 'Opcional' permite desmarcar na venda, 'Adicional' permite adicionar na venda',
+                'type' => Type::nonNull(GraphQL::type('ComposicaoTipo')),
+                'description' => 'Tipo de composição, \'Composicao\' sempre retira do estoque, \'Opcional\' permite desmarcar na venda, \'Adicional\' permite adicionar na venda',
             ],
             'quantidade' => [
                 'type' => Type::nonNull(Type::float()),

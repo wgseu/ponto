@@ -96,7 +96,7 @@ class AssociacaoType extends GraphQLType
                 'description' => 'Total que foi pago incluindo o troco',
             ],
             'status' => [
-                'type' => Type::nonNull(GraphQL::type('AssociacaoStatusEnum')),
+                'type' => Type::nonNull(GraphQL::type('AssociacaoStatus')),
                 'description' => 'Status do pedido que não foi integrado ainda',
             ],
             'motivo' => [

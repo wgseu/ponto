@@ -34,7 +34,7 @@ use Rebing\GraphQL\Support\InputType;
 class ItemInput extends InputType
 {
     protected $attributes = [
-        'name' => 'Item',
+        'name' => 'ItemInput',
         'description' => 'Produtos, taxas e serviços do pedido, a alteração do estado permite o controle de produção',
     ];
 
@@ -113,7 +113,7 @@ class ItemInput extends InputType
                 'description' => 'Observações do item pedido, Ex.: bem gelado, mal passado',
             ],
             'estado' => [
-                'type' => Type::nonNull(GraphQL::type('ItemEstadoEnum')),
+                'type' => Type::nonNull(GraphQL::type('ItemEstado')),
                 'description' => 'Estado de preparo e envio do produto',
             ],
             'cancelado' => [

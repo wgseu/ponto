@@ -34,7 +34,7 @@ use Rebing\GraphQL\Support\InputType;
 class MetricaInput extends InputType
 {
     protected $attributes = [
-        'name' => 'Metrica',
+        'name' => 'MetricaInput',
         'description' => 'Métricas de avaliação do atendimento e outros serviços do estabelecimento',
     ];
 
@@ -56,7 +56,7 @@ class MetricaInput extends InputType
                 'description' => 'Descreve o que deve ser avaliado pelo cliente',
             ],
             'tipo' => [
-                'type' => Type::nonNull(GraphQL::type('MetricaTipoEnum')),
+                'type' => Type::nonNull(GraphQL::type('MetricaTipo')),
                 'description' => 'Tipo de métrica que pode ser velocidade de entrega, quantidade no atendimento, sabor da comida e apresentação do prato',
             ],
             'quantidade' => [

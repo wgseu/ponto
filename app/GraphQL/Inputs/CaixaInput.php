@@ -34,7 +34,7 @@ use Rebing\GraphQL\Support\InputType;
 class CaixaInput extends InputType
 {
     protected $attributes = [
-        'name' => 'Caixa',
+        'name' => 'CaixaInput',
         'description' => 'Caixas de movimentação financeira',
     ];
 

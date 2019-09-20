@@ -48,19 +48,19 @@ class NotaType extends GraphQLType
                 'description' => 'Identificador da nota',
             ],
             'tipo' => [
-                'type' => Type::nonNull(GraphQL::type('NotaTipoEnum')),
+                'type' => Type::nonNull(GraphQL::type('NotaTipo')),
                 'description' => 'Tipo de registro se nota ou inutilização',
             ],
             'ambiente' => [
-                'type' => Type::nonNull(GraphQL::type('NotaAmbienteEnum')),
+                'type' => Type::nonNull(GraphQL::type('NotaAmbiente')),
                 'description' => 'Ambiente em que a nota foi gerada',
             ],
             'acao' => [
-                'type' => Type::nonNull(GraphQL::type('NotaAcaoEnum')),
+                'type' => Type::nonNull(GraphQL::type('NotaAcao')),
                 'description' => 'Ação que deve ser tomada sobre a nota fiscal',
             ],
             'estado' => [
-                'type' => Type::nonNull(GraphQL::type('NotaEstadoEnum')),
+                'type' => Type::nonNull(GraphQL::type('NotaEstado')),
                 'description' => 'Estado da nota',
             ],
             'ultimo_evento_id' => [

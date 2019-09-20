@@ -33,7 +33,7 @@ use Rebing\GraphQL\Support\InputType;
 class FuncaoInput extends InputType
 {
     protected $attributes = [
-        'name' => 'Funcao',
+        'name' => 'FuncaoInput',
         'description' => 'Função ou atribuição de tarefas à um prestador',
     ];
 

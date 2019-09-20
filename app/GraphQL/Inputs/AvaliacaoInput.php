@@ -34,7 +34,7 @@ use Rebing\GraphQL\Support\InputType;
 class AvaliacaoInput extends InputType
 {
     protected $attributes = [
-        'name' => 'Avaliacao',
+        'name' => 'AvaliacaoInput',
         'description' => 'Avaliação de atendimento e outros serviços do estabelecimento',
     ];
 

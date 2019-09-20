@@ -56,7 +56,7 @@ class EmitenteType extends GraphQLType
                 'description' => 'Regime tributário da empresa',
             ],
             'ambiente' => [
-                'type' => Type::nonNull(GraphQL::type('EmitenteAmbienteEnum')),
+                'type' => Type::nonNull(GraphQL::type('EmitenteAmbiente')),
                 'description' => 'Ambiente de emissão das notas',
             ],
             'csc_teste' => [

@@ -56,7 +56,7 @@ class MetricaType extends GraphQLType
                 'description' => 'Descreve o que deve ser avaliado pelo cliente',
             ],
             'tipo' => [
-                'type' => Type::nonNull(GraphQL::type('MetricaTipoEnum')),
+                'type' => Type::nonNull(GraphQL::type('MetricaTipo')),
                 'description' => 'Tipo de métrica que pode ser velocidade de entrega, quantidade no atendimento, sabor da comida e apresentação do prato',
             ],
             'quantidade' => [

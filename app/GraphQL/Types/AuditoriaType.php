@@ -60,11 +60,11 @@ class AuditoriaType extends GraphQLType
                 'description' => 'Prestador que autorizou o acesso ao recurso descrito',
             ],
             'tipo' => [
-                'type' => Type::nonNull(GraphQL::type('AuditoriaTipoEnum')),
+                'type' => Type::nonNull(GraphQL::type('AuditoriaTipo')),
                 'description' => 'Tipo de atividade exercida',
             ],
             'prioridade' => [
-                'type' => Type::nonNull(GraphQL::type('AuditoriaPrioridadeEnum')),
+                'type' => Type::nonNull(GraphQL::type('AuditoriaPrioridade')),
                 'description' => 'Prioridade de acesso do recurso',
             ],
             'descricao' => [

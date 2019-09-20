@@ -33,7 +33,7 @@ use Rebing\GraphQL\Support\InputType;
 class ResumoInput extends InputType
 {
     protected $attributes = [
-        'name' => 'Resumo',
+        'name' => 'ResumoInput',
         'description' => 'Resumo de fechamento de caixa, informa o valor contado no fechamento do caixa para cada forma de pagamento',
     ];
 

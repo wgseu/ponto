@@ -124,7 +124,7 @@ class PagamentoType extends GraphQLType
                 'description' => 'Detalhes do pagamento',
             ],
             'estado' => [
-                'type' => Type::nonNull(GraphQL::type('PagamentoEstadoEnum')),
+                'type' => Type::nonNull(GraphQL::type('PagamentoEstado')),
                 'description' => 'Informa qual o andamento do processo de pagamento',
             ],
             'data_pagamento' => [

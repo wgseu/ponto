@@ -60,7 +60,7 @@ class ServicoType extends GraphQLType
                 'description' => 'Detalhes do serviço, Ex.: Com participação especial de fulano',
             ],
             'tipo' => [
-                'type' => Type::nonNull(GraphQL::type('ServicoTipoEnum')),
+                'type' => Type::nonNull(GraphQL::type('ServicoTipo')),
                 'description' => 'Tipo de serviço, Evento: Eventos como show no estabelecimento',
             ],
             'obrigatorio' => [

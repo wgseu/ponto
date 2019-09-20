@@ -34,7 +34,7 @@ use Rebing\GraphQL\Support\InputType;
 class JuncaoInput extends InputType
 {
     protected $attributes = [
-        'name' => 'Juncao',
+        'name' => 'JuncaoInput',
         'description' => 'Junções de mesas, informa quais mesas estão juntas ao pedido',
     ];
 
@@ -54,7 +54,7 @@ class JuncaoInput extends InputType
                 'description' => 'Pedido a qual a mesa está junta, o pedido deve ser de uma mesa',
             ],
             'estado' => [
-                'type' => Type::nonNull(GraphQL::type('JuncaoEstadoEnum')),
+                'type' => Type::nonNull(GraphQL::type('JuncaoEstado')),
                 'description' => 'Estado a junção da mesa. Associado: a mesa está junta ao pedido, Liberado: A mesa está livre, Cancelado: A mesa está liberada',
             ],
             'data_movimento' => [

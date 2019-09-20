@@ -84,7 +84,7 @@ class RequisitoType extends GraphQLType
                 'description' => 'Detalhes na compra desse produto',
             ],
             'data_recolhimento' => [
-                'type' => GraphQL::type('datetime'),
+                'type' => GraphQL::type('DateTime'),
                 'description' => 'Informa o momento do recolhimento da mercadoria na pratileira',
             ],
         ];

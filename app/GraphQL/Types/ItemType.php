@@ -128,15 +128,15 @@ class ItemType extends GraphQLType
                 'description' => 'Informa se o item foi cancelado por conta de desperdício',
             ],
             'data_processamento' => [
-                'type' => GraphQL::type('datetime'),
+                'type' => GraphQL::type('DateTime'),
                 'description' => 'Data do processamento do item',
             ],
             'data_atualizacao' => [
-                'type' => GraphQL::type('datetime'),
+                'type' => GraphQL::type('DateTime'),
                 'description' => 'Data de atualização do estado do item',
             ],
             'data_lancamento' => [
-                'type' => Type::nonNull(GraphQL::type('datetime')),
+                'type' => Type::nonNull(GraphQL::type('DateTime')),
                 'description' => 'Data e hora da realização do pedido do item',
             ],
         ];

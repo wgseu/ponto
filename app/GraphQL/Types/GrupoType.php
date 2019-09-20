@@ -80,7 +80,7 @@ class GrupoType extends GraphQLType
                 'description' => 'Informa a ordem de exibição dos grupos',
             ],
             'data_arquivado' => [
-                'type' => GraphQL::type('datetime'),
+                'type' => GraphQL::type('DateTime'),
                 'description' => 'Data em que o grupo foi arquivado e não será mais usado',
             ],
         ];

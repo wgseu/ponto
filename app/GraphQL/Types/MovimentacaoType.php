@@ -68,11 +68,11 @@ class MovimentacaoType extends GraphQLType
                 'description' => 'Funcionário que fechou o caixa',
             ],
             'data_fechamento' => [
-                'type' => GraphQL::type('datetime'),
+                'type' => GraphQL::type('DateTime'),
                 'description' => 'Data de fechamento do caixa',
             ],
             'data_abertura' => [
-                'type' => Type::nonNull(GraphQL::type('datetime')),
+                'type' => Type::nonNull(GraphQL::type('DateTime')),
                 'description' => 'Data de abertura do caixa',
             ],
         ];

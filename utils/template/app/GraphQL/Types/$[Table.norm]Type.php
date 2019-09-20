@@ -52,11 +52,11 @@ $[field.if(primary)]
 $[field.else.if(reference)]
                 'type' => $[field.if(null)]$[field.else]Type::nonNull($[field.end]Type::int()$[field.if(null)]$[field.else])$[field.end],
 $[field.else.if(date)]
-                'type' => $[field.if(null)]$[field.else]Type::nonNull($[field.end]GraphQL::type('date')$[field.if(null)]$[field.else])$[field.end],
+                'type' => $[field.if(null)]$[field.else]Type::nonNull($[field.end]GraphQL::type('Date')$[field.if(null)]$[field.else])$[field.end],
 $[field.else.if(time)]
-                'type' => $[field.if(null)]$[field.else]Type::nonNull($[field.end]GraphQL::type('time')$[field.if(null)]$[field.else])$[field.end],
+                'type' => $[field.if(null)]$[field.else]Type::nonNull($[field.end]GraphQL::type('Time')$[field.if(null)]$[field.else])$[field.end],
 $[field.else.if(datetime)]
-                'type' => $[field.if(null)]$[field.else]Type::nonNull($[field.end]GraphQL::type('datetime')$[field.if(null)]$[field.else])$[field.end],
+                'type' => $[field.if(null)]$[field.else]Type::nonNull($[field.end]GraphQL::type('DateTime')$[field.if(null)]$[field.else])$[field.end],
 $[field.else.if(currency)]
                 'type' => $[field.if(null)]$[field.else]Type::nonNull($[field.end]Type::float()$[field.if(null)]$[field.else])$[field.end],
 $[field.else.if(float|double)]

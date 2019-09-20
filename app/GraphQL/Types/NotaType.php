@@ -132,19 +132,19 @@ class NotaType extends GraphQLType
                 'description' => 'Informa se todos os processamentos da nota já foram realizados',
             ],
             'data_autorizacao' => [
-                'type' => GraphQL::type('datetime'),
+                'type' => GraphQL::type('DateTime'),
                 'description' => 'Data de autorização da nota fiscal',
             ],
             'data_emissao' => [
-                'type' => Type::nonNull(GraphQL::type('datetime')),
+                'type' => Type::nonNull(GraphQL::type('DateTime')),
                 'description' => 'Data de emissão da nota',
             ],
             'data_lancamento' => [
-                'type' => Type::nonNull(GraphQL::type('datetime')),
+                'type' => Type::nonNull(GraphQL::type('DateTime')),
                 'description' => 'Data de lançamento da nota no sistema',
             ],
             'data_arquivado' => [
-                'type' => GraphQL::type('datetime'),
+                'type' => GraphQL::type('DateTime'),
                 'description' => 'Data em que a nota foi arquivada',
             ],
         ];

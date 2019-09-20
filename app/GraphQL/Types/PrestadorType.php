@@ -84,11 +84,11 @@ class PrestadorType extends GraphQLType
                 'description' => 'Remuneracao pelas atividades exercidas, não está incluso comissões',
             ],
             'data_termino' => [
-                'type' => GraphQL::type('datetime'),
+                'type' => GraphQL::type('DateTime'),
                 'description' => 'Data de término de contrato, informado apenas quando ativo for não',
             ],
             'data_cadastro' => [
-                'type' => Type::nonNull(GraphQL::type('datetime')),
+                'type' => Type::nonNull(GraphQL::type('DateTime')),
                 'description' => 'Data em que o prestador de serviços foi cadastrado no sistema',
             ],
         ];

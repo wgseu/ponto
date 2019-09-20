@@ -92,7 +92,7 @@ class ClienteType extends GraphQLType
                 'description' => 'E-mail do cliente ou da empresa',
             ],
             'data_nascimento' => [
-                'type' => GraphQL::type('date'),
+                'type' => GraphQL::type('Date'),
                 'description' => 'Data de aniversário ou data de fundação',
             ],
             'slogan' => [
@@ -136,11 +136,11 @@ class ClienteType extends GraphQLType
                 'description' => 'Código da linguagem utilizada pelo cliente para visualizar o aplicativo e o site, Ex: pt-BR',
             ],
             'data_atualizacao' => [
-                'type' => Type::nonNull(GraphQL::type('datetime')),
+                'type' => Type::nonNull(GraphQL::type('DateTime')),
                 'description' => 'Data de atualização das informações do cliente',
             ],
             'data_cadastro' => [
-                'type' => Type::nonNull(GraphQL::type('datetime')),
+                'type' => Type::nonNull(GraphQL::type('DateTime')),
                 'description' => 'Data de cadastro do cliente',
             ],
         ];

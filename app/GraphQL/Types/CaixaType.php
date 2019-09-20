@@ -68,7 +68,7 @@ class CaixaType extends GraphQLType
                 'description' => 'Informa se o caixa está ativo',
             ],
             'data_desativada' => [
-                'type' => GraphQL::type('datetime'),
+                'type' => GraphQL::type('DateTime'),
                 'description' => 'Informa se o caixa está ativo',
             ],
         ];

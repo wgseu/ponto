@@ -64,7 +64,7 @@ class PropriedadeType extends GraphQLType
                 'description' => 'Imagem que representa a propriedade',
             ],
             'data_atualizacao' => [
-                'type' => Type::nonNull(GraphQL::type('datetime')),
+                'type' => Type::nonNull(GraphQL::type('DateTime')),
                 'description' => 'Data de atualização dos dados ou da imagem da propriedade',
             ],
         ];

@@ -72,7 +72,7 @@ class ChequeType extends GraphQLType
                 'description' => 'Valor na folha do cheque',
             ],
             'vencimento' => [
-                'type' => Type::nonNull(GraphQL::type('datetime')),
+                'type' => Type::nonNull(GraphQL::type('DateTime')),
                 'description' => 'Data de vencimento do cheque',
             ],
             'cancelado' => [
@@ -80,11 +80,11 @@ class ChequeType extends GraphQLType
                 'description' => 'Informa se o cheque e todas as suas folhas estão cancelados',
             ],
             'recolhimento' => [
-                'type' => GraphQL::type('datetime'),
+                'type' => GraphQL::type('DateTime'),
                 'description' => 'Data de recolhimento do cheque',
             ],
             'data_cadastro' => [
-                'type' => Type::nonNull(GraphQL::type('datetime')),
+                'type' => Type::nonNull(GraphQL::type('DateTime')),
                 'description' => 'Data de cadastro do cheque',
             ],
         ];

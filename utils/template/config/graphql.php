@@ -121,6 +121,8 @@ $[table.end]
     // ]
     //
     'types' => [
+        'DateTime' => 'App\GraphQL\Types\DateTimeType',
+
         'StringFilter' => 'App\GraphQL\Unions\StringUnion',
         'NumberFilter' => 'App\GraphQL\Unions\NumberUnion',
         'DateFilter' => 'App\GraphQL\Unions\DateUnion',
@@ -130,16 +132,18 @@ $[table.end]
         'DateInput' => 'App\GraphQL\Inputs\DateInput',
         'DateRangeInput' => 'App\GraphQL\Inputs\DateRangeInput',
 
-$[table.each]
-$[field.each(all)]
-$[field.if(enum)]
-        '$[Table.norm]$[Field.norm]' => 'App\GraphQL\Enums\$[Table.norm]$[Field.norm]Enum',
-$[field.end]
-$[field.end]
-$[table.end]
+        'OrderByEnum' => 'App\GraphQL\Enums\OrderByEnum',
 
 $[table.each]
         '$[Table.norm]Filter' => 'App\GraphQL\Filters\$[Table.norm]Filter',
+$[table.end]
+
+$[table.each]
+$[field.each(all)]
+$[field.if(enum)]
+        '$[Table.norm]$[Field.norm]Filter' => 'App\GraphQL\Unions\$[Table.norm]$[Field.norm]Union',
+$[field.end]
+$[field.end]
 $[table.end]
 
 $[table.each]
@@ -152,6 +156,14 @@ $[table.end]
 
 $[table.each]
         '$[Table.norm]' => 'App\GraphQL\Types\$[Table.norm]Type',
+$[table.end]
+
+$[table.each]
+$[field.each(all)]
+$[field.if(enum)]
+        '$[Table.norm]$[Field.norm]' => 'App\GraphQL\Enums\$[Table.norm]$[Field.norm]Enum',
+$[field.end]
+$[field.end]
 $[table.end]
     ],
 

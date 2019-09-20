@@ -132,7 +132,7 @@ class ContaType extends GraphQLType
                 'description' => 'Fórmula de juros que será cobrado em caso de atraso',
             ],
             'vencimento' => [
-                'type' => Type::nonNull(GraphQL::type('datetime')),
+                'type' => Type::nonNull(GraphQL::type('DateTime')),
                 'description' => 'Data de vencimento da conta',
             ],
             'numero' => [
@@ -148,11 +148,11 @@ class ContaType extends GraphQLType
                 'description' => 'Informa o estado da conta',
             ],
             'data_calculo' => [
-                'type' => GraphQL::type('datetime'),
+                'type' => GraphQL::type('DateTime'),
                 'description' => 'Data do último cálculo de acréscimo por atraso de pagamento',
             ],
             'data_emissao' => [
-                'type' => Type::nonNull(GraphQL::type('datetime')),
+                'type' => Type::nonNull(GraphQL::type('DateTime')),
                 'description' => 'Data de emissão da conta',
             ],
         ];

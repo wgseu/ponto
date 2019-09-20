@@ -76,7 +76,7 @@ class ComposicaoType extends GraphQLType
                 'description' => 'Indica se a composição está sendo usada atualmente na composição do produto',
             ],
             'data_remocao' => [
-                'type' => GraphQL::type('datetime'),
+                'type' => GraphQL::type('DateTime'),
                 'description' => 'Data em que a composição foi removida e não será mais exibida por padrão',
             ],
         ];

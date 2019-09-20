@@ -68,7 +68,7 @@ class PontuacaoType extends GraphQLType
                 'description' => 'Quantidade de pontos ganhos ou gastos',
             ],
             'data_cadastro' => [
-                'type' => Type::nonNull(GraphQL::type('datetime')),
+                'type' => Type::nonNull(GraphQL::type('DateTime')),
                 'description' => 'Data de cadastro dos pontos',
             ],
         ];

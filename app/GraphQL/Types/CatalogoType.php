@@ -80,11 +80,11 @@ class CatalogoType extends GraphQLType
                 'description' => 'Informa o conteúdo do produto como é comprado, Ex.: 5UN no mesmo pacote',
             ],
             'data_consulta' => [
-                'type' => GraphQL::type('datetime'),
+                'type' => GraphQL::type('DateTime'),
                 'description' => 'Última data de consulta do preço do produto',
             ],
             'data_parada' => [
-                'type' => GraphQL::type('datetime'),
+                'type' => GraphQL::type('DateTime'),
                 'description' => 'Data em que o produto deixou de ser vendido pelo fornecedor',
             ],
         ];

@@ -64,7 +64,7 @@ class EventoType extends GraphQLType
                 'description' => 'Código de status do evento, geralmente código de erro de uma exceção',
             ],
             'data_criacao' => [
-                'type' => Type::nonNull(GraphQL::type('datetime')),
+                'type' => Type::nonNull(GraphQL::type('DateTime')),
                 'description' => 'Data de criação do evento',
             ],
         ];

@@ -68,15 +68,15 @@ class ViagemType extends GraphQLType
                 'description' => 'Distância percorrida até chegar de volta ao ponto de partida',
             ],
             'data_atualizacao' => [
-                'type' => GraphQL::type('datetime'),
+                'type' => GraphQL::type('DateTime'),
                 'description' => 'Data de atualização da localização do responsável',
             ],
             'data_chegada' => [
-                'type' => GraphQL::type('datetime'),
+                'type' => GraphQL::type('DateTime'),
                 'description' => 'Data de chegada no estabelecimento',
             ],
             'data_saida' => [
-                'type' => Type::nonNull(GraphQL::type('datetime')),
+                'type' => Type::nonNull(GraphQL::type('DateTime')),
                 'description' => 'Data e hora que o responsável saiu para entregar o pedido ou fazer as compras',
             ],
         ];

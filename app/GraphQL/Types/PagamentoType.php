@@ -128,15 +128,15 @@ class PagamentoType extends GraphQLType
                 'description' => 'Informa qual o andamento do processo de pagamento',
             ],
             'data_pagamento' => [
-                'type' => GraphQL::type('datetime'),
+                'type' => GraphQL::type('DateTime'),
                 'description' => 'Data de pagamento',
             ],
             'data_compensacao' => [
-                'type' => GraphQL::type('datetime'),
+                'type' => GraphQL::type('DateTime'),
                 'description' => 'Data de compensação do pagamento',
             ],
             'data_lancamento' => [
-                'type' => Type::nonNull(GraphQL::type('datetime')),
+                'type' => Type::nonNull(GraphQL::type('DateTime')),
                 'description' => 'Data e hora do lançamento do pagamento',
             ],
         ];

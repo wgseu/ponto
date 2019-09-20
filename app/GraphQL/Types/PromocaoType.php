@@ -148,7 +148,7 @@ class PromocaoType extends GraphQLType
                 'description' => 'Imagem promocional',
             ],
             'data_arquivado' => [
-                'type' => GraphQL::type('datetime'),
+                'type' => GraphQL::type('DateTime'),
                 'description' => 'Data em que a promoção foi arquivada',
             ],
         ];

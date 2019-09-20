@@ -25,40 +25,18 @@
 
 declare(strict_types=1);
 
-namespace App\GraphQL\Types;
+namespace App\GraphQL\Enums;
 
-use App\Models\Fornecedor;
-use Rebing\GraphQL\Support\Facades\GraphQL;
-use GraphQL\Type\Definition\Type;
-use Rebing\GraphQL\Support\Type as GraphQLType;
+use Rebing\GraphQL\Support\EnumType;
 
-class FornecedorType extends GraphQLType
+class OrderByEnum extends EnumType
 {
     protected $attributes = [
-        'name' => 'Fornecedor',
-        'description' => 'Fornecedores de produtos',
-        'model' => Fornecedor::class,
+        'name' => 'OrderByEnum',
+        'description' => 'Order field ascending or descending',
+        'values' => [
+            'asc' => 'asc',
+            'desc' => 'desc',
+        ],
     ];
-
-    public function fields(): array
-    {
-        return [
-            'id' => [
-                'type' => Type::id(),
-                'description' => 'Identificador do fornecedor',
-            ],
-            'empresa_id' => [
-                'type' => Type::nonNull(Type::int()),
-                'description' => 'Empresa do fornecedor',
-            ],
-            'prazo_pagamento' => [
-                'type' => Type::nonNull(Type::int()),
-                'description' => 'Prazo em dias para pagamento do fornecedor',
-            ],
-            'data_cadastro' => [
-                'type' => Type::nonNull(GraphQL::type('DateTime')),
-                'description' => 'Data de cadastro do fornecedor',
-            ],
-        ];
-    }
 }

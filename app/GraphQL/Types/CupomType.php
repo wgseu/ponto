@@ -108,11 +108,11 @@ class CupomType extends GraphQLType
                 'description' => 'Valor do pedido com os serviços que permite usar esse cupom',
             ],
             'validade' => [
-                'type' => Type::nonNull(GraphQL::type('datetime')),
+                'type' => Type::nonNull(GraphQL::type('DateTime')),
                 'description' => 'Validade do cupom',
             ],
             'data_registro' => [
-                'type' => Type::nonNull(GraphQL::type('datetime')),
+                'type' => Type::nonNull(GraphQL::type('DateTime')),
                 'description' => 'Data de registro do cupom ou do uso',
             ],
         ];

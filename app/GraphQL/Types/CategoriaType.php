@@ -68,11 +68,11 @@ class CategoriaType extends GraphQLType
                 'description' => 'Informa a ordem de exibição das categorias nas vendas',
             ],
             'data_atualizacao' => [
-                'type' => Type::nonNull(GraphQL::type('datetime')),
+                'type' => Type::nonNull(GraphQL::type('DateTime')),
                 'description' => 'Data de atualização das informações da categoria',
             ],
             'data_arquivado' => [
-                'type' => GraphQL::type('datetime'),
+                'type' => GraphQL::type('DateTime'),
                 'description' => 'Data em que a categoria foi arquivada e não será mais usada',
             ],
         ];

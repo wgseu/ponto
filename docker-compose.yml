@@ -21,6 +21,12 @@ services:
             - "./:/var/www/html"
             - "/etc/passwd:/etc/passwd:ro"
             - "/etc/group:/etc/group:ro"
+    node:
+        image: node:10
+        command: ["node", "resources/js/index.js"]
+        working_dir: /usr/src/app
+        volumes:
+            - "./:/usr/src/app"
     myadmin:
         image: phpmyadmin/phpmyadmin
         ports:

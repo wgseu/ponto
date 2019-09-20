@@ -38,12 +38,8 @@ class Contagem extends Model
      */
     protected $table = 'contagens';
 
-    /**
-     * Indicates if the model should be timestamped.
-     *
-     * @var bool
-     */
-    public $timestamps = false;
+    const CREATED_AT = null;
+    const UPDATED_AT = 'data_atualizacao';
 
     /**
      * Produto que possui o estoque acumulado nesse setor

@@ -5,17 +5,11 @@
   "private": true,
   "description": "Gerenciamento de Restaurantes e Afins",
   "author": "MZ Software <contato@grandchef.com.br>",
-  "scripts": {
-    "dev": "gulp",
-    "fix-sql": "gulp fix_sql",
-    "fix-script": "gulp fix_script",
-    "fix-pop": "gulp fix_pop --name"
-  },
+  "scripts": {},
   "devDependencies": {
-    "browser-sync": "^2.26.5",
-    "dotenv": "^7.0.0",
-    "eslint": "^5.16.0",
-    "gulp": "^4.0.1",
-    "replace-in-file": "^4.0.0"
+    "eslint": "^5.16.0"
+  },
+  "dependencies": {
+    "socket.io": "^2.2.0"
   }
 }

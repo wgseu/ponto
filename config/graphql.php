@@ -2,6 +2,10 @@
 
 declare(strict_types=1);
 
+use App\GraphQL\Inputs\FuncaoInput;
+use App\GraphQL\Mutations\FuncaoMutation;
+use App\GraphQL\Queries\FuncaoQuery;
+use App\GraphQL\Types\FuncaoType;
 use example\Type\ExampleType;
 use example\Query\ExampleQuery;
 use example\Mutation\ExampleMutation;
@@ -101,10 +105,10 @@ return [
     'schemas' => [
         'default' => [
             'query' => [
-                // 'example_query' => ExampleQuery::class,
+                'funcoes' => FuncaoQuery::class,
             ],
             'mutation' => [
-                // 'example_mutation'  => ExampleMutation::class,
+                'saveFuncao' => FuncaoMutation::class
             ],
             'middleware' => [],
             'method'     => ['get', 'post'],
@@ -121,9 +125,8 @@ return [
     // ]
     //
     'types' => [
-        // 'example'           => ExampleType::class,
-        // 'relation_example'  => ExampleRelationType::class,
-        // \Rebing\GraphQL\Support\UploadType::class,
+        'funcao' => FuncaoType::class,
+        'FuncaoInput' => FuncaoInput::class,
     ],
 
     // The types will be loaded on demand. Default is to load all types on each request

@@ -6,7 +6,6 @@ include .env
 
 export DEBUG_BACK
 export DEBUG_HOST
-export WEB_HOST
 export CURRENT_UID
 
 export PROXY_HOST
@@ -53,9 +52,6 @@ init:
 doc: reset
 	@docker-compose exec -T php ./vendor/bin/apigen generate app --destination docs/api
 
-term:
-	@utils\docker-term $(CURDIR)
-
 clean: stop
 
 purge: clean
@@ -87,16 +83,11 @@ autoload:
 		roquie/composer-parallel dump-autoload -n --no-scripts
 
 start: init
-	envsubst '$$WEB_HOST' < ./etc/nginx/default.template.conf > ./etc/nginx/default.conf
-	envsubst '$$FASTCGI_HOST $$FASTCGI_PORT $$PROXY_HOST $$PUBLIC_PATH' < ./etc/nginx/location.template.conf > ./etc/nginx/location.info
 	envsubst '$$DEBUG_BACK $$DEBUG_HOST' < ./etc/php/php.template.ini > ./etc/php/php.ini
 	docker-compose up -d
 
 stop:
 	@docker-compose down -v
-
-logs:
-	@docker-compose logs -f
 
 migrate:
 	@docker exec -i $(shell CURRENT_UID=$(CURRENT_UID) docker-compose ps -q php) ./artisan migrate
@@ -121,10 +112,6 @@ cover:
 	@docker-compose exec -T php ./vendor/bin/phpunit --configuration ./ --coverage-html storage/coverage
 
 class:
-	@mkdir -p $(DB_DUMPS_DIR)
-	@npm run fix-script
-	@cp -f database/model/script.sql $(DB_DUMPS_DIR)/script_no_trigger.sql
-	@npm run fix-sql
-	@java -jar utils/SQLtoClass.jar -p utils/config.properties -t utils/template -o storage/app/generated
+	@java -jar utils/SQLtoClass.jar -p utils/config.properties -t utils/template -o storage/generated
 
 .PHONY: clean test check init

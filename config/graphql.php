@@ -49,7 +49,7 @@ return [
     'controllers' => \Rebing\GraphQL\GraphQLController::class.'@query',
 
     // Any middleware for the graphql route group
-    'middleware' => [],
+    'middleware' => ['cors'],
 
     // Additional route group attributes
     //

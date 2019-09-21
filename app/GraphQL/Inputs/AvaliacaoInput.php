@@ -71,7 +71,7 @@ class AvaliacaoInput extends InputType
                 'description' => 'Comentário da avaliação',
             ],
             'data_avaliacao' => [
-                'type' => Type::nonNull(GraphQL::type('datetime')),
+                'type' => Type::nonNull(GraphQL::type('DateTime')),
                 'description' => 'Data da avaliação',
             ],
         ];

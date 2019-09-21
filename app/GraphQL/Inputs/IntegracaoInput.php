@@ -85,7 +85,7 @@ class IntegracaoInput extends InputType
                 'description' => 'Informa de o módulo de integração está habilitado',
             ],
             'data_atualizacao' => [
-                'type' => Type::nonNull(GraphQL::type('datetime')),
+                'type' => Type::nonNull(GraphQL::type('DateTime')),
                 'description' => 'Data de atualização dos dados do módulo de integração',
             ],
         ];

@@ -63,7 +63,7 @@ class CreditoInput extends InputType
                 'description' => 'Informa se o crédito foi cancelado',
             ],
             'data_cadastro' => [
-                'type' => Type::nonNull(GraphQL::type('datetime')),
+                'type' => Type::nonNull(GraphQL::type('DateTime')),
                 'description' => 'Data de cadastro do crédito',
             ],
         ];

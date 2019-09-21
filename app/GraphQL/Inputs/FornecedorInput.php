@@ -54,7 +54,7 @@ class FornecedorInput extends InputType
                 'description' => 'Prazo em dias para pagamento do fornecedor',
             ],
             'data_cadastro' => [
-                'type' => Type::nonNull(GraphQL::type('datetime')),
+                'type' => Type::nonNull(GraphQL::type('DateTime')),
                 'description' => 'Data de cadastro do fornecedor',
             ],
         ];

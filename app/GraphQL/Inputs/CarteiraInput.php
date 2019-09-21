@@ -104,7 +104,7 @@ class CarteiraInput extends InputType
                 'description' => 'Informa se a carteira ou conta bancária está ativa',
             ],
             'data_desativada' => [
-                'type' => GraphQL::type('datetime'),
+                'type' => GraphQL::type('DateTime'),
                 'description' => 'null',
             ],
         ];

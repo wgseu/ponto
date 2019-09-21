@@ -63,11 +63,11 @@ class ListaInput extends InputType
                 'description' => 'Informações da viagem para realizar as compras',
             ],
             'data_viagem' => [
-                'type' => Type::nonNull(GraphQL::type('datetime')),
+                'type' => Type::nonNull(GraphQL::type('DateTime')),
                 'description' => 'Data e hora para o encarregado ir fazer as compras',
             ],
             'data_cadastro' => [
-                'type' => Type::nonNull(GraphQL::type('datetime')),
+                'type' => Type::nonNull(GraphQL::type('DateTime')),
                 'description' => 'Data de cadastro da lista',
             ],
         ];

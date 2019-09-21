@@ -149,7 +149,7 @@ class PedidoInput extends InputType
                 'description' => 'Informa quem fechou o pedido e imprimiu a conta',
             ],
             'data_impressao' => [
-                'type' => GraphQL::type('datetime'),
+                'type' => GraphQL::type('DateTime'),
                 'description' => 'Data de impressão da conta do cliente',
             ],
             'motivo' => [
@@ -158,19 +158,19 @@ class PedidoInput extends InputType
                 'description' => 'Informa o motivo do cancelamento',
             ],
             'data_entrega' => [
-                'type' => GraphQL::type('datetime'),
+                'type' => GraphQL::type('DateTime'),
                 'description' => 'Data e hora que o entregador saiu para entregar esse pedido',
             ],
             'data_agendamento' => [
-                'type' => GraphQL::type('datetime'),
+                'type' => GraphQL::type('DateTime'),
                 'description' => 'Data de agendamento do pedido',
             ],
             'data_conclusao' => [
-                'type' => GraphQL::type('datetime'),
+                'type' => GraphQL::type('DateTime'),
                 'description' => 'Data de finalização do pedido',
             ],
             'data_criacao' => [
-                'type' => Type::nonNull(GraphQL::type('datetime')),
+                'type' => Type::nonNull(GraphQL::type('DateTime')),
                 'description' => 'Data de criação do pedido',
             ],
         ];

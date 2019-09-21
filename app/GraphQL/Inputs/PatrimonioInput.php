@@ -101,7 +101,7 @@ class PatrimonioInput extends InputType
                 'description' => 'Caminho relativo da foto do bem',
             ],
             'data_atualizacao' => [
-                'type' => Type::nonNull(GraphQL::type('datetime')),
+                'type' => Type::nonNull(GraphQL::type('DateTime')),
                 'description' => 'Data de atualização das informações do bem',
             ],
         ];

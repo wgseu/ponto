@@ -58,7 +58,7 @@ class ContagemInput extends InputType
                 'description' => 'Quantidade do produto nesse setor',
             ],
             'data_atualizacao' => [
-                'type' => Type::nonNull(GraphQL::type('datetime')),
+                'type' => Type::nonNull(GraphQL::type('DateTime')),
                 'description' => 'Data em que a contagem foi atualizada',
             ],
         ];

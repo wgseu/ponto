@@ -64,7 +64,7 @@ class CompraInput extends InputType
                 'description' => 'Informa o nome do documento no servidor do sistema',
             ],
             'data_compra' => [
-                'type' => Type::nonNull(GraphQL::type('datetime')),
+                'type' => Type::nonNull(GraphQL::type('DateTime')),
                 'description' => 'Informa da data de finalização da compra',
             ],
         ];

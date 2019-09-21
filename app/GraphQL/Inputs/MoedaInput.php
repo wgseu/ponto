@@ -79,7 +79,7 @@ class MoedaInput extends InputType
                 'description' => 'Multiplicador para conversão para a moeda principal',
             ],
             'data_atualizacao' => [
-                'type' => GraphQL::type('datetime'),
+                'type' => GraphQL::type('DateTime'),
                 'description' => 'Data da última atualização do fator de conversão',
             ],
             'ativa' => [

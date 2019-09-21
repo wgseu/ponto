@@ -68,11 +68,11 @@ class MetricaInput extends InputType
                 'description' => 'Média das avaliações para o período informado',
             ],
             'data_processamento' => [
-                'type' => GraphQL::type('datetime'),
+                'type' => GraphQL::type('DateTime'),
                 'description' => 'Data do último processamento da avaliação',
             ],
             'data_arquivado' => [
-                'type' => GraphQL::type('datetime'),
+                'type' => GraphQL::type('DateTime'),
                 'description' => 'Data em que essa métrica foi arquivada',
             ],
         ];

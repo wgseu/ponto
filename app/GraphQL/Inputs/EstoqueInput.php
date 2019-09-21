@@ -87,11 +87,11 @@ class EstoqueInput extends InputType
                 'description' => 'Lote de produção do produto comprado',
             ],
             'fabricacao' => [
-                'type' => GraphQL::type('datetime'),
+                'type' => GraphQL::type('DateTime'),
                 'description' => 'Data de fabricação do produto',
             ],
             'vencimento' => [
-                'type' => GraphQL::type('datetime'),
+                'type' => GraphQL::type('DateTime'),
                 'description' => 'Data de vencimento do produto',
             ],
             'detalhes' => [
@@ -108,7 +108,7 @@ class EstoqueInput extends InputType
                 'description' => 'Informa a entrada ou saída do estoque foi cancelada',
             ],
             'data_movimento' => [
-                'type' => Type::nonNull(GraphQL::type('datetime')),
+                'type' => Type::nonNull(GraphQL::type('DateTime')),
                 'description' => 'Data de entrada ou saída do produto do estoque',
             ],
         ];

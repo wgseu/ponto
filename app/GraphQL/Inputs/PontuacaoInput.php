@@ -66,7 +66,7 @@ class PontuacaoInput extends InputType
                 'description' => 'Quantidade de pontos ganhos ou gastos',
             ],
             'data_cadastro' => [
-                'type' => Type::nonNull(GraphQL::type('datetime')),
+                'type' => Type::nonNull(GraphQL::type('DateTime')),
                 'description' => 'Data de cadastro dos pontos',
             ],
         ];

@@ -83,7 +83,7 @@ class EmitenteInput extends InputType
                 'description' => 'Token da API do IBPT',
             ],
             'data_expiracao' => [
-                'type' => GraphQL::type('datetime'),
+                'type' => GraphQL::type('DateTime'),
                 'description' => 'Data de expiração do certificado',
             ],
         ];

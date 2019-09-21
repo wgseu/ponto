@@ -76,7 +76,7 @@ class AuditoriaInput extends InputType
                 'description' => 'Código de autorização necessário para permitir realizar a função descrita',
             ],
             'data_registro' => [
-                'type' => Type::nonNull(GraphQL::type('datetime')),
+                'type' => Type::nonNull(GraphQL::type('DateTime')),
                 'description' => 'Data e hora do ocorrido',
             ],
         ];

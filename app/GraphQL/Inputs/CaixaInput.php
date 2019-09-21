@@ -67,7 +67,7 @@ class CaixaInput extends InputType
                 'description' => 'Informa se o caixa está ativo',
             ],
             'data_desativada' => [
-                'type' => GraphQL::type('datetime'),
+                'type' => GraphQL::type('DateTime'),
                 'description' => 'Informa se o caixa está ativo',
             ],
         ];

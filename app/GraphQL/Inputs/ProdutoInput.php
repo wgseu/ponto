@@ -143,11 +143,11 @@ class ProdutoInput extends InputType
                 'description' => 'Imagem do produto',
             ],
             'data_atualizacao' => [
-                'type' => Type::nonNull(GraphQL::type('datetime')),
+                'type' => Type::nonNull(GraphQL::type('DateTime')),
                 'description' => 'Data de atualização das informações do produto',
             ],
             'data_arquivado' => [
-                'type' => GraphQL::type('datetime'),
+                'type' => GraphQL::type('DateTime'),
                 'description' => 'Data em que o produto foi arquivado e não será mais usado',
             ],
         ];

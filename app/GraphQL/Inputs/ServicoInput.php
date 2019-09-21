@@ -69,11 +69,11 @@ class ServicoInput extends InputType
                 'description' => 'Informa se a taxa é obrigatória',
             ],
             'data_inicio' => [
-                'type' => GraphQL::type('datetime'),
+                'type' => GraphQL::type('DateTime'),
                 'description' => 'Data de início do evento',
             ],
             'data_fim' => [
-                'type' => GraphQL::type('datetime'),
+                'type' => GraphQL::type('DateTime'),
                 'description' => 'Data final do evento',
             ],
             'tempo_limite' => [

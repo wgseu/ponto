@@ -86,7 +86,7 @@ class PacoteInput extends InputType
                 'description' => 'Indica se o pacote estará disponível para venda',
             ],
             'data_arquivado' => [
-                'type' => GraphQL::type('datetime'),
+                'type' => GraphQL::type('DateTime'),
                 'description' => 'Data em que o pacote foi arquivado e não será mais usado',
             ],
         ];

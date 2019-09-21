@@ -115,7 +115,7 @@ class LocalizacaoInput extends InputType
                 'description' => 'Ex.: Minha Casa, Casa da Amiga',
             ],
             'data_arquivado' => [
-                'type' => GraphQL::type('datetime'),
+                'type' => GraphQL::type('DateTime'),
                 'description' => 'Informa a data que essa localização foi removida',
             ],
         ];

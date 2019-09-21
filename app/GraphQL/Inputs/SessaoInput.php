@@ -46,11 +46,11 @@ class SessaoInput extends InputType
                 'description' => 'Código da sessão',
             ],
             'data_inicio' => [
-                'type' => Type::nonNull(GraphQL::type('datetime')),
+                'type' => Type::nonNull(GraphQL::type('DateTime')),
                 'description' => 'Data de início da sessão',
             ],
             'data_termino' => [
-                'type' => GraphQL::type('datetime'),
+                'type' => GraphQL::type('DateTime'),
                 'description' => 'Data de fechamento da sessão',
             ],
             'aberta' => [

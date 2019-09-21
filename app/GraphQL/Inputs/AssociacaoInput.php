@@ -121,11 +121,11 @@ class AssociacaoInput extends InputType
                 'description' => 'Informa se a associação já foi integrada no sistema',
             ],
             'data_confirmacao' => [
-                'type' => GraphQL::type('datetime'),
+                'type' => GraphQL::type('DateTime'),
                 'description' => 'Data e hora que o pedido foi confirmado e impresso na produção',
             ],
             'data_pedido' => [
-                'type' => Type::nonNull(GraphQL::type('datetime')),
+                'type' => Type::nonNull(GraphQL::type('DateTime')),
                 'description' => 'Data e hora que o pedido foi criado na plataforma que o gerou',
             ],
         ];

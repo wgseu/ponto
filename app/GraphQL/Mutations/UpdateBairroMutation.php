@@ -37,12 +37,11 @@ class UpdateBairroMutation extends Mutation
 {
     protected $attributes = [
         'name' => 'UpdateBairro',
-        'description' => 'Bairro de uma cidade',
     ];
 
     public function authorize(array $args): bool
     {
-        return Auth::user()->can('bairro:update');
+        return true; // Auth::user()->can('bairro:update');
     }
 
     public function type(): Type
@@ -57,7 +56,7 @@ class UpdateBairroMutation extends Mutation
                 'type' => Type::nonNull(Type::id()),
                 'description' => 'Identificador do bairro',
             ],
-            'input' => ['type' => GraphQL::type('BairroInput')],
+            'input' => ['type' => Type::nonNull(GraphQL::type('BairroInput'))],
         ];
     }
 

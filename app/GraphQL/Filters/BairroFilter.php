@@ -35,7 +35,6 @@ class BairroFilter extends InputType
 {
     protected $attributes = [
         'name' => 'BairroFilter',
-        'description' => 'Bairro de uma cidade',
     ];
 
     public function fields(): array
@@ -45,19 +44,19 @@ class BairroFilter extends InputType
                 'type' => Type::id(),
             ],
             'cidade_id' => [
-                'type' => Type::nonNull(Type::int()),
+                'type' => Type::int(),
             ],
             'nome' => [
-                'type' => Type::nonNull(GraphQL::type('StringFilter')),
+                'type' => GraphQL::type('StringFilter'),
             ],
             'valor_entrega' => [
-                'type' => Type::nonNull(GraphQL::type('NumberFilter')),
+                'type' => GraphQL::type('NumberFilter'),
             ],
             'disponivel' => [
-                'type' => Type::nonNull(Type::boolean()),
+                'type' => Type::boolean(),
             ],
             'mapeado' => [
-                'type' => Type::nonNull(Type::boolean()),
+                'type' => Type::boolean(),
             ],
             'entrega_minima' => [
                 'type' => GraphQL::type('NumberFilter'),

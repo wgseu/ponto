@@ -42,28 +42,28 @@ class ComposicaoOrder extends InputType
     {
         return [
             'id' => [
-                'type' => Type::nonNull(GraphQL::type('OrderByEnum')),
+                'type' => GraphQL::type('OrderByEnum'),
             ],
             'composicao_id' => [
-                'type' => Type::nonNull(GraphQL::type('OrderByEnum')),
+                'type' => GraphQL::type('OrderByEnum'),
             ],
             'produto_id' => [
-                'type' => Type::nonNull(GraphQL::type('OrderByEnum')),
+                'type' => GraphQL::type('OrderByEnum'),
             ],
             'tipo' => [
-                'type' => Type::nonNull(GraphQL::type('OrderByEnum')),
+                'type' => GraphQL::type('OrderByEnum'),
             ],
             'quantidade' => [
-                'type' => Type::nonNull(GraphQL::type('OrderByEnum')),
+                'type' => GraphQL::type('OrderByEnum'),
             ],
             'valor' => [
-                'type' => Type::nonNull(GraphQL::type('OrderByEnum')),
+                'type' => GraphQL::type('OrderByEnum'),
             ],
             'quantidade_maxima' => [
-                'type' => Type::nonNull(GraphQL::type('OrderByEnum')),
+                'type' => GraphQL::type('OrderByEnum'),
             ],
             'ativa' => [
-                'type' => Type::nonNull(GraphQL::type('OrderByEnum')),
+                'type' => GraphQL::type('OrderByEnum'),
             ],
             'data_remocao' => [
                 'type' => GraphQL::type('OrderByEnum'),

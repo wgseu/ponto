@@ -51,6 +51,20 @@ class Telefone extends Model
      *
      * @var array
      */
+    protected $fillable = [
+        'cliente_id',
+        'pais_id',
+        'numero',
+        'operadora',
+        'servico',
+        'principal',
+    ];
+
+    /**
+     * The model's default values for attributes.
+     *
+     * @var array
+     */
     protected $attributes = [
         'principal' => false,
     ];

@@ -50,6 +50,30 @@ class Estoque extends Model
      *
      * @var array
      */
+    protected $fillable = [
+        'produto_id',
+        'requisito_id',
+        'transacao_id',
+        'entrada_id',
+        'fornecedor_id',
+        'setor_id',
+        'prestador_id',
+        'quantidade',
+        'preco_compra',
+        'lote',
+        'fabricacao',
+        'vencimento',
+        'detalhes',
+        'reservado',
+        'cancelado',
+        'data_movimento',
+    ];
+
+    /**
+     * The model's default values for attributes.
+     *
+     * @var array
+     */
     protected $attributes = [
         'preco_compra' => 0,
         'reservado' => false,

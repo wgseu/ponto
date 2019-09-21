@@ -35,7 +35,6 @@ class HorarioFilter extends InputType
 {
     protected $attributes = [
         'name' => 'HorarioFilter',
-        'description' => 'Informa o horário de funcionamento do estabelecimento',
     ];
 
     public function fields(): array
@@ -45,7 +44,7 @@ class HorarioFilter extends InputType
                 'type' => Type::id(),
             ],
             'modo' => [
-                'type' => Type::nonNull(GraphQL::type('HorarioModoFilter')),
+                'type' => GraphQL::type('HorarioModoFilter'),
             ],
             'funcao_id' => [
                 'type' => Type::int(),
@@ -54,10 +53,10 @@ class HorarioFilter extends InputType
                 'type' => Type::int(),
             ],
             'inicio' => [
-                'type' => Type::nonNull(GraphQL::type('NumberFilter')),
+                'type' => GraphQL::type('NumberFilter'),
             ],
             'fim' => [
-                'type' => Type::nonNull(GraphQL::type('NumberFilter')),
+                'type' => GraphQL::type('NumberFilter'),
             ],
             'mensagem' => [
                 'type' => GraphQL::type('StringFilter'),
@@ -66,10 +65,10 @@ class HorarioFilter extends InputType
                 'type' => GraphQL::type('NumberFilter'),
             ],
             'entrega_maxima' => [
-                'type' => Type::nonNull(GraphQL::type('NumberFilter')),
+                'type' => GraphQL::type('NumberFilter'),
             ],
             'fechado' => [
-                'type' => Type::nonNull(Type::boolean()),
+                'type' => Type::boolean(),
             ],
         ];
     }

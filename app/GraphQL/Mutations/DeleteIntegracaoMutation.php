@@ -37,12 +37,11 @@ class DeleteIntegracaoMutation extends Mutation
 {
     protected $attributes = [
         'name' => 'DeleteIntegracao',
-        'description' => 'Informa quais integrações estão disponíveis',
     ];
 
     public function authorize(array $args): bool
     {
-        return Auth::user()->can('integracao:delete');
+        return true; // Auth::user()->can('integracao:delete');
     }
 
     public function type(): Type
@@ -57,7 +56,6 @@ class DeleteIntegracaoMutation extends Mutation
                 'type' => Type::nonNull(Type::id()),
                 'description' => 'Identificador da integração',
             ],
-            'input' => ['type' => GraphQL::type('IntegracaoInput')],
         ];
     }
 

@@ -35,7 +35,6 @@ class GrupoFilter extends InputType
 {
     protected $attributes = [
         'name' => 'GrupoFilter',
-        'description' => 'Grupos de pacotes, permite criar grupos como Tamanho, Sabores para formações de produtos',
     ];
 
     public function fields(): array
@@ -45,28 +44,28 @@ class GrupoFilter extends InputType
                 'type' => Type::id(),
             ],
             'produto_id' => [
-                'type' => Type::nonNull(Type::int()),
+                'type' => Type::int(),
             ],
             'nome' => [
-                'type' => Type::nonNull(GraphQL::type('StringFilter')),
+                'type' => GraphQL::type('StringFilter'),
             ],
             'descricao' => [
-                'type' => Type::nonNull(GraphQL::type('StringFilter')),
+                'type' => GraphQL::type('StringFilter'),
             ],
             'tipo' => [
-                'type' => Type::nonNull(GraphQL::type('GrupoTipoFilter')),
+                'type' => GraphQL::type('GrupoTipoFilter'),
             ],
             'quantidade_minima' => [
-                'type' => Type::nonNull(GraphQL::type('NumberFilter')),
+                'type' => GraphQL::type('NumberFilter'),
             ],
             'quantidade_maxima' => [
-                'type' => Type::nonNull(GraphQL::type('NumberFilter')),
+                'type' => GraphQL::type('NumberFilter'),
             ],
             'funcao' => [
-                'type' => Type::nonNull(GraphQL::type('GrupoFuncaoFilter')),
+                'type' => GraphQL::type('GrupoFuncaoFilter'),
             ],
             'ordem' => [
-                'type' => Type::nonNull(GraphQL::type('NumberFilter')),
+                'type' => GraphQL::type('NumberFilter'),
             ],
             'data_arquivado' => [
                 'type' => GraphQL::type('DateFilter'),

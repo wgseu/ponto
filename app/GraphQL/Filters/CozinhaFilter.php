@@ -35,7 +35,6 @@ class CozinhaFilter extends InputType
 {
     protected $attributes = [
         'name' => 'CozinhaFilter',
-        'description' => 'Categoria de comida servida pelo estabelecimento',
     ];
 
     public function fields(): array
@@ -45,7 +44,7 @@ class CozinhaFilter extends InputType
                 'type' => Type::id(),
             ],
             'nome' => [
-                'type' => Type::nonNull(GraphQL::type('StringFilter')),
+                'type' => GraphQL::type('StringFilter'),
             ],
             'descricao' => [
                 'type' => GraphQL::type('StringFilter'),

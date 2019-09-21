@@ -35,7 +35,6 @@ class FuncionalidadeFilter extends InputType
 {
     protected $attributes = [
         'name' => 'FuncionalidadeFilter',
-        'description' => 'Grupo de funcionalidades do sistema',
     ];
 
     public function fields(): array
@@ -45,16 +44,16 @@ class FuncionalidadeFilter extends InputType
                 'type' => Type::id(),
             ],
             'modulo_id' => [
-                'type' => Type::nonNull(Type::int()),
+                'type' => Type::int(),
             ],
             'funcionalidade_id' => [
                 'type' => Type::int(),
             ],
             'nome' => [
-                'type' => Type::nonNull(GraphQL::type('StringFilter')),
+                'type' => GraphQL::type('StringFilter'),
             ],
             'descricao' => [
-                'type' => Type::nonNull(GraphQL::type('StringFilter')),
+                'type' => GraphQL::type('StringFilter'),
             ],
         ];
     }

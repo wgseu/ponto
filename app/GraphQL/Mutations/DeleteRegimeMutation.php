@@ -37,12 +37,11 @@ class DeleteRegimeMutation extends Mutation
 {
     protected $attributes = [
         'name' => 'DeleteRegime',
-        'description' => 'Regimes tributários',
     ];
 
     public function authorize(array $args): bool
     {
-        return Auth::user()->can('regime:delete');
+        return true; // Auth::user()->can('regime:delete');
     }
 
     public function type(): Type
@@ -57,7 +56,6 @@ class DeleteRegimeMutation extends Mutation
                 'type' => Type::nonNull(Type::id()),
                 'description' => 'Identificador do regime tributário',
             ],
-            'input' => ['type' => GraphQL::type('RegimeInput')],
         ];
     }
 

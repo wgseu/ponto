@@ -56,6 +56,23 @@ class Emitente extends Model
      *
      * @var array
      */
+    protected $fillable = [
+        'contador_id',
+        'regime_id',
+        'ambiente',
+        'csc_teste',
+        'csc',
+        'token_teste',
+        'token',
+        'ibpt',
+        'data_expiracao',
+    ];
+
+    /**
+     * The model's default values for attributes.
+     *
+     * @var array
+     */
     protected $attributes = [
         'ambiente' => self::AMBIENTE_HOMOLOGACAO,
     ];

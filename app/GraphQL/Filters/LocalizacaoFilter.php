@@ -35,7 +35,6 @@ class LocalizacaoFilter extends InputType
 {
     protected $attributes = [
         'name' => 'LocalizacaoFilter',
-        'description' => 'Endereço detalhado de um cliente',
     ];
 
     public function fields(): array
@@ -45,10 +44,10 @@ class LocalizacaoFilter extends InputType
                 'type' => Type::id(),
             ],
             'cliente_id' => [
-                'type' => Type::nonNull(Type::int()),
+                'type' => Type::int(),
             ],
             'bairro_id' => [
-                'type' => Type::nonNull(Type::int()),
+                'type' => Type::int(),
             ],
             'zona_id' => [
                 'type' => Type::int(),
@@ -57,13 +56,13 @@ class LocalizacaoFilter extends InputType
                 'type' => GraphQL::type('StringFilter'),
             ],
             'logradouro' => [
-                'type' => Type::nonNull(GraphQL::type('StringFilter')),
+                'type' => GraphQL::type('StringFilter'),
             ],
             'numero' => [
-                'type' => Type::nonNull(GraphQL::type('StringFilter')),
+                'type' => GraphQL::type('StringFilter'),
             ],
             'tipo' => [
-                'type' => Type::nonNull(GraphQL::type('LocalizacaoTipoFilter')),
+                'type' => GraphQL::type('LocalizacaoTipoFilter'),
             ],
             'complemento' => [
                 'type' => GraphQL::type('StringFilter'),

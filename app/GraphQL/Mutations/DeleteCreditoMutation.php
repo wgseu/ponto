@@ -37,12 +37,11 @@ class DeleteCreditoMutation extends Mutation
 {
     protected $attributes = [
         'name' => 'DeleteCredito',
-        'description' => 'Créditos de clientes',
     ];
 
     public function authorize(array $args): bool
     {
-        return Auth::user()->can('credito:delete');
+        return true; // Auth::user()->can('credito:delete');
     }
 
     public function type(): Type
@@ -57,7 +56,6 @@ class DeleteCreditoMutation extends Mutation
                 'type' => Type::nonNull(Type::id()),
                 'description' => 'Identificador do crédito',
             ],
-            'input' => ['type' => GraphQL::type('CreditoInput')],
         ];
     }
 

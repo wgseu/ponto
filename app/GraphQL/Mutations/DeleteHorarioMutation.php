@@ -37,12 +37,11 @@ class DeleteHorarioMutation extends Mutation
 {
     protected $attributes = [
         'name' => 'DeleteHorario',
-        'description' => 'Informa o horário de funcionamento do estabelecimento',
     ];
 
     public function authorize(array $args): bool
     {
-        return Auth::user()->can('horario:delete');
+        return true; // Auth::user()->can('horario:delete');
     }
 
     public function type(): Type
@@ -57,7 +56,6 @@ class DeleteHorarioMutation extends Mutation
                 'type' => Type::nonNull(Type::id()),
                 'description' => 'Identificador do horário',
             ],
-            'input' => ['type' => GraphQL::type('HorarioInput')],
         ];
     }
 

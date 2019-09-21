@@ -35,7 +35,6 @@ class ProdutoFilter extends InputType
 {
     protected $attributes = [
         'name' => 'ProdutoFilter',
-        'description' => 'Informações sobre o produto, composição ou pacote',
     ];
 
     public function fields(): array
@@ -45,13 +44,13 @@ class ProdutoFilter extends InputType
                 'type' => Type::id(),
             ],
             'codigo' => [
-                'type' => Type::nonNull(GraphQL::type('StringFilter')),
+                'type' => GraphQL::type('StringFilter'),
             ],
             'categoria_id' => [
-                'type' => Type::nonNull(Type::int()),
+                'type' => Type::int(),
             ],
             'unidade_id' => [
-                'type' => Type::nonNull(Type::int()),
+                'type' => Type::int(),
             ],
             'setor_estoque_id' => [
                 'type' => Type::int(),
@@ -63,7 +62,7 @@ class ProdutoFilter extends InputType
                 'type' => Type::int(),
             ],
             'descricao' => [
-                'type' => Type::nonNull(GraphQL::type('StringFilter')),
+                'type' => GraphQL::type('StringFilter'),
             ],
             'abreviacao' => [
                 'type' => GraphQL::type('StringFilter'),
@@ -72,37 +71,37 @@ class ProdutoFilter extends InputType
                 'type' => GraphQL::type('StringFilter'),
             ],
             'quantidade_minima' => [
-                'type' => Type::nonNull(GraphQL::type('NumberFilter')),
+                'type' => GraphQL::type('NumberFilter'),
             ],
             'quantidade_maxima' => [
-                'type' => Type::nonNull(GraphQL::type('NumberFilter')),
+                'type' => GraphQL::type('NumberFilter'),
             ],
             'preco_venda' => [
-                'type' => Type::nonNull(GraphQL::type('NumberFilter')),
+                'type' => GraphQL::type('NumberFilter'),
             ],
             'custo_producao' => [
                 'type' => GraphQL::type('NumberFilter'),
             ],
             'tipo' => [
-                'type' => Type::nonNull(GraphQL::type('ProdutoTipoFilter')),
+                'type' => GraphQL::type('ProdutoTipoFilter'),
             ],
             'cobrar_servico' => [
-                'type' => Type::nonNull(Type::boolean()),
+                'type' => Type::boolean(),
             ],
             'divisivel' => [
-                'type' => Type::nonNull(Type::boolean()),
+                'type' => Type::boolean(),
             ],
             'pesavel' => [
-                'type' => Type::nonNull(Type::boolean()),
+                'type' => Type::boolean(),
             ],
             'tempo_preparo' => [
-                'type' => Type::nonNull(GraphQL::type('NumberFilter')),
+                'type' => GraphQL::type('NumberFilter'),
             ],
             'disponivel' => [
-                'type' => Type::nonNull(Type::boolean()),
+                'type' => Type::boolean(),
             ],
             'insumo' => [
-                'type' => Type::nonNull(Type::boolean()),
+                'type' => Type::boolean(),
             ],
             'avaliacao' => [
                 'type' => GraphQL::type('NumberFilter'),
@@ -114,7 +113,7 @@ class ProdutoFilter extends InputType
                 'type' => GraphQL::type('StringFilter'),
             ],
             'data_atualizacao' => [
-                'type' => Type::nonNull(GraphQL::type('DateFilter')),
+                'type' => GraphQL::type('DateFilter'),
             ],
             'data_arquivado' => [
                 'type' => GraphQL::type('DateFilter'),

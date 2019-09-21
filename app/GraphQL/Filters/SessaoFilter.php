@@ -35,7 +35,6 @@ class SessaoFilter extends InputType
 {
     protected $attributes = [
         'name' => 'SessaoFilter',
-        'description' => 'Sessão de trabalho do dia, permite que vários caixas sejam abertos utilizando uma mesma sessão',
     ];
 
     public function fields(): array
@@ -45,13 +44,13 @@ class SessaoFilter extends InputType
                 'type' => Type::id(),
             ],
             'data_inicio' => [
-                'type' => Type::nonNull(GraphQL::type('DateFilter')),
+                'type' => GraphQL::type('DateFilter'),
             ],
             'data_termino' => [
                 'type' => GraphQL::type('DateFilter'),
             ],
             'aberta' => [
-                'type' => Type::nonNull(Type::boolean()),
+                'type' => Type::boolean(),
             ],
         ];
     }

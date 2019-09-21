@@ -50,6 +50,22 @@ class Cartao extends Model
      *
      * @var array
      */
+    protected $fillable = [
+        'forma_id',
+        'carteira_id',
+        'bandeira',
+        'taxa',
+        'dias_repasse',
+        'taxa_antecipacao',
+        'imagem_url',
+        'ativo',
+    ];
+
+    /**
+     * The model's default values for attributes.
+     *
+     * @var array
+     */
     protected $attributes = [
         'taxa' => 0,
         'dias_repasse' => 30,

@@ -35,7 +35,6 @@ class SetorFilter extends InputType
 {
     protected $attributes = [
         'name' => 'SetorFilter',
-        'description' => 'Setor de impressão e de estoque',
     ];
 
     public function fields(): array
@@ -48,7 +47,7 @@ class SetorFilter extends InputType
                 'type' => Type::int(),
             ],
             'nome' => [
-                'type' => Type::nonNull(GraphQL::type('StringFilter')),
+                'type' => GraphQL::type('StringFilter'),
             ],
             'descricao' => [
                 'type' => GraphQL::type('StringFilter'),

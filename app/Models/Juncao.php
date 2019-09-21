@@ -58,6 +58,18 @@ class Juncao extends Model
      *
      * @var array
      */
+    protected $fillable = [
+        'mesa_id',
+        'pedido_id',
+        'estado',
+        'data_movimento',
+    ];
+
+    /**
+     * The model's default values for attributes.
+     *
+     * @var array
+     */
     protected $attributes = [
         'estado' => self::ESTADO_ASSOCIADO,
     ];

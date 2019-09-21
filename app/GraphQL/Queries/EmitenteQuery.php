@@ -42,12 +42,11 @@ class EmitenteQuery extends Query
 {
     protected $attributes = [
         'name' => 'emitentes',
-        'description' => 'Dados do emitente das notas fiscais',
     ];
 
     public function authorize(array $args): bool
     {
-        return Auth::user()->can('emitente:view');
+        return true; // Auth::user()->can('emitente:view');
     }
 
     public function type(): Type
@@ -60,6 +59,8 @@ class EmitenteQuery extends Query
         return [
             'filter' => ['name' => 'filter', 'type' => GraphQL::type('EmitenteFilter')],
             'order' => ['name' => 'order', 'type' => GraphQL::type('EmitenteOrder')],
+            'limit' => ['name' => 'limit', 'type' => Type::int(), 'rules' => ['min:1', 'max:100']],
+            'page' => ['name' => 'page', 'type' => Type::int(), 'rules' => ['min:1']],
         ];
     }
 
@@ -69,7 +70,8 @@ class EmitenteQuery extends Query
         $fields = $getSelectFields();
         $query = Emitente::with($fields->getRelations())
             ->select($fields->getSelect())
-            ->where(Filter::map($args['filter']));
-        return Ordering::apply($args['order'], $query)->paginate($args['limit'], ['*'], 'page', $args['page']);
+            ->where(Filter::map($args['filter'] ?? []));
+        return Ordering::apply($args['order'] ?? [], $query)
+            ->paginate($args['limit'] ?? 10, ['*'], 'page', $args['page'] ?? 1);
     }
 }

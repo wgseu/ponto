@@ -42,12 +42,11 @@ class SetorQuery extends Query
 {
     protected $attributes = [
         'name' => 'setores',
-        'description' => 'Setor de impressão e de estoque',
     ];
 
     public function authorize(array $args): bool
     {
-        return Auth::user()->can('setor:view');
+        return true; // Auth::user()->can('setor:view');
     }
 
     public function type(): Type
@@ -60,6 +59,8 @@ class SetorQuery extends Query
         return [
             'filter' => ['name' => 'filter', 'type' => GraphQL::type('SetorFilter')],
             'order' => ['name' => 'order', 'type' => GraphQL::type('SetorOrder')],
+            'limit' => ['name' => 'limit', 'type' => Type::int(), 'rules' => ['min:1', 'max:100']],
+            'page' => ['name' => 'page', 'type' => Type::int(), 'rules' => ['min:1']],
         ];
     }
 
@@ -69,7 +70,8 @@ class SetorQuery extends Query
         $fields = $getSelectFields();
         $query = Setor::with($fields->getRelations())
             ->select($fields->getSelect())
-            ->where(Filter::map($args['filter']));
-        return Ordering::apply($args['order'], $query)->paginate($args['limit'], ['*'], 'page', $args['page']);
+            ->where(Filter::map($args['filter'] ?? []));
+        return Ordering::apply($args['order'] ?? [], $query)
+            ->paginate($args['limit'] ?? 10, ['*'], 'page', $args['page'] ?? 1);
     }
 }

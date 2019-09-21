@@ -35,7 +35,6 @@ class ModuloFilter extends InputType
 {
     protected $attributes = [
         'name' => 'ModuloFilter',
-        'description' => 'Módulos do sistema que podem ser desativados/ativados',
     ];
 
     public function fields(): array
@@ -45,13 +44,13 @@ class ModuloFilter extends InputType
                 'type' => Type::id(),
             ],
             'nome' => [
-                'type' => Type::nonNull(GraphQL::type('StringFilter')),
+                'type' => GraphQL::type('StringFilter'),
             ],
             'descricao' => [
-                'type' => Type::nonNull(GraphQL::type('StringFilter')),
+                'type' => GraphQL::type('StringFilter'),
             ],
             'habilitado' => [
-                'type' => Type::nonNull(Type::boolean()),
+                'type' => Type::boolean(),
             ],
         ];
     }

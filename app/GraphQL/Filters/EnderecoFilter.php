@@ -35,7 +35,6 @@ class EnderecoFilter extends InputType
 {
     protected $attributes = [
         'name' => 'EnderecoFilter',
-        'description' => 'Endereços de ruas e avenidas com informação de CEP',
     ];
 
     public function fields(): array
@@ -45,16 +44,16 @@ class EnderecoFilter extends InputType
                 'type' => Type::id(),
             ],
             'cidade_id' => [
-                'type' => Type::nonNull(Type::int()),
+                'type' => Type::int(),
             ],
             'bairro_id' => [
-                'type' => Type::nonNull(Type::int()),
+                'type' => Type::int(),
             ],
             'logradouro' => [
-                'type' => Type::nonNull(GraphQL::type('StringFilter')),
+                'type' => GraphQL::type('StringFilter'),
             ],
             'cep' => [
-                'type' => Type::nonNull(GraphQL::type('StringFilter')),
+                'type' => GraphQL::type('StringFilter'),
             ],
         ];
     }

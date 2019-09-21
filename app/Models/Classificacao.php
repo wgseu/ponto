@@ -46,6 +46,17 @@ class Classificacao extends Model
     public $timestamps = false;
 
     /**
+     * The model's default values for attributes.
+     *
+     * @var array
+     */
+    protected $fillable = [
+        'classificacao_id',
+        'descricao',
+        'icone_url',
+    ];
+
+    /**
      * Classificação superior, quando informado, esta classificação será uma
      * subclassificação
      */

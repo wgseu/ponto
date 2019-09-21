@@ -42,34 +42,34 @@ class NotaOrder extends InputType
     {
         return [
             'id' => [
-                'type' => Type::nonNull(GraphQL::type('OrderByEnum')),
+                'type' => GraphQL::type('OrderByEnum'),
             ],
             'tipo' => [
-                'type' => Type::nonNull(GraphQL::type('OrderByEnum')),
+                'type' => GraphQL::type('OrderByEnum'),
             ],
             'ambiente' => [
-                'type' => Type::nonNull(GraphQL::type('OrderByEnum')),
+                'type' => GraphQL::type('OrderByEnum'),
             ],
             'acao' => [
-                'type' => Type::nonNull(GraphQL::type('OrderByEnum')),
+                'type' => GraphQL::type('OrderByEnum'),
             ],
             'estado' => [
-                'type' => Type::nonNull(GraphQL::type('OrderByEnum')),
+                'type' => GraphQL::type('OrderByEnum'),
             ],
             'ultimo_evento_id' => [
                 'type' => GraphQL::type('OrderByEnum'),
             ],
             'serie' => [
-                'type' => Type::nonNull(GraphQL::type('OrderByEnum')),
+                'type' => GraphQL::type('OrderByEnum'),
             ],
             'numero_inicial' => [
-                'type' => Type::nonNull(GraphQL::type('OrderByEnum')),
+                'type' => GraphQL::type('OrderByEnum'),
             ],
             'numero_final' => [
-                'type' => Type::nonNull(GraphQL::type('OrderByEnum')),
+                'type' => GraphQL::type('OrderByEnum'),
             ],
             'sequencia' => [
-                'type' => Type::nonNull(GraphQL::type('OrderByEnum')),
+                'type' => GraphQL::type('OrderByEnum'),
             ],
             'chave' => [
                 'type' => GraphQL::type('OrderByEnum'),
@@ -87,7 +87,7 @@ class NotaOrder extends InputType
                 'type' => GraphQL::type('OrderByEnum'),
             ],
             'contingencia' => [
-                'type' => Type::nonNull(GraphQL::type('OrderByEnum')),
+                'type' => GraphQL::type('OrderByEnum'),
             ],
             'consulta_url' => [
                 'type' => GraphQL::type('OrderByEnum'),
@@ -102,19 +102,19 @@ class NotaOrder extends InputType
                 'type' => GraphQL::type('OrderByEnum'),
             ],
             'corrigido' => [
-                'type' => Type::nonNull(GraphQL::type('OrderByEnum')),
+                'type' => GraphQL::type('OrderByEnum'),
             ],
             'concluido' => [
-                'type' => Type::nonNull(GraphQL::type('OrderByEnum')),
+                'type' => GraphQL::type('OrderByEnum'),
             ],
             'data_autorizacao' => [
                 'type' => GraphQL::type('OrderByEnum'),
             ],
             'data_emissao' => [
-                'type' => Type::nonNull(GraphQL::type('OrderByEnum')),
+                'type' => GraphQL::type('OrderByEnum'),
             ],
             'data_lancamento' => [
-                'type' => Type::nonNull(GraphQL::type('OrderByEnum')),
+                'type' => GraphQL::type('OrderByEnum'),
             ],
             'data_arquivado' => [
                 'type' => GraphQL::type('OrderByEnum'),

@@ -37,12 +37,11 @@ class UpdateItemMutation extends Mutation
 {
     protected $attributes = [
         'name' => 'UpdateItem',
-        'description' => 'Produtos, taxas e serviços do pedido, a alteração do estado permite o controle de produção',
     ];
 
     public function authorize(array $args): bool
     {
-        return Auth::user()->can('item:update');
+        return true; // Auth::user()->can('item:update');
     }
 
     public function type(): Type
@@ -57,7 +56,7 @@ class UpdateItemMutation extends Mutation
                 'type' => Type::nonNull(Type::id()),
                 'description' => 'Identificador do item do pedido',
             ],
-            'input' => ['type' => GraphQL::type('ItemInput')],
+            'input' => ['type' => Type::nonNull(GraphQL::type('ItemInput'))],
         ];
     }
 

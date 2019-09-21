@@ -35,7 +35,6 @@ class CatalogoFilter extends InputType
 {
     protected $attributes = [
         'name' => 'CatalogoFilter',
-        'description' => 'Informa a lista de produtos disponíveis nos fornecedores',
     ];
 
     public function fields(): array
@@ -45,28 +44,28 @@ class CatalogoFilter extends InputType
                 'type' => Type::id(),
             ],
             'produto_id' => [
-                'type' => Type::nonNull(Type::int()),
+                'type' => Type::int(),
             ],
             'fornecedor_id' => [
-                'type' => Type::nonNull(Type::int()),
+                'type' => Type::int(),
             ],
             'preco_compra' => [
-                'type' => Type::nonNull(GraphQL::type('NumberFilter')),
+                'type' => GraphQL::type('NumberFilter'),
             ],
             'preco_venda' => [
-                'type' => Type::nonNull(GraphQL::type('NumberFilter')),
+                'type' => GraphQL::type('NumberFilter'),
             ],
             'quantidade_minima' => [
-                'type' => Type::nonNull(GraphQL::type('NumberFilter')),
+                'type' => GraphQL::type('NumberFilter'),
             ],
             'estoque' => [
-                'type' => Type::nonNull(GraphQL::type('NumberFilter')),
+                'type' => GraphQL::type('NumberFilter'),
             ],
             'limitado' => [
-                'type' => Type::nonNull(Type::boolean()),
+                'type' => Type::boolean(),
             ],
             'conteudo' => [
-                'type' => Type::nonNull(GraphQL::type('NumberFilter')),
+                'type' => GraphQL::type('NumberFilter'),
             ],
             'data_consulta' => [
                 'type' => GraphQL::type('DateFilter'),

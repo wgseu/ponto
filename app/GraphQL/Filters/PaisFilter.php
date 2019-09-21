@@ -35,7 +35,6 @@ class PaisFilter extends InputType
 {
     protected $attributes = [
         'name' => 'PaisFilter',
-        'description' => 'Informações de um páis com sua moeda e língua nativa',
     ];
 
     public function fields(): array
@@ -45,19 +44,19 @@ class PaisFilter extends InputType
                 'type' => Type::id(),
             ],
             'nome' => [
-                'type' => Type::nonNull(GraphQL::type('StringFilter')),
+                'type' => GraphQL::type('StringFilter'),
             ],
             'sigla' => [
-                'type' => Type::nonNull(GraphQL::type('StringFilter')),
+                'type' => GraphQL::type('StringFilter'),
             ],
             'codigo' => [
-                'type' => Type::nonNull(GraphQL::type('StringFilter')),
+                'type' => GraphQL::type('StringFilter'),
             ],
             'moeda_id' => [
-                'type' => Type::nonNull(Type::int()),
+                'type' => Type::int(),
             ],
             'idioma' => [
-                'type' => Type::nonNull(GraphQL::type('StringFilter')),
+                'type' => GraphQL::type('StringFilter'),
             ],
             'prefixo' => [
                 'type' => GraphQL::type('StringFilter'),
@@ -66,7 +65,7 @@ class PaisFilter extends InputType
                 'type' => GraphQL::type('StringFilter'),
             ],
             'unitario' => [
-                'type' => Type::nonNull(Type::boolean()),
+                'type' => Type::boolean(),
             ],
         ];
     }

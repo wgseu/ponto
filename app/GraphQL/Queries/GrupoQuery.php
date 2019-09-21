@@ -42,12 +42,11 @@ class GrupoQuery extends Query
 {
     protected $attributes = [
         'name' => 'grupos',
-        'description' => 'Grupos de pacotes, permite criar grupos como Tamanho, Sabores para formações de produtos',
     ];
 
     public function authorize(array $args): bool
     {
-        return Auth::user()->can('grupo:view');
+        return true; // Auth::user()->can('grupo:view');
     }
 
     public function type(): Type
@@ -60,6 +59,8 @@ class GrupoQuery extends Query
         return [
             'filter' => ['name' => 'filter', 'type' => GraphQL::type('GrupoFilter')],
             'order' => ['name' => 'order', 'type' => GraphQL::type('GrupoOrder')],
+            'limit' => ['name' => 'limit', 'type' => Type::int(), 'rules' => ['min:1', 'max:100']],
+            'page' => ['name' => 'page', 'type' => Type::int(), 'rules' => ['min:1']],
         ];
     }
 
@@ -69,7 +70,8 @@ class GrupoQuery extends Query
         $fields = $getSelectFields();
         $query = Grupo::with($fields->getRelations())
             ->select($fields->getSelect())
-            ->where(Filter::map($args['filter']));
-        return Ordering::apply($args['order'], $query)->paginate($args['limit'], ['*'], 'page', $args['page']);
+            ->where(Filter::map($args['filter'] ?? []));
+        return Ordering::apply($args['order'] ?? [], $query)
+            ->paginate($args['limit'] ?? 10, ['*'], 'page', $args['page'] ?? 1);
     }
 }

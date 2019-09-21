@@ -42,46 +42,46 @@ class AssociacaoOrder extends InputType
     {
         return [
             'id' => [
-                'type' => Type::nonNull(GraphQL::type('OrderByEnum')),
+                'type' => GraphQL::type('OrderByEnum'),
             ],
             'integracao_id' => [
-                'type' => Type::nonNull(GraphQL::type('OrderByEnum')),
+                'type' => GraphQL::type('OrderByEnum'),
             ],
             'entrega_id' => [
                 'type' => GraphQL::type('OrderByEnum'),
             ],
             'codigo' => [
-                'type' => Type::nonNull(GraphQL::type('OrderByEnum')),
+                'type' => GraphQL::type('OrderByEnum'),
             ],
             'cliente' => [
-                'type' => Type::nonNull(GraphQL::type('OrderByEnum')),
+                'type' => GraphQL::type('OrderByEnum'),
             ],
             'chave' => [
-                'type' => Type::nonNull(GraphQL::type('OrderByEnum')),
+                'type' => GraphQL::type('OrderByEnum'),
             ],
             'pedido' => [
-                'type' => Type::nonNull(GraphQL::type('OrderByEnum')),
+                'type' => GraphQL::type('OrderByEnum'),
             ],
             'endereco' => [
                 'type' => GraphQL::type('OrderByEnum'),
             ],
             'quantidade' => [
-                'type' => Type::nonNull(GraphQL::type('OrderByEnum')),
+                'type' => GraphQL::type('OrderByEnum'),
             ],
             'servicos' => [
-                'type' => Type::nonNull(GraphQL::type('OrderByEnum')),
+                'type' => GraphQL::type('OrderByEnum'),
             ],
             'produtos' => [
-                'type' => Type::nonNull(GraphQL::type('OrderByEnum')),
+                'type' => GraphQL::type('OrderByEnum'),
             ],
             'descontos' => [
-                'type' => Type::nonNull(GraphQL::type('OrderByEnum')),
+                'type' => GraphQL::type('OrderByEnum'),
             ],
             'pago' => [
-                'type' => Type::nonNull(GraphQL::type('OrderByEnum')),
+                'type' => GraphQL::type('OrderByEnum'),
             ],
             'status' => [
-                'type' => Type::nonNull(GraphQL::type('OrderByEnum')),
+                'type' => GraphQL::type('OrderByEnum'),
             ],
             'motivo' => [
                 'type' => GraphQL::type('OrderByEnum'),
@@ -90,16 +90,16 @@ class AssociacaoOrder extends InputType
                 'type' => GraphQL::type('OrderByEnum'),
             ],
             'sincronizado' => [
-                'type' => Type::nonNull(GraphQL::type('OrderByEnum')),
+                'type' => GraphQL::type('OrderByEnum'),
             ],
             'integrado' => [
-                'type' => Type::nonNull(GraphQL::type('OrderByEnum')),
+                'type' => GraphQL::type('OrderByEnum'),
             ],
             'data_confirmacao' => [
                 'type' => GraphQL::type('OrderByEnum'),
             ],
             'data_pedido' => [
-                'type' => Type::nonNull(GraphQL::type('OrderByEnum')),
+                'type' => GraphQL::type('OrderByEnum'),
             ],
         ];
     }

@@ -42,13 +42,13 @@ class AcessoOrder extends InputType
     {
         return [
             'id' => [
-                'type' => Type::nonNull(GraphQL::type('OrderByEnum')),
+                'type' => GraphQL::type('OrderByEnum'),
             ],
             'funcao_id' => [
-                'type' => Type::nonNull(GraphQL::type('OrderByEnum')),
+                'type' => GraphQL::type('OrderByEnum'),
             ],
             'permissao_id' => [
-                'type' => Type::nonNull(GraphQL::type('OrderByEnum')),
+                'type' => GraphQL::type('OrderByEnum'),
             ],
         ];
     }

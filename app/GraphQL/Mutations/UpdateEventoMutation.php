@@ -37,12 +37,11 @@ class UpdateEventoMutation extends Mutation
 {
     protected $attributes = [
         'name' => 'UpdateEvento',
-        'description' => 'Eventos de envio das notas',
     ];
 
     public function authorize(array $args): bool
     {
-        return Auth::user()->can('evento:update');
+        return true; // Auth::user()->can('evento:update');
     }
 
     public function type(): Type
@@ -57,7 +56,7 @@ class UpdateEventoMutation extends Mutation
                 'type' => Type::nonNull(Type::id()),
                 'description' => 'Identificador do evento',
             ],
-            'input' => ['type' => GraphQL::type('EventoInput')],
+            'input' => ['type' => Type::nonNull(GraphQL::type('EventoInput'))],
         ];
     }
 

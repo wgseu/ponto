@@ -35,7 +35,6 @@ class EmitenteFilter extends InputType
 {
     protected $attributes = [
         'name' => 'EmitenteFilter',
-        'description' => 'Dados do emitente das notas fiscais',
     ];
 
     public function fields(): array
@@ -48,10 +47,10 @@ class EmitenteFilter extends InputType
                 'type' => Type::int(),
             ],
             'regime_id' => [
-                'type' => Type::nonNull(Type::int()),
+                'type' => Type::int(),
             ],
             'ambiente' => [
-                'type' => Type::nonNull(GraphQL::type('EmitenteAmbienteFilter')),
+                'type' => GraphQL::type('EmitenteAmbienteFilter'),
             ],
             'csc_teste' => [
                 'type' => GraphQL::type('StringFilter'),

@@ -42,12 +42,11 @@ class PromocaoQuery extends Query
 {
     protected $attributes = [
         'name' => 'promocoes',
-        'description' => 'Informa se há descontos nos produtos em determinados dias da semana, o preço pode subir ou descer e ser agendado para ser aplicado',
     ];
 
     public function authorize(array $args): bool
     {
-        return Auth::user()->can('promocao:view');
+        return true; // Auth::user()->can('promocao:view');
     }
 
     public function type(): Type
@@ -60,6 +59,8 @@ class PromocaoQuery extends Query
         return [
             'filter' => ['name' => 'filter', 'type' => GraphQL::type('PromocaoFilter')],
             'order' => ['name' => 'order', 'type' => GraphQL::type('PromocaoOrder')],
+            'limit' => ['name' => 'limit', 'type' => Type::int(), 'rules' => ['min:1', 'max:100']],
+            'page' => ['name' => 'page', 'type' => Type::int(), 'rules' => ['min:1']],
         ];
     }
 
@@ -69,7 +70,8 @@ class PromocaoQuery extends Query
         $fields = $getSelectFields();
         $query = Promocao::with($fields->getRelations())
             ->select($fields->getSelect())
-            ->where(Filter::map($args['filter']));
-        return Ordering::apply($args['order'], $query)->paginate($args['limit'], ['*'], 'page', $args['page']);
+            ->where(Filter::map($args['filter'] ?? []));
+        return Ordering::apply($args['order'] ?? [], $query)
+            ->paginate($args['limit'] ?? 10, ['*'], 'page', $args['page'] ?? 1);
     }
 }

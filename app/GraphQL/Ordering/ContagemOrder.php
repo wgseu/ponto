@@ -42,19 +42,19 @@ class ContagemOrder extends InputType
     {
         return [
             'id' => [
-                'type' => Type::nonNull(GraphQL::type('OrderByEnum')),
+                'type' => GraphQL::type('OrderByEnum'),
             ],
             'produto_id' => [
-                'type' => Type::nonNull(GraphQL::type('OrderByEnum')),
+                'type' => GraphQL::type('OrderByEnum'),
             ],
             'setor_id' => [
-                'type' => Type::nonNull(GraphQL::type('OrderByEnum')),
+                'type' => GraphQL::type('OrderByEnum'),
             ],
             'quantidade' => [
-                'type' => Type::nonNull(GraphQL::type('OrderByEnum')),
+                'type' => GraphQL::type('OrderByEnum'),
             ],
             'data_atualizacao' => [
-                'type' => Type::nonNull(GraphQL::type('OrderByEnum')),
+                'type' => GraphQL::type('OrderByEnum'),
             ],
         ];
     }

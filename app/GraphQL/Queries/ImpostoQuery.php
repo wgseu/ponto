@@ -42,12 +42,11 @@ class ImpostoQuery extends Query
 {
     protected $attributes = [
         'name' => 'impostos',
-        'description' => 'Impostos disponíveis para informar no produto',
     ];
 
     public function authorize(array $args): bool
     {
-        return Auth::user()->can('imposto:view');
+        return true; // Auth::user()->can('imposto:view');
     }
 
     public function type(): Type
@@ -60,6 +59,8 @@ class ImpostoQuery extends Query
         return [
             'filter' => ['name' => 'filter', 'type' => GraphQL::type('ImpostoFilter')],
             'order' => ['name' => 'order', 'type' => GraphQL::type('ImpostoOrder')],
+            'limit' => ['name' => 'limit', 'type' => Type::int(), 'rules' => ['min:1', 'max:100']],
+            'page' => ['name' => 'page', 'type' => Type::int(), 'rules' => ['min:1']],
         ];
     }
 
@@ -69,7 +70,8 @@ class ImpostoQuery extends Query
         $fields = $getSelectFields();
         $query = Imposto::with($fields->getRelations())
             ->select($fields->getSelect())
-            ->where(Filter::map($args['filter']));
-        return Ordering::apply($args['order'], $query)->paginate($args['limit'], ['*'], 'page', $args['page']);
+            ->where(Filter::map($args['filter'] ?? []));
+        return Ordering::apply($args['order'] ?? [], $query)
+            ->paginate($args['limit'] ?? 10, ['*'], 'page', $args['page'] ?? 1);
     }
 }

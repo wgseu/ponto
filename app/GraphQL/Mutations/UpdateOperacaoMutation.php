@@ -37,12 +37,11 @@ class UpdateOperacaoMutation extends Mutation
 {
     protected $attributes = [
         'name' => 'UpdateOperacao',
-        'description' => 'Código Fiscal de Operações e Prestações (CFOP)',
     ];
 
     public function authorize(array $args): bool
     {
-        return Auth::user()->can('operacao:update');
+        return true; // Auth::user()->can('operacao:update');
     }
 
     public function type(): Type
@@ -57,7 +56,7 @@ class UpdateOperacaoMutation extends Mutation
                 'type' => Type::nonNull(Type::id()),
                 'description' => 'Identificador da operação',
             ],
-            'input' => ['type' => GraphQL::type('OperacaoInput')],
+            'input' => ['type' => Type::nonNull(GraphQL::type('OperacaoInput'))],
         ];
     }
 

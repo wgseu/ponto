@@ -35,7 +35,6 @@ class ComandaFilter extends InputType
 {
     protected $attributes = [
         'name' => 'ComandaFilter',
-        'description' => 'Comanda individual, permite lançar pedidos em cartões de consumo',
     ];
 
     public function fields(): array
@@ -45,13 +44,13 @@ class ComandaFilter extends InputType
                 'type' => Type::id(),
             ],
             'numero' => [
-                'type' => Type::nonNull(GraphQL::type('NumberFilter')),
+                'type' => GraphQL::type('NumberFilter'),
             ],
             'nome' => [
-                'type' => Type::nonNull(GraphQL::type('StringFilter')),
+                'type' => GraphQL::type('StringFilter'),
             ],
             'ativa' => [
-                'type' => Type::nonNull(Type::boolean()),
+                'type' => Type::boolean(),
             ],
         ];
     }

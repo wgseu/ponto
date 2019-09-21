@@ -37,12 +37,11 @@ class UpdateCupomMutation extends Mutation
 {
     protected $attributes = [
         'name' => 'UpdateCupom',
-        'description' => 'Informa os cupons de descontos e seus usos',
     ];
 
     public function authorize(array $args): bool
     {
-        return Auth::user()->can('cupom:update');
+        return true; // Auth::user()->can('cupom:update');
     }
 
     public function type(): Type
@@ -57,7 +56,7 @@ class UpdateCupomMutation extends Mutation
                 'type' => Type::nonNull(Type::id()),
                 'description' => 'Identificador do cupom',
             ],
-            'input' => ['type' => GraphQL::type('CupomInput')],
+            'input' => ['type' => Type::nonNull(GraphQL::type('CupomInput'))],
         ];
     }
 

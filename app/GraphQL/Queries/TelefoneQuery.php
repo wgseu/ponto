@@ -42,12 +42,11 @@ class TelefoneQuery extends Query
 {
     protected $attributes = [
         'name' => 'telefones',
-        'description' => 'Telefones dos clientes, apenas o telefone principal deve ser único por cliente',
     ];
 
     public function authorize(array $args): bool
     {
-        return Auth::user()->can('telefone:view');
+        return true; // Auth::user()->can('telefone:view');
     }
 
     public function type(): Type
@@ -60,6 +59,8 @@ class TelefoneQuery extends Query
         return [
             'filter' => ['name' => 'filter', 'type' => GraphQL::type('TelefoneFilter')],
             'order' => ['name' => 'order', 'type' => GraphQL::type('TelefoneOrder')],
+            'limit' => ['name' => 'limit', 'type' => Type::int(), 'rules' => ['min:1', 'max:100']],
+            'page' => ['name' => 'page', 'type' => Type::int(), 'rules' => ['min:1']],
         ];
     }
 
@@ -69,7 +70,8 @@ class TelefoneQuery extends Query
         $fields = $getSelectFields();
         $query = Telefone::with($fields->getRelations())
             ->select($fields->getSelect())
-            ->where(Filter::map($args['filter']));
-        return Ordering::apply($args['order'], $query)->paginate($args['limit'], ['*'], 'page', $args['page']);
+            ->where(Filter::map($args['filter'] ?? []));
+        return Ordering::apply($args['order'] ?? [], $query)
+            ->paginate($args['limit'] ?? 10, ['*'], 'page', $args['page'] ?? 1);
     }
 }

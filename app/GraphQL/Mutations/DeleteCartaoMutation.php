@@ -37,12 +37,11 @@ class DeleteCartaoMutation extends Mutation
 {
     protected $attributes = [
         'name' => 'DeleteCartao',
-        'description' => 'Cartões utilizados na forma de pagamento em cartão',
     ];
 
     public function authorize(array $args): bool
     {
-        return Auth::user()->can('cartao:delete');
+        return true; // Auth::user()->can('cartao:delete');
     }
 
     public function type(): Type
@@ -57,7 +56,6 @@ class DeleteCartaoMutation extends Mutation
                 'type' => Type::nonNull(Type::id()),
                 'description' => 'Identificador do cartão',
             ],
-            'input' => ['type' => GraphQL::type('CartaoInput')],
         ];
     }
 

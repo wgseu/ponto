@@ -37,12 +37,11 @@ class DeleteTelefoneMutation extends Mutation
 {
     protected $attributes = [
         'name' => 'DeleteTelefone',
-        'description' => 'Telefones dos clientes, apenas o telefone principal deve ser único por cliente',
     ];
 
     public function authorize(array $args): bool
     {
-        return Auth::user()->can('telefone:delete');
+        return true; // Auth::user()->can('telefone:delete');
     }
 
     public function type(): Type
@@ -57,7 +56,6 @@ class DeleteTelefoneMutation extends Mutation
                 'type' => Type::nonNull(Type::id()),
                 'description' => 'Identificador do telefone',
             ],
-            'input' => ['type' => GraphQL::type('TelefoneInput')],
         ];
     }
 

@@ -50,6 +50,23 @@ class Integracao extends Model
      *
      * @var array
      */
+    protected $fillable = [
+        'nome',
+        'descricao',
+        'icone_url',
+        'login',
+        'secret',
+        'opcoes',
+        'associacoes',
+        'ativo',
+        'data_atualizacao',
+    ];
+
+    /**
+     * The model's default values for attributes.
+     *
+     * @var array
+     */
     protected $attributes = [
         'ativo' => false,
     ];

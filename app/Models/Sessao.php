@@ -51,6 +51,17 @@ class Sessao extends Model
      *
      * @var array
      */
+    protected $fillable = [
+        'data_inicio',
+        'data_termino',
+        'aberta',
+    ];
+
+    /**
+     * The model's default values for attributes.
+     *
+     * @var array
+     */
     protected $attributes = [
         'aberta' => true,
     ];

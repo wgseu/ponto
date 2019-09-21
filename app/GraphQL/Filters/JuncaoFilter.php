@@ -35,7 +35,6 @@ class JuncaoFilter extends InputType
 {
     protected $attributes = [
         'name' => 'JuncaoFilter',
-        'description' => 'Junções de mesas, informa quais mesas estão juntas ao pedido',
     ];
 
     public function fields(): array
@@ -45,16 +44,16 @@ class JuncaoFilter extends InputType
                 'type' => Type::id(),
             ],
             'mesa_id' => [
-                'type' => Type::nonNull(Type::int()),
+                'type' => Type::int(),
             ],
             'pedido_id' => [
-                'type' => Type::nonNull(Type::int()),
+                'type' => Type::int(),
             ],
             'estado' => [
-                'type' => Type::nonNull(GraphQL::type('JuncaoEstadoFilter')),
+                'type' => GraphQL::type('JuncaoEstadoFilter'),
             ],
             'data_movimento' => [
-                'type' => Type::nonNull(GraphQL::type('DateFilter')),
+                'type' => GraphQL::type('DateFilter'),
             ],
         ];
     }

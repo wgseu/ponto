@@ -37,12 +37,11 @@ class CreateFormaMutation extends Mutation
 {
     protected $attributes = [
         'name' => 'CreateForma',
-        'description' => 'Formas de pagamento disponíveis para pedido e contas',
     ];
 
     public function authorize(array $args): bool
     {
-        return Auth::user()->can('forma:create');
+        return true; // Auth::user()->can('forma:create');
     }
 
     public function type(): Type
@@ -53,7 +52,7 @@ class CreateFormaMutation extends Mutation
     public function args(): array
     {
         return [
-            'input' => ['type' => GraphQL::type('FormaInput')],
+            'input' => ['type' => Type::nonNull(GraphQL::type('FormaInput'))],
         ];
     }
 

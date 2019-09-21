@@ -37,12 +37,11 @@ class CreateGrupoMutation extends Mutation
 {
     protected $attributes = [
         'name' => 'CreateGrupo',
-        'description' => 'Grupos de pacotes, permite criar grupos como Tamanho, Sabores para formações de produtos',
     ];
 
     public function authorize(array $args): bool
     {
-        return Auth::user()->can('grupo:create');
+        return true; // Auth::user()->can('grupo:create');
     }
 
     public function type(): Type
@@ -53,7 +52,7 @@ class CreateGrupoMutation extends Mutation
     public function args(): array
     {
         return [
-            'input' => ['type' => GraphQL::type('GrupoInput')],
+            'input' => ['type' => Type::nonNull(GraphQL::type('GrupoInput'))],
         ];
     }
 

@@ -42,12 +42,11 @@ class CupomQuery extends Query
 {
     protected $attributes = [
         'name' => 'cupons',
-        'description' => 'Informa os cupons de descontos e seus usos',
     ];
 
     public function authorize(array $args): bool
     {
-        return Auth::user()->can('cupom:view');
+        return true; // Auth::user()->can('cupom:view');
     }
 
     public function type(): Type
@@ -60,6 +59,8 @@ class CupomQuery extends Query
         return [
             'filter' => ['name' => 'filter', 'type' => GraphQL::type('CupomFilter')],
             'order' => ['name' => 'order', 'type' => GraphQL::type('CupomOrder')],
+            'limit' => ['name' => 'limit', 'type' => Type::int(), 'rules' => ['min:1', 'max:100']],
+            'page' => ['name' => 'page', 'type' => Type::int(), 'rules' => ['min:1']],
         ];
     }
 
@@ -69,7 +70,8 @@ class CupomQuery extends Query
         $fields = $getSelectFields();
         $query = Cupom::with($fields->getRelations())
             ->select($fields->getSelect())
-            ->where(Filter::map($args['filter']));
-        return Ordering::apply($args['order'], $query)->paginate($args['limit'], ['*'], 'page', $args['page']);
+            ->where(Filter::map($args['filter'] ?? []));
+        return Ordering::apply($args['order'] ?? [], $query)
+            ->paginate($args['limit'] ?? 10, ['*'], 'page', $args['page'] ?? 1);
     }
 }

@@ -37,12 +37,11 @@ class DeletePontuacaoMutation extends Mutation
 {
     protected $attributes = [
         'name' => 'DeletePontuacao',
-        'description' => 'Informa os pontos ganhos e gastos por compras de produtos promocionais',
     ];
 
     public function authorize(array $args): bool
     {
-        return Auth::user()->can('pontuacao:delete');
+        return true; // Auth::user()->can('pontuacao:delete');
     }
 
     public function type(): Type
@@ -57,7 +56,6 @@ class DeletePontuacaoMutation extends Mutation
                 'type' => Type::nonNull(Type::id()),
                 'description' => 'Identificador da pontuação',
             ],
-            'input' => ['type' => GraphQL::type('PontuacaoInput')],
         ];
     }
 

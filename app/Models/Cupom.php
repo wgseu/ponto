@@ -72,6 +72,31 @@ class Cupom extends Model
      *
      * @var array
      */
+    protected $fillable = [
+        'cupom_id',
+        'pedido_id',
+        'cliente_id',
+        'codigo',
+        'quantidade',
+        'tipo_desconto',
+        'valor',
+        'porcentagem',
+        'incluir_servicos',
+        'limitar_pedidos',
+        'funcao_pedidos',
+        'pedidos_limite',
+        'limitar_valor',
+        'funcao_valor',
+        'valor_limite',
+        'validade',
+        'data_registro',
+    ];
+
+    /**
+     * The model's default values for attributes.
+     *
+     * @var array
+     */
     protected $attributes = [
         'valor' => 0,
         'porcentagem' => 0,

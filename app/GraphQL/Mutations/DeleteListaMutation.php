@@ -37,12 +37,11 @@ class DeleteListaMutation extends Mutation
 {
     protected $attributes = [
         'name' => 'DeleteLista',
-        'description' => 'Lista de compras de produtos',
     ];
 
     public function authorize(array $args): bool
     {
-        return Auth::user()->can('lista:delete');
+        return true; // Auth::user()->can('lista:delete');
     }
 
     public function type(): Type
@@ -57,7 +56,6 @@ class DeleteListaMutation extends Mutation
                 'type' => Type::nonNull(Type::id()),
                 'description' => 'Identificador da lista de compras',
             ],
-            'input' => ['type' => GraphQL::type('ListaInput')],
         ];
     }
 

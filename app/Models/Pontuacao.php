@@ -46,6 +46,20 @@ class Pontuacao extends Model
     public $timestamps = false;
 
     /**
+     * The model's default values for attributes.
+     *
+     * @var array
+     */
+    protected $fillable = [
+        'promocao_id',
+        'cliente_id',
+        'pedido_id',
+        'item_id',
+        'quantidade',
+        'data_cadastro',
+    ];
+
+    /**
      * Informa a promoção que originou os pontos ou que descontou os pontos
      */
     public function promocao()

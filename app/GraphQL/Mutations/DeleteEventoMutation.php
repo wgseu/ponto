@@ -37,12 +37,11 @@ class DeleteEventoMutation extends Mutation
 {
     protected $attributes = [
         'name' => 'DeleteEvento',
-        'description' => 'Eventos de envio das notas',
     ];
 
     public function authorize(array $args): bool
     {
-        return Auth::user()->can('evento:delete');
+        return true; // Auth::user()->can('evento:delete');
     }
 
     public function type(): Type
@@ -57,7 +56,6 @@ class DeleteEventoMutation extends Mutation
                 'type' => Type::nonNull(Type::id()),
                 'description' => 'Identificador do evento',
             ],
-            'input' => ['type' => GraphQL::type('EventoInput')],
         ];
     }
 

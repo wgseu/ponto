@@ -37,12 +37,11 @@ class DeleteResumoMutation extends Mutation
 {
     protected $attributes = [
         'name' => 'DeleteResumo',
-        'description' => 'Resumo de fechamento de caixa, informa o valor contado no fechamento do caixa para cada forma de pagamento',
     ];
 
     public function authorize(array $args): bool
     {
-        return Auth::user()->can('resumo:delete');
+        return true; // Auth::user()->can('resumo:delete');
     }
 
     public function type(): Type
@@ -57,7 +56,6 @@ class DeleteResumoMutation extends Mutation
                 'type' => Type::nonNull(Type::id()),
                 'description' => 'Identificador do resumo',
             ],
-            'input' => ['type' => GraphQL::type('ResumoInput')],
         ];
     }
 

@@ -37,12 +37,11 @@ class DeleteFormaMutation extends Mutation
 {
     protected $attributes = [
         'name' => 'DeleteForma',
-        'description' => 'Formas de pagamento disponíveis para pedido e contas',
     ];
 
     public function authorize(array $args): bool
     {
-        return Auth::user()->can('forma:delete');
+        return true; // Auth::user()->can('forma:delete');
     }
 
     public function type(): Type
@@ -57,7 +56,6 @@ class DeleteFormaMutation extends Mutation
                 'type' => Type::nonNull(Type::id()),
                 'description' => 'Identificador da forma de pagamento',
             ],
-            'input' => ['type' => GraphQL::type('FormaInput')],
         ];
     }
 

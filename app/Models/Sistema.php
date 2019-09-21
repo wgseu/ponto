@@ -46,4 +46,14 @@ class Sistema extends Model
      * @var bool
      */
     public $timestamps = false;
+
+    /**
+     * The model's default values for attributes.
+     *
+     * @var array
+     */
+    protected $fillable = [
+        'fuso_horario',
+        'opcoes',
+    ];
 }

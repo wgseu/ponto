@@ -37,12 +37,11 @@ class DeleteEmpresaMutation extends Mutation
 {
     protected $attributes = [
         'name' => 'DeleteEmpresa',
-        'description' => 'Informações da empresa',
     ];
 
     public function authorize(array $args): bool
     {
-        return Auth::user()->can('empresa:delete');
+        return true; // Auth::user()->can('empresa:delete');
     }
 
     public function type(): Type
@@ -57,7 +56,6 @@ class DeleteEmpresaMutation extends Mutation
                 'type' => Type::nonNull(Type::id()),
                 'description' => 'Identificador único da empresa, valor 1',
             ],
-            'input' => ['type' => GraphQL::type('EmpresaInput')],
         ];
     }
 

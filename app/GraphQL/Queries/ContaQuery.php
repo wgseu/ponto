@@ -42,12 +42,11 @@ class ContaQuery extends Query
 {
     protected $attributes = [
         'name' => 'contas',
-        'description' => 'Contas a pagar e ou receber',
     ];
 
     public function authorize(array $args): bool
     {
-        return Auth::user()->can('conta:view');
+        return true; // Auth::user()->can('conta:view');
     }
 
     public function type(): Type
@@ -60,6 +59,8 @@ class ContaQuery extends Query
         return [
             'filter' => ['name' => 'filter', 'type' => GraphQL::type('ContaFilter')],
             'order' => ['name' => 'order', 'type' => GraphQL::type('ContaOrder')],
+            'limit' => ['name' => 'limit', 'type' => Type::int(), 'rules' => ['min:1', 'max:100']],
+            'page' => ['name' => 'page', 'type' => Type::int(), 'rules' => ['min:1']],
         ];
     }
 
@@ -69,7 +70,8 @@ class ContaQuery extends Query
         $fields = $getSelectFields();
         $query = Conta::with($fields->getRelations())
             ->select($fields->getSelect())
-            ->where(Filter::map($args['filter']));
-        return Ordering::apply($args['order'], $query)->paginate($args['limit'], ['*'], 'page', $args['page']);
+            ->where(Filter::map($args['filter'] ?? []));
+        return Ordering::apply($args['order'] ?? [], $query)
+            ->paginate($args['limit'] ?? 10, ['*'], 'page', $args['page'] ?? 1);
     }
 }

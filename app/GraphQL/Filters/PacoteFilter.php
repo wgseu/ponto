@@ -35,7 +35,6 @@ class PacoteFilter extends InputType
 {
     protected $attributes = [
         'name' => 'PacoteFilter',
-        'description' => 'Contém todos as opções para a formação do produto final',
     ];
 
     public function fields(): array
@@ -45,10 +44,10 @@ class PacoteFilter extends InputType
                 'type' => Type::id(),
             ],
             'pacote_id' => [
-                'type' => Type::nonNull(Type::int()),
+                'type' => Type::int(),
             ],
             'grupo_id' => [
-                'type' => Type::nonNull(Type::int()),
+                'type' => Type::int(),
             ],
             'produto_id' => [
                 'type' => Type::int(),
@@ -60,19 +59,19 @@ class PacoteFilter extends InputType
                 'type' => Type::int(),
             ],
             'quantidade_minima' => [
-                'type' => Type::nonNull(GraphQL::type('NumberFilter')),
+                'type' => GraphQL::type('NumberFilter'),
             ],
             'quantidade_maxima' => [
-                'type' => Type::nonNull(GraphQL::type('NumberFilter')),
+                'type' => GraphQL::type('NumberFilter'),
             ],
             'acrescimo' => [
-                'type' => Type::nonNull(GraphQL::type('NumberFilter')),
+                'type' => GraphQL::type('NumberFilter'),
             ],
             'selecionado' => [
-                'type' => Type::nonNull(Type::boolean()),
+                'type' => Type::boolean(),
             ],
             'disponivel' => [
-                'type' => Type::nonNull(Type::boolean()),
+                'type' => Type::boolean(),
             ],
             'data_arquivado' => [
                 'type' => GraphQL::type('DateFilter'),

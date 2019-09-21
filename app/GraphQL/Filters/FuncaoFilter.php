@@ -35,7 +35,6 @@ class FuncaoFilter extends InputType
 {
     protected $attributes = [
         'name' => 'FuncaoFilter',
-        'description' => 'Função ou atribuição de tarefas à um prestador',
     ];
 
     public function fields(): array
@@ -45,10 +44,10 @@ class FuncaoFilter extends InputType
                 'type' => Type::id(),
             ],
             'descricao' => [
-                'type' => Type::nonNull(GraphQL::type('StringFilter')),
+                'type' => GraphQL::type('StringFilter'),
             ],
             'remuneracao' => [
-                'type' => Type::nonNull(GraphQL::type('NumberFilter')),
+                'type' => GraphQL::type('NumberFilter'),
             ],
         ];
     }

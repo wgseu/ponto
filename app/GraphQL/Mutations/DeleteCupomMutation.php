@@ -37,12 +37,11 @@ class DeleteCupomMutation extends Mutation
 {
     protected $attributes = [
         'name' => 'DeleteCupom',
-        'description' => 'Informa os cupons de descontos e seus usos',
     ];
 
     public function authorize(array $args): bool
     {
-        return Auth::user()->can('cupom:delete');
+        return true; // Auth::user()->can('cupom:delete');
     }
 
     public function type(): Type
@@ -57,7 +56,6 @@ class DeleteCupomMutation extends Mutation
                 'type' => Type::nonNull(Type::id()),
                 'description' => 'Identificador do cupom',
             ],
-            'input' => ['type' => GraphQL::type('CupomInput')],
         ];
     }
 

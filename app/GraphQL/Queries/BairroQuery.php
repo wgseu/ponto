@@ -42,12 +42,11 @@ class BairroQuery extends Query
 {
     protected $attributes = [
         'name' => 'bairros',
-        'description' => 'Bairro de uma cidade',
     ];
 
     public function authorize(array $args): bool
     {
-        return Auth::user()->can('bairro:view');
+        return true; // Auth::user()->can('bairro:view');
     }
 
     public function type(): Type
@@ -60,6 +59,8 @@ class BairroQuery extends Query
         return [
             'filter' => ['name' => 'filter', 'type' => GraphQL::type('BairroFilter')],
             'order' => ['name' => 'order', 'type' => GraphQL::type('BairroOrder')],
+            'limit' => ['name' => 'limit', 'type' => Type::int(), 'rules' => ['min:1', 'max:100']],
+            'page' => ['name' => 'page', 'type' => Type::int(), 'rules' => ['min:1']],
         ];
     }
 
@@ -69,7 +70,8 @@ class BairroQuery extends Query
         $fields = $getSelectFields();
         $query = Bairro::with($fields->getRelations())
             ->select($fields->getSelect())
-            ->where(Filter::map($args['filter']));
-        return Ordering::apply($args['order'], $query)->paginate($args['limit'], ['*'], 'page', $args['page']);
+            ->where(Filter::map($args['filter'] ?? []));
+        return Ordering::apply($args['order'] ?? [], $query)
+            ->paginate($args['limit'] ?? 10, ['*'], 'page', $args['page'] ?? 1);
     }
 }

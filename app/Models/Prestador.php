@@ -58,6 +58,25 @@ class Prestador extends Model
      *
      * @var array
      */
+    protected $fillable = [
+        'codigo',
+        'pin',
+        'funcao_id',
+        'cliente_id',
+        'empresa_id',
+        'vinculo',
+        'porcentagem',
+        'pontuacao',
+        'remuneracao',
+        'data_termino',
+        'data_cadastro',
+    ];
+
+    /**
+     * The model's default values for attributes.
+     *
+     * @var array
+     */
     protected $attributes = [
         'vinculo' => self::VINCULO_FUNCIONARIO,
         'porcentagem' => 0,

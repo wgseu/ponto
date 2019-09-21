@@ -35,7 +35,6 @@ class EmpresaFilter extends InputType
 {
     protected $attributes = [
         'name' => 'EmpresaFilter',
-        'description' => 'Informações da empresa',
     ];
 
     public function fields(): array

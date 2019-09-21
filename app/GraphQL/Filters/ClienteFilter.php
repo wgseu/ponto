@@ -35,7 +35,6 @@ class ClienteFilter extends InputType
 {
     protected $attributes = [
         'name' => 'ClienteFilter',
-        'description' => 'Informações de cliente físico ou jurídico. Clientes, empresas, funcionários, fornecedores e parceiros são cadastrados aqui',
     ];
 
     public function fields(): array
@@ -45,7 +44,7 @@ class ClienteFilter extends InputType
                 'type' => Type::id(),
             ],
             'tipo' => [
-                'type' => Type::nonNull(GraphQL::type('ClienteTipoFilter')),
+                'type' => GraphQL::type('ClienteTipoFilter'),
             ],
             'empresa_id' => [
                 'type' => Type::int(),
@@ -57,7 +56,7 @@ class ClienteFilter extends InputType
                 'type' => GraphQL::type('StringFilter'),
             ],
             'nome' => [
-                'type' => Type::nonNull(GraphQL::type('StringFilter')),
+                'type' => GraphQL::type('StringFilter'),
             ],
             'sobrenome' => [
                 'type' => GraphQL::type('StringFilter'),
@@ -84,7 +83,7 @@ class ClienteFilter extends InputType
                 'type' => GraphQL::type('StringFilter'),
             ],
             'status' => [
-                'type' => Type::nonNull(GraphQL::type('ClienteStatusFilter')),
+                'type' => GraphQL::type('ClienteStatusFilter'),
             ],
             'secreto' => [
                 'type' => GraphQL::type('StringFilter'),
@@ -111,10 +110,10 @@ class ClienteFilter extends InputType
                 'type' => GraphQL::type('StringFilter'),
             ],
             'data_atualizacao' => [
-                'type' => Type::nonNull(GraphQL::type('DateFilter')),
+                'type' => GraphQL::type('DateFilter'),
             ],
             'data_cadastro' => [
-                'type' => Type::nonNull(GraphQL::type('DateFilter')),
+                'type' => GraphQL::type('DateFilter'),
             ],
         ];
     }

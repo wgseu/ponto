@@ -37,12 +37,11 @@ class UpdateCreditoMutation extends Mutation
 {
     protected $attributes = [
         'name' => 'UpdateCredito',
-        'description' => 'Créditos de clientes',
     ];
 
     public function authorize(array $args): bool
     {
-        return Auth::user()->can('credito:update');
+        return true; // Auth::user()->can('credito:update');
     }
 
     public function type(): Type
@@ -57,7 +56,7 @@ class UpdateCreditoMutation extends Mutation
                 'type' => Type::nonNull(Type::id()),
                 'description' => 'Identificador do crédito',
             ],
-            'input' => ['type' => GraphQL::type('CreditoInput')],
+            'input' => ['type' => Type::nonNull(GraphQL::type('CreditoInput'))],
         ];
     }
 

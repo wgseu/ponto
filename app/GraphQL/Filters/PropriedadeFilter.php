@@ -35,7 +35,6 @@ class PropriedadeFilter extends InputType
 {
     protected $attributes = [
         'name' => 'PropriedadeFilter',
-        'description' => 'Informa tamanhos de pizzas e opções de peso do produto',
     ];
 
     public function fields(): array
@@ -45,10 +44,10 @@ class PropriedadeFilter extends InputType
                 'type' => Type::id(),
             ],
             'grupo_id' => [
-                'type' => Type::nonNull(Type::int()),
+                'type' => Type::int(),
             ],
             'nome' => [
-                'type' => Type::nonNull(GraphQL::type('StringFilter')),
+                'type' => GraphQL::type('StringFilter'),
             ],
             'abreviacao' => [
                 'type' => GraphQL::type('StringFilter'),
@@ -57,7 +56,7 @@ class PropriedadeFilter extends InputType
                 'type' => GraphQL::type('StringFilter'),
             ],
             'data_atualizacao' => [
-                'type' => Type::nonNull(GraphQL::type('DateFilter')),
+                'type' => GraphQL::type('DateFilter'),
             ],
         ];
     }

@@ -35,7 +35,6 @@ class CartaoFilter extends InputType
 {
     protected $attributes = [
         'name' => 'CartaoFilter',
-        'description' => 'Cartões utilizados na forma de pagamento em cartão',
     ];
 
     public function fields(): array
@@ -45,28 +44,28 @@ class CartaoFilter extends InputType
                 'type' => Type::id(),
             ],
             'forma_id' => [
-                'type' => Type::nonNull(Type::int()),
+                'type' => Type::int(),
             ],
             'carteira_id' => [
                 'type' => Type::int(),
             ],
             'bandeira' => [
-                'type' => Type::nonNull(GraphQL::type('StringFilter')),
+                'type' => GraphQL::type('StringFilter'),
             ],
             'taxa' => [
-                'type' => Type::nonNull(GraphQL::type('NumberFilter')),
+                'type' => GraphQL::type('NumberFilter'),
             ],
             'dias_repasse' => [
-                'type' => Type::nonNull(GraphQL::type('NumberFilter')),
+                'type' => GraphQL::type('NumberFilter'),
             ],
             'taxa_antecipacao' => [
-                'type' => Type::nonNull(GraphQL::type('NumberFilter')),
+                'type' => GraphQL::type('NumberFilter'),
             ],
             'imagem_url' => [
                 'type' => GraphQL::type('StringFilter'),
             ],
             'ativo' => [
-                'type' => Type::nonNull(Type::boolean()),
+                'type' => Type::boolean(),
             ],
         ];
     }

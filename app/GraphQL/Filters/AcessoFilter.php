@@ -35,7 +35,6 @@ class AcessoFilter extends InputType
 {
     protected $attributes = [
         'name' => 'AcessoFilter',
-        'description' => 'Permite acesso à uma determinada funcionalidade da lista de permissões',
     ];
 
     public function fields(): array
@@ -45,10 +44,10 @@ class AcessoFilter extends InputType
                 'type' => Type::id(),
             ],
             'funcao_id' => [
-                'type' => Type::nonNull(Type::int()),
+                'type' => Type::int(),
             ],
             'permissao_id' => [
-                'type' => Type::nonNull(Type::int()),
+                'type' => Type::int(),
             ],
         ];
     }

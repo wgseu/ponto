@@ -42,12 +42,11 @@ class PrestadorQuery extends Query
 {
     protected $attributes = [
         'name' => 'prestadores',
-        'description' => 'Prestador de serviço que realiza alguma tarefa na empresa',
     ];
 
     public function authorize(array $args): bool
     {
-        return Auth::user()->can('prestador:view');
+        return true; // Auth::user()->can('prestador:view');
     }
 
     public function type(): Type
@@ -60,6 +59,8 @@ class PrestadorQuery extends Query
         return [
             'filter' => ['name' => 'filter', 'type' => GraphQL::type('PrestadorFilter')],
             'order' => ['name' => 'order', 'type' => GraphQL::type('PrestadorOrder')],
+            'limit' => ['name' => 'limit', 'type' => Type::int(), 'rules' => ['min:1', 'max:100']],
+            'page' => ['name' => 'page', 'type' => Type::int(), 'rules' => ['min:1']],
         ];
     }
 
@@ -69,7 +70,8 @@ class PrestadorQuery extends Query
         $fields = $getSelectFields();
         $query = Prestador::with($fields->getRelations())
             ->select($fields->getSelect())
-            ->where(Filter::map($args['filter']));
-        return Ordering::apply($args['order'], $query)->paginate($args['limit'], ['*'], 'page', $args['page']);
+            ->where(Filter::map($args['filter'] ?? []));
+        return Ordering::apply($args['order'] ?? [], $query)
+            ->paginate($args['limit'] ?? 10, ['*'], 'page', $args['page'] ?? 1);
     }
 }

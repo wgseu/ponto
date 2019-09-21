@@ -35,7 +35,6 @@ class TributacaoFilter extends InputType
 {
     protected $attributes = [
         'name' => 'TributacaoFilter',
-        'description' => 'Informação tributária dos produtos',
     ];
 
     public function fields(): array
@@ -45,19 +44,19 @@ class TributacaoFilter extends InputType
                 'type' => Type::id(),
             ],
             'ncm' => [
-                'type' => Type::nonNull(GraphQL::type('StringFilter')),
+                'type' => GraphQL::type('StringFilter'),
             ],
             'cest' => [
                 'type' => GraphQL::type('StringFilter'),
             ],
             'origem_id' => [
-                'type' => Type::nonNull(Type::int()),
+                'type' => Type::int(),
             ],
             'operacao_id' => [
-                'type' => Type::nonNull(Type::int()),
+                'type' => Type::int(),
             ],
             'imposto_id' => [
-                'type' => Type::nonNull(Type::int()),
+                'type' => Type::int(),
             ],
         ];
     }

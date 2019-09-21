@@ -35,7 +35,6 @@ class RegimeFilter extends InputType
 {
     protected $attributes = [
         'name' => 'RegimeFilter',
-        'description' => 'Regimes tributários',
     ];
 
     public function fields(): array
@@ -45,10 +44,10 @@ class RegimeFilter extends InputType
                 'type' => Type::id(),
             ],
             'codigo' => [
-                'type' => Type::nonNull(GraphQL::type('NumberFilter')),
+                'type' => GraphQL::type('NumberFilter'),
             ],
             'descricao' => [
-                'type' => Type::nonNull(GraphQL::type('StringFilter')),
+                'type' => GraphQL::type('StringFilter'),
             ],
         ];
     }

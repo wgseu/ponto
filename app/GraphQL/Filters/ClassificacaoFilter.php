@@ -35,7 +35,6 @@ class ClassificacaoFilter extends InputType
 {
     protected $attributes = [
         'name' => 'ClassificacaoFilter',
-        'description' => 'Classificação se contas, permite atribuir um grupo de contas',
     ];
 
     public function fields(): array
@@ -48,7 +47,7 @@ class ClassificacaoFilter extends InputType
                 'type' => Type::int(),
             ],
             'descricao' => [
-                'type' => Type::nonNull(GraphQL::type('StringFilter')),
+                'type' => GraphQL::type('StringFilter'),
             ],
             'icone_url' => [
                 'type' => GraphQL::type('StringFilter'),

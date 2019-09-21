@@ -37,12 +37,11 @@ class CreateCupomMutation extends Mutation
 {
     protected $attributes = [
         'name' => 'CreateCupom',
-        'description' => 'Informa os cupons de descontos e seus usos',
     ];
 
     public function authorize(array $args): bool
     {
-        return Auth::user()->can('cupom:create');
+        return true; // Auth::user()->can('cupom:create');
     }
 
     public function type(): Type
@@ -53,7 +52,7 @@ class CreateCupomMutation extends Mutation
     public function args(): array
     {
         return [
-            'input' => ['type' => GraphQL::type('CupomInput')],
+            'input' => ['type' => Type::nonNull(GraphQL::type('CupomInput'))],
         ];
     }
 

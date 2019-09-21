@@ -50,6 +50,19 @@ class Credito extends Model
      *
      * @var array
      */
+    protected $fillable = [
+        'cliente_id',
+        'valor',
+        'detalhes',
+        'cancelado',
+        'data_cadastro',
+    ];
+
+    /**
+     * The model's default values for attributes.
+     *
+     * @var array
+     */
     protected $attributes = [
         'cancelado' => false,
     ];

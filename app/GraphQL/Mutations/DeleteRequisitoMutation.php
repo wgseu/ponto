@@ -37,12 +37,11 @@ class DeleteRequisitoMutation extends Mutation
 {
     protected $attributes = [
         'name' => 'DeleteRequisito',
-        'description' => 'Informa os produtos da lista de compras',
     ];
 
     public function authorize(array $args): bool
     {
-        return Auth::user()->can('requisito:delete');
+        return true; // Auth::user()->can('requisito:delete');
     }
 
     public function type(): Type
@@ -57,7 +56,6 @@ class DeleteRequisitoMutation extends Mutation
                 'type' => Type::nonNull(Type::id()),
                 'description' => 'Identificador do produto da lista',
             ],
-            'input' => ['type' => GraphQL::type('RequisitoInput')],
         ];
     }
 

@@ -37,12 +37,11 @@ class CreateResumoMutation extends Mutation
 {
     protected $attributes = [
         'name' => 'CreateResumo',
-        'description' => 'Resumo de fechamento de caixa, informa o valor contado no fechamento do caixa para cada forma de pagamento',
     ];
 
     public function authorize(array $args): bool
     {
-        return Auth::user()->can('resumo:create');
+        return true; // Auth::user()->can('resumo:create');
     }
 
     public function type(): Type
@@ -53,7 +52,7 @@ class CreateResumoMutation extends Mutation
     public function args(): array
     {
         return [
-            'input' => ['type' => GraphQL::type('ResumoInput')],
+            'input' => ['type' => Type::nonNull(GraphQL::type('ResumoInput'))],
         ];
     }
 

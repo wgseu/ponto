@@ -37,12 +37,11 @@ class CreateCaixaMutation extends Mutation
 {
     protected $attributes = [
         'name' => 'CreateCaixa',
-        'description' => 'Caixas de movimentação financeira',
     ];
 
     public function authorize(array $args): bool
     {
-        return Auth::user()->can('caixa:create');
+        return true; // Auth::user()->can('caixa:create');
     }
 
     public function type(): Type
@@ -53,7 +52,7 @@ class CreateCaixaMutation extends Mutation
     public function args(): array
     {
         return [
-            'input' => ['type' => GraphQL::type('CaixaInput')],
+            'input' => ['type' => Type::nonNull(GraphQL::type('CaixaInput'))],
         ];
     }
 

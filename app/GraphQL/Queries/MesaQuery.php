@@ -42,12 +42,11 @@ class MesaQuery extends Query
 {
     protected $attributes = [
         'name' => 'mesas',
-        'description' => 'Mesas para lançamento de pedidos',
     ];
 
     public function authorize(array $args): bool
     {
-        return Auth::user()->can('mesa:view');
+        return true; // Auth::user()->can('mesa:view');
     }
 
     public function type(): Type
@@ -60,6 +59,8 @@ class MesaQuery extends Query
         return [
             'filter' => ['name' => 'filter', 'type' => GraphQL::type('MesaFilter')],
             'order' => ['name' => 'order', 'type' => GraphQL::type('MesaOrder')],
+            'limit' => ['name' => 'limit', 'type' => Type::int(), 'rules' => ['min:1', 'max:100']],
+            'page' => ['name' => 'page', 'type' => Type::int(), 'rules' => ['min:1']],
         ];
     }
 
@@ -69,7 +70,8 @@ class MesaQuery extends Query
         $fields = $getSelectFields();
         $query = Mesa::with($fields->getRelations())
             ->select($fields->getSelect())
-            ->where(Filter::map($args['filter']));
-        return Ordering::apply($args['order'], $query)->paginate($args['limit'], ['*'], 'page', $args['page']);
+            ->where(Filter::map($args['filter'] ?? []));
+        return Ordering::apply($args['order'] ?? [], $query)
+            ->paginate($args['limit'] ?? 10, ['*'], 'page', $args['page'] ?? 1);
     }
 }

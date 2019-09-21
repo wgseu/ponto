@@ -37,12 +37,11 @@ class CreateCardapioMutation extends Mutation
 {
     protected $attributes = [
         'name' => 'CreateCardapio',
-        'description' => 'Cardápios para cada integração ou local de venda',
     ];
 
     public function authorize(array $args): bool
     {
-        return Auth::user()->can('cardapio:create');
+        return true; // Auth::user()->can('cardapio:create');
     }
 
     public function type(): Type
@@ -53,7 +52,7 @@ class CreateCardapioMutation extends Mutation
     public function args(): array
     {
         return [
-            'input' => ['type' => GraphQL::type('CardapioInput')],
+            'input' => ['type' => Type::nonNull(GraphQL::type('CardapioInput'))],
         ];
     }
 

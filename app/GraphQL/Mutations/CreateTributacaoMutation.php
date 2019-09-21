@@ -37,12 +37,11 @@ class CreateTributacaoMutation extends Mutation
 {
     protected $attributes = [
         'name' => 'CreateTributacao',
-        'description' => 'Informação tributária dos produtos',
     ];
 
     public function authorize(array $args): bool
     {
-        return Auth::user()->can('tributacao:create');
+        return true; // Auth::user()->can('tributacao:create');
     }
 
     public function type(): Type
@@ -53,7 +52,7 @@ class CreateTributacaoMutation extends Mutation
     public function args(): array
     {
         return [
-            'input' => ['type' => GraphQL::type('TributacaoInput')],
+            'input' => ['type' => Type::nonNull(GraphQL::type('TributacaoInput'))],
         ];
     }
 

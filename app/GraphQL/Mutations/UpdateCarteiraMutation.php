@@ -37,12 +37,11 @@ class UpdateCarteiraMutation extends Mutation
 {
     protected $attributes = [
         'name' => 'UpdateCarteira',
-        'description' => 'Informa uma conta bancária ou uma carteira financeira',
     ];
 
     public function authorize(array $args): bool
     {
-        return Auth::user()->can('carteira:update');
+        return true; // Auth::user()->can('carteira:update');
     }
 
     public function type(): Type
@@ -57,7 +56,7 @@ class UpdateCarteiraMutation extends Mutation
                 'type' => Type::nonNull(Type::id()),
                 'description' => 'Código local da carteira',
             ],
-            'input' => ['type' => GraphQL::type('CarteiraInput')],
+            'input' => ['type' => Type::nonNull(GraphQL::type('CarteiraInput'))],
         ];
     }
 

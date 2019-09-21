@@ -42,10 +42,10 @@ class EstoqueOrder extends InputType
     {
         return [
             'id' => [
-                'type' => Type::nonNull(GraphQL::type('OrderByEnum')),
+                'type' => GraphQL::type('OrderByEnum'),
             ],
             'produto_id' => [
-                'type' => Type::nonNull(GraphQL::type('OrderByEnum')),
+                'type' => GraphQL::type('OrderByEnum'),
             ],
             'requisito_id' => [
                 'type' => GraphQL::type('OrderByEnum'),
@@ -60,16 +60,16 @@ class EstoqueOrder extends InputType
                 'type' => GraphQL::type('OrderByEnum'),
             ],
             'setor_id' => [
-                'type' => Type::nonNull(GraphQL::type('OrderByEnum')),
+                'type' => GraphQL::type('OrderByEnum'),
             ],
             'prestador_id' => [
                 'type' => GraphQL::type('OrderByEnum'),
             ],
             'quantidade' => [
-                'type' => Type::nonNull(GraphQL::type('OrderByEnum')),
+                'type' => GraphQL::type('OrderByEnum'),
             ],
             'preco_compra' => [
-                'type' => Type::nonNull(GraphQL::type('OrderByEnum')),
+                'type' => GraphQL::type('OrderByEnum'),
             ],
             'lote' => [
                 'type' => GraphQL::type('OrderByEnum'),
@@ -84,13 +84,13 @@ class EstoqueOrder extends InputType
                 'type' => GraphQL::type('OrderByEnum'),
             ],
             'reservado' => [
-                'type' => Type::nonNull(GraphQL::type('OrderByEnum')),
+                'type' => GraphQL::type('OrderByEnum'),
             ],
             'cancelado' => [
-                'type' => Type::nonNull(GraphQL::type('OrderByEnum')),
+                'type' => GraphQL::type('OrderByEnum'),
             ],
             'data_movimento' => [
-                'type' => Type::nonNull(GraphQL::type('OrderByEnum')),
+                'type' => GraphQL::type('OrderByEnum'),
             ],
         ];
     }

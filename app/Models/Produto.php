@@ -60,6 +60,39 @@ class Produto extends Model
      *
      * @var array
      */
+    protected $fillable = [
+        'codigo',
+        'categoria_id',
+        'unidade_id',
+        'setor_estoque_id',
+        'setor_preparo_id',
+        'tributacao_id',
+        'descricao',
+        'abreviacao',
+        'detalhes',
+        'quantidade_minima',
+        'quantidade_maxima',
+        'preco_venda',
+        'custo_producao',
+        'tipo',
+        'cobrar_servico',
+        'divisivel',
+        'pesavel',
+        'tempo_preparo',
+        'disponivel',
+        'insumo',
+        'avaliacao',
+        'estoque',
+        'imagem_url',
+        'data_atualizacao',
+        'data_arquivado',
+    ];
+
+    /**
+     * The model's default values for attributes.
+     *
+     * @var array
+     */
     protected $attributes = [
         'quantidade_minima' => 0,
         'quantidade_maxima' => 0,

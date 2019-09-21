@@ -35,7 +35,6 @@ class BancoFilter extends InputType
 {
     protected $attributes = [
         'name' => 'BancoFilter',
-        'description' => 'Bancos disponíveis no país',
     ];
 
     public function fields(): array
@@ -45,13 +44,13 @@ class BancoFilter extends InputType
                 'type' => Type::id(),
             ],
             'numero' => [
-                'type' => Type::nonNull(GraphQL::type('StringFilter')),
+                'type' => GraphQL::type('StringFilter'),
             ],
             'fantasia' => [
-                'type' => Type::nonNull(GraphQL::type('StringFilter')),
+                'type' => GraphQL::type('StringFilter'),
             ],
             'razao_social' => [
-                'type' => Type::nonNull(GraphQL::type('StringFilter')),
+                'type' => GraphQL::type('StringFilter'),
             ],
             'agencia_mascara' => [
                 'type' => GraphQL::type('StringFilter'),

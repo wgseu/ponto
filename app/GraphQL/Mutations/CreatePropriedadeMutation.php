@@ -37,12 +37,11 @@ class CreatePropriedadeMutation extends Mutation
 {
     protected $attributes = [
         'name' => 'CreatePropriedade',
-        'description' => 'Informa tamanhos de pizzas e opções de peso do produto',
     ];
 
     public function authorize(array $args): bool
     {
-        return Auth::user()->can('propriedade:create');
+        return true; // Auth::user()->can('propriedade:create');
     }
 
     public function type(): Type
@@ -53,7 +52,7 @@ class CreatePropriedadeMutation extends Mutation
     public function args(): array
     {
         return [
-            'input' => ['type' => GraphQL::type('PropriedadeInput')],
+            'input' => ['type' => Type::nonNull(GraphQL::type('PropriedadeInput'))],
         ];
     }
 

@@ -37,12 +37,11 @@ class DeleteContagemMutation extends Mutation
 {
     protected $attributes = [
         'name' => 'DeleteContagem',
-        'description' => 'Guarda a soma do estoque de cada produto por setor',
     ];
 
     public function authorize(array $args): bool
     {
-        return Auth::user()->can('contagem:delete');
+        return true; // Auth::user()->can('contagem:delete');
     }
 
     public function type(): Type
@@ -57,7 +56,6 @@ class DeleteContagemMutation extends Mutation
                 'type' => Type::nonNull(Type::id()),
                 'description' => 'Identificador da contagem',
             ],
-            'input' => ['type' => GraphQL::type('ContagemInput')],
         ];
     }
 

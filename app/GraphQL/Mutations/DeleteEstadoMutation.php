@@ -37,12 +37,11 @@ class DeleteEstadoMutation extends Mutation
 {
     protected $attributes = [
         'name' => 'DeleteEstado',
-        'description' => 'Estado federativo de um país',
     ];
 
     public function authorize(array $args): bool
     {
-        return Auth::user()->can('estado:delete');
+        return true; // Auth::user()->can('estado:delete');
     }
 
     public function type(): Type
@@ -57,7 +56,6 @@ class DeleteEstadoMutation extends Mutation
                 'type' => Type::nonNull(Type::id()),
                 'description' => 'Identificador do estado',
             ],
-            'input' => ['type' => GraphQL::type('EstadoInput')],
         ];
     }
 

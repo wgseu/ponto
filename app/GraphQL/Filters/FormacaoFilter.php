@@ -35,7 +35,6 @@ class FormacaoFilter extends InputType
 {
     protected $attributes = [
         'name' => 'FormacaoFilter',
-        'description' => 'Informa qual foi a formação que gerou esse produto, assim como quais item foram retirados/adicionados da composição',
     ];
 
     public function fields(): array
@@ -45,7 +44,7 @@ class FormacaoFilter extends InputType
                 'type' => Type::id(),
             ],
             'item_id' => [
-                'type' => Type::nonNull(Type::int()),
+                'type' => Type::int(),
             ],
             'pacote_id' => [
                 'type' => Type::int(),
@@ -54,7 +53,7 @@ class FormacaoFilter extends InputType
                 'type' => Type::int(),
             ],
             'quantidade' => [
-                'type' => Type::nonNull(GraphQL::type('NumberFilter')),
+                'type' => GraphQL::type('NumberFilter'),
             ],
         ];
     }

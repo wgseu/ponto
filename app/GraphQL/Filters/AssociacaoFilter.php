@@ -35,7 +35,6 @@ class AssociacaoFilter extends InputType
 {
     protected $attributes = [
         'name' => 'AssociacaoFilter',
-        'description' => 'Lista de pedidos que não foram integrados ainda e devem ser associados ao sistema',
     ];
 
     public function fields(): array
@@ -45,43 +44,43 @@ class AssociacaoFilter extends InputType
                 'type' => Type::id(),
             ],
             'integracao_id' => [
-                'type' => Type::nonNull(Type::int()),
+                'type' => Type::int(),
             ],
             'entrega_id' => [
                 'type' => Type::int(),
             ],
             'codigo' => [
-                'type' => Type::nonNull(GraphQL::type('StringFilter')),
+                'type' => GraphQL::type('StringFilter'),
             ],
             'cliente' => [
-                'type' => Type::nonNull(GraphQL::type('StringFilter')),
+                'type' => GraphQL::type('StringFilter'),
             ],
             'chave' => [
-                'type' => Type::nonNull(GraphQL::type('StringFilter')),
+                'type' => GraphQL::type('StringFilter'),
             ],
             'pedido' => [
-                'type' => Type::nonNull(GraphQL::type('StringFilter')),
+                'type' => GraphQL::type('StringFilter'),
             ],
             'endereco' => [
                 'type' => GraphQL::type('StringFilter'),
             ],
             'quantidade' => [
-                'type' => Type::nonNull(GraphQL::type('NumberFilter')),
+                'type' => GraphQL::type('NumberFilter'),
             ],
             'servicos' => [
-                'type' => Type::nonNull(GraphQL::type('NumberFilter')),
+                'type' => GraphQL::type('NumberFilter'),
             ],
             'produtos' => [
-                'type' => Type::nonNull(GraphQL::type('NumberFilter')),
+                'type' => GraphQL::type('NumberFilter'),
             ],
             'descontos' => [
-                'type' => Type::nonNull(GraphQL::type('NumberFilter')),
+                'type' => GraphQL::type('NumberFilter'),
             ],
             'pago' => [
-                'type' => Type::nonNull(GraphQL::type('NumberFilter')),
+                'type' => GraphQL::type('NumberFilter'),
             ],
             'status' => [
-                'type' => Type::nonNull(GraphQL::type('AssociacaoStatusFilter')),
+                'type' => GraphQL::type('AssociacaoStatusFilter'),
             ],
             'motivo' => [
                 'type' => GraphQL::type('StringFilter'),
@@ -90,16 +89,16 @@ class AssociacaoFilter extends InputType
                 'type' => GraphQL::type('StringFilter'),
             ],
             'sincronizado' => [
-                'type' => Type::nonNull(Type::boolean()),
+                'type' => Type::boolean(),
             ],
             'integrado' => [
-                'type' => Type::nonNull(Type::boolean()),
+                'type' => Type::boolean(),
             ],
             'data_confirmacao' => [
                 'type' => GraphQL::type('DateFilter'),
             ],
             'data_pedido' => [
-                'type' => Type::nonNull(GraphQL::type('DateFilter')),
+                'type' => GraphQL::type('DateFilter'),
             ],
         ];
     }

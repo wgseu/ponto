@@ -37,12 +37,11 @@ class DeleteChequeMutation extends Mutation
 {
     protected $attributes = [
         'name' => 'DeleteCheque',
-        'description' => 'Folha de cheque lançado como pagamento',
     ];
 
     public function authorize(array $args): bool
     {
-        return Auth::user()->can('cheque:delete');
+        return true; // Auth::user()->can('cheque:delete');
     }
 
     public function type(): Type
@@ -57,7 +56,6 @@ class DeleteChequeMutation extends Mutation
                 'type' => Type::nonNull(Type::id()),
                 'description' => 'Identificador da folha de cheque',
             ],
-            'input' => ['type' => GraphQL::type('ChequeInput')],
         ];
     }
 

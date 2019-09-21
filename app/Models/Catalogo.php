@@ -50,6 +50,24 @@ class Catalogo extends Model
      *
      * @var array
      */
+    protected $fillable = [
+        'produto_id',
+        'fornecedor_id',
+        'preco_compra',
+        'preco_venda',
+        'quantidade_minima',
+        'estoque',
+        'limitado',
+        'conteudo',
+        'data_consulta',
+        'data_parada',
+    ];
+
+    /**
+     * The model's default values for attributes.
+     *
+     * @var array
+     */
     protected $attributes = [
         'preco_venda' => preço de venda,
         'quantidade_minima' => quantidade mínima,

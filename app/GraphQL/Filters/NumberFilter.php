@@ -2,30 +2,36 @@
 
 declare(strict_types=1);
 
-namespace App\GraphQL\Inputs;
+namespace App\GraphQL\Filters;
 
 use GraphQL\Type\Definition\Type;
 use Rebing\GraphQL\Support\InputType;
 
-class NumberInput extends InputType
+class NumberFilter extends InputType
 {
     protected $attributes = [
-        'name' => 'NumberInput',
+        'name' => 'NumberFilter',
     ];
 
     public function fields(): array
     {
         return [
+            'eq' => [
+                'type' => Type::float(),
+            ],
+            'ne' => [
+                'type' => Type::float(),
+            ],
             'gt' => [
                 'type' => Type::float(),
             ],
-            'gte' => [
+            'ge' => [
                 'type' => Type::float(),
             ],
             'lt' => [
                 'type' => Type::float(),
             ],
-            'lte' => [
+            'le' => [
                 'type' => Type::float(),
             ],
         ];

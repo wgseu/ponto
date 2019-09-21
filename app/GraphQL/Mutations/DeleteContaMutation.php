@@ -37,12 +37,11 @@ class DeleteContaMutation extends Mutation
 {
     protected $attributes = [
         'name' => 'DeleteConta',
-        'description' => 'Contas a pagar e ou receber',
     ];
 
     public function authorize(array $args): bool
     {
-        return Auth::user()->can('conta:delete');
+        return true; // Auth::user()->can('conta:delete');
     }
 
     public function type(): Type
@@ -57,7 +56,6 @@ class DeleteContaMutation extends Mutation
                 'type' => Type::nonNull(Type::id()),
                 'description' => 'Código da conta',
             ],
-            'input' => ['type' => GraphQL::type('ContaInput')],
         ];
     }
 

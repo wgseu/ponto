@@ -61,6 +61,37 @@ class Pagamento extends Model
      *
      * @var array
      */
+    protected $fillable = [
+        'carteira_id',
+        'moeda_id',
+        'pagamento_id',
+        'agrupamento_id',
+        'movimentacao_id',
+        'funcionario_id',
+        'forma_id',
+        'pedido_id',
+        'conta_id',
+        'cartao_id',
+        'cheque_id',
+        'crediario_id',
+        'credito_id',
+        'valor',
+        'numero_parcela',
+        'parcelas',
+        'lancado',
+        'codigo',
+        'detalhes',
+        'estado',
+        'data_pagamento',
+        'data_compensacao',
+        'data_lancamento',
+    ];
+
+    /**
+     * The model's default values for attributes.
+     *
+     * @var array
+     */
     protected $attributes = [
         'numero_parcela' => 1,
         'parcelas' => 1,

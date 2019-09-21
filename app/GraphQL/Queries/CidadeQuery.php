@@ -42,12 +42,11 @@ class CidadeQuery extends Query
 {
     protected $attributes = [
         'name' => 'cidades',
-        'description' => 'Cidade de um estado, contém bairros',
     ];
 
     public function authorize(array $args): bool
     {
-        return Auth::user()->can('cidade:view');
+        return true; // Auth::user()->can('cidade:view');
     }
 
     public function type(): Type
@@ -60,6 +59,8 @@ class CidadeQuery extends Query
         return [
             'filter' => ['name' => 'filter', 'type' => GraphQL::type('CidadeFilter')],
             'order' => ['name' => 'order', 'type' => GraphQL::type('CidadeOrder')],
+            'limit' => ['name' => 'limit', 'type' => Type::int(), 'rules' => ['min:1', 'max:100']],
+            'page' => ['name' => 'page', 'type' => Type::int(), 'rules' => ['min:1']],
         ];
     }
 
@@ -69,7 +70,8 @@ class CidadeQuery extends Query
         $fields = $getSelectFields();
         $query = Cidade::with($fields->getRelations())
             ->select($fields->getSelect())
-            ->where(Filter::map($args['filter']));
-        return Ordering::apply($args['order'], $query)->paginate($args['limit'], ['*'], 'page', $args['page']);
+            ->where(Filter::map($args['filter'] ?? []));
+        return Ordering::apply($args['order'] ?? [], $query)
+            ->paginate($args['limit'] ?? 10, ['*'], 'page', $args['page'] ?? 1);
     }
 }

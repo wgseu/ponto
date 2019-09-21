@@ -42,12 +42,11 @@ class ClienteQuery extends Query
 {
     protected $attributes = [
         'name' => 'clientes',
-        'description' => 'Informações de cliente físico ou jurídico. Clientes, empresas, funcionários, fornecedores e parceiros são cadastrados aqui',
     ];
 
     public function authorize(array $args): bool
     {
-        return Auth::user()->can('cliente:view');
+        return true; // Auth::user()->can('cliente:view');
     }
 
     public function type(): Type
@@ -60,6 +59,8 @@ class ClienteQuery extends Query
         return [
             'filter' => ['name' => 'filter', 'type' => GraphQL::type('ClienteFilter')],
             'order' => ['name' => 'order', 'type' => GraphQL::type('ClienteOrder')],
+            'limit' => ['name' => 'limit', 'type' => Type::int(), 'rules' => ['min:1', 'max:100']],
+            'page' => ['name' => 'page', 'type' => Type::int(), 'rules' => ['min:1']],
         ];
     }
 
@@ -69,7 +70,8 @@ class ClienteQuery extends Query
         $fields = $getSelectFields();
         $query = Cliente::with($fields->getRelations())
             ->select($fields->getSelect())
-            ->where(Filter::map($args['filter']));
-        return Ordering::apply($args['order'], $query)->paginate($args['limit'], ['*'], 'page', $args['page']);
+            ->where(Filter::map($args['filter'] ?? []));
+        return Ordering::apply($args['order'] ?? [], $query)
+            ->paginate($args['limit'] ?? 10, ['*'], 'page', $args['page'] ?? 1);
     }
 }

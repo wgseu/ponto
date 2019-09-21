@@ -42,13 +42,13 @@ class PagamentoOrder extends InputType
     {
         return [
             'id' => [
-                'type' => Type::nonNull(GraphQL::type('OrderByEnum')),
+                'type' => GraphQL::type('OrderByEnum'),
             ],
             'carteira_id' => [
-                'type' => Type::nonNull(GraphQL::type('OrderByEnum')),
+                'type' => GraphQL::type('OrderByEnum'),
             ],
             'moeda_id' => [
-                'type' => Type::nonNull(GraphQL::type('OrderByEnum')),
+                'type' => GraphQL::type('OrderByEnum'),
             ],
             'pagamento_id' => [
                 'type' => GraphQL::type('OrderByEnum'),
@@ -84,16 +84,16 @@ class PagamentoOrder extends InputType
                 'type' => GraphQL::type('OrderByEnum'),
             ],
             'valor' => [
-                'type' => Type::nonNull(GraphQL::type('OrderByEnum')),
+                'type' => GraphQL::type('OrderByEnum'),
             ],
             'numero_parcela' => [
-                'type' => Type::nonNull(GraphQL::type('OrderByEnum')),
+                'type' => GraphQL::type('OrderByEnum'),
             ],
             'parcelas' => [
-                'type' => Type::nonNull(GraphQL::type('OrderByEnum')),
+                'type' => GraphQL::type('OrderByEnum'),
             ],
             'lancado' => [
-                'type' => Type::nonNull(GraphQL::type('OrderByEnum')),
+                'type' => GraphQL::type('OrderByEnum'),
             ],
             'codigo' => [
                 'type' => GraphQL::type('OrderByEnum'),
@@ -102,7 +102,7 @@ class PagamentoOrder extends InputType
                 'type' => GraphQL::type('OrderByEnum'),
             ],
             'estado' => [
-                'type' => Type::nonNull(GraphQL::type('OrderByEnum')),
+                'type' => GraphQL::type('OrderByEnum'),
             ],
             'data_pagamento' => [
                 'type' => GraphQL::type('OrderByEnum'),
@@ -111,7 +111,7 @@ class PagamentoOrder extends InputType
                 'type' => GraphQL::type('OrderByEnum'),
             ],
             'data_lancamento' => [
-                'type' => Type::nonNull(GraphQL::type('OrderByEnum')),
+                'type' => GraphQL::type('OrderByEnum'),
             ],
         ];
     }

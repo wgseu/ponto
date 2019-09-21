@@ -57,6 +57,22 @@ class Dispositivo extends Model
      *
      * @var array
      */
+    protected $fillable = [
+        'setor_id',
+        'caixa_id',
+        'nome',
+        'tipo',
+        'descricao',
+        'opcoes',
+        'serial',
+        'validacao',
+    ];
+
+    /**
+     * The model's default values for attributes.
+     *
+     * @var array
+     */
     protected $attributes = [
         'tipo' => self::TIPO_COMPUTADOR,
     ];

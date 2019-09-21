@@ -35,7 +35,6 @@ class MovimentacaoFilter extends InputType
 {
     protected $attributes = [
         'name' => 'MovimentacaoFilter',
-        'description' => 'Movimentação do caixa, permite abrir diversos caixas na conta de operadores',
     ];
 
     public function fields(): array
@@ -45,16 +44,16 @@ class MovimentacaoFilter extends InputType
                 'type' => Type::id(),
             ],
             'sessao_id' => [
-                'type' => Type::nonNull(Type::int()),
+                'type' => Type::int(),
             ],
             'caixa_id' => [
-                'type' => Type::nonNull(Type::int()),
+                'type' => Type::int(),
             ],
             'aberta' => [
-                'type' => Type::nonNull(Type::boolean()),
+                'type' => Type::boolean(),
             ],
             'iniciador_id' => [
-                'type' => Type::nonNull(Type::int()),
+                'type' => Type::int(),
             ],
             'fechador_id' => [
                 'type' => Type::int(),
@@ -63,7 +62,7 @@ class MovimentacaoFilter extends InputType
                 'type' => GraphQL::type('DateFilter'),
             ],
             'data_abertura' => [
-                'type' => Type::nonNull(GraphQL::type('DateFilter')),
+                'type' => GraphQL::type('DateFilter'),
             ],
         ];
     }

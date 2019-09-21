@@ -57,6 +57,30 @@ class Localizacao extends Model
      *
      * @var array
      */
+    protected $fillable = [
+        'cliente_id',
+        'bairro_id',
+        'zona_id',
+        'cep',
+        'logradouro',
+        'numero',
+        'tipo',
+        'complemento',
+        'condominio',
+        'bloco',
+        'apartamento',
+        'referencia',
+        'latitude',
+        'longitude',
+        'apelido',
+        'data_arquivado',
+    ];
+
+    /**
+     * The model's default values for attributes.
+     *
+     * @var array
+     */
     protected $attributes = [
         'tipo' => self::TIPO_CASA,
     ];

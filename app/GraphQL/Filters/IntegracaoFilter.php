@@ -35,7 +35,6 @@ class IntegracaoFilter extends InputType
 {
     protected $attributes = [
         'name' => 'IntegracaoFilter',
-        'description' => 'Informa quais integrações estão disponíveis',
     ];
 
     public function fields(): array
@@ -45,7 +44,7 @@ class IntegracaoFilter extends InputType
                 'type' => Type::id(),
             ],
             'nome' => [
-                'type' => Type::nonNull(GraphQL::type('StringFilter')),
+                'type' => GraphQL::type('StringFilter'),
             ],
             'descricao' => [
                 'type' => GraphQL::type('StringFilter'),
@@ -66,10 +65,10 @@ class IntegracaoFilter extends InputType
                 'type' => GraphQL::type('StringFilter'),
             ],
             'ativo' => [
-                'type' => Type::nonNull(Type::boolean()),
+                'type' => Type::boolean(),
             ],
             'data_atualizacao' => [
-                'type' => Type::nonNull(GraphQL::type('DateFilter')),
+                'type' => GraphQL::type('DateFilter'),
             ],
         ];
     }

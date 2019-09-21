@@ -37,12 +37,11 @@ class CreateEstadoMutation extends Mutation
 {
     protected $attributes = [
         'name' => 'CreateEstado',
-        'description' => 'Estado federativo de um país',
     ];
 
     public function authorize(array $args): bool
     {
-        return Auth::user()->can('estado:create');
+        return true; // Auth::user()->can('estado:create');
     }
 
     public function type(): Type
@@ -53,7 +52,7 @@ class CreateEstadoMutation extends Mutation
     public function args(): array
     {
         return [
-            'input' => ['type' => GraphQL::type('EstadoInput')],
+            'input' => ['type' => Type::nonNull(GraphQL::type('EstadoInput'))],
         ];
     }
 

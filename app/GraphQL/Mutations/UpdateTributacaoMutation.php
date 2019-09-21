@@ -37,12 +37,11 @@ class UpdateTributacaoMutation extends Mutation
 {
     protected $attributes = [
         'name' => 'UpdateTributacao',
-        'description' => 'Informação tributária dos produtos',
     ];
 
     public function authorize(array $args): bool
     {
-        return Auth::user()->can('tributacao:update');
+        return true; // Auth::user()->can('tributacao:update');
     }
 
     public function type(): Type
@@ -57,7 +56,7 @@ class UpdateTributacaoMutation extends Mutation
                 'type' => Type::nonNull(Type::id()),
                 'description' => 'Identificador da tributação',
             ],
-            'input' => ['type' => GraphQL::type('TributacaoInput')],
+            'input' => ['type' => Type::nonNull(GraphQL::type('TributacaoInput'))],
         ];
     }
 

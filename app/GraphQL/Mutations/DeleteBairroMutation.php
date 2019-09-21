@@ -37,12 +37,11 @@ class DeleteBairroMutation extends Mutation
 {
     protected $attributes = [
         'name' => 'DeleteBairro',
-        'description' => 'Bairro de uma cidade',
     ];
 
     public function authorize(array $args): bool
     {
-        return Auth::user()->can('bairro:delete');
+        return true; // Auth::user()->can('bairro:delete');
     }
 
     public function type(): Type
@@ -57,7 +56,6 @@ class DeleteBairroMutation extends Mutation
                 'type' => Type::nonNull(Type::id()),
                 'description' => 'Identificador do bairro',
             ],
-            'input' => ['type' => GraphQL::type('BairroInput')],
         ];
     }
 

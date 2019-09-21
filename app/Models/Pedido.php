@@ -72,6 +72,45 @@ class Pedido extends Model
      *
      * @var array
      */
+    protected $fillable = [
+        'pedido_id',
+        'mesa_id',
+        'comanda_id',
+        'sessao_id',
+        'prestador_id',
+        'cliente_id',
+        'localizacao_id',
+        'entrega_id',
+        'associacao_id',
+        'tipo',
+        'estado',
+        'servicos',
+        'produtos',
+        'comissao',
+        'subtotal',
+        'descontos',
+        'total',
+        'pago',
+        'troco',
+        'lancado',
+        'pessoas',
+        'cpf',
+        'email',
+        'descricao',
+        'fechador_id',
+        'data_impressao',
+        'motivo',
+        'data_entrega',
+        'data_agendamento',
+        'data_conclusao',
+        'data_criacao',
+    ];
+
+    /**
+     * The model's default values for attributes.
+     *
+     * @var array
+     */
     protected $attributes = [
         'tipo' => self::TIPO_MESA,
         'estado' => self::ESTADO_ABERTO,

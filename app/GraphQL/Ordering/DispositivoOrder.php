@@ -42,7 +42,7 @@ class DispositivoOrder extends InputType
     {
         return [
             'id' => [
-                'type' => Type::nonNull(GraphQL::type('OrderByEnum')),
+                'type' => GraphQL::type('OrderByEnum'),
             ],
             'setor_id' => [
                 'type' => GraphQL::type('OrderByEnum'),
@@ -51,10 +51,10 @@ class DispositivoOrder extends InputType
                 'type' => GraphQL::type('OrderByEnum'),
             ],
             'nome' => [
-                'type' => Type::nonNull(GraphQL::type('OrderByEnum')),
+                'type' => GraphQL::type('OrderByEnum'),
             ],
             'tipo' => [
-                'type' => Type::nonNull(GraphQL::type('OrderByEnum')),
+                'type' => GraphQL::type('OrderByEnum'),
             ],
             'descricao' => [
                 'type' => GraphQL::type('OrderByEnum'),
@@ -63,7 +63,7 @@ class DispositivoOrder extends InputType
                 'type' => GraphQL::type('OrderByEnum'),
             ],
             'serial' => [
-                'type' => Type::nonNull(GraphQL::type('OrderByEnum')),
+                'type' => GraphQL::type('OrderByEnum'),
             ],
             'validacao' => [
                 'type' => GraphQL::type('OrderByEnum'),

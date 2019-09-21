@@ -37,12 +37,11 @@ class DeletePatrimonioMutation extends Mutation
 {
     protected $attributes = [
         'name' => 'DeletePatrimonio',
-        'description' => 'Informa detalhadamente um bem da empresa',
     ];
 
     public function authorize(array $args): bool
     {
-        return Auth::user()->can('patrimonio:delete');
+        return true; // Auth::user()->can('patrimonio:delete');
     }
 
     public function type(): Type
@@ -57,7 +56,6 @@ class DeletePatrimonioMutation extends Mutation
                 'type' => Type::nonNull(Type::id()),
                 'description' => 'Identificador do bem',
             ],
-            'input' => ['type' => GraphQL::type('PatrimonioInput')],
         ];
     }
 

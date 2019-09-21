@@ -37,12 +37,11 @@ class DeleteGrupoMutation extends Mutation
 {
     protected $attributes = [
         'name' => 'DeleteGrupo',
-        'description' => 'Grupos de pacotes, permite criar grupos como Tamanho, Sabores para formações de produtos',
     ];
 
     public function authorize(array $args): bool
     {
-        return Auth::user()->can('grupo:delete');
+        return true; // Auth::user()->can('grupo:delete');
     }
 
     public function type(): Type
@@ -57,7 +56,6 @@ class DeleteGrupoMutation extends Mutation
                 'type' => Type::nonNull(Type::id()),
                 'description' => 'Identificador do grupo',
             ],
-            'input' => ['type' => GraphQL::type('GrupoInput')],
         ];
     }
 

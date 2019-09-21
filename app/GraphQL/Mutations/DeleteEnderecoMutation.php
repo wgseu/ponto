@@ -37,12 +37,11 @@ class DeleteEnderecoMutation extends Mutation
 {
     protected $attributes = [
         'name' => 'DeleteEndereco',
-        'description' => 'Endereços de ruas e avenidas com informação de CEP',
     ];
 
     public function authorize(array $args): bool
     {
-        return Auth::user()->can('endereco:delete');
+        return true; // Auth::user()->can('endereco:delete');
     }
 
     public function type(): Type
@@ -57,7 +56,6 @@ class DeleteEnderecoMutation extends Mutation
                 'type' => Type::nonNull(Type::id()),
                 'description' => 'Identificador do endereço',
             ],
-            'input' => ['type' => GraphQL::type('EnderecoInput')],
         ];
     }
 

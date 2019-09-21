@@ -37,12 +37,11 @@ class DeleteComandaMutation extends Mutation
 {
     protected $attributes = [
         'name' => 'DeleteComanda',
-        'description' => 'Comanda individual, permite lançar pedidos em cartões de consumo',
     ];
 
     public function authorize(array $args): bool
     {
-        return Auth::user()->can('comanda:delete');
+        return true; // Auth::user()->can('comanda:delete');
     }
 
     public function type(): Type
@@ -57,7 +56,6 @@ class DeleteComandaMutation extends Mutation
                 'type' => Type::nonNull(Type::id()),
                 'description' => 'Número da comanda',
             ],
-            'input' => ['type' => GraphQL::type('ComandaInput')],
         ];
     }
 

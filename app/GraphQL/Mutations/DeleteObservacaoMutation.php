@@ -37,12 +37,11 @@ class DeleteObservacaoMutation extends Mutation
 {
     protected $attributes = [
         'name' => 'DeleteObservacao',
-        'description' => 'Observações e instruções de preparo de produto',
     ];
 
     public function authorize(array $args): bool
     {
-        return Auth::user()->can('observacao:delete');
+        return true; // Auth::user()->can('observacao:delete');
     }
 
     public function type(): Type
@@ -57,7 +56,6 @@ class DeleteObservacaoMutation extends Mutation
                 'type' => Type::nonNull(Type::id()),
                 'description' => 'Identificador da observação',
             ],
-            'input' => ['type' => GraphQL::type('ObservacaoInput')],
         ];
     }
 

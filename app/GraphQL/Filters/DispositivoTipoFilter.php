@@ -25,32 +25,33 @@
 
 declare(strict_types=1);
 
-namespace App\GraphQL\Unions;
+namespace App\GraphQL\Filters;
 
 use GraphQL\Type\Definition\Type;
-use Rebing\GraphQL\Support\UnionType;
+use Rebing\GraphQL\Support\InputType;
 use Rebing\GraphQL\Support\Facades\GraphQL;
 
-class $[Table.norm]$[Field.norm]Union extends UnionType
+class DispositivoTipoFilter extends InputType
 {
     protected $attributes = [
-        'name' => '$[Table.norm]$[Field.norm]Filter',
+        'name' => 'DispositivoTipoFilter',
     ];
 
-    public function types(): array
+    public function fields(): array
     {
         return [
-            GraphQL::type('$[Table.norm]$[Field.norm]'),
-            Type::listOf(GraphQL::type('$[Table.norm]$[Field.norm]')),
+            'eq' => [
+                'type' => GraphQL::type('DispositivoTipo'),
+            ],
+            'ne' => [
+                'type' => GraphQL::type('DispositivoTipo'),
+            ],
+            'in' => [
+                'type' => Type::listOf(GraphQL::type('DispositivoTipo')),
+            ],
+            'ni' => [
+                'type' => Type::listOf(GraphQL::type('DispositivoTipo')),
+            ],
         ];
-    }
-
-    public function resolveType($value)
-    {
-        if (is_array($value)) {
-            return Type::listOf(GraphQL::type('$[Table.norm]$[Field.norm]'));
-        } else {
-            return GraphQL::type('$[Table.norm]$[Field.norm]');
-        }
     }
 }

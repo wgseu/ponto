@@ -59,6 +59,20 @@ class Lista extends Model
      *
      * @var array
      */
+    protected $fillable = [
+        'descricao',
+        'estado',
+        'encarregado_id',
+        'viagem_id',
+        'data_viagem',
+        'data_cadastro',
+    ];
+
+    /**
+     * The model's default values for attributes.
+     *
+     * @var array
+     */
     protected $attributes = [
         'estado' => self::ESTADO_ANALISE,
     ];

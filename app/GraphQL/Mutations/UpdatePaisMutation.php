@@ -37,12 +37,11 @@ class UpdatePaisMutation extends Mutation
 {
     protected $attributes = [
         'name' => 'UpdatePais',
-        'description' => 'Informações de um páis com sua moeda e língua nativa',
     ];
 
     public function authorize(array $args): bool
     {
-        return Auth::user()->can('pais:update');
+        return true; // Auth::user()->can('pais:update');
     }
 
     public function type(): Type
@@ -57,7 +56,7 @@ class UpdatePaisMutation extends Mutation
                 'type' => Type::nonNull(Type::id()),
                 'description' => 'Identificador do país',
             ],
-            'input' => ['type' => GraphQL::type('PaisInput')],
+            'input' => ['type' => Type::nonNull(GraphQL::type('PaisInput'))],
         ];
     }
 

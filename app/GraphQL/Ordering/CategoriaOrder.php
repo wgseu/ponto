@@ -42,13 +42,13 @@ class CategoriaOrder extends InputType
     {
         return [
             'id' => [
-                'type' => Type::nonNull(GraphQL::type('OrderByEnum')),
+                'type' => GraphQL::type('OrderByEnum'),
             ],
             'categoria_id' => [
                 'type' => GraphQL::type('OrderByEnum'),
             ],
             'descricao' => [
-                'type' => Type::nonNull(GraphQL::type('OrderByEnum')),
+                'type' => GraphQL::type('OrderByEnum'),
             ],
             'detalhes' => [
                 'type' => GraphQL::type('OrderByEnum'),
@@ -57,10 +57,10 @@ class CategoriaOrder extends InputType
                 'type' => GraphQL::type('OrderByEnum'),
             ],
             'ordem' => [
-                'type' => Type::nonNull(GraphQL::type('OrderByEnum')),
+                'type' => GraphQL::type('OrderByEnum'),
             ],
             'data_atualizacao' => [
-                'type' => Type::nonNull(GraphQL::type('OrderByEnum')),
+                'type' => GraphQL::type('OrderByEnum'),
             ],
             'data_arquivado' => [
                 'type' => GraphQL::type('OrderByEnum'),

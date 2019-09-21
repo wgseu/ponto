@@ -37,12 +37,11 @@ class DeletePromocaoMutation extends Mutation
 {
     protected $attributes = [
         'name' => 'DeletePromocao',
-        'description' => 'Informa se há descontos nos produtos em determinados dias da semana, o preço pode subir ou descer e ser agendado para ser aplicado',
     ];
 
     public function authorize(array $args): bool
     {
-        return Auth::user()->can('promocao:delete');
+        return true; // Auth::user()->can('promocao:delete');
     }
 
     public function type(): Type
@@ -57,7 +56,6 @@ class DeletePromocaoMutation extends Mutation
                 'type' => Type::nonNull(Type::id()),
                 'description' => 'Identificador da promoção',
             ],
-            'input' => ['type' => GraphQL::type('PromocaoInput')],
         ];
     }
 

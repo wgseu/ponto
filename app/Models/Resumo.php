@@ -47,6 +47,18 @@ class Resumo extends Model
     public $timestamps = false;
 
     /**
+     * The model's default values for attributes.
+     *
+     * @var array
+     */
+    protected $fillable = [
+        'movimentacao_id',
+        'forma_id',
+        'cartao_id',
+        'valor',
+    ];
+
+    /**
      * Movimentação do caixa referente ao resumo
      */
     public function movimentacao()

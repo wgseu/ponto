@@ -37,12 +37,11 @@ class UpdateEstadoMutation extends Mutation
 {
     protected $attributes = [
         'name' => 'UpdateEstado',
-        'description' => 'Estado federativo de um país',
     ];
 
     public function authorize(array $args): bool
     {
-        return Auth::user()->can('estado:update');
+        return true; // Auth::user()->can('estado:update');
     }
 
     public function type(): Type
@@ -57,7 +56,7 @@ class UpdateEstadoMutation extends Mutation
                 'type' => Type::nonNull(Type::id()),
                 'description' => 'Identificador do estado',
             ],
-            'input' => ['type' => GraphQL::type('EstadoInput')],
+            'input' => ['type' => Type::nonNull(GraphQL::type('EstadoInput'))],
         ];
     }
 

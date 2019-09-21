@@ -50,6 +50,21 @@ class Bairro extends Model
      *
      * @var array
      */
+    protected $fillable = [
+        'cidade_id',
+        'nome',
+        'valor_entrega',
+        'disponivel',
+        'mapeado',
+        'entrega_minima',
+        'entrega_maxima',
+    ];
+
+    /**
+     * The model's default values for attributes.
+     *
+     * @var array
+     */
     protected $attributes = [
         'disponivel' => true,
         'mapeado' => false,

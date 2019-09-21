@@ -37,12 +37,11 @@ class UpdatePontuacaoMutation extends Mutation
 {
     protected $attributes = [
         'name' => 'UpdatePontuacao',
-        'description' => 'Informa os pontos ganhos e gastos por compras de produtos promocionais',
     ];
 
     public function authorize(array $args): bool
     {
-        return Auth::user()->can('pontuacao:update');
+        return true; // Auth::user()->can('pontuacao:update');
     }
 
     public function type(): Type
@@ -57,7 +56,7 @@ class UpdatePontuacaoMutation extends Mutation
                 'type' => Type::nonNull(Type::id()),
                 'description' => 'Identificador da pontuação',
             ],
-            'input' => ['type' => GraphQL::type('PontuacaoInput')],
+            'input' => ['type' => Type::nonNull(GraphQL::type('PontuacaoInput'))],
         ];
     }
 

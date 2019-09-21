@@ -42,12 +42,11 @@ class ProdutoQuery extends Query
 {
     protected $attributes = [
         'name' => 'produtos',
-        'description' => 'Informações sobre o produto, composição ou pacote',
     ];
 
     public function authorize(array $args): bool
     {
-        return Auth::user()->can('produto:view');
+        return true; // Auth::user()->can('produto:view');
     }
 
     public function type(): Type
@@ -60,6 +59,8 @@ class ProdutoQuery extends Query
         return [
             'filter' => ['name' => 'filter', 'type' => GraphQL::type('ProdutoFilter')],
             'order' => ['name' => 'order', 'type' => GraphQL::type('ProdutoOrder')],
+            'limit' => ['name' => 'limit', 'type' => Type::int(), 'rules' => ['min:1', 'max:100']],
+            'page' => ['name' => 'page', 'type' => Type::int(), 'rules' => ['min:1']],
         ];
     }
 
@@ -69,7 +70,8 @@ class ProdutoQuery extends Query
         $fields = $getSelectFields();
         $query = Produto::with($fields->getRelations())
             ->select($fields->getSelect())
-            ->where(Filter::map($args['filter']));
-        return Ordering::apply($args['order'], $query)->paginate($args['limit'], ['*'], 'page', $args['page']);
+            ->where(Filter::map($args['filter'] ?? []));
+        return Ordering::apply($args['order'] ?? [], $query)
+            ->paginate($args['limit'] ?? 10, ['*'], 'page', $args['page'] ?? 1);
     }
 }

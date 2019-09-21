@@ -37,12 +37,11 @@ class DeleteNotaMutation extends Mutation
 {
     protected $attributes = [
         'name' => 'DeleteNota',
-        'description' => 'Notas fiscais e inutilizações',
     ];
 
     public function authorize(array $args): bool
     {
-        return Auth::user()->can('nota:delete');
+        return true; // Auth::user()->can('nota:delete');
     }
 
     public function type(): Type
@@ -57,7 +56,6 @@ class DeleteNotaMutation extends Mutation
                 'type' => Type::nonNull(Type::id()),
                 'description' => 'Identificador da nota',
             ],
-            'input' => ['type' => GraphQL::type('NotaInput')],
         ];
     }
 

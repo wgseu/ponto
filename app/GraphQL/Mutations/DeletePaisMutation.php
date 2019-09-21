@@ -37,12 +37,11 @@ class DeletePaisMutation extends Mutation
 {
     protected $attributes = [
         'name' => 'DeletePais',
-        'description' => 'Informações de um páis com sua moeda e língua nativa',
     ];
 
     public function authorize(array $args): bool
     {
-        return Auth::user()->can('pais:delete');
+        return true; // Auth::user()->can('pais:delete');
     }
 
     public function type(): Type
@@ -57,7 +56,6 @@ class DeletePaisMutation extends Mutation
                 'type' => Type::nonNull(Type::id()),
                 'description' => 'Identificador do país',
             ],
-            'input' => ['type' => GraphQL::type('PaisInput')],
         ];
     }
 

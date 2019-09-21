@@ -37,12 +37,11 @@ class DeletePacoteMutation extends Mutation
 {
     protected $attributes = [
         'name' => 'DeletePacote',
-        'description' => 'Contém todos as opções para a formação do produto final',
     ];
 
     public function authorize(array $args): bool
     {
-        return Auth::user()->can('pacote:delete');
+        return true; // Auth::user()->can('pacote:delete');
     }
 
     public function type(): Type
@@ -57,7 +56,6 @@ class DeletePacoteMutation extends Mutation
                 'type' => Type::nonNull(Type::id()),
                 'description' => 'Identificador do pacote',
             ],
-            'input' => ['type' => GraphQL::type('PacoteInput')],
         ];
     }
 

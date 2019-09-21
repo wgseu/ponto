@@ -37,12 +37,11 @@ class DeleteComposicaoMutation extends Mutation
 {
     protected $attributes = [
         'name' => 'DeleteComposicao',
-        'description' => 'Informa as propriedades da composição de um produto composto',
     ];
 
     public function authorize(array $args): bool
     {
-        return Auth::user()->can('composicao:delete');
+        return true; // Auth::user()->can('composicao:delete');
     }
 
     public function type(): Type
@@ -57,7 +56,6 @@ class DeleteComposicaoMutation extends Mutation
                 'type' => Type::nonNull(Type::id()),
                 'description' => 'Identificador da composição',
             ],
-            'input' => ['type' => GraphQL::type('ComposicaoInput')],
         ];
     }
 

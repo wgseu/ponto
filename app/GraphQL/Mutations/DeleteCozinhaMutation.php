@@ -37,12 +37,11 @@ class DeleteCozinhaMutation extends Mutation
 {
     protected $attributes = [
         'name' => 'DeleteCozinha',
-        'description' => 'Categoria de comida servida pelo estabelecimento',
     ];
 
     public function authorize(array $args): bool
     {
-        return Auth::user()->can('cozinha:delete');
+        return true; // Auth::user()->can('cozinha:delete');
     }
 
     public function type(): Type
@@ -57,7 +56,6 @@ class DeleteCozinhaMutation extends Mutation
                 'type' => Type::nonNull(Type::id()),
                 'description' => 'Identificador da cozinha',
             ],
-            'input' => ['type' => GraphQL::type('CozinhaInput')],
         ];
     }
 

@@ -37,12 +37,11 @@ class Create$[Table.norm]Mutation extends Mutation
 {
     protected $attributes = [
         'name' => 'Create$[Table.norm]',
-        'description' => '$[Table.comment]',
     ];
 
     public function authorize(array $args): bool
     {
-        return Auth::user()->can('$[table.unix]:create');
+        return true; // Auth::user()->can('$[table.unix]:create');
     }
 
     public function type(): Type
@@ -53,7 +52,7 @@ class Create$[Table.norm]Mutation extends Mutation
     public function args(): array
     {
         return [
-            'input' => ['type' => GraphQL::type('$[Table.norm]Input')],
+            'input' => ['type' => Type::nonNull(GraphQL::type('$[Table.norm]Input'))],
         ];
     }
 

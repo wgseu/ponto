@@ -37,12 +37,11 @@ class CreateHorarioMutation extends Mutation
 {
     protected $attributes = [
         'name' => 'CreateHorario',
-        'description' => 'Informa o horário de funcionamento do estabelecimento',
     ];
 
     public function authorize(array $args): bool
     {
-        return Auth::user()->can('horario:create');
+        return true; // Auth::user()->can('horario:create');
     }
 
     public function type(): Type
@@ -53,7 +52,7 @@ class CreateHorarioMutation extends Mutation
     public function args(): array
     {
         return [
-            'input' => ['type' => GraphQL::type('HorarioInput')],
+            'input' => ['type' => Type::nonNull(GraphQL::type('HorarioInput'))],
         ];
     }
 

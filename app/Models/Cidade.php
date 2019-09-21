@@ -46,6 +46,17 @@ class Cidade extends Model
     public $timestamps = false;
 
     /**
+     * The model's default values for attributes.
+     *
+     * @var array
+     */
+    protected $fillable = [
+        'estado_id',
+        'nome',
+        'cep',
+    ];
+
+    /**
      * Informa a qual estado a cidade pertence
      */
     public function estado()

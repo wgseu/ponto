@@ -44,4 +44,14 @@ class Funcao extends Model
      * @var bool
      */
     public $timestamps = false;
+
+    /**
+     * The model's default values for attributes.
+     *
+     * @var array
+     */
+    protected $fillable = [
+        'descricao',
+        'remuneracao',
+    ];
 }

@@ -37,12 +37,11 @@ class DeleteMesaMutation extends Mutation
 {
     protected $attributes = [
         'name' => 'DeleteMesa',
-        'description' => 'Mesas para lançamento de pedidos',
     ];
 
     public function authorize(array $args): bool
     {
-        return Auth::user()->can('mesa:delete');
+        return true; // Auth::user()->can('mesa:delete');
     }
 
     public function type(): Type
@@ -57,7 +56,6 @@ class DeleteMesaMutation extends Mutation
                 'type' => Type::nonNull(Type::id()),
                 'description' => 'Número da mesa',
             ],
-            'input' => ['type' => GraphQL::type('MesaInput')],
         ];
     }
 

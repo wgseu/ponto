@@ -37,12 +37,11 @@ class DeleteCompraMutation extends Mutation
 {
     protected $attributes = [
         'name' => 'DeleteCompra',
-        'description' => 'Compras realizadas em uma lista num determinado fornecedor',
     ];
 
     public function authorize(array $args): bool
     {
-        return Auth::user()->can('compra:delete');
+        return true; // Auth::user()->can('compra:delete');
     }
 
     public function type(): Type
@@ -57,7 +56,6 @@ class DeleteCompraMutation extends Mutation
                 'type' => Type::nonNull(Type::id()),
                 'description' => 'Identificador da compra',
             ],
-            'input' => ['type' => GraphQL::type('CompraInput')],
         ];
     }
 

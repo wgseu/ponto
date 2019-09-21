@@ -46,6 +46,17 @@ class Setor extends Model
     public $timestamps = false;
 
     /**
+     * The model's default values for attributes.
+     *
+     * @var array
+     */
+    protected $fillable = [
+        'setor_id',
+        'nome',
+        'descricao',
+    ];
+
+    /**
      * Informa o setor que abrange esse subsetor
      */
     public function setor()

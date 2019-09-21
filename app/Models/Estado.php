@@ -46,6 +46,17 @@ class Estado extends Model
     public $timestamps = false;
 
     /**
+     * The model's default values for attributes.
+     *
+     * @var array
+     */
+    protected $fillable = [
+        'pais_id',
+        'nome',
+        'uf',
+    ];
+
+    /**
      * País a qual esse estado pertence
      */
     public function pais()

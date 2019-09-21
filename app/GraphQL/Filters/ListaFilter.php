@@ -35,7 +35,6 @@ class ListaFilter extends InputType
 {
     protected $attributes = [
         'name' => 'ListaFilter',
-        'description' => 'Lista de compras de produtos',
     ];
 
     public function fields(): array
@@ -45,22 +44,22 @@ class ListaFilter extends InputType
                 'type' => Type::id(),
             ],
             'descricao' => [
-                'type' => Type::nonNull(GraphQL::type('StringFilter')),
+                'type' => GraphQL::type('StringFilter'),
             ],
             'estado' => [
-                'type' => Type::nonNull(GraphQL::type('ListaEstadoFilter')),
+                'type' => GraphQL::type('ListaEstadoFilter'),
             ],
             'encarregado_id' => [
-                'type' => Type::nonNull(Type::int()),
+                'type' => Type::int(),
             ],
             'viagem_id' => [
                 'type' => Type::int(),
             ],
             'data_viagem' => [
-                'type' => Type::nonNull(GraphQL::type('DateFilter')),
+                'type' => GraphQL::type('DateFilter'),
             ],
             'data_cadastro' => [
-                'type' => Type::nonNull(GraphQL::type('DateFilter')),
+                'type' => GraphQL::type('DateFilter'),
             ],
         ];
     }

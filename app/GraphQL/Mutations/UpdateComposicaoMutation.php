@@ -37,12 +37,11 @@ class UpdateComposicaoMutation extends Mutation
 {
     protected $attributes = [
         'name' => 'UpdateComposicao',
-        'description' => 'Informa as propriedades da composição de um produto composto',
     ];
 
     public function authorize(array $args): bool
     {
-        return Auth::user()->can('composicao:update');
+        return true; // Auth::user()->can('composicao:update');
     }
 
     public function type(): Type
@@ -57,7 +56,7 @@ class UpdateComposicaoMutation extends Mutation
                 'type' => Type::nonNull(Type::id()),
                 'description' => 'Identificador da composição',
             ],
-            'input' => ['type' => GraphQL::type('ComposicaoInput')],
+            'input' => ['type' => Type::nonNull(GraphQL::type('ComposicaoInput'))],
         ];
     }
 

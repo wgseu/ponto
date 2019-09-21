@@ -37,12 +37,11 @@ class DeleteCidadeMutation extends Mutation
 {
     protected $attributes = [
         'name' => 'DeleteCidade',
-        'description' => 'Cidade de um estado, contém bairros',
     ];
 
     public function authorize(array $args): bool
     {
-        return Auth::user()->can('cidade:delete');
+        return true; // Auth::user()->can('cidade:delete');
     }
 
     public function type(): Type
@@ -57,7 +56,6 @@ class DeleteCidadeMutation extends Mutation
                 'type' => Type::nonNull(Type::id()),
                 'description' => 'Código que identifica a cidade',
             ],
-            'input' => ['type' => GraphQL::type('CidadeInput')],
         ];
     }
 

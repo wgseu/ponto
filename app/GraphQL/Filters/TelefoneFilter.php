@@ -35,7 +35,6 @@ class TelefoneFilter extends InputType
 {
     protected $attributes = [
         'name' => 'TelefoneFilter',
-        'description' => 'Telefones dos clientes, apenas o telefone principal deve ser único por cliente',
     ];
 
     public function fields(): array
@@ -45,13 +44,13 @@ class TelefoneFilter extends InputType
                 'type' => Type::id(),
             ],
             'cliente_id' => [
-                'type' => Type::nonNull(Type::int()),
+                'type' => Type::int(),
             ],
             'pais_id' => [
-                'type' => Type::nonNull(Type::int()),
+                'type' => Type::int(),
             ],
             'numero' => [
-                'type' => Type::nonNull(GraphQL::type('StringFilter')),
+                'type' => GraphQL::type('StringFilter'),
             ],
             'operadora' => [
                 'type' => GraphQL::type('StringFilter'),
@@ -60,7 +59,7 @@ class TelefoneFilter extends InputType
                 'type' => GraphQL::type('StringFilter'),
             ],
             'principal' => [
-                'type' => Type::nonNull(Type::boolean()),
+                'type' => Type::boolean(),
             ],
         ];
     }

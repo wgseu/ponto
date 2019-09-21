@@ -37,12 +37,11 @@ class DeleteEmitenteMutation extends Mutation
 {
     protected $attributes = [
         'name' => 'DeleteEmitente',
-        'description' => 'Dados do emitente das notas fiscais',
     ];
 
     public function authorize(array $args): bool
     {
-        return Auth::user()->can('emitente:delete');
+        return true; // Auth::user()->can('emitente:delete');
     }
 
     public function type(): Type
@@ -57,7 +56,6 @@ class DeleteEmitenteMutation extends Mutation
                 'type' => Type::nonNull(Type::id()),
                 'description' => 'Identificador do emitente, sempre 1',
             ],
-            'input' => ['type' => GraphQL::type('EmitenteInput')],
         ];
     }
 

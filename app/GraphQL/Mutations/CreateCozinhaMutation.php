@@ -37,12 +37,11 @@ class CreateCozinhaMutation extends Mutation
 {
     protected $attributes = [
         'name' => 'CreateCozinha',
-        'description' => 'Categoria de comida servida pelo estabelecimento',
     ];
 
     public function authorize(array $args): bool
     {
-        return Auth::user()->can('cozinha:create');
+        return true; // Auth::user()->can('cozinha:create');
     }
 
     public function type(): Type
@@ -53,7 +52,7 @@ class CreateCozinhaMutation extends Mutation
     public function args(): array
     {
         return [
-            'input' => ['type' => GraphQL::type('CozinhaInput')],
+            'input' => ['type' => Type::nonNull(GraphQL::type('CozinhaInput'))],
         ];
     }
 

@@ -42,10 +42,10 @@ class PontuacaoOrder extends InputType
     {
         return [
             'id' => [
-                'type' => Type::nonNull(GraphQL::type('OrderByEnum')),
+                'type' => GraphQL::type('OrderByEnum'),
             ],
             'promocao_id' => [
-                'type' => Type::nonNull(GraphQL::type('OrderByEnum')),
+                'type' => GraphQL::type('OrderByEnum'),
             ],
             'cliente_id' => [
                 'type' => GraphQL::type('OrderByEnum'),
@@ -57,10 +57,10 @@ class PontuacaoOrder extends InputType
                 'type' => GraphQL::type('OrderByEnum'),
             ],
             'quantidade' => [
-                'type' => Type::nonNull(GraphQL::type('OrderByEnum')),
+                'type' => GraphQL::type('OrderByEnum'),
             ],
             'data_cadastro' => [
-                'type' => Type::nonNull(GraphQL::type('OrderByEnum')),
+                'type' => GraphQL::type('OrderByEnum'),
             ],
         ];
     }

@@ -47,6 +47,18 @@ class Empresa extends Model
     public $timestamps = false;
 
     /**
+     * The model's default values for attributes.
+     *
+     * @var array
+     */
+    protected $fillable = [
+        'pais_id',
+        'empresa_id',
+        'parceiro_id',
+        'opcoes',
+    ];
+
+    /**
      * País em que a empresa está situada
      */
     public function pais()

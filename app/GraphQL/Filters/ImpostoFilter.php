@@ -35,7 +35,6 @@ class ImpostoFilter extends InputType
 {
     protected $attributes = [
         'name' => 'ImpostoFilter',
-        'description' => 'Impostos disponíveis para informar no produto',
     ];
 
     public function fields(): array
@@ -45,19 +44,19 @@ class ImpostoFilter extends InputType
                 'type' => Type::id(),
             ],
             'grupo' => [
-                'type' => Type::nonNull(GraphQL::type('ImpostoGrupoFilter')),
+                'type' => GraphQL::type('ImpostoGrupoFilter'),
             ],
             'simples' => [
-                'type' => Type::nonNull(Type::boolean()),
+                'type' => Type::boolean(),
             ],
             'substituicao' => [
-                'type' => Type::nonNull(Type::boolean()),
+                'type' => Type::boolean(),
             ],
             'codigo' => [
-                'type' => Type::nonNull(GraphQL::type('NumberFilter')),
+                'type' => GraphQL::type('NumberFilter'),
             ],
             'descricao' => [
-                'type' => Type::nonNull(GraphQL::type('StringFilter')),
+                'type' => GraphQL::type('StringFilter'),
             ],
         ];
     }

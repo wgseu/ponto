@@ -35,7 +35,6 @@ class ZonaFilter extends InputType
 {
     protected $attributes = [
         'name' => 'ZonaFilter',
-        'description' => 'Zonas de um bairro',
     ];
 
     public function fields(): array
@@ -45,16 +44,16 @@ class ZonaFilter extends InputType
                 'type' => Type::id(),
             ],
             'bairro_id' => [
-                'type' => Type::nonNull(Type::int()),
+                'type' => Type::int(),
             ],
             'nome' => [
-                'type' => Type::nonNull(GraphQL::type('StringFilter')),
+                'type' => GraphQL::type('StringFilter'),
             ],
             'adicional_entrega' => [
-                'type' => Type::nonNull(GraphQL::type('NumberFilter')),
+                'type' => GraphQL::type('NumberFilter'),
             ],
             'disponivel' => [
-                'type' => Type::nonNull(Type::boolean()),
+                'type' => Type::boolean(),
             ],
             'area' => [
                 'type' => GraphQL::type('StringFilter'),

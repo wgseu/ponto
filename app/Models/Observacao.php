@@ -50,6 +50,17 @@ class Observacao extends Model
      *
      * @var array
      */
+    protected $fillable = [
+        'produto_id',
+        'grupo',
+        'descricao',
+    ];
+
+    /**
+     * The model's default values for attributes.
+     *
+     * @var array
+     */
     protected $attributes = [
         'grupo' => 0,
     ];

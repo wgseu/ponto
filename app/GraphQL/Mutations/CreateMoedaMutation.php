@@ -37,12 +37,11 @@ class CreateMoedaMutation extends Mutation
 {
     protected $attributes = [
         'name' => 'CreateMoeda',
-        'description' => 'Moedas financeiras de um país',
     ];
 
     public function authorize(array $args): bool
     {
-        return Auth::user()->can('moeda:create');
+        return true; // Auth::user()->can('moeda:create');
     }
 
     public function type(): Type
@@ -53,7 +52,7 @@ class CreateMoedaMutation extends Mutation
     public function args(): array
     {
         return [
-            'input' => ['type' => GraphQL::type('MoedaInput')],
+            'input' => ['type' => Type::nonNull(GraphQL::type('MoedaInput'))],
         ];
     }
 

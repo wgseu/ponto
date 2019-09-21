@@ -56,6 +56,26 @@ class Servico extends Model
      *
      * @var array
      */
+    protected $fillable = [
+        'nome',
+        'descricao',
+        'detalhes',
+        'tipo',
+        'obrigatorio',
+        'data_inicio',
+        'data_fim',
+        'tempo_limite',
+        'valor',
+        'individual',
+        'imagem_url',
+        'ativo',
+    ];
+
+    /**
+     * The model's default values for attributes.
+     *
+     * @var array
+     */
     protected $attributes = [
         'obrigatorio' => true,
         'valor' => 0,

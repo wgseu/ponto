@@ -35,7 +35,6 @@ class EstadoFilter extends InputType
 {
     protected $attributes = [
         'name' => 'EstadoFilter',
-        'description' => 'Estado federativo de um país',
     ];
 
     public function fields(): array
@@ -45,13 +44,13 @@ class EstadoFilter extends InputType
                 'type' => Type::id(),
             ],
             'pais_id' => [
-                'type' => Type::nonNull(Type::int()),
+                'type' => Type::int(),
             ],
             'nome' => [
-                'type' => Type::nonNull(GraphQL::type('StringFilter')),
+                'type' => GraphQL::type('StringFilter'),
             ],
             'uf' => [
-                'type' => Type::nonNull(GraphQL::type('StringFilter')),
+                'type' => GraphQL::type('StringFilter'),
             ],
         ];
     }

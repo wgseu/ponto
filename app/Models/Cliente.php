@@ -70,6 +70,38 @@ class Cliente extends Model
      *
      * @var array
      */
+    protected $fillable = [
+        'tipo',
+        'empresa_id',
+        'login',
+        'senha',
+        'nome',
+        'sobrenome',
+        'genero',
+        'cpf',
+        'rg',
+        'im',
+        'email',
+        'data_nascimento',
+        'slogan',
+        'status',
+        'secreto',
+        'limite_compra',
+        'instagram',
+        'facebook_url',
+        'twitter',
+        'linkedin_url',
+        'imagem_url',
+        'linguagem',
+        'data_atualizacao',
+        'data_cadastro',
+    ];
+
+    /**
+     * The model's default values for attributes.
+     *
+     * @var array
+     */
     protected $attributes = [
         'tipo' => self::TIPO_FISICA,
         'status' => self::STATUS_INATIVO,

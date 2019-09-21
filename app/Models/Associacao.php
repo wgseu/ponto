@@ -56,6 +56,33 @@ class Associacao extends Model
     public $timestamps = false;
 
     /**
+     * The model's default values for attributes.
+     *
+     * @var array
+     */
+    protected $fillable = [
+        'integracao_id',
+        'entrega_id',
+        'codigo',
+        'cliente',
+        'chave',
+        'pedido',
+        'endereco',
+        'quantidade',
+        'servicos',
+        'produtos',
+        'descontos',
+        'pago',
+        'status',
+        'motivo',
+        'mensagem',
+        'sincronizado',
+        'integrado',
+        'data_confirmacao',
+        'data_pedido',
+    ];
+
+    /**
      * Integração a qual essa associação de pedido deve ser realizada
      */
     public function integracao()

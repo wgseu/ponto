@@ -37,12 +37,11 @@ class Update$[Table.norm]Mutation extends Mutation
 {
     protected $attributes = [
         'name' => 'Update$[Table.norm]',
-        'description' => '$[Table.comment]',
     ];
 
     public function authorize(array $args): bool
     {
-        return Auth::user()->can('$[table.unix]:update');
+        return true; // Auth::user()->can('$[table.unix]:update');
     }
 
     public function type(): Type
@@ -57,7 +56,7 @@ class Update$[Table.norm]Mutation extends Mutation
                 'type' => Type::nonNull(Type::id()),
                 'description' => '$[primary.comment]',
             ],
-            'input' => ['type' => GraphQL::type('$[Table.norm]Input')],
+            'input' => ['type' => Type::nonNull(GraphQL::type('$[Table.norm]Input'))],
         ];
     }
 

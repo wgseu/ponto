@@ -37,12 +37,11 @@ class DeletePedidoMutation extends Mutation
 {
     protected $attributes = [
         'name' => 'DeletePedido',
-        'description' => 'Informações do pedido de venda',
     ];
 
     public function authorize(array $args): bool
     {
-        return Auth::user()->can('pedido:delete');
+        return true; // Auth::user()->can('pedido:delete');
     }
 
     public function type(): Type
@@ -57,7 +56,6 @@ class DeletePedidoMutation extends Mutation
                 'type' => Type::nonNull(Type::id()),
                 'description' => 'Código do pedido',
             ],
-            'input' => ['type' => GraphQL::type('PedidoInput')],
         ];
     }
 

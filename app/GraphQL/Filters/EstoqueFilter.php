@@ -35,7 +35,6 @@ class EstoqueFilter extends InputType
 {
     protected $attributes = [
         'name' => 'EstoqueFilter',
-        'description' => 'Estoque de produtos por setor',
     ];
 
     public function fields(): array
@@ -45,7 +44,7 @@ class EstoqueFilter extends InputType
                 'type' => Type::id(),
             ],
             'produto_id' => [
-                'type' => Type::nonNull(Type::int()),
+                'type' => Type::int(),
             ],
             'requisito_id' => [
                 'type' => Type::int(),
@@ -60,16 +59,16 @@ class EstoqueFilter extends InputType
                 'type' => Type::int(),
             ],
             'setor_id' => [
-                'type' => Type::nonNull(Type::int()),
+                'type' => Type::int(),
             ],
             'prestador_id' => [
                 'type' => Type::int(),
             ],
             'quantidade' => [
-                'type' => Type::nonNull(GraphQL::type('NumberFilter')),
+                'type' => GraphQL::type('NumberFilter'),
             ],
             'preco_compra' => [
-                'type' => Type::nonNull(GraphQL::type('NumberFilter')),
+                'type' => GraphQL::type('NumberFilter'),
             ],
             'lote' => [
                 'type' => GraphQL::type('StringFilter'),
@@ -84,13 +83,13 @@ class EstoqueFilter extends InputType
                 'type' => GraphQL::type('StringFilter'),
             ],
             'reservado' => [
-                'type' => Type::nonNull(Type::boolean()),
+                'type' => Type::boolean(),
             ],
             'cancelado' => [
-                'type' => Type::nonNull(Type::boolean()),
+                'type' => Type::boolean(),
             ],
             'data_movimento' => [
-                'type' => Type::nonNull(GraphQL::type('DateFilter')),
+                'type' => GraphQL::type('DateFilter'),
             ],
         ];
     }

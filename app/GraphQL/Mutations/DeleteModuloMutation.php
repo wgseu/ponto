@@ -37,12 +37,11 @@ class DeleteModuloMutation extends Mutation
 {
     protected $attributes = [
         'name' => 'DeleteModulo',
-        'description' => 'Módulos do sistema que podem ser desativados/ativados',
     ];
 
     public function authorize(array $args): bool
     {
-        return Auth::user()->can('modulo:delete');
+        return true; // Auth::user()->can('modulo:delete');
     }
 
     public function type(): Type
@@ -57,7 +56,6 @@ class DeleteModuloMutation extends Mutation
                 'type' => Type::nonNull(Type::id()),
                 'description' => 'Identificador do módulo',
             ],
-            'input' => ['type' => GraphQL::type('ModuloInput')],
         ];
     }
 

@@ -46,6 +46,17 @@ class Permissao extends Model
     public $timestamps = false;
 
     /**
+     * The model's default values for attributes.
+     *
+     * @var array
+     */
+    protected $fillable = [
+        'funcionalidade_id',
+        'nome',
+        'descricao',
+    ];
+
+    /**
      * Categoriza um grupo de permissões
      */
     public function funcionalidade()

@@ -37,12 +37,11 @@ class CreateComposicaoMutation extends Mutation
 {
     protected $attributes = [
         'name' => 'CreateComposicao',
-        'description' => 'Informa as propriedades da composição de um produto composto',
     ];
 
     public function authorize(array $args): bool
     {
-        return Auth::user()->can('composicao:create');
+        return true; // Auth::user()->can('composicao:create');
     }
 
     public function type(): Type
@@ -53,7 +52,7 @@ class CreateComposicaoMutation extends Mutation
     public function args(): array
     {
         return [
-            'input' => ['type' => GraphQL::type('ComposicaoInput')],
+            'input' => ['type' => Type::nonNull(GraphQL::type('ComposicaoInput'))],
         ];
     }
 

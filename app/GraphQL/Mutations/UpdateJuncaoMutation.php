@@ -37,12 +37,11 @@ class UpdateJuncaoMutation extends Mutation
 {
     protected $attributes = [
         'name' => 'UpdateJuncao',
-        'description' => 'Junções de mesas, informa quais mesas estão juntas ao pedido',
     ];
 
     public function authorize(array $args): bool
     {
-        return Auth::user()->can('juncao:update');
+        return true; // Auth::user()->can('juncao:update');
     }
 
     public function type(): Type
@@ -57,7 +56,7 @@ class UpdateJuncaoMutation extends Mutation
                 'type' => Type::nonNull(Type::id()),
                 'description' => 'Identificador da junção',
             ],
-            'input' => ['type' => GraphQL::type('JuncaoInput')],
+            'input' => ['type' => Type::nonNull(GraphQL::type('JuncaoInput'))],
         ];
     }
 

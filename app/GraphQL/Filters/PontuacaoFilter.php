@@ -35,7 +35,6 @@ class PontuacaoFilter extends InputType
 {
     protected $attributes = [
         'name' => 'PontuacaoFilter',
-        'description' => 'Informa os pontos ganhos e gastos por compras de produtos promocionais',
     ];
 
     public function fields(): array
@@ -45,7 +44,7 @@ class PontuacaoFilter extends InputType
                 'type' => Type::id(),
             ],
             'promocao_id' => [
-                'type' => Type::nonNull(Type::int()),
+                'type' => Type::int(),
             ],
             'cliente_id' => [
                 'type' => Type::int(),
@@ -57,10 +56,10 @@ class PontuacaoFilter extends InputType
                 'type' => Type::int(),
             ],
             'quantidade' => [
-                'type' => Type::nonNull(GraphQL::type('NumberFilter')),
+                'type' => GraphQL::type('NumberFilter'),
             ],
             'data_cadastro' => [
-                'type' => Type::nonNull(GraphQL::type('DateFilter')),
+                'type' => GraphQL::type('DateFilter'),
             ],
         ];
     }

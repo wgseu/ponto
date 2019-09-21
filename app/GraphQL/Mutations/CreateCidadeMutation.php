@@ -37,12 +37,11 @@ class CreateCidadeMutation extends Mutation
 {
     protected $attributes = [
         'name' => 'CreateCidade',
-        'description' => 'Cidade de um estado, contém bairros',
     ];
 
     public function authorize(array $args): bool
     {
-        return Auth::user()->can('cidade:create');
+        return true; // Auth::user()->can('cidade:create');
     }
 
     public function type(): Type
@@ -53,7 +52,7 @@ class CreateCidadeMutation extends Mutation
     public function args(): array
     {
         return [
-            'input' => ['type' => GraphQL::type('CidadeInput')],
+            'input' => ['type' => Type::nonNull(GraphQL::type('CidadeInput'))],
         ];
     }
 

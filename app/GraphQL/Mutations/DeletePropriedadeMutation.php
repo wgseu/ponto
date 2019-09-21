@@ -37,12 +37,11 @@ class DeletePropriedadeMutation extends Mutation
 {
     protected $attributes = [
         'name' => 'DeletePropriedade',
-        'description' => 'Informa tamanhos de pizzas e opções de peso do produto',
     ];
 
     public function authorize(array $args): bool
     {
-        return Auth::user()->can('propriedade:delete');
+        return true; // Auth::user()->can('propriedade:delete');
     }
 
     public function type(): Type
@@ -57,7 +56,6 @@ class DeletePropriedadeMutation extends Mutation
                 'type' => Type::nonNull(Type::id()),
                 'description' => 'Identificador da propriedade',
             ],
-            'input' => ['type' => GraphQL::type('PropriedadeInput')],
         ];
     }
 

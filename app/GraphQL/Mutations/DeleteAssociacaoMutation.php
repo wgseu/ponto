@@ -37,12 +37,11 @@ class DeleteAssociacaoMutation extends Mutation
 {
     protected $attributes = [
         'name' => 'DeleteAssociacao',
-        'description' => 'Lista de pedidos que não foram integrados ainda e devem ser associados ao sistema',
     ];
 
     public function authorize(array $args): bool
     {
-        return Auth::user()->can('associacao:delete');
+        return true; // Auth::user()->can('associacao:delete');
     }
 
     public function type(): Type
@@ -57,7 +56,6 @@ class DeleteAssociacaoMutation extends Mutation
                 'type' => Type::nonNull(Type::id()),
                 'description' => 'Identificador da associação no banco de dados',
             ],
-            'input' => ['type' => GraphQL::type('AssociacaoInput')],
         ];
     }
 

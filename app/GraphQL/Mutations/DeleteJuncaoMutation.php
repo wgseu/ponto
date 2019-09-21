@@ -37,12 +37,11 @@ class DeleteJuncaoMutation extends Mutation
 {
     protected $attributes = [
         'name' => 'DeleteJuncao',
-        'description' => 'Junções de mesas, informa quais mesas estão juntas ao pedido',
     ];
 
     public function authorize(array $args): bool
     {
-        return Auth::user()->can('juncao:delete');
+        return true; // Auth::user()->can('juncao:delete');
     }
 
     public function type(): Type
@@ -57,7 +56,6 @@ class DeleteJuncaoMutation extends Mutation
                 'type' => Type::nonNull(Type::id()),
                 'description' => 'Identificador da junção',
             ],
-            'input' => ['type' => GraphQL::type('JuncaoInput')],
         ];
     }
 

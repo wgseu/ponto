@@ -37,12 +37,11 @@ class DeletePrestadorMutation extends Mutation
 {
     protected $attributes = [
         'name' => 'DeletePrestador',
-        'description' => 'Prestador de serviço que realiza alguma tarefa na empresa',
     ];
 
     public function authorize(array $args): bool
     {
-        return Auth::user()->can('prestador:delete');
+        return true; // Auth::user()->can('prestador:delete');
     }
 
     public function type(): Type
@@ -57,7 +56,6 @@ class DeletePrestadorMutation extends Mutation
                 'type' => Type::nonNull(Type::id()),
                 'description' => 'Identificador do prestador',
             ],
-            'input' => ['type' => GraphQL::type('PrestadorInput')],
         ];
     }
 

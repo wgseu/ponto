@@ -37,12 +37,11 @@ class CreateFuncaoMutation extends Mutation
 {
     protected $attributes = [
         'name' => 'CreateFuncao',
-        'description' => 'Função ou atribuição de tarefas à um prestador',
     ];
 
     public function authorize(array $args): bool
     {
-        return Auth::user()->can('funcao:create');
+        return true; // Auth::user()->can('funcao:create');
     }
 
     public function type(): Type
@@ -53,7 +52,7 @@ class CreateFuncaoMutation extends Mutation
     public function args(): array
     {
         return [
-            'input' => ['type' => GraphQL::type('FuncaoInput')],
+            'input' => ['type' => Type::nonNull(GraphQL::type('FuncaoInput'))],
         ];
     }
 

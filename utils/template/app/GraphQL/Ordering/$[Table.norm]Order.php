@@ -43,7 +43,7 @@ class $[Table.norm]Order extends InputType
         return [
 $[field.each(all)]
             '$[field]' => [
-                'type' => $[field.if(null)]$[field.else]Type::nonNull($[field.end]GraphQL::type('OrderByEnum')$[field.if(null)]$[field.else])$[field.end],
+                'type' => GraphQL::type('OrderByEnum'),
             ],
 $[field.end]
         ];

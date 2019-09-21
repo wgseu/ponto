@@ -87,6 +87,41 @@ class Conta extends Model
      *
      * @var array
      */
+    protected $fillable = [
+        'classificacao_id',
+        'funcionario_id',
+        'conta_id',
+        'agrupamento_id',
+        'carteira_id',
+        'cliente_id',
+        'pedido_id',
+        'tipo',
+        'descricao',
+        'valor',
+        'consolidado',
+        'fonte',
+        'numero_parcela',
+        'parcelas',
+        'frequencia',
+        'modo',
+        'automatico',
+        'acrescimo',
+        'multa',
+        'juros',
+        'formula',
+        'vencimento',
+        'numero',
+        'anexo_url',
+        'estado',
+        'data_calculo',
+        'data_emissao',
+    ];
+
+    /**
+     * The model's default values for attributes.
+     *
+     * @var array
+     */
     protected $attributes = [
         'tipo' => self::TIPO_DESPESA,
         'consolidado' => 0,

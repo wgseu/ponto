@@ -35,7 +35,6 @@ class CreditoFilter extends InputType
 {
     protected $attributes = [
         'name' => 'CreditoFilter',
-        'description' => 'Créditos de clientes',
     ];
 
     public function fields(): array
@@ -45,19 +44,19 @@ class CreditoFilter extends InputType
                 'type' => Type::id(),
             ],
             'cliente_id' => [
-                'type' => Type::nonNull(Type::int()),
+                'type' => Type::int(),
             ],
             'valor' => [
-                'type' => Type::nonNull(GraphQL::type('NumberFilter')),
+                'type' => GraphQL::type('NumberFilter'),
             ],
             'detalhes' => [
-                'type' => Type::nonNull(GraphQL::type('StringFilter')),
+                'type' => GraphQL::type('StringFilter'),
             ],
             'cancelado' => [
-                'type' => Type::nonNull(Type::boolean()),
+                'type' => Type::boolean(),
             ],
             'data_cadastro' => [
-                'type' => Type::nonNull(GraphQL::type('DateFilter')),
+                'type' => GraphQL::type('DateFilter'),
             ],
         ];
     }

@@ -46,6 +46,18 @@ class Endereco extends Model
     public $timestamps = false;
 
     /**
+     * The model's default values for attributes.
+     *
+     * @var array
+     */
+    protected $fillable = [
+        'cidade_id',
+        'bairro_id',
+        'logradouro',
+        'cep',
+    ];
+
+    /**
      * Cidade a qual o endereço pertence
      */
     public function cidade()

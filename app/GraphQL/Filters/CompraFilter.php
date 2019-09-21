@@ -35,7 +35,6 @@ class CompraFilter extends InputType
 {
     protected $attributes = [
         'name' => 'CompraFilter',
-        'description' => 'Compras realizadas em uma lista num determinado fornecedor',
     ];
 
     public function fields(): array
@@ -48,16 +47,16 @@ class CompraFilter extends InputType
                 'type' => GraphQL::type('StringFilter'),
             ],
             'comprador_id' => [
-                'type' => Type::nonNull(Type::int()),
+                'type' => Type::int(),
             ],
             'fornecedor_id' => [
-                'type' => Type::nonNull(Type::int()),
+                'type' => Type::int(),
             ],
             'documento_url' => [
                 'type' => GraphQL::type('StringFilter'),
             ],
             'data_compra' => [
-                'type' => Type::nonNull(GraphQL::type('DateFilter')),
+                'type' => GraphQL::type('DateFilter'),
             ],
         ];
     }

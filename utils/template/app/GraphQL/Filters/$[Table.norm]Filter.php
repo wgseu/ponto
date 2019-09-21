@@ -35,7 +35,6 @@ class $[Table.norm]Filter extends InputType
 {
     protected $attributes = [
         'name' => '$[Table.norm]Filter',
-        'description' => '$[Table.comment]',
     ];
 
     public function fields(): array
@@ -46,26 +45,26 @@ $[field.each(all)]
 $[field.if(primary)]
                 'type' => Type::id(),
 $[field.else.if(reference)]
-                'type' => $[field.if(null)]$[field.else]Type::nonNull($[field.end]Type::int()$[field.if(null)]$[field.else])$[field.end],
+                'type' => Type::int(),
 $[field.else.if(date)]
-                'type' => $[field.if(null)]$[field.else]Type::nonNull($[field.end]GraphQL::type('DateFilter')$[field.if(null)]$[field.else])$[field.end],
+                'type' => GraphQL::type('DateFilter'),
 $[field.else.if(time)]
-                'type' => $[field.if(null)]$[field.else]Type::nonNull($[field.end]GraphQL::type('TimeFilter')$[field.if(null)]$[field.else])$[field.end],
+                'type' => GraphQL::type('TimeFilter'),
 $[field.else.if(datetime)]
-                'type' => $[field.if(null)]$[field.else]Type::nonNull($[field.end]GraphQL::type('DateFilter')$[field.if(null)]$[field.else])$[field.end],
+                'type' => GraphQL::type('DateFilter'),
 $[field.else.if(currency)]
-                'type' => $[field.if(null)]$[field.else]Type::nonNull($[field.end]GraphQL::type('NumberFilter')$[field.if(null)]$[field.else])$[field.end],
+                'type' => GraphQL::type('NumberFilter'),
 $[field.else.if(float|double)]
-                'type' => $[field.if(null)]$[field.else]Type::nonNull($[field.end]GraphQL::type('NumberFilter')$[field.if(null)]$[field.else])$[field.end],
+                'type' => GraphQL::type('NumberFilter'),
 $[field.else.if(integer|bigint)]
-                'type' => $[field.if(null)]$[field.else]Type::nonNull($[field.end]GraphQL::type('NumberFilter')$[field.if(null)]$[field.else])$[field.end],
+                'type' => GraphQL::type('NumberFilter'),
 $[field.else.if(blob)]
 $[field.else.if(boolean)]
-                'type' => $[field.if(null)]$[field.else]Type::nonNull($[field.end]Type::boolean()$[field.if(null)]$[field.else])$[field.end],
+                'type' => Type::boolean(),
 $[field.else.if(enum)]
-                'type' => $[field.if(null)]$[field.else]Type::nonNull($[field.end]GraphQL::type('$[Table.norm]$[Field.norm]Filter')$[field.if(null)]$[field.else])$[field.end],
+                'type' => GraphQL::type('$[Table.norm]$[Field.norm]Filter'),
 $[field.else]
-                'type' => $[field.if(null)]$[field.else]Type::nonNull($[field.end]GraphQL::type('StringFilter')$[field.if(null)]$[field.else])$[field.end],
+                'type' => GraphQL::type('StringFilter'),
 $[field.end]
             ],
 $[field.end]

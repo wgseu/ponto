@@ -37,12 +37,11 @@ class DeleteEstoqueMutation extends Mutation
 {
     protected $attributes = [
         'name' => 'DeleteEstoque',
-        'description' => 'Estoque de produtos por setor',
     ];
 
     public function authorize(array $args): bool
     {
-        return Auth::user()->can('estoque:delete');
+        return true; // Auth::user()->can('estoque:delete');
     }
 
     public function type(): Type
@@ -57,7 +56,6 @@ class DeleteEstoqueMutation extends Mutation
                 'type' => Type::nonNull(Type::id()),
                 'description' => 'Identificador da entrada no estoque',
             ],
-            'input' => ['type' => GraphQL::type('EstoqueInput')],
         ];
     }
 

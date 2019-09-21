@@ -42,10 +42,10 @@ class AvaliacaoOrder extends InputType
     {
         return [
             'id' => [
-                'type' => Type::nonNull(GraphQL::type('OrderByEnum')),
+                'type' => GraphQL::type('OrderByEnum'),
             ],
             'metrica_id' => [
-                'type' => Type::nonNull(GraphQL::type('OrderByEnum')),
+                'type' => GraphQL::type('OrderByEnum'),
             ],
             'cliente_id' => [
                 'type' => GraphQL::type('OrderByEnum'),
@@ -57,13 +57,13 @@ class AvaliacaoOrder extends InputType
                 'type' => GraphQL::type('OrderByEnum'),
             ],
             'estrelas' => [
-                'type' => Type::nonNull(GraphQL::type('OrderByEnum')),
+                'type' => GraphQL::type('OrderByEnum'),
             ],
             'comentario' => [
                 'type' => GraphQL::type('OrderByEnum'),
             ],
             'data_avaliacao' => [
-                'type' => Type::nonNull(GraphQL::type('OrderByEnum')),
+                'type' => GraphQL::type('OrderByEnum'),
             ],
         ];
     }

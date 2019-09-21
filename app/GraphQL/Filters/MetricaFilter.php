@@ -35,7 +35,6 @@ class MetricaFilter extends InputType
 {
     protected $attributes = [
         'name' => 'MetricaFilter',
-        'description' => 'Métricas de avaliação do atendimento e outros serviços do estabelecimento',
     ];
 
     public function fields(): array
@@ -45,16 +44,16 @@ class MetricaFilter extends InputType
                 'type' => Type::id(),
             ],
             'nome' => [
-                'type' => Type::nonNull(GraphQL::type('StringFilter')),
+                'type' => GraphQL::type('StringFilter'),
             ],
             'descricao' => [
                 'type' => GraphQL::type('StringFilter'),
             ],
             'tipo' => [
-                'type' => Type::nonNull(GraphQL::type('MetricaTipoFilter')),
+                'type' => GraphQL::type('MetricaTipoFilter'),
             ],
             'quantidade' => [
-                'type' => Type::nonNull(GraphQL::type('NumberFilter')),
+                'type' => GraphQL::type('NumberFilter'),
             ],
             'avaliacao' => [
                 'type' => GraphQL::type('NumberFilter'),

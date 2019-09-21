@@ -35,7 +35,6 @@ class ContagemFilter extends InputType
 {
     protected $attributes = [
         'name' => 'ContagemFilter',
-        'description' => 'Guarda a soma do estoque de cada produto por setor',
     ];
 
     public function fields(): array
@@ -45,16 +44,16 @@ class ContagemFilter extends InputType
                 'type' => Type::id(),
             ],
             'produto_id' => [
-                'type' => Type::nonNull(Type::int()),
+                'type' => Type::int(),
             ],
             'setor_id' => [
-                'type' => Type::nonNull(Type::int()),
+                'type' => Type::int(),
             ],
             'quantidade' => [
-                'type' => Type::nonNull(GraphQL::type('NumberFilter')),
+                'type' => GraphQL::type('NumberFilter'),
             ],
             'data_atualizacao' => [
-                'type' => Type::nonNull(GraphQL::type('DateFilter')),
+                'type' => GraphQL::type('DateFilter'),
             ],
         ];
     }

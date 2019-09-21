@@ -37,12 +37,11 @@ class UpdateSetorMutation extends Mutation
 {
     protected $attributes = [
         'name' => 'UpdateSetor',
-        'description' => 'Setor de impressão e de estoque',
     ];
 
     public function authorize(array $args): bool
     {
-        return Auth::user()->can('setor:update');
+        return true; // Auth::user()->can('setor:update');
     }
 
     public function type(): Type
@@ -57,7 +56,7 @@ class UpdateSetorMutation extends Mutation
                 'type' => Type::nonNull(Type::id()),
                 'description' => 'Identificador do setor',
             ],
-            'input' => ['type' => GraphQL::type('SetorInput')],
+            'input' => ['type' => Type::nonNull(GraphQL::type('SetorInput'))],
         ];
     }
 

@@ -37,12 +37,11 @@ class CreateCarteiraMutation extends Mutation
 {
     protected $attributes = [
         'name' => 'CreateCarteira',
-        'description' => 'Informa uma conta bancária ou uma carteira financeira',
     ];
 
     public function authorize(array $args): bool
     {
-        return Auth::user()->can('carteira:create');
+        return true; // Auth::user()->can('carteira:create');
     }
 
     public function type(): Type
@@ -53,7 +52,7 @@ class CreateCarteiraMutation extends Mutation
     public function args(): array
     {
         return [
-            'input' => ['type' => GraphQL::type('CarteiraInput')],
+            'input' => ['type' => Type::nonNull(GraphQL::type('CarteiraInput'))],
         ];
     }
 

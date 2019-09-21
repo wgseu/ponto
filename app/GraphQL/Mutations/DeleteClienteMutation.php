@@ -37,12 +37,11 @@ class DeleteClienteMutation extends Mutation
 {
     protected $attributes = [
         'name' => 'DeleteCliente',
-        'description' => 'Informações de cliente físico ou jurídico. Clientes, empresas, funcionários, fornecedores e parceiros são cadastrados aqui',
     ];
 
     public function authorize(array $args): bool
     {
-        return Auth::user()->can('cliente:delete');
+        return true; // Auth::user()->can('cliente:delete');
     }
 
     public function type(): Type
@@ -57,7 +56,6 @@ class DeleteClienteMutation extends Mutation
                 'type' => Type::nonNull(Type::id()),
                 'description' => 'Identificador do cliente',
             ],
-            'input' => ['type' => GraphQL::type('ClienteInput')],
         ];
     }
 

@@ -37,12 +37,11 @@ class DeleteViagemMutation extends Mutation
 {
     protected $attributes = [
         'name' => 'DeleteViagem',
-        'description' => 'Registro de viagem de uma entrega ou compra de insumos',
     ];
 
     public function authorize(array $args): bool
     {
-        return Auth::user()->can('viagem:delete');
+        return true; // Auth::user()->can('viagem:delete');
     }
 
     public function type(): Type
@@ -57,7 +56,6 @@ class DeleteViagemMutation extends Mutation
                 'type' => Type::nonNull(Type::id()),
                 'description' => 'Identificador da viagem',
             ],
-            'input' => ['type' => GraphQL::type('ViagemInput')],
         ];
     }
 

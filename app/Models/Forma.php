@@ -61,6 +61,22 @@ class Forma extends Model
      *
      * @var array
      */
+    protected $fillable = [
+        'tipo',
+        'carteira_id',
+        'descricao',
+        'min_parcelas',
+        'max_parcelas',
+        'parcelas_sem_juros',
+        'juros',
+        'ativa',
+    ];
+
+    /**
+     * The model's default values for attributes.
+     *
+     * @var array
+     */
     protected $attributes = [
         'min_parcelas' => 1,
         'max_parcelas' => 1,

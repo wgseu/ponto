@@ -42,12 +42,11 @@ class ItemQuery extends Query
 {
     protected $attributes = [
         'name' => 'itens',
-        'description' => 'Produtos, taxas e serviços do pedido, a alteração do estado permite o controle de produção',
     ];
 
     public function authorize(array $args): bool
     {
-        return Auth::user()->can('item:view');
+        return true; // Auth::user()->can('item:view');
     }
 
     public function type(): Type
@@ -60,6 +59,8 @@ class ItemQuery extends Query
         return [
             'filter' => ['name' => 'filter', 'type' => GraphQL::type('ItemFilter')],
             'order' => ['name' => 'order', 'type' => GraphQL::type('ItemOrder')],
+            'limit' => ['name' => 'limit', 'type' => Type::int(), 'rules' => ['min:1', 'max:100']],
+            'page' => ['name' => 'page', 'type' => Type::int(), 'rules' => ['min:1']],
         ];
     }
 
@@ -69,7 +70,8 @@ class ItemQuery extends Query
         $fields = $getSelectFields();
         $query = Item::with($fields->getRelations())
             ->select($fields->getSelect())
-            ->where(Filter::map($args['filter']));
-        return Ordering::apply($args['order'], $query)->paginate($args['limit'], ['*'], 'page', $args['page']);
+            ->where(Filter::map($args['filter'] ?? []));
+        return Ordering::apply($args['order'] ?? [], $query)
+            ->paginate($args['limit'] ?? 10, ['*'], 'page', $args['page'] ?? 1);
     }
 }

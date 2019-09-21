@@ -37,12 +37,11 @@ class DeleteAcessoMutation extends Mutation
 {
     protected $attributes = [
         'name' => 'DeleteAcesso',
-        'description' => 'Permite acesso à uma determinada funcionalidade da lista de permissões',
     ];
 
     public function authorize(array $args): bool
     {
-        return Auth::user()->can('acesso:delete');
+        return true; // Auth::user()->can('acesso:delete');
     }
 
     public function type(): Type
@@ -57,7 +56,6 @@ class DeleteAcessoMutation extends Mutation
                 'type' => Type::nonNull(Type::id()),
                 'description' => 'Identificador do acesso',
             ],
-            'input' => ['type' => GraphQL::type('AcessoInput')],
         ];
     }
 

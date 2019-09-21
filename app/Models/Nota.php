@@ -82,6 +82,39 @@ class Nota extends Model
      *
      * @var array
      */
+    protected $fillable = [
+        'tipo',
+        'ambiente',
+        'acao',
+        'estado',
+        'ultimo_evento_id',
+        'serie',
+        'numero_inicial',
+        'numero_final',
+        'sequencia',
+        'chave',
+        'recibo',
+        'protocolo',
+        'pedido_id',
+        'motivo',
+        'contingencia',
+        'consulta_url',
+        'qrcode',
+        'tributos',
+        'detalhes',
+        'corrigido',
+        'concluido',
+        'data_autorizacao',
+        'data_emissao',
+        'data_lancamento',
+        'data_arquivado',
+    ];
+
+    /**
+     * The model's default values for attributes.
+     *
+     * @var array
+     */
     protected $attributes = [
         'corrigido' => true,
         'concluido' => false,

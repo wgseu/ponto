@@ -42,12 +42,11 @@ class ZonaQuery extends Query
 {
     protected $attributes = [
         'name' => 'zonas',
-        'description' => 'Zonas de um bairro',
     ];
 
     public function authorize(array $args): bool
     {
-        return Auth::user()->can('zona:view');
+        return true; // Auth::user()->can('zona:view');
     }
 
     public function type(): Type
@@ -60,6 +59,8 @@ class ZonaQuery extends Query
         return [
             'filter' => ['name' => 'filter', 'type' => GraphQL::type('ZonaFilter')],
             'order' => ['name' => 'order', 'type' => GraphQL::type('ZonaOrder')],
+            'limit' => ['name' => 'limit', 'type' => Type::int(), 'rules' => ['min:1', 'max:100']],
+            'page' => ['name' => 'page', 'type' => Type::int(), 'rules' => ['min:1']],
         ];
     }
 
@@ -69,7 +70,8 @@ class ZonaQuery extends Query
         $fields = $getSelectFields();
         $query = Zona::with($fields->getRelations())
             ->select($fields->getSelect())
-            ->where(Filter::map($args['filter']));
-        return Ordering::apply($args['order'], $query)->paginate($args['limit'], ['*'], 'page', $args['page']);
+            ->where(Filter::map($args['filter'] ?? []));
+        return Ordering::apply($args['order'] ?? [], $query)
+            ->paginate($args['limit'] ?? 10, ['*'], 'page', $args['page'] ?? 1);
     }
 }

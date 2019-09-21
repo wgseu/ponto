@@ -37,12 +37,11 @@ class CreatePacoteMutation extends Mutation
 {
     protected $attributes = [
         'name' => 'CreatePacote',
-        'description' => 'Contém todos as opções para a formação do produto final',
     ];
 
     public function authorize(array $args): bool
     {
-        return Auth::user()->can('pacote:create');
+        return true; // Auth::user()->can('pacote:create');
     }
 
     public function type(): Type
@@ -53,7 +52,7 @@ class CreatePacoteMutation extends Mutation
     public function args(): array
     {
         return [
-            'input' => ['type' => GraphQL::type('PacoteInput')],
+            'input' => ['type' => Type::nonNull(GraphQL::type('PacoteInput'))],
         ];
     }
 

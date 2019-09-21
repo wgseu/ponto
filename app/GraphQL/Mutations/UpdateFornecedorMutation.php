@@ -37,12 +37,11 @@ class UpdateFornecedorMutation extends Mutation
 {
     protected $attributes = [
         'name' => 'UpdateFornecedor',
-        'description' => 'Fornecedores de produtos',
     ];
 
     public function authorize(array $args): bool
     {
-        return Auth::user()->can('fornecedor:update');
+        return true; // Auth::user()->can('fornecedor:update');
     }
 
     public function type(): Type
@@ -57,7 +56,7 @@ class UpdateFornecedorMutation extends Mutation
                 'type' => Type::nonNull(Type::id()),
                 'description' => 'Identificador do fornecedor',
             ],
-            'input' => ['type' => GraphQL::type('FornecedorInput')],
+            'input' => ['type' => Type::nonNull(GraphQL::type('FornecedorInput'))],
         ];
     }
 

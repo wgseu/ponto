@@ -51,6 +51,18 @@ class Formacao extends Model
      *
      * @var array
      */
+    protected $fillable = [
+        'item_id',
+        'pacote_id',
+        'composicao_id',
+        'quantidade',
+    ];
+
+    /**
+     * The model's default values for attributes.
+     *
+     * @var array
+     */
     protected $attributes = [
         'quantidade' => 1,
     ];

@@ -50,6 +50,22 @@ class Pais extends Model
      *
      * @var array
      */
+    protected $fillable = [
+        'nome',
+        'sigla',
+        'codigo',
+        'moeda_id',
+        'idioma',
+        'prefixo',
+        'entradas',
+        'unitario',
+    ];
+
+    /**
+     * The model's default values for attributes.
+     *
+     * @var array
+     */
     protected $attributes = [
         'unitario' => false,
     ];

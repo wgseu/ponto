@@ -37,12 +37,11 @@ class UpdatePedidoMutation extends Mutation
 {
     protected $attributes = [
         'name' => 'UpdatePedido',
-        'description' => 'Informações do pedido de venda',
     ];
 
     public function authorize(array $args): bool
     {
-        return Auth::user()->can('pedido:update');
+        return true; // Auth::user()->can('pedido:update');
     }
 
     public function type(): Type
@@ -57,7 +56,7 @@ class UpdatePedidoMutation extends Mutation
                 'type' => Type::nonNull(Type::id()),
                 'description' => 'Código do pedido',
             ],
-            'input' => ['type' => GraphQL::type('PedidoInput')],
+            'input' => ['type' => Type::nonNull(GraphQL::type('PedidoInput'))],
         ];
     }
 

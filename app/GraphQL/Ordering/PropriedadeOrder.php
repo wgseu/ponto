@@ -42,13 +42,13 @@ class PropriedadeOrder extends InputType
     {
         return [
             'id' => [
-                'type' => Type::nonNull(GraphQL::type('OrderByEnum')),
+                'type' => GraphQL::type('OrderByEnum'),
             ],
             'grupo_id' => [
-                'type' => Type::nonNull(GraphQL::type('OrderByEnum')),
+                'type' => GraphQL::type('OrderByEnum'),
             ],
             'nome' => [
-                'type' => Type::nonNull(GraphQL::type('OrderByEnum')),
+                'type' => GraphQL::type('OrderByEnum'),
             ],
             'abreviacao' => [
                 'type' => GraphQL::type('OrderByEnum'),
@@ -57,7 +57,7 @@ class PropriedadeOrder extends InputType
                 'type' => GraphQL::type('OrderByEnum'),
             ],
             'data_atualizacao' => [
-                'type' => Type::nonNull(GraphQL::type('OrderByEnum')),
+                'type' => GraphQL::type('OrderByEnum'),
             ],
         ];
     }

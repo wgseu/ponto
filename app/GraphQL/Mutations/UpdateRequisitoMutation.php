@@ -37,12 +37,11 @@ class UpdateRequisitoMutation extends Mutation
 {
     protected $attributes = [
         'name' => 'UpdateRequisito',
-        'description' => 'Informa os produtos da lista de compras',
     ];
 
     public function authorize(array $args): bool
     {
-        return Auth::user()->can('requisito:update');
+        return true; // Auth::user()->can('requisito:update');
     }
 
     public function type(): Type
@@ -57,7 +56,7 @@ class UpdateRequisitoMutation extends Mutation
                 'type' => Type::nonNull(Type::id()),
                 'description' => 'Identificador do produto da lista',
             ],
-            'input' => ['type' => GraphQL::type('RequisitoInput')],
+            'input' => ['type' => Type::nonNull(GraphQL::type('RequisitoInput'))],
         ];
     }
 

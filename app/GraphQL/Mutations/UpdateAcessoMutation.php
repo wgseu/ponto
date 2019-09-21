@@ -37,12 +37,11 @@ class UpdateAcessoMutation extends Mutation
 {
     protected $attributes = [
         'name' => 'UpdateAcesso',
-        'description' => 'Permite acesso à uma determinada funcionalidade da lista de permissões',
     ];
 
     public function authorize(array $args): bool
     {
-        return Auth::user()->can('acesso:update');
+        return true; // Auth::user()->can('acesso:update');
     }
 
     public function type(): Type
@@ -57,7 +56,7 @@ class UpdateAcessoMutation extends Mutation
                 'type' => Type::nonNull(Type::id()),
                 'description' => 'Identificador do acesso',
             ],
-            'input' => ['type' => GraphQL::type('AcessoInput')],
+            'input' => ['type' => Type::nonNull(GraphQL::type('AcessoInput'))],
         ];
     }
 

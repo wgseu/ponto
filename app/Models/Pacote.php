@@ -50,6 +50,25 @@ class Pacote extends Model
      *
      * @var array
      */
+    protected $fillable = [
+        'pacote_id',
+        'grupo_id',
+        'produto_id',
+        'propriedade_id',
+        'associacao_id',
+        'quantidade_minima',
+        'quantidade_maxima',
+        'acrescimo',
+        'selecionado',
+        'disponivel',
+        'data_arquivado',
+    ];
+
+    /**
+     * The model's default values for attributes.
+     *
+     * @var array
+     */
     protected $attributes = [
         'quantidade_minima' => 0,
         'quantidade_maxima' => 1,

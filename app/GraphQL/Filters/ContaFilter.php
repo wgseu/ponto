@@ -35,7 +35,6 @@ class ContaFilter extends InputType
 {
     protected $attributes = [
         'name' => 'ContaFilter',
-        'description' => 'Contas a pagar e ou receber',
     ];
 
     public function fields(): array
@@ -45,10 +44,10 @@ class ContaFilter extends InputType
                 'type' => Type::id(),
             ],
             'classificacao_id' => [
-                'type' => Type::nonNull(Type::int()),
+                'type' => Type::int(),
             ],
             'funcionario_id' => [
-                'type' => Type::nonNull(Type::int()),
+                'type' => Type::int(),
             ],
             'conta_id' => [
                 'type' => Type::int(),
@@ -66,49 +65,49 @@ class ContaFilter extends InputType
                 'type' => Type::int(),
             ],
             'tipo' => [
-                'type' => Type::nonNull(GraphQL::type('ContaTipoFilter')),
+                'type' => GraphQL::type('ContaTipoFilter'),
             ],
             'descricao' => [
-                'type' => Type::nonNull(GraphQL::type('StringFilter')),
+                'type' => GraphQL::type('StringFilter'),
             ],
             'valor' => [
-                'type' => Type::nonNull(GraphQL::type('NumberFilter')),
+                'type' => GraphQL::type('NumberFilter'),
             ],
             'consolidado' => [
-                'type' => Type::nonNull(GraphQL::type('NumberFilter')),
+                'type' => GraphQL::type('NumberFilter'),
             ],
             'fonte' => [
-                'type' => Type::nonNull(GraphQL::type('ContaFonteFilter')),
+                'type' => GraphQL::type('ContaFonteFilter'),
             ],
             'numero_parcela' => [
-                'type' => Type::nonNull(GraphQL::type('NumberFilter')),
+                'type' => GraphQL::type('NumberFilter'),
             ],
             'parcelas' => [
-                'type' => Type::nonNull(GraphQL::type('NumberFilter')),
+                'type' => GraphQL::type('NumberFilter'),
             ],
             'frequencia' => [
-                'type' => Type::nonNull(GraphQL::type('NumberFilter')),
+                'type' => GraphQL::type('NumberFilter'),
             ],
             'modo' => [
-                'type' => Type::nonNull(GraphQL::type('ContaModoFilter')),
+                'type' => GraphQL::type('ContaModoFilter'),
             ],
             'automatico' => [
-                'type' => Type::nonNull(Type::boolean()),
+                'type' => Type::boolean(),
             ],
             'acrescimo' => [
-                'type' => Type::nonNull(GraphQL::type('NumberFilter')),
+                'type' => GraphQL::type('NumberFilter'),
             ],
             'multa' => [
-                'type' => Type::nonNull(GraphQL::type('NumberFilter')),
+                'type' => GraphQL::type('NumberFilter'),
             ],
             'juros' => [
-                'type' => Type::nonNull(GraphQL::type('NumberFilter')),
+                'type' => GraphQL::type('NumberFilter'),
             ],
             'formula' => [
-                'type' => Type::nonNull(GraphQL::type('ContaFormulaFilter')),
+                'type' => GraphQL::type('ContaFormulaFilter'),
             ],
             'vencimento' => [
-                'type' => Type::nonNull(GraphQL::type('DateFilter')),
+                'type' => GraphQL::type('DateFilter'),
             ],
             'numero' => [
                 'type' => GraphQL::type('StringFilter'),
@@ -117,13 +116,13 @@ class ContaFilter extends InputType
                 'type' => GraphQL::type('StringFilter'),
             ],
             'estado' => [
-                'type' => Type::nonNull(GraphQL::type('ContaEstadoFilter')),
+                'type' => GraphQL::type('ContaEstadoFilter'),
             ],
             'data_calculo' => [
                 'type' => GraphQL::type('DateFilter'),
             ],
             'data_emissao' => [
-                'type' => Type::nonNull(GraphQL::type('DateFilter')),
+                'type' => GraphQL::type('DateFilter'),
             ],
         ];
     }

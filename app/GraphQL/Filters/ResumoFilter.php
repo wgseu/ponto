@@ -35,7 +35,6 @@ class ResumoFilter extends InputType
 {
     protected $attributes = [
         'name' => 'ResumoFilter',
-        'description' => 'Resumo de fechamento de caixa, informa o valor contado no fechamento do caixa para cada forma de pagamento',
     ];
 
     public function fields(): array
@@ -45,16 +44,16 @@ class ResumoFilter extends InputType
                 'type' => Type::id(),
             ],
             'movimentacao_id' => [
-                'type' => Type::nonNull(Type::int()),
+                'type' => Type::int(),
             ],
             'forma_id' => [
-                'type' => Type::nonNull(Type::int()),
+                'type' => Type::int(),
             ],
             'cartao_id' => [
                 'type' => Type::int(),
             ],
             'valor' => [
-                'type' => Type::nonNull(GraphQL::type('NumberFilter')),
+                'type' => GraphQL::type('NumberFilter'),
             ],
         ];
     }

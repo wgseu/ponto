@@ -50,6 +50,20 @@ class Caixa extends Model
      *
      * @var array
      */
+    protected $fillable = [
+        'carteira_id',
+        'descricao',
+        'serie',
+        'numero_inicial',
+        'ativa',
+        'data_desativada',
+    ];
+
+    /**
+     * The model's default values for attributes.
+     *
+     * @var array
+     */
     protected $attributes = [
         'serie' => 1,
         'numero_inicial' => 1,

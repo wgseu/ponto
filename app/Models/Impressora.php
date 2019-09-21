@@ -58,6 +58,22 @@ class Impressora extends Model
      *
      * @var array
      */
+    protected $fillable = [
+        'dispositivo_id',
+        'setor_id',
+        'nome',
+        'modelo',
+        'modo',
+        'opcoes',
+        'colunas',
+        'avanco',
+    ];
+
+    /**
+     * The model's default values for attributes.
+     *
+     * @var array
+     */
     protected $attributes = [
         'modo' => self::MODO_TERMINAL,
         'colunas' => 48,

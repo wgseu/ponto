@@ -35,7 +35,6 @@ class PatrimonioFilter extends InputType
 {
     protected $attributes = [
         'name' => 'PatrimonioFilter',
-        'description' => 'Informa detalhadamente um bem da empresa',
     ];
 
     public function fields(): array
@@ -45,46 +44,46 @@ class PatrimonioFilter extends InputType
                 'type' => Type::id(),
             ],
             'empresa_id' => [
-                'type' => Type::nonNull(Type::int()),
+                'type' => Type::int(),
             ],
             'fornecedor_id' => [
                 'type' => Type::int(),
             ],
             'numero' => [
-                'type' => Type::nonNull(GraphQL::type('StringFilter')),
+                'type' => GraphQL::type('StringFilter'),
             ],
             'descricao' => [
-                'type' => Type::nonNull(GraphQL::type('StringFilter')),
+                'type' => GraphQL::type('StringFilter'),
             ],
             'quantidade' => [
-                'type' => Type::nonNull(GraphQL::type('NumberFilter')),
+                'type' => GraphQL::type('NumberFilter'),
             ],
             'altura' => [
-                'type' => Type::nonNull(GraphQL::type('NumberFilter')),
+                'type' => GraphQL::type('NumberFilter'),
             ],
             'largura' => [
-                'type' => Type::nonNull(GraphQL::type('NumberFilter')),
+                'type' => GraphQL::type('NumberFilter'),
             ],
             'comprimento' => [
-                'type' => Type::nonNull(GraphQL::type('NumberFilter')),
+                'type' => GraphQL::type('NumberFilter'),
             ],
             'estado' => [
-                'type' => Type::nonNull(GraphQL::type('PatrimonioEstadoFilter')),
+                'type' => GraphQL::type('PatrimonioEstadoFilter'),
             ],
             'custo' => [
-                'type' => Type::nonNull(GraphQL::type('NumberFilter')),
+                'type' => GraphQL::type('NumberFilter'),
             ],
             'valor' => [
-                'type' => Type::nonNull(GraphQL::type('NumberFilter')),
+                'type' => GraphQL::type('NumberFilter'),
             ],
             'ativo' => [
-                'type' => Type::nonNull(Type::boolean()),
+                'type' => Type::boolean(),
             ],
             'imagem_url' => [
                 'type' => GraphQL::type('StringFilter'),
             ],
             'data_atualizacao' => [
-                'type' => Type::nonNull(GraphQL::type('DateFilter')),
+                'type' => GraphQL::type('DateFilter'),
             ],
         ];
     }

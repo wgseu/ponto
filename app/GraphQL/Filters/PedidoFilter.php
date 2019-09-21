@@ -35,7 +35,6 @@ class PedidoFilter extends InputType
 {
     protected $attributes = [
         'name' => 'PedidoFilter',
-        'description' => 'Informações do pedido de venda',
     ];
 
     public function fields(): array
@@ -72,40 +71,40 @@ class PedidoFilter extends InputType
                 'type' => Type::int(),
             ],
             'tipo' => [
-                'type' => Type::nonNull(GraphQL::type('PedidoTipoFilter')),
+                'type' => GraphQL::type('PedidoTipoFilter'),
             ],
             'estado' => [
-                'type' => Type::nonNull(GraphQL::type('PedidoEstadoFilter')),
+                'type' => GraphQL::type('PedidoEstadoFilter'),
             ],
             'servicos' => [
-                'type' => Type::nonNull(GraphQL::type('NumberFilter')),
+                'type' => GraphQL::type('NumberFilter'),
             ],
             'produtos' => [
-                'type' => Type::nonNull(GraphQL::type('NumberFilter')),
+                'type' => GraphQL::type('NumberFilter'),
             ],
             'comissao' => [
-                'type' => Type::nonNull(GraphQL::type('NumberFilter')),
+                'type' => GraphQL::type('NumberFilter'),
             ],
             'subtotal' => [
-                'type' => Type::nonNull(GraphQL::type('NumberFilter')),
+                'type' => GraphQL::type('NumberFilter'),
             ],
             'descontos' => [
-                'type' => Type::nonNull(GraphQL::type('NumberFilter')),
+                'type' => GraphQL::type('NumberFilter'),
             ],
             'total' => [
-                'type' => Type::nonNull(GraphQL::type('NumberFilter')),
+                'type' => GraphQL::type('NumberFilter'),
             ],
             'pago' => [
-                'type' => Type::nonNull(GraphQL::type('NumberFilter')),
+                'type' => GraphQL::type('NumberFilter'),
             ],
             'troco' => [
-                'type' => Type::nonNull(GraphQL::type('NumberFilter')),
+                'type' => GraphQL::type('NumberFilter'),
             ],
             'lancado' => [
-                'type' => Type::nonNull(GraphQL::type('NumberFilter')),
+                'type' => GraphQL::type('NumberFilter'),
             ],
             'pessoas' => [
-                'type' => Type::nonNull(GraphQL::type('NumberFilter')),
+                'type' => GraphQL::type('NumberFilter'),
             ],
             'cpf' => [
                 'type' => GraphQL::type('StringFilter'),
@@ -135,7 +134,7 @@ class PedidoFilter extends InputType
                 'type' => GraphQL::type('DateFilter'),
             ],
             'data_criacao' => [
-                'type' => Type::nonNull(GraphQL::type('DateFilter')),
+                'type' => GraphQL::type('DateFilter'),
             ],
         ];
     }

@@ -42,12 +42,11 @@ class AssociacaoQuery extends Query
 {
     protected $attributes = [
         'name' => 'associacoes',
-        'description' => 'Lista de pedidos que não foram integrados ainda e devem ser associados ao sistema',
     ];
 
     public function authorize(array $args): bool
     {
-        return Auth::user()->can('associacao:view');
+        return true; // Auth::user()->can('associacao:view');
     }
 
     public function type(): Type
@@ -60,6 +59,8 @@ class AssociacaoQuery extends Query
         return [
             'filter' => ['name' => 'filter', 'type' => GraphQL::type('AssociacaoFilter')],
             'order' => ['name' => 'order', 'type' => GraphQL::type('AssociacaoOrder')],
+            'limit' => ['name' => 'limit', 'type' => Type::int(), 'rules' => ['min:1', 'max:100']],
+            'page' => ['name' => 'page', 'type' => Type::int(), 'rules' => ['min:1']],
         ];
     }
 
@@ -69,7 +70,8 @@ class AssociacaoQuery extends Query
         $fields = $getSelectFields();
         $query = Associacao::with($fields->getRelations())
             ->select($fields->getSelect())
-            ->where(Filter::map($args['filter']));
-        return Ordering::apply($args['order'], $query)->paginate($args['limit'], ['*'], 'page', $args['page']);
+            ->where(Filter::map($args['filter'] ?? []));
+        return Ordering::apply($args['order'] ?? [], $query)
+            ->paginate($args['limit'] ?? 10, ['*'], 'page', $args['page'] ?? 1);
     }
 }

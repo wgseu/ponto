@@ -37,12 +37,11 @@ class CreateZonaMutation extends Mutation
 {
     protected $attributes = [
         'name' => 'CreateZona',
-        'description' => 'Zonas de um bairro',
     ];
 
     public function authorize(array $args): bool
     {
-        return Auth::user()->can('zona:create');
+        return true; // Auth::user()->can('zona:create');
     }
 
     public function type(): Type
@@ -53,7 +52,7 @@ class CreateZonaMutation extends Mutation
     public function args(): array
     {
         return [
-            'input' => ['type' => GraphQL::type('ZonaInput')],
+            'input' => ['type' => Type::nonNull(GraphQL::type('ZonaInput'))],
         ];
     }
 

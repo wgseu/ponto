@@ -35,7 +35,6 @@ class CarteiraFilter extends InputType
 {
     protected $attributes = [
         'name' => 'CarteiraFilter',
-        'description' => 'Informa uma conta bancária ou uma carteira financeira',
     ];
 
     public function fields(): array
@@ -45,7 +44,7 @@ class CarteiraFilter extends InputType
                 'type' => Type::id(),
             ],
             'tipo' => [
-                'type' => Type::nonNull(GraphQL::type('CarteiraTipoFilter')),
+                'type' => GraphQL::type('CarteiraTipoFilter'),
             ],
             'carteira_id' => [
                 'type' => Type::int(),
@@ -54,7 +53,7 @@ class CarteiraFilter extends InputType
                 'type' => Type::int(),
             ],
             'descricao' => [
-                'type' => Type::nonNull(GraphQL::type('StringFilter')),
+                'type' => GraphQL::type('StringFilter'),
             ],
             'conta' => [
                 'type' => GraphQL::type('StringFilter'),
@@ -63,7 +62,7 @@ class CarteiraFilter extends InputType
                 'type' => GraphQL::type('StringFilter'),
             ],
             'transacao' => [
-                'type' => Type::nonNull(GraphQL::type('NumberFilter')),
+                'type' => GraphQL::type('NumberFilter'),
             ],
             'limite' => [
                 'type' => GraphQL::type('NumberFilter'),
@@ -81,7 +80,7 @@ class CarteiraFilter extends InputType
                 'type' => GraphQL::type('StringFilter'),
             ],
             'ativa' => [
-                'type' => Type::nonNull(Type::boolean()),
+                'type' => Type::boolean(),
             ],
             'data_desativada' => [
                 'type' => GraphQL::type('DateFilter'),

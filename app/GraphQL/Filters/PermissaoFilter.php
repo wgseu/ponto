@@ -35,7 +35,6 @@ class PermissaoFilter extends InputType
 {
     protected $attributes = [
         'name' => 'PermissaoFilter',
-        'description' => 'Informa a listagem de todas as funções do sistema',
     ];
 
     public function fields(): array
@@ -45,13 +44,13 @@ class PermissaoFilter extends InputType
                 'type' => Type::id(),
             ],
             'funcionalidade_id' => [
-                'type' => Type::nonNull(Type::int()),
+                'type' => Type::int(),
             ],
             'nome' => [
-                'type' => Type::nonNull(GraphQL::type('StringFilter')),
+                'type' => GraphQL::type('StringFilter'),
             ],
             'descricao' => [
-                'type' => Type::nonNull(GraphQL::type('StringFilter')),
+                'type' => GraphQL::type('StringFilter'),
             ],
         ];
     }

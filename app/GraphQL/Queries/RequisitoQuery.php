@@ -42,12 +42,11 @@ class RequisitoQuery extends Query
 {
     protected $attributes = [
         'name' => 'requisitos',
-        'description' => 'Informa os produtos da lista de compras',
     ];
 
     public function authorize(array $args): bool
     {
-        return Auth::user()->can('requisito:view');
+        return true; // Auth::user()->can('requisito:view');
     }
 
     public function type(): Type
@@ -60,6 +59,8 @@ class RequisitoQuery extends Query
         return [
             'filter' => ['name' => 'filter', 'type' => GraphQL::type('RequisitoFilter')],
             'order' => ['name' => 'order', 'type' => GraphQL::type('RequisitoOrder')],
+            'limit' => ['name' => 'limit', 'type' => Type::int(), 'rules' => ['min:1', 'max:100']],
+            'page' => ['name' => 'page', 'type' => Type::int(), 'rules' => ['min:1']],
         ];
     }
 
@@ -69,7 +70,8 @@ class RequisitoQuery extends Query
         $fields = $getSelectFields();
         $query = Requisito::with($fields->getRelations())
             ->select($fields->getSelect())
-            ->where(Filter::map($args['filter']));
-        return Ordering::apply($args['order'], $query)->paginate($args['limit'], ['*'], 'page', $args['page']);
+            ->where(Filter::map($args['filter'] ?? []));
+        return Ordering::apply($args['order'] ?? [], $query)
+            ->paginate($args['limit'] ?? 10, ['*'], 'page', $args['page'] ?? 1);
     }
 }

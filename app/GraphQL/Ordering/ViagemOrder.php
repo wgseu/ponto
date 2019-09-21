@@ -42,10 +42,10 @@ class ViagemOrder extends InputType
     {
         return [
             'id' => [
-                'type' => Type::nonNull(GraphQL::type('OrderByEnum')),
+                'type' => GraphQL::type('OrderByEnum'),
             ],
             'responsavel_id' => [
-                'type' => Type::nonNull(GraphQL::type('OrderByEnum')),
+                'type' => GraphQL::type('OrderByEnum'),
             ],
             'latitude' => [
                 'type' => GraphQL::type('OrderByEnum'),
@@ -66,7 +66,7 @@ class ViagemOrder extends InputType
                 'type' => GraphQL::type('OrderByEnum'),
             ],
             'data_saida' => [
-                'type' => Type::nonNull(GraphQL::type('OrderByEnum')),
+                'type' => GraphQL::type('OrderByEnum'),
             ],
         ];
     }

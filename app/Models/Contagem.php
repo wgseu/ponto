@@ -38,8 +38,24 @@ class Contagem extends Model
      */
     protected $table = 'contagens';
 
-    const CREATED_AT = null;
-    const UPDATED_AT = 'data_atualizacao';
+    /**
+     * Indicates if the model should be timestamped.
+     *
+     * @var bool
+     */
+    public $timestamps = false;
+
+    /**
+     * The model's default values for attributes.
+     *
+     * @var array
+     */
+    protected $fillable = [
+        'produto_id',
+        'setor_id',
+        'quantidade',
+        'data_atualizacao',
+    ];
 
     /**
      * Produto que possui o estoque acumulado nesse setor

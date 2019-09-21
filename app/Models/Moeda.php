@@ -50,6 +50,23 @@ class Moeda extends Model
      *
      * @var array
      */
+    protected $fillable = [
+        'nome',
+        'simbolo',
+        'codigo',
+        'divisao',
+        'fracao',
+        'formato',
+        'conversao',
+        'data_atualizacao',
+        'ativa',
+    ];
+
+    /**
+     * The model's default values for attributes.
+     *
+     * @var array
+     */
     protected $attributes = [
         'ativa' => false,
     ];

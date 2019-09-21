@@ -42,12 +42,11 @@ class FormacaoQuery extends Query
 {
     protected $attributes = [
         'name' => 'formacoes',
-        'description' => 'Informa qual foi a formação que gerou esse produto, assim como quais item foram retirados/adicionados da composição',
     ];
 
     public function authorize(array $args): bool
     {
-        return Auth::user()->can('formacao:view');
+        return true; // Auth::user()->can('formacao:view');
     }
 
     public function type(): Type
@@ -60,6 +59,8 @@ class FormacaoQuery extends Query
         return [
             'filter' => ['name' => 'filter', 'type' => GraphQL::type('FormacaoFilter')],
             'order' => ['name' => 'order', 'type' => GraphQL::type('FormacaoOrder')],
+            'limit' => ['name' => 'limit', 'type' => Type::int(), 'rules' => ['min:1', 'max:100']],
+            'page' => ['name' => 'page', 'type' => Type::int(), 'rules' => ['min:1']],
         ];
     }
 
@@ -69,7 +70,8 @@ class FormacaoQuery extends Query
         $fields = $getSelectFields();
         $query = Formacao::with($fields->getRelations())
             ->select($fields->getSelect())
-            ->where(Filter::map($args['filter']));
-        return Ordering::apply($args['order'], $query)->paginate($args['limit'], ['*'], 'page', $args['page']);
+            ->where(Filter::map($args['filter'] ?? []));
+        return Ordering::apply($args['order'] ?? [], $query)
+            ->paginate($args['limit'] ?? 10, ['*'], 'page', $args['page'] ?? 1);
     }
 }

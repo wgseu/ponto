@@ -42,12 +42,11 @@ class SessaoQuery extends Query
 {
     protected $attributes = [
         'name' => 'sessoes',
-        'description' => 'Sessão de trabalho do dia, permite que vários caixas sejam abertos utilizando uma mesma sessão',
     ];
 
     public function authorize(array $args): bool
     {
-        return Auth::user()->can('sessao:view');
+        return true; // Auth::user()->can('sessao:view');
     }
 
     public function type(): Type
@@ -60,6 +59,8 @@ class SessaoQuery extends Query
         return [
             'filter' => ['name' => 'filter', 'type' => GraphQL::type('SessaoFilter')],
             'order' => ['name' => 'order', 'type' => GraphQL::type('SessaoOrder')],
+            'limit' => ['name' => 'limit', 'type' => Type::int(), 'rules' => ['min:1', 'max:100']],
+            'page' => ['name' => 'page', 'type' => Type::int(), 'rules' => ['min:1']],
         ];
     }
 
@@ -69,7 +70,8 @@ class SessaoQuery extends Query
         $fields = $getSelectFields();
         $query = Sessao::with($fields->getRelations())
             ->select($fields->getSelect())
-            ->where(Filter::map($args['filter']));
-        return Ordering::apply($args['order'], $query)->paginate($args['limit'], ['*'], 'page', $args['page']);
+            ->where(Filter::map($args['filter'] ?? []));
+        return Ordering::apply($args['order'] ?? [], $query)
+            ->paginate($args['limit'] ?? 10, ['*'], 'page', $args['page'] ?? 1);
     }
 }

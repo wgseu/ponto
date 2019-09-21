@@ -37,12 +37,11 @@ class CreateClienteMutation extends Mutation
 {
     protected $attributes = [
         'name' => 'CreateCliente',
-        'description' => 'Informações de cliente físico ou jurídico. Clientes, empresas, funcionários, fornecedores e parceiros são cadastrados aqui',
     ];
 
     public function authorize(array $args): bool
     {
-        return Auth::user()->can('cliente:create');
+        return true; // Auth::user()->can('cliente:create');
     }
 
     public function type(): Type
@@ -53,7 +52,7 @@ class CreateClienteMutation extends Mutation
     public function args(): array
     {
         return [
-            'input' => ['type' => GraphQL::type('ClienteInput')],
+            'input' => ['type' => Type::nonNull(GraphQL::type('ClienteInput'))],
         ];
     }
 

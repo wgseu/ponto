@@ -35,7 +35,6 @@ class UnidadeFilter extends InputType
 {
     protected $attributes = [
         'name' => 'UnidadeFilter',
-        'description' => 'Unidades de medidas aplicadas aos produtos',
     ];
 
     public function fields(): array
@@ -45,13 +44,13 @@ class UnidadeFilter extends InputType
                 'type' => Type::id(),
             ],
             'nome' => [
-                'type' => Type::nonNull(GraphQL::type('StringFilter')),
+                'type' => GraphQL::type('StringFilter'),
             ],
             'descricao' => [
                 'type' => GraphQL::type('StringFilter'),
             ],
             'sigla' => [
-                'type' => Type::nonNull(GraphQL::type('StringFilter')),
+                'type' => GraphQL::type('StringFilter'),
             ],
         ];
     }

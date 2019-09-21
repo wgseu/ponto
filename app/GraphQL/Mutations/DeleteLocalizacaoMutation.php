@@ -37,12 +37,11 @@ class DeleteLocalizacaoMutation extends Mutation
 {
     protected $attributes = [
         'name' => 'DeleteLocalizacao',
-        'description' => 'Endereço detalhado de um cliente',
     ];
 
     public function authorize(array $args): bool
     {
-        return Auth::user()->can('localizacao:delete');
+        return true; // Auth::user()->can('localizacao:delete');
     }
 
     public function type(): Type
@@ -57,7 +56,6 @@ class DeleteLocalizacaoMutation extends Mutation
                 'type' => Type::nonNull(Type::id()),
                 'description' => 'Identificador do endereço',
             ],
-            'input' => ['type' => GraphQL::type('LocalizacaoInput')],
         ];
     }
 

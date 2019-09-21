@@ -60,6 +60,19 @@ class Cardapio extends Model
      *
      * @var array
      */
+    protected $fillable = [
+        'produto_id',
+        'integracao_id',
+        'local',
+        'acrescimo',
+        'disponivel',
+    ];
+
+    /**
+     * The model's default values for attributes.
+     *
+     * @var array
+     */
     protected $attributes = [
         'acrescimo' => 0,
         'disponivel' => true,

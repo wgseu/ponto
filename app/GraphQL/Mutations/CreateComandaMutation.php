@@ -37,12 +37,11 @@ class CreateComandaMutation extends Mutation
 {
     protected $attributes = [
         'name' => 'CreateComanda',
-        'description' => 'Comanda individual, permite lançar pedidos em cartões de consumo',
     ];
 
     public function authorize(array $args): bool
     {
-        return Auth::user()->can('comanda:create');
+        return true; // Auth::user()->can('comanda:create');
     }
 
     public function type(): Type
@@ -53,7 +52,7 @@ class CreateComandaMutation extends Mutation
     public function args(): array
     {
         return [
-            'input' => ['type' => GraphQL::type('ComandaInput')],
+            'input' => ['type' => Type::nonNull(GraphQL::type('ComandaInput'))],
         ];
     }
 

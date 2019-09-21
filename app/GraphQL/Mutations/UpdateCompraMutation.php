@@ -37,12 +37,11 @@ class UpdateCompraMutation extends Mutation
 {
     protected $attributes = [
         'name' => 'UpdateCompra',
-        'description' => 'Compras realizadas em uma lista num determinado fornecedor',
     ];
 
     public function authorize(array $args): bool
     {
-        return Auth::user()->can('compra:update');
+        return true; // Auth::user()->can('compra:update');
     }
 
     public function type(): Type
@@ -57,7 +56,7 @@ class UpdateCompraMutation extends Mutation
                 'type' => Type::nonNull(Type::id()),
                 'description' => 'Identificador da compra',
             ],
-            'input' => ['type' => GraphQL::type('CompraInput')],
+            'input' => ['type' => Type::nonNull(GraphQL::type('CompraInput'))],
         ];
     }
 

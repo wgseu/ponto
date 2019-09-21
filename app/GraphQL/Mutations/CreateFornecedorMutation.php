@@ -37,12 +37,11 @@ class CreateFornecedorMutation extends Mutation
 {
     protected $attributes = [
         'name' => 'CreateFornecedor',
-        'description' => 'Fornecedores de produtos',
     ];
 
     public function authorize(array $args): bool
     {
-        return Auth::user()->can('fornecedor:create');
+        return true; // Auth::user()->can('fornecedor:create');
     }
 
     public function type(): Type
@@ -53,7 +52,7 @@ class CreateFornecedorMutation extends Mutation
     public function args(): array
     {
         return [
-            'input' => ['type' => GraphQL::type('FornecedorInput')],
+            'input' => ['type' => Type::nonNull(GraphQL::type('FornecedorInput'))],
         ];
     }
 

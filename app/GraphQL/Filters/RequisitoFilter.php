@@ -35,7 +35,6 @@ class RequisitoFilter extends InputType
 {
     protected $attributes = [
         'name' => 'RequisitoFilter',
-        'description' => 'Informa os produtos da lista de compras',
     ];
 
     public function fields(): array
@@ -45,10 +44,10 @@ class RequisitoFilter extends InputType
                 'type' => Type::id(),
             ],
             'lista_id' => [
-                'type' => Type::nonNull(Type::int()),
+                'type' => Type::int(),
             ],
             'produto_id' => [
-                'type' => Type::nonNull(Type::int()),
+                'type' => Type::int(),
             ],
             'compra_id' => [
                 'type' => Type::int(),
@@ -57,16 +56,16 @@ class RequisitoFilter extends InputType
                 'type' => Type::int(),
             ],
             'quantidade' => [
-                'type' => Type::nonNull(GraphQL::type('NumberFilter')),
+                'type' => GraphQL::type('NumberFilter'),
             ],
             'comprado' => [
-                'type' => Type::nonNull(GraphQL::type('NumberFilter')),
+                'type' => GraphQL::type('NumberFilter'),
             ],
             'preco_maximo' => [
-                'type' => Type::nonNull(GraphQL::type('NumberFilter')),
+                'type' => GraphQL::type('NumberFilter'),
             ],
             'preco' => [
-                'type' => Type::nonNull(GraphQL::type('NumberFilter')),
+                'type' => GraphQL::type('NumberFilter'),
             ],
             'observacoes' => [
                 'type' => GraphQL::type('StringFilter'),

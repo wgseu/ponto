@@ -35,7 +35,6 @@ class OperacaoFilter extends InputType
 {
     protected $attributes = [
         'name' => 'OperacaoFilter',
-        'description' => 'Código Fiscal de Operações e Prestações (CFOP)',
     ];
 
     public function fields(): array
@@ -45,10 +44,10 @@ class OperacaoFilter extends InputType
                 'type' => Type::id(),
             ],
             'codigo' => [
-                'type' => Type::nonNull(GraphQL::type('NumberFilter')),
+                'type' => GraphQL::type('NumberFilter'),
             ],
             'descricao' => [
-                'type' => Type::nonNull(GraphQL::type('StringFilter')),
+                'type' => GraphQL::type('StringFilter'),
             ],
             'detalhes' => [
                 'type' => GraphQL::type('StringFilter'),

@@ -42,16 +42,16 @@ class EmitenteOrder extends InputType
     {
         return [
             'id' => [
-                'type' => Type::nonNull(GraphQL::type('OrderByEnum')),
+                'type' => GraphQL::type('OrderByEnum'),
             ],
             'contador_id' => [
                 'type' => GraphQL::type('OrderByEnum'),
             ],
             'regime_id' => [
-                'type' => Type::nonNull(GraphQL::type('OrderByEnum')),
+                'type' => GraphQL::type('OrderByEnum'),
             ],
             'ambiente' => [
-                'type' => Type::nonNull(GraphQL::type('OrderByEnum')),
+                'type' => GraphQL::type('OrderByEnum'),
             ],
             'csc_teste' => [
                 'type' => GraphQL::type('OrderByEnum'),

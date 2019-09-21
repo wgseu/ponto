@@ -37,12 +37,11 @@ class DeleteFormacaoMutation extends Mutation
 {
     protected $attributes = [
         'name' => 'DeleteFormacao',
-        'description' => 'Informa qual foi a formação que gerou esse produto, assim como quais item foram retirados/adicionados da composição',
     ];
 
     public function authorize(array $args): bool
     {
-        return Auth::user()->can('formacao:delete');
+        return true; // Auth::user()->can('formacao:delete');
     }
 
     public function type(): Type
@@ -57,7 +56,6 @@ class DeleteFormacaoMutation extends Mutation
                 'type' => Type::nonNull(Type::id()),
                 'description' => 'Identificador da formação',
             ],
-            'input' => ['type' => GraphQL::type('FormacaoInput')],
         ];
     }
 

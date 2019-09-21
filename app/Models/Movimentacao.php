@@ -51,6 +51,21 @@ class Movimentacao extends Model
      *
      * @var array
      */
+    protected $fillable = [
+        'sessao_id',
+        'caixa_id',
+        'aberta',
+        'iniciador_id',
+        'fechador_id',
+        'data_fechamento',
+        'data_abertura',
+    ];
+
+    /**
+     * The model's default values for attributes.
+     *
+     * @var array
+     */
     protected $attributes = [
         'aberta' => true,
     ];

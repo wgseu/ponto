@@ -35,7 +35,6 @@ class PromocaoFilter extends InputType
 {
     protected $attributes = [
         'name' => 'PromocaoFilter',
-        'description' => 'Informa se há descontos nos produtos em determinados dias da semana, o preço pode subir ou descer e ser agendado para ser aplicado',
     ];
 
     public function fields(): array
@@ -69,49 +68,49 @@ class PromocaoFilter extends InputType
                 'type' => GraphQL::type('PromocaoLocalFilter'),
             ],
             'inicio' => [
-                'type' => Type::nonNull(GraphQL::type('NumberFilter')),
+                'type' => GraphQL::type('NumberFilter'),
             ],
             'fim' => [
-                'type' => Type::nonNull(GraphQL::type('NumberFilter')),
+                'type' => GraphQL::type('NumberFilter'),
             ],
             'valor' => [
-                'type' => Type::nonNull(GraphQL::type('NumberFilter')),
+                'type' => GraphQL::type('NumberFilter'),
             ],
             'pontos' => [
-                'type' => Type::nonNull(GraphQL::type('NumberFilter')),
+                'type' => GraphQL::type('NumberFilter'),
             ],
             'parcial' => [
-                'type' => Type::nonNull(Type::boolean()),
+                'type' => Type::boolean(),
             ],
             'proibir' => [
-                'type' => Type::nonNull(Type::boolean()),
+                'type' => Type::boolean(),
             ],
             'evento' => [
-                'type' => Type::nonNull(Type::boolean()),
+                'type' => Type::boolean(),
             ],
             'agendamento' => [
-                'type' => Type::nonNull(Type::boolean()),
+                'type' => Type::boolean(),
             ],
             'limitar_vendas' => [
-                'type' => Type::nonNull(Type::boolean()),
+                'type' => Type::boolean(),
             ],
             'funcao_vendas' => [
-                'type' => Type::nonNull(GraphQL::type('PromocaoFuncaoVendasFilter')),
+                'type' => GraphQL::type('PromocaoFuncaoVendasFilter'),
             ],
             'vendas_limite' => [
-                'type' => Type::nonNull(GraphQL::type('NumberFilter')),
+                'type' => GraphQL::type('NumberFilter'),
             ],
             'limitar_cliente' => [
-                'type' => Type::nonNull(Type::boolean()),
+                'type' => Type::boolean(),
             ],
             'funcao_cliente' => [
-                'type' => Type::nonNull(GraphQL::type('PromocaoFuncaoClienteFilter')),
+                'type' => GraphQL::type('PromocaoFuncaoClienteFilter'),
             ],
             'cliente_limite' => [
-                'type' => Type::nonNull(GraphQL::type('NumberFilter')),
+                'type' => GraphQL::type('NumberFilter'),
             ],
             'ativa' => [
-                'type' => Type::nonNull(Type::boolean()),
+                'type' => Type::boolean(),
             ],
             'chamada' => [
                 'type' => GraphQL::type('StringFilter'),

@@ -35,7 +35,6 @@ class MesaFilter extends InputType
 {
     protected $attributes = [
         'name' => 'MesaFilter',
-        'description' => 'Mesas para lançamento de pedidos',
     ];
 
     public function fields(): array
@@ -45,16 +44,16 @@ class MesaFilter extends InputType
                 'type' => Type::id(),
             ],
             'setor_id' => [
-                'type' => Type::nonNull(Type::int()),
+                'type' => Type::int(),
             ],
             'numero' => [
-                'type' => Type::nonNull(GraphQL::type('NumberFilter')),
+                'type' => GraphQL::type('NumberFilter'),
             ],
             'nome' => [
                 'type' => GraphQL::type('StringFilter'),
             ],
             'ativa' => [
-                'type' => Type::nonNull(Type::boolean()),
+                'type' => Type::boolean(),
             ],
         ];
     }

@@ -42,12 +42,11 @@ class CarteiraQuery extends Query
 {
     protected $attributes = [
         'name' => 'carteiras',
-        'description' => 'Informa uma conta bancária ou uma carteira financeira',
     ];
 
     public function authorize(array $args): bool
     {
-        return Auth::user()->can('carteira:view');
+        return true; // Auth::user()->can('carteira:view');
     }
 
     public function type(): Type
@@ -60,6 +59,8 @@ class CarteiraQuery extends Query
         return [
             'filter' => ['name' => 'filter', 'type' => GraphQL::type('CarteiraFilter')],
             'order' => ['name' => 'order', 'type' => GraphQL::type('CarteiraOrder')],
+            'limit' => ['name' => 'limit', 'type' => Type::int(), 'rules' => ['min:1', 'max:100']],
+            'page' => ['name' => 'page', 'type' => Type::int(), 'rules' => ['min:1']],
         ];
     }
 
@@ -69,7 +70,8 @@ class CarteiraQuery extends Query
         $fields = $getSelectFields();
         $query = Carteira::with($fields->getRelations())
             ->select($fields->getSelect())
-            ->where(Filter::map($args['filter']));
-        return Ordering::apply($args['order'], $query)->paginate($args['limit'], ['*'], 'page', $args['page']);
+            ->where(Filter::map($args['filter'] ?? []));
+        return Ordering::apply($args['order'] ?? [], $query)
+            ->paginate($args['limit'] ?? 10, ['*'], 'page', $args['page'] ?? 1);
     }
 }

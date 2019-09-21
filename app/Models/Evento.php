@@ -61,6 +61,19 @@ class Evento extends Model
     public $timestamps = false;
 
     /**
+     * The model's default values for attributes.
+     *
+     * @var array
+     */
+    protected $fillable = [
+        'nota_id',
+        'estado',
+        'mensagem',
+        'codigo',
+        'data_criacao',
+    ];
+
+    /**
      * Nota a qual o evento foi criado
      */
     public function nota()

@@ -46,6 +46,19 @@ class Compra extends Model
     public $timestamps = false;
 
     /**
+     * The model's default values for attributes.
+     *
+     * @var array
+     */
+    protected $fillable = [
+        'numero',
+        'comprador_id',
+        'fornecedor_id',
+        'documento_url',
+        'data_compra',
+    ];
+
+    /**
      * Informa o funcionário que comprou os produtos da lista
      */
     public function comprador()

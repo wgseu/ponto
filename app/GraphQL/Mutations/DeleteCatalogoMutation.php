@@ -37,12 +37,11 @@ class DeleteCatalogoMutation extends Mutation
 {
     protected $attributes = [
         'name' => 'DeleteCatalogo',
-        'description' => 'Informa a lista de produtos disponíveis nos fornecedores',
     ];
 
     public function authorize(array $args): bool
     {
-        return Auth::user()->can('catalogo:delete');
+        return true; // Auth::user()->can('catalogo:delete');
     }
 
     public function type(): Type
@@ -57,7 +56,6 @@ class DeleteCatalogoMutation extends Mutation
                 'type' => Type::nonNull(Type::id()),
                 'description' => 'Identificador do catálogo',
             ],
-            'input' => ['type' => GraphQL::type('CatalogoInput')],
         ];
     }
 

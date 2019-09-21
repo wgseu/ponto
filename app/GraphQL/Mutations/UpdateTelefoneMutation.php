@@ -37,12 +37,11 @@ class UpdateTelefoneMutation extends Mutation
 {
     protected $attributes = [
         'name' => 'UpdateTelefone',
-        'description' => 'Telefones dos clientes, apenas o telefone principal deve ser único por cliente',
     ];
 
     public function authorize(array $args): bool
     {
-        return Auth::user()->can('telefone:update');
+        return true; // Auth::user()->can('telefone:update');
     }
 
     public function type(): Type
@@ -57,7 +56,7 @@ class UpdateTelefoneMutation extends Mutation
                 'type' => Type::nonNull(Type::id()),
                 'description' => 'Identificador do telefone',
             ],
-            'input' => ['type' => GraphQL::type('TelefoneInput')],
+            'input' => ['type' => Type::nonNull(GraphQL::type('TelefoneInput'))],
         ];
     }
 

@@ -46,6 +46,18 @@ class Funcionalidade extends Model
     public $timestamps = false;
 
     /**
+     * The model's default values for attributes.
+     *
+     * @var array
+     */
+    protected $fillable = [
+        'modulo_id',
+        'funcionalidade_id',
+        'nome',
+        'descricao',
+    ];
+
+    /**
      * Módulo que essa funcionalidade pertence
      */
     public function modulo()

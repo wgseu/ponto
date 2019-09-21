@@ -35,7 +35,6 @@ class PrestadorFilter extends InputType
 {
     protected $attributes = [
         'name' => 'PrestadorFilter',
-        'description' => 'Prestador de serviço que realiza alguma tarefa na empresa',
     ];
 
     public function fields(): array
@@ -45,37 +44,37 @@ class PrestadorFilter extends InputType
                 'type' => Type::id(),
             ],
             'codigo' => [
-                'type' => Type::nonNull(GraphQL::type('StringFilter')),
+                'type' => GraphQL::type('StringFilter'),
             ],
             'pin' => [
                 'type' => GraphQL::type('StringFilter'),
             ],
             'funcao_id' => [
-                'type' => Type::nonNull(Type::int()),
+                'type' => Type::int(),
             ],
             'cliente_id' => [
-                'type' => Type::nonNull(Type::int()),
+                'type' => Type::int(),
             ],
             'empresa_id' => [
                 'type' => Type::int(),
             ],
             'vinculo' => [
-                'type' => Type::nonNull(GraphQL::type('PrestadorVinculoFilter')),
+                'type' => GraphQL::type('PrestadorVinculoFilter'),
             ],
             'porcentagem' => [
-                'type' => Type::nonNull(GraphQL::type('NumberFilter')),
+                'type' => GraphQL::type('NumberFilter'),
             ],
             'pontuacao' => [
-                'type' => Type::nonNull(GraphQL::type('NumberFilter')),
+                'type' => GraphQL::type('NumberFilter'),
             ],
             'remuneracao' => [
-                'type' => Type::nonNull(GraphQL::type('NumberFilter')),
+                'type' => GraphQL::type('NumberFilter'),
             ],
             'data_termino' => [
                 'type' => GraphQL::type('DateFilter'),
             ],
             'data_cadastro' => [
-                'type' => Type::nonNull(GraphQL::type('DateFilter')),
+                'type' => GraphQL::type('DateFilter'),
             ],
         ];
     }

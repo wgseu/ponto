@@ -50,6 +50,24 @@ class Requisito extends Model
      *
      * @var array
      */
+    protected $fillable = [
+        'lista_id',
+        'produto_id',
+        'compra_id',
+        'fornecedor_id',
+        'quantidade',
+        'comprado',
+        'preco_maximo',
+        'preco',
+        'observacoes',
+        'data_recolhimento',
+    ];
+
+    /**
+     * The model's default values for attributes.
+     *
+     * @var array
+     */
     protected $attributes = [
         'quantidade' => 0,
         'comprado' => 0,

@@ -37,12 +37,11 @@ class UpdatePromocaoMutation extends Mutation
 {
     protected $attributes = [
         'name' => 'UpdatePromocao',
-        'description' => 'Informa se há descontos nos produtos em determinados dias da semana, o preço pode subir ou descer e ser agendado para ser aplicado',
     ];
 
     public function authorize(array $args): bool
     {
-        return Auth::user()->can('promocao:update');
+        return true; // Auth::user()->can('promocao:update');
     }
 
     public function type(): Type
@@ -57,7 +56,7 @@ class UpdatePromocaoMutation extends Mutation
                 'type' => Type::nonNull(Type::id()),
                 'description' => 'Identificador da promoção',
             ],
-            'input' => ['type' => GraphQL::type('PromocaoInput')],
+            'input' => ['type' => Type::nonNull(GraphQL::type('PromocaoInput'))],
         ];
     }
 

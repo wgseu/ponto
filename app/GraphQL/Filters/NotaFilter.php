@@ -35,7 +35,6 @@ class NotaFilter extends InputType
 {
     protected $attributes = [
         'name' => 'NotaFilter',
-        'description' => 'Notas fiscais e inutilizações',
     ];
 
     public function fields(): array
@@ -45,31 +44,31 @@ class NotaFilter extends InputType
                 'type' => Type::id(),
             ],
             'tipo' => [
-                'type' => Type::nonNull(GraphQL::type('NotaTipoFilter')),
+                'type' => GraphQL::type('NotaTipoFilter'),
             ],
             'ambiente' => [
-                'type' => Type::nonNull(GraphQL::type('NotaAmbienteFilter')),
+                'type' => GraphQL::type('NotaAmbienteFilter'),
             ],
             'acao' => [
-                'type' => Type::nonNull(GraphQL::type('NotaAcaoFilter')),
+                'type' => GraphQL::type('NotaAcaoFilter'),
             ],
             'estado' => [
-                'type' => Type::nonNull(GraphQL::type('NotaEstadoFilter')),
+                'type' => GraphQL::type('NotaEstadoFilter'),
             ],
             'ultimo_evento_id' => [
                 'type' => Type::int(),
             ],
             'serie' => [
-                'type' => Type::nonNull(GraphQL::type('NumberFilter')),
+                'type' => GraphQL::type('NumberFilter'),
             ],
             'numero_inicial' => [
-                'type' => Type::nonNull(GraphQL::type('NumberFilter')),
+                'type' => GraphQL::type('NumberFilter'),
             ],
             'numero_final' => [
-                'type' => Type::nonNull(GraphQL::type('NumberFilter')),
+                'type' => GraphQL::type('NumberFilter'),
             ],
             'sequencia' => [
-                'type' => Type::nonNull(GraphQL::type('NumberFilter')),
+                'type' => GraphQL::type('NumberFilter'),
             ],
             'chave' => [
                 'type' => GraphQL::type('StringFilter'),
@@ -87,7 +86,7 @@ class NotaFilter extends InputType
                 'type' => GraphQL::type('StringFilter'),
             ],
             'contingencia' => [
-                'type' => Type::nonNull(Type::boolean()),
+                'type' => Type::boolean(),
             ],
             'consulta_url' => [
                 'type' => GraphQL::type('StringFilter'),
@@ -102,19 +101,19 @@ class NotaFilter extends InputType
                 'type' => GraphQL::type('StringFilter'),
             ],
             'corrigido' => [
-                'type' => Type::nonNull(Type::boolean()),
+                'type' => Type::boolean(),
             ],
             'concluido' => [
-                'type' => Type::nonNull(Type::boolean()),
+                'type' => Type::boolean(),
             ],
             'data_autorizacao' => [
                 'type' => GraphQL::type('DateFilter'),
             ],
             'data_emissao' => [
-                'type' => Type::nonNull(GraphQL::type('DateFilter')),
+                'type' => GraphQL::type('DateFilter'),
             ],
             'data_lancamento' => [
-                'type' => Type::nonNull(GraphQL::type('DateFilter')),
+                'type' => GraphQL::type('DateFilter'),
             ],
             'data_arquivado' => [
                 'type' => GraphQL::type('DateFilter'),

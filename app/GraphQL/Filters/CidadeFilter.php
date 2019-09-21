@@ -35,7 +35,6 @@ class CidadeFilter extends InputType
 {
     protected $attributes = [
         'name' => 'CidadeFilter',
-        'description' => 'Cidade de um estado, contém bairros',
     ];
 
     public function fields(): array
@@ -45,10 +44,10 @@ class CidadeFilter extends InputType
                 'type' => Type::id(),
             ],
             'estado_id' => [
-                'type' => Type::nonNull(Type::int()),
+                'type' => Type::int(),
             ],
             'nome' => [
-                'type' => Type::nonNull(GraphQL::type('StringFilter')),
+                'type' => GraphQL::type('StringFilter'),
             ],
             'cep' => [
                 'type' => GraphQL::type('StringFilter'),

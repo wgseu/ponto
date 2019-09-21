@@ -61,6 +61,37 @@ class Item extends Model
      *
      * @var array
      */
+    protected $fillable = [
+        'pedido_id',
+        'prestador_id',
+        'produto_id',
+        'servico_id',
+        'item_id',
+        'pagamento_id',
+        'descricao',
+        'composicao',
+        'preco',
+        'quantidade',
+        'subtotal',
+        'comissao',
+        'total',
+        'preco_venda',
+        'preco_compra',
+        'detalhes',
+        'estado',
+        'cancelado',
+        'motivo',
+        'desperdicado',
+        'data_processamento',
+        'data_atualizacao',
+        'data_lancamento',
+    ];
+
+    /**
+     * The model's default values for attributes.
+     *
+     * @var array
+     */
     protected $attributes = [
         'comissao' => 0,
         'preco_compra' => 0,

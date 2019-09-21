@@ -46,6 +46,21 @@ class Avaliacao extends Model
     public $timestamps = false;
 
     /**
+     * The model's default values for attributes.
+     *
+     * @var array
+     */
+    protected $fillable = [
+        'metrica_id',
+        'cliente_id',
+        'pedido_id',
+        'produto_id',
+        'estrelas',
+        'comentario',
+        'data_avaliacao',
+    ];
+
+    /**
      * Métrica de avaliação
      */
     public function metrica()

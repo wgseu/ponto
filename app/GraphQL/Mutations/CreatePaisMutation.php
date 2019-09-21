@@ -37,12 +37,11 @@ class CreatePaisMutation extends Mutation
 {
     protected $attributes = [
         'name' => 'CreatePais',
-        'description' => 'Informações de um páis com sua moeda e língua nativa',
     ];
 
     public function authorize(array $args): bool
     {
-        return Auth::user()->can('pais:create');
+        return true; // Auth::user()->can('pais:create');
     }
 
     public function type(): Type
@@ -53,7 +52,7 @@ class CreatePaisMutation extends Mutation
     public function args(): array
     {
         return [
-            'input' => ['type' => GraphQL::type('PaisInput')],
+            'input' => ['type' => Type::nonNull(GraphQL::type('PaisInput'))],
         ];
     }
 

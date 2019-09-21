@@ -35,7 +35,6 @@ class FornecedorFilter extends InputType
 {
     protected $attributes = [
         'name' => 'FornecedorFilter',
-        'description' => 'Fornecedores de produtos',
     ];
 
     public function fields(): array
@@ -45,13 +44,13 @@ class FornecedorFilter extends InputType
                 'type' => Type::id(),
             ],
             'empresa_id' => [
-                'type' => Type::nonNull(Type::int()),
+                'type' => Type::int(),
             ],
             'prazo_pagamento' => [
-                'type' => Type::nonNull(GraphQL::type('NumberFilter')),
+                'type' => GraphQL::type('NumberFilter'),
             ],
             'data_cadastro' => [
-                'type' => Type::nonNull(GraphQL::type('DateFilter')),
+                'type' => GraphQL::type('DateFilter'),
             ],
         ];
     }

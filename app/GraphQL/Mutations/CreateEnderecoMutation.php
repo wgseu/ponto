@@ -37,12 +37,11 @@ class CreateEnderecoMutation extends Mutation
 {
     protected $attributes = [
         'name' => 'CreateEndereco',
-        'description' => 'Endereços de ruas e avenidas com informação de CEP',
     ];
 
     public function authorize(array $args): bool
     {
-        return Auth::user()->can('endereco:create');
+        return true; // Auth::user()->can('endereco:create');
     }
 
     public function type(): Type
@@ -53,7 +52,7 @@ class CreateEnderecoMutation extends Mutation
     public function args(): array
     {
         return [
-            'input' => ['type' => GraphQL::type('EnderecoInput')],
+            'input' => ['type' => Type::nonNull(GraphQL::type('EnderecoInput'))],
         ];
     }
 

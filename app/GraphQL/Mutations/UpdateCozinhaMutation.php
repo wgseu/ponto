@@ -37,12 +37,11 @@ class UpdateCozinhaMutation extends Mutation
 {
     protected $attributes = [
         'name' => 'UpdateCozinha',
-        'description' => 'Categoria de comida servida pelo estabelecimento',
     ];
 
     public function authorize(array $args): bool
     {
-        return Auth::user()->can('cozinha:update');
+        return true; // Auth::user()->can('cozinha:update');
     }
 
     public function type(): Type
@@ -57,7 +56,7 @@ class UpdateCozinhaMutation extends Mutation
                 'type' => Type::nonNull(Type::id()),
                 'description' => 'Identificador da cozinha',
             ],
-            'input' => ['type' => GraphQL::type('CozinhaInput')],
+            'input' => ['type' => Type::nonNull(GraphQL::type('CozinhaInput'))],
         ];
     }
 

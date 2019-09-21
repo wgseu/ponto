@@ -46,6 +46,19 @@ class Propriedade extends Model
     public $timestamps = false;
 
     /**
+     * The model's default values for attributes.
+     *
+     * @var array
+     */
+    protected $fillable = [
+        'grupo_id',
+        'nome',
+        'abreviacao',
+        'imagem_url',
+        'data_atualizacao',
+    ];
+
+    /**
      * Grupo que possui essa propriedade como item de um pacote
      */
     public function grupo()

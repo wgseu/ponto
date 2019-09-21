@@ -37,12 +37,11 @@ class DeleteSessaoMutation extends Mutation
 {
     protected $attributes = [
         'name' => 'DeleteSessao',
-        'description' => 'Sessão de trabalho do dia, permite que vários caixas sejam abertos utilizando uma mesma sessão',
     ];
 
     public function authorize(array $args): bool
     {
-        return Auth::user()->can('sessao:delete');
+        return true; // Auth::user()->can('sessao:delete');
     }
 
     public function type(): Type
@@ -57,7 +56,6 @@ class DeleteSessaoMutation extends Mutation
                 'type' => Type::nonNull(Type::id()),
                 'description' => 'Código da sessão',
             ],
-            'input' => ['type' => GraphQL::type('SessaoInput')],
         ];
     }
 

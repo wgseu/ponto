@@ -37,12 +37,11 @@ class UpdateMovimentacaoMutation extends Mutation
 {
     protected $attributes = [
         'name' => 'UpdateMovimentacao',
-        'description' => 'Movimentação do caixa, permite abrir diversos caixas na conta de operadores',
     ];
 
     public function authorize(array $args): bool
     {
-        return Auth::user()->can('movimentacao:update');
+        return true; // Auth::user()->can('movimentacao:update');
     }
 
     public function type(): Type
@@ -57,7 +56,7 @@ class UpdateMovimentacaoMutation extends Mutation
                 'type' => Type::nonNull(Type::id()),
                 'description' => 'Código da movimentação do caixa',
             ],
-            'input' => ['type' => GraphQL::type('MovimentacaoInput')],
+            'input' => ['type' => Type::nonNull(GraphQL::type('MovimentacaoInput'))],
         ];
     }
 

@@ -59,6 +59,23 @@ class Horario extends Model
      *
      * @var array
      */
+    protected $fillable = [
+        'modo',
+        'funcao_id',
+        'prestador_id',
+        'inicio',
+        'fim',
+        'mensagem',
+        'entrega_minima',
+        'entrega_maxima',
+        'fechado',
+    ];
+
+    /**
+     * The model's default values for attributes.
+     *
+     * @var array
+     */
     protected $attributes = [
         'modo' => self::MODO_FUNCIONAMENTO,
         'entrega_maxima' => 0,

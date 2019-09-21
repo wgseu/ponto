@@ -42,12 +42,11 @@ class SistemaQuery extends Query
 {
     protected $attributes = [
         'name' => 'sistemas',
-        'description' => 'Classe que informa detalhes da empresa, parceiro e opções do sistema como a versão do banco de dados e a licença de uso',
     ];
 
     public function authorize(array $args): bool
     {
-        return Auth::user()->can('sistema:view');
+        return true; // Auth::user()->can('sistema:view');
     }
 
     public function type(): Type
@@ -60,6 +59,8 @@ class SistemaQuery extends Query
         return [
             'filter' => ['name' => 'filter', 'type' => GraphQL::type('SistemaFilter')],
             'order' => ['name' => 'order', 'type' => GraphQL::type('SistemaOrder')],
+            'limit' => ['name' => 'limit', 'type' => Type::int(), 'rules' => ['min:1', 'max:100']],
+            'page' => ['name' => 'page', 'type' => Type::int(), 'rules' => ['min:1']],
         ];
     }
 
@@ -69,7 +70,8 @@ class SistemaQuery extends Query
         $fields = $getSelectFields();
         $query = Sistema::with($fields->getRelations())
             ->select($fields->getSelect())
-            ->where(Filter::map($args['filter']));
-        return Ordering::apply($args['order'], $query)->paginate($args['limit'], ['*'], 'page', $args['page']);
+            ->where(Filter::map($args['filter'] ?? []));
+        return Ordering::apply($args['order'] ?? [], $query)
+            ->paginate($args['limit'] ?? 10, ['*'], 'page', $args['page'] ?? 1);
     }
 }

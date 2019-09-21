@@ -68,6 +68,23 @@ class Grupo extends Model
      *
      * @var array
      */
+    protected $fillable = [
+        'produto_id',
+        'nome',
+        'descricao',
+        'tipo',
+        'quantidade_minima',
+        'quantidade_maxima',
+        'funcao',
+        'ordem',
+        'data_arquivado',
+    ];
+
+    /**
+     * The model's default values for attributes.
+     *
+     * @var array
+     */
     protected $attributes = [
         'tipo' => self::TIPO_INTEIRO,
         'quantidade_minima' => 1,

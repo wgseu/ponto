@@ -44,4 +44,17 @@ class Banco extends Model
      * @var bool
      */
     public $timestamps = false;
+
+    /**
+     * The model's default values for attributes.
+     *
+     * @var array
+     */
+    protected $fillable = [
+        'numero',
+        'fantasia',
+        'razao_social',
+        'agencia_mascara',
+        'conta_mascara',
+    ];
 }

@@ -37,12 +37,11 @@ class DeleteBancoMutation extends Mutation
 {
     protected $attributes = [
         'name' => 'DeleteBanco',
-        'description' => 'Bancos disponíveis no país',
     ];
 
     public function authorize(array $args): bool
     {
-        return Auth::user()->can('banco:delete');
+        return true; // Auth::user()->can('banco:delete');
     }
 
     public function type(): Type
@@ -57,7 +56,6 @@ class DeleteBancoMutation extends Mutation
                 'type' => Type::nonNull(Type::id()),
                 'description' => 'Identificador do banco',
             ],
-            'input' => ['type' => GraphQL::type('BancoInput')],
         ];
     }
 

@@ -37,12 +37,11 @@ class DeleteItemMutation extends Mutation
 {
     protected $attributes = [
         'name' => 'DeleteItem',
-        'description' => 'Produtos, taxas e serviços do pedido, a alteração do estado permite o controle de produção',
     ];
 
     public function authorize(array $args): bool
     {
-        return Auth::user()->can('item:delete');
+        return true; // Auth::user()->can('item:delete');
     }
 
     public function type(): Type
@@ -57,7 +56,6 @@ class DeleteItemMutation extends Mutation
                 'type' => Type::nonNull(Type::id()),
                 'description' => 'Identificador do item do pedido',
             ],
-            'input' => ['type' => GraphQL::type('ItemInput')],
         ];
     }
 

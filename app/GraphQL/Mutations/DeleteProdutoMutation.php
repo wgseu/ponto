@@ -37,12 +37,11 @@ class DeleteProdutoMutation extends Mutation
 {
     protected $attributes = [
         'name' => 'DeleteProduto',
-        'description' => 'Informações sobre o produto, composição ou pacote',
     ];
 
     public function authorize(array $args): bool
     {
-        return Auth::user()->can('produto:delete');
+        return true; // Auth::user()->can('produto:delete');
     }
 
     public function type(): Type
@@ -57,7 +56,6 @@ class DeleteProdutoMutation extends Mutation
                 'type' => Type::nonNull(Type::id()),
                 'description' => 'Código do produto',
             ],
-            'input' => ['type' => GraphQL::type('ProdutoInput')],
         ];
     }
 

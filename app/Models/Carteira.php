@@ -66,6 +66,28 @@ class Carteira extends Model
      *
      * @var array
      */
+    protected $fillable = [
+        'tipo',
+        'carteira_id',
+        'banco_id',
+        'descricao',
+        'conta',
+        'agencia',
+        'transacao',
+        'limite',
+        'token',
+        'ambiente',
+        'logo_url',
+        'cor',
+        'ativa',
+        'data_desativada',
+    ];
+
+    /**
+     * The model's default values for attributes.
+     *
+     * @var array
+     */
     protected $attributes = [
         'transacao' => 0,
         'ativa' => true,

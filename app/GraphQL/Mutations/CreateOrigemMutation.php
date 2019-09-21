@@ -37,12 +37,11 @@ class CreateOrigemMutation extends Mutation
 {
     protected $attributes = [
         'name' => 'CreateOrigem',
-        'description' => 'Origem da mercadoria',
     ];
 
     public function authorize(array $args): bool
     {
-        return Auth::user()->can('origem:create');
+        return true; // Auth::user()->can('origem:create');
     }
 
     public function type(): Type
@@ -53,7 +52,7 @@ class CreateOrigemMutation extends Mutation
     public function args(): array
     {
         return [
-            'input' => ['type' => GraphQL::type('OrigemInput')],
+            'input' => ['type' => Type::nonNull(GraphQL::type('OrigemInput'))],
         ];
     }
 

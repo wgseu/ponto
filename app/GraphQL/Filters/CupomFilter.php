@@ -35,7 +35,6 @@ class CupomFilter extends InputType
 {
     protected $attributes = [
         'name' => 'CupomFilter',
-        'description' => 'Informa os cupons de descontos e seus usos',
     ];
 
     public function fields(): array
@@ -54,46 +53,46 @@ class CupomFilter extends InputType
                 'type' => Type::int(),
             ],
             'codigo' => [
-                'type' => Type::nonNull(GraphQL::type('StringFilter')),
+                'type' => GraphQL::type('StringFilter'),
             ],
             'quantidade' => [
-                'type' => Type::nonNull(GraphQL::type('NumberFilter')),
+                'type' => GraphQL::type('NumberFilter'),
             ],
             'tipo_desconto' => [
-                'type' => Type::nonNull(GraphQL::type('CupomTipoDescontoFilter')),
+                'type' => GraphQL::type('CupomTipoDescontoFilter'),
             ],
             'valor' => [
-                'type' => Type::nonNull(GraphQL::type('NumberFilter')),
+                'type' => GraphQL::type('NumberFilter'),
             ],
             'porcentagem' => [
-                'type' => Type::nonNull(GraphQL::type('NumberFilter')),
+                'type' => GraphQL::type('NumberFilter'),
             ],
             'incluir_servicos' => [
-                'type' => Type::nonNull(Type::boolean()),
+                'type' => Type::boolean(),
             ],
             'limitar_pedidos' => [
-                'type' => Type::nonNull(Type::boolean()),
+                'type' => Type::boolean(),
             ],
             'funcao_pedidos' => [
-                'type' => Type::nonNull(GraphQL::type('CupomFuncaoPedidosFilter')),
+                'type' => GraphQL::type('CupomFuncaoPedidosFilter'),
             ],
             'pedidos_limite' => [
-                'type' => Type::nonNull(GraphQL::type('NumberFilter')),
+                'type' => GraphQL::type('NumberFilter'),
             ],
             'limitar_valor' => [
-                'type' => Type::nonNull(Type::boolean()),
+                'type' => Type::boolean(),
             ],
             'funcao_valor' => [
-                'type' => Type::nonNull(GraphQL::type('CupomFuncaoValorFilter')),
+                'type' => GraphQL::type('CupomFuncaoValorFilter'),
             ],
             'valor_limite' => [
-                'type' => Type::nonNull(GraphQL::type('NumberFilter')),
+                'type' => GraphQL::type('NumberFilter'),
             ],
             'validade' => [
-                'type' => Type::nonNull(GraphQL::type('DateFilter')),
+                'type' => GraphQL::type('DateFilter'),
             ],
             'data_registro' => [
-                'type' => Type::nonNull(GraphQL::type('DateFilter')),
+                'type' => GraphQL::type('DateFilter'),
             ],
         ];
     }

@@ -37,12 +37,11 @@ class UpdateEnderecoMutation extends Mutation
 {
     protected $attributes = [
         'name' => 'UpdateEndereco',
-        'description' => 'Endereços de ruas e avenidas com informação de CEP',
     ];
 
     public function authorize(array $args): bool
     {
-        return Auth::user()->can('endereco:update');
+        return true; // Auth::user()->can('endereco:update');
     }
 
     public function type(): Type
@@ -57,7 +56,7 @@ class UpdateEnderecoMutation extends Mutation
                 'type' => Type::nonNull(Type::id()),
                 'description' => 'Identificador do endereço',
             ],
-            'input' => ['type' => GraphQL::type('EnderecoInput')],
+            'input' => ['type' => Type::nonNull(GraphQL::type('EnderecoInput'))],
         ];
     }
 

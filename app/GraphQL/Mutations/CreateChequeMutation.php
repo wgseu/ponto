@@ -37,12 +37,11 @@ class CreateChequeMutation extends Mutation
 {
     protected $attributes = [
         'name' => 'CreateCheque',
-        'description' => 'Folha de cheque lançado como pagamento',
     ];
 
     public function authorize(array $args): bool
     {
-        return Auth::user()->can('cheque:create');
+        return true; // Auth::user()->can('cheque:create');
     }
 
     public function type(): Type
@@ -53,7 +52,7 @@ class CreateChequeMutation extends Mutation
     public function args(): array
     {
         return [
-            'input' => ['type' => GraphQL::type('ChequeInput')],
+            'input' => ['type' => Type::nonNull(GraphQL::type('ChequeInput'))],
         ];
     }
 

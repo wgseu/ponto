@@ -37,12 +37,11 @@ class CreateCatalogoMutation extends Mutation
 {
     protected $attributes = [
         'name' => 'CreateCatalogo',
-        'description' => 'Informa a lista de produtos disponíveis nos fornecedores',
     ];
 
     public function authorize(array $args): bool
     {
-        return Auth::user()->can('catalogo:create');
+        return true; // Auth::user()->can('catalogo:create');
     }
 
     public function type(): Type
@@ -53,7 +52,7 @@ class CreateCatalogoMutation extends Mutation
     public function args(): array
     {
         return [
-            'input' => ['type' => GraphQL::type('CatalogoInput')],
+            'input' => ['type' => Type::nonNull(GraphQL::type('CatalogoInput'))],
         ];
     }
 

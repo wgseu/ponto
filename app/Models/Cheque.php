@@ -50,6 +50,24 @@ class Cheque extends Model
      *
      * @var array
      */
+    protected $fillable = [
+        'cliente_id',
+        'banco_id',
+        'agencia',
+        'conta',
+        'numero',
+        'valor',
+        'vencimento',
+        'cancelado',
+        'recolhimento',
+        'data_cadastro',
+    ];
+
+    /**
+     * The model's default values for attributes.
+     *
+     * @var array
+     */
     protected $attributes = [
         'cancelado' => cancelado,
     ];

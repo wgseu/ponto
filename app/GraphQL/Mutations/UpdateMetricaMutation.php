@@ -37,12 +37,11 @@ class UpdateMetricaMutation extends Mutation
 {
     protected $attributes = [
         'name' => 'UpdateMetrica',
-        'description' => 'Métricas de avaliação do atendimento e outros serviços do estabelecimento',
     ];
 
     public function authorize(array $args): bool
     {
-        return Auth::user()->can('metrica:update');
+        return true; // Auth::user()->can('metrica:update');
     }
 
     public function type(): Type
@@ -57,7 +56,7 @@ class UpdateMetricaMutation extends Mutation
                 'type' => Type::nonNull(Type::id()),
                 'description' => 'Identificador da métrica',
             ],
-            'input' => ['type' => GraphQL::type('MetricaInput')],
+            'input' => ['type' => Type::nonNull(GraphQL::type('MetricaInput'))],
         ];
     }
 

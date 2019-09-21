@@ -37,12 +37,11 @@ class UpdateSessaoMutation extends Mutation
 {
     protected $attributes = [
         'name' => 'UpdateSessao',
-        'description' => 'Sessão de trabalho do dia, permite que vários caixas sejam abertos utilizando uma mesma sessão',
     ];
 
     public function authorize(array $args): bool
     {
-        return Auth::user()->can('sessao:update');
+        return true; // Auth::user()->can('sessao:update');
     }
 
     public function type(): Type
@@ -57,7 +56,7 @@ class UpdateSessaoMutation extends Mutation
                 'type' => Type::nonNull(Type::id()),
                 'description' => 'Código da sessão',
             ],
-            'input' => ['type' => GraphQL::type('SessaoInput')],
+            'input' => ['type' => Type::nonNull(GraphQL::type('SessaoInput'))],
         ];
     }
 

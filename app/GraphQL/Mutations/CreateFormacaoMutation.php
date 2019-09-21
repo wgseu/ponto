@@ -37,12 +37,11 @@ class CreateFormacaoMutation extends Mutation
 {
     protected $attributes = [
         'name' => 'CreateFormacao',
-        'description' => 'Informa qual foi a formação que gerou esse produto, assim como quais item foram retirados/adicionados da composição',
     ];
 
     public function authorize(array $args): bool
     {
-        return Auth::user()->can('formacao:create');
+        return true; // Auth::user()->can('formacao:create');
     }
 
     public function type(): Type
@@ -53,7 +52,7 @@ class CreateFormacaoMutation extends Mutation
     public function args(): array
     {
         return [
-            'input' => ['type' => GraphQL::type('FormacaoInput')],
+            'input' => ['type' => Type::nonNull(GraphQL::type('FormacaoInput'))],
         ];
     }
 

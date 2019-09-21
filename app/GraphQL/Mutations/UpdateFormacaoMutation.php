@@ -37,12 +37,11 @@ class UpdateFormacaoMutation extends Mutation
 {
     protected $attributes = [
         'name' => 'UpdateFormacao',
-        'description' => 'Informa qual foi a formação que gerou esse produto, assim como quais item foram retirados/adicionados da composição',
     ];
 
     public function authorize(array $args): bool
     {
-        return Auth::user()->can('formacao:update');
+        return true; // Auth::user()->can('formacao:update');
     }
 
     public function type(): Type
@@ -57,7 +56,7 @@ class UpdateFormacaoMutation extends Mutation
                 'type' => Type::nonNull(Type::id()),
                 'description' => 'Identificador da formação',
             ],
-            'input' => ['type' => GraphQL::type('FormacaoInput')],
+            'input' => ['type' => Type::nonNull(GraphQL::type('FormacaoInput'))],
         ];
     }
 

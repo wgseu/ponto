@@ -37,12 +37,11 @@ class DeleteFornecedorMutation extends Mutation
 {
     protected $attributes = [
         'name' => 'DeleteFornecedor',
-        'description' => 'Fornecedores de produtos',
     ];
 
     public function authorize(array $args): bool
     {
-        return Auth::user()->can('fornecedor:delete');
+        return true; // Auth::user()->can('fornecedor:delete');
     }
 
     public function type(): Type
@@ -57,7 +56,6 @@ class DeleteFornecedorMutation extends Mutation
                 'type' => Type::nonNull(Type::id()),
                 'description' => 'Identificador do fornecedor',
             ],
-            'input' => ['type' => GraphQL::type('FornecedorInput')],
         ];
     }
 

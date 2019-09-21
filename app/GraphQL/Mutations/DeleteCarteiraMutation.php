@@ -37,12 +37,11 @@ class DeleteCarteiraMutation extends Mutation
 {
     protected $attributes = [
         'name' => 'DeleteCarteira',
-        'description' => 'Informa uma conta bancária ou uma carteira financeira',
     ];
 
     public function authorize(array $args): bool
     {
-        return Auth::user()->can('carteira:delete');
+        return true; // Auth::user()->can('carteira:delete');
     }
 
     public function type(): Type
@@ -57,7 +56,6 @@ class DeleteCarteiraMutation extends Mutation
                 'type' => Type::nonNull(Type::id()),
                 'description' => 'Código local da carteira',
             ],
-            'input' => ['type' => GraphQL::type('CarteiraInput')],
         ];
     }
 

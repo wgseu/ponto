@@ -37,12 +37,11 @@ class CreateItemMutation extends Mutation
 {
     protected $attributes = [
         'name' => 'CreateItem',
-        'description' => 'Produtos, taxas e serviços do pedido, a alteração do estado permite o controle de produção',
     ];
 
     public function authorize(array $args): bool
     {
-        return Auth::user()->can('item:create');
+        return true; // Auth::user()->can('item:create');
     }
 
     public function type(): Type
@@ -53,7 +52,7 @@ class CreateItemMutation extends Mutation
     public function args(): array
     {
         return [
-            'input' => ['type' => GraphQL::type('ItemInput')],
+            'input' => ['type' => Type::nonNull(GraphQL::type('ItemInput'))],
         ];
     }
 

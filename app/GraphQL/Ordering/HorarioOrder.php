@@ -42,10 +42,10 @@ class HorarioOrder extends InputType
     {
         return [
             'id' => [
-                'type' => Type::nonNull(GraphQL::type('OrderByEnum')),
+                'type' => GraphQL::type('OrderByEnum'),
             ],
             'modo' => [
-                'type' => Type::nonNull(GraphQL::type('OrderByEnum')),
+                'type' => GraphQL::type('OrderByEnum'),
             ],
             'funcao_id' => [
                 'type' => GraphQL::type('OrderByEnum'),
@@ -54,10 +54,10 @@ class HorarioOrder extends InputType
                 'type' => GraphQL::type('OrderByEnum'),
             ],
             'inicio' => [
-                'type' => Type::nonNull(GraphQL::type('OrderByEnum')),
+                'type' => GraphQL::type('OrderByEnum'),
             ],
             'fim' => [
-                'type' => Type::nonNull(GraphQL::type('OrderByEnum')),
+                'type' => GraphQL::type('OrderByEnum'),
             ],
             'mensagem' => [
                 'type' => GraphQL::type('OrderByEnum'),
@@ -66,10 +66,10 @@ class HorarioOrder extends InputType
                 'type' => GraphQL::type('OrderByEnum'),
             ],
             'entrega_maxima' => [
-                'type' => Type::nonNull(GraphQL::type('OrderByEnum')),
+                'type' => GraphQL::type('OrderByEnum'),
             ],
             'fechado' => [
-                'type' => Type::nonNull(GraphQL::type('OrderByEnum')),
+                'type' => GraphQL::type('OrderByEnum'),
             ],
         ];
     }

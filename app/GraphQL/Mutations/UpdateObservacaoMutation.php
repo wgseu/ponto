@@ -37,12 +37,11 @@ class UpdateObservacaoMutation extends Mutation
 {
     protected $attributes = [
         'name' => 'UpdateObservacao',
-        'description' => 'Observações e instruções de preparo de produto',
     ];
 
     public function authorize(array $args): bool
     {
-        return Auth::user()->can('observacao:update');
+        return true; // Auth::user()->can('observacao:update');
     }
 
     public function type(): Type
@@ -57,7 +56,7 @@ class UpdateObservacaoMutation extends Mutation
                 'type' => Type::nonNull(Type::id()),
                 'description' => 'Identificador da observação',
             ],
-            'input' => ['type' => GraphQL::type('ObservacaoInput')],
+            'input' => ['type' => Type::nonNull(GraphQL::type('ObservacaoInput'))],
         ];
     }
 

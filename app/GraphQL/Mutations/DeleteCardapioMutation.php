@@ -37,12 +37,11 @@ class DeleteCardapioMutation extends Mutation
 {
     protected $attributes = [
         'name' => 'DeleteCardapio',
-        'description' => 'Cardápios para cada integração ou local de venda',
     ];
 
     public function authorize(array $args): bool
     {
-        return Auth::user()->can('cardapio:delete');
+        return true; // Auth::user()->can('cardapio:delete');
     }
 
     public function type(): Type
@@ -57,7 +56,6 @@ class DeleteCardapioMutation extends Mutation
                 'type' => Type::nonNull(Type::id()),
                 'description' => 'Identificador do cardápio',
             ],
-            'input' => ['type' => GraphQL::type('CardapioInput')],
         ];
     }
 

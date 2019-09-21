@@ -35,7 +35,6 @@ class CategoriaFilter extends InputType
 {
     protected $attributes = [
         'name' => 'CategoriaFilter',
-        'description' => 'Informa qual a categoria dos produtos e permite a rápida localização dos mesmos',
     ];
 
     public function fields(): array
@@ -48,7 +47,7 @@ class CategoriaFilter extends InputType
                 'type' => Type::int(),
             ],
             'descricao' => [
-                'type' => Type::nonNull(GraphQL::type('StringFilter')),
+                'type' => GraphQL::type('StringFilter'),
             ],
             'detalhes' => [
                 'type' => GraphQL::type('StringFilter'),
@@ -57,10 +56,10 @@ class CategoriaFilter extends InputType
                 'type' => GraphQL::type('StringFilter'),
             ],
             'ordem' => [
-                'type' => Type::nonNull(GraphQL::type('NumberFilter')),
+                'type' => GraphQL::type('NumberFilter'),
             ],
             'data_atualizacao' => [
-                'type' => Type::nonNull(GraphQL::type('DateFilter')),
+                'type' => GraphQL::type('DateFilter'),
             ],
             'data_arquivado' => [
                 'type' => GraphQL::type('DateFilter'),

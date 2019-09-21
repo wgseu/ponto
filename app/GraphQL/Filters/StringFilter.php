@@ -2,29 +2,30 @@
 
 declare(strict_types=1);
 
-namespace App\GraphQL\Inputs;
+namespace App\GraphQL\Filters;
 
 use GraphQL\Type\Definition\Type;
-use Rebing\GraphQL\Support\Facades\GraphQL;
 use Rebing\GraphQL\Support\InputType;
 
-class DateInput extends InputType
+class StringFilter extends InputType
 {
     protected $attributes = [
-        'name' => 'DateInput',
+        'name' => 'StringFilter',
     ];
 
     public function fields(): array
     {
         return [
-            'before' => [
+            'eq' => [
                 'type' => Type::string(),
             ],
-            'after' => [
+            'startsWith' => [
                 'type' => Type::string(),
+                'description' => 'Text start with give input',
             ],
-            'between' => [
-                'type' => GraphQL::type('DateRangeInput'),
+            'contains' => [
+                'type' => Type::string(),
+                'description' => 'Text contains give input',
             ],
         ];
     }

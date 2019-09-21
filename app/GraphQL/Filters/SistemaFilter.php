@@ -35,7 +35,6 @@ class SistemaFilter extends InputType
 {
     protected $attributes = [
         'name' => 'SistemaFilter',
-        'description' => 'Classe que informa detalhes da empresa, parceiro e opções do sistema como a versão do banco de dados e a licença de uso',
     ];
 
     public function fields(): array

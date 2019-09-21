@@ -35,7 +35,6 @@ class MoedaFilter extends InputType
 {
     protected $attributes = [
         'name' => 'MoedaFilter',
-        'description' => 'Moedas financeiras de um país',
     ];
 
     public function fields(): array
@@ -45,22 +44,22 @@ class MoedaFilter extends InputType
                 'type' => Type::id(),
             ],
             'nome' => [
-                'type' => Type::nonNull(GraphQL::type('StringFilter')),
+                'type' => GraphQL::type('StringFilter'),
             ],
             'simbolo' => [
-                'type' => Type::nonNull(GraphQL::type('StringFilter')),
+                'type' => GraphQL::type('StringFilter'),
             ],
             'codigo' => [
-                'type' => Type::nonNull(GraphQL::type('StringFilter')),
+                'type' => GraphQL::type('StringFilter'),
             ],
             'divisao' => [
-                'type' => Type::nonNull(GraphQL::type('NumberFilter')),
+                'type' => GraphQL::type('NumberFilter'),
             ],
             'fracao' => [
                 'type' => GraphQL::type('StringFilter'),
             ],
             'formato' => [
-                'type' => Type::nonNull(GraphQL::type('StringFilter')),
+                'type' => GraphQL::type('StringFilter'),
             ],
             'conversao' => [
                 'type' => GraphQL::type('NumberFilter'),
@@ -69,7 +68,7 @@ class MoedaFilter extends InputType
                 'type' => GraphQL::type('DateFilter'),
             ],
             'ativa' => [
-                'type' => Type::nonNull(Type::boolean()),
+                'type' => Type::boolean(),
             ],
         ];
     }

@@ -50,6 +50,17 @@ class Modulo extends Model
      *
      * @var array
      */
+    protected $fillable = [
+        'nome',
+        'descricao',
+        'habilitado',
+    ];
+
+    /**
+     * The model's default values for attributes.
+     *
+     * @var array
+     */
     protected $attributes = [
         'habilitado' => true,
     ];

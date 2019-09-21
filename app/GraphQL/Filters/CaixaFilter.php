@@ -35,7 +35,6 @@ class CaixaFilter extends InputType
 {
     protected $attributes = [
         'name' => 'CaixaFilter',
-        'description' => 'Caixas de movimentação financeira',
     ];
 
     public function fields(): array
@@ -45,19 +44,19 @@ class CaixaFilter extends InputType
                 'type' => Type::id(),
             ],
             'carteira_id' => [
-                'type' => Type::nonNull(Type::int()),
+                'type' => Type::int(),
             ],
             'descricao' => [
-                'type' => Type::nonNull(GraphQL::type('StringFilter')),
+                'type' => GraphQL::type('StringFilter'),
             ],
             'serie' => [
-                'type' => Type::nonNull(GraphQL::type('NumberFilter')),
+                'type' => GraphQL::type('NumberFilter'),
             ],
             'numero_inicial' => [
-                'type' => Type::nonNull(GraphQL::type('NumberFilter')),
+                'type' => GraphQL::type('NumberFilter'),
             ],
             'ativa' => [
-                'type' => Type::nonNull(Type::boolean()),
+                'type' => Type::boolean(),
             ],
             'data_desativada' => [
                 'type' => GraphQL::type('DateFilter'),

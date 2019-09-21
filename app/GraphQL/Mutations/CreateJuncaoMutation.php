@@ -37,12 +37,11 @@ class CreateJuncaoMutation extends Mutation
 {
     protected $attributes = [
         'name' => 'CreateJuncao',
-        'description' => 'Junções de mesas, informa quais mesas estão juntas ao pedido',
     ];
 
     public function authorize(array $args): bool
     {
-        return Auth::user()->can('juncao:create');
+        return true; // Auth::user()->can('juncao:create');
     }
 
     public function type(): Type
@@ -53,7 +52,7 @@ class CreateJuncaoMutation extends Mutation
     public function args(): array
     {
         return [
-            'input' => ['type' => GraphQL::type('JuncaoInput')],
+            'input' => ['type' => Type::nonNull(GraphQL::type('JuncaoInput'))],
         ];
     }
 

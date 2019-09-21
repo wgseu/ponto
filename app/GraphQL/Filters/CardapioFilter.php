@@ -35,7 +35,6 @@ class CardapioFilter extends InputType
 {
     protected $attributes = [
         'name' => 'CardapioFilter',
-        'description' => 'Cardápios para cada integração ou local de venda',
     ];
 
     public function fields(): array
@@ -45,7 +44,7 @@ class CardapioFilter extends InputType
                 'type' => Type::id(),
             ],
             'produto_id' => [
-                'type' => Type::nonNull(Type::int()),
+                'type' => Type::int(),
             ],
             'integracao_id' => [
                 'type' => Type::int(),
@@ -54,10 +53,10 @@ class CardapioFilter extends InputType
                 'type' => GraphQL::type('CardapioLocalFilter'),
             ],
             'acrescimo' => [
-                'type' => Type::nonNull(GraphQL::type('NumberFilter')),
+                'type' => GraphQL::type('NumberFilter'),
             ],
             'disponivel' => [
-                'type' => Type::nonNull(Type::boolean()),
+                'type' => Type::boolean(),
             ],
         ];
     }

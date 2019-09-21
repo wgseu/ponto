@@ -35,7 +35,6 @@ class ObservacaoFilter extends InputType
 {
     protected $attributes = [
         'name' => 'ObservacaoFilter',
-        'description' => 'Observações e instruções de preparo de produto',
     ];
 
     public function fields(): array
@@ -45,13 +44,13 @@ class ObservacaoFilter extends InputType
                 'type' => Type::id(),
             ],
             'produto_id' => [
-                'type' => Type::nonNull(Type::int()),
+                'type' => Type::int(),
             ],
             'grupo' => [
-                'type' => Type::nonNull(GraphQL::type('NumberFilter')),
+                'type' => GraphQL::type('NumberFilter'),
             ],
             'descricao' => [
-                'type' => Type::nonNull(GraphQL::type('StringFilter')),
+                'type' => GraphQL::type('StringFilter'),
             ],
         ];
     }

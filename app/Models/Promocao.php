@@ -76,6 +76,40 @@ class Promocao extends Model
      *
      * @var array
      */
+    protected $fillable = [
+        'promocao_id',
+        'categoria_id',
+        'produto_id',
+        'servico_id',
+        'bairro_id',
+        'zona_id',
+        'integracao_id',
+        'local',
+        'inicio',
+        'fim',
+        'valor',
+        'pontos',
+        'parcial',
+        'proibir',
+        'evento',
+        'agendamento',
+        'limitar_vendas',
+        'funcao_vendas',
+        'vendas_limite',
+        'limitar_cliente',
+        'funcao_cliente',
+        'cliente_limite',
+        'ativa',
+        'chamada',
+        'banner_url',
+        'data_arquivado',
+    ];
+
+    /**
+     * The model's default values for attributes.
+     *
+     * @var array
+     */
     protected $attributes = [
         'pontos' => 0,
         'parcial' => false,

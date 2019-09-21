@@ -37,12 +37,11 @@ class DeleteUnidadeMutation extends Mutation
 {
     protected $attributes = [
         'name' => 'DeleteUnidade',
-        'description' => 'Unidades de medidas aplicadas aos produtos',
     ];
 
     public function authorize(array $args): bool
     {
-        return Auth::user()->can('unidade:delete');
+        return true; // Auth::user()->can('unidade:delete');
     }
 
     public function type(): Type
@@ -57,7 +56,6 @@ class DeleteUnidadeMutation extends Mutation
                 'type' => Type::nonNull(Type::id()),
                 'description' => 'Identificador da unidade',
             ],
-            'input' => ['type' => GraphQL::type('UnidadeInput')],
         ];
     }
 

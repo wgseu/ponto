@@ -35,7 +35,6 @@ class PagamentoFilter extends InputType
 {
     protected $attributes = [
         'name' => 'PagamentoFilter',
-        'description' => 'Pagamentos de contas e pedidos',
     ];
 
     public function fields(): array
@@ -45,10 +44,10 @@ class PagamentoFilter extends InputType
                 'type' => Type::id(),
             ],
             'carteira_id' => [
-                'type' => Type::nonNull(Type::int()),
+                'type' => Type::int(),
             ],
             'moeda_id' => [
-                'type' => Type::nonNull(Type::int()),
+                'type' => Type::int(),
             ],
             'pagamento_id' => [
                 'type' => Type::int(),
@@ -84,16 +83,16 @@ class PagamentoFilter extends InputType
                 'type' => Type::int(),
             ],
             'valor' => [
-                'type' => Type::nonNull(GraphQL::type('NumberFilter')),
+                'type' => GraphQL::type('NumberFilter'),
             ],
             'numero_parcela' => [
-                'type' => Type::nonNull(GraphQL::type('NumberFilter')),
+                'type' => GraphQL::type('NumberFilter'),
             ],
             'parcelas' => [
-                'type' => Type::nonNull(GraphQL::type('NumberFilter')),
+                'type' => GraphQL::type('NumberFilter'),
             ],
             'lancado' => [
-                'type' => Type::nonNull(GraphQL::type('NumberFilter')),
+                'type' => GraphQL::type('NumberFilter'),
             ],
             'codigo' => [
                 'type' => GraphQL::type('StringFilter'),
@@ -102,7 +101,7 @@ class PagamentoFilter extends InputType
                 'type' => GraphQL::type('StringFilter'),
             ],
             'estado' => [
-                'type' => Type::nonNull(GraphQL::type('PagamentoEstadoFilter')),
+                'type' => GraphQL::type('PagamentoEstadoFilter'),
             ],
             'data_pagamento' => [
                 'type' => GraphQL::type('DateFilter'),
@@ -111,7 +110,7 @@ class PagamentoFilter extends InputType
                 'type' => GraphQL::type('DateFilter'),
             ],
             'data_lancamento' => [
-                'type' => Type::nonNull(GraphQL::type('DateFilter')),
+                'type' => GraphQL::type('DateFilter'),
             ],
         ];
     }

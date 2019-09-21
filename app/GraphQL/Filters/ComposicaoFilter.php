@@ -35,7 +35,6 @@ class ComposicaoFilter extends InputType
 {
     protected $attributes = [
         'name' => 'ComposicaoFilter',
-        'description' => 'Informa as propriedades da composição de um produto composto',
     ];
 
     public function fields(): array
@@ -45,25 +44,25 @@ class ComposicaoFilter extends InputType
                 'type' => Type::id(),
             ],
             'composicao_id' => [
-                'type' => Type::nonNull(Type::int()),
+                'type' => Type::int(),
             ],
             'produto_id' => [
-                'type' => Type::nonNull(Type::int()),
+                'type' => Type::int(),
             ],
             'tipo' => [
-                'type' => Type::nonNull(GraphQL::type('ComposicaoTipoFilter')),
+                'type' => GraphQL::type('ComposicaoTipoFilter'),
             ],
             'quantidade' => [
-                'type' => Type::nonNull(GraphQL::type('NumberFilter')),
+                'type' => GraphQL::type('NumberFilter'),
             ],
             'valor' => [
-                'type' => Type::nonNull(GraphQL::type('NumberFilter')),
+                'type' => GraphQL::type('NumberFilter'),
             ],
             'quantidade_maxima' => [
-                'type' => Type::nonNull(GraphQL::type('NumberFilter')),
+                'type' => GraphQL::type('NumberFilter'),
             ],
             'ativa' => [
-                'type' => Type::nonNull(Type::boolean()),
+                'type' => Type::boolean(),
             ],
             'data_remocao' => [
                 'type' => GraphQL::type('DateFilter'),

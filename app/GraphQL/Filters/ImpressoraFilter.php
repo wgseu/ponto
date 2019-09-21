@@ -35,7 +35,6 @@ class ImpressoraFilter extends InputType
 {
     protected $attributes = [
         'name' => 'ImpressoraFilter',
-        'description' => 'Impressora para impressão de serviços e contas',
     ];
 
     public function fields(): array
@@ -45,28 +44,28 @@ class ImpressoraFilter extends InputType
                 'type' => Type::id(),
             ],
             'dispositivo_id' => [
-                'type' => Type::nonNull(Type::int()),
+                'type' => Type::int(),
             ],
             'setor_id' => [
-                'type' => Type::nonNull(Type::int()),
+                'type' => Type::int(),
             ],
             'nome' => [
-                'type' => Type::nonNull(GraphQL::type('StringFilter')),
+                'type' => GraphQL::type('StringFilter'),
             ],
             'modelo' => [
-                'type' => Type::nonNull(GraphQL::type('StringFilter')),
+                'type' => GraphQL::type('StringFilter'),
             ],
             'modo' => [
-                'type' => Type::nonNull(GraphQL::type('ImpressoraModoFilter')),
+                'type' => GraphQL::type('ImpressoraModoFilter'),
             ],
             'opcoes' => [
                 'type' => GraphQL::type('StringFilter'),
             ],
             'colunas' => [
-                'type' => Type::nonNull(GraphQL::type('NumberFilter')),
+                'type' => GraphQL::type('NumberFilter'),
             ],
             'avanco' => [
-                'type' => Type::nonNull(GraphQL::type('NumberFilter')),
+                'type' => GraphQL::type('NumberFilter'),
             ],
         ];
     }

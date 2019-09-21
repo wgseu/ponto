@@ -50,6 +50,21 @@ class Zona extends Model
      *
      * @var array
      */
+    protected $fillable = [
+        'bairro_id',
+        'nome',
+        'adicional_entrega',
+        'disponivel',
+        'area',
+        'entrega_minima',
+        'entrega_maxima',
+    ];
+
+    /**
+     * The model's default values for attributes.
+     *
+     * @var array
+     */
     protected $attributes = [
         'disponivel' => true,
     ];

@@ -37,12 +37,11 @@ class UpdateAssociacaoMutation extends Mutation
 {
     protected $attributes = [
         'name' => 'UpdateAssociacao',
-        'description' => 'Lista de pedidos que não foram integrados ainda e devem ser associados ao sistema',
     ];
 
     public function authorize(array $args): bool
     {
-        return Auth::user()->can('associacao:update');
+        return true; // Auth::user()->can('associacao:update');
     }
 
     public function type(): Type
@@ -57,7 +56,7 @@ class UpdateAssociacaoMutation extends Mutation
                 'type' => Type::nonNull(Type::id()),
                 'description' => 'Identificador da associação no banco de dados',
             ],
-            'input' => ['type' => GraphQL::type('AssociacaoInput')],
+            'input' => ['type' => Type::nonNull(GraphQL::type('AssociacaoInput'))],
         ];
     }
 

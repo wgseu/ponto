@@ -37,12 +37,11 @@ class UpdateEmitenteMutation extends Mutation
 {
     protected $attributes = [
         'name' => 'UpdateEmitente',
-        'description' => 'Dados do emitente das notas fiscais',
     ];
 
     public function authorize(array $args): bool
     {
-        return Auth::user()->can('emitente:update');
+        return true; // Auth::user()->can('emitente:update');
     }
 
     public function type(): Type
@@ -57,7 +56,7 @@ class UpdateEmitenteMutation extends Mutation
                 'type' => Type::nonNull(Type::id()),
                 'description' => 'Identificador do emitente, sempre 1',
             ],
-            'input' => ['type' => GraphQL::type('EmitenteInput')],
+            'input' => ['type' => Type::nonNull(GraphQL::type('EmitenteInput'))],
         ];
     }
 

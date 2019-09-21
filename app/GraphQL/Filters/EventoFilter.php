@@ -35,7 +35,6 @@ class EventoFilter extends InputType
 {
     protected $attributes = [
         'name' => 'EventoFilter',
-        'description' => 'Eventos de envio das notas',
     ];
 
     public function fields(): array
@@ -45,19 +44,19 @@ class EventoFilter extends InputType
                 'type' => Type::id(),
             ],
             'nota_id' => [
-                'type' => Type::nonNull(Type::int()),
+                'type' => Type::int(),
             ],
             'estado' => [
-                'type' => Type::nonNull(GraphQL::type('EventoEstadoFilter')),
+                'type' => GraphQL::type('EventoEstadoFilter'),
             ],
             'mensagem' => [
-                'type' => Type::nonNull(GraphQL::type('StringFilter')),
+                'type' => GraphQL::type('StringFilter'),
             ],
             'codigo' => [
-                'type' => Type::nonNull(GraphQL::type('StringFilter')),
+                'type' => GraphQL::type('StringFilter'),
             ],
             'data_criacao' => [
-                'type' => Type::nonNull(GraphQL::type('DateFilter')),
+                'type' => GraphQL::type('DateFilter'),
             ],
         ];
     }

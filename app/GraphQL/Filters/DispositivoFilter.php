@@ -35,7 +35,6 @@ class DispositivoFilter extends InputType
 {
     protected $attributes = [
         'name' => 'DispositivoFilter',
-        'description' => 'Computadores e tablets com opções de acesso',
     ];
 
     public function fields(): array
@@ -51,10 +50,10 @@ class DispositivoFilter extends InputType
                 'type' => Type::int(),
             ],
             'nome' => [
-                'type' => Type::nonNull(GraphQL::type('StringFilter')),
+                'type' => GraphQL::type('StringFilter'),
             ],
             'tipo' => [
-                'type' => Type::nonNull(GraphQL::type('DispositivoTipoFilter')),
+                'type' => GraphQL::type('DispositivoTipoFilter'),
             ],
             'descricao' => [
                 'type' => GraphQL::type('StringFilter'),
@@ -63,7 +62,7 @@ class DispositivoFilter extends InputType
                 'type' => GraphQL::type('StringFilter'),
             ],
             'serial' => [
-                'type' => Type::nonNull(GraphQL::type('StringFilter')),
+                'type' => GraphQL::type('StringFilter'),
             ],
             'validacao' => [
                 'type' => GraphQL::type('StringFilter'),

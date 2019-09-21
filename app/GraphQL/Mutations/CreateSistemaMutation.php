@@ -37,12 +37,11 @@ class CreateSistemaMutation extends Mutation
 {
     protected $attributes = [
         'name' => 'CreateSistema',
-        'description' => 'Classe que informa detalhes da empresa, parceiro e opções do sistema como a versão do banco de dados e a licença de uso',
     ];
 
     public function authorize(array $args): bool
     {
-        return Auth::user()->can('sistema:create');
+        return true; // Auth::user()->can('sistema:create');
     }
 
     public function type(): Type
@@ -53,7 +52,7 @@ class CreateSistemaMutation extends Mutation
     public function args(): array
     {
         return [
-            'input' => ['type' => GraphQL::type('SistemaInput')],
+            'input' => ['type' => Type::nonNull(GraphQL::type('SistemaInput'))],
         ];
     }
 

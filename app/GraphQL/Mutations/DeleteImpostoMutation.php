@@ -37,12 +37,11 @@ class DeleteImpostoMutation extends Mutation
 {
     protected $attributes = [
         'name' => 'DeleteImposto',
-        'description' => 'Impostos disponíveis para informar no produto',
     ];
 
     public function authorize(array $args): bool
     {
-        return Auth::user()->can('imposto:delete');
+        return true; // Auth::user()->can('imposto:delete');
     }
 
     public function type(): Type
@@ -57,7 +56,6 @@ class DeleteImpostoMutation extends Mutation
                 'type' => Type::nonNull(Type::id()),
                 'description' => 'Identificador do imposto',
             ],
-            'input' => ['type' => GraphQL::type('ImpostoInput')],
         ];
     }
 

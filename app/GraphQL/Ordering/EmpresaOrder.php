@@ -42,7 +42,7 @@ class EmpresaOrder extends InputType
     {
         return [
             'id' => [
-                'type' => Type::nonNull(GraphQL::type('OrderByEnum')),
+                'type' => GraphQL::type('OrderByEnum'),
             ],
             'pais_id' => [
                 'type' => GraphQL::type('OrderByEnum'),

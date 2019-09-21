@@ -37,12 +37,11 @@ class CreateContagemMutation extends Mutation
 {
     protected $attributes = [
         'name' => 'CreateContagem',
-        'description' => 'Guarda a soma do estoque de cada produto por setor',
     ];
 
     public function authorize(array $args): bool
     {
-        return Auth::user()->can('contagem:create');
+        return true; // Auth::user()->can('contagem:create');
     }
 
     public function type(): Type
@@ -53,7 +52,7 @@ class CreateContagemMutation extends Mutation
     public function args(): array
     {
         return [
-            'input' => ['type' => GraphQL::type('ContagemInput')],
+            'input' => ['type' => Type::nonNull(GraphQL::type('ContagemInput'))],
         ];
     }
 

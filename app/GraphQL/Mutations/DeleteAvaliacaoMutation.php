@@ -37,12 +37,11 @@ class DeleteAvaliacaoMutation extends Mutation
 {
     protected $attributes = [
         'name' => 'DeleteAvaliacao',
-        'description' => 'Avaliação de atendimento e outros serviços do estabelecimento',
     ];
 
     public function authorize(array $args): bool
     {
-        return Auth::user()->can('avaliacao:delete');
+        return true; // Auth::user()->can('avaliacao:delete');
     }
 
     public function type(): Type
@@ -57,7 +56,6 @@ class DeleteAvaliacaoMutation extends Mutation
                 'type' => Type::nonNull(Type::id()),
                 'description' => 'Identificador da avaliação',
             ],
-            'input' => ['type' => GraphQL::type('AvaliacaoInput')],
         ];
     }
 

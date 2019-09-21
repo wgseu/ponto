@@ -37,12 +37,11 @@ class UpdateFuncionalidadeMutation extends Mutation
 {
     protected $attributes = [
         'name' => 'UpdateFuncionalidade',
-        'description' => 'Grupo de funcionalidades do sistema',
     ];
 
     public function authorize(array $args): bool
     {
-        return Auth::user()->can('funcionalidade:update');
+        return true; // Auth::user()->can('funcionalidade:update');
     }
 
     public function type(): Type
@@ -57,7 +56,7 @@ class UpdateFuncionalidadeMutation extends Mutation
                 'type' => Type::nonNull(Type::id()),
                 'description' => 'Identificador da funcionalidade',
             ],
-            'input' => ['type' => GraphQL::type('FuncionalidadeInput')],
+            'input' => ['type' => Type::nonNull(GraphQL::type('FuncionalidadeInput'))],
         ];
     }
 

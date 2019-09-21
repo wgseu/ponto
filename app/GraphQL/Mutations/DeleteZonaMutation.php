@@ -37,12 +37,11 @@ class DeleteZonaMutation extends Mutation
 {
     protected $attributes = [
         'name' => 'DeleteZona',
-        'description' => 'Zonas de um bairro',
     ];
 
     public function authorize(array $args): bool
     {
-        return Auth::user()->can('zona:delete');
+        return true; // Auth::user()->can('zona:delete');
     }
 
     public function type(): Type
@@ -57,7 +56,6 @@ class DeleteZonaMutation extends Mutation
                 'type' => Type::nonNull(Type::id()),
                 'description' => 'Identificador da zona',
             ],
-            'input' => ['type' => GraphQL::type('ZonaInput')],
         ];
     }
 

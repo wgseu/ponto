@@ -35,7 +35,6 @@ class ServicoFilter extends InputType
 {
     protected $attributes = [
         'name' => 'ServicoFilter',
-        'description' => 'Taxas, eventos e serviço cobrado nos pedidos',
     ];
 
     public function fields(): array
@@ -45,19 +44,19 @@ class ServicoFilter extends InputType
                 'type' => Type::id(),
             ],
             'nome' => [
-                'type' => Type::nonNull(GraphQL::type('StringFilter')),
+                'type' => GraphQL::type('StringFilter'),
             ],
             'descricao' => [
-                'type' => Type::nonNull(GraphQL::type('StringFilter')),
+                'type' => GraphQL::type('StringFilter'),
             ],
             'detalhes' => [
                 'type' => GraphQL::type('StringFilter'),
             ],
             'tipo' => [
-                'type' => Type::nonNull(GraphQL::type('ServicoTipoFilter')),
+                'type' => GraphQL::type('ServicoTipoFilter'),
             ],
             'obrigatorio' => [
-                'type' => Type::nonNull(Type::boolean()),
+                'type' => Type::boolean(),
             ],
             'data_inicio' => [
                 'type' => GraphQL::type('DateFilter'),
@@ -69,16 +68,16 @@ class ServicoFilter extends InputType
                 'type' => GraphQL::type('NumberFilter'),
             ],
             'valor' => [
-                'type' => Type::nonNull(GraphQL::type('NumberFilter')),
+                'type' => GraphQL::type('NumberFilter'),
             ],
             'individual' => [
-                'type' => Type::nonNull(Type::boolean()),
+                'type' => Type::boolean(),
             ],
             'imagem_url' => [
                 'type' => GraphQL::type('StringFilter'),
             ],
             'ativo' => [
-                'type' => Type::nonNull(Type::boolean()),
+                'type' => Type::boolean(),
             ],
         ];
     }

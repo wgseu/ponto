@@ -37,12 +37,11 @@ class CreateServicoMutation extends Mutation
 {
     protected $attributes = [
         'name' => 'CreateServico',
-        'description' => 'Taxas, eventos e serviço cobrado nos pedidos',
     ];
 
     public function authorize(array $args): bool
     {
-        return Auth::user()->can('servico:create');
+        return true; // Auth::user()->can('servico:create');
     }
 
     public function type(): Type
@@ -53,7 +52,7 @@ class CreateServicoMutation extends Mutation
     public function args(): array
     {
         return [
-            'input' => ['type' => GraphQL::type('ServicoInput')],
+            'input' => ['type' => Type::nonNull(GraphQL::type('ServicoInput'))],
         ];
     }
 

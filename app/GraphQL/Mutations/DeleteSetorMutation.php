@@ -37,12 +37,11 @@ class DeleteSetorMutation extends Mutation
 {
     protected $attributes = [
         'name' => 'DeleteSetor',
-        'description' => 'Setor de impressão e de estoque',
     ];
 
     public function authorize(array $args): bool
     {
-        return Auth::user()->can('setor:delete');
+        return true; // Auth::user()->can('setor:delete');
     }
 
     public function type(): Type
@@ -57,7 +56,6 @@ class DeleteSetorMutation extends Mutation
                 'type' => Type::nonNull(Type::id()),
                 'description' => 'Identificador do setor',
             ],
-            'input' => ['type' => GraphQL::type('SetorInput')],
         ];
     }
 

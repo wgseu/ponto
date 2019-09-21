@@ -37,12 +37,11 @@ class CreateAcessoMutation extends Mutation
 {
     protected $attributes = [
         'name' => 'CreateAcesso',
-        'description' => 'Permite acesso à uma determinada funcionalidade da lista de permissões',
     ];
 
     public function authorize(array $args): bool
     {
-        return Auth::user()->can('acesso:create');
+        return true; // Auth::user()->can('acesso:create');
     }
 
     public function type(): Type
@@ -53,7 +52,7 @@ class CreateAcessoMutation extends Mutation
     public function args(): array
     {
         return [
-            'input' => ['type' => GraphQL::type('AcessoInput')],
+            'input' => ['type' => Type::nonNull(GraphQL::type('AcessoInput'))],
         ];
     }
 

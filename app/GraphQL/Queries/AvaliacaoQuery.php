@@ -42,12 +42,11 @@ class AvaliacaoQuery extends Query
 {
     protected $attributes = [
         'name' => 'avaliacoes',
-        'description' => 'Avaliação de atendimento e outros serviços do estabelecimento',
     ];
 
     public function authorize(array $args): bool
     {
-        return Auth::user()->can('avaliacao:view');
+        return true; // Auth::user()->can('avaliacao:view');
     }
 
     public function type(): Type
@@ -60,6 +59,8 @@ class AvaliacaoQuery extends Query
         return [
             'filter' => ['name' => 'filter', 'type' => GraphQL::type('AvaliacaoFilter')],
             'order' => ['name' => 'order', 'type' => GraphQL::type('AvaliacaoOrder')],
+            'limit' => ['name' => 'limit', 'type' => Type::int(), 'rules' => ['min:1', 'max:100']],
+            'page' => ['name' => 'page', 'type' => Type::int(), 'rules' => ['min:1']],
         ];
     }
 
@@ -69,7 +70,8 @@ class AvaliacaoQuery extends Query
         $fields = $getSelectFields();
         $query = Avaliacao::with($fields->getRelations())
             ->select($fields->getSelect())
-            ->where(Filter::map($args['filter']));
-        return Ordering::apply($args['order'], $query)->paginate($args['limit'], ['*'], 'page', $args['page']);
+            ->where(Filter::map($args['filter'] ?? []));
+        return Ordering::apply($args['order'] ?? [], $query)
+            ->paginate($args['limit'] ?? 10, ['*'], 'page', $args['page'] ?? 1);
     }
 }

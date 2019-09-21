@@ -37,12 +37,11 @@ class UpdateCatalogoMutation extends Mutation
 {
     protected $attributes = [
         'name' => 'UpdateCatalogo',
-        'description' => 'Informa a lista de produtos disponíveis nos fornecedores',
     ];
 
     public function authorize(array $args): bool
     {
-        return Auth::user()->can('catalogo:update');
+        return true; // Auth::user()->can('catalogo:update');
     }
 
     public function type(): Type
@@ -57,7 +56,7 @@ class UpdateCatalogoMutation extends Mutation
                 'type' => Type::nonNull(Type::id()),
                 'description' => 'Identificador do catálogo',
             ],
-            'input' => ['type' => GraphQL::type('CatalogoInput')],
+            'input' => ['type' => Type::nonNull(GraphQL::type('CatalogoInput'))],
         ];
     }
 

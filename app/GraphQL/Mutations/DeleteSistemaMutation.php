@@ -37,12 +37,11 @@ class DeleteSistemaMutation extends Mutation
 {
     protected $attributes = [
         'name' => 'DeleteSistema',
-        'description' => 'Classe que informa detalhes da empresa, parceiro e opções do sistema como a versão do banco de dados e a licença de uso',
     ];
 
     public function authorize(array $args): bool
     {
-        return Auth::user()->can('sistema:delete');
+        return true; // Auth::user()->can('sistema:delete');
     }
 
     public function type(): Type
@@ -57,7 +56,6 @@ class DeleteSistemaMutation extends Mutation
                 'type' => Type::nonNull(Type::id()),
                 'description' => 'Identificador único do sistema, valor 1',
             ],
-            'input' => ['type' => GraphQL::type('SistemaInput')],
         ];
     }
 

@@ -37,12 +37,11 @@ class UpdateCardapioMutation extends Mutation
 {
     protected $attributes = [
         'name' => 'UpdateCardapio',
-        'description' => 'Cardápios para cada integração ou local de venda',
     ];
 
     public function authorize(array $args): bool
     {
-        return Auth::user()->can('cardapio:update');
+        return true; // Auth::user()->can('cardapio:update');
     }
 
     public function type(): Type
@@ -57,7 +56,7 @@ class UpdateCardapioMutation extends Mutation
                 'type' => Type::nonNull(Type::id()),
                 'description' => 'Identificador do cardápio',
             ],
-            'input' => ['type' => GraphQL::type('CardapioInput')],
+            'input' => ['type' => Type::nonNull(GraphQL::type('CardapioInput'))],
         ];
     }
 

@@ -37,12 +37,11 @@ class DeletePagamentoMutation extends Mutation
 {
     protected $attributes = [
         'name' => 'DeletePagamento',
-        'description' => 'Pagamentos de contas e pedidos',
     ];
 
     public function authorize(array $args): bool
     {
-        return Auth::user()->can('pagamento:delete');
+        return true; // Auth::user()->can('pagamento:delete');
     }
 
     public function type(): Type
@@ -57,7 +56,6 @@ class DeletePagamentoMutation extends Mutation
                 'type' => Type::nonNull(Type::id()),
                 'description' => 'Identificador do pagamento',
             ],
-            'input' => ['type' => GraphQL::type('PagamentoInput')],
         ];
     }
 

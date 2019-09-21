@@ -37,12 +37,11 @@ class CreateUnidadeMutation extends Mutation
 {
     protected $attributes = [
         'name' => 'CreateUnidade',
-        'description' => 'Unidades de medidas aplicadas aos produtos',
     ];
 
     public function authorize(array $args): bool
     {
-        return Auth::user()->can('unidade:create');
+        return true; // Auth::user()->can('unidade:create');
     }
 
     public function type(): Type
@@ -53,7 +52,7 @@ class CreateUnidadeMutation extends Mutation
     public function args(): array
     {
         return [
-            'input' => ['type' => GraphQL::type('UnidadeInput')],
+            'input' => ['type' => Type::nonNull(GraphQL::type('UnidadeInput'))],
         ];
     }
 

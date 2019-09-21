@@ -57,6 +57,28 @@ class Patrimonio extends Model
      *
      * @var array
      */
+    protected $fillable = [
+        'empresa_id',
+        'fornecedor_id',
+        'numero',
+        'descricao',
+        'quantidade',
+        'altura',
+        'largura',
+        'comprimento',
+        'estado',
+        'custo',
+        'valor',
+        'ativo',
+        'imagem_url',
+        'data_atualizacao',
+    ];
+
+    /**
+     * The model's default values for attributes.
+     *
+     * @var array
+     */
     protected $attributes = [
         'altura' => 0,
         'largura' => 0,

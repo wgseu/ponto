@@ -46,6 +46,19 @@ class Tributacao extends Model
     public $timestamps = false;
 
     /**
+     * The model's default values for attributes.
+     *
+     * @var array
+     */
+    protected $fillable = [
+        'ncm',
+        'cest',
+        'origem_id',
+        'operacao_id',
+        'imposto_id',
+    ];
+
+    /**
      * Origem do produto
      */
     public function origem()

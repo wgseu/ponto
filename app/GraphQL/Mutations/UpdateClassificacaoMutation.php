@@ -37,12 +37,11 @@ class UpdateClassificacaoMutation extends Mutation
 {
     protected $attributes = [
         'name' => 'UpdateClassificacao',
-        'description' => 'Classificação se contas, permite atribuir um grupo de contas',
     ];
 
     public function authorize(array $args): bool
     {
-        return Auth::user()->can('classificacao:update');
+        return true; // Auth::user()->can('classificacao:update');
     }
 
     public function type(): Type
@@ -57,7 +56,7 @@ class UpdateClassificacaoMutation extends Mutation
                 'type' => Type::nonNull(Type::id()),
                 'description' => 'Identificador da classificação',
             ],
-            'input' => ['type' => GraphQL::type('ClassificacaoInput')],
+            'input' => ['type' => Type::nonNull(GraphQL::type('ClassificacaoInput'))],
         ];
     }
 

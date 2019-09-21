@@ -37,12 +37,11 @@ class UpdatePacoteMutation extends Mutation
 {
     protected $attributes = [
         'name' => 'UpdatePacote',
-        'description' => 'Contém todos as opções para a formação do produto final',
     ];
 
     public function authorize(array $args): bool
     {
-        return Auth::user()->can('pacote:update');
+        return true; // Auth::user()->can('pacote:update');
     }
 
     public function type(): Type
@@ -57,7 +56,7 @@ class UpdatePacoteMutation extends Mutation
                 'type' => Type::nonNull(Type::id()),
                 'description' => 'Identificador do pacote',
             ],
-            'input' => ['type' => GraphQL::type('PacoteInput')],
+            'input' => ['type' => Type::nonNull(GraphQL::type('PacoteInput'))],
         ];
     }
 

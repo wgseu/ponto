@@ -42,12 +42,11 @@ class ResumoQuery extends Query
 {
     protected $attributes = [
         'name' => 'resumos',
-        'description' => 'Resumo de fechamento de caixa, informa o valor contado no fechamento do caixa para cada forma de pagamento',
     ];
 
     public function authorize(array $args): bool
     {
-        return Auth::user()->can('resumo:view');
+        return true; // Auth::user()->can('resumo:view');
     }
 
     public function type(): Type
@@ -60,6 +59,8 @@ class ResumoQuery extends Query
         return [
             'filter' => ['name' => 'filter', 'type' => GraphQL::type('ResumoFilter')],
             'order' => ['name' => 'order', 'type' => GraphQL::type('ResumoOrder')],
+            'limit' => ['name' => 'limit', 'type' => Type::int(), 'rules' => ['min:1', 'max:100']],
+            'page' => ['name' => 'page', 'type' => Type::int(), 'rules' => ['min:1']],
         ];
     }
 
@@ -69,7 +70,8 @@ class ResumoQuery extends Query
         $fields = $getSelectFields();
         $query = Resumo::with($fields->getRelations())
             ->select($fields->getSelect())
-            ->where(Filter::map($args['filter']));
-        return Ordering::apply($args['order'], $query)->paginate($args['limit'], ['*'], 'page', $args['page']);
+            ->where(Filter::map($args['filter'] ?? []));
+        return Ordering::apply($args['order'] ?? [], $query)
+            ->paginate($args['limit'] ?? 10, ['*'], 'page', $args['page'] ?? 1);
     }
 }

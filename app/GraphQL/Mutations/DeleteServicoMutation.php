@@ -37,12 +37,11 @@ class DeleteServicoMutation extends Mutation
 {
     protected $attributes = [
         'name' => 'DeleteServico',
-        'description' => 'Taxas, eventos e serviço cobrado nos pedidos',
     ];
 
     public function authorize(array $args): bool
     {
-        return Auth::user()->can('servico:delete');
+        return true; // Auth::user()->can('servico:delete');
     }
 
     public function type(): Type
@@ -57,7 +56,6 @@ class DeleteServicoMutation extends Mutation
                 'type' => Type::nonNull(Type::id()),
                 'description' => 'Identificador do serviço',
             ],
-            'input' => ['type' => GraphQL::type('ServicoInput')],
         ];
     }
 

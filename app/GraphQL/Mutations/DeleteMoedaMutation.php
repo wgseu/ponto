@@ -37,12 +37,11 @@ class DeleteMoedaMutation extends Mutation
 {
     protected $attributes = [
         'name' => 'DeleteMoeda',
-        'description' => 'Moedas financeiras de um país',
     ];
 
     public function authorize(array $args): bool
     {
-        return Auth::user()->can('moeda:delete');
+        return true; // Auth::user()->can('moeda:delete');
     }
 
     public function type(): Type
@@ -57,7 +56,6 @@ class DeleteMoedaMutation extends Mutation
                 'type' => Type::nonNull(Type::id()),
                 'description' => 'Identificador da moeda',
             ],
-            'input' => ['type' => GraphQL::type('MoedaInput')],
         ];
     }
 

@@ -37,12 +37,11 @@ class DeleteFuncaoMutation extends Mutation
 {
     protected $attributes = [
         'name' => 'DeleteFuncao',
-        'description' => 'Função ou atribuição de tarefas à um prestador',
     ];
 
     public function authorize(array $args): bool
     {
-        return Auth::user()->can('funcao:delete');
+        return true; // Auth::user()->can('funcao:delete');
     }
 
     public function type(): Type
@@ -57,7 +56,6 @@ class DeleteFuncaoMutation extends Mutation
                 'type' => Type::nonNull(Type::id()),
                 'description' => 'Identificador da função',
             ],
-            'input' => ['type' => GraphQL::type('FuncaoInput')],
         ];
     }
 

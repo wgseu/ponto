@@ -37,12 +37,11 @@ class UpdateFormaMutation extends Mutation
 {
     protected $attributes = [
         'name' => 'UpdateForma',
-        'description' => 'Formas de pagamento disponíveis para pedido e contas',
     ];
 
     public function authorize(array $args): bool
     {
-        return Auth::user()->can('forma:update');
+        return true; // Auth::user()->can('forma:update');
     }
 
     public function type(): Type
@@ -57,7 +56,7 @@ class UpdateFormaMutation extends Mutation
                 'type' => Type::nonNull(Type::id()),
                 'description' => 'Identificador da forma de pagamento',
             ],
-            'input' => ['type' => GraphQL::type('FormaInput')],
+            'input' => ['type' => Type::nonNull(GraphQL::type('FormaInput'))],
         ];
     }
 

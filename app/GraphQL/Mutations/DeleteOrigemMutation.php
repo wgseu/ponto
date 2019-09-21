@@ -37,12 +37,11 @@ class DeleteOrigemMutation extends Mutation
 {
     protected $attributes = [
         'name' => 'DeleteOrigem',
-        'description' => 'Origem da mercadoria',
     ];
 
     public function authorize(array $args): bool
     {
-        return Auth::user()->can('origem:delete');
+        return true; // Auth::user()->can('origem:delete');
     }
 
     public function type(): Type
@@ -57,7 +56,6 @@ class DeleteOrigemMutation extends Mutation
                 'type' => Type::nonNull(Type::id()),
                 'description' => 'Identificador da origem',
             ],
-            'input' => ['type' => GraphQL::type('OrigemInput')],
         ];
     }
 

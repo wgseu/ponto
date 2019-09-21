@@ -37,12 +37,11 @@ class DeleteDispositivoMutation extends Mutation
 {
     protected $attributes = [
         'name' => 'DeleteDispositivo',
-        'description' => 'Computadores e tablets com opções de acesso',
     ];
 
     public function authorize(array $args): bool
     {
-        return Auth::user()->can('dispositivo:delete');
+        return true; // Auth::user()->can('dispositivo:delete');
     }
 
     public function type(): Type
@@ -57,7 +56,6 @@ class DeleteDispositivoMutation extends Mutation
                 'type' => Type::nonNull(Type::id()),
                 'description' => 'Identificador do dispositivo',
             ],
-            'input' => ['type' => GraphQL::type('DispositivoInput')],
         ];
     }
 

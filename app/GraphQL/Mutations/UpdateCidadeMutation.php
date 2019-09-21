@@ -37,12 +37,11 @@ class UpdateCidadeMutation extends Mutation
 {
     protected $attributes = [
         'name' => 'UpdateCidade',
-        'description' => 'Cidade de um estado, contém bairros',
     ];
 
     public function authorize(array $args): bool
     {
-        return Auth::user()->can('cidade:update');
+        return true; // Auth::user()->can('cidade:update');
     }
 
     public function type(): Type
@@ -57,7 +56,7 @@ class UpdateCidadeMutation extends Mutation
                 'type' => Type::nonNull(Type::id()),
                 'description' => 'Código que identifica a cidade',
             ],
-            'input' => ['type' => GraphQL::type('CidadeInput')],
+            'input' => ['type' => Type::nonNull(GraphQL::type('CidadeInput'))],
         ];
     }
 

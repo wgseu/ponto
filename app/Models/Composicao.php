@@ -58,6 +58,22 @@ class Composicao extends Model
      *
      * @var array
      */
+    protected $fillable = [
+        'composicao_id',
+        'produto_id',
+        'tipo',
+        'quantidade',
+        'valor',
+        'quantidade_maxima',
+        'ativa',
+        'data_remocao',
+    ];
+
+    /**
+     * The model's default values for attributes.
+     *
+     * @var array
+     */
     protected $attributes = [
         'tipo' => self::TIPO_COMPOSICAO,
         'valor' => 0,

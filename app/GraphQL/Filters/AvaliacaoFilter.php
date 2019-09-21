@@ -35,7 +35,6 @@ class AvaliacaoFilter extends InputType
 {
     protected $attributes = [
         'name' => 'AvaliacaoFilter',
-        'description' => 'Avaliação de atendimento e outros serviços do estabelecimento',
     ];
 
     public function fields(): array
@@ -45,7 +44,7 @@ class AvaliacaoFilter extends InputType
                 'type' => Type::id(),
             ],
             'metrica_id' => [
-                'type' => Type::nonNull(Type::int()),
+                'type' => Type::int(),
             ],
             'cliente_id' => [
                 'type' => Type::int(),
@@ -57,13 +56,13 @@ class AvaliacaoFilter extends InputType
                 'type' => Type::int(),
             ],
             'estrelas' => [
-                'type' => Type::nonNull(GraphQL::type('NumberFilter')),
+                'type' => GraphQL::type('NumberFilter'),
             ],
             'comentario' => [
                 'type' => GraphQL::type('StringFilter'),
             ],
             'data_avaliacao' => [
-                'type' => Type::nonNull(GraphQL::type('DateFilter')),
+                'type' => GraphQL::type('DateFilter'),
             ],
         ];
     }

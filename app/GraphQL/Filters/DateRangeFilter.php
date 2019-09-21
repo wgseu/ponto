@@ -2,15 +2,15 @@
 
 declare(strict_types=1);
 
-namespace App\GraphQL\Inputs;
+namespace App\GraphQL\Filters;
 
 use GraphQL\Type\Definition\Type;
 use Rebing\GraphQL\Support\InputType;
 
-class DateRangeInput extends InputType
+class DateRangeFilter extends InputType
 {
     protected $attributes = [
-        'name' => 'DateRangeInput',
+        'name' => 'DateRangeFilter',
     ];
 
     public function fields(): array

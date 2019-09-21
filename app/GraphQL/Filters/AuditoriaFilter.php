@@ -35,7 +35,6 @@ class AuditoriaFilter extends InputType
 {
     protected $attributes = [
         'name' => 'AuditoriaFilter',
-        'description' => 'Registra todas as atividades importantes do sistema',
     ];
 
     public function fields(): array
@@ -48,25 +47,25 @@ class AuditoriaFilter extends InputType
                 'type' => Type::int(),
             ],
             'prestador_id' => [
-                'type' => Type::nonNull(Type::int()),
+                'type' => Type::int(),
             ],
             'autorizador_id' => [
-                'type' => Type::nonNull(Type::int()),
+                'type' => Type::int(),
             ],
             'tipo' => [
-                'type' => Type::nonNull(GraphQL::type('AuditoriaTipoFilter')),
+                'type' => GraphQL::type('AuditoriaTipoFilter'),
             ],
             'prioridade' => [
-                'type' => Type::nonNull(GraphQL::type('AuditoriaPrioridadeFilter')),
+                'type' => GraphQL::type('AuditoriaPrioridadeFilter'),
             ],
             'descricao' => [
-                'type' => Type::nonNull(GraphQL::type('StringFilter')),
+                'type' => GraphQL::type('StringFilter'),
             ],
             'autorizacao' => [
                 'type' => GraphQL::type('StringFilter'),
             ],
             'data_registro' => [
-                'type' => Type::nonNull(GraphQL::type('DateFilter')),
+                'type' => GraphQL::type('DateFilter'),
             ],
         ];
     }

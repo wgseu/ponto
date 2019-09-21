@@ -46,6 +46,16 @@ class Acesso extends Model
     public $timestamps = false;
 
     /**
+     * The model's default values for attributes.
+     *
+     * @var array
+     */
+    protected $fillable = [
+        'funcao_id',
+        'permissao_id',
+    ];
+
+    /**
      * Função a que a permissão se aplica
      */
     public function funcao()

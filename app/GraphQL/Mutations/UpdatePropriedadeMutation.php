@@ -37,12 +37,11 @@ class UpdatePropriedadeMutation extends Mutation
 {
     protected $attributes = [
         'name' => 'UpdatePropriedade',
-        'description' => 'Informa tamanhos de pizzas e opções de peso do produto',
     ];
 
     public function authorize(array $args): bool
     {
-        return Auth::user()->can('propriedade:update');
+        return true; // Auth::user()->can('propriedade:update');
     }
 
     public function type(): Type
@@ -57,7 +56,7 @@ class UpdatePropriedadeMutation extends Mutation
                 'type' => Type::nonNull(Type::id()),
                 'description' => 'Identificador da propriedade',
             ],
-            'input' => ['type' => GraphQL::type('PropriedadeInput')],
+            'input' => ['type' => Type::nonNull(GraphQL::type('PropriedadeInput'))],
         ];
     }
 

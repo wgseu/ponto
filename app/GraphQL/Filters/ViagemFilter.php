@@ -35,7 +35,6 @@ class ViagemFilter extends InputType
 {
     protected $attributes = [
         'name' => 'ViagemFilter',
-        'description' => 'Registro de viagem de uma entrega ou compra de insumos',
     ];
 
     public function fields(): array
@@ -45,7 +44,7 @@ class ViagemFilter extends InputType
                 'type' => Type::id(),
             ],
             'responsavel_id' => [
-                'type' => Type::nonNull(Type::int()),
+                'type' => Type::int(),
             ],
             'latitude' => [
                 'type' => GraphQL::type('NumberFilter'),
@@ -66,7 +65,7 @@ class ViagemFilter extends InputType
                 'type' => GraphQL::type('DateFilter'),
             ],
             'data_saida' => [
-                'type' => Type::nonNull(GraphQL::type('DateFilter')),
+                'type' => GraphQL::type('DateFilter'),
             ],
         ];
     }

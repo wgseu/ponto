@@ -37,12 +37,11 @@ class CreateClassificacaoMutation extends Mutation
 {
     protected $attributes = [
         'name' => 'CreateClassificacao',
-        'description' => 'Classificação se contas, permite atribuir um grupo de contas',
     ];
 
     public function authorize(array $args): bool
     {
-        return Auth::user()->can('classificacao:create');
+        return true; // Auth::user()->can('classificacao:create');
     }
 
     public function type(): Type
@@ -53,7 +52,7 @@ class CreateClassificacaoMutation extends Mutation
     public function args(): array
     {
         return [
-            'input' => ['type' => GraphQL::type('ClassificacaoInput')],
+            'input' => ['type' => Type::nonNull(GraphQL::type('ClassificacaoInput'))],
         ];
     }
 

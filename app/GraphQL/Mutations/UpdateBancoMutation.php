@@ -37,12 +37,11 @@ class UpdateBancoMutation extends Mutation
 {
     protected $attributes = [
         'name' => 'UpdateBanco',
-        'description' => 'Bancos disponíveis no país',
     ];
 
     public function authorize(array $args): bool
     {
-        return Auth::user()->can('banco:update');
+        return true; // Auth::user()->can('banco:update');
     }
 
     public function type(): Type
@@ -57,7 +56,7 @@ class UpdateBancoMutation extends Mutation
                 'type' => Type::nonNull(Type::id()),
                 'description' => 'Identificador do banco',
             ],
-            'input' => ['type' => GraphQL::type('BancoInput')],
+            'input' => ['type' => Type::nonNull(GraphQL::type('BancoInput'))],
         ];
     }
 

@@ -50,6 +50,17 @@ class Fornecedor extends Model
      *
      * @var array
      */
+    protected $fillable = [
+        'empresa_id',
+        'prazo_pagamento',
+        'data_cadastro',
+    ];
+
+    /**
+     * The model's default values for attributes.
+     *
+     * @var array
+     */
     protected $attributes = [
         'prazo_pagamento' => 0,
     ];

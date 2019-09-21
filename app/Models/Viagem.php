@@ -46,6 +46,22 @@ class Viagem extends Model
     public $timestamps = false;
 
     /**
+     * The model's default values for attributes.
+     *
+     * @var array
+     */
+    protected $fillable = [
+        'responsavel_id',
+        'latitude',
+        'longitude',
+        'quilometragem',
+        'distancia',
+        'data_atualizacao',
+        'data_chegada',
+        'data_saida',
+    ];
+
+    /**
      * Responsável pela entrega ou compra
      */
     public function responsavel()

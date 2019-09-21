@@ -42,12 +42,11 @@ class PacoteQuery extends Query
 {
     protected $attributes = [
         'name' => 'pacotes',
-        'description' => 'Contém todos as opções para a formação do produto final',
     ];
 
     public function authorize(array $args): bool
     {
-        return Auth::user()->can('pacote:view');
+        return true; // Auth::user()->can('pacote:view');
     }
 
     public function type(): Type
@@ -60,6 +59,8 @@ class PacoteQuery extends Query
         return [
             'filter' => ['name' => 'filter', 'type' => GraphQL::type('PacoteFilter')],
             'order' => ['name' => 'order', 'type' => GraphQL::type('PacoteOrder')],
+            'limit' => ['name' => 'limit', 'type' => Type::int(), 'rules' => ['min:1', 'max:100']],
+            'page' => ['name' => 'page', 'type' => Type::int(), 'rules' => ['min:1']],
         ];
     }
 
@@ -69,7 +70,8 @@ class PacoteQuery extends Query
         $fields = $getSelectFields();
         $query = Pacote::with($fields->getRelations())
             ->select($fields->getSelect())
-            ->where(Filter::map($args['filter']));
-        return Ordering::apply($args['order'], $query)->paginate($args['limit'], ['*'], 'page', $args['page']);
+            ->where(Filter::map($args['filter'] ?? []));
+        return Ordering::apply($args['order'] ?? [], $query)
+            ->paginate($args['limit'] ?? 10, ['*'], 'page', $args['page'] ?? 1);
     }
 }

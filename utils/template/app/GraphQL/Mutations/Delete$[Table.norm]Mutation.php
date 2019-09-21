@@ -37,12 +37,11 @@ class Delete$[Table.norm]Mutation extends Mutation
 {
     protected $attributes = [
         'name' => 'Delete$[Table.norm]',
-        'description' => '$[Table.comment]',
     ];
 
     public function authorize(array $args): bool
     {
-        return Auth::user()->can('$[table.unix]:delete');
+        return true; // Auth::user()->can('$[table.unix]:delete');
     }
 
     public function type(): Type
@@ -57,7 +56,6 @@ class Delete$[Table.norm]Mutation extends Mutation
                 'type' => Type::nonNull(Type::id()),
                 'description' => '$[primary.comment]',
             ],
-            'input' => ['type' => GraphQL::type('$[Table.norm]Input')],
         ];
     }
 

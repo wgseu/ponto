@@ -42,10 +42,10 @@ class CarteiraOrder extends InputType
     {
         return [
             'id' => [
-                'type' => Type::nonNull(GraphQL::type('OrderByEnum')),
+                'type' => GraphQL::type('OrderByEnum'),
             ],
             'tipo' => [
-                'type' => Type::nonNull(GraphQL::type('OrderByEnum')),
+                'type' => GraphQL::type('OrderByEnum'),
             ],
             'carteira_id' => [
                 'type' => GraphQL::type('OrderByEnum'),
@@ -54,7 +54,7 @@ class CarteiraOrder extends InputType
                 'type' => GraphQL::type('OrderByEnum'),
             ],
             'descricao' => [
-                'type' => Type::nonNull(GraphQL::type('OrderByEnum')),
+                'type' => GraphQL::type('OrderByEnum'),
             ],
             'conta' => [
                 'type' => GraphQL::type('OrderByEnum'),
@@ -63,7 +63,7 @@ class CarteiraOrder extends InputType
                 'type' => GraphQL::type('OrderByEnum'),
             ],
             'transacao' => [
-                'type' => Type::nonNull(GraphQL::type('OrderByEnum')),
+                'type' => GraphQL::type('OrderByEnum'),
             ],
             'limite' => [
                 'type' => GraphQL::type('OrderByEnum'),
@@ -81,7 +81,7 @@ class CarteiraOrder extends InputType
                 'type' => GraphQL::type('OrderByEnum'),
             ],
             'ativa' => [
-                'type' => Type::nonNull(GraphQL::type('OrderByEnum')),
+                'type' => GraphQL::type('OrderByEnum'),
             ],
             'data_desativada' => [
                 'type' => GraphQL::type('OrderByEnum'),

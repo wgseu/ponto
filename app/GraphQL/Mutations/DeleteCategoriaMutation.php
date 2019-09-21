@@ -37,12 +37,11 @@ class DeleteCategoriaMutation extends Mutation
 {
     protected $attributes = [
         'name' => 'DeleteCategoria',
-        'description' => 'Informa qual a categoria dos produtos e permite a rápida localização dos mesmos',
     ];
 
     public function authorize(array $args): bool
     {
-        return Auth::user()->can('categoria:delete');
+        return true; // Auth::user()->can('categoria:delete');
     }
 
     public function type(): Type
@@ -57,7 +56,6 @@ class DeleteCategoriaMutation extends Mutation
                 'type' => Type::nonNull(Type::id()),
                 'description' => 'Identificador da categoria',
             ],
-            'input' => ['type' => GraphQL::type('CategoriaInput')],
         ];
     }
 

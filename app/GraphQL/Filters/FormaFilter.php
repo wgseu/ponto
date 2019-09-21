@@ -35,7 +35,6 @@ class FormaFilter extends InputType
 {
     protected $attributes = [
         'name' => 'FormaFilter',
-        'description' => 'Formas de pagamento disponíveis para pedido e contas',
     ];
 
     public function fields(): array
@@ -45,28 +44,28 @@ class FormaFilter extends InputType
                 'type' => Type::id(),
             ],
             'tipo' => [
-                'type' => Type::nonNull(GraphQL::type('FormaTipoFilter')),
+                'type' => GraphQL::type('FormaTipoFilter'),
             ],
             'carteira_id' => [
-                'type' => Type::nonNull(Type::int()),
+                'type' => Type::int(),
             ],
             'descricao' => [
-                'type' => Type::nonNull(GraphQL::type('StringFilter')),
+                'type' => GraphQL::type('StringFilter'),
             ],
             'min_parcelas' => [
-                'type' => Type::nonNull(GraphQL::type('NumberFilter')),
+                'type' => GraphQL::type('NumberFilter'),
             ],
             'max_parcelas' => [
-                'type' => Type::nonNull(GraphQL::type('NumberFilter')),
+                'type' => GraphQL::type('NumberFilter'),
             ],
             'parcelas_sem_juros' => [
-                'type' => Type::nonNull(GraphQL::type('NumberFilter')),
+                'type' => GraphQL::type('NumberFilter'),
             ],
             'juros' => [
-                'type' => Type::nonNull(GraphQL::type('NumberFilter')),
+                'type' => GraphQL::type('NumberFilter'),
             ],
             'ativa' => [
-                'type' => Type::nonNull(Type::boolean()),
+                'type' => Type::boolean(),
             ],
         ];
     }

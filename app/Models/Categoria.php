@@ -51,6 +51,21 @@ class Categoria extends Model
      *
      * @var array
      */
+    protected $fillable = [
+        'categoria_id',
+        'descricao',
+        'detalhes',
+        'imagem_url',
+        'ordem',
+        'data_atualizacao',
+        'data_arquivado',
+    ];
+
+    /**
+     * The model's default values for attributes.
+     *
+     * @var array
+     */
     protected $attributes = [
         'ordem' => 0,
     ];

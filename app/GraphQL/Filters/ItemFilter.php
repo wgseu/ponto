@@ -35,7 +35,6 @@ class ItemFilter extends InputType
 {
     protected $attributes = [
         'name' => 'ItemFilter',
-        'description' => 'Produtos, taxas e serviços do pedido, a alteração do estado permite o controle de produção',
     ];
 
     public function fields(): array
@@ -45,7 +44,7 @@ class ItemFilter extends InputType
                 'type' => Type::id(),
             ],
             'pedido_id' => [
-                'type' => Type::nonNull(Type::int()),
+                'type' => Type::int(),
             ],
             'prestador_id' => [
                 'type' => Type::int(),
@@ -69,40 +68,40 @@ class ItemFilter extends InputType
                 'type' => GraphQL::type('StringFilter'),
             ],
             'preco' => [
-                'type' => Type::nonNull(GraphQL::type('NumberFilter')),
+                'type' => GraphQL::type('NumberFilter'),
             ],
             'quantidade' => [
-                'type' => Type::nonNull(GraphQL::type('NumberFilter')),
+                'type' => GraphQL::type('NumberFilter'),
             ],
             'subtotal' => [
-                'type' => Type::nonNull(GraphQL::type('NumberFilter')),
+                'type' => GraphQL::type('NumberFilter'),
             ],
             'comissao' => [
-                'type' => Type::nonNull(GraphQL::type('NumberFilter')),
+                'type' => GraphQL::type('NumberFilter'),
             ],
             'total' => [
-                'type' => Type::nonNull(GraphQL::type('NumberFilter')),
+                'type' => GraphQL::type('NumberFilter'),
             ],
             'preco_venda' => [
-                'type' => Type::nonNull(GraphQL::type('NumberFilter')),
+                'type' => GraphQL::type('NumberFilter'),
             ],
             'preco_compra' => [
-                'type' => Type::nonNull(GraphQL::type('NumberFilter')),
+                'type' => GraphQL::type('NumberFilter'),
             ],
             'detalhes' => [
                 'type' => GraphQL::type('StringFilter'),
             ],
             'estado' => [
-                'type' => Type::nonNull(GraphQL::type('ItemEstadoFilter')),
+                'type' => GraphQL::type('ItemEstadoFilter'),
             ],
             'cancelado' => [
-                'type' => Type::nonNull(Type::boolean()),
+                'type' => Type::boolean(),
             ],
             'motivo' => [
                 'type' => GraphQL::type('StringFilter'),
             ],
             'desperdicado' => [
-                'type' => Type::nonNull(Type::boolean()),
+                'type' => Type::boolean(),
             ],
             'data_processamento' => [
                 'type' => GraphQL::type('DateFilter'),
@@ -111,7 +110,7 @@ class ItemFilter extends InputType
                 'type' => GraphQL::type('DateFilter'),
             ],
             'data_lancamento' => [
-                'type' => Type::nonNull(GraphQL::type('DateFilter')),
+                'type' => GraphQL::type('DateFilter'),
             ],
         ];
     }

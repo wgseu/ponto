@@ -37,12 +37,11 @@ class DeleteImpressoraMutation extends Mutation
 {
     protected $attributes = [
         'name' => 'DeleteImpressora',
-        'description' => 'Impressora para impressão de serviços e contas',
     ];
 
     public function authorize(array $args): bool
     {
-        return Auth::user()->can('impressora:delete');
+        return true; // Auth::user()->can('impressora:delete');
     }
 
     public function type(): Type
@@ -57,7 +56,6 @@ class DeleteImpressoraMutation extends Mutation
                 'type' => Type::nonNull(Type::id()),
                 'description' => 'Identificador da impressora',
             ],
-            'input' => ['type' => GraphQL::type('ImpressoraInput')],
         ];
     }
 

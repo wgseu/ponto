@@ -37,12 +37,11 @@ class DeletePermissaoMutation extends Mutation
 {
     protected $attributes = [
         'name' => 'DeletePermissao',
-        'description' => 'Informa a listagem de todas as funções do sistema',
     ];
 
     public function authorize(array $args): bool
     {
-        return Auth::user()->can('permissao:delete');
+        return true; // Auth::user()->can('permissao:delete');
     }
 
     public function type(): Type
@@ -57,7 +56,6 @@ class DeletePermissaoMutation extends Mutation
                 'type' => Type::nonNull(Type::id()),
                 'description' => 'Identificador da permissão',
             ],
-            'input' => ['type' => GraphQL::type('PermissaoInput')],
         ];
     }
 

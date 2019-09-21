@@ -70,6 +70,20 @@ $[field.end]
      * @var bool
      */
     public $timestamps = false;
+
+    /**
+     * The model's default values for attributes.
+     *
+     * @var array
+     */
+    protected $fillable = [
+$[field.each(all)]
+$[field.if(primary)]
+$[field.else]
+        '$[field]',
+$[field.end]
+$[field.end]
+    ];
 $[field.exists(default)]
 
     /**

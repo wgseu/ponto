@@ -60,6 +60,22 @@ class Auditoria extends Model
     public $timestamps = false;
 
     /**
+     * The model's default values for attributes.
+     *
+     * @var array
+     */
+    protected $fillable = [
+        'permissao_id',
+        'prestador_id',
+        'autorizador_id',
+        'tipo',
+        'prioridade',
+        'descricao',
+        'autorizacao',
+        'data_registro',
+    ];
+
+    /**
      * Informa a permissão concedida ou utilizada que permitiu a realização da
      * operação
      */

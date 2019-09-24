@@ -34,6 +34,7 @@ use App\GraphQL\Utils\Ordering;
 use Closure;
 use GraphQL\Type\Definition\Type;
 use Rebing\GraphQL\Support\Query;
+use Illuminate\Support\Facades\Auth;
 use GraphQL\Type\Definition\ResolveInfo;
 use Rebing\GraphQL\Support\SelectFields;
 use Rebing\GraphQL\Support\Facades\GraphQL;
@@ -46,7 +47,7 @@ class PacoteQuery extends Query
 
     public function authorize(array $args): bool
     {
-        return true; // Auth::user()->can('pacote:view');
+        return Auth::check() && Auth::user()->can('pacote:view');
     }
 
     public function type(): Type

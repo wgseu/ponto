@@ -31,6 +31,7 @@ use App\Models\Carteira;
 
 use GraphQL\Type\Definition\Type;
 use Rebing\GraphQL\Support\Mutation;
+use Illuminate\Support\Facades\Auth;
 use Rebing\GraphQL\Support\Facades\GraphQL;
 
 class DeleteCarteiraMutation extends Mutation
@@ -41,7 +42,7 @@ class DeleteCarteiraMutation extends Mutation
 
     public function authorize(array $args): bool
     {
-        return true; // Auth::user()->can('carteira:delete');
+        return Auth::check() && Auth::user()->can('carteira:delete');
     }
 
     public function type(): Type

@@ -31,6 +31,7 @@ use App\Models\Forma;
 
 use GraphQL\Type\Definition\Type;
 use Rebing\GraphQL\Support\Mutation;
+use Illuminate\Support\Facades\Auth;
 use Rebing\GraphQL\Support\Facades\GraphQL;
 
 class UpdateFormaMutation extends Mutation
@@ -41,7 +42,7 @@ class UpdateFormaMutation extends Mutation
 
     public function authorize(array $args): bool
     {
-        return true; // Auth::user()->can('forma:update');
+        return Auth::check() && Auth::user()->can('forma:update');
     }
 
     public function type(): Type

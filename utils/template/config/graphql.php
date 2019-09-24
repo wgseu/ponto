@@ -39,7 +39,7 @@ return [
     'controllers' => \Rebing\GraphQL\GraphQLController::class.'@query',
 
     // Any middleware for the graphql route group
-    'middleware' => [],
+    'middleware' => ['cors'],
 
     // Additional route group attributes
     //
@@ -100,6 +100,8 @@ $[table.each]
 $[table.end]
             ],
             'mutation' => [
+                'LoginCliente' => 'App\GraphQL\Mutations\LoginClienteMutation',
+
 $[table.each]
                 'Create$[Table.norm]' => 'App\GraphQL\Mutations\Create$[Table.norm]Mutation',
                 'Update$[Table.norm]' => 'App\GraphQL\Mutations\Update$[Table.norm]Mutation',
@@ -130,6 +132,8 @@ $[table.end]
         'DateRangeFilter' => 'App\GraphQL\Filters\DateRangeFilter',
 
         'OrderByEnum' => 'App\GraphQL\Enums\OrderByEnum',
+
+        'ClienteAuth' => 'App\GraphQL\Types\ClienteAuthType',
 
 $[table.each]
         '$[Table.norm]Filter' => 'App\GraphQL\Filters\$[Table.norm]Filter',
@@ -169,7 +173,7 @@ $[table.end]
     // The types will be loaded on demand. Default is to load all types on each request
     // Can increase performance on schemes with many types
     // Presupposes the config type key to match the type class name property
-    'lazyload_types' => false,
+    'lazyload_types' => true,
 
     // This callable will be passed the Error object for each errors GraphQL catch.
     // The method should return an array representing the error.

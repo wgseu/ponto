@@ -31,6 +31,7 @@ use App\Models\Classificacao;
 
 use GraphQL\Type\Definition\Type;
 use Rebing\GraphQL\Support\Mutation;
+use Illuminate\Support\Facades\Auth;
 use Rebing\GraphQL\Support\Facades\GraphQL;
 
 class CreateClassificacaoMutation extends Mutation
@@ -41,7 +42,7 @@ class CreateClassificacaoMutation extends Mutation
 
     public function authorize(array $args): bool
     {
-        return true; // Auth::user()->can('classificacao:create');
+        return Auth::check() && Auth::user()->can('classificacao:create');
     }
 
     public function type(): Type

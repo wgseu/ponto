@@ -31,6 +31,7 @@ use App\Models\Conta;
 
 use GraphQL\Type\Definition\Type;
 use Rebing\GraphQL\Support\Mutation;
+use Illuminate\Support\Facades\Auth;
 use Rebing\GraphQL\Support\Facades\GraphQL;
 
 class DeleteContaMutation extends Mutation
@@ -41,7 +42,7 @@ class DeleteContaMutation extends Mutation
 
     public function authorize(array $args): bool
     {
-        return true; // Auth::user()->can('conta:delete');
+        return Auth::check() && Auth::user()->can('conta:delete');
     }
 
     public function type(): Type

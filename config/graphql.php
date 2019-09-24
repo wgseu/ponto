@@ -174,6 +174,8 @@ return [
                 'contagens' => 'App\GraphQL\Queries\ContagemQuery',
             ],
             'mutation' => [
+                'LoginCliente' => 'App\GraphQL\Mutations\LoginClienteMutation',
+
                 'CreateSetor' => 'App\GraphQL\Mutations\CreateSetorMutation',
                 'UpdateSetor' => 'App\GraphQL\Mutations\UpdateSetorMutation',
                 'DeleteSetor' => 'App\GraphQL\Mutations\DeleteSetorMutation',
@@ -430,6 +432,8 @@ return [
         'DateRangeFilter' => 'App\GraphQL\Filters\DateRangeFilter',
 
         'OrderByEnum' => 'App\GraphQL\Enums\OrderByEnum',
+
+        'ClienteAuth' => 'App\GraphQL\Types\ClienteAuthType',
 
         'SetorFilter' => 'App\GraphQL\Filters\SetorFilter',
         'MesaFilter' => 'App\GraphQL\Filters\MesaFilter',

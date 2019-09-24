@@ -31,6 +31,7 @@ use App\Models\Associacao;
 
 use GraphQL\Type\Definition\Type;
 use Rebing\GraphQL\Support\Mutation;
+use Illuminate\Support\Facades\Auth;
 use Rebing\GraphQL\Support\Facades\GraphQL;
 
 class UpdateAssociacaoMutation extends Mutation
@@ -41,7 +42,7 @@ class UpdateAssociacaoMutation extends Mutation
 
     public function authorize(array $args): bool
     {
-        return true; // Auth::user()->can('associacao:update');
+        return Auth::check() && Auth::user()->can('associacao:update');
     }
 
     public function type(): Type

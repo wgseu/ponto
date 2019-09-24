@@ -31,6 +31,7 @@ use App\Models\Estado;
 
 use GraphQL\Type\Definition\Type;
 use Rebing\GraphQL\Support\Mutation;
+use Illuminate\Support\Facades\Auth;
 use Rebing\GraphQL\Support\Facades\GraphQL;
 
 class CreateEstadoMutation extends Mutation
@@ -41,7 +42,7 @@ class CreateEstadoMutation extends Mutation
 
     public function authorize(array $args): bool
     {
-        return true; // Auth::user()->can('estado:create');
+        return Auth::check() && Auth::user()->can('estado:create');
     }
 
     public function type(): Type

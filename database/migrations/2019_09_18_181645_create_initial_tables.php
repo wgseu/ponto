@@ -14,6 +14,7 @@ class CreateInitialTables extends Migration
     public function up()
     {
         Schema::disableForeignKeyConstraints();
+
         Schema::create('setores', function (Blueprint $table) {
             $table->increments('id');
             $table->unsignedInteger('setor_id')->nullable();
@@ -27,6 +28,7 @@ class CreateInitialTables extends Migration
                 ->onUpdate('cascade')
                 ->onDelete('cascade');
         });
+
         Schema::create('mesas', function (Blueprint $table) {
             $table->increments('id');
             $table->unsignedInteger('setor_id');
@@ -42,6 +44,7 @@ class CreateInitialTables extends Migration
                 ->onUpdate('cascade')
                 ->onDelete('restrict');
         });
+
         Schema::create('sessoes', function (Blueprint $table) {
             $table->increments('id');
             $table->dateTime('data_inicio');
@@ -52,6 +55,7 @@ class CreateInitialTables extends Migration
             $table->index(['data_inicio']);
             $table->index(['data_termino']);
         });
+
         Schema::create('bancos', function (Blueprint $table) {
             $table->increments('id');
             $table->string('numero', 40);
@@ -64,6 +68,7 @@ class CreateInitialTables extends Migration
             $table->unique(['numero']);
             $table->unique(['fantasia']);
         });
+
         Schema::create('carteiras', function (Blueprint $table) {
             $table->increments('id');
             $table->enum('tipo', ['bancaria', 'financeira', 'credito', 'local']);
@@ -92,6 +97,7 @@ class CreateInitialTables extends Migration
                 ->onUpdate('cascade')
                 ->onDelete('restrict');
         });
+
         Schema::create('caixas', function (Blueprint $table) {
             $table->increments('id');
             $table->unsignedInteger('carteira_id');
@@ -108,6 +114,7 @@ class CreateInitialTables extends Migration
                 ->onUpdate('cascade')
                 ->onDelete('restrict');
         });
+
         Schema::create('formas', function (Blueprint $table) {
             $table->increments('id');
             $table->enum('tipo', ['dinheiro', 'credito', 'debito', 'vale', 'cheque', 'crediario', 'saldo']);
@@ -126,6 +133,7 @@ class CreateInitialTables extends Migration
                 ->onUpdate('cascade')
                 ->onDelete('restrict');
         });
+
         Schema::create('cartoes', function (Blueprint $table) {
             $table->increments('id');
             $table->unsignedInteger('forma_id');
@@ -148,6 +156,7 @@ class CreateInitialTables extends Migration
                 ->onUpdate('cascade')
                 ->onDelete('restrict');
         });
+
         Schema::create('funcoes', function (Blueprint $table) {
             $table->increments('id');
             $table->string('descricao', 45);
@@ -155,6 +164,7 @@ class CreateInitialTables extends Migration
 
             $table->unique(['descricao']);
         });
+
         Schema::create('clientes', function (Blueprint $table) {
             $table->increments('id');
             $table->enum('tipo', ['fisica', 'juridica'])->default('fisica');
@@ -193,6 +203,7 @@ class CreateInitialTables extends Migration
                 ->onUpdate('cascade')
                 ->onDelete('restrict');
         });
+
         Schema::create('prestadores', function (Blueprint $table) {
             $table->increments('id');
             $table->string('codigo', 100);
@@ -224,6 +235,7 @@ class CreateInitialTables extends Migration
                 ->onUpdate('cascade')
                 ->onDelete('restrict');
         });
+
         Schema::create('moedas', function (Blueprint $table) {
             $table->increments('id');
             $table->string('nome', 45);
@@ -238,6 +250,7 @@ class CreateInitialTables extends Migration
 
             $table->unique(['codigo']);
         });
+
         Schema::create('paises', function (Blueprint $table) {
             $table->increments('id');
             $table->string('nome', 100);
@@ -258,6 +271,7 @@ class CreateInitialTables extends Migration
                 ->onUpdate('cascade')
                 ->onDelete('restrict');
         });
+
         Schema::create('estados', function (Blueprint $table) {
             $table->increments('id');
             $table->unsignedInteger('pais_id');
@@ -271,6 +285,7 @@ class CreateInitialTables extends Migration
                 ->onUpdate('cascade')
                 ->onDelete('cascade');
         });
+
         Schema::create('cidades', function (Blueprint $table) {
             $table->increments('id');
             $table->unsignedInteger('estado_id');
@@ -284,6 +299,7 @@ class CreateInitialTables extends Migration
                 ->onUpdate('cascade')
                 ->onDelete('cascade');
         });
+
         Schema::create('bairros', function (Blueprint $table) {
             $table->increments('id');
             $table->unsignedInteger('cidade_id');
@@ -300,6 +316,7 @@ class CreateInitialTables extends Migration
                 ->onUpdate('cascade')
                 ->onDelete('cascade');
         });
+
         Schema::create('zonas', function (Blueprint $table) {
             $table->increments('id');
             $table->unsignedInteger('bairro_id');
@@ -316,6 +333,7 @@ class CreateInitialTables extends Migration
                 ->onUpdate('cascade')
                 ->onDelete('cascade');
         });
+
         Schema::create('localizacoes', function (Blueprint $table) {
             $table->increments('id');
             $table->unsignedInteger('cliente_id');
@@ -350,6 +368,7 @@ class CreateInitialTables extends Migration
                 ->onUpdate('cascade')
                 ->onDelete('restrict');
         });
+
         Schema::create('comandas', function (Blueprint $table) {
             $table->increments('id');
             $table->integer('numero');
@@ -359,6 +378,7 @@ class CreateInitialTables extends Migration
             $table->unique(['nome']);
             $table->unique(['numero']);
         });
+
         Schema::create('viagens', function (Blueprint $table) {
             $table->increments('id');
             $table->unsignedInteger('responsavel_id');
@@ -376,6 +396,7 @@ class CreateInitialTables extends Migration
                 ->onUpdate('cascade')
                 ->onDelete('restrict');
         });
+
         Schema::create('integracoes', function (Blueprint $table) {
             $table->increments('id');
             $table->string('nome', 45);
@@ -390,6 +411,7 @@ class CreateInitialTables extends Migration
 
             $table->unique(['nome']);
         });
+
         Schema::create('associacoes', function (Blueprint $table) {
             $table->increments('id');
             $table->unsignedInteger('integracao_id');
@@ -423,6 +445,7 @@ class CreateInitialTables extends Migration
                 ->onUpdate('cascade')
                 ->onDelete('restrict');
         });
+
         Schema::create('pedidos', function (Blueprint $table) {
             $table->increments('id');
             $table->unsignedInteger('pedido_id')->nullable();
@@ -510,6 +533,7 @@ class CreateInitialTables extends Migration
                 ->onUpdate('cascade')
                 ->onDelete('restrict');
         });
+
         Schema::create('categorias', function (Blueprint $table) {
             $table->increments('id');
             $table->unsignedInteger('categoria_id')->nullable();
@@ -527,6 +551,7 @@ class CreateInitialTables extends Migration
                 ->onUpdate('cascade')
                 ->onDelete('cascade');
         });
+
         Schema::create('unidades', function (Blueprint $table) {
             $table->increments('id');
             $table->string('nome', 45);
@@ -535,6 +560,7 @@ class CreateInitialTables extends Migration
 
             $table->unique(['sigla']);
         });
+
         Schema::create('origens', function (Blueprint $table) {
             $table->increments('id');
             $table->integer('codigo');
@@ -542,6 +568,7 @@ class CreateInitialTables extends Migration
 
             $table->unique(['codigo']);
         });
+
         Schema::create('operacoes', function (Blueprint $table) {
             $table->increments('id');
             $table->integer('codigo');
@@ -550,6 +577,7 @@ class CreateInitialTables extends Migration
 
             $table->unique(['codigo']);
         });
+
         Schema::create('impostos', function (Blueprint $table) {
             $table->increments('id');
             $table->enum('grupo', ['icms', 'pis', 'cofins', 'ipi', 'ii']);
@@ -560,6 +588,7 @@ class CreateInitialTables extends Migration
 
             $table->unique(['grupo', 'simples', 'substituicao', 'codigo']);
         });
+
         Schema::create('tributacoes', function (Blueprint $table) {
             $table->increments('id');
             $table->string('ncm', 10);
@@ -584,6 +613,7 @@ class CreateInitialTables extends Migration
                 ->onUpdate('cascade')
                 ->onDelete('restrict');
         });
+
         Schema::create('produtos', function (Blueprint $table) {
             $table->increments('id');
             $table->string('codigo', 100);
@@ -640,6 +670,7 @@ class CreateInitialTables extends Migration
                 ->onUpdate('cascade')
                 ->onDelete('restrict');
         });
+
         Schema::create('servicos', function (Blueprint $table) {
             $table->increments('id');
             $table->string('nome', 50);
@@ -656,6 +687,7 @@ class CreateInitialTables extends Migration
             $table->boolean('ativo')->default(true);
 
         });
+
         Schema::create('classificacoes', function (Blueprint $table) {
             $table->increments('id');
             $table->unsignedInteger('classificacao_id')->nullable();
@@ -669,6 +701,7 @@ class CreateInitialTables extends Migration
                 ->onUpdate('cascade')
                 ->onDelete('cascade');
         });
+
         Schema::create('contas', function (Blueprint $table) {
             $table->increments('id');
             $table->unsignedInteger('classificacao_id');
@@ -737,6 +770,7 @@ class CreateInitialTables extends Migration
                 ->onUpdate('cascade')
                 ->onDelete('cascade');
         });
+
         Schema::create('movimentacoes', function (Blueprint $table) {
             $table->increments('id');
             $table->unsignedInteger('sessao_id');
@@ -770,6 +804,7 @@ class CreateInitialTables extends Migration
                 ->onUpdate('cascade')
                 ->onDelete('restrict');
         });
+
         Schema::create('creditos', function (Blueprint $table) {
             $table->increments('id');
             $table->unsignedInteger('cliente_id');
@@ -784,6 +819,7 @@ class CreateInitialTables extends Migration
                 ->onUpdate('cascade')
                 ->onDelete('restrict');
         });
+
         Schema::create('cheques', function (Blueprint $table) {
             $table->increments('id');
             $table->unsignedInteger('cliente_id');
@@ -810,6 +846,7 @@ class CreateInitialTables extends Migration
                 ->onUpdate('cascade')
                 ->onDelete('restrict');
         });
+
         Schema::create('pagamentos', function (Blueprint $table) {
             $table->increments('id');
             $table->unsignedInteger('carteira_id');
@@ -905,6 +942,7 @@ class CreateInitialTables extends Migration
                 ->onUpdate('cascade')
                 ->onDelete('restrict');
         });
+
         Schema::create('itens', function (Blueprint $table) {
             $table->increments('id');
             $table->unsignedInteger('pedido_id');
@@ -962,6 +1000,7 @@ class CreateInitialTables extends Migration
                 ->onUpdate('cascade')
                 ->onDelete('restrict');
         });
+
         Schema::create('modulos', function (Blueprint $table) {
             $table->increments('id');
             $table->string('nome', 50);
@@ -970,12 +1009,13 @@ class CreateInitialTables extends Migration
 
             $table->unique(['nome']);
         });
+
         Schema::create('funcionalidades', function (Blueprint $table) {
             $table->increments('id');
-            $table->unsignedInteger('modulo_id');
+            $table->unsignedInteger('modulo_id')->nullable();
             $table->unsignedInteger('funcionalidade_id')->nullable();
             $table->string('nome', 64);
-            $table->string('descricao', 100);
+            $table->string('descricao', 200);
 
             $table->unique(['nome']);
             $table->index(['funcionalidade_id']);
@@ -989,6 +1029,7 @@ class CreateInitialTables extends Migration
                 ->onUpdate('cascade')
                 ->onDelete('cascade');
         });
+
         Schema::create('permissoes', function (Blueprint $table) {
             $table->increments('id');
             $table->unsignedInteger('funcionalidade_id');
@@ -1002,6 +1043,7 @@ class CreateInitialTables extends Migration
                 ->onUpdate('cascade')
                 ->onDelete('cascade');
         });
+
         Schema::create('auditorias', function (Blueprint $table) {
             $table->increments('id');
             $table->unsignedInteger('permissao_id')->nullable();
@@ -1030,6 +1072,7 @@ class CreateInitialTables extends Migration
                 ->onUpdate('cascade')
                 ->onDelete('restrict');
         });
+
         Schema::create('composicoes', function (Blueprint $table) {
             $table->increments('id');
             $table->unsignedInteger('composicao_id');
@@ -1052,6 +1095,7 @@ class CreateInitialTables extends Migration
                 ->onUpdate('cascade')
                 ->onDelete('restrict');
         });
+
         Schema::create('fornecedores', function (Blueprint $table) {
             $table->increments('id');
             $table->unsignedInteger('empresa_id');
@@ -1064,6 +1108,7 @@ class CreateInitialTables extends Migration
                 ->onUpdate('cascade')
                 ->onDelete('restrict');
         });
+
         Schema::create('listas', function (Blueprint $table) {
             $table->increments('id');
             $table->string('descricao', 100);
@@ -1084,6 +1129,7 @@ class CreateInitialTables extends Migration
                 ->onUpdate('cascade')
                 ->onDelete('restrict');
         });
+
         Schema::create('compras', function (Blueprint $table) {
             $table->increments('id');
             $table->string('numero', 64)->nullable();
@@ -1104,6 +1150,7 @@ class CreateInitialTables extends Migration
                 ->onUpdate('cascade')
                 ->onDelete('restrict');
         });
+
         Schema::create('requisitos', function (Blueprint $table) {
             $table->increments('id');
             $table->unsignedInteger('lista_id');
@@ -1138,6 +1185,7 @@ class CreateInitialTables extends Migration
                 ->onUpdate('cascade')
                 ->onDelete('restrict');
         });
+
         Schema::create('estoques', function (Blueprint $table) {
             $table->increments('id');
             $table->unsignedInteger('produto_id');
@@ -1194,6 +1242,7 @@ class CreateInitialTables extends Migration
                 ->onUpdate('cascade')
                 ->onDelete('restrict');
         });
+
         Schema::create('grupos', function (Blueprint $table) {
             $table->increments('id');
             $table->unsignedInteger('produto_id');
@@ -1212,6 +1261,7 @@ class CreateInitialTables extends Migration
                 ->onUpdate('cascade')
                 ->onDelete('cascade');
         });
+
         Schema::create('propriedades', function (Blueprint $table) {
             $table->increments('id');
             $table->unsignedInteger('grupo_id');
@@ -1226,6 +1276,7 @@ class CreateInitialTables extends Migration
                 ->onUpdate('cascade')
                 ->onDelete('cascade');
         });
+
         Schema::create('pacotes', function (Blueprint $table) {
             $table->increments('id');
             $table->unsignedInteger('pacote_id');
@@ -1266,6 +1317,7 @@ class CreateInitialTables extends Migration
                 ->onUpdate('cascade')
                 ->onDelete('cascade');
         });
+
         Schema::create('dispositivos', function (Blueprint $table) {
             $table->increments('id');
             $table->unsignedInteger('setor_id')->nullable();
@@ -1289,6 +1341,7 @@ class CreateInitialTables extends Migration
                 ->onUpdate('cascade')
                 ->onDelete('restrict');
         });
+
         Schema::create('impressoras', function (Blueprint $table) {
             $table->increments('id');
             $table->unsignedInteger('dispositivo_id');
@@ -1311,6 +1364,7 @@ class CreateInitialTables extends Migration
                 ->onUpdate('cascade')
                 ->onDelete('restrict');
         });
+
         Schema::create('promocoes', function (Blueprint $table) {
             $table->increments('id');
             $table->unsignedInteger('promocao_id')->nullable();
@@ -1376,6 +1430,7 @@ class CreateInitialTables extends Migration
                 ->onUpdate('cascade')
                 ->onDelete('cascade');
         });
+
         Schema::create('acessos', function (Blueprint $table) {
             $table->increments('id');
             $table->unsignedInteger('funcao_id');
@@ -1392,6 +1447,7 @@ class CreateInitialTables extends Migration
                 ->onUpdate('cascade')
                 ->onDelete('cascade');
         });
+
         Schema::create('catalogos', function (Blueprint $table) {
             $table->increments('id');
             $table->unsignedInteger('produto_id');
@@ -1416,12 +1472,14 @@ class CreateInitialTables extends Migration
                 ->onUpdate('cascade')
                 ->onDelete('cascade');
         });
+
         Schema::create('sistemas', function (Blueprint $table) {
             $table->increments('id');
             $table->string('fuso_horario', 100)->nullable();
             $table->text('opcoes')->nullable();
 
         });
+
         Schema::create('resumos', function (Blueprint $table) {
             $table->increments('id');
             $table->unsignedInteger('movimentacao_id');
@@ -1445,6 +1503,7 @@ class CreateInitialTables extends Migration
                 ->onUpdate('cascade')
                 ->onDelete('restrict');
         });
+
         Schema::create('formacoes', function (Blueprint $table) {
             $table->increments('id');
             $table->unsignedInteger('item_id');
@@ -1468,6 +1527,7 @@ class CreateInitialTables extends Migration
                 ->onUpdate('cascade')
                 ->onDelete('restrict');
         });
+
         Schema::create('enderecos', function (Blueprint $table) {
             $table->increments('id');
             $table->unsignedInteger('cidade_id');
@@ -1487,6 +1547,7 @@ class CreateInitialTables extends Migration
                 ->onUpdate('cascade')
                 ->onDelete('cascade');
         });
+
         Schema::create('horarios', function (Blueprint $table) {
             $table->increments('id');
             $table->enum('modo', ['funcionamento', 'operacao', 'entrega'])->default('funcionamento');
@@ -1510,6 +1571,7 @@ class CreateInitialTables extends Migration
                 ->onUpdate('cascade')
                 ->onDelete('cascade');
         });
+
         Schema::create('patrimonios', function (Blueprint $table) {
             $table->increments('id');
             $table->unsignedInteger('empresa_id');
@@ -1539,6 +1601,7 @@ class CreateInitialTables extends Migration
                 ->onUpdate('cascade')
                 ->onDelete('restrict');
         });
+
         Schema::create('juncoes', function (Blueprint $table) {
             $table->increments('id');
             $table->unsignedInteger('mesa_id');
@@ -1557,6 +1620,7 @@ class CreateInitialTables extends Migration
                 ->onUpdate('cascade')
                 ->onDelete('cascade');
         });
+
         Schema::create('regimes', function (Blueprint $table) {
             $table->increments('id');
             $table->integer('codigo');
@@ -1564,6 +1628,7 @@ class CreateInitialTables extends Migration
 
             $table->unique(['codigo']);
         });
+
         Schema::create('emitentes', function (Blueprint $table) {
             $table->increments('id');
             $table->unsignedInteger('contador_id')->nullable();
@@ -1587,6 +1652,7 @@ class CreateInitialTables extends Migration
                 ->onUpdate('cascade')
                 ->onDelete('restrict');
         });
+
         Schema::create('notas', function (Blueprint $table) {
             $table->increments('id');
             $table->enum('tipo', ['nota', 'inutilizacao']);
@@ -1627,6 +1693,7 @@ class CreateInitialTables extends Migration
                 ->onUpdate('cascade')
                 ->onDelete('restrict');
         });
+
         Schema::create('eventos', function (Blueprint $table) {
             $table->increments('id');
             $table->unsignedInteger('nota_id');
@@ -1641,6 +1708,7 @@ class CreateInitialTables extends Migration
                 ->onUpdate('cascade')
                 ->onDelete('cascade');
         });
+
         Schema::create('empresas', function (Blueprint $table) {
             $table->increments('id');
             $table->unsignedInteger('pais_id')->nullable();
@@ -1664,6 +1732,7 @@ class CreateInitialTables extends Migration
                 ->onUpdate('cascade')
                 ->onDelete('restrict');
         });
+
         Schema::create('pontuacoes', function (Blueprint $table) {
             $table->increments('id');
             $table->unsignedInteger('promocao_id');
@@ -1694,6 +1763,7 @@ class CreateInitialTables extends Migration
                 ->onUpdate('cascade')
                 ->onDelete('cascade');
         });
+
         Schema::create('telefones', function (Blueprint $table) {
             $table->increments('id');
             $table->unsignedInteger('cliente_id');
@@ -1715,6 +1785,7 @@ class CreateInitialTables extends Migration
                 ->onUpdate('cascade')
                 ->onDelete('restrict');
         });
+
         Schema::create('observacoes', function (Blueprint $table) {
             $table->increments('id');
             $table->unsignedInteger('produto_id');
@@ -1727,6 +1798,7 @@ class CreateInitialTables extends Migration
                 ->onUpdate('cascade')
                 ->onDelete('cascade');
         });
+
         Schema::create('cupons', function (Blueprint $table) {
             $table->increments('id');
             $table->unsignedInteger('cupom_id')->nullable();
@@ -1763,6 +1835,7 @@ class CreateInitialTables extends Migration
                 ->onUpdate('cascade')
                 ->onDelete('restrict');
         });
+
         Schema::create('metricas', function (Blueprint $table) {
             $table->increments('id');
             $table->string('nome', 100);
@@ -1775,6 +1848,7 @@ class CreateInitialTables extends Migration
 
             $table->unique(['nome']);
         });
+
         Schema::create('avaliacoes', function (Blueprint $table) {
             $table->increments('id');
             $table->unsignedInteger('metrica_id');
@@ -1806,6 +1880,7 @@ class CreateInitialTables extends Migration
                 ->onUpdate('cascade')
                 ->onDelete('cascade');
         });
+
         Schema::create('cozinhas', function (Blueprint $table) {
             $table->increments('id');
             $table->string('nome', 50);
@@ -1813,6 +1888,7 @@ class CreateInitialTables extends Migration
 
             $table->unique(['nome']);
         });
+
         Schema::create('cardapios', function (Blueprint $table) {
             $table->increments('id');
             $table->unsignedInteger('produto_id');
@@ -1832,6 +1908,7 @@ class CreateInitialTables extends Migration
                 ->onUpdate('cascade')
                 ->onDelete('cascade');
         });
+
         Schema::create('contagens', function (Blueprint $table) {
             $table->increments('id');
             $table->unsignedInteger('produto_id');

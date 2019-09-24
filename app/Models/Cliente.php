@@ -24,14 +24,21 @@
  */
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
+use Illuminate\Foundation\Auth\User;
+use Illuminate\Notifications\Notifiable;
+use Tymon\JWTAuth\Contracts\JWTSubject;
 
 /**
  * Informações de cliente físico ou jurídico. Clientes, empresas,
  * funcionários, fornecedores e parceiros são cadastrados aqui
  */
-class Cliente extends Model
+class Cliente extends User implements JWTSubject
 {
+    use Notifiable;
+
+    const UPDATED_AT = 'data_atualizacao';
+    const CREATED_AT = 'data_cadastro';
+
     /**
      * Informa o tipo de pessoa, que pode ser física ou jurídica
      */
@@ -59,13 +66,6 @@ class Cliente extends Model
     protected $table = 'clientes';
 
     /**
-     * Indicates if the model should be timestamped.
-     *
-     * @var bool
-     */
-    public $timestamps = false;
-
-    /**
      * The model's default values for attributes.
      *
      * @var array
@@ -84,8 +84,6 @@ class Cliente extends Model
         'email',
         'data_nascimento',
         'slogan',
-        'status',
-        'secreto',
         'limite_compra',
         'instagram',
         'facebook_url',
@@ -93,8 +91,15 @@ class Cliente extends Model
         'linkedin_url',
         'imagem_url',
         'linguagem',
-        'data_atualizacao',
-        'data_cadastro',
+    ];
+ 
+    /**
+     * The attributes that should be hidden for arrays.
+     *
+     * @var array
+     */
+    protected $hidden = [
+        'senha', 'secreto',
     ];
 
     /**
@@ -106,6 +111,49 @@ class Cliente extends Model
         'tipo' => self::TIPO_FISICA,
         'status' => self::STATUS_INATIVO,
     ];
+
+    /**
+     * Get the identifier that will be stored in the subject claim of the JWT.
+     *
+     * @return mixed
+     */
+    public function getJWTIdentifier()
+    {
+        return $this->getKey();
+    }
+ 
+    /**
+     * Return a key value array, containing any custom claims to be added to the JWT.
+     *
+     * @return array
+     */
+    public function getJWTCustomClaims()
+    {
+        return [];
+    }
+
+    /**
+     * Sempre que alterar a senha, roda a encriptação
+     *
+     * @param string $senha
+     * @return void
+     */
+    public function setSenhaAttribute($senha)
+    {
+        if ( !empty($senha) ) {
+            $this->attributes['senha'] = bcrypt($senha);
+        }
+    } 
+
+    /**
+     * Get the password for the user.
+     *
+     * @return string
+     */
+    public function getAuthPassword()
+    {
+        return $this->senha;
+    }
 
     /**
      * Informa se esse cliente faz parte da empresa informada

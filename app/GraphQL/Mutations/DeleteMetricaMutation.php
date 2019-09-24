@@ -31,6 +31,7 @@ use App\Models\Metrica;
 
 use GraphQL\Type\Definition\Type;
 use Rebing\GraphQL\Support\Mutation;
+use Illuminate\Support\Facades\Auth;
 use Rebing\GraphQL\Support\Facades\GraphQL;
 
 class DeleteMetricaMutation extends Mutation
@@ -41,7 +42,7 @@ class DeleteMetricaMutation extends Mutation
 
     public function authorize(array $args): bool
     {
-        return true; // Auth::user()->can('metrica:delete');
+        return Auth::check() && Auth::user()->can('metrica:delete');
     }
 
     public function type(): Type

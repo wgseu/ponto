@@ -31,6 +31,7 @@ use App\Models\$[Table.norm];
 
 use GraphQL\Type\Definition\Type;
 use Rebing\GraphQL\Support\Mutation;
+use Illuminate\Support\Facades\Auth;
 use Rebing\GraphQL\Support\Facades\GraphQL;
 
 class Delete$[Table.norm]Mutation extends Mutation
@@ -41,7 +42,7 @@ class Delete$[Table.norm]Mutation extends Mutation
 
     public function authorize(array $args): bool
     {
-        return true; // Auth::user()->can('$[table.unix]:delete');
+        return Auth::check() && Auth::user()->can('$[table.norm]:delete');
     }
 
     public function type(): Type

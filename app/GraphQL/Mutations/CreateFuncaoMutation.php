@@ -31,6 +31,7 @@ use App\Models\Funcao;
 
 use GraphQL\Type\Definition\Type;
 use Rebing\GraphQL\Support\Mutation;
+use Illuminate\Support\Facades\Auth;
 use Rebing\GraphQL\Support\Facades\GraphQL;
 
 class CreateFuncaoMutation extends Mutation
@@ -41,7 +42,7 @@ class CreateFuncaoMutation extends Mutation
 
     public function authorize(array $args): bool
     {
-        return true; // Auth::user()->can('funcao:create');
+        return Auth::check() && Auth::user()->can('funcao:create');
     }
 
     public function type(): Type

@@ -31,6 +31,7 @@ use App\Models\Integracao;
 
 use GraphQL\Type\Definition\Type;
 use Rebing\GraphQL\Support\Mutation;
+use Illuminate\Support\Facades\Auth;
 use Rebing\GraphQL\Support\Facades\GraphQL;
 
 class DeleteIntegracaoMutation extends Mutation
@@ -41,7 +42,7 @@ class DeleteIntegracaoMutation extends Mutation
 
     public function authorize(array $args): bool
     {
-        return true; // Auth::user()->can('integracao:delete');
+        return Auth::check() && Auth::user()->can('integracao:delete');
     }
 
     public function type(): Type

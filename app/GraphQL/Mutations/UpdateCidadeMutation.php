@@ -31,6 +31,7 @@ use App\Models\Cidade;
 
 use GraphQL\Type\Definition\Type;
 use Rebing\GraphQL\Support\Mutation;
+use Illuminate\Support\Facades\Auth;
 use Rebing\GraphQL\Support\Facades\GraphQL;
 
 class UpdateCidadeMutation extends Mutation
@@ -41,7 +42,7 @@ class UpdateCidadeMutation extends Mutation
 
     public function authorize(array $args): bool
     {
-        return true; // Auth::user()->can('cidade:update');
+        return Auth::check() && Auth::user()->can('cidade:update');
     }
 
     public function type(): Type

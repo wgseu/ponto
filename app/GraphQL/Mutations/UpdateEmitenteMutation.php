@@ -31,6 +31,7 @@ use App\Models\Emitente;
 
 use GraphQL\Type\Definition\Type;
 use Rebing\GraphQL\Support\Mutation;
+use Illuminate\Support\Facades\Auth;
 use Rebing\GraphQL\Support\Facades\GraphQL;
 
 class UpdateEmitenteMutation extends Mutation
@@ -41,7 +42,7 @@ class UpdateEmitenteMutation extends Mutation
 
     public function authorize(array $args): bool
     {
-        return true; // Auth::user()->can('emitente:update');
+        return Auth::check() && Auth::user()->can('emitente:update');
     }
 
     public function type(): Type

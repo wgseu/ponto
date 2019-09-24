@@ -31,6 +31,7 @@ use App\Models\Viagem;
 
 use GraphQL\Type\Definition\Type;
 use Rebing\GraphQL\Support\Mutation;
+use Illuminate\Support\Facades\Auth;
 use Rebing\GraphQL\Support\Facades\GraphQL;
 
 class DeleteViagemMutation extends Mutation
@@ -41,7 +42,7 @@ class DeleteViagemMutation extends Mutation
 
     public function authorize(array $args): bool
     {
-        return true; // Auth::user()->can('viagem:delete');
+        return Auth::check() && Auth::user()->can('viagem:delete');
     }
 
     public function type(): Type

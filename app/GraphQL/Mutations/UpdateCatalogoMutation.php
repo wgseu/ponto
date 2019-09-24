@@ -31,6 +31,7 @@ use App\Models\Catalogo;
 
 use GraphQL\Type\Definition\Type;
 use Rebing\GraphQL\Support\Mutation;
+use Illuminate\Support\Facades\Auth;
 use Rebing\GraphQL\Support\Facades\GraphQL;
 
 class UpdateCatalogoMutation extends Mutation
@@ -41,7 +42,7 @@ class UpdateCatalogoMutation extends Mutation
 
     public function authorize(array $args): bool
     {
-        return true; // Auth::user()->can('catalogo:update');
+        return Auth::check() && Auth::user()->can('catalogo:update');
     }
 
     public function type(): Type

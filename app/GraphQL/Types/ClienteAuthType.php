@@ -25,32 +25,39 @@
 
 declare(strict_types=1);
 
-namespace App\GraphQL\Unions;
+namespace App\GraphQL\Types;
 
-use GraphQL\Type\Definition\Type;
-use Rebing\GraphQL\Support\UnionType;
+use App\Models\Cliente;
 use Rebing\GraphQL\Support\Facades\GraphQL;
+use GraphQL\Type\Definition\Type;
+use Rebing\GraphQL\Support\Type as GraphQLType;
 
-class ContaEstadoUnion extends UnionType
+class ClienteAuthType extends GraphQLType
 {
     protected $attributes = [
-        'name' => 'ContaEstadoFilter',
+        'name' => 'ClienteAuth',
+        'description' => 'Resposta do login',
     ];
 
-    public function types(): array
+    public function fields(): array
     {
         return [
-            GraphQL::type('ContaEstado'),
-            Type::listOf(GraphQL::type('ContaEstado')),
+            'error' => [
+                'type' => Type::string(),
+                'description' => 'Mensagem quando a senha ou usuário forem incorretos',
+            ],
+            'access_token' => [
+                'type' => Type::string(),
+                'description' => 'Token que permite acessar os recursos',
+            ],
+            'token_type' => [
+                'type' => Type::string(),
+                'description' => 'Tipo de token, sempre bearer',
+            ],
+            'expires_in' => [
+                'type' => Type::int(),
+                'description' => 'Timestamp que o token irá expirar em segundos',
+            ],
         ];
-    }
-
-    public function resolveType($value)
-    {
-        if (is_array($value)) {
-            return Type::listOf(GraphQL::type('ContaEstado'));
-        } else {
-            return GraphQL::type('ContaEstado');
-        }
     }
 }

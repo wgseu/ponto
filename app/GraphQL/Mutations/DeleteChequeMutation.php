@@ -31,6 +31,7 @@ use App\Models\Cheque;
 
 use GraphQL\Type\Definition\Type;
 use Rebing\GraphQL\Support\Mutation;
+use Illuminate\Support\Facades\Auth;
 use Rebing\GraphQL\Support\Facades\GraphQL;
 
 class DeleteChequeMutation extends Mutation
@@ -41,7 +42,7 @@ class DeleteChequeMutation extends Mutation
 
     public function authorize(array $args): bool
     {
-        return true; // Auth::user()->can('cheque:delete');
+        return Auth::check() && Auth::user()->can('cheque:delete');
     }
 
     public function type(): Type

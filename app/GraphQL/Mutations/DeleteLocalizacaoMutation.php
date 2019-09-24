@@ -31,6 +31,7 @@ use App\Models\Localizacao;
 
 use GraphQL\Type\Definition\Type;
 use Rebing\GraphQL\Support\Mutation;
+use Illuminate\Support\Facades\Auth;
 use Rebing\GraphQL\Support\Facades\GraphQL;
 
 class DeleteLocalizacaoMutation extends Mutation
@@ -41,7 +42,7 @@ class DeleteLocalizacaoMutation extends Mutation
 
     public function authorize(array $args): bool
     {
-        return true; // Auth::user()->can('localizacao:delete');
+        return Auth::check() && Auth::user()->can('localizacao:delete');
     }
 
     public function type(): Type

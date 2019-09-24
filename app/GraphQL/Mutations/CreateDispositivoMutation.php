@@ -31,6 +31,7 @@ use App\Models\Dispositivo;
 
 use GraphQL\Type\Definition\Type;
 use Rebing\GraphQL\Support\Mutation;
+use Illuminate\Support\Facades\Auth;
 use Rebing\GraphQL\Support\Facades\GraphQL;
 
 class CreateDispositivoMutation extends Mutation
@@ -41,7 +42,7 @@ class CreateDispositivoMutation extends Mutation
 
     public function authorize(array $args): bool
     {
-        return true; // Auth::user()->can('dispositivo:create');
+        return Auth::check() && Auth::user()->can('dispositivo:create');
     }
 
     public function type(): Type

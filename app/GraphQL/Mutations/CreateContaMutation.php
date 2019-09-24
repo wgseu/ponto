@@ -31,6 +31,7 @@ use App\Models\Conta;
 
 use GraphQL\Type\Definition\Type;
 use Rebing\GraphQL\Support\Mutation;
+use Illuminate\Support\Facades\Auth;
 use Rebing\GraphQL\Support\Facades\GraphQL;
 
 class CreateContaMutation extends Mutation
@@ -41,7 +42,7 @@ class CreateContaMutation extends Mutation
 
     public function authorize(array $args): bool
     {
-        return true; // Auth::user()->can('conta:create');
+        return Auth::check() && Auth::user()->can('conta:create');
     }
 
     public function type(): Type

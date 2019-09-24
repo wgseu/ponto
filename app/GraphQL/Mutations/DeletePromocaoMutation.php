@@ -31,6 +31,7 @@ use App\Models\Promocao;
 
 use GraphQL\Type\Definition\Type;
 use Rebing\GraphQL\Support\Mutation;
+use Illuminate\Support\Facades\Auth;
 use Rebing\GraphQL\Support\Facades\GraphQL;
 
 class DeletePromocaoMutation extends Mutation
@@ -41,7 +42,7 @@ class DeletePromocaoMutation extends Mutation
 
     public function authorize(array $args): bool
     {
-        return true; // Auth::user()->can('promocao:delete');
+        return Auth::check() && Auth::user()->can('promocao:delete');
     }
 
     public function type(): Type

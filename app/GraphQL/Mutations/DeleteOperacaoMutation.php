@@ -31,6 +31,7 @@ use App\Models\Operacao;
 
 use GraphQL\Type\Definition\Type;
 use Rebing\GraphQL\Support\Mutation;
+use Illuminate\Support\Facades\Auth;
 use Rebing\GraphQL\Support\Facades\GraphQL;
 
 class DeleteOperacaoMutation extends Mutation
@@ -41,7 +42,7 @@ class DeleteOperacaoMutation extends Mutation
 
     public function authorize(array $args): bool
     {
-        return true; // Auth::user()->can('operacao:delete');
+        return Auth::check() && Auth::user()->can('operacao:delete');
     }
 
     public function type(): Type

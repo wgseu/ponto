@@ -59,10 +59,6 @@ class ClienteType extends GraphQLType
                 'type' => Type::string(),
                 'description' => 'Nome de usuário utilizado para entrar no sistema, aplicativo ou site',
             ],
-            'senha' => [
-                'type' => Type::string(),
-                'description' => 'Senha embaralhada do cliente',
-            ],
             'nome' => [
                 'type' => Type::nonNull(Type::string()),
                 'description' => 'Primeiro nome da pessoa física ou nome fantasia da empresa',
@@ -102,10 +98,6 @@ class ClienteType extends GraphQLType
             'status' => [
                 'type' => Type::nonNull(GraphQL::type('ClienteStatus')),
                 'description' => 'Informa o estado da conta do cliente',
-            ],
-            'secreto' => [
-                'type' => Type::string(),
-                'description' => 'Código secreto para recuperar a conta do cliente',
             ],
             'limite_compra' => [
                 'type' => Type::float(),

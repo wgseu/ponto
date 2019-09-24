@@ -25,32 +25,46 @@
 
 declare(strict_types=1);
 
-namespace App\GraphQL\Unions;
+namespace App\GraphQL\Mutations;
 
 use GraphQL\Type\Definition\Type;
-use Rebing\GraphQL\Support\UnionType;
+use Illuminate\Auth\AuthenticationException;
+use Rebing\GraphQL\Support\Mutation;
 use Rebing\GraphQL\Support\Facades\GraphQL;
 
-class PedidoEstadoUnion extends UnionType
+class LoginClienteMutation extends Mutation
 {
     protected $attributes = [
-        'name' => 'PedidoEstadoFilter',
+        'name' => 'LoginCliente',
     ];
 
-    public function types(): array
+    public function type(): Type
+    {
+        return GraphQL::type('ClienteAuth');
+    }
+
+    public function args(): array
     {
         return [
-            GraphQL::type('PedidoEstado'),
-            Type::listOf(GraphQL::type('PedidoEstado')),
+            'username' => ['type' => Type::nonNull(Type::string())],
+            'password' => ['type' => Type::nonNull(Type::string())],
         ];
     }
 
-    public function resolveType($value)
+    public function resolve($root, $args)
     {
-        if (is_array($value)) {
-            return Type::listOf(GraphQL::type('PedidoEstado'));
-        } else {
-            return GraphQL::type('PedidoEstado');
+        $credentials = [
+            'email' => $args['username'],
+            'password' => $args['password'],
+        ];
+        // attempt to verify the credentials and create a token for the user
+        if (! $token = auth()->attempt($credentials)) {
+            throw new AuthenticationException(__('messages.authentication_failed'));
         }
+        return [
+            'access_token' => $token,
+            'token_type'   => 'bearer',
+            'expires_in'   => auth()->factory()->getTTL() * 60
+        ];
     }
 }

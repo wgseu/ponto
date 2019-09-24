@@ -31,6 +31,7 @@ use App\Models\Pontuacao;
 
 use GraphQL\Type\Definition\Type;
 use Rebing\GraphQL\Support\Mutation;
+use Illuminate\Support\Facades\Auth;
 use Rebing\GraphQL\Support\Facades\GraphQL;
 
 class DeletePontuacaoMutation extends Mutation
@@ -41,7 +42,7 @@ class DeletePontuacaoMutation extends Mutation
 
     public function authorize(array $args): bool
     {
-        return true; // Auth::user()->can('pontuacao:delete');
+        return Auth::check() && Auth::user()->can('pontuacao:delete');
     }
 
     public function type(): Type

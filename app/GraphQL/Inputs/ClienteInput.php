@@ -46,7 +46,7 @@ class ClienteInput extends InputType
                 'description' => 'Identificador do cliente',
             ],
             'tipo' => [
-                'type' => Type::nonNull(GraphQL::type('ClienteTipo')),
+                'type' => GraphQL::type('ClienteTipo'),
                 'description' => 'Informa o tipo de pessoa, que pode ser física ou jurídica',
             ],
             'empresa_id' => [
@@ -106,15 +106,6 @@ class ClienteInput extends InputType
                 'rules' => ['max:100'],
                 'description' => 'Slogan ou detalhes do cliente',
             ],
-            'status' => [
-                'type' => Type::nonNull(GraphQL::type('ClienteStatus')),
-                'description' => 'Informa o estado da conta do cliente',
-            ],
-            'secreto' => [
-                'type' => Type::string(),
-                'rules' => ['max:40'],
-                'description' => 'Código secreto para recuperar a conta do cliente',
-            ],
             'limite_compra' => [
                 'type' => Type::float(),
                 'description' => 'Limite de compra utilizando a forma de pagamento Conta',
@@ -148,14 +139,6 @@ class ClienteInput extends InputType
                 'type' => Type::string(),
                 'rules' => ['max:20'],
                 'description' => 'Código da linguagem utilizada pelo cliente para visualizar o aplicativo e o site, Ex: pt-BR',
-            ],
-            'data_atualizacao' => [
-                'type' => Type::nonNull(GraphQL::type('DateTime')),
-                'description' => 'Data de atualização das informações do cliente',
-            ],
-            'data_cadastro' => [
-                'type' => Type::nonNull(GraphQL::type('DateTime')),
-                'description' => 'Data de cadastro do cliente',
             ],
         ];
     }

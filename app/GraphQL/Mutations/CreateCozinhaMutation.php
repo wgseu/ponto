@@ -31,6 +31,7 @@ use App\Models\Cozinha;
 
 use GraphQL\Type\Definition\Type;
 use Rebing\GraphQL\Support\Mutation;
+use Illuminate\Support\Facades\Auth;
 use Rebing\GraphQL\Support\Facades\GraphQL;
 
 class CreateCozinhaMutation extends Mutation
@@ -41,7 +42,7 @@ class CreateCozinhaMutation extends Mutation
 
     public function authorize(array $args): bool
     {
-        return true; // Auth::user()->can('cozinha:create');
+        return Auth::check() && Auth::user()->can('cozinha:create');
     }
 
     public function type(): Type

@@ -31,6 +31,7 @@ use App\Models\Moeda;
 
 use GraphQL\Type\Definition\Type;
 use Rebing\GraphQL\Support\Mutation;
+use Illuminate\Support\Facades\Auth;
 use Rebing\GraphQL\Support\Facades\GraphQL;
 
 class CreateMoedaMutation extends Mutation
@@ -41,7 +42,7 @@ class CreateMoedaMutation extends Mutation
 
     public function authorize(array $args): bool
     {
-        return true; // Auth::user()->can('moeda:create');
+        return Auth::check() && Auth::user()->can('moeda:create');
     }
 
     public function type(): Type

@@ -31,6 +31,7 @@ use App\Models\Requisito;
 
 use GraphQL\Type\Definition\Type;
 use Rebing\GraphQL\Support\Mutation;
+use Illuminate\Support\Facades\Auth;
 use Rebing\GraphQL\Support\Facades\GraphQL;
 
 class UpdateRequisitoMutation extends Mutation
@@ -41,7 +42,7 @@ class UpdateRequisitoMutation extends Mutation
 
     public function authorize(array $args): bool
     {
-        return true; // Auth::user()->can('requisito:update');
+        return Auth::check() && Auth::user()->can('requisito:update');
     }
 
     public function type(): Type

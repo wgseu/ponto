@@ -31,6 +31,7 @@ use App\Models\Banco;
 
 use GraphQL\Type\Definition\Type;
 use Rebing\GraphQL\Support\Mutation;
+use Illuminate\Support\Facades\Auth;
 use Rebing\GraphQL\Support\Facades\GraphQL;
 
 class UpdateBancoMutation extends Mutation
@@ -41,7 +42,7 @@ class UpdateBancoMutation extends Mutation
 
     public function authorize(array $args): bool
     {
-        return true; // Auth::user()->can('banco:update');
+        return Auth::check() && Auth::user()->can('banco:update');
     }
 
     public function type(): Type

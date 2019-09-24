@@ -31,6 +31,7 @@ use App\Models\Patrimonio;
 
 use GraphQL\Type\Definition\Type;
 use Rebing\GraphQL\Support\Mutation;
+use Illuminate\Support\Facades\Auth;
 use Rebing\GraphQL\Support\Facades\GraphQL;
 
 class CreatePatrimonioMutation extends Mutation
@@ -41,7 +42,7 @@ class CreatePatrimonioMutation extends Mutation
 
     public function authorize(array $args): bool
     {
-        return true; // Auth::user()->can('patrimonio:create');
+        return Auth::check() && Auth::user()->can('patrimonio:create');
     }
 
     public function type(): Type

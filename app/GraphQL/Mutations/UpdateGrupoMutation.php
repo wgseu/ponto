@@ -31,6 +31,7 @@ use App\Models\Grupo;
 
 use GraphQL\Type\Definition\Type;
 use Rebing\GraphQL\Support\Mutation;
+use Illuminate\Support\Facades\Auth;
 use Rebing\GraphQL\Support\Facades\GraphQL;
 
 class UpdateGrupoMutation extends Mutation
@@ -41,7 +42,7 @@ class UpdateGrupoMutation extends Mutation
 
     public function authorize(array $args): bool
     {
-        return true; // Auth::user()->can('grupo:update');
+        return Auth::check() && Auth::user()->can('grupo:update');
     }
 
     public function type(): Type

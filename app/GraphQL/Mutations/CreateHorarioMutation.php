@@ -31,6 +31,7 @@ use App\Models\Horario;
 
 use GraphQL\Type\Definition\Type;
 use Rebing\GraphQL\Support\Mutation;
+use Illuminate\Support\Facades\Auth;
 use Rebing\GraphQL\Support\Facades\GraphQL;
 
 class CreateHorarioMutation extends Mutation
@@ -41,7 +42,7 @@ class CreateHorarioMutation extends Mutation
 
     public function authorize(array $args): bool
     {
-        return true; // Auth::user()->can('horario:create');
+        return Auth::check() && Auth::user()->can('horario:create');
     }
 
     public function type(): Type

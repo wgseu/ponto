@@ -31,6 +31,7 @@ use App\Models\Cartao;
 
 use GraphQL\Type\Definition\Type;
 use Rebing\GraphQL\Support\Mutation;
+use Illuminate\Support\Facades\Auth;
 use Rebing\GraphQL\Support\Facades\GraphQL;
 
 class CreateCartaoMutation extends Mutation
@@ -41,7 +42,7 @@ class CreateCartaoMutation extends Mutation
 
     public function authorize(array $args): bool
     {
-        return true; // Auth::user()->can('cartao:create');
+        return Auth::check() && Auth::user()->can('cartao:create');
     }
 
     public function type(): Type

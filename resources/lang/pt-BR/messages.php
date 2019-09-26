@@ -19,6 +19,29 @@ return [
     'fiscal_description' => 'Nota fiscal de consumidor eletrônica',
     'table_self_service_description' => 'Autoatendimento em mesas',
 
+    'administrator' => 'Administrador',
+    'waiter' => 'Garçom',
+    'cash_operator' => 'Operador(a) de Caixa',
+    'cooker' => 'Cozinheiro(a)',
+    'caretaker' => 'Zelador(a)',
+    'deliveryman' => 'Entregador(a)',
+    'stockist' => 'Estoquista',
+
+    'table_number' => 'Mesa :number',
+    'cards_number' => 'Comanda :number',
+
+    'covered_hall' => 'Salão coberto',
+    'open_lounge' => 'Área aberta',
+    'cashier' => 'Caixas',
+    'delivery' => 'Entregas',
+    'parking' => 'Estacionamento',
+    'kitchen' => 'Cozinha',
+    'barbecue' => 'Churrasqueira',
+    'pizza_oven' => 'Fornos',
+    'stock' => 'Estoque',
+    'pub' => 'Bar',
+    'toilets' => 'Banheiros',
+
     'authentication_failed' => 'Falha na autenticação',
 
     'setor_view_permition' => 'Lista e visualiza os setores',

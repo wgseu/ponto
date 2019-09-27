@@ -58,6 +58,10 @@ class ClienteAuthType extends GraphQLType
                 'type' => Type::int(),
                 'description' => 'Timestamp que o token irá expirar em segundos',
             ],
+            'cliente' => [
+                'type' => GraphQL::type('Cliente'),
+                'description' => 'Os dados do cliente logado',
+            ],
         ];
     }
 }

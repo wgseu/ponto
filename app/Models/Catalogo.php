@@ -69,11 +69,11 @@ class Catalogo extends Model
      * @var array
      */
     protected $attributes = [
-        'preco_venda' => preço de venda,
-        'quantidade_minima' => quantidade mínima,
-        'estoque' => estoque,
-        'limitado' => limitado,
-        'conteudo' => conteúdo,
+        'preco_venda' =>  0,
+        'quantidade_minima' => 1,
+        'estoque' => 0,
+        'limitado' => false,
+        'conteudo' => 1,
     ];
 
     /**

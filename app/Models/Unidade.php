@@ -31,6 +31,9 @@ use Illuminate\Database\Eloquent\Model;
  */
 class Unidade extends Model
 {
+
+    const UPDATED_AT = 'data_atualizacao';
+    const DELETED_AT = 'data_arquivado';
     /**
      * The table associated with the model.
      *

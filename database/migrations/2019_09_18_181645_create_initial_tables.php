@@ -239,7 +239,7 @@ class CreateInitialTables extends Migration
         Schema::create('moedas', function (Blueprint $table) {
             $table->increments('id');
             $table->string('nome', 45);
-            $table->string('simbolo', 10);
+            $table->text('simbolo', 10);
             $table->string('codigo', 45);
             $table->integer('divisao');
             $table->string('fracao', 45)->nullable();
@@ -541,7 +541,7 @@ class CreateInitialTables extends Migration
             $table->string('detalhes', 200)->nullable();
             $table->string('imagem_url', 100)->nullable();
             $table->integer('ordem')->default(0);
-            $table->dateTime('data_atualizacao');
+            $table->dateTime('data_atualizacao')->nullable();
             $table->dateTime('data_arquivado')->nullable();
 
             $table->unique(['descricao']);
@@ -639,7 +639,7 @@ class CreateInitialTables extends Migration
             $table->double('avaliacao')->nullable();
             $table->double('estoque')->nullable()->default(0);
             $table->string('imagem_url', 100)->nullable();
-            $table->dateTime('data_atualizacao');
+            $table->dateTime('data_atualizacao')->nullable();
             $table->dateTime('data_arquivado')->nullable();
 
             $table->unique(['descricao']);

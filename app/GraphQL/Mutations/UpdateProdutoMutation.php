@@ -64,6 +64,7 @@ class UpdateProdutoMutation extends Mutation
     public function resolve($root, $args)
     {
         $produto = Produto::findOrFail($args['id']);
+        $produto->validate();
         $produto->fill($args['input']);
         $produto->save();
         return $produto;

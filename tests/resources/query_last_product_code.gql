@@ -1,0 +1,9 @@
+query {
+  produtos(order: { id: desc }, limit: 1) {
+    data {
+      id
+      descricao
+      codigo
+    }
+  }
+}

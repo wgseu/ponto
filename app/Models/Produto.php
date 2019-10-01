@@ -24,6 +24,8 @@
  */
 namespace App\Models;
 
+use App\Concerns\ModelEvents;
+use App\Interfaces\ValidateInterface;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Validation\ValidationException;
 use App\Models\Item;
@@ -32,12 +34,14 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 /**
  * Informações sobre o produto, composição ou pacote
  */
-class Produto extends Model
+class Produto extends Model implements ValidateInterface
 {
     use SoftDeletes;
+    use ModelEvents;
 
     const UPDATED_AT = 'data_atualizacao';
     const DELETED_AT = 'data_arquivado';
+
     /**
      * Informa qual é o tipo de produto. Produto: Produto normal que possui
      * estoque, Composição: Produto que não possui estoque diretamente, pois é
@@ -158,11 +162,11 @@ class Produto extends Model
         $errors = [];
         $item = Item::where('produto_id', $this->produto_id);
 
-        if ($this->tipo == self::TIPO_COMPOSICAO ||
-            $this->tipo == self::TIPO_PACOTE ||
-            $item->exists()
-            )
-        {
+        if (
+            $this->tipo == self::TIPO_COMPOSICAO
+            || $this->tipo == self::TIPO_PACOTE
+            || $item->exists()
+        ) {
             $errors['tipo'] = __('messages.produto_already_packaged');
         }
         if (!empty($errors)) {

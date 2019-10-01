@@ -86,11 +86,11 @@ class ProdutoInput extends InputType
                 'description' => 'Informa detalhes do produto, Ex: Com Cebola, Pimenta, Orégano',
             ],
             'quantidade_minima' => [
-                'type' => Type::nonNull(Type::float()),
+                'type' => Type::float(),
                 'description' => 'Informa a quantidade limite para que o sistema avise que o produto já está acabando',
             ],
             'quantidade_maxima' => [
-                'type' => Type::nonNull(Type::float()),
+                'type' => Type::float(),
                 'description' => 'Informa a quantidade máxima do produto no estoque, não proibe, apenas avisa',
             ],
             'preco_venda' => [
@@ -143,7 +143,7 @@ class ProdutoInput extends InputType
                 'description' => 'Imagem do produto',
             ],
             'data_atualizacao' => [
-                'type' => Type::nonNull(GraphQL::type('DateTime')),
+                'type' => GraphQL::type('DateTime'),
                 'description' => 'Data de atualização das informações do produto',
             ],
             'data_arquivado' => [

@@ -22,40 +22,49 @@
  *
  * @author Equipe GrandChef <desenvolvimento@grandchef.com.br>
  */
-namespace App\Models;
+namespace App\Concerns;
 
-use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Builder;
+use App\Interfaces\ValidateInterface;
+use App\Interfaces\ValidateInsertInterface;
+use App\Interfaces\ValidateUpdateInterface;
 
 /**
- * Unidades de medidas aplicadas aos produtos
+ * Informações sobre o produto, composição ou pacote
  */
-class Unidade extends Model
+trait ModelEvents
 {
-
-    const UPDATED_AT = 'data_atualizacao';
-    const DELETED_AT = 'data_arquivado';
     /**
-     * The table associated with the model.
+     * @inheritDoc
      *
-     * @var string
+     * @param Builder  $query
+     * @return bool
      */
-    protected $table = 'unidades';
+    protected function performInsert(Builder $query)
+    {
+        if ($this instanceof ValidateInterface) {
+            $this->validate();
+        }
+        if ($this instanceof ValidateInsertInterface) {
+            $this->onInsert();
+        }
+        return parent::performInsert($query);
+    }
 
     /**
-     * Indicates if the model should be timestamped.
+     * @inheritDoc
      *
-     * @var bool
+     * @param Builder  $query
+     * @return bool
      */
-    public $timestamps = false;
-
-    /**
-     * The model's default values for attributes.
-     *
-     * @var array
-     */
-    protected $fillable = [
-        'nome',
-        'descricao',
-        'sigla',
-    ];
+    protected function performUpdate(Builder $query)
+    {
+        if ($this instanceof ValidateInterface) {
+            $this->validate();
+        }
+        if ($this instanceof ValidateUpdateInterface) {
+            $this->onUpdate();
+        }
+        return parent::performUpdate($query);
+    }
 }

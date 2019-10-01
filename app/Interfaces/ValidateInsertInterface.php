@@ -22,40 +22,12 @@
  *
  * @author Equipe GrandChef <desenvolvimento@grandchef.com.br>
  */
-namespace App\Models;
-
-use Illuminate\Database\Eloquent\Model;
+namespace App\Interfaces;
 
 /**
- * Unidades de medidas aplicadas aos produtos
+ * Valida regras de negócio ao criar um model
  */
-class Unidade extends Model
+interface ValidateInsertInterface
 {
-
-    const UPDATED_AT = 'data_atualizacao';
-    const DELETED_AT = 'data_arquivado';
-    /**
-     * The table associated with the model.
-     *
-     * @var string
-     */
-    protected $table = 'unidades';
-
-    /**
-     * Indicates if the model should be timestamped.
-     *
-     * @var bool
-     */
-    public $timestamps = false;
-
-    /**
-     * The model's default values for attributes.
-     *
-     * @var array
-     */
-    protected $fillable = [
-        'nome',
-        'descricao',
-        'sigla',
-    ];
+    public function onInsert();
 }

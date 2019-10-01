@@ -63,7 +63,6 @@ class DeleteProdutoMutation extends Mutation
     public function resolve($root, $args)
     {
         $produto = Produto::findOrFail($args['id']);
-        $produto->validate();
         $produto->delete();
         return $produto;
     }

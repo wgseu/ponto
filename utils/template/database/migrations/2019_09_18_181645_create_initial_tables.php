@@ -22,7 +22,11 @@ $[table.end]
         Schema::create('$[table]', function (Blueprint $table) {
 $[field.each(all)]
 $[field.if(primary)]
+$[field.if(enum)]
+            $table->enum('$[field]', [$[field.each(option)]$[field.if(first)]$[field.else], $[field.end]'$[field.option]'$[field.end]])$[field.if(null)]->nullable()$[field.end]$[field.if(default)]->default($[field.default])$[field.end];
+$[field.else]
             $table->increments('$[field]')$[field.if(null)]->nullable()$[field.end]$[field.if(info)]->default($[Field.info])$[field.end];
+$[field.end]
 $[field.else.if(reference)]
             $table->unsignedInteger('$[field]')$[field.if(null)]->nullable()$[field.end]$[field.if(info)]->default($[Field.info])$[field.end];
 $[field.else.if(date)]
@@ -56,6 +60,13 @@ $[field.end]
 $[table.if(reference)]
 
 $[table.end]
+$[field.each(all)]
+$[field.if(primary)]
+$[field.if(enum)]
+            $table->primary('$[field]');
+$[field.end]
+$[field.end]
+$[field.end]
 $[table.each(unique)]
 $[unique.if(primary)]
 $[unique.else]
@@ -85,7 +96,7 @@ $[table.end]
     {
         Schema::disableForeignKeyConstraints();
 $[table.each]
-        Schema::drop('$[table]');
+        Schema::dropIfExists('$[table]');
 $[table.end]
         Schema::enableForeignKeyConstraints();
     }

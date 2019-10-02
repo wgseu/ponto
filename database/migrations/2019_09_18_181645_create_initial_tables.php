@@ -1474,10 +1474,11 @@ class CreateInitialTables extends Migration
         });
 
         Schema::create('sistemas', function (Blueprint $table) {
-            $table->increments('id')->default('1');
+            $table->enum('id', ['1'])->default('1');
             $table->string('fuso_horario', 100)->nullable();
             $table->text('opcoes')->nullable();
 
+            $table->primary('id');
         });
 
         Schema::create('resumos', function (Blueprint $table) {
@@ -1630,7 +1631,7 @@ class CreateInitialTables extends Migration
         });
 
         Schema::create('emitentes', function (Blueprint $table) {
-            $table->increments('id')->default('1');
+            $table->enum('id', ['1'])->default('1');
             $table->unsignedInteger('contador_id')->nullable();
             $table->unsignedInteger('regime_id');
             $table->enum('ambiente', ['homologacao', 'producao'])->default('homologacao');
@@ -1641,6 +1642,7 @@ class CreateInitialTables extends Migration
             $table->string('ibpt', 100)->nullable();
             $table->dateTime('data_expiracao')->nullable();
 
+            $table->primary('id');
             $table->index(['contador_id']);
             $table->index(['regime_id']);
             $table->foreign('contador_id')
@@ -1710,12 +1712,13 @@ class CreateInitialTables extends Migration
         });
 
         Schema::create('empresas', function (Blueprint $table) {
-            $table->increments('id')->default('1');
+            $table->enum('id', ['1'])->default('1');
             $table->unsignedInteger('pais_id')->nullable();
             $table->unsignedInteger('empresa_id')->nullable();
             $table->unsignedInteger('parceiro_id')->nullable();
             $table->text('opcoes')->nullable();
 
+            $table->primary('id');
             $table->index(['empresa_id']);
             $table->index(['parceiro_id']);
             $table->index(['pais_id']);
@@ -1938,83 +1941,83 @@ class CreateInitialTables extends Migration
     public function down()
     {
         Schema::disableForeignKeyConstraints();
-        Schema::drop('setores');
-        Schema::drop('mesas');
-        Schema::drop('sessoes');
-        Schema::drop('bancos');
-        Schema::drop('carteiras');
-        Schema::drop('caixas');
-        Schema::drop('formas');
-        Schema::drop('cartoes');
-        Schema::drop('funcoes');
-        Schema::drop('clientes');
-        Schema::drop('prestadores');
-        Schema::drop('moedas');
-        Schema::drop('paises');
-        Schema::drop('estados');
-        Schema::drop('cidades');
-        Schema::drop('bairros');
-        Schema::drop('zonas');
-        Schema::drop('localizacoes');
-        Schema::drop('comandas');
-        Schema::drop('viagens');
-        Schema::drop('integracoes');
-        Schema::drop('associacoes');
-        Schema::drop('pedidos');
-        Schema::drop('categorias');
-        Schema::drop('unidades');
-        Schema::drop('origens');
-        Schema::drop('operacoes');
-        Schema::drop('impostos');
-        Schema::drop('tributacoes');
-        Schema::drop('produtos');
-        Schema::drop('servicos');
-        Schema::drop('classificacoes');
-        Schema::drop('contas');
-        Schema::drop('movimentacoes');
-        Schema::drop('creditos');
-        Schema::drop('cheques');
-        Schema::drop('pagamentos');
-        Schema::drop('itens');
-        Schema::drop('modulos');
-        Schema::drop('funcionalidades');
-        Schema::drop('permissoes');
-        Schema::drop('auditorias');
-        Schema::drop('composicoes');
-        Schema::drop('fornecedores');
-        Schema::drop('listas');
-        Schema::drop('compras');
-        Schema::drop('requisitos');
-        Schema::drop('estoques');
-        Schema::drop('grupos');
-        Schema::drop('propriedades');
-        Schema::drop('pacotes');
-        Schema::drop('dispositivos');
-        Schema::drop('impressoras');
-        Schema::drop('promocoes');
-        Schema::drop('acessos');
-        Schema::drop('catalogos');
-        Schema::drop('sistemas');
-        Schema::drop('resumos');
-        Schema::drop('formacoes');
-        Schema::drop('enderecos');
-        Schema::drop('horarios');
-        Schema::drop('patrimonios');
-        Schema::drop('juncoes');
-        Schema::drop('regimes');
-        Schema::drop('emitentes');
-        Schema::drop('notas');
-        Schema::drop('eventos');
-        Schema::drop('empresas');
-        Schema::drop('pontuacoes');
-        Schema::drop('telefones');
-        Schema::drop('observacoes');
-        Schema::drop('cupons');
-        Schema::drop('metricas');
-        Schema::drop('avaliacoes');
-        Schema::drop('cozinhas');
-        Schema::drop('cardapios');
-        Schema::drop('contagens');
+        Schema::dropIfExists('setores');
+        Schema::dropIfExists('mesas');
+        Schema::dropIfExists('sessoes');
+        Schema::dropIfExists('bancos');
+        Schema::dropIfExists('carteiras');
+        Schema::dropIfExists('caixas');
+        Schema::dropIfExists('formas');
+        Schema::dropIfExists('cartoes');
+        Schema::dropIfExists('funcoes');
+        Schema::dropIfExists('clientes');
+        Schema::dropIfExists('prestadores');
+        Schema::dropIfExists('moedas');
+        Schema::dropIfExists('paises');
+        Schema::dropIfExists('estados');
+        Schema::dropIfExists('cidades');
+        Schema::dropIfExists('bairros');
+        Schema::dropIfExists('zonas');
+        Schema::dropIfExists('localizacoes');
+        Schema::dropIfExists('comandas');
+        Schema::dropIfExists('viagens');
+        Schema::dropIfExists('integracoes');
+        Schema::dropIfExists('associacoes');
+        Schema::dropIfExists('pedidos');
+        Schema::dropIfExists('categorias');
+        Schema::dropIfExists('unidades');
+        Schema::dropIfExists('origens');
+        Schema::dropIfExists('operacoes');
+        Schema::dropIfExists('impostos');
+        Schema::dropIfExists('tributacoes');
+        Schema::dropIfExists('produtos');
+        Schema::dropIfExists('servicos');
+        Schema::dropIfExists('classificacoes');
+        Schema::dropIfExists('contas');
+        Schema::dropIfExists('movimentacoes');
+        Schema::dropIfExists('creditos');
+        Schema::dropIfExists('cheques');
+        Schema::dropIfExists('pagamentos');
+        Schema::dropIfExists('itens');
+        Schema::dropIfExists('modulos');
+        Schema::dropIfExists('funcionalidades');
+        Schema::dropIfExists('permissoes');
+        Schema::dropIfExists('auditorias');
+        Schema::dropIfExists('composicoes');
+        Schema::dropIfExists('fornecedores');
+        Schema::dropIfExists('listas');
+        Schema::dropIfExists('compras');
+        Schema::dropIfExists('requisitos');
+        Schema::dropIfExists('estoques');
+        Schema::dropIfExists('grupos');
+        Schema::dropIfExists('propriedades');
+        Schema::dropIfExists('pacotes');
+        Schema::dropIfExists('dispositivos');
+        Schema::dropIfExists('impressoras');
+        Schema::dropIfExists('promocoes');
+        Schema::dropIfExists('acessos');
+        Schema::dropIfExists('catalogos');
+        Schema::dropIfExists('sistemas');
+        Schema::dropIfExists('resumos');
+        Schema::dropIfExists('formacoes');
+        Schema::dropIfExists('enderecos');
+        Schema::dropIfExists('horarios');
+        Schema::dropIfExists('patrimonios');
+        Schema::dropIfExists('juncoes');
+        Schema::dropIfExists('regimes');
+        Schema::dropIfExists('emitentes');
+        Schema::dropIfExists('notas');
+        Schema::dropIfExists('eventos');
+        Schema::dropIfExists('empresas');
+        Schema::dropIfExists('pontuacoes');
+        Schema::dropIfExists('telefones');
+        Schema::dropIfExists('observacoes');
+        Schema::dropIfExists('cupons');
+        Schema::dropIfExists('metricas');
+        Schema::dropIfExists('avaliacoes');
+        Schema::dropIfExists('cozinhas');
+        Schema::dropIfExists('cardapios');
+        Schema::dropIfExists('contagens');
         Schema::enableForeignKeyConstraints();
     }
 }

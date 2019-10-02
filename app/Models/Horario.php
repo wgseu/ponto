@@ -24,13 +24,17 @@
  */
 namespace App\Models;
 
+use App\Concerns\ModelEvents;
+use App\Interfaces\ValidateInterface;
 use Illuminate\Database\Eloquent\Model;
 
 /**
  * Informa o horário de funcionamento do estabelecimento
  */
-class Horario extends Model
+class Horario extends Model implements ValidateInterface
 {
+    use ModelEvents;
+
     /**
      * Modo de trabalho disponível nesse horário, Funcionamento: horário em que
      * o estabelecimento estará aberto, Operação: quando aceitar novos pedidos
@@ -55,7 +59,7 @@ class Horario extends Model
     public $timestamps = false;
 
     /**
-     * The model's default values for attributes.
+     * The attributes that are mass assignable.
      *
      * @var array
      */
@@ -97,5 +101,9 @@ class Horario extends Model
     public function prestador()
     {
         return $this->belongsTo('App\Models\Prestador', 'prestador_id');
+    }
+
+    public function validate()
+    {
     }
 }

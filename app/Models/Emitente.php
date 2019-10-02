@@ -24,13 +24,17 @@
  */
 namespace App\Models;
 
+use App\Concerns\ModelEvents;
+use App\Interfaces\ValidateInterface;
 use Illuminate\Database\Eloquent\Model;
 
 /**
  * Dados do emitente das notas fiscais
  */
-class Emitente extends Model
+class Emitente extends Model implements ValidateInterface
 {
+    use ModelEvents;
+
     /**
      * Ambiente de emissão das notas
      */
@@ -52,7 +56,7 @@ class Emitente extends Model
     public $timestamps = false;
 
     /**
-     * The model's default values for attributes.
+     * The attributes that are mass assignable.
      *
      * @var array
      */
@@ -91,5 +95,9 @@ class Emitente extends Model
     public function regime()
     {
         return $this->belongsTo('App\Models\Regime', 'regime_id');
+    }
+
+    public function validate()
+    {
     }
 }

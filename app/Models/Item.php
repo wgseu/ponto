@@ -24,14 +24,18 @@
  */
 namespace App\Models;
 
+use App\Concerns\ModelEvents;
+use App\Interfaces\ValidateInterface;
 use Illuminate\Database\Eloquent\Model;
 
 /**
  * Produtos, taxas e serviços do pedido, a alteração do estado permite o
  * controle de produção
  */
-class Item extends Model
+class Item extends Model implements ValidateInterface
 {
+    use ModelEvents;
+
     /**
      * Estado de preparo e envio do produto
      */
@@ -42,6 +46,9 @@ class Item extends Model
     const ESTADO_DISPONIVEL = 'disponivel';
     const ESTADO_ENTREGUE = 'entregue';
 
+    const UPDATED_AT = 'data_atualizacao';
+    const CREATED_AT = 'data_lancamento';
+
     /**
      * The table associated with the model.
      *
@@ -50,14 +57,7 @@ class Item extends Model
     protected $table = 'itens';
 
     /**
-     * Indicates if the model should be timestamped.
-     *
-     * @var bool
-     */
-    public $timestamps = false;
-
-    /**
-     * The model's default values for attributes.
+     * The attributes that are mass assignable.
      *
      * @var array
      */
@@ -83,8 +83,6 @@ class Item extends Model
         'motivo',
         'desperdicado',
         'data_processamento',
-        'data_atualizacao',
-        'data_lancamento',
     ];
 
     /**
@@ -146,5 +144,9 @@ class Item extends Model
     public function pagamento()
     {
         return $this->belongsTo('App\Models\Pagamento', 'pagamento_id');
+    }
+
+    public function validate()
+    {
     }
 }

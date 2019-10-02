@@ -24,13 +24,16 @@
  */
 namespace App\Models;
 
+use App\Concerns\ModelEvents;
+use App\Interfaces\ValidateInterface;
 use Illuminate\Database\Eloquent\Model;
 
 /**
  * Informações da empresa
  */
-class Empresa extends Model
+class Empresa extends Model implements ValidateInterface
 {
+    use ModelEvents;
 
     /**
      * The table associated with the model.
@@ -47,7 +50,7 @@ class Empresa extends Model
     public $timestamps = false;
 
     /**
-     * The model's default values for attributes.
+     * The attributes that are mass assignable.
      *
      * @var array
      */
@@ -56,6 +59,14 @@ class Empresa extends Model
         'empresa_id',
         'parceiro_id',
         'opcoes',
+    ];
+
+    /**
+     * The model's default values for attributes.
+     *
+     * @var array
+     */
+    protected $attributes = [
     ];
 
     /**
@@ -82,5 +93,9 @@ class Empresa extends Model
     public function parceiro()
     {
         return $this->belongsTo('App\Models\Cliente', 'parceiro_id');
+    }
+
+    public function validate()
+    {
     }
 }

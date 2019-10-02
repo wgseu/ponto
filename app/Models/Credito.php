@@ -24,13 +24,20 @@
  */
 namespace App\Models;
 
+use App\Concerns\ModelEvents;
+use App\Interfaces\ValidateInterface;
 use Illuminate\Database\Eloquent\Model;
 
 /**
  * Créditos de clientes
  */
-class Credito extends Model
+class Credito extends Model implements ValidateInterface
 {
+    use ModelEvents;
+
+    const CREATED_AT = 'data_cadastro';
+    const UPDATED_AT = null;
+
     /**
      * The table associated with the model.
      *
@@ -39,14 +46,7 @@ class Credito extends Model
     protected $table = 'creditos';
 
     /**
-     * Indicates if the model should be timestamped.
-     *
-     * @var bool
-     */
-    public $timestamps = false;
-
-    /**
-     * The model's default values for attributes.
+     * The attributes that are mass assignable.
      *
      * @var array
      */
@@ -55,7 +55,6 @@ class Credito extends Model
         'valor',
         'detalhes',
         'cancelado',
-        'data_cadastro',
     ];
 
     /**
@@ -73,5 +72,9 @@ class Credito extends Model
     public function cliente()
     {
         return $this->belongsTo('App\Models\Cliente', 'cliente_id');
+    }
+
+    public function validate()
+    {
     }
 }

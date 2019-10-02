@@ -24,13 +24,17 @@
  */
 namespace App\Models;
 
+use App\Concerns\ModelEvents;
+use App\Interfaces\ValidateInterface;
 use Illuminate\Database\Eloquent\Model;
 
 /**
  * Prestador de serviço que realiza alguma tarefa na empresa
  */
-class Prestador extends Model
+class Prestador extends Model implements ValidateInterface
 {
+    use ModelEvents;
+
     /**
      * Vínculo empregatício com a empresa, funcionário e autônomo são pessoas
      * físicas, prestador é pessoa jurídica
@@ -38,6 +42,9 @@ class Prestador extends Model
     const VINCULO_FUNCIONARIO = 'funcionario';
     const VINCULO_PRESTADOR = 'prestador';
     const VINCULO_AUTONOMO = 'autonomo';
+
+    const CREATED_AT = 'data_cadastro';
+    const UPDATED_AT = null;
 
     /**
      * The table associated with the model.
@@ -47,14 +54,7 @@ class Prestador extends Model
     protected $table = 'prestadores';
 
     /**
-     * Indicates if the model should be timestamped.
-     *
-     * @var bool
-     */
-    public $timestamps = false;
-
-    /**
-     * The model's default values for attributes.
+     * The attributes that are mass assignable.
      *
      * @var array
      */
@@ -69,7 +69,6 @@ class Prestador extends Model
         'pontuacao',
         'remuneracao',
         'data_termino',
-        'data_cadastro',
     ];
 
     /**
@@ -107,5 +106,9 @@ class Prestador extends Model
     public function empresa()
     {
         return $this->belongsTo('App\Models\Prestador', 'empresa_id');
+    }
+
+    public function validate()
+    {
     }
 }

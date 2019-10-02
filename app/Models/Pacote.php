@@ -24,13 +24,21 @@
  */
 namespace App\Models;
 
+use App\Concerns\ModelEvents;
+use App\Interfaces\ValidateInterface;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
  * Contém todos as opções para a formação do produto final
  */
-class Pacote extends Model
+class Pacote extends Model implements ValidateInterface
 {
+    use ModelEvents;
+    use SoftDeletes;
+
+    const DELETED_AT = 'data_arquivado';
+
     /**
      * The table associated with the model.
      *
@@ -46,7 +54,7 @@ class Pacote extends Model
     public $timestamps = false;
 
     /**
-     * The model's default values for attributes.
+     * The attributes that are mass assignable.
      *
      * @var array
      */
@@ -61,7 +69,6 @@ class Pacote extends Model
         'acrescimo',
         'selecionado',
         'disponivel',
-        'data_arquivado',
     ];
 
     /**
@@ -116,5 +123,9 @@ class Pacote extends Model
     public function associacao()
     {
         return $this->belongsTo('App\Models\Pacote', 'associacao_id');
+    }
+
+    public function validate()
+    {
     }
 }

@@ -24,13 +24,17 @@
  */
 namespace App\Models;
 
+use App\Concerns\ModelEvents;
+use App\Interfaces\ValidateInterface;
 use Illuminate\Database\Eloquent\Model;
 
 /**
  * Eventos de envio das notas
  */
-class Evento extends Model
+class Evento extends Model implements ValidateInterface
 {
+    use ModelEvents;
+
     /**
      * Estado do evento
      */
@@ -46,6 +50,9 @@ class Evento extends Model
     const ESTADO_INUTILIZADO = 'inutilizado';
     const ESTADO_AUTORIZADO = 'autorizado';
 
+    const CREATED_AT = 'data_criacao';
+    const UPDATED_AT = null;
+
     /**
      * The table associated with the model.
      *
@@ -54,14 +61,7 @@ class Evento extends Model
     protected $table = 'eventos';
 
     /**
-     * Indicates if the model should be timestamped.
-     *
-     * @var bool
-     */
-    public $timestamps = false;
-
-    /**
-     * The model's default values for attributes.
+     * The attributes that are mass assignable.
      *
      * @var array
      */
@@ -70,7 +70,6 @@ class Evento extends Model
         'estado',
         'mensagem',
         'codigo',
-        'data_criacao',
     ];
 
     /**
@@ -79,5 +78,9 @@ class Evento extends Model
     public function nota()
     {
         return $this->belongsTo('App\Models\Nota', 'nota_id');
+    }
+
+    public function validate()
+    {
     }
 }

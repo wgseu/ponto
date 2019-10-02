@@ -24,13 +24,17 @@
  */
 namespace App\Models;
 
+use App\Concerns\ModelEvents;
+use App\Interfaces\ValidateInterface;
 use Illuminate\Database\Eloquent\Model;
 
 /**
  * Função ou atribuição de tarefas à um prestador
  */
-class Funcao extends Model
+class Funcao extends Model implements ValidateInterface
 {
+    use ModelEvents;
+
     /**
      * The table associated with the model.
      *
@@ -46,7 +50,7 @@ class Funcao extends Model
     public $timestamps = false;
 
     /**
-     * The model's default values for attributes.
+     * The attributes that are mass assignable.
      *
      * @var array
      */
@@ -54,4 +58,8 @@ class Funcao extends Model
         'descricao',
         'remuneracao',
     ];
+
+    public function validate()
+    {
+    }
 }

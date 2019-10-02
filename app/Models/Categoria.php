@@ -24,14 +24,24 @@
  */
 namespace App\Models;
 
+use App\Concerns\ModelEvents;
+use App\Interfaces\ValidateInterface;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
  * Informa qual a categoria dos produtos e permite a rápida localização dos
  * mesmos
  */
-class Categoria extends Model
+class Categoria extends Model implements ValidateInterface
 {
+    use ModelEvents;
+    use SoftDeletes;
+
+    const UPDATED_AT = 'data_atualizacao';
+    const DELETED_AT = 'data_arquivado';
+    const CREATED_AT = null;
+
     /**
      * The table associated with the model.
      *
@@ -40,14 +50,7 @@ class Categoria extends Model
     protected $table = 'categorias';
 
     /**
-     * Indicates if the model should be timestamped.
-     *
-     * @var bool
-     */
-    public $timestamps = false;
-
-    /**
-     * The model's default values for attributes.
+     * The attributes that are mass assignable.
      *
      * @var array
      */
@@ -57,8 +60,6 @@ class Categoria extends Model
         'detalhes',
         'imagem_url',
         'ordem',
-        'data_atualizacao',
-        'data_arquivado',
     ];
 
     /**
@@ -77,5 +78,9 @@ class Categoria extends Model
     public function categoria()
     {
         return $this->belongsTo('App\Models\Categoria', 'categoria_id');
+    }
+
+    public function validate()
+    {
     }
 }

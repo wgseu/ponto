@@ -24,13 +24,17 @@
  */
 namespace App\Models;
 
+use App\Concerns\ModelEvents;
+use App\Interfaces\ValidateInterface;
 use Illuminate\Database\Eloquent\Model;
 
 /**
  * Origem da mercadoria
  */
-class Origem extends Model
+class Origem extends Model implements ValidateInterface
 {
+    use ModelEvents;
+
     /**
      * The table associated with the model.
      *
@@ -46,7 +50,7 @@ class Origem extends Model
     public $timestamps = false;
 
     /**
-     * The model's default values for attributes.
+     * The attributes that are mass assignable.
      *
      * @var array
      */
@@ -54,4 +58,8 @@ class Origem extends Model
         'codigo',
         'descricao',
     ];
+
+    public function validate()
+    {
+    }
 }

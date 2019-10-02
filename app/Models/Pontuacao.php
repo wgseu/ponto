@@ -24,13 +24,20 @@
  */
 namespace App\Models;
 
+use App\Concerns\ModelEvents;
+use App\Interfaces\ValidateInterface;
 use Illuminate\Database\Eloquent\Model;
 
 /**
  * Informa os pontos ganhos e gastos por compras de produtos promocionais
  */
-class Pontuacao extends Model
+class Pontuacao extends Model implements ValidateInterface
 {
+    use ModelEvents;
+
+    const CREATED_AT = 'data_cadastro';
+    const UPDATED_AT = null;
+
     /**
      * The table associated with the model.
      *
@@ -39,14 +46,7 @@ class Pontuacao extends Model
     protected $table = 'pontuacoes';
 
     /**
-     * Indicates if the model should be timestamped.
-     *
-     * @var bool
-     */
-    public $timestamps = false;
-
-    /**
-     * The model's default values for attributes.
+     * The attributes that are mass assignable.
      *
      * @var array
      */
@@ -56,7 +56,6 @@ class Pontuacao extends Model
         'pedido_id',
         'item_id',
         'quantidade',
-        'data_cadastro',
     ];
 
     /**
@@ -90,5 +89,9 @@ class Pontuacao extends Model
     public function item()
     {
         return $this->belongsTo('App\Models\Item', 'item_id');
+    }
+
+    public function validate()
+    {
     }
 }

@@ -24,13 +24,17 @@
  */
 namespace App\Models;
 
+use App\Concerns\ModelEvents;
+use App\Interfaces\ValidateInterface;
 use Illuminate\Database\Eloquent\Model;
 
 /**
  * Bancos disponíveis no país
  */
-class Banco extends Model
+class Banco extends Model implements ValidateInterface
 {
+    use ModelEvents;
+
     /**
      * The table associated with the model.
      *
@@ -46,7 +50,7 @@ class Banco extends Model
     public $timestamps = false;
 
     /**
-     * The model's default values for attributes.
+     * The attributes that are mass assignable.
      *
      * @var array
      */
@@ -57,4 +61,8 @@ class Banco extends Model
         'agencia_mascara',
         'conta_mascara',
     ];
+
+    public function validate()
+    {
+    }
 }

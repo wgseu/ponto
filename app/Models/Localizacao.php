@@ -24,19 +24,27 @@
  */
 namespace App\Models;
 
+use App\Concerns\ModelEvents;
+use App\Interfaces\ValidateInterface;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
  * Endereço detalhado de um cliente
  */
-class Localizacao extends Model
+class Localizacao extends Model implements ValidateInterface
 {
+    use ModelEvents;
+    use SoftDeletes;
+
     /**
      * Tipo de endereço Casa ou Apartamento
      */
     const TIPO_CASA = 'casa';
     const TIPO_APARTAMENTO = 'apartamento';
     const TIPO_CONDOMINIO = 'condominio';
+
+    const DELETED_AT = 'data_arquivado';
 
     /**
      * The table associated with the model.
@@ -53,7 +61,7 @@ class Localizacao extends Model
     public $timestamps = false;
 
     /**
-     * The model's default values for attributes.
+     * The attributes that are mass assignable.
      *
      * @var array
      */
@@ -73,7 +81,6 @@ class Localizacao extends Model
         'latitude',
         'longitude',
         'apelido',
-        'data_arquivado',
     ];
 
     /**
@@ -107,5 +114,9 @@ class Localizacao extends Model
     public function zona()
     {
         return $this->belongsTo('App\Models\Zona', 'zona_id');
+    }
+
+    public function validate()
+    {
     }
 }

@@ -24,20 +24,20 @@
  */
 namespace App\Models;
 
+use App\Concerns\ModelEvents;
 use Illuminate\Foundation\Auth\User;
-use Illuminate\Notifications\Notifiable;
+use App\Interfaces\ValidateInterface;
 use Tymon\JWTAuth\Contracts\JWTSubject;
+use Illuminate\Notifications\Notifiable;
 
 /**
  * Informações de cliente físico ou jurídico. Clientes, empresas,
  * funcionários, fornecedores e parceiros são cadastrados aqui
  */
-class Cliente extends User implements JWTSubject
+class Cliente extends User implements ValidateInterface, JWTSubject
 {
     use Notifiable;
-
-    const UPDATED_AT = 'data_atualizacao';
-    const CREATED_AT = 'data_cadastro';
+    use ModelEvents;
 
     /**
      * Informa o tipo de pessoa, que pode ser física ou jurídica
@@ -58,6 +58,9 @@ class Cliente extends User implements JWTSubject
     const STATUS_ATIVO = 'ativo';
     const STATUS_BLOQUEADO = 'bloqueado';
 
+    const UPDATED_AT = 'data_atualizacao';
+    const CREATED_AT = 'data_cadastro';
+
     /**
      * The table associated with the model.
      *
@@ -66,7 +69,7 @@ class Cliente extends User implements JWTSubject
     protected $table = 'clientes';
 
     /**
-     * The model's default values for attributes.
+     * The attributes that are mass assignable.
      *
      * @var array
      */
@@ -161,5 +164,9 @@ class Cliente extends User implements JWTSubject
     public function empresa()
     {
         return $this->belongsTo('App\Models\Cliente', 'empresa_id');
+    }
+
+    public function validate()
+    {
     }
 }

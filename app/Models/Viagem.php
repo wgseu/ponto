@@ -24,13 +24,20 @@
  */
 namespace App\Models;
 
+use App\Concerns\ModelEvents;
+use App\Interfaces\ValidateInterface;
 use Illuminate\Database\Eloquent\Model;
 
 /**
  * Registro de viagem de uma entrega ou compra de insumos
  */
-class Viagem extends Model
+class Viagem extends Model implements ValidateInterface
 {
+    use ModelEvents;
+
+    const UPDATED_AT = 'data_atualizacao';
+    const CREATED_AT = null;
+
     /**
      * The table associated with the model.
      *
@@ -39,14 +46,7 @@ class Viagem extends Model
     protected $table = 'viagens';
 
     /**
-     * Indicates if the model should be timestamped.
-     *
-     * @var bool
-     */
-    public $timestamps = false;
-
-    /**
-     * The model's default values for attributes.
+     * The attributes that are mass assignable.
      *
      * @var array
      */
@@ -56,7 +56,6 @@ class Viagem extends Model
         'longitude',
         'quilometragem',
         'distancia',
-        'data_atualizacao',
         'data_chegada',
         'data_saida',
     ];
@@ -67,5 +66,9 @@ class Viagem extends Model
     public function responsavel()
     {
         return $this->belongsTo('App\Models\Prestador', 'responsavel_id');
+    }
+
+    public function validate()
+    {
     }
 }

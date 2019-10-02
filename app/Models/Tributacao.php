@@ -24,13 +24,17 @@
  */
 namespace App\Models;
 
+use App\Concerns\ModelEvents;
+use App\Interfaces\ValidateInterface;
 use Illuminate\Database\Eloquent\Model;
 
 /**
  * Informação tributária dos produtos
  */
-class Tributacao extends Model
+class Tributacao extends Model implements ValidateInterface
 {
+    use ModelEvents;
+
     /**
      * The table associated with the model.
      *
@@ -46,7 +50,7 @@ class Tributacao extends Model
     public $timestamps = false;
 
     /**
-     * The model's default values for attributes.
+     * The attributes that are mass assignable.
      *
      * @var array
      */
@@ -80,5 +84,9 @@ class Tributacao extends Model
     public function imposto()
     {
         return $this->belongsTo('App\Models\Imposto', 'imposto_id');
+    }
+
+    public function validate()
+    {
     }
 }

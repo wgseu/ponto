@@ -24,13 +24,17 @@
  */
 namespace App\Models;
 
+use App\Concerns\ModelEvents;
+use App\Interfaces\ValidateInterface;
 use Illuminate\Database\Eloquent\Model;
 
 /**
  * Cartões utilizados na forma de pagamento em cartão
  */
-class Cartao extends Model
+class Cartao extends Model implements ValidateInterface
 {
+    use ModelEvents;
+
     /**
      * The table associated with the model.
      *
@@ -46,7 +50,7 @@ class Cartao extends Model
     public $timestamps = false;
 
     /**
-     * The model's default values for attributes.
+     * The attributes that are mass assignable.
      *
      * @var array
      */
@@ -87,5 +91,9 @@ class Cartao extends Model
     public function carteira()
     {
         return $this->belongsTo('App\Models\Carteira', 'carteira_id');
+    }
+
+    public function validate()
+    {
     }
 }

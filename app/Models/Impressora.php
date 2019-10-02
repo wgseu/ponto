@@ -24,13 +24,17 @@
  */
 namespace App\Models;
 
+use App\Concerns\ModelEvents;
+use App\Interfaces\ValidateInterface;
 use Illuminate\Database\Eloquent\Model;
 
 /**
  * Impressora para impressão de serviços e contas
  */
-class Impressora extends Model
+class Impressora extends Model implements ValidateInterface
 {
+    use ModelEvents;
+
     /**
      * Modo de impressão
      */
@@ -54,7 +58,7 @@ class Impressora extends Model
     public $timestamps = false;
 
     /**
-     * The model's default values for attributes.
+     * The attributes that are mass assignable.
      *
      * @var array
      */
@@ -94,5 +98,9 @@ class Impressora extends Model
     public function setor()
     {
         return $this->belongsTo('App\Models\Setor', 'setor_id');
+    }
+
+    public function validate()
+    {
     }
 }

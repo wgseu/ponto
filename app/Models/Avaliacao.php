@@ -24,13 +24,17 @@
  */
 namespace App\Models;
 
+use App\Concerns\ModelEvents;
+use App\Interfaces\ValidateInterface;
 use Illuminate\Database\Eloquent\Model;
 
 /**
  * Avaliação de atendimento e outros serviços do estabelecimento
  */
-class Avaliacao extends Model
+class Avaliacao extends Model implements ValidateInterface
 {
+    use ModelEvents;
+
     /**
      * The table associated with the model.
      *
@@ -46,7 +50,7 @@ class Avaliacao extends Model
     public $timestamps = false;
 
     /**
-     * The model's default values for attributes.
+     * The attributes that are mass assignable.
      *
      * @var array
      */
@@ -91,5 +95,9 @@ class Avaliacao extends Model
     public function produto()
     {
         return $this->belongsTo('App\Models\Produto', 'produto_id');
+    }
+
+    public function validate()
+    {
     }
 }

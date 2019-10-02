@@ -24,13 +24,17 @@
  */
 namespace App\Models;
 
+use App\Concerns\ModelEvents;
+use App\Interfaces\ValidateInterface;
 use Illuminate\Database\Eloquent\Model;
 
 /**
  * Informações de um páis com sua moeda e língua nativa
  */
-class Pais extends Model
+class Pais extends Model implements ValidateInterface
 {
+    use ModelEvents;
+
     /**
      * The table associated with the model.
      *
@@ -46,7 +50,7 @@ class Pais extends Model
     public $timestamps = false;
 
     /**
-     * The model's default values for attributes.
+     * The attributes that are mass assignable.
      *
      * @var array
      */
@@ -76,5 +80,9 @@ class Pais extends Model
     public function moeda()
     {
         return $this->belongsTo('App\Models\Moeda', 'moeda_id');
+    }
+
+    public function validate()
+    {
     }
 }

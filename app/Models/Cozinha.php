@@ -24,13 +24,17 @@
  */
 namespace App\Models;
 
+use App\Concerns\ModelEvents;
+use App\Interfaces\ValidateInterface;
 use Illuminate\Database\Eloquent\Model;
 
 /**
  * Categoria de comida servida pelo estabelecimento
  */
-class Cozinha extends Model
+class Cozinha extends Model implements ValidateInterface
 {
+    use ModelEvents;
+
     /**
      * The table associated with the model.
      *
@@ -46,7 +50,7 @@ class Cozinha extends Model
     public $timestamps = false;
 
     /**
-     * The model's default values for attributes.
+     * The attributes that are mass assignable.
      *
      * @var array
      */
@@ -54,4 +58,8 @@ class Cozinha extends Model
         'nome',
         'descricao',
     ];
+
+    public function validate()
+    {
+    }
 }

@@ -24,13 +24,17 @@
  */
 namespace App\Models;
 
+use App\Concerns\ModelEvents;
+use App\Interfaces\ValidateInterface;
 use Illuminate\Database\Eloquent\Model;
 
 /**
  * Caixas de movimentação financeira
  */
-class Caixa extends Model
+class Caixa extends Model implements ValidateInterface
 {
+    use ModelEvents;
+
     /**
      * The table associated with the model.
      *
@@ -46,7 +50,7 @@ class Caixa extends Model
     public $timestamps = false;
 
     /**
-     * The model's default values for attributes.
+     * The attributes that are mass assignable.
      *
      * @var array
      */
@@ -73,5 +77,9 @@ class Caixa extends Model
     public function carteira()
     {
         return $this->belongsTo('App\Models\Carteira', 'carteira_id');
+    }
+
+    public function validate()
+    {
     }
 }

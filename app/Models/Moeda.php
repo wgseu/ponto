@@ -24,13 +24,20 @@
  */
 namespace App\Models;
 
+use App\Concerns\ModelEvents;
+use App\Interfaces\ValidateInterface;
 use Illuminate\Database\Eloquent\Model;
 
 /**
  * Moedas financeiras de um país
  */
-class Moeda extends Model
+class Moeda extends Model implements ValidateInterface
 {
+    use ModelEvents;
+
+    const UPDATED_AT = 'data_atualizacao';
+    const CREATED_AT = null;
+
     /**
      * The table associated with the model.
      *
@@ -39,14 +46,7 @@ class Moeda extends Model
     protected $table = 'moedas';
 
     /**
-     * Indicates if the model should be timestamped.
-     *
-     * @var bool
-     */
-    public $timestamps = false;
-
-    /**
-     * The model's default values for attributes.
+     * The attributes that are mass assignable.
      *
      * @var array
      */
@@ -58,7 +58,6 @@ class Moeda extends Model
         'fracao',
         'formato',
         'conversao',
-        'data_atualizacao',
         'ativa',
     ];
 
@@ -70,4 +69,8 @@ class Moeda extends Model
     protected $attributes = [
         'ativa' => false,
     ];
+
+    public function validate()
+    {
+    }
 }

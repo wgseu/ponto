@@ -24,14 +24,18 @@
  */
 namespace App\Models;
 
+use App\Concerns\ModelEvents;
+use App\Interfaces\ValidateInterface;
 use Illuminate\Database\Eloquent\Model;
 
 /**
  * Movimentação do caixa, permite abrir diversos caixas na conta de
  * operadores
  */
-class Movimentacao extends Model
+class Movimentacao extends Model implements ValidateInterface
 {
+    use ModelEvents;
+
     /**
      * The table associated with the model.
      *
@@ -47,7 +51,7 @@ class Movimentacao extends Model
     public $timestamps = false;
 
     /**
-     * The model's default values for attributes.
+     * The attributes that are mass assignable.
      *
      * @var array
      */
@@ -101,5 +105,9 @@ class Movimentacao extends Model
     public function fechador()
     {
         return $this->belongsTo('App\Models\Prestador', 'fechador_id');
+    }
+
+    public function validate()
+    {
     }
 }

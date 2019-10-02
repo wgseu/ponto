@@ -24,13 +24,17 @@
  */
 namespace App\Models;
 
+use App\Concerns\ModelEvents;
+use App\Interfaces\ValidateInterface;
 use Illuminate\Database\Eloquent\Model;
 
 /**
  * Estado federativo de um país
  */
-class Estado extends Model
+class Estado extends Model implements ValidateInterface
 {
+    use ModelEvents;
+
     /**
      * The table associated with the model.
      *
@@ -46,7 +50,7 @@ class Estado extends Model
     public $timestamps = false;
 
     /**
-     * The model's default values for attributes.
+     * The attributes that are mass assignable.
      *
      * @var array
      */
@@ -62,5 +66,9 @@ class Estado extends Model
     public function pais()
     {
         return $this->belongsTo('App\Models\Pais', 'pais_id');
+    }
+
+    public function validate()
+    {
     }
 }

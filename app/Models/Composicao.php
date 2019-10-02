@@ -24,13 +24,17 @@
  */
 namespace App\Models;
 
+use App\Concerns\ModelEvents;
+use App\Interfaces\ValidateInterface;
 use Illuminate\Database\Eloquent\Model;
 
 /**
  * Informa as propriedades da composição de um produto composto
  */
-class Composicao extends Model
+class Composicao extends Model implements ValidateInterface
 {
+    use ModelEvents;
+
     /**
      * Tipo de composição, 'Composicao' sempre retira do estoque, 'Opcional'
      * permite desmarcar na venda, 'Adicional' permite adicionar na venda
@@ -54,7 +58,7 @@ class Composicao extends Model
     public $timestamps = false;
 
     /**
-     * The model's default values for attributes.
+     * The attributes that are mass assignable.
      *
      * @var array
      */
@@ -97,5 +101,9 @@ class Composicao extends Model
     public function produto()
     {
         return $this->belongsTo('App\Models\Produto', 'produto_id');
+    }
+
+    public function validate()
+    {
     }
 }

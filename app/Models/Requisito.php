@@ -24,13 +24,17 @@
  */
 namespace App\Models;
 
+use App\Concerns\ModelEvents;
+use App\Interfaces\ValidateInterface;
 use Illuminate\Database\Eloquent\Model;
 
 /**
  * Informa os produtos da lista de compras
  */
-class Requisito extends Model
+class Requisito extends Model implements ValidateInterface
 {
+    use ModelEvents;
+
     /**
      * The table associated with the model.
      *
@@ -46,7 +50,7 @@ class Requisito extends Model
     public $timestamps = false;
 
     /**
-     * The model's default values for attributes.
+     * The attributes that are mass assignable.
      *
      * @var array
      */
@@ -106,5 +110,9 @@ class Requisito extends Model
     public function fornecedor()
     {
         return $this->belongsTo('App\Models\Fornecedor', 'fornecedor_id');
+    }
+
+    public function validate()
+    {
     }
 }

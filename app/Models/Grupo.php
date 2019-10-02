@@ -24,14 +24,20 @@
  */
 namespace App\Models;
 
+use App\Concerns\ModelEvents;
+use App\Interfaces\ValidateInterface;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
  * Grupos de pacotes, permite criar grupos como Tamanho, Sabores para
  * formações de produtos
  */
-class Grupo extends Model
+class Grupo extends Model implements ValidateInterface
 {
+    use ModelEvents;
+    use SoftDeletes;
+
     /**
      * Informa se a formação final será apenas uma unidade ou vários itens
      */
@@ -49,6 +55,8 @@ class Grupo extends Model
     const FUNCAO_MAXIMO = 'maximo';
     const FUNCAO_SOMA = 'soma';
 
+    const DELETED_AT = 'data_arquivado';
+
     /**
      * The table associated with the model.
      *
@@ -64,7 +72,7 @@ class Grupo extends Model
     public $timestamps = false;
 
     /**
-     * The model's default values for attributes.
+     * The attributes that are mass assignable.
      *
      * @var array
      */
@@ -77,7 +85,6 @@ class Grupo extends Model
         'quantidade_maxima',
         'funcao',
         'ordem',
-        'data_arquivado',
     ];
 
     /**
@@ -99,5 +106,9 @@ class Grupo extends Model
     public function produto()
     {
         return $this->belongsTo('App\Models\Produto', 'produto_id');
+    }
+
+    public function validate()
+    {
     }
 }

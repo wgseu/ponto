@@ -24,13 +24,17 @@
  */
 namespace App\Models;
 
+use App\Concerns\ModelEvents;
+use App\Interfaces\ValidateInterface;
 use Illuminate\Database\Eloquent\Model;
 
 /**
  * Informa uma conta bancária ou uma carteira financeira
  */
-class Carteira extends Model
+class Carteira extends Model implements ValidateInterface
 {
+    use ModelEvents;
+
     /**
      * Tipo de carteira, 'Bancaria' para conta bancária, 'Financeira' para
      * carteira financeira da empresa ou de sites de pagamentos, 'Credito' para
@@ -62,7 +66,7 @@ class Carteira extends Model
     public $timestamps = false;
 
     /**
-     * The model's default values for attributes.
+     * The attributes that are mass assignable.
      *
      * @var array
      */
@@ -107,5 +111,9 @@ class Carteira extends Model
     public function banco()
     {
         return $this->belongsTo('App\Models\Banco', 'banco_id');
+    }
+
+    public function validate()
+    {
     }
 }

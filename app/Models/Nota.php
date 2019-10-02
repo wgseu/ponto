@@ -24,13 +24,19 @@
  */
 namespace App\Models;
 
+use App\Concerns\ModelEvents;
+use App\Interfaces\ValidateInterface;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
  * Notas fiscais e inutilizações
  */
-class Nota extends Model
+class Nota extends Model implements ValidateInterface
 {
+    use ModelEvents;
+    use SoftDeletes;
+
     /**
      * Tipo de registro se nota ou inutilização
      */
@@ -63,6 +69,10 @@ class Nota extends Model
     const ESTADO_INUTILIZADO = 'inutilizado';
     const ESTADO_AUTORIZADO = 'autorizado';
 
+    const CREATED_AT = 'data_lancamento';
+    const DELETED_AT = 'data_arquivado';
+    const UPDATED_AT = null;
+
     /**
      * The table associated with the model.
      *
@@ -71,14 +81,7 @@ class Nota extends Model
     protected $table = 'notas';
 
     /**
-     * Indicates if the model should be timestamped.
-     *
-     * @var bool
-     */
-    public $timestamps = false;
-
-    /**
-     * The model's default values for attributes.
+     * The attributes that are mass assignable.
      *
      * @var array
      */
@@ -106,8 +109,6 @@ class Nota extends Model
         'concluido',
         'data_autorizacao',
         'data_emissao',
-        'data_lancamento',
-        'data_arquivado',
     ];
 
     /**
@@ -134,5 +135,9 @@ class Nota extends Model
     public function pedido()
     {
         return $this->belongsTo('App\Models\Pedido', 'pedido_id');
+    }
+
+    public function validate()
+    {
     }
 }

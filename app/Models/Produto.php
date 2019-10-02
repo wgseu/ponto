@@ -24,23 +24,20 @@
  */
 namespace App\Models;
 
+use App\Models\Item;
 use App\Concerns\ModelEvents;
 use App\Interfaces\ValidateInterface;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Validation\ValidationException;
-use App\Models\Item;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Validation\ValidationException;
 
 /**
  * Informações sobre o produto, composição ou pacote
  */
 class Produto extends Model implements ValidateInterface
 {
-    use SoftDeletes;
     use ModelEvents;
-
-    const UPDATED_AT = 'data_atualizacao';
-    const DELETED_AT = 'data_arquivado';
+    use SoftDeletes;
 
     /**
      * Informa qual é o tipo de produto. Produto: Produto normal que possui
@@ -52,6 +49,10 @@ class Produto extends Model implements ValidateInterface
     const TIPO_COMPOSICAO = 'composicao';
     const TIPO_PACOTE = 'pacote';
 
+    const UPDATED_AT = 'data_atualizacao';
+    const DELETED_AT = 'data_arquivado';
+    const CREATED_AT = null;
+
     /**
      * The table associated with the model.
      *
@@ -60,14 +61,7 @@ class Produto extends Model implements ValidateInterface
     protected $table = 'produtos';
 
     /**
-     * Indicates if the model should be timestamped.
-     *
-     * @var bool
-     */
-    public $timestamps = false;
-
-    /**
-     * The model's default values for attributes.
+     * The attributes that are mass assignable.
      *
      * @var array
      */

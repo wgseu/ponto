@@ -24,13 +24,17 @@
  */
 namespace App\Models;
 
+use App\Concerns\ModelEvents;
+use App\Interfaces\ValidateInterface;
 use Illuminate\Database\Eloquent\Model;
 
 /**
  * Classificação se contas, permite atribuir um grupo de contas
  */
-class Classificacao extends Model
+class Classificacao extends Model implements ValidateInterface
 {
+    use ModelEvents;
+
     /**
      * The table associated with the model.
      *
@@ -46,7 +50,7 @@ class Classificacao extends Model
     public $timestamps = false;
 
     /**
-     * The model's default values for attributes.
+     * The attributes that are mass assignable.
      *
      * @var array
      */
@@ -63,5 +67,9 @@ class Classificacao extends Model
     public function classificacao()
     {
         return $this->belongsTo('App\Models\Classificacao', 'classificacao_id');
+    }
+
+    public function validate()
+    {
     }
 }

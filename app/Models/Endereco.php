@@ -24,13 +24,17 @@
  */
 namespace App\Models;
 
+use App\Concerns\ModelEvents;
+use App\Interfaces\ValidateInterface;
 use Illuminate\Database\Eloquent\Model;
 
 /**
  * Endereços de ruas e avenidas com informação de CEP
  */
-class Endereco extends Model
+class Endereco extends Model implements ValidateInterface
 {
+    use ModelEvents;
+
     /**
      * The table associated with the model.
      *
@@ -46,7 +50,7 @@ class Endereco extends Model
     public $timestamps = false;
 
     /**
-     * The model's default values for attributes.
+     * The attributes that are mass assignable.
      *
      * @var array
      */
@@ -71,5 +75,9 @@ class Endereco extends Model
     public function bairro()
     {
         return $this->belongsTo('App\Models\Bairro', 'bairro_id');
+    }
+
+    public function validate()
+    {
     }
 }

@@ -24,13 +24,17 @@
  */
 namespace App\Models;
 
+use App\Concerns\ModelEvents;
+use App\Interfaces\ValidateInterface;
 use Illuminate\Database\Eloquent\Model;
 
 /**
  * Permite acesso à uma determinada funcionalidade da lista de permissões
  */
-class Acesso extends Model
+class Acesso extends Model implements ValidateInterface
 {
+    use ModelEvents;
+
     /**
      * The table associated with the model.
      *
@@ -46,7 +50,7 @@ class Acesso extends Model
     public $timestamps = false;
 
     /**
-     * The model's default values for attributes.
+     * The attributes that are mass assignable.
      *
      * @var array
      */
@@ -69,5 +73,9 @@ class Acesso extends Model
     public function permissao()
     {
         return $this->belongsTo('App\Models\Permissao', 'permissao_id');
+    }
+
+    public function validate()
+    {
     }
 }

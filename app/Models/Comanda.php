@@ -24,13 +24,17 @@
  */
 namespace App\Models;
 
+use App\Concerns\ModelEvents;
+use App\Interfaces\ValidateInterface;
 use Illuminate\Database\Eloquent\Model;
 
 /**
  * Comanda individual, permite lançar pedidos em cartões de consumo
  */
-class Comanda extends Model
+class Comanda extends Model implements ValidateInterface
 {
+    use ModelEvents;
+
     /**
      * The table associated with the model.
      *
@@ -46,7 +50,7 @@ class Comanda extends Model
     public $timestamps = false;
 
     /**
-     * The model's default values for attributes.
+     * The attributes that are mass assignable.
      *
      * @var array
      */
@@ -64,4 +68,8 @@ class Comanda extends Model
     protected $attributes = [
         'ativa' => true,
     ];
+
+    public function validate()
+    {
+    }
 }

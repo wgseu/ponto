@@ -24,16 +24,17 @@
  */
 namespace App\Models;
 
+use App\Concerns\ModelEvents;
+use App\Interfaces\ValidateInterface;
 use Illuminate\Database\Eloquent\Model;
 
 /**
  * Unidades de medidas aplicadas aos produtos
  */
-class Unidade extends Model
+class Unidade extends Model implements ValidateInterface
 {
+    use ModelEvents;
 
-    const UPDATED_AT = 'data_atualizacao';
-    const DELETED_AT = 'data_arquivado';
     /**
      * The table associated with the model.
      *
@@ -49,7 +50,7 @@ class Unidade extends Model
     public $timestamps = false;
 
     /**
-     * The model's default values for attributes.
+     * The attributes that are mass assignable.
      *
      * @var array
      */
@@ -58,4 +59,8 @@ class Unidade extends Model
         'descricao',
         'sigla',
     ];
+
+    public function validate()
+    {
+    }
 }

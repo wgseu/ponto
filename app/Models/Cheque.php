@@ -24,13 +24,20 @@
  */
 namespace App\Models;
 
+use App\Concerns\ModelEvents;
+use App\Interfaces\ValidateInterface;
 use Illuminate\Database\Eloquent\Model;
 
 /**
  * Folha de cheque lançado como pagamento
  */
-class Cheque extends Model
+class Cheque extends Model implements ValidateInterface
 {
+    use ModelEvents;
+
+    const CREATED_AT = 'data_cadastro';
+    const UPDATED_AT = null;
+
     /**
      * The table associated with the model.
      *
@@ -39,14 +46,7 @@ class Cheque extends Model
     protected $table = 'cheques';
 
     /**
-     * Indicates if the model should be timestamped.
-     *
-     * @var bool
-     */
-    public $timestamps = false;
-
-    /**
-     * The model's default values for attributes.
+     * The attributes that are mass assignable.
      *
      * @var array
      */
@@ -60,7 +60,6 @@ class Cheque extends Model
         'vencimento',
         'cancelado',
         'recolhimento',
-        'data_cadastro',
     ];
 
     /**
@@ -69,7 +68,7 @@ class Cheque extends Model
      * @var array
      */
     protected $attributes = [
-        'cancelado' => cancelado,
+        'cancelado' => false,
     ];
 
     /**
@@ -86,5 +85,9 @@ class Cheque extends Model
     public function banco()
     {
         return $this->belongsTo('App\Models\Banco', 'banco_id');
+    }
+
+    public function validate()
+    {
     }
 }

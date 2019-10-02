@@ -24,13 +24,17 @@
  */
 namespace App\Models;
 
+use App\Concerns\ModelEvents;
+use App\Interfaces\ValidateInterface;
 use Illuminate\Database\Eloquent\Model;
 
 /**
  * Registra todas as atividades importantes do sistema
  */
-class Auditoria extends Model
+class Auditoria extends Model implements ValidateInterface
 {
+    use ModelEvents;
+
     /**
      * Tipo de atividade exercida
      */
@@ -60,7 +64,7 @@ class Auditoria extends Model
     public $timestamps = false;
 
     /**
-     * The model's default values for attributes.
+     * The attributes that are mass assignable.
      *
      * @var array
      */
@@ -98,5 +102,9 @@ class Auditoria extends Model
     public function autorizador()
     {
         return $this->belongsTo('App\Models\Prestador', 'autorizador_id');
+    }
+
+    public function validate()
+    {
     }
 }

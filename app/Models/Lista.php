@@ -24,13 +24,17 @@
  */
 namespace App\Models;
 
+use App\Concerns\ModelEvents;
+use App\Interfaces\ValidateInterface;
 use Illuminate\Database\Eloquent\Model;
 
 /**
  * Lista de compras de produtos
  */
-class Lista extends Model
+class Lista extends Model implements ValidateInterface
 {
+    use ModelEvents;
+
     /**
      * Estado da lista de compra. Análise: Ainda estão sendo adicionado
      * produtos na lista, Fechada: Está pronto para compra, Comprada: Todos os
@@ -40,6 +44,9 @@ class Lista extends Model
     const ESTADO_FECHADA = 'fechada';
     const ESTADO_COMPRADA = 'comprada';
 
+    const CREATED_AT = 'data_cadastro';
+    const UPDATED_AT = null;
+
     /**
      * The table associated with the model.
      *
@@ -48,14 +55,7 @@ class Lista extends Model
     protected $table = 'listas';
 
     /**
-     * Indicates if the model should be timestamped.
-     *
-     * @var bool
-     */
-    public $timestamps = false;
-
-    /**
-     * The model's default values for attributes.
+     * The attributes that are mass assignable.
      *
      * @var array
      */
@@ -65,7 +65,6 @@ class Lista extends Model
         'encarregado_id',
         'viagem_id',
         'data_viagem',
-        'data_cadastro',
     ];
 
     /**
@@ -91,5 +90,9 @@ class Lista extends Model
     public function viagem()
     {
         return $this->belongsTo('App\Models\Viagem', 'viagem_id');
+    }
+
+    public function validate()
+    {
     }
 }

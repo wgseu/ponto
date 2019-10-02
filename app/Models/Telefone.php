@@ -24,14 +24,18 @@
  */
 namespace App\Models;
 
+use App\Concerns\ModelEvents;
+use App\Interfaces\ValidateInterface;
 use Illuminate\Database\Eloquent\Model;
 
 /**
  * Telefones dos clientes, apenas o telefone principal deve ser único por
  * cliente
  */
-class Telefone extends Model
+class Telefone extends Model implements ValidateInterface
 {
+    use ModelEvents;
+
     /**
      * The table associated with the model.
      *
@@ -47,7 +51,7 @@ class Telefone extends Model
     public $timestamps = false;
 
     /**
-     * The model's default values for attributes.
+     * The attributes that are mass assignable.
      *
      * @var array
      */
@@ -83,5 +87,9 @@ class Telefone extends Model
     public function pais()
     {
         return $this->belongsTo('App\Models\Pais', 'pais_id');
+    }
+
+    public function validate()
+    {
     }
 }

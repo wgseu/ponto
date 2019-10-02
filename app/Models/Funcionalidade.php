@@ -24,13 +24,17 @@
  */
 namespace App\Models;
 
+use App\Concerns\ModelEvents;
+use App\Interfaces\ValidateInterface;
 use Illuminate\Database\Eloquent\Model;
 
 /**
  * Grupo de funcionalidades do sistema
  */
-class Funcionalidade extends Model
+class Funcionalidade extends Model implements ValidateInterface
 {
+    use ModelEvents;
+
     /**
      * The table associated with the model.
      *
@@ -46,7 +50,7 @@ class Funcionalidade extends Model
     public $timestamps = false;
 
     /**
-     * The model's default values for attributes.
+     * The attributes that are mass assignable.
      *
      * @var array
      */
@@ -71,5 +75,9 @@ class Funcionalidade extends Model
     public function funcionalidade()
     {
         return $this->belongsTo('App\Models\Funcionalidade', 'funcionalidade_id');
+    }
+
+    public function validate()
+    {
     }
 }

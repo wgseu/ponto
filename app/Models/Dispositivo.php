@@ -24,13 +24,17 @@
  */
 namespace App\Models;
 
+use App\Concerns\ModelEvents;
+use App\Interfaces\ValidateInterface;
 use Illuminate\Database\Eloquent\Model;
 
 /**
  * Computadores e tablets com opções de acesso
  */
-class Dispositivo extends Model
+class Dispositivo extends Model implements ValidateInterface
 {
+    use ModelEvents;
+
     /**
      * Tipo de dispositivo
      */
@@ -53,7 +57,7 @@ class Dispositivo extends Model
     public $timestamps = false;
 
     /**
-     * The model's default values for attributes.
+     * The attributes that are mass assignable.
      *
      * @var array
      */
@@ -92,5 +96,9 @@ class Dispositivo extends Model
     public function caixa()
     {
         return $this->belongsTo('App\Models\Caixa', 'caixa_id');
+    }
+
+    public function validate()
+    {
     }
 }

@@ -24,13 +24,20 @@
  */
 namespace App\Models;
 
+use App\Concerns\ModelEvents;
+use App\Interfaces\ValidateInterface;
 use Illuminate\Database\Eloquent\Model;
 
 /**
  * Informa tamanhos de pizzas e opções de peso do produto
  */
-class Propriedade extends Model
+class Propriedade extends Model implements ValidateInterface
 {
+    use ModelEvents;
+
+    const UPDATED_AT = 'data_atualizacao';
+    const CREATED_AT = null;
+
     /**
      * The table associated with the model.
      *
@@ -39,14 +46,7 @@ class Propriedade extends Model
     protected $table = 'propriedades';
 
     /**
-     * Indicates if the model should be timestamped.
-     *
-     * @var bool
-     */
-    public $timestamps = false;
-
-    /**
-     * The model's default values for attributes.
+     * The attributes that are mass assignable.
      *
      * @var array
      */
@@ -55,7 +55,6 @@ class Propriedade extends Model
         'nome',
         'abreviacao',
         'imagem_url',
-        'data_atualizacao',
     ];
 
     /**
@@ -64,5 +63,9 @@ class Propriedade extends Model
     public function grupo()
     {
         return $this->belongsTo('App\Models\Grupo', 'grupo_id');
+    }
+
+    public function validate()
+    {
     }
 }

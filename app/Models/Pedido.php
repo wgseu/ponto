@@ -24,13 +24,17 @@
  */
 namespace App\Models;
 
+use App\Concerns\ModelEvents;
+use App\Interfaces\ValidateInterface;
 use Illuminate\Database\Eloquent\Model;
 
 /**
  * Informações do pedido de venda
  */
-class Pedido extends Model
+class Pedido extends Model implements ValidateInterface
 {
+    use ModelEvents;
+
     /**
      * Tipo de venda
      */
@@ -53,6 +57,9 @@ class Pedido extends Model
     const ESTADO_CONCLUIDO = 'concluido';
     const ESTADO_CANCELADO = 'cancelado';
 
+    const CREATED_AT = 'data_criacao';
+    const UPDATED_AT = null;
+
     /**
      * The table associated with the model.
      *
@@ -61,14 +68,7 @@ class Pedido extends Model
     protected $table = 'pedidos';
 
     /**
-     * Indicates if the model should be timestamped.
-     *
-     * @var bool
-     */
-    public $timestamps = false;
-
-    /**
-     * The model's default values for attributes.
+     * The attributes that are mass assignable.
      *
      * @var array
      */
@@ -103,7 +103,6 @@ class Pedido extends Model
         'data_entrega',
         'data_agendamento',
         'data_conclusao',
-        'data_criacao',
     ];
 
     /**
@@ -206,5 +205,9 @@ class Pedido extends Model
     public function fechador()
     {
         return $this->belongsTo('App\Models\Prestador', 'fechador_id');
+    }
+
+    public function validate()
+    {
     }
 }

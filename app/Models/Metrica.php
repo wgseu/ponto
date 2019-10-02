@@ -24,14 +24,20 @@
  */
 namespace App\Models;
 
+use App\Concerns\ModelEvents;
+use App\Interfaces\ValidateInterface;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
  * Métricas de avaliação do atendimento e outros serviços do
  * estabelecimento
  */
-class Metrica extends Model
+class Metrica extends Model implements ValidateInterface
 {
+    use ModelEvents;
+    use SoftDeletes;
+
     /**
      * Tipo de métrica que pode ser velocidade de entrega, quantidade no
      * atendimento, sabor da comida e apresentação do prato
@@ -40,6 +46,8 @@ class Metrica extends Model
     const TIPO_ATENDIMENTO = 'atendimento';
     const TIPO_PRODUCAO = 'producao';
     const TIPO_APRESENTACAO = 'apresentacao';
+
+    const DELETED_AT = 'data_arquivado';
 
     /**
      * The table associated with the model.
@@ -56,7 +64,7 @@ class Metrica extends Model
     public $timestamps = false;
 
     /**
-     * The model's default values for attributes.
+     * The attributes that are mass assignable.
      *
      * @var array
      */
@@ -67,6 +75,9 @@ class Metrica extends Model
         'quantidade',
         'avaliacao',
         'data_processamento',
-        'data_arquivado',
     ];
+
+    public function validate()
+    {
+    }
 }

@@ -24,14 +24,17 @@
  */
 namespace App\Models;
 
+use App\Concerns\ModelEvents;
+use App\Interfaces\ValidateInterface;
 use Illuminate\Database\Eloquent\Model;
 
 /**
  * Classe que informa detalhes da empresa, parceiro e opções do sistema
  * como a versão do banco de dados e a licença de uso
  */
-class Sistema extends Model
+class Sistema extends Model implements ValidateInterface
 {
+    use ModelEvents;
 
     /**
      * The table associated with the model.
@@ -48,7 +51,7 @@ class Sistema extends Model
     public $timestamps = false;
 
     /**
-     * The model's default values for attributes.
+     * The attributes that are mass assignable.
      *
      * @var array
      */
@@ -56,4 +59,16 @@ class Sistema extends Model
         'fuso_horario',
         'opcoes',
     ];
+
+    /**
+     * The model's default values for attributes.
+     *
+     * @var array
+     */
+    protected $attributes = [
+    ];
+
+    public function validate()
+    {
+    }
 }

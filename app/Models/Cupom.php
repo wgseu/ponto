@@ -24,13 +24,17 @@
  */
 namespace App\Models;
 
+use App\Concerns\ModelEvents;
+use App\Interfaces\ValidateInterface;
 use Illuminate\Database\Eloquent\Model;
 
 /**
  * Informa os cupons de descontos e seus usos
  */
-class Cupom extends Model
+class Cupom extends Model implements ValidateInterface
 {
+    use ModelEvents;
+
     /**
      * Informa se o desconto será por valor ou porcentagem
      */
@@ -68,7 +72,7 @@ class Cupom extends Model
     public $timestamps = false;
 
     /**
-     * The model's default values for attributes.
+     * The attributes that are mass assignable.
      *
      * @var array
      */
@@ -130,5 +134,9 @@ class Cupom extends Model
     public function cliente()
     {
         return $this->belongsTo('App\Models\Cliente', 'cliente_id');
+    }
+
+    public function validate()
+    {
     }
 }

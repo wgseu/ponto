@@ -24,13 +24,20 @@
  */
 namespace App\Models;
 
+use App\Concerns\ModelEvents;
+use App\Interfaces\ValidateInterface;
 use Illuminate\Database\Eloquent\Model;
 
 /**
  * Fornecedores de produtos
  */
-class Fornecedor extends Model
+class Fornecedor extends Model implements ValidateInterface
 {
+    use ModelEvents;
+
+    const CREATED_AT = 'data_cadastro';
+    const UPDATED_AT = null;
+
     /**
      * The table associated with the model.
      *
@@ -39,21 +46,13 @@ class Fornecedor extends Model
     protected $table = 'fornecedores';
 
     /**
-     * Indicates if the model should be timestamped.
-     *
-     * @var bool
-     */
-    public $timestamps = false;
-
-    /**
-     * The model's default values for attributes.
+     * The attributes that are mass assignable.
      *
      * @var array
      */
     protected $fillable = [
         'empresa_id',
         'prazo_pagamento',
-        'data_cadastro',
     ];
 
     /**
@@ -71,5 +70,9 @@ class Fornecedor extends Model
     public function empresa()
     {
         return $this->belongsTo('App\Models\Cliente', 'empresa_id');
+    }
+
+    public function validate()
+    {
     }
 }

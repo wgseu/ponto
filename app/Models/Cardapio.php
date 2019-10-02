@@ -24,13 +24,17 @@
  */
 namespace App\Models;
 
+use App\Concerns\ModelEvents;
+use App\Interfaces\ValidateInterface;
 use Illuminate\Database\Eloquent\Model;
 
 /**
  * Cardápios para cada integração ou local de venda
  */
-class Cardapio extends Model
+class Cardapio extends Model implements ValidateInterface
 {
+    use ModelEvents;
+
     /**
      * O cardápio será exibido para vendas nesse local
      */
@@ -56,7 +60,7 @@ class Cardapio extends Model
     public $timestamps = false;
 
     /**
-     * The model's default values for attributes.
+     * The attributes that are mass assignable.
      *
      * @var array
      */
@@ -92,5 +96,9 @@ class Cardapio extends Model
     public function integracao()
     {
         return $this->belongsTo('App\Models\Integracao', 'integracao_id');
+    }
+
+    public function validate()
+    {
     }
 }

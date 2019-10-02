@@ -24,14 +24,18 @@
  */
 namespace App\Models;
 
+use App\Concerns\ModelEvents;
+use App\Interfaces\ValidateInterface;
 use Illuminate\Database\Eloquent\Model;
 
 /**
  * Resumo de fechamento de caixa, informa o valor contado no fechamento do
  * caixa para cada forma de pagamento
  */
-class Resumo extends Model
+class Resumo extends Model implements ValidateInterface
 {
+    use ModelEvents;
+
     /**
      * The table associated with the model.
      *
@@ -47,7 +51,7 @@ class Resumo extends Model
     public $timestamps = false;
 
     /**
-     * The model's default values for attributes.
+     * The attributes that are mass assignable.
      *
      * @var array
      */
@@ -80,5 +84,9 @@ class Resumo extends Model
     public function cartao()
     {
         return $this->belongsTo('App\Models\Cartao', 'cartao_id');
+    }
+
+    public function validate()
+    {
     }
 }

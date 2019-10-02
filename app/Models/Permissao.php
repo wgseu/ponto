@@ -24,13 +24,17 @@
  */
 namespace App\Models;
 
+use App\Concerns\ModelEvents;
+use App\Interfaces\ValidateInterface;
 use Illuminate\Database\Eloquent\Model;
 
 /**
  * Informa a listagem de todas as funções do sistema
  */
-class Permissao extends Model
+class Permissao extends Model implements ValidateInterface
 {
+    use ModelEvents;
+
     /**
      * The table associated with the model.
      *
@@ -46,7 +50,7 @@ class Permissao extends Model
     public $timestamps = false;
 
     /**
-     * The model's default values for attributes.
+     * The attributes that are mass assignable.
      *
      * @var array
      */
@@ -62,5 +66,9 @@ class Permissao extends Model
     public function funcionalidade()
     {
         return $this->belongsTo('App\Models\Funcionalidade', 'funcionalidade_id');
+    }
+
+    public function validate()
+    {
     }
 }

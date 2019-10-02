@@ -24,19 +24,26 @@
  */
 namespace App\Models;
 
+use App\Concerns\ModelEvents;
+use App\Interfaces\ValidateInterface;
 use Illuminate\Database\Eloquent\Model;
 
 /**
  * Informa detalhadamente um bem da empresa
  */
-class Patrimonio extends Model
+class Patrimonio extends Model implements ValidateInterface
 {
+    use ModelEvents;
+
     /**
      * Estado de conservação do bem
      */
     const ESTADO_NOVO = 'novo';
     const ESTADO_CONSERVADO = 'conservado';
     const ESTADO_RUIM = 'ruim';
+
+    const UPDATED_AT = 'data_atualizacao';
+    const CREATED_AT = null;
 
     /**
      * The table associated with the model.
@@ -46,14 +53,7 @@ class Patrimonio extends Model
     protected $table = 'patrimonios';
 
     /**
-     * Indicates if the model should be timestamped.
-     *
-     * @var bool
-     */
-    public $timestamps = false;
-
-    /**
-     * The model's default values for attributes.
+     * The attributes that are mass assignable.
      *
      * @var array
      */
@@ -71,7 +71,6 @@ class Patrimonio extends Model
         'valor',
         'ativo',
         'imagem_url',
-        'data_atualizacao',
     ];
 
     /**
@@ -103,5 +102,9 @@ class Patrimonio extends Model
     public function fornecedor()
     {
         return $this->belongsTo('App\Models\Fornecedor', 'fornecedor_id');
+    }
+
+    public function validate()
+    {
     }
 }

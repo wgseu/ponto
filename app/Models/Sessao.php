@@ -24,14 +24,18 @@
  */
 namespace App\Models;
 
+use App\Concerns\ModelEvents;
+use App\Interfaces\ValidateInterface;
 use Illuminate\Database\Eloquent\Model;
 
 /**
  * Sessão de trabalho do dia, permite que vários caixas sejam abertos
  * utilizando uma mesma sessão
  */
-class Sessao extends Model
+class Sessao extends Model implements ValidateInterface
 {
+    use ModelEvents;
+
     /**
      * The table associated with the model.
      *
@@ -47,7 +51,7 @@ class Sessao extends Model
     public $timestamps = false;
 
     /**
-     * The model's default values for attributes.
+     * The attributes that are mass assignable.
      *
      * @var array
      */
@@ -65,4 +69,8 @@ class Sessao extends Model
     protected $attributes = [
         'aberta' => true,
     ];
+
+    public function validate()
+    {
+    }
 }

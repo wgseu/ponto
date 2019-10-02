@@ -24,13 +24,17 @@
  */
 namespace App\Models;
 
+use App\Concerns\ModelEvents;
+use App\Interfaces\ValidateInterface;
 use Illuminate\Database\Eloquent\Model;
 
 /**
  * Estoque de produtos por setor
  */
-class Estoque extends Model
+class Estoque extends Model implements ValidateInterface
 {
+    use ModelEvents;
+
     /**
      * The table associated with the model.
      *
@@ -46,7 +50,7 @@ class Estoque extends Model
     public $timestamps = false;
 
     /**
-     * The model's default values for attributes.
+     * The attributes that are mass assignable.
      *
      * @var array
      */
@@ -135,5 +139,9 @@ class Estoque extends Model
     public function prestador()
     {
         return $this->belongsTo('App\Models\Prestador', 'prestador_id');
+    }
+
+    public function validate()
+    {
     }
 }

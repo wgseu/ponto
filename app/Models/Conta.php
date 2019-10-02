@@ -24,13 +24,17 @@
  */
 namespace App\Models;
 
+use App\Concerns\ModelEvents;
+use App\Interfaces\ValidateInterface;
 use Illuminate\Database\Eloquent\Model;
 
 /**
  * Contas a pagar e ou receber
  */
-class Conta extends Model
+class Conta extends Model implements ValidateInterface
 {
+    use ModelEvents;
+
     /**
      * Tipo de conta se receita ou despesa
      */
@@ -83,7 +87,7 @@ class Conta extends Model
     public $timestamps = false;
 
     /**
-     * The model's default values for attributes.
+     * The attributes that are mass assignable.
      *
      * @var array
      */
@@ -195,5 +199,9 @@ class Conta extends Model
     public function pedido()
     {
         return $this->belongsTo('App\Models\Pedido', 'pedido_id');
+    }
+
+    public function validate()
+    {
     }
 }

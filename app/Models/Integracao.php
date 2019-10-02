@@ -24,13 +24,20 @@
  */
 namespace App\Models;
 
+use App\Concerns\ModelEvents;
+use App\Interfaces\ValidateInterface;
 use Illuminate\Database\Eloquent\Model;
 
 /**
  * Informa quais integrações estão disponíveis
  */
-class Integracao extends Model
+class Integracao extends Model implements ValidateInterface
 {
+    use ModelEvents;
+
+    const UPDATED_AT = 'data_atualizacao';
+    const CREATED_AT = null;
+
     /**
      * The table associated with the model.
      *
@@ -39,14 +46,7 @@ class Integracao extends Model
     protected $table = 'integracoes';
 
     /**
-     * Indicates if the model should be timestamped.
-     *
-     * @var bool
-     */
-    public $timestamps = false;
-
-    /**
-     * The model's default values for attributes.
+     * The attributes that are mass assignable.
      *
      * @var array
      */
@@ -59,7 +59,6 @@ class Integracao extends Model
         'opcoes',
         'associacoes',
         'ativo',
-        'data_atualizacao',
     ];
 
     /**
@@ -70,4 +69,8 @@ class Integracao extends Model
     protected $attributes = [
         'ativo' => false,
     ];
+
+    public function validate()
+    {
+    }
 }

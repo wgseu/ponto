@@ -189,7 +189,7 @@ class CreateInitialTables extends Migration
             $table->string('linkedin_url', 200)->nullable();
             $table->string('imagem_url', 100)->nullable();
             $table->string('linguagem', 20)->nullable();
-            $table->dateTime('data_atualizacao');
+            $table->dateTime('data_atualizacao')->nullable();
             $table->dateTime('data_cadastro');
 
             $table->unique(['email']);
@@ -239,7 +239,7 @@ class CreateInitialTables extends Migration
         Schema::create('moedas', function (Blueprint $table) {
             $table->increments('id');
             $table->string('nome', 45);
-            $table->text('simbolo', 10);
+            $table->string('simbolo', 10);
             $table->string('codigo', 45);
             $table->integer('divisao');
             $table->string('fracao', 45)->nullable();
@@ -407,7 +407,7 @@ class CreateInitialTables extends Migration
             $table->text('opcoes')->nullable();
             $table->text('associacoes')->nullable();
             $table->boolean('ativo')->default(false);
-            $table->dateTime('data_atualizacao');
+            $table->dateTime('data_atualizacao')->nullable();
 
             $table->unique(['nome']);
         });
@@ -829,7 +829,7 @@ class CreateInitialTables extends Migration
             $table->string('numero', 20);
             $table->decimal('valor', 19, 4);
             $table->dateTime('vencimento');
-            $table->boolean('cancelado');
+            $table->boolean('cancelado')->default(false);
             $table->dateTime('recolhimento')->nullable();
             $table->dateTime('data_cadastro');
 
@@ -1268,7 +1268,7 @@ class CreateInitialTables extends Migration
             $table->string('nome', 100);
             $table->string('abreviacao', 100)->nullable();
             $table->string('imagem_url', 100)->nullable();
-            $table->dateTime('data_atualizacao');
+            $table->dateTime('data_atualizacao')->nullable();
 
             $table->unique(['grupo_id', 'nome']);
             $table->foreign('grupo_id')
@@ -1453,11 +1453,11 @@ class CreateInitialTables extends Migration
             $table->unsignedInteger('produto_id');
             $table->unsignedInteger('fornecedor_id');
             $table->decimal('preco_compra', 19, 4);
-            $table->decimal('preco_venda', 19, 4);
-            $table->double('quantidade_minima');
-            $table->double('estoque');
-            $table->boolean('limitado');
-            $table->double('conteudo');
+            $table->decimal('preco_venda', 19, 4)->default(0);
+            $table->double('quantidade_minima')->default(1);
+            $table->double('estoque')->default(0);
+            $table->boolean('limitado')->default(false);
+            $table->double('conteudo')->default(1);
             $table->dateTime('data_consulta')->nullable();
             $table->dateTime('data_parada')->nullable();
 
@@ -1474,7 +1474,7 @@ class CreateInitialTables extends Migration
         });
 
         Schema::create('sistemas', function (Blueprint $table) {
-            $table->increments('id');
+            $table->increments('id')->default('1');
             $table->string('fuso_horario', 100)->nullable();
             $table->text('opcoes')->nullable();
 
@@ -1587,7 +1587,7 @@ class CreateInitialTables extends Migration
             $table->decimal('valor', 19, 4)->default(0);
             $table->boolean('ativo')->default(true);
             $table->string('imagem_url', 200)->nullable();
-            $table->dateTime('data_atualizacao');
+            $table->dateTime('data_atualizacao')->nullable();
 
             $table->unique(['numero']);
             $table->index(['fornecedor_id']);
@@ -1630,7 +1630,7 @@ class CreateInitialTables extends Migration
         });
 
         Schema::create('emitentes', function (Blueprint $table) {
-            $table->increments('id');
+            $table->increments('id')->default('1');
             $table->unsignedInteger('contador_id')->nullable();
             $table->unsignedInteger('regime_id');
             $table->enum('ambiente', ['homologacao', 'producao'])->default('homologacao');
@@ -1710,7 +1710,7 @@ class CreateInitialTables extends Migration
         });
 
         Schema::create('empresas', function (Blueprint $table) {
-            $table->increments('id');
+            $table->increments('id')->default('1');
             $table->unsignedInteger('pais_id')->nullable();
             $table->unsignedInteger('empresa_id')->nullable();
             $table->unsignedInteger('parceiro_id')->nullable();
@@ -1914,7 +1914,7 @@ class CreateInitialTables extends Migration
             $table->unsignedInteger('produto_id');
             $table->unsignedInteger('setor_id');
             $table->double('quantidade');
-            $table->dateTime('data_atualizacao');
+            $table->dateTime('data_atualizacao')->nullable();
 
             $table->unique(['produto_id', 'setor_id']);
             $table->index(['setor_id']);

@@ -24,13 +24,17 @@
  */
 namespace App\Models;
 
+use App\Concerns\ModelEvents;
+use App\Interfaces\ValidateInterface;
 use Illuminate\Database\Eloquent\Model;
 
 /**
  * Observações e instruções de preparo de produto
  */
-class Observacao extends Model
+class Observacao extends Model implements ValidateInterface
 {
+    use ModelEvents;
+
     /**
      * The table associated with the model.
      *
@@ -46,7 +50,7 @@ class Observacao extends Model
     public $timestamps = false;
 
     /**
-     * The model's default values for attributes.
+     * The attributes that are mass assignable.
      *
      * @var array
      */
@@ -71,5 +75,9 @@ class Observacao extends Model
     public function produto()
     {
         return $this->belongsTo('App\Models\Produto', 'produto_id');
+    }
+
+    public function validate()
+    {
     }
 }

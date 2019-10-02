@@ -24,14 +24,18 @@
  */
 namespace App\Models;
 
+use App\Concerns\ModelEvents;
+use App\Interfaces\ValidateInterface;
 use Illuminate\Database\Eloquent\Model;
 
 /**
  * Lista de pedidos que não foram integrados ainda e devem ser associados
  * ao sistema
  */
-class Associacao extends Model
+class Associacao extends Model implements ValidateInterface
 {
+    use ModelEvents;
+
     /**
      * Status do pedido que não foi integrado ainda
      */
@@ -56,7 +60,7 @@ class Associacao extends Model
     public $timestamps = false;
 
     /**
-     * The model's default values for attributes.
+     * The attributes that are mass assignable.
      *
      * @var array
      */
@@ -96,5 +100,9 @@ class Associacao extends Model
     public function entrega()
     {
         return $this->belongsTo('App\Models\Viagem', 'entrega_id');
+    }
+
+    public function validate()
+    {
     }
 }

@@ -24,13 +24,17 @@
  */
 namespace App\Models;
 
+use App\Concerns\ModelEvents;
+use App\Interfaces\ValidateInterface;
 use Illuminate\Database\Eloquent\Model;
 
 /**
  * Formas de pagamento disponíveis para pedido e contas
  */
-class Forma extends Model
+class Forma extends Model implements ValidateInterface
 {
+    use ModelEvents;
+
     /**
      * Tipo de pagamento
      */
@@ -57,7 +61,7 @@ class Forma extends Model
     public $timestamps = false;
 
     /**
-     * The model's default values for attributes.
+     * The attributes that are mass assignable.
      *
      * @var array
      */
@@ -91,5 +95,9 @@ class Forma extends Model
     public function carteira()
     {
         return $this->belongsTo('App\Models\Carteira', 'carteira_id');
+    }
+
+    public function validate()
+    {
     }
 }

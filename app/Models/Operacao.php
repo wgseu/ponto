@@ -24,13 +24,17 @@
  */
 namespace App\Models;
 
+use App\Concerns\ModelEvents;
+use App\Interfaces\ValidateInterface;
 use Illuminate\Database\Eloquent\Model;
 
 /**
  * Código Fiscal de Operações e Prestações (CFOP)
  */
-class Operacao extends Model
+class Operacao extends Model implements ValidateInterface
 {
+    use ModelEvents;
+
     /**
      * The table associated with the model.
      *
@@ -46,7 +50,7 @@ class Operacao extends Model
     public $timestamps = false;
 
     /**
-     * The model's default values for attributes.
+     * The attributes that are mass assignable.
      *
      * @var array
      */
@@ -55,4 +59,8 @@ class Operacao extends Model
         'descricao',
         'detalhes',
     ];
+
+    public function validate()
+    {
+    }
 }

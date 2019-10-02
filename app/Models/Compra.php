@@ -24,13 +24,17 @@
  */
 namespace App\Models;
 
+use App\Concerns\ModelEvents;
+use App\Interfaces\ValidateInterface;
 use Illuminate\Database\Eloquent\Model;
 
 /**
  * Compras realizadas em uma lista num determinado fornecedor
  */
-class Compra extends Model
+class Compra extends Model implements ValidateInterface
 {
+    use ModelEvents;
+
     /**
      * The table associated with the model.
      *
@@ -46,7 +50,7 @@ class Compra extends Model
     public $timestamps = false;
 
     /**
-     * The model's default values for attributes.
+     * The attributes that are mass assignable.
      *
      * @var array
      */
@@ -72,5 +76,9 @@ class Compra extends Model
     public function fornecedor()
     {
         return $this->belongsTo('App\Models\Fornecedor', 'fornecedor_id');
+    }
+
+    public function validate()
+    {
     }
 }

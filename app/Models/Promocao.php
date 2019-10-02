@@ -24,14 +24,20 @@
  */
 namespace App\Models;
 
+use App\Concerns\ModelEvents;
+use App\Interfaces\ValidateInterface;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
  * Informa se há descontos nos produtos em determinados dias da semana, o
  * preço pode subir ou descer e ser agendado para ser aplicado
  */
-class Promocao extends Model
+class Promocao extends Model implements ValidateInterface
 {
+    use ModelEvents;
+    use SoftDeletes;
+
     /**
      * Local onde o preço será aplicado
      */
@@ -57,6 +63,8 @@ class Promocao extends Model
     const FUNCAO_CLIENTE_IGUAL = 'igual';
     const FUNCAO_CLIENTE_MAIOR = 'maior';
 
+    const DELETED_AT = 'data_arquivado';
+
     /**
      * The table associated with the model.
      *
@@ -72,7 +80,7 @@ class Promocao extends Model
     public $timestamps = false;
 
     /**
-     * The model's default values for attributes.
+     * The attributes that are mass assignable.
      *
      * @var array
      */
@@ -102,7 +110,6 @@ class Promocao extends Model
         'ativa',
         'chamada',
         'banner_url',
-        'data_arquivado',
     ];
 
     /**
@@ -182,5 +189,9 @@ class Promocao extends Model
     public function integracao()
     {
         return $this->belongsTo('App\Models\Integracao', 'integracao_id');
+    }
+
+    public function validate()
+    {
     }
 }

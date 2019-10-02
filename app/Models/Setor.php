@@ -24,13 +24,17 @@
  */
 namespace App\Models;
 
+use App\Concerns\ModelEvents;
+use App\Interfaces\ValidateInterface;
 use Illuminate\Database\Eloquent\Model;
 
 /**
  * Setor de impressão e de estoque
  */
-class Setor extends Model
+class Setor extends Model implements ValidateInterface
 {
+    use ModelEvents;
+
     /**
      * The table associated with the model.
      *
@@ -46,7 +50,7 @@ class Setor extends Model
     public $timestamps = false;
 
     /**
-     * The model's default values for attributes.
+     * The attributes that are mass assignable.
      *
      * @var array
      */
@@ -62,5 +66,9 @@ class Setor extends Model
     public function setor()
     {
         return $this->belongsTo('App\Models\Setor', 'setor_id');
+    }
+
+    public function validate()
+    {
     }
 }

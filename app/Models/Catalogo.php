@@ -24,13 +24,17 @@
  */
 namespace App\Models;
 
+use App\Concerns\ModelEvents;
+use App\Interfaces\ValidateInterface;
 use Illuminate\Database\Eloquent\Model;
 
 /**
  * Informa a lista de produtos disponíveis nos fornecedores
  */
-class Catalogo extends Model
+class Catalogo extends Model implements ValidateInterface
 {
+    use ModelEvents;
+
     /**
      * The table associated with the model.
      *
@@ -46,7 +50,7 @@ class Catalogo extends Model
     public $timestamps = false;
 
     /**
-     * The model's default values for attributes.
+     * The attributes that are mass assignable.
      *
      * @var array
      */
@@ -69,7 +73,7 @@ class Catalogo extends Model
      * @var array
      */
     protected $attributes = [
-        'preco_venda' =>  0,
+        'preco_venda' => 0,
         'quantidade_minima' => 1,
         'estoque' => 0,
         'limitado' => false,
@@ -90,5 +94,9 @@ class Catalogo extends Model
     public function fornecedor()
     {
         return $this->belongsTo('App\Models\Fornecedor', 'fornecedor_id');
+    }
+
+    public function validate()
+    {
     }
 }

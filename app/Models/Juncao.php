@@ -24,13 +24,17 @@
  */
 namespace App\Models;
 
+use App\Concerns\ModelEvents;
+use App\Interfaces\ValidateInterface;
 use Illuminate\Database\Eloquent\Model;
 
 /**
  * Junções de mesas, informa quais mesas estão juntas ao pedido
  */
-class Juncao extends Model
+class Juncao extends Model implements ValidateInterface
 {
+    use ModelEvents;
+
     /**
      * Estado a junção da mesa. Associado: a mesa está junta ao pedido,
      * Liberado: A mesa está livre, Cancelado: A mesa está liberada
@@ -54,7 +58,7 @@ class Juncao extends Model
     public $timestamps = false;
 
     /**
-     * The model's default values for attributes.
+     * The attributes that are mass assignable.
      *
      * @var array
      */
@@ -88,5 +92,9 @@ class Juncao extends Model
     public function pedido()
     {
         return $this->belongsTo('App\Models\Pedido', 'pedido_id');
+    }
+
+    public function validate()
+    {
     }
 }

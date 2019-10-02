@@ -24,13 +24,17 @@
  */
 namespace App\Models;
 
+use App\Concerns\ModelEvents;
+use App\Interfaces\ValidateInterface;
 use Illuminate\Database\Eloquent\Model;
 
 /**
  * Bairro de uma cidade
  */
-class Bairro extends Model
+class Bairro extends Model implements ValidateInterface
 {
+    use ModelEvents;
+
     /**
      * The table associated with the model.
      *
@@ -46,7 +50,7 @@ class Bairro extends Model
     public $timestamps = false;
 
     /**
-     * The model's default values for attributes.
+     * The attributes that are mass assignable.
      *
      * @var array
      */
@@ -76,5 +80,9 @@ class Bairro extends Model
     public function cidade()
     {
         return $this->belongsTo('App\Models\Cidade', 'cidade_id');
+    }
+
+    public function validate()
+    {
     }
 }

@@ -24,13 +24,17 @@
  */
 namespace App\Models;
 
+use App\Concerns\ModelEvents;
+use App\Interfaces\ValidateInterface;
 use Illuminate\Database\Eloquent\Model;
 
 /**
  * Taxas, eventos e serviço cobrado nos pedidos
  */
-class Servico extends Model
+class Servico extends Model implements ValidateInterface
 {
+    use ModelEvents;
+
     /**
      * Tipo de serviço, Evento: Eventos como show no estabelecimento
      */
@@ -52,7 +56,7 @@ class Servico extends Model
     public $timestamps = false;
 
     /**
-     * The model's default values for attributes.
+     * The attributes that are mass assignable.
      *
      * @var array
      */
@@ -82,4 +86,8 @@ class Servico extends Model
         'individual' => false,
         'ativo' => true,
     ];
+
+    public function validate()
+    {
+    }
 }

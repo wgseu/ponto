@@ -24,13 +24,17 @@
  */
 namespace App\Models;
 
+use App\Concerns\ModelEvents;
+use App\Interfaces\ValidateInterface;
 use Illuminate\Database\Eloquent\Model;
 
 /**
  * Impostos disponíveis para informar no produto
  */
-class Imposto extends Model
+class Imposto extends Model implements ValidateInterface
 {
+    use ModelEvents;
+
     /**
      * Grupo do imposto
      */
@@ -55,7 +59,7 @@ class Imposto extends Model
     public $timestamps = false;
 
     /**
-     * The model's default values for attributes.
+     * The attributes that are mass assignable.
      *
      * @var array
      */
@@ -66,4 +70,8 @@ class Imposto extends Model
         'codigo',
         'descricao',
     ];
+
+    public function validate()
+    {
+    }
 }

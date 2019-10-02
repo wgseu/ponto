@@ -24,13 +24,17 @@
  */
 namespace App\Models;
 
+use App\Concerns\ModelEvents;
+use App\Interfaces\ValidateInterface;
 use Illuminate\Database\Eloquent\Model;
 
 /**
  * Pagamentos de contas e pedidos
  */
-class Pagamento extends Model
+class Pagamento extends Model implements ValidateInterface
 {
+    use ModelEvents;
+
     /**
      * Informa qual o andamento do processo de pagamento
      */
@@ -42,6 +46,9 @@ class Pagamento extends Model
     const ESTADO_DEVOLVIDO = 'devolvido';
     const ESTADO_CANCELADO = 'cancelado';
 
+    const CREATED_AT = 'data_lancamento';
+    const UPDATED_AT = null;
+
     /**
      * The table associated with the model.
      *
@@ -50,14 +57,7 @@ class Pagamento extends Model
     protected $table = 'pagamentos';
 
     /**
-     * Indicates if the model should be timestamped.
-     *
-     * @var bool
-     */
-    public $timestamps = false;
-
-    /**
-     * The model's default values for attributes.
+     * The attributes that are mass assignable.
      *
      * @var array
      */
@@ -84,7 +84,6 @@ class Pagamento extends Model
         'estado',
         'data_pagamento',
         'data_compensacao',
-        'data_lancamento',
     ];
 
     /**
@@ -204,5 +203,9 @@ class Pagamento extends Model
     public function credito()
     {
         return $this->belongsTo('App\Models\Credito', 'credito_id');
+    }
+
+    public function validate()
+    {
     }
 }

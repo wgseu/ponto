@@ -24,13 +24,20 @@
  */
 namespace App\Models;
 
+use App\Concerns\ModelEvents;
+use App\Interfaces\ValidateInterface;
 use Illuminate\Database\Eloquent\Model;
 
 /**
  * Guarda a soma do estoque de cada produto por setor
  */
-class Contagem extends Model
+class Contagem extends Model implements ValidateInterface
 {
+    use ModelEvents;
+
+    const UPDATED_AT = 'data_atualizacao';
+    const CREATED_AT = null;
+
     /**
      * The table associated with the model.
      *
@@ -39,14 +46,7 @@ class Contagem extends Model
     protected $table = 'contagens';
 
     /**
-     * Indicates if the model should be timestamped.
-     *
-     * @var bool
-     */
-    public $timestamps = false;
-
-    /**
-     * The model's default values for attributes.
+     * The attributes that are mass assignable.
      *
      * @var array
      */
@@ -54,7 +54,6 @@ class Contagem extends Model
         'produto_id',
         'setor_id',
         'quantidade',
-        'data_atualizacao',
     ];
 
     /**
@@ -71,5 +70,9 @@ class Contagem extends Model
     public function setor()
     {
         return $this->belongsTo('App\Models\Setor', 'setor_id');
+    }
+
+    public function validate()
+    {
     }
 }

@@ -41,26 +41,22 @@ class MetricaInput extends InputType
     public function fields(): array
     {
         return [
-            'id' => [
-                'type' => Type::id(),
-                'description' => 'Identificador da métrica',
-            ],
             'nome' => [
                 'type' => Type::nonNull(Type::string()),
-                'rules' => ['max:100'],
                 'description' => 'Nome da métrica',
+                'rules' => ['max:100'],
             ],
             'descricao' => [
                 'type' => Type::string(),
-                'rules' => ['max:200'],
                 'description' => 'Descreve o que deve ser avaliado pelo cliente',
+                'rules' => ['max:200'],
             ],
             'tipo' => [
                 'type' => Type::nonNull(GraphQL::type('MetricaTipo')),
                 'description' => 'Tipo de métrica que pode ser velocidade de entrega, quantidade no atendimento, sabor da comida e apresentação do prato',
             ],
             'quantidade' => [
-                'type' => Type::nonNull(Type::int()),
+                'type' => Type::int(),
                 'description' => 'Quantidade das últimas avaliações para reavaliação da métrica',
             ],
             'avaliacao' => [
@@ -70,10 +66,6 @@ class MetricaInput extends InputType
             'data_processamento' => [
                 'type' => GraphQL::type('DateTime'),
                 'description' => 'Data do último processamento da avaliação',
-            ],
-            'data_arquivado' => [
-                'type' => GraphQL::type('DateTime'),
-                'description' => 'Data em que essa métrica foi arquivada',
             ],
         ];
     }

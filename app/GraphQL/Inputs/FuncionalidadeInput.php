@@ -40,12 +40,8 @@ class FuncionalidadeInput extends InputType
     public function fields(): array
     {
         return [
-            'id' => [
-                'type' => Type::id(),
-                'description' => 'Identificador da funcionalidade',
-            ],
             'modulo_id' => [
-                'type' => Type::nonNull(Type::int()),
+                'type' => Type::int(),
                 'description' => 'Módulo que essa funcionalidade pertence',
             ],
             'funcionalidade_id' => [
@@ -54,13 +50,13 @@ class FuncionalidadeInput extends InputType
             ],
             'nome' => [
                 'type' => Type::nonNull(Type::string()),
-                'rules' => ['max:64'],
                 'description' => 'Nome da funcionalidade, único em todo o sistema',
+                'rules' => ['max:64'],
             ],
             'descricao' => [
                 'type' => Type::nonNull(Type::string()),
-                'rules' => ['max:100'],
                 'description' => 'Descrição da funcionalidade',
+                'rules' => ['max:200'],
             ],
         ];
     }

@@ -40,24 +40,20 @@ class PaisInput extends InputType
     public function fields(): array
     {
         return [
-            'id' => [
-                'type' => Type::id(),
-                'description' => 'Identificador do país',
-            ],
             'nome' => [
                 'type' => Type::nonNull(Type::string()),
-                'rules' => ['max:100'],
                 'description' => 'Nome do país',
+                'rules' => ['max:100'],
             ],
             'sigla' => [
                 'type' => Type::nonNull(Type::string()),
-                'rules' => ['max:10'],
                 'description' => 'Abreviação do nome do país',
+                'rules' => ['max:10'],
             ],
             'codigo' => [
                 'type' => Type::nonNull(Type::string()),
-                'rules' => ['max:10'],
                 'description' => 'Código do país com 2 letras',
+                'rules' => ['max:10'],
             ],
             'moeda_id' => [
                 'type' => Type::nonNull(Type::int()),
@@ -65,21 +61,21 @@ class PaisInput extends InputType
             ],
             'idioma' => [
                 'type' => Type::nonNull(Type::string()),
-                'rules' => ['max:10'],
                 'description' => 'Idioma nativo do país',
+                'rules' => ['max:10'],
             ],
             'prefixo' => [
                 'type' => Type::string(),
-                'rules' => ['max:45'],
                 'description' => 'Prefixo de telefone para ligações internacionais',
+                'rules' => ['max:45'],
             ],
             'entradas' => [
                 'type' => Type::string(),
-                'rules' => ['max:65535'],
                 'description' => 'Frases, nomes de campos e máscaras específicas do país',
+                'rules' => ['max:65535'],
             ],
             'unitario' => [
-                'type' => Type::nonNull(Type::boolean()),
+                'type' => Type::boolean(),
                 'description' => 'Informa se o país tem apenas um estado federativo',
             ],
         ];

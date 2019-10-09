@@ -22,34 +22,12 @@
  *
  * @author Equipe GrandChef <desenvolvimento@grandchef.com.br>
  */
+namespace App\Interfaces;
 
-declare(strict_types=1);
-
-namespace App\GraphQL\Inputs;
-
-use GraphQL\Type\Definition\Type;
-use Rebing\GraphQL\Support\InputType;
-
-class CozinhaInput extends InputType
+/**
+ * Valida regras de negócio ao criar um model
+ */
+interface AuthorizableInterface
 {
-    protected $attributes = [
-        'name' => 'CozinhaInput',
-        'description' => 'Categoria de comida servida pelo estabelecimento',
-    ];
-
-    public function fields(): array
-    {
-        return [
-            'nome' => [
-                'type' => Type::nonNull(Type::string()),
-                'description' => 'Nome da cozinha, Ex. Japonesa, Brasileira, Italiana, Pizza',
-                'rules' => ['max:50'],
-            ],
-            'descricao' => [
-                'type' => Type::string(),
-                'description' => 'Descrição da cozinha, o que é servido',
-                'rules' => ['max:255'],
-            ],
-        ];
-    }
+    public function hasPermissionTo(string $ability);
 }

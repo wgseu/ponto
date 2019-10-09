@@ -27,7 +27,6 @@ declare(strict_types=1);
 
 namespace App\GraphQL\Inputs;
 
-use Rebing\GraphQL\Support\Facades\GraphQL;
 use GraphQL\Type\Definition\Type;
 use Rebing\GraphQL\Support\InputType;
 
@@ -41,10 +40,6 @@ class CreditoInput extends InputType
     public function fields(): array
     {
         return [
-            'id' => [
-                'type' => Type::id(),
-                'description' => 'Identificador do crédito',
-            ],
             'cliente_id' => [
                 'type' => Type::nonNull(Type::int()),
                 'description' => 'Cliente a qual o crédito pertence',
@@ -55,16 +50,12 @@ class CreditoInput extends InputType
             ],
             'detalhes' => [
                 'type' => Type::nonNull(Type::string()),
-                'rules' => ['max:255'],
                 'description' => 'Detalhes do crédito, justificativa do crédito',
+                'rules' => ['max:255'],
             ],
             'cancelado' => [
-                'type' => Type::nonNull(Type::boolean()),
+                'type' => Type::boolean(),
                 'description' => 'Informa se o crédito foi cancelado',
-            ],
-            'data_cadastro' => [
-                'type' => Type::nonNull(GraphQL::type('DateTime')),
-                'description' => 'Data de cadastro do crédito',
             ],
         ];
     }

@@ -40,18 +40,14 @@ class RegimeInput extends InputType
     public function fields(): array
     {
         return [
-            'id' => [
-                'type' => Type::id(),
-                'description' => 'Identificador do regime tributário',
-            ],
             'codigo' => [
                 'type' => Type::nonNull(Type::int()),
                 'description' => 'Código do regime tributário',
             ],
             'descricao' => [
                 'type' => Type::nonNull(Type::string()),
-                'rules' => ['max:200'],
                 'description' => 'Descrição do regime tributário',
+                'rules' => ['max:200'],
             ],
         ];
     }

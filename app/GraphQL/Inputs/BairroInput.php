@@ -40,29 +40,25 @@ class BairroInput extends InputType
     public function fields(): array
     {
         return [
-            'id' => [
-                'type' => Type::id(),
-                'description' => 'Identificador do bairro',
-            ],
             'cidade_id' => [
                 'type' => Type::nonNull(Type::int()),
                 'description' => 'Cidade a qual o bairro pertence',
             ],
             'nome' => [
                 'type' => Type::nonNull(Type::string()),
-                'rules' => ['max:100'],
                 'description' => 'Nome do bairro',
+                'rules' => ['max:100'],
             ],
             'valor_entrega' => [
                 'type' => Type::nonNull(Type::float()),
                 'description' => 'Valor cobrado para entregar um pedido nesse bairro',
             ],
             'disponivel' => [
-                'type' => Type::nonNull(Type::boolean()),
+                'type' => Type::boolean(),
                 'description' => 'Informa se o bairro está disponível para entrega de pedidos',
             ],
             'mapeado' => [
-                'type' => Type::nonNull(Type::boolean()),
+                'type' => Type::boolean(),
                 'description' => 'Informa se o bairro está mapeado por zonas e se é obrigatório selecionar uma zona',
             ],
             'entrega_minima' => [

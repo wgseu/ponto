@@ -27,9 +27,9 @@ declare(strict_types=1);
 
 namespace App\GraphQL\Inputs;
 
-use Rebing\GraphQL\Support\Facades\GraphQL;
 use GraphQL\Type\Definition\Type;
 use Rebing\GraphQL\Support\InputType;
+use Rebing\GraphQL\Support\Facades\GraphQL;
 
 class ViagemInput extends InputType
 {
@@ -41,10 +41,6 @@ class ViagemInput extends InputType
     public function fields(): array
     {
         return [
-            'id' => [
-                'type' => Type::id(),
-                'description' => 'Identificador da viagem',
-            ],
             'responsavel_id' => [
                 'type' => Type::nonNull(Type::int()),
                 'description' => 'Responsável pela entrega ou compra',
@@ -64,10 +60,6 @@ class ViagemInput extends InputType
             'distancia' => [
                 'type' => Type::float(),
                 'description' => 'Distância percorrida até chegar de volta ao ponto de partida',
-            ],
-            'data_atualizacao' => [
-                'type' => GraphQL::type('DateTime'),
-                'description' => 'Data de atualização da localização do responsável',
             ],
             'data_chegada' => [
                 'type' => GraphQL::type('DateTime'),

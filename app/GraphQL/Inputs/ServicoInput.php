@@ -41,31 +41,27 @@ class ServicoInput extends InputType
     public function fields(): array
     {
         return [
-            'id' => [
-                'type' => Type::id(),
-                'description' => 'Identificador do serviço',
-            ],
             'nome' => [
                 'type' => Type::nonNull(Type::string()),
-                'rules' => ['max:50'],
                 'description' => 'Nome do serviço, Ex.: Comissão, Entrega, Couvert',
+                'rules' => ['max:50'],
             ],
             'descricao' => [
                 'type' => Type::nonNull(Type::string()),
-                'rules' => ['max:100'],
                 'description' => 'Descrição do serviço, Ex.: Show de fulano',
+                'rules' => ['max:100'],
             ],
             'detalhes' => [
                 'type' => Type::string(),
-                'rules' => ['max:200'],
                 'description' => 'Detalhes do serviço, Ex.: Com participação especial de fulano',
+                'rules' => ['max:200'],
             ],
             'tipo' => [
                 'type' => Type::nonNull(GraphQL::type('ServicoTipo')),
                 'description' => 'Tipo de serviço, Evento: Eventos como show no estabelecimento',
             ],
             'obrigatorio' => [
-                'type' => Type::nonNull(Type::boolean()),
+                'type' => Type::boolean(),
                 'description' => 'Informa se a taxa é obrigatória',
             ],
             'data_inicio' => [
@@ -81,20 +77,20 @@ class ServicoInput extends InputType
                 'description' => 'Tempo de participação máxima que não será obrigatório adicionar o serviço ao pedido',
             ],
             'valor' => [
-                'type' => Type::nonNull(Type::float()),
+                'type' => Type::float(),
                 'description' => 'Valor do serviço',
             ],
             'individual' => [
-                'type' => Type::nonNull(Type::boolean()),
+                'type' => Type::boolean(),
                 'description' => 'Informa se a taxa ou serviço é individual para cada pessoa',
             ],
             'imagem_url' => [
                 'type' => Type::string(),
-                'rules' => ['max:100'],
                 'description' => 'Banner do evento',
+                'rules' => ['max:100'],
             ],
             'ativo' => [
-                'type' => Type::nonNull(Type::boolean()),
+                'type' => Type::boolean(),
                 'description' => 'Informa se o serviço está ativo',
             ],
         ];

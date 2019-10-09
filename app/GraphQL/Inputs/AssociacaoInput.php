@@ -41,10 +41,6 @@ class AssociacaoInput extends InputType
     public function fields(): array
     {
         return [
-            'id' => [
-                'type' => Type::id(),
-                'description' => 'Identificador da associação no banco de dados',
-            ],
             'integracao_id' => [
                 'type' => Type::nonNull(Type::int()),
                 'description' => 'Integração a qual essa associação de pedido deve ser realizada',
@@ -55,28 +51,28 @@ class AssociacaoInput extends InputType
             ],
             'codigo' => [
                 'type' => Type::nonNull(Type::string()),
-                'rules' => ['max:50'],
                 'description' => 'Código curto do pedido vindo da plataforma',
+                'rules' => ['max:50'],
             ],
             'cliente' => [
                 'type' => Type::nonNull(Type::string()),
-                'rules' => ['max:255'],
                 'description' => 'Nome do cliente que fez o pedido',
+                'rules' => ['max:255'],
             ],
             'chave' => [
                 'type' => Type::nonNull(Type::string()),
-                'rules' => ['max:100'],
                 'description' => 'Dado chave do cliente, esperado telefone, e-mail ou CPF',
+                'rules' => ['max:100'],
             ],
             'pedido' => [
                 'type' => Type::nonNull(Type::string()),
-                'rules' => ['max:65535'],
                 'description' => 'Pedido no formato JSON para exibição na lista de pedidos e posterior integração',
+                'rules' => ['max:65535'],
             ],
             'endereco' => [
                 'type' => Type::string(),
-                'rules' => ['max:255'],
                 'description' => 'Endereço para ser entregue o pedido, nulo para o cliente vir buscar no restaurante',
+                'rules' => ['max:255'],
             ],
             'quantidade' => [
                 'type' => Type::nonNull(Type::float()),
@@ -99,18 +95,18 @@ class AssociacaoInput extends InputType
                 'description' => 'Total que foi pago incluindo o troco',
             ],
             'status' => [
-                'type' => Type::nonNull(GraphQL::type('AssociacaoStatus')),
+                'type' => GraphQL::type('AssociacaoStatus'),
                 'description' => 'Status do pedido que não foi integrado ainda',
             ],
             'motivo' => [
                 'type' => Type::string(),
-                'rules' => ['max:200'],
                 'description' => 'Informa o motivo do cancelamento',
+                'rules' => ['max:200'],
             ],
             'mensagem' => [
                 'type' => Type::string(),
-                'rules' => ['max:255'],
                 'description' => 'Mensagem de erro que foi gerada ao tentar integrar automaticamente',
+                'rules' => ['max:255'],
             ],
             'sincronizado' => [
                 'type' => Type::nonNull(Type::boolean()),

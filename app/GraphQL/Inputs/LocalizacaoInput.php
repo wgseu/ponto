@@ -41,10 +41,6 @@ class LocalizacaoInput extends InputType
     public function fields(): array
     {
         return [
-            'id' => [
-                'type' => Type::id(),
-                'description' => 'Identificador do endereço',
-            ],
             'cliente_id' => [
                 'type' => Type::nonNull(Type::int()),
                 'description' => 'Cliente a qual esse endereço pertence',
@@ -59,47 +55,47 @@ class LocalizacaoInput extends InputType
             ],
             'cep' => [
                 'type' => Type::string(),
-                'rules' => ['max:8'],
                 'description' => 'Código dos correios para identificar um logradouro',
+                'rules' => ['max:8'],
             ],
             'logradouro' => [
                 'type' => Type::nonNull(Type::string()),
-                'rules' => ['max:100'],
                 'description' => 'Nome da rua ou avenida',
+                'rules' => ['max:100'],
             ],
             'numero' => [
                 'type' => Type::nonNull(Type::string()),
-                'rules' => ['max:20'],
                 'description' => 'Número da casa ou do condomínio',
+                'rules' => ['max:20'],
             ],
             'tipo' => [
-                'type' => Type::nonNull(GraphQL::type('LocalizacaoTipo')),
+                'type' => GraphQL::type('LocalizacaoTipo'),
                 'description' => 'Tipo de endereço Casa ou Apartamento',
             ],
             'complemento' => [
                 'type' => Type::string(),
-                'rules' => ['max:100'],
                 'description' => 'Complemento do endereço, Ex.: Loteamento Sul',
+                'rules' => ['max:100'],
             ],
             'condominio' => [
                 'type' => Type::string(),
-                'rules' => ['max:100'],
                 'description' => 'Nome do condomínio',
+                'rules' => ['max:100'],
             ],
             'bloco' => [
                 'type' => Type::string(),
-                'rules' => ['max:20'],
                 'description' => 'Número do bloco quando for apartamento',
+                'rules' => ['max:20'],
             ],
             'apartamento' => [
                 'type' => Type::string(),
-                'rules' => ['max:20'],
                 'description' => 'Número do apartamento',
+                'rules' => ['max:20'],
             ],
             'referencia' => [
                 'type' => Type::string(),
-                'rules' => ['max:200'],
                 'description' => 'Ponto de referência para chegar ao local',
+                'rules' => ['max:200'],
             ],
             'latitude' => [
                 'type' => Type::float(),
@@ -111,12 +107,8 @@ class LocalizacaoInput extends InputType
             ],
             'apelido' => [
                 'type' => Type::string(),
-                'rules' => ['max:45'],
                 'description' => 'Ex.: Minha Casa, Casa da Amiga',
-            ],
-            'data_arquivado' => [
-                'type' => GraphQL::type('DateTime'),
-                'description' => 'Informa a data que essa localização foi removida',
+                'rules' => ['max:45'],
             ],
         ];
     }

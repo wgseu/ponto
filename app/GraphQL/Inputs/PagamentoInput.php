@@ -41,10 +41,6 @@ class PagamentoInput extends InputType
     public function fields(): array
     {
         return [
-            'id' => [
-                'type' => Type::id(),
-                'description' => 'Identificador do pagamento',
-            ],
             'carteira_id' => [
                 'type' => Type::nonNull(Type::int()),
                 'description' => 'Carteira de destino do valor',
@@ -102,11 +98,11 @@ class PagamentoInput extends InputType
                 'description' => 'Valor pago ou recebido na moeda informada no momento do recebimento',
             ],
             'numero_parcela' => [
-                'type' => Type::nonNull(Type::int()),
+                'type' => Type::int(),
                 'description' => 'Informa qual o número da parcela para este pagamento',
             ],
             'parcelas' => [
-                'type' => Type::nonNull(Type::int()),
+                'type' => Type::int(),
                 'description' => 'Quantidade de parcelas desse pagamento',
             ],
             'lancado' => [
@@ -115,16 +111,16 @@ class PagamentoInput extends InputType
             ],
             'codigo' => [
                 'type' => Type::string(),
-                'rules' => ['max:100'],
                 'description' => 'Código do pagamento, usado em transações online',
+                'rules' => ['max:100'],
             ],
             'detalhes' => [
                 'type' => Type::string(),
-                'rules' => ['max:200'],
                 'description' => 'Detalhes do pagamento',
+                'rules' => ['max:200'],
             ],
             'estado' => [
-                'type' => Type::nonNull(GraphQL::type('PagamentoEstado')),
+                'type' => GraphQL::type('PagamentoEstado'),
                 'description' => 'Informa qual o andamento do processo de pagamento',
             ],
             'data_pagamento' => [
@@ -134,10 +130,6 @@ class PagamentoInput extends InputType
             'data_compensacao' => [
                 'type' => GraphQL::type('DateTime'),
                 'description' => 'Data de compensação do pagamento',
-            ],
-            'data_lancamento' => [
-                'type' => Type::nonNull(GraphQL::type('DateTime')),
-                'description' => 'Data e hora do lançamento do pagamento',
             ],
         ];
     }

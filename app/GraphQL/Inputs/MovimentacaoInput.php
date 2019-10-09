@@ -41,10 +41,6 @@ class MovimentacaoInput extends InputType
     public function fields(): array
     {
         return [
-            'id' => [
-                'type' => Type::id(),
-                'description' => 'Código da movimentação do caixa',
-            ],
             'sessao_id' => [
                 'type' => Type::nonNull(Type::int()),
                 'description' => 'Sessão do dia, permite abrir vários caixas no mesmo dia com o mesmo código da sessão',
@@ -54,7 +50,7 @@ class MovimentacaoInput extends InputType
                 'description' => 'Caixa a qual pertence essa movimentação',
             ],
             'aberta' => [
-                'type' => Type::nonNull(Type::boolean()),
+                'type' => Type::boolean(),
                 'description' => 'Informa se o caixa está aberto',
             ],
             'iniciador_id' => [

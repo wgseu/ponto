@@ -27,7 +27,10 @@ declare(strict_types=1);
 
 namespace App\GraphQL\Inputs;
 
-$[table.exists(date|time|datetime|enum)]
+$[table.exists(date|time|enum)]
+use Rebing\GraphQL\Support\Facades\GraphQL;
+$[table.else.exists(data_cadastro|data_criacao|data_lancamento|data_envio|data_atualizacao|data_arquivado|data_arquivamento)]
+$[table.else.exists(datetime)]
 use Rebing\GraphQL\Support\Facades\GraphQL;
 $[table.end]
 use GraphQL\Type\Definition\Type;
@@ -44,35 +47,67 @@ class $[Table.norm]Input extends InputType
     {
         return [
 $[field.each(all)]
-            '$[field]' => [
 $[field.if(primary)]
-                'type' => Type::id(),
 $[field.else.if(reference)]
+            '$[field]' => [
                 'type' => $[field.if(null)]$[field.else]Type::nonNull($[field.end]Type::int()$[field.if(null)]$[field.else])$[field.end],
-$[field.else.if(date)]
-                'type' => $[field.if(null)]$[field.else]Type::nonNull($[field.end]GraphQL::type('Date')$[field.if(null)]$[field.else])$[field.end],
-$[field.else.if(time)]
-                'type' => $[field.if(null)]$[field.else]Type::nonNull($[field.end]GraphQL::type('Time')$[field.if(null)]$[field.else])$[field.end],
-$[field.else.if(datetime)]
-                'type' => $[field.if(null)]$[field.else]Type::nonNull($[field.end]GraphQL::type('DateTime')$[field.if(null)]$[field.else])$[field.end],
-$[field.else.if(currency)]
-                'type' => $[field.if(null)]$[field.else]Type::nonNull($[field.end]Type::float()$[field.if(null)]$[field.else])$[field.end],
-$[field.else.if(float|double)]
-                'type' => $[field.if(null)]$[field.else]Type::nonNull($[field.end]Type::float()$[field.if(null)]$[field.else])$[field.end],
-$[field.else.if(integer|bigint)]
-                'type' => $[field.if(null)]$[field.else]Type::nonNull($[field.end]Type::int()$[field.if(null)]$[field.else])$[field.end],
-$[field.else.if(blob)]
-                'type' => $[field.if(null)]$[field.else]Type::nonNull($[field.end]Type::string()$[field.if(null)]$[field.else])$[field.end],
-$[field.else.if(boolean)]
-                'type' => $[field.if(null)]$[field.else]Type::nonNull($[field.end]Type::boolean()$[field.if(null)]$[field.else])$[field.end],
-$[field.else.if(enum)]
-                'type' => $[field.if(null)]$[field.else]Type::nonNull($[field.end]GraphQL::type('$[Table.norm]$[Field.norm]')$[field.if(null)]$[field.else])$[field.end],
-$[field.else]
-                'type' => $[field.if(null)]$[field.else]Type::nonNull($[field.end]Type::string()$[field.if(null)]$[field.else])$[field.end],
-                'rules' => ['max:$[field.length]'],
-$[field.end]
                 'description' => '$[Field.comment]',
             ],
+$[field.else.if(date)]
+            '$[field]' => [
+                'type' => $[field.if(null|info)]$[field.else]Type::nonNull($[field.end]GraphQL::type('Date')$[field.if(null|info)]$[field.else])$[field.end],
+                'description' => '$[Field.comment]',
+            ],
+$[field.else.if(time)]
+            '$[field]' => [
+                'type' => $[field.if(null|info)]$[field.else]Type::nonNull($[field.end]GraphQL::type('Time')$[field.if(null|info)]$[field.else])$[field.end],
+                'description' => '$[Field.comment]',
+            ],
+$[field.else.if(datetime)]
+$[field.match(.*cadastro|.*criacao|.*lancamento|.*envio|.*atualizacao|.*arquivado|.*arquivamento)]
+$[field.else]
+            '$[field]' => [
+                'type' => $[field.if(null|info)]$[field.else]Type::nonNull($[field.end]GraphQL::type('DateTime')$[field.if(null|info)]$[field.else])$[field.end],
+                'description' => '$[Field.comment]',
+            ],
+$[field.end]
+$[field.else.if(currency)]
+            '$[field]' => [
+                'type' => $[field.if(null|info)]$[field.else]Type::nonNull($[field.end]Type::float()$[field.if(null|info)]$[field.else])$[field.end],
+                'description' => '$[Field.comment]',
+            ],
+$[field.else.if(float|double)]
+            '$[field]' => [
+                'type' => $[field.if(null|info)]$[field.else]Type::nonNull($[field.end]Type::float()$[field.if(null|info)]$[field.else])$[field.end],
+                'description' => '$[Field.comment]',
+            ],
+$[field.else.if(integer|bigint)]
+            '$[field]' => [
+                'type' => $[field.if(null|info)]$[field.else]Type::nonNull($[field.end]Type::int()$[field.if(null|info)]$[field.else])$[field.end],
+                'description' => '$[Field.comment]',
+            ],
+$[field.else.if(blob)]
+            '$[field]' => [
+                'type' => $[field.if(null|info)]$[field.else]Type::nonNull($[field.end]Type::string()$[field.if(null|info)]$[field.else])$[field.end],
+                'description' => '$[Field.comment]',
+            ],
+$[field.else.if(boolean)]
+            '$[field]' => [
+                'type' => $[field.if(null|info)]$[field.else]Type::nonNull($[field.end]Type::boolean()$[field.if(null|info)]$[field.else])$[field.end],
+                'description' => '$[Field.comment]',
+            ],
+$[field.else.if(enum)]
+            '$[field]' => [
+                'type' => $[field.if(null|info)]$[field.else]Type::nonNull($[field.end]GraphQL::type('$[Table.norm]$[Field.norm]')$[field.if(null|info)]$[field.else])$[field.end],
+                'description' => '$[Field.comment]',
+            ],
+$[field.else]
+            '$[field]' => [
+                'type' => $[field.if(null|info)]$[field.else]Type::nonNull($[field.end]Type::string()$[field.if(null|info)]$[field.else])$[field.end],
+                'description' => '$[Field.comment]',
+                'rules' => ['max:$[field.length]'],
+            ],
+$[field.end]
 $[field.end]
         ];
     }

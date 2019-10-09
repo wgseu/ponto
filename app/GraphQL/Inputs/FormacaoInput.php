@@ -40,10 +40,6 @@ class FormacaoInput extends InputType
     public function fields(): array
     {
         return [
-            'id' => [
-                'type' => Type::id(),
-                'description' => 'Identificador da formação',
-            ],
             'item_id' => [
                 'type' => Type::nonNull(Type::int()),
                 'description' => 'Informa qual foi o produto vendido para essa formação',
@@ -57,7 +53,7 @@ class FormacaoInput extends InputType
                 'description' => 'Informa qual composição foi retirada ou adicionada no momento da venda',
             ],
             'quantidade' => [
-                'type' => Type::nonNull(Type::float()),
+                'type' => Type::float(),
                 'description' => 'Quantidade de itens selecionados',
             ],
         ];

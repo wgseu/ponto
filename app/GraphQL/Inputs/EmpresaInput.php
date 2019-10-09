@@ -41,10 +41,6 @@ class EmpresaInput extends InputType
     public function fields(): array
     {
         return [
-            'id' => [
-                'type' => Type::id(),
-                'description' => 'Identificador único da empresa, valor 1',
-            ],
             'pais_id' => [
                 'type' => Type::int(),
                 'description' => 'País em que a empresa está situada',
@@ -59,8 +55,8 @@ class EmpresaInput extends InputType
             ],
             'opcoes' => [
                 'type' => Type::string(),
-                'rules' => ['max:65535'],
                 'description' => 'Opções gerais do sistema como opções de impressão e comportamento',
+                'rules' => ['max:65535'],
             ],
         ];
     }

@@ -27,7 +27,6 @@ declare(strict_types=1);
 
 namespace App\GraphQL\Inputs;
 
-use Rebing\GraphQL\Support\Facades\GraphQL;
 use GraphQL\Type\Definition\Type;
 use Rebing\GraphQL\Support\InputType;
 
@@ -41,21 +40,13 @@ class FornecedorInput extends InputType
     public function fields(): array
     {
         return [
-            'id' => [
-                'type' => Type::id(),
-                'description' => 'Identificador do fornecedor',
-            ],
             'empresa_id' => [
                 'type' => Type::nonNull(Type::int()),
                 'description' => 'Empresa do fornecedor',
             ],
             'prazo_pagamento' => [
-                'type' => Type::nonNull(Type::int()),
+                'type' => Type::int(),
                 'description' => 'Prazo em dias para pagamento do fornecedor',
-            ],
-            'data_cadastro' => [
-                'type' => Type::nonNull(GraphQL::type('DateTime')),
-                'description' => 'Data de cadastro do fornecedor',
             ],
         ];
     }

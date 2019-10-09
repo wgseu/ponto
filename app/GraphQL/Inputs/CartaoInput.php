@@ -40,10 +40,6 @@ class CartaoInput extends InputType
     public function fields(): array
     {
         return [
-            'id' => [
-                'type' => Type::id(),
-                'description' => 'Identificador do cartão',
-            ],
             'forma_id' => [
                 'type' => Type::nonNull(Type::int()),
                 'description' => 'Forma de pagamento associada à esse cartão ou vale',
@@ -54,28 +50,28 @@ class CartaoInput extends InputType
             ],
             'bandeira' => [
                 'type' => Type::nonNull(Type::string()),
-                'rules' => ['max:50'],
                 'description' => 'Nome da bandeira do cartão',
+                'rules' => ['max:50'],
             ],
             'taxa' => [
-                'type' => Type::nonNull(Type::float()),
+                'type' => Type::float(),
                 'description' => 'Taxa em porcentagem cobrado sobre o total do pagamento, valores de 0 a 100',
             ],
             'dias_repasse' => [
-                'type' => Type::nonNull(Type::int()),
+                'type' => Type::int(),
                 'description' => 'Quantidade de dias para repasse do valor',
             ],
             'taxa_antecipacao' => [
-                'type' => Type::nonNull(Type::float()),
+                'type' => Type::float(),
                 'description' => 'Taxa em porcentagem para antecipação de recebimento de parcelas',
             ],
             'imagem_url' => [
                 'type' => Type::string(),
-                'rules' => ['max:100'],
                 'description' => 'Imagem do cartão',
+                'rules' => ['max:100'],
             ],
             'ativo' => [
-                'type' => Type::nonNull(Type::boolean()),
+                'type' => Type::boolean(),
                 'description' => 'Informa se o cartão está ativo',
             ],
         ];

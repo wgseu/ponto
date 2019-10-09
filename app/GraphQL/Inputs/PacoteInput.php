@@ -27,7 +27,6 @@ declare(strict_types=1);
 
 namespace App\GraphQL\Inputs;
 
-use Rebing\GraphQL\Support\Facades\GraphQL;
 use GraphQL\Type\Definition\Type;
 use Rebing\GraphQL\Support\InputType;
 
@@ -41,10 +40,6 @@ class PacoteInput extends InputType
     public function fields(): array
     {
         return [
-            'id' => [
-                'type' => Type::id(),
-                'description' => 'Identificador do pacote',
-            ],
             'pacote_id' => [
                 'type' => Type::nonNull(Type::int()),
                 'description' => 'Pacote a qual pertence as informações de formação do produto final',
@@ -66,11 +61,11 @@ class PacoteInput extends InputType
                 'description' => 'Informa a propriedade pai de um complemento, permite atribuir preços diferentes dependendo da propriedade, Ex.: Tamanho -> Sabor, onde Tamanho é pai de Sabor',
             ],
             'quantidade_minima' => [
-                'type' => Type::nonNull(Type::int()),
+                'type' => Type::int(),
                 'description' => 'Permite definir uma quantidade mínima obrigatória para a venda desse item',
             ],
             'quantidade_maxima' => [
-                'type' => Type::nonNull(Type::int()),
+                'type' => Type::int(),
                 'description' => 'Define a quantidade máxima que pode ser vendido esse item repetidamente',
             ],
             'acrescimo' => [
@@ -78,16 +73,12 @@ class PacoteInput extends InputType
                 'description' => 'Valor acrescentado ao produto quando o item é selecionado',
             ],
             'selecionado' => [
-                'type' => Type::nonNull(Type::boolean()),
+                'type' => Type::boolean(),
                 'description' => 'Informa se o complemento está selecionado por padrão, recomendado apenas para produtos',
             ],
             'disponivel' => [
-                'type' => Type::nonNull(Type::boolean()),
+                'type' => Type::boolean(),
                 'description' => 'Indica se o pacote estará disponível para venda',
-            ],
-            'data_arquivado' => [
-                'type' => GraphQL::type('DateTime'),
-                'description' => 'Data em que o pacote foi arquivado e não será mais usado',
             ],
         ];
     }

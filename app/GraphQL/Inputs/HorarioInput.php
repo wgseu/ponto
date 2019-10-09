@@ -41,12 +41,8 @@ class HorarioInput extends InputType
     public function fields(): array
     {
         return [
-            'id' => [
-                'type' => Type::id(),
-                'description' => 'Identificador do horário',
-            ],
             'modo' => [
-                'type' => Type::nonNull(GraphQL::type('HorarioModo')),
+                'type' => GraphQL::type('HorarioModo'),
                 'description' => 'Modo de trabalho disponível nesse horário, Funcionamento: horário em que o estabelecimento estará aberto, Operação: quando aceitar novos pedidos locais, Entrega: quando aceita ainda pedidos para entrega',
             ],
             'funcao_id' => [
@@ -67,19 +63,19 @@ class HorarioInput extends InputType
             ],
             'mensagem' => [
                 'type' => Type::string(),
-                'rules' => ['max:200'],
                 'description' => 'Mensagem que será mostrada quando o estabelecimento estiver fechado por algum motivo',
+                'rules' => ['max:200'],
             ],
             'entrega_minima' => [
                 'type' => Type::int(),
                 'description' => 'Tempo mínimo que leva para entregar nesse horário',
             ],
             'entrega_maxima' => [
-                'type' => Type::nonNull(Type::int()),
+                'type' => Type::int(),
                 'description' => 'Tempo máximo que leva para entregar nesse horário',
             ],
             'fechado' => [
-                'type' => Type::nonNull(Type::boolean()),
+                'type' => Type::boolean(),
                 'description' => 'Informa se o estabelecimento estará fechado nesse horário programado, o início e fim será tempo no formato unix, quando verdadeiro tem prioridade sobre todos os horários',
             ],
         ];

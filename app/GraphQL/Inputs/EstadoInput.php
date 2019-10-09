@@ -40,23 +40,19 @@ class EstadoInput extends InputType
     public function fields(): array
     {
         return [
-            'id' => [
-                'type' => Type::id(),
-                'description' => 'Identificador do estado',
-            ],
             'pais_id' => [
                 'type' => Type::nonNull(Type::int()),
                 'description' => 'País a qual esse estado pertence',
             ],
             'nome' => [
                 'type' => Type::nonNull(Type::string()),
-                'rules' => ['max:64'],
                 'description' => 'Nome do estado',
+                'rules' => ['max:64'],
             ],
             'uf' => [
                 'type' => Type::nonNull(Type::string()),
-                'rules' => ['max:48'],
                 'description' => 'Sigla do estado',
+                'rules' => ['max:48'],
             ],
         ];
     }

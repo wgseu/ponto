@@ -40,10 +40,6 @@ class ResumoInput extends InputType
     public function fields(): array
     {
         return [
-            'id' => [
-                'type' => Type::id(),
-                'description' => 'Identificador do resumo',
-            ],
             'movimentacao_id' => [
                 'type' => Type::nonNull(Type::int()),
                 'description' => 'Movimentação do caixa referente ao resumo',

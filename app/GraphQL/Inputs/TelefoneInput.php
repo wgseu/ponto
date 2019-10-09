@@ -40,10 +40,6 @@ class TelefoneInput extends InputType
     public function fields(): array
     {
         return [
-            'id' => [
-                'type' => Type::id(),
-                'description' => 'Identificador do telefone',
-            ],
             'cliente_id' => [
                 'type' => Type::nonNull(Type::int()),
                 'description' => 'Informa o cliente que possui esse número de telefone',
@@ -54,21 +50,21 @@ class TelefoneInput extends InputType
             ],
             'numero' => [
                 'type' => Type::nonNull(Type::string()),
-                'rules' => ['max:12'],
                 'description' => 'Número de telefone com DDD',
+                'rules' => ['max:12'],
             ],
             'operadora' => [
                 'type' => Type::string(),
-                'rules' => ['max:45'],
                 'description' => 'Informa qual a operadora desse telefone',
+                'rules' => ['max:45'],
             ],
             'servico' => [
                 'type' => Type::string(),
-                'rules' => ['max:45'],
                 'description' => 'Informa qual serviço está associado à esse número, Ex: WhatsApp',
+                'rules' => ['max:45'],
             ],
             'principal' => [
-                'type' => Type::nonNull(Type::boolean()),
+                'type' => Type::boolean(),
                 'description' => 'Informa se o telefone é principal e exclusivo do cliente',
             ],
         ];

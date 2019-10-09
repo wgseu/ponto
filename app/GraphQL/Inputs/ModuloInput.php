@@ -40,22 +40,18 @@ class ModuloInput extends InputType
     public function fields(): array
     {
         return [
-            'id' => [
-                'type' => Type::id(),
-                'description' => 'Identificador do módulo',
-            ],
             'nome' => [
                 'type' => Type::nonNull(Type::string()),
-                'rules' => ['max:50'],
                 'description' => 'Nome do módulo, unico em todo o sistema',
+                'rules' => ['max:50'],
             ],
             'descricao' => [
                 'type' => Type::nonNull(Type::string()),
-                'rules' => ['max:200'],
                 'description' => 'Descrição do módulo, informa detalhes sobre a funcionalidade do módulo no sistema',
+                'rules' => ['max:200'],
             ],
             'habilitado' => [
-                'type' => Type::nonNull(Type::boolean()),
+                'type' => Type::boolean(),
                 'description' => 'Informa se o módulo do sistema está habilitado',
             ],
         ];

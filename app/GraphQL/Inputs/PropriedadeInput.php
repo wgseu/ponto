@@ -27,7 +27,6 @@ declare(strict_types=1);
 
 namespace App\GraphQL\Inputs;
 
-use Rebing\GraphQL\Support\Facades\GraphQL;
 use GraphQL\Type\Definition\Type;
 use Rebing\GraphQL\Support\InputType;
 
@@ -41,32 +40,24 @@ class PropriedadeInput extends InputType
     public function fields(): array
     {
         return [
-            'id' => [
-                'type' => Type::id(),
-                'description' => 'Identificador da propriedade',
-            ],
             'grupo_id' => [
                 'type' => Type::nonNull(Type::int()),
                 'description' => 'Grupo que possui essa propriedade como item de um pacote',
             ],
             'nome' => [
                 'type' => Type::nonNull(Type::string()),
-                'rules' => ['max:100'],
                 'description' => 'Nome da propriedade, Ex.: Grande, Pequena',
+                'rules' => ['max:100'],
             ],
             'abreviacao' => [
                 'type' => Type::string(),
-                'rules' => ['max:100'],
                 'description' => 'Abreviação do nome da propriedade, Ex.: G para Grande, P para Pequena, essa abreviação fará parte do nome do produto',
+                'rules' => ['max:100'],
             ],
             'imagem_url' => [
                 'type' => Type::string(),
-                'rules' => ['max:100'],
                 'description' => 'Imagem que representa a propriedade',
-            ],
-            'data_atualizacao' => [
-                'type' => Type::nonNull(GraphQL::type('DateTime')),
-                'description' => 'Data de atualização dos dados ou da imagem da propriedade',
+                'rules' => ['max:100'],
             ],
         ];
     }

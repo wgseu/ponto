@@ -41,10 +41,6 @@ class PatrimonioInput extends InputType
     public function fields(): array
     {
         return [
-            'id' => [
-                'type' => Type::id(),
-                'description' => 'Identificador do bem',
-            ],
             'empresa_id' => [
                 'type' => Type::nonNull(Type::int()),
                 'description' => 'Empresa a que esse bem pertence',
@@ -55,54 +51,50 @@ class PatrimonioInput extends InputType
             ],
             'numero' => [
                 'type' => Type::nonNull(Type::string()),
-                'rules' => ['max:45'],
                 'description' => 'Número que identifica o bem',
+                'rules' => ['max:45'],
             ],
             'descricao' => [
                 'type' => Type::nonNull(Type::string()),
-                'rules' => ['max:200'],
                 'description' => 'Descrição ou nome do bem',
+                'rules' => ['max:200'],
             ],
             'quantidade' => [
                 'type' => Type::nonNull(Type::float()),
                 'description' => 'Quantidade do bem com as mesmas características',
             ],
             'altura' => [
-                'type' => Type::nonNull(Type::float()),
+                'type' => Type::float(),
                 'description' => 'Altura do bem em metros',
             ],
             'largura' => [
-                'type' => Type::nonNull(Type::float()),
+                'type' => Type::float(),
                 'description' => 'Largura do bem em metros',
             ],
             'comprimento' => [
-                'type' => Type::nonNull(Type::float()),
+                'type' => Type::float(),
                 'description' => 'Comprimento do bem em metros',
             ],
             'estado' => [
-                'type' => Type::nonNull(GraphQL::type('PatrimonioEstado')),
+                'type' => GraphQL::type('PatrimonioEstado'),
                 'description' => 'Estado de conservação do bem',
             ],
             'custo' => [
-                'type' => Type::nonNull(Type::float()),
+                'type' => Type::float(),
                 'description' => 'Valor de custo do bem',
             ],
             'valor' => [
-                'type' => Type::nonNull(Type::float()),
+                'type' => Type::float(),
                 'description' => 'Valor que o bem vale atualmente',
             ],
             'ativo' => [
-                'type' => Type::nonNull(Type::boolean()),
+                'type' => Type::boolean(),
                 'description' => 'Informa se o bem está ativo e em uso',
             ],
             'imagem_url' => [
                 'type' => Type::string(),
-                'rules' => ['max:200'],
                 'description' => 'Caminho relativo da foto do bem',
-            ],
-            'data_atualizacao' => [
-                'type' => Type::nonNull(GraphQL::type('DateTime')),
-                'description' => 'Data de atualização das informações do bem',
+                'rules' => ['max:200'],
             ],
         ];
     }

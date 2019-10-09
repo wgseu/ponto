@@ -27,7 +27,6 @@ declare(strict_types=1);
 
 namespace App\GraphQL\Inputs;
 
-use Rebing\GraphQL\Support\Facades\GraphQL;
 use GraphQL\Type\Definition\Type;
 use Rebing\GraphQL\Support\InputType;
 
@@ -41,40 +40,28 @@ class CategoriaInput extends InputType
     public function fields(): array
     {
         return [
-            'id' => [
-                'type' => Type::id(),
-                'description' => 'Identificador da categoria',
-            ],
             'categoria_id' => [
                 'type' => Type::int(),
                 'description' => 'Informa a categoria pai da categoria atual, a categoria atual é uma subcategoria',
             ],
             'descricao' => [
                 'type' => Type::nonNull(Type::string()),
-                'rules' => ['max:45'],
                 'description' => 'Descrição da categoria. Ex.: Refrigerantes, Salgados',
+                'rules' => ['max:45'],
             ],
             'detalhes' => [
                 'type' => Type::string(),
-                'rules' => ['max:200'],
                 'description' => 'Informa os detalhes gerais dos produtos dessa categoria',
+                'rules' => ['max:200'],
             ],
             'imagem_url' => [
                 'type' => Type::string(),
-                'rules' => ['max:100'],
                 'description' => 'Imagem representativa da categoria',
+                'rules' => ['max:100'],
             ],
             'ordem' => [
-                'type' => Type::nonNull(Type::int()),
+                'type' => Type::int(),
                 'description' => 'Informa a ordem de exibição das categorias nas vendas',
-            ],
-            'data_atualizacao' => [
-                'type' => Type::nonNull(GraphQL::type('DateTime')),
-                'description' => 'Data de atualização das informações da categoria',
-            ],
-            'data_arquivado' => [
-                'type' => GraphQL::type('DateTime'),
-                'description' => 'Data em que a categoria foi arquivada e não será mais usada',
             ],
         ];
     }

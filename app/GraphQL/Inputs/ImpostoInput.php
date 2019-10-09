@@ -41,10 +41,6 @@ class ImpostoInput extends InputType
     public function fields(): array
     {
         return [
-            'id' => [
-                'type' => Type::id(),
-                'description' => 'Identificador do imposto',
-            ],
             'grupo' => [
                 'type' => Type::nonNull(GraphQL::type('ImpostoGrupo')),
                 'description' => 'Grupo do imposto',
@@ -63,8 +59,8 @@ class ImpostoInput extends InputType
             ],
             'descricao' => [
                 'type' => Type::nonNull(Type::string()),
-                'rules' => ['max:255'],
                 'description' => 'Descrição do imposto',
+                'rules' => ['max:255'],
             ],
         ];
     }

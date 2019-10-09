@@ -25,6 +25,7 @@
 namespace App\Models;
 
 use App\Concerns\ModelEvents;
+use App\Interfaces\AuthorizableInterface;
 use Illuminate\Foundation\Auth\User;
 use App\Interfaces\ValidateInterface;
 use Tymon\JWTAuth\Contracts\JWTSubject;
@@ -34,7 +35,7 @@ use Illuminate\Notifications\Notifiable;
  * Informações de cliente físico ou jurídico. Clientes, empresas,
  * funcionários, fornecedores e parceiros são cadastrados aqui
  */
-class Cliente extends User implements ValidateInterface, JWTSubject
+class Cliente extends User implements ValidateInterface, JWTSubject, AuthorizableInterface
 {
     use Notifiable;
     use ModelEvents;
@@ -168,5 +169,10 @@ class Cliente extends User implements ValidateInterface, JWTSubject
 
     public function validate()
     {
+    }
+
+    public function hasPermissionTo(string $ability)
+    {
+        return true;
     }
 }

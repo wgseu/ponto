@@ -41,14 +41,10 @@ class ProdutoInput extends InputType
     public function fields(): array
     {
         return [
-            'id' => [
-                'type' => Type::id(),
-                'description' => 'Código do produto',
-            ],
             'codigo' => [
                 'type' => Type::nonNull(Type::string()),
-                'rules' => ['max:100'],
                 'description' => 'Código do produto podendo ser de barras ou aleatório, deve ser único entre todos os produtos',
+                'rules' => ['max:100'],
             ],
             'categoria_id' => [
                 'type' => Type::nonNull(Type::int()),
@@ -72,18 +68,18 @@ class ProdutoInput extends InputType
             ],
             'descricao' => [
                 'type' => Type::nonNull(Type::string()),
-                'rules' => ['max:75'],
                 'description' => 'Descrição do produto, Ex.: Refri. Coca Cola 2L.',
+                'rules' => ['max:75'],
             ],
             'abreviacao' => [
                 'type' => Type::string(),
-                'rules' => ['max:100'],
                 'description' => 'Nome abreviado do produto, Ex.: Cebola, Tomate, Queijo',
+                'rules' => ['max:100'],
             ],
             'detalhes' => [
                 'type' => Type::string(),
-                'rules' => ['max:255'],
                 'description' => 'Informa detalhes do produto, Ex: Com Cebola, Pimenta, Orégano',
+                'rules' => ['max:255'],
             ],
             'quantidade_minima' => [
                 'type' => Type::float(),
@@ -94,7 +90,7 @@ class ProdutoInput extends InputType
                 'description' => 'Informa a quantidade máxima do produto no estoque, não proibe, apenas avisa',
             ],
             'preco_venda' => [
-                'type' => Type::nonNull(Type::float()),
+                'type' => Type::float(),
                 'description' => 'Preço de venda base desse produto para todos os cardápios',
             ],
             'custo_producao' => [
@@ -102,31 +98,31 @@ class ProdutoInput extends InputType
                 'description' => 'Informa qual o valor para o custo de produção do produto, utilizado quando não há formação de composição do produto',
             ],
             'tipo' => [
-                'type' => Type::nonNull(GraphQL::type('ProdutoTipo')),
+                'type' => GraphQL::type('ProdutoTipo'),
                 'description' => 'Informa qual é o tipo de produto. Produto: Produto normal que possui estoque, Composição: Produto que não possui estoque diretamente, pois é composto de outros produtos ou composições, Pacote: Permite a composição no momento da venda, não possui estoque diretamente',
             ],
             'cobrar_servico' => [
-                'type' => Type::nonNull(Type::boolean()),
+                'type' => Type::boolean(),
                 'description' => 'Informa se deve ser cobrado a taxa de serviço dos garçons sobre este produto',
             ],
             'divisivel' => [
-                'type' => Type::nonNull(Type::boolean()),
+                'type' => Type::boolean(),
                 'description' => 'Informa se o produto pode ser vendido fracionado',
             ],
             'pesavel' => [
-                'type' => Type::nonNull(Type::boolean()),
+                'type' => Type::boolean(),
                 'description' => 'Informa se o peso do produto deve ser obtido de uma balança, obrigatoriamente o produto deve ser divisível',
             ],
             'tempo_preparo' => [
-                'type' => Type::nonNull(Type::int()),
+                'type' => Type::int(),
                 'description' => 'Tempo de preparo em minutos para preparar uma composição, 0 para não informado',
             ],
             'disponivel' => [
-                'type' => Type::nonNull(Type::boolean()),
+                'type' => Type::boolean(),
                 'description' => 'Informa se o produto estará disponível para venda em todos os cardápios',
             ],
             'insumo' => [
-                'type' => Type::nonNull(Type::boolean()),
+                'type' => Type::boolean(),
                 'description' => 'Informa se o produto é de uso interno e não está disponível para venda',
             ],
             'avaliacao' => [
@@ -139,16 +135,8 @@ class ProdutoInput extends InputType
             ],
             'imagem_url' => [
                 'type' => Type::string(),
-                'rules' => ['max:100'],
                 'description' => 'Imagem do produto',
-            ],
-            'data_atualizacao' => [
-                'type' => GraphQL::type('DateTime'),
-                'description' => 'Data de atualização das informações do produto',
-            ],
-            'data_arquivado' => [
-                'type' => GraphQL::type('DateTime'),
-                'description' => 'Data em que o produto foi arquivado e não será mais usado',
+                'rules' => ['max:100'],
             ],
         ];
     }

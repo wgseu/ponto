@@ -41,29 +41,25 @@ class CaixaInput extends InputType
     public function fields(): array
     {
         return [
-            'id' => [
-                'type' => Type::id(),
-                'description' => 'Identificador do caixa',
-            ],
             'carteira_id' => [
                 'type' => Type::nonNull(Type::int()),
                 'description' => 'null',
             ],
             'descricao' => [
                 'type' => Type::nonNull(Type::string()),
-                'rules' => ['max:50'],
                 'description' => 'Descrição do caixa',
+                'rules' => ['max:50'],
             ],
             'serie' => [
-                'type' => Type::nonNull(Type::int()),
+                'type' => Type::int(),
                 'description' => 'Série do caixa',
             ],
             'numero_inicial' => [
-                'type' => Type::nonNull(Type::int()),
+                'type' => Type::int(),
                 'description' => 'Número inicial na geração da nota, será usado quando maior que o último número utilizado',
             ],
             'ativa' => [
-                'type' => Type::nonNull(Type::boolean()),
+                'type' => Type::boolean(),
                 'description' => 'Informa se o caixa está ativo',
             ],
             'data_desativada' => [

@@ -40,21 +40,17 @@ class ComandaInput extends InputType
     public function fields(): array
     {
         return [
-            'id' => [
-                'type' => Type::id(),
-                'description' => 'Número da comanda',
-            ],
             'numero' => [
                 'type' => Type::nonNull(Type::int()),
                 'description' => 'Número da comanda',
             ],
             'nome' => [
                 'type' => Type::nonNull(Type::string()),
-                'rules' => ['max:50'],
                 'description' => 'Nome da comanda',
+                'rules' => ['max:50'],
             ],
             'ativa' => [
-                'type' => Type::nonNull(Type::boolean()),
+                'type' => Type::boolean(),
                 'description' => 'Informa se a comanda está diponível para ser usada nas vendas',
             ],
         ];

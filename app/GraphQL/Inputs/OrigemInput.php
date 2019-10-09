@@ -40,18 +40,14 @@ class OrigemInput extends InputType
     public function fields(): array
     {
         return [
-            'id' => [
-                'type' => Type::id(),
-                'description' => 'Identificador da origem',
-            ],
             'codigo' => [
                 'type' => Type::nonNull(Type::int()),
                 'description' => 'Código da origem da mercadoria',
             ],
             'descricao' => [
                 'type' => Type::nonNull(Type::string()),
-                'rules' => ['max:200'],
                 'description' => 'Descrição da origem da mercadoria',
+                'rules' => ['max:200'],
             ],
         ];
     }

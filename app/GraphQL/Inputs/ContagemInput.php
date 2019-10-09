@@ -27,7 +27,6 @@ declare(strict_types=1);
 
 namespace App\GraphQL\Inputs;
 
-use Rebing\GraphQL\Support\Facades\GraphQL;
 use GraphQL\Type\Definition\Type;
 use Rebing\GraphQL\Support\InputType;
 
@@ -41,10 +40,6 @@ class ContagemInput extends InputType
     public function fields(): array
     {
         return [
-            'id' => [
-                'type' => Type::id(),
-                'description' => 'Identificador da contagem',
-            ],
             'produto_id' => [
                 'type' => Type::nonNull(Type::int()),
                 'description' => 'Produto que possui o estoque acumulado nesse setor',
@@ -56,10 +51,6 @@ class ContagemInput extends InputType
             'quantidade' => [
                 'type' => Type::nonNull(Type::float()),
                 'description' => 'Quantidade do produto nesse setor',
-            ],
-            'data_atualizacao' => [
-                'type' => Type::nonNull(GraphQL::type('DateTime')),
-                'description' => 'Data em que a contagem foi atualizada',
             ],
         ];
     }

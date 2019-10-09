@@ -40,23 +40,19 @@ class PermissaoInput extends InputType
     public function fields(): array
     {
         return [
-            'id' => [
-                'type' => Type::id(),
-                'description' => 'Identificador da permissão',
-            ],
             'funcionalidade_id' => [
                 'type' => Type::nonNull(Type::int()),
                 'description' => 'Categoriza um grupo de permissões',
             ],
             'nome' => [
                 'type' => Type::nonNull(Type::string()),
-                'rules' => ['max:45'],
                 'description' => 'Nome da permissão, único no sistema',
+                'rules' => ['max:45'],
             ],
             'descricao' => [
                 'type' => Type::nonNull(Type::string()),
-                'rules' => ['max:100'],
                 'description' => 'Descreve a permissão',
+                'rules' => ['max:100'],
             ],
         ];
     }

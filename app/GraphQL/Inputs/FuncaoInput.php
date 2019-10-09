@@ -40,14 +40,10 @@ class FuncaoInput extends InputType
     public function fields(): array
     {
         return [
-            'id' => [
-                'type' => Type::id(),
-                'description' => 'Identificador da função',
-            ],
             'descricao' => [
                 'type' => Type::nonNull(Type::string()),
-                'rules' => ['max:45'],
                 'description' => 'Descreve o nome da função',
+                'rules' => ['max:45'],
             ],
             'remuneracao' => [
                 'type' => Type::nonNull(Type::float()),

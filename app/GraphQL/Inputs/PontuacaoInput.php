@@ -27,7 +27,6 @@ declare(strict_types=1);
 
 namespace App\GraphQL\Inputs;
 
-use Rebing\GraphQL\Support\Facades\GraphQL;
 use GraphQL\Type\Definition\Type;
 use Rebing\GraphQL\Support\InputType;
 
@@ -41,10 +40,6 @@ class PontuacaoInput extends InputType
     public function fields(): array
     {
         return [
-            'id' => [
-                'type' => Type::id(),
-                'description' => 'Identificador da pontuação',
-            ],
             'promocao_id' => [
                 'type' => Type::nonNull(Type::int()),
                 'description' => 'Informa a promoção que originou os pontos ou que descontou os pontos',
@@ -64,10 +59,6 @@ class PontuacaoInput extends InputType
             'quantidade' => [
                 'type' => Type::nonNull(Type::int()),
                 'description' => 'Quantidade de pontos ganhos ou gastos',
-            ],
-            'data_cadastro' => [
-                'type' => Type::nonNull(GraphQL::type('DateTime')),
-                'description' => 'Data de cadastro dos pontos',
             ],
         ];
     }

@@ -40,10 +40,6 @@ class EnderecoInput extends InputType
     public function fields(): array
     {
         return [
-            'id' => [
-                'type' => Type::id(),
-                'description' => 'Identificador do endereço',
-            ],
             'cidade_id' => [
                 'type' => Type::nonNull(Type::int()),
                 'description' => 'Cidade a qual o endereço pertence',
@@ -54,13 +50,13 @@ class EnderecoInput extends InputType
             ],
             'logradouro' => [
                 'type' => Type::nonNull(Type::string()),
-                'rules' => ['max:200'],
                 'description' => 'Nome da rua ou avenida',
+                'rules' => ['max:200'],
             ],
             'cep' => [
                 'type' => Type::nonNull(Type::string()),
-                'rules' => ['max:8'],
                 'description' => 'Código dos correios para identificar a rua ou avenida',
+                'rules' => ['max:8'],
             ],
         ];
     }

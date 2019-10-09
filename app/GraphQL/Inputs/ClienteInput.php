@@ -41,10 +41,6 @@ class ClienteInput extends InputType
     public function fields(): array
     {
         return [
-            'id' => [
-                'type' => Type::id(),
-                'description' => 'Identificador do cliente',
-            ],
             'tipo' => [
                 'type' => GraphQL::type('ClienteTipo'),
                 'description' => 'Informa o tipo de pessoa, que pode ser física ou jurídica',
@@ -55,23 +51,23 @@ class ClienteInput extends InputType
             ],
             'login' => [
                 'type' => Type::string(),
-                'rules' => ['max:50'],
                 'description' => 'Nome de usuário utilizado para entrar no sistema, aplicativo ou site',
+                'rules' => ['max:50'],
             ],
             'senha' => [
                 'type' => Type::string(),
-                'rules' => ['max:255'],
                 'description' => 'Senha embaralhada do cliente',
+                'rules' => ['max:255'],
             ],
             'nome' => [
                 'type' => Type::nonNull(Type::string()),
-                'rules' => ['max:100'],
                 'description' => 'Primeiro nome da pessoa física ou nome fantasia da empresa',
+                'rules' => ['max:100'],
             ],
             'sobrenome' => [
                 'type' => Type::string(),
-                'rules' => ['max:100'],
                 'description' => 'Restante do nome da pessoa física ou Razão social da empresa',
+                'rules' => ['max:100'],
             ],
             'genero' => [
                 'type' => GraphQL::type('ClienteGenero'),
@@ -79,23 +75,23 @@ class ClienteInput extends InputType
             ],
             'cpf' => [
                 'type' => Type::string(),
-                'rules' => ['max:20'],
                 'description' => 'Cadastro de Pessoa Física(CPF) ou Cadastro Nacional de Pessoa Jurídica(CNPJ)',
+                'rules' => ['max:20'],
             ],
             'rg' => [
                 'type' => Type::string(),
-                'rules' => ['max:20'],
                 'description' => 'Registro Geral(RG) ou Inscrição Estadual (IE)',
+                'rules' => ['max:20'],
             ],
             'im' => [
                 'type' => Type::string(),
-                'rules' => ['max:20'],
                 'description' => 'Inscrição municipal da empresa',
+                'rules' => ['max:20'],
             ],
             'email' => [
                 'type' => Type::string(),
-                'rules' => ['max:100'],
                 'description' => 'E-mail do cliente ou da empresa',
+                'rules' => ['max:100'],
             ],
             'data_nascimento' => [
                 'type' => GraphQL::type('Date'),
@@ -103,8 +99,17 @@ class ClienteInput extends InputType
             ],
             'slogan' => [
                 'type' => Type::string(),
-                'rules' => ['max:100'],
                 'description' => 'Slogan ou detalhes do cliente',
+                'rules' => ['max:100'],
+            ],
+            'status' => [
+                'type' => GraphQL::type('ClienteStatus'),
+                'description' => 'Informa o estado da conta do cliente',
+            ],
+            'secreto' => [
+                'type' => Type::string(),
+                'description' => 'Código secreto para recuperar a conta do cliente',
+                'rules' => ['max:40'],
             ],
             'limite_compra' => [
                 'type' => Type::float(),
@@ -112,33 +117,33 @@ class ClienteInput extends InputType
             ],
             'instagram' => [
                 'type' => Type::string(),
-                'rules' => ['max:200'],
                 'description' => 'URL para acessar a página do Instagram do cliente',
+                'rules' => ['max:200'],
             ],
             'facebook_url' => [
                 'type' => Type::string(),
-                'rules' => ['max:200'],
                 'description' => 'URL para acessar a página do Facebook do cliente',
+                'rules' => ['max:200'],
             ],
             'twitter' => [
                 'type' => Type::string(),
-                'rules' => ['max:200'],
                 'description' => 'URL para acessar a página do Twitter do cliente',
+                'rules' => ['max:200'],
             ],
             'linkedin_url' => [
                 'type' => Type::string(),
-                'rules' => ['max:200'],
                 'description' => 'URL para acessar a página do LinkedIn do cliente',
+                'rules' => ['max:200'],
             ],
             'imagem_url' => [
                 'type' => Type::string(),
-                'rules' => ['max:100'],
                 'description' => 'Foto do cliente ou logo da empresa',
+                'rules' => ['max:100'],
             ],
             'linguagem' => [
                 'type' => Type::string(),
-                'rules' => ['max:20'],
                 'description' => 'Código da linguagem utilizada pelo cliente para visualizar o aplicativo e o site, Ex: pt-BR',
+                'rules' => ['max:20'],
             ],
         ];
     }

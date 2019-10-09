@@ -41,10 +41,6 @@ class ItemInput extends InputType
     public function fields(): array
     {
         return [
-            'id' => [
-                'type' => Type::id(),
-                'description' => 'Identificador do item do pedido',
-            ],
             'pedido_id' => [
                 'type' => Type::nonNull(Type::int()),
                 'description' => 'Pedido a qual pertence esse item',
@@ -71,13 +67,13 @@ class ItemInput extends InputType
             ],
             'descricao' => [
                 'type' => Type::string(),
-                'rules' => ['max:200'],
                 'description' => 'Sobrescreve a descrição do produto na exibição',
+                'rules' => ['max:200'],
             ],
             'composicao' => [
                 'type' => Type::string(),
-                'rules' => ['max:65535'],
                 'description' => 'Informa a composição escolhida',
+                'rules' => ['max:65535'],
             ],
             'preco' => [
                 'type' => Type::nonNull(Type::float()),
@@ -92,7 +88,7 @@ class ItemInput extends InputType
                 'description' => 'Subtotal do item sem comissão',
             ],
             'comissao' => [
-                'type' => Type::nonNull(Type::float()),
+                'type' => Type::float(),
                 'description' => 'Valor total de comissão cobrada nesse item da venda',
             ],
             'total' => [
@@ -104,42 +100,34 @@ class ItemInput extends InputType
                 'description' => 'Preço de normal do produto no momento da venda',
             ],
             'preco_compra' => [
-                'type' => Type::nonNull(Type::float()),
+                'type' => Type::float(),
                 'description' => 'Preço de compra do produto calculado automaticamente na hora da venda',
             ],
             'detalhes' => [
                 'type' => Type::string(),
-                'rules' => ['max:255'],
                 'description' => 'Observações do item pedido, Ex.: bem gelado, mal passado',
+                'rules' => ['max:255'],
             ],
             'estado' => [
-                'type' => Type::nonNull(GraphQL::type('ItemEstado')),
+                'type' => GraphQL::type('ItemEstado'),
                 'description' => 'Estado de preparo e envio do produto',
             ],
             'cancelado' => [
-                'type' => Type::nonNull(Type::boolean()),
+                'type' => Type::boolean(),
                 'description' => 'Informa se o item foi cancelado',
             ],
             'motivo' => [
                 'type' => Type::string(),
-                'rules' => ['max:200'],
                 'description' => 'Informa o motivo do item ser cancelado',
+                'rules' => ['max:200'],
             ],
             'desperdicado' => [
-                'type' => Type::nonNull(Type::boolean()),
+                'type' => Type::boolean(),
                 'description' => 'Informa se o item foi cancelado por conta de desperdício',
             ],
             'data_processamento' => [
                 'type' => GraphQL::type('DateTime'),
                 'description' => 'Data do processamento do item',
-            ],
-            'data_atualizacao' => [
-                'type' => GraphQL::type('DateTime'),
-                'description' => 'Data de atualização do estado do item',
-            ],
-            'data_lancamento' => [
-                'type' => Type::nonNull(GraphQL::type('DateTime')),
-                'description' => 'Data e hora da realização do pedido do item',
             ],
         ];
     }

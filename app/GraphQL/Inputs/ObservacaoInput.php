@@ -40,22 +40,18 @@ class ObservacaoInput extends InputType
     public function fields(): array
     {
         return [
-            'id' => [
-                'type' => Type::id(),
-                'description' => 'Identificador da observação',
-            ],
             'produto_id' => [
                 'type' => Type::nonNull(Type::int()),
                 'description' => 'Informa o produto que pode conter essa observação',
             ],
             'grupo' => [
-                'type' => Type::nonNull(Type::int()),
+                'type' => Type::int(),
                 'description' => 'Informa o grupo de observações obrigatórias, se maior que zero, é obrigatório escolher pelo menos uma opção',
             ],
             'descricao' => [
                 'type' => Type::nonNull(Type::string()),
-                'rules' => ['max:100'],
                 'description' => 'Descrição da observação do produto',
+                'rules' => ['max:100'],
             ],
         ];
     }

@@ -40,10 +40,6 @@ class AcessoInput extends InputType
     public function fields(): array
     {
         return [
-            'id' => [
-                'type' => Type::id(),
-                'description' => 'Identificador do acesso',
-            ],
             'funcao_id' => [
                 'type' => Type::nonNull(Type::int()),
                 'description' => 'Função a que a permissão se aplica',

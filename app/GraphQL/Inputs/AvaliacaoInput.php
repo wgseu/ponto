@@ -41,10 +41,6 @@ class AvaliacaoInput extends InputType
     public function fields(): array
     {
         return [
-            'id' => [
-                'type' => Type::id(),
-                'description' => 'Identificador da avaliação',
-            ],
             'metrica_id' => [
                 'type' => Type::nonNull(Type::int()),
                 'description' => 'Métrica de avaliação',
@@ -67,8 +63,8 @@ class AvaliacaoInput extends InputType
             ],
             'comentario' => [
                 'type' => Type::string(),
-                'rules' => ['max:255'],
                 'description' => 'Comentário da avaliação',
+                'rules' => ['max:255'],
             ],
             'data_avaliacao' => [
                 'type' => Type::nonNull(GraphQL::type('DateTime')),

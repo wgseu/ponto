@@ -41,10 +41,6 @@ class EventoInput extends InputType
     public function fields(): array
     {
         return [
-            'id' => [
-                'type' => Type::id(),
-                'description' => 'Identificador do evento',
-            ],
             'nota_id' => [
                 'type' => Type::nonNull(Type::int()),
                 'description' => 'Nota a qual o evento foi criado',
@@ -55,17 +51,13 @@ class EventoInput extends InputType
             ],
             'mensagem' => [
                 'type' => Type::nonNull(Type::string()),
-                'rules' => ['max:65535'],
                 'description' => 'Mensagem do evento, descreve que aconteceu',
+                'rules' => ['max:65535'],
             ],
             'codigo' => [
                 'type' => Type::nonNull(Type::string()),
-                'rules' => ['max:20'],
                 'description' => 'Código de status do evento, geralmente código de erro de uma exceção',
-            ],
-            'data_criacao' => [
-                'type' => Type::nonNull(GraphQL::type('DateTime')),
-                'description' => 'Data de criação do evento',
+                'rules' => ['max:20'],
             ],
         ];
     }

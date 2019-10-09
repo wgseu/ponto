@@ -40,24 +40,20 @@ class UnidadeInput extends InputType
     public function fields(): array
     {
         return [
-            'id' => [
-                'type' => Type::id(),
-                'description' => 'Identificador da unidade',
-            ],
             'nome' => [
                 'type' => Type::nonNull(Type::string()),
-                'rules' => ['max:45'],
                 'description' => 'Nome da unidade de medida, Ex.: Grama, Quilo',
+                'rules' => ['max:45'],
             ],
             'descricao' => [
                 'type' => Type::string(),
-                'rules' => ['max:45'],
                 'description' => 'Detalhes sobre a unidade de medida',
+                'rules' => ['max:45'],
             ],
             'sigla' => [
                 'type' => Type::nonNull(Type::string()),
-                'rules' => ['max:10'],
                 'description' => 'Sigla da unidade de medida, Ex.: UN, L, g',
+                'rules' => ['max:10'],
             ],
         ];
     }

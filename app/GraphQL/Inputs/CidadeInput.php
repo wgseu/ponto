@@ -40,23 +40,19 @@ class CidadeInput extends InputType
     public function fields(): array
     {
         return [
-            'id' => [
-                'type' => Type::id(),
-                'description' => 'Código que identifica a cidade',
-            ],
             'estado_id' => [
                 'type' => Type::nonNull(Type::int()),
                 'description' => 'Informa a qual estado a cidade pertence',
             ],
             'nome' => [
                 'type' => Type::nonNull(Type::string()),
-                'rules' => ['max:100'],
                 'description' => 'Nome da cidade, é único para cada estado',
+                'rules' => ['max:100'],
             ],
             'cep' => [
                 'type' => Type::string(),
-                'rules' => ['max:8'],
                 'description' => 'Código dos correios para identificação da cidade',
+                'rules' => ['max:8'],
             ],
         ];
     }

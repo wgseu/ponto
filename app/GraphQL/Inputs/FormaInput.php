@@ -41,10 +41,6 @@ class FormaInput extends InputType
     public function fields(): array
     {
         return [
-            'id' => [
-                'type' => Type::id(),
-                'description' => 'Identificador da forma de pagamento',
-            ],
             'tipo' => [
                 'type' => Type::nonNull(GraphQL::type('FormaTipo')),
                 'description' => 'Tipo de pagamento',
@@ -55,27 +51,27 @@ class FormaInput extends InputType
             ],
             'descricao' => [
                 'type' => Type::nonNull(Type::string()),
-                'rules' => ['max:50'],
                 'description' => 'Descrição da forma de pagamento',
+                'rules' => ['max:50'],
             ],
             'min_parcelas' => [
-                'type' => Type::nonNull(Type::int()),
+                'type' => Type::int(),
                 'description' => 'Quantidade mínima de parcelas',
             ],
             'max_parcelas' => [
-                'type' => Type::nonNull(Type::int()),
+                'type' => Type::int(),
                 'description' => 'Quantidade máxima de parcelas',
             ],
             'parcelas_sem_juros' => [
-                'type' => Type::nonNull(Type::int()),
+                'type' => Type::int(),
                 'description' => 'Quantidade de parcelas em que não será cobrado juros',
             ],
             'juros' => [
-                'type' => Type::nonNull(Type::float()),
+                'type' => Type::float(),
                 'description' => 'Juros cobrado ao cliente no parcelamento',
             ],
             'ativa' => [
-                'type' => Type::nonNull(Type::boolean()),
+                'type' => Type::boolean(),
                 'description' => 'Informa se a forma de pagamento está ativa',
             ],
         ];

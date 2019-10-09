@@ -27,9 +27,9 @@ declare(strict_types=1);
 
 namespace App\GraphQL\Inputs;
 
-use Rebing\GraphQL\Support\Facades\GraphQL;
 use GraphQL\Type\Definition\Type;
 use Rebing\GraphQL\Support\InputType;
+use Rebing\GraphQL\Support\Facades\GraphQL;
 
 class ChequeInput extends InputType
 {
@@ -41,10 +41,6 @@ class ChequeInput extends InputType
     public function fields(): array
     {
         return [
-            'id' => [
-                'type' => Type::id(),
-                'description' => 'Identificador da folha de cheque',
-            ],
             'cliente_id' => [
                 'type' => Type::nonNull(Type::int()),
                 'description' => 'Cliente que emitiu o cheque',
@@ -55,18 +51,18 @@ class ChequeInput extends InputType
             ],
             'agencia' => [
                 'type' => Type::nonNull(Type::string()),
-                'rules' => ['max:45'],
                 'description' => 'Número da agência',
+                'rules' => ['max:45'],
             ],
             'conta' => [
                 'type' => Type::nonNull(Type::string()),
-                'rules' => ['max:45'],
                 'description' => 'Número da conta do banco descrito no cheque',
+                'rules' => ['max:45'],
             ],
             'numero' => [
                 'type' => Type::nonNull(Type::string()),
-                'rules' => ['max:20'],
                 'description' => 'Número da folha do cheque',
+                'rules' => ['max:20'],
             ],
             'valor' => [
                 'type' => Type::nonNull(Type::float()),
@@ -77,16 +73,12 @@ class ChequeInput extends InputType
                 'description' => 'Data de vencimento do cheque',
             ],
             'cancelado' => [
-                'type' => Type::nonNull(Type::boolean()),
+                'type' => Type::boolean(),
                 'description' => 'Informa se o cheque e todas as suas folhas estão cancelados',
             ],
             'recolhimento' => [
                 'type' => GraphQL::type('DateTime'),
                 'description' => 'Data de recolhimento do cheque',
-            ],
-            'data_cadastro' => [
-                'type' => Type::nonNull(GraphQL::type('DateTime')),
-                'description' => 'Data de cadastro do cheque',
             ],
         ];
     }

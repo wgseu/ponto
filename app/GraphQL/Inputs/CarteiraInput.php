@@ -41,10 +41,6 @@ class CarteiraInput extends InputType
     public function fields(): array
     {
         return [
-            'id' => [
-                'type' => Type::id(),
-                'description' => 'Código local da carteira',
-            ],
             'tipo' => [
                 'type' => Type::nonNull(GraphQL::type('CarteiraTipo')),
                 'description' => 'Tipo de carteira, \'Bancaria\' para conta bancária, \'Financeira\' para carteira financeira da empresa ou de sites de pagamentos, \'Credito\' para cartão de crédito e \'Local\' para caixas e cofres locais',
@@ -59,21 +55,21 @@ class CarteiraInput extends InputType
             ],
             'descricao' => [
                 'type' => Type::nonNull(Type::string()),
-                'rules' => ['max:100'],
                 'description' => 'Descrição da carteira, nome dado a carteira cadastrada',
+                'rules' => ['max:100'],
             ],
             'conta' => [
                 'type' => Type::string(),
-                'rules' => ['max:100'],
                 'description' => 'Número da conta bancária ou usuário da conta de acesso da carteira',
+                'rules' => ['max:100'],
             ],
             'agencia' => [
                 'type' => Type::string(),
-                'rules' => ['max:200'],
                 'description' => 'Número da agência da conta bancária ou site da carteira financeira',
+                'rules' => ['max:200'],
             ],
             'transacao' => [
-                'type' => Type::nonNull(Type::float()),
+                'type' => Type::float(),
                 'description' => 'Valor cobrado pela operadora de pagamento para cada transação',
             ],
             'limite' => [
@@ -82,8 +78,8 @@ class CarteiraInput extends InputType
             ],
             'token' => [
                 'type' => Type::string(),
-                'rules' => ['max:250'],
                 'description' => 'Token para integração de pagamentos',
+                'rules' => ['max:250'],
             ],
             'ambiente' => [
                 'type' => GraphQL::type('CarteiraAmbiente'),
@@ -91,16 +87,16 @@ class CarteiraInput extends InputType
             ],
             'logo_url' => [
                 'type' => Type::string(),
-                'rules' => ['max:100'],
                 'description' => 'Logo do gateway de pagamento',
+                'rules' => ['max:100'],
             ],
             'cor' => [
                 'type' => Type::string(),
-                'rules' => ['max:20'],
                 'description' => 'Cor predominante da marca da instituição',
+                'rules' => ['max:20'],
             ],
             'ativa' => [
-                'type' => Type::nonNull(Type::boolean()),
+                'type' => Type::boolean(),
                 'description' => 'Informa se a carteira ou conta bancária está ativa',
             ],
             'data_desativada' => [

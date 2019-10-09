@@ -40,34 +40,30 @@ class BancoInput extends InputType
     public function fields(): array
     {
         return [
-            'id' => [
-                'type' => Type::id(),
-                'description' => 'Identificador do banco',
-            ],
             'numero' => [
                 'type' => Type::nonNull(Type::string()),
-                'rules' => ['max:40'],
                 'description' => 'Número do banco',
+                'rules' => ['max:40'],
             ],
             'fantasia' => [
                 'type' => Type::nonNull(Type::string()),
-                'rules' => ['max:200'],
                 'description' => 'null',
+                'rules' => ['max:200'],
             ],
             'razao_social' => [
                 'type' => Type::nonNull(Type::string()),
-                'rules' => ['max:200'],
                 'description' => 'Razão social do banco',
+                'rules' => ['max:200'],
             ],
             'agencia_mascara' => [
                 'type' => Type::string(),
-                'rules' => ['max:45'],
                 'description' => 'Mascara para formatação do número da agência',
+                'rules' => ['max:45'],
             ],
             'conta_mascara' => [
                 'type' => Type::string(),
-                'rules' => ['max:45'],
                 'description' => 'Máscara para formatação do número da conta',
+                'rules' => ['max:45'],
             ],
         ];
     }

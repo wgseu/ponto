@@ -40,10 +40,6 @@ class MesaInput extends InputType
     public function fields(): array
     {
         return [
-            'id' => [
-                'type' => Type::id(),
-                'description' => 'Número da mesa',
-            ],
             'setor_id' => [
                 'type' => Type::nonNull(Type::int()),
                 'description' => 'Setor em que a mesa está localizada',
@@ -54,11 +50,11 @@ class MesaInput extends InputType
             ],
             'nome' => [
                 'type' => Type::string(),
-                'rules' => ['max:50'],
                 'description' => 'Nome da mesa',
+                'rules' => ['max:50'],
             ],
             'ativa' => [
-                'type' => Type::nonNull(Type::boolean()),
+                'type' => Type::boolean(),
                 'description' => 'Informa se a mesa está disponível para lançamento de pedidos',
             ],
         ];

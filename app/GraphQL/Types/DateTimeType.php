@@ -2,7 +2,7 @@
 
 namespace App\GraphQL\Types;
 
-use DateTimeImmutable;
+use DateTime;
 use GraphQL\Language\AST\Node;
 use GraphQL\Error\InvariantViolation;
 use GraphQL\Type\Definition\ScalarType;
@@ -26,7 +26,7 @@ class DateTimeType extends ScalarType
      */
     public function serialize($value): string
     {
-        if (! $value instanceof DateTimeImmutable) {
+        if (! $value instanceof DateTime) {
             throw new InvariantViolation('DateTime is not an instance of DateTimeImmutable');
         }
 
@@ -36,9 +36,9 @@ class DateTimeType extends ScalarType
     /**
      * @param mixed $value
      */
-    public function parseValue($value): ?DateTimeImmutable
+    public function parseValue($value): ?DateTime
     {
-        return DateTimeImmutable::createFromFormat('Y-m-d H:i:s', $value) ?: null;
+        return DateTime::createFromFormat('Y-m-d H:i:s', $value) ?: null;
     }
 
     /**

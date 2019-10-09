@@ -41,10 +41,6 @@ class PromocaoInput extends InputType
     public function fields(): array
     {
         return [
-            'id' => [
-                'type' => Type::id(),
-                'description' => 'Identificador da promoção',
-            ],
             'promocao_id' => [
                 'type' => Type::int(),
                 'description' => 'Promoção que originou os pontos do cliente/pedido, se informado a promoção será o resgate e somente pontos gerados por ela poderão ser usados',
@@ -90,66 +86,62 @@ class PromocaoInput extends InputType
                 'description' => 'Acréscimo ou desconto aplicado ao produto ou serviço',
             ],
             'pontos' => [
-                'type' => Type::nonNull(Type::int()),
+                'type' => Type::int(),
                 'description' => 'Informa quantos pontos será ganho (Positivo) ou descontado (Negativo) na compra desse produto',
             ],
             'parcial' => [
-                'type' => Type::nonNull(Type::boolean()),
+                'type' => Type::boolean(),
                 'description' => 'Informa se o resgate dos produtos podem ser feitos de forma parcial',
             ],
             'proibir' => [
-                'type' => Type::nonNull(Type::boolean()),
+                'type' => Type::boolean(),
                 'description' => 'Informa se deve proibir a venda desse produto no período informado',
             ],
             'evento' => [
-                'type' => Type::nonNull(Type::boolean()),
+                'type' => Type::boolean(),
                 'description' => 'Informa se a promoção será aplicada apenas no intervalo de data informado',
             ],
             'agendamento' => [
-                'type' => Type::nonNull(Type::boolean()),
+                'type' => Type::boolean(),
                 'description' => 'Informa se essa promoção é um agendamento de preço, na data inicial o preço será aplicado, assim como a visibilidade do produto ou serviço será ativada ou desativada de acordo com o proibir',
             ],
             'limitar_vendas' => [
-                'type' => Type::nonNull(Type::boolean()),
+                'type' => Type::boolean(),
                 'description' => 'Informa se deve limitar a quantidade de vendas dessa categoria, produto ou serviço',
             ],
             'funcao_vendas' => [
-                'type' => Type::nonNull(GraphQL::type('PromocaoFuncaoVendas')),
+                'type' => GraphQL::type('PromocaoFuncaoVendas'),
                 'description' => 'Informa a regra para decidir se ainda pode vender com essa promoção',
             ],
             'vendas_limite' => [
-                'type' => Type::nonNull(Type::int()),
+                'type' => Type::int(),
                 'description' => 'Quantidade de vendas que essa promoção será programada',
             ],
             'limitar_cliente' => [
-                'type' => Type::nonNull(Type::boolean()),
+                'type' => Type::boolean(),
                 'description' => 'Informa se deve limitar a venda desse produto por cliente',
             ],
             'funcao_cliente' => [
-                'type' => Type::nonNull(GraphQL::type('PromocaoFuncaoCliente')),
+                'type' => GraphQL::type('PromocaoFuncaoCliente'),
                 'description' => 'Informa a regra para decidir se o cliente consegue comprar mais nessa promoção',
             ],
             'cliente_limite' => [
-                'type' => Type::nonNull(Type::float()),
+                'type' => Type::float(),
                 'description' => 'Quantidade de compras que o cliente será limitado a comprar',
             ],
             'ativa' => [
-                'type' => Type::nonNull(Type::boolean()),
+                'type' => Type::boolean(),
                 'description' => 'Informa se a promoção está ativa',
             ],
             'chamada' => [
                 'type' => Type::string(),
-                'rules' => ['max:200'],
                 'description' => 'Chamada para a promoção',
+                'rules' => ['max:200'],
             ],
             'banner_url' => [
                 'type' => Type::string(),
-                'rules' => ['max:100'],
                 'description' => 'Imagem promocional',
-            ],
-            'data_arquivado' => [
-                'type' => GraphQL::type('DateTime'),
-                'description' => 'Data em que a promoção foi arquivada',
+                'rules' => ['max:100'],
             ],
         ];
     }

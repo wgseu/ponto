@@ -40,23 +40,19 @@ class SetorInput extends InputType
     public function fields(): array
     {
         return [
-            'id' => [
-                'type' => Type::id(),
-                'description' => 'Identificador do setor',
-            ],
             'setor_id' => [
                 'type' => Type::int(),
                 'description' => 'Informa o setor que abrange esse subsetor',
             ],
             'nome' => [
                 'type' => Type::nonNull(Type::string()),
-                'rules' => ['max:50'],
                 'description' => 'Nome do setor, único em todo o sistema',
+                'rules' => ['max:50'],
             ],
             'descricao' => [
                 'type' => Type::string(),
-                'rules' => ['max:70'],
                 'description' => 'Descreve a utilização do setor',
+                'rules' => ['max:70'],
             ],
         ];
     }

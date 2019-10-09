@@ -41,10 +41,6 @@ class NotaInput extends InputType
     public function fields(): array
     {
         return [
-            'id' => [
-                'type' => Type::id(),
-                'description' => 'Identificador da nota',
-            ],
             'tipo' => [
                 'type' => Type::nonNull(GraphQL::type('NotaTipo')),
                 'description' => 'Tipo de registro se nota ou inutilização',
@@ -83,18 +79,18 @@ class NotaInput extends InputType
             ],
             'chave' => [
                 'type' => Type::string(),
-                'rules' => ['max:50'],
                 'description' => 'Chave da nota fiscal',
+                'rules' => ['max:50'],
             ],
             'recibo' => [
                 'type' => Type::string(),
-                'rules' => ['max:50'],
                 'description' => 'Recibo de envio para consulta posterior',
+                'rules' => ['max:50'],
             ],
             'protocolo' => [
                 'type' => Type::string(),
-                'rules' => ['max:80'],
                 'description' => 'Protocolo de autorização da nota fiscal',
+                'rules' => ['max:80'],
             ],
             'pedido_id' => [
                 'type' => Type::int(),
@@ -102,8 +98,8 @@ class NotaInput extends InputType
             ],
             'motivo' => [
                 'type' => Type::string(),
-                'rules' => ['max:255'],
                 'description' => 'Motivo do cancelamento, contingência ou inutilização',
+                'rules' => ['max:255'],
             ],
             'contingencia' => [
                 'type' => Type::nonNull(Type::boolean()),
@@ -111,13 +107,13 @@ class NotaInput extends InputType
             ],
             'consulta_url' => [
                 'type' => Type::string(),
-                'rules' => ['max:255'],
                 'description' => 'URL de consulta da nota fiscal',
+                'rules' => ['max:255'],
             ],
             'qrcode' => [
                 'type' => Type::string(),
-                'rules' => ['max:65535'],
                 'description' => 'Dados do QRCode da nota',
+                'rules' => ['max:65535'],
             ],
             'tributos' => [
                 'type' => Type::float(),
@@ -125,15 +121,15 @@ class NotaInput extends InputType
             ],
             'detalhes' => [
                 'type' => Type::string(),
-                'rules' => ['max:255'],
                 'description' => 'Informações de interesse do contribuinte',
+                'rules' => ['max:255'],
             ],
             'corrigido' => [
-                'type' => Type::nonNull(Type::boolean()),
+                'type' => Type::boolean(),
                 'description' => 'Informa se os erros já foram corrigidos para retomada do processamento',
             ],
             'concluido' => [
-                'type' => Type::nonNull(Type::boolean()),
+                'type' => Type::boolean(),
                 'description' => 'Informa se todos os processamentos da nota já foram realizados',
             ],
             'data_autorizacao' => [
@@ -143,14 +139,6 @@ class NotaInput extends InputType
             'data_emissao' => [
                 'type' => Type::nonNull(GraphQL::type('DateTime')),
                 'description' => 'Data de emissão da nota',
-            ],
-            'data_lancamento' => [
-                'type' => Type::nonNull(GraphQL::type('DateTime')),
-                'description' => 'Data de lançamento da nota no sistema',
-            ],
-            'data_arquivado' => [
-                'type' => GraphQL::type('DateTime'),
-                'description' => 'Data em que a nota foi arquivada',
             ],
         ];
     }

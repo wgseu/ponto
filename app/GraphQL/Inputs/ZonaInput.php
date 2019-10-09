@@ -40,31 +40,27 @@ class ZonaInput extends InputType
     public function fields(): array
     {
         return [
-            'id' => [
-                'type' => Type::id(),
-                'description' => 'Identificador da zona',
-            ],
             'bairro_id' => [
                 'type' => Type::nonNull(Type::int()),
                 'description' => 'Bairro em que essa zona está localizada',
             ],
             'nome' => [
                 'type' => Type::nonNull(Type::string()),
-                'rules' => ['max:45'],
                 'description' => 'Nome da zona, Ex. Sul, Leste, Começo, Fim',
+                'rules' => ['max:45'],
             ],
             'adicional_entrega' => [
                 'type' => Type::nonNull(Type::float()),
                 'description' => 'Taxa adicional para entrega nessa zona, será somado com a taxa para esse bairro',
             ],
             'disponivel' => [
-                'type' => Type::nonNull(Type::boolean()),
+                'type' => Type::boolean(),
                 'description' => 'Informa se a zona está disponível para entrega de pedidos',
             ],
             'area' => [
                 'type' => Type::string(),
-                'rules' => ['max:65535'],
                 'description' => 'Área de cobertura para entrega',
+                'rules' => ['max:65535'],
             ],
             'entrega_minima' => [
                 'type' => Type::int(),

@@ -27,7 +27,6 @@ declare(strict_types=1);
 
 namespace App\GraphQL\Inputs;
 
-use Rebing\GraphQL\Support\Facades\GraphQL;
 use GraphQL\Type\Definition\Type;
 use Rebing\GraphQL\Support\InputType;
 
@@ -41,24 +40,20 @@ class MoedaInput extends InputType
     public function fields(): array
     {
         return [
-            'id' => [
-                'type' => Type::id(),
-                'description' => 'Identificador da moeda',
-            ],
             'nome' => [
                 'type' => Type::nonNull(Type::string()),
-                'rules' => ['max:45'],
                 'description' => 'Nome da moeda',
+                'rules' => ['max:45'],
             ],
             'simbolo' => [
                 'type' => Type::nonNull(Type::string()),
-                'rules' => ['max:10'],
                 'description' => 'Símbolo da moeda, Ex.: R$, $',
+                'rules' => ['max:10'],
             ],
             'codigo' => [
                 'type' => Type::nonNull(Type::string()),
-                'rules' => ['max:45'],
                 'description' => 'Código internacional da moeda, Ex.: USD, BRL',
+                'rules' => ['max:45'],
             ],
             'divisao' => [
                 'type' => Type::nonNull(Type::int()),
@@ -66,24 +61,20 @@ class MoedaInput extends InputType
             ],
             'fracao' => [
                 'type' => Type::string(),
-                'rules' => ['max:45'],
                 'description' => 'Informa o nome da fração, Ex.: Centavo',
+                'rules' => ['max:45'],
             ],
             'formato' => [
                 'type' => Type::nonNull(Type::string()),
-                'rules' => ['max:45'],
                 'description' => 'Formado de exibição do valor, Ex: $ %s, para $ 3,00',
+                'rules' => ['max:45'],
             ],
             'conversao' => [
                 'type' => Type::float(),
                 'description' => 'Multiplicador para conversão para a moeda principal',
             ],
-            'data_atualizacao' => [
-                'type' => GraphQL::type('DateTime'),
-                'description' => 'Data da última atualização do fator de conversão',
-            ],
             'ativa' => [
-                'type' => Type::nonNull(Type::boolean()),
+                'type' => Type::boolean(),
                 'description' => 'Informa se a moeda é recebida pela empresa, a moeda do país mesmo desativada sempre é aceita',
             ],
         ];

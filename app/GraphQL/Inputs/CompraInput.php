@@ -41,14 +41,10 @@ class CompraInput extends InputType
     public function fields(): array
     {
         return [
-            'id' => [
-                'type' => Type::id(),
-                'description' => 'Identificador da compra',
-            ],
             'numero' => [
                 'type' => Type::string(),
-                'rules' => ['max:64'],
                 'description' => 'Informa o número fiscal da compra',
+                'rules' => ['max:64'],
             ],
             'comprador_id' => [
                 'type' => Type::nonNull(Type::int()),
@@ -60,8 +56,8 @@ class CompraInput extends InputType
             ],
             'documento_url' => [
                 'type' => Type::string(),
-                'rules' => ['max:150'],
                 'description' => 'Informa o nome do documento no servidor do sistema',
+                'rules' => ['max:150'],
             ],
             'data_compra' => [
                 'type' => Type::nonNull(GraphQL::type('DateTime')),

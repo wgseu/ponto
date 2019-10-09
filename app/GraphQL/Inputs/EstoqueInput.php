@@ -41,10 +41,6 @@ class EstoqueInput extends InputType
     public function fields(): array
     {
         return [
-            'id' => [
-                'type' => Type::id(),
-                'description' => 'Identificador da entrada no estoque',
-            ],
             'produto_id' => [
                 'type' => Type::nonNull(Type::int()),
                 'description' => 'Produto que entrou no estoque',
@@ -78,13 +74,13 @@ class EstoqueInput extends InputType
                 'description' => 'Quantidade do mesmo produto inserido no estoque',
             ],
             'preco_compra' => [
-                'type' => Type::nonNull(Type::float()),
+                'type' => Type::float(),
                 'description' => 'Preço de compra do produto',
             ],
             'lote' => [
                 'type' => Type::string(),
-                'rules' => ['max:45'],
                 'description' => 'Lote de produção do produto comprado',
+                'rules' => ['max:45'],
             ],
             'fabricacao' => [
                 'type' => GraphQL::type('DateTime'),
@@ -96,15 +92,15 @@ class EstoqueInput extends InputType
             ],
             'detalhes' => [
                 'type' => Type::string(),
-                'rules' => ['max:100'],
                 'description' => 'Detalhes da inserção ou retirada do estoque',
+                'rules' => ['max:100'],
             ],
             'reservado' => [
-                'type' => Type::nonNull(Type::boolean()),
+                'type' => Type::boolean(),
                 'description' => 'Informa se os produtos foram retirados do estoque ou se estão apenas reservados',
             ],
             'cancelado' => [
-                'type' => Type::nonNull(Type::boolean()),
+                'type' => Type::boolean(),
                 'description' => 'Informa a entrada ou saída do estoque foi cancelada',
             ],
             'data_movimento' => [

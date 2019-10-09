@@ -40,23 +40,19 @@ class OperacaoInput extends InputType
     public function fields(): array
     {
         return [
-            'id' => [
-                'type' => Type::id(),
-                'description' => 'Identificador da operação',
-            ],
             'codigo' => [
                 'type' => Type::nonNull(Type::int()),
                 'description' => 'Código CFOP sem pontuação',
             ],
             'descricao' => [
                 'type' => Type::nonNull(Type::string()),
-                'rules' => ['max:255'],
                 'description' => 'Descrição da operação',
+                'rules' => ['max:255'],
             ],
             'detalhes' => [
                 'type' => Type::string(),
-                'rules' => ['max:65535'],
                 'description' => 'Detalhes da operação (Opcional)',
+                'rules' => ['max:65535'],
             ],
         ];
     }

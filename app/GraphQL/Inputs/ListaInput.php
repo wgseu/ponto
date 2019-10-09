@@ -41,17 +41,13 @@ class ListaInput extends InputType
     public function fields(): array
     {
         return [
-            'id' => [
-                'type' => Type::id(),
-                'description' => 'Identificador da lista de compras',
-            ],
             'descricao' => [
                 'type' => Type::nonNull(Type::string()),
-                'rules' => ['max:100'],
                 'description' => 'Nome da lista, pode ser uma data',
+                'rules' => ['max:100'],
             ],
             'estado' => [
-                'type' => Type::nonNull(GraphQL::type('ListaEstado')),
+                'type' => GraphQL::type('ListaEstado'),
                 'description' => 'Estado da lista de compra. Análise: Ainda estão sendo adicionado produtos na lista, Fechada: Está pronto para compra, Comprada: Todos os itens foram comprados',
             ],
             'encarregado_id' => [
@@ -65,10 +61,6 @@ class ListaInput extends InputType
             'data_viagem' => [
                 'type' => Type::nonNull(GraphQL::type('DateTime')),
                 'description' => 'Data e hora para o encarregado ir fazer as compras',
-            ],
-            'data_cadastro' => [
-                'type' => Type::nonNull(GraphQL::type('DateTime')),
-                'description' => 'Data de cadastro da lista',
             ],
         ];
     }

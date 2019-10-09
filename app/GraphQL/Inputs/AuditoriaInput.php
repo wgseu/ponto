@@ -41,10 +41,6 @@ class AuditoriaInput extends InputType
     public function fields(): array
     {
         return [
-            'id' => [
-                'type' => Type::id(),
-                'description' => 'Identificador da auditoria',
-            ],
             'permissao_id' => [
                 'type' => Type::int(),
                 'description' => 'Informa a permissão concedida ou utilizada que permitiu a realização da operação',
@@ -67,13 +63,13 @@ class AuditoriaInput extends InputType
             ],
             'descricao' => [
                 'type' => Type::nonNull(Type::string()),
-                'rules' => ['max:255'],
                 'description' => 'Descrição da atividade exercida',
+                'rules' => ['max:255'],
             ],
             'autorizacao' => [
                 'type' => Type::string(),
-                'rules' => ['max:255'],
                 'description' => 'Código de autorização necessário para permitir realizar a função descrita',
+                'rules' => ['max:255'],
             ],
             'data_registro' => [
                 'type' => Type::nonNull(GraphQL::type('DateTime')),

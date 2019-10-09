@@ -40,23 +40,19 @@ class ClassificacaoInput extends InputType
     public function fields(): array
     {
         return [
-            'id' => [
-                'type' => Type::id(),
-                'description' => 'Identificador da classificação',
-            ],
             'classificacao_id' => [
                 'type' => Type::int(),
                 'description' => 'Classificação superior, quando informado, esta classificação será uma subclassificação',
             ],
             'descricao' => [
                 'type' => Type::nonNull(Type::string()),
-                'rules' => ['max:100'],
                 'description' => 'Descrição da classificação',
+                'rules' => ['max:100'],
             ],
             'icone_url' => [
                 'type' => Type::string(),
-                'rules' => ['max:100'],
                 'description' => 'Ícone da categoria da conta',
+                'rules' => ['max:100'],
             ],
         ];
     }

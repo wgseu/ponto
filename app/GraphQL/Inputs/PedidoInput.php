@@ -41,10 +41,6 @@ class PedidoInput extends InputType
     public function fields(): array
     {
         return [
-            'id' => [
-                'type' => Type::id(),
-                'description' => 'Código do pedido',
-            ],
             'pedido_id' => [
                 'type' => Type::int(),
                 'description' => 'Informa o pedido da mesa / comanda principal quando as mesas / comandas forem agrupadas',
@@ -82,67 +78,67 @@ class PedidoInput extends InputType
                 'description' => 'Informa se o pedido veio de uma integração e se está associado',
             ],
             'tipo' => [
-                'type' => Type::nonNull(GraphQL::type('PedidoTipo')),
+                'type' => GraphQL::type('PedidoTipo'),
                 'description' => 'Tipo de venda',
             ],
             'estado' => [
-                'type' => Type::nonNull(GraphQL::type('PedidoEstado')),
+                'type' => GraphQL::type('PedidoEstado'),
                 'description' => 'Estado do pedido, Agendado: O pedido deve ser processado na data de agendamento. Aberto: O pedido deve ser processado. Entrega: O pedido saiu para entrega. Fechado: O cliente pediu a conta e está pronto para pagar. Concluído: O pedido foi pago e concluído, Cancelado: O pedido foi cancelado com os itens e pagamentos',
             ],
             'servicos' => [
-                'type' => Type::nonNull(Type::float()),
+                'type' => Type::float(),
                 'description' => 'Valor total dos serviços desse pedido',
             ],
             'produtos' => [
-                'type' => Type::nonNull(Type::float()),
+                'type' => Type::float(),
                 'description' => 'Valor total dos produtos do pedido sem a comissão',
             ],
             'comissao' => [
-                'type' => Type::nonNull(Type::float()),
+                'type' => Type::float(),
                 'description' => 'Valor total da comissão desse pedido',
             ],
             'subtotal' => [
-                'type' => Type::nonNull(Type::float()),
+                'type' => Type::float(),
                 'description' => 'Subtotal do pedido sem os descontos',
             ],
             'descontos' => [
-                'type' => Type::nonNull(Type::float()),
+                'type' => Type::float(),
                 'description' => 'Total de descontos realizado nesse pedido',
             ],
             'total' => [
-                'type' => Type::nonNull(Type::float()),
+                'type' => Type::float(),
                 'description' => 'Total do pedido já com descontos',
             ],
             'pago' => [
-                'type' => Type::nonNull(Type::float()),
+                'type' => Type::float(),
                 'description' => 'Valor já pago do pedido',
             ],
             'troco' => [
-                'type' => Type::nonNull(Type::float()),
+                'type' => Type::float(),
                 'description' => 'Troco do cliente',
             ],
             'lancado' => [
-                'type' => Type::nonNull(Type::float()),
+                'type' => Type::float(),
                 'description' => 'Valor lançado para pagar, mas não foi pago ainda',
             ],
             'pessoas' => [
-                'type' => Type::nonNull(Type::int()),
+                'type' => Type::int(),
                 'description' => 'Informa quantas pessoas estão na mesa',
             ],
             'cpf' => [
                 'type' => Type::string(),
-                'rules' => ['max:20'],
                 'description' => 'CPF/CNPJ na nota',
+                'rules' => ['max:20'],
             ],
             'email' => [
                 'type' => Type::string(),
-                'rules' => ['max:100'],
                 'description' => 'E-mail para envio do XML e Danfe',
+                'rules' => ['max:100'],
             ],
             'descricao' => [
                 'type' => Type::string(),
-                'rules' => ['max:255'],
                 'description' => 'Detalhes da reserva ou do pedido',
+                'rules' => ['max:255'],
             ],
             'fechador_id' => [
                 'type' => Type::int(),
@@ -154,8 +150,8 @@ class PedidoInput extends InputType
             ],
             'motivo' => [
                 'type' => Type::string(),
-                'rules' => ['max:200'],
                 'description' => 'Informa o motivo do cancelamento',
+                'rules' => ['max:200'],
             ],
             'data_entrega' => [
                 'type' => GraphQL::type('DateTime'),
@@ -168,10 +164,6 @@ class PedidoInput extends InputType
             'data_conclusao' => [
                 'type' => GraphQL::type('DateTime'),
                 'description' => 'Data de finalização do pedido',
-            ],
-            'data_criacao' => [
-                'type' => Type::nonNull(GraphQL::type('DateTime')),
-                'description' => 'Data de criação do pedido',
             ],
         ];
     }

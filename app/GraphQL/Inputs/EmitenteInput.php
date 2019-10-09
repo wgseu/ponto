@@ -41,10 +41,6 @@ class EmitenteInput extends InputType
     public function fields(): array
     {
         return [
-            'id' => [
-                'type' => Type::id(),
-                'description' => 'Identificador do emitente, sempre 1',
-            ],
             'contador_id' => [
                 'type' => Type::int(),
                 'description' => 'Contador responsável pela contabilidade da empresa',
@@ -54,33 +50,33 @@ class EmitenteInput extends InputType
                 'description' => 'Regime tributário da empresa',
             ],
             'ambiente' => [
-                'type' => Type::nonNull(GraphQL::type('EmitenteAmbiente')),
+                'type' => GraphQL::type('EmitenteAmbiente'),
                 'description' => 'Ambiente de emissão das notas',
             ],
             'csc_teste' => [
                 'type' => Type::string(),
-                'rules' => ['max:100'],
                 'description' => 'Código de segurança do contribuinte',
+                'rules' => ['max:100'],
             ],
             'csc' => [
                 'type' => Type::string(),
-                'rules' => ['max:100'],
                 'description' => 'Código de segurança do contribuinte',
+                'rules' => ['max:100'],
             ],
             'token_teste' => [
                 'type' => Type::string(),
-                'rules' => ['max:10'],
                 'description' => 'Token do código de segurança do contribuinte',
+                'rules' => ['max:10'],
             ],
             'token' => [
                 'type' => Type::string(),
-                'rules' => ['max:10'],
                 'description' => 'Token do código de segurança do contribuinte',
+                'rules' => ['max:10'],
             ],
             'ibpt' => [
                 'type' => Type::string(),
-                'rules' => ['max:100'],
                 'description' => 'Token da API do IBPT',
+                'rules' => ['max:100'],
             ],
             'data_expiracao' => [
                 'type' => GraphQL::type('DateTime'),

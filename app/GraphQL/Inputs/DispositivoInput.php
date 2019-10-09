@@ -41,10 +41,6 @@ class DispositivoInput extends InputType
     public function fields(): array
     {
         return [
-            'id' => [
-                'type' => Type::id(),
-                'description' => 'Identificador do dispositivo',
-            ],
             'setor_id' => [
                 'type' => Type::int(),
                 'description' => 'Setor em que o dispositivo está instalado/será usado',
@@ -55,32 +51,32 @@ class DispositivoInput extends InputType
             ],
             'nome' => [
                 'type' => Type::nonNull(Type::string()),
-                'rules' => ['max:100'],
                 'description' => 'Nome do computador ou tablet em rede, único entre os dispositivos',
+                'rules' => ['max:100'],
             ],
             'tipo' => [
-                'type' => Type::nonNull(GraphQL::type('DispositivoTipo')),
+                'type' => GraphQL::type('DispositivoTipo'),
                 'description' => 'Tipo de dispositivo',
             ],
             'descricao' => [
                 'type' => Type::string(),
-                'rules' => ['max:45'],
                 'description' => 'Descrição do dispositivo',
+                'rules' => ['max:45'],
             ],
             'opcoes' => [
                 'type' => Type::string(),
-                'rules' => ['max:65535'],
                 'description' => 'Opções do dispositivo, Ex.: Balança, identificador de chamadas e outros',
+                'rules' => ['max:65535'],
             ],
             'serial' => [
                 'type' => Type::nonNull(Type::string()),
-                'rules' => ['max:45'],
                 'description' => 'Serial do tablet para validação, único entre os dispositivos',
+                'rules' => ['max:45'],
             ],
             'validacao' => [
                 'type' => Type::string(),
-                'rules' => ['max:40'],
                 'description' => 'Validação do dispositivo',
+                'rules' => ['max:40'],
             ],
         ];
     }

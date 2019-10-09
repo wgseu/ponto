@@ -41,10 +41,6 @@ class JuncaoInput extends InputType
     public function fields(): array
     {
         return [
-            'id' => [
-                'type' => Type::id(),
-                'description' => 'Identificador da junção',
-            ],
             'mesa_id' => [
                 'type' => Type::nonNull(Type::int()),
                 'description' => 'Mesa que está junta ao pedido',
@@ -54,7 +50,7 @@ class JuncaoInput extends InputType
                 'description' => 'Pedido a qual a mesa está junta, o pedido deve ser de uma mesa',
             ],
             'estado' => [
-                'type' => Type::nonNull(GraphQL::type('JuncaoEstado')),
+                'type' => GraphQL::type('JuncaoEstado'),
                 'description' => 'Estado a junção da mesa. Associado: a mesa está junta ao pedido, Liberado: A mesa está livre, Cancelado: A mesa está liberada',
             ],
             'data_movimento' => [

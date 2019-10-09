@@ -41,10 +41,6 @@ class ImpressoraInput extends InputType
     public function fields(): array
     {
         return [
-            'id' => [
-                'type' => Type::id(),
-                'description' => 'Identificador da impressora',
-            ],
             'dispositivo_id' => [
                 'type' => Type::nonNull(Type::int()),
                 'description' => 'Dispositivo que contém a impressora',
@@ -55,29 +51,29 @@ class ImpressoraInput extends InputType
             ],
             'nome' => [
                 'type' => Type::nonNull(Type::string()),
-                'rules' => ['max:100'],
                 'description' => 'Nome da impressora instalada no sistema operacional',
+                'rules' => ['max:100'],
             ],
             'modelo' => [
                 'type' => Type::nonNull(Type::string()),
-                'rules' => ['max:45'],
                 'description' => 'Informa qual conjunto de comandos deve ser utilizado',
+                'rules' => ['max:45'],
             ],
             'modo' => [
-                'type' => Type::nonNull(GraphQL::type('ImpressoraModo')),
+                'type' => GraphQL::type('ImpressoraModo'),
                 'description' => 'Modo de impressão',
             ],
             'opcoes' => [
                 'type' => Type::string(),
-                'rules' => ['max:65535'],
                 'description' => 'Opções da impressora, Ex.: Cortar papel, Acionar gaveta e outros',
+                'rules' => ['max:65535'],
             ],
             'colunas' => [
-                'type' => Type::nonNull(Type::int()),
+                'type' => Type::int(),
                 'description' => 'Quantidade de colunas do cupom',
             ],
             'avanco' => [
-                'type' => Type::nonNull(Type::int()),
+                'type' => Type::int(),
                 'description' => 'Quantidade de linhas para avanço do papel',
             ],
         ];

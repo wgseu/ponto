@@ -41,10 +41,6 @@ class RequisitoInput extends InputType
     public function fields(): array
     {
         return [
-            'id' => [
-                'type' => Type::id(),
-                'description' => 'Identificador do produto da lista',
-            ],
             'lista_id' => [
                 'type' => Type::nonNull(Type::int()),
                 'description' => 'Lista de compra desse produto',
@@ -62,25 +58,25 @@ class RequisitoInput extends InputType
                 'description' => 'Fornecedor em que deve ser consultado ou realizado as compras dos produtos, pode ser alterado no momento da compra',
             ],
             'quantidade' => [
-                'type' => Type::nonNull(Type::float()),
+                'type' => Type::float(),
                 'description' => 'Quantidade de produtos que deve ser comprado',
             ],
             'comprado' => [
-                'type' => Type::nonNull(Type::float()),
+                'type' => Type::float(),
                 'description' => 'Informa quantos produtos já foram comprados',
             ],
             'preco_maximo' => [
-                'type' => Type::nonNull(Type::float()),
+                'type' => Type::float(),
                 'description' => 'Preço máximo que deve ser pago na compra desse produto',
             ],
             'preco' => [
-                'type' => Type::nonNull(Type::float()),
+                'type' => Type::float(),
                 'description' => 'Preço em que o produto foi comprado da última vez ou o novo preço',
             ],
             'observacoes' => [
                 'type' => Type::string(),
-                'rules' => ['max:100'],
                 'description' => 'Detalhes na compra desse produto',
+                'rules' => ['max:100'],
             ],
             'data_recolhimento' => [
                 'type' => GraphQL::type('DateTime'),

@@ -41,10 +41,6 @@ class CupomInput extends InputType
     public function fields(): array
     {
         return [
-            'id' => [
-                'type' => Type::id(),
-                'description' => 'Identificador do cupom',
-            ],
             'cupom_id' => [
                 'type' => Type::int(),
                 'description' => 'Informa de qual cupom foi usado',
@@ -59,8 +55,8 @@ class CupomInput extends InputType
             ],
             'codigo' => [
                 'type' => Type::nonNull(Type::string()),
-                'rules' => ['max:20'],
                 'description' => 'Código para uso do cupom',
+                'rules' => ['max:20'],
             ],
             'quantidade' => [
                 'type' => Type::nonNull(Type::int()),
@@ -71,11 +67,11 @@ class CupomInput extends InputType
                 'description' => 'Informa se o desconto será por valor ou porcentagem',
             ],
             'valor' => [
-                'type' => Type::nonNull(Type::float()),
+                'type' => Type::float(),
                 'description' => 'Valor do desconto que será aplicado no pedido',
             ],
             'porcentagem' => [
-                'type' => Type::nonNull(Type::float()),
+                'type' => Type::float(),
                 'description' => 'Porcentagem de desconto do pedido',
             ],
             'incluir_servicos' => [
@@ -83,27 +79,27 @@ class CupomInput extends InputType
                 'description' => 'Informa se o cupom também se aplica nos serviços',
             ],
             'limitar_pedidos' => [
-                'type' => Type::nonNull(Type::boolean()),
+                'type' => Type::boolean(),
                 'description' => 'Informa se deve limitar o cupom pela quantidade de pedidos válidos do cliente',
             ],
             'funcao_pedidos' => [
-                'type' => Type::nonNull(GraphQL::type('CupomFuncaoPedidos')),
+                'type' => GraphQL::type('CupomFuncaoPedidos'),
                 'description' => 'Informa a regra para decidir se a quantidade de pedidos permite usar esse cupom',
             ],
             'pedidos_limite' => [
-                'type' => Type::nonNull(Type::int()),
+                'type' => Type::int(),
                 'description' => 'Quantidade de pedidos válidos que permite usar esse cupom',
             ],
             'limitar_valor' => [
-                'type' => Type::nonNull(Type::boolean()),
+                'type' => Type::boolean(),
                 'description' => 'Informa se deve limitar o uso do cupom pelo valor do pedido',
             ],
             'funcao_valor' => [
-                'type' => Type::nonNull(GraphQL::type('CupomFuncaoValor')),
+                'type' => GraphQL::type('CupomFuncaoValor'),
                 'description' => 'Informa a regra para decidir se o valor do pedido permite usar esse cupom',
             ],
             'valor_limite' => [
-                'type' => Type::nonNull(Type::float()),
+                'type' => Type::float(),
                 'description' => 'Valor do pedido com os serviços que permite usar esse cupom',
             ],
             'validade' => [

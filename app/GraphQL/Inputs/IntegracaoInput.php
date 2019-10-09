@@ -27,7 +27,6 @@ declare(strict_types=1);
 
 namespace App\GraphQL\Inputs;
 
-use Rebing\GraphQL\Support\Facades\GraphQL;
 use GraphQL\Type\Definition\Type;
 use Rebing\GraphQL\Support\InputType;
 
@@ -41,52 +40,44 @@ class IntegracaoInput extends InputType
     public function fields(): array
     {
         return [
-            'id' => [
-                'type' => Type::id(),
-                'description' => 'Identificador da integração',
-            ],
             'nome' => [
                 'type' => Type::nonNull(Type::string()),
-                'rules' => ['max:45'],
                 'description' => 'Nome do módulo de integração',
+                'rules' => ['max:45'],
             ],
             'descricao' => [
                 'type' => Type::string(),
-                'rules' => ['max:200'],
                 'description' => 'Descrição do módulo integrador',
+                'rules' => ['max:200'],
             ],
             'icone_url' => [
                 'type' => Type::string(),
-                'rules' => ['max:200'],
                 'description' => 'Nome do ícone do módulo integrador',
+                'rules' => ['max:200'],
             ],
             'login' => [
                 'type' => Type::string(),
-                'rules' => ['max:200'],
                 'description' => 'Login de acesso à API de sincronização',
+                'rules' => ['max:200'],
             ],
             'secret' => [
                 'type' => Type::string(),
-                'rules' => ['max:200'],
                 'description' => 'Chave secreta para acesso à API',
+                'rules' => ['max:200'],
             ],
             'opcoes' => [
                 'type' => Type::string(),
-                'rules' => ['max:65535'],
                 'description' => 'Opções da integração, estados e tokens da loja',
+                'rules' => ['max:65535'],
             ],
             'associacoes' => [
                 'type' => Type::string(),
-                'rules' => ['max:65535'],
                 'description' => 'Associações de produtos e cartões',
+                'rules' => ['max:65535'],
             ],
             'ativo' => [
-                'type' => Type::nonNull(Type::boolean()),
+                'type' => Type::boolean(),
                 'description' => 'Informa de o módulo de integração está habilitado',
-            ],
-            'data_atualizacao' => [
-                'type' => Type::nonNull(GraphQL::type('DateTime')),
-                'description' => 'Data de atualização dos dados do módulo de integração',
             ],
         ];
     }

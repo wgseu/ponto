@@ -41,10 +41,6 @@ class SessaoInput extends InputType
     public function fields(): array
     {
         return [
-            'id' => [
-                'type' => Type::id(),
-                'description' => 'Código da sessão',
-            ],
             'data_inicio' => [
                 'type' => Type::nonNull(GraphQL::type('DateTime')),
                 'description' => 'Data de início da sessão',
@@ -54,7 +50,7 @@ class SessaoInput extends InputType
                 'description' => 'Data de fechamento da sessão',
             ],
             'aberta' => [
-                'type' => Type::nonNull(Type::boolean()),
+                'type' => Type::boolean(),
                 'description' => 'Informa se a sessão está aberta',
             ],
         ];

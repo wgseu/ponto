@@ -41,19 +41,15 @@ class SistemaInput extends InputType
     public function fields(): array
     {
         return [
-            'id' => [
-                'type' => Type::id(),
-                'description' => 'Identificador único do sistema, valor 1',
-            ],
             'fuso_horario' => [
                 'type' => Type::string(),
-                'rules' => ['max:100'],
                 'description' => 'Informa qual o fuso horário',
+                'rules' => ['max:100'],
             ],
             'opcoes' => [
                 'type' => Type::string(),
-                'rules' => ['max:65535'],
                 'description' => 'Opções gerais do sistema',
+                'rules' => ['max:65535'],
             ],
         ];
     }

@@ -41,10 +41,6 @@ class CardapioInput extends InputType
     public function fields(): array
     {
         return [
-            'id' => [
-                'type' => Type::id(),
-                'description' => 'Identificador do cardápio',
-            ],
             'produto_id' => [
                 'type' => Type::nonNull(Type::int()),
                 'description' => 'Produto que faz parte desse cardápio',
@@ -58,11 +54,11 @@ class CardapioInput extends InputType
                 'description' => 'O cardápio será exibido para vendas nesse local',
             ],
             'acrescimo' => [
-                'type' => Type::nonNull(Type::float()),
+                'type' => Type::float(),
                 'description' => 'Acréscimo ao preço de venda do produto nesse cardápio',
             ],
             'disponivel' => [
-                'type' => Type::nonNull(Type::boolean()),
+                'type' => Type::boolean(),
                 'description' => 'Informa se o produto estará disponível para venda nesse cardápio',
             ],
         ];

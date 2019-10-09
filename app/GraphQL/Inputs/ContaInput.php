@@ -41,10 +41,6 @@ class ContaInput extends InputType
     public function fields(): array
     {
         return [
-            'id' => [
-                'type' => Type::id(),
-                'description' => 'Código da conta',
-            ],
             'classificacao_id' => [
                 'type' => Type::nonNull(Type::int()),
                 'description' => 'Classificação da conta',
@@ -74,60 +70,60 @@ class ContaInput extends InputType
                 'description' => 'Pedido da qual essa conta foi gerada',
             ],
             'tipo' => [
-                'type' => Type::nonNull(GraphQL::type('ContaTipo')),
+                'type' => GraphQL::type('ContaTipo'),
                 'description' => 'Tipo de conta se receita ou despesa',
             ],
             'descricao' => [
                 'type' => Type::nonNull(Type::string()),
-                'rules' => ['max:200'],
                 'description' => 'Descrição da conta',
+                'rules' => ['max:200'],
             ],
             'valor' => [
                 'type' => Type::nonNull(Type::float()),
                 'description' => 'Valor da conta',
             ],
             'consolidado' => [
-                'type' => Type::nonNull(Type::float()),
+                'type' => Type::float(),
                 'description' => 'Valor pago ou recebido da conta',
             ],
             'fonte' => [
-                'type' => Type::nonNull(GraphQL::type('ContaFonte')),
+                'type' => GraphQL::type('ContaFonte'),
                 'description' => 'Fonte dos valores, comissão e remuneração se pagar antes do vencimento, o valor será proporcional',
             ],
             'numero_parcela' => [
-                'type' => Type::nonNull(Type::int()),
+                'type' => Type::int(),
                 'description' => 'Informa qual o número da parcela para esta conta',
             ],
             'parcelas' => [
-                'type' => Type::nonNull(Type::int()),
+                'type' => Type::int(),
                 'description' => 'Quantidade de parcelas que essa conta terá, zero para conta recorrente e será alterado para 1 quando criar a próxima conta',
             ],
             'frequencia' => [
-                'type' => Type::nonNull(Type::int()),
+                'type' => Type::int(),
                 'description' => 'Frequência da recorrência em dias ou mês, depende do modo de cobrança',
             ],
             'modo' => [
-                'type' => Type::nonNull(GraphQL::type('ContaModo')),
+                'type' => GraphQL::type('ContaModo'),
                 'description' => 'Modo de cobrança se diário ou mensal, a quantidade é definida em frequencia',
             ],
             'automatico' => [
-                'type' => Type::nonNull(Type::boolean()),
+                'type' => Type::boolean(),
                 'description' => 'Informa se o pagamento será automático após o vencimento, só ocorrerá se tiver saldo na carteira, usado para débito automático',
             ],
             'acrescimo' => [
-                'type' => Type::nonNull(Type::float()),
+                'type' => Type::float(),
                 'description' => 'Acréscimo de valores ao total',
             ],
             'multa' => [
-                'type' => Type::nonNull(Type::float()),
+                'type' => Type::float(),
                 'description' => 'Valor da multa em caso de atraso',
             ],
             'juros' => [
-                'type' => Type::nonNull(Type::float()),
+                'type' => Type::float(),
                 'description' => 'Juros diário em caso de atraso, valor de 0 a 1, 1 = 100%',
             ],
             'formula' => [
-                'type' => Type::nonNull(GraphQL::type('ContaFormula')),
+                'type' => GraphQL::type('ContaFormula'),
                 'description' => 'Fórmula de juros que será cobrado em caso de atraso',
             ],
             'vencimento' => [
@@ -136,16 +132,16 @@ class ContaInput extends InputType
             ],
             'numero' => [
                 'type' => Type::string(),
-                'rules' => ['max:64'],
                 'description' => 'Número do documento que gerou a conta',
+                'rules' => ['max:64'],
             ],
             'anexo_url' => [
                 'type' => Type::string(),
-                'rules' => ['max:200'],
                 'description' => 'Caminho do anexo da conta',
+                'rules' => ['max:200'],
             ],
             'estado' => [
-                'type' => Type::nonNull(GraphQL::type('ContaEstado')),
+                'type' => GraphQL::type('ContaEstado'),
                 'description' => 'Informa o estado da conta',
             ],
             'data_calculo' => [

@@ -41,10 +41,6 @@ class ComposicaoInput extends InputType
     public function fields(): array
     {
         return [
-            'id' => [
-                'type' => Type::id(),
-                'description' => 'Identificador da composição',
-            ],
             'composicao_id' => [
                 'type' => Type::nonNull(Type::int()),
                 'description' => 'Informa a qual produto pertence essa composição, deve sempre ser um produto do tipo Composição',
@@ -54,7 +50,7 @@ class ComposicaoInput extends InputType
                 'description' => 'Produto ou composição que faz parte dessa composição, Obs: Não pode ser um pacote',
             ],
             'tipo' => [
-                'type' => Type::nonNull(GraphQL::type('ComposicaoTipo')),
+                'type' => GraphQL::type('ComposicaoTipo'),
                 'description' => 'Tipo de composição, \'Composicao\' sempre retira do estoque, \'Opcional\' permite desmarcar na venda, \'Adicional\' permite adicionar na venda',
             ],
             'quantidade' => [
@@ -62,15 +58,15 @@ class ComposicaoInput extends InputType
                 'description' => 'Quantidade que será consumida desse produto para cada composição formada',
             ],
             'valor' => [
-                'type' => Type::nonNull(Type::float()),
+                'type' => Type::float(),
                 'description' => 'Desconto que será realizado ao retirar esse produto da composição no  momento da venda',
             ],
             'quantidade_maxima' => [
-                'type' => Type::nonNull(Type::int()),
+                'type' => Type::int(),
                 'description' => 'Define a quantidade máxima que essa composição pode ser vendida repetidamente',
             ],
             'ativa' => [
-                'type' => Type::nonNull(Type::boolean()),
+                'type' => Type::boolean(),
                 'description' => 'Indica se a composição está sendo usada atualmente na composição do produto',
             ],
             'data_remocao' => [

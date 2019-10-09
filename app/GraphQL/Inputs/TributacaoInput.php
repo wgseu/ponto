@@ -40,19 +40,15 @@ class TributacaoInput extends InputType
     public function fields(): array
     {
         return [
-            'id' => [
-                'type' => Type::id(),
-                'description' => 'Identificador da tributação',
-            ],
             'ncm' => [
                 'type' => Type::nonNull(Type::string()),
-                'rules' => ['max:10'],
                 'description' => 'Código NCM (Nomenclatura Comum do Mercosul) do produto',
+                'rules' => ['max:10'],
             ],
             'cest' => [
                 'type' => Type::string(),
-                'rules' => ['max:20'],
                 'description' => 'Código CEST do produto (Opcional)',
+                'rules' => ['max:20'],
             ],
             'origem_id' => [
                 'type' => Type::nonNull(Type::int()),

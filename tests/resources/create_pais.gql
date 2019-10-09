@@ -1,0 +1,7 @@
+mutation createPais($input: PaisInput!) {
+  CreateMoeda(input: $input) {
+    id
+    nome
+    sigla
+  }
+}

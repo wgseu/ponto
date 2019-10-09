@@ -1,0 +1,9 @@
+query {
+  produtos(order: { id: asc }, filter: { estoque: { gt: 10 } }) {
+    data {
+      id
+      descricao
+      estoque
+    }
+  }
+}

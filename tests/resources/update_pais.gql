@@ -1,0 +1,7 @@
+mutation updatePais($input: PaisInput!) {
+  UpdatePais(id: 1, input: $input) {
+    id
+    nome
+    sigla
+  }
+}

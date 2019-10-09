@@ -115,3 +115,5 @@ class:
 	@java -jar utils/SQLtoClass.jar -p utils/config.properties -t utils/template -o storage/generated
 
 .PHONY: clean test check init
+
+restart: stop start

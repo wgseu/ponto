@@ -1,0 +1,6 @@
+mutation {
+  DeletePais(id: 1) {
+    id
+    nome
+  }
+}

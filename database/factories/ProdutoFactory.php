@@ -3,14 +3,17 @@
 /** @var \Illuminate\Database\Eloquent\Factory $factory */
 
 use App\Models\Produto;
+use App\Models\Categoria;
+use App\Models\Unidade;
 use Faker\Generator as Faker;
 
 $factory->define(Produto::class, function (Faker $faker) {
+    $categoria_id = factory(Categoria::class)->create();
+    $unidade_id = factory(Unidade::class)->create();
     return [
-        'codigo' => $faker->numberBetween(1, 999),
-        'categoria_id' => 1,
-        'unidade_id' => 1,
-        'descricao' => $faker->word,
-        'custo_producao' => 0,
+        'codigo' => $faker->unique()->numberBetween(1, 99999999),
+        'categoria_id' => $categoria_id->id,
+        'unidade_id' => $unidade_id->id,
+        'descricao' => $faker->unique()->name,
     ];
 });

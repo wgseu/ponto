@@ -1,0 +1,9 @@
+query {
+  produtos(filter: { id: 1 }) {
+    data {
+      id
+      descricao
+      estoque
+    }
+  }
+}

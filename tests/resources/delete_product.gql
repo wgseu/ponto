@@ -1,0 +1,6 @@
+mutation {
+  DeleteProduto(id: 1) {
+    id
+    descricao
+  }
+}

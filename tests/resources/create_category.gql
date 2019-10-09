@@ -1,0 +1,7 @@
+mutation createCategoria($input: CategoriaInput!) {
+  CreateCategoria(input: $input) {
+    id
+    detalhes
+    descricao
+  }
+}

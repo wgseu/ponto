@@ -23,6 +23,7 @@
     <php>
         <ini name="date.timezone" value="UTC"/>
         <server name="APP_ENV" value="testing"/>
+        <server name="JWT_SECRET" value="skjadkuwb32d486ads48ac1da"/>
         <server name="BCRYPT_ROUNDS" value="4"/>
         <server name="CACHE_DRIVER" value="array"/>
         <server name="MAIL_DRIVER" value="array"/>

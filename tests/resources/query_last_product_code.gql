@@ -4,6 +4,7 @@ query {
       id
       descricao
       codigo
+      data_arquivado
     }
   }
 }

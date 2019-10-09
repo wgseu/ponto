@@ -1,0 +1,9 @@
+query {
+  paises {
+    data {
+      id
+      nome
+      sigla
+    }
+  }
+}

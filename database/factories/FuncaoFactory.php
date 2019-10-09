@@ -2,13 +2,12 @@
 
 /** @var \Illuminate\Database\Eloquent\Factory $factory */
 
-use App\Models\Unidade;
+use App\Models\Funcao;
 use Faker\Generator as Faker;
 
-$factory->define(Unidade::class, function (Faker $faker) {
+$factory->define(Funcao::class, function (Faker $faker) {
     return [
-        'nome' => $faker->unique()->name,
         'descricao' => $faker->unique()->name,
-        'sigla' => $faker->unique()->name,
+        'remuneracao' => 4.50,
     ];
 });

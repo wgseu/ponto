@@ -1,0 +1,10 @@
+query {
+  paises(order: { id: desc }, limit: 1) {
+    data {
+      id
+      nome
+      sigla
+      moeda_id
+    }
+  }
+}

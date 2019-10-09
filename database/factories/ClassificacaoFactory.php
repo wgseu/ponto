@@ -2,13 +2,11 @@
 
 /** @var \Illuminate\Database\Eloquent\Factory $factory */
 
-use App\Models\Unidade;
+use App\Models\Classificacao;
 use Faker\Generator as Faker;
 
-$factory->define(Unidade::class, function (Faker $faker) {
+$factory->define(Classificacao::class, function (Faker $faker) {
     return [
-        'nome' => $faker->unique()->name,
         'descricao' => $faker->unique()->name,
-        'sigla' => $faker->unique()->name,
     ];
 });

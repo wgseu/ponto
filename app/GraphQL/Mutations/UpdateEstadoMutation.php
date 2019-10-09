@@ -57,7 +57,7 @@ class UpdateEstadoMutation extends Mutation
                 'type' => Type::nonNull(Type::id()),
                 'description' => 'Identificador do estado',
             ],
-            'input' => ['type' => Type::nonNull(GraphQL::type('EstadoInput'))],
+            'input' => ['type' => Type::nonNull(GraphQL::type('EstadoUpdateInput'))],
         ];
     }
 

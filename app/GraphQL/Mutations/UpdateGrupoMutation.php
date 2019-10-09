@@ -57,7 +57,7 @@ class UpdateGrupoMutation extends Mutation
                 'type' => Type::nonNull(Type::id()),
                 'description' => 'Identificador do grupo',
             ],
-            'input' => ['type' => Type::nonNull(GraphQL::type('GrupoInput'))],
+            'input' => ['type' => Type::nonNull(GraphQL::type('GrupoUpdateInput'))],
         ];
     }
 

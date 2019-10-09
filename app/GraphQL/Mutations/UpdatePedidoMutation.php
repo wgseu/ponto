@@ -57,7 +57,7 @@ class UpdatePedidoMutation extends Mutation
                 'type' => Type::nonNull(Type::id()),
                 'description' => 'Código do pedido',
             ],
-            'input' => ['type' => Type::nonNull(GraphQL::type('PedidoInput'))],
+            'input' => ['type' => Type::nonNull(GraphQL::type('PedidoUpdateInput'))],
         ];
     }
 

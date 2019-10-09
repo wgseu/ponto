@@ -57,7 +57,7 @@ class UpdateFormacaoMutation extends Mutation
                 'type' => Type::nonNull(Type::id()),
                 'description' => 'Identificador da formação',
             ],
-            'input' => ['type' => Type::nonNull(GraphQL::type('FormacaoInput'))],
+            'input' => ['type' => Type::nonNull(GraphQL::type('FormacaoUpdateInput'))],
         ];
     }
 

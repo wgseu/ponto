@@ -57,7 +57,7 @@ class UpdateCartaoMutation extends Mutation
                 'type' => Type::nonNull(Type::id()),
                 'description' => 'Identificador do cartão',
             ],
-            'input' => ['type' => Type::nonNull(GraphQL::type('CartaoInput'))],
+            'input' => ['type' => Type::nonNull(GraphQL::type('CartaoUpdateInput'))],
         ];
     }
 

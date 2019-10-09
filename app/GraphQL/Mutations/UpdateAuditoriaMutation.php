@@ -57,7 +57,7 @@ class UpdateAuditoriaMutation extends Mutation
                 'type' => Type::nonNull(Type::id()),
                 'description' => 'Identificador da auditoria',
             ],
-            'input' => ['type' => Type::nonNull(GraphQL::type('AuditoriaInput'))],
+            'input' => ['type' => Type::nonNull(GraphQL::type('AuditoriaUpdateInput'))],
         ];
     }
 

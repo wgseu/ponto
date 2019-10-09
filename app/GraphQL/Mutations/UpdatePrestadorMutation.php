@@ -57,7 +57,7 @@ class UpdatePrestadorMutation extends Mutation
                 'type' => Type::nonNull(Type::id()),
                 'description' => 'Identificador do prestador',
             ],
-            'input' => ['type' => Type::nonNull(GraphQL::type('PrestadorInput'))],
+            'input' => ['type' => Type::nonNull(GraphQL::type('PrestadorUpdateInput'))],
         ];
     }
 

@@ -57,7 +57,7 @@ class UpdateCupomMutation extends Mutation
                 'type' => Type::nonNull(Type::id()),
                 'description' => 'Identificador do cupom',
             ],
-            'input' => ['type' => Type::nonNull(GraphQL::type('CupomInput'))],
+            'input' => ['type' => Type::nonNull(GraphQL::type('CupomUpdateInput'))],
         ];
     }
 

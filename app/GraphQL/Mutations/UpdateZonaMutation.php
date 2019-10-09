@@ -57,7 +57,7 @@ class UpdateZonaMutation extends Mutation
                 'type' => Type::nonNull(Type::id()),
                 'description' => 'Identificador da zona',
             ],
-            'input' => ['type' => Type::nonNull(GraphQL::type('ZonaInput'))],
+            'input' => ['type' => Type::nonNull(GraphQL::type('ZonaUpdateInput'))],
         ];
     }
 

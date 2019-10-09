@@ -57,7 +57,7 @@ class UpdateBancoMutation extends Mutation
                 'type' => Type::nonNull(Type::id()),
                 'description' => 'Identificador do banco',
             ],
-            'input' => ['type' => Type::nonNull(GraphQL::type('BancoInput'))],
+            'input' => ['type' => Type::nonNull(GraphQL::type('BancoUpdateInput'))],
         ];
     }
 

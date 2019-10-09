@@ -157,6 +157,10 @@ $[table.each]
 $[table.end]
 
 $[table.each]
+        '$[Table.norm]UpdateInput' => 'App\GraphQL\Inputs\$[Table.norm]UpdateInput',
+$[table.end]
+
+$[table.each]
         '$[Table.norm]' => 'App\GraphQL\Types\$[Table.norm]Type',
 $[table.end]
 

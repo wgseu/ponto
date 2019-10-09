@@ -57,7 +57,7 @@ class UpdateEnderecoMutation extends Mutation
                 'type' => Type::nonNull(Type::id()),
                 'description' => 'Identificador do endereço',
             ],
-            'input' => ['type' => Type::nonNull(GraphQL::type('EnderecoInput'))],
+            'input' => ['type' => Type::nonNull(GraphQL::type('EnderecoUpdateInput'))],
         ];
     }
 

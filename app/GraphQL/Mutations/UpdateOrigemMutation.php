@@ -57,7 +57,7 @@ class UpdateOrigemMutation extends Mutation
                 'type' => Type::nonNull(Type::id()),
                 'description' => 'Identificador da origem',
             ],
-            'input' => ['type' => Type::nonNull(GraphQL::type('OrigemInput'))],
+            'input' => ['type' => Type::nonNull(GraphQL::type('OrigemUpdateInput'))],
         ];
     }
 

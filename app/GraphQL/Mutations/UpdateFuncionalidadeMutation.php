@@ -57,7 +57,7 @@ class UpdateFuncionalidadeMutation extends Mutation
                 'type' => Type::nonNull(Type::id()),
                 'description' => 'Identificador da funcionalidade',
             ],
-            'input' => ['type' => Type::nonNull(GraphQL::type('FuncionalidadeInput'))],
+            'input' => ['type' => Type::nonNull(GraphQL::type('FuncionalidadeUpdateInput'))],
         ];
     }
 

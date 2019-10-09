@@ -57,7 +57,7 @@ class UpdatePacoteMutation extends Mutation
                 'type' => Type::nonNull(Type::id()),
                 'description' => 'Identificador do pacote',
             ],
-            'input' => ['type' => Type::nonNull(GraphQL::type('PacoteInput'))],
+            'input' => ['type' => Type::nonNull(GraphQL::type('PacoteUpdateInput'))],
         ];
     }
 

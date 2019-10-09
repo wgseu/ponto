@@ -57,7 +57,7 @@ class UpdateCatalogoMutation extends Mutation
                 'type' => Type::nonNull(Type::id()),
                 'description' => 'Identificador do catálogo',
             ],
-            'input' => ['type' => Type::nonNull(GraphQL::type('CatalogoInput'))],
+            'input' => ['type' => Type::nonNull(GraphQL::type('CatalogoUpdateInput'))],
         ];
     }
 

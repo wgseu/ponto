@@ -57,7 +57,7 @@ class UpdateBairroMutation extends Mutation
                 'type' => Type::nonNull(Type::id()),
                 'description' => 'Identificador do bairro',
             ],
-            'input' => ['type' => Type::nonNull(GraphQL::type('BairroInput'))],
+            'input' => ['type' => Type::nonNull(GraphQL::type('BairroUpdateInput'))],
         ];
     }
 

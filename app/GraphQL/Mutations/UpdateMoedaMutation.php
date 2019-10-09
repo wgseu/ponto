@@ -57,7 +57,7 @@ class UpdateMoedaMutation extends Mutation
                 'type' => Type::nonNull(Type::id()),
                 'description' => 'Identificador da moeda',
             ],
-            'input' => ['type' => Type::nonNull(GraphQL::type('MoedaInput'))],
+            'input' => ['type' => Type::nonNull(GraphQL::type('MoedaUpdateInput'))],
         ];
     }
 

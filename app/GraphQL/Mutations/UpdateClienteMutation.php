@@ -57,7 +57,7 @@ class UpdateClienteMutation extends Mutation
                 'type' => Type::nonNull(Type::id()),
                 'description' => 'Identificador do cliente',
             ],
-            'input' => ['type' => Type::nonNull(GraphQL::type('ClienteInput'))],
+            'input' => ['type' => Type::nonNull(GraphQL::type('ClienteUpdateInput'))],
         ];
     }
 

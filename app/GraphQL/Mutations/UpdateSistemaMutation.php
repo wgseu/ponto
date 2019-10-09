@@ -57,7 +57,7 @@ class UpdateSistemaMutation extends Mutation
                 'type' => Type::nonNull(Type::id()),
                 'description' => 'Identificador único do sistema, valor 1',
             ],
-            'input' => ['type' => Type::nonNull(GraphQL::type('SistemaInput'))],
+            'input' => ['type' => Type::nonNull(GraphQL::type('SistemaUpdateInput'))],
         ];
     }
 

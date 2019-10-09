@@ -1,9 +1,10 @@
 query {
-  produtos(filter: { id: 1 }) {
+  produtos (filter: {}) {
     data {
       id
       descricao
-      estoque
+      preco_venda
     }
+    total
   }
 }

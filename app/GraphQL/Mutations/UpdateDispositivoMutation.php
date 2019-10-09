@@ -57,7 +57,7 @@ class UpdateDispositivoMutation extends Mutation
                 'type' => Type::nonNull(Type::id()),
                 'description' => 'Identificador do dispositivo',
             ],
-            'input' => ['type' => Type::nonNull(GraphQL::type('DispositivoInput'))],
+            'input' => ['type' => Type::nonNull(GraphQL::type('DispositivoUpdateInput'))],
         ];
     }
 

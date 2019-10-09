@@ -57,7 +57,7 @@ class UpdateLocalizacaoMutation extends Mutation
                 'type' => Type::nonNull(Type::id()),
                 'description' => 'Identificador do endereço',
             ],
-            'input' => ['type' => Type::nonNull(GraphQL::type('LocalizacaoInput'))],
+            'input' => ['type' => Type::nonNull(GraphQL::type('LocalizacaoUpdateInput'))],
         ];
     }
 

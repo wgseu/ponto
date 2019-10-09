@@ -5,5 +5,6 @@ query {
       nome
       sigla
     }
+    total
   }
 }

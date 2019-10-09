@@ -57,7 +57,7 @@ class UpdateModuloMutation extends Mutation
                 'type' => Type::nonNull(Type::id()),
                 'description' => 'Identificador do módulo',
             ],
-            'input' => ['type' => Type::nonNull(GraphQL::type('ModuloInput'))],
+            'input' => ['type' => Type::nonNull(GraphQL::type('ModuloUpdateInput'))],
         ];
     }
 

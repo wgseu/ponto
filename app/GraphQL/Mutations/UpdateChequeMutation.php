@@ -57,7 +57,7 @@ class UpdateChequeMutation extends Mutation
                 'type' => Type::nonNull(Type::id()),
                 'description' => 'Identificador da folha de cheque',
             ],
-            'input' => ['type' => Type::nonNull(GraphQL::type('ChequeInput'))],
+            'input' => ['type' => Type::nonNull(GraphQL::type('ChequeUpdateInput'))],
         ];
     }
 

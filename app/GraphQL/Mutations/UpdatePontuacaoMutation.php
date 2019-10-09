@@ -57,7 +57,7 @@ class UpdatePontuacaoMutation extends Mutation
                 'type' => Type::nonNull(Type::id()),
                 'description' => 'Identificador da pontuação',
             ],
-            'input' => ['type' => Type::nonNull(GraphQL::type('PontuacaoInput'))],
+            'input' => ['type' => Type::nonNull(GraphQL::type('PontuacaoUpdateInput'))],
         ];
     }
 

@@ -57,7 +57,7 @@ class UpdateRegimeMutation extends Mutation
                 'type' => Type::nonNull(Type::id()),
                 'description' => 'Identificador do regime tributário',
             ],
-            'input' => ['type' => Type::nonNull(GraphQL::type('RegimeInput'))],
+            'input' => ['type' => Type::nonNull(GraphQL::type('RegimeUpdateInput'))],
         ];
     }
 

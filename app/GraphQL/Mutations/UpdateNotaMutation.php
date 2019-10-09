@@ -57,7 +57,7 @@ class UpdateNotaMutation extends Mutation
                 'type' => Type::nonNull(Type::id()),
                 'description' => 'Identificador da nota',
             ],
-            'input' => ['type' => Type::nonNull(GraphQL::type('NotaInput'))],
+            'input' => ['type' => Type::nonNull(GraphQL::type('NotaUpdateInput'))],
         ];
     }
 

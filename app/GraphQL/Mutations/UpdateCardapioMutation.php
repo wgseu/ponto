@@ -57,7 +57,7 @@ class UpdateCardapioMutation extends Mutation
                 'type' => Type::nonNull(Type::id()),
                 'description' => 'Identificador do cardápio',
             ],
-            'input' => ['type' => Type::nonNull(GraphQL::type('CardapioInput'))],
+            'input' => ['type' => Type::nonNull(GraphQL::type('CardapioUpdateInput'))],
         ];
     }
 

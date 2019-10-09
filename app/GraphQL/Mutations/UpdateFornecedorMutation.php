@@ -57,7 +57,7 @@ class UpdateFornecedorMutation extends Mutation
                 'type' => Type::nonNull(Type::id()),
                 'description' => 'Identificador do fornecedor',
             ],
-            'input' => ['type' => Type::nonNull(GraphQL::type('FornecedorInput'))],
+            'input' => ['type' => Type::nonNull(GraphQL::type('FornecedorUpdateInput'))],
         ];
     }
 

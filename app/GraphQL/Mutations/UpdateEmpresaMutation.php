@@ -57,7 +57,7 @@ class UpdateEmpresaMutation extends Mutation
                 'type' => Type::nonNull(Type::id()),
                 'description' => 'Identificador único da empresa, valor 1',
             ],
-            'input' => ['type' => Type::nonNull(GraphQL::type('EmpresaInput'))],
+            'input' => ['type' => Type::nonNull(GraphQL::type('EmpresaUpdateInput'))],
         ];
     }
 

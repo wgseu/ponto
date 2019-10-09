@@ -57,7 +57,7 @@ class UpdateRequisitoMutation extends Mutation
                 'type' => Type::nonNull(Type::id()),
                 'description' => 'Identificador do produto da lista',
             ],
-            'input' => ['type' => Type::nonNull(GraphQL::type('RequisitoInput'))],
+            'input' => ['type' => Type::nonNull(GraphQL::type('RequisitoUpdateInput'))],
         ];
     }
 

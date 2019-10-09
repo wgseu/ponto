@@ -57,7 +57,7 @@ class UpdateIntegracaoMutation extends Mutation
                 'type' => Type::nonNull(Type::id()),
                 'description' => 'Identificador da integração',
             ],
-            'input' => ['type' => Type::nonNull(GraphQL::type('IntegracaoInput'))],
+            'input' => ['type' => Type::nonNull(GraphQL::type('IntegracaoUpdateInput'))],
         ];
     }
 

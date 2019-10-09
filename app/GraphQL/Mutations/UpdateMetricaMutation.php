@@ -57,7 +57,7 @@ class UpdateMetricaMutation extends Mutation
                 'type' => Type::nonNull(Type::id()),
                 'description' => 'Identificador da métrica',
             ],
-            'input' => ['type' => Type::nonNull(GraphQL::type('MetricaInput'))],
+            'input' => ['type' => Type::nonNull(GraphQL::type('MetricaUpdateInput'))],
         ];
     }
 

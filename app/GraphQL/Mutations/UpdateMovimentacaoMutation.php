@@ -57,7 +57,7 @@ class UpdateMovimentacaoMutation extends Mutation
                 'type' => Type::nonNull(Type::id()),
                 'description' => 'Código da movimentação do caixa',
             ],
-            'input' => ['type' => Type::nonNull(GraphQL::type('MovimentacaoInput'))],
+            'input' => ['type' => Type::nonNull(GraphQL::type('MovimentacaoUpdateInput'))],
         ];
     }
 

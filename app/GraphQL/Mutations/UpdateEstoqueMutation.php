@@ -57,7 +57,7 @@ class UpdateEstoqueMutation extends Mutation
                 'type' => Type::nonNull(Type::id()),
                 'description' => 'Identificador da entrada no estoque',
             ],
-            'input' => ['type' => Type::nonNull(GraphQL::type('EstoqueInput'))],
+            'input' => ['type' => Type::nonNull(GraphQL::type('EstoqueUpdateInput'))],
         ];
     }
 

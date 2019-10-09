@@ -57,7 +57,7 @@ class UpdateEmitenteMutation extends Mutation
                 'type' => Type::nonNull(Type::id()),
                 'description' => 'Identificador do emitente, sempre 1',
             ],
-            'input' => ['type' => Type::nonNull(GraphQL::type('EmitenteInput'))],
+            'input' => ['type' => Type::nonNull(GraphQL::type('EmitenteUpdateInput'))],
         ];
     }
 

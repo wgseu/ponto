@@ -57,7 +57,7 @@ class Update$[Table.norm]Mutation extends Mutation
                 'type' => Type::nonNull(Type::id()),
                 'description' => '$[primary.comment]',
             ],
-            'input' => ['type' => Type::nonNull(GraphQL::type('$[Table.norm]Input'))],
+            'input' => ['type' => Type::nonNull(GraphQL::type('$[Table.norm]UpdateInput'))],
         ];
     }
 

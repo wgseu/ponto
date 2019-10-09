@@ -57,7 +57,7 @@ class UpdateProdutoMutation extends Mutation
                 'type' => Type::nonNull(Type::id()),
                 'description' => 'Código do produto',
             ],
-            'input' => ['type' => Type::nonNull(GraphQL::type('ProdutoInput'))],
+            'input' => ['type' => Type::nonNull(GraphQL::type('ProdutoUpdateInput'))],
         ];
     }
 

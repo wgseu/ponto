@@ -57,7 +57,7 @@ class UpdateJuncaoMutation extends Mutation
                 'type' => Type::nonNull(Type::id()),
                 'description' => 'Identificador da junção',
             ],
-            'input' => ['type' => Type::nonNull(GraphQL::type('JuncaoInput'))],
+            'input' => ['type' => Type::nonNull(GraphQL::type('JuncaoUpdateInput'))],
         ];
     }
 

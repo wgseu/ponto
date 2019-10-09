@@ -57,7 +57,7 @@ class UpdateTributacaoMutation extends Mutation
                 'type' => Type::nonNull(Type::id()),
                 'description' => 'Identificador da tributação',
             ],
-            'input' => ['type' => Type::nonNull(GraphQL::type('TributacaoInput'))],
+            'input' => ['type' => Type::nonNull(GraphQL::type('TributacaoUpdateInput'))],
         ];
     }
 

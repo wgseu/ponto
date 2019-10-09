@@ -57,7 +57,7 @@ class UpdateAvaliacaoMutation extends Mutation
                 'type' => Type::nonNull(Type::id()),
                 'description' => 'Identificador da avaliação',
             ],
-            'input' => ['type' => Type::nonNull(GraphQL::type('AvaliacaoInput'))],
+            'input' => ['type' => Type::nonNull(GraphQL::type('AvaliacaoUpdateInput'))],
         ];
     }
 

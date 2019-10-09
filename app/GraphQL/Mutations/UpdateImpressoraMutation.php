@@ -57,7 +57,7 @@ class UpdateImpressoraMutation extends Mutation
                 'type' => Type::nonNull(Type::id()),
                 'description' => 'Identificador da impressora',
             ],
-            'input' => ['type' => Type::nonNull(GraphQL::type('ImpressoraInput'))],
+            'input' => ['type' => Type::nonNull(GraphQL::type('ImpressoraUpdateInput'))],
         ];
     }
 

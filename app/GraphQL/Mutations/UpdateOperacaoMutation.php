@@ -57,7 +57,7 @@ class UpdateOperacaoMutation extends Mutation
                 'type' => Type::nonNull(Type::id()),
                 'description' => 'Identificador da operação',
             ],
-            'input' => ['type' => Type::nonNull(GraphQL::type('OperacaoInput'))],
+            'input' => ['type' => Type::nonNull(GraphQL::type('OperacaoUpdateInput'))],
         ];
     }
 

@@ -57,7 +57,7 @@ class UpdateContaMutation extends Mutation
                 'type' => Type::nonNull(Type::id()),
                 'description' => 'Código da conta',
             ],
-            'input' => ['type' => Type::nonNull(GraphQL::type('ContaInput'))],
+            'input' => ['type' => Type::nonNull(GraphQL::type('ContaUpdateInput'))],
         ];
     }
 

@@ -57,7 +57,7 @@ class UpdatePatrimonioMutation extends Mutation
                 'type' => Type::nonNull(Type::id()),
                 'description' => 'Identificador do bem',
             ],
-            'input' => ['type' => Type::nonNull(GraphQL::type('PatrimonioInput'))],
+            'input' => ['type' => Type::nonNull(GraphQL::type('PatrimonioUpdateInput'))],
         ];
     }
 

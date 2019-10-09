@@ -57,7 +57,7 @@ class UpdateViagemMutation extends Mutation
                 'type' => Type::nonNull(Type::id()),
                 'description' => 'Identificador da viagem',
             ],
-            'input' => ['type' => Type::nonNull(GraphQL::type('ViagemInput'))],
+            'input' => ['type' => Type::nonNull(GraphQL::type('ViagemUpdateInput'))],
         ];
     }
 

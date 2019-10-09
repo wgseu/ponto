@@ -1,5 +1,5 @@
-mutation updatePais($input: PaisInput!) {
-  UpdatePais(id: 1, input: $input) {
+mutation updatePais($id: ID!, $input: PaisUpdateInput!) {
+  UpdatePais(id: $id, input: $input) {
     id
     nome
     sigla

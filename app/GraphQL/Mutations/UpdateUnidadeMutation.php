@@ -57,7 +57,7 @@ class UpdateUnidadeMutation extends Mutation
                 'type' => Type::nonNull(Type::id()),
                 'description' => 'Identificador da unidade',
             ],
-            'input' => ['type' => Type::nonNull(GraphQL::type('UnidadeInput'))],
+            'input' => ['type' => Type::nonNull(GraphQL::type('UnidadeUpdateInput'))],
         ];
     }
 

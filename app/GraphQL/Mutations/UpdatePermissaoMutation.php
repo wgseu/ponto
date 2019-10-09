@@ -57,7 +57,7 @@ class UpdatePermissaoMutation extends Mutation
                 'type' => Type::nonNull(Type::id()),
                 'description' => 'Identificador da permissão',
             ],
-            'input' => ['type' => Type::nonNull(GraphQL::type('PermissaoInput'))],
+            'input' => ['type' => Type::nonNull(GraphQL::type('PermissaoUpdateInput'))],
         ];
     }
 

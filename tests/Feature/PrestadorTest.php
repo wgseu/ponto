@@ -19,4 +19,12 @@ class PrestadorTest extends TestCase
             'Authorization' => "Bearer $token",
         ];
     }
+
+    /**
+     * TODO: remove me
+     */
+    public function testNothing()
+    {
+        $this->assertTrue(true);
+    }
 }

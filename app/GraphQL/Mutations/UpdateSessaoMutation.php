@@ -57,7 +57,7 @@ class UpdateSessaoMutation extends Mutation
                 'type' => Type::nonNull(Type::id()),
                 'description' => 'Código da sessão',
             ],
-            'input' => ['type' => Type::nonNull(GraphQL::type('SessaoInput'))],
+            'input' => ['type' => Type::nonNull(GraphQL::type('SessaoUpdateInput'))],
         ];
     }
 

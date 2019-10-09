@@ -57,7 +57,7 @@ class UpdateSetorMutation extends Mutation
                 'type' => Type::nonNull(Type::id()),
                 'description' => 'Identificador do setor',
             ],
-            'input' => ['type' => Type::nonNull(GraphQL::type('SetorInput'))],
+            'input' => ['type' => Type::nonNull(GraphQL::type('SetorUpdateInput'))],
         ];
     }
 

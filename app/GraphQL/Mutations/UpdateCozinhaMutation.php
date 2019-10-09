@@ -57,7 +57,7 @@ class UpdateCozinhaMutation extends Mutation
                 'type' => Type::nonNull(Type::id()),
                 'description' => 'Identificador da cozinha',
             ],
-            'input' => ['type' => Type::nonNull(GraphQL::type('CozinhaInput'))],
+            'input' => ['type' => Type::nonNull(GraphQL::type('CozinhaUpdateInput'))],
         ];
     }
 

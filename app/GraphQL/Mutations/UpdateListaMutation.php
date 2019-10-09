@@ -57,7 +57,7 @@ class UpdateListaMutation extends Mutation
                 'type' => Type::nonNull(Type::id()),
                 'description' => 'Identificador da lista de compras',
             ],
-            'input' => ['type' => Type::nonNull(GraphQL::type('ListaInput'))],
+            'input' => ['type' => Type::nonNull(GraphQL::type('ListaUpdateInput'))],
         ];
     }
 

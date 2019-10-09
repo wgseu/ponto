@@ -57,7 +57,7 @@ class UpdateCarteiraMutation extends Mutation
                 'type' => Type::nonNull(Type::id()),
                 'description' => 'Código local da carteira',
             ],
-            'input' => ['type' => Type::nonNull(GraphQL::type('CarteiraInput'))],
+            'input' => ['type' => Type::nonNull(GraphQL::type('CarteiraUpdateInput'))],
         ];
     }
 

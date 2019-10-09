@@ -1,7 +1,8 @@
 mutation createProduct ($input: ProdutoInput!) {
   CreateProduto(input: $input) {
-    descricao,
-    preco_venda,
+    id
     codigo
+    descricao
+    preco_venda
   }
 }

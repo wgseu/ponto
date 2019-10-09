@@ -57,7 +57,7 @@ class UpdateItemMutation extends Mutation
                 'type' => Type::nonNull(Type::id()),
                 'description' => 'Identificador do item do pedido',
             ],
-            'input' => ['type' => Type::nonNull(GraphQL::type('ItemInput'))],
+            'input' => ['type' => Type::nonNull(GraphQL::type('ItemUpdateInput'))],
         ];
     }
 

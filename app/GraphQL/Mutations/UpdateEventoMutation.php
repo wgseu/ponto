@@ -57,7 +57,7 @@ class UpdateEventoMutation extends Mutation
                 'type' => Type::nonNull(Type::id()),
                 'description' => 'Identificador do evento',
             ],
-            'input' => ['type' => Type::nonNull(GraphQL::type('EventoInput'))],
+            'input' => ['type' => Type::nonNull(GraphQL::type('EventoUpdateInput'))],
         ];
     }
 

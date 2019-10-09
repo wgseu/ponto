@@ -57,7 +57,7 @@ class UpdatePaisMutation extends Mutation
                 'type' => Type::nonNull(Type::id()),
                 'description' => 'Identificador do país',
             ],
-            'input' => ['type' => Type::nonNull(GraphQL::type('PaisInput'))],
+            'input' => ['type' => Type::nonNull(GraphQL::type('PaisUpdateInput'))],
         ];
     }
 

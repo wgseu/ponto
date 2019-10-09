@@ -57,7 +57,7 @@ class UpdateContagemMutation extends Mutation
                 'type' => Type::nonNull(Type::id()),
                 'description' => 'Identificador da contagem',
             ],
-            'input' => ['type' => Type::nonNull(GraphQL::type('ContagemInput'))],
+            'input' => ['type' => Type::nonNull(GraphQL::type('ContagemUpdateInput'))],
         ];
     }
 

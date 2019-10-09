@@ -57,7 +57,7 @@ class UpdateCreditoMutation extends Mutation
                 'type' => Type::nonNull(Type::id()),
                 'description' => 'Identificador do crédito',
             ],
-            'input' => ['type' => Type::nonNull(GraphQL::type('CreditoInput'))],
+            'input' => ['type' => Type::nonNull(GraphQL::type('CreditoUpdateInput'))],
         ];
     }
 

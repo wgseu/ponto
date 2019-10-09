@@ -57,7 +57,7 @@ class UpdateServicoMutation extends Mutation
                 'type' => Type::nonNull(Type::id()),
                 'description' => 'Identificador do serviço',
             ],
-            'input' => ['type' => Type::nonNull(GraphQL::type('ServicoInput'))],
+            'input' => ['type' => Type::nonNull(GraphQL::type('ServicoUpdateInput'))],
         ];
     }
 

@@ -57,7 +57,7 @@ class UpdateCompraMutation extends Mutation
                 'type' => Type::nonNull(Type::id()),
                 'description' => 'Identificador da compra',
             ],
-            'input' => ['type' => Type::nonNull(GraphQL::type('CompraInput'))],
+            'input' => ['type' => Type::nonNull(GraphQL::type('CompraUpdateInput'))],
         ];
     }
 

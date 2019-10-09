@@ -57,7 +57,7 @@ class UpdatePagamentoMutation extends Mutation
                 'type' => Type::nonNull(Type::id()),
                 'description' => 'Identificador do pagamento',
             ],
-            'input' => ['type' => Type::nonNull(GraphQL::type('PagamentoInput'))],
+            'input' => ['type' => Type::nonNull(GraphQL::type('PagamentoUpdateInput'))],
         ];
     }
 

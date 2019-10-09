@@ -57,7 +57,7 @@ class UpdateCaixaMutation extends Mutation
                 'type' => Type::nonNull(Type::id()),
                 'description' => 'Identificador do caixa',
             ],
-            'input' => ['type' => Type::nonNull(GraphQL::type('CaixaInput'))],
+            'input' => ['type' => Type::nonNull(GraphQL::type('CaixaUpdateInput'))],
         ];
     }
 

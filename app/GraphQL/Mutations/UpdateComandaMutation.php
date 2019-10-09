@@ -57,7 +57,7 @@ class UpdateComandaMutation extends Mutation
                 'type' => Type::nonNull(Type::id()),
                 'description' => 'Número da comanda',
             ],
-            'input' => ['type' => Type::nonNull(GraphQL::type('ComandaInput'))],
+            'input' => ['type' => Type::nonNull(GraphQL::type('ComandaUpdateInput'))],
         ];
     }
 

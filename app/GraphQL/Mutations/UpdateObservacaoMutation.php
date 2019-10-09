@@ -57,7 +57,7 @@ class UpdateObservacaoMutation extends Mutation
                 'type' => Type::nonNull(Type::id()),
                 'description' => 'Identificador da observação',
             ],
-            'input' => ['type' => Type::nonNull(GraphQL::type('ObservacaoInput'))],
+            'input' => ['type' => Type::nonNull(GraphQL::type('ObservacaoUpdateInput'))],
         ];
     }
 

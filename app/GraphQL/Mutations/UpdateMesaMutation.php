@@ -57,7 +57,7 @@ class UpdateMesaMutation extends Mutation
                 'type' => Type::nonNull(Type::id()),
                 'description' => 'Número da mesa',
             ],
-            'input' => ['type' => Type::nonNull(GraphQL::type('MesaInput'))],
+            'input' => ['type' => Type::nonNull(GraphQL::type('MesaUpdateInput'))],
         ];
     }
 

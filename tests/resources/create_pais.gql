@@ -1,5 +1,5 @@
 mutation createPais($input: PaisInput!) {
-  CreateMoeda(input: $input) {
+  CreatePais(input: $input) {
     id
     nome
     sigla

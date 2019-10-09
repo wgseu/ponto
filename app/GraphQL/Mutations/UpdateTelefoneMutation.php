@@ -57,7 +57,7 @@ class UpdateTelefoneMutation extends Mutation
                 'type' => Type::nonNull(Type::id()),
                 'description' => 'Identificador do telefone',
             ],
-            'input' => ['type' => Type::nonNull(GraphQL::type('TelefoneInput'))],
+            'input' => ['type' => Type::nonNull(GraphQL::type('TelefoneUpdateInput'))],
         ];
     }
 

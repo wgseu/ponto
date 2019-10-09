@@ -57,7 +57,7 @@ class UpdateAcessoMutation extends Mutation
                 'type' => Type::nonNull(Type::id()),
                 'description' => 'Identificador do acesso',
             ],
-            'input' => ['type' => Type::nonNull(GraphQL::type('AcessoInput'))],
+            'input' => ['type' => Type::nonNull(GraphQL::type('AcessoUpdateInput'))],
         ];
     }
 

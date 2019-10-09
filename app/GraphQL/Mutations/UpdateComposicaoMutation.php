@@ -57,7 +57,7 @@ class UpdateComposicaoMutation extends Mutation
                 'type' => Type::nonNull(Type::id()),
                 'description' => 'Identificador da composição',
             ],
-            'input' => ['type' => Type::nonNull(GraphQL::type('ComposicaoInput'))],
+            'input' => ['type' => Type::nonNull(GraphQL::type('ComposicaoUpdateInput'))],
         ];
     }
 

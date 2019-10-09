@@ -57,7 +57,7 @@ class UpdateHorarioMutation extends Mutation
                 'type' => Type::nonNull(Type::id()),
                 'description' => 'Identificador do horário',
             ],
-            'input' => ['type' => Type::nonNull(GraphQL::type('HorarioInput'))],
+            'input' => ['type' => Type::nonNull(GraphQL::type('HorarioUpdateInput'))],
         ];
     }
 

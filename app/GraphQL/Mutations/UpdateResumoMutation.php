@@ -57,7 +57,7 @@ class UpdateResumoMutation extends Mutation
                 'type' => Type::nonNull(Type::id()),
                 'description' => 'Identificador do resumo',
             ],
-            'input' => ['type' => Type::nonNull(GraphQL::type('ResumoInput'))],
+            'input' => ['type' => Type::nonNull(GraphQL::type('ResumoUpdateInput'))],
         ];
     }
 

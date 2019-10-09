@@ -57,7 +57,7 @@ class UpdatePropriedadeMutation extends Mutation
                 'type' => Type::nonNull(Type::id()),
                 'description' => 'Identificador da propriedade',
             ],
-            'input' => ['type' => Type::nonNull(GraphQL::type('PropriedadeInput'))],
+            'input' => ['type' => Type::nonNull(GraphQL::type('PropriedadeUpdateInput'))],
         ];
     }
 

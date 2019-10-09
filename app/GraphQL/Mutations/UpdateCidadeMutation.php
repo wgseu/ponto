@@ -57,7 +57,7 @@ class UpdateCidadeMutation extends Mutation
                 'type' => Type::nonNull(Type::id()),
                 'description' => 'Código que identifica a cidade',
             ],
-            'input' => ['type' => Type::nonNull(GraphQL::type('CidadeInput'))],
+            'input' => ['type' => Type::nonNull(GraphQL::type('CidadeUpdateInput'))],
         ];
     }
 

@@ -13,33 +13,20 @@ class ProdutoTest extends TestCase
     public function testCreateProduct()
     {
         $headers = PrestadorTest::auth();
-        $categoria = $this->graphfl('create_category', [
-            "input" => [
-                "descricao" => "Bebida"
-            ]
-        ], $headers);
-        $unidade = $this->graphfl('create_unity', [
-            "input" => [
-                "nome" => "Unidade",
-                "sigla" => "Un"
-            ]
-        ], $headers);
-        $produto = $this->graphfl('create_product', [
+        $seed_product = factory(Produto::class)->create();
+        $response = $this->graphfl('create_product', [
             "input" => [
                 "codigo" => 14,
-                "categoria_id" => $categoria->json("data.CreateCategoria.id"),
-                "unidade_id" => $unidade->json("data.CreateUnidade.id"),
-                "descricao" => "Pepsi",
-                "preco_venda" => 3.5,
-                "custo_producao" => 0
+                "categoria_id" => $seed_product->categoria_id,
+                "unidade_id" => $seed_product->unidade_id,
+                "descricao" => 'Pepsi',
+                "preco_venda" => 3.5
             ]
         ], $headers);
-        $response = $this->graphfl('query_last_product_code');
-
-        $this->assertEquals(
-            $produto->json("data.CreateProduto.codigo"),
-            $response->json("data.produtos.data.0.codigo")
-        );
+        $found_product = Produto::findOrFail($response->json("data.CreateProduto.id"));
+        $this->assertEquals(14, $found_product->codigo);
+        $this->assertEquals('Pepsi', $found_product->descricao);
+        $this->assertEquals(3.5, $found_product->preco_venda);
     }
 
     public function testUpdateProduct()
@@ -73,15 +60,12 @@ class ProdutoTest extends TestCase
     
     public function testeQueryProduct()
     {
-        $headers = PrestadorTest::auth();
         for ($i=0; $i < 10; $i++) {
             factory(Produto::class)->create();
         }
 
-        $response = $this->graphfl('query_stock_product_filter', [], $headers);
-        $this->assertTrue($response->json('data.produtos.data.0.estoque') > 10);
-        $response = $this->graphfl('query_first_product_id', [], $headers);
-        $this->assertTrue($response->json('data.produtos.data.0.id') == 1);
-        
+        $headers = PrestadorTest::auth();
+        $response = $this->graphfl('query_products', [], $headers);
+        $this->assertEquals(10, $response->json('data.produtos.total'));
     }
 }

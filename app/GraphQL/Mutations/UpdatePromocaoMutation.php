@@ -57,7 +57,7 @@ class UpdatePromocaoMutation extends Mutation
                 'type' => Type::nonNull(Type::id()),
                 'description' => 'Identificador da promoção',
             ],
-            'input' => ['type' => Type::nonNull(GraphQL::type('PromocaoInput'))],
+            'input' => ['type' => Type::nonNull(GraphQL::type('PromocaoUpdateInput'))],
         ];
     }
 

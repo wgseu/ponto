@@ -57,7 +57,7 @@ class UpdateAssociacaoMutation extends Mutation
                 'type' => Type::nonNull(Type::id()),
                 'description' => 'Identificador da associação no banco de dados',
             ],
-            'input' => ['type' => Type::nonNull(GraphQL::type('AssociacaoInput'))],
+            'input' => ['type' => Type::nonNull(GraphQL::type('AssociacaoUpdateInput'))],
         ];
     }
 

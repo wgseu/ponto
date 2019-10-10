@@ -1,6 +1,8 @@
-mutation createMoeda($input: MoedaInput!) {
-  CreateMoeda(input: $input) {
-    id
+mutation ($MoedaInput: MoedaInput!)
+{
+  CreateMoeda(input: $MoedaInput) 
+  {
+    id 
     nome
   }
 }

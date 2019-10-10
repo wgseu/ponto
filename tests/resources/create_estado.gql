@@ -1,0 +1,8 @@
+mutation estado($EstadoInput: EstadoInput!)
+{
+  CreateEstado(input: $EstadoInput) 
+  {
+    id 
+    nome
+  }
+}

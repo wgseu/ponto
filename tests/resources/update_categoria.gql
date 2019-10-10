@@ -1,0 +1,9 @@
+mutation UpdateCategoria ($CategoriaUpdateInput: CategoriaUpdateInput!, $ID: ID!)
+{
+  UpdateCategoria(id: $ID, input: $CategoriaUpdateInput) 
+  {
+		id
+    descricao
+    ordem
+  }
+}

@@ -1,0 +1,8 @@
+mutation  fornecedor($FornecedorInput: FornecedorInput!)
+{
+  CreateFornecedor(input: $FornecedorInput) 
+  {
+    id 
+    empresa_id
+  }
+}

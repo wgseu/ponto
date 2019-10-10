@@ -1,0 +1,8 @@
+mutation bairro($BairroInput: BairroInput!)
+{
+  CreateBairro(input: $BairroInput) 
+  {
+    id 
+    nome
+  }
+}

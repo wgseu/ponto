@@ -1,0 +1,5 @@
+mutation Delete($ID: ID!){
+  DeleteUnidade(id: $ID) {
+    id
+  }
+}

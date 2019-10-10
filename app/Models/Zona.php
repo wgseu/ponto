@@ -83,5 +83,17 @@ class Zona extends Model implements ValidateInterface
 
     public function validate()
     {
+        $errors = [];
+        if (!is_null($this->entrega_minima) && !is_null($this->entrega_maxima) ) {
+            if ($this->entrega_minima > $this->entrega_maxima){
+                $errors['entrega_minima'] = __('messagens.error_time_delivery');
+            }
+        }
+        if ($this->adicional_entrega < 0){
+            $errors['value_delivery_negative'] = __('messagens.error_time_delivery');
+        }
+        if (!empty($errors)) {
+            throw ValidationException::withMessages($errors);
+        }
     }
 }

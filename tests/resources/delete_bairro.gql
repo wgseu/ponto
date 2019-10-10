@@ -1,0 +1,8 @@
+mutation bairro($ID: ID!)
+{
+  DeleteBairro(id: $ID) 
+  {
+    id 
+    nome
+  }
+}

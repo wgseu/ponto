@@ -1,0 +1,8 @@
+mutation zona($ZonaInput: ZonaInput!)
+{
+  CreateZona(input: $ZonaInput) 
+  {
+    id 
+    nome
+  }
+}

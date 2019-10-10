@@ -1,0 +1,8 @@
+mutation ($MoedaUpdateInput: MoedaUpdateInput!, $ID: ID!)
+{
+  UpdateMoeda(id: $ID, input: $MoedaUpdateInput) 
+  {
+		id
+    nome
+  }
+}

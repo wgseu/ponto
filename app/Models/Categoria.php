@@ -82,5 +82,19 @@ class Categoria extends Model implements ValidateInterface
 
     public function validate()
     {
+        $errors = [];
+        if (!is_null($this->categoria_id)) {
+            $categoriapai = self::find($this->categoria_id);
+            if (!$categoriapai->exists()) {
+                $errors['categoriaid'] = __('messagens.categoriapai_not_found');
+            } elseif (!is_null($categoriapai->categoria_id)) {
+                $errors['categoriaid'] = __('messagens.categoriapai_already');
+            } elseif ($categoriapai->id == $this->id) {
+                $errors['categoriaid'] = __('messagens.categoriapai_same');
+            }
+        }
+        if (!empty($errors)) {
+            throw ValidationException::withMessages($errors);
+        }
     }
 }

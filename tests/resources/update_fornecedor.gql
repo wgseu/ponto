@@ -1,0 +1,9 @@
+mutation UpdateUnidade ($FornecedorUpdateInput: FornecedorUpdateInput!, $ID: ID!)
+{
+  UpdateFornecedor(id: $ID, input: $FornecedorUpdateInput) 
+  {
+		id
+    prazo_pagamento
+    empresa_id
+  }
+}

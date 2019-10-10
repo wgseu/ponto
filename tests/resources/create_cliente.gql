@@ -1,0 +1,8 @@
+mutation  cliente($ClienteInput: ClienteInput!)
+{
+  CreateCliente(input: $ClienteInput) 
+  {
+    id 
+    nome
+  }
+}

@@ -1,0 +1,8 @@
+mutation cidade($CidadeUpdateInput: CidadeUpdateInput!, $ID: ID!)
+{
+  UpdateCidade(input: $CidadeUpdateInput, id: $ID) 
+  {
+    estado_id
+    nome
+  }
+}

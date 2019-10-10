@@ -1,0 +1,5 @@
+mutation Delete($ID: ID!){
+  DeleteCategoria(id: $ID) {
+    descricao
+  }
+}

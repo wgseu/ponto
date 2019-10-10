@@ -1,0 +1,7 @@
+mutation DeleteFornecedor( $ID: ID!)
+{
+  DeleteFornecedor(id: $ID) 
+  {
+		id
+  }
+}

@@ -1,0 +1,8 @@
+mutation estado($ID: ID!)
+{
+  DeleteEstado(id: $ID) 
+  {
+    id 
+    nome
+  }
+}

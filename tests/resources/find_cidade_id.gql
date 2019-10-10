@@ -1,0 +1,9 @@
+query ($ID: ID!){
+  cidades(filter: {id: $ID}) {
+    data{
+      id 
+    	nome
+    }
+
+  }
+}

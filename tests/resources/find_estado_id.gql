@@ -1,0 +1,8 @@
+query estado ($ID: ID!){
+  estados(filter: {id: $ID}) {
+    data{
+    	id 
+    	nome
+    }
+  }
+}

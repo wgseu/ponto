@@ -1,0 +1,8 @@
+query ($ID: ID!){
+  bairros(filter: {id: $ID}) {
+    data{
+      nome
+      id
+    }
+  }
+}

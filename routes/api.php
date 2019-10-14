@@ -2,7 +2,6 @@
 
 use Illuminate\Http\Request;
 
-use App\Http\Controllers\MailController;
 
 /*
 |--------------------------------------------------------------------------
@@ -14,7 +13,3 @@ use App\Http\Controllers\MailController;
 | is assigned the "api" middleware group. Enjoy building your API!
 |
 */
-
-Route::get('/active/{token}', function ($token) {
-    return MailController::activeUser($token);
-});

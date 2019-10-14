@@ -59,7 +59,7 @@ class CreateClienteMutation extends Mutation
         $cliente->save();
         $data = [
             'nome' => $cliente->nome,
-            'url' => 'http://localhost:8003/api/active/' . auth()->fromUser($cliente)
+            'url' => url('/active/' . auth()->fromUser($cliente))
         ];
         Mail::to($cliente->email)->send(new MailContact($data));
         return $cliente;

@@ -2,6 +2,8 @@
 
 use Illuminate\Http\Request;
 
+use App\Http\Controllers\MailController;
+
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -13,6 +15,6 @@ use Illuminate\Http\Request;
 |
 */
 
-Route::middleware('auth:api')->get('/user', function (Request $request) {
-    return $request->user();
+Route::get('/active/{token}', function ($token) {
+    return MailController::activeUser($token);
 });

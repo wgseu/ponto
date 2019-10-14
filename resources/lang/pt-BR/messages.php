@@ -563,4 +563,5 @@ return [
     'mozambique' => 'Moçambique',
     'mozambique_initials' => 'MOZ',
     'mozambique_code' => 'MZ',
+    'token_or_user_invalid' => 'Token inválido ou usuário não está cadastrado',
 ];

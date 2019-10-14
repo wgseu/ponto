@@ -27,11 +27,11 @@ declare(strict_types=1);
 
 namespace App\GraphQL\Mutations;
 
+use App\Mail\MailContact;
 use App\Models\Cliente;
-
 use GraphQL\Type\Definition\Type;
+use Illuminate\Support\Facades\Mail;
 use Rebing\GraphQL\Support\Mutation;
-use Illuminate\Support\Facades\Auth;
 use Rebing\GraphQL\Support\Facades\GraphQL;
 
 class CreateClienteMutation extends Mutation
@@ -57,6 +57,11 @@ class CreateClienteMutation extends Mutation
         $cliente = new Cliente();
         $cliente->fill($args['input']);
         $cliente->save();
+        $data = [
+            'nome' => $cliente->nome,
+            'url' => 'http://localhost:8003/api/active/' . auth()->fromUser($cliente)
+        ];
+        Mail::to($cliente->email)->send(new MailContact($data));
         return $cliente;
     }
 }

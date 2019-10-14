@@ -1,0 +1,6 @@
+mutation ($ClassificacaoInput: ClassificacaoInput!) {
+  CreateClassificacao(input: $ClassificacaoInput) {
+    id
+		descricao
+  }
+}

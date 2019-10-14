@@ -25,6 +25,8 @@ class DatabaseSeeder extends Seeder
             MoedaSeeder::class,
             ProdutoSeeder::class,
             PaisSeeder::class,
+            CreditoSeeder::class,
+            ClassificacaoSeeder::class,
         ]);
     }
 }

@@ -1,0 +1,8 @@
+mutation ($CreditoInput: CreditoInput!) {
+  CreateCredito(input: $CreditoInput) {
+    id
+    cliente_id
+    valor
+    detalhes
+  }
+}

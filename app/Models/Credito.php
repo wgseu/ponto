@@ -74,7 +74,42 @@ class Credito extends Model implements ValidateInterface
         return $this->belongsTo('App\Models\Cliente', 'cliente_id');
     }
 
+/* 
+    Regras:
+    Não pode cancelar um credito maior que o saldo de creditos.
+    O resgate de credito não pode ser superior ao saldo.
+    Impossível recuperar creditos cancelados decontados.
+ */
     public function validate()
     {
+        $errors = [];
+        $saldo = self::where('cliente_id', $this->cliente_id)
+                    ->where('cancelado', false)
+                    ->sum('valor');
+        if (!is_null($this->id) &&
+            $this->cancelado == false){
+            $oldValue = self::find($this->id);
+            $saldo -= $oldValue->valor;
+        }
+        if ($this->cancelado == false && 
+            $this->valor < 0 &&
+            ($saldo + $this->valor) < 0) {
+            $errors['clienteid'] = __('messages.cliente_cannot_transfer');
+        }
+        if ($this->cancelado == true &&
+            ($saldo - $this->valor) < 0) {
+            $errors['clienteid'] = __('messages.cancel_cannot_greater');
+        } 
+        if (!is_null($this->id)) {
+            $oldValue = self::find($this->id);
+            if ($oldValue->cancelado == true &&
+                $this->cancelado == false &&
+                $this->valor < 0) {
+                    $errors['clienteid'] = __('messages.cancel_cannot_greater');
+            }
+        }
+        if (!empty($errors)) {
+            throw ValidationException::withMessages($errors);
+        }
     }
 }

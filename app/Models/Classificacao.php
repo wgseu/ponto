@@ -69,7 +69,25 @@ class Classificacao extends Model implements ValidateInterface
         return $this->belongsTo('App\Models\Classificacao', 'classificacao_id');
     }
 
+    /**
+     * Regras:
+     * subclassificação não pode ser referencia para uma uma nova subclassificação.
+     */
     public function validate()
     {
+        $errors = [];
+        if (!is_null($this->classificacao_id)) {
+            $classificacaopai = self::find($this->classificacao_id);
+            if (!$classificacaopai->exists()) {
+                $errors['classificacaoid'] = __('messagens.classificacaopai_not_found');
+            } elseif (!is_null($classificacaopai->classificacao_id)) {
+                $errors['classificacaoid'] = __('messagens.classificacaopai_already');
+            } elseif ($classificacaopai->id == $this->id) {
+                $errors['classificacaoid'] = __('messagens.classificacaopai_not_found');
+            }
+        }
+        if (!empty($errors)) {
+            throw ValidationException::withMessages($errors);
+        }
     }
 }

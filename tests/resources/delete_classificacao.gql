@@ -1,0 +1,6 @@
+mutation ($ID: ID!) {
+  DeleteClassificacao(id: $ID) {
+    id
+    descricao
+  }
+}

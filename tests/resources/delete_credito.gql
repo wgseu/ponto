@@ -1,0 +1,7 @@
+mutation ($ID: ID!) {
+  DeleteCredito(id: $ID) {
+    id
+    cliente_id
+    valor
+  }
+}

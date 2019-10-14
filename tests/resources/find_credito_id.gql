@@ -1,0 +1,10 @@
+query {
+	creditos (filter: {cliente_id: 1, cancelado: false}){
+		data{
+			id
+			cliente_id
+			valor
+			cancelado
+		}
+	}
+}

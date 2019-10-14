@@ -9,7 +9,7 @@ use Faker\Generator as Faker;
 $factory->define(Credito::class, function (Faker $faker) {
     $cliente_id = factory(Cliente::class)->create();
     return [
-        'cliente_id' => $cliente_id->id,
+        'cliente_id' => 1,
         'valor' => 4.50,
         'detalhes' => $faker->name,
     ];

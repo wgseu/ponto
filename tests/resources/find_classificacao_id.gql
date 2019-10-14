@@ -1,0 +1,8 @@
+query {
+	classificacoes (filter: {id: 1}){
+		data{
+			id
+			descricao
+		}
+	}
+}

@@ -1,0 +1,8 @@
+mutation ($CreditoUpdateInput: CreditoUpdateInput!, $ID: ID!) {
+  UpdateCredito(input: $CreditoUpdateInput, id: $ID) {
+    id
+    cliente_id
+    valor
+    cancelado
+  }
+}

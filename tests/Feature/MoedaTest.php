@@ -9,12 +9,6 @@ use Tests\TestCase;
 class MoedaTest extends TestCase
 {
     use RefreshDatabase;
-    
-    public function create()
-    {
-        $moeda = factory(Moeda::class)->create();
-        return $moeda;
-    }
 
     public function testCreateMoeda()
     {
@@ -40,7 +34,7 @@ class MoedaTest extends TestCase
     public function testFindMoeda()
     {
         $headers = PrestadorTest::auth();
-        $moeda = $this->create();
+        $moeda = factory(Moeda::class)->create();
         $response = $this->graphfl('find_moeda_id',[
             "ID" => $moeda->id,
         ], $headers);
@@ -53,7 +47,7 @@ class MoedaTest extends TestCase
     public function testUpdateMoeda()
     {
         $headers = PrestadorTest::auth();
-        $moeda = $this->create(); 
+        $moeda = factory(Moeda::class)->create();
         $response = $this->graphfl('update_moeda', [
             "ID" => $moeda->id,
             "MoedaUpdateInput" => [
@@ -76,7 +70,7 @@ class MoedaTest extends TestCase
     public function testDeleteMoeda()
     {
         $headers = PrestadorTest::auth();
-        $moeda = $this->create();
+        $moeda = factory(Moeda::class)->create();
         $response = $this->graphfl('delete_moeda', [
             "ID" => $moeda->id
         ], $headers);

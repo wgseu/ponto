@@ -508,10 +508,16 @@ return [
     'contagem_functionality_name' => 'Contagens',
     'contagem_functionality_description' => 'Guarda a soma do estoque de cada produto por setor',
     'produto_already_packaged' => 'Produto pertence a um grupo',
+<<<<<<< Updated upstream
     'cliente_cannot_transfer' => 'A transferência não pode negativar os créditos',
     'cancel_cannot_greater' => 'O cancelamento não pode negativar os créditos',
     'classificacaopai_not_found' => 'Subclassificacao não encontrada',
     'classificacaopai_already' => 'Subclassificação inválida',
+=======
+    'moeda_invalid_format' => 'O formato da Moeda é inválido',
+    'moeda_invalid_divisao' => 'O metodo fracionado adotado é inválido',
+    'error_time_delivery' => 'O tempo minino de entrega não pode ser superior ao tempo maximo de entrega',
+>>>>>>> Stashed changes
     'pizza_pastas' => 'Pizzas e massas',
     'meals' => 'Refeições',
     'beer' => 'Cervejas',

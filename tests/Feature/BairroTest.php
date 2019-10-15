@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\Bairro;
+use App\Models\Cidade;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
@@ -12,28 +13,13 @@ class BairroTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function create()
-    {
-        $cidade = new CidadeTest();
-        $cid = $cidade->create();
-        $bairro = factory(Bairro::class)->create();
-        return $bairro;
-    }
-
-    public function biuld()
-    {
-        $cidade = new CidadeTest();
-        $cid = $cidade->create();
-        return $cid;
-    }
-
     public function testCreateBairro()
     {
         $headers = PrestadorTest::auth();
-        $cidade = self::biuld();
+        $cidade = factory(Cidade::class)->create();
         $bairro = $this->graphfl('create_bairro', [
             "BairroInput" => [
-                "cidade_id" => 1,
+                "cidade_id" => $cidade->id,
                 "nome"=> "Jardim Imperial",
                 "valor_entrega" => 14.9,
                 "disponivel" => true,
@@ -51,7 +37,7 @@ class BairroTest extends TestCase
     public function testFindBairro()
     {
         $headers = PrestadorTest::auth();
-        $bairro = $this->create();
+        $bairro = factory(Bairro::class)->create();
         $response = $this->graphfl('find_bairro_id',[
             "ID" => $bairro->id,
         ], $headers);
@@ -65,16 +51,12 @@ class BairroTest extends TestCase
     public function testUpdateBairro()
     {
         $headers = PrestadorTest::auth();
-        $cidade = self::biuld();
         $bairro = factory(Bairro::class)->create();
         $response = $this->graphfl('update_bairro', [
-            "ID" => $cidade->id,
+            "ID" => $bairro->id,
             "BairroUpdateInput" => [
-                "cidade_id" => 1,
                 "nome"=> "Jardim 51 Mundial das Palmeiras",
-                "valor_entrega" => 10,
-                "disponivel" => true,
-                "mapeado" => false, 
+                "valor_entrega" => 10.2,
               ]
         ], $headers);
         $bairro->refresh();
@@ -83,27 +65,15 @@ class BairroTest extends TestCase
             $response->json('data.UpdateBairro.nome')
         );
         $this->assertEquals(
-            $bairro->cidade_id,
-            $response->json('data.UpdateBairro.cidade_id')
-        );
-        $this->assertEquals(
             $bairro->valor_entrega,
             $response->json('data.UpdateBairro.valor_entrega')
-        );
-        $this->assertEquals(
-            $bairro->disponivel,
-            $response->json('data.UpdateBairro.disponivel')
-        );
-        $this->assertEquals(
-            0,
-            $response->json('data.UpdateBairro.mapeado')
         );
     }
     
     public function testDeleteBairro()
     {
         $headers = PrestadorTest::auth();
-        $bairro = $this->create();
+        $bairro = factory(Bairro::class)->create();
         $response = $this->graphfl('delete_bairro', [
             "ID" => $bairro->id
         ], $headers);
@@ -112,6 +82,5 @@ class BairroTest extends TestCase
             $response->json("data.DeleteBairro.id")
         );
     }
-
     
 }

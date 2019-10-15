@@ -80,6 +80,10 @@ class Categoria extends Model implements ValidateInterface
         return $this->belongsTo('App\Models\Categoria', 'categoria_id');
     }
 
+    /**
+     * Regras:
+     * subclassificação não pode ser referencia para uma uma nova subclassificação.
+     */
     public function validate()
     {
         $errors = [];
@@ -89,7 +93,7 @@ class Categoria extends Model implements ValidateInterface
                 $errors['categoriaid'] = __('messagens.categoriapai_not_found');
             } elseif (!is_null($categoriapai->categoria_id)) {
                 $errors['categoriaid'] = __('messagens.categoriapai_already');
-            } elseif ($categoriapai->id == $this->id) {
+            } elseif ($this->id == $this->categoria_id) {
                 $errors['categoriaid'] = __('messagens.categoriapai_same');
             }
         }

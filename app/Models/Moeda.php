@@ -70,7 +70,30 @@ class Moeda extends Model implements ValidateInterface
         'ativa' => false,
     ];
 
+        /**
+     * Regras:
+     * Se a moeda estiver ativa a conversao não pode ser nula,
+     * É obrigatório a presença de {value} em formato e não deve ser o unica caracteristica exemple R$ {value}
+     * É obrigatório conter um dos numeros da lista na divisao para definir a quantidade de casas decimais.
+     */
     public function validate()
     {
+        $errors= [];
+        $value = strpos($this->formato, '{value}');
+        $lista = [1,10,100,1000,10000];
+        if ($this->ativa == true) {
+            if (is_null($this->conversao)) {
+                $errors['conversao'] = __('messages.moeda_active_null_conversion');
+            }
+        }
+        if ($value == false || strlen($this->formato) <= 8){
+            $errors['formato'] = __('messages.moeda_invalid_format');
+        }
+        if (in_array($this->divisao, $lista) === false) {
+            $errors['divisao'] = __('messages.moeda_invalid_divisao');
+        }
+        if (!empty($errors)) {
+            throw ValidationException::withMessages($errors);
+        }
     }
 }

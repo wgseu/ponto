@@ -81,6 +81,11 @@ class Zona extends Model implements ValidateInterface
         return $this->belongsTo('App\Models\Bairro', 'bairro_id');
     }
 
+    /**
+     * Regras:
+     * Se não nulos o tempo de entrega minimo não pode ser superior ao tempo de entrega maximo;
+     * O valor adicional de entrega não pode ser negativo.
+     */
     public function validate()
     {
         $errors = [];

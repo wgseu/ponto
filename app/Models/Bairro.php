@@ -82,6 +82,12 @@ class Bairro extends Model implements ValidateInterface
         return $this->belongsTo('App\Models\Cidade', 'cidade_id');
     }
 
+
+    /**
+     * Regras:
+     * Se não nulos o tempo de entrega minimo não pode ser superior ao tempo de entrega maximo;
+     * O valor da entrega não pode ser negativo.
+     */
     public function validate()
     {
         $errors = [];

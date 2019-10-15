@@ -10,12 +10,6 @@ use App\Models\Unidade;
 class UnidadeTest extends TestCase
 {
     use RefreshDatabase;
-    
-    public function create()
-    {
-        $unidade = factory(Unidade::class)->create();
-        return $unidade;
-    }
 
     public function testCreateUnidade()
     {
@@ -36,7 +30,7 @@ class UnidadeTest extends TestCase
     public function testFindUnidade()
     {
         $headers = PrestadorTest::auth();
-        $unidade = $this->create();
+        $unidade = factory(Unidade::class)->create();
         $response = $this->graphfl('find_unidade_id',[
             "ID" => $unidade->id,
         ], $headers);
@@ -49,7 +43,7 @@ class UnidadeTest extends TestCase
     public function testUpdateUnidade()
     {
         $headers = PrestadorTest::auth();
-        $unidade = $this->create(); 
+        $unidade = factory(Unidade::class)->create(); 
         $response = $this->graphfl('update_unidade', [
             "ID" => $unidade->id,
             "UnidadeUpdateInput" => [
@@ -71,7 +65,7 @@ class UnidadeTest extends TestCase
     public function testDeleteUnidade()
     {
         $headers = PrestadorTest::auth();
-        $unidade = $this->create();
+        $unidade = factory(Unidade::class)->create();
         $response = $this->graphfl('delete_unidade', [
             "ID" => $unidade->id
         ], $headers);

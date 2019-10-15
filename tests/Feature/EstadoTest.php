@@ -13,30 +13,15 @@ class EstadoTest extends TestCase
 {
     use RefreshDatabase; 
 
-    public function create()
-    {
-        factory(Moeda::class)->create();
-        factory(Pais::class)->create();
-        $estado = factory(Estado::class)->create();
-        return $estado;
-    }
-
-    public function biuld()
-    {
-        factory(Moeda::class)->create();
-        $pais = factory(Pais::class)->create();
-        return $pais;
-    }
-
     public function testCreateEstado()
     {
         $headers = PrestadorTest::auth();
-        $pais = self::biuld();
+        $pais = factory(Pais::class)->create();
         $estado = $this->graphfl('create_estado', [
             "EstadoInput" => [
-              "pais_id" => $pais->id,
               "nome" => "Paraná",
               "uf" => "PR",
+              "pais_id" => $pais->id
             ]
         ], $headers);
         $this->assertEquals(
@@ -48,7 +33,7 @@ class EstadoTest extends TestCase
     public function testFindEstado()
     {
         $headers = PrestadorTest::auth();
-        $estado = $this->create();
+        $estado = factory(Estado::class)->create();
         $response = $this->graphfl('find_estado_id',[
             "ID" => $estado->id,
         ], $headers);
@@ -62,12 +47,10 @@ class EstadoTest extends TestCase
     public function testUpdateEstado()
     {
         $headers = PrestadorTest::auth();
-        $pais = self::biuld();
         $estado = factory(Estado::class)->create();
         $response = $this->graphfl('update_estado', [
             "ID" => $estado->id,
             "EstadoUpdateInput" => [
-                "pais_id" => $pais->id,
                 "nome" => "Paraná",
                 "uf" => "PR",
             ]
@@ -82,16 +65,12 @@ class EstadoTest extends TestCase
             $estado->uf,
             $response->json('data.UpdateEstado.uf')
         );
-        $this->assertEquals(
-            $estado->pais_id,
-            $response->json('data.UpdateEstado.pais_id')
-        );
     }
     
     public function testDeleteEstado()
     {
         $headers = PrestadorTest::auth();
-        $estado = $this->create();
+        $estado = factory(Estado::class)->create();
         $response = $this->graphfl('delete_estado', [
             "ID" => $estado->id
         ], $headers);

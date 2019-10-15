@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Models\Bairro;
 use App\Models\Zona;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
@@ -11,25 +12,10 @@ class ZonaTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function create()
-    {
-        $bairro = new BairroTest();
-        $bar = $bairro->create();
-        $zona = factory(Zona::class)->create();
-        return $zona;
-    }
-
-    public function biuld()
-    {
-        $bairro = new BairroTest();
-        $bar = $bairro->create();
-        return $bar;
-    }
-
-    public function testCreateBairro()
+    public function testCreateZona()
     {
         $headers = PrestadorTest::auth();
-        $bairro = self::biuld();
+        $bairro = factory(Bairro::class)->create();
         $zona = $this->graphfl('create_zona', [
             "ZonaInput" => [
                 "bairro_id" => $bairro->id,
@@ -44,10 +30,10 @@ class ZonaTest extends TestCase
         );
     }
 
-    public function testFindBairro()
+    public function testFindZona()
     {
         $headers = PrestadorTest::auth();
-        $zona = $this->create();
+        $zona = factory(Zona::class)->create();
         $response = $this->graphfl('find_zona_id',[
             "ID" => $zona->id,
         ], $headers);
@@ -58,15 +44,13 @@ class ZonaTest extends TestCase
         );
     }
 
-    public function testUpdateBairro()
+    public function testUpdateZona()
     {
         $headers = PrestadorTest::auth();
-        $bairro = self::biuld();
         $zona = factory(Zona::class)->create();
         $response = $this->graphfl('update_zona', [
-            "ID" => $bairro->id,
+            "ID" => $zona->id,
             "ZonaUpdateInput" => [
-                "bairro_id" => $zona->id,
                 "nome"=> "Area 51",
                 "adicional_entrega" => 20,
                 "disponivel" => true,
@@ -78,10 +62,6 @@ class ZonaTest extends TestCase
             $response->json('data.UpdateZona.nome')
         );
         $this->assertEquals(
-            $zona->bairro_id,
-            $response->json('data.UpdateZona.bairro_id')
-        );
-        $this->assertEquals(
             $zona->adicional_entrega,
             $response->json('data.UpdateZona.adicional_entrega')
         );
@@ -91,10 +71,10 @@ class ZonaTest extends TestCase
         );
     }
     
-    public function testDeleteBairro()
+    public function testDeleteZona()
     {
         $headers = PrestadorTest::auth();
-        $zona = $this->create();
+        $zona = factory(Zona::class)->create();
         $response = $this->graphfl('delete_zona', [
             "ID" => $zona->id
         ], $headers);

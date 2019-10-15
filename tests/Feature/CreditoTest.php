@@ -12,12 +12,6 @@ class CreditoTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function create()
-    {
-        $credito = factory(Credito::class)->create();
-        return $credito;
-    }
-
     public function testCreateCredito()
     {
         $headers = PrestadorTest::auth();
@@ -37,9 +31,9 @@ class CreditoTest extends TestCase
     public function testFindCredito()
     {
         $headers = PrestadorTest::auth();
-        $bairro = $this->create();
+        $credito = factory(Credito::class)->create();
         $response = $this->graphfl('find_credito_id',[
-            "ID" => $bairro->id,
+            "ID" => $credito->id,
         ], $headers);
 
         $this->assertEquals(

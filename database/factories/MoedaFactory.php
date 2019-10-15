@@ -12,6 +12,6 @@ $factory->define(Moeda::class, function (Faker $faker) {
         'simbolo' => $simbolo,
         'codigo' => $faker->unique()->word,
         'divisao' => 100,
-        'formato' => "$simbolo :value",
+        'formato' => "$simbolo {value}",
     ];
 });

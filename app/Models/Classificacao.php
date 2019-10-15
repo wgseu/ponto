@@ -82,7 +82,7 @@ class Classificacao extends Model implements ValidateInterface
                 $errors['classificacaoid'] = __('messagens.classificacaopai_not_found');
             } elseif (!is_null($classificacaopai->classificacao_id)) {
                 $errors['classificacaoid'] = __('messagens.classificacaopai_already');
-            } elseif ($classificacaopai->id == $this->id) {
+            } elseif ($this->id == $this->classificacao_id) {
                 $errors['classificacaoid'] = __('messagens.classificacaopai_not_found');
             }
         }

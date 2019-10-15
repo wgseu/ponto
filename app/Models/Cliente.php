@@ -24,12 +24,14 @@
  */
 namespace App\Models;
 
+use Exception;
+use App\Util\Validator;
 use App\Concerns\ModelEvents;
-use App\Interfaces\AuthorizableInterface;
 use Illuminate\Foundation\Auth\User;
 use App\Interfaces\ValidateInterface;
 use Tymon\JWTAuth\Contracts\JWTSubject;
 use Illuminate\Notifications\Notifiable;
+use App\Interfaces\AuthorizableInterface;
 
 /**
  * Informações de cliente físico ou jurídico. Clientes, empresas,
@@ -169,6 +171,19 @@ class Cliente extends User implements ValidateInterface, JWTSubject, Authorizabl
 
     public function validate()
     {
+        $errors = [];
+        if ($this->tipo == self::TIPO_FISICA) {
+            if (!Validator::checkCPF($this->cpf)) {
+                $errors['cpf'] = __('messages.cpf_invalid');
+            }
+        } else {
+            if (!Validator::checkCNPJ($this->cnpj)) {
+                $errors['cnpj'] = __('messages.cnpj_invalid');
+            }
+        }
+        if (!empty($errors)) {
+            throw new Exception($errors);
+        }
     }
 
     public function hasPermissionTo(string $ability)

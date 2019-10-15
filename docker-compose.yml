@@ -12,7 +12,7 @@ services:
         depends_on:
             - php
             - db
-            - node
+            - sync
     php:
         image: nanoninja/php-fpm:7.3.6
         restart: always
@@ -22,9 +22,10 @@ services:
             - "./:/var/www/html"
             - "/etc/passwd:/etc/passwd:ro"
             - "/etc/group:/etc/group:ro"
-    node:
+    sync:
         image: node:10
-        command: ["node", "resources/js/index.js"]
+        command: node resources/js/index.js
+        restart: always
         working_dir: /usr/src/app
         volumes:
             - "./:/usr/src/app"

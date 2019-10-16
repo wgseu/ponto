@@ -1,0 +1,8 @@
+query {
+  unidades {
+    data {
+      id
+    }
+    total
+  }
+}

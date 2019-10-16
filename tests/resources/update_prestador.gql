@@ -1,0 +1,5 @@
+mutation updatePrestador($id: ID!, $input: PrestadorUpdateInput!) {
+  UpdatePrestador(id: $id, input: $input) {
+    codigo
+  }
+}

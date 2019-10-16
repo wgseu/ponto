@@ -1,0 +1,6 @@
+mutation updateDispositivo($id: ID!, $input: DispositivoUpdateInput!) {
+  UpdateDispositivo(id: $id, input: $input) {
+    nome
+    serial
+  }
+}

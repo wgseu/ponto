@@ -1,0 +1,8 @@
+query {
+  caixas {
+    data {
+      id
+    }
+    total
+  }
+}

@@ -1,0 +1,5 @@
+mutation updateCartao($id: ID!, $input: CartaoUpdateInput!) {
+  UpdateCartao(id: $id, input: $input) {
+    bandeira
+  }
+}

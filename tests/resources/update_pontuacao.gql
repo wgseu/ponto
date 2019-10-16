@@ -1,0 +1,5 @@
+mutation updatePontuacao($id: ID!, $input: PontuacaoUpdateInput!) {
+  UpdatePontuacao(id: $id, input: $input) {
+    quantidade
+  }
+}

@@ -1,0 +1,5 @@
+mutation updateCozinha($id: ID!, $input: CozinhaUpdateInput!) {
+  UpdateCozinha(id: $id, input: $input) {
+    nome
+  }
+}

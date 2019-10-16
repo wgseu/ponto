@@ -1,0 +1,5 @@
+mutation updatePacote($id: ID!, $input: PacoteUpdateInput!) {
+  UpdatePacote(id: $id, input: $input) {
+    acrescimo
+  }
+}

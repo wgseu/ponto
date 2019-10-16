@@ -1,0 +1,6 @@
+mutation updateHorario($id: ID!, $input: HorarioUpdateInput!) {
+  UpdateHorario(id: $id, input: $input) {
+    inicio
+    fim
+  }
+}

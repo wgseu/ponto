@@ -1,0 +1,6 @@
+mutation createFornecedor($input: FornecedorInput!) {
+  CreateFornecedor(input: $input) {
+    id
+    empresa_id
+  }
+}

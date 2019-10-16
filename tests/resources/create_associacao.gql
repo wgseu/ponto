@@ -1,0 +1,19 @@
+mutation createAssociacao($input: AssociacaoInput!) {
+  CreateAssociacao(input: $input) {
+    id
+    integracao_id
+    codigo
+    cliente
+    chave
+    pedido
+    quantidade
+    servicos
+    produtos
+    descontos
+    pago
+    status
+    sincronizado
+    integrado
+    data_pedido
+  }
+}

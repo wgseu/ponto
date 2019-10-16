@@ -1,0 +1,7 @@
+mutation createDispositivo($input: DispositivoInput!) {
+  CreateDispositivo(input: $input) {
+    id
+    nome
+    serial
+  }
+}

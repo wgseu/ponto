@@ -1,0 +1,5 @@
+mutation ($id: ID!) {
+  DeleteFuncionalidade(id: $id) {
+    id
+  }
+}

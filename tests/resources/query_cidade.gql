@@ -1,0 +1,8 @@
+query {
+  cidades {
+    data {
+      id
+    }
+    total
+  }
+}

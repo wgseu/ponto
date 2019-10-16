@@ -1,0 +1,6 @@
+mutation updateLista($id: ID!, $input: ListaUpdateInput!) {
+  UpdateLista(id: $id, input: $input) {
+    descricao
+    data_viagem
+  }
+}

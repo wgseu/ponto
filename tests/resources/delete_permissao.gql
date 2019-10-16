@@ -1,0 +1,5 @@
+mutation ($id: ID!) {
+  DeletePermissao(id: $id) {
+    id
+  }
+}

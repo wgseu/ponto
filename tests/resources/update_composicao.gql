@@ -1,0 +1,5 @@
+mutation updateComposicao($id: ID!, $input: ComposicaoUpdateInput!) {
+  UpdateComposicao(id: $id, input: $input) {
+    quantidade
+  }
+}

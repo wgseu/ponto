@@ -1,0 +1,5 @@
+mutation updateSetor($id: ID!, $input: SetorUpdateInput!) {
+  UpdateSetor(id: $id, input: $input) {
+    nome
+  }
+}

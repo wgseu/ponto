@@ -1,0 +1,5 @@
+mutation ($id: ID!) {
+  Delete$[Table.norm](id: $id) {
+    id
+  }
+}

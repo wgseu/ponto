@@ -1,0 +1,4 @@
+mutation updateSistema($id: ID!, $input: SistemaUpdateInput!) {
+  UpdateSistema(id: $id, input: $input) {
+  }
+}

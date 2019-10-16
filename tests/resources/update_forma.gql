@@ -1,0 +1,6 @@
+mutation updateForma($id: ID!, $input: FormaUpdateInput!) {
+  UpdateForma(id: $id, input: $input) {
+    tipo
+    descricao
+  }
+}

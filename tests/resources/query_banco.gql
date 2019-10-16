@@ -1,0 +1,8 @@
+query {
+  bancos {
+    data {
+      id
+    }
+    total
+  }
+}

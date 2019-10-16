@@ -1,0 +1,7 @@
+mutation createPropriedade($input: PropriedadeInput!) {
+  CreatePropriedade(input: $input) {
+    id
+    grupo_id
+    nome
+  }
+}

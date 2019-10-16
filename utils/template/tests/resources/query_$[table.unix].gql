@@ -1,0 +1,8 @@
+query {
+  $[tAble.norm.plural] {
+    data {
+      id
+    }
+    total
+  }
+}

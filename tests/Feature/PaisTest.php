@@ -1,10 +1,31 @@
 <?php
-
+/**
+ * Copyright 2014 da MZ Software - MZ Desenvolvimento de Sistemas LTDA
+ *
+ * Este arquivo é parte do programa GrandChef - Sistema para Gerenciamento de Churrascarias, Bares e Restaurantes.
+ * O GrandChef é um software proprietário; você não pode redistribuí-lo e/ou modificá-lo.
+ * DISPOSIÇÕES GERAIS
+ * O cliente não deverá remover qualquer identificação do produto, avisos de direitos autorais,
+ * ou outros avisos ou restrições de propriedade do GrandChef.
+ *
+ * O cliente não deverá causar ou permitir a engenharia reversa, desmontagem,
+ * ou descompilação do GrandChef.
+ *
+ * PROPRIEDADE DOS DIREITOS AUTORAIS DO PROGRAMA
+ *
+ * GrandChef é a especialidade do desenvolvedor e seus
+ * licenciadores e é protegido por direitos autorais, segredos comerciais e outros direitos
+ * de leis de propriedade.
+ *
+ * O Cliente adquire apenas o direito de usar o software e não adquire qualquer outros
+ * direitos, expressos ou implícitos no GrandChef diferentes dos especificados nesta Licença.
+ *
+ * @author Equipe GrandChef <desenvolvimento@mzsw.com.br>
+ */
 namespace Tests\Feature;
 
-use App\Models\Pais;
 use Tests\TestCase;
-use Illuminate\Foundation\Testing\WithFaker;
+use App\Models\Pais;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
 class PaisTest extends TestCase
@@ -14,60 +35,61 @@ class PaisTest extends TestCase
     public function testCreatePais()
     {
         $headers = PrestadorTest::auth();
-        $pais_seed = factory(Pais::class)->create();
+        $seed_pais =  factory(Pais::class)->create();
         $response = $this->graphfl('create_pais', [
             'input' => [
                 'nome' => 'Korea',
                 'sigla' => 'KOR',
                 'codigo' => 'KO',
                 'idioma' => 'Koreano',
-                'moeda_id' => $pais_seed->moeda_id
+                'moeda_id' => $seed_pais->moeda_id,
             ]
         ], $headers);
 
-        $pais = Pais::findOrFail($response->json('data.CreatePais.id'));
-        $this->assertEquals('Korea', $pais->nome);
+        $found_pais = Pais::findOrFail($response->json('data.CreatePais.id'));
+        $this->assertEquals('Korea', $found_pais->nome);
+        $this->assertEquals('KOR', $found_pais->sigla);
+        $this->assertEquals('KO', $found_pais->codigo);
+        $this->assertEquals($seed_pais->moeda_id, $found_pais->moeda_id);
+        $this->assertEquals('Koreano', $found_pais->idioma);
     }
 
     public function testUpdatePais()
     {
         $headers = PrestadorTest::auth();
-        $old_pais = factory(Pais::class)->create();
+        $pais = factory(Pais::class)->create();
         $this->graphfl('update_pais', [
-            "input" => [
-                "nome" => "Russia",
-                "sigla" => "RUS",
-                "codigo" => "RS",
-                "idioma" => "ru-RU",
-            ],
-            "id" => $old_pais->id,
+            'id' => $pais->id,
+            'input' => [
+                'nome' => 'Russia',
+                'sigla' => 'RUS',
+                'codigo' => 'RS',
+                'idioma' => 'RU',
+            ]
         ], $headers);
-        $pais = $old_pais->fresh();
+        $pais->refresh();
         $this->assertEquals('Russia', $pais->nome);
+        $this->assertEquals('RUS', $pais->sigla);
+        $this->assertEquals('RS', $pais->codigo);
+        $this->assertEquals('RU', $pais->idioma);
     }
 
     public function testDeletePais()
     {
         $headers = PrestadorTest::auth();
         $pais_to_delete = factory(Pais::class)->create();
-        $this->graphfl('delete_pais', [
-            'id' => $pais_to_delete->id,
-        ], $headers);
-        $not_found_pais = $pais_to_delete->fresh();
-        $this->assertNull($not_found_pais);
+        $pais_to_delete = $this->graphfl('delete_pais', ['id' => $pais_to_delete->id], $headers);
+        $pais = Pais::find($pais_to_delete->id);
+        $this->assertNull($pais);
     }
 
     public function testQueryPais()
     {
-        for ($i = 0; $i < 10; $i++) {
+        for ($i=0; $i < 10; $i++) {
             factory(Pais::class)->create();
         }
-
         $headers = PrestadorTest::auth();
         $response = $this->graphfl('query_pais', [], $headers);
         $this->assertEquals(10, $response->json('data.paises.total'));
-        $this->assertIsArray($response->json('data.paises.data'));
-        $this->assertCount(10, $response->json('data.paises.data'));
     }
-
 }

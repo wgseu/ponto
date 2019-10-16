@@ -1,0 +1,9 @@
+mutation updateImposto($id: ID!, $input: ImpostoUpdateInput!) {
+  UpdateImposto(id: $id, input: $input) {
+    grupo
+    simples
+    substituicao
+    codigo
+    descricao
+  }
+}

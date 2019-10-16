@@ -1,0 +1,6 @@
+mutation updateEstoque($id: ID!, $input: EstoqueUpdateInput!) {
+  UpdateEstoque(id: $id, input: $input) {
+    quantidade
+    data_movimento
+  }
+}

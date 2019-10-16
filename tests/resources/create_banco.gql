@@ -1,0 +1,8 @@
+mutation createBanco($input: BancoInput!) {
+  CreateBanco(input: $input) {
+    id
+    numero
+    fantasia
+    razao_social
+  }
+}

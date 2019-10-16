@@ -1,0 +1,8 @@
+query {
+  cheques {
+    data {
+      id
+    }
+    total
+  }
+}

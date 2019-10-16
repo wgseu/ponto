@@ -1,0 +1,7 @@
+mutation createHorario($input: HorarioInput!) {
+  CreateHorario(input: $input) {
+    id
+    inicio
+    fim
+  }
+}

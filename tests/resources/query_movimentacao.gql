@@ -1,0 +1,8 @@
+query {
+  movimentacoes {
+    data {
+      id
+    }
+    total
+  }
+}

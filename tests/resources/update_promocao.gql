@@ -1,0 +1,7 @@
+mutation updatePromocao($id: ID!, $input: PromocaoUpdateInput!) {
+  UpdatePromocao(id: $id, input: $input) {
+    inicio
+    fim
+    valor
+  }
+}

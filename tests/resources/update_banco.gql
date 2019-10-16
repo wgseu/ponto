@@ -1,0 +1,7 @@
+mutation updateBanco($id: ID!, $input: BancoUpdateInput!) {
+  UpdateBanco(id: $id, input: $input) {
+    numero
+    fantasia
+    razao_social
+  }
+}

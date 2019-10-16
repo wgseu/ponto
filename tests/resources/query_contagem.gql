@@ -1,0 +1,8 @@
+query {
+  contagens {
+    data {
+      id
+    }
+    total
+  }
+}

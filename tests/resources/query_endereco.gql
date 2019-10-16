@@ -1,0 +1,8 @@
+query {
+  enderecos {
+    data {
+      id
+    }
+    total
+  }
+}

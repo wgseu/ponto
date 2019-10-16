@@ -1,0 +1,6 @@
+mutation createFormacao($input: FormacaoInput!) {
+  CreateFormacao(input: $input) {
+    id
+    item_id
+  }
+}

@@ -1,0 +1,8 @@
+mutation createCompra($input: CompraInput!) {
+  CreateCompra(input: $input) {
+    id
+    comprador_id
+    fornecedor_id
+    data_compra
+  }
+}

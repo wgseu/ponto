@@ -1,0 +1,9 @@
+mutation createPagamento($input: PagamentoInput!) {
+  CreatePagamento(input: $input) {
+    id
+    carteira_id
+    moeda_id
+    valor
+    lancado
+  }
+}

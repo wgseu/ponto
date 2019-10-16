@@ -1,0 +1,6 @@
+mutation updateOrigem($id: ID!, $input: OrigemUpdateInput!) {
+  UpdateOrigem(id: $id, input: $input) {
+    codigo
+    descricao
+  }
+}

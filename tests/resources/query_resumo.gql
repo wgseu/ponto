@@ -1,0 +1,8 @@
+query {
+  resumos {
+    data {
+      id
+    }
+    total
+  }
+}

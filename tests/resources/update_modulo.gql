@@ -1,0 +1,6 @@
+mutation updateModulo($id: ID!, $input: ModuloUpdateInput!) {
+  UpdateModulo(id: $id, input: $input) {
+    nome
+    descricao
+  }
+}

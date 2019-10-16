@@ -1,0 +1,8 @@
+mutation createJuncao($input: JuncaoInput!) {
+  CreateJuncao(input: $input) {
+    id
+    mesa_id
+    pedido_id
+    data_movimento
+  }
+}

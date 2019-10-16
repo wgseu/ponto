@@ -1,0 +1,8 @@
+mutation createPermissao($input: PermissaoInput!) {
+  CreatePermissao(input: $input) {
+    id
+    funcionalidade_id
+    nome
+    descricao
+  }
+}

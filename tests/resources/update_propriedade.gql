@@ -1,0 +1,5 @@
+mutation updatePropriedade($id: ID!, $input: PropriedadeUpdateInput!) {
+  UpdatePropriedade(id: $id, input: $input) {
+    nome
+  }
+}

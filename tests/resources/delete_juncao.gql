@@ -1,0 +1,5 @@
+mutation ($id: ID!) {
+  DeleteJuncao(id: $id) {
+    id
+  }
+}

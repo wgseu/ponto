@@ -1,0 +1,8 @@
+query {
+  integracoes {
+    data {
+      id
+    }
+    total
+  }
+}

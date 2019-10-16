@@ -1,0 +1,14 @@
+mutation updateNota($id: ID!, $input: NotaUpdateInput!) {
+  UpdateNota(id: $id, input: $input) {
+    tipo
+    ambiente
+    acao
+    estado
+    serie
+    numero_inicial
+    numero_final
+    sequencia
+    contingencia
+    data_emissao
+  }
+}

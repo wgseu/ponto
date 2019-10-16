@@ -1,0 +1,6 @@
+mutation updateLocalizacao($id: ID!, $input: LocalizacaoUpdateInput!) {
+  UpdateLocalizacao(id: $id, input: $input) {
+    logradouro
+    numero
+  }
+}

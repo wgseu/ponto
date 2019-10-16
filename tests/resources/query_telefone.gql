@@ -1,0 +1,8 @@
+query {
+  telefones {
+    data {
+      id
+    }
+    total
+  }
+}

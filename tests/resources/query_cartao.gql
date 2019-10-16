@@ -1,0 +1,8 @@
+query {
+  cartoes {
+    data {
+      id
+    }
+    total
+  }
+}

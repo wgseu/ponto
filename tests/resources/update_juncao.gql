@@ -1,0 +1,5 @@
+mutation updateJuncao($id: ID!, $input: JuncaoUpdateInput!) {
+  UpdateJuncao(id: $id, input: $input) {
+    data_movimento
+  }
+}

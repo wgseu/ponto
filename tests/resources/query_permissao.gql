@@ -1,0 +1,8 @@
+query {
+  permissoes {
+    data {
+      id
+    }
+    total
+  }
+}

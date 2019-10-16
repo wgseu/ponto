@@ -1,0 +1,9 @@
+mutation createLocalizacao($input: LocalizacaoInput!) {
+  CreateLocalizacao(input: $input) {
+    id
+    cliente_id
+    bairro_id
+    logradouro
+    numero
+  }
+}

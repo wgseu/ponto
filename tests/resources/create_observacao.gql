@@ -1,0 +1,7 @@
+mutation createObservacao($input: ObservacaoInput!) {
+  CreateObservacao(input: $input) {
+    id
+    produto_id
+    descricao
+  }
+}

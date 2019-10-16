@@ -1,0 +1,8 @@
+mutation updateConta($id: ID!, $input: ContaUpdateInput!) {
+  UpdateConta(id: $id, input: $input) {
+    descricao
+    valor
+    vencimento
+    data_emissao
+  }
+}

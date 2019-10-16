@@ -1,0 +1,8 @@
+mutation createLista($input: ListaInput!) {
+  CreateLista(input: $input) {
+    id
+    descricao
+    encarregado_id
+    data_viagem
+  }
+}

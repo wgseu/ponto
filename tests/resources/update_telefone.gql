@@ -1,0 +1,5 @@
+mutation updateTelefone($id: ID!, $input: TelefoneUpdateInput!) {
+  UpdateTelefone(id: $id, input: $input) {
+    numero
+  }
+}

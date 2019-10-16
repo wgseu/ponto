@@ -1,0 +1,6 @@
+mutation updatePagamento($id: ID!, $input: PagamentoUpdateInput!) {
+  UpdatePagamento(id: $id, input: $input) {
+    valor
+    lancado
+  }
+}

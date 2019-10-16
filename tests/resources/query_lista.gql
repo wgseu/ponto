@@ -1,0 +1,8 @@
+query {
+  listas {
+    data {
+      id
+    }
+    total
+  }
+}

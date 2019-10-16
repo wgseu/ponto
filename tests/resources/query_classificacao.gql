@@ -1,0 +1,8 @@
+query {
+  classificacoes {
+    data {
+      id
+    }
+    total
+  }
+}

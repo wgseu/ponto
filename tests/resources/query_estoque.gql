@@ -1,0 +1,8 @@
+query {
+  estoques {
+    data {
+      id
+    }
+    total
+  }
+}

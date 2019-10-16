@@ -1,0 +1,7 @@
+mutation createOrigem($input: OrigemInput!) {
+  CreateOrigem(input: $input) {
+    id
+    codigo
+    descricao
+  }
+}

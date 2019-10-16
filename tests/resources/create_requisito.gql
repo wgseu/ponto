@@ -1,0 +1,7 @@
+mutation createRequisito($input: RequisitoInput!) {
+  CreateRequisito(input: $input) {
+    id
+    lista_id
+    produto_id
+  }
+}

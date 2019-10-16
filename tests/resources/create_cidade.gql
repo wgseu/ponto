@@ -1,0 +1,7 @@
+mutation createCidade($input: CidadeInput!) {
+  CreateCidade(input: $input) {
+    id
+    estado_id
+    nome
+  }
+}

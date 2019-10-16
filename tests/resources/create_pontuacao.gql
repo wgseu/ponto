@@ -1,0 +1,7 @@
+mutation createPontuacao($input: PontuacaoInput!) {
+  CreatePontuacao(input: $input) {
+    id
+    promocao_id
+    quantidade
+  }
+}

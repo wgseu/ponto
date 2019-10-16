@@ -1,0 +1,8 @@
+query {
+  acessos {
+    data {
+      id
+    }
+    total
+  }
+}

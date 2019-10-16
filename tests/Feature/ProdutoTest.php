@@ -1,71 +1,90 @@
 <?php
-
+/**
+ * Copyright 2014 da MZ Software - MZ Desenvolvimento de Sistemas LTDA
+ *
+ * Este arquivo é parte do programa GrandChef - Sistema para Gerenciamento de Churrascarias, Bares e Restaurantes.
+ * O GrandChef é um software proprietário; você não pode redistribuí-lo e/ou modificá-lo.
+ * DISPOSIÇÕES GERAIS
+ * O cliente não deverá remover qualquer identificação do produto, avisos de direitos autorais,
+ * ou outros avisos ou restrições de propriedade do GrandChef.
+ *
+ * O cliente não deverá causar ou permitir a engenharia reversa, desmontagem,
+ * ou descompilação do GrandChef.
+ *
+ * PROPRIEDADE DOS DIREITOS AUTORAIS DO PROGRAMA
+ *
+ * GrandChef é a especialidade do desenvolvedor e seus
+ * licenciadores e é protegido por direitos autorais, segredos comerciais e outros direitos
+ * de leis de propriedade.
+ *
+ * O Cliente adquire apenas o direito de usar o software e não adquire qualquer outros
+ * direitos, expressos ou implícitos no GrandChef diferentes dos especificados nesta Licença.
+ *
+ * @author Equipe GrandChef <desenvolvimento@mzsw.com.br>
+ */
 namespace Tests\Feature;
 
-use App\Models\Produto;
 use Tests\TestCase;
+use App\Models\Produto;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
 class ProdutoTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function testCreateProduct()
+    public function testCreateProduto()
     {
         $headers = PrestadorTest::auth();
-        $seed_product = factory(Produto::class)->create();
-        $response = $this->graphfl('create_product', [
-            "input" => [
-                "codigo" => 14,
-                "categoria_id" => $seed_product->categoria_id,
-                "unidade_id" => $seed_product->unidade_id,
-                "descricao" => 'Pepsi',
-                "preco_venda" => 3.5
+        $seed_produto =  factory(Produto::class)->create();
+        $response = $this->graphfl('create_produto', [
+            'input' => [
+                'codigo' => 'abc123',
+                'categoria_id' => $seed_produto->categoria_id,
+                'unidade_id' => $seed_produto->unidade_id,
+                'descricao' => 'Pepsi',
             ]
         ], $headers);
-        $found_product = Produto::findOrFail($response->json("data.CreateProduto.id"));
-        $this->assertEquals(14, $found_product->codigo);
-        $this->assertEquals('Pepsi', $found_product->descricao);
-        $this->assertEquals(3.5, $found_product->preco_venda);
+
+        $found_produto = Produto::findOrFail($response->json('data.CreateProduto.id'));
+        $this->assertEquals('abc123', $found_produto->codigo);
+        $this->assertEquals($seed_produto->categoria_id, $found_produto->categoria_id);
+        $this->assertEquals($seed_produto->unidade_id, $found_produto->unidade_id);
+        $this->assertEquals('Pepsi', $found_produto->descricao);
     }
 
-    public function testUpdateProduct()
+    public function testUpdateProduto()
     {
         $headers = PrestadorTest::auth();
-        $old_produto = factory(Produto::class)->create();
-        $produto = $this->graphfl('update_product', [
-            "id" => $old_produto->id,
-            "input" => [
-                "descricao" => "Vinho",
+        $produto = factory(Produto::class)->create();
+        $this->graphfl('update_produto', [
+            'id' => $produto->id,
+            'input' => [
+                'codigo' => '111ddd',
+                'descricao' => 'Coca Cola',
             ]
         ], $headers);
-        $old_produto->refresh();
-        $this->assertEquals(
-            $produto->json("data.UpdateProduto.descricao"),
-            $old_produto->descricao
-        );
+        $produto->refresh();
+        $this->assertEquals('111ddd', $produto->codigo);
+        $this->assertEquals('Coca Cola', $produto->descricao);
     }
 
-    public function testDeleteProduct()
+    public function testDeleteProduto()
     {
         $headers = PrestadorTest::auth();
         $produto_to_delete = factory(Produto::class)->create();
-        $this->graphfl('delete_product', [
-            'id' => $produto_to_delete->id,
-        ], $headers);
+        $produto_to_delete = $this->graphfl('delete_produto', ['id' => $produto_to_delete->id], $headers);
         $produto_to_delete->refresh();
         $this->assertTrue($produto_to_delete->trashed());
         $this->assertNotNull($produto_to_delete->data_arquivado);
     }
-    
-    public function testeQueryProduct()
+
+    public function testQueryProduto()
     {
         for ($i=0; $i < 10; $i++) {
             factory(Produto::class)->create();
         }
-
         $headers = PrestadorTest::auth();
-        $response = $this->graphfl('query_products', [], $headers);
+        $response = $this->graphfl('query_produto', [], $headers);
         $this->assertEquals(10, $response->json('data.produtos.total'));
     }
 }

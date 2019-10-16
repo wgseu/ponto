@@ -1,0 +1,10 @@
+mutation updateCupom($id: ID!, $input: CupomUpdateInput!) {
+  UpdateCupom(id: $id, input: $input) {
+    codigo
+    quantidade
+    tipo_desconto
+    incluir_servicos
+    validade
+    data_registro
+  }
+}

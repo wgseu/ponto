@@ -1,0 +1,6 @@
+mutation updateCredito($id: ID!, $input: CreditoUpdateInput!) {
+  UpdateCredito(id: $id, input: $input) {
+    valor
+    detalhes
+  }
+}

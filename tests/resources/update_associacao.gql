@@ -1,0 +1,17 @@
+mutation updateAssociacao($id: ID!, $input: AssociacaoUpdateInput!) {
+  UpdateAssociacao(id: $id, input: $input) {
+    codigo
+    cliente
+    chave
+    pedido
+    quantidade
+    servicos
+    produtos
+    descontos
+    pago
+    status
+    sincronizado
+    integrado
+    data_pedido
+  }
+}

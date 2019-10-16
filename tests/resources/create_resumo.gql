@@ -1,0 +1,8 @@
+mutation createResumo($input: ResumoInput!) {
+  CreateResumo(input: $input) {
+    id
+    movimentacao_id
+    forma_id
+    valor
+  }
+}

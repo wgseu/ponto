@@ -4,6 +4,7 @@
 
 use App\Models\Composicao;
 use App\Models\Produto;
+use Illuminate\Support\Carbon;
 use Faker\Generator as Faker;
 
 $factory->define(Composicao::class, function (Faker $faker) {

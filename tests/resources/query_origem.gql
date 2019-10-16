@@ -1,0 +1,8 @@
+query {
+  origens {
+    data {
+      id
+    }
+    total
+  }
+}

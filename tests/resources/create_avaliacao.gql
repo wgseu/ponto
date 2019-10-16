@@ -1,0 +1,8 @@
+mutation createAvaliacao($input: AvaliacaoInput!) {
+  CreateAvaliacao(input: $input) {
+    id
+    metrica_id
+    estrelas
+    data_avaliacao
+  }
+}

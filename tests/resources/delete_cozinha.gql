@@ -1,0 +1,5 @@
+mutation ($id: ID!) {
+  DeleteCozinha(id: $id) {
+    id
+  }
+}

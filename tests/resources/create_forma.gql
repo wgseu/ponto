@@ -1,0 +1,8 @@
+mutation createForma($input: FormaInput!) {
+  CreateForma(input: $input) {
+    id
+    tipo
+    carteira_id
+    descricao
+  }
+}

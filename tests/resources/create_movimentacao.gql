@@ -1,0 +1,9 @@
+mutation createMovimentacao($input: MovimentacaoInput!) {
+  CreateMovimentacao(input: $input) {
+    id
+    sessao_id
+    caixa_id
+    iniciador_id
+    data_abertura
+  }
+}

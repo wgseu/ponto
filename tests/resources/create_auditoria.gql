@@ -1,0 +1,11 @@
+mutation createAuditoria($input: AuditoriaInput!) {
+  CreateAuditoria(input: $input) {
+    id
+    prestador_id
+    autorizador_id
+    tipo
+    prioridade
+    descricao
+    data_registro
+  }
+}

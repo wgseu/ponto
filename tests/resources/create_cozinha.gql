@@ -1,0 +1,6 @@
+mutation createCozinha($input: CozinhaInput!) {
+  CreateCozinha(input: $input) {
+    id
+    nome
+  }
+}

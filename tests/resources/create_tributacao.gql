@@ -1,0 +1,9 @@
+mutation createTributacao($input: TributacaoInput!) {
+  CreateTributacao(input: $input) {
+    id
+    ncm
+    origem_id
+    operacao_id
+    imposto_id
+  }
+}

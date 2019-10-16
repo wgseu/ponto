@@ -1,0 +1,8 @@
+mutation createMetrica($input: MetricaInput!) {
+  CreateMetrica(input: $input) {
+    id
+    nome
+    tipo
+    quantidade
+  }
+}

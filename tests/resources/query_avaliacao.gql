@@ -1,0 +1,8 @@
+query {
+  avaliacoes {
+    data {
+      id
+    }
+    total
+  }
+}

@@ -1,0 +1,7 @@
+mutation updateMetrica($id: ID!, $input: MetricaUpdateInput!) {
+  UpdateMetrica(id: $id, input: $input) {
+    nome
+    tipo
+    quantidade
+  }
+}

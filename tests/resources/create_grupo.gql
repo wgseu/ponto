@@ -1,0 +1,8 @@
+mutation createGrupo($input: GrupoInput!) {
+  CreateGrupo(input: $input) {
+    id
+    produto_id
+    nome
+    descricao
+  }
+}

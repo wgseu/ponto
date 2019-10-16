@@ -1,0 +1,8 @@
+query {
+  setores {
+    data {
+      id
+    }
+    total
+  }
+}

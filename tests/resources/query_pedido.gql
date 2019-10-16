@@ -1,0 +1,8 @@
+query {
+  pedidos {
+    data {
+      id
+    }
+    total
+  }
+}

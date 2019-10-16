@@ -1,0 +1,5 @@
+mutation ($id: ID!) {
+  DeleteComposicao(id: $id) {
+    id
+  }
+}

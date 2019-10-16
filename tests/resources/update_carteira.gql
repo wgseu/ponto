@@ -1,0 +1,6 @@
+mutation updateCarteira($id: ID!, $input: CarteiraUpdateInput!) {
+  UpdateCarteira(id: $id, input: $input) {
+    tipo
+    descricao
+  }
+}

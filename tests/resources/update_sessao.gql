@@ -1,0 +1,5 @@
+mutation updateSessao($id: ID!, $input: SessaoUpdateInput!) {
+  UpdateSessao(id: $id, input: $input) {
+    data_inicio
+  }
+}

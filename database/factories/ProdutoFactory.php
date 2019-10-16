@@ -11,7 +11,7 @@ $factory->define(Produto::class, function (Faker $faker) {
     $categoria_id = factory(Categoria::class)->create();
     $unidade_id = factory(Unidade::class)->create();
     return [
-        'codigo' => $faker->unique()->numberBetween(1, 99999999),
+        'codigo' => $faker->unique()->name,
         'categoria_id' => $categoria_id->id,
         'unidade_id' => $unidade_id->id,
         'descricao' => $faker->unique()->name,

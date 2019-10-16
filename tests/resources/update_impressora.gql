@@ -1,0 +1,6 @@
+mutation updateImpressora($id: ID!, $input: ImpressoraUpdateInput!) {
+  UpdateImpressora(id: $id, input: $input) {
+    nome
+    modelo
+  }
+}

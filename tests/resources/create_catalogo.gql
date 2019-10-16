@@ -1,0 +1,8 @@
+mutation createCatalogo($input: CatalogoInput!) {
+  CreateCatalogo(input: $input) {
+    id
+    produto_id
+    fornecedor_id
+    preco_compra
+  }
+}

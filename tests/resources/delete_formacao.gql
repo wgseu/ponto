@@ -1,0 +1,5 @@
+mutation ($id: ID!) {
+  DeleteFormacao(id: $id) {
+    id
+  }
+}

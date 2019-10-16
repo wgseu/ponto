@@ -1,0 +1,8 @@
+query {
+  funcoes {
+    data {
+      id
+    }
+    total
+  }
+}

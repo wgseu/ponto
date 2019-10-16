@@ -1,0 +1,5 @@
+mutation updateObservacao($id: ID!, $input: ObservacaoUpdateInput!) {
+  UpdateObservacao(id: $id, input: $input) {
+    descricao
+  }
+}

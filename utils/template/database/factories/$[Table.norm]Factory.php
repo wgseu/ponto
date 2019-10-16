@@ -24,7 +24,9 @@ $[field.end]
 $[field.end]
     return [
 $[field.each(all)]
-$[field.if(primary|null|info)]
+$[field.if(primary|null|default)]
+$[field.else.if(enum)]
+        '$[field]' => $[field.each(option)]$[field.if(first)]$[Table.norm]::$[FIELD.unix]_$[FIELD.option.norm]$[field.end]$[field.end],
 $[field.else.if(reference)]
         '$[field]' => $$[field.unix]->id,
 $[field.else.if(date)]
@@ -46,8 +48,6 @@ $[field.else.if(blob)]
         '$[field]' => 0,
 $[field.else.if(boolean)]
         '$[field]' => false,
-$[field.else.if(enum)]
-        '$[field]' => $[field.each(option)]$[field.if(first)]$[Table.norm]::$[FIELD.unix]_$[FIELD.option.norm]$[field.end]$[field.end],
 $[field.else]
         '$[field]' => $faker->$[field.if(unique)]unique()->$[field.end]name,
 $[field.end]

@@ -1,0 +1,9 @@
+mutation updateCheque($id: ID!, $input: ChequeUpdateInput!) {
+  UpdateCheque(id: $id, input: $input) {
+    agencia
+    conta
+    numero
+    valor
+    vencimento
+  }
+}

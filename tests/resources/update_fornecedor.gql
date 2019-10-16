@@ -1,0 +1,4 @@
+mutation updateFornecedor($id: ID!, $input: FornecedorUpdateInput!) {
+  UpdateFornecedor(id: $id, input: $input) {
+  }
+}

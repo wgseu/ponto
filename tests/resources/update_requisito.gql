@@ -1,0 +1,4 @@
+mutation updateRequisito($id: ID!, $input: RequisitoUpdateInput!) {
+  UpdateRequisito(id: $id, input: $input) {
+  }
+}

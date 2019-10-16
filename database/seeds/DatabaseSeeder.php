@@ -27,6 +27,8 @@ class DatabaseSeeder extends Seeder
             PaisSeeder::class,
             CreditoSeeder::class,
             ClassificacaoSeeder::class,
+            BancoSeeder::class,
+            ChequeSeeder::class,
         ]);
     }
 }

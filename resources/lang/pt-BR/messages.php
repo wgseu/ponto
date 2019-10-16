@@ -508,16 +508,11 @@ return [
     'contagem_functionality_name' => 'Contagens',
     'contagem_functionality_description' => 'Guarda a soma do estoque de cada produto por setor',
     'produto_already_packaged' => 'Produto pertence a um grupo',
-<<<<<<< Updated upstream
-    'cliente_cannot_transfer' => 'A transferência não pode negativar os créditos',
-    'cancel_cannot_greater' => 'O cancelamento não pode negativar os créditos',
     'classificacaopai_not_found' => 'Subclassificacao não encontrada',
     'classificacaopai_already' => 'Subclassificação inválida',
-=======
     'moeda_invalid_format' => 'O formato da Moeda é inválido',
     'moeda_invalid_divisao' => 'O metodo fracionado adotado é inválido',
     'error_time_delivery' => 'O tempo minino de entrega não pode ser superior ao tempo maximo de entrega',
->>>>>>> Stashed changes
     'pizza_pastas' => 'Pizzas e massas',
     'meals' => 'Refeições',
     'beer' => 'Cervejas',
@@ -573,4 +568,16 @@ return [
     'mozambique' => 'Moçambique',
     'mozambique_initials' => 'MOZ',
     'mozambique_code' => 'MZ',
+    'token_or_user_invalid' => 'Token inválido ou usuário não está cadastrado',
+    'value_negative' => 'O valor informado não pode ser negativo',
+    'invalid_expiration' => 'A data de Vencimento não pode ser menor que a data de cadastro',
+    'duplicate_cheque' => 'Cheque já esta cadastrado',
+    'cliente_cannot_transfer' => 'A transferência não pode negativar os créditos',
+    'cancel_cannot_greater' => 'O cancelamento não pode negativar os créditos',
+    'cancel_cannot_update' => 'Depois de cancelado não se pode alterar',
+    'cancel_cannot_create' => 'Não pode criar um item já cancelado',
+    'saldo_insufficient' => 'Créditos insuficiente',
+    'cannot_transfer_value_negative' => 'Não é possível transferir um abatimento',
+    'saldo_transfer_insufficient' => 'A trasnferencia não pode negativar os créditos',
+
 ];

@@ -87,7 +87,25 @@ class Cheque extends Model implements ValidateInterface
         return $this->belongsTo('App\Models\Banco', 'banco_id');
     }
 
+    /**
+     * Regras:
+     * O cheque não pode ter a mesma agencia conta e numero;
+     * O valor do cheque não pode ser negativo.
+     */
     public function validate()
     {
+        $errors = [];
+        $cheque = self::where('numero', $this->numero)
+                        ->where('agencia', $this->agencia)
+                        ->where('conta', $this->conta);
+        if ($cheque->exists()){
+            $errors['numero'] = __('messages.duplicate_cheque');
+        }
+        if ($this->valor < 0) {
+            $errors['valor'] = __('messages.value_negative');
+        } 
+        if (!empty($errors)) {
+            throw ValidationException::withMessages($errors);
+        }
     }
 }

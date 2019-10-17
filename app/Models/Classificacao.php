@@ -72,6 +72,7 @@ class Classificacao extends Model implements ValidateInterface
     /**
      * Regras:
      * subclassificação não pode ser referencia para uma uma nova subclassificação.
+     * Depois de usada com referência uma Classificação não pode alterar sua subclassificação.
      */
     public function validate()
     {
@@ -83,7 +84,14 @@ class Classificacao extends Model implements ValidateInterface
             } elseif (!is_null($classificacaopai->classificacao_id)) {
                 $errors['classificacaoid'] = __('messagens.classificacaopai_already');
             } elseif ($this->id == $this->classificacao_id) {
-                $errors['classificacaoid'] = __('messagens.classificacaopai_not_found');
+                $errors['classificacaoid'] = __('messagens.classificacaopai_some');
+            }
+        }
+        if (!is_null($this->id)) {
+            $classificacao = self::where('classificacao_id', $this->id);
+            $oldClassificacao = self::find($this->id);
+            if ($classificacao->exists() && $oldClassificacao->classificacao_id != $this->classificacao_id){
+                $errors['classificacaoid'] = __('messagens.classificacao_invalid_update');
             }
         }
         if (!empty($errors)) {

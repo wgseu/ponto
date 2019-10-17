@@ -89,17 +89,34 @@ class Cheque extends Model implements ValidateInterface
 
     /**
      * Regras:
-     * O cheque não pode ter a mesma agencia conta e numero;
+     * O cheque não pode ter a mesma agencia conta e numero de outro cheque a menos que ele esteje cancelado;
+     * O cheque não pode ser criado já cancelado;
+     * O cheque não pode ser alterado depois de recolhido;
+     * O cheque não pode ser alterado depois de cancelado;
      * O valor do cheque não pode ser negativo.
      */
     public function validate()
     {
         $errors = [];
-        $cheque = self::where('numero', $this->numero)
-                        ->where('agencia', $this->agencia)
-                        ->where('conta', $this->conta);
-        if ($cheque->exists()){
-            $errors['numero'] = __('messages.duplicate_cheque');
+        $oldCheque = self::find($this->id);
+        if (is_null($this->id)) {
+            $cheque = self::where('numero', $this->numero)
+                ->where('agencia', $this->agencia)
+                ->where('conta', $this->conta)
+                ->where('cancelado', false);
+            if ($cheque->exists()) {
+                $errors['numero'] = __('messages.duplicate_cheque');
+            }
+            if ($this->cancelado) {
+                $errors['cancelado'] = __('messages.new_canceled');
+            }
+        } else {
+            if (!is_null($oldCheque->recolhimento)) {
+                $errors['recolhimento'] = __('messages.recolhido_cannot_update');
+            } 
+            if ($oldCheque->cancelado) {
+                $errors['cancelado'] = __('messages.cancel_cannot_update');
+            }
         }
         if ($this->valor < 0) {
             $errors['valor'] = __('messages.value_negative');

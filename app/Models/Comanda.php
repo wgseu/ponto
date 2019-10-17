@@ -69,7 +69,25 @@ class Comanda extends Model implements ValidateInterface
         'ativa' => true,
     ];
 
+        /**
+     * Regras:
+     * Uma comanda não pode ser desativada se ja estiver agrupada a algum pedido,
+     * Não é possível criar uma comanda inativa.
+     */
     public function validate()
     {
+        $old_comanda = self::find($this->id);
+        if (!is_null($this->id) && $old_comanda->ativa && !$this->ativa) {
+            $pedido = Pedido::where('comanda_id', $this->id);
+            if ($pedido->exists()) {
+                $errors['ativa'] = __('messages.comanda_ativa_open');
+            }
+        }
+        if (is_null($this->id) && !$this->ativa) {
+            $errors['ativa'] = __('messages.comanda_inativa_invalid');
+        }
+        if (!empty($errors)) {
+            throw new ValidationException($errors);
+        }
     }
 }

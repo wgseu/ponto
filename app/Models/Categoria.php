@@ -82,7 +82,8 @@ class Categoria extends Model implements ValidateInterface
 
     /**
      * Regras:
-     * subclassificação não pode ser referencia para uma uma nova subclassificação.
+     * subcategoria não pode ser referencia para uma uma nova subcategoria.
+     * Depois de usada como referencia a categoria não pode alterar sua subcategoria.
      */
     public function validate()
     {
@@ -94,7 +95,14 @@ class Categoria extends Model implements ValidateInterface
             } elseif (!is_null($categoriapai->categoria_id)) {
                 $errors['categoriaid'] = __('messagens.categoriapai_already');
             } elseif ($this->id == $this->categoria_id) {
-                $errors['categoriaid'] = __('messagens.categoriapai_same');
+                $errors['categoriaid'] = __('messagens.categoriapai_some');
+            }
+        }
+        if (!is_null($this->id)) {
+            $categoria = self::where('categoria_id', $this->id);
+            $oldCategoria = self::find($this->id);
+            if ($categoria->exists() && $oldCategoria->categoria_id != $this->categoria_id){
+                $errors['categoriaid'] = __('messagens.categoria_invalid_update');
             }
         }
         if (!empty($errors)) {

@@ -1,0 +1,8 @@
+query {
+  estados {
+    data {
+      id
+    }
+    total
+  }
+}

@@ -1,0 +1,6 @@
+mutation createIntegracao($input: IntegracaoInput!) {
+  CreateIntegracao(input: $input) {
+    id
+    nome
+  }
+}

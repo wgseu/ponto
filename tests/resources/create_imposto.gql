@@ -1,0 +1,10 @@
+mutation createImposto($input: ImpostoInput!) {
+  CreateImposto(input: $input) {
+    id
+    grupo
+    simples
+    substituicao
+    codigo
+    descricao
+  }
+}

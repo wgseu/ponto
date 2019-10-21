@@ -1,0 +1,11 @@
+mutation createConta($input: ContaInput!) {
+  CreateConta(input: $input) {
+    id
+    classificacao_id
+    funcionario_id
+    descricao
+    valor
+    vencimento
+    data_emissao
+  }
+}

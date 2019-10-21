@@ -1,0 +1,8 @@
+query {
+  fornecedores {
+    data {
+      id
+    }
+    total
+  }
+}

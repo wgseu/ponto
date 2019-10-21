@@ -1,0 +1,8 @@
+query {
+  compras {
+    data {
+      id
+    }
+    total
+  }
+}

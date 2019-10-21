@@ -1,0 +1,5 @@
+mutation ($id: ID!) {
+  DeleteHorario(id: $id) {
+    id
+  }
+}

@@ -1,0 +1,9 @@
+mutation createImpressora($input: ImpressoraInput!) {
+  CreateImpressora(input: $input) {
+    id
+    dispositivo_id
+    setor_id
+    nome
+    modelo
+  }
+}

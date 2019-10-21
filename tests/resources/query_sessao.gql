@@ -1,0 +1,8 @@
+query {
+  sessoes {
+    data {
+      id
+    }
+    total
+  }
+}

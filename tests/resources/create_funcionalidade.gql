@@ -1,0 +1,7 @@
+mutation createFuncionalidade($input: FuncionalidadeInput!) {
+  CreateFuncionalidade(input: $input) {
+    id
+    nome
+    descricao
+  }
+}

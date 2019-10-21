@@ -1,0 +1,8 @@
+query {
+  empresas {
+    data {
+      id
+    }
+    total
+  }
+}

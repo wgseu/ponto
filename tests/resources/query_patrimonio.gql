@@ -1,0 +1,8 @@
+query {
+  patrimonios {
+    data {
+      id
+    }
+    total
+  }
+}

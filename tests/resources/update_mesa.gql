@@ -1,0 +1,5 @@
+mutation updateMesa($id: ID!, $input: MesaUpdateInput!) {
+  UpdateMesa(id: $id, input: $input) {
+    numero
+  }
+}

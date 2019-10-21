@@ -1,0 +1,8 @@
+query {
+  moedas {
+    data {
+      id
+    }
+    total
+  }
+}

@@ -1,0 +1,7 @@
+mutation createComanda($input: ComandaInput!) {
+  CreateComanda(input: $input) {
+    id
+    numero
+    nome
+  }
+}

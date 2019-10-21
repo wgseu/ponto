@@ -1,0 +1,8 @@
+query {
+  pagamentos {
+    data {
+      id
+    }
+    total
+  }
+}

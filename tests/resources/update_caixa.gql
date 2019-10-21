@@ -1,0 +1,5 @@
+mutation updateCaixa($id: ID!, $input: CaixaUpdateInput!) {
+  UpdateCaixa(id: $id, input: $input) {
+    descricao
+  }
+}

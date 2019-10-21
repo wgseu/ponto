@@ -20,6 +20,7 @@ $factory->define(Associacao::class, function (Faker $faker) {
         'produtos' => 4.50,
         'descontos' => 4.50,
         'pago' => 4.50,
+        'status' => Associacao::STATUS_AGENDADO,
         'sincronizado' => false,
         'integrado' => false,
         'data_pedido' => Carbon::now(),

@@ -3,5 +3,8 @@ mutation createPais($input: PaisInput!) {
     id
     nome
     sigla
+    codigo
+    moeda_id
+    idioma
   }
 }

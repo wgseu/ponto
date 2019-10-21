@@ -1,0 +1,8 @@
+query {
+  itens {
+    data {
+      id
+    }
+    total
+  }
+}

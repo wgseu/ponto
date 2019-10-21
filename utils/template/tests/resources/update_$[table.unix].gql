@@ -1,0 +1,16 @@
+mutation update$[Table.norm]($id: ID!, $input: $[Table.norm]UpdateInput!) {
+  Update$[Table.norm](id: $id, input: $input) {
+$[field.each(all)]
+$[field.if(primary|default|null)]
+$[field.else.if(datetime)]
+$[field.match(.*cadastro|.*criacao|.*lancamento|.*envio|.*atualizacao|.*arquivado|.*arquivamento)]
+$[field.else]
+    $[field]
+$[field.end]
+$[field.else.if(reference)]
+$[field.else]
+    $[field]
+$[field.end]
+$[field.end]
+  }
+}

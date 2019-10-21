@@ -1,0 +1,7 @@
+mutation createCaixa($input: CaixaInput!) {
+  CreateCaixa(input: $input) {
+    id
+    carteira_id
+    descricao
+  }
+}

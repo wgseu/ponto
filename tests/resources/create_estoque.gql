@@ -1,0 +1,9 @@
+mutation createEstoque($input: EstoqueInput!) {
+  CreateEstoque(input: $input) {
+    id
+    produto_id
+    setor_id
+    quantidade
+    data_movimento
+  }
+}

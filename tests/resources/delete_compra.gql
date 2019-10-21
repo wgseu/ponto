@@ -1,0 +1,5 @@
+mutation ($id: ID!) {
+  DeleteCompra(id: $id) {
+    id
+  }
+}

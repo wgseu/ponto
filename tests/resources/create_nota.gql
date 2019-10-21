@@ -1,0 +1,15 @@
+mutation createNota($input: NotaInput!) {
+  CreateNota(input: $input) {
+    id
+    tipo
+    ambiente
+    acao
+    estado
+    serie
+    numero_inicial
+    numero_final
+    sequencia
+    contingencia
+    data_emissao
+  }
+}

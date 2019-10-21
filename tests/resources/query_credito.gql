@@ -1,0 +1,8 @@
+query {
+  creditos {
+    data {
+      id
+    }
+    total
+  }
+}

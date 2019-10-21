@@ -1,0 +1,8 @@
+mutation createServico($input: ServicoInput!) {
+  CreateServico(input: $input) {
+    id
+    nome
+    descricao
+    tipo
+  }
+}

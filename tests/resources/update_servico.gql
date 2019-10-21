@@ -1,0 +1,7 @@
+mutation updateServico($id: ID!, $input: ServicoUpdateInput!) {
+  UpdateServico(id: $id, input: $input) {
+    nome
+    descricao
+    tipo
+  }
+}

@@ -7,7 +7,7 @@ use App\Models\Moeda;
 use Faker\Generator as Faker;
 
 $factory->define(Pais::class, function (Faker $faker) {
-    $moeda = factory(Moeda::class)->create();
+    $moeda_id = factory(Moeda::class)->create();
     return [
         'nome' => $faker->unique()->name,
         'sigla' => $faker->unique()->word,

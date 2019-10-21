@@ -1,0 +1,7 @@
+mutation createUnidade($input: UnidadeInput!) {
+  CreateUnidade(input: $input) {
+    id
+    nome
+    sigla
+  }
+}

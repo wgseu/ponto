@@ -1,0 +1,8 @@
+query {
+  modulos {
+    data {
+      id
+    }
+    total
+  }
+}

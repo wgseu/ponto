@@ -1,0 +1,6 @@
+mutation createSessao($input: SessaoInput!) {
+  CreateSessao(input: $input) {
+    id
+    data_inicio
+  }
+}

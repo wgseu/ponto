@@ -1,0 +1,8 @@
+query {
+  tributacoes {
+    data {
+      id
+    }
+    total
+  }
+}

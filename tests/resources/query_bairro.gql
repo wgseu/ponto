@@ -1,0 +1,8 @@
+query {
+  bairros {
+    data {
+      id
+    }
+    total
+  }
+}

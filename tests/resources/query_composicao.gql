@@ -1,0 +1,8 @@
+query {
+  composicoes {
+    data {
+      id
+    }
+    total
+  }
+}

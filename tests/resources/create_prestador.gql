@@ -1,0 +1,8 @@
+mutation createPrestador($input: PrestadorInput!) {
+  CreatePrestador(input: $input) {
+    id
+    codigo
+    funcao_id
+    cliente_id
+  }
+}

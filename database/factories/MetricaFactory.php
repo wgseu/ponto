@@ -9,5 +9,6 @@ $factory->define(Metrica::class, function (Faker $faker) {
     return [
         'nome' => $faker->unique()->name,
         'tipo' => Metrica::TIPO_ENTREGA,
+        'quantidade' => $faker->numberBetween(1, 70),
     ];
 });

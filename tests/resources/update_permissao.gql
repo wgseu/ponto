@@ -1,0 +1,6 @@
+mutation updatePermissao($id: ID!, $input: PermissaoUpdateInput!) {
+  UpdatePermissao(id: $id, input: $input) {
+    nome
+    descricao
+  }
+}

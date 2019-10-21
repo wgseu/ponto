@@ -1,0 +1,7 @@
+mutation updateEvento($id: ID!, $input: EventoUpdateInput!) {
+  UpdateEvento(id: $id, input: $input) {
+    estado
+    mensagem
+    codigo
+  }
+}

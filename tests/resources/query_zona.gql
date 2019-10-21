@@ -1,0 +1,8 @@
+query {
+  zonas {
+    data {
+      id
+    }
+    total
+  }
+}

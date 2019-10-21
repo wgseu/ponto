@@ -1,7 +1,8 @@
 mutation updatePais($id: ID!, $input: PaisUpdateInput!) {
   UpdatePais(id: $id, input: $input) {
-    id
     nome
     sigla
+    codigo
+    idioma
   }
 }

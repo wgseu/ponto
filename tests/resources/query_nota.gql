@@ -1,0 +1,8 @@
+query {
+  notas {
+    data {
+      id
+    }
+    total
+  }
+}

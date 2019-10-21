@@ -1,0 +1,8 @@
+query {
+  impostos {
+    data {
+      id
+    }
+    total
+  }
+}

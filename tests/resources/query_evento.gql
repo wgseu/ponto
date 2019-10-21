@@ -1,0 +1,8 @@
+query {
+  eventos {
+    data {
+      id
+    }
+    total
+  }
+}

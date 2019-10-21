@@ -1,0 +1,6 @@
+mutation updateUnidade($id: ID!, $input: UnidadeUpdateInput!) {
+  UpdateUnidade(id: $id, input: $input) {
+    nome
+    sigla
+  }
+}

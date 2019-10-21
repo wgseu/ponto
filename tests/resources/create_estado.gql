@@ -1,0 +1,8 @@
+mutation createEstado($input: EstadoInput!) {
+  CreateEstado(input: $input) {
+    id
+    pais_id
+    nome
+    uf
+  }
+}

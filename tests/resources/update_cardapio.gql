@@ -1,0 +1,4 @@
+mutation updateCardapio($id: ID!, $input: CardapioUpdateInput!) {
+  UpdateCardapio(id: $id, input: $input) {
+  }
+}

@@ -1,0 +1,6 @@
+mutation updateFuncao($id: ID!, $input: FuncaoUpdateInput!) {
+  UpdateFuncao(id: $id, input: $input) {
+    descricao
+    remuneracao
+  }
+}

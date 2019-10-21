@@ -1,0 +1,8 @@
+mutation updateAuditoria($id: ID!, $input: AuditoriaUpdateInput!) {
+  UpdateAuditoria(id: $id, input: $input) {
+    tipo
+    prioridade
+    descricao
+    data_registro
+  }
+}

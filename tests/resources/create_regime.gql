@@ -1,0 +1,7 @@
+mutation createRegime($input: RegimeInput!) {
+  CreateRegime(input: $input) {
+    id
+    codigo
+    descricao
+  }
+}

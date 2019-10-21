@@ -1,0 +1,8 @@
+query {
+  pacotes {
+    data {
+      id
+    }
+    total
+  }
+}

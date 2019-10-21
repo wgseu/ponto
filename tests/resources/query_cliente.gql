@@ -1,0 +1,8 @@
+query {
+  clientes {
+    data {
+      id
+    }
+    total
+  }
+}

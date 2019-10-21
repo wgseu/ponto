@@ -1,0 +1,8 @@
+query {
+  carteiras {
+    data {
+      id
+    }
+    total
+  }
+}

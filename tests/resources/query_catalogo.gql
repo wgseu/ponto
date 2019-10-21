@@ -1,0 +1,8 @@
+query {
+  catalogos {
+    data {
+      id
+    }
+    total
+  }
+}

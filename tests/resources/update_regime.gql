@@ -1,0 +1,6 @@
+mutation updateRegime($id: ID!, $input: RegimeUpdateInput!) {
+  UpdateRegime(id: $id, input: $input) {
+    codigo
+    descricao
+  }
+}

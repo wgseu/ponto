@@ -1,0 +1,8 @@
+mutation createComposicao($input: ComposicaoInput!) {
+  CreateComposicao(input: $input) {
+    id
+    composicao_id
+    produto_id
+    quantidade
+  }
+}

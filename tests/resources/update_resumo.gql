@@ -1,0 +1,5 @@
+mutation updateResumo($id: ID!, $input: ResumoUpdateInput!) {
+  UpdateResumo(id: $id, input: $input) {
+    valor
+  }
+}

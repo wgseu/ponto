@@ -1,0 +1,8 @@
+query {
+  cardapios {
+    data {
+      id
+    }
+    total
+  }
+}

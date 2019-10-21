@@ -1,0 +1,6 @@
+mutation updateEstado($id: ID!, $input: EstadoUpdateInput!) {
+  UpdateEstado(id: $id, input: $input) {
+    nome
+    uf
+  }
+}

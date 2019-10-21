@@ -1,0 +1,11 @@
+mutation createItem($input: ItemInput!) {
+  CreateItem(input: $input) {
+    id
+    pedido_id
+    preco
+    quantidade
+    subtotal
+    total
+    preco_venda
+  }
+}

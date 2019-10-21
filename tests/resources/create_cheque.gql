@@ -1,0 +1,12 @@
+mutation createCheque($input: ChequeInput!) {
+  CreateCheque(input: $input) {
+    id
+    cliente_id
+    banco_id
+    agencia
+    conta
+    numero
+    valor
+    vencimento
+  }
+}

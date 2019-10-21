@@ -1,0 +1,6 @@
+mutation updateAvaliacao($id: ID!, $input: AvaliacaoUpdateInput!) {
+  UpdateAvaliacao(id: $id, input: $input) {
+    estrelas
+    data_avaliacao
+  }
+}

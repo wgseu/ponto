@@ -1,0 +1,8 @@
+query {
+  formacoes {
+    data {
+      id
+    }
+    total
+  }
+}

@@ -1,0 +1,7 @@
+mutation createViagem($input: ViagemInput!) {
+  CreateViagem(input: $input) {
+    id
+    responsavel_id
+    data_saida
+  }
+}

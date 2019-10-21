@@ -1,0 +1,8 @@
+query {
+  promocoes {
+    data {
+      id
+    }
+    total
+  }
+}

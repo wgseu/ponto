@@ -1,0 +1,5 @@
+mutation updateTributacao($id: ID!, $input: TributacaoUpdateInput!) {
+  UpdateTributacao(id: $id, input: $input) {
+    ncm
+  }
+}

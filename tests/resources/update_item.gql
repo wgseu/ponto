@@ -1,0 +1,9 @@
+mutation updateItem($id: ID!, $input: ItemUpdateInput!) {
+  UpdateItem(id: $id, input: $input) {
+    preco
+    quantidade
+    subtotal
+    total
+    preco_venda
+  }
+}

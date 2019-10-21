@@ -1,0 +1,5 @@
+mutation ($id: ID!) {
+  DeleteTelefone(id: $id) {
+    id
+  }
+}

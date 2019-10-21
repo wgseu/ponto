@@ -1,0 +1,5 @@
+mutation ($id: ID!) {
+  DeleteRequisito(id: $id) {
+    id
+  }
+}

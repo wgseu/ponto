@@ -1,0 +1,6 @@
+mutation createCardapio($input: CardapioInput!) {
+  CreateCardapio(input: $input) {
+    id
+    produto_id
+  }
+}

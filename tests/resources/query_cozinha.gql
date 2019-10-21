@@ -1,0 +1,8 @@
+query {
+  cozinhas {
+    data {
+      id
+    }
+    total
+  }
+}

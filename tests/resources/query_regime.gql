@@ -1,0 +1,8 @@
+query {
+  regimes {
+    data {
+      id
+    }
+    total
+  }
+}

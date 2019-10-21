@@ -1,0 +1,6 @@
+mutation createSetor($input: SetorInput!) {
+  CreateSetor(input: $input) {
+    id
+    nome
+  }
+}

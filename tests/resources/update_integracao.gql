@@ -1,0 +1,5 @@
+mutation updateIntegracao($id: ID!, $input: IntegracaoUpdateInput!) {
+  UpdateIntegracao(id: $id, input: $input) {
+    nome
+  }
+}

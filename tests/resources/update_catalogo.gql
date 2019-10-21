@@ -1,0 +1,5 @@
+mutation updateCatalogo($id: ID!, $input: CatalogoUpdateInput!) {
+  UpdateCatalogo(id: $id, input: $input) {
+    preco_compra
+  }
+}

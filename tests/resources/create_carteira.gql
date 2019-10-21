@@ -1,0 +1,7 @@
+mutation createCarteira($input: CarteiraInput!) {
+  CreateCarteira(input: $input) {
+    id
+    tipo
+    descricao
+  }
+}

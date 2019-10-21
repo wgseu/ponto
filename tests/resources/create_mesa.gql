@@ -1,0 +1,7 @@
+mutation createMesa($input: MesaInput!) {
+  CreateMesa(input: $input) {
+    id
+    setor_id
+    numero
+  }
+}

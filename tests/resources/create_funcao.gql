@@ -1,0 +1,7 @@
+mutation createFuncao($input: FuncaoInput!) {
+  CreateFuncao(input: $input) {
+    id
+    descricao
+    remuneracao
+  }
+}

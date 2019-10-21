@@ -1,0 +1,6 @@
+mutation updateOperacao($id: ID!, $input: OperacaoUpdateInput!) {
+  UpdateOperacao(id: $id, input: $input) {
+    codigo
+    descricao
+  }
+}

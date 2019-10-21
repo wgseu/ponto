@@ -1,0 +1,8 @@
+query {
+  servicos {
+    data {
+      id
+    }
+    total
+  }
+}

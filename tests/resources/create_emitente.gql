@@ -1,0 +1,5 @@
+mutation createEmitente($input: EmitenteInput!) {
+  CreateEmitente(input: $input) {
+    regime_id
+  }
+}

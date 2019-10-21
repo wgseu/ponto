@@ -1,0 +1,5 @@
+mutation updateCompra($id: ID!, $input: CompraUpdateInput!) {
+  UpdateCompra(id: $id, input: $input) {
+    data_compra
+  }
+}

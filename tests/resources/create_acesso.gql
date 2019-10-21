@@ -1,0 +1,7 @@
+mutation createAcesso($input: AcessoInput!) {
+  CreateAcesso(input: $input) {
+    id
+    funcao_id
+    permissao_id
+  }
+}

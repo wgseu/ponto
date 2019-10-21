@@ -1,0 +1,8 @@
+query {
+  horarios {
+    data {
+      id
+    }
+    total
+  }
+}

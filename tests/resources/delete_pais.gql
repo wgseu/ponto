@@ -1,6 +1,5 @@
-mutation {
-  DeletePais(id: 1) {
+mutation ($id: ID!) {
+  DeletePais(id: $id) {
     id
-    nome
   }
 }

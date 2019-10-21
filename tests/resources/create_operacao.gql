@@ -1,0 +1,7 @@
+mutation createOperacao($input: OperacaoInput!) {
+  CreateOperacao(input: $input) {
+    id
+    codigo
+    descricao
+  }
+}

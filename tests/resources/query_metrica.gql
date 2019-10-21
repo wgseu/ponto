@@ -1,0 +1,8 @@
+query {
+  metricas {
+    data {
+      id
+    }
+    total
+  }
+}

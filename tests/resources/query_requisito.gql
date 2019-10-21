@@ -1,0 +1,8 @@
+query {
+  requisitos {
+    data {
+      id
+    }
+    total
+  }
+}

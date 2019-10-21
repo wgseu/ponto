@@ -1,0 +1,5 @@
+mutation updateViagem($id: ID!, $input: ViagemUpdateInput!) {
+  UpdateViagem(id: $id, input: $input) {
+    data_saida
+  }
+}

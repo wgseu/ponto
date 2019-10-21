@@ -1,0 +1,15 @@
+mutation create$[Table.norm]($input: $[Table.norm]Input!) {
+  Create$[Table.norm](input: $input) {
+$[field.each(all)]
+$[field.if(default|null)]
+$[field.else.if(datetime)]
+$[field.match(.*cadastro|.*criacao|.*lancamento|.*envio|.*atualizacao|.*arquivado|.*arquivamento)]
+$[field.else]
+    $[field]
+$[field.end]
+$[field.else]
+    $[field]
+$[field.end]
+$[field.end]
+  }
+}

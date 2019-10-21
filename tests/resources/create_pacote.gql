@@ -1,0 +1,8 @@
+mutation createPacote($input: PacoteInput!) {
+  CreatePacote(input: $input) {
+    id
+    pacote_id
+    grupo_id
+    acrescimo
+  }
+}

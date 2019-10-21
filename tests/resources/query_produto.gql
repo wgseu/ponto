@@ -1,0 +1,8 @@
+query {
+  produtos {
+    data {
+      id
+    }
+    total
+  }
+}

@@ -8,9 +8,9 @@ use Faker\Generator as Faker;
 $factory->define(Imposto::class, function (Faker $faker) {
     return [
         'grupo' => Imposto::GRUPO_ICMS,
-        'simples' => false,
+        'simples' => true,
         'substituicao' => false,
-        'codigo' => $faker->numberBetween(1, 70),
+        'codigo' => $faker->numberBetween(1, 100),
         'descricao' => $faker->unique()->word,
     ];
 });

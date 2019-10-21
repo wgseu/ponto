@@ -7,7 +7,7 @@ use Faker\Generator as Faker;
 
 $factory->define(Origem::class, function (Faker $faker) {
     return [
-        'codigo' => $faker->numberBetween(1, 70),
-        'descricao' => $faker->name,
+        'codigo' => $faker->numberBetween(1, 8888),
+        'descricao' => $faker->word,
     ];
 });

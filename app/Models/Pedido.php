@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright 2014 da GrandChef - GrandChef Desenvolvimento de Sistemas LTDA
  *
@@ -22,6 +23,7 @@
  *
  * @author Equipe GrandChef <desenvolvimento@grandchef.com.br>
  */
+
 namespace App\Models;
 
 use App\Concerns\ModelEvents;
@@ -38,10 +40,10 @@ class Pedido extends Model implements ValidateInterface
     /**
      * Tipo de venda
      */
-    const TIPO_MESA = 'mesa';
-    const TIPO_COMANDA = 'comanda';
-    const TIPO_BALCAO = 'balcao';
-    const TIPO_ENTREGA = 'entrega';
+    public const TIPO_MESA = 'mesa';
+    public const TIPO_COMANDA = 'comanda';
+    public const TIPO_BALCAO = 'balcao';
+    public const TIPO_ENTREGA = 'entrega';
 
     /**
      * Estado do pedido, Agendado: O pedido deve ser processado na data de
@@ -50,15 +52,15 @@ class Pedido extends Model implements ValidateInterface
      * pagar. Concluído: O pedido foi pago e concluído, Cancelado: O pedido foi
      * cancelado com os itens e pagamentos
      */
-    const ESTADO_AGENDADO = 'agendado';
-    const ESTADO_ABERTO = 'aberto';
-    const ESTADO_ENTREGA = 'entrega';
-    const ESTADO_FECHADO = 'fechado';
-    const ESTADO_CONCLUIDO = 'concluido';
-    const ESTADO_CANCELADO = 'cancelado';
+    public const ESTADO_AGENDADO = 'agendado';
+    public const ESTADO_ABERTO = 'aberto';
+    public const ESTADO_ENTREGA = 'entrega';
+    public const ESTADO_FECHADO = 'fechado';
+    public const ESTADO_CONCLUIDO = 'concluido';
+    public const ESTADO_CANCELADO = 'cancelado';
 
-    const CREATED_AT = 'data_criacao';
-    const UPDATED_AT = null;
+    public const CREATED_AT = 'data_criacao';
+    public const UPDATED_AT = null;
 
     /**
      * The table associated with the model.

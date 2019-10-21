@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright 2014 da GrandChef - GrandChef Desenvolvimento de Sistemas LTDA
  *
@@ -22,6 +23,7 @@
  *
  * @author Equipe GrandChef <desenvolvimento@grandchef.com.br>
  */
+
 namespace App\Models;
 
 use App\Concerns\ModelEvents;
@@ -35,8 +37,8 @@ class Pontuacao extends Model implements ValidateInterface
 {
     use ModelEvents;
 
-    const CREATED_AT = 'data_cadastro';
-    const UPDATED_AT = null;
+    public const CREATED_AT = 'data_cadastro';
+    public const UPDATED_AT = null;
 
     /**
      * The table associated with the model.

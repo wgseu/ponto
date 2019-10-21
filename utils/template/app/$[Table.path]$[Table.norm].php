@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright 2014 da GrandChef - GrandChef Desenvolvimento de Sistemas LTDA
  *
@@ -22,6 +23,7 @@
  *
  * @author Equipe GrandChef <desenvolvimento@grandchef.com.br>
  */
+
 $[table.if(package)]
 namespace $[Table.package];
 $[table.end]
@@ -56,7 +58,7 @@ $[field.end]
      */
 $[field.end]
 $[field.each(option)]
-    const $[FIELD.unix]_$[FIELD.option.norm] = '$[field.option]';
+    public const $[FIELD.unix]_$[FIELD.option.norm] = '$[field.option]';
 $[field.end]
 $[field.end]
 $[table.exists(data_cadastro|data_criacao|data_lancamento|data_envio|data_atualizacao|data_arquivado|data_arquivamento)]
@@ -64,21 +66,21 @@ $[table.exists(data_cadastro|data_criacao|data_lancamento|data_envio|data_atuali
 $[field.each(all)]
 $[field.if(datetime)]
 $[field.match(.*cadastro|.*criacao|.*lancamento|.*envio)]
-    const CREATED_AT = '$[field]';
+    public const CREATED_AT = '$[field]';
 $[field.else.match(.*atualizacao)]
-    const UPDATED_AT = '$[field]';
+    public const UPDATED_AT = '$[field]';
 $[field.else.match(.*arquivado|.*arquivamento)]
-    const DELETED_AT = '$[field]';
+    public const DELETED_AT = '$[field]';
 $[field.end]
 $[field.end]
 $[field.end]
 $[table.exists(data_cadastro|data_criacao|data_lancamento|data_envio)]
 $[table.exists(data_atualizacao)]
 $[table.else]
-    const UPDATED_AT = null;
+    public const UPDATED_AT = null;
 $[table.end]
 $[table.else.exists(data_atualizacao)]
-    const CREATED_AT = null;
+    public const CREATED_AT = null;
 $[table.end]
 $[table.end]
 

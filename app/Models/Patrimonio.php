@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright 2014 da GrandChef - GrandChef Desenvolvimento de Sistemas LTDA
  *
@@ -22,6 +23,7 @@
  *
  * @author Equipe GrandChef <desenvolvimento@grandchef.com.br>
  */
+
 namespace App\Models;
 
 use App\Concerns\ModelEvents;
@@ -38,12 +40,12 @@ class Patrimonio extends Model implements ValidateInterface
     /**
      * Estado de conservação do bem
      */
-    const ESTADO_NOVO = 'novo';
-    const ESTADO_CONSERVADO = 'conservado';
-    const ESTADO_RUIM = 'ruim';
+    public const ESTADO_NOVO = 'novo';
+    public const ESTADO_CONSERVADO = 'conservado';
+    public const ESTADO_RUIM = 'ruim';
 
-    const UPDATED_AT = 'data_atualizacao';
-    const CREATED_AT = null;
+    public const UPDATED_AT = 'data_atualizacao';
+    public const CREATED_AT = null;
 
     /**
      * The table associated with the model.

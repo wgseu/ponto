@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright 2014 da GrandChef - GrandChef Desenvolvimento de Sistemas LTDA
  *
@@ -22,6 +23,7 @@
  *
  * @author Equipe GrandChef <desenvolvimento@grandchef.com.br>
  */
+
 namespace App\Models;
 
 use App\Concerns\ModelEvents;
@@ -38,20 +40,20 @@ class Evento extends Model implements ValidateInterface
     /**
      * Estado do evento
      */
-    const ESTADO_ABERTO = 'aberto';
-    const ESTADO_ASSINADO = 'assinado';
-    const ESTADO_VALIDADO = 'validado';
-    const ESTADO_PENDENTE = 'pendente';
-    const ESTADO_PROCESSAMENTO = 'processamento';
-    const ESTADO_DENEGADO = 'denegado';
-    const ESTADO_CANCELADO = 'cancelado';
-    const ESTADO_REJEITADO = 'rejeitado';
-    const ESTADO_CONTINGENCIA = 'contingencia';
-    const ESTADO_INUTILIZADO = 'inutilizado';
-    const ESTADO_AUTORIZADO = 'autorizado';
+    public const ESTADO_ABERTO = 'aberto';
+    public const ESTADO_ASSINADO = 'assinado';
+    public const ESTADO_VALIDADO = 'validado';
+    public const ESTADO_PENDENTE = 'pendente';
+    public const ESTADO_PROCESSAMENTO = 'processamento';
+    public const ESTADO_DENEGADO = 'denegado';
+    public const ESTADO_CANCELADO = 'cancelado';
+    public const ESTADO_REJEITADO = 'rejeitado';
+    public const ESTADO_CONTINGENCIA = 'contingencia';
+    public const ESTADO_INUTILIZADO = 'inutilizado';
+    public const ESTADO_AUTORIZADO = 'autorizado';
 
-    const CREATED_AT = 'data_criacao';
-    const UPDATED_AT = null;
+    public const CREATED_AT = 'data_criacao';
+    public const UPDATED_AT = null;
 
     /**
      * The table associated with the model.

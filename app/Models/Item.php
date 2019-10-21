@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright 2014 da GrandChef - GrandChef Desenvolvimento de Sistemas LTDA
  *
@@ -22,6 +23,7 @@
  *
  * @author Equipe GrandChef <desenvolvimento@grandchef.com.br>
  */
+
 namespace App\Models;
 
 use App\Concerns\ModelEvents;
@@ -39,15 +41,15 @@ class Item extends Model implements ValidateInterface
     /**
      * Estado de preparo e envio do produto
      */
-    const ESTADO_ADICIONADO = 'adicionado';
-    const ESTADO_ENVIADO = 'enviado';
-    const ESTADO_PROCESSADO = 'processado';
-    const ESTADO_PRONTO = 'pronto';
-    const ESTADO_DISPONIVEL = 'disponivel';
-    const ESTADO_ENTREGUE = 'entregue';
+    public const ESTADO_ADICIONADO = 'adicionado';
+    public const ESTADO_ENVIADO = 'enviado';
+    public const ESTADO_PROCESSADO = 'processado';
+    public const ESTADO_PRONTO = 'pronto';
+    public const ESTADO_DISPONIVEL = 'disponivel';
+    public const ESTADO_ENTREGUE = 'entregue';
 
-    const UPDATED_AT = 'data_atualizacao';
-    const CREATED_AT = 'data_lancamento';
+    public const UPDATED_AT = 'data_atualizacao';
+    public const CREATED_AT = 'data_lancamento';
 
     /**
      * The table associated with the model.

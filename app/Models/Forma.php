@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright 2014 da GrandChef - GrandChef Desenvolvimento de Sistemas LTDA
  *
@@ -22,6 +23,7 @@
  *
  * @author Equipe GrandChef <desenvolvimento@grandchef.com.br>
  */
+
 namespace App\Models;
 
 use App\Concerns\ModelEvents;
@@ -38,13 +40,13 @@ class Forma extends Model implements ValidateInterface
     /**
      * Tipo de pagamento
      */
-    const TIPO_DINHEIRO = 'dinheiro';
-    const TIPO_CREDITO = 'credito';
-    const TIPO_DEBITO = 'debito';
-    const TIPO_VALE = 'vale';
-    const TIPO_CHEQUE = 'cheque';
-    const TIPO_CREDIARIO = 'crediario';
-    const TIPO_SALDO = 'saldo';
+    public const TIPO_DINHEIRO = 'dinheiro';
+    public const TIPO_CREDITO = 'credito';
+    public const TIPO_DEBITO = 'debito';
+    public const TIPO_VALE = 'vale';
+    public const TIPO_CHEQUE = 'cheque';
+    public const TIPO_CREDIARIO = 'crediario';
+    public const TIPO_SALDO = 'saldo';
 
     /**
      * The table associated with the model.

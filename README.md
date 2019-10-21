@@ -63,3 +63,15 @@ yarn dev
    [Twitter Bootstrap]: <http://twitter.github.com/bootstrap/>
    [Gulp]: <http://gulpjs.com>
    [jQuery]: <http://jquery.com>
+
+### Deployment
+
+Cria uma imagem do docker
+```sh
+docker build -t gcr.io/upheld-setting-221119/grandchef-product-api:v1.0 .
+```
+
+Envia nova versão para repositório
+```sh
+docker push gcr.io/upheld-setting-221119/grandchef-product-api:v1.0
+```

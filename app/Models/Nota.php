@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright 2014 da GrandChef - GrandChef Desenvolvimento de Sistemas LTDA
  *
@@ -22,6 +23,7 @@
  *
  * @author Equipe GrandChef <desenvolvimento@grandchef.com.br>
  */
+
 namespace App\Models;
 
 use App\Concerns\ModelEvents;
@@ -40,38 +42,38 @@ class Nota extends Model implements ValidateInterface
     /**
      * Tipo de registro se nota ou inutilização
      */
-    const TIPO_NOTA = 'nota';
-    const TIPO_INUTILIZACAO = 'inutilizacao';
+    public const TIPO_NOTA = 'nota';
+    public const TIPO_INUTILIZACAO = 'inutilizacao';
 
     /**
      * Ambiente em que a nota foi gerada
      */
-    const AMBIENTE_HOMOLOGACAO = 'homologacao';
-    const AMBIENTE_PRODUCAO = 'producao';
+    public const AMBIENTE_HOMOLOGACAO = 'homologacao';
+    public const AMBIENTE_PRODUCAO = 'producao';
 
     /**
      * Ação que deve ser tomada sobre a nota fiscal
      */
-    const ACAO_AUTORIZAR = 'autorizar';
-    const ACAO_CANCELAR = 'cancelar';
-    const ACAO_INUTILIZAR = 'inutilizar';
+    public const ACAO_AUTORIZAR = 'autorizar';
+    public const ACAO_CANCELAR = 'cancelar';
+    public const ACAO_INUTILIZAR = 'inutilizar';
 
     /**
      * Estado da nota
      */
-    const ESTADO_ABERTO = 'aberto';
-    const ESTADO_ASSINADO = 'assinado';
-    const ESTADO_PENDENTE = 'pendente';
-    const ESTADO_PROCESSAMENTO = 'processamento';
-    const ESTADO_DENEGADO = 'denegado';
-    const ESTADO_REJEITADO = 'rejeitado';
-    const ESTADO_CANCELADO = 'cancelado';
-    const ESTADO_INUTILIZADO = 'inutilizado';
-    const ESTADO_AUTORIZADO = 'autorizado';
+    public const ESTADO_ABERTO = 'aberto';
+    public const ESTADO_ASSINADO = 'assinado';
+    public const ESTADO_PENDENTE = 'pendente';
+    public const ESTADO_PROCESSAMENTO = 'processamento';
+    public const ESTADO_DENEGADO = 'denegado';
+    public const ESTADO_REJEITADO = 'rejeitado';
+    public const ESTADO_CANCELADO = 'cancelado';
+    public const ESTADO_INUTILIZADO = 'inutilizado';
+    public const ESTADO_AUTORIZADO = 'autorizado';
 
-    const CREATED_AT = 'data_lancamento';
-    const DELETED_AT = 'data_arquivado';
-    const UPDATED_AT = null;
+    public const CREATED_AT = 'data_lancamento';
+    public const DELETED_AT = 'data_arquivado';
+    public const UPDATED_AT = null;
 
     /**
      * The table associated with the model.

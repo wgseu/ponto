@@ -24,6 +24,7 @@ class DatabaseSeeder extends Seeder
             UnidadeSeeder::class,
             MoedaSeeder::class,
             ProdutoSeeder::class,
+            ComposicaoSeeder::class,
             PaisSeeder::class,
         ]);
     }

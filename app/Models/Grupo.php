@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright 2014 da GrandChef - GrandChef Desenvolvimento de Sistemas LTDA
  *
@@ -22,6 +23,7 @@
  *
  * @author Equipe GrandChef <desenvolvimento@grandchef.com.br>
  */
+
 namespace App\Models;
 
 use App\Concerns\ModelEvents;
@@ -41,8 +43,8 @@ class Grupo extends Model implements ValidateInterface
     /**
      * Informa se a formação final será apenas uma unidade ou vários itens
      */
-    const TIPO_INTEIRO = 'inteiro';
-    const TIPO_FRACIONADO = 'fracionado';
+    public const TIPO_INTEIRO = 'inteiro';
+    public const TIPO_FRACIONADO = 'fracionado';
 
     /**
      * Informa qual será a fórmula de cálculo do preço, Mínimo: obtém o menor
@@ -50,12 +52,12 @@ class Grupo extends Model implements ValidateInterface
      * selecionados, Máximo: Obtém o preço do item mais caro do grupo, Soma:
      * Soma todos os preços dos produtos selecionados
      */
-    const FUNCAO_MINIMO = 'minimo';
-    const FUNCAO_MEDIA = 'media';
-    const FUNCAO_MAXIMO = 'maximo';
-    const FUNCAO_SOMA = 'soma';
+    public const FUNCAO_MINIMO = 'minimo';
+    public const FUNCAO_MEDIA = 'media';
+    public const FUNCAO_MAXIMO = 'maximo';
+    public const FUNCAO_SOMA = 'soma';
 
-    const DELETED_AT = 'data_arquivado';
+    public const DELETED_AT = 'data_arquivado';
 
     /**
      * The table associated with the model.

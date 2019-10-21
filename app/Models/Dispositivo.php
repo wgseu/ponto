@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright 2014 da GrandChef - GrandChef Desenvolvimento de Sistemas LTDA
  *
@@ -22,6 +23,7 @@
  *
  * @author Equipe GrandChef <desenvolvimento@grandchef.com.br>
  */
+
 namespace App\Models;
 
 use App\Concerns\ModelEvents;
@@ -38,9 +40,9 @@ class Dispositivo extends Model implements ValidateInterface
     /**
      * Tipo de dispositivo
      */
-    const TIPO_COMPUTADOR = 'computador';
-    const TIPO_TABLET = 'tablet';
-    const TIPO_NAVEGADOR = 'navegador';
+    public const TIPO_COMPUTADOR = 'computador';
+    public const TIPO_TABLET = 'tablet';
+    public const TIPO_NAVEGADOR = 'navegador';
 
     /**
      * The table associated with the model.

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright 2014 da GrandChef - GrandChef Desenvolvimento de Sistemas LTDA
  *
@@ -22,6 +23,7 @@
  *
  * @author Equipe GrandChef <desenvolvimento@grandchef.com.br>
  */
+
 namespace App\Models;
 
 use Exception;
@@ -45,24 +47,24 @@ class Cliente extends User implements ValidateInterface, JWTSubject, Authorizabl
     /**
      * Informa o tipo de pessoa, que pode ser física ou jurídica
      */
-    const TIPO_FISICA = 'fisica';
-    const TIPO_JURIDICA = 'juridica';
+    public const TIPO_FISICA = 'fisica';
+    public const TIPO_JURIDICA = 'juridica';
 
     /**
      * Informa o gênero do cliente do tipo pessoa física
      */
-    const GENERO_MASCULINO = 'masculino';
-    const GENERO_FEMININO = 'feminino';
+    public const GENERO_MASCULINO = 'masculino';
+    public const GENERO_FEMININO = 'feminino';
 
     /**
      * Informa o estado da conta do cliente
      */
-    const STATUS_INATIVO = 'inativo';
-    const STATUS_ATIVO = 'ativo';
-    const STATUS_BLOQUEADO = 'bloqueado';
+    public const STATUS_INATIVO = 'inativo';
+    public const STATUS_ATIVO = 'ativo';
+    public const STATUS_BLOQUEADO = 'bloqueado';
 
-    const UPDATED_AT = 'data_atualizacao';
-    const CREATED_AT = 'data_cadastro';
+    public const UPDATED_AT = 'data_atualizacao';
+    public const CREATED_AT = 'data_cadastro';
 
     /**
      * The table associated with the model.
@@ -146,10 +148,10 @@ class Cliente extends User implements ValidateInterface, JWTSubject, Authorizabl
      */
     public function setSenhaAttribute($senha)
     {
-        if ( !empty($senha) ) {
+        if (!empty($senha)) {
             $this->attributes['senha'] = bcrypt($senha);
         }
-    } 
+    }
 
     /**
      * Get the password for the user.

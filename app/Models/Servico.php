@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright 2014 da GrandChef - GrandChef Desenvolvimento de Sistemas LTDA
  *
@@ -22,6 +23,7 @@
  *
  * @author Equipe GrandChef <desenvolvimento@grandchef.com.br>
  */
+
 namespace App\Models;
 
 use App\Concerns\ModelEvents;
@@ -38,8 +40,8 @@ class Servico extends Model implements ValidateInterface
     /**
      * Tipo de serviço, Evento: Eventos como show no estabelecimento
      */
-    const TIPO_EVENTO = 'evento';
-    const TIPO_TAXA = 'taxa';
+    public const TIPO_EVENTO = 'evento';
+    public const TIPO_TAXA = 'taxa';
 
     /**
      * The table associated with the model.

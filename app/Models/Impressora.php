@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright 2014 da GrandChef - GrandChef Desenvolvimento de Sistemas LTDA
  *
@@ -22,6 +23,7 @@
  *
  * @author Equipe GrandChef <desenvolvimento@grandchef.com.br>
  */
+
 namespace App\Models;
 
 use App\Concerns\ModelEvents;
@@ -38,10 +40,10 @@ class Impressora extends Model implements ValidateInterface
     /**
      * Modo de impressão
      */
-    const MODO_TERMINAL = 'terminal';
-    const MODO_CAIXA = 'caixa';
-    const MODO_SERVICO = 'servico';
-    const MODO_ESTOQUE = 'estoque';
+    public const MODO_TERMINAL = 'terminal';
+    public const MODO_CAIXA = 'caixa';
+    public const MODO_SERVICO = 'servico';
+    public const MODO_ESTOQUE = 'estoque';
 
     /**
      * The table associated with the model.

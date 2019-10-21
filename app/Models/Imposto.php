@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright 2014 da GrandChef - GrandChef Desenvolvimento de Sistemas LTDA
  *
@@ -22,6 +23,7 @@
  *
  * @author Equipe GrandChef <desenvolvimento@grandchef.com.br>
  */
+
 namespace App\Models;
 
 use App\Concerns\ModelEvents;
@@ -38,11 +40,11 @@ class Imposto extends Model implements ValidateInterface
     /**
      * Grupo do imposto
      */
-    const GRUPO_ICMS = 'icms';
-    const GRUPO_PIS = 'pis';
-    const GRUPO_COFINS = 'cofins';
-    const GRUPO_IPI = 'ipi';
-    const GRUPO_II = 'ii';
+    public const GRUPO_ICMS = 'icms';
+    public const GRUPO_PIS = 'pis';
+    public const GRUPO_COFINS = 'cofins';
+    public const GRUPO_IPI = 'ipi';
+    public const GRUPO_II = 'ii';
 
     /**
      * The table associated with the model.

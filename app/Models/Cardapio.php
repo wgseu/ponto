@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright 2014 da GrandChef - GrandChef Desenvolvimento de Sistemas LTDA
  *
@@ -22,6 +23,7 @@
  *
  * @author Equipe GrandChef <desenvolvimento@grandchef.com.br>
  */
+
 namespace App\Models;
 
 use App\Concerns\ModelEvents;
@@ -38,12 +40,12 @@ class Cardapio extends Model implements ValidateInterface
     /**
      * O cardápio será exibido para vendas nesse local
      */
-    const LOCAL_LOCAL = 'local';
-    const LOCAL_MESA = 'mesa';
-    const LOCAL_COMANDA = 'comanda';
-    const LOCAL_BALCAO = 'balcao';
-    const LOCAL_ENTREGA = 'entrega';
-    const LOCAL_ONLINE = 'online';
+    public const LOCAL_LOCAL = 'local';
+    public const LOCAL_MESA = 'mesa';
+    public const LOCAL_COMANDA = 'comanda';
+    public const LOCAL_BALCAO = 'balcao';
+    public const LOCAL_ENTREGA = 'entrega';
+    public const LOCAL_ONLINE = 'online';
 
     /**
      * The table associated with the model.

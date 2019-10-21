@@ -28,7 +28,7 @@ class CategoriaSeeder extends Seeder
             'descricao' => __('messages.juices'),
         ]))->save();
         (new Categoria([
-            'descricao' => __('messages.Cigarettes'),
+            'descricao' => __('messages.cigarettes'),
         ]))->save();
         (new Categoria([
             'descricao' => __('messages.spirits'),
@@ -44,6 +44,18 @@ class CategoriaSeeder extends Seeder
         ]))->save();
         (new Categoria([
             'descricao' => __('messages.tropical_drinks'),
+        ]))->save();
+        (new Categoria([
+            'descricao' => __('messages.vegetables'),
+        ]))->save();
+        (new Categoria([
+            'descricao' => __('messages.acai'),
+        ]))->save();
+        (new Categoria([
+            'descricao' => __('messages.oils'),
+        ]))->save();
+        (new Categoria([
+            'descricao' => __('messages.spices'),
         ]))->save();
     }
 }

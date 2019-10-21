@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright 2014 da GrandChef - GrandChef Desenvolvimento de Sistemas LTDA
  *
@@ -22,6 +23,7 @@
  *
  * @author Equipe GrandChef <desenvolvimento@grandchef.com.br>
  */
+
 namespace App\Models;
 
 use App\Concerns\ModelEvents;
@@ -37,7 +39,7 @@ class Pacote extends Model implements ValidateInterface
     use ModelEvents;
     use SoftDeletes;
 
-    const DELETED_AT = 'data_arquivado';
+    public const DELETED_AT = 'data_arquivado';
 
     /**
      * The table associated with the model.

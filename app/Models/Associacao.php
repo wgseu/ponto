@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright 2014 da GrandChef - GrandChef Desenvolvimento de Sistemas LTDA
  *
@@ -22,6 +23,7 @@
  *
  * @author Equipe GrandChef <desenvolvimento@grandchef.com.br>
  */
+
 namespace App\Models;
 
 use App\Concerns\ModelEvents;
@@ -39,11 +41,11 @@ class Associacao extends Model implements ValidateInterface
     /**
      * Status do pedido que não foi integrado ainda
      */
-    const STATUS_AGENDADO = 'agendado';
-    const STATUS_ABERTO = 'aberto';
-    const STATUS_ENTREGA = 'entrega';
-    const STATUS_CONCLUIDO = 'concluido';
-    const STATUS_CANCELADO = 'cancelado';
+    public const STATUS_AGENDADO = 'agendado';
+    public const STATUS_ABERTO = 'aberto';
+    public const STATUS_ENTREGA = 'entrega';
+    public const STATUS_CONCLUIDO = 'concluido';
+    public const STATUS_CANCELADO = 'cancelado';
 
     /**
      * The table associated with the model.

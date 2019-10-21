@@ -100,7 +100,7 @@ seeds:
 
 dump:
 	@mkdir -p $(DB_DUMPS_DIR)
-	@docker exec $(shell CURRENT_UID=$(CURRENT_UID) docker-compose ps -q db) mysqldump -B "$(DB_NAME)" -u"$(DB_ROOT_USER)" -p"$(DB_ROOT_PASSWORD)" --add-drop-database > $(DB_DUMPS_DIR)/db.sql
+	@docker exec $(shell CURRENT_UID=$(CURRENT_UID) docker-compose ps -q db) mysqldump -B "$(DB_DATABASE)" -u"$(DB_ROOT_USER)" -p"$(DB_ROOT_PASSWORD)" --add-drop-database > $(DB_DUMPS_DIR)/db.sql
 
 restore:
 	@docker exec -i $(shell CURRENT_UID=$(CURRENT_UID) docker-compose ps -q db) mysql -u"$(DB_ROOT_USER)" -p"$(DB_ROOT_PASSWORD)" < $(DB_DUMPS_DIR)/db.sql

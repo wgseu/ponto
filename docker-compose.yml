@@ -36,7 +36,7 @@ services:
         environment:
             - PMA_ARBITRARY=1
             - PMA_HOST=db
-            - PMA_USER=${DB_USER}
+            - PMA_USER=${DB_USERNAME}
             - PMA_PASSWORD=${DB_PASSWORD}
         restart: always
         depends_on:
@@ -48,8 +48,8 @@ services:
         env_file:
             - ".env"
         environment:
-            - MYSQL_DATABASE=${DB_NAME}
-            - MYSQL_USER=${DB_USER}
+            - MYSQL_DATABASE=${DB_DATABASE}
+            - MYSQL_USER=${DB_USERNAME}
             - MYSQL_PASSWORD=${DB_PASSWORD}
             - MYSQL_ALLOW_EMPTY_PASSWORD=1
         volumes:

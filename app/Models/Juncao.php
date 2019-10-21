@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright 2014 da GrandChef - GrandChef Desenvolvimento de Sistemas LTDA
  *
@@ -22,6 +23,7 @@
  *
  * @author Equipe GrandChef <desenvolvimento@grandchef.com.br>
  */
+
 namespace App\Models;
 
 use App\Concerns\ModelEvents;
@@ -39,9 +41,9 @@ class Juncao extends Model implements ValidateInterface
      * Estado a junção da mesa. Associado: a mesa está junta ao pedido,
      * Liberado: A mesa está livre, Cancelado: A mesa está liberada
      */
-    const ESTADO_ASSOCIADO = 'associado';
-    const ESTADO_LIBERADO = 'liberado';
-    const ESTADO_CANCELADO = 'cancelado';
+    public const ESTADO_ASSOCIADO = 'associado';
+    public const ESTADO_LIBERADO = 'liberado';
+    public const ESTADO_CANCELADO = 'cancelado';
 
     /**
      * The table associated with the model.

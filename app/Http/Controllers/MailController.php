@@ -7,7 +7,7 @@ use Tymon\JWTAuth\Facades\JWTAuth;
 
 class MailController extends Controller
 {
-    public static function activeUser($token)
+    public function activeUser($token)
     {
         $token = JWTAuth::parseToken()->authenticate();
         if ($token) {

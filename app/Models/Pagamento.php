@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright 2014 da GrandChef - GrandChef Desenvolvimento de Sistemas LTDA
  *
@@ -22,6 +23,7 @@
  *
  * @author Equipe GrandChef <desenvolvimento@grandchef.com.br>
  */
+
 namespace App\Models;
 
 use App\Concerns\ModelEvents;
@@ -38,16 +40,16 @@ class Pagamento extends Model implements ValidateInterface
     /**
      * Informa qual o andamento do processo de pagamento
      */
-    const ESTADO_ABERTO = 'aberto';
-    const ESTADO_AGUARDANDO = 'aguardando';
-    const ESTADO_ANALISE = 'analise';
-    const ESTADO_PAGO = 'pago';
-    const ESTADO_DISPUTA = 'disputa';
-    const ESTADO_DEVOLVIDO = 'devolvido';
-    const ESTADO_CANCELADO = 'cancelado';
+    public const ESTADO_ABERTO = 'aberto';
+    public const ESTADO_AGUARDANDO = 'aguardando';
+    public const ESTADO_ANALISE = 'analise';
+    public const ESTADO_PAGO = 'pago';
+    public const ESTADO_DISPUTA = 'disputa';
+    public const ESTADO_DEVOLVIDO = 'devolvido';
+    public const ESTADO_CANCELADO = 'cancelado';
 
-    const CREATED_AT = 'data_lancamento';
-    const UPDATED_AT = null;
+    public const CREATED_AT = 'data_lancamento';
+    public const UPDATED_AT = null;
 
     /**
      * The table associated with the model.

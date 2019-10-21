@@ -1,6 +1,11 @@
 {
     "better-phpunit.phpunitBinary": "${workspaceFolder}/vendor/bin/phpunit",
     "better-phpunit.commandSuffix": "--no-coverage",
+    "phpcs.standard": "PSR12",
     "phpcs.executablePath": "vendor/bin/phpcs",
-    "phpcs.enable": false
+    "phpcs.ignorePatterns": [
+        "storage/*",
+        "vendor/*"
+    ],
+    "phpcs.enable": true
 }

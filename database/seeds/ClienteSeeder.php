@@ -14,27 +14,13 @@ class ClienteSeeder extends Seeder
     {
         (new Cliente([
             'tipo' => Cliente::TIPO_FISICA,
-            'empresa_id' => null,
             'login' => 'admin',
             'senha' => 'Teste123',
             'nome' => 'Beta',
-            'sobrenome' => 'teste',
+            'sobrenome' => 'Teste',
             'genero' => Cliente::GENERO_MASCULINO,
-            'cpf' => '70724444084',
-            'rg' => null,
-            'im' => null,
             'email' => 'beta@grandchef.com.br',
-            'data_nascimento' => null,
-            'slogan' => null,
-            'status' => Cliente::STATUS_INATIVO,
-            'secreto' => null,
-            'limite_compra' => null,
-            'instagram' => null,
-            'facebook_url' => null,
-            'twitter' => null,
-            'linkedin_url' => null,
-            'imagem_url' => null,
-            'linguagem' => null,
+            'status' => Cliente::STATUS_ATIVO,
         ]))->save();
     }
 }

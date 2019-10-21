@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright 2014 da GrandChef - GrandChef Desenvolvimento de Sistemas LTDA
  *
@@ -22,11 +23,13 @@
  *
  * @author Equipe GrandChef <desenvolvimento@grandchef.com.br>
  */
+
 namespace App\Models;
 
 use App\Concerns\ModelEvents;
 use App\Interfaces\ValidateInterface;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
  * Informa as propriedades da composição de um produto composto
@@ -34,14 +37,17 @@ use Illuminate\Database\Eloquent\Model;
 class Composicao extends Model implements ValidateInterface
 {
     use ModelEvents;
+    use SoftDeletes;
+
+    public const DELETED_AT = 'data_remocao';
 
     /**
      * Tipo de composição, 'Composicao' sempre retira do estoque, 'Opcional'
      * permite desmarcar na venda, 'Adicional' permite adicionar na venda
      */
-    const TIPO_COMPOSICAO = 'composicao';
-    const TIPO_OPCIONAL = 'opcional';
-    const TIPO_ADICIONAL = 'adicional';
+    public const TIPO_COMPOSICAO = 'composicao';
+    public const TIPO_OPCIONAL = 'opcional';
+    public const TIPO_ADICIONAL = 'adicional';
 
     /**
      * The table associated with the model.
@@ -70,7 +76,6 @@ class Composicao extends Model implements ValidateInterface
         'valor',
         'quantidade_maxima',
         'ativa',
-        'data_remocao',
     ];
 
     /**

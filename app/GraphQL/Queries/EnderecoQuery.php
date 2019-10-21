@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright 2014 da GrandChef - GrandChef Desenvolvimento de Sistemas LTDA
  *
@@ -30,7 +31,6 @@ namespace App\GraphQL\Queries;
 use App\Models\Endereco;
 use App\GraphQL\Utils\Filter;
 use App\GraphQL\Utils\Ordering;
-
 use Closure;
 use GraphQL\Type\Definition\Type;
 use Rebing\GraphQL\Support\Query;

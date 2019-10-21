@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright 2014 da GrandChef - GrandChef Desenvolvimento de Sistemas LTDA
  *
@@ -22,6 +23,7 @@
  *
  * @author Equipe GrandChef <desenvolvimento@grandchef.com.br>
  */
+
 namespace App\Models;
 
 use App\Concerns\ModelEvents;
@@ -40,9 +42,9 @@ class Horario extends Model implements ValidateInterface
      * o estabelecimento estará aberto, Operação: quando aceitar novos pedidos
      * locais, Entrega: quando aceita ainda pedidos para entrega
      */
-    const MODO_FUNCIONAMENTO = 'funcionamento';
-    const MODO_OPERACAO = 'operacao';
-    const MODO_ENTREGA = 'entrega';
+    public const MODO_FUNCIONAMENTO = 'funcionamento';
+    public const MODO_OPERACAO = 'operacao';
+    public const MODO_ENTREGA = 'entrega';
 
     /**
      * The table associated with the model.

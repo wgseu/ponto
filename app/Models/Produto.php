@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright 2014 da GrandChef - GrandChef Desenvolvimento de Sistemas LTDA
  *
@@ -22,9 +23,9 @@
  *
  * @author Equipe GrandChef <desenvolvimento@grandchef.com.br>
  */
+
 namespace App\Models;
 
-use App\Models\Item;
 use App\Concerns\ModelEvents;
 use App\Interfaces\ValidateInterface;
 use Illuminate\Database\Eloquent\Model;
@@ -45,13 +46,13 @@ class Produto extends Model implements ValidateInterface
      * composto de outros produtos ou composições, Pacote: Permite a composição
      * no momento da venda, não possui estoque diretamente
      */
-    const TIPO_PRODUTO = 'produto';
-    const TIPO_COMPOSICAO = 'composicao';
-    const TIPO_PACOTE = 'pacote';
+    public const TIPO_PRODUTO = 'produto';
+    public const TIPO_COMPOSICAO = 'composicao';
+    public const TIPO_PACOTE = 'pacote';
 
-    const UPDATED_AT = 'data_atualizacao';
-    const DELETED_AT = 'data_arquivado';
-    const CREATED_AT = null;
+    public const UPDATED_AT = 'data_atualizacao';
+    public const DELETED_AT = 'data_arquivado';
+    public const CREATED_AT = null;
 
     /**
      * The table associated with the model.
@@ -154,12 +155,12 @@ class Produto extends Model implements ValidateInterface
     public function validate()
     {
         $errors = [];
+        $old = $this->fresh();
         $item = Item::where('produto_id', $this->produto_id);
-
         if (
-            $this->tipo == self::TIPO_COMPOSICAO
-            || $this->tipo == self::TIPO_PACOTE
-            || $item->exists()
+            !is_null($old)
+            && $this->tipo != $old->tipo
+            && $item->exists()
         ) {
             $errors['tipo'] = __('messages.produto_already_packaged');
         }

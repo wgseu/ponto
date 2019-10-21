@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright 2014 da GrandChef - GrandChef Desenvolvimento de Sistemas LTDA
  *
@@ -22,6 +23,7 @@
  *
  * @author Equipe GrandChef <desenvolvimento@grandchef.com.br>
  */
+
 namespace App\Models;
 
 use App\Concerns\ModelEvents;
@@ -38,16 +40,16 @@ class Auditoria extends Model implements ValidateInterface
     /**
      * Tipo de atividade exercida
      */
-    const TIPO_FINANCEIRO = 'financeiro';
-    const TIPO_ADMINISTRATIVO = 'administrativo';
-    const TIPO_OPERACIONAL = 'operacional';
+    public const TIPO_FINANCEIRO = 'financeiro';
+    public const TIPO_ADMINISTRATIVO = 'administrativo';
+    public const TIPO_OPERACIONAL = 'operacional';
 
     /**
      * Prioridade de acesso do recurso
      */
-    const PRIORIDADE_BAIXA = 'baixa';
-    const PRIORIDADE_MEDIA = 'media';
-    const PRIORIDADE_ALTA = 'alta';
+    public const PRIORIDADE_BAIXA = 'baixa';
+    public const PRIORIDADE_MEDIA = 'media';
+    public const PRIORIDADE_ALTA = 'alta';
 
     /**
      * The table associated with the model.

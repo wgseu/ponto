@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright 2014 da GrandChef - GrandChef Desenvolvimento de Sistemas LTDA
  *
@@ -22,6 +23,7 @@
  *
  * @author Equipe GrandChef <desenvolvimento@grandchef.com.br>
  */
+
 namespace App\Models;
 
 use App\Concerns\ModelEvents;
@@ -40,12 +42,12 @@ class Lista extends Model implements ValidateInterface
      * produtos na lista, Fechada: Está pronto para compra, Comprada: Todos os
      * itens foram comprados
      */
-    const ESTADO_ANALISE = 'analise';
-    const ESTADO_FECHADA = 'fechada';
-    const ESTADO_COMPRADA = 'comprada';
+    public const ESTADO_ANALISE = 'analise';
+    public const ESTADO_FECHADA = 'fechada';
+    public const ESTADO_COMPRADA = 'comprada';
 
-    const CREATED_AT = 'data_cadastro';
-    const UPDATED_AT = null;
+    public const CREATED_AT = 'data_cadastro';
+    public const UPDATED_AT = null;
 
     /**
      * The table associated with the model.

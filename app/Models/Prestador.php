@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright 2014 da GrandChef - GrandChef Desenvolvimento de Sistemas LTDA
  *
@@ -22,6 +23,7 @@
  *
  * @author Equipe GrandChef <desenvolvimento@grandchef.com.br>
  */
+
 namespace App\Models;
 
 use App\Concerns\ModelEvents;
@@ -39,12 +41,12 @@ class Prestador extends Model implements ValidateInterface
      * Vínculo empregatício com a empresa, funcionário e autônomo são pessoas
      * físicas, prestador é pessoa jurídica
      */
-    const VINCULO_FUNCIONARIO = 'funcionario';
-    const VINCULO_PRESTADOR = 'prestador';
-    const VINCULO_AUTONOMO = 'autonomo';
+    public const VINCULO_FUNCIONARIO = 'funcionario';
+    public const VINCULO_PRESTADOR = 'prestador';
+    public const VINCULO_AUTONOMO = 'autonomo';
 
-    const CREATED_AT = 'data_cadastro';
-    const UPDATED_AT = null;
+    public const CREATED_AT = 'data_cadastro';
+    public const UPDATED_AT = null;
 
     /**
      * The table associated with the model.

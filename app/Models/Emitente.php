@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright 2014 da GrandChef - GrandChef Desenvolvimento de Sistemas LTDA
  *
@@ -22,6 +23,7 @@
  *
  * @author Equipe GrandChef <desenvolvimento@grandchef.com.br>
  */
+
 namespace App\Models;
 
 use App\Concerns\ModelEvents;
@@ -38,8 +40,8 @@ class Emitente extends Model implements ValidateInterface
     /**
      * Ambiente de emissão das notas
      */
-    const AMBIENTE_HOMOLOGACAO = 'homologacao';
-    const AMBIENTE_PRODUCAO = 'producao';
+    public const AMBIENTE_HOMOLOGACAO = 'homologacao';
+    public const AMBIENTE_PRODUCAO = 'producao';
 
     /**
      * The table associated with the model.

@@ -10,3 +10,5 @@ npm-debug.log
 database/model/model.mwb.bak
 **/*.pyc
 .phpunit.result.cache
+public/static/
+public/index.html

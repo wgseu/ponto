@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright 2014 da GrandChef - GrandChef Desenvolvimento de Sistemas LTDA
  *
@@ -22,6 +23,7 @@
  *
  * @author Equipe GrandChef <desenvolvimento@grandchef.com.br>
  */
+
 namespace App\Models;
 
 use App\Concerns\ModelEvents;
@@ -40,16 +42,16 @@ class Carteira extends Model implements ValidateInterface
      * carteira financeira da empresa ou de sites de pagamentos, 'Credito' para
      * cartão de crédito e 'Local' para caixas e cofres locais
      */
-    const TIPO_BANCARIA = 'bancaria';
-    const TIPO_FINANCEIRA = 'financeira';
-    const TIPO_CREDITO = 'credito';
-    const TIPO_LOCAL = 'local';
+    public const TIPO_BANCARIA = 'bancaria';
+    public const TIPO_FINANCEIRA = 'financeira';
+    public const TIPO_CREDITO = 'credito';
+    public const TIPO_LOCAL = 'local';
 
     /**
      * Ambiente de execução da API usando o token
      */
-    const AMBIENTE_TESTE = 'teste';
-    const AMBIENTE_PRODUCAO = 'producao';
+    public const AMBIENTE_TESTE = 'teste';
+    public const AMBIENTE_PRODUCAO = 'producao';
 
     /**
      * The table associated with the model.

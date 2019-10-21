@@ -1,6 +1,5 @@
 <?php
 
-use App\Http\Controllers\MailController;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -12,6 +11,6 @@ use App\Http\Controllers\MailController;
 |
 */
 
-Route::get('/active/{token}', function ($token) {
-    return MailController::activeUser($token);
-});
+Route::get('/active/{token}', 'MailController@activeUser');
+
+Route::get('/{page}', 'IndexController@any')->where('page', '.*');

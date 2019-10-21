@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright 2014 da GrandChef - GrandChef Desenvolvimento de Sistemas LTDA
  *
@@ -22,6 +23,7 @@
  *
  * @author Equipe GrandChef <desenvolvimento@grandchef.com.br>
  */
+
 namespace App\Models;
 
 use App\Concerns\ModelEvents;
@@ -38,39 +40,39 @@ class Conta extends Model implements ValidateInterface
     /**
      * Tipo de conta se receita ou despesa
      */
-    const TIPO_RECEITA = 'receita';
-    const TIPO_DESPESA = 'despesa';
+    public const TIPO_RECEITA = 'receita';
+    public const TIPO_DESPESA = 'despesa';
 
     /**
      * Fonte dos valores, comissão e remuneração se pagar antes do vencimento,
      * o valor será proporcional
      */
-    const FONTE_FIXA = 'fixa';
-    const FONTE_VARIAVEL = 'variavel';
-    const FONTE_COMISSAO = 'comissao';
-    const FONTE_REMUNERACAO = 'remuneracao';
+    public const FONTE_FIXA = 'fixa';
+    public const FONTE_VARIAVEL = 'variavel';
+    public const FONTE_COMISSAO = 'comissao';
+    public const FONTE_REMUNERACAO = 'remuneracao';
 
     /**
      * Modo de cobrança se diário ou mensal, a quantidade é definida em
      * frequencia
      */
-    const MODO_DIARIO = 'diario';
-    const MODO_MENSAL = 'mensal';
+    public const MODO_DIARIO = 'diario';
+    public const MODO_MENSAL = 'mensal';
 
     /**
      * Fórmula de juros que será cobrado em caso de atraso
      */
-    const FORMULA_SIMPLES = 'simples';
-    const FORMULA_COMPOSTO = 'composto';
+    public const FORMULA_SIMPLES = 'simples';
+    public const FORMULA_COMPOSTO = 'composto';
 
     /**
      * Informa o estado da conta
      */
-    const ESTADO_ANALISE = 'analise';
-    const ESTADO_ATIVA = 'ativa';
-    const ESTADO_PAGA = 'paga';
-    const ESTADO_CANCELADA = 'cancelada';
-    const ESTADO_DESATIVADA = 'desativada';
+    public const ESTADO_ANALISE = 'analise';
+    public const ESTADO_ATIVA = 'ativa';
+    public const ESTADO_PAGA = 'paga';
+    public const ESTADO_CANCELADA = 'cancelada';
+    public const ESTADO_DESATIVADA = 'desativada';
 
     /**
      * The table associated with the model.

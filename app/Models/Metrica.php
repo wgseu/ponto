@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright 2014 da GrandChef - GrandChef Desenvolvimento de Sistemas LTDA
  *
@@ -22,6 +23,7 @@
  *
  * @author Equipe GrandChef <desenvolvimento@grandchef.com.br>
  */
+
 namespace App\Models;
 
 use App\Concerns\ModelEvents;
@@ -42,12 +44,12 @@ class Metrica extends Model implements ValidateInterface
      * Tipo de métrica que pode ser velocidade de entrega, quantidade no
      * atendimento, sabor da comida e apresentação do prato
      */
-    const TIPO_ENTREGA = 'entrega';
-    const TIPO_ATENDIMENTO = 'atendimento';
-    const TIPO_PRODUCAO = 'producao';
-    const TIPO_APRESENTACAO = 'apresentacao';
+    public const TIPO_ENTREGA = 'entrega';
+    public const TIPO_ATENDIMENTO = 'atendimento';
+    public const TIPO_PRODUCAO = 'producao';
+    public const TIPO_APRESENTACAO = 'apresentacao';
 
-    const DELETED_AT = 'data_arquivado';
+    public const DELETED_AT = 'data_arquivado';
 
     /**
      * The table associated with the model.

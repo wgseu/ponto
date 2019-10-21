@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright 2014 da GrandChef - GrandChef Desenvolvimento de Sistemas LTDA
  *
@@ -22,6 +23,7 @@
  *
  * @author Equipe GrandChef <desenvolvimento@grandchef.com.br>
  */
+
 namespace App\Models;
 
 use App\Concerns\ModelEvents;
@@ -38,24 +40,24 @@ class Cupom extends Model implements ValidateInterface
     /**
      * Informa se o desconto será por valor ou porcentagem
      */
-    const TIPO_DESCONTO_VALOR = 'valor';
-    const TIPO_DESCONTO_PORCENTAGEM = 'porcentagem';
+    public const TIPO_DESCONTO_VALOR = 'valor';
+    public const TIPO_DESCONTO_PORCENTAGEM = 'porcentagem';
 
     /**
      * Informa a regra para decidir se a quantidade de pedidos permite usar
      * esse cupom
      */
-    const FUNCAO_PEDIDOS_MENOR = 'menor';
-    const FUNCAO_PEDIDOS_IGUAL = 'igual';
-    const FUNCAO_PEDIDOS_MAIOR = 'maior';
+    public const FUNCAO_PEDIDOS_MENOR = 'menor';
+    public const FUNCAO_PEDIDOS_IGUAL = 'igual';
+    public const FUNCAO_PEDIDOS_MAIOR = 'maior';
 
     /**
      * Informa a regra para decidir se o valor do pedido permite usar esse
      * cupom
      */
-    const FUNCAO_VALOR_MENOR = 'menor';
-    const FUNCAO_VALOR_IGUAL = 'igual';
-    const FUNCAO_VALOR_MAIOR = 'maior';
+    public const FUNCAO_VALOR_MENOR = 'menor';
+    public const FUNCAO_VALOR_IGUAL = 'igual';
+    public const FUNCAO_VALOR_MAIOR = 'maior';
 
     /**
      * The table associated with the model.

@@ -1,0 +1,7 @@
+mutation ($input: MoedaUpdateInput!, $id: ID!) {
+  UpdateMoeda(id: $id, input: $input) 
+  {
+    id
+    nome
+  }
+}

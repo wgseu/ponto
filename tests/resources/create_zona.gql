@@ -1,0 +1,8 @@
+mutation zona($input: ZonaInput!)
+{
+  CreateZona(input: $input) 
+  {
+    id 
+    nome
+  }
+}

@@ -1,0 +1,10 @@
+query ($id: ID!) {
+  creditos (filter: {id: $id}) {
+    data{
+      id
+      cliente_id
+      detalhes
+      cancelado
+    }
+  }
+}

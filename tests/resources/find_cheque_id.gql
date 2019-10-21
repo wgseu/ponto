@@ -1,0 +1,11 @@
+query ($id: ID!){
+  cheques(filter: {id: $id}) {
+    data{
+      agencia
+      conta
+      numero
+      valor
+      id
+    }
+  }
+}

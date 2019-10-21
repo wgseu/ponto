@@ -1,0 +1,11 @@
+mutation zona($input: ZonaUpdateInput!, $id: ID!)
+{
+  UpdateZona(input: $input, id: $id) 
+  {
+    nome
+    bairro_id
+    adicional_entrega
+    disponivel
+  }
+}
+

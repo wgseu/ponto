@@ -1,0 +1,7 @@
+mutation zona($id: ID!)
+{
+  DeleteZona(id: $id) 
+  {
+    id
+  }
+}

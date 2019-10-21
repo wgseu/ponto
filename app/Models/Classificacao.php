@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright 2014 da GrandChef - GrandChef Desenvolvimento de Sistemas LTDA
  *
@@ -22,11 +23,13 @@
  *
  * @author Equipe GrandChef <desenvolvimento@grandchef.com.br>
  */
+
 namespace App\Models;
 
 use App\Concerns\ModelEvents;
 use App\Interfaces\ValidateInterface;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Validation\ValidationException;
 
 /**
  * Classificação se contas, permite atribuir um grupo de contas
@@ -69,7 +72,33 @@ class Classificacao extends Model implements ValidateInterface
         return $this->belongsTo('App\Models\Classificacao', 'classificacao_id');
     }
 
+    /**
+     * Regras:
+     * subclassificação não pode ser referencia para uma uma nova subclassificação.
+     * Depois de usada com referência uma Classificação não pode alterar a subclassificação.
+     */
     public function validate()
     {
+        $errors = [];
+        if (!is_null($this->classificacao_id)) {
+            $classificacaopai = $this->classificacao;
+            if (is_null($classificacaopai)) {
+                $errors['classificacaoid'] = __('messagens.classificacaopai_not_found');
+            } elseif (!is_null($classificacaopai->classificacao_id)) {
+                $errors['classificacaoid'] = __('messagens.classificacaopai_already');
+            } elseif ($this->id == $this->classificacao_id) {
+                $errors['classificacaoid'] = __('messagens.classificacaopai_some');
+            }
+        }
+        if ($this->exists) {
+            $classificacao = self::where('classificacao_id', $this->id);
+            $oldClassificacao = self::find($this->id);
+            if ($classificacao->exists() && $oldClassificacao->classificacao_id != $this->classificacao_id) {
+                $errors['classificacaoid'] = __('messagens.classificacao_invalid_update');
+            }
+        }
+        if (!empty($errors)) {
+            throw ValidationException::withMessages($errors);
+        }
     }
 }

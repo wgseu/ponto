@@ -1,0 +1,8 @@
+query ($id: ID!){
+  moedas(filter: {id: $id}) {
+    data {
+      id
+      nome
+    }
+  }
+}

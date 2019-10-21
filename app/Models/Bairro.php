@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright 2014 da GrandChef - GrandChef Desenvolvimento de Sistemas LTDA
  *
@@ -22,11 +23,13 @@
  *
  * @author Equipe GrandChef <desenvolvimento@grandchef.com.br>
  */
+
 namespace App\Models;
 
 use App\Concerns\ModelEvents;
 use App\Interfaces\ValidateInterface;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Validation\ValidationException;
 
 /**
  * Bairro de uma cidade
@@ -82,7 +85,24 @@ class Bairro extends Model implements ValidateInterface
         return $this->belongsTo('App\Models\Cidade', 'cidade_id');
     }
 
+    /**
+     * Regras:
+     * Se não nulas o prazo de  entrega minima não pode ser superior ao prazo de entrega maximo;
+     * O valor da entrega não pode ser negativo.
+     */
     public function validate()
     {
+        $errors = [];
+        if (!is_null($this->entrega_minima) && !is_null($this->entrega_maxima)) {
+            if ($this->entrega_minima > $this->entrega_maxima) {
+                $errors['entrega_minima'] = __('messagens.error_time_delivery');
+            }
+        }
+        if ($this->valor_entrega < 0) {
+            $errors['value_delivery_negative'] = __('messagens.error_time_delivery');
+        }
+        if (!empty($errors)) {
+            throw ValidationException::withMessages($errors);
+        }
     }
 }

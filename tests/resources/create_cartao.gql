@@ -1,0 +1,7 @@
+mutation createCartao($input: CartaoInput!) {
+  CreateCartao(input: $input) {
+    id
+    forma_id
+    bandeira
+  }
+}

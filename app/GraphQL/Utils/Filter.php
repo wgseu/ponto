@@ -70,7 +70,7 @@ class Filter
                     break;
                 case 'between':
                     if (!isset($value['start']) || !isset($value['end'])) {
-                        continue;
+                        break;
                     }
                     $condition[] = [$key, 'between', [$value['start'], $value['end']]];
                     break;

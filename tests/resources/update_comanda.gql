@@ -1,0 +1,6 @@
+mutation updateComanda($id: ID!, $input: ComandaUpdateInput!) {
+  UpdateComanda(id: $id, input: $input) {
+    numero
+    nome
+  }
+}

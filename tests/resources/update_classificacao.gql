@@ -1,0 +1,7 @@
+mutation ($input: ClassificacaoUpdateInput!, $id: ID!) {
+  UpdateClassificacao(input: $input, id: $id) {
+    id
+    descricao
+    classificacao_id
+  }
+}

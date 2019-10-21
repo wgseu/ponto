@@ -1,0 +1,8 @@
+mutation ($id: ID!)
+{
+  DeleteMoeda(id: $id) 
+  {
+    id
+    nome
+  }
+}

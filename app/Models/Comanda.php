@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright 2014 da GrandChef - GrandChef Desenvolvimento de Sistemas LTDA
  *
@@ -22,11 +23,13 @@
  *
  * @author Equipe GrandChef <desenvolvimento@grandchef.com.br>
  */
+
 namespace App\Models;
 
 use App\Concerns\ModelEvents;
 use App\Interfaces\ValidateInterface;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Validation\ValidationException;
 
 /**
  * Comanda individual, permite lançar pedidos em cartões de consumo
@@ -69,7 +72,27 @@ class Comanda extends Model implements ValidateInterface
         'ativa' => true,
     ];
 
+    /**
+     * Regras:
+     * Uma comanda não pode ser desativada se houver pedidos relacionado a elas que não estejam concluidos ou cancelados
+     * Uma comanda não pode ser criada ja desativada.
+     */
     public function validate()
     {
+        $old_comanda = self::find($this->id);
+        if ($this->exists && $old_comanda->ativa && !$this->ativa) {
+            $pedido = Pedido::where('comanda_id', $this->id)
+                ->where('estado', '<>', Pedido::ESTADO_CONCLUIDO)
+                ->where('estado', '<>', Pedido::ESTADO_CANCELADO);
+            if ($pedido->exists()) {
+                $errors['ativa'] = __('messages.comanda_ativa_open');
+            }
+        }
+        if (!$this->exists && !$this->ativa) {
+            $errors['ativa'] = __('messages.comanda_inativa_invalid');
+        }
+        if (!empty($errors)) {
+            throw new ValidationException($errors);
+        }
     }
 }

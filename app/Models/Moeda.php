@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright 2014 da GrandChef - GrandChef Desenvolvimento de Sistemas LTDA
  *
@@ -22,11 +23,13 @@
  *
  * @author Equipe GrandChef <desenvolvimento@grandchef.com.br>
  */
+
 namespace App\Models;
 
 use App\Concerns\ModelEvents;
 use App\Interfaces\ValidateInterface;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Validation\ValidationException;
 
 /**
  * Moedas financeiras de um país
@@ -35,8 +38,8 @@ class Moeda extends Model implements ValidateInterface
 {
     use ModelEvents;
 
-    const UPDATED_AT = 'data_atualizacao';
-    const CREATED_AT = null;
+    public const UPDATED_AT = 'data_atualizacao';
+    public const CREATED_AT = null;
 
     /**
      * The table associated with the model.
@@ -70,7 +73,30 @@ class Moeda extends Model implements ValidateInterface
         'ativa' => false,
     ];
 
+    /**
+     * Ainda falta a regra de Moeda atual do país deve ter conversão igual a 1
+     * Regras:
+     * Para o país ativo a conversaõ da moeda ver ser igual a 1;
+     * Formato deve conter :value, espaço e simbolo;
+     * Se a moeda estiver ativa a conversão não pode ser nula;
+     */
     public function validate()
     {
+        $errors = [];
+        $value = strpos($this->formato, ':value');
+        $simbolo = explode(' ', $this->formato);
+        $lista = [1,10,100,1000,10000];
+        if ($this->ativa && is_null($this->conversao)) {
+            $errors['conversao'] = __('messages.moeda_active_null_conversion');
+        }
+        if (!$value || count($simbolo) > 2) {
+            $errors['formato'] = __('messages.moeda_invalid_format');
+        }
+        if (!in_array($this->divisao, $lista)) {
+            $errors['divisao'] = __('messages.moeda_invalid_divisao');
+        }
+        if (!empty($errors)) {
+            throw ValidationException::withMessages($errors);
+        }
     }
 }

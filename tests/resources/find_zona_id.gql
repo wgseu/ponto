@@ -1,0 +1,10 @@
+query zona($id: ID!)
+{
+  zonas(filter: {id: $id}) 
+  {
+    data{
+      id
+      nome
+    }
+  }
+}

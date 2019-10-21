@@ -5,6 +5,7 @@
 use App\Models\Cheque;
 use App\Models\Cliente;
 use App\Models\Banco;
+use Carbon\Carbon;
 use Faker\Generator as Faker;
 
 $factory->define(Cheque::class, function (Faker $faker) {

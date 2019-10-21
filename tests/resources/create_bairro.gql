@@ -1,0 +1,8 @@
+mutation createBairro($input: BairroInput!) {
+  CreateBairro(input: $input) {
+    id
+    cidade_id
+    nome
+    valor_entrega
+  }
+}

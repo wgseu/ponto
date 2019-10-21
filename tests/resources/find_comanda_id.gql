@@ -1,0 +1,9 @@
+query ($id: ID!){
+  comandas(filter: {id: $id}) {
+    data{
+      nome
+      numero
+      id
+    }
+  }
+}

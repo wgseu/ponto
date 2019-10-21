@@ -1,0 +1,9 @@
+query ($id: ID!){
+  setores(filter: {id: $id}) {
+    data{
+      nome
+      descricao
+      id
+    }
+  }
+}

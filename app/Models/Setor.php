@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright 2014 da GrandChef - GrandChef Desenvolvimento de Sistemas LTDA
  *
@@ -22,11 +23,13 @@
  *
  * @author Equipe GrandChef <desenvolvimento@grandchef.com.br>
  */
+
 namespace App\Models;
 
 use App\Concerns\ModelEvents;
 use App\Interfaces\ValidateInterface;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Validation\ValidationException;
 
 /**
  * Setor de impressão e de estoque
@@ -68,7 +71,33 @@ class Setor extends Model implements ValidateInterface
         return $this->belongsTo('App\Models\Setor', 'setor_id');
     }
 
+    /**
+     * Regras:
+     * Subsetor não pode ser referência para uma uma nova subsetor.
+     * Depois de ser usuado como referência um setor não pode alterar o setor_id para uma subsetor.
+     */
     public function validate()
     {
+        $errors = [];
+        if (!is_null($this->setor_id)) {
+            $setorpai = $this->setor;
+            if (is_null($setorpai)) {
+                $errors['setorid'] = __('messagens.setorpai_not_found');
+            } elseif (!is_null($setorpai->setor_id)) {
+                $errors['setorid'] = __('messagens.setorpai_already');
+            } elseif ($this->id == $this->setor_id) {
+                $errors['setorid'] = __('messagens.setorpai_some');
+            }
+        }
+        if ($this->exists) {
+            $setor = self::where('setor_id', $this->id);
+            $oldSetor = self::find($this->id);
+            if ($setor->exists() && $oldSetor->setor_id != $this->setor_id) {
+                $errors['setorid'] = __('messagens.setorpai_invalid_update');
+            }
+        }
+        if (!empty($errors)) {
+            throw ValidationException::withMessages($errors);
+        }
     }
 }

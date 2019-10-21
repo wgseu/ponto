@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright 2014 da GrandChef - GrandChef Desenvolvimento de Sistemas LTDA
  *
@@ -22,12 +23,14 @@
  *
  * @author Equipe GrandChef <desenvolvimento@grandchef.com.br>
  */
+
 namespace App\Models;
 
 use App\Concerns\ModelEvents;
 use App\Interfaces\ValidateInterface;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Validation\ValidationException;
 
 /**
  * Informa qual a categoria dos produtos e permite a rápida localização dos
@@ -38,9 +41,9 @@ class Categoria extends Model implements ValidateInterface
     use ModelEvents;
     use SoftDeletes;
 
-    const UPDATED_AT = 'data_atualizacao';
-    const DELETED_AT = 'data_arquivado';
-    const CREATED_AT = null;
+    public const UPDATED_AT = 'data_atualizacao';
+    public const DELETED_AT = 'data_arquivado';
+    public const CREATED_AT = null;
 
     /**
      * The table associated with the model.
@@ -80,7 +83,33 @@ class Categoria extends Model implements ValidateInterface
         return $this->belongsTo('App\Models\Categoria', 'categoria_id');
     }
 
+    /**
+     * Regras:
+     * Subcategoria não pode ser referencia para uma uma nova subcategoria.
+     * Depois de usada com referência uma categoria não pode alterar a subcategoria.
+     */
     public function validate()
     {
+        $errors = [];
+        if (!is_null($this->categoria_id)) {
+            $categoriapai = $this->categoria;
+            if (is_null($categoriapai)) {
+                $errors['categoriaid'] = __('messagens.categoriapai_not_found');
+            } elseif (!is_null($categoriapai->categoria_id)) {
+                $errors['categoriaid'] = __('messagens.categoriapai_already');
+            } elseif ($this->id == $this->categoria_id) {
+                $errors['categoriaid'] = __('messagens.categoriapai_some');
+            }
+        }
+        if ($this->exists) {
+            $categoria = self::where('categoria_id', $this->id);
+            $oldCategoria = self::find($this->id);
+            if ($categoria->exists() && $oldCategoria->categoria_id != $this->categoria_id) {
+                $errors['categoriaid'] = __('messagens.categoriapai_invalid_update');
+            }
+        }
+        if (!empty($errors)) {
+            throw ValidationException::withMessages($errors);
+        }
     }
 }

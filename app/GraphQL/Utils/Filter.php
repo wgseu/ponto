@@ -87,7 +87,7 @@ class Filter
                     break;
                 case 'between':
                     if (!isset($value['start']) || !isset($value['end'])) {
-                        continue;
+                        break;
                     }
                     $query->whereBetween($key, [$value['start'], $value['end']]);
                     break;

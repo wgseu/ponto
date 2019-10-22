@@ -29,6 +29,7 @@ namespace App\Models;
 use App\Concerns\ModelEvents;
 use App\Interfaces\ValidateInterface;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Validation\ValidationException;
 
 /**
  * Comanda individual, permite lançar pedidos em cartões de consumo
@@ -71,7 +72,25 @@ class Comanda extends Model implements ValidateInterface
         'ativa' => true,
     ];
 
+    /**
+     * Regras:
+     * Uma comanda não pode ser desativada se ja estiver agrupada a algum pedido,
+     * Não é possível criar uma comanda inativa.
+     */
     public function validate()
     {
+        $old_comanda = $this->fresh();
+        if ($this->exists && $old_comanda->ativa && !$this->ativa) {
+            $pedido = Pedido::where('comanda_id', $this->id);
+            if ($pedido->exists()) {
+                $errors['ativa'] = __('messages.comanda_ativa_open');
+            }
+        }
+        if (!$this->exists && !$this->ativa) {
+            $errors['ativa'] = __('messages.comanda_inativa_invalid');
+        }
+        if (!empty($errors)) {
+            throw ValidationException::withMessages($errors);
+        }
     }
 }

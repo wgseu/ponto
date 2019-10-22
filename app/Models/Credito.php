@@ -29,6 +29,7 @@ namespace App\Models;
 use App\Concerns\ModelEvents;
 use App\Interfaces\ValidateInterface;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Validation\ValidationException;
 
 /**
  * Créditos de clientes
@@ -76,7 +77,62 @@ class Credito extends Model implements ValidateInterface
         return $this->belongsTo('App\Models\Cliente', 'cliente_id');
     }
 
+    /**
+     * Regras:
+     * O resgate de credito não pode ser superior ao saldo.de creditos
+     * Depois de Cancelados os creditos não podem ser modificados;
+     * Não pode cancelar um credito maior que o saldo de creditos.
+     * Impossivel tranferir abatimento para outros clientes;
+     * Uma transferencia de credito não pode deixar saldo negativo.
+     * Impossível criar um credito já cancelando;
+     */
     public function validate()
     {
+        $errors = [];
+        $saldo = self::where('cliente_id', $this->cliente_id)
+                    ->where('cancelado', false)
+                    ->sum('valor');
+        if (
+            $this->exists &&
+            !$this->cancelado
+        ) {
+            $oldValue = $this->fresh();
+            $saldo -= $oldValue->valor;
+        }
+        if (
+            !$this->cancelado &&
+            $this->valor < 0 &&
+            ($saldo + $this->valor) < 0
+        ) {
+            $errors['valor'] = __('messages.saldo_insufficient');
+        }
+        if ($this->exists) {
+            $oldCredito = $this->fresh();
+            if ($oldCredito->cancelado) {
+                $errors['cancelado'] = __('messages.cancel_cannot_update');
+            }
+            if (
+                $oldCredito->cliente_id == $this->cliente_id &&
+                $this->cancelado &&
+                ($saldo - $this->valor) < 0
+            ) {
+                $errors['cancelado'] = __('messages.cancel_cannot_greater');
+            }
+            if ($oldCredito->cliente_id != $this->cliente_id && $this->valor < 0) {
+                $errors['cliente_id'] = __('messages.cannot_transfer_value_negative');
+            } else {
+                $oldsaldo = self::where('cliente_id', $oldCredito->cliente_id)
+                    ->where('cancelado', false)
+                    ->sum('valor');
+                if ($this->valor > $oldsaldo) {
+                    $errors['cliente_id'] = __('messages.saldo_transfer_insufficient');
+                }
+            }
+        } elseif ($this->cancelado) {
+            $errors['cancelado'] = __('messages.cancel_cannot_create');
+        }
+        if (!empty($errors)) {
+            throw ValidationException::withMessages($errors);
+        }
     }
 }

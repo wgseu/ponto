@@ -45,9 +45,9 @@ class PacoteQuery extends Query
         'name' => 'pacotes',
     ];
 
-    public function authorize(array $args): bool
+    public function type(): Type
     {
-        return Auth::check() && Auth::user()->can('pacote:view');
+        return GraphQL::paginate('Pacote');
     }
 
     public function args(): array

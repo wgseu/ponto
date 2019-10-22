@@ -29,6 +29,7 @@ namespace App\Models;
 use App\Concerns\ModelEvents;
 use App\Interfaces\ValidateInterface;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Validation\ValidationException;
 
 /**
  * Zonas de um bairro
@@ -83,7 +84,24 @@ class Zona extends Model implements ValidateInterface
         return $this->belongsTo('App\Models\Bairro', 'bairro_id');
     }
 
+    /**
+     * Regras:
+     * Se não nulos o tempo de entrega minimo não pode ser superior ao tempo de entrega maximo;
+     * O valor adicional de entrega não pode ser negativo.
+     */
     public function validate()
     {
+        $errors = [];
+        if (!is_null($this->entrega_minima) && !is_null($this->entrega_maxima) ) {
+            if ($this->entrega_minima > $this->entrega_maxima) {
+                $errors['entrega_minima'] = __('messagens.error_time_delivery');
+            }
+        }
+        if ($this->adicional_entrega < 0) {
+            $errors['adicional_entrega'] = __('messagens.error_time_delivery');
+        }
+        if (!empty($errors)) {
+            throw ValidationException::withMessages($errors);
+        }
     }
 }

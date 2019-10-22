@@ -26,7 +26,6 @@
 
 namespace App\Models;
 
-use Exception;
 use App\Util\Validator;
 use App\Concerns\ModelEvents;
 use Illuminate\Foundation\Auth\User;
@@ -34,6 +33,7 @@ use App\Interfaces\ValidateInterface;
 use Tymon\JWTAuth\Contracts\JWTSubject;
 use Illuminate\Notifications\Notifiable;
 use App\Interfaces\AuthorizableInterface;
+use Illuminate\Validation\ValidationException;
 
 /**
  * Informações de cliente físico ou jurídico. Clientes, empresas,
@@ -184,12 +184,31 @@ class Cliente extends User implements ValidateInterface, JWTSubject, Authorizabl
             }
         }
         if (!empty($errors)) {
-            throw new Exception($errors);
+            throw ValidationException::withMessages($errors);
         }
     }
 
-    public function hasPermissionTo(string $ability)
+    /**
+     * Informa se esse cliente é dono da empresa
+     *
+     * @return boolean
+     */
+    public function isOwner()
     {
-        return true;
+        $empresa = Empresa::find('1');
+        return is_null($empresa)
+            || is_null($empresa->empresa_id)
+            || $empresa->empresa_id == $this->empresa_id;
+    }
+
+    /**
+     * Verifica se o cliente tem acesso para a permissão informada
+     *
+     * @param string $permissao
+     * @return boolean
+     */
+    public function hasPermissionTo(string $permissao)
+    {
+        return $this->isOwner() || true;
     }
 }

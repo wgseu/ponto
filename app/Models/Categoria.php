@@ -30,6 +30,7 @@ use App\Concerns\ModelEvents;
 use App\Interfaces\ValidateInterface;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Validation\ValidationException;
 
 /**
  * Informa qual a categoria dos produtos e permite a rápida localização dos
@@ -82,7 +83,33 @@ class Categoria extends Model implements ValidateInterface
         return $this->belongsTo('App\Models\Categoria', 'categoria_id');
     }
 
+    /**
+     * Regras:
+     * subcategoria não pode ser referencia para uma uma nova subcategoria.
+     * Depois de usada como referencia a categoria não pode alterar sua subcategoria.
+     */
     public function validate()
     {
+        $errors = [];
+        if (!is_null($this->categoria_id)) {
+            $categoriapai = self::find($this->categoria_id);
+            if (!$categoriapai->exists()) {
+                $errors['categoria_id'] = __('messagens.categoriapai_not_found');
+            } elseif (!is_null($categoriapai->categoria_id)) {
+                $errors['categoria_id'] = __('messagens.categoriapai_already');
+            } elseif ($this->id == $this->categoria_id) {
+                $errors['categoria_id'] = __('messagens.categoriapai_some');
+            }
+        }
+        if ($this->exists) {
+            $categoria = self::where('categoria_id', $this->id);
+            $oldCategoria = self::find($this->id);
+            if ($categoria->exists() && $oldCategoria->categoria_id != $this->categoria_id) {
+                $errors['categoria_id'] = __('messagens.categoria_invalid_update');
+            }
+        }
+        if (!empty($errors)) {
+            throw ValidationException::withMessages($errors);
+        }
     }
 }

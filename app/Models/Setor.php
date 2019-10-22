@@ -29,6 +29,7 @@ namespace App\Models;
 use App\Concerns\ModelEvents;
 use App\Interfaces\ValidateInterface;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Validation\ValidationException;
 
 /**
  * Setor de impressão e de estoque
@@ -70,7 +71,33 @@ class Setor extends Model implements ValidateInterface
         return $this->belongsTo('App\Models\Setor', 'setor_id');
     }
 
+    /**
+     * Regras:
+     * Subsetor não pode ser referência para uma uma nova subsetor.
+     * Depois de ser usuado como referência um setor não pode alterar o setor_id.
+     */
     public function validate()
     {
+        $errors = [];
+        if (!is_null($this->setor_id)) {
+            $setorpai =  self::find($this->setor_id);
+            if (!$setorpai->exists()) {
+                $errors['setor_id'] = __('messagens.setorpai_not_found');
+            } elseif (!is_null($setorpai->setor_id)) {
+                $errors['setor_id'] = __('messagens.setorpai_already');
+            } elseif ($this->id == $this->setor_id) {
+                $errors['setor_id'] = __('messagens.setorpai_some');
+            }
+        }
+        if ($this->exists) {
+            $setor = self::where('setor_id', $this->id);
+            $oldSetor = $this->fresh();
+            if ($setor->exists() && $oldSetor->setor_id != $this->setor_id) {
+                $errors['setor_id'] = __('messagens.setorpai_invalid_update');
+            }
+        }
+        if (!empty($errors)) {
+            throw ValidationException::withMessages($errors);
+        }
     }
 }

@@ -29,6 +29,7 @@ namespace App\Models;
 use App\Concerns\ModelEvents;
 use App\Interfaces\ValidateInterface;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Validation\ValidationException;
 
 /**
  * Folha de cheque lançado como pagamento
@@ -89,7 +90,42 @@ class Cheque extends Model implements ValidateInterface
         return $this->belongsTo('App\Models\Banco', 'banco_id');
     }
 
+    /**
+     * Regras:
+     * O cheque não pode ter a mesma agencia conta e numero de outro cheque a menos que ele esteje cancelado;
+     * O cheque não pode ser criado já cancelado;
+     * O cheque não pode ser alterado depois de recolhido;
+     * O cheque não pode ser alterado depois de cancelado;
+     * O valor do cheque não pode ser negativo.
+     */
     public function validate()
     {
+        $errors = [];
+        if (!$this->exists) {
+            $cheque = self::where('numero', $this->numero)
+                ->where('agencia', $this->agencia)
+                ->where('conta', $this->conta)
+                ->where('cancelado', false);
+            if ($cheque->exists()) {
+                $errors['numero'] = __('messages.duplicate_cheque');
+            }
+            if ($this->cancelado) {
+                $errors['cancelado'] = __('messages.new_canceled');
+            }
+        } else {
+            $oldCheque = $this->fresh();
+            if (!is_null($oldCheque->recolhimento)) {
+                $errors['recolhimento'] = __('messages.recolhido_cannot_update');
+            }
+            if ($oldCheque->cancelado) {
+                $errors['cancelado'] = __('messages.cancel_cannot_update');
+            }
+        }
+        if ($this->valor < 0) {
+            $errors['valor'] = __('messages.value_negative');
+        }
+        if (!empty($errors)) {
+            throw ValidationException::withMessages($errors);
+        }
     }
 }
